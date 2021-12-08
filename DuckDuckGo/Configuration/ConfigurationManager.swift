@@ -49,19 +49,14 @@ final class ConfigurationManager {
     @UserDefaultsWrapper(key: .configLastUpdated, defaultValue: .distantPast)
     var lastUpdateTime: Date
 
-    private var trackerBlockerDataUpdatedSubject = PassthroughSubject<Void, Never>()
     private var timerCancellable: AnyCancellable?
     private var refreshCancellable: AnyCancellable?
     private var lastRefreshCheckTime: Date = Date()
 
-    private let scriptSource: ScriptSourceProviding
     private let configDownloader: ConfigurationDownloading
 
     /// Use the shared instance if subscribing to events.  Only use the constructor for testing.
-    init(scriptSource: ScriptSourceProviding = DefaultScriptSourceProvider.shared,
-         configDownloader: ConfigurationDownloading = DefaultConfigurationDownloader(deliveryQueue: ConfigurationManager.queue)) {
-
-        self.scriptSource = scriptSource
+    init(configDownloader: ConfigurationDownloading = DefaultConfigurationDownloader(deliveryQueue: ConfigurationManager.queue)) {
         self.configDownloader = configDownloader
 
         os_log("Starting configuration refresh timer", log: .config, type: .debug)
@@ -72,10 +67,6 @@ final class ConfigurationManager {
                 self.lastRefreshCheckTime = Date()
                 self.refreshIfNeeded()
             })
-    }
-
-    public func trackerBlockerDataUpdatedPublisher() -> AnyPublisher<Void, Never> {
-        return trackerBlockerDataUpdatedSubject.share().eraseToAnyPublisher()
     }
 
     func log() {
@@ -153,13 +144,15 @@ final class ConfigurationManager {
 
     private func updateTrackerBlockingDependencies() throws {
 
-        TrackerRadarManager.shared.reload()
-        PrivacyConfigurationManager.shared.reload()
-        scriptSource.reload()
-        ContentBlockerRulesManager.shared.compileRules { _ in
-            self.trackerBlockerDataUpdatedSubject.send(())
-        }
+        let tdsEtag = DefaultConfigurationStorage.shared.loadEtag(for: .trackerRadar)
+        let tdsData = DefaultConfigurationStorage.shared.loadData(for: .trackerRadar)
+        ContentBlocking.trackerDataManager.reload(etag: tdsEtag, data: tdsData)
 
+        let configEtag = DefaultConfigurationStorage.shared.loadEtag(for: .privacyConfiguration)
+        let configData = DefaultConfigurationStorage.shared.loadData(for: .privacyConfiguration)
+        ContentBlocking.privacyConfigurationManager.reload(etag: configEtag, data: configData)
+
+        ContentBlocking.contentBlockingManager.scheduleCompilation()
     }
 
     private func updateBloomFilter() throws {

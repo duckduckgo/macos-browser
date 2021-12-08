@@ -86,7 +86,6 @@ final class BookmarkManagementDetailViewController: NSViewController {
         tableView.registerForDraggedTypes([BookmarkPasteboardWriter.bookmarkUTIInternalType,
                                            FolderPasteboardWriter.folderUTIInternalType])
 
-        configureTableHighlight()
         reloadData()
     }
 
@@ -101,20 +100,16 @@ final class BookmarkManagementDetailViewController: NSViewController {
         updateEditingState(forRowAt: -1)
     }
 
-    func configureTableHighlight() {
-        tableView.selectionHighlightStyle = .none
-    }
-
     fileprivate func reloadData() {
         guard editingBookmarkIndex == nil else {
             // If the table view is editing, the reload will be deferred until after the cell animation has completed.
             return
         }
-
         self.tableView.reloadData()
     }
 
-    @IBAction func handleClick(_ sender: NSTableView) {
+    private func performClickAction(_ sender: NSTableView, doubleClick: Bool) {
+
         let index = sender.clickedRow
 
         guard index != -1, let entity = fetchEntity(at: index) else {
@@ -127,12 +122,9 @@ final class BookmarkManagementDetailViewController: NSViewController {
         if row?.editing ?? false {
             return
         }
-
-        // 1. Command: Open in Background Tab
-        // 2. Command + Shift: Open in New Window
-        // 3. Default: Open in Current Tab
-
         editingBookmarkIndex = nil
+
+        guard doubleClick else { return }
 
         if let bookmark = entity as? Bookmark {
             if NSApplication.shared.isCommandPressed && NSApplication.shared.isShiftPressed {
@@ -140,16 +132,22 @@ final class BookmarkManagementDetailViewController: NSViewController {
             } else if NSApplication.shared.isCommandPressed {
                 WindowControllersManager.shared.show(url: bookmark.url, newTab: true)
             } else {
-                WindowControllersManager.shared.show(url: bookmark.url)
-                tableView.deselectAll(nil)
+                WindowControllersManager.shared.show(url: bookmark.url, newTab: true)
             }
-
             Pixel.fire(.navigation(kind: .bookmark(isFavorite: bookmark.isFavorite), source: .managementInterface))
         } else if let folder = entity as? BookmarkFolder {
+            resetSelections()
             delegate?.bookmarkManagementDetailViewControllerDidSelectFolder(folder)
-        } else {
-            assertionFailure("\(#file): Failed to cast selected object to Folder or Bookmark")
         }
+
+    }
+
+    @IBAction func handleDoubleClick(_ sender: NSTableView) {
+        performClickAction(sender, doubleClick: true)
+    }
+
+    @IBAction func handleClick(_ sender: NSTableView) {
+        performClickAction(sender, doubleClick: false)
     }
 
     @IBAction func presentAddBookmarkModal(_ sender: Any) {
@@ -266,6 +264,8 @@ extension BookmarkManagementDetailViewController: NSTableViewDelegate, NSTableVi
 
     func tableView(_ tableView: NSTableView, rowViewForRow row: Int) -> NSTableRowView? {
         let rowView = BookmarkTableRowView()
+        rowView.onSelectionChanged = onSelectionChanged
+
         let entity = fetchEntity(at: row)
 
         if let uuid = editingBookmarkIndex?.uuid, uuid == entity?.id {
@@ -290,7 +290,7 @@ extension BookmarkManagementDetailViewController: NSTableViewDelegate, NSTableVi
             } else {
                 assertionFailure("Failed to cast bookmark")
             }
-
+            cell.isSelected = tableView.selectedRowIndexes.contains(row)
             return cell
         }
 
@@ -401,6 +401,34 @@ extension BookmarkManagementDetailViewController: NSTableViewDelegate, NSTableVi
     fileprivate func selectedItems() -> [AnyObject] {
         return tableView.selectedRowIndexes.compactMap { (index) -> AnyObject? in
             return fetchEntity(at: index) as AnyObject
+        }
+    }
+
+    /// Updates the next/previous selection state of each row, and clears the selection flag.
+    fileprivate func resetSelections() {
+        guard totalRows() > 0 else { return }
+
+        let indexes = tableView.selectedRowIndexes
+        for index in 0 ..< totalRows() {
+            let row = self.tableView.rowView(atRow: index, makeIfNecessary: false) as? BookmarkTableRowView
+            row?.hasPrevious = indexes.contains(index - 1)
+            row?.hasNext = indexes.contains(index + 1)
+
+            let cell = self.tableView.view(atColumn: 0, row: index, makeIfNecessary: false) as? BookmarkTableCellView
+            cell?.isSelected = false
+        }
+    }
+        
+    func tableViewSelectionDidChange(_ notification: Notification) {
+        onSelectionChanged()
+    }
+
+    func onSelectionChanged() {
+        resetSelections()
+        let indexes = tableView.selectedRowIndexes
+        indexes.forEach {
+            let cell = self.tableView.view(atColumn: 0, row: $0, makeIfNecessary: false) as? BookmarkTableCellView
+            cell?.isSelected = true
         }
     }
 

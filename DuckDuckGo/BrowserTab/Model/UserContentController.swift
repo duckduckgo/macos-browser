@@ -18,15 +18,16 @@
 
 import WebKit
 import Combine
+import BrowserServicesKit
 
 final class UserContentController: WKUserContentController {
     private var blockingRulesUpdatedCancellable: AnyCancellable?
     
-    let privacyConfiguration: PrivacyConfigurationManagment
+    let privacyConfigurationManager: PrivacyConfigurationManager
 
-    public init(rulesPublisher: AnyPublisher<WKContentRuleList?, Never> = ContentBlockerRulesManager.shared.blockingRules,
-                privacyConfiguration: PrivacyConfigurationManagment = PrivacyConfigurationManager.shared) {
-        self.privacyConfiguration = privacyConfiguration
+    public init(rulesPublisher: ContentBlockingUpdating.NewRulesPublisher = ContentBlocking.contentBlockingUpdating.contentBlockingRules,
+                privacyConfigurationManager: PrivacyConfigurationManager = ContentBlocking.privacyConfigurationManager) {
+        self.privacyConfigurationManager = privacyConfigurationManager
         super.init()
 
         installContentBlockingRules(publisher: rulesPublisher)
@@ -36,17 +37,17 @@ final class UserContentController: WKUserContentController {
         fatalError("init(coder:) has not been implemented")
     }
 
-    func installContentBlockingRules(publisher: AnyPublisher<WKContentRuleList?, Never>) {
-        blockingRulesUpdatedCancellable = publisher.receive(on: RunLoop.main).sink { [weak self] rules in
+    func installContentBlockingRules(publisher: ContentBlockingUpdating.NewRulesPublisher) {
+        blockingRulesUpdatedCancellable = publisher.receive(on: RunLoop.main).sink { [weak self] newRules in
             dispatchPrecondition(condition: .onQueue(.main))
 
             guard let self = self,
-                  let rules = rules
+                  let newRules = newRules
             else { return }
 
             self.removeAllContentRuleLists()
-            if self.privacyConfiguration.isEnabled(featureKey: .contentBlocking) {
-                self.add(rules)
+            if self.privacyConfigurationManager.privacyConfig.isEnabled(featureKey: .contentBlocking) {
+                self.add(newRules.rules.rulesList)
             }
         }
     }

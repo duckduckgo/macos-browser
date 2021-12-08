@@ -26,6 +26,8 @@ extension NSDragOperation {
 
 final class BookmarksOutlineView: NSOutlineView {
 
+    var lastRow: RoundedSelectionRowView?
+
     override func frameOfOutlineCell(atRow row: Int) -> NSRect {
         let frame = super.frameOfOutlineCell(atRow: row)
 
@@ -48,4 +50,23 @@ final class BookmarksOutlineView: NSOutlineView {
         }
     }
 
+    override func awakeFromNib() {
+        guard let scrollView = enclosingScrollView else { fatalError() }
+
+        let trackingArea = NSTrackingArea(rect: scrollView.frame,
+                                          options: [.mouseMoved, .activeInKeyWindow, .inVisibleRect],
+                                          owner: self,
+                                          userInfo: nil)
+        scrollView.addTrackingArea(trackingArea)
+    }
+
+    override func mouseMoved(with event: NSEvent) {
+        lastRow?.highlight = false
+        let point = convert(event.locationInWindow, to: nil)
+        let row = row(at: point)
+        guard row >= 0, let rowView = rowView(atRow: row, makeIfNecessary: false) as? RoundedSelectionRowView else { return }
+        let item = item(atRow: row) as? BookmarkNode
+        rowView.highlight = !(item?.representedObject is SpacerNode)
+        lastRow = rowView
+    }
 }

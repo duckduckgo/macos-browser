@@ -20,10 +20,33 @@ import Foundation
 
 final class BookmarkTableRowView: NSTableRowView {
 
+    var onSelectionChanged: (() -> Void)?
+
     var editing = false
+
+    var hasPrevious = false {
+        didSet {
+            needsDisplay = true
+        }
+    }
+
+    var hasNext = false {
+        didSet {
+            needsDisplay = true
+        }
+    }
+
     var mouseInside: Bool = false {
         didSet {
             needsDisplay = true
+        }
+    }
+
+    override var isSelected: Bool {
+        didSet {
+            if mouseInside {
+                onSelectionChanged?()
+            }
         }
     }
 
@@ -38,6 +61,26 @@ final class BookmarkTableRowView: NSTableRowView {
             NSColor.rowHoverColor.setFill()
             path.fill()
         }
+    }
+
+    override func drawSelection(in dirtyRect: NSRect) {
+        guard !editing else { return }
+
+        var roundedCorners = [NSBezierPath.Corners]()
+
+        if !hasPrevious {
+            roundedCorners.append(.topLeft)
+            roundedCorners.append(.topRight)
+        }
+
+        if !hasNext {
+            roundedCorners.append(.bottomLeft)
+            roundedCorners.append(.bottomRight)
+        }
+
+        let path = NSBezierPath(roundedRect: dirtyRect, forCorners: roundedCorners, cornerRadius: 6)
+        NSColor.selectedContentBackgroundColor.setFill()
+        path.fill()
     }
 
     override func updateTrackingAreas() {
