@@ -181,7 +181,7 @@ private struct AddressView: View {
                     .padding(.bottom, 5)
 
                 Picker("", selection: $model.addressCountryCode) {
-                    ForEach(CountryList.countries, id: \.self) { country in
+                    ForEach(CountryList.countries) { country in
                         Text(country.name)
                             .tag(country.countryCode)
                     }
