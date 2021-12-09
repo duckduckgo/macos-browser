@@ -53,7 +53,7 @@ final class LocalPixelDataStore: PixelDataStore {
                     continue
                 }
                 guard let value = item.valueEncrypted as? NSNumber else {
-                    assertionFailure("LocalPixelDataStore: Could not decrypt value")
+//                    assertionFailure("LocalPixelDataStore: Could not decrypt value")
                     continue
                 }
                 dict[key] = value

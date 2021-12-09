@@ -1,5 +1,5 @@
 //
-//  LoginFaviconView.swift
+//  FaviconSize.swift
 //
 //  Copyright © 2021 DuckDuckGo. All rights reserved.
 //
@@ -16,26 +16,14 @@
 //  limitations under the License.
 //
 
-import SwiftUI
+import Foundation
 
-struct LoginFaviconView: View {
+enum FaviconSize: Int {
 
-    let domain: String
+    // 16x16 points or bigger
+    case small = 16
 
-    let faviconManagement: FaviconManagement = FaviconManager.shared
-
-    var body: some View {
-
-        let favicon = faviconManagement.getCachedFavicon(for: domain, sizeCategory: .small)?.image ?? NSImage(named: "Login")
-
-        if let image = favicon {
-            Image(nsImage: image)
-                .resizable()
-                .aspectRatio(contentMode: .fit)
-                .frame(width: 32)
-                .cornerRadius(4.0)
-        }
-
-    }
+    // 66x66 points or bigger
+    case medium = 66
 
 }

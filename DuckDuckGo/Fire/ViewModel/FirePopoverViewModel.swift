@@ -115,10 +115,10 @@ final class FirePopoverViewModel {
             .subtracting(fireproofed)
 
         self.fireproofed = fireproofed
-            .map { Item(domain: $0, favicon: faviconManagement.getCachedFavicon(for: $0, mustBeFromUserScript: false)) }
+            .map { Item(domain: $0, favicon: faviconManagement.getCachedFavicon(for: $0, sizeCategory: .small)?.image) }
             .sorted { $0.domain < $1.domain }
         self.selectable = selectable
-            .map { Item(domain: $0, favicon: faviconManagement.getCachedFavicon(for: $0, mustBeFromUserScript: false)) }
+            .map { Item(domain: $0, favicon: faviconManagement.getCachedFavicon(for: $0, sizeCategory: .small)?.image) }
             .sorted { $0.domain < $1.domain }
         selectAll()
     }

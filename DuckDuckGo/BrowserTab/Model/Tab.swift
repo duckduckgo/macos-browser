@@ -123,12 +123,6 @@ final class Tab: NSObject {
         super.init()
 
         setupWebView(shouldLoadInBackground: shouldLoadInBackground)
-
-        // cache session-restored favicon if present
-        if let favicon = favicon,
-           let host = content.url?.host {
-            faviconManagement.cacheIfNeeded(favicon: favicon, for: host, isFromUserScript: false)
-        }
     }
 
     deinit {
@@ -379,31 +373,37 @@ final class Tab: NSObject {
     let faviconManagement: FaviconManagement
 
     private func handleFavicon(oldContent: TabContent) {
-        if !content.isUrl {
+        guard content.isUrl, let url = content.url else {
             favicon = nil
-        }
-        if oldContent.url?.host != content.url?.host {
-            fetchFavicon(nil, for: content.url?.host, isFromUserScript: false)
-        }
-    }
-
-    private func fetchFavicon(_ faviconURL: URL?, for host: String?, isFromUserScript: Bool) {
-        if favicon != nil {
-            favicon = nil
-        }
-
-        guard let host = host else {
             return
         }
 
-        faviconManagement.fetchFavicon(faviconURL, for: host, isFromUserScript: isFromUserScript) { (image, error) in
-            guard error == nil, let image = image else {
-                return
+        if let cachedFavicon = faviconManagement.getCachedFavicon(for: url, sizeCategory: .small)?.image {
+            if cachedFavicon != favicon {
+                favicon = cachedFavicon
             }
-
-            self.favicon = image
+        } else {
+            favicon = nil
         }
     }
+
+//    private func fetchFavicon(_ faviconURL: URL?, for host: String?, isFromUserScript: Bool) {
+//        if favicon != nil {
+//            favicon = nil
+//        }
+//
+//        guard let host = host else {
+//            return
+//        }
+//
+//        faviconManagement.fetchFavicon(faviconURL, for: host, isFromUserScript: isFromUserScript) { (image, error) in
+//            guard error == nil, let image = image else {
+//                return
+//            }
+//
+//            self.favicon = image
+//        }
+//    }
 
     // MARK: - User Scripts
 
@@ -582,20 +582,17 @@ extension Tab: ContextMenuDelegate {
 
 extension Tab: FaviconUserScriptDelegate {
 
-    func faviconUserScript(_ faviconUserScript: FaviconUserScript, didFindFavicon faviconUrl: URL) {
-        guard let host = self.content.url?.host else {
-            return
-        }
-
-        faviconManagement.fetchFavicon(faviconUrl, for: host, isFromUserScript: true) { (image, error) in
-            guard host == self.content.url?.host else {
+    func faviconUserScript(_ faviconUserScript: FaviconUserScript,
+                           didFindFaviconLinks faviconLinks: [FaviconUserScript.FaviconLink],
+                           for documentUrl: URL) {
+        faviconManagement.fetchFavicons(faviconLinks, documentUrl: documentUrl) { (favicon, error) in
+            guard documentUrl == self.content.url else {
                 return
             }
-            guard error == nil, let image = image else {
+            guard error == nil, let favicon = favicon else {
                 return
             }
-
-            self.favicon = image
+            self.favicon = favicon.image
         }
     }
 

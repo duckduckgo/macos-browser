@@ -46,14 +46,14 @@ final class LocalBookmarkManager: BookmarkManager {
     static let shared = LocalBookmarkManager()
 
     private init() {
-        subscribeToCachedFavicons()
+//        subscribeToCachedFavicons()
     }
 
     init(bookmarkStore: BookmarkStore, faviconManagement: FaviconManagement) {
         self.bookmarkStore = bookmarkStore
         self.faviconManagement = faviconManagement
 
-        subscribeToCachedFavicons()
+//        subscribeToCachedFavicons()
     }
 
     @Published private(set) var list: BookmarkList?
@@ -99,7 +99,7 @@ final class LocalBookmarkManager: BookmarkManager {
         }
 
         let id = UUID()
-        let bookmark = Bookmark(id: id, url: url, title: title, favicon: favicon(for: url.host), isFavorite: isFavorite)
+        let bookmark = Bookmark(id: id, url: url, title: title, isFavorite: isFavorite)
 
         list?.insert(bookmark)
         bookmarkStore.save(bookmark: bookmark, parent: nil) { [weak self] success, _  in
@@ -201,32 +201,9 @@ final class LocalBookmarkManager: BookmarkManager {
 
     // MARK: - Favicons
 
-    private var faviconCancellable: AnyCancellable?
-
-    private func subscribeToCachedFavicons() {
-        faviconCancellable = faviconManagement.cachedFaviconsPublisher
-            .sink(receiveValue: { [weak self] (host, favicon) in
-                self?.update(favicon: favicon, for: host)
-            })
-    }
-
-    private func update(favicon: NSImage, for host: String) {
-        guard let bookmarks = list?.bookmarks() else { return }
-
-        bookmarks
-            .filter { $0.url.host == host &&
-                $0.favicon?.size.isSmaller(than: favicon.size) ?? true
-            }
-            .forEach {
-                let bookmark = $0
-                bookmark.favicon = favicon
-                update(bookmark: bookmark)
-            }
-    }
-
     private func favicon(for host: String?) -> NSImage? {
         if let host = host {
-            return faviconManagement.getCachedFavicon(for: host, mustBeFromUserScript: false)
+            return faviconManagement.getCachedFavicon(for: host, sizeCategory: .small)?.image
         }
 
         return nil
