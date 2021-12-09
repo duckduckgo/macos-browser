@@ -647,9 +647,7 @@ extension BrowserTabViewController: WKUIDelegate {
         var shouldOpenPopUp = navigationAction.isUserInitiated
         if !shouldOpenPopUp {
             let url = navigationAction.request.url
-            parentTab.permissions.permissions([.popups],
-                                              requestedForDomain: navigationAction.sourceFrame.request.url?.host,
-                                              url: url) { [weak parentTab] granted in
+            parentTab.permissions.permissions([.popups], requestedForDomain: webView.url?.host, url: url) { [weak parentTab] granted in
 
                 guard let parentTab = parentTab else { return }
 
