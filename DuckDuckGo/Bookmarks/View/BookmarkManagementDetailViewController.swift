@@ -87,6 +87,7 @@ final class BookmarkManagementDetailViewController: NSViewController {
                                            FolderPasteboardWriter.folderUTIInternalType])
 
         reloadData()
+        self.tableView.selectionHighlightStyle = .none
     }
 
     override func viewDidDisappear() {
