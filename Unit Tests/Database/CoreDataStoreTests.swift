@@ -54,11 +54,17 @@ final class CoreDataStoreTests: XCTestCase {
 
     func testWhenObjectIsRemovedWithPredicateThenItShouldntBeLoadedFromStore() throws {
         let storedId1 = try store.add(.init(domain: "duckduckgo.com", testAttribute: "a"))
-        _=try store.add(.init(domain: "otherdomain.com", testAttribute: "b"))
+        let storedId2 = try store.add(.init(domain: "otherdomain.com", testAttribute: "b"))
 
         let e = expectation(description: "object removed")
-        store.remove(objectsWithPredicate: NSPredicate(format: #keyPath(TestManagedObject.testAttribute) + " == %@", "b")) { [store] error in
-            XCTAssertNil(error)
+        store.remove(objectsWithPredicate: NSPredicate(format: #keyPath(TestManagedObject.testAttribute) + " == %@", "b")) { [store] result in
+            switch result {
+            case .success(let ids):
+                XCTAssertEqual(ids, [storedId2])
+            case .failure(let error):
+                XCTFail("unexpected error \(error)")
+            }
+
             let fireproofed = try? store.load(into: .init(), self.load)
             XCTAssertEqual(fireproofed, [.init(domain: "duckduckgo.com", testAttribute: "a"): storedId1])
             e.fulfill()
