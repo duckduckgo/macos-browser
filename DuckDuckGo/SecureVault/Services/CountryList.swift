@@ -40,7 +40,10 @@ struct CountryList {
             return Country(id: code, name: name)
         }
 
-        return countries
+        return countries.sorted { first, second in
+            let result = first.name.caseInsensitiveCompare(second.name)
+            return result == .orderedAscending
+        }
     }()
 
     static func name(forCountryCode code: String?) -> String? {
