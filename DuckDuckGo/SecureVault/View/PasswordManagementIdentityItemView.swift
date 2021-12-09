@@ -87,9 +87,7 @@ private struct IdentificationView: View {
     var body: some View {
 
         VStack(alignment: .leading, spacing: 0) {
-            let editMode = model.isEditing || model.isNew
-
-            if !model.firstName.isEmpty || !model.middleName.isEmpty || !model.lastName.isEmpty || editMode {
+            if !model.firstName.isEmpty || !model.middleName.isEmpty || !model.lastName.isEmpty || model.isInEditMode {
                 Text(UserText.pmIdentification)
                     .bold()
                     .foregroundColor(.gray)
@@ -106,29 +104,48 @@ private struct IdentificationView: View {
                     .padding(.bottom, 5)
 
                 HStack {
-
-                    Picker("", selection: $model.birthdayDay) {
-                        ForEach(Date.daysInMonth, id: \.self) { year in
-                            Text(String(year))
-                                .tag(year as Int?)
+                    
+                    NSPopUpButtonView<Int?>(selection: $model.birthdayDay, popupCreator: {
+                        let button = NSPopUpButton()
+                        
+                        let item = button.menu?.addItem(withTitle: "-", action: nil, keyEquivalent: "")
+                        item?.representedObject = nil
+                        
+                        for date in Date.daysInMonth {
+                            let item = button.menu?.addItem(withTitle: String(date), action: nil, keyEquivalent: "")
+                            item?.representedObject = date
                         }
-                    }
+                        
+                        return button
+                    })
 
-                    Picker("", selection: $model.birthdayMonth) {
-                        ForEach(Date.monthsWithIndex, id: \.self) { month in
-                            Text(month.name)
-                                .tag(month.index as Int?)
+                    NSPopUpButtonView<Int?>(selection: $model.birthdayMonth, popupCreator: {
+                        let button = NSPopUpButton()
+                        
+                        let item = button.menu?.addItem(withTitle: "-", action: nil, keyEquivalent: "")
+                        item?.representedObject = nil
+                        
+                        for date in Date.monthsWithIndex {
+                            let item = button.menu?.addItem(withTitle: date.name, action: nil, keyEquivalent: "")
+                            item?.representedObject = date.index
                         }
-                    }
-                    .labelsHidden()
+                        
+                        return button
+                    })
+                    
+                    NSPopUpButtonView<Int?>(selection: $model.birthdayYear, popupCreator: {
+                        let button = NSPopUpButton()
+                        
+                        let item = button.menu?.addItem(withTitle: "-", action: nil, keyEquivalent: "")
+                        item?.representedObject = nil
 
-                    Picker("", selection: $model.birthdayYear) {
-                        ForEach(Date.lastHundredYears, id: \.self) { year in
-                            Text(String(year))
-                                .tag(year as Int?)
+                        for date in Date.lastHundredYears {
+                            let item = button.menu?.addItem(withTitle: String(date), action: nil, keyEquivalent: "")
+                            item?.representedObject = date
                         }
-                    }
-                    .labelsHidden()
+                        
+                        return button
+                    })
 
                 }
                 .padding(.bottom, interItemSpacing)
@@ -180,14 +197,21 @@ private struct AddressView: View {
                     .bold()
                     .padding(.bottom, 5)
 
-                Picker("", selection: $model.addressCountryCode) {
-                    ForEach(CountryList.countries) { country in
-                        Text(country.name)
-                            .tag(country.countryCode)
+                NSPopUpButtonView<String>(selection: $model.addressCountryCode, popupCreator: {
+                    let button = NSPopUpButton()
+                    
+                    let item = button.menu?.addItem(withTitle: "-", action: nil, keyEquivalent: "")
+                    item?.representedObject = ""
+                    
+                    for country in CountryList.countries {
+                        let item = button.menu?.addItem(withTitle: country.name, action: nil, keyEquivalent: "")
+                        item?.representedObject = country.countryCode
                     }
-                }
-                .labelsHidden()
+                    
+                    return button
+                })
                 .padding(.bottom, 5)
+                
             } else if !model.addressCountryCode.isEmpty {
                 Text("Country")
                     .bold()
@@ -353,3 +377,58 @@ private struct EditableIdentityField: View {
     }
 
 }
+
+// swiftlint:disable force_cast
+struct NSPopUpButtonView<ItemType>: NSViewRepresentable where ItemType: Equatable {
+    
+    typealias NSViewType = NSPopUpButton
+
+    @Binding var selection: ItemType
+    var popupCreator: () -> NSPopUpButton
+    
+    func makeNSView(context: NSViewRepresentableContext<NSPopUpButtonView>) -> NSPopUpButton {
+        let newPopupButton = popupCreator()
+        setPopUpFromSelection(newPopupButton, selection: selection)
+        
+        newPopupButton.target = context.coordinator
+        newPopupButton.action = #selector(Coordinator.dropdownItemSelected(_:))
+
+        return newPopupButton
+    }
+    
+    func updateNSView(_ nsView: NSPopUpButton, context: NSViewRepresentableContext<NSPopUpButtonView>) {
+        setPopUpFromSelection(nsView, selection: selection)
+    }
+    
+    func setPopUpFromSelection(_ button: NSPopUpButton, selection: ItemType) {
+        let itemsList = button.itemArray
+        let matchedMenuItem = itemsList.filter { ($0.representedObject as! ItemType) == selection }.first
+
+        if matchedMenuItem != nil {
+            button.select(matchedMenuItem)
+        }
+    }
+    
+    func makeCoordinator() -> Coordinator {
+        return Coordinator(self)
+    }
+    
+    final class Coordinator: NSObject {
+        var parent: NSPopUpButtonView!
+        
+        init(_ parent: NSPopUpButtonView) {
+            super.init()
+            self.parent = parent
+        }
+        
+        @objc func dropdownItemSelected(_ sender: NSPopUpButton) {
+            guard let selectedItem = sender.selectedItem else {
+                assertionFailure()
+                return
+            }
+
+            parent.selection = selectedItem.representedObject as! ItemType
+        }
+    }
+}
+// swiftlint:enable force_cast
