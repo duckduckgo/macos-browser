@@ -246,7 +246,7 @@ final class BookmarkTableCellView: NSTableCellView, NibLoadable {
         titleLabel.textColor = isSelected && !editing ? .white : .controlTextColor
         menuButton.contentTintColor = isSelected ? .white : .buttonColor
         faviconImageView.contentTintColor = isSelected ? .white : .suggestionIconColor
-        accessoryImageView.contentTintColor = isSelected ? .white : .controlColor
+        accessoryImageView.contentTintColor = isSelected ? .white : .suggestionIconColor
     }
 
     private func ensureTrackingArea() {
