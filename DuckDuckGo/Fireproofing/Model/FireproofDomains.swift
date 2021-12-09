@@ -107,11 +107,22 @@ internal class FireproofDomains {
 
     func remove(domain: String) {
         dispatchPrecondition(condition: .onQueue(.main))
-        guard let id = container.remove(domain: domain) else {
+        guard let id = container.objectID(forDomain: domain) else {
             assertionFailure("fireproof domain \(domain) not found")
             return
         }
-        store.remove(objectWithId: id)
+
+        store.remove(objectWithId: id) { [weak self] error in
+            dispatchPrecondition(condition: .onQueue(.main))
+            guard error == nil else {
+                os_log("FireproofDomainsStore: Failed to remove Fireproof Domain", type: .error)
+                return
+            }
+
+            if self?.container.remove(domain: domain, withID: id) == false {
+                os_log("FireproofDomainsStore: Failed to remove Fireproof Domain from container", type: .error)
+            }
+        }
     }
 
     func clearAll() {

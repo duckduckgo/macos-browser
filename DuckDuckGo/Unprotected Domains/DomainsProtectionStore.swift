@@ -19,15 +19,10 @@
 import Foundation
 import CoreData
 import os.log
-
-protocol UnprotectedDomains: AnyObject {
-    func isHostUnprotected(_ domain: String) -> Bool
-    func disableProtection(forDomain domain: String)
-    func enableProtection(forDomain domain: String)
-}
+import BrowserServicesKit
 
 typealias UnprotectedDomainsStore = CoreDataStore<UnprotectedDomainManagedObject>
-final class LocalUnprotectedDomains: UnprotectedDomains {
+final class LocalUnprotectedDomains {
 
     static let shared = LocalUnprotectedDomains()
 
@@ -36,10 +31,19 @@ final class LocalUnprotectedDomains: UnprotectedDomains {
     @UserDefaultsWrapper(key: .unprotectedDomains, defaultValue: nil)
     private var legacyUserDefaultsUnprotectedDomainsData: Data?
 
-    lazy private var unprotectedDomainsToIds: [String: NSManagedObjectID] = loadUnprotectedDomains()
+    private let queue = DispatchQueue(label: "unprotected.domains.queue")
+    lazy private var _unprotectedDomainsToIds: [String: NSManagedObjectID] = loadUnprotectedDomains()
 
-    var unprotectedDomains: [String] {
-        Array(unprotectedDomainsToIds.keys)
+    private var unprotectedDomainsToIds: [String: NSManagedObjectID] {
+        queue.sync {
+            _unprotectedDomainsToIds
+        }
+    }
+
+    private func modifyUnprotectedDomainsToIds<T>(_ modify: (inout [String: NSManagedObjectID]) throws -> T) rethrows -> T {
+        try queue.sync {
+            try modify(&_unprotectedDomainsToIds)
+        }
     }
 
     init(store: UnprotectedDomainsStore = UnprotectedDomainsStore(tableName: "UnprotectedDomains")) {
@@ -47,7 +51,6 @@ final class LocalUnprotectedDomains: UnprotectedDomains {
     }
 
     private func loadUnprotectedDomains() -> [String: NSManagedObjectID] {
-        dispatchPrecondition(condition: .onQueue(.main))
         do {
             if let data = legacyUserDefaultsUnprotectedDomainsData,
                var domains = try? NSKeyedUnarchiver.unarchivedObject(ofClass: NSSet.self, from: data) as? Set<String>,
@@ -71,29 +74,51 @@ final class LocalUnprotectedDomains: UnprotectedDomains {
     }
 
     func isHostUnprotected(_ domain: String) -> Bool {
-        dispatchPrecondition(condition: .onQueue(.main))
         return unprotectedDomainsToIds[domain.dropWWW()] != nil
     }
 
     func disableProtection(forDomain domain: String) {
-        dispatchPrecondition(condition: .onQueue(.main))
         let domainWithoutWWW = domain.dropWWW()
         do {
             let id = try store.add(domainWithoutWWW)
-            unprotectedDomainsToIds[domainWithoutWWW] = id
+            modifyUnprotectedDomainsToIds { $0[domainWithoutWWW] = id }
         } catch {
             assertionFailure("could not add unprotected domain \(domain): \(error)")
         }
     }
 
-    func enableProtection(forDomain domain: String) {
-        dispatchPrecondition(condition: .onQueue(.main))
+    func enableProtection(forDomain domain: String, completionHandler: ((Error?) -> Void)?) {
         let domainWithoutWWW = domain.dropWWW()
         guard let id = unprotectedDomainsToIds[domainWithoutWWW] else {
             assertionFailure("unprotected domain \(domain) not found")
             return
         }
-        store.remove(objectWithId: id)
+        store.remove(objectWithId: id) { [weak self] error in
+            defer { completionHandler?(error) }
+            guard error == nil else {
+                os_log("UnprotectedDomainStore: Failed to remove Unprotected Domain", type: .error)
+                return
+            }
+            self?.modifyUnprotectedDomainsToIds {
+                $0.updateInPlace(key: domainWithoutWWW) {
+                    guard $0 == id else { return }
+                    $0 = nil
+                }
+            }
+
+        }
+    }
+
+}
+
+extension LocalUnprotectedDomains: DomainsProtectionStore {
+
+    var unprotectedDomains: Set<String> {
+        Set(unprotectedDomainsToIds.keys)
+    }
+
+    func enableProtection(forDomain domain: String) {
+        enableProtection(forDomain: domain, completionHandler: nil)
     }
 
 }

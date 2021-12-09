@@ -56,16 +56,26 @@ struct FireproofDomainsContainer {
         return domain
     }
 
-    mutating func remove(domain: String) -> NSManagedObjectID? {
+    func objectID(forDomain domain: String) -> NSManagedObjectID? {
+        let domain = domain.dropWWW()
+        return domainsToIds[domain]
+    }
+
+    mutating func remove(domain: String, withID objectID: NSManagedObjectID) -> Bool {
         let domain = domain.dropWWW()
         guard let idx = domainsToIds.index(forKey: domain) else {
             assertionFailure("\(domain) is not Fireproof")
-            return nil
+            return false
         }
-        let id = domainsToIds.remove(at: idx).value
+        let id = domainsToIds[idx].value
+        guard id == objectID else {
+            assertionFailure("ObjectID for \(domain) does not match")
+            return false
+        }
+        domainsToIds.remove(at: idx)
 
         let components = domain.components(separatedBy: ".")
-        guard components.count > 2 else { return id }
+        guard components.count > 2 else { return true }
 
         for i in 1..<components.count {
             let superdomain = components[i..<components.count].joined(separator: ".")
@@ -78,7 +88,7 @@ struct FireproofDomainsContainer {
             }
         }
 
-        return id
+        return true
     }
 
     func contains(domain: String, includingSuperdomains: Bool = true) -> Bool {
