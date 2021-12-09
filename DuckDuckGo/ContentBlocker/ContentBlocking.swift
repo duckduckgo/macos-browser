@@ -23,11 +23,12 @@ import os.log
 
 final class ContentBlocking {
 
-    static let privacyConfigurationManager = PrivacyConfigurationManager(fetchedETag: DefaultConfigurationStorage.shared.loadEtag(for: .privacyConfiguration),
-                                                                         fetchedData: DefaultConfigurationStorage.shared.loadData(for: .privacyConfiguration),
-                                                                         embeddedDataProvider: AppPrivacyConfigurationDataProvider(),
-                                                                         localProtection: LocalUnprotectedDomains.shared,
-                                                                         errorReporting: debugEvents)
+    static let privacyConfigurationManager
+        = PrivacyConfigurationManager(fetchedETag: DefaultConfigurationStorage.shared.loadEtag(for: .privacyConfiguration),
+                                      fetchedData: DefaultConfigurationStorage.shared.loadData(for: .privacyConfiguration),
+                                      embeddedDataProvider: AppPrivacyConfigurationDataProvider(),
+                                      localProtection: LocalUnprotectedDomains.shared,
+                                      errorReporting: debugEvents)
 
     static let contentBlockingUpdating = ContentBlockingUpdating()
 
