@@ -28,8 +28,10 @@ final class GPCRequestFactory {
     }
     
     var gpcEnabled = true
+    var privacyConfig: PrivacyConfiguration!
     
-    init() {
+    init(config: PrivacyConfiguration = ContentBlocking.privacyConfigurationManager.privacyConfig) {
+        privacyConfig = config
         reloadGPCSetting()
     }
     
@@ -38,10 +40,8 @@ final class GPCRequestFactory {
         gpcEnabled = prefs.gpcEnabled
     }
     
-    func requestForGPC(basedOn incomingRequest: URLRequest,
-                       config: PrivacyConfiguration = ContentBlocking.privacyConfigurationManager.privacyConfig) -> URLRequest? {
-        
-        func removeHeader(fromRequest incomingRequest: URLRequest) -> URLRequest? {
+    func requestForGPC(basedOn incomingRequest: URLRequest) -> URLRequest? {
+        func removingHeader(fromRequest incomingRequest: URLRequest) -> URLRequest? {
             var request = incomingRequest
             if let headers = request.allHTTPHeaderFields, headers.firstIndex(where: { $0.key == Constants.secGPCHeader }) != nil {
                 request.setValue(nil, forHTTPHeaderField: Constants.secGPCHeader)
@@ -58,11 +58,11 @@ final class GPCRequestFactory {
          */
         guard let url = incomingRequest.url, URL.isGPCEnabled(url: url) else {
             // Remove GPC header if its still there (or nil)
-            return removeHeader(fromRequest: incomingRequest)
+            return removingHeader(fromRequest: incomingRequest)
         }
         
         // Add GPC header if needed
-        if config.isEnabled(featureKey: .gpc) && gpcEnabled {
+        if privacyConfig.isEnabled(featureKey: .gpc) && gpcEnabled {
             var request = incomingRequest
             if let headers = request.allHTTPHeaderFields,
                headers.firstIndex(where: { $0.key == Constants.secGPCHeader }) == nil {
@@ -71,7 +71,7 @@ final class GPCRequestFactory {
             }
         } else {
             // Check if GPC header is still there and remove it
-            return removeHeader(fromRequest: incomingRequest)
+            return removingHeader(fromRequest: incomingRequest)
         }
         
         return nil
