@@ -22,12 +22,11 @@ import os.log
 
 protocol PermissionManagerProtocol: AnyObject {
 
-    typealias PublishedPermission = (domain: String, permissionType: PermissionType, grant: Bool?)
+    typealias PublishedPermission = (domain: String, permissionType: PermissionType, decision: PersistedPermissionDecision)
     var permissionPublisher: AnyPublisher<PublishedPermission, Never> { get }
 
-    func permission(forDomain domain: String, permissionType: PermissionType) -> Bool?
-    func setPermission(_ permission: Bool, forDomain domain: String, permissionType: PermissionType)
-    func removePermission(forDomain domain: String, permissionType: PermissionType)
+    func permission(forDomain domain: String, permissionType: PermissionType) -> PersistedPermissionDecision
+    func setPermission(_ decision: PersistedPermissionDecision, forDomain domain: String, permissionType: PermissionType)
 
     func burnPermissions(except fireproofDomains: FireproofDomains, completion: @escaping () -> Void)
     func burnPermissions(of domains: Set<String>, completion: @escaping () -> Void)
@@ -60,45 +59,37 @@ final class PermissionManager: PermissionManagerProtocol {
         }
     }
 
-    func permission(forDomain domain: String, permissionType: PermissionType) -> Bool? {
-        return permissions[domain.dropWWW()]?[permissionType]?.allow
+    func permission(forDomain domain: String, permissionType: PermissionType) -> PersistedPermissionDecision {
+        return permissions[domain.dropWWW()]?[permissionType]?.decision ?? .ask
     }
 
-    func setPermission(_ allow: Bool, forDomain domain: String, permissionType: PermissionType) {
-        assert(permissionType.canPersistGrantedDecision || !allow)
-        assert(permissionType.canPersistDeniedDecision || allow)
+    func hasPermissionPersisted(forDomain domain: String, permissionType: PermissionType) -> Bool {
+        return permissions[domain.dropWWW()]?[permissionType] != nil
+    }
+
+    func setPermission(_ decision: PersistedPermissionDecision, forDomain domain: String, permissionType: PermissionType) {
+        assert(permissionType.canPersistGrantedDecision || decision != .allow)
+        assert(permissionType.canPersistDeniedDecision || decision != .deny)
         
         let storedPermission: StoredPermission
         let domain = domain.dropWWW()
 
         defer {
-            self.permissionSubject.send( (domain, permissionType, allow) )
+            self.permissionSubject.send( (domain, permissionType, decision) )
         }
         if var oldValue = permissions[domain]?[permissionType] {
-            oldValue.allow = allow
+            oldValue.decision = decision
             storedPermission = oldValue
-            store.update(objectWithId: oldValue.id, allow: allow)
+            store.update(objectWithId: oldValue.id, decision: decision)
         } else {
             do {
-                storedPermission = try store.add(domain: domain, permissionType: permissionType, allow: allow)
+                storedPermission = try store.add(domain: domain, permissionType: permissionType, decision: decision)
             } catch {
                 os_log("PermissionStore: Failed to store permission", type: .error)
                 return
             }
         }
         self.permissions[domain, default: [:]][permissionType] = storedPermission
-    }
-
-    func removePermission(forDomain domain: String, permissionType: PermissionType) {
-        let domain = domain.dropWWW()
-        guard let oldValue = permissions[domain]?[permissionType] else {
-            assertionFailure("PermissionStore: Failed to remove permission")
-            return
-        }
-        permissions[domain]?[permissionType] = nil
-        store.remove(objectWithId: oldValue.id)
-
-        self.permissionSubject.send( (domain, permissionType, nil) )
     }
 
     func burnPermissions(except fireproofDomains: FireproofDomains, completion: @escaping () -> Void) {

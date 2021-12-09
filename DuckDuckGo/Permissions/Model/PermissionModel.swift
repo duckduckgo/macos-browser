@@ -77,7 +77,7 @@ final class PermissionModel {
             self?.permissionManager(permissionManager,
                                     didChangePermanentDecisionFor: value.permissionType,
                                     forDomain: value.domain,
-                                    to: value.grant)
+                                    to: value.decision)
         }.store(in: &cancellables)
     }
 
@@ -173,18 +173,18 @@ final class PermissionModel {
     private func permissionManager(_: PermissionManagerProtocol,
                                    didChangePermanentDecisionFor permissionType: PermissionType,
                                    forDomain domain: String,
-                                   to decision: Bool?) {
+                                   to decision: PersistedPermissionDecision) {
 
         // If Always Allow/Deny for the current host: Grant/Revoke the permission
         guard webView?.url?.host?.dropWWW() == domain else { return }
 
         switch (decision, self.permissions[permissionType]) {
-        case (false, .some):
+        case (.deny, .some):
             self.revoke(permissionType)
             fallthrough
-        case (true, .requested):
+        case (.allow, .requested):
             while let query = self.authorizationQueries.first(where: { $0.permissions == [permissionType] }) {
-                query.handleDecision(grant: decision!)
+                query.handleDecision(grant: decision == .allow)
             }
         default: break
         }
@@ -210,8 +210,8 @@ final class PermissionModel {
 
     func revoke(_ permission: PermissionType) {
         if let domain = webView?.url?.host,
-           permissionManager.permission(forDomain: domain, permissionType: permission) == true {
-            permissionManager.removePermission(forDomain: domain, permissionType: permission)
+           case .allow = permissionManager.permission(forDomain: domain, permissionType: permission) {
+            permissionManager.setPermission(.ask, forDomain: domain, permissionType: permission)
         }
         self.permissions[permission].revoke() // await deactivation
         webView?.revokePermissions([permission])
@@ -247,28 +247,34 @@ final class PermissionModel {
 
     private func shouldGrantPermission(for permissions: [PermissionType], requestedForDomain domain: String) -> Bool? {
         for permission in permissions {
-            var grant: Bool?
-            if let stored = permissionManager.permission(forDomain: domain, permissionType: permission),
-               (permission.canPersistGrantedDecision || stored == false) && (permission.canPersistDeniedDecision || stored == true) {
-                grant = stored
+            var grant: PersistedPermissionDecision
+            let stored = permissionManager.permission(forDomain: domain, permissionType: permission)
+            if case .allow = stored, permission.canPersistGrantedDecision {
+                grant = .allow
+            } else if case .deny = stored, permission.canPersistDeniedDecision {
+                grant = .deny
             } else if let state = self.permissions[permission] {
                 switch state {
                 // deny if already denied during current page being displayed
                 case .denied, .revoking:
-                    grant = false
+                    grant = .deny
                 // ask otherwise
                 case .disabled, .requested, .active, .inactive, .paused, .reloading:
-                    break
+                    grant = .ask
                 }
+            } else {
+                grant = .ask
             }
 
-            if let grant = grant {
-                if grant == false {
-                    // deny if at least one permission denied permanently
-                    // or during current page being displayed
-                    return false
-                } // else if grant == true: allow if all permissions allowed permanently
-            } else {
+            switch grant {
+            case .deny:
+                // deny if at least one permission denied permanently
+                // or during current page being displayed
+                return false
+            case .allow:
+                // allow if all permissions allowed permanently
+                break
+            case .ask:
                 // if at least one permission is not set: ask
                 return nil
             }

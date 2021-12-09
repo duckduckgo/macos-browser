@@ -786,13 +786,13 @@ extension AddressBarButtonsViewController: PermissionContextMenuDelegate {
         tabCollectionViewModel.selectedTabViewModel?.tab.permissions.allow(query)
     }
     func permissionContextMenu(_ menu: PermissionContextMenu, alwaysAllowPermission permission: PermissionType) {
-        PermissionManager.shared.setPermission(true, forDomain: menu.domain, permissionType: permission)
+        PermissionManager.shared.setPermission(.allow, forDomain: menu.domain, permissionType: permission)
     }
     func permissionContextMenu(_ menu: PermissionContextMenu, alwaysDenyPermission permission: PermissionType) {
-        PermissionManager.shared.setPermission(false, forDomain: menu.domain, permissionType: permission)
+        PermissionManager.shared.setPermission(.deny, forDomain: menu.domain, permissionType: permission)
     }
     func permissionContextMenu(_ menu: PermissionContextMenu, resetStoredPermission permission: PermissionType) {
-        PermissionManager.shared.removePermission(forDomain: menu.domain, permissionType: permission)
+        PermissionManager.shared.setPermission(.ask, forDomain: menu.domain, permissionType: permission)
     }
     func permissionContextMenuReloadPage(_ menu: PermissionContextMenu) {
         tabCollectionViewModel.selectedTabViewModel?.tab.reload()
