@@ -84,8 +84,16 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
             // MARK: perform first time launch logic here
         }
 
-        if (notification.userInfo?[NSApplication.launchIsDefaultUserInfoKey] as? NSNumber)?.boolValue == true {
-            Pixel.fire(.appLaunch(launch: .autoInitialOrRegular()))
+        if Pixel.Event.AppLaunch.repetition().value == .initial
+            || (notification.userInfo?[NSApplication.launchIsDefaultUserInfoKey] as? NSNumber)?.boolValue == true {
+
+            Pixel.fire(.appLaunch(launch: .autoInitialOrRegular())) { error in
+                if let error = error {
+                    os_log("appLaunch Pixel send failed: %s", type: .error, "\(error)")
+                } else {
+                    Pixel.Event.AppLaunch.repetition().update()
+                }
+            }
         }
 
         stateRestorationManager.applicationDidFinishLaunching()
