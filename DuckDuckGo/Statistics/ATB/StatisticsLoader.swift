@@ -30,7 +30,7 @@ final class StatisticsLoader {
     private let parser = AtbParser()
     private var isAppRetentionRequestInProgress = false
     
-    init(statisticsStore: StatisticsStore = StatisticsUserDefaults()) {
+    init(statisticsStore: StatisticsStore = LocalStatisticsStore()) {
         self.statisticsStore = statisticsStore
     }
 

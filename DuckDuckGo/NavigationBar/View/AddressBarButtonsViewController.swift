@@ -411,7 +411,7 @@ final class AddressBarButtonsViewController: NSViewController {
         }
 
         let animation = Animation.named(animationName, animationCache: LottieAnimationCache.shared)
-        let animationView = AnimationView(animation: animation, imageProvider: self)
+        let animationView = AnimationView(animation: animation, imageProvider: trackerAnimationImageProvider)
         animationView.identifier = NSUserInterfaceItemIdentifier(rawValue: animationName)
         animationViewCache[animationName] = animationView
         return animationView
@@ -644,7 +644,7 @@ final class AddressBarButtonsViewController: NSViewController {
 
     // MARK: Tracker Animation
 
-    var lastTrackerImages = [CGImage]()
+    let trackerAnimationImageProvider = TrackerAnimationImageProvider()
 
     private func animateTrackers() {
         guard !privacyEntryPointButton.isHidden,
@@ -668,7 +668,8 @@ final class AddressBarButtonsViewController: NSViewController {
         }
 
         if let trackerInfo = selectedTabViewModel.tab.trackerInfo {
-            lastTrackerImages = PrivacyIconViewModel.trackerImages(from: trackerInfo)
+            let lastTrackerImages = PrivacyIconViewModel.trackerImages(from: trackerInfo)
+            trackerAnimationImageProvider.lastTrackerImages = lastTrackerImages
 
             let trackerAnimationView: AnimationView?
             switch lastTrackerImages.count {
@@ -805,7 +806,9 @@ extension AddressBarButtonsViewController: NSPopoverDelegate {
 
 }
 
-extension AddressBarButtonsViewController: AnimationImageProvider {
+final class TrackerAnimationImageProvider: AnimationImageProvider {
+
+    var lastTrackerImages = [CGImage]()
 
     func imageForAsset(asset: ImageAsset) -> CGImage? {
         switch asset.name {
