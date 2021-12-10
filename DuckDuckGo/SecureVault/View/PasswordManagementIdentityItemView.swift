@@ -109,33 +109,63 @@ private struct IdentificationView: View {
 
                 HStack {
                     
-                    NSPopUpButtonView<Int?>(selection: $model.birthdayDay, popupCreator: {
-                        let button = NSPopUpButton()
-                        
-                        let item = button.menu?.addItem(withTitle: UserText.pmDay, action: nil, keyEquivalent: "")
-                        item?.representedObject = nil
-                        
-                        for date in Date.daysInMonth {
-                            let item = button.menu?.addItem(withTitle: String(date), action: nil, keyEquivalent: "")
-                            item?.representedObject = date
-                        }
-                        
-                        return button
-                    })
+                    if Locale.current.dateComponentOrder == .dayMonthYear {
+                        NSPopUpButtonView<Int?>(selection: $model.birthdayDay, popupCreator: {
+                            let button = NSPopUpButton()
+                            
+                            let item = button.menu?.addItem(withTitle: UserText.pmDay, action: nil, keyEquivalent: "")
+                            item?.representedObject = nil
+                            
+                            for date in Date.daysInMonth {
+                                let item = button.menu?.addItem(withTitle: String(date), action: nil, keyEquivalent: "")
+                                item?.representedObject = date
+                            }
+                            
+                            return button
+                        })
 
-                    NSPopUpButtonView<Int?>(selection: $model.birthdayMonth, popupCreator: {
-                        let button = NSPopUpButton()
-                        
-                        let item = button.menu?.addItem(withTitle: UserText.pmMonth, action: nil, keyEquivalent: "")
-                        item?.representedObject = nil
-                        
-                        for date in Date.monthsWithIndex {
-                            let item = button.menu?.addItem(withTitle: date.name, action: nil, keyEquivalent: "")
-                            item?.representedObject = date.index
-                        }
-                        
-                        return button
-                    })
+                        NSPopUpButtonView<Int?>(selection: $model.birthdayMonth, popupCreator: {
+                            let button = NSPopUpButton()
+                            
+                            let item = button.menu?.addItem(withTitle: UserText.pmMonth, action: nil, keyEquivalent: "")
+                            item?.representedObject = nil
+                            
+                            for date in Date.monthsWithIndex {
+                                let item = button.menu?.addItem(withTitle: date.name, action: nil, keyEquivalent: "")
+                                item?.representedObject = date.index
+                            }
+                            
+                            return button
+                        })
+                    } else {
+                        NSPopUpButtonView<Int?>(selection: $model.birthdayMonth, popupCreator: {
+                            let button = NSPopUpButton()
+                            
+                            let item = button.menu?.addItem(withTitle: UserText.pmMonth, action: nil, keyEquivalent: "")
+                            item?.representedObject = nil
+                            
+                            for date in Date.monthsWithIndex {
+                                let item = button.menu?.addItem(withTitle: date.name, action: nil, keyEquivalent: "")
+                                item?.representedObject = date.index
+                            }
+                            
+                            return button
+                        })
+
+                        NSPopUpButtonView<Int?>(selection: $model.birthdayDay, popupCreator: {
+                            let button = NSPopUpButton()
+                            
+                            let item = button.menu?.addItem(withTitle: UserText.pmDay, action: nil, keyEquivalent: "")
+                            item?.representedObject = nil
+                            
+                            for date in Date.daysInMonth {
+                                let item = button.menu?.addItem(withTitle: String(date), action: nil, keyEquivalent: "")
+                                item?.representedObject = date
+                            }
+                            
+                            return button
+                        })
+                    }
                     
                     NSPopUpButtonView<Int?>(selection: $model.birthdayYear, popupCreator: {
                         let button = NSPopUpButton()

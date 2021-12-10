@@ -167,6 +167,7 @@
 		4BA1A6E6258C270800F6F690 /* EncryptionKeyGeneratorTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4BA1A6E5258C270800F6F690 /* EncryptionKeyGeneratorTests.swift */; };
 		4BA1A6F6258C4F9600F6F690 /* EncryptionMocks.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4BA1A6F5258C4F9600F6F690 /* EncryptionMocks.swift */; };
 		4BA1A6FE258C5C1300F6F690 /* EncryptedValueTransformerTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4BA1A6FD258C5C1300F6F690 /* EncryptedValueTransformerTests.swift */; };
+		4BA91D13276313E8002A1065 /* LocaleExtension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4BA91D12276313E8002A1065 /* LocaleExtension.swift */; };
 		4BB46EA226B8954500222970 /* logins-encrypted.json in Resources */ = {isa = PBXBuildFile; fileRef = 4BB46EA026B8954500222970 /* logins-encrypted.json */; };
 		4BB46EA326B8954500222970 /* key4-encrypted.db in Resources */ = {isa = PBXBuildFile; fileRef = 4BB46EA126B8954500222970 /* key4-encrypted.db */; };
 		4BB6CE5F26B77ED000EC5860 /* Cryptography.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4BB6CE5E26B77ED000EC5860 /* Cryptography.swift */; };
@@ -784,6 +785,7 @@
 		4BA1A6EA258C288C00F6F690 /* EncryptionKeyStoreTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EncryptionKeyStoreTests.swift; sourceTree = "<group>"; };
 		4BA1A6F5258C4F9600F6F690 /* EncryptionMocks.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EncryptionMocks.swift; sourceTree = "<group>"; };
 		4BA1A6FD258C5C1300F6F690 /* EncryptedValueTransformerTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EncryptedValueTransformerTests.swift; sourceTree = "<group>"; };
+		4BA91D12276313E8002A1065 /* LocaleExtension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LocaleExtension.swift; sourceTree = "<group>"; };
 		4BB46EA026B8954500222970 /* logins-encrypted.json */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.json; path = "logins-encrypted.json"; sourceTree = "<group>"; };
 		4BB46EA126B8954500222970 /* key4-encrypted.db */ = {isa = PBXFileReference; lastKnownFileType = file; path = "key4-encrypted.db"; sourceTree = "<group>"; };
 		4BB6CE5E26B77ED000EC5860 /* Cryptography.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Cryptography.swift; sourceTree = "<group>"; };
@@ -2766,6 +2768,7 @@
 				4BA1A6C1258B0A1300F6F690 /* ContiguousBytesExtension.swift */,
 				85AC3AF625D5DBFD00C7D2AA /* DataExtension.swift */,
 				B6A9E46F26146A250067D1B9 /* DateExtension.swift */,
+				4BA91D12276313E8002A1065 /* LocaleExtension.swift */,
 				B63D467025BFA6C100874977 /* DispatchQueueExtensions.swift */,
 				AA92126E25ACCB1100600CD4 /* ErrorExtension.swift */,
 				AAECA41F24EEA4AC00EFA63A /* IndexPathExtension.swift */,
@@ -3563,6 +3566,7 @@
 				4B0511C4262CAA5A00F6079C /* PreferencesSidebarViewController.swift in Sources */,
 				B6E53888267C94A00010FEA9 /* HomepageCollectionViewFlowLayout.swift in Sources */,
 				B61EF3F1266F922200B4D78F /* WKProcessPool+DownloadDelegate.swift in Sources */,
+				4BA91D13276313E8002A1065 /* LocaleExtension.swift in Sources */,
 				B6106BAD26A7BF390013B453 /* PermissionState.swift in Sources */,
 				14505A08256084EF00272CC6 /* UserAgent.swift in Sources */,
 				4B8AC93526B3B2FD00879451 /* NSAlert+DataImport.swift in Sources */,
