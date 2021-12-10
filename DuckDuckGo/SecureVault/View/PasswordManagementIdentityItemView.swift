@@ -66,6 +66,10 @@ struct PasswordManagementIdentityItemView: View {
 
                     Spacer(minLength: 0)
 
+                    if model.isInEditMode {
+                        Divider()
+                    }
+
                     Buttons()
                         .padding()
 
