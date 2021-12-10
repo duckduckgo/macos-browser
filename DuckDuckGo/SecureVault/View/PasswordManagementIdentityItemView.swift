@@ -108,7 +108,7 @@ private struct IdentificationView: View {
                     NSPopUpButtonView<Int?>(selection: $model.birthdayDay, popupCreator: {
                         let button = NSPopUpButton()
                         
-                        let item = button.menu?.addItem(withTitle: "-", action: nil, keyEquivalent: "")
+                        let item = button.menu?.addItem(withTitle: UserText.pmDay, action: nil, keyEquivalent: "")
                         item?.representedObject = nil
                         
                         for date in Date.daysInMonth {
@@ -122,7 +122,7 @@ private struct IdentificationView: View {
                     NSPopUpButtonView<Int?>(selection: $model.birthdayMonth, popupCreator: {
                         let button = NSPopUpButton()
                         
-                        let item = button.menu?.addItem(withTitle: "-", action: nil, keyEquivalent: "")
+                        let item = button.menu?.addItem(withTitle: UserText.pmMonth, action: nil, keyEquivalent: "")
                         item?.representedObject = nil
                         
                         for date in Date.monthsWithIndex {
@@ -136,7 +136,7 @@ private struct IdentificationView: View {
                     NSPopUpButtonView<Int?>(selection: $model.birthdayYear, popupCreator: {
                         let button = NSPopUpButton()
                         
-                        let item = button.menu?.addItem(withTitle: "-", action: nil, keyEquivalent: "")
+                        let item = button.menu?.addItem(withTitle: UserText.pmYear, action: nil, keyEquivalent: "")
                         item?.representedObject = nil
 
                         for date in Date.lastHundredYears {
