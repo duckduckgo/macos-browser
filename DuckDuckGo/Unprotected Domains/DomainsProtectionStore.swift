@@ -22,7 +22,7 @@ import os.log
 import BrowserServicesKit
 
 typealias UnprotectedDomainsStore = CoreDataStore<UnprotectedDomainManagedObject>
-final class LocalUnprotectedDomains {
+final class LocalUnprotectedDomains: DomainsProtectionStore {
 
     static let shared = LocalUnprotectedDomains()
 
@@ -38,6 +38,10 @@ final class LocalUnprotectedDomains {
         queue.sync {
             _unprotectedDomainsToIds
         }
+    }
+
+    var unprotectedDomains: Set<String> {
+        Set(unprotectedDomainsToIds.keys)
     }
 
     private func modifyUnprotectedDomainsToIds<T>(_ modify: (inout [String: NSManagedObjectID]) throws -> T) rethrows -> T {
@@ -87,38 +91,24 @@ final class LocalUnprotectedDomains {
         }
     }
 
-    func enableProtection(forDomain domain: String, completionHandler: ((Error?) -> Void)?) {
+    func enableProtection(forDomain domain: String) {
         let domainWithoutWWW = domain.dropWWW()
-        guard let id = unprotectedDomainsToIds[domainWithoutWWW] else {
+
+        guard let id = modifyUnprotectedDomainsToIds({
+            return $0.updateInPlace(key: domainWithoutWWW) { id -> NSManagedObjectID? in
+                defer { id = nil }
+                return id
+            }
+        }) else {
             assertionFailure("unprotected domain \(domain) not found")
             return
         }
-        store.remove(objectWithId: id) { [weak self] error in
-            defer { completionHandler?(error) }
-            guard error == nil else {
-                os_log("UnprotectedDomainStore: Failed to remove Unprotected Domain", type: .error)
+        store.remove(objectWithId: id) { error in
+            if let error = error {
+                assertionFailure("UnprotectedDomainStore: Failed to remove Unprotected Domain: \(error)")
                 return
             }
-            self?.modifyUnprotectedDomainsToIds {
-                $0.updateInPlace(key: domainWithoutWWW) {
-                    guard $0 == id else { return }
-                    $0 = nil
-                }
-            }
-
         }
-    }
-
-}
-
-extension LocalUnprotectedDomains: DomainsProtectionStore {
-
-    var unprotectedDomains: Set<String> {
-        Set(unprotectedDomainsToIds.keys)
-    }
-
-    func enableProtection(forDomain domain: String) {
-        enableProtection(forDomain: domain, completionHandler: nil)
     }
 
 }

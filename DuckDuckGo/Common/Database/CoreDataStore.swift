@@ -38,6 +38,14 @@ extension CoreDataStore {
         try add([value]).first?.id ?? { throw CoreDataStoreError.objectNotFound }()
     }
 
+    func remove(objectWithId id: NSManagedObjectID) {
+        remove(objectWithId: id, completionHandler: nil)
+    }
+
+    func remove(objectsWithPredicate predicate: NSPredicate) {
+        remove(objectsWithPredicate: predicate, completionHandler: nil)
+    }
+
     func clear() {
         clear(completionHandler: nil)
     }

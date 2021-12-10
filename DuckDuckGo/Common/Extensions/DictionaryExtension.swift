@@ -20,7 +20,7 @@ import Foundation
 
 extension Dictionary {
 
-    mutating func updateInPlace(key: Key, update: (inout Value?) throws -> Void) rethrows {
+    mutating func updateInPlace<T>(key: Key, update: (inout Value?) throws -> T) rethrows -> T {
         try update(&self[key])
     }
 
