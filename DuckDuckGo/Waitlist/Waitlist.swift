@@ -21,11 +21,10 @@ import Foundation
 final class Waitlist {
     
     // swiftlint:disable force_cast
-    static func createWindowController() -> NSWindowController {
+    static func createViewController() -> NSViewController {
         let storyboard = NSStoryboard(name: "Waitlist", bundle: Bundle.main)
-        let windowController = storyboard.instantiateController(withIdentifier: "WaitlistWindowController") as! NSWindowController
-        
-        return windowController
+        let controller = storyboard.instantiateController(withIdentifier: "WaitlistLockScreenViewController") as! NSViewController
+        return controller
     }
     // swiftlint:enable force_cast
     

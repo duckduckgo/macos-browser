@@ -161,6 +161,11 @@ extension MainWindowController: NSWindowDelegate {
         if (notification.object as? NSWindow)?.isPopUpWindow == false {
             WindowControllersManager.shared.lastKeyMainWindowController = self
         }
+        
+        print("DID BECOME KEY")
+        
+        let viewController = Waitlist.createViewController()
+        mainViewController.beginSheet(viewController)
     }
 
     func windowDidResignKey(_ notification: Notification) {
@@ -187,6 +192,7 @@ extension MainWindowController: NSWindowDelegate {
             WindowControllersManager.shared.unregister(self)
         }
     }
+
 }
 
 fileprivate extension MainMenu {

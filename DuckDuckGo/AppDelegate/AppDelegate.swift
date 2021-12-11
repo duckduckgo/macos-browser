@@ -106,18 +106,6 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         crashReporter.checkForNewReports()
 #endif
         urlEventHandler.applicationDidFinishLaunching()
-        
-        // WAITLIST:
-
-        let windowController = Waitlist.createWindowController()
-        let response = NSApplication.shared.runModal(for: windowController.window!)
-        // swiftlint:enable force_cast
-     
-        if response == .abort {
-            exit(1)
-        }
-
-        print("Response: \(response)")
     }
 
     func applicationShouldTerminate(_ sender: NSApplication) -> NSApplication.TerminateReply {

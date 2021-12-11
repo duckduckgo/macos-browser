@@ -24,6 +24,10 @@ final class WaitlistLockScreenViewController: NSViewController {
 
     override func viewDidLoad() {
         super.viewDidLoad()
+        
+        // The unlock screen always uses a light mode appearance, so it's hardcoded here to avoid fighting against
+        // system controls that try to display in dark mode.
+        view.appearance = NSAppearance(named: .aqua)
     }
     
     @IBAction func unlock(_ sender: NSButton) {

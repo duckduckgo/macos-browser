@@ -6,101 +6,145 @@
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
     </dependencies>
     <scenes>
-        <!--Window Controller-->
-        <scene sceneID="m31-DN-CVg">
-            <objects>
-                <windowController storyboardIdentifier="WaitlistWindowController" id="lYq-z5-Oer" customClass="WaitlistWindowController" customModule="DuckDuckGo_Privacy_Browser" customModuleProvider="target" sceneMemberID="viewController">
-                    <window key="window" title="Desktop Browser Waitlist" allowsToolTipsWhenApplicationIsInactive="NO" autorecalculatesKeyViewLoop="NO" releasedWhenClosed="NO" visibleAtLaunch="NO" frameAutosaveName="" animationBehavior="default" id="OJl-Wj-u1K">
-                        <windowStyleMask key="styleMask" titled="YES" closable="YES" miniaturizable="YES" resizable="YES"/>
-                        <windowPositionMask key="initialPositionMask" leftStrut="YES" rightStrut="YES" topStrut="YES" bottomStrut="YES"/>
-                        <rect key="contentRect" x="95" y="323" width="700" height="400"/>
-                        <rect key="screenRect" x="0.0" y="0.0" width="1728" height="1079"/>
-                        <view key="contentView" id="eox-7T-vB3">
-                            <rect key="frame" x="0.0" y="0.0" width="700" height="400"/>
-                            <autoresizingMask key="autoresizingMask"/>
-                        </view>
-                        <connections>
-                            <outlet property="delegate" destination="lYq-z5-Oer" id="4ur-4J-Xtq"/>
-                        </connections>
-                    </window>
-                    <connections>
-                        <segue destination="F9Q-mg-aJG" kind="relationship" relationship="window.shadowedContentViewController" id="gY4-Or-BgJ"/>
-                    </connections>
-                </windowController>
-                <customObject id="8pJ-cq-vb9" userLabel="First Responder" customClass="NSResponder" sceneMemberID="firstResponder"/>
-            </objects>
-            <point key="canvasLocation" x="-462" y="-274.5"/>
-        </scene>
-        <!--Waitlist Lock Screen View Controller-->
+        <!--Welcome to DuckDuckGo-->
         <scene sceneID="WHd-gN-94v">
             <objects>
-                <viewController storyboardIdentifier="WaitlistUnlockViewController" id="F9Q-mg-aJG" customClass="WaitlistLockScreenViewController" customModule="DuckDuckGo_Privacy_Browser" customModuleProvider="target" sceneMemberID="viewController">
-                    <view key="view" id="Tm0-Dx-fKo">
-                        <rect key="frame" x="0.0" y="0.0" width="752" height="400"/>
+                <viewController title="Welcome to DuckDuckGo" storyboardIdentifier="WaitlistLockScreenViewController" id="F9Q-mg-aJG" customClass="WaitlistLockScreenViewController" customModule="DuckDuckGo_Privacy_Browser" customModuleProvider="target" sceneMemberID="viewController">
+                    <view key="view" appearanceType="aqua" id="Tm0-Dx-fKo">
+                        <rect key="frame" x="0.0" y="0.0" width="360" height="318"/>
                         <autoresizingMask key="autoresizingMask"/>
                         <subviews>
-                            <stackView distribution="fill" orientation="vertical" alignment="centerX" horizontalStackHuggingPriority="249.99998474121094" verticalStackHuggingPriority="249.99998474121094" detachesHiddenViews="YES" translatesAutoresizingMaskIntoConstraints="NO" id="1Dc-Sl-H3o">
-                                <rect key="frame" x="226" y="80" width="300" height="68"/>
-                                <subviews>
-                                    <textField focusRingType="none" verticalHuggingPriority="750" horizontalCompressionResistancePriority="1000" translatesAutoresizingMaskIntoConstraints="NO" id="QkQ-Su-Se9">
-                                        <rect key="frame" x="54" y="28" width="193" height="40"/>
-                                        <constraints>
-                                            <constraint firstAttribute="height" constant="40" id="RQe-1b-cQk"/>
-                                        </constraints>
-                                        <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" selectable="YES" editable="YES" sendsActionOnEndEditing="YES" borderStyle="bezel" focusRingType="none" alignment="center" placeholderString="Invite Code" bezelStyle="round" id="3u7-ac-bVZ">
-                                            <font key="font" usesAppearanceFont="YES"/>
-                                            <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
-                                            <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
-                                        </textFieldCell>
-                                    </textField>
-                                    <button horizontalHuggingPriority="249" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="hVh-EB-iQR">
-                                        <rect key="frame" x="47" y="-7" width="207" height="32"/>
-                                        <buttonCell key="cell" type="push" title="Unlock" bezelStyle="rounded" alignment="center" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="OD9-vE-QIc">
-                                            <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
-                                            <font key="font" metaFont="system"/>
-                                        </buttonCell>
-                                        <connections>
-                                            <action selector="unlock:" target="F9Q-mg-aJG" id="rV4-ho-Bba"/>
-                                        </connections>
-                                    </button>
-                                </subviews>
+                            <imageView horizontalHuggingPriority="251" verticalHuggingPriority="251" translatesAutoresizingMaskIntoConstraints="NO" id="Xhj-pq-oPi" userLabel="Background View">
+                                <rect key="frame" x="0.0" y="58" width="360" height="260"/>
                                 <constraints>
-                                    <constraint firstItem="hVh-EB-iQR" firstAttribute="width" secondItem="QkQ-Su-Se9" secondAttribute="width" id="nMl-Kn-w76"/>
-                                    <constraint firstAttribute="width" constant="300" id="r5m-In-a26"/>
+                                    <constraint firstAttribute="width" constant="360" id="JEf-90-og5"/>
+                                    <constraint firstAttribute="height" constant="260" id="noD-mK-fKm"/>
                                 </constraints>
-                                <visibilityPriorities>
-                                    <integer value="1000"/>
-                                    <integer value="1000"/>
-                                </visibilityPriorities>
-                                <customSpacing>
-                                    <real value="3.4028234663852886e+38"/>
-                                    <real value="3.4028234663852886e+38"/>
-                                </customSpacing>
-                            </stackView>
+                                <imageCell key="cell" refusesFirstResponder="YES" alignment="left" imageScaling="proportionallyDown" image="WaitlistLockScreenBackground" id="DHG-a0-nPf"/>
+                            </imageView>
                             <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="OtQ-lg-ny6">
-                                <rect key="frame" x="243" y="264" width="266" height="24"/>
-                                <textFieldCell key="cell" lineBreakMode="clipping" title="DuckDuckGo Privacy Browser" id="ecb-cd-Gzd">
-                                    <font key="font" size="20" name="ProximaNova-Regular"/>
-                                    <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
+                                <rect key="frame" x="54" y="198" width="252" height="26"/>
+                                <textFieldCell key="cell" lineBreakMode="clipping" title="Welcome to DuckDuckGo" id="ecb-cd-Gzd">
+                                    <font key="font" size="22" name="SFProDisplay-Semibold"/>
+                                    <color key="textColor" red="0.20000000000000001" green="0.20000000000000001" blue="0.20000000000000001" alpha="1" colorSpace="calibratedRGB"/>
                                     <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
                                 </textFieldCell>
                             </textField>
-                            <imageView horizontalHuggingPriority="251" verticalHuggingPriority="251" translatesAutoresizingMaskIntoConstraints="NO" id="geE-7q-xYb">
-                                <rect key="frame" x="351" y="304" width="50" height="48"/>
+                            <imageView horizontalHuggingPriority="251" verticalHuggingPriority="251" translatesAutoresizingMaskIntoConstraints="NO" id="geE-7q-xYb" userLabel="Dax Logo">
+                                <rect key="frame" x="155" y="240" width="50" height="48"/>
                                 <constraints>
                                     <constraint firstAttribute="width" constant="50" id="fX6-VY-K07"/>
                                     <constraint firstAttribute="height" constant="48" id="m5s-eQ-VIx"/>
                                 </constraints>
                                 <imageCell key="cell" refusesFirstResponder="YES" alignment="left" imageScaling="proportionallyDown" image="HomepageLogo" id="i4p-iE-ZkA"/>
                             </imageView>
+                            <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="Qkr-p5-9Ks">
+                                <rect key="frame" x="106" y="153" width="148" height="30"/>
+                                <textFieldCell key="cell" lineBreakMode="clipping" alignment="center" title="Enter your invite code to get started" id="6Sz-9i-tb7">
+                                    <font key="font" size="13" name="SFProText-Semibold"/>
+                                    <color key="textColor" red="0.20000000000000001" green="0.20000000000000001" blue="0.20000000000000001" alpha="1" colorSpace="calibratedRGB"/>
+                                    <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
+                                </textFieldCell>
+                            </textField>
+                            <customView translatesAutoresizingMaskIntoConstraints="NO" id="khJ-Qn-0J1" userLabel="Button Container" customClass="ColorView" customModule="DuckDuckGo_Privacy_Browser" customModuleProvider="target">
+                                <rect key="frame" x="0.0" y="0.0" width="360" height="58"/>
+                                <subviews>
+                                    <stackView distribution="fillEqually" orientation="horizontal" alignment="centerY" horizontalStackHuggingPriority="249.99998474121094" verticalStackHuggingPriority="249.99998474121094" detachesHiddenViews="YES" translatesAutoresizingMaskIntoConstraints="NO" id="HlJ-7k-AfV">
+                                        <rect key="frame" x="20" y="15" width="320" height="28"/>
+                                        <subviews>
+                                            <button horizontalHuggingPriority="249" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="HUG-fd-k5l">
+                                                <rect key="frame" x="-3" y="-4" width="162" height="35"/>
+                                                <constraints>
+                                                    <constraint firstAttribute="height" constant="28" id="yCS-vf-YGr"/>
+                                                </constraints>
+                                                <buttonCell key="cell" type="bevel" title="Quit" bezelStyle="regularSquare" alignment="center" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="Vyy-QX-xos">
+                                                    <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
+                                                    <font key="font" metaFont="system"/>
+                                                </buttonCell>
+                                            </button>
+                                            <button horizontalHuggingPriority="248" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="wvn-Vr-E1z">
+                                                <rect key="frame" x="161" y="-4" width="162" height="35"/>
+                                                <constraints>
+                                                    <constraint firstAttribute="height" constant="28" id="niE-xg-tqY"/>
+                                                </constraints>
+                                                <buttonCell key="cell" type="bevel" title="Continue" bezelStyle="regularSquare" alignment="center" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="KfL-iP-RaH">
+                                                    <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
+                                                    <font key="font" metaFont="system"/>
+                                                    <string key="keyEquivalent" base64-UTF8="YES">
+DQ
+</string>
+                                                </buttonCell>
+                                            </button>
+                                        </subviews>
+                                        <constraints>
+                                            <constraint firstAttribute="height" constant="28" id="MP4-ul-iPR"/>
+                                        </constraints>
+                                        <visibilityPriorities>
+                                            <integer value="1000"/>
+                                            <integer value="1000"/>
+                                        </visibilityPriorities>
+                                        <customSpacing>
+                                            <real value="3.4028234663852886e+38"/>
+                                            <real value="3.4028234663852886e+38"/>
+                                        </customSpacing>
+                                    </stackView>
+                                </subviews>
+                                <constraints>
+                                    <constraint firstAttribute="trailing" secondItem="HlJ-7k-AfV" secondAttribute="trailing" constant="20" id="9Tz-BK-PxR"/>
+                                    <constraint firstItem="HlJ-7k-AfV" firstAttribute="top" secondItem="khJ-Qn-0J1" secondAttribute="top" constant="15" id="QhX-3h-jFo"/>
+                                    <constraint firstItem="HlJ-7k-AfV" firstAttribute="leading" secondItem="khJ-Qn-0J1" secondAttribute="leading" constant="20" id="k4V-CU-jjb"/>
+                                    <constraint firstAttribute="bottom" secondItem="HlJ-7k-AfV" secondAttribute="bottom" constant="15" id="x0l-ox-NcC"/>
+                                </constraints>
+                                <userDefinedRuntimeAttributes>
+                                    <userDefinedRuntimeAttribute type="color" keyPath="backgroundColor">
+                                        <color key="value" red="1" green="1" blue="1" alpha="1" colorSpace="calibratedRGB"/>
+                                    </userDefinedRuntimeAttribute>
+                                </userDefinedRuntimeAttributes>
+                            </customView>
+                            <textField verticalHuggingPriority="750" horizontalCompressionResistancePriority="1000" translatesAutoresizingMaskIntoConstraints="NO" id="QkQ-Su-Se9">
+                                <rect key="frame" x="140" y="116" width="80" height="22"/>
+                                <constraints>
+                                    <constraint firstAttribute="height" constant="22" id="RQe-1b-cQk"/>
+                                    <constraint firstAttribute="width" constant="80" id="hz1-Xq-OHn"/>
+                                </constraints>
+                                <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" selectable="YES" editable="YES" sendsActionOnEndEditing="YES" borderStyle="bezel" alignment="center" bezelStyle="round" id="3u7-ac-bVZ">
+                                    <font key="font" size="13" name="SFPro-Regular"/>
+                                    <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
+                                    <color key="backgroundColor" red="1" green="1" blue="1" alpha="1" colorSpace="calibratedRGB"/>
+                                </textFieldCell>
+                            </textField>
+                            <customView translatesAutoresizingMaskIntoConstraints="NO" id="Z2p-Aq-FeA" customClass="ColorView" customModule="DuckDuckGo_Privacy_Browser" customModuleProvider="target">
+                                <rect key="frame" x="0.0" y="58" width="360" height="1"/>
+                                <constraints>
+                                    <constraint firstAttribute="height" constant="1" id="WEF-HU-yMH"/>
+                                </constraints>
+                                <userDefinedRuntimeAttributes>
+                                    <userDefinedRuntimeAttribute type="color" keyPath="backgroundColor">
+                                        <color key="value" red="0.80784313725490198" green="0.84313725490196079" blue="0.87058823529411766" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                                    </userDefinedRuntimeAttribute>
+                                </userDefinedRuntimeAttributes>
+                            </customView>
                         </subviews>
                         <constraints>
                             <constraint firstItem="OtQ-lg-ny6" firstAttribute="centerX" secondItem="Tm0-Dx-fKo" secondAttribute="centerX" id="0as-6M-igR"/>
-                            <constraint firstItem="1Dc-Sl-H3o" firstAttribute="centerX" secondItem="Tm0-Dx-fKo" secondAttribute="centerX" id="0kq-0M-gJD"/>
+                            <constraint firstAttribute="trailing" secondItem="Z2p-Aq-FeA" secondAttribute="trailing" id="1Vp-TP-PH1"/>
+                            <constraint firstItem="khJ-Qn-0J1" firstAttribute="leading" secondItem="Tm0-Dx-fKo" secondAttribute="leading" id="2q9-Wr-irb"/>
+                            <constraint firstItem="QkQ-Su-Se9" firstAttribute="top" secondItem="Qkr-p5-9Ks" secondAttribute="bottom" constant="15" id="68c-lT-1Ye"/>
+                            <constraint firstItem="QkQ-Su-Se9" firstAttribute="centerX" secondItem="Tm0-Dx-fKo" secondAttribute="centerX" id="7NY-mY-aQF"/>
+                            <constraint firstItem="Xhj-pq-oPi" firstAttribute="leading" secondItem="Tm0-Dx-fKo" secondAttribute="leading" id="9PC-Vq-Nbf"/>
+                            <constraint firstItem="khJ-Qn-0J1" firstAttribute="top" secondItem="Xhj-pq-oPi" secondAttribute="bottom" id="E9v-G0-gJP"/>
+                            <constraint firstAttribute="bottom" secondItem="khJ-Qn-0J1" secondAttribute="bottom" id="HZ3-gE-6nb"/>
+                            <constraint firstItem="Qkr-p5-9Ks" firstAttribute="top" secondItem="OtQ-lg-ny6" secondAttribute="bottom" constant="15" id="K58-1P-8jn"/>
+                            <constraint firstItem="Xhj-pq-oPi" firstAttribute="top" secondItem="Tm0-Dx-fKo" secondAttribute="top" id="SoZ-Y8-Zzb"/>
+                            <constraint firstItem="Xhj-pq-oPi" firstAttribute="centerX" secondItem="Tm0-Dx-fKo" secondAttribute="centerX" id="UXL-65-aqT"/>
+                            <constraint firstAttribute="trailing" secondItem="khJ-Qn-0J1" secondAttribute="trailing" id="VbA-Qi-6YH"/>
                             <constraint firstItem="OtQ-lg-ny6" firstAttribute="top" secondItem="geE-7q-xYb" secondAttribute="bottom" constant="16" id="asf-xF-I09"/>
                             <constraint firstItem="geE-7q-xYb" firstAttribute="centerX" secondItem="Tm0-Dx-fKo" secondAttribute="centerX" id="bEj-SH-qVT"/>
-                            <constraint firstAttribute="bottom" secondItem="1Dc-Sl-H3o" secondAttribute="bottom" constant="80" id="ixg-n6-8aG"/>
-                            <constraint firstItem="geE-7q-xYb" firstAttribute="top" secondItem="Tm0-Dx-fKo" secondAttribute="top" constant="48" id="qcc-jB-32V"/>
+                            <constraint firstItem="Qkr-p5-9Ks" firstAttribute="centerX" secondItem="Tm0-Dx-fKo" secondAttribute="centerX" id="haa-oI-ZQa"/>
+                            <constraint firstAttribute="trailing" secondItem="Xhj-pq-oPi" secondAttribute="trailing" id="oQV-7C-gi2"/>
+                            <constraint firstItem="geE-7q-xYb" firstAttribute="top" secondItem="Tm0-Dx-fKo" secondAttribute="top" constant="30" id="qcc-jB-32V"/>
+                            <constraint firstItem="khJ-Qn-0J1" firstAttribute="top" secondItem="Z2p-Aq-FeA" secondAttribute="bottom" id="wka-6r-2BP"/>
+                            <constraint firstItem="Z2p-Aq-FeA" firstAttribute="leading" secondItem="Tm0-Dx-fKo" secondAttribute="leading" id="xfl-fY-7xe"/>
                         </constraints>
                     </view>
                     <connections>
@@ -114,5 +158,6 @@
     </scenes>
     <resources>
         <image name="HomepageLogo" width="192" height="192"/>
+        <image name="WaitlistLockScreenBackground" width="360" height="260"/>
     </resources>
 </document>

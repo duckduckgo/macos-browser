@@ -201,6 +201,7 @@
 		4BE65480271FCD4D008D1D63 /* PasswordManagementLoginModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4BE6547C271FCD4D008D1D63 /* PasswordManagementLoginModel.swift */; };
 		4BE65481271FCD4D008D1D63 /* PasswordManagementNoteModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4BE6547D271FCD4D008D1D63 /* PasswordManagementNoteModel.swift */; };
 		4BE65485271FCD7B008D1D63 /* LoginFaviconView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4BE65484271FCD7B008D1D63 /* LoginFaviconView.swift */; };
+		4BEF0E6827641A0E00AF7C58 /* WaitlistLockScreenViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4BEF0E6627641A0E00AF7C58 /* WaitlistLockScreenViewController.swift */; };
 		4BF01C00272AE74C00884A61 /* CountryList.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4BE65482271FCD53008D1D63 /* CountryList.swift */; };
 		4BF4951826C08395000547B8 /* ThirdPartyBrowserTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4BF4951726C08395000547B8 /* ThirdPartyBrowserTests.swift */; };
 		7B4CE8E726F02135009134B1 /* TabBarTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7B4CE8E626F02134009134B1 /* TabBarTests.swift */; };
@@ -821,6 +822,7 @@
 		4BE6547D271FCD4D008D1D63 /* PasswordManagementNoteModel.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PasswordManagementNoteModel.swift; sourceTree = "<group>"; };
 		4BE65482271FCD53008D1D63 /* CountryList.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CountryList.swift; sourceTree = "<group>"; };
 		4BE65484271FCD7B008D1D63 /* LoginFaviconView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = LoginFaviconView.swift; sourceTree = "<group>"; };
+		4BEF0E6627641A0E00AF7C58 /* WaitlistLockScreenViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = WaitlistLockScreenViewController.swift; sourceTree = "<group>"; };
 		4BF4951726C08395000547B8 /* ThirdPartyBrowserTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ThirdPartyBrowserTests.swift; sourceTree = "<group>"; };
 		7B4CE8DA26F02108009134B1 /* UI Tests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = "UI Tests.xctest"; sourceTree = BUILT_PRODUCTS_DIR; };
 		7B4CE8DE26F02108009134B1 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
@@ -1769,6 +1771,7 @@
 		4BC68A6C2759ADC20029A586 /* Waitlist */ = {
 			isa = PBXGroup;
 			children = (
+				4BEF0E6627641A0E00AF7C58 /* WaitlistLockScreenViewController.swift */,
 				4BC68A6F2759AE490029A586 /* Waitlist.storyboard */,
 				4BC68A712759B2140029A586 /* Waitlist.swift */,
 			);
@@ -3728,6 +3731,7 @@
 				AAEEC6A927088ADB008445F7 /* FireCoordinator.swift in Sources */,
 				B655369B268442EE00085A79 /* GeolocationProvider.swift in Sources */,
 				B6C0B23C26E87D900031CB7F /* NSAlert+ActiveDownloadsTermination.swift in Sources */,
+				4BEF0E6827641A0E00AF7C58 /* WaitlistLockScreenViewController.swift in Sources */,
 				AAECA42024EEA4AC00EFA63A /* IndexPathExtension.swift in Sources */,
 				4BE65478271FCD41008D1D63 /* PasswordManagementNoteItemView.swift in Sources */,
 				AA5C8F632591021700748EB7 /* NSApplicationExtension.swift in Sources */,
