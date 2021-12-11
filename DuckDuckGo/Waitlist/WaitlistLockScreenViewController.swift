@@ -21,6 +21,7 @@ import AppKit
 final class WaitlistLockScreenViewController: NSViewController {
     
     @IBOutlet var inviteCodeTextField: NSTextField!
+    @IBOutlet var continueButton: NSButton!
 
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -30,22 +31,39 @@ final class WaitlistLockScreenViewController: NSViewController {
         view.appearance = NSAppearance(named: .aqua)
     }
     
+    @IBAction func quit(_ sender: NSButton) {
+        // NSRunningApplication.current.terminate()
+        exit(0)
+    }
+    
     @IBAction func unlock(_ sender: NSButton) {
-        let code = inviteCodeTextField.stringValue
-        let url = URL(string: "https://quackdev.duckduckgo.com/api/auth/invites/macosbrowser/redeem")!
-        
-        APIRequest.request(url: url, method: .post, parameters: ["code": code], callBackOnMainThread: true) { result, error  in
-            if let result = result {
-                self.unlockApp()
-            } else {
-                print("Failed")
-            }
-        }
+//        let code = inviteCodeTextField.stringValue
+//        let url = URL(string: "https://quackdev.duckduckgo.com/api/auth/invites/macosbrowser/redeem")!
+//
+//        APIRequest.request(url: url, method: .post, parameters: ["code": code], callBackOnMainThread: true) { result, error  in
+//            if let result = result {
+//                self.unlockApp()
+//            } else {
+//                print("Failed")
+//            }
+//        }
     }
     
     private func unlockApp() {
         NSApplication.shared.stopModal(withCode: .OK)
         self.view.window?.close()
+    }
+    
+}
+
+extension WaitlistLockScreenViewController: NSTextFieldDelegate {
+    
+    func controlTextDidChange(_ notification: Notification) {
+        if let info = notification.userInfo, let text = info["NSFieldEditor"] as? NSText {
+            text.string = text.string.uppercased()
+        }
+        
+        continueButton.isEnabled = !inviteCodeTextField.stringValue.isEmpty
     }
     
 }

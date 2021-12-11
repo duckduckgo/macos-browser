@@ -39,8 +39,8 @@
                                 <imageCell key="cell" refusesFirstResponder="YES" alignment="left" imageScaling="proportionallyDown" image="HomepageLogo" id="i4p-iE-ZkA"/>
                             </imageView>
                             <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="Qkr-p5-9Ks">
-                                <rect key="frame" x="106" y="153" width="148" height="30"/>
-                                <textFieldCell key="cell" lineBreakMode="clipping" alignment="center" title="Enter your invite code to get started" id="6Sz-9i-tb7">
+                                <rect key="frame" x="105" y="153" width="150" height="30"/>
+                                <textFieldCell key="cell" lineBreakMode="clipping" alignment="center" title="Enter your Invite Code to get started" id="6Sz-9i-tb7">
                                     <font key="font" size="13" name="SFProText-Semibold"/>
                                     <color key="textColor" red="0.20000000000000001" green="0.20000000000000001" blue="0.20000000000000001" alpha="1" colorSpace="calibratedRGB"/>
                                     <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
@@ -61,19 +61,25 @@
                                                     <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
                                                     <font key="font" metaFont="system"/>
                                                 </buttonCell>
+                                                <connections>
+                                                    <action selector="quit:" target="F9Q-mg-aJG" id="h4t-s1-6bm"/>
+                                                </connections>
                                             </button>
                                             <button horizontalHuggingPriority="248" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="wvn-Vr-E1z">
                                                 <rect key="frame" x="161" y="-4" width="162" height="35"/>
                                                 <constraints>
                                                     <constraint firstAttribute="height" constant="28" id="niE-xg-tqY"/>
                                                 </constraints>
-                                                <buttonCell key="cell" type="bevel" title="Continue" bezelStyle="regularSquare" alignment="center" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="KfL-iP-RaH">
+                                                <buttonCell key="cell" type="bevel" title="Continue" bezelStyle="regularSquare" alignment="center" enabled="NO" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="KfL-iP-RaH">
                                                     <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
                                                     <font key="font" metaFont="system"/>
                                                     <string key="keyEquivalent" base64-UTF8="YES">
 DQ
 </string>
                                                 </buttonCell>
+                                                <connections>
+                                                    <action selector="unlock:" target="F9Q-mg-aJG" id="umc-1o-0E3"/>
+                                                </connections>
                                             </button>
                                         </subviews>
                                         <constraints>
@@ -102,16 +108,19 @@ DQ
                                 </userDefinedRuntimeAttributes>
                             </customView>
                             <textField verticalHuggingPriority="750" horizontalCompressionResistancePriority="1000" translatesAutoresizingMaskIntoConstraints="NO" id="QkQ-Su-Se9">
-                                <rect key="frame" x="140" y="116" width="80" height="22"/>
+                                <rect key="frame" x="125" y="116" width="110" height="22"/>
                                 <constraints>
                                     <constraint firstAttribute="height" constant="22" id="RQe-1b-cQk"/>
-                                    <constraint firstAttribute="width" constant="80" id="hz1-Xq-OHn"/>
+                                    <constraint firstAttribute="width" constant="110" id="hz1-Xq-OHn"/>
                                 </constraints>
                                 <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" selectable="YES" editable="YES" sendsActionOnEndEditing="YES" borderStyle="bezel" alignment="center" bezelStyle="round" id="3u7-ac-bVZ">
                                     <font key="font" size="13" name="SFPro-Regular"/>
                                     <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
                                     <color key="backgroundColor" red="1" green="1" blue="1" alpha="1" colorSpace="calibratedRGB"/>
                                 </textFieldCell>
+                                <connections>
+                                    <outlet property="delegate" destination="F9Q-mg-aJG" id="YOp-0Z-PY6"/>
+                                </connections>
                             </textField>
                             <customView translatesAutoresizingMaskIntoConstraints="NO" id="Z2p-Aq-FeA" customClass="ColorView" customModule="DuckDuckGo_Privacy_Browser" customModuleProvider="target">
                                 <rect key="frame" x="0.0" y="58" width="360" height="1"/>
@@ -148,6 +157,7 @@ DQ
                         </constraints>
                     </view>
                     <connections>
+                        <outlet property="continueButton" destination="wvn-Vr-E1z" id="F5F-t8-DfM"/>
                         <outlet property="inviteCodeTextField" destination="QkQ-Su-Se9" id="ESU-eP-zxm"/>
                     </connections>
                 </viewController>

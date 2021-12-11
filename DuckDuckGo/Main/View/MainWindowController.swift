@@ -162,8 +162,6 @@ extension MainWindowController: NSWindowDelegate {
             WindowControllersManager.shared.lastKeyMainWindowController = self
         }
         
-        print("DID BECOME KEY")
-        
         let viewController = Waitlist.createViewController()
         mainViewController.beginSheet(viewController)
     }
