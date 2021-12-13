@@ -63,6 +63,7 @@ final class WaitlistLockScreenViewController: NSViewController {
     @IBAction func continueButtonClicked(_ sender: NSButton) {
         if viewModel.state == .unlockSuccess {
             self.dismiss()
+            NotificationCenter.default.post(name: .macWaitlistLockScreenDidUnlock, object: nil)
         } else {
             viewModel.attemptUnlock(code: inviteCodeTextField.stringValue)
         }
@@ -87,6 +88,7 @@ final class WaitlistLockScreenViewController: NSViewController {
 
             continueButton.isEnabled = false
             errorLabel.isHidden = true
+            inviteCodeTextField.isEnabled = false
             networkRequestSpinner.startAnimation(nil)
             networkRequestSpinner.isHidden = false
         case .unlockSuccess:
@@ -103,6 +105,9 @@ final class WaitlistLockScreenViewController: NSViewController {
             inviteCodeStateGroup.isHidden = false
             successStateGroup.isHidden = true
             
+            inviteCodeTextField.isEnabled = true
+            inviteCodeTextField.makeMeFirstResponder()
+
             networkRequestSpinner.isHidden = true
             continueButton.isEnabled = true
             errorLabel.isHidden = false

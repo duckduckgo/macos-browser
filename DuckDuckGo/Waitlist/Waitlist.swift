@@ -35,15 +35,17 @@ struct Waitlist {
         }
     }
     
-    static func displayLockScreenIfNecessary(in viewController: NSViewController) {
+    static func displayLockScreenIfNecessary(in viewController: NSViewController) -> Bool {
         guard !isUnlocked else {
-            return
+            return false
         }
 
         let lockScreenViewController = WaitlistLockScreenViewController.instantiate()
         let lockScreenWindow = lockScreenViewController.wrappedInWindowController()
         
         viewController.beginSheet(lockScreenWindow)
+        
+        return true
     }
     
 }

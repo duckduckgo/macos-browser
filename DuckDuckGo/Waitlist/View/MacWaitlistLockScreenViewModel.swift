@@ -55,8 +55,6 @@ final class MacWaitlistLockScreenViewModel: ObservableObject {
                 self.state = .unlockSuccess
             }
         } else {
-            self.state = .unlockFailure
-            
             waitlistRequest.unlock(with: code) { result in
                 switch result {
                 case .success(let response):

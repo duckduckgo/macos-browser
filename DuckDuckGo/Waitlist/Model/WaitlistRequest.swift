@@ -45,8 +45,8 @@ protocol MacWaitlistRequest {
 
 struct MacWaitlistAPIRequest: MacWaitlistRequest {
     
-    static let developmentEndpoint = URL(string: "https://quackdev.duckduckgo.com/api/auth/waitlist/")!
-    static let productionEndpoint = URL(string: "https://quack.duckduckgo.com/api/auth/waitlist/")!
+    static let developmentEndpoint = URL(string: "https://quackdev.duckduckgo.com/api/auth/invites/")!
+    static let productionEndpoint = URL(string: "https://quack.duckduckgo.com/api/auth/invites/")!
     
     private let endpoint: URL
     

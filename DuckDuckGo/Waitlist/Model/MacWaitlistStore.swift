@@ -38,7 +38,7 @@ final class MacWaitlistEncryptedFileStorage: MacWaitlistStore {
     
     init(containerURL: URL = .sandboxApplicationSupportURL,
          fileStore: FileStore = EncryptedFileStore.withDefaultEncryptionKey(),
-         statisticsStore: StatisticsStore = StatisticsUserDefaults()) {
+         statisticsStore: StatisticsStore = LocalStatisticsStore()) {
         self.containerURL = containerURL
         self.statisticsStore = statisticsStore
         self.fileStore = fileStore

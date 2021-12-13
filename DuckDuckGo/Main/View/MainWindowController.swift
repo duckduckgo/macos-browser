@@ -56,6 +56,10 @@ final class MainWindowController: NSWindowController {
     private func setupWindow() {
         window?.delegate = self
         window?.setFrameAutosaveName(Self.windowFrameSaveName)
+        
+        NotificationCenter.default.addObserver(forName: .macWaitlistLockScreenDidUnlock, object: nil, queue: .main) { [weak self] _ in
+            self?.userInteraction(prevented: false)
+        }
     }
 
     private func setupToolbar() {
@@ -162,7 +166,11 @@ extension MainWindowController: NSWindowDelegate {
             WindowControllersManager.shared.lastKeyMainWindowController = self
         }
         
-        Waitlist.displayLockScreenIfNecessary(in: mainViewController)
+        let displayed = Waitlist.displayLockScreenIfNecessary(in: mainViewController)
+        
+        if displayed {
+            userInteraction(prevented: true)
+        }
     }
 
     func windowDidResignKey(_ notification: Notification) {
@@ -202,7 +210,8 @@ fileprivate extension MainMenu {
             closeWindowMenuItem,
             closeAllWindowsMenuItem,
             closeTabMenuItem,
-            burnWebsiteDataMenuItem
+            burnWebsiteDataMenuItem,
+            importBrowserDataMenuItem
         ]
     }
 
