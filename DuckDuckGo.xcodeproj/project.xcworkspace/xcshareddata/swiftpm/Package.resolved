@@ -5,7 +5,7 @@
         "package": "BrowserServicesKit",
         "repositoryURL": "https://github.com/duckduckgo/BrowserServicesKit.git",
         "state": {
-          "branch": "release/friends-and-family",
+          "branch": null,
           "revision": "6d0dc34bbb1c8fab681cb3664c6c7fd151594412",
           "version": null
         }
