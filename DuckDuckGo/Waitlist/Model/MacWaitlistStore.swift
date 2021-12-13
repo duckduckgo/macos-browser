@@ -28,10 +28,20 @@ protocol MacWaitlistStore {
 
 final class MacWaitlistEncryptedFileStorage: MacWaitlistStore {
     
+    private var encryptedMetadataFilePath: URL {
+        return containerURL.appendingPathComponent("Configuration").appendingPathComponent("LaunchConfiguration")
+    }
+
+    private let containerURL: URL
     private let statisticsStore: StatisticsStore
+    private let fileStore: FileStore
     
-    init(statisticsStore: StatisticsStore = StatisticsUserDefaults()) {
+    init(containerURL: URL = .sandboxApplicationSupportURL,
+         fileStore: FileStore = EncryptedFileStore.withDefaultEncryptionKey(),
+         statisticsStore: StatisticsStore = StatisticsUserDefaults()) {
+        self.containerURL = containerURL
         self.statisticsStore = statisticsStore
+        self.fileStore = fileStore
     }
     
     func isExistingInstall() -> Bool {
@@ -39,12 +49,35 @@ final class MacWaitlistEncryptedFileStorage: MacWaitlistStore {
     }
     
     func isUnlocked() -> Bool {
-        return false
+        guard let metadata = loadMetadataFromDisk() else {
+            return false
+        }
+        
+        return metadata.unlockCodeVerified
     }
     
     func unlock() {
-        print(URL.sandboxApplicationSupportURL)
-        print("UNLOCKING")
+        let metadata = MacWaitlistMetadata(initialUpgradeCheckComplete: true, unlockCodeVerified: true)
+        
+        guard let metadataJSONData = metadata.toJSON() else {
+            // TODO: This is a serious error that will prevent users from unlocking, it should be handled somehow.
+            return
+        }
+
+        fileStore.persist(metadataJSONData, url: encryptedMetadataFilePath)
+    }
+    
+    func deleteExistingMetadata() {
+        fileStore.remove(fileAtURL: encryptedMetadataFilePath)
+    }
+    
+    private func loadMetadataFromDisk() -> MacWaitlistMetadata? {
+        guard let data = fileStore.loadData(at: encryptedMetadataFilePath) else {
+            return nil
+        }
+        
+        let decoder = JSONDecoder()
+        return try? decoder.decode(MacWaitlistMetadata.self, from: data)
     }
     
 }

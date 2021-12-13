@@ -658,6 +658,12 @@ CQ
                                                 <action selector="resetSecureVaultData:" target="Ady-hI-5gd" id="5uS-MI-2BN"/>
                                             </connections>
                                         </menuItem>
+                                        <menuItem title="Reset Mac Waitlist Lock Screen" id="jXH-IC-kHl">
+                                            <modifierMask key="keyEquivalentModifierMask"/>
+                                            <connections>
+                                                <action selector="resetMacWaitlistUnlockState:" target="Ady-hI-5gd" id="1Bd-q4-0F9"/>
+                                            </connections>
+                                        </menuItem>
                                         <menuItem title="Fatal Error" id="FeS-hb-rvM" userLabel="Reset Default Browser Prompt">
                                             <modifierMask key="keyEquivalentModifierMask"/>
                                             <connections>

@@ -75,7 +75,8 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         guard !Self.isRunningTests else { return }
 
         // IMPORTANT: This call needs to run before ATB is initialized, as it is used to determine whether this is an existing install being migrated.
-        Waitlist.unlockExistingInstallIfNecessary()
+        // TODO: Enable for production builds.
+        // Waitlist.unlockExistingInstallIfNecessary()
 
         HTTPSUpgrade.shared.loadDataAsync()
         LocalBookmarkManager.shared.loadBookmarks()

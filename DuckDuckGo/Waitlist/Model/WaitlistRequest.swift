@@ -19,11 +19,15 @@
 import Foundation
 
 struct MacWaitlistRedeemSuccessResponse: Decodable {
+    var hasExpectedStatusMessage: Bool {
+        return status == "redeemed"
+    }
+
     let status: String
 }
 
 struct MacWaitlistRedeemFailureResponse: Decodable {
-    let status: String
+    let error: String
 }
 
 enum MacWaitlistRedeemError: Error {

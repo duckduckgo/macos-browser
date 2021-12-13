@@ -28,13 +28,6 @@ final class WaitlistLockScreenViewController: NSViewController {
     }
     // swiftlint:enable force_cast
     
-    enum LockScreenState {
-        case requiresUnlock
-        case unlockRequestInFlight
-        case unlockSuccess
-        case unlockFailure
-    }
-    
     @IBOutlet var inviteCodeStateGroup: NSView!
     @IBOutlet var successStateGroup: NSView!
     
@@ -48,12 +41,6 @@ final class WaitlistLockScreenViewController: NSViewController {
     private let viewModel = MacWaitlistLockScreenViewModel()
     private var viewStateCancellable: AnyCancellable?
 
-    private var state: LockScreenState = .requiresUnlock {
-        didSet {
-            renderCurrentState()
-        }
-    }
-
     override func viewDidLoad() {
         super.viewDidLoad()
         
@@ -65,8 +52,7 @@ final class WaitlistLockScreenViewController: NSViewController {
             self?.render(state: newState)
         }
         
-        state = .requiresUnlock
-        render(state: self.state)
+        renderCurrentState()
     }
     
     @IBAction func quit(_ sender: NSButton) {
@@ -75,7 +61,7 @@ final class WaitlistLockScreenViewController: NSViewController {
     }
     
     @IBAction func continueButtonClicked(_ sender: NSButton) {
-        if state == .unlockSuccess {
+        if viewModel.state == .unlockSuccess {
             self.dismiss()
         } else {
             viewModel.attemptUnlock(code: inviteCodeTextField.stringValue)
@@ -83,10 +69,10 @@ final class WaitlistLockScreenViewController: NSViewController {
     }
     
     private func renderCurrentState() {
-        render(state: self.state)
+        render(state: viewModel.state)
     }
 
-    private func render(state: LockScreenState) {
+    private func render(state: MacWaitlistLockScreenViewModel.ViewState) {
         switch state {
         case .requiresUnlock:
             inviteCodeStateGroup.isHidden = false

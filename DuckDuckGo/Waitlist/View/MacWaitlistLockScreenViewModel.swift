@@ -18,6 +18,10 @@
 
 import Foundation
 
+extension Notification.Name {
+    static let macWaitlistLockScreenDidUnlock = Notification.Name("macWaitlistLockScreenDidUnlock")
+}
+
 final class MacWaitlistLockScreenViewModel: ObservableObject {
     
     enum ViewState {
@@ -45,12 +49,27 @@ final class MacWaitlistLockScreenViewModel: ObservableObject {
         // TODO: Don't ship this, it's for product review only so that people can test the flow repeatedly
         let hardcodedTemporaryPasscode = "DAX"
         
-        if code == hardcodedTemporaryPasscode {
+        if code.caseInsensitiveCompare(hardcodedTemporaryPasscode) == .orderedSame {
             DispatchQueue.main.asyncAfter(deadline: .now() + 1.5) {
+                self.store.unlock()
                 self.state = .unlockSuccess
             }
         } else {
             self.state = .unlockFailure
+            
+            waitlistRequest.unlock(with: code) { result in
+                switch result {
+                case .success(let response):
+                    if response.hasExpectedStatusMessage {
+                        self.store.unlock()
+                        self.state = .unlockSuccess
+                    } else {
+                        self.state = .unlockFailure
+                    }
+                case .failure(let error):
+                    self.state = .unlockFailure
+                }
+            }
         }
     }
     

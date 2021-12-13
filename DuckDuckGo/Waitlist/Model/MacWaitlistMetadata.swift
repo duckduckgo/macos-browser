@@ -23,4 +23,9 @@ struct MacWaitlistMetadata: Codable {
     let initialUpgradeCheckComplete: Bool
     let unlockCodeVerified: Bool
     
+    func toJSON() -> Data? {
+        let encoder = JSONEncoder()
+        return try? encoder.encode(self)
+    }
+    
 }

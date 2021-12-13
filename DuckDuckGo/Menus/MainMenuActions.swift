@@ -489,6 +489,11 @@ extension MainViewController {
             }
         }
     }
+    
+    @IBAction func resetMacWaitlistUnlockState(_ sender: Any?) {
+        let store = MacWaitlistEncryptedFileStorage()
+        store.deleteExistingMetadata()
+    }
 
     // MARK: - Developer Tools
 
