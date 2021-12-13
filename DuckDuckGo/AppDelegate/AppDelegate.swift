@@ -148,7 +148,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         if Pixel.Event.AppLaunch.repetition().value == .initial || regularLaunch ?? false {
 
             Pixel.fire(.appLaunch(launch: .autoInitialOrRegular())) { error in
-                if let error = error {
+                if let error = error, error is URLError {
                     os_log("appLaunch Pixel send failed: %s", type: .error, "\(error)")
                 } else {
                     Pixel.Event.AppLaunch.repetition().update()
