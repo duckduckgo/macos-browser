@@ -36,6 +36,7 @@ final class GPCRequestFactory {
     }
     
     func reloadGPCSetting() {
+        privacyConfig = ContentBlocking.privacyConfigurationManager.privacyConfig
         let prefs = PrivacySecurityPreferences()
         gpcEnabled = prefs.gpcEnabled
     }
