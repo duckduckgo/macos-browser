@@ -47,6 +47,8 @@ final class BrowserTabViewController: NSViewController {
 
     private var hoverLabelWorkItem: DispatchWorkItem?
 
+    private var temporaryContentController: NSViewController?
+
     required init?(coder: NSCoder) {
         fatalError("BrowserTabViewController: Bad initializer")
     }
@@ -223,6 +225,7 @@ final class BrowserTabViewController: NSViewController {
 
     private func removeAllTabContent(includingWebView: Bool = true) {
         self.homepageView.removeFromSuperview()
+        temporaryContentController?.removeCompletely()
         preferencesViewController.removeCompletely()
         bookmarksViewController.removeCompletely()
         if includingWebView {
@@ -230,24 +233,36 @@ final class BrowserTabViewController: NSViewController {
         }
     }
 
-    private func showTabContent(_ vc: NSViewController) {
+    private func showTabContentController(_ vc: NSViewController) {
         self.addChild(vc)
         view.addAndLayout(vc.view)
     }
 
+    private func showTemporaryTabContentController(_ vc: NSViewController) {
+        temporaryContentController?.removeCompletely()
+        showTabContentController(vc)
+        temporaryContentController = vc
+    }
+
+    private func requestDisableUI() {
+        (view.window?.windowController as? MainWindowController)?.userInteraction(prevented: true)
+    }
+
     private func show(tabContent content: Tab.TabContent?) {
+
         switch content ?? .homepage {
         case .bookmarks:
             removeAllTabContent()
-            showTabContent(bookmarksViewController)
+            showTabContentController(bookmarksViewController)
 
         case .preferences:
             removeAllTabContent()
-            showTabContent(preferencesViewController)
+            showTabContentController(preferencesViewController)
 
         case .onboarding:
             removeAllTabContent()
-            showTabContent(OnboardingViewController.create())
+            requestDisableUI()
+            showTemporaryTabContentController(OnboardingViewController.create(withDelegate: self))
 
         case .url:
             removeAllTabContent(includingWebView: false)
@@ -261,8 +276,8 @@ final class BrowserTabViewController: NSViewController {
 
         case .none:
             removeAllTabContent()
-
         }
+        
     }
 
     // MARK: - Preferences
@@ -852,6 +867,31 @@ private extension WKWebView {
             return nil
         }
         return tab
+    }
+
+}
+
+extension BrowserTabViewController: OnboardingDelegate {
+
+    func onboardingDidRequestImportData(completion: () -> Void) {
+        print(#function)
+    }
+
+    func onboardingDidRequestSetDefault(completion: () -> Void) {
+        print(#function)
+    }
+
+    func onboardingHasFinished() {
+        print(#function)
+        (view.window?.windowController as? MainWindowController)?.userInteraction(prevented: false)
+    }
+
+    func onboardingDidRequestStartBrowsing() {
+        print(#function)
+        if let tab = tabViewModel?.tab {
+            closeTab(tab)
+        }
+        openNewTab(with: .homepage)
     }
 
 }

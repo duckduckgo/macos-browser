@@ -90,7 +90,7 @@ final class MainWindowController: NSWindowController {
             })
     }
 
-    private func userInteraction(prevented: Bool) { // TODO more for onboarding?
+    func userInteraction(prevented: Bool) {
         mainViewController.tabCollectionViewModel.changesEnabled = !prevented
         mainViewController.tabCollectionViewModel.selectedTabViewModel?.tab.contentChangeEnabled = !prevented
 

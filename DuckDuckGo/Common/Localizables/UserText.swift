@@ -369,5 +369,18 @@ struct UserText {
 
     static let exportLoginsFileNameSuffix = NSLocalizedString("export.logins.file.name.suffix", value: "Logins", comment: "The last part of the suggested file name for exporting logins")
     static let exportBookmarksFileNameSuffix = NSLocalizedString("export.bookmarks.file.name.suffix", value: "Bookmarks", comment: "The last part of the suggested file for exporting bookmarks")
-    
+
+
+    static let onboardingWelcomeTitle = "Welcome to DuckDuckGo!"
+    static let onboardingSetDefaultText = "Next, try setting DuckDuckGo as your default ⭐️ browser, so you can open links with peace of mind, every time."
+    static let onboardingImportDataText = "First, let me help you import your bookmarks 📖 and passwords 🔑 from those less private browsers."
+    static let onboardingWelcomeText = "Tired of being tracked online? You've come to the right place. 👍\n\nI'll help you stay private️ as you search and browse the web. Trackers be gone!"
+    static let onboardingStartBrowsingText = "Now, try visiting some of your favorite sites.\n\nWatch the address bar 👆 to see how I block trackers, and upgrade the security of your connection when possible. 🔒"
+
+    static let onboardingStartButton = "Let's do it!"
+    static let onboardingImportDataButton = "Import Data"
+    static let onboardingSetDefaultButton = "Set Default"
+    static let onboardingStartBrowsingButton = "Start Browsing"
+    static let onboardingNotNowButton = "Not Now"
+
 }

@@ -19,10 +19,27 @@
 import AppKit
 import SwiftUI
 
+// This is being passed to SwiftUI, so doesn't need to be weakly held and also doesn't use delegate pattern of passing self to the functions
+protocol OnboardingDelegate: NSObjectProtocol {
+
+    /// Import data UI should be launched.  Whatever happens, call the completion to move on to the next screen.
+    func onboardingDidRequestImportData(completion: () -> Void)
+
+    /// Request set default should be launched.  Whatever happens, call the completion to move on to the next screen.
+    func onboardingDidRequestSetDefault(completion: () -> Void)
+
+    /// Has finished, but still showing a screen.  This is when to re-enable the UI.
+    func onboardingHasFinished()
+
+    /// Start browsing button pressed.  Close this and open the home tab.
+    func onboardingDidRequestStartBrowsing()
+
+}
+
 final class OnboardingViewController: NSHostingController<OnboardingView> {
 
-    static func create() -> OnboardingViewController {
-        return OnboardingViewController(rootView: OnboardingView())
+    static func create(withDelegate delegate: OnboardingDelegate) -> OnboardingViewController {
+        return OnboardingViewController(rootView: OnboardingView(delegate: delegate))
     }
 
 }

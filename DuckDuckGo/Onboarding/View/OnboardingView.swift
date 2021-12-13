@@ -93,7 +93,7 @@ struct SpeechBubble: View {
                      )
 
                 }
-                .fill(.white)
+                .fill(Color(NSColor.interfaceBackgroundColor))
                 .shadow(radius: 5)
             }
 
@@ -151,8 +151,24 @@ struct SpeechTextModifier: ViewModifier {
         content
             .font(.system(size: 15, weight: .light))
             .lineSpacing(5)
-            .foregroundColor(.black)
             .padding(.horizontal)
+    }
+
+}
+
+struct DaxSpeech: View {
+
+    let text: String
+
+    var body: some View {
+        ZStack(alignment: .topLeading) {
+            Text(text)
+                .kerning(-0.23)
+                .modifier(SpeechTextModifier())
+        }
+        .frame(width: 314)
+        .padding()
+        .background(SpeechBubble())
     }
 
 }
@@ -166,14 +182,7 @@ struct ActionSpeech: View {
 
     var body: some View {
         VStack {
-            ZStack(alignment: .topLeading) {
-                Text(text)
-                    .kerning(-0.23)
-                    .modifier(SpeechTextModifier())
-            }
-            .frame(width: 314)
-            .padding()
-            .background(SpeechBubble())
+            DaxSpeech(text: text)
 
             HStack {
 
@@ -196,14 +205,6 @@ struct ActionSpeech: View {
 
 }
 
-let setDefaultText = "Next, try setting DuckDuckGo as your default ⭐️ browser, so you can open links with peace of mind, every time."
-
-let importDataText = "First, let me help you import your bookmarks 📖 and passwords 🔑 from those less private browsers."
-
-let welcomeText = "Tired of being tracked online? You've come to the right place. 👍\n\nI'll help you stay private️ as you search and browse the web. Trackers be gone!"
-
-let startBrowsingText = "Now, try visiting some of your favorite sites.\n\nWatch the address bar 👆 to see how I block trackers, and upgrade the security of your connection when possible. 🔒"
-
 struct CallToAction: View {
 
     let text: String
@@ -213,14 +214,7 @@ struct CallToAction: View {
 
     var body: some View {
         VStack {
-            ZStack(alignment: .topLeading) {
-                Text(text)
-                    .kerning(-0.23)
-                    .modifier(SpeechTextModifier())
-            }
-            .frame(width: 314)
-            .padding()
-            .background(SpeechBubble())
+            DaxSpeech(text: text)
 
             Button(cta) {
                 onNext()
@@ -246,6 +240,8 @@ struct DaxConversation: View {
 
     }
 
+    weak var delegate: OnboardingDelegate?
+
     let image = Image("OnboardingDax")
 
     @State var makeSpace = false
@@ -264,7 +260,7 @@ struct DaxConversation: View {
 
         VStack(alignment: showSpeech ? .leading : .center) {
 
-            Text("Welcome to DuckDuckGo!")
+            Text(UserText.onboardingWelcomeTitle)
                 .kerning(-1.26)
                 .font(.system(size: 42, weight: .bold, design: .default))
                 .foregroundColor(.black)
@@ -281,27 +277,31 @@ struct DaxConversation: View {
                     .shadow(color: .black.opacity(0.16), radius: 6, x: 0, y: 3)
                     .transition(.daxWelcome)
 
-                CallToAction(text: welcomeText, cta: "Let's Do It!") {
+                CallToAction(text: UserText.onboardingWelcomeText, cta: UserText.onboardingStartButton) {
                     moveToPhase(.importData)
                 }
                 .visibility(showSpeech && phase == .welcome ? .visible : .gone)
 
-                ActionSpeech(text: importDataText, actionName: "Import Data") {
-                    moveToPhase(.setDefault)
+                ActionSpeech(text: UserText.onboardingImportDataText, actionName: UserText.onboardingImportDataButton) {
+                    delegate?.onboardingDidRequestImportData {
+                        moveToPhase(.setDefault)
+                    }
                 } skip: {
                     moveToPhase(.setDefault)
                 }
                 .visibility(showSpeech && phase == .importData ? .visible : .gone)
 
-                ActionSpeech(text: setDefaultText, actionName: "Set Default") {
-                    moveToPhase(.startBrowsing)
+                ActionSpeech(text: UserText.onboardingSetDefaultText, actionName: UserText.onboardingSetDefaultButton) {
+                    delegate?.onboardingDidRequestSetDefault {
+                        moveToPhase(.startBrowsing)
+                    }
                 } skip: {
                     moveToPhase(.startBrowsing)
                 }
                 .visibility(showSpeech && phase == .setDefault ? .visible : .gone)
 
-                CallToAction(text: startBrowsingText, cta: "Start Browsing") {
-                    moveToPhase(.welcome)
+                CallToAction(text: UserText.onboardingStartBrowsingText, cta: UserText.onboardingStartBrowsingButton) {
+                    delegate?.onboardingDidRequestStartBrowsing()
                 }
                 .visibility(showSpeech && phase == .startBrowsing ? .visible : .gone)
 
@@ -342,6 +342,10 @@ struct DaxConversation: View {
 
 struct OnboardingView: View {
 
+    // swiftlint:disable weak_delegate
+    let delegate: OnboardingDelegate
+    // swiftlint:enable weak_delegate
+
     let image = Image("OnboardingBackground")
 
     @State var showDax = false
@@ -357,7 +361,7 @@ struct OnboardingView: View {
             }
 
             if showDax {
-                DaxConversation()
+                DaxConversation(delegate: delegate)
             }
 
         }
@@ -370,20 +374,6 @@ struct OnboardingView: View {
                 showDax = true
             }
         }
-    }
-
-}
-
-struct SpeechBubbleTweaking: View {
-
-    var body: some View {
-
-        Text("Hello World\n\n\nGoodbye All")
-            .foregroundColor(Color.black)
-            .frame(width: 200, alignment: .topLeading)
-            .padding()
-            .background(SpeechBubble())
-
     }
 
 }

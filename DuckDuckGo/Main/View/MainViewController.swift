@@ -270,7 +270,7 @@ final class MainViewController: NSViewController {
             browserTabViewController.webView?.makeMeFirstResponder()
         case .preferences: browserTabViewController.preferencesViewController.view.makeMeFirstResponder()
         case .bookmarks: browserTabViewController.bookmarksViewController.view.makeMeFirstResponder()
-        case .onboarding: break // TODO 
+        case .onboarding: break
         }
 
     }
