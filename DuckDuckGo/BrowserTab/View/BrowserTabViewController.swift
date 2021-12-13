@@ -247,7 +247,7 @@ final class BrowserTabViewController: NSViewController {
 
         case .onboarding:
             removeAllTabContent()
-            showTabContent(PreferencesSplitViewController.create())
+            showTabContent(OnboardingViewController.create())
 
         case .url:
             removeAllTabContent(includingWebView: false)
@@ -263,13 +263,6 @@ final class BrowserTabViewController: NSViewController {
             removeAllTabContent()
 
         }
-    }
-
-    // MARK: - Onboarding
-
-    func startOnboarding(completion: () -> Void) {
-        print(#function)
-        completion()
     }
 
     // MARK: - Preferences

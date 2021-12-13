@@ -250,6 +250,10 @@
 		85AC3B3525DA82A600C7D2AA /* DataTaskProviding.swift in Sources */ = {isa = PBXBuildFile; fileRef = 85AC3B3425DA82A600C7D2AA /* DataTaskProviding.swift */; };
 		85AC3B4925DAC9BD00C7D2AA /* ConfigurationStorageTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 85AC3B4825DAC9BD00C7D2AA /* ConfigurationStorageTests.swift */; };
 		85AE2FF224A33A2D002D507F /* WebKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 85AE2FF124A33A2D002D507F /* WebKit.framework */; };
+		85B7184A27677C2D00B4277F /* Onboarding.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 85B7184927677C2D00B4277F /* Onboarding.storyboard */; };
+		85B7184C27677C6500B4277F /* OnboardingViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 85B7184B27677C6500B4277F /* OnboardingViewController.swift */; };
+		85B7184E27677CBB00B4277F /* OnboardingView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 85B7184D27677CBB00B4277F /* OnboardingView.swift */; };
+		85B7185027677EA400B4277F /* Onboarding.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 85B7184F27677EA400B4277F /* Onboarding.xcassets */; };
 		85C6A29625CC1FFD00EEB5F1 /* UserDefaultsWrapper.swift in Sources */ = {isa = PBXBuildFile; fileRef = 85C6A29525CC1FFD00EEB5F1 /* UserDefaultsWrapper.swift */; };
 		85CC1D73269EF1880062F04E /* PasswordManagementItemList.swift in Sources */ = {isa = PBXBuildFile; fileRef = 85CC1D72269EF1880062F04E /* PasswordManagementItemList.swift */; };
 		85CC1D7B26A05ECF0062F04E /* PasswordManagementItemListModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 85CC1D7A26A05ECF0062F04E /* PasswordManagementItemListModel.swift */; };
@@ -874,6 +878,10 @@
 		85AC3B3425DA82A600C7D2AA /* DataTaskProviding.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DataTaskProviding.swift; sourceTree = "<group>"; };
 		85AC3B4825DAC9BD00C7D2AA /* ConfigurationStorageTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConfigurationStorageTests.swift; sourceTree = "<group>"; };
 		85AE2FF124A33A2D002D507F /* WebKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = WebKit.framework; path = System/Library/Frameworks/WebKit.framework; sourceTree = SDKROOT; };
+		85B7184927677C2D00B4277F /* Onboarding.storyboard */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; path = Onboarding.storyboard; sourceTree = "<group>"; };
+		85B7184B27677C6500B4277F /* OnboardingViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OnboardingViewController.swift; sourceTree = "<group>"; };
+		85B7184D27677CBB00B4277F /* OnboardingView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OnboardingView.swift; sourceTree = "<group>"; };
+		85B7184F27677EA400B4277F /* Onboarding.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Onboarding.xcassets; sourceTree = "<group>"; };
 		85C6A29525CC1FFD00EEB5F1 /* UserDefaultsWrapper.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UserDefaultsWrapper.swift; sourceTree = "<group>"; };
 		85CC1D72269EF1880062F04E /* PasswordManagementItemList.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PasswordManagementItemList.swift; sourceTree = "<group>"; };
 		85CC1D7A26A05ECF0062F04E /* PasswordManagementItemListModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PasswordManagementItemListModel.swift; sourceTree = "<group>"; };
@@ -1938,6 +1946,25 @@
 			name = Frameworks;
 			sourceTree = "<group>";
 		};
+		85B7184727677A7D00B4277F /* Onboarding */ = {
+			isa = PBXGroup;
+			children = (
+				85B7184827677A9200B4277F /* View */,
+			);
+			path = Onboarding;
+			sourceTree = "<group>";
+		};
+		85B7184827677A9200B4277F /* View */ = {
+			isa = PBXGroup;
+			children = (
+				85B7184927677C2D00B4277F /* Onboarding.storyboard */,
+				85B7184F27677EA400B4277F /* Onboarding.xcassets */,
+				85B7184D27677CBB00B4277F /* OnboardingView.swift */,
+				85B7184B27677C6500B4277F /* OnboardingViewController.swift */,
+			);
+			path = View;
+			sourceTree = "<group>";
+		};
 		85CC1D7826A05E790062F04E /* Model */ = {
 			isa = PBXGroup;
 			children = (
@@ -2142,6 +2169,7 @@
 				AA97BF4425135CB60014931A /* Menus */,
 				85378D9A274E618C007C5CBF /* MessageViews */,
 				AA86491524D83384001BABEE /* NavigationBar */,
+				85B7184727677A7D00B4277F /* Onboarding */,
 				B64C84DB2692D6E80048FEBE /* Permissions */,
 				4B0511A2262CAA5A00F6079C /* Preferences */,
 				B6FA893A269C414900588ECD /* Privacy Dashboard */,
@@ -3395,6 +3423,7 @@
 				AA693E5E2696E5B90007BB78 /* CrashReports.storyboard in Resources */,
 				4B0511CE262CAA5A00F6079C /* DownloadPreferencesTableCellView.xib in Resources */,
 				8511E18425F82B34002F516B /* 01_Fire_really_small.json in Resources */,
+				85B7184A27677C2D00B4277F /* Onboarding.storyboard in Resources */,
 				4B0511C3262CAA5A00F6079C /* Preferences.storyboard in Resources */,
 				B6B1E88226D5DAC30062C350 /* Downloads.storyboard in Resources */,
 				AA3439712754D4E900B241FA /* dark-shield.json in Resources */,
@@ -3433,6 +3462,7 @@
 				85625994269C8F9600EE44BC /* PasswordManager.storyboard in Resources */,
 				AA80EC6D256C469C007083E7 /* NavigationBar.storyboard in Resources */,
 				4B0511C6262CAA5A00F6079C /* DefaultBrowserTableCellView.xib in Resources */,
+				85B7185027677EA400B4277F /* Onboarding.xcassets in Resources */,
 				0230C0A1271F53670018F728 /* gpc.js in Resources */,
 				4B677433255DBEB800025BD8 /* httpsMobileV2Bloom.bin in Resources */,
 				AA34397B2754D55100B241FA /* trackers-3.json in Resources */,
@@ -3680,6 +3710,7 @@
 				B6A9E4A3261475C70067D1B9 /* AppUsageActivityMonitor.swift in Sources */,
 				4BA1A6A0258B079600F6F690 /* DataEncryption.swift in Sources */,
 				B6FA8941269C425400588ECD /* PrivacyDashboardPopover.swift in Sources */,
+				85B7184E27677CBB00B4277F /* OnboardingView.swift in Sources */,
 				AABEE6AF24AD22B90043105B /* AddressBarTextField.swift in Sources */,
 				B693954C26F04BEB0015B914 /* FocusRingView.swift in Sources */,
 				4B9292DB2667125D00AD2C21 /* ContextualMenu.swift in Sources */,
@@ -3891,6 +3922,7 @@
 				B6AAAC3E26048F690029438D /* RandomAccessCollectionExtension.swift in Sources */,
 				4B9292AF26670F5300AD2C21 /* NSOutlineViewExtensions.swift in Sources */,
 				AA585D82248FD31100E9A3E2 /* AppDelegate.swift in Sources */,
+				85B7184C27677C6500B4277F /* OnboardingViewController.swift in Sources */,
 				AA72D5F025FEA49900C77619 /* AddEditFavoriteWindow.swift in Sources */,
 				1456D6E124EFCBC300775049 /* TabBarCollectionView.swift in Sources */,
 				85308E25267FC9F2001ABD76 /* NSAlertExtension.swift in Sources */,

@@ -146,18 +146,6 @@ final class MainWindowController: NSWindowController {
         WindowControllersManager.shared.register(self)
     }
 
-    // MARK: Onboarding
-
-    @IBAction func startOnboarding(_ sender: NSMenuItem?) {
-        print(#function)
-        userInteraction(prevented: true)
-        mainViewController.browserTabViewController.startOnboarding {
-            print("Onboarding complete")
-            // TODO save onboarding state
-            self.userInteraction(prevented: false)
-        }
-    }
-
 }
 
 extension MainWindowController: NSWindowDelegate {
