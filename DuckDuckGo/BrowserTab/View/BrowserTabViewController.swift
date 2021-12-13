@@ -24,7 +24,7 @@ import SwiftUI
 import BrowserServicesKit
 
 // swiftlint:disable file_length
-final class BrowserTabViewController: NSViewController {
+final class BrowserTabViewController: NSViewController, OverlayProtocol {
 
     @IBOutlet weak var errorView: NSView!
     @IBOutlet weak var homepageView: NSView!
@@ -62,7 +62,7 @@ final class BrowserTabViewController: NSViewController {
         return _contentOverlayPopover!
     }
     
-    public override func getContentOverlayPopover(_ response: AutofillMessaging) -> ContentOverlayPopover? {
+    public func getContentOverlayPopover(_ response: AutofillMessaging) -> ContentOverlayPopover? {
         // TODO Not sure if this should hold ref to the content script directly seems bad
         contentOverlayPopover.viewController.messageInterfaceBack = response
         
@@ -73,8 +73,7 @@ final class BrowserTabViewController: NSViewController {
         
         // Private API to hide the popover arrow
         contentOverlayPopover.setValue(true, forKeyPath: "shouldHideAnchor")
-        //contentOverlayPopover.setValue(CGSize.zero, forKeyPath: "anchorSize")
-        
+        // contentOverlayPopover.setValue(CGSize.zero, forKeyPath: "anchorSize")
         contentOverlayPopover.zoomFactor = self.webView?.magnification
         contentOverlayPopover.webView = self.webView
         
@@ -174,7 +173,7 @@ final class BrowserTabViewController: NSViewController {
 
         guard self.tabViewModel !== tabViewModel else { return }
 
-        tabViewModel.tab.userScripts.autofillScript.topView = self
+        tabViewModel.tab.topView = self
         let oldWebView = webView
         displayWebView(of: tabViewModel)
         subscribeToUrl(of: tabViewModel)

@@ -429,6 +429,8 @@ final class Tab: NSObject {
         return manager
     }()
 
+    public var topView: OverlayProtocol?
+
     // TODO make private again
     public var userScripts: UserScripts! {
         willSet {
@@ -443,7 +445,7 @@ final class Tab: NSObject {
             userScripts.surrogatesScript.delegate = self
             userScripts.contentBlockerRulesScript.delegate = self
             // TODO verify this changes on tab change
-            userScripts.autofillScript.topView = nil
+            userScripts.autofillScript.topView = self.topView
             userScripts.autofillScript.emailDelegate = emailManager
             userScripts.autofillScript.vaultDelegate = vaultManager
             userScripts.pageObserverScript.delegate = self
