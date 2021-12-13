@@ -80,7 +80,7 @@
                             </userDefinedRuntimeAttributes>
                         </customView>
                         <imageView horizontalHuggingPriority="251" verticalHuggingPriority="251" translatesAutoresizingMaskIntoConstraints="NO" id="bS2-51-Skh">
-                            <rect key="frame" x="2" y="5" width="32" height="30"/>
+                            <rect key="frame" x="5" y="5" width="32" height="30"/>
                             <constraints>
                                 <constraint firstAttribute="height" constant="30" id="1Qj-y0-A6r"/>
                                 <constraint firstAttribute="width" constant="32" id="bFf-Ci-vMW"/>
@@ -88,7 +88,7 @@
                             <imageCell key="cell" refusesFirstResponder="YES" alignment="left" imageScaling="proportionallyDown" image="Search" id="i82-cu-gTO"/>
                         </imageView>
                         <textField focusRingType="none" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="3Vr-DR-fdD" customClass="AddressBarTextField" customModule="DuckDuckGo_Privacy_Browser" customModuleProvider="target">
-                            <rect key="frame" x="31" y="12" width="404" height="16"/>
+                            <rect key="frame" x="34" y="12" width="401" height="16"/>
                             <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" selectable="YES" editable="YES" sendsActionOnEndEditing="YES" focusRingType="none" placeholderString="Search or enter address" id="FTG-Jg-Wmc">
                                 <font key="font" usesAppearanceFont="YES"/>
                                 <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
@@ -136,7 +136,7 @@
                         <constraint firstAttribute="trailing" secondItem="3Vr-DR-fdD" secondAttribute="trailing" constant="42" id="LaC-0U-E3Y"/>
                         <constraint firstItem="bS2-51-Skh" firstAttribute="centerY" secondItem="3Vr-DR-fdD" secondAttribute="centerY" id="T9L-OV-h4X"/>
                         <constraint firstAttribute="trailing" secondItem="ziH-o6-MGN" secondAttribute="trailing" constant="1" id="YLS-lx-Frh"/>
-                        <constraint firstItem="bS2-51-Skh" firstAttribute="leading" secondItem="r0u-XH-URQ" secondAttribute="leading" constant="2" id="feT-nq-a5e"/>
+                        <constraint firstItem="bS2-51-Skh" firstAttribute="leading" secondItem="r0u-XH-URQ" secondAttribute="leading" constant="5" id="feT-nq-a5e"/>
                         <constraint firstItem="3Vr-DR-fdD" firstAttribute="centerY" secondItem="r0u-XH-URQ" secondAttribute="centerY" id="vUG-Ap-zdd"/>
                     </constraints>
                 </customView>

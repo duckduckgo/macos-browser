@@ -31,7 +31,8 @@ final class OutlineSeparatorViewCell: NSTableCellView {
     init(separatorVisible: Bool = false) {
         super.init(frame: .zero)
 
-        self.heightAnchor.constraint(equalToConstant: 20).isActive = true
+        // Previous value of 20 was being ignored anyway and causes lots of console logging
+        self.heightAnchor.constraint(equalToConstant: 28).isActive = true
 
         if separatorVisible {
             addSubview(separatorView)

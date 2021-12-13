@@ -111,12 +111,19 @@ final class BookmarkListViewController: NSViewController {
     
     @IBAction func handleClick(_ sender: NSOutlineView) {
         guard sender.clickedRow != -1 else { return }
-        
-        if let node = sender.item(atRow: sender.clickedRow) as? BookmarkNode,
+
+        let item = sender.item(atRow: sender.clickedRow)
+        if let node = item as? BookmarkNode,
            let bookmark = node.representedObject as? Bookmark {
             WindowControllersManager.shared.open(bookmark: bookmark)
             delegate?.popoverShouldClose(self)
             Pixel.fire(.navigation(kind: .bookmark(isFavorite: bookmark.isFavorite), source: .listInterface))
+        } else {
+            if outlineView.isItemExpanded(item) {
+                outlineView.animator().collapseItem(item)
+            } else {
+                outlineView.animator().expandItem(item)
+            }
         }
     }
     

@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<model type="com.apple.IDECoreDataModeler.DataModel" documentVersion="1.0" lastSavedToolsVersion="19557.2" systemVersion="20G224" minimumToolsVersion="Automatic" sourceLanguage="Swift" userDefinedModelVersionIdentifier="">
+<model type="com.apple.IDECoreDataModeler.DataModel" documentVersion="1.0" lastSavedToolsVersion="17709" systemVersion="19H524" minimumToolsVersion="Automatic" sourceLanguage="Swift" userDefinedModelVersionIdentifier="">
     <entity name="PixelData" representedClassName="PixelData" syncable="YES" codeGenerationType="class">
         <attribute name="key" attributeType="String"/>
-        <attribute name="valueEncrypted" attributeType="Transformable" valueTransformerName="NSDataTransformer"/>
+        <attribute name="valueEncrypted" attributeType="Transformable" valueTransformerName="NSNumberTransformer"/>
         <fetchIndex name="byKeyIndex">
             <fetchIndexElement property="key" type="Binary" order="ascending"/>
         </fetchIndex>
