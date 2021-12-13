@@ -18,14 +18,32 @@
 
 import Foundation
 
-final class Waitlist {
+struct Waitlist {
     
-    // swiftlint:disable force_cast
-    static func createViewController() -> NSViewController {
-        let storyboard = NSStoryboard(name: "Waitlist", bundle: Bundle.main)
-        let controller = storyboard.instantiateController(withIdentifier: "WaitlistLockScreenViewController") as! NSViewController
-        return controller
+    static var isUnlocked: Bool {
+        return MacWaitlistEncryptedFileStorage().isUnlocked()
     }
-    // swiftlint:enable force_cast
+
+    static var isExistingInstall: Bool {
+        return MacWaitlistEncryptedFileStorage().isExistingInstall()
+    }
+    
+    static func unlockExistingInstallIfNecessary() {
+        if isExistingInstall {
+            let storage = MacWaitlistEncryptedFileStorage()
+            storage.unlock()
+        }
+    }
+    
+    static func displayLockScreenIfNecessary(in viewController: NSViewController) {
+        guard !isUnlocked else {
+            return
+        }
+
+        let lockScreenViewController = WaitlistLockScreenViewController.instantiate()
+        let lockScreenWindow = lockScreenViewController.wrappedInWindowController()
+        
+        viewController.beginSheet(lockScreenWindow)
+    }
     
 }

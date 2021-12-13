@@ -162,8 +162,7 @@ extension MainWindowController: NSWindowDelegate {
             WindowControllersManager.shared.lastKeyMainWindowController = self
         }
         
-        let viewController = Waitlist.createViewController()
-        mainViewController.beginSheet(viewController)
+        Waitlist.displayLockScreenIfNecessary(in: mainViewController)
     }
 
     func windowDidResignKey(_ notification: Notification) {

@@ -202,6 +202,10 @@
 		4BE65481271FCD4D008D1D63 /* PasswordManagementNoteModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4BE6547D271FCD4D008D1D63 /* PasswordManagementNoteModel.swift */; };
 		4BE65485271FCD7B008D1D63 /* LoginFaviconView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4BE65484271FCD7B008D1D63 /* LoginFaviconView.swift */; };
 		4BEF0E6827641A0E00AF7C58 /* WaitlistLockScreenViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4BEF0E6627641A0E00AF7C58 /* WaitlistLockScreenViewController.swift */; };
+		4BEF0E6A276676A500AF7C58 /* WaitlistRequest.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4BEF0E69276676A500AF7C58 /* WaitlistRequest.swift */; };
+		4BEF0E6C276676AB00AF7C58 /* MacWaitlistStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4BEF0E6B276676AB00AF7C58 /* MacWaitlistStore.swift */; };
+		4BEF0E702766805500AF7C58 /* MacWaitlistMetadata.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4BEF0E6F2766805500AF7C58 /* MacWaitlistMetadata.swift */; };
+		4BEF0E722766B11200AF7C58 /* MacWaitlistLockScreenViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4BEF0E712766B11200AF7C58 /* MacWaitlistLockScreenViewModel.swift */; };
 		4BF01C00272AE74C00884A61 /* CountryList.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4BE65482271FCD53008D1D63 /* CountryList.swift */; };
 		4BF4951826C08395000547B8 /* ThirdPartyBrowserTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4BF4951726C08395000547B8 /* ThirdPartyBrowserTests.swift */; };
 		7B4CE8E726F02135009134B1 /* TabBarTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7B4CE8E626F02134009134B1 /* TabBarTests.swift */; };
@@ -823,6 +827,10 @@
 		4BE65482271FCD53008D1D63 /* CountryList.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CountryList.swift; sourceTree = "<group>"; };
 		4BE65484271FCD7B008D1D63 /* LoginFaviconView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = LoginFaviconView.swift; sourceTree = "<group>"; };
 		4BEF0E6627641A0E00AF7C58 /* WaitlistLockScreenViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = WaitlistLockScreenViewController.swift; sourceTree = "<group>"; };
+		4BEF0E69276676A500AF7C58 /* WaitlistRequest.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WaitlistRequest.swift; sourceTree = "<group>"; };
+		4BEF0E6B276676AB00AF7C58 /* MacWaitlistStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MacWaitlistStore.swift; sourceTree = "<group>"; };
+		4BEF0E6F2766805500AF7C58 /* MacWaitlistMetadata.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MacWaitlistMetadata.swift; sourceTree = "<group>"; };
+		4BEF0E712766B11200AF7C58 /* MacWaitlistLockScreenViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MacWaitlistLockScreenViewModel.swift; sourceTree = "<group>"; };
 		4BF4951726C08395000547B8 /* ThirdPartyBrowserTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ThirdPartyBrowserTests.swift; sourceTree = "<group>"; };
 		7B4CE8DA26F02108009134B1 /* UI Tests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = "UI Tests.xctest"; sourceTree = BUILT_PRODUCTS_DIR; };
 		7B4CE8DE26F02108009134B1 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
@@ -1771,11 +1779,31 @@
 		4BC68A6C2759ADC20029A586 /* Waitlist */ = {
 			isa = PBXGroup;
 			children = (
-				4BEF0E6627641A0E00AF7C58 /* WaitlistLockScreenViewController.swift */,
-				4BC68A6F2759AE490029A586 /* Waitlist.storyboard */,
 				4BC68A712759B2140029A586 /* Waitlist.swift */,
+				4BEF0E6E27667F6E00AF7C58 /* Model */,
+				4BEF0E6D27667F6300AF7C58 /* View */,
 			);
 			path = Waitlist;
+			sourceTree = "<group>";
+		};
+		4BEF0E6D27667F6300AF7C58 /* View */ = {
+			isa = PBXGroup;
+			children = (
+				4BC68A6F2759AE490029A586 /* Waitlist.storyboard */,
+				4BEF0E6627641A0E00AF7C58 /* WaitlistLockScreenViewController.swift */,
+				4BEF0E712766B11200AF7C58 /* MacWaitlistLockScreenViewModel.swift */,
+			);
+			path = View;
+			sourceTree = "<group>";
+		};
+		4BEF0E6E27667F6E00AF7C58 /* Model */ = {
+			isa = PBXGroup;
+			children = (
+				4BEF0E69276676A500AF7C58 /* WaitlistRequest.swift */,
+				4BEF0E6B276676AB00AF7C58 /* MacWaitlistStore.swift */,
+				4BEF0E6F2766805500AF7C58 /* MacWaitlistMetadata.swift */,
+			);
+			path = Model;
 			sourceTree = "<group>";
 		};
 		7B4CE8DB26F02108009134B1 /* UI Tests */ = {
@@ -3583,6 +3611,7 @@
 				B61EF3F1266F922200B4D78F /* WKProcessPool+DownloadDelegate.swift in Sources */,
 				B6106BAD26A7BF390013B453 /* PermissionState.swift in Sources */,
 				14505A08256084EF00272CC6 /* UserAgent.swift in Sources */,
+				4BEF0E702766805500AF7C58 /* MacWaitlistMetadata.swift in Sources */,
 				4B8AC93526B3B2FD00879451 /* NSAlert+DataImport.swift in Sources */,
 				AA7412BD24D2BEEE00D22FE0 /* MainWindow.swift in Sources */,
 				AAD6D8882696DF6D002393B3 /* CrashReportPromptViewController.swift in Sources */,
@@ -3665,8 +3694,10 @@
 				4B9292AA26670D3700AD2C21 /* Bookmark.xcmappingmodel in Sources */,
 				AAC5E4D025D6A709007F5990 /* Bookmark.swift in Sources */,
 				AA9B7C8326A197A00008D425 /* ServerTrust.swift in Sources */,
+				4BEF0E722766B11200AF7C58 /* MacWaitlistLockScreenViewModel.swift in Sources */,
 				B64C853826944B880048FEBE /* StoredPermission.swift in Sources */,
 				AAE246F8270A406200BEEAEE /* FirePopoverCollectionViewHeader.swift in Sources */,
+				4BEF0E6C276676AB00AF7C58 /* MacWaitlistStore.swift in Sources */,
 				AA5D6DAC24A340F700C6FBCE /* WebViewStateObserver.swift in Sources */,
 				AAB7320926DD0CD9002FACF9 /* FireViewController.swift in Sources */,
 				4B92928C26670D1700AD2C21 /* OutlineSeparatorViewCell.swift in Sources */,
@@ -3900,6 +3931,7 @@
 				AA72D5F025FEA49900C77619 /* AddEditFavoriteWindow.swift in Sources */,
 				1456D6E124EFCBC300775049 /* TabBarCollectionView.swift in Sources */,
 				85308E25267FC9F2001ABD76 /* NSAlertExtension.swift in Sources */,
+				4BEF0E6A276676A500AF7C58 /* WaitlistRequest.swift in Sources */,
 				4B59024826B3673600489384 /* ThirdPartyBrowser.swift in Sources */,
 				B65E6B9E26D9EC0800095F96 /* CircularProgressView.swift in Sources */,
 				AABEE69C24A902BB0043105B /* SuggestionContainer.swift in Sources */,
