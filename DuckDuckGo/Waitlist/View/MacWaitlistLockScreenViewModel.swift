@@ -50,7 +50,7 @@ final class MacWaitlistLockScreenViewModel: ObservableObject {
         let hardcodedTemporaryPasscode = "DAX"
         
         if code.caseInsensitiveCompare(hardcodedTemporaryPasscode) == .orderedSame {
-            DispatchQueue.main.asyncAfter(deadline: .now() + 1.5) {
+            DispatchQueue.main.asyncAfter(deadline: .now() + 3.0) {
                 self.store.unlock()
                 self.state = .unlockSuccess
             }

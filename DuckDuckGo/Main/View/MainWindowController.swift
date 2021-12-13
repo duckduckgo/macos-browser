@@ -211,8 +211,11 @@ fileprivate extension MainMenu {
             closeAllWindowsMenuItem,
             closeTabMenuItem,
             burnWebsiteDataMenuItem,
-            importBrowserDataMenuItem
-        ]
+            importBrowserDataMenuItem,
+            manageBookmarksMenuItem,
+            importBookmarksMenuItem,
+            preferencesMenuItem
+        ]// .compactMap { $0 }
     }
 
 }

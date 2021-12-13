@@ -36,6 +36,7 @@ final class MainMenu: NSMenu {
     @IBOutlet weak var printMenuItem: NSMenuItem?
     @IBOutlet weak var shareMenuItem: NSMenuItem!
     @IBOutlet weak var importBrowserDataMenuItem: NSMenuItem!
+    @IBOutlet weak var preferencesMenuItem: NSMenuItem!
 
     @IBOutlet weak var checkSpellingWhileTypingMenuItem: NSMenuItem?
     @IBOutlet weak var checkGrammarWithSpellingMenuItem: NSMenuItem?
@@ -47,8 +48,8 @@ final class MainMenu: NSMenu {
     @IBOutlet weak var homeMenuItem: NSMenuItem?
     @IBOutlet weak var reopenLastClosedTabMenuItem: NSMenuItem?
 
-    @IBOutlet weak var manageBookmarksMenuItem: NSMenuItem?
-    @IBOutlet weak var importBookmarksMenuItem: NSMenuItem?
+    @IBOutlet weak var manageBookmarksMenuItem: NSMenuItem!
+    @IBOutlet weak var importBookmarksMenuItem: NSMenuItem!
     @IBOutlet weak var bookmarksMenuItem: NSMenuItem?
     @IBOutlet weak var bookmarkThisPageMenuItem: NSMenuItem?
     @IBOutlet weak var favoritesMenuItem: NSMenuItem?

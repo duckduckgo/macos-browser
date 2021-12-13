@@ -46,7 +46,9 @@ final class WaitlistLockScreenViewController: NSViewController {
         
         // The unlock screen always uses a light mode appearance, so it's hardcoded here to avoid fighting against
         // system controls that try to display in dark mode.
-        view.appearance = NSAppearance(named: .aqua)
+        // view.appearance = NSAppearance(named: .aqua)
+        inviteCodeTextField.appearance = NSAppearance(named: .aqua)
+        networkRequestSpinner.appearance = NSAppearance(named: .aqua)
         
         viewStateCancellable = viewModel.$state.sink { [weak self] newState in
             self?.render(state: newState)
