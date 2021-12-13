@@ -90,7 +90,7 @@ final class MainWindowController: NSWindowController {
             })
     }
 
-    private func userInteraction(prevented: Bool) {
+    private func userInteraction(prevented: Bool) { // TODO more for onboarding?
         mainViewController.tabCollectionViewModel.changesEnabled = !prevented
         mainViewController.tabCollectionViewModel.selectedTabViewModel?.tab.contentChangeEnabled = !prevented
 
@@ -144,6 +144,18 @@ final class MainWindowController: NSWindowController {
 
     private func register() {
         WindowControllersManager.shared.register(self)
+    }
+
+    // MARK: Onboarding
+
+    @IBAction func startOnboarding(_ sender: NSMenuItem?) {
+        print(#function)
+        userInteraction(prevented: true)
+        mainViewController.browserTabViewController.startOnboarding {
+            print("Onboarding complete")
+            // TODO save onboarding state
+            self.userInteraction(prevented: false)
+        }
     }
 
 }

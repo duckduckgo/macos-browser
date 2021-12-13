@@ -40,6 +40,7 @@ struct UserText {
     static let tabHomeTitle = NSLocalizedString("tab.home.title", value: "Home", comment: "Tab home title")
     static let tabPreferencesTitle = NSLocalizedString("tab.preferences.title", value: "Preferences", comment: "Tab preferences title")
     static let tabBookmarksTitle = NSLocalizedString("tab.bookmarks.title", value: "Bookmarks", comment: "Tab bookmarks title")
+    static let tabOnboardingTitle = NSLocalizedString("tab.onboarding.title", value: "Onboarding", comment: "Tab onboarding title")
     static let tabErrorTitle = NSLocalizedString("tab.error.title", value: "Oops!", comment: "Tab error title")
 
     static let unknownErrorMessage = NSLocalizedString("error.unknown", value: "An unknown error has occurred", comment: "Error page subtitle")

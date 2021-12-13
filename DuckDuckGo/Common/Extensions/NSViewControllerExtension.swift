@@ -68,4 +68,10 @@ extension NSViewController {
         }
     }
 
+    func removeCompletely() {
+        guard parent != nil else { return }
+        removeFromParent()
+        view.removeFromSuperview()
+    }
+
 }

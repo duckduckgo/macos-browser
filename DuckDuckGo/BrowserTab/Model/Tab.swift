@@ -47,18 +47,18 @@ final class Tab: NSObject {
         case url(URL)
         case preferences
         case bookmarks
+        case onboarding
         case none
 
         static var displayableTabTypes: [TabContent] {
             return [TabContent.preferences, .bookmarks].sorted { first, second in
                 switch first {
-                case .homepage, .url, .preferences, .bookmarks, .none: break
+                case .homepage, .url, .preferences, .bookmarks, .onboarding, .none: break
                 // !! Replace [TabContent.preferences, .bookmarks] above with new displayable Tab Types if added
                 }
                 guard let firstTitle = first.title, let secondTitle = second.title else {
                     return true // Arbitrary sort order, only non-standard tabs are displayable.
                 }
-
                 return firstTitle.localizedStandardCompare(secondTitle) == .orderedAscending
             }
         }
@@ -68,6 +68,7 @@ final class Tab: NSObject {
             case .url, .homepage, .none: return nil
             case .preferences: return UserText.tabPreferencesTitle
             case .bookmarks: return UserText.tabBookmarksTitle
+            case .onboarding: return UserText.tabOnboardingTitle
             }
         }
 

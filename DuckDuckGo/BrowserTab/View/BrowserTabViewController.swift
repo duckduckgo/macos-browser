@@ -98,14 +98,6 @@ final class BrowserTabViewController: NSViewController {
         show(tabContent: tabViewModel?.tab.content)
     }
 
-    private func showHomepage() {
-        self.webView?.removeFromSuperview()
-        removePreferencesPage()
-        removeBookmarksPage()
-
-        view.addAndLayout(homepageView)
-    }
-
     private func addWebViewToViewHierarchy(_ webView: WebView) {
         // This code should ideally use Auto Layout, but in order to enable the web inspector, it needs to use springs & structs.
         // The line at the bottom of this comment is the "correct" method of doing this, but breaks the inspector.
@@ -229,50 +221,55 @@ final class BrowserTabViewController: NSViewController {
         updateInterface(tabViewModel: tabCollectionViewModel.selectedTabViewModel)
     }
 
+    private func removeAllTabContent(includingWebView: Bool = true) {
+        self.homepageView.removeFromSuperview()
+        preferencesViewController.removeCompletely()
+        bookmarksViewController.removeCompletely()
+        if includingWebView {
+            self.webView?.removeFromSuperview()
+        }
+    }
+
+    private func showTabContent(_ vc: NSViewController) {
+        self.addChild(vc)
+        view.addAndLayout(vc.view)
+    }
+
     private func show(tabContent content: Tab.TabContent?) {
         switch content ?? .homepage {
         case .bookmarks:
-            self.homepageView.removeFromSuperview()
-            removePreferencesPage()
-            self.webView?.removeFromSuperview()
-            guard bookmarksViewController.parent == nil else {
-                return
-            }
-            
-            self.addChild(bookmarksViewController)
-            view.addAndLayout(bookmarksViewController.view)
+            removeAllTabContent()
+            showTabContent(bookmarksViewController)
 
         case .preferences:
-            self.homepageView.removeFromSuperview()
-            removeBookmarksPage()
-            self.webView?.removeFromSuperview()
-            guard preferencesViewController.parent == nil else {
-                return
-            }
+            removeAllTabContent()
+            showTabContent(preferencesViewController)
 
-            self.addChild(preferencesViewController)
-            view.addAndLayout(preferencesViewController.view)
+        case .onboarding:
+            removeAllTabContent()
+            showTabContent(PreferencesSplitViewController.create())
 
         case .url:
-            self.homepageView.removeFromSuperview()
-            removeBookmarksPage()
-            removePreferencesPage()
+            removeAllTabContent(includingWebView: false)
             if let webView = self.webView, webView.superview == nil {
                 addWebViewToViewHierarchy(webView)
             }
 
         case .homepage:
-            removeBookmarksPage()
-            removePreferencesPage()
-            self.webView?.removeFromSuperview()
-            showHomepage()
+            removeAllTabContent()
+            view.addAndLayout(homepageView)
 
         case .none:
-            self.homepageView.removeFromSuperview()
-            removeBookmarksPage()
-            removePreferencesPage()
-            self.webView?.removeFromSuperview()
+            removeAllTabContent()
+
         }
+    }
+
+    // MARK: - Onboarding
+
+    func startOnboarding(completion: () -> Void) {
+        print(#function)
+        completion()
     }
 
     // MARK: - Preferences
@@ -284,12 +281,6 @@ final class BrowserTabViewController: NSViewController {
         return viewController
     }()
 
-    private func removePreferencesPage() {
-        guard preferencesViewController.parent != nil else { return }
-        preferencesViewController.removeFromParent()
-        preferencesViewController.view.removeFromSuperview()
-    }
-
     // MARK: - Bookmarks
 
     private(set) lazy var bookmarksViewController: BookmarkManagementSplitViewController = {
@@ -298,12 +289,6 @@ final class BrowserTabViewController: NSViewController {
 
         return viewController
     }()
-
-    private func removeBookmarksPage() {
-        guard bookmarksViewController.parent != nil else { return }
-        bookmarksViewController.removeFromParent()
-        bookmarksViewController.view.removeFromSuperview()
-    }
 
 }
 
