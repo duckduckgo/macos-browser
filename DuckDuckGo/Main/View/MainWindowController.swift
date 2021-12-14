@@ -166,11 +166,17 @@ extension MainWindowController: NSWindowDelegate {
             WindowControllersManager.shared.lastKeyMainWindowController = self
         }
         
-        let displayed = Waitlist.displayLockScreenIfNecessary(in: mainViewController)
-        
-        if displayed {
+        #if DEBUG
+        if !AppDelegate.isRunningTests {            
+            if Waitlist.displayLockScreenIfNecessary(in: mainViewController) {
+                updateWindowForLockScreen(lockScreenVisible: true)
+            }
+        }
+        #else
+        if Waitlist.displayLockScreenIfNecessary(in: mainViewController) {
             updateWindowForLockScreen(lockScreenVisible: true)
         }
+        #endif
     }
     
     private func updateWindowForLockScreen(lockScreenVisible: Bool) {
@@ -220,7 +226,7 @@ fileprivate extension MainMenu {
             manageBookmarksMenuItem,
             importBookmarksMenuItem,
             preferencesMenuItem
-        ]// .compactMap { $0 }
+        ]
     }
 
 }
