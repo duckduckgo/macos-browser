@@ -34,14 +34,10 @@ final class MacWaitlistEncryptedFileStorage: MacWaitlistStore {
 
     private let containerURL: URL
     private let statisticsStore: StatisticsStore
-    private let fileStore: FileStore
     
-    init(containerURL: URL = .sandboxApplicationSupportURL,
-         fileStore: FileStore = EncryptedFileStore.withDefaultEncryptionKey(),
-         statisticsStore: StatisticsStore = LocalStatisticsStore()) {
+    init(containerURL: URL = .sandboxApplicationSupportURL, statisticsStore: StatisticsStore = LocalStatisticsStore()) {
         self.containerURL = containerURL
         self.statisticsStore = statisticsStore
-        self.fileStore = fileStore
     }
     
     func isExistingInstall() -> Bool {
@@ -49,11 +45,7 @@ final class MacWaitlistEncryptedFileStorage: MacWaitlistStore {
     }
     
     func isUnlocked() -> Bool {
-        guard let metadata = loadMetadataFromDisk() else {
-            return false
-        }
-        
-        return metadata.unlockCodeVerified
+        return statisticsStore.waitlistUnlocked
     }
     
     /// Marks an existing installation of the browser as unlocked, if it has been detected to have been previously installed.
@@ -63,12 +55,12 @@ final class MacWaitlistEncryptedFileStorage: MacWaitlistStore {
     /// 2. **The install date is not present**: In this case, the browser saves metadata indicating that this check has been already performed, thus future checks
     ///   of the ATB value will be ignored even if it is present.
     func unlockExistingInstallIfNecessary() {
-        guard loadMetadataFromDisk() == nil else {
+        guard !statisticsStore.waitlistUpgradeCheckComplete else {
             return
         }
         
-        // No metadata was found, meaning that this is the first time that the browser has been run with the lock
-        // screen feature included. Check for ATB and unlock the browser if it's present.
+        // No waitlist check has been performed, meaning that this is the first time that the browser has been run with
+        //  the lock screen feature included. Check for ATB and unlock the browser if it's present.
         if isExistingInstall() {
             unlock()
         } else {
@@ -77,35 +69,17 @@ final class MacWaitlistEncryptedFileStorage: MacWaitlistStore {
     }
     
     func unlock() {
-        saveUnlockAttempt(verified: true)
+        statisticsStore.waitlistUpgradeCheckComplete = true
+        statisticsStore.waitlistUnlocked = true
     }
     
     func saveFailedUnlockAttempt() {
-        saveUnlockAttempt(verified: false)
-    }
-    
-    private func saveUnlockAttempt(verified: Bool) {
-        let metadata = MacWaitlistMetadata(initialUpgradeCheckComplete: true, unlockCodeVerified: verified)
-        
-        guard let metadataJSONData = metadata.toJSON() else {
-            #warning("This is a serious error that will prevent users from unlocking, it should be handled somehow.")
-            return
-        }
-
-        _ = fileStore.persist(metadataJSONData, url: encryptedMetadataFilePath)
+        statisticsStore.waitlistUpgradeCheckComplete = true
     }
     
     func deleteExistingMetadata() {
-        fileStore.remove(fileAtURL: encryptedMetadataFilePath)
-    }
-    
-    private func loadMetadataFromDisk() -> MacWaitlistMetadata? {
-        guard let data = fileStore.loadData(at: encryptedMetadataFilePath) else {
-            return nil
-        }
-        
-        let decoder = JSONDecoder()
-        return try? decoder.decode(MacWaitlistMetadata.self, from: data)
+        statisticsStore.waitlistUpgradeCheckComplete = false
+        statisticsStore.waitlistUnlocked = false
     }
     
 }

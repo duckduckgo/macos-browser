@@ -27,13 +27,6 @@ protocol FileStore {
 }
 
 final class EncryptedFileStore: FileStore {
-    
-    static func withDefaultEncryptionKey() -> EncryptedFileStore {
-        let keyStore = EncryptionKeyStore()
-        let key = try? keyStore.readKey()
-        
-        return EncryptedFileStore(encryptionKey: key)
-    }
 
     private let encryptionKey: SymmetricKey?
 

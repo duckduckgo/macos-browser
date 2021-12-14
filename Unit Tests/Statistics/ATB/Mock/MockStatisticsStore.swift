@@ -29,4 +29,8 @@ final class MockStatisticsStore: StatisticsStore {
 
     var variant: String?
     var lastAppRetentionRequestDate: Date?
+    
+    var waitlistUnlocked: Bool = false
+    var waitlistUpgradeCheckComplete: Bool = false
+
 }

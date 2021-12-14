@@ -30,6 +30,9 @@ protocol StatisticsStore: AnyObject {
 
     var lastAppRetentionRequestDate: Date? { get set }
     var isAppRetentionFiredToday: Bool { get }
+    
+    var waitlistUpgradeCheckComplete: Bool { get set }
+    var waitlistUnlocked: Bool { get set }
 }
 
 extension StatisticsStore {
