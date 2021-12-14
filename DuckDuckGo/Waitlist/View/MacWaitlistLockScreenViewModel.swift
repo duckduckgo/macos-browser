@@ -44,7 +44,12 @@ final class MacWaitlistLockScreenViewModel: ObservableObject {
     }
     
     public func attemptUnlock(code: String) {
-        self.state = .unlockRequestInFlight
+        if state == .unlockRequestInFlight {
+            assertionFailure("Attempted to unlock while a request was active")
+            return
+        }
+        
+        state = .unlockRequestInFlight
 
         #warning("Don't ship this, it's for product review only so that people can test the flow repeatedly")
         let hardcodedTemporaryPasscode = "DAX"
