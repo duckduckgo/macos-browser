@@ -183,7 +183,9 @@ final class LocalPixelDataStore<T: NSManagedObject>: PixelDataStore {
                 let deletedObjects = result?.result as? [NSManagedObjectID] ?? []
                 let changes: [AnyHashable: Any] = [NSDeletedObjectsKey: deletedObjects]
                 NSManagedObjectContext.mergeChanges(fromRemoteContextSave: changes, into: [context])
-
+                
+                self.cache.removeValue(forKey: key)
+                
                 mainQueueCompletion(nil)
             } catch {
                 mainQueueCompletion(error)
