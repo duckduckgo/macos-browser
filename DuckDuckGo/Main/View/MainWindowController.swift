@@ -58,7 +58,7 @@ final class MainWindowController: NSWindowController {
         window?.setFrameAutosaveName(Self.windowFrameSaveName)
         
         NotificationCenter.default.addObserver(forName: .macWaitlistLockScreenDidUnlock, object: nil, queue: .main) { [weak self] _ in
-            self?.userInteraction(prevented: false)
+            self?.updateWindowForLockScreen(lockScreenVisible: false)
         }
     }
 
@@ -169,8 +169,13 @@ extension MainWindowController: NSWindowDelegate {
         let displayed = Waitlist.displayLockScreenIfNecessary(in: mainViewController)
         
         if displayed {
-            userInteraction(prevented: true)
+            updateWindowForLockScreen(lockScreenVisible: true)
         }
+    }
+    
+    private func updateWindowForLockScreen(lockScreenVisible: Bool) {
+        userInteraction(prevented: lockScreenVisible)
+        window?.isMovable = lockScreenVisible
     }
 
     func windowDidResignKey(_ notification: Notification) {

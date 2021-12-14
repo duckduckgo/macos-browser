@@ -24,13 +24,13 @@
                                 <imageCell key="cell" refusesFirstResponder="YES" alignment="left" imageScaling="proportionallyDown" image="WaitlistLockScreenBackground" id="DHG-a0-nPf"/>
                             </imageView>
                             <customView translatesAutoresizingMaskIntoConstraints="NO" id="kDa-kp-O7E" userLabel="Invite Code State Group">
-                                <rect key="frame" x="0.0" y="91" width="360" height="197"/>
+                                <rect key="frame" x="0.0" y="85" width="360" height="203"/>
                                 <subviews>
                                     <imageView horizontalHuggingPriority="251" verticalHuggingPriority="251" translatesAutoresizingMaskIntoConstraints="NO" id="geE-7q-xYb" userLabel="Dax Logo">
-                                        <rect key="frame" x="155" y="149" width="50" height="48"/>
+                                        <rect key="frame" x="153" y="149" width="55" height="54"/>
                                         <constraints>
-                                            <constraint firstAttribute="width" constant="50" id="fX6-VY-K07"/>
-                                            <constraint firstAttribute="height" constant="48" id="m5s-eQ-VIx"/>
+                                            <constraint firstAttribute="width" constant="55" id="fX6-VY-K07"/>
+                                            <constraint firstAttribute="height" constant="54" id="m5s-eQ-VIx"/>
                                         </constraints>
                                         <imageCell key="cell" refusesFirstResponder="YES" alignment="left" imageScaling="proportionallyDown" image="HomepageLogo" id="i4p-iE-ZkA"/>
                                     </imageView>
@@ -232,6 +232,7 @@ DQ
                         <outlet property="errorLabel" destination="qPO-fW-OlL" id="3Or-MO-MDZ"/>
                         <outlet property="inviteCodeStateGroup" destination="kDa-kp-O7E" id="f38-aF-L10"/>
                         <outlet property="inviteCodeTextField" destination="QkQ-Su-Se9" id="ESU-eP-zxm"/>
+                        <outlet property="logoImageView" destination="geE-7q-xYb" id="VW5-Fc-wha"/>
                         <outlet property="networkRequestSpinner" destination="EDs-WA-Nxu" id="9g4-ye-wX7"/>
                         <outlet property="quitButton" destination="HUG-fd-k5l" id="GlZ-nW-GG4"/>
                         <outlet property="successStateGroup" destination="lcR-8N-GXM" id="ktU-8N-Bdc"/>
