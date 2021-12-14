@@ -53,6 +53,8 @@ final class LocalStatisticsStore: StatisticsStore {
         static let appRetentionAtb = "statistics.appretentionatb.key"
         static let variant = "statistics.variant.key"
         static let lastAppRetentionRequestDate = "statistics.appretentionatb.last.request.key"
+        static let waitlistUpgradeCheckComplete = "waitlist.upgradecomplete"
+        static let waitlistUnlocked = "waitlist.unlocked"
     }
 
     private let pixelDataStore: PixelDataStore
@@ -154,6 +156,34 @@ final class LocalStatisticsStore: StatisticsStore {
                 pixelDataStore.set(value.timeIntervalSinceReferenceDate, forKey: Keys.lastAppRetentionRequestDate)
             } else {
                 pixelDataStore.removeValue(forKey: Keys.lastAppRetentionRequestDate)
+            }
+        }
+    }
+    
+    var waitlistUpgradeCheckComplete: Bool {
+        get {
+            guard let booleanStringValue: String = pixelDataStore.value(forKey: Keys.waitlistUpgradeCheckComplete) else { return false }
+            return Bool(booleanStringValue) ?? false
+        }
+        set {
+            let booleanAsString = String(newValue)
+            pixelDataStore.set(booleanAsString, forKey: Keys.waitlistUpgradeCheckComplete)
+        }
+    }
+    
+    var waitlistUnlocked: Bool {
+        get {
+            guard let booleanStringValue: String = pixelDataStore.value(forKey: Keys.waitlistUnlocked) else { return false }
+            return Bool(booleanStringValue) ?? false
+        }
+        set {
+            if newValue == true {
+                let booleanAsString = String(newValue)
+                pixelDataStore.set(booleanAsString, forKey: Keys.waitlistUnlocked)
+            } else {
+                // Let the absense of a value represent false, so that anyone digging into the SQLite database won't
+                // see a false key and simply set it to true. The database is encrypted, so risk of this is low.
+                pixelDataStore.removeValue(forKey: Keys.waitlistUnlocked)
             }
         }
     }
