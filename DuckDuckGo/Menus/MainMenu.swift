@@ -57,8 +57,7 @@ final class MainMenu: NSMenu {
 
     @IBOutlet weak var debugMenuItem: NSMenuItem? {
         didSet {
-            #if DEBUG || REVIEW
-            #else
+            #if !DEBUG && !REVIEW
             if let item = debugMenuItem {
                 removeItem(item)
             }
