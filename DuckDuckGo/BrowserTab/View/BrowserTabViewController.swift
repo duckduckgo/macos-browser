@@ -888,10 +888,10 @@ extension BrowserTabViewController: OnboardingDelegate {
 
     func onboardingDidRequestStartBrowsing() {
         print(#function)
+        openNewTab(with: .homepage)
         if let tab = tabViewModel?.tab {
             closeTab(tab)
         }
-        openNewTab(with: .homepage)
     }
 
 }

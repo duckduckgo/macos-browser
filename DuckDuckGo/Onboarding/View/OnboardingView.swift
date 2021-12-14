@@ -303,6 +303,9 @@ struct DaxConversation: View {
                 CallToAction(text: UserText.onboardingStartBrowsingText, cta: UserText.onboardingStartBrowsingButton) {
                     delegate?.onboardingDidRequestStartBrowsing()
                 }
+                .onAppear {
+                    delegate?.onboardingHasFinished()
+                }
                 .visibility(showSpeech && phase == .startBrowsing ? .visible : .gone)
 
                 Spacer()
