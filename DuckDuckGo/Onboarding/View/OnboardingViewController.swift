@@ -23,10 +23,10 @@ import SwiftUI
 protocol OnboardingDelegate: NSObjectProtocol {
 
     /// Import data UI should be launched.  Whatever happens, call the completion to move on to the next screen.
-    func onboardingDidRequestImportData(completion: () -> Void)
+    func onboardingDidRequestImportData(completion: @escaping () -> Void)
 
     /// Request set default should be launched.  Whatever happens, call the completion to move on to the next screen.
-    func onboardingDidRequestSetDefault(completion: () -> Void)
+    func onboardingDidRequestSetDefault(completion: @escaping () -> Void)
 
     /// Has finished, but still showing a screen.  This is when to re-enable the UI.
     func onboardingHasFinished()

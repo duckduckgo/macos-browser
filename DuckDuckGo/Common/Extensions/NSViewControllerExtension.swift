@@ -43,11 +43,11 @@ extension NSViewController {
         }
     }
 
-    func beginSheet(_ viewController: NSViewController) {
+    func beginSheet(_ viewController: NSViewController, completionHandler handler: ((NSApplication.ModalResponse) -> Void)? = nil) {
         let windowController = viewController.wrappedInWindowController()
 
         if let windowSheet = windowController.window {
-            view.window?.beginSheet(windowSheet)
+            view.window?.beginSheet(windowSheet, completionHandler: handler)
         }
     }
 

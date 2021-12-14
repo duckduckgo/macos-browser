@@ -873,12 +873,24 @@ private extension WKWebView {
 
 extension BrowserTabViewController: OnboardingDelegate {
 
-    func onboardingDidRequestImportData(completion: () -> Void) {
+    func onboardingDidRequestImportData(completion: @escaping () -> Void) {
         print(#function)
+
+        let viewController = DataImportViewController.create()
+        beginSheet(viewController) { _ in
+            completion()
+        }
     }
 
-    func onboardingDidRequestSetDefault(completion: () -> Void) {
+    func onboardingDidRequestSetDefault(completion: @escaping () -> Void) {
         print(#function)
+        DefaultBrowserPreferences.becomeDefault()
+
+        var observer: Any?
+        observer = NotificationCenter.default.addObserver(forName: NSApplication.didBecomeActiveNotification, object: nil, queue: .main) { _ in
+            completion()
+            NotificationCenter.default.removeObserver(observer as Any)
+        }
     }
 
     func onboardingHasFinished() {
