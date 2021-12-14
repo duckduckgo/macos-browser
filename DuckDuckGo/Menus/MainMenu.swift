@@ -57,11 +57,13 @@ final class MainMenu: NSMenu {
 
     @IBOutlet weak var debugMenuItem: NSMenuItem? {
         didSet {
-#if !DEBUG
-            if let item = debugMenuItem {
-                removeItem(item)
-            }
-#endif
+            #warning("Re-enable this one product reviews and such are complete. We need this for now so that people")
+            // can reset the flow.
+// #if !DEBUG
+//            if let item = debugMenuItem {
+//                removeItem(item)
+//            }
+// #endif
         }
     }
 

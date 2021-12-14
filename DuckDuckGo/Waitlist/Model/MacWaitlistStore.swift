@@ -60,7 +60,7 @@ final class MacWaitlistEncryptedFileStorage: MacWaitlistStore {
         let metadata = MacWaitlistMetadata(initialUpgradeCheckComplete: true, unlockCodeVerified: true)
         
         guard let metadataJSONData = metadata.toJSON() else {
-            // TODO: This is a serious error that will prevent users from unlocking, it should be handled somehow.
+            #warning("This is a serious error that will prevent users from unlocking, it should be handled somehow.")
             return
         }
 

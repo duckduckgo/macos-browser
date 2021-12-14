@@ -57,7 +57,8 @@ struct MacWaitlistAPIRequest: MacWaitlistRequest {
             #if DEBUG
             self.endpoint = Self.developmentEndpoint
             #else
-            self.endpoint = Self.productionEndpoint
+            #warning("Change this to production later")
+            self.endpoint = Self.developmentEndpoint
             #endif
         }
     }
@@ -68,7 +69,7 @@ struct MacWaitlistAPIRequest: MacWaitlistRequest {
         let redeemURL = self.endpoint.appendingPathComponent("macosbrowser").appendingPathComponent("redeem")
         let parameters = [ "code": inviteCode ]
         
-        APIRequest.request(url: redeemURL, method: .post, parameters: parameters, callBackOnMainThread: true) { response, error in
+        APIRequest.request(url: redeemURL, method: .post, parameters: parameters, callBackOnMainThread: true) { response, _ in
             let decoder = JSONDecoder()
 
             if let responseData = response?.data,
