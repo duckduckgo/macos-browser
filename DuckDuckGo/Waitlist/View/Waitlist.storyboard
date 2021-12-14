@@ -24,10 +24,10 @@
                                 <imageCell key="cell" refusesFirstResponder="YES" alignment="left" imageScaling="proportionallyDown" image="WaitlistLockScreenBackground" id="DHG-a0-nPf"/>
                             </imageView>
                             <customView translatesAutoresizingMaskIntoConstraints="NO" id="kDa-kp-O7E" userLabel="Invite Code State Group">
-                                <rect key="frame" x="0.0" y="70" width="352" height="212"/>
+                                <rect key="frame" x="0.0" y="73" width="352" height="209"/>
                                 <subviews>
                                     <imageView horizontalHuggingPriority="251" verticalHuggingPriority="251" translatesAutoresizingMaskIntoConstraints="NO" id="geE-7q-xYb" userLabel="Dax Logo">
-                                        <rect key="frame" x="149" y="158" width="55" height="54"/>
+                                        <rect key="frame" x="149" y="155" width="55" height="54"/>
                                         <constraints>
                                             <constraint firstAttribute="width" constant="55" id="fX6-VY-K07"/>
                                             <constraint firstAttribute="height" constant="54" id="m5s-eQ-VIx"/>
@@ -35,7 +35,7 @@
                                         <imageCell key="cell" refusesFirstResponder="YES" alignment="left" imageScaling="proportionallyDown" image="HomepageLogo" id="i4p-iE-ZkA"/>
                                     </imageView>
                                     <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="OtQ-lg-ny6">
-                                        <rect key="frame" x="50" y="118" width="252" height="26"/>
+                                        <rect key="frame" x="50" y="115" width="252" height="26"/>
                                         <textFieldCell key="cell" lineBreakMode="clipping" title="Welcome to DuckDuckGo" id="ecb-cd-Gzd">
                                             <font key="font" size="22" name="SFProDisplay-Semibold"/>
                                             <color key="textColor" red="0.20000000000000001" green="0.20000000000000001" blue="0.20000000000000001" alpha="1" colorSpace="calibratedRGB"/>
@@ -43,9 +43,9 @@
                                         </textFieldCell>
                                     </textField>
                                     <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="Qkr-p5-9Ks">
-                                        <rect key="frame" x="101" y="68" width="150" height="30"/>
+                                        <rect key="frame" x="107" y="68" width="139" height="28"/>
                                         <textFieldCell key="cell" lineBreakMode="clipping" alignment="center" title="Enter your Invite Code to get started" id="6Sz-9i-tb7">
-                                            <font key="font" size="13" name="SFProText-Semibold"/>
+                                            <font key="font" size="12" name="SFProText-Semibold"/>
                                             <color key="textColor" red="0.20000000000000001" green="0.20000000000000001" blue="0.20000000000000001" alpha="1" colorSpace="calibratedRGB"/>
                                             <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
                                         </textFieldCell>
@@ -89,7 +89,7 @@
                                     <constraint firstItem="OtQ-lg-ny6" firstAttribute="centerX" secondItem="kDa-kp-O7E" secondAttribute="centerX" id="oKN-Bk-GjS"/>
                                     <constraint firstAttribute="trailing" secondItem="qPO-fW-OlL" secondAttribute="trailing" constant="15" id="qUV-Z4-ybc"/>
                                     <constraint firstItem="EDs-WA-Nxu" firstAttribute="centerY" secondItem="qPO-fW-OlL" secondAttribute="centerY" id="sBE-3y-jfC"/>
-                                    <constraint firstItem="Qkr-p5-9Ks" firstAttribute="top" secondItem="OtQ-lg-ny6" secondAttribute="bottom" constant="20" id="ub4-7U-qmf"/>
+                                    <constraint firstItem="Qkr-p5-9Ks" firstAttribute="top" secondItem="OtQ-lg-ny6" secondAttribute="bottom" constant="19" id="ub4-7U-qmf"/>
                                     <constraint firstItem="qPO-fW-OlL" firstAttribute="top" secondItem="QkQ-Su-Se9" secondAttribute="bottom" constant="15" id="wxH-iZ-IIK"/>
                                     <constraint firstItem="QkQ-Su-Se9" firstAttribute="centerX" secondItem="kDa-kp-O7E" secondAttribute="centerX" id="ypO-nl-4rA"/>
                                 </constraints>
