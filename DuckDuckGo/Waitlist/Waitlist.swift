@@ -37,7 +37,7 @@ struct Waitlist {
             return false
         }
 
-        let lockScreenViewController = WaitlistLockScreenViewController.instantiate()
+        let lockScreenViewController = MacWaitlistLockScreenViewController.instantiate()
         let lockScreenWindow = lockScreenViewController.wrappedInWindowController()
         
         viewController.beginSheet(lockScreenWindow)

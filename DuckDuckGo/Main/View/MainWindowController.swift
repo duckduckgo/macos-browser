@@ -57,9 +57,12 @@ final class MainWindowController: NSWindowController {
         window?.delegate = self
         window?.setFrameAutosaveName(Self.windowFrameSaveName)
         
-        NotificationCenter.default.addObserver(forName: .macWaitlistLockScreenDidUnlock, object: nil, queue: .main) { [weak self] _ in
-            self?.updateWindowForLockScreen(lockScreenVisible: false)
-        }
+        NotificationCenter.default.addObserver(self, selector: #selector(dismissLockScreen), name: .macWaitlistLockScreenDidUnlock, object: nil)
+    }
+    
+    @objc
+    private func dismissLockScreen() {
+        updateWindowForLockScreen(lockScreenVisible: false)
     }
 
     private func setupToolbar() {
