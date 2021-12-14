@@ -12,6 +12,7 @@
 		0230C0A3272080090018F728 /* KeyedCodingExtension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0230C0A2272080090018F728 /* KeyedCodingExtension.swift */; };
 		0230C0A52721F3750018F728 /* GPCRequestFactory.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0230C0A42721F3750018F728 /* GPCRequestFactory.swift */; };
 		026ADE1426C3010C002518EE /* macos-config.json in Resources */ = {isa = PBXBuildFile; fileRef = 026ADE1326C3010C002518EE /* macos-config.json */; };
+		02FFDA6C276923FD007CF935 /* AltContentBlockerRulesSource.swift in Sources */ = {isa = PBXBuildFile; fileRef = 02FFDA6B276923FD007CF935 /* AltContentBlockerRulesSource.swift */; };
 		142879DA24CE1179005419BB /* SuggestionViewModelTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 142879D924CE1179005419BB /* SuggestionViewModelTests.swift */; };
 		142879DC24CE1185005419BB /* SuggestionContainerViewModelTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 142879DB24CE1185005419BB /* SuggestionContainerViewModelTests.swift */; };
 		1430DFF524D0580F00B8978C /* TabBarViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1430DFF424D0580F00B8978C /* TabBarViewController.swift */; };
@@ -631,6 +632,7 @@
 		0230C0A2272080090018F728 /* KeyedCodingExtension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KeyedCodingExtension.swift; sourceTree = "<group>"; };
 		0230C0A42721F3750018F728 /* GPCRequestFactory.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GPCRequestFactory.swift; sourceTree = "<group>"; };
 		026ADE1326C3010C002518EE /* macos-config.json */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.json; path = "macos-config.json"; sourceTree = "<group>"; };
+		02FFDA6B276923FD007CF935 /* AltContentBlockerRulesSource.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AltContentBlockerRulesSource.swift; sourceTree = "<group>"; };
 		142879D924CE1179005419BB /* SuggestionViewModelTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SuggestionViewModelTests.swift; sourceTree = "<group>"; };
 		142879DB24CE1185005419BB /* SuggestionContainerViewModelTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SuggestionContainerViewModelTests.swift; sourceTree = "<group>"; };
 		1430DFF424D0580F00B8978C /* TabBarViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TabBarViewController.swift; sourceTree = "<group>"; };
@@ -1454,6 +1456,7 @@
 				85AC3B0425D6B1D800C7D2AA /* ScriptSourceProviding.swift */,
 				9826B09F2747DF3D0092F683 /* ContentBlocking.swift */,
 				9826B0A12747DFEB0092F683 /* AppPrivacyConfigurationDataProvider.swift */,
+				02FFDA6B276923FD007CF935 /* AltContentBlockerRulesSource.swift */,
 			);
 			path = ContentBlocker;
 			sourceTree = "<group>";
@@ -3587,6 +3590,7 @@
 				AA5C8F5E2590EEE800748EB7 /* NSPointExtension.swift in Sources */,
 				AA6EF9AD25066F42004754E6 /* WindowsManager.swift in Sources */,
 				B68458CD25C7EB9000DC17B6 /* WKWebViewConfigurationExtensions.swift in Sources */,
+				02FFDA6C276923FD007CF935 /* AltContentBlockerRulesSource.swift in Sources */,
 				AAC30A26268DFEE200D2D9CD /* CrashReporter.swift in Sources */,
 				4B9292A426670D2A00AD2C21 /* PasteboardWriting.swift in Sources */,
 				4B0511BE262CAA5A00F6079C /* DownloadPreferences.swift in Sources */,
@@ -4991,7 +4995,7 @@
 			repositoryURL = "https://github.com/duckduckgo/BrowserServicesKit.git";
 			requirement = {
 				kind = revision;
-				revision = 6d0dc34bbb1c8fab681cb3664c6c7fd151594412;
+				revision = 227df5c549b31d0e66d0de3cd02e96c789add510;
 			};
 		};
 		85FF55C625F82E4F00E2AB99 /* XCRemoteSwiftPackageReference "lottie-ios" */ = {

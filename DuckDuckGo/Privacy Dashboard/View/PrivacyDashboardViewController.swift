@@ -39,8 +39,10 @@ final class PrivacyDashboardViewController: NSViewController {
         initWebView()
         webView.configuration.userContentController.addHandlerNoContentWorld(privacyDashboardScript)
 
-        contentBlockinRulesUpdatedCancellable = prepareContentBlockingCancellable(publisher: ContentBlocking.contentBlockingUpdating.contentBlockingRules)
-        altContentBlockinRulesUpdatedCancellable = prepareContentBlockingCancellable(publisher: ContentBlocking.altContentBlockingUpdating.contentBlockingRules)
+        contentBlockinRulesUpdatedCancellable
+            prepareContentBlockingCancellable(publisher: ContentBlocking.contentBlockingUpdating.contentBlockingRules)
+        altContentBlockinRulesUpdatedCancellable =
+            prepareContentBlockingCancellable(publisher: ContentBlocking.altContentBlockingUpdating.contentBlockingRules)
     }
 
     private func prepareContentBlockingCancellable(publisher: ContentBlockingUpdating.NewRulesPublisher) -> AnyCancellable? {
