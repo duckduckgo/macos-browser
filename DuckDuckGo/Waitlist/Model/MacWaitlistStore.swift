@@ -77,17 +77,14 @@ final class MacWaitlistEncryptedFileStorage: MacWaitlistStore {
     }
     
     func unlock() {
-        let metadata = MacWaitlistMetadata(initialUpgradeCheckComplete: true, unlockCodeVerified: true)
-        
-        guard let metadataJSONData = metadata.toJSON() else {
-            #warning("This is a serious error that will prevent users from unlocking, it should be handled somehow.")
-            return
-        }
-
-        fileStore.persist(metadataJSONData, url: encryptedMetadataFilePath)
+        saveUnlockAttempt(verified: true)
     }
     
     func saveFailedUnlockAttempt() {
+        saveUnlockAttempt(verified: false)
+    }
+    
+    private func saveUnlockAttempt(verified: Bool) {
         let metadata = MacWaitlistMetadata(initialUpgradeCheckComplete: true, unlockCodeVerified: false)
         
         guard let metadataJSONData = metadata.toJSON() else {
@@ -95,7 +92,7 @@ final class MacWaitlistEncryptedFileStorage: MacWaitlistStore {
             return
         }
 
-        fileStore.persist(metadataJSONData, url: encryptedMetadataFilePath)
+        _ = fileStore.persist(metadataJSONData, url: encryptedMetadataFilePath)
     }
     
     func deleteExistingMetadata() {

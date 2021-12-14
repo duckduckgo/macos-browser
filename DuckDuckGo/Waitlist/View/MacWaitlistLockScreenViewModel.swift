@@ -64,7 +64,7 @@ final class MacWaitlistLockScreenViewModel: ObservableObject {
                     } else {
                         self.state = .unlockFailure
                     }
-                case .failure(let error):
+                case .failure:
                     self.state = .unlockFailure
                 }
             }
