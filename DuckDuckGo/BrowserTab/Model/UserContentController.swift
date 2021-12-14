@@ -22,30 +22,36 @@ import BrowserServicesKit
 
 final class UserContentController: WKUserContentController {
     private var blockingRulesUpdatedCancellable: AnyCancellable?
+    private var altBlockingRulesUpdatedCancellable: AnyCancellable?
     
     let privacyConfigurationManager: PrivacyConfigurationManager
 
     public init(rulesPublisher: ContentBlockingUpdating.NewRulesPublisher = ContentBlocking.contentBlockingUpdating.contentBlockingRules,
+                altRulesPublisher: ContentBlockingUpdating.NewRulesPublisher = ContentBlocking.altContentBlockingUpdating.contentBlockingRules,
                 privacyConfigurationManager: PrivacyConfigurationManager = ContentBlocking.privacyConfigurationManager) {
         self.privacyConfigurationManager = privacyConfigurationManager
         super.init()
 
-        installContentBlockingRules(publisher: rulesPublisher)
+        blockingRulesUpdatedCancellable = installContentBlockingRules(publisher: rulesPublisher)
+        altBlockingRulesUpdatedCancellable = installContentBlockingRules(publisher: altRulesPublisher)
     }
 
     required init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
 
-    func installContentBlockingRules(publisher: ContentBlockingUpdating.NewRulesPublisher) {
-        blockingRulesUpdatedCancellable = publisher.receive(on: RunLoop.main).sink { [weak self] newRules in
+    func installContentBlockingRules(publisher: ContentBlockingUpdating.NewRulesPublisher) -> AnyCancellable? {
+         return publisher.receive(on: RunLoop.main).sink { [weak self] newRules in
             dispatchPrecondition(condition: .onQueue(.main))
 
             guard let self = self,
                   let newRules = newRules
             else { return }
 
-            self.removeAllContentRuleLists()
+            if let oldRules = newRules.oldRules {
+                self.remove(oldRules)
+            }
+            
             if self.privacyConfigurationManager.privacyConfig.isEnabled(featureKey: .contentBlocking) {
                 self.add(newRules.rules.rulesList)
             }

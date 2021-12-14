@@ -153,6 +153,7 @@ final class ConfigurationManager {
         ContentBlocking.privacyConfigurationManager.reload(etag: configEtag, data: configData)
 
         ContentBlocking.contentBlockingManager.scheduleCompilation()
+        ContentBlocking.altContentBlockingManager.scheduleCompilation()
     }
 
     private func updateBloomFilter() throws {

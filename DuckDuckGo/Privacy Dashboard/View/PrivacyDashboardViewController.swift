@@ -32,17 +32,19 @@ final class PrivacyDashboardViewController: NSViewController {
     var serverTrustViewModel: ServerTrustViewModel?
 
     private var contentBlockinRulesUpdatedCancellable: AnyCancellable?
+    private var altContentBlockinRulesUpdatedCancellable: AnyCancellable?
 
     override func viewDidLoad() {
         privacyDashboardScript.delegate = self
         initWebView()
         webView.configuration.userContentController.addHandlerNoContentWorld(privacyDashboardScript)
 
-        prepareContentBlockingCancellable(publisher: ContentBlocking.contentBlockingUpdating.contentBlockingRules)
+        contentBlockinRulesUpdatedCancellable = prepareContentBlockingCancellable(publisher: ContentBlocking.contentBlockingUpdating.contentBlockingRules)
+        altContentBlockinRulesUpdatedCancellable = prepareContentBlockingCancellable(publisher: ContentBlocking.altContentBlockingUpdating.contentBlockingRules)
     }
 
-    private func prepareContentBlockingCancellable(publisher: ContentBlockingUpdating.NewRulesPublisher) {
-        contentBlockinRulesUpdatedCancellable = publisher.receive(on: RunLoop.main).sink { [weak self] newRules in
+    private func prepareContentBlockingCancellable(publisher: ContentBlockingUpdating.NewRulesPublisher) -> AnyCancellable? {
+        return publisher.receive(on: RunLoop.main).sink { [weak self] newRules in
             dispatchPrecondition(condition: .onQueue(.main))
 
             guard let self = self, let newRules = newRules, !self.pendingUpdates.isEmpty else { return }
@@ -202,7 +204,9 @@ extension PrivacyDashboardViewController: PrivacyDashboardUserScriptDelegate {
         }
 
         let completionToken = ContentBlocking.contentBlockingManager.scheduleCompilation()
+        let altToken = ContentBlocking.altContentBlockingManager.scheduleCompilation()
         pendingUpdates[completionToken] = domain
+        pendingUpdates[altToken] = domain
         sendPendingUpdates()
     }
 

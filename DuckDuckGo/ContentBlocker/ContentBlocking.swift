@@ -42,6 +42,14 @@ final class ContentBlocking {
 
     private static let contentBlockingSource = DefaultContentBlockerRulesSource(trackerDataManager: trackerDataManager,
                                                                                 privacyConfigManager: privacyConfigurationManager)
+    
+    // Exmaple for 2nd content blocking rule list
+    static let altContentBlockingUpdating = ContentBlockingUpdating()
+    static let altContentBlockingSource = AltContentBlockerRulesSource(trackerDataManager: trackerDataManager,
+                                                                       privacyConfigManager: privacyConfigurationManager)
+    static let altContentBlockingManager = ContentBlockerRulesManager(source: altContentBlockingSource,
+                                                                      updateListener: altContentBlockingUpdating,
+                                                                      logger: OSLog.contentBlocking)
 
     private static let debugEvents = EventMapping<ContentBlockerDebugEvents> { event, error, parameters, onComplete in
         let domainEvent: Pixel.Event.Debug
@@ -86,6 +94,7 @@ final class ContentBlocking {
 
 final class ContentBlockingUpdating: ContentBlockerRulesUpdating {
     typealias NewRulesInfo = (rules: ContentBlockerRulesManager.CurrentRules,
+                              oldRules: WKContentRuleList?,
                               changes: ContentBlockerRulesIdentifier.Difference,
                               completionTokens: Set<ContentBlockerRulesManager.CompletionToken>)
     typealias NewRulesPublisher = AnyPublisher<NewRulesInfo?, Never>
@@ -98,9 +107,11 @@ final class ContentBlockingUpdating: ContentBlockerRulesUpdating {
 
     func rulesManager(_ manager: ContentBlockerRulesManager,
                       didUpdateRules rules: ContentBlockerRulesManager.CurrentRules,
+                      oldRules: WKContentRuleList?,
                       changes: ContentBlockerRulesIdentifier.Difference,
                       completionTokens: [ContentBlockerRulesManager.CompletionToken]) {
-        contentBlockingRulesSubject.send((rules: rules, changes: changes, completionTokens: Set(completionTokens)))
+        contentBlockingRulesSubject.send((rules: rules, oldRules: oldRules,
+                                          changes: changes, completionTokens: Set(completionTokens)))
     }
 
 }
