@@ -1,5 +1,5 @@
 //
-//  WaitlistLockScreenViewController.swift
+//  MacWaitlistLockScreenViewController.swift
 //
 //  Copyright © 2021 DuckDuckGo. All rights reserved.
 //
@@ -19,7 +19,7 @@
 import AppKit
 import Combine
 
-final class WaitlistLockScreenViewController: NSViewController {
+final class MacWaitlistLockScreenViewController: NSViewController {
     
     // swiftlint:disable force_cast
     static func instantiate() -> NSViewController {
@@ -133,7 +133,7 @@ final class WaitlistLockScreenViewController: NSViewController {
     
 }
 
-extension WaitlistLockScreenViewController: NSTextFieldDelegate {
+extension MacWaitlistLockScreenViewController: NSTextFieldDelegate {
     
     func controlTextDidChange(_ notification: Notification) {
         if let info = notification.userInfo, let text = info["NSFieldEditor"] as? NSText {

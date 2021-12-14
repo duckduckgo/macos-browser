@@ -202,7 +202,7 @@
 		4BE65480271FCD4D008D1D63 /* PasswordManagementLoginModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4BE6547C271FCD4D008D1D63 /* PasswordManagementLoginModel.swift */; };
 		4BE65481271FCD4D008D1D63 /* PasswordManagementNoteModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4BE6547D271FCD4D008D1D63 /* PasswordManagementNoteModel.swift */; };
 		4BE65485271FCD7B008D1D63 /* LoginFaviconView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4BE65484271FCD7B008D1D63 /* LoginFaviconView.swift */; };
-		4BEF0E6827641A0E00AF7C58 /* WaitlistLockScreenViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4BEF0E6627641A0E00AF7C58 /* WaitlistLockScreenViewController.swift */; };
+		4BEF0E6827641A0E00AF7C58 /* MacWaitlistLockScreenViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4BEF0E6627641A0E00AF7C58 /* MacWaitlistLockScreenViewController.swift */; };
 		4BEF0E6A276676A500AF7C58 /* WaitlistRequest.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4BEF0E69276676A500AF7C58 /* WaitlistRequest.swift */; };
 		4BEF0E6C276676AB00AF7C58 /* MacWaitlistStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4BEF0E6B276676AB00AF7C58 /* MacWaitlistStore.swift */; };
 		4BEF0E702766805500AF7C58 /* MacWaitlistMetadata.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4BEF0E6F2766805500AF7C58 /* MacWaitlistMetadata.swift */; };
@@ -833,7 +833,7 @@
 		4BE6547D271FCD4D008D1D63 /* PasswordManagementNoteModel.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PasswordManagementNoteModel.swift; sourceTree = "<group>"; };
 		4BE65482271FCD53008D1D63 /* CountryList.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CountryList.swift; sourceTree = "<group>"; };
 		4BE65484271FCD7B008D1D63 /* LoginFaviconView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = LoginFaviconView.swift; sourceTree = "<group>"; };
-		4BEF0E6627641A0E00AF7C58 /* WaitlistLockScreenViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = WaitlistLockScreenViewController.swift; sourceTree = "<group>"; };
+		4BEF0E6627641A0E00AF7C58 /* MacWaitlistLockScreenViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MacWaitlistLockScreenViewController.swift; sourceTree = "<group>"; };
 		4BEF0E69276676A500AF7C58 /* WaitlistRequest.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WaitlistRequest.swift; sourceTree = "<group>"; };
 		4BEF0E6B276676AB00AF7C58 /* MacWaitlistStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MacWaitlistStore.swift; sourceTree = "<group>"; };
 		4BEF0E6F2766805500AF7C58 /* MacWaitlistMetadata.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MacWaitlistMetadata.swift; sourceTree = "<group>"; };
@@ -1810,7 +1810,7 @@
 			isa = PBXGroup;
 			children = (
 				4BC68A6F2759AE490029A586 /* Waitlist.storyboard */,
-				4BEF0E6627641A0E00AF7C58 /* WaitlistLockScreenViewController.swift */,
+				4BEF0E6627641A0E00AF7C58 /* MacWaitlistLockScreenViewController.swift */,
 				4BEF0E712766B11200AF7C58 /* MacWaitlistLockScreenViewModel.swift */,
 			);
 			path = View;
@@ -3787,7 +3787,7 @@
 				AAEEC6A927088ADB008445F7 /* FireCoordinator.swift in Sources */,
 				B655369B268442EE00085A79 /* GeolocationProvider.swift in Sources */,
 				B6C0B23C26E87D900031CB7F /* NSAlert+ActiveDownloadsTermination.swift in Sources */,
-				4BEF0E6827641A0E00AF7C58 /* WaitlistLockScreenViewController.swift in Sources */,
+				4BEF0E6827641A0E00AF7C58 /* MacWaitlistLockScreenViewController.swift in Sources */,
 				AAECA42024EEA4AC00EFA63A /* IndexPathExtension.swift in Sources */,
 				4BE65478271FCD41008D1D63 /* PasswordManagementNoteItemView.swift in Sources */,
 				AA5C8F632591021700748EB7 /* NSApplicationExtension.swift in Sources */,
