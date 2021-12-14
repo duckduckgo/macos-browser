@@ -28,6 +28,18 @@ final class WaitlistLockScreenViewController: NSViewController {
     }
     // swiftlint:enable force_cast
     
+    @IBOutlet var logoImageView: NSImageView! {
+        didSet {
+            logoImageView.wantsLayer = true
+            logoImageView.layer?.masksToBounds = false
+            logoImageView.layer?.shadowColor = NSColor.black.cgColor
+            logoImageView.layer?.shadowRadius = 2
+            logoImageView.layer?.shadowOffset = CGSize(width: 0, height: -2)
+            logoImageView.layer?.shadowOpacity = 0.3
+            logoImageView.layer?.contentsScale = NSScreen.main!.backingScaleFactor
+        }
+    }
+    
     @IBOutlet var inviteCodeStateGroup: NSView!
     @IBOutlet var successStateGroup: NSView!
     
