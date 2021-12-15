@@ -24,8 +24,6 @@ struct ActionSpeech: View {
 
     let text: String
     let actionName: String
-    let actionPixel: Pixel.Event
-    let skipPixel: Pixel.Event
     let action: () -> Void
     let skip: () -> Void
 
@@ -36,16 +34,18 @@ struct ActionSpeech: View {
             HStack(spacing: 12) {
 
                 Button(UserText.onboardingNotNowButton) {
-                    Pixel.fire(skipPixel)
-                    skip()
+                    withAnimation {
+                        skip()
+                    }
                 }
-                .buttonStyle(ActionButtonStyle(skip: true))
+                .buttonStyle(SkipButtonStyle())
 
                 Button(actionName) {
-                    Pixel.fire(actionPixel)
-                    action()
+                    withAnimation {
+                        action()
+                    }
                 }
-                .buttonStyle(ActionButtonStyle(skip: false))
+                .buttonStyle(ActionButtonStyle())
 
             }
             .frame(width: 292)

@@ -1,5 +1,5 @@
 //
-//  ActionButtonStyle.swift
+//  CallToAction.swift
 //
 //  Copyright © 2021 DuckDuckGo. All rights reserved.
 //
@@ -20,24 +20,28 @@ import SwiftUI
 
 extension Onboarding {
 
-struct ActionButtonStyle: ButtonStyle {
+struct CallToAction: View {
 
-    let skip: Bool
+    let text: String
+    let cta: String
 
-    func makeBody(configuration: Self.Configuration) -> some View {
+    let onNext: () -> Void
 
-        let fillColor = skip ? .black.opacity(0.06) : Color("OnboardingActionButton")
+    var body: some View {
+        VStack {
+            DaxSpeech(text: text)
 
-        configuration.label
-            .padding(.vertical, 8)
-            .frame(maxWidth: .infinity)
-            .truncationMode(.tail)
-            .background(RoundedRectangle(cornerRadius: 8, style: .continuous).fill(fillColor))
-            .foregroundColor(skip ? .black : .white)
-            .opacity(configuration.isPressed ? 0.6 : 1.0)
-            .font(.system(size: 13, weight: .bold, design: .default))
+            Button(cta) {
+                withAnimation {
+                    onNext()
+                }
+            }
+            .frame(width: 296)
+            .buttonStyle(ActionButtonStyle())
 
+        }
     }
+
 }
 
 }

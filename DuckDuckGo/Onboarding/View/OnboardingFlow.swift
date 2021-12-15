@@ -22,29 +22,12 @@ extension Onboarding {
 
 struct OnboardingFlow: View {
 
-    enum OnboardingPhase {
-
-        case start
-        case welcome
-        case importData
-        case setDefault
-        case startBrowsing
-
-    }
-
-    weak var delegate: OnboardingDelegate?
+    @EnvironmentObject var model: OnboardingViewModel
 
     @State var makeSpace = false
     @State var showLogo = false
     @State var showTitle = true
     @State var showSpeech = false
-    @State var phase: OnboardingPhase = .start
-
-    func moveToPhase(_ phase: OnboardingPhase) {
-        withAnimation {
-            self.phase = phase
-        }
-    }
 
     var body: some View {
 
@@ -68,42 +51,27 @@ struct OnboardingFlow: View {
                     .transition(.move(edge: .bottom).combined(with: .opacity))
                     .padding(.init(top: 0, leading: 0, bottom: 0, trailing: showSpeech ? 10 : 0))
 
-                CallToActionView(text: UserText.onboardingWelcomeText,
-                                 cta: UserText.onboardingStartButton,
-                                 pixel: .onboardingStartPressed) {
-                    moveToPhase(.importData)
-                }
-                .visibility(showSpeech && phase == .welcome ? .visible : .gone)
+                CallToAction(text: UserText.onboardingWelcomeText,
+                             cta: UserText.onboardingStartButton) {
+                    model.onStartPressed()
+                }.visibility(model.state == .welcome ? .visible : .gone)
 
                 ActionSpeech(text: UserText.onboardingImportDataText,
-                             actionName: UserText.onboardingImportDataButton,
-                             actionPixel: .onboardingImportPressed,
-                             skipPixel: .onboardingImportSkipped) {
-                    delegate?.onboardingDidRequestImportData {
-                        moveToPhase(.setDefault)
-                    }
+                             actionName: UserText.onboardingImportDataButton) {
+                    model.onImportPressed()
                 } skip: {
-                    moveToPhase(.setDefault)
-                }
-                .visibility(showSpeech && phase == .importData ? .visible : .gone)
+                    model.onImportSkipped()
+                }.visibility(model.state == .importData ? .visible : .gone)
 
                 ActionSpeech(text: UserText.onboardingSetDefaultText,
-                             actionName: UserText.onboardingSetDefaultButton,
-                             actionPixel: .onboardingSetDefaultPressed,
-                             skipPixel: .onboardingSetDefaultSkipped) {
-                    delegate?.onboardingDidRequestSetDefault {
-                        moveToPhase(.startBrowsing)
-                    }
+                             actionName: UserText.onboardingSetDefaultButton) {
+                    model.onSetDefaultPressed()
                 } skip: {
-                    moveToPhase(.startBrowsing)
-                }
-                .visibility(showSpeech && phase == .setDefault ? .visible : .gone)
+                    model.onSetDefaultSkipped()
+                }.visibility(model.state == .setDefault ? .visible : .gone)
 
                 DaxSpeech(text: UserText.onboardingStartBrowsingText)
-                .onAppear {
-                    delegate?.onboardingHasFinished()
-                }
-                .visibility(showSpeech && phase == .startBrowsing ? .visible : .gone)
+                    .visibility(model.state == .startBrowsing ? .visible : .gone)
 
                 Spacer()
                     .visibility(showSpeech ? .visible : .gone)
@@ -131,7 +99,7 @@ struct OnboardingFlow: View {
             }
 
             withAnimation(.easeIn.delay(3.5)) {
-                phase = .welcome
+                model.onSplashFinished()
             }
 
         }

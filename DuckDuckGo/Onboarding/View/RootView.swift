@@ -22,8 +22,6 @@ extension Onboarding {
 
 struct RootView: View {
 
-    weak var delegate: OnboardingDelegate?
-
     @State var showDax = false
     @State var showImage = false
 
@@ -36,7 +34,7 @@ struct RootView: View {
                 .foregroundColor(.white)
                 .visibility(showImage ? .invisible : .visible)
 
-            OnboardingFlow(delegate: delegate)
+            OnboardingFlow()
                 .visibility(showDax ? .visible : .gone)
                 .frame(maxWidth: .infinity, maxHeight: .infinity)
 
