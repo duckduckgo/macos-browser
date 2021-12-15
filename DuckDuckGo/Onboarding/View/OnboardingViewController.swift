@@ -42,10 +42,4 @@ final class OnboardingViewController: NSHostingController<OnboardingView> {
         return OnboardingViewController(rootView: OnboardingView(delegate: delegate))
     }
 
-    override func viewDidLoad() {
-        super.viewDidLoad()
-        // Doesn't get called
-        print(#function, view)
-    }
-
 }

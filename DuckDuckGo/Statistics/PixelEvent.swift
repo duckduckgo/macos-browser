@@ -80,6 +80,12 @@ extension Pixel {
         case formAutofilled(kind: FormAutofillKind)
         case autofillItemSaved(kind: FormAutofillKind)
 
+        case onboardingStartPressed
+        case onboardingImportPressed
+        case onboardingImportSkipped
+        case onboardingSetDefaultPressed
+        case onboardingSetDefaultSkipped
+
         case debug(event: Debug, error: Error? = nil)
 
         enum Debug: String, CustomStringConvertible {
@@ -204,6 +210,22 @@ extension Pixel.Event {
 
         case .debug(event: let event, error: _):
             return "m_mac_debug_\(event)"
+
+        case .onboardingStartPressed:
+            return "m_mac_onboarding_start_pressed"
+
+        case .onboardingImportPressed:
+            return "m_mac_onboarding_import_pressed"
+
+        case .onboardingImportSkipped:
+            return "m_mac_onboarding_import_skipped"
+
+        case .onboardingSetDefaultPressed:
+            return "m_mac_onboarding_setdefault_pressed"
+
+        case .onboardingSetDefaultSkipped:
+            return "m_mac_onboarding_setdefault_skipped"
+
         }
     }
 

@@ -177,6 +177,8 @@ struct ActionSpeech: View {
 
     let text: String
     let actionName: String
+    let actionPixel: Pixel.Event
+    let skipPixel: Pixel.Event
     let action: () -> Void
     let skip: () -> Void
 
@@ -187,11 +189,13 @@ struct ActionSpeech: View {
             HStack {
 
                 Button("Not Now") {
+                    Pixel.fire(skipPixel)
                     skip()
                 }
                 .buttonStyle(ActionButtonStyle(skip: true))
 
                 Button(actionName) {
+                    Pixel.fire(actionPixel)
                     action()
                 }
                 .buttonStyle(ActionButtonStyle(skip: false))
@@ -209,6 +213,7 @@ struct CallToAction: View {
 
     let text: String
     let cta: String
+    let pixel: Pixel.Event
 
     let onNext: () -> Void
 
@@ -217,6 +222,7 @@ struct CallToAction: View {
             DaxSpeech(text: text)
 
             Button(cta) {
+                Pixel.fire(pixel)
                 onNext()
             }
             .frame(width: 290)
@@ -277,12 +283,17 @@ struct DaxConversation: View {
                     .shadow(color: .black.opacity(0.16), radius: 6, x: 0, y: 3)
                     .transition(.daxWelcome)
 
-                CallToAction(text: UserText.onboardingWelcomeText, cta: UserText.onboardingStartButton) {
+                CallToAction(text: UserText.onboardingWelcomeText,
+                             cta: UserText.onboardingStartButton,
+                             pixel: .onboardingStartPressed) {
                     moveToPhase(.importData)
                 }
                 .visibility(showSpeech && phase == .welcome ? .visible : .gone)
 
-                ActionSpeech(text: UserText.onboardingImportDataText, actionName: UserText.onboardingImportDataButton) {
+                ActionSpeech(text: UserText.onboardingImportDataText,
+                             actionName: UserText.onboardingImportDataButton,
+                             actionPixel: .onboardingImportPressed,
+                             skipPixel: .onboardingImportSkipped) {
                     delegate?.onboardingDidRequestImportData {
                         moveToPhase(.setDefault)
                     }
@@ -291,7 +302,10 @@ struct DaxConversation: View {
                 }
                 .visibility(showSpeech && phase == .importData ? .visible : .gone)
 
-                ActionSpeech(text: UserText.onboardingSetDefaultText, actionName: UserText.onboardingSetDefaultButton) {
+                ActionSpeech(text: UserText.onboardingSetDefaultText,
+                             actionName: UserText.onboardingSetDefaultButton,
+                             actionPixel: .onboardingSetDefaultPressed,
+                             skipPixel: .onboardingSetDefaultSkipped) {
                     delegate?.onboardingDidRequestSetDefault {
                         moveToPhase(.startBrowsing)
                     }
@@ -300,9 +314,7 @@ struct DaxConversation: View {
                 }
                 .visibility(showSpeech && phase == .setDefault ? .visible : .gone)
 
-                CallToAction(text: UserText.onboardingStartBrowsingText, cta: UserText.onboardingStartBrowsingButton) {
-                    delegate?.onboardingDidRequestStartBrowsing()
-                }
+                DaxSpeech(text: UserText.onboardingStartBrowsingText)
                 .onAppear {
                     delegate?.onboardingHasFinished()
                 }

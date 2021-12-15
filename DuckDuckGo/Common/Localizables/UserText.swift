@@ -371,16 +371,15 @@ struct UserText {
     static let exportBookmarksFileNameSuffix = NSLocalizedString("export.bookmarks.file.name.suffix", value: "Bookmarks", comment: "The last part of the suggested file for exporting bookmarks")
 
 
-    static let onboardingWelcomeTitle = "Welcome to DuckDuckGo!"
-    static let onboardingWelcomeText = "Tired of being tracked online? You've come to the right place 👍\n\nI'll help you stay private️ as you search and browse the web. Trackers be gone!"
-    static let onboardingImportDataText = "First, let me help you import your bookmarks 📖 and passwords 🔑 from those less private browsers."
-    static let onboardingSetDefaultText = "Next, try setting DuckDuckGo as your default browser, so you can open links with peace of mind, every time."
-    static let onboardingStartBrowsingText = "Now, try visiting some of your favorite sites.\n\nWatch the address bar 👆 to see how I protect your privacy 🔒"
+    static let onboardingWelcomeTitle = NSLocalizedString("onboarding.welcome.title", value: "Welcome to DuckDuckGo!", comment: "General welcome to the app title")
+    static let onboardingWelcomeText = NSLocalizedString("onboarding.welcome.text", value: "Tired of being tracked online? You've come to the right place 👍\n\nI'll help you stay private️ as you search and browse the web. Trackers be gone!", comment: "Detailed welcome to the app text")
+    static let onboardingImportDataText = NSLocalizedString("onboarding.importdata.text", value: "First, let me help you import your bookmarks 📖 and passwords 🔑 from those less private browsers.", comment: "Call to action to import data from other browsers")
+    static let onboardingSetDefaultText = NSLocalizedString("onboarding.setdefault.text", value: "Next, try setting DuckDuckGo as your default browser, so you can open links with peace of mind, every time.", comment: "Call to action to set the browser as default")
+    static let onboardingStartBrowsingText = NSLocalizedString("onboarding.startbrowsing.text", value: "Now, try visiting some of your favorite sites.\n\nWatch the address bar 👆 to see how I protect your privacy 🔒", comment: "Call to action to start using the app as a browser")
 
-    static let onboardingStartButton = "Get Started"
-    static let onboardingImportDataButton = "Import"
-    static let onboardingSetDefaultButton = "Let's Do It!"
-    static let onboardingStartBrowsingButton = "Start Browsing"
-    static let onboardingNotNowButton = "Not Now"
+    static let onboardingStartButton = NSLocalizedString("onboarding.welcome.button", value: "Get Started", comment: "Start the onboarding flow")
+    static let onboardingImportDataButton = NSLocalizedString("onboarding.importdata.button", value: "Import", comment: "Launch the import data UI")
+    static let onboardingSetDefaultButton = NSLocalizedString("onboarding.setdefault.button", value: "Let's Do It!", comment: "Launch the set default UI")
+    static let onboardingNotNowButton = NSLocalizedString("onboarding.notnow.button", value: "Not Now", comment: "Skip a step of the onboarding flow")
 
 }

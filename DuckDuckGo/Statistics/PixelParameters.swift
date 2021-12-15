@@ -92,7 +92,12 @@ extension Pixel.Event {
              .importedBookmarks,
              .exportedBookmarks,
              .formAutofilled,
-             .autofillItemSaved:
+             .autofillItemSaved,
+             .onboardingStartPressed,
+             .onboardingImportPressed,
+             .onboardingImportSkipped,
+             .onboardingSetDefaultPressed,
+             .onboardingSetDefaultSkipped:
 
             return nil
         }
