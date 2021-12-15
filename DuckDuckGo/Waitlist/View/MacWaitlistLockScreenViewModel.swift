@@ -45,7 +45,10 @@ final class MacWaitlistLockScreenViewModel: ObservableObject {
     
     public func attemptUnlock(code: String) {
         if state == .unlockRequestInFlight {
-            assertionFailure("Attempted to unlock while a request was active")
+            if !AppDelegate.isRunningTests {
+                assertionFailure("Attempted to unlock while a request was active")
+            }
+            
             return
         }
         
