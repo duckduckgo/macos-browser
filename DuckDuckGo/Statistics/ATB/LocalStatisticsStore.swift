@@ -47,6 +47,15 @@ final class LocalStatisticsStore: StatisticsStore {
     }
 
     private struct Keys {
+        static let installDate = "stats.installdate.key"
+        static let atb = "stats.atb.key"
+        static let searchRetentionAtb = "stats.retentionatb.key"
+        static let appRetentionAtb = "stats.appretentionatb.key"
+        static let variant = "stats.variant.key"
+        static let lastAppRetentionRequestDate = "stats.appretentionatb.last.request.key"
+    }
+
+    private struct DeprecatedKeys {
         static let installDate = "statistics.installdate.key"
         static let atb = "statistics.atb.key"
         static let searchRetentionAtb = "statistics.retentionatb.key"
