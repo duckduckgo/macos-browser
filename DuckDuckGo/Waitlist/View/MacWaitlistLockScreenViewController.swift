@@ -65,6 +65,8 @@ final class MacWaitlistLockScreenViewController: NSViewController {
         }
         
         renderCurrentState()
+        
+        NotificationCenter.default.addObserver(self, selector: #selector(dismissIfNecessary(_:)), name: .macWaitlistLockScreenDidUnlock, object: nil)
     }
     
     @IBAction func quit(_ sender: NSButton) {
@@ -75,9 +77,19 @@ final class MacWaitlistLockScreenViewController: NSViewController {
     @IBAction func continueButtonClicked(_ sender: NSButton) {
         if viewModel.state == .unlockSuccess {
             self.dismiss()
-            NotificationCenter.default.post(name: .macWaitlistLockScreenDidUnlock, object: nil)
+            NotificationCenter.default.post(name: .macWaitlistLockScreenDidUnlock, object: self)
         } else {
             viewModel.attemptUnlock(code: inviteCodeTextField.stringValue)
+        }
+    }
+    
+    @objc
+    private func dismissIfNecessary(_ notification: Notification) {
+        // In the case that there are somehow multiple windows active when the app launches and displays the unlock
+        // screen, each window will have its own modal view. When the app unlocks, dismiss all of those that weren't
+        // sending the notification. The sender is dismissed elsewhere and is excluded here to avoid double-dismissing.
+        if let object = notification.object as? Self, object !== self {
+            dismiss()
         }
     }
     
