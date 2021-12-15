@@ -355,28 +355,35 @@ struct OnboardingView: View {
     @State var showImage = false
 
     var body: some View {
-        ZStack {
-            if showImage {
-                image
-                    .resizable()
+
+        GeometryReader { g in
+
+            ZStack(alignment: .bottom) {
+
+                Rectangle()
                     .frame(maxWidth: .infinity, maxHeight: .infinity)
-                    .transition(.opacity.animation(.easeIn(duration: 1).delay(0.5)))
-            }
+                    .foregroundColor(.white)
+                    .visibility(showImage ? .invisible : .visible)
 
-            if showDax {
                 DaxConversation(delegate: delegate)
+                    .visibility(showDax ? .visible : .gone)
+                    .frame(maxWidth: .infinity, maxHeight: .infinity)
+
+            }
+            .background(Color("OnboardingBackgroundColor"))
+            .frame(maxWidth: .infinity, maxHeight: .infinity)
+            .onAppear {
+                withAnimation {
+                    showDax = true
+                }
+
+                withAnimation(.easeIn.delay(0.3)) {
+                    showImage = true
+                }
             }
 
         }
-        // .frame(width: 800, height: 600)
-        .frame(maxWidth: .infinity, maxHeight: .infinity)
-        .background(Color.white)
-        .onAppear {
-            withAnimation {
-                showImage = true
-                showDax = true
-            }
-        }
+
     }
 
 }
