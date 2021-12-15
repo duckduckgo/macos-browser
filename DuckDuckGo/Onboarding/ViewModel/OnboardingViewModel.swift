@@ -29,9 +29,6 @@ protocol OnboardingDelegate: NSObjectProtocol {
     /// Has finished, but still showing a screen.  This is when to re-enable the UI.
     func onboardingHasFinished()
 
-    /// Start browsing button pressed.  Close this and open the home tab.
-    func onboardingDidRequestStartBrowsing()
-
 }
 
 final class OnboardingViewModel: ObservableObject {
@@ -79,12 +76,14 @@ final class OnboardingViewModel: ObservableObject {
         Pixel.fire(.onboardingSetDefaultPressed)
         delegate?.onboardingDidRequestSetDefault { [weak self] in
             self?.state = .startBrowsing
+            self?.delegate?.onboardingHasFinished()
         }
     }
 
     func onSetDefaultSkipped() {
         Pixel.fire(.onboardingSetDefaultSkipped)
         state = .startBrowsing
+        delegate?.onboardingHasFinished()
     }
 
 }

@@ -898,14 +898,6 @@ extension BrowserTabViewController: OnboardingDelegate {
         (view.window?.windowController as? MainWindowController)?.userInteraction(prevented: false)
     }
 
-    func onboardingDidRequestStartBrowsing() {
-        print(#function)
-        openNewTab(with: .homepage)
-        if let tab = tabViewModel?.tab {
-            closeTab(tab)
-        }
-    }
-
 }
 
 // swiftlint:enable file_length
