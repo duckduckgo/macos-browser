@@ -172,6 +172,10 @@ extension MainWindowController: NSWindowDelegate {
             WindowControllersManager.shared.lastKeyMainWindowController = self
         }
         
+        displayLockScreenIfNecessary()
+    }
+    
+    private func displayLockScreenIfNecessary() {
         // Displaying a modal so soon after the window becoming key causes issues related to the window animation and
         // state, such as a double animation happening as the window opens, and the address bar state being incorrect.
         // Dispatching this change to the end of the main queue fixes it.
