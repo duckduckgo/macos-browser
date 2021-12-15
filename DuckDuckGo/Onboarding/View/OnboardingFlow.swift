@@ -66,6 +66,7 @@ struct OnboardingFlow: View {
                     .frame(width: 64, height: 64)
                     .shadow(color: .black.opacity(0.16), radius: 6, x: 0, y: 3)
                     .transition(.move(edge: .bottom).combined(with: .opacity))
+                    .padding(.init(top: 0, leading: 0, bottom: 0, trailing: showSpeech ? 10 : 0))
 
                 CallToActionView(text: UserText.onboardingWelcomeText,
                                  cta: UserText.onboardingStartButton,
@@ -112,7 +113,7 @@ struct OnboardingFlow: View {
             Spacer().visibility(showSpeech ? .visible : .gone)
 
         }
-        .padding()
+        .padding(30)
         .onAppear {
 
             withAnimation(.easeIn(duration: 0.5).delay(1.5)) {

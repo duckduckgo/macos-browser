@@ -33,7 +33,7 @@ struct ActionSpeech: View {
         VStack {
             DaxSpeech(text: text)
 
-            HStack {
+            HStack(spacing: 12) {
 
                 Button(UserText.onboardingNotNowButton) {
                     Pixel.fire(skipPixel)
@@ -48,8 +48,7 @@ struct ActionSpeech: View {
                 .buttonStyle(ActionButtonStyle(skip: false))
 
             }
-            .padding(.leading, 10)
-            .frame(width: 290)
+            .frame(width: 292)
 
         }
     }

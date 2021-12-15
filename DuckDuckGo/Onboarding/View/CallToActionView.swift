@@ -36,8 +36,7 @@ struct CallToActionView: View {
                 Pixel.fire(pixel)
                 onNext()
             }
-            .frame(width: 290)
-            .padding(.leading, 10)
+            .frame(width: 296)
             .buttonStyle(ActionButtonStyle(skip: false))
 
         }
