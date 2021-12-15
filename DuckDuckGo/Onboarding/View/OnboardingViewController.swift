@@ -36,10 +36,10 @@ protocol OnboardingDelegate: NSObjectProtocol {
 
 }
 
-final class OnboardingViewController: NSHostingController<OnboardingView> {
+final class OnboardingViewController: NSHostingController<Onboarding.RootView> {
 
     static func create(withDelegate delegate: OnboardingDelegate) -> OnboardingViewController {
-        return OnboardingViewController(rootView: OnboardingView(delegate: delegate))
+        return OnboardingViewController(rootView: Onboarding.RootView(delegate: delegate))
     }
 
 }
