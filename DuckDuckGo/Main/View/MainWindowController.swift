@@ -104,7 +104,7 @@ final class MainWindowController: NSWindowController {
         mainViewController.tabBarViewController.fireButton.isEnabled = !prevented
         mainViewController.navigationBarViewController.controlsForUserPrevention.forEach { $0?.isEnabled = !prevented }
         
-        NSApplication.shared.mainMenuTyped.autoupdatingMenusToBeDisabledDuringUserPrevention.forEach { $0.autoenablesItems = !prevented }
+        NSApplication.shared.mainMenuTyped.autoupdatingMenusForUserPrevention.forEach { $0.autoenablesItems = !prevented }
         NSApplication.shared.mainMenuTyped.menuItemsForUserPrevention.forEach { $0.isEnabled = !prevented }
 
         if prevented {
@@ -240,7 +240,7 @@ fileprivate extension MainMenu {
         ]
     }
     
-    var autoupdatingMenusToBeDisabledDuringUserPrevention: [NSMenu] {
+    var autoupdatingMenusForUserPrevention: [NSMenu] {
         return [
             preferencesMenuItem.menu,
             manageBookmarksMenuItem.menu
