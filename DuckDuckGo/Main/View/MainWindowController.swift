@@ -165,21 +165,27 @@ extension MainWindowController: NSWindowDelegate {
     func windowDidBecomeKey(_ notification: Notification) {
         mainViewController.windowDidBecomeMain()
         mainViewController.navigationBarViewController.windowDidBecomeMain()
+
         if (notification.object as? NSWindow)?.isPopUpWindow == false {
             WindowControllersManager.shared.lastKeyMainWindowController = self
         }
         
-        #if DEBUG
-        if !AppDelegate.isRunningTests {            
-            if Waitlist.displayLockScreenIfNecessary(in: mainViewController) {
-                updateWindowForLockScreen(lockScreenVisible: true)
+        // Displaying a modal so soon after the window becoming key causes issues related to the window animation and
+        // state, such as a double animation happening as the window opens, and the address bar state being incorrect.
+        // Dispatching this change to the end of the main queue fixes it.
+        DispatchQueue.main.async {
+#if DEBUG
+            if !AppDelegate.isRunningTests {
+                if Waitlist.displayLockScreenIfNecessary(in: self.mainViewController) {
+                    self.updateWindowForLockScreen(lockScreenVisible: true)
+                }
             }
+#else
+            if Waitlist.displayLockScreenIfNecessary(in: self.mainViewController) {
+                self.updateWindowForLockScreen(lockScreenVisible: true)
+            }
+#endif
         }
-        #else
-        if Waitlist.displayLockScreenIfNecessary(in: mainViewController) {
-            updateWindowForLockScreen(lockScreenVisible: true)
-        }
-        #endif
     }
     
     private func updateWindowForLockScreen(lockScreenVisible: Bool) {
