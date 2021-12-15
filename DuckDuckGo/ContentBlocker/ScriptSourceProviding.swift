@@ -49,29 +49,34 @@ final class DefaultScriptSourceProvider: ScriptSourceProviding {
     let configStorage: ConfigurationStoring
     let privacyConfigurationManager: PrivacyConfigurationManager
     let contentBlockingManager: ContentBlockerRulesManager
+    let altContentBlockingManager: ContentBlockerRulesManager
 
     var contentBlockingRulesUpdatedCancellable: AnyCancellable!
+    var altContentBlockingUpdatedCancellable: AnyCancellable!
 
     private init(configStorage: ConfigurationStoring = DefaultConfigurationStorage.shared,
                  privacyConfigurationManager: PrivacyConfigurationManager = ContentBlocking.privacyConfigurationManager,
                  contentBlockingManager: ContentBlockerRulesManager = ContentBlocking.contentBlockingManager,
-                 contentBlockingUpdating: ContentBlockingUpdating = ContentBlocking.contentBlockingUpdating) {
+                 contentBlockingUpdating: ContentBlockingUpdating = ContentBlocking.contentBlockingUpdating,
+                 altContentBlockingManager: ContentBlockerRulesManager = ContentBlocking.altContentBlockingManager,
+                 altContentBlockingUpdating: ContentBlockingUpdating = ContentBlocking.altContentBlockingUpdating) {
         self.configStorage = configStorage
         self.privacyConfigurationManager = privacyConfigurationManager
         self.contentBlockingManager = contentBlockingManager
+        self.altContentBlockingManager = altContentBlockingManager
 
-        attachListeners(contentBlockingUpdating: contentBlockingUpdating)
+        contentBlockingRulesUpdatedCancellable = attachListeners(contentBlockingUpdating: contentBlockingUpdating)
+        altContentBlockingUpdatedCancellable = attachListeners(contentBlockingUpdating: altContentBlockingUpdating)
 
         reload(knownChanges: nil)
     }
 
-    private func attachListeners(contentBlockingUpdating: ContentBlockingUpdating) {
-        let cancellable = contentBlockingUpdating.contentBlockingRules.receive(on: RunLoop.main).sink(receiveValue: { [weak self] newRulesInfo in
+    private func attachListeners(contentBlockingUpdating: ContentBlockingUpdating) -> AnyCancellable? {
+        return contentBlockingUpdating.contentBlockingRules.receive(on: RunLoop.main).sink(receiveValue: { [weak self] newRulesInfo in
             guard let self = self, let newRulesInfo = newRulesInfo else { return }
 
             self.reload(knownChanges: newRulesInfo.changes)
         })
-        contentBlockingRulesUpdatedCancellable = cancellable
     }
 
     func reload(knownChanges: ContentBlockerRulesIdentifier.Difference?) {

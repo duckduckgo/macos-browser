@@ -68,7 +68,7 @@ final class AltContentBlockerRulesSource: ContentBlockerRulesSource {
     }
     
     var allowListEtag: String {
-        return privacyConfigManager.privacyConfig.identifier
+        return privacyConfigManager.privacyConfig.identifier + customEtag
     }
     
     var allowList: [TrackerException] {
