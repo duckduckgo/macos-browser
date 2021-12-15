@@ -41,7 +41,6 @@ struct RootView: View {
                 .frame(maxWidth: .infinity, maxHeight: .infinity)
 
         }
-        .background(Color("OnboardingBackgroundColor"))
         .frame(maxWidth: .infinity, maxHeight: .infinity)
         .onAppear {
             withAnimation {

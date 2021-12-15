@@ -36,10 +36,23 @@ protocol OnboardingDelegate: NSObjectProtocol {
 
 }
 
-final class OnboardingViewController: NSHostingController<Onboarding.RootView> {
+final class OnboardingViewController: NSViewController {
 
-    static func create(withDelegate delegate: OnboardingDelegate) -> OnboardingViewController {
-        return OnboardingViewController(rootView: Onboarding.RootView(delegate: delegate))
+    static func create(withDelegate delegate: OnboardingDelegate) -> Self {
+        let storyboard = NSStoryboard(name: "Onboarding", bundle: nil)
+        // swiftlint:disable force_cast
+        let controller = storyboard.instantiateController(withIdentifier: "Onboarding") as! Self
+        controller.delegate = delegate
+        // swiftlint:enable force_cast
+        return controller
+    }
+
+    weak var delegate: OnboardingDelegate?
+
+    override func viewDidLoad() {
+        super.viewDidLoad()
+        let host = NSHostingView(rootView: Onboarding.RootView(delegate: delegate))
+        view.addAndLayout(host)
     }
 
 }
