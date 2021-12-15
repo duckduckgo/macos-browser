@@ -168,6 +168,7 @@
 		4BA1A6E6258C270800F6F690 /* EncryptionKeyGeneratorTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4BA1A6E5258C270800F6F690 /* EncryptionKeyGeneratorTests.swift */; };
 		4BA1A6F6258C4F9600F6F690 /* EncryptionMocks.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4BA1A6F5258C4F9600F6F690 /* EncryptionMocks.swift */; };
 		4BA1A6FE258C5C1300F6F690 /* EncryptedValueTransformerTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4BA1A6FD258C5C1300F6F690 /* EncryptedValueTransformerTests.swift */; };
+		4BA7C91627695EA500FEBA8E /* MacWaitlistRequestTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4BA7C91527695EA500FEBA8E /* MacWaitlistRequestTests.swift */; };
 		4BB46EA226B8954500222970 /* logins-encrypted.json in Resources */ = {isa = PBXBuildFile; fileRef = 4BB46EA026B8954500222970 /* logins-encrypted.json */; };
 		4BB46EA326B8954500222970 /* key4-encrypted.db in Resources */ = {isa = PBXBuildFile; fileRef = 4BB46EA126B8954500222970 /* key4-encrypted.db */; };
 		4BB6CE5F26B77ED000EC5860 /* Cryptography.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4BB6CE5E26B77ED000EC5860 /* Cryptography.swift */; };
@@ -797,6 +798,7 @@
 		4BA1A6EA258C288C00F6F690 /* EncryptionKeyStoreTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EncryptionKeyStoreTests.swift; sourceTree = "<group>"; };
 		4BA1A6F5258C4F9600F6F690 /* EncryptionMocks.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EncryptionMocks.swift; sourceTree = "<group>"; };
 		4BA1A6FD258C5C1300F6F690 /* EncryptedValueTransformerTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EncryptedValueTransformerTests.swift; sourceTree = "<group>"; };
+		4BA7C91527695EA500FEBA8E /* MacWaitlistRequestTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MacWaitlistRequestTests.swift; sourceTree = "<group>"; };
 		4BB46EA026B8954500222970 /* logins-encrypted.json */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.json; path = "logins-encrypted.json"; sourceTree = "<group>"; };
 		4BB46EA126B8954500222970 /* key4-encrypted.db */ = {isa = PBXFileReference; lastKnownFileType = file; path = "key4-encrypted.db"; sourceTree = "<group>"; };
 		4BB6CE5E26B77ED000EC5860 /* Cryptography.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Cryptography.swift; sourceTree = "<group>"; };
@@ -1434,6 +1436,7 @@
 			isa = PBXGroup;
 			children = (
 				4B2CBF402767EEC1001DF04B /* MacWaitlistStoreTests.swift */,
+				4BA7C91527695EA500FEBA8E /* MacWaitlistRequestTests.swift */,
 			);
 			path = Waitlist;
 			sourceTree = "<group>";
@@ -4025,6 +4028,7 @@
 				AAC9C01E24CB6BEB00AD1325 /* TabCollectionViewModelTests.swift in Sources */,
 				B662D3DE275613BB0035D4D6 /* EncryptionKeyStoreMock.swift in Sources */,
 				AA0877BA26D5161D00B05660 /* WebKitVersionProviderTests.swift in Sources */,
+				4BA7C91627695EA500FEBA8E /* MacWaitlistRequestTests.swift in Sources */,
 				B69B50462726C5C200758A2B /* AtbAndVariantCleanupTests.swift in Sources */,
 				85E11C3725E7F1E100974CAF /* ExternalURLHandlerTests.swift in Sources */,
 				B6DA44282616CAE000DD1EC2 /* AppUsageActivityMonitorTests.swift in Sources */,

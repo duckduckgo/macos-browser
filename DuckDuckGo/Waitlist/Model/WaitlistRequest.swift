@@ -26,14 +26,8 @@ struct MacWaitlistRedeemSuccessResponse: Decodable {
     let status: String
 }
 
-struct MacWaitlistRedeemFailureResponse: Decodable {
-    let error: String
-}
-
 enum MacWaitlistRedeemError: Error {
-    case invalidInviteCode
-    case alreadyRedeemedInviteCode
-    case unknownError
+    case redemptionError
 }
 
 protocol MacWaitlistRequest {
@@ -44,21 +38,17 @@ protocol MacWaitlistRequest {
 }
 
 struct MacWaitlistAPIRequest: MacWaitlistRequest {
-    
-    static let developmentEndpoint = URL(string: "https://quackdev.duckduckgo.com/api/auth/invites/")!
-    static let productionEndpoint = URL(string: "https://quack.duckduckgo.com/api/auth/invites/")!
-    
+        
     private let endpoint: URL
     
     init(endpoint: URL? = nil) {
         if let endpoint = endpoint {
             self.endpoint = endpoint
         } else {
-            #if DEBUG
-            self.endpoint = Self.developmentEndpoint
+            #if DEBUG || REVIEW
+            self.endpoint = URL.redeemMacWaitlistInviteCode(endpoint: .developmentEndpoint)
             #else
-            #warning("Change this to production later")
-            self.endpoint = Self.developmentEndpoint
+            self.endpoint = URL.redeemMacWaitlistInviteCode(endpoint: .productionEndpoint)
             #endif
         }
     }
@@ -66,17 +56,16 @@ struct MacWaitlistAPIRequest: MacWaitlistRequest {
     func unlock(with inviteCode: String,
                 completion: @escaping (Result<MacWaitlistRedeemSuccessResponse, MacWaitlistRedeemError>) -> Void) {
         
-        let redeemURL = self.endpoint.appendingPathComponent("macosbrowser").appendingPathComponent("redeem")
         let parameters = [ "code": inviteCode ]
         
-        APIRequest.request(url: redeemURL, method: .post, parameters: parameters, callBackOnMainThread: true) { response, _ in
+        APIRequest.request(url: endpoint, method: .post, parameters: parameters, callBackOnMainThread: true) { response, _ in
             let decoder = JSONDecoder()
 
             if let responseData = response?.data,
                let decodedResponse = try? decoder.decode(MacWaitlistRedeemSuccessResponse.self, from: responseData) {
                 completion(.success(decodedResponse))
             } else {
-                completion(.failure(.unknownError))
+                completion(.failure(.redemptionError))
             }
         }
         
