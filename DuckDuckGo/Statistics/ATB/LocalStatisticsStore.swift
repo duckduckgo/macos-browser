@@ -55,6 +55,8 @@ final class LocalStatisticsStore: StatisticsStore {
         static let lastAppRetentionRequestDate = "stats.appretentionatb.last.request.key"
     }
 
+    // These are the original ATB keys that have been replaced in order to resolve retention data issues.
+    // These keys should be removed from the database in the future.
     private struct DeprecatedKeys {
         static let installDate = "statistics.installdate.key"
         static let atb = "statistics.atb.key"
