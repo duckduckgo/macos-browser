@@ -42,7 +42,7 @@ struct CallToAction: View {
                     onNext()
                 }
             }
-            .frame(width: 292)
+            .frame(width: speachWidth - 8)
             .buttonStyle(ActionButtonStyle())
             .visibility(typingFinished ? .visible : .gone)
         }

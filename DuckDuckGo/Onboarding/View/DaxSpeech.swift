@@ -40,21 +40,19 @@ struct DaxSpeech: View {
             Text(text)
                 .kerning(-0.23)
                 .frame(maxWidth: .infinity, alignment: .leading)
-                .padding(.horizontal, 20)
-                .padding(.vertical, 16)
                 .visibility(.invisible)
 
             Text(typedText)
                 .kerning(-0.23)
                 .frame(maxWidth: .infinity, alignment: .leading)
-                .padding(.horizontal, 20)
-                .padding(.vertical, 16)
         }
+        .padding(.horizontal, 18)
+        .padding(.vertical, 14)
         .lineLimit(nil)
         .multilineTextAlignment(.leading)
         .font(.system(size: 15))
         .lineSpacing(9)
-        .frame(width: 328)
+        .frame(width: speachWidth + 8)
         .background(SpeechBubble())
         .onReceive(timer, perform: { _ in
             if model.typingDisabled {

@@ -19,4 +19,8 @@
 import SwiftUI
 
 // Namespace definition for onboarding view structs
-struct Onboarding { }
+struct Onboarding {
+
+    static let speachWidth: CGFloat = 332
+
+}
