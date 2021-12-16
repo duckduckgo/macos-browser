@@ -54,7 +54,7 @@ struct DaxSpeech: View {
         }
         .lineLimit(nil)
         .multilineTextAlignment(.leading)
-        .font(.custom("SFProText-Regular", size: 15))
+        .font(.system(size: 15))
         .lineSpacing(9)
         .frame(width: 328)
         .background(SpeechBubble())
