@@ -30,6 +30,15 @@ final class OnboardingViewController: NSViewController {
         // swiftlint:enable force_cast
         return controller
     }
+    
+    @IBOutlet var backgroundImageView: NSImageView! {
+        didSet {
+            // NSImageView magic to improve image resizing performance.
+            backgroundImageView.layer = CALayer()
+            backgroundImageView.layer?.contentsGravity = .resizeAspectFill
+            backgroundImageView.layer?.contents = backgroundImageView.image
+        }
+    }
 
     weak var delegate: OnboardingDelegate?
 
