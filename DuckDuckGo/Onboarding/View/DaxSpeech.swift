@@ -59,6 +59,9 @@ struct DaxSpeech: View {
         .onReceive(timer, perform: { _ in
             if model.typingDisabled {
                 typedText = text
+                Timer.scheduledTimer(withTimeInterval: 0.5, repeats: false, block: { _ in onTypingFinished?() })
+                self.timer.upstream.connect().cancel()
+                return
             } else if model.skipTypingRequested {
                 typedText = text
                 model.typingSkipped()
