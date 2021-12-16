@@ -36,7 +36,6 @@ final class MacWaitlistLockScreenViewController: NSViewController {
             logoImageView.layer?.shadowRadius = 2
             logoImageView.layer?.shadowOffset = CGSize(width: 0, height: -2)
             logoImageView.layer?.shadowOpacity = 0.3
-            logoImageView.layer?.contentsScale = NSScreen.main!.backingScaleFactor
         }
     }
     

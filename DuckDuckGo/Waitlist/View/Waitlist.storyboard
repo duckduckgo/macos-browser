@@ -27,15 +27,15 @@
                                 <rect key="frame" x="0.0" y="73" width="352" height="209"/>
                                 <subviews>
                                     <imageView horizontalHuggingPriority="251" verticalHuggingPriority="251" translatesAutoresizingMaskIntoConstraints="NO" id="geE-7q-xYb" userLabel="Dax Logo">
-                                        <rect key="frame" x="149" y="155" width="55" height="54"/>
+                                        <rect key="frame" x="148" y="153" width="56" height="56"/>
                                         <constraints>
-                                            <constraint firstAttribute="width" constant="55" id="fX6-VY-K07"/>
-                                            <constraint firstAttribute="height" constant="54" id="m5s-eQ-VIx"/>
+                                            <constraint firstAttribute="width" constant="56" id="fX6-VY-K07"/>
+                                            <constraint firstAttribute="height" constant="56" id="m5s-eQ-VIx"/>
                                         </constraints>
-                                        <imageCell key="cell" refusesFirstResponder="YES" alignment="left" imageScaling="proportionallyDown" image="HomepageLogo" id="i4p-iE-ZkA"/>
+                                        <imageCell key="cell" refusesFirstResponder="YES" alignment="left" imageScaling="proportionallyDown" image="DaxLockScreenLogo" id="i4p-iE-ZkA"/>
                                     </imageView>
                                     <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="OtQ-lg-ny6">
-                                        <rect key="frame" x="50" y="115" width="252" height="26"/>
+                                        <rect key="frame" x="50" y="113" width="252" height="26"/>
                                         <textFieldCell key="cell" lineBreakMode="clipping" title="Welcome to DuckDuckGo" id="ecb-cd-Gzd">
                                             <font key="font" size="22" name="SFProDisplay-Semibold"/>
                                             <color key="textColor" red="0.20000000000000001" green="0.20000000000000001" blue="0.20000000000000001" alpha="1" colorSpace="calibratedRGB"/>
@@ -43,7 +43,7 @@
                                         </textFieldCell>
                                     </textField>
                                     <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="Qkr-p5-9Ks">
-                                        <rect key="frame" x="107" y="68" width="139" height="28"/>
+                                        <rect key="frame" x="107" y="66" width="139" height="28"/>
                                         <textFieldCell key="cell" lineBreakMode="clipping" alignment="center" title="Enter your Invite Code to get started" id="6Sz-9i-tb7">
                                             <font key="font" size="12" name="SFProText-Semibold"/>
                                             <color key="textColor" red="0.20000000000000001" green="0.20000000000000001" blue="0.20000000000000001" alpha="1" colorSpace="calibratedRGB"/>
@@ -51,7 +51,7 @@
                                         </textFieldCell>
                                     </textField>
                                     <textField verticalHuggingPriority="750" horizontalCompressionResistancePriority="1000" translatesAutoresizingMaskIntoConstraints="NO" id="QkQ-Su-Se9">
-                                        <rect key="frame" x="121" y="31" width="110" height="22"/>
+                                        <rect key="frame" x="121" y="29" width="110" height="22"/>
                                         <constraints>
                                             <constraint firstAttribute="height" constant="22" id="RQe-1b-cQk"/>
                                             <constraint firstAttribute="width" constant="110" id="hz1-Xq-OHn"/>
@@ -90,7 +90,7 @@
                                     <constraint firstAttribute="trailing" secondItem="qPO-fW-OlL" secondAttribute="trailing" constant="15" id="qUV-Z4-ybc"/>
                                     <constraint firstItem="EDs-WA-Nxu" firstAttribute="centerY" secondItem="qPO-fW-OlL" secondAttribute="centerY" id="sBE-3y-jfC"/>
                                     <constraint firstItem="Qkr-p5-9Ks" firstAttribute="top" secondItem="OtQ-lg-ny6" secondAttribute="bottom" constant="19" id="ub4-7U-qmf"/>
-                                    <constraint firstItem="qPO-fW-OlL" firstAttribute="top" secondItem="QkQ-Su-Se9" secondAttribute="bottom" constant="15" id="wxH-iZ-IIK"/>
+                                    <constraint firstItem="qPO-fW-OlL" firstAttribute="top" secondItem="QkQ-Su-Se9" secondAttribute="bottom" constant="13" id="wxH-iZ-IIK"/>
                                     <constraint firstItem="QkQ-Su-Se9" firstAttribute="centerX" secondItem="kDa-kp-O7E" secondAttribute="centerX" id="ypO-nl-4rA"/>
                                 </constraints>
                             </customView>
@@ -244,7 +244,7 @@ DQ
         </scene>
     </scenes>
     <resources>
-        <image name="HomepageLogo" width="192" height="192"/>
+        <image name="DaxLockScreenLogo" width="56" height="56"/>
         <image name="WaitlistLockScreenBackground" width="360" height="260"/>
         <image name="WaitlistOptionsMenuExample" width="300" height="93"/>
         <namedColor name="BrowserTabBackgroundColor">
