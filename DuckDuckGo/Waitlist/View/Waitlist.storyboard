@@ -97,7 +97,7 @@
                             <customView hidden="YES" translatesAutoresizingMaskIntoConstraints="NO" id="lcR-8N-GXM" userLabel="Success State Group">
                                 <rect key="frame" x="0.0" y="59" width="352" height="223"/>
                                 <subviews>
-                                    <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="lhW-Ve-a0B">
+                                    <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" verticalCompressionResistancePriority="1000" translatesAutoresizingMaskIntoConstraints="NO" id="lhW-Ve-a0B">
                                         <rect key="frame" x="-2" y="190" width="356" height="33"/>
                                         <textFieldCell key="cell" lineBreakMode="clipping" alignment="center" title="You’re In!" id="TLE-jd-xCR">
                                             <font key="font" size="22" name="SFProDisplay-Semibold"/>
@@ -105,26 +105,26 @@
                                             <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
                                         </textFieldCell>
                                     </textField>
-                                    <textField horizontalHuggingPriority="251" verticalHuggingPriority="1000" translatesAutoresizingMaskIntoConstraints="NO" id="y9u-MK-68b">
-                                        <rect key="frame" x="48" y="98" width="256" height="80"/>
+                                    <textField horizontalHuggingPriority="251" verticalHuggingPriority="1000" verticalCompressionResistancePriority="1000" translatesAutoresizingMaskIntoConstraints="NO" id="y9u-MK-68b">
+                                        <rect key="frame" x="43" y="98" width="266" height="80"/>
                                         <textFieldCell key="cell" alignment="center" id="csS-uu-V2s">
                                             <font key="font" metaFont="system"/>
                                             <string key="title">Thank you for trying our beta.
 
-We ❤️ your feedback. Click the ••• menu then "Send Feedback" to share your thoughts and help us improve.</string>
+We ❤️ your feedback. When you have thoughts to share, click the ••• menu then “Send Feedback” to help us improve.</string>
                                             <color key="textColor" red="0.11770976330000001" green="0.1136905476" blue="0.1372279525" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                                             <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
                                         </textFieldCell>
                                     </textField>
-                                    <imageView horizontalHuggingPriority="1000" verticalHuggingPriority="1000" translatesAutoresizingMaskIntoConstraints="NO" id="SdB-Pv-VOD">
+                                    <imageView horizontalHuggingPriority="1000" verticalHuggingPriority="1000" verticalCompressionResistancePriority="751" translatesAutoresizingMaskIntoConstraints="NO" id="SdB-Pv-VOD">
                                         <rect key="frame" x="26" y="0.0" width="300" height="93"/>
                                         <imageCell key="cell" refusesFirstResponder="YES" alignment="left" imageScaling="proportionallyDown" image="WaitlistOptionsMenuExample" id="6Bg-Tq-Laq"/>
                                     </imageView>
                                 </subviews>
                                 <constraints>
                                     <constraint firstAttribute="bottom" secondItem="SdB-Pv-VOD" secondAttribute="bottom" id="9a7-CX-OC7"/>
-                                    <constraint firstItem="y9u-MK-68b" firstAttribute="leading" secondItem="lcR-8N-GXM" secondAttribute="leading" constant="50" id="Hk8-X8-SUu"/>
-                                    <constraint firstAttribute="trailing" secondItem="y9u-MK-68b" secondAttribute="trailing" constant="50" id="Mju-yH-cFw"/>
+                                    <constraint firstItem="y9u-MK-68b" firstAttribute="leading" secondItem="lcR-8N-GXM" secondAttribute="leading" constant="45" id="Hk8-X8-SUu"/>
+                                    <constraint firstAttribute="trailing" secondItem="y9u-MK-68b" secondAttribute="trailing" constant="45" id="Mju-yH-cFw"/>
                                     <constraint firstItem="lhW-Ve-a0B" firstAttribute="top" secondItem="lcR-8N-GXM" secondAttribute="top" id="SxN-bg-VHx"/>
                                     <constraint firstAttribute="trailing" secondItem="lhW-Ve-a0B" secondAttribute="trailing" id="Xp4-GY-QKy"/>
                                     <constraint firstItem="lhW-Ve-a0B" firstAttribute="leading" secondItem="lcR-8N-GXM" secondAttribute="leading" id="Z1T-9f-NkF"/>
