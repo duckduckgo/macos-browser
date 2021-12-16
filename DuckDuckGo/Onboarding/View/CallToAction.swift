@@ -36,9 +36,8 @@ struct CallToAction: View {
                     onNext()
                 }
             }
-            .frame(width: 296)
+            .frame(width: 292)
             .buttonStyle(ActionButtonStyle())
-
         }
     }
 

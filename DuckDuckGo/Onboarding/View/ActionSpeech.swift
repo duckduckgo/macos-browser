@@ -30,7 +30,7 @@ struct ActionSpeech: View {
     var body: some View {
         VStack {
             DaxSpeech(text: text)
-
+            
             HStack(spacing: 12) {
 
                 Button(UserText.onboardingNotNowButton) {

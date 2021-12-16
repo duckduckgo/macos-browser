@@ -17,6 +17,7 @@
 //
 
 import SwiftUI
+import Combine
 
 extension Onboarding {
 
@@ -24,17 +25,42 @@ struct DaxSpeech: View {
 
     let text: String
 
+    @State var typingIndex = 0
+    @State var typedText = ""
+    @State var timer = Timer.publish(every: 0.03, tolerance: 0, on: .main, in: .default, options: nil).autoconnect()
+
     var body: some View {
         ZStack(alignment: .topLeading) {
+
+            // This text view sets the proper height for the speech bubble.
             Text(text)
                 .kerning(-0.23)
-                .font(.system(size: 15, weight: .light))
-                .lineSpacing(5)
+                .frame(maxWidth: .infinity, alignment: .leading)
+                .padding(.horizontal, 20)
+                .padding(.vertical, 16)
+                .foregroundColor(Color.blue)
+                .visibility(.invisible)
+
+            Text(typedText)
+                .kerning(-0.23)
+                .frame(maxWidth: .infinity, alignment: .leading)
                 .padding(.horizontal, 20)
                 .padding(.vertical, 16)
         }
+        .lineLimit(nil)
+        .multilineTextAlignment(.leading)
+        .font(.system(size: 15, weight: .light))
+        .lineSpacing(5)
         .frame(width: 328)
         .background(SpeechBubble())
+        .onReceive(timer, perform: { _ in
+            typingIndex = min(typingIndex + 1, text.utf16.count)
+            typedText = String(text.utf16[text.utf16.startIndex ..< text.utf16.index(text.utf16.startIndex, offsetBy: typingIndex)]) ?? ""
+
+            if typedText == text {
+                self.timer.upstream.connect().cancel()
+            }
+        })
     }
 
 }
@@ -42,18 +68,13 @@ struct DaxSpeech: View {
 fileprivate struct SpeechBubble: View {
 
     let radius: CGFloat = 8
-    let speechOffset: CGFloat = 40
     let tailSize: CGFloat = 8
     let tailPosition: CGFloat = 32
 
     var body: some View {
         ZStack {
             GeometryReader { g in
-
-                let width = g.size.width
-                let height = g.size.height
-
-                let rect = CGRect(x: 0, y: 0, width: width, height: height)
+                let rect = CGRect(x: 0, y: 0, width: g.size.width, height: g.size.height)
 
                 Path { path in
 

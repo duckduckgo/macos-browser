@@ -72,7 +72,7 @@ struct OnboardingFlow: View {
 
                 DaxSpeech(text: UserText.onboardingStartBrowsingText)
                     .visibility(model.state == .startBrowsing ? .visible : .gone)
-
+                
                 Spacer()
                     .visibility(showSpeech ? .visible : .gone)
 
