@@ -53,6 +53,8 @@ final class LocalStatisticsStore: StatisticsStore {
         static let appRetentionAtb = "stats.appretentionatb.key"
         static let variant = "stats.variant.key"
         static let lastAppRetentionRequestDate = "stats.appretentionatb.last.request.key"
+        static let waitlistUpgradeCheckComplete = "waitlist.upgradecomplete"
+        static let waitlistUnlocked = "waitlist.unlocked"
     }
 
     // These are the original ATB keys that have been replaced in order to resolve retention data issues.
@@ -64,8 +66,6 @@ final class LocalStatisticsStore: StatisticsStore {
         static let appRetentionAtb = "statistics.appretentionatb.key"
         static let variant = "statistics.variant.key"
         static let lastAppRetentionRequestDate = "statistics.appretentionatb.last.request.key"
-        static let waitlistUpgradeCheckComplete = "waitlist.upgradecomplete"
-        static let waitlistUnlocked = "waitlist.unlocked"
     }
 
     private let pixelDataStore: PixelDataStore
