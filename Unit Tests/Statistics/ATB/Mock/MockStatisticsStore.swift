@@ -22,6 +22,7 @@ import Foundation
 
 final class MockStatisticsStore: StatisticsStore {
 
+    var hasCurrentOrDeprecatedInstallStatistics: Bool = false
     var installDate: Date?
     var atb: String?
     var searchRetentionAtb: String?

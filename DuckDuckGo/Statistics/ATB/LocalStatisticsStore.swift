@@ -36,8 +36,15 @@ final class LocalStatisticsStore: StatisticsStore {
 
         @UserDefaultsWrapper(key: .lastAppRetentionRequestDate, defaultValue: nil)
         var lastAppRetentionRequestDate: Date?
+        
+        @UserDefaultsWrapper(key: .legacyStatisticsStoreDataCleared, defaultValue: false)
+        var legacyStatisticsStoreDataCleared: Bool
 
         mutating func clear() {
+            if atb != nil || installDate != nil {
+                legacyStatisticsStoreDataCleared = true
+            }
+
             atb = nil
             installDate = nil
             searchRetentionAtb = nil

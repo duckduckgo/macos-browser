@@ -55,6 +55,9 @@ final class MacWaitlistEncryptedFileStorage: MacWaitlistStore {
     /// 2. **The install date is not present**: In this case, the browser saves metadata indicating that this check has been already performed, thus future checks
     ///   of the ATB value will be ignored even if it is present.
     func unlockExistingInstallIfNecessary() {
+        // If the user has previously ran the upgrade check, then we can't check that they're an existing install. At
+        // that point they may have ATB data and masquerade as an existing user, so the browser needs to remember that
+        // they've tried to upgrade and failed, and now only an invite code can unlock them.
         guard !statisticsStore.waitlistUpgradeCheckComplete else {
             return
         }
