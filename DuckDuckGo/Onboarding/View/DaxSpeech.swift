@@ -61,6 +61,7 @@ struct DaxSpeech: View {
         .onReceive(timer, perform: { _ in
             if model.skipTypingRequested {
                 typedText = text
+                model.typingSkipped()
             }
 
             if typedText == text {
@@ -68,6 +69,7 @@ struct DaxSpeech: View {
                 self.timer.upstream.connect().cancel()
                 return
             }
+            
             typingIndex = min(typingIndex + 1, text.utf16.count)
             typedText = String(text.utf16[text.utf16.startIndex ..< text.utf16.index(text.utf16.startIndex, offsetBy: typingIndex)]) ?? ""
         })

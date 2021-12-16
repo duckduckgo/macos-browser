@@ -85,6 +85,7 @@ extension Pixel {
         case onboardingImportSkipped
         case onboardingSetDefaultPressed
         case onboardingSetDefaultSkipped
+        case onboardingTypingSkipped
 
         case debug(event: Debug, error: Error? = nil)
 
@@ -224,6 +225,9 @@ extension Pixel.Event {
             return "m_mac_onboarding_setdefault_pressed"
 
         case .onboardingSetDefaultSkipped:
+            return "m_mac_onboarding_setdefault_skipped"
+
+        case .onboardingTypingSkipped:
             return "m_mac_onboarding_setdefault_skipped"
 
         }

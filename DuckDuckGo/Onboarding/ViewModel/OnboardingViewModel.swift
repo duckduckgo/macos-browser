@@ -95,4 +95,8 @@ final class OnboardingViewModel: ObservableObject {
         skipTypingRequested = true
     }
 
+    func typingSkipped() {
+        Pixel.fire(.onboardingTypingSkipped)
+    }
+
 }

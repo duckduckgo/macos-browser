@@ -97,7 +97,8 @@ extension Pixel.Event {
              .onboardingImportPressed,
              .onboardingImportSkipped,
              .onboardingSetDefaultPressed,
-             .onboardingSetDefaultSkipped:
+             .onboardingSetDefaultSkipped,
+             .onboardingTypingSkipped:
 
             return nil
         }
