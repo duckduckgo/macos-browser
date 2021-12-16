@@ -72,15 +72,7 @@ final class LocalStatisticsStore: StatisticsStore {
         self.pixelDataStore = pixelDataStore
 
         var legacyStatisticsStore = LegacyStatisticsStore()
-        if let atb = legacyStatisticsStore.atb {
-            self.atb = atb
-            self.installDate = legacyStatisticsStore.installDate
-            self.searchRetentionAtb = legacyStatisticsStore.searchRetentionAtb
-            self.appRetentionAtb = legacyStatisticsStore.appRetentionAtb
-            self.lastAppRetentionRequestDate = legacyStatisticsStore.lastAppRetentionRequestDate
-
-            legacyStatisticsStore.clear()
-        }
+        legacyStatisticsStore.clear()
     }
 
     var hasInstallStatistics: Bool {
