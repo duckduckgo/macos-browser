@@ -117,7 +117,11 @@ extension Optional where Wrapped == PermissionState {
     }
 
     mutating func popupOpened(nextQuery: PermissionAuthorizationQuery?) {
-        self = nextQuery != nil ? .requested(nextQuery!) : .inactive
+        if let nextQuery = nextQuery {
+            self = .requested(nextQuery)
+        } else if case .requested = self {
+            self = .inactive
+        }
     }
 
     mutating func update(with captureState: WKWebView.CaptureState) {

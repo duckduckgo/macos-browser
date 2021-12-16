@@ -538,7 +538,9 @@ final class AddressBarButtonsViewController: NSViewController {
         microphoneButton.buttonState = selectedTabViewModel.usedPermissions.camera == nil
             ? selectedTabViewModel.usedPermissions.microphone
             : nil
-        popupsButton.buttonState = selectedTabViewModel.usedPermissions.popups
+        popupsButton.buttonState = selectedTabViewModel.usedPermissions.popups?.isRequested == true // show only when there're popups blocked
+            ? selectedTabViewModel.usedPermissions.popups
+            : nil
 
         showOrHidePermissionPopoverIfNeeded()
     }
