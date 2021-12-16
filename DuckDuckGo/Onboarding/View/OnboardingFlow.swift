@@ -27,11 +27,12 @@ struct OnboardingFlow: View {
     @State var makeSpace = false
     @State var showLogo = false
     @State var showTitle = true
-    @State var showSpeech = false
+    @State var daxInSpeechPosition = false
+    @State var showDialogs = false
 
     var body: some View {
 
-        VStack(alignment: showSpeech ? .leading : .center) {
+        VStack(alignment: daxInSpeechPosition ? .leading : .center) {
 
             Text(UserText.onboardingWelcomeTitle)
                 .kerning(-1.26)
@@ -49,36 +50,40 @@ struct OnboardingFlow: View {
                     .frame(width: 64, height: 64)
                     .shadow(color: .black.opacity(0.16), radius: 6, x: 0, y: 3)
                     .transition(.move(edge: .bottom).combined(with: .opacity))
-                    .padding(.init(top: 0, leading: 0, bottom: 0, trailing: showSpeech ? 10 : 0))
+                    .padding(.init(top: 0, leading: 0, bottom: 0, trailing: daxInSpeechPosition ? 10 : 0))
 
-                CallToAction(text: UserText.onboardingWelcomeText,
-                             cta: UserText.onboardingStartButton) {
-                    model.onStartPressed()
-                }.visibility(model.state == .welcome ? .visible : .gone)
+                ZStack {
 
-                ActionSpeech(text: UserText.onboardingImportDataText,
-                             actionName: UserText.onboardingImportDataButton) {
-                    model.onImportPressed()
-                } skip: {
-                    model.onImportSkipped()
-                }.visibility(model.state == .importData ? .visible : .gone)
+                    CallToAction(text: UserText.onboardingWelcomeText,
+                                 cta: UserText.onboardingStartButton) {
+                        model.onStartPressed()
+                    }.visibility(model.state == .welcome ? .visible : .gone)
 
-                ActionSpeech(text: UserText.onboardingSetDefaultText,
-                             actionName: UserText.onboardingSetDefaultButton) {
-                    model.onSetDefaultPressed()
-                } skip: {
-                    model.onSetDefaultSkipped()
-                }.visibility(model.state == .setDefault ? .visible : .gone)
+                    ActionSpeech(text: UserText.onboardingImportDataText,
+                                 actionName: UserText.onboardingImportDataButton) {
+                        model.onImportPressed()
+                    } skip: {
+                        model.onImportSkipped()
+                    }.visibility(model.state == .importData ? .visible : .gone)
 
-                DaxSpeech(text: UserText.onboardingStartBrowsingText)
-                    .visibility(model.state == .startBrowsing ? .visible : .gone)
-                
+                    ActionSpeech(text: UserText.onboardingSetDefaultText,
+                                 actionName: UserText.onboardingSetDefaultButton) {
+                        model.onSetDefaultPressed()
+                    } skip: {
+                        model.onSetDefaultSkipped()
+                    }.visibility(model.state == .setDefault ? .visible : .gone)
+
+                    DaxSpeech(text: UserText.onboardingStartBrowsingText)
+                        .visibility(model.state == .startBrowsing ? .visible : .gone)
+
+                }.visibility(showDialogs ? .visible : .gone)
+
                 Spacer()
-                    .visibility(showSpeech ? .visible : .gone)
+                    .visibility(daxInSpeechPosition ? .visible : .gone)
 
             }.visibility(showLogo ? .visible : .gone)
 
-            Spacer().visibility(showSpeech ? .visible : .gone)
+            Spacer().visibility(daxInSpeechPosition ? .visible : .gone)
 
         }
         .padding(30)
@@ -95,11 +100,14 @@ struct OnboardingFlow: View {
 
             withAnimation(.easeIn.delay(3.0)) {
                 showTitle = false
-                showSpeech = true
+                daxInSpeechPosition = true
             }
 
-            withAnimation(.easeIn.delay(3.5)) {
-                model.onSplashFinished()
+            Timer.scheduledTimer(withTimeInterval: 3.5, repeats: false) { _ in
+                withAnimation {
+                    model.onSplashFinished()
+                    showDialogs = true
+                }
             }
 
         }
