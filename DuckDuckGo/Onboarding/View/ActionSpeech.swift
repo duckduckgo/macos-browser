@@ -27,9 +27,15 @@ struct ActionSpeech: View {
     let action: () -> Void
     let skip: () -> Void
 
+    @State var typingFinished = false
+
     var body: some View {
         VStack {
-            DaxSpeech(text: text)
+            DaxSpeech(text: text) {
+                withAnimation {
+                    typingFinished = true
+                }
+            }
             
             HStack(spacing: 12) {
 
@@ -48,6 +54,7 @@ struct ActionSpeech: View {
                 .buttonStyle(ActionButtonStyle())
 
             }
+            .visibility(typingFinished ? .visible : .gone)
             .frame(width: 292)
 
         }

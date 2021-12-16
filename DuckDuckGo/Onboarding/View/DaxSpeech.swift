@@ -23,11 +23,17 @@ extension Onboarding {
 
 struct DaxSpeech: View {
 
+    @EnvironmentObject var model: OnboardingViewModel
+
+    // @Binding var typingFinished: Bool
+
     let text: String
 
-    @State var typingIndex = 0
-    @State var typedText = ""
-    @State var timer = Timer.publish(every: 0.03, tolerance: 0, on: .main, in: .default, options: nil).autoconnect()
+    let onTypingFinished: (() -> Void)?
+
+    @State private var typingIndex = 0
+    @State private var typedText = ""
+    @State private var timer = Timer.publish(every: 0.03, tolerance: 0, on: .main, in: .default, options: nil).autoconnect()
 
     var body: some View {
         ZStack(alignment: .topLeading) {
@@ -38,7 +44,6 @@ struct DaxSpeech: View {
                 .frame(maxWidth: .infinity, alignment: .leading)
                 .padding(.horizontal, 20)
                 .padding(.vertical, 16)
-                .foregroundColor(Color.blue)
                 .visibility(.invisible)
 
             Text(typedText)
@@ -49,17 +54,22 @@ struct DaxSpeech: View {
         }
         .lineLimit(nil)
         .multilineTextAlignment(.leading)
-        .font(.system(size: 15, weight: .light))
-        .lineSpacing(5)
+        .font(.custom("SFProText-Regular", size: 15))
+        .lineSpacing(9)
         .frame(width: 328)
         .background(SpeechBubble())
         .onReceive(timer, perform: { _ in
-            typingIndex = min(typingIndex + 1, text.utf16.count)
-            typedText = String(text.utf16[text.utf16.startIndex ..< text.utf16.index(text.utf16.startIndex, offsetBy: typingIndex)]) ?? ""
+            if model.skipTypingRequested {
+                typedText = text
+            }
 
             if typedText == text {
+                onTypingFinished?()
                 self.timer.upstream.connect().cancel()
+                return
             }
+            typingIndex = min(typingIndex + 1, text.utf16.count)
+            typedText = String(text.utf16[text.utf16.startIndex ..< text.utf16.index(text.utf16.startIndex, offsetBy: typingIndex)]) ?? ""
         })
     }
 

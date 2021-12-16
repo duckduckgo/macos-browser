@@ -874,8 +874,6 @@ private extension WKWebView {
 extension BrowserTabViewController: OnboardingDelegate {
 
     func onboardingDidRequestImportData(completion: @escaping () -> Void) {
-        print(#function)
-
         let viewController = DataImportViewController.create()
         beginSheet(viewController) { _ in
             completion()
@@ -883,7 +881,6 @@ extension BrowserTabViewController: OnboardingDelegate {
     }
 
     func onboardingDidRequestSetDefault(completion: @escaping () -> Void) {
-        print(#function)
         DefaultBrowserPreferences.becomeDefault()
 
         var observer: Any?
@@ -894,7 +891,6 @@ extension BrowserTabViewController: OnboardingDelegate {
     }
 
     func onboardingHasFinished() {
-        print(#function)
         (view.window?.windowController as? MainWindowController)?.userInteraction(prevented: false)
     }
 

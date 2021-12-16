@@ -43,7 +43,12 @@ final class OnboardingViewModel: ObservableObject {
 
     }
 
-    @Published var state = OnboardingPhase.start
+    @Published var skipTypingRequested = false
+    @Published var state = OnboardingPhase.start {
+        didSet {
+            skipTypingRequested = false
+        }
+    }
 
     weak var delegate: OnboardingDelegate?
 
@@ -84,6 +89,10 @@ final class OnboardingViewModel: ObservableObject {
         Pixel.fire(.onboardingSetDefaultSkipped)
         state = .startBrowsing
         delegate?.onboardingHasFinished()
+    }
+
+    func skipTyping() {
+        skipTypingRequested = true
     }
 
 }

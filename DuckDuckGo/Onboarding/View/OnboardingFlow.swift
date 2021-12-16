@@ -30,6 +30,9 @@ struct OnboardingFlow: View {
     @State var daxInSpeechPosition = false
     @State var showDialogs = false
 
+    // Not used for display, just needs to be passed to DaxSpeech. Might be a better way to do this.
+    @State var typingFinished = false
+
     var body: some View {
 
         VStack(alignment: daxInSpeechPosition ? .leading : .center) {
@@ -73,7 +76,7 @@ struct OnboardingFlow: View {
                         model.onSetDefaultSkipped()
                     }.visibility(model.state == .setDefault ? .visible : .gone)
 
-                    DaxSpeech(text: UserText.onboardingStartBrowsingText)
+                    DaxSpeech(text: UserText.onboardingStartBrowsingText, onTypingFinished: nil)
                         .visibility(model.state == .startBrowsing ? .visible : .gone)
 
                 }.visibility(showDialogs ? .visible : .gone)

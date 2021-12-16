@@ -16,6 +16,7 @@
 //  limitations under the License.
 //
 
+import Carbon.HIToolbox
 import AppKit
 import SwiftUI
 
@@ -32,10 +33,28 @@ final class OnboardingViewController: NSViewController {
 
     weak var delegate: OnboardingDelegate?
 
+    let model = OnboardingViewModel(delegate: nil)
+
+    var mouseDownMonitor: Any?
+
     override func viewDidLoad() {
         super.viewDidLoad()
-        let host = NSHostingView(rootView: Onboarding.RootView().environmentObject(OnboardingViewModel(delegate: delegate)))
+        model.delegate = delegate
+        let host = NSHostingView(rootView: Onboarding.RootView().environmentObject(model))
         view.addAndLayout(host)
+
+        mouseDownMonitor = NSEvent.addLocalMonitorForEvents(matching: [.leftMouseDown, .otherMouseDown, .keyDown]) { [weak self] event in
+            dispatchPrecondition(condition: .onQueue(.main))
+            if event.type == .keyDown && event.keyCode != kVK_Escape {
+                return event
+            }
+            self?.model.skipTyping()
+            return event
+        }
+    }
+
+    deinit {
+        NSEvent.removeMonitor(mouseDownMonitor as Any)
     }
 
 }
