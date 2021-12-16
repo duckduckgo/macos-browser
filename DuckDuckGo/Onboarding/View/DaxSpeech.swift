@@ -25,8 +25,6 @@ struct DaxSpeech: View {
 
     @EnvironmentObject var model: OnboardingViewModel
 
-    // @Binding var typingFinished: Bool
-
     let text: String
 
     let onTypingFinished: (() -> Void)?
@@ -59,7 +57,9 @@ struct DaxSpeech: View {
         .frame(width: 328)
         .background(SpeechBubble())
         .onReceive(timer, perform: { _ in
-            if model.skipTypingRequested {
+            if model.typingDisabled {
+                typedText = text
+            } else if model.skipTypingRequested {
                 typedText = text
                 model.typingSkipped()
             }
@@ -69,7 +69,7 @@ struct DaxSpeech: View {
                 self.timer.upstream.connect().cancel()
                 return
             }
-            
+
             typingIndex = min(typingIndex + 1, text.utf16.count)
             typedText = String(text.utf16[text.utf16.startIndex ..< text.utf16.index(text.utf16.startIndex, offsetBy: typingIndex)]) ?? ""
         })

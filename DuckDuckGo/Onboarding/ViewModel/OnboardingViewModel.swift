@@ -43,6 +43,9 @@ final class OnboardingViewModel: ObservableObject {
 
     }
 
+    // We can remove this later, once typing animation issues are resolved.
+    let typingDisabled = true
+
     @Published var skipTypingRequested = false
     @Published var state = OnboardingPhase.start {
         didSet {
