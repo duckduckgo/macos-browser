@@ -234,8 +234,11 @@ class PixelArgumentsTests: XCTestCase {
         let afterTomorrow = tomorrow.addingTimeInterval(3600 * 24)
 
         _=Pixel.Event.AppLaunch.autoInitialOrRegular(store: pixelDataStore, now: now)
+        Pixel.Event.AppLaunch.repetition(store: pixelDataStore, now: now).update()
         let rep1 = Pixel.Event.AppLaunch.autoInitialOrRegular(store: pixelDataStore, now: tomorrow)
+        Pixel.Event.AppLaunch.repetition(store: pixelDataStore, now: tomorrow).update()
         let rep2 = Pixel.Event.AppLaunch.autoInitialOrRegular(store: pixelDataStore, now: tomorrow2)
+        Pixel.Event.AppLaunch.repetition(store: pixelDataStore, now: tomorrow2).update()
         let rep3 = Pixel.Event.AppLaunch.autoInitialOrRegular(store: pixelDataStore, now: afterTomorrow)
 
         XCTAssertEqual(rep1, .dailyFirst)

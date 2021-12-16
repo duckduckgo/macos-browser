@@ -36,6 +36,7 @@
                                     <constraint firstAttribute="width" constant="16" id="WqZ-bO-1EK"/>
                                 </constraints>
                                 <imageCell key="cell" refusesFirstResponder="YES" alignment="left" imageScaling="proportionallyDown" image="Web" id="Joa-RU-nuz"/>
+                                <color key="contentTintColor" name="SuggestionIconColor"/>
                             </imageView>
                             <textField focusRingType="none" horizontalHuggingPriority="251" verticalHuggingPriority="750" horizontalCompressionResistancePriority="250" translatesAutoresizingMaskIntoConstraints="NO" id="uOv-ms-Lo9">
                                 <rect key="frame" x="30" y="58" width="390" height="15"/>
@@ -151,6 +152,9 @@
         </namedColor>
         <namedColor name="ClearColor">
             <color red="1" green="1" blue="1" alpha="0.0" colorSpace="custom" customColorSpace="sRGB"/>
+        </namedColor>
+        <namedColor name="SuggestionIconColor">
+            <color red="0.20000000000000001" green="0.20000000000000001" blue="0.20000000000000001" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
         </namedColor>
         <namedColor name="TableCellEditingColor">
             <color red="1" green="1" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>

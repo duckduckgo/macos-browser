@@ -158,7 +158,9 @@ final class FaviconReferenceCache {
             case .small: return urlCacheEntry.smallFaviconUrl ?? urlCacheEntry.mediumFaviconUrl
             default: return urlCacheEntry.mediumFaviconUrl
             }
-        } else if let host = documentURL.host, let hostCacheEntry = hostReferences[host] {
+        } else if let host = documentURL.host,
+                    let hostCacheEntry = hostReferences[host] ?? (host.hasPrefix("www") ?
+                                                                  hostReferences[host.dropWWW()] : hostReferences["www.\(host)"]) {
             switch sizeCategory {
             case .small: return hostCacheEntry.smallFaviconUrl ?? hostCacheEntry.mediumFaviconUrl
             default: return hostCacheEntry.mediumFaviconUrl
@@ -171,7 +173,7 @@ final class FaviconReferenceCache {
     func getFaviconUrl(for host: String, sizeCategory: Favicon.SizeCategory) -> URL? {
         dispatchPrecondition(condition: .onQueue(queue))
 
-        let hostCacheEntry = hostReferences[host]
+        let hostCacheEntry = hostReferences[host] ?? (host.hasPrefix("www") ? hostReferences[host.dropWWW()] : hostReferences["www.\(host)"])
 
         switch sizeCategory {
         case .small: return hostCacheEntry?.smallFaviconUrl ?? hostCacheEntry?.mediumFaviconUrl

@@ -61,6 +61,10 @@ final class BookmarkTableRowView: NSTableRowView {
             NSColor.rowHoverColor.setFill()
             path.fill()
         }
+
+        if isSelected {
+            drawSelection(in: dirtyRect)
+        }
     }
 
     override func drawSelection(in dirtyRect: NSRect) {

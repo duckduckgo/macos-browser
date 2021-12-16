@@ -92,6 +92,7 @@ final class FaviconManager: FaviconManagement {
                         return nil
                     }
 
+                    //TODO: guard not older than one week!
                     if let favicon = self?.imageCache.get(faviconUrl: faviconUrl) {
                         return favicon
                     }

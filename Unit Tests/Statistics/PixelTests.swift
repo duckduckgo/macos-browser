@@ -174,32 +174,4 @@ class PixelTests: XCTestCase {
         wait(for: [expectation], timeout: 1.0)
     }
 
-    func testWhenCountedPixelFiresThenCountIncreased() {
-        let store = PixelStoreMock()
-
-        var expectation = XCTestExpectation()
-        stub(condition: isHost(host) && isPath("/t/m_mac_debug_cfgfetch")) { request -> HTTPStubsResponse in
-            XCTAssertEqual("1", try? request.url?.getParameter(name: "c"))
-
-            expectation.fulfill()
-            return HTTPStubsResponse(data: Data(), statusCode: 200, headers: nil)
-        }
-
-        Pixel.fire(.debug(event: .configurationFetchError, error: nil, countedBy: .init(store: store)))
-
-        wait(for: [expectation], timeout: 1.0)
-
-        expectation = XCTestExpectation()
-        stub(condition: isHost(host) && isPath("/t/m_mac_debug_cfgfetch")) { request -> HTTPStubsResponse in
-            XCTAssertEqual("2", try? request.url?.getParameter(name: "c"))
-
-            expectation.fulfill()
-            return HTTPStubsResponse(data: Data(), statusCode: 200, headers: nil)
-        }
-
-        Pixel.fire(.debug(event: .configurationFetchError, error: nil, countedBy: .init(store: store)))
-
-        wait(for: [expectation], timeout: 1.0)
-    }
-
 }

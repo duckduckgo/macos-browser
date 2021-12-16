@@ -21,7 +21,7 @@ import Foundation
 final class FaviconSelector {
 
     static func filterUnnecessaryFaviconLink(faviconLinks: [FaviconUserScript.FaviconLink]) -> [FaviconUserScript.FaviconLink] {
-        //TODO: Filter
+        //TODO: Filter? If possible
         return faviconLinks
     }
 
