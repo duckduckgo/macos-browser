@@ -22,6 +22,7 @@ import Foundation
 protocol StatisticsStore: AnyObject {
 
     var hasInstallStatistics: Bool { get }
+    var hasCurrentOrDeprecatedInstallStatistics: Bool { get }
     var installDate: Date? { get set }
     var atb: String? { get set }
     var searchRetentionAtb: String? { get set }

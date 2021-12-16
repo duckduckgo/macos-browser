@@ -80,6 +80,11 @@ final class LocalStatisticsStore: StatisticsStore {
     var hasInstallStatistics: Bool {
         return atb != nil
     }
+    
+    var hasCurrentOrDeprecatedInstallStatistics: Bool {
+        let legacyATB: String? = pixelDataStore.value(forKey: DeprecatedKeys.atb)
+        return legacyATB != nil
+    }
 
     var atb: String? {
         get {

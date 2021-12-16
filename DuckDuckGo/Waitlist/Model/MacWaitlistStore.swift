@@ -41,7 +41,7 @@ final class MacWaitlistEncryptedFileStorage: MacWaitlistStore {
     }
     
     func isExistingInstall() -> Bool {
-        return statisticsStore.hasInstallStatistics
+        return statisticsStore.hasCurrentOrDeprecatedInstallStatistics
     }
     
     func isUnlocked() -> Bool {

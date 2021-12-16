@@ -54,27 +54,28 @@ final class MacWaitlistLockScreenViewModel: ObservableObject {
         
         state = .unlockRequestInFlight
 
-        #warning("Don't ship this, it's for product review only so that people can test the flow repeatedly")
-        let hardcodedTemporaryPasscode = "DAX"
+        #if DEBUG || REVIEW
         
-        if code.caseInsensitiveCompare(hardcodedTemporaryPasscode) == .orderedSame {
-            DispatchQueue.main.asyncAfter(deadline: .now() + 3.0) {
+        if code.caseInsensitiveCompare("DAX") == .orderedSame {
+            DispatchQueue.main.asyncAfter(deadline: .now() + 1.5) {
                 self.store.unlock()
                 self.state = .unlockSuccess
             }
-        } else {
-            waitlistRequest.unlock(with: code) { result in
-                switch result {
-                case .success(let response):
-                    if response.hasExpectedStatusMessage {
-                        self.store.unlock()
-                        self.state = .unlockSuccess
-                    } else {
-                        self.state = .unlockFailure
-                    }
-                case .failure:
+        }
+        
+        #endif
+
+        waitlistRequest.unlock(with: code) { result in
+            switch result {
+            case .success(let response):
+                if response.hasExpectedStatusMessage {
+                    self.store.unlock()
+                    self.state = .unlockSuccess
+                } else {
                     self.state = .unlockFailure
                 }
+            case .failure:
+                self.state = .unlockFailure
             }
         }
     }
