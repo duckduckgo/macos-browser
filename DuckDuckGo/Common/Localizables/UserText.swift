@@ -383,4 +383,6 @@ struct UserText {
 
     static let waitlistGetStarted = NSLocalizedString("waitlist.get-started", value: "Get Started", comment: "Button title used in the waitlist lock screen success state")
     
+    static let waitlistGetStarted = NSLocalizedString("waitlist.get-started", value: "Get Started", comment: "Button title used in the waitlist lock screen success state")
+    
 }
