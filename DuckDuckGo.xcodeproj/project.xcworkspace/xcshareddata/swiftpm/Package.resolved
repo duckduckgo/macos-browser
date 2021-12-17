@@ -5,8 +5,8 @@
         "package": "BrowserServicesKit",
         "repositoryURL": "https://github.com/duckduckgo/BrowserServicesKit.git",
         "state": {
-          "branch": "release/friends-and-family",
-          "revision": "63fe79d6aa23a251895552b01fde6f47d084100a",
+          "branch": "feature/bartek/multiple-blocking-rule-lists",
+          "revision": "438ecb0e7eac4b22a5f78cbe8810ce34f45e7436",
           "version": null
         }
       },

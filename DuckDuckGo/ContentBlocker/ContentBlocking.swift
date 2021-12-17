@@ -36,12 +36,13 @@ final class ContentBlocking {
                                                        data: DefaultConfigurationStorage.shared.loadData(for: .trackerRadar),
                                                        errorReporting: debugEvents)
 
-    static let contentBlockingManager = ContentBlockerRulesManager(source: contentBlockingSource,
+    static let contentBlockingManager = ContentBlockerRulesManager(rulesSource: contentBlockerRulesSource,
+                                                                   exceptionsSource: exceptionsSource,
                                                                    updateListener: contentBlockingUpdating,
                                                                    logger: OSLog.contentBlocking)
-
-    private static let contentBlockingSource = DefaultContentBlockerRulesSource(trackerDataManager: trackerDataManager,
-                                                                                privacyConfigManager: privacyConfigurationManager)
+    
+    private static let contentBlockerRulesSource = ContentBlockerRulesLists(trackerDataManger: trackerDataManager)
+    private static let exceptionsSource = DefaultContentBlockerRulesExceptionsSource(privacyConfigManager: privacyConfigurationManager)
 
     private static let debugEvents = EventMapping<ContentBlockerDebugEvents> { event, error, parameters, onComplete in
         let domainEvent: Pixel.Event.Debug
@@ -85,7 +86,7 @@ final class ContentBlocking {
 }
 
 final class ContentBlockingUpdating: ContentBlockerRulesUpdating {
-    typealias NewRulesInfo = (rules: ContentBlockerRulesManager.CurrentRules,
+    typealias NewRulesInfo = (rules: [ContentBlockerRulesManager.Rules],
                               changes: ContentBlockerRulesIdentifier.Difference,
                               completionTokens: Set<ContentBlockerRulesManager.CompletionToken>)
     typealias NewRulesPublisher = AnyPublisher<NewRulesInfo?, Never>
@@ -97,7 +98,7 @@ final class ContentBlockingUpdating: ContentBlockerRulesUpdating {
     }
 
     func rulesManager(_ manager: ContentBlockerRulesManager,
-                      didUpdateRules rules: ContentBlockerRulesManager.CurrentRules,
+                      didUpdateRules rules: [ContentBlockerRulesManager.Rules],
                       changes: ContentBlockerRulesIdentifier.Difference,
                       completionTokens: [ContentBlockerRulesManager.CompletionToken]) {
         contentBlockingRulesSubject.send((rules: rules, changes: changes, completionTokens: Set(completionTokens)))
