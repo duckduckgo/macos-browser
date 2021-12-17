@@ -92,6 +92,15 @@ struct OnboardingFlow: View {
         .padding(30)
         .onAppear {
 
+            if model.state == .startBrowsing {
+                showLogo = true
+                daxInSpeechPosition = true
+                showDialogs = true
+                showTitle = false
+                model.onboardingReshown()
+                return
+            }
+
             withAnimation(.easeIn(duration: 0.5).delay(1.5)) {
                 makeSpace = true
             }

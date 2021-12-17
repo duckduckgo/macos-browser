@@ -42,7 +42,7 @@ final class OnboardingViewController: NSViewController {
 
     weak var delegate: OnboardingDelegate?
 
-    let model = OnboardingViewModel(delegate: nil)
+    let model = OnboardingViewModel()
 
     var mouseDownMonitor: Any?
 

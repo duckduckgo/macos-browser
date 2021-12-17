@@ -35,7 +35,7 @@ final class OnboardingViewModel: ObservableObject {
 
     enum OnboardingPhase {
 
-        case start
+        case startFlow
         case welcome
         case importData
         case setDefault
@@ -47,16 +47,20 @@ final class OnboardingViewModel: ObservableObject {
     let typingDisabled = true
 
     @Published var skipTypingRequested = false
-    @Published var state = OnboardingPhase.start {
+    @Published var state: OnboardingPhase = .startFlow {
         didSet {
             skipTypingRequested = false
         }
     }
 
+    @UserDefaultsWrapper(key: .onboardingFinished, defaultValue: false)
+    var onboardingFinished: Bool
+
     weak var delegate: OnboardingDelegate?
 
-    init(delegate: OnboardingDelegate?) {
+    init(delegate: OnboardingDelegate? = nil) {
         self.delegate = delegate
+        self.state = onboardingFinished ? .startBrowsing : .startFlow
     }
 
     func onSplashFinished() {
@@ -91,6 +95,7 @@ final class OnboardingViewModel: ObservableObject {
     func onSetDefaultSkipped() {
         Pixel.fire(.onboardingSetDefaultSkipped)
         state = .startBrowsing
+        onboardingFinished = true
         delegate?.onboardingHasFinished()
     }
 
@@ -100,6 +105,10 @@ final class OnboardingViewModel: ObservableObject {
 
     func typingSkipped() {
         Pixel.fire(.onboardingTypingSkipped)
+    }
+
+    func onboardingReshown() {
+        delegate?.onboardingHasFinished()
     }
 
 }

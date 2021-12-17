@@ -22,6 +22,7 @@ extension Onboarding {
 
 struct RootView: View {
 
+    @EnvironmentObject var model: OnboardingViewModel
     @State var showDax = false
     @State var showImage = false
 
@@ -41,6 +42,13 @@ struct RootView: View {
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity)
         .onAppear {
+
+            if model.state == .startBrowsing {
+                showDax = true
+                showImage = true
+                return
+            }
+
             withAnimation {
                 showDax = true
             }

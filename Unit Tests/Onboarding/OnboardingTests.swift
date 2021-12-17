@@ -27,12 +27,12 @@ class OnboardingTests: XCTestCase {
 
     func testWhenInitialisedThenStateIsStarted() {
         let model = OnboardingViewModel(delegate: nil)
-        XCTAssertEqual(model.state, .start)
+        XCTAssertEqual(model.state, .startFlow)
     }
 
     func testStateChanges() {
         let model = OnboardingViewModel(delegate: delegate)
-        assertStateChange(model, .start, .welcome, model.onSplashFinished)
+        assertStateChange(model, .startFlow, .welcome, model.onSplashFinished)
         assertStateChange(model, .welcome, .importData, model.onStartPressed)
         assertStateChange(model, .importData, .setDefault, model.onImportPressed)
         assertStateChange(model, .setDefault, .startBrowsing, model.onSetDefaultPressed)

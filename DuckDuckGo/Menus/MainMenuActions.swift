@@ -107,6 +107,7 @@ extension AppDelegate {
     }
 
     @IBAction func startOnboarding(_ sender: Any?) {
+        OnboardingViewModel().onboardingFinished = false
         let tabCollection = TabCollection(tabs: [Tab(content: .onboarding)])
         let tabCollectionViewModel = TabCollectionViewModel(tabCollection: tabCollection)
         WindowsManager.openNewWindow(with: tabCollectionViewModel)
