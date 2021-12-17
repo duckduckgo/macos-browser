@@ -2325,7 +2325,6 @@
 				AA63744E24C9BB4A00AB2AC4 /* Suggestions */,
 				AAC9C01224CAFBB700AD1325 /* TabBar */,
 				AA0877B626D515EE00B05660 /* User Agent */,
-				B61F012125ECBACE00ABB5A3 /* UserScripts */,
 			);
 			path = "Unit Tests";
 			sourceTree = "<group>";
@@ -3125,13 +3124,6 @@
 				B6CF78E2267B0A1900CD4F13 /* WKNavigationAction+Private.h */,
 			);
 			path = Extensions;
-			sourceTree = "<group>";
-		};
-		B61F012125ECBACE00ABB5A3 /* UserScripts */ = {
-			isa = PBXGroup;
-			children = (
-			);
-			path = UserScripts;
 			sourceTree = "<group>";
 		};
 		B64C84DB2692D6E80048FEBE /* Permissions */ = {
