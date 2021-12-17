@@ -369,4 +369,6 @@ struct UserText {
     static let exportLoginsFileNameSuffix = NSLocalizedString("export.logins.file.name.suffix", value: "Logins", comment: "The last part of the suggested file name for exporting logins")
     static let exportBookmarksFileNameSuffix = NSLocalizedString("export.bookmarks.file.name.suffix", value: "Bookmarks", comment: "The last part of the suggested file for exporting bookmarks")
     
+    static let waitlistGetStarted = NSLocalizedString("waitlist.get-started", value: "Get Started", comment: "Button title used in the waitlist lock screen success state")
+    
 }

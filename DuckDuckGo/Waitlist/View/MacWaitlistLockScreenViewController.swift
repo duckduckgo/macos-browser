@@ -69,7 +69,6 @@ final class MacWaitlistLockScreenViewController: NSViewController {
     }
     
     @IBAction func quit(_ sender: NSButton) {
-        // NSRunningApplication.current.terminate()
         exit(0)
     }
     
@@ -124,7 +123,7 @@ final class MacWaitlistLockScreenViewController: NSViewController {
             
             quitButton.isHidden = true
             continueButton.isEnabled = true
-            continueButton.title = "Get Started"
+            continueButton.title = UserText.waitlistGetStarted
         case .unlockFailure:
             inviteCodeStateGroup.isHidden = false
             successStateGroup.isHidden = true
@@ -136,11 +135,6 @@ final class MacWaitlistLockScreenViewController: NSViewController {
             continueButton.isEnabled = true
             errorLabel.isHidden = false
         }
-    }
-    
-    private func unlockApp() {
-        NSApplication.shared.stopModal(withCode: .OK)
-        self.view.window?.close()
     }
     
 }
