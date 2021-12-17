@@ -664,6 +664,12 @@ CQ
                                                 <action selector="resetMacWaitlistUnlockState:" target="Ady-hI-5gd" id="1Bd-q4-0F9"/>
                                             </connections>
                                         </menuItem>
+                                        <menuItem title="Set Fake User Defaults ATB Values" id="tjI-pj-o1j">
+                                            <modifierMask key="keyEquivalentModifierMask"/>
+                                            <connections>
+                                                <action selector="setFakeUserDefaultsATBValues:" target="Ady-hI-5gd" id="Bn7-nE-crD"/>
+                                            </connections>
+                                        </menuItem>
                                         <menuItem title="Fatal Error" id="FeS-hb-rvM" userLabel="Reset Default Browser Prompt">
                                             <modifierMask key="keyEquivalentModifierMask"/>
                                             <connections>
