@@ -63,6 +63,7 @@ final class MainWindowController: NSWindowController {
     @objc
     private func dismissLockScreen() {
         updateWindowForLockScreen(lockScreenVisible: false)
+        mainViewController.tabCollectionViewModel.selectedTabViewModel?.tab.startOnboarding()
     }
 
     private func setupToolbar() {

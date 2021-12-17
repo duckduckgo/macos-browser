@@ -283,6 +283,10 @@ final class Tab: NSObject {
         content = .homepage
     }
 
+    func startOnboarding() {
+        content = .onboarding
+    }
+
     func reload() {
         if let error = error, let failingUrl = error.failingUrl {
             webView.load(failingUrl)
