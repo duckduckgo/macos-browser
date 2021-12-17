@@ -101,18 +101,24 @@ struct OnboardingFlow: View {
                 return
             }
 
-            withAnimation(.easeIn(duration: 0.5).delay(1.5)) {
-                makeSpace = true
+            Timer.scheduledTimer(withTimeInterval: 1.5, repeats: false) { _ in
+                withAnimation(.easeIn(duration: 0.5)) {
+                    makeSpace = true
+                }
             }
 
-            withAnimation(.easeIn(duration: 0.5).delay(2.0)) {
-                showLogo = true
-                makeSpace = false
+            Timer.scheduledTimer(withTimeInterval: 2.0, repeats: false) { _ in
+                withAnimation(.easeIn(duration: 0.5)) {
+                    showLogo = true
+                    makeSpace = false
+                }
             }
 
-            withAnimation(.easeIn.delay(3.0)) {
-                showTitle = false
-                daxInSpeechPosition = true
+            Timer.scheduledTimer(withTimeInterval: 3.0, repeats: false) { _ in
+                withAnimation(.easeIn) {
+                    showTitle = false
+                    daxInSpeechPosition = true
+                }
             }
 
             Timer.scheduledTimer(withTimeInterval: 3.5, repeats: false) { _ in
