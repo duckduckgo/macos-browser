@@ -489,6 +489,18 @@ extension MainViewController {
             }
         }
     }
+    
+    @IBAction func resetMacWaitlistUnlockState(_ sender: Any?) {
+        let store = MacWaitlistEncryptedFileStorage()
+        store.deleteExistingMetadata()
+    }
+    
+    // Used to test the lock screen upgrade process. Users with the legacy ATB format need to be unlocked.
+    @IBAction func setFakeUserDefaultsATBValues(_ sender: Any?) {
+        var legacyStore = LocalStatisticsStore.LegacyStatisticsStore()
+        legacyStore.atb = "fake-atb-value"
+        legacyStore.installDate = Date()
+    }
 
     // MARK: - Developer Tools
 

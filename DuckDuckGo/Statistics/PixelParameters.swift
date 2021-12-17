@@ -92,7 +92,11 @@ extension Pixel.Event {
              .importedBookmarks,
              .exportedBookmarks,
              .formAutofilled,
-             .autofillItemSaved:
+             .autofillItemSaved,
+             .waitlistFirstLaunch,
+             .waitlistMigratedExistingInstall,
+             .waitlistPresentedLockScreen,
+             .waitlistDismissedLockScreen:
 
             return nil
         }

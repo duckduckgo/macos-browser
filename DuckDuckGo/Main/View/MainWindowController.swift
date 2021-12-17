@@ -56,6 +56,13 @@ final class MainWindowController: NSWindowController {
     private func setupWindow() {
         window?.delegate = self
         window?.setFrameAutosaveName(Self.windowFrameSaveName)
+        
+        NotificationCenter.default.addObserver(self, selector: #selector(dismissLockScreen), name: .macWaitlistLockScreenDidUnlock, object: nil)
+    }
+    
+    @objc
+    private func dismissLockScreen() {
+        updateWindowForLockScreen(lockScreenVisible: false)
     }
 
     private func setupToolbar() {
@@ -96,6 +103,8 @@ final class MainWindowController: NSWindowController {
 
         mainViewController.tabBarViewController.fireButton.isEnabled = !prevented
         mainViewController.navigationBarViewController.controlsForUserPrevention.forEach { $0?.isEnabled = !prevented }
+        
+        NSApplication.shared.mainMenuTyped.autoupdatingMenusForUserPrevention.forEach { $0.autoenablesItems = !prevented }
         NSApplication.shared.mainMenuTyped.menuItemsForUserPrevention.forEach { $0.isEnabled = !prevented }
 
         if prevented {
@@ -158,9 +167,36 @@ extension MainWindowController: NSWindowDelegate {
     func windowDidBecomeKey(_ notification: Notification) {
         mainViewController.windowDidBecomeMain()
         mainViewController.navigationBarViewController.windowDidBecomeMain()
+
         if (notification.object as? NSWindow)?.isPopUpWindow == false {
             WindowControllersManager.shared.lastKeyMainWindowController = self
         }
+        
+        displayLockScreenIfNecessary()
+    }
+    
+    private func displayLockScreenIfNecessary() {
+        // Displaying a modal so soon after the window becoming key causes issues related to the window animation and
+        // state, such as a double animation happening as the window opens, and the address bar state being incorrect.
+        // Dispatching this change to the end of the main queue fixes it.
+        DispatchQueue.main.async {
+#if DEBUG
+            if !AppDelegate.isRunningTests {
+                if Waitlist.displayLockScreenIfNecessary(in: self.mainViewController) {
+                    self.updateWindowForLockScreen(lockScreenVisible: true)
+                }
+            }
+#else
+            if Waitlist.displayLockScreenIfNecessary(in: self.mainViewController) {
+                self.updateWindowForLockScreen(lockScreenVisible: true)
+            }
+#endif
+        }
+    }
+    
+    private func updateWindowForLockScreen(lockScreenVisible: Bool) {
+        userInteraction(prevented: lockScreenVisible)
+        window?.isMovable = lockScreenVisible
     }
 
     func windowDidResignKey(_ notification: Notification) {
@@ -187,6 +223,7 @@ extension MainWindowController: NSWindowDelegate {
             WindowControllersManager.shared.unregister(self)
         }
     }
+
 }
 
 fileprivate extension MainMenu {
@@ -199,8 +236,19 @@ fileprivate extension MainMenu {
             closeWindowMenuItem,
             closeAllWindowsMenuItem,
             closeTabMenuItem,
-            burnWebsiteDataMenuItem
+            burnWebsiteDataMenuItem,
+            importBrowserDataMenuItem,
+            manageBookmarksMenuItem,
+            importBookmarksMenuItem,
+            preferencesMenuItem
         ]
+    }
+    
+    var autoupdatingMenusForUserPrevention: [NSMenu] {
+        return [
+            preferencesMenuItem.menu,
+            manageBookmarksMenuItem.menu
+        ].compactMap { $0 }
     }
 
 }
