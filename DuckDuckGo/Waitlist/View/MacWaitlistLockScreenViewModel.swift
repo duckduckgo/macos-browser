@@ -55,7 +55,6 @@ final class MacWaitlistLockScreenViewModel: ObservableObject {
         state = .unlockRequestInFlight
 
         #if DEBUG
-        
         // For testing the lock screen in development without having to burn an invite code each time.
         if code.caseInsensitiveCompare("DAX") == .orderedSame {
             DispatchQueue.main.asyncAfter(deadline: .now() + 1.5) {
@@ -65,7 +64,6 @@ final class MacWaitlistLockScreenViewModel: ObservableObject {
             
             return
         }
-        
         #endif
 
         waitlistRequest.unlock(with: code) { result in

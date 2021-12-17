@@ -88,6 +88,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         }
 
         fireLaunchPixel(regularLaunch: (notification.userInfo?[NSApplication.launchIsDefaultUserInfoKey] as? NSNumber)?.boolValue)
+        fireWaitlistLaunchPixel()
 
         stateRestorationManager.applicationDidFinishLaunching()
 
@@ -107,6 +108,8 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         crashReporter.checkForNewReports()
 #endif
         urlEventHandler.applicationDidFinishLaunching()
+        
+        GlobalUserDefaults.appHasLaunchedBefore = true
     }
 
     func applicationShouldTerminate(_ sender: NSApplication) -> NSApplication.TerminateReply {
@@ -157,6 +160,12 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
                     Pixel.Event.AppLaunch.repetition().update()
                 }
             }
+        }
+    }
+    
+    private func fireWaitlistLaunchPixel() {
+        if !GlobalUserDefaults.appHasLaunchedBefore && !Waitlist.isUnlocked {
+            Pixel.fire(.waitlistFirstLaunch)
         }
     }
 

@@ -23,6 +23,8 @@ public struct UserDefaultsWrapper<T> {
 
     public enum Key: String, CaseIterable {
 
+        case appHasLaunchedBefore = "global.app-has-launched-before"
+
         case configLastUpdated = "config.last.updated"
         case configStorageTrackerRadarEtag = "config.storage.trackerradar.etag"
         case configStorageBloomFilterSpecEtag = "config.storage.bloomfilter.spec.etag"

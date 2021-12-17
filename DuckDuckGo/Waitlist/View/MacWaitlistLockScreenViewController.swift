@@ -77,6 +77,7 @@ final class MacWaitlistLockScreenViewController: NSViewController {
         if viewModel.state == .unlockSuccess {
             self.dismiss()
             NotificationCenter.default.post(name: .macWaitlistLockScreenDidUnlock, object: self)
+            Pixel.fire(.waitlistDismissedLockScreen)
         } else {
             viewModel.attemptUnlock(code: inviteCodeTextField.stringValue)
         }

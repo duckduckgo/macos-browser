@@ -63,9 +63,10 @@ final class MacWaitlistEncryptedFileStorage: MacWaitlistStore {
         }
         
         // No waitlist check has been performed, meaning that this is the first time that the browser has been run with
-        //  the lock screen feature included. Check for ATB and unlock the browser if it's present.
+        // the lock screen feature included. Check for ATB and unlock the browser if it's present.
         if isExistingInstall() {
             unlock()
+            Pixel.fire(.waitlistMigratedExistingInstall)
         } else {
             saveFailedUnlockAttempt()
         }

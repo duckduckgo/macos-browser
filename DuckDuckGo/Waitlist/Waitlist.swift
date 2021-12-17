@@ -46,6 +46,8 @@ struct Waitlist {
         
         viewController.beginSheet(lockScreenWindow)
         
+        Pixel.fire(.waitlistPresentedLockScreen)
+        
         return true
     }
     
