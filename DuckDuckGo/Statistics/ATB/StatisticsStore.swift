@@ -22,6 +22,7 @@ import Foundation
 protocol StatisticsStore: AnyObject {
 
     var hasInstallStatistics: Bool { get }
+    var hasCurrentOrDeprecatedInstallStatistics: Bool { get }
     var installDate: Date? { get set }
     var atb: String? { get set }
     var searchRetentionAtb: String? { get set }
@@ -30,6 +31,9 @@ protocol StatisticsStore: AnyObject {
 
     var lastAppRetentionRequestDate: Date? { get set }
     var isAppRetentionFiredToday: Bool { get }
+    
+    var waitlistUpgradeCheckComplete: Bool { get set }
+    var waitlistUnlocked: Bool { get set }
 }
 
 extension StatisticsStore {

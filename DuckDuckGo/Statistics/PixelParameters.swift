@@ -98,7 +98,11 @@ extension Pixel.Event {
              .onboardingImportSkipped,
              .onboardingSetDefaultPressed,
              .onboardingSetDefaultSkipped,
-             .onboardingTypingSkipped:
+             .onboardingTypingSkipped,
+             .waitlistFirstLaunch,
+             .waitlistMigratedExistingInstall,
+             .waitlistPresentedLockScreen,
+             .waitlistDismissedLockScreen:
 
             return nil
         }

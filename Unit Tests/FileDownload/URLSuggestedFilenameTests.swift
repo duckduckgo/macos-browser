@@ -19,8 +19,6 @@
 import Foundation
 import XCTest
 import Combine
-import OHHTTPStubs
-import OHHTTPStubsSwift
 @testable import DuckDuckGo_Privacy_Browser
 
 final class URLSuggestedFilenameTests: XCTestCase {
