@@ -25,6 +25,14 @@ class OnboardingTests: XCTestCase {
     let delegate = MockOnboardingDelegate()
     // swiftlint:enable weak_delegate
 
+    @UserDefaultsWrapper(key: .onboardingFinished, defaultValue: false)
+    var onboardingFinished: Bool
+
+    override func setUp() {
+        super.setUp()
+        onboardingFinished = false
+    }
+
     func testWhenInitialisedThenStateIsStarted() {
         let model = OnboardingViewModel(delegate: nil)
         XCTAssertEqual(model.state, .startFlow)
@@ -76,6 +84,14 @@ class OnboardingTests: XCTestCase {
         XCTAssertEqual(0, delegate.didRequestImportDataCalled)
         XCTAssertEqual(1, delegate.didRequestSetDefaultCalled)
         XCTAssertEqual(2, delegate.hasFinishedCalled)
+
+        XCTAssertTrue(onboardingFinished)
+    }
+
+    func testWhenOnboardingFinishedThenInitialStateIsStartBrowsing() {
+        onboardingFinished = true
+        let model = OnboardingViewModel()
+        XCTAssertEqual(model.state, .startBrowsing)
     }
 
     private func assertStateChange(_ model: OnboardingViewModel,

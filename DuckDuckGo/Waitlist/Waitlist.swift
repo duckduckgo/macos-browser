@@ -29,7 +29,11 @@ struct Waitlist {
     }
     
     static func unlockExistingInstallIfNecessary() {
+#if DEBUG || REVIEW
+        MacWaitlistEncryptedFileStorage().unlock()
+#else
         MacWaitlistEncryptedFileStorage().unlockExistingInstallIfNecessary()
+#endif
     }
     
     static func displayLockScreenIfNecessary(in viewController: NSViewController) -> Bool {

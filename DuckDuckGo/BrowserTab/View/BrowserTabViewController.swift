@@ -47,7 +47,7 @@ final class BrowserTabViewController: NSViewController {
 
     private var hoverLabelWorkItem: DispatchWorkItem?
 
-    private var temporaryContentController: NSViewController?
+    private var transientTabContentViewController: NSViewController?
 
     required init?(coder: NSCoder) {
         fatalError("BrowserTabViewController: Bad initializer")
@@ -225,7 +225,7 @@ final class BrowserTabViewController: NSViewController {
 
     private func removeAllTabContent(includingWebView: Bool = true) {
         self.homepageView.removeFromSuperview()
-        temporaryContentController?.removeCompletely()
+        transientTabContentViewController?.removeCompletely()
         preferencesViewController.removeCompletely()
         bookmarksViewController.removeCompletely()
         if includingWebView {
@@ -238,10 +238,10 @@ final class BrowserTabViewController: NSViewController {
         view.addAndLayout(vc.view)
     }
 
-    private func showTemporaryTabContentController(_ vc: NSViewController) {
-        temporaryContentController?.removeCompletely()
+    private func showTransientTabContentController(_ vc: NSViewController) {
+        transientTabContentViewController?.removeCompletely()
         showTabContentController(vc)
-        temporaryContentController = vc
+        transientTabContentViewController = vc
     }
 
     private func requestDisableUI() {
@@ -262,10 +262,10 @@ final class BrowserTabViewController: NSViewController {
         case .onboarding:
             removeAllTabContent()
             requestDisableUI()
-            if let vc = temporaryContentController as? OnboardingViewController {
+            if let vc = transientTabContentViewController as? OnboardingViewController {
                 showTabContentController(vc)
             } else {
-                showTemporaryTabContentController(OnboardingViewController.create(withDelegate: self))
+                showTransientTabContentController(OnboardingViewController.create(withDelegate: self))
             }
 
         case .url:
