@@ -108,7 +108,6 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         crashReporter.checkForNewReports()
 #endif
         urlEventHandler.applicationDidFinishLaunching()
-
     }
 
     func applicationShouldTerminate(_ sender: NSApplication) -> NSApplication.TerminateReply {

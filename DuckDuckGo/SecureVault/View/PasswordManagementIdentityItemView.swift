@@ -109,6 +109,8 @@ private struct IdentificationView: View {
 
                 HStack {
                     
+                    // Way too much code duplication in here, but this view may be altered a fair bit in 2022, and I'm
+                    // out of time to fix it up before the end of 2021, so it's staying this way for a bit. Sorry!
                     if Locale.current.dateComponentOrder == .dayMonthYear {
                         NSPopUpButtonView<Int?>(selection: $model.birthdayDay, popupCreator: {
                             let button = NSPopUpButton()
