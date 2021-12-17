@@ -34,7 +34,7 @@ final class PasswordManagementViewController: NSViewController {
     static func create() -> Self {
         let storyboard = NSStoryboard(name: "PasswordManager", bundle: nil)
         // swiftlint:disable force_cast
-        let controller = storyboard.instantiateController(withIdentifier: "PasswordManagement") as! Self
+        let controller: Self = storyboard.instantiateController(withIdentifier: "PasswordManagement") as! Self
         controller.loadView()
         // swiftlint:enable force_cast
         return controller
