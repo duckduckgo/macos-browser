@@ -61,6 +61,7 @@ public struct UserDefaultsWrapper<T> {
         // unlocked status with regards to the lock screen
         case legacyStatisticsStoreDataCleared = "statistics.appretentionatb.legacy-data-cleared"
 
+        case onboardingFinished = "onboarding.finished"
     }
 
     private let key: Key

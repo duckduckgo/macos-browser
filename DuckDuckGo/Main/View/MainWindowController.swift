@@ -63,6 +63,7 @@ final class MainWindowController: NSWindowController {
     @objc
     private func dismissLockScreen() {
         updateWindowForLockScreen(lockScreenVisible: false)
+        mainViewController.tabCollectionViewModel.selectedTabViewModel?.tab.startOnboarding()
     }
 
     private func setupToolbar() {
@@ -97,7 +98,7 @@ final class MainWindowController: NSWindowController {
             })
     }
 
-    private func userInteraction(prevented: Bool) {
+    func userInteraction(prevented: Bool) {
         mainViewController.tabCollectionViewModel.changesEnabled = !prevented
         mainViewController.tabCollectionViewModel.selectedTabViewModel?.tab.contentChangeEnabled = !prevented
 
