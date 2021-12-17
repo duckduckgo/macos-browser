@@ -357,6 +357,7 @@ final class Tab: NSObject {
         webView.allowsBackForwardNavigationGestures = true
         webView.allowsMagnification = true
 
+        userScripts = UserScripts(with: scriptsSource)
         subscribeToUserScriptChanges()
         subscribeToOpenExternalUrlEvents()
 

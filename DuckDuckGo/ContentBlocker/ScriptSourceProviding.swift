@@ -86,8 +86,12 @@ final class DefaultScriptSourceProvider: ScriptSourceProviding {
     }
 
     private func buildContentBlockerRulesConfig() -> ContentBlockerUserScriptConfig {
+        
+        let tdsName = DefaultContentBlockerRulesListsSource.Constants.trackerDataSetRulesListName
+        let trackerData = contentBlockingManager.currentRules.first(where: { $0.name == tdsName})?.trackerData
+        
         return DefaultContentBlockerUserScriptConfig(privacyConfiguration: privacyConfigurationManager.privacyConfig,
-                                                     trackerData: contentBlockingManager.currentRules?.trackerData)
+                                                     trackerData: trackerData)
     }
 
     private func buildSurrogatesConfig() -> SurrogatesUserScriptConfig {
@@ -100,7 +104,8 @@ final class DefaultScriptSourceProvider: ScriptSourceProviding {
         #endif
 
         let surrogates = configStorage.loadData(for: .surrogates)?.utf8String() ?? ""
-        let rules = contentBlockingManager.currentRules
+        let tdsName = DefaultContentBlockerRulesListsSource.Constants.trackerDataSetRulesListName
+        let rules = contentBlockingManager.currentRules.first(where: { $0.name == tdsName})
         return DefaultSurrogatesUserScriptConfig(privacyConfig: privacyConfigurationManager.privacyConfig,
                                                  surrogates: surrogates,
                                                  trackerData: rules?.trackerData,

@@ -102,6 +102,15 @@ final class BookmarkTableCellView: NSTableCellView, NibLoadable {
         }
     }
 
+    var isSelected = false {
+        didSet {
+            titleLabel.textColor = isSelected ? .white : NSColor.controlTextColor
+            faviconImageView.contentTintColor = isSelected ? .white : .black
+            accessoryImageView.contentTintColor = isSelected ? .white : nil
+            updateTitleLabelValue()
+        }
+    }
+
     private var entity: BaseBookmarkEntity?
     private var trackingArea: NSTrackingArea?
     private var mouseInside: Bool = false {
@@ -124,7 +133,7 @@ final class BookmarkTableCellView: NSTableCellView, NibLoadable {
 
     override var backgroundStyle: NSView.BackgroundStyle {
         didSet {
-            faviconImageView.contentTintColor = .black
+            faviconImageView.contentTintColor = isSelected ? .white : .black
             updateTitleLabelValue()
         }
     }
@@ -285,7 +294,10 @@ final class BookmarkTableCellView: NSTableCellView, NibLoadable {
     }
 
     private func buildTitleAttributedString(tertiaryValue: String) -> NSAttributedString {
-        let titleAttributes = [NSAttributedString.Key.foregroundColor: NSColor.labelColor]
+
+        let color = isSelected ? NSColor.white : NSColor.labelColor
+
+        let titleAttributes = [NSAttributedString.Key.foregroundColor: color]
         let titleString = NSMutableAttributedString(string: primaryTitleLabelValue, attributes: titleAttributes)
 
         let urlAttributes = [NSAttributedString.Key.foregroundColor: NSColor.tertiaryLabelColor]
