@@ -889,8 +889,10 @@ extension BrowserTabViewController: OnboardingDelegate {
 
         var observer: Any?
         observer = NotificationCenter.default.addObserver(forName: NSApplication.didBecomeActiveNotification, object: nil, queue: .main) { _ in
-            completion()
             NotificationCenter.default.removeObserver(observer as Any)
+            withAnimation {
+                completion()
+            }
         }
     }
 

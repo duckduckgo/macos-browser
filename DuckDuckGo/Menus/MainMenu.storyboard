@@ -676,12 +676,6 @@ CQ
                                                 <action selector="triggerFatalError:" target="Ady-hI-5gd" id="pS0-iQ-TPe"/>
                                             </connections>
                                         </menuItem>
-                                        <menuItem title="Start Onboarding" id="dYn-BI-dBX">
-                                            <modifierMask key="keyEquivalentModifierMask"/>
-                                            <connections>
-                                                <action selector="startOnboarding:" target="Ady-hI-5gd" id="Hsa-6G-JUw"/>
-                                            </connections>
-                                        </menuItem>
                                     </items>
                                 </menu>
                             </menuItem>

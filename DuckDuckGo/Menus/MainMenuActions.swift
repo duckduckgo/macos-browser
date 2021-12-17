@@ -106,13 +106,6 @@ extension AppDelegate {
         WindowsManager.openNewWindow(with: tabCollectionViewModel)
     }
 
-    @IBAction func startOnboarding(_ sender: Any?) {
-        OnboardingViewModel().onboardingFinished = false
-        let tabCollection = TabCollection(tabs: [Tab(content: .onboarding)])
-        let tabCollectionViewModel = TabCollectionViewModel(tabCollection: tabCollection)
-        WindowsManager.openNewWindow(with: tabCollectionViewModel)
-    }
-
     @IBAction func openImportBrowserDataWindow(_ sender: Any?) {
         guard let windowController = WindowControllersManager.shared.lastKeyMainWindowController,
               windowController.window?.isKeyWindow == true else {
@@ -498,6 +491,7 @@ extension MainViewController {
     }
     
     @IBAction func resetMacWaitlistUnlockState(_ sender: Any?) {
+        OnboardingViewModel().onboardingFinished = false
         let store = MacWaitlistEncryptedFileStorage()
         store.deleteExistingMetadata()
     }
