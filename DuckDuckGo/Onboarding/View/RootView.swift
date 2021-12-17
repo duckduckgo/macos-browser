@@ -23,8 +23,8 @@ extension Onboarding {
 struct RootView: View {
 
     @EnvironmentObject var model: OnboardingViewModel
-    @State var showDax = false
-    @State var showImage = false
+    @State var showOnboardingFlow = false
+    @State var showBackgroundImage = false
 
     var body: some View {
 
@@ -33,10 +33,10 @@ struct RootView: View {
             Rectangle()
                 .frame(maxWidth: .infinity, maxHeight: .infinity)
                 .foregroundColor(.white)
-                .visibility(showImage ? .invisible : .visible)
+                .visibility(showBackgroundImage ? .invisible : .visible)
 
             OnboardingFlow()
-                .visibility(showDax ? .visible : .gone)
+                .visibility(showOnboardingFlow ? .visible : .gone)
                 .frame(maxWidth: .infinity, maxHeight: .infinity)
 
         }
@@ -44,17 +44,17 @@ struct RootView: View {
         .onAppear {
 
             if model.state == .startBrowsing {
-                showDax = true
-                showImage = true
+                showOnboardingFlow = true
+                showBackgroundImage = true
                 return
             }
 
             withAnimation {
-                showDax = true
+                showOnboardingFlow = true
             }
 
             withAnimation(.easeIn.delay(0.3)) {
-                showImage = true
+                showBackgroundImage = true
             }
         }
 
