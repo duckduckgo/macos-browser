@@ -33,6 +33,7 @@ protocol PixelDataStore {
     func removeValue(forKey key: String, completionHandler: ((Error?) -> Void)?)
     
 }
+
 extension PixelDataStore {
     func set(_ value: Double, forKey key: String) {
         set(value, forKey: key, completionHandler: nil)

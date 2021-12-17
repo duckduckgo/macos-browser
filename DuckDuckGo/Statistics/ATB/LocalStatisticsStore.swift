@@ -21,7 +21,7 @@ import Foundation
 
 final class LocalStatisticsStore: StatisticsStore {
 
-    private struct LegacyStatisticsStore {
+    struct LegacyStatisticsStore {
         @UserDefaultsWrapper(key: .atb, defaultValue: nil)
         var atb: String?
 
@@ -37,6 +37,8 @@ final class LocalStatisticsStore: StatisticsStore {
         @UserDefaultsWrapper(key: .lastAppRetentionRequestDate, defaultValue: nil)
         var lastAppRetentionRequestDate: Date?
         
+        /// Used to determine whether this clearing process took place. While we no longer use these values, we need to know if a user has upgraded from a
+        /// version which did use them, so that they can be shephered into an unlocked waitlist state. When the waitlist feature is removed, this key can be deleted.
         @UserDefaultsWrapper(key: .legacyStatisticsStoreDataCleared, defaultValue: false)
         var legacyStatisticsStoreDataCleared: Bool
 
@@ -88,9 +90,19 @@ final class LocalStatisticsStore: StatisticsStore {
         return atb != nil
     }
     
+    /// There are three cases in which users can upgrade to a version which includes the Lock Screen feature:
+    ///
+    /// 1. Users with ATB stored in User Defaults
+    /// 2. Users with ATB stored under the DeprecatedKeys values
+    /// 3. Users with ATB stored under the Keys values
+    ///
+    /// This property checks each of these cases to determine whether a user has upgraded from an existing install in any of these cases.
     var hasCurrentOrDeprecatedInstallStatistics: Bool {
-        let legacyATB: String? = pixelDataStore.value(forKey: DeprecatedKeys.atb)
-        return legacyATB != nil
+        let legacyATBWasMigrated = LegacyStatisticsStore().legacyStatisticsStoreDataCleared
+        let deprecatedATB: String? = pixelDataStore.value(forKey: DeprecatedKeys.atb)
+        let hasDeprecatedATB = deprecatedATB != nil
+        
+        return hasInstallStatistics || hasDeprecatedATB || legacyATBWasMigrated
     }
 
     var atb: String? {
