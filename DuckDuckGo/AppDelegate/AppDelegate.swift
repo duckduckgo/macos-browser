@@ -87,8 +87,8 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
             // MARK: perform first time launch logic here
         }
 
-        fireLaunchPixel(regularLaunch: (notification.userInfo?[NSApplication.launchIsDefaultUserInfoKey] as? NSNumber)?.boolValue)
         fireWaitlistLaunchPixel()
+        fireLaunchPixel(regularLaunch: (notification.userInfo?[NSApplication.launchIsDefaultUserInfoKey] as? NSNumber)?.boolValue)
 
         stateRestorationManager.applicationDidFinishLaunching()
 
@@ -108,8 +108,6 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         crashReporter.checkForNewReports()
 #endif
         urlEventHandler.applicationDidFinishLaunching()
-        
-        GlobalUserDefaults.appHasLaunchedBefore = true
     }
 
     func applicationShouldTerminate(_ sender: NSApplication) -> NSApplication.TerminateReply {
@@ -164,7 +162,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
     }
     
     private func fireWaitlistLaunchPixel() {
-        if !GlobalUserDefaults.appHasLaunchedBefore && !Waitlist.isUnlocked {
+        if Pixel.Event.AppLaunch.repetition().value == .initial && !Waitlist.isUnlocked {
             Pixel.fire(.waitlistFirstLaunch)
         }
     }
