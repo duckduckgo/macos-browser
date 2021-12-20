@@ -60,6 +60,7 @@ internal class WebCacheManager {
     private func clearFileCache() async {
         let fm = FileManager.default
         let cachesDir = fm.urls(for: .cachesDirectory, in: .userDomainMask).first!
+            .appendingPathComponent(Bundle.main.bundleIdentifier!)
         let tmpDir = fm.temporaryDirectory(appropriateFor: cachesDir).appendingPathComponent(UUID().uuidString)
 
         do {
