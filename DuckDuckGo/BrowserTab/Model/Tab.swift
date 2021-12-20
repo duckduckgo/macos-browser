@@ -838,13 +838,13 @@ extension Tab: WKNavigationDelegate {
         }
     }
 
-    @available(macOS 12, *)
+    @available(macOS 11.3, *)
     @objc(webView:navigationAction:didBecomeDownload:)
     func webView(_ webView: WKWebView, navigationAction: WKNavigationAction, didBecome download: WKDownload) {
         self.webView(webView, navigationAction: navigationAction, didBecomeDownload: download)
     }
 
-    @available(macOS 12, *)
+    @available(macOS 11.3, *)
     @objc(webView:navigationResponse:didBecomeDownload:)
     func webView(_ webView: WKWebView, navigationResponse: WKNavigationResponse, didBecome download: WKDownload) {
         self.webView(webView, navigationResponse: navigationResponse, didBecomeDownload: download)
