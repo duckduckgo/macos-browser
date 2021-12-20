@@ -15,7 +15,7 @@
                         <rect key="frame" x="0.0" y="0.0" width="803" height="48"/>
                         <autoresizingMask key="autoresizingMask"/>
                         <subviews>
-                            <customView hidden="YES" translatesAutoresizingMaskIntoConstraints="NO" id="EQw-GG-GMA" customClass="WindowDraggingView" customModule="DuckDuckGo_Privacy_Browser" customModuleProvider="target">
+                            <customView translatesAutoresizingMaskIntoConstraints="NO" id="EQw-GG-GMA" customClass="WindowDraggingView" customModule="DuckDuckGo_Privacy_Browser" customModuleProvider="target">
                                 <rect key="frame" x="0.0" y="0.0" width="803" height="48"/>
                             </customView>
                             <stackView distribution="fill" orientation="horizontal" alignment="top" spacing="4" horizontalStackHuggingPriority="249.99998474121094" verticalStackHuggingPriority="249.99998474121094" detachesHiddenViews="YES" translatesAutoresizingMaskIntoConstraints="NO" id="eEh-kf-smR">
