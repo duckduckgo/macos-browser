@@ -67,6 +67,7 @@ private extension Tab.TabContent {
         case preferences = 1
         case bookmarks = 2
         case homepage = 3
+        case onboarding = 4
     }
 
     init?(type: ContentType, url: URL?) {
@@ -80,6 +81,8 @@ private extension Tab.TabContent {
             self = .bookmarks
         case .preferences:
             self = .preferences
+        case .onboarding:
+            self = .onboarding
         }
     }
 
@@ -89,6 +92,7 @@ private extension Tab.TabContent {
         case .homepage: return .homepage
         case .bookmarks: return .bookmarks
         case .preferences: return .preferences
+        case .onboarding: return .onboarding
         case .none: return .homepage
         }
     }

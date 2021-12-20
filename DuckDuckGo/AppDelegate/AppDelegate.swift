@@ -74,6 +74,9 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
     func applicationDidFinishLaunching(_ notification: Notification) {
         guard !Self.isRunningTests else { return }
 
+        // IMPORTANT: This call needs to run before ATB is initialized, as it is used to determine whether this is an existing install being migrated.
+        Waitlist.unlockExistingInstallIfNecessary()
+
         HTTPSUpgrade.shared.loadDataAsync()
         LocalBookmarkManager.shared.loadBookmarks()
         _=ConfigurationManager.shared
@@ -84,6 +87,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
             // MARK: perform first time launch logic here
         }
 
+        fireWaitlistLaunchPixel()
         fireLaunchPixel(regularLaunch: (notification.userInfo?[NSApplication.launchIsDefaultUserInfoKey] as? NSNumber)?.boolValue)
 
         stateRestorationManager.applicationDidFinishLaunching()
@@ -154,6 +158,12 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
                     Pixel.Event.AppLaunch.repetition().update()
                 }
             }
+        }
+    }
+    
+    private func fireWaitlistLaunchPixel() {
+        if Pixel.Event.AppLaunch.repetition().value == .initial && !Waitlist.isUnlocked {
+            Pixel.fire(.waitlistFirstLaunch)
         }
     }
 
