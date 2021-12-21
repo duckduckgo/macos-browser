@@ -627,7 +627,7 @@ extension Tab: ContentBlockerRulesUserScriptDelegate {
 
 extension Tab: ClickToLoadUserScriptDelegate {
 
-    func clickToLoadUserScriptAllowFB(_ script: UserScript, replyHandler: @escaping (Bool) -> Void) -> Void {
+    func clickToLoadUserScriptAllowFB(_ script: UserScript, replyHandler: @escaping (Bool) -> Void) {
         guard self.FBblocked else {
             replyHandler(true)
             return
@@ -637,7 +637,12 @@ extension Tab: ClickToLoadUserScriptDelegate {
             replyHandler(false)
             return
         }
-        store.lookUpContentRuleList(forIdentifier: "fb") { [weak self] ruleList, error in
+        store.getAvailableContentRuleListIdentifiers({ ruleLists in
+            print(ruleLists?[0])
+            print(ruleLists?[1])
+        })
+
+        store.lookUpContentRuleList(forIdentifier: "etag-fb") { [weak self] ruleList, error in
             guard let self = self else {
                 assert(false, "self is gone")
                 replyHandler(false)

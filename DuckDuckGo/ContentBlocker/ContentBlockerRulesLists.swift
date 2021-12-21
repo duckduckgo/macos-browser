@@ -21,21 +21,26 @@ import TrackerRadarKit
 import BrowserServicesKit
 
 final class ContentBlockerRulesLists: DefaultContentBlockerRulesListsSource {
-    
-    static var customRulesUrl: URL {
-        return Bundle.main.url(forResource: "filename", withExtension: "json")!
+    static var FBTrackers: URL {
+        return Bundle.main.url(forResource: "fb-tds", withExtension: "json")!
     }
     
     override var contentBlockerRulesLists: [ContentBlockerRulesList] {
         var result = super.contentBlockerRulesLists
         
         // Add new ones
-//        let dataFile = (try? Data(contentsOf: Self.customRulesUrl)) ?? Data()
-//        let trackerData = try? JSONDecoder().decode(TrackerData.self, from: dataFile)
-//        let dataSet: TrackerDataManager.DataSet = TrackerDataManager.DataSet(trackerData, "etag")
-//        let additionalRulesList = ContentBlockerRulesList(name: "name", trackerData: nil, fallbackTrackerData: dataSet)
-//        
-//        result.append(additionalRulesList)
+        do {
+            let dataFile = (try? Data(contentsOf: Self.FBTrackers)) ?? Data()
+            let trackerData = try JSONDecoder().decode(TrackerData.self, from: dataFile)
+            // TODO generate real etag here for above list?
+            let dataSet: TrackerDataManager.DataSet = TrackerDataManager.DataSet(trackerData, "etag-fb")
+            let additionalRulesList = ContentBlockerRulesList(name: "fb", trackerData: nil, fallbackTrackerData: dataSet)
+    
+            result.append(additionalRulesList)
+                    
+        } catch {
+            print(error)
+        }
         return result
     }
 }
