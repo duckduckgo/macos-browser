@@ -93,6 +93,7 @@ final class Tab: NSObject {
          webViewConfiguration: WebViewConfiguration? = nil,
          historyCoordinating: HistoryCoordinating = HistoryCoordinator.shared,
          scriptsSource: ScriptSourceProviding = DefaultScriptSourceProvider.shared,
+         contentBlockingManager: ContentBlockerRulesManager = ContentBlocking.contentBlockingManager,
          visitedDomains: Set<String> = Set<String>(),
          title: String? = nil,
          error: Error? = nil,
@@ -106,6 +107,7 @@ final class Tab: NSObject {
         self.faviconService = faviconService
         self.historyCoordinating = historyCoordinating
         self.scriptsSource = scriptsSource
+        self.contentBlockingManager = contentBlockingManager
         self.visitedDomains = visitedDomains
         self.title = title
         self.error = error
@@ -421,6 +423,8 @@ final class Tab: NSObject {
 
     let scriptsSource: ScriptSourceProviding
     private var userScriptsUpdatedCancellable: AnyCancellable?
+    
+    let contentBlockingManager: ContentBlockerRulesManager
 
     lazy var emailManager: EmailManager = {
         let emailManager = EmailManager()
@@ -632,31 +636,15 @@ extension Tab: ClickToLoadUserScriptDelegate {
             replyHandler(true)
             return
         }
-        guard let store = WKContentRuleListStore.default() else {
-            assert(false, "Failed to access the default WKContentRuleListStore")
+        
+        if let fbRules = contentBlockingManager.currentRules.first(where: { $0.name == "" }) {
+            webView.configuration.userContentController.remove(fbRules.rulesList)
+        } else {
+            assertionFailure("Missing FB List")
             replyHandler(false)
-            return
         }
-        store.getAvailableContentRuleListIdentifiers({ ruleLists in
-            print(ruleLists?[0])
-            print(ruleLists?[1])
-        })
 
-        store.lookUpContentRuleList(forIdentifier: "etag-fb") { [weak self] ruleList, error in
-            guard let self = self else {
-                assert(false, "self is gone")
-                replyHandler(false)
-                return
-            }
-            self.FBblockingRules = ruleList!
-
-            if let error = error {
-                os_log("Failed to access FB rules %{public}s", type: .error, error.localizedDescription)
-            }
-            self.FBblocked = false
-            self.webView.configuration.userContentController.remove(ruleList!)
-            replyHandler(true)
-        }
+        replyHandler(true)
     }
 }
 
