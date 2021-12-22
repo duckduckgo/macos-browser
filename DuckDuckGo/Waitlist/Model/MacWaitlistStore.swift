@@ -34,14 +34,22 @@ final class MacWaitlistEncryptedFileStorage: MacWaitlistStore {
 
     private let containerURL: URL
     private let statisticsStore: StatisticsStore
+    private let historyStore: HistoryStoring
+    private let pixelStore: PixelDataStore
     
-    init(containerURL: URL = .sandboxApplicationSupportURL, statisticsStore: StatisticsStore = LocalStatisticsStore()) {
+    init(containerURL: URL = .sandboxApplicationSupportURL,
+         statisticsStore: StatisticsStore = LocalStatisticsStore(),
+         historyStore: HistoryStoring = HistoryStore(),
+         pixelStore: PixelDataStore = LocalPixelDataStore.shared) {
         self.containerURL = containerURL
         self.statisticsStore = statisticsStore
+        self.historyStore = historyStore
+        self.pixelStore = pixelStore
     }
     
     func isExistingInstall() -> Bool {
-        return statisticsStore.hasCurrentOrDeprecatedInstallStatistics
+        let isFirstLaunch = Pixel.Event.AppLaunch.repetition(store: pixelStore, now: Date()).value == .initial
+        return statisticsStore.hasCurrentOrDeprecatedInstallStatistics || historyStore.hasHistoryEntries() || !isFirstLaunch
     }
     
     func isUnlocked() -> Bool {

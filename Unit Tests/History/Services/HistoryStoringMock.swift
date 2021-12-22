@@ -65,5 +65,12 @@ final class HistoryStoringMock: HistoryStoring {
             promise(.success(()))
         }
     }
+    
+    var hasHistoryEntriesCalled = false
+    var hasHistory = false
+    func hasHistoryEntries() -> Bool {
+        hasHistoryEntriesCalled = true
+        return hasHistory
+    }
 
 }

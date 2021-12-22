@@ -26,6 +26,7 @@ protocol HistoryStoring {
     func cleanOld(until date: Date) -> Future<History, Error>
     func removeEntries(_ entries: [HistoryEntry]) -> Future<History, Error>
     func save(entry: HistoryEntry) -> Future<Void, Error>
+    func hasHistoryEntries() -> Bool
 
 }
 
@@ -81,6 +82,24 @@ final class HistoryStore: HistoryStoring {
                 }
             }
         }
+    }
+    
+    // Only used as a part of the lock screen migration check. When the browser is public and the lock screen is removed
+    // from the codebase, this can be removed too.
+    func hasHistoryEntries() -> Bool {
+        var hasHistory = false
+
+        context.performAndWait {
+            do {
+                let historyFetchRequest = NSFetchRequest<NSFetchRequestResult>(entityName: HistoryEntryManagedObject.className())
+                let count = try context.count(for: historyFetchRequest)
+                hasHistory = (count != 0)
+            } catch {
+                // Do nothing, `hasHistory` will remain false
+            }
+        }
+        
+        return hasHistory
     }
 
     private func remove(_ identifiers: [UUID], context: NSManagedObjectContext) -> Result<Void, Error> {

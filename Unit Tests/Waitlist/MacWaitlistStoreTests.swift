@@ -21,9 +21,15 @@ import XCTest
 
 class MacWaitlistStoreTests: XCTestCase {
     
+    var mockHistoryStore = HistoryStoringMock()
+    var mockPixelStore = PixelStoreMock()
+    
     override func setUp() {
         super.setUp()
         UserDefaultsWrapper<Any>.clearAll()
+        
+        mockHistoryStore = HistoryStoringMock()
+        mockPixelStore = PixelStoreMock()
     }
     
     override func tearDown() {
@@ -32,31 +38,31 @@ class MacWaitlistStoreTests: XCTestCase {
     }
 
     func testWhenNoInstallStatisticsAreFound_ThenTheAppIsNotAnExistingInstall() {
-        let mockStatisticsStore = mockStatisticsStore()
-        let store = MacWaitlistEncryptedFileStorage(statisticsStore: mockStatisticsStore)
+        let mockStatisticsStore = LocalStatisticsStore(pixelDataStore: mockPixelStore)
+        let store = MacWaitlistEncryptedFileStorage(statisticsStore: mockStatisticsStore, historyStore: mockHistoryStore, pixelStore: mockPixelStore)
         
         XCTAssertFalse(store.isExistingInstall())
     }
     
     func testWhenInstallStatisticsAreFound_ThenTheAppIsAnExistingInstall() {
-        let mockStatisticsStore = mockStatisticsStore()
+        let mockStatisticsStore = LocalStatisticsStore(pixelDataStore: mockPixelStore)
         mockStatisticsStore.atb = "atb"
 
-        let store = MacWaitlistEncryptedFileStorage(statisticsStore: mockStatisticsStore)
+        let store = MacWaitlistEncryptedFileStorage(statisticsStore: mockStatisticsStore, historyStore: mockHistoryStore, pixelStore: mockPixelStore)
         
         XCTAssertTrue(store.isExistingInstall())
     }
     
     func testWhenStoreDoesNotHaveInstallMetadata_ThenIsUnlockedReturnsFalse() {
-        let mockStatisticsStore = mockStatisticsStore()
-        let store = MacWaitlistEncryptedFileStorage(statisticsStore: mockStatisticsStore)
+        let mockStatisticsStore = LocalStatisticsStore(pixelDataStore: mockPixelStore)
+        let store = MacWaitlistEncryptedFileStorage(statisticsStore: mockStatisticsStore, historyStore: mockHistoryStore, pixelStore: mockPixelStore)
         
         XCTAssertFalse(store.isUnlocked())
     }
     
     func testWhenStoreHasInstallMetadata_ThenIsUnlockedReturnsTrue() {
-        let mockStatisticsStore = mockStatisticsStore()
-        let store = MacWaitlistEncryptedFileStorage(statisticsStore: mockStatisticsStore)
+        let mockStatisticsStore = LocalStatisticsStore(pixelDataStore: mockPixelStore)
+        let store = MacWaitlistEncryptedFileStorage(statisticsStore: mockStatisticsStore, historyStore: mockHistoryStore, pixelStore: mockPixelStore)
         
         store.unlock()
 
@@ -64,8 +70,8 @@ class MacWaitlistStoreTests: XCTestCase {
     }
 
     func testWhenStoreUnlocks_ThenMetadataIsStoredToDisk() {
-        let mockStatisticsStore = mockStatisticsStore()
-        let store = MacWaitlistEncryptedFileStorage(statisticsStore: mockStatisticsStore)
+        let mockStatisticsStore = LocalStatisticsStore(pixelDataStore: mockPixelStore)
+        let store = MacWaitlistEncryptedFileStorage(statisticsStore: mockStatisticsStore, historyStore: mockHistoryStore, pixelStore: mockPixelStore)
         
         XCTAssertFalse(mockStatisticsStore.waitlistUpgradeCheckComplete)
         XCTAssertFalse(mockStatisticsStore.waitlistUnlocked)
@@ -75,8 +81,8 @@ class MacWaitlistStoreTests: XCTestCase {
     }
     
     func testWhenStoreDeletesMetadata_ThenMetadataIsRemoved() {
-        let mockStatisticsStore = mockStatisticsStore()
-        let store = MacWaitlistEncryptedFileStorage(statisticsStore: mockStatisticsStore)
+        let mockStatisticsStore = LocalStatisticsStore(pixelDataStore: mockPixelStore)
+        let store = MacWaitlistEncryptedFileStorage(statisticsStore: mockStatisticsStore, historyStore: mockHistoryStore, pixelStore: mockPixelStore)
         
         store.unlock()
         XCTAssertTrue(mockStatisticsStore.waitlistUpgradeCheckComplete)
@@ -88,10 +94,10 @@ class MacWaitlistStoreTests: XCTestCase {
     }
     
     func testWhenUnlockingExistingInstall_And_ATBIsSet_ThenInstallIsUnlocked() {
-        let mockStatisticsStore = mockStatisticsStore()
+        let mockStatisticsStore = LocalStatisticsStore(pixelDataStore: mockPixelStore)
         mockStatisticsStore.atb = "atb"
 
-        let store = MacWaitlistEncryptedFileStorage(statisticsStore: mockStatisticsStore)
+        let store = MacWaitlistEncryptedFileStorage(statisticsStore: mockStatisticsStore, historyStore: mockHistoryStore, pixelStore: mockPixelStore)
         
         store.unlockExistingInstallIfNecessary()
         
@@ -102,8 +108,8 @@ class MacWaitlistStoreTests: XCTestCase {
         var legacyStore = LocalStatisticsStore.LegacyStatisticsStore()
         legacyStore.atb = "atb"
 
-        let mockStatisticsStore = mockStatisticsStore()
-        let store = MacWaitlistEncryptedFileStorage(statisticsStore: mockStatisticsStore)
+        let mockStatisticsStore = LocalStatisticsStore(pixelDataStore: mockPixelStore)
+        let store = MacWaitlistEncryptedFileStorage(statisticsStore: mockStatisticsStore, historyStore: mockHistoryStore, pixelStore: mockPixelStore)
         
         store.unlockExistingInstallIfNecessary()
         
@@ -111,8 +117,8 @@ class MacWaitlistStoreTests: XCTestCase {
     }
     
     func testWhenUnlockingExistingInstall_And_ATBIsNotSet_ThenInstallRemainsLocked() {
-        let mockStatisticsStore = mockStatisticsStore()
-        let store = MacWaitlistEncryptedFileStorage(statisticsStore: mockStatisticsStore)
+        let mockStatisticsStore = LocalStatisticsStore(pixelDataStore: mockPixelStore)
+        let store = MacWaitlistEncryptedFileStorage(statisticsStore: mockStatisticsStore, historyStore: mockHistoryStore, pixelStore: mockPixelStore)
         
         store.unlockExistingInstallIfNecessary()
         
@@ -120,9 +126,9 @@ class MacWaitlistStoreTests: XCTestCase {
     }
     
     func testWhenUnlockingExistingInstall_AndATBIsNotSet_AndATBIsLaterSet_ThenInstallRemainsLocked() {
-        let mockStatisticsStore = mockStatisticsStore()
+        let mockStatisticsStore = LocalStatisticsStore(pixelDataStore: mockPixelStore)
 
-        let store = MacWaitlistEncryptedFileStorage(statisticsStore: mockStatisticsStore)
+        let store = MacWaitlistEncryptedFileStorage(statisticsStore: mockStatisticsStore, historyStore: mockHistoryStore, pixelStore: mockPixelStore)
         store.unlockExistingInstallIfNecessary()
         XCTAssertFalse(store.isUnlocked())
         
@@ -137,9 +143,29 @@ class MacWaitlistStoreTests: XCTestCase {
         XCTAssertTrue(store.isUnlocked())
     }
     
-    private func mockStatisticsStore() -> StatisticsStore {
-        let pixelStore = PixelStoreMock()
-        return LocalStatisticsStore(pixelDataStore: pixelStore)
+    func testWhenUnlockingExistingInstall_AndATBIsNotSet_AndHistoryDoesNotExist_ThenInstallIsUnlocked() {
+        let mockStatisticsStore = LocalStatisticsStore(pixelDataStore: mockPixelStore)
+        mockHistoryStore.hasHistory = false
+        
+        let store = MacWaitlistEncryptedFileStorage(statisticsStore: mockStatisticsStore, historyStore: mockHistoryStore, pixelStore: mockPixelStore)
+        
+        XCTAssertFalse(store.isUnlocked())
+        store.unlockExistingInstallIfNecessary()
+        XCTAssertFalse(store.isUnlocked())
+        XCTAssertTrue(mockHistoryStore.hasHistoryEntriesCalled)
+    }
+    
+    func testWhenUnlockingExistingInstall_AndATBIsNotSet_AndHistoryExists_ThenInstallIsUnlocked() {
+        let mockStatisticsStore = LocalStatisticsStore(pixelDataStore: mockPixelStore)
+        let mockHistoryStore = HistoryStoringMock()
+        mockHistoryStore.hasHistory = true
+        
+        let store = MacWaitlistEncryptedFileStorage(statisticsStore: mockStatisticsStore, historyStore: mockHistoryStore, pixelStore: mockPixelStore)
+        
+        XCTAssertFalse(store.isUnlocked())
+        store.unlockExistingInstallIfNecessary()
+        XCTAssertTrue(store.isUnlocked())
+        XCTAssertTrue(mockHistoryStore.hasHistoryEntriesCalled)
     }
     
 }
