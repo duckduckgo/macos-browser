@@ -151,8 +151,6 @@ final class Tab: NSObject {
     
     var FBblocked = true
     
-    var FBblockingRules: WKContentRuleList? = nil
-
     @Published private(set) var content: TabContent {
         didSet {
             handleFavicon(oldContent: oldValue)
@@ -306,8 +304,13 @@ final class Tab: NSObject {
         guard !self.FBblocked else {
             return
         }
-        self.FBblocked = true
-        self.webView.configuration.userContentController.add(self.FBblockingRules!)
+
+        if let fbRules = contentBlockingManager.currentRules.first(where: { $0.name == "fb" }) {
+            self.FBblocked = true
+            webView.configuration.userContentController.add(fbRules.rulesList)
+        } else {
+            assertionFailure("Missing FB List")
+        }
     }
 
     private func reloadIfNeeded(shouldLoadInBackground: Bool = false) {
@@ -637,7 +640,8 @@ extension Tab: ClickToLoadUserScriptDelegate {
             return
         }
         
-        if let fbRules = contentBlockingManager.currentRules.first(where: { $0.name == "" }) {
+        if let fbRules = contentBlockingManager.currentRules.first(where: { $0.name == "fb" }) {
+            self.FBblocked = false
             webView.configuration.userContentController.remove(fbRules.rulesList)
         } else {
             assertionFailure("Missing FB List")
