@@ -152,6 +152,28 @@ final class HistoryStoreTests: XCTestCase {
 
         waitForExpectations(timeout: 1, handler: nil)
     }
+    
+    func testWhenHistoryStoreHasNoEntries_ThenHasHistoryEntriesReturnsFalse() {
+        let container = NSPersistentContainer.createInMemoryPersistentContainer(modelName: "History", bundle: Bundle(for: type(of: self)))
+        let context = container.viewContext
+        let historyStore = HistoryStore(context: context)
+        
+        XCTAssertFalse(historyStore.hasHistoryEntries())
+    }
+    
+    func testWhenHistoryStoreHasEntries_ThenHasHistoryEntriesReturnsTrue() {
+        let container = NSPersistentContainer.createInMemoryPersistentContainer(modelName: "History", bundle: Bundle(for: type(of: self)))
+        let context = container.viewContext
+        let historyStore = HistoryStore(context: context)
+
+        let historyEntry = HistoryEntry(identifier: UUID(), url: URL.duckDuckGo, title: "Test", numberOfVisits: 1, lastVisit: Date())
+        let savingExpectation = self.expectation(description: "Saving")
+        save(entry: historyEntry, historyStore: historyStore, expectation: savingExpectation)
+        
+        waitForExpectations(timeout: 1, handler: nil)
+        
+        XCTAssertTrue(historyStore.hasHistoryEntries())
+    }
 
 }
 
