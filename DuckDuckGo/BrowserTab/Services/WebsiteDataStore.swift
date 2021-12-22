@@ -70,9 +70,15 @@ internal class WebCacheManager {
             return
         }
 
-        for dirName in ["WebKit", "fsCachedData"] {
-            try? fm.moveItem(at: cachesDir.appendingPathComponent(dirName), to: tmpDir.appendingPathComponent(dirName))
+        let contents = try? fm.contentsOfDirectory(atPath: cachesDir.path)
+        for name in contents ?? [] {
+            guard ["WebKit", "fsCachedData"].contains(name) || name.hasPrefix("Cache.") else { continue }
+            try? fm.moveItem(at: cachesDir.appendingPathComponent(name), to: tmpDir.appendingPathComponent(name))
         }
+
+        try? fm.createDirectory(at: cachesDir.appendingPathComponent("WebKit"),
+                                withIntermediateDirectories: false,
+                                attributes: nil)
 
         Process("/bin/rm", "-rf", tmpDir.path).launch()
     }
