@@ -26,23 +26,23 @@ final class PermissionStoreTests: XCTestCase {
     lazy var store = LocalPermissionStore(context: container.viewContext)
 
     func testWhenPermissionIsAddedThenItMustBeLoadedFromStore() throws {
-        let stored = try store.add(domain: "duckduckgo.com", permissionType: .camera, allow: true)
-        XCTAssertTrue(stored.allow)
+        let stored = try store.add(domain: "duckduckgo.com", permissionType: .camera, decision: .allow)
+        XCTAssertEqual(stored.decision, .allow)
 
         let permissions = try store.loadPermissions()
-        XCTAssertEqual(permissions, [.init(permission: StoredPermission(id: stored.id, allow: true),
+        XCTAssertEqual(permissions, [.init(permission: StoredPermission(id: stored.id, decision: .allow),
                                            domain: "duckduckgo.com",
                                            type: .camera)])
     }
 
     func testWhenPermissionIsRemovedThenItShouldntBeLoadedFromStore() throws {
-        let stored1 = try store.add(domain: "duckduckgo.com", permissionType: .microphone, allow: true)
-        let stored2 = try store.add(domain: "otherdomain.com", permissionType: .geolocation, allow: false)
+        let stored1 = try store.add(domain: "duckduckgo.com", permissionType: .microphone, decision: .allow)
+        let stored2 = try store.add(domain: "otherdomain.com", permissionType: .geolocation, decision: .deny)
 
         let e = expectation(description: "object removed")
         store.remove(objectWithId: stored2.id) { [store] _ in
             let permissions = try? store.loadPermissions()
-            XCTAssertEqual(permissions, [.init(permission: StoredPermission(id: stored1.id, allow: true),
+            XCTAssertEqual(permissions, [.init(permission: StoredPermission(id: stored1.id, decision: .allow),
                                                domain: "duckduckgo.com",
                                                type: .microphone)])
             e.fulfill()
@@ -51,16 +51,16 @@ final class PermissionStoreTests: XCTestCase {
     }
 
     func testWhenPermissionIsUpdatedThenIstLoadedWithNewValue() throws {
-        let stored1 = try store.add(domain: "duckduckgo.com", permissionType: .microphone, allow: true)
-        let stored2 = try store.add(domain: "otherdomain.com", permissionType: .geolocation, allow: true)
+        let stored1 = try store.add(domain: "duckduckgo.com", permissionType: .microphone, decision: .allow)
+        let stored2 = try store.add(domain: "otherdomain.com", permissionType: .geolocation, decision: .allow)
 
         let e = expectation(description: "object removed")
-        store.update(objectWithId: stored2.id, allow: false) { [store] _ in
+        store.update(objectWithId: stored2.id, decision: .deny) { [store] _ in
             let permissions = try? store.loadPermissions()
-            XCTAssertEqual(permissions, [.init(permission: StoredPermission(id: stored1.id, allow: true),
+            XCTAssertEqual(permissions, [.init(permission: StoredPermission(id: stored1.id, decision: .allow),
                                                domain: "duckduckgo.com",
                                                type: .microphone),
-                                         .init(permission: StoredPermission(id: stored2.id, allow: false),
+                                         .init(permission: StoredPermission(id: stored2.id, decision: .deny),
                                                                             domain: "otherdomain.com",
                                                                             type: .geolocation)])
             e.fulfill()
@@ -69,10 +69,10 @@ final class PermissionStoreTests: XCTestCase {
     }
 
     func testWhenPermissionsAreClearedThenOnlyExceptionsRemain() throws {
-        let stored1 = try store.add(domain: "duckduckgo.com", permissionType: .microphone, allow: true)
-        _=try store.add(domain: "otherdomain.com", permissionType: .geolocation, allow: true)
-        let stored3 = try store.add(domain: "wikipedia.org", permissionType: .camera, allow: false)
-        _=try store.add(domain: "permission.site", permissionType: .microphone, allow: false)
+        let stored1 = try store.add(domain: "duckduckgo.com", permissionType: .microphone, decision: .allow)
+        _=try store.add(domain: "otherdomain.com", permissionType: .geolocation, decision: .allow)
+        let stored3 = try store.add(domain: "wikipedia.org", permissionType: .camera, decision: .deny)
+        _=try store.add(domain: "permission.site", permissionType: .microphone, decision: .deny)
 
         let e = expectation(description: "store cleared")
         store.clear(except: [stored1, stored3]) { [store] error in
@@ -80,10 +80,10 @@ final class PermissionStoreTests: XCTestCase {
 
             let permissions = try! store.loadPermissions() // swiftlint:disable:this force_try
 
-            XCTAssertEqual(permissions, [.init(permission: StoredPermission(id: stored1.id, allow: true),
+            XCTAssertEqual(permissions, [.init(permission: StoredPermission(id: stored1.id, decision: .allow),
                                                domain: "duckduckgo.com",
                                                type: .microphone),
-                                         .init(permission: StoredPermission(id: stored3.id, allow: false),
+                                         .init(permission: StoredPermission(id: stored3.id, decision: .deny),
                                                                             domain: "wikipedia.org",
                                                                             type: .camera)])
 
