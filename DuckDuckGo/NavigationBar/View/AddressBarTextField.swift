@@ -782,9 +782,25 @@ extension AddressBarTextField: SuggestionViewControllerDelegate {
 }
 
 extension AddressBarTextField: NSTextViewDelegate {
+
     func textView(_ textView: NSTextView, willChangeSelectionFromCharacterRange _: NSRange, toCharacterRange range: NSRange) -> NSRange {
         return self.filterSuffix(fromSelectionRange: range, for: textView.string)
     }
+
+    func textView(_ view: NSTextView, menu: NSMenu, for event: NSEvent, at charIndex: Int) -> NSMenu? {
+        return removingAttributeChangingMenuItems(from: menu)
+    }
+
+    private func removingAttributeChangingMenuItems(from menu: NSMenu) -> NSMenu {
+        menu.items.reversed().forEach { menuItem in
+            if menuItem.action == Selector(("_makeLinkFromMenu:")) ||
+                menuItem.submenu?.item(at: 0)?.action == #selector(NSFontManager.orderFrontFontPanel(_:)) {
+                menu.removeItem(menuItem)
+            }
+        }
+        return menu
+    }
+
 }
 
 final class AddressBarTextEditor: NSTextView {
