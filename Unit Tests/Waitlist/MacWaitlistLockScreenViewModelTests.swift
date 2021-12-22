@@ -26,7 +26,7 @@ class MacWaitlistLockScreenViewModelTests: XCTestCase {
     
     func testWhenInitializingTheViewModel_ThenStateEqualsRequiresUnlock() {
         let mockStatisticsStore = MockStatisticsStore()
-        let mockStore = MacWaitlistEncryptedFileStorage(statisticsStore: mockStatisticsStore)
+        let mockStore = MacWaitlistEncryptedFileStorage(statisticsStore: mockStatisticsStore, pixelStore: PixelStoreMock())
         let mockRequest = MockWaitlistRequest(returnedResult: .success(successResponse))
         let viewModel = MacWaitlistLockScreenViewModel(store: mockStore, waitlistRequest: mockRequest)
         
@@ -35,7 +35,7 @@ class MacWaitlistLockScreenViewModelTests: XCTestCase {
     
     func testWhenCallingUnlock_ThenStateEqualsUnlockRequestInFlight() {
         let mockStatisticsStore = MockStatisticsStore()
-        let mockStore = MacWaitlistEncryptedFileStorage(statisticsStore: mockStatisticsStore)
+        let mockStore = MacWaitlistEncryptedFileStorage(statisticsStore: mockStatisticsStore, pixelStore: PixelStoreMock())
         let mockRequest = MockWaitlistRequest(returnedResult: nil)
         let viewModel = MacWaitlistLockScreenViewModel(store: mockStore, waitlistRequest: mockRequest)
         
@@ -46,7 +46,7 @@ class MacWaitlistLockScreenViewModelTests: XCTestCase {
     
     func testWhenCallingUnlockTwice_ThenSecondCallIsIgnored() {
         let mockStatisticsStore = MockStatisticsStore()
-        let mockStore = MacWaitlistEncryptedFileStorage(statisticsStore: mockStatisticsStore)
+        let mockStore = MacWaitlistEncryptedFileStorage(statisticsStore: mockStatisticsStore, pixelStore: PixelStoreMock())
         let mockRequest = MockWaitlistRequest(returnedResult: nil)
         let viewModel = MacWaitlistLockScreenViewModel(store: mockStore, waitlistRequest: mockRequest)
         
@@ -59,7 +59,7 @@ class MacWaitlistLockScreenViewModelTests: XCTestCase {
     
     func testWhenCallingUnlock_AndResponseIsSuccessful_ThenStateEqualsUnlockSuccess() {
         let mockStatisticsStore = MockStatisticsStore()
-        let mockStore = MacWaitlistEncryptedFileStorage(statisticsStore: mockStatisticsStore)
+        let mockStore = MacWaitlistEncryptedFileStorage(statisticsStore: mockStatisticsStore, pixelStore: PixelStoreMock())
         let mockRequest = MockWaitlistRequest(returnedResult: .success(successResponse))
         let viewModel = MacWaitlistLockScreenViewModel(store: mockStore, waitlistRequest: mockRequest)
         
@@ -70,7 +70,7 @@ class MacWaitlistLockScreenViewModelTests: XCTestCase {
     
     func testWhenCallingUnlock_AndResponseIsUnsucessful_ThenStateEqualsUnlockFailure() {
         let mockStatisticsStore = MockStatisticsStore()
-        let mockStore = MacWaitlistEncryptedFileStorage(statisticsStore: mockStatisticsStore)
+        let mockStore = MacWaitlistEncryptedFileStorage(statisticsStore: mockStatisticsStore, pixelStore: PixelStoreMock())
         let mockRequest = MockWaitlistRequest(returnedResult: .failure(.redemptionError))
         let viewModel = MacWaitlistLockScreenViewModel(store: mockStore, waitlistRequest: mockRequest)
         
@@ -80,8 +80,8 @@ class MacWaitlistLockScreenViewModelTests: XCTestCase {
     }
     
     func testWhenCallingUnlock_AndResponseIsSuccessful_ButStatusMessageDoesNotMatch_ThenStateEqualsUnlockSuccess() {
-        let mockStatisticsStore = MockStatisticsStore()
-        let mockStore = MacWaitlistEncryptedFileStorage(statisticsStore: mockStatisticsStore)
+        let mockStatisticsStore = LocalStatisticsStore(pixelDataStore: PixelStoreMock())
+        let mockStore = MacWaitlistEncryptedFileStorage(statisticsStore: mockStatisticsStore, pixelStore: PixelStoreMock())
         let almostSuccessResponse = MacWaitlistRedeemSuccessResponse(status: "invalid_message")
         let mockRequest = MockWaitlistRequest(returnedResult: .success(almostSuccessResponse))
         let viewModel = MacWaitlistLockScreenViewModel(store: mockStore, waitlistRequest: mockRequest)
