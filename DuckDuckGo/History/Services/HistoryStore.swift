@@ -90,13 +90,9 @@ final class HistoryStore: HistoryStoring {
         var hasHistory = false
 
         context.performAndWait {
-            do {
-                let historyFetchRequest = NSFetchRequest<NSFetchRequestResult>(entityName: HistoryEntryManagedObject.className())
-                let count = try context.count(for: historyFetchRequest)
-                hasHistory = (count != 0)
-            } catch {
-                // Do nothing, `hasHistory` will remain false
-            }
+            let historyFetchRequest = NSFetchRequest<NSFetchRequestResult>(entityName: HistoryEntryManagedObject.className())
+            let count = (try? context.count(for: historyFetchRequest)) ?? 0
+            hasHistory = (count != 0)
         }
         
         return hasHistory
