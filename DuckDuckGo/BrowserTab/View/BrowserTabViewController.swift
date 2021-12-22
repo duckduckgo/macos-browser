@@ -309,6 +309,16 @@ final class BrowserTabViewController: NSViewController {
 
 extension BrowserTabViewController: TabDelegate {
 
+    func tabWillStartNavigation(_ tab: Tab, isUserInitiated: Bool) {
+        if isUserInitiated,
+           let window = self.view.window,
+           window.isPopUpWindow == true,
+           window.isKeyWindow == false {
+
+            window.makeKeyAndOrderFront(nil)
+        }
+    }
+
 	func tab(_ tab: Tab, requestedOpenExternalURL url: URL, forUserEnteredURL userEntered: Bool) {
         guard let window = self.view.window else {
             os_log("%s: Window is nil", type: .error, className)

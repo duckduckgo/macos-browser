@@ -23,6 +23,7 @@ import Combine
 import BrowserServicesKit
 
 protocol TabDelegate: FileDownloadManagerDelegate {
+    func tabWillStartNavigation(_ tab: Tab, isUserInitiated: Bool)
     func tabDidStartNavigation(_ tab: Tab)
     func tab(_ tab: Tab, requestedNewTabWith content: Tab.TabContent, selected: Bool)
     func tab(_ tab: Tab, willShowContextMenuAt position: NSPoint, image: URL?, link: URL?, selectedText: String?)
@@ -727,6 +728,7 @@ extension Tab: WKNavigationDelegate {
         }
 
         guard let url = navigationAction.request.url, let urlScheme = url.scheme else {
+            self.willPerformNavigationAction(navigationAction)
             decisionHandler(.allow)
             return
         }
@@ -751,8 +753,12 @@ extension Tab: WKNavigationDelegate {
         }
 
         HTTPSUpgrade.shared.isUpgradeable(url: url) { [weak self] isUpgradable in
-            if let self = self,
-               isUpgradable && navigationAction.isTargetingMainFrame,
+            guard let self = self else {
+                decisionHandler(.cancel)
+                return
+            }
+
+            if isUpgradable && navigationAction.isTargetingMainFrame,
                 let upgradedUrl = url.toHttps() {
 
                 self.invalidateBackItemIfNeeded(for: navigationAction)
@@ -762,11 +768,18 @@ extension Tab: WKNavigationDelegate {
                 return
             }
 
+            self.willPerformNavigationAction(navigationAction)
             decisionHandler(.allow)
         }
     }
     // swiftlint:enable cyclomatic_complexity
     // swiftlint:enable function_body_length
+
+    private func willPerformNavigationAction(_ navigationAction: WKNavigationAction) {
+        if navigationAction.isTargetingMainFrame {
+            delegate?.tabWillStartNavigation(self, isUserInitiated: navigationAction.isUserInitiated)
+        }
+    }
 
     private func invalidateBackItemIfNeeded(for navigationAction: WKNavigationAction) {
         guard let url = navigationAction.request.url,
