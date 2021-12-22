@@ -245,7 +245,7 @@ extension Pixel.Event {
             return "m_mac_onboarding_setdefault_skipped"
 
         case .onboardingTypingSkipped:
-            return "m_mac_onboarding_setdefault_skipped"
+            return "m_mac_onboarding_typing_skipped"
 
         }
     }
