@@ -658,6 +658,18 @@ CQ
                                                 <action selector="resetSecureVaultData:" target="Ady-hI-5gd" id="5uS-MI-2BN"/>
                                             </connections>
                                         </menuItem>
+                                        <menuItem title="Reset Mac Waitlist Lock Screen" id="jXH-IC-kHl">
+                                            <modifierMask key="keyEquivalentModifierMask"/>
+                                            <connections>
+                                                <action selector="resetMacWaitlistUnlockState:" target="Ady-hI-5gd" id="1Bd-q4-0F9"/>
+                                            </connections>
+                                        </menuItem>
+                                        <menuItem title="Set Fake User Defaults ATB Values" id="tjI-pj-o1j">
+                                            <modifierMask key="keyEquivalentModifierMask"/>
+                                            <connections>
+                                                <action selector="setFakeUserDefaultsATBValues:" target="Ady-hI-5gd" id="Bn7-nE-crD"/>
+                                            </connections>
+                                        </menuItem>
                                         <menuItem title="Fatal Error" id="FeS-hb-rvM" userLabel="Reset Default Browser Prompt">
                                             <modifierMask key="keyEquivalentModifierMask"/>
                                             <connections>
@@ -707,9 +719,13 @@ CQ
                             <outlet property="helpMenuItem" destination="wpr-3q-Mcd" id="PSe-Hj-hck"/>
                             <outlet property="helpSeparatorMenuItem" destination="ESk-wA-tC4" id="XV6-OM-YLi"/>
                             <outlet property="homeMenuItem" destination="FPm-eZ-BQ8" id="Taj-EN-6R8"/>
+                            <outlet property="importBookmarksMenuItem" destination="tNX-Bv-yM3" id="NI1-on-lCU"/>
+                            <outlet property="importBrowserDataMenuItem" destination="gTV-od-6G5" id="2R0-Pa-qG4"/>
+                            <outlet property="manageBookmarksMenuItem" destination="BaO-sP-wbQ" id="rn7-HX-04s"/>
                             <outlet property="newTabMenuItem" destination="9qI-62-tsd" id="6SI-rG-P34"/>
                             <outlet property="newWindowMenuItem" destination="Was-JA-tGl" id="uyQ-qR-DFk"/>
                             <outlet property="openLocationMenuItem" destination="xnU-dQ-JR1" id="DYS-Dt-ydU"/>
+                            <outlet property="preferencesMenuItem" destination="BOF-NM-1cW" id="wju-ps-laD"/>
                             <outlet property="printMenuItem" destination="uFk-FD-FTB" id="mOP-Xp-myS"/>
                             <outlet property="printSeparatorItem" destination="anH-0y-7dE" id="E6b-rl-clQ"/>
                             <outlet property="reloadMenuItem" destination="aKZ-VG-MOp" id="J3D-X3-Xg3"/>

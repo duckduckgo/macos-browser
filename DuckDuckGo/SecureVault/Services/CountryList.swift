@@ -20,9 +20,13 @@ import Foundation
 
 struct CountryList {
 
-    struct Country: Hashable {
+    struct Country: Identifiable {
+        let id: String
         let name: String
-        let countryCode: String
+        
+        var countryCode: String {
+            return id
+        }
     }
 
     static let countries: [Country] = {
@@ -33,10 +37,13 @@ struct CountryList {
                 return nil
             }
 
-            return Country(name: name, countryCode: code)
+            return Country(id: code, name: name)
         }
 
-        return countries
+        return countries.sorted { first, second in
+            let result = first.name.caseInsensitiveCompare(second.name)
+            return result == .orderedAscending
+        }
     }()
 
     static func name(forCountryCode code: String?) -> String? {
