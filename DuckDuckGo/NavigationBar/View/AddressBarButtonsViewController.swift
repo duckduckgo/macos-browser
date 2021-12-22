@@ -622,7 +622,9 @@ final class AddressBarButtonsViewController: NSViewController {
             !isHypertextUrl ||
             selectedTabViewModel.errorViewState.isVisible ||
             isTextFieldValueText
-        imageButtonWrapper.isHidden = !privacyEntryPointButton.isHidden || isAnyTrackerAnimationPlaying
+        imageButtonWrapper.isHidden = view.window?.isPopUpWindow == true
+            || !privacyEntryPointButton.isHidden
+            || isAnyTrackerAnimationPlaying
     }
 
     private func updatePrivacyEntryPointIcon() {
