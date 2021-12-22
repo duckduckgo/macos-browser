@@ -721,7 +721,6 @@
          if (widgetData.replaceSettings.type === 'loginButton') {
              window.webkit.messageHandlers.getImage.postMessage(widgetData.replaceSettings.icon).then((icon) => {
                  // TODO shortcircuit and below
-                 console.log('Postmessage icon', icon)
                  // Create a button to replace old element
                  const { button, container } = makeLoginButton(widgetData.replaceSettings.buttonText, widget.getMode(), widgetData.replaceSettings.popupTitleText, widgetData.replaceSettings.popupBodyText, icon, originalElement)
                  button.addEventListener('click', widget.clickFunction(originalElement, container))
@@ -791,19 +790,16 @@
 
      // Fetch reusable assets
      window.webkit.messageHandlers.getImage.postMessage('loading_light.svg').then((response) => {
-         console.log('Postmessage icon', response)
          loadingImages.lightMode = response
      })
     .catch((e) => console.log('messageHandler exception', e))
 
      window.webkit.messageHandlers.getImage.postMessage('loading_dark.svg').then((response) => {
-         console.log('Postmessage icon', response)
          loadingImages.darkMode = response
      })
     .catch((e) => console.log('messageHandler exception', e))
 
      window.webkit.messageHandlers.getImage.postMessage('dax.png').then((response) => {
-         console.log('Postmessage icon', response)
          logoImg = response
      })
     .catch((e) => console.log('messageHandler exception', e))
@@ -963,7 +959,6 @@
      function makeModal (entity, acceptFunction, ...acceptFunctionParams) {
          window.webkit.messageHandlers.getImage.postMessage(entityData[entity].modalIcon).then((icon) => {
              // TODO short circuit this
-             console.log('Postmessage icon', icon)
              const modalContainer = document.createElement('div')
              modalContainer.style.cssText = styles.modalContainer
              const pageOverlay = document.createElement('div')

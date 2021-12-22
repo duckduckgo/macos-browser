@@ -78,6 +78,6 @@ final class ClickToLoadUserScript: NSObject, UserScript, WKScriptMessageHandlerW
     }
     
     func userContentController(_ userContentController: WKUserContentController, didReceive message: WKScriptMessage) {
-        print("SHOULDN'T BE HERE!")
+        assertionFailure("SHOULDN'T BE HERE!")
     }
 }

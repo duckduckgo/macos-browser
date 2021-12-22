@@ -37,9 +37,8 @@ final class ContentBlockerRulesLists: DefaultContentBlockerRulesListsSource {
             let additionalRulesList = ContentBlockerRulesList(name: "fb", trackerData: nil, fallbackTrackerData: dataSet)
     
             result.append(additionalRulesList)
-                    
         } catch {
-            print(error)
+            assertionFailure(error.localizedDescription)
         }
         return result
     }
