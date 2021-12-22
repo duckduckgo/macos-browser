@@ -48,7 +48,7 @@ final class MacWaitlistEncryptedFileStorage: MacWaitlistStore {
     }
     
     func isExistingInstall() -> Bool {
-        let isRepeatLaunch = Pixel.Event.AppLaunch.repetition(store: pixelStore, now: Date()).value == .repetitive
+        let isRepeatLaunch = [.repetitive, .dailyFirst].contains(Pixel.Event.AppLaunch.repetition(store: pixelStore).value)
         return statisticsStore.hasCurrentOrDeprecatedInstallStatistics || historyStore.hasHistoryEntries() || isRepeatLaunch
     }
     
