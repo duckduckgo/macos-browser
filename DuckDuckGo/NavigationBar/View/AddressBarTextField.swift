@@ -791,11 +791,19 @@ extension AddressBarTextField: NSTextViewDelegate {
         return removingAttributeChangingMenuItems(from: menu)
     }
 
+    private static var selectorsToRemove = [
+        Selector(("_makeLinkFromMenu:")),
+        Selector(("_searchWithGoogleFromMenu:")),
+        #selector(NSFontManager.orderFrontFontPanel(_:))
+    ]
+
     private func removingAttributeChangingMenuItems(from menu: NSMenu) -> NSMenu {
         menu.items.reversed().forEach { menuItem in
-            if menuItem.action == Selector(("_makeLinkFromMenu:")) ||
-                menuItem.submenu?.item(at: 0)?.action == #selector(NSFontManager.orderFrontFontPanel(_:)) {
-                menu.removeItem(menuItem)
+            if let action = menuItem.action {
+                if Self.selectorsToRemove.contains(action) { menu.removeItem(menuItem) }
+            }
+            if let submenuAction = menuItem.submenu?.item(at: 0)?.action {
+                if Self.selectorsToRemove.contains(submenuAction) { menu.removeItem(menuItem) }
             }
         }
         return menu
