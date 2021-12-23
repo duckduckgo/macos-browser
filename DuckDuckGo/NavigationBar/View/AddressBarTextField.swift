@@ -794,7 +794,12 @@ extension AddressBarTextField: NSTextViewDelegate {
     private static var selectorsToRemove = [
         Selector(("_makeLinkFromMenu:")),
         Selector(("_searchWithGoogleFromMenu:")),
-        #selector(NSFontManager.orderFrontFontPanel(_:))
+        #selector(NSFontManager.orderFrontFontPanel(_:)),
+        #selector(NSText.showGuessPanel(_:)),
+        Selector(("replaceQuotesInSelection:")),
+        #selector(NSStandardKeyBindingResponding.uppercaseWord(_:)),
+        #selector(NSTextView.startSpeaking(_:)),
+        #selector(NSTextView.changeLayoutOrientation(_:))
     ]
 
     private func removingAttributeChangingMenuItems(from menu: NSMenu) -> NSMenu {
@@ -802,8 +807,14 @@ extension AddressBarTextField: NSTextViewDelegate {
             if let action = menuItem.action {
                 if Self.selectorsToRemove.contains(action) { menu.removeItem(menuItem) }
             }
-            if let submenuAction = menuItem.submenu?.item(at: 0)?.action {
-                if Self.selectorsToRemove.contains(submenuAction) { menu.removeItem(menuItem) }
+            if let submenu = menuItem.submenu, submenu.items.first(where: { submenuItem in
+                if let submenuAction = submenuItem.action, Self.selectorsToRemove.contains(submenuAction) {
+                    return true
+                } else {
+                    return false
+                }
+            }) != nil {
+                menu.removeItem(menuItem)
             }
         }
         return menu
