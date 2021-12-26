@@ -35,10 +35,6 @@ final class FaviconReferenceCache {
     init(faviconQueue: DispatchQueue, faviconStoring: FaviconStoring) {
         storing = faviconStoring
         queue = faviconQueue
-
-//        queue.async {
-//            self.loadReferences()
-//        }
     }
 
     private(set) var loaded = false

@@ -61,7 +61,7 @@ final class HomepageCollectionViewItem: NSCollectionViewItem {
     func set(bookmarkViewModel: BookmarkViewModel) {
 
         if let bookmark = bookmarkViewModel.entity as? Bookmark {
-            if let favicon = bookmark.favicon(.medium) {
+            if let favicon = bookmark.favicon(.medium) ?? bookmark.favicon(.small) {
                 faviconImageView.image = favicon
                 faviconImageView.layer?.backgroundColor = NSColor.clear.cgColor
                 representingCharacterTextField.isHidden = true
