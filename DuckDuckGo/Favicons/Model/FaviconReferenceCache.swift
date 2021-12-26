@@ -108,6 +108,7 @@ final class FaviconReferenceCache {
     }
 
     private func insertToHostCache(faviconUrls: (smallFaviconUrl: URL?, mediumFaviconUrl: URL?), host: String, documentUrl: URL) {
+        //TODO: duplicates!?
         let hostReference = FaviconHostReference(identifier: UUID(),
                                               smallFaviconUrl: faviconUrls.smallFaviconUrl,
                                               mediumFaviconUrl: faviconUrls.mediumFaviconUrl,
@@ -130,6 +131,7 @@ final class FaviconReferenceCache {
     }
 
     private func insertToUrlCache(faviconUrls: (smallFaviconUrl: URL?, mediumFaviconUrl: URL?), documentUrl: URL) {
+        //TODO: duplicates!?
         let urlReference = FaviconUrlReference(identifier: UUID(),
                                              smallFaviconUrl: faviconUrls.smallFaviconUrl,
                                              mediumFaviconUrl: faviconUrls.mediumFaviconUrl,

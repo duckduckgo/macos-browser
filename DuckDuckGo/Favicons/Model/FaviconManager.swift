@@ -19,16 +19,11 @@
 import Cocoa
 import Combine
 
-// Update tech design
-// Product feedback request
-// Design Review
-// Privacy triage
-
 // TODOs
 // Synchronous favicon getting?
 // Burning
 // Selection of favicon links in FaviconSelector
-// Invalidating or better - redownloading if cache entry is old
+// Invalidating very old ones and redownloading after one week?
 
 protocol FaviconManagement {
 
