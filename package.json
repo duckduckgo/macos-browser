@@ -2,6 +2,7 @@
   "name": "macos-browser",
   "version": "1.0.0",
   "scripts": {
+    "rebuild": "rollup -c",
     "test": "npx eslint ."
   },
   "devDependencies": {
@@ -9,6 +10,7 @@
     "eslint-config-standard": "^16.0.3",
     "eslint-plugin-import": "^2.25.2",
     "eslint-plugin-node": "^11.1.0",
-    "eslint-plugin-promise": "^5.1.0"
+    "eslint-plugin-promise": "^5.1.0",
+    "rollup": "^2.61.1"
   }
 }

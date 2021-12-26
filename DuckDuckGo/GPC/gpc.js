@@ -17,41 +17,18 @@
 //  limitations under the License.
 //
 
+import { isUnprotectedDomain, parseNewLineList } from '../BrowserTab/Model/userScriptUtils.js'
+
 (function () {
-    function getTopLevelURL () {
-        try {
-            // FROM: https://stackoverflow.com/a/7739035/73479
-            // FIX: Better capturing of top level URL so that trackers in embedded documents are not considered first party
-            return new URL(window.location !== window.parent.location ? document.referrer : document.location.href)
-        } catch (error) {
-            return new URL(location.href)
-        }
-    }
+    const gpcEnabled = $GPC_ENABLED$
+    const featureList = parseNewLineList(`
+    $GPC_EXCEPTIONS$
+    `)
+    const userList = parseNewLineList(`
+    $USER_UNPROTECTED_DOMAINS$
+    `)
 
-    let gpcEnabled = $GPC_ENABLED$
-
-    const topLevelUrl = getTopLevelURL()
-    const domainParts = topLevelUrl && topLevelUrl.host ? topLevelUrl.host.split('.') : []
-
-    const userExcluded = `
-            $USER_UNPROTECTED_DOMAINS$
-    `.split('\n').filter(domain => domain.trim() === topLevelUrl.host).length > 0
-    if (userExcluded) {
-        return
-    }
-
-    while (domainParts.length > 1 && gpcEnabled) {
-        const partialDomain = domainParts.join('.')
-        const gpcExcluded = `
-            $GPC_EXCEPTIONS$
-        `.split('\n').filter(domain => domain.trim() === partialDomain).length > 0
-        if (gpcExcluded) {
-            gpcEnabled = false
-            break
-        }
-        domainParts.shift()
-    }
-    if (!gpcEnabled) {
+    if (!gpcEnabled || isUnprotectedDomain(featureList, userList)) {
         return
     }
 
