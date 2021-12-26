@@ -192,6 +192,8 @@ final class TabViewModel {
             title = UserText.tabBookmarksTitle
         case .homepage:
             title = UserText.tabHomeTitle
+        case .onboarding:
+            title = UserText.tabOnboardingTitle
         case .url, .none:
             if let title = tab.title {
                 self.title = title
@@ -217,7 +219,7 @@ final class TabViewModel {
         case .bookmarks:
             favicon = Favicon.bookmarks
             return
-        case .url, .none: break
+        case .url, .onboarding, .none: break
         }
 
         if let favicon = tab.favicon {
