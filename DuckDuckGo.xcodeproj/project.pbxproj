@@ -8,7 +8,6 @@
 
 /* Begin PBXBuildFile section */
 		0230C09F271F53000018F728 /* GPCUserScript.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0230C09E271F53000018F728 /* GPCUserScript.swift */; };
-		0230C0A1271F53670018F728 /* gpc.js in Resources */ = {isa = PBXBuildFile; fileRef = 0230C0A0271F53670018F728 /* gpc.js */; };
 		0230C0A3272080090018F728 /* KeyedCodingExtension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0230C0A2272080090018F728 /* KeyedCodingExtension.swift */; };
 		0230C0A52721F3750018F728 /* GPCRequestFactory.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0230C0A42721F3750018F728 /* GPCRequestFactory.swift */; };
 		026ADE1426C3010C002518EE /* macos-config.json in Resources */ = {isa = PBXBuildFile; fileRef = 026ADE1326C3010C002518EE /* macos-config.json */; };
@@ -212,9 +211,10 @@
 		4BEF0E722766B11200AF7C58 /* MacWaitlistLockScreenViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4BEF0E712766B11200AF7C58 /* MacWaitlistLockScreenViewModel.swift */; };
 		4BF01C00272AE74C00884A61 /* CountryList.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4BE65482271FCD53008D1D63 /* CountryList.swift */; };
 		4BF4951826C08395000547B8 /* ThirdPartyBrowserTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4BF4951726C08395000547B8 /* ThirdPartyBrowserTests.swift */; };
+		7B1164BB2778D3030016FE4E /* gpc.js in Resources */ = {isa = PBXBuildFile; fileRef = 7B1164BA2778D3030016FE4E /* gpc.js */; };
+		7B1164BD2778D3240016FE4E /* navigatorCredentials.js in Resources */ = {isa = PBXBuildFile; fileRef = 7B1164BC2778D3240016FE4E /* navigatorCredentials.js */; };
 		7B4CE8E726F02135009134B1 /* TabBarTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7B4CE8E626F02134009134B1 /* TabBarTests.swift */; };
 		7B860DE227274A8C006D8957 /* NavigatorCredentialsUserScript.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7B860DE127274A8B006D8957 /* NavigatorCredentialsUserScript.swift */; };
-		7B860DE427274E54006D8957 /* navigatorCredentials.js in Resources */ = {isa = PBXBuildFile; fileRef = 7B860DE327274E54006D8957 /* navigatorCredentials.js */; };
 		7BA4727D26F01BC400EAA165 /* CoreDataTestUtilities.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B9292C42667104B00AD2C21 /* CoreDataTestUtilities.swift */; };
 		8511E18425F82B34002F516B /* 01_Fire_really_small.json in Resources */ = {isa = PBXBuildFile; fileRef = 8511E18325F82B34002F516B /* 01_Fire_really_small.json */; };
 		853014D625E671A000FB8205 /* PageObserverUserScript.swift in Sources */ = {isa = PBXBuildFile; fileRef = 853014D525E671A000FB8205 /* PageObserverUserScript.swift */; };
@@ -858,6 +858,8 @@
 		4BEF0E6B276676AB00AF7C58 /* MacWaitlistStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MacWaitlistStore.swift; sourceTree = "<group>"; };
 		4BEF0E712766B11200AF7C58 /* MacWaitlistLockScreenViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MacWaitlistLockScreenViewModel.swift; sourceTree = "<group>"; };
 		4BF4951726C08395000547B8 /* ThirdPartyBrowserTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ThirdPartyBrowserTests.swift; sourceTree = "<group>"; };
+		7B1164BA2778D3030016FE4E /* gpc.js */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.javascript; name = gpc.js; path = dist/gpc.js; sourceTree = "<group>"; };
+		7B1164BC2778D3240016FE4E /* navigatorCredentials.js */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.javascript; name = navigatorCredentials.js; path = dist/navigatorCredentials.js; sourceTree = "<group>"; };
 		7B4CE8DA26F02108009134B1 /* UI Tests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = "UI Tests.xctest"; sourceTree = BUILT_PRODUCTS_DIR; };
 		7B4CE8DE26F02108009134B1 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		7B4CE8E626F02134009134B1 /* TabBarTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TabBarTests.swift; sourceTree = "<group>"; };
@@ -1324,6 +1326,7 @@
 		0230C09D271F52D50018F728 /* GPC */ = {
 			isa = PBXGroup;
 			children = (
+				7B1164BA2778D3030016FE4E /* gpc.js */,
 				0230C09E271F53000018F728 /* GPCUserScript.swift */,
 				0230C0A42721F3750018F728 /* GPCRequestFactory.swift */,
 				0230C0A0271F53670018F728 /* gpc.js */,
@@ -2585,6 +2588,7 @@
 		AA86491E24D83A66001BABEE /* Model */ = {
 			isa = PBXGroup;
 			children = (
+				7B1164BC2778D3240016FE4E /* navigatorCredentials.js */,
 				856CADEF271710F400E79BB0 /* HoverUserScript.swift */,
 				4B2E7D6226FF9D6500D2DB17 /* PrintingUserScript.swift */,
 				7B860DE327274E54006D8957 /* navigatorCredentials.js */,
@@ -3553,6 +3557,7 @@
 				339A6B5826A044BA00E3DAE8 /* duckduckgo-privacy-dashboard in Resources */,
 				4B92928E26670D1700AD2C21 /* BookmarkOutlineViewCell.xib in Resources */,
 				858C78FC2705EB5F009B2B44 /* HomepageHeader.xib in Resources */,
+				7B1164BB2778D3030016FE4E /* gpc.js in Resources */,
 				B64C84DE2692D7400048FEBE /* PermissionAuthorization.storyboard in Resources */,
 				4BC68A702759AE490029A586 /* Waitlist.storyboard in Resources */,
 				AA34397D2754D55100B241FA /* dark-trackers-3.json in Resources */,
@@ -3564,8 +3569,8 @@
 				AA80EC6D256C469C007083E7 /* NavigationBar.storyboard in Resources */,
 				4B0511C6262CAA5A00F6079C /* DefaultBrowserTableCellView.xib in Resources */,
 				85B7185027677EA400B4277F /* Onboarding.xcassets in Resources */,
-				0230C0A1271F53670018F728 /* gpc.js in Resources */,
 				4B677433255DBEB800025BD8 /* httpsMobileV2Bloom.bin in Resources */,
+				7B1164BD2778D3240016FE4E /* navigatorCredentials.js in Resources */,
 				AA34397B2754D55100B241FA /* trackers-3.json in Resources */,
 				026ADE1426C3010C002518EE /* macos-config.json in Resources */,
 				4B677432255DBEB800025BD8 /* httpsMobileV2BloomSpec.json in Resources */,
@@ -3574,7 +3579,6 @@
 				AAE246F42709EF3B00BEEAEE /* FirePopoverCollectionViewItem.xib in Resources */,
 				AA3439702754D4E900B241FA /* dark-shield-dot.json in Resources */,
 				4B0511C1262CAA5A00F6079C /* PrivacySecurityPreferencesTableCellView.xib in Resources */,
-				7B860DE427274E54006D8957 /* navigatorCredentials.js in Resources */,
 				AA34397A2754D55100B241FA /* trackers-2.json in Resources */,
 				4B0511D0262CAA5A00F6079C /* AppearancePreferencesTableCellView.xib in Resources */,
 				336D5B18262D8D3C0052E0C9 /* findinpage.js in Resources */,
