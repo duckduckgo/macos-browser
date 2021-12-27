@@ -9,14 +9,5 @@ export default [
                 format: 'iife'
             }
         ]
-    },
-    {
-        input: 'DuckDuckGo/GPC/gpc.js',
-        output: [
-            {
-                file: 'DuckDuckGo/GPC/dist/gpc.js',
-                format: 'iife'
-            }
-        ]
     }
 ]

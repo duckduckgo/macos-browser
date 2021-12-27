@@ -25,8 +25,8 @@ protocol ScriptSourceProviding {
     func reload(knownChanges: ContentBlockerRulesIdentifier.Difference?)
     var contentBlockerRulesConfig: ContentBlockerUserScriptConfig? { get }
     var surrogatesConfig: SurrogatesUserScriptConfig? { get }
-    var gpcSource: String { get }
     var navigatorCredentialsSource: String { get }
+    var privacyConfigurationManager: PrivacyConfigurationManager { get }
 
     var sourceUpdatedPublisher: AnyPublisher<ContentBlockerRulesIdentifier.Difference?, Never> { get }
 
@@ -38,7 +38,6 @@ final class DefaultScriptSourceProvider: ScriptSourceProviding {
 
     private(set) var contentBlockerRulesConfig: ContentBlockerUserScriptConfig?
     private(set) var surrogatesConfig: SurrogatesUserScriptConfig?
-    private(set) var gpcSource: String = ""
     private(set) var navigatorCredentialsSource: String = ""
 
     private let sourceUpdatedSubject = PassthroughSubject<ContentBlockerRulesIdentifier.Difference?, Never>()
@@ -77,7 +76,6 @@ final class DefaultScriptSourceProvider: ScriptSourceProviding {
     func reload(knownChanges: ContentBlockerRulesIdentifier.Difference?) {
         contentBlockerRulesConfig = buildContentBlockerRulesConfig()
         surrogatesConfig = buildSurrogatesConfig()
-        gpcSource = buildGPCSource()
         navigatorCredentialsSource = buildNavigatorCredentialsSource()
         sourceUpdatedSubject.send( knownChanges )
     }
@@ -104,20 +102,6 @@ final class DefaultScriptSourceProvider: ScriptSourceProviding {
                                                  encodedSurrogateTrackerData: rules?.encodedTrackerData,
                                                  isDebugBuild: isDebugBuild)
     }
-    
-    private func buildGPCSource() -> String {
-        let privacyConfiguration = privacyConfigurationManager.privacyConfig
-        let exceptions = privacyConfiguration.tempUnprotectedDomains +
-                            privacyConfiguration.exceptionsList(forFeature: .gpc)
-        let privSettings = PrivacySecurityPreferences()
-        let localUnprotectedDomains = privacyConfiguration.userUnprotectedDomains.joined(separator: "\n")
-        
-        return GPCUserScript.loadJS("gpc", from: .main, withReplacements: [
-            "$GPC_ENABLED$": privacyConfiguration.isEnabled(featureKey: .gpc) && privSettings.gpcEnabled ? "true" : "false",
-            "$GPC_EXCEPTIONS$": exceptions.joined(separator: "\n"),
-            "$USER_UNPROTECTED_DOMAINS$": localUnprotectedDomains
-        ])
-    }
 
     private func buildNavigatorCredentialsSource() -> String {
         let privacyConfiguration = privacyConfigurationManager.privacyConfig
@@ -131,5 +115,4 @@ final class DefaultScriptSourceProvider: ScriptSourceProviding {
              "$CREDENTIALS_EXCEPTIONS$": (unprotectedDomains + contentBlockingExceptions).joined(separator: "\n")
         ])
     }
-
 }

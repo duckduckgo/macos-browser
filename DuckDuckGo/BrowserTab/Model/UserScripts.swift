@@ -34,14 +34,14 @@ final class UserScripts {
     let contentBlockerRulesScript: ContentBlockerRulesUserScript
     let surrogatesScript: SurrogatesUserScript
     let navigatorCredentialsUserScript: NavigatorCredentialsUserScript
-    let gpcScript: GPCUserScript
+    let contentScopeUserScript: ContentScopeUserScript
 
     init(with sourceProvider: ScriptSourceProviding) {
 
         contentBlockerRulesScript = ContentBlockerRulesUserScript(configuration: sourceProvider.contentBlockerRulesConfig!)
         surrogatesScript = SurrogatesUserScript(configuration: sourceProvider.surrogatesConfig!)
         navigatorCredentialsUserScript = NavigatorCredentialsUserScript(scriptSource: sourceProvider)
-        gpcScript = GPCUserScript(scriptSource: sourceProvider)
+        contentScopeUserScript = ContentScopeUserScript(sourceProvider.privacyConfigurationManager)
     }
 
     lazy var userScripts: [UserScript] = [
@@ -54,8 +54,8 @@ final class UserScripts {
         pageObserverScript,
         printingUserScript,
         hoverUserScript,
-        gpcScript,
         navigatorCredentialsUserScript,
+        contentScopeUserScript,
         autofillScript
     ]
 
