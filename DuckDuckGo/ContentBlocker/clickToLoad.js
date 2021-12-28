@@ -778,14 +778,18 @@
 //         if (!response) {
 //             return
 //         }
+     window.setTimeout(() => {
+         init()
          if (document.readyState === 'complete') {
-             init()
+             console.log('SURR complete')
          } else {
-             // Content script loaded before page content, so wait for load.
+             console.log('SURR not complete')
              window.addEventListener('load', (event) => {
                  init()
+                 console.log('SURR complete event')
              })
          }
+     })
 //     })
 
      // Fetch reusable assets
