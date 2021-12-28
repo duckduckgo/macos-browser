@@ -88,6 +88,7 @@ final class FaviconStore: FaviconStoring {
                     return
                 }
 
+                //TODO: duplicates!?
                 let insertedObject = NSEntityDescription.insertNewObject(forEntityName: FaviconManagedObject.className(), into: self.context)
                 guard let faviconMO = insertedObject as? FaviconManagedObject else {
                     promise(.failure(FaviconStoreError.savingFailed))
@@ -149,6 +150,7 @@ final class FaviconStore: FaviconStoring {
                     return
                 }
 
+                //TODO: duplicates!?
                 let insertedObject = NSEntityDescription.insertNewObject(forEntityName: FaviconHostReferenceManagedObject.className(),
                                                                          into: self.context)
                 guard let faviconHostReferenceMO = insertedObject as? FaviconHostReferenceManagedObject else {
@@ -177,6 +179,7 @@ final class FaviconStore: FaviconStoring {
                     return
                 }
 
+                //TODO: duplicates!?
                 let insertedObject = NSEntityDescription.insertNewObject(forEntityName: FaviconUrlReferenceManagedObject.className(),
                                                                          into: self.context)
                 guard let faviconUrlReferenceMO = insertedObject as? FaviconUrlReferenceManagedObject else {

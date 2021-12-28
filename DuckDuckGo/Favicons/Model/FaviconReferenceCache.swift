@@ -20,8 +20,6 @@ import Foundation
 import Combine
 import os.log
 
-//TODO: Invalidate host entries (plus clean url entries for the host)
-
 final class FaviconReferenceCache {
 
     private let storing: FaviconStoring
@@ -76,7 +74,7 @@ final class FaviconReferenceCache {
         }
 
         if let cacheEntry = hostReferences[host] {
-            // Already cached
+            // Host references already cached
 
             if cacheEntry.smallFaviconUrl == faviconUrls.smallFaviconUrl && cacheEntry.mediumFaviconUrl == faviconUrls.mediumFaviconUrl {
                 // Equal
@@ -85,9 +83,10 @@ final class FaviconReferenceCache {
 
             if cacheEntry.documentUrl == documentUrl {
                 // Favicon was updated
-                insertToHostCache(faviconUrls: (faviconUrls.smallFaviconUrl, faviconUrls.mediumFaviconUrl), host: host, documentUrl: documentUrl)
-                //TODO: Invalidate URL cache with this host
 
+                // Exceptions may contain updated favicon if user visited a different documentUrl sooner
+                invalidateUrlCache(for: host)
+                insertToHostCache(faviconUrls: (faviconUrls.smallFaviconUrl, faviconUrls.mediumFaviconUrl), host: host, documentUrl: documentUrl)
                 return
             } else {
                 // Exception
@@ -104,7 +103,6 @@ final class FaviconReferenceCache {
     }
 
     private func insertToHostCache(faviconUrls: (smallFaviconUrl: URL?, mediumFaviconUrl: URL?), host: String, documentUrl: URL) {
-        //TODO: duplicates!?
         let hostReference = FaviconHostReference(identifier: UUID(),
                                               smallFaviconUrl: faviconUrls.smallFaviconUrl,
                                               mediumFaviconUrl: faviconUrls.mediumFaviconUrl,
@@ -127,12 +125,12 @@ final class FaviconReferenceCache {
     }
 
     private func insertToUrlCache(faviconUrls: (smallFaviconUrl: URL?, mediumFaviconUrl: URL?), documentUrl: URL) {
-        //TODO: duplicates!?
         let urlReference = FaviconUrlReference(identifier: UUID(),
                                              smallFaviconUrl: faviconUrls.smallFaviconUrl,
                                              mediumFaviconUrl: faviconUrls.mediumFaviconUrl,
                                              documentUrl: documentUrl,
                                              dateCreated: Date())
+
         urlReferences[documentUrl] = urlReference
 
         storing.save(urlReference: urlReference)
@@ -143,6 +141,27 @@ final class FaviconReferenceCache {
                     os_log("Favicon url reference saved successfully. document url: %s", log: .favicons, urlReference.documentUrl.absoluteString)
                 case .failure(let error):
                     os_log("Saving of favicon reference failed: %s", log: .favicons, type: .error, error.localizedDescription)
+                }
+            }, receiveValue: {})
+            .store(in: &self.cancellables)
+    }
+
+    private func invalidateUrlCache(for host: String) {
+        dispatchPrecondition(condition: .onQueue(queue))
+
+        let toInvalidateReferences = urlReferences.values.filter { urlReference in
+            urlReference.documentUrl.host == host
+        }
+
+        toInvalidateReferences.forEach { urlReferences[$0.documentUrl] = nil }
+        storing.remove(urlReferences: toInvalidateReferences)
+            .receive(on: self.queue, options: .init(flags: .barrier))
+            .sink(receiveCompletion: { completion in
+                switch completion {
+                case .finished:
+                    os_log("Favicon url references removed successfully", log: .favicons)
+                case .failure(let error):
+                    os_log("Removing of favicon references failed: %s", log: .favicons, type: .error, error.localizedDescription)
                 }
             }, receiveValue: {})
             .store(in: &self.cancellables)

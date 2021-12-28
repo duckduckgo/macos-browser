@@ -20,10 +20,10 @@ import Cocoa
 import Combine
 
 // TODOs
-// Synchronous favicon getting?
-// Burning
-// Selection of favicon links in FaviconSelector
-// Invalidating very old ones and redownloading after one week?
+// 2 Issue with storage -> existing entries
+// 3, 4 Burning
+// 5 Cleaning of the cache if entries are older than one month and not in bookmarks, keychain, ...
+// 6 Unit Tests
 
 protocol FaviconManagement {
 
@@ -42,7 +42,7 @@ final class FaviconManager: FaviconManagement {
 
     static let shared = FaviconManager()
 
-    private let queue = DispatchQueue(label: "FaviconManager queue", attributes: .concurrent)
+    private let queue = DispatchQueue(label: "FaviconManager queue", qos: .userInitiated, attributes: .concurrent)
     private lazy var store: FaviconStoring = FaviconStore()
 
     private init() {
@@ -68,9 +68,10 @@ final class FaviconManager: FaviconManagement {
             }
         }
 
-        //TODO: Optimizations: If every favicon is cached, then completion
+        queue.async(flags: .barrier) { [weak self] in
+            var newIconLoaded = false
 
-        queue.async { [weak self] in
+            // Add favicon.ico into links
             var faviconLinks = faviconLinks
             if let host = documentUrl.host {
                 let faviconIcoLink = FaviconUserScript.FaviconLink(href: "\(URL.NavigationalScheme.https.separated())\(host)/favicon.ico",
@@ -78,17 +79,14 @@ final class FaviconManager: FaviconManagement {
                 faviconLinks.append(faviconIcoLink)
             }
 
-            faviconLinks = FaviconSelector.filterUnnecessaryFaviconLink(faviconLinks: faviconLinks)
-
             // Load favicons if needed
-            let favicons: [Favicon] = faviconLinks
+            var favicons: [Favicon] = faviconLinks
                 .compactMap { faviconLink -> Favicon? in
                     guard let faviconUrl = URL(string: faviconLink.href) else {
                         return nil
                     }
 
-                    //TODO: guard not older than one week!
-                    if let favicon = self?.imageCache.get(faviconUrl: faviconUrl) {
+                    if let favicon = self?.imageCache.get(faviconUrl: faviconUrl), favicon.dateCreated > Date.weekAgo {
                         return favicon
                     }
 
@@ -99,17 +97,28 @@ final class FaviconManager: FaviconManagement {
                                                  relationString: faviconLink.rel,
                                                  dateCreated: Date())
                         self?.imageCache.insert(newFavicon)
+                        newIconLoaded = true
                         return newFavicon
                     }
 
                     return nil
                 }
 
-            let mediumFavicon = FaviconSelector.getMostSuitableFavicon(for: .medium, favicons: favicons)
-            let smallFavicon = FaviconSelector.getMostSuitableFavicon(for: .small, favicons: favicons)
-            self?.referenceCache.insert(faviconUrls: (smallFavicon?.url, mediumFavicon?.url), documentUrl: documentUrl)
+            if newIconLoaded {
+                favicons = favicons.sorted(by: { $0.image.size.width < $1.image.size.width })
+                let mediumFavicon = FaviconSelector.getMostSuitableFavicon(for: .medium, favicons: favicons)
+                let smallFavicon = FaviconSelector.getMostSuitableFavicon(for: .small, favicons: favicons)
+                self?.referenceCache.insert(faviconUrls: (smallFavicon?.url, mediumFavicon?.url), documentUrl: documentUrl)
+                mainQueueCompletion(smallFavicon, nil)
+            } else {
+                guard let faviconUrl = self?.referenceCache.getFaviconUrl(for: documentUrl, sizeCategory: .small),
+                      let cachedFavicon = self?.imageCache.get(faviconUrl: faviconUrl) else {
+                          mainQueueCompletion(nil, nil)
+                          return
+                }
 
-            mainQueueCompletion(smallFavicon, nil)
+                mainQueueCompletion(cachedFavicon, nil)
+            }
         }
     }
 
@@ -138,16 +147,20 @@ final class FaviconManager: FaviconManagement {
     func burn(except fireproofDomains: FireproofDomains, completion: @escaping () -> Void) {
         //TODO: Burn
 
-        referenceCache.burn(except: fireproofDomains) {
-            self.imageCache.burn(except: fireproofDomains, completion: completion)
+        queue.async(flags: .barrier) {
+            self.referenceCache.burn(except: fireproofDomains) {
+                self.imageCache.burn(except: fireproofDomains, completion: completion)
+            }
         }
     }
 
     func burnDomains(_ domains: Set<String>, completion: @escaping () -> Void) {
         //TODO: Burn
 
-        referenceCache.burnDomains(domains) {
-            self.imageCache.burnDomains(domains, completion: completion)
+        queue.async(flags: .barrier) {
+            self.referenceCache.burnDomains(domains) {
+                self.imageCache.burnDomains(domains, completion: completion)
+            }
         }
     }
 

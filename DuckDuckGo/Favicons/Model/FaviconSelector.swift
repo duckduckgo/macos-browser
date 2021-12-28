@@ -20,15 +20,9 @@ import Foundation
 
 final class FaviconSelector {
 
-    static func filterUnnecessaryFaviconLink(faviconLinks: [FaviconUserScript.FaviconLink]) -> [FaviconUserScript.FaviconLink] {
-        //TODO: Filter? If possible
-        return faviconLinks
-    }
-
     static func getMostSuitableFavicon(for sizeCategory: Favicon.SizeCategory, favicons: [Favicon]) -> Favicon? {
         // Create groups according to the relation. // Prioritise favicon, then icon, and others
         let faviconGroups = favicons
-            .sorted(by: { $0.image.size.width < $1.image.size.width })
             // Categorize into 4 categories according to the quality
             .reduce(into: [[Favicon](), [Favicon](), [Favicon](), [Favicon]()], { partialResult, favicon in
                 if favicon.sizeCategory == sizeCategory {
