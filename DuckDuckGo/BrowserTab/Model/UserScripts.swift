@@ -41,7 +41,9 @@ final class UserScripts {
         contentBlockerRulesScript = ContentBlockerRulesUserScript(configuration: sourceProvider.contentBlockerRulesConfig!)
         surrogatesScript = SurrogatesUserScript(configuration: sourceProvider.surrogatesConfig!)
         navigatorCredentialsUserScript = NavigatorCredentialsUserScript(scriptSource: sourceProvider)
-        contentScopeUserScript = ContentScopeUserScript(sourceProvider.privacyConfigurationManager)
+        let privSettings = PrivacySecurityPreferences()
+        let prefs = ContentScopePreferences.init(gpcEnabled: privSettings.gpcEnabled)
+        contentScopeUserScript = ContentScopeUserScript(sourceProvider.privacyConfigurationManager, preferences: prefs)
     }
 
     lazy var userScripts: [UserScript] = [
