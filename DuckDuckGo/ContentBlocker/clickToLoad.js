@@ -130,6 +130,16 @@
              scripts[0].parentNode.insertBefore(s, scripts[0])
          }
      }
+     
+     function getTopLevelURL () {
+         try {
+             // FROM: https://stackoverflow.com/a/7739035/73479
+             // FIX: Better capturing of top level URL so that trackers in embedded documents are not considered first party
+             return new URL(window.location !== window.parent.location ? document.referrer : document.location.href)
+         } catch (error) {
+             return new URL(location.href)
+         }
+     }
 
      /*********************************************************
       *  Style Definitions
@@ -774,23 +784,25 @@
         .catch((e) => console.log('messageHandler exception', e))
      }
 
-//     sendMessage('initClickToLoad', {}, function (response) {
-//         if (!response) {
-//             return
-//         }
-     window.setTimeout(() => {
-         init()
-         if (document.readyState === 'complete') {
-             console.log('SURR complete')
-         } else {
-             console.log('SURR not complete')
-             window.addEventListener('load', (event) => {
-                 init()
-                 console.log('SURR complete event')
-             })
+     const hostname = getTopLevelURL().hostname
+     console.log('HOSTNAME', getTopLevelURL(), hostname)
+     window.webkit.messageHandlers.initClickToLoad.postMessage(hostname).then((protected) => {
+         if (!protected) {
+             return
          }
+         window.setTimeout(() => {
+             init()
+             if (document.readyState === 'complete') {
+                 console.log('SURR complete')
+             } else {
+                 console.log('SURR not complete')
+                 window.addEventListener('load', (event) => {
+                     init()
+                     console.log('SURR complete event')
+                 })
+             }
+         })
      })
-//     })
 
      // Fetch reusable assets
      window.webkit.messageHandlers.getImage.postMessage('loading_light.svg').then((response) => {

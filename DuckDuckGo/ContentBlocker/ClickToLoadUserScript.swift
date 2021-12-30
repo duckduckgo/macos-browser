@@ -21,21 +21,14 @@ import BrowserServicesKit
 
 protocol ClickToLoadUserScriptDelegate: AnyObject {
 
-    func clickToLoadUserScriptAllowFB(_ script: UserScript, replyHandler: @escaping (Bool) -> Void) -> Void
+    func clickToLoadUserScriptAllowFB(_ script: UserScript, replyHandler: @escaping (Bool) -> Void)
 }
 
 final class ClickToLoadUserScript: NSObject, UserScript, WKScriptMessageHandlerWithReply {
 
-    struct ContentBlockerKey {
-        static let url = "url"
-        static let resourceType = "resourceType"
-        static let blocked = "blocked"
-        static let pageUrl = "pageUrl"
-    }
-
     var injectionTime: WKUserScriptInjectionTime { .atDocumentStart }
     var forMainFrameOnly: Bool { false }
-    var messageNames: [String] { ["getImage", "getLogo", "getLoadingImage", "enableFacebook" ] }
+    var messageNames: [String] { ["getImage", "enableFacebook", "initClickToLoad" ] }
     let source: String
 
     init(scriptSource: ScriptSourceProviding = DefaultScriptSourceProvider.shared) {
@@ -46,6 +39,19 @@ final class ClickToLoadUserScript: NSObject, UserScript, WKScriptMessageHandlerW
 
     func userContentController(_ userContentController: WKUserContentController, didReceive message: WKScriptMessage,
                                replyHandler: @escaping (Any?, String?) -> Void) {
+        if message.name == "initClickToLoad" {
+            let controller = userContentController as? UserContentController
+            let privacyConfigurationManager = controller!.privacyConfigurationManager
+            let privacyConfiguration = privacyConfigurationManager.privacyConfig
+
+            let protected = privacyConfiguration.isProtected(domain: message.body as? String)
+            if protected {
+                replyHandler(true, nil)
+            } else {
+                replyHandler(false, nil)
+            }
+            return
+        }
         if message.name == "enableFacebook" {
             guard let delegate = delegate else { return }
             delegate.clickToLoadUserScriptAllowFB(self) { (_) -> Void in
@@ -73,7 +79,6 @@ final class ClickToLoadUserScript: NSObject, UserScript, WKScriptMessageHandlerW
             replyHandler(nil, nil)
             return
         }
-
         replyHandler(image, nil)
     }
     
