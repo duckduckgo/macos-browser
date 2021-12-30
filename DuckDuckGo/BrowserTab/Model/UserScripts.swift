@@ -42,7 +42,7 @@ final class UserScripts {
         surrogatesScript = SurrogatesUserScript(configuration: sourceProvider.surrogatesConfig!)
         navigatorCredentialsUserScript = NavigatorCredentialsUserScript(scriptSource: sourceProvider)
         let privSettings = PrivacySecurityPreferences()
-        let prefs = ContentScopePreferences.init(gpcEnabled: privSettings.gpcEnabled)
+        let prefs = ContentScopePreferences.init(gpcEnabled: privSettings.gpcEnabled, sessionKey: sourceProvider.sessionKey)
         contentScopeUserScript = ContentScopeUserScript(sourceProvider.privacyConfigurationManager, preferences: prefs)
     }
 

@@ -27,7 +27,7 @@ protocol ScriptSourceProviding {
     var surrogatesConfig: SurrogatesUserScriptConfig? { get }
     var navigatorCredentialsSource: String { get }
     var privacyConfigurationManager: PrivacyConfigurationManager { get }
-
+    var sessionKey: String { get }
     var sourceUpdatedPublisher: AnyPublisher<ContentBlockerRulesIdentifier.Difference?, Never> { get }
 
 }
@@ -39,6 +39,7 @@ final class DefaultScriptSourceProvider: ScriptSourceProviding {
     private(set) var contentBlockerRulesConfig: ContentBlockerUserScriptConfig?
     private(set) var surrogatesConfig: SurrogatesUserScriptConfig?
     private(set) var navigatorCredentialsSource: String = ""
+    private(set) var sessionKey: String = ""
 
     private let sourceUpdatedSubject = PassthroughSubject<ContentBlockerRulesIdentifier.Difference?, Never>()
     var sourceUpdatedPublisher: AnyPublisher<ContentBlockerRulesIdentifier.Difference?, Never> {
@@ -77,7 +78,12 @@ final class DefaultScriptSourceProvider: ScriptSourceProviding {
         contentBlockerRulesConfig = buildContentBlockerRulesConfig()
         surrogatesConfig = buildSurrogatesConfig()
         navigatorCredentialsSource = buildNavigatorCredentialsSource()
+        sessionKey = generateSessionKey()
         sourceUpdatedSubject.send( knownChanges )
+    }
+
+    private func generateSessionKey() -> String {
+        return UUID().uuidString
     }
 
     private func buildContentBlockerRulesConfig() -> ContentBlockerUserScriptConfig {

@@ -1,9 +1,33 @@
 {
     "readme": "https://github.com/duckduckgo/privacy-configuration",
-    "version": 1637856403667,
+    "version": 1640815518311,
     "features": {
+        "ampLinks": {
+            "exceptions": [],
+            "settings": {
+                "ampLinkFormats": [
+                    "^https?:\\/\\/(?:w{3}\\.)?google\\.\\S{2,}\\/amp\\/s\\/(\\S+)$",
+                    "^https?:\\/\\/\\S+ampproject\\.org\\/v\\/s\\/(\\S+)$"
+                ],
+                "ampKeywords": [
+                    "=amp",
+                    "amp=",
+                    "&amp",
+                    "amp&",
+                    "/amp",
+                    "amp/",
+                    ".amp",
+                    "amp.",
+                    "%amp",
+                    "amp%",
+                    "_amp",
+                    "amp_",
+                    "?amp"
+                ]
+            },
+            "state": "disabled"
+        },
         "autoconsent": {
-            "state": "enabled",
             "exceptions": [
                 {
                     "domain": "spiegel.de",
@@ -12,7 +36,8 @@
             ],
             "settings": {
                 "disabledCMPs": []
-            }
+            },
+            "state": "enabled"
         },
         "autofill": {
             "exceptions": [
@@ -28,12 +53,24 @@
             "state": "disabled"
         },
         "clickToPlay": {
-            "state": "enabled",
-            "exceptions": []
+            "exceptions": [],
+            "state": "disabled"
         },
         "contentBlocking": {
             "state": "enabled",
             "exceptions": [
+                {
+                    "domain": "pureflix.com",
+                    "reason": "Videos not playing"
+                },
+                {
+                    "domain": "www.omahasteaks.com",
+                    "reason": "Add to cart not working"
+                },
+                {
+                    "domain": "iltalehti.fi",
+                    "reason": "Video content missing"
+                },
                 {
                     "domain": "agame.com",
                     "reason": "Site not loading"
@@ -48,10 +85,6 @@
                 },
                 {
                     "domain": "ah.nl",
-                    "reason": "Missing site content"
-                },
-                {
-                    "domain": "toledoblade.com",
                     "reason": "Missing site content"
                 },
                 {
@@ -130,11 +163,10 @@
             ]
         },
         "fingerprintingBattery": {
-            "state": "enabled",
-            "exceptions": []
+            "exceptions": [],
+            "state": "enabled"
         },
         "fingerprintingCanvas": {
-            "state": "enabled",
             "exceptions": [
                 {
                     "domain": "walgreens.com",
@@ -156,10 +188,10 @@
                     "domain": "kroger.com",
                     "reason": "Broken login"
                 }
-            ]
+            ],
+            "state": "enabled"
         },
         "fingerprintingHardware": {
-            "state": "enabled",
             "exceptions": [
                 {
                     "domain": "play.geforcenow.com",
@@ -169,19 +201,20 @@
                     "domain": "stadia.google.com",
                     "reason": "site breakage"
                 }
-            ]
+            ],
+            "state": "enabled"
         },
         "fingerprintingScreenSize": {
-            "state": "enabled",
-            "exceptions": []
+            "exceptions": [],
+            "state": "enabled"
         },
         "fingerprintingTemporaryStorage": {
-            "state": "enabled",
-            "exceptions": []
+            "exceptions": [],
+            "state": "enabled"
         },
         "floc": {
-            "state": "enabled",
-            "exceptions": []
+            "exceptions": [],
+            "state": "disabled"
         },
         "gpc": {
             "state": "enabled",
@@ -204,9 +237,17 @@
             "state": "enabled",
             "exceptions": []
         },
+        "navigatorCredentials": {
+            "exceptions": [],
+            "state": "enabled"
+        },
+        "navigatorInterface": {
+            "exceptions": [],
+            "state": "enabled"
+        },
         "referrer": {
-            "state": "enabled",
-            "exceptions": []
+            "exceptions": [],
+            "state": "enabled"
         },
         "trackerAllowlist": {
             "state": "enabled",
@@ -228,17 +269,16 @@
             "exceptions": []
         },
         "trackingCookies1p": {
-            "state": "enabled",
             "settings": {
                 "firstPartyTrackerCookiePolicy": {
                     "threshold": 86400,
                     "maxAge": 86400
                 }
             },
-            "exceptions": []
+            "exceptions": [],
+            "state": "disabled"
         },
         "trackingCookies3p": {
-            "state": "enabled",
             "settings": {
                 "excludedCookieDomains": [
                     {
@@ -347,10 +387,39 @@
                     }
                 ]
             },
-            "exceptions": []
+            "exceptions": [],
+            "state": "disabled"
+        },
+        "trackingParameters": {
+            "exceptions": [],
+            "settings": {
+                "trackingParameters": [
+                    "utm_[a-zA-Z]*",
+                    "gclid",
+                    "fbclid",
+                    "fb_action_ids",
+                    "fb_action_types",
+                    "fb_source",
+                    "fb_ref",
+                    "ga_source",
+                    "ga_medium",
+                    "ga_term",
+                    "ga_content",
+                    "ga_campaign",
+                    "ga_place",
+                    "action_object_map",
+                    "action_type_map",
+                    "action_ref_map",
+                    "gs_l",
+                    "mkt_tok",
+                    "hmb_campaign",
+                    "hmb_source",
+                    "hmb_medium"
+                ]
+            },
+            "state": "disabled"
         },
         "userAgentRotation": {
-            "state": "disabled",
             "settings": {
                 "agentExcludePatterns": [
                     {
@@ -396,11 +465,8 @@
                     "domain": "dzcdn.net",
                     "reason": "Breaks images on deezer"
                 }
-            ]
-        },
-        "navigatorCredentials": {
-            "state": "enabled",
-            "exceptions": []
+            ],
+            "state": "disabled"
         }
     },
     "unprotectedTemporary": [
