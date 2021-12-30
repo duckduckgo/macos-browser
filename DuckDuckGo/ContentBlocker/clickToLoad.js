@@ -16,9 +16,6 @@
      const fbSurrogate = `${fb-sdk.js}` // inject SDK
      const fbConfig = JSON.parse(`${clickToLoadConfig.json}`.replace(/\\/g, ''));
 
-     console.log('fbSurrogate', fbSurrogate)
-     console.log('fbConfig', fbConfig)
-
      /**
      *
      *  Base64 encode / decode
@@ -124,7 +121,6 @@
          s.type = "application/javascript"
          s.async = false
          s.src = surrogate
-         console.log('FB s.src', surrogate)
          var scripts = document.getElementsByTagName("script")
          if (scripts && scripts.length > 0) {
              scripts[0].parentNode.insertBefore(s, scripts[0])
@@ -785,20 +781,16 @@
      }
 
      const hostname = getTopLevelURL().hostname
-     console.log('HOSTNAME', getTopLevelURL(), hostname)
      window.webkit.messageHandlers.initClickToLoad.postMessage(hostname).then((protected) => {
-         if (!protected) {
+         if (!protected || hostname === "") {
              return
          }
          window.setTimeout(() => {
              init()
              if (document.readyState === 'complete') {
-                 console.log('SURR complete')
              } else {
-                 console.log('SURR not complete')
                  window.addEventListener('load', (event) => {
                      init()
-                     console.log('SURR complete event')
                  })
              }
          })
