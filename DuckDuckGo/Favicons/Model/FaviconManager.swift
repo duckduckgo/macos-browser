@@ -20,9 +20,8 @@ import Cocoa
 import Combine
 
 // TODOs
-// 2 Issue with storage -> existing entries
-// 3, 4 Burning
-// 5 Cleaning of the cache if entries are older than one month and not in bookmarks, keychain, ...
+// 3, 4 Burning (Just getting right references and favicons and calling remove in FaviconStore
+// 5 Cleaning of the cache if entries are older than one month and not in bookmarks, keychain, ... (Trigger after loading from app delegate)
 // 6 Unit Tests
 
 protocol FaviconManagement {
@@ -145,8 +144,6 @@ final class FaviconManager: FaviconManagement {
     // MARK: - Burning
 
     func burn(except fireproofDomains: FireproofDomains, completion: @escaping () -> Void) {
-        //TODO: Burn
-
         queue.async(flags: .barrier) {
             self.referenceCache.burn(except: fireproofDomains) {
                 self.imageCache.burn(except: fireproofDomains, completion: completion)
@@ -155,8 +152,6 @@ final class FaviconManager: FaviconManagement {
     }
 
     func burnDomains(_ domains: Set<String>, completion: @escaping () -> Void) {
-        //TODO: Burn
-
         queue.async(flags: .barrier) {
             self.referenceCache.burnDomains(domains) {
                 self.imageCache.burnDomains(domains, completion: completion)

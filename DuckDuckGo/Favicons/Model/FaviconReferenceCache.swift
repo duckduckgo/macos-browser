@@ -25,7 +25,10 @@ final class FaviconReferenceCache {
     private let storing: FaviconStoring
     private let queue: DispatchQueue
 
+    // References to favicon URLs for whole domains
     private var hostReferences = [String: FaviconHostReference]()
+
+    // References to favicon URLs for special URLs
     private var urlReferences = [URL: FaviconUrlReference]()
 
     private var cancellables = Set<AnyCancellable>()
@@ -45,10 +48,10 @@ final class FaviconReferenceCache {
             .sink(receiveCompletion: { completion in
                 switch completion {
                 case .finished:
-                    os_log("Favicon references loaded successfully", log: .favicons)
+                    os_log("References loaded successfully", log: .favicons)
                     completionHandler?(nil)
                 case .failure(let error):
-                    os_log("Loading of favicon references failed: %s", log: .favicons, type: .error, error.localizedDescription)
+                    os_log("Loading of references failed: %s", log: .favicons, type: .error, error.localizedDescription)
                     completionHandler?(error)
                 }
             }, receiveValue: { [weak self] (hostReferences, urlReferences) in
@@ -103,6 +106,22 @@ final class FaviconReferenceCache {
     }
 
     private func insertToHostCache(faviconUrls: (smallFaviconUrl: URL?, mediumFaviconUrl: URL?), host: String, documentUrl: URL) {
+        // Remove existing
+        if let oldReference = hostReferences[host] {
+            storing.remove(hostReferences: [oldReference])
+                .receive(on: self.queue, options: .init(flags: .barrier))
+                .sink(receiveCompletion: { completion in
+                    switch completion {
+                    case .finished:
+                        os_log("Host reference removed successfully. host: %s", log: .favicons, host)
+                    case .failure(let error):
+                        os_log("Removing of the host reference failed: %s", log: .favicons, type: .error, error.localizedDescription)
+                    }
+                }, receiveValue: {})
+                .store(in: &self.cancellables)
+        }
+
+        // Create and save new references
         let hostReference = FaviconHostReference(identifier: UUID(),
                                               smallFaviconUrl: faviconUrls.smallFaviconUrl,
                                               mediumFaviconUrl: faviconUrls.mediumFaviconUrl,
@@ -116,15 +135,31 @@ final class FaviconReferenceCache {
             .sink(receiveCompletion: { completion in
                 switch completion {
                 case .finished:
-                    os_log("Favicon host reference saved successfully. host: %s", log: .favicons, hostReference.host)
+                    os_log("Host reference saved successfully. host: %s", log: .favicons, hostReference.host)
                 case .failure(let error):
-                    os_log("Saving of favicon reference failed: %s", log: .favicons, type: .error, error.localizedDescription)
+                    os_log("Saving of host reference failed: %s", log: .favicons, type: .error, error.localizedDescription)
                 }
             }, receiveValue: {})
             .store(in: &self.cancellables)
     }
 
     private func insertToUrlCache(faviconUrls: (smallFaviconUrl: URL?, mediumFaviconUrl: URL?), documentUrl: URL) {
+        // Remove existing
+        if let oldReference = urlReferences[documentUrl] {
+            storing.remove(urlReferences: [oldReference])
+                .receive(on: self.queue, options: .init(flags: .barrier))
+                .sink(receiveCompletion: { completion in
+                    switch completion {
+                    case .finished:
+                        os_log("URL reference removed successfully. document url: %s", log: .favicons, documentUrl.absoluteString)
+                    case .failure(let error):
+                        os_log("Removing of URL reference failed: %s", log: .favicons, type: .error, error.localizedDescription)
+                    }
+                }, receiveValue: {})
+                .store(in: &self.cancellables)
+        }
+
+        // Create and save new references
         let urlReference = FaviconUrlReference(identifier: UUID(),
                                              smallFaviconUrl: faviconUrls.smallFaviconUrl,
                                              mediumFaviconUrl: faviconUrls.mediumFaviconUrl,
@@ -138,9 +173,9 @@ final class FaviconReferenceCache {
             .sink(receiveCompletion: { completion in
                 switch completion {
                 case .finished:
-                    os_log("Favicon url reference saved successfully. document url: %s", log: .favicons, urlReference.documentUrl.absoluteString)
+                    os_log("URL reference saved successfully. document URL: %s", log: .favicons, urlReference.documentUrl.absoluteString)
                 case .failure(let error):
-                    os_log("Saving of favicon reference failed: %s", log: .favicons, type: .error, error.localizedDescription)
+                    os_log("Saving of URL reference failed: %s", log: .favicons, type: .error, error.localizedDescription)
                 }
             }, receiveValue: {})
             .store(in: &self.cancellables)
@@ -159,9 +194,9 @@ final class FaviconReferenceCache {
             .sink(receiveCompletion: { completion in
                 switch completion {
                 case .finished:
-                    os_log("Favicon url references removed successfully", log: .favicons)
+                    os_log("URL references invalidated successfully", log: .favicons)
                 case .failure(let error):
-                    os_log("Removing of favicon references failed: %s", log: .favicons, type: .error, error.localizedDescription)
+                    os_log("Invalidating of URL references failed: %s", log: .favicons, type: .error, error.localizedDescription)
                 }
             }, receiveValue: {})
             .store(in: &self.cancellables)

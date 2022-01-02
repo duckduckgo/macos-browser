@@ -60,6 +60,7 @@ final class FaviconStore: FaviconStoring {
                 }
 
                 let fetchRequest = FaviconManagedObject.fetchRequest() as NSFetchRequest<FaviconManagedObject>
+                fetchRequest.sortDescriptors = [NSSortDescriptor(key: #keyPath(FaviconManagedObject.dateCreated), ascending: true)]
                 fetchRequest.returnsObjectsAsFaults = false
                 do {
                     let faviconMOs = try self.context.fetch(fetchRequest)
@@ -74,10 +75,8 @@ final class FaviconStore: FaviconStoring {
     }
 
     func removeFavicons(_ favicons: [Favicon]) -> Future<Void, Error> {
-        //TODO:
-        return Future { [weak self] promise in
-            promise(.success(()))
-        }
+        let identifiers = favicons.map { $0.identifier }
+        return remove(identifiers: identifiers, entityName: FaviconManagedObject.className())
     }
 
     func save(favicon: Favicon) -> Future<Void, Error> {
@@ -88,7 +87,6 @@ final class FaviconStore: FaviconStoring {
                     return
                 }
 
-                //TODO: duplicates!?
                 let insertedObject = NSEntityDescription.insertNewObject(forEntityName: FaviconManagedObject.className(), into: self.context)
                 guard let faviconMO = insertedObject as? FaviconManagedObject else {
                     promise(.failure(FaviconStoreError.savingFailed))
@@ -117,6 +115,7 @@ final class FaviconStore: FaviconStoring {
                 }
 
                 let hostFetchRequest = FaviconHostReferenceManagedObject.fetchRequest() as NSFetchRequest<FaviconHostReferenceManagedObject>
+                hostFetchRequest.sortDescriptors = [NSSortDescriptor(key: #keyPath(FaviconHostReferenceManagedObject.dateCreated), ascending: true)]
                 hostFetchRequest.returnsObjectsAsFaults = false
                 let faviconHostReferences: [FaviconHostReference]
                 do {
@@ -129,6 +128,7 @@ final class FaviconStore: FaviconStoring {
                 }
 
                 let urlFetchRequest = FaviconUrlReferenceManagedObject.fetchRequest() as NSFetchRequest<FaviconUrlReferenceManagedObject>
+                urlFetchRequest.sortDescriptors = [NSSortDescriptor(key: #keyPath(FaviconUrlReferenceManagedObject.dateCreated), ascending: true)]
                 urlFetchRequest.returnsObjectsAsFaults = false
                 do {
                     let faviconUrlReferenceMOs = try self.context.fetch(urlFetchRequest)
@@ -150,7 +150,6 @@ final class FaviconStore: FaviconStoring {
                     return
                 }
 
-                //TODO: duplicates!?
                 let insertedObject = NSEntityDescription.insertNewObject(forEntityName: FaviconHostReferenceManagedObject.className(),
                                                                          into: self.context)
                 guard let faviconHostReferenceMO = insertedObject as? FaviconHostReferenceManagedObject else {
@@ -179,7 +178,6 @@ final class FaviconStore: FaviconStoring {
                     return
                 }
 
-                //TODO: duplicates!?
                 let insertedObject = NSEntityDescription.insertNewObject(forEntityName: FaviconUrlReferenceManagedObject.className(),
                                                                          into: self.context)
                 guard let faviconUrlReferenceMO = insertedObject as? FaviconUrlReferenceManagedObject else {
@@ -201,16 +199,44 @@ final class FaviconStore: FaviconStoring {
     }
 
     func remove(hostReferences: [FaviconHostReference]) -> Future<Void, Error> {
-        //TODO:
-        return Future { [weak self] promise in
-            promise(.success(()))
-        }
+        let identifiers = hostReferences.map { $0.identifier }
+        return remove(identifiers: identifiers, entityName: FaviconHostReferenceManagedObject.className())
     }
 
     func remove(urlReferences: [FaviconUrlReference]) -> Future<Void, Error> {
-        //TODO:
+        let identifiers = urlReferences.map { $0.identifier }
+        return remove(identifiers: identifiers, entityName: FaviconUrlReferenceManagedObject.className())
+    }
+
+    private func remove(identifiers: [UUID], entityName: String) -> Future<Void, Error> {
         return Future { [weak self] promise in
-            promise(.success(()))
+            self?.context.perform {
+                guard let self = self else {
+                    promise(.failure(FaviconStoreError.storeDeallocated))
+                    return
+                }
+
+                // To avoid long predicate, execute multiple times
+                let chunkedIdentifiers = identifiers.chunked(into: 100)
+
+                for identifiers in chunkedIdentifiers {
+                    let deleteRequest = NSFetchRequest<NSFetchRequestResult>(entityName: entityName)
+                    let predicates = identifiers.map({ NSPredicate(format: "identifier == %@", argumentArray: [$0]) })
+                    deleteRequest.predicate = NSCompoundPredicate(type: .or, subpredicates: predicates)
+                    let batchDeleteRequest = NSBatchDeleteRequest(fetchRequest: deleteRequest)
+                    batchDeleteRequest.resultType = .resultTypeObjectIDs
+                    do {
+                        let result = try self.context.execute(batchDeleteRequest) as? NSBatchDeleteResult
+                        let deletedObjects = result?.result as? [NSManagedObjectID] ?? []
+                        let changes: [AnyHashable: Any] = [ NSDeletedObjectsKey: deletedObjects ]
+                        NSManagedObjectContext.mergeChanges(fromRemoteContextSave: changes, into: [self.context])
+                        os_log("%d entries of %s removed", log: .history, entityName, deletedObjects.count)
+                    } catch {
+                        promise(.failure(error))
+                    }
+                }
+                promise(.success(()))
+            }
         }
     }
 

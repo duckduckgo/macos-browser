@@ -67,7 +67,6 @@ struct Favicon {
         self.identifier = identifier
         self.url = url
         self.image = image
-        hash = image.tiffRepresentation?.hashValue ?? 0
         self.relation = relation
         sizeCategory = SizeCategory(imageSize: image.size)
         self.dateCreated = dateCreated
@@ -76,26 +75,8 @@ struct Favicon {
     let identifier: UUID
     let url: URL
     let image: NSImage
-    let hash: Int
     let relation: Relation
     let sizeCategory: SizeCategory
     let dateCreated: Date
 
 }
-
-//TODO: is this usable?
-//extension Favicon: Equatable {
-//
-//    static func == (lhs: Favicon, rhs: Favicon) -> Bool {
-//        guard lhs.hash == rhs.hash else { return false }
-//
-//        guard let lhsTiffRepresentation = lhs.image.tiffRepresentation,
-//              let rhsTiffRepresentation = rhs.image.tiffRepresentation else {
-//                  assertionFailure("Failed to create TIFF data")
-//                  return false
-//              }
-//
-//        return (lhsTiffRepresentation as NSData).isEqual(to: rhsTiffRepresentation)
-//    }
-//
-//}

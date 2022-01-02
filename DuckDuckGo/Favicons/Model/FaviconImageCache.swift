@@ -65,13 +65,29 @@ final class FaviconImageCache {
 
         guard loaded else { return }
 
+        // Remove existing favicon with the same URL
+        if let oldFavicon = entries[favicon.url] {
+            storing.removeFavicons([oldFavicon])
+                .receive(on: self.queue, options: .init(flags: .barrier))
+                .sink(receiveCompletion: { completion in
+                    switch completion {
+                    case .finished:
+                        os_log("Favicon removed successfully. URL: %s", log: .favicons, favicon.url.absoluteString)
+                    case .failure(let error):
+                        os_log("Removing of favicon failed: %s", log: .favicons, type: .error, error.localizedDescription)
+                    }
+                }, receiveValue: {})
+                .store(in: &self.cancellables)
+        }
+
+        // Save the new one
         entries[favicon.url] = favicon
         storing.save(favicon: favicon)
             .receive(on: self.queue, options: .init(flags: .barrier))
             .sink(receiveCompletion: { completion in
                 switch completion {
                 case .finished:
-                    os_log("Favicon saved successfully. URL: %s, document URL: %", log: .favicons, favicon.url.absoluteString)
+                    os_log("Favicon saved successfully. URL: %s", log: .favicons, favicon.url.absoluteString)
                 case .failure(let error):
                     os_log("Saving of favicon failed: %s", log: .favicons, type: .error, error.localizedDescription)
                 }
