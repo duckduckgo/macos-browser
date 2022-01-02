@@ -23,6 +23,7 @@ import Combine
 protocol BookmarkManager: AnyObject {
 
     func isUrlBookmarked(url: URL) -> Bool
+    func isHostInBookmarks(host: String) -> Bool
     func getBookmark(for url: URL) -> Bookmark?
     @discardableResult func makeBookmark(for url: URL, title: String, isFavorite: Bool) -> Bookmark?
     @discardableResult func makeFolder(for title: String, parent: BookmarkFolder?) -> BookmarkFolder
@@ -45,15 +46,11 @@ final class LocalBookmarkManager: BookmarkManager {
 
     static let shared = LocalBookmarkManager()
 
-    private init() {
-//        subscribeToCachedFavicons()
-    }
+    private init() {}
 
     init(bookmarkStore: BookmarkStore, faviconManagement: FaviconManagement) {
         self.bookmarkStore = bookmarkStore
         self.faviconManagement = faviconManagement
-
-//        subscribeToCachedFavicons()
     }
 
     @Published private(set) var list: BookmarkList?
@@ -84,6 +81,12 @@ final class LocalBookmarkManager: BookmarkManager {
 
     func isUrlBookmarked(url: URL) -> Bool {
         return list?[url] != nil
+    }
+
+    func isHostInBookmarks(host: String) -> Bool {
+        return list?.allBookmarkURLsOrdered.contains(where: { url in
+            url.host == host
+        }) ?? false
     }
 
     func getBookmark(for url: URL) -> Bookmark? {

@@ -23,6 +23,7 @@ import Combine
 // 5 Cleaning of the cache if entries are older than one month and not in bookmarks, keychain, ... (Trigger after loading from app delegate)
 // 6 Unit Tests
 // 7 Pixels
+// 4 Synchronous to asynchronous?
 
 protocol FaviconManagement {
 
@@ -32,7 +33,7 @@ protocol FaviconManagement {
     func getCachedFavicon(for documentUrl: URL, sizeCategory: Favicon.SizeCategory) -> Favicon?
     func getCachedFavicon(for host: String, sizeCategory: Favicon.SizeCategory) -> Favicon?
 
-    func burn(except fireproofDomains: FireproofDomains, completion: @escaping () -> Void)
+    func burnExceptApproved(fireproofDomains: FireproofDomains, bookmarkManager: BookmarkManager, completion: @escaping () -> Void)
     func burnDomains(_ domains: Set<String>, completion: @escaping () -> Void)
 
 }
@@ -144,11 +145,17 @@ final class FaviconManager: FaviconManagement {
 
     // MARK: - Burning
 
-    // TODO: Bookmarks, Logins
-    func burn(except fireproofDomains: FireproofDomains, completion: @escaping () -> Void) {
+    // TODO: Logins
+    func burnExceptApproved(fireproofDomains: FireproofDomains, bookmarkManager: BookmarkManager, completion: @escaping () -> Void) {
         queue.async(flags: .barrier) {
-            self.referenceCache.burn(except: fireproofDomains) {
-                self.imageCache.burn(except: fireproofDomains, completion: completion)
+            self.referenceCache.burnExceptApproved(fireproofDomains: fireproofDomains,
+                                                   bookmarkManager: bookmarkManager) {
+                self.imageCache.burnExceptApproved(fireproofDomains: fireproofDomains,
+                                                   bookmarkManager: bookmarkManager) {
+                    DispatchQueue.main.async {
+                        completion()
+                    }
+                }
             }
         }
     }
@@ -156,7 +163,11 @@ final class FaviconManager: FaviconManagement {
     func burnDomains(_ domains: Set<String>, completion: @escaping () -> Void) {
         queue.async(flags: .barrier) {
             self.referenceCache.burnDomains(domains) {
-                self.imageCache.burnDomains(domains, completion: completion)
+                self.imageCache.burnDomains(domains) {
+                    DispatchQueue.main.async {
+                        completion()
+                    }
+                }
             }
         }
     }
