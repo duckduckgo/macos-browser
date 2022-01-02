@@ -56,19 +56,21 @@ struct Favicon {
         }
     }
 
-    init(identifier: UUID, url: URL, image: NSImage, relationString: String, dateCreated: Date) {
+    init(identifier: UUID, url: URL, image: NSImage, relationString: String, documentUrl: URL, dateCreated: Date) {
         self.init(identifier: identifier,
                   url: url, image: image,
                   relation: Relation(relationString: relationString),
+                  documentUrl: documentUrl,
                   dateCreated: dateCreated)
     }
 
-    init(identifier: UUID, url: URL, image: NSImage, relation: Relation, dateCreated: Date) {
+    init(identifier: UUID, url: URL, image: NSImage, relation: Relation, documentUrl: URL, dateCreated: Date) {
         self.identifier = identifier
         self.url = url
         self.image = image
         self.relation = relation
         sizeCategory = SizeCategory(imageSize: image.size)
+        self.documentUrl = documentUrl
         self.dateCreated = dateCreated
     }
 
@@ -77,6 +79,7 @@ struct Favicon {
     let image: NSImage
     let relation: Relation
     let sizeCategory: SizeCategory
+    let documentUrl: URL
     let dateCreated: Date
 
 }

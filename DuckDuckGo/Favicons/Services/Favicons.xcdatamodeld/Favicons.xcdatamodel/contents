@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<model type="com.apple.IDECoreDataModeler.DataModel" documentVersion="1.0" lastSavedToolsVersion="19461" systemVersion="21A559" minimumToolsVersion="Automatic" sourceLanguage="Swift" userDefinedModelVersionIdentifier="">
+<model type="com.apple.IDECoreDataModeler.DataModel" documentVersion="1.0" lastSavedToolsVersion="19574" systemVersion="21C52" minimumToolsVersion="Automatic" sourceLanguage="Swift" userDefinedModelVersionIdentifier="">
     <entity name="FaviconHostReferenceManagedObject" representedClassName="FaviconHostReferenceManagedObject" syncable="YES" codeGenerationType="class">
         <attribute name="dateCreated" attributeType="Date" usesScalarValueType="NO"/>
         <attribute name="documentUrlEncrypted" attributeType="Transformable" valueTransformerName="NSURLTransformer"/>
@@ -10,6 +10,7 @@
     </entity>
     <entity name="FaviconManagedObject" representedClassName="FaviconManagedObject" syncable="YES" codeGenerationType="class">
         <attribute name="dateCreated" attributeType="Date" usesScalarValueType="NO"/>
+        <attribute name="documentUrlEncrypted" attributeType="Transformable" valueTransformerName="NSURLTransformer"/>
         <attribute name="identifier" attributeType="UUID" usesScalarValueType="NO"/>
         <attribute name="imageEncrypted" attributeType="Transformable" valueTransformerName="NSImageTransformer"/>
         <attribute name="relation" attributeType="Integer 64" defaultValueString="0" usesScalarValueType="YES"/>
@@ -24,7 +25,7 @@
     </entity>
     <elements>
         <element name="FaviconHostReferenceManagedObject" positionX="-54" positionY="-9" width="128" height="119"/>
-        <element name="FaviconManagedObject" positionX="-63" positionY="-18" width="128" height="104"/>
+        <element name="FaviconManagedObject" positionX="-63" positionY="-18" width="128" height="119"/>
         <element name="FaviconUrlReferenceManagedObject" positionX="-18" positionY="63" width="128" height="104"/>
     </elements>
 </model>

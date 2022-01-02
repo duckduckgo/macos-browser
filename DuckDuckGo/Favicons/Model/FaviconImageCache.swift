@@ -67,17 +67,7 @@ final class FaviconImageCache {
 
         // Remove existing favicon with the same URL
         if let oldFavicon = entries[favicon.url] {
-            storing.removeFavicons([oldFavicon])
-                .receive(on: self.queue, options: .init(flags: .barrier))
-                .sink(receiveCompletion: { completion in
-                    switch completion {
-                    case .finished:
-                        os_log("Favicon removed successfully. URL: %s", log: .favicons, favicon.url.absoluteString)
-                    case .failure(let error):
-                        os_log("Removing of favicon failed: %s", log: .favicons, type: .error, error.localizedDescription)
-                    }
-                }, receiveValue: {})
-                .store(in: &self.cancellables)
+            removeFavicons([oldFavicon])
         }
 
         // Save the new one
@@ -101,16 +91,48 @@ final class FaviconImageCache {
         return entries[faviconUrl]
     }
 
-    // MARK: Burning
+    // MARK: - Burning
 
     func burn(except fireproofDomains: FireproofDomains, completion: @escaping () -> Void) {
-        //TODO: Burn
-        // Don't forget about store
+        dispatchPrecondition(condition: .onQueue(queue))
+
+        let faviconsToBurn = entries.values.filter { favicon in
+            guard let host = favicon.documentUrl.host else {
+                return false
+            }
+            return !fireproofDomains.isFireproof(fireproofDomain: host)
+        }
+
+        removeFavicons(faviconsToBurn, completionHandler: completion)
     }
 
     func burnDomains(_ domains: Set<String>, completion: @escaping () -> Void) {
-        //TODO: Burn
-        // Don't forget about store
+        dispatchPrecondition(condition: .onQueue(queue))
+
+        let faviconsToBurn = entries.values.filter { favicon in
+            guard let host = favicon.documentUrl.host else {
+                return false
+            }
+            return domains.contains(host)
+        }
+
+        removeFavicons(faviconsToBurn, completionHandler: completion)
     }
 
+    // MARK: - Private
+
+    private func removeFavicons(_ favicons: [Favicon], completionHandler: (() -> Void)? = nil) {
+        storing.removeFavicons(favicons)
+            .receive(on: self.queue, options: .init(flags: .barrier))
+            .sink(receiveCompletion: { completion in
+                switch completion {
+                case .finished:
+                    os_log("Favicons removed successfully.", log: .favicons)
+                case .failure(let error):
+                    os_log("Removing of favicons failed: %s", log: .favicons, type: .error, error.localizedDescription)
+                }
+                completionHandler?()
+            }, receiveValue: {})
+            .store(in: &self.cancellables)
+    }
 }

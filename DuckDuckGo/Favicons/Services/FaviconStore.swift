@@ -248,13 +248,14 @@ fileprivate extension Favicon {
         guard let identifier = faviconMO.identifier,
               let url = faviconMO.urlEncrypted as? URL,
               let image = faviconMO.imageEncrypted as? NSImage,
+              let documentUrl = faviconMO.documentUrlEncrypted as? URL,
               let dateCreated = faviconMO.dateCreated,
               let relation = Favicon.Relation(rawValue: Int(faviconMO.relation)) else {
             assertionFailure("Favicon: Failed to init Favicon from FaviconManagedObject")
             return nil
         }
 
-        self.init(identifier: identifier, url: url, image: image, relation: relation, dateCreated: dateCreated)
+        self.init(identifier: identifier, url: url, image: image, relation: relation, documentUrl: documentUrl, dateCreated: dateCreated)
     }
 
 }
@@ -312,6 +313,7 @@ fileprivate extension FaviconManagedObject {
         imageEncrypted = favicon.image
         relation = Int64(favicon.relation.rawValue)
         urlEncrypted = favicon.url as NSURL
+        documentUrlEncrypted = favicon.documentUrl as NSURL
         dateCreated = favicon.dateCreated
     }
 

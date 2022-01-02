@@ -20,9 +20,9 @@ import Cocoa
 import Combine
 
 // TODOs
-// 3, 4 Burning (Just getting right references and favicons and calling remove in FaviconStore
 // 5 Cleaning of the cache if entries are older than one month and not in bookmarks, keychain, ... (Trigger after loading from app delegate)
 // 6 Unit Tests
+// 7 Pixels
 
 protocol FaviconManagement {
 
@@ -94,6 +94,7 @@ final class FaviconManager: FaviconManagement {
                                                  url: faviconUrl,
                                                  image: loadedImage,
                                                  relationString: faviconLink.rel,
+                                                 documentUrl: documentUrl,
                                                  dateCreated: Date())
                         self?.imageCache.insert(newFavicon)
                         newIconLoaded = true
@@ -143,6 +144,7 @@ final class FaviconManager: FaviconManagement {
 
     // MARK: - Burning
 
+    // TODO: Bookmarks, Logins
     func burn(except fireproofDomains: FireproofDomains, completion: @escaping () -> Void) {
         queue.async(flags: .barrier) {
             self.referenceCache.burn(except: fireproofDomains) {

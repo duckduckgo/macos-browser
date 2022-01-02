@@ -105,103 +105,6 @@ final class FaviconReferenceCache {
         }
     }
 
-    private func insertToHostCache(faviconUrls: (smallFaviconUrl: URL?, mediumFaviconUrl: URL?), host: String, documentUrl: URL) {
-        // Remove existing
-        if let oldReference = hostReferences[host] {
-            storing.remove(hostReferences: [oldReference])
-                .receive(on: self.queue, options: .init(flags: .barrier))
-                .sink(receiveCompletion: { completion in
-                    switch completion {
-                    case .finished:
-                        os_log("Host reference removed successfully. host: %s", log: .favicons, host)
-                    case .failure(let error):
-                        os_log("Removing of the host reference failed: %s", log: .favicons, type: .error, error.localizedDescription)
-                    }
-                }, receiveValue: {})
-                .store(in: &self.cancellables)
-        }
-
-        // Create and save new references
-        let hostReference = FaviconHostReference(identifier: UUID(),
-                                              smallFaviconUrl: faviconUrls.smallFaviconUrl,
-                                              mediumFaviconUrl: faviconUrls.mediumFaviconUrl,
-                                              host: host,
-                                              documentUrl: documentUrl,
-                                              dateCreated: Date())
-        hostReferences[host] = hostReference
-
-        storing.save(hostReference: hostReference)
-            .receive(on: self.queue, options: .init(flags: .barrier))
-            .sink(receiveCompletion: { completion in
-                switch completion {
-                case .finished:
-                    os_log("Host reference saved successfully. host: %s", log: .favicons, hostReference.host)
-                case .failure(let error):
-                    os_log("Saving of host reference failed: %s", log: .favicons, type: .error, error.localizedDescription)
-                }
-            }, receiveValue: {})
-            .store(in: &self.cancellables)
-    }
-
-    private func insertToUrlCache(faviconUrls: (smallFaviconUrl: URL?, mediumFaviconUrl: URL?), documentUrl: URL) {
-        // Remove existing
-        if let oldReference = urlReferences[documentUrl] {
-            storing.remove(urlReferences: [oldReference])
-                .receive(on: self.queue, options: .init(flags: .barrier))
-                .sink(receiveCompletion: { completion in
-                    switch completion {
-                    case .finished:
-                        os_log("URL reference removed successfully. document url: %s", log: .favicons, documentUrl.absoluteString)
-                    case .failure(let error):
-                        os_log("Removing of URL reference failed: %s", log: .favicons, type: .error, error.localizedDescription)
-                    }
-                }, receiveValue: {})
-                .store(in: &self.cancellables)
-        }
-
-        // Create and save new references
-        let urlReference = FaviconUrlReference(identifier: UUID(),
-                                             smallFaviconUrl: faviconUrls.smallFaviconUrl,
-                                             mediumFaviconUrl: faviconUrls.mediumFaviconUrl,
-                                             documentUrl: documentUrl,
-                                             dateCreated: Date())
-
-        urlReferences[documentUrl] = urlReference
-
-        storing.save(urlReference: urlReference)
-            .receive(on: self.queue, options: .init(flags: .barrier))
-            .sink(receiveCompletion: { completion in
-                switch completion {
-                case .finished:
-                    os_log("URL reference saved successfully. document URL: %s", log: .favicons, urlReference.documentUrl.absoluteString)
-                case .failure(let error):
-                    os_log("Saving of URL reference failed: %s", log: .favicons, type: .error, error.localizedDescription)
-                }
-            }, receiveValue: {})
-            .store(in: &self.cancellables)
-    }
-
-    private func invalidateUrlCache(for host: String) {
-        dispatchPrecondition(condition: .onQueue(queue))
-
-        let toInvalidateReferences = urlReferences.values.filter { urlReference in
-            urlReference.documentUrl.host == host
-        }
-
-        toInvalidateReferences.forEach { urlReferences[$0.documentUrl] = nil }
-        storing.remove(urlReferences: toInvalidateReferences)
-            .receive(on: self.queue, options: .init(flags: .barrier))
-            .sink(receiveCompletion: { completion in
-                switch completion {
-                case .finished:
-                    os_log("URL references invalidated successfully", log: .favicons)
-                case .failure(let error):
-                    os_log("Invalidating of URL references failed: %s", log: .favicons, type: .error, error.localizedDescription)
-                }
-            }, receiveValue: {})
-            .store(in: &self.cancellables)
-    }
-
     func getFaviconUrl(for documentURL: URL, sizeCategory: Favicon.SizeCategory) -> URL? {
         dispatchPrecondition(condition: .onQueue(queue))
 
@@ -233,14 +136,144 @@ final class FaviconReferenceCache {
         }
     }
 
-    // MARK: Burning
+    // MARK: - Burning
 
     func burn(except fireproofDomains: FireproofDomains, completion: @escaping () -> Void) {
-        //TODO: Burn
+        dispatchPrecondition(condition: .onQueue(queue))
+
+        // Remove host references
+        let hostReferencesToBurn = hostReferences.values.filter { hostReference in
+            let host = hostReference.host
+            return !fireproofDomains.isFireproof(fireproofDomain: host)
+        }
+
+        remove(hostReferences: hostReferencesToBurn) {
+            // Remove URL references
+            let urlReferencesToBurn = self.urlReferences.values.filter { urlReference in
+                guard let host = urlReference.documentUrl.host else {
+                    return false
+                }
+                return !fireproofDomains.isFireproof(fireproofDomain: host)
+            }
+            self.remove(urlReferences: urlReferencesToBurn, completionHandler: completion)
+        }
     }
 
     func burnDomains(_ domains: Set<String>, completion: @escaping () -> Void) {
-        //TODO: Burn
+        dispatchPrecondition(condition: .onQueue(queue))
+
+        // Remove host references
+        let hostReferencesToBurn = hostReferences.values.filter { hostReference in
+            return domains.contains(hostReference.host)
+        }
+
+        remove(hostReferences: hostReferencesToBurn) {
+            // Remove URL references
+            let urlReferencesToBurn = self.urlReferences.values.filter { urlReference in
+                guard let host = urlReference.documentUrl.host else {
+                    return false
+                }
+                return domains.contains(host)
+            }
+            self.remove(urlReferences: urlReferencesToBurn, completionHandler: completion)
+        }
+    }
+
+    // MARK: - Private
+
+    private func insertToHostCache(faviconUrls: (smallFaviconUrl: URL?, mediumFaviconUrl: URL?), host: String, documentUrl: URL) {
+        // Remove existing
+        if let oldReference = hostReferences[host] {
+            remove(hostReferences: [oldReference])
+        }
+
+        // Create and save new references
+        let hostReference = FaviconHostReference(identifier: UUID(),
+                                              smallFaviconUrl: faviconUrls.smallFaviconUrl,
+                                              mediumFaviconUrl: faviconUrls.mediumFaviconUrl,
+                                              host: host,
+                                              documentUrl: documentUrl,
+                                              dateCreated: Date())
+        hostReferences[host] = hostReference
+
+        storing.save(hostReference: hostReference)
+            .receive(on: self.queue, options: .init(flags: .barrier))
+            .sink(receiveCompletion: { completion in
+                switch completion {
+                case .finished:
+                    os_log("Host reference saved successfully. host: %s", log: .favicons, hostReference.host)
+                case .failure(let error):
+                    os_log("Saving of host reference failed: %s", log: .favicons, type: .error, error.localizedDescription)
+                }
+            }, receiveValue: {})
+            .store(in: &self.cancellables)
+    }
+
+    private func insertToUrlCache(faviconUrls: (smallFaviconUrl: URL?, mediumFaviconUrl: URL?), documentUrl: URL) {
+        // Remove existing
+        if let oldReference = urlReferences[documentUrl] {
+            remove(urlReferences: [oldReference])
+        }
+
+        // Create and save new references
+        let urlReference = FaviconUrlReference(identifier: UUID(),
+                                             smallFaviconUrl: faviconUrls.smallFaviconUrl,
+                                             mediumFaviconUrl: faviconUrls.mediumFaviconUrl,
+                                             documentUrl: documentUrl,
+                                             dateCreated: Date())
+
+        urlReferences[documentUrl] = urlReference
+
+        storing.save(urlReference: urlReference)
+            .receive(on: self.queue, options: .init(flags: .barrier))
+            .sink(receiveCompletion: { completion in
+                switch completion {
+                case .finished:
+                    os_log("URL reference saved successfully. document URL: %s", log: .favicons, urlReference.documentUrl.absoluteString)
+                case .failure(let error):
+                    os_log("Saving of URL reference failed: %s", log: .favicons, type: .error, error.localizedDescription)
+                }
+            }, receiveValue: {})
+            .store(in: &self.cancellables)
+    }
+
+    private func invalidateUrlCache(for host: String) {
+        let toInvalidateReferences = urlReferences.values.filter { urlReference in
+            urlReference.documentUrl.host == host
+        }
+
+        toInvalidateReferences.forEach { urlReferences[$0.documentUrl] = nil }
+        remove(urlReferences: toInvalidateReferences)
+    }
+
+    private func remove(hostReferences: [FaviconHostReference], completionHandler: (() -> Void)? = nil) {
+        storing.remove(hostReferences: hostReferences)
+            .receive(on: self.queue, options: .init(flags: .barrier))
+            .sink(receiveCompletion: { completion in
+                switch completion {
+                case .finished:
+                    os_log("Host references burned successfully.", log: .favicons)
+                case .failure(let error):
+                    os_log("Burning of host references failed: %s", log: .favicons, type: .error, error.localizedDescription)
+                }
+                completionHandler?()
+            }, receiveValue: {})
+            .store(in: &self.cancellables)
+    }
+
+    private func remove(urlReferences: [FaviconUrlReference], completionHandler: (() -> Void)? = nil) {
+        self.storing.remove(urlReferences: urlReferences)
+            .receive(on: self.queue, options: .init(flags: .barrier))
+            .sink(receiveCompletion: { completion in
+                switch completion {
+                case .finished:
+                    os_log("URL references burned successfully.", log: .favicons)
+                case .failure(let error):
+                    os_log("Burning of URL references failed: %s", log: .favicons, type: .error, error.localizedDescription)
+                }
+                completionHandler?()
+            }, receiveValue: {})
+            .store(in: &self.cancellables)
     }
 
 }
