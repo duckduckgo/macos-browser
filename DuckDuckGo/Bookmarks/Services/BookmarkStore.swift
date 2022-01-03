@@ -122,7 +122,6 @@ final class LocalBookmarkStore: BookmarkStore {
             bookmarkMO.id = bookmark.id
             bookmarkMO.urlEncrypted = bookmark.url as NSURL?
             bookmarkMO.titleEncrypted = bookmark.title as NSString
-//            bookmarkMO.faviconEncrypted = bookmark.favicon
             bookmarkMO.isFavorite = bookmark.isFavorite
             bookmarkMO.isFolder = bookmark.isFolder
             bookmarkMO.dateAdded = NSDate.now
@@ -485,7 +484,6 @@ fileprivate extension BookmarkManagedObject {
         id = bookmark.id
         urlEncrypted = bookmark.url as NSURL?
         titleEncrypted = bookmark.title as NSString
-//        faviconEncrypted = bookmark.favicon
         isFavorite = bookmark.isFavorite
         isFolder = false
     }

@@ -107,7 +107,7 @@ final class FaviconManager: FaviconManagement {
                     return nil
                 }
 
-            if newIconLoaded {
+            if newIconLoaded || self?.referenceCache.getFaviconUrl(for: documentUrl, sizeCategory: .small) == nil {
                 favicons = favicons.sorted(by: { $0.image.size.width < $1.image.size.width })
                 let mediumFavicon = FaviconSelector.getMostSuitableFavicon(for: .medium, favicons: favicons)
                 let smallFavicon = FaviconSelector.getMostSuitableFavicon(for: .small, favicons: favicons)

@@ -392,24 +392,6 @@ final class Tab: NSObject {
         }
     }
 
-//    private func fetchFavicon(_ faviconURL: URL?, for host: String?, isFromUserScript: Bool) {
-//        if favicon != nil {
-//            favicon = nil
-//        }
-//
-//        guard let host = host else {
-//            return
-//        }
-//
-//        faviconManagement.fetchFavicon(faviconURL, for: host, isFromUserScript: isFromUserScript) { (image, error) in
-//            guard error == nil, let image = image else {
-//                return
-//            }
-//
-//            self.favicon = image
-//        }
-//    }
-
     // MARK: - User Scripts
 
     let scriptsSource: ScriptSourceProviding

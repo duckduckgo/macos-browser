@@ -137,7 +137,7 @@ final class Bookmark: BaseBookmarkEntity {
     var isFavorite: Bool
     var parentFolderUUID: UUID?
 
-    // Property oldFavicon can be removed in future updates when favicon cache built
+    // Property oldFavicon can be removed in future updates when favicon cache is built
     var oldFavicon: NSImage?
     let faviconManagement: FaviconManagement
     func favicon(_ sizeCategory: Favicon.SizeCategory) -> NSImage? {

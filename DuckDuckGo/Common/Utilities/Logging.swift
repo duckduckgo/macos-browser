@@ -77,7 +77,7 @@ struct Logging {
     fileprivate static let contentBlockingLoggingEnabled = false
     fileprivate static let contentBlockingLog: OSLog = OSLog(subsystem: Bundle.main.bundleIdentifier ?? "DuckDuckGo", category: "Content Blocking")
 
-    fileprivate static let faviconLoggingEnabled = true
+    fileprivate static let faviconLoggingEnabled = false
     fileprivate static let faviconLog: OSLog = OSLog(subsystem: Bundle.main.bundleIdentifier ?? "DuckDuckGo", category: "Favicons")
 
 }
