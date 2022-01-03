@@ -79,7 +79,6 @@ final class BookmarkListTests: XCTestCase {
         let unknownBookmark = Bookmark(id: UUID(),
                                        url: URL.duckDuckGoAutocomplete,
                                        title: "Unknown title",
-                                       favicon: nil,
                                        isFavorite: true)
 
         bookmarkList.update(with: unknownBookmark)
@@ -98,9 +97,9 @@ final class BookmarkListTests: XCTestCase {
         var bookmarkList = BookmarkList()
 
         let bookmarks = [
-            Bookmark(id: UUID(), url: URL(string: "wikipedia.org")!, title: "Title", favicon: nil, isFavorite: true),
-            Bookmark(id: UUID(), url: URL.duckDuckGo, title: "Title", favicon: nil, isFavorite: true),
-            Bookmark(id: UUID(), url: URL(string: "apple.com")!, title: "Title", favicon: nil, isFavorite: true)
+            Bookmark(id: UUID(), url: URL(string: "wikipedia.org")!, title: "Title", isFavorite: true),
+            Bookmark(id: UUID(), url: URL.duckDuckGo, title: "Title", isFavorite: true),
+            Bookmark(id: UUID(), url: URL(string: "apple.com")!, title: "Title", isFavorite: true)
         ]
         bookmarks.forEach { bookmarkList.insert($0) }
         let bookmarkToReplace = bookmarks[2]
@@ -117,8 +116,8 @@ final class BookmarkListTests: XCTestCase {
 
         let firstUrl = URL(string: "wikipedia.org")!
         let bookmarks = [
-            Bookmark(id: UUID(), url: firstUrl, title: "Title", favicon: nil, isFavorite: true),
-            Bookmark(id: UUID(), url: URL.duckDuckGo, title: "Title", favicon: nil, isFavorite: true)
+            Bookmark(id: UUID(), url: firstUrl, title: "Title", isFavorite: true),
+            Bookmark(id: UUID(), url: URL.duckDuckGo, title: "Title", isFavorite: true)
         ]
 
         bookmarks.forEach { bookmarkList.insert($0) }
@@ -139,7 +138,6 @@ fileprivate extension Bookmark {
     static var aBookmark: Bookmark = Bookmark(id: UUID(),
                                               url: URL.duckDuckGo,
                                               title: "Title",
-                                              favicon: nil,
                                               isFavorite: false)
 
 }

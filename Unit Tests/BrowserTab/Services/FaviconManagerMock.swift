@@ -22,16 +22,28 @@ import Combine
 
 final class FaviconManagerMock: FaviconManagement {
 
-    var cachedFaviconsPublisher = PassthroughSubject<(host: String, favicon: NSImage), Never>()
-
-    func fetchFavicon(_ faviconUrl: URL?, for host: String, isFromUserScript: Bool, completion: @escaping (NSImage?, Error?) -> Void) {
+    func fetchFavicons(_ faviconLinks: [FaviconUserScript.FaviconLink],
+                       documentUrl: URL,
+                       completion: @escaping (Favicon?, Error?) -> Void) {
+        completion(nil, nil)
     }
 
-    func getCachedFavicon(for host: String, mustBeFromUserScript: Bool) -> NSImage? {
+    func getCachedFavicon(for documentUrl: URL, sizeCategory: Favicon.SizeCategory) -> Favicon? {
         return nil
     }
 
-    func cacheIfNeeded(favicon: NSImage, for host: String, isFromUserScript: Bool) {
+    func getCachedFavicon(for host: String, sizeCategory: Favicon.SizeCategory) -> Favicon? {
+        return nil
+    }
+
+    func burnExcept(fireproofDomains: FireproofDomains,
+                    bookmarkManager: BookmarkManager,
+                    completion: @escaping () -> Void) {
+        completion()
+    }
+
+    func burnDomains(_ domains: Set<String>, completion: @escaping () -> Void) {
+        completion()
     }
 
 }

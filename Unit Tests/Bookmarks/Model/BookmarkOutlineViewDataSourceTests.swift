@@ -179,7 +179,6 @@ fileprivate extension Bookmark {
     static var mock: Bookmark = Bookmark(id: UUID(),
                                          url: URL.duckDuckGo,
                                          title: "Title",
-                                         favicon: nil,
                                          isFavorite: false)
 
 }
