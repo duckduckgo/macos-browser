@@ -283,9 +283,9 @@ final class FaviconReferenceCache {
             .sink(receiveCompletion: { completion in
                 switch completion {
                 case .finished:
-                    os_log("Host references burned successfully.", log: .favicons)
+                    os_log("Host references removed successfully.", log: .favicons)
                 case .failure(let error):
-                    os_log("Burning of host references failed: %s", log: .favicons, type: .error, error.localizedDescription)
+                    os_log("Removing of host references failed: %s", log: .favicons, type: .error, error.localizedDescription)
                 }
                 completionHandler?()
             }, receiveValue: {})
@@ -305,9 +305,9 @@ final class FaviconReferenceCache {
             .sink(receiveCompletion: { completion in
                 switch completion {
                 case .finished:
-                    os_log("URL references burned successfully.", log: .favicons)
+                    os_log("URL references removed successfully.", log: .favicons)
                 case .failure(let error):
-                    os_log("Burning of URL references failed: %s", log: .favicons, type: .error, error.localizedDescription)
+                    os_log("Removing of URL references failed: %s", log: .favicons, type: .error, error.localizedDescription)
                 }
                 completionHandler?()
             }, receiveValue: {})
