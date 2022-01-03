@@ -67,7 +67,7 @@ final class FaviconImageCache {
 
         // Remove existing favicon with the same URL
         if let oldFavicon = entries[favicon.url] {
-            removeFavicons([oldFavicon])
+            removeFaviconsFromStore([oldFavicon])
         }
 
         // Save the new one
@@ -91,39 +91,59 @@ final class FaviconImageCache {
         return entries[faviconUrl]
     }
 
-    // MARK: - Burning
+    // MARK: - Clean
 
-    func burnExceptApproved(fireproofDomains: FireproofDomains,
-                            bookmarkManager: BookmarkManager,
-                            completion: @escaping () -> Void) {
+    func cleanOldExcept(fireproofDomains: FireproofDomains,
+                        bookmarkManager: BookmarkManager,
+                        completion: @escaping () -> Void) {
         dispatchPrecondition(condition: .onQueue(queue))
 
-        let faviconsToBurn = entries.values.filter { favicon in
+        removeFavicons(filter: { favicon in
+            guard let host = favicon.documentUrl.host else {
+                return false
+            }
+            return favicon.dateCreated < Date.monthAgo &&
+                !fireproofDomains.isFireproof(fireproofDomain: host) &&
+                !bookmarkManager.isHostInBookmarks(host: host)
+        }, completionHandler: completion)
+    }
+
+    // MARK: - Burning
+
+    func burnExcept(fireproofDomains: FireproofDomains,
+                    bookmarkManager: BookmarkManager,
+                    completion: @escaping () -> Void) {
+        dispatchPrecondition(condition: .onQueue(queue))
+
+        removeFavicons(filter: { favicon in
             guard let host = favicon.documentUrl.host else {
                 return false
             }
             return !(fireproofDomains.isFireproof(fireproofDomain: host) || bookmarkManager.isHostInBookmarks(host: host))
-        }
-        faviconsToBurn.forEach { entries[$0.url] = nil }
-        removeFavicons(faviconsToBurn, completionHandler: completion)
+        }, completionHandler: completion)
     }
 
     func burnDomains(_ domains: Set<String>, completion: @escaping () -> Void) {
         dispatchPrecondition(condition: .onQueue(queue))
 
-        let faviconsToBurn = entries.values.filter { favicon in
+        removeFavicons(filter: { favicon in
             guard let host = favicon.documentUrl.host else {
                 return false
             }
             return domains.contains(host)
-        }
-
-        removeFavicons(faviconsToBurn, completionHandler: completion)
+        }, completionHandler: completion)
     }
 
     // MARK: - Private
 
-    private func removeFavicons(_ favicons: [Favicon], completionHandler: (() -> Void)? = nil) {
+    private func removeFavicons(filter isRemoved: (Favicon) -> Bool, completionHandler: (() -> Void)? = nil) {
+        let faviconsToRemove = entries.values.filter(isRemoved)
+        faviconsToRemove.forEach { entries[$0.url] = nil }
+
+        removeFaviconsFromStore(faviconsToRemove, completionHandler: completionHandler)
+    }
+
+    private func removeFaviconsFromStore(_ favicons: [Favicon], completionHandler: (() -> Void)? = nil) {
         storing.removeFavicons(favicons)
             .receive(on: self.queue, options: .init(flags: .barrier))
             .sink(receiveCompletion: { completion in

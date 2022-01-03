@@ -19,12 +19,6 @@
 import Cocoa
 import Combine
 
-// TODOs
-// 5 Cleaning of the cache if entries are older than one month and not in bookmarks, keychain, ... (Trigger after loading from app delegate)
-// 6 Unit Tests
-// 7 Pixels
-// 4 Synchronous to asynchronous?
-
 protocol FaviconManagement {
 
     func fetchFavicons(_ faviconLinks: [FaviconUserScript.FaviconLink],
@@ -33,7 +27,9 @@ protocol FaviconManagement {
     func getCachedFavicon(for documentUrl: URL, sizeCategory: Favicon.SizeCategory) -> Favicon?
     func getCachedFavicon(for host: String, sizeCategory: Favicon.SizeCategory) -> Favicon?
 
-    func burnExceptApproved(fireproofDomains: FireproofDomains, bookmarkManager: BookmarkManager, completion: @escaping () -> Void)
+    func burnExcept(fireproofDomains: FireproofDomains,
+                    bookmarkManager: BookmarkManager,
+                    completion: @escaping () -> Void)
     func burnDomains(_ domains: Set<String>, completion: @escaping () -> Void)
 
 }
@@ -48,7 +44,13 @@ final class FaviconManager: FaviconManagement {
     private init() {
         queue.async {
             self.imageCache.loadFavicons { _ in
-                self.referenceCache.loadReferences()
+                self.imageCache.cleanOldExcept(fireproofDomains: FireproofDomains.shared,
+                                               bookmarkManager: LocalBookmarkManager.shared) {
+                    self.referenceCache.loadReferences { _ in
+                        self.referenceCache.cleanOldExcept(fireproofDomains: FireproofDomains.shared,
+                                                           bookmarkManager: LocalBookmarkManager.shared)
+                    }
+                }
             }
         }
     }
@@ -145,12 +147,13 @@ final class FaviconManager: FaviconManagement {
 
     // MARK: - Burning
 
-    // TODO: Logins
-    func burnExceptApproved(fireproofDomains: FireproofDomains, bookmarkManager: BookmarkManager, completion: @escaping () -> Void) {
+    func burnExcept(fireproofDomains: FireproofDomains,
+                    bookmarkManager: BookmarkManager,
+                    completion: @escaping () -> Void) {
         queue.async(flags: .barrier) {
-            self.referenceCache.burnExceptApproved(fireproofDomains: fireproofDomains,
+            self.referenceCache.burnExcept(fireproofDomains: fireproofDomains,
                                                    bookmarkManager: bookmarkManager) {
-                self.imageCache.burnExceptApproved(fireproofDomains: fireproofDomains,
+                self.imageCache.burnExcept(fireproofDomains: fireproofDomains,
                                                    bookmarkManager: bookmarkManager) {
                     DispatchQueue.main.async {
                         completion()

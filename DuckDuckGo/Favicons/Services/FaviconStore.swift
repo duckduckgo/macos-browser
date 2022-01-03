@@ -208,6 +208,8 @@ final class FaviconStore: FaviconStoring {
         return remove(identifiers: identifiers, entityName: FaviconUrlReferenceManagedObject.className())
     }
 
+    // MARK: - Private
+
     private func remove(identifiers: [UUID], entityName: String) -> Future<Void, Error> {
         return Future { [weak self] promise in
             self?.context.perform {

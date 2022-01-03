@@ -180,7 +180,7 @@ final class Fire {
     // MARK: - Favicons
 
     private func burnFavicons(completion: @escaping () -> Void) {
-        self.faviconManagement.burnExceptApproved(fireproofDomains: FireproofDomains.shared,
+        self.faviconManagement.burnExcept(fireproofDomains: FireproofDomains.shared,
                                                   bookmarkManager: LocalBookmarkManager.shared,
                                                   completion: completion)
     }
