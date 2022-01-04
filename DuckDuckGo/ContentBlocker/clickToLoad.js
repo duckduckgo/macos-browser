@@ -623,7 +623,7 @@
                      // notify surrogate to enable SDK and replace original element.
                      if (this.clickAction.type === 'allowFull') {
                          parent.replaceChild(originalElement, replacementElement)
-                         window.dispatchEvent(new CustomEvent(`Load${this.entity}SDK`))
+//                         window.dispatchEvent(new CustomEvent(`Load${this.entity}SDK`))
                          return
                      }
                      // Create a container for the new FB element

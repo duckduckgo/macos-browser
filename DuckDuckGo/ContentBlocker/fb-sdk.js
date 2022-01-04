@@ -89,7 +89,7 @@
         fbLogin.shouldRun = true
         replaceWindowOpen()
         loginPopup()
-        enableFacebookSDK()
+//        enableFacebookSDK()
     }
 
     function replaceWindowOpen () {
