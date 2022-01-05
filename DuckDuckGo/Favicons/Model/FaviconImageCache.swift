@@ -79,6 +79,10 @@ final class FaviconImageCache {
     }
 
     func get(faviconUrl: URL) -> Favicon? {
+        guard loaded else {
+            return nil
+        }
+
         return entries[faviconUrl]
     }
 
@@ -129,6 +133,8 @@ final class FaviconImageCache {
     }
 
     private func removeFaviconsFromStore(_ favicons: [Favicon], completionHandler: (() -> Void)? = nil) {
+        guard !favicons.isEmpty else { completionHandler?(); return }
+
         storing.removeFavicons(favicons)
             .receive(on: DispatchQueue.main)
             .sink(receiveCompletion: { completion in

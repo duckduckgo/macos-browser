@@ -21,6 +21,9 @@ import Combine
 
 protocol FaviconManagement {
 
+    var areFaviconsLoaded: Bool { get }
+    func loadFavicons()
+
     func handleFaviconLinks(_ faviconLinks: [FaviconUserScript.FaviconLink],
                             documentUrl: URL,
                             completion: @escaping (Favicon?) -> Void)
@@ -41,8 +44,8 @@ final class FaviconManager: FaviconManagement {
     private let fetchingQueue = DispatchQueue(label: "FaviconManager queue", qos: .userInitiated, attributes: .concurrent)
     private lazy var store: FaviconStoring = FaviconStore()
 
-    private init() {
-        self.imageCache.loadFavicons { _ in
+    func loadFavicons() {
+        imageCache.loadFavicons { _ in
             self.imageCache.cleanOldExcept(fireproofDomains: FireproofDomains.shared,
                                            bookmarkManager: LocalBookmarkManager.shared) {
                 self.referenceCache.loadReferences { _ in
@@ -53,12 +56,15 @@ final class FaviconManager: FaviconManagement {
         }
     }
 
+    var areFaviconsLoaded: Bool {
+        imageCache.loaded && referenceCache.loaded
+    }
+
     // MARK: - Fetching & Cache
 
     private lazy var imageCache = FaviconImageCache(faviconStoring: store)
     private lazy var referenceCache = FaviconReferenceCache(faviconStoring: store)
 
-    //TODO break into multiple methods
     func handleFaviconLinks(_ faviconLinks: [FaviconUserScript.FaviconLink],
                             documentUrl: URL,
                             completion: @escaping (Favicon?) -> Void) {
@@ -140,10 +146,10 @@ final class FaviconManager: FaviconManagement {
                         return nil
                     }
 
-                    if let loadedImage = NSImage(contentsOf: faviconUrl), loadedImage.isValid {
+                    if let fetchedImage = NSImage(contentsOf: faviconUrl), fetchedImage.isValid {
                         return Favicon(identifier: UUID(),
                                        url: faviconUrl,
-                                       image: loadedImage,
+                                       image: fetchedImage,
                                        relationString: faviconLink.rel,
                                        documentUrl: documentUrl,
                                        dateCreated: Date())

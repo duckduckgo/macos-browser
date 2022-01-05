@@ -138,6 +138,7 @@ fileprivate extension Bookmark {
     static var aBookmark: Bookmark = Bookmark(id: UUID(),
                                               url: URL.duckDuckGo,
                                               title: "Title",
-                                              isFavorite: false)
+                                              isFavorite: false,
+                                              faviconManagement: FaviconManagerMock())
 
 }

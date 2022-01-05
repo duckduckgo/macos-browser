@@ -378,6 +378,8 @@ final class Tab: NSObject {
     let faviconManagement: FaviconManagement
 
     private func handleFavicon(oldContent: TabContent) {
+        guard faviconManagement.areFaviconsLoaded else { return }
+
         guard content.isUrl, let url = content.url else {
             favicon = nil
             return

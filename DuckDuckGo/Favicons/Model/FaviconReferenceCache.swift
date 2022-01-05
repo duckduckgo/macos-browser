@@ -100,6 +100,10 @@ final class FaviconReferenceCache {
     }
 
     func getFaviconUrl(for documentURL: URL, sizeCategory: Favicon.SizeCategory) -> URL? {
+        guard loaded else {
+            return nil
+        }
+
         if let urlCacheEntry = urlReferences[documentURL] {
             switch sizeCategory {
             case .small: return urlCacheEntry.smallFaviconUrl ?? urlCacheEntry.mediumFaviconUrl
@@ -118,6 +122,10 @@ final class FaviconReferenceCache {
     }
 
     func getFaviconUrl(for host: String, sizeCategory: Favicon.SizeCategory) -> URL? {
+        guard loaded else {
+            return nil
+        }
+
         let hostCacheEntry = hostReferences[host] ?? (host.hasPrefix("www") ? hostReferences[host.dropWWW()] : hostReferences["www.\(host)"])
 
         switch sizeCategory {
@@ -262,6 +270,8 @@ final class FaviconReferenceCache {
     }
 
     private func removeHostReferencesFromStore(_ hostReferences: [FaviconHostReference], completionHandler: (() -> Void)? = nil) {
+        guard !hostReferences.isEmpty else { completionHandler?(); return }
+
         storing.remove(hostReferences: hostReferences)
             .receive(on: DispatchQueue.main)
             .sink(receiveCompletion: { completion in
@@ -284,6 +294,8 @@ final class FaviconReferenceCache {
     }
 
     private func removeUrlReferencesFromStore(_ urlReferences: [FaviconUrlReference], completionHandler: (() -> Void)? = nil) {
+        guard !urlReferences.isEmpty else { completionHandler?(); return }
+
         self.storing.remove(urlReferences: urlReferences)
             .receive(on: DispatchQueue.main)
             .sink(receiveCompletion: { completion in
