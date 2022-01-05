@@ -30,10 +30,12 @@ final class FireTests: XCTestCase {
         let manager = WebCacheManagerMock()
         let historyCoordinator = HistoryCoordinatingMock()
         let permissionManager = PermissionManagerMock()
+        let faviconManager = FaviconManagerMock()
 
         let fire = Fire(cacheManager: manager,
                         historyCoordinating: historyCoordinator,
-                        permissionManager: permissionManager)
+                        permissionManager: permissionManager,
+                        faviconManagement: faviconManager)
         let tabCollectionViewModel = TabCollectionViewModel.aTabCollectionViewModel
 
         let burningExpectation = expectation(description: "Burning")
@@ -69,9 +71,12 @@ final class FireTests: XCTestCase {
         let manager = WebCacheManagerMock()
         let historyCoordinator = HistoryCoordinatingMock()
         let permissionManager = PermissionManagerMock()
+        let faviconManager = FaviconManagerMock()
         let fire = Fire(cacheManager: manager,
                         historyCoordinating: historyCoordinator,
-                        permissionManager: permissionManager)
+                        permissionManager: permissionManager,
+                        faviconManagement: faviconManager)
+
         let tabCollectionViewModel = TabCollectionViewModel.aTabCollectionViewModel
 
         let isBurningExpectation = expectation(description: "Burning")

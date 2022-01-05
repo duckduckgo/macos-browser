@@ -181,8 +181,8 @@ final class Fire {
 
     private func burnFavicons(completion: @escaping () -> Void) {
         self.faviconManagement.burnExcept(fireproofDomains: FireproofDomains.shared,
-                                                  bookmarkManager: LocalBookmarkManager.shared,
-                                                  completion: completion)
+                                          bookmarkManager: LocalBookmarkManager.shared,
+                                          completion: completion)
     }
 
     private func burnFavicons(for domains: Set<String>, completion: @escaping () -> Void) {
