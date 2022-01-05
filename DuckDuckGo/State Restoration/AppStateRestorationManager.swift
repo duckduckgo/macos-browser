@@ -40,11 +40,14 @@ final class AppStateRestorationManager {
             Pixel.fire(.debug(event: .appStateRestorationFailed, error: error))
         }
 
-        cancellable = WindowControllersManager.shared.stateChanged
-            .debounce(for: .seconds(1), scheduler: RunLoop.main)
-            .sink { [unowned self] _ in
-                self.stateDidChange()
-            }
+        DispatchQueue.main.asyncAfter(deadline: .now() + 1) { [weak self] in
+            self?.cancellable = WindowControllersManager.shared.stateChanged
+                .debounce(for: .seconds(1), scheduler: RunLoop.main)
+                .sink { [weak self] _ in
+                    self?.stateDidChange()
+                }
+        }
+
     }
 
     private func stateDidChange() {
