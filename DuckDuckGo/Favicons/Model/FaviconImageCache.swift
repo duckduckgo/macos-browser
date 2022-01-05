@@ -23,24 +23,20 @@ import os.log
 final class FaviconImageCache {
 
     private let storing: FaviconStoring
-    private let queue: DispatchQueue
 
     private var entries = [URL: Favicon]()
 
     private var cancellables = Set<AnyCancellable>()
 
-    init(faviconQueue: DispatchQueue, faviconStoring: FaviconStoring) {
+    init(faviconStoring: FaviconStoring) {
         storing = faviconStoring
-        queue = faviconQueue
     }
 
     private(set) var loaded = false
 
     func loadFavicons(completionHandler: ((Error?) -> Void)? = nil) {
-        dispatchPrecondition(condition: .onQueue(queue))
-
         storing.loadFavicons()
-            .receive(on: self.queue, options: .init(flags: .barrier))
+            .receive(on: DispatchQueue.main)
             .sink(receiveCompletion: { completion in
                 switch completion {
                 case .finished:
@@ -51,7 +47,6 @@ final class FaviconImageCache {
                     completionHandler?(error)
                 }
             }, receiveValue: { [weak self] favicons in
-                dispatchPrecondition(condition: .onQueue(self!.queue))
                 favicons.forEach { favicon in
                     self?.entries[favicon.url] = favicon
                 }
@@ -61,8 +56,6 @@ final class FaviconImageCache {
     }
 
     func insert(_ favicon: Favicon) {
-        dispatchPrecondition(condition: .onQueue(queue))
-
         guard loaded else { return }
 
         // Remove existing favicon with the same URL
@@ -73,7 +66,7 @@ final class FaviconImageCache {
         // Save the new one
         entries[favicon.url] = favicon
         storing.save(favicon: favicon)
-            .receive(on: self.queue, options: .init(flags: .barrier))
+            .receive(on: DispatchQueue.main)
             .sink(receiveCompletion: { completion in
                 switch completion {
                 case .finished:
@@ -86,8 +79,6 @@ final class FaviconImageCache {
     }
 
     func get(faviconUrl: URL) -> Favicon? {
-        dispatchPrecondition(condition: .onQueue(queue))
-
         return entries[faviconUrl]
     }
 
@@ -96,8 +87,6 @@ final class FaviconImageCache {
     func cleanOldExcept(fireproofDomains: FireproofDomains,
                         bookmarkManager: BookmarkManager,
                         completion: @escaping () -> Void) {
-        dispatchPrecondition(condition: .onQueue(queue))
-
         removeFavicons(filter: { favicon in
             guard let host = favicon.documentUrl.host else {
                 return false
@@ -113,8 +102,6 @@ final class FaviconImageCache {
     func burnExcept(fireproofDomains: FireproofDomains,
                     bookmarkManager: BookmarkManager,
                     completion: @escaping () -> Void) {
-        dispatchPrecondition(condition: .onQueue(queue))
-
         removeFavicons(filter: { favicon in
             guard let host = favicon.documentUrl.host else {
                 return false
@@ -124,8 +111,6 @@ final class FaviconImageCache {
     }
 
     func burnDomains(_ domains: Set<String>, completion: @escaping () -> Void) {
-        dispatchPrecondition(condition: .onQueue(queue))
-
         removeFavicons(filter: { favicon in
             guard let host = favicon.documentUrl.host else {
                 return false
@@ -145,7 +130,7 @@ final class FaviconImageCache {
 
     private func removeFaviconsFromStore(_ favicons: [Favicon], completionHandler: (() -> Void)? = nil) {
         storing.removeFavicons(favicons)
-            .receive(on: self.queue, options: .init(flags: .barrier))
+            .receive(on: DispatchQueue.main)
             .sink(receiveCompletion: { completion in
                 switch completion {
                 case .finished:

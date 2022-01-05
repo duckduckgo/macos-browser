@@ -23,7 +23,6 @@ import os.log
 final class FaviconReferenceCache {
 
     private let storing: FaviconStoring
-    private let queue: DispatchQueue
 
     // References to favicon URLs for whole domains
     private var hostReferences = [String: FaviconHostReference]()
@@ -33,18 +32,15 @@ final class FaviconReferenceCache {
 
     private var cancellables = Set<AnyCancellable>()
 
-    init(faviconQueue: DispatchQueue, faviconStoring: FaviconStoring) {
+    init(faviconStoring: FaviconStoring) {
         storing = faviconStoring
-        queue = faviconQueue
     }
 
     private(set) var loaded = false
 
     func loadReferences(completionHandler: ((Error?) -> Void)? = nil) {
-        dispatchPrecondition(condition: .onQueue(queue))
-
         storing.loadFaviconReferences()
-            .receive(on: self.queue, options: .init(flags: .barrier))
+            .receive(on: DispatchQueue.main)
             .sink(receiveCompletion: { completion in
                 switch completion {
                 case .finished:
@@ -55,7 +51,6 @@ final class FaviconReferenceCache {
                     completionHandler?(error)
                 }
             }, receiveValue: { [weak self] (hostReferences, urlReferences) in
-                dispatchPrecondition(condition: .onQueue(self!.queue))
                 hostReferences.forEach { reference in
                     self?.hostReferences[reference.host] = reference
                 }
@@ -68,7 +63,6 @@ final class FaviconReferenceCache {
     }
 
     func insert(faviconUrls: (smallFaviconUrl: URL?, mediumFaviconUrl: URL?), documentUrl: URL) {
-        dispatchPrecondition(condition: .onQueue(queue))
         guard loaded else { return }
 
         guard let host = documentUrl.host else {
@@ -106,8 +100,6 @@ final class FaviconReferenceCache {
     }
 
     func getFaviconUrl(for documentURL: URL, sizeCategory: Favicon.SizeCategory) -> URL? {
-        dispatchPrecondition(condition: .onQueue(queue))
-
         if let urlCacheEntry = urlReferences[documentURL] {
             switch sizeCategory {
             case .small: return urlCacheEntry.smallFaviconUrl ?? urlCacheEntry.mediumFaviconUrl
@@ -126,8 +118,6 @@ final class FaviconReferenceCache {
     }
 
     func getFaviconUrl(for host: String, sizeCategory: Favicon.SizeCategory) -> URL? {
-        dispatchPrecondition(condition: .onQueue(queue))
-
         let hostCacheEntry = hostReferences[host] ?? (host.hasPrefix("www") ? hostReferences[host.dropWWW()] : hostReferences["www.\(host)"])
 
         switch sizeCategory {
@@ -141,8 +131,6 @@ final class FaviconReferenceCache {
     func cleanOldExcept(fireproofDomains: FireproofDomains,
                         bookmarkManager: BookmarkManager,
                         completion: (() -> Void)? = nil) {
-        dispatchPrecondition(condition: .onQueue(queue))
-
         // Remove host references
         removeHostReferences(filter: { hostReference in
             let host = hostReference.host
@@ -172,8 +160,6 @@ final class FaviconReferenceCache {
             return fireproofDomains.isFireproof(fireproofDomain: host) || bookmarkManager.isHostInBookmarks(host: host)
         }
 
-        dispatchPrecondition(condition: .onQueue(queue))
-
         // Remove host references
         removeHostReferences(filter: { hostReference in
             let host = hostReference.host
@@ -190,8 +176,6 @@ final class FaviconReferenceCache {
     }
 
     func burnDomains(_ domains: Set<String>, completion: @escaping () -> Void) {
-        dispatchPrecondition(condition: .onQueue(queue))
-
         // Remove host references
         removeHostReferences(filter: { hostReference in
             return domains.contains(hostReference.host)
@@ -224,7 +208,7 @@ final class FaviconReferenceCache {
         hostReferences[host] = hostReference
 
         storing.save(hostReference: hostReference)
-            .receive(on: self.queue, options: .init(flags: .barrier))
+            .receive(on: DispatchQueue.main)
             .sink(receiveCompletion: { completion in
                 switch completion {
                 case .finished:
@@ -252,7 +236,7 @@ final class FaviconReferenceCache {
         urlReferences[documentUrl] = urlReference
 
         storing.save(urlReference: urlReference)
-            .receive(on: self.queue, options: .init(flags: .barrier))
+            .receive(on: DispatchQueue.main)
             .sink(receiveCompletion: { completion in
                 switch completion {
                 case .finished:
@@ -279,7 +263,7 @@ final class FaviconReferenceCache {
 
     private func removeHostReferencesFromStore(_ hostReferences: [FaviconHostReference], completionHandler: (() -> Void)? = nil) {
         storing.remove(hostReferences: hostReferences)
-            .receive(on: self.queue, options: .init(flags: .barrier))
+            .receive(on: DispatchQueue.main)
             .sink(receiveCompletion: { completion in
                 switch completion {
                 case .finished:
@@ -301,7 +285,7 @@ final class FaviconReferenceCache {
 
     private func removeUrlReferencesFromStore(_ urlReferences: [FaviconUrlReference], completionHandler: (() -> Void)? = nil) {
         self.storing.remove(urlReferences: urlReferences)
-            .receive(on: self.queue, options: .init(flags: .barrier))
+            .receive(on: DispatchQueue.main)
             .sink(receiveCompletion: { completion in
                 switch completion {
                 case .finished:

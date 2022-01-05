@@ -572,11 +572,8 @@ extension Tab: FaviconUserScriptDelegate {
     func faviconUserScript(_ faviconUserScript: FaviconUserScript,
                            didFindFaviconLinks faviconLinks: [FaviconUserScript.FaviconLink],
                            for documentUrl: URL) {
-        faviconManagement.fetchFavicons(faviconLinks, documentUrl: documentUrl) { (favicon, error) in
-            guard documentUrl == self.content.url else {
-                return
-            }
-            guard error == nil, let favicon = favicon else {
+        faviconManagement.handleFaviconLinks(faviconLinks, documentUrl: documentUrl) { favicon in
+            guard documentUrl == self.content.url, let favicon = favicon else {
                 return
             }
             self.favicon = favicon.image
