@@ -22,10 +22,8 @@ import Combine
 
 final class FaviconManagerMock: FaviconManagement {
 
-    func fetchFavicons(_ faviconLinks: [FaviconUserScript.FaviconLink],
-                       documentUrl: URL,
-                       completion: @escaping (Favicon?, Error?) -> Void) {
-        completion(nil, nil)
+    func handleFaviconLinks(_ faviconLinks: [FaviconUserScript.FaviconLink], documentUrl: URL, completion: @escaping (Favicon?) -> Void) {
+        completion(nil)
     }
 
     func getCachedFavicon(for documentUrl: URL, sizeCategory: Favicon.SizeCategory) -> Favicon? {
