@@ -115,7 +115,7 @@ final class FaviconManager: FaviconManagement {
             // If we haven't pick a favicon yet or there is a new favicon loaded or favicons are outdated
             // Pick the most suitable favicons. Otherwise use cached references
             if noFaviconPickedYet || newFaviconLoaded || faviconsOutdated {
-                cachedFavicons = cachedFavicons.sorted(by: { $0.image.size.width < $1.image.size.width })
+                cachedFavicons = cachedFavicons.sorted(by: { $0.longestSide < $1.longestSide })
                 let mediumFavicon = FaviconSelector.getMostSuitableFavicon(for: .medium, favicons: cachedFavicons)
                 let smallFavicon = FaviconSelector.getMostSuitableFavicon(for: .small, favicons: cachedFavicons)
                 self.referenceCache.insert(faviconUrls: (smallFavicon?.url, mediumFavicon?.url), documentUrl: documentUrl)
@@ -217,24 +217,13 @@ final class FaviconManager: FaviconManagement {
                     guard let faviconUrl = URL(string: faviconLink.href) else {
                         return nil
                     }
-
-                    if let fetchedImage = NSImage(contentsOf: faviconUrl), fetchedImage.isValid {
-                        return Favicon(identifier: UUID(),
-                                       url: faviconUrl,
-                                       image: fetchedImage,
-                                       relationString: faviconLink.rel,
-                                       documentUrl: documentUrl,
-                                       dateCreated: Date())
-
-                    } else {
-                        // To prevent reloading of non-valid images
-                        return Favicon(identifier: UUID(),
-                                       url: faviconUrl,
-                                       image: NSImage(),
-                                       relationString: faviconLink.rel,
-                                       documentUrl: documentUrl,
-                                       dateCreated: Date())
-                    }
+                    
+                    return Favicon(identifier: UUID(),
+                                   url: faviconUrl,
+                                   image: NSImage(contentsOf: faviconUrl),
+                                   relationString: faviconLink.rel,
+                                   documentUrl: documentUrl,
+                                   dateCreated: Date())
                 }
             mainQueueCompletion(favicons)
         }

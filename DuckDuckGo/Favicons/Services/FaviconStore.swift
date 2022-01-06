@@ -249,13 +249,14 @@ fileprivate extension Favicon {
     init?(faviconMO: FaviconManagedObject) {
         guard let identifier = faviconMO.identifier,
               let url = faviconMO.urlEncrypted as? URL,
-              let image = faviconMO.imageEncrypted as? NSImage,
               let documentUrl = faviconMO.documentUrlEncrypted as? URL,
               let dateCreated = faviconMO.dateCreated,
               let relation = Favicon.Relation(rawValue: Int(faviconMO.relation)) else {
             assertionFailure("Favicon: Failed to init Favicon from FaviconManagedObject")
             return nil
         }
+
+        let image = faviconMO.imageEncrypted as? NSImage
 
         self.init(identifier: identifier, url: url, image: image, relation: relation, documentUrl: documentUrl, dateCreated: dateCreated)
     }

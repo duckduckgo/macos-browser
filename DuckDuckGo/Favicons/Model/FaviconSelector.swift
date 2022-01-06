@@ -23,7 +23,7 @@ final class FaviconSelector {
     static func getMostSuitableFavicon(for sizeCategory: Favicon.SizeCategory, favicons: [Favicon]) -> Favicon? {
         // Create groups according to the relation. // Prioritise favicon, then icon, and others
         let faviconGroups = favicons
-            // Categorize into 4 categories according to the quality
+        // Categorize into 4 categories according to the quality
             .reduce(into: [[Favicon](), [Favicon](), [Favicon](), [Favicon]()], { partialResult, favicon in
                 if favicon.sizeCategory == sizeCategory {
                     switch favicon.relation {
@@ -32,16 +32,15 @@ final class FaviconSelector {
                     case .other: partialResult[2].append(favicon)
                     }
                 } else {
-                    if sizeCategory == .medium || sizeCategory == .large {
-                        // Use anything larger than size category for medium or large
-                        if favicon.image.size.width > sizeCategory.rawValue {
-                            partialResult[3].append(favicon)
-                        }
-                    } else {
-                        // Use tiny even for small as the last option
+                    // Use tiny even for small as the worst result
+                    if sizeCategory == .small && favicon.sizeCategory == .tiny {
                         partialResult[3].append(favicon)
                     }
 
+                    // Use large even for medium as the worst result
+                    if sizeCategory == .medium && favicon.sizeCategory == .large {
+                        partialResult[3].append(favicon)
+                    }
                 }
             })
 

@@ -40,23 +40,31 @@ struct Favicon {
     }
 
     enum SizeCategory: CGFloat {
-        case tiny = 0
+        case noImage = 0
+        case tiny = 1
         case small = 32
         case medium = 132
         case large = 264
+        case huge = 1024
 
-        init(imageSize: CGSize) {
-            let maxSide = max(imageSize.width, imageSize.height)
-            switch maxSide {
-            case 0..<Self.small.rawValue:  self = .tiny
+        init(imageSize: CGSize?) {
+            guard let imageSize = imageSize else {
+                self = .noImage
+                return
+            }
+            let longestSide = max(imageSize.width, imageSize.height)
+            switch longestSide {
+            case 0: self = .noImage
+            case 1..<Self.small.rawValue:  self = .tiny
             case Self.small.rawValue..<Self.medium.rawValue: self = .small
             case Self.medium.rawValue..<Self.large.rawValue: self = .medium
-            default: self = .large
+            case Self.large.rawValue..<Self.huge.rawValue: self = .large
+            default: self = .huge
             }
         }
     }
 
-    init(identifier: UUID, url: URL, image: NSImage, relationString: String, documentUrl: URL, dateCreated: Date) {
+    init(identifier: UUID, url: URL, image: NSImage?, relationString: String, documentUrl: URL, dateCreated: Date) {
         self.init(identifier: identifier,
                   url: url, image: image,
                   relation: Relation(relationString: relationString),
@@ -64,22 +72,41 @@ struct Favicon {
                   dateCreated: dateCreated)
     }
 
-    init(identifier: UUID, url: URL, image: NSImage, relation: Relation, documentUrl: URL, dateCreated: Date) {
+    init(identifier: UUID, url: URL, image: NSImage?, relation: Relation, documentUrl: URL, dateCreated: Date) {
+
+        // Avoid storing or using of non-valid or huge images
+        if let image = image, image.isValid {
+            let sizeCategory = SizeCategory(imageSize: image.size)
+            if sizeCategory == .huge || sizeCategory == .noImage {
+                self.image = nil
+            } else {
+                self.image = image
+            }
+        } else {
+            self.image = nil
+        }
+
         self.identifier = identifier
         self.url = url
-        self.image = image
         self.relation = relation
-        sizeCategory = SizeCategory(imageSize: image.size)
+        self.sizeCategory = SizeCategory(imageSize: self.image?.size)
         self.documentUrl = documentUrl
         self.dateCreated = dateCreated
     }
 
     let identifier: UUID
     let url: URL
-    let image: NSImage
+    let image: NSImage?
     let relation: Relation
     let sizeCategory: SizeCategory
     let documentUrl: URL
     let dateCreated: Date
 
+    var longestSide: CGFloat {
+        guard let image = image else {
+            return 0
+        }
+
+        return max(image.size.width, image.size.height)
+    }
 }

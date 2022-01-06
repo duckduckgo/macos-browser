@@ -70,7 +70,7 @@ final class WKBackForwardListItemViewModel {
 
         if let url = backForwardListItem.url,
            let favicon = faviconManagement.getCachedFavicon(for: url, sizeCategory: .small),
-           let image = favicon.image.resizedToFaviconSize() {
+           let image = favicon.image?.resizedToFaviconSize() {
             return image
         }
 
