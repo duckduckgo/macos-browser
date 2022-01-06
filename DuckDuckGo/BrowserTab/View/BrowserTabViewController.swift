@@ -885,6 +885,11 @@ extension BrowserTabViewController: OnboardingDelegate {
     }
 
     func onboardingDidRequestSetDefault(completion: @escaping () -> Void) {
+        if DefaultBrowserPreferences.isDefault {
+            completion()
+            return
+        }
+
         DefaultBrowserPreferences.becomeDefault()
 
         var observer: Any?
