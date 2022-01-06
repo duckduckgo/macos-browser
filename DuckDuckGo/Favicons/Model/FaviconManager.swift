@@ -68,27 +68,11 @@ final class FaviconManager: FaviconManagement {
     func handleFaviconLinks(_ faviconLinks: [FaviconUserScript.FaviconLink],
                             documentUrl: URL,
                             completion: @escaping (Favicon?) -> Void) {
-        // Add favicon.ico into links
-        var faviconLinks = faviconLinks
-        if let host = documentUrl.host {
-            let faviconIcoLink = FaviconUserScript.FaviconLink(href: "\(URL.NavigationalScheme.https.separated())\(host)/favicon.ico",
-                                                               rel: "favicon.ico")
-            faviconLinks.append(faviconIcoLink)
-        }
+        // Manually add favicon.ico into links
+        let faviconLinks = addingFaviconIco(into: faviconLinks, documentUrl: documentUrl)
 
         // Fetch favicons if needed
-        let faviconLinksToFetch = faviconLinks.filter { faviconLink in
-            guard let faviconUrl = URL(string: faviconLink.href) else {
-                return false
-            }
-
-            if let favicon = imageCache.get(faviconUrl: faviconUrl), favicon.dateCreated > Date.weekAgo {
-                return false
-            } else {
-                return true
-            }
-        }
-
+        let faviconLinksToFetch = filteringAlreadyFetchedFaviconLinks(from: faviconLinks)
         fetchFavicons(faviconLinks: faviconLinksToFetch, documentUrl: documentUrl) { [weak self] newFavicons in
             guard let self = self else { return }
 
@@ -148,6 +132,72 @@ final class FaviconManager: FaviconManagement {
         }
     }
 
+    func getCachedFavicon(for documentUrl: URL, sizeCategory: Favicon.SizeCategory) -> Favicon? {
+        guard let faviconUrl = referenceCache.getFaviconUrl(for: documentUrl, sizeCategory: sizeCategory) else {
+            return nil
+        }
+
+        return imageCache.get(faviconUrl: faviconUrl)
+    }
+
+    func getCachedFavicon(for host: String, sizeCategory: Favicon.SizeCategory) -> Favicon? {
+        guard let faviconUrl = referenceCache.getFaviconUrl(for: host, sizeCategory: sizeCategory) else {
+            return nil
+        }
+
+        return imageCache.get(faviconUrl: faviconUrl)
+    }
+
+    // MARK: - Burning
+
+    func burnExcept(fireproofDomains: FireproofDomains,
+                    bookmarkManager: BookmarkManager,
+                    completion: @escaping () -> Void) {
+        self.referenceCache.burnExcept(fireproofDomains: fireproofDomains,
+                                       bookmarkManager: bookmarkManager) {
+            self.imageCache.burnExcept(fireproofDomains: fireproofDomains,
+                                       bookmarkManager: bookmarkManager) {
+                completion()
+            }
+        }
+    }
+
+    func burnDomains(_ domains: Set<String>, completion: @escaping () -> Void) {
+        self.referenceCache.burnDomains(domains) {
+            self.imageCache.burnDomains(domains) {
+                DispatchQueue.main.async {
+                    completion()
+                }
+            }
+        }
+    }
+
+    // MARK: - Private
+
+    private func addingFaviconIco(into faviconLinks: [FaviconUserScript.FaviconLink], documentUrl: URL) -> [FaviconUserScript.FaviconLink] {
+        var faviconLinks = faviconLinks
+        if let host = documentUrl.host {
+            let faviconIcoLink = FaviconUserScript.FaviconLink(href: "\(URL.NavigationalScheme.https.separated())\(host)/favicon.ico",
+                                                               rel: "favicon.ico")
+            faviconLinks.append(faviconIcoLink)
+        }
+        return faviconLinks
+    }
+
+    private func filteringAlreadyFetchedFaviconLinks(from faviconLinks: [FaviconUserScript.FaviconLink]) -> [FaviconUserScript.FaviconLink] {
+        return faviconLinks.filter { faviconLink in
+            guard let faviconUrl = URL(string: faviconLink.href) else {
+                return false
+            }
+
+            if let favicon = imageCache.get(faviconUrl: faviconUrl), favicon.dateCreated > Date.weekAgo {
+                return false
+            } else {
+                return true
+            }
+        }
+    }
+
     private func fetchFavicons(faviconLinks: [FaviconUserScript.FaviconLink], documentUrl: URL, completion: @escaping ([Favicon]) -> Void) {
 
         func mainQueueCompletion(_ favicons: [Favicon]) {
@@ -189,45 +239,4 @@ final class FaviconManager: FaviconManagement {
             mainQueueCompletion(favicons)
         }
     }
-
-    func getCachedFavicon(for documentUrl: URL, sizeCategory: Favicon.SizeCategory) -> Favicon? {
-        guard let faviconUrl = referenceCache.getFaviconUrl(for: documentUrl, sizeCategory: sizeCategory) else {
-            return nil
-        }
-
-        return imageCache.get(faviconUrl: faviconUrl)
-    }
-
-    func getCachedFavicon(for host: String, sizeCategory: Favicon.SizeCategory) -> Favicon? {
-        guard let faviconUrl = referenceCache.getFaviconUrl(for: host, sizeCategory: sizeCategory) else {
-            return nil
-        }
-
-        return imageCache.get(faviconUrl: faviconUrl)
-    }
-
-    // MARK: - Burning
-
-    func burnExcept(fireproofDomains: FireproofDomains,
-                    bookmarkManager: BookmarkManager,
-                    completion: @escaping () -> Void) {
-        self.referenceCache.burnExcept(fireproofDomains: fireproofDomains,
-                                       bookmarkManager: bookmarkManager) {
-            self.imageCache.burnExcept(fireproofDomains: fireproofDomains,
-                                       bookmarkManager: bookmarkManager) {
-                completion()
-            }
-        }
-    }
-
-    func burnDomains(_ domains: Set<String>, completion: @escaping () -> Void) {
-        self.referenceCache.burnDomains(domains) {
-            self.imageCache.burnDomains(domains) {
-                DispatchQueue.main.async {
-                    completion()
-                }
-            }
-        }
-    }
-
 }
