@@ -75,7 +75,7 @@ final class ClickToLoadUserScript: NSObject, UserScript, WKScriptMessageHandlerW
         if message.name == "getImage" {
             image = ClickToLoadModel.getImage[arg]!
         } else {
-            print("Uknown message type")
+            assertionFailure("Uknown message type")
             replyHandler(nil, nil)
             return
         }
