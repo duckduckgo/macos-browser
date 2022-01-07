@@ -19,10 +19,19 @@
 import Foundation
 import TrackerRadarKit
 import BrowserServicesKit
+import CryptoKit
 
 final class ContentBlockerRulesLists: DefaultContentBlockerRulesListsSource {
     static var FBTrackers: URL {
         return Bundle.main.url(forResource: "fb-tds", withExtension: "json")!
+    }
+    
+    func MD5(data: Data) -> String {
+        let digest = Insecure.MD5.hash(data: data)
+
+        return digest.map {
+            String(format: "%02hhx", $0)
+        }.joined()
     }
     
     override var contentBlockerRulesLists: [ContentBlockerRulesList] {
@@ -32,8 +41,8 @@ final class ContentBlockerRulesLists: DefaultContentBlockerRulesListsSource {
         do {
             let dataFile = (try? Data(contentsOf: Self.FBTrackers)) ?? Data()
             let trackerData = try JSONDecoder().decode(TrackerData.self, from: dataFile)
-            // TODO generate real etag here for above list?
-            let dataSet: TrackerDataManager.DataSet = TrackerDataManager.DataSet(trackerData, "etag-fb")
+            let etag = MD5(data: dataFile)
+            let dataSet: TrackerDataManager.DataSet = TrackerDataManager.DataSet(trackerData, etag)
             let additionalRulesList = ContentBlockerRulesList(name: "fb", trackerData: nil, fallbackTrackerData: dataSet)
     
             result.append(additionalRulesList)
