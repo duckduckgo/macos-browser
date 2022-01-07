@@ -299,18 +299,29 @@ final class Tab: NSObject {
             webView.reload()
         }
     }
-    
-    private func clickToLoadBlockFB() {
-        guard !self.FBblocked else {
-            return
+
+    private func setFBProtection(enabled: Bool) -> Bool {
+        guard self.FBblocked != enabled else {
+            return false
         }
 
         if let fbRules = contentBlockingManager.currentRules.first(where: { $0.name == "fb" }) {
-            self.FBblocked = true
-            webView.configuration.userContentController.add(fbRules.rulesList)
+            if self.FBblocked {
+                self.FBblocked = false
+                webView.configuration.userContentController.remove(fbRules.rulesList)
+            } else {
+                self.FBblocked = true
+                webView.configuration.userContentController.add(fbRules.rulesList)
+            }
+            return true
         } else {
             assertionFailure("Missing FB List")
         }
+        return false
+    }
+
+    private func clickToLoadBlockFB() {
+        setFBProtection(enabled: true)
     }
 
     private func reloadIfNeeded(shouldLoadInBackground: Bool = false) {
@@ -640,21 +651,17 @@ extension Tab: ClickToLoadUserScriptDelegate {
             return
         }
         
-        if let fbRules = contentBlockingManager.currentRules.first(where: { $0.name == "fb" }) {
-            self.FBblocked = false
-            webView.configuration.userContentController.remove(fbRules.rulesList)
+        if setFBProtection(enabled: false) {
+            replyHandler(true)
         } else {
-            assertionFailure("Missing FB List")
             replyHandler(false)
         }
-
-        replyHandler(true)
     }
 }
 
 extension Tab: SurrogatesUserScriptDelegate {
     func surrogatesUserScriptShouldProcessTrackers(_ script: SurrogatesUserScript) -> Bool {
-        return true
+         return true
     }
 
     func surrogatesUserScript(_ script: SurrogatesUserScript, detectedTracker tracker: DetectedTracker, withSurrogate host: String) {
