@@ -4590,7 +4590,7 @@
 					"@executable_path/../Frameworks",
 				);
 				MARKETING_VERSION = 0.17.7;
-				PRODUCT_BUNDLE_IDENTIFIER = com.ladamski.macos.browser;
+				PRODUCT_BUNDLE_IDENTIFIER = com.duckduckgo.macos.browser;
 				PRODUCT_MODULE_NAME = "$(TARGET_NAME:c99extidentifier)";
 				PRODUCT_NAME = DuckDuckGo;
 				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "FEEDBACK OUT_OF_APPSTORE";
@@ -4722,7 +4722,7 @@
 					"@executable_path/../Frameworks",
 				);
 				MARKETING_VERSION = 0.17.7;
-				PRODUCT_BUNDLE_IDENTIFIER = com.ladamski.macos.browser.review;
+				PRODUCT_BUNDLE_IDENTIFIER = com.duckduckgo.macos.browser.review;
 				PRODUCT_MODULE_NAME = "$(TARGET_NAME:c99extidentifier)";
 				PRODUCT_NAME = "DuckDuckGo Review";
 				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "FEEDBACK OUT_OF_APPSTORE";
@@ -4871,7 +4871,7 @@
 					"@executable_path/../Frameworks",
 				);
 				MARKETING_VERSION = 0.17.7;
-				PRODUCT_BUNDLE_IDENTIFIER = com.ladamski.macos.browser;
+				PRODUCT_BUNDLE_IDENTIFIER = com.duckduckgo.macos.browser;
 				PRODUCT_MODULE_NAME = "$(TARGET_NAME:c99extidentifier)";
 				PRODUCT_NAME = "DuckDuckGo Non-Production";
 				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "FEEDBACK OUT_OF_APPSTORE BETA";
