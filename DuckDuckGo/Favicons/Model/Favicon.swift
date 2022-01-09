@@ -45,7 +45,7 @@ struct Favicon {
         case small = 32
         case medium = 132
         case large = 264
-        case huge = 1024
+        case huge = 2048
 
         init(imageSize: CGSize?) {
             guard let imageSize = imageSize else {
