@@ -105,6 +105,8 @@ final class BookmarkManagementSidebarViewController: NSViewController {
 
     override func viewWillAppear() {
         super.viewWillAppear()
+        reloadData()
+
         tabSwitcherButton.select(tabType: .bookmarks)
     }
 
