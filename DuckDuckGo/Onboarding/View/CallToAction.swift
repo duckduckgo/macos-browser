@@ -37,14 +37,17 @@ struct CallToAction: View {
                 }
             }
 
-            Button(cta) {
+            Button {
                 withAnimation {
                     onNext()
                 }
+            } label: {
+                Text(cta)
             }
             .frame(width: speachWidth - 8)
             .buttonStyle(ActionButtonStyle())
             .visibility(typingFinished ? .visible : .gone)
+
         }
     }
 
