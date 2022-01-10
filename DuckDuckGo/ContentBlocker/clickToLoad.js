@@ -10,8 +10,8 @@
      let logoImg
      const titleID = 'DuckDuckGoPrivacyEssentialsCTLElementTitle'
      const entities = []
-     const ddgFont = "" //TODO chrome.runtime.getURL('public/font/ProximaNova-Reg-webfont.woff')
-     const ddgFontBold = ""//TODO  chrome.runtime.getURL('public/font/ProximaNova-Bold-webfont.woff2')
+     const ddgFont = 'ProximaNova-Reg-webfont.woff'
+     const ddgFontBold = 'ProximaNova-Bold-webfont.woff2'
      const entityData = {}
      const fbSurrogate = `${fb-sdk.js}` // inject SDK
      const fbConfig = JSON.parse(`${clickToLoadConfig.json}`.replace(/\\/g, ''));
@@ -144,12 +144,12 @@
          fontStyle: `
              @font-face{
                  font-family: DuckDuckGoPrivacyEssentials;
-                 src: url(${ddgFont});
+                 src: local(${ddgFont}),format('woff');
              }
              @font-face{
                  font-family: DuckDuckGoPrivacyEssentialsBold;
                  font-weight: bold;
-                 src: url(${ddgFontBold});
+                 src: local(${ddgFontBold}),format('woff2');
              }
          `,
          darkMode: {
