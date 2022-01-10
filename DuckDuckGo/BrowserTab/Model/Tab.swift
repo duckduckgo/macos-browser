@@ -306,6 +306,7 @@ final class Tab: NSObject {
         }
     }
 
+    @discardableResult
     private func setFBProtection(enabled: Bool) -> Bool {
         guard self.FBblocked != enabled else {
             return false
@@ -644,15 +645,8 @@ extension Tab: ContentBlockerRulesUserScriptDelegate {
         return true
     }
 
-    func contentBlockerRulesUserScriptShouldProcessCTLTrackers(_ script: ContentBlockerRulesUserScript) -> (Bool, TrackerData?) {
-        var rules: TrackerData
-        if let fbRules = contentBlockingManager.currentRules.first(where: { $0.name == "fb" }) {
-            rules = fbRules.trackerData
-            return (self.FBblocked, rules)
-        } else {
-            assertionFailure("Missing FB List")
-            return (false, nil)
-        }
+    func contentBlockerRulesUserScriptShouldProcessCTLTrackers(_ script: ContentBlockerRulesUserScript) -> Bool {
+        return FBblocked
     }
 
     func contentBlockerRulesUserScript(_ script: ContentBlockerRulesUserScript, detectedTracker tracker: DetectedTracker) {

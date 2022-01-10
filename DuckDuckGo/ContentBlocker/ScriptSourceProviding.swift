@@ -95,8 +95,11 @@ final class DefaultScriptSourceProvider: ScriptSourceProviding {
         let tdsName = DefaultContentBlockerRulesListsSource.Constants.trackerDataSetRulesListName
         let trackerData = contentBlockingManager.currentRules.first(where: { $0.name == tdsName})?.trackerData
         
+        let ctlTrackerData = contentBlockingManager.currentRules.first(where: { $0.name == "fb" })?.trackerData
+        
         return DefaultContentBlockerUserScriptConfig(privacyConfiguration: privacyConfigurationManager.privacyConfig,
-                                                     trackerData: trackerData)
+                                                     trackerData: trackerData,
+                                                     ctlTrackerData: ctlTrackerData)
     }
 
     private func buildSurrogatesConfig() -> SurrogatesUserScriptConfig {
