@@ -1,10 +1,12 @@
 {
     "trackers": {
         "facebook.com": {
+            "domain": "facebook.com",
             "owner": {
                 "name": "Facebook, Inc.",
                 "displayName": "Facebook"
             },
+            "default": "ignore",
             "rules": [
                 {
                     "rule": "facebook\\.com\\/[a-z_A-Z]+\\/sdk\\.js",
@@ -13,15 +15,17 @@
                             "graph.facebook.com"
                         ]
                     },
-                    "surrogate": "facebook.js"
+                    "action": "block"
                 }
             ]
         },
         "facebook.net": {
+            "domain": "facebook.net",
             "owner": {
                 "name": "Facebook, Inc.",
                 "displayName": "Facebook"
             },
+            "default": "ignore",
             "rules": [
                 {
                     "rule": "facebook\\.net\\/[a-z_A-Z]+\\/sdk\\.js",
@@ -30,7 +34,7 @@
                             "graph.facebook.com"
                         ]
                     },
-                    "surrogate": "facebook.js"
+                    "action": "block"
                 },
                 {
                     "rule": "facebook\\.net\\/[a-z_A-Z]+\\/all\\.js",
@@ -39,8 +43,7 @@
                             "graph.facebook.com"
                         ]
                     },
-                    "surrogate": "facebook.js"
-                }
+                    "action": "block"                }
             ]
         }
     },
