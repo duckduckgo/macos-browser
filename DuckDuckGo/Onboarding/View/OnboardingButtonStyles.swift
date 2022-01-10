@@ -27,7 +27,7 @@ struct ActionButtonStyle: ButtonStyle {
             .padding(.vertical, 8)
             .frame(maxWidth: .infinity)
             .truncationMode(.tail)
-            .background(RoundedRectangle(cornerRadius: 8, style: .continuous).fill(Color("OnboardingActionButton")))
+            .background(RoundedRectangle(cornerRadius: 8, style: .continuous).fill(Color("OnboardingActionButtonColor")))
             .foregroundColor(.white)
             .opacity(configuration.isPressed ? 0.6 : 1.0)
             .font(.system(size: 13, weight: .bold, design: .default))

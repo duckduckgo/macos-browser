@@ -46,6 +46,7 @@ final class PasswordManagementViewController: NSViewController {
     @IBOutlet var itemContainer: NSView!
     @IBOutlet var searchField: NSTextField!
     @IBOutlet var divider: NSView!
+    @IBOutlet var emptyState: NSView!
 
     var editingCancellable: AnyCancellable?
 
@@ -163,7 +164,9 @@ final class PasswordManagementViewController: NSViewController {
             self?.doSaveCredentials(credentials)
         }, onDeleteRequested: { [weak self] credentials in
             self?.promptToDelete(credentials: credentials)
-        })
+        }) { [weak self] in
+            self?.refetchWithText(self!.searchField.stringValue)
+        }
 
         self.itemModel = itemModel
 
@@ -179,7 +182,9 @@ final class PasswordManagementViewController: NSViewController {
             self?.doSaveIdentity(note)
         }, onDeleteRequested: { [weak self] identity in
             self?.promptToDelete(identity: identity)
-        })
+        }) { [weak self] in
+            self?.refetchWithText(self!.searchField.stringValue)
+        }
 
         self.itemModel = itemModel
 
@@ -195,7 +200,9 @@ final class PasswordManagementViewController: NSViewController {
             self?.doSaveNote(note)
         }, onDeleteRequested: { [weak self] note in
             self?.promptToDelete(note: note)
-        })
+        }) { [weak self] in
+            self?.refetchWithText(self!.searchField.stringValue)
+        }
 
         self.itemModel = itemModel
 
@@ -211,7 +218,9 @@ final class PasswordManagementViewController: NSViewController {
             self?.doSaveCreditCard(card)
         }, onDeleteRequested: { [weak self] card in
             self?.promptToDelete(card: card)
-        })
+        }) { [weak self] in
+            self?.refetchWithText(self!.searchField.stringValue)
+        }
 
         self.itemModel = itemModel
 
@@ -226,6 +235,7 @@ final class PasswordManagementViewController: NSViewController {
     }
 
     private func replaceItemContainerChildView(with view: NSView) {
+        emptyState.isHidden = true
         clearSelectedItem()
 
         view.frame = itemContainer.bounds
@@ -510,6 +520,7 @@ final class PasswordManagementViewController: NSViewController {
                         identities.map(SecureVaultItem.identity)
 
             DispatchQueue.main.async {
+                self.emptyState.isHidden = !items.isEmpty
                 completion(items)
             }
         }
