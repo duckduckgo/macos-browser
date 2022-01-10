@@ -491,7 +491,7 @@ extension MainViewController {
     }
     
     @IBAction func resetMacWaitlistUnlockState(_ sender: Any?) {
-        OnboardingViewModel().onboardingFinished = false
+        OnboardingViewModel().restart()
         let store = MacWaitlistEncryptedFileStorage()
         store.deleteExistingMetadata()
     }

@@ -203,7 +203,15 @@ final class Tab: NSObject {
     }
 
     func update(url: URL?, userEntered: Bool = true) {
-        self.content = url == .homePage ? .homepage : .url(url ?? .blankPage)
+
+        if url == .homePage {
+            self.content = .homepage
+        } else if url == .welcome {
+            OnboardingViewModel().restart()
+            self.content = .onboarding
+        } else {
+            self.content = .url(url ?? .blankPage)
+        }
 
         // This function is called when the user has manually typed in a new address, which should reset the login detection flow.
         userEnteredUrl = userEntered

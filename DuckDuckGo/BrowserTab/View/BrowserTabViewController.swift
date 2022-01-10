@@ -262,11 +262,7 @@ final class BrowserTabViewController: NSViewController {
         case .onboarding:
             removeAllTabContent()
             requestDisableUI()
-            if let vc = transientTabContentViewController as? OnboardingViewController {
-                showTabContentController(vc)
-            } else {
-                showTransientTabContentController(OnboardingViewController.create(withDelegate: self))
-            }
+            showTransientTabContentController(OnboardingViewController.create(withDelegate: self))
 
         case .url:
             removeAllTabContent(includingWebView: false)

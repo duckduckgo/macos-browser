@@ -82,6 +82,10 @@ extension URL {
         return URL(string: "about:home")!
     }
 
+    static var welcome: URL {
+        return URL(string: "about:welcome")!
+    }
+
     // MARK: Pixel
 
     static let pixelBase = ProcessInfo.processInfo.environment["PIXEL_BASE_URL", default: "https://improving.duckduckgo.com"]
