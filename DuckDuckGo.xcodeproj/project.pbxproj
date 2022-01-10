@@ -261,7 +261,6 @@
 		85E11C2F25E7DC7E00974CAF /* ExternalURLHandler.swift in Sources */ = {isa = PBXBuildFile; fileRef = 85E11C2E25E7DC7E00974CAF /* ExternalURLHandler.swift */; };
 		85E11C3725E7F1E100974CAF /* ExternalURLHandlerTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 85E11C3625E7F1E100974CAF /* ExternalURLHandlerTests.swift */; };
 		85F1B0C925EF9759004792B6 /* URLEventHandlerTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 85F1B0C825EF9759004792B6 /* URLEventHandlerTests.swift */; };
-		85F4D1C4266695C9002DD869 /* BrowserServicesKit in Frameworks */ = {isa = PBXBuildFile; productRef = 85F4D1C3266695C9002DD869 /* BrowserServicesKit */; };
 		85F69B3C25EDE81F00978E59 /* URLExtensionTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 85F69B3B25EDE81F00978E59 /* URLExtensionTests.swift */; };
 		85FF55C825F82E4F00E2AB99 /* Lottie in Frameworks */ = {isa = PBXBuildFile; productRef = 85FF55C725F82E4F00E2AB99 /* Lottie */; };
 		9812D895276CEDA5004B6181 /* ContentBlockerRulesLists.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9812D894276CEDA5004B6181 /* ContentBlockerRulesLists.swift */; };
@@ -595,6 +594,7 @@
 		B6FA8941269C425400588ECD /* PrivacyDashboardPopover.swift in Sources */ = {isa = PBXBuildFile; fileRef = B6FA8940269C425400588ECD /* PrivacyDashboardPopover.swift */; };
 		EA0BA3A9272217E6002A0B6C /* ClickToLoadUserScript.swift in Sources */ = {isa = PBXBuildFile; fileRef = EA0BA3A8272217E6002A0B6C /* ClickToLoadUserScript.swift */; };
 		EA18D1CA272F0DC8006DC101 /* social_images in Resources */ = {isa = PBXBuildFile; fileRef = EA18D1C9272F0DC8006DC101 /* social_images */; };
+		EA2EB98B278BD931001E54AF /* BrowserServicesKit in Frameworks */ = {isa = PBXBuildFile; productRef = EA2EB98A278BD931001E54AF /* BrowserServicesKit */; };
 		EA4617F0273A28A700F110A2 /* fb-tds.json in Resources */ = {isa = PBXBuildFile; fileRef = EA4617EF273A28A700F110A2 /* fb-tds.json */; };
 		EA477680272A21B700419EDA /* clickToLoadConfig.json in Resources */ = {isa = PBXBuildFile; fileRef = EA47767F272A21B700419EDA /* clickToLoadConfig.json */; };
 		EAC80DE0271F6C0100BBF02D /* fb-sdk.js in Resources */ = {isa = PBXBuildFile; fileRef = EAC80DDF271F6C0100BBF02D /* fb-sdk.js */; };
@@ -1259,11 +1259,11 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				EA2EB98B278BD931001E54AF /* BrowserServicesKit in Frameworks */,
 				85AE2FF224A33A2D002D507F /* WebKit.framework in Frameworks */,
 				B65783F525F8ACA400D8DB33 /* Punnycode in Frameworks */,
 				4B82E9B325B69E3E00656FE7 /* TrackerRadarKit in Frameworks */,
 				AA06B6B72672AF8100F541C5 /* Sparkle in Frameworks */,
-				85F4D1C4266695C9002DD869 /* BrowserServicesKit in Frameworks */,
 				85FF55C825F82E4F00E2AB99 /* Lottie in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -3297,8 +3297,8 @@
 				4B82E9B225B69E3E00656FE7 /* TrackerRadarKit */,
 				85FF55C725F82E4F00E2AB99 /* Lottie */,
 				B65783F425F8ACA400D8DB33 /* Punnycode */,
-				85F4D1C3266695C9002DD869 /* BrowserServicesKit */,
 				AA06B6B62672AF8100F541C5 /* Sparkle */,
+				EA2EB98A278BD931001E54AF /* BrowserServicesKit */,
 			);
 			productName = DuckDuckGo;
 			productReference = AA585D7E248FD31100E9A3E2 /* DuckDuckGo.app */;
@@ -3367,8 +3367,8 @@
 				85FF55C625F82E4F00E2AB99 /* XCRemoteSwiftPackageReference "lottie-ios" */,
 				B65783F325F8ACA400D8DB33 /* XCRemoteSwiftPackageReference "PunycodeSwift" */,
 				B6DA44152616C13800DD1EC2 /* XCRemoteSwiftPackageReference "OHHTTPStubs" */,
-				85F4D1C2266695C9002DD869 /* XCRemoteSwiftPackageReference "BrowserServicesKit" */,
 				AA06B6B52672AF8100F541C5 /* XCRemoteSwiftPackageReference "Sparkle" */,
+				EA2EB989278BD931001E54AF /* XCRemoteSwiftPackageReference "BrowserServicesKit" */,
 			);
 			productRefGroup = AA585D7F248FD31100E9A3E2 /* Products */;
 			projectDirPath = "";
@@ -4281,7 +4281,7 @@
 				CODE_SIGN_IDENTITY = "";
 				CODE_SIGN_STYLE = Manual;
 				COMBINE_HIDPI_IMAGES = YES;
-				CURRENT_PROJECT_VERSION = 0.17.7;
+				CURRENT_PROJECT_VERSION = 0.20.0;
 				DEVELOPMENT_TEAM = "";
 				ENABLE_HARDENED_RUNTIME = YES;
 				INFOPLIST_FILE = DuckDuckGo/Info.plist;
@@ -4289,7 +4289,7 @@
 					"$(inherited)",
 					"@executable_path/../Frameworks",
 				);
-				MARKETING_VERSION = 0.17.7;
+				MARKETING_VERSION = 0.20.0;
 				PRODUCT_BUNDLE_IDENTIFIER = com.duckduckgo.macos.browser.debug;
 				PRODUCT_MODULE_NAME = "$(TARGET_NAME:c99extidentifier)";
 				PRODUCT_NAME = DuckDuckGo;
@@ -4553,7 +4553,7 @@
 				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
-				CURRENT_PROJECT_VERSION = 0.17.7;
+				CURRENT_PROJECT_VERSION = 0.20.0;
 				DEVELOPMENT_TEAM = HKE973VLUW;
 				ENABLE_HARDENED_RUNTIME = YES;
 				INFOPLIST_FILE = DuckDuckGo/Info.plist;
@@ -4561,7 +4561,7 @@
 					"$(inherited)",
 					"@executable_path/../Frameworks",
 				);
-				MARKETING_VERSION = 0.17.7;
+				MARKETING_VERSION = 0.20.0;
 				PRODUCT_BUNDLE_IDENTIFIER = com.duckduckgo.macos.browser.debug;
 				PRODUCT_MODULE_NAME = "$(TARGET_NAME:c99extidentifier)";
 				PRODUCT_NAME = DuckDuckGo;
@@ -4581,7 +4581,7 @@
 				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
-				CURRENT_PROJECT_VERSION = 0.17.7;
+				CURRENT_PROJECT_VERSION = 0.20.0;
 				DEVELOPMENT_TEAM = HKE973VLUW;
 				ENABLE_HARDENED_RUNTIME = YES;
 				INFOPLIST_FILE = DuckDuckGo/Info.plist;
@@ -4589,7 +4589,7 @@
 					"$(inherited)",
 					"@executable_path/../Frameworks",
 				);
-				MARKETING_VERSION = 0.17.7;
+				MARKETING_VERSION = 0.20.0;
 				PRODUCT_BUNDLE_IDENTIFIER = com.duckduckgo.macos.browser;
 				PRODUCT_MODULE_NAME = "$(TARGET_NAME:c99extidentifier)";
 				PRODUCT_NAME = DuckDuckGo;
@@ -4713,7 +4713,7 @@
 				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
-				CURRENT_PROJECT_VERSION = 0.17.7;
+				CURRENT_PROJECT_VERSION = 0.20.0;
 				DEVELOPMENT_TEAM = HKE973VLUW;
 				ENABLE_HARDENED_RUNTIME = YES;
 				INFOPLIST_FILE = DuckDuckGo/Info.plist;
@@ -4721,7 +4721,7 @@
 					"$(inherited)",
 					"@executable_path/../Frameworks",
 				);
-				MARKETING_VERSION = 0.17.7;
+				MARKETING_VERSION = 0.20.0;
 				PRODUCT_BUNDLE_IDENTIFIER = com.duckduckgo.macos.browser.review;
 				PRODUCT_MODULE_NAME = "$(TARGET_NAME:c99extidentifier)";
 				PRODUCT_NAME = "DuckDuckGo Review";
@@ -4861,7 +4861,7 @@
 				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
-				CURRENT_PROJECT_VERSION = 0.17.7;
+				CURRENT_PROJECT_VERSION = 0.20.0;
 				DEVELOPMENT_TEAM = HKE973VLUW;
 				ENABLE_HARDENED_RUNTIME = YES;
 				GCC_PREPROCESSOR_DEFINITIONS = "BETA=1";
@@ -4870,7 +4870,7 @@
 					"$(inherited)",
 					"@executable_path/../Frameworks",
 				);
-				MARKETING_VERSION = 0.17.7;
+				MARKETING_VERSION = 0.20.0;
 				PRODUCT_BUNDLE_IDENTIFIER = com.duckduckgo.macos.browser;
 				PRODUCT_MODULE_NAME = "$(TARGET_NAME:c99extidentifier)";
 				PRODUCT_NAME = "DuckDuckGo Non-Production";
@@ -5000,14 +5000,6 @@
 				version = 1.0.3;
 			};
 		};
-		85F4D1C2266695C9002DD869 /* XCRemoteSwiftPackageReference "BrowserServicesKit" */ = {
-			isa = XCRemoteSwiftPackageReference;
-			repositoryURL = "https://github.com/duckduckgo/BrowserServicesKit.git";
-			requirement = {
-				branch = "feature/bartek/multiple-blocking-rule-lists";
-				kind = branch;
-			};
-		};
 		85FF55C625F82E4F00E2AB99 /* XCRemoteSwiftPackageReference "lottie-ios" */ = {
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/airbnb/lottie-ios";
@@ -5040,6 +5032,14 @@
 				minimumVersion = 9.1.0;
 			};
 		};
+		EA2EB989278BD931001E54AF /* XCRemoteSwiftPackageReference "BrowserServicesKit" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/ladamski/BrowserServicesKit";
+			requirement = {
+				branch = "la/ctl-delegate";
+				kind = branch;
+			};
+		};
 /* End XCRemoteSwiftPackageReference section */
 
 /* Begin XCSwiftPackageProductDependency section */
@@ -5047,11 +5047,6 @@
 			isa = XCSwiftPackageProductDependency;
 			package = 4B82E9B125B69E3E00656FE7 /* XCRemoteSwiftPackageReference "TrackerRadarKit" */;
 			productName = TrackerRadarKit;
-		};
-		85F4D1C3266695C9002DD869 /* BrowserServicesKit */ = {
-			isa = XCSwiftPackageProductDependency;
-			package = 85F4D1C2266695C9002DD869 /* XCRemoteSwiftPackageReference "BrowserServicesKit" */;
-			productName = BrowserServicesKit;
 		};
 		85FF55C725F82E4F00E2AB99 /* Lottie */ = {
 			isa = XCSwiftPackageProductDependency;
@@ -5077,6 +5072,11 @@
 			isa = XCSwiftPackageProductDependency;
 			package = B6DA44152616C13800DD1EC2 /* XCRemoteSwiftPackageReference "OHHTTPStubs" */;
 			productName = OHHTTPStubsSwift;
+		};
+		EA2EB98A278BD931001E54AF /* BrowserServicesKit */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = EA2EB989278BD931001E54AF /* XCRemoteSwiftPackageReference "BrowserServicesKit" */;
+			productName = BrowserServicesKit;
 		};
 /* End XCSwiftPackageProductDependency section */
 

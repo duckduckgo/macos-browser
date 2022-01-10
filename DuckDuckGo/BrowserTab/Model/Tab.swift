@@ -21,6 +21,7 @@ import WebKit
 import os
 import Combine
 import BrowserServicesKit
+import TrackerRadarKit
 
 protocol TabDelegate: FileDownloadManagerDelegate {
     func tabDidStartNavigation(_ tab: Tab)
@@ -636,6 +637,17 @@ extension Tab: ContentBlockerRulesUserScriptDelegate {
 
     func contentBlockerRulesUserScriptShouldProcessTrackers(_ script: ContentBlockerRulesUserScript) -> Bool {
         return true
+    }
+
+    func contentBlockerRulesUserScriptShouldProcessCTLTrackers(_ script: ContentBlockerRulesUserScript) -> (Bool, TrackerData?) {
+        var rules: TrackerData
+        if let fbRules = contentBlockingManager.currentRules.first(where: { $0.name == "fb" }) {
+            rules = fbRules.trackerData
+            return (self.FBblocked, rules)
+        } else {
+            assertionFailure("Missing FB List")
+            return (false, nil)
+        }
     }
 
     func contentBlockerRulesUserScript(_ script: ContentBlockerRulesUserScript, detectedTracker tracker: DetectedTracker) {

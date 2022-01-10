@@ -3,10 +3,10 @@
     "pins": [
       {
         "package": "BrowserServicesKit",
-        "repositoryURL": "https://github.com/duckduckgo/BrowserServicesKit.git",
+        "repositoryURL": "https://github.com/ladamski/BrowserServicesKit",
         "state": {
-          "branch": "feature/bartek/multiple-blocking-rule-lists",
-          "revision": "5697394cdb0b3e3f35c1756a37be34685487ec47",
+          "branch": "la/ctl-delegate",
+          "revision": "9d180b6938e0160c6409cbdf9c2d6b5c4b3e37cd",
           "version": null
         }
       },
