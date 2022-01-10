@@ -24,7 +24,7 @@ final class FaviconSelector {
         // Create groups according to the relation. // Prioritise favicon, then icon, and others
         let faviconGroups = favicons
         // Categorize into 4 categories according to the quality
-            .reduce(into: [[Favicon](), [Favicon](), [Favicon](), [Favicon]()], { partialResult, favicon in
+            .reduce(into: [[Favicon](), [Favicon](), [Favicon](), [Favicon](), [Favicon]()], { partialResult, favicon in
                 if favicon.sizeCategory == sizeCategory {
                     switch favicon.relation {
                     case .favicon: partialResult[0].append(favicon)
@@ -32,14 +32,19 @@ final class FaviconSelector {
                     case .other: partialResult[2].append(favicon)
                     }
                 } else {
-                    // Use tiny even for small as the worst result
+                    // Use tiny even for small if small not available
                     if sizeCategory == .small && favicon.sizeCategory == .tiny {
                         partialResult[3].append(favicon)
                     }
 
-                    // Use large even for medium as the worst result
+                    // Use large even for medium if medium not available
                     if sizeCategory == .medium && favicon.sizeCategory == .large {
                         partialResult[3].append(favicon)
+                    }
+
+                    // Use small for medium if medium not available
+                    if sizeCategory == .medium && favicon.sizeCategory == .small {
+                        partialResult[4].insert(favicon, at: 0)
                     }
                 }
             })
