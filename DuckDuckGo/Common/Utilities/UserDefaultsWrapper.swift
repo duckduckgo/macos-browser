@@ -56,9 +56,13 @@ public struct UserDefaultsWrapper<T> {
         case atb = "statistics.atb.key"
         case searchRetentionAtb = "statistics.retentionatb.key"
         case appRetentionAtb = "statistics.appretentionatb.key"
-        case variant = "statistics.variant.key"
         case lastAppRetentionRequestDate = "statistics.appretentionatb.last.request.key"
+        
+        // Used to detect whether a user had old User Defaults ATB data at launch, in order to grant them implicitly
+        // unlocked status with regards to the lock screen
+        case legacyStatisticsStoreDataCleared = "statistics.appretentionatb.legacy-data-cleared"
 
+        case onboardingFinished = "onboarding.finished"
     }
 
     private let key: Key

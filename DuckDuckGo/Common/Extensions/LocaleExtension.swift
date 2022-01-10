@@ -1,5 +1,5 @@
 //
-//  GPCUserScript.swift
+//  LocaleExtension.swift
 //
 //  Copyright © 2021 DuckDuckGo. All rights reserved.
 //
@@ -16,20 +16,26 @@
 //  limitations under the License.
 //
 
-import WebKit
-import os
-import BrowserServicesKit
+import Foundation
 
-final class GPCUserScript: NSObject, UserScript {
-    var injectionTime: WKUserScriptInjectionTime { .atDocumentStart }
-    var forMainFrameOnly: Bool { false }
-    var messageNames: [String] { [] }
-    let source: String
-
-    init(scriptSource: ScriptSourceProviding) {
-        source = scriptSource.gpcSource
+extension Locale {
+    
+    enum DateComponentOrder {
+        case dayMonthYear
+        case monthDayYear
     }
 
-    func userContentController(_ userContentController: WKUserContentController, didReceive message: WKScriptMessage) {
+    var dateComponentOrder: DateComponentOrder {
+        guard let format = DateFormatter.dateFormat(fromTemplate: "MMMMd", options: 0, locale: self) else {
+            // Default to the North American ordering.
+            return .monthDayYear
+        }
+        
+        if format.hasPrefix("d") {
+            return .dayMonthYear
+        } else {
+            return .monthDayYear
+        }
     }
+    
 }

@@ -265,7 +265,7 @@ final class MainViewController: NSViewController {
         }
 
         switch selectedTabViewModel.tab.content {
-        case .homepage, .none: navigationBarViewController.addressBarViewController?.addressBarTextField.makeMeFirstResponder()
+        case .homepage, .onboarding, .none: navigationBarViewController.addressBarViewController?.addressBarTextField.makeMeFirstResponder()
         case .url:
             browserTabViewController.webView?.makeMeFirstResponder()
         case .preferences: browserTabViewController.preferencesViewController.view.makeMeFirstResponder()

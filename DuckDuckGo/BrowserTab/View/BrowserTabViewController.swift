@@ -47,6 +47,8 @@ final class BrowserTabViewController: NSViewController {
 
     private var hoverLabelWorkItem: DispatchWorkItem?
 
+    private var transientTabContentViewController: NSViewController?
+
     required init?(coder: NSCoder) {
         fatalError("BrowserTabViewController: Bad initializer")
     }
@@ -96,14 +98,6 @@ final class BrowserTabViewController: NSViewController {
         changeWebView(tabViewModel: tabViewModel)
         scheduleHoverLabelUpdatesForUrl(nil)
         show(tabContent: tabViewModel?.tab.content)
-    }
-
-    private func showHomepage() {
-        self.webView?.removeFromSuperview()
-        removePreferencesPage()
-        removeBookmarksPage()
-
-        view.addAndLayout(homepageView)
     }
 
     private func addWebViewToViewHierarchy(_ webView: WebView) {
@@ -229,50 +223,65 @@ final class BrowserTabViewController: NSViewController {
         updateInterface(tabViewModel: tabCollectionViewModel.selectedTabViewModel)
     }
 
+    private func removeAllTabContent(includingWebView: Bool = true) {
+        self.homepageView.removeFromSuperview()
+        transientTabContentViewController?.removeCompletely()
+        preferencesViewController.removeCompletely()
+        bookmarksViewController.removeCompletely()
+        if includingWebView {
+            self.webView?.removeFromSuperview()
+        }
+    }
+
+    private func showTabContentController(_ vc: NSViewController) {
+        self.addChild(vc)
+        view.addAndLayout(vc.view)
+    }
+
+    private func showTransientTabContentController(_ vc: NSViewController) {
+        transientTabContentViewController?.removeCompletely()
+        showTabContentController(vc)
+        transientTabContentViewController = vc
+    }
+
+    private func requestDisableUI() {
+        (view.window?.windowController as? MainWindowController)?.userInteraction(prevented: true)
+    }
+
     private func show(tabContent content: Tab.TabContent?) {
+
         switch content ?? .homepage {
         case .bookmarks:
-            self.homepageView.removeFromSuperview()
-            removePreferencesPage()
-            self.webView?.removeFromSuperview()
-            guard bookmarksViewController.parent == nil else {
-                return
-            }
-            
-            self.addChild(bookmarksViewController)
-            view.addAndLayout(bookmarksViewController.view)
+            removeAllTabContent()
+            showTabContentController(bookmarksViewController)
 
         case .preferences:
-            self.homepageView.removeFromSuperview()
-            removeBookmarksPage()
-            self.webView?.removeFromSuperview()
-            guard preferencesViewController.parent == nil else {
-                return
+            removeAllTabContent()
+            showTabContentController(preferencesViewController)
+
+        case .onboarding:
+            removeAllTabContent()
+            requestDisableUI()
+            if let vc = transientTabContentViewController as? OnboardingViewController {
+                showTabContentController(vc)
+            } else {
+                showTransientTabContentController(OnboardingViewController.create(withDelegate: self))
             }
 
-            self.addChild(preferencesViewController)
-            view.addAndLayout(preferencesViewController.view)
-
         case .url:
-            self.homepageView.removeFromSuperview()
-            removeBookmarksPage()
-            removePreferencesPage()
+            removeAllTabContent(includingWebView: false)
             if let webView = self.webView, webView.superview == nil {
                 addWebViewToViewHierarchy(webView)
             }
 
         case .homepage:
-            removeBookmarksPage()
-            removePreferencesPage()
-            self.webView?.removeFromSuperview()
-            showHomepage()
+            removeAllTabContent()
+            view.addAndLayout(homepageView)
 
         case .none:
-            self.homepageView.removeFromSuperview()
-            removeBookmarksPage()
-            removePreferencesPage()
-            self.webView?.removeFromSuperview()
+            removeAllTabContent()
         }
+        
     }
 
     // MARK: - Preferences
@@ -284,12 +293,6 @@ final class BrowserTabViewController: NSViewController {
         return viewController
     }()
 
-    private func removePreferencesPage() {
-        guard preferencesViewController.parent != nil else { return }
-        preferencesViewController.removeFromParent()
-        preferencesViewController.view.removeFromSuperview()
-    }
-
     // MARK: - Bookmarks
 
     private(set) lazy var bookmarksViewController: BookmarkManagementSplitViewController = {
@@ -298,12 +301,6 @@ final class BrowserTabViewController: NSViewController {
 
         return viewController
     }()
-
-    private func removeBookmarksPage() {
-        guard bookmarksViewController.parent != nil else { return }
-        bookmarksViewController.removeFromParent()
-        bookmarksViewController.view.removeFromSuperview()
-    }
 
 }
 
@@ -874,6 +871,38 @@ private extension WKWebView {
             return nil
         }
         return tab
+    }
+
+}
+
+extension BrowserTabViewController: OnboardingDelegate {
+
+    func onboardingDidRequestImportData(completion: @escaping () -> Void) {
+        let viewController = DataImportViewController.create()
+        beginSheet(viewController) { _ in
+            completion()
+        }
+    }
+
+    func onboardingDidRequestSetDefault(completion: @escaping () -> Void) {
+        if DefaultBrowserPreferences.isDefault {
+            completion()
+            return
+        }
+
+        DefaultBrowserPreferences.becomeDefault()
+
+        var observer: Any?
+        observer = NotificationCenter.default.addObserver(forName: NSApplication.didBecomeActiveNotification, object: nil, queue: .main) { _ in
+            NotificationCenter.default.removeObserver(observer as Any)
+            withAnimation {
+                completion()
+            }
+        }
+    }
+
+    func onboardingHasFinished() {
+        (view.window?.windowController as? MainWindowController)?.userInteraction(prevented: false)
     }
 
 }

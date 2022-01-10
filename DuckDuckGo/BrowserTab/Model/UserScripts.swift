@@ -35,14 +35,17 @@ final class UserScripts {
     let contentBlockerRulesScript: ContentBlockerRulesUserScript
     let surrogatesScript: SurrogatesUserScript
     let navigatorCredentialsUserScript: NavigatorCredentialsUserScript
-    let gpcScript: GPCUserScript
+    let contentScopeUserScript: ContentScopeUserScript
 
     init(with sourceProvider: ScriptSourceProviding) {
 
         contentBlockerRulesScript = ContentBlockerRulesUserScript(configuration: sourceProvider.contentBlockerRulesConfig!)
         surrogatesScript = SurrogatesUserScript(configuration: sourceProvider.surrogatesConfig!)
         navigatorCredentialsUserScript = NavigatorCredentialsUserScript(scriptSource: sourceProvider)
-        gpcScript = GPCUserScript(scriptSource: sourceProvider)
+        let privacySettings = PrivacySecurityPreferences()
+        let sessionKey = sourceProvider.sessionKey ?? ""
+        let prefs = ContentScopeProperties.init(gpcEnabled: privacySettings.gpcEnabled, sessionKey: sessionKey)
+        contentScopeUserScript = ContentScopeUserScript(sourceProvider.privacyConfigurationManager, properties: prefs)
     }
 
     lazy var userScripts: [UserScript] = [
@@ -55,10 +58,10 @@ final class UserScripts {
         pageObserverScript,
         printingUserScript,
         hoverUserScript,
-        gpcScript,
         navigatorCredentialsUserScript,
-        autofillScript,
-        clickToLoadScript
+        clickToLoadScript,
+        contentScopeUserScript,
+        autofillScript
     ]
 
     lazy var scripts = userScripts.map { $0.makeWKUserScript() }
