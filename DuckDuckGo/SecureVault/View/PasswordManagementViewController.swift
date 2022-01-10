@@ -92,6 +92,11 @@ final class PasswordManagementViewController: NSViewController {
         menu.popUp(positioning: nil, at: location, in: sender.superview)
     }
 
+    @IBAction func onImportClicked(_ sender: NSButton) {
+        let viewController = DataImportViewController.create()
+        beginSheet(viewController)
+    }
+
     private func refetchWithText(_ text: String, clearWhenNoMatches: Bool = false, completion: (() -> Void)? = nil) {
         fetchSecureVaultItems { [weak self] items in
             self?.listModel?.update(items: items)
