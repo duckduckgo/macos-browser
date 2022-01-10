@@ -7,8 +7,6 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		0230C09F271F53000018F728 /* GPCUserScript.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0230C09E271F53000018F728 /* GPCUserScript.swift */; };
-		0230C0A1271F53670018F728 /* gpc.js in Resources */ = {isa = PBXBuildFile; fileRef = 0230C0A0271F53670018F728 /* gpc.js */; };
 		0230C0A3272080090018F728 /* KeyedCodingExtension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0230C0A2272080090018F728 /* KeyedCodingExtension.swift */; };
 		0230C0A52721F3750018F728 /* GPCRequestFactory.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0230C0A42721F3750018F728 /* GPCRequestFactory.swift */; };
 		026ADE1426C3010C002518EE /* macos-config.json in Resources */ = {isa = PBXBuildFile; fileRef = 026ADE1326C3010C002518EE /* macos-config.json */; };
@@ -649,8 +647,6 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
-		0230C09E271F53000018F728 /* GPCUserScript.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GPCUserScript.swift; sourceTree = "<group>"; };
-		0230C0A0271F53670018F728 /* gpc.js */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.javascript; path = gpc.js; sourceTree = "<group>"; };
 		0230C0A2272080090018F728 /* KeyedCodingExtension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KeyedCodingExtension.swift; sourceTree = "<group>"; };
 		0230C0A42721F3750018F728 /* GPCRequestFactory.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GPCRequestFactory.swift; sourceTree = "<group>"; };
 		026ADE1326C3010C002518EE /* macos-config.json */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.json; path = "macos-config.json"; sourceTree = "<group>"; };
@@ -1322,9 +1318,7 @@
 		0230C09D271F52D50018F728 /* GPC */ = {
 			isa = PBXGroup;
 			children = (
-				0230C09E271F53000018F728 /* GPCUserScript.swift */,
 				0230C0A42721F3750018F728 /* GPCRequestFactory.swift */,
-				0230C0A0271F53670018F728 /* gpc.js */,
 			);
 			path = GPC;
 			sourceTree = "<group>";
@@ -3982,7 +3976,6 @@
 				85378DA2274E7F25007C5CBF /* EmailManagerRequestDelegate.swift in Sources */,
 				B68172A9269C487D006D1092 /* PrivacyDashboardUserScript.swift in Sources */,
 				858A797F26A79EAA00A75A42 /* UserText+PasswordManager.swift in Sources */,
-				0230C09F271F53000018F728 /* GPCUserScript.swift in Sources */,
 				B693954E26F04BEB0015B914 /* ProgressView.swift in Sources */,
 				B69B503C2726A12500758A2B /* StatisticsStore.swift in Sources */,
 				B693955426F04BEC0015B914 /* ColorView.swift in Sources */,
@@ -5140,7 +5133,7 @@
 			repositoryURL = "https://github.com/duckduckgo/BrowserServicesKit.git";
 			requirement = {
 				kind = revision;
-				revision = be84a3b281920cdd2805398960eff43fe9267607;
+				revision = d9ebd24d7c61c4b3025bd029577bfe6c06f3c2b9;
 			};
 		};
 		85FF55C625F82E4F00E2AB99 /* XCRemoteSwiftPackageReference "lottie-ios" */ = {
