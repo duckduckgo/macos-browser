@@ -81,13 +81,7 @@ final class WebViewStateObserver: NSObject {
         switch keyPath {
         case #keyPath(WKWebView.url):
             if let url = webView.url {
-                if url == .homePage {
-                    tabViewModel.tab.setContent(.homepage)
-                } else if url == .welcome {
-                    tabViewModel.tab.setContent(.onboarding)
-                } else {
-                    tabViewModel.tab.setContent(.url(url))
-                }
+                tabViewModel.tab.setContent(.contentFromURL(url))
                 tabViewModel.tab.addVisit(of: url)
             }
             updateTitle() // The title might not change if webView doesn't think anything is different so update title here as well
