@@ -107,6 +107,7 @@ final class TabBarViewController: NSViewController {
 
     private func reloadSelection() {
         guard collectionView.selectionIndexPaths.first?.item != tabCollectionViewModel.selectionIndex else {
+            collectionView.updateItemsLeftToSelectedItems()
             return
         }
 
