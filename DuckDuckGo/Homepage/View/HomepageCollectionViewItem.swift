@@ -62,11 +62,11 @@ final class HomepageCollectionViewItem: NSCollectionViewItem {
 
         if let bookmark = bookmarkViewModel.entity as? Bookmark {
             if let favicon = bookmark.favicon(.medium) ?? bookmark.favicon(.small) {
-                setFaviconImageView(favicon)
+                faviconImageView.image = favicon
                 faviconImageView.layer?.backgroundColor = NSColor.clear.cgColor
                 representingCharacterTextField.isHidden = true
             } else {
-                setFaviconImageView(nil)
+                faviconImageView.image = nil
                 faviconImageView.layer?.backgroundColor = bookmarkViewModel.representingColor.cgColor
                 representingCharacterTextField.isHidden = false
                 representingCharacterTextField.stringValue = bookmarkViewModel.representingCharacter
@@ -78,20 +78,6 @@ final class HomepageCollectionViewItem: NSCollectionViewItem {
         }
 
         setupMenu()
-    }
-
-    private func setFaviconImageView(_ image: NSImage?) {
-        guard let image = image else {
-            faviconImageView.image = nil
-            return
-        }
-
-        if image.size.width < faviconImageView.bounds.size.width * 2 || image.size.height < faviconImageView.bounds.size.height * 2 {
-            let resized = image.resized(to: NSSize(width: image.size.width / 2, height: image.size.width / 2))
-            faviconImageView.image = resized
-        } else {
-            faviconImageView.image = image
-        }
     }
 
     func setAddFavourite() {
