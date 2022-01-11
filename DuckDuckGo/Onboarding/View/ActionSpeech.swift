@@ -55,7 +55,7 @@ struct ActionSpeech: View {
 
             }
             .visibility(typingFinished ? .visible : .gone)
-            .frame(width: speachWidth - 8)
+            .frame(width: speechWidth)
 
         }
     }

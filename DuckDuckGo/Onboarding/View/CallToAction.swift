@@ -44,7 +44,7 @@ struct CallToAction: View {
             } label: {
                 Text(cta)
             }
-            .frame(width: speachWidth - 8)
+            .frame(width: speechWidth)
             .buttonStyle(ActionButtonStyle())
             .visibility(typingFinished ? .visible : .gone)
 

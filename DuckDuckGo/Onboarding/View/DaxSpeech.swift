@@ -52,7 +52,7 @@ struct DaxSpeech: View {
         .multilineTextAlignment(.leading)
         .font(.system(size: 15))
         .lineSpacing(9)
-        .frame(width: speachWidth + 8)
+        .frame(width: speechWidth)
         .background(SpeechBubble())
         .onReceive(timer, perform: { _ in
             if model.typingDisabled {
