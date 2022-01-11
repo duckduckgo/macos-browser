@@ -87,7 +87,7 @@ final class ContentBlocking {
 
 final class ContentBlockingUpdating: ContentBlockerRulesUpdating {
     typealias NewRulesInfo = (rules: [ContentBlockerRulesManager.Rules],
-                              changes: ContentBlockerRulesIdentifier.Difference,
+                              changes: [String: ContentBlockerRulesIdentifier.Difference],
                               completionTokens: Set<ContentBlockerRulesManager.CompletionToken>)
     typealias NewRulesPublisher = AnyPublisher<NewRulesInfo?, Never>
 
@@ -99,7 +99,7 @@ final class ContentBlockingUpdating: ContentBlockerRulesUpdating {
 
     func rulesManager(_ manager: ContentBlockerRulesManager,
                       didUpdateRules rules: [ContentBlockerRulesManager.Rules],
-                      changes: ContentBlockerRulesIdentifier.Difference,
+                      changes: [String: ContentBlockerRulesIdentifier.Difference],
                       completionTokens: [ContentBlockerRulesManager.CompletionToken]) {
         contentBlockingRulesSubject.send((rules: rules, changes: changes, completionTokens: Set(completionTokens)))
     }

@@ -22,7 +22,7 @@ import BrowserServicesKit
 
 protocol ScriptSourceProviding {
 
-    func reload(knownChanges: ContentBlockerRulesIdentifier.Difference?)
+    func reload(knownChanges: [String: ContentBlockerRulesIdentifier.Difference])
     var contentBlockerRulesConfig: ContentBlockerUserScriptConfig? { get }
     var surrogatesConfig: SurrogatesUserScriptConfig? { get }
     var navigatorCredentialsSource: String { get }
@@ -30,7 +30,7 @@ protocol ScriptSourceProviding {
     var sessionKey: String? { get }
     var clickToLoadSource: String { get }
 
-    var sourceUpdatedPublisher: AnyPublisher<ContentBlockerRulesIdentifier.Difference?, Never> { get }
+    var sourceUpdatedPublisher: AnyPublisher<[String: ContentBlockerRulesIdentifier.Difference], Never> { get }
 
 }
 
@@ -44,8 +44,8 @@ final class DefaultScriptSourceProvider: ScriptSourceProviding {
     private(set) var sessionKey: String?
     private(set) var clickToLoadSource: String = ""
 
-    private let sourceUpdatedSubject = PassthroughSubject<ContentBlockerRulesIdentifier.Difference?, Never>()
-    var sourceUpdatedPublisher: AnyPublisher<ContentBlockerRulesIdentifier.Difference?, Never> {
+    private let sourceUpdatedSubject = PassthroughSubject<[String: ContentBlockerRulesIdentifier.Difference], Never>()
+    var sourceUpdatedPublisher: AnyPublisher<[String: ContentBlockerRulesIdentifier.Difference], Never> {
         sourceUpdatedSubject.eraseToAnyPublisher()
     }
 
@@ -65,7 +65,7 @@ final class DefaultScriptSourceProvider: ScriptSourceProviding {
 
         attachListeners(contentBlockingUpdating: contentBlockingUpdating)
 
-        reload(knownChanges: nil)
+        reload(knownChanges: [:])
     }
 
     private func attachListeners(contentBlockingUpdating: ContentBlockingUpdating) {
@@ -77,7 +77,7 @@ final class DefaultScriptSourceProvider: ScriptSourceProviding {
         contentBlockingRulesUpdatedCancellable = cancellable
     }
 
-    func reload(knownChanges: ContentBlockerRulesIdentifier.Difference?) {
+    func reload(knownChanges: [String: ContentBlockerRulesIdentifier.Difference]) {
         contentBlockerRulesConfig = buildContentBlockerRulesConfig()
         surrogatesConfig = buildSurrogatesConfig()
         navigatorCredentialsSource = buildNavigatorCredentialsSource()
