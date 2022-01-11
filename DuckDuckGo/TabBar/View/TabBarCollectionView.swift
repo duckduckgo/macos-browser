@@ -80,12 +80,13 @@ final class TabBarCollectionView: NSCollectionView {
         collectionViewLayout?.invalidateLayout()
     }
 
-    private func updateItemsLeftToSelectedItems(_ selectionIndexPaths: Set<IndexPath>) {
+    func updateItemsLeftToSelectedItems(_ selectionIndexPaths: Set<IndexPath>? = nil) {
+        let indexPaths = selectionIndexPaths ?? self.selectionIndexPaths
         visibleItems().forEach {
             ($0 as? TabBarViewItem)?.isLeftToSelected = false
         }
 
-        for indexPath in selectionIndexPaths where indexPath.item > 0 {
+        for indexPath in indexPaths where indexPath.item > 0 {
             let leftToSelectionIndexPath = IndexPath(item: indexPath.item - 1)
             (item(at: leftToSelectionIndexPath) as? TabBarViewItem)?.isLeftToSelected = true
         }
