@@ -37,15 +37,6 @@ struct OnboardingFlow: View {
 
         VStack(alignment: daxInSpeechPosition ? .leading : .center) {
 
-            Text(UserText.onboardingWelcomeTitle)
-                .kerning(-1.26)
-                .font(.system(size: 42, weight: .bold, design: .default))
-                .foregroundColor(.black)
-                .visibility(showTitle ? .visible : .gone)
-
-            Color.clear.frame(width: 64, height: 64)
-                .visibility(makeSpace ? .visible : .gone)
-
             HStack(alignment: .top) {
 
                 Image("OnboardingDax")
@@ -85,6 +76,12 @@ struct OnboardingFlow: View {
                     .visibility(daxInSpeechPosition ? .visible : .gone)
 
             }.visibility(showLogo ? .visible : .gone)
+
+            Text(UserText.onboardingWelcomeTitle)
+                .kerning(-1.26)
+                .font(.system(size: 42, weight: .bold, design: .default))
+                .foregroundColor(.black)
+                .visibility(showTitle ? .visible : .gone)
 
             Spacer().visibility(daxInSpeechPosition ? .visible : .gone)
 
