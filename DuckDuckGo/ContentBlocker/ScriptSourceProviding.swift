@@ -134,28 +134,44 @@ final class DefaultScriptSourceProvider: ScriptSourceProviding {
         ])
     }
     
-    private func loadTextFile(_ fileName: String, _ fileExt: String) -> String {
-        let sdkUrl = Bundle.main.url(
+    private func loadTextFile(_ fileName: String, _ fileExt: String) -> String? {
+        let url = Bundle.main.url(
             forResource: fileName,
             withExtension: fileExt
         )
-        var data = ""
-        do {
-            data = try String(contentsOf: sdkUrl!)
-        } catch let error as NSError {
-            print(error.debugDescription)
+        guard let data = try? String(contentsOf: url!) else {
+            assertionFailure("Failed to load text file")
+            return nil
         }
         
         return data
+    }
+
+    private func loadFont(_ fileName: String, _ fileExt: String) -> String? {
+        let url = Bundle.main.url(
+            forResource: fileName,
+            withExtension: fileExt
+        )
+        guard let base64String = try? Data(contentsOf: url!).base64EncodedString() else {
+            assertionFailure("Failed to load font")
+            return nil
+        }
+        
+        let font = "data:application/octet-stream;base64," + base64String
+        return font
     }
 
     private func buildClickToLoadSource() -> String {
         // For now bundle FB SDK and associated config, as they diverged from the extension
         let fbSDK = loadTextFile("fb-sdk", "js")
         let config = loadTextFile("clickToLoadConfig", "json")
+        let proximaRegFont = loadFont("ProximaNova-Reg-webfont", "woff2")
+        let proximaBoldFont = loadFont("ProximaNova-Bold-webfont", "woff2")
         return ContentBlockerRulesUserScript.loadJS("clickToLoad", from: .main, withReplacements: [
-            "${fb-sdk.js}": fbSDK,
-            "${clickToLoadConfig.json}": config
+            "${fb-sdk.js}": fbSDK!,
+            "${clickToLoadConfig.json}": config!,
+            "${proximaRegFont}": proximaRegFont!,
+            "${proximaBoldFont}": proximaBoldFont!
         ])
     }
 }
