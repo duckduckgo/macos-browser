@@ -47,6 +47,8 @@ final class PasswordManagementViewController: NSViewController {
     @IBOutlet var searchField: NSTextField!
     @IBOutlet var divider: NSView!
     @IBOutlet var emptyState: NSView!
+    @IBOutlet var emptyStateTitle: NSTextField!
+    @IBOutlet var emptyStateMessage: NSTextField!
 
     var editingCancellable: AnyCancellable?
 
@@ -73,6 +75,9 @@ final class PasswordManagementViewController: NSViewController {
         super.viewDidLoad()
         createListView()
         createLoginItemView()
+
+        emptyStateTitle.attributedStringValue = NSAttributedString.make(emptyStateTitle.stringValue, lineHeight: 1.14, kern: -0.23)
+        emptyStateMessage.attributedStringValue = NSAttributedString.make(emptyStateMessage.stringValue, lineHeight: 1.05, kern: -0.08)
     }
 
     override func viewDidAppear() {
