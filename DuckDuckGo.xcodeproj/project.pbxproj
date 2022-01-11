@@ -610,6 +610,7 @@
 		B6DA441E2616C84600DD1EC2 /* PixelStoreMock.swift in Sources */ = {isa = PBXBuildFile; fileRef = B6DA441D2616C84600DD1EC2 /* PixelStoreMock.swift */; };
 		B6DA44232616CABC00DD1EC2 /* PixelArgumentsTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = B6DA44222616CABC00DD1EC2 /* PixelArgumentsTests.swift */; };
 		B6DA44282616CAE000DD1EC2 /* AppUsageActivityMonitorTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = B6DA44272616CAE000DD1EC2 /* AppUsageActivityMonitorTests.swift */; };
+		B6DB3AEF278D5C370024C5C4 /* URLSessionExtension.swift in Sources */ = {isa = PBXBuildFile; fileRef = B6DB3AEE278D5C370024C5C4 /* URLSessionExtension.swift */; };
 		B6DB3CF926A00E2D00D459B7 /* AVCaptureDevice+SwizzledAuthState.swift in Sources */ = {isa = PBXBuildFile; fileRef = B6DB3CF826A00E2D00D459B7 /* AVCaptureDevice+SwizzledAuthState.swift */; };
 		B6DB3CFB26A17CB800D459B7 /* PermissionModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = B6DB3CFA26A17CB800D459B7 /* PermissionModel.swift */; };
 		B6E53883267C83420010FEA9 /* HomepageBackgroundView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B6E53882267C83420010FEA9 /* HomepageBackgroundView.swift */; };
@@ -1265,6 +1266,7 @@
 		B6DA441D2616C84600DD1EC2 /* PixelStoreMock.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PixelStoreMock.swift; sourceTree = "<group>"; };
 		B6DA44222616CABC00DD1EC2 /* PixelArgumentsTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PixelArgumentsTests.swift; sourceTree = "<group>"; };
 		B6DA44272616CAE000DD1EC2 /* AppUsageActivityMonitorTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppUsageActivityMonitorTests.swift; sourceTree = "<group>"; };
+		B6DB3AEE278D5C370024C5C4 /* URLSessionExtension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = URLSessionExtension.swift; sourceTree = "<group>"; };
 		B6DB3CF826A00E2D00D459B7 /* AVCaptureDevice+SwizzledAuthState.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "AVCaptureDevice+SwizzledAuthState.swift"; sourceTree = "<group>"; };
 		B6DB3CFA26A17CB800D459B7 /* PermissionModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PermissionModel.swift; sourceTree = "<group>"; };
 		B6E53882267C83420010FEA9 /* HomepageBackgroundView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HomepageBackgroundView.swift; sourceTree = "<group>"; };
@@ -2957,6 +2959,7 @@
 				B6C0B24326E9CB080031CB7F /* RunLoopExtension.swift */,
 				0230C0A2272080090018F728 /* KeyedCodingExtension.swift */,
 				336B39E62726BAE800C417D3 /* UserDefaultsExtension.swift */,
+				B6DB3AEE278D5C370024C5C4 /* URLSessionExtension.swift */,
 				4B7A60A0273E0BE400BBDFEB /* WKWebsiteDataStoreExtension.swift */,
 			);
 			path = Extensions;
@@ -3699,6 +3702,7 @@
 				AA80EC54256BE3BC007083E7 /* UserText.swift in Sources */,
 				B61EF3EC266F91E700B4D78F /* WKWebView+Download.swift in Sources */,
 				B637274426CE25EF00C8CB02 /* NSApplication+BuildTime.m in Sources */,
+				B6DB3AEF278D5C370024C5C4 /* URLSessionExtension.swift in Sources */,
 				4B7A60A1273E0BE400BBDFEB /* WKWebsiteDataStoreExtension.swift in Sources */,
 				B693955326F04BEC0015B914 /* WindowDraggingView.swift in Sources */,
 				4B0511C4262CAA5A00F6079C /* PreferencesSidebarViewController.swift in Sources */,
