@@ -31,7 +31,7 @@ struct DaxSpeech: View {
 
     @State private var typingIndex = 0
     @State private var typedText = ""
-    @State private var timer = Timer.publish(every: 0.03, tolerance: 0, on: .main, in: .default, options: nil).autoconnect()
+    @State private var timer = Timer.publish(every: 0.02, tolerance: 0, on: .main, in: .default, options: nil).autoconnect()
 
     var body: some View {
         ZStack(alignment: .topLeading) {
@@ -71,8 +71,10 @@ struct DaxSpeech: View {
                 return
             }
 
-            typingIndex = min(typingIndex + 1, text.utf16.count)
-            typedText = String(text.utf16[text.utf16.startIndex ..< text.utf16.index(text.utf16.startIndex, offsetBy: typingIndex)]) ?? ""
+            let chars = Array(text)
+            typingIndex = min(typingIndex + 1, chars.count)
+            let typedChars = chars[0 ..< typingIndex]
+            typedText = String(typedChars)
         })
     }
 
