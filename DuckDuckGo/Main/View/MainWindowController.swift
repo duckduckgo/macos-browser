@@ -37,7 +37,14 @@ final class MainWindowController: NSWindowController {
 
     init(mainViewController: MainViewController, popUp: Bool, fireViewModel: FireViewModel = FireCoordinator.fireViewModel) {
         let makeWindow: (NSRect) -> NSWindow = popUp ? PopUpWindow.init(frame:) : MainWindow.init(frame:)
-        let window = makeWindow(NSRect(x: 0, y: 0, width: 1024, height: 790))
+
+        let size = mainViewController.view.frame.size
+        let moveToCenter = CGAffineTransform(translationX: ((NSScreen.main?.frame.width ?? 1024) - size.width) / 2,
+                                             y: ((NSScreen.main?.frame.height ?? 790) - size.height) / 2)
+        let frame = NSRect(origin: (NSScreen.main?.frame.origin ?? .zero).applying(moveToCenter),
+                           size: size)
+
+        let window = makeWindow(frame)
         window.contentViewController = mainViewController
         self.fireViewModel = fireViewModel
 
