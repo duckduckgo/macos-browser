@@ -101,7 +101,8 @@ final class DefaultScriptSourceProvider: ScriptSourceProviding {
         
         return DefaultContentBlockerUserScriptConfig(privacyConfiguration: privacyConfigurationManager.privacyConfig,
                                                      trackerData: trackerData,
-                                                     ctlTrackerData: ctlTrackerData)
+                                                     ctlTrackerData: ctlTrackerData,
+                                                     trackerDataManager: ContentBlocking.trackerDataManager)
     }
 
     private func buildSurrogatesConfig() -> SurrogatesUserScriptConfig {
@@ -120,6 +121,7 @@ final class DefaultScriptSourceProvider: ScriptSourceProviding {
                                                  surrogates: surrogates,
                                                  trackerData: rules?.trackerData,
                                                  encodedSurrogateTrackerData: rules?.encodedTrackerData,
+                                                 trackerDataManager: ContentBlocking.trackerDataManager,
                                                  isDebugBuild: isDebugBuild)
     }
 
