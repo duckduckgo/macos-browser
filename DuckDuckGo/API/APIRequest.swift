@@ -23,18 +23,7 @@ import os.log
 typealias APIRequestCompletion = (APIRequest.Response?, Error?) -> Void
 
 enum APIRequest {
-    
-    private static var defaultCallbackQueue: OperationQueue = {
-        let queue = OperationQueue()
-        queue.name = "APIRequest default callback queue"
-        queue.qualityOfService = .utility
-        queue.maxConcurrentOperationCount = 1
-        return queue
-    }()
-    
-    private static let defaultSession = URLSession(configuration: .default, delegate: nil, delegateQueue: defaultCallbackQueue)
-    private static let mainThreadCallbackSession = URLSession(configuration: .default, delegate: nil, delegateQueue: OperationQueue.main)
-    
+
     struct Response {
         
         var data: Data?
@@ -66,10 +55,10 @@ enum APIRequest {
         
         let urlRequest = urlRequestFor(url: url, method: method, parameters: parameters, headers: headers, timeoutInterval: timeoutInterval)
         
-        let session = callBackOnMainThread ? mainThreadCallbackSession : defaultSession
+        let session: URLSession = callBackOnMainThread ? .mainThreadCallbackSession : .default
 
         let task = session.dataTask(with: urlRequest) { (data, response, error) in
-            
+
             let httpResponse = response as? HTTPURLResponse
 
             if let error = error {
@@ -100,6 +89,7 @@ enum APIRequest {
         urlRequest.timeoutInterval = timeoutInterval
         return urlRequest
     }
+
 }
 
 extension HTTPURLResponse {
