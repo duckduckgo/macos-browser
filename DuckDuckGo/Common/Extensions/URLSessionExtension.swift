@@ -23,7 +23,7 @@ extension URLSession {
     private static var defaultCallbackQueue: OperationQueue = {
         let queue = OperationQueue()
         queue.name = "APIRequest default callback queue"
-        queue.qualityOfService = .utility
+        queue.qualityOfService = .userInitiated
         queue.maxConcurrentOperationCount = 1
         return queue
     }()

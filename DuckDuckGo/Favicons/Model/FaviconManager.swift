@@ -41,7 +41,6 @@ final class FaviconManager: FaviconManagement {
 
     static let shared = FaviconManager()
 
-    private let fetchingQueue = DispatchQueue(label: "FaviconManager queue", qos: .userInitiated, attributes: .concurrent)
     private lazy var store: FaviconStoring = FaviconStore()
 
     func loadFavicons() {
@@ -199,33 +198,41 @@ final class FaviconManager: FaviconManagement {
     }
 
     private func fetchFavicons(faviconLinks: [FaviconUserScript.FaviconLink], documentUrl: URL, completion: @escaping ([Favicon]) -> Void) {
-
-        func mainQueueCompletion(_ favicons: [Favicon]) {
-            DispatchQueue.main.async {
-                completion(favicons)
-            }
-        }
-
         guard !faviconLinks.isEmpty else {
             completion([])
             return
         }
 
-        fetchingQueue.async(flags: .barrier) {
-            let favicons: [Favicon] = faviconLinks
-                .compactMap { faviconLink -> Favicon? in
-                    guard let faviconUrl = URL(string: faviconLink.href) else {
-                        return nil
-                    }
-                    
-                    return Favicon(identifier: UUID(),
-                                   url: faviconUrl,
-                                   image: NSImage(contentsOf: faviconUrl),
-                                   relationString: faviconLink.rel,
-                                   documentUrl: documentUrl,
-                                   dateCreated: Date())
+        let group = DispatchGroup()
+        var favicons = [Favicon]()
+
+        faviconLinks.forEach { faviconLink in
+            guard let faviconUrl = URL(string: faviconLink.href) else {
+                return
+            }
+
+            group.enter()
+            URLSession.default.dataTask(with: faviconUrl) { data, _, error in
+                guard let data = data, error == nil else {
+                    assertionFailure("Fetching failed")
+                    return
                 }
-            mainQueueCompletion(favicons)
+
+                let favicon = Favicon(identifier: UUID(),
+                                      url: faviconUrl,
+                                      image: NSImage(data: data),
+                                      relationString: faviconLink.rel,
+                                      documentUrl: documentUrl,
+                                      dateCreated: Date())
+                DispatchQueue.main.async {
+                    favicons.append(favicon)
+                    group.leave()
+                }
+            }.resume()
+        }
+
+        group.notify(queue: .main) {
+            completion(favicons)
         }
     }
 }
