@@ -43,7 +43,7 @@ final class OnboardingViewModel: ObservableObject {
 
     }
 
-    let typingDisabled = false
+    var typingDisabled = false
 
     @Published var skipTypingRequested = false
     @Published var state: OnboardingPhase = .startFlow {
@@ -108,6 +108,7 @@ final class OnboardingViewModel: ObservableObject {
     
     func onboardingReshown() {
         if onboardingFinished {
+            typingDisabled = true
             delegate?.onboardingHasFinished()
         } else {
             state = .startFlow
