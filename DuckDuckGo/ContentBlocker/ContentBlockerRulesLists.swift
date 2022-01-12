@@ -22,7 +22,12 @@ import BrowserServicesKit
 import CryptoKit
 
 final class ContentBlockerRulesLists: DefaultContentBlockerRulesListsSource {
-    static var FBTrackers: URL {
+    
+    enum Constants {
+        static let clickToLoadRulesListName = "ClickToLoad"
+    }
+    
+    static var fbTrackers: URL {
         return Bundle.main.url(forResource: "fb-tds", withExtension: "json")!
     }
     
@@ -39,11 +44,13 @@ final class ContentBlockerRulesLists: DefaultContentBlockerRulesListsSource {
         
         // Add new ones
         do {
-            let dataFile = (try? Data(contentsOf: Self.FBTrackers)) ?? Data()
+            let dataFile = (try? Data(contentsOf: Self.fbTrackers)) ?? Data()
             let trackerData = try JSONDecoder().decode(TrackerData.self, from: dataFile)
             let etag = MD5(data: dataFile)
             let dataSet: TrackerDataManager.DataSet = TrackerDataManager.DataSet(trackerData, etag)
-            let additionalRulesList = ContentBlockerRulesList(name: "fb", trackerData: nil, fallbackTrackerData: dataSet)
+            let additionalRulesList = ContentBlockerRulesList(name: Constants.clickToLoadRulesListName,
+                                                              trackerData: nil,
+                                                              fallbackTrackerData: dataSet)
     
             result.append(additionalRulesList)
         } catch {

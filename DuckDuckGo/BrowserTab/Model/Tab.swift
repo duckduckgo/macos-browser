@@ -312,7 +312,9 @@ final class Tab: NSObject {
             return false
         }
 
-        if let fbRules = contentBlockingManager.currentRules.first(where: { $0.name == "fb" }) {
+        if let fbRules = contentBlockingManager.currentRules.first(where: {
+            $0.name == ContentBlockerRulesLists.Constants.clickToLoadRulesListName
+        }) {
             if self.FBblocked {
                 self.FBblocked = false
                 webView.configuration.userContentController.remove(fbRules.rulesList)

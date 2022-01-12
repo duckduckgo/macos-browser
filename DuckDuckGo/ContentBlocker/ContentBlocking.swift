@@ -44,7 +44,7 @@ final class ContentBlocking {
     private static let contentBlockerRulesSource = ContentBlockerRulesLists(trackerDataManger: trackerDataManager)
     private static let exceptionsSource = DefaultContentBlockerRulesExceptionsSource(privacyConfigManager: privacyConfigurationManager)
 
-    private static let debugEvents = EventMapping<ContentBlockerDebugEvents> { event, error, parameters, onComplete in
+    private static let debugEvents = EventMapping<ContentBlockerDebugEvents> { event, scope, error, parameters, onComplete in
         let domainEvent: Pixel.Event.Debug
         switch event {
         case .trackerDataParseFailed:
@@ -66,19 +66,49 @@ final class ContentBlocking {
             domainEvent = .privacyConfigurationCouldNotBeLoaded
 
         case .contentBlockingTDSCompilationFailed:
-            domainEvent = .contentBlockingTDSCompilationFailed
+            if scope == DefaultContentBlockerRulesListsSource.Constants.trackerDataSetRulesListName {
+                domainEvent = .contentBlockingTDSCompilationFailed
+            } else if scope == ContentBlockerRulesLists.Constants.clickToLoadRulesListName {
+                domainEvent = .clickToLoadTDSCompilationFailed
+            } else {
+                domainEvent = .contentBlockingErrorReportingIssue
+            }
 
         case .contentBlockingTempListCompilationFailed:
-            domainEvent = .contentBlockingTempListCompilationFailed
+            if scope == DefaultContentBlockerRulesListsSource.Constants.trackerDataSetRulesListName {
+                domainEvent = .contentBlockingTempListCompilationFailed
+            } else if scope == ContentBlockerRulesLists.Constants.clickToLoadRulesListName {
+                domainEvent = .clickToLoadTempListCompilationFailed
+            } else {
+                domainEvent = .contentBlockingErrorReportingIssue
+            }
 
         case .contentBlockingAllowListCompilationFailed:
-            domainEvent = .contentBlockingAllowListCompilationFailed
+            if scope == DefaultContentBlockerRulesListsSource.Constants.trackerDataSetRulesListName {
+                domainEvent = .contentBlockingAllowListCompilationFailed
+            } else if scope == ContentBlockerRulesLists.Constants.clickToLoadRulesListName {
+                domainEvent = .clickToLoadAllowListCompilationFailed
+            } else {
+                domainEvent = .contentBlockingErrorReportingIssue
+            }
 
         case .contentBlockingUnpSitesCompilationFailed:
-            domainEvent = .contentBlockingUnpSitesCompilationFailed
+            if scope == DefaultContentBlockerRulesListsSource.Constants.trackerDataSetRulesListName {
+                domainEvent = .contentBlockingUnpSitesCompilationFailed
+            } else if scope == ContentBlockerRulesLists.Constants.clickToLoadRulesListName {
+                domainEvent = .clickToLoadUnpSitesCompilationFailed
+            } else {
+                domainEvent = .contentBlockingErrorReportingIssue
+            }
 
         case .contentBlockingFallbackCompilationFailed:
-            domainEvent = .contentBlockingFallbackCompilationFailed
+            if scope == DefaultContentBlockerRulesListsSource.Constants.trackerDataSetRulesListName {
+                domainEvent = .contentBlockingFallbackCompilationFailed
+            } else if scope == ContentBlockerRulesLists.Constants.clickToLoadRulesListName {
+                domainEvent = .clickToLoadFallbackCompilationFailed
+            } else {
+                domainEvent = .contentBlockingErrorReportingIssue
+            }
         }
 
         Pixel.fire(.debug(event: domainEvent, error: error), withAdditionalParameters: parameters, onComplete: onComplete)
