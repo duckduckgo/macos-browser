@@ -27,9 +27,15 @@ final class ContentBlockerRulesLists: DefaultContentBlockerRulesListsSource {
         static let clickToLoadRulesListName = "ClickToLoad"
     }
     
-    static var fbTrackers: URL {
-        return Bundle.main.url(forResource: "fb-tds", withExtension: "json")!
-    }
+    static var fbTrackerDataFile: Data = {
+        let url = Bundle.main.url(forResource: "fb-tds", withExtension: "json")!
+        return (try? Data(contentsOf: url)) ?? Data()
+    }()
+
+    static var fbTrackerDataSet: TrackerRadarKit.TrackerData = {
+        let trackerData = (try? JSONDecoder().decode(TrackerData.self, from: fbTrackerDataFile)) ?? nil
+        return trackerData!
+    }()
     
     func MD5(data: Data) -> String {
         let digest = Insecure.MD5.hash(data: data)
@@ -37,25 +43,19 @@ final class ContentBlockerRulesLists: DefaultContentBlockerRulesListsSource {
         return digest.map {
             String(format: "%02hhx", $0)
         }.joined()
-    }
+    }    
     
     override var contentBlockerRulesLists: [ContentBlockerRulesList] {
         var result = super.contentBlockerRulesLists
         
         // Add new ones
-        do {
-            let dataFile = (try? Data(contentsOf: Self.fbTrackers)) ?? Data()
-            let trackerData = try JSONDecoder().decode(TrackerData.self, from: dataFile)
-            let etag = MD5(data: dataFile)
-            let dataSet: TrackerDataManager.DataSet = TrackerDataManager.DataSet(trackerData, etag)
-            let additionalRulesList = ContentBlockerRulesList(name: Constants.clickToLoadRulesListName,
-                                                              trackerData: nil,
-                                                              fallbackTrackerData: dataSet)
-    
-            result.append(additionalRulesList)
-        } catch {
-            assertionFailure(error.localizedDescription)
-        }
+        let etag = MD5(data: Self.fbTrackerDataFile)
+        let dataSet: TrackerDataManager.DataSet = TrackerDataManager.DataSet(Self.fbTrackerDataSet, etag)
+        let additionalRulesList = ContentBlockerRulesList(name: Constants.clickToLoadRulesListName,
+                                                          trackerData: nil,
+                                                          fallbackTrackerData: dataSet)
+
+        result.append(additionalRulesList)
         return result
     }
 }
