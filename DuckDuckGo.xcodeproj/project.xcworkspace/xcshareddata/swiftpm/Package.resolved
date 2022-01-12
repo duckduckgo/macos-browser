@@ -6,7 +6,7 @@
         "repositoryURL": "https://github.com/duckduckgo/BrowserServicesKit.git",
         "state": {
           "branch": null,
-          "revision": "be84a3b281920cdd2805398960eff43fe9267607",
+          "revision": "d9ebd24d7c61c4b3025bd029577bfe6c06f3c2b9",
           "version": null
         }
       },
@@ -23,9 +23,9 @@
         "package": "Lottie",
         "repositoryURL": "https://github.com/airbnb/lottie-ios",
         "state": {
-          "branch": "lottie/macos-spm",
-          "revision": "f4d701070f9743b9ef7b9ac42d386d1ef98b842f",
-          "version": null
+          "branch": null,
+          "revision": "4a6058cbbdfe4f74aeae92c8bd51ad3b0de2a1ee",
+          "version": "3.3.0"
         }
       },
       {

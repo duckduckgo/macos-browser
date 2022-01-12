@@ -1,5 +1,5 @@
 //
-//  GPCUserScript.swift
+//  ProcessExtension.swift
 //
 //  Copyright © 2021 DuckDuckGo. All rights reserved.
 //
@@ -16,20 +16,17 @@
 //  limitations under the License.
 //
 
-import WebKit
-import os
-import BrowserServicesKit
+import Foundation
 
-final class GPCUserScript: NSObject, UserScript {
-    var injectionTime: WKUserScriptInjectionTime { .atDocumentStart }
-    var forMainFrameOnly: Bool { false }
-    var messageNames: [String] { [] }
-    let source: String
+extension Process {
 
-    init(scriptSource: ScriptSourceProviding) {
-        source = scriptSource.gpcSource
+    convenience init(_ command: String, _ args: String..., workDirectory: URL? = nil) {
+        self.init()
+        self.executableURL = URL(fileURLWithPath: command)
+        self.arguments = args
+        if let workDirectory = workDirectory {
+            self.currentDirectoryURL = workDirectory
+        }
     }
 
-    func userContentController(_ userContentController: WKUserContentController, didReceive message: WKScriptMessage) {
-    }
 }

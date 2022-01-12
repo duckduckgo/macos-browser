@@ -501,8 +501,8 @@ final class PermissionModelTests: XCTestCase {
     }
 
     func testWhenDeniedPermissionIsStoredThenQueryIsDenied() {
-        permissionManagerMock.setPermission(true, forDomain: URL.duckDuckGo.host!, permissionType: .camera)
-        permissionManagerMock.setPermission(false, forDomain: URL.duckDuckGo.host!, permissionType: .microphone)
+        permissionManagerMock.setPermission(.allow, forDomain: URL.duckDuckGo.host!, permissionType: .camera)
+        permissionManagerMock.setPermission(.deny, forDomain: URL.duckDuckGo.host!, permissionType: .microphone)
 
         let c = model.$authorizationQuery.sink { query in
             guard query != nil else { return }
@@ -521,8 +521,8 @@ final class PermissionModelTests: XCTestCase {
     }
 
     func testWhenGrantedPermissionIsStoredThenQueryIsGranted() {
-        permissionManagerMock.setPermission(true, forDomain: URL.duckDuckGo.host!, permissionType: .camera)
-        permissionManagerMock.setPermission(true, forDomain: URL.duckDuckGo.host!, permissionType: .microphone)
+        permissionManagerMock.setPermission(.allow, forDomain: URL.duckDuckGo.host!, permissionType: .camera)
+        permissionManagerMock.setPermission(.allow, forDomain: URL.duckDuckGo.host!, permissionType: .microphone)
 
         let c = model.$authorizationQuery.sink { query in
             guard query != nil else { return }
@@ -541,7 +541,7 @@ final class PermissionModelTests: XCTestCase {
     }
 
     func testWhenPartialGrantedPermissionIsStoredThenQueryIsQueried() {
-        permissionManagerMock.setPermission(true, forDomain: URL.duckDuckGo.host!, permissionType: .camera)
+        permissionManagerMock.setPermission(.allow, forDomain: URL.duckDuckGo.host!, permissionType: .camera)
 
         let e = expectation(description: "Permission asked")
         let c = model.$authorizationQuery.sink { query in
@@ -566,7 +566,7 @@ final class PermissionModelTests: XCTestCase {
         } else {
             webView.mediaCaptureState = [.activeCamera, .activeMicrophone]
         }
-        permissionManagerMock.setPermission(true, forDomain: URL.duckDuckGo.host!, permissionType: .camera)
+        permissionManagerMock.setPermission(.allow, forDomain: URL.duckDuckGo.host!, permissionType: .camera)
 
         let e = expectation(description: "camera stopped")
         if #available(macOS 12, *) {
@@ -583,8 +583,8 @@ final class PermissionModelTests: XCTestCase {
             }
         }
 
-        permissionManagerMock.setPermission(false, forDomain: URL.duckDuckGo.host!, permissionType: .camera)
-        permissionManagerMock.permissionSubject.send( (URL.duckDuckGo.host!, .camera, false) )
+        permissionManagerMock.setPermission(.deny, forDomain: URL.duckDuckGo.host!, permissionType: .camera)
+        permissionManagerMock.permissionSubject.send( (URL.duckDuckGo.host!, .camera, .deny) )
 
         waitForExpectations(timeout: 1)
     }
@@ -597,7 +597,7 @@ final class PermissionModelTests: XCTestCase {
         } else {
             self.webView.mediaCaptureState = [.activeCamera, .activeMicrophone]
         }
-        permissionManagerMock.setPermission(true, forDomain: URL.duckDuckGo.host!, permissionType: .camera)
+        permissionManagerMock.setPermission(.allow, forDomain: URL.duckDuckGo.host!, permissionType: .camera)
 
         if #available(macOS 12, *) {
             webView.setMicCaptureStateHandler = { _ in
@@ -613,7 +613,7 @@ final class PermissionModelTests: XCTestCase {
         }
 
         permissionManagerMock.removePermission(forDomain: URL.duckDuckGo.host!, permissionType: .camera)
-        permissionManagerMock.permissionSubject.send( (URL.duckDuckGo.host!, .camera, nil) )
+        permissionManagerMock.permissionSubject.send( (URL.duckDuckGo.host!, .camera, .ask) )
     }
 
     func testWhenMicrophoneIsMutedThenSetMediaCaptureMutedIsCalled() {
