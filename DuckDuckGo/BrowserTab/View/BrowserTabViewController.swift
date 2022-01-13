@@ -874,10 +874,7 @@ private extension WKWebView {
 extension BrowserTabViewController: OnboardingDelegate {
 
     func onboardingDidRequestImportData(completion: @escaping () -> Void) {
-        let viewController = DataImportViewController.create()
-        beginSheet(viewController) { _ in
-            completion()
-        }
+        DataImportViewController.show()
     }
 
     func onboardingDidRequestSetDefault(completion: @escaping () -> Void) {
