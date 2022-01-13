@@ -214,7 +214,7 @@ final class FaviconManager: FaviconManagement {
             group.enter()
             URLSession.default.dataTask(with: faviconUrl) { data, _, error in
                 guard let data = data, error == nil else {
-                    assertionFailure("Fetching failed")
+                    group.leave()
                     return
                 }
 
