@@ -29,6 +29,7 @@ struct UserText {
     static let remove = NSLocalizedString("remove", value: "Remove", comment: "Remove button")
     static let quit = NSLocalizedString("quit", value: "Quit", comment: "Quit button")
     static let dontQuit = NSLocalizedString("dont.quit", value: "Don’t Quit", comment: "Don’t Quit button")
+    static let next = NSLocalizedString("next", value: "Next", comment: "Next button")
 
     static let duplicateTab = NSLocalizedString("duplicate.tab", value: "Duplicate Tab", comment: "Menu item. Duplicate as a verb")
     static let closeTab = NSLocalizedString("close.tab", value: "Close Tab", comment: "Menu item")
@@ -221,6 +222,11 @@ struct UserText {
     }
 
     // MARK: - Login Import & Export
+
+    static func closeBrowserWarningFor(browser: String) -> String {
+        let localized = NSLocalizedString("import.close.browser.warning", value: "You must close %@ before importing data.", comment: "Close browser warning when importing data")
+        return String(format: localized, browser)
+    }
 
     static let importLoginsCSV = NSLocalizedString("import.logins.csv.title", value: "CSV Logins File", comment: "Title text for the CSV importer")
 

@@ -32,6 +32,7 @@ final class DataImportViewController: NSViewController {
         case unableToImport
         case permissionsRequired([DataImport.DataType])
         case ableToImport
+        case moreInfoAvailabile
         case failedToImport
         case completedImport([DataImport.Summary])
     }
@@ -42,7 +43,8 @@ final class DataImportViewController: NSViewController {
         
         static func defaultState() -> ViewState {
             if let firstInstalledBrowser = ThirdPartyBrowser.installedBrowsers.first {
-                return ViewState(selectedImportSource: firstInstalledBrowser.importSource, interactionState: .ableToImport)
+                return ViewState(selectedImportSource: firstInstalledBrowser.importSource,
+                                 interactionState: firstInstalledBrowser.importSource == .safari ? .ableToImport : .moreInfoAvailabile)
             } else {
                 return ViewState(selectedImportSource: .csv, interactionState: .ableToImport)
             }
@@ -114,6 +116,7 @@ final class DataImportViewController: NSViewController {
         switch viewState.interactionState {
         case .ableToImport, .failedToImport: beginImport()
         case .completedImport: dismiss()
+        case .moreInfoAvailabile: showMoreInfo()
         default:
             assertionFailure("\(#file): Import button should be disabled when unable to import")
         }
@@ -132,24 +135,43 @@ final class DataImportViewController: NSViewController {
         importSourcePopUpButton.displayImportSources()
         renderCurrentViewState()
 
-        selectedImportSourceCancellable = importSourcePopUpButton.selectionPublisher.sink { [weak self] index in
-            guard let self = self else { return }
-
-            let validSources = DataImport.Source.allCases.filter(\.canImportData)
-            let item = self.importSourcePopUpButton.itemArray[index]
-            let source = validSources.first(where: { $0.importSourceName == item.title })!
-
-            if source == .csv {
-                self.viewState = ViewState(selectedImportSource: source, interactionState: .unableToImport)
-            } else {
-                if source == .safari {
-                    let state: InteractionState = SafariDataImporter.canReadBookmarksFile() ? .ableToImport : .permissionsRequired([.bookmarks])
-                    self.viewState = ViewState(selectedImportSource: source, interactionState: state)
-                } else {
-                    self.viewState = ViewState(selectedImportSource: source, interactionState: .ableToImport)
-                }
-            }
+        selectedImportSourceCancellable = importSourcePopUpButton.selectionPublisher.sink { [weak self] _ in
+            self?.refreshViewState()
         }
+    }
+
+    private func refreshViewState() {
+
+        let item = self.importSourcePopUpButton.itemArray[importSourcePopUpButton.indexOfSelectedItem]
+        let validSources = DataImport.Source.allCases.filter(\.canImportData)
+        let source = validSources.first(where: { $0.importSourceName == item.title })!
+
+        switch source {
+        case .csv:
+            self.viewState = ViewState(selectedImportSource: source, interactionState: .unableToImport)
+
+        case .safari:
+            let state: InteractionState = SafariDataImporter.canReadBookmarksFile() ? .ableToImport : .permissionsRequired([.bookmarks])
+            self.viewState = ViewState(selectedImportSource: source, interactionState: state)
+
+        case .chrome, .firefox, .brave, .edge:
+            self.viewState = ViewState(selectedImportSource: source,
+                                       interactionState: loginsSelected ? .moreInfoAvailabile : .ableToImport)
+        }
+
+    }
+
+    var loginsSelected: Bool {
+        if let browserViewController = self.currentChildViewController as? BrowserImportViewController,
+           browserViewController.selectedImportOptions.contains(.logins) {
+            return true
+        }
+
+        if let importer = self.dataImporter, importer.importableTypes().contains(.logins) {
+            return true
+        }
+        
+        return false
     }
 
     private func renderCurrentViewState() {
@@ -170,6 +192,11 @@ final class DataImportViewController: NSViewController {
         case .ableToImport:
             importSourcePopUpButton.isHidden = false
             importButton.title = UserText.initiateImport
+            importButton.isEnabled = true
+            cancelButton.isHidden = false
+        case .moreInfoAvailabile:
+            importSourcePopUpButton.isHidden = false
+            importButton.title = UserText.next
             importButton.isEnabled = true
             cancelButton.isHidden = false
         case .permissionsRequired:
@@ -259,6 +286,12 @@ final class DataImportViewController: NSViewController {
     }
 
     // MARK: - Actions
+
+    private func showMoreInfo() {
+        viewState = .init(selectedImportSource: viewState.selectedImportSource, interactionState: .ableToImport)
+        importSourcePopUpButton.isEnabled = false
+        embed(viewController: BrowserImportMoreInfoViewController.create())
+    }
 
     private func beginImport() {
         if let browser = ThirdPartyBrowser.browser(for: viewState.selectedImportSource), browser.isRunning {
@@ -388,7 +421,11 @@ extension DataImportViewController: CSVImportViewControllerDelegate {
 extension DataImportViewController: BrowserImportViewControllerDelegate {
 
     func browserImportViewController(_ viewController: BrowserImportViewController, didChangeSelectedImportOptions options: [DataImport.DataType]) {
-        self.viewState.interactionState = options.isEmpty ? .unableToImport : .ableToImport
+        if options.isEmpty {
+            viewState.interactionState = .unableToImport
+        } else {
+            refreshViewState()
+        }
     }
 
 }
