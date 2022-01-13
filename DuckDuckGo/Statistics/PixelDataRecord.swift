@@ -37,9 +37,10 @@ extension PixelData {
             assertionFailure("PixelData: valueEncrypted is not Data")
             return nil
         }
-        if let string = try? NSKeyedUnarchiver.unarchivedObject(ofClass: NSString.self, from: data) {
-            return PixelDataRecord(key: key, value: string as NSString)
-        } else if let number = try? NSKeyedUnarchiver.unarchivedObject(ofClass: NSNumber.self, from: data) {
+        let unarchived = try? NSKeyedUnarchiver.unarchivedObject(ofClasses: [NSString.self, NSNumber.self], from: data)
+        if let string = unarchived as? NSString {
+            return PixelDataRecord(key: key, value: string)
+        } else if let number = unarchived as? NSNumber {
             return PixelDataRecord(key: key, value: number)
         } else {
             return nil
