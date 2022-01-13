@@ -49,6 +49,16 @@ final class DataImportViewController: NSViewController {
         }
     }
 
+    static func show() {
+        guard let windowController = WindowControllersManager.shared.lastKeyMainWindowController,
+              windowController.window?.isKeyWindow == true else {
+            return
+        }
+
+        let viewController = DataImportViewController.create()
+        windowController.mainViewController.beginSheet(viewController)
+    }
+
     static func create() -> DataImportViewController {
         let storyboard = NSStoryboard(name: Constants.storyboardName, bundle: nil)
         return storyboard.instantiateController(identifier: Constants.identifier)

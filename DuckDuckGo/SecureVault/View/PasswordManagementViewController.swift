@@ -98,8 +98,7 @@ final class PasswordManagementViewController: NSViewController {
     }
 
     @IBAction func onImportClicked(_ sender: NSButton) {
-        let viewController = DataImportViewController.create()
-        beginSheet(viewController)
+        DataImportViewController.show()
     }
 
     private func refetchWithText(_ text: String, clearWhenNoMatches: Bool = false, completion: (() -> Void)? = nil) {

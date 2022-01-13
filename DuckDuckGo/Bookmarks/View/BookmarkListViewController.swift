@@ -135,7 +135,11 @@ final class BookmarkListViewController: NSViewController {
             }
         }
     }
-    
+
+    @IBAction func onImportClicked(_ sender: NSButton) {
+        DataImportViewController.show()
+    }
+
     // MARK: NSOutlineView Configuration
     
     private func expandAndRestore(selectedNodes: [BookmarkNode]) {
