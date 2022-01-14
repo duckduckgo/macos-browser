@@ -19,6 +19,7 @@
 import Foundation
 import Combine
 import os.log
+import BrowserServicesKit
 
 final class FaviconImageCache {
 
@@ -105,21 +106,27 @@ final class FaviconImageCache {
 
     func burnExcept(fireproofDomains: FireproofDomains,
                     bookmarkManager: BookmarkManager,
+                    secureVaultDomains: Set<String>,
                     completion: @escaping () -> Void) {
         removeFavicons(filter: { favicon in
             guard let host = favicon.documentUrl.host else {
                 return false
             }
-            return !(fireproofDomains.isFireproof(fireproofDomain: host) || bookmarkManager.isHostInBookmarks(host: host))
+            return !(fireproofDomains.isFireproof(fireproofDomain: host) ||
+                     bookmarkManager.isHostInBookmarks(host: host) ||
+                     secureVaultDomains.contains(host))
         }, completionHandler: completion)
     }
 
-    func burnDomains(_ domains: Set<String>, except bookmarkManager: BookmarkManager, completion: @escaping () -> Void) {
+    func burnDomains(_ domains: Set<String>,
+                     except bookmarkManager: BookmarkManager,
+                     except secureVaultDomains: Set<String>,
+                     completion: @escaping () -> Void) {
         removeFavicons(filter: { favicon in
             guard let host = favicon.documentUrl.host else {
                 return false
             }
-            return domains.contains(host) && !bookmarkManager.isHostInBookmarks(host: host)
+            return domains.contains(host) && !bookmarkManager.isHostInBookmarks(host: host) && !secureVaultDomains.contains(host)
         }, completionHandler: completion)
     }
 
