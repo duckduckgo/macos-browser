@@ -79,6 +79,18 @@ extension Pixel {
 
         case formAutofilled(kind: FormAutofillKind)
         case autofillItemSaved(kind: FormAutofillKind)
+        
+        case waitlistFirstLaunch
+        case waitlistMigratedExistingInstall
+        case waitlistPresentedLockScreen
+        case waitlistDismissedLockScreen
+
+        case onboardingStartPressed
+        case onboardingImportPressed
+        case onboardingImportSkipped
+        case onboardingSetDefaultPressed
+        case onboardingSetDefaultSkipped
+        case onboardingTypingSkipped
 
         case debug(event: Debug, error: Error? = nil)
 
@@ -201,9 +213,40 @@ extension Pixel.Event {
 
         case .autofillItemSaved(kind: let kind):
             return "m_mac_save_\(kind)"
+            
+        case .waitlistFirstLaunch:
+            return "m_mac_waitlist_first_launch_while_locked"
+            
+        case .waitlistMigratedExistingInstall:
+            return "m_mac_waitlist_migrated_existing_install"
+            
+        case .waitlistPresentedLockScreen:
+            return "m_mac_waitlist_lock_screen_presented"
+            
+        case .waitlistDismissedLockScreen:
+            return "m_mac_waitlist_lock_screen_dismissed"
 
         case .debug(event: let event, error: _):
             return "m_mac_debug_\(event)"
+
+        case .onboardingStartPressed:
+            return "m_mac_onboarding_start_pressed"
+
+        case .onboardingImportPressed:
+            return "m_mac_onboarding_import_pressed"
+
+        case .onboardingImportSkipped:
+            return "m_mac_onboarding_import_skipped"
+
+        case .onboardingSetDefaultPressed:
+            return "m_mac_onboarding_setdefault_pressed"
+
+        case .onboardingSetDefaultSkipped:
+            return "m_mac_onboarding_setdefault_skipped"
+
+        case .onboardingTypingSkipped:
+            return "m_mac_onboarding_setdefault_skipped"
+
         }
     }
 

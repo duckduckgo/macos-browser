@@ -57,9 +57,10 @@ final class Fire {
         let burningDomains = domains.union(wwwDomains)
 
         group.enter()
-        burnWebCache(domains: burningDomains, completion: {
+        Task {
+            await burnWebCache(domains: burningDomains)
             group.leave()
-        })
+        }
 
         group.enter()
         burnHistory(of: burningDomains, completion: {
@@ -89,7 +90,8 @@ final class Fire {
         let group = DispatchGroup()
 
         group.enter()
-        burnWebCache {
+        Task {
+            await burnWebCache()
             group.leave()
         }
 
@@ -116,28 +118,16 @@ final class Fire {
 
     // MARK: - Web cache
 
-    private func burnWebCache(completion: @escaping () -> Void) {
+    private func burnWebCache() async {
         os_log("WebsiteDataStore began cookie deletion", log: .fire)
-
-        webCacheManager.clear {
-            os_log("WebsiteDataStore completed cookie deletion", log: .fire)
-
-            DispatchQueue.main.async {
-                completion()
-            }
-        }
+        await webCacheManager.clear()
+        os_log("WebsiteDataStore completed cookie deletion", log: .fire)
     }
 
-    private func burnWebCache(domains: Set<String>? = nil, completion: @escaping () -> Void) {
+    private func burnWebCache(domains: Set<String>? = nil) async {
         os_log("WebsiteDataStore began cookie deletion", log: .fire)
-
-        webCacheManager.clear(domains: domains) {
-            os_log("WebsiteDataStore completed cookie deletion", log: .fire)
-
-            DispatchQueue.main.async {
-                completion()
-            }
-        }
+        await webCacheManager.clear(domains: domains)
+        os_log("WebsiteDataStore completed cookie deletion", log: .fire)
     }
 
     // MARK: - History

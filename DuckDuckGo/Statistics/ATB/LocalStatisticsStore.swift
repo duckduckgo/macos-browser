@@ -21,7 +21,7 @@ import Foundation
 
 final class LocalStatisticsStore: StatisticsStore {
 
-    private struct LegacyStatisticsStore {
+    struct LegacyStatisticsStore {
         @UserDefaultsWrapper(key: .atb, defaultValue: nil)
         var atb: String?
 
@@ -36,8 +36,17 @@ final class LocalStatisticsStore: StatisticsStore {
 
         @UserDefaultsWrapper(key: .lastAppRetentionRequestDate, defaultValue: nil)
         var lastAppRetentionRequestDate: Date?
+        
+        /// Used to determine whether this clearing process took place. While we no longer use these values, we need to know if a user has upgraded from a
+        /// version which did use them, so that they can be shephered into an unlocked waitlist state. When the waitlist feature is removed, this key can be deleted.
+        @UserDefaultsWrapper(key: .legacyStatisticsStoreDataCleared, defaultValue: false)
+        var legacyStatisticsStoreDataCleared: Bool
 
         mutating func clear() {
+            if atb != nil || installDate != nil {
+                legacyStatisticsStoreDataCleared = true
+            }
+
             atb = nil
             installDate = nil
             searchRetentionAtb = nil
@@ -47,6 +56,19 @@ final class LocalStatisticsStore: StatisticsStore {
     }
 
     private struct Keys {
+        static let installDate = "stats.installdate.key"
+        static let atb = "stats.atb.key"
+        static let searchRetentionAtb = "stats.retentionatb.key"
+        static let appRetentionAtb = "stats.appretentionatb.key"
+        static let variant = "stats.variant.key"
+        static let lastAppRetentionRequestDate = "stats.appretentionatb.last.request.key"
+        static let waitlistUpgradeCheckComplete = "waitlist.upgradecomplete"
+        static let waitlistUnlocked = "waitlist.unlocked"
+    }
+
+    // These are the original ATB keys that have been replaced in order to resolve retention data issues.
+    // These keys should be removed from the database in the future.
+    private struct DeprecatedKeys {
         static let installDate = "statistics.installdate.key"
         static let atb = "statistics.atb.key"
         static let searchRetentionAtb = "statistics.retentionatb.key"
@@ -61,19 +83,26 @@ final class LocalStatisticsStore: StatisticsStore {
         self.pixelDataStore = pixelDataStore
 
         var legacyStatisticsStore = LegacyStatisticsStore()
-        if let atb = legacyStatisticsStore.atb {
-            self.atb = atb
-            self.installDate = legacyStatisticsStore.installDate
-            self.searchRetentionAtb = legacyStatisticsStore.searchRetentionAtb
-            self.appRetentionAtb = legacyStatisticsStore.appRetentionAtb
-            self.lastAppRetentionRequestDate = legacyStatisticsStore.lastAppRetentionRequestDate
-
-            legacyStatisticsStore.clear()
-        }
+        legacyStatisticsStore.clear()
     }
 
     var hasInstallStatistics: Bool {
         return atb != nil
+    }
+    
+    /// There are three cases in which users can upgrade to a version which includes the Lock Screen feature:
+    ///
+    /// 1. Users with ATB stored in User Defaults
+    /// 2. Users with ATB stored under the DeprecatedKeys values
+    /// 3. Users with ATB stored under the Keys values
+    ///
+    /// This property checks each of these cases to determine whether a user has upgraded from an existing install in any of these cases.
+    var hasCurrentOrDeprecatedInstallStatistics: Bool {
+        let legacyATBWasMigrated = LegacyStatisticsStore().legacyStatisticsStoreDataCleared
+        let deprecatedATB: String? = pixelDataStore.value(forKey: DeprecatedKeys.atb)
+        let hasDeprecatedATB = deprecatedATB != nil
+        
+        return hasInstallStatistics || hasDeprecatedATB || legacyATBWasMigrated
     }
 
     var atb: String? {
@@ -154,6 +183,34 @@ final class LocalStatisticsStore: StatisticsStore {
                 pixelDataStore.set(value.timeIntervalSinceReferenceDate, forKey: Keys.lastAppRetentionRequestDate)
             } else {
                 pixelDataStore.removeValue(forKey: Keys.lastAppRetentionRequestDate)
+            }
+        }
+    }
+    
+    var waitlistUpgradeCheckComplete: Bool {
+        get {
+            guard let booleanStringValue: String = pixelDataStore.value(forKey: Keys.waitlistUpgradeCheckComplete) else { return false }
+            return Bool(booleanStringValue) ?? false
+        }
+        set {
+            let booleanAsString = String(newValue)
+            pixelDataStore.set(booleanAsString, forKey: Keys.waitlistUpgradeCheckComplete)
+        }
+    }
+    
+    var waitlistUnlocked: Bool {
+        get {
+            guard let booleanStringValue: String = pixelDataStore.value(forKey: Keys.waitlistUnlocked) else { return false }
+            return Bool(booleanStringValue) ?? false
+        }
+        set {
+            if newValue == true {
+                let booleanAsString = String(newValue)
+                pixelDataStore.set(booleanAsString, forKey: Keys.waitlistUnlocked)
+            } else {
+                // Let the absense of a value represent false, so that anyone digging into the SQLite database won't
+                // see a false key and simply set it to true. The database is encrypted, so risk of this is low.
+                pixelDataStore.removeValue(forKey: Keys.waitlistUnlocked)
             }
         }
     }

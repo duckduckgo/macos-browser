@@ -25,9 +25,9 @@ final class PermissionStoreMock: PermissionStore {
 
     enum CallHistoryItem: Equatable {
         case load
-        case update(id: NSManagedObjectID, allow: Bool?)
+        case update(id: NSManagedObjectID, decision: PersistedPermissionDecision?)
         case remove(NSManagedObjectID)
-        case add(domain: String, permissionType: PermissionType, allow: Bool)
+        case add(domain: String, permissionType: PermissionType, decision: PersistedPermissionDecision)
         case clear(exceptions: [StoredPermission])
     }
 
@@ -41,8 +41,8 @@ final class PermissionStoreMock: PermissionStore {
         return permissions
     }
 
-    func update(objectWithId id: NSManagedObjectID, allow: Bool?, completionHandler: ((Error?) -> Void)?) {
-        history.append(.update(id: id, allow: allow))
+    func update(objectWithId id: NSManagedObjectID, decision: PersistedPermissionDecision?, completionHandler: ((Error?) -> Void)?) {
+        history.append(.update(id: id, decision: decision))
         completionHandler?(nil)
     }
 
@@ -51,12 +51,12 @@ final class PermissionStoreMock: PermissionStore {
         completionHandler?(nil)
     }
 
-    func add(domain: String, permissionType: PermissionType, allow: Bool) throws -> StoredPermission {
-        history.append(.add(domain: domain, permissionType: permissionType, allow: allow))
+    func add(domain: String, permissionType: PermissionType, decision: PersistedPermissionDecision) throws -> StoredPermission {
+        history.append(.add(domain: domain, permissionType: permissionType, decision: decision))
         if let error = error {
             throw error
         }
-        return StoredPermission(id: .init(), allow: allow)
+        return StoredPermission(id: .init(), decision: decision)
     }
 
     func clear(except: [StoredPermission], completionHandler: ((Error?) -> Void)?) {

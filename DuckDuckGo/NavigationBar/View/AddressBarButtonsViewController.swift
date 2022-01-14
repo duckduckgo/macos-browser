@@ -78,6 +78,8 @@ final class AddressBarButtonsViewController: NSViewController {
     @IBOutlet weak var imageButton: NSButton!
     @IBOutlet weak var clearButton: NSButton!
 
+    @IBOutlet weak var buttonsContainer: NSStackView!
+
     @IBOutlet weak var animationWrapperView: NSView!
     var trackerAnimationView1: AnimationView!
     var trackerAnimationView2: AnimationView!
@@ -114,6 +116,8 @@ final class AddressBarButtonsViewController: NSViewController {
             popupsButton.action = #selector(popupsButtonAction(_:))
         }
     }
+
+    @Published private(set) var buttonsWidth: CGFloat = 0
 
     private var tabCollectionViewModel: TabCollectionViewModel
     private var bookmarkManager: BookmarkManager = LocalBookmarkManager.shared
@@ -159,17 +163,15 @@ final class AddressBarButtonsViewController: NSViewController {
         super.viewDidLoad()
 
         setupAnimationViews()
-        setupButtons()
         subscribeToSelectedTabViewModel()
         subscribeToBookmarkList()
         subscribePrivacyDashboardPendingUpdates()
         subscribeToEffectiveAppearance()
         updateBookmarkButtonVisibility()
+    }
 
-        cameraButton.sendAction(on: .leftMouseDown)
-        microphoneButton.sendAction(on: .leftMouseDown)
-        geolocationButton.sendAction(on: .leftMouseDown)
-        popupsButton.sendAction(on: .leftMouseDown)
+    override func viewWillAppear() {
+        setupButtons()
     }
 
     var mouseEnterExitTrackingArea: NSTrackingArea?
@@ -179,6 +181,7 @@ final class AddressBarButtonsViewController: NSViewController {
         if view.window?.isPopUpWindow == false {
             updateTrackingAreaForHover()
         }
+        self.buttonsWidth = buttonsContainer.frame.size.width + 4.0
     }
 
     func updateTrackingAreaForHover() {
@@ -225,6 +228,8 @@ final class AddressBarButtonsViewController: NSViewController {
     }
 
     private func updateBookmarkButtonVisibility() {
+        guard view.window?.isPopUpWindow == false else { return }
+
         let hasEmptyAddressBar = tabCollectionViewModel.selectedTabViewModel?.addressBarString.isEmpty ?? true
         let showBookmarkButton = clearButton.isHidden && !hasEmptyAddressBar && (isMouseOver || bookmarkPopover.isShown)
 
@@ -402,6 +407,11 @@ final class AddressBarButtonsViewController: NSViewController {
 
         privacyEntryPointButton.contentTintColor = .privacyEnabledColor
         imageButton.applyFaviconStyle()
+
+        cameraButton.sendAction(on: .leftMouseDown)
+        microphoneButton.sendAction(on: .leftMouseDown)
+        geolocationButton.sendAction(on: .leftMouseDown)
+        popupsButton.sendAction(on: .leftMouseDown)
     }
 
     private var animationViewCache = [String: AnimationView]()
@@ -538,7 +548,9 @@ final class AddressBarButtonsViewController: NSViewController {
         microphoneButton.buttonState = selectedTabViewModel.usedPermissions.camera == nil
             ? selectedTabViewModel.usedPermissions.microphone
             : nil
-        popupsButton.buttonState = selectedTabViewModel.usedPermissions.popups
+        popupsButton.buttonState = selectedTabViewModel.usedPermissions.popups?.isRequested == true // show only when there're popups blocked
+            ? selectedTabViewModel.usedPermissions.popups
+            : nil
 
         showOrHidePermissionPopoverIfNeeded()
     }
@@ -610,7 +622,9 @@ final class AddressBarButtonsViewController: NSViewController {
             !isHypertextUrl ||
             selectedTabViewModel.errorViewState.isVisible ||
             isTextFieldValueText
-        imageButtonWrapper.isHidden = !privacyEntryPointButton.isHidden || isAnyTrackerAnimationPlaying
+        imageButtonWrapper.isHidden = view.window?.isPopUpWindow == true
+            || !privacyEntryPointButton.isHidden
+            || isAnyTrackerAnimationPlaying
     }
 
     private func updatePrivacyEntryPointIcon() {
@@ -774,13 +788,13 @@ extension AddressBarButtonsViewController: PermissionContextMenuDelegate {
         tabCollectionViewModel.selectedTabViewModel?.tab.permissions.allow(query)
     }
     func permissionContextMenu(_ menu: PermissionContextMenu, alwaysAllowPermission permission: PermissionType) {
-        PermissionManager.shared.setPermission(true, forDomain: menu.domain, permissionType: permission)
+        PermissionManager.shared.setPermission(.allow, forDomain: menu.domain, permissionType: permission)
     }
     func permissionContextMenu(_ menu: PermissionContextMenu, alwaysDenyPermission permission: PermissionType) {
-        PermissionManager.shared.setPermission(false, forDomain: menu.domain, permissionType: permission)
+        PermissionManager.shared.setPermission(.deny, forDomain: menu.domain, permissionType: permission)
     }
     func permissionContextMenu(_ menu: PermissionContextMenu, resetStoredPermission permission: PermissionType) {
-        PermissionManager.shared.removePermission(forDomain: menu.domain, permissionType: permission)
+        PermissionManager.shared.setPermission(.ask, forDomain: menu.domain, permissionType: permission)
     }
     func permissionContextMenuReloadPage(_ menu: PermissionContextMenu) {
         tabCollectionViewModel.selectedTabViewModel?.tab.reload()
