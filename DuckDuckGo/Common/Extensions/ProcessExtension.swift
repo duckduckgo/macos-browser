@@ -1,5 +1,5 @@
 //
-//  PermissionAuthorizationState.swift
+//  ProcessExtension.swift
 //
 //  Copyright © 2021 DuckDuckGo. All rights reserved.
 //
@@ -18,27 +18,14 @@
 
 import Foundation
 
-enum PermissionAuthorizationState: String, CaseIterable {
-    case ask
-    case grant
-    case deny
+extension Process {
 
-    init(decision: PersistedPermissionDecision) {
-        switch decision {
-        case .ask:
-            self = .ask
-        case .allow:
-            self = .grant
-        case .deny:
-            self = .deny
-        }
-    }
-
-    var persistedPermissionDecision: PersistedPermissionDecision {
-        switch self {
-        case .ask: return .ask
-        case .grant: return .allow
-        case .deny: return .deny
+    convenience init(_ command: String, _ args: String..., workDirectory: URL? = nil) {
+        self.init()
+        self.executableURL = URL(fileURLWithPath: command)
+        self.arguments = args
+        if let workDirectory = workDirectory {
+            self.currentDirectoryURL = workDirectory
         }
     }
 

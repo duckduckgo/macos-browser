@@ -57,8 +57,12 @@ final class FireTests: XCTestCase {
                         permissionManager: permissionManager)
         let tabCollectionViewModel = TabCollectionViewModel.aTabCollectionViewModel
 
-        fire.burnAll(tabCollectionViewModel: tabCollectionViewModel)
+        let finishedBurningExpectation = expectation(description: "Finished burning")
+        fire.burnAll(tabCollectionViewModel: tabCollectionViewModel) {
+            finishedBurningExpectation.fulfill()
+        }
 
+        waitForExpectations(timeout: 1)
         XCTAssert(manager.clearCalled)
         XCTAssert(historyCoordinator.burnCalled)
         XCTAssert(permissionManager.burnPermissionsCalled)

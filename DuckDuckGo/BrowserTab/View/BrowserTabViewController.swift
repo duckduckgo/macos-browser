@@ -302,6 +302,16 @@ final class BrowserTabViewController: NSViewController {
 
 extension BrowserTabViewController: TabDelegate {
 
+    func tabWillStartNavigation(_ tab: Tab, isUserInitiated: Bool) {
+        if isUserInitiated,
+           let window = self.view.window,
+           window.isPopUpWindow == true,
+           window.isKeyWindow == false {
+
+            window.makeKeyAndOrderFront(nil)
+        }
+    }
+
 	func tab(_ tab: Tab, requestedOpenExternalURL url: URL, forUserEnteredURL userEntered: Bool) {
         guard let window = self.view.window else {
             os_log("%s: Window is nil", type: .error, className)
@@ -636,12 +646,11 @@ extension BrowserTabViewController: WKUIDelegate {
             parentTab.permissions.authorizationQueries.first(where: { $0.permissions.contains(.popups) })
         }
 
+        let contentSize = NSSize(width: windowFeatures.width?.intValue ?? 1024, height: windowFeatures.height?.intValue ?? 752)
         var shouldOpenPopUp = navigationAction.isUserInitiated
         if !shouldOpenPopUp {
             let url = navigationAction.request.url
-            parentTab.permissions.permissions([.popups],
-                                              requestedForDomain: navigationAction.sourceFrame.request.url?.host,
-                                              url: url) { [weak parentTab] granted in
+            parentTab.permissions.permissions([.popups], requestedForDomain: webView.url?.host, url: url) { [weak parentTab] granted in
 
                 guard let parentTab = parentTab else { return }
 
@@ -653,7 +662,7 @@ extension BrowserTabViewController: WKUIDelegate {
                     // called asynchronously
                     guard let url = navigationAction.request.url else { return }
                     let tab = makeTab(parentTab: parentTab, content: .url(url))
-                    WindowsManager.openPopUpWindow(with: tab)
+                    WindowsManager.openPopUpWindow(with: tab, contentSize: contentSize)
 
                     parentTab.permissions.permissions.popups.popupOpened(nextQuery: nextQuery(parentTab: parentTab))
 
@@ -671,7 +680,7 @@ extension BrowserTabViewController: WKUIDelegate {
         if windowFeatures.toolbarsVisibility?.boolValue == true {
             tabCollectionViewModel.insertChild(tab: tab, selected: true)
         } else {
-            WindowsManager.openPopUpWindow(with: tab)
+            WindowsManager.openPopUpWindow(with: tab, contentSize: contentSize)
         }
         parentTab.permissions.permissions.popups.popupOpened(nextQuery: nextQuery(parentTab: parentTab))
 
