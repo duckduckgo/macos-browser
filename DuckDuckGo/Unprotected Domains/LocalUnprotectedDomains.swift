@@ -1,5 +1,5 @@
 //
-//  DomainsProtectionStore.swift
+//  LocalUnprotectedDomains.swift
 //  DuckDuckGo
 //
 //  Copyright © 2017 DuckDuckGo. All rights reserved.
@@ -32,21 +32,25 @@ final class LocalUnprotectedDomains: DomainsProtectionStore {
     private var legacyUserDefaultsUnprotectedDomainsData: Data?
 
     private let queue = DispatchQueue(label: "unprotected.domains.queue")
-    lazy private var _unprotectedDomainsToIds: [String: NSManagedObjectID] = loadUnprotectedDomains()
 
-    private var unprotectedDomainsToIds: [String: NSManagedObjectID] {
+    private typealias UnprotectedDomainsContainer = KeySetDictionary<String, NSManagedObjectID>
+    lazy private var _unprotectedDomains: UnprotectedDomainsContainer = loadUnprotectedDomains()
+
+    private var unprotectedDomainsToIds: UnprotectedDomainsContainer {
         queue.sync {
-            _unprotectedDomainsToIds
+            _unprotectedDomains
         }
     }
 
     var unprotectedDomains: Set<String> {
-        Set(unprotectedDomainsToIds.keys)
+        queue.sync {
+            _unprotectedDomains.keys
+        }
     }
 
-    private func modifyUnprotectedDomainsToIds<T>(_ modify: (inout [String: NSManagedObjectID]) throws -> T) rethrows -> T {
+    private func modifyUnprotectedDomains<T>(_ modify: (inout UnprotectedDomainsContainer) throws -> T) rethrows -> T {
         try queue.sync {
-            try modify(&_unprotectedDomainsToIds)
+            try modify(&_unprotectedDomains)
         }
     }
 
@@ -54,14 +58,13 @@ final class LocalUnprotectedDomains: DomainsProtectionStore {
         self.store = store
     }
 
-    private func loadUnprotectedDomains() -> [String: NSManagedObjectID] {
+    private func loadUnprotectedDomains() -> UnprotectedDomainsContainer {
         do {
             if let data = legacyUserDefaultsUnprotectedDomainsData,
-               var domains = try? NSKeyedUnarchiver.unarchivedObject(ofClass: NSSet.self, from: data) as? Set<String>,
+               let domains = try? NSKeyedUnarchiver.unarchivedObject(ofClass: NSSet.self, from: data) as? Set<String>,
                !domains.isEmpty {
 
-                domains = Set(domains.map { $0.dropWWW() })
-                var result = [String: NSManagedObjectID]()
+                var result = UnprotectedDomainsContainer()
                 do {
                     result = try store.add(domains).reduce(into: [:]) { $0[$1.value] = $1.id }
                     self.legacyUserDefaultsUnprotectedDomainsData = nil
@@ -77,29 +80,17 @@ final class LocalUnprotectedDomains: DomainsProtectionStore {
         }
     }
 
-    func isHostUnprotected(_ domain: String) -> Bool {
-        return unprotectedDomainsToIds[domain.dropWWW()] != nil
-    }
-
     func disableProtection(forDomain domain: String) {
-        let domainWithoutWWW = domain.dropWWW()
         do {
-            let id = try store.add(domainWithoutWWW)
-            modifyUnprotectedDomainsToIds { $0[domainWithoutWWW] = id }
+            let id = try store.add(domain)
+            modifyUnprotectedDomains { $0[domain] = id }
         } catch {
             assertionFailure("could not add unprotected domain \(domain): \(error)")
         }
     }
 
     func enableProtection(forDomain domain: String) {
-        let domainWithoutWWW = domain.dropWWW()
-
-        guard let id = modifyUnprotectedDomainsToIds({
-            return $0.updateInPlace(key: domainWithoutWWW) { id -> NSManagedObjectID? in
-                defer { id = nil }
-                return id
-            }
-        }) else {
+        guard let id = modifyUnprotectedDomains({ $0.removeValue(forKey: domain) }) else {
             assertionFailure("unprotected domain \(domain) not found")
             return
         }
