@@ -68,7 +68,7 @@ final class Fire {
         group.enter()
         burnHistory(of: burningDomains, completion: {
             self.burnPermissions(of: burningDomains, completion: {
-                self.burnFavicons(for: domains) {
+                self.burnFavicons(for: burningDomains) {
                     self.burnDownloads(of: burningDomains)
                     group.leave()
                 }
@@ -176,7 +176,7 @@ final class Fire {
     }
 
     private func burnFavicons(for domains: Set<String>, completion: @escaping () -> Void) {
-        self.faviconManagement.burnDomains(domains, completion: completion)
+        self.faviconManagement.burnDomains(domains, except: LocalBookmarkManager.shared, completion: completion)
     }
 
     // MARK: - Windows & Tabs

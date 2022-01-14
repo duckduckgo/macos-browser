@@ -183,17 +183,18 @@ final class FaviconReferenceCache {
         }
     }
 
-    func burnDomains(_ domains: Set<String>, completion: @escaping () -> Void) {
+    func burnDomains(_ domains: Set<String>, except bookmarkManager: BookmarkManager, completion: @escaping () -> Void) {
         // Remove host references
         removeHostReferences(filter: { hostReference in
-            return domains.contains(hostReference.host)
+            let host = hostReference.host
+            return domains.contains(host) && !bookmarkManager.isHostInBookmarks(host: host)
         }) {
             // Remove URL references
             self.removeUrlReferences(filter: { urlReference in
                 guard let host = urlReference.documentUrl.host else {
                     return false
                 }
-                return domains.contains(host)
+                return domains.contains(host) && !bookmarkManager.isHostInBookmarks(host: host)
             }, completionHandler: completion)
         }
     }

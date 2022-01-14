@@ -33,7 +33,7 @@ protocol FaviconManagement {
     func burnExcept(fireproofDomains: FireproofDomains,
                     bookmarkManager: BookmarkManager,
                     completion: @escaping () -> Void)
-    func burnDomains(_ domains: Set<String>, completion: @escaping () -> Void)
+    func burnDomains(_ domains: Set<String>, except bookmarkManager: BookmarkManager, completion: @escaping () -> Void)
 
 }
 
@@ -161,9 +161,9 @@ final class FaviconManager: FaviconManagement {
         }
     }
 
-    func burnDomains(_ domains: Set<String>, completion: @escaping () -> Void) {
-        self.referenceCache.burnDomains(domains) {
-            self.imageCache.burnDomains(domains) {
+    func burnDomains(_ domains: Set<String>, except bookmarkManager: BookmarkManager, completion: @escaping () -> Void) {
+        self.referenceCache.burnDomains(domains, except: bookmarkManager) {
+            self.imageCache.burnDomains(domains, except: bookmarkManager) {
                 DispatchQueue.main.async {
                     completion()
                 }
