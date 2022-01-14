@@ -18,7 +18,7 @@
 
 import XCTest
 import Combine
-@testable import BrowserServicesKit
+import BrowserServicesKit
 @testable import DuckDuckGo_Privacy_Browser
 
 final class FaviconManagerMock: FaviconManagement {
