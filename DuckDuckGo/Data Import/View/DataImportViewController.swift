@@ -68,6 +68,7 @@ final class DataImportViewController: NSViewController {
 
     private var viewState: ViewState = .defaultState() {
         didSet {
+
             renderCurrentViewState()
 
             let bookmarkImporter = CoreDataBookmarkImporter(bookmarkManager: LocalBookmarkManager.shared)
@@ -96,6 +97,7 @@ final class DataImportViewController: NSViewController {
                     self.dataImporter = nil
                 }
             }
+
         }
     }
 
@@ -141,7 +143,6 @@ final class DataImportViewController: NSViewController {
     }
 
     private func refreshViewState() {
-
         let item = self.importSourcePopUpButton.itemArray[importSourcePopUpButton.indexOfSelectedItem]
         let validSources = DataImport.Source.allCases.filter(\.canImportData)
         let source = validSources.first(where: { $0.importSourceName == item.title })!
@@ -162,16 +163,12 @@ final class DataImportViewController: NSViewController {
     }
 
     var loginsSelected: Bool {
-        if let browserViewController = self.currentChildViewController as? BrowserImportViewController,
-           browserViewController.selectedImportOptions.contains(.logins) {
-            return true
+        if let browserViewController = self.currentChildViewController as? BrowserImportViewController {
+            return browserViewController.selectedImportOptions.contains(.logins)
         }
 
-        if let importer = self.dataImporter, importer.importableTypes().contains(.logins) {
-            return true
-        }
-        
-        return false
+        // Assume true as a default in order to show next button when new child view controller is set
+        return true
     }
 
     private func renderCurrentViewState() {
@@ -290,7 +287,7 @@ final class DataImportViewController: NSViewController {
     private func showMoreInfo() {
         viewState = .init(selectedImportSource: viewState.selectedImportSource, interactionState: .ableToImport)
         importSourcePopUpButton.isEnabled = false
-        embed(viewController: BrowserImportMoreInfoViewController.create())
+        embed(viewController: BrowserImportMoreInfoViewController.create(source: viewState.selectedImportSource))
     }
 
     private func beginImport() {

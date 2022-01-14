@@ -224,7 +224,7 @@ struct UserText {
     // MARK: - Login Import & Export
 
     static func closeBrowserWarningFor(browser: String) -> String {
-        let localized = NSLocalizedString("import.close.browser.warning", value: "You must close %@ before importing data.", comment: "Close browser warning when importing data")
+        let localized = NSLocalizedString("import.close.browser.warning", value: "You must quit %@ before importing data.", comment: "Quit browser warning when importing data")
         return String(format: localized, browser)
     }
 
@@ -388,5 +388,7 @@ struct UserText {
     static let onboardingNotNowButton = NSLocalizedString("onboarding.notnow.button", value: "Maybe Later", comment: "Skip a step of the onboarding flow")
 
     static let waitlistGetStarted = NSLocalizedString("waitlist.get-started", value: "Get Started", comment: "Button title used in the waitlist lock screen success state")
-    
+
+    static let importFromChromiumMoreInfo = NSLocalizedString("import.from.chromium.info", value: "You'll be asked to enter your Keychain password.\n\nDuckDuckGo won’t see your Keychain password, but macOS needs it to access and import passwords into DuckDuckGo.\n\nImported passwords are encrypted and only stored on this computer.", comment: "More info when importing from Chromium")
+
 }

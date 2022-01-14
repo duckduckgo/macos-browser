@@ -684,31 +684,42 @@ Gw
         <!--Browser Import More Info View Controller-->
         <scene sceneID="dHA-ZE-ykZ">
             <objects>
-                <viewController storyboardIdentifier="BrowserImportMoreInfoViewController" id="SgA-ff-zsw" customClass="BrowserImportMoreInfoViewController" sceneMemberID="viewController">
+                <viewController storyboardIdentifier="BrowserImportMoreInfoViewController" id="SgA-ff-zsw" customClass="BrowserImportMoreInfoViewController" customModule="DuckDuckGo_Privacy_Browser" customModuleProvider="target" sceneMemberID="viewController">
                     <view key="view" id="H3k-x6-3b0">
-                        <rect key="frame" x="0.0" y="0.0" width="522" height="300"/>
+                        <rect key="frame" x="0.0" y="0.0" width="522" height="108"/>
                         <autoresizingMask key="autoresizingMask"/>
                         <subviews>
                             <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="3kL-jQ-3EH">
-                                <rect key="frame" x="43" y="202" width="243" height="16"/>
-                                <textFieldCell key="cell" lineBreakMode="clipping" title="Something's gonna happen, deal with it" id="UQf-oq-EoR">
+                                <rect key="frame" x="18" y="20" width="486" height="80"/>
+                                <constraints>
+                                    <constraint firstAttribute="width" constant="482" id="ydb-zs-Xp6"/>
+                                </constraints>
+                                <textFieldCell key="cell" id="UQf-oq-EoR">
                                     <font key="font" usesAppearanceFont="YES"/>
+                                    <string key="title">First line
+
+Second line
+
+Third line</string>
                                     <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
                                     <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
                                 </textFieldCell>
                             </textField>
                         </subviews>
                         <constraints>
-                            <constraint firstItem="3kL-jQ-3EH" firstAttribute="leading" secondItem="H3k-x6-3b0" secondAttribute="leading" constant="45" id="HTM-zc-eJl"/>
-                            <constraint firstAttribute="trailing" secondItem="3kL-jQ-3EH" secondAttribute="trailing" constant="238" id="jHa-b2-eXm"/>
-                            <constraint firstAttribute="bottom" secondItem="3kL-jQ-3EH" secondAttribute="bottom" constant="202" id="xR0-kC-zmF"/>
-                            <constraint firstItem="3kL-jQ-3EH" firstAttribute="top" secondItem="H3k-x6-3b0" secondAttribute="top" constant="82" id="yWM-Ai-vUO"/>
+                            <constraint firstAttribute="bottom" secondItem="3kL-jQ-3EH" secondAttribute="bottom" constant="20" symbolic="YES" id="71h-WL-qeP"/>
+                            <constraint firstItem="3kL-jQ-3EH" firstAttribute="leading" secondItem="H3k-x6-3b0" secondAttribute="leading" constant="20" id="HTM-zc-eJl"/>
+                            <constraint firstAttribute="trailing" secondItem="3kL-jQ-3EH" secondAttribute="trailing" constant="20" id="jHa-b2-eXm"/>
+                            <constraint firstItem="3kL-jQ-3EH" firstAttribute="top" secondItem="H3k-x6-3b0" secondAttribute="top" constant="8" id="yWM-Ai-vUO"/>
                         </constraints>
                     </view>
+                    <connections>
+                        <outlet property="label" destination="3kL-jQ-3EH" id="iEb-p6-nYb"/>
+                    </connections>
                 </viewController>
                 <customObject id="NjF-DS-gNH" userLabel="First Responder" customClass="NSResponder" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="75" y="1201"/>
+            <point key="canvasLocation" x="75" y="1105"/>
         </scene>
     </scenes>
     <resources>

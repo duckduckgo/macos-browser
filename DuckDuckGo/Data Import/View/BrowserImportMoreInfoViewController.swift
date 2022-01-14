@@ -25,11 +25,37 @@ final class BrowserImportMoreInfoViewController: NSViewController {
         static let identifier = "BrowserImportMoreInfoViewController"
     }
 
-    static func create() -> Self {
+    static func create(source: DataImport.Source) -> Self {
         let storyboard = NSStoryboard(name: Constants.storyboardName, bundle: nil)
 
         return storyboard.instantiateController(identifier: Constants.identifier) { (coder) -> Self? in
-            return Self.init(coder: coder)
+            return Self.init(coder: coder, source: source)
+        }
+    }
+
+    let source: DataImport.Source
+
+    init?(coder: NSCoder, source: DataImport.Source) {
+        self.source = source
+        super.init(coder: coder)
+    }
+
+    required init?(coder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }
+
+    @IBOutlet weak var label: NSTextField!
+
+    override func viewDidLoad() {
+        super.viewDidLoad()
+        switch source {
+        case .chrome, .edge, .brave:
+            label.stringValue = UserText.importFromChromiumMoreInfo
+
+        case .firefox:
+            label.stringValue = "TBD"
+
+        default: fatalError("Unsupported source for more info")
         }
     }
 
