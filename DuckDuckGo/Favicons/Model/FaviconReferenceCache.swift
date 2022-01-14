@@ -167,7 +167,9 @@ final class FaviconReferenceCache {
                     completion: @escaping () -> Void) {
 
         func isHostApproved(host: String) -> Bool {
-            return fireproofDomains.isFireproof(fireproofDomain: host) || bookmarkManager.isHostInBookmarks(host: host) || secureVaultDomains.contains(host)
+            return fireproofDomains.isFireproof(fireproofDomain: host) ||
+                bookmarkManager.isHostInBookmarks(host: host) ||
+                secureVaultDomains.contains(host)
         }
 
         // Remove host references
