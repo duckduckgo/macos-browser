@@ -92,8 +92,6 @@ final class FaviconManager: FaviconManagement {
 
                     if let favicon = self.imageCache.get(faviconUrl: faviconUrl), favicon.dateCreated > Date.weekAgo {
                         return favicon
-                    } else {
-                        assertionFailure("Missing entry for faviconUrl")
                     }
 
                     return nil
