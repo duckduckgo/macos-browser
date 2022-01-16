@@ -221,10 +221,11 @@ final class AppStateChangePublisherTests: XCTestCase {
     func testWhenTabURLChangedThenStateChangePublished() {
         WindowsManager.openNewWindow()
 
-        let e = expectation(description: "Reordering tabs fires State changes")
+        var e: XCTestExpectation? = expectation(description: "Reordering tabs fires State changes")
         WindowControllersManager.shared.stateChanged
             .sink { _ in
-                e.fulfill()
+                e?.fulfill()
+                e = nil
             }.store(in: &cancellables)
 
         WindowControllersManager.shared.mainWindowControllers[0].mainViewController.tabCollectionViewModel

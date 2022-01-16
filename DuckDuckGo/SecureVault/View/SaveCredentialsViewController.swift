@@ -55,6 +55,8 @@ final class SaveCredentialsViewController: NSViewController {
 
     private var credentials: SecureVaultModels.WebsiteCredentials?
 
+    private var faviconManagement: FaviconManagement = FaviconManager.shared
+
     private var saveButtonAction: (() -> Void)?
 
     var passwordData: Data {
@@ -153,7 +155,7 @@ final class SaveCredentialsViewController: NSViewController {
     }
 
     func loadFaviconForDomain(_ domain: String) {
-        faviconImage.image = LocalFaviconService.shared.getCachedFavicon(for: domain, mustBeFromUserScript: false)
+        faviconImage.image = faviconManagement.getCachedFavicon(for: domain, sizeCategory: .small)?.image
             ?? NSImage(named: NSImage.Name("Web"))
     }
 

@@ -23,7 +23,7 @@ struct BookmarkList {
 
     var topLevelEntities: [BaseBookmarkEntity] = []
 
-    private var allBookmarkURLsOrdered: [URL]
+    private(set) var allBookmarkURLsOrdered: [URL]
     private var favoriteBookmarkURLsOrdered: [URL]
     private var itemsDict: [URL: Bookmark]
 

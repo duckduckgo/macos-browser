@@ -82,6 +82,12 @@ final class BookmarkListViewController: NSViewController {
         }.store(in: &cancellables)
     }
 
+    override func viewWillAppear() {
+        super.viewWillAppear()
+
+        reloadData()
+    }
+
     private func reloadData() {
         let selectedNodes = self.selectedNodes
         
