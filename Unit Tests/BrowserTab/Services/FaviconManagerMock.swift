@@ -40,14 +40,12 @@ final class FaviconManagerMock: FaviconManagement {
 
     func burnExcept(fireproofDomains: FireproofDomains,
                     bookmarkManager: BookmarkManager,
-                    secureVault: SecureVault,
                     completion: @escaping () -> Void) {
         completion()
     }
 
     func burnDomains(_ domains: Set<String>,
                      except bookmarkManager: BookmarkManager,
-                     except secureVault: SecureVault,
                      completion: @escaping () -> Void) {
         completion()
     }
