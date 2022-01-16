@@ -33,11 +33,9 @@ protocol FaviconManagement {
 
     func burnExcept(fireproofDomains: FireproofDomains,
                     bookmarkManager: BookmarkManager,
-                    secureVault: SecureVault,
                     completion: @escaping () -> Void)
     func burnDomains(_ domains: Set<String>,
                      except bookmarkManager: BookmarkManager,
-                     except secureVault: SecureVault,
                      completion: @escaping () -> Void)
 
 }
@@ -156,15 +154,11 @@ final class FaviconManager: FaviconManagement {
 
     func burnExcept(fireproofDomains: FireproofDomains,
                     bookmarkManager: BookmarkManager,
-                    secureVault: SecureVault,
                     completion: @escaping () -> Void) {
-        let secureVaultDomains = secureVault.accountDomains
         self.referenceCache.burnExcept(fireproofDomains: fireproofDomains,
-                                       bookmarkManager: bookmarkManager,
-                                       secureVaultDomains: secureVaultDomains) {
+                                       bookmarkManager: bookmarkManager) {
             self.imageCache.burnExcept(fireproofDomains: fireproofDomains,
-                                       bookmarkManager: bookmarkManager,
-                                       secureVaultDomains: secureVaultDomains) {
+                                       bookmarkManager: bookmarkManager) {
                 completion()
             }
         }
@@ -172,11 +166,9 @@ final class FaviconManager: FaviconManagement {
 
     func burnDomains(_ domains: Set<String>,
                      except bookmarkManager: BookmarkManager,
-                     except secureVault: SecureVault,
                      completion: @escaping () -> Void) {
-        let secureVaultDomains = secureVault.accountDomains
-        self.referenceCache.burnDomains(domains, except: bookmarkManager, except: secureVaultDomains) {
-            self.imageCache.burnDomains(domains, except: bookmarkManager, except: secureVaultDomains) {
+        self.referenceCache.burnDomains(domains, except: bookmarkManager) {
+            self.imageCache.burnDomains(domains, except: bookmarkManager) {
                 DispatchQueue.main.async {
                     completion()
                 }
@@ -248,19 +240,4 @@ final class FaviconManager: FaviconManagement {
             completion(favicons)
         }
     }
-}
-
-fileprivate extension SecureVault {
-
-    var accountDomains: Set<String> {
-        guard let accounts = try? accounts() else {
-            assertionFailure("Failedto get accounts")
-            return Set()
-        }
-
-        return Set(accounts.map { account in
-            account.domain
-        })
-    }
-
 }

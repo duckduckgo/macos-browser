@@ -163,13 +163,11 @@ final class FaviconReferenceCache {
 
     func burnExcept(fireproofDomains: FireproofDomains,
                     bookmarkManager: BookmarkManager,
-                    secureVaultDomains: Set<String>,
                     completion: @escaping () -> Void) {
 
         func isHostApproved(host: String) -> Bool {
             return fireproofDomains.isFireproof(fireproofDomain: host) ||
-                bookmarkManager.isHostInBookmarks(host: host) ||
-                secureVaultDomains.contains(host)
+                bookmarkManager.isHostInBookmarks(host: host)
         }
 
         // Remove host references
@@ -189,19 +187,18 @@ final class FaviconReferenceCache {
 
     func burnDomains(_ domains: Set<String>,
                      except bookmarkManager: BookmarkManager,
-                     except secureVaultDomains: Set<String>,
                      completion: @escaping () -> Void) {
         // Remove host references
         removeHostReferences(filter: { hostReference in
             let host = hostReference.host
-            return domains.contains(host) && !bookmarkManager.isHostInBookmarks(host: host) && !secureVaultDomains.contains(host)
+            return domains.contains(host) && !bookmarkManager.isHostInBookmarks(host: host)
         }) {
             // Remove URL references
             self.removeUrlReferences(filter: { urlReference in
                 guard let host = urlReference.documentUrl.host else {
                     return false
                 }
-                return domains.contains(host) && !bookmarkManager.isHostInBookmarks(host: host) && !secureVaultDomains.contains(host)
+                return domains.contains(host) && !bookmarkManager.isHostInBookmarks(host: host)
             }, completionHandler: completion)
         }
     }

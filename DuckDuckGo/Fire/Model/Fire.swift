@@ -171,20 +171,14 @@ final class Fire {
     // MARK: - Favicons
 
     private func burnFavicons(completion: @escaping () -> Void) {
-        let vault = try? SecureVaultFactory.default.makeVault()
-
         self.faviconManagement.burnExcept(fireproofDomains: FireproofDomains.shared,
                                           bookmarkManager: LocalBookmarkManager.shared,
-                                          secureVault: vault!,
                                           completion: completion)
     }
 
     private func burnFavicons(for domains: Set<String>, completion: @escaping () -> Void) {
-        let vault = try? SecureVaultFactory.default.makeVault()
-
         self.faviconManagement.burnDomains(domains,
                                            except: LocalBookmarkManager.shared,
-                                           except: vault!,
                                            completion: completion)
     }
 

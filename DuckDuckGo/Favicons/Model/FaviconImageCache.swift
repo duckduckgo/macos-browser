@@ -106,27 +106,24 @@ final class FaviconImageCache {
 
     func burnExcept(fireproofDomains: FireproofDomains,
                     bookmarkManager: BookmarkManager,
-                    secureVaultDomains: Set<String>,
                     completion: @escaping () -> Void) {
         removeFavicons(filter: { favicon in
             guard let host = favicon.documentUrl.host else {
                 return false
             }
             return !(fireproofDomains.isFireproof(fireproofDomain: host) ||
-                     bookmarkManager.isHostInBookmarks(host: host) ||
-                     secureVaultDomains.contains(host))
+                     bookmarkManager.isHostInBookmarks(host: host))
         }, completionHandler: completion)
     }
 
     func burnDomains(_ domains: Set<String>,
                      except bookmarkManager: BookmarkManager,
-                     except secureVaultDomains: Set<String>,
                      completion: @escaping () -> Void) {
         removeFavicons(filter: { favicon in
             guard let host = favicon.documentUrl.host else {
                 return false
             }
-            return domains.contains(host) && !bookmarkManager.isHostInBookmarks(host: host) && !secureVaultDomains.contains(host)
+            return domains.contains(host) && !bookmarkManager.isHostInBookmarks(host: host)
         }, completionHandler: completion)
     }
 
