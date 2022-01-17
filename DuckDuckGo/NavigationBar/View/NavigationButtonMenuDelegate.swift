@@ -62,7 +62,7 @@ extension NavigationButtonMenuDelegate: NSMenuDelegate {
         }
 
         let listItemViewModel = WKBackForwardListItemViewModel(backForwardListItem: listItem,
-                                                               faviconService: LocalFaviconService.shared,
+                                                               faviconManagement: FaviconManager.shared,
                                                                historyCoordinating: HistoryCoordinator.shared,
                                                                isCurrentItem: listItems[safe: index] === currentListItem)
 

@@ -106,7 +106,7 @@ extension SuggestionContainer: SuggestionLoadingDataSource {
         var request = URLRequest.defaultRequest(with: url)
         request.timeoutInterval = 1
 
-        URLSession.shared.dataTask(with: request) { (data, _, error) in
+        URLSession.default.dataTask(with: request) { (data, _, error) in
             completion(data, error)
         }.resume()
     }

@@ -30,10 +30,10 @@ class PixelArgumentsTests: XCTestCase {
     override func setUp() {
         bookmarkStore = BookmarkStoreMock()
         bookmarkStore.bookmarks = []
-        bookmarkManager = LocalBookmarkManager(bookmarkStore: bookmarkStore, faviconService: FaviconServiceMock())
+        bookmarkManager = LocalBookmarkManager(bookmarkStore: bookmarkStore, faviconManagement: FaviconManagerMock())
         bookmarkManager.loadBookmarks()
         UserDefaultsWrapper<Any>.clearAll()
-        fireproofDomains = FireproofDomains()
+        fireproofDomains = FireproofDomains(store: FireproofDomainsStoreMock())
         pixelDataStore = PixelStoreMock()
     }
 
@@ -148,7 +148,7 @@ class PixelArgumentsTests: XCTestCase {
     // MARK: IsBookmarkFireproofed
 
     func testWhenInitWithFireproofDomainThenIsBookmarkFireproofedIsFireproofed() {
-        fireproofDomains.addToAllowed(domain: "duckduckgo.com")
+        fireproofDomains.add(domain: "duckduckgo.com")
         let url = URL(string: "https://duckduckgo.com/?q=search")!
         let fp = Pixel.Event.IsBookmarkFireproofed(url: url, fireproofDomains: fireproofDomains)
         XCTAssertEqual(fp, .fireproofed)

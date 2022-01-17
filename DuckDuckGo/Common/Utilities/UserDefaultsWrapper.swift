@@ -32,6 +32,7 @@ public struct UserDefaultsWrapper<T> {
         case configStoragePrivacyConfigurationEtag = "config.storage.privacyconfiguration.etag"
 
         case fireproofDomains = "com.duckduckgo.fireproofing.allowedDomains"
+        case unprotectedDomains = "com.duckduckgo.contentblocker.unprotectedDomains"
 
         case defaultBrowserDismissed = "browser.default.dismissed"
 
@@ -76,8 +77,9 @@ public struct UserDefaultsWrapper<T> {
 
     public var wrappedValue: T {
         get {
-            if let storedValue = UserDefaults.standard.object(forKey: key.rawValue) as? T {
-                return storedValue
+            if let storedValue = UserDefaults.standard.object(forKey: key.rawValue),
+               let typedValue = storedValue as? T {
+                return typedValue
             }
 
             if setIfEmpty {

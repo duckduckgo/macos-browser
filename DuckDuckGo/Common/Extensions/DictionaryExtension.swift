@@ -1,8 +1,7 @@
 //
-//  UserDefaultsExtension.swift
-//  DuckDuckGo
+//  DictionaryExtension.swift
 //
-//  Copyright © 2017 DuckDuckGo. All rights reserved.
+//  Copyright © 2021 DuckDuckGo. All rights reserved.
 //
 //  Licensed under the Apache License, Version 2.0 (the "License");
 //  you may not use this file except in compliance with the License.
@@ -16,12 +15,13 @@
 //  See the License for the specific language governing permissions and
 //  limitations under the License.
 //
+
 import Foundation
 
-extension UserDefaults {
+extension Dictionary {
 
-    public func bool(forKey key: String, defaultValue: Bool) -> Bool {
-        return object(forKey: key) as? Bool ?? defaultValue
+    mutating func updateInPlace<T>(key: Key, update: (inout Value?) throws -> T) rethrows -> T {
+        try update(&self[key])
     }
 
 }

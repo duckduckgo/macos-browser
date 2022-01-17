@@ -28,6 +28,7 @@ final class AddressBarViewController: NSViewController {
     @IBOutlet var activeBackgroundView: NSView!
     @IBOutlet var activeBackgroundViewWithSuggestions: NSView!
     @IBOutlet var progressIndicator: ProgressView!
+    @IBOutlet var passiveTextFieldMinXConstraint: NSLayoutConstraint!
 
     private(set) var addressBarButtonsViewController: AddressBarButtonsViewController?
     
@@ -56,7 +57,7 @@ final class AddressBarViewController: NSViewController {
         }
     }
 
-    private var selectedTabViewModelCancellable: AnyCancellable?
+    private var cancellables = Set<AnyCancellable>()
     private var passiveAddressBarStringCancellable: AnyCancellable?
     private var suggestionsVisibleCancellable: AnyCancellable?
     private var frameCancellable: AnyCancellable?
@@ -120,6 +121,7 @@ final class AddressBarViewController: NSViewController {
                                                    object: nil)
             addMouseMonitors()
         }
+        subscribeToButtonsWidth()
     }
 
     // swiftlint:disable notification_center_detachment
@@ -164,12 +166,12 @@ final class AddressBarViewController: NSViewController {
     @IBOutlet var shadowView: ShadowView!
 
     private func subscribeToSelectedTabViewModel() {
-        selectedTabViewModelCancellable = tabCollectionViewModel.$selectedTabViewModel.receive(on: DispatchQueue.main).sink { [weak self] _ in
+        tabCollectionViewModel.$selectedTabViewModel.receive(on: DispatchQueue.main).sink { [weak self] _ in
             self?.subscribeToPassiveAddressBarString()
             self?.subscribeToProgressEvents()
             // don't resign first responder on tab switching
             self?.clickPoint = nil
-        }
+        }.store(in: &cancellables)
     }
 
     private func subscribeToPassiveAddressBarString() {
@@ -221,6 +223,11 @@ final class AddressBarViewController: NSViewController {
                     progressIndicator.finishAndHide()
                 }
         }
+    }
+
+    func subscribeToButtonsWidth() {
+        addressBarButtonsViewController!.$buttonsWidth.weakAssign(to: \.constant, on: passiveTextFieldMinXConstraint)
+            .store(in: &cancellables)
     }
 
     private func updateView() {

@@ -22,4 +22,24 @@ enum PermissionAuthorizationState: String, CaseIterable {
     case ask
     case grant
     case deny
+
+    init(decision: PersistedPermissionDecision) {
+        switch decision {
+        case .ask:
+            self = .ask
+        case .allow:
+            self = .grant
+        case .deny:
+            self = .deny
+        }
+    }
+
+    var persistedPermissionDecision: PersistedPermissionDecision {
+        switch self {
+        case .ask: return .ask
+        case .grant: return .allow
+        case .deny: return .deny
+        }
+    }
+
 }

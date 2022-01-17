@@ -107,13 +107,13 @@ final class PrivacyDashboardViewController: NSViewController {
         }
 
         let authState: PrivacyDashboardUserScript.AuthorizationState = PermissionType.allCases.compactMap { permissionType in
-            guard let alwaysGrant = PermissionManager.shared.permission(forDomain: domain, permissionType: permissionType) else {
-                if usedPermissions[permissionType] != nil {
-                    return (permissionType, .ask)
-                }
+            guard PermissionManager.shared.hasPermissionPersisted(forDomain: domain, permissionType: permissionType)
+                    || usedPermissions[permissionType] != nil
+            else {
                 return nil
             }
-            return (permissionType, alwaysGrant ? .grant : .deny)
+            let decision = PermissionManager.shared.permission(forDomain: domain, permissionType: permissionType)
+            return (permissionType, .init(decision: decision))
         }
 
         privacyDashboardScript.setPermissions(usedPermissions, authorizationState: authState, domain: domain, in: webView)
@@ -211,12 +211,8 @@ extension PrivacyDashboardViewController: PrivacyDashboardUserScriptDelegate {
             assertionFailure("PrivacyDashboardViewController: no domain available")
             return
         }
-        switch state {
-        case .ask:
-            PermissionManager.shared.removePermission(forDomain: domain, permissionType: permission)
-        case .deny, .grant:
-            PermissionManager.shared.setPermission(state == .grant, forDomain: domain, permissionType: permission)
-        }
+
+        PermissionManager.shared.setPermission(state.persistedPermissionDecision, forDomain: domain, permissionType: permission)
     }
 
     func userScript(_ userScript: PrivacyDashboardUserScript, setPermission permission: PermissionType, paused: Bool) {

@@ -78,8 +78,8 @@ class BookmarkOutlineViewDataSourceTests: XCTestCase {
     func testWhenValidatingBookmarkDrop_AndDestinationIsFolder_ThenMoveDragOperationIsReturned() {
         let mockDestinationFolder = BookmarkFolder.mock
         let bookmarkStoreMock = BookmarkStoreMock()
-        let faviconServiceMock = FaviconServiceMock()
-        let bookmarkManager = LocalBookmarkManager(bookmarkStore: bookmarkStoreMock, faviconService: faviconServiceMock)
+        let faviconManagerMock = FaviconManagerMock()
+        let bookmarkManager = LocalBookmarkManager(bookmarkStore: bookmarkStoreMock, faviconManagement: faviconManagerMock)
 
         bookmarkStoreMock.bookmarks = [mockDestinationFolder]
         bookmarkManager.loadBookmarks()
@@ -98,8 +98,8 @@ class BookmarkOutlineViewDataSourceTests: XCTestCase {
     func testWhenValidatingFolderDrop_AndDestinationIsFolder_ThenMoveDragOperationIsReturned() {
         let mockDestinationFolder = BookmarkFolder.mock
         let bookmarkStoreMock = BookmarkStoreMock()
-        let faviconServiceMock = FaviconServiceMock()
-        let bookmarkManager = LocalBookmarkManager(bookmarkStore: bookmarkStoreMock, faviconService: faviconServiceMock)
+        let faviconManagerMock = FaviconManagerMock()
+        let bookmarkManager = LocalBookmarkManager(bookmarkStore: bookmarkStoreMock, faviconManagement: faviconManagerMock)
 
         bookmarkStoreMock.bookmarks = [mockDestinationFolder]
         bookmarkManager.loadBookmarks()
@@ -118,8 +118,8 @@ class BookmarkOutlineViewDataSourceTests: XCTestCase {
     func testWhenValidatingFolderDrop_AndDestinationIsSameFolder_ThenNoDragOperationIsReturned() {
         let mockDestinationFolder = BookmarkFolder.mock
         let bookmarkStoreMock = BookmarkStoreMock()
-        let faviconServiceMock = FaviconServiceMock()
-        let bookmarkManager = LocalBookmarkManager(bookmarkStore: bookmarkStoreMock, faviconService: faviconServiceMock)
+        let faviconManagerMock = FaviconManagerMock()
+        let bookmarkManager = LocalBookmarkManager(bookmarkStore: bookmarkStoreMock, faviconManagement: faviconManagerMock)
 
         bookmarkStoreMock.bookmarks = [mockDestinationFolder]
         bookmarkManager.loadBookmarks()
@@ -140,8 +140,8 @@ class BookmarkOutlineViewDataSourceTests: XCTestCase {
         let rootFolder = BookmarkFolder(id: UUID(), title: "Root", children: [childFolder])
 
         let bookmarkStoreMock = BookmarkStoreMock()
-        let faviconServiceMock = FaviconServiceMock()
-        let bookmarkManager = LocalBookmarkManager(bookmarkStore: bookmarkStoreMock, faviconService: faviconServiceMock)
+        let faviconManagerMock = FaviconManagerMock()
+        let bookmarkManager = LocalBookmarkManager(bookmarkStore: bookmarkStoreMock, faviconManagement: faviconManagerMock)
 
         bookmarkStoreMock.bookmarks = [rootFolder]
         bookmarkManager.loadBookmarks()
@@ -162,8 +162,8 @@ class BookmarkOutlineViewDataSourceTests: XCTestCase {
 
     private func createTreeController(with bookmarks: [BaseBookmarkEntity]) -> BookmarkTreeController {
         let bookmarkStoreMock = BookmarkStoreMock()
-        let faviconServiceMock = FaviconServiceMock()
-        let bookmarkManager = LocalBookmarkManager(bookmarkStore: bookmarkStoreMock, faviconService: faviconServiceMock)
+        let faviconManagerMock = FaviconManagerMock()
+        let bookmarkManager = LocalBookmarkManager(bookmarkStore: bookmarkStoreMock, faviconManagement: faviconManagerMock)
 
         bookmarkStoreMock.bookmarks = bookmarks
         bookmarkManager.loadBookmarks()
@@ -179,7 +179,6 @@ fileprivate extension Bookmark {
     static var mock: Bookmark = Bookmark(id: UUID(),
                                          url: URL.duckDuckGo,
                                          title: "Title",
-                                         favicon: nil,
                                          isFavorite: false)
 
 }

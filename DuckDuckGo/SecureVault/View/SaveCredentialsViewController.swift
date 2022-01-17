@@ -55,6 +55,8 @@ final class SaveCredentialsViewController: NSViewController {
 
     private var credentials: SecureVaultModels.WebsiteCredentials?
 
+    private var faviconManagement: FaviconManagement = FaviconManager.shared
+
     private var saveButtonAction: (() -> Void)?
 
     var passwordData: Data {
@@ -98,7 +100,7 @@ final class SaveCredentialsViewController: NSViewController {
         Pixel.fire(.autofillItemSaved(kind: .password))
         if self.fireproofCheck.state == .on {
             Pixel.fire(.fireproof(kind: .pwm, suggested: .pwm))
-            FireproofDomains.shared.addToAllowed(domain: account.domain)
+            FireproofDomains.shared.add(domain: account.domain)
         }
     }
 
@@ -124,7 +126,7 @@ final class SaveCredentialsViewController: NSViewController {
         alert.beginSheetModal(for: window) { response in
             if response == NSApplication.ModalResponse.alertFirstButtonReturn {
                 Pixel.fire(.fireproof(kind: .pwm, suggested: .suggested))
-                FireproofDomains.shared.addToAllowed(domain: host)
+                FireproofDomains.shared.add(domain: host)
             }
         }
 
@@ -153,7 +155,7 @@ final class SaveCredentialsViewController: NSViewController {
     }
 
     func loadFaviconForDomain(_ domain: String) {
-        faviconImage.image = LocalFaviconService.shared.getCachedFavicon(for: domain, mustBeFromUserScript: false)
+        faviconImage.image = faviconManagement.getCachedFavicon(for: domain, sizeCategory: .small)?.image
             ?? NSImage(named: NSImage.Name("Web"))
     }
 
