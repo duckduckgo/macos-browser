@@ -28,20 +28,18 @@ final class GPCRequestFactory {
     }
     
     var gpcEnabled = true
-    var privacyConfig: PrivacyConfiguration!
     
-    init(config: PrivacyConfiguration = ContentBlocking.privacyConfigurationManager.privacyConfig) {
-        privacyConfig = config
+    init() {
         reloadGPCSetting()
     }
     
     func reloadGPCSetting() {
-        privacyConfig = ContentBlocking.privacyConfigurationManager.privacyConfig
         let prefs = PrivacySecurityPreferences()
         gpcEnabled = prefs.gpcEnabled
     }
     
-    func requestForGPC(basedOn incomingRequest: URLRequest) -> URLRequest? {
+    func requestForGPC(basedOn incomingRequest: URLRequest,
+                       config: PrivacyConfiguration = ContentBlocking.privacyConfigurationManager.privacyConfig) -> URLRequest? {
         func removingHeader(fromRequest incomingRequest: URLRequest) -> URLRequest? {
             var request = incomingRequest
             if let headers = request.allHTTPHeaderFields, headers.firstIndex(where: { $0.key == Constants.secGPCHeader }) != nil {
@@ -63,7 +61,7 @@ final class GPCRequestFactory {
         }
         
         // Add GPC header if needed
-        if privacyConfig.isEnabled(featureKey: .gpc) && gpcEnabled {
+        if config.isEnabled(featureKey: .gpc) && gpcEnabled {
             var request = incomingRequest
             if let headers = request.allHTTPHeaderFields,
                headers.firstIndex(where: { $0.key == Constants.secGPCHeader }) == nil {
