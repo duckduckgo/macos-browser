@@ -58,7 +58,7 @@ final class WebCacheManagerTests: XCTestCase {
     func testWhenClearedThenCookiesWithParentDomainsAreRetained() {
 
         let logins = MockPreservedLogins(domains: [
-            "www.example.com"
+            "example.com"
         ])
 
         let cookieStore = MockHTTPCookieStore(cookies: [
@@ -88,7 +88,7 @@ final class WebCacheManagerTests: XCTestCase {
 
     func testWhenClearedThenDDGCookiesAreRetained() {
         let logins = MockPreservedLogins(domains: [
-            "www.example.com"
+            "example.com"
         ])
 
         let cookieStore = MockHTTPCookieStore(cookies: [
@@ -115,7 +115,7 @@ final class WebCacheManagerTests: XCTestCase {
 
     func testWhenClearedThenCookiesForLoginsAreRetained() {
         let logins = MockPreservedLogins(domains: [
-            "www.example.com"
+            "example.com"
         ])
 
         let cookieStore = MockHTTPCookieStore(cookies: [
@@ -192,14 +192,12 @@ final class WebCacheManagerTests: XCTestCase {
 
     class MockPreservedLogins: FireproofDomains {
 
-        let domains: [String]
-
-        override var fireproofDomains: [String] {
-            return domains
-        }
-
         init(domains: [String]) {
-            self.domains = domains
+            super.init(store: FireproofDomainsStoreMock())
+
+            for domain in domains {
+                super.add(domain: domain)
+            }
         }
 
     }

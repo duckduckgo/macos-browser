@@ -100,7 +100,7 @@ final class SaveCredentialsViewController: NSViewController {
         Pixel.fire(.autofillItemSaved(kind: .password))
         if self.fireproofCheck.state == .on {
             Pixel.fire(.fireproof(kind: .pwm, suggested: .pwm))
-            FireproofDomains.shared.addToAllowed(domain: account.domain)
+            FireproofDomains.shared.add(domain: account.domain)
         }
     }
 
@@ -126,7 +126,7 @@ final class SaveCredentialsViewController: NSViewController {
         alert.beginSheetModal(for: window) { response in
             if response == NSApplication.ModalResponse.alertFirstButtonReturn {
                 Pixel.fire(.fireproof(kind: .pwm, suggested: .suggested))
-                FireproofDomains.shared.addToAllowed(domain: host)
+                FireproofDomains.shared.add(domain: host)
             }
         }
 
