@@ -22,13 +22,16 @@ import WebKit
 final class WKBackForwardListItemViewModel {
 
     private let backForwardListItem: BackForwardListItem
-    private let faviconService: FaviconService
+    private let faviconManagement: FaviconManagement
     private let historyCoordinating: HistoryCoordinating
     private let isCurrentItem: Bool
 
-    init(backForwardListItem: BackForwardListItem, faviconService: FaviconService, historyCoordinating: HistoryCoordinating, isCurrentItem: Bool) {
+    init(backForwardListItem: BackForwardListItem,
+         faviconManagement: FaviconManagement,
+         historyCoordinating: HistoryCoordinating,
+         isCurrentItem: Bool) {
         self.backForwardListItem = backForwardListItem
-        self.faviconService = faviconService
+        self.faviconManagement = faviconManagement
         self.historyCoordinating = historyCoordinating
         self.isCurrentItem = isCurrentItem
     }
@@ -65,9 +68,10 @@ final class WKBackForwardListItemViewModel {
             return NSImage(named: "HomeFavicon")
         }
 
-        if let host = backForwardListItem.url?.host, let favicon = faviconService.getCachedFavicon(for: host, mustBeFromUserScript: false) {
-            favicon.size = NSSize.faviconSize
-            return favicon
+        if let url = backForwardListItem.url,
+           let favicon = faviconManagement.getCachedFavicon(for: url, sizeCategory: .small),
+           let image = favicon.image?.resizedToFaviconSize() {
+            return image
         }
 
         return NSImage(named: "DefaultFavicon")

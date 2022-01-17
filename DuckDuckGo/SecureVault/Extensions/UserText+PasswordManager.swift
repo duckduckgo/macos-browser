@@ -44,6 +44,9 @@ extension UserText {
     static let pmFirstName = NSLocalizedString("pm.name.first", value: "First Name", comment: "Label for first name title")
     static let pmMiddleName = NSLocalizedString("pm.name.middle", value: "Middle Name", comment: "Label for middle name title")
     static let pmLastName = NSLocalizedString("pm.name.last", value: "Last Name", comment: "Label for last name title")
+    static let pmDay = NSLocalizedString("pm.day", value: "Day", comment: "Label for Day title")
+    static let pmMonth = NSLocalizedString("pm.month", value: "Month", comment: "Label for Month title")
+    static let pmYear = NSLocalizedString("pm.year", value: "Year", comment: "Label for Year title")
 
     static let pmAddress1 = NSLocalizedString("pm.address.address1", value: "Address 1", comment: "Label for address 1 title")
     static let pmAddress2 = NSLocalizedString("pm.address.address2", value: "Address 2", comment: "Label for address 2 title")

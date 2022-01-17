@@ -23,6 +23,7 @@ import Combine
 import BrowserServicesKit
 
 protocol TabDelegate: FileDownloadManagerDelegate {
+    func tabWillStartNavigation(_ tab: Tab, isUserInitiated: Bool)
     func tabDidStartNavigation(_ tab: Tab)
     func tab(_ tab: Tab, requestedNewTabWith content: Tab.TabContent, selected: Bool)
     func tab(_ tab: Tab, willShowContextMenuAt position: NSPoint, image: URL?, link: URL?, selectedText: String?)
@@ -47,18 +48,18 @@ final class Tab: NSObject {
         case url(URL)
         case preferences
         case bookmarks
+        case onboarding
         case none
 
         static var displayableTabTypes: [TabContent] {
             return [TabContent.preferences, .bookmarks].sorted { first, second in
                 switch first {
-                case .homepage, .url, .preferences, .bookmarks, .none: break
+                case .homepage, .url, .preferences, .bookmarks, .onboarding, .none: break
                 // !! Replace [TabContent.preferences, .bookmarks] above with new displayable Tab Types if added
                 }
                 guard let firstTitle = first.title, let secondTitle = second.title else {
                     return true // Arbitrary sort order, only non-standard tabs are displayable.
                 }
-
                 return firstTitle.localizedStandardCompare(secondTitle) == .orderedAscending
             }
         }
@@ -68,6 +69,7 @@ final class Tab: NSObject {
             case .url, .homepage, .none: return nil
             case .preferences: return UserText.tabPreferencesTitle
             case .bookmarks: return UserText.tabBookmarksTitle
+            case .onboarding: return UserText.tabOnboardingTitle
             }
         }
 
@@ -88,7 +90,7 @@ final class Tab: NSObject {
     weak var delegate: TabDelegate?
 
     init(content: TabContent,
-         faviconService: FaviconService = LocalFaviconService.shared,
+         faviconManagement: FaviconManagement = FaviconManager.shared,
          webCacheManager: WebCacheManager = WebCacheManager.shared,
          webViewConfiguration: WebViewConfiguration? = nil,
          historyCoordinating: HistoryCoordinating = HistoryCoordinator.shared,
@@ -103,7 +105,7 @@ final class Tab: NSObject {
          canBeClosedWithBack: Bool = false) {
 
         self.content = content
-        self.faviconService = faviconService
+        self.faviconManagement = faviconManagement
         self.historyCoordinating = historyCoordinating
         self.scriptsSource = scriptsSource
         self.visitedDomains = visitedDomains
@@ -123,12 +125,6 @@ final class Tab: NSObject {
         super.init()
 
         setupWebView(shouldLoadInBackground: shouldLoadInBackground)
-
-        // cache session-restored favicon if present
-        if let favicon = favicon,
-           let host = content.url?.host {
-            faviconService.cacheIfNeeded(favicon: favicon, for: host, isFromUserScript: false)
-        }
     }
 
     deinit {
@@ -282,6 +278,10 @@ final class Tab: NSObject {
         content = .homepage
     }
 
+    func startOnboarding() {
+        content = .onboarding
+    }
+
     func reload() {
         if let error = error, let failingUrl = error.failingUrl {
             webView.load(failingUrl)
@@ -376,32 +376,22 @@ final class Tab: NSObject {
     // MARK: - Favicon
 
     @Published var favicon: NSImage?
-    let faviconService: FaviconService
+    let faviconManagement: FaviconManagement
 
     private func handleFavicon(oldContent: TabContent) {
-        if !content.isUrl {
-            favicon = nil
-        }
-        if oldContent.url?.host != content.url?.host {
-            fetchFavicon(nil, for: content.url?.host, isFromUserScript: false)
-        }
-    }
+        guard faviconManagement.areFaviconsLoaded else { return }
 
-    private func fetchFavicon(_ faviconURL: URL?, for host: String?, isFromUserScript: Bool) {
-        if favicon != nil {
+        guard content.isUrl, let url = content.url else {
             favicon = nil
-        }
-
-        guard let host = host else {
             return
         }
 
-        faviconService.fetchFavicon(faviconURL, for: host, isFromUserScript: isFromUserScript) { (image, error) in
-            guard error == nil, let image = image else {
-                return
+        if let cachedFavicon = faviconManagement.getCachedFavicon(for: url, sizeCategory: .small)?.image {
+            if cachedFavicon != favicon {
+                favicon = cachedFavicon
             }
-
-            self.favicon = image
+        } else {
+            favicon = nil
         }
     }
 
@@ -582,20 +572,14 @@ extension Tab: ContextMenuDelegate {
 
 extension Tab: FaviconUserScriptDelegate {
 
-    func faviconUserScript(_ faviconUserScript: FaviconUserScript, didFindFavicon faviconUrl: URL) {
-        guard let host = self.content.url?.host else {
-            return
-        }
-
-        faviconService.fetchFavicon(faviconUrl, for: host, isFromUserScript: true) { (image, error) in
-            guard host == self.content.url?.host else {
+    func faviconUserScript(_ faviconUserScript: FaviconUserScript,
+                           didFindFaviconLinks faviconLinks: [FaviconUserScript.FaviconLink],
+                           for documentUrl: URL) {
+        faviconManagement.handleFaviconLinks(faviconLinks, documentUrl: documentUrl) { favicon in
+            guard documentUrl == self.content.url, let favicon = favicon else {
                 return
             }
-            guard error == nil, let image = image else {
-                return
-            }
-
-            self.favicon = image
+            self.favicon = favicon.image
         }
     }
 
@@ -610,6 +594,7 @@ extension Tab: ContentBlockerRulesUserScriptDelegate {
     func contentBlockerRulesUserScript(_ script: ContentBlockerRulesUserScript, detectedTracker tracker: DetectedTracker) {
         trackerInfo?.add(detectedTracker: tracker)
     }
+
 }
 
 extension Tab: SurrogatesUserScriptDelegate {
@@ -727,6 +712,7 @@ extension Tab: WKNavigationDelegate {
         }
 
         guard let url = navigationAction.request.url, let urlScheme = url.scheme else {
+            self.willPerformNavigationAction(navigationAction)
             decisionHandler(.allow)
             return
         }
@@ -751,8 +737,12 @@ extension Tab: WKNavigationDelegate {
         }
 
         HTTPSUpgrade.shared.isUpgradeable(url: url) { [weak self] isUpgradable in
-            if let self = self,
-               isUpgradable && navigationAction.isTargetingMainFrame,
+            guard let self = self else {
+                decisionHandler(.cancel)
+                return
+            }
+
+            if isUpgradable && navigationAction.isTargetingMainFrame,
                 let upgradedUrl = url.toHttps() {
 
                 self.invalidateBackItemIfNeeded(for: navigationAction)
@@ -762,11 +752,18 @@ extension Tab: WKNavigationDelegate {
                 return
             }
 
+            self.willPerformNavigationAction(navigationAction)
             decisionHandler(.allow)
         }
     }
     // swiftlint:enable cyclomatic_complexity
     // swiftlint:enable function_body_length
+
+    private func willPerformNavigationAction(_ navigationAction: WKNavigationAction) {
+        if navigationAction.isTargetingMainFrame {
+            delegate?.tabWillStartNavigation(self, isUserInitiated: navigationAction.isUserInitiated)
+        }
+    }
 
     private func invalidateBackItemIfNeeded(for navigationAction: WKNavigationAction) {
         guard let url = navigationAction.request.url,
@@ -833,13 +830,13 @@ extension Tab: WKNavigationDelegate {
         }
     }
 
-    @available(macOS 12, *)
+    @available(macOS 11.3, *)
     @objc(webView:navigationAction:didBecomeDownload:)
     func webView(_ webView: WKWebView, navigationAction: WKNavigationAction, didBecome download: WKDownload) {
         self.webView(webView, navigationAction: navigationAction, didBecomeDownload: download)
     }
 
-    @available(macOS 12, *)
+    @available(macOS 11.3, *)
     @objc(webView:navigationResponse:didBecomeDownload:)
     func webView(_ webView: WKWebView, navigationResponse: WKNavigationResponse, didBecome download: WKDownload) {
         self.webView(webView, navigationResponse: navigationResponse, didBecomeDownload: download)

@@ -32,6 +32,7 @@ public struct UserDefaultsWrapper<T> {
         case configStoragePrivacyConfigurationEtag = "config.storage.privacyconfiguration.etag"
 
         case fireproofDomains = "com.duckduckgo.fireproofing.allowedDomains"
+        case unprotectedDomains = "com.duckduckgo.contentblocker.unprotectedDomains"
 
         case defaultBrowserDismissed = "browser.default.dismissed"
 
@@ -55,9 +56,13 @@ public struct UserDefaultsWrapper<T> {
         case atb = "statistics.atb.key"
         case searchRetentionAtb = "statistics.retentionatb.key"
         case appRetentionAtb = "statistics.appretentionatb.key"
-        case variant = "statistics.variant.key"
         case lastAppRetentionRequestDate = "statistics.appretentionatb.last.request.key"
+        
+        // Used to detect whether a user had old User Defaults ATB data at launch, in order to grant them implicitly
+        // unlocked status with regards to the lock screen
+        case legacyStatisticsStoreDataCleared = "statistics.appretentionatb.legacy-data-cleared"
 
+        case onboardingFinished = "onboarding.finished"
     }
 
     private let key: Key
@@ -72,8 +77,9 @@ public struct UserDefaultsWrapper<T> {
 
     public var wrappedValue: T {
         get {
-            if let storedValue = UserDefaults.standard.object(forKey: key.rawValue) as? T {
-                return storedValue
+            if let storedValue = UserDefaults.standard.object(forKey: key.rawValue),
+               let typedValue = storedValue as? T {
+                return typedValue
             }
 
             if setIfEmpty {

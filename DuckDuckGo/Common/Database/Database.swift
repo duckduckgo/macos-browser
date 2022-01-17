@@ -25,7 +25,16 @@ final class Database {
         static let databaseName = "Database"
     }
     
-    static let shared = Database()
+    static let shared: Database = {
+#if DEBUG
+        if AppDelegate.isRunningTests {
+            let keyStoreMockClass = (NSClassFromString("EncryptionKeyStoreMock") as? NSObject.Type)!
+            let keyStoreMock = (keyStoreMockClass.init() as? EncryptionKeyStoring)!
+            return Database(keyStore: keyStoreMock)
+        }
+#endif
+        return Database()
+    }()
 
     private let container: NSPersistentContainer
     private let storeLoadedCondition = RunLoop.ResumeCondition()
@@ -33,22 +42,17 @@ final class Database {
     var model: NSManagedObjectModel {
         return container.managedObjectModel
     }
-    
-    convenience init() {
-        let mainBundle = Bundle.main
 
-        guard let managedObjectModel = NSManagedObjectModel.mergedModel(from: [mainBundle]) else { fatalError("No DB scheme found") }
-        
-        self.init(name: Constants.databaseName, model: managedObjectModel)
-    }
-    
-    init(name: String, model: NSManagedObjectModel) {
+    init(name: String = Constants.databaseName,
+         model: NSManagedObjectModel = NSManagedObjectModel.mergedModel(from: [.main])!,
+         keyStore: EncryptionKeyStoring = EncryptionKeyStore(generator: EncryptionKeyGenerator())) {
         do {
-            try EncryptedValueTransformer<NSImage>.registerTransformer()
-            try EncryptedValueTransformer<NSString>.registerTransformer()
-            try EncryptedValueTransformer<NSURL>.registerTransformer()
-            try EncryptedValueTransformer<NSNumber>.registerTransformer()
-            try EncryptedValueTransformer<NSError>.registerTransformer()
+            try EncryptedValueTransformer<NSImage>.registerTransformer(keyStore: keyStore)
+            try EncryptedValueTransformer<NSString>.registerTransformer(keyStore: keyStore)
+            try EncryptedValueTransformer<NSURL>.registerTransformer(keyStore: keyStore)
+            try EncryptedValueTransformer<NSNumber>.registerTransformer(keyStore: keyStore)
+            try EncryptedValueTransformer<NSError>.registerTransformer(keyStore: keyStore)
+            try EncryptedValueTransformer<NSData>.registerTransformer(keyStore: keyStore)
         } catch {
             fatalError("Failed to register encryption value transformers")
         }
@@ -59,7 +63,7 @@ final class Database {
     func loadStore(migrationHandler: @escaping (NSManagedObjectContext) -> Void = { _ in }) {
         container.loadPersistentStores { _, error in
             if let error = error {
-                Pixel.fire(.debug(event: .dbInitializationError, error: error, countedBy: .counter))
+                Pixel.fire(.debug(event: .dbInitializationError, error: error))
                 // Give Pixel a chance to be sent, but not too long
                 Thread.sleep(forTimeInterval: 1)
                 fatalError("Could not load DB: \(error.localizedDescription)")

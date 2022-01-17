@@ -146,7 +146,7 @@ final class TabViewModel {
             return
         }
 
-        guard let url = tab.content.url else {
+        guard let url = tab.content.url ?? tab.parentTab?.content.url else {
             addressBarString = ""
             passiveAddressBarString = ""
             return
@@ -164,19 +164,15 @@ final class TabViewModel {
             return
         }
 
-        guard let host = url.host else {
+        guard let host = url.host ?? tab.parentTab?.content.url?.host else {
+            // also lands here for about:blank and about:home
             addressBarString = ""
             passiveAddressBarString = ""
             return
         }
 
-        if [.blankPage, .homePage].contains(url) {
-            addressBarString = ""
-            passiveAddressBarString = ""
-        } else {
-            addressBarString = url.absoluteString
-            passiveAddressBarString = host.drop(prefix: URL.HostPrefix.www.separated())
-        }
+        addressBarString = url.absoluteString
+        passiveAddressBarString = host.drop(prefix: URL.HostPrefix.www.separated())
     }
 
     private func updateTitle() {
@@ -192,6 +188,8 @@ final class TabViewModel {
             title = UserText.tabBookmarksTitle
         case .homepage:
             title = UserText.tabHomeTitle
+        case .onboarding:
+            title = UserText.tabOnboardingTitle
         case .url, .none:
             if let title = tab.title {
                 self.title = title
@@ -217,7 +215,7 @@ final class TabViewModel {
         case .bookmarks:
             favicon = Favicon.bookmarks
             return
-        case .url, .none: break
+        case .url, .onboarding, .none: break
         }
 
         if let favicon = tab.favicon {

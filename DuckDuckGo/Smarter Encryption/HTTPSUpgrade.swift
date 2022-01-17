@@ -28,7 +28,7 @@ final class HTTPSUpgrade {
     private let dataReloadLock = NSLock()
     private let store: HTTPSUpgradeStore
     private var bloomFilter: BloomFilterWrapper?
-    
+
     init(store: HTTPSUpgradeStore = HTTPSUpgradePersistence()) {
         self.store = store
     }
@@ -50,7 +50,7 @@ final class HTTPSUpgrade {
             completion(false)
             return
         }
-        
+
         guard config.isFeature(.httpsUpgrade, enabledForDomain: host) else {
             completion(false)
             return

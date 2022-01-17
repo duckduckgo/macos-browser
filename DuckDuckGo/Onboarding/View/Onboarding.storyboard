@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<document type="com.apple.InterfaceBuilder3.Cocoa.Storyboard.XIB" version="3.0" toolsVersion="19455" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES">
+    <dependencies>
+        <deployment identifier="macosx"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="19455"/>
+        <capability name="Named colors" minToolsVersion="9.0"/>
+        <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
+    </dependencies>
+    <scenes>
+        <!--Onboarding View Controller-->
+        <scene sceneID="0jb-zS-dCZ">
+            <objects>
+                <viewController storyboardIdentifier="Onboarding" id="IxI-w0-wIk" customClass="OnboardingViewController" customModule="DuckDuckGo_Privacy_Browser" customModuleProvider="target" sceneMemberID="viewController">
+                    <view key="view" id="tyt-9M-nur" customClass="ColorView" customModule="DuckDuckGo_Privacy_Browser" customModuleProvider="target">
+                        <rect key="frame" x="0.0" y="0.0" width="400" height="400"/>
+                        <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                        <subviews>
+                            <imageView horizontalHuggingPriority="251" verticalHuggingPriority="251" horizontalCompressionResistancePriority="250" verticalCompressionResistancePriority="250" translatesAutoresizingMaskIntoConstraints="NO" id="9qI-qr-Wdf">
+                                <rect key="frame" x="0.0" y="-1" width="401" height="401"/>
+                                <constraints>
+                                    <constraint firstAttribute="width" secondItem="9qI-qr-Wdf" secondAttribute="height" multiplier="1:1" id="HHd-mZ-lhE"/>
+                                </constraints>
+                                <imageCell key="cell" refusesFirstResponder="YES" alignment="left" imageScaling="proportionallyUpOrDown" image="OnboardingBackground" id="khz-iN-aMR"/>
+                            </imageView>
+                        </subviews>
+                        <constraints>
+                            <constraint firstAttribute="trailing" secondItem="9qI-qr-Wdf" secondAttribute="trailing" constant="-1" id="9jC-g0-nTm"/>
+                            <constraint firstAttribute="bottom" secondItem="9qI-qr-Wdf" secondAttribute="bottom" constant="-1" id="NlB-qj-Ob1"/>
+                            <constraint firstItem="9qI-qr-Wdf" firstAttribute="leading" secondItem="tyt-9M-nur" secondAttribute="leading" id="XpA-NB-SAJ"/>
+                        </constraints>
+                        <userDefinedRuntimeAttributes>
+                            <userDefinedRuntimeAttribute type="color" keyPath="backgroundColor">
+                                <color key="value" name="OnboardingBackgroundColor"/>
+                            </userDefinedRuntimeAttribute>
+                        </userDefinedRuntimeAttributes>
+                    </view>
+                    <connections>
+                        <outlet property="backgroundImageView" destination="9qI-qr-Wdf" id="Ztf-ld-LyD"/>
+                    </connections>
+                </viewController>
+                <customObject id="SAY-7V-5gA" userLabel="First Responder" customClass="NSResponder" sceneMemberID="firstResponder"/>
+            </objects>
+            <point key="canvasLocation" x="-261" y="90"/>
+        </scene>
+    </scenes>
+    <resources>
+        <image name="OnboardingBackground" width="1281" height="1281"/>
+        <namedColor name="OnboardingBackgroundColor">
+            <color red="0.80000001192092896" green="0.85500001907348633" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+        </namedColor>
+    </resources>
+</document>

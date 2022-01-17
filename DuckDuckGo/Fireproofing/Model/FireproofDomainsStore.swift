@@ -1,5 +1,5 @@
 //
-//  FaviconServiceMock.swift
+//  FireproofDomainsStore.swift
 //
 //  Copyright © 2021 DuckDuckGo. All rights reserved.
 //
@@ -16,22 +16,28 @@
 //  limitations under the License.
 //
 
-import XCTest
-import Combine
-@testable import DuckDuckGo_Privacy_Browser
+import Foundation
+import CoreData
 
-final class FaviconServiceMock: FaviconService {
+typealias FireproofDomainsStore = CoreDataStore<FireproofDomainManagedObject>
+extension FireproofDomainsStore {
 
-    var cachedFaviconsPublisher = PassthroughSubject<(host: String, favicon: NSImage), Never>()
-
-    func fetchFavicon(_ faviconUrl: URL?, for host: String, isFromUserScript: Bool, completion: @escaping (NSImage?, Error?) -> Void) {
+    func load() throws -> FireproofDomainsContainer {
+        try load(into: FireproofDomainsContainer()) {
+            try $0.add(domain: $1.value, withId: $1.id)
+        }
     }
 
-    func getCachedFavicon(for host: String, mustBeFromUserScript: Bool) -> NSImage? {
-        return nil
+}
+
+extension FireproofDomainManagedObject: ValueRepresentableManagedObject {
+
+    func update(with domain: String) {
+        self.domainEncrypted = domain as NSString
     }
 
-    func cacheIfNeeded(favicon: NSImage, for host: String, isFromUserScript: Bool) {
+    func valueRepresentation() -> String? {
+        self.domainEncrypted as? String
     }
 
 }

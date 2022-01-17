@@ -46,13 +46,8 @@ extension Pixel.Event {
 
     var parameters: [String: String]? {
         switch self {
-        case .debug(event: let event, error: let error, countedBy: let counter):
+        case .debug(event: _, error: let error):
             var params = [String: String]()
-
-            if let counter = counter {
-                let count = counter.incrementedCount(for: event)
-                params[Pixel.Parameters.errorCount] = "\(count)"
-            }
 
             if let error = error {
                 let nsError = error as NSError
@@ -97,7 +92,17 @@ extension Pixel.Event {
              .importedBookmarks,
              .exportedBookmarks,
              .formAutofilled,
-             .autofillItemSaved:
+             .autofillItemSaved,
+             .onboardingStartPressed,
+             .onboardingImportPressed,
+             .onboardingImportSkipped,
+             .onboardingSetDefaultPressed,
+             .onboardingSetDefaultSkipped,
+             .onboardingTypingSkipped,
+             .waitlistFirstLaunch,
+             .waitlistMigratedExistingInstall,
+             .waitlistPresentedLockScreen,
+             .waitlistDismissedLockScreen:
 
             return nil
         }

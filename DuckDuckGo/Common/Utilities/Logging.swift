@@ -48,6 +48,10 @@ extension OSLog {
         Logging.contentBlockingLoggingEnabled ? Logging.contentBlockingLog : .disabled
     }
 
+    static var favicons: OSLog {
+        Logging.faviconLoggingEnabled ? Logging.faviconLog : .disabled
+    }
+
 }
 
 struct Logging {
@@ -72,5 +76,8 @@ struct Logging {
 
     fileprivate static let contentBlockingLoggingEnabled = false
     fileprivate static let contentBlockingLog: OSLog = OSLog(subsystem: Bundle.main.bundleIdentifier ?? "DuckDuckGo", category: "Content Blocking")
+
+    fileprivate static let faviconLoggingEnabled = false
+    fileprivate static let faviconLog: OSLog = OSLog(subsystem: Bundle.main.bundleIdentifier ?? "DuckDuckGo", category: "Favicons")
 
 }

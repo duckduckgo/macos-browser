@@ -20,15 +20,16 @@ import Foundation
 
 protocol PermissionStore: AnyObject {
     func loadPermissions() throws -> [PermissionEntity]
-    func update(objectWithId id: NSManagedObjectID, allow: Bool?, completionHandler: ((Error?) -> Void)?)
+    func update(objectWithId id: NSManagedObjectID, decision: PersistedPermissionDecision?, completionHandler: ((Error?) -> Void)?)
     func remove(objectWithId id: NSManagedObjectID, completionHandler: ((Error?) -> Void)?)
-    func add(domain: String, permissionType: PermissionType, allow: Bool) throws -> StoredPermission
+    func add(domain: String, permissionType: PermissionType, decision: PersistedPermissionDecision) throws -> StoredPermission
 
     func clear(except: [StoredPermission], completionHandler: ((Error?) -> Void)?)
 }
+
 extension PermissionStore {
-    func update(objectWithId id: NSManagedObjectID, allow: Bool?) {
-        update(objectWithId: id, allow: allow, completionHandler: nil)
+    func update(objectWithId id: NSManagedObjectID, decision: PersistedPermissionDecision?) {
+        update(objectWithId: id, decision: decision, completionHandler: nil)
     }
     func remove(objectWithId id: NSManagedObjectID) {
         remove(objectWithId: id, completionHandler: nil)
@@ -85,7 +86,7 @@ final class LocalPermissionStore: PermissionStore {
         return entities
     }
 
-    func update(objectWithId id: NSManagedObjectID, allow: Bool?, completionHandler: ((Error?) -> Void)?) {
+    func update(objectWithId id: NSManagedObjectID, decision: PersistedPermissionDecision?, completionHandler: ((Error?) -> Void)?) {
         guard let context = context else { return }
         func mainQueueCompletion(error: Error?) {
             guard completionHandler != nil else { return }
@@ -102,8 +103,8 @@ final class LocalPermissionStore: PermissionStore {
                 return
             }
 
-            if let allow = allow {
-                managedObject.allow = allow
+            if let decision = decision {
+                managedObject.decision = decision
             } else {
                 context.delete(managedObject)
             }
@@ -119,7 +120,7 @@ final class LocalPermissionStore: PermissionStore {
     }
 
     func remove(objectWithId id: NSManagedObjectID, completionHandler: ((Error?) -> Void)?) {
-        update(objectWithId: id, allow: nil, completionHandler: completionHandler)
+        update(objectWithId: id, decision: nil, completionHandler: completionHandler)
     }
 
     func clear(except exceptions: [StoredPermission], completionHandler: ((Error?) -> Void)?) {
@@ -152,7 +153,7 @@ final class LocalPermissionStore: PermissionStore {
 
     private func performAdd(domain: String,
                             permissionType: PermissionType,
-                            allow: Bool) -> Result<NSManagedObjectID, Error>? {
+                            decision: PersistedPermissionDecision) -> Result<NSManagedObjectID, Error>? {
         guard let context = context else { return nil }
 
         var result: Result<NSManagedObjectID, Error>?
@@ -164,7 +165,7 @@ final class LocalPermissionStore: PermissionStore {
 
             managedObject.domainEncrypted = domain as NSString
             managedObject.permissionType = permissionType.rawValue
-            managedObject.allow = allow
+            managedObject.decision = decision
 
             do {
                 try context.save()
@@ -176,11 +177,11 @@ final class LocalPermissionStore: PermissionStore {
         return result
     }
 
-    func add(domain: String, permissionType: PermissionType, allow: Bool) throws -> StoredPermission {
-        let result = performAdd(domain: domain, permissionType: permissionType, allow: allow)
+    func add(domain: String, permissionType: PermissionType, decision: PersistedPermissionDecision) throws -> StoredPermission {
+        let result = performAdd(domain: domain, permissionType: permissionType, decision: decision)
         switch result {
         case .success(let id):
-            return StoredPermission(id: id, allow: allow)
+            return StoredPermission(id: id, decision: decision)
         case .failure(let error):
             throw error
         case .none:

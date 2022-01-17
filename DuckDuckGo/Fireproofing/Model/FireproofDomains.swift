@@ -17,6 +17,8 @@
 //
 
 import Foundation
+import CoreData
+import os.log
 
 internal class FireproofDomains {
 
@@ -27,56 +29,111 @@ internal class FireproofDomains {
     }
 
     static let shared = FireproofDomains()
+    private let store: FireproofDomainsStore
 
-    @UserDefaultsWrapper(key: .fireproofDomains, defaultValue: [])
-    private(set) var fireproofDomains: [String] {
+    @UserDefaultsWrapper(key: .fireproofDomains, defaultValue: nil)
+    private var legacyUserDefaultsFireproofDomains: [String]?
+
+    private lazy var container: FireproofDomainsContainer = loadFireproofDomains() {
         didSet {
             NotificationCenter.default.post(name: Constants.allowedDomainsChangedNotification, object: self)
         }
     }
 
+    var fireproofDomains: [String] {
+        container.domains
+    }
+
+    init(store: FireproofDomainsStore = FireproofDomainsStore(tableName: "FireproofDomains")) {
+        self.store = store
+    }
+
+    private func loadFireproofDomains() -> FireproofDomainsContainer {
+        dispatchPrecondition(condition: .onQueue(.main))
+        do {
+            if let domains = legacyUserDefaultsFireproofDomains?.map({ $0.dropWWW() }),
+               !domains.isEmpty {
+
+                var container = FireproofDomainsContainer()
+                do {
+                    let added = try store.add(Set(domains))
+                    for (domain, id) in added {
+                        try container.add(domain: domain, withId: id)
+                    }
+
+                    self.legacyUserDefaultsFireproofDomains = nil
+                } catch {}
+
+                return container
+            }
+
+            return try store.load()
+        } catch {
+            os_log("FireproofDomainsStore: Failed to load Fireproof Domains", type: .error)
+            return FireproofDomainsContainer()
+        }
+    }
+
     func toggle(domain: String) -> Bool {
+        dispatchPrecondition(condition: .onQueue(.main))
         if isFireproof(fireproofDomain: domain) {
             remove(domain: domain)
             return false
-        } else {
-            addToAllowed(domain: domain)
-            return true
         }
+        add(domain: domain)
+        return true
     }
 
-    func addToAllowed(domain: String) {
+    func add(domain: String) {
+        dispatchPrecondition(condition: .onQueue(.main))
         guard !isFireproof(fireproofDomain: domain) else {
+            // submodains also?
             return
         }
 
-        fireproofDomains += [domain]
+        let domainWithoutWWW = domain.dropWWW()
+        do {
+            let id = try store.add(domainWithoutWWW)
+            try container.add(domain: domainWithoutWWW, withId: id)
+        } catch {
+            assertionFailure("could not add fireproof domain \(domain): \(error)")
+            return
+        }
 
         NotificationCenter.default.post(name: Constants.newFireproofDomainNotification, object: self, userInfo: [
-            Constants.newFireproofDomainKey: domain
+            Constants.newFireproofDomainKey: domainWithoutWWW
         ])
     }
 
-    public func isFireproof(cookieDomain: String) -> Bool {
-        fireproofDomains.contains {
-            $0 == cookieDomain
-                || ".\($0)" == cookieDomain
-                || (cookieDomain.hasPrefix(".") && $0.hasSuffix(cookieDomain))
-        }
-    }
-
     func remove(domain: String) {
-        fireproofDomains.removeAll {
-            $0 == domain || $0 == "www.\(domain)"
+        dispatchPrecondition(condition: .onQueue(.main))
+        guard let id = container.remove(domain: domain) else {
+            assertionFailure("fireproof domain \(domain) not found")
+            return
+        }
+
+        store.remove(objectWithId: id) { error in
+            if let error = error {
+                assertionFailure("FireproofDomainsStore: Failed to remove Fireproof Domain: \(error)")
+                return
+            }
         }
     }
 
     func clearAll() {
-        fireproofDomains = []
+        dispatchPrecondition(condition: .onQueue(.main))
+        container = FireproofDomainsContainer()
+        store.clear()
+    }
+
+    func isFireproof(cookieDomain: String) -> Bool {
+        let domainWithoutDotPrefix = cookieDomain.drop(prefix: ".")
+        return container.contains(domain: domainWithoutDotPrefix, includingSuperdomains: false)
+            || (cookieDomain.hasPrefix(".") && container.contains(superdomain: domainWithoutDotPrefix))
     }
 
     func isFireproof(fireproofDomain domain: String) -> Bool {
-        return fireproofDomains.contains(where: { $0.hasSuffix(domain) || $0.dropWWW().hasSuffix(domain) })
+        return container.contains(domain: domain)
     }
 
     func isURLFireproof(url: URL) -> Bool {

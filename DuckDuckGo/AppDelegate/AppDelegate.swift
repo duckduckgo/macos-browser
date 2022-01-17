@@ -74,8 +74,12 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
     func applicationDidFinishLaunching(_ notification: Notification) {
         guard !Self.isRunningTests else { return }
 
+        // IMPORTANT: This call needs to run before ATB is initialized, as it is used to determine whether this is an existing install being migrated.
+        Waitlist.unlockExistingInstallIfNecessary()
+
         HTTPSUpgrade.shared.loadDataAsync()
         LocalBookmarkManager.shared.loadBookmarks()
+        FaviconManager.shared.loadFavicons()
         _=ConfigurationManager.shared
         _=DownloadListCoordinator.shared
 
@@ -84,9 +88,8 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
             // MARK: perform first time launch logic here
         }
 
-        if (notification.userInfo?[NSApplication.launchIsDefaultUserInfoKey] as? NSNumber)?.boolValue == true {
-            Pixel.fire(.appLaunch(launch: .autoInitialOrRegular()))
-        }
+        fireWaitlistLaunchPixel()
+        fireLaunchPixel(regularLaunch: (notification.userInfo?[NSApplication.launchIsDefaultUserInfoKey] as? NSNumber)?.boolValue)
 
         stateRestorationManager.applicationDidFinishLaunching()
 
@@ -144,6 +147,25 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
     private func applyPreferredTheme() {
         let appearancePreferences = AppearancePreferences()
         appearancePreferences.updateUserInterfaceStyle()
+    }
+
+    private func fireLaunchPixel(regularLaunch: Bool?) {
+        if Pixel.Event.AppLaunch.repetition().value == .initial || regularLaunch ?? false {
+
+            Pixel.fire(.appLaunch(launch: .autoInitialOrRegular())) { error in
+                if let error = error, error is URLError {
+                    os_log("appLaunch Pixel send failed: %s", type: .error, "\(error)")
+                } else {
+                    Pixel.Event.AppLaunch.repetition().update()
+                }
+            }
+        }
+    }
+    
+    private func fireWaitlistLaunchPixel() {
+        if Pixel.Event.AppLaunch.repetition().value == .initial && !Waitlist.isUnlocked {
+            Pixel.fire(.waitlistFirstLaunch)
+        }
     }
 
 }

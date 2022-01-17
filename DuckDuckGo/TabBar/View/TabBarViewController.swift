@@ -107,6 +107,7 @@ final class TabBarViewController: NSViewController {
 
     private func reloadSelection() {
         guard collectionView.selectionIndexPaths.first?.item != tabCollectionViewModel.selectionIndex else {
+            collectionView.updateItemsLeftToSelectedItems()
             return
         }
 
@@ -764,17 +765,30 @@ extension TabBarViewController: TabBarViewItemDelegate {
     }
 
     func tabBarViewItemFireproofSite(_ tabBarViewItem: TabBarViewItem) {
-        if let url = tabCollectionViewModel.selectedTabViewModel?.tab.content.url,
-           let host = url.host {
-            Pixel.fire(.fireproof(kind: .init(url: url), suggested: .manual))
-            FireproofDomains.shared.addToAllowed(domain: host)
+        guard let indexPath = collectionView.indexPath(for: tabBarViewItem),
+              let tabViewModel = tabCollectionViewModel.tabViewModel(at: indexPath.item),
+              let url = tabViewModel.tab.content.url,
+              let host = url.host
+        else {
+            os_log("TabBarViewController: Failed to get url of tab bar view item", type: .error)
+            return
         }
+
+        Pixel.fire(.fireproof(kind: .init(url: url), suggested: .manual))
+        FireproofDomains.shared.add(domain: host)
     }
 
     func tabBarViewItemRemoveFireproofing(_ tabBarViewItem: TabBarViewItem) {
-        if let host = tabCollectionViewModel.selectedTabViewModel?.tab.content.url?.host {
-            FireproofDomains.shared.remove(domain: host)
+        guard let indexPath = collectionView.indexPath(for: tabBarViewItem),
+              let tabViewModel = tabCollectionViewModel.tabViewModel(at: indexPath.item),
+              let url = tabViewModel.tab.content.url,
+              let host = url.host
+        else {
+            os_log("TabBarViewController: Failed to get url of tab bar view item", type: .error)
+            return
         }
+
+        FireproofDomains.shared.remove(domain: host)
     }
 
     func otherTabBarViewItemsState(for tabBarViewItem: TabBarViewItem) -> OtherTabBarViewItemsState {
