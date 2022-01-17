@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<document type="com.apple.InterfaceBuilder3.Cocoa.Storyboard.XIB" version="3.0" toolsVersion="19455" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES">
+<document type="com.apple.InterfaceBuilder3.Cocoa.Storyboard.XIB" version="3.0" toolsVersion="19529" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES">
     <dependencies>
         <deployment identifier="macosx"/>
-        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="19455"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="19529"/>
         <capability name="Named colors" minToolsVersion="9.0"/>
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
     </dependencies>
@@ -24,10 +24,10 @@
                                 <imageCell key="cell" refusesFirstResponder="YES" alignment="left" imageScaling="proportionallyDown" image="WaitlistLockScreenBackground" id="DHG-a0-nPf"/>
                             </imageView>
                             <customView translatesAutoresizingMaskIntoConstraints="NO" id="kDa-kp-O7E" userLabel="Invite Code State Group">
-                                <rect key="frame" x="0.0" y="73" width="352" height="209"/>
+                                <rect key="frame" x="0.0" y="71" width="352" height="211"/>
                                 <subviews>
                                     <imageView horizontalHuggingPriority="251" verticalHuggingPriority="251" translatesAutoresizingMaskIntoConstraints="NO" id="geE-7q-xYb" userLabel="Dax Logo">
-                                        <rect key="frame" x="148" y="153" width="56" height="56"/>
+                                        <rect key="frame" x="148" y="155" width="56" height="56"/>
                                         <constraints>
                                             <constraint firstAttribute="width" constant="56" id="fX6-VY-K07"/>
                                             <constraint firstAttribute="height" constant="56" id="m5s-eQ-VIx"/>
@@ -35,17 +35,17 @@
                                         <imageCell key="cell" refusesFirstResponder="YES" alignment="left" imageScaling="proportionallyDown" image="DaxLockScreenLogo" id="i4p-iE-ZkA"/>
                                     </imageView>
                                     <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="OtQ-lg-ny6">
-                                        <rect key="frame" x="50" y="113" width="252" height="26"/>
+                                        <rect key="frame" x="47" y="115" width="259" height="26"/>
                                         <textFieldCell key="cell" lineBreakMode="clipping" title="Welcome to DuckDuckGo" id="ecb-cd-Gzd">
-                                            <font key="font" size="22" name="SFProDisplay-Semibold"/>
+                                            <font key="font" metaFont="systemSemibold" size="22"/>
                                             <color key="textColor" red="0.20000000000000001" green="0.20000000000000001" blue="0.20000000000000001" alpha="1" colorSpace="calibratedRGB"/>
                                             <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
                                         </textFieldCell>
                                     </textField>
                                     <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="Qkr-p5-9Ks">
-                                        <rect key="frame" x="107" y="66" width="139" height="28"/>
+                                        <rect key="frame" x="107" y="66" width="139" height="30"/>
                                         <textFieldCell key="cell" lineBreakMode="clipping" alignment="center" title="Enter your Invite Code to get started" id="6Sz-9i-tb7">
-                                            <font key="font" size="12" name="SFProText-Semibold"/>
+                                            <font key="font" metaFont="systemSemibold" size="12"/>
                                             <color key="textColor" red="0.20000000000000001" green="0.20000000000000001" blue="0.20000000000000001" alpha="1" colorSpace="calibratedRGB"/>
                                             <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
                                         </textFieldCell>
@@ -57,7 +57,7 @@
                                             <constraint firstAttribute="width" constant="110" id="hz1-Xq-OHn"/>
                                         </constraints>
                                         <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" selectable="YES" editable="YES" sendsActionOnEndEditing="YES" borderStyle="bezel" alignment="center" bezelStyle="round" id="3u7-ac-bVZ">
-                                            <font key="font" size="13" name="SFPro-Regular"/>
+                                            <font key="font" metaFont="system"/>
                                             <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
                                             <color key="backgroundColor" name="BrowserTabBackgroundColor"/>
                                         </textFieldCell>
@@ -100,7 +100,7 @@
                                     <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" verticalCompressionResistancePriority="1000" translatesAutoresizingMaskIntoConstraints="NO" id="lhW-Ve-a0B">
                                         <rect key="frame" x="-2" y="190" width="356" height="33"/>
                                         <textFieldCell key="cell" lineBreakMode="clipping" alignment="center" title="You’re In!" id="TLE-jd-xCR">
-                                            <font key="font" size="22" name="SFProDisplay-Semibold"/>
+                                            <font key="font" metaFont="systemSemibold" size="22"/>
                                             <color key="textColor" red="0.20000000000000001" green="0.20000000000000001" blue="0.20000000000000001" alpha="1" colorSpace="calibratedRGB"/>
                                             <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
                                         </textFieldCell>
@@ -160,9 +160,6 @@ We ❤️ your feedback. When you have thoughts to share, click the ••• me
                                                 <buttonCell key="cell" type="bevel" title="Continue" bezelStyle="regularSquare" alignment="center" enabled="NO" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="KfL-iP-RaH">
                                                     <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
                                                     <font key="font" metaFont="system"/>
-                                                    <string key="keyEquivalent" base64-UTF8="YES">
-DQ
-</string>
                                                 </buttonCell>
                                                 <connections>
                                                     <action selector="continueButtonClicked:" target="F9Q-mg-aJG" id="F7a-Nn-9qn"/>
