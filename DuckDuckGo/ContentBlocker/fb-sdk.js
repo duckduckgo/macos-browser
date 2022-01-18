@@ -1,7 +1,7 @@
- (() => {
-//facebook.net/sdk.js application/javascript
+(() => {
+// facebook.net/sdk.js application/javascript
     'use strict'
-    const originalFBURL = document.currentScript.src
+    // const originalFBURL = document.currentScript.src
     let siteInit = function () {}
     let fbIsEnabled = false
     let initData = {}
@@ -41,55 +41,55 @@
      */
     function enableFacebookSDK () {
         if (!fbIsEnabled) {
-         window.FB = undefined
-         window.fbAsyncInit = function () {
-             if (runInit && initData) {
-                 window.FB.init(initData)
-             }
-             siteInit()
-             if (fbLogin.shouldRun) {
-                 window.FB.login(fbLogin.callback, fbLogin.params)
-             }
-         }
-         const fbScript = document.createElement('script')
-         fbScript.setAttribute('crossorigin', 'anonymous')
-         fbScript.setAttribute('async', '')
-         fbScript.setAttribute('defer', '')
-         fbScript.src = 'https://connect.facebook.net/en_US/sdk.js?XFBML=false' //originalFBURL
-         fbScript.onload = function () {
-             for (const node of parseCalls) {
-                 window.FB.XFBML.parse.apply(window.FB.XFBML, node)
-             }
-         }
-         document.head.appendChild(fbScript)
-         fbIsEnabled = true
+            window.FB = undefined
+            window.fbAsyncInit = function () {
+                if (runInit && initData) {
+                    window.FB.init(initData)
+                }
+                siteInit()
+                if (fbLogin.shouldRun) {
+                    window.FB.login(fbLogin.callback, fbLogin.params)
+                }
+            }
+            const fbScript = document.createElement('script')
+            fbScript.setAttribute('crossorigin', 'anonymous')
+            fbScript.setAttribute('async', '')
+            fbScript.setAttribute('defer', '')
+            fbScript.src = 'https://connect.facebook.net/en_US/sdk.js?XFBML=false' // originalFBURL
+            fbScript.onload = function () {
+                for (const node of parseCalls) {
+                    window.FB.XFBML.parse.apply(window.FB.XFBML, node)
+                }
+            }
+            document.head.appendChild(fbScript)
+            fbIsEnabled = true
         } else {
-         if (initData) {
-             window.FB.init(initData)
-         }
+            if (initData) {
+                window.FB.init(initData)
+            }
         }
     }
-     
-    function removeFacebookSurrogate() {
-         window.fbAsyncInit = function () {
-             if (runInit && initData) {
-                 window.FB.init(initData)
-             }
-             siteInit()
-             if (fbLogin.shouldRun) {
-                 window.FB.login(fbLogin.callback, fbLogin.params)
-             }
-         }
-         if(window.FB && window.FB.isSurrogate) {
-             window.FB = undefined
-         }
-     }
+
+    function removeFacebookSurrogate () {
+        window.fbAsyncInit = function () {
+            if (runInit && initData) {
+                window.FB.init(initData)
+            }
+            siteInit()
+            if (fbLogin.shouldRun) {
+                window.FB.login(fbLogin.callback, fbLogin.params)
+            }
+        }
+        if (window.FB && window.FB.isSurrogate) {
+            window.FB = undefined
+        }
+    }
 
     function runFacebookLogin () {
         fbLogin.shouldRun = true
         replaceWindowOpen()
         loginPopup()
-//        enableFacebookSDK()
+        // enableFacebookSDK()
     }
 
     function replaceWindowOpen () {
@@ -120,7 +120,7 @@
             window.fbAsyncInit()
         }
     }
-    console.log('window.FB', window.FB)
+
     delete window.FB
     if (!window.FB) {
         window.FB = {
@@ -130,28 +130,28 @@
                     initData = obj
                     runInit = true
                     messageAddon({
-                        'appID': obj.appId
+                        appID: obj.appId
                     })
                 }
             },
-            ui: function (obj, cb) {
+            ui: function (obj, cbx) {
                 if (obj.method && obj.method === 'share') {
                     const shareLink = 'https://www.facebook.com/sharer/sharer.php?u=' + obj.href
                     window.open(shareLink, 'share-facebook', 'width=550,height=235')
                 }
-                cb({})
+                cbx({ })
             },
             getAccessToken: function () {},
             getAuthResponse: function () {
-                return {status: ''}
+                return { status: '' }
             },
-            getLoginStatus: function (callback) { callback({status: ''}) },
+            getLoginStatus: function (cbx) { cbx({ status: '' }) },
             getUserID: function () {},
             login: function (cb, params) {
                 fbLogin.callback = cb
                 fbLogin.params = params
                 messageAddon({
-                    'action': 'login'
+                    action: 'login'
                 })
             },
             logout: function () {},

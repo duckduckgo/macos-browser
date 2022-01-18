@@ -779,8 +779,8 @@
      }
 
      const hostname = getTopLevelURL().hostname
-     window.webkit.messageHandlers.initClickToLoad.postMessage(hostname).then((protected) => {
-         if (!protected || hostname === "") {
+     window.webkit.messageHandlers.initClickToLoad.postMessage(hostname).then((blocked) => {
+         if (!blocked || hostname === "") {
              return
          }
          window.setTimeout(() => {
