@@ -30,8 +30,24 @@ struct DaxSpeech: View {
     let onTypingFinished: (() -> Void)?
 
     @State private var typingIndex = 0
-    @State private var typedText = ""
+    @State private var typedText = "" {
+        didSet {
+            guard #available(macOS 12, *) else { return }
+            let chars = Array(text)
+            let untypedChars = chars[Array(typedText).count ..< chars.count]
+            let combined = NSMutableAttributedString()
+            combined.append(NSAttributedString(string: typedText, attributes: [
+                NSAttributedString.Key.foregroundColor: NSColor.white
+            ]))
+            combined.append(NSAttributedString(string: String(untypedChars), attributes: [
+                NSAttributedString.Key.foregroundColor: NSColor.clear
+            ]))
+            attributedTypedText = combined
+        }
+    }
     @State private var timer = Timer.publish(every: 0.02, tolerance: 0, on: .main, in: .default, options: nil).autoconnect()
+
+    @State private var attributedTypedText = NSAttributedString(string: "")
 
     var body: some View {
         ZStack(alignment: .topLeading) {
@@ -42,9 +58,20 @@ struct DaxSpeech: View {
                 .frame(maxWidth: .infinity, alignment: .leading)
                 .visibility(.invisible)
 
-            Text(typedText)
-                .kerning(-0.23)
-                .frame(maxWidth: .infinity, alignment: .leading)
+            if #available(macOS 12, *) {
+
+                Text(AttributedString(attributedTypedText))
+                    .kerning(-0.23)
+                    .frame(maxWidth: .infinity, alignment: .leading)
+
+            } else {
+
+                Text(typedText)
+                    .kerning(-0.23)
+                    .frame(maxWidth: .infinity, alignment: .leading)
+
+            }
+
         }
         .padding(.horizontal, 18)
         .padding(.vertical, 14)
@@ -74,7 +101,9 @@ struct DaxSpeech: View {
             let chars = Array(text)
             typingIndex = min(typingIndex + 1, chars.count)
             let typedChars = chars[0 ..< typingIndex]
+
             typedText = String(typedChars)
+
         })
     }
 
