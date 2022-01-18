@@ -5301,8 +5301,8 @@
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/airbnb/lottie-ios";
 			requirement = {
-				branch = "lottie/macos-spm";
-				kind = branch;
+				kind = upToNextMajorVersion;
+				minimumVersion = 3.3.0;
 			};
 		};
 		9807F643278CA16F00E1547B /* XCRemoteSwiftPackageReference "BrowserServicesKit" */ = {
