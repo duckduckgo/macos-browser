@@ -37,6 +37,14 @@ extension PermissionType {
             return true
         }
     }
+    var canPersistDeniedDecision: Bool {
+        switch self {
+        case .camera, .microphone, .geolocation:
+            return true
+        case .popups:
+            return false
+        }
+    }
 }
 
 extension Array where Element == PermissionType {

@@ -79,6 +79,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
 
         HTTPSUpgrade.shared.loadDataAsync()
         LocalBookmarkManager.shared.loadBookmarks()
+        FaviconManager.shared.loadFavicons()
         _=ConfigurationManager.shared
         _=DownloadListCoordinator.shared
 

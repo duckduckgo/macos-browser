@@ -93,7 +93,7 @@ final class PermissionContextMenu: NSMenu {
 
     private func setupOtherPermissionMenuItems(for permissions: Permissions) {
         let permanentlyDeniedPermission = permissions.first(where: {
-            $0.value == .denied && PermissionManager.shared.permission(forDomain: domain, permissionType: $0.key) == false
+            $0.value == .denied && PermissionManager.shared.permission(forDomain: domain, permissionType: $0.key) == .deny
         })
         // don't display Reload item for permanently denied Permissions
         var shouldAddReload = permanentlyDeniedPermission == nil
@@ -143,7 +143,7 @@ final class PermissionContextMenu: NSMenu {
 
         addItem(.separator())
 
-        if PermissionManager.shared.permission(forDomain: domain, permissionType: .popups) == nil {
+        if case .ask = PermissionManager.shared.permission(forDomain: domain, permissionType: .popups) {
             addItem(.alwaysAllow(.popups, on: domain, target: self))
         } else {
             addItem(.alwaysAsk(.popups, on: domain, target: self))
@@ -167,15 +167,16 @@ final class PermissionContextMenu: NSMenu {
         for (permission, state) in permissions {
             switch state {
             case .active, .inactive, .paused:
-                guard permission.canPersistGrantedDecision else { continue }
-                if PermissionManager.shared.permission(forDomain: domain, permissionType: permission) == nil {
+                if case .ask = PermissionManager.shared.permission(forDomain: domain, permissionType: permission) {
+                    guard permission.canPersistGrantedDecision else { continue }
                     addItem(.alwaysAllow(permission, on: domain, target: self))
                 } else {
                     addItem(.alwaysAsk(permission, on: domain, target: self))
                 }
 
             case .denied:
-                if PermissionManager.shared.permission(forDomain: domain, permissionType: permission) == nil {
+                if case .ask = PermissionManager.shared.permission(forDomain: domain, permissionType: permission) {
+                    guard permission.canPersistDeniedDecision else { continue }
                     addItem(.alwaysDeny(permission, on: domain, target: self))
                 } else {
                     addItem(.alwaysAsk(permission, on: domain, target: self))
@@ -310,7 +311,13 @@ private extension NSMenuItem {
     }
 
     static func alwaysAllow(_ permission: PermissionType, on domain: String, target: PermissionContextMenu) -> NSMenuItem {
-        let title = String(format: UserText.permissionAlwaysAllowDeviceFormat, permission.localizedDescription, domain)
+        let title: String
+        if case .popups = permission {
+            title = String(format: UserText.permissionAlwaysAllowPopupsFormat, domain)
+        } else {
+            title = String(format: UserText.permissionAlwaysAllowDeviceFormat, permission.localizedDescription, domain)
+        }
+
         let item = NSMenuItem(title: title,
                               action: #selector(PermissionContextMenu.alwaysAllowPermission),
                               keyEquivalent: "")

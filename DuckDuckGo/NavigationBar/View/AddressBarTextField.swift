@@ -782,9 +782,45 @@ extension AddressBarTextField: SuggestionViewControllerDelegate {
 }
 
 extension AddressBarTextField: NSTextViewDelegate {
+
     func textView(_ textView: NSTextView, willChangeSelectionFromCharacterRange _: NSRange, toCharacterRange range: NSRange) -> NSRange {
         return self.filterSuffix(fromSelectionRange: range, for: textView.string)
     }
+
+    func textView(_ view: NSTextView, menu: NSMenu, for event: NSEvent, at charIndex: Int) -> NSMenu? {
+        return removingAttributeChangingMenuItems(from: menu)
+    }
+
+    private static var selectorsToRemove: Set<Selector> = Set([
+        Selector(("_makeLinkFromMenu:")),
+        Selector(("_searchWithGoogleFromMenu:")),
+        #selector(NSFontManager.orderFrontFontPanel(_:)),
+        #selector(NSText.showGuessPanel(_:)),
+        Selector(("replaceQuotesInSelection:")),
+        #selector(NSStandardKeyBindingResponding.uppercaseWord(_:)),
+        #selector(NSTextView.startSpeaking(_:)),
+        #selector(NSTextView.changeLayoutOrientation(_:))
+    ])
+
+    private func removingAttributeChangingMenuItems(from menu: NSMenu) -> NSMenu {
+        menu.items.reversed().forEach { menuItem in
+            if let action = menuItem.action, Self.selectorsToRemove.contains(action) {
+                menu.removeItem(menuItem)
+            } else {
+                if let submenu = menuItem.submenu, submenu.items.first(where: { submenuItem in
+                    if let submenuAction = submenuItem.action, Self.selectorsToRemove.contains(submenuAction) {
+                        return true
+                    } else {
+                        return false
+                    }
+                }) != nil {
+                    menu.removeItem(menuItem)
+                }
+            }
+        }
+        return menu
+    }
+
 }
 
 final class AddressBarTextEditor: NSTextView {

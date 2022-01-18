@@ -48,7 +48,7 @@ final class BookmarkOutlineViewCell: NSTableCellView {
     private func commonInit() {}
 
     func update(from bookmark: Bookmark) {
-        faviconImageView.image = bookmark.favicon ?? Self.defaultBookmarkFavicon
+        faviconImageView.image = bookmark.favicon(.small) ?? Self.defaultBookmarkFavicon
         titleLabel.stringValue = bookmark.title
         countLabel.stringValue = ""
     }

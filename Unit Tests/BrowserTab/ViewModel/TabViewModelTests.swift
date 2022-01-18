@@ -162,21 +162,6 @@ final class TabViewModelTests: XCTestCase {
         waitForExpectations(timeout: 5, handler: nil)
     }
 
-    func testWhenTabDownloadedFaviconThenFaviconIsNotNil() {
-        let tabViewModel = TabViewModel.aTabViewModel
-        tabViewModel.tab.url = URL(string: "http://apple.com")
-
-        let faviconExpectation = expectation(description: "Favicon")
-
-        tabViewModel.$favicon.debounce(for: 1, scheduler: RunLoop.main).sink { favicon in
-            guard favicon != nil else { return }
-
-            XCTAssertNotEqual(favicon, TabViewModel.Favicon.home)
-            faviconExpectation.fulfill()
-        } .store(in: &cancellables)
-        waitForExpectations(timeout: 5, handler: nil)
-    }
-
 }
 
 extension TabViewModel {

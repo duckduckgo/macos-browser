@@ -55,6 +55,9 @@ final class MacWaitlistLockScreenViewController: NSViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         
+        // Force the key equivalent to equal the return key. This value wasn't being consistently applied when set in the Storyboard.
+        continueButton.keyEquivalent = "\r"
+
         // The unlock screen background uses a light mode background, so those UI elements are hardcoded.
         inviteCodeTextField.appearance = NSAppearance(named: .aqua)
         networkRequestSpinner.appearance = NSAppearance(named: .aqua)

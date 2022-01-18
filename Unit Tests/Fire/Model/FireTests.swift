@@ -30,10 +30,12 @@ final class FireTests: XCTestCase {
         let manager = WebCacheManagerMock()
         let historyCoordinator = HistoryCoordinatingMock()
         let permissionManager = PermissionManagerMock()
+        let faviconManager = FaviconManagerMock()
 
         let fire = Fire(cacheManager: manager,
                         historyCoordinating: historyCoordinator,
-                        permissionManager: permissionManager)
+                        permissionManager: permissionManager,
+                        faviconManagement: faviconManager)
         let tabCollectionViewModel = TabCollectionViewModel.aTabCollectionViewModel
 
         let burningExpectation = expectation(description: "Burning")
@@ -51,14 +53,20 @@ final class FireTests: XCTestCase {
         let manager = WebCacheManagerMock()
         let historyCoordinator = HistoryCoordinatingMock()
         let permissionManager = PermissionManagerMock()
+        let faviconManager = FaviconManagerMock()
 
         let fire = Fire(cacheManager: manager,
                         historyCoordinating: historyCoordinator,
-                        permissionManager: permissionManager)
+                        permissionManager: permissionManager,
+                        faviconManagement: faviconManager)
         let tabCollectionViewModel = TabCollectionViewModel.aTabCollectionViewModel
 
-        fire.burnAll(tabCollectionViewModel: tabCollectionViewModel)
+        let finishedBurningExpectation = expectation(description: "Finished burning")
+        fire.burnAll(tabCollectionViewModel: tabCollectionViewModel) {
+            finishedBurningExpectation.fulfill()
+        }
 
+        waitForExpectations(timeout: 1)
         XCTAssert(manager.clearCalled)
         XCTAssert(historyCoordinator.burnCalled)
         XCTAssert(permissionManager.burnPermissionsCalled)
@@ -69,9 +77,13 @@ final class FireTests: XCTestCase {
         let manager = WebCacheManagerMock()
         let historyCoordinator = HistoryCoordinatingMock()
         let permissionManager = PermissionManagerMock()
+        let faviconManager = FaviconManagerMock()
+
         let fire = Fire(cacheManager: manager,
                         historyCoordinating: historyCoordinator,
-                        permissionManager: permissionManager)
+                        permissionManager: permissionManager,
+                        faviconManagement: faviconManager)
+
         let tabCollectionViewModel = TabCollectionViewModel.aTabCollectionViewModel
 
         let isBurningExpectation = expectation(description: "Burning")

@@ -21,14 +21,14 @@ import BrowserServicesKit
 import Combine
 import os.log
 
-// swiftlint:disable line_length
 final class ContentBlocking {
 
-    static let privacyConfigurationManager = PrivacyConfigurationManager(fetchedETag: DefaultConfigurationStorage.shared.loadEtag(for: .privacyConfiguration),
-                                                                         fetchedData: DefaultConfigurationStorage.shared.loadData(for: .privacyConfiguration),
-                                                                         embeddedDataProvider: AppPrivacyConfigurationDataProvider(),
-                                                                         localProtection: DomainsProtectionUserDefaultsStore(),
-                                                                         errorReporting: debugEvents)
+    static let privacyConfigurationManager
+        = PrivacyConfigurationManager(fetchedETag: DefaultConfigurationStorage.shared.loadEtag(for: .privacyConfiguration),
+                                      fetchedData: DefaultConfigurationStorage.shared.loadData(for: .privacyConfiguration),
+                                      embeddedDataProvider: AppPrivacyConfigurationDataProvider(),
+                                      localProtection: LocalUnprotectedDomains.shared,
+                                      errorReporting: debugEvents)
 
     static let contentBlockingUpdating = ContentBlockingUpdating()
 
@@ -135,46 +135,3 @@ final class ContentBlockingUpdating: ContentBlockerRulesUpdating {
     }
 
 }
-
-private class DomainsProtectionUserDefaultsStore: DomainsProtectionStore {
-
-    private struct Keys {
-        static let unprotectedDomains = "com.duckduckgo.contentblocker.unprotectedDomains"
-    }
-
-    private var userDefaults: UserDefaults? {
-        return UserDefaults()
-    }
-
-    public private(set) var unprotectedDomains: Set<String> {
-        get {
-            guard let data = userDefaults?.data(forKey: Keys.unprotectedDomains) else { return Set<String>() }
-            guard let unprotectedDomains = try? NSKeyedUnarchiver.unarchivedObject(ofClass: NSSet.self, from: data) as? Set<String> else {
-                return Set<String>()
-            }
-            return unprotectedDomains
-        }
-        set(newUnprotectedDomain) {
-            guard let data = try? NSKeyedArchiver.archivedData(withRootObject: newUnprotectedDomain, requiringSecureCoding: false) else { return }
-            userDefaults?.set(data, forKey: Keys.unprotectedDomains)
-        }
-    }
-
-    public func isHostUnprotected(forDomain domain: String) -> Bool {
-        return unprotectedDomains.contains(domain)
-    }
-
-    public func disableProtection(forDomain domain: String) {
-        var domains = unprotectedDomains
-        domains.insert(domain)
-        unprotectedDomains = domains
-    }
-
-    public func enableProtection(forDomain domain: String) {
-        var domains = unprotectedDomains
-        domains.remove(domain)
-        unprotectedDomains = domains
-    }
-}
-
-// swiftlint:enable line_length

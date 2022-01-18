@@ -169,7 +169,7 @@ final class BookmarkTableCellView: NSTableCellView, NibLoadable {
     func update(from bookmark: Bookmark) {
         self.entity = bookmark
 
-        faviconImageView.image = bookmark.favicon ?? Self.defaultBookmarkFavicon
+        faviconImageView.image = bookmark.favicon(.small)
         accessoryImageView.image = bookmark.isFavorite ? Self.favoriteAccessoryViewImage : nil
         favoriteButton.image = bookmark.isFavorite ? Self.favoriteFilledAccessoryViewImage : Self.favoriteAccessoryViewImage
         primaryTitleLabelValue = bookmark.title

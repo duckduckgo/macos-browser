@@ -80,7 +80,7 @@ internal class BaseBookmarkEntity {
             return Bookmark(id: id,
                             url: url,
                             title: title,
-                            favicon: managedObject.faviconEncrypted as? NSImage,
+                            oldFavicon: managedObject.faviconEncrypted as? NSImage,
                             isFavorite: managedObject.isFavorite,
                             parentFolderUUID: parentFolderUUID)
         }
@@ -134,21 +134,29 @@ final class Bookmark: BaseBookmarkEntity {
     }
 
     let url: URL
-    var favicon: NSImage?
     var isFavorite: Bool
     var parentFolderUUID: UUID?
+
+    // Property oldFavicon can be removed in future updates when favicon cache is built
+    var oldFavicon: NSImage?
+    let faviconManagement: FaviconManagement
+    func favicon(_ sizeCategory: Favicon.SizeCategory) -> NSImage? {
+        return faviconManagement.getCachedFavicon(for: url, sizeCategory: sizeCategory)?.image ?? oldFavicon
+    }
 
     init(id: UUID,
          url: URL,
          title: String,
-         favicon: NSImage? = nil,
+         oldFavicon: NSImage? = nil,
          isFavorite: Bool,
-         parentFolderUUID: UUID? = nil) {
+         parentFolderUUID: UUID? = nil,
+         faviconManagement: FaviconManagement = FaviconManager.shared) {
 
         self.url = url
-        self.favicon = favicon
+        self.oldFavicon = oldFavicon
         self.isFavorite = isFavorite
         self.parentFolderUUID = parentFolderUUID
+        self.faviconManagement = faviconManagement
 
         super.init(id: id, title: title, isFolder: false)
     }
@@ -157,7 +165,7 @@ final class Bookmark: BaseBookmarkEntity {
         self.init(id: bookmark.id,
                   url: newUrl,
                   title: bookmark.title,
-                  favicon: nil,
+                  oldFavicon: nil,
                   isFavorite: bookmark.isFavorite)
     }
 

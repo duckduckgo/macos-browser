@@ -34,6 +34,8 @@ final class FireproofDomainsViewController: NSViewController {
     @IBOutlet var tableView: NSTableView!
     @IBOutlet var removeDomainButton: NSButton!
 
+    private let faviconManagement: FaviconManagement = FaviconManager.shared
+
     private var allFireproofDomains = [String]()
     private var filteredFireproofDomains: [String]?
 
@@ -54,7 +56,7 @@ final class FireproofDomainsViewController: NSViewController {
 
     fileprivate func reloadData() {
         allFireproofDomains = FireproofDomains.shared.fireproofDomains.sorted { (lhs, rhs) -> Bool in
-            return lhs.dropWWW() < rhs.dropWWW()
+            return lhs < rhs
         }
 
         tableView.reloadData()
@@ -97,7 +99,7 @@ extension FireproofDomainsViewController: NSTableViewDataSource, NSTableViewDele
         if let cell = tableView.makeView(withIdentifier: Constants.cellIdentifier, owner: nil) as? NSTableCellView {
             let domain = fireproofDomains[row]
             cell.textField?.stringValue = domain.dropWWW()
-            cell.imageView?.image = LocalFaviconService.shared.getCachedFavicon(for: domain, mustBeFromUserScript: false)
+            cell.imageView?.image = faviconManagement.getCachedFavicon(for: domain, sizeCategory: .small)?.image
             cell.imageView?.applyFaviconStyle()
 
             return cell

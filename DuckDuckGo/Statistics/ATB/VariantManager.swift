@@ -107,7 +107,7 @@ final class DefaultVariantManager: VariantManager {
             _ = newInstallCompletion(self)
             return
         }
-        
+
         storage.variant = variant.name
         newInstallCompletion(self)
     }

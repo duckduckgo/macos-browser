@@ -18,9 +18,35 @@
 
 import Foundation
 
+enum PersistedPermissionDecision {
+    case deny
+    case allow
+    case ask
+
+    init(allow: Bool, isRemoved: Bool) {
+        switch (allow, isRemoved) {
+        case (_, true):
+            self = .ask
+        case (true, _):
+            self = .allow
+        case (false, _):
+            self = .deny
+        }
+    }
+
+    var boolValue: Bool {
+        switch self {
+        case .deny, .ask:
+            return false
+        case .allow:
+            return true
+        }
+    }
+}
+
 struct StoredPermission: Equatable {
     let id: NSManagedObjectID
-    var allow: Bool
+    var decision: PersistedPermissionDecision
 }
 
 struct PermissionEntity: Equatable {
@@ -42,9 +68,28 @@ struct PermissionEntity: Equatable {
             return nil
         }
 
-        self.permission = StoredPermission(id: managedObject.objectID, allow: managedObject.allow)
+        self.permission = StoredPermission(id: managedObject.objectID, decision: managedObject.decision)
         self.domain = domain
         self.type = permissionType
+    }
+
+}
+
+extension PermissionManagedObject {
+
+    var decision: PersistedPermissionDecision {
+        get {
+            return .init(allow: self.allow, isRemoved: self.isRemoved)
+        }
+        set {
+            if case .ask = newValue {
+                self.isRemoved = true
+                self.allow = false
+            } else {
+                self.allow = newValue.boolValue
+                self.isRemoved = false
+            }
+        }
     }
 
 }

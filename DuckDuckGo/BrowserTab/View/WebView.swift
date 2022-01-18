@@ -146,8 +146,7 @@ final class WebView: WKWebView {
     }
 
     var isInspectorShown: Bool {
-        guard let result = inspectorPerform("isVisible") else { return false }
-        return result.toOpaque() == UnsafeMutableRawPointer(bitPattern: 0x1)
+        return inspectorPerform("isVisible") != nil
     }
 
     @nonobjc func openDeveloperTools() {
