@@ -24,7 +24,7 @@ import SwiftUI
 import BrowserServicesKit
 
 // swiftlint:disable file_length
-final class BrowserTabViewController: NSViewController, OverlayProtocol {
+final class BrowserTabViewController: NSViewController {
 
     @IBOutlet weak var errorView: NSView!
     @IBOutlet weak var homepageView: NSView!
@@ -51,34 +51,6 @@ final class BrowserTabViewController: NSViewController, OverlayProtocol {
 
     private var mouseDownMonitor: Any?
     private var mouseUpMonitor: Any?
-    private var cancellables = Set<AnyCancellable>()
-
-    private var _contentOverlayPopover: ContentOverlayPopover?
-    private var contentOverlayPopover: ContentOverlayPopover {
-        if _contentOverlayPopover == nil {
-            _contentOverlayPopover = ContentOverlayPopover()
-            // _privacyDashboardPopover!.delegate = self
-        }
-        return _contentOverlayPopover!
-    }
-    
-    public func getContentOverlayPopover(_ response: AutofillMessaging) -> ContentOverlayPopover? {
-        // TODO Not sure if this should hold ref to the content script directly seems bad
-        contentOverlayPopover.viewController.messageInterfaceBack = response
-        
-        WindowControllersManager.shared.stateChanged
-            .sink { _ in
-                self.contentOverlayPopover.close()
-            }.store(in: &cancellables)
-        
-        // Private API to hide the popover arrow
-        contentOverlayPopover.setValue(true, forKeyPath: "shouldHideAnchor")
-        // contentOverlayPopover.setValue(CGSize.zero, forKeyPath: "anchorSize")
-        contentOverlayPopover.zoomFactor = self.webView?.magnification
-        contentOverlayPopover.webView = self.webView
-        
-        return contentOverlayPopover
-    }
     
     required init?(coder: NSCoder) {
         fatalError("BrowserTabViewController: Bad initializer")
@@ -128,7 +100,6 @@ final class BrowserTabViewController: NSViewController, OverlayProtocol {
 
         changeWebView(tabViewModel: tabViewModel)
         scheduleHoverLabelUpdatesForUrl(nil)
-        contentOverlayPopover.close()
         show(tabContent: tabViewModel?.tab.content)
     }
 
@@ -173,7 +144,6 @@ final class BrowserTabViewController: NSViewController, OverlayProtocol {
 
         guard self.tabViewModel !== tabViewModel else { return }
 
-        tabViewModel.tab.topView = self
         let oldWebView = webView
         displayWebView(of: tabViewModel)
         subscribeToUrl(of: tabViewModel)

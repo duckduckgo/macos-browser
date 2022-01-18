@@ -40,7 +40,31 @@ protocol TabDelegate: FileDownloadManagerDelegate {
 
 // swiftlint:disable type_body_length
 // swiftlint:disable file_length
-final class Tab: NSObject {
+final class Tab: NSObject, OverlayProtocol {
+
+    private var cancellables = Set<AnyCancellable>()
+
+    private var _contentOverlayPopover: ContentOverlayPopover?
+    public var contentOverlayPopover: ContentOverlayPopover {
+        if _contentOverlayPopover == nil {
+            _contentOverlayPopover = ContentOverlayPopover()
+        }
+        return _contentOverlayPopover!
+    }
+
+    public func getContentOverlayPopover(_ response: AutofillMessaging) -> ContentOverlayPopover? {
+        contentOverlayPopover.viewController.messageInterfaceBack = response
+        WindowControllersManager.shared.stateChanged
+            .sink { _ in
+                self.contentOverlayPopover.close()
+            }.store(in: &cancellables)
+        // Private API to hide the popover arrow
+        contentOverlayPopover.setValue(true, forKeyPath: "shouldHideAnchor")
+        contentOverlayPopover.zoomFactor = self.webView.magnification
+        contentOverlayPopover.webView = self.webView
+        return contentOverlayPopover
+    }
+
 
     enum TabContent: Equatable {
         case homepage
@@ -444,8 +468,7 @@ final class Tab: NSObject {
             userScripts.contextMenuScript.delegate = self
             userScripts.surrogatesScript.delegate = self
             userScripts.contentBlockerRulesScript.delegate = self
-            // TODO verify this changes on tab change
-            userScripts.autofillScript.topView = self.topView
+            userScripts.autofillScript.topView = self
             userScripts.autofillScript.emailDelegate = emailManager
             userScripts.autofillScript.vaultDelegate = vaultManager
             userScripts.pageObserverScript.delegate = self
