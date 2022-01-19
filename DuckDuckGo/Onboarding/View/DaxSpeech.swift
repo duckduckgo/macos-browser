@@ -35,10 +35,7 @@ struct DaxSpeech: View {
             guard #available(macOS 12, *) else { return }
             let chars = Array(text)
             let untypedChars = chars[Array(typedText).count ..< chars.count]
-            let combined = NSMutableAttributedString()
-            combined.append(NSAttributedString(string: typedText, attributes: [
-                NSAttributedString.Key.foregroundColor: NSColor.white
-            ]))
+            let combined = NSMutableAttributedString(string: typedText)
             combined.append(NSAttributedString(string: String(untypedChars), attributes: [
                 NSAttributedString.Key.foregroundColor: NSColor.clear
             ]))
