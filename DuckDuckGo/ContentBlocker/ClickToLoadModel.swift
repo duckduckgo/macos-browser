@@ -18,37 +18,38 @@
 
 import Foundation
 
-private func loadFile(name: String) -> String? {
-    let pathPrefix = "social_images/"
-    let fileArgs = name.split(separator: ".")
-    let fileName = String(fileArgs[0])
-    let fileExt = String(fileArgs[1])
-
-    let filePath = pathPrefix + fileName
-
-    let imgURL = Bundle.main.url(
-        forResource: filePath,
-        withExtension: fileExt
-    )
-    if imgURL == nil {
-        return nil
-    }
-    guard let base64String = try? Data(contentsOf: imgURL!).base64EncodedString() else { return nil }
-    let image = "data:image/" + (fileExt == "svg" ? "svg+xml" : fileExt) + ";base64," + base64String
-    return image
-}
-
 struct ClickToLoadModel {
-        static let getImage: [String: String] = {
+
+    private static func loadFile(name: String) -> String? {
+        let pathPrefix = "social_images/"
+        let fileArgs = name.split(separator: ".")
+        let fileName = String(fileArgs[0])
+        let fileExt = String(fileArgs[1])
+
+        let filePath = pathPrefix + fileName
+
+        let imgURL = Bundle.main.url(
+            forResource: filePath,
+            withExtension: fileExt
+        )
+        if imgURL == nil {
+            return nil
+        }
+        guard let base64String = try? Data(contentsOf: imgURL!).base64EncodedString() else { return nil }
+        let image = "data:image/" + (fileExt == "svg" ? "svg+xml" : fileExt) + ";base64," + base64String
+        return image
+    }
+    
+    static let getImage: [String: String] = {
         return [
-            "dax.png": loadFile(name: "dax.png")!,
-            "loading_light.svg": loadFile(name: "loading_light.svg")!,
-            "loading_dark.svg": loadFile(name: "loading_dark.svg")!,
-            "blocked_facebook_logo.svg": loadFile(name: "blocked_facebook_logo.svg")!,
-            "blocked_group.svg": loadFile(name: "blocked_group.svg")!,
-            "blocked_page.svg": loadFile(name: "blocked_page.svg")!,
-            "blocked_post.svg": loadFile(name: "blocked_post.svg")!,
-            "blocked_video.svg": loadFile(name: "blocked_video.svg")!
+            "dax.png": Self.loadFile(name: "dax.png")!,
+            "loading_light.svg": Self.loadFile(name: "loading_light.svg")!,
+            "loading_dark.svg": Self.loadFile(name: "loading_dark.svg")!,
+            "blocked_facebook_logo.svg": Self.loadFile(name: "blocked_facebook_logo.svg")!,
+            "blocked_group.svg": Self.loadFile(name: "blocked_group.svg")!,
+            "blocked_page.svg": Self.loadFile(name: "blocked_page.svg")!,
+            "blocked_post.svg": Self.loadFile(name: "blocked_post.svg")!,
+            "blocked_video.svg": Self.loadFile(name: "blocked_video.svg")!
         ]
     }()
 }
