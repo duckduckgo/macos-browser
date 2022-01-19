@@ -146,7 +146,7 @@ final class Tab: NSObject {
 
     var contentChangeEnabled = true
     
-    var FBblocked = true
+    var fbBlockingEnabled = true
     
     @Published private(set) var content: TabContent {
         didSet {
@@ -303,18 +303,18 @@ final class Tab: NSObject {
 
     @discardableResult
     private func setFBProtection(enabled: Bool) -> Bool {
-        guard self.FBblocked != enabled else {
+        guard self.fbBlockingEnabled != enabled else {
             return false
         }
 
         if let fbRules = contentBlockingManager.currentRules.first(where: {
             $0.name == ContentBlockerRulesLists.Constants.clickToLoadRulesListName
         }) {
-            if self.FBblocked {
-                self.FBblocked = false
+            if self.fbBlockingEnabled {
+                self.fbBlockingEnabled = false
                 webView.configuration.userContentController.remove(fbRules.rulesList)
             } else {
-                self.FBblocked = true
+                self.fbBlockingEnabled = true
                 webView.configuration.userContentController.add(fbRules.rulesList)
             }
             return true
@@ -627,7 +627,7 @@ extension Tab: ContentBlockerRulesUserScriptDelegate {
     }
 
     func contentBlockerRulesUserScriptShouldProcessCTLTrackers(_ script: ContentBlockerRulesUserScript) -> Bool {
-        return FBblocked
+        return fbBlockingEnabled
     }
 
     func contentBlockerRulesUserScript(_ script: ContentBlockerRulesUserScript, detectedTracker tracker: DetectedTracker) {
@@ -639,7 +639,7 @@ extension Tab: ContentBlockerRulesUserScriptDelegate {
 extension Tab: ClickToLoadUserScriptDelegate {
 
     func clickToLoadUserScriptAllowFB(_ script: UserScript, replyHandler: @escaping (Bool) -> Void) {
-        guard self.FBblocked else {
+        guard self.fbBlockingEnabled else {
             replyHandler(true)
             return
         }
