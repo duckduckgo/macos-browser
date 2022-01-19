@@ -1,5 +1,5 @@
 //
-//  NavigatorCredentialsUserScript.swift
+//  FireproofDomainsStore.swift
 //
 //  Copyright © 2021 DuckDuckGo. All rights reserved.
 //
@@ -16,22 +16,28 @@
 //  limitations under the License.
 //
 
-import BrowserServicesKit
-import WebKit
+import Foundation
+import CoreData
 
-public final class NavigatorCredentialsUserScript: NSObject, UserScript {
-    public let messageNames: [String] = []
+typealias FireproofDomainsStore = CoreDataStore<FireproofDomainManagedObject>
+extension FireproofDomainsStore {
 
-    init(scriptSource: ScriptSourceProviding) {
-        source = scriptSource.navigatorCredentialsSource
+    func load() throws -> FireproofDomainsContainer {
+        try load(into: FireproofDomainsContainer()) {
+            try $0.add(domain: $1.value, withId: $1.id)
+        }
     }
 
-    public func userContentController(_ userContentController: WKUserContentController, didReceive message: WKScriptMessage) {
+}
+
+extension FireproofDomainManagedObject: ValueRepresentableManagedObject {
+
+    func update(with domain: String) {
+        self.domainEncrypted = domain as NSString
     }
 
-    public let source: String
-
-    public let injectionTime: WKUserScriptInjectionTime = .atDocumentStart
-    public let forMainFrameOnly: Bool = false
+    func valueRepresentation() -> String? {
+        self.domainEncrypted as? String
+    }
 
 }

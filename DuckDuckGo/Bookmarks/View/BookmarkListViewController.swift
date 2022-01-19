@@ -91,6 +91,12 @@ final class BookmarkListViewController: NSViewController {
         emptyStateMessage.attributedStringValue = NSAttributedString.make(emptyStateMessage.stringValue, lineHeight: 1.05, kern: -0.08)
     }
 
+    override func viewWillAppear() {
+        super.viewWillAppear()
+
+        reloadData()
+    }
+
     private func reloadData() {
         let selectedNodes = self.selectedNodes
         

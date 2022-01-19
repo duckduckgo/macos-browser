@@ -18,6 +18,7 @@
 
 import Foundation
 import os.log
+import BrowserServicesKit
 
 final class Fire {
 
@@ -26,6 +27,7 @@ final class Fire {
     let permissionManager: PermissionManagerProtocol
     let downloadListCoordinator: DownloadListCoordinator
     let windowControllerManager: WindowControllersManager
+    let faviconManagement: FaviconManagement
 
     @Published private(set) var isBurning = false
 
@@ -33,12 +35,14 @@ final class Fire {
          historyCoordinating: HistoryCoordinating = HistoryCoordinator.shared,
          permissionManager: PermissionManagerProtocol = PermissionManager.shared,
          downloadListCoordinator: DownloadListCoordinator = DownloadListCoordinator.shared,
-         windowControllerManager: WindowControllersManager = WindowControllersManager.shared) {
+         windowControllerManager: WindowControllersManager = WindowControllersManager.shared,
+         faviconManagement: FaviconManagement = FaviconManager.shared) {
         self.webCacheManager = cacheManager
         self.historyCoordinating = historyCoordinating
         self.permissionManager = permissionManager
         self.downloadListCoordinator = downloadListCoordinator
         self.windowControllerManager = windowControllerManager
+        self.faviconManagement = faviconManagement
     }
 
     func burnDomains(_ domains: Set<String>, completion: (() -> Void)? = nil) {
@@ -65,8 +69,10 @@ final class Fire {
         group.enter()
         burnHistory(of: burningDomains, completion: {
             self.burnPermissions(of: burningDomains, completion: {
-                self.burnDownloads(of: burningDomains)
-                group.leave()
+                self.burnFavicons(for: burningDomains) {
+                    self.burnDownloads(of: burningDomains)
+                    group.leave()
+                }
             })
         })
 
@@ -98,8 +104,10 @@ final class Fire {
         group.enter()
         burnHistory {
             self.burnPermissions {
-                self.burnDownloads()
-                group.leave()
+                self.burnFavicons {
+                    self.burnDownloads()
+                    group.leave()
+                }
             }
         }
 
@@ -158,6 +166,20 @@ final class Fire {
 
     private func burnDownloads(of domains: Set<String>) {
         self.downloadListCoordinator.cleanupInactiveDownloads(for: domains)
+    }
+
+    // MARK: - Favicons
+
+    private func burnFavicons(completion: @escaping () -> Void) {
+        self.faviconManagement.burnExcept(fireproofDomains: FireproofDomains.shared,
+                                          bookmarkManager: LocalBookmarkManager.shared,
+                                          completion: completion)
+    }
+
+    private func burnFavicons(for domains: Set<String>, completion: @escaping () -> Void) {
+        self.faviconManagement.burnDomains(domains,
+                                           except: LocalBookmarkManager.shared,
+                                           completion: completion)
     }
 
     // MARK: - Windows & Tabs

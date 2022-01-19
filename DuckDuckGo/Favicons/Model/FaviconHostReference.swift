@@ -1,5 +1,5 @@
 //
-//  FaviconServiceMock.swift
+//  FaviconHostReference.swift
 //
 //  Copyright © 2021 DuckDuckGo. All rights reserved.
 //
@@ -16,22 +16,15 @@
 //  limitations under the License.
 //
 
-import XCTest
-import Combine
-@testable import DuckDuckGo_Privacy_Browser
+import Foundation
 
-final class FaviconServiceMock: FaviconService {
+struct FaviconHostReference {
 
-    var cachedFaviconsPublisher = PassthroughSubject<(host: String, favicon: NSImage), Never>()
-
-    func fetchFavicon(_ faviconUrl: URL?, for host: String, isFromUserScript: Bool, completion: @escaping (NSImage?, Error?) -> Void) {
-    }
-
-    func getCachedFavicon(for host: String, mustBeFromUserScript: Bool) -> NSImage? {
-        return nil
-    }
-
-    func cacheIfNeeded(favicon: NSImage, for host: String, isFromUserScript: Bool) {
-    }
+    let identifier: UUID
+    let smallFaviconUrl: URL?
+    let mediumFaviconUrl: URL?
+    let host: String
+    let documentUrl: URL
+    let dateCreated: Date
 
 }
