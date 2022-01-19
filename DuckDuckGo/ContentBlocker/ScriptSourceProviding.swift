@@ -25,7 +25,6 @@ protocol ScriptSourceProviding {
     func reload(knownChanges: [String: ContentBlockerRulesIdentifier.Difference])
     var contentBlockerRulesConfig: ContentBlockerUserScriptConfig? { get }
     var surrogatesConfig: SurrogatesUserScriptConfig? { get }
-    var navigatorCredentialsSource: String { get }
     var privacyConfigurationManager: PrivacyConfigurationManager { get }
     var sessionKey: String? { get }
     var clickToLoadSource: String { get }
@@ -40,7 +39,6 @@ final class DefaultScriptSourceProvider: ScriptSourceProviding {
 
     private(set) var contentBlockerRulesConfig: ContentBlockerUserScriptConfig?
     private(set) var surrogatesConfig: SurrogatesUserScriptConfig?
-    private(set) var navigatorCredentialsSource: String = ""
     private(set) var sessionKey: String?
     private(set) var clickToLoadSource: String = ""
 
@@ -80,7 +78,6 @@ final class DefaultScriptSourceProvider: ScriptSourceProviding {
     func reload(knownChanges: [String: ContentBlockerRulesIdentifier.Difference]) {
         contentBlockerRulesConfig = buildContentBlockerRulesConfig()
         surrogatesConfig = buildSurrogatesConfig()
-        navigatorCredentialsSource = buildNavigatorCredentialsSource()
         sessionKey = generateSessionKey()
         clickToLoadSource = buildClickToLoadSource()
         sourceUpdatedSubject.send( knownChanges )
@@ -123,19 +120,6 @@ final class DefaultScriptSourceProvider: ScriptSourceProviding {
                                                  encodedSurrogateTrackerData: rules?.encodedTrackerData,
                                                  trackerDataManager: ContentBlocking.trackerDataManager,
                                                  isDebugBuild: isDebugBuild)
-    }
-
-    private func buildNavigatorCredentialsSource() -> String {
-        let privacyConfiguration = privacyConfigurationManager.privacyConfig
-        let unprotectedDomains = privacyConfiguration.tempUnprotectedDomains
-        let contentBlockingExceptions = privacyConfiguration.exceptionsList(forFeature: .navigatorCredentials)
-        if !privacyConfiguration.isEnabled(featureKey: .navigatorCredentials) {
-            return ""
-        }
-        return NavigatorCredentialsUserScript.loadJS("navigatorCredentials", from: .main, withReplacements: [
-             "$USER_UNPROTECTED_DOMAINS$": "",
-             "$CREDENTIALS_EXCEPTIONS$": (unprotectedDomains + contentBlockingExceptions).joined(separator: "\n")
-        ])
     }
     
     private func loadTextFile(_ fileName: String, _ fileExt: String) -> String? {

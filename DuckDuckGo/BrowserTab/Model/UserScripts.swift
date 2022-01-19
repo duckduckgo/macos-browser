@@ -34,14 +34,12 @@ final class UserScripts {
 
     let contentBlockerRulesScript: ContentBlockerRulesUserScript
     let surrogatesScript: SurrogatesUserScript
-    let navigatorCredentialsUserScript: NavigatorCredentialsUserScript
     let contentScopeUserScript: ContentScopeUserScript
 
     init(with sourceProvider: ScriptSourceProviding) {
 
         contentBlockerRulesScript = ContentBlockerRulesUserScript(configuration: sourceProvider.contentBlockerRulesConfig!)
         surrogatesScript = SurrogatesUserScript(configuration: sourceProvider.surrogatesConfig!)
-        navigatorCredentialsUserScript = NavigatorCredentialsUserScript(scriptSource: sourceProvider)
         let privacySettings = PrivacySecurityPreferences()
         let sessionKey = sourceProvider.sessionKey ?? ""
         let prefs = ContentScopeProperties.init(gpcEnabled: privacySettings.gpcEnabled, sessionKey: sessionKey)
@@ -58,7 +56,6 @@ final class UserScripts {
         pageObserverScript,
         printingUserScript,
         hoverUserScript,
-        navigatorCredentialsUserScript,
         clickToLoadScript,
         contentScopeUserScript,
         autofillScript
