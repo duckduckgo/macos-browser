@@ -780,11 +780,6 @@
         }
         window.setTimeout(() => {
             init()
-            if (document.readyState !== 'complete') {
-                window.addEventListener('load', (event) => {
-                    init()
-                })
-            }
         })
     })
 
