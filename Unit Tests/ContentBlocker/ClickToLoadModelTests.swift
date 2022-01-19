@@ -23,7 +23,7 @@ import BrowserServicesKit
 
 class ClickToLoadModelTests: XCTestCase {
 
-    func testWhenEmbeddedDataIsUpdatedThenUpdateSHAAndEtag() {
+    func testClickToLoadModelInagesArePresent() {
 
         let nmodelImages = ClickToLoadModel.getImage
         let expectedImages = [
@@ -38,8 +38,7 @@ class ClickToLoadModelTests: XCTestCase {
         ]
 
         for (image) in expectedImages {
-            XCTAssertNotNil(nmodelImages[image],
-                           "Error: missing ClickToLoadModel image: " + image)
+            XCTAssertNotNil(nmodelImages[image], "Error: missing ClickToLoadModel image: " + image)
         }
     }
 
