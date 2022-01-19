@@ -246,9 +246,6 @@ struct UserText {
     static let initiateImport = NSLocalizedString("import.data.initiate", value: "Import", comment: "Button text for importing data")
     static let doneImporting = NSLocalizedString("import.data.done", value: "Done", comment: "Button text for finishing the data import")
 
-    static let chromiumPasswordImportDisclaimer = NSLocalizedString("import.chromium.disclaimer", value: "Your Keychain password is temporarily needed to import passwords.", comment: "Warning text for the Chromium password import option")
-    static let firefoxPasswordImportDisclaimer = NSLocalizedString("import.firefox.disclaimer", value: "Your Primary Password is temporarily needed to import passwords.", comment: "Warning text for the Chromium password import option")
-
     static let dataImportFailedTitle = NSLocalizedString("import.data.import-failed.title", value: "Import Failed", comment: "Alert title when the data import fails")
 
     static func dataImportFailedBody(_ source: DataImport.Source, errorMessage: String) -> String {
@@ -262,11 +259,16 @@ struct UserText {
     static let dataImportAlertAccept = NSLocalizedString("import.data.alert.accept", value: "Okay", comment: "Accept button for data import alerts")
     static let dataImportAlertCancel = NSLocalizedString("import.data.alert.cancel", value: "Cancel", comment: "Cancel button for data import alerts")
 
-    static let dataImportRequiresPasswordTitle = NSLocalizedString("import.data.requires-password.title", value: "Primary Password Required", comment: "Alert title text when the data import needs a password")
+    static func dataImportRequiresPasswordTitle(_ source: DataImport.Source) -> String {
+        let localized = NSLocalizedString("import.data.requires-password.title",
+                                         value: "Enter Primary Password for %@",
+                                         comment: "Alert title text when the data import needs a password")
+        return String(format: localized, source.importSourceName)
+    }
 
     static func dataImportRequiresPasswordBody(_ source: DataImport.Source) -> String {
         let localized = NSLocalizedString("import.data.requires-password.body",
-                                          value: "A primary password is required to import %@ logins.",
+                                          value: "DuckDuckGo won't save or share your %1$@ Primary Password, but DuckDuckGo needs it to access and import passwords from %1$@.",
                                           comment: "Alert body text when the data import needs a password")
         return String(format: localized, source.importSourceName)
     }
@@ -391,5 +393,7 @@ struct UserText {
     static let waitlistGetStarted = NSLocalizedString("waitlist.get-started", value: "Get Started", comment: "Button title used in the waitlist lock screen success state")
 
     static let importFromChromiumMoreInfo = NSLocalizedString("import.from.chromium.info", value: "You'll be asked to enter your Keychain password.\n\nDuckDuckGo won’t see your Keychain password, but macOS needs it to access and import passwords into DuckDuckGo.\n\nImported passwords are encrypted and only stored on this computer.", comment: "More info when importing from Chromium")
+
+    static let importFromFirefoxMoreInfo = NSLocalizedString("import.from.firefox.info", value: "You'll be asked to enter your Primary Password for Firefox.\n\nImported passwords are encrypted and only stored on this computer.", comment: "More info when importing from Firefox")
 
 }

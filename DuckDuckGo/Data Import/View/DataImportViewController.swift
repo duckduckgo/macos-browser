@@ -102,6 +102,8 @@ final class DataImportViewController: NSViewController {
     }
 
     private weak var currentChildViewController: NSViewController?
+    private var browserImportViewController: BrowserImportViewController?
+
     private var dataImporter: DataImporter?
     private var selectedImportSourceCancellable: AnyCancellable?
 
@@ -223,8 +225,11 @@ final class DataImportViewController: NSViewController {
                 let filePermissionViewController =  RequestFilePermissionViewController.create(importSource: importSource, permissionsRequired: types)
                 filePermissionViewController.delegate = self
                 return filePermissionViewController
+            } else if browserImportViewController?.browser == importSource {
+                return browserImportViewController
             } else {
-                return createBrowserImportViewController(for: importSource)
+                browserImportViewController = createBrowserImportViewController(for: importSource)
+                return browserImportViewController
             }
 
         case .csv:
@@ -313,15 +318,26 @@ final class DataImportViewController: NSViewController {
 
     }
 
+    var selectedProfile: DataImport.BrowserProfile? {
+        return browserImportViewController?.selectedProfile
+    }
+
+    var selectedImportOptions: [DataImport.DataType] {
+        guard let importer = self.dataImporter else {
+            assertionFailure("\(#file): No data importer or profile found")
+            return []
+        }
+        return browserImportViewController?.selectedImportOptions ?? importer.importableTypes()
+    }
+
     private func completeImport() {
         guard let importer = self.dataImporter else {
             assertionFailure("\(#file): No data importer or profile found")
             return
         }
 
-        let browserViewController = self.currentChildViewController as? BrowserImportViewController
-        let importTypes = browserViewController?.selectedImportOptions ?? importer.importableTypes()
-        let profile = browserViewController?.selectedProfile
+        let profile = selectedProfile
+        let importTypes = selectedImportOptions
 
         importer.importData(types: importTypes, from: profile) { result in
             switch result {

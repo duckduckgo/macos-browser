@@ -62,7 +62,7 @@ extension NSAlert {
         let textField = NSSecureTextField(frame: NSRect(x: 0, y: 0, width: 280, height: 24))
         let alert = NSAlert()
 
-        alert.messageText = UserText.dataImportRequiresPasswordTitle
+        alert.messageText = UserText.dataImportRequiresPasswordTitle(source)
         alert.informativeText = UserText.dataImportRequiresPasswordBody(source)
         alert.alertStyle = .warning
         alert.accessoryView = textField

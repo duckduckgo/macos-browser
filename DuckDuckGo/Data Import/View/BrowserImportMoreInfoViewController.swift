@@ -53,7 +53,7 @@ final class BrowserImportMoreInfoViewController: NSViewController {
             label.stringValue = UserText.importFromChromiumMoreInfo
 
         case .firefox:
-            label.stringValue = "TBD"
+            label.stringValue = UserText.importFromFirefoxMoreInfo
 
         default: fatalError("Unsupported source for more info")
         }
