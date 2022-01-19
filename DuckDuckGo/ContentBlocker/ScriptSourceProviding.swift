@@ -25,7 +25,6 @@ protocol ScriptSourceProviding {
     func reload(knownChanges: ContentBlockerRulesIdentifier.Difference?)
     var contentBlockerRulesConfig: ContentBlockerUserScriptConfig? { get }
     var surrogatesConfig: SurrogatesUserScriptConfig? { get }
-    var navigatorCredentialsSource: String { get }
     var privacyConfigurationManager: PrivacyConfigurationManager { get }
     var sessionKey: String? { get }
     var sourceUpdatedPublisher: AnyPublisher<ContentBlockerRulesIdentifier.Difference?, Never> { get }
@@ -38,7 +37,6 @@ final class DefaultScriptSourceProvider: ScriptSourceProviding {
 
     private(set) var contentBlockerRulesConfig: ContentBlockerUserScriptConfig?
     private(set) var surrogatesConfig: SurrogatesUserScriptConfig?
-    private(set) var navigatorCredentialsSource: String = ""
     private(set) var sessionKey: String?
 
     private let sourceUpdatedSubject = PassthroughSubject<ContentBlockerRulesIdentifier.Difference?, Never>()
@@ -77,7 +75,6 @@ final class DefaultScriptSourceProvider: ScriptSourceProviding {
     func reload(knownChanges: ContentBlockerRulesIdentifier.Difference?) {
         contentBlockerRulesConfig = buildContentBlockerRulesConfig()
         surrogatesConfig = buildSurrogatesConfig()
-        navigatorCredentialsSource = buildNavigatorCredentialsSource()
         sessionKey = generateSessionKey()
         sourceUpdatedSubject.send( knownChanges )
     }
@@ -107,18 +104,5 @@ final class DefaultScriptSourceProvider: ScriptSourceProviding {
                                                  trackerData: rules?.trackerData,
                                                  encodedSurrogateTrackerData: rules?.encodedTrackerData,
                                                  isDebugBuild: isDebugBuild)
-    }
-
-    private func buildNavigatorCredentialsSource() -> String {
-        let privacyConfiguration = privacyConfigurationManager.privacyConfig
-        let unprotectedDomains = privacyConfiguration.tempUnprotectedDomains
-        let contentBlockingExceptions = privacyConfiguration.exceptionsList(forFeature: .navigatorCredentials)
-        if !privacyConfiguration.isEnabled(featureKey: .navigatorCredentials) {
-            return ""
-        }
-        return NavigatorCredentialsUserScript.loadJS("navigatorCredentials", from: .main, withReplacements: [
-             "$USER_UNPROTECTED_DOMAINS$": "",
-             "$CREDENTIALS_EXCEPTIONS$": (unprotectedDomains + contentBlockingExceptions).joined(separator: "\n")
-        ])
     }
 }
