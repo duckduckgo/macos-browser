@@ -51,14 +51,16 @@ final class DataImportViewController: NSViewController {
         }
     }
 
-    static func show() {
+    static func show(completion: (() -> Void)? = nil) {
         guard let windowController = WindowControllersManager.shared.lastKeyMainWindowController,
               windowController.window?.isKeyWindow == true else {
             return
         }
 
         let viewController = DataImportViewController.create()
-        windowController.mainViewController.beginSheet(viewController)
+        windowController.mainViewController.beginSheet(viewController) { _ in
+            completion?()
+        }
     }
 
     static func create() -> DataImportViewController {
