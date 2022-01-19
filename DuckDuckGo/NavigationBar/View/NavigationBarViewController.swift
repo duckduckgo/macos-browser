@@ -401,16 +401,25 @@ final class NavigationBarViewController: NSViewController {
 
         let timerBlock: (Timer) -> Void = { [weak self] _ in
             guard let self = self else { return }
-            self.downloadsButtonHidingTimer?.invalidate()
-            self.downloadsButtonHidingTimer = nil
-            if DownloadListCoordinator.shared.hasActiveDownloads || self.downloadsPopover.isShown { return }
 
-            self.downloadsButton.isHidden = true
+            self.invalideDownloadButtonHidingTimer()
+            self.hideDownloadButtonIfPossible()
         }
 
         downloadsButtonHidingTimer = Timer.scheduledTimer(withTimeInterval: Constants.downloadsButtonAutoHidingInterval,
                                                           repeats: false,
                                                           block: timerBlock)
+    }
+
+    private func invalideDownloadButtonHidingTimer() {
+        self.downloadsButtonHidingTimer?.invalidate()
+        self.downloadsButtonHidingTimer = nil
+    }
+
+    private func hideDownloadButtonIfPossible() {
+        if DownloadListCoordinator.shared.hasActiveDownloads || self.downloadsPopover.isShown { return }
+
+        downloadsButton.isHidden = true
     }
 
     private func updateBookmarksButton() {
@@ -516,7 +525,8 @@ extension NavigationBarViewController: NSPopoverDelegate {
 extension NavigationBarViewController: DownloadsViewControllerDelegate {
 
     func clearDownloadsActionTriggered() {
-        downloadsButton.isHidden = true
+        invalideDownloadButtonHidingTimer()
+        hideDownloadButtonIfPossible()
     }
 
 }
