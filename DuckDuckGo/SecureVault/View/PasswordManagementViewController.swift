@@ -53,6 +53,8 @@ final class PasswordManagementViewController: NSViewController {
     var isDirty = false
 
     var listModel: PasswordManagementItemListModel?
+    var listView: NSView?
+
     var itemModel: PasswordManagementItemModel? {
         didSet {
             editingCancellable?.cancel()
@@ -81,7 +83,7 @@ final class PasswordManagementViewController: NSViewController {
             itemModel?.clearSecureVaultModel()
         }
 
-        refetchWithText(isDirty ? "" : domain ?? "", clearWhenNoMatches: true)
+        refetchWithText("", selectItemMatchingDomain: domain, clearWhenNoMatches: true)
     }
 
     @IBAction func onNewClicked(_ sender: NSButton) {
@@ -91,7 +93,10 @@ final class PasswordManagementViewController: NSViewController {
         menu.popUp(positioning: nil, at: location, in: sender.superview)
     }
 
-    private func refetchWithText(_ text: String, clearWhenNoMatches: Bool = false, completion: (() -> Void)? = nil) {
+    private func refetchWithText(_ text: String,
+                                 selectItemMatchingDomain: String? = nil,
+                                 clearWhenNoMatches: Bool = false,
+                                 completion: (() -> Void)? = nil) {
         fetchSecureVaultItems { [weak self] items in
             self?.listModel?.update(items: items)
             self?.searchField.stringValue = text
@@ -100,6 +105,8 @@ final class PasswordManagementViewController: NSViewController {
             if clearWhenNoMatches && self?.listModel?.displayedItems.isEmpty == true {
                 self?.searchField.stringValue = ""
                 self?.updateFilter()
+            } else if let selectItemMatchingDomain = selectItemMatchingDomain {
+                self?.listModel?.select(loginWithDomain: selectItemMatchingDomain)
             } else if self?.isDirty == false {
                 self?.listModel?.selectFirst()
             }
@@ -472,12 +479,23 @@ final class PasswordManagementViewController: NSViewController {
         }
 
         self.listModel = listModel
-
-        let view = NSHostingView(rootView: PasswordManagementItemListView().environmentObject(listModel))
-        view.frame = listContainer.bounds
-        listContainer.addSubview(view)
+        self.listView = NSHostingView(rootView: PasswordManagementItemListView().environmentObject(listModel))
     }
     // swiftlint:enable function_body_length
+    
+    override func viewWillAppear() {
+        super.viewWillAppear()
+        
+        if let listView = self.listView {
+            listView.frame = listContainer.bounds
+            listContainer.addSubview(listView)
+        }
+    }
+    
+    override func viewDidDisappear() {
+        super.viewDidDisappear()
+        listView?.removeFromSuperview()
+    }
 
     private func createNewSecureVaultItemMenu() -> NSMenu {
         let menu = NSMenu()

@@ -246,6 +246,18 @@ final class PasswordManagementItemListModel: ObservableObject {
             }
         }
     }
+    
+    func select(loginWithDomain domain: String, notify: Bool = true) {
+        for section in displayedItems {
+            if case let .accounts(accounts) = section {
+                if let account = accounts.first(where: { $0.websiteAccount?.domain == domain }) {
+                    selected(item: account, notify: notify)
+                }
+
+                return
+            }
+        }
+    }
 
     func update(item: SecureVaultItem) {
         if let index = items.firstIndex(of: item) {

@@ -23,33 +23,76 @@ import BrowserServicesKit
 struct PasswordManagementItemListView: View {
 
     @EnvironmentObject var model: PasswordManagementItemListModel
+    @State private var timer = Timer.publish(every: 2, tolerance: 0, on: .main, in: .default, options: nil).autoconnect()
 
     var body: some View {
 
-        ScrollView {
-            VStack(alignment: .leading) {
-                Spacer(minLength: 10)
-
-                ForEach(model.displayedItems, id: \.title) { section in
-
-                    Section(header: Text(section.title).padding(.leading, 18).padding(.top, 10)) {
-
-                        ForEach(section.items, id: \.id) { item in
-                            ItemView(item: item, selected: model.selected == item) {
-                                model.selected(item: item)
+        if #available(macOS 11.0, *) {
+            ScrollView {
+                ScrollViewReader { proxy in
+                    PasswordManagementItemListStackView()
+                         .onAppear {
+                            DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
+                                if let selectionID = model.selected?.id {
+                                    print("DEBUG: Scrolling via onAppear")
+                                    proxy.scrollTo(selectionID, anchor: .center)
+                                }
                             }
-                            .padding(.horizontal, 10)
-                        }
-                    }
-
+                         }
                 }
-
-                Spacer(minLength: 10)
             }
+        } else {
+            PasswordManagementItemListStackView()
         }
 
     }
 
+}
+
+struct PasswordManagementItemListStackView: View {
+    
+    @EnvironmentObject var model: PasswordManagementItemListModel
+    
+    var body: some View {
+        
+        if #available(macOS 11.0, *) {
+            LazyVStack(alignment: .leading) {
+                PasswordManagementItemListInternalView()
+            }
+        } else {
+            VStack(alignment: .leading) {
+                PasswordManagementItemListInternalView()
+            }
+        }
+        
+    }
+    
+}
+
+private struct PasswordManagementItemListInternalView: View {
+    
+    @EnvironmentObject var model: PasswordManagementItemListModel
+
+    var body: some View {
+        Spacer(minLength: 10)
+        
+        ForEach(model.displayedItems, id: \.title) { section in
+            
+            Section(header: Text(section.title).padding(.leading, 18).padding(.top, 10)) {
+                
+                ForEach(section.items, id: \.id) { item in
+                    ItemView(item: item, selected: model.selected == item) {
+                        model.selected(item: item)
+                    }
+                    .padding(.horizontal, 10)
+                }
+            }
+            
+        }
+        
+        Spacer(minLength: 10)
+    }
+    
 }
 
 private struct ItemView: View {
