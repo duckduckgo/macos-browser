@@ -104,11 +104,13 @@ final class PasswordManagementViewController: NSViewController {
 
             if clearWhenNoMatches && self?.listModel?.displayedItems.isEmpty == true {
                 self?.searchField.stringValue = ""
-                self?.updateFilter()
-            } else if let selectItemMatchingDomain = selectItemMatchingDomain {
-                self?.listModel?.select(loginWithDomain: selectItemMatchingDomain)
+                self?.updateFilter()                
             } else if self?.isDirty == false {
-                self?.listModel?.selectFirst()
+                if let selectItemMatchingDomain = selectItemMatchingDomain {
+                    self?.listModel?.selectLoginWithDomainOrFirst(domain: selectItemMatchingDomain)
+                } else {
+                    self?.listModel?.selectFirst()
+                }
             }
 
             completion?()
