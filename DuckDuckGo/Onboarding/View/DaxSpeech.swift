@@ -51,20 +51,17 @@ struct DaxSpeech: View {
 
             // This text view sets the proper height for the speech bubble.
             Text(text)
-                .kerning(-0.23)
                 .frame(maxWidth: .infinity, alignment: .leading)
                 .visibility(.invisible)
 
             if #available(macOS 12, *) {
 
                 Text(AttributedString(attributedTypedText))
-                    .kerning(-0.23)
                     .frame(maxWidth: .infinity, alignment: .leading)
 
             } else {
 
                 Text(typedText)
-                    .kerning(-0.23)
                     .frame(maxWidth: .infinity, alignment: .leading)
 
             }
@@ -74,8 +71,9 @@ struct DaxSpeech: View {
         .padding(.vertical, 14)
         .lineLimit(nil)
         .multilineTextAlignment(.leading)
-        .font(.system(size: 15))
-        .lineSpacing(9)
+        .font(.daxSpeech)
+        .lineSpacing(2.5)
+        .foregroundColor(Color("OnboardingDaxSpeechTextColor"))
         .frame(width: speechWidth)
         .background(SpeechBubble())
         .onReceive(timer, perform: { _ in
@@ -109,8 +107,9 @@ struct DaxSpeech: View {
 fileprivate struct SpeechBubble: View {
 
     let radius: CGFloat = 8
-    let tailSize: CGFloat = 8
+    let tailSize: CGFloat = 12
     let tailPosition: CGFloat = 32
+    let tailHeight: CGFloat = 22
 
     var body: some View {
         ZStack {
@@ -121,9 +120,9 @@ fileprivate struct SpeechBubble: View {
 
                     path.move(to: CGPoint(x: rect.minX, y: rect.maxY - radius))
 
-                    path.addLine(to: CGPoint(x: rect.minX, y: tailPosition + 10))
+                    path.addLine(to: CGPoint(x: rect.minX, y: tailPosition + tailHeight / 2))
                     path.addLine(to: CGPoint(x: rect.minX - tailSize, y: tailPosition))
-                    path.addLine(to: CGPoint(x: rect.minX, y: tailPosition - 10))
+                    path.addLine(to: CGPoint(x: rect.minX, y: tailPosition - tailHeight / 2))
 
                      path.addArc(
                          center: CGPoint(x: rect.minX + radius, y: rect.minY + radius),
@@ -156,11 +155,23 @@ fileprivate struct SpeechBubble: View {
 
                 }
                 .fill(Color(NSColor.interfaceBackgroundColor))
-                .shadow(radius: 5)
+                .shadow(color: Color("OnboardingDaxSpeechShadowColor"), radius: 2, x: 0, y: 0)
             }
 
         }
     }
 }
+
+}
+
+fileprivate extension Font {
+
+    static var daxSpeech: Font = {
+        if #available(macOS 11.0, *) {
+            return .system(size: 15, weight: .light, design: .default)
+        } else {
+            return .system(size: 15)
+        }
+    }()
 
 }

@@ -23,28 +23,33 @@ extension Onboarding {
 struct ActionButtonStyle: ButtonStyle {
 
     func makeBody(configuration: Self.Configuration) -> some View {
+
+        let color = configuration.isPressed ? Color("OnboardingActionButtonPressedColor") : Color("OnboardingActionButtonColor")
+
         configuration.label
             .padding(.vertical, 8)
             .frame(maxWidth: .infinity)
             .truncationMode(.tail)
-            .background(RoundedRectangle(cornerRadius: 8, style: .continuous).fill(Color("OnboardingActionButtonColor")))
+            .background(RoundedRectangle(cornerRadius: 8, style: .continuous).fill(color))
             .foregroundColor(.white)
-            .opacity(configuration.isPressed ? 0.6 : 1.0)
-            .font(.system(size: 13, weight: .bold, design: .default))
+            .font(.system(size: 13, weight: .semibold, design: .default))
+
     }
 }
 
 struct SkipButtonStyle: ButtonStyle {
 
     func makeBody(configuration: Self.Configuration) -> some View {
+
+        let color = configuration.isPressed ? Color("OnboardingSkipButtonPressedColor") : Color("OnboardingSkipButtonColor")
+
         configuration.label
             .padding(.vertical, 8)
             .frame(maxWidth: .infinity)
             .truncationMode(.tail)
-            .background(RoundedRectangle(cornerRadius: 8, style: .continuous).fill(Color.black.opacity(0.06)))
+            .background(RoundedRectangle(cornerRadius: 8, style: .continuous).fill(color))
             .foregroundColor(.black)
-            .opacity(configuration.isPressed ? 0.6 : 1.0)
-            .font(.system(size: 13, weight: .bold, design: .default))
+            .font(.system(size: 13, weight: .semibold, design: .default))
 
     }
 }
