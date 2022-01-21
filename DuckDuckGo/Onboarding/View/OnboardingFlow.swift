@@ -40,7 +40,6 @@ struct OnboardingFlow: View {
                     .frame(width: 64, height: 64)
                     .shadow(color: .black.opacity(0.16), radius: 6, x: 0, y: 3)
                     .transition(.move(edge: .bottom).combined(with: .opacity))
-                    // .padding(.init(top: 0, leading: 0, bottom: 0, trailing: daxInSpeechPosition ? 10 : 0))
 
                 ZStack {
 

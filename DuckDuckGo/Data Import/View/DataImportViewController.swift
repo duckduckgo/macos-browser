@@ -115,7 +115,13 @@ final class DataImportViewController: NSViewController {
     @IBOutlet var cancelButton: NSButton!
 
     @IBAction func cancelButtonClicked(_ sender: Any) {
-        dismiss()
+        if currentChildViewController is BrowserImportMoreInfoViewController {
+            viewState = .init(selectedImportSource: viewState.selectedImportSource, interactionState: .moreInfoAvailabile)
+            importSourcePopUpButton.isEnabled = true
+            cancelButton.title = UserText.cancel
+        } else {
+            dismiss()
+        }
     }
 
     @IBAction func actionButtonClicked(_ sender: Any) {
@@ -295,6 +301,7 @@ final class DataImportViewController: NSViewController {
         viewState = .init(selectedImportSource: viewState.selectedImportSource, interactionState: .ableToImport)
         importSourcePopUpButton.isEnabled = false
         embed(viewController: BrowserImportMoreInfoViewController.create(source: viewState.selectedImportSource))
+        cancelButton.title = UserText.navigateBack
     }
 
     private func beginImport() {
