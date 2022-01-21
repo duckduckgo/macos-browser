@@ -24,14 +24,10 @@ struct OnboardingFlow: View {
 
     @EnvironmentObject var model: OnboardingViewModel
 
-    @State var makeSpace = false
     @State var showLogo = false
     @State var showTitle = true
     @State var daxInSpeechPosition = false
     @State var showDialogs = false
-
-    // Not used for display, just needs to be passed to DaxSpeech. Might be a better way to do this.
-    @State var typingFinished = false
 
     var body: some View {
 
@@ -100,14 +96,7 @@ struct OnboardingFlow: View {
 
             Timer.scheduledTimer(withTimeInterval: 1.5, repeats: false) { _ in
                 withAnimation(.easeIn(duration: 0.5)) {
-                    makeSpace = true
-                }
-            }
-
-            Timer.scheduledTimer(withTimeInterval: 2.0, repeats: false) { _ in
-                withAnimation(.easeIn(duration: 0.5)) {
                     showLogo = true
-                    makeSpace = false
                 }
             }
 
