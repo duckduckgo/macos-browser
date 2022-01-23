@@ -135,23 +135,6 @@ class HistoryCoordinatorTests: XCTestCase {
         }
     }
 
-    func testWhenDomainIsVisitedForTheFirstTimeUsingTheNonRootUrl_ThenItsRootUrlIsGenerated() {
-        let (historyStoringMock, historyCoordinator) = HistoryCoordinator.aHistoryCoordinator
-
-        let nonRootUrl = URL(string: "https://duckduckgo.com/privacy")!
-        historyCoordinator.addVisit(of: nonRootUrl)
-        Thread.sleep(forTimeInterval: 0.1)
-
-        XCTAssert(historyStoringMock.savedHistoryEntries[0].url == URL(string: "https://duckduckgo.com/privacy"))
-        XCTAssert(historyStoringMock.savedHistoryEntries[1].url == URL(string: "https://duckduckgo.com/"))
-
-        historyCoordinator.addVisit(of: nonRootUrl)
-        Thread.sleep(forTimeInterval: 0.1)
-
-        XCTAssert(historyStoringMock.savedHistoryEntries[2].url == URL(string: "https://duckduckgo.com/privacy"))
-        XCTAssertEqual(historyStoringMock.savedHistoryEntries.count, 3)
-    }
-
     func testWhenUrlIsMarkedAsDownload_ThenIsDownloadFlagIsStored() {
         let (historyStoringMock, historyCoordinator) = HistoryCoordinator.aHistoryCoordinator
 
@@ -196,7 +179,7 @@ class HistoryCoordinatorTests: XCTestCase {
         XCTAssertFalse(historyStoringMock.savedHistoryEntries.last?.failedToLoad ?? true)
     }
 
-    func testWhenUrlAndItsRootAreMarkedAsDownloadAndUrlIsVisitedAgain_ThenFlagIsClearedForBoth() {
+    func testWhenUrlisMarkedAsDownloadAndIsVisitedAgain_ThenFlagIsCleared() {
         let (historyStoringMock, historyCoordinator) = HistoryCoordinator.aHistoryCoordinator
 
         let url = URL(string: "https://duckduckgo.com/traffic")!
@@ -204,19 +187,16 @@ class HistoryCoordinatorTests: XCTestCase {
         Thread.sleep(forTimeInterval: 0.1)
 
         XCTAssertFalse(historyStoringMock.savedHistoryEntries[0].isDownload)
-        XCTAssertFalse(historyStoringMock.savedHistoryEntries[1].isDownload)
 
         historyCoordinator.markDownloadUrl(url)
         Thread.sleep(forTimeInterval: 0.1)
 
-        XCTAssert(historyStoringMock.savedHistoryEntries[2].isDownload)
-        XCTAssert(historyStoringMock.savedHistoryEntries[3].isDownload)
+        XCTAssert(historyStoringMock.savedHistoryEntries[1].isDownload)
 
         historyCoordinator.addVisit(of: url)
         Thread.sleep(forTimeInterval: 0.1)
 
-        XCTAssertFalse(historyStoringMock.savedHistoryEntries[4].isDownload)
-        XCTAssertFalse(historyStoringMock.savedHistoryEntries[5].isDownload)
+        XCTAssertFalse(historyStoringMock.savedHistoryEntries[2].isDownload)
     }
 
     func testWhenUrlHasNoTitle_ThenFetchingTitleReturnsNil() {
