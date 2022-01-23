@@ -83,13 +83,14 @@ final class HistoryCoordinator: HistoryCoordinating {
             var entry = historyDictionary[url] ?? HistoryEntry(url: url)
             entry.addVisit()
             entry.failedToLoad = false
+            entry.isDownload = false
 
             historyDictionary[url] = entry
             self?.historyDictionary = historyDictionary
             self?._history = self?.makeHistory(from: historyDictionary)
             self?.save(entry: entry)
 
-            self?.generateRootUrlIfNeeded(from: url)
+            self?.addRootUrlIfNeeded(from: url)
         }
     }
 
@@ -266,23 +267,35 @@ final class HistoryCoordinator: HistoryCoordinating {
     /// For the better user experience
     /// When visiting a domain for the first time using a non-root URL, generating its root URL and adding into the history with the visit count 0
     /// triggers the autocompletion of the root URL.
-    private func generateRootUrlIfNeeded(from url: URL) {
+    private func addRootUrlIfNeeded(from url: URL) {
         queue.async(flags: .barrier) { [weak self] in
             guard var historyDictionary = self?.historyDictionary else {
                 os_log("Root URL of %s not saved. History not loaded yet", log: .history, url.absoluteString)
                 return
             }
 
-            guard !url.isRoot, let rootUrl = url.root, historyDictionary[rootUrl] == nil else {
+            guard !url.isRoot, let rootUrl = url.root else {
                 return
             }
 
-            let entry = HistoryEntry(url: rootUrl)
+            var entryToSave: HistoryEntry?
+            if var rootUrlEntry = historyDictionary[rootUrl] {
+                // Clean failedToLoad or isDownload flags if necessary
+                if rootUrlEntry.isDownload || rootUrlEntry.failedToLoad {
+                    rootUrlEntry.isDownload = false
+                    rootUrlEntry.failedToLoad = false
+                    entryToSave = rootUrlEntry
+                }
+            } else {
+                entryToSave = HistoryEntry(url: rootUrl)
+            }
 
-            historyDictionary[rootUrl] = entry
-            self?.historyDictionary = historyDictionary
-            self?._history = self?.makeHistory(from: historyDictionary)
-            self?.save(entry: entry)
+            if let entryToSave = entryToSave {
+                historyDictionary[rootUrl] = entryToSave
+                self?.historyDictionary = historyDictionary
+                self?._history = self?.makeHistory(from: historyDictionary)
+                self?.save(entry: entryToSave)
+            }
         }
     }
 
