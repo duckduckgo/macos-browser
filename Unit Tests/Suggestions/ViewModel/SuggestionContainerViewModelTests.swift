@@ -41,7 +41,7 @@ final class SuggestionContainerViewModelTests: XCTestCase {
         let selectedSuggestionViewModelExpectation = expectation(description: "Selected suggestion view model expectation")
         suggestionContainerViewModel.$selectedSuggestionViewModel.sink { selectedSuggestionViewModel in
             if let selectedSuggestionViewModel = selectedSuggestionViewModel {
-                XCTAssertEqual(suggestionContainerViewModel.suggestionContainer.suggestions?[index], selectedSuggestionViewModel.suggestion)
+                XCTAssertEqual(suggestionContainerViewModel.suggestionContainer.result?.array[index], selectedSuggestionViewModel.suggestion)
                 selectedSuggestionViewModelExpectation.fulfill()
             }
         } .store(in: &cancellables)
@@ -132,7 +132,7 @@ extension SuggestionContainerViewModel {
         suggestionContainer.getSuggestions(for: "Test")
         suggestionLoadingMock.completion?(SuggestionResult.aSuggestionResult, nil )
 
-        while suggestionContainer.suggestions == nil {
+        while suggestionContainer.result == nil {
             RunLoop.current.run(mode: .default, before: Date().addingTimeInterval(0.05))
         }
 

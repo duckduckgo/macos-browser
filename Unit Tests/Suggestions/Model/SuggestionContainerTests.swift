@@ -30,7 +30,7 @@ final class SuggestionContainerTests: XCTestCase {
                                                       bookmarkManager: LocalBookmarkManager.shared)
 
         let e = expectation(description: "Suggestions updated")
-        let cancellable = suggestionContainer.$suggestions.sink {
+        let cancellable = suggestionContainer.$result.sink {
             if $0 != nil {
                 e.fulfill()
             }
@@ -44,7 +44,7 @@ final class SuggestionContainerTests: XCTestCase {
         withExtendedLifetime(cancellable) {
             waitForExpectations(timeout: 1)
         }
-        XCTAssertEqual(suggestionContainer.suggestions, result.topHits + result.duckduckgoSuggestions + result.historyAndBookmarks)
+        XCTAssertEqual(suggestionContainer.result?.array, result.topHits + result.duckduckgoSuggestions + result.historyAndBookmarks)
     }
 
     func testWhenStopGettingSuggestionsIsCalled_ThenNoSuggestionsArePublished() {
@@ -59,7 +59,7 @@ final class SuggestionContainerTests: XCTestCase {
         suggestionLoadingMock.completion?(SuggestionResult.aSuggestionResult, nil)
 
         XCTAssert(suggestionLoadingMock.getSuggestionsCalled)
-        XCTAssertNil(suggestionContainer.suggestions)
+        XCTAssertNil(suggestionContainer.result)
     }
 
 }
