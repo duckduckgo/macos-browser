@@ -56,11 +56,11 @@ struct PasswordManagementItemListStackView: View {
         
         if #available(macOS 11.0, *) {
             LazyVStack(alignment: .leading) {
-                PasswordManagementItemListInternalView()
+                PasswordManagementItemStackContentsView()
             }
         } else {
             VStack(alignment: .leading) {
-                PasswordManagementItemListInternalView()
+                PasswordManagementItemStackContentsView()
             }
         }
         
@@ -68,7 +68,7 @@ struct PasswordManagementItemListStackView: View {
     
 }
 
-private struct PasswordManagementItemListInternalView: View {
+private struct PasswordManagementItemStackContentsView: View {
     
     @EnvironmentObject var model: PasswordManagementItemListModel
 
