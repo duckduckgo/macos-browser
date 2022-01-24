@@ -257,7 +257,7 @@ extension MainViewController {
             }
             navigationBarViewController?.view.window?.makeKeyAndOrderFront(nil)
         }
-        navigationBarViewController?.toggleDownloadsPopover()
+        navigationBarViewController?.toggleDownloadsPopover(keepButtonVisible: false)
     }
 
     // MARK: - History
