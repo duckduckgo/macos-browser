@@ -31,14 +31,14 @@ struct PasswordManagementItemListView: View {
             ScrollView {
                 ScrollViewReader { proxy in
                     PasswordManagementItemListStackView()
-                         .onAppear {
+                        .onAppear {
+                            // Scrolling to the selected item doesn't work consistently without a very slight delay.
                             DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
                                 if let selectionID = model.selected?.id {
-                                    print("DEBUG: Scrolling via onAppear")
                                     proxy.scrollTo(selectionID, anchor: .center)
                                 }
                             }
-                         }
+                        }
                 }
             }
         } else {
