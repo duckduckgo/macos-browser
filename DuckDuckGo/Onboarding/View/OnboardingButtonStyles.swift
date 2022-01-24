@@ -43,13 +43,24 @@ struct SkipButtonStyle: ButtonStyle {
 
         let color = configuration.isPressed ? Color("OnboardingSkipButtonPressedColor") : Color("OnboardingSkipButtonColor")
 
-        configuration.label
+        let label = configuration.label
             .padding(.vertical, 8)
             .frame(maxWidth: .infinity)
             .truncationMode(.tail)
-            .background(RoundedRectangle(cornerRadius: 8, style: .continuous).fill(color))
             .foregroundColor(.black)
             .font(.system(size: 13, weight: .semibold, design: .default))
+
+        if #available(macOS 12.0, *) {
+
+            label.background(RoundedRectangle(cornerRadius: 8, style: .continuous).fill(color)
+                                .background(RoundedRectangle(cornerRadius: 8, style: .continuous).fill(.ultraThinMaterial)))
+
+        } else {
+
+            label.background(RoundedRectangle(cornerRadius: 8, style: .continuous).fill(color)
+                                .background(RoundedRectangle(cornerRadius: 8, style: .continuous).fill(Color("OnboardingSkipButtonBaseColor"))))
+
+        }
 
     }
 }
