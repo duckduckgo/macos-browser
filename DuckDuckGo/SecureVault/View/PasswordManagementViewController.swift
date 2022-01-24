@@ -46,6 +46,9 @@ final class PasswordManagementViewController: NSViewController {
     @IBOutlet var itemContainer: NSView!
     @IBOutlet var searchField: NSTextField!
     @IBOutlet var divider: NSView!
+    @IBOutlet var emptyState: NSView!
+    @IBOutlet var emptyStateTitle: NSTextField!
+    @IBOutlet var emptyStateMessage: NSTextField!
 
     var editingCancellable: AnyCancellable?
 
@@ -72,6 +75,9 @@ final class PasswordManagementViewController: NSViewController {
         super.viewDidLoad()
         createListView()
         createLoginItemView()
+
+        emptyStateTitle.attributedStringValue = NSAttributedString.make(emptyStateTitle.stringValue, lineHeight: 1.14, kern: -0.23)
+        emptyStateMessage.attributedStringValue = NSAttributedString.make(emptyStateMessage.stringValue, lineHeight: 1.05, kern: -0.08)
     }
 
     override func viewDidAppear() {
@@ -89,6 +95,10 @@ final class PasswordManagementViewController: NSViewController {
         let location = NSPoint(x: sender.frame.origin.x, y: sender.frame.origin.y - (sender.frame.height / 2) + 6)
 
         menu.popUp(positioning: nil, at: location, in: sender.superview)
+    }
+
+    @IBAction func onImportClicked(_ sender: NSButton) {
+        DataImportViewController.show()
     }
 
     private func refetchWithText(_ text: String, clearWhenNoMatches: Bool = false, completion: (() -> Void)? = nil) {
@@ -163,7 +173,9 @@ final class PasswordManagementViewController: NSViewController {
             self?.doSaveCredentials(credentials)
         }, onDeleteRequested: { [weak self] credentials in
             self?.promptToDelete(credentials: credentials)
-        })
+        }) { [weak self] in
+            self?.refetchWithText(self!.searchField.stringValue)
+        }
 
         self.itemModel = itemModel
 
@@ -179,7 +191,9 @@ final class PasswordManagementViewController: NSViewController {
             self?.doSaveIdentity(note)
         }, onDeleteRequested: { [weak self] identity in
             self?.promptToDelete(identity: identity)
-        })
+        }) { [weak self] in
+            self?.refetchWithText(self!.searchField.stringValue)
+        }
 
         self.itemModel = itemModel
 
@@ -195,7 +209,9 @@ final class PasswordManagementViewController: NSViewController {
             self?.doSaveNote(note)
         }, onDeleteRequested: { [weak self] note in
             self?.promptToDelete(note: note)
-        })
+        }) { [weak self] in
+            self?.refetchWithText(self!.searchField.stringValue)
+        }
 
         self.itemModel = itemModel
 
@@ -211,7 +227,9 @@ final class PasswordManagementViewController: NSViewController {
             self?.doSaveCreditCard(card)
         }, onDeleteRequested: { [weak self] card in
             self?.promptToDelete(card: card)
-        })
+        }) { [weak self] in
+            self?.refetchWithText(self!.searchField.stringValue)
+        }
 
         self.itemModel = itemModel
 
@@ -226,6 +244,7 @@ final class PasswordManagementViewController: NSViewController {
     }
 
     private func replaceItemContainerChildView(with view: NSView) {
+        emptyState.isHidden = true
         clearSelectedItem()
 
         view.frame = itemContainer.bounds
@@ -510,6 +529,7 @@ final class PasswordManagementViewController: NSViewController {
                         identities.map(SecureVaultItem.identity)
 
             DispatchQueue.main.async {
+                self.emptyState.isHidden = !items.isEmpty
                 completion(items)
             }
         }

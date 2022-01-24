@@ -267,7 +267,8 @@
 		85B7184A27677C2D00B4277F /* Onboarding.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 85B7184927677C2D00B4277F /* Onboarding.storyboard */; };
 		85B7184C27677C6500B4277F /* OnboardingViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 85B7184B27677C6500B4277F /* OnboardingViewController.swift */; };
 		85B7184E27677CBB00B4277F /* RootView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 85B7184D27677CBB00B4277F /* RootView.swift */; };
-		85B7185027677EA400B4277F /* Onboarding.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 85B7184F27677EA400B4277F /* Onboarding.xcassets */; };
+		85C48CCC278D808F00D3263E /* NSAttributedStringExtension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 85C48CCB278D808F00D3263E /* NSAttributedStringExtension.swift */; };
+		85C48CD127908C1000D3263E /* BrowserImportMoreInfoViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 85C48CD027908C1000D3263E /* BrowserImportMoreInfoViewController.swift */; };
 		85C6A29625CC1FFD00EEB5F1 /* UserDefaultsWrapper.swift in Sources */ = {isa = PBXBuildFile; fileRef = 85C6A29525CC1FFD00EEB5F1 /* UserDefaultsWrapper.swift */; };
 		85CC1D73269EF1880062F04E /* PasswordManagementItemList.swift in Sources */ = {isa = PBXBuildFile; fileRef = 85CC1D72269EF1880062F04E /* PasswordManagementItemList.swift */; };
 		85CC1D7B26A05ECF0062F04E /* PasswordManagementItemListModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 85CC1D7A26A05ECF0062F04E /* PasswordManagementItemListModel.swift */; };
@@ -932,7 +933,8 @@
 		85B7184927677C2D00B4277F /* Onboarding.storyboard */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; path = Onboarding.storyboard; sourceTree = "<group>"; };
 		85B7184B27677C6500B4277F /* OnboardingViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OnboardingViewController.swift; sourceTree = "<group>"; };
 		85B7184D27677CBB00B4277F /* RootView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RootView.swift; sourceTree = "<group>"; };
-		85B7184F27677EA400B4277F /* Onboarding.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Onboarding.xcassets; sourceTree = "<group>"; };
+		85C48CCB278D808F00D3263E /* NSAttributedStringExtension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NSAttributedStringExtension.swift; sourceTree = "<group>"; };
+		85C48CD027908C1000D3263E /* BrowserImportMoreInfoViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BrowserImportMoreInfoViewController.swift; sourceTree = "<group>"; };
 		85C6A29525CC1FFD00EEB5F1 /* UserDefaultsWrapper.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UserDefaultsWrapper.swift; sourceTree = "<group>"; };
 		85CC1D72269EF1880062F04E /* PasswordManagementItemList.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PasswordManagementItemList.swift; sourceTree = "<group>"; };
 		85CC1D7A26A05ECF0062F04E /* PasswordManagementItemListModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PasswordManagementItemListModel.swift; sourceTree = "<group>"; };
@@ -1643,14 +1645,15 @@
 		4B723DEC26B0002B00E14D75 /* View */ = {
 			isa = PBXGroup;
 			children = (
-				4BB99D0526FE1979001E4761 /* RequestFilePermissionViewController.swift */,
+				85C48CD027908C1000D3263E /* BrowserImportMoreInfoViewController.swift */,
+				4B78A86A26BB3ADD0071BB16 /* BrowserImportSummaryViewController.swift */,
 				4B59024226B35F7C00489384 /* BrowserImportViewController.swift */,
+				4B723DF026B0002B00E14D75 /* CSVImportSummaryViewController.swift */,
+				4B723DEF26B0002B00E14D75 /* CSVImportViewController.swift */,
 				4B723DED26B0002B00E14D75 /* DataImport.storyboard */,
 				4B723DEE26B0002B00E14D75 /* DataImportViewController.swift */,
-				4B723DEF26B0002B00E14D75 /* CSVImportViewController.swift */,
-				4B723DF026B0002B00E14D75 /* CSVImportSummaryViewController.swift */,
-				4B78A86A26BB3ADD0071BB16 /* BrowserImportSummaryViewController.swift */,
 				4B8AC93426B3B2FD00879451 /* NSAlert+DataImport.swift */,
+				4BB99D0526FE1979001E4761 /* RequestFilePermissionViewController.swift */,
 			);
 			path = View;
 			sourceTree = "<group>";
@@ -2086,7 +2089,6 @@
 				85707F27276A34D900DC0649 /* DaxSpeech.swift */,
 				85B7184927677C2D00B4277F /* Onboarding.storyboard */,
 				85707F25276A335700DC0649 /* Onboarding.swift */,
-				85B7184F27677EA400B4277F /* Onboarding.xcassets */,
 				85707F2B276A364E00DC0649 /* OnboardingFlow.swift */,
 				85B7184B27677C6500B4277F /* OnboardingViewController.swift */,
 				85B7184D27677CBB00B4277F /* RootView.swift */,
@@ -2985,6 +2987,7 @@
 				85308E24267FC9F2001ABD76 /* NSAlertExtension.swift */,
 				F44C130125C2DA0400426E3E /* NSAppearanceExtension.swift */,
 				AA5C8F622591021700748EB7 /* NSApplicationExtension.swift */,
+				85C48CCB278D808F00D3263E /* NSAttributedStringExtension.swift */,
 				B65E6B9F26D9F10600095F96 /* NSBezierPathExtension.swift */,
 				B63D467925BFC3E100874977 /* NSCoderExtensions.swift */,
 				F41D174025CB131900472416 /* NSColorExtension.swift */,
@@ -3022,6 +3025,7 @@
 				AA88D14A252A557100980B4E /* URLRequestExtension.swift */,
 				B6DB3AEE278D5C370024C5C4 /* URLSessionExtension.swift */,
 				AAA0CC69253CC43C0079BC96 /* WKUserContentControllerExtension.swift */,
+				4B7A60A0273E0BE400BBDFEB /* WKWebsiteDataStoreExtension.swift */,
 				B63D466725BEB6C200874977 /* WKWebView+Private.h */,
 				B63D466825BEB6C200874977 /* WKWebView+SessionState.swift */,
 				B68458CC25C7EB9000DC17B6 /* WKWebViewConfigurationExtensions.swift */,
@@ -3649,7 +3653,6 @@
 				85625994269C8F9600EE44BC /* PasswordManager.storyboard in Resources */,
 				AA80EC6D256C469C007083E7 /* NavigationBar.storyboard in Resources */,
 				4B0511C6262CAA5A00F6079C /* DefaultBrowserTableCellView.xib in Resources */,
-				85B7185027677EA400B4277F /* Onboarding.xcassets in Resources */,
 				4B677433255DBEB800025BD8 /* httpsMobileV2Bloom.bin in Resources */,
 				AA34397B2754D55100B241FA /* trackers-3.json in Resources */,
 				026ADE1426C3010C002518EE /* macos-config.json in Resources */,
@@ -4069,6 +4072,7 @@
 				AA3F895324C18AD500628DDE /* SuggestionViewModel.swift in Sources */,
 				4B9292A326670D2A00AD2C21 /* BookmarkManagedObject.swift in Sources */,
 				4B723E1326B0007A00E14D75 /* CSVLoginExporter.swift in Sources */,
+				85C48CCC278D808F00D3263E /* NSAttributedStringExtension.swift in Sources */,
 				8562599A269CA0A600EE44BC /* NSRectExtension.swift in Sources */,
 				4B0511C5262CAA5A00F6079C /* PrivacySecurityPreferencesTableCellView.swift in Sources */,
 				B6040856274B830F00680351 /* DictionaryExtension.swift in Sources */,
@@ -4120,6 +4124,7 @@
 				B66E9DD42670EB4A00E53BB5 /* WKDownload+WebKitDownload.swift in Sources */,
 				B69B503F2726A12500758A2B /* LocalStatisticsStore.swift in Sources */,
 				B689ECD526C247DB006FB0C5 /* BackForwardListItem.swift in Sources */,
+				85C48CD127908C1000D3263E /* BrowserImportMoreInfoViewController.swift in Sources */,
 				B69B50572727D16900758A2B /* AtbAndVariantCleanup.swift in Sources */,
 				B693954A26F04BEB0015B914 /* NibLoadable.swift in Sources */,
 				AA7412B724D1687000D22FE0 /* TabBarScrollView.swift in Sources */,

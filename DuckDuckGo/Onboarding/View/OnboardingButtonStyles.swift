@@ -23,28 +23,35 @@ extension Onboarding {
 struct ActionButtonStyle: ButtonStyle {
 
     func makeBody(configuration: Self.Configuration) -> some View {
+
+        let color = configuration.isPressed ? Color("OnboardingActionButtonPressedColor") : Color("OnboardingActionButtonColor")
+
         configuration.label
             .padding(.vertical, 8)
             .frame(maxWidth: .infinity)
             .truncationMode(.tail)
-            .background(RoundedRectangle(cornerRadius: 8, style: .continuous).fill(Color("OnboardingActionButton")))
+            .background(RoundedRectangle(cornerRadius: 8, style: .continuous).fill(color))
             .foregroundColor(.white)
-            .opacity(configuration.isPressed ? 0.6 : 1.0)
-            .font(.system(size: 13, weight: .bold, design: .default))
+            .font(.system(size: 13, weight: .semibold, design: .default))
+
     }
 }
 
 struct SkipButtonStyle: ButtonStyle {
 
     func makeBody(configuration: Self.Configuration) -> some View {
+
+        let color = configuration.isPressed ? Color("OnboardingSkipButtonPressedColor") : Color("OnboardingSkipButtonColor")
+
         configuration.label
             .padding(.vertical, 8)
             .frame(maxWidth: .infinity)
             .truncationMode(.tail)
-            .background(RoundedRectangle(cornerRadius: 8, style: .continuous).fill(Color.black.opacity(0.06)))
             .foregroundColor(.black)
-            .opacity(configuration.isPressed ? 0.6 : 1.0)
-            .font(.system(size: 13, weight: .bold, design: .default))
+            .font(.system(size: 13, weight: .semibold, design: .default))
+            .background(RoundedRectangle(cornerRadius: 8, style: .continuous).fill(color)
+                                // background for the background to prevent transparency show matt anderson details
+                                .background(RoundedRectangle(cornerRadius: 8, style: .continuous).fill(Color("OnboardingSkipButtonBaseColor"))))
 
     }
 }

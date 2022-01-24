@@ -30,29 +30,51 @@ struct DaxSpeech: View {
     let onTypingFinished: (() -> Void)?
 
     @State private var typingIndex = 0
-    @State private var typedText = ""
-    @State private var timer = Timer.publish(every: 0.03, tolerance: 0, on: .main, in: .default, options: nil).autoconnect()
+    @State private var typedText = "" {
+        didSet {
+            guard #available(macOS 12, *) else { return }
+            let chars = Array(text)
+            let untypedChars = chars[Array(typedText).count ..< chars.count]
+            let combined = NSMutableAttributedString(string: typedText)
+            combined.append(NSAttributedString(string: String(untypedChars), attributes: [
+                NSAttributedString.Key.foregroundColor: NSColor.clear
+            ]))
+            attributedTypedText = combined
+        }
+    }
+    @State private var timer = Timer.publish(every: 0.02, tolerance: 0, on: .main, in: .default, options: nil).autoconnect()
+
+    @State private var attributedTypedText = NSAttributedString(string: "")
 
     var body: some View {
         ZStack(alignment: .topLeading) {
 
             // This text view sets the proper height for the speech bubble.
             Text(text)
-                .kerning(-0.23)
                 .frame(maxWidth: .infinity, alignment: .leading)
                 .visibility(.invisible)
 
-            Text(typedText)
-                .kerning(-0.23)
-                .frame(maxWidth: .infinity, alignment: .leading)
+            if #available(macOS 12, *) {
+
+                Text(AttributedString(attributedTypedText))
+                    .frame(maxWidth: .infinity, alignment: .leading)
+
+            } else {
+
+                Text(typedText)
+                    .frame(maxWidth: .infinity, alignment: .leading)
+
+            }
+
         }
         .padding(.horizontal, 18)
         .padding(.vertical, 14)
         .lineLimit(nil)
         .multilineTextAlignment(.leading)
-        .font(.system(size: 15))
-        .lineSpacing(9)
-        .frame(width: speachWidth + 8)
+        .font(.daxSpeech)
+        .lineSpacing(2.5)
+        .foregroundColor(Color("OnboardingDaxSpeechTextColor"))
+        .frame(width: speechWidth)
         .background(SpeechBubble())
         .onReceive(timer, perform: { _ in
             if model.typingDisabled {
@@ -71,8 +93,12 @@ struct DaxSpeech: View {
                 return
             }
 
-            typingIndex = min(typingIndex + 1, text.utf16.count)
-            typedText = String(text.utf16[text.utf16.startIndex ..< text.utf16.index(text.utf16.startIndex, offsetBy: typingIndex)]) ?? ""
+            let chars = Array(text)
+            typingIndex = min(typingIndex + 1, chars.count)
+            let typedChars = chars[0 ..< typingIndex]
+
+            typedText = String(typedChars)
+
         })
     }
 
@@ -81,8 +107,9 @@ struct DaxSpeech: View {
 fileprivate struct SpeechBubble: View {
 
     let radius: CGFloat = 8
-    let tailSize: CGFloat = 8
+    let tailSize: CGFloat = 12
     let tailPosition: CGFloat = 32
+    let tailHeight: CGFloat = 22
 
     var body: some View {
         ZStack {
@@ -93,9 +120,9 @@ fileprivate struct SpeechBubble: View {
 
                     path.move(to: CGPoint(x: rect.minX, y: rect.maxY - radius))
 
-                    path.addLine(to: CGPoint(x: rect.minX, y: tailPosition + 10))
+                    path.addLine(to: CGPoint(x: rect.minX, y: tailPosition + tailHeight / 2))
                     path.addLine(to: CGPoint(x: rect.minX - tailSize, y: tailPosition))
-                    path.addLine(to: CGPoint(x: rect.minX, y: tailPosition - 10))
+                    path.addLine(to: CGPoint(x: rect.minX, y: tailPosition - tailHeight / 2))
 
                      path.addArc(
                          center: CGPoint(x: rect.minX + radius, y: rect.minY + radius),
@@ -128,11 +155,23 @@ fileprivate struct SpeechBubble: View {
 
                 }
                 .fill(Color(NSColor.interfaceBackgroundColor))
-                .shadow(radius: 5)
+                .shadow(color: Color("OnboardingDaxSpeechShadowColor"), radius: 2, x: 0, y: 0)
             }
 
         }
     }
 }
+
+}
+
+fileprivate extension Font {
+
+    static var daxSpeech: Font = {
+        if #available(macOS 11.0, *) {
+            return .system(size: 15, weight: .light, design: .default)
+        } else {
+            return .system(size: 15)
+        }
+    }()
 
 }

@@ -107,14 +107,7 @@ extension AppDelegate {
     }
 
     @IBAction func openImportBrowserDataWindow(_ sender: Any?) {
-        guard let windowController = WindowControllersManager.shared.lastKeyMainWindowController,
-              windowController.window?.isKeyWindow == true else {
-
-            return
-        }
-
-        let viewController = DataImportViewController.create()
-        windowController.mainViewController.beginSheet(viewController)
+        DataImportViewController.show()
     }
 
     @IBAction func openExportLogins(_ sender: Any?) {
@@ -491,7 +484,7 @@ extension MainViewController {
     }
     
     @IBAction func resetMacWaitlistUnlockState(_ sender: Any?) {
-        OnboardingViewModel().onboardingFinished = false
+        OnboardingViewModel().restart()
         let store = MacWaitlistEncryptedFileStorage()
         store.deleteExistingMetadata()
     }

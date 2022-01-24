@@ -33,6 +33,7 @@ final class PasswordManagementNoteModel: ObservableObject, PasswordManagementIte
     var onDirtyChanged: (Bool) -> Void
     var onSaveRequested: (SecureVaultModels.Note) -> Void
     var onDeleteRequested: (SecureVaultModels.Note) -> Void
+    var onCancelled: () -> Void
 
     var isEditingPublisher: Published<Bool>.Publisher {
         return $isEditing
@@ -78,10 +79,12 @@ final class PasswordManagementNoteModel: ObservableObject, PasswordManagementIte
 
     init(onDirtyChanged: @escaping (Bool) -> Void,
          onSaveRequested: @escaping (SecureVaultModels.Note) -> Void,
-         onDeleteRequested: @escaping (SecureVaultModels.Note) -> Void) {
+         onDeleteRequested: @escaping (SecureVaultModels.Note) -> Void,
+         onCancelled: @escaping () -> Void) {
         self.onDirtyChanged = onDirtyChanged
         self.onSaveRequested = onSaveRequested
         self.onDeleteRequested = onDeleteRequested
+        self.onCancelled = onCancelled
     }
 
     func createNew() {
@@ -97,6 +100,8 @@ final class PasswordManagementNoteModel: ObservableObject, PasswordManagementIte
             note = nil
             isNew = false
         }
+
+        onCancelled()
     }
 
     func save() {

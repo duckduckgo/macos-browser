@@ -16,7 +16,7 @@
 //  limitations under the License.
 //
 
-import Foundation
+import AppKit
 import Combine
 
 protocol BookmarkManagementDetailViewControllerDelegate: AnyObject {
@@ -40,6 +40,9 @@ final class BookmarkManagementDetailViewController: NSViewController {
     @IBOutlet var tableView: NSTableView!
     @IBOutlet var colorView: ColorView!
     @IBOutlet var contextMenu: NSMenu!
+    @IBOutlet var emptyState: NSView!
+    @IBOutlet var emptyStateTitle: NSTextField!
+    @IBOutlet var emptyStateMessage: NSTextField!
 
     weak var delegate: BookmarkManagementDetailViewControllerDelegate?
 
@@ -88,7 +91,10 @@ final class BookmarkManagementDetailViewController: NSViewController {
 
         reloadData()
         self.tableView.selectionHighlightStyle = .none
-    }
+
+        emptyStateTitle.attributedStringValue = NSAttributedString.make(emptyStateTitle.stringValue, lineHeight: 1.14, kern: -0.23)
+        emptyStateMessage.attributedStringValue = NSAttributedString.make(emptyStateMessage.stringValue, lineHeight: 1.05, kern: -0.08)
+   }
 
     override func viewDidDisappear() {
         super.viewDidDisappear()
@@ -106,7 +112,12 @@ final class BookmarkManagementDetailViewController: NSViewController {
             // If the table view is editing, the reload will be deferred until after the cell animation has completed.
             return
         }
+        emptyState.isHidden = !(bookmarkManager.list?.topLevelEntities.isEmpty ?? true)
         self.tableView.reloadData()
+    }
+
+    @IBAction func onImportClicked(_ sender: NSButton) {
+        DataImportViewController.show()
     }
 
     @IBAction func handleDoubleClick(_ sender: NSTableView) {

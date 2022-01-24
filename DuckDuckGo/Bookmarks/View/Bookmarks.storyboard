@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<document type="com.apple.InterfaceBuilder3.Cocoa.Storyboard.XIB" version="3.0" toolsVersion="19455" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES">
+<document type="com.apple.InterfaceBuilder3.Cocoa.Storyboard.XIB" version="3.0" toolsVersion="19529" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES">
     <dependencies>
         <deployment identifier="macosx"/>
-        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="19455"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="19529"/>
         <capability name="Named colors" minToolsVersion="9.0"/>
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
     </dependencies>
@@ -145,11 +145,11 @@
             <objects>
                 <viewController id="nlv-9S-Ioa" customClass="BookmarkManagementDetailViewController" customModule="DuckDuckGo_Privacy_Browser" customModuleProvider="target" sceneMemberID="viewController">
                     <view key="view" id="0G1-O6-fPI">
-                        <rect key="frame" x="0.0" y="0.0" width="676" height="155"/>
+                        <rect key="frame" x="0.0" y="0.0" width="676" height="629"/>
                         <autoresizingMask key="autoresizingMask"/>
                         <subviews>
                             <customView translatesAutoresizingMaskIntoConstraints="NO" id="pWh-Hk-YzZ" customClass="ColorView" customModule="DuckDuckGo_Privacy_Browser" customModuleProvider="target">
-                                <rect key="frame" x="0.0" y="0.0" width="676" height="155"/>
+                                <rect key="frame" x="0.0" y="0.0" width="676" height="629"/>
                                 <userDefinedRuntimeAttributes>
                                     <userDefinedRuntimeAttribute type="color" keyPath="backgroundColor">
                                         <color key="value" name="HomepageBackgroundColor"/>
@@ -157,16 +157,16 @@
                                 </userDefinedRuntimeAttributes>
                             </customView>
                             <box verticalHuggingPriority="750" boxType="separator" translatesAutoresizingMaskIntoConstraints="NO" id="fLo-NU-bGv">
-                                <rect key="frame" x="58" y="72" width="560" height="5"/>
+                                <rect key="frame" x="58" y="546" width="560" height="5"/>
                             </box>
                             <scrollView borderType="none" autohidesScrollers="YES" horizontalLineScroll="17" horizontalPageScroll="10" verticalLineScroll="17" verticalPageScroll="10" usesPredominantAxisScrolling="NO" translatesAutoresizingMaskIntoConstraints="NO" id="mTh-HU-7C9">
-                                <rect key="frame" x="48" y="0.0" width="580" height="74"/>
+                                <rect key="frame" x="48" y="0.0" width="580" height="548"/>
                                 <clipView key="contentView" drawsBackground="NO" id="Cld-aq-MYg">
-                                    <rect key="frame" x="0.0" y="0.0" width="580" height="74"/>
+                                    <rect key="frame" x="0.0" y="0.0" width="580" height="548"/>
                                     <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                     <subviews>
                                         <tableView verticalHuggingPriority="750" allowsExpansionToolTips="YES" tableStyle="plain" columnReordering="NO" columnResizing="NO" autosaveColumns="NO" rowSizeStyle="automatic" usesAutomaticRowHeights="YES" viewBased="YES" id="b59-XH-JSp">
-                                            <rect key="frame" x="0.0" y="0.0" width="580" height="30"/>
+                                            <rect key="frame" x="0.0" y="0.0" width="580" height="504"/>
                                             <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                             <color key="backgroundColor" name="ClearColor"/>
                                             <color key="gridColor" name="gridColor" catalog="System" colorSpace="catalog"/>
@@ -207,8 +207,65 @@
                                     <outlet property="menu" destination="f4d-eZ-YLo" id="Rgr-Lz-a1f"/>
                                 </connections>
                             </scrollView>
+                            <customView hidden="YES" translatesAutoresizingMaskIntoConstraints="NO" id="I9P-t9-o4Y">
+                                <rect key="frame" x="226" y="187" width="224" height="218"/>
+                                <subviews>
+                                    <imageView horizontalHuggingPriority="251" verticalHuggingPriority="251" translatesAutoresizingMaskIntoConstraints="NO" id="mrh-3F-46f">
+                                        <rect key="frame" x="48" y="122" width="128" height="96"/>
+                                        <constraints>
+                                            <constraint firstAttribute="width" constant="128" id="HL1-xB-Qev"/>
+                                            <constraint firstAttribute="height" constant="96" id="pad-px-VPH"/>
+                                        </constraints>
+                                        <imageCell key="cell" refusesFirstResponder="YES" alignment="left" imageScaling="proportionallyDown" image="BookmarksEmpty" id="OUR-i6-oZZ"/>
+                                    </imageView>
+                                    <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="LTY-g7-MLc">
+                                        <rect key="frame" x="14" y="95" width="196" height="19"/>
+                                        <constraints>
+                                            <constraint firstAttribute="width" constant="192" id="2hn-g3-ubB"/>
+                                        </constraints>
+                                        <textFieldCell key="cell" alignment="center" title="No bookmarks yet" id="ygy-gQ-4m8">
+                                            <font key="font" metaFont="systemSemibold" size="15"/>
+                                            <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
+                                            <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
+                                        </textFieldCell>
+                                    </textField>
+                                    <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="NwF-DN-Ena">
+                                        <rect key="frame" x="14" y="39" width="196" height="48"/>
+                                        <constraints>
+                                            <constraint firstAttribute="width" constant="192" id="UWK-SS-qdF"/>
+                                        </constraints>
+                                        <textFieldCell key="cell" alignment="center" title="If your bookmarks are saved in another browser, you can import them into DuckDuckGo." id="T2s-vA-z51">
+                                            <font key="font" metaFont="system"/>
+                                            <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
+                                            <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
+                                        </textFieldCell>
+                                    </textField>
+                                    <button verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="wj9-wP-cyN">
+                                        <rect key="frame" x="75" y="4" width="75" height="32"/>
+                                        <buttonCell key="cell" type="push" title="Import" bezelStyle="rounded" alignment="center" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="smU-wG-Sgm">
+                                            <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
+                                            <font key="font" metaFont="system"/>
+                                        </buttonCell>
+                                        <connections>
+                                            <action selector="onImportClicked:" target="nlv-9S-Ioa" id="3Oo-i4-1AM"/>
+                                        </connections>
+                                    </button>
+                                </subviews>
+                                <constraints>
+                                    <constraint firstItem="NwF-DN-Ena" firstAttribute="centerX" secondItem="I9P-t9-o4Y" secondAttribute="centerX" id="49U-8q-z7E"/>
+                                    <constraint firstItem="wj9-wP-cyN" firstAttribute="top" secondItem="NwF-DN-Ena" secondAttribute="bottom" constant="8" id="NDF-59-dTg"/>
+                                    <constraint firstAttribute="height" constant="218" id="T9i-D4-z0N"/>
+                                    <constraint firstItem="NwF-DN-Ena" firstAttribute="top" secondItem="LTY-g7-MLc" secondAttribute="bottom" constant="8" id="UqQ-Lr-CeI"/>
+                                    <constraint firstItem="wj9-wP-cyN" firstAttribute="centerX" secondItem="I9P-t9-o4Y" secondAttribute="centerX" id="a3n-gn-X7n"/>
+                                    <constraint firstItem="mrh-3F-46f" firstAttribute="centerX" secondItem="I9P-t9-o4Y" secondAttribute="centerX" id="fAG-jK-eU8"/>
+                                    <constraint firstAttribute="width" constant="224" id="m4i-nX-GeL"/>
+                                    <constraint firstItem="mrh-3F-46f" firstAttribute="top" secondItem="I9P-t9-o4Y" secondAttribute="top" id="mZ3-O8-rbP"/>
+                                    <constraint firstItem="LTY-g7-MLc" firstAttribute="centerX" secondItem="I9P-t9-o4Y" secondAttribute="centerX" id="nUv-NL-Efh"/>
+                                    <constraint firstItem="LTY-g7-MLc" firstAttribute="top" secondItem="mrh-3F-46f" secondAttribute="bottom" constant="8" id="xB2-zS-Uxz"/>
+                                </constraints>
+                            </customView>
                             <button verticalHuggingPriority="750" imageHugsTitle="YES" translatesAutoresizingMaskIntoConstraints="NO" id="nQu-I8-OqK" customClass="MouseOverButton" customModule="DuckDuckGo_Privacy_Browser" customModuleProvider="target">
-                                <rect key="frame" x="194" y="99" width="110" height="24"/>
+                                <rect key="frame" x="194" y="573" width="110" height="24"/>
                                 <constraints>
                                     <constraint firstAttribute="width" constant="110" id="fCv-XV-yrO"/>
                                     <constraint firstAttribute="height" constant="24" id="ys9-mF-qNi"/>
@@ -234,7 +291,7 @@
                                 </connections>
                             </button>
                             <button verticalHuggingPriority="750" imageHugsTitle="YES" translatesAutoresizingMaskIntoConstraints="NO" id="96h-Ck-yux" customClass="MouseOverButton" customModule="DuckDuckGo_Privacy_Browser" customModuleProvider="target">
-                                <rect key="frame" x="48" y="99" width="130" height="24"/>
+                                <rect key="frame" x="48" y="573" width="130" height="24"/>
                                 <constraints>
                                     <constraint firstAttribute="height" constant="24" id="CKf-3f-aSt"/>
                                     <constraint firstAttribute="width" constant="130" id="hTU-md-bGM"/>
@@ -267,21 +324,28 @@
                             <constraint firstItem="mTh-HU-7C9" firstAttribute="top" secondItem="fLo-NU-bGv" secondAttribute="bottom" id="Nof-ez-kWz"/>
                             <constraint firstItem="pWh-Hk-YzZ" firstAttribute="leading" secondItem="0G1-O6-fPI" secondAttribute="leading" id="Qru-FU-YrV"/>
                             <constraint firstAttribute="bottom" secondItem="pWh-Hk-YzZ" secondAttribute="bottom" id="STg-lN-c04"/>
+                            <constraint firstItem="I9P-t9-o4Y" firstAttribute="centerY" secondItem="b59-XH-JSp" secondAttribute="centerY" id="TR5-oX-CiT"/>
                             <constraint firstAttribute="bottom" secondItem="mTh-HU-7C9" secondAttribute="bottom" id="ZSL-bc-yTD"/>
                             <constraint firstItem="pWh-Hk-YzZ" firstAttribute="top" secondItem="0G1-O6-fPI" secondAttribute="top" id="aGZ-X7-K6H"/>
                             <constraint firstAttribute="trailing" relation="greaterThanOrEqual" secondItem="nQu-I8-OqK" secondAttribute="trailing" constant="20" id="eYV-TZ-5bu"/>
                             <constraint firstAttribute="trailing" secondItem="fLo-NU-bGv" secondAttribute="trailing" constant="58" id="ep6-4T-swC"/>
+                            <constraint firstItem="I9P-t9-o4Y" firstAttribute="centerX" secondItem="b59-XH-JSp" secondAttribute="centerX" id="gnY-O5-3SB"/>
                             <constraint firstItem="nQu-I8-OqK" firstAttribute="leading" secondItem="96h-Ck-yux" secondAttribute="trailing" constant="16" id="hKM-YS-17O"/>
                             <constraint firstAttribute="trailing" secondItem="pWh-Hk-YzZ" secondAttribute="trailing" id="qXD-FT-b4Y"/>
                             <constraint firstItem="nQu-I8-OqK" firstAttribute="centerY" secondItem="96h-Ck-yux" secondAttribute="centerY" id="qi0-9n-sUF"/>
                             <constraint firstItem="fLo-NU-bGv" firstAttribute="leading" secondItem="0G1-O6-fPI" secondAttribute="leading" constant="58" id="rWx-rp-2nh"/>
                             <constraint firstItem="96h-Ck-yux" firstAttribute="top" secondItem="0G1-O6-fPI" secondAttribute="top" constant="32" id="rg7-1o-hhd"/>
+                            <constraint firstItem="I9P-t9-o4Y" firstAttribute="top" relation="greaterThanOrEqual" secondItem="fLo-NU-bGv" secondAttribute="bottom" constant="8" symbolic="YES" id="rtM-iM-wUt"/>
                             <constraint firstItem="mTh-HU-7C9" firstAttribute="leading" secondItem="0G1-O6-fPI" secondAttribute="leading" constant="48" id="rza-vo-ne6"/>
+                            <constraint firstItem="I9P-t9-o4Y" firstAttribute="centerX" secondItem="fLo-NU-bGv" secondAttribute="centerX" id="w2T-Uf-wSq"/>
                         </constraints>
                     </view>
                     <connections>
                         <outlet property="colorView" destination="pWh-Hk-YzZ" id="n4l-p3-mej"/>
                         <outlet property="contextMenu" destination="f4d-eZ-YLo" id="qae-Le-1CK"/>
+                        <outlet property="emptyState" destination="I9P-t9-o4Y" id="pJ2-CO-qfr"/>
+                        <outlet property="emptyStateMessage" destination="NwF-DN-Ena" id="a33-QA-OZc"/>
+                        <outlet property="emptyStateTitle" destination="LTY-g7-MLc" id="3cM-x5-wox"/>
                         <outlet property="tableView" destination="b59-XH-JSp" id="PpV-fJ-Dcg"/>
                     </connections>
                 </viewController>
@@ -292,7 +356,7 @@
                     </connections>
                 </menu>
             </objects>
-            <point key="canvasLocation" x="669" y="172"/>
+            <point key="canvasLocation" x="669" y="408.5"/>
         </scene>
         <!--Bookmark Popover View Controller-->
         <scene sceneID="3pH-Ju-wLu">
@@ -603,12 +667,13 @@ Gw
         <scene sceneID="zFa-lt-gPi">
             <objects>
                 <viewController storyboardIdentifier="BookmarkListViewController" id="Scx-gG-IP9" customClass="BookmarkListViewController" customModule="DuckDuckGo_Privacy_Browser" customModuleProvider="target" sceneMemberID="viewController">
-                    <view key="view" autoresizesSubviews="NO" translatesAutoresizingMaskIntoConstraints="NO" id="xb9-2G-g28">
-                        <rect key="frame" x="0.0" y="0.0" width="357" height="489"/>
+                    <view key="view" autoresizesSubviews="NO" id="xb9-2G-g28">
+                        <rect key="frame" x="0.0" y="0.0" width="420" height="453"/>
+                        <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                         <subviews>
                             <box boxType="custom" borderType="none" cornerRadius="4" title="Box" id="w8x-KI-XTE">
-                                <rect key="frame" x="-85" y="-25" width="527" height="568"/>
-                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                                <rect key="frame" x="0.0" y="0.0" width="527" height="568"/>
+                                <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                 <view key="contentView" id="FFC-K5-ECO">
                                     <rect key="frame" x="0.0" y="0.0" width="527" height="568"/>
                                     <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
@@ -616,7 +681,7 @@ Gw
                                 <color key="fillColor" name="PopoverBackgroundColor"/>
                             </box>
                             <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="TJx-89-ls4">
-                                <rect key="frame" x="13" y="457" width="89" height="20"/>
+                                <rect key="frame" x="13" y="421" width="89" height="20"/>
                                 <textFieldCell key="cell" lineBreakMode="clipping" title="Bookmarks" id="HqW-8W-PJu">
                                     <font key="font" size="17" name="SFProDisplay-Semibold"/>
                                     <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
@@ -624,10 +689,10 @@ Gw
                                 </textFieldCell>
                             </textField>
                             <box verticalHuggingPriority="750" boxType="separator" translatesAutoresizingMaskIntoConstraints="NO" id="Wgx-ZT-vUV" userLabel="Divider">
-                                <rect key="frame" x="0.0" y="442" width="357" height="5"/>
+                                <rect key="frame" x="0.0" y="406" width="420" height="5"/>
                             </box>
                             <button translatesAutoresizingMaskIntoConstraints="NO" id="qBa-rT-8sF" userLabel="New Bookmark Button" customClass="MouseOverButton" customModule="DuckDuckGo_Privacy_Browser" customModuleProvider="target">
-                                <rect key="frame" x="245" y="455" width="24" height="24"/>
+                                <rect key="frame" x="308" y="419" width="24" height="24"/>
                                 <constraints>
                                     <constraint firstAttribute="height" constant="24" id="9mk-iy-mXT"/>
                                     <constraint firstAttribute="width" constant="24" id="kiL-Lk-pWq"/>
@@ -653,7 +718,7 @@ Gw
                                 </connections>
                             </button>
                             <button translatesAutoresizingMaskIntoConstraints="NO" id="xMD-lr-ArK" userLabel="New Folder Button" customClass="MouseOverButton" customModule="DuckDuckGo_Privacy_Browser" customModuleProvider="target">
-                                <rect key="frame" x="279" y="455" width="24" height="24"/>
+                                <rect key="frame" x="342" y="419" width="24" height="24"/>
                                 <constraints>
                                     <constraint firstAttribute="height" constant="24" id="BWu-UC-Ow7"/>
                                     <constraint firstAttribute="width" constant="24" id="wml-gt-OK1"/>
@@ -679,7 +744,7 @@ Gw
                                 </connections>
                             </button>
                             <button translatesAutoresizingMaskIntoConstraints="NO" id="pTk-xE-OqR" userLabel="Show Management UI Button" customClass="MouseOverButton" customModule="DuckDuckGo_Privacy_Browser" customModuleProvider="target">
-                                <rect key="frame" x="313" y="455" width="24" height="24"/>
+                                <rect key="frame" x="376" y="419" width="24" height="24"/>
                                 <constraints>
                                     <constraint firstAttribute="width" constant="24" id="cBD-Aw-Rsl"/>
                                     <constraint firstAttribute="height" constant="24" id="rgG-V6-CDn"/>
@@ -705,19 +770,19 @@ Gw
                                 </connections>
                             </button>
                             <scrollView borderType="none" autohidesScrollers="YES" horizontalLineScroll="24" horizontalPageScroll="10" verticalLineScroll="24" verticalPageScroll="10" hasHorizontalScroller="NO" usesPredominantAxisScrolling="NO" translatesAutoresizingMaskIntoConstraints="NO" id="sfH-at-DQe" userLabel="Bookmarks Outline View">
-                                <rect key="frame" x="0.0" y="0.0" width="357" height="444"/>
-                                <clipView key="contentView" drawsBackground="NO" translatesAutoresizingMaskIntoConstraints="NO" id="jhZ-VR-onf">
-                                    <rect key="frame" x="0.0" y="0.0" width="357" height="444"/>
+                                <rect key="frame" x="0.0" y="0.0" width="420" height="408"/>
+                                <clipView key="contentView" drawsBackground="NO" id="jhZ-VR-onf">
+                                    <rect key="frame" x="0.0" y="0.0" width="420" height="408"/>
                                     <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                     <subviews>
-                                        <outlineView verticalHuggingPriority="750" allowsExpansionToolTips="YES" columnAutoresizingStyle="lastColumnOnly" columnResizing="NO" multipleSelection="NO" autosaveColumns="NO" rowHeight="24" usesAutomaticRowHeights="YES" viewBased="YES" indentationPerLevel="13" outlineTableColumn="UgF-sw-0QC" translatesAutoresizingMaskIntoConstraints="NO" id="66p-cd-DbA" customClass="BookmarksOutlineView" customModule="DuckDuckGo_Privacy_Browser" customModuleProvider="target">
-                                            <rect key="frame" x="0.0" y="0.0" width="357" height="444"/>
+                                        <outlineView verticalHuggingPriority="750" allowsExpansionToolTips="YES" columnAutoresizingStyle="lastColumnOnly" columnResizing="NO" multipleSelection="NO" autosaveColumns="NO" rowHeight="24" usesAutomaticRowHeights="YES" viewBased="YES" indentationPerLevel="13" outlineTableColumn="UgF-sw-0QC" id="66p-cd-DbA" customClass="BookmarksOutlineView" customModule="DuckDuckGo_Privacy_Browser" customModuleProvider="target">
+                                            <rect key="frame" x="0.0" y="0.0" width="408" height="408"/>
                                             <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                             <size key="intercellSpacing" width="17" height="0.0"/>
                                             <color key="backgroundColor" name="ClearColor"/>
                                             <color key="gridColor" name="ClearColor"/>
                                             <tableColumns>
-                                                <tableColumn width="325" minWidth="325" maxWidth="1000" id="UgF-sw-0QC">
+                                                <tableColumn width="376" minWidth="325" maxWidth="1000" id="UgF-sw-0QC">
                                                     <tableHeaderCell key="headerCell" lineBreakMode="truncatingTail" borderStyle="border">
                                                         <color key="textColor" name="headerTextColor" catalog="System" colorSpace="catalog"/>
                                                         <color key="backgroundColor" name="headerColor" catalog="System" colorSpace="catalog"/>
@@ -751,8 +816,66 @@ Gw
                                     <outlet property="menu" destination="glL-gu-nIh" id="iAr-HS-i2o"/>
                                 </connections>
                             </scrollView>
+                            <customView hidden="YES" translatesAutoresizingMaskIntoConstraints="NO" id="ziZ-XM-tSu">
+                                <rect key="frame" x="39" y="25" width="342" height="383"/>
+                                <subviews>
+                                    <imageView horizontalHuggingPriority="251" verticalHuggingPriority="251" translatesAutoresizingMaskIntoConstraints="NO" id="WZt-zq-I2M">
+                                        <rect key="frame" x="107" y="193" width="128" height="96"/>
+                                        <constraints>
+                                            <constraint firstAttribute="width" constant="128" id="GPh-R0-HdO"/>
+                                            <constraint firstAttribute="height" constant="96" id="fE4-RX-Sxb"/>
+                                        </constraints>
+                                        <imageCell key="cell" refusesFirstResponder="YES" alignment="left" imageScaling="proportionallyDown" image="BookmarksEmpty" id="HE9-Wu-hju"/>
+                                    </imageView>
+                                    <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="1ce-Da-33o">
+                                        <rect key="frame" x="73" y="166" width="196" height="19"/>
+                                        <constraints>
+                                            <constraint firstAttribute="width" constant="192" id="wey-FY-4Ip"/>
+                                        </constraints>
+                                        <textFieldCell key="cell" alignment="center" title="No bookmarks yet" id="SBF-Z2-Epi">
+                                            <font key="font" metaFont="systemSemibold" size="15"/>
+                                            <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
+                                            <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
+                                        </textFieldCell>
+                                    </textField>
+                                    <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="1Te-SN-ek2">
+                                        <rect key="frame" x="73" y="110" width="196" height="48"/>
+                                        <constraints>
+                                            <constraint firstAttribute="width" constant="192" id="CsZ-nA-pG6"/>
+                                        </constraints>
+                                        <textFieldCell key="cell" alignment="center" title="If your bookmarks are saved in another browser, you can import them into DuckDuckGo." id="39F-rl-iAg">
+                                            <font key="font" metaFont="system"/>
+                                            <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
+                                            <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
+                                        </textFieldCell>
+                                    </textField>
+                                    <button verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="xBY-EI-RYm">
+                                        <rect key="frame" x="134" y="75" width="75" height="32"/>
+                                        <buttonCell key="cell" type="push" title="Import" bezelStyle="rounded" alignment="center" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="uXp-el-wPt">
+                                            <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
+                                            <font key="font" metaFont="system"/>
+                                        </buttonCell>
+                                        <connections>
+                                            <action selector="onImportClicked:" target="Scx-gG-IP9" id="m99-82-5ax"/>
+                                        </connections>
+                                    </button>
+                                </subviews>
+                                <constraints>
+                                    <constraint firstAttribute="width" constant="342" id="APC-C4-A77"/>
+                                    <constraint firstItem="xBY-EI-RYm" firstAttribute="top" secondItem="1Te-SN-ek2" secondAttribute="bottom" constant="8" id="CD2-e8-dEz"/>
+                                    <constraint firstItem="1ce-Da-33o" firstAttribute="centerX" secondItem="ziZ-XM-tSu" secondAttribute="centerX" id="S6x-JH-Lng"/>
+                                    <constraint firstAttribute="height" constant="383" id="WIZ-JC-snI"/>
+                                    <constraint firstItem="WZt-zq-I2M" firstAttribute="centerX" secondItem="ziZ-XM-tSu" secondAttribute="centerX" id="XPg-IF-oln"/>
+                                    <constraint firstItem="xBY-EI-RYm" firstAttribute="centerX" secondItem="ziZ-XM-tSu" secondAttribute="centerX" id="bXy-Os-DAD"/>
+                                    <constraint firstItem="1Te-SN-ek2" firstAttribute="top" secondItem="1ce-Da-33o" secondAttribute="bottom" constant="8" id="psx-bE-GsF"/>
+                                    <constraint firstItem="1ce-Da-33o" firstAttribute="top" secondItem="WZt-zq-I2M" secondAttribute="bottom" constant="8" id="xcs-GZ-4Ta"/>
+                                    <constraint firstItem="WZt-zq-I2M" firstAttribute="top" secondItem="ziZ-XM-tSu" secondAttribute="top" constant="94.5" id="xf8-Ws-cdm"/>
+                                    <constraint firstItem="1Te-SN-ek2" firstAttribute="centerX" secondItem="ziZ-XM-tSu" secondAttribute="centerX" id="zEF-iC-ggd"/>
+                                </constraints>
+                            </customView>
                         </subviews>
                         <constraints>
+                            <constraint firstItem="ziZ-XM-tSu" firstAttribute="centerX" secondItem="Wgx-ZT-vUV" secondAttribute="centerX" id="6g2-xw-QwJ"/>
                             <constraint firstItem="sfH-at-DQe" firstAttribute="top" secondItem="Wgx-ZT-vUV" secondAttribute="bottom" id="HCS-40-lt3"/>
                             <constraint firstAttribute="trailing" secondItem="Wgx-ZT-vUV" secondAttribute="trailing" id="IHY-bB-P4D"/>
                             <constraint firstAttribute="trailing" secondItem="pTk-xE-OqR" secondAttribute="trailing" constant="20" symbolic="YES" id="JB3-nj-EBU"/>
@@ -766,12 +889,16 @@ Gw
                             <constraint firstItem="sfH-at-DQe" firstAttribute="leading" secondItem="xb9-2G-g28" secondAttribute="leading" id="j7E-WK-AS8"/>
                             <constraint firstItem="xMD-lr-ArK" firstAttribute="leading" secondItem="qBa-rT-8sF" secondAttribute="trailing" constant="10" symbolic="YES" id="jLx-74-nNz"/>
                             <constraint firstItem="TJx-89-ls4" firstAttribute="leading" secondItem="xb9-2G-g28" secondAttribute="leading" constant="15" id="jlk-qH-vHa"/>
+                            <constraint firstItem="ziZ-XM-tSu" firstAttribute="top" secondItem="Wgx-ZT-vUV" secondAttribute="bottom" id="oKx-XS-L5q"/>
                             <constraint firstItem="qBa-rT-8sF" firstAttribute="centerY" secondItem="TJx-89-ls4" secondAttribute="centerY" id="pkc-Pa-8yn"/>
                             <constraint firstItem="pTk-xE-OqR" firstAttribute="centerY" secondItem="TJx-89-ls4" secondAttribute="centerY" id="umv-FL-gFh"/>
                         </constraints>
                     </view>
                     <connections>
                         <outlet property="contextMenu" destination="glL-gu-nIh" id="hNS-Ys-6PW"/>
+                        <outlet property="emptyState" destination="ziZ-XM-tSu" id="n1i-7d-W48"/>
+                        <outlet property="emptyStateMessage" destination="1Te-SN-ek2" id="7Lu-g0-VVP"/>
+                        <outlet property="emptyStateTitle" destination="1ce-Da-33o" id="n3W-I6-rcZ"/>
                         <outlet property="outlineView" destination="66p-cd-DbA" id="Shg-RA-vKK"/>
                     </connections>
                 </viewController>
@@ -788,6 +915,7 @@ Gw
     <resources>
         <image name="AddBookmark" width="16" height="16"/>
         <image name="AddFolder" width="16" height="16"/>
+        <image name="BookmarksEmpty" width="128" height="96"/>
         <image name="Expand" width="16" height="16"/>
         <image name="Favorite" width="16" height="16"/>
         <namedColor name="ButtonColor">
