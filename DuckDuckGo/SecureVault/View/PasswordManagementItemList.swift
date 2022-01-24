@@ -23,7 +23,6 @@ import BrowserServicesKit
 struct PasswordManagementItemListView: View {
 
     @EnvironmentObject var model: PasswordManagementItemListModel
-    @State private var timer = Timer.publish(every: 2, tolerance: 0, on: .main, in: .default, options: nil).autoconnect()
 
     var body: some View {
 
