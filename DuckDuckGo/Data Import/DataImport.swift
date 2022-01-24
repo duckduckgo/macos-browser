@@ -79,7 +79,12 @@ enum DataImport {
             case .brave, .chrome, .edge:
                 // Chromium profiles are either named "Default", or a series of incrementing profile names, i.e. "Profile 1", "Profile 2", etc.
                 let potentialProfiles = profileURLs.map(BrowserProfile.init(profileURL:))
-                let filteredProfiles =  potentialProfiles.filter { $0.hasNonDefaultProfileName || $0.profileName == "Default" || $0.profileName.hasPrefix("Profile ") }
+                let filteredProfiles =  potentialProfiles.filter {
+                    $0.hasNonDefaultProfileName ||
+                    $0.profileName == "Default" ||
+                    $0.profileName.hasPrefix("Profile ")
+                }
+
                 let sortedProfiles = filteredProfiles.sorted()
 
                 self.profiles = sortedProfiles
