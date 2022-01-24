@@ -131,6 +131,11 @@ final class AddressBarTextField: NSTextField {
     }
 
     private func updateValue() {
+        guard !isHomepageAddressBar else {
+            value = .text("")
+            return
+        }
+
         guard let selectedTabViewModel = tabCollectionViewModel.selectedTabViewModel else {
             return
         }
