@@ -28,13 +28,20 @@ final class ContentBlockerRulesLists: DefaultContentBlockerRulesListsSource {
     }
     
     static var fbTrackerDataFile: Data = {
-        let url = Bundle.main.url(forResource: "fb-tds", withExtension: "json")!
-        return (try? Data(contentsOf: url)) ?? Data()
+        do {
+            let url = Bundle.main.url(forResource: "fb-tds", withExtension: "json")!
+            return try Data(contentsOf: url)
+        } catch {
+            fatalError("Failed to load FB-TDS")
+        }
     }()
 
     static var fbTrackerDataSet: TrackerRadarKit.TrackerData = {
-        let trackerData = (try? JSONDecoder().decode(TrackerData.self, from: fbTrackerDataFile)) ?? nil
-        return trackerData!
+        do {
+            return try JSONDecoder().decode(TrackerData.self, from: fbTrackerDataFile)
+        } catch {
+            fatalError("Failed to JSON decode FB-TDS")
+        }
     }()
     
     func MD5(data: Data) -> String {
