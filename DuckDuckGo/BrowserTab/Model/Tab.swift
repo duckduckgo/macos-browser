@@ -21,6 +21,7 @@ import WebKit
 import os
 import Combine
 import BrowserServicesKit
+import TrackerRadarKit
 
 protocol TabDelegate: FileDownloadManagerDelegate {
     func tabWillStartNavigation(_ tab: Tab, isUserInitiated: Bool)
@@ -105,6 +106,7 @@ final class Tab: NSObject {
          webViewConfiguration: WebViewConfiguration? = nil,
          historyCoordinating: HistoryCoordinating = HistoryCoordinator.shared,
          scriptsSource: ScriptSourceProviding = DefaultScriptSourceProvider.shared,
+         contentBlockingManager: ContentBlockerRulesManager = ContentBlocking.contentBlockingManager,
          visitedDomains: Set<String> = Set<String>(),
          title: String? = nil,
          error: Error? = nil,
@@ -118,6 +120,7 @@ final class Tab: NSObject {
         self.faviconManagement = faviconManagement
         self.historyCoordinating = historyCoordinating
         self.scriptsSource = scriptsSource
+        self.contentBlockingManager = contentBlockingManager
         self.visitedDomains = visitedDomains
         self.title = title
         self.error = error
@@ -152,7 +155,9 @@ final class Tab: NSObject {
     var userEnteredUrl = true
 
     var contentChangeEnabled = true
-
+    
+    var fbBlockingEnabled = true
+    
     @Published private(set) var content: TabContent {
         didSet {
             handleFavicon(oldContent: oldValue)
@@ -309,6 +314,33 @@ final class Tab: NSObject {
         }
     }
 
+    @discardableResult
+    private func setFBProtection(enabled: Bool) -> Bool {
+        guard self.fbBlockingEnabled != enabled else {
+            return false
+        }
+
+        if let fbRules = contentBlockingManager.currentRules.first(where: {
+            $0.name == ContentBlockerRulesLists.Constants.clickToLoadRulesListName
+        }) {
+            if self.fbBlockingEnabled {
+                self.fbBlockingEnabled = false
+                webView.configuration.userContentController.remove(fbRules.rulesList)
+            } else {
+                self.fbBlockingEnabled = true
+                webView.configuration.userContentController.add(fbRules.rulesList)
+            }
+            return true
+        } else {
+            assertionFailure("Missing FB List")
+        }
+        return false
+    }
+
+    private func clickToLoadBlockFB() {
+        setFBProtection(enabled: true)
+    }
+
     private func reloadIfNeeded(shouldLoadInBackground: Bool = false) {
         let url: URL
         switch self.content {
@@ -412,6 +444,8 @@ final class Tab: NSObject {
 
     let scriptsSource: ScriptSourceProviding
     private var userScriptsUpdatedCancellable: AnyCancellable?
+    
+    let contentBlockingManager: ContentBlockerRulesManager
 
     lazy var emailManager: EmailManager = {
         let emailManager = EmailManager()
@@ -437,6 +471,7 @@ final class Tab: NSObject {
             userScripts.contextMenuScript.delegate = self
             userScripts.surrogatesScript.delegate = self
             userScripts.contentBlockerRulesScript.delegate = self
+            userScripts.clickToLoadScript.delegate = self
             userScripts.autofillScript.emailDelegate = emailManager
             userScripts.autofillScript.vaultDelegate = vaultManager
             userScripts.pageObserverScript.delegate = self
@@ -604,16 +639,35 @@ extension Tab: ContentBlockerRulesUserScriptDelegate {
         return true
     }
 
+    func contentBlockerRulesUserScriptShouldProcessCTLTrackers(_ script: ContentBlockerRulesUserScript) -> Bool {
+        return fbBlockingEnabled
+    }
+
     func contentBlockerRulesUserScript(_ script: ContentBlockerRulesUserScript, detectedTracker tracker: DetectedTracker) {
         trackerInfo?.add(detectedTracker: tracker)
     }
 
 }
 
-extension Tab: SurrogatesUserScriptDelegate {
+extension Tab: ClickToLoadUserScriptDelegate {
 
+    func clickToLoadUserScriptAllowFB(_ script: UserScript, replyHandler: @escaping (Bool) -> Void) {
+        guard self.fbBlockingEnabled else {
+            replyHandler(true)
+            return
+        }
+        
+        if setFBProtection(enabled: false) {
+            replyHandler(true)
+        } else {
+            replyHandler(false)
+        }
+    }
+}
+
+extension Tab: SurrogatesUserScriptDelegate {
     func surrogatesUserScriptShouldProcessTrackers(_ script: SurrogatesUserScript) -> Bool {
-        return true
+         return true
     }
 
     func surrogatesUserScript(_ script: SurrogatesUserScript, detectedTracker tracker: DetectedTracker, withSurrogate host: String) {
@@ -809,6 +863,7 @@ extension Tab: WKNavigationDelegate {
     }
 
     func webView(_ webView: WKWebView, didStartProvisionalNavigation navigation: WKNavigation!) {
+        self.clickToLoadBlockFB()
         delegate?.tabDidStartNavigation(self)
 
         // Unnecessary assignment triggers publishing
