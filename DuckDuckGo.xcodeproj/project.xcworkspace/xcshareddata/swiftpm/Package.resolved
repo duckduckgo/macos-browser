@@ -5,8 +5,8 @@
         "package": "BrowserServicesKit",
         "repositoryURL": "https://github.com/duckduckgo/BrowserServicesKit",
         "state": {
-          "branch": "feature/bartek/multiple-blocking-rule-lists",
-          "revision": "73b2e4d8faa54fce6907d72dd8141aa7e20be283",
+          "branch": null,
+          "revision": "da3f840edb7d9adf681c3fed0b4da6ad841fd288",
           "version": null
         }
       },
