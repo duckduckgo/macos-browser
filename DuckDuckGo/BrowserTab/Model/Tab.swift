@@ -103,7 +103,7 @@ final class Tab: NSObject {
     init(content: TabContent,
          faviconManagement: FaviconManagement = FaviconManager.shared,
          webCacheManager: WebCacheManager = WebCacheManager.shared,
-         webViewConfiguration: WebViewConfiguration? = nil,
+         webViewConfiguration: WKWebViewConfiguration? = nil,
          historyCoordinating: HistoryCoordinating = HistoryCoordinator.shared,
          scriptsSource: ScriptSourceProviding = DefaultScriptSourceProvider.shared,
          contentBlockingManager: ContentBlockerRulesManager = ContentBlocking.contentBlockingManager,
