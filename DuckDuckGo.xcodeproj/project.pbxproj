@@ -463,6 +463,7 @@
 		B6106BB126A7D8720013B453 /* PermissionStoreTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = B6106BB026A7D8720013B453 /* PermissionStoreTests.swift */; };
 		B6106BB326A7F4AA0013B453 /* GeolocationServiceMock.swift in Sources */ = {isa = PBXBuildFile; fileRef = B6106BB226A7F4AA0013B453 /* GeolocationServiceMock.swift */; };
 		B6106BB526A809E60013B453 /* GeolocationProviderTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = B6106BB426A809E60013B453 /* GeolocationProviderTests.swift */; };
+		B610F2BB27A145C500FCEBE9 /* RulesCompilationMonitor.swift in Sources */ = {isa = PBXBuildFile; fileRef = B610F2BA27A145C500FCEBE9 /* RulesCompilationMonitor.swift */; };
 		B61EF3EC266F91E700B4D78F /* WKWebView+Download.swift in Sources */ = {isa = PBXBuildFile; fileRef = B61EF3EB266F91E700B4D78F /* WKWebView+Download.swift */; };
 		B61EF3F1266F922200B4D78F /* WKProcessPool+DownloadDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = B61EF3F0266F922200B4D78F /* WKProcessPool+DownloadDelegate.swift */; };
 		B61F015525EDD5A700ABB5A3 /* UserContentController.swift in Sources */ = {isa = PBXBuildFile; fileRef = B61F015425EDD5A700ABB5A3 /* UserContentController.swift */; };
@@ -1144,6 +1145,7 @@
 		B6106BB026A7D8720013B453 /* PermissionStoreTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PermissionStoreTests.swift; sourceTree = "<group>"; };
 		B6106BB226A7F4AA0013B453 /* GeolocationServiceMock.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GeolocationServiceMock.swift; sourceTree = "<group>"; };
 		B6106BB426A809E60013B453 /* GeolocationProviderTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GeolocationProviderTests.swift; sourceTree = "<group>"; };
+		B610F2BA27A145C500FCEBE9 /* RulesCompilationMonitor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RulesCompilationMonitor.swift; sourceTree = "<group>"; };
 		B61EF3EB266F91E700B4D78F /* WKWebView+Download.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "WKWebView+Download.swift"; sourceTree = "<group>"; };
 		B61EF3F0266F922200B4D78F /* WKProcessPool+DownloadDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "WKProcessPool+DownloadDelegate.swift"; sourceTree = "<group>"; };
 		B61F015425EDD5A700ABB5A3 /* UserContentController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UserContentController.swift; sourceTree = "<group>"; };
@@ -3057,7 +3059,6 @@
 				AA88D14A252A557100980B4E /* URLRequestExtension.swift */,
 				B6DB3AEE278D5C370024C5C4 /* URLSessionExtension.swift */,
 				AAA0CC69253CC43C0079BC96 /* WKUserContentControllerExtension.swift */,
-				4B7A60A0273E0BE400BBDFEB /* WKWebsiteDataStoreExtension.swift */,
 				B63D466725BEB6C200874977 /* WKWebView+Private.h */,
 				B63D466825BEB6C200874977 /* WKWebView+SessionState.swift */,
 				B68458CC25C7EB9000DC17B6 /* WKWebViewConfigurationExtensions.swift */,
@@ -3395,6 +3396,7 @@
 				B6A9E47E26146A800067D1B9 /* PixelArguments.swift */,
 				B6A9E48326146AAB0067D1B9 /* PixelParameters.swift */,
 				B6A9E4A2261475C70067D1B9 /* AppUsageActivityMonitor.swift */,
+				B610F2BA27A145C500FCEBE9 /* RulesCompilationMonitor.swift */,
 				B6DA44012616B28300DD1EC2 /* PixelDataStore.swift */,
 				B68C92C32750EF76002AC6B0 /* PixelDataRecord.swift */,
 				B6DA44062616B30600DD1EC2 /* PixelDataModel.xcdatamodeld */,
@@ -3873,6 +3875,7 @@
 				1430DFF524D0580F00B8978C /* TabBarViewController.swift in Sources */,
 				4B92929B26670D2A00AD2C21 /* BookmarkOutlineViewDataSource.swift in Sources */,
 				85D885B026A590A90077C374 /* NSNotificationName+PasswordManager.swift in Sources */,
+				B610F2BB27A145C500FCEBE9 /* RulesCompilationMonitor.swift in Sources */,
 				AAC30A28268E045400D2D9CD /* CrashReportReader.swift in Sources */,
 				85AC3B3525DA82A600C7D2AA /* DataTaskProviding.swift in Sources */,
 				AAEF6BC8276A081C0024DCF4 /* FaviconSelector.swift in Sources */,

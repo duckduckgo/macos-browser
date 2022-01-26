@@ -36,6 +36,57 @@ extension Pixel {
 
         case crash
 
+        enum OnboardingShown: String, CustomStringConvertible {
+            var description: String { rawValue }
+
+            init(_ value: Bool) {
+                if value {
+                    self = .onboardingShown
+                } else {
+                    self = .regularNavigation
+                }
+            }
+            case onboardingShown = "onboarding-shown"
+            case regularNavigation = "regular-nav"
+        }
+
+        enum WaitResult: String, CustomStringConvertible {
+            var description: String { rawValue }
+
+            case closed
+            case quit
+            case success
+        }
+
+        enum CompileRulesWaitTime: String, CustomStringConvertible {
+            var description: String { rawValue }
+
+            case lessThan5s = "5"
+            case lessThan10s = "10"
+            case lessThan20s = "20"
+            case lessThan40s = "40"
+            case more = "more"
+        }
+        case compileRulesWait(onboardingShown: OnboardingShown, waitTime: CompileRulesWaitTime, result: WaitResult)
+        static func compileRulesWait(onboardingShown: Bool, waitTime interval: TimeInterval, result: WaitResult) -> Event {
+            let waitTime: CompileRulesWaitTime
+            switch interval {
+            case ...5:
+                waitTime = .lessThan5s
+            case ...10:
+                waitTime = .lessThan10s
+            case ...20:
+                waitTime = .lessThan20s
+            case ...40:
+                waitTime = .lessThan40s
+            default:
+                waitTime = .more
+            }
+            return .compileRulesWait(onboardingShown: OnboardingShown(onboardingShown),
+                                     waitTime: waitTime,
+                                     result: result)
+        }
+
         case fireproof(kind: FireproofKind, repetition: Repetition = .init(key: "fireproof"), suggested: FireproofingSuggested)
         case fireproofSuggested(repetition: Repetition = .init(key: "fireproof-suggested"))
 
@@ -161,6 +212,9 @@ extension Pixel.Event {
 
         case .crash:
             return "m_mac_crash"
+
+        case .compileRulesWait(onboardingShown: let onboardingShown, waitTime: let waitTime, result: let result):
+            return "m_mac_cbr-wait_\(onboardingShown)_\(waitTime)_\(result)"
 
         case .fireproof(kind: let kind, repetition: let repetition, suggested: let suggested):
             return "m_mac_fireproof_\(kind)_\(repetition)_\(suggested)"

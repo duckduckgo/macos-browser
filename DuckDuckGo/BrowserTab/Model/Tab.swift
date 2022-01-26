@@ -405,6 +405,12 @@ final class Tab: NSObject {
         reloadIfNeeded(shouldLoadInBackground: shouldLoadInBackground)
     }
 
+    func tabWillClose() {
+        webView.stopLoading()
+        webView.stopMediaCapture()
+        RulesCompilationMonitor.shared.tabWillClose(self)
+    }
+
     // MARK: - Open External URL
 
     let externalUrlHandler = ExternalURLHandler()
@@ -814,7 +820,9 @@ extension Tab: WKNavigationDelegate {
         }
 
         if navigationAction.isTargetingMainFrame && !url.isDuckDuckGo {
-            await webView.configuration.userContentController.awaitContentBlockingRulesInstalled()
+            RulesCompilationMonitor.shared.tabWillWaitForRulesCompilation(self)
+            let waitTime = await webView.configuration.userContentController.awaitContentBlockingRulesInstalled()
+            RulesCompilationMonitor.shared.tab(self, didFinishWaitingForRulesWithWaitTime: waitTime)
         }
         self.willPerformNavigationAction(navigationAction)
 

@@ -73,6 +73,7 @@ extension Pixel.Event {
              .browserMadeDefault,
              .burn,
              .crash,
+             .compileRulesWait,
              .fireproof,
              .fireproofSuggested,
              .bookmark,

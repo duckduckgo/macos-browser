@@ -58,7 +58,9 @@ final class Pixel {
         guard !dryRun else {
             os_log(.debug, log: .pixel, "%@", pixelName.replacingOccurrences(of: "_", with: "."))
 
-            onComplete(nil)
+            DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
+                onComplete(nil)
+            }
             return
         }
 

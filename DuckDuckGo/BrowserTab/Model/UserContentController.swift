@@ -65,29 +65,31 @@ final class UserContentController: WKUserContentController {
         }
     }
 
-    func userContentControllerContentBlockingRulesInstalled() async {
+    func userContentControllerContentBlockingRulesInstalled() async -> TimeInterval? {
         guard self.privacyConfigurationManager.privacyConfig.isEnabled(featureKey: .contentBlocking),
               !contentRulesInstalled
-        else { return }
+        else { return nil }
 
+        let start = CACurrentMediaTime()
         await withCheckedContinuation { c in
             self.contentRulesInstalledContinuation = { [continuation=self.contentRulesInstalledContinuation] in
                 c.resume()
                 continuation?()
             }
         } as Void
+        return CACurrentMediaTime() - start
     }
 
 }
 
 extension WKUserContentController {
 
-    func awaitContentBlockingRulesInstalled() async {
+    func awaitContentBlockingRulesInstalled() async -> TimeInterval? {
         guard let self = self as? UserContentController else {
             assertionFailure("unexpected WKUserContentController")
-            return
+            return nil
         }
-        await self.userContentControllerContentBlockingRulesInstalled()
+        return await self.userContentControllerContentBlockingRulesInstalled()
     }
 
 }
