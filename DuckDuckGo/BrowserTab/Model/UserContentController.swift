@@ -37,6 +37,16 @@ final class UserContentController: WKUserContentController {
         fatalError("init(coder:) has not been implemented")
     }
 
+    private var contentRulesInstalledContinuation: (() -> Void)?
+    private var contentRulesInstalled = false {
+        didSet {
+            if contentRulesInstalled {
+                contentRulesInstalledContinuation?()
+                self.contentRulesInstalledContinuation = nil
+            }
+        }
+    }
+
     func installContentBlockingRules(publisher: ContentBlockingUpdating.NewRulesPublisher) {
         blockingRulesUpdatedCancellable = publisher.receive(on: RunLoop.main).sink { [weak self] newRules in
             dispatchPrecondition(condition: .onQueue(.main))
@@ -50,8 +60,34 @@ final class UserContentController: WKUserContentController {
                 for rules in newRules.rules {
                     self.add(rules.rulesList)
                 }
+                self.contentRulesInstalled = true
             }
         }
+    }
+
+    func userContentControllerContentBlockingRulesInstalled() async {
+        guard self.privacyConfigurationManager.privacyConfig.isEnabled(featureKey: .contentBlocking),
+              !contentRulesInstalled
+        else { return }
+
+        await withCheckedContinuation { c in
+            self.contentRulesInstalledContinuation = { [continuation=self.contentRulesInstalledContinuation] in
+                c.resume()
+                continuation?()
+            }
+        } as Void
+    }
+
+}
+
+extension WKUserContentController {
+
+    func awaitContentBlockingRulesInstalled() async {
+        guard let self = self as? UserContentController else {
+            assertionFailure("unexpected WKUserContentController")
+            return
+        }
+        await self.userContentControllerContentBlockingRulesInstalled()
     }
 
 }

@@ -733,9 +733,9 @@ extension Tab: WKNavigationDelegate {
 
     // swiftlint:disable cyclomatic_complexity
     // swiftlint:disable function_body_length
+    @MainActor
     func webView(_ webView: WKWebView,
-                 decidePolicyFor navigationAction: WKNavigationAction,
-                 decisionHandler: @escaping (WKNavigationActionPolicy) -> Void) {
+                 decidePolicyFor navigationAction: WKNavigationAction) async -> WKNavigationActionPolicy {
 
         webView.customUserAgent = UserAgent.for(navigationAction.request.url)
 
@@ -746,15 +746,16 @@ extension Tab: WKNavigationDelegate {
                 // Auto-cancel simulated Back action when upgrading to HTTPS or GPC from Client Redirect
                 self.webView.frozenCanGoForward = nil
                 self.webView.frozenCanGoBack = nil
-                decisionHandler(.cancel)
-                return
+
+                return .cancel
 
             } else if navigationAction.navigationType != .backForward,
                let request = GPCRequestFactory.shared.requestForGPC(basedOn: navigationAction.request) {
                 self.invalidateBackItemIfNeeded(for: navigationAction)
-                decisionHandler(.cancel)
-                webView.load(request)
-                return
+                defer {
+                    webView.load(request)
+                }
+                return .cancel
             }
         }
 
@@ -770,25 +771,23 @@ extension Tab: WKNavigationDelegate {
         let isLinkActivated = navigationAction.navigationType == .linkActivated
         let isMiddleClicked = navigationAction.buttonNumber == Constants.webkitMiddleClick
         if isLinkActivated && NSApp.isCommandPressed || isMiddleClicked {
-            decisionHandler(.cancel)
-            delegate?.tab(self, requestedNewTabWith: navigationAction.request.url.map { .url($0) } ?? .none, selected: NSApp.isShiftPressed)
-            return
+            defer {
+                delegate?.tab(self, requestedNewTabWith: navigationAction.request.url.map { .url($0) } ?? .none, selected: NSApp.isShiftPressed)
+            }
+            return .cancel
         } else if isLinkActivated && NSApp.isOptionPressed && !NSApp.isCommandPressed {
-            decisionHandler(.download(navigationAction, using: webView))
-            return
+            return .download(navigationAction, using: webView)
         }
 
         guard let url = navigationAction.request.url, let urlScheme = url.scheme else {
             self.willPerformNavigationAction(navigationAction)
-            decisionHandler(.allow)
-            return
+            return .allow
         }
 
         if navigationAction.shouldDownload {
             // register the navigationAction for legacy _WKDownload to be called back on the Tab
             // further download will be passed to webView:navigationAction:didBecomeDownload:
-            decisionHandler(.download(navigationAction, using: webView))
-            return
+            return .download(navigationAction, using: webView)
 
         } else if externalUrlHandler.isExternal(scheme: urlScheme) {
             // ignore <iframe src="custom://url"> but allow via address bar
@@ -799,29 +798,27 @@ extension Tab: WKNavigationDelegate {
                                       fromFrame: fromFrame,
                                       triggeredByUser: navigationAction.navigationType == .linkActivated)
 
-            decisionHandler(.cancel)
-            return
+            return .cancel
         }
 
-        HTTPSUpgrade.shared.isUpgradeable(url: url) { [weak self] isUpgradable in
-            guard let self = self else {
-                decisionHandler(.cancel)
-                return
-            }
+        let isUpgradable = HTTPSUpgrade.shared.isUpgradeable(url: url)
 
-            if isUpgradable && navigationAction.isTargetingMainFrame,
-                let upgradedUrl = url.toHttps() {
+        if isUpgradable && navigationAction.isTargetingMainFrame,
+            let upgradedUrl = url.toHttps() {
 
-                self.invalidateBackItemIfNeeded(for: navigationAction)
-                self.webView.load(upgradedUrl)
-                self.setConnectionUpgradedTo(upgradedUrl, navigationAction: navigationAction)
-                decisionHandler(.cancel)
-                return
-            }
+            self.invalidateBackItemIfNeeded(for: navigationAction)
+            self.webView.load(upgradedUrl)
+            self.setConnectionUpgradedTo(upgradedUrl, navigationAction: navigationAction)
 
-            self.willPerformNavigationAction(navigationAction)
-            decisionHandler(.allow)
+            return .cancel
         }
+
+        if navigationAction.isTargetingMainFrame && !url.isDuckDuckGo {
+            await webView.configuration.userContentController.awaitContentBlockingRulesInstalled()
+        }
+        self.willPerformNavigationAction(navigationAction)
+
+        return .allow
     }
     // swiftlint:enable cyclomatic_complexity
     // swiftlint:enable function_body_length

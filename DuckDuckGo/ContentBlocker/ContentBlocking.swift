@@ -38,6 +38,7 @@ final class ContentBlocking {
 
     static let contentBlockingManager = ContentBlockerRulesManager(rulesSource: contentBlockerRulesSource,
                                                                    exceptionsSource: exceptionsSource,
+                                                                   cache: ContentBlockingRulesCache(),
                                                                    updateListener: contentBlockingUpdating,
                                                                    logger: OSLog.contentBlocking)
     
@@ -132,6 +133,17 @@ final class ContentBlockingUpdating: ContentBlockerRulesUpdating {
                       changes: [String: ContentBlockerRulesIdentifier.Difference],
                       completionTokens: [ContentBlockerRulesManager.CompletionToken]) {
         contentBlockingRulesSubject.send((rules: rules, changes: changes, completionTokens: Set(completionTokens)))
+    }
+
+}
+
+final class ContentBlockingRulesCache: ContentBlockerRulesCaching {
+
+    @UserDefaultsWrapper(key: .contentBlockingRulesCache, defaultValue: [:])
+    public var contentRulesCache: [String: Date]
+
+    var contentRulesCacheInterval: TimeInterval {
+        7 * 24 * 3600
     }
 
 }

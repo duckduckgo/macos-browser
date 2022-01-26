@@ -22,7 +22,6 @@ import BrowserServicesKit
 
 final class HTTPSUpgrade {
 
-    typealias UpgradeCheckCompletion = (Bool) -> Void
     static let shared = HTTPSUpgrade()
     
     private let dataReloadLock = NSLock()
@@ -33,33 +32,28 @@ final class HTTPSUpgrade {
         self.store = store
     }
 
-    func isUpgradeable(url: URL, completion: @escaping UpgradeCheckCompletion,
-                       config: PrivacyConfiguration = ContentBlocking.privacyConfigurationManager.privacyConfig) {
+    func isUpgradeable(url: URL, config: PrivacyConfiguration = ContentBlocking.privacyConfigurationManager.privacyConfig) -> Bool {
         
         guard url.scheme == URL.NavigationalScheme.http.rawValue else {
-            completion(false)
-            return
+            return false
         }
         
         guard let host = url.host else {
-            completion(false)
-            return
+            return false
         }
         
         if store.shouldExcludeDomain(host) {
-            completion(false)
-            return
+            return false
         }
 
         guard config.isFeature(.httpsUpgrade, enabledForDomain: host) else {
-            completion(false)
-            return
+            return false
         }
         
         waitForAnyReloadsToComplete()
         let isUpgradable = isInUpgradeList(host: host)
-        completion(isUpgradable)
-           
+
+        return isUpgradable
     }
     
     private func isInUpgradeList(host: String) -> Bool {
