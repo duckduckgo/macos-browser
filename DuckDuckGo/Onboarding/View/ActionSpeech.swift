@@ -30,7 +30,7 @@ struct ActionSpeech: View {
     @State var typingFinished = false
 
     var body: some View {
-        VStack {
+        VStack(spacing: 15) {
             DaxSpeech(text: text) {
                 withAnimation {
                     typingFinished = true
@@ -55,7 +55,7 @@ struct ActionSpeech: View {
 
             }
             .visibility(typingFinished ? .visible : .gone)
-            .frame(width: speachWidth - 8)
+            .frame(width: speechWidth)
 
         }
     }
