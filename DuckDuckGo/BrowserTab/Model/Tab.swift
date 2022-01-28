@@ -22,7 +22,7 @@ import os
 import Combine
 import BrowserServicesKit
 
-protocol TabDelegate: FileDownloadManagerDelegate {
+protocol TabDelegate: FileDownloadManagerDelegate, OverlayProtocol {
     func tabDidStartNavigation(_ tab: Tab)
     func tab(_ tab: Tab, requestedNewTabWith content: Tab.TabContent, selected: Bool)
     func tab(_ tab: Tab, willShowContextMenuAt position: NSPoint, image: URL?, link: URL?, selectedText: String?)
@@ -40,31 +40,7 @@ protocol TabDelegate: FileDownloadManagerDelegate {
 
 // swiftlint:disable type_body_length
 // swiftlint:disable file_length
-final class Tab: NSObject, OverlayProtocol {
-
-    private var cancellables = Set<AnyCancellable>()
-
-    private var _contentOverlayPopover: ContentOverlayPopover?
-    public var contentOverlayPopover: ContentOverlayPopover {
-        if _contentOverlayPopover == nil {
-            _contentOverlayPopover = ContentOverlayPopover()
-        }
-        return _contentOverlayPopover!
-    }
-
-    public func getContentOverlayPopover(_ response: AutofillMessaging) -> ContentOverlayPopover? {
-        contentOverlayPopover.viewController.messageInterfaceBack = response
-        WindowControllersManager.shared.stateChanged
-            .sink { _ in
-                self.contentOverlayPopover.close()
-            }.store(in: &cancellables)
-        // Private API to hide the popover arrow
-        contentOverlayPopover.setValue(true, forKeyPath: "shouldHideAnchor")
-        contentOverlayPopover.zoomFactor = self.webView.magnification
-        contentOverlayPopover.webView = self.webView
-        return contentOverlayPopover
-    }
-
+final class Tab: NSObject {
 
     enum TabContent: Equatable {
         case homepage
@@ -167,8 +143,6 @@ final class Tab: NSObject, OverlayProtocol {
     // MARK: - Properties
 
     let webView: WebView
-    
-    var clickPoint: NSPoint?
 
     var userEnteredUrl = true
 
@@ -453,7 +427,7 @@ final class Tab: NSObject, OverlayProtocol {
         return manager
     }()
 
-    public var topView: OverlayProtocol?
+    // public var topView: OverlayProtocol?
 
     // TODO make private again
     public var userScripts: UserScripts! {
@@ -468,7 +442,7 @@ final class Tab: NSObject, OverlayProtocol {
             userScripts.contextMenuScript.delegate = self
             userScripts.surrogatesScript.delegate = self
             userScripts.contentBlockerRulesScript.delegate = self
-            userScripts.autofillScript.topView = self
+            userScripts.autofillScript.topView = self.delegate
             userScripts.autofillScript.emailDelegate = emailManager
             userScripts.autofillScript.vaultDelegate = vaultManager
             userScripts.pageObserverScript.delegate = self
@@ -566,6 +540,13 @@ final class Tab: NSObject, OverlayProtocol {
     // print operation and ignores incoming printHandler messages if one exists.
     fileprivate var activePrintOperation: NSPrintOperation?
 
+}
+
+extension Tab: AutofillUserScriptDelegate {
+    func clickTriggered(clickPoint: NSPoint) {
+        userScripts.autofillScript.clickPoint = clickPoint
+        userScripts.autofillScript.topView = self.delegate
+    }
 }
 
 extension Tab: PrintingUserScriptDelegate {
