@@ -337,10 +337,6 @@ final class Tab: NSObject {
         return false
     }
 
-    private func clickToLoadBlockFB() {
-        setFBProtection(enabled: true)
-    }
-
     private func reloadIfNeeded(shouldLoadInBackground: Bool = false) {
         let url: URL
         switch self.content {
@@ -783,6 +779,16 @@ extension Tab: WKNavigationDelegate {
             decisionHandler(.allow)
             return
         }
+        
+        let privacyConfigurationManager = ContentBlocking.privacyConfigurationManager
+        let privacyConfiguration = privacyConfigurationManager.privacyConfig
+
+        let featureEnabled = privacyConfiguration.isFeature(.clickToPlay, enabledForDomain: url.host)
+        if featureEnabled {
+            setFBProtection(enabled: true)
+        } else {
+            setFBProtection(enabled: false)
+        }
 
         if navigationAction.shouldDownload {
             // register the navigationAction for legacy _WKDownload to be called back on the Tab
@@ -863,7 +869,6 @@ extension Tab: WKNavigationDelegate {
     }
 
     func webView(_ webView: WKWebView, didStartProvisionalNavigation navigation: WKNavigation!) {
-        self.clickToLoadBlockFB()
         delegate?.tabDidStartNavigation(self)
 
         // Unnecessary assignment triggers publishing
