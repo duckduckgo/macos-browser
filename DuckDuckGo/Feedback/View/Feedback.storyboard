@@ -1,0 +1,243 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<document type="com.apple.InterfaceBuilder3.Cocoa.Storyboard.XIB" version="3.0" toolsVersion="19529" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES">
+    <dependencies>
+        <deployment identifier="macosx"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="19529"/>
+        <capability name="Named colors" minToolsVersion="9.0"/>
+        <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
+    </dependencies>
+    <scenes>
+        <!--Window Controller-->
+        <scene sceneID="FZH-OE-Mx2">
+            <objects>
+                <windowController storyboardIdentifier="FeedbackWindowController" id="n1V-pB-Dar" sceneMemberID="viewController">
+                    <window key="window" title="Window" allowsToolTipsWhenApplicationIsInactive="NO" autorecalculatesKeyViewLoop="NO" releasedWhenClosed="NO" visibleAtLaunch="NO" frameAutosaveName="" animationBehavior="default" titlebarAppearsTransparent="YES" titleVisibility="hidden" id="1yO-BO-t61" customClass="FeedbackWindow" customModule="DuckDuckGo_Privacy_Browser" customModuleProvider="target">
+                        <windowStyleMask key="styleMask" titled="YES" closable="YES" fullSizeContentView="YES"/>
+                        <windowPositionMask key="initialPositionMask" leftStrut="YES" rightStrut="YES" topStrut="YES" bottomStrut="YES"/>
+                        <rect key="contentRect" x="216" y="264" width="360" height="320"/>
+                        <rect key="screenRect" x="0.0" y="0.0" width="1536" height="935"/>
+                        <view key="contentView" id="9E9-JX-Qhb">
+                            <rect key="frame" x="0.0" y="0.0" width="360" height="320"/>
+                            <autoresizingMask key="autoresizingMask"/>
+                        </view>
+                        <connections>
+                            <outlet property="delegate" destination="n1V-pB-Dar" id="ZwH-lt-Tw6"/>
+                        </connections>
+                    </window>
+                    <connections>
+                        <segue destination="TOa-sP-KHa" kind="relationship" relationship="window.shadowedContentViewController" id="2YK-yx-ncM"/>
+                    </connections>
+                </windowController>
+                <customObject id="Nmr-Vd-3ch" userLabel="First Responder" customClass="NSResponder" sceneMemberID="firstResponder"/>
+            </objects>
+            <point key="canvasLocation" x="-299" y="567"/>
+        </scene>
+        <!--Feedback View Controller-->
+        <scene sceneID="NVa-uK-UhP">
+            <objects>
+                <viewController id="TOa-sP-KHa" customClass="FeedbackViewController" customModule="DuckDuckGo_Privacy_Browser" customModuleProvider="target" sceneMemberID="viewController">
+                    <view key="view" id="Ie8-lu-6dX">
+                        <rect key="frame" x="0.0" y="0.0" width="360" height="320"/>
+                        <autoresizingMask key="autoresizingMask"/>
+                        <subviews>
+                            <customView translatesAutoresizingMaskIntoConstraints="NO" id="B4Q-yT-nKT" customClass="ColorView" customModule="DuckDuckGo_Privacy_Browser" customModuleProvider="target">
+                                <rect key="frame" x="0.0" y="235" width="360" height="85"/>
+                                <subviews>
+                                    <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="7KM-rJ-r28">
+                                        <rect key="frame" x="38" y="24" width="284" height="38"/>
+                                        <constraints>
+                                            <constraint firstAttribute="width" constant="280" id="WpG-jC-P2k"/>
+                                            <constraint firstAttribute="height" constant="38" id="h5E-7e-FnD"/>
+                                        </constraints>
+                                        <textFieldCell key="cell" alignment="center" title="Help DuckDuckGo Improve macOS App" id="M7g-24-ECG">
+                                            <font key="font" metaFont="systemSemibold" size="15"/>
+                                            <color key="textColor" name="GreyTextColor"/>
+                                            <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
+                                        </textFieldCell>
+                                    </textField>
+                                    <button hidden="YES" translatesAutoresizingMaskIntoConstraints="NO" id="gmY-Cl-KRc">
+                                        <rect key="frame" x="8" y="57" width="20" height="20"/>
+                                        <constraints>
+                                            <constraint firstAttribute="height" constant="20" id="5Cl-wW-X8R"/>
+                                            <constraint firstAttribute="width" constant="20" id="NJC-UV-HPf"/>
+                                        </constraints>
+                                        <buttonCell key="cell" type="square" bezelStyle="shadowlessSquare" image="Close" imagePosition="only" alignment="center" imageScaling="proportionallyUpOrDown" inset="2" id="aRg-eO-aAC">
+                                            <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
+                                            <font key="font" metaFont="system"/>
+                                        </buttonCell>
+                                    </button>
+                                </subviews>
+                                <constraints>
+                                    <constraint firstAttribute="height" constant="85" id="0od-R2-dBY"/>
+                                    <constraint firstItem="7KM-rJ-r28" firstAttribute="centerX" secondItem="B4Q-yT-nKT" secondAttribute="centerX" id="B3c-lB-0Ee"/>
+                                    <constraint firstItem="7KM-rJ-r28" firstAttribute="centerY" secondItem="B4Q-yT-nKT" secondAttribute="centerY" id="EyM-8M-vKg"/>
+                                    <constraint firstItem="gmY-Cl-KRc" firstAttribute="leading" secondItem="B4Q-yT-nKT" secondAttribute="leading" constant="8" id="JCT-9z-jBi"/>
+                                    <constraint firstItem="gmY-Cl-KRc" firstAttribute="top" secondItem="B4Q-yT-nKT" secondAttribute="top" constant="8" id="aj3-d1-Icj"/>
+                                </constraints>
+                                <userDefinedRuntimeAttributes>
+                                    <userDefinedRuntimeAttribute type="color" keyPath="backgroundColor">
+                                        <color key="value" name="FirePopoverPanelBackground"/>
+                                    </userDefinedRuntimeAttribute>
+                                </userDefinedRuntimeAttributes>
+                            </customView>
+                            <box verticalHuggingPriority="750" boxType="separator" translatesAutoresizingMaskIntoConstraints="NO" id="iPz-Dg-VNs">
+                                <rect key="frame" x="0.0" y="233" width="360" height="5"/>
+                            </box>
+                            <customView translatesAutoresizingMaskIntoConstraints="NO" id="wYB-07-s0m" customClass="ColorView" customModule="DuckDuckGo_Privacy_Browser" customModuleProvider="target">
+                                <rect key="frame" x="0.0" y="0.0" width="360" height="235"/>
+                                <subviews>
+                                    <button verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="Gy6-KF-A15">
+                                        <rect key="frame" x="14" y="14" width="332" height="40"/>
+                                        <constraints>
+                                            <constraint firstAttribute="height" constant="28" id="vLC-1q-2RZ"/>
+                                        </constraints>
+                                        <buttonCell key="cell" type="push" title="Submit" bezelStyle="rounded" alignment="center" controlSize="large" enabled="NO" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="ng8-Xz-jPD">
+                                            <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
+                                            <font key="font" metaFont="system"/>
+                                            <string key="keyEquivalent" base64-UTF8="YES">
+DQ
+</string>
+                                        </buttonCell>
+                                        <connections>
+                                            <action selector="submitButtonAction:" target="TOa-sP-KHa" id="5ag-9f-dye"/>
+                                        </connections>
+                                    </button>
+                                    <scrollView borderType="line" horizontalLineScroll="10" horizontalPageScroll="10" verticalLineScroll="10" verticalPageScroll="10" hasHorizontalScroller="NO" translatesAutoresizingMaskIntoConstraints="NO" id="A0q-Tl-XgR">
+                                        <rect key="frame" x="20" y="68" width="320" height="97"/>
+                                        <clipView key="contentView" id="8R6-WZ-VlP">
+                                            <rect key="frame" x="1" y="1" width="318" height="95"/>
+                                            <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                                            <subviews>
+                                                <textView editable="NO" importsGraphics="NO" richText="NO" verticallyResizable="YES" smartInsertDelete="YES" id="PPh-o7-ch1">
+                                                    <rect key="frame" x="0.0" y="0.0" width="318" height="95"/>
+                                                    <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                                                    <color key="textColor" name="textColor" catalog="System" colorSpace="catalog"/>
+                                                    <color key="backgroundColor" name="FirePopoverPanelBackground"/>
+                                                    <size key="minSize" width="318" height="95"/>
+                                                    <size key="maxSize" width="410" height="10000000"/>
+                                                    <color key="insertionPointColor" name="textColor" catalog="System" colorSpace="catalog"/>
+                                                </textView>
+                                            </subviews>
+                                            <color key="backgroundColor" name="FirePopoverPanelBackground"/>
+                                        </clipView>
+                                        <scroller key="horizontalScroller" hidden="YES" wantsLayer="YES" verticalHuggingPriority="750" horizontal="YES" id="52O-vd-BdQ">
+                                            <rect key="frame" x="-100" y="-100" width="240" height="16"/>
+                                            <autoresizingMask key="autoresizingMask"/>
+                                        </scroller>
+                                        <scroller key="verticalScroller" wantsLayer="YES" verticalHuggingPriority="750" horizontal="NO" id="03x-cI-gFA">
+                                            <rect key="frame" x="303" y="1" width="16" height="95"/>
+                                            <autoresizingMask key="autoresizingMask"/>
+                                        </scroller>
+                                    </scrollView>
+                                    <popUpButton translatesAutoresizingMaskIntoConstraints="NO" id="7Z6-Ji-PH7">
+                                        <rect key="frame" x="17" y="181" width="326" height="37"/>
+                                        <constraints>
+                                            <constraint firstAttribute="height" constant="30" id="Fw3-Y4-XV0"/>
+                                        </constraints>
+                                        <popUpButtonCell key="cell" type="bevel" title="Pick a category" bezelStyle="regularSquare" alignment="left" lineBreakMode="truncatingTail" state="on" borderStyle="border" tag="-1" inset="2" selectedItem="z2T-3Y-jPK" id="gWx-cK-gfz">
+                                            <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
+                                            <font key="font" metaFont="menu"/>
+                                            <menu key="menu" id="wtn-Rl-BIC">
+                                                <items>
+                                                    <menuItem title="Pick a category" state="on" tag="-1" id="z2T-3Y-jPK"/>
+                                                    <menuItem isSeparatorItem="YES" id="K5Z-td-X6u"/>
+                                                    <menuItem title="Website is broken" id="uoX-qE-3kz"/>
+                                                    <menuItem title="DuckDuckGo App is broken" tag="1" id="Yti-fm-YMV"/>
+                                                    <menuItem title="Feature request" tag="2" id="I6J-ps-0Vy"/>
+                                                    <menuItem title="General Feedback" tag="3" id="GSM-nJ-01d"/>
+                                                </items>
+                                            </menu>
+                                        </popUpButtonCell>
+                                        <connections>
+                                            <action selector="categoryPopUpButton:" target="TOa-sP-KHa" id="Ob6-Fs-Z0f"/>
+                                        </connections>
+                                    </popUpButton>
+                                    <popUpButton hidden="YES" translatesAutoresizingMaskIntoConstraints="NO" id="hUd-Rb-6Ls">
+                                        <rect key="frame" x="17" y="131" width="326" height="37"/>
+                                        <constraints>
+                                            <constraint firstAttribute="height" constant="30" id="3Tm-Sk-Wei"/>
+                                        </constraints>
+                                        <popUpButtonCell key="cell" type="bevel" title="Pick your issue from the list" bezelStyle="regularSquare" alignment="left" lineBreakMode="truncatingTail" state="on" borderStyle="border" tag="-1" inset="2" selectedItem="50u-Do-Pk7" id="d1R-Kk-zzo">
+                                            <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
+                                            <font key="font" metaFont="menu"/>
+                                            <menu key="menu" id="5HU-z4-NLx">
+                                                <items>
+                                                    <menuItem title="Pick your issue from the list" state="on" tag="-1" id="50u-Do-Pk7"/>
+                                                    <menuItem isSeparatorItem="YES" id="VgP-Y6-9FR"/>
+                                                    <menuItem title="Video didn't play" id="Lcy-nr-Bvy"/>
+                                                    <menuItem title="The site asked me to disable" tag="1" id="Jbl-XF-mkd"/>
+                                                    <menuItem title="Images didn't load" tag="2" id="AMn-JN-Npb"/>
+                                                    <menuItem title="Content is missing" tag="3" id="naz-Hr-IpO"/>
+                                                    <menuItem title="Comments didn't load" tag="4" id="0YV-Mw-KfP"/>
+                                                    <menuItem title="I can't sign in" tag="5" id="ks1-6b-EFw"/>
+                                                    <menuItem title="Links or buttons don't work" tag="6" id="Fhy-jA-gGf"/>
+                                                    <menuItem title="Something else" tag="7" id="dYh-6K-3z6"/>
+                                                </items>
+                                            </menu>
+                                        </popUpButtonCell>
+                                        <connections>
+                                            <action selector="subcategoryPopUpButton:" target="TOa-sP-KHa" id="HLX-Ka-Z1l"/>
+                                        </connections>
+                                    </popUpButton>
+                                </subviews>
+                                <constraints>
+                                    <constraint firstItem="Gy6-KF-A15" firstAttribute="leading" secondItem="wYB-07-s0m" secondAttribute="leading" constant="20" symbolic="YES" id="1M2-iH-q0F"/>
+                                    <constraint firstItem="A0q-Tl-XgR" firstAttribute="top" secondItem="7Z6-Ji-PH7" secondAttribute="bottom" constant="20" id="51h-NH-qUw"/>
+                                    <constraint firstAttribute="trailing" secondItem="hUd-Rb-6Ls" secondAttribute="trailing" constant="20" symbolic="YES" id="84Y-DV-nEP"/>
+                                    <constraint firstItem="hUd-Rb-6Ls" firstAttribute="leading" secondItem="wYB-07-s0m" secondAttribute="leading" constant="20" symbolic="YES" id="ANC-4S-Obb"/>
+                                    <constraint firstAttribute="trailing" secondItem="A0q-Tl-XgR" secondAttribute="trailing" constant="20" symbolic="YES" id="HY8-OE-Gh5"/>
+                                    <constraint firstAttribute="trailing" secondItem="Gy6-KF-A15" secondAttribute="trailing" constant="20" symbolic="YES" id="J4k-PJ-uFO"/>
+                                    <constraint firstItem="Gy6-KF-A15" firstAttribute="top" secondItem="A0q-Tl-XgR" secondAttribute="bottom" constant="20" symbolic="YES" id="Jfz-FB-TMT"/>
+                                    <constraint firstAttribute="bottom" secondItem="Gy6-KF-A15" secondAttribute="bottom" constant="20" symbolic="YES" id="KOD-v1-Y2g"/>
+                                    <constraint firstItem="7Z6-Ji-PH7" firstAttribute="top" secondItem="wYB-07-s0m" secondAttribute="top" constant="20" symbolic="YES" id="ZL6-G9-svI"/>
+                                    <constraint firstItem="A0q-Tl-XgR" firstAttribute="leading" secondItem="wYB-07-s0m" secondAttribute="leading" constant="20" symbolic="YES" id="jVn-2H-Vak"/>
+                                    <constraint firstItem="7Z6-Ji-PH7" firstAttribute="leading" secondItem="wYB-07-s0m" secondAttribute="leading" constant="20" symbolic="YES" id="sQp-ga-TtJ"/>
+                                    <constraint firstItem="hUd-Rb-6Ls" firstAttribute="top" secondItem="7Z6-Ji-PH7" secondAttribute="bottom" constant="20" id="v0s-Ol-fR0"/>
+                                    <constraint firstAttribute="trailing" secondItem="7Z6-Ji-PH7" secondAttribute="trailing" constant="20" symbolic="YES" id="zCp-C1-Fcy"/>
+                                </constraints>
+                                <userDefinedRuntimeAttributes>
+                                    <userDefinedRuntimeAttribute type="color" keyPath="backgroundColor">
+                                        <color key="value" name="InterfaceBackgroundColor"/>
+                                    </userDefinedRuntimeAttribute>
+                                </userDefinedRuntimeAttributes>
+                            </customView>
+                        </subviews>
+                        <constraints>
+                            <constraint firstItem="B4Q-yT-nKT" firstAttribute="top" secondItem="Ie8-lu-6dX" secondAttribute="top" id="3Dc-AK-Lr4"/>
+                            <constraint firstAttribute="trailing" secondItem="wYB-07-s0m" secondAttribute="trailing" id="54G-1j-PDV"/>
+                            <constraint firstItem="wYB-07-s0m" firstAttribute="leading" secondItem="Ie8-lu-6dX" secondAttribute="leading" id="70v-uj-SxJ"/>
+                            <constraint firstItem="B4Q-yT-nKT" firstAttribute="leading" secondItem="Ie8-lu-6dX" secondAttribute="leading" id="ADl-PW-sIG"/>
+                            <constraint firstAttribute="trailing" secondItem="B4Q-yT-nKT" secondAttribute="trailing" id="Qvt-j3-DaC"/>
+                            <constraint firstAttribute="trailing" secondItem="iPz-Dg-VNs" secondAttribute="trailing" id="Xte-41-dmx"/>
+                            <constraint firstAttribute="bottom" secondItem="wYB-07-s0m" secondAttribute="bottom" id="iNT-d7-7lc"/>
+                            <constraint firstItem="iPz-Dg-VNs" firstAttribute="bottom" secondItem="B4Q-yT-nKT" secondAttribute="bottom" id="k6G-bc-JFm"/>
+                            <constraint firstItem="wYB-07-s0m" firstAttribute="top" secondItem="B4Q-yT-nKT" secondAttribute="bottom" id="lQH-dg-3tL"/>
+                            <constraint firstItem="iPz-Dg-VNs" firstAttribute="leading" secondItem="Ie8-lu-6dX" secondAttribute="leading" id="qPT-VT-BJu"/>
+                        </constraints>
+                    </view>
+                    <connections>
+                        <outlet property="categoryPopUpButton" destination="7Z6-Ji-PH7" id="4aZ-ZE-ym6"/>
+                        <outlet property="scrollView" destination="A0q-Tl-XgR" id="NHW-V2-BZn"/>
+                        <outlet property="subcategoryPopUpButton" destination="hUd-Rb-6Ls" id="DqR-hE-Sm5"/>
+                        <outlet property="submitButton" destination="Gy6-KF-A15" id="aBn-VX-sGY"/>
+                        <outlet property="textView" destination="PPh-o7-ch1" id="y3m-Dd-CS2"/>
+                    </connections>
+                </viewController>
+                <customObject id="FaH-Lu-sfn" userLabel="First Responder" customClass="NSResponder" sceneMemberID="firstResponder"/>
+            </objects>
+            <point key="canvasLocation" x="-299" y="1038"/>
+        </scene>
+    </scenes>
+    <resources>
+        <image name="Close" width="16" height="16"/>
+        <namedColor name="FirePopoverPanelBackground">
+            <color red="0.98000001907348633" green="0.98000001907348633" blue="0.98000001907348633" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+        </namedColor>
+        <namedColor name="GreyTextColor">
+            <color red="0.20000000000000001" green="0.20000000000000001" blue="0.20000000000000001" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+        </namedColor>
+        <namedColor name="InterfaceBackgroundColor">
+            <color red="1" green="1" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+        </namedColor>
+    </resources>
+</document>

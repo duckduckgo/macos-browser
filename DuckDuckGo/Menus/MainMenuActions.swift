@@ -59,20 +59,23 @@ extension AppDelegate {
 #if FEEDBACK
 
     @IBAction func openFeedback(_ sender: Any?) {
-        guard let windowController = WindowControllersManager.shared.lastKeyMainWindowController else {
-            WindowsManager.openNewWindow(with: URL.feedback)
+        // swiftlint:disable force_cast
+        let windowController = NSStoryboard.feedback.instantiateController(withIdentifier: "FeedbackWindowController") as! NSWindowController
+        // swiftlint:enable force_cast
+
+        guard let window = windowController.window as? FeedbackWindow, let screen = window.screen else {
+            assertionFailure("HomepageViewController: Failed to present FeedbackWindowController")
             return
         }
 
-        let mainViewController = windowController.mainViewController
+        let windowFrame = NSRect(x: screen.frame.origin.x + screen.frame.size.width / 2.0 - FeedbackWindow.Size.width / 2.0,
+                                 y: screen.frame.origin.y + screen.frame.size.height / 2.0 - FeedbackWindow.Size.height / 2.0,
+                                 width: FeedbackWindow.Size.width,
+                                 height: FeedbackWindow.Size.height)
 
-        DefaultConfigurationStorage.shared.log()
-        ConfigurationManager.shared.log()
-
-        let tab = Tab(content: .url(.feedback))
-        let tabCollectionViewModel = mainViewController.tabCollectionViewModel
-        tabCollectionViewModel.append(tab: tab)
-        windowController.window?.makeKeyAndOrderFront(nil)
+        WindowControllersManager.shared.lastKeyMainWindowController?.window?.addChildWindow(window, ordered: .above)
+        window.setFrame(windowFrame, display: true)
+        window.makeKeyAndOrderFront(nil)
     }
 
 #endif
@@ -630,5 +633,12 @@ extension MainViewController: FindInPageDelegate {
     func findInPageDone(_ controller: FindInPageViewController) {
         self.tabCollectionViewModel.selectedTabViewModel?.closeFindInPage()
     }
+
+}
+
+
+fileprivate extension NSStoryboard {
+
+    static let feedback = NSStoryboard(name: "Feedback", bundle: .main)
 
 }
