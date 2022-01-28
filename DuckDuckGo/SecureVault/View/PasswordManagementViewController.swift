@@ -113,7 +113,8 @@ final class PasswordManagementViewController: NSViewController {
                                  selectItemMatchingDomain: String? = nil,
                                  clearWhenNoMatches: Bool = false,
                                  completion: (() -> Void)? = nil) {
-        fetchSecureVaultItems { [weak self] items in
+        let category = SecureVaultSorting.Category.allItems
+        fetchSecureVaultItems(category: category) { [weak self] items in
             self?.listModel?.update(items: items)
             self?.searchField.stringValue = text
             self?.updateFilter()
@@ -542,17 +543,34 @@ final class PasswordManagementViewController: NSViewController {
         listModel?.filter = text
     }
 
-    private func fetchSecureVaultItems(completion: @escaping ([SecureVaultItem]) -> Void) {
+    private func fetchSecureVaultItems(category: SecureVaultSorting.Category = .allItems, completion: @escaping ([SecureVaultItem]) -> Void) {
         DispatchQueue.global(qos: .userInitiated).async {
-            let accounts = (try? self.secureVault?.accounts()) ?? []
-            let cards = (try? self.secureVault?.creditCards()) ?? []
-            let notes = (try? self.secureVault?.notes()) ?? []
-            let identities = (try? self.secureVault?.identities()) ?? []
+            var items: [SecureVaultItem]
+            
+            switch category {
+            case .allItems:
+                let accounts = (try? self.secureVault?.accounts()) ?? []
+                let cards = (try? self.secureVault?.creditCards()) ?? []
+                let notes = (try? self.secureVault?.notes()) ?? []
+                let identities = (try? self.secureVault?.identities()) ?? []
 
-            let items = accounts.map(SecureVaultItem.account) +
+                items = accounts.map(SecureVaultItem.account) +
                         cards.map(SecureVaultItem.card) +
                         notes.map(SecureVaultItem.note) +
                         identities.map(SecureVaultItem.identity)
+            case .logins:
+                let accounts = (try? self.secureVault?.accounts()) ?? []
+                items = accounts.map(SecureVaultItem.account)
+            case .identities:
+                let identities = (try? self.secureVault?.identities()) ?? []
+                items = identities.map(SecureVaultItem.identity)
+            case .cards:
+                let cards = (try? self.secureVault?.creditCards()) ?? []
+                items = cards.map(SecureVaultItem.card)
+            case .notes:
+                let notes = (try? self.secureVault?.notes()) ?? []
+                items = notes.map(SecureVaultItem.note)
+            }
 
             DispatchQueue.main.async {
                 self.emptyState.isHidden = !items.isEmpty

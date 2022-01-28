@@ -1,5 +1,5 @@
 //
-//  PasswordManagementItemList.swift
+//  PasswordManagementItemListView.swift
 //
 //  Copyright © 2021 DuckDuckGo. All rights reserved.
 //
@@ -27,17 +27,22 @@ struct PasswordManagementItemListView: View {
     var body: some View {
 
         if #available(macOS 11.0, *) {
-            ScrollView {
-                ScrollViewReader { proxy in
-                    PasswordManagementItemListStackView()
-                        .onAppear {
-                            // Scrolling to the selected item doesn't work consistently without a very slight delay.
-                            DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
-                                if let selectionID = model.selected?.id {
-                                    proxy.scrollTo(selectionID, anchor: .center)
+            VStack {
+                PasswordManagementItemListCategoryView()
+                    .padding([.top, .leading, .trailing], 10)
+                
+                ScrollView {
+                    ScrollViewReader { proxy in
+                        PasswordManagementItemListStackView()
+                            .onAppear {
+                                // Scrolling to the selected item doesn't work consistently without a very slight delay.
+                                DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
+                                    if let selectionID = model.selected?.id {
+                                        proxy.scrollTo(selectionID, anchor: .center)
+                                    }
                                 }
                             }
-                        }
+                    }
                 }
             }
         } else {
@@ -46,6 +51,62 @@ struct PasswordManagementItemListView: View {
 
     }
 
+}
+
+struct PasswordManagementItemListCategoryView: View {
+    
+    @EnvironmentObject var model: PasswordManagementItemListModel
+    
+    @State private var sort: Int = 0
+
+    var body: some View {
+        
+        HStack {
+            
+            Picker("", selection: $model.selectedCategory) {
+                ForEach(SecureVaultSorting.Category.allCases, id: \.self) { category in
+                    HStack {
+                        if let imageName = category.imageName {
+                            Image(imageName)
+                        }
+                        Text(category.rawValue)
+                    }
+                    
+                    if category == .allItems {
+                        Divider()
+                    }
+                }
+            }.labelsHidden()
+            
+            Spacer()
+
+            MenuButton(label:
+                Image("SortAscending")
+            ) {
+                Picker("", selection: $model.selectedCategory) {
+                    ForEach(SecureVaultSorting.Category.allCases, id: \.self) {
+                        if $0 == .allItems {
+                            Text($0.rawValue)
+                            Divider()
+                        } else {
+                            Text($0.rawValue)
+                        }
+                    }
+                }
+                .labelsHidden()
+                .pickerStyle(.radioGroup)
+
+                Divider()
+
+                Button("Oldest to Most Recent") { }
+                Button("Most Recent to Oldest") { }
+            }
+            .menuButtonStyle(BorderlessButtonMenuButtonStyle())
+            .frame(width: 16, height: 16)
+
+        }
+        
+    }
 }
 
 struct PasswordManagementItemListStackView: View {
@@ -64,6 +125,28 @@ struct PasswordManagementItemListStackView: View {
             }
         }
         
+    }
+    
+}
+
+struct PasswordManagementItemListTableView: View {
+    
+    @EnvironmentObject var model: PasswordManagementItemListModel
+
+    var body: some View {
+        
+        List {
+            ForEach(model.displayedItems, id: \.title) { section in
+                Section(header: Text(section.title)) {
+                    ForEach(section.items) { item in
+                        ItemView(item: item, selected: model.selected == item) {
+                            model.selected(item: item)
+                        }
+                    }
+                }
+            }
+        }
+
     }
     
 }

@@ -128,6 +128,19 @@ enum SecureVaultItem: Equatable, Identifiable, Comparable {
             return subtitle
         }
     }
+    
+    func matches(category: SecureVaultSorting.Category) -> Bool {
+        if category == .allItems {
+            return true
+        }
+
+        switch self {
+        case .account: return category == .logins
+        case .card: return category == .cards
+        case .identity: return category == .identities
+        case .note: return category == .notes
+        }
+    }
 
     static func == (lhs: SecureVaultItem, rhs: SecureVaultItem) -> Bool {
         switch (lhs, rhs) {
@@ -203,7 +216,7 @@ final class PasswordManagementItemListModel: ObservableObject {
 
     var filter: String = "" {
         didSet {
-            refresh()
+            updateFilteredData()
 
             // Only select the first item if the filter has actually changed
             if oldValue != filter {
@@ -214,10 +227,16 @@ final class PasswordManagementItemListModel: ObservableObject {
 
     private var items = [SecureVaultItem]() {
         didSet {
-            refresh()
+            updateFilteredData()
         }
     }
 
+    @Published var selectedCategory = SecureVaultSorting.Category.allItems {
+        didSet {
+            updateFilteredData()
+            selectFirst()
+        }
+    }
     @Published private(set) var displayedItems = [ListSection]()
     @Published private(set) var selected: SecureVaultItem?
 
@@ -228,6 +247,7 @@ final class PasswordManagementItemListModel: ObservableObject {
     }
 
     func update(items: [SecureVaultItem]) {
+        print("DEBUG (\(Date()): Updating items: \(items.count)")
         self.items = items.sorted()
     }
 
@@ -284,16 +304,15 @@ final class PasswordManagementItemListModel: ObservableObject {
         displayedItems = sections
     }
 
-    func refresh() {
+    func updateFilteredData() {
         let filter = self.filter.lowercased()
+        let itemsByCategory = items.filter { $0.matches(category: selectedCategory) }
 
         if filter.isEmpty {
-            displayedItems = sortIntoSections(items)
+            displayedItems = sortIntoSections(itemsByCategory)
         } else {
-            let filter = filter.lowercased()
-            let filteredItems = items.filter { $0.item(matches: filter) }
-
-            displayedItems = sortIntoSections(filteredItems)
+            let itemsFilteredByString = itemsByCategory.filter { $0.item(matches: filter) }
+            displayedItems = sortIntoSections(itemsFilteredByString)
         }
     }
 
