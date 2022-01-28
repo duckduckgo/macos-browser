@@ -85,7 +85,7 @@ internal class WebCacheManager {
 
     @MainActor
     private func removeAllDataExceptCookies() async {
-        let allExceptCookies = WKWebsiteDataStore.allWebsiteDataTypesExceptCookies
+        let allExceptCookies = WKWebsiteDataStore.removableDataTypes
 
         // Remove all data except cookies for all domains, and then filter cookies to preserve those allowed by Fireproofing.
         await websiteDataStore.removeData(ofTypes: allExceptCookies, modifiedSince: Date.distantPast)

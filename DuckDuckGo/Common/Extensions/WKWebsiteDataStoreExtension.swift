@@ -20,11 +20,11 @@ import WebKit
 
 extension WKWebsiteDataStore {
     
-    /// Removes all website data types except cookies, including those not publicly declared by WebKit. Cookies are not removed as they are handled separately
-    /// by the Fire button logic.
+    /// Removes all website data types except cookies, local storage, and IndexedDB. This set includes those types not publicly declared by WebKit.
+    /// Cookies are not removed as they are handled separately by the Fire button logic.
     ///
     /// - note: The full list of data types can be found in the [WKWebsiteDataStore](https://github.com/WebKit/WebKit/blob/main/Source/WebKit/UIProcess/API/Cocoa/WKWebsiteDataRecord.mm) documentation.
-    static var allWebsiteDataTypesExceptCookies: Set<String> {
+    static var removableDataTypes: Set<String> {
         var types = Self.allWebsiteDataTypes()
         
         types.insert("_WKWebsiteDataTypeMediaKeys")
@@ -37,6 +37,11 @@ extension WKWebsiteDataStore {
         types.insert("_WKWebsiteDataTypeAlternativeServices")
 
         types.remove(WKWebsiteDataTypeCookies)
+        types.remove(WKWebsiteDataTypeLocalStorage)
+        
+        if #available(macOS 12.2, *) {
+            types.remove(WKWebsiteDataTypeIndexedDBDatabases)
+        }
         
         return types
     }
