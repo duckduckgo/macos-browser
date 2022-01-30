@@ -56,14 +56,14 @@ struct PasswordManagementItemListView: View {
 struct PasswordManagementItemListCategoryView: View {
     
     @EnvironmentObject var model: PasswordManagementItemListModel
-    
-    @State private var sort: Int = 0
 
     var body: some View {
         
         HStack {
             
-            Picker("", selection: $model.selectedCategory) {
+            // Category Picker:
+
+            Picker("", selection: $model.sortDescriptor.category) {
                 ForEach(SecureVaultSorting.Category.allCases, id: \.self) { category in
                     HStack {
                         if let imageName = category.imageName {
@@ -80,14 +80,15 @@ struct PasswordManagementItemListCategoryView: View {
             
             Spacer()
 
+            // Sort Picker:
+
             MenuButton(label:
                 Image("SortAscending")
             ) {
-                Picker("", selection: $model.selectedCategory) {
-                    ForEach(SecureVaultSorting.Category.allCases, id: \.self) {
-                        if $0 == .allItems {
-                            Text($0.rawValue)
-                            Divider()
+                Picker("", selection: $model.sortDescriptor.parameter) {
+                    ForEach(SecureVaultSorting.SortParameter.allCases, id: \.self) {
+                        if $0 == model.sortDescriptor.parameter {
+                            Text("✓ \($0.rawValue)")
                         } else {
                             Text($0.rawValue)
                         }
@@ -98,8 +99,17 @@ struct PasswordManagementItemListCategoryView: View {
 
                 Divider()
 
-                Button("Oldest to Most Recent") { }
-                Button("Most Recent to Oldest") { }
+                Picker("", selection: $model.sortDescriptor.order) {
+                    ForEach(SecureVaultSorting.SortOrder.allCases, id: \.self) {
+                        if $0 == model.sortDescriptor.order {
+                            Text("✓ \($0.title(for: model.sortDescriptor.parameter.type))")
+                        } else {
+                            Text($0.title(for: model.sortDescriptor.parameter.type))
+                        }
+                    }
+                }
+                .labelsHidden()
+                .pickerStyle(.radioGroup)
             }
             .menuButtonStyle(BorderlessButtonMenuButtonStyle())
             .frame(width: 16, height: 16)

@@ -19,6 +19,9 @@
 import Foundation
 
 struct SecureVaultSorting {
+    
+    static let `default` = SecureVaultSorting(category: .allItems, parameter: .title, order: .descending)
+
     enum Category: String, CaseIterable, Identifiable {
         var id: Category { self }
 
@@ -52,9 +55,24 @@ struct SecureVaultSorting {
         }
     }
     
-    enum SortOrder {
+    enum SortOrder: CaseIterable {
         case ascending
         case descending
+        
+        func title(for sortDataType: SortDataType) -> String {
+            switch sortDataType {
+            case .string:
+                switch self {
+                case .ascending: return "String Ascending"
+                case .descending: return "String Descending"
+                }
+            case .date:
+                switch self {
+                case .ascending: return "Date Ascending"
+                case .descending: return "Date Descending"
+                }
+            }
+        }
     }
     
     enum SortDataType {
@@ -62,9 +80,8 @@ struct SecureVaultSorting {
         case date
     }
 
-    let category: Category
-    let parameter: SortParameter
-    let order: SortOrder
-    
-    static let `default` = SecureVaultSorting(category: .allItems, parameter: .title, order: .descending)
+    var category: Category
+    var parameter: SortParameter
+    var order: SortOrder
+
 }

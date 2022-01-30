@@ -129,6 +129,20 @@ enum SecureVaultItem: Equatable, Identifiable, Comparable {
         }
     }
     
+    var firstCharacter: String {
+        let defaultFirstCharacter = "#"
+
+        guard let character = self.displayTitle.first else {
+            return defaultFirstCharacter
+        }
+        
+        if character.isLetter {
+            return character.uppercased()
+        } else {
+            return defaultFirstCharacter
+        }
+    }
+    
     func matches(category: SecureVaultSorting.Category) -> Bool {
         if category == .allItems {
             return true
@@ -231,7 +245,7 @@ final class PasswordManagementItemListModel: ObservableObject {
         }
     }
 
-    @Published var selectedCategory = SecureVaultSorting.Category.allItems {
+    @Published var sortDescriptor = SecureVaultSorting.default {
         didSet {
             updateFilteredData()
             selectFirst()
@@ -247,7 +261,6 @@ final class PasswordManagementItemListModel: ObservableObject {
     }
 
     func update(items: [SecureVaultItem]) {
-        print("DEBUG (\(Date()): Updating items: \(items.count)")
         self.items = items.sorted()
     }
 
@@ -306,13 +319,16 @@ final class PasswordManagementItemListModel: ObservableObject {
 
     func updateFilteredData() {
         let filter = self.filter.lowercased()
-        let itemsByCategory = items.filter { $0.matches(category: selectedCategory) }
+        let itemsByCategory = items.filter { $0.matches(category: sortDescriptor.category) }
 
         if filter.isEmpty {
-            displayedItems = sortIntoSections(itemsByCategory)
+            switch sortDescriptor.parameter {
+            case .title: displayedItems = sortIntoSectionsByTitle(itemsByCategory)
+            default: displayedItems = sortIntoSectionsByItemType(itemsByCategory)
+            }
         } else {
             let itemsFilteredByString = itemsByCategory.filter { $0.item(matches: filter) }
-            displayedItems = sortIntoSections(itemsFilteredByString)
+            displayedItems = sortIntoSectionsByItemType(itemsFilteredByString)
         }
     }
 
@@ -330,7 +346,7 @@ final class PasswordManagementItemListModel: ObservableObject {
         selected = nil
     }
 
-    private func sortIntoSections(_ items: [SecureVaultItem]) -> [ListSection] {
+    private func sortIntoSectionsByItemType(_ items: [SecureVaultItem]) -> [ListSection] {
         var accounts = [SecureVaultItem]()
         var cards = [SecureVaultItem]()
         var identities = [SecureVaultItem]()
@@ -357,6 +373,29 @@ final class PasswordManagementItemListModel: ObservableObject {
         if !notes.isEmpty { sections.append(.notes(notes)) }
 
         return sections
+    }
+    
+    private func sortIntoSectionsByTitle(_ items: [SecureVaultItem]) -> [ListSection] {
+        var sections = [ListSection]()
+        var itemsByFirstCharacter: [String: [SecureVaultItem]] = Dictionary(grouping: items) {
+            return $0.firstCharacter
+        }
+        
+        let sortedKeys = itemsByFirstCharacter.keys.sorted(by: <)
+        
+        for key in sortedKeys {
+            // Append section
+        }
+        
+        return []
+    }
+
+    private func sortIntoSectionsByDateCreated(_ items: [SecureVaultItem]) -> [ListSection] {
+        return []
+    }
+    
+    private func sortIntoSectionsByDateModified(_ items: [SecureVaultItem]) -> [ListSection] {
+        return []
     }
 
 }
