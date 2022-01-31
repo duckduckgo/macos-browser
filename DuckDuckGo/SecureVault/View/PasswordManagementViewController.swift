@@ -144,6 +144,14 @@ final class PasswordManagementViewController: NSViewController {
         self.listModel?.clearSelection()
         self.itemModel?.clearSecureVaultModel()
     }
+    
+    func select(category: SecureVaultSorting.Category?) {
+        guard let category = category else {
+            return
+        }
+
+        self.listModel?.sortDescriptor = .init(category: category, parameter: .title, order: .ascending)
+    }
 
     private func syncModelsOnCredentials(_ credentials: SecureVaultModels.WebsiteCredentials, select: Bool = false) {
         self.itemModel?.setSecureVaultModel(credentials)

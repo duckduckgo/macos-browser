@@ -65,6 +65,19 @@ enum SecureVaultItem: Equatable, Identifiable, Comparable {
             return note.title
         }
     }
+    
+    var created: Date {
+        switch self {
+        case .account(let account):
+            return account.created
+        case .card(let card):
+            return card.created
+        case .identity(let identity):
+            return identity.created
+        case .note(let note):
+            return note.created
+        }
+    }
 
     var lastUpdated: Date {
         switch self {
@@ -186,39 +199,13 @@ enum SecureVaultItem: Equatable, Identifiable, Comparable {
 /// Could maybe even abstract a bunch of this code to be more generic re-usable styled list for use elsewhere.
 final class PasswordManagementItemListModel: ObservableObject {
 
-    enum ListSection {
-        case accounts([SecureVaultItem])
-        case cards([SecureVaultItem])
-        case notes([SecureVaultItem])
-        case identities([SecureVaultItem])
-
-        var title: String {
-            switch self {
-            case .accounts: return "Logins"
-            case .cards: return "Credit Cards"
-            case .notes: return "Notes"
-            case .identities: return "Identities"
-            }
-        }
-
-        var items: [SecureVaultItem] {
-            switch self {
-            case .accounts(let items): return items
-            case .cards(let items): return items
-            case .notes(let items): return items
-            case .identities(let items): return items
-            }
-        }
+    struct ListSection {
+        let title: String
+        let items: [SecureVaultItem]
 
         func withUpdatedItems(_ newItems: [SecureVaultItem]) -> ListSection {
-            switch self {
-            case .accounts: return .accounts(newItems)
-            case .cards: return .cards(newItems)
-            case .notes: return .notes(newItems)
-            case .identities: return .identities(newItems)
-            }
+            return ListSection(title: title, items: newItems)
         }
-
     }
 
     static let personNameComponentsFormatter: PersonNameComponentsFormatter = {
@@ -282,11 +269,9 @@ final class PasswordManagementItemListModel: ObservableObject {
     
     func selectLoginWithDomainOrFirst(domain: String, notify: Bool = true) {
         for section in displayedItems {
-            if case let .accounts(accounts) = section {
-                if let account = accounts.first(where: { $0.websiteAccount?.domain == domain }) {
-                    selected(item: account, notify: notify)
-                    return
-                }
+            if let account = section.items.first(where: { $0.websiteAccount?.domain == domain }) {
+                selected(item: account, notify: notify)
+                return
             }
         }
         
@@ -323,8 +308,14 @@ final class PasswordManagementItemListModel: ObservableObject {
 
         if filter.isEmpty {
             switch sortDescriptor.parameter {
-            case .title: displayedItems = sortIntoSectionsByTitle(itemsByCategory)
-            default: displayedItems = sortIntoSectionsByItemType(itemsByCategory)
+            case .title:
+                displayedItems = sections(with: itemsByCategory, by: \.firstCharacter, order: sortDescriptor.order)
+            case .dateCreated:
+                displayedItems = sections(with: itemsByCategory, by: \.created, order: sortDescriptor.order)
+            case .dateModified:
+                displayedItems = sections(with: itemsByCategory, by: \.lastUpdated, order: sortDescriptor.order)
+            default:
+                displayedItems = sortIntoSectionsByItemType(itemsByCategory)
             }
         } else {
             let itemsFilteredByString = itemsByCategory.filter { $0.item(matches: filter) }
@@ -367,35 +358,71 @@ final class PasswordManagementItemListModel: ObservableObject {
 
         var sections = [ListSection]()
 
-        if !accounts.isEmpty { sections.append(.accounts(accounts)) }
-        if !cards.isEmpty { sections.append(.cards(cards)) }
-        if !identities.isEmpty { sections.append(.identities(identities)) }
-        if !notes.isEmpty { sections.append(.notes(notes)) }
+        if !accounts.isEmpty { sections.append(ListSection(title: "Logins", items: accounts)) }
+        if !cards.isEmpty { sections.append(ListSection(title: "Cards", items: cards)) }
+        if !identities.isEmpty { sections.append(ListSection(title: "Identities", items: identities)) }
+        if !notes.isEmpty { sections.append(ListSection(title: "Notes", items: notes)) }
 
         return sections
     }
     
-    private func sortIntoSectionsByTitle(_ items: [SecureVaultItem]) -> [ListSection] {
-        var sections = [ListSection]()
-        var itemsByFirstCharacter: [String: [SecureVaultItem]] = Dictionary(grouping: items) {
-            return $0.firstCharacter
+    private func sections(with items: [SecureVaultItem],
+                          by keyPath: KeyPath<SecureVaultItem, String>,
+                          order: SecureVaultSorting.SortOrder) -> [ListSection] {
+        let sortedKeys: [String]
+        let itemsByFirstCharacter: [String: [SecureVaultItem]] = Dictionary(grouping: items) { $0[keyPath: keyPath] }
+        
+        if order == .ascending {
+            sortedKeys = itemsByFirstCharacter.keys.sorted(by: <)
+        } else {
+            sortedKeys = itemsByFirstCharacter.keys.sorted(by: >)
         }
-        
-        let sortedKeys = itemsByFirstCharacter.keys.sorted(by: <)
-        
-        for key in sortedKeys {
-            // Append section
+
+        return sortedKeys.map { key in
+            ListSection(title: key, items: itemsByFirstCharacter[key] ?? [])
         }
-        
-        return []
     }
 
-    private func sortIntoSectionsByDateCreated(_ items: [SecureVaultItem]) -> [ListSection] {
-        return []
+    private func sections(with items: [SecureVaultItem],
+                          by keyPath: KeyPath<SecureVaultItem, Date>,
+                          order: SecureVaultSorting.SortOrder) -> [ListSection] {
+        let formatter = DateFormatter()
+        formatter.dateFormat = "MMM yyyy"
+
+        let itemsByDateMetadata: [DateMetadata: [SecureVaultItem]] = Dictionary(grouping: items) {
+            let date = $0[keyPath: keyPath]
+
+            guard let month = date.components.month, let year = date.components.year else {
+                return DateMetadata.unknown
+            }
+
+            return DateMetadata(title: formatter.string(from: date).uppercased(), month: month, year: year)
+        }
+        
+        let sortedKeys: [DateMetadata]
+        
+        if order == .ascending {
+            sortedKeys = itemsByDateMetadata.keys.sorted { a, b in
+                (a.month, a.year) < (b.month, b.year)
+            }
+        } else {
+            sortedKeys = itemsByDateMetadata.keys.sorted { a, b in
+                (a.month, a.year) > (b.month, b.year)
+            }
+        }
+
+        return sortedKeys.map { key in
+            let secureVaultItems = itemsByDateMetadata[key] ?? []
+            return ListSection(title: key.title, items: secureVaultItems)
+        }
     }
     
-    private func sortIntoSectionsByDateModified(_ items: [SecureVaultItem]) -> [ListSection] {
-        return []
+    private struct DateMetadata: Equatable, Hashable {
+        static let unknown = DateMetadata(title: "#", month: 0, year: 0)
+
+        let title: String
+        let month: Int
+        let year: Int
     }
 
 }

@@ -24,7 +24,7 @@ import BrowserServicesKit
 protocol OptionsButtonMenuDelegate: AnyObject {
 
     func optionsButtonMenuRequestedBookmarkPopover(_ menu: NSMenu)
-    func optionsButtonMenuRequestedLoginsPopover(_ menu: NSMenu)
+    func optionsButtonMenuRequestedLoginsPopover(_ menu: NSMenu, selectedCategory: SecureVaultSorting.Category)
     func optionsButtonMenuRequestedDownloadsPopover(_ menu: NSMenu)
     func optionsButtonMenuRequestedPrint(_ menu: NSMenu)
 
@@ -113,8 +113,24 @@ final class MoreOptionsMenu: NSMenu {
         actionDelegate?.optionsButtonMenuRequestedDownloadsPopover(self)
     }
 
-    @objc func openLogins(_ sender: NSMenuItem) {
-        actionDelegate?.optionsButtonMenuRequestedLoginsPopover(self)
+    @objc func openLoginsWithAllItems(_ sender: NSMenuItem) {
+        actionDelegate?.optionsButtonMenuRequestedLoginsPopover(self, selectedCategory: .allItems)
+    }
+    
+    @objc func openLoginsWithLogins(_ sender: NSMenuItem) {
+        actionDelegate?.optionsButtonMenuRequestedLoginsPopover(self, selectedCategory: .logins)
+    }
+    
+    @objc func openLoginsWithIdentities(_ sender: NSMenuItem) {
+        actionDelegate?.optionsButtonMenuRequestedLoginsPopover(self, selectedCategory: .identities)
+    }
+    
+    @objc func openLoginsWithCreditCards(_ sender: NSMenuItem) {
+        actionDelegate?.optionsButtonMenuRequestedLoginsPopover(self, selectedCategory: .cards)
+    }
+    
+    @objc func openLoginsWithNotes(_ sender: NSMenuItem) {
+        actionDelegate?.optionsButtonMenuRequestedLoginsPopover(self, selectedCategory: .notes)
     }
 
     @objc func openPreferences(_ sender: NSMenuItem) {
@@ -176,10 +192,37 @@ final class MoreOptionsMenu: NSMenu {
             .withImage(NSImage(named: "Downloads"))
             .firingPixel(Pixel.Event.MoreResult.downloads)
 
-        addItem(withTitle: UserText.passwordManagement, action: #selector(openLogins), keyEquivalent: "")
+        let loginsSubMenu = LoginsSubMenu()
+        
+        loginsSubMenu.addItem(withTitle: UserText.passwordManagementAllItems, action: #selector(openLoginsWithAllItems), keyEquivalent: "")
             .targetting(self)
-            .withImage(NSImage(named: "PasswordManagement"))
             .firingPixel(Pixel.Event.MoreResult.logins)
+        
+        loginsSubMenu.addItem(NSMenuItem.separator())
+        
+        loginsSubMenu.addItem(withTitle: UserText.passwordManagementLogins, action: #selector(openLoginsWithLogins), keyEquivalent: "")
+            .targetting(self)
+            .withImage(NSImage(named: "LoginGlyph"))
+            .firingPixel(Pixel.Event.MoreResult.logins)
+        
+        loginsSubMenu.addItem(withTitle: UserText.passwordManagementIdentities, action: #selector(openLoginsWithIdentities), keyEquivalent: "")
+            .targetting(self)
+            .withImage(NSImage(named: "IdentityGlyph"))
+            .firingPixel(Pixel.Event.MoreResult.logins)
+        
+        loginsSubMenu.addItem(withTitle: UserText.passwordManagementCreditCards, action: #selector(openLoginsWithCreditCards), keyEquivalent: "")
+            .targetting(self)
+            .withImage(NSImage(named: "CreditCardGlyph"))
+            .firingPixel(Pixel.Event.MoreResult.logins)
+        
+        loginsSubMenu.addItem(withTitle: UserText.passwordManagementNotes, action: #selector(openLoginsWithNotes), keyEquivalent: "")
+            .targetting(self)
+            .withImage(NSImage(named: "NoteGlyph"))
+            .firingPixel(Pixel.Event.MoreResult.logins)
+        
+        addItem(withTitle: UserText.passwordManagement, action: nil, keyEquivalent: "")
+            .withImage(NSImage(named: "PasswordManagement"))
+            .withSubmenu(loginsSubMenu)
 
         addItem(NSMenuItem.separator())
     }
@@ -329,6 +372,18 @@ final class ZoomSubMenu: NSMenu {
         addItem(actualSizeItem)
     }
 
+}
+
+final class LoginsSubMenu: NSMenu {
+    
+    init() {
+        super.init(title: UserText.passwordManagement)
+    }
+
+    required init(coder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }
+    
 }
 
 extension NSMenuItem {

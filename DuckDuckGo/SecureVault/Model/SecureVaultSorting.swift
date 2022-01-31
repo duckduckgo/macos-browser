@@ -20,7 +20,7 @@ import Foundation
 
 struct SecureVaultSorting {
     
-    static let `default` = SecureVaultSorting(category: .allItems, parameter: .title, order: .descending)
+    static let `default` = SecureVaultSorting(category: .allItems, parameter: .title, order: .ascending)
 
     enum Category: String, CaseIterable, Identifiable {
         var id: Category { self }
