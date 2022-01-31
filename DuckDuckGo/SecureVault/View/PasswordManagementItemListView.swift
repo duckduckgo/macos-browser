@@ -20,7 +20,7 @@ import Foundation
 import SwiftUI
 import BrowserServicesKit
 
-struct ViewOffsetKey: PreferenceKey {
+struct ScrollOffsetKey: PreferenceKey {
     typealias Value = CGFloat
     static var defaultValue = CGFloat.zero
     static func reduce(value: inout Value, nextValue: () -> Value) {
@@ -32,19 +32,21 @@ struct PasswordManagementItemListView: View {
 
     @EnvironmentObject var model: PasswordManagementItemListModel
     
-    @State private var scrollOffset = CGFloat.zero
+    @State private var opacity = CGFloat.zero
 
     var body: some View {
 
         if #available(macOS 11.0, *) {
-            VStack {
+            VStack(spacing: 0) {
                 PasswordManagementItemListCategoryView()
                     .padding([.leading, .trailing], 10)
-                    .padding([.top], 20)
-                    .padding([.bottom], 10)
+                    .padding([.top, .bottom], 20)
                 
                 Divider()
+                    .shadow(color: .black, radius: 3.0, x: 0, y: 1)
+                    .opacity(opacity)
                 
+                GeometryReader { outsideProxy in
                 ScrollView {
                     ScrollViewReader { proxy in
                         PasswordManagementItemListStackView()
@@ -56,19 +58,31 @@ struct PasswordManagementItemListView: View {
                                     }
                                 }
                             }
-//                            .background(GeometryReader {
-//                                Color.clear.preference(key: ViewOffsetKey.self, value: -$0.frame(in: .named("scroll")).origin.y)
-//                            })
-//                            .onPreferenceChange(ViewOffsetKey.self) {
-//                                print("offset >> \($0)")
-//                            }
+                            .background(GeometryReader { insideProxy in
+                                Color.clear.preference(key: ScrollOffsetKey.self,
+                                                       value: self.calculateContentOffset(fromOutsideProxy: outsideProxy, insideProxy: insideProxy))
+                            })
+                            .onPreferenceChange(ScrollOffsetKey.self) { offset in
+                                let fadeDistance: CGFloat = 150
+                                
+                                if offset <= 0 {
+                                    self.opacity = 0
+                                } else {
+                                    self.opacity = offset / fadeDistance
+                                }
+                            }
                     }
+                }
                 }
             }
         } else {
             PasswordManagementItemListStackView()
         }
 
+    }
+    
+    private func calculateContentOffset(fromOutsideProxy outsideProxy: GeometryProxy, insideProxy: GeometryProxy) -> CGFloat {
+        return outsideProxy.frame(in: .global).minY - insideProxy.frame(in: .global).minY
     }
 
 }
