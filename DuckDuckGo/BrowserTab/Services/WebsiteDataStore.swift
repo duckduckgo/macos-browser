@@ -99,7 +99,9 @@ internal class WebCacheManager {
         let allRecords = await websiteDataStore.dataRecords(ofTypes: WKWebsiteDataStore.allWebsiteDataTypes())
         
         let removableRecords = allRecords.filter { record in
-            !fireproofDomains.isFireproof(cookieDomain: record.displayName)
+            // For Local Storage, only remove records that *exactly match* the display name.
+            // Subdomains or root domains should be excluded.
+            !fireproofDomains.fireproofDomains.contains(record.displayName)
         }
         
         await websiteDataStore.removeData(ofTypes: WKWebsiteDataStore.allWebsiteDataTypesExceptCookies, for: removableRecords)
