@@ -59,6 +59,22 @@ struct SecureVaultSorting {
         case ascending
         case descending
         
+//        var stringSortFunction<T: Comparable>: (T, T) -> Bool {
+//            return self == .ascending ? (<) : (>)
+//        }
+        
+//        var dateMetadataSortFunction: (DateMetadata, DateMetadata) -> Bool {
+//            if order == .ascending {
+//                sortedKeys = itemsByDateMetadata.keys.sorted { a, b in
+//                    (a.month, a.year) < (b.month, b.year)
+//                }
+//            } else {
+//                sortedKeys = itemsByDateMetadata.keys.sorted { a, b in
+//                    (a.month, a.year) > (b.month, b.year)
+//                }
+//            }
+//        }
+        
         func title(for sortDataType: SortDataType) -> String {
             switch sortDataType {
             case .string:

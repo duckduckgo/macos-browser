@@ -199,6 +199,7 @@ private struct ItemView: View {
         let font = Font.custom("SFProText-Regular", size: 13)
 
         Button(action: action, label: {
+            
             HStack(spacing: 0) {
 
                 switch item {
