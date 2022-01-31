@@ -40,12 +40,14 @@ final class ClickToLoadUserScript: NSObject, UserScript, WKScriptMessageHandlerW
     func userContentController(_ userContentController: WKUserContentController, didReceive message: WKScriptMessage,
                                replyHandler: @escaping (Any?, String?) -> Void) {
         if message.name == "initClickToLoad" {
+            let host = message.body as? String
             let controller = userContentController as? UserContentController
             let privacyConfigurationManager = controller!.privacyConfigurationManager
             let privacyConfiguration = privacyConfigurationManager.privacyConfig
 
-            let protected = privacyConfiguration.isProtected(domain: message.body as? String)
-            if protected {
+            let locallyProtected = privacyConfiguration.isProtected(domain: host)
+            let featureEnabled = privacyConfiguration.isFeature(.clickToPlay, enabledForDomain: host)
+            if locallyProtected && featureEnabled {
                 replyHandler(true, nil)
             } else {
                 replyHandler(false, nil)

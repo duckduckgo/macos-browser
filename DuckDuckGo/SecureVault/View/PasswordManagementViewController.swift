@@ -21,6 +21,8 @@ import Combine
 import SwiftUI
 import BrowserServicesKit
 
+// swiftlint:disable file_length
+
 protocol PasswordManagementDelegate: AnyObject {
 
     /// May not be called on main thread.
@@ -732,3 +734,5 @@ extension PasswordManagementViewController: NSTextFieldDelegate {
     }
 
 }
+
+// swiftlint:enable file_length
