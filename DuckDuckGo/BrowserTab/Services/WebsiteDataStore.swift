@@ -51,7 +51,7 @@ internal class WebCacheManager {
         // first cleanup ~/Library/Caches
         await self.clearFileCache()
 
-        await removeAllRemovableDataTypes()
+        await removeAllSafelyRemovableDataTypes()
         
         await removeLocalStorageAndIndexedDBForNonFireproofDomains()
 
@@ -87,7 +87,7 @@ internal class WebCacheManager {
     }
 
     @MainActor
-    private func removeAllRemovableDataTypes() async {
+    private func removeAllSafelyRemovableDataTypes() async {
         let allExceptCookies = WKWebsiteDataStore.safelyRemovableWebsiteDataTypes
 
         // Remove all data except cookies for all domains, and then filter cookies to preserve those allowed by Fireproofing.
