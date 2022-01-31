@@ -333,10 +333,6 @@ final class Tab: NSObject {
         return true
     }
 
-    private func clickToLoadBlockFB() {
-        setFBProtection(enabled: true)
-    }
-
     private func reloadIfNeeded(shouldLoadInBackground: Bool = false) {
         let url: URL
         switch self.content {
@@ -805,9 +801,21 @@ extension Tab: WKNavigationDelegate {
         if navigationAction.isTargetingMainFrame && !url.isDuckDuckGo {
             RulesCompilationMonitor.shared.tabWillWaitForRulesCompilation(self)
             var waitTime: TimeInterval?
-            await webView.configuration.userContentController.awaitContentBlockingRulesInstalled(waitTime: &waitTime)
+            await webView.configuration.userContentController.awaitContentBlockingAssetsInstalled(waitTime: &waitTime)
             RulesCompilationMonitor.shared.tab(self, didFinishWaitingForRulesWithWaitTime: waitTime)
         }
+
+        // Enable/disable FBProtection only after UserScripts are installed (awaitContentBlockingAssetsInstalled)
+        let privacyConfigurationManager = ContentBlocking.privacyConfigurationManager
+        let privacyConfiguration = privacyConfigurationManager.privacyConfig
+
+        let featureEnabled = privacyConfiguration.isFeature(.clickToPlay, enabledForDomain: url.host)
+        if featureEnabled {
+            setFBProtection(enabled: true)
+        } else {
+            setFBProtection(enabled: false)
+        }
+
         self.willPerformNavigationAction(navigationAction)
 
         return .allow
@@ -852,7 +860,6 @@ extension Tab: WKNavigationDelegate {
     }
 
     func webView(_ webView: WKWebView, didStartProvisionalNavigation navigation: WKNavigation!) {
-        self.clickToLoadBlockFB()
         delegate?.tabDidStartNavigation(self)
 
         // Unnecessary assignment triggers publishing

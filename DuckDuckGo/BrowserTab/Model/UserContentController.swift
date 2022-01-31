@@ -131,7 +131,7 @@ final class UserContentController: WKUserContentController {
         self.scripts?.userScripts.forEach(self.removeHandler(_:))
     }
 
-    func userContentControllerContentBlockingRulesInstalled() async -> TimeInterval? {
+    func userContentControllerContentBlockingAssetsInstalled() async -> TimeInterval? {
         guard self.privacyConfigurationManager.privacyConfig.isEnabled(featureKey: .contentBlocking),
               !contentBlockingAssetsInstalled
         else { return nil }
@@ -150,12 +150,12 @@ final class UserContentController: WKUserContentController {
 
 extension WKUserContentController {
 
-    func awaitContentBlockingRulesInstalled(waitTime: inout TimeInterval?) async {
+    func awaitContentBlockingAssetsInstalled(waitTime: inout TimeInterval?) async {
         guard let self = self as? UserContentController else {
             assertionFailure("unexpected WKUserContentController")
             return
         }
-        waitTime = await self.userContentControllerContentBlockingRulesInstalled()
+        waitTime = await self.userContentControllerContentBlockingAssetsInstalled()
     }
 
 }
