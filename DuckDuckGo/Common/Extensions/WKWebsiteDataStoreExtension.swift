@@ -20,11 +20,11 @@ import WebKit
 
 extension WKWebsiteDataStore {
     
-    /// Removes all website data types except cookies, local storage, and IndexedDB. This set includes those types not publicly declared by WebKit.
+    /// All website data types except cookies. This set includes those types not publicly declared by WebKit.
     /// Cookies are not removed as they are handled separately by the Fire button logic.
     ///
     /// - note: The full list of data types can be found in the [WKWebsiteDataStore](https://github.com/WebKit/WebKit/blob/main/Source/WebKit/UIProcess/API/Cocoa/WKWebsiteDataRecord.mm) documentation.
-    static var removableDataTypes: Set<String> {
+    static var allWebsiteDataTypesExceptCookies: Set<String> {
         var types = Self.allWebsiteDataTypes()
         
         types.insert("_WKWebsiteDataTypeMediaKeys")
@@ -37,6 +37,17 @@ extension WKWebsiteDataStore {
         types.insert("_WKWebsiteDataTypeAlternativeServices")
 
         types.remove(WKWebsiteDataTypeCookies)
+        
+        return types
+    }
+    
+    /// All website data types that are safe to remove from all domains, regardless of their Fireproof status. This set includes those types not publicly declared by WebKit.
+    /// Cookies are not removed as they are handled separately by the Fire button logic.
+    ///
+    /// - note: The full list of data types can be found in the [WKWebsiteDataStore](https://github.com/WebKit/WebKit/blob/main/Source/WebKit/UIProcess/API/Cocoa/WKWebsiteDataRecord.mm) documentation.
+    static var removableDataTypes: Set<String> {
+        var types = Self.allWebsiteDataTypesExceptCookies
+
         types.remove(WKWebsiteDataTypeLocalStorage)
         
         // Only Fireproof IndexedDB on macOS 12.2+. Earlier versions have a privacy flaw that can expose browsing history.

@@ -31,6 +31,7 @@ protocol WebsiteDataStore {
 
     func dataRecords(ofTypes dataTypes: Set<String>) async -> [WKWebsiteDataRecord]
     func removeData(ofTypes dataTypes: Set<String>, modifiedSince date: Date) async
+    func removeData(ofTypes dataTypes: Set<String>, for records: [WKWebsiteDataRecord]) async
 }
 
 internal class WebCacheManager {
@@ -50,7 +51,9 @@ internal class WebCacheManager {
         // first cleanup ~/Library/Caches
         await self.clearFileCache()
 
-        await removeAllDataExceptCookies()
+        await removeAllRemovableDataTypes()
+        
+        await removeLocalStorageAndIndexedDBForNonFireproofDomains()
 
         await removeCookies(forDomains: domains)
 
@@ -84,11 +87,22 @@ internal class WebCacheManager {
     }
 
     @MainActor
-    private func removeAllDataExceptCookies() async {
+    private func removeAllRemovableDataTypes() async {
         let allExceptCookies = WKWebsiteDataStore.removableDataTypes
 
         // Remove all data except cookies for all domains, and then filter cookies to preserve those allowed by Fireproofing.
         await websiteDataStore.removeData(ofTypes: allExceptCookies, modifiedSince: Date.distantPast)
+    }
+    
+    @MainActor
+    private func removeLocalStorageAndIndexedDBForNonFireproofDomains() async {
+        let allRecords = await websiteDataStore.dataRecords(ofTypes: WKWebsiteDataStore.allWebsiteDataTypes())
+        
+        let removableRecords = allRecords.filter { record in
+            !fireproofDomains.isFireproof(cookieDomain: record.displayName)
+        }
+        
+        await websiteDataStore.removeData(ofTypes: WKWebsiteDataStore.allWebsiteDataTypesExceptCookies, for: removableRecords)
     }
 
     @MainActor
