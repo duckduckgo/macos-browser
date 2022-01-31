@@ -73,8 +73,8 @@ struct PasswordManagementListSection {
             return DateMetadata(title: Self.dateFormatter.string(from: date).uppercased(), month: month, year: year)
         }
         
-        let metadataSortFunction: (DateMetadata, DateMetadata) -> Bool = order == .ascending ? (<) : (>)
-        let dateSortFunction: (Date, Date) -> Bool = order == .ascending ? (<) : (>)
+        let metadataSortFunction: (DateMetadata, DateMetadata) -> Bool = order == .ascending ? (>) : (<)
+        let dateSortFunction: (Date, Date) -> Bool = order == .ascending ? (>) : (<)
         let sortedKeys = itemsByDateMetadata.keys.sorted(by: metadataSortFunction)
         
         return sortedKeys.map { key in

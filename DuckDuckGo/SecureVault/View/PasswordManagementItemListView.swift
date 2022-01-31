@@ -20,16 +20,30 @@ import Foundation
 import SwiftUI
 import BrowserServicesKit
 
+struct ViewOffsetKey: PreferenceKey {
+    typealias Value = CGFloat
+    static var defaultValue = CGFloat.zero
+    static func reduce(value: inout Value, nextValue: () -> Value) {
+        value += nextValue()
+    }
+}
+
 struct PasswordManagementItemListView: View {
 
     @EnvironmentObject var model: PasswordManagementItemListModel
+    
+    @State private var scrollOffset = CGFloat.zero
 
     var body: some View {
 
         if #available(macOS 11.0, *) {
             VStack {
                 PasswordManagementItemListCategoryView()
-                    .padding([.top, .leading, .trailing], 10)
+                    .padding([.leading, .trailing], 10)
+                    .padding([.top], 20)
+                    .padding([.bottom], 10)
+                
+                Divider()
                 
                 ScrollView {
                     ScrollViewReader { proxy in
@@ -42,6 +56,12 @@ struct PasswordManagementItemListView: View {
                                     }
                                 }
                             }
+//                            .background(GeometryReader {
+//                                Color.clear.preference(key: ViewOffsetKey.self, value: -$0.frame(in: .named("scroll")).origin.y)
+//                            })
+//                            .onPreferenceChange(ViewOffsetKey.self) {
+//                                print("offset >> \($0)")
+//                            }
                     }
                 }
             }
@@ -82,9 +102,7 @@ struct PasswordManagementItemListCategoryView: View {
 
             // Sort Picker:
 
-            MenuButton(label:
-                Image("SortAscending")
-            ) {
+            MenuButton(label: Image(model.sortDescriptor.order == .ascending ? "SortAscending" : "SortDescending")) {
                 Picker("", selection: $model.sortDescriptor.parameter) {
                     ForEach(SecureVaultSorting.SortParameter.allCases, id: \.self) {
                         if $0 == model.sortDescriptor.parameter {

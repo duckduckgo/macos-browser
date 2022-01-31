@@ -347,7 +347,7 @@ final class PasswordManagementItemListModel: ObservableObject {
         var sections = [PasswordManagementListSection]()
 
         if !accounts.isEmpty { sections.append(PasswordManagementListSection(title: "Logins", items: accounts)) }
-        if !cards.isEmpty { sections.append(PasswordManagementListSection(title: "Cards", items: cards)) }
+        if !cards.isEmpty { sections.append(PasswordManagementListSection(title: "Credit Cards", items: cards)) }
         if !identities.isEmpty { sections.append(PasswordManagementListSection(title: "Identities", items: identities)) }
         if !notes.isEmpty { sections.append(PasswordManagementListSection(title: "Notes", items: notes)) }
 

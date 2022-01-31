@@ -28,7 +28,7 @@ struct SecureVaultSorting {
         case allItems = "All Items"
         case logins = "Logins"
         case identities = "Identities"
-        case cards = "Cards"
+        case cards = "Credit Cards"
         case notes = "Notes"
         
         var imageName: String? {
@@ -59,33 +59,17 @@ struct SecureVaultSorting {
         case ascending
         case descending
         
-//        var stringSortFunction<T: Comparable>: (T, T) -> Bool {
-//            return self == .ascending ? (<) : (>)
-//        }
-        
-//        var dateMetadataSortFunction: (DateMetadata, DateMetadata) -> Bool {
-//            if order == .ascending {
-//                sortedKeys = itemsByDateMetadata.keys.sorted { a, b in
-//                    (a.month, a.year) < (b.month, b.year)
-//                }
-//            } else {
-//                sortedKeys = itemsByDateMetadata.keys.sorted { a, b in
-//                    (a.month, a.year) > (b.month, b.year)
-//                }
-//            }
-//        }
-        
         func title(for sortDataType: SortDataType) -> String {
             switch sortDataType {
             case .string:
                 switch self {
-                case .ascending: return "String Ascending"
-                case .descending: return "String Descending"
+                case .ascending: return "Alphabetically"
+                case .descending: return "Reverse Alphabetically"
                 }
             case .date:
                 switch self {
-                case .ascending: return "Date Ascending"
-                case .descending: return "Date Descending"
+                case .ascending: return "Newest First"
+                case .descending: return "Oldest First"
                 }
             }
         }
