@@ -20,59 +20,125 @@ import WebKit
 import Combine
 import BrowserServicesKit
 
+protocol UserContentControllerDelegate: AnyObject {
+    func userContentController(_ userContentController: UserContentController, didInstallUserScripts userScripts: UserScripts)
+}
+
 final class UserContentController: WKUserContentController {
     private var blockingRulesUpdatedCancellable: AnyCancellable?
-    
+    weak var delegate: UserContentControllerDelegate?
+
     let privacyConfigurationManager: PrivacyConfigurationManager
 
-    public init(rulesPublisher: ContentBlockingUpdating.NewRulesPublisher = ContentBlocking.contentBlockingUpdating.contentBlockingRules,
-                privacyConfigurationManager: PrivacyConfigurationManager = ContentBlocking.privacyConfigurationManager) {
+    struct ContentBlockingAssets {
+        let rules: [String: WKContentRuleList]
+        let scripts: UserScripts
+    }
+
+    public init<Pub: Publisher>(assetsPublisher: Pub, privacyConfigurationManager: PrivacyConfigurationManager)
+    where Pub.Failure == Never, Pub.Output == ContentBlockingAssets {
+
         self.privacyConfigurationManager = privacyConfigurationManager
         super.init()
 
-        installContentBlockingRules(publisher: rulesPublisher)
+        attachToContentBlockingAssetsPublisher(publisher: assetsPublisher)
+    }
+
+    public convenience init(privacyConfigurationManager: PrivacyConfigurationManager = ContentBlocking.privacyConfigurationManager) {
+        self.init(assetsPublisher: ContentBlocking.contentBlockingUpdating.userContentBlockingAssets,
+                  privacyConfigurationManager: privacyConfigurationManager)
     }
 
     required init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
 
-    private var contentRulesInstalledContinuation: (() -> Void)?
-    private var contentRulesInstalled = false {
+    private var cbaInstalledContinuation: (() -> Void)?
+    private var contentBlockingAssetsInstalled = false {
         didSet {
-            if contentRulesInstalled {
-                contentRulesInstalledContinuation?()
-                self.contentRulesInstalledContinuation = nil
+            if contentBlockingAssetsInstalled {
+                cbaInstalledContinuation?()
+                self.cbaInstalledContinuation = nil
             }
         }
     }
 
-    func installContentBlockingRules(publisher: ContentBlockingUpdating.NewRulesPublisher) {
-        blockingRulesUpdatedCancellable = publisher.receive(on: RunLoop.main).sink { [weak self] newRules in
-            dispatchPrecondition(condition: .onQueue(.main))
+    private func attachToContentBlockingAssetsPublisher<Pub: Publisher>(publisher: Pub)
+    where Pub.Failure == Never, Pub.Output == ContentBlockingAssets {
 
-            guard let self = self,
-                  let newRules = newRules
-            else { return }
+        blockingRulesUpdatedCancellable = publisher.receive(on: DispatchQueue.main).sink { [weak self] assets in
+            self?.installContentBlockingAssets(assets)
+        }
+    }
 
+    private func installContentBlockingAssets(_ assets: ContentBlockingAssets) {
+        dispatchPrecondition(condition: .onQueue(.main))
+
+        self.contentRuleLists = assets.rules
+        self.scripts = assets.scripts
+
+        self.contentBlockingAssetsInstalled = true
+    }
+
+    private(set) var contentRuleLists: [String: WKContentRuleList] = [:] {
+        didSet {
             self.removeAllContentRuleLists()
             if self.privacyConfigurationManager.privacyConfig.isEnabled(featureKey: .contentBlocking) {
-                for rules in newRules.rules {
-                    self.add(rules.rulesList)
+                for rulesList in contentRuleLists.values {
+                    self.add(rulesList)
                 }
-                self.contentRulesInstalled = true
             }
         }
+    }
+
+    struct ContentRulesNotFoundError: Error {}
+    func enableContentRuleList(withIdentifier identifier: String) throws {
+        guard let ruleList = self.contentRuleLists[identifier] else {
+            throw ContentRulesNotFoundError()
+        }
+        self.add(ruleList)
+    }
+
+    func disableContentRuleList(withIdentifier identifier: String) {
+        guard let ruleList = self.contentRuleLists[identifier] else {
+            assertionFailure("Rule list not installed")
+            return
+        }
+        self.remove(ruleList)
+    }
+
+    private(set) var scripts: UserScripts? {
+        willSet {
+            self.removeAllUserScripts()
+        }
+        didSet {
+            guard let userScripts = scripts else { return }
+
+            userScripts.scripts.forEach(self.addUserScript)
+            userScripts.userScripts.forEach(self.addHandler)
+
+            guard let delegate = delegate else {
+                assertionFailure("UserContentController delegate not set")
+                return
+            }
+
+            delegate.userContentController(self, didInstallUserScripts: userScripts)
+        }
+    }
+
+    override func removeAllUserScripts() {
+        super.removeAllUserScripts()
+        self.scripts?.userScripts.forEach(self.removeHandler(_:))
     }
 
     func userContentControllerContentBlockingRulesInstalled() async -> TimeInterval? {
         guard self.privacyConfigurationManager.privacyConfig.isEnabled(featureKey: .contentBlocking),
-              !contentRulesInstalled
+              !contentBlockingAssetsInstalled
         else { return nil }
 
         let start = CACurrentMediaTime()
         await withCheckedContinuation { c in
-            self.contentRulesInstalledContinuation = { [continuation=self.contentRulesInstalledContinuation] in
+            self.cbaInstalledContinuation = { [continuation=self.cbaInstalledContinuation] in
                 c.resume()
                 continuation?()
             }
@@ -84,12 +150,12 @@ final class UserContentController: WKUserContentController {
 
 extension WKUserContentController {
 
-    func awaitContentBlockingRulesInstalled() async -> TimeInterval? {
+    func awaitContentBlockingRulesInstalled(waitTime: inout TimeInterval?) async {
         guard let self = self as? UserContentController else {
             assertionFailure("unexpected WKUserContentController")
-            return nil
+            return
         }
-        return await self.userContentControllerContentBlockingRulesInstalled()
+        waitTime = await self.userContentControllerContentBlockingRulesInstalled()
     }
 
 }

@@ -30,17 +30,17 @@ final class UserScripts {
     let hoverUserScript = HoverUserScript()
     let debugScript = DebugUserScript()
     let autofillScript = AutofillUserScript()
-    let clickToLoadScript = ClickToLoadUserScript()
 
+    let clickToLoadScript: ClickToLoadUserScript
     let contentBlockerRulesScript: ContentBlockerRulesUserScript
     let surrogatesScript: SurrogatesUserScript
     let contentScopeUserScript: ContentScopeUserScript
 
     init(with sourceProvider: ScriptSourceProviding) {
-
+        clickToLoadScript = ClickToLoadUserScript(source: sourceProvider.clickToLoadSource)
         contentBlockerRulesScript = ContentBlockerRulesUserScript(configuration: sourceProvider.contentBlockerRulesConfig!)
         surrogatesScript = SurrogatesUserScript(configuration: sourceProvider.surrogatesConfig!)
-        let privacySettings = PrivacySecurityPreferences()
+        let privacySettings = PrivacySecurityPreferences.shared
         let sessionKey = sourceProvider.sessionKey ?? ""
         let prefs = ContentScopeProperties.init(gpcEnabled: privacySettings.gpcEnabled, sessionKey: sessionKey)
         contentScopeUserScript = ContentScopeUserScript(sourceProvider.privacyConfigurationManager, properties: prefs)
@@ -62,19 +62,5 @@ final class UserScripts {
     ]
 
     lazy var scripts = userScripts.map { $0.makeWKUserScript() }
-
-}
-
-extension UserScripts {
-
-    func install(into controller: WKUserContentController) {
-        scripts.forEach(controller.addUserScript)
-        userScripts.forEach(controller.addHandler)
-    }
-
-    func remove(from controller: WKUserContentController) {
-        controller.removeAllUserScripts()
-        userScripts.forEach(controller.removeHandler)
-    }
 
 }

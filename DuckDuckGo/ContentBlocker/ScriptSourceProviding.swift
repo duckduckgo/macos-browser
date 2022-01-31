@@ -22,65 +22,37 @@ import BrowserServicesKit
 
 protocol ScriptSourceProviding {
 
-    func reload(knownChanges: [String: ContentBlockerRulesIdentifier.Difference])
     var contentBlockerRulesConfig: ContentBlockerUserScriptConfig? { get }
     var surrogatesConfig: SurrogatesUserScriptConfig? { get }
     var privacyConfigurationManager: PrivacyConfigurationManager { get }
     var sessionKey: String? { get }
     var clickToLoadSource: String { get }
 
-    var sourceUpdatedPublisher: AnyPublisher<[String: ContentBlockerRulesIdentifier.Difference], Never> { get }
-
 }
 
-final class DefaultScriptSourceProvider: ScriptSourceProviding {
-
-    static var shared: ScriptSourceProviding = DefaultScriptSourceProvider()
+struct DefaultScriptSourceProvider: ScriptSourceProviding {
 
     private(set) var contentBlockerRulesConfig: ContentBlockerUserScriptConfig?
     private(set) var surrogatesConfig: SurrogatesUserScriptConfig?
     private(set) var sessionKey: String?
     private(set) var clickToLoadSource: String = ""
 
-    private let sourceUpdatedSubject = PassthroughSubject<[String: ContentBlockerRulesIdentifier.Difference], Never>()
-    var sourceUpdatedPublisher: AnyPublisher<[String: ContentBlockerRulesIdentifier.Difference], Never> {
-        sourceUpdatedSubject.eraseToAnyPublisher()
-    }
-
     let configStorage: ConfigurationStoring
     let privacyConfigurationManager: PrivacyConfigurationManager
     let contentBlockingManager: ContentBlockerRulesManager
 
-    var contentBlockingRulesUpdatedCancellable: AnyCancellable!
+    init(configStorage: ConfigurationStoring = DefaultConfigurationStorage.shared,
+         privacyConfigurationManager: PrivacyConfigurationManager = ContentBlocking.privacyConfigurationManager,
+         contentBlockingManager: ContentBlockerRulesManager = ContentBlocking.contentBlockingManager) {
 
-    private init(configStorage: ConfigurationStoring = DefaultConfigurationStorage.shared,
-                 privacyConfigurationManager: PrivacyConfigurationManager = ContentBlocking.privacyConfigurationManager,
-                 contentBlockingManager: ContentBlockerRulesManager = ContentBlocking.contentBlockingManager,
-                 contentBlockingUpdating: ContentBlockingUpdating = ContentBlocking.contentBlockingUpdating) {
         self.configStorage = configStorage
         self.privacyConfigurationManager = privacyConfigurationManager
         self.contentBlockingManager = contentBlockingManager
 
-        attachListeners(contentBlockingUpdating: contentBlockingUpdating)
-
-        reload(knownChanges: [:])
-    }
-
-    private func attachListeners(contentBlockingUpdating: ContentBlockingUpdating) {
-        let cancellable = contentBlockingUpdating.contentBlockingRules.receive(on: RunLoop.main).sink(receiveValue: { [weak self] newRulesInfo in
-            guard let self = self, let newRulesInfo = newRulesInfo else { return }
-
-            self.reload(knownChanges: newRulesInfo.changes)
-        })
-        contentBlockingRulesUpdatedCancellable = cancellable
-    }
-
-    func reload(knownChanges: [String: ContentBlockerRulesIdentifier.Difference]) {
-        contentBlockerRulesConfig = buildContentBlockerRulesConfig()
-        surrogatesConfig = buildSurrogatesConfig()
-        sessionKey = generateSessionKey()
-        clickToLoadSource = buildClickToLoadSource()
-        sourceUpdatedSubject.send( knownChanges )
+        self.contentBlockerRulesConfig = buildContentBlockerRulesConfig()
+        self.surrogatesConfig = buildSurrogatesConfig()
+        self.sessionKey = generateSessionKey()
+        self.clickToLoadSource = buildClickToLoadSource()
     }
 
     private func generateSessionKey() -> String {
@@ -88,10 +60,10 @@ final class DefaultScriptSourceProvider: ScriptSourceProviding {
     }
 
     private func buildContentBlockerRulesConfig() -> ContentBlockerUserScriptConfig {
-        
+
         let tdsName = DefaultContentBlockerRulesListsSource.Constants.trackerDataSetRulesListName
         let trackerData = contentBlockingManager.currentRules.first(where: { $0.name == tdsName})?.trackerData
-        
+
         let ctlTrackerData = (contentBlockingManager.currentRules.first(where: {
             $0.name == ContentBlockerRulesLists.Constants.clickToLoadRulesListName
         })?.trackerData) ?? ContentBlockerRulesLists.fbTrackerDataSet
@@ -121,7 +93,7 @@ final class DefaultScriptSourceProvider: ScriptSourceProviding {
                                                  trackerDataManager: ContentBlocking.trackerDataManager,
                                                  isDebugBuild: isDebugBuild)
     }
-    
+
     private func loadTextFile(_ fileName: String, _ fileExt: String) -> String? {
         let url = Bundle.main.url(
             forResource: fileName,
@@ -131,7 +103,7 @@ final class DefaultScriptSourceProvider: ScriptSourceProviding {
             assertionFailure("Failed to load text file")
             return nil
         }
-        
+
         return data
     }
 
@@ -144,7 +116,7 @@ final class DefaultScriptSourceProvider: ScriptSourceProviding {
             assertionFailure("Failed to load font")
             return nil
         }
-        
+
         let font = "data:application/octet-stream;base64," + base64String
         return font
     }
@@ -162,4 +134,5 @@ final class DefaultScriptSourceProvider: ScriptSourceProviding {
             "${proximaBoldFont}": proximaBoldFont!
         ])
     }
+
 }

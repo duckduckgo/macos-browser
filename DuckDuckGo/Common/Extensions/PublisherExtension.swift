@@ -27,4 +27,13 @@ extension Publisher where Failure == Never {
         }
     }
 
+    /// Buffers latest published value and replays it on subscription
+    func shareReplay() -> AnyPublisher<Output, Failure> {
+        return self.map { $0 }
+            .multicast { CurrentValueSubject(nil) }
+            .autoconnect()
+            .compactMap { $0 }
+            .eraseToAnyPublisher()
+    }
+
 }

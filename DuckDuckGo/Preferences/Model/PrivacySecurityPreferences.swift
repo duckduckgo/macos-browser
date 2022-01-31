@@ -17,19 +17,28 @@
 //
 
 import Foundation
+import Combine
 
-struct PrivacySecurityPreferences {
+final class PrivacySecurityPreferences {
+    static let shared = PrivacySecurityPreferences()
+
+    private init() {}
 
     @UserDefaultsWrapper(key: .loginDetectionEnabled, defaultValue: true)
-    public var loginDetectionEnabled: Bool
-    
+    var loginDetectionEnabled: Bool
+
     @UserDefaultsWrapper(key: .gpcEnabled, defaultValue: true)
-    public var gpcEnabled: Bool {
+    var gpcEnabled: Bool {
         didSet {
-            DefaultScriptSourceProvider.shared.reload(knownChanges: [:])
-            GPCRequestFactory.shared.reloadGPCSetting()
+            gpcEnabledUpdatesSubject.send(gpcEnabled)
         }
     }
+
+    private let gpcEnabledUpdatesSubject = PassthroughSubject<Bool, Never>()
+    var gpcEnabledUpdatesPublisher: AnyPublisher<Bool, Never> {
+        gpcEnabledUpdatesSubject.eraseToAnyPublisher()
+    }
+
 }
 
 extension PrivacySecurityPreferences: PreferenceSection {

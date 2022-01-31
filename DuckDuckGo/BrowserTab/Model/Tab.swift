@@ -105,8 +105,6 @@ final class Tab: NSObject {
          webCacheManager: WebCacheManager = WebCacheManager.shared,
          webViewConfiguration: WKWebViewConfiguration? = nil,
          historyCoordinating: HistoryCoordinating = HistoryCoordinator.shared,
-         scriptsSource: ScriptSourceProviding = DefaultScriptSourceProvider.shared,
-         contentBlockingManager: ContentBlockerRulesManager = ContentBlocking.contentBlockingManager,
          visitedDomains: Set<String> = Set<String>(),
          title: String? = nil,
          error: Error? = nil,
@@ -119,8 +117,6 @@ final class Tab: NSObject {
         self.content = content
         self.faviconManagement = faviconManagement
         self.historyCoordinating = historyCoordinating
-        self.scriptsSource = scriptsSource
-        self.contentBlockingManager = contentBlockingManager
         self.visitedDomains = visitedDomains
         self.title = title
         self.error = error
@@ -141,7 +137,7 @@ final class Tab: NSObject {
     }
 
     deinit {
-        userScripts?.remove(from: webView.configuration.userContentController)
+        webView.configuration.userContentController.removeAllUserScripts()
     }
 
     // MARK: - Event Publishers
@@ -316,25 +312,25 @@ final class Tab: NSObject {
 
     @discardableResult
     private func setFBProtection(enabled: Bool) -> Bool {
-        guard self.fbBlockingEnabled != enabled else {
+        guard self.fbBlockingEnabled != enabled else { return false }
+        guard let userContentController = self.webView.configuration.userContentController as? UserContentController else {
+            assertionFailure("expected UserContentController")
             return false
         }
 
-        if let fbRules = contentBlockingManager.currentRules.first(where: {
-            $0.name == ContentBlockerRulesLists.Constants.clickToLoadRulesListName
-        }) {
-            if self.fbBlockingEnabled {
-                self.fbBlockingEnabled = false
-                webView.configuration.userContentController.remove(fbRules.rulesList)
-            } else {
-                self.fbBlockingEnabled = true
-                webView.configuration.userContentController.add(fbRules.rulesList)
+        if enabled {
+            do {
+                try userContentController.enableContentRuleList(withIdentifier: ContentBlockerRulesLists.Constants.clickToLoadRulesListName)
+            } catch {
+                assertionFailure("Missing FB List")
+                return false
             }
-            return true
         } else {
-            assertionFailure("Missing FB List")
+            userContentController.disableContentRuleList(withIdentifier: ContentBlockerRulesLists.Constants.clickToLoadRulesListName)
         }
-        return false
+        self.fbBlockingEnabled = enabled
+
+        return true
     }
 
     private func clickToLoadBlockFB() {
@@ -389,9 +385,12 @@ final class Tab: NSObject {
         webView.navigationDelegate = self
         webView.allowsBackForwardNavigationGestures = true
         webView.allowsMagnification = true
+        guard let userContentController = self.webView.configuration.userContentController as? UserContentController else {
+            assertionFailure("expected UserContentController")
+            return
+        }
+        userContentController.delegate = self
 
-        userScripts = UserScripts(with: scriptsSource)
-        subscribeToUserScriptChanges()
         subscribeToOpenExternalUrlEvents()
 
         superviewObserver = webView.observe(\.superview, options: .old) { [weak self] _, change in
@@ -448,11 +447,6 @@ final class Tab: NSObject {
 
     // MARK: - User Scripts
 
-    let scriptsSource: ScriptSourceProviding
-    private var userScriptsUpdatedCancellable: AnyCancellable?
-    
-    let contentBlockingManager: ContentBlockerRulesManager
-
     lazy var emailManager: EmailManager = {
         let emailManager = EmailManager()
         emailManager.requestDelegate = self
@@ -465,41 +459,9 @@ final class Tab: NSObject {
         return manager
     }()
 
-    private var userScripts: UserScripts! {
-        willSet {
-            if let userScripts = userScripts {
-                userScripts.remove(from: webView.configuration.userContentController)
-            }
-        }
-        didSet {
-            userScripts.debugScript.instrumentation = instrumentation
-            userScripts.faviconScript.delegate = self
-            userScripts.contextMenuScript.delegate = self
-            userScripts.surrogatesScript.delegate = self
-            userScripts.contentBlockerRulesScript.delegate = self
-            userScripts.clickToLoadScript.delegate = self
-            userScripts.autofillScript.emailDelegate = emailManager
-            userScripts.autofillScript.vaultDelegate = vaultManager
-            userScripts.pageObserverScript.delegate = self
-            userScripts.printingUserScript.delegate = self
-            userScripts.hoverUserScript.delegate = self
-
-            attachFindInPage()
-
-            userScripts.install(into: webView.configuration.userContentController)
-        }
-    }
-
-    private func subscribeToUserScriptChanges() {
-        userScriptsUpdatedCancellable = scriptsSource.sourceUpdatedPublisher.receive(on: RunLoop.main).sink { [weak self] _ in
-            guard let self = self, self.delegate != nil else { return }
-
-            self.userScripts = UserScripts(with: self.scriptsSource)
-        }
-    }
-
     // MARK: - Find in Page
 
+    var findInPageScript: FindInPageUserScript?
     var findInPageCancellable: AnyCancellable?
     private func subscribeToFindInPageTextChange() {
         findInPageCancellable?.cancel()
@@ -511,7 +473,7 @@ final class Tab: NSObject {
     }
 
     private func attachFindInPage() {
-        userScripts.findInPageScript.model = findInPage
+        findInPageScript?.model = findInPage
         subscribeToFindInPageTextChange()
     }
 
@@ -574,6 +536,27 @@ final class Tab: NSObject {
     // To avoid webpages invoking the printHandler and overwhelming the browser, this property keeps track of the active
     // print operation and ignores incoming printHandler messages if one exists.
     fileprivate var activePrintOperation: NSPrintOperation?
+
+}
+
+extension Tab: UserContentControllerDelegate {
+
+    func userContentController(_ userContentController: UserContentController, didInstallUserScripts userScripts: UserScripts) {
+        userScripts.debugScript.instrumentation = instrumentation
+        userScripts.faviconScript.delegate = self
+        userScripts.contextMenuScript.delegate = self
+        userScripts.surrogatesScript.delegate = self
+        userScripts.contentBlockerRulesScript.delegate = self
+        userScripts.clickToLoadScript.delegate = self
+        userScripts.autofillScript.emailDelegate = emailManager
+        userScripts.autofillScript.vaultDelegate = vaultManager
+        userScripts.pageObserverScript.delegate = self
+        userScripts.printingUserScript.delegate = self
+        userScripts.hoverUserScript.delegate = self
+
+        self.findInPageScript = userScripts.findInPageScript
+        attachFindInPage()
+    }
 
 }
 
@@ -662,7 +645,7 @@ extension Tab: ClickToLoadUserScriptDelegate {
             replyHandler(true)
             return
         }
-        
+
         if setFBProtection(enabled: false) {
             replyHandler(true)
         } else {
@@ -821,7 +804,8 @@ extension Tab: WKNavigationDelegate {
 
         if navigationAction.isTargetingMainFrame && !url.isDuckDuckGo {
             RulesCompilationMonitor.shared.tabWillWaitForRulesCompilation(self)
-            let waitTime = await webView.configuration.userContentController.awaitContentBlockingRulesInstalled()
+            var waitTime: TimeInterval?
+            await webView.configuration.userContentController.awaitContentBlockingRulesInstalled(waitTime: &waitTime)
             RulesCompilationMonitor.shared.tab(self, didFinishWaitingForRulesWithWaitTime: waitTime)
         }
         self.willPerformNavigationAction(navigationAction)
@@ -976,20 +960,21 @@ extension Tab: WKWebViewDownloadDelegate {
 }
 
 extension Tab {
+
     private func find(text: String) {
-        userScripts.findInPageScript.find(text: text, inWebView: webView)
+        findInPageScript?.find(text: text, inWebView: webView)
     }
 
     func findDone() {
-        userScripts.findInPageScript.done(withWebView: webView)
+        findInPageScript?.done(withWebView: webView)
     }
 
     func findNext() {
-        userScripts.findInPageScript.next(withWebView: webView)
+        findInPageScript?.next(withWebView: webView)
     }
 
     func findPrevious() {
-        userScripts.findInPageScript.previous(withWebView: webView)
+        findInPageScript?.previous(withWebView: webView)
     }
 }
 

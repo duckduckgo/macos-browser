@@ -30,8 +30,6 @@ final class ContentBlocking {
                                       localProtection: LocalUnprotectedDomains.shared,
                                       errorReporting: debugEvents)
 
-    static let contentBlockingUpdating = ContentBlockingUpdating()
-
     static let trackerDataManager = TrackerDataManager(etag: DefaultConfigurationStorage.shared.loadEtag(for: .trackerRadar),
                                                        data: DefaultConfigurationStorage.shared.loadData(for: .trackerRadar),
                                                        errorReporting: debugEvents)
@@ -39,9 +37,9 @@ final class ContentBlocking {
     static let contentBlockingManager = ContentBlockerRulesManager(rulesSource: contentBlockerRulesSource,
                                                                    exceptionsSource: exceptionsSource,
                                                                    cache: ContentBlockingRulesCache(),
-                                                                   updateListener: contentBlockingUpdating,
                                                                    logger: OSLog.contentBlocking)
-    
+    static let contentBlockingUpdating = ContentBlockingUpdating(contentBlockerRulesManager: contentBlockingManager)
+
     private static let contentBlockerRulesSource = ContentBlockerRulesLists(trackerDataManger: trackerDataManager)
     private static let exceptionsSource = DefaultContentBlockerRulesExceptionsSource(privacyConfigManager: privacyConfigurationManager)
 
@@ -116,24 +114,38 @@ final class ContentBlocking {
     }
 }
 
-final class ContentBlockingUpdating: ContentBlockerRulesUpdating {
-    typealias NewRulesInfo = (rules: [ContentBlockerRulesManager.Rules],
-                              changes: [String: ContentBlockerRulesIdentifier.Difference],
-                              completionTokens: Set<ContentBlockerRulesManager.CompletionToken>)
-    typealias NewRulesPublisher = AnyPublisher<NewRulesInfo?, Never>
+final class ContentBlockingUpdating {
 
-    private let contentBlockingRulesSubject = CurrentValueSubject<NewRulesInfo?, Never>(nil)
+    init(contentBlockerRulesManager: ContentBlockerRulesManager,
+         privacySecurityPreferences: PrivacySecurityPreferences = PrivacySecurityPreferences.shared) {
 
-    var contentBlockingRules: NewRulesPublisher {
-        contentBlockingRulesSubject.eraseToAnyPublisher()
+        let rulesAndScriptsPublisher = contentBlockerRulesManager.updatesPublisher
+            // regenerate UserScripts on gpcEnabled preference updated
+            .combineLatest(
+                // first publish actual gpcEnabled value followed by updates
+                privacySecurityPreferences.gpcEnabledUpdatesPublisher.prepend(privacySecurityPreferences.gpcEnabled)
+            )
+            .map {
+                return (update: $0.0 as ContentBlockerRulesManager.UpdateEvent, // drop $0.gpcEnabled value
+                        userScripts: UserScripts(with: DefaultScriptSourceProvider())) // regenerate UserScripts
+            }
+            .shareReplay() // buffer latest update
+
+        self.userContentBlockingAssets = rulesAndScriptsPublisher
+            .map {
+                UserContentController.ContentBlockingAssets(rules: $0.update.rules.reduce(into: [:]) { $0[$1.name] = $1.rulesList },
+                                                            scripts: $0.userScripts)
+            }
+            .eraseToAnyPublisher()
+
+        self.completionTokensPublisher = rulesAndScriptsPublisher
+            .map(\.update.completionTokens)
+            .eraseToAnyPublisher()
+
     }
 
-    func rulesManager(_ manager: ContentBlockerRulesManager,
-                      didUpdateRules rules: [ContentBlockerRulesManager.Rules],
-                      changes: [String: ContentBlockerRulesIdentifier.Difference],
-                      completionTokens: [ContentBlockerRulesManager.CompletionToken]) {
-        contentBlockingRulesSubject.send((rules: rules, changes: changes, completionTokens: Set(completionTokens)))
-    }
+    let userContentBlockingAssets: AnyPublisher<UserContentController.ContentBlockingAssets, Never>
+    let completionTokensPublisher: AnyPublisher<[ContentBlockerRulesManager.CompletionToken], Never>
 
 }
 

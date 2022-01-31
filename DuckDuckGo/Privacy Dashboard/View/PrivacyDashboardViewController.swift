@@ -38,17 +38,19 @@ final class PrivacyDashboardViewController: NSViewController {
         initWebView()
         webView.configuration.userContentController.addHandlerNoContentWorld(privacyDashboardScript)
 
-        prepareContentBlockingCancellable(publisher: ContentBlocking.contentBlockingUpdating.contentBlockingRules)
+        prepareContentBlockingCancellable(publisher: ContentBlocking.contentBlockingUpdating.completionTokensPublisher)
     }
 
-    private func prepareContentBlockingCancellable(publisher: ContentBlockingUpdating.NewRulesPublisher) {
-        contentBlockinRulesUpdatedCancellable = publisher.receive(on: RunLoop.main).sink { [weak self] newRules in
+    private func prepareContentBlockingCancellable<Pub: Publisher>(publisher: Pub)
+    where Pub.Output == [ContentBlockerRulesManager.CompletionToken], Pub.Failure == Never {
+
+        contentBlockinRulesUpdatedCancellable = publisher.receive(on: RunLoop.main).sink { [weak self] completionTokens in
             dispatchPrecondition(condition: .onQueue(.main))
 
-            guard let self = self, let newRules = newRules, !self.pendingUpdates.isEmpty else { return }
+            guard let self = self, !self.pendingUpdates.isEmpty else { return }
 
             var didUpdate = false
-            for token in newRules.completionTokens {
+            for token in completionTokens {
                 if self.pendingUpdates.removeValue(forKey: token) != nil {
                     didUpdate = true
                 }
