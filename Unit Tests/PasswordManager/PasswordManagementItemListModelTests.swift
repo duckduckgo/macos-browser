@@ -93,18 +93,14 @@ final class PasswordManagementItemListModelTests: XCTestCase {
         var accounts = [SecureVaultModels.WebsiteAccount]()
 
         for section in sections {
-            switch section {
-            case .accounts(let items):
-                let accountsFromItems: [SecureVaultModels.WebsiteAccount] = items.compactMap {
-                    switch $0 {
-                    case .account(let account): return account
-                    default: return nil
-                    }
+            let accountsFromItems: [SecureVaultModels.WebsiteAccount] = section.items.compactMap {
+                switch $0 {
+                case .account(let account): return account
+                default: return nil
                 }
-
-                accounts.append(contentsOf: accountsFromItems)
-            default: break
             }
+
+            accounts.append(contentsOf: accountsFromItems)
         }
 
         return accounts
