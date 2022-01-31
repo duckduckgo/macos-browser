@@ -45,7 +45,7 @@ extension WKWebsiteDataStore {
     /// Cookies are not removed as they are handled separately by the Fire button logic.
     ///
     /// - note: The full list of data types can be found in the [WKWebsiteDataStore](https://github.com/WebKit/WebKit/blob/main/Source/WebKit/UIProcess/API/Cocoa/WKWebsiteDataRecord.mm) documentation.
-    static var removableDataTypes: Set<String> {
+    static var safelyRemovableWebsiteDataTypes: Set<String> {
         var types = Self.allWebsiteDataTypesExceptCookies
 
         types.remove(WKWebsiteDataTypeLocalStorage)

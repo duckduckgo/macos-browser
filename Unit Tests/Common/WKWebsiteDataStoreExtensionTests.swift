@@ -23,7 +23,7 @@ import XCTest
 final class WKWebsiteDataStoreExtensionTests: XCTestCase {
     
     func testWhenGettingRemovableDataTypes_ThenLocalStorageAndIndexedDBAreNotIncluded() {
-        let removableTypes = WKWebsiteDataStore.removableDataTypes
+        let removableTypes = WKWebsiteDataStore.safelyRemovableWebsiteDataTypes
         
         XCTAssertFalse(removableTypes.contains(WKWebsiteDataTypeLocalStorage))
         

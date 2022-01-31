@@ -155,7 +155,7 @@ final class WebCacheManagerTests: XCTestCase {
         }
         wait(for: [expect], timeout: 5.0)
 
-        XCTAssertEqual(dataStore.removeDataCalledCount, 1)
+        XCTAssertEqual(dataStore.removeDataCalledCount, 2)
     }
 
     // MARK: Mocks
