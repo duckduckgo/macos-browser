@@ -39,11 +39,10 @@ struct PasswordManagementItemListView: View {
         if #available(macOS 11.0, *) {
             VStack(spacing: 0) {
                 PasswordManagementItemListCategoryView()
-                    .padding([.leading, .trailing], 10)
-                    .padding([.top, .bottom], 20)
+                    .padding([.leading, .trailing], 15)
+                    .padding([.top, .bottom], 15)
                 
                 Divider()
-                    .shadow(color: .black, radius: 3.0, x: 0, y: 1)
                     .opacity(opacity)
                 
                 GeometryReader { outsideProxy in
@@ -63,12 +62,11 @@ struct PasswordManagementItemListView: View {
                                                        value: self.calculateContentOffset(fromOutsideProxy: outsideProxy, insideProxy: insideProxy))
                             })
                             .onPreferenceChange(ScrollOffsetKey.self) { offset in
-                                let fadeDistance: CGFloat = 150
-                                
                                 if offset <= 0 {
                                     self.opacity = 0
                                 } else {
-                                    self.opacity = offset / fadeDistance
+                                    // Fade in the divider over 100pts of scrolling. This is picked arbitrarily, and can be changed.
+                                    self.opacity = offset / 100
                                 }
                             }
                     }
@@ -96,21 +94,27 @@ struct PasswordManagementItemListCategoryView: View {
         HStack {
             
             // Category Picker:
-
-            Picker("", selection: $model.sortDescriptor.category) {
-                ForEach(SecureVaultSorting.Category.allCases, id: \.self) { category in
-                    HStack {
-                        if let imageName = category.imageName {
-                            Image(imageName)
-                        }
-                        Text(category.rawValue)
-                    }
+            
+            NSPopUpButtonView<SecureVaultSorting.Category>(selection: $model.sortDescriptor.category, viewCreator: {
+                let button = NSPopUpButton()
+                button.font = NSFont.systemFont(ofSize: 13, weight: .semibold)
+                button.isBordered = false
+                (button.cell as? NSPopUpButtonCell)?.arrowPosition = .arrowAtCenter
+                
+                for category in SecureVaultSorting.Category.allCases {
+                    let item = button.menu?.addItem(withTitle: category.rawValue, action: nil, keyEquivalent: "")
+                    item?.representedObject = category
                     
                     if category == .allItems {
-                        Divider()
+                        button.menu?.addItem(NSMenuItem.separator())
                     }
                 }
-            }.labelsHidden()
+                
+                button.sizeToFit()
+
+                return button
+            })
+                .frame(maxHeight: 20)
             
             Spacer()
 
@@ -177,6 +181,8 @@ struct PasswordManagementItemListTableView: View {
 
     var body: some View {
         
+        let _ = print("DEBUG: Selected: \(model.selected?.id)")
+
         List {
             ForEach(model.displayedItems, id: \.title) { section in
                 Section(header: Text(section.title)) {
@@ -227,6 +233,10 @@ private struct ItemView: View {
 
     var body: some View {
 
+        if selected {
+            let _ = print("DEBUG: Got Selected: \(item.id)")
+        }
+        
         let textColor = selected ? .white : Color(NSColor.controlTextColor)
         let font = Font.custom("SFProText-Regular", size: 13)
 

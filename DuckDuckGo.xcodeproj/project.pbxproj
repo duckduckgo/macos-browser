@@ -114,6 +114,7 @@
 		4B8AC94026B49BEE00879451 /* logins.json in Resources */ = {isa = PBXBuildFile; fileRef = 4B8AC93E26B49BEE00879451 /* logins.json */; };
 		4B8AC94126B49BEE00879451 /* key4.db in Resources */ = {isa = PBXBuildFile; fileRef = 4B8AC93F26B49BEE00879451 /* key4.db */; };
 		4B8AD0AF27A7790F00AE44D6 /* PasswordManagementListSection.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B8AD0AE27A7790F00AE44D6 /* PasswordManagementListSection.swift */; };
+		4B8AD0B327A8A4FC00AE44D6 /* NSPopUpButtonView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B8AD0B227A8A4FC00AE44D6 /* NSPopUpButtonView.swift */; };
 		4B8D9062276D1D880078DB17 /* LocaleExtension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B8D9061276D1D880078DB17 /* LocaleExtension.swift */; };
 		4B92928B26670D1700AD2C21 /* BookmarksOutlineView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B92928526670D1600AD2C21 /* BookmarksOutlineView.swift */; };
 		4B92928C26670D1700AD2C21 /* OutlineSeparatorViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B92928626670D1600AD2C21 /* OutlineSeparatorViewCell.swift */; };
@@ -790,6 +791,7 @@
 		4B8AC93E26B49BEE00879451 /* logins.json */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.json; path = logins.json; sourceTree = "<group>"; };
 		4B8AC93F26B49BEE00879451 /* key4.db */ = {isa = PBXFileReference; lastKnownFileType = file; path = key4.db; sourceTree = "<group>"; };
 		4B8AD0AE27A7790F00AE44D6 /* PasswordManagementListSection.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PasswordManagementListSection.swift; sourceTree = "<group>"; };
+		4B8AD0B227A8A4FC00AE44D6 /* NSPopUpButtonView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NSPopUpButtonView.swift; sourceTree = "<group>"; };
 		4B8D9061276D1D880078DB17 /* LocaleExtension.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = LocaleExtension.swift; sourceTree = "<group>"; };
 		4B92928526670D1600AD2C21 /* BookmarksOutlineView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = BookmarksOutlineView.swift; sourceTree = "<group>"; };
 		4B92928626670D1600AD2C21 /* OutlineSeparatorViewCell.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = OutlineSeparatorViewCell.swift; sourceTree = "<group>"; };
@@ -2164,6 +2166,7 @@
 				85625993269C8F9600EE44BC /* PasswordManager.storyboard */,
 				85890639267BCD8E00D23B0D /* SaveCredentialsPopover.swift */,
 				8589063B267BCDC000D23B0D /* SaveCredentialsViewController.swift */,
+				4B8AD0B227A8A4FC00AE44D6 /* NSPopUpButtonView.swift */,
 			);
 			path = View;
 			sourceTree = "<group>";
@@ -3970,6 +3973,7 @@
 				AABEE6AF24AD22B90043105B /* AddressBarTextField.swift in Sources */,
 				B693954C26F04BEB0015B914 /* FocusRingView.swift in Sources */,
 				4B9292DB2667125D00AD2C21 /* ContextualMenu.swift in Sources */,
+				4B8AD0B327A8A4FC00AE44D6 /* NSPopUpButtonView.swift in Sources */,
 				AA68C3D32490ED62001B8783 /* NavigationBarViewController.swift in Sources */,
 				AA585DAF2490E6E600E9A3E2 /* MainViewController.swift in Sources */,
 				AA5FA69A275F91C700DCE9C9 /* Favicon.swift in Sources */,
