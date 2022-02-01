@@ -18,9 +18,9 @@
 
 import AppKit
 
-struct ChromePreferences: Decodable {
+struct ChromePreferences: Codable {
     
-    struct ChromeProfile: Decodable {
+    struct ChromeProfile: Codable {
         let name: String
     }
     
