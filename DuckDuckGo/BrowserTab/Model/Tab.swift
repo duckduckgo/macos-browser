@@ -141,7 +141,10 @@ final class Tab: NSObject {
 
     deinit {
         webView.configuration.userContentController.removeAllUserScripts()
-        assert(self.content == .none, "tabWillClose() was not called for this Tab")
+
+#if DEBUG
+        assert(self.isClosing || !content.isUrl, "tabWillClose() was not called for this Tab")
+#endif
     }
 
     // MARK: - Event Publishers
@@ -404,11 +407,18 @@ final class Tab: NSObject {
         reloadIfNeeded(shouldLoadInBackground: shouldLoadInBackground)
     }
 
+#if DEBUG
+    private var isClosing = false
+#endif
+
     func tabWillClose() {
         webView.stopLoading()
         webView.stopMediaCapture()
         cbaTimeReporter?.tabWillClose(self)
-        self.content = .none
+
+#if DEBUG
+        self.isClosing = true
+#endif
     }
 
     // MARK: - Open External URL

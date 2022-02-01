@@ -132,4 +132,8 @@ final class TabCollection: NSObject {
         lastRemovedTabCache = nil
     }
 
+    deinit {
+        tabs.forEach { $0.tabWillClose() }
+    }
+
 }
