@@ -29,6 +29,7 @@ struct UserText {
     static let remove = NSLocalizedString("remove", value: "Remove", comment: "Remove button")
     static let quit = NSLocalizedString("quit", value: "Quit", comment: "Quit button")
     static let dontQuit = NSLocalizedString("dont.quit", value: "Don’t Quit", comment: "Don’t Quit button")
+    static let next = NSLocalizedString("next", value: "Next", comment: "Next button")
 
     static let duplicateTab = NSLocalizedString("duplicate.tab", value: "Duplicate Tab", comment: "Menu item. Duplicate as a verb")
     static let closeTab = NSLocalizedString("close.tab", value: "Close Tab", comment: "Menu item")
@@ -223,6 +224,11 @@ struct UserText {
 
     // MARK: - Login Import & Export
 
+    static func closeBrowserWarningFor(browser: String) -> String {
+        let localized = NSLocalizedString("import.close.browser.warning", value: "You must quit %@ before importing data.", comment: "Quit browser warning when importing data")
+        return String(format: localized, browser)
+    }
+
     static let importLoginsCSV = NSLocalizedString("import.logins.csv.title", value: "CSV Logins File", comment: "Title text for the CSV importer")
 
     static let csvImportDescription = NSLocalizedString("import.logins.csv.description", value: "The CSV importer will try to match column headers to their position.\nIf there is no header, it supports two formats:\n\n1. URL, Username, Password\n2. Title, URL, Username, Password", comment: "Description text for the CSV importer")
@@ -240,9 +246,6 @@ struct UserText {
     static let initiateImport = NSLocalizedString("import.data.initiate", value: "Import", comment: "Button text for importing data")
     static let doneImporting = NSLocalizedString("import.data.done", value: "Done", comment: "Button text for finishing the data import")
 
-    static let chromiumPasswordImportDisclaimer = NSLocalizedString("import.chromium.disclaimer", value: "Your Keychain password is temporarily needed to import passwords.", comment: "Warning text for the Chromium password import option")
-    static let firefoxPasswordImportDisclaimer = NSLocalizedString("import.firefox.disclaimer", value: "Your Primary Password is temporarily needed to import passwords.", comment: "Warning text for the Chromium password import option")
-
     static let dataImportFailedTitle = NSLocalizedString("import.data.import-failed.title", value: "Import Failed", comment: "Alert title when the data import fails")
 
     static func dataImportFailedBody(_ source: DataImport.Source, errorMessage: String) -> String {
@@ -256,11 +259,16 @@ struct UserText {
     static let dataImportAlertAccept = NSLocalizedString("import.data.alert.accept", value: "Okay", comment: "Accept button for data import alerts")
     static let dataImportAlertCancel = NSLocalizedString("import.data.alert.cancel", value: "Cancel", comment: "Cancel button for data import alerts")
 
-    static let dataImportRequiresPasswordTitle = NSLocalizedString("import.data.requires-password.title", value: "Primary Password Required", comment: "Alert title text when the data import needs a password")
+    static func dataImportRequiresPasswordTitle(_ source: DataImport.Source) -> String {
+        let localized = NSLocalizedString("import.data.requires-password.title",
+                                         value: "Enter Primary Password for %@",
+                                         comment: "Alert title text when the data import needs a password")
+        return String(format: localized, source.importSourceName)
+    }
 
     static func dataImportRequiresPasswordBody(_ source: DataImport.Source) -> String {
         let localized = NSLocalizedString("import.data.requires-password.body",
-                                          value: "A primary password is required to import %@ logins.",
+                                          value: "DuckDuckGo won't save or share your %1$@ Primary Password, but DuckDuckGo needs it to access and import passwords from %1$@.",
                                           comment: "Alert body text when the data import needs a password")
         return String(format: localized, source.importSourceName)
     }
@@ -375,7 +383,7 @@ struct UserText {
     static let onboardingWelcomeText = NSLocalizedString("onboarding.welcome.text", value: "Tired of being tracked online? You've come to the right place 👍\n\nI'll help you stay private️ as you search and browse the web. Trackers be gone!", comment: "Detailed welcome to the app text")
     static let onboardingImportDataText = NSLocalizedString("onboarding.importdata.text", value: "First, let me help you import your bookmarks 📖 and passwords 🔑 from those less private browsers.", comment: "Call to action to import data from other browsers")
     static let onboardingSetDefaultText = NSLocalizedString("onboarding.setdefault.text", value: "Next, try setting DuckDuckGo as your default️ browser, so you can open links with peace of mind, every time.", comment: "Call to action to set the browser as default")
-    static let onboardingStartBrowsingText = NSLocalizedString("onboarding.startbrowsing.text", value: "You’re all set!\n\nWant to see how I protect you? Try visiting one of your favorite sites 👆\n\nKeep watching the address bar as you go. I’ll be blocking trackers and upgrading the security of your connection when possible 🔒", comment: "Call to action to start using the app as a browser")
+    static let onboardingStartBrowsingText = NSLocalizedString("onboarding.startbrowsing.text", value: "You’re all set!\n\nWant to see how I protect you? Try visiting one of your favorite sites 👆\n\nKeep watching the address bar as you go. I’ll be blocking trackers and upgrading the security of your connection when possible\u{00A0}🔒", comment: "Call to action to start using the app as a browser")
 
     static let onboardingStartButton = NSLocalizedString("onboarding.welcome.button", value: "Get Started", comment: "Start the onboarding flow")
     static let onboardingImportDataButton = NSLocalizedString("onboarding.importdata.button", value: "Import", comment: "Launch the import data UI")
@@ -383,5 +391,9 @@ struct UserText {
     static let onboardingNotNowButton = NSLocalizedString("onboarding.notnow.button", value: "Maybe Later", comment: "Skip a step of the onboarding flow")
 
     static let waitlistGetStarted = NSLocalizedString("waitlist.get-started", value: "Get Started", comment: "Button title used in the waitlist lock screen success state")
-    
+
+    static let importFromChromiumMoreInfo = NSLocalizedString("import.from.chromium.info", value: "You'll be asked to enter your Keychain password.\n\nDuckDuckGo won’t see your Keychain password, but macOS needs it to access and import passwords into DuckDuckGo.\n\nImported passwords are encrypted and only stored on this computer.", comment: "More info when importing from Chromium")
+
+    static let importFromFirefoxMoreInfo = NSLocalizedString("import.from.firefox.info", value: "You'll be asked to enter your Primary Password for Firefox.\n\nImported passwords are encrypted and only stored on this computer.", comment: "More info when importing from Firefox")
+
 }

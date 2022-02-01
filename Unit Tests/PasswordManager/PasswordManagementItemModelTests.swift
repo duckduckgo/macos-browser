@@ -23,13 +23,25 @@ import BrowserServicesKit
 final class PasswordManagementItemModelTests: XCTestCase {
 
     var isDirty = false
+    var cancelled = false
     var savedCredentials: SecureVaultModels.WebsiteCredentials?
     var deletedCredentials: SecureVaultModels.WebsiteCredentials?
+
+    func testWhenCancelPressedThenOnCancelledCalled() {
+        XCTAssertFalse(cancelled)
+        let model = PasswordManagementLoginModel(onDirtyChanged: onDirtyChanged,
+                                                onSaveRequested: onSaveRequested,
+                                                onDeleteRequested: onDeleteRequested,
+                                                onCancelled: onCancelled)
+        model.cancel()
+        XCTAssertTrue(cancelled)
+    }
 
     func testWhenCredentialsAreSavedThenSaveIsRequested() {
         let model = PasswordManagementLoginModel(onDirtyChanged: onDirtyChanged,
                                                 onSaveRequested: onSaveRequested,
-                                                onDeleteRequested: onDeleteRequested)
+                                                onDeleteRequested: onDeleteRequested,
+                                                onCancelled: onCancelled)
 
         model.credentials = makeCredentials(id: 1)
         model.save()
@@ -41,7 +53,8 @@ final class PasswordManagementItemModelTests: XCTestCase {
     func testWhenCredentialsAreDeletedThenDeleteIsRequested() {
         let model = PasswordManagementLoginModel(onDirtyChanged: onDirtyChanged,
                                                 onSaveRequested: onSaveRequested,
-                                                onDeleteRequested: onDeleteRequested)
+                                                onDeleteRequested: onDeleteRequested,
+                                                onCancelled: onCancelled)
 
         model.credentials = makeCredentials(id: 1)
         model.requestDelete()
@@ -53,7 +66,8 @@ final class PasswordManagementItemModelTests: XCTestCase {
     func testWhenCredentialsHasNoIdThenModelStateIsNew() {
         let model = PasswordManagementLoginModel(onDirtyChanged: onDirtyChanged,
                                                 onSaveRequested: onSaveRequested,
-                                                onDeleteRequested: onDeleteRequested)
+                                                onDeleteRequested: onDeleteRequested,
+                                                onCancelled: onCancelled)
 
         model.createNew()
 
@@ -67,7 +81,8 @@ final class PasswordManagementItemModelTests: XCTestCase {
     func testWhenModelIsEditedThenStateIsUpdated() {
         let model = PasswordManagementLoginModel(onDirtyChanged: onDirtyChanged,
                                                 onSaveRequested: onSaveRequested,
-                                                onDeleteRequested: onDeleteRequested)
+                                                onDeleteRequested: onDeleteRequested,
+                                                onCancelled: onCancelled)
 
         model.credentials = makeCredentials(id: 1)
         XCTAssertEqual(model.domain, "domain")
@@ -112,6 +127,10 @@ final class PasswordManagementItemModelTests: XCTestCase {
 
     func onDeleteRequested(credentials: SecureVaultModels.WebsiteCredentials) {
         deletedCredentials = credentials
+    }
+
+    func onCancelled() {
+        self.cancelled = true
     }
 
     func makeCredentials(id: Int64,

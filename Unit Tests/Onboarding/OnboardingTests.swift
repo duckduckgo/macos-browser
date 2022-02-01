@@ -94,6 +94,13 @@ class OnboardingTests: XCTestCase {
         XCTAssertEqual(model.state, .startBrowsing)
     }
 
+    func testWhenOnboardingRestartedThenInitialStateIsStartFlow() {
+        OnboardingViewModel().restart()
+
+        let model = OnboardingViewModel()
+        XCTAssertEqual(model.state, .startFlow)
+    }
+
     private func assertStateChange(_ model: OnboardingViewModel,
                                    _ expectedCurrentState: OnboardingViewModel.OnboardingPhase,
                                    _ expectedFinalState: OnboardingViewModel.OnboardingPhase,
