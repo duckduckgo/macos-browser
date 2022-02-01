@@ -113,7 +113,8 @@ enum DataImport {
 
     struct BrowserProfile: Comparable {
         enum Constants {
-            static let chromePreferencesFileName = "Preferences"
+            static let chromiumPreferencesFileName = "Preferences"
+            static let chromiumSystemProfileName = "System Profile"
         }
 
         let profileURL: URL
@@ -155,8 +156,12 @@ enum DataImport {
                 return nil
             }
             
-            if profileDirectoryContents.contains(Constants.chromePreferencesFileName),
-               let chromePreferenceData = try? Data(contentsOf: profileURL.appendingPathComponent(Constants.chromePreferencesFileName)),
+            guard profileURL.lastPathComponent != Constants.chromiumSystemProfileName else {
+                return nil
+            }
+            
+            if profileDirectoryContents.contains(Constants.chromiumPreferencesFileName),
+               let chromePreferenceData = try? Data(contentsOf: profileURL.appendingPathComponent(Constants.chromiumPreferencesFileName)),
                let chromePreferences = try? JSONDecoder().decode(ChromePreferences.self, from: chromePreferenceData) {
                 return chromePreferences.profile.name
             }
