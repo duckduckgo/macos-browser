@@ -99,12 +99,14 @@ final class Tab: NSObject {
     }
 
     weak var delegate: TabDelegate?
+    private let cbaTimeReporter: ContentBlockingAssetsCompilationTimeReporter?
 
     init(content: TabContent,
          faviconManagement: FaviconManagement = FaviconManager.shared,
          webCacheManager: WebCacheManager = WebCacheManager.shared,
          webViewConfiguration: WKWebViewConfiguration? = nil,
          historyCoordinating: HistoryCoordinating = HistoryCoordinator.shared,
+         cbaTimeReporter: ContentBlockingAssetsCompilationTimeReporter? = ContentBlockingAssetsCompilationTimeReporter.shared,
          visitedDomains: Set<String> = Set<String>(),
          title: String? = nil,
          error: Error? = nil,
@@ -117,6 +119,7 @@ final class Tab: NSObject {
         self.content = content
         self.faviconManagement = faviconManagement
         self.historyCoordinating = historyCoordinating
+        self.cbaTimeReporter = cbaTimeReporter
         self.visitedDomains = visitedDomains
         self.title = title
         self.error = error
@@ -138,6 +141,7 @@ final class Tab: NSObject {
 
     deinit {
         webView.configuration.userContentController.removeAllUserScripts()
+        assert(self.content == .none, "tabWillClose() was not called for this Tab")
     }
 
     // MARK: - Event Publishers
@@ -403,7 +407,8 @@ final class Tab: NSObject {
     func tabWillClose() {
         webView.stopLoading()
         webView.stopMediaCapture()
-        RulesCompilationMonitor.shared.tabWillClose(self)
+        cbaTimeReporter?.tabWillClose(self)
+        self.content = .none
     }
 
     // MARK: - Open External URL
@@ -798,11 +803,14 @@ extension Tab: WKNavigationDelegate {
             return .cancel
         }
 
-        if navigationAction.isTargetingMainFrame && !url.isDuckDuckGo {
-            RulesCompilationMonitor.shared.tabWillWaitForRulesCompilation(self)
-            var waitTime: TimeInterval?
-            await webView.configuration.userContentController.awaitContentBlockingAssetsInstalled(waitTime: &waitTime)
-            RulesCompilationMonitor.shared.tab(self, didFinishWaitingForRulesWithWaitTime: waitTime)
+        // Ensure Content Blocking Assets (WKContentRuleList&UserScripts) are installed
+        if !webView.configuration.userContentController.contentBlockingAssetsInstalled,
+           navigationAction.isTargetingMainFrame,
+           !url.isDuckDuckGo {
+
+            cbaTimeReporter?.tabWillWaitForRulesCompilation(self)
+            await webView.configuration.userContentController.awaitContentBlockingAssetsInstalled()
+            cbaTimeReporter?.reportWaitTimeForTabFinishedWaitingForRules(self)
         }
 
         // Enable/disable FBProtection only after UserScripts are installed (awaitContentBlockingAssetsInstalled)

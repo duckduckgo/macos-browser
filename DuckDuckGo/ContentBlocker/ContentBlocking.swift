@@ -121,25 +121,26 @@ final class ContentBlockingUpdating {
 
         let rulesAndScriptsPublisher = contentBlockerRulesManager.updatesPublisher
             // regenerate UserScripts on gpcEnabled preference updated
-            .combineLatest(
-                // first publish actual gpcEnabled value followed by updates
-                privacySecurityPreferences.gpcEnabledUpdatesPublisher.prepend(privacySecurityPreferences.gpcEnabled)
-            )
+            .combineLatest(privacySecurityPreferences.$gpcEnabled)
             .map {
-                return (update: $0.0 as ContentBlockerRulesManager.UpdateEvent, // drop $0.gpcEnabled value
+                return (rulesUpdate: $0.0 as ContentBlockerRulesManager.UpdateEvent, // drop gpcEnabled value: $0.1
                         userScripts: UserScripts(with: DefaultScriptSourceProvider())) // regenerate UserScripts
             }
             .shareReplay() // buffer latest update
 
         self.userContentBlockingAssets = rulesAndScriptsPublisher
-            .map {
-                UserContentController.ContentBlockingAssets(rules: $0.update.rules.reduce(into: [:]) { $0[$1.name] = $1.rulesList },
-                                                            scripts: $0.userScripts)
+            .map { rulesAndScripts in
+                UserContentController.ContentBlockingAssets(rules: rulesAndScripts.rulesUpdate.rules
+                                                                .reduce(into: [String: WKContentRuleList](), { result, rules in
+                                                                    result[rules.name] = rules.rulesList
+                                                                }),
+                                                            scripts: rulesAndScripts.userScripts)
             }
             .eraseToAnyPublisher()
 
+        // publish completion tokens for the Content Blocking Assets Regeneration operation
         self.completionTokensPublisher = rulesAndScriptsPublisher
-            .map(\.update.completionTokens)
+            .map(\.rulesUpdate.completionTokens)
             .eraseToAnyPublisher()
 
     }

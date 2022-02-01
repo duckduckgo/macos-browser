@@ -27,16 +27,12 @@ final class PrivacySecurityPreferences {
     @UserDefaultsWrapper(key: .loginDetectionEnabled, defaultValue: true)
     var loginDetectionEnabled: Bool
 
-    @UserDefaultsWrapper(key: .gpcEnabled, defaultValue: true)
-    var gpcEnabled: Bool {
+    @Published
+    var gpcEnabled: Bool = UserDefaultsWrapper(key: .gpcEnabled, defaultValue: true).wrappedValue {
         didSet {
-            gpcEnabledUpdatesSubject.send(gpcEnabled)
+            var udWrapper = UserDefaultsWrapper(key: .gpcEnabled, defaultValue: true)
+            udWrapper.wrappedValue = gpcEnabled
         }
-    }
-
-    private let gpcEnabledUpdatesSubject = PassthroughSubject<Bool, Never>()
-    var gpcEnabledUpdatesPublisher: AnyPublisher<Bool, Never> {
-        gpcEnabledUpdatesSubject.eraseToAnyPublisher()
     }
 
 }

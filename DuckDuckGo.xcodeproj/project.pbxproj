@@ -464,6 +464,7 @@
 		B6106BB326A7F4AA0013B453 /* GeolocationServiceMock.swift in Sources */ = {isa = PBXBuildFile; fileRef = B6106BB226A7F4AA0013B453 /* GeolocationServiceMock.swift */; };
 		B6106BB526A809E60013B453 /* GeolocationProviderTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = B6106BB426A809E60013B453 /* GeolocationProviderTests.swift */; };
 		B610F2BB27A145C500FCEBE9 /* RulesCompilationMonitor.swift in Sources */ = {isa = PBXBuildFile; fileRef = B610F2BA27A145C500FCEBE9 /* RulesCompilationMonitor.swift */; };
+		B610F2E427A8F37A00FCEBE9 /* CBRCompileTimeReporterTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = B610F2E327A8F37A00FCEBE9 /* CBRCompileTimeReporterTests.swift */; };
 		B61EF3EC266F91E700B4D78F /* WKWebView+Download.swift in Sources */ = {isa = PBXBuildFile; fileRef = B61EF3EB266F91E700B4D78F /* WKWebView+Download.swift */; };
 		B61EF3F1266F922200B4D78F /* WKProcessPool+DownloadDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = B61EF3F0266F922200B4D78F /* WKProcessPool+DownloadDelegate.swift */; };
 		B61F015525EDD5A700ABB5A3 /* UserContentController.swift in Sources */ = {isa = PBXBuildFile; fileRef = B61F015425EDD5A700ABB5A3 /* UserContentController.swift */; };
@@ -1146,6 +1147,8 @@
 		B6106BB226A7F4AA0013B453 /* GeolocationServiceMock.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GeolocationServiceMock.swift; sourceTree = "<group>"; };
 		B6106BB426A809E60013B453 /* GeolocationProviderTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GeolocationProviderTests.swift; sourceTree = "<group>"; };
 		B610F2BA27A145C500FCEBE9 /* RulesCompilationMonitor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RulesCompilationMonitor.swift; sourceTree = "<group>"; };
+		B610F2E327A8F37A00FCEBE9 /* CBRCompileTimeReporterTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CBRCompileTimeReporterTests.swift; sourceTree = "<group>"; };
+		B611161427A1074E003802FA /* BrowserServicesKit */ = {isa = PBXFileReference; lastKnownFileType = wrapper; name = BrowserServicesKit; path = ../BrowserServicesKit; sourceTree = "<group>"; };
 		B61EF3EB266F91E700B4D78F /* WKWebView+Download.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "WKWebView+Download.swift"; sourceTree = "<group>"; };
 		B61EF3F0266F922200B4D78F /* WKProcessPool+DownloadDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "WKProcessPool+DownloadDelegate.swift"; sourceTree = "<group>"; };
 		B61F015425EDD5A700ABB5A3 /* UserContentController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UserContentController.swift; sourceTree = "<group>"; };
@@ -2296,6 +2299,7 @@
 			isa = PBXGroup;
 			children = (
 				AA68C3D62490F821001B8783 /* README.md */,
+				B611161427A1074E003802FA /* BrowserServicesKit */,
 				AA585D80248FD31100E9A3E2 /* DuckDuckGo */,
 				AA585D93248FD31400E9A3E2 /* Unit Tests */,
 				4B1AD89E25FC27E200261379 /* Integration Tests */,
@@ -3455,6 +3459,7 @@
 				B6DA44272616CAE000DD1EC2 /* AppUsageActivityMonitorTests.swift */,
 				B6DA441D2616C84600DD1EC2 /* PixelStoreMock.swift */,
 				4B117F7C276C0CB5002F3D8C /* LocalStatisticsStoreTests.swift */,
+				B610F2E327A8F37A00FCEBE9 /* CBRCompileTimeReporterTests.swift */,
 			);
 			path = Statistics;
 			sourceTree = "<group>";
@@ -4352,6 +4357,7 @@
 				4BB99D1126FE1A84001E4761 /* SafariBookmarksReaderTests.swift in Sources */,
 				4B11060A25903EAC0039B979 /* CoreDataEncryptionTests.swift in Sources */,
 				4B9292C32667103100AD2C21 /* PasteboardBookmarkTests.swift in Sources */,
+				B610F2E427A8F37A00FCEBE9 /* CBRCompileTimeReporterTests.swift in Sources */,
 				AAEC74BB2642E67C00C2EFBC /* NSPersistentContainerExtension.swift in Sources */,
 				AABAF59C260A7D130085060C /* FaviconManagerMock.swift in Sources */,
 				AAEC74B82642E43800C2EFBC /* HistoryStoreTests.swift in Sources */,

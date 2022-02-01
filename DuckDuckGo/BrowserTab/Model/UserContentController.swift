@@ -54,9 +54,10 @@ final class UserContentController: WKUserContentController {
     }
 
     private var cbaInstalledContinuation: (() -> Void)?
-    private var contentBlockingAssetsInstalled = false {
+
+    private(set) var uccContentBlockingAssetsInstalled = false {
         didSet {
-            if contentBlockingAssetsInstalled {
+            if uccContentBlockingAssetsInstalled {
                 cbaInstalledContinuation?()
                 self.cbaInstalledContinuation = nil
             }
@@ -77,7 +78,7 @@ final class UserContentController: WKUserContentController {
         self.contentRuleLists = assets.rules
         self.scripts = assets.scripts
 
-        self.contentBlockingAssetsInstalled = true
+        self.uccContentBlockingAssetsInstalled = true
     }
 
     private(set) var contentRuleLists: [String: WKContentRuleList] = [:] {
@@ -131,31 +132,37 @@ final class UserContentController: WKUserContentController {
         self.scripts?.userScripts.forEach(self.removeHandler(_:))
     }
 
-    func userContentControllerContentBlockingAssetsInstalled() async -> TimeInterval? {
+    func userContentControllerContentBlockingAssetsInstalled() async {
         guard self.privacyConfigurationManager.privacyConfig.isEnabled(featureKey: .contentBlocking),
               !contentBlockingAssetsInstalled
-        else { return nil }
+        else { return }
 
-        let start = CACurrentMediaTime()
         await withCheckedContinuation { c in
             self.cbaInstalledContinuation = { [continuation=self.cbaInstalledContinuation] in
                 c.resume()
                 continuation?()
             }
         } as Void
-        return CACurrentMediaTime() - start
     }
 
 }
 
 extension WKUserContentController {
 
-    func awaitContentBlockingAssetsInstalled(waitTime: inout TimeInterval?) async {
+    var contentBlockingAssetsInstalled: Bool {
+        guard let self = self as? UserContentController else {
+            assertionFailure("unexpected WKUserContentController")
+            return true
+        }
+        return self.uccContentBlockingAssetsInstalled
+    }
+
+    func awaitContentBlockingAssetsInstalled() async {
         guard let self = self as? UserContentController else {
             assertionFailure("unexpected WKUserContentController")
             return
         }
-        waitTime = await self.userContentControllerContentBlockingAssetsInstalled()
+        await self.userContentControllerContentBlockingAssetsInstalled()
     }
 
 }

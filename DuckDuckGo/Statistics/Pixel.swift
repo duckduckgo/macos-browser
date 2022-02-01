@@ -57,7 +57,7 @@ final class Pixel {
 
         guard !dryRun else {
             os_log(.debug, log: .pixel, "%@", pixelName.replacingOccurrences(of: "_", with: "."))
-
+            // simulate server response time for Dry Run mode
             DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
                 onComplete(nil)
             }

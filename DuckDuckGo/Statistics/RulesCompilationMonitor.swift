@@ -18,17 +18,24 @@
 
 import Foundation
 
-final class RulesCompilationMonitor: NSObject {
-    static let shared = RulesCompilationMonitor()
+typealias ContentBlockingAssetsCompilationTimeReporter = AbstractContentBlockingAssetsCompilationTimeReporter<Tab>
+extension ContentBlockingAssetsCompilationTimeReporter {
+    static let shared = ContentBlockingAssetsCompilationTimeReporter()
+}
+
+final class AbstractContentBlockingAssetsCompilationTimeReporter<Caller: AnyObject & Hashable>: NSObject {
+
+    var currentTime: () -> TimeInterval = CACurrentMediaTime
+
     private var waitStart: TimeInterval?
-    private var waiters = Set<Tab>()
+    private var waiters = NSMapTable<Caller, NSNumber>.init(keyOptions: .weakMemory, valueOptions: .strongMemory)
     private var isFinished = false
 
     @UserDefaultsWrapper(key: .onboardingFinished, defaultValue: false)
     private var onboardingFinished: Bool
     private var onboardingShown: Bool!
 
-    private override init() {
+    override init() {
         super.init()
         self.onboardingShown = !onboardingFinished
         NotificationCenter.default.addObserver(self,
@@ -37,49 +44,61 @@ final class RulesCompilationMonitor: NSObject {
                                                object: nil)
     }
 
-    func tabWillWaitForRulesCompilation(_ tab: Tab) {
+    /// Called when a Tab is going  to wait for Content Blocking Rules compilation
+    func tabWillWaitForRulesCompilation(_ tab: Caller) {
         guard !isFinished else { return }
 
-        waiters.insert(tab)
+        waiters.setObject(NSNumber(value: true), forKey: tab)
         if waitStart == nil {
-            waitStart = CACurrentMediaTime()
+            waitStart = currentTime()
         }
     }
 
-    func tab(_ tab: Tab, didFinishWaitingForRulesWithWaitTime waitTime: TimeInterval?) {
-        guard waiters.remove(tab) != nil, waiters.isEmpty else { return }
+    /// Called when Rules compilation finishes
+    func reportWaitTimeForTabFinishedWaitingForRules(_ tab: Caller) {
+        defer { waiters.removeObject(forKey: tab) }
+        guard waiters.object(forKey: tab) != nil,
+              !isFinished,
+              let waitStart = waitStart
+        else { return }
 
-        if let waitTime = waitTime {
-            Pixel.fire(.compileRulesWait(onboardingShown: self.onboardingShown, waitTime: waitTime, result: .success))
-        }
+        Pixel.fire(.compileRulesWait(onboardingShown: self.onboardingShown, waitTime: currentTime() - waitStart, result: .success))
 
         // report only once
         isFinished = true
     }
 
-    func tabWillClose(_ tab: Tab) {
-        guard waiters.remove(tab) != nil,
+    /// If Tab is going to close while the rules are still being compiled: report wait time with Tab .closed argument
+    func tabWillClose(_ tab: Caller) {
+        defer { waiters.removeObject(forKey: tab) }
+        guard waiters.object(forKey: tab) != nil,
               !isFinished,
               let waitStart = self.waitStart
         else { return }
 
-        Pixel.fire(.compileRulesWait(onboardingShown: self.onboardingShown, waitTime: CACurrentMediaTime() - waitStart, result: .closed))
+        Pixel.fire(.compileRulesWait(onboardingShown: self.onboardingShown, waitTime: currentTime() - waitStart, result: .closed))
 
         // report only once
         isFinished = true
     }
 
+    /// If App is going to close while the rules are still being compiled: report wait time with .quit argument
     @objc func applicationWillTerminate(_: Notification) {
         guard !isFinished,
-              !waiters.isEmpty,
+              waiters.count > 0,
               let waitStart = self.waitStart
         else { return }
-
+        // Run the loop until Pixel is sent
         let condition = RunLoop.ResumeCondition()
-        Pixel.fire(.compileRulesWait(onboardingShown: self.onboardingShown, waitTime: CACurrentMediaTime() - waitStart, result: .quit)) { _ in
+        Pixel.fire(.compileRulesWait(onboardingShown: self.onboardingShown, waitTime: currentTime() - waitStart, result: .quit)) { _ in
             condition.resolve()
         }
         RunLoop.current.run(until: condition)
+        isFinished = true
+    }
+
+    deinit {
+        NotificationCenter.default.removeObserver(self)
     }
 
 }
