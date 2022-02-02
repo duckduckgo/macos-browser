@@ -466,6 +466,7 @@
 		B610F2BB27A145C500FCEBE9 /* RulesCompilationMonitor.swift in Sources */ = {isa = PBXBuildFile; fileRef = B610F2BA27A145C500FCEBE9 /* RulesCompilationMonitor.swift */; };
 		B610F2E427A8F37A00FCEBE9 /* CBRCompileTimeReporterTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = B610F2E327A8F37A00FCEBE9 /* CBRCompileTimeReporterTests.swift */; };
 		B610F2EB27AA8E4500FCEBE9 /* ContentBlockingUpdatingTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = B610F2E527AA388100FCEBE9 /* ContentBlockingUpdatingTests.swift */; };
+		B610F2EC27AA8F9400FCEBE9 /* ContentBlockerRulesManagerMock.swift in Sources */ = {isa = PBXBuildFile; fileRef = B610F2E727AA397100FCEBE9 /* ContentBlockerRulesManagerMock.swift */; };
 		B61EF3EC266F91E700B4D78F /* WKWebView+Download.swift in Sources */ = {isa = PBXBuildFile; fileRef = B61EF3EB266F91E700B4D78F /* WKWebView+Download.swift */; };
 		B61EF3F1266F922200B4D78F /* WKProcessPool+DownloadDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = B61EF3F0266F922200B4D78F /* WKProcessPool+DownloadDelegate.swift */; };
 		B61F015525EDD5A700ABB5A3 /* UserContentController.swift in Sources */ = {isa = PBXBuildFile; fileRef = B61F015425EDD5A700ABB5A3 /* UserContentController.swift */; };
@@ -4338,6 +4339,7 @@
 				AA63745424C9BF9A00AB2AC4 /* SuggestionContainerTests.swift in Sources */,
 				AAC9C01524CAFBCE00AD1325 /* TabTests.swift in Sources */,
 				B69B504C2726CA2900758A2B /* MockVariantManager.swift in Sources */,
+				B610F2EC27AA8F9400FCEBE9 /* ContentBlockerRulesManagerMock.swift in Sources */,
 				B6BBF1722744CE36004F850E /* FireproofDomainsStoreMock.swift in Sources */,
 				4BA1A6D9258C0CB300F6F690 /* DataEncryptionTests.swift in Sources */,
 				EA1E52B52798CF98002EC53C /* ClickToLoadModelTests.swift in Sources */,
