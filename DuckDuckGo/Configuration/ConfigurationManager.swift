@@ -146,13 +146,13 @@ final class ConfigurationManager {
 
         let tdsEtag = DefaultConfigurationStorage.shared.loadEtag(for: .trackerRadar)
         let tdsData = DefaultConfigurationStorage.shared.loadData(for: .trackerRadar)
-        ContentBlocking.trackerDataManager.reload(etag: tdsEtag, data: tdsData)
+        ContentBlocking.shared.trackerDataManager.reload(etag: tdsEtag, data: tdsData)
 
         let configEtag = DefaultConfigurationStorage.shared.loadEtag(for: .privacyConfiguration)
         let configData = DefaultConfigurationStorage.shared.loadData(for: .privacyConfiguration)
-        ContentBlocking.privacyConfigurationManager.reload(etag: configEtag, data: configData)
+        ContentBlocking.shared.privacyConfigurationManager.reload(etag: configEtag, data: configData)
 
-        ContentBlocking.contentBlockingManager.scheduleCompilation()
+        ContentBlocking.shared.contentBlockingManager.scheduleCompilation()
     }
 
     private func updateBloomFilter() throws {
