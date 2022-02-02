@@ -44,8 +44,8 @@ final class UserContentController: WKUserContentController {
         attachToContentBlockingAssetsPublisher(publisher: assetsPublisher)
     }
 
-    public convenience init(privacyConfigurationManager: PrivacyConfigurationManager = ContentBlocking.privacyConfigurationManager) {
-        self.init(assetsPublisher: ContentBlocking.contentBlockingUpdating.userContentBlockingAssets,
+    public convenience init(privacyConfigurationManager: PrivacyConfigurationManager = ContentBlocking.shared.privacyConfigurationManager) {
+        self.init(assetsPublisher: ContentBlocking.shared.contentBlockingUpdating.userContentBlockingAssets,
                   privacyConfigurationManager: privacyConfigurationManager)
     }
 

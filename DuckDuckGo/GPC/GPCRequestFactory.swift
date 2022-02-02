@@ -34,7 +34,7 @@ final class GPCRequestFactory {
     }
     
     func requestForGPC(basedOn incomingRequest: URLRequest,
-                       config: PrivacyConfiguration = ContentBlocking.privacyConfigurationManager.privacyConfig) -> URLRequest? {
+                       config: PrivacyConfiguration = ContentBlocking.shared.privacyConfigurationManager.privacyConfig) -> URLRequest? {
         func removingHeader(fromRequest incomingRequest: URLRequest) -> URLRequest? {
             var request = incomingRequest
             if let headers = request.allHTTPHeaderFields, headers.firstIndex(where: { $0.key == Constants.secGPCHeader }) != nil {

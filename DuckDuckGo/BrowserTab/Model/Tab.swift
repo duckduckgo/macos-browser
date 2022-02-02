@@ -824,7 +824,7 @@ extension Tab: WKNavigationDelegate {
         }
 
         // Enable/disable FBProtection only after UserScripts are installed (awaitContentBlockingAssetsInstalled)
-        let privacyConfigurationManager = ContentBlocking.privacyConfigurationManager
+        let privacyConfigurationManager = ContentBlocking.shared.privacyConfigurationManager
         let privacyConfiguration = privacyConfigurationManager.privacyConfig
 
         let featureEnabled = privacyConfiguration.isFeature(.clickToPlay, enabledForDomain: url.host)

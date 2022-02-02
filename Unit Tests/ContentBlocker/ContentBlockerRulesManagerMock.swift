@@ -1,7 +1,7 @@
 //
-//  PublisherExtension.swift
+//  ContentBlockerRulesManagerMock.swift
 //
-//  Copyright © 2021 DuckDuckGo. All rights reserved.
+//  Copyright © 2022 DuckDuckGo. All rights reserved.
 //
 //  Licensed under the Apache License, Version 2.0 (the "License");
 //  you may not use this file except in compliance with the License.
@@ -16,15 +16,16 @@
 //  limitations under the License.
 //
 
-import Foundation
+@testable import DuckDuckGo_Privacy_Browser
+import BrowserServicesKit
 import Combine
 
-extension Publisher where Failure == Never {
+final class ContentBlockerRulesManagerMock: ContentBlockerRulesManagerProtocol {
 
-    func weakAssign<T: AnyObject>(to keyPath: ReferenceWritableKeyPath<T, Output>, on object: T) -> AnyCancellable {
-        sink { [weak object] value in
-            object?[keyPath: keyPath] = value
-        }
+    var updatesPublisher: AnyPublisher<ContentBlockerRulesManager.UpdateEvent, Never> {
+        updatesSubject.eraseToAnyPublisher()
     }
+
+    let updatesSubject = PassthroughSubject<ContentBlockerRulesManager.UpdateEvent, Never>()
 
 }

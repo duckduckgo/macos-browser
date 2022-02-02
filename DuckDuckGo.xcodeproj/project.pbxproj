@@ -465,6 +465,8 @@
 		B6106BB526A809E60013B453 /* GeolocationProviderTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = B6106BB426A809E60013B453 /* GeolocationProviderTests.swift */; };
 		B610F2BB27A145C500FCEBE9 /* RulesCompilationMonitor.swift in Sources */ = {isa = PBXBuildFile; fileRef = B610F2BA27A145C500FCEBE9 /* RulesCompilationMonitor.swift */; };
 		B610F2E427A8F37A00FCEBE9 /* CBRCompileTimeReporterTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = B610F2E327A8F37A00FCEBE9 /* CBRCompileTimeReporterTests.swift */; };
+		B610F2E627AA388100FCEBE9 /* ContentBlockingUpdatingTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = B610F2E527AA388100FCEBE9 /* ContentBlockingUpdatingTests.swift */; };
+		B610F2E827AA397100FCEBE9 /* ContentBlockerRulesManagerMock.swift in Sources */ = {isa = PBXBuildFile; fileRef = B610F2E727AA397100FCEBE9 /* ContentBlockerRulesManagerMock.swift */; };
 		B61EF3EC266F91E700B4D78F /* WKWebView+Download.swift in Sources */ = {isa = PBXBuildFile; fileRef = B61EF3EB266F91E700B4D78F /* WKWebView+Download.swift */; };
 		B61EF3F1266F922200B4D78F /* WKProcessPool+DownloadDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = B61EF3F0266F922200B4D78F /* WKProcessPool+DownloadDelegate.swift */; };
 		B61F015525EDD5A700ABB5A3 /* UserContentController.swift in Sources */ = {isa = PBXBuildFile; fileRef = B61F015425EDD5A700ABB5A3 /* UserContentController.swift */; };
@@ -1148,6 +1150,8 @@
 		B6106BB426A809E60013B453 /* GeolocationProviderTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GeolocationProviderTests.swift; sourceTree = "<group>"; };
 		B610F2BA27A145C500FCEBE9 /* RulesCompilationMonitor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RulesCompilationMonitor.swift; sourceTree = "<group>"; };
 		B610F2E327A8F37A00FCEBE9 /* CBRCompileTimeReporterTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CBRCompileTimeReporterTests.swift; sourceTree = "<group>"; };
+		B610F2E527AA388100FCEBE9 /* ContentBlockingUpdatingTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentBlockingUpdatingTests.swift; sourceTree = "<group>"; };
+		B610F2E727AA397100FCEBE9 /* ContentBlockerRulesManagerMock.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentBlockerRulesManagerMock.swift; sourceTree = "<group>"; };
 		B61EF3EB266F91E700B4D78F /* WKWebView+Download.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "WKWebView+Download.swift"; sourceTree = "<group>"; };
 		B61EF3F0266F922200B4D78F /* WKProcessPool+DownloadDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "WKProcessPool+DownloadDelegate.swift"; sourceTree = "<group>"; };
 		B61F015425EDD5A700ABB5A3 /* UserContentController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UserContentController.swift; sourceTree = "<group>"; };
@@ -1766,6 +1770,8 @@
 				98EB5D0F27516A4800681FE6 /* AppPrivacyConfigurationTests.swift */,
 				EA1E52B42798CF98002EC53C /* ClickToLoadModelTests.swift */,
 				EA8AE769279FBDB20078943E /* ClickToLoadTDSTests.swift */,
+				B610F2E527AA388100FCEBE9 /* ContentBlockingUpdatingTests.swift */,
+				B610F2E727AA397100FCEBE9 /* ContentBlockerRulesManagerMock.swift */,
 			);
 			path = ContentBlocker;
 			sourceTree = "<group>";
@@ -4333,6 +4339,7 @@
 				AA63745424C9BF9A00AB2AC4 /* SuggestionContainerTests.swift in Sources */,
 				AAC9C01524CAFBCE00AD1325 /* TabTests.swift in Sources */,
 				B69B504C2726CA2900758A2B /* MockVariantManager.swift in Sources */,
+				B610F2E827AA397100FCEBE9 /* ContentBlockerRulesManagerMock.swift in Sources */,
 				B6BBF1722744CE36004F850E /* FireproofDomainsStoreMock.swift in Sources */,
 				4BA1A6D9258C0CB300F6F690 /* DataEncryptionTests.swift in Sources */,
 				EA1E52B52798CF98002EC53C /* ClickToLoadModelTests.swift in Sources */,
@@ -4365,6 +4372,7 @@
 				4B723E0526B0003E00E14D75 /* DataImportMocks.swift in Sources */,
 				85AC3B1725D9BC1A00C7D2AA /* ConfigurationDownloaderTests.swift in Sources */,
 				B693955D26F19CD70015B914 /* DownloadListStoreTests.swift in Sources */,
+				B610F2E627AA388100FCEBE9 /* ContentBlockingUpdatingTests.swift in Sources */,
 				4B0511E7262CAB3700F6079C /* UserDefaultsWrapperUtilities.swift in Sources */,
 				4BA1A6F6258C4F9600F6F690 /* EncryptionMocks.swift in Sources */,
 				B6B3E0962654DACD0040E0A2 /* UTTypeTests.swift in Sources */,

@@ -42,8 +42,8 @@ struct DefaultScriptSourceProvider: ScriptSourceProviding {
     let contentBlockingManager: ContentBlockerRulesManager
 
     init(configStorage: ConfigurationStoring = DefaultConfigurationStorage.shared,
-         privacyConfigurationManager: PrivacyConfigurationManager = ContentBlocking.privacyConfigurationManager,
-         contentBlockingManager: ContentBlockerRulesManager = ContentBlocking.contentBlockingManager) {
+         privacyConfigurationManager: PrivacyConfigurationManager = ContentBlocking.shared.privacyConfigurationManager,
+         contentBlockingManager: ContentBlockerRulesManager = ContentBlocking.shared.contentBlockingManager) {
 
         self.configStorage = configStorage
         self.privacyConfigurationManager = privacyConfigurationManager
@@ -71,7 +71,7 @@ struct DefaultScriptSourceProvider: ScriptSourceProviding {
         return DefaultContentBlockerUserScriptConfig(privacyConfiguration: privacyConfigurationManager.privacyConfig,
                                                      trackerData: trackerData,
                                                      ctlTrackerData: ctlTrackerData,
-                                                     trackerDataManager: ContentBlocking.trackerDataManager)
+                                                     trackerDataManager: ContentBlocking.shared.trackerDataManager)
     }
 
     private func buildSurrogatesConfig() -> SurrogatesUserScriptConfig {
@@ -90,7 +90,7 @@ struct DefaultScriptSourceProvider: ScriptSourceProviding {
                                                  surrogates: surrogates,
                                                  trackerData: rules?.trackerData,
                                                  encodedSurrogateTrackerData: rules?.encodedTrackerData,
-                                                 trackerDataManager: ContentBlocking.trackerDataManager,
+                                                 trackerDataManager: ContentBlocking.shared.trackerDataManager,
                                                  isDebugBuild: isDebugBuild)
     }
 

@@ -38,7 +38,7 @@ final class PrivacyDashboardViewController: NSViewController {
         initWebView()
         webView.configuration.userContentController.addHandlerNoContentWorld(privacyDashboardScript)
 
-        prepareContentBlockingCancellable(publisher: ContentBlocking.contentBlockingUpdating.completionTokensPublisher)
+        prepareContentBlockingCancellable(publisher: ContentBlocking.shared.contentBlockingUpdating.completionTokensPublisher)
     }
 
     private func prepareContentBlockingCancellable<Pub: Publisher>(publisher: Pub)
@@ -148,7 +148,7 @@ final class PrivacyDashboardViewController: NSViewController {
             return
         }
 
-        let configuration = ContentBlocking.privacyConfigurationManager.privacyConfig
+        let configuration = ContentBlocking.shared.privacyConfigurationManager.privacyConfig
         let isProtected = !configuration.isUserUnprotected(domain: domain)
         self.privacyDashboardScript.setProtectionStatus(isProtected, webView: self.webView)
     }
@@ -168,7 +168,7 @@ final class PrivacyDashboardViewController: NSViewController {
             return
         }
 
-        let pageEntity = ContentBlocking.trackerDataManager.trackerData.findEntity(forHost: domain)
+        let pageEntity = ContentBlocking.shared.trackerDataManager.trackerData.findEntity(forHost: domain)
         self.privacyDashboardScript.setParentEntity(pageEntity, webView: self.webView)
     }
 
@@ -196,14 +196,14 @@ extension PrivacyDashboardViewController: PrivacyDashboardUserScriptDelegate {
             return
         }
 
-        let configuration = ContentBlocking.privacyConfigurationManager.privacyConfig
+        let configuration = ContentBlocking.shared.privacyConfigurationManager.privacyConfig
         if isProtected {
             configuration.userEnabledProtection(forDomain: domain)
         } else {
             configuration.userDisabledProtection(forDomain: domain)
         }
 
-        let completionToken = ContentBlocking.contentBlockingManager.scheduleCompilation()
+        let completionToken = ContentBlocking.shared.contentBlockingManager.scheduleCompilation()
         pendingUpdates[completionToken] = domain
         sendPendingUpdates()
     }

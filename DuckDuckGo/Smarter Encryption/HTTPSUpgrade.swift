@@ -32,7 +32,7 @@ final class HTTPSUpgrade {
         self.store = store
     }
 
-    func isUpgradeable(url: URL, config: PrivacyConfiguration = ContentBlocking.privacyConfigurationManager.privacyConfig) -> Bool {
+    func isUpgradeable(url: URL, config: PrivacyConfiguration = ContentBlocking.shared.privacyConfigurationManager.privacyConfig) -> Bool {
         
         guard url.scheme == URL.NavigationalScheme.http.rawValue else {
             return false
