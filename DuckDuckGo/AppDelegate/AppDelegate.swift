@@ -94,7 +94,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         stateRestorationManager.applicationDidFinishLaunching()
 
         if WindowsManager.windows.isEmpty {
-//            WindowsManager.openNewWindow()
+            WindowsManager.openNewWindow()
         }
 
         grammarFeaturesManager.manage()

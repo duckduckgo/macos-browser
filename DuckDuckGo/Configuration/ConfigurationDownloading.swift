@@ -91,11 +91,11 @@ final class DefaultConfigurationDownloader: ConfigurationDownloading {
 
             let storedEtag = self.storage.loadEtag(for: config)
 
-//            if let embeddedEtag = embeddedEtag, storedEtag == nil {
-//                request.addValue(embeddedEtag, forHTTPHeaderField: Constants.ifNoneMatchField)
-//            } else if self.storage.loadData(for: config) != nil, let etag = storedEtag {
-//                request.addValue(etag, forHTTPHeaderField: Constants.ifNoneMatchField)
-//            }
+            if let embeddedEtag = embeddedEtag, storedEtag == nil {
+                request.addValue(embeddedEtag, forHTTPHeaderField: Constants.ifNoneMatchField)
+            } else if self.storage.loadData(for: config) != nil, let etag = storedEtag {
+                request.addValue(etag, forHTTPHeaderField: Constants.ifNoneMatchField)
+            }
 
             self.dataTaskProvider.dataTaskPublisher(for: request)
                 .tryMap { result -> ConfigurationDownloadMeta? in
@@ -103,9 +103,9 @@ final class DefaultConfigurationDownloader: ConfigurationDownloading {
                         throw Error.invalidResponse
                     }
 
-//                    if response.statusCode == Constants.notModifiedResponseCode {
-//                        return nil
-//                    }
+                    if response.statusCode == Constants.notModifiedResponseCode {
+                        return nil
+                    }
 
                     guard let etag = response.value(forHTTPHeaderField: Constants.etagField) else {
                         throw Error.noEtagInResponse
