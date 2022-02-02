@@ -19,7 +19,7 @@
 import XCTest
 import WebKit
 import TrackerRadarKit
-@testable import BrowserServicesKit
+import BrowserServicesKit
 @testable import DuckDuckGo_Privacy_Browser
 
 class ContentBlockingUpdatingTests: XCTestCase {
