@@ -31,6 +31,14 @@ class EmbeddedTrackerDataTests: XCTestCase {
         XCTAssertEqual(hash, AppTrackerDataSetProvider.Constants.embeddedDataSetSHA, "Error: please update SHA and ETag when changing embedded TDS")
     }
     
+    func testWhenEmbeddedDataIsPresentThenWeCanUseItToLookupTrackers() {
+        let manager = TrackerDataManager(etag: nil,
+                                         data: nil,
+                                         embeddedDataProvider: AppTrackerDataSetProvider())
+        
+        XCTAssertEqual(manager.trackerData.findEntity(forHost: "www.google.com")?.displayName, "Google")
+    }
+    
     func testWhenEmbeddedDataIsCompiledThenThereIsNoError() throws {
         
         let embeddedData = try Data(contentsOf: AppTrackerDataSetProvider.embeddedUrl)
