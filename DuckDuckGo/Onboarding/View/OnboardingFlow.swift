@@ -24,36 +24,22 @@ struct OnboardingFlow: View {
 
     @EnvironmentObject var model: OnboardingViewModel
 
-    @State var makeSpace = false
     @State var showLogo = false
     @State var showTitle = true
     @State var daxInSpeechPosition = false
     @State var showDialogs = false
 
-    // Not used for display, just needs to be passed to DaxSpeech. Might be a better way to do this.
-    @State var typingFinished = false
-
     var body: some View {
 
         VStack(alignment: daxInSpeechPosition ? .leading : .center) {
 
-            Text(UserText.onboardingWelcomeTitle)
-                .kerning(-1.26)
-                .font(.system(size: 42, weight: .bold, design: .default))
-                .foregroundColor(.black)
-                .visibility(showTitle ? .visible : .gone)
-
-            Color.clear.frame(width: 64, height: 64)
-                .visibility(makeSpace ? .visible : .gone)
-
-            HStack(alignment: .top) {
+            HStack(alignment: .top, spacing: 23) {
 
                 Image("OnboardingDax")
                     .resizable()
                     .frame(width: 64, height: 64)
                     .shadow(color: .black.opacity(0.16), radius: 6, x: 0, y: 3)
                     .transition(.move(edge: .bottom).combined(with: .opacity))
-                    .padding(.init(top: 0, leading: 0, bottom: 0, trailing: daxInSpeechPosition ? 10 : 0))
 
                 ZStack {
 
@@ -86,6 +72,12 @@ struct OnboardingFlow: View {
 
             }.visibility(showLogo ? .visible : .gone)
 
+            Text(UserText.onboardingWelcomeTitle)
+                .kerning(-1.26)
+                .font(.system(size: 42, weight: .bold, design: .default))
+                .foregroundColor(.black)
+                .visibility(showTitle ? .visible : .gone)
+
             Spacer().visibility(daxInSpeechPosition ? .visible : .gone)
 
         }
@@ -103,14 +95,7 @@ struct OnboardingFlow: View {
 
             Timer.scheduledTimer(withTimeInterval: 1.5, repeats: false) { _ in
                 withAnimation(.easeIn(duration: 0.5)) {
-                    makeSpace = true
-                }
-            }
-
-            Timer.scheduledTimer(withTimeInterval: 2.0, repeats: false) { _ in
-                withAnimation(.easeIn(duration: 0.5)) {
                     showLogo = true
-                    makeSpace = false
                 }
             }
 

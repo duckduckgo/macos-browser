@@ -31,6 +31,7 @@ protocol WebsiteDataStore {
 
     func dataRecords(ofTypes dataTypes: Set<String>) async -> [WKWebsiteDataRecord]
     func removeData(ofTypes dataTypes: Set<String>, modifiedSince date: Date) async
+    func removeData(ofTypes dataTypes: Set<String>, for records: [WKWebsiteDataRecord]) async
 }
 
 internal class WebCacheManager {
@@ -50,7 +51,9 @@ internal class WebCacheManager {
         // first cleanup ~/Library/Caches
         await self.clearFileCache()
 
-        await removeAllDataExceptCookies()
+        await removeAllSafelyRemovableDataTypes()
+        
+        await removeLocalStorageAndIndexedDBForNonFireproofDomains()
 
         await removeCookies(forDomains: domains)
 
@@ -84,11 +87,24 @@ internal class WebCacheManager {
     }
 
     @MainActor
-    private func removeAllDataExceptCookies() async {
-        let allExceptCookies = WKWebsiteDataStore.allWebsiteDataTypesExceptCookies
+    private func removeAllSafelyRemovableDataTypes() async {
+        let safelyRemovableTypes = WKWebsiteDataStore.safelyRemovableWebsiteDataTypes
 
-        // Remove all data except cookies for all domains, and then filter cookies to preserve those allowed by Fireproofing.
-        await websiteDataStore.removeData(ofTypes: allExceptCookies, modifiedSince: Date.distantPast)
+        // Remove all data except cookies, local storage, and IndexedDB for all domains, and then filter cookies to preserve those allowed by Fireproofing.
+        await websiteDataStore.removeData(ofTypes: safelyRemovableTypes, modifiedSince: Date.distantPast)
+    }
+    
+    @MainActor
+    private func removeLocalStorageAndIndexedDBForNonFireproofDomains() async {
+        let allRecords = await websiteDataStore.dataRecords(ofTypes: WKWebsiteDataStore.allWebsiteDataTypes())
+        
+        let removableRecords = allRecords.filter { record in
+            // For Local Storage, only remove records that *exactly match* the display name.
+            // Subdomains or root domains should be excluded.
+            !fireproofDomains.fireproofDomains.contains(record.displayName)
+        }
+        
+        await websiteDataStore.removeData(ofTypes: WKWebsiteDataStore.allWebsiteDataTypesExceptCookies, for: removableRecords)
     }
 
     @MainActor

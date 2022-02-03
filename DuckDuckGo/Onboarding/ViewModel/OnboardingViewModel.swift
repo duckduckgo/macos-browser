@@ -43,8 +43,7 @@ final class OnboardingViewModel: ObservableObject {
 
     }
 
-    // We can remove this later, once typing animation issues are resolved.
-    let typingDisabled = true
+    var typingDisabled = false
 
     @Published var skipTypingRequested = false
     @Published var state: OnboardingPhase = .startFlow {
@@ -54,7 +53,7 @@ final class OnboardingViewModel: ObservableObject {
     }
 
     @UserDefaultsWrapper(key: .onboardingFinished, defaultValue: false)
-    var onboardingFinished: Bool
+    private(set) var onboardingFinished: Bool
 
     weak var delegate: OnboardingDelegate?
 
@@ -106,9 +105,19 @@ final class OnboardingViewModel: ObservableObject {
     func typingSkipped() {
         Pixel.fire(.onboardingTypingSkipped)
     }
-
+    
     func onboardingReshown() {
-        delegate?.onboardingHasFinished()
+        if onboardingFinished {
+            typingDisabled = true
+            delegate?.onboardingHasFinished()
+        } else {
+            state = .startFlow
+        }
+    }
+
+    func restart() {
+        onboardingFinished = false
+        state = .startFlow
     }
 
 }

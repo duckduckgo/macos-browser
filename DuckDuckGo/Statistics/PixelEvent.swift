@@ -118,12 +118,20 @@ extension Pixel {
             case suggestionsFetchFailed = "sgf"
             case appOpenURLFailed = "url"
             case appStateRestorationFailed = "srf"
+            
+            case contentBlockingErrorReportingIssue = "content_blocking_error_reporting_issue"
 
             case contentBlockingTDSCompilationFailed = "content_blocking_compilation_error_fetched_tds"
             case contentBlockingTempListCompilationFailed = "content_blocking_compilation_error_temp_list"
             case contentBlockingAllowListCompilationFailed = "content_blocking_compilation_error_allow_list"
             case contentBlockingUnpSitesCompilationFailed = "content_blocking_compilation_error_unprotected_list"
             case contentBlockingFallbackCompilationFailed = "content_blocking_compilation_error_fallback_tds"
+            
+            case clickToLoadTDSCompilationFailed = "click_to_load_compilation_error_fetched_tds"
+            case clickToLoadTempListCompilationFailed = "click_to_load_compilation_error_temp_list"
+            case clickToLoadAllowListCompilationFailed = "click_to_load_compilation_error_allow_list"
+            case clickToLoadUnpSitesCompilationFailed = "click_to_load_compilation_error_unprotected_list"
+            case clickToLoadFallbackCompilationFailed = "click_to_load_compilation_error_fallback_tds"
         }
 
     }
