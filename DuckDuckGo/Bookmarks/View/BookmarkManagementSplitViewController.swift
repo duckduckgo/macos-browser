@@ -53,7 +53,7 @@ final class BookmarkManagementSplitViewController: NSSplitViewController {
         detailViewController.delegate = self
         sidebarViewController.tabSwitcherButton.displayBrowserTabButtons(withSelectedTab: .bookmarks)
 
-        selectedTabCancellable = sidebarViewController.tabSwitcherButton.selectionPublisher.sink { [weak self] index in
+        selectedTabCancellable = sidebarViewController.tabSwitcherButton.selectionPublisher.dropFirst().sink { [weak self] index in
             self?.delegate?.selectedTab(at: index)
         }
     }

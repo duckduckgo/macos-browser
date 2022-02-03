@@ -19,6 +19,7 @@
 import AppKit
 import BrowserServicesKit
 import Combine
+import os.log
 
 // swiftlint:disable type_body_length
 final class DataImportViewController: NSViewController {
@@ -68,6 +69,11 @@ final class DataImportViewController: NSViewController {
         return storyboard.instantiateController(identifier: Constants.identifier)
     }
 
+    private func secureVaultImporter() throws -> SecureVaultLoginImporter {
+        let secureVault = try SecureVaultFactory.default.makeVault()
+        return SecureVaultLoginImporter(secureVault: secureVault)
+    }
+
     private var viewState: ViewState = .defaultState() {
         didSet {
 
@@ -75,31 +81,27 @@ final class DataImportViewController: NSViewController {
 
             let bookmarkImporter = CoreDataBookmarkImporter(bookmarkManager: LocalBookmarkManager.shared)
 
-            switch viewState.selectedImportSource {
-            case .brave:
-                let secureVault = try? SecureVaultFactory.default.makeVault()
-                let secureVaultImporter = SecureVaultLoginImporter(secureVault: secureVault!)
-                self.dataImporter = BraveDataImporter(loginImporter: secureVaultImporter, bookmarkImporter: bookmarkImporter)
-            case .chrome:
-                let secureVault = try? SecureVaultFactory.default.makeVault()
-                let secureVaultImporter = SecureVaultLoginImporter(secureVault: secureVault!)
-                self.dataImporter = ChromeDataImporter(loginImporter: secureVaultImporter, bookmarkImporter: bookmarkImporter)
-            case .edge:
-                let secureVault = try? SecureVaultFactory.default.makeVault()
-                let secureVaultImporter = SecureVaultLoginImporter(secureVault: secureVault!)
-                self.dataImporter = EdgeDataImporter(loginImporter: secureVaultImporter, bookmarkImporter: bookmarkImporter)
-            case .firefox:
-                let secureVault = try? SecureVaultFactory.default.makeVault()
-                let secureVaultImporter = SecureVaultLoginImporter(secureVault: secureVault!)
-                self.dataImporter = FirefoxDataImporter(loginImporter: secureVaultImporter, bookmarkImporter: bookmarkImporter)
-            case .safari:
-                self.dataImporter = SafariDataImporter(bookmarkImporter: bookmarkImporter)
-            case .csv:
-                if !(self.dataImporter is CSVImporter) {
-                    self.dataImporter = nil
+            do {
+                switch viewState.selectedImportSource {
+                case .brave:
+                    self.dataImporter = try BraveDataImporter(loginImporter: secureVaultImporter(), bookmarkImporter: bookmarkImporter)
+                case .chrome:
+                    self.dataImporter = try ChromeDataImporter(loginImporter: secureVaultImporter(), bookmarkImporter: bookmarkImporter)
+                case .edge:
+                    self.dataImporter = try EdgeDataImporter(loginImporter: secureVaultImporter(), bookmarkImporter: bookmarkImporter)
+                case .firefox:
+                    self.dataImporter = try FirefoxDataImporter(loginImporter: secureVaultImporter(), bookmarkImporter: bookmarkImporter)
+                case .safari:
+                    self.dataImporter = SafariDataImporter(bookmarkImporter: bookmarkImporter)
+                case .csv:
+                    if !(self.dataImporter is CSVImporter) {
+                        self.dataImporter = nil
+                    }
                 }
+            } catch {
+                os_log("dataImporter initialization failed: %{public}s", type: .error, error.localizedDescription)
+                self.presentAlert(for: .cannotAccessSecureVault)
             }
-
         }
     }
 
@@ -139,11 +141,6 @@ final class DataImportViewController: NSViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
 
-        let secureVault = try? SecureVaultFactory.default.makeVault()
-        let secureVaultImporter = SecureVaultLoginImporter(secureVault: secureVault!)
-        let bookmarkImporter = CoreDataBookmarkImporter(bookmarkManager: LocalBookmarkManager.shared)
-
-        self.dataImporter = ChromeDataImporter(loginImporter: secureVaultImporter, bookmarkImporter: bookmarkImporter)
         importSourcePopUpButton.displayImportSources()
         renderCurrentViewState()
 
@@ -435,6 +432,7 @@ extension DataImportViewController: CSVImportViewControllerDelegate {
             self.viewState.interactionState = .ableToImport
         } catch {
             self.viewState.interactionState = .unableToImport
+            self.presentAlert(for: .cannotAccessSecureVault)
         }
     }
 

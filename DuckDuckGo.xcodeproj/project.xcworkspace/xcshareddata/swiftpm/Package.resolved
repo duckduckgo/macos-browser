@@ -5,8 +5,8 @@
         "package": "BrowserServicesKit",
         "repositoryURL": "https://github.com/duckduckgo/BrowserServicesKit",
         "state": {
-          "branch": "bartek/per-platform-tds",
-          "revision": "d0cff40674bbec8b796be1c6347101232d7480f0",
+          "branch": null,
+          "revision": "0d896c52a00ca64a72d850df0751caea37ff1d70",
           "version": null
         }
       },
