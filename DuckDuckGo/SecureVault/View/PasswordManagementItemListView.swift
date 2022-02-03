@@ -39,38 +39,39 @@ struct PasswordManagementItemListView: View {
         if #available(macOS 11.0, *) {
             VStack(spacing: 0) {
                 PasswordManagementItemListCategoryView()
-                    .padding([.top, .bottom], 15)
+                    .padding(.top, 15)
+                    .padding(.bottom, 14)
                     .padding([.leading, .trailing], 10)
                 
                 Divider()
                     .opacity(opacity)
                 
                 GeometryReader { outsideProxy in
-                ScrollView {
-                    ScrollViewReader { proxy in
-                        PasswordManagementItemListStackView()
-                            .onAppear {
-                                // Scrolling to the selected item doesn't work consistently without a very slight delay.
-                                DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
-                                    if let selectionID = model.selected?.id {
-                                        proxy.scrollTo(selectionID, anchor: .center)
+                    ScrollView {
+                        ScrollViewReader { proxy in
+                            PasswordManagementItemListStackView()
+                                .onAppear {
+                                    // Scrolling to the selected item doesn't work consistently without a very slight delay.
+                                    DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
+                                        if let selectionID = model.selected?.id {
+                                            proxy.scrollTo(selectionID, anchor: .center)
+                                        }
                                     }
                                 }
-                            }
-                            .background(GeometryReader { insideProxy in
-                                Color.clear.preference(key: ScrollOffsetKey.self,
-                                                       value: self.calculateContentOffset(fromOutsideProxy: outsideProxy, insideProxy: insideProxy))
-                            })
-                            .onPreferenceChange(ScrollOffsetKey.self) { offset in
-                                if offset <= 0 {
-                                    self.opacity = 0
-                                } else {
-                                    // Fade in the divider over 100pts of scrolling. This is picked arbitrarily, and can be changed.
-                                    self.opacity = offset / 100
+                                .background(GeometryReader { insideProxy in
+                                    Color.clear.preference(key: ScrollOffsetKey.self,
+                                                           value: self.calculateContentOffset(fromOutsideProxy: outsideProxy, insideProxy: insideProxy))
+                                })
+                                .onPreferenceChange(ScrollOffsetKey.self) { offset in
+                                    if offset <= 0 {
+                                        self.opacity = 0
+                                    } else {
+                                        // Fade in the divider over 100pts of scrolling. This is picked arbitrarily, and can be changed.
+                                        self.opacity = offset / 100
+                                    }
                                 }
-                            }
+                        }
                     }
-                }
                 }
             }
         } else {
@@ -169,7 +170,7 @@ struct PasswordManagementItemListStackView: View {
     var body: some View {
         
         if #available(macOS 11.0, *) {
-            VStack(alignment: .leading) {
+            LazyVStack(alignment: .leading) {
                 PasswordManagementItemStackContentsView()
             }
         } else {
@@ -178,28 +179,6 @@ struct PasswordManagementItemListStackView: View {
             }
         }
         
-    }
-    
-}
-
-struct PasswordManagementItemListTableView: View {
-    
-    @EnvironmentObject var model: PasswordManagementItemListModel
-
-    var body: some View {
-        
-        List {
-            ForEach(model.displayedItems, id: \.title) { section in
-                Section(header: Text(section.title)) {
-                    ForEach(section.items, id: \.id) { item in
-                        ItemView(item: item, selected: model.selected == item) {
-                            model.selected(item: item)
-                        }
-                    }
-                }
-            }
-        }
-
     }
     
 }
@@ -216,7 +195,7 @@ private struct PasswordManagementItemStackContentsView: View {
             Section(header: Text(section.title).padding(.leading, 18).padding(.top, 10)) {
                 
                 ForEach(section.items, id: \.id) { item in
-                    ItemView(item: item, selected: model.selected == item) {
+                    ItemView(item: item) {
                         model.selected(item: item)
                     }
                     .padding(.horizontal, 10)
@@ -232,12 +211,14 @@ private struct PasswordManagementItemStackContentsView: View {
 
 private struct ItemView: View {
 
+    @EnvironmentObject var model: PasswordManagementItemListModel
+
     let item: SecureVaultItem
-    let selected: Bool
     let action: () -> Void
 
     var body: some View {
  
+        let selected = model.selected == item
         let textColor = selected ? .white : Color(NSColor.controlTextColor)
         let font = Font.custom("SFProText-Regular", size: 13)
 
