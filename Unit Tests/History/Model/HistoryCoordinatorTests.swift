@@ -135,19 +135,6 @@ class HistoryCoordinatorTests: XCTestCase {
         }
     }
 
-    func testWhenUrlIsMarkedAsDownload_ThenIsDownloadFlagIsStored() {
-        let (historyStoringMock, historyCoordinator) = HistoryCoordinator.aHistoryCoordinator
-
-        let downloadUrl = URL(string: "https://duckduckgo.com/download")!
-        historyCoordinator.addVisit(of: downloadUrl)
-        Thread.sleep(forTimeInterval: 0.1)
-
-        historyCoordinator.markDownloadUrl(downloadUrl)
-        Thread.sleep(forTimeInterval: 0.1)
-
-        XCTAssertTrue(historyStoringMock.savedHistoryEntries.last?.isDownload ?? false)
-    }
-
     func testWhenUrlIsMarkedAsFailedToLoad_ThenFailedToLoadFlagIsStored() {
         let (historyStoringMock, historyCoordinator) = HistoryCoordinator.aHistoryCoordinator
 
@@ -177,26 +164,6 @@ class HistoryCoordinatorTests: XCTestCase {
 
         XCTAssertEqual(url, historyStoringMock.savedHistoryEntries.last?.url)
         XCTAssertFalse(historyStoringMock.savedHistoryEntries.last?.failedToLoad ?? true)
-    }
-
-    func testWhenUrlisMarkedAsDownloadAndIsVisitedAgain_ThenFlagIsCleared() {
-        let (historyStoringMock, historyCoordinator) = HistoryCoordinator.aHistoryCoordinator
-
-        let url = URL(string: "https://duckduckgo.com/traffic")!
-        historyCoordinator.addVisit(of: url)
-        Thread.sleep(forTimeInterval: 0.1)
-
-        XCTAssertFalse(historyStoringMock.savedHistoryEntries[0].isDownload)
-
-        historyCoordinator.markDownloadUrl(url)
-        Thread.sleep(forTimeInterval: 0.1)
-
-        XCTAssert(historyStoringMock.savedHistoryEntries[1].isDownload)
-
-        historyCoordinator.addVisit(of: url)
-        Thread.sleep(forTimeInterval: 0.1)
-
-        XCTAssertFalse(historyStoringMock.savedHistoryEntries[2].isDownload)
     }
 
     func testWhenUrlHasNoTitle_ThenFetchingTitleReturnsNil() {

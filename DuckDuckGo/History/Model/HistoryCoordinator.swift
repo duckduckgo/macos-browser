@@ -29,7 +29,6 @@ protocol HistoryCoordinating: AnyObject {
 
     func addVisit(of url: URL)
     func updateTitleIfNeeded(title: String, url: URL)
-    func markDownloadUrl(_ url: URL)
     func markFailedToLoadUrl(_ url: URL)
     func title(for url: URL) -> String?
 
@@ -83,7 +82,6 @@ final class HistoryCoordinator: HistoryCoordinating {
             var entry = historyDictionary[url] ?? HistoryEntry(url: url)
             entry.addVisit()
             entry.failedToLoad = false
-            entry.isDownload = false
 
             historyDictionary[url] = entry
             self?.historyDictionary = historyDictionary
@@ -111,17 +109,6 @@ final class HistoryCoordinator: HistoryCoordinating {
 
     func markFailedToLoadUrl(_ url: URL) {
         mark(url: url, keyPath: \HistoryEntry.failedToLoad, value: true)
-    }
-
-    func markDownloadUrl(_ url: URL) {
-        mark(url: url, keyPath: \HistoryEntry.isDownload, value: true)
-
-        queue.async(flags: .barrier) { [weak self] in
-            guard let historyDictionary = self?.historyDictionary else { return }
-            if !url.isRoot, let rootUrl = url.root, let rootEntry = historyDictionary[rootUrl], rootEntry.numberOfVisits == 0 {
-                self?.mark(url: rootUrl, keyPath: \HistoryEntry.isDownload, value: true)
-            }
-        }
     }
 
     func title(for url: URL) -> String? {
@@ -248,13 +235,12 @@ final class HistoryCoordinator: HistoryCoordinating {
             .sink(receiveCompletion: { completion in
                 switch completion {
                 case .finished:
-                    os_log("Visit entry updated successfully. URL: %s, Title: %s, Number of visits: %d, failed to load: %s, is download: %s",
+                    os_log("Visit entry updated successfully. URL: %s, Title: %s, Number of visits: %d, failed to load: %s",
                            log: .history,
                            entry.url.absoluteString,
                            entry.title ?? "",
                            entry.numberOfVisits,
-                           entry.failedToLoad ? "yes" : "no",
-                           entry.isDownload ? "yes" : "no")
+                           entry.failedToLoad ? "yes" : "no")
                 case .failure(let error):
                     os_log("Saving of history entry failed: %s", log: .history, type: .error, error.localizedDescription)
                 }

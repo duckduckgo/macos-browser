@@ -331,7 +331,7 @@ final class AddressBarTextField: NSTextField {
     private func makeUrl(suggestion: Suggestion?, stringValueWithoutSuffix: String, completion: @escaping (URL?, Bool) -> Void) {
         let finalUrl: URL?
         switch suggestion {
-        case .bookmark(title: _, url: let url, isFavorite: _),
+        case .bookmark(title: _, url: let url, isFavorite: _, allowedInTopHits: _),
              .historyEntry(title: _, url: let url, allowedInTopHits: _),
              .website(url: let url):
             finalUrl = url
@@ -462,7 +462,7 @@ final class AddressBarTextField: NSTextField {
                 guard let host = url.host else { return nil }
                 self = Suffix.visit(host: host)
 
-            case .bookmark(title: _, url: let url, isFavorite: _),
+            case .bookmark(title: _, url: let url, isFavorite: _, allowedInTopHits: _),
                  .historyEntry(title: _, url: let url, allowedInTopHits: _):
                 if let title = suggestionViewModel.title,
                    !title.isEmpty,
@@ -584,7 +584,7 @@ final class AddressBarTextField: NSTextField {
     private func suggestionsContainLocalItems() -> SuggestionListChacteristics {
         var characteristics = SuggestionListChacteristics(hasBookmark: false, hasFavorite: false, hasHistoryEntry: false)
         for suggestion in self.suggestionContainerViewModel?.suggestionContainer.result?.array ?? [] {
-            if case .bookmark(title: _, url: _, isFavorite: let isFavorite) = suggestion {
+            if case .bookmark(title: _, url: _, isFavorite: let isFavorite, allowedInTopHits: _) = suggestion {
                 if isFavorite {
                     characteristics.hasFavorite = true
                 } else {
