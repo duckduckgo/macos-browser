@@ -39,8 +39,8 @@ struct PasswordManagementItemListView: View {
         if #available(macOS 11.0, *) {
             VStack(spacing: 0) {
                 PasswordManagementItemListCategoryView()
-                    .padding([.leading, .trailing], 15)
                     .padding([.top, .bottom], 15)
+                    .padding([.leading, .trailing], 10)
                 
                 Divider()
                     .opacity(opacity)
@@ -88,10 +88,14 @@ struct PasswordManagementItemListView: View {
 struct PasswordManagementItemListCategoryView: View {
     
     @EnvironmentObject var model: PasswordManagementItemListModel
+    
+    var categoryPickerColor: Color {
+        return model.sortDescriptor.category == .allItems ? Color("SecureVaultCategoryDefaultColor") : Color("SecureVaultCategorySelectedColor")
+    }
 
     var body: some View {
         
-        HStack {
+        HStack(spacing: 2) {
             
             // Category Picker:
             
@@ -114,6 +118,9 @@ struct PasswordManagementItemListCategoryView: View {
 
                 return button
             })
+                .padding(4)
+                .background(categoryPickerColor)
+                .cornerRadius(4.0)
                 .frame(maxHeight: 20)
             
             Spacer()
@@ -162,7 +169,7 @@ struct PasswordManagementItemListStackView: View {
     var body: some View {
         
         if #available(macOS 11.0, *) {
-            LazyVStack(alignment: .leading) {
+            VStack(alignment: .leading) {
                 PasswordManagementItemStackContentsView()
             }
         } else {
@@ -181,12 +188,10 @@ struct PasswordManagementItemListTableView: View {
 
     var body: some View {
         
-        let _ = print("DEBUG: Selected: \(model.selected?.id)")
-
         List {
             ForEach(model.displayedItems, id: \.title) { section in
                 Section(header: Text(section.title)) {
-                    ForEach(section.items) { item in
+                    ForEach(section.items, id: \.id) { item in
                         ItemView(item: item, selected: model.selected == item) {
                             model.selected(item: item)
                         }
@@ -232,11 +237,7 @@ private struct ItemView: View {
     let action: () -> Void
 
     var body: some View {
-
-        if selected {
-            let _ = print("DEBUG: Got Selected: \(item.id)")
-        }
-        
+ 
         let textColor = selected ? .white : Color(NSColor.controlTextColor)
         let font = Font.custom("SFProText-Regular", size: 13)
 
