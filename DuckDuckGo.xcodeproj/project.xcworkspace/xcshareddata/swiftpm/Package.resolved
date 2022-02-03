@@ -5,8 +5,8 @@
         "package": "BrowserServicesKit",
         "repositoryURL": "https://github.com/duckduckgo/BrowserServicesKit",
         "state": {
-          "branch": "bartek/per-platform-tds",
-          "revision": "d0cff40674bbec8b796be1c6347101232d7480f0",
+          "branch": "release/friends-and-family",
+          "revision": "e1ab23388d876f65a1d2e032b25d35c003311a68",
           "version": null
         }
       },
@@ -62,15 +62,6 @@
           "branch": null,
           "revision": "6b2aa2748a7881eebb9f84fb10c01293e15b52ca",
           "version": "0.5.0"
-        }
-      },
-      {
-        "package": "TrackerRadarKit",
-        "repositoryURL": "https://github.com/duckduckgo/TrackerRadarKit.git",
-        "state": {
-          "branch": null,
-          "revision": "5f4caf35b8418700a48c64c7c61eb43308c8dacc",
-          "version": "1.0.3"
         }
       }
     ]
