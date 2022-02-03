@@ -193,7 +193,7 @@ final class MoreOptionsMenu: NSMenu {
 
             addItem(withTitle: title, action: #selector(toggleFireproofing(_:)), keyEquivalent: "")
                 .targetting(self)
-                .withImage(NSImage(named: "BurnProof"))
+                .withImage(NSImage(named: "Fireproof"))
                 .firingPixel(Pixel.Event.MoreResult.fireproof)
 
         }
