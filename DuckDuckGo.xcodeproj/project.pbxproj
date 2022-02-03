@@ -5329,7 +5329,7 @@
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/duckduckgo/BrowserServicesKit";
 			requirement = {
-				branch = "bartek/per-platform-tds";
+				branch = "release/friends-and-family";
 				kind = branch;
 			};
 		};
