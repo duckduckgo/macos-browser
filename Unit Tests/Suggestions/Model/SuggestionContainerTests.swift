@@ -44,7 +44,7 @@ final class SuggestionContainerTests: XCTestCase {
         withExtendedLifetime(cancellable) {
             waitForExpectations(timeout: 1)
         }
-        XCTAssertEqual(suggestionContainer.result?.array, result.topHits + result.duckduckgoSuggestions + result.historyAndBookmarks)
+        XCTAssertEqual(suggestionContainer.result?.all, result.topHits + result.duckduckgoSuggestions + result.historyAndBookmarks)
     }
 
     func testWhenStopGettingSuggestionsIsCalled_ThenNoSuggestionsArePublished() {

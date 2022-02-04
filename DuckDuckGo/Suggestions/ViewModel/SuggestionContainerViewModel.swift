@@ -98,7 +98,7 @@ final class SuggestionContainerViewModel {
     }
     
     func suggestionViewModel(at index: Int) -> SuggestionViewModel? {
-        let items = suggestionContainer.result?.array ?? []
+        let items = suggestionContainer.result?.all ?? []
 
         guard index < items.count else {
             os_log("SuggestionContainerViewModel: Absolute index is out of bounds", type: .error)

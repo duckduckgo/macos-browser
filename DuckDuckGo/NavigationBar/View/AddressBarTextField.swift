@@ -583,7 +583,7 @@ final class AddressBarTextField: NSTextField {
 
     private func suggestionsContainLocalItems() -> SuggestionListChacteristics {
         var characteristics = SuggestionListChacteristics(hasBookmark: false, hasFavorite: false, hasHistoryEntry: false)
-        for suggestion in self.suggestionContainerViewModel?.suggestionContainer.result?.array ?? [] {
+        for suggestion in self.suggestionContainerViewModel?.suggestionContainer.result?.all ?? [] {
             if case .bookmark(title: _, url: _, isFavorite: let isFavorite, allowedInTopHits: _) = suggestion {
                 if isFavorite {
                     characteristics.hasFavorite = true
