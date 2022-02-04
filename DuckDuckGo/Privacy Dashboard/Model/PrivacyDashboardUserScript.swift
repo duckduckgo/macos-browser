@@ -134,7 +134,7 @@ final class PrivacyDashboardUserScript: NSObject, StaticUserScript {
             [
                 "key": item.permission.rawValue,
                 "icon": item.permission.jsStyle,
-                "title": item.permission.localizedDescription,
+                "title": item.permission.jsTitle,
                 "permission": item.state.rawValue,
                 "used": usedPermissions[item.permission] != nil,
                 "paused": usedPermissions[item.permission] == .paused,
@@ -239,6 +239,15 @@ extension PermissionType {
             return self.rawValue
         case .externalScheme:
             return "externalScheme"
+        }
+    }
+
+    var jsTitle: String {
+        switch self {
+        case .camera, .microphone, .geolocation, .popups:
+            return self.localizedDescription
+        case .externalScheme:
+            return String(format: UserText.permissionExternalSchemeOpenFormat, self.localizedDescription)
         }
     }
 
