@@ -278,7 +278,6 @@
 		85D438B6256E7C9E00F3BAF8 /* ContextMenuUserScript.swift in Sources */ = {isa = PBXBuildFile; fileRef = 85D438B5256E7C9E00F3BAF8 /* ContextMenuUserScript.swift */; };
 		85D885B026A590A90077C374 /* NSNotificationName+PasswordManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 85D885AF26A590A90077C374 /* NSNotificationName+PasswordManager.swift */; };
 		85D885B326A5A9DE0077C374 /* NSAlert+PasswordManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 85D885B226A5A9DE0077C374 /* NSAlert+PasswordManager.swift */; };
-		85E11C3725E7F1E100974CAF /* ExternalURLHandlerTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 85E11C3625E7F1E100974CAF /* ExternalURLHandlerTests.swift */; };
 		85F1B0C925EF9759004792B6 /* URLEventHandlerTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 85F1B0C825EF9759004792B6 /* URLEventHandlerTests.swift */; };
 		85F487B5276A8F2E003CE668 /* OnboardingTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 85F487B4276A8F2E003CE668 /* OnboardingTests.swift */; };
 		85F69B3C25EDE81F00978E59 /* URLExtensionTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 85F69B3B25EDE81F00978E59 /* URLExtensionTests.swift */; };
@@ -960,7 +959,6 @@
 		85D438B5256E7C9E00F3BAF8 /* ContextMenuUserScript.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContextMenuUserScript.swift; sourceTree = "<group>"; };
 		85D885AF26A590A90077C374 /* NSNotificationName+PasswordManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "NSNotificationName+PasswordManager.swift"; sourceTree = "<group>"; };
 		85D885B226A5A9DE0077C374 /* NSAlert+PasswordManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "NSAlert+PasswordManager.swift"; sourceTree = "<group>"; };
-		85E11C3625E7F1E100974CAF /* ExternalURLHandlerTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ExternalURLHandlerTests.swift; sourceTree = "<group>"; };
 		85F1B0C825EF9759004792B6 /* URLEventHandlerTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = URLEventHandlerTests.swift; sourceTree = "<group>"; };
 		85F487B4276A8F2E003CE668 /* OnboardingTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OnboardingTests.swift; sourceTree = "<group>"; };
 		85F69B3B25EDE81F00978E59 /* URLExtensionTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = URLExtensionTests.swift; sourceTree = "<group>"; };
@@ -2764,7 +2762,6 @@
 			isa = PBXGroup;
 			children = (
 				AAC9C01424CAFBCE00AD1325 /* TabTests.swift */,
-				85E11C3625E7F1E100974CAF /* ExternalURLHandlerTests.swift */,
 			);
 			path = Model;
 			sourceTree = "<group>";
@@ -4287,7 +4284,6 @@
 				AA0877BA26D5161D00B05660 /* WebKitVersionProviderTests.swift in Sources */,
 				4BA7C91627695EA500FEBA8E /* MacWaitlistRequestTests.swift in Sources */,
 				B69B50462726C5C200758A2B /* AtbAndVariantCleanupTests.swift in Sources */,
-				85E11C3725E7F1E100974CAF /* ExternalURLHandlerTests.swift in Sources */,
 				B6DA44282616CAE000DD1EC2 /* AppUsageActivityMonitorTests.swift in Sources */,
 				4B59024C26B38BB800489384 /* ChromiumLoginReaderTests.swift in Sources */,
 				AAC9C01724CAFBDC00AD1325 /* TabCollectionTests.swift in Sources */,
