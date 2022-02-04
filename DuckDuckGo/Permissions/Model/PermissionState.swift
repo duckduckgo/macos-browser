@@ -124,6 +124,10 @@ extension Optional where Wrapped == PermissionState {
         }
     }
 
+    mutating func externalSchemeOpened() {
+        self = .inactive
+    }
+
     mutating func update(with captureState: WKWebView.CaptureState) {
         switch (self, captureState) {
         // same state

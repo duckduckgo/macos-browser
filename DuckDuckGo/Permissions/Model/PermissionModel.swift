@@ -84,7 +84,7 @@ final class PermissionModel {
     private func resetPermissions() {
         webView?.configuration.processPool.geolocationProvider?.reset()
         webView?.revokePermissions([.camera, .microphone])
-        for permission in PermissionType.allCases {
+        for permission in permissions.keys {
             // await permission deactivation and transition to .none
             permissions[permission].willReload()
         }
@@ -93,7 +93,7 @@ final class PermissionModel {
 
     private func updatePermissions() {
         guard let webView = webView else { return }
-        for permissionType in PermissionType.allCases {
+        for permissionType in PermissionType.permissionsUpdatedExternally {
             switch permissionType {
             case .microphone:
                 permissions.microphone.update(with: webView.microphoneState)
@@ -111,7 +111,7 @@ final class PermissionModel {
                 } else {
                     permissions.geolocation.update(with: webView.geolocationState)
                 }
-            case .popups:
+            case .popups, .externalScheme:
                 continue
             }
         }
@@ -121,7 +121,7 @@ final class PermissionModel {
                                     domain: String,
                                     url: URL?,
                                     decisionHandler: @escaping (Bool) -> Void) {
-        let query = PermissionAuthorizationQuery(domain: domain, url: url, permissions: permissions) { [weak self] decision in
+        let query = PermissionAuthorizationQuery(domain: domain, url: url, permissions: permissions) { [weak self] decision, remember in
             let query: PermissionAuthorizationQuery?
             let granted: Bool
             switch decision {
@@ -135,6 +135,9 @@ final class PermissionModel {
 
                 for permission in permissions {
                     self?.permissions[permission].denied()
+                    if remember == true {
+                        self?.permissionManager.setPermission(.deny, forDomain: domain, permissionType: permission)
+                    }
                 }
 
             case .granted(let completedQuery):
@@ -143,6 +146,9 @@ final class PermissionModel {
 
                 for permission in permissions {
                     self?.permissions[permission].granted()
+                    if remember == true {
+                        self?.permissionManager.setPermission(.allow, forDomain: domain, permissionType: permission)
+                    }
                 }
             }
 
@@ -194,10 +200,6 @@ final class PermissionModel {
 
     func set(_ permissions: [PermissionType], muted: Bool) {
         webView?.setPermissions(permissions, muted: muted)
-    }
-
-    func set(_ permission: PermissionType, muted: Bool) {
-        webView?.setPermissions([permission], muted: muted)
     }
 
     func allow(_ query: PermissionAuthorizationQuery) {
@@ -305,6 +307,15 @@ final class PermissionModel {
             decisionHandler(false)
             for permission in permissions {
                 self.permissions[permission].denied()
+            }
+        }
+    }
+
+    @MainActor
+    func permissions(_ permissions: [PermissionType], requestedForDomain domain: String?, url: URL? = nil) async -> Bool {
+        await withCheckedContinuation { continuation in
+            self.permissions(permissions, requestedForDomain: domain, url: url) { decision in
+                continuation.resume(returning: decision)
             }
         }
     }

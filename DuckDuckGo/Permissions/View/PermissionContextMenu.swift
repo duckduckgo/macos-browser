@@ -68,7 +68,7 @@ final class PermissionContextMenu: NSMenu {
         switch permissions.camera {
         case .active:
             if ![.active, .inactive].contains(permissions.microphone) || WKWebView.canMuteCameraAndMicrophoneSeparately {
-                addItem(.mute([.camera], target: self))
+                addItem(.mute(.camera, target: self))
             } else {
                 addItem(.mute(permissionTypes, target: self))
                 permissions.microphone = nil
@@ -77,7 +77,7 @@ final class PermissionContextMenu: NSMenu {
 
         case .paused:
             if permissions.microphone != .paused || WKWebView.canMuteCameraAndMicrophoneSeparately {
-                addItem(.unmute([.camera], target: self))
+                addItem(.unmute(.camera, target: self))
             } else {
                 addItem(.unmute(permissionTypes, target: self))
                 permissions.microphone = nil
@@ -152,7 +152,7 @@ final class PermissionContextMenu: NSMenu {
 
     private func addRevokeItems() {
         guard permissions.contains(where: {
-            [.active, .inactive, .paused].contains($0.value) && $0.key != .popups
+            [.active, .inactive, .paused].contains($0.value) && $0.key != .popups && !$0.key.isExternalScheme
         }) else { return }
 
         addSeparator(if: numberOfItems > 0)
@@ -239,7 +239,7 @@ final class PermissionContextMenu: NSMenu {
         actionDelegate?.permissionContextMenuReloadPage(self)
     }
 
-    @objc func openPopup(_ sender: NSMenuItem) {
+    @objc func allowPermissionQuery(_ sender: NSMenuItem) {
         guard let query = sender.representedObject as? PermissionAuthorizationQuery else {
             assertionFailure("Expected PermissionAuthorizationQuery")
             return
@@ -261,8 +261,8 @@ final class PermissionContextMenu: NSMenu {
             deeplink = URL(string: "x-apple.systempreferences:com.apple.preference.security?Privacy_Microphone")!
         case .geolocation:
             deeplink = URL(string: "x-apple.systempreferences:com.apple.preference.security?Privacy_LocationServices")!
-        case .popups:
-            assertionFailure("No settings available for Popups")
+        case .popups, .externalScheme:
+            assertionFailure("No settings available")
             return
         }
         NSWorkspace.shared.open(deeplink)
@@ -312,10 +312,13 @@ private extension NSMenuItem {
 
     static func alwaysAllow(_ permission: PermissionType, on domain: String, target: PermissionContextMenu) -> NSMenuItem {
         let title: String
-        if case .popups = permission {
-            title = String(format: UserText.permissionAlwaysAllowPopupsFormat, domain)
-        } else {
+        switch permission {
+        case .camera, .microphone, .geolocation:
             title = String(format: UserText.permissionAlwaysAllowDeviceFormat, permission.localizedDescription, domain)
+        case .externalScheme:
+            title = String(format: UserText.permissionAlwaysAllowExternalSchemeFormat, domain, permission.localizedDescription)
+        case .popups:
+            title = String(format: UserText.permissionAlwaysAllowPopupsFormat, domain)
         }
 
         let item = NSMenuItem(title: title,
@@ -337,7 +340,17 @@ private extension NSMenuItem {
     }
 
     static func alwaysDeny(_ permission: PermissionType, on domain: String, target: PermissionContextMenu) -> NSMenuItem {
-        let title = String(format: UserText.permissionAlwaysDenyDeviceFormat, permission.localizedDescription, domain)
+        let title: String
+        switch permission {
+        case .popups:
+            assertionFailure("Always Deny not supported for Popups")
+            fallthrough
+        case .camera, .microphone, .geolocation:
+            title = String(format: UserText.permissionAlwaysDenyDeviceFormat, permission.localizedDescription, domain)
+        case .externalScheme:
+            title = String(format: UserText.permissionAlwaysDenyExternalSchemeFormat, domain, permission.localizedDescription)
+        }
+
         let item = NSMenuItem(title: title,
                               action: #selector(PermissionContextMenu.alwaysDenyPermission),
                               keyEquivalent: "")
@@ -353,7 +366,7 @@ private extension NSMenuItem {
             title = UserText.permissionGeolocationServicesDisabled
         } else {
             title = String(format: UserText.permissionAppPermissionDisabledFormat,
-                           Bundle.main.displayName,
+                           Bundle.main.displayName ?? "DuckDuckGo",
                            permission.localizedDescription)
         }
         return NSMenuItem(title: title, action: nil, keyEquivalent: "")
@@ -369,7 +382,7 @@ private extension NSMenuItem {
     }
 
     static func popupPermissionRequested(domain: String?) -> NSMenuItem {
-        let title = String(format: UserText.permissionPopupTitleFormat, domain ?? "“”")
+        let title = UserText.permissionPopupTitle
         let attributedTitle = NSMutableAttributedString(string: title)
         attributedTitle.setAttributes([.font: NSFont.systemFont(ofSize: 11.0)], range: title.nsRange())
 
@@ -384,7 +397,7 @@ private extension NSMenuItem {
                           target: PermissionContextMenu) -> NSMenuItem {
 
         let title = String(format: UserText.permissionPopupOpenFormat, query.url?.absoluteString ?? "“”")
-        let item = NSMenuItem(title: title, action: #selector(PermissionContextMenu.openPopup), keyEquivalent: "")
+        let item = NSMenuItem(title: title, action: #selector(PermissionContextMenu.allowPermissionQuery), keyEquivalent: "")
         item.representedObject = query
         item.target = target
         return item

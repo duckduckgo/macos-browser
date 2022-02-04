@@ -312,38 +312,30 @@ extension BrowserTabViewController: TabDelegate {
         }
     }
 
-	func tab(_ tab: Tab, requestedOpenExternalURL url: URL, forUserEnteredURL userEntered: Bool) {
-        guard let window = self.view.window else {
-            os_log("%s: Window is nil", type: .error, className)
+    @MainActor
+    func tab(_ tab: Tab, requestedOpenExternalURL url: URL, forUserEnteredURL userEntered: Bool) async throws {
+        func searchForExternalUrl() {
+            tab.update(url: URL.makeSearchUrl(from: url.absoluteString), userEntered: false)
+        }
+
+        guard NSWorkspace.shared.urlForApplication(toOpen: url) != nil else {
+            guard userEntered else { throw FailedToOpenExternallyError() }
+
+            searchForExternalUrl()
             return
         }
 
-        guard tabCollectionViewModel.selectedTabViewModel?.tab == tab else {
-            // Only allow the selected tab to open external apps
+        let permissionType = PermissionType.externalScheme(scheme: url.scheme ?? "")
+        let granted = await tab.permissions.permissions([permissionType], requestedForDomain: webView?.url?.host, url: url)
+        guard granted else {
+            if userEntered {
+                searchForExternalUrl()
+            }
             return
         }
 
-		func searchForExternalUrl() {
-			tab.update(url: URL.makeSearchUrl(from: url.absoluteString), userEntered: false)
-		}
-
-        guard let appUrl = NSWorkspace.shared.urlForApplication(toOpen: url) else {
-			if userEntered {
-				searchForExternalUrl()
-			} else {
-				NSAlert.unableToOpenExernalURLAlert().beginSheetModal(for: window)
-			}
-            return
-        }
-
-        let externalAppName = Bundle(url: appUrl)?.infoDictionary?["CFBundleName"] as? String
-        NSAlert.openExternalURLAlert(with: externalAppName).beginSheetModal(for: window) { response in
-            if response == NSApplication.ModalResponse.alertFirstButtonReturn {
-                NSWorkspace.shared.open(url)
-			} else if userEntered {
-				searchForExternalUrl()
-			}
-        }
+        NSWorkspace.shared.open(url)
+        tab.permissions.permissions[permissionType].externalSchemeOpened()
     }
 
     func tabPageDOMLoaded(_ tab: Tab) {
@@ -650,7 +642,7 @@ extension BrowserTabViewController: WKUIDelegate {
         var shouldOpenPopUp = navigationAction.isUserInitiated
         if !shouldOpenPopUp {
             let url = navigationAction.request.url
-            parentTab.permissions.permissions([.popups], requestedForDomain: webView.url?.host, url: url) { [weak parentTab] granted in
+            parentTab.permissions.permissions(.popups, requestedForDomain: webView.url?.host, url: url) { [weak parentTab] granted in
 
                 guard let parentTab = parentTab else { return }
 
@@ -747,7 +739,7 @@ extension BrowserTabViewController: WKUIDelegate {
     // https://github.com/WebKit/WebKit/blob/9d7278159234e0bfa3d27909a19e695928f3b31e/Source/WebKit/UIProcess/API/Cocoa/WKUIDelegatePrivate.h#L131
     @objc(_webView:requestGeolocationPermissionForFrame:decisionHandler:)
     func webView(_ webView: WKWebView, requestGeolocationPermissionFor frame: WKFrameInfo, decisionHandler: @escaping (Bool) -> Void) {
-        webView.tab?.permissions.permissions([.geolocation], requestedForDomain: frame.request.url?.host, decisionHandler: decisionHandler)
+        webView.tab?.permissions.permissions(.geolocation, requestedForDomain: frame.request.url?.host, decisionHandler: decisionHandler)
             ?? /* Tab deallocated: */ {
                 decisionHandler(false)
             }()
@@ -760,7 +752,7 @@ extension BrowserTabViewController: WKUIDelegate {
                  requestGeolocationPermissionFor origin: WKSecurityOrigin,
                  initiatedBy frame: WKFrameInfo,
                  decisionHandler: @escaping (WKPermissionDecision) -> Void) {
-        webView.tab?.permissions.permissions([.geolocation], requestedForDomain: frame.request.url?.host) { granted in
+        webView.tab?.permissions.permissions(.geolocation, requestedForDomain: frame.request.url?.host) { granted in
             decisionHandler(granted ? .grant : .deny)
         } ?? /* Tab deallocated: */ {
             decisionHandler(.deny)
@@ -907,6 +899,12 @@ extension BrowserTabViewController: OnboardingDelegate {
         (view.window?.windowController as? MainWindowController)?.userInteraction(prevented: false)
     }
 
+}
+
+struct FailedToOpenExternallyError: Error, LocalizedError {
+    var errorDescription: String? {
+        UserText.failedToOpenExternally
+    }
 }
 
 // swiftlint:enable file_length

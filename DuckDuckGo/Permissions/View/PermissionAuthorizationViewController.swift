@@ -29,6 +29,12 @@ extension PermissionType {
             return UserText.permissionGeolocation
         case .popups:
             return UserText.permissionPopups
+        case .externalScheme(scheme: let scheme):
+            guard let url = URL(string: scheme + URL.NavigationalScheme.separator),
+                  let app = NSWorkspace.shared.application(toOpen: url)
+            else { return scheme }
+
+            return app
         }
     }
 }
@@ -50,6 +56,7 @@ extension Array where Element == PermissionType {
 final class PermissionAuthorizationViewController: NSViewController {
 
     @IBOutlet var descriptionLabel: NSTextField!
+    @IBOutlet var rememberChoiceCheckbox: NSButton!
 
     weak var query: PermissionAuthorizationQuery? {
         didSet {
@@ -61,27 +68,37 @@ final class PermissionAuthorizationViewController: NSViewController {
         updateText()
     }
 
+    override func viewWillAppear() {
+        rememberChoiceCheckbox.state = .off
+    }
+
     private func updateText() {
         guard isViewLoaded,
-              let query = query
+              let query = query,
+              !query.permissions.isEmpty
         else { return }
 
-        let format = query.permissions == [.popups]
-            ? UserText.popupWindowsPermissionAuthorizationFormat
-            : UserText.devicePermissionAuthorizationFormat
-        self.descriptionLabel.stringValue = String(format: format,
-                                                   query.domain,
-                                                   query.permissions.localizedDescription)
+        let format: String
+        switch query.permissions[0] {
+        case .camera, .microphone, .geolocation:
+            format = UserText.devicePermissionAuthorizationFormat
+        case .popups:
+            format = UserText.popupWindowsPermissionAuthorizationFormat
+        case .externalScheme:
+            format = UserText.externalSchemePermissionAuthorizationFormat
+        }
+        self.descriptionLabel.stringValue = String(format: format, query.domain, query.permissions.localizedDescription)
+        self.rememberChoiceCheckbox.isHidden = !query.shouldShowRememberChoiceCheckbox
     }
 
     @IBAction func grantAction(_ sender: NSButton) {
         self.dismiss()
-        query?.handleDecision(grant: true)
+        query?.handleDecision(grant: true, remember: !rememberChoiceCheckbox.isHidden && rememberChoiceCheckbox.state == .on)
     }
 
     @IBAction func denyAction(_ sender: NSButton) {
         self.dismiss()
-        query?.handleDecision(grant: false)
+        query?.handleDecision(grant: false, remember: !rememberChoiceCheckbox.isHidden && rememberChoiceCheckbox.state == .on)
     }
 
 }

@@ -28,7 +28,7 @@ protocol TabDelegate: FileDownloadManagerDelegate {
     func tabDidStartNavigation(_ tab: Tab)
     func tab(_ tab: Tab, requestedNewTabWith content: Tab.TabContent, selected: Bool)
     func tab(_ tab: Tab, willShowContextMenuAt position: NSPoint, image: URL?, link: URL?, selectedText: String?)
-	func tab(_ tab: Tab, requestedOpenExternalURL url: URL, forUserEnteredURL: Bool)
+    func tab(_ tab: Tab, requestedOpenExternalURL url: URL, forUserEnteredURL: Bool) async throws
     func tab(_ tab: Tab, requestedSaveCredentials credentials: SecureVaultModels.WebsiteCredentials)
     func tab(_ tab: Tab,
              requestedBasicAuthenticationChallengeWith protectionSpace: URLProtectionSpace,
@@ -388,7 +388,6 @@ final class Tab: NSObject {
 
         userScripts = UserScripts(with: scriptsSource)
         subscribeToUserScriptChanges()
-        subscribeToOpenExternalUrlEvents()
 
         superviewObserver = webView.observe(\.superview, options: .old) { [weak self] _, change in
             // if the webView is being added to superview - reload if needed
@@ -399,19 +398,6 @@ final class Tab: NSObject {
 
         // background tab loading should start immediately
         reloadIfNeeded(shouldLoadInBackground: shouldLoadInBackground)
-    }
-
-    // MARK: - Open External URL
-
-    let externalUrlHandler = ExternalURLHandler()
-    var openExternalUrlEventsCancellable: AnyCancellable?
-
-    private func subscribeToOpenExternalUrlEvents() {
-        openExternalUrlEventsCancellable = externalUrlHandler.openExternalUrlPublisher.sink { [weak self] in
-            if let self = self {
-                self.delegate?.tab(self, requestedOpenExternalURL: $0, forUserEnteredURL: self.userEnteredUrl)
-            }
-        }
     }
 
     // MARK: - Favicon
@@ -729,10 +715,8 @@ extension Tab: WKNavigationDelegate {
 
     // swiftlint:disable cyclomatic_complexity
     // swiftlint:disable function_body_length
-    func webView(_ webView: WKWebView,
-                 decidePolicyFor navigationAction: WKNavigationAction,
-                 decisionHandler: @escaping (WKNavigationActionPolicy) -> Void) {
-
+    @MainActor
+    func webView(_ webView: WKWebView, decidePolicyFor navigationAction: WKNavigationAction) async -> WKNavigationActionPolicy {
         webView.customUserAgent = UserAgent.for(navigationAction.request.url)
 
         if navigationAction.isTargetingMainFrame {
@@ -742,15 +726,15 @@ extension Tab: WKNavigationDelegate {
                 // Auto-cancel simulated Back action when upgrading to HTTPS or GPC from Client Redirect
                 self.webView.frozenCanGoForward = nil
                 self.webView.frozenCanGoBack = nil
-                decisionHandler(.cancel)
-                return
+
+                return .cancel
 
             } else if navigationAction.navigationType != .backForward,
                let request = GPCRequestFactory.shared.requestForGPC(basedOn: navigationAction.request) {
                 self.invalidateBackItemIfNeeded(for: navigationAction)
-                decisionHandler(.cancel)
+
                 webView.load(request)
-                return
+                return .cancel
             }
         }
 
@@ -766,18 +750,15 @@ extension Tab: WKNavigationDelegate {
         let isLinkActivated = navigationAction.navigationType == .linkActivated
         let isMiddleClicked = navigationAction.buttonNumber == Constants.webkitMiddleClick
         if isLinkActivated && NSApp.isCommandPressed || isMiddleClicked {
-            decisionHandler(.cancel)
             delegate?.tab(self, requestedNewTabWith: navigationAction.request.url.map { .url($0) } ?? .none, selected: NSApp.isShiftPressed)
-            return
+            return .cancel
         } else if isLinkActivated && NSApp.isOptionPressed && !NSApp.isCommandPressed {
-            decisionHandler(.download(navigationAction, using: webView))
-            return
+            return .download(navigationAction, using: webView)
         }
 
-        guard let url = navigationAction.request.url, let urlScheme = url.scheme else {
+        guard let url = navigationAction.request.url, url.scheme != nil else {
             self.willPerformNavigationAction(navigationAction)
-            decisionHandler(.allow)
-            return
+            return .allow
         }
         
         let privacyConfigurationManager = ContentBlocking.privacyConfigurationManager
@@ -793,41 +774,38 @@ extension Tab: WKNavigationDelegate {
         if navigationAction.shouldDownload {
             // register the navigationAction for legacy _WKDownload to be called back on the Tab
             // further download will be passed to webView:navigationAction:didBecomeDownload:
-            decisionHandler(.download(navigationAction, using: webView))
-            return
+            return .download(navigationAction, using: webView)
 
-        } else if externalUrlHandler.isExternal(scheme: urlScheme) {
+        } else if url.isExternalSchemeLink {
             // ignore <iframe src="custom://url"> but allow via address bar
-            let fromFrame = !(navigationAction.sourceFrame.isMainFrame || self.userEnteredUrl)
+            guard navigationAction.sourceFrame.isMainFrame else { return .cancel }
 
-            externalUrlHandler.handle(url: url,
-                                      onPage: webView.url,
-                                      fromFrame: fromFrame,
-                                      triggeredByUser: navigationAction.navigationType == .linkActivated)
-
-            decisionHandler(.cancel)
-            return
+            do {
+                try await self.delegate?.tab(self, requestedOpenExternalURL: url, forUserEnteredURL: userEnteredUrl)
+            } catch {
+                // if opening external URL fails do nothing for now
+            }
+            return .cancel
         }
 
-        HTTPSUpgrade.shared.isUpgradeable(url: url) { [weak self] isUpgradable in
-            guard let self = self else {
-                decisionHandler(.cancel)
-                return
+        let isUpgradable = await withCheckedContinuation { c in
+            HTTPSUpgrade.shared.isUpgradeable(url: url) { isUpgradable in
+                c.resume(returning: isUpgradable)
             }
-
-            if isUpgradable && navigationAction.isTargetingMainFrame,
-                let upgradedUrl = url.toHttps() {
-
-                self.invalidateBackItemIfNeeded(for: navigationAction)
-                self.webView.load(upgradedUrl)
-                self.setConnectionUpgradedTo(upgradedUrl, navigationAction: navigationAction)
-                decisionHandler(.cancel)
-                return
-            }
-
-            self.willPerformNavigationAction(navigationAction)
-            decisionHandler(.allow)
         }
+
+        if isUpgradable && navigationAction.isTargetingMainFrame,
+            let upgradedUrl = url.toHttps() {
+
+            self.invalidateBackItemIfNeeded(for: navigationAction)
+            self.webView.load(upgradedUrl)
+            self.setConnectionUpgradedTo(upgradedUrl, navigationAction: navigationAction)
+
+            return .cancel
+        }
+
+        self.willPerformNavigationAction(navigationAction)
+        return .allow
     }
     // swiftlint:enable cyclomatic_complexity
     // swiftlint:enable function_body_length

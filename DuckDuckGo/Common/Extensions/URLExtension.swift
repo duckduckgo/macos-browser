@@ -302,6 +302,10 @@ extension URL {
         return scheme == "data"
     }
 
+    var isExternalSchemeLink: Bool {
+        return !["https", "http", "about", "file", "blob", "data"].contains(scheme)
+    }
+
     // MARK: - DuckDuckGo
 
     static var duckDuckGo: URL {

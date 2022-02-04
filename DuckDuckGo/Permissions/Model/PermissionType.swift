@@ -19,17 +19,58 @@
 import Foundation
 import WebKit
 
-enum PermissionType: String, CaseIterable {
+enum PermissionType: Hashable {
+    private enum Constants: String {
+        case camera
+        case microphone
+        case geolocation
+        case popups
+        case external = "external_"
+    }
+
     case camera
     case microphone
     case geolocation
     case popups
+    case externalScheme(scheme: String)
+
+    var rawValue: String {
+        switch self {
+        case .camera: return Constants.camera.rawValue
+        case .microphone: return Constants.microphone.rawValue
+        case .geolocation: return Constants.geolocation.rawValue
+        case .popups: return Constants.popups.rawValue
+        case .externalScheme(scheme: let scheme): return Constants.external.rawValue + scheme
+        }
+    }
+
+    init?(rawValue: String) {
+        switch rawValue {
+        case Constants.camera.rawValue: self = .camera
+        case Constants.microphone.rawValue: self = .microphone
+        case Constants.geolocation.rawValue: self = .geolocation
+        case Constants.popups.rawValue: self = .popups
+        default:
+            if rawValue.hasPrefix(Constants.external.rawValue) {
+                let scheme = rawValue.drop(prefix: Constants.external.rawValue)
+                guard !scheme.isEmpty else { return nil }
+                self = .externalScheme(scheme: scheme)
+                return
+            }
+            return nil
+        }
+    }
 }
 
 extension PermissionType {
+
+    static var permissionsUpdatedExternally: [PermissionType] {
+        return [.camera, .microphone, .geolocation]
+    }
+
     var canPersistGrantedDecision: Bool {
         switch self {
-        case .camera, .microphone:
+        case .camera, .microphone, .externalScheme:
             return true
         case .geolocation:
             return false
@@ -39,12 +80,20 @@ extension PermissionType {
     }
     var canPersistDeniedDecision: Bool {
         switch self {
-        case .camera, .microphone, .geolocation:
+        case .camera, .microphone, .geolocation, .externalScheme:
             return true
         case .popups:
             return false
         }
     }
+
+    var isExternalScheme: Bool {
+        if case .externalScheme = self {
+            return true
+        }
+        return false
+    }
+
 }
 
 extension Array where Element == PermissionType {
@@ -78,5 +127,11 @@ extension Array where Element == PermissionType {
         guard !result.isEmpty else { return nil }
         self = result
     }
+
+    static var camera: Self { [.camera] }
+    static var microphone: Self { [.microphone] }
+    static var geolocation: Self { [.geolocation] }
+    static var popups: Self { [.popups] }
+    static func externalScheme(_ scheme: String) -> Self { return [.externalScheme(scheme: scheme)] }
 
 }

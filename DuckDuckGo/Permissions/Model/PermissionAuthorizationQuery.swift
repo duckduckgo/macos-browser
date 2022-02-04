@@ -23,28 +23,29 @@ final class PermissionAuthorizationQuery {
     let domain: String
     let permissions: [PermissionType]
     var wasShownOnce: Bool = false
+    var shouldShowRememberChoiceCheckbox: Bool = false
 
     enum Decision {
         case granted(PermissionAuthorizationQuery)
         case denied(PermissionAuthorizationQuery)
         case deinitialized
     }
-    private var decisionHandler: ((Decision) -> Void)?
+    private var decisionHandler: ((Decision, Bool?) -> Void)?
 
-    init(domain: String, url: URL?, permissions: [PermissionType], decisionHandler: @escaping (Decision) -> Void) {
+    init(domain: String, url: URL?, permissions: [PermissionType], decisionHandler: @escaping (Decision, Bool?) -> Void) {
         self.domain = domain
         self.url = url
         self.permissions = permissions
         self.decisionHandler = decisionHandler
     }
 
-    func handleDecision(grant: Bool) {
-        decisionHandler?(grant ? .granted(self) : .denied(self))
+    func handleDecision(grant: Bool, remember: Bool? = nil) {
+        decisionHandler?(grant ? .granted(self) : .denied(self), remember)
         decisionHandler = nil
     }
 
     deinit {
-        decisionHandler?(.deinitialized)
+        decisionHandler?(.deinitialized, nil)
     }
 
 }

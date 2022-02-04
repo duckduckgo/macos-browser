@@ -480,7 +480,7 @@ final class PermissionModelTests: XCTestCase {
         }
 
         let e2 = expectation(description: "Permission granted")
-        self.webView(webView, requestUserMediaAuthorizationFor: [.camera],
+        self.webView(webView, requestUserMediaAuthorizationFor: .camera,
                      url: .duckDuckGo,
                      mainFrameURL: .duckDuckGo) { granted in
             XCTAssertFalse(granted)
@@ -945,7 +945,7 @@ extension PermissionModelTests: WebViewPermissionsDelegate {
 
     @objc(_webView:requestGeolocationPermissionForFrame:decisionHandler:)
     func webView(_ webView: WKWebView, requestGeolocationPermissionFor frame: WKFrameInfo, decisionHandler: @escaping (Bool) -> Void) {
-        self.model.permissions([.geolocation], requestedForDomain: frame.request.url?.host, decisionHandler: decisionHandler)
+        self.model.permissions(.geolocation, requestedForDomain: frame.request.url?.host, decisionHandler: decisionHandler)
     }
 
     @objc(_webView:requestGeolocationPermissionForOrigin:initiatedByFrame:decisionHandler:)
@@ -954,7 +954,7 @@ extension PermissionModelTests: WebViewPermissionsDelegate {
                  requestGeolocationPermissionFor origin: WKSecurityOrigin,
                  initiatedBy frame: WKFrameInfo,
                  decisionHandler: @escaping (WKPermissionDecision) -> Void) {
-        self.model.permissions([.geolocation], requestedForDomain: frame.request.url?.host) { granted in
+        self.model.permissions(.geolocation, requestedForDomain: frame.request.url?.host) { granted in
             decisionHandler(granted ? .grant : .deny)
         }
     }
