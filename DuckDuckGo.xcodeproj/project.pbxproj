@@ -86,6 +86,8 @@
 		4B677439255DBEB800025BD8 /* HTTPSUpgradeStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B677430255DBEB800025BD8 /* HTTPSUpgradeStore.swift */; };
 		4B677442255DBEEA00025BD8 /* Database.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B677440255DBEEA00025BD8 /* Database.swift */; };
 		4B67744B255DBF3A00025BD8 /* BloomFilter.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4B677449255DBF3A00025BD8 /* BloomFilter.cpp */; };
+		4B70C00127B0793D000386ED /* DuckDuckGo-ExampleCrash.ips in Resources */ = {isa = PBXBuildFile; fileRef = 4B70BFFF27B0793D000386ED /* DuckDuckGo-ExampleCrash.ips */; };
+		4B70C00227B0793D000386ED /* CrashReportTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B70C00027B0793D000386ED /* CrashReportTests.swift */; };
 		4B723E0526B0003E00E14D75 /* DataImportMocks.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B723DFF26B0003E00E14D75 /* DataImportMocks.swift */; };
 		4B723E0626B0003E00E14D75 /* CSVParserTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B723E0026B0003E00E14D75 /* CSVParserTests.swift */; };
 		4B723E0726B0003E00E14D75 /* CSVImporterTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B723E0126B0003E00E14D75 /* CSVImporterTests.swift */; };
@@ -765,6 +767,8 @@
 		4B677449255DBF3A00025BD8 /* BloomFilter.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = BloomFilter.cpp; path = Submodules/bloom_cpp/src/BloomFilter.cpp; sourceTree = SOURCE_ROOT; };
 		4B67744A255DBF3A00025BD8 /* BloomFilter.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = BloomFilter.hpp; path = Submodules/bloom_cpp/src/BloomFilter.hpp; sourceTree = SOURCE_ROOT; };
 		4B677454255DC18000025BD8 /* Bridging.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Bridging.h; sourceTree = "<group>"; };
+		4B70BFFF27B0793D000386ED /* DuckDuckGo-ExampleCrash.ips */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = "DuckDuckGo-ExampleCrash.ips"; sourceTree = "<group>"; };
+		4B70C00027B0793D000386ED /* CrashReportTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CrashReportTests.swift; sourceTree = "<group>"; };
 		4B723DEB26B0002B00E14D75 /* DataImport.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DataImport.swift; sourceTree = "<group>"; };
 		4B723DED26B0002B00E14D75 /* DataImport.storyboard */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; path = DataImport.storyboard; sourceTree = "<group>"; };
 		4B723DEE26B0002B00E14D75 /* DataImportViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DataImportViewController.swift; sourceTree = "<group>"; };
@@ -1674,6 +1678,23 @@
 			name = bloom_cpp;
 			sourceTree = "<group>";
 		};
+		4B70BFFD27B0793D000386ED /* Crash Reports */ = {
+			isa = PBXGroup;
+			children = (
+				4B70BFFE27B0793D000386ED /* Example Crash Reports */,
+				4B70C00027B0793D000386ED /* CrashReportTests.swift */,
+			);
+			path = "Crash Reports";
+			sourceTree = "<group>";
+		};
+		4B70BFFE27B0793D000386ED /* Example Crash Reports */ = {
+			isa = PBXGroup;
+			children = (
+				4B70BFFF27B0793D000386ED /* DuckDuckGo-ExampleCrash.ips */,
+			);
+			path = "Example Crash Reports";
+			sourceTree = "<group>";
+		};
 		4B723DEA26B0002B00E14D75 /* Data Import */ = {
 			isa = PBXGroup;
 			children = (
@@ -2392,6 +2413,7 @@
 				85F69B3A25EDE7F800978E59 /* Common */,
 				85AC3B1525D9BBFA00C7D2AA /* Configuration */,
 				4B82E9B725B6A04B00656FE7 /* ContentBlocker */,
+				4B70BFFD27B0793D000386ED /* Crash Reports */,
 				4B723E0226B0003E00E14D75 /* Data Export */,
 				B683097A274DCFE3004B46BB /* Database */,
 				4B723DFE26B0003E00E14D75 /* Data Import */,
@@ -3743,6 +3765,7 @@
 				B69B50542726CD8100758A2B /* atb-with-update.json in Resources */,
 				B69B50522726CD8100758A2B /* atb.json in Resources */,
 				4BB99D0B26FE1A7B001E4761 /* Bookmarks in Resources */,
+				4B70C00127B0793D000386ED /* DuckDuckGo-ExampleCrash.ips in Resources */,
 				4B8AC94126B49BEE00879451 /* key4.db in Resources */,
 				B67C6C422654BF49006C872E /* DuckDuckGo-Symbol.jpg in Resources */,
 				B69B50552726CD8100758A2B /* invalid.json in Resources */,
@@ -4376,6 +4399,7 @@
 				B6106BB326A7F4AA0013B453 /* GeolocationServiceMock.swift in Sources */,
 				4B8AC93D26B49BE600879451 /* FirefoxLoginReaderTests.swift in Sources */,
 				4B723E0526B0003E00E14D75 /* DataImportMocks.swift in Sources */,
+				4B70C00227B0793D000386ED /* CrashReportTests.swift in Sources */,
 				85AC3B1725D9BC1A00C7D2AA /* ConfigurationDownloaderTests.swift in Sources */,
 				B693955D26F19CD70015B914 /* DownloadListStoreTests.swift in Sources */,
 				4B0511E7262CAB3700F6079C /* UserDefaultsWrapperUtilities.swift in Sources */,
