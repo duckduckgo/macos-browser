@@ -92,4 +92,26 @@ struct JSONCrashReport: CrashReport {
 
 }
 
+/// Encapsulates the logic for decoding and encoding a JSON crash report.
+/// This is done so that we only read the values that the crash report requires to symbolicate, and nothing more.
+/// It is encoded back into the .ips format, but without the values from the original report that the symbolicator does not need to function.
+struct DecodableJSONCrashReport {
+    
+    static func decode(from string: String) -> DecodableJSONCrashReport? {
+        return nil
+    }
+    
+    static func encode() -> String {
+        return ""
+    }
+    
+    struct Payload: Codable {
+        
+    }
+
+    let metadata: String
+    let payload: Payload
+    
+}
+
 #endif
