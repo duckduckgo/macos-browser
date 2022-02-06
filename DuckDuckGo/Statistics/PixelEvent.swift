@@ -18,6 +18,7 @@
 
 import Foundation
 
+// swiftlint:disable identifier_name
 extension Pixel {
 
     enum Event {
@@ -78,8 +79,20 @@ extension Pixel {
 
         case formAutofilled(kind: FormAutofillKind)
         case autofillItemSaved(kind: FormAutofillKind)
+        
+        case waitlistFirstLaunch
+        case waitlistMigratedExistingInstall
+        case waitlistPresentedLockScreen
+        case waitlistDismissedLockScreen
 
-        case debug(event: Debug, error: Error? = nil, countedBy: Pixel.Counter? = nil)
+        case onboardingStartPressed
+        case onboardingImportPressed
+        case onboardingImportSkipped
+        case onboardingSetDefaultPressed
+        case onboardingSetDefaultSkipped
+        case onboardingTypingSkipped
+
+        case debug(event: Debug, error: Error? = nil)
 
         enum Debug: String, CustomStringConvertible {
             var description: String { rawValue }
@@ -105,11 +118,25 @@ extension Pixel {
             case suggestionsFetchFailed = "sgf"
             case appOpenURLFailed = "url"
             case appStateRestorationFailed = "srf"
+            
+            case contentBlockingErrorReportingIssue = "content_blocking_error_reporting_issue"
+
+            case contentBlockingTDSCompilationFailed = "content_blocking_compilation_error_fetched_tds"
+            case contentBlockingTempListCompilationFailed = "content_blocking_compilation_error_temp_list"
+            case contentBlockingAllowListCompilationFailed = "content_blocking_compilation_error_allow_list"
+            case contentBlockingUnpSitesCompilationFailed = "content_blocking_compilation_error_unprotected_list"
+            case contentBlockingFallbackCompilationFailed = "content_blocking_compilation_error_fallback_tds"
+            
+            case clickToLoadTDSCompilationFailed = "click_to_load_compilation_error_fetched_tds"
+            case clickToLoadTempListCompilationFailed = "click_to_load_compilation_error_temp_list"
+            case clickToLoadAllowListCompilationFailed = "click_to_load_compilation_error_allow_list"
+            case clickToLoadUnpSitesCompilationFailed = "click_to_load_compilation_error_unprotected_list"
+            case clickToLoadFallbackCompilationFailed = "click_to_load_compilation_error_fallback_tds"
         }
 
     }
-
 }
+// swiftlint:enable identifier_name
 
 extension Pixel.Event {
 
@@ -194,9 +221,40 @@ extension Pixel.Event {
 
         case .autofillItemSaved(kind: let kind):
             return "m_mac_save_\(kind)"
+            
+        case .waitlistFirstLaunch:
+            return "m_mac_waitlist_first_launch_while_locked"
+            
+        case .waitlistMigratedExistingInstall:
+            return "m_mac_waitlist_migrated_existing_install"
+            
+        case .waitlistPresentedLockScreen:
+            return "m_mac_waitlist_lock_screen_presented"
+            
+        case .waitlistDismissedLockScreen:
+            return "m_mac_waitlist_lock_screen_dismissed"
 
-        case .debug(event: let event, error: _, countedBy: _):
+        case .debug(event: let event, error: _):
             return "m_mac_debug_\(event)"
+
+        case .onboardingStartPressed:
+            return "m_mac_onboarding_start_pressed"
+
+        case .onboardingImportPressed:
+            return "m_mac_onboarding_import_pressed"
+
+        case .onboardingImportSkipped:
+            return "m_mac_onboarding_import_skipped"
+
+        case .onboardingSetDefaultPressed:
+            return "m_mac_onboarding_setdefault_pressed"
+
+        case .onboardingSetDefaultSkipped:
+            return "m_mac_onboarding_setdefault_skipped"
+
+        case .onboardingTypingSkipped:
+            return "m_mac_onboarding_setdefault_skipped"
+
         }
     }
 

@@ -33,6 +33,7 @@ final class PasswordManagementLoginModel: ObservableObject, PasswordManagementIt
     var onDirtyChanged: (Bool) -> Void
     var onSaveRequested: (SecureVaultModels.WebsiteCredentials) -> Void
     var onDeleteRequested: (SecureVaultModels.WebsiteCredentials) -> Void
+    var onCancelled: () -> Void
 
     func setSecureVaultModel<Model>(_ modelObject: Model) {
         guard let modelObject = modelObject as? SecureVaultModels.WebsiteCredentials else {
@@ -113,10 +114,12 @@ final class PasswordManagementLoginModel: ObservableObject, PasswordManagementIt
 
     init(onDirtyChanged: @escaping (Bool) -> Void,
          onSaveRequested: @escaping (SecureVaultModels.WebsiteCredentials) -> Void,
-         onDeleteRequested: @escaping (SecureVaultModels.WebsiteCredentials) -> Void) {
+         onDeleteRequested: @escaping (SecureVaultModels.WebsiteCredentials) -> Void,
+         onCancelled: @escaping () -> Void) {
         self.onDirtyChanged = onDirtyChanged
         self.onSaveRequested = onSaveRequested
         self.onDeleteRequested = onDeleteRequested
+        self.onCancelled = onCancelled
     }
 
     func copy(_ value: String) {
@@ -149,6 +152,8 @@ final class PasswordManagementLoginModel: ObservableObject, PasswordManagementIt
             credentials = nil
             isNew = false
         }
+
+        onCancelled()
     }
 
     func createNew() {

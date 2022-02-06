@@ -21,10 +21,12 @@ import WebKit
 import os
 import Combine
 import BrowserServicesKit
+import TrackerRadarKit
 
 protocol TabDelegate: FileDownloadManagerDelegate {
+    func tabWillStartNavigation(_ tab: Tab, isUserInitiated: Bool)
     func tabDidStartNavigation(_ tab: Tab)
-    func tab(_ tab: Tab, requestedNewTab url: URL?, selected: Bool)
+    func tab(_ tab: Tab, requestedNewTabWith content: Tab.TabContent, selected: Bool)
     func tab(_ tab: Tab, willShowContextMenuAt position: NSPoint, image: URL?, link: URL?, selectedText: String?)
 	func tab(_ tab: Tab, requestedOpenExternalURL url: URL, forUserEnteredURL: Bool)
     func tab(_ tab: Tab, requestedSaveCredentials credentials: SecureVaultModels.WebsiteCredentials)
@@ -47,18 +49,28 @@ final class Tab: NSObject {
         case url(URL)
         case preferences
         case bookmarks
+        case onboarding
         case none
+
+        static func contentFromURL(_ url: URL?) -> TabContent {
+            if url == .homePage {
+                return .homepage
+            } else if url == .welcome {
+                return .onboarding
+            } else {
+                return .url(url ?? .blankPage)
+            }
+        }
 
         static var displayableTabTypes: [TabContent] {
             return [TabContent.preferences, .bookmarks].sorted { first, second in
                 switch first {
-                case .homepage, .url, .preferences, .bookmarks, .none: break
+                case .homepage, .url, .preferences, .bookmarks, .onboarding, .none: break
                 // !! Replace [TabContent.preferences, .bookmarks] above with new displayable Tab Types if added
                 }
                 guard let firstTitle = first.title, let secondTitle = second.title else {
                     return true // Arbitrary sort order, only non-standard tabs are displayable.
                 }
-
                 return firstTitle.localizedStandardCompare(secondTitle) == .orderedAscending
             }
         }
@@ -68,6 +80,7 @@ final class Tab: NSObject {
             case .url, .homepage, .none: return nil
             case .preferences: return UserText.tabPreferencesTitle
             case .bookmarks: return UserText.tabBookmarksTitle
+            case .onboarding: return UserText.tabOnboardingTitle
             }
         }
 
@@ -88,10 +101,12 @@ final class Tab: NSObject {
     weak var delegate: TabDelegate?
 
     init(content: TabContent,
-         faviconService: FaviconService = LocalFaviconService.shared,
+         faviconManagement: FaviconManagement = FaviconManager.shared,
          webCacheManager: WebCacheManager = WebCacheManager.shared,
          webViewConfiguration: WebViewConfiguration? = nil,
          historyCoordinating: HistoryCoordinating = HistoryCoordinator.shared,
+         scriptsSource: ScriptSourceProviding = DefaultScriptSourceProvider.shared,
+         contentBlockingManager: ContentBlockerRulesManager = ContentBlocking.contentBlockingManager,
          visitedDomains: Set<String> = Set<String>(),
          title: String? = nil,
          error: Error? = nil,
@@ -102,8 +117,10 @@ final class Tab: NSObject {
          canBeClosedWithBack: Bool = false) {
 
         self.content = content
-        self.faviconService = faviconService
+        self.faviconManagement = faviconManagement
         self.historyCoordinating = historyCoordinating
+        self.scriptsSource = scriptsSource
+        self.contentBlockingManager = contentBlockingManager
         self.visitedDomains = visitedDomains
         self.title = title
         self.error = error
@@ -121,12 +138,6 @@ final class Tab: NSObject {
         super.init()
 
         setupWebView(shouldLoadInBackground: shouldLoadInBackground)
-
-        // cache session-restored favicon if present
-        if let favicon = favicon,
-           let host = content.url?.host {
-            faviconService.cacheIfNeeded(favicon: favicon, for: host, isFromUserScript: false)
-        }
     }
 
     deinit {
@@ -144,8 +155,10 @@ final class Tab: NSObject {
     var userEnteredUrl = true
 
     var contentChangeEnabled = true
-
-    @PublishedAfter private(set) var content: TabContent {
+    
+    var fbBlockingEnabled = true
+    
+    @Published private(set) var content: TabContent {
         didSet {
             handleFavicon(oldContent: oldValue)
             invalidateSessionStateData()
@@ -165,8 +178,8 @@ final class Tab: NSObject {
         self.content = content
     }
 
-    @PublishedAfter var title: String?
-    @PublishedAfter var error: Error?
+    @Published var title: String?
+    @Published var error: Error?
     let permissions: PermissionModel
 
     weak private(set) var parentTab: Tab?
@@ -200,7 +213,10 @@ final class Tab: NSObject {
     }
 
     func update(url: URL?, userEntered: Bool = true) {
-        self.content = url == .homePage ? .homepage : .url(url ?? .blankPage)
+        if url == .welcome {
+            OnboardingViewModel().restart()
+        }
+        self.content = .contentFromURL(url)
 
         // This function is called when the user has manually typed in a new address, which should reset the login detection flow.
         userEnteredUrl = userEntered
@@ -280,6 +296,10 @@ final class Tab: NSObject {
         content = .homepage
     }
 
+    func startOnboarding() {
+        content = .onboarding
+    }
+
     func reload() {
         if let error = error, let failingUrl = error.failingUrl {
             webView.load(failingUrl)
@@ -292,6 +312,29 @@ final class Tab: NSObject {
         } else {
             webView.reload()
         }
+    }
+
+    @discardableResult
+    private func setFBProtection(enabled: Bool) -> Bool {
+        guard self.fbBlockingEnabled != enabled else {
+            return false
+        }
+
+        if let fbRules = contentBlockingManager.currentRules.first(where: {
+            $0.name == ContentBlockerRulesLists.Constants.clickToLoadRulesListName
+        }) {
+            if self.fbBlockingEnabled {
+                self.fbBlockingEnabled = false
+                webView.configuration.userContentController.remove(fbRules.rulesList)
+            } else {
+                self.fbBlockingEnabled = true
+                webView.configuration.userContentController.add(fbRules.rulesList)
+            }
+            return true
+        } else {
+            assertionFailure("Missing FB List")
+        }
+        return false
     }
 
     private func reloadIfNeeded(shouldLoadInBackground: Bool = false) {
@@ -343,7 +386,8 @@ final class Tab: NSObject {
         webView.allowsBackForwardNavigationGestures = true
         webView.allowsMagnification = true
 
-        subscribeToUserScripts()
+        userScripts = UserScripts(with: scriptsSource)
+        subscribeToUserScriptChanges()
         subscribeToOpenExternalUrlEvents()
 
         superviewObserver = webView.observe(\.superview, options: .old) { [weak self] _, change in
@@ -373,37 +417,32 @@ final class Tab: NSObject {
     // MARK: - Favicon
 
     @Published var favicon: NSImage?
-    let faviconService: FaviconService
+    let faviconManagement: FaviconManagement
 
     private func handleFavicon(oldContent: TabContent) {
-        if !content.isUrl {
-            favicon = nil
-        }
-        if oldContent.url?.host != content.url?.host {
-            fetchFavicon(nil, for: content.url?.host, isFromUserScript: false)
-        }
-    }
+        guard faviconManagement.areFaviconsLoaded else { return }
 
-    private func fetchFavicon(_ faviconURL: URL?, for host: String?, isFromUserScript: Bool) {
-        if favicon != nil {
+        guard content.isUrl, let url = content.url else {
             favicon = nil
-        }
-
-        guard let host = host else {
             return
         }
 
-        faviconService.fetchFavicon(faviconURL, for: host, isFromUserScript: isFromUserScript) { (image, error) in
-            guard error == nil, let image = image else {
-                return
+        if let cachedFavicon = faviconManagement.getCachedFavicon(for: url, sizeCategory: .small)?.image {
+            if cachedFavicon != favicon {
+                favicon = cachedFavicon
             }
-
-            self.favicon = image
+        } else {
+            favicon = nil
         }
     }
 
     // MARK: - User Scripts
+
+    let scriptsSource: ScriptSourceProviding
+    private var userScriptsUpdatedCancellable: AnyCancellable?
     
+    let contentBlockingManager: ContentBlockerRulesManager
+
     lazy var emailManager: EmailManager = {
         let emailManager = EmailManager()
         emailManager.requestDelegate = self
@@ -416,8 +455,6 @@ final class Tab: NSObject {
         return manager
     }()
 
-    private var userScriptsUpdatedCancellable: AnyCancellable?
-
     private var userScripts: UserScripts! {
         willSet {
             if let userScripts = userScripts {
@@ -428,8 +465,9 @@ final class Tab: NSObject {
             userScripts.debugScript.instrumentation = instrumentation
             userScripts.faviconScript.delegate = self
             userScripts.contextMenuScript.delegate = self
-            userScripts.contentBlockerScript.delegate = self
+            userScripts.surrogatesScript.delegate = self
             userScripts.contentBlockerRulesScript.delegate = self
+            userScripts.clickToLoadScript.delegate = self
             userScripts.autofillScript.emailDelegate = emailManager
             userScripts.autofillScript.vaultDelegate = vaultManager
             userScripts.pageObserverScript.delegate = self
@@ -442,11 +480,12 @@ final class Tab: NSObject {
         }
     }
 
-    private func subscribeToUserScripts() {
-        userScriptsUpdatedCancellable = UserScriptsManager.shared
-            .$userScripts
-            .map(UserScripts.init(copy:))
-            .weakAssign(to: \.userScripts, on: self)
+    private func subscribeToUserScriptChanges() {
+        userScriptsUpdatedCancellable = scriptsSource.sourceUpdatedPublisher.receive(on: RunLoop.main).sink { [weak self] _ in
+            guard let self = self, self.delegate != nil else { return }
+
+            self.userScripts = UserScripts(with: self.scriptsSource)
+        }
     }
 
     // MARK: - Find in Page
@@ -577,43 +616,61 @@ extension Tab: ContextMenuDelegate {
 
 extension Tab: FaviconUserScriptDelegate {
 
-    func faviconUserScript(_ faviconUserScript: FaviconUserScript, didFindFavicon faviconUrl: URL) {
-        guard let host = self.content.url?.host else {
-            return
-        }
-
-        faviconService.fetchFavicon(faviconUrl, for: host, isFromUserScript: true) { (image, error) in
-            guard host == self.content.url?.host else {
+    func faviconUserScript(_ faviconUserScript: FaviconUserScript,
+                           didFindFaviconLinks faviconLinks: [FaviconUserScript.FaviconLink],
+                           for documentUrl: URL) {
+        faviconManagement.handleFaviconLinks(faviconLinks, documentUrl: documentUrl) { favicon in
+            guard documentUrl == self.content.url, let favicon = favicon else {
                 return
             }
-            guard error == nil, let image = image else {
-                return
-            }
-
-            self.favicon = image
+            self.favicon = favicon.image
         }
     }
 
 }
 
-extension Tab: ContentBlockerUserScriptDelegate {
+extension Tab: ContentBlockerRulesUserScriptDelegate {
 
-    func contentBlockerUserScriptShouldProcessTrackers(_ script: UserScript) -> Bool {
+    func contentBlockerRulesUserScriptShouldProcessTrackers(_ script: ContentBlockerRulesUserScript) -> Bool {
         return true
     }
 
-    func contentBlockerUserScript(_ script: ContentBlockerUserScript,
-                                  detectedTracker tracker: DetectedTracker,
-                                  withSurrogate host: String) {
-        trackerInfo?.add(installedSurrogateHost: host)
-
-        contentBlockerUserScript(script, detectedTracker: tracker)
+    func contentBlockerRulesUserScriptShouldProcessCTLTrackers(_ script: ContentBlockerRulesUserScript) -> Bool {
+        return fbBlockingEnabled
     }
 
-    func contentBlockerUserScript(_ script: UserScript, detectedTracker tracker: DetectedTracker) {
+    func contentBlockerRulesUserScript(_ script: ContentBlockerRulesUserScript, detectedTracker tracker: DetectedTracker) {
         trackerInfo?.add(detectedTracker: tracker)
     }
 
+}
+
+extension Tab: ClickToLoadUserScriptDelegate {
+
+    func clickToLoadUserScriptAllowFB(_ script: UserScript, replyHandler: @escaping (Bool) -> Void) {
+        guard self.fbBlockingEnabled else {
+            replyHandler(true)
+            return
+        }
+        
+        if setFBProtection(enabled: false) {
+            replyHandler(true)
+        } else {
+            replyHandler(false)
+        }
+    }
+}
+
+extension Tab: SurrogatesUserScriptDelegate {
+    func surrogatesUserScriptShouldProcessTrackers(_ script: SurrogatesUserScript) -> Bool {
+         return true
+    }
+
+    func surrogatesUserScript(_ script: SurrogatesUserScript, detectedTracker tracker: DetectedTracker, withSurrogate host: String) {
+        trackerInfo?.add(installedSurrogateHost: host)
+
+        trackerInfo?.add(detectedTracker: tracker)
+    }
 }
 
 extension Tab: EmailManagerRequestDelegate { }
@@ -710,7 +767,7 @@ extension Tab: WKNavigationDelegate {
         let isMiddleClicked = navigationAction.buttonNumber == Constants.webkitMiddleClick
         if isLinkActivated && NSApp.isCommandPressed || isMiddleClicked {
             decisionHandler(.cancel)
-            delegate?.tab(self, requestedNewTab: navigationAction.request.url, selected: NSApp.isShiftPressed)
+            delegate?.tab(self, requestedNewTabWith: navigationAction.request.url.map { .url($0) } ?? .none, selected: NSApp.isShiftPressed)
             return
         } else if isLinkActivated && NSApp.isOptionPressed && !NSApp.isCommandPressed {
             decisionHandler(.download(navigationAction, using: webView))
@@ -718,8 +775,19 @@ extension Tab: WKNavigationDelegate {
         }
 
         guard let url = navigationAction.request.url, let urlScheme = url.scheme else {
+            self.willPerformNavigationAction(navigationAction)
             decisionHandler(.allow)
             return
+        }
+        
+        let privacyConfigurationManager = ContentBlocking.privacyConfigurationManager
+        let privacyConfiguration = privacyConfigurationManager.privacyConfig
+
+        let featureEnabled = privacyConfiguration.isFeature(.clickToPlay, enabledForDomain: url.host)
+        if featureEnabled {
+            setFBProtection(enabled: true)
+        } else {
+            setFBProtection(enabled: false)
         }
 
         if navigationAction.shouldDownload {
@@ -742,8 +810,12 @@ extension Tab: WKNavigationDelegate {
         }
 
         HTTPSUpgrade.shared.isUpgradeable(url: url) { [weak self] isUpgradable in
-            if let self = self,
-               isUpgradable && navigationAction.isTargetingMainFrame,
+            guard let self = self else {
+                decisionHandler(.cancel)
+                return
+            }
+
+            if isUpgradable && navigationAction.isTargetingMainFrame,
                 let upgradedUrl = url.toHttps() {
 
                 self.invalidateBackItemIfNeeded(for: navigationAction)
@@ -753,11 +825,18 @@ extension Tab: WKNavigationDelegate {
                 return
             }
 
+            self.willPerformNavigationAction(navigationAction)
             decisionHandler(.allow)
         }
     }
     // swiftlint:enable cyclomatic_complexity
     // swiftlint:enable function_body_length
+
+    private func willPerformNavigationAction(_ navigationAction: WKNavigationAction) {
+        if navigationAction.isTargetingMainFrame {
+            delegate?.tabWillStartNavigation(self, isUserInitiated: navigationAction.isUserInitiated)
+        }
+    }
 
     private func invalidateBackItemIfNeeded(for navigationAction: WKNavigationAction) {
         guard let url = navigationAction.request.url,
@@ -824,13 +903,13 @@ extension Tab: WKNavigationDelegate {
         }
     }
 
-    @available(macOS 12, *)
+    @available(macOS 11.3, *)
     @objc(webView:navigationAction:didBecomeDownload:)
     func webView(_ webView: WKWebView, navigationAction: WKNavigationAction, didBecome download: WKDownload) {
         self.webView(webView, navigationAction: navigationAction, didBecomeDownload: download)
     }
 
-    @available(macOS 12, *)
+    @available(macOS 11.3, *)
     @objc(webView:navigationResponse:didBecomeDownload:)
     func webView(_ webView: WKWebView, navigationResponse: WKNavigationResponse, didBecome download: WKDownload) {
         self.webView(webView, navigationResponse: navigationResponse, didBecomeDownload: download)

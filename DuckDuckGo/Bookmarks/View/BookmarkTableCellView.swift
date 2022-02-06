@@ -99,6 +99,14 @@ final class BookmarkTableCellView: NSTableCellView, NibLoadable {
             } else {
                 exitEditingMode()
             }
+            updateColors()
+        }
+    }
+
+    var isSelected = false {
+        didSet {
+            updateColors()
+            updateTitleLabelValue()
         }
     }
 
@@ -118,13 +126,15 @@ final class BookmarkTableCellView: NSTableCellView, NibLoadable {
                 resetAppearanceFromBookmark()
             }
 
-            updateTitleLabelValue()
+            if !editing {
+                updateTitleLabelValue()
+            }
         }
     }
 
     override var backgroundStyle: NSView.BackgroundStyle {
         didSet {
-            faviconImageView.contentTintColor = .black
+            faviconImageView.contentTintColor = isSelected ? .white : .black
             updateTitleLabelValue()
         }
     }
@@ -159,7 +169,7 @@ final class BookmarkTableCellView: NSTableCellView, NibLoadable {
     func update(from bookmark: Bookmark) {
         self.entity = bookmark
 
-        faviconImageView.image = bookmark.favicon ?? Self.defaultBookmarkFavicon
+        faviconImageView.image = bookmark.favicon(.small)
         accessoryImageView.image = bookmark.isFavorite ? Self.favoriteAccessoryViewImage : nil
         favoriteButton.image = bookmark.isFavorite ? Self.favoriteFilledAccessoryViewImage : Self.favoriteAccessoryViewImage
         primaryTitleLabelValue = bookmark.title
@@ -232,6 +242,13 @@ final class BookmarkTableCellView: NSTableCellView, NibLoadable {
         }
     }
 
+    private func updateColors() {
+        titleLabel.textColor = isSelected && !editing ? .white : .controlTextColor
+        menuButton.contentTintColor = isSelected ? .white : .buttonColor
+        faviconImageView.contentTintColor = isSelected ? .white : .suggestionIconColor
+        accessoryImageView.contentTintColor = isSelected ? .white : .suggestionIconColor
+    }
+
     private func ensureTrackingArea() {
         if trackingArea == nil {
             trackingArea = NSTrackingArea(rect: .zero, options: [.inVisibleRect, .activeAlways, .mouseEnteredAndExited], owner: self, userInfo: nil)
@@ -285,10 +302,14 @@ final class BookmarkTableCellView: NSTableCellView, NibLoadable {
     }
 
     private func buildTitleAttributedString(tertiaryValue: String) -> NSAttributedString {
-        let titleAttributes = [NSAttributedString.Key.foregroundColor: NSColor.labelColor]
+        let color = isSelected ? NSColor.white : NSColor.labelColor
+
+        let titleAttributes = [NSAttributedString.Key.foregroundColor: color]
         let titleString = NSMutableAttributedString(string: primaryTitleLabelValue, attributes: titleAttributes)
 
-        let urlAttributes = [NSAttributedString.Key.foregroundColor: NSColor.tertiaryLabelColor]
+        let urlColor = isSelected ? NSColor.white.withAlphaComponent(0.6) : NSColor.tertiaryLabelColor
+
+        let urlAttributes = [NSAttributedString.Key.foregroundColor: urlColor]
         let urlString = NSAttributedString(string: " – \(tertiaryValue)", attributes: urlAttributes)
 
         titleString.append(urlString)

@@ -19,21 +19,48 @@
 import Cocoa
 import WebKit
 import Combine
+import BrowserServicesKit
 
 final class PrivacyDashboardViewController: NSViewController {
 
     @IBOutlet var webView: WKWebView!
     private let privacyDashboardScript = PrivacyDashboardUserScript()
     private var cancellables = Set<AnyCancellable>()
-    @Published var pendingUpdates = Set<String>()
+    @Published var pendingUpdates = [String: String]()
 
     weak var tabViewModel: TabViewModel?
     var serverTrustViewModel: ServerTrustViewModel?
+
+    private var contentBlockinRulesUpdatedCancellable: AnyCancellable?
 
     override func viewDidLoad() {
         privacyDashboardScript.delegate = self
         initWebView()
         webView.configuration.userContentController.addHandlerNoContentWorld(privacyDashboardScript)
+
+        prepareContentBlockingCancellable(publisher: ContentBlocking.contentBlockingUpdating.contentBlockingRules)
+    }
+
+    private func prepareContentBlockingCancellable(publisher: ContentBlockingUpdating.NewRulesPublisher) {
+        contentBlockinRulesUpdatedCancellable = publisher.receive(on: RunLoop.main).sink { [weak self] newRules in
+            dispatchPrecondition(condition: .onQueue(.main))
+
+            guard let self = self, let newRules = newRules, !self.pendingUpdates.isEmpty else { return }
+
+            var didUpdate = false
+            for token in newRules.completionTokens {
+                if self.pendingUpdates.removeValue(forKey: token) != nil {
+                    didUpdate = true
+                }
+            }
+
+            if didUpdate {
+                self.sendPendingUpdates()
+
+                let activeTab = self.tabViewModel?.tab
+                activeTab?.reload()
+            }
+        }
     }
 
     override func viewWillAppear() {
@@ -80,13 +107,13 @@ final class PrivacyDashboardViewController: NSViewController {
         }
 
         let authState: PrivacyDashboardUserScript.AuthorizationState = PermissionType.allCases.compactMap { permissionType in
-            guard let alwaysGrant = PermissionManager.shared.permission(forDomain: domain, permissionType: permissionType) else {
-                if usedPermissions[permissionType] != nil {
-                    return (permissionType, .ask)
-                }
+            guard PermissionManager.shared.hasPermissionPersisted(forDomain: domain, permissionType: permissionType)
+                    || usedPermissions[permissionType] != nil
+            else {
                 return nil
             }
-            return (permissionType, alwaysGrant ? .grant : .deny)
+            let decision = PermissionManager.shared.permission(forDomain: domain, permissionType: permissionType)
+            return (permissionType, .init(decision: decision))
         }
 
         privacyDashboardScript.setPermissions(usedPermissions, authorizationState: authState, domain: domain, in: webView)
@@ -119,8 +146,8 @@ final class PrivacyDashboardViewController: NSViewController {
             return
         }
 
-        let protectionStore = DomainsProtectionUserDefaultsStore()
-        let isProtected = !protectionStore.unprotectedDomains.contains(domain)
+        let configuration = ContentBlocking.privacyConfigurationManager.privacyConfig
+        let isProtected = !configuration.isUserUnprotected(domain: domain)
         self.privacyDashboardScript.setProtectionStatus(isProtected, webView: self.webView)
     }
 
@@ -130,7 +157,7 @@ final class PrivacyDashboardViewController: NSViewController {
             return
         }
 
-        self.privacyDashboardScript.setPendingUpdates(self.pendingUpdates, domain: domain, webView: self.webView)
+        self.privacyDashboardScript.setIsPendingUpdates(pendingUpdates.values.contains(domain), webView: self.webView)
     }
 
     private func sendParentEntity() {
@@ -139,7 +166,7 @@ final class PrivacyDashboardViewController: NSViewController {
             return
         }
 
-        let pageEntity = TrackerRadarManager.shared.findEntity(forHost: domain)
+        let pageEntity = ContentBlocking.trackerDataManager.trackerData.findEntity(forHost: domain)
         self.privacyDashboardScript.setParentEntity(pageEntity, webView: self.webView)
     }
 
@@ -167,21 +194,16 @@ extension PrivacyDashboardViewController: PrivacyDashboardUserScriptDelegate {
             return
         }
 
-        let activeTab = self.tabViewModel?.tab
-        let protectionStore = DomainsProtectionUserDefaultsStore()
-        let operation = isProtected ? protectionStore.enableProtection : protectionStore.disableProtection
-        operation(domain)
-
-        pendingUpdates.insert(domain)
-        self.sendPendingUpdates()
-
-        ContentBlockerRulesManager.shared.compileRules { _ in
-            DefaultScriptSourceProvider.shared.reload()
-            HTTPSUpgrade.shared.reload()
-            self.pendingUpdates.remove(domain)
-            self.sendPendingUpdates()
-            activeTab?.reload()
+        let configuration = ContentBlocking.privacyConfigurationManager.privacyConfig
+        if isProtected {
+            configuration.userEnabledProtection(forDomain: domain)
+        } else {
+            configuration.userDisabledProtection(forDomain: domain)
         }
+
+        let completionToken = ContentBlocking.contentBlockingManager.scheduleCompilation()
+        pendingUpdates[completionToken] = domain
+        sendPendingUpdates()
     }
 
     func userScript(_ userScript: PrivacyDashboardUserScript, didSetPermission permission: PermissionType, to state: PermissionAuthorizationState) {
@@ -189,12 +211,8 @@ extension PrivacyDashboardViewController: PrivacyDashboardUserScriptDelegate {
             assertionFailure("PrivacyDashboardViewController: no domain available")
             return
         }
-        switch state {
-        case .ask:
-            PermissionManager.shared.removePermission(forDomain: domain, permissionType: permission)
-        case .deny, .grant:
-            PermissionManager.shared.setPermission(state == .grant, forDomain: domain, permissionType: permission)
-        }
+
+        PermissionManager.shared.setPermission(state.persistedPermissionDecision, forDomain: domain, permissionType: permission)
     }
 
     func userScript(_ userScript: PrivacyDashboardUserScript, setPermission permission: PermissionType, paused: Bool) {

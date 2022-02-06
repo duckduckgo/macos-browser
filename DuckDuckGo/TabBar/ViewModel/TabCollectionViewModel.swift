@@ -190,10 +190,6 @@ final class TabCollectionViewModel: NSObject {
         }
     }
 
-    func insertNewTab(at index: Int = 0) {
-        insert(tab: Tab(content: .homepage), at: index)
-    }
-
     func insertChild(tab: Tab, selected: Bool) {
         guard changesEnabled else { return }
         guard let parentTab = tab.parentTab,

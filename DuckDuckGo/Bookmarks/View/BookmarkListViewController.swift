@@ -41,7 +41,10 @@ final class BookmarkListViewController: NSViewController {
 
     @IBOutlet var outlineView: NSOutlineView!
     @IBOutlet var contextMenu: NSMenu!
-    
+    @IBOutlet var emptyState: NSView!
+    @IBOutlet var emptyStateTitle: NSTextField!
+    @IBOutlet var emptyStateMessage: NSTextField!
+
     private var cancellables = Set<AnyCancellable>()
     private var bookmarkManager: BookmarkManager = LocalBookmarkManager.shared
     private let treeControllerDataSource = BookmarkListTreeControllerDataSource()
@@ -77,9 +80,21 @@ final class BookmarkListViewController: NSViewController {
         outlineView.registerForDraggedTypes([BookmarkPasteboardWriter.bookmarkUTIInternalType,
                                              FolderPasteboardWriter.folderUTIInternalType])
         
-        LocalBookmarkManager.shared.listPublisher.receive(on: RunLoop.main).sink { [weak self] _ in
+        LocalBookmarkManager.shared.listPublisher.receive(on: RunLoop.main).sink { [weak self] list in
             self?.reloadData()
+            let isEmpty = list?.topLevelEntities.isEmpty ?? true
+            self?.emptyState.isHidden = !isEmpty
+            self?.outlineView.isHidden = isEmpty
         }.store(in: &cancellables)
+
+        emptyStateTitle.attributedStringValue = NSAttributedString.make(emptyStateTitle.stringValue, lineHeight: 1.14, kern: -0.23)
+        emptyStateMessage.attributedStringValue = NSAttributedString.make(emptyStateMessage.stringValue, lineHeight: 1.05, kern: -0.08)
+    }
+
+    override func viewWillAppear() {
+        super.viewWillAppear()
+
+        reloadData()
     }
 
     private func reloadData() {
@@ -111,15 +126,26 @@ final class BookmarkListViewController: NSViewController {
     
     @IBAction func handleClick(_ sender: NSOutlineView) {
         guard sender.clickedRow != -1 else { return }
-        
-        if let node = sender.item(atRow: sender.clickedRow) as? BookmarkNode,
+
+        let item = sender.item(atRow: sender.clickedRow)
+        if let node = item as? BookmarkNode,
            let bookmark = node.representedObject as? Bookmark {
             WindowControllersManager.shared.open(bookmark: bookmark)
             delegate?.popoverShouldClose(self)
             Pixel.fire(.navigation(kind: .bookmark(isFavorite: bookmark.isFavorite), source: .listInterface))
+        } else {
+            if outlineView.isItemExpanded(item) {
+                outlineView.animator().collapseItem(item)
+            } else {
+                outlineView.animator().expandItem(item)
+            }
         }
     }
-    
+
+    @IBAction func onImportClicked(_ sender: NSButton) {
+        DataImportViewController.show()
+    }
+
     // MARK: NSOutlineView Configuration
     
     private func expandAndRestore(selectedNodes: [BookmarkNode]) {

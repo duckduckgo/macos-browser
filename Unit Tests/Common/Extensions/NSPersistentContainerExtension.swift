@@ -21,7 +21,8 @@ import CoreData
 
 extension NSPersistentContainer {
 
-    static func createInMemoryPersistentContainer(modelName: String, bundle: Bundle) -> NSPersistentContainer {
+    static func createPersistentContainer(at url: URL, modelName: String, bundle: Bundle) -> NSPersistentContainer {
+
         guard let modelURL = bundle.url(forResource: modelName, withExtension: "momd") else {
             fatalError("Error loading model from bundle")
         }
@@ -32,13 +33,8 @@ extension NSPersistentContainer {
 
         let container = NSPersistentContainer(name: modelName, managedObjectModel: objectModel)
 
-        // Creates a persistent store using the in-memory model, no state will be written to disk.
-        // This was the approach I had seen recommended in a WWDC session, but there is also a
-        // `NSInMemoryStoreType` option for doing this.
-        //
-        // This approach is apparently the recommended choice: https://www.donnywals.com/setting-up-a-core-data-store-for-unit-tests/
         let description = NSPersistentStoreDescription()
-        description.url = URL(fileURLWithPath: "/dev/null")
+        description.url = url
         container.persistentStoreDescriptions = [description]
 
         container.loadPersistentStores(completionHandler: { _, error in
@@ -48,6 +44,15 @@ extension NSPersistentContainer {
         })
 
         return container
+    }
+
+    static func createInMemoryPersistentContainer(modelName: String, bundle: Bundle) -> NSPersistentContainer {
+        // Creates a persistent store using the in-memory model, no state will be written to disk.
+        // This was the approach I had seen recommended in a WWDC session, but there is also a
+        // `NSInMemoryStoreType` option for doing this.
+        //
+        // This approach is apparently the recommended choice: https://www.donnywals.com/setting-up-a-core-data-store-for-unit-tests/
+        return createPersistentContainer(at: URL(fileURLWithPath: "/dev/null"), modelName: modelName, bundle: bundle)
     }
 
 }

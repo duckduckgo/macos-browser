@@ -52,22 +52,6 @@ final class TabViewModelTests: XCTestCase {
         XCTAssertEqual(tabViewModel.addressBarString, "")
     }
 
-    func testWhenURLIsSearchThenAddressBarStringIsTheQuery() {
-        let tabViewModel = TabViewModel.aTabViewModel
-
-        let query = "query"
-        let searchUrl = URL.makeSearchUrl(from: query)
-        tabViewModel.tab.url = searchUrl
-
-        let addressBarStringExpectation = expectation(description: "Address bar string")
-
-        tabViewModel.$addressBarString.debounce(for: 0.1, scheduler: RunLoop.main).sink { addressBarString in
-            XCTAssertEqual(addressBarString, query)
-            addressBarStringExpectation.fulfill()
-        } .store(in: &cancellables)
-        waitForExpectations(timeout: 1, handler: nil)
-    }
-
     func testWhenURLIsSetThenAddressBarIsUpdated() {
         let tabViewModel = TabViewModel.aTabViewModel
 
@@ -165,27 +149,14 @@ final class TabViewModelTests: XCTestCase {
         tabViewModel.tab.setContent(.homepage)
 
         let faviconExpectation = expectation(description: "Favicon")
+        var fulfilled = false
 
         tabViewModel.$favicon.debounce(for: 0.1, scheduler: RunLoop.main).sink { favicon in
-            XCTAssertNotNil(favicon)
-            if favicon == TabViewModel.Favicon.home {
+            guard favicon != nil else { return }
+            if favicon == TabViewModel.Favicon.home,
+                !fulfilled {
                 faviconExpectation.fulfill()
-            }
-        } .store(in: &cancellables)
-        waitForExpectations(timeout: 5, handler: nil)
-    }
-
-    func testWhenTabDownloadedFaviconThenFaviconIsNotNil() {
-        let tabViewModel = TabViewModel.aTabViewModel
-        tabViewModel.tab.url = URL(string: "http://apple.com")
-
-        let faviconExpectation = expectation(description: "Favicon")
-
-        tabViewModel.$favicon.debounce(for: 1, scheduler: RunLoop.main).sink { favicon in
-            XCTAssertNotNil(favicon)
-            XCTAssertNotEqual(favicon, TabViewModel.Favicon.home)
-            if favicon != nil {
-                faviconExpectation.fulfill()
+                fulfilled = true
             }
         } .store(in: &cancellables)
         waitForExpectations(timeout: 5, handler: nil)

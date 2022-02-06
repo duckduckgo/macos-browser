@@ -18,16 +18,18 @@
 
 import Foundation
 import Combine
+import BrowserServicesKit
 
 protocol ScriptSourceProviding {
 
-    func reload()
-    var contentBlockerRulesSource: String { get }
-    var contentBlockerSource: String { get }
-    var gpcSource: String { get }
-    var navigatorCredentialsSource: String { get }
+    func reload(knownChanges: [String: ContentBlockerRulesIdentifier.Difference])
+    var contentBlockerRulesConfig: ContentBlockerUserScriptConfig? { get }
+    var surrogatesConfig: SurrogatesUserScriptConfig? { get }
+    var privacyConfigurationManager: PrivacyConfigurationManager { get }
+    var sessionKey: String? { get }
+    var clickToLoadSource: String { get }
 
-    var sourceUpdatedPublisher: AnyPublisher<Void, Never> { get }
+    var sourceUpdatedPublisher: AnyPublisher<[String: ContentBlockerRulesIdentifier.Difference], Never> { get }
 
 }
 
@@ -35,102 +37,129 @@ final class DefaultScriptSourceProvider: ScriptSourceProviding {
 
     static var shared: ScriptSourceProviding = DefaultScriptSourceProvider()
 
-    @Published
-    private(set) var contentBlockerRulesSource: String = ""
-    @Published
-    private(set) var contentBlockerSource: String = ""
-    @Published
-    private(set) var gpcSource: String = ""
-    private(set) var navigatorCredentialsSource: String = ""
+    private(set) var contentBlockerRulesConfig: ContentBlockerUserScriptConfig?
+    private(set) var surrogatesConfig: SurrogatesUserScriptConfig?
+    private(set) var sessionKey: String?
+    private(set) var clickToLoadSource: String = ""
 
-    private let sourceUpdatedSubject = PassthroughSubject<Void, Never>()
-
-    var sourceUpdatedPublisher: AnyPublisher<Void, Never> {
+    private let sourceUpdatedSubject = PassthroughSubject<[String: ContentBlockerRulesIdentifier.Difference], Never>()
+    var sourceUpdatedPublisher: AnyPublisher<[String: ContentBlockerRulesIdentifier.Difference], Never> {
         sourceUpdatedSubject.eraseToAnyPublisher()
     }
 
     let configStorage: ConfigurationStoring
-    let privacyConfiguration: PrivacyConfigurationManagment
+    let privacyConfigurationManager: PrivacyConfigurationManager
+    let contentBlockingManager: ContentBlockerRulesManager
+
+    var contentBlockingRulesUpdatedCancellable: AnyCancellable!
 
     private init(configStorage: ConfigurationStoring = DefaultConfigurationStorage.shared,
-                 privacyConfiguration: PrivacyConfigurationManagment = PrivacyConfigurationManager.shared) {
+                 privacyConfigurationManager: PrivacyConfigurationManager = ContentBlocking.privacyConfigurationManager,
+                 contentBlockingManager: ContentBlockerRulesManager = ContentBlocking.contentBlockingManager,
+                 contentBlockingUpdating: ContentBlockingUpdating = ContentBlocking.contentBlockingUpdating) {
         self.configStorage = configStorage
-        self.privacyConfiguration = privacyConfiguration
-        reload()
+        self.privacyConfigurationManager = privacyConfigurationManager
+        self.contentBlockingManager = contentBlockingManager
+
+        attachListeners(contentBlockingUpdating: contentBlockingUpdating)
+
+        reload(knownChanges: [:])
     }
 
-    func reload() {
-        contentBlockerRulesSource = buildContentBlockerRulesSource()
-        contentBlockerSource = buildContentBlockerSource()
-        gpcSource = buildGPCSource()
-        navigatorCredentialsSource = buildNavigatorCredentialsSource()
-        sourceUpdatedSubject.send( () )
+    private func attachListeners(contentBlockingUpdating: ContentBlockingUpdating) {
+        let cancellable = contentBlockingUpdating.contentBlockingRules.receive(on: RunLoop.main).sink(receiveValue: { [weak self] newRulesInfo in
+            guard let self = self, let newRulesInfo = newRulesInfo else { return }
+
+            self.reload(knownChanges: newRulesInfo.changes)
+        })
+        contentBlockingRulesUpdatedCancellable = cancellable
     }
 
-    private func buildContentBlockerRulesSource() -> String {
-        let unprotectedDomains = privacyConfiguration.tempUnprotectedDomains
-        let contentBlockingExceptions = privacyConfiguration.exceptionsList(forFeature: .contentBlocking)
-        let protectionStore = DomainsProtectionUserDefaultsStore()
-        return ContentBlockerRulesUserScript.loadJS("contentblockerrules", from: .main, withReplacements: [
-            "$TEMP_UNPROTECTED_DOMAINS$": (unprotectedDomains + contentBlockingExceptions).joined(separator: "\n"),
-            "$USER_UNPROTECTED_DOMAINS$": protectionStore.unprotectedDomains.joined(separator: "\n")
-        ])
+    func reload(knownChanges: [String: ContentBlockerRulesIdentifier.Difference]) {
+        contentBlockerRulesConfig = buildContentBlockerRulesConfig()
+        surrogatesConfig = buildSurrogatesConfig()
+        sessionKey = generateSessionKey()
+        clickToLoadSource = buildClickToLoadSource()
+        sourceUpdatedSubject.send( knownChanges )
     }
 
-    private func buildContentBlockerSource() -> String {
+    private func generateSessionKey() -> String {
+        return UUID().uuidString
+    }
 
-        // Use sensible defaults in case the upstream data is unparsable
-        let trackerData = TrackerRadarManager.shared.encodedTrackerData
-        let surrogates = configStorage.loadData(for: .surrogates)?.utf8String() ?? ""
-
-        let remoteUnprotectedDomains = (privacyConfiguration.tempUnprotectedDomains.joined(separator: "\n"))
-            + "\n"
-            + (privacyConfiguration.exceptionsList(forFeature: .contentBlocking).joined(separator: "\n"))
-
-        let protectionStore = DomainsProtectionUserDefaultsStore()
-        let localUnprotectedDomains = protectionStore.unprotectedDomains.joined(separator: "\n")
-        let isDebugBuild: String
+    private func buildContentBlockerRulesConfig() -> ContentBlockerUserScriptConfig {
         
+        let tdsName = DefaultContentBlockerRulesListsSource.Constants.trackerDataSetRulesListName
+        let trackerData = contentBlockingManager.currentRules.first(where: { $0.name == tdsName})?.trackerData
+        
+        let ctlTrackerData = (contentBlockingManager.currentRules.first(where: {
+            $0.name == ContentBlockerRulesLists.Constants.clickToLoadRulesListName
+        })?.trackerData) ?? ContentBlockerRulesLists.fbTrackerDataSet
+
+        return DefaultContentBlockerUserScriptConfig(privacyConfiguration: privacyConfigurationManager.privacyConfig,
+                                                     trackerData: trackerData,
+                                                     ctlTrackerData: ctlTrackerData,
+                                                     trackerDataManager: ContentBlocking.trackerDataManager)
+    }
+
+    private func buildSurrogatesConfig() -> SurrogatesUserScriptConfig {
+
+        let isDebugBuild: Bool
         #if DEBUG
-        isDebugBuild = "true"
+        isDebugBuild = true
         #else
-        isDebugBuild = "false"
+        isDebugBuild = false
         #endif
-        
-        return ContentBlockerUserScript.loadJS("contentblocker", from: .main, withReplacements: [
-            "$IS_DEBUG$": isDebugBuild,
-            "$TEMP_UNPROTECTED_DOMAINS$": remoteUnprotectedDomains,
-            "$USER_UNPROTECTED_DOMAINS$": localUnprotectedDomains,
-            "$TRACKER_DATA$": trackerData,
-            "$SURROGATES$": surrogates,
-            "$BLOCKING_ENABLED$": privacyConfiguration.isEnabled(featureKey: .contentBlocking) ? "true" : "false"
-        ])
+
+        let surrogates = configStorage.loadData(for: .surrogates)?.utf8String() ?? ""
+        let tdsName = DefaultContentBlockerRulesListsSource.Constants.trackerDataSetRulesListName
+        let rules = contentBlockingManager.currentRules.first(where: { $0.name == tdsName})
+        return DefaultSurrogatesUserScriptConfig(privacyConfig: privacyConfigurationManager.privacyConfig,
+                                                 surrogates: surrogates,
+                                                 trackerData: rules?.trackerData,
+                                                 encodedSurrogateTrackerData: rules?.encodedTrackerData,
+                                                 trackerDataManager: ContentBlocking.trackerDataManager,
+                                                 isDebugBuild: isDebugBuild)
     }
     
-    private func buildGPCSource() -> String {
-        let exceptions = privacyConfiguration.tempUnprotectedDomains +
-                            privacyConfiguration.exceptionsList(forFeature: .gpc)
-        let privSettings = PrivacySecurityPreferences()
-        let protectionStore = DomainsProtectionUserDefaultsStore()
-        let localUnprotectedDomains = protectionStore.unprotectedDomains.joined(separator: "\n")
-        
-        return GPCUserScript.loadJS("gpc", from: .main, withReplacements: [
-            "$GPC_ENABLED$": privacyConfiguration.isEnabled(featureKey: .gpc) && privSettings.gpcEnabled ? "true" : "false",
-            "$GPC_EXCEPTIONS$": exceptions.joined(separator: "\n"),
-            "$USER_UNPROTECTED_DOMAINS$": localUnprotectedDomains
-        ])
-    }
-
-    private func buildNavigatorCredentialsSource() -> String {
-        let unprotectedDomains = privacyConfiguration.tempUnprotectedDomains
-        let contentBlockingExceptions = privacyConfiguration.exceptionsList(forFeature: .navigatorCredentials)
-        if !privacyConfiguration.isEnabled(featureKey: .navigatorCredentials) {
-            return ""
+    private func loadTextFile(_ fileName: String, _ fileExt: String) -> String? {
+        let url = Bundle.main.url(
+            forResource: fileName,
+            withExtension: fileExt
+        )
+        guard let data = try? String(contentsOf: url!) else {
+            assertionFailure("Failed to load text file")
+            return nil
         }
-        return NavigatorCredentialsUserScript.loadJS("navigatorCredentials", from: .main, withReplacements: [
-             "$USER_UNPROTECTED_DOMAINS$": "",
-             "$CREDENTIALS_EXCEPTIONS$": (unprotectedDomains + contentBlockingExceptions).joined(separator: "\n")
-        ])
+        
+        return data
     }
 
+    private func loadFont(_ fileName: String, _ fileExt: String) -> String? {
+        let url = Bundle.main.url(
+            forResource: fileName,
+            withExtension: fileExt
+        )
+        guard let base64String = try? Data(contentsOf: url!).base64EncodedString() else {
+            assertionFailure("Failed to load font")
+            return nil
+        }
+        
+        let font = "data:application/octet-stream;base64," + base64String
+        return font
+    }
+
+    private func buildClickToLoadSource() -> String {
+        // For now bundle FB SDK and associated config, as they diverged from the extension
+        let fbSDK = loadTextFile("fb-sdk", "js")
+        let config = loadTextFile("clickToLoadConfig", "json")
+        let proximaRegFont = loadFont("ProximaNova-Reg-webfont", "woff2")
+        let proximaBoldFont = loadFont("ProximaNova-Bold-webfont", "woff2")
+        return ContentBlockerRulesUserScript.loadJS("clickToLoad", from: .main, withReplacements: [
+            "${fb-sdk.js}": fbSDK!,
+            "${clickToLoadConfig.json}": config!,
+            "${proximaRegFont}": proximaRegFont!,
+            "${proximaBoldFont}": proximaBoldFont!
+        ])
+    }
 }

@@ -23,6 +23,7 @@ import Combine
 protocol BookmarkManager: AnyObject {
 
     func isUrlBookmarked(url: URL) -> Bool
+    func isHostInBookmarks(host: String) -> Bool
     func getBookmark(for url: URL) -> Bookmark?
     @discardableResult func makeBookmark(for url: URL, title: String, isFavorite: Bool) -> Bookmark?
     @discardableResult func makeFolder(for title: String, parent: BookmarkFolder?) -> BookmarkFolder
@@ -45,22 +46,18 @@ final class LocalBookmarkManager: BookmarkManager {
 
     static let shared = LocalBookmarkManager()
 
-    private init() {
-        subscribeToCachedFavicons()
-    }
+    private init() {}
 
-    init(bookmarkStore: BookmarkStore, faviconService: FaviconService) {
+    init(bookmarkStore: BookmarkStore, faviconManagement: FaviconManagement) {
         self.bookmarkStore = bookmarkStore
-        self.faviconService = faviconService
-
-        subscribeToCachedFavicons()
+        self.faviconManagement = faviconManagement
     }
 
     @Published private(set) var list: BookmarkList?
     var listPublisher: Published<BookmarkList?>.Publisher { $list }
 
     private lazy var bookmarkStore: BookmarkStore = LocalBookmarkStore()
-    private lazy var faviconService: FaviconService = LocalFaviconService.shared
+    private lazy var faviconManagement: FaviconManagement = FaviconManager.shared
 
     // MARK: - Bookmarks
 
@@ -86,6 +83,12 @@ final class LocalBookmarkManager: BookmarkManager {
         return list?[url] != nil
     }
 
+    func isHostInBookmarks(host: String) -> Bool {
+        return list?.allBookmarkURLsOrdered.contains(where: { url in
+            url.host == host
+        }) ?? false
+    }
+
     func getBookmark(for url: URL) -> Bookmark? {
         return list?[url]
     }
@@ -99,7 +102,7 @@ final class LocalBookmarkManager: BookmarkManager {
         }
 
         let id = UUID()
-        let bookmark = Bookmark(id: id, url: url, title: title, favicon: favicon(for: url.host), isFavorite: isFavorite)
+        let bookmark = Bookmark(id: id, url: url, title: title, isFavorite: isFavorite)
 
         list?.insert(bookmark)
         bookmarkStore.save(bookmark: bookmark, parent: nil) { [weak self] success, _  in
@@ -201,32 +204,9 @@ final class LocalBookmarkManager: BookmarkManager {
 
     // MARK: - Favicons
 
-    private var faviconCancellable: AnyCancellable?
-
-    private func subscribeToCachedFavicons() {
-        faviconCancellable = faviconService.cachedFaviconsPublisher
-            .sink(receiveValue: { [weak self] (host, favicon) in
-                self?.update(favicon: favicon, for: host)
-            })
-    }
-
-    private func update(favicon: NSImage, for host: String) {
-        guard let bookmarks = list?.bookmarks() else { return }
-
-        bookmarks
-            .filter { $0.url.host == host &&
-                $0.favicon?.size.isSmaller(than: favicon.size) ?? true
-            }
-            .forEach {
-                let bookmark = $0
-                bookmark.favicon = favicon
-                update(bookmark: bookmark)
-            }
-    }
-
     private func favicon(for host: String?) -> NSImage? {
         if let host = host {
-            return faviconService.getCachedFavicon(for: host, mustBeFromUserScript: false)
+            return faviconManagement.getCachedFavicon(for: host, sizeCategory: .small)?.image
         }
 
         return nil

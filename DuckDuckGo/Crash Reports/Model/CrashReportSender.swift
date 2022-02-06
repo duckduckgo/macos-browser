@@ -41,7 +41,7 @@ final class CrashReportSender {
 
         print("SENDING CRASH: \(request)")
         
-        URLSession.shared.dataTask(with: request) { (_, _, error) in
+        URLSession.default.dataTask(with: request) { (_, _, error) in
             if error != nil {
                 assertionFailure("CrashReportSender: Failed to send the crash reprot")
             }

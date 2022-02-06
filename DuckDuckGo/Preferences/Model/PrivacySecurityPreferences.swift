@@ -26,7 +26,7 @@ struct PrivacySecurityPreferences {
     @UserDefaultsWrapper(key: .gpcEnabled, defaultValue: true)
     public var gpcEnabled: Bool {
         didSet {
-            DefaultScriptSourceProvider.shared.reload()
+            DefaultScriptSourceProvider.shared.reload(knownChanges: [:])
             GPCRequestFactory.shared.reloadGPCSetting()
         }
     }

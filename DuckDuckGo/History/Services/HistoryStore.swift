@@ -216,8 +216,7 @@ fileprivate extension HistoryEntry {
                   title: title,
                   numberOfVisits: Int(numberOfVisits),
                   lastVisit: lastVisit,
-                  failedToLoad: historyMO.failedToLoad,
-                  isDownload: historyMO.isDownload)
+                  failedToLoad: historyMO.failedToLoad)
     }
 
 }
@@ -240,7 +239,6 @@ fileprivate extension HistoryEntryManagedObject {
         numberOfVisits = Int64(entry.numberOfVisits)
         lastVisit = entry.lastVisit
         failedToLoad = entry.failedToLoad
-        isDownload = entry.isDownload
     }
 
 }

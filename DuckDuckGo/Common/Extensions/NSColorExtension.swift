@@ -130,4 +130,6 @@ extension NSColor {
         NSColor(named: "ButtonMouseDownColor")!
     }
 
+    static let buttonColor: NSColor = NSColor(named: "ButtonColor")!
+
 }

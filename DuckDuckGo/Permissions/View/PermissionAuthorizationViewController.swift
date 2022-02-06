@@ -27,8 +27,24 @@ extension PermissionType {
             return UserText.permissionMicrophone
         case .geolocation:
             return UserText.permissionGeolocation
+        case .popups:
+            return UserText.permissionPopups
         }
     }
+}
+
+extension Array where Element == PermissionType {
+
+    var localizedDescription: String {
+        if Set(self) == Set([.camera, .microphone]) {
+            return UserText.permissionCameraAndMicrophone
+        } else if self.count == 1 {
+            return self[0].localizedDescription
+        }
+        assertionFailure("Unexpected Permissions combination")
+        return self.map(\.localizedDescription).joined(separator: ", ")
+    }
+
 }
 
 final class PermissionAuthorizationViewController: NSViewController {
@@ -49,12 +65,13 @@ final class PermissionAuthorizationViewController: NSViewController {
         guard isViewLoaded,
               let query = query
         else { return }
-        let localizedPermissions = query.permissions.map(\.localizedDescription).reduce("") {
-            $0.isEmpty ? $1 : String(format: UserText.permissionAndPermissionFormat, $0, $1)
-        }
-        self.descriptionLabel.stringValue = String(format: UserText.permissionAuthorizationFormat,
+
+        let format = query.permissions == [.popups]
+            ? UserText.popupWindowsPermissionAuthorizationFormat
+            : UserText.devicePermissionAuthorizationFormat
+        self.descriptionLabel.stringValue = String(format: format,
                                                    query.domain,
-                                                   localizedPermissions)
+                                                   query.permissions.localizedDescription)
     }
 
     @IBAction func grantAction(_ sender: NSButton) {

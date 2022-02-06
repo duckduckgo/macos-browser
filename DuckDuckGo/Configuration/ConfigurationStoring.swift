@@ -37,7 +37,8 @@ final class DefaultConfigurationStorage: ConfigurationStoring {
         .bloomFilterSpec: "smarterEncryptionSpec.json",
         .surrogates: "surrogates.txt",
         .privacyConfiguration: "macos-config.json",
-        .trackerRadar: "tracker-radar.json"
+        .trackerRadar: "tracker-radar.json",
+        .FBConfig: "social_ctp_configuration.json"
     ]
 
     static let shared = DefaultConfigurationStorage()
@@ -58,7 +59,10 @@ final class DefaultConfigurationStorage: ConfigurationStoring {
     private var surrogatesEtag: String?
     
     @UserDefaultsWrapper(key: .configStoragePrivacyConfigurationEtag, defaultValue: nil)
-    private var privacyConfigruationEtag: String?
+    private var privacyConfigurationEtag: String?
+
+    @UserDefaultsWrapper(key: .configFBConfigEtag, defaultValue: nil)
+    private var FBConfigEtag: String?
 
     private init() { }
 
@@ -80,7 +84,10 @@ final class DefaultConfigurationStorage: ConfigurationStoring {
             return trackerRadarEtag
             
         case .privacyConfiguration:
-            return privacyConfigruationEtag
+            return privacyConfigurationEtag
+
+        case .FBConfig:
+            return FBConfigEtag
         }
     }
 
@@ -102,7 +109,10 @@ final class DefaultConfigurationStorage: ConfigurationStoring {
             trackerRadarEtag = etag
             
         case .privacyConfiguration:
-            privacyConfigruationEtag = etag
+            privacyConfigurationEtag = etag
+
+        case .FBConfig:
+            return FBConfigEtag = etag
         }
     }
 
@@ -127,7 +137,8 @@ final class DefaultConfigurationStorage: ConfigurationStoring {
         os_log("bloomFilterExcludedDomainsEtag %{public}s", log: .config, type: .default, bloomFilterExcludedDomainsEtag ?? "")
         os_log("surrogatesEtag %{public}s", log: .config, type: .default, surrogatesEtag ?? "")
         os_log("trackerRadarEtag %{public}s", log: .config, type: .default, trackerRadarEtag ?? "")
-        os_log("privacyConfigurationEtag %{public}s", log: .config, type: .default, privacyConfigruationEtag ?? "")
+        os_log("privacyConfigurationEtag %{public}s", log: .config, type: .default, privacyConfigurationEtag ?? "")
+        os_log("FBConfigEtag %{public}s", log: .config, type: .default, FBConfigEtag ?? "")
     }
 
     func fileUrl(for config: ConfigurationLocation) -> URL {

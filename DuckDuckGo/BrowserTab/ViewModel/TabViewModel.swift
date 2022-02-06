@@ -64,7 +64,10 @@ final class TabViewModel {
     var loadingStartTime: CFTimeInterval?
 
     @Published private(set) var addressBarString: String = ""
-    @PublishedAfter private(set) var passiveAddressBarString: String = ""
+    @Published private(set) var passiveAddressBarString: String = ""
+    var lastAddressBarTextFieldValue: AddressBarTextField.Value?
+    var lastHomepageTextFieldValue: AddressBarTextField.Value?
+
     @Published private(set) var title: String = UserText.tabHomeTitle
     @Published private(set) var favicon: NSImage?
     @Published private(set) var findInPage: FindInPageModel = FindInPageModel()
@@ -86,7 +89,7 @@ final class TabViewModel {
     }
 
     private func subscribeToUrl() {
-        tab.$content.sink { [weak self] _ in
+        tab.$content.receive(on: DispatchQueue.main).sink { [weak self] _ in
             self?.updateCanReload()
             self?.updateAddressBarStrings()
             self?.updateCanBeBookmarked()
@@ -95,7 +98,7 @@ final class TabViewModel {
     }
 
     private func subscribeToTitle() {
-        tab.$title.sink { [weak self] _ in self?.updateTitle() } .store(in: &cancellables)
+        tab.$title.receive(on: DispatchQueue.main).sink { [weak self] _ in self?.updateTitle() } .store(in: &cancellables)
     }
 
     private func subscribeToFavicon() {
@@ -143,7 +146,7 @@ final class TabViewModel {
             return
         }
 
-        guard let url = tab.content.url else {
+        guard let url = tab.content.url ?? tab.parentTab?.content.url else {
             addressBarString = ""
             passiveAddressBarString = ""
             return
@@ -161,22 +164,15 @@ final class TabViewModel {
             return
         }
 
-        guard let host = url.host else {
+        guard let host = url.host ?? tab.parentTab?.content.url?.host else {
+            // also lands here for about:blank and about:home
             addressBarString = ""
             passiveAddressBarString = ""
             return
         }
 
-        if let searchQuery = url.searchQuery {
-            addressBarString = searchQuery
-            passiveAddressBarString = searchQuery
-        } else if [.blankPage, .homePage].contains(url) {
-            addressBarString = ""
-            passiveAddressBarString = ""
-        } else {
-            addressBarString = url.absoluteString
-            passiveAddressBarString = host.drop(prefix: URL.HostPrefix.www.separated())
-        }
+        addressBarString = url.absoluteString
+        passiveAddressBarString = host.drop(prefix: URL.HostPrefix.www.separated())
     }
 
     private func updateTitle() {
@@ -192,6 +188,8 @@ final class TabViewModel {
             title = UserText.tabBookmarksTitle
         case .homepage:
             title = UserText.tabHomeTitle
+        case .onboarding:
+            title = UserText.tabOnboardingTitle
         case .url, .none:
             if let title = tab.title {
                 self.title = title
@@ -217,7 +215,7 @@ final class TabViewModel {
         case .bookmarks:
             favicon = Favicon.bookmarks
             return
-        case .url, .none: break
+        case .url, .onboarding, .none: break
         }
 
         if let favicon = tab.favicon {

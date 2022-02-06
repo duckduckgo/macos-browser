@@ -168,7 +168,11 @@ final class HomepageHeaderView: NSView {
     }
 
     private func updateSearchView() {
-        if window?.firstResponder != field.currentEditor() {
+        guard let firstResponder = window?.firstResponder else {
+            return
+        }
+
+        if firstResponder != field.currentEditor() {
            showSearchInactive()
         } else if field.isSuggestionWindowVisible {
             showSearchHasResults()
@@ -182,7 +186,7 @@ final class HomepageHeaderView: NSView {
 extension HomepageHeaderView: MouseClickViewDelegate {
 
     func mouseClickView(_ mouseClickView: MouseClickView, mouseDownEvent: NSEvent) {
-        field.makeMeFirstResponderIfNeeded()
+        field.makeMeFirstResponder()
     }
 
 }

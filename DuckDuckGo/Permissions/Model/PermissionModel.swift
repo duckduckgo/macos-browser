@@ -22,12 +22,13 @@ import WebKit
 import AVFoundation
 import CoreLocation
 
+// swiftlint:disable:next type_body_length
 final class PermissionModel {
 
     @PublishedAfter var permissions = Permissions()
     @PublishedAfter var authorizationQuery: PermissionAuthorizationQuery?
 
-    private var authorizationQueries = [PermissionAuthorizationQuery]() {
+    private(set) var authorizationQueries = [PermissionAuthorizationQuery]() {
         didSet {
             authorizationQuery = authorizationQueries.first
         }
@@ -76,7 +77,7 @@ final class PermissionModel {
             self?.permissionManager(permissionManager,
                                     didChangePermanentDecisionFor: value.permissionType,
                                     forDomain: value.domain,
-                                    to: value.grant)
+                                    to: value.decision)
         }.store(in: &cancellables)
     }
 
@@ -110,12 +111,17 @@ final class PermissionModel {
                 } else {
                     permissions.geolocation.update(with: webView.geolocationState)
                 }
+            case .popups:
+                continue
             }
         }
     }
 
-    private func queryAuthorization(for permissions: [PermissionType], domain: String, decisionHandler: @escaping (Bool) -> Void) {
-        let query = PermissionAuthorizationQuery(domain: domain, permissions: permissions) { [weak self] decision in
+    private func queryAuthorization(for permissions: [PermissionType],
+                                    domain: String,
+                                    url: URL?,
+                                    decisionHandler: @escaping (Bool) -> Void) {
+        let query = PermissionAuthorizationQuery(domain: domain, url: url, permissions: permissions) { [weak self] decision in
             let query: PermissionAuthorizationQuery?
             let granted: Bool
             switch decision {
@@ -167,17 +173,21 @@ final class PermissionModel {
     private func permissionManager(_: PermissionManagerProtocol,
                                    didChangePermanentDecisionFor permissionType: PermissionType,
                                    forDomain domain: String,
-                                   to decision: Bool?) {
+                                   to decision: PersistedPermissionDecision) {
 
-        // If Always Deny for the current host: revoke the permission
-        guard webView?.url?.host?.dropWWW() == domain,
-           decision == false,
-           self.permissions[permissionType] != nil
-        else {
-            return
+        // If Always Allow/Deny for the current host: Grant/Revoke the permission
+        guard webView?.url?.host?.dropWWW() == domain else { return }
+
+        switch (decision, self.permissions[permissionType]) {
+        case (.deny, .some):
+            self.revoke(permissionType)
+            fallthrough
+        case (.allow, .requested):
+            while let query = self.authorizationQueries.first(where: { $0.permissions == [permissionType] }) {
+                query.handleDecision(grant: decision == .allow)
+            }
+        default: break
         }
-
-        self.revoke(permissionType)
     }
 
     // MARK: Pausing/Revoking
@@ -190,10 +200,18 @@ final class PermissionModel {
         webView?.setPermissions([permission], muted: muted)
     }
 
+    func allow(_ query: PermissionAuthorizationQuery) {
+        guard self.authorizationQueries.contains(where: { $0 === query }) else {
+            assertionFailure("unexpected Permission state")
+            return
+        }
+        query.handleDecision(grant: true)
+    }
+
     func revoke(_ permission: PermissionType) {
         if let domain = webView?.url?.host,
-           permissionManager.permission(forDomain: domain, permissionType: permission) == true {
-            permissionManager.removePermission(forDomain: domain, permissionType: permission)
+           case .allow = permissionManager.permission(forDomain: domain, permissionType: permission) {
+            permissionManager.setPermission(.ask, forDomain: domain, permissionType: permission)
         }
         self.permissions[permission].revoke() // await deactivation
         webView?.revokePermissions([permission])
@@ -229,28 +247,34 @@ final class PermissionModel {
 
     private func shouldGrantPermission(for permissions: [PermissionType], requestedForDomain domain: String) -> Bool? {
         for permission in permissions {
-            var grant: Bool?
-            if let stored = permissionManager.permission(forDomain: domain, permissionType: permission),
-               permission.canPersistGrantedDecision || stored != true {
-                grant = stored
+            var grant: PersistedPermissionDecision
+            let stored = permissionManager.permission(forDomain: domain, permissionType: permission)
+            if case .allow = stored, permission.canPersistGrantedDecision {
+                grant = .allow
+            } else if case .deny = stored, permission.canPersistDeniedDecision {
+                grant = .deny
             } else if let state = self.permissions[permission] {
                 switch state {
                 // deny if already denied during current page being displayed
                 case .denied, .revoking:
-                    grant = false
+                    grant = .deny
                 // ask otherwise
                 case .disabled, .requested, .active, .inactive, .paused, .reloading:
-                    break
+                    grant = .ask
                 }
+            } else {
+                grant = .ask
             }
 
-            if let grant = grant {
-                if grant == false {
-                    // deny if at least one permission denied permanently
-                    // or during current page being displayed
-                    return false
-                } // else if grant == true: allow if all permissions allowed permanently
-            } else {
+            switch grant {
+            case .deny:
+                // deny if at least one permission denied permanently
+                // or during current page being displayed
+                return false
+            case .allow:
+                // allow if all permissions allowed permanently
+                break
+            case .ask:
                 // if at least one permission is not set: ask
                 return nil
             }
@@ -258,8 +282,14 @@ final class PermissionModel {
         return true
     }
 
-    func permissions(_ permissions: [PermissionType], requestedForDomain domain: String?, decisionHandler: @escaping (Bool) -> Void) {
-        guard let domain = domain, !domain.isEmpty, !permissions.isEmpty else {
+    func permissions(_ permissions: [PermissionType],
+                     requestedForDomain domain: String?,
+                     url: URL? = nil,
+                     decisionHandler: @escaping (Bool) -> Void) {
+        guard let domain = domain,
+              !domain.isEmpty,
+              !permissions.isEmpty
+        else {
             assertionFailure("Unexpected permissions/domain")
             decisionHandler(false)
             return
@@ -268,7 +298,7 @@ final class PermissionModel {
         let shouldGrant = shouldGrantPermission(for: permissions, requestedForDomain: domain)
         switch shouldGrant {
         case .none:
-            queryAuthorization(for: permissions, domain: domain, decisionHandler: decisionHandler)
+            queryAuthorization(for: permissions, domain: domain, url: url, decisionHandler: decisionHandler)
         case .some(true):
             decisionHandler(true)
         case .some(false):

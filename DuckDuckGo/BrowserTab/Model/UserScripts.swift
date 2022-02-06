@@ -18,6 +18,7 @@
 
 import Foundation
 import BrowserServicesKit
+import TrackerRadarKit
 
 final class UserScripts {
 
@@ -25,37 +26,39 @@ final class UserScripts {
     let faviconScript = FaviconUserScript()
     let contextMenuScript = ContextMenuUserScript()
     let findInPageScript = FindInPageUserScript()
-    let contentBlockerScript = ContentBlockerUserScript()
-    let contentBlockerRulesScript = ContentBlockerRulesUserScript()
-    let autofillScript = AutofillUserScript()
     let printingUserScript = PrintingUserScript()
     let hoverUserScript = HoverUserScript()
-    let navigatorCredentialsUserScript = NavigatorCredentialsUserScript()
     let debugScript = DebugUserScript()
-    let gpcScript = GPCUserScript()
+    let autofillScript = AutofillUserScript()
+    let clickToLoadScript = ClickToLoadUserScript()
 
-    init() {
-    }
+    let contentBlockerRulesScript: ContentBlockerRulesUserScript
+    let surrogatesScript: SurrogatesUserScript
+    let contentScopeUserScript: ContentScopeUserScript
 
-    init(copy other: UserScripts) {
-        scripts = other.scripts
-        scripts.removeLast()
-        scripts.append(autofillScript.makeWKUserScript())
+    init(with sourceProvider: ScriptSourceProviding) {
+
+        contentBlockerRulesScript = ContentBlockerRulesUserScript(configuration: sourceProvider.contentBlockerRulesConfig!)
+        surrogatesScript = SurrogatesUserScript(configuration: sourceProvider.surrogatesConfig!)
+        let privacySettings = PrivacySecurityPreferences()
+        let sessionKey = sourceProvider.sessionKey ?? ""
+        let prefs = ContentScopeProperties.init(gpcEnabled: privacySettings.gpcEnabled, sessionKey: sessionKey)
+        contentScopeUserScript = ContentScopeUserScript(sourceProvider.privacyConfigurationManager, properties: prefs)
     }
 
     lazy var userScripts: [UserScript] = [
-        self.debugScript,
-        self.faviconScript,
-        self.contextMenuScript,
-        self.findInPageScript,
-        self.contentBlockerScript,
-        self.contentBlockerRulesScript,
-        self.pageObserverScript,
-        self.printingUserScript,
-        self.hoverUserScript,
-        self.gpcScript,
-        self.navigatorCredentialsUserScript,
-        self.autofillScript
+        debugScript,
+        faviconScript,
+        contextMenuScript,
+        findInPageScript,
+        surrogatesScript,
+        contentBlockerRulesScript,
+        pageObserverScript,
+        printingUserScript,
+        hoverUserScript,
+        clickToLoadScript,
+        contentScopeUserScript,
+        autofillScript
     ]
 
     lazy var scripts = userScripts.map { $0.makeWKUserScript() }

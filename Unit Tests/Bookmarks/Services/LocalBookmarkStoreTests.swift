@@ -32,7 +32,7 @@ final class LocalBookmarkStoreTests: XCTestCase {
         let savingExpectation = self.expectation(description: "Saving")
         let loadingExpectation = self.expectation(description: "Loading")
 
-        let bookmark = Bookmark(id: UUID(), url: URL.duckDuckGo, title: "DuckDuckGo", favicon: nil, isFavorite: true)
+        let bookmark = Bookmark(id: UUID(), url: URL.duckDuckGo, title: "DuckDuckGo", isFavorite: true)
 
         bookmarkStore.save(bookmark: bookmark, parent: nil) { (success, error) in
             XCTAssert(success)
@@ -63,7 +63,7 @@ final class LocalBookmarkStoreTests: XCTestCase {
         let removingExpectation = self.expectation(description: "Removing")
         let loadingExpectation = self.expectation(description: "Loading")
 
-        let bookmark = Bookmark(id: UUID(), url: URL.duckDuckGo, title: "DuckDuckGo", favicon: nil, isFavorite: true)
+        let bookmark = Bookmark(id: UUID(), url: URL.duckDuckGo, title: "DuckDuckGo", isFavorite: true)
         bookmarkStore.save(bookmark: bookmark, parent: nil) { (success, error) in
             XCTAssert(success)
             XCTAssertNil(error)
@@ -98,7 +98,7 @@ final class LocalBookmarkStoreTests: XCTestCase {
         let savingExpectation = self.expectation(description: "Saving")
         let loadingExpectation = self.expectation(description: "Loading")
 
-        let bookmark = Bookmark(id: UUID(), url: URL.duckDuckGo, title: "DuckDuckGo", favicon: nil, isFavorite: true)
+        let bookmark = Bookmark(id: UUID(), url: URL.duckDuckGo, title: "DuckDuckGo", isFavorite: true)
 
         bookmarkStore.save(bookmark: bookmark, parent: nil) { (success, error) in
             XCTAssert(success)
@@ -106,7 +106,7 @@ final class LocalBookmarkStoreTests: XCTestCase {
 
             savingExpectation.fulfill()
 
-            let modifiedBookmark = Bookmark(id: bookmark.id, url: URL.duckDuckGo, title: "New Title", favicon: nil, isFavorite: false)
+            let modifiedBookmark = Bookmark(id: bookmark.id, url: URL.duckDuckGo, title: "New Title", isFavorite: false)
             bookmarkStore.update(bookmark: modifiedBookmark)
 
             bookmarkStore.loadAll(type: .bookmarks) { bookmarks, error in

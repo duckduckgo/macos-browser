@@ -43,7 +43,7 @@ extension EmailManagerRequestDelegate {
         request.allHTTPHeaderFields = headers
         request.httpMethod = method
         request.httpBody = httpBody
-        URLSession.shared.dataTask(with: request) { (data, _, error) in
+        URLSession.default.dataTask(with: request) { (data, _, error) in
             currentQueue?.addOperation {
                 completion(data, error)
             }
