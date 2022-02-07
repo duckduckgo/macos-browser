@@ -47,7 +47,7 @@ final class SuggestionViewController: NSViewController {
         super.init(coder: coder)
     }
 
-    var suggestionContainerCancellable: AnyCancellable?
+    var suggestionResultCancellable: AnyCancellable?
     var selectionIndexCancellable: AnyCancellable?
 
     private var mouseUpEventsMonitor: Any?
@@ -62,7 +62,7 @@ final class SuggestionViewController: NSViewController {
 
         setupTableView()
         addTrackingArea()
-        subscribeToSuggestions()
+        subscribeToSuggestionResult()
         subscribeToSelectionIndex()
     }
 
@@ -128,8 +128,8 @@ final class SuggestionViewController: NSViewController {
         }
     }
 
-    private func subscribeToSuggestions() {
-        suggestionContainerCancellable = suggestionContainerViewModel.suggestionContainer.$suggestions
+    private func subscribeToSuggestionResult() {
+        suggestionResultCancellable = suggestionContainerViewModel.suggestionContainer.$result
             .receive(on: DispatchQueue.main)
             .sink { [weak self] _ in
             self?.displayNewSuggestions()
@@ -152,7 +152,7 @@ final class SuggestionViewController: NSViewController {
         }
 
         // Remove the second reload that causes visual glitch in the beginning of typing
-        if suggestionContainerViewModel.suggestionContainer.suggestions != nil {
+        if suggestionContainerViewModel.suggestionContainer.result != nil {
             updateHeight()
             tableView.reloadData()
             self.selectRow(at: self.suggestionContainerViewModel.selectionIndex)
