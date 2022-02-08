@@ -17,3 +17,26 @@
 //
 
 import Foundation
+
+final class FeedbackSender {
+
+    func sendFeedback() {
+        let parameters = [
+            "type": "app-feedback",
+            "comment": "Testing comment",
+            "category": "1199184518165816",
+            "osversion": "12.1",
+            "appversion": "0.18.4"
+        ]
+
+        let url = URL(string: "https://use-tstorey1.duckduckgo.com/feedback.js")!
+        APIRequest.request(url: url, method: .post, parameters: parameters) { _, error in
+            if let error = error {
+                print(error)
+            } else {
+                print("OK")
+            }
+        }
+    }
+
+}

@@ -63,19 +63,15 @@ extension AppDelegate {
         let windowController = NSStoryboard.feedback.instantiateController(withIdentifier: "FeedbackWindowController") as! NSWindowController
         // swiftlint:enable force_cast
 
-        guard let window = windowController.window as? FeedbackWindow, let screen = window.screen else {
+        guard let feedbackWindow = windowController.window as? FeedbackWindow,
+              let parentWindowController = WindowControllersManager.shared.lastKeyMainWindowController else {
             assertionFailure("HomepageViewController: Failed to present FeedbackWindowController")
             return
         }
 
-        let windowFrame = NSRect(x: screen.frame.origin.x + screen.frame.size.width / 2.0 - FeedbackWindow.Size.width / 2.0,
-                                 y: screen.frame.origin.y + screen.frame.size.height / 2.0 - FeedbackWindow.Size.height / 2.0,
-                                 width: FeedbackWindow.Size.width,
-                                 height: FeedbackWindow.Size.height)
-
-        WindowControllersManager.shared.lastKeyMainWindowController?.window?.addChildWindow(window, ordered: .above)
-        window.setFrame(windowFrame, display: true)
-        window.makeKeyAndOrderFront(nil)
+        feedbackWindow.feedbackViewController.currentTabContent =
+            parentWindowController.mainViewController.tabCollectionViewModel.selectedTabViewModel?.tab.content
+        parentWindowController.window?.beginSheet(feedbackWindow) { _ in }
     }
 
 #endif
@@ -635,7 +631,6 @@ extension MainViewController: FindInPageDelegate {
     }
 
 }
-
 
 fileprivate extension NSStoryboard {
 

@@ -37,11 +37,11 @@
             <objects>
                 <viewController id="TOa-sP-KHa" customClass="FeedbackViewController" customModule="DuckDuckGo_Privacy_Browser" customModuleProvider="target" sceneMemberID="viewController">
                     <view key="view" id="Ie8-lu-6dX">
-                        <rect key="frame" x="0.0" y="0.0" width="360" height="320"/>
+                        <rect key="frame" x="0.0" y="0.0" width="360" height="245"/>
                         <autoresizingMask key="autoresizingMask"/>
                         <subviews>
                             <customView translatesAutoresizingMaskIntoConstraints="NO" id="B4Q-yT-nKT" customClass="ColorView" customModule="DuckDuckGo_Privacy_Browser" customModuleProvider="target">
-                                <rect key="frame" x="0.0" y="235" width="360" height="85"/>
+                                <rect key="frame" x="0.0" y="160" width="360" height="85"/>
                                 <subviews>
                                     <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="7KM-rJ-r28">
                                         <rect key="frame" x="38" y="24" width="284" height="38"/>
@@ -81,63 +81,20 @@
                                 </userDefinedRuntimeAttributes>
                             </customView>
                             <box verticalHuggingPriority="750" boxType="separator" translatesAutoresizingMaskIntoConstraints="NO" id="iPz-Dg-VNs">
-                                <rect key="frame" x="0.0" y="233" width="360" height="5"/>
+                                <rect key="frame" x="0.0" y="158" width="360" height="5"/>
                             </box>
                             <customView translatesAutoresizingMaskIntoConstraints="NO" id="wYB-07-s0m" customClass="ColorView" customModule="DuckDuckGo_Privacy_Browser" customModuleProvider="target">
-                                <rect key="frame" x="0.0" y="0.0" width="360" height="235"/>
+                                <rect key="frame" x="0.0" y="0.0" width="360" height="160"/>
                                 <subviews>
-                                    <button verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="Gy6-KF-A15">
-                                        <rect key="frame" x="14" y="14" width="332" height="40"/>
-                                        <constraints>
-                                            <constraint firstAttribute="height" constant="28" id="vLC-1q-2RZ"/>
-                                        </constraints>
-                                        <buttonCell key="cell" type="push" title="Submit" bezelStyle="rounded" alignment="center" controlSize="large" enabled="NO" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="ng8-Xz-jPD">
-                                            <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
-                                            <font key="font" metaFont="system"/>
-                                            <string key="keyEquivalent" base64-UTF8="YES">
-DQ
-</string>
-                                        </buttonCell>
-                                        <connections>
-                                            <action selector="submitButtonAction:" target="TOa-sP-KHa" id="5ag-9f-dye"/>
-                                        </connections>
-                                    </button>
-                                    <scrollView borderType="line" horizontalLineScroll="10" horizontalPageScroll="10" verticalLineScroll="10" verticalPageScroll="10" hasHorizontalScroller="NO" translatesAutoresizingMaskIntoConstraints="NO" id="A0q-Tl-XgR">
-                                        <rect key="frame" x="20" y="68" width="320" height="97"/>
-                                        <clipView key="contentView" id="8R6-WZ-VlP">
-                                            <rect key="frame" x="1" y="1" width="318" height="95"/>
-                                            <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
-                                            <subviews>
-                                                <textView editable="NO" importsGraphics="NO" richText="NO" verticallyResizable="YES" smartInsertDelete="YES" id="PPh-o7-ch1">
-                                                    <rect key="frame" x="0.0" y="0.0" width="318" height="95"/>
-                                                    <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
-                                                    <color key="textColor" name="textColor" catalog="System" colorSpace="catalog"/>
-                                                    <color key="backgroundColor" name="FirePopoverPanelBackground"/>
-                                                    <size key="minSize" width="318" height="95"/>
-                                                    <size key="maxSize" width="410" height="10000000"/>
-                                                    <color key="insertionPointColor" name="textColor" catalog="System" colorSpace="catalog"/>
-                                                </textView>
-                                            </subviews>
-                                            <color key="backgroundColor" name="FirePopoverPanelBackground"/>
-                                        </clipView>
-                                        <scroller key="horizontalScroller" hidden="YES" wantsLayer="YES" verticalHuggingPriority="750" horizontal="YES" id="52O-vd-BdQ">
-                                            <rect key="frame" x="-100" y="-100" width="240" height="16"/>
-                                            <autoresizingMask key="autoresizingMask"/>
-                                        </scroller>
-                                        <scroller key="verticalScroller" wantsLayer="YES" verticalHuggingPriority="750" horizontal="NO" id="03x-cI-gFA">
-                                            <rect key="frame" x="303" y="1" width="16" height="95"/>
-                                            <autoresizingMask key="autoresizingMask"/>
-                                        </scroller>
-                                    </scrollView>
                                     <popUpButton translatesAutoresizingMaskIntoConstraints="NO" id="7Z6-Ji-PH7">
-                                        <rect key="frame" x="17" y="181" width="326" height="37"/>
+                                        <rect key="frame" x="17" y="106" width="326" height="37"/>
                                         <constraints>
                                             <constraint firstAttribute="height" constant="30" id="Fw3-Y4-XV0"/>
                                         </constraints>
-                                        <popUpButtonCell key="cell" type="bevel" title="Pick a category" bezelStyle="regularSquare" alignment="left" lineBreakMode="truncatingTail" state="on" borderStyle="border" tag="-1" inset="2" selectedItem="z2T-3Y-jPK" id="gWx-cK-gfz">
+                                        <popUpButtonCell key="cell" type="bevel" title="Pick a category" bezelStyle="regularSquare" alignment="left" lineBreakMode="truncatingTail" state="on" borderStyle="border" tag="-1" inset="2" autoenablesItems="NO" selectedItem="z2T-3Y-jPK" id="gWx-cK-gfz">
                                             <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
                                             <font key="font" metaFont="menu"/>
-                                            <menu key="menu" id="wtn-Rl-BIC">
+                                            <menu key="menu" autoenablesItems="NO" id="wtn-Rl-BIC">
                                                 <items>
                                                     <menuItem title="Pick a category" state="on" tag="-1" id="z2T-3Y-jPK"/>
                                                     <menuItem isSeparatorItem="YES" id="K5Z-td-X6u"/>
@@ -152,47 +109,172 @@ DQ
                                             <action selector="categoryPopUpButton:" target="TOa-sP-KHa" id="Ob6-Fs-Z0f"/>
                                         </connections>
                                     </popUpButton>
-                                    <popUpButton hidden="YES" translatesAutoresizingMaskIntoConstraints="NO" id="hUd-Rb-6Ls">
-                                        <rect key="frame" x="17" y="131" width="326" height="37"/>
+                                    <customView hidden="YES" translatesAutoresizingMaskIntoConstraints="NO" id="8Xi-CY-jyt" userLabel="Browser Feedback View">
+                                        <rect key="frame" x="20" y="-110" width="320" height="200"/>
+                                        <subviews>
+                                            <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="Obm-Wr-qrD">
+                                                <rect key="frame" x="-2" y="170" width="324" height="30"/>
+                                                <constraints>
+                                                    <constraint firstAttribute="height" constant="30" id="Q5Y-kP-1HE"/>
+                                                    <constraint firstAttribute="width" constant="320" id="Y8O-Rh-baf"/>
+                                                </constraints>
+                                                <textFieldCell key="cell" title="Please describe what issue you are experiencing and any details that could help us reproduce it:" id="B04-A6-cRC">
+                                                    <font key="font" metaFont="cellTitle"/>
+                                                    <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
+                                                    <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
+                                                </textFieldCell>
+                                            </textField>
+                                            <textField verticalHuggingPriority="750" horizontalCompressionResistancePriority="250" translatesAutoresizingMaskIntoConstraints="NO" id="wK6-n4-LX0">
+                                                <rect key="frame" x="0.0" y="65" width="320" height="97"/>
+                                                <constraints>
+                                                    <constraint firstAttribute="height" constant="97" id="RkU-ia-Jx0"/>
+                                                </constraints>
+                                                <textFieldCell key="cell" selectable="YES" editable="YES" sendsActionOnEndEditing="YES" state="on" borderStyle="bezel" drawsBackground="YES" id="6F0-63-Q3a">
+                                                    <font key="font" metaFont="system"/>
+                                                    <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
+                                                    <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
+                                                </textFieldCell>
+                                            </textField>
+                                            <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="nm3-pj-w2B">
+                                                <rect key="frame" x="-2" y="0.0" width="324" height="47"/>
+                                                <constraints>
+                                                    <constraint firstAttribute="width" constant="320" id="46H-7M-bu2"/>
+                                                    <constraint firstAttribute="height" constant="47" id="w0L-qh-saU"/>
+                                                </constraints>
+                                                <textFieldCell key="cell" title="Reports sent to DuckDuckGo are 100% anonymous and only include your message, the version of the app, and the version of macOS." id="7PA-BW-gkt">
+                                                    <font key="font" metaFont="smallSystem"/>
+                                                    <color key="textColor" name="secondaryLabelColor" catalog="System" colorSpace="catalog"/>
+                                                    <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
+                                                </textFieldCell>
+                                            </textField>
+                                        </subviews>
                                         <constraints>
-                                            <constraint firstAttribute="height" constant="30" id="3Tm-Sk-Wei"/>
+                                            <constraint firstItem="nm3-pj-w2B" firstAttribute="leading" secondItem="8Xi-CY-jyt" secondAttribute="leading" id="5O5-rb-Ifm"/>
+                                            <constraint firstItem="wK6-n4-LX0" firstAttribute="top" secondItem="Obm-Wr-qrD" secondAttribute="bottom" constant="8" id="9Do-M1-64N"/>
+                                            <constraint firstAttribute="trailing" secondItem="Obm-Wr-qrD" secondAttribute="trailing" id="PvD-sA-dg7"/>
+                                            <constraint firstAttribute="height" constant="200" id="UQa-QI-LjA"/>
+                                            <constraint firstAttribute="trailing" secondItem="wK6-n4-LX0" secondAttribute="trailing" id="Xd3-Y9-PLt"/>
+                                            <constraint firstItem="wK6-n4-LX0" firstAttribute="leading" secondItem="8Xi-CY-jyt" secondAttribute="leading" id="Z3y-LM-RMP"/>
+                                            <constraint firstAttribute="trailing" secondItem="nm3-pj-w2B" secondAttribute="trailing" id="lSB-6W-Oqd"/>
+                                            <constraint firstItem="Obm-Wr-qrD" firstAttribute="leading" secondItem="8Xi-CY-jyt" secondAttribute="leading" id="nPu-64-eju"/>
+                                            <constraint firstAttribute="bottom" secondItem="nm3-pj-w2B" secondAttribute="bottom" id="o4f-9q-xA6"/>
+                                            <constraint firstItem="Obm-Wr-qrD" firstAttribute="top" secondItem="8Xi-CY-jyt" secondAttribute="top" id="ugH-Lt-ZLK"/>
                                         </constraints>
-                                        <popUpButtonCell key="cell" type="bevel" title="Pick your issue from the list" bezelStyle="regularSquare" alignment="left" lineBreakMode="truncatingTail" state="on" borderStyle="border" tag="-1" inset="2" selectedItem="50u-Do-Pk7" id="d1R-Kk-zzo">
+                                    </customView>
+                                    <customView hidden="YES" translatesAutoresizingMaskIntoConstraints="NO" id="8B9-wf-zcP" userLabel="Website Breakage View">
+                                        <rect key="frame" x="20" y="-7" width="320" height="97"/>
+                                        <subviews>
+                                            <popUpButton translatesAutoresizingMaskIntoConstraints="NO" id="hUd-Rb-6Ls">
+                                                <rect key="frame" x="-3" y="63" width="326" height="37"/>
+                                                <constraints>
+                                                    <constraint firstAttribute="height" constant="30" id="3Tm-Sk-Wei"/>
+                                                </constraints>
+                                                <popUpButtonCell key="cell" type="bevel" title="Pick your issue from the list" bezelStyle="regularSquare" alignment="left" lineBreakMode="truncatingTail" state="on" borderStyle="border" tag="-1" inset="2" autoenablesItems="NO" selectedItem="50u-Do-Pk7" id="d1R-Kk-zzo">
+                                                    <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
+                                                    <font key="font" metaFont="menu"/>
+                                                    <menu key="menu" autoenablesItems="NO" id="5HU-z4-NLx">
+                                                        <items>
+                                                            <menuItem title="Pick your issue from the list" state="on" tag="-1" id="50u-Do-Pk7"/>
+                                                            <menuItem isSeparatorItem="YES" id="VgP-Y6-9FR"/>
+                                                            <menuItem title="Video didn't play" id="Lcy-nr-Bvy"/>
+                                                            <menuItem title="The site asked me to disable" tag="1" id="Jbl-XF-mkd"/>
+                                                            <menuItem title="Images didn't load" tag="2" id="AMn-JN-Npb"/>
+                                                            <menuItem title="Content is missing" tag="3" id="naz-Hr-IpO"/>
+                                                            <menuItem title="Comments didn't load" tag="4" id="0YV-Mw-KfP"/>
+                                                            <menuItem title="I can't sign in" tag="5" id="ks1-6b-EFw"/>
+                                                            <menuItem title="Links or buttons don't work" tag="6" id="Fhy-jA-gGf"/>
+                                                            <menuItem title="Something else" tag="7" id="dYh-6K-3z6"/>
+                                                        </items>
+                                                    </menu>
+                                                </popUpButtonCell>
+                                                <connections>
+                                                    <action selector="subcategoryPopUpButton:" target="TOa-sP-KHa" id="HLX-Ka-Z1l"/>
+                                                </connections>
+                                            </popUpButton>
+                                            <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="NLb-RN-SpK">
+                                                <rect key="frame" x="-2" y="0.0" width="324" height="47"/>
+                                                <constraints>
+                                                    <constraint firstAttribute="height" constant="47" id="3gs-wF-UfX"/>
+                                                    <constraint firstAttribute="width" constant="320" id="tVZ-1G-sgl"/>
+                                                </constraints>
+                                                <textFieldCell key="cell" id="SXY-b7-hGs">
+                                                    <font key="font" metaFont="cellTitle"/>
+                                                    <string key="title">Reports sent to DuckDuckGo are 100% anonymous and only include your selection above, the URL, and a list of trackers we found on the site.</string>
+                                                    <color key="textColor" name="secondaryLabelColor" catalog="System" colorSpace="catalog"/>
+                                                    <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
+                                                </textFieldCell>
+                                            </textField>
+                                        </subviews>
+                                        <constraints>
+                                            <constraint firstAttribute="height" constant="97" id="3Lp-Et-qRB"/>
+                                            <constraint firstItem="hUd-Rb-6Ls" firstAttribute="leading" secondItem="8B9-wf-zcP" secondAttribute="leading" id="Jed-xd-3mg"/>
+                                            <constraint firstAttribute="trailing" secondItem="NLb-RN-SpK" secondAttribute="trailing" id="TUS-jM-vt1"/>
+                                            <constraint firstAttribute="bottom" secondItem="NLb-RN-SpK" secondAttribute="bottom" id="dzu-Qi-Dq1"/>
+                                            <constraint firstItem="hUd-Rb-6Ls" firstAttribute="top" secondItem="8B9-wf-zcP" secondAttribute="top" id="fLV-TA-OMV"/>
+                                            <constraint firstItem="NLb-RN-SpK" firstAttribute="leading" secondItem="8B9-wf-zcP" secondAttribute="leading" id="goU-1M-ibi"/>
+                                            <constraint firstAttribute="trailing" secondItem="hUd-Rb-6Ls" secondAttribute="trailing" id="kGb-Nb-7TU"/>
+                                        </constraints>
+                                    </customView>
+                                    <customView translatesAutoresizingMaskIntoConstraints="NO" id="RYb-WZ-bIo" customClass="ColorView" customModule="DuckDuckGo_Privacy_Browser" customModuleProvider="target">
+                                        <rect key="frame" x="0.0" y="0.0" width="360" height="69"/>
+                                        <constraints>
+                                            <constraint firstAttribute="height" constant="69" id="Knp-n3-po1"/>
+                                        </constraints>
+                                        <userDefinedRuntimeAttributes>
+                                            <userDefinedRuntimeAttribute type="color" keyPath="backgroundColor">
+                                                <color key="value" name="InterfaceBackgroundColor"/>
+                                            </userDefinedRuntimeAttribute>
+                                        </userDefinedRuntimeAttributes>
+                                    </customView>
+                                    <button verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="Gy6-KF-A15">
+                                        <rect key="frame" x="180" y="14" width="166" height="40"/>
+                                        <constraints>
+                                            <constraint firstAttribute="height" constant="28" id="vLC-1q-2RZ"/>
+                                        </constraints>
+                                        <buttonCell key="cell" type="push" title="Submit" bezelStyle="rounded" alignment="center" controlSize="large" enabled="NO" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="ng8-Xz-jPD">
                                             <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
-                                            <font key="font" metaFont="menu"/>
-                                            <menu key="menu" id="5HU-z4-NLx">
-                                                <items>
-                                                    <menuItem title="Pick your issue from the list" state="on" tag="-1" id="50u-Do-Pk7"/>
-                                                    <menuItem isSeparatorItem="YES" id="VgP-Y6-9FR"/>
-                                                    <menuItem title="Video didn't play" id="Lcy-nr-Bvy"/>
-                                                    <menuItem title="The site asked me to disable" tag="1" id="Jbl-XF-mkd"/>
-                                                    <menuItem title="Images didn't load" tag="2" id="AMn-JN-Npb"/>
-                                                    <menuItem title="Content is missing" tag="3" id="naz-Hr-IpO"/>
-                                                    <menuItem title="Comments didn't load" tag="4" id="0YV-Mw-KfP"/>
-                                                    <menuItem title="I can't sign in" tag="5" id="ks1-6b-EFw"/>
-                                                    <menuItem title="Links or buttons don't work" tag="6" id="Fhy-jA-gGf"/>
-                                                    <menuItem title="Something else" tag="7" id="dYh-6K-3z6"/>
-                                                </items>
-                                            </menu>
-                                        </popUpButtonCell>
+                                            <font key="font" metaFont="system"/>
+                                        </buttonCell>
                                         <connections>
-                                            <action selector="subcategoryPopUpButton:" target="TOa-sP-KHa" id="HLX-Ka-Z1l"/>
+                                            <action selector="submitButtonAction:" target="TOa-sP-KHa" id="5ag-9f-dye"/>
                                         </connections>
-                                    </popUpButton>
+                                    </button>
+                                    <button verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="G99-8X-64H">
+                                        <rect key="frame" x="14" y="14" width="166" height="40"/>
+                                        <constraints>
+                                            <constraint firstAttribute="height" constant="28" id="ixj-c9-sMF"/>
+                                        </constraints>
+                                        <buttonCell key="cell" type="push" title="Cancel" bezelStyle="rounded" alignment="center" controlSize="large" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="B8C-ef-DG6">
+                                            <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
+                                            <font key="font" metaFont="system"/>
+                                            <string key="keyEquivalent" base64-UTF8="YES">
+Gw
+</string>
+                                        </buttonCell>
+                                        <connections>
+                                            <action selector="cancelButtonAction:" target="TOa-sP-KHa" id="kan-lY-RNY"/>
+                                        </connections>
+                                    </button>
                                 </subviews>
                                 <constraints>
-                                    <constraint firstItem="Gy6-KF-A15" firstAttribute="leading" secondItem="wYB-07-s0m" secondAttribute="leading" constant="20" symbolic="YES" id="1M2-iH-q0F"/>
-                                    <constraint firstItem="A0q-Tl-XgR" firstAttribute="top" secondItem="7Z6-Ji-PH7" secondAttribute="bottom" constant="20" id="51h-NH-qUw"/>
-                                    <constraint firstAttribute="trailing" secondItem="hUd-Rb-6Ls" secondAttribute="trailing" constant="20" symbolic="YES" id="84Y-DV-nEP"/>
-                                    <constraint firstItem="hUd-Rb-6Ls" firstAttribute="leading" secondItem="wYB-07-s0m" secondAttribute="leading" constant="20" symbolic="YES" id="ANC-4S-Obb"/>
-                                    <constraint firstAttribute="trailing" secondItem="A0q-Tl-XgR" secondAttribute="trailing" constant="20" symbolic="YES" id="HY8-OE-Gh5"/>
+                                    <constraint firstAttribute="height" constant="160" id="0W2-HI-Vs8"/>
+                                    <constraint firstItem="Gy6-KF-A15" firstAttribute="leading" secondItem="G99-8X-64H" secondAttribute="trailing" constant="12" symbolic="YES" id="0eZ-Ps-KCz"/>
+                                    <constraint firstItem="8Xi-CY-jyt" firstAttribute="leading" secondItem="wYB-07-s0m" secondAttribute="leading" constant="20" symbolic="YES" id="4Rd-xk-lya"/>
+                                    <constraint firstItem="8B9-wf-zcP" firstAttribute="top" secondItem="7Z6-Ji-PH7" secondAttribute="bottom" constant="20" id="8Zk-eQ-vBn"/>
+                                    <constraint firstItem="RYb-WZ-bIo" firstAttribute="leading" secondItem="wYB-07-s0m" secondAttribute="leading" id="Igx-KW-WiD"/>
                                     <constraint firstAttribute="trailing" secondItem="Gy6-KF-A15" secondAttribute="trailing" constant="20" symbolic="YES" id="J4k-PJ-uFO"/>
-                                    <constraint firstItem="Gy6-KF-A15" firstAttribute="top" secondItem="A0q-Tl-XgR" secondAttribute="bottom" constant="20" symbolic="YES" id="Jfz-FB-TMT"/>
                                     <constraint firstAttribute="bottom" secondItem="Gy6-KF-A15" secondAttribute="bottom" constant="20" symbolic="YES" id="KOD-v1-Y2g"/>
+                                    <constraint firstAttribute="trailing" secondItem="RYb-WZ-bIo" secondAttribute="trailing" id="Mah-G4-3ac"/>
+                                    <constraint firstItem="8Xi-CY-jyt" firstAttribute="top" secondItem="7Z6-Ji-PH7" secondAttribute="bottom" constant="20" id="UMz-My-Ftp"/>
+                                    <constraint firstItem="G99-8X-64H" firstAttribute="leading" secondItem="wYB-07-s0m" secondAttribute="leading" constant="20" id="VJ3-WB-B1n"/>
+                                    <constraint firstAttribute="bottom" secondItem="G99-8X-64H" secondAttribute="bottom" constant="20" symbolic="YES" id="Vlb-cF-IG9"/>
+                                    <constraint firstItem="Gy6-KF-A15" firstAttribute="width" secondItem="G99-8X-64H" secondAttribute="width" id="XTc-rW-crW"/>
                                     <constraint firstItem="7Z6-Ji-PH7" firstAttribute="top" secondItem="wYB-07-s0m" secondAttribute="top" constant="20" symbolic="YES" id="ZL6-G9-svI"/>
-                                    <constraint firstItem="A0q-Tl-XgR" firstAttribute="leading" secondItem="wYB-07-s0m" secondAttribute="leading" constant="20" symbolic="YES" id="jVn-2H-Vak"/>
+                                    <constraint firstAttribute="trailing" secondItem="8B9-wf-zcP" secondAttribute="trailing" constant="20" id="nRt-k0-4pb"/>
+                                    <constraint firstItem="8B9-wf-zcP" firstAttribute="leading" secondItem="wYB-07-s0m" secondAttribute="leading" constant="20" id="opY-Un-GIS"/>
+                                    <constraint firstAttribute="bottom" secondItem="RYb-WZ-bIo" secondAttribute="bottom" id="owJ-rI-cNo"/>
+                                    <constraint firstAttribute="trailing" secondItem="8Xi-CY-jyt" secondAttribute="trailing" constant="20" symbolic="YES" id="qeH-Yu-rbl"/>
                                     <constraint firstItem="7Z6-Ji-PH7" firstAttribute="leading" secondItem="wYB-07-s0m" secondAttribute="leading" constant="20" symbolic="YES" id="sQp-ga-TtJ"/>
-                                    <constraint firstItem="hUd-Rb-6Ls" firstAttribute="top" secondItem="7Z6-Ji-PH7" secondAttribute="bottom" constant="20" id="v0s-Ol-fR0"/>
                                     <constraint firstAttribute="trailing" secondItem="7Z6-Ji-PH7" secondAttribute="trailing" constant="20" symbolic="YES" id="zCp-C1-Fcy"/>
                                 </constraints>
                                 <userDefinedRuntimeAttributes>
@@ -216,16 +298,22 @@ DQ
                         </constraints>
                     </view>
                     <connections>
+                        <outlet property="brokenWebsiteMenuItem" destination="uoX-qE-3kz" id="wmY-ud-Nqg"/>
+                        <outlet property="browserFeedbackView" destination="8Xi-CY-jyt" id="5IL-yu-IWc"/>
                         <outlet property="categoryPopUpButton" destination="7Z6-Ji-PH7" id="4aZ-ZE-ym6"/>
-                        <outlet property="scrollView" destination="A0q-Tl-XgR" id="NHW-V2-BZn"/>
+                        <outlet property="contentView" destination="wYB-07-s0m" id="XXQ-Fh-tQF"/>
+                        <outlet property="contentViewHeightContraint" destination="0W2-HI-Vs8" id="vY1-me-1T6"/>
+                        <outlet property="pickCategoryMenuItem" destination="z2T-3Y-jPK" id="6dO-Or-fk2"/>
+                        <outlet property="pickIssueMenuItem" destination="50u-Do-Pk7" id="Y1x-aK-HtI"/>
                         <outlet property="subcategoryPopUpButton" destination="hUd-Rb-6Ls" id="DqR-hE-Sm5"/>
                         <outlet property="submitButton" destination="Gy6-KF-A15" id="aBn-VX-sGY"/>
-                        <outlet property="textView" destination="PPh-o7-ch1" id="y3m-Dd-CS2"/>
+                        <outlet property="textField" destination="wK6-n4-LX0" id="iIL-8c-BX9"/>
+                        <outlet property="websiteBreakageView" destination="8B9-wf-zcP" id="enA-tH-Z1l"/>
                     </connections>
                 </viewController>
                 <customObject id="FaH-Lu-sfn" userLabel="First Responder" customClass="NSResponder" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="-299" y="1038"/>
+            <point key="canvasLocation" x="-299" y="1009.5"/>
         </scene>
     </scenes>
     <resources>

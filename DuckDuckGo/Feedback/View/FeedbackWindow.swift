@@ -33,8 +33,8 @@ final class FeedbackWindow: NSWindow {
     override var canBecomeMain: Bool { false }
 
     // swiftlint:disable force_cast
-    var addEditFavoriteViewController: AddEditFavoriteViewController {
-        contentViewController as! AddEditFavoriteViewController
+    var feedbackViewController: FeedbackViewController {
+        contentViewController as! FeedbackViewController
     }
     // swiftlint:enable force_cast
 
