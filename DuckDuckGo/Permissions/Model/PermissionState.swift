@@ -54,6 +54,8 @@ enum PermissionState: Equatable {
         if case .denied = self { return true }
         return false
     }
+
+    static var denied: PermissionState { .denied(retry: nil) }
     
 }
 
