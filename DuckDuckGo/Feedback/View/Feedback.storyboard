@@ -101,7 +101,7 @@
                                                     <menuItem title="Website is broken" id="uoX-qE-3kz"/>
                                                     <menuItem title="DuckDuckGo App is broken" tag="1" id="Yti-fm-YMV"/>
                                                     <menuItem title="Feature request" tag="2" id="I6J-ps-0Vy"/>
-                                                    <menuItem title="General Feedback" tag="3" id="GSM-nJ-01d"/>
+                                                    <menuItem title="General feedback" tag="3" id="GSM-nJ-01d"/>
                                                 </items>
                                             </menu>
                                         </popUpButtonCell>

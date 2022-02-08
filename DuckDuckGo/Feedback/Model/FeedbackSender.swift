@@ -17,24 +17,24 @@
 //
 
 import Foundation
+import os.log
 
 final class FeedbackSender {
 
-    func sendFeedback() {
+    static let feedbackURL = URL(string: "https://duckduckgo.com/feedback.js")!
+
+    func sendFeedback(_ feedback: Feedback, appVersion: String, osVersion: String) {
         let parameters = [
             "type": "app-feedback",
-            "comment": "Testing comment",
-            "category": "1199184518165816",
-            "osversion": "12.1",
-            "appversion": "0.18.4"
+            "comment": feedback.comment ?? "",
+            "category": feedback.category.asanaId ?? "",
+            "osversion": osVersion,
+            "appversion": appVersion
         ]
 
-        let url = URL(string: "https://use-tstorey1.duckduckgo.com/feedback.js")!
-        APIRequest.request(url: url, method: .post, parameters: parameters) { _, error in
+        APIRequest.request(url: Self.feedbackURL, method: .post, parameters: parameters) { _, error in
             if let error = error {
-                print(error)
-            } else {
-                print("OK")
+                os_log("FeedbackSender: Failed to submit feedback %s", type: .error, error.localizedDescription)
             }
         }
     }

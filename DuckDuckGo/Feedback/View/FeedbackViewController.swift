@@ -38,13 +38,9 @@ final class FeedbackViewController: NSViewController {
 
     private var cancellables = Set<AnyCancellable>()
 
-    var feedback: Feedback? {
-        didSet {
-            updateViews()
-        }
-    }
-
     var currentTabContent: Tab.TabContent?
+
+    private let feedbackSender = FeedbackSender()
 
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -93,8 +89,9 @@ final class FeedbackViewController: NSViewController {
     }
 
     @IBAction func submitButtonAction(_ sender: Any) {
-        //TODO submit
-        guard let window = self.view.window,
+        sendFeedback()
+
+        guard let window = view.window,
               let sheetParent = window.sheetParent else {
                   assertionFailure("No sheet parent")
                   return
@@ -190,6 +187,20 @@ final class FeedbackViewController: NSViewController {
 
     private func updateBrokenWebsiteMenuItem() {
         brokenWebsiteMenuItem.isEnabled = currentTabContent?.isUrl ?? false
+    }
+
+    private func sendFeedback() {
+        guard let category = selectedCategory,
+              let feedback = Feedback(category: category,
+                                      subcategory: selectedSubCategory,
+                                      comment: textField.stringValue == "" ? nil : textField.stringValue)
+        else {
+            assertionFailure("Can't send feedback")
+            return
+        }
+        feedbackSender.sendFeedback(feedback,
+                                    appVersion: "\(AppVersion.shared.versionNumber)",
+                                    osVersion: "\(ProcessInfo.processInfo.operatingSystemVersion)")
     }
 }
 

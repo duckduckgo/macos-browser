@@ -51,6 +51,15 @@ struct Feedback {
                 return Subcategory.allCases
             }
         }
+
+        var asanaId: String? {
+            switch self {
+            case .bug: return "1199184518165816"
+            case .featureRequest: return "1199184518165815"
+            case .other: return "1200574389728916"
+            case .websiteBreakage: return nil
+            }
+        }
     }
 
     enum Subcategory: CaseIterable {
