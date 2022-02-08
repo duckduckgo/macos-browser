@@ -3,13 +3,12 @@
     <entity name="HistoryEntryManagedObject" representedClassName="HistoryEntryManagedObject" syncable="YES" codeGenerationType="class">
         <attribute name="failedToLoad" attributeType="Boolean" defaultValueString="NO" usesScalarValueType="YES"/>
         <attribute name="identifier" attributeType="UUID" usesScalarValueType="NO"/>
-        <attribute name="isDownload" attributeType="Boolean" defaultValueString="NO" usesScalarValueType="YES"/>
         <attribute name="lastVisit" attributeType="Date" usesScalarValueType="NO"/>
         <attribute name="numberOfVisits" attributeType="Integer 64" defaultValueString="0" usesScalarValueType="YES"/>
         <attribute name="titleEncrypted" optional="YES" attributeType="Transformable" valueTransformerName="NSStringTransformer"/>
         <attribute name="urlEncrypted" attributeType="Transformable" valueTransformerName="NSURLTransformer"/>
     </entity>
     <elements>
-        <element name="HistoryEntryManagedObject" positionX="-63" positionY="-18" width="128" height="134"/>
+        <element name="HistoryEntryManagedObject" positionX="-63" positionY="-18" width="128" height="119"/>
     </elements>
 </model>

@@ -189,11 +189,13 @@ final class MoreOptionsMenu: NSMenu {
 
         if url.canFireproof, let host = url.host {
 
-            let title = FireproofDomains.shared.isFireproof(fireproofDomain: host) ? UserText.removeFireproofing : UserText.fireproofSite
+            let isFireproof = FireproofDomains.shared.isFireproof(fireproofDomain: host)
+            let title = isFireproof ? UserText.removeFireproofing : UserText.fireproofSite
+            let image = isFireproof ? NSImage(named: "Burn") : NSImage(named: "Fireproof")
 
             addItem(withTitle: title, action: #selector(toggleFireproofing(_:)), keyEquivalent: "")
                 .targetting(self)
-                .withImage(NSImage(named: "BurnProof"))
+                .withImage(image)
                 .firingPixel(Pixel.Event.MoreResult.fireproof)
 
         }

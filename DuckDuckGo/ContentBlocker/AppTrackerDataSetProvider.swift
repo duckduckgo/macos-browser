@@ -1,7 +1,7 @@
 //
-//  AppPrivacyConfigurationDataProvider.swift
+//  AppTrackerDataSetProvider.swift
 //
-//  Copyright © 2021 DuckDuckGo. All rights reserved.
+//  Copyright © 2022 DuckDuckGo. All rights reserved.
 //
 //  Licensed under the Apache License, Version 2.0 (the "License");
 //  you may not use this file except in compliance with the License.
@@ -19,15 +19,15 @@
 import Foundation
 import BrowserServicesKit
 
-final class AppPrivacyConfigurationDataProvider: EmbeddedDataProvider {
+final class AppTrackerDataSetProvider: EmbeddedDataProvider {
 
     public struct Constants {
-        public static let embeddedConfigETag = "083fe0926381273459e458bcca3e7c9a"
-        public static let embeddedConfigurationSHA = "9c09f3b3064024bac710e03ddd0b625ed73bd4d46d4fc75fa04983dfd5fc1239"
+        public static let embeddedDataSetETag = "\"b5a369bfb768bc327fb22575c792a348\""
+        public static let embeddedDataSetSHA = "b85c321da42d5f2286982e1242d2d1985307d443a7e3c2d195fda92d012f77ef"
     }
 
     var embeddedDataEtag: String {
-        return Constants.embeddedConfigETag
+        return Constants.embeddedDataSetETag
     }
 
     var embeddedData: Data {
@@ -35,7 +35,7 @@ final class AppPrivacyConfigurationDataProvider: EmbeddedDataProvider {
     }
 
     static var embeddedUrl: URL {
-        return Bundle.main.url(forResource: "macos-config", withExtension: "json")!
+        return Bundle.main.url(forResource: "trackerData", withExtension: "json")!
     }
 
     static func loadEmbeddedAsData() -> Data {

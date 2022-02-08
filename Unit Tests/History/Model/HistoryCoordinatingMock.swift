@@ -45,11 +45,6 @@ final class HistoryCoordinatingMock: HistoryCoordinating {
         completion()
     }
 
-    var markDownloadUrlCalled = false
-    func markDownloadUrl(_ url: URL) {
-        markDownloadUrlCalled = true
-    }
-
     var markFailedToLoadUrlCalled = false
     func markFailedToLoadUrl(_ url: URL) {
         markFailedToLoadUrlCalled = true

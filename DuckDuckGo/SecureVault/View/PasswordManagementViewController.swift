@@ -21,6 +21,8 @@ import Combine
 import SwiftUI
 import BrowserServicesKit
 
+// swiftlint:disable file_length
+
 protocol PasswordManagementDelegate: AnyObject {
 
     /// May not be called on main thread.
@@ -56,6 +58,8 @@ final class PasswordManagementViewController: NSViewController {
     var isDirty = false
 
     var listModel: PasswordManagementItemListModel?
+    var listView: NSView?
+
     var itemModel: PasswordManagementItemModel? {
         didSet {
             editingCancellable?.cancel()
@@ -87,7 +91,13 @@ final class PasswordManagementViewController: NSViewController {
             itemModel?.clearSecureVaultModel()
         }
 
-        refetchWithText(isDirty ? "" : domain ?? "", clearWhenNoMatches: true)
+        // Only select the matching item directly if macOS 11 is available, as 10.15 doesn't support scrolling directly to a given
+        // item in SwiftUI. On 10.15, show the matching item by filtering the search bar automatically instead.
+        if #available(macOS 11.0, *) {
+            refetchWithText("", selectItemMatchingDomain: domain?.dropWWW(), clearWhenNoMatches: true)
+        } else {
+            refetchWithText(isDirty ? "" : domain ?? "", clearWhenNoMatches: true)
+        }
     }
 
     @IBAction func onNewClicked(_ sender: NSButton) {
@@ -101,7 +111,10 @@ final class PasswordManagementViewController: NSViewController {
         DataImportViewController.show()
     }
 
-    private func refetchWithText(_ text: String, clearWhenNoMatches: Bool = false, completion: (() -> Void)? = nil) {
+    private func refetchWithText(_ text: String,
+                                 selectItemMatchingDomain: String? = nil,
+                                 clearWhenNoMatches: Bool = false,
+                                 completion: (() -> Void)? = nil) {
         fetchSecureVaultItems { [weak self] items in
             self?.listModel?.update(items: items)
             self?.searchField.stringValue = text
@@ -109,9 +122,13 @@ final class PasswordManagementViewController: NSViewController {
 
             if clearWhenNoMatches && self?.listModel?.displayedItems.isEmpty == true {
                 self?.searchField.stringValue = ""
-                self?.updateFilter()
+                self?.updateFilter()                
             } else if self?.isDirty == false {
-                self?.listModel?.selectFirst()
+                if let selectItemMatchingDomain = selectItemMatchingDomain {
+                    self?.listModel?.selectLoginWithDomainOrFirst(domain: selectItemMatchingDomain)
+                } else {
+                    self?.listModel?.selectFirst()
+                }
             }
 
             completion?()
@@ -491,12 +508,23 @@ final class PasswordManagementViewController: NSViewController {
         }
 
         self.listModel = listModel
-
-        let view = NSHostingView(rootView: PasswordManagementItemListView().environmentObject(listModel))
-        view.frame = listContainer.bounds
-        listContainer.addSubview(view)
+        self.listView = NSHostingView(rootView: PasswordManagementItemListView().environmentObject(listModel))
     }
     // swiftlint:enable function_body_length
+    
+    override func viewWillAppear() {
+        super.viewWillAppear()
+        
+        if let listView = self.listView {
+            listView.frame = listContainer.bounds
+            listContainer.addSubview(listView)
+        }
+    }
+    
+    override func viewDidDisappear() {
+        super.viewDidDisappear()
+        listView?.removeFromSuperview()
+    }
 
     private func createNewSecureVaultItemMenu() -> NSMenu {
         let menu = NSMenu()
@@ -680,3 +708,5 @@ extension PasswordManagementViewController: NSTextFieldDelegate {
     }
 
 }
+
+// swiftlint:enable file_length
