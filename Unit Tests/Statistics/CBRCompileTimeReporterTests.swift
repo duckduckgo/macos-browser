@@ -178,7 +178,6 @@ class CBRCompileTimeReporterTests: XCTestCase {
 
     }
 
-
     func testWhenTabClosedDuringOnboardingThenPixelIsFired() {
         for (time, expectation) in waitExpectationSeq {
             performTest(withOnboardingFinished: false, waitTime: time, expectedWaitTime: expectation, result: .closed)
