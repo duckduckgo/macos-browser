@@ -43,6 +43,7 @@ final class ContentBlocking {
 
         trackerDataManager = TrackerDataManager(etag: DefaultConfigurationStorage.shared.loadEtag(for: .trackerRadar),
                                                 data: DefaultConfigurationStorage.shared.loadData(for: .trackerRadar),
+                                                embeddedDataProvider: AppTrackerDataSetProvider(),
                                                 errorReporting: Self.debugEvents)
 
         contentBlockerRulesSource = ContentBlockerRulesLists(trackerDataManger: trackerDataManager)

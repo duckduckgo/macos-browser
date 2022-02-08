@@ -155,7 +155,7 @@ final class WebCacheManagerTests: XCTestCase {
         }
         wait(for: [expect], timeout: 5.0)
 
-        XCTAssertEqual(dataStore.removeDataCalledCount, 1)
+        XCTAssertEqual(dataStore.removeDataCalledCount, 2)
     }
 
     // MARK: Mocks
@@ -171,6 +171,18 @@ final class WebCacheManagerTests: XCTestCase {
         }
 
         func removeData(ofTypes dataTypes: Set<String>, modifiedSince date: Date) async {
+            removeDataCalledCount += 1
+
+            // In the real implementation, records will be selectively removed or edited based on their Fireproof status. For simplicity in this test,
+            // only remove records if all data types are removed, so that we can tell whether records for given domains still exist in some form.
+            if dataTypes == WKWebsiteDataStore.allWebsiteDataTypes() {
+                self.records = records.filter {
+                    dataTypes == $0.dataTypes
+                }
+            }
+        }
+        
+        func removeData(ofTypes dataTypes: Set<String>, for records: [WKWebsiteDataRecord]) async {
             removeDataCalledCount += 1
 
             // In the real implementation, records will be selectively removed or edited based on their Fireproof status. For simplicity in this test,
