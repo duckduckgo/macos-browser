@@ -813,14 +813,17 @@ extension Tab: WKNavigationDelegate {
             return .cancel
         }
 
-        // Ensure Content Blocking Assets (WKContentRuleList&UserScripts) are installed
-        if !webView.configuration.userContentController.contentBlockingAssetsInstalled,
-           navigationAction.isTargetingMainFrame,
+        if navigationAction.isTargetingMainFrame,
            !url.isDuckDuckGo {
 
-            cbaTimeReporter?.tabWillWaitForRulesCompilation(self)
-            await webView.configuration.userContentController.awaitContentBlockingAssetsInstalled()
-            cbaTimeReporter?.reportWaitTimeForTabFinishedWaitingForRules(self)
+            // Ensure Content Blocking Assets (WKContentRuleList&UserScripts) are installed
+            if !webView.configuration.userContentController.contentBlockingAssetsInstalled {
+                cbaTimeReporter?.tabWillWaitForRulesCompilation(self)
+                await webView.configuration.userContentController.awaitContentBlockingAssetsInstalled()
+                cbaTimeReporter?.reportWaitTimeForTabFinishedWaitingForRules(self)
+            } else {
+                cbaTimeReporter?.reportNavigationDidNotWaitForRules()
+            }
         }
 
         // Enable/disable FBProtection only after UserScripts are installed (awaitContentBlockingAssetsInstalled)

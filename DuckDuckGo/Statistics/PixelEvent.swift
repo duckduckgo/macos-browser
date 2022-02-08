@@ -61,6 +61,8 @@ extension Pixel {
         enum CompileRulesWaitTime: String, CustomStringConvertible {
             var description: String { rawValue }
 
+            case noWait = "0"
+            case lessThan1s = "1"
             case lessThan5s = "5"
             case lessThan10s = "10"
             case lessThan20s = "20"
@@ -71,6 +73,10 @@ extension Pixel {
         static func compileRulesWait(onboardingShown: Bool, waitTime interval: TimeInterval, result: WaitResult) -> Event {
             let waitTime: CompileRulesWaitTime
             switch interval {
+            case 0:
+                waitTime = .noWait
+            case ...1:
+                waitTime = .lessThan1s
             case ...5:
                 waitTime = .lessThan5s
             case ...10:
@@ -177,7 +183,9 @@ extension Pixel {
             case contentBlockingAllowListCompilationFailed = "content_blocking_compilation_error_allow_list"
             case contentBlockingUnpSitesCompilationFailed = "content_blocking_compilation_error_unprotected_list"
             case contentBlockingFallbackCompilationFailed = "content_blocking_compilation_error_fallback_tds"
-            
+
+            case contentBlockingCompilationTime = "content_blocking_compilation_time"
+
             case clickToLoadTDSCompilationFailed = "click_to_load_compilation_error_fetched_tds"
             case clickToLoadTempListCompilationFailed = "click_to_load_compilation_error_temp_list"
             case clickToLoadAllowListCompilationFailed = "click_to_load_compilation_error_allow_list"

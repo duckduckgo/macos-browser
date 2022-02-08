@@ -52,6 +52,7 @@ final class ContentBlocking {
         contentBlockingManager = ContentBlockerRulesManager(rulesSource: contentBlockerRulesSource,
                                                             exceptionsSource: exceptionsSource,
                                                             cache: ContentBlockingRulesCache(),
+                                                            errorReporting: Self.debugEvents,
                                                             logger: OSLog.contentBlocking)
         contentBlockingUpdating = ContentBlockingUpdating(contentBlockerRulesManager: contentBlockingManager)
 
@@ -122,6 +123,9 @@ final class ContentBlocking {
             } else {
                 domainEvent = .contentBlockingErrorReportingIssue
             }
+
+        case .contentBlockingCompilationTime:
+            domainEvent = .contentBlockingCompilationTime
         }
 
         Pixel.fire(.debug(event: domainEvent, error: error), withAdditionalParameters: parameters, onComplete: onComplete)

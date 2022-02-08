@@ -54,6 +54,13 @@ final class AbstractContentBlockingAssetsCompilationTimeReporter<Caller: AnyObje
         }
     }
 
+    private func report(waitTime: TimeInterval, result: Pixel.Event.WaitResult, completionHandler: @escaping ((Error?) -> Void) = { _ in }) {
+        Pixel.fire(.compileRulesWait(onboardingShown: self.onboardingShown, waitTime: waitTime, result: result), onComplete: completionHandler)
+
+        // report only once
+        isFinished = true
+    }
+
     /// Called when Rules compilation finishes
     func reportWaitTimeForTabFinishedWaitingForRules(_ tab: Caller) {
         defer { waiters.removeObject(forKey: tab) }
@@ -62,10 +69,7 @@ final class AbstractContentBlockingAssetsCompilationTimeReporter<Caller: AnyObje
               let waitStart = waitStart
         else { return }
 
-        Pixel.fire(.compileRulesWait(onboardingShown: self.onboardingShown, waitTime: currentTime() - waitStart, result: .success))
-
-        // report only once
-        isFinished = true
+        report(waitTime: currentTime() - waitStart, result: .success)
     }
 
     /// If Tab is going to close while the rules are still being compiled: report wait time with Tab .closed argument
@@ -76,10 +80,7 @@ final class AbstractContentBlockingAssetsCompilationTimeReporter<Caller: AnyObje
               let waitStart = self.waitStart
         else { return }
 
-        Pixel.fire(.compileRulesWait(onboardingShown: self.onboardingShown, waitTime: currentTime() - waitStart, result: .closed))
-
-        // report only once
-        isFinished = true
+        report(waitTime: currentTime() - waitStart, result: .closed)
     }
 
     /// If App is going to close while the rules are still being compiled: report wait time with .quit argument
@@ -90,11 +91,16 @@ final class AbstractContentBlockingAssetsCompilationTimeReporter<Caller: AnyObje
         else { return }
         // Run the loop until Pixel is sent
         let condition = RunLoop.ResumeCondition()
-        Pixel.fire(.compileRulesWait(onboardingShown: self.onboardingShown, waitTime: currentTime() - waitStart, result: .quit)) { _ in
+        report(waitTime: currentTime() - waitStart, result: .quit) { _ in
             condition.resolve()
         }
         RunLoop.current.run(until: condition)
-        isFinished = true
+    }
+
+    /// When Navigation while Content Blocking Rules are already available
+    func reportNavigationDidNotWaitForRules() {
+        guard !isFinished else { return }
+        report(waitTime: 0, result: .success)
     }
 
     deinit {
