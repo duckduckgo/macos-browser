@@ -63,7 +63,7 @@ class CBRCompileTimeReporterTests: XCTestCase {
 
         let expectation = expectation(description: "Pixel should fire")
         stub(condition: isHost(host)) { req -> HTTPStubsResponse in
-            XCTAssertEqual(req.url?.lastPathComponent, pixel.name)
+            XCTAssertEqual(req.url?.lastPathComponent, pixel.name, "waitTime \(waitTime)")
             expectation.fulfill()
             return HTTPStubsResponse(data: Data(), statusCode: 200, headers: nil)
         }
