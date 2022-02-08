@@ -92,7 +92,10 @@ class CBRCompileTimeReporterTests: XCTestCase {
     }
 
     typealias Pair = (TimeInterval, Pixel.Event.CompileRulesWaitTime)
-    let waitExpectationSeq: [Pair] = [(3, .lessThan5s),
+    let waitExpectationSeq: [Pair] = [(0, .noWait),
+                                      (0.5, .lessThan1s),
+                                      (0.1, .lessThan1s),
+                                      (2, .lessThan5s),
                                       (5, .lessThan5s),
                                       (6, .lessThan10s),
                                       (10, .lessThan10s),
@@ -139,7 +142,7 @@ class CBRCompileTimeReporterTests: XCTestCase {
     }
 
     func testWhenReporterReceivesEventSequenceThenOnlyOnePixelIsFired() {
-        performTest(withOnboardingFinished: true, waitTime: 1, expectedWaitTime: .lessThan5s, result: .success)
+        performTest(withOnboardingFinished: true, waitTime: 1, expectedWaitTime: .lessThan1s, result: .success)
 
         stub(condition: isHost(host)) { _ -> HTTPStubsResponse in
             XCTFail("Unexpected Pixel")
@@ -164,6 +167,34 @@ class CBRCompileTimeReporterTests: XCTestCase {
             tab3 = t3
 
             performTest(withOnboardingFinished: false, waitTime: 4, expectedWaitTime: .lessThan5s, result: .success) { reporter in
+                self.time += 4
+                reporter.tabWillWaitForRulesCompilation(tab2)
+                reporter.tabWillWaitForRulesCompilation(tab3)
+                reporter.reportWaitTimeForTabFinishedWaitingForRules(tab3)
+                reporter.tabWillClose(tab2)
+            }
+
+            self.tab = nil
+        }
+
+        XCTAssertNil(tab1)
+        XCTAssertNil(tab2)
+        XCTAssertNil(tab3)
+    }
+
+    func testWhenNoWaitIsPerformedAndMoreThanOneTabWaitThenOnlyNoWaitPixelIsFired() {
+        weak var tab1 = self.tab
+        weak var tab2: NSObject!
+        weak var tab3: NSObject!
+
+        autoreleasepool {
+            let t2 = NSObject()
+            let t3 = NSObject()
+            tab2 = t2
+            tab3 = t3
+
+            performTest(withOnboardingFinished: false, waitTime: 4, expectedWaitTime: .noWait, result: .success) { reporter in
+                reporter.reportNavigationDidNotWaitForRules()
                 reporter.tabWillWaitForRulesCompilation(tab2)
                 reporter.tabWillWaitForRulesCompilation(tab3)
                 reporter.reportWaitTimeForTabFinishedWaitingForRules(tab3)
