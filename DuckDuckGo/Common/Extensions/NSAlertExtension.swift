@@ -58,7 +58,7 @@ extension NSAlert {
         alert.messageText = UserText.fireproofConfirmationTitle(domain: domain)
         alert.informativeText = UserText.fireproofConfirmationMessage
         alert.alertStyle = .warning
-        alert.icon = #imageLiteral(resourceName: "Fireproof")
+        alert.icon = NSImage(named: "Fireproof")
         alert.addButton(withTitle: UserText.fireproof)
         alert.addButton(withTitle: UserText.notNow)
         return alert

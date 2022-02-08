@@ -24,7 +24,7 @@ final class SuggestionContainer {
 
     static let maximumNumberOfSuggestions = 9
 
-    @Published private(set) var suggestions: [Suggestion]?
+    @Published private(set) var result: SuggestionResult?
 
     private let historyCoordinating: HistoryCoordinating
     private let bookmarkManager: BookmarkManager
@@ -56,7 +56,7 @@ final class SuggestionContainer {
 
             guard self?.latestQuery == query else { return }
             guard let result = result else {
-                self?.suggestions = nil
+                self?.result = nil
                 os_log("Suggestions: Failed to get suggestions - %s",
                        type: .error,
                        "\(String(describing: error))")
@@ -71,7 +71,7 @@ final class SuggestionContainer {
                        "\(String(describing: error))")
             }
 
-            self?.suggestions = result.topHits + result.duckduckgoSuggestions + result.historyAndBookmarks
+            self?.result = result
         }
     }
 

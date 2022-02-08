@@ -123,7 +123,7 @@ final class SuggestionViewModelTests: XCTestCase {
     func testWhenSuggestionIsBookmark_ThenStringIsTitle() {
         let url = URL(string: "https://spreadprivacy.com")!
         let title = "Title"
-        let suggestion = Suggestion.bookmark(title: title, url: url, isFavorite: true)
+        let suggestion = Suggestion.bookmark(title: title, url: url, isFavorite: true, allowedInTopHits: true)
         let suggestionViewModel = SuggestionViewModel(suggestion: suggestion, userStringValue: "")
 
         XCTAssertEqual(suggestionViewModel.string, title)

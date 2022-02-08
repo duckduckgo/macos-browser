@@ -44,7 +44,7 @@ final class AddressBarTextField: NSTextField {
         didSet {
             guard suggestionContainerViewModel != nil else { return }
             initSuggestionWindow()
-            subscribeToSuggestionItems()
+            subscribeToSuggestionResult()
             subscribeToSelectedSuggestionViewModel()
         }
     }
@@ -61,7 +61,7 @@ final class AddressBarTextField: NSTextField {
 
     @IBInspectable var isHomepageAddressBar: Bool = false
 
-    private var suggestionItemsCancellable: AnyCancellable?
+    private var suggestionResultCancellable: AnyCancellable?
     private var selectedSuggestionViewModelCancellable: AnyCancellable?
     private var selectedTabViewModelCancellable: AnyCancellable?
     private var searchSuggestionsCancellable: AnyCancellable?
@@ -92,12 +92,12 @@ final class AddressBarTextField: NSTextField {
 
     private var isHandlingUserAppendingText = false
 
-    private func subscribeToSuggestionItems() {
-        suggestionItemsCancellable = suggestionContainerViewModel?.suggestionContainer.$suggestions
+    private func subscribeToSuggestionResult() {
+        suggestionResultCancellable = suggestionContainerViewModel?.suggestionContainer.$result
             .receive(on: DispatchQueue.main)
             .sink { [weak self] _ in
                 guard let self = self else { return }
-                if self.suggestionContainerViewModel?.suggestionContainer.suggestions?.count ?? 0 > 0 {
+                if self.suggestionContainerViewModel?.suggestionContainer.result?.count ?? 0 > 0 {
                     self.showSuggestionWindow()
                     Pixel.fire(.suggestionsDisplayed(self.suggestionsContainLocalItems()))
                 }
@@ -331,7 +331,7 @@ final class AddressBarTextField: NSTextField {
     private func makeUrl(suggestion: Suggestion?, stringValueWithoutSuffix: String, completion: @escaping (URL?, Bool) -> Void) {
         let finalUrl: URL?
         switch suggestion {
-        case .bookmark(title: _, url: let url, isFavorite: _),
+        case .bookmark(title: _, url: let url, isFavorite: _, allowedInTopHits: _),
              .historyEntry(title: _, url: let url, allowedInTopHits: _),
              .website(url: let url):
             finalUrl = url
@@ -462,7 +462,7 @@ final class AddressBarTextField: NSTextField {
                 guard let host = url.host else { return nil }
                 self = Suffix.visit(host: host)
 
-            case .bookmark(title: _, url: let url, isFavorite: _),
+            case .bookmark(title: _, url: let url, isFavorite: _, allowedInTopHits: _),
                  .historyEntry(title: _, url: let url, allowedInTopHits: _):
                 if let title = suggestionViewModel.title,
                    !title.isEmpty,
@@ -583,8 +583,8 @@ final class AddressBarTextField: NSTextField {
 
     private func suggestionsContainLocalItems() -> SuggestionListChacteristics {
         var characteristics = SuggestionListChacteristics(hasBookmark: false, hasFavorite: false, hasHistoryEntry: false)
-        for suggestion in self.suggestionContainerViewModel?.suggestionContainer.suggestions ?? [] {
-            if case .bookmark(title: _, url: _, isFavorite: let isFavorite) = suggestion {
+        for suggestion in self.suggestionContainerViewModel?.suggestionContainer.result?.all ?? [] {
+            if case .bookmark(title: _, url: _, isFavorite: let isFavorite, allowedInTopHits: _) = suggestion {
                 if isFavorite {
                     characteristics.hasFavorite = true
                 } else {

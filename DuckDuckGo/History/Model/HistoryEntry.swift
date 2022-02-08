@@ -26,7 +26,6 @@ struct HistoryEntry {
     var numberOfVisits: Int
     var lastVisit: Date
     var failedToLoad: Bool
-    var isDownload: Bool
 
     mutating func addVisit() {
         numberOfVisits += 1
@@ -43,8 +42,7 @@ extension HistoryEntry {
                   title: nil,
                   numberOfVisits: 0,
                   lastVisit: Date.startOfDayToday,
-                  failedToLoad: false,
-                  isDownload: false)
+                  failedToLoad: false)
     }
 
 }
