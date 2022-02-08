@@ -179,6 +179,7 @@ struct UserText {
     static let permissionAlwaysAllowDeviceFormat = NSLocalizedString("permission.always.allow", value: "Always Allow %@ on “%@“", comment: "Make input media device access permanently allowed for current domain")
     static let permissionAlwaysAllowPopupsFormat = NSLocalizedString("permission.always.allow.popups", value: "Always Allow on “%@“", comment: "Make popups permanently allowed for current domain")
     static let permissionAlwaysAllowExternalSchemeFormat = NSLocalizedString("permission.always.allow.externalScheme", value: "Always Allow “%@“ to open %@", comment: "Make External Links (%@ 2) permanently allowed to open on current domain (%@ 1)")
+    static let permissionAllowExternalSchemeFormat = NSLocalizedString("permission.allow.externalScheme", value: "Allow “%@“ to open %@", comment: "Allow to open External Link (%@ 2) to open on current domain (%@ 1)")
     static let permissionAlwaysDenyExternalSchemeFormat = NSLocalizedString("permission.always.deny.externalScheme", value: "Never Ask for “%@“ to open %@", comment: "Make External Links (%@ 2) permanently denied to open on current domain (%@ 1)")
 
     static let permissionAlwaysAskDeviceFormat = NSLocalizedString("permission.always.ask", value: "Always Ask for %@ on “%@“", comment: "Make input media device access always asked from user for current domain")

@@ -24,6 +24,7 @@ final class PermissionAuthorizationQuery {
     let permissions: [PermissionType]
     var wasShownOnce: Bool = false
     var shouldShowRememberChoiceCheckbox: Bool = false
+    var retry: (() -> Void)?
 
     enum Decision {
         case granted(PermissionAuthorizationQuery)
@@ -32,16 +33,23 @@ final class PermissionAuthorizationQuery {
     }
     private var decisionHandler: ((Decision, Bool?) -> Void)?
 
-    init(domain: String, url: URL?, permissions: [PermissionType], decisionHandler: @escaping (Decision, Bool?) -> Void) {
+    init(domain: String,
+         url: URL?,
+         permissions: [PermissionType],
+         retryHandler: (() -> Void)?,
+         decisionHandler: @escaping (Decision, Bool?) -> Void) {
+
         self.domain = domain
         self.url = url
         self.permissions = permissions
+        self.retry = retryHandler
         self.decisionHandler = decisionHandler
     }
 
     func handleDecision(grant: Bool, remember: Bool? = nil) {
-        decisionHandler?(grant ? .granted(self) : .denied(self), remember)
-        decisionHandler = nil
+        var handler: ((Decision, Bool?) -> Void)?
+        swap(&handler, &decisionHandler) // only run once
+        handler?(grant ? .granted(self) : .denied(self), remember)
     }
 
     deinit {

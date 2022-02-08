@@ -27,6 +27,7 @@ protocol PermissionContextMenuDelegate: AnyObject {
     func permissionContextMenu(_ menu: PermissionContextMenu, alwaysAllowPermission: PermissionType)
     func permissionContextMenu(_ menu: PermissionContextMenu, alwaysDenyPermission: PermissionType)
     func permissionContextMenu(_ menu: PermissionContextMenu, resetStoredPermission: PermissionType)
+    func permissionContextMenu(_ menu: PermissionContextMenu, allowPermissionAndRetry permission: PermissionType)
     func permissionContextMenuReloadPage(_ menu: PermissionContextMenu)
 }
 
@@ -93,7 +94,7 @@ final class PermissionContextMenu: NSMenu {
 
     private func setupOtherPermissionMenuItems(for permissions: Permissions) {
         let permanentlyDeniedPermission = permissions.first(where: {
-            $0.value == .denied && PermissionManager.shared.permission(forDomain: domain, permissionType: $0.key) == .deny
+            $0.value.isDenied && PermissionManager.shared.permission(forDomain: domain, permissionType: $0.key) == .deny
         })
         // don't display Reload item for permanently denied Permissions
         var shouldAddReload = permanentlyDeniedPermission == nil
@@ -106,9 +107,12 @@ final class PermissionContextMenu: NSMenu {
             case .inactive:
                 break
 
-            case .denied:
-                guard shouldAddReload else { break }
-                addItem(.reload(target: self))
+            case .denied(let retry):
+                if retry != nil {
+                    addItem(.retry(permission, on: domain, target: self))
+                } else if shouldAddReload {
+                    addItem(.reload(target: self))
+                }
                 shouldAddReload = false
 
             case .disabled(systemWide: let systemWide):
@@ -239,6 +243,14 @@ final class PermissionContextMenu: NSMenu {
         actionDelegate?.permissionContextMenuReloadPage(self)
     }
 
+    @objc func retry(_ sender: NSMenuItem) {
+        guard let permission = sender.representedObject as? PermissionType else {
+            assertionFailure("Expected PermissionType")
+            return
+        }
+        actionDelegate?.permissionContextMenu(self, allowPermissionAndRetry: permission)
+    }
+
     @objc func allowPermissionQuery(_ sender: NSMenuItem) {
         guard let query = sender.representedObject as? PermissionAuthorizationQuery else {
             assertionFailure("Expected PermissionAuthorizationQuery")
@@ -306,6 +318,24 @@ private extension NSMenuItem {
         let item = NSMenuItem(title: UserText.permissionReloadToEnable,
                               action: #selector(PermissionContextMenu.reload),
                               keyEquivalent: "")
+        item.target = target
+        return item
+    }
+
+    static func retry(_ permission: PermissionType, on domain: String, target: PermissionContextMenu) -> NSMenuItem {
+        let title: String
+        switch permission {
+        case .camera, .microphone, .geolocation, .popups:
+            assertionFailure("Add proper localization")
+            fallthrough
+        case .externalScheme:
+            title = String(format: UserText.permissionAllowExternalSchemeFormat, domain, permission.localizedDescription)
+        }
+
+        let item = NSMenuItem(title: title,
+                              action: #selector(PermissionContextMenu.retry),
+                              keyEquivalent: "")
+        item.representedObject = permission
         item.target = target
         return item
     }

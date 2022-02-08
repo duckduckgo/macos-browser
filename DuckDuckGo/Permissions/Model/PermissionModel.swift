@@ -120,8 +120,14 @@ final class PermissionModel {
     private func queryAuthorization(for permissions: [PermissionType],
                                     domain: String,
                                     url: URL?,
+                                    retryHandler: (() -> Void)?,
                                     decisionHandler: @escaping (Bool) -> Void) {
-        let query = PermissionAuthorizationQuery(domain: domain, url: url, permissions: permissions) { [weak self] decision, remember in
+
+        let query = PermissionAuthorizationQuery(domain: domain,
+                                                 url: url,
+                                                 permissions: permissions,
+                                                 retryHandler: retryHandler) { [weak self] decision, remember in
+
             let query: PermissionAuthorizationQuery?
             let granted: Bool
             switch decision {
@@ -134,10 +140,7 @@ final class PermissionModel {
                 granted = false
 
                 for permission in permissions {
-                    self?.permissions[permission].denied()
-                    if remember == true {
-                        self?.permissionManager.setPermission(.deny, forDomain: domain, permissionType: permission)
-                    }
+                    self?.permissions[permission].denied(retry: completedQuery.retry)
                 }
 
             case .granted(let completedQuery):
@@ -146,9 +149,6 @@ final class PermissionModel {
 
                 for permission in permissions {
                     self?.permissions[permission].granted()
-                    if remember == true {
-                        self?.permissionManager.setPermission(.allow, forDomain: domain, permissionType: permission)
-                    }
                 }
             }
 
@@ -162,6 +162,12 @@ final class PermissionModel {
                 return
             }
             self.authorizationQueries.remove(at: idx)
+
+            if remember == true {
+                for permission in permissions {
+                    self.permissionManager.setPermission(granted ? .allow : .deny, forDomain: domain, permissionType: permission)
+                }
+            }
         }
 
         // When Geolocation queried by a website but System Permission is denied: switch to `disabled`
@@ -215,8 +221,27 @@ final class PermissionModel {
            case .allow = permissionManager.permission(forDomain: domain, permissionType: permission) {
             permissionManager.setPermission(.ask, forDomain: domain, permissionType: permission)
         }
-        self.permissions[permission].revoke() // await deactivation
-        webView?.revokePermissions([permission])
+        switch permission {
+        case .camera, .microphone, .geolocation:
+            self.permissions[permission].revoke() // await deactivation
+            webView?.revokePermissions([permission])
+
+        case .popups, .externalScheme:
+            self.permissions[permission].denied(retry: nil)
+        }
+    }
+
+    func allowAndRetry(_ permission: PermissionType) {
+        if let domain = webView?.url?.host,
+           case .deny = permissionManager.permission(forDomain: domain, permissionType: permission) {
+            permissionManager.setPermission(.ask, forDomain: domain, permissionType: permission)
+        }
+
+        guard case .denied(retry: let retry) = self.permissions[permission] else {
+            assertionFailure("Retry not supported for \(permission)")
+            return
+        }
+        retry?()
     }
 
     // MARK: - WebView delegated methods
@@ -287,7 +312,9 @@ final class PermissionModel {
     func permissions(_ permissions: [PermissionType],
                      requestedForDomain domain: String?,
                      url: URL? = nil,
+                     retryHandler: (() -> Void)? = nil,
                      decisionHandler: @escaping (Bool) -> Void) {
+
         guard let domain = domain,
               !domain.isEmpty,
               !permissions.isEmpty
@@ -300,21 +327,25 @@ final class PermissionModel {
         let shouldGrant = shouldGrantPermission(for: permissions, requestedForDomain: domain)
         switch shouldGrant {
         case .none:
-            queryAuthorization(for: permissions, domain: domain, url: url, decisionHandler: decisionHandler)
+            queryAuthorization(for: permissions, domain: domain, url: url, retryHandler: retryHandler, decisionHandler: decisionHandler)
         case .some(true):
             decisionHandler(true)
         case .some(false):
             decisionHandler(false)
             for permission in permissions {
-                self.permissions[permission].denied()
+                self.permissions[permission].denied(retry: retryHandler)
             }
         }
     }
 
     @MainActor
-    func permissions(_ permissions: [PermissionType], requestedForDomain domain: String?, url: URL? = nil) async -> Bool {
-        await withCheckedContinuation { continuation in
-            self.permissions(permissions, requestedForDomain: domain, url: url) { decision in
+    func permissions(_ permissions: [PermissionType],
+                     requestedForDomain domain: String?,
+                     url: URL? = nil,
+                     retryHandler: (() -> Void)? = nil) async -> Bool {
+
+        return await withCheckedContinuation { continuation in
+            self.permissions(permissions, requestedForDomain: domain, url: url, retryHandler: retryHandler) { decision in
                 continuation.resume(returning: decision)
             }
         }

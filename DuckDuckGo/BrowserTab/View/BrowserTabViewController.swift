@@ -328,7 +328,15 @@ extension BrowserTabViewController: TabDelegate {
         }
 
         let permissionType = PermissionType.externalScheme(scheme: url.scheme ?? "")
-        let granted = await tab.permissions.permissions([permissionType], requestedForDomain: webView?.url?.host, url: url)
+        let granted = await tab.permissions.permissions([permissionType],
+                                                        requestedForDomain: webView?.url?.host,
+                                                        url: url,
+                                                        retryHandler: { [weak self, weak tab] in
+            // `Allow` requested from context menu after denying
+            guard let self = self, let tab = tab else { return }
+            self.tab(tab, openExternalURL: url, touchingPermissionType: permissionType)
+        })
+
         guard granted else {
             if userEntered {
                 searchForExternalUrl()
@@ -336,6 +344,10 @@ extension BrowserTabViewController: TabDelegate {
             return
         }
 
+        self.tab(tab, openExternalURL: url, touchingPermissionType: permissionType)
+    }
+
+    private func tab(_ tab: Tab, openExternalURL url: URL, touchingPermissionType permissionType: PermissionType) {
         NSWorkspace.shared.open(url)
         tab.permissions.permissions[permissionType].externalSchemeOpened()
     }
