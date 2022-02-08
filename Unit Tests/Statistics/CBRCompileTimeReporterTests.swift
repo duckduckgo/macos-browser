@@ -94,7 +94,7 @@ class CBRCompileTimeReporterTests: XCTestCase {
     typealias Pair = (TimeInterval, Pixel.Event.CompileRulesWaitTime)
     let waitExpectationSeq: [Pair] = [(0, .noWait),
                                       (0.5, .lessThan1s),
-                                      (0.1, .lessThan1s),
+                                      (1, .lessThan1s),
                                       (2, .lessThan5s),
                                       (5, .lessThan5s),
                                       (6, .lessThan10s),
@@ -115,67 +115,6 @@ class CBRCompileTimeReporterTests: XCTestCase {
         for (time, expectation) in waitExpectationSeq {
             performTest(withOnboardingFinished: true, waitTime: time, expectedWaitTime: expectation, result: .success)
         }
-    }
-
-    func testWaiting0secucceedsDuringRegularNavigation() {
-        let (time, expectation) = (0, .noWait) as (TimeInterval, Pixel.Event.CompileRulesWaitTime)
-        performTest(withOnboardingFinished: true, waitTime: time, expectedWaitTime: expectation, result: .success)
-
-    }
-    func testWaiting0_5secucceedsDuringRegularNavigation() {
-        let (time, expectation) = (0.5, .lessThan1s) as (TimeInterval, Pixel.Event.CompileRulesWaitTime)
-        performTest(withOnboardingFinished: true, waitTime: time, expectedWaitTime: expectation, result: .success)
-
-    }
-    func testWaiting0_1secucceedsDuringRegularNavigation() {
-        let (time, expectation) = (0.1, .lessThan1s) as (TimeInterval, Pixel.Event.CompileRulesWaitTime)
-        performTest(withOnboardingFinished: true, waitTime: time, expectedWaitTime: expectation, result: .success)
-
-    }
-    func testWaiting2secucceedsDuringRegularNavigation() {
-        let (time, expectation) = (2, .lessThan5s) as (TimeInterval, Pixel.Event.CompileRulesWaitTime)
-        performTest(withOnboardingFinished: true, waitTime: time, expectedWaitTime: expectation, result: .success)
-
-    }
-    func testWaiting5secucceedsDuringRegularNavigation() {
-        let (time, expectation) = (5, .lessThan5s) as (TimeInterval, Pixel.Event.CompileRulesWaitTime)
-        performTest(withOnboardingFinished: true, waitTime: time, expectedWaitTime: expectation, result: .success)
-
-    }
-    func testWaiting6secucceedsDuringRegularNavigation() {
-        let (time, expectation) = (6, .lessThan10s) as (TimeInterval, Pixel.Event.CompileRulesWaitTime)
-        performTest(withOnboardingFinished: true, waitTime: time, expectedWaitTime: expectation, result: .success)
-
-    }
-    func testWaiting10secucceedsDuringRegularNavigation() {
-        let (time, expectation) = (10, .lessThan10s) as (TimeInterval, Pixel.Event.CompileRulesWaitTime)
-        performTest(withOnboardingFinished: true, waitTime: time, expectedWaitTime: expectation, result: .success)
-
-    }
-    func testWaiting20secucceedsDuringRegularNavigation() {
-        let (time, expectation) = (20, .lessThan20s) as (TimeInterval, Pixel.Event.CompileRulesWaitTime)
-        performTest(withOnboardingFinished: true, waitTime: time, expectedWaitTime: expectation, result: .success)
-
-    }
-    func testWaiting21secucceedsDuringRegularNavigation() {
-        let (time, expectation) = (21, .lessThan40s) as (TimeInterval, Pixel.Event.CompileRulesWaitTime)
-        performTest(withOnboardingFinished: true, waitTime: time, expectedWaitTime: expectation, result: .success)
-
-    }
-    func testWaiting40secucceedsDuringRegularNavigation() {
-        let (time, expectation) = (40, .lessThan40s) as (TimeInterval, Pixel.Event.CompileRulesWaitTime)
-        performTest(withOnboardingFinished: true, waitTime: time, expectedWaitTime: expectation, result: .success)
-
-    }
-    func testWaiting41secucceedsDuringRegularNavigation() {
-        let (time, expectation) = (41, .more) as (TimeInterval, Pixel.Event.CompileRulesWaitTime)
-        performTest(withOnboardingFinished: true, waitTime: time, expectedWaitTime: expectation, result: .success)
-
-    }
-    func testWaiting60secucceedsDuringRegularNavigation() {
-        let (time, expectation) = (60, .more) as (TimeInterval, Pixel.Event.CompileRulesWaitTime)
-        performTest(withOnboardingFinished: true, waitTime: time, expectedWaitTime: expectation, result: .success)
-
     }
 
     func testWhenTabClosedDuringOnboardingThenPixelIsFired() {
