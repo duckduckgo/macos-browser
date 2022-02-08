@@ -24,15 +24,15 @@ import BrowserServicesKit
 final class SuggestionContainerViewModel {
 
     let suggestionContainer: SuggestionContainer
-    private var suggestionsCancellable: AnyCancellable?
+    private var suggestionResultCancellable: AnyCancellable?
 
     init(suggestionContainer: SuggestionContainer) {
         self.suggestionContainer = suggestionContainer
-        subscribeToSuggestions()
+        subscribeToSuggestionResult()
     }
 
     var numberOfSuggestions: Int {
-        suggestionContainer.suggestions?.count ?? 0
+        suggestionContainer.result?.count ?? 0
     }
 
     @Published private(set) var selectionIndex: Int? {
@@ -46,12 +46,12 @@ final class SuggestionContainerViewModel {
     private var isTopSuggestionSelectionExpected = false
 
     private var shouldSelectTopSuggestion: Bool {
-        guard self.suggestionContainer.suggestions?.isEmpty == false else { return false }
+        guard let result = suggestionContainer.result, !result.isEmpty else { return false }
 
         if self.isTopSuggestionSelectionExpected,
+           result.canBeAutocompleted,
            let userStringValue = self.userStringValue,
            let firstSuggestion = self.suggestionViewModel(at: 0),
-           firstSuggestion.suggestion.allowedForAutocompletion,
            firstSuggestion.autocompletionString.lowercased().hasPrefix(userStringValue.lowercased()) {
             return true
         } else {
@@ -59,8 +59,8 @@ final class SuggestionContainerViewModel {
         }
     }
 
-    private func subscribeToSuggestions() {
-        suggestionsCancellable = suggestionContainer.$suggestions.receive(on: DispatchQueue.main)
+    private func subscribeToSuggestionResult() {
+        suggestionResultCancellable = suggestionContainer.$result.receive(on: DispatchQueue.main)
             .sink { [weak self] _ in
             guard let self = self,
                   self.shouldSelectTopSuggestion
@@ -98,7 +98,7 @@ final class SuggestionContainerViewModel {
     }
     
     func suggestionViewModel(at index: Int) -> SuggestionViewModel? {
-        let items = suggestionContainer.suggestions ?? []
+        let items = suggestionContainer.result?.all ?? []
 
         guard index < items.count else {
             os_log("SuggestionContainerViewModel: Absolute index is out of bounds", type: .error)

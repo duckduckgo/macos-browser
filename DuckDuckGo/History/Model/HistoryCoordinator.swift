@@ -29,7 +29,6 @@ protocol HistoryCoordinating: AnyObject {
 
     func addVisit(of url: URL)
     func updateTitleIfNeeded(title: String, url: URL)
-    func markDownloadUrl(_ url: URL)
     func markFailedToLoadUrl(_ url: URL)
     func title(for url: URL) -> String?
 
@@ -88,8 +87,6 @@ final class HistoryCoordinator: HistoryCoordinating {
             self?.historyDictionary = historyDictionary
             self?._history = self?.makeHistory(from: historyDictionary)
             self?.save(entry: entry)
-
-            self?.generateRootUrlIfNeeded(from: url)
         }
     }
 
@@ -112,17 +109,6 @@ final class HistoryCoordinator: HistoryCoordinating {
 
     func markFailedToLoadUrl(_ url: URL) {
         mark(url: url, keyPath: \HistoryEntry.failedToLoad, value: true)
-    }
-
-    func markDownloadUrl(_ url: URL) {
-        mark(url: url, keyPath: \HistoryEntry.isDownload, value: true)
-
-        queue.async(flags: .barrier) { [weak self] in
-            guard let historyDictionary = self?.historyDictionary else { return }
-            if !url.isRoot, let rootUrl = url.root, let rootEntry = historyDictionary[rootUrl], rootEntry.numberOfVisits == 0 {
-                self?.mark(url: rootUrl, keyPath: \HistoryEntry.isDownload, value: true)
-            }
-        }
     }
 
     func title(for url: URL) -> String? {
@@ -249,41 +235,17 @@ final class HistoryCoordinator: HistoryCoordinating {
             .sink(receiveCompletion: { completion in
                 switch completion {
                 case .finished:
-                    os_log("Visit entry updated successfully. URL: %s, Title: %s, Number of visits: %d, failed to load: %s, is download: %s",
+                    os_log("Visit entry updated successfully. URL: %s, Title: %s, Number of visits: %d, failed to load: %s",
                            log: .history,
                            entry.url.absoluteString,
                            entry.title ?? "",
                            entry.numberOfVisits,
-                           entry.failedToLoad ? "yes" : "no",
-                           entry.isDownload ? "yes" : "no")
+                           entry.failedToLoad ? "yes" : "no")
                 case .failure(let error):
                     os_log("Saving of history entry failed: %s", log: .history, type: .error, error.localizedDescription)
                 }
             }, receiveValue: {})
             .store(in: &self.cancellables)
-    }
-
-    /// For the better user experience
-    /// When visiting a domain for the first time using a non-root URL, generating its root URL and adding into the history with the visit count 0
-    /// triggers the autocompletion of the root URL.
-    private func generateRootUrlIfNeeded(from url: URL) {
-        queue.async(flags: .barrier) { [weak self] in
-            guard var historyDictionary = self?.historyDictionary else {
-                os_log("Root URL of %s not saved. History not loaded yet", log: .history, url.absoluteString)
-                return
-            }
-
-            guard !url.isRoot, let rootUrl = url.root, historyDictionary[rootUrl] == nil else {
-                return
-            }
-
-            let entry = HistoryEntry(url: rootUrl)
-
-            historyDictionary[rootUrl] = entry
-            self?.historyDictionary = historyDictionary
-            self?._history = self?.makeHistory(from: historyDictionary)
-            self?.save(entry: entry)
-        }
     }
 
     /// Sets boolean value for the keyPath in HistroryEntry for the specified url
