@@ -36,6 +36,8 @@ extension Pixel {
 
         case crash
 
+        case brokenSiteReport
+
         case fireproof(kind: FireproofKind, repetition: Repetition = .init(key: "fireproof"), suggested: FireproofingSuggested)
         case fireproofSuggested(repetition: Repetition = .init(key: "fireproof-suggested"))
 
@@ -161,6 +163,9 @@ extension Pixel.Event {
 
         case .crash:
             return "m_mac_crash"
+
+        case .brokenSiteReport:
+            return "epbf"
 
         case .fireproof(kind: let kind, repetition: let repetition, suggested: let suggested):
             return "m_mac_fireproof_\(kind)_\(repetition)_\(suggested)"

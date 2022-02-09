@@ -23,19 +23,31 @@ final class FeedbackSender {
 
     static let feedbackURL = URL(string: "https://duckduckgo.com/feedback.js")!
 
-    func sendFeedback(_ feedback: Feedback, appVersion: String, osVersion: String) {
+    func sendFeedback(_ feedback: Feedback) {
         let parameters = [
             "type": "app-feedback",
-            "comment": feedback.comment ?? "",
-            "category": feedback.category.asanaId ?? "",
-            "osversion": osVersion,
-            "appversion": appVersion
+            "comment": feedback.comment,
+            "category": feedback.category.asanaId,
+            "osversion": feedback.osVersion,
+            "appversion": feedback.appVersion
         ]
 
         APIRequest.request(url: Self.feedbackURL, method: .post, parameters: parameters) { _, error in
             if let error = error {
                 os_log("FeedbackSender: Failed to submit feedback %s", type: .error, error.localizedDescription)
             }
+        }
+    }
+
+}
+
+fileprivate extension Feedback.Category {
+
+    var asanaId: String {
+        switch self {
+        case .bug: return "1199184518165816"
+        case .featureRequest: return "1199184518165815"
+        case .other: return "1200574389728916"
         }
     }
 

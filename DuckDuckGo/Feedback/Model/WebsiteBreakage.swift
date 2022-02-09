@@ -1,5 +1,5 @@
 //
-//  Feedback.swift
+//  WebsiteBreakage.swift
 //
 //  Copyright © 2022 DuckDuckGo. All rights reserved.
 //
@@ -17,19 +17,27 @@
 //
 
 import Foundation
-import QuartzCore
 
-struct Feedback {
+struct WebsiteBreakage {
 
-    enum Category {
-        case bug
-        case featureRequest
-        case other
+    enum Category: String, CaseIterable {
+        case theSiteAskedToDisable = "paywall"
+        case cantSignIn = "login"
+        case linksDontWork = "links"
+        case imagesDidntLoad = "images"
+        case videoDidntPlay = "videos"
+        case contentIsMissing = "content"
+        case commentsDidntLoad = "comments"
+        case somethingElse = "Other"
     }
 
     let category: Category
-    let comment: String
+    let siteUrl: URL
     let appVersion: String
     let osVersion: String
+    let upgradedHttps: Bool
+    let tdsETag: String?
+    let blockedTrackerDomains: [String]
+    let installedSurrogates: [String]
 
 }

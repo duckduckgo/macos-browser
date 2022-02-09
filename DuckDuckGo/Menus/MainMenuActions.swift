@@ -69,8 +69,8 @@ extension AppDelegate {
             return
         }
 
-        feedbackWindow.feedbackViewController.currentTabContent =
-            parentWindowController.mainViewController.tabCollectionViewModel.selectedTabViewModel?.tab.content
+        feedbackWindow.feedbackViewController.currentTab =
+            parentWindowController.mainViewController.tabCollectionViewModel.selectedTabViewModel?.tab
         parentWindowController.window?.beginSheet(feedbackWindow) { _ in }
     }
 

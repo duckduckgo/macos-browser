@@ -21,8 +21,23 @@ import Combine
 
 final class FeedbackViewController: NSViewController {
 
-    @IBOutlet weak var categoryPopUpButton: NSPopUpButton!
-    @IBOutlet weak var pickCategoryMenuItem: NSMenuItem!
+    enum FormOption {
+        case websiteBreakage
+        case feedback(feedbackCategory: Feedback.Category)
+
+        init?(tag: Int) {
+            switch tag {
+            case 0: self = FormOption.websiteBreakage
+            case 1: self = FormOption.feedback(feedbackCategory: .bug)
+            case 2: self = FormOption.feedback(feedbackCategory: .featureRequest)
+            case 3: self = FormOption.feedback(feedbackCategory: .other)
+            default: return nil
+            }
+        }
+    }
+
+    @IBOutlet weak var optionPopUpButton: NSPopUpButton!
+    @IBOutlet weak var pickOptionMenuItem: NSMenuItem!
     @IBOutlet weak var brokenWebsiteMenuItem: NSMenuItem!
 
     @IBOutlet weak var contentView: ColorView!
@@ -32,15 +47,17 @@ final class FeedbackViewController: NSViewController {
     @IBOutlet weak var textField: NSTextField!
 
     @IBOutlet weak var websiteBreakageView: NSView!
-    @IBOutlet weak var subcategoryPopUpButton: NSPopUpButton!
+    @IBOutlet weak var websiteBreakageCategoryPopUpButton: NSPopUpButton!
     @IBOutlet weak var pickIssueMenuItem: NSMenuItem!
+
     @IBOutlet weak var submitButton: NSButton!
 
     private var cancellables = Set<AnyCancellable>()
 
-    var currentTabContent: Tab.TabContent?
+    var currentTab: Tab?
 
     private let feedbackSender = FeedbackSender()
+    private let websiteBreakageSender = WebsiteBreakageSender()
 
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -65,11 +82,11 @@ final class FeedbackViewController: NSViewController {
         // swiftlint:enable notification_center_detachment
     }
 
-    @IBAction func categoryPopUpButton(_ sender: Any) {
+    @IBAction func optionPopUpButtonAction(_ sender: Any) {
         updateViews()
     }
 
-    @IBAction func subcategoryPopUpButton(_ sender: Any) {
+    @IBAction func websiteBreakageCategoryPopUpButtonAction(_ sender: Any) {
         updateViews()
     }
 
@@ -79,9 +96,9 @@ final class FeedbackViewController: NSViewController {
             return
         }
 
-        if popUpButton == categoryPopUpButton {
-            pickCategoryMenuItem.isEnabled = false
-        } else if popUpButton == subcategoryPopUpButton {
+        if popUpButton == optionPopUpButton {
+            pickOptionMenuItem.isEnabled = false
+        } else if popUpButton == websiteBreakageCategoryPopUpButton {
             pickIssueMenuItem.isEnabled = false
         } else {
             assertionFailure("Unknown popup button")
@@ -89,7 +106,11 @@ final class FeedbackViewController: NSViewController {
     }
 
     @IBAction func submitButtonAction(_ sender: Any) {
-        sendFeedback()
+        switch selectedFormOption {
+        case .none: assertionFailure("Submit shouldn't be enabled"); return
+        case .websiteBreakage: sendWebsiteBreakage()
+        case .feedback: sendFeedback()
+        }
 
         guard let window = view.window,
               let sheetParent = window.sheetParent else {
@@ -110,18 +131,17 @@ final class FeedbackViewController: NSViewController {
         sheetParent.endSheet(window, returnCode: .cancel)
     }
 
-    private var selectedCategory: Feedback.Category? {
-        guard let categoryItem = categoryPopUpButton.selectedItem,
-              categoryItem.tag >= 0,
-              let category = Feedback.Category(tag: categoryItem.tag) else {
-                  return nil
-              }
-        return category
+    private var selectedFormOption: FormOption? {
+        guard let item = optionPopUpButton.selectedItem, item.tag >= 0 else {
+            return nil
+        }
+
+        return FormOption(tag: item.tag)
     }
 
-    private var selectedSubCategory: Feedback.Subcategory? {
-        guard let subcategoryItem = subcategoryPopUpButton.selectedItem,
-              let subcategory = Feedback.Subcategory(tag: subcategoryItem.tag) else {
+    private var selectedWebsiteBreakageCategory: WebsiteBreakage.Category? {
+        guard let subcategoryItem = websiteBreakageCategoryPopUpButton.selectedItem,
+              let subcategory = WebsiteBreakage.Category(tag: subcategoryItem.tag) else {
                   return nil
               }
         return subcategory
@@ -132,24 +152,24 @@ final class FeedbackViewController: NSViewController {
             updateSubmitButton()
         }
 
-        guard let selectedCategory = selectedCategory else {
+        guard let selectedFormOption = selectedFormOption else {
             browserFeedbackView.isHidden = true
             websiteBreakageView.isHidden = true
             contentViewHeightContraint.constant = 160
-            pickCategoryMenuItem.isEnabled = true
+            pickOptionMenuItem.isEnabled = true
             return
         }
 
         let contentHeight: CGFloat
-        switch selectedCategory {
-        case .bug, .featureRequest, .other:
+        switch selectedFormOption {
+        case .feedback:
             browserFeedbackView.isHidden = false
             contentHeight = 338
             textField.makeMeFirstResponder()
         case .websiteBreakage:
             browserFeedbackView.isHidden = true
             contentHeight = 235
-            if selectedSubCategory == nil {
+            if selectedWebsiteBreakageCategory == nil {
                 pickIssueMenuItem.isEnabled = true
             }
         }
@@ -162,20 +182,20 @@ final class FeedbackViewController: NSViewController {
     }
 
     private func updateSubmitButton() {
-        guard let selectedCategory = selectedCategory else {
+        guard let selectedFormOption = selectedFormOption else {
             submitButton.isEnabled = false
             return
         }
 
-        switch selectedCategory {
-        case .featureRequest, .bug, .other:
+        switch selectedFormOption {
+        case .feedback:
             if !textField.stringValue.trimmingWhitespaces().isEmpty {
                 submitButton.isEnabled = true
             } else {
                 submitButton.isEnabled = false
             }
         case .websiteBreakage:
-            if selectedSubCategory != nil {
+            if selectedWebsiteBreakageCategory != nil {
                 submitButton.isEnabled = true
             } else {
                 submitButton.isEnabled = false
@@ -186,41 +206,53 @@ final class FeedbackViewController: NSViewController {
     }
 
     private func updateBrokenWebsiteMenuItem() {
-        brokenWebsiteMenuItem.isEnabled = currentTabContent?.isUrl ?? false
+        brokenWebsiteMenuItem.isEnabled = currentTab?.content.isUrl ?? false
     }
 
     private func sendFeedback() {
-        guard let category = selectedCategory,
-              let feedback = Feedback(category: category,
-                                      subcategory: selectedSubCategory,
-                                      comment: textField.stringValue == "" ? nil : textField.stringValue)
-        else {
+        guard let selectedFormOption = selectedFormOption else {
             assertionFailure("Can't send feedback")
             return
         }
-        feedbackSender.sendFeedback(feedback,
+
+        switch selectedFormOption {
+        case .websiteBreakage: assertionFailure("Wrong method executed")
+        case .feedback(feedbackCategory: let feedbackCategory):
+            let feedback = Feedback(category: feedbackCategory,
+                                    comment: textField.stringValue,
                                     appVersion: "\(AppVersion.shared.versionNumber)",
                                     osVersion: "\(ProcessInfo.processInfo.operatingSystemVersion)")
+            feedbackSender.sendFeedback(feedback)
+        }
     }
-}
 
-fileprivate extension Feedback.Category {
-
-    init?(tag: Int) {
-        switch tag {
-        case 0: self = .websiteBreakage
-        case 1: self = .bug
-        case 2: self = .featureRequest
-        case 3: self = .other
-        default:
-            return nil
+    private func sendWebsiteBreakage() {
+        guard let selectedFormOption = selectedFormOption,
+              let selectedWebsiteBreakageCategory = selectedWebsiteBreakageCategory,
+              let siteUrl = currentTab?.content.url else {
+            assertionFailure("Can't send breakage")
+            return
         }
 
+        switch selectedFormOption {
+        case .feedback: assertionFailure("Wrong method executed")
+        case .websiteBreakage:
+            let blockedTrackerDomains = currentTab?.trackerInfo?.trackersBlocked.compactMap { $0.domain } ?? []
+            let installedSurrogates = currentTab?.trackerInfo?.installedSurrogates.map {$0} ?? []
+            let websiteBreakage = WebsiteBreakage(category: selectedWebsiteBreakageCategory,
+                                                  siteUrl: siteUrl,
+                                                  appVersion: "\(AppVersion.shared.versionNumber)",
+                                                  osVersion: "\(ProcessInfo.processInfo.operatingSystemVersion)",
+                                                  upgradedHttps: currentTab?.connectionUpgradedTo != nil,
+                                                  tdsETag: DefaultConfigurationStorage.shared.loadEtag(for: .trackerRadar),
+                                                  blockedTrackerDomains: blockedTrackerDomains,
+                                                  installedSurrogates: installedSurrogates)
+            websiteBreakageSender.sendWebsiteBreakage(websiteBreakage)
+        }
     }
-
 }
 
-fileprivate extension Feedback.Subcategory {
+fileprivate extension WebsiteBreakage.Category {
 
     init?(tag: Int) {
         switch tag {

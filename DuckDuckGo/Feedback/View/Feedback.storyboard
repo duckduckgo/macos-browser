@@ -106,7 +106,7 @@
                                             </menu>
                                         </popUpButtonCell>
                                         <connections>
-                                            <action selector="categoryPopUpButton:" target="TOa-sP-KHa" id="Ob6-Fs-Z0f"/>
+                                            <action selector="optionPopUpButtonAction:" target="TOa-sP-KHa" id="UAa-qp-Arp"/>
                                         </connections>
                                     </popUpButton>
                                     <customView hidden="YES" translatesAutoresizingMaskIntoConstraints="NO" id="8Xi-CY-jyt" userLabel="Browser Feedback View">
@@ -188,7 +188,7 @@
                                                     </menu>
                                                 </popUpButtonCell>
                                                 <connections>
-                                                    <action selector="subcategoryPopUpButton:" target="TOa-sP-KHa" id="HLX-Ka-Z1l"/>
+                                                    <action selector="websiteBreakageCategoryPopUpButtonAction:" target="TOa-sP-KHa" id="k1b-m9-V8B"/>
                                                 </connections>
                                             </popUpButton>
                                             <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="NLb-RN-SpK">
@@ -300,14 +300,14 @@ Gw
                     <connections>
                         <outlet property="brokenWebsiteMenuItem" destination="uoX-qE-3kz" id="wmY-ud-Nqg"/>
                         <outlet property="browserFeedbackView" destination="8Xi-CY-jyt" id="5IL-yu-IWc"/>
-                        <outlet property="categoryPopUpButton" destination="7Z6-Ji-PH7" id="4aZ-ZE-ym6"/>
                         <outlet property="contentView" destination="wYB-07-s0m" id="XXQ-Fh-tQF"/>
                         <outlet property="contentViewHeightContraint" destination="0W2-HI-Vs8" id="vY1-me-1T6"/>
-                        <outlet property="pickCategoryMenuItem" destination="z2T-3Y-jPK" id="6dO-Or-fk2"/>
+                        <outlet property="optionPopUpButton" destination="7Z6-Ji-PH7" id="4aZ-ZE-ym6"/>
                         <outlet property="pickIssueMenuItem" destination="50u-Do-Pk7" id="Y1x-aK-HtI"/>
-                        <outlet property="subcategoryPopUpButton" destination="hUd-Rb-6Ls" id="DqR-hE-Sm5"/>
+                        <outlet property="pickOptionMenuItem" destination="z2T-3Y-jPK" id="6dO-Or-fk2"/>
                         <outlet property="submitButton" destination="Gy6-KF-A15" id="aBn-VX-sGY"/>
                         <outlet property="textField" destination="wK6-n4-LX0" id="iIL-8c-BX9"/>
+                        <outlet property="websiteBreakageCategoryPopUpButton" destination="hUd-Rb-6Ls" id="DqR-hE-Sm5"/>
                         <outlet property="websiteBreakageView" destination="8B9-wf-zcP" id="enA-tH-Z1l"/>
                     </connections>
                 </viewController>
