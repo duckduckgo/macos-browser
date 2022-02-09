@@ -81,8 +81,12 @@ final class CSVImporter: DataImporter {
             return 0
         }
 
+        var seen: [String: Bool] = [:]
+
         let logins = extractLogins(from: fileContents)
-        return logins.count
+        let uniqueLogins = logins.filter { seen.updateValue(true, forKey: "\($0.url)-\($0.username)") == nil }
+        
+        return uniqueLogins.count
     }
 
     static func extractLogins(from fileContents: String) -> [ImportedLoginCredential] {
