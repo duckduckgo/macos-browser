@@ -49,15 +49,33 @@ final class PasswordManagementViewController: NSViewController {
     @IBOutlet var searchField: NSTextField!
     @IBOutlet var divider: NSView!
     @IBOutlet var emptyState: NSView!
+    @IBOutlet var emptyStateImageView: NSImageView!
     @IBOutlet var emptyStateTitle: NSTextField!
     @IBOutlet var emptyStateMessage: NSTextField!
+    @IBOutlet var emptyStateButton: NSButton!
 
+    var displayedItemsCancellable: AnyCancellable?
     var editingCancellable: AnyCancellable?
 
     var domain: String?
     var isDirty = false
 
-    var listModel: PasswordManagementItemListModel?
+    var listModel: PasswordManagementItemListModel? {
+        didSet {
+            displayedItemsCancellable?.cancel()
+            displayedItemsCancellable = nil
+
+            displayedItemsCancellable = listModel?.$displayedItems.sink(receiveValue: { [weak self] items in
+                if items.isEmpty {
+                    self?.emptyStateImageView.imageScaling = .scaleProportionallyUpOrDown
+                    self?.configureEmptyState()
+                } else {
+                    self?.emptyState.isHidden = true
+                }
+            })
+        }
+    }
+
     var listView: NSView?
 
     var itemModel: PasswordManagementItemModel? {
@@ -98,6 +116,47 @@ final class PasswordManagementViewController: NSViewController {
         } else {
             refetchWithText(isDirty ? "" : domain ?? "", clearWhenNoMatches: true)
         }
+    }
+    
+    private func configureEmptyState() {
+        guard let category = listModel?.sortDescriptor.category else {
+            return
+        }
+        
+        switch category {
+        case .allItems:
+            showDefaultEmptyState()
+        case .logins:
+            showEmptyState(imageName: "Login", title: "No Logins")
+        case .identities:
+            showEmptyState(imageName: "Identity", title: "No Identities")
+        case .cards:
+            showEmptyState(imageName: "Card", title: "No Cards")
+        case .notes:
+            showEmptyState(imageName: "Note", title: "No Notes")
+        }
+    }
+
+    private func showDefaultEmptyState() {
+        emptyState.isHidden = false
+        emptyStateMessage.isHidden = false
+        emptyStateButton.isHidden = false
+        
+        emptyStateImageView.image = NSImage(named: "LoginsEmpty")
+
+        let title = "No logins or credit card info yet"
+        emptyStateTitle.attributedStringValue = NSAttributedString.make(title, lineHeight: 1.14, kern: -0.23)
+        let message = "If your logins are saved in another browser, you can import them into DuckDuckGo."
+        emptyStateMessage.attributedStringValue = NSAttributedString.make(message, lineHeight: 1.05, kern: -0.08)
+    }
+    
+    private func showEmptyState(imageName: String, title: String) {
+        emptyState.isHidden = false
+        
+        emptyStateImageView.image = NSImage(named: imageName)
+        emptyStateTitle.attributedStringValue = NSAttributedString.make(title, lineHeight: 1.14, kern: -0.23)
+        emptyStateMessage.isHidden = true
+        emptyStateButton.isHidden = true
     }
 
     @IBAction func onNewClicked(_ sender: NSButton) {
@@ -471,6 +530,7 @@ final class PasswordManagementViewController: NSViewController {
                   }
 
             func loadNewItemWithID() {
+                print("DEBUG: Loading new item: \(newValue)")
                 switch newValue {
                 case .account:
                     guard let credentials = try? self?.secureVault?.websiteCredentialsFor(accountId: id) else { return }
