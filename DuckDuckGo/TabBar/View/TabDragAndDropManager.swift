@@ -26,19 +26,22 @@ final class TabDragAndDropManager {
 
     private init() { }
 
-    private typealias Unit = (tabCollectionViewModel: TabCollectionViewModel, indexPath: IndexPath)
+    private struct Unit {
+        weak var tabCollectionViewModel: TabCollectionViewModel?
+        var indexPath: IndexPath
+    }
 
     private var sourceUnit: Unit?
     private var destinationUnit: Unit?
     private(set) var isDropRequested: Bool = false
 
     func setSource(tabCollectionViewModel: TabCollectionViewModel, indexPath: IndexPath) {
-        sourceUnit = (tabCollectionViewModel, indexPath)
+        sourceUnit = .init(tabCollectionViewModel: tabCollectionViewModel, indexPath: indexPath)
     }
 
     func setDestination(tabCollectionViewModel: TabCollectionViewModel, indexPath: IndexPath) {
         isDropRequested = true
-        destinationUnit = (tabCollectionViewModel, indexPath)
+        destinationUnit = .init(tabCollectionViewModel: tabCollectionViewModel, indexPath: indexPath)
     }
 
     func performDragAndDropIfNeeded() -> Bool {
@@ -54,14 +57,17 @@ final class TabDragAndDropManager {
 
     private func performDragAndDrop() {
         guard let sourceUnit = sourceUnit, let destinationUnit = destinationUnit,
-              let tab = sourceUnit.tabCollectionViewModel.tabViewModel(at: sourceUnit.indexPath.item)?.tab else {
+              let sourceTabCollectionViewModel = sourceUnit.tabCollectionViewModel,
+              let destinationTabCollectionViewModel = destinationUnit.tabCollectionViewModel,
+              let tab = sourceTabCollectionViewModel.tabViewModel(at: sourceUnit.indexPath.item)?.tab
+        else {
             os_log("TabDragAndDropManager: Missing data to perform drag and drop", type: .error)
             return
         }
-        let newIndexPath = min(destinationUnit.indexPath.item + 1, destinationUnit.tabCollectionViewModel.tabCollection.tabs.count)
+        let newIndexPath = min(destinationUnit.indexPath.item + 1, destinationTabCollectionViewModel.tabCollection.tabs.count)
 
-        sourceUnit.tabCollectionViewModel.remove(at: sourceUnit.indexPath.item)
-        destinationUnit.tabCollectionViewModel.insert(tab: tab, at: newIndexPath)
+        sourceTabCollectionViewModel.remove(at: sourceUnit.indexPath.item)
+        destinationTabCollectionViewModel.insert(tab: tab, at: newIndexPath)
     }
 
     func clear() {
