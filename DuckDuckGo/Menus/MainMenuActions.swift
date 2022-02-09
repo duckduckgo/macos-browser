@@ -471,15 +471,25 @@ extension MainViewController {
 
     @IBAction func resetSecureVaultData(_ sender: Any?) {
         let vault = try? SecureVaultFactory.default.makeVault()
+        
         let accounts = (try? vault?.accounts()) ?? []
-        let accountIDs = accounts.compactMap(\.id)
+        for accountID in accounts.compactMap(\.id) {
+            try? vault?.deleteWebsiteCredentialsFor(accountId: accountID)
+        }
+        
+        let cards = (try? vault?.creditCards()) ?? []
+        for cardID in cards.compactMap(\.id) {
+            try? vault?.deleteCreditCardFor(cardId: cardID)
+        }
 
-        for accountID in accountIDs {
-            do {
-                try vault?.deleteWebsiteCredentialsFor(accountId: accountID)
-            } catch {
-                os_log("Failed to remove credential with account ID %d", type: .error, accountID)
-            }
+        let identities = (try? vault?.identities()) ?? []
+        for identityID in identities.compactMap(\.id) {
+            try? vault?.deleteIdentityFor(identityId: identityID)
+        }
+        
+        let notes = (try? vault?.notes()) ?? []
+        for noteID in notes.compactMap(\.id) {
+            try? vault?.deleteNoteFor(noteId: noteID)
         }
     }
     
