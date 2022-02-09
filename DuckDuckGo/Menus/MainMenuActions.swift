@@ -493,6 +493,20 @@ extension MainViewController {
         }
     }
     
+    @IBAction func resetBookmarks(_ sender: Any?) {
+        guard let topLevelEntities = LocalBookmarkManager.shared.list?.topLevelEntities else {
+            return
+        }
+        
+        for entity in topLevelEntities {
+            if let folder = entity as? BookmarkFolder {
+                LocalBookmarkManager.shared.remove(folder: folder)
+            } else if let bookmark = entity as? Bookmark {
+                LocalBookmarkManager.shared.remove(bookmark: bookmark)
+            }
+        }
+    }
+    
     @IBAction func resetMacWaitlistUnlockState(_ sender: Any?) {
         OnboardingViewModel().restart()
         let store = MacWaitlistEncryptedFileStorage()
