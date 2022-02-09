@@ -314,37 +314,39 @@ extension BrowserTabViewController: TabDelegate {
         }
     }
 
-    @MainActor
-    func tab(_ tab: Tab, requestedOpenExternalURL url: URL, forUserEnteredURL userEntered: Bool) async throws {
-        func searchForExternalUrl() {
-            tab.update(url: URL.makeSearchUrl(from: url.absoluteString), userEntered: false)
+    func tab(_ tab: Tab, requestedOpenExternalURL url: URL, forUserEnteredURL userEntered: Bool) {
+
+        let searchForExternalUrl = { [weak tab] in
+            tab?.update(url: URL.makeSearchUrl(from: url.absoluteString), userEntered: false)
         }
 
         guard NSWorkspace.shared.urlForApplication(toOpen: url) != nil else {
-            guard userEntered else { throw FailedToOpenExternallyError() }
+            guard userEntered else { return }
 
             searchForExternalUrl()
             return
         }
 
         let permissionType = PermissionType.externalScheme(scheme: url.scheme ?? "")
-        let granted = await tab.permissions.permissions([permissionType],
-                                                        requestedForDomain: webView?.url?.host,
-                                                        url: url,
-                                                        retryHandler: { [weak self, weak tab] in
+        let retryHandler = { [weak self, weak tab] in
             // `Allow` requested from context menu after denying
             guard let self = self, let tab = tab else { return }
             self.tab(tab, openExternalURL: url, touchingPermissionType: permissionType)
-        })
-
-        guard granted else {
-            if userEntered {
-                searchForExternalUrl()
-            }
-            return
         }
 
-        self.tab(tab, openExternalURL: url, touchingPermissionType: permissionType)
+        tab.permissions.permissions([permissionType],
+                                    requestedForDomain: webView?.url?.host ?? "localhost",
+                                    url: url,
+                                    retryHandler: retryHandler) { [weak self] granted in
+            guard granted else {
+                if userEntered {
+                    searchForExternalUrl()
+                }
+                return
+            }
+
+            self?.tab(tab, openExternalURL: url, touchingPermissionType: permissionType)
+        }
     }
 
     private func tab(_ tab: Tab, openExternalURL url: URL, touchingPermissionType permissionType: PermissionType) {
@@ -913,12 +915,6 @@ extension BrowserTabViewController: OnboardingDelegate {
         (view.window?.windowController as? MainWindowController)?.userInteraction(prevented: false)
     }
 
-}
-
-struct FailedToOpenExternallyError: Error, LocalizedError {
-    var errorDescription: String? {
-        UserText.failedToOpenExternally
-    }
 }
 
 // swiftlint:enable file_length

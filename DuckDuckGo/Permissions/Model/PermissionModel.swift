@@ -338,19 +338,6 @@ final class PermissionModel {
         }
     }
 
-    @MainActor
-    func permissions(_ permissions: [PermissionType],
-                     requestedForDomain domain: String?,
-                     url: URL? = nil,
-                     retryHandler: (() -> Void)? = nil) async -> Bool {
-
-        return await withCheckedContinuation { continuation in
-            self.permissions(permissions, requestedForDomain: domain, url: url, retryHandler: retryHandler) { decision in
-                continuation.resume(returning: decision)
-            }
-        }
-    }
-
     func mediaCaptureStateDidChange() {
         updatePermissions()
     }
