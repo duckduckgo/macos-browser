@@ -116,14 +116,6 @@ class CBRCompileTimeReporterTests: XCTestCase {
         }
     }
 
-    func testWaitingSucceedsDuringRegularNavigation() {
-        for (time, expectation) in waitExpectationSeq {
-            autoreleasepool {
-                _=performTest(withOnboardingFinished: true, waitTime: time, expectedWaitTime: expectation, result: .success)
-            }
-        }
-    }
-
     func testWhenTabClosedDuringOnboardingThenPixelIsFired() {
         for (time, expectation) in waitExpectationSeq {
             autoreleasepool {
