@@ -54,7 +54,7 @@ struct SecureVaultSorting {
         
         var controlAppearance: NSAppearance.Name {
             switch self {
-            case .allItems: return .aqua
+            case .allItems: return NSApp.appearance?.name ?? .aqua
             case .logins: return .aqua
             case .identities: return .darkAqua
             case .cards: return .darkAqua
