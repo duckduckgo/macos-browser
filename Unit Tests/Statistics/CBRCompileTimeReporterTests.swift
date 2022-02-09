@@ -22,9 +22,9 @@ import OHHTTPStubsSwift
 @testable import DuckDuckGo_Privacy_Browser
 
 class CBRCompileTimeReporterTests: XCTestCase {
+    typealias Reporter = AbstractContentBlockingAssetsCompilationTimeReporter<NSObject>
 
     let host = "improving.duckduckgo.com"
-    var reporter: AbstractContentBlockingAssetsCompilationTimeReporter<NSObject>!
     var tab: NSObject! = NSObject()
     var time = CACurrentMediaTime()
 
@@ -39,22 +39,24 @@ class CBRCompileTimeReporterTests: XCTestCase {
         super.tearDown()
     }
 
-    func initReporter(onboardingFinished: Bool) {
+    func initReporter(onboardingFinished: Bool) -> Reporter {
         var udWrapper = UserDefaultsWrapper(key: .onboardingFinished, defaultValue: true)
         udWrapper.wrappedValue = onboardingFinished
 
-        reporter = AbstractContentBlockingAssetsCompilationTimeReporter<NSObject>()
+        let reporter = Reporter()
         reporter.currentTime = { self.time }
+        return reporter
     }
 
+    @discardableResult
     func performTest(withOnboardingFinished onboardingFinished: Bool,
                      waitTime: TimeInterval,
                      expectedWaitTime: Pixel.Event.CompileRulesWaitTime,
                      result: Pixel.Event.WaitResult,
-                     runBeforeFinishing: ((AbstractContentBlockingAssetsCompilationTimeReporter<NSObject>) throws -> Void)? = nil) rethrows {
+                     runBeforeFinishing: ((Reporter) throws -> Void)? = nil) rethrows -> Reporter {
 
         HTTPStubs.removeAllStubs()
-        initReporter(onboardingFinished: onboardingFinished)
+        let reporter = initReporter(onboardingFinished: onboardingFinished)
         let pixel = Pixel.Event.compileRulesWait(onboardingShown: onboardingFinished ? .regularNavigation : .onboardingShown,
                                                  waitTime: expectedWaitTime,
                                                  result: result)
@@ -88,7 +90,8 @@ class CBRCompileTimeReporterTests: XCTestCase {
                                                          userInfo: nil))
         }
 
-        waitForExpectations(timeout: 1)
+        waitForExpectations(timeout: 5)
+        return reporter
     }
 
     typealias Pair = (TimeInterval, Pixel.Event.CompileRulesWaitTime)
@@ -107,42 +110,54 @@ class CBRCompileTimeReporterTests: XCTestCase {
 
     func testWhenWaitingSucceedsDuringOnboardingThenPixelIsFired() {
         for (time, expectation) in waitExpectationSeq {
-            performTest(withOnboardingFinished: false, waitTime: time, expectedWaitTime: expectation, result: .success)
+            autoreleasepool {
+                _=performTest(withOnboardingFinished: false, waitTime: time, expectedWaitTime: expectation, result: .success)
+            }
         }
     }
 
     func testWaitingSucceedsDuringRegularNavigation() {
         for (time, expectation) in waitExpectationSeq {
-            performTest(withOnboardingFinished: true, waitTime: time, expectedWaitTime: expectation, result: .success)
+            autoreleasepool {
+                _=performTest(withOnboardingFinished: true, waitTime: time, expectedWaitTime: expectation, result: .success)
+            }
         }
     }
 
     func testWhenTabClosedDuringOnboardingThenPixelIsFired() {
         for (time, expectation) in waitExpectationSeq {
-            performTest(withOnboardingFinished: false, waitTime: time, expectedWaitTime: expectation, result: .closed)
+            autoreleasepool {
+                _=performTest(withOnboardingFinished: false, waitTime: time, expectedWaitTime: expectation, result: .closed)
+            }
         }
     }
 
     func testWhenTabClosedDuringRegularNavigationThenPixelIsFired() {
         for (time, expectation) in waitExpectationSeq {
-            performTest(withOnboardingFinished: true, waitTime: time, expectedWaitTime: expectation, result: .closed)
+            autoreleasepool {
+                _=performTest(withOnboardingFinished: true, waitTime: time, expectedWaitTime: expectation, result: .closed)
+            }
         }
     }
 
     func testWhenAppQuitsDuringOnboardingThenPixelIsFired() {
         for (time, expectation) in waitExpectationSeq {
-            performTest(withOnboardingFinished: false, waitTime: time, expectedWaitTime: expectation, result: .quit)
+            autoreleasepool {
+                _=performTest(withOnboardingFinished: false, waitTime: time, expectedWaitTime: expectation, result: .quit)
+            }
         }
     }
 
     func testWhenAppQuitsDuringRegularNavigationThenPixelIsFired() {
         for (time, expectation) in waitExpectationSeq {
-            performTest(withOnboardingFinished: true, waitTime: time, expectedWaitTime: expectation, result: .quit)
+            autoreleasepool {
+                _=performTest(withOnboardingFinished: true, waitTime: time, expectedWaitTime: expectation, result: .quit)
+            }
         }
     }
 
     func testWhenReporterReceivesEventSequenceThenOnlyOnePixelIsFired() {
-        performTest(withOnboardingFinished: true, waitTime: 1, expectedWaitTime: .lessThan1s, result: .success)
+        let reporter = performTest(withOnboardingFinished: true, waitTime: 1, expectedWaitTime: .lessThan1s, result: .success)
 
         stub(condition: isHost(host)) { _ -> HTTPStubsResponse in
             XCTFail("Unexpected Pixel")
@@ -214,7 +229,7 @@ class CBRCompileTimeReporterTests: XCTestCase {
 
         struct Err: Error {}
         autoreleasepool {
-            try? performTest(withOnboardingFinished: false, waitTime: 4, expectedWaitTime: .lessThan5s, result: .success) { _ in
+            try? _=performTest(withOnboardingFinished: false, waitTime: 4, expectedWaitTime: .lessThan5s, result: .success) { _ in
                 self.tab = nil
                 throw Err()
             }
