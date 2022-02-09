@@ -337,8 +337,8 @@ extension BrowserTabViewController: TabDelegate {
         tab.permissions.permissions([permissionType],
                                     requestedForDomain: webView?.url?.host ?? "localhost",
                                     url: url,
-                                    retryHandler: retryHandler) { [weak self] granted in
-            guard granted else {
+                                    retryHandler: retryHandler) { [weak self, weak tab] granted in
+            guard granted, let tab = tab else {
                 if userEntered {
                     searchForExternalUrl()
                 }
