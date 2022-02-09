@@ -441,6 +441,8 @@ final class LocalBookmarkStore: BookmarkStore {
             bookmarkManagedObject.urlEncrypted = bookmarkOrFolder.url as NSURL?
             bookmarkManagedObject.dateAdded = NSDate.now
             bookmarkManagedObject.parentFolder = parent
+            
+            // Bookmarks from the bookmarks bar are imported as favorites
             bookmarkManagedObject.isFavorite = (!bookmarkOrFolder.isFolder && markBookmarksAsFavorite)
 
             if let children = bookmarkOrFolder.children {
