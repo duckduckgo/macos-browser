@@ -152,7 +152,7 @@ final class Tab: NSObject {
 
     let webView: WebView
 
-    var userEnteredUrl = true
+    var userEnteredUrl = false
 
     var contentChangeEnabled = true
     
