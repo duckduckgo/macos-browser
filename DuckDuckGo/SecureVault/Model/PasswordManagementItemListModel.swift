@@ -229,8 +229,11 @@ final class PasswordManagementItemListModel: ObservableObject {
             selectFirst()
         }
     }
+
     @Published private(set) var displayedItems = [PasswordManagementListSection]()
     @Published private(set) var selected: SecureVaultItem?
+    
+    var cancellables = Set<AnyCancellable>()
 
     private var onItemSelected: (_ old: SecureVaultItem?, _ new: SecureVaultItem?) -> Void
 

@@ -17,6 +17,7 @@
 //
 
 import Foundation
+import SwiftUI
 
 struct SecureVaultSorting {
     
@@ -38,6 +39,26 @@ struct SecureVaultSorting {
             case .identities: return "IdentityGlyph"
             case .cards: return "CreditCardGlyph"
             case .notes: return "NoteGlyph"
+            }
+        }
+        
+        var categoryColor: Color? {
+            switch self {
+            case .allItems: return nil
+            case .logins: return Color("LoginsColor")
+            case .identities: return Color("IdentitiesColor")
+            case .cards: return Color("CardsColor")
+            case .notes: return Color("NotesColor")
+            }
+        }
+        
+        var controlAppearance: NSAppearance.Name {
+            switch self {
+            case .allItems: return .aqua
+            case .logins: return .aqua
+            case .identities: return .darkAqua
+            case .cards: return .darkAqua
+            case .notes: return .aqua
             }
         }
     }

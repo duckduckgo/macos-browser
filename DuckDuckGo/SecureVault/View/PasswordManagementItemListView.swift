@@ -19,6 +19,7 @@
 import Foundation
 import SwiftUI
 import BrowserServicesKit
+import Combine
 
 struct ScrollOffsetKey: PreferenceKey {
     typealias Value = CGFloat
@@ -91,7 +92,7 @@ struct PasswordManagementItemListCategoryView: View {
     @EnvironmentObject var model: PasswordManagementItemListModel
     
     var categoryPickerColor: Color {
-        return model.sortDescriptor.category == .allItems ? Color("SecureVaultCategoryDefaultColor") : Color.accentColor.opacity(0.3)
+        return model.sortDescriptor.category.categoryColor ?? Color("SecureVaultCategoryDefaultColor")
     }
 
     var body: some View {
@@ -114,11 +115,18 @@ struct PasswordManagementItemListCategoryView: View {
                     }
 
                     item?.representedObject = category
-                    
+
                     if category == .allItems {
                         button.menu?.addItem(NSMenuItem.separator())
                     }
                 }
+                
+                button.selectionPublisher.sink { index in
+                    // I hate this and everything about it. It won't be here by the time a PR shows up
+                    let realIndex = (index <= 1) ? index : index - 1
+                    let category = SecureVaultSorting.Category.allCases[realIndex]
+                    button.appearance = NSAppearance(named: category.controlAppearance)
+                }.store(in: &model.cancellables)
                 
                 button.sizeToFit()
 
