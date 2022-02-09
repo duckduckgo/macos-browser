@@ -77,6 +77,18 @@ final class BrowserTabViewController: NSViewController {
         subscribeToErrorViewState()
     }
 
+    override func viewDidAppear() {
+        NotificationCenter.default.addObserver(self,
+                                               selector: #selector(windowWillClose(_:)),
+                                               name: NSWindow.willCloseNotification,
+                                               object: self.view.window)
+    }
+
+    @objc
+    private func windowWillClose(_ notification: NSNotification) {
+        self.removeWebViewFromHierarchy()
+    }
+
     private func subscribeToSelectedTabViewModel() {
         selectedTabViewModelCancellable = tabCollectionViewModel.$selectedTabViewModel
             .sink { [weak self] selectedTabViewModel in
