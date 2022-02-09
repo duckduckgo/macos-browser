@@ -55,10 +55,10 @@ final class AbstractContentBlockingAssetsCompilationTimeReporter<Caller: AnyObje
     }
 
     private func report(waitTime: TimeInterval, result: Pixel.Event.WaitResult, completionHandler: @escaping ((Error?) -> Void) = { _ in }) {
-        Pixel.fire(.compileRulesWait(onboardingShown: self.onboardingShown, waitTime: waitTime, result: result), onComplete: completionHandler)
-
         // report only once
         isFinished = true
+
+        Pixel.fire(.compileRulesWait(onboardingShown: self.onboardingShown, waitTime: waitTime, result: result), onComplete: completionHandler)
     }
 
     /// Called when Rules compilation finishes
