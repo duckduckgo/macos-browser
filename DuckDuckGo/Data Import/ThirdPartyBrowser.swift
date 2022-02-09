@@ -16,7 +16,7 @@
 //  limitations under the License.
 //
 
-import Foundation
+import AppKit
 
 private struct BundleIdentifiers {
     let production: String
@@ -28,45 +28,48 @@ private struct BundleIdentifiers {
     }
 }
 
-struct ThirdPartyBrowser {
+enum ThirdPartyBrowser: CaseIterable {
 
-    static var brave: ThirdPartyBrowser { ThirdPartyBrowser(type: .brave) }
-    static var chrome: ThirdPartyBrowser { ThirdPartyBrowser(type: .chrome) }
-    static var edge: ThirdPartyBrowser { ThirdPartyBrowser(type: .edge) }
-    static var firefox: ThirdPartyBrowser { ThirdPartyBrowser(type: .firefox) }
-    static var safari: ThirdPartyBrowser { ThirdPartyBrowser(type: .safari) }
+    case brave
+    case chrome
+    case edge
+    case firefox
+    case safari
+    
+    static var installedBrowsers: [ThirdPartyBrowser] {
+        return allCases.filter(\.isInstalled)
+    }
 
     static func browser(for source: DataImport.Source) -> ThirdPartyBrowser? {
         switch source {
-        case .brave:
-            return Self.brave
-        case .chrome:
-            return Self.chrome
-        case .edge:
-            return Self.edge
-        case .firefox:
-            return Self.firefox
-        case .safari:
-            return Self.safari
-        case .csv:
-            return nil
+        case .brave: return .brave
+        case .chrome: return .chrome
+        case .edge: return .edge
+        case .firefox: return .firefox
+        case .safari: return .safari
+        case .csv: return nil
         }
     }
 
-    enum BrowserType {
-        case brave
-        case chrome
-        case edge
-        case firefox
-        case safari
-    }
-
     var isInstalled: Bool {
-        return applicationPath != nil
+        let detectedApplicationPath = applicationPath != nil
+        let detectedBrowserProfiles = !(browserProfiles?.profiles.isEmpty ?? true)
+        
+        return detectedApplicationPath && detectedBrowserProfiles
     }
 
     var isRunning: Bool {
         return !findRunningApplications().isEmpty
+    }
+    
+    var importSource: DataImport.Source {
+        switch self {
+        case .brave: return .brave
+        case .chrome: return .chrome
+        case .edge: return .edge
+        case .firefox: return .firefox
+        case .safari: return .safari
+        }
     }
 
     var applicationIcon: NSImage? {
@@ -85,14 +88,14 @@ struct ThirdPartyBrowser {
                                                                                       options: [.skipsHiddenFiles]).filter(\.hasDirectoryPath) else {
             // Safari is an exception, as it may need permissions granted before being able to read the contents of the profile path. To be safe,
             // return the profile anyway and check the file system permissions when preparing to import.
-            if type == .safari {
-                return DataImport.BrowserProfileList(browser: self.type, profileURLs: [profilePath])
+            if self == .safari {
+                return DataImport.BrowserProfileList(browser: self, profileURLs: [profilePath])
             } else {
                 return nil
             }
         }
 
-        return DataImport.BrowserProfileList(browser: self.type, profileURLs: potentialProfileURLs)
+        return DataImport.BrowserProfileList(browser: self, profileURLs: potentialProfileURLs)
     }
 
     // Returns the first available path to the application. This will test the production bundle ID, and any known pre-release versions, such as the
@@ -108,7 +111,7 @@ struct ThirdPartyBrowser {
     }
 
     private var bundleIdentifiers: BundleIdentifiers {
-        switch type {
+        switch self {
         case .brave: return BundleIdentifiers(productionBundleID: "com.brave.Browser", relatedBundleIDs: ["com.brave.Browser.nightly"])
         case .chrome: return BundleIdentifiers(productionBundleID: "com.google.Chrome", relatedBundleIDs: ["com.google.Chrome.canary"])
         case .edge: return BundleIdentifiers(productionBundleID: "com.microsoft.edgemac", relatedBundleIDs: [])
@@ -119,8 +122,6 @@ struct ThirdPartyBrowser {
         case .safari: return BundleIdentifiers(productionBundleID: "com.apple.safari", relatedBundleIDs: [])
         }
     }
-
-    private let type: BrowserType
 
     func forceTerminate() {
         let applications = findRunningApplications()
@@ -145,7 +146,7 @@ struct ThirdPartyBrowser {
     private func profilesDirectory() -> URL {
         let applicationSupportURL = FileManager.default.urls(for: .applicationSupportDirectory, in: .userDomainMask)[0]
 
-        switch type {
+        switch self {
         case .brave: return applicationSupportURL.appendingPathComponent("BraveSoftware/Brave-Browser/")
         case .chrome: return applicationSupportURL.appendingPathComponent("Google/Chrome/")
         case .edge: return applicationSupportURL.appendingPathComponent("Microsoft Edge/")

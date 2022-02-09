@@ -16,7 +16,7 @@
 //  limitations under the License.
 //
 
-import Foundation
+import AppKit
 import Combine
 
 protocol BookmarkManagementDetailViewControllerDelegate: AnyObject {
@@ -40,6 +40,9 @@ final class BookmarkManagementDetailViewController: NSViewController {
     @IBOutlet var tableView: NSTableView!
     @IBOutlet var colorView: ColorView!
     @IBOutlet var contextMenu: NSMenu!
+    @IBOutlet var emptyState: NSView!
+    @IBOutlet var emptyStateTitle: NSTextField!
+    @IBOutlet var emptyStateMessage: NSTextField!
 
     weak var delegate: BookmarkManagementDetailViewControllerDelegate?
 
@@ -86,9 +89,12 @@ final class BookmarkManagementDetailViewController: NSViewController {
         tableView.registerForDraggedTypes([BookmarkPasteboardWriter.bookmarkUTIInternalType,
                                            FolderPasteboardWriter.folderUTIInternalType])
 
-        configureTableHighlight()
         reloadData()
-    }
+        self.tableView.selectionHighlightStyle = .none
+
+        emptyStateTitle.attributedStringValue = NSAttributedString.make(emptyStateTitle.stringValue, lineHeight: 1.14, kern: -0.23)
+        emptyStateMessage.attributedStringValue = NSAttributedString.make(emptyStateMessage.stringValue, lineHeight: 1.05, kern: -0.08)
+   }
 
     override func viewDidDisappear() {
         super.viewDidDisappear()
@@ -101,38 +107,25 @@ final class BookmarkManagementDetailViewController: NSViewController {
         updateEditingState(forRowAt: -1)
     }
 
-    func configureTableHighlight() {
-        tableView.selectionHighlightStyle = .none
-    }
-
     fileprivate func reloadData() {
         guard editingBookmarkIndex == nil else {
             // If the table view is editing, the reload will be deferred until after the cell animation has completed.
             return
         }
-
+        emptyState.isHidden = !(bookmarkManager.list?.topLevelEntities.isEmpty ?? true)
         self.tableView.reloadData()
     }
 
-    @IBAction func handleClick(_ sender: NSTableView) {
+    @IBAction func onImportClicked(_ sender: NSButton) {
+        DataImportViewController.show()
+    }
+
+    @IBAction func handleDoubleClick(_ sender: NSTableView) {
         let index = sender.clickedRow
 
-        guard index != -1, let entity = fetchEntity(at: index) else {
-            updateEditingState(forRowAt: index)
+        guard index != -1, editingBookmarkIndex?.index != index, let entity = fetchEntity(at: index) else {
             return
         }
-
-        let row = sender.view(atColumn: 0, row: index, makeIfNecessary: false) as? BookmarkTableCellView
-
-        if row?.editing ?? false {
-            return
-        }
-
-        // 1. Command: Open in Background Tab
-        // 2. Command + Shift: Open in New Window
-        // 3. Default: Open in Current Tab
-
-        editingBookmarkIndex = nil
 
         if let bookmark = entity as? Bookmark {
             if NSApplication.shared.isCommandPressed && NSApplication.shared.isShiftPressed {
@@ -140,15 +133,20 @@ final class BookmarkManagementDetailViewController: NSViewController {
             } else if NSApplication.shared.isCommandPressed {
                 WindowControllersManager.shared.show(url: bookmark.url, newTab: true)
             } else {
-                WindowControllersManager.shared.show(url: bookmark.url)
-                tableView.deselectAll(nil)
+                WindowControllersManager.shared.show(url: bookmark.url, newTab: true)
             }
-
             Pixel.fire(.navigation(kind: .bookmark(isFavorite: bookmark.isFavorite), source: .managementInterface))
         } else if let folder = entity as? BookmarkFolder {
+            resetSelections()
             delegate?.bookmarkManagementDetailViewControllerDidSelectFolder(folder)
-        } else {
-            assertionFailure("\(#file): Failed to cast selected object to Folder or Bookmark")
+        }
+    }
+
+    @IBAction func handleClick(_ sender: NSTableView) {
+        let index = sender.clickedRow
+
+        if index != editingBookmarkIndex?.index {
+            endEditing()
         }
     }
 
@@ -164,28 +162,24 @@ final class BookmarkManagementDetailViewController: NSViewController {
         beginSheet(addFolderViewController)
     }
 
+    private func endEditing() {
+        if let editingIndex = editingBookmarkIndex?.index {
+            animateEditingState(forRowAt: editingIndex, editing: false)
+        }
+        self.editingBookmarkIndex = nil
+    }
+
     private func updateEditingState(forRowAt index: Int) {
         guard index != -1 else {
-            if let expandedIndex = self.editingBookmarkIndex?.index {
-                animateEditingState(forRowAt: expandedIndex, editing: false) {
-                    self.editingBookmarkIndex = nil
-                }
-            }
-
+            endEditing()
             return
         }
 
-        // Cancel the current editing state, if one exists.
-        if let expandedIndex = self.editingBookmarkIndex?.index {
-            animateEditingState(forRowAt: expandedIndex, editing: false)
-            self.editingBookmarkIndex = nil
+        if editingBookmarkIndex?.index == nil || editingBookmarkIndex?.index != index {
+            endEditing()
         }
 
-        // If the current expanded row matches the one that has just been double clicked, we're going to deselect it.
-        if editingBookmarkIndex?.index == index {
-            editingBookmarkIndex = nil
-            animateEditingState(forRowAt: index, editing: false)
-        } else if let entity = fetchEntity(at: index) {
+        if let entity = fetchEntity(at: index) {
             editingBookmarkIndex = EditedBookmarkMetadata(uuid: entity.id, index: index)
             animateEditingState(forRowAt: index, editing: true)
         } else {
@@ -266,6 +260,8 @@ extension BookmarkManagementDetailViewController: NSTableViewDelegate, NSTableVi
 
     func tableView(_ tableView: NSTableView, rowViewForRow row: Int) -> NSTableRowView? {
         let rowView = BookmarkTableRowView()
+        rowView.onSelectionChanged = onSelectionChanged
+
         let entity = fetchEntity(at: row)
 
         if let uuid = editingBookmarkIndex?.uuid, uuid == entity?.id {
@@ -290,7 +286,7 @@ extension BookmarkManagementDetailViewController: NSTableViewDelegate, NSTableVi
             } else {
                 assertionFailure("Failed to cast bookmark")
             }
-
+            cell.isSelected = tableView.selectedRowIndexes.contains(row)
             return cell
         }
 
@@ -401,6 +397,34 @@ extension BookmarkManagementDetailViewController: NSTableViewDelegate, NSTableVi
     fileprivate func selectedItems() -> [AnyObject] {
         return tableView.selectedRowIndexes.compactMap { (index) -> AnyObject? in
             return fetchEntity(at: index) as AnyObject
+        }
+    }
+
+    /// Updates the next/previous selection state of each row, and clears the selection flag.
+    fileprivate func resetSelections() {
+        guard totalRows() > 0 else { return }
+
+        let indexes = tableView.selectedRowIndexes
+        for index in 0 ..< totalRows() {
+            let row = self.tableView.rowView(atRow: index, makeIfNecessary: false) as? BookmarkTableRowView
+            row?.hasPrevious = indexes.contains(index - 1)
+            row?.hasNext = indexes.contains(index + 1)
+
+            let cell = self.tableView.view(atColumn: 0, row: index, makeIfNecessary: false) as? BookmarkTableCellView
+            cell?.isSelected = false
+        }
+    }
+        
+    func tableViewSelectionDidChange(_ notification: Notification) {
+        onSelectionChanged()
+    }
+
+    func onSelectionChanged() {
+        resetSelections()
+        let indexes = tableView.selectedRowIndexes
+        indexes.forEach {
+            let cell = self.tableView.view(atColumn: 0, row: $0, makeIfNecessary: false) as? BookmarkTableCellView
+            cell?.isSelected = true
         }
     }
 

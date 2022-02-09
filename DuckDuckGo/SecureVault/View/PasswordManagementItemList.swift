@@ -26,30 +26,72 @@ struct PasswordManagementItemListView: View {
 
     var body: some View {
 
-        ScrollView {
-            VStack(alignment: .leading) {
-                Spacer(minLength: 10)
-
-                ForEach(model.displayedItems, id: \.title) { section in
-
-                    Section(header: Text(section.title).padding(.leading, 18).padding(.top, 10)) {
-
-                        ForEach(section.items, id: \.id) { item in
-                            ItemView(item: item, selected: model.selected == item) {
-                                model.selected(item: item)
+        if #available(macOS 11.0, *) {
+            ScrollView {
+                ScrollViewReader { proxy in
+                    PasswordManagementItemListStackView()
+                        .onAppear {
+                            // Scrolling to the selected item doesn't work consistently without a very slight delay.
+                            DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
+                                if let selectionID = model.selected?.id {
+                                    proxy.scrollTo(selectionID, anchor: .center)
+                                }
                             }
-                            .padding(.horizontal, 10)
                         }
-                    }
-
                 }
-
-                Spacer(minLength: 10)
             }
+        } else {
+            PasswordManagementItemListStackView()
         }
 
     }
 
+}
+
+struct PasswordManagementItemListStackView: View {
+    
+    @EnvironmentObject var model: PasswordManagementItemListModel
+    
+    var body: some View {
+        
+        if #available(macOS 11.0, *) {
+            LazyVStack(alignment: .leading) {
+                PasswordManagementItemStackContentsView()
+            }
+        } else {
+            VStack(alignment: .leading) {
+                PasswordManagementItemStackContentsView()
+            }
+        }
+        
+    }
+    
+}
+
+private struct PasswordManagementItemStackContentsView: View {
+    
+    @EnvironmentObject var model: PasswordManagementItemListModel
+
+    var body: some View {
+        Spacer(minLength: 10)
+        
+        ForEach(model.displayedItems, id: \.title) { section in
+            
+            Section(header: Text(section.title).padding(.leading, 18).padding(.top, 10)) {
+                
+                ForEach(section.items, id: \.id) { item in
+                    ItemView(item: item, selected: model.selected == item) {
+                        model.selected(item: item)
+                    }
+                    .padding(.horizontal, 10)
+                }
+            }
+            
+        }
+        
+        Spacer(minLength: 10)
+    }
+    
 }
 
 private struct ItemView: View {
@@ -110,13 +152,11 @@ private struct PasswordManagerItemButtonStyle: ButtonStyle {
 
     func makeBody(configuration: Self.Configuration) -> some View {
 
-        let fillColor = configuration.isPressed ? Color.accentColor.opacity(0.6) : bgColor
-
         configuration.label
             .padding(.vertical, 8)
             .frame(maxWidth: .infinity, alignment: .leading)
             .truncationMode(.tail)
-            .background(RoundedRectangle(cornerRadius: 3, style: .continuous).fill(fillColor))
+            .background(RoundedRectangle(cornerRadius: 3, style: .continuous).fill(bgColor))
 
     }
 }

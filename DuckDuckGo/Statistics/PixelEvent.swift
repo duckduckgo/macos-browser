@@ -18,12 +18,14 @@
 
 import Foundation
 
+// swiftlint:disable identifier_name
 extension Pixel {
 
     enum Event {
         case appLaunch(isDefault: IsDefaultBrowser = .init(), launch: AppLaunch)
         case launchTiming
 
+        case appUsage
         case appActiveUsage(isDefault: IsDefaultBrowser = .init(), avgTabs: AverageTabsCount)
 
         case browserMadeDefault
@@ -73,11 +75,24 @@ extension Pixel {
         case importedLogins(repetition: Repetition = .init(key: "imported-logins"), source: DataImportSource)
         case exportedLogins(repetition: Repetition = .init(key: "exported-logins"))
         case importedBookmarks(repetition: Repetition = .init(key: "imported-bookmarks"), source: DataImportSource)
+        case exportedBookmarks(repetition: Repetition = .init(key: "exported-bookmarks"))
 
         case formAutofilled(kind: FormAutofillKind)
         case autofillItemSaved(kind: FormAutofillKind)
+        
+        case waitlistFirstLaunch
+        case waitlistMigratedExistingInstall
+        case waitlistPresentedLockScreen
+        case waitlistDismissedLockScreen
 
-        case debug(event: Debug, error: Error? = nil, countedBy: Pixel.Counter? = nil)
+        case onboardingStartPressed
+        case onboardingImportPressed
+        case onboardingImportSkipped
+        case onboardingSetDefaultPressed
+        case onboardingSetDefaultSkipped
+        case onboardingTypingSkipped
+
+        case debug(event: Debug, error: Error? = nil)
 
         enum Debug: String, CustomStringConvertible {
             var description: String { rawValue }
@@ -103,11 +118,25 @@ extension Pixel {
             case suggestionsFetchFailed = "sgf"
             case appOpenURLFailed = "url"
             case appStateRestorationFailed = "srf"
+            
+            case contentBlockingErrorReportingIssue = "content_blocking_error_reporting_issue"
+
+            case contentBlockingTDSCompilationFailed = "content_blocking_compilation_error_fetched_tds"
+            case contentBlockingTempListCompilationFailed = "content_blocking_compilation_error_temp_list"
+            case contentBlockingAllowListCompilationFailed = "content_blocking_compilation_error_allow_list"
+            case contentBlockingUnpSitesCompilationFailed = "content_blocking_compilation_error_unprotected_list"
+            case contentBlockingFallbackCompilationFailed = "content_blocking_compilation_error_fallback_tds"
+            
+            case clickToLoadTDSCompilationFailed = "click_to_load_compilation_error_fetched_tds"
+            case clickToLoadTempListCompilationFailed = "click_to_load_compilation_error_temp_list"
+            case clickToLoadAllowListCompilationFailed = "click_to_load_compilation_error_allow_list"
+            case clickToLoadUnpSitesCompilationFailed = "click_to_load_compilation_error_unprotected_list"
+            case clickToLoadFallbackCompilationFailed = "click_to_load_compilation_error_fallback_tds"
         }
 
     }
-
 }
+// swiftlint:enable identifier_name
 
 extension Pixel.Event {
 
@@ -117,6 +146,9 @@ extension Pixel.Event {
             return "ml_mac_app-launch_\(isDefault)_\(launch)"
         case .launchTiming:
             return "ml_mac_launch-timing"
+
+        case .appUsage:
+            return "m_mac_usage"
 
         case .appActiveUsage(isDefault: let isDefault, avgTabs: let avgTabs):
             return "m_mac_active-usage_\(isDefault)_\(avgTabs)"
@@ -181,14 +213,48 @@ extension Pixel.Event {
         case .importedBookmarks(repetition: let repetition, source: let source):
             return "m_mac_imported-bookmarks_\(repetition)_\(source)"
 
+        case .exportedBookmarks(repetition: let repetition):
+            return "m_mac_exported-bookmarks_\(repetition)"
+
         case .formAutofilled(kind: let kind):
             return "m_mac_autofill_\(kind)"
 
         case .autofillItemSaved(kind: let kind):
             return "m_mac_save_\(kind)"
+            
+        case .waitlistFirstLaunch:
+            return "m_mac_waitlist_first_launch_while_locked"
+            
+        case .waitlistMigratedExistingInstall:
+            return "m_mac_waitlist_migrated_existing_install"
+            
+        case .waitlistPresentedLockScreen:
+            return "m_mac_waitlist_lock_screen_presented"
+            
+        case .waitlistDismissedLockScreen:
+            return "m_mac_waitlist_lock_screen_dismissed"
 
-        case .debug(event: let event, error: _, countedBy: _):
+        case .debug(event: let event, error: _):
             return "m_mac_debug_\(event)"
+
+        case .onboardingStartPressed:
+            return "m_mac_onboarding_start_pressed"
+
+        case .onboardingImportPressed:
+            return "m_mac_onboarding_import_pressed"
+
+        case .onboardingImportSkipped:
+            return "m_mac_onboarding_import_skipped"
+
+        case .onboardingSetDefaultPressed:
+            return "m_mac_onboarding_setdefault_pressed"
+
+        case .onboardingSetDefaultSkipped:
+            return "m_mac_onboarding_setdefault_skipped"
+
+        case .onboardingTypingSkipped:
+            return "m_mac_onboarding_setdefault_skipped"
+
         }
     }
 

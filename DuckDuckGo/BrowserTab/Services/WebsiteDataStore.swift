@@ -17,26 +17,21 @@
 //
 
 import WebKit
+import GRDB
 import os
 
 public protocol HTTPCookieStore {
-
-    func getAllCookies(_ completionHandler: @escaping ([HTTPCookie]) -> Void)
-
-    func setCookie(_ cookie: HTTPCookie, completionHandler: (() -> Void)?)
-
-    func delete(_ cookie: HTTPCookie, completionHandler: (() -> Void)?)
-
+    func allCookies() async -> [HTTPCookie]
+    func setCookie(_ cookie: HTTPCookie) async
+    func deleteCookie(_ cookie: HTTPCookie) async
 }
 
 protocol WebsiteDataStore {
-
     var cookieStore: HTTPCookieStore? { get }
 
-    func fetchDataRecords(ofTypes dataTypes: Set<String>, completionHandler: @escaping ([WKWebsiteDataRecord]) -> Void)
-
-    func removeData(ofTypes dataTypes: Set<String>, for dataRecords: [WKWebsiteDataRecord], completionHandler: @escaping () -> Void)
-
+    func dataRecords(ofTypes dataTypes: Set<String>) async -> [WKWebsiteDataRecord]
+    func removeData(ofTypes dataTypes: Set<String>, modifiedSince date: Date) async
+    func removeData(ofTypes dataTypes: Set<String>, for records: [WKWebsiteDataRecord]) async
 }
 
 internal class WebCacheManager {
@@ -52,59 +47,124 @@ internal class WebCacheManager {
         self.websiteDataStore = websiteDataStore
     }
 
-    func clear(domains: Set<String>? = nil,
-               completion: @escaping () -> Void) {
+    func clear(domains: Set<String>? = nil) async {
+        // first cleanup ~/Library/Caches
+        await self.clearFileCache()
 
-        let all = WKWebsiteDataStore.allWebsiteDataTypes()
-        let allExceptCookies = all.filter { $0 != "WKWebsiteDataTypeCookies" }
+        await removeAllSafelyRemovableDataTypes()
+        
+        await removeLocalStorageAndIndexedDBForNonFireproofDomains()
 
-        websiteDataStore.fetchDataRecords(ofTypes: all) { [weak self] records in
+        await removeCookies(forDomains: domains)
 
-            // Remove all data except cookies for all domains, and then filter cookies to preserve those allowed by Fireproofing.
-            self?.websiteDataStore.removeData(ofTypes: allExceptCookies, for: records) { [weak self] in
-                guard let self = self else { return }
+        await self.removeResourceLoadStatisticsDatabase()
+    }
 
-                guard let cookieStore = self.websiteDataStore.cookieStore else {
-                    completion()
-                    return
+    private func clearFileCache() async {
+        let fm = FileManager.default
+        let cachesDir = fm.urls(for: .cachesDirectory, in: .userDomainMask).first!
+            .appendingPathComponent(Bundle.main.bundleIdentifier!)
+        let tmpDir = fm.temporaryDirectory(appropriateFor: cachesDir).appendingPathComponent(UUID().uuidString)
+
+        do {
+            try fm.createDirectory(at: tmpDir, withIntermediateDirectories: false, attributes: nil)
+        } catch {
+            os_log("Could not create temporary directory: %s", type: .error, "\(error)")
+            return
+        }
+
+        let contents = try? fm.contentsOfDirectory(atPath: cachesDir.path)
+        for name in contents ?? [] {
+            guard ["WebKit", "fsCachedData"].contains(name) || name.hasPrefix("Cache.") else { continue }
+            try? fm.moveItem(at: cachesDir.appendingPathComponent(name), to: tmpDir.appendingPathComponent(name))
+        }
+
+        try? fm.createDirectory(at: cachesDir.appendingPathComponent("WebKit"),
+                                withIntermediateDirectories: false,
+                                attributes: nil)
+
+        Process("/bin/rm", "-rf", tmpDir.path).launch()
+    }
+
+    @MainActor
+    private func removeAllSafelyRemovableDataTypes() async {
+        let safelyRemovableTypes = WKWebsiteDataStore.safelyRemovableWebsiteDataTypes
+
+        // Remove all data except cookies, local storage, and IndexedDB for all domains, and then filter cookies to preserve those allowed by Fireproofing.
+        await websiteDataStore.removeData(ofTypes: safelyRemovableTypes, modifiedSince: Date.distantPast)
+    }
+    
+    @MainActor
+    private func removeLocalStorageAndIndexedDBForNonFireproofDomains() async {
+        let allRecords = await websiteDataStore.dataRecords(ofTypes: WKWebsiteDataStore.allWebsiteDataTypes())
+        
+        let removableRecords = allRecords.filter { record in
+            // For Local Storage, only remove records that *exactly match* the display name.
+            // Subdomains or root domains should be excluded.
+            !fireproofDomains.fireproofDomains.contains(record.displayName)
+        }
+        
+        await websiteDataStore.removeData(ofTypes: WKWebsiteDataStore.allWebsiteDataTypesExceptCookies, for: removableRecords)
+    }
+
+    @MainActor
+    private func removeCookies(forDomains domains: Set<String>? = nil) async {
+        guard let cookieStore = websiteDataStore.cookieStore else { return }
+        var cookies = await cookieStore.allCookies()
+
+        if let domains = domains {
+            // If domains are specified, clear just their cookies
+            cookies = cookies.filter { cookie in
+                domains.contains {
+                    $0 == cookie.domain
+                    || ".\($0)" == cookie.domain
+                    || (cookie.domain.hasPrefix(".") && $0.hasSuffix(cookie.domain))
                 }
+            }
+        }
 
-                let group = DispatchGroup()
-                group.enter()
-                cookieStore.getAllCookies { cookies in
-                    var cookies = cookies
-                    if let domains = domains {
-                        // If domains are specified, clear just their cookies
-                        cookies = cookies.filter { cookie in
-                            domains.contains {
-                                $0 == cookie.domain
-                                || ".\($0)" == cookie.domain
-                                || (cookie.domain.hasPrefix(".") && $0.hasSuffix(cookie.domain))
-                            }
-                        }
-                    }
-                    // Don't clear fireproof domains
-                    let cookiesToRemove = cookies.filter { cookie in
-                        !self.fireproofDomains.isFireproof(cookieDomain: cookie.domain) && cookie.domain != URL.cookieDomain
-                    }
+        // Don't clear fireproof domains
+        let cookiesToRemove = cookies.filter { cookie in
+            !self.fireproofDomains.isFireproof(cookieDomain: cookie.domain) && cookie.domain != URL.cookieDomain
+        }
 
-                    for cookie in cookiesToRemove {
-                        group.enter()
-                        os_log("Deleting cookie for %s named %s", log: .fire, cookie.domain, cookie.name)
-                        cookieStore.delete(cookie) {
-                            group.leave()
-                        }
-                    }
+        for cookie in cookiesToRemove {
+            os_log("Deleting cookie for %s named %s", log: .fire, cookie.domain, cookie.name)
+            await cookieStore.deleteCookie(cookie)
+        }
+    }
+    
+    // WKWebView doesn't provide a way to remove the observations database, which contains domains that have been
+    // visited by the user. This database is removed directly as a part of the Fire button process.
+    private func removeResourceLoadStatisticsDatabase() async {
+        guard let bundleID = Bundle.main.bundleIdentifier,
+              var libraryURL = FileManager.default.urls(for: .libraryDirectory, in: .userDomainMask).first else {
+            return
+        }
 
-                    group.leave()
-                }
+        libraryURL.appendPathComponent("WebKit/\(bundleID)/WebsiteData/ResourceLoadStatistics")
+        
+        let contentsOfDirectory = (try? FileManager.default.contentsOfDirectory(at: libraryURL, includingPropertiesForKeys: [.nameKey])) ?? []
+        let fileNames = contentsOfDirectory.compactMap(\.suggestedFilename)
+        
+        guard fileNames.contains("observations.db") else {
+            return
+        }
 
-                DispatchQueue.global(qos: .background).async {
-                    group.wait()
-                    DispatchQueue.main.async {
-                        completion()
-                    }
-                }
+        // We've confirmed that the observations.db exists, now it can be cleaned out. We can't delete it entirely, as
+        // WebKit won't recreate it until next app launch.
+        
+        let databasePath = libraryURL.appendingPathComponent("observations.db")
+
+        guard let pool = try? DatabasePool(path: databasePath.absoluteString) else {
+            return
+        }
+        
+        try? pool.write { database in
+            let tables = try String.fetchAll(database, sql: "SELECT name FROM sqlite_master WHERE type='table'")
+            
+            for table in tables {
+                try database.execute(sql: "DELETE FROM \(table)")
             }
         }
     }

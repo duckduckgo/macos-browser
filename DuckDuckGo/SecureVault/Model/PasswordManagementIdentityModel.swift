@@ -33,6 +33,7 @@ final class PasswordManagementIdentityModel: ObservableObject, PasswordManagemen
     var onDirtyChanged: (Bool) -> Void
     var onSaveRequested: (SecureVaultModels.Identity) -> Void
     var onDeleteRequested: (SecureVaultModels.Identity) -> Void
+    var onCancelled: () -> Void
 
     var isEditingPublisher: Published<Bool>.Publisher {
         return $isEditing
@@ -106,6 +107,12 @@ final class PasswordManagementIdentityModel: ObservableObject, PasswordManagemen
             isDirty = true
         }
     }
+    
+    @Published var addressStreet2: String = "" {
+        didSet {
+            isDirty = true
+        }
+    }
 
     @Published var addressCity: String = "" {
         didSet {
@@ -160,10 +167,12 @@ final class PasswordManagementIdentityModel: ObservableObject, PasswordManagemen
 
     init(onDirtyChanged: @escaping (Bool) -> Void,
          onSaveRequested: @escaping (SecureVaultModels.Identity) -> Void,
-         onDeleteRequested: @escaping (SecureVaultModels.Identity) -> Void) {
+         onDeleteRequested: @escaping (SecureVaultModels.Identity) -> Void,
+         onCancelled: @escaping () -> Void) {
         self.onDirtyChanged = onDirtyChanged
         self.onSaveRequested = onSaveRequested
         self.onDeleteRequested = onDeleteRequested
+        self.onCancelled = onCancelled
     }
 
     func copy(_ value: String) {
@@ -183,6 +192,8 @@ final class PasswordManagementIdentityModel: ObservableObject, PasswordManagemen
             identity = nil
             isNew = false
         }
+
+        onCancelled()
     }
 
     func save() {
@@ -197,6 +208,7 @@ final class PasswordManagementIdentityModel: ObservableObject, PasswordManagemen
         identity.birthdayYear = birthdayYear
 
         identity.addressStreet = addressStreet
+        identity.addressStreet2 = addressStreet2
         identity.addressCity = addressCity
         identity.addressProvince = addressProvince
         identity.addressPostalCode = addressPostalCode
@@ -242,6 +254,7 @@ final class PasswordManagementIdentityModel: ObservableObject, PasswordManagemen
         birthdayYear = identity?.birthdayYear
 
         addressStreet = identity?.addressStreet ?? ""
+        addressStreet2 = identity?.addressStreet2 ?? ""
         addressCity = identity?.addressCity ?? ""
         addressProvince = identity?.addressProvince ?? ""
         addressPostalCode = identity?.addressPostalCode ?? ""

@@ -52,22 +52,6 @@ final class TabViewModelTests: XCTestCase {
         XCTAssertEqual(tabViewModel.addressBarString, "")
     }
 
-    func testWhenURLIsSearchThenAddressBarStringIsTheQuery() {
-        let tabViewModel = TabViewModel.aTabViewModel
-
-        let query = "query"
-        let searchUrl = URL.makeSearchUrl(from: query)
-        tabViewModel.tab.url = searchUrl
-
-        let addressBarStringExpectation = expectation(description: "Address bar string")
-
-        tabViewModel.$addressBarString.debounce(for: 0.1, scheduler: RunLoop.main).sink { addressBarString in
-            XCTAssertEqual(addressBarString, query)
-            addressBarStringExpectation.fulfill()
-        } .store(in: &cancellables)
-        waitForExpectations(timeout: 1, handler: nil)
-    }
-
     func testWhenURLIsSetThenAddressBarIsUpdated() {
         let tabViewModel = TabViewModel.aTabViewModel
 
@@ -153,23 +137,26 @@ final class TabViewModelTests: XCTestCase {
 
     // MARK: - Favicon
 
-    func testWhenURLIsNilThenFaviconIsHomeFavicon() {
-        let tabViewModel = TabViewModel.aTabViewModel
+    func testWhenContentIsNoneThenFaviconIsNil() {
+        let tab = Tab(content: .none)
+        let tabViewModel = TabViewModel(tab: tab)
 
-        XCTAssertEqual(tabViewModel.favicon, TabViewModel.Favicon.home)
+        XCTAssertEqual(tabViewModel.favicon, nil)
     }
 
-    func testWhenTabDownloadedFaviconThenFaviconIsNotNil() {
+    func testWhenContentIsHomeThenFaviconIsHome() {
         let tabViewModel = TabViewModel.aTabViewModel
-        tabViewModel.tab.url = URL(string: "http://apple.com")
+        tabViewModel.tab.setContent(.homepage)
 
         let faviconExpectation = expectation(description: "Favicon")
+        var fulfilled = false
 
-        tabViewModel.$favicon.debounce(for: 0.3, scheduler: RunLoop.main).sink { favicon in
-            XCTAssertNotNil(favicon)
-            XCTAssertNotEqual(favicon, TabViewModel.Favicon.home)
-            if favicon != TabViewModel.Favicon.defaultFavicon {
+        tabViewModel.$favicon.debounce(for: 0.1, scheduler: RunLoop.main).sink { favicon in
+            guard favicon != nil else { return }
+            if favicon == TabViewModel.Favicon.home,
+                !fulfilled {
                 faviconExpectation.fulfill()
+                fulfilled = true
             }
         } .store(in: &cancellables)
         waitForExpectations(timeout: 5, handler: nil)

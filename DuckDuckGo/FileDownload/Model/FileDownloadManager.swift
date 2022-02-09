@@ -38,14 +38,11 @@ final class FileDownloadManager: FileDownloadManagerProtocol {
     static let shared = FileDownloadManager()
     private let workspace: NSWorkspace
     private let preferences: DownloadPreferences
-    private let historyCoordinating: HistoryCoordinating
 
     init(workspace: NSWorkspace = NSWorkspace.shared,
-         preferences: DownloadPreferences = .init(),
-         historyCoordinating: HistoryCoordinating = HistoryCoordinator.shared) {
+         preferences: DownloadPreferences = .init()) {
         self.workspace = workspace
         self.preferences = preferences
-        self.historyCoordinating = historyCoordinating
     }
 
     private (set) var downloads = Set<WebKitDownloadTask>()
@@ -110,9 +107,6 @@ final class FileDownloadManager: FileDownloadManagerProtocol {
         downloads.insert(task)
         downloadAddedSubject.send(task)
         task.start(delegate: self)
-
-        if let url = download.originalRequest?.url { historyCoordinating.markDownloadUrl(url) }
-        if let mainDocumentUrl = download.originalRequest?.mainDocumentURL { historyCoordinating.markDownloadUrl(mainDocumentUrl) }
 
         return task
     }

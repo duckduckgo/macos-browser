@@ -18,6 +18,7 @@
 
 import Foundation
 import os.log
+import BrowserServicesKit
 
 final class HTTPSUpgrade {
 
@@ -27,12 +28,13 @@ final class HTTPSUpgrade {
     private let dataReloadLock = NSLock()
     private let store: HTTPSUpgradeStore
     private var bloomFilter: BloomFilterWrapper?
-    
+
     init(store: HTTPSUpgradeStore = HTTPSUpgradePersistence()) {
         self.store = store
     }
 
-    func isUpgradeable(url: URL, completion: @escaping UpgradeCheckCompletion) {
+    func isUpgradeable(url: URL, completion: @escaping UpgradeCheckCompletion,
+                       config: PrivacyConfiguration = ContentBlocking.privacyConfigurationManager.privacyConfig) {
         
         guard url.scheme == URL.NavigationalScheme.http.rawValue else {
             completion(false)
@@ -45,6 +47,11 @@ final class HTTPSUpgrade {
         }
         
         if store.shouldExcludeDomain(host) {
+            completion(false)
+            return
+        }
+
+        guard config.isFeature(.httpsUpgrade, enabledForDomain: host) else {
             completion(false)
             return
         }

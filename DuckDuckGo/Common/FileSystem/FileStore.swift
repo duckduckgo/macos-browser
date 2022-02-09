@@ -23,6 +23,7 @@ protocol FileStore {
     func persist(_ data: Data, url: URL) -> Bool
     func loadData(at url: URL) -> Data?
     func hasData(at url: URL) -> Bool
+    func directoryContents(at path: String) throws -> [String]
     func remove(fileAtURL url: URL)
 }
 
@@ -69,6 +70,10 @@ final class EncryptedFileStore: FileStore {
     func hasData(at url: URL) -> Bool {
         return FileManager.default.fileExists(atPath: url.path)
     }
+    
+    func directoryContents(at path: String) throws -> [String] {
+        return try FileManager.default.contentsOfDirectory(atPath: path)
+    }
 
     func remove(fileAtURL url: URL) {
         var isDir: ObjCBool = false
@@ -96,6 +101,10 @@ extension FileManager: FileStore {
 
     func hasData(at url: URL) -> Bool {
         return fileExists(atPath: url.path)
+    }
+    
+    func directoryContents(at path: String) throws -> [String] {
+        return try contentsOfDirectory(atPath: path)
     }
 
     func remove(fileAtURL url: URL) {

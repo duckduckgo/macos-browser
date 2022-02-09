@@ -19,6 +19,13 @@
 import Cocoa
 import Combine
 
+protocol FirePopoverViewControllerDelegate: AnyObject {
+
+    func firePopoverViewControllerDidClear(_ firePopoverViewController: FirePopoverViewController)
+    func firePopoverViewControllerDidCancel(_ firePopoverViewController: FirePopoverViewController)
+
+}
+
 final class FirePopoverViewController: NSViewController {
 
     struct Constants {
@@ -28,13 +35,12 @@ final class FirePopoverViewController: NSViewController {
         static let footerHeight: CGFloat = 8
     }
 
+    weak var delegate: FirePopoverViewControllerDelegate?
+
     private let fireViewModel: FireViewModel
     private let tabCollectionViewModel: TabCollectionViewModel
     private var firePopoverViewModel: FirePopoverViewModel
     private let historyCoordinating: HistoryCoordinating
-
-    @UserDefaultsWrapper(key: .fireInfoPresentedOnce, defaultValue: false)
-    var infoPresentedOnce: Bool
 
     @IBOutlet weak var optionsButton: NSPopUpButton!
     @IBOutlet weak var openDetailsButton: NSButton!
@@ -46,7 +52,6 @@ final class FirePopoverViewController: NSViewController {
     @IBOutlet weak var collectionView: NSCollectionView!
     @IBOutlet weak var collectionViewBottomConstraint: NSLayoutConstraint!
     @IBOutlet weak var warningWrapperView: NSView!
-    @IBOutlet weak var infoContainerView: NSView!
     @IBOutlet weak var clearButton: NSButton!
 
     private var viewModelCancellable: AnyCancellable?
@@ -56,11 +61,12 @@ final class FirePopoverViewController: NSViewController {
         fatalError("FirePopoverViewController: Bad initializer")
     }
 
-    init?(coder: NSCoder, fireViewModel: FireViewModel,
+    init?(coder: NSCoder,
+          fireViewModel: FireViewModel,
           tabCollectionViewModel: TabCollectionViewModel,
           historyCoordinating: HistoryCoordinating = HistoryCoordinator.shared,
           fireproofDomains: FireproofDomains = FireproofDomains.shared,
-          faviconService: FaviconService = LocalFaviconService.shared) {
+          faviconManagement: FaviconManagement = FaviconManager.shared) {
         self.fireViewModel = fireViewModel
         self.tabCollectionViewModel = tabCollectionViewModel
         self.historyCoordinating = historyCoordinating
@@ -68,7 +74,7 @@ final class FirePopoverViewController: NSViewController {
                                                          tabCollectionViewModel: tabCollectionViewModel,
                                                          historyCoordinating: historyCoordinating,
                                                          fireproofDomains: fireproofDomains,
-                                                         faviconService: faviconService)
+                                                         faviconManagement: faviconManagement)
 
         super.init(coder: coder)
     }
@@ -83,7 +89,6 @@ final class FirePopoverViewController: NSViewController {
         setupOptionsButton()
         updateCloseDetailsButton()
         updateWarningWrapperView()
-        removeInfoContainerViewIfNeeded()
 
         subscribeToViewModel()
         subscribeToSelected()
@@ -129,12 +134,13 @@ final class FirePopoverViewController: NSViewController {
     }
 
     @IBAction func clearButtonAction(_ sender: Any) {
-        dismiss()
+        delegate?.firePopoverViewControllerDidClear(self)
         firePopoverViewModel.burn()
+
     }
 
     @IBAction func cancelButtonAction(_ sender: Any) {
-        dismiss()
+        delegate?.firePopoverViewControllerDidCancel(self)
     }
 
     private func subscribeToViewModel() {
@@ -201,13 +207,6 @@ final class FirePopoverViewController: NSViewController {
     private func setupOptionsButton() {
         FirePopoverViewModel.ClearingOption.allCases.enumerated().forEach { (index, option) in
             optionsButton.menu?.item(withTag: index)?.title = option.string
-        }
-    }
-
-    private func removeInfoContainerViewIfNeeded() {
-        if infoPresentedOnce {
-            infoContainerView?.removeFromSuperview()
-            infoContainerView = nil
         }
     }
 

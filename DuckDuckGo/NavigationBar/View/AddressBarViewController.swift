@@ -28,6 +28,7 @@ final class AddressBarViewController: NSViewController {
     @IBOutlet var activeBackgroundView: NSView!
     @IBOutlet var activeBackgroundViewWithSuggestions: NSView!
     @IBOutlet var progressIndicator: ProgressView!
+    @IBOutlet var passiveTextFieldMinXConstraint: NSLayoutConstraint!
 
     private(set) var addressBarButtonsViewController: AddressBarButtonsViewController?
     
@@ -35,22 +36,31 @@ final class AddressBarViewController: NSViewController {
     private let suggestionContainerViewModel = SuggestionContainerViewModel(suggestionContainer: SuggestionContainer())
 
     enum Mode: Equatable {
-        case searching(withUrl: Bool)
+        case editing(isUrl: Bool)
         case browsing
+
+        var isEditing: Bool {
+            return self != .browsing
+        }
     }
     
-    private var mode: Mode = .searching(withUrl: false) {
+    private var mode: Mode = .editing(isUrl: false) {
         didSet {
-            updateButtons()
+            addressBarButtonsViewController?.controllerMode = mode
         }
     }
 
-    private var selectedTabViewModelCancellable: AnyCancellable?
-    private var addressBarTextFieldValueCancellable: AnyCancellable?
+    private var isFirstResponder = false {
+        didSet {
+            updateView()
+            self.addressBarButtonsViewController?.isTextFieldEditorFirstResponder = isFirstResponder
+        }
+    }
+
+    private var cancellables = Set<AnyCancellable>()
     private var passiveAddressBarStringCancellable: AnyCancellable?
     private var suggestionsVisibleCancellable: AnyCancellable?
     private var frameCancellable: AnyCancellable?
-    private var addressBarStringCancellable: AnyCancellable?
 
     private var progressCancellable: AnyCancellable?
     private var loadingCancellable: AnyCancellable?
@@ -72,25 +82,46 @@ final class AddressBarViewController: NSViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
 
-        updateView(firstResponder: false)
+        updateView()
+        addressBarTextField.addressBarTextFieldDelegate = self
         addressBarTextField.tabCollectionViewModel = tabCollectionViewModel
-        addressBarTextField.suggestionContainerViewModel = suggestionContainerViewModel
         subscribeToSelectedTabViewModel()
-        subscribeToAddressBarTextFieldValue()
         registerForMouseEnteredAndExitedEvents()
-
-        NotificationCenter.default.addObserver(self,
-                                               selector: #selector(refreshAddressBarAppearance(_:)),
-                                               name: FireproofDomains.Constants.allowedDomainsChangedNotification,
-                                               object: nil)
     }
 
     override func viewWillAppear() {
-        NotificationCenter.default.addObserver(self,
-                                               selector: #selector(textFieldFirstReponderNotification(_:)),
-                                               name: .firstResponder,
-                                               object: nil)
-        addMouseMonitors()
+        if view.window?.isPopUpWindow == true {
+            addressBarTextField.isHidden = true
+            inactiveBackgroundView.isHidden = true
+            activeBackgroundViewWithSuggestions.isHidden = true
+            activeBackgroundView.isHidden = true
+            shadowView.isHidden = true
+        } else {
+            addressBarTextField.suggestionContainerViewModel = suggestionContainerViewModel
+
+            registerForMouseEnteredAndExitedEvents()
+
+            NotificationCenter.default.addObserver(self,
+                                                   selector: #selector(refreshAddressBarAppearance(_:)),
+                                                   name: FireproofDomains.Constants.allowedDomainsChangedNotification,
+                                                   object: nil)
+
+            NotificationCenter.default.addObserver(self,
+                                                   selector: #selector(refreshAddressBarAppearance(_:)),
+                                                   name: NSWindow.didBecomeKeyNotification,
+                                                   object: nil)
+
+            NotificationCenter.default.addObserver(self,
+                                                   selector: #selector(refreshAddressBarAppearance(_:)),
+                                                   name: NSWindow.didResignKeyNotification,
+                                                   object: nil)
+            NotificationCenter.default.addObserver(self,
+                                                   selector: #selector(textFieldFirstReponderNotification(_:)),
+                                                   name: .firstResponder,
+                                                   object: nil)
+            addMouseMonitors()
+        }
+        subscribeToButtonsWidth()
     }
 
     // swiftlint:disable notification_center_detachment
@@ -104,7 +135,24 @@ final class AddressBarViewController: NSViewController {
         super.viewDidLayout()
 
         addressBarTextField.viewDidLayout()
-        addressBarTextField.makeMeFirstResponderIfNeeded()
+    }
+
+    func escapeKeyDown() -> Bool {
+        guard isFirstResponder else { return false }
+
+        guard !mode.isEditing else {
+            addressBarTextField.escapeKeyDown()
+            return true
+        }
+
+        // If the webview doesn't have content it doesn't handle becoming the first responder properly
+        if tabCollectionViewModel.selectedTabViewModel?.tab.webView.url != nil {
+            tabCollectionViewModel.selectedTabViewModel?.tab.webView.makeMeFirstResponder()
+        } else {
+            view.superview?.becomeFirstResponder()
+        }
+
+        return true
     }
 
     @IBSegueAction func createAddressBarButtonsViewController(_ coder: NSCoder) -> AddressBarButtonsViewController? {
@@ -118,21 +166,12 @@ final class AddressBarViewController: NSViewController {
     @IBOutlet var shadowView: ShadowView!
 
     private func subscribeToSelectedTabViewModel() {
-        selectedTabViewModelCancellable = tabCollectionViewModel.$selectedTabViewModel.receive(on: DispatchQueue.main).sink { [weak self] _ in
+        tabCollectionViewModel.$selectedTabViewModel.receive(on: DispatchQueue.main).sink { [weak self] _ in
             self?.subscribeToPassiveAddressBarString()
             self?.subscribeToProgressEvents()
-            self?.subscribeToAddressBarString()
             // don't resign first responder on tab switching
             self?.clickPoint = nil
-        }
-    }
-
-    private func subscribeToAddressBarString() {
-        addressBarStringCancellable?.cancel()
-        guard let model = tabCollectionViewModel.selectedTabViewModel else { return }
-        addressBarStringCancellable = model.$addressBarString.receive(on: DispatchQueue.main).sink { [weak self] _ in
-            self?.addressBarTextField.makeMeFirstResponderIfNeeded()
-        }
+        }.store(in: &cancellables)
     }
 
     private func subscribeToPassiveAddressBarString() {
@@ -186,25 +225,27 @@ final class AddressBarViewController: NSViewController {
         }
     }
 
-    private func subscribeToAddressBarTextFieldValue() {
-        addressBarTextFieldValueCancellable = addressBarTextField.$value.receive(on: DispatchQueue.main).sink { [weak self] _ in
-            guard let self = self else { return }
-            self.updateMode()
-            self.updateButtons()
-        }
+    func subscribeToButtonsWidth() {
+        addressBarButtonsViewController!.$buttonsWidth.weakAssign(to: \.constant, on: passiveTextFieldMinXConstraint)
+            .store(in: &cancellables)
     }
 
-    private func updateView(firstResponder: Bool) {
-        addressBarTextField.alphaValue = firstResponder ? 1 : 0
-        passiveTextField.alphaValue = firstResponder ? 0 : 1
+    private func updateView() {
+        let isPassiveTextFieldHidden = isFirstResponder || mode.isEditing
+        addressBarTextField.alphaValue = isPassiveTextFieldHidden ? 1 : 0
+        passiveTextField.alphaValue = isPassiveTextFieldHidden ? 0 : 1
 
-        updateShadowView(firstResponder: firstResponder)
-        inactiveBackgroundView.alphaValue = firstResponder ? 0 : 1
-        activeBackgroundView.alphaValue = firstResponder ? 1 : 0
+        updateShadowView(firstResponder: isFirstResponder)
+        inactiveBackgroundView.alphaValue = isFirstResponder ? 0 : 1
+        activeBackgroundView.alphaValue = isFirstResponder ? 1 : 0
+        
+        activeBackgroundView.layer?.borderColor = NSColor.controlAccentColor.withAlphaComponent(0.6).cgColor
     }
 
     private func updateShadowView(firstResponder: Bool) {
-        guard firstResponder else {
+        guard firstResponder,
+            view.window?.isPopUpWindow == false
+        else {
             suggestionsVisibleCancellable = nil
             frameCancellable = nil
             shadowView.removeFromSuperview()
@@ -212,10 +253,10 @@ final class AddressBarViewController: NSViewController {
         }
 
         suggestionsVisibleCancellable = addressBarTextField.suggestionWindowVisible.sink { [weak self] visible in
-            self?.shadowView.shadowSides = visible ? [.left, .top, .right] : .all
-            self?.shadowView.shadowColor = visible ? .suggestionsShadowColor : .addressBarShadowColor
-            self?.shadowView.shadowRadius = visible ? 8.0 : 4.0
-
+            self?.shadowView.shadowSides = visible ? [.left, .top, .right] : []
+            self?.shadowView.shadowColor = visible ? .suggestionsShadowColor : .clear
+            self?.shadowView.shadowRadius = visible ? 8.0 : 0.0
+            
             self?.activeBackgroundView.isHidden = visible
             self?.activeBackgroundViewWithSuggestions.isHidden = !visible
         }
@@ -233,46 +274,47 @@ final class AddressBarViewController: NSViewController {
         shadowView.frame = frame
     }
 
-    private func updateMode() {
-        switch self.addressBarTextField.value {
-        case .text: self.mode = .searching(withUrl: false)
-        case .url(urlString: _, url: _, userTyped: let userTyped): self.mode = userTyped ? .searching(withUrl: true) : .browsing
+    private func updateMode(value: AddressBarTextField.Value? = nil) {
+        switch value ?? self.addressBarTextField.value {
+        case .text: self.mode = .editing(isUrl: false)
+        case .url(urlString: _, url: _, userTyped: let userTyped): self.mode = userTyped ? .editing(isUrl: true) : .browsing
         case .suggestion(let suggestionViewModel):
             switch suggestionViewModel.suggestion {
-            case .phrase, .unknown: self.mode = .searching(withUrl: false)
-            case .website, .bookmark, .historyEntry: self.mode = .searching(withUrl: true)
+            case .phrase, .unknown: self.mode = .editing(isUrl: false)
+            case .website, .bookmark, .historyEntry: self.mode = .editing(isUrl: true)
             }
         }
     }
 
     @objc private func refreshAddressBarAppearance(_ sender: Any) {
         self.updateMode()
-        self.updateButtons()
+        self.addressBarButtonsViewController?.updateButtons()
+
+        guard let window = view.window else { return }
+
+        NSAppearance.withAppAppearance {
+            if window.isKeyWindow {
+                activeBackgroundView.layer?.borderWidth = 2.0
+                activeBackgroundView.layer?.borderColor = NSColor.controlAccentColor.withAlphaComponent(0.6).cgColor
+                activeBackgroundView.layer?.backgroundColor = NSColor.addressBarBackgroundColor.cgColor
+            } else {
+                activeBackgroundView.layer?.borderWidth = 0
+                activeBackgroundView.layer?.borderColor = nil
+                activeBackgroundView.layer?.backgroundColor = NSColor.inactiveSearchBarBackground.cgColor
+            }
+        }
     }
 
-    private func updateButtons() {
-        let isTextFieldEditorFirstResponder = view.window?.firstResponder === addressBarTextField.currentEditor()
-
-        self.addressBarButtonsViewController?.updateButtons(mode: mode,
-                                                            isTextFieldEditorFirstResponder: isTextFieldEditorFirstResponder,
-                                                            textFieldValue: addressBarTextField.value)
-    }
-    
 }
 
 extension AddressBarViewController {
 
     @objc func textFieldFirstReponderNotification(_ notification: Notification) {
         if view.window?.firstResponder == addressBarTextField.currentEditor() {
-            updateView(firstResponder: true)
+            isFirstResponder = true
         } else {
-            if mode != .browsing {
-                self.mode = .browsing
-            }
-            updateView(firstResponder: false)
+            isFirstResponder = false
         }
-
-        updateButtons()
     }
     
 }
@@ -382,6 +424,16 @@ extension AddressBarViewController: AddressBarButtonsViewControllerDelegate {
 
     func addressBarButtonsViewControllerClearButtonClicked(_ addressBarButtonsViewController: AddressBarButtonsViewController) {
         addressBarTextField.clearValue()
+    }
+
+}
+
+extension AddressBarViewController: AddressBarTextFieldDelegate {
+
+    func adressBarTextField(_ addressBarTextField: AddressBarTextField, didChangeValue value: AddressBarTextField.Value) {
+        updateMode(value: value)
+        addressBarButtonsViewController?.textFieldValue = value
+        updateView()
     }
 
 }

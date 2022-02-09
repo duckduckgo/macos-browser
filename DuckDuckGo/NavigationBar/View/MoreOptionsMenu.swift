@@ -46,6 +46,8 @@ final class MoreOptionsMenu: NSMenu {
         self.emailManager = emailManager
         super.init(title: "")
 
+        self.emailManager.requestDelegate = self
+
         setupMenuItems()
     }
 
@@ -187,11 +189,13 @@ final class MoreOptionsMenu: NSMenu {
 
         if url.canFireproof, let host = url.host {
 
-            let title = FireproofDomains.shared.isFireproof(fireproofDomain: host) ? UserText.removeFireproofing : UserText.fireproofSite
+            let isFireproof = FireproofDomains.shared.isFireproof(fireproofDomain: host)
+            let title = isFireproof ? UserText.removeFireproofing : UserText.fireproofSite
+            let image = isFireproof ? NSImage(named: "Burn") : NSImage(named: "Fireproof")
 
             addItem(withTitle: title, action: #selector(toggleFireproofing(_:)), keyEquivalent: "")
                 .targetting(self)
-                .withImage(NSImage(named: "BurnProof"))
+                .withImage(image)
                 .firingPixel(Pixel.Event.MoreResult.fireproof)
 
         }
@@ -263,12 +267,17 @@ final class EmailOptionsButtonSubMenu: NSMenu {
     }
     
     @objc func createAddressAction(_ sender: NSMenuItem) {
-        guard let url = emailManager.generateTokenPageURL else {
-            assertionFailure("Could not get token page URL, token not available")
-            return
+        assert(emailManager.requestDelegate != nil, "No requestDelegate on emailManager")
+
+        emailManager.getAliasIfNeededAndConsume { [weak self] alias, error in
+            guard let alias = alias, let address = self?.emailManager.emailAddressFor(alias) else {
+                assertionFailure(error?.localizedDescription ?? "Unexpected email error")
+                return
+            }
+            NSPasteboard.general.clearContents()
+            NSPasteboard.general.setString(address, forType: .string)
+            NotificationCenter.default.post(name: NSNotification.Name.privateEmailCopiedToClipboard, object: nil)
         }
-        let tab = Tab(content: .url(url))
-        tabCollectionViewModel.append(tab: tab)
         Pixel.fire(.moreMenu(result: .emailProtectionCreateAddress))
     }
     
@@ -351,3 +360,5 @@ extension NSMenuItem {
     }
 
 }
+
+extension MoreOptionsMenu: EmailManagerRequestDelegate { }

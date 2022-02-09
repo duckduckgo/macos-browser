@@ -128,41 +128,11 @@ class HistoryCoordinatorTests: XCTestCase {
 
         XCTAssert(historyCoordinator.history!.count == 4)
 
-        let fireproofDomains = FireproofDomains()
-        fireproofDomains.addToAllowed(domain: fireproofDomain)
+        let fireproofDomains = FireproofDomains(store: FireproofDomainsStoreMock())
+        fireproofDomains.add(domain: fireproofDomain)
         historyCoordinator.burn(except: fireproofDomains) {
             XCTAssert(historyStoringMock.removeEntriesArray.count == 3)
         }
-    }
-
-    func testWhenDomainIsVisitedForTheFirstTimeUsingTheNonRootUrl_ThenItsRootUrlIsGenerated() {
-        let (historyStoringMock, historyCoordinator) = HistoryCoordinator.aHistoryCoordinator
-
-        let nonRootUrl = URL(string: "https://duckduckgo.com/privacy")!
-        historyCoordinator.addVisit(of: nonRootUrl)
-        Thread.sleep(forTimeInterval: 0.1)
-
-        XCTAssert(historyStoringMock.savedHistoryEntries[0].url == URL(string: "https://duckduckgo.com/privacy"))
-        XCTAssert(historyStoringMock.savedHistoryEntries[1].url == URL(string: "https://duckduckgo.com/"))
-
-        historyCoordinator.addVisit(of: nonRootUrl)
-        Thread.sleep(forTimeInterval: 0.1)
-
-        XCTAssert(historyStoringMock.savedHistoryEntries[2].url == URL(string: "https://duckduckgo.com/privacy"))
-        XCTAssertEqual(historyStoringMock.savedHistoryEntries.count, 3)
-    }
-
-    func testWhenUrlIsMarkedAsDownload_ThenIsDownloadFlagIsStored() {
-        let (historyStoringMock, historyCoordinator) = HistoryCoordinator.aHistoryCoordinator
-
-        let downloadUrl = URL(string: "https://duckduckgo.com/download")!
-        historyCoordinator.addVisit(of: downloadUrl)
-        Thread.sleep(forTimeInterval: 0.1)
-
-        historyCoordinator.markDownloadUrl(downloadUrl)
-        Thread.sleep(forTimeInterval: 0.1)
-
-        XCTAssertTrue(historyStoringMock.savedHistoryEntries.last?.isDownload ?? false)
     }
 
     func testWhenUrlIsMarkedAsFailedToLoad_ThenFailedToLoadFlagIsStored() {

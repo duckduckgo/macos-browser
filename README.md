@@ -6,16 +6,6 @@ The app uses submodules, which will need to be cloned in order for the project t
 
 Run `git submodule update --init --recursive`
 
-### ESLint
-
-The app uses ESLint for checking JavaScript and is installed independently.
-
-To install the latest node: `brew install node`.
-
-Run `npm install` to install all the dependencies.
-
-To check the JavaScript run `npx eslint .` and `npx eslint . --fix` to run automated fixing.
-
 ## Schemes
 
 `DuckDuckGo Privacy Browser` is the primary scheme. Use it for development, testing and internal releases.

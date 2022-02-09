@@ -21,6 +21,8 @@ import Combine
 import SwiftUI
 import BrowserServicesKit
 
+// swiftlint:disable file_length
+
 protocol PasswordManagementDelegate: AnyObject {
 
     /// May not be called on main thread.
@@ -34,7 +36,7 @@ final class PasswordManagementViewController: NSViewController {
     static func create() -> Self {
         let storyboard = NSStoryboard(name: "PasswordManager", bundle: nil)
         // swiftlint:disable force_cast
-        let controller = storyboard.instantiateController(withIdentifier: "PasswordManagement") as! Self
+        let controller: Self = storyboard.instantiateController(withIdentifier: "PasswordManagement") as! Self
         controller.loadView()
         // swiftlint:enable force_cast
         return controller
@@ -46,6 +48,9 @@ final class PasswordManagementViewController: NSViewController {
     @IBOutlet var itemContainer: NSView!
     @IBOutlet var searchField: NSTextField!
     @IBOutlet var divider: NSView!
+    @IBOutlet var emptyState: NSView!
+    @IBOutlet var emptyStateTitle: NSTextField!
+    @IBOutlet var emptyStateMessage: NSTextField!
 
     var editingCancellable: AnyCancellable?
 
@@ -53,6 +58,8 @@ final class PasswordManagementViewController: NSViewController {
     var isDirty = false
 
     var listModel: PasswordManagementItemListModel?
+    var listView: NSView?
+
     var itemModel: PasswordManagementItemModel? {
         didSet {
             editingCancellable?.cancel()
@@ -72,6 +79,9 @@ final class PasswordManagementViewController: NSViewController {
         super.viewDidLoad()
         createListView()
         createLoginItemView()
+
+        emptyStateTitle.attributedStringValue = NSAttributedString.make(emptyStateTitle.stringValue, lineHeight: 1.14, kern: -0.23)
+        emptyStateMessage.attributedStringValue = NSAttributedString.make(emptyStateMessage.stringValue, lineHeight: 1.05, kern: -0.08)
     }
 
     override func viewDidAppear() {
@@ -81,7 +91,13 @@ final class PasswordManagementViewController: NSViewController {
             itemModel?.clearSecureVaultModel()
         }
 
-        refetchWithText(isDirty ? "" : domain ?? "", clearWhenNoMatches: true)
+        // Only select the matching item directly if macOS 11 is available, as 10.15 doesn't support scrolling directly to a given
+        // item in SwiftUI. On 10.15, show the matching item by filtering the search bar automatically instead.
+        if #available(macOS 11.0, *) {
+            refetchWithText("", selectItemMatchingDomain: domain?.dropWWW(), clearWhenNoMatches: true)
+        } else {
+            refetchWithText(isDirty ? "" : domain ?? "", clearWhenNoMatches: true)
+        }
     }
 
     @IBAction func onNewClicked(_ sender: NSButton) {
@@ -91,7 +107,14 @@ final class PasswordManagementViewController: NSViewController {
         menu.popUp(positioning: nil, at: location, in: sender.superview)
     }
 
-    private func refetchWithText(_ text: String, clearWhenNoMatches: Bool = false, completion: (() -> Void)? = nil) {
+    @IBAction func onImportClicked(_ sender: NSButton) {
+        DataImportViewController.show()
+    }
+
+    private func refetchWithText(_ text: String,
+                                 selectItemMatchingDomain: String? = nil,
+                                 clearWhenNoMatches: Bool = false,
+                                 completion: (() -> Void)? = nil) {
         fetchSecureVaultItems { [weak self] items in
             self?.listModel?.update(items: items)
             self?.searchField.stringValue = text
@@ -99,9 +122,13 @@ final class PasswordManagementViewController: NSViewController {
 
             if clearWhenNoMatches && self?.listModel?.displayedItems.isEmpty == true {
                 self?.searchField.stringValue = ""
-                self?.updateFilter()
+                self?.updateFilter()                
             } else if self?.isDirty == false {
-                self?.listModel?.selectFirst()
+                if let selectItemMatchingDomain = selectItemMatchingDomain {
+                    self?.listModel?.selectLoginWithDomainOrFirst(domain: selectItemMatchingDomain)
+                } else {
+                    self?.listModel?.selectFirst()
+                }
             }
 
             completion?()
@@ -163,7 +190,9 @@ final class PasswordManagementViewController: NSViewController {
             self?.doSaveCredentials(credentials)
         }, onDeleteRequested: { [weak self] credentials in
             self?.promptToDelete(credentials: credentials)
-        })
+        }) { [weak self] in
+            self?.refetchWithText(self!.searchField.stringValue)
+        }
 
         self.itemModel = itemModel
 
@@ -179,7 +208,9 @@ final class PasswordManagementViewController: NSViewController {
             self?.doSaveIdentity(note)
         }, onDeleteRequested: { [weak self] identity in
             self?.promptToDelete(identity: identity)
-        })
+        }) { [weak self] in
+            self?.refetchWithText(self!.searchField.stringValue)
+        }
 
         self.itemModel = itemModel
 
@@ -195,7 +226,9 @@ final class PasswordManagementViewController: NSViewController {
             self?.doSaveNote(note)
         }, onDeleteRequested: { [weak self] note in
             self?.promptToDelete(note: note)
-        })
+        }) { [weak self] in
+            self?.refetchWithText(self!.searchField.stringValue)
+        }
 
         self.itemModel = itemModel
 
@@ -211,7 +244,9 @@ final class PasswordManagementViewController: NSViewController {
             self?.doSaveCreditCard(card)
         }, onDeleteRequested: { [weak self] card in
             self?.promptToDelete(card: card)
-        })
+        }) { [weak self] in
+            self?.refetchWithText(self!.searchField.stringValue)
+        }
 
         self.itemModel = itemModel
 
@@ -226,6 +261,7 @@ final class PasswordManagementViewController: NSViewController {
     }
 
     private func replaceItemContainerChildView(with view: NSView) {
+        emptyState.isHidden = true
         clearSelectedItem()
 
         view.frame = itemContainer.bounds
@@ -343,11 +379,8 @@ final class PasswordManagementViewController: NSViewController {
                 self.refetchWithText(self.searchField.stringValue)
                 self.postChange()
 
-            case .alertSecondButtonReturn:
-                break // cancel, do nothing
-
             default:
-                fatalError("Unknown response \(response)")
+                break // cancel, do nothing
             }
 
         }
@@ -367,11 +400,8 @@ final class PasswordManagementViewController: NSViewController {
                 self.refetchWithText(self.searchField.stringValue)
                 self.postChange()
 
-            case .alertSecondButtonReturn:
-                break // cancel, do nothing
-
             default:
-                fatalError("Unknown response \(response)")
+                break // cancel, do nothing
             }
 
         }
@@ -391,11 +421,8 @@ final class PasswordManagementViewController: NSViewController {
                 self.refetchWithText(self.searchField.stringValue)
                 self.postChange()
 
-            case .alertSecondButtonReturn:
-                break // cancel, do nothing
-
             default:
-                fatalError("Unknown response \(response)")
+                break // cancel, do nothing
             }
 
         }
@@ -415,11 +442,8 @@ final class PasswordManagementViewController: NSViewController {
                 self.refetchWithText(self.searchField.stringValue)
                 self.postChange()
 
-            case .alertSecondButtonReturn:
-                break // cancel, do nothing
-
             default:
-                fatalError("Unknown response \(response)")
+                break // cancel, do nothing
             }
 
         }
@@ -471,13 +495,10 @@ final class PasswordManagementViewController: NSViewController {
                         self?.itemModel?.cancel()
                         loadNewItemWithID()
 
-                    case .alertThirdButtonReturn: // Cancel
+                    default: // Cancel
                         if let previousValue = previousValue {
-                            self?.listModel?.select(item: previousValue)
+                            self?.listModel?.select(item: previousValue, notify: false)
                         }
-
-                    default:
-                        fatalError("Unknown response \(response)")
                     }
 
                 }
@@ -487,30 +508,33 @@ final class PasswordManagementViewController: NSViewController {
         }
 
         self.listModel = listModel
-
-        let view = NSHostingView(rootView: PasswordManagementItemListView().environmentObject(listModel))
-        view.frame = listContainer.bounds
-        listContainer.addSubview(view)
+        self.listView = NSHostingView(rootView: PasswordManagementItemListView().environmentObject(listModel))
     }
     // swiftlint:enable function_body_length
+    
+    override func viewWillAppear() {
+        super.viewWillAppear()
+        
+        if let listView = self.listView {
+            listView.frame = listContainer.bounds
+            listContainer.addSubview(listView)
+        }
+    }
+    
+    override func viewDidDisappear() {
+        super.viewDidDisappear()
+        listView?.removeFromSuperview()
+    }
 
     private func createNewSecureVaultItemMenu() -> NSMenu {
         let menu = NSMenu()
 
-#if DEBUG
         menu.items = [
             NSMenuItem(title: UserText.pmNewCard, action: #selector(createNewCreditCard), keyEquivalent: ""),
             NSMenuItem(title: UserText.pmNewLogin, action: #selector(createNewLogin), keyEquivalent: ""),
             NSMenuItem(title: UserText.pmNewIdentity, action: #selector(createNewIdentity), keyEquivalent: ""),
             NSMenuItem(title: UserText.pmNewNote, action: #selector(createNewNote), keyEquivalent: "")
         ]
-#else
-        menu.items = [
-            NSMenuItem(title: UserText.pmNewCard, action: #selector(createNewCreditCard), keyEquivalent: ""),
-            NSMenuItem(title: UserText.pmNewLogin, action: #selector(createNewLogin), keyEquivalent: ""),
-            NSMenuItem(title: UserText.pmNewNote, action: #selector(createNewNote), keyEquivalent: "")
-        ]
-#endif
 
         return menu
     }
@@ -533,6 +557,7 @@ final class PasswordManagementViewController: NSViewController {
                         identities.map(SecureVaultItem.identity)
 
             DispatchQueue.main.async {
+                self.emptyState.isHidden = !items.isEmpty
                 completion(items)
             }
         }
@@ -562,11 +587,8 @@ final class PasswordManagementViewController: NSViewController {
                     self.itemModel?.cancel()
                     createNew()
 
-                case .alertThirdButtonReturn: // Cancel
+                default: // Cancel
                     break // just do nothing
-
-                default:
-                    fatalError("Unknown response \(response)")
                 }
 
             }
@@ -599,11 +621,8 @@ final class PasswordManagementViewController: NSViewController {
                     self.itemModel?.cancel()
                     createNew()
 
-                case .alertThirdButtonReturn: // Cancel
+                default: // Cancel
                     break // just do nothing
-
-                default:
-                    fatalError("Unknown response \(response)")
                 }
 
             }
@@ -636,11 +655,8 @@ final class PasswordManagementViewController: NSViewController {
                     self.itemModel?.cancel()
                     createNew()
 
-                case .alertThirdButtonReturn: // Cancel
+                default: // Cancel
                     break // just do nothing
-
-                default:
-                    fatalError("Unknown response \(response)")
                 }
 
             }
@@ -673,11 +689,8 @@ final class PasswordManagementViewController: NSViewController {
                     self.itemModel?.cancel()
                     createNew()
 
-                case .alertThirdButtonReturn: // Cancel
+                default: // Cancel
                     break // just do nothing
-
-                default:
-                    fatalError("Unknown response \(response)")
                 }
 
             }
@@ -685,7 +698,7 @@ final class PasswordManagementViewController: NSViewController {
             createNew()
         }
     }
-    
+
 }
 
 extension PasswordManagementViewController: NSTextFieldDelegate {
@@ -695,3 +708,5 @@ extension PasswordManagementViewController: NSTextFieldDelegate {
     }
 
 }
+
+// swiftlint:enable file_length

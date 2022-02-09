@@ -91,6 +91,7 @@ enum SecureVaultItem: Equatable, Identifiable, Comparable {
             return identity.title.localizedCaseInsensitiveContains(filter)
         case .note(let note):
             return note.title.localizedCaseInsensitiveContains(filter) ||
+                note.text.localizedCaseInsensitiveContains(filter) ||
                 (note.associatedDomain?.localizedCaseInsensitiveContains(filter) ?? false)
         }
     }
@@ -104,7 +105,8 @@ enum SecureVaultItem: Equatable, Identifiable, Comparable {
         case .identity(let identity):
             return identity.title
         case .note(let note):
-            return note.title
+            let title = note.displayTitle
+            return title ?? UserText.pmEmptyNote
         }
     }
 
@@ -122,7 +124,8 @@ enum SecureVaultItem: Equatable, Identifiable, Comparable {
 
             return PasswordManagementItemListModel.personNameComponentsFormatter.string(from: nameComponents)
         case .note(let note):
-            return note.text.truncated(length: 100)
+            let subtitle = note.displaySubtitle
+            return subtitle
         }
     }
 
@@ -165,7 +168,7 @@ final class PasswordManagementItemListModel: ObservableObject {
         var title: String {
             switch self {
             case .accounts: return "Logins"
-            case .cards: return "Cards"
+            case .cards: return "Credit Cards"
             case .notes: return "Notes"
             case .identities: return "Identities"
             }
@@ -228,21 +231,40 @@ final class PasswordManagementItemListModel: ObservableObject {
         self.items = items.sorted()
     }
 
-    func selected(item: SecureVaultItem?) {
+    func selected(item: SecureVaultItem?, notify: Bool = true) {
         let previous = selected
         selected = item
-        onItemSelected(previous, item)
-    }
-
-    func select(item: SecureVaultItem) {
-        for section in displayedItems {
-            if let first = section.items.first(where: { $0 == item }) {
-                selected(item: first)
-            }
+        if notify {
+            onItemSelected(previous, item)
         }
     }
 
+    func select(item: SecureVaultItem, notify: Bool = true) {
+        for section in displayedItems {
+            if let first = section.items.first(where: { $0 == item }) {
+                selected(item: first, notify: notify)
+            }
+        }
+    }
+    
+    func selectLoginWithDomainOrFirst(domain: String, notify: Bool = true) {
+        for section in displayedItems {
+            if case let .accounts(accounts) = section {
+                if let account = accounts.first(where: { $0.websiteAccount?.domain == domain }) {
+                    selected(item: account, notify: notify)
+                    return
+                }
+            }
+        }
+        
+        selectFirst()
+    }
+
     func update(item: SecureVaultItem) {
+        if let index = items.firstIndex(of: item) {
+            items[index] = item
+        }
+
         var sections = displayedItems
 
         guard let sectionIndex = sections.firstIndex(where: {

@@ -48,6 +48,8 @@ final class BrowserTabViewController: NSViewController {
 
     private var hoverLabelWorkItem: DispatchWorkItem?
 
+    private var transientTabContentViewController: NSViewController?
+
     required init?(coder: NSCoder) {
         fatalError("BrowserTabViewController: Bad initializer")
     }
@@ -76,9 +78,10 @@ final class BrowserTabViewController: NSViewController {
     }
 
     private func subscribeToSelectedTabViewModel() {
-        selectedTabViewModelCancellable = tabCollectionViewModel.$selectedTabViewModel.receive(on: DispatchQueue.main).sink { [weak self] _ in
-            self?.updateInterface()
-            self?.subscribeToErrorViewState()
+        selectedTabViewModelCancellable = tabCollectionViewModel.$selectedTabViewModel
+            .sink { [weak self] selectedTabViewModel in
+                self?.updateInterface(tabViewModel: selectedTabViewModel)
+                self?.subscribeToErrorViewState()
         }
     }
 
@@ -87,17 +90,15 @@ final class BrowserTabViewController: NSViewController {
     /// 1. No URL is provided, so the webview should be hidden in favor of showing the default UI elements.
     /// 2. A URL is provided for the first time, so the webview should be added as a subview and the URL should be loaded.
     /// 3. A URL is provided after already adding the webview, so the webview should be reloaded.
-    private func updateInterface() {
-        changeWebView()
-        show(tabContent: tabCollectionViewModel.selectedTabViewModel?.tab.content)
-    }
+    private func updateInterface(tabViewModel: TabViewModel?) {
+        if tabCollectionViewModel.tabCollection.tabs.isEmpty {
+            view.window?.close()
+            return
+        }
 
-    private func showHomepage() {
-        removeWebViewFromHierarchy()
-        removePreferencesPage()
-        removeBookmarksPage()
-
-        view.addAndLayout(homepageView)
+        changeWebView(tabViewModel: tabViewModel)
+        scheduleHoverLabelUpdatesForUrl(nil)
+        show(tabContent: tabViewModel?.tab.content)
     }
 
     private func removeWebViewFromHierarchy(webView: WebView? = nil,
@@ -130,11 +131,9 @@ final class BrowserTabViewController: NSViewController {
 
         // Make sure this is on top
         view.addSubview(hoverLabelContainer)
-
-        setFirstResponderIfNeeded()
     }
 
-    private func changeWebView() {
+    private func changeWebView(tabViewModel: TabViewModel?) {
 
         func displayWebView(of tabViewModel: TabViewModel) {
             tabViewModel.tab.delegate = self
@@ -168,7 +167,7 @@ final class BrowserTabViewController: NSViewController {
             .removeDuplicates()
             .receive(on: DispatchQueue.main)
             .sink { [weak self] _ in
-                self?.updateInterface()
+                self?.updateInterface(tabViewModel: tabViewModel)
          }
     }
 
@@ -181,13 +180,17 @@ final class BrowserTabViewController: NSViewController {
         }
     }
 
+    func makeWebViewFirstResponder() {
+        self.webView?.makeMeFirstResponder()
+    }
+
     private func setFirstResponderIfNeeded() {
         guard webView?.url != nil else {
             return
         }
 
         DispatchQueue.main.async { [weak self] in
-            self?.webView?.makeMeFirstResponder()
+            self?.makeWebViewFirstResponder()
         }
     }
 
@@ -203,8 +206,21 @@ final class BrowserTabViewController: NSViewController {
         homepageView.isHidden = shown
     }
 
-    private func openNewTab(with url: URL?, parentTab: Tab?, selected: Bool = false, canBeClosedWithBack: Bool = false) {
-        let tab = Tab(content: url != nil ? .url(url!) : .homepage,
+    func openNewTab(with content: Tab.TabContent, parentTab: Tab? = nil, selected: Bool = false, canBeClosedWithBack: Bool = false) {
+        // shouldn't open New Tabs in PopUp window
+        guard view.window?.isPopUpWindow == false else {
+            // Prefer Tab's Parent
+            if let parentTab = tabCollectionViewModel.selectedTabViewModel?.tab.parentTab, parentTab.delegate !== self {
+                parentTab.delegate?.tab(parentTab, requestedNewTabWith: content, selected: true)
+                parentTab.webView.window?.makeKeyAndOrderFront(nil)
+            // Act as default URL Handler if no Parent
+            } else {
+                WindowControllersManager.shared.showTab(with: content)
+            }
+            return
+        }
+
+        let tab = Tab(content: content,
                       parentTab: parentTab,
                       shouldLoadInBackground: true,
                       canBeClosedWithBack: canBeClosedWithBack)
@@ -221,80 +237,99 @@ final class BrowserTabViewController: NSViewController {
     private func show(displayableTabAtIndex index: Int) {
         // The tab switcher only displays displayable tab types.
         tabCollectionViewModel.selectedTabViewModel?.tab.setContent(Tab.TabContent.displayableTabTypes[index])
-        updateInterface()
+        updateInterface(tabViewModel: tabCollectionViewModel.selectedTabViewModel)
+    }
+
+    private func removeAllTabContent(includingWebView: Bool = true) {
+        self.homepageView.removeFromSuperview()
+        transientTabContentViewController?.removeCompletely()
+        preferencesViewController.removeCompletely()
+        bookmarksViewController.removeCompletely()
+        if includingWebView {
+            self.removeWebViewFromHierarchy()
+        }
+    }
+
+    private func showTabContentController(_ vc: NSViewController) {
+        self.addChild(vc)
+        view.addAndLayout(vc.view)
+    }
+
+    private func showTransientTabContentController(_ vc: NSViewController) {
+        transientTabContentViewController?.removeCompletely()
+        showTabContentController(vc)
+        transientTabContentViewController = vc
+    }
+
+    private func requestDisableUI() {
+        (view.window?.windowController as? MainWindowController)?.userInteraction(prevented: true)
     }
 
     private func show(tabContent content: Tab.TabContent?) {
+
         switch content ?? .homepage {
         case .bookmarks:
-            self.homepageView.removeFromSuperview()
-            removePreferencesPage()
-            removeWebViewFromHierarchy()
-            self.addChild(bookmarksViewController)
-            view.addAndLayout(bookmarksViewController.view)
+            removeAllTabContent()
+            showTabContentController(bookmarksViewController)
 
         case .preferences:
-            self.homepageView.removeFromSuperview()
-            removeBookmarksPage()
-            removeWebViewFromHierarchy()
-            self.addChild(preferencesViewController)
-            view.addAndLayout(preferencesViewController.view)
+            removeAllTabContent()
+            showTabContentController(preferencesViewController)
+
+        case .onboarding:
+            removeAllTabContent()
+            if !OnboardingViewModel().onboardingFinished {
+                requestDisableUI()
+            }
+            showTransientTabContentController(OnboardingViewController.create(withDelegate: self))
 
         case .url:
-            self.homepageView.removeFromSuperview()
-            removeBookmarksPage()
-            removePreferencesPage()
+            removeAllTabContent(includingWebView: false)
             if let webView = self.webView, webView.superview == nil {
                 addWebViewToViewHierarchy(webView)
             }
 
         case .homepage:
-            removeBookmarksPage()
-            removePreferencesPage()
-            removeWebViewFromHierarchy()
-            showHomepage()
+            removeAllTabContent()
+            view.addAndLayout(homepageView)
 
         case .none:
-            self.homepageView.removeFromSuperview()
-            removeBookmarksPage()
-            removePreferencesPage()
-            removeWebViewFromHierarchy()
+            removeAllTabContent()
         }
+        
     }
 
     // MARK: - Preferences
 
-    private lazy var preferencesViewController: PreferencesSplitViewController = {
+    private(set) lazy var preferencesViewController: PreferencesSplitViewController = {
         let viewController = PreferencesSplitViewController.create()
         viewController.delegate = self
 
         return viewController
     }()
 
-    private func removePreferencesPage() {
-        guard preferencesViewController.parent != nil else { return }
-        preferencesViewController.removeFromParent()
-        preferencesViewController.view.removeFromSuperview()
-    }
-
     // MARK: - Bookmarks
 
-    private lazy var bookmarksViewController: BookmarkManagementSplitViewController = {
+    private(set) lazy var bookmarksViewController: BookmarkManagementSplitViewController = {
         let viewController = BookmarkManagementSplitViewController.create()
         viewController.delegate = self
 
         return viewController
     }()
 
-    private func removeBookmarksPage() {
-        guard bookmarksViewController.parent != nil else { return }
-        bookmarksViewController.removeFromParent()
-        bookmarksViewController.view.removeFromSuperview()
-    }
-
 }
 
 extension BrowserTabViewController: TabDelegate {
+
+    func tabWillStartNavigation(_ tab: Tab, isUserInitiated: Bool) {
+        if isUserInitiated,
+           let window = self.view.window,
+           window.isPopUpWindow == true,
+           window.isKeyWindow == false {
+
+            window.makeKeyAndOrderFront(nil)
+        }
+    }
 
 	func tab(_ tab: Tab, requestedOpenExternalURL url: URL, forUserEnteredURL userEntered: Bool) {
         guard let window = self.view.window else {
@@ -341,6 +376,7 @@ extension BrowserTabViewController: TabDelegate {
         guard let tabViewModel = tabViewModel else { return }
 
         tabViewModel.closeFindInPage()
+        tabViewModel.tab.resetDashboardInfo(tabViewModel.tab.webView.url)
         tab.permissions.tabDidStartNavigation()
         if !tabViewModel.isLoading,
            tabViewModel.tab.webView.isLoading {
@@ -348,8 +384,8 @@ extension BrowserTabViewController: TabDelegate {
         }
     }
 
-    func tab(_ tab: Tab, requestedNewTab url: URL?, selected: Bool) {
-        openNewTab(with: url, parentTab: tab, selected: selected, canBeClosedWithBack: selected == true)
+    func tab(_ tab: Tab, requestedNewTabWith content: Tab.TabContent, selected: Bool) {
+        openNewTab(with: content, parentTab: tab, selected: selected, canBeClosedWithBack: selected == true)
     }
 
     func closeTab(_ tab: Tab) {
@@ -398,6 +434,10 @@ extension BrowserTabViewController: TabDelegate {
         scheduleHoverLabelUpdatesForUrl(url)
     }
 
+    func windowDidResignKey() {
+        scheduleHoverLabelUpdatesForUrl(nil)
+    }
+
     private func scheduleHoverLabelUpdatesForUrl(_ url: URL?) {
         // cancel previous animation, if any
         hoverLabelWorkItem?.cancel()
@@ -411,7 +451,7 @@ extension BrowserTabViewController: TabDelegate {
             animationItem = DispatchWorkItem { [weak self] in
                 self?.hoverLabelContainer.animator().alphaValue = 0
             }
-        } else if hoverLabelContainer.alphaValue < 1 {
+        } else if url != nil && hoverLabelContainer.alphaValue < 1 {
             // schedule a fade in
             delay = 0.5
             animationItem = DispatchWorkItem { [weak self] in
@@ -506,7 +546,7 @@ extension BrowserTabViewController: LinkMenuItemSelectors {
 
     func openLinkInNewTab(_ sender: NSMenuItem) {
         guard let url = contextMenuLink else { return }
-        openNewTab(with: url, parentTab: tabViewModel?.tab)
+        openNewTab(with: .url(url), parentTab: tabViewModel?.tab)
     }
 
     func openLinkInNewWindow(_ sender: NSMenuItem) {
@@ -536,7 +576,7 @@ extension BrowserTabViewController: ImageMenuItemSelectors {
 
     func openImageInNewTab(_ sender: NSMenuItem) {
         guard let url = contextMenuImage else { return }
-        openNewTab(with: url, parentTab: tabViewModel?.tab)
+        openNewTab(with: .url(url), parentTab: tabViewModel?.tab)
     }
 
     func openImageInNewWindow(_ sender: NSMenuItem) {
@@ -564,8 +604,8 @@ extension BrowserTabViewController: MenuItemSelectors {
 
     func search(_ sender: NSMenuItem) {
         let selectedText = contextMenuSelectedText ?? ""
-        let url = URL.makeSearchUrl(from: selectedText)
-        openNewTab(with: url, parentTab: tabViewModel?.tab, selected: true)
+        guard let url = URL.makeSearchUrl(from: selectedText) else { return }
+        openNewTab(with: .url(url), parentTab: tabViewModel?.tab, selected: true)
     }
 
 }
@@ -612,13 +652,56 @@ extension BrowserTabViewController: WKUIDelegate {
                  for navigationAction: WKNavigationAction,
                  windowFeatures: WKWindowFeatures) -> WKWebView? {
 
-        // Returned web view must be created with the specified configuration.
+        func makeTab(parentTab: Tab, content: Tab.TabContent) -> Tab {
+            // Returned web view must be created with the specified configuration.
+            return Tab(content: content,
+                       webViewConfiguration: configuration,
+                       parentTab: parentTab,
+                       canBeClosedWithBack: true)
+        }
+        guard let parentTab = webView.tab else { return nil }
+        func nextQuery(parentTab: Tab) -> PermissionAuthorizationQuery? {
+            parentTab.permissions.authorizationQueries.first(where: { $0.permissions.contains(.popups) })
+        }
 
-        let tab = Tab(content: .none,
-                      webViewConfiguration: configuration,
-                      parentTab: tabViewModel?.tab,
-                      canBeClosedWithBack: true)
-        tabCollectionViewModel.insertChild(tab: tab, selected: true)
+        let contentSize = NSSize(width: windowFeatures.width?.intValue ?? 1024, height: windowFeatures.height?.intValue ?? 752)
+        var shouldOpenPopUp = navigationAction.isUserInitiated
+        if !shouldOpenPopUp {
+            let url = navigationAction.request.url
+            parentTab.permissions.permissions([.popups], requestedForDomain: webView.url?.host, url: url) { [weak parentTab] granted in
+
+                guard let parentTab = parentTab else { return }
+
+                switch (granted, shouldOpenPopUp) {
+                case (true, false):
+                    // callback called synchronously - will return webView for the request
+                    shouldOpenPopUp = true
+                case (true, true):
+                    // called asynchronously
+                    guard let url = navigationAction.request.url else { return }
+                    let tab = makeTab(parentTab: parentTab, content: .url(url))
+                    WindowsManager.openPopUpWindow(with: tab, contentSize: contentSize)
+
+                    parentTab.permissions.permissions.popups.popupOpened(nextQuery: nextQuery(parentTab: parentTab))
+
+                case (false, _):
+                    return
+                }
+            }
+        }
+        guard shouldOpenPopUp else {
+            shouldOpenPopUp = true // if granted asynchronously
+            return nil
+        }
+
+        let tab = makeTab(parentTab: parentTab, content: .none)
+        if windowFeatures.toolbarsVisibility?.boolValue == true {
+            tabCollectionViewModel.insertChild(tab: tab, selected: true)
+        } else {
+            WindowsManager.openPopUpWindow(with: tab, contentSize: contentSize)
+        }
+        parentTab.permissions.permissions.popups.popupOpened(nextQuery: nextQuery(parentTab: parentTab))
+
         // WebKit loads the request in the returned web view.
         return tab.webView
     }
@@ -664,7 +747,6 @@ extension BrowserTabViewController: WKUIDelegate {
                  mainFrameURL: URL,
                  decisionHandler: @escaping (Bool) -> Void) {
         guard let permissions = [PermissionType](devices: devices) else {
-            assertionFailure("Could not decode PermissionType")
             decisionHandler(false)
             return
         }
@@ -812,6 +894,35 @@ private extension WKWebView {
             return nil
         }
         return tab
+    }
+
+}
+
+extension BrowserTabViewController: OnboardingDelegate {
+
+    func onboardingDidRequestImportData(completion: @escaping () -> Void) {
+        DataImportViewController.show(completion: completion)
+    }
+
+    func onboardingDidRequestSetDefault(completion: @escaping () -> Void) {
+        if DefaultBrowserPreferences.isDefault {
+            completion()
+            return
+        }
+
+        DefaultBrowserPreferences.becomeDefault()
+
+        var observer: Any?
+        observer = NotificationCenter.default.addObserver(forName: NSApplication.didBecomeActiveNotification, object: nil, queue: .main) { _ in
+            NotificationCenter.default.removeObserver(observer as Any)
+            withAnimation {
+                completion()
+            }
+        }
+    }
+
+    func onboardingHasFinished() {
+        (view.window?.windowController as? MainWindowController)?.userInteraction(prevented: false)
     }
 
 }

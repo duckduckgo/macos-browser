@@ -26,7 +26,8 @@ final class PasswordManagementPopover: NSPopover {
         super.init()
 
         self.animates = false
-        self.behavior = .transient
+        // Prevent Popover detaching on Alert appearance
+        self.behavior = .semitransient
         self.delegate = self
 
         setupContentController()
@@ -40,6 +41,9 @@ final class PasswordManagementPopover: NSPopover {
     var viewController: PasswordManagementViewController { contentViewController as! PasswordManagementViewController }
     // swiftlint:enable force_cast
 
+    private var parentWindowDidResignKeyObserver: Any?
+    private var parentWindowDidBecomeKeyObserver: Any?
+
     private func setupContentController() {
         let controller = PasswordManagementViewController.create()
         contentViewController = controller
@@ -49,11 +53,37 @@ final class PasswordManagementPopover: NSPopover {
 
 extension PasswordManagementPopover: NSPopoverDelegate {
 
+    func popoverDidShow(_ notification: Notification) {
+        parentWindowDidBecomeKeyObserver = NotificationCenter.default.addObserver(forName: NSWindow.didBecomeMainNotification,
+                                                                                  object: nil,
+                                                                                  queue: OperationQueue.main) { [weak self] _ in
+            guard let self = self, self.isShown else { return }
+            self.close()
+        }
+        parentWindowDidResignKeyObserver = NotificationCenter.default.addObserver(forName: NSWindow.didResignMainNotification,
+                                                                                  object: nil,
+                                                                                  queue: OperationQueue.main) { [weak self] _ in
+            guard let self = self, self.isShown else { return }
+            self.close()
+        }
+    }
+
+    func popoverShouldClose(_ popover: NSPopover) -> Bool {
+        return true
+    }
+
     func popoverDidClose(_ notification: Notification) {
+        if let window = viewController.view.window {
+            for sheet in window.sheets {
+                window.endSheet(sheet, returnCode: .cancel)
+            }
+        }
         viewController.postChange()
         if !viewController.isDirty {
             viewController.clear()
         }
+        parentWindowDidResignKeyObserver = nil
+        parentWindowDidBecomeKeyObserver = nil
     }
 
 }
