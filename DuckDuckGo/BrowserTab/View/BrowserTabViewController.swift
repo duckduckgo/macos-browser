@@ -145,7 +145,7 @@ final class BrowserTabViewController: NSViewController {
             addWebViewToViewHierarchy(newWebView)
         }
 
-        guard let tabViewModel = tabCollectionViewModel.selectedTabViewModel else {
+        guard let tabViewModel = tabViewModel else {
             self.tabViewModel = nil
             removeWebViewFromHierarchy()
             return
