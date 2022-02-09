@@ -226,9 +226,9 @@ private struct PasswordManagementItemStackContentsView: View {
     var body: some View {
         Spacer(minLength: 10)
         
-        ForEach(model.displayedItems, id: \.title) { section in
+        ForEach(Array(model.displayedItems.enumerated()), id: \.offset) { index, section in
             
-            Section(header: Text(section.title).padding(.leading, 18).padding(.top, 10)) {
+            Section(header: Text(section.title).padding(.leading, 18).padding(.top, index == 0 ? 0 : 10)) {
                 
                 ForEach(section.items, id: \.id) { item in
                     ItemView(item: item) {
@@ -236,6 +236,7 @@ private struct PasswordManagementItemStackContentsView: View {
                     }
                     .padding(.horizontal, 10)
                 }
+
             }
             
         }
