@@ -168,7 +168,7 @@ final class FeedbackViewController: NSViewController {
             textField.makeMeFirstResponder()
         case .websiteBreakage:
             browserFeedbackView.isHidden = true
-            contentHeight = 235
+            contentHeight = 260
             if selectedWebsiteBreakageCategory == nil {
                 pickIssueMenuItem.isEnabled = true
             }

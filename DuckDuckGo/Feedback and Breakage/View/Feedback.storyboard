@@ -162,10 +162,10 @@
                                         </constraints>
                                     </customView>
                                     <customView hidden="YES" translatesAutoresizingMaskIntoConstraints="NO" id="8B9-wf-zcP" userLabel="Website Breakage View">
-                                        <rect key="frame" x="20" y="-7" width="320" height="97"/>
+                                        <rect key="frame" x="20" y="-32" width="320" height="122"/>
                                         <subviews>
                                             <popUpButton translatesAutoresizingMaskIntoConstraints="NO" id="hUd-Rb-6Ls">
-                                                <rect key="frame" x="-3" y="63" width="326" height="37"/>
+                                                <rect key="frame" x="-3" y="88" width="326" height="37"/>
                                                 <constraints>
                                                     <constraint firstAttribute="height" constant="30" id="3Tm-Sk-Wei"/>
                                                 </constraints>
@@ -192,21 +192,21 @@
                                                 </connections>
                                             </popUpButton>
                                             <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="NLb-RN-SpK">
-                                                <rect key="frame" x="-2" y="0.0" width="324" height="47"/>
+                                                <rect key="frame" x="-2" y="0.0" width="324" height="67"/>
                                                 <constraints>
-                                                    <constraint firstAttribute="height" constant="47" id="3gs-wF-UfX"/>
+                                                    <constraint firstAttribute="height" constant="67" id="3gs-wF-UfX"/>
                                                     <constraint firstAttribute="width" constant="320" id="tVZ-1G-sgl"/>
                                                 </constraints>
                                                 <textFieldCell key="cell" id="SXY-b7-hGs">
                                                     <font key="font" metaFont="cellTitle"/>
-                                                    <string key="title">Reports sent to DuckDuckGo are 100% anonymous and only include your selection above, the URL, and a list of trackers we found on the site.</string>
+                                                    <string key="title">Reports sent to DuckDuckGo are 100% anonymous and only include your selection above, the URL, a list of trackers we found on the site, the version of the app, and the version of macOS.</string>
                                                     <color key="textColor" name="secondaryLabelColor" catalog="System" colorSpace="catalog"/>
                                                     <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
                                                 </textFieldCell>
                                             </textField>
                                         </subviews>
                                         <constraints>
-                                            <constraint firstAttribute="height" constant="97" id="3Lp-Et-qRB"/>
+                                            <constraint firstAttribute="height" constant="122" id="3Lp-Et-qRB"/>
                                             <constraint firstItem="hUd-Rb-6Ls" firstAttribute="leading" secondItem="8B9-wf-zcP" secondAttribute="leading" id="Jed-xd-3mg"/>
                                             <constraint firstAttribute="trailing" secondItem="NLb-RN-SpK" secondAttribute="trailing" id="TUS-jM-vt1"/>
                                             <constraint firstAttribute="bottom" secondItem="NLb-RN-SpK" secondAttribute="bottom" id="dzu-Qi-Dq1"/>
