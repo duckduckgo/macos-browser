@@ -5351,7 +5351,7 @@
 			repositoryURL = "https://github.com/duckduckgo/BrowserServicesKit";
 			requirement = {
 				kind = revision;
-				revision = 75464355b8aa78020a60905cbbe95a4c3a29b5a7;
+				revision = d663338d50ac8d2b60c963ecc68c409c7c266a1d;
 			};
 		};
 		AA06B6B52672AF8100F541C5 /* XCRemoteSwiftPackageReference "Sparkle" */ = {
