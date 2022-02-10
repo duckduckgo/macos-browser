@@ -362,27 +362,28 @@ final class LocalBookmarkStore: BookmarkStore {
 
                 let bookmarkCountBeforeImport = try context.count(for: Bookmark.bookmarksFetchRequest())
 
-                if let bookmarksBar = bookmarks.topLevelFolders.bookmarkBar.children {
-                    let result = recursivelyCreateEntities(from: bookmarksBar,
-                                                           parent: nil,
-                                                           existingBookmarkURLs: bookmarkURLs,
-                                                           markBookmarksAsFavorite: true,
-                                                           in: self.context)
-
-                    total += result
-                }
-
                 let allFolders = try context.fetch(BookmarkFolder.bookmarkFoldersFetchRequest())
-                let existingOtherFolder = allFolders.first { ($0.titleEncrypted as? String) == "Other Bookmarks" }
-                let otherBookmarksFolder = existingOtherFolder ?? createFolder(titled: UserText.bookmarkImportOtherBookmarks, in: self.context)
                 
                 if let otherBookmarks = bookmarks.topLevelFolders.otherBookmarks.children {
                     let result = recursivelyCreateEntities(from: otherBookmarks,
-                                                           parent: otherBookmarksFolder,
+                                                           parent: nil,
                                                            existingBookmarkURLs: bookmarkURLs,
                                                            markBookmarksAsFavorite: false,
                                                            in: self.context)
                     
+                    total += result
+                }
+                
+                let existingFavoritesFolder = allFolders.first { ($0.titleEncrypted as? String) == "Favorites" }
+                let favoritesFolder = existingFavoritesFolder ?? createFolder(titled: UserText.bookmarkImportImportedFavorites, in: self.context)
+                
+                if let bookmarksBar = bookmarks.topLevelFolders.bookmarkBar.children {
+                    let result = recursivelyCreateEntities(from: bookmarksBar,
+                                                           parent: favoritesFolder,
+                                                           existingBookmarkURLs: bookmarkURLs,
+                                                           markBookmarksAsFavorite: true,
+                                                           in: self.context)
+
                     total += result
                 }
 
