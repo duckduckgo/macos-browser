@@ -16,7 +16,7 @@
 //  limitations under the License.
 //
 
-import Foundation
+import AppKit
 
 enum DataImport {
 
@@ -78,15 +78,20 @@ enum DataImport {
             switch browser {
             case .brave, .chrome, .edge:
                 // Chromium profiles are either named "Default", or a series of incrementing profile names, i.e. "Profile 1", "Profile 2", etc.
-                let potentialProfiles = profileURLs.map(BrowserProfile.init(profileURL:))
-                let filteredProfiles =  potentialProfiles.filter { $0.name == "Default" || $0.name.hasPrefix("Profile ") }
+                let potentialProfiles = profileURLs.map(BrowserProfile.from(profileURL:))
+                let filteredProfiles =  potentialProfiles.filter {
+                    $0.hasNonDefaultProfileName ||
+                    $0.profileName == "Default" ||
+                    $0.profileName.hasPrefix("Profile ")
+                }
+
                 let sortedProfiles = filteredProfiles.sorted()
 
                 self.profiles = sortedProfiles
             case .firefox:
-                self.profiles = profileURLs.map(BrowserProfile.init(profileURL:)).sorted()
+                self.profiles = profileURLs.map(BrowserProfile.from(profileURL:)).sorted()
             case .safari:
-                self.profiles = profileURLs.map(BrowserProfile.init(profileURL:)).sorted()
+                self.profiles = profileURLs.map(BrowserProfile.from(profileURL:)).sorted()
             }
         }
 
@@ -97,9 +102,9 @@ enum DataImport {
         var defaultProfile: BrowserProfile? {
             switch browser {
             case .brave, .chrome, .edge:
-                return profiles.first { $0.name == "Default" } ?? profiles.first
+                return profiles.first { $0.profileName == "Default" } ?? profiles.first
             case .firefox:
-                return profiles.first { $0.name == "default-release" } ?? profiles.first
+                return profiles.first { $0.profileName == "default-release" } ?? profiles.first
             case .safari:
                 return nil
             }
@@ -107,18 +112,39 @@ enum DataImport {
     }
 
     struct BrowserProfile: Comparable {
-        let profileURL: URL
 
-        init(profileURL: URL) {
-            self.profileURL = profileURL
+        enum Constants {
+            static let chromiumPreferencesFileName = "Preferences"
+            static let chromiumSystemProfileName = "System Profile"
         }
 
-        var name: String {
-            return profileURL.lastPathComponent.components(separatedBy: ".").last ?? profileURL.lastPathComponent
+        let profileURL: URL
+        var profileName: String {
+            return detectedChromePreferencesProfileName ?? fallbackProfileName
+        }
+        
+        var hasNonDefaultProfileName: Bool {
+            return detectedChromePreferencesProfileName != nil
+        }
+
+        private let fileStore: FileStore
+        private let fallbackProfileName: String
+        private let detectedChromePreferencesProfileName: String?
+        
+        static func from(profileURL: URL) -> BrowserProfile {
+            return BrowserProfile(profileURL: profileURL)
+        }
+
+        init(profileURL: URL, fileStore: FileStore = FileManager.default) {
+            self.fileStore = fileStore
+            self.profileURL = profileURL
+
+            self.fallbackProfileName = Self.getDefaultProfileName(at: profileURL)
+            self.detectedChromePreferencesProfileName = Self.getChromeProfileName(at: profileURL, fileStore: fileStore)
         }
 
         var hasLoginData: Bool {
-            guard let profileDirectoryContents = try? FileManager.default.contentsOfDirectory(atPath: profileURL.path) else {
+            guard let profileDirectoryContents = try? fileStore.directoryContents(at: profileURL.path) else {
                 return false
             }
 
@@ -128,8 +154,34 @@ enum DataImport {
             return hasChromiumData || hasFirefoxData
         }
 
+        private static func getDefaultProfileName(at profileURL: URL) -> String {
+            return profileURL.lastPathComponent.components(separatedBy: ".").last ?? profileURL.lastPathComponent
+        }
+        
+        private static func getChromeProfileName(at profileURL: URL, fileStore: FileStore) -> String? {
+            guard let profileDirectoryContents = try? fileStore.directoryContents(at: profileURL.path) else {
+                return nil
+            }
+            
+            guard profileURL.lastPathComponent != Constants.chromiumSystemProfileName else {
+                return nil
+            }
+            
+            if profileDirectoryContents.contains(Constants.chromiumPreferencesFileName),
+               let chromePreferenceData = fileStore.loadData(at: profileURL.appendingPathComponent(Constants.chromiumPreferencesFileName)),
+               let chromePreferences = try? JSONDecoder().decode(ChromePreferences.self, from: chromePreferenceData) {
+                return chromePreferences.profile.name
+            }
+            
+            return nil
+        }
+
         static func < (lhs: DataImport.BrowserProfile, rhs: DataImport.BrowserProfile) -> Bool {
-            return lhs.name.localizedCompare(rhs.name) == .orderedAscending
+            return lhs.profileName.localizedCompare(rhs.profileName) == .orderedAscending
+        }
+        
+        static func == (lhs: DataImport.BrowserProfile, rhs: DataImport.BrowserProfile) -> Bool {
+            return lhs.profileURL == rhs.profileURL
         }
     }
 
