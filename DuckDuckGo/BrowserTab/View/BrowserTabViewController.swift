@@ -320,12 +320,40 @@ extension BrowserTabViewController: TabDelegate {
             tab?.update(url: URL.makeSearchUrl(from: url.absoluteString), userEntered: false)
         }
 
+        // there is a hacky way you can detect whether an app is installed to handle a protocol:
+        // https://www.npmjs.com/package/custom-protocol-check
+        // > Safari: using hidden iframe onBlur to detect whether the focus is stolen.
+        // > When the focus is stolen, it assumes that the custom protocol launches external app and therefore it exists.
+        // Which, looking at the Zoom launcher code, is almost what they're doing:
+        /*
+            document.body.focus();
+            var t = function() {
+                return window.removeEventListener("blur", o)
+            };
+            function o() {
+                n(),
+                t()
+            }
+            var s = i.isMobile ? Ar : Cr;
+            if (setTimeout((function() {
+                n({
+                    code: 1001,
+                    message: "urlscheme no blur within timout " + s + "ms"
+                }),
+                t()
+            }), s), window.addEventListener("blur", o)
+            ...
+        */
+        // The code immediately after that then creates an iframe with the zoommtg:// link in it
+        // if the app is installed, the browser protocol handler will show, which triggers a blur event
+        // So, we'll steal a WebView focus if the app is installed, otherwise download should be triggered
         guard NSWorkspace.shared.urlForApplication(toOpen: url) != nil else {
-            guard userEntered else { return }
-
-            searchForExternalUrl()
+            if userEntered {
+                searchForExternalUrl()
+            }
             return
         }
+        self.view.makeMeFirstResponder()
 
         let permissionType = PermissionType.externalScheme(scheme: url.scheme ?? "")
         let retryHandler = { [weak self, weak tab] in
