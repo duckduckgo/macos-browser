@@ -57,7 +57,7 @@ struct SecureVaultSorting {
             case .allItems: return NSApp.appearance?.name ?? .aqua
             case .logins: return .aqua
             case .identities: return .darkAqua
-            case .cards: return .darkAqua
+            case .cards: return .aqua
             case .notes: return .aqua
             }
         }
