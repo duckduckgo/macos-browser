@@ -116,6 +116,14 @@ class CBRCompileTimeReporterTests: XCTestCase {
         }
     }
 
+    func testWaitingSucceedsDuringRegularNavigation() {
+        for (time, expectation) in waitExpectationSeq {
+            autoreleasepool {
+                _=performTest(withOnboardingFinished: true, waitTime: time, expectedWaitTime: expectation, result: .success)
+            }
+        }
+    }
+
     func testWhenTabClosedDuringOnboardingThenPixelIsFired() {
         for (time, expectation) in waitExpectationSeq {
             autoreleasepool {
@@ -132,21 +140,21 @@ class CBRCompileTimeReporterTests: XCTestCase {
         }
     }
 
-    func testWhenAppQuitsDuringOnboardingThenPixelIsFired() {
-        for (time, expectation) in waitExpectationSeq {
-            autoreleasepool {
-                _=performTest(withOnboardingFinished: false, waitTime: time, expectedWaitTime: expectation, result: .quit)
-            }
-        }
-    }
-
-    func testWhenAppQuitsDuringRegularNavigationThenPixelIsFired() {
-        for (time, expectation) in waitExpectationSeq {
-            autoreleasepool {
-                _=performTest(withOnboardingFinished: true, waitTime: time, expectedWaitTime: expectation, result: .quit)
-            }
-        }
-    }
+//    func testWhenAppQuitsDuringOnboardingThenPixelIsFired() {
+//        for (time, expectation) in waitExpectationSeq {
+//            autoreleasepool {
+//                _=performTest(withOnboardingFinished: false, waitTime: time, expectedWaitTime: expectation, result: .quit)
+//            }
+//        }
+//    }
+//
+//    func testWhenAppQuitsDuringRegularNavigationThenPixelIsFired() {
+//        for (time, expectation) in waitExpectationSeq {
+//            autoreleasepool {
+//                _=performTest(withOnboardingFinished: true, waitTime: time, expectedWaitTime: expectation, result: .quit)
+//            }
+//        }
+//    }
 
     func testWhenReporterReceivesEventSequenceThenOnlyOnePixelIsFired() {
         let reporter = performTest(withOnboardingFinished: true, waitTime: 1, expectedWaitTime: .lessThan1s, result: .success)
