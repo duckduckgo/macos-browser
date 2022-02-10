@@ -56,6 +56,10 @@ class CBRCompileTimeReporterTests: XCTestCase {
                      runBeforeFinishing: ((Reporter) throws -> Void)? = nil) rethrows -> Reporter {
 
         HTTPStubs.removeAllStubs()
+        defer {
+            HTTPStubs.removeAllStubs()
+            print("returning")
+        }
         let reporter = initReporter(onboardingFinished: onboardingFinished)
         let pixel = Pixel.Event.compileRulesWait(onboardingShown: onboardingFinished ? .regularNavigation : .onboardingShown,
                                                  waitTime: expectedWaitTime,
@@ -64,13 +68,16 @@ class CBRCompileTimeReporterTests: XCTestCase {
         reporter.tabWillWaitForRulesCompilation(tab)
 
         let expectation = expectation(description: "Pixel should fire")
+        print("expecting", pixel.name)
         stub(condition: isHost(host)) { req -> HTTPStubsResponse in
+            print("received", req.url?.lastPathComponent)
             XCTAssertEqual(req.url?.lastPathComponent, pixel.name, "waitTime \(waitTime)")
             expectation.fulfill()
             return HTTPStubsResponse(data: Data(), statusCode: 200, headers: nil)
         }
 
         do {
+            print("runBeforeFinishing", runBeforeFinishing != nil)
             try runBeforeFinishing?(reporter)
         } catch {
             expectation.fulfill()
@@ -79,6 +86,7 @@ class CBRCompileTimeReporterTests: XCTestCase {
         }
 
         time += waitTime
+        print("sending", result)
         switch result {
         case .success:
             reporter.reportWaitTimeForTabFinishedWaitingForRules(tab)
@@ -90,7 +98,9 @@ class CBRCompileTimeReporterTests: XCTestCase {
                                                          userInfo: nil))
         }
 
+        print("waiting")
         waitForExpectations(timeout: 5)
+
         return reporter
     }
 
@@ -140,21 +150,21 @@ class CBRCompileTimeReporterTests: XCTestCase {
         }
     }
 
-//    func testWhenAppQuitsDuringOnboardingThenPixelIsFired() {
-//        for (time, expectation) in waitExpectationSeq {
-//            autoreleasepool {
-//                _=performTest(withOnboardingFinished: false, waitTime: time, expectedWaitTime: expectation, result: .quit)
-//            }
-//        }
-//    }
-//
-//    func testWhenAppQuitsDuringRegularNavigationThenPixelIsFired() {
-//        for (time, expectation) in waitExpectationSeq {
-//            autoreleasepool {
-//                _=performTest(withOnboardingFinished: true, waitTime: time, expectedWaitTime: expectation, result: .quit)
-//            }
-//        }
-//    }
+    func testWhenAppQuitsDuringOnboardingThenPixelIsFired() {
+        for (time, expectation) in waitExpectationSeq {
+            autoreleasepool {
+                _=performTest(withOnboardingFinished: false, waitTime: time, expectedWaitTime: expectation, result: .quit)
+            }
+        }
+    }
+
+    func testWhenAppQuitsDuringRegularNavigationThenPixelIsFired() {
+        for (time, expectation) in waitExpectationSeq {
+            autoreleasepool {
+                _=performTest(withOnboardingFinished: true, waitTime: time, expectedWaitTime: expectation, result: .quit)
+            }
+        }
+    }
 
     func testWhenReporterReceivesEventSequenceThenOnlyOnePixelIsFired() {
         let reporter = performTest(withOnboardingFinished: true, waitTime: 1, expectedWaitTime: .lessThan1s, result: .success)
