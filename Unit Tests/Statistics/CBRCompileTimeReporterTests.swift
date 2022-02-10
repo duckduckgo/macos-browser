@@ -58,7 +58,6 @@ class CBRCompileTimeReporterTests: XCTestCase {
         HTTPStubs.removeAllStubs()
         defer {
             HTTPStubs.removeAllStubs()
-            print("returning")
         }
         let reporter = initReporter(onboardingFinished: onboardingFinished)
         let pixel = Pixel.Event.compileRulesWait(onboardingShown: onboardingFinished ? .regularNavigation : .onboardingShown,
@@ -68,16 +67,14 @@ class CBRCompileTimeReporterTests: XCTestCase {
         reporter.tabWillWaitForRulesCompilation(tab)
 
         let expectation = expectation(description: "Pixel should fire")
-        print("expecting", pixel.name)
         stub(condition: isHost(host)) { req -> HTTPStubsResponse in
-            print("received", req.url?.lastPathComponent)
+            print("received", req.url?.lastPathComponent ?? "", "expected", pixel.name)
             XCTAssertEqual(req.url?.lastPathComponent, pixel.name, "waitTime \(waitTime)")
             expectation.fulfill()
             return HTTPStubsResponse(data: Data(), statusCode: 200, headers: nil)
         }
 
         do {
-            print("runBeforeFinishing", runBeforeFinishing != nil)
             try runBeforeFinishing?(reporter)
         } catch {
             expectation.fulfill()
@@ -86,7 +83,6 @@ class CBRCompileTimeReporterTests: XCTestCase {
         }
 
         time += waitTime
-        print("sending", result)
         switch result {
         case .success:
             reporter.reportWaitTimeForTabFinishedWaitingForRules(tab)
@@ -98,9 +94,7 @@ class CBRCompileTimeReporterTests: XCTestCase {
                                                          userInfo: nil))
         }
 
-        print("waiting")
         waitForExpectations(timeout: 5)
-
         return reporter
     }
 

@@ -59,6 +59,10 @@ final class ContentBlocking {
     }
 
     private static let debugEvents = EventMapping<ContentBlockerDebugEvents> { event, scope, error, parameters, onComplete in
+#if DEBUG
+        guard !AppDelegate.isRunningTests else { return }
+#endif
+
         let domainEvent: Pixel.Event.Debug
         switch event {
         case .trackerDataParseFailed:
