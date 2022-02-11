@@ -42,3 +42,4 @@ struct WebsiteBreakage {
     let installedSurrogates: [String]
 
 }
+

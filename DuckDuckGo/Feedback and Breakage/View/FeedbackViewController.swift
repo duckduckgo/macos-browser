@@ -55,6 +55,14 @@ final class FeedbackViewController: NSViewController {
     private var cancellables = Set<AnyCancellable>()
 
     var currentTab: Tab?
+    var currentTabUrl: URL? {
+        guard let url = currentTab?.content.url else {
+            return nil
+        }
+
+        // ⚠️ To limit privacy risk, site URL is trimmed to not include query and fragment
+        return url.trimmingQueryItemsAndFragment()
+    }
 
     private let feedbackSender = FeedbackSender()
     private let websiteBreakageSender = WebsiteBreakageSender()
@@ -229,7 +237,7 @@ final class FeedbackViewController: NSViewController {
     private func sendWebsiteBreakage() {
         guard let selectedFormOption = selectedFormOption,
               let selectedWebsiteBreakageCategory = selectedWebsiteBreakageCategory,
-              let siteUrl = currentTab?.content.url else {
+              let siteUrl = currentTabUrl else {
             assertionFailure("Can't send breakage")
             return
         }
@@ -285,6 +293,18 @@ extension FeedbackViewController: NSTextFieldDelegate {
             return true
         }
         return false
+    }
+
+}
+
+private extension URL {
+
+    func trimmingQueryItemsAndFragment() -> URL? {
+        var components = URLComponents(url: self, resolvingAgainstBaseURL: true)
+        components?.queryItems = nil
+        components?.fragment = nil
+
+        return components?.url
     }
 
 }
