@@ -183,7 +183,8 @@
                                                             <menuItem title="Comments didn't load" tag="4" id="0YV-Mw-KfP"/>
                                                             <menuItem title="I can't sign in" tag="5" id="ks1-6b-EFw"/>
                                                             <menuItem title="Links or buttons don't work" tag="6" id="Fhy-jA-gGf"/>
-                                                            <menuItem title="Something else" tag="7" id="dYh-6K-3z6"/>
+                                                            <menuItem title="The browser is incompatible" tag="7" id="Z7S-Jl-DQ4"/>
+                                                            <menuItem title="Something else" tag="8" id="dYh-6K-3z6"/>
                                                         </items>
                                                     </menu>
                                                 </popUpButtonCell>

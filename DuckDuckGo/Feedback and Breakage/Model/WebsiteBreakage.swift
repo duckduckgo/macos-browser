@@ -28,7 +28,8 @@ struct WebsiteBreakage {
         case videoDidntPlay = "videos"
         case contentIsMissing = "content"
         case commentsDidntLoad = "comments"
-        case somethingElse = "Other"
+        case browserIsIncompatible = "unsupported"
+        case somethingElse = "other"
     }
 
     let category: Category

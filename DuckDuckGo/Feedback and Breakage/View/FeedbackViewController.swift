@@ -263,7 +263,8 @@ fileprivate extension WebsiteBreakage.Category {
         case 4: self = .videoDidntPlay
         case 5: self = .contentIsMissing
         case 6: self = .commentsDidntLoad
-        case 7: self = .somethingElse
+        case 7: self = .browserIsIncompatible
+        case 8: self = .somethingElse
 
         default:
             return nil
