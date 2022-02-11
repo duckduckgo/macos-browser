@@ -488,6 +488,7 @@
 		B63ED0E026AFE32F00A9DAD1 /* GeolocationProviderMock.swift in Sources */ = {isa = PBXBuildFile; fileRef = B63ED0DF26AFE32F00A9DAD1 /* GeolocationProviderMock.swift */; };
 		B63ED0E326B3E7FA00A9DAD1 /* CLLocationManagerMock.swift in Sources */ = {isa = PBXBuildFile; fileRef = B63ED0E226B3E7FA00A9DAD1 /* CLLocationManagerMock.swift */; };
 		B63ED0E526BB8FB900A9DAD1 /* SharingMenu.swift in Sources */ = {isa = PBXBuildFile; fileRef = B63ED0E426BB8FB900A9DAD1 /* SharingMenu.swift */; };
+		B642738227B65BAC0005DFD1 /* SecureVaultErrorReporter.swift in Sources */ = {isa = PBXBuildFile; fileRef = B642738127B65BAC0005DFD1 /* SecureVaultErrorReporter.swift */; };
 		B64C84DE2692D7400048FEBE /* PermissionAuthorization.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = B64C84DD2692D7400048FEBE /* PermissionAuthorization.storyboard */; };
 		B64C84E32692DC9F0048FEBE /* PermissionAuthorizationViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = B64C84E22692DC9F0048FEBE /* PermissionAuthorizationViewController.swift */; };
 		B64C84EB2692DD650048FEBE /* PermissionAuthorizationPopover.swift in Sources */ = {isa = PBXBuildFile; fileRef = B64C84EA2692DD650048FEBE /* PermissionAuthorizationPopover.swift */; };
@@ -1178,6 +1179,7 @@
 		B63ED0DF26AFE32F00A9DAD1 /* GeolocationProviderMock.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GeolocationProviderMock.swift; sourceTree = "<group>"; };
 		B63ED0E226B3E7FA00A9DAD1 /* CLLocationManagerMock.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CLLocationManagerMock.swift; sourceTree = "<group>"; };
 		B63ED0E426BB8FB900A9DAD1 /* SharingMenu.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SharingMenu.swift; sourceTree = "<group>"; };
+		B642738127B65BAC0005DFD1 /* SecureVaultErrorReporter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SecureVaultErrorReporter.swift; sourceTree = "<group>"; };
 		B64C84DD2692D7400048FEBE /* PermissionAuthorization.storyboard */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; path = PermissionAuthorization.storyboard; sourceTree = "<group>"; };
 		B64C84E22692DC9F0048FEBE /* PermissionAuthorizationViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PermissionAuthorizationViewController.swift; sourceTree = "<group>"; };
 		B64C84EA2692DD650048FEBE /* PermissionAuthorizationPopover.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PermissionAuthorizationPopover.swift; sourceTree = "<group>"; };
@@ -2061,6 +2063,7 @@
 				85CC1D7826A05E790062F04E /* Model */,
 				85CC1D7F26A05F6C0062F04E /* Services */,
 				85CC1D7926A05E820062F04E /* View */,
+				B642738127B65BAC0005DFD1 /* SecureVaultErrorReporter.swift */,
 			);
 			path = SecureVault;
 			sourceTree = "<group>";
@@ -4228,6 +4231,7 @@
 				4B59023D26B35F3600489384 /* ChromeDataImporter.swift in Sources */,
 				B68C92C42750EF76002AC6B0 /* PixelDataRecord.swift in Sources */,
 				853014D625E671A000FB8205 /* PageObserverUserScript.swift in Sources */,
+				B642738227B65BAC0005DFD1 /* SecureVaultErrorReporter.swift in Sources */,
 				4B139AFD26B60BD800894F82 /* NSImageExtensions.swift in Sources */,
 				B6A9E45B261460350067D1B9 /* APIHeaders.swift in Sources */,
 				85625996269C953C00EE44BC /* PasswordManagementViewController.swift in Sources */,
@@ -5331,7 +5335,7 @@
 			repositoryURL = "https://github.com/duckduckgo/BrowserServicesKit";
 			requirement = {
 				kind = revision;
-				revision = 73882824970f754709694aaf4b66dd61bb1bc632;
+				revision = 0a16e53fb6932b852767975481d8ff86bd28323b;
 			};
 		};
 		AA06B6B52672AF8100F541C5 /* XCRemoteSwiftPackageReference "Sparkle" */ = {
