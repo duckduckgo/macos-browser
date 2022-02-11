@@ -58,7 +58,9 @@ final class AbstractContentBlockingAssetsCompilationTimeReporter<Caller: AnyObje
         // report only once
         isFinished = true
 
-        Pixel.fire(.compileRulesWait(onboardingShown: self.onboardingShown, waitTime: waitTime, result: result), onComplete: completionHandler)
+        Pixel.fire(.compileRulesWait(onboardingShown: self.onboardingShown, waitTime: waitTime, result: result),
+                   withAdditionalParameters: ["waitTime": String(waitTime)],
+                   onComplete: completionHandler)
     }
 
     /// Called when Rules compilation finishes
