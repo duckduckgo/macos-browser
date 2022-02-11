@@ -140,11 +140,15 @@ final class Tab: NSObject {
     }
 
     deinit {
-        webView.configuration.userContentController.removeAllUserScripts()
+        self.userContentController.removeAllUserScripts()
 
 #if DEBUG
         assert(self.isClosing || !content.isUrl, "tabWillClose() was not called for this Tab")
 #endif
+    }
+
+    private var userContentController: UserContentController {
+        (webView.configuration.userContentController as? UserContentController)!
     }
 
     // MARK: - Event Publishers
@@ -320,10 +324,6 @@ final class Tab: NSObject {
     @discardableResult
     private func setFBProtection(enabled: Bool) -> Bool {
         guard self.fbBlockingEnabled != enabled else { return false }
-        guard let userContentController = self.webView.configuration.userContentController as? UserContentController else {
-            assertionFailure("expected UserContentController")
-            return false
-        }
 
         if enabled {
             do {
@@ -338,6 +338,10 @@ final class Tab: NSObject {
         self.fbBlockingEnabled = enabled
 
         return true
+    }
+
+    var cbrCompletionTokensPublisher: AnyPublisher<[ContentBlockerRulesManager.CompletionToken], Never> {
+        userContentController.$contentBlockingAssets.compactMap { $0?.completionTokens }.eraseToAnyPublisher()
     }
 
     private func reloadIfNeeded(shouldLoadInBackground: Bool = false) {
@@ -388,10 +392,6 @@ final class Tab: NSObject {
         webView.navigationDelegate = self
         webView.allowsBackForwardNavigationGestures = true
         webView.allowsMagnification = true
-        guard let userContentController = self.webView.configuration.userContentController as? UserContentController else {
-            assertionFailure("expected UserContentController")
-            return
-        }
         userContentController.delegate = self
 
         subscribeToOpenExternalUrlEvents()
@@ -817,9 +817,9 @@ extension Tab: WKNavigationDelegate {
            !url.isDuckDuckGo {
 
             // Ensure Content Blocking Assets (WKContentRuleList&UserScripts) are installed
-            if !webView.configuration.userContentController.contentBlockingAssetsInstalled {
+            if !userContentController.contentBlockingAssetsInstalled {
                 cbaTimeReporter?.tabWillWaitForRulesCompilation(self)
-                await webView.configuration.userContentController.awaitContentBlockingAssetsInstalled()
+                await userContentController.awaitContentBlockingAssetsInstalled()
                 cbaTimeReporter?.reportWaitTimeForTabFinishedWaitingForRules(self)
             } else {
                 cbaTimeReporter?.reportNavigationDidNotWaitForRules()

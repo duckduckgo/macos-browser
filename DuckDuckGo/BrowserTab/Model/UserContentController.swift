@@ -25,15 +25,23 @@ protocol UserContentControllerDelegate: AnyObject {
 }
 
 final class UserContentController: WKUserContentController {
-    private var blockingRulesUpdatedCancellable: AnyCancellable?
+    let privacyConfigurationManager: PrivacyConfigurationManager
     weak var delegate: UserContentControllerDelegate?
 
-    let privacyConfigurationManager: PrivacyConfigurationManager
-
     struct ContentBlockingAssets {
-        let rules: [String: WKContentRuleList]
-        let scripts: UserScripts
+        let contentRuleLists: [String: WKContentRuleList]
+        let userScripts: UserScripts
+        let completionTokens: [ContentBlockerRulesManager.CompletionToken]
     }
+    @Published private(set) var contentBlockingAssets: ContentBlockingAssets? {
+        didSet {
+            guard let contentBlockingAssets = contentBlockingAssets else { return }
+            self.installContentRuleLists(contentBlockingAssets.contentRuleLists)
+            self.installUserScripts(contentBlockingAssets.userScripts)
+        }
+    }
+
+    private var cancellable: AnyCancellable?
 
     public init<Pub: Publisher>(assetsPublisher: Pub, privacyConfigurationManager: PrivacyConfigurationManager)
     where Pub.Failure == Never, Pub.Output == ContentBlockingAssets {
@@ -41,7 +49,7 @@ final class UserContentController: WKUserContentController {
         self.privacyConfigurationManager = privacyConfigurationManager
         super.init()
 
-        attachToContentBlockingAssetsPublisher(publisher: assetsPublisher)
+        cancellable = assetsPublisher.receive(on: DispatchQueue.main).map { $0 }.weakAssign(to: \.contentBlockingAssets, on: self)
     }
 
     public convenience init(privacyConfigurationManager: PrivacyConfigurationManager = ContentBlocking.shared.privacyConfigurationManager) {
@@ -53,116 +61,69 @@ final class UserContentController: WKUserContentController {
         fatalError("init(coder:) has not been implemented")
     }
 
-    private var cbaInstalledContinuation: (() -> Void)?
+    private func installContentRuleLists(_ contentRuleLists: [String: WKContentRuleList]) {
+        self.removeAllContentRuleLists()
+        guard self.privacyConfigurationManager.privacyConfig.isEnabled(featureKey: .contentBlocking) else { return }
 
-    private(set) var uccContentBlockingAssetsInstalled = false {
-        didSet {
-            if uccContentBlockingAssetsInstalled {
-                cbaInstalledContinuation?()
-                self.cbaInstalledContinuation = nil
-            }
-        }
-    }
-
-    private func attachToContentBlockingAssetsPublisher<Pub: Publisher>(publisher: Pub)
-    where Pub.Failure == Never, Pub.Output == ContentBlockingAssets {
-
-        blockingRulesUpdatedCancellable = publisher.receive(on: DispatchQueue.main).sink { [weak self] assets in
-            self?.installContentBlockingAssets(assets)
-        }
-    }
-
-    private func installContentBlockingAssets(_ assets: ContentBlockingAssets) {
-        dispatchPrecondition(condition: .onQueue(.main))
-
-        self.contentRuleLists = assets.rules
-        self.scripts = assets.scripts
-
-        self.uccContentBlockingAssetsInstalled = true
-    }
-
-    private(set) var contentRuleLists: [String: WKContentRuleList] = [:] {
-        didSet {
-            self.removeAllContentRuleLists()
-            if self.privacyConfigurationManager.privacyConfig.isEnabled(featureKey: .contentBlocking) {
-                for rulesList in contentRuleLists.values {
-                    self.add(rulesList)
-                }
-            }
-        }
+        contentRuleLists.values.forEach(self.add)
     }
 
     struct ContentRulesNotFoundError: Error {}
     func enableContentRuleList(withIdentifier identifier: String) throws {
-        guard let ruleList = self.contentRuleLists[identifier] else {
+        guard let ruleList = self.contentBlockingAssets?.contentRuleLists[identifier] else {
             throw ContentRulesNotFoundError()
         }
         self.add(ruleList)
     }
 
     func disableContentRuleList(withIdentifier identifier: String) {
-        guard let ruleList = self.contentRuleLists[identifier] else {
+        guard let ruleList = self.contentBlockingAssets?.contentRuleLists[identifier] else {
             assertionFailure("Rule list not installed")
             return
         }
         self.remove(ruleList)
     }
 
-    private(set) var scripts: UserScripts? {
-        willSet {
-            self.removeAllUserScripts()
+    private func installUserScripts(_ userScripts: UserScripts) {
+        self.removeAllUserScripts()
+
+        userScripts.scripts.forEach(self.addUserScript)
+        userScripts.userScripts.forEach(self.addHandler)
+
+        guard let delegate = delegate else {
+            assertionFailure("UserContentController delegate not set")
+            return
         }
-        didSet {
-            guard let userScripts = scripts else { return }
 
-            userScripts.scripts.forEach(self.addUserScript)
-            userScripts.userScripts.forEach(self.addHandler)
-
-            guard let delegate = delegate else {
-                assertionFailure("UserContentController delegate not set")
-                return
-            }
-
-            delegate.userContentController(self, didInstallUserScripts: userScripts)
-        }
+        delegate.userContentController(self, didInstallUserScripts: userScripts)
     }
 
     override func removeAllUserScripts() {
         super.removeAllUserScripts()
-        self.scripts?.userScripts.forEach(self.removeHandler(_:))
-    }
-
-    func userContentControllerContentBlockingAssetsInstalled() async {
-        guard self.privacyConfigurationManager.privacyConfig.isEnabled(featureKey: .contentBlocking),
-              !contentBlockingAssetsInstalled
-        else { return }
-
-        await withCheckedContinuation { c in
-            self.cbaInstalledContinuation = { [continuation=self.cbaInstalledContinuation] in
-                c.resume()
-                continuation?()
-            }
-        } as Void
+        self.contentBlockingAssets?.userScripts.userScripts.forEach(self.removeHandler)
     }
 
 }
 
-extension WKUserContentController {
+extension UserContentController {
 
     var contentBlockingAssetsInstalled: Bool {
-        guard let self = self as? UserContentController else {
-            assertionFailure("unexpected WKUserContentController")
-            return true
-        }
-        return self.uccContentBlockingAssetsInstalled
+        contentBlockingAssets != nil
     }
 
     func awaitContentBlockingAssetsInstalled() async {
-        guard let self = self as? UserContentController else {
-            assertionFailure("unexpected WKUserContentController")
-            return
-        }
-        await self.userContentControllerContentBlockingAssetsInstalled()
+        guard !contentBlockingAssetsInstalled else { return }
+
+        await withCheckedContinuation { c in
+            var cancellable: AnyCancellable!
+            cancellable = $contentBlockingAssets.receive(on: DispatchQueue.main).sink { assets in
+                guard assets != nil else { return }
+                withExtendedLifetime(cancellable) {
+                    c.resume()
+                    cancellable.cancel()
+                }
+            }
+        } as Void
     }
 
 }

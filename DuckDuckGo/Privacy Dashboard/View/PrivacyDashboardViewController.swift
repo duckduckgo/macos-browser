@@ -37,14 +37,12 @@ final class PrivacyDashboardViewController: NSViewController {
         privacyDashboardScript.delegate = self
         initWebView()
         webView.configuration.userContentController.addHandlerNoContentWorld(privacyDashboardScript)
-
-        prepareContentBlockingCancellable(publisher: ContentBlocking.shared.contentBlockingUpdating.completionTokensPublisher)
     }
 
     private func prepareContentBlockingCancellable<Pub: Publisher>(publisher: Pub)
     where Pub.Output == [ContentBlockerRulesManager.CompletionToken], Pub.Failure == Never {
 
-        contentBlockinRulesUpdatedCancellable = publisher.receive(on: RunLoop.main).sink { [weak self] completionTokens in
+        publisher.receive(on: RunLoop.main).sink { [weak self] completionTokens in
             dispatchPrecondition(condition: .onQueue(.main))
 
             guard let self = self, !self.pendingUpdates.isEmpty else { return }
@@ -62,12 +60,15 @@ final class PrivacyDashboardViewController: NSViewController {
                 let activeTab = self.tabViewModel?.tab
                 activeTab?.reload()
             }
-        }
+        }.store(in: &cancellables)
     }
 
     override func viewWillAppear() {
+        guard let tabViewModel = tabViewModel else { return }
+
         let url = Bundle.main.url(forResource: "popup", withExtension: "html", subdirectory: "duckduckgo-privacy-dashboard/build/macos/html")!
         webView.loadFileURL(url, allowingReadAccessTo: url.deletingLastPathComponent())
+        prepareContentBlockingCancellable(publisher: tabViewModel.tab.cbrCompletionTokensPublisher)
     }
 
     override func viewWillDisappear() {

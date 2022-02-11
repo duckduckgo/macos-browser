@@ -63,12 +63,12 @@ class ContentBlockingUpdatingTests: XCTestCase {
         let c = updating.userContentBlockingAssets.sink { assets in
             switch (ruleList1, ruleList2) {
             case (.none, _):
-                ruleList1 = assets.rules["test"]
+                ruleList1 = assets.contentRuleLists["test"]
             case (.some, .none):
-                ruleList2 = assets.rules["test"]
+                ruleList2 = assets.contentRuleLists["test"]
             case (.some(let list1), .some(let list2)):
                 XCTAssertFalse(list1 == list2)
-                XCTAssertFalse(assets.rules["test"] === list2)
+                XCTAssertFalse(assets.contentRuleLists["test"] === list2)
                 e.fulfill()
             }
         }
@@ -87,14 +87,14 @@ class ContentBlockingUpdatingTests: XCTestCase {
         var userScripts: UserScripts!
         let c = updating.userContentBlockingAssets.sink { assets in
             if ruleList == nil && userScripts == nil {
-                ruleList = assets.rules["test"]
-                userScripts = assets.scripts
+                ruleList = assets.contentRuleLists["test"]
+                userScripts = assets.userScripts
             } else {
                 // ruleList should not be recompiled
-                XCTAssertTrue(assets.rules["test"] === ruleList)
+                XCTAssertTrue(assets.contentRuleLists["test"] === ruleList)
                 XCTAssertTrue(assets.isValid)
                 // userScripts should be rebuilt
-                XCTAssertFalse(assets.scripts === userScripts)
+                XCTAssertFalse(assets.userScripts === userScripts)
 
                 e.fulfill()
             }
@@ -113,7 +113,7 @@ class ContentBlockingUpdatingTests: XCTestCase {
         let update2 = Self.testUpdate()
         var update1received = false
         let e = expectation(description: "2 updates received")
-        let c = updating.completionTokensPublisher.sink { tokens in
+        let c = updating.userContentBlockingAssets.map { $0.completionTokens }.sink { tokens in
             if !update1received {
                 XCTAssertEqual(tokens, update1.completionTokens)
                 update1received = true
@@ -172,7 +172,7 @@ class ContentBlockingUpdatingTests: XCTestCase {
 
 extension UserContentController.ContentBlockingAssets {
     var isValid: Bool {
-        return self.rules["test"] != nil && self.scripts.userScripts.isEmpty == false
+        return self.contentRuleLists["test"] != nil && self.userScripts.userScripts.isEmpty == false
     }
 }
 

@@ -17,9 +17,10 @@
 //
 
 import Foundation
-import BrowserServicesKit
+import WebKit
 import Combine
 import os.log
+import BrowserServicesKit
 
 final class ContentBlocking {
     static let shared = ContentBlocking()
@@ -138,20 +139,10 @@ final class ContentBlocking {
 
 final class ContentBlockingUpdating {
 
-    private struct RulesAndScripts {
-        let rulesUpdate: ContentBlockerRulesManager.UpdateEvent
-        let userScripts: UserScripts
-
-        init(rulesUpdate: ContentBlockerRulesManager.UpdateEvent) {
-            self.rulesUpdate = rulesUpdate
-            self.userScripts = UserScripts(with: DefaultScriptSourceProvider())
-        }
-    }
-    @Published private var rulesAndScripts: RulesAndScripts?
+    @Published private var rulesUpdate: ContentBlockerRulesManager.UpdateEvent?
     private var cancellable: AnyCancellable?
 
     private(set) var userContentBlockingAssets: AnyPublisher<UserContentController.ContentBlockingAssets, Never>!
-    private(set) var completionTokensPublisher: AnyPublisher<[ContentBlockerRulesManager.CompletionToken], Never>!
 
     init(contentBlockerRulesManager: ContentBlockerRulesManagerProtocol,
          privacySecurityPreferences: PrivacySecurityPreferences = PrivacySecurityPreferences.shared) {
@@ -161,25 +152,19 @@ final class ContentBlockingUpdating {
             // regenerate UserScripts on gpcEnabled preference updated
             .combineLatest(privacySecurityPreferences.$gpcEnabled)
             .map { $0.0 } // drop gpcEnabled value: $0.1
-            .map(RulesAndScripts.init(rulesUpdate:)) // regenerate UserScripts
-            .weakAssign(to: \.rulesAndScripts, on: self) // buffer latest update value
+            .weakAssign(to: \.rulesUpdate, on: self) // buffer latest update value
 
         // 2. Publish ContentBlockingAssets(Rules+Scripts) for WKUserContentController per subscription
-        self.userContentBlockingAssets = $rulesAndScripts
+        self.userContentBlockingAssets = $rulesUpdate
             .compactMap { $0 } // drop initial nil
-            .map { rulesAndScripts in
-                UserContentController.ContentBlockingAssets(rules: rulesAndScripts.rulesUpdate.rules
+            .map { rulesUpdate in
+                UserContentController.ContentBlockingAssets(contentRuleLists: rulesUpdate.rules
                                                                 .reduce(into: [String: WKContentRuleList](), { result, rules in
                                                                     result[rules.name] = rules.rulesList
                                                                 }),
-                                                            scripts: rulesAndScripts.userScripts)
+                                                            userScripts: UserScripts(with: DefaultScriptSourceProvider()),
+                                                            completionTokens: rulesUpdate.completionTokens)
             }
-            .eraseToAnyPublisher()
-
-        // 3. Publish completion tokens for the Content Blocking Assets Regeneration operation for waiting Privacy Dashboard
-        self.completionTokensPublisher = $rulesAndScripts
-            .compactMap { $0 } // drop initial nil
-            .map(\.rulesUpdate.completionTokens)
             .eraseToAnyPublisher()
 
     }
