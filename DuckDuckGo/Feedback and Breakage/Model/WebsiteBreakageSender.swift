@@ -27,7 +27,8 @@ final class WebsiteBreakageSender {
                                             "tds": websiteBreakage.tdsETag?.trimmingCharacters(in: CharacterSet(charactersIn: "\"")) ?? "",
                                             "blockedTrackers": websiteBreakage.blockedTrackerDomains.joined(separator: ","),
                                             "surrogates": websiteBreakage.installedSurrogates.joined(separator: ","),
-                                            "os": websiteBreakage.osVersion]
+                                            "os": websiteBreakage.osVersion,
+                                            "atb": websiteBreakage.atb ?? ""]
 
         Pixel.fire(.brokenSiteReport, withAdditionalParameters: parameters)
     }

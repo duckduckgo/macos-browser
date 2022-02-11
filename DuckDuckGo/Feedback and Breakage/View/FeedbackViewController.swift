@@ -253,6 +253,7 @@ final class FeedbackViewController: NSViewController {
                                                   osVersion: "\(ProcessInfo.processInfo.operatingSystemVersion)",
                                                   upgradedHttps: currentTab?.connectionUpgradedTo != nil,
                                                   tdsETag: DefaultConfigurationStorage.shared.loadEtag(for: .trackerRadar),
+                                                  atb: LocalStatisticsStore().atb,
                                                   blockedTrackerDomains: blockedTrackerDomains,
                                                   installedSurrogates: installedSurrogates)
             websiteBreakageSender.sendWebsiteBreakage(websiteBreakage)
