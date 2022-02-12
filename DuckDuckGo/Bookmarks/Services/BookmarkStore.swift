@@ -365,7 +365,8 @@ final class LocalBookmarkStore: BookmarkStore {
                 let allFolders = try context.fetch(BookmarkFolder.bookmarkFoldersFetchRequest())
                 
                 if let otherBookmarks = bookmarks.topLevelFolders.otherBookmarks.children {
-                    let result = recursivelyCreateEntities(from: otherBookmarks,
+                    // Reverse the top level collection so that the order matches the imported bookmarks correctly.
+                    let result = recursivelyCreateEntities(from: otherBookmarks.reversed(),
                                                            parent: nil,
                                                            existingBookmarkURLs: bookmarkURLs,
                                                            markBookmarksAsFavorite: false,
