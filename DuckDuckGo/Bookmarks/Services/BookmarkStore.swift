@@ -375,7 +375,7 @@ final class LocalBookmarkStore: BookmarkStore {
                     total += result
                 }
                 
-                let existingFavoritesFolder = allFolders.first { ($0.titleEncrypted as? String) == "Favorites" }
+                let existingFavoritesFolder = allFolders.first { ($0.titleEncrypted as? String) == UserText.bookmarkImportImportedFavorites }
                 let favoritesFolder = existingFavoritesFolder ?? createFolder(titled: UserText.bookmarkImportImportedFavorites, in: self.context)
                 
                 if let bookmarksBar = bookmarks.topLevelFolders.bookmarkBar.children {
