@@ -93,14 +93,10 @@ struct PasswordManagementItemListCategoryView: View {
 
     var body: some View {
         
-        HStack {
-            
-            // Category Picker:
+        HStack(alignment: .center) {
             
             NSPopUpButtonView<SecureVaultSorting.Category>(selection: $model.sortDescriptor.category, viewCreator: {
                 let button = PopUpButton()
-                // button.font = NSFont.systemFont(ofSize: 13, weight: .regular)
-                // button.isBordered = false
                 
                 for category in SecureVaultSorting.Category.allCases {
                     button.addItem(withTitle: category.rawValue,
@@ -118,14 +114,18 @@ struct PasswordManagementItemListCategoryView: View {
                     }
                 }
                 
-                // button.sizeToFit()
+                button.sizeToFit()
                 
                 return button
-            }).frame(maxHeight: 30)
+            })
+                .alignmentGuide(VerticalAlignment.center) { _ in
+                    // Magic number to line up the pop up button with the sort button.
+                    // The custom pop up button cell isn't getting the expected frame, making it look misaligned, so this is used
+                    // to account for it.
+                    return 11
+                }
             
             Spacer()
-
-            // Sort Picker:
 
             // MenuButton incorrectly displays a disabled state when you re-render it with a different image.
             // According to Stack Overflow, this was fixed in macOS 12, but it can still be reproduced on 12.2.
@@ -181,10 +181,9 @@ struct PasswordManagementSortButton: View {
             .pickerStyle(.radioGroup)
         }
         .menuButtonStyle(BorderlessButtonMenuButtonStyle())
-        .frame(width: 16, height: 16)
         .padding([.top, .bottom, .trailing], 4)
         .padding(.leading, 7) // Leading needs additional padding to appear symmetrical
-        .background(RoundedRectangle(cornerRadius: 4).foregroundColor(sortHover ? Color("SecureVaultCategoryDefaultColor") : Color.clear))
+        .background(RoundedRectangle(cornerRadius: 5).foregroundColor(sortHover ? Color("SecureVaultCategoryDefaultColor") : Color.clear))
         .onHover { isOver in
             sortHover = isOver
         }

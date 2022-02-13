@@ -118,9 +118,15 @@ final class NSPopUpButtonBackgroundColorCell: NSPopUpButtonCell {
             return
         }
 
+        let horizontalOffset: CGFloat = 3
+        var modifiedFrame = frame
+        modifiedFrame.origin.x += horizontalOffset
+        modifiedFrame.size.width -= horizontalOffset
+        modifiedFrame.size.height -= 1
+        
         color.backgroundColor.setFill()
 
-        let backgroundPath = NSBezierPath(roundedRect: frame, xRadius: 6, yRadius: 6)
+        let backgroundPath = NSBezierPath(roundedRect: modifiedFrame, xRadius: 5, yRadius: 5)
         backgroundPath.fill()
         
         let foregroundColor = foregroundColor(for: title)
