@@ -173,7 +173,7 @@ final class NavigationBarViewController: NSViewController {
         }
 
         Pixel.fire(.refresh(source: .init(sender: sender, default: .button)))
-        selectedTabViewModel.tab.reload()
+        selectedTabViewModel.reload()
     }
 
     @IBAction func optionsButtonAction(_ sender: NSButton) {
