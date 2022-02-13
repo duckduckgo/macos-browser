@@ -1,0 +1,137 @@
+//
+//  PopUpButton.swift
+//
+//  Copyright © 2022 DuckDuckGo. All rights reserved.
+//
+//  Licensed under the Apache License, Version 2.0 (the "License");
+//  you may not use this file except in compliance with the License.
+//  You may obtain a copy of the License at
+//
+//  http://www.apache.org/licenses/LICENSE-2.0
+//
+//  Unless required by applicable law or agreed to in writing, software
+//  distributed under the License is distributed on an "AS IS" BASIS,
+//  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+//  See the License for the specific language governing permissions and
+//  limitations under the License.
+//
+
+import Foundation
+
+extension NSImage {
+
+    // swiftlint:disable force_cast
+    func tint(color: NSColor) -> NSImage {
+        let image = self.copy() as! NSImage
+        image.lockFocus()
+
+        color.set()
+
+        let imageRect = NSRect(origin: NSZeroPoint, size: image.size)
+        imageRect.fill(using: .sourceAtop)
+
+        image.unlockFocus()
+
+        return image
+    }
+    // swiftlint:enable force_cast
+
+}
+
+private struct NSMenuItemColor {
+    let foregroundColor: NSColor?
+    let backgroundColor: NSColor
+}
+
+final class PopUpButton: NSPopUpButton {
+    
+    var backgroundColorCell: NSPopUpButtonBackgroundColorCell? {
+        return self.cell as? NSPopUpButtonBackgroundColorCell
+    }
+    
+    init() {
+        super.init(frame: .zero, pullsDown: true)
+        self.cell = NSPopUpButtonBackgroundColorCell()
+    }
+    
+    override init(frame frameRect: NSRect) {
+        super.init(frame: frameRect)
+        self.cell = NSPopUpButtonBackgroundColorCell()
+    }
+    
+    required init?(coder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }
+    
+    func addItem(withTitle title: String,
+                 foregroundColor: NSColor?,
+                 backgroundColor: NSColor) {
+        self.addItem(withTitle: title)
+        
+        let itemColor = NSMenuItemColor(foregroundColor: foregroundColor, backgroundColor: backgroundColor)
+        backgroundColorCell?.colors[title] = itemColor
+    }
+    
+}
+
+final class NSPopUpButtonBackgroundColorCell: NSPopUpButtonCell {
+
+    private static let chevronsImage = NSImage(named: "PopUpButtonChevrons")!
+    
+    fileprivate var colors: [String: NSMenuItemColor] = [:]
+    
+    private func foregroundColor(for title: String) -> NSColor {
+        if let color = colors[title]?.foregroundColor {
+            return color
+        } else {
+            return NSApplication.shared.effectiveAppearance.name == .aqua ? .black : .white
+        }
+    }
+    
+    override func drawTitle(withFrame cellFrame: NSRect, in controlView: NSView) {
+        let font = self.font ?? NSFont.systemFont(ofSize: 15)
+
+        let string = NSAttributedString(string: title, attributes: [
+            NSAttributedString.Key.font: font,
+            NSAttributedString.Key.foregroundColor: foregroundColor(for: title)
+        ])
+
+        var titleRect = titleRect(forBounds: cellFrame)
+        titleRect.origin.y += 2
+        string.draw(in: titleRect)
+    }
+    
+    override func drawImage(withFrame cellFrame: NSRect, in controlView: NSView) {
+        let color = foregroundColor(for: title)
+        guard let tintedImage = image?.tint(color: color) else {
+            return
+        }
+
+        var imageRect = imageRect(forBounds: cellFrame)
+        imageRect.origin.y += 1
+        
+        tintedImage.draw(in: imageRect)
+    }
+    
+    override func drawBezel(withFrame frame: NSRect, in controlView: NSView) {
+        guard let color = colors[title] else {
+            return
+        }
+
+        color.backgroundColor.setFill()
+
+        let backgroundPath = NSBezierPath(roundedRect: frame, xRadius: 6, yRadius: 6)
+        backgroundPath.fill()
+        
+        let foregroundColor = foregroundColor(for: title)
+        
+        let tintedChevrons = Self.chevronsImage.tint(color: foregroundColor)
+        let chevronFrame = NSRect(x: frame.size.width - Self.chevronsImage.size.width - 4,
+                                  y: frame.size.height / 2 - Self.chevronsImage.size.height / 2,
+                                  width: Self.chevronsImage.size.width,
+                                  height: Self.chevronsImage.size.height)
+
+        tintedChevrons.draw(in: chevronFrame)
+    }
+
+}

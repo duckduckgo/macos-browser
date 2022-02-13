@@ -74,28 +74,3 @@ struct NSPopUpButtonView<ItemType>: NSViewRepresentable where ItemType: Equatabl
     }
 }
 // swiftlint:enable force_cast
-
-final class NSPopUpButtonBackgroundColorCell: NSPopUpButtonCell {
-
-    override func drawBezel(withFrame frame: NSRect, in controlView: NSView) {
-        print("drawBezel")
-        print("TITLE: \(titleOfSelectedItem)")
-    }
-    
-    override func drawInterior(withFrame cellFrame: NSRect, in controlView: NSView) {
-        super.drawInterior(withFrame: cellFrame, in: controlView)
-        print("drawInterior")
-        print("TITLE: \(titleOfSelectedItem)")
-    }
-
-    override func drawBorderAndBackground(withFrame cellFrame: NSRect, in controlView: NSView) {
-        super.drawBorderAndBackground(withFrame: cellFrame, in: controlView)
-        print("drawBorderAndBackground")
-        print("TITLE: \(titleOfSelectedItem)")
-        
-        guard let context = NSGraphicsContext.current?.cgContext else { return }
-        NSColor.red.setFill()
-        context.fill(cellFrame)
-    }
-
-}

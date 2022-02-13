@@ -127,13 +127,13 @@ final class PasswordManagementViewController: NSViewController {
         case .allItems:
             showDefaultEmptyState()
         case .logins:
-            showEmptyState(imageName: "Login", title: "No Logins")
+            showEmptyState(imageName: "LoginsEmpty", title: "No Logins")
         case .identities:
-            showEmptyState(imageName: "Identity", title: "No Identities")
+            showEmptyState(imageName: "IdentitiesEmpty", title: "No Identities")
         case .cards:
-            showEmptyState(imageName: "Card", title: "No Cards")
+            showEmptyState(imageName: "CreditCardsEmpty", title: "No Cards")
         case .notes:
-            showEmptyState(imageName: "Note", title: "No Notes")
+            showEmptyState(imageName: "NotesEmpty", title: "No Notes")
         }
     }
 

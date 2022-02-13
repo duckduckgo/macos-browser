@@ -42,23 +42,23 @@ struct SecureVaultSorting {
             }
         }
         
-        var categoryColor: Color? {
+        var backgroundColor: NSColor {
             switch self {
-            case .allItems: return nil
-            case .logins: return Color("LoginsColor")
-            case .identities: return Color("IdentitiesColor")
-            case .cards: return Color("CardsColor")
-            case .notes: return Color("NotesColor")
+            case .allItems: return NSColor(named: "SecureVaultCategoryDefaultColor")!
+            case .logins: return NSColor(named: "LoginsColor")!
+            case .identities: return NSColor(named: "IdentitiesColor")!
+            case .cards: return NSColor(named: "CardsColor")!
+            case .notes: return NSColor(named: "NotesColor")!
             }
         }
         
-        var controlAppearance: NSAppearance.Name {
+        var foregroundColor: NSColor? {
             switch self {
-            case .allItems: return NSApp.appearance?.name ?? .aqua
-            case .logins: return .aqua
-            case .identities: return .darkAqua
-            case .cards: return .aqua
-            case .notes: return .aqua
+            case .allItems: return nil // Show white or black depending on system appearance
+            case .logins: return .black
+            case .identities: return .black
+            case .cards: return .white
+            case .notes: return .black
             }
         }
     }

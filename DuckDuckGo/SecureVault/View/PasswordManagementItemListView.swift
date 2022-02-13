@@ -61,7 +61,7 @@ struct PasswordManagementItemListView: View {
                                 }
                                 .background(GeometryReader { insideProxy in
                                     Color.clear.preference(key: ScrollOffsetKey.self,
-                                                           value: self.calculateContentOffset(fromOutsideProxy: outsideProxy, insideProxy: insideProxy))
+                                                           value: self.calculateContentOffset(from: outsideProxy, to: insideProxy))
                                 })
                                 .onPreferenceChange(ScrollOffsetKey.self) { offset in
                                     if offset <= 0 {
@@ -81,7 +81,7 @@ struct PasswordManagementItemListView: View {
 
     }
     
-    private func calculateContentOffset(fromOutsideProxy outsideProxy: GeometryProxy, insideProxy: GeometryProxy) -> CGFloat {
+    private func calculateContentOffset(from outsideProxy: GeometryProxy, to insideProxy: GeometryProxy) -> CGFloat {
         return outsideProxy.frame(in: .global).minY - insideProxy.frame(in: .global).minY
     }
 
@@ -90,10 +90,6 @@ struct PasswordManagementItemListView: View {
 struct PasswordManagementItemListCategoryView: View {
     
     @EnvironmentObject var model: PasswordManagementItemListModel
-    
-    var categoryPickerColor: Color {
-        return model.sortDescriptor.category.categoryColor ?? Color("SecureVaultCategoryDefaultColor")
-    }
 
     var body: some View {
         
@@ -102,40 +98,30 @@ struct PasswordManagementItemListCategoryView: View {
             // Category Picker:
             
             NSPopUpButtonView<SecureVaultSorting.Category>(selection: $model.sortDescriptor.category, viewCreator: {
-                let button = NSPopUpButton()
-                button.font = NSFont.systemFont(ofSize: 13, weight: .regular)
-                button.isBordered = false
-                (button.cell as? NSPopUpButtonCell)?.arrowPosition = .arrowAtCenter
+                let button = PopUpButton()
+                // button.font = NSFont.systemFont(ofSize: 13, weight: .regular)
+                // button.isBordered = false
                 
                 for category in SecureVaultSorting.Category.allCases {
-                    let item = button.menu?.addItem(withTitle: category.rawValue, action: nil, keyEquivalent: "")
+                    button.addItem(withTitle: category.rawValue,
+                                   foregroundColor: category.foregroundColor,
+                                   backgroundColor: category.backgroundColor)
                     
                     if let imageName = category.imageName {
-                        item?.image = NSImage(named: imageName)
+                        button.lastItem?.image = NSImage(named: imageName)
                     }
-
-                    item?.representedObject = category
-
+                    
+                    button.lastItem?.representedObject = category
+                    
                     if category == .allItems {
                         button.menu?.addItem(NSMenuItem.separator())
                     }
                 }
                 
-                button.selectionPublisher.sink { index in
-                    // I hate this and everything about it. It won't be here by the time a PR shows up
-                    let realIndex = (index <= 1) ? index : index - 1
-                    let category = SecureVaultSorting.Category.allCases[realIndex]
-                    button.appearance = NSAppearance(named: category.controlAppearance)
-                }.store(in: &model.cancellables)
+                // button.sizeToFit()
                 
-                button.sizeToFit()
-
                 return button
-            })
-                .padding(4)
-                .background(categoryPickerColor)
-                .cornerRadius(4.0)
-                .frame(maxHeight: 20)
+            }).frame(maxHeight: 30)
             
             Spacer()
 
