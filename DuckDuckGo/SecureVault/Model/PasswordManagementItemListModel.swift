@@ -304,6 +304,10 @@ final class PasswordManagementItemListModel: ObservableObject {
             itemsByCategory = itemsByCategory.filter { $0.item(matches: filter) }
         }
 
+        if displayedItems.isEmpty && items.isEmpty {
+            return
+        }
+
         switch sortDescriptor.parameter {
         case .title:
             displayedItems = PasswordManagementListSection.sections(with: itemsByCategory, by: \.firstCharacter, order: sortDescriptor.order)
