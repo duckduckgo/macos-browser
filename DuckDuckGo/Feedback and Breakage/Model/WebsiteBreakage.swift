@@ -34,7 +34,6 @@ struct WebsiteBreakage {
 
     let category: Category
     let siteUrl: URL
-    let appVersion: String
     let osVersion: String
     let upgradedHttps: Bool
     let tdsETag: String?
@@ -43,4 +42,3 @@ struct WebsiteBreakage {
     let installedSurrogates: [String]
 
 }
-

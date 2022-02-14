@@ -249,7 +249,6 @@ final class FeedbackViewController: NSViewController {
             let installedSurrogates = currentTab?.trackerInfo?.installedSurrogates.map {$0} ?? []
             let websiteBreakage = WebsiteBreakage(category: selectedWebsiteBreakageCategory,
                                                   siteUrl: siteUrl,
-                                                  appVersion: "\(AppVersion.shared.versionNumber)",
                                                   osVersion: "\(ProcessInfo.processInfo.operatingSystemVersion)",
                                                   upgradedHttps: currentTab?.connectionUpgradedTo != nil,
                                                   tdsETag: DefaultConfigurationStorage.shared.loadEtag(for: .trackerRadar),
