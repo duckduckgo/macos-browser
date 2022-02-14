@@ -32,7 +32,7 @@ struct WebsiteBreakage {
         case somethingElse = "other"
     }
 
-    let category: Category
+    let category: Category?
     let siteUrl: URL
     let osVersion: String
     let upgradedHttps: Bool

@@ -203,11 +203,7 @@ final class FeedbackViewController: NSViewController {
                 submitButton.isEnabled = false
             }
         case .websiteBreakage:
-            if selectedWebsiteBreakageCategory != nil {
-                submitButton.isEnabled = true
-            } else {
-                submitButton.isEnabled = false
-            }
+            submitButton.isEnabled = true
         }
 
         submitButton.bezelColor = submitButton.isEnabled ? NSColor.controlAccentColor: nil
@@ -236,7 +232,6 @@ final class FeedbackViewController: NSViewController {
 
     private func sendWebsiteBreakage() {
         guard let selectedFormOption = selectedFormOption,
-              let selectedWebsiteBreakageCategory = selectedWebsiteBreakageCategory,
               let siteUrl = currentTabUrl else {
             assertionFailure("Can't send breakage")
             return
