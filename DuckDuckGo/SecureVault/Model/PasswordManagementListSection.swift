@@ -70,7 +70,7 @@ struct PasswordManagementListSection {
                 return DateMetadata.unknown
             }
             
-            return DateMetadata(title: Self.dateFormatter.string(from: date).uppercased(), month: month, year: year)
+            return DateMetadata(title: Self.dateFormatter.string(from: date), month: month, year: year)
         }
         
         let metadataSortFunction: (DateMetadata, DateMetadata) -> Bool = order == .ascending ? (>) : (<)
