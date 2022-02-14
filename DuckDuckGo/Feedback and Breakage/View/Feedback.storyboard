@@ -284,18 +284,73 @@ Gw
                                     </userDefinedRuntimeAttribute>
                                 </userDefinedRuntimeAttributes>
                             </customView>
+                            <customView hidden="YES" translatesAutoresizingMaskIntoConstraints="NO" id="C8j-UX-ywh">
+                                <rect key="frame" x="0.0" y="0.0" width="360" height="160"/>
+                                <subviews>
+                                    <button verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="3nf-Bg-7k2">
+                                        <rect key="frame" x="14" y="14" width="332" height="40"/>
+                                        <constraints>
+                                            <constraint firstAttribute="height" constant="28" id="1gW-Wq-I7c"/>
+                                        </constraints>
+                                        <buttonCell key="cell" type="push" title="OK" bezelStyle="rounded" alignment="center" controlSize="large" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="H3H-xG-326">
+                                            <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
+                                            <font key="font" metaFont="system"/>
+                                            <string key="keyEquivalent" base64-UTF8="YES">
+DQ
+</string>
+                                        </buttonCell>
+                                        <connections>
+                                            <action selector="okButtonAction:" target="TOa-sP-KHa" id="C2a-ct-tif"/>
+                                        </connections>
+                                    </button>
+                                    <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="Pad-Pc-j6d">
+                                        <rect key="frame" x="137" y="114" width="87" height="19"/>
+                                        <textFieldCell key="cell" alignment="center" title="Thank you!" id="NFA-fu-2EM">
+                                            <font key="font" metaFont="systemSemibold" size="15"/>
+                                            <color key="textColor" name="GreyTextColor"/>
+                                            <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
+                                        </textFieldCell>
+                                    </textField>
+                                    <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="syf-sE-uUM">
+                                        <rect key="frame" x="18" y="75" width="324" height="28"/>
+                                        <constraints>
+                                            <constraint firstAttribute="height" constant="28" id="NhF-KV-8Fz"/>
+                                            <constraint firstAttribute="width" constant="320" id="OKh-5g-IKI"/>
+                                        </constraints>
+                                        <textFieldCell key="cell" alignment="center" title="Your report will help improve the app and make the experience better for other people" id="cij-aI-J9r">
+                                            <font key="font" metaFont="smallSystem"/>
+                                            <color key="textColor" name="secondaryLabelColor" catalog="System" colorSpace="catalog"/>
+                                            <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
+                                        </textFieldCell>
+                                    </textField>
+                                </subviews>
+                                <constraints>
+                                    <constraint firstAttribute="trailing" secondItem="3nf-Bg-7k2" secondAttribute="trailing" constant="20" symbolic="YES" id="0ih-HM-vLb"/>
+                                    <constraint firstItem="Pad-Pc-j6d" firstAttribute="centerY" secondItem="C8j-UX-ywh" secondAttribute="centerY" constant="-43" id="Bit-yx-9pS"/>
+                                    <constraint firstAttribute="bottom" secondItem="3nf-Bg-7k2" secondAttribute="bottom" constant="20" symbolic="YES" id="G6K-eI-7Wb"/>
+                                    <constraint firstItem="3nf-Bg-7k2" firstAttribute="leading" secondItem="C8j-UX-ywh" secondAttribute="leading" constant="20" symbolic="YES" id="IAg-ez-Kww"/>
+                                    <constraint firstAttribute="trailing" secondItem="syf-sE-uUM" secondAttribute="trailing" constant="20" symbolic="YES" id="Qih-Y8-L1A"/>
+                                    <constraint firstItem="syf-sE-uUM" firstAttribute="centerY" secondItem="C8j-UX-ywh" secondAttribute="centerY" constant="-9" id="gGu-Qg-XAr"/>
+                                    <constraint firstItem="Pad-Pc-j6d" firstAttribute="centerX" secondItem="C8j-UX-ywh" secondAttribute="centerX" id="kxj-pU-r3k"/>
+                                    <constraint firstItem="syf-sE-uUM" firstAttribute="leading" secondItem="C8j-UX-ywh" secondAttribute="leading" constant="20" symbolic="YES" id="psO-TK-tGb"/>
+                                </constraints>
+                            </customView>
                         </subviews>
                         <constraints>
                             <constraint firstItem="B4Q-yT-nKT" firstAttribute="top" secondItem="Ie8-lu-6dX" secondAttribute="top" id="3Dc-AK-Lr4"/>
                             <constraint firstAttribute="trailing" secondItem="wYB-07-s0m" secondAttribute="trailing" id="54G-1j-PDV"/>
                             <constraint firstItem="wYB-07-s0m" firstAttribute="leading" secondItem="Ie8-lu-6dX" secondAttribute="leading" id="70v-uj-SxJ"/>
+                            <constraint firstAttribute="trailing" secondItem="C8j-UX-ywh" secondAttribute="trailing" id="8oa-Q0-m1z"/>
                             <constraint firstItem="B4Q-yT-nKT" firstAttribute="leading" secondItem="Ie8-lu-6dX" secondAttribute="leading" id="ADl-PW-sIG"/>
                             <constraint firstAttribute="trailing" secondItem="B4Q-yT-nKT" secondAttribute="trailing" id="Qvt-j3-DaC"/>
                             <constraint firstAttribute="trailing" secondItem="iPz-Dg-VNs" secondAttribute="trailing" id="Xte-41-dmx"/>
+                            <constraint firstItem="C8j-UX-ywh" firstAttribute="top" secondItem="B4Q-yT-nKT" secondAttribute="bottom" id="bdh-tz-GgB"/>
+                            <constraint firstItem="C8j-UX-ywh" firstAttribute="leading" secondItem="Ie8-lu-6dX" secondAttribute="leading" id="cb2-bQ-LAr"/>
                             <constraint firstAttribute="bottom" secondItem="wYB-07-s0m" secondAttribute="bottom" id="iNT-d7-7lc"/>
                             <constraint firstItem="iPz-Dg-VNs" firstAttribute="bottom" secondItem="B4Q-yT-nKT" secondAttribute="bottom" id="k6G-bc-JFm"/>
                             <constraint firstItem="wYB-07-s0m" firstAttribute="top" secondItem="B4Q-yT-nKT" secondAttribute="bottom" id="lQH-dg-3tL"/>
                             <constraint firstItem="iPz-Dg-VNs" firstAttribute="leading" secondItem="Ie8-lu-6dX" secondAttribute="leading" id="qPT-VT-BJu"/>
+                            <constraint firstAttribute="bottom" secondItem="C8j-UX-ywh" secondAttribute="bottom" id="taz-Ft-0Yy"/>
                         </constraints>
                     </view>
                     <connections>
@@ -308,6 +363,7 @@ Gw
                         <outlet property="pickOptionMenuItem" destination="z2T-3Y-jPK" id="6dO-Or-fk2"/>
                         <outlet property="submitButton" destination="Gy6-KF-A15" id="aBn-VX-sGY"/>
                         <outlet property="textField" destination="wK6-n4-LX0" id="iIL-8c-BX9"/>
+                        <outlet property="thankYouView" destination="C8j-UX-ywh" id="EQo-2a-mhp"/>
                         <outlet property="websiteBreakageCategoryPopUpButton" destination="hUd-Rb-6Ls" id="DqR-hE-Sm5"/>
                         <outlet property="websiteBreakageView" destination="8B9-wf-zcP" id="enA-tH-Z1l"/>
                     </connections>

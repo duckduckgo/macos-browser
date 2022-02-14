@@ -21,6 +21,13 @@ import Combine
 
 final class FeedbackViewController: NSViewController {
 
+    enum Constants {
+        static let defaultContentHeight: CGFloat = 160
+        static let feedbackContentHeight: CGFloat = 338
+        static let websiteBreakageContentHeight: CGFloat = 260
+
+    }
+
     enum FormOption {
         case websiteBreakage
         case feedback(feedbackCategory: Feedback.Category)
@@ -52,6 +59,7 @@ final class FeedbackViewController: NSViewController {
 
     @IBOutlet weak var submitButton: NSButton!
 
+    @IBOutlet weak var thankYouView: NSView!
     private var cancellables = Set<AnyCancellable>()
 
     var currentTab: Tab?
@@ -120,6 +128,10 @@ final class FeedbackViewController: NSViewController {
         case .feedback: sendFeedback()
         }
 
+        showThankYou()
+    }
+
+    @IBAction func okButtonAction(_ sender: Any) {
         guard let window = view.window,
               let sheetParent = window.sheetParent else {
                   assertionFailure("No sheet parent")
@@ -163,7 +175,7 @@ final class FeedbackViewController: NSViewController {
         guard let selectedFormOption = selectedFormOption else {
             browserFeedbackView.isHidden = true
             websiteBreakageView.isHidden = true
-            contentViewHeightContraint.constant = 160
+            setContentViewHeight(Constants.defaultContentHeight, animated: false)
             pickOptionMenuItem.isEnabled = true
             return
         }
@@ -172,20 +184,28 @@ final class FeedbackViewController: NSViewController {
         switch selectedFormOption {
         case .feedback:
             browserFeedbackView.isHidden = false
-            contentHeight = 338
+            contentHeight = Constants.feedbackContentHeight
             textField.makeMeFirstResponder()
         case .websiteBreakage:
             browserFeedbackView.isHidden = true
-            contentHeight = 260
+            contentHeight = Constants.websiteBreakageContentHeight
             if selectedWebsiteBreakageCategory == nil {
                 pickIssueMenuItem.isEnabled = true
             }
         }
         websiteBreakageView.isHidden = !browserFeedbackView.isHidden
-        NSAnimationContext.runAnimationGroup { [weak self] context in
-            context.duration = 1/3
-            context.timingFunction = CAMediaTimingFunction(name: .easeInEaseOut)
-            self?.contentViewHeightContraint.animator().constant = contentHeight
+        setContentViewHeight(contentHeight, animated: true)
+    }
+
+    private func setContentViewHeight(_ height: CGFloat, animated: Bool) {
+        if animated {
+            NSAnimationContext.runAnimationGroup { [weak self] context in
+                context.duration = 1/3
+                context.timingFunction = CAMediaTimingFunction(name: .easeInEaseOut)
+                self?.contentViewHeightContraint.animator().constant = height
+            }
+        } else {
+            contentViewHeightContraint.constant = height
         }
     }
 
@@ -252,6 +272,12 @@ final class FeedbackViewController: NSViewController {
                                                   installedSurrogates: installedSurrogates)
             websiteBreakageSender.sendWebsiteBreakage(websiteBreakage)
         }
+    }
+
+    private func showThankYou() {
+        setContentViewHeight(Constants.defaultContentHeight, animated: true)
+        contentView.isHidden = true
+        thankYouView.isHidden = false
     }
 }
 
