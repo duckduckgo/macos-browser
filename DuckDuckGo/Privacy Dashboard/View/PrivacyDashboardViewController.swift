@@ -56,9 +56,7 @@ final class PrivacyDashboardViewController: NSViewController {
 
             if didUpdate {
                 self.sendPendingUpdates()
-
-                let activeTab = self.tabViewModel?.tab
-                activeTab?.reload()
+                self.tabViewModel?.reload()
             }
         }
     }

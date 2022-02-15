@@ -196,7 +196,7 @@ extension MainViewController {
         }
 
         Pixel.fire(.refresh(source: .init(sender: sender, default: .mainMenu)))
-        selectedTabViewModel.tab.reload()
+        selectedTabViewModel.reload()
     }
 
     @IBAction func stopLoadingPage(_ sender: Any) {

@@ -62,6 +62,13 @@ final class FirefoxLoginReader {
         let databasePath = firefoxProfileURL.appendingPathComponent(keyDatabaseName).path
 
         let loginsPath = firefoxProfileURL.appendingPathComponent(loginsFileName).path
+        
+        // If there isn't a file where logins are expected, consider it a successful import of 0 logins
+        // to avoid showing an error state.
+        guard FileManager.default.fileExists(atPath: loginsPath) else {
+            return .success([])
+        }
+        
         guard let logins = readLoginsFile(from: loginsPath) else {
             return .failure(.couldNotReadLoginsFile)
         }
