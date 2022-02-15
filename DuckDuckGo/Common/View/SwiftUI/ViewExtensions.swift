@@ -40,4 +40,17 @@ extension View {
         }
     }
 
+    func link(onHoverChanged: ((Bool) -> Void)? = nil, clicked: @escaping () -> Void) -> some View {
+        self.onHover { over in
+            onHoverChanged?(over)
+            if over {
+                NSCursor.pointingHand.set()
+            } else {
+                NSCursor.arrow.set()
+            }
+        }.onTapGesture {
+            clicked()
+        }
+    }
+
 }

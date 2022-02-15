@@ -143,8 +143,8 @@ final class TabCollectionViewModel: NSObject {
 
     // MARK: - Addition
 
-    func appendNewTab(with content: Tab.TabContent = .homepage, forceChange: Bool = false) {
-        append(tab: Tab(content: content), selected: true)
+    func appendNewTab(with content: Tab.TabContent = .homepage, selected: Bool = true, forceChange: Bool = false) {
+        append(tab: Tab(content: content), selected: selected, forceChange: forceChange)
     }
 
     func append(tab: Tab, selected: Bool = true, forceChange: Bool = false) {
@@ -268,7 +268,7 @@ final class TabCollectionViewModel: NSObject {
         if !tabCollection.tabs.indices.contains(selectionIndex ?? -1) {
             selectionIndex = tabCollection.tabs.indices.last
         }
-        
+
         delegate?.tabCollectionViewModelDidMultipleChanges(self)
     }
 
