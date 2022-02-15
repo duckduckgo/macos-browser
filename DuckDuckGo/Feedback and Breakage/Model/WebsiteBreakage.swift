@@ -33,7 +33,7 @@ struct WebsiteBreakage {
     }
 
     let category: Category?
-    let siteUrl: URL
+    let siteUrlString: String
     let osVersion: String
     let upgradedHttps: Bool
     let tdsETag: String?

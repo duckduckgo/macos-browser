@@ -24,7 +24,7 @@ final class FeedbackViewController: NSViewController {
     enum Constants {
         static let defaultContentHeight: CGFloat = 160
         static let feedbackContentHeight: CGFloat = 338
-        static let websiteBreakageContentHeight: CGFloat = 260
+        static let websiteBreakageContentHeight: CGFloat = 307
 
     }
 
@@ -45,17 +45,16 @@ final class FeedbackViewController: NSViewController {
 
     @IBOutlet weak var optionPopUpButton: NSPopUpButton!
     @IBOutlet weak var pickOptionMenuItem: NSMenuItem!
-    @IBOutlet weak var brokenWebsiteMenuItem: NSMenuItem!
 
     @IBOutlet weak var contentView: ColorView!
     @IBOutlet weak var contentViewHeightContraint: NSLayoutConstraint!
 
     @IBOutlet weak var browserFeedbackView: NSView!
-    @IBOutlet weak var textField: NSTextField!
+    @IBOutlet weak var browserFeedbackTextField: NSTextField!
 
     @IBOutlet weak var websiteBreakageView: NSView!
+    @IBOutlet weak var urlTextField: NSTextField!
     @IBOutlet weak var websiteBreakageCategoryPopUpButton: NSPopUpButton!
-    @IBOutlet weak var pickIssueMenuItem: NSMenuItem!
 
     @IBOutlet weak var submitButton: NSButton!
 
@@ -77,7 +76,8 @@ final class FeedbackViewController: NSViewController {
 
     override func viewDidLoad() {
         super.viewDidLoad()
-        textField.delegate = self
+        browserFeedbackTextField.delegate = self
+        urlTextField.delegate = self
     }
 
     override func viewDidAppear() {
@@ -87,7 +87,6 @@ final class FeedbackViewController: NSViewController {
                                                selector: #selector(popUpButtonOpened(_:)),
                                                name: NSPopUpButton.willPopUpNotification,
                                                object: nil)
-        updateBrokenWebsiteMenuItem()
     }
 
     override func viewDidDisappear() {
@@ -115,7 +114,7 @@ final class FeedbackViewController: NSViewController {
         if popUpButton == optionPopUpButton {
             pickOptionMenuItem.isEnabled = false
         } else if popUpButton == websiteBreakageCategoryPopUpButton {
-            pickIssueMenuItem.isEnabled = false
+            view.makeMeFirstResponder()
         } else {
             assertionFailure("Unknown popup button")
         }
@@ -185,12 +184,13 @@ final class FeedbackViewController: NSViewController {
         case .feedback:
             browserFeedbackView.isHidden = false
             contentHeight = Constants.feedbackContentHeight
-            textField.makeMeFirstResponder()
+            browserFeedbackTextField.makeMeFirstResponder()
         case .websiteBreakage:
             browserFeedbackView.isHidden = true
             contentHeight = Constants.websiteBreakageContentHeight
-            if selectedWebsiteBreakageCategory == nil {
-                pickIssueMenuItem.isEnabled = true
+            urlTextField.stringValue = currentTabUrl?.absoluteString ?? ""
+            if urlTextField.stringValue.isEmpty {
+                urlTextField.makeMeFirstResponder()
             }
         }
         websiteBreakageView.isHidden = !browserFeedbackView.isHidden
@@ -217,20 +217,16 @@ final class FeedbackViewController: NSViewController {
 
         switch selectedFormOption {
         case .feedback:
-            if !textField.stringValue.trimmingWhitespaces().isEmpty {
+            if !browserFeedbackTextField.stringValue.trimmingWhitespaces().isEmpty {
                 submitButton.isEnabled = true
             } else {
                 submitButton.isEnabled = false
             }
         case .websiteBreakage:
-            submitButton.isEnabled = true
+            submitButton.isEnabled = !urlTextField.stringValue.isEmpty
         }
 
         submitButton.bezelColor = submitButton.isEnabled ? NSColor.controlAccentColor: nil
-    }
-
-    private func updateBrokenWebsiteMenuItem() {
-        brokenWebsiteMenuItem.isEnabled = currentTab?.content.isUrl ?? false
     }
 
     private func sendFeedback() {
@@ -243,7 +239,7 @@ final class FeedbackViewController: NSViewController {
         case .websiteBreakage: assertionFailure("Wrong method executed")
         case .feedback(feedbackCategory: let feedbackCategory):
             let feedback = Feedback(category: feedbackCategory,
-                                    comment: textField.stringValue,
+                                    comment: browserFeedbackTextField.stringValue,
                                     appVersion: "\(AppVersion.shared.versionNumber)",
                                     osVersion: "\(ProcessInfo.processInfo.operatingSystemVersion)")
             feedbackSender.sendFeedback(feedback)
@@ -251,8 +247,7 @@ final class FeedbackViewController: NSViewController {
     }
 
     private func sendWebsiteBreakage() {
-        guard let selectedFormOption = selectedFormOption,
-              let siteUrl = currentTabUrl else {
+        guard let selectedFormOption = selectedFormOption else {
             assertionFailure("Can't send breakage")
             return
         }
@@ -263,7 +258,7 @@ final class FeedbackViewController: NSViewController {
             let blockedTrackerDomains = currentTab?.trackerInfo?.trackersBlocked.compactMap { $0.domain } ?? []
             let installedSurrogates = currentTab?.trackerInfo?.installedSurrogates.map {$0} ?? []
             let websiteBreakage = WebsiteBreakage(category: selectedWebsiteBreakageCategory,
-                                                  siteUrl: siteUrl,
+                                                  siteUrlString: urlTextField.stringValue,
                                                   osVersion: "\(ProcessInfo.processInfo.operatingSystemVersion)",
                                                   upgradedHttps: currentTab?.connectionUpgradedTo != nil,
                                                   tdsETag: DefaultConfigurationStorage.shared.loadEtag(for: .trackerRadar),

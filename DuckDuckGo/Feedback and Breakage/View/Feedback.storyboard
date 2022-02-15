@@ -44,12 +44,12 @@
                                 <rect key="frame" x="0.0" y="160" width="360" height="85"/>
                                 <subviews>
                                     <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="7KM-rJ-r28">
-                                        <rect key="frame" x="38" y="24" width="284" height="38"/>
+                                        <rect key="frame" x="69" y="24" width="222" height="38"/>
                                         <constraints>
-                                            <constraint firstAttribute="width" constant="280" id="WpG-jC-P2k"/>
+                                            <constraint firstAttribute="width" constant="218" id="WpG-jC-P2k"/>
                                             <constraint firstAttribute="height" constant="38" id="h5E-7e-FnD"/>
                                         </constraints>
-                                        <textFieldCell key="cell" alignment="center" title="Help DuckDuckGo Improve macOS App" id="M7g-24-ECG">
+                                        <textFieldCell key="cell" alignment="center" title="Help Improve DuckDuckGo for Mac" id="M7g-24-ECG">
                                             <font key="font" metaFont="systemSemibold" size="15"/>
                                             <color key="textColor" name="GreyTextColor"/>
                                             <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
@@ -162,8 +162,19 @@
                                         </constraints>
                                     </customView>
                                     <customView hidden="YES" translatesAutoresizingMaskIntoConstraints="NO" id="8B9-wf-zcP" userLabel="Website Breakage View">
-                                        <rect key="frame" x="20" y="-32" width="320" height="122"/>
+                                        <rect key="frame" x="20" y="-79" width="320" height="169"/>
                                         <subviews>
+                                            <textField verticalHuggingPriority="750" horizontalCompressionResistancePriority="250" translatesAutoresizingMaskIntoConstraints="NO" id="2gs-6z-agW">
+                                                <rect key="frame" x="0.0" y="142" width="320" height="27"/>
+                                                <constraints>
+                                                    <constraint firstAttribute="height" constant="27" id="l1h-jz-vPJ"/>
+                                                </constraints>
+                                                <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" selectable="YES" editable="YES" sendsActionOnEndEditing="YES" state="on" borderStyle="bezel" drawsBackground="YES" usesSingleLineMode="YES" id="AsP-i9-AYb">
+                                                    <font key="font" metaFont="system"/>
+                                                    <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
+                                                    <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
+                                                </textFieldCell>
+                                            </textField>
                                             <popUpButton translatesAutoresizingMaskIntoConstraints="NO" id="hUd-Rb-6Ls">
                                                 <rect key="frame" x="-3" y="88" width="326" height="37"/>
                                                 <constraints>
@@ -193,7 +204,7 @@
                                                 </connections>
                                             </popUpButton>
                                             <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="NLb-RN-SpK">
-                                                <rect key="frame" x="-2" y="0.0" width="324" height="67"/>
+                                                <rect key="frame" x="-2" y="5" width="324" height="67"/>
                                                 <constraints>
                                                     <constraint firstAttribute="height" constant="67" id="3gs-wF-UfX"/>
                                                     <constraint firstAttribute="width" constant="320" id="tVZ-1G-sgl"/>
@@ -207,13 +218,16 @@
                                             </textField>
                                         </subviews>
                                         <constraints>
-                                            <constraint firstAttribute="height" constant="122" id="3Lp-Et-qRB"/>
+                                            <constraint firstAttribute="height" constant="169" id="3Lp-Et-qRB"/>
+                                            <constraint firstItem="2gs-6z-agW" firstAttribute="top" secondItem="8B9-wf-zcP" secondAttribute="top" id="Boe-IN-w2P"/>
                                             <constraint firstItem="hUd-Rb-6Ls" firstAttribute="leading" secondItem="8B9-wf-zcP" secondAttribute="leading" id="Jed-xd-3mg"/>
                                             <constraint firstAttribute="trailing" secondItem="NLb-RN-SpK" secondAttribute="trailing" id="TUS-jM-vt1"/>
-                                            <constraint firstAttribute="bottom" secondItem="NLb-RN-SpK" secondAttribute="bottom" id="dzu-Qi-Dq1"/>
-                                            <constraint firstItem="hUd-Rb-6Ls" firstAttribute="top" secondItem="8B9-wf-zcP" secondAttribute="top" id="fLV-TA-OMV"/>
+                                            <constraint firstItem="2gs-6z-agW" firstAttribute="leading" secondItem="8B9-wf-zcP" secondAttribute="leading" id="ZiI-DM-AFY"/>
+                                            <constraint firstItem="hUd-Rb-6Ls" firstAttribute="top" secondItem="2gs-6z-agW" secondAttribute="bottom" constant="20" id="gUO-WO-8Hr"/>
                                             <constraint firstItem="NLb-RN-SpK" firstAttribute="leading" secondItem="8B9-wf-zcP" secondAttribute="leading" id="goU-1M-ibi"/>
                                             <constraint firstAttribute="trailing" secondItem="hUd-Rb-6Ls" secondAttribute="trailing" id="kGb-Nb-7TU"/>
+                                            <constraint firstAttribute="trailing" secondItem="2gs-6z-agW" secondAttribute="trailing" id="qTG-tx-tnf"/>
+                                            <constraint firstItem="NLb-RN-SpK" firstAttribute="top" secondItem="hUd-Rb-6Ls" secondAttribute="bottom" constant="20" id="tE4-8t-hsL"/>
                                         </constraints>
                                     </customView>
                                     <customView translatesAutoresizingMaskIntoConstraints="NO" id="RYb-WZ-bIo" customClass="ColorView" customModule="DuckDuckGo_Privacy_Browser" customModuleProvider="target">
@@ -354,16 +368,15 @@ DQ
                         </constraints>
                     </view>
                     <connections>
-                        <outlet property="brokenWebsiteMenuItem" destination="uoX-qE-3kz" id="wmY-ud-Nqg"/>
+                        <outlet property="browserFeedbackTextField" destination="wK6-n4-LX0" id="iIL-8c-BX9"/>
                         <outlet property="browserFeedbackView" destination="8Xi-CY-jyt" id="5IL-yu-IWc"/>
                         <outlet property="contentView" destination="wYB-07-s0m" id="XXQ-Fh-tQF"/>
                         <outlet property="contentViewHeightContraint" destination="0W2-HI-Vs8" id="vY1-me-1T6"/>
                         <outlet property="optionPopUpButton" destination="7Z6-Ji-PH7" id="4aZ-ZE-ym6"/>
-                        <outlet property="pickIssueMenuItem" destination="50u-Do-Pk7" id="Y1x-aK-HtI"/>
                         <outlet property="pickOptionMenuItem" destination="z2T-3Y-jPK" id="6dO-Or-fk2"/>
                         <outlet property="submitButton" destination="Gy6-KF-A15" id="aBn-VX-sGY"/>
-                        <outlet property="textField" destination="wK6-n4-LX0" id="iIL-8c-BX9"/>
                         <outlet property="thankYouView" destination="C8j-UX-ywh" id="EQo-2a-mhp"/>
+                        <outlet property="urlTextField" destination="2gs-6z-agW" id="7CM-5N-ugt"/>
                         <outlet property="websiteBreakageCategoryPopUpButton" destination="hUd-Rb-6Ls" id="DqR-hE-Sm5"/>
                         <outlet property="websiteBreakageView" destination="8B9-wf-zcP" id="enA-tH-Z1l"/>
                     </connections>

@@ -22,7 +22,7 @@ final class WebsiteBreakageSender {
 
     func sendWebsiteBreakage(_ websiteBreakage: WebsiteBreakage) {
         let parameters: [String: String] = ["category": websiteBreakage.category?.rawValue ?? "",
-                                            "siteUrl": websiteBreakage.siteUrl.absoluteString,
+                                            "siteUrl": websiteBreakage.siteUrlString,
                                             "upgradedHttps": websiteBreakage.upgradedHttps ? "true" : "false",
                                             "tds": websiteBreakage.tdsETag?.trimmingCharacters(in: CharacterSet(charactersIn: "\"")) ?? "",
                                             "blockedTrackers": websiteBreakage.blockedTrackerDomains.joined(separator: ","),
