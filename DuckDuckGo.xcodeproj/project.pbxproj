@@ -233,6 +233,8 @@
 		85589E8727BBB8F20038AD11 /* HomepageFavoritesModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 85589E8627BBB8F20038AD11 /* HomepageFavoritesModel.swift */; };
 		85589E8927BBB9040038AD11 /* HomepageModels.swift in Sources */ = {isa = PBXBuildFile; fileRef = 85589E8827BBB9040038AD11 /* HomepageModels.swift */; };
 		85589E8B27BBBADC0038AD11 /* ColorExtensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 85589E8A27BBBADC0038AD11 /* ColorExtensions.swift */; };
+		85589E8D27BBBB870038AD11 /* NavigationBar.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 85589E8C27BBBB870038AD11 /* NavigationBar.storyboard */; };
+		85589E8F27BBBBF10038AD11 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 85589E8E27BBBBF10038AD11 /* Main.storyboard */; };
 		85625994269C8F9600EE44BC /* PasswordManager.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 85625993269C8F9600EE44BC /* PasswordManager.storyboard */; };
 		85625996269C953C00EE44BC /* PasswordManagementViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 85625995269C953C00EE44BC /* PasswordManagementViewController.swift */; };
 		85625998269C9C5F00EE44BC /* PasswordManagementPopover.swift in Sources */ = {isa = PBXBuildFile; fileRef = 85625997269C9C5F00EE44BC /* PasswordManagementPopover.swift */; };
@@ -325,7 +327,6 @@
 		AA585D82248FD31100E9A3E2 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA585D81248FD31100E9A3E2 /* AppDelegate.swift */; };
 		AA585D84248FD31100E9A3E2 /* BrowserTabViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA585D83248FD31100E9A3E2 /* BrowserTabViewController.swift */; };
 		AA585D86248FD31400E9A3E2 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = AA585D85248FD31400E9A3E2 /* Assets.xcassets */; };
-		AA585D89248FD31400E9A3E2 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = AA585D87248FD31400E9A3E2 /* Main.storyboard */; };
 		AA585DAF2490E6E600E9A3E2 /* MainViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA585DAE2490E6E600E9A3E2 /* MainViewController.swift */; };
 		AA5C8F59258FE21F00748EB7 /* NSTextFieldExtension.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA5C8F58258FE21F00748EB7 /* NSTextFieldExtension.swift */; };
 		AA5C8F5E2590EEE800748EB7 /* NSPointExtension.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA5C8F5D2590EEE800748EB7 /* NSPointExtension.swift */; };
@@ -365,7 +366,6 @@
 		AA75A0AE26F3500C0086B667 /* PrivacyIconViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA75A0AD26F3500C0086B667 /* PrivacyIconViewModel.swift */; };
 		AA80EC54256BE3BC007083E7 /* UserText.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA80EC53256BE3BC007083E7 /* UserText.swift */; };
 		AA80EC67256C4691007083E7 /* BrowserTab.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = AA80EC69256C4691007083E7 /* BrowserTab.storyboard */; };
-		AA80EC6D256C469C007083E7 /* NavigationBar.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = AA80EC6F256C469C007083E7 /* NavigationBar.storyboard */; };
 		AA80EC73256C46A2007083E7 /* Suggestion.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = AA80EC75256C46A2007083E7 /* Suggestion.storyboard */; };
 		AA80EC79256C46AA007083E7 /* TabBar.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = AA80EC7B256C46AA007083E7 /* TabBar.storyboard */; };
 		AA80EC89256C49B8007083E7 /* Localizable.strings in Resources */ = {isa = PBXBuildFile; fileRef = AA80EC8B256C49B8007083E7 /* Localizable.strings */; };
@@ -914,6 +914,8 @@
 		85589E8627BBB8F20038AD11 /* HomepageFavoritesModel.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = HomepageFavoritesModel.swift; sourceTree = "<group>"; };
 		85589E8827BBB9040038AD11 /* HomepageModels.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HomepageModels.swift; sourceTree = "<group>"; };
 		85589E8A27BBBADC0038AD11 /* ColorExtensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ColorExtensions.swift; sourceTree = "<group>"; };
+		85589E8C27BBBB870038AD11 /* NavigationBar.storyboard */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.storyboard; path = NavigationBar.storyboard; sourceTree = "<group>"; };
+		85589E8E27BBBBF10038AD11 /* Main.storyboard */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.storyboard; path = Main.storyboard; sourceTree = "<group>"; };
 		85625993269C8F9600EE44BC /* PasswordManager.storyboard */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; path = PasswordManager.storyboard; sourceTree = "<group>"; };
 		85625995269C953C00EE44BC /* PasswordManagementViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PasswordManagementViewController.swift; sourceTree = "<group>"; };
 		85625997269C9C5F00EE44BC /* PasswordManagementPopover.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PasswordManagementPopover.swift; sourceTree = "<group>"; };
@@ -1004,7 +1006,6 @@
 		AA585D81248FD31100E9A3E2 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		AA585D83248FD31100E9A3E2 /* BrowserTabViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BrowserTabViewController.swift; sourceTree = "<group>"; };
 		AA585D85248FD31400E9A3E2 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
-		AA585D88248FD31400E9A3E2 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/Main.storyboard; sourceTree = "<group>"; };
 		AA585D8A248FD31400E9A3E2 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		AA585D8B248FD31400E9A3E2 /* DuckDuckGo.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = DuckDuckGo.entitlements; sourceTree = "<group>"; };
 		AA585D90248FD31400E9A3E2 /* Unit Tests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = "Unit Tests.xctest"; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -1049,7 +1050,6 @@
 		AA7DE8E026A9BD000012B490 /* History 2.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = "History 2.xcdatamodel"; sourceTree = "<group>"; };
 		AA80EC53256BE3BC007083E7 /* UserText.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UserText.swift; sourceTree = "<group>"; };
 		AA80EC68256C4691007083E7 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/BrowserTab.storyboard; sourceTree = "<group>"; };
-		AA80EC6E256C469C007083E7 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/NavigationBar.storyboard; sourceTree = "<group>"; };
 		AA80EC74256C46A2007083E7 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/Suggestion.storyboard; sourceTree = "<group>"; };
 		AA80EC7A256C46AA007083E7 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/TabBar.storyboard; sourceTree = "<group>"; };
 		AA80EC8A256C49B8007083E7 /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/Localizable.strings; sourceTree = "<group>"; };
@@ -2554,7 +2554,7 @@
 		AA68C3D824911D56001B8783 /* View */ = {
 			isa = PBXGroup;
 			children = (
-				AA585D87248FD31400E9A3E2 /* Main.storyboard */,
+				85589E8E27BBBBF10038AD11 /* Main.storyboard */,
 				AA7412BC24D2BEEE00D22FE0 /* MainWindow.swift */,
 				AA7412B424D1536B00D22FE0 /* MainWindowController.swift */,
 				AA585DAE2490E6E600E9A3E2 /* MainViewController.swift */,
@@ -2657,7 +2657,7 @@
 		AA86491624D8339A001BABEE /* View */ = {
 			isa = PBXGroup;
 			children = (
-				AA80EC6F256C469C007083E7 /* NavigationBar.storyboard */,
+				85589E8C27BBBB870038AD11 /* NavigationBar.storyboard */,
 				AA68C3D22490ED62001B8783 /* NavigationBarViewController.swift */,
 				14D9B8F924F7E089000D4D13 /* AddressBarViewController.swift */,
 				AABEE6AE24AD22B90043105B /* AddressBarTextField.swift */,
@@ -3688,7 +3688,7 @@
 				AAE8B102258A41C000E81239 /* Tooltip.storyboard in Resources */,
 				AA68C3D72490F821001B8783 /* README.md in Resources */,
 				AA585D86248FD31400E9A3E2 /* Assets.xcassets in Resources */,
-				AA585D89248FD31400E9A3E2 /* Main.storyboard in Resources */,
+				85589E8D27BBBB870038AD11 /* NavigationBar.storyboard in Resources */,
 				AAE246F6270A3D3000BEEAEE /* FirePopoverCollectionViewHeader.xib in Resources */,
 				85378D9C274E61B8007C5CBF /* MessageViews.storyboard in Resources */,
 				AA80EC79256C46AA007083E7 /* TabBar.storyboard in Resources */,
@@ -3711,11 +3711,11 @@
 				AA34397D2754D55100B241FA /* dark-trackers-3.json in Resources */,
 				AA3439782754D55100B241FA /* dark-trackers-2.json in Resources */,
 				AAB7320726DD0C37002FACF9 /* Fire.storyboard in Resources */,
+				85589E8F27BBBBF10038AD11 /* Main.storyboard in Resources */,
 				EA18D1CA272F0DC8006DC101 /* social_images in Resources */,
 				AA80EC8F256C49BC007083E7 /* Localizable.stringsdict in Resources */,
 				EAC80DE0271F6C0100BBF02D /* fb-sdk.js in Resources */,
 				85625994269C8F9600EE44BC /* PasswordManager.storyboard in Resources */,
-				AA80EC6D256C469C007083E7 /* NavigationBar.storyboard in Resources */,
 				4B0511C6262CAA5A00F6079C /* DefaultBrowserTableCellView.xib in Resources */,
 				4B677433255DBEB800025BD8 /* httpsMobileV2Bloom.bin in Resources */,
 				AA34397B2754D55100B241FA /* trackers-3.json in Resources */,
@@ -4429,28 +4429,12 @@
 /* End PBXTargetDependency section */
 
 /* Begin PBXVariantGroup section */
-		AA585D87248FD31400E9A3E2 /* Main.storyboard */ = {
-			isa = PBXVariantGroup;
-			children = (
-				AA585D88248FD31400E9A3E2 /* Base */,
-			);
-			name = Main.storyboard;
-			sourceTree = "<group>";
-		};
 		AA80EC69256C4691007083E7 /* BrowserTab.storyboard */ = {
 			isa = PBXVariantGroup;
 			children = (
 				AA80EC68256C4691007083E7 /* Base */,
 			);
 			name = BrowserTab.storyboard;
-			sourceTree = "<group>";
-		};
-		AA80EC6F256C469C007083E7 /* NavigationBar.storyboard */ = {
-			isa = PBXVariantGroup;
-			children = (
-				AA80EC6E256C469C007083E7 /* Base */,
-			);
-			name = NavigationBar.storyboard;
 			sourceTree = "<group>";
 		};
 		AA80EC75256C46A2007083E7 /* Suggestion.storyboard */ = {

@@ -30,6 +30,8 @@ final class MainViewController: NSViewController {
     @IBOutlet var navigationBarTopConstraint: NSLayoutConstraint!
     @IBOutlet var addressBarHeightConstraint: NSLayoutConstraint!
 
+    @IBOutlet var divider: NSView!
+
     private(set) var tabBarViewController: TabBarViewController!
     private(set) var navigationBarViewController: NavigationBarViewController!
     private(set) var browserTabViewController: BrowserTabViewController!
@@ -62,6 +64,7 @@ final class MainViewController: NSViewController {
         listenToKeyDownEvents()
         subscribeToSelectedTabViewModel()
         findInPageContainerView.applyDropShadow()
+        animateNavigationBar(tabCollectionViewModel.selectedTabViewModel?.tab.content == .homepage, animated: false)
 
     }
 
@@ -73,7 +76,7 @@ final class MainViewController: NSViewController {
             addressBarHeightConstraint.constant = tabBarContainerView.frame.height
         }
     }
-    
+
     override func viewDidLayout() {
         findInPageContainerView.applyDropShadow()
     }
@@ -159,8 +162,34 @@ final class MainViewController: NSViewController {
             self?.navigationalCancellables = []
             self?.subscribeToCanGoBackForward()
             self?.subscribeToFindInPage()
+            self?.subscribeToTabContent()
             self?.adjustFirstResponder()
         }
+    }
+
+    // TODO clean up
+    private func animateNavigationBar(_ homepage: Bool, animated: Bool = true) {
+//        let constraint = animated ? navigationBarTopConstraint.animator() : navigationBarTopConstraint
+//        constraint?.constant = homepage ? -30 : 38
+
+        let performAnim = false // = animated
+
+        let minHeight: CGFloat = 48
+        let height = performAnim ? addressBarHeightConstraint.animator() : addressBarHeightConstraint
+        height?.constant = homepage ? 30 + minHeight : minHeight
+
+        let divider = performAnim ? self.divider.animator() : self.divider
+        divider?.alphaValue = homepage ? 0 : 1.0
+
+    }
+
+    private func subscribeToTabContent() {
+        tabCollectionViewModel.selectedTabViewModel?.tab.$content.sink(receiveValue: { [weak self] content in
+            DispatchQueue.main.async {
+                self?.animateNavigationBar(content == .homepage)
+            }
+
+        }).store(in: &self.navigationalCancellables)
     }
 
     private func subscribeToFindInPage() {

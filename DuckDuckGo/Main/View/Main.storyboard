@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<document type="com.apple.InterfaceBuilder3.Cocoa.Storyboard.XIB" version="3.0" toolsVersion="19455" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES">
+<document type="com.apple.InterfaceBuilder3.Cocoa.Storyboard.XIB" version="3.0" toolsVersion="19529" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES">
     <dependencies>
         <deployment identifier="macosx"/>
-        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="19455"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="19529"/>
         <capability name="Named colors" minToolsVersion="9.0"/>
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
     </dependencies>
@@ -94,10 +94,11 @@
                         </constraints>
                     </view>
                     <connections>
+                        <outlet property="addressBarHeightConstraint" destination="vZS-tl-wOP" id="cCS-Fd-zJd"/>
+                        <outlet property="divider" destination="af1-Eb-VaG" id="Nws-XY-cPD"/>
                         <outlet property="findInPageContainerView" destination="Jbn-9T-FNt" id="5Sl-UV-Fa9"/>
                         <outlet property="navigationBarContainerView" destination="wFH-xq-50o" id="hbq-xV-McI"/>
                         <outlet property="navigationBarTopConstraint" destination="TRm-AX-VcL" id="cCS-Fd-hJd"/>
-                        <outlet property="addressBarHeightConstraint" destination="vZS-tl-wOP" id="cCS-Fd-zJd"/>
                         <outlet property="tabBarContainerView" destination="lYg-bX-QrJ" id="nor-E0-cFP"/>
                         <outlet property="webContainerView" destination="SYo-8W-jl3" id="DoZ-Ih-dHA"/>
                     </connections>

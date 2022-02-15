@@ -27,23 +27,24 @@ struct RootView: View {
 
     var body: some View {
 
-        Group {
-            ScrollView {
-                VStack {
-                    VStack(alignment: .leading, spacing: 24) {
+        GeometryReader { geometry in
+            Group {
+                ScrollView {
+                    VStack {
+                        VStack(alignment: .leading, spacing: 24) {
 
-                        Favorites()
+                            Favorites()
 
-                        Spacer()
-                    }
-                    .frame(maxWidth: 512)
-                    .padding(.top, 48)
-                }.frame(maxWidth: .infinity)
+                            Spacer()
+                        }
+                        .frame(maxWidth: 512)
+                        .padding(.top, max(48, geometry.size.height / 4))
+                    }.frame(maxWidth: .infinity)
+                }
             }
-
+            .frame(maxWidth: .infinity)
+            .background(Color("NewTabPageBackgroundColor"))
         }
-        .frame(maxWidth: .infinity)
-        .background(Color("NewTabPageBackgroundColor"))
      }
 
 }
@@ -165,6 +166,7 @@ struct FaviconView: View {
         }.onAppear {
             refreshImage()
         }.onReceive(timer) { _ in
+            timer.upstream.connect().cancel()
             refreshImage()
         }
 

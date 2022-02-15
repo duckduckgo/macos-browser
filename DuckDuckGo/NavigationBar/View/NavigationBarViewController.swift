@@ -36,10 +36,13 @@ final class NavigationBarViewController: NSViewController {
     @IBOutlet weak var bookmarkListButton: NSButton!
     @IBOutlet weak var passwordManagementButton: NSButton!
     @IBOutlet weak var downloadsButton: MouseOverButton!
+    @IBOutlet weak var navigationButtons: NSView!
+    @IBOutlet weak var daxLogo: NSView!
 
     @IBOutlet var addressBarLeftToNavButtonsConstraint: NSLayoutConstraint!
     @IBOutlet var addressBarLeftToSuperviewConstraint: NSLayoutConstraint!
     @IBOutlet var addressBarProportionalWidthConstraint: NSLayoutConstraint!
+    @IBOutlet var addressBarTopConstraint: NSLayoutConstraint!
 
     lazy var downloadsProgressView: CircularProgressView = {
         let bounds = downloadsButton.bounds
@@ -112,6 +115,8 @@ final class NavigationBarViewController: NSViewController {
         optionsButton.sendAction(on: .leftMouseDown)
         bookmarkListButton.sendAction(on: .leftMouseDown)
         downloadsButton.sendAction(on: .leftMouseDown)
+
+        animateBar(tabCollectionViewModel.selectedTabViewModel?.tab.content == .homepage, animated: false)
     }
 
     override func viewWillAppear() {
@@ -328,9 +333,25 @@ final class NavigationBarViewController: NSViewController {
     private func subscribeToTabUrl() {
         urlCancellable = tabCollectionViewModel.selectedTabViewModel?.tab.$content
             .receive(on: DispatchQueue.main)
-            .sink(receiveValue: { [weak self] _ in
+            .sink(receiveValue: { [weak self] content in
                 self?.updatePasswordManagementButton()
+                self?.animateBar(content == .homepage)
             })
+    }
+
+    private func animateBar(_ homepage: Bool, animated: Bool = true) {
+
+        let performAnim = false // = animated
+
+        let top = performAnim ? addressBarTopConstraint.animator() : addressBarTopConstraint
+        top?.constant = homepage ? 24 : 8
+
+        let width = performAnim ? addressBarProportionalWidthConstraint.animator() : addressBarProportionalWidthConstraint
+        width?.constant = homepage ? -260 : 0
+
+        let image = performAnim ? daxLogo.animator() : daxLogo
+        image?.alphaValue = homepage ? 1 : 0
+
     }
 
     private func subscribeToDownloads() {

@@ -31,7 +31,7 @@ final class AddressBarViewController: NSViewController {
     @IBOutlet var passiveTextFieldMinXConstraint: NSLayoutConstraint!
 
     private(set) var addressBarButtonsViewController: AddressBarButtonsViewController?
-    
+
     private var tabCollectionViewModel: TabCollectionViewModel
     private let suggestionContainerViewModel = SuggestionContainerViewModel(suggestionContainer: SuggestionContainer())
 
@@ -43,7 +43,7 @@ final class AddressBarViewController: NSViewController {
             return self != .browsing
         }
     }
-    
+
     private var mode: Mode = .editing(isUrl: false) {
         didSet {
             addressBarButtonsViewController?.controllerMode = mode
@@ -162,7 +162,7 @@ final class AddressBarViewController: NSViewController {
         controller?.delegate = self
         return addressBarButtonsViewController
     }
-    
+
     @IBOutlet var shadowView: ShadowView!
 
     private func subscribeToSelectedTabViewModel() {
@@ -189,7 +189,7 @@ final class AddressBarViewController: NSViewController {
     private func subscribeToProgressEvents() {
         progressCancellable = nil
         loadingCancellable = nil
-        
+
         guard let selectedTabViewModel = tabCollectionViewModel.selectedTabViewModel else {
             progressIndicator.hide(animated: false)
             return
@@ -238,7 +238,7 @@ final class AddressBarViewController: NSViewController {
         updateShadowView(firstResponder: isFirstResponder)
         inactiveBackgroundView.alphaValue = isFirstResponder ? 0 : 1
         activeBackgroundView.alphaValue = isFirstResponder ? 1 : 0
-        
+
         activeBackgroundView.layer?.borderColor = NSColor.controlAccentColor.withAlphaComponent(0.6).cgColor
     }
 
@@ -256,7 +256,7 @@ final class AddressBarViewController: NSViewController {
             self?.shadowView.shadowSides = visible ? [.left, .top, .right] : []
             self?.shadowView.shadowColor = visible ? .suggestionsShadowColor : .clear
             self?.shadowView.shadowRadius = visible ? 8.0 : 0.0
-            
+
             self?.activeBackgroundView.isHidden = visible
             self?.activeBackgroundViewWithSuggestions.isHidden = !visible
         }
@@ -316,7 +316,7 @@ extension AddressBarViewController {
             isFirstResponder = false
         }
     }
-    
+
 }
 
 // MARK: - Mouse states

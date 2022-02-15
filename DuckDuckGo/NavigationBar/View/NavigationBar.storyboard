@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<document type="com.apple.InterfaceBuilder3.Cocoa.Storyboard.XIB" version="3.0" toolsVersion="19455" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES" initialViewController="o2v-eH-jTI">
+<document type="com.apple.InterfaceBuilder3.Cocoa.Storyboard.XIB" version="3.0" toolsVersion="19529" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES" initialViewController="o2v-eH-jTI">
     <dependencies>
         <deployment identifier="macosx"/>
-        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="19455"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="19529"/>
         <capability name="Named colors" minToolsVersion="9.0"/>
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
     </dependencies>
@@ -111,11 +111,18 @@
                                     <real value="3.4028234663852886e+38"/>
                                 </customSpacing>
                             </stackView>
+                            <imageView horizontalHuggingPriority="251" verticalHuggingPriority="251" translatesAutoresizingMaskIntoConstraints="NO" id="8Aq-SD-DCb">
+                                <rect key="frame" x="33" y="2" width="43" height="44"/>
+                                <constraints>
+                                    <constraint firstAttribute="width" secondItem="8Aq-SD-DCb" secondAttribute="height" multiplier="1:1" id="5kl-xy-buj"/>
+                                    <constraint firstAttribute="height" constant="43.5" id="i3r-nh-RJU"/>
+                                </constraints>
+                                <imageCell key="cell" refusesFirstResponder="YES" alignment="left" imageScaling="proportionallyDown" image="OnboardingDax" id="KUM-i2-YQi"/>
+                            </imageView>
                             <containerView translatesAutoresizingMaskIntoConstraints="NO" id="Wba-nA-FYj">
                                 <rect key="frame" x="84" y="6" width="560" height="36"/>
                                 <constraints>
                                     <constraint firstAttribute="width" relation="greaterThanOrEqual" priority="301" constant="560" id="UmE-2a-hW4"/>
-                                    <constraint firstAttribute="height" constant="36" id="fDM-4Y-Nvs"/>
                                 </constraints>
                                 <connections>
                                     <segue destination="H4f-bE-T92" kind="embed" destinationCreationSelector="createAddressBarViewController:" id="5BM-Q3-tYH"/>
@@ -244,19 +251,23 @@
                             </stackView>
                         </subviews>
                         <constraints>
+                            <constraint firstItem="aWu-Jm-Oaz" firstAttribute="top" secondItem="hYV-nu-QIp" secondAttribute="top" constant="10" id="0WC-12-qLF"/>
                             <constraint firstItem="aWu-Jm-Oaz" firstAttribute="leading" relation="greaterThanOrEqual" secondItem="Wba-nA-FYj" secondAttribute="trailing" constant="8" id="1AC-G2-aTL"/>
                             <constraint firstAttribute="bottom" secondItem="EQw-GG-GMA" secondAttribute="bottom" id="4ye-CO-dDp"/>
+                            <constraint firstItem="8Aq-SD-DCb" firstAttribute="centerY" secondItem="Wba-nA-FYj" secondAttribute="centerY" id="Gk6-zX-0bu"/>
                             <constraint firstItem="eEh-kf-smR" firstAttribute="leading" secondItem="hYV-nu-QIp" secondAttribute="leading" constant="12" id="MQ7-vv-adb"/>
                             <constraint firstItem="Wba-nA-FYj" firstAttribute="centerX" secondItem="hYV-nu-QIp" secondAttribute="centerX" priority="300" constant="8" id="Ofg-Pb-s0m"/>
                             <constraint firstAttribute="trailing" secondItem="aWu-Jm-Oaz" secondAttribute="trailing" constant="12" id="UeG-qO-bD2"/>
                             <constraint firstItem="Wba-nA-FYj" firstAttribute="leading" relation="greaterThanOrEqual" secondItem="eEh-kf-smR" secondAttribute="trailing" priority="999" constant="8" id="W83-wu-cjA"/>
                             <constraint firstItem="EQw-GG-GMA" firstAttribute="top" secondItem="hYV-nu-QIp" secondAttribute="top" id="ctd-w7-EMF"/>
+                            <constraint firstItem="Wba-nA-FYj" firstAttribute="top" secondItem="hYV-nu-QIp" secondAttribute="top" constant="6" id="dZt-72-5bV"/>
                             <constraint firstItem="EQw-GG-GMA" firstAttribute="leading" secondItem="hYV-nu-QIp" secondAttribute="leading" id="hpe-5Y-XTJ"/>
-                            <constraint firstItem="aWu-Jm-Oaz" firstAttribute="centerY" secondItem="hYV-nu-QIp" secondAttribute="centerY" id="oRj-YP-56Z"/>
                             <constraint firstAttribute="trailing" secondItem="EQw-GG-GMA" secondAttribute="trailing" id="oYK-XH-0iN"/>
-                            <constraint firstItem="eEh-kf-smR" firstAttribute="centerY" secondItem="hYV-nu-QIp" secondAttribute="centerY" id="p4d-Um-snf"/>
+                            <constraint firstItem="eEh-kf-smR" firstAttribute="top" secondItem="hYV-nu-QIp" secondAttribute="top" constant="10" id="qeF-30-DZN"/>
+                            <constraint firstItem="Wba-nA-FYj" firstAttribute="leading" secondItem="8Aq-SD-DCb" secondAttribute="trailing" constant="8" id="rsG-Gt-Q8z"/>
                             <constraint firstItem="Wba-nA-FYj" firstAttribute="leading" secondItem="hYV-nu-QIp" secondAttribute="leading" constant="84" id="t38-xG-cxS"/>
                             <constraint firstItem="Wba-nA-FYj" firstAttribute="centerY" secondItem="hYV-nu-QIp" secondAttribute="centerY" id="uOr-Zw-zxM"/>
+                            <constraint firstAttribute="bottom" secondItem="Wba-nA-FYj" secondAttribute="bottom" constant="6" id="yMe-Nd-T9T"/>
                             <constraint firstItem="eEh-kf-smR" firstAttribute="leading" secondItem="hYV-nu-QIp" secondAttribute="leading" constant="12" id="yWl-jM-JYI"/>
                             <constraint firstItem="Wba-nA-FYj" firstAttribute="width" secondItem="hYV-nu-QIp" secondAttribute="width" multiplier="0.6" priority="300" id="yyv-y0-Is1"/>
                         </constraints>
@@ -270,10 +281,13 @@
                         <outlet property="addressBarLeftToNavButtonsConstraint" destination="W83-wu-cjA" id="cCS-Fa-hJd"/>
                         <outlet property="addressBarLeftToSuperviewConstraint" destination="t38-xG-cxS" id="cCS-Fb-hJd"/>
                         <outlet property="addressBarProportionalWidthConstraint" destination="yyv-y0-Is1" id="cCS-Fc-hJd"/>
+                        <outlet property="addressBarTopConstraint" destination="dZt-72-5bV" id="hkq-Cb-oFO"/>
                         <outlet property="bookmarkListButton" destination="4sj-qN-UUY" id="Fjs-KE-Lfp"/>
+                        <outlet property="daxLogo" destination="8Aq-SD-DCb" id="Nvf-Dp-svh"/>
                         <outlet property="downloadsButton" destination="G8p-di-fq4" id="oxD-pc-8hn"/>
                         <outlet property="goBackButton" destination="kky-0N-Cfd" id="RA9-yE-URS"/>
                         <outlet property="goForwardButton" destination="mdE-u0-Ei5" id="7wT-nX-Avr"/>
+                        <outlet property="navigationButtons" destination="eEh-kf-smR" id="XC4-bo-89V"/>
                         <outlet property="optionsButton" destination="iIF-Ky-unr" id="vvZ-mm-idv"/>
                         <outlet property="passwordManagementButton" destination="1nW-I1-nut" id="wDs-oE-b7d"/>
                         <outlet property="refreshButton" destination="B2U-XM-Vo0" id="BUY-sH-cf0"/>
@@ -423,6 +437,7 @@
                             <constraint firstAttribute="trailing" secondItem="ENV-0H-Fcc" secondAttribute="trailing" constant="5" id="Cig-ek-031"/>
                             <constraint firstItem="e0p-7S-Gan" firstAttribute="leading" secondItem="wj6-L2-5rJ" secondAttribute="leading" constant="3" id="E5D-iA-uu3"/>
                             <constraint firstItem="le0-Hn-ZAC" firstAttribute="centerX" secondItem="wj6-L2-5rJ" secondAttribute="centerX" id="GIk-xf-3Bn"/>
+                            <constraint firstItem="ENV-0H-Fcc" firstAttribute="top" secondItem="wj6-L2-5rJ" secondAttribute="top" constant="3" id="HfA-Q8-0Uz"/>
                             <constraint firstItem="zaX-wZ-E3D" firstAttribute="centerY" secondItem="wj6-L2-5rJ" secondAttribute="centerY" id="M2U-b3-Z0t"/>
                             <constraint firstItem="bOl-8Z-hTh" firstAttribute="leading" secondItem="wj6-L2-5rJ" secondAttribute="leading" constant="4" id="OSv-yy-Yz5"/>
                             <constraint firstItem="e0p-7S-Gan" firstAttribute="top" secondItem="wj6-L2-5rJ" secondAttribute="top" constant="1" id="QK2-Pt-rY4"/>
@@ -435,7 +450,7 @@
                             <constraint firstItem="Ij9-fc-CLI" firstAttribute="top" secondItem="wj6-L2-5rJ" secondAttribute="top" id="XhY-ag-U21"/>
                             <constraint firstItem="zaX-wZ-E3D" firstAttribute="leading" secondItem="wj6-L2-5rJ" secondAttribute="leading" constant="37" id="bY3-LA-cuF"/>
                             <constraint firstItem="le0-Hn-ZAC" firstAttribute="leading" relation="greaterThanOrEqual" secondItem="wj6-L2-5rJ" secondAttribute="leading" constant="37" id="eJI-rp-ptx"/>
-                            <constraint firstItem="ENV-0H-Fcc" firstAttribute="centerY" secondItem="wj6-L2-5rJ" secondAttribute="centerY" id="knb-UX-IQW"/>
+                            <constraint firstAttribute="bottom" secondItem="ENV-0H-Fcc" secondAttribute="bottom" constant="3" id="jNf-6E-eDn"/>
                             <constraint firstItem="Ij9-fc-CLI" firstAttribute="leading" secondItem="wj6-L2-5rJ" secondAttribute="leading" id="mPy-45-VDH"/>
                             <constraint firstAttribute="bottom" secondItem="e0p-7S-Gan" secondAttribute="bottom" priority="300" constant="1" id="nuB-My-vJR"/>
                             <constraint firstItem="le0-Hn-ZAC" firstAttribute="centerY" secondItem="wj6-L2-5rJ" secondAttribute="centerY" id="wEn-eS-Lat"/>
@@ -480,7 +495,7 @@
                                     <constraint firstAttribute="width" constant="100" id="CQO-D3-iVT"/>
                                 </constraints>
                             </customView>
-                            <button translatesAutoresizingMaskIntoConstraints="NO" id="taC-vG-1fV" customClass="AddressBarButton" customModule="DuckDuckGo_Privacy_Browser" customModuleProvider="target">
+                            <button hidden="YES" translatesAutoresizingMaskIntoConstraints="NO" id="taC-vG-1fV" customClass="AddressBarButton" customModule="DuckDuckGo_Privacy_Browser" customModuleProvider="target">
                                 <rect key="frame" x="545" y="0.0" width="32" height="32"/>
                                 <constraints>
                                     <constraint firstAttribute="width" constant="32" id="3ze-iM-E0b"/>
@@ -506,7 +521,7 @@
                                     <action selector="bookmarkButtonAction:" target="mcr-nj-GmC" id="zSj-zA-HAq"/>
                                 </connections>
                             </button>
-                            <button translatesAutoresizingMaskIntoConstraints="NO" id="kRc-0m-oqe" customClass="MouseOverButton" customModule="DuckDuckGo_Privacy_Browser" customModuleProvider="target">
+                            <button hidden="YES" translatesAutoresizingMaskIntoConstraints="NO" id="kRc-0m-oqe" customClass="MouseOverButton" customModule="DuckDuckGo_Privacy_Browser" customModuleProvider="target">
                                 <rect key="frame" x="545" y="3" width="30" height="26"/>
                                 <constraints>
                                     <constraint firstAttribute="width" constant="30" id="8Ag-uG-RA7"/>
@@ -750,6 +765,7 @@
         <image name="HomeFavicon" width="16" height="16"/>
         <image name="Microphone-Active" width="12" height="16"/>
         <image name="Microphone-Icon" width="12" height="16"/>
+        <image name="OnboardingDax" width="128" height="128"/>
         <image name="PasswordManagement" width="16" height="16"/>
         <image name="PopupBlocked" width="16" height="16"/>
         <image name="Refresh" width="16" height="16"/>
