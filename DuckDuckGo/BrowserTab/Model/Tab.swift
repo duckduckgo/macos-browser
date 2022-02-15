@@ -23,7 +23,7 @@ import Combine
 import BrowserServicesKit
 import TrackerRadarKit
 
-protocol TabDelegate: FileDownloadManagerDelegate {
+protocol TabDelegate: FileDownloadManagerDelegate, OverlayProtocol {
     func tabWillStartNavigation(_ tab: Tab, isUserInitiated: Bool)
     func tabDidStartNavigation(_ tab: Tab)
     func tab(_ tab: Tab, requestedNewTabWith content: Tab.TabContent, selected: Bool)
@@ -455,7 +455,8 @@ final class Tab: NSObject {
         return manager
     }()
 
-    private var userScripts: UserScripts! {
+    // TODO make private again
+    public var userScripts: UserScripts! {
         willSet {
             if let userScripts = userScripts {
                 userScripts.remove(from: webView.configuration.userContentController)
@@ -468,6 +469,7 @@ final class Tab: NSObject {
             userScripts.surrogatesScript.delegate = self
             userScripts.contentBlockerRulesScript.delegate = self
             userScripts.clickToLoadScript.delegate = self
+            userScripts.autofillScript.topView = self.delegate
             userScripts.autofillScript.emailDelegate = emailManager
             userScripts.autofillScript.vaultDelegate = vaultManager
             userScripts.pageObserverScript.delegate = self
@@ -565,6 +567,13 @@ final class Tab: NSObject {
     // print operation and ignores incoming printHandler messages if one exists.
     fileprivate var activePrintOperation: NSPrintOperation?
 
+}
+
+extension Tab: AutofillUserScriptDelegate {
+    func clickTriggered(clickPoint: NSPoint) {
+        userScripts.autofillScript.clickPoint = clickPoint
+        userScripts.autofillScript.topView = self.delegate
+    }
 }
 
 extension Tab: PrintingUserScriptDelegate {

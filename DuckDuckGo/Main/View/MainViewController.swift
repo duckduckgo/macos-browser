@@ -20,6 +20,7 @@ import Cocoa
 import Carbon.HIToolbox
 import Combine
 import os.log
+import BrowserServicesKit
 
 final class MainViewController: NSViewController {
 
@@ -274,6 +275,9 @@ final class MainViewController: NSViewController {
 
     }
 
+    private func getSelectedTab() -> Tab? {
+        return tabCollectionViewModel.selectedTabViewModel?.tab
+    }
 }
 
 // MARK: - Mouse & Keyboard Events

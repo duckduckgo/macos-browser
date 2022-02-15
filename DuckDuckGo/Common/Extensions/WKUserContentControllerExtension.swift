@@ -22,13 +22,13 @@ import BrowserServicesKit
 
 extension WKUserContentController {
 
-    func addHandlerNoContentWorld(_ userScript: UserScript) {
+    public func addHandlerNoContentWorld(_ userScript: UserScript) {
         for messageName in userScript.messageNames {
             add(userScript, name: messageName)
         }
     }
     
-    func addHandler(_ userScript: UserScript) {
+    public func addHandler(_ userScript: UserScript) {
         for messageName in userScript.messageNames {
             if #available(macOS 11.0, *) {
                 let contentWorld: WKContentWorld = userScript.getContentWorld()
@@ -43,7 +43,7 @@ extension WKUserContentController {
         }
     }
 
-    func removeHandler(_ userScript: UserScript) {
+    public func removeHandler(_ userScript: UserScript) {
         userScript.messageNames.forEach {
             if #available(macOS 11.0, *) {
                 let contentWorld: WKContentWorld = userScript.getContentWorld()
