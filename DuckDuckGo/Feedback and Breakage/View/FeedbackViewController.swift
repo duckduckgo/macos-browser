@@ -25,6 +25,7 @@ final class FeedbackViewController: NSViewController {
         static let defaultContentHeight: CGFloat = 160
         static let feedbackContentHeight: CGFloat = 338
         static let websiteBreakageContentHeight: CGFloat = 307
+        static let thankYouContentHeight: CGFloat = 262
 
     }
 
@@ -270,7 +271,7 @@ final class FeedbackViewController: NSViewController {
     }
 
     private func showThankYou() {
-        setContentViewHeight(Constants.defaultContentHeight, animated: true)
+        setContentViewHeight(Constants.thankYouContentHeight, animated: true)
         contentView.isHidden = true
         thankYouView.isHidden = false
     }

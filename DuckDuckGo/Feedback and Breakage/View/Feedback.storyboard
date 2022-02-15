@@ -301,8 +301,8 @@ Gw
                             <customView hidden="YES" translatesAutoresizingMaskIntoConstraints="NO" id="C8j-UX-ywh">
                                 <rect key="frame" x="0.0" y="0.0" width="360" height="160"/>
                                 <subviews>
-                                    <button verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="3nf-Bg-7k2">
-                                        <rect key="frame" x="14" y="14" width="332" height="40"/>
+                                    <button verticalHuggingPriority="750" misplaced="YES" translatesAutoresizingMaskIntoConstraints="NO" id="3nf-Bg-7k2">
+                                        <rect key="frame" x="14" y="-3" width="332" height="40"/>
                                         <constraints>
                                             <constraint firstAttribute="height" constant="28" id="1gW-Wq-I7c"/>
                                         </constraints>
@@ -317,8 +317,16 @@ DQ
                                             <action selector="okButtonAction:" target="TOa-sP-KHa" id="C2a-ct-tif"/>
                                         </connections>
                                     </button>
+                                    <imageView horizontalHuggingPriority="251" verticalHuggingPriority="251" translatesAutoresizingMaskIntoConstraints="NO" id="nOJ-4u-waA">
+                                        <rect key="frame" x="132" y="44" width="96" height="96"/>
+                                        <constraints>
+                                            <constraint firstAttribute="width" constant="96" id="OdO-XF-nm1"/>
+                                            <constraint firstAttribute="height" constant="96" id="eyV-Eu-vmp"/>
+                                        </constraints>
+                                        <imageCell key="cell" refusesFirstResponder="YES" alignment="left" imageScaling="proportionallyDown" image="ThankYou" id="Ykf-at-KNR"/>
+                                    </imageView>
                                     <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="Pad-Pc-j6d">
-                                        <rect key="frame" x="137" y="114" width="87" height="19"/>
+                                        <rect key="frame" x="137" y="17" width="87" height="19"/>
                                         <textFieldCell key="cell" alignment="center" title="Thank you!" id="NFA-fu-2EM">
                                             <font key="font" metaFont="systemSemibold" size="15"/>
                                             <color key="textColor" name="GreyTextColor"/>
@@ -326,7 +334,7 @@ DQ
                                         </textFieldCell>
                                     </textField>
                                     <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="syf-sE-uUM">
-                                        <rect key="frame" x="18" y="75" width="324" height="28"/>
+                                        <rect key="frame" x="18" y="-19" width="324" height="28"/>
                                         <constraints>
                                             <constraint firstAttribute="height" constant="28" id="NhF-KV-8Fz"/>
                                             <constraint firstAttribute="width" constant="320" id="OKh-5g-IKI"/>
@@ -340,13 +348,15 @@ DQ
                                 </subviews>
                                 <constraints>
                                     <constraint firstAttribute="trailing" secondItem="3nf-Bg-7k2" secondAttribute="trailing" constant="20" symbolic="YES" id="0ih-HM-vLb"/>
-                                    <constraint firstItem="Pad-Pc-j6d" firstAttribute="centerY" secondItem="C8j-UX-ywh" secondAttribute="centerY" constant="-43" id="Bit-yx-9pS"/>
                                     <constraint firstAttribute="bottom" secondItem="3nf-Bg-7k2" secondAttribute="bottom" constant="20" symbolic="YES" id="G6K-eI-7Wb"/>
                                     <constraint firstItem="3nf-Bg-7k2" firstAttribute="leading" secondItem="C8j-UX-ywh" secondAttribute="leading" constant="20" symbolic="YES" id="IAg-ez-Kww"/>
                                     <constraint firstAttribute="trailing" secondItem="syf-sE-uUM" secondAttribute="trailing" constant="20" symbolic="YES" id="Qih-Y8-L1A"/>
-                                    <constraint firstItem="syf-sE-uUM" firstAttribute="centerY" secondItem="C8j-UX-ywh" secondAttribute="centerY" constant="-9" id="gGu-Qg-XAr"/>
+                                    <constraint firstItem="nOJ-4u-waA" firstAttribute="centerX" secondItem="C8j-UX-ywh" secondAttribute="centerX" id="jIn-5G-ItS"/>
+                                    <constraint firstItem="Pad-Pc-j6d" firstAttribute="top" secondItem="nOJ-4u-waA" secondAttribute="bottom" constant="8" id="jqU-sX-T0P"/>
                                     <constraint firstItem="Pad-Pc-j6d" firstAttribute="centerX" secondItem="C8j-UX-ywh" secondAttribute="centerX" id="kxj-pU-r3k"/>
+                                    <constraint firstItem="nOJ-4u-waA" firstAttribute="top" secondItem="C8j-UX-ywh" secondAttribute="top" constant="20" id="maw-do-guj"/>
                                     <constraint firstItem="syf-sE-uUM" firstAttribute="leading" secondItem="C8j-UX-ywh" secondAttribute="leading" constant="20" symbolic="YES" id="psO-TK-tGb"/>
+                                    <constraint firstItem="syf-sE-uUM" firstAttribute="top" secondItem="Pad-Pc-j6d" secondAttribute="bottom" constant="8" id="uoM-1L-Ohi"/>
                                 </constraints>
                             </customView>
                         </subviews>
@@ -388,6 +398,7 @@ DQ
     </scenes>
     <resources>
         <image name="Close" width="16" height="16"/>
+        <image name="ThankYou" width="96" height="96"/>
         <namedColor name="FirePopoverPanelBackground">
             <color red="0.98000001907348633" green="0.98000001907348633" blue="0.98000001907348633" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
         </namedColor>
