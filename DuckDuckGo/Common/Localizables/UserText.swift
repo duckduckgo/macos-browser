@@ -215,6 +215,10 @@ struct UserText {
     static let isDefaultBrowser = NSLocalizedString("preferences.default-browser.active", value: "DuckDuckGo is your default browser", comment: "Indicate that the browser is the default")
     static let isNotDefaultBrowser = NSLocalizedString("preferences.default-browser.inactive", value: "DuckDuckGo is not your default browser.", comment: "Indicate that the browser is not the default")
 
+    static let feedbackBugDescription = NSLocalizedString("feedback.bug.description", value: "Please describe the issue in as much detail as possible:", comment: "Label in the feedback form")
+    static let feedbackFeatureRequestDescription = NSLocalizedString("feedback.feature.request.description", value: "What feature would you like to see?", comment: "Label in the feedback form")
+    static let feedbackOtherDescription = NSLocalizedString("feedback.other.description", value: "Please give us your feedback:", comment: "Label in the feedback form")
+
     static func versionLabel(version: String, build: String) -> String {
         let localized = NSLocalizedString("version",
                                           value: "Version %@ (%@)",

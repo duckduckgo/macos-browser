@@ -23,7 +23,7 @@ final class FeedbackViewController: NSViewController {
 
     enum Constants {
         static let defaultContentHeight: CGFloat = 160
-        static let feedbackContentHeight: CGFloat = 338
+        static let feedbackContentHeight: CGFloat = 323
         static let websiteBreakageContentHeight: CGFloat = 307
         static let thankYouContentHeight: CGFloat = 262
 
@@ -51,6 +51,7 @@ final class FeedbackViewController: NSViewController {
     @IBOutlet weak var contentViewHeightContraint: NSLayoutConstraint!
 
     @IBOutlet weak var browserFeedbackView: NSView!
+    @IBOutlet weak var browserFeedbackDescriptionLabel: NSTextField!
     @IBOutlet weak var browserFeedbackTextField: NSTextField!
 
     @IBOutlet weak var websiteBreakageView: NSView!
@@ -182,9 +183,10 @@ final class FeedbackViewController: NSViewController {
 
         let contentHeight: CGFloat
         switch selectedFormOption {
-        case .feedback:
+        case .feedback(let feedbackCategory):
             browserFeedbackView.isHidden = false
             contentHeight = Constants.feedbackContentHeight
+            updateBrowserFeedbackDescriptionLabel(for: feedbackCategory)
             browserFeedbackTextField.makeMeFirstResponder()
         case .websiteBreakage:
             browserFeedbackView.isHidden = true
@@ -228,6 +230,17 @@ final class FeedbackViewController: NSViewController {
         }
 
         submitButton.bezelColor = submitButton.isEnabled ? NSColor.controlAccentColor: nil
+    }
+
+    private func updateBrowserFeedbackDescriptionLabel(for category: Feedback.Category) {
+        switch category {
+        case .bug:
+            browserFeedbackDescriptionLabel.stringValue = UserText.feedbackBugDescription
+        case .featureRequest:
+            browserFeedbackDescriptionLabel.stringValue = UserText.feedbackFeatureRequestDescription
+        case .other:
+            browserFeedbackDescriptionLabel.stringValue = UserText.feedbackOtherDescription
+        }
     }
 
     private func sendFeedback() {
