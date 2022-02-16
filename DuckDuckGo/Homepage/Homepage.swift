@@ -1,5 +1,5 @@
 //
-//  HomepageModels.swift
+//  Homepage.swift
 //
 //  Copyright © 2022 DuckDuckGo. All rights reserved.
 //
@@ -18,7 +18,18 @@
 
 import Foundation
 
-// Namespace declaration
-struct HomepageModels {
+/// Namespace declaration
+struct Homepage {
+
+    struct Views {
+    }
+
+    struct Models {
+    }
+
+    // MARK: Constants
+
+    static let favoritesPerRow = 5
+    static let favoritesRowCountWhenCollapsed = 2
 
 }

@@ -18,9 +18,16 @@
 
 import Foundation
 
-extension HomepageModels {
+extension Homepage.Models {
 
-    static let favoritesPerRow = 5
+    struct FavoriteModel {
+
+        static let addButtonUUID = UUID()
+
+        let id: UUID
+        let bookmark: Bookmark?
+
+    }
 
     final class FavoritesModel: ObservableObject {
 
@@ -33,20 +40,13 @@ extension HomepageModels {
         @Published var favorites: [Bookmark] = [] {
             didSet {
                 print(#function, favorites)
-
-                var rows = favorites.chunked(into: favoritesPerRow)
-                if rows.last?.count == favoritesPerRow {
-                    rows.append([])
-                }
-
-                if rows.isEmpty {
-                    rows.append([])
-                }
-                self.rows = rows
+                var favorites = self.favorites.map { FavoriteModel(id: $0.id, bookmark: $0) }
+                favorites.append(FavoriteModel(id: FavoriteModel.addButtonUUID, bookmark: nil))
+                self.rows = favorites.chunked(into: Homepage.favoritesPerRow)
             }
         }
 
-        @Published private(set) var rows: [[Bookmark]] = []
+        @Published private(set) var rows: [[FavoriteModel]] = []
 
         let open: (Bookmark, OpenTarget) -> Void
         let remove: (Bookmark) -> Void

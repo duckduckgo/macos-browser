@@ -29,7 +29,7 @@ final class HomepageViewController: NSViewController {
 
     private weak var host: NSView?
  
-    var favoritesModel: HomepageModels.FavoritesModel!
+    var favoritesModel: Homepage.Models.FavoritesModel!
     var bookmarkListSubscription: AnyCancellable?
 
     required init?(coder: NSCoder) {
@@ -46,7 +46,7 @@ final class HomepageViewController: NSViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
 
-        favoritesModel = HomepageModels.FavoritesModel(open: { [weak self] bookmark, target in
+        favoritesModel = Homepage.Models.FavoritesModel(open: { [weak self] bookmark, target in
 
             self?.openUrl(bookmark.url, target: target)
 
@@ -61,7 +61,7 @@ final class HomepageViewController: NSViewController {
 
         refreshFavoritesModel()
 
-        let rootView = Homepage.RootView()
+        let rootView = Homepage.Views.RootView()
             .environmentObject(favoritesModel)
 
         let host = NSHostingView(rootView: rootView)
@@ -94,7 +94,7 @@ final class HomepageViewController: NSViewController {
         host?.frame = self.view.frame
     }
 
-    private func openUrl(_ url: URL, target: HomepageModels.FavoritesModel.OpenTarget? = nil) {
+    private func openUrl(_ url: URL, target: Homepage.Models.FavoritesModel.OpenTarget? = nil) {
         if target == .newWindow || NSApplication.shared.isCommandPressed && NSApplication.shared.isOptionPressed {
             WindowsManager.openNewWindow(with: url)
             return

@@ -19,7 +19,7 @@
 import SwiftUI
 import BrowserServicesKit
 
-struct Homepage {
+extension Homepage.Views {
 
 struct RootView: View {
 
@@ -215,7 +215,7 @@ struct HoverButton: View {
 
 struct Favorites: View {
 
-    @EnvironmentObject var model: HomepageModels.FavoritesModel
+    @EnvironmentObject var model: Homepage.Models.FavoritesModel
 
     @State var expanded = false
     @State var isHovering = false
@@ -232,25 +232,22 @@ struct Favorites: View {
 
         VStack(alignment: .leading, spacing: 12) {
 
-            ForEach(expanded ? model.rows.indices : model.rows.indices.prefix(1), id: \.self) { index in
+            ForEach(expanded ? model.rows.indices : model.rows.indices.prefix(Homepage.favoritesRowCountWhenCollapsed), id: \.self) { index in
                 HStack(alignment: .top, spacing: 29) {
-
                     ForEach(model.rows[index], id: \.id) { favorite in
-                        if !expanded && favorite == model.rows[index].last {
-                            addButton
+                        if let bookmark = favorite.bookmark {
+                            Favorite(bookmark: bookmark)
                         } else {
-                            Favorite(bookmark: favorite)
+                            addButton
                         }
                     }
 
-                    if expanded && model.rows[index].count < HomepageModels.favoritesPerRow {
-                        addButton
-                    }
+                    Spacer()
                 }
             }
 
             MoreOrLess(moreIsUp: true, expanded: $expanded)
-                .visibility(model.rows.count > 1 && isHovering ? .visible : .invisible)
+                .visibility(model.rows.count > Homepage.favoritesRowCountWhenCollapsed && isHovering ? .visible : .invisible)
 
         }.onHover { isHovering in
             self.isHovering = isHovering
@@ -261,7 +258,7 @@ struct Favorites: View {
 
 struct Favorite: View {
 
-    @EnvironmentObject var model: HomepageModels.FavoritesModel
+    @EnvironmentObject var model: Homepage.Models.FavoritesModel
 
     let size: CGFloat = 72
 
