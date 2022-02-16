@@ -67,6 +67,9 @@
 		4B2CBF412767EEC1001DF04B /* MacWaitlistStoreTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B2CBF402767EEC1001DF04B /* MacWaitlistStoreTests.swift */; };
 		4B2E7D6326FF9D6500D2DB17 /* PrintingUserScript.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B2E7D6226FF9D6500D2DB17 /* PrintingUserScript.swift */; };
 		4B379C1527BD91E3008A968E /* DeviceIdleStateDetector.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B379C1427BD91E3008A968E /* DeviceIdleStateDetector.swift */; };
+		4B379C1727BD9D7C008A968E /* LoginsPreferencesTableCellView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B379C1627BD9D7C008A968E /* LoginsPreferencesTableCellView.swift */; };
+		4B379C1927BD9EAA008A968E /* LoginsPreferences.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B379C1827BD9EAA008A968E /* LoginsPreferences.swift */; };
+		4B379C1B27BD9F88008A968E /* LoginsPreferencesTableCellView.xib in Resources */ = {isa = PBXBuildFile; fileRef = 4B379C1A27BD9F88008A968E /* LoginsPreferencesTableCellView.xib */; };
 		4B3F641E27A8D3BD00E0C118 /* BrowserProfileTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B3F641D27A8D3BD00E0C118 /* BrowserProfileTests.swift */; };
 		4B4F72EC266B2ED300814C60 /* CollectionExtension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B4F72EB266B2ED300814C60 /* CollectionExtension.swift */; };
 		4B59023D26B35F3600489384 /* ChromeDataImporter.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B59023826B35F3600489384 /* ChromeDataImporter.swift */; };
@@ -751,6 +754,9 @@
 		4B2CBF402767EEC1001DF04B /* MacWaitlistStoreTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MacWaitlistStoreTests.swift; sourceTree = "<group>"; };
 		4B2E7D6226FF9D6500D2DB17 /* PrintingUserScript.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PrintingUserScript.swift; sourceTree = "<group>"; };
 		4B379C1427BD91E3008A968E /* DeviceIdleStateDetector.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DeviceIdleStateDetector.swift; sourceTree = "<group>"; };
+		4B379C1627BD9D7C008A968E /* LoginsPreferencesTableCellView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LoginsPreferencesTableCellView.swift; sourceTree = "<group>"; };
+		4B379C1827BD9EAA008A968E /* LoginsPreferences.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LoginsPreferences.swift; sourceTree = "<group>"; };
+		4B379C1A27BD9F88008A968E /* LoginsPreferencesTableCellView.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = LoginsPreferencesTableCellView.xib; sourceTree = "<group>"; };
 		4B3F641D27A8D3BD00E0C118 /* BrowserProfileTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BrowserProfileTests.swift; sourceTree = "<group>"; };
 		4B4F72EB266B2ED300814C60 /* CollectionExtension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CollectionExtension.swift; sourceTree = "<group>"; };
 		4B59023826B35F3600489384 /* ChromeDataImporter.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ChromeDataImporter.swift; sourceTree = "<group>"; };
@@ -1501,6 +1507,7 @@
 				4B0511A5262CAA5A00F6079C /* AppearancePreferences.swift */,
 				4B0511A6262CAA5A00F6079C /* PrivacySecurityPreferences.swift */,
 				4B0511A7262CAA5A00F6079C /* DownloadPreferences.swift */,
+				4B379C1827BD9EAA008A968E /* LoginsPreferences.swift */,
 				4B0511A8262CAA5A00F6079C /* PreferenceSections.swift */,
 			);
 			path = Model;
@@ -1525,6 +1532,8 @@
 				4B0511B8262CAA5A00F6079C /* DownloadPreferencesTableCellView.xib */,
 				4B0511B9262CAA5A00F6079C /* AppearancePreferencesTableCellView.swift */,
 				4B0511BA262CAA5A00F6079C /* AppearancePreferencesTableCellView.xib */,
+				4B379C1627BD9D7C008A968E /* LoginsPreferencesTableCellView.swift */,
+				4B379C1A27BD9F88008A968E /* LoginsPreferencesTableCellView.xib */,
 			);
 			path = View;
 			sourceTree = "<group>";
@@ -3724,6 +3733,7 @@
 				4B723E1126B0006C00E14D75 /* DataImport.storyboard in Resources */,
 				4B92929026670D1700AD2C21 /* BookmarkTableCellView.xib in Resources */,
 				339A6B5826A044BA00E3DAE8 /* duckduckgo-privacy-dashboard in Resources */,
+				4B379C1B27BD9F88008A968E /* LoginsPreferencesTableCellView.xib in Resources */,
 				4B92928E26670D1700AD2C21 /* BookmarkOutlineViewCell.xib in Resources */,
 				858C78FC2705EB5F009B2B44 /* HomepageHeader.xib in Resources */,
 				B64C84DE2692D7400048FEBE /* PermissionAuthorization.storyboard in Resources */,
@@ -4054,6 +4064,7 @@
 				B6C0B23C26E87D900031CB7F /* NSAlert+ActiveDownloadsTermination.swift in Sources */,
 				4BEF0E6827641A0E00AF7C58 /* MacWaitlistLockScreenViewController.swift in Sources */,
 				AAECA42024EEA4AC00EFA63A /* IndexPathExtension.swift in Sources */,
+				4B379C1927BD9EAA008A968E /* LoginsPreferences.swift in Sources */,
 				4BE65478271FCD41008D1D63 /* PasswordManagementNoteItemView.swift in Sources */,
 				AA5C8F632591021700748EB7 /* NSApplicationExtension.swift in Sources */,
 				AA9E9A5625A3AE8400D1959D /* NSWindowExtension.swift in Sources */,
@@ -4239,6 +4250,7 @@
 				85B7184C27677C6500B4277F /* OnboardingViewController.swift in Sources */,
 				AA72D5F025FEA49900C77619 /* AddEditFavoriteWindow.swift in Sources */,
 				1456D6E124EFCBC300775049 /* TabBarCollectionView.swift in Sources */,
+				4B379C1727BD9D7C008A968E /* LoginsPreferencesTableCellView.swift in Sources */,
 				85308E25267FC9F2001ABD76 /* NSAlertExtension.swift in Sources */,
 				4BEF0E6A276676A500AF7C58 /* WaitlistRequest.swift in Sources */,
 				4B59024826B3673600489384 /* ThirdPartyBrowser.swift in Sources */,

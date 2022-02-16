@@ -48,6 +48,7 @@ final class PreferencesListViewController: NSViewController {
         case defaultBrowser
         case appearance
         case privacySecurity
+        case logins
         case downloads
     }
 
@@ -65,6 +66,9 @@ final class PreferencesListViewController: NSViewController {
         let privacySecurityNib = PrivacySecurityPreferencesTableCellView.nib()
         preferencesTableView.register(privacySecurityNib, forIdentifier: PrivacySecurityPreferencesTableCellView.identifier)
 
+        let loginsNib = LoginsPreferencesTableCellView.nib()
+        preferencesTableView.register(loginsNib, forIdentifier: LoginsPreferencesTableCellView.identifier)
+        
         let downloadsNib = DownloadPreferencesTableCellView.nib()
         preferencesTableView.register(downloadsNib, forIdentifier: DownloadPreferencesTableCellView.identifier)
 
@@ -157,6 +161,10 @@ extension PreferencesListViewController: NSTableViewDataSource, NSTableViewDeleg
             let preferences = PrivacySecurityPreferences()
             cell?.update(loginDetectionEnabled: preferences.loginDetectionEnabled,
                          gpcEnabled: preferences.gpcEnabled)
+            return cell
+        case .logins:
+            let cell: LoginsPreferencesTableCellView? = createCell(identifier: LoginsPreferencesTableCellView.identifier,
+                                                                   tableView: tableView)
             return cell
         case .downloads:
             let cell: DownloadPreferencesTableCellView? = createCell(identifier: DownloadPreferencesTableCellView.identifier, tableView: tableView)

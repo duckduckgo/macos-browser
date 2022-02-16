@@ -33,6 +33,7 @@ struct PreferenceSections {
         DefaultBrowserPreferences(),
         AppearancePreferences(),
         PrivacySecurityPreferences(),
+        LoginsPreferences(),
         DownloadPreferences()
     ]) {
         self.sections = sections
