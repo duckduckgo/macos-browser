@@ -63,7 +63,7 @@
 		4B1E6EED27AB5E5100F51793 /* SecureVaultSorting.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B1E6EEB27AB5E5100F51793 /* SecureVaultSorting.swift */; };
 		4B1E6EEE27AB5E5100F51793 /* PasswordManagementListSection.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B1E6EEC27AB5E5100F51793 /* PasswordManagementListSection.swift */; };
 		4B1E6EF127AB5E5D00F51793 /* NSPopUpButtonView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B1E6EEF27AB5E5D00F51793 /* NSPopUpButtonView.swift */; };
-		4B1E6EF227AB5E5D00F51793 /* PasswordManagementItemListView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B1E6EF027AB5E5D00F51793 /* PasswordManagementItemListView.swift */; };
+		4B1E6EF227AB5E5D00F51793 /* PasswordManagementItemList.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B1E6EF027AB5E5D00F51793 /* PasswordManagementItemList.swift */; };
 		4B2CBF412767EEC1001DF04B /* MacWaitlistStoreTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B2CBF402767EEC1001DF04B /* MacWaitlistStoreTests.swift */; };
 		4B2E7D6326FF9D6500D2DB17 /* PrintingUserScript.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B2E7D6226FF9D6500D2DB17 /* PrintingUserScript.swift */; };
 		4B3F641E27A8D3BD00E0C118 /* BrowserProfileTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B3F641D27A8D3BD00E0C118 /* BrowserProfileTests.swift */; };
@@ -745,7 +745,7 @@
 		4B1E6EEB27AB5E5100F51793 /* SecureVaultSorting.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SecureVaultSorting.swift; sourceTree = "<group>"; };
 		4B1E6EEC27AB5E5100F51793 /* PasswordManagementListSection.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PasswordManagementListSection.swift; sourceTree = "<group>"; };
 		4B1E6EEF27AB5E5D00F51793 /* NSPopUpButtonView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = NSPopUpButtonView.swift; sourceTree = "<group>"; };
-		4B1E6EF027AB5E5D00F51793 /* PasswordManagementItemListView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PasswordManagementItemListView.swift; sourceTree = "<group>"; };
+		4B1E6EF027AB5E5D00F51793 /* PasswordManagementItemList.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PasswordManagementItemList.swift; sourceTree = "<group>"; };
 		4B2CBF402767EEC1001DF04B /* MacWaitlistStoreTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MacWaitlistStoreTests.swift; sourceTree = "<group>"; };
 		4B2E7D6226FF9D6500D2DB17 /* PrintingUserScript.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PrintingUserScript.swift; sourceTree = "<group>"; };
 		4B3F641D27A8D3BD00E0C118 /* BrowserProfileTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BrowserProfileTests.swift; sourceTree = "<group>"; };
@@ -2177,7 +2177,7 @@
 			children = (
 				4BBE0AA627B9B027003B37A8 /* PopUpButton.swift */,
 				4B1E6EEF27AB5E5D00F51793 /* NSPopUpButtonView.swift */,
-				4B1E6EF027AB5E5D00F51793 /* PasswordManagementItemListView.swift */,
+				4B1E6EF027AB5E5D00F51793 /* PasswordManagementItemList.swift */,
 				4BE65473271FCD40008D1D63 /* EditableTextView.swift */,
 				4BE65470271FCD40008D1D63 /* PasswordManagementCreditCardItemView.swift */,
 				4BE6546E271FCD40008D1D63 /* PasswordManagementIdentityItemView.swift */,
@@ -3970,7 +3970,7 @@
 				AABEE6AB24ACA0F90043105B /* SuggestionTableRowView.swift in Sources */,
 				4B0511CB262CAA5A00F6079C /* DownloadPreferencesTableCellView.swift in Sources */,
 				4B9292AA26670D3700AD2C21 /* Bookmark.xcmappingmodel in Sources */,
-				4B1E6EF227AB5E5D00F51793 /* PasswordManagementItemListView.swift in Sources */,
+				4B1E6EF227AB5E5D00F51793 /* PasswordManagementItemList.swift in Sources */,
 				AAC5E4D025D6A709007F5990 /* Bookmark.swift in Sources */,
 				AA9B7C8326A197A00008D425 /* ServerTrust.swift in Sources */,
 				4BEF0E722766B11200AF7C58 /* MacWaitlistLockScreenViewModel.swift in Sources */,
