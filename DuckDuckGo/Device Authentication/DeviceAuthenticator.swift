@@ -20,29 +20,38 @@ import Foundation
 
 final class DeviceAuthenticator {
     
+    static let shared = DeviceAuthenticator()
+
     private let idleStateDetector: DeviceIdleStateDetector
     private let authenticationService: DeviceAuthenticationService
     private let loginsPreferences: LoginsPreferences
     
     init(idleStateDetector: DeviceIdleStateDetector = .shared,
          authenticationService: DeviceAuthenticationService = LocalAuthenticationService(),
-         loginsPreferences: LoginsPreferences) {
+         loginsPreferences: LoginsPreferences = LoginsPreferences()) {
         self.idleStateDetector = idleStateDetector
         self.authenticationService = authenticationService
         self.loginsPreferences = loginsPreferences
     }
     
-    var requiresAuthorization: Bool {
+    private(set) var isAuthenticating: Bool = false
+    
+    var requiresAuthentication: Bool {
         return idleStateDetector.secondsSinceLastEvent >= loginsPreferences.autoLockThreshold.seconds
     }
 
     func authorizeDevice(result: @escaping (Bool) -> Void) {
-        guard requiresAuthorization else {
+        guard requiresAuthentication else {
             result(true)
             return
         }
         
-        authenticationService.authenticateDevice(result: result)
+        isAuthenticating = true
+
+        authenticationService.authenticateDevice { authenticated in
+            self.isAuthenticating = false
+            result(authenticated)
+        }
     }
     
 }

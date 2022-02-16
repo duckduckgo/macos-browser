@@ -23,11 +23,13 @@ final class DeviceIdleStateDetector {
     
     private enum Constants {
         static let intervalBetweenIdleChecks: TimeInterval = 10
-        static let idleDuration: TimeInterval = 60
+        static let idleDuration: TimeInterval = 15
     }
  
     static let shared = DeviceIdleStateDetector()
     
+    private(set) var hasPassedIdleThreshold: Bool = false
+
     private var timer: Timer?
     private(set) var secondsSinceLastEvent: TimeInterval
     
@@ -53,6 +55,7 @@ final class DeviceIdleStateDetector {
         
         if self.secondsSinceLastEvent > Constants.idleDuration {
             print("SYSTEM IDLE TOO LONG!")
+            hasPassedIdleThreshold = true
         }
     }
 

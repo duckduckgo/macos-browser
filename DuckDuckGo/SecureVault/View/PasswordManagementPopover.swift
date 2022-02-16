@@ -36,6 +36,21 @@ final class PasswordManagementPopover: NSPopover {
     required init?(coder: NSCoder) {
         fatalError("\(Self.self): Bad initializer")
     }
+    
+    var numberOfCloseRequestsToIgnore = 0
+    
+    override func close() {
+        if DeviceAuthenticator.shared.isAuthenticating {
+            numberOfCloseRequestsToIgnore = 2
+        } else if numberOfCloseRequestsToIgnore > 0 {
+            // This means that the previous close request was due to authentication.
+            // When this happens, another close request comes in right after for some reason, so ignore that too, but allow future requests.
+            numberOfCloseRequestsToIgnore -= 1
+            return
+        } else {
+            super.close()
+        }
+    }
 
     // swiftlint:disable force_cast
     var viewController: PasswordManagementViewController { contentViewController as! PasswordManagementViewController }
@@ -73,7 +88,7 @@ extension PasswordManagementPopover: NSPopoverDelegate {
     }
 
     func popoverShouldClose(_ popover: NSPopover) -> Bool {
-        return true
+        return !DeviceAuthenticator.shared.isAuthenticating
     }
 
     func popoverDidClose(_ notification: Notification) {

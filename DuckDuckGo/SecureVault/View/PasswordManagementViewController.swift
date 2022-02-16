@@ -100,6 +100,17 @@ final class PasswordManagementViewController: NSViewController {
         emptyStateTitle.attributedStringValue = NSAttributedString.make(emptyStateTitle.stringValue, lineHeight: 1.14, kern: -0.23)
         emptyStateMessage.attributedStringValue = NSAttributedString.make(emptyStateMessage.stringValue, lineHeight: 1.05, kern: -0.08)
     }
+    
+    override func viewWillAppear() {
+        super.viewWillAppear()
+        
+        if let listView = self.listView {
+            listView.frame = listContainer.bounds
+            listContainer.addSubview(listView)
+        }
+        
+        print("CHECK AUTHENTICATION?")
+    }
 
     override func viewDidAppear() {
         super.viewDidAppear()
@@ -115,6 +126,20 @@ final class PasswordManagementViewController: NSViewController {
         } else {
             refetchWithText(isDirty ? "" : domain ?? "", clearWhenNoMatches: true)
         }
+        
+        let preferences = LoginsPreferences()
+        let authenticator = DeviceAuthenticator.shared
+        
+        if authenticator.requiresAuthentication {
+            authenticator.authorizeDevice { authorized in
+                print("AUTHORIZED")
+            }
+        }
+    }
+    
+    override func viewDidDisappear() {
+        super.viewDidDisappear()
+        listView?.removeFromSuperview()
     }
     
     private func showEmptyState() {
@@ -581,20 +606,6 @@ final class PasswordManagementViewController: NSViewController {
     }
     // swiftlint:enable function_body_length
     
-    override func viewWillAppear() {
-        super.viewWillAppear()
-        
-        if let listView = self.listView {
-            listView.frame = listContainer.bounds
-            listContainer.addSubview(listView)
-        }
-    }
-    
-    override func viewDidDisappear() {
-        super.viewDidDisappear()
-        listView?.removeFromSuperview()
-    }
-
     private func createNewSecureVaultItemMenu() -> NSMenu {
         let menu = NSMenu()
 
