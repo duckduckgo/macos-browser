@@ -23,14 +23,24 @@ struct SecureVaultSorting {
     
     static let `default` = SecureVaultSorting(category: .allItems, parameter: .title, order: .ascending)
 
-    enum Category: String, CaseIterable, Identifiable {
+    enum Category: CaseIterable, Identifiable {
         var id: Category { self }
-
-        case allItems = "All Items"
-        case logins = "Logins"
-        case identities = "Identities"
-        case cards = "Credit Cards"
-        case notes = "Notes"
+        
+        case allItems
+        case logins
+        case identities
+        case cards
+        case notes
+        
+        var title: String {
+            switch self {
+            case .allItems: return UserText.passwordManagementAllItems
+            case .logins: return UserText.passwordManagementLogins
+            case .identities: return UserText.passwordManagementIdentities
+            case .cards: return UserText.passwordManagementCreditCards
+            case .notes: return UserText.passwordManagementNotes
+            }
+        }
         
         var imageName: String? {
             switch self {
@@ -63,11 +73,18 @@ struct SecureVaultSorting {
         }
     }
     
-    enum SortParameter: String, CaseIterable {
-        case title = "Title"
-        case dateModified = "Date Modified"
-        case dateCreated = "Date Created"
+    enum SortParameter: CaseIterable {
+        case title
+        case dateModified
+        case dateCreated
         
+        var title: String {
+            switch self {
+            case .title: return UserText.pmSortParameterTitle
+            case .dateModified: return UserText.pmSortParameterDateModified
+            case .dateCreated: return UserText.pmSortParameterDateCreated
+            }
+        }
         var type: SortDataType {
             switch self {
             case .title: return .string
@@ -84,13 +101,13 @@ struct SecureVaultSorting {
             switch sortDataType {
             case .string:
                 switch self {
-                case .ascending: return "Alphabetically"
-                case .descending: return "Reverse Alphabetically"
+                case .ascending: return UserText.pmSortStringAscending
+                case .descending: return UserText.pmSortStringDescending
                 }
             case .date:
                 switch self {
-                case .ascending: return "Newest First"
-                case .descending: return "Oldest First"
+                case .ascending: return UserText.pmSortDateAscending
+                case .descending: return UserText.pmSortDateDescending
                 }
             }
         }

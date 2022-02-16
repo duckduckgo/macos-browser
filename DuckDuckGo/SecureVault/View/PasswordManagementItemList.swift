@@ -101,7 +101,7 @@ struct PasswordManagementItemListCategoryView: View {
                 let button = PopUpButton()
                 
                 for category in SecureVaultSorting.Category.allCases {
-                    button.addItem(withTitle: category.rawValue,
+                    button.addItem(withTitle: category.title,
                                    foregroundColor: category.foregroundColor,
                                    backgroundColor: category.backgroundColor)
                     
@@ -280,9 +280,9 @@ struct PasswordManagementSortButton: View {
             Picker("", selection: $model.sortDescriptor.parameter) {
                 ForEach(SecureVaultSorting.SortParameter.allCases, id: \.self) {
                     if $0 == model.sortDescriptor.parameter {
-                        Text("✓ \($0.rawValue)")
+                        Text("✓ \($0.title)")
                     } else {
-                        Text("    \($0.rawValue)")
+                        Text("    \($0.title)")
                     }
                 }
             }

@@ -18,6 +18,7 @@
 
 import Foundation
 
+// swiftlint:disable line_length
 extension UserText {
 
     static let pmNewCard = NSLocalizedString("pm.new.card", value: "Credit Card", comment: "Label for new card title")
@@ -58,5 +59,15 @@ extension UserText {
 
     static let pmNote = NSLocalizedString("pm.note", value: "Note", comment: "Label for note title")
     static let pmEmptyNote = NSLocalizedString("pm.note.empty", value: "Empty note", comment: "Label for empty note title")
-
+    
+    static let pmSortStringAscending = NSLocalizedString("pm.sort.string.ascending", value: "Alphabetically", comment: "Label for Ascending string sort order")
+    static let pmSortStringDescending = NSLocalizedString("pm.sort.string.descending", value: "Reverse Alphabetically", comment: "Label for Descending string sort order")
+    static let pmSortDateAscending = NSLocalizedString("pm.sort.date.ascending", value: "Newest First", comment: "Label for Ascending date sort order")
+    static let pmSortDateDescending = NSLocalizedString("pm.sort.date.descending", value: "Oldest First", comment: "Label for Descending date sort order")
+    
+    static let pmSortParameterTitle = NSLocalizedString("pm.sort.parameter.title", value: "Title", comment: "Label for Title sort parameter")
+    static let pmSortParameterDateCreated = NSLocalizedString("pm.sort.parameter.date-created", value: "Date Created", comment: "Label for Date Created sort parameter")
+    static let pmSortParameterDateModified = NSLocalizedString("pm.sort.parameter.date-modified", value: "Date Modified", comment: "Label for Date Modified sort parameter")
+    
 }
+// swiftlint:enable line_length
