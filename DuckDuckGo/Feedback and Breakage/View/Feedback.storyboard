@@ -37,17 +37,16 @@
             <objects>
                 <viewController id="TOa-sP-KHa" customClass="FeedbackViewController" customModule="DuckDuckGo_Privacy_Browser" customModuleProvider="target" sceneMemberID="viewController">
                     <view key="view" id="Ie8-lu-6dX">
-                        <rect key="frame" x="0.0" y="0.0" width="360" height="245"/>
+                        <rect key="frame" x="0.0" y="0.0" width="360" height="229"/>
                         <autoresizingMask key="autoresizingMask"/>
                         <subviews>
                             <customView translatesAutoresizingMaskIntoConstraints="NO" id="B4Q-yT-nKT" customClass="ColorView" customModule="DuckDuckGo_Privacy_Browser" customModuleProvider="target">
-                                <rect key="frame" x="0.0" y="160" width="360" height="85"/>
+                                <rect key="frame" x="0.0" y="160" width="360" height="69"/>
                                 <subviews>
                                     <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="7KM-rJ-r28">
-                                        <rect key="frame" x="69" y="24" width="222" height="38"/>
+                                        <rect key="frame" x="43" y="25" width="274" height="19"/>
                                         <constraints>
-                                            <constraint firstAttribute="width" constant="218" id="WpG-jC-P2k"/>
-                                            <constraint firstAttribute="height" constant="38" id="h5E-7e-FnD"/>
+                                            <constraint firstAttribute="width" constant="270" id="WpG-jC-P2k"/>
                                         </constraints>
                                         <textFieldCell key="cell" alignment="center" title="Help Improve DuckDuckGo for Mac" id="M7g-24-ECG">
                                             <font key="font" metaFont="systemSemibold" size="15"/>
@@ -56,7 +55,7 @@
                                         </textFieldCell>
                                     </textField>
                                     <button hidden="YES" translatesAutoresizingMaskIntoConstraints="NO" id="gmY-Cl-KRc">
-                                        <rect key="frame" x="8" y="57" width="20" height="20"/>
+                                        <rect key="frame" x="8" y="41" width="20" height="20"/>
                                         <constraints>
                                             <constraint firstAttribute="height" constant="20" id="5Cl-wW-X8R"/>
                                             <constraint firstAttribute="width" constant="20" id="NJC-UV-HPf"/>
@@ -68,7 +67,7 @@
                                     </button>
                                 </subviews>
                                 <constraints>
-                                    <constraint firstAttribute="height" constant="85" id="0od-R2-dBY"/>
+                                    <constraint firstAttribute="height" constant="69" id="0od-R2-dBY"/>
                                     <constraint firstItem="7KM-rJ-r28" firstAttribute="centerX" secondItem="B4Q-yT-nKT" secondAttribute="centerX" id="B3c-lB-0Ee"/>
                                     <constraint firstItem="7KM-rJ-r28" firstAttribute="centerY" secondItem="B4Q-yT-nKT" secondAttribute="centerY" id="EyM-8M-vKg"/>
                                     <constraint firstItem="gmY-Cl-KRc" firstAttribute="leading" secondItem="B4Q-yT-nKT" secondAttribute="leading" constant="8" id="JCT-9z-jBi"/>
@@ -301,8 +300,8 @@ Gw
                             <customView hidden="YES" translatesAutoresizingMaskIntoConstraints="NO" id="C8j-UX-ywh">
                                 <rect key="frame" x="0.0" y="0.0" width="360" height="160"/>
                                 <subviews>
-                                    <button verticalHuggingPriority="750" misplaced="YES" translatesAutoresizingMaskIntoConstraints="NO" id="3nf-Bg-7k2">
-                                        <rect key="frame" x="14" y="-3" width="332" height="40"/>
+                                    <button verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="3nf-Bg-7k2">
+                                        <rect key="frame" x="14" y="14" width="332" height="40"/>
                                         <constraints>
                                             <constraint firstAttribute="height" constant="28" id="1gW-Wq-I7c"/>
                                         </constraints>
