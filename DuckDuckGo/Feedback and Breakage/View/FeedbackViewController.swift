@@ -46,6 +46,7 @@ final class FeedbackViewController: NSViewController {
 
     @IBOutlet weak var optionPopUpButton: NSPopUpButton!
     @IBOutlet weak var pickOptionMenuItem: NSMenuItem!
+    @IBOutlet weak var websiteIsBrokenMenuItem: NSMenuItem!
 
     @IBOutlet weak var contentView: ColorView!
     @IBOutlet weak var contentViewHeightContraint: NSLayoutConstraint!
@@ -89,6 +90,7 @@ final class FeedbackViewController: NSViewController {
                                                selector: #selector(popUpButtonOpened(_:)),
                                                name: NSPopUpButton.willPopUpNotification,
                                                object: nil)
+        updateBrokenWebsiteMenuItem()
     }
 
     override func viewDidDisappear() {
@@ -115,10 +117,6 @@ final class FeedbackViewController: NSViewController {
 
         if popUpButton == optionPopUpButton {
             pickOptionMenuItem.isEnabled = false
-        } else if popUpButton == websiteBreakageCategoryPopUpButton {
-            view.makeMeFirstResponder()
-        } else {
-            assertionFailure("Unknown popup button")
         }
     }
 
@@ -192,9 +190,6 @@ final class FeedbackViewController: NSViewController {
             browserFeedbackView.isHidden = true
             contentHeight = Constants.websiteBreakageContentHeight
             urlTextField.stringValue = currentTabUrl?.absoluteString ?? ""
-            if urlTextField.stringValue.isEmpty {
-                urlTextField.makeMeFirstResponder()
-            }
         }
         websiteBreakageView.isHidden = !browserFeedbackView.isHidden
         setContentViewHeight(contentHeight, animated: true)
@@ -241,6 +236,10 @@ final class FeedbackViewController: NSViewController {
         case .other:
             browserFeedbackDescriptionLabel.stringValue = UserText.feedbackOtherDescription
         }
+    }
+
+    private func updateBrokenWebsiteMenuItem() {
+        websiteIsBrokenMenuItem.isEnabled = currentTab?.content.isUrl ?? false
     }
 
     private func sendFeedback() {
@@ -312,6 +311,10 @@ fileprivate extension WebsiteBreakage.Category {
 }
 
 extension FeedbackViewController: NSTextFieldDelegate {
+
+    func control(_ control: NSControl, textShouldBeginEditing fieldEditor: NSText) -> Bool {
+        return control != urlTextField
+    }
 
     func controlTextDidChange(_ notification: Notification) {
         updateSubmitButton()

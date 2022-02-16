@@ -179,12 +179,12 @@
                                                 <constraints>
                                                     <constraint firstAttribute="height" constant="30" id="3Tm-Sk-Wei"/>
                                                 </constraints>
-                                                <popUpButtonCell key="cell" type="bevel" title="Pick your issue from the list" bezelStyle="regularSquare" alignment="left" lineBreakMode="truncatingTail" state="on" borderStyle="border" tag="-1" inset="2" autoenablesItems="NO" selectedItem="50u-Do-Pk7" id="d1R-Kk-zzo">
+                                                <popUpButtonCell key="cell" type="bevel" title="Select a category (optional)" bezelStyle="regularSquare" alignment="left" lineBreakMode="truncatingTail" state="on" borderStyle="border" tag="-1" inset="2" autoenablesItems="NO" selectedItem="50u-Do-Pk7" id="d1R-Kk-zzo">
                                                     <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
                                                     <font key="font" metaFont="menu"/>
                                                     <menu key="menu" autoenablesItems="NO" id="5HU-z4-NLx">
                                                         <items>
-                                                            <menuItem title="Pick your issue from the list" state="on" tag="-1" id="50u-Do-Pk7"/>
+                                                            <menuItem title="Select a category (optional)" state="on" tag="-1" id="50u-Do-Pk7"/>
                                                             <menuItem isSeparatorItem="YES" id="VgP-Y6-9FR"/>
                                                             <menuItem title="Video didn't play" id="Lcy-nr-Bvy"/>
                                                             <menuItem title="The site asked me to disable" tag="1" id="Jbl-XF-mkd"/>
@@ -389,6 +389,7 @@ DQ
                         <outlet property="urlTextField" destination="2gs-6z-agW" id="7CM-5N-ugt"/>
                         <outlet property="websiteBreakageCategoryPopUpButton" destination="hUd-Rb-6Ls" id="DqR-hE-Sm5"/>
                         <outlet property="websiteBreakageView" destination="8B9-wf-zcP" id="enA-tH-Z1l"/>
+                        <outlet property="websiteIsBrokenMenuItem" destination="uoX-qE-3kz" id="xnb-jy-aeZ"/>
                     </connections>
                 </viewController>
                 <customObject id="FaH-Lu-sfn" userLabel="First Responder" customClass="NSResponder" sceneMemberID="firstResponder"/>
