@@ -19,6 +19,12 @@
 import AppKit
 import Combine
 
+final class GridClipTableView: NSTableView {
+
+    override func drawGrid(inClipRect clipRect: NSRect) { }
+
+}
+
 final class PreferencesListViewController: NSViewController {
 
     enum Constants {
@@ -31,7 +37,7 @@ final class PreferencesListViewController: NSViewController {
         return storyboard.instantiateController(identifier: Constants.identifier)
     }
 
-    @IBOutlet var preferencesTableView: NSTableView!
+    @IBOutlet var preferencesTableView: GridClipTableView!
 
     @Published var firstVisibleCellIndex: Int = 0
 
@@ -49,7 +55,6 @@ final class PreferencesListViewController: NSViewController {
         super.viewDidLoad()
 
         preferencesTableView.selectionHighlightStyle = .none
-        preferencesTableView.gridStyleMask = [.solidHorizontalGridLineMask]
 
         let defaultBrowserNib = DefaultBrowserTableCellView.nib()
         preferencesTableView.register(defaultBrowserNib, forIdentifier: DefaultBrowserTableCellView.identifier)
