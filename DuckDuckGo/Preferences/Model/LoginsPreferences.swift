@@ -48,6 +48,23 @@ struct LoginsPreferences {
                 return "1 hour"
             }
         }
+        
+        var seconds: TimeInterval {
+            switch self {
+            case .tenSeconds:
+                return 10
+            case .oneMinute:
+                return 60
+            case .fiveMinutes:
+                return 60 * 5
+            case .fifteenMinutes:
+                return 60 * 15
+            case .thirtyMinutes:
+                return 60 * 30
+            case .oneHour:
+                return 60 * 60
+            }
+        }
     }
     
     // TODO: Put this into secure storage, so that someone can't edit user defaults to remove auto-lock.

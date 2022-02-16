@@ -29,7 +29,7 @@ final class DeviceIdleStateDetector {
     static let shared = DeviceIdleStateDetector()
     
     private var timer: Timer?
-    private var secondsSinceLastEvent: TimeInterval
+    private(set) var secondsSinceLastEvent: TimeInterval
     
     private init() {
         self.secondsSinceLastEvent = Self.secondsSinceLastEvent

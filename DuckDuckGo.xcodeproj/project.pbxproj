@@ -70,6 +70,9 @@
 		4B379C1727BD9D7C008A968E /* LoginsPreferencesTableCellView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B379C1627BD9D7C008A968E /* LoginsPreferencesTableCellView.swift */; };
 		4B379C1927BD9EAA008A968E /* LoginsPreferences.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B379C1827BD9EAA008A968E /* LoginsPreferences.swift */; };
 		4B379C1B27BD9F88008A968E /* LoginsPreferencesTableCellView.xib in Resources */ = {isa = PBXBuildFile; fileRef = 4B379C1A27BD9F88008A968E /* LoginsPreferencesTableCellView.xib */; };
+		4B379C1E27BDB7FF008A968E /* DeviceAuthenticator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B379C1D27BDB7FF008A968E /* DeviceAuthenticator.swift */; };
+		4B379C2027BDBA18008A968E /* DeviceAuthenticationService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B379C1F27BDBA18008A968E /* DeviceAuthenticationService.swift */; };
+		4B379C2227BDBA29008A968E /* LocalAuthenticationService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B379C2127BDBA29008A968E /* LocalAuthenticationService.swift */; };
 		4B3F641E27A8D3BD00E0C118 /* BrowserProfileTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B3F641D27A8D3BD00E0C118 /* BrowserProfileTests.swift */; };
 		4B4F72EC266B2ED300814C60 /* CollectionExtension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B4F72EB266B2ED300814C60 /* CollectionExtension.swift */; };
 		4B59023D26B35F3600489384 /* ChromeDataImporter.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B59023826B35F3600489384 /* ChromeDataImporter.swift */; };
@@ -757,6 +760,9 @@
 		4B379C1627BD9D7C008A968E /* LoginsPreferencesTableCellView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LoginsPreferencesTableCellView.swift; sourceTree = "<group>"; };
 		4B379C1827BD9EAA008A968E /* LoginsPreferences.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LoginsPreferences.swift; sourceTree = "<group>"; };
 		4B379C1A27BD9F88008A968E /* LoginsPreferencesTableCellView.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = LoginsPreferencesTableCellView.xib; sourceTree = "<group>"; };
+		4B379C1D27BDB7FF008A968E /* DeviceAuthenticator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DeviceAuthenticator.swift; sourceTree = "<group>"; };
+		4B379C1F27BDBA18008A968E /* DeviceAuthenticationService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DeviceAuthenticationService.swift; sourceTree = "<group>"; };
+		4B379C2127BDBA29008A968E /* LocalAuthenticationService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LocalAuthenticationService.swift; sourceTree = "<group>"; };
 		4B3F641D27A8D3BD00E0C118 /* BrowserProfileTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BrowserProfileTests.swift; sourceTree = "<group>"; };
 		4B4F72EB266B2ED300814C60 /* CollectionExtension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CollectionExtension.swift; sourceTree = "<group>"; };
 		4B59023826B35F3600489384 /* ChromeDataImporter.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ChromeDataImporter.swift; sourceTree = "<group>"; };
@@ -1567,6 +1573,16 @@
 			path = Waitlist;
 			sourceTree = "<group>";
 		};
+		4B379C1C27BDB7EA008A968E /* Device Authentication */ = {
+			isa = PBXGroup;
+			children = (
+				4B379C1F27BDBA18008A968E /* DeviceAuthenticationService.swift */,
+				4B379C2127BDBA29008A968E /* LocalAuthenticationService.swift */,
+				4B379C1D27BDB7FF008A968E /* DeviceAuthenticator.swift */,
+			);
+			path = "Device Authentication";
+			sourceTree = "<group>";
+		};
 		4B59023726B35F3600489384 /* Chromium */ = {
 			isa = PBXGroup;
 			children = (
@@ -2375,6 +2391,7 @@
 				AAC30A24268DF93500D2D9CD /* Crash Reports */,
 				4B723DEA26B0002B00E14D75 /* Data Import */,
 				4B723DF826B0002B00E14D75 /* Data Export */,
+				4B379C1C27BDB7EA008A968E /* Device Authentication */,
 				4B65143C26392483005B46EB /* Email */,
 				AA5FA695275F823900DCE9C9 /* Favicons */,
 				8556A60C256C15C60092FA9D /* FileDownload */,
@@ -3959,6 +3976,7 @@
 				85707F24276A332A00DC0649 /* OnboardingButtonStyles.swift in Sources */,
 				B637273B26CBC8AF00C8CB02 /* AuthenticationAlert.swift in Sources */,
 				9826B0A02747DF3D0092F683 /* ContentBlocking.swift in Sources */,
+				4B379C2227BDBA29008A968E /* LocalAuthenticationService.swift in Sources */,
 				4B0511BB262CAA5A00F6079C /* DefaultBrowserPreferences.swift in Sources */,
 				4BB99D0326FE191E001E4761 /* SafariBookmarksReader.swift in Sources */,
 				AACF6FD626BC366D00CF09F9 /* SafariVersionReader.swift in Sources */,
@@ -4248,6 +4266,7 @@
 				4B9292AF26670F5300AD2C21 /* NSOutlineViewExtensions.swift in Sources */,
 				AA585D82248FD31100E9A3E2 /* AppDelegate.swift in Sources */,
 				85B7184C27677C6500B4277F /* OnboardingViewController.swift in Sources */,
+				4B379C1E27BDB7FF008A968E /* DeviceAuthenticator.swift in Sources */,
 				AA72D5F025FEA49900C77619 /* AddEditFavoriteWindow.swift in Sources */,
 				1456D6E124EFCBC300775049 /* TabBarCollectionView.swift in Sources */,
 				4B379C1727BD9D7C008A968E /* LoginsPreferencesTableCellView.swift in Sources */,
@@ -4300,6 +4319,7 @@
 				4BF01C00272AE74C00884A61 /* CountryList.swift in Sources */,
 				AAC5E4D925D6A711007F5990 /* BookmarkStore.swift in Sources */,
 				B6FA893F269C424500588ECD /* PrivacyDashboardViewController.swift in Sources */,
+				4B379C2027BDBA18008A968E /* DeviceAuthenticationService.swift in Sources */,
 				AA72D5FE25FFF94E00C77619 /* NSMenuItemExtension.swift in Sources */,
 				4BA1A6C2258B0A1300F6F690 /* ContiguousBytesExtension.swift in Sources */,
 				AA9B7C7E26A06E040008D425 /* TrackerInfo.swift in Sources */,
