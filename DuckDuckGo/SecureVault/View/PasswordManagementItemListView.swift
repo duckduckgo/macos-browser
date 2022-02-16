@@ -129,67 +129,22 @@ struct PasswordManagementItemListCategoryView: View {
 
             // MenuButton incorrectly displays a disabled state when you re-render it with a different image.
             // According to Stack Overflow, this was fixed in macOS 12, but it can still be reproduced on 12.2.
-            // To work around this, two separate buttons are used depending on the sort order. Less efficient, but renders correctly every time.
+            // This also happens with Menu in macOS 11.0+, so using that on later macOS versions doesn't help.
+            // To work around this, two separate buttons are used depending on the sort order. But, to make matters worse: this hack doesn't always work!
+            // So, as a last resort, both buttons are kept in a ZStack and opacity is used to determine whether they're visible, which so far seems reliable.
             //
             // Reference: https://stackoverflow.com/questions/65602163/swiftui-menu-button-displayed-as-disabled-initially
 
-            if model.sortDescriptor.order == .ascending {
+            ZStack {
                 PasswordManagementSortButton(imageName: "SortAscending")
-            } else {
+                    .opacity(model.sortDescriptor.order == .ascending ? 1 : 0)
+                    
                 PasswordManagementSortButton(imageName: "SortDescending")
+                    .opacity(model.sortDescriptor.order == .descending ? 1 : 0)
             }
-
         }
         
     }
-}
-
-struct PasswordManagementSortButton: View {
-    
-    @EnvironmentObject var model: PasswordManagementItemListModel
-    @State var sortHover: Bool = false
-    
-    let imageName: String
-    
-    var body: some View {
-        
-        MenuButton(label: Image(imageName)) {
-            Picker("", selection: $model.sortDescriptor.parameter) {
-                ForEach(SecureVaultSorting.SortParameter.allCases, id: \.self) {
-                    if $0 == model.sortDescriptor.parameter {
-                        Text("✓ \($0.rawValue)")
-                    } else {
-                        Text("    \($0.rawValue)")
-                    }
-                }
-            }
-            .labelsHidden()
-            .pickerStyle(.radioGroup)
-
-            Divider()
-
-            Picker("", selection: $model.sortDescriptor.order) {
-                ForEach(SecureVaultSorting.SortOrder.allCases, id: \.self) {
-                    if $0 == model.sortDescriptor.order {
-                        Text("✓ \($0.title(for: model.sortDescriptor.parameter.type))")
-                    } else {
-                        Text("    \($0.title(for: model.sortDescriptor.parameter.type))")
-                    }
-                }
-            }
-            .labelsHidden()
-            .pickerStyle(.radioGroup)
-        }
-        .menuButtonStyle(BorderlessButtonMenuButtonStyle())
-        .padding([.top, .bottom, .trailing], 4)
-        .padding(.leading, 7) // Leading needs additional padding to appear symmetrical
-        .background(RoundedRectangle(cornerRadius: 5).foregroundColor(sortHover ? Color("SecureVaultCategoryDefaultColor") : Color.clear))
-        .onHover { isOver in
-            sortHover = isOver
-        }
-        
-    }
-    
 }
 
 struct PasswordManagementItemListStackView: View {
@@ -307,4 +262,54 @@ private struct PasswordManagerItemButtonStyle: ButtonStyle {
             .background(RoundedRectangle(cornerRadius: 3, style: .continuous).fill(bgColor))
 
     }
+}
+
+struct PasswordManagementSortButton: View {
+    
+    @EnvironmentObject var model: PasswordManagementItemListModel
+
+    @State var sortHover: Bool = false
+    
+    let imageName: String
+    
+    var body: some View {
+        
+        MenuButton(label: Image(imageName).renderingMode(.template)) {
+            Picker("", selection: $model.sortDescriptor.parameter) {
+                ForEach(SecureVaultSorting.SortParameter.allCases, id: \.self) {
+                    if $0 == model.sortDescriptor.parameter {
+                        Text("✓ \($0.rawValue)")
+                    } else {
+                        Text("    \($0.rawValue)")
+                    }
+                }
+            }
+            .labelsHidden()
+            .pickerStyle(.radioGroup)
+
+            Divider()
+
+            Picker("", selection: $model.sortDescriptor.order) {
+                ForEach(SecureVaultSorting.SortOrder.allCases, id: \.self) {
+                    if $0 == model.sortDescriptor.order {
+                        Text("✓ \($0.title(for: model.sortDescriptor.parameter.type))")
+                    } else {
+                        Text("    \($0.title(for: model.sortDescriptor.parameter.type))")
+                    }
+                }
+            }
+            .labelsHidden()
+            .pickerStyle(.radioGroup)
+        }
+        .menuButtonStyle(BorderlessButtonMenuButtonStyle())
+        .padding([.top, .bottom, .trailing], 4)
+        .padding(.leading, 7) // Leading needs additional padding to appear symmetrical
+        .background(RoundedRectangle(cornerRadius: 5).foregroundColor(sortHover ? Color("SecureVaultCategoryDefaultColor") : Color.clear))
+        .onHover { isOver in
+            sortHover = isOver
+        }
+        .foregroundColor(.red)
+        
+    }
+    
 }
