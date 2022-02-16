@@ -37,7 +37,6 @@ struct WebsiteBreakage {
     let osVersion: String
     let upgradedHttps: Bool
     let tdsETag: String?
-    let atb: String?
     let blockedTrackerDomains: [String]
     let installedSurrogates: [String]
 

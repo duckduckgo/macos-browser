@@ -28,8 +28,7 @@ final class WebsiteBreakageSender {
                                             "blockedTrackers": websiteBreakage.blockedTrackerDomains.joined(separator: ","),
                                             "surrogates": websiteBreakage.installedSurrogates.joined(separator: ","),
                                             "os": websiteBreakage.osVersion,
-                                            "manufacturer": "Apple",
-                                            "atb": websiteBreakage.atb ?? ""]
+                                            "manufacturer": "Apple"]
 
         Pixel.fire(.brokenSiteReport, withAdditionalParameters: parameters)
     }
