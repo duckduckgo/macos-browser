@@ -165,6 +165,9 @@ extension PreferencesListViewController: NSTableViewDataSource, NSTableViewDeleg
         case .logins:
             let cell: LoginsPreferencesTableCellView? = createCell(identifier: LoginsPreferencesTableCellView.identifier,
                                                                    tableView: tableView)
+            cell?.delegate = self
+            let preferences = LoginsPreferences()
+            cell?.update(autoLockEnabled: preferences.shouldAutoLockLogins, threshold: preferences.autoLockThreshold)
             return cell
         case .downloads:
             let cell: DownloadPreferencesTableCellView? = createCell(identifier: DownloadPreferencesTableCellView.identifier, tableView: tableView)
@@ -228,4 +231,16 @@ extension PreferencesListViewController: PrivacySecurityPreferencesTableCellView
         preferences.gpcEnabled = enabled
     }
 
+}
+
+extension PreferencesListViewController: LoginsPreferencesTableCellViewDelegate {
+    
+    func loginsPreferencesTableCellView(_ cell: LoginsPreferencesTableCellView,
+                                        setShouldAutoLockLogins: Bool,
+                                        autoLockThreshold: LoginsPreferences.AutoLockThreshold) {
+        var preferences = LoginsPreferences()
+        preferences.shouldAutoLockLogins = setShouldAutoLockLogins
+        preferences.autoLockThreshold = autoLockThreshold
+    }
+    
 }

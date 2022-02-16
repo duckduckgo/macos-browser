@@ -61,6 +61,9 @@
                                                 </items>
                                             </menu>
                                         </popUpButtonCell>
+                                        <connections>
+                                            <action selector="autoLockThresholdChanged:" target="r9o-mb-reY" id="wO1-KL-ura"/>
+                                        </connections>
                                     </popUpButton>
                                     <button verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="WXS-rX-FCz">
                                         <rect key="frame" x="-2" y="37" width="551" height="18"/>

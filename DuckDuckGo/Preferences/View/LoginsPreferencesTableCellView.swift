@@ -18,6 +18,14 @@
 
 import Foundation
 
+protocol LoginsPreferencesTableCellViewDelegate: AnyObject {
+
+    func loginsPreferencesTableCellView(_ cell: LoginsPreferencesTableCellView,
+                                        setShouldAutoLockLogins: Bool,
+                                        autoLockThreshold: LoginsPreferences.AutoLockThreshold)
+
+}
+
 final class LoginsPreferencesTableCellView: NSTableCellView {
 
     static let identifier = NSUserInterfaceItemIdentifier("LoginsPreferencesTableCellView")
@@ -31,8 +39,40 @@ final class LoginsPreferencesTableCellView: NSTableCellView {
     @IBOutlet var autoLockDisabledRadioButton: NSButton!
     @IBOutlet var autoLockThresholdPopUpButton: NSPopUpButton!
     
+    weak var delegate: LoginsPreferencesTableCellViewDelegate?
+
+    private var loginPreferences = LoginsPreferences()
+
     @IBAction func autoLockEnabledPreferenceChanged(_ sender: AnyObject) {
-        print("Selected")
+        notifyDelegateOfPreferenceChanges()
+    }
+    
+    @IBAction func autoLockThresholdChanged(_ sender: AnyObject) {
+        notifyDelegateOfPreferenceChanges()
     }
 
+    func update(autoLockEnabled: Bool, threshold: LoginsPreferences.AutoLockThreshold) {
+        if autoLockEnabled {
+            autoLockEnabledRadioButton.state = .on
+        } else {
+            autoLockDisabledRadioButton.state = .on
+        }
+
+        autoLockThresholdPopUpButton.removeAllItems()
+        
+        for threshold in LoginsPreferences.AutoLockThreshold.allCases {
+            autoLockThresholdPopUpButton.addItem(withTitle: threshold.title)
+            autoLockThresholdPopUpButton.lastItem?.representedObject = threshold
+        }
+        
+        autoLockThresholdPopUpButton.selectItem(withTitle: threshold.title)
+    }
+    
+    private func notifyDelegateOfPreferenceChanges() {
+        let shouldAutoLock = (autoLockEnabledRadioButton.state == .on)
+        let threshold = (autoLockThresholdPopUpButton.selectedItem?.representedObject as? LoginsPreferences.AutoLockThreshold) ?? .fifteenMinutes
+        
+        delegate?.loginsPreferencesTableCellView(self, setShouldAutoLockLogins: shouldAutoLock, autoLockThreshold: threshold)
+    }
+    
 }

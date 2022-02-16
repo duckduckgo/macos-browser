@@ -44,7 +44,6 @@ public struct UserDefaultsWrapper<T> {
         case gpcEnabled = "preferences.gpc-enabled"
         case alwaysRequestDownloadLocationKey = "preferences.download-location.always-request"
         case autoLockLoginsEnabled = "preferences.logins.auto-lock-enabled"
-        case autoLockLoginsThreshold = "preferences.logins.auto-lock-threshold"
 
         case saveAsPreferredFileType = "saveAs.selected.filetype"
 

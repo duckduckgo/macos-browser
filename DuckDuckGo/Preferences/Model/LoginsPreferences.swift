@@ -20,7 +20,11 @@ import Foundation
 
 struct LoginsPreferences {
 
-    enum AutoLockThreshold: String {
+    private enum Keys {
+        static let autoLockLoginsThreshold = "preferences.logins.auto-lock-threshold"
+    }
+
+    enum AutoLockThreshold: String, CaseIterable {
         case tenSeconds
         case oneMinute
         case fiveMinutes
@@ -46,11 +50,30 @@ struct LoginsPreferences {
         }
     }
     
+    // TODO: Put this into secure storage, so that someone can't edit user defaults to remove auto-lock.
     @UserDefaultsWrapper(key: .autoLockLoginsEnabled, defaultValue: true)
     public var shouldAutoLockLogins: Bool
     
-    @UserDefaultsWrapper(key: .autoLockLoginsThreshold, defaultValue: .fifteenMinutes)
-    public var autoLockThreshold: AutoLockThreshold
+    var autoLockThreshold: AutoLockThreshold {
+        get {
+            if let thresholdName = userDefaults.string(forKey: Keys.autoLockLoginsThreshold),
+               let threshold = AutoLockThreshold(rawValue: thresholdName) {
+                return threshold
+            } else {
+                return .fifteenMinutes
+            }
+        }
+
+        set {
+            userDefaults.setValue(newValue.rawValue, forKey: Keys.autoLockLoginsThreshold)
+        }
+    }
+    
+    private let userDefaults: UserDefaults
+
+    init(userDefaults: UserDefaults = .standard) {
+        self.userDefaults = userDefaults
+    }
 
 }
 
