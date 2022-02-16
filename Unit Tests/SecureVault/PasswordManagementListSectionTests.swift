@@ -60,6 +60,19 @@ final class PasswordManagementListSectionTests: XCTestCase {
         XCTAssertEqual(sections.last!.items.map(\.title), ["Alfa", "Alfa Two"])
     }
     
+    func testWhenSortingItemsByTitle_AndTitlesUseDigits_ThenOctothorpeTitleIsUsed() {
+        let accounts = [
+            login(named: "123"),
+            login(named: "😬"),
+            login(named: "...")
+        ]
+
+        let sections = PasswordManagementListSection.sections(with: accounts, by: \.firstCharacter, order: .ascending)
+        
+        XCTAssertEqual(sections.count, 1)
+        XCTAssertEqual(sections.first!.title, "#")
+    }
+    
     func testWhenSortingItemsByDate_AndAllMonthsAndYearsAreTheSame_ThenOneSectionIsReturned() {
         let months = [1, 1, 1, 1, 1]
         let accounts = months.map { login(named: "Login", month: $0, year: 2000) }
