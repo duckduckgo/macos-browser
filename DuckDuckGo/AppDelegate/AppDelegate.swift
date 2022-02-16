@@ -25,7 +25,6 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
 
     let launchTimingPixel = TimedPixel(.launchTiming)
 
-
     static var isRunningTests: Bool {
 #if DEBUG
         ProcessInfo.processInfo.environment["XCTestConfigurationFilePath"] != nil
