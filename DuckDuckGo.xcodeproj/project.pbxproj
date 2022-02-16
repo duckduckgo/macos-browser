@@ -198,6 +198,7 @@
 		4BB99D1126FE1A84001E4761 /* SafariBookmarksReaderTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4BB99D0E26FE1A84001E4761 /* SafariBookmarksReaderTests.swift */; };
 		4BB99D1326FE1A94001E4761 /* places.sqlite in Resources */ = {isa = PBXBuildFile; fileRef = 4BB99D1226FE1A94001E4761 /* places.sqlite */; };
 		4BBE0AA727B9B027003B37A8 /* PopUpButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4BBE0AA627B9B027003B37A8 /* PopUpButton.swift */; };
+		4BBE0ADA27BC8CDE003B37A8 /* PasswordManagementListSectionTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4BBE0AD927BC8CDE003B37A8 /* PasswordManagementListSectionTests.swift */; };
 		4BC68A702759AE490029A586 /* Waitlist.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 4BC68A6F2759AE490029A586 /* Waitlist.storyboard */; };
 		4BC68A722759B2140029A586 /* Waitlist.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4BC68A712759B2140029A586 /* Waitlist.swift */; };
 		4BE0DF06267819A1006337B7 /* NSStoryboardExtension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4BE0DF0426781961006337B7 /* NSStoryboardExtension.swift */; };
@@ -884,6 +885,7 @@
 		4BB99D0E26FE1A84001E4761 /* SafariBookmarksReaderTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SafariBookmarksReaderTests.swift; sourceTree = "<group>"; };
 		4BB99D1226FE1A94001E4761 /* places.sqlite */ = {isa = PBXFileReference; lastKnownFileType = file; path = places.sqlite; sourceTree = "<group>"; };
 		4BBE0AA627B9B027003B37A8 /* PopUpButton.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PopUpButton.swift; sourceTree = "<group>"; };
+		4BBE0AD927BC8CDE003B37A8 /* PasswordManagementListSectionTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PasswordManagementListSectionTests.swift; sourceTree = "<group>"; };
 		4BC68A6F2759AE490029A586 /* Waitlist.storyboard */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; path = Waitlist.storyboard; sourceTree = "<group>"; };
 		4BC68A712759B2140029A586 /* Waitlist.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Waitlist.swift; sourceTree = "<group>"; };
 		4BE0DF0426781961006337B7 /* NSStoryboardExtension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NSStoryboardExtension.swift; sourceTree = "<group>"; };
@@ -2092,6 +2094,7 @@
 			isa = PBXGroup;
 			children = (
 				858C1BEC26974E6600E6C014 /* PasswordManagerSettingsTests.swift */,
+				4BBE0AD927BC8CDE003B37A8 /* PasswordManagementListSectionTests.swift */,
 			);
 			path = SecureVault;
 			sourceTree = "<group>";
@@ -4343,6 +4346,7 @@
 				AA652CDB25DDAB32009059CC /* BookmarkStoreMock.swift in Sources */,
 				B62EB47C25BAD3BB005745C6 /* WKWebViewPrivateMethodsAvailabilityTests.swift in Sources */,
 				4B3F641E27A8D3BD00E0C118 /* BrowserProfileTests.swift in Sources */,
+				4BBE0ADA27BC8CDE003B37A8 /* PasswordManagementListSectionTests.swift in Sources */,
 				B6106BA026A7BE0B0013B453 /* PermissionManagerTests.swift in Sources */,
 				B662D3D92755D7AD0035D4D6 /* PixelStoreTests.swift in Sources */,
 				B6106BB526A809E60013B453 /* GeolocationProviderTests.swift in Sources */,
