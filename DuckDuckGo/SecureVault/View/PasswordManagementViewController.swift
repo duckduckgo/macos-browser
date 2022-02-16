@@ -208,7 +208,11 @@ final class PasswordManagementViewController: NSViewController {
             return
         }
 
-        self.listModel?.sortDescriptor = .init(category: category, parameter: .title, order: .ascending)
+        if let descriptor = self.listModel?.sortDescriptor {
+            self.listModel?.sortDescriptor = .init(category: category, parameter: descriptor.parameter, order: descriptor.order)
+        } else {
+            self.listModel?.sortDescriptor = .init(category: category, parameter: .title, order: .ascending)
+        }
     }
 
     private func syncModelsOnCredentials(_ credentials: SecureVaultModels.WebsiteCredentials, select: Bool = false) {
