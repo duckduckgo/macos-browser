@@ -78,7 +78,7 @@ final class BrowserImportViewController: NSViewController {
             return profileList.validImportableProfiles.first
         }
 
-        return profileList.validImportableProfiles.first { $0.name == selectedProfile.title }
+        return profileList.validImportableProfiles.first { $0.profileName == selectedProfile.title }
     }
 
     let browser: DataImport.Source
@@ -149,9 +149,9 @@ extension NSPopUpButton {
         var selectedSourceIndex: Int?
 
         for (index, profile) in validProfiles.enumerated() {
-            addItem(withTitle: profile.name)
+            addItem(withTitle: profile.profileName)
 
-            if profile.name == defaultProfile?.name {
+            if profile.profileName == defaultProfile?.profileName {
                 selectedSourceIndex = index
             }
         }

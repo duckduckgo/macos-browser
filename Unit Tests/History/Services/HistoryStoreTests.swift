@@ -163,8 +163,7 @@ fileprivate extension HistoryEntry {
                   title: title,
                   numberOfVisits: numberOfVisits,
                   lastVisit: lastVisit,
-                  failedToLoad: false,
-                  isDownload: false)
+                  failedToLoad: false)
     }
 
 }

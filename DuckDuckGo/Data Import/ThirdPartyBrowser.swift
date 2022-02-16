@@ -16,7 +16,7 @@
 //  limitations under the License.
 //
 
-import Foundation
+import AppKit
 
 private struct BundleIdentifiers {
     let production: String
@@ -52,7 +52,10 @@ enum ThirdPartyBrowser: CaseIterable {
     }
 
     var isInstalled: Bool {
-        return applicationPath != nil
+        let detectedApplicationPath = applicationPath != nil
+        let detectedBrowserProfiles = !(browserProfiles?.profiles.isEmpty ?? true)
+        
+        return detectedApplicationPath && detectedBrowserProfiles
     }
 
     var isRunning: Bool {
