@@ -196,29 +196,29 @@ final class MoreOptionsMenu: NSMenu {
         
         loginsSubMenu.addItem(withTitle: UserText.passwordManagementAllItems, action: #selector(openLoginsWithAllItems), keyEquivalent: "")
             .targetting(self)
-            .firingPixel(Pixel.Event.MoreResult.logins)
+            .firingPixel(Pixel.Event.MoreResult.loginsMenuAllItems)
         
         loginsSubMenu.addItem(NSMenuItem.separator())
         
         loginsSubMenu.addItem(withTitle: UserText.passwordManagementLogins, action: #selector(openLoginsWithLogins), keyEquivalent: "")
             .targetting(self)
             .withImage(NSImage(named: "LoginGlyph"))
-            .firingPixel(Pixel.Event.MoreResult.logins)
+            .firingPixel(Pixel.Event.MoreResult.loginsMenuLogins)
         
         loginsSubMenu.addItem(withTitle: UserText.passwordManagementIdentities, action: #selector(openLoginsWithIdentities), keyEquivalent: "")
             .targetting(self)
             .withImage(NSImage(named: "IdentityGlyph"))
-            .firingPixel(Pixel.Event.MoreResult.logins)
+            .firingPixel(Pixel.Event.MoreResult.loginsMenuIdentities)
         
         loginsSubMenu.addItem(withTitle: UserText.passwordManagementCreditCards, action: #selector(openLoginsWithCreditCards), keyEquivalent: "")
             .targetting(self)
             .withImage(NSImage(named: "CreditCardGlyph"))
-            .firingPixel(Pixel.Event.MoreResult.logins)
+            .firingPixel(Pixel.Event.MoreResult.loginsMenuCreditCards)
         
         loginsSubMenu.addItem(withTitle: UserText.passwordManagementNotes, action: #selector(openLoginsWithNotes), keyEquivalent: "")
             .targetting(self)
             .withImage(NSImage(named: "NoteGlyph"))
-            .firingPixel(Pixel.Event.MoreResult.logins)
+            .firingPixel(Pixel.Event.MoreResult.loginsMenuNotes)
         
         addItem(withTitle: UserText.passwordManagement, action: nil, keyEquivalent: "")
             .withImage(NSImage(named: "PasswordManagement"))
