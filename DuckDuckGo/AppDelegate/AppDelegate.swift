@@ -125,6 +125,8 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         crashReporter.checkForNewReports()
 #endif
         urlEventHandler.applicationDidFinishLaunching()
+        
+        DeviceIdleStateDetector.shared.beginIdleCheckTimer()
     }
 
     func applicationShouldTerminate(_ sender: NSApplication) -> NSApplication.TerminateReply {
