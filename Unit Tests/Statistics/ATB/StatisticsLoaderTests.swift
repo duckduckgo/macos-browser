@@ -235,7 +235,7 @@ class StatisticsLoaderTests: XCTestCase {
         let expect = expectation(description: "Search retention ATB requested")
         testee.refreshRetentionAtb(isSearch: true) {
             XCTAssertEqual(self.mockStatisticsStore.atb, "v20-1")
-            XCTAssertEqual(self.mockStatisticsStore.appRetentionAtb, "appRetentionAtb")
+            XCTAssertEqual(self.mockStatisticsStore.appRetentionAtb, "v77-5")
             XCTAssertEqual(self.mockStatisticsStore.searchRetentionAtb, "v77-5")
             expect.fulfill()
         }
@@ -289,6 +289,7 @@ class StatisticsLoaderTests: XCTestCase {
 
     func loadSuccessfulUpdateAtbStub() {
         stub(condition: isHost(URL.initialAtb.host!)) { _ in
+            print("*** atb update stub for host")
             let path = OHPathForFile("atb-with-update.json", type(of: self))!
             return fixture(filePath: path, status: 200, headers: nil)
         }
