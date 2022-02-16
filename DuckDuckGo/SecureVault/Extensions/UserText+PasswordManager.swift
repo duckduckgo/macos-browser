@@ -20,6 +20,16 @@ import Foundation
 
 // swiftlint:disable line_length
 extension UserText {
+    
+    static let pmEmptyStateDefaultTitle = NSLocalizedString("pm.empty.default.title", value: "No logins or credit card info yet", comment: "Label for default empty state title")
+    static let pmEmptyStateDefaultDescription = NSLocalizedString("pm.empty.default.description",
+                                                                  value: "If your logins are saved in another browser, you can import them into DuckDuckGo.",
+                                                                  comment: "Label for default empty state description")
+    
+    static let pmEmptyStateLoginsTitle = NSLocalizedString("pm.empty.logins.title", value: "No Logins", comment: "Label for logins empty state title")
+    static let pmEmptyStateIdentitiesTitle = NSLocalizedString("pm.empty.identities.title", value: "No Identities", comment: "Label for identities empty state title")
+    static let pmEmptyStateCardsTitle = NSLocalizedString("pm.empty.cards.title", value: "No Cards", comment: "Label for cards empty state title")
+    static let pmEmptyStateNotesTitle = NSLocalizedString("pm.empty.notes.title", value: "No Notes", comment: "Label for notes empty state title")
 
     static let pmNewCard = NSLocalizedString("pm.new.card", value: "Credit Card", comment: "Label for new card title")
     static let pmNewLogin = NSLocalizedString("pm.new.login", value: "Login", comment: "Label for new login title")

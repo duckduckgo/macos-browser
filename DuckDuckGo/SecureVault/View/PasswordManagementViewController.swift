@@ -126,13 +126,13 @@ final class PasswordManagementViewController: NSViewController {
         case .allItems:
             showDefaultEmptyState()
         case .logins:
-            showEmptyState(imageName: "LoginsEmpty", title: "No Logins")
+            showEmptyState(imageName: "LoginsEmpty", title: UserText.pmEmptyStateLoginsTitle)
         case .identities:
-            showEmptyState(imageName: "IdentitiesEmpty", title: "No Identities")
+            showEmptyState(imageName: "IdentitiesEmpty", title: UserText.pmEmptyStateIdentitiesTitle)
         case .cards:
-            showEmptyState(imageName: "CreditCardsEmpty", title: "No Cards")
+            showEmptyState(imageName: "CreditCardsEmpty", title: UserText.pmEmptyStateCardsTitle)
         case .notes:
-            showEmptyState(imageName: "NotesEmpty", title: "No Notes")
+            showEmptyState(imageName: "NotesEmpty", title: UserText.pmEmptyStateNotesTitle)
         }
     }
 
@@ -143,10 +143,8 @@ final class PasswordManagementViewController: NSViewController {
         
         emptyStateImageView.image = NSImage(named: "LoginsEmpty")
 
-        let title = "No logins or credit card info yet"
-        emptyStateTitle.attributedStringValue = NSAttributedString.make(title, lineHeight: 1.14, kern: -0.23)
-        let message = "If your logins are saved in another browser, you can import them into DuckDuckGo."
-        emptyStateMessage.attributedStringValue = NSAttributedString.make(message, lineHeight: 1.05, kern: -0.08)
+        emptyStateTitle.attributedStringValue = NSAttributedString.make(UserText.pmEmptyStateDefaultTitle, lineHeight: 1.14, kern: -0.23)
+        emptyStateMessage.attributedStringValue = NSAttributedString.make(UserText.pmEmptyStateDefaultDescription, lineHeight: 1.05, kern: -0.08)
     }
     
     private func showEmptyState(imageName: String, title: String) {
