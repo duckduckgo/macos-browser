@@ -18,26 +18,6 @@
 
 import Foundation
 
-extension NSImage {
-
-    // swiftlint:disable force_cast
-    func tint(color: NSColor) -> NSImage {
-        let image = self.copy() as! NSImage
-        image.lockFocus()
-
-        color.set()
-
-        let imageRect = NSRect(origin: NSZeroPoint, size: image.size)
-        imageRect.fill(using: .sourceAtop)
-
-        image.unlockFocus()
-
-        return image
-    }
-    // swiftlint:enable force_cast
-
-}
-
 private struct NSMenuItemColor {
     let foregroundColor: NSColor?
     let backgroundColor: NSColor
@@ -103,7 +83,7 @@ final class NSPopUpButtonBackgroundColorCell: NSPopUpButtonCell {
     
     override func drawImage(withFrame cellFrame: NSRect, in controlView: NSView) {
         let color = foregroundColor(for: title)
-        guard let tintedImage = image?.tint(color: color) else {
+        guard let tintedImage = image?.tinted(with: color) else {
             return
         }
 
@@ -131,7 +111,7 @@ final class NSPopUpButtonBackgroundColorCell: NSPopUpButtonCell {
         
         let foregroundColor = foregroundColor(for: title)
         
-        let tintedChevrons = Self.chevronsImage.tint(color: foregroundColor)
+        let tintedChevrons = Self.chevronsImage.tinted(with: foregroundColor)
         let chevronFrame = NSRect(x: frame.size.width - Self.chevronsImage.size.width - 4,
                                   y: frame.size.height / 2 - Self.chevronsImage.size.height / 2,
                                   width: Self.chevronsImage.size.width,

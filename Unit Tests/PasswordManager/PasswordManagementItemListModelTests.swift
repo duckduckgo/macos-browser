@@ -89,7 +89,7 @@ final class PasswordManagementItemListModelTests: XCTestCase {
         newSelection = new
     }
 
-    private func accounts(from sections: [PasswordManagementItemListModel.ListSection]) -> [SecureVaultModels.WebsiteAccount] {
+    private func accounts(from sections: [PasswordManagementListSection]) -> [SecureVaultModels.WebsiteAccount] {
         var accounts = [SecureVaultModels.WebsiteAccount]()
 
         for section in sections {

@@ -37,16 +37,16 @@ struct PasswordManagementItemListView: View {
 
     var body: some View {
 
-        if #available(macOS 11.0, *) {
-            VStack(spacing: 0) {
-                PasswordManagementItemListCategoryView()
-                    .padding(.top, 15)
-                    .padding(.bottom, 14)
-                    .padding([.leading, .trailing], 10)
-                
-                Divider()
-                    .opacity(opacity)
-                
+        VStack(spacing: 0) {
+            PasswordManagementItemListCategoryView()
+                .padding(.top, 15)
+                .padding(.bottom, 14)
+                .padding([.leading, .trailing], 10)
+            
+            Divider()
+                .opacity(opacity)
+            
+            if #available(macOS 11.0, *) {
                 GeometryReader { outsideProxy in
                     ScrollView {
                         ScrollViewReader { proxy in
@@ -74,11 +74,13 @@ struct PasswordManagementItemListView: View {
                         }
                     }
                 }
+            } else {
+                ScrollView {
+                    PasswordManagementItemListStackView()
+                }
             }
-        } else {
-            PasswordManagementItemListStackView()
         }
-
+        
     }
     
     private func calculateContentOffset(from outsideProxy: GeometryProxy, to insideProxy: GeometryProxy) -> CGFloat {
