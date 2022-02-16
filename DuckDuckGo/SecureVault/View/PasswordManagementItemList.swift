@@ -133,16 +133,14 @@ struct PasswordManagementItemListCategoryView: View {
             // According to Stack Overflow, this was fixed in macOS 12, but it can still be reproduced on 12.2.
             // This also happens with Menu in macOS 11.0+, so using that on later macOS versions doesn't help.
             // To work around this, two separate buttons are used depending on the sort order. But, to make matters worse: this hack doesn't always work!
-            // So, as a last resort, both buttons are kept in a ZStack and opacity is used to determine whether they're visible, which so far seems reliable.
+            // So, as a last resort, both buttons are kept in a ZStack with their image and opacity is used to determine whether they're visible, which so far seems reliable.
             //
             // Reference: https://stackoverflow.com/questions/65602163/swiftui-menu-button-displayed-as-disabled-initially
-
-            ZStack {
+            
+            if model.sortDescriptor.order == .ascending {
                 PasswordManagementSortButton(imageName: "SortAscending")
-                    .opacity(model.sortDescriptor.order == .ascending ? 1 : 0)
-                    
+            } else {
                 PasswordManagementSortButton(imageName: "SortDescending")
-                    .opacity(model.sortDescriptor.order == .descending ? 1 : 0)
             }
         }
         
@@ -276,41 +274,45 @@ struct PasswordManagementSortButton: View {
     
     var body: some View {
         
-        MenuButton(label: Image(imageName).renderingMode(.template)) {
-            Picker("", selection: $model.sortDescriptor.parameter) {
-                ForEach(SecureVaultSorting.SortParameter.allCases, id: \.self) {
-                    if $0 == model.sortDescriptor.parameter {
-                        Text("✓ \($0.title)")
-                    } else {
-                        Text("    \($0.title)")
+        ZStack {
+            Image(imageName)
+            
+            // The image is added elsewhere, because MenuButton has a bug with using Images as labels.
+            MenuButton(label: Image(nsImage: NSImage())) {
+                Picker("", selection: $model.sortDescriptor.parameter) {
+                    ForEach(SecureVaultSorting.SortParameter.allCases, id: \.self) {
+                        if $0 == model.sortDescriptor.parameter {
+                            Text("✓ \($0.title)")
+                        } else {
+                            Text("    \($0.title)")
+                        }
                     }
                 }
-            }
-            .labelsHidden()
-            .pickerStyle(.radioGroup)
-
-            Divider()
-
-            Picker("", selection: $model.sortDescriptor.order) {
-                ForEach(SecureVaultSorting.SortOrder.allCases, id: \.self) {
-                    if $0 == model.sortDescriptor.order {
-                        Text("✓ \($0.title(for: model.sortDescriptor.parameter.type))")
-                    } else {
-                        Text("    \($0.title(for: model.sortDescriptor.parameter.type))")
+                .labelsHidden()
+                .pickerStyle(.radioGroup)
+                
+                Divider()
+                
+                Picker("", selection: $model.sortDescriptor.order) {
+                    ForEach(SecureVaultSorting.SortOrder.allCases, id: \.self) {
+                        if $0 == model.sortDescriptor.order {
+                            Text("✓ \($0.title(for: model.sortDescriptor.parameter.type))")
+                        } else {
+                            Text("    \($0.title(for: model.sortDescriptor.parameter.type))")
+                        }
                     }
                 }
+                .labelsHidden()
+                .pickerStyle(.radioGroup)
             }
-            .labelsHidden()
-            .pickerStyle(.radioGroup)
+            .menuButtonStyle(BorderlessButtonMenuButtonStyle())
+            .padding(5)
+            .background(RoundedRectangle(cornerRadius: 5).foregroundColor(sortHover ? Color("SecureVaultCategoryDefaultColor") : Color.clear))
+            .onHover { isOver in
+                sortHover = isOver
+            }
+            .foregroundColor(.red)
         }
-        .menuButtonStyle(BorderlessButtonMenuButtonStyle())
-        .padding([.top, .bottom, .trailing], 4)
-        .padding(.leading, 7) // Leading needs additional padding to appear symmetrical
-        .background(RoundedRectangle(cornerRadius: 5).foregroundColor(sortHover ? Color("SecureVaultCategoryDefaultColor") : Color.clear))
-        .onHover { isOver in
-            sortHover = isOver
-        }
-        .foregroundColor(.red)
         
     }
     
