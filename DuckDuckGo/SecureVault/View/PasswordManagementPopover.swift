@@ -38,19 +38,19 @@ final class PasswordManagementPopover: NSPopover {
     }
     
     var numberOfCloseRequestsToIgnore = 0
-    
-    override func close() {
-        if DeviceAuthenticator.shared.isAuthenticating {
-            numberOfCloseRequestsToIgnore = 2
-        } else if numberOfCloseRequestsToIgnore > 0 {
-            // This means that the previous close request was due to authentication.
-            // When this happens, another close request comes in right after for some reason, so ignore that too, but allow future requests.
-            numberOfCloseRequestsToIgnore -= 1
-            return
-        } else {
-            super.close()
-        }
-    }
+
+//    override func close() {
+//        if DeviceAuthenticator.shared.isAuthenticating {
+//            numberOfCloseRequestsToIgnore = 2
+//        } else if numberOfCloseRequestsToIgnore > 0 {
+//            // This means that the previous close request was due to authentication.
+//            // When this happens, another close request comes in right after for some reason, so ignore that too, but allow future requests.
+//            numberOfCloseRequestsToIgnore -= 1
+//            return
+//        } else {
+//            super.close()
+//        }
+//    }
 
     // swiftlint:disable force_cast
     var viewController: PasswordManagementViewController { contentViewController as! PasswordManagementViewController }
@@ -73,17 +73,27 @@ final class PasswordManagementPopover: NSPopover {
 extension PasswordManagementPopover: NSPopoverDelegate {
 
     func popoverDidShow(_ notification: Notification) {
-        parentWindowDidBecomeKeyObserver = NotificationCenter.default.addObserver(forName: NSWindow.didBecomeMainNotification,
-                                                                                  object: nil,
-                                                                                  queue: OperationQueue.main) { [weak self] _ in
-            guard let self = self, self.isShown else { return }
-            // self.close()
-        }
+        
+//        This block causes the popover to be dismissed after authenticating. Do we still need it if we're dismissed the popover on resignMain?
+//
+//        parentWindowDidBecomeKeyObserver = NotificationCenter.default.addObserver(forName: NSWindow.didBecomeMainNotification,
+//                                                                                  object: nil,
+//                                                                                  queue: OperationQueue.main) { [weak self] _ in
+//            guard let self = self, self.isShown else { return }
+//
+//            if !DeviceAuthenticator.shared.isAuthenticating {
+//                self.close()
+//            }
+//        }
+
         parentWindowDidResignKeyObserver = NotificationCenter.default.addObserver(forName: NSWindow.didResignMainNotification,
                                                                                   object: nil,
                                                                                   queue: OperationQueue.main) { [weak self] _ in
             guard let self = self, self.isShown else { return }
-            // self.close()
+            
+            if !DeviceAuthenticator.shared.isAuthenticating {
+                self.close()
+            }
         }
     }
 
