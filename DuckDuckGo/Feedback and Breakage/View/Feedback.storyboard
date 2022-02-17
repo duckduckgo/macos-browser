@@ -109,10 +109,10 @@
                                         </connections>
                                     </popUpButton>
                                     <customView hidden="YES" translatesAutoresizingMaskIntoConstraints="NO" id="8Xi-CY-jyt" userLabel="Browser Feedback View">
-                                        <rect key="frame" x="20" y="-110" width="320" height="200"/>
+                                        <rect key="frame" x="20" y="-125" width="320" height="215"/>
                                         <subviews>
                                             <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="Obm-Wr-qrD">
-                                                <rect key="frame" x="-2" y="185" width="324" height="15"/>
+                                                <rect key="frame" x="-2" y="200" width="324" height="15"/>
                                                 <constraints>
                                                     <constraint firstAttribute="width" constant="320" id="Y8O-Rh-baf"/>
                                                 </constraints>
@@ -123,7 +123,7 @@
                                                 </textFieldCell>
                                             </textField>
                                             <textField verticalHuggingPriority="750" horizontalCompressionResistancePriority="250" translatesAutoresizingMaskIntoConstraints="NO" id="wK6-n4-LX0">
-                                                <rect key="frame" x="0.0" y="80" width="320" height="97"/>
+                                                <rect key="frame" x="0.0" y="95" width="320" height="97"/>
                                                 <constraints>
                                                     <constraint firstAttribute="height" constant="97" id="RkU-ia-Jx0"/>
                                                 </constraints>
@@ -134,13 +134,14 @@
                                                 </textFieldCell>
                                             </textField>
                                             <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="nm3-pj-w2B">
-                                                <rect key="frame" x="-2" y="13" width="324" height="47"/>
+                                                <rect key="frame" x="-2" y="28" width="324" height="47"/>
                                                 <constraints>
                                                     <constraint firstAttribute="width" constant="320" id="46H-7M-bu2"/>
                                                     <constraint firstAttribute="height" constant="47" id="w0L-qh-saU"/>
                                                 </constraints>
-                                                <textFieldCell key="cell" title="Reports sent to DuckDuckGo are 100% anonymous and only include your message, the DuckDuckGo app version, and your macOS version" id="7PA-BW-gkt">
+                                                <textFieldCell key="cell" id="7PA-BW-gkt">
                                                     <font key="font" metaFont="smallSystem"/>
+                                                    <string key="title">Reports sent to DuckDuckGo are 100% anonymous and only include your message, the DuckDuckGo app version, and your macOS version.</string>
                                                     <color key="textColor" name="secondaryLabelColor" catalog="System" colorSpace="catalog"/>
                                                     <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
                                                 </textFieldCell>
@@ -150,7 +151,7 @@
                                             <constraint firstItem="nm3-pj-w2B" firstAttribute="leading" secondItem="8Xi-CY-jyt" secondAttribute="leading" id="5O5-rb-Ifm"/>
                                             <constraint firstItem="wK6-n4-LX0" firstAttribute="top" secondItem="Obm-Wr-qrD" secondAttribute="bottom" constant="8" id="9Do-M1-64N"/>
                                             <constraint firstAttribute="trailing" secondItem="Obm-Wr-qrD" secondAttribute="trailing" id="PvD-sA-dg7"/>
-                                            <constraint firstAttribute="height" constant="200" id="UQa-QI-LjA"/>
+                                            <constraint firstAttribute="height" constant="215" id="UQa-QI-LjA"/>
                                             <constraint firstAttribute="trailing" secondItem="wK6-n4-LX0" secondAttribute="trailing" id="Xd3-Y9-PLt"/>
                                             <constraint firstItem="wK6-n4-LX0" firstAttribute="leading" secondItem="8Xi-CY-jyt" secondAttribute="leading" id="Z3y-LM-RMP"/>
                                             <constraint firstItem="nm3-pj-w2B" firstAttribute="top" secondItem="wK6-n4-LX0" secondAttribute="bottom" constant="20" id="bZL-wM-h8Q"/>
