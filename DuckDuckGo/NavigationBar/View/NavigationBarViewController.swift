@@ -346,7 +346,7 @@ final class NavigationBarViewController: NSViewController {
         let performAnim = animated
 
         let top = performAnim ? addressBarTopConstraint.animator() : addressBarTopConstraint
-        top?.constant = homepage ? 24 : 8
+        top?.constant = homepage ? 16 : 6
 
         let width = performAnim ? addressBarProportionalWidthConstraint.animator() : addressBarProportionalWidthConstraint
         width?.constant = homepage ? -260 : 0

@@ -255,19 +255,19 @@
                             <constraint firstAttribute="bottom" secondItem="EQw-GG-GMA" secondAttribute="bottom" id="4ye-CO-dDp"/>
                             <constraint firstItem="8Aq-SD-DCb" firstAttribute="centerY" secondItem="Wba-nA-FYj" secondAttribute="centerY" id="Gk6-zX-0bu"/>
                             <constraint firstItem="eEh-kf-smR" firstAttribute="leading" secondItem="hYV-nu-QIp" secondAttribute="leading" constant="12" id="MQ7-vv-adb"/>
+                            <constraint firstAttribute="bottom" secondItem="Wba-nA-FYj" secondAttribute="bottom" constant="6" id="Nbq-Kg-VCW"/>
                             <constraint firstItem="Wba-nA-FYj" firstAttribute="centerX" secondItem="hYV-nu-QIp" secondAttribute="centerX" priority="300" constant="8" id="Ofg-Pb-s0m"/>
                             <constraint firstItem="8Aq-SD-DCb" firstAttribute="leading" secondItem="hYV-nu-QIp" secondAttribute="leading" constant="20" id="Pf2-Cq-EMk"/>
                             <constraint firstAttribute="trailing" secondItem="aWu-Jm-Oaz" secondAttribute="trailing" constant="12" id="UeG-qO-bD2"/>
                             <constraint firstItem="Wba-nA-FYj" firstAttribute="leading" relation="greaterThanOrEqual" secondItem="eEh-kf-smR" secondAttribute="trailing" priority="999" constant="8" id="W83-wu-cjA"/>
                             <constraint firstItem="aWu-Jm-Oaz" firstAttribute="centerY" secondItem="Wba-nA-FYj" secondAttribute="centerY" id="Xav-R7-O9E"/>
                             <constraint firstItem="EQw-GG-GMA" firstAttribute="top" secondItem="hYV-nu-QIp" secondAttribute="top" id="ctd-w7-EMF"/>
-                            <constraint firstItem="Wba-nA-FYj" firstAttribute="top" secondItem="hYV-nu-QIp" secondAttribute="top" constant="6" id="dZt-72-5bV"/>
+                            <constraint firstItem="Wba-nA-FYj" firstAttribute="top" secondItem="hYV-nu-QIp" secondAttribute="top" constant="6" id="eaI-DA-rCA"/>
                             <constraint firstItem="EQw-GG-GMA" firstAttribute="leading" secondItem="hYV-nu-QIp" secondAttribute="leading" id="hpe-5Y-XTJ"/>
                             <constraint firstAttribute="trailing" secondItem="EQw-GG-GMA" secondAttribute="trailing" id="oYK-XH-0iN"/>
                             <constraint firstItem="eEh-kf-smR" firstAttribute="top" secondItem="hYV-nu-QIp" secondAttribute="top" constant="10" id="qeF-30-DZN"/>
                             <constraint firstItem="Wba-nA-FYj" firstAttribute="leading" secondItem="hYV-nu-QIp" secondAttribute="leading" constant="84" id="t38-xG-cxS"/>
                             <constraint firstItem="Wba-nA-FYj" firstAttribute="centerY" secondItem="hYV-nu-QIp" secondAttribute="centerY" id="uOr-Zw-zxM"/>
-                            <constraint firstAttribute="bottom" secondItem="Wba-nA-FYj" secondAttribute="bottom" constant="6" id="yMe-Nd-T9T"/>
                             <constraint firstItem="eEh-kf-smR" firstAttribute="leading" secondItem="hYV-nu-QIp" secondAttribute="leading" constant="12" id="yWl-jM-JYI"/>
                             <constraint firstItem="Wba-nA-FYj" firstAttribute="width" secondItem="hYV-nu-QIp" secondAttribute="width" multiplier="0.6" priority="300" id="yyv-y0-Is1"/>
                         </constraints>
@@ -281,7 +281,7 @@
                         <outlet property="addressBarLeftToNavButtonsConstraint" destination="W83-wu-cjA" id="cCS-Fa-hJd"/>
                         <outlet property="addressBarLeftToSuperviewConstraint" destination="t38-xG-cxS" id="cCS-Fb-hJd"/>
                         <outlet property="addressBarProportionalWidthConstraint" destination="yyv-y0-Is1" id="cCS-Fc-hJd"/>
-                        <outlet property="addressBarTopConstraint" destination="dZt-72-5bV" id="hkq-Cb-oFO"/>
+                        <outlet property="addressBarTopConstraint" destination="eaI-DA-rCA" id="uVa-nB-VUG"/>
                         <outlet property="bookmarkListButton" destination="4sj-qN-UUY" id="Fjs-KE-Lfp"/>
                         <outlet property="daxLogo" destination="8Aq-SD-DCb" id="Nvf-Dp-svh"/>
                         <outlet property="downloadsButton" destination="G8p-di-fq4" id="oxD-pc-8hn"/>

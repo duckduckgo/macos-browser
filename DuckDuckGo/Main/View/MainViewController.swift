@@ -170,9 +170,8 @@ final class MainViewController: NSViewController {
     private func animateNavigationBar(_ homepage: Bool, animated: Bool = true) {
         let performAnim = animated
 
-        let minHeight: CGFloat = 48
         let height = performAnim ? addressBarHeightConstraint.animator() : addressBarHeightConstraint
-        height?.constant = homepage ? 30 + minHeight : minHeight
+        height?.constant = homepage ? 68 : 48
 
         let divider = performAnim ? self.divider.animator() : self.divider
         divider?.alphaValue = homepage ? 0 : 1.0
