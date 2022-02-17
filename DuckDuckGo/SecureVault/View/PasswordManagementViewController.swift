@@ -33,6 +33,9 @@ protocol PasswordManagementDelegate: AnyObject {
 // swiftlint:disable type_body_length
 final class PasswordManagementViewController: NSViewController {
 
+    private enum Constants {
+        static let preferencesLink = "ddgLink://preferences"
+    }
     static func create() -> Self {
         let storyboard = NSStoryboard(name: "PasswordManager", bundle: nil)
         // swiftlint:disable force_cast
@@ -57,7 +60,35 @@ final class PasswordManagementViewController: NSViewController {
     
     @IBOutlet var lockScreen: NSView!
     @IBOutlet var lockScreenDurationLabel: NSTextField!
-    @IBOutlet var lockScreenOpenInPreferencesLabel: NSTextField!
+    @IBOutlet var lockScreenOpenInPreferencesTextView: NSTextView! {
+        didSet {
+            lockScreenOpenInPreferencesTextView.delegate = self
+
+            let linkAttributes: [NSAttributedString.Key: Any] = [
+                .foregroundColor: NSColor(named: "LinkBlueColor")!,
+                .cursor: NSCursor.pointingHand
+            ]
+            
+            lockScreenOpenInPreferencesTextView.linkTextAttributes = linkAttributes
+
+            let string = NSMutableAttributedString(string: UserText.pmLockScreenPreferencesLabel + " ")
+            let linkString = NSMutableAttributedString(string: UserText.pmLockScreenPreferencesLink, attributes: [
+                .link: URL.preferences
+            ])
+
+            let paragraphStyle = NSMutableParagraphStyle()
+            paragraphStyle.alignment = .center
+            
+            string.append(linkString)
+            string.addAttributes([
+                .paragraphStyle: paragraphStyle,
+                .font: NSFont.systemFont(ofSize: 13, weight: .regular),
+                .foregroundColor: NSColor.secondaryLabelColor
+            ], range: NSRange(location: 0, length: string.length))
+            
+            lockScreenOpenInPreferencesTextView.textStorage?.setAttributedString(string)
+        }
+    }
 
     var displayedItemsCancellable: AnyCancellable?
     var editingCancellable: AnyCancellable?
@@ -169,7 +200,7 @@ final class PasswordManagementViewController: NSViewController {
         
         toggleLockScreen(hidden: !authenticator.requiresAuthentication)
         
-        authenticator.authorizeDevice { authorized in
+        authenticator.authenticateUser { authorized in
             self.toggleLockScreen(hidden: authorized)
         }
     }
@@ -845,6 +876,18 @@ extension PasswordManagementViewController: NSTextFieldDelegate {
 
     func controlTextDidChange(_ obj: Notification) {
         updateFilter()
+    }
+
+}
+
+extension PasswordManagementViewController: NSTextViewDelegate {
+    
+    func textView(_ textView: NSTextView, clickedOnLink link: Any, at charIndex: Int) -> Bool {
+        if let link = link as? URL, link == URL.preferences {
+            WindowControllersManager.shared.showPreferencesTab()
+        }
+
+        return true
     }
 
 }

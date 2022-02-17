@@ -86,5 +86,12 @@ extension UserText {
         return String(format: localized, duration)
     }
     
+    static let pmLockScreenPreferencesLabel = NSLocalizedString("pm.lock-screen.preferences.label", value: "Change in", comment: "")
+    static let pmLockScreenPreferencesLink = NSLocalizedString("pm.lock-screen.preferences.link", value: "Preferences", comment: "")
+    
+    static let pmAutoLockPromptUnlockLogins = NSLocalizedString("pm.lock-screen.prompt.unlock-logins", value: "unlock Logins+", comment: "Label presented when unlocking Logins+")
+    static let pmAutoLockPromptChangeLoginsSettings = NSLocalizedString("pm.lock-screen.prompt.change-settings", value: "change Logins+ settings", comment: "Label presented when changing Auto-Lock settings")
+    static let pmAutoLockPromptAutofill = NSLocalizedString("pm.lock-screen.prompt.autofill", value: "autofill credit card information", comment: "Label presented when autofilling credit card information")
+    
 }
 // swiftlint:enable line_length

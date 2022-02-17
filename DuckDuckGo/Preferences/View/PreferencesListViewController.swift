@@ -241,8 +241,7 @@ extension PreferencesListViewController: LoginsPreferencesTableCellViewDelegate 
                                         autoLockThreshold: LoginsPreferences.AutoLockThreshold) {
         let context = LAContext()
         
-        context.evaluatePolicy(.deviceOwnerAuthentication,
-                               localizedReason: "update your Auto-Lock settings") { authenticated, _ in
+        context.evaluatePolicy(.deviceOwnerAuthentication, localizedReason: UserText.pmAutoLockPromptChangeLoginsSettings) { authenticated, _ in
             DispatchQueue.main.async {
                 var preferences = LoginsPreferences()
                 

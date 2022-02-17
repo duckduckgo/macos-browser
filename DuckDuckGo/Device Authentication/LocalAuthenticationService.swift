@@ -23,10 +23,9 @@ final class LocalAuthenticationService: DeviceAuthenticationService {
     
     func authenticateDevice(result: @escaping DeviceAuthenticationResult) {
         let context = LAContext()
-        let reason = "unlock Logins+"
+        let reason = UserText.pmAutoLockPromptUnlockLogins
         
-        // TODO: Handle error?
-        context.evaluatePolicy(.deviceOwnerAuthentication, localizedReason: reason) { authenticated, _ in
+        context.evaluatePolicy(.deviceOwnerAuthentication, localizedReason: reason) { authenticated, error in
             DispatchQueue.main.async {
                 result(authenticated)
             }
