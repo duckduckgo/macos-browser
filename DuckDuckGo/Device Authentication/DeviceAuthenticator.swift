@@ -42,7 +42,7 @@ final class DeviceAuthenticator {
     private(set) var isAuthenticating: Bool = false
     private(set) var deviceIsLocked: Bool {
         didSet {
-            os_log("Device lock state changed: %{bool}d", log: .autoLock, deviceIsLocked)
+            os_log("Device lock state changed: %s", log: .autoLock, deviceIsLocked ? "locked" : "unlocked")
             
             if deviceIsLocked {
                 NotificationCenter.default.post(name: .deviceBecameLocked, object: nil)
@@ -128,8 +128,6 @@ final class DeviceAuthenticator {
     
     private func checkIdleTimeIntervalAndLockIfNecessary(interval: TimeInterval) {
         if interval >= loginsPreferences.autoLockThreshold.seconds {
-            os_log("Device locked!", log: .autoLock)
-            
             self.deviceIsLocked = true
             self.idleStateDetector?.cancelIdleCheckTimer()
         }

@@ -31,7 +31,7 @@ struct LoginsPreferences {
     }
 
     enum AutoLockThreshold: String, CaseIterable {
-        case fiveSeconds
+        case thirtySeconds
         case oneMinute
         case fiveMinutes
         case fifteenMinutes
@@ -40,8 +40,8 @@ struct LoginsPreferences {
 
         var title: String {
             switch self {
-            case .fiveSeconds:
-                return "5 seconds"
+            case .thirtySeconds:
+                return "30 seconds"
             case .oneMinute:
                 return "1 minute"
             case .fiveMinutes:
@@ -57,8 +57,8 @@ struct LoginsPreferences {
         
         var seconds: TimeInterval {
             switch self {
-            case .fiveSeconds:
-                return 5
+            case .thirtySeconds:
+                return 30
             case .oneMinute:
                 return 60
             case .fiveMinutes:
