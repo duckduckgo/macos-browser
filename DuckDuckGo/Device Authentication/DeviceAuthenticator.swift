@@ -17,6 +17,7 @@
 //
 
 import Foundation
+import LocalAuthentication
 import os.log
 
 extension NSNotification.Name {
@@ -26,6 +27,11 @@ extension NSNotification.Name {
 }
 
 final class DeviceAuthenticator {
+    
+    static var deviceSupportsBiometrics: Bool {
+        let context = LAContext()
+        return context.canEvaluatePolicy(.deviceOwnerAuthenticationWithBiometrics, error: nil)
+    }
     
     static let shared = DeviceAuthenticator()
 
@@ -105,7 +111,7 @@ final class DeviceAuthenticator {
         
         isAuthenticating = true
 
-        authenticationService.authenticateDevice { authenticated in
+        authenticationService.authenticateDevice(reason: UserText.pmAutoLockPromptUnlockLogins) { authenticated in
             os_log("Completed authenticating, with result: %{bool}d", log: .autoLock, authenticated)
             
             self.isAuthenticating = false

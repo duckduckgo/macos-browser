@@ -20,6 +20,7 @@ import Foundation
 import Combine
 import SwiftUI
 import BrowserServicesKit
+import LocalAuthentication
 
 // swiftlint:disable file_length
 
@@ -33,9 +34,6 @@ protocol PasswordManagementDelegate: AnyObject {
 // swiftlint:disable type_body_length
 final class PasswordManagementViewController: NSViewController {
 
-    private enum Constants {
-        static let preferencesLink = "ddgLink://preferences"
-    }
     static func create() -> Self {
         let storyboard = NSStoryboard(name: "PasswordManager", bundle: nil)
         // swiftlint:disable force_cast
@@ -59,6 +57,16 @@ final class PasswordManagementViewController: NSViewController {
     @IBOutlet var emptyStateButton: NSButton!
     
     @IBOutlet var lockScreen: NSView!
+    @IBOutlet var lockScreenIconImageView: NSImageView! {
+        didSet {
+            if DeviceAuthenticator.deviceSupportsBiometrics {
+                lockScreenIconImageView.image = NSImage(named: "LoginsLockTouchID")
+            } else {
+                lockScreenIconImageView.image = NSImage(named: "LoginsLockPassword")
+            }
+        }
+    }
+
     @IBOutlet var lockScreenDurationLabel: NSTextField!
     @IBOutlet var lockScreenOpenInPreferencesTextView: NSTextView! {
         didSet {

@@ -21,10 +21,9 @@ import LocalAuthentication
 
 final class LocalAuthenticationService: DeviceAuthenticationService {
     
-    func authenticateDevice(result: @escaping DeviceAuthenticationResult) {
+    func authenticateDevice(reason: String, result: @escaping DeviceAuthenticationResult) {
         let context = LAContext()
-        let reason = UserText.pmAutoLockPromptUnlockLogins
-        
+
         context.evaluatePolicy(.deviceOwnerAuthentication, localizedReason: reason) { authenticated, error in
             DispatchQueue.main.async {
                 result(authenticated)

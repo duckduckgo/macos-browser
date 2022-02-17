@@ -22,6 +22,6 @@ protocol DeviceAuthenticationService {
     
     typealias DeviceAuthenticationResult = (Bool) -> Void
     
-    func authenticateDevice(result: @escaping DeviceAuthenticationResult)
+    func authenticateDevice(reason: String, result: @escaping DeviceAuthenticationResult)
     
 }
