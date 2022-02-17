@@ -23,30 +23,39 @@ final class DeviceAuthenticator {
     
     static let shared = DeviceAuthenticator()
 
-    private let idleStateDetector: DeviceIdleStateDetector
+    private var idleStateDetector: DeviceIdleStateDetector? = nil
     private let authenticationService: DeviceAuthenticationService
     private let loginsPreferences: LoginsPreferences
     
-    init(idleStateDetector: DeviceIdleStateDetector = .shared,
-         authenticationService: DeviceAuthenticationService = LocalAuthenticationService(),
+    init(authenticationService: DeviceAuthenticationService = LocalAuthenticationService(),
          loginsPreferences: LoginsPreferences = LoginsPreferences()) {
-        self.idleStateDetector = idleStateDetector
         self.authenticationService = authenticationService
         self.loginsPreferences = loginsPreferences
     }
     
     private(set) var isAuthenticating: Bool = false
-    private(set) var deviceIsLocked: Bool = false
+    private(set) var deviceIsLocked: Bool = true
     
     var requiresAuthentication: Bool {
         guard loginsPreferences.shouldAutoLockLogins else {
             return false
         }
 
-        let requiresAuthentication = idleStateDetector.maximumIdleStateIntervalSinceLastAuthentication >= loginsPreferences.autoLockThreshold.seconds
-        os_log("Checked authentication, with result: %{bool}d", log: .autoLock, requiresAuthentication)
-
-        return requiresAuthentication
+        return deviceIsLocked
+    }
+    
+    func beginCheckingIdleTimer() {
+        if self.idleStateDetector == nil {
+            self.idleStateDetector = DeviceIdleStateDetector(idleTimeCallback: self.checkIdleTimeIntervalAndLockIfNecessary(interval:))
+        }
+        
+        guard !deviceIsLocked && loginsPreferences.shouldAutoLockLogins else {
+            os_log("Tried to start idle timer while device was already locked", log: .autoLock)
+            return
+        }
+        
+        os_log("Beginning idle timer", log: .autoLock)
+        idleStateDetector?.beginIdleCheckTimer()
     }
 
     func authorizeDevice(result: @escaping (Bool) -> Void) {
@@ -62,13 +71,24 @@ final class DeviceAuthenticator {
         authenticationService.authenticateDevice { authenticated in
             os_log("Completed authenticating, with result: %{bool}d", log: .autoLock, authenticated)
             
+            self.isAuthenticating = false
+            self.deviceIsLocked = !authenticated
+            
             if authenticated {
-                self.idleStateDetector.resetIdleStateDuration()
+                // Now that the user has unlocked the device, begin the idle timer again.
+                self.idleStateDetector?.beginIdleCheckTimer()
             }
             
-            self.isAuthenticating = false
-            
             result(authenticated)
+        }
+    }
+    
+    private func checkIdleTimeIntervalAndLockIfNecessary(interval: TimeInterval) {
+        if interval >= loginsPreferences.autoLockThreshold.seconds {
+            os_log("Device locked!", log: .autoLock)
+            
+            self.deviceIsLocked = true
+            self.idleStateDetector?.cancelIdleCheckTimer()
         }
     }
     

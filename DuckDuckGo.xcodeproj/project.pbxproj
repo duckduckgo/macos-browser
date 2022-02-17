@@ -1581,6 +1581,7 @@
 				4B379C1F27BDBA18008A968E /* DeviceAuthenticationService.swift */,
 				4B379C2127BDBA29008A968E /* LocalAuthenticationService.swift */,
 				4B379C1D27BDB7FF008A968E /* DeviceAuthenticator.swift */,
+				4B379C1427BD91E3008A968E /* DeviceIdleStateDetector.swift */,
 			);
 			path = "Device Authentication";
 			sourceTree = "<group>";
@@ -1909,7 +1910,6 @@
 				85C6A29525CC1FFD00EEB5F1 /* UserDefaultsWrapper.swift */,
 				B6AAAC2C260330580029438D /* PublishedAfter.swift */,
 				4BB6CE5E26B77ED000EC5860 /* Cryptography.swift */,
-				4B379C1427BD91E3008A968E /* DeviceIdleStateDetector.swift */,
 			);
 			path = Utilities;
 			sourceTree = "<group>";

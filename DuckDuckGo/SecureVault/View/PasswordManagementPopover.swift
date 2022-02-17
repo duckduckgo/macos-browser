@@ -77,13 +77,13 @@ extension PasswordManagementPopover: NSPopoverDelegate {
                                                                                   object: nil,
                                                                                   queue: OperationQueue.main) { [weak self] _ in
             guard let self = self, self.isShown else { return }
-            self.close()
+            // self.close()
         }
         parentWindowDidResignKeyObserver = NotificationCenter.default.addObserver(forName: NSWindow.didResignMainNotification,
                                                                                   object: nil,
                                                                                   queue: OperationQueue.main) { [weak self] _ in
             guard let self = self, self.isShown else { return }
-            self.close()
+            // self.close()
         }
     }
 

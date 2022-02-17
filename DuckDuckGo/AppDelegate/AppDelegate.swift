@@ -126,7 +126,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
 #endif
         urlEventHandler.applicationDidFinishLaunching()
         
-        DeviceIdleStateDetector.shared.beginIdleCheckTimer()
+        DeviceAuthenticator.shared.beginCheckingIdleTimer()
     }
 
     func applicationShouldTerminate(_ sender: NSApplication) -> NSApplication.TerminateReply {

@@ -23,27 +23,30 @@ import os.log
 final class DeviceIdleStateDetector {
     
     private enum Constants {
-        static let intervalBetweenIdleChecks: TimeInterval = 3
+        static let intervalBetweenIdleChecks: TimeInterval = 1
     }
- 
-    static let shared = DeviceIdleStateDetector()
     
     private var timer: Timer?
-    private(set) var maximumIdleStateIntervalSinceLastAuthentication: TimeInterval
+    private let idleTimeCallback: (TimeInterval) -> Void
     
-    private init() {
-        self.maximumIdleStateIntervalSinceLastAuthentication = 0
+    init(idleTimeCallback: @escaping (TimeInterval) -> Void) {
+        self.idleTimeCallback = idleTimeCallback
     }
         
     func beginIdleCheckTimer() {
-        self.timer = Timer.scheduledTimer(withTimeInterval: Constants.intervalBetweenIdleChecks, repeats: true) { [weak self] _ in
-            self?.checkWhetherSystemHasBecomeIdle()
+        os_log("Beginning idle check timer", log: .autoLock)
+        let timer = Timer(timeInterval: Constants.intervalBetweenIdleChecks, repeats: true) { [weak self] _ in
+            self?.idleTimeCallback(Self.secondsSinceLastEvent)
         }
+        
+        self.timer = timer
+        RunLoop.current.add(timer, forMode: .common)
     }
     
-    func resetIdleStateDuration() {
-        self.maximumIdleStateIntervalSinceLastAuthentication = 0
-        os_log("Reset idle duration", log: .autoLock)
+    func cancelIdleCheckTimer() {
+        os_log("Cancelling idle check timer", log: .autoLock)
+        self.timer?.invalidate()
+        self.timer = nil
     }
     
     private static var secondsSinceLastEvent: TimeInterval {
@@ -53,13 +56,6 @@ final class DeviceIdleStateDetector {
         os_log("Idle duration since last user input event: %f", log: .autoLock, secondsSinceLastEvent)
         
         return secondsSinceLastEvent
-    }
-
-    private func checkWhetherSystemHasBecomeIdle() {
-        let secondsSinceLastEvent = Self.secondsSinceLastEvent
-        self.maximumIdleStateIntervalSinceLastAuthentication = max(maximumIdleStateIntervalSinceLastAuthentication, secondsSinceLastEvent)
-        
-        os_log("Checking whether system is idle, current max duration: %f", log: .autoLock, maximumIdleStateIntervalSinceLastAuthentication)
     }
 
 }
