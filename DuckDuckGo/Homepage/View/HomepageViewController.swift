@@ -30,7 +30,11 @@ final class HomepageViewController: NSViewController {
     private weak var host: NSView?
  
     var favoritesModel: Homepage.Models.FavoritesModel!
+    var defaultBrowserModel: Homepage.Models.DefaultBrowser!
     var bookmarkListSubscription: AnyCancellable?
+
+    @UserDefaultsWrapper(key: .defaultBrowserDismissed, defaultValue: false)
+    var defaultBrowserDismissed: Bool
 
     required init?(coder: NSCoder) {
         fatalError("HomepageViewController: Bad initializer")
@@ -46,23 +50,14 @@ final class HomepageViewController: NSViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
 
-        favoritesModel = Homepage.Models.FavoritesModel(open: { [weak self] bookmark, target in
-
-            self?.openUrl(bookmark.url, target: target)
-
-        }, remove: { bookmark in
-
-            bookmark.isFavorite = false
-            LocalBookmarkManager.shared.update(bookmark: bookmark)
-
-        }, addEdit: { [weak self] bookmark in
-            self?.showAddEditController(for: bookmark)
-        })
+        favoritesModel = createFavoritesModel()
+        defaultBrowserModel = createDefaultBrowserModel()
 
         refreshFavoritesModel()
 
         let rootView = Homepage.Views.RootView()
             .environmentObject(favoritesModel)
+            .environmentObject(defaultBrowserModel)
 
         let host = NSHostingView(rootView: rootView)
         host.frame = view.frame
@@ -70,6 +65,30 @@ final class HomepageViewController: NSViewController {
         self.host = host
 
         subscribeToBookmarks()
+    }
+
+    func createDefaultBrowserModel() -> Homepage.Models.DefaultBrowser {
+        return .init(isDefault: DefaultBrowserPreferences.isDefault, wasClosed: defaultBrowserDismissed, requestSetDefault: {
+            DefaultBrowserPreferences.becomeDefault { [weak self] in
+                self?.defaultBrowserModel.isDefault = DefaultBrowserPreferences.isDefault
+            }
+        }, close: { [weak self] in
+            self?.defaultBrowserDismissed = true
+            withAnimation {
+                self?.defaultBrowserModel.wasClosed = true
+            }
+        })
+    }
+
+    func createFavoritesModel() -> Homepage.Models.FavoritesModel {
+        return .init(open: { [weak self] bookmark, target in
+            self?.openUrl(bookmark.url, target: target)
+        }, remove: { bookmark in
+            bookmark.isFavorite = false
+            LocalBookmarkManager.shared.update(bookmark: bookmark)
+        }, addEdit: { [weak self] bookmark in
+            self?.showAddEditController(for: bookmark)
+        })
     }
 
     func refreshFavoritesModel(list: BookmarkList? = LocalBookmarkManager.shared.list) {

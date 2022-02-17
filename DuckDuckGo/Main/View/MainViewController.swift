@@ -167,12 +167,8 @@ final class MainViewController: NSViewController {
         }
     }
 
-    // TODO clean up
     private func animateNavigationBar(_ homepage: Bool, animated: Bool = true) {
-//        let constraint = animated ? navigationBarTopConstraint.animator() : navigationBarTopConstraint
-//        constraint?.constant = homepage ? -30 : 38
-
-        let performAnim = false // = animated
+        let performAnim = animated
 
         let minHeight: CGFloat = 48
         let height = performAnim ? addressBarHeightConstraint.animator() : addressBarHeightConstraint
@@ -180,7 +176,6 @@ final class MainViewController: NSViewController {
 
         let divider = performAnim ? self.divider.animator() : self.divider
         divider?.alphaValue = homepage ? 0 : 1.0
-
     }
 
     private func subscribeToTabContent() {

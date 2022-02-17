@@ -340,9 +340,8 @@ final class NavigationBarViewController: NSViewController {
     }
 
     private func animateBar(_ homepage: Bool, animated: Bool = true) {
-
-        let performAnim = false // = animated
-
+        let performAnim = animated
+        
         let top = performAnim ? addressBarTopConstraint.animator() : addressBarTopConstraint
         top?.constant = homepage ? 24 : 8
 

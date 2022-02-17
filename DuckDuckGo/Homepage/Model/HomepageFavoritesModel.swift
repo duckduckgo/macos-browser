@@ -20,6 +20,39 @@ import Foundation
 
 extension Homepage.Models {
 
+    final class DefaultBrowser: ObservableObject {
+
+        @Published var shouldShow: Bool = false
+
+        var wasClosed: Bool {
+            didSet {
+                updateShowState()
+            }
+        }
+
+        var isDefault: Bool {
+            didSet {
+                updateShowState()
+            }
+        }
+
+        let requestSetDefault: () -> Void
+        let close: () -> Void
+
+        init(isDefault: Bool, wasClosed: Bool, requestSetDefault: @escaping () -> Void, close: @escaping () -> Void) {
+            self.isDefault = isDefault
+            self.wasClosed = wasClosed
+            self.requestSetDefault = requestSetDefault
+            self.close = close
+
+            updateShowState()
+        }
+
+        private func updateShowState() {
+            shouldShow = !wasClosed && !isDefault
+        }
+    }
+
     struct FavoriteModel {
 
         static let addButtonUUID = UUID()

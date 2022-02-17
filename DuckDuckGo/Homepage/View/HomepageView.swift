@@ -26,23 +26,71 @@ struct RootView: View {
     var body: some View {
 
         GeometryReader { geometry in
-            Group {
-                ScrollView {
-                    VStack(spacing: 0) {
-                        PrivacySummary()
+            ZStack {
+                Group {
+                    ScrollView {
+                        VStack(spacing: 0) {
+                            PrivacySummary()
 
-                        Favorites()
-                            .frame(maxWidth: 512)
-                            .padding(.top, max(48, geometry.size.height * 0.29))
+                            Favorites()
+                                .frame(maxWidth: 512)
+                                .padding(.top, max(48, geometry.size.height * 0.29))
 
+                        }
+                        .frame(maxWidth: .infinity)
                     }
-                    .frame(maxWidth: .infinity)
                 }
+
+                DefaultBrowserPrompt()
             }
             .frame(maxWidth: .infinity)
             .background(Color("NewTabPageBackgroundColor"))
         }
      }
+
+}
+
+struct DefaultBrowserPrompt: View {
+
+    @EnvironmentObject var model: Homepage.Models.DefaultBrowser
+
+    var body: some View {
+
+        VStack {
+            Spacer()
+
+            HStack {
+                HoverButton(imageName: "Close", imageSize: 22) {
+                    self.model.close()
+                }.padding()
+
+                Spacer()
+
+//                Image(nsImage: NSImage(named: "Logo")!.resized(to: .init(width: 38, height: 38))!)
+                Image("Logo")
+                    .resizable(resizingMode: .stretch)
+                    .frame(width: 38, height: 38)
+
+                Text("Set DuckDuckGo as your default browser")
+                    .font(.body)
+
+                let button = Button("Set Default...") {
+                    self.model.requestSetDefault()
+                }
+
+                if #available(macOS 12.0, *) {
+                    button.buttonStyle(.borderedProminent)
+                } else {
+                    button.buttonStyle(.bordered)
+                }
+
+                Spacer()
+            }
+            .background(Color("BrowserTabBackgroundColor").shadow(radius: 3))
+
+        }.visibility(model.shouldShow ? .visible : .gone)
+        
+    }
 
 }
 
