@@ -108,8 +108,6 @@ final class PasswordManagementViewController: NSViewController {
             listView.frame = listContainer.bounds
             listContainer.addSubview(listView)
         }
-        
-        print("CHECK AUTHENTICATION?")
     }
 
     override func viewDidAppear() {
@@ -127,12 +125,14 @@ final class PasswordManagementViewController: NSViewController {
             refetchWithText(isDirty ? "" : domain ?? "", clearWhenNoMatches: true)
         }
         
-        let preferences = LoginsPreferences()
         let authenticator = DeviceAuthenticator.shared
-        
         if authenticator.requiresAuthentication {
             authenticator.authorizeDevice { authorized in
-                print("AUTHORIZED")
+                if authorized {
+                    print("Authenticated! Remove lock screen here")
+                } else {
+                    print("Not authenticated, keep lock screen")
+                }
             }
         }
     }

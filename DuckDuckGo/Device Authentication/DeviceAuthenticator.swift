@@ -17,6 +17,7 @@
 //
 
 import Foundation
+import os.log
 
 final class DeviceAuthenticator {
     
@@ -37,7 +38,10 @@ final class DeviceAuthenticator {
     private(set) var isAuthenticating: Bool = false
     
     var requiresAuthentication: Bool {
-        return idleStateDetector.secondsSinceLastEvent >= loginsPreferences.autoLockThreshold.seconds
+        let requiresAuthentication = idleStateDetector.maximumIdleStateIntervalSinceLastAuthentication >= loginsPreferences.autoLockThreshold.seconds
+        os_log("Checked authentication, with result: %{bool}d", log: .autoLock, requiresAuthentication)
+
+        return requiresAuthentication
     }
 
     func authorizeDevice(result: @escaping (Bool) -> Void) {
@@ -46,10 +50,15 @@ final class DeviceAuthenticator {
             return
         }
         
+        os_log("Began authenticating", log: .autoLock)
+        
         isAuthenticating = true
 
         authenticationService.authenticateDevice { authenticated in
+            os_log("Completed authenticating, with result: %{bool}d", log: .autoLock, authenticated)
+
             self.isAuthenticating = false
+            self.idleStateDetector.resetIdleStateDuration()
             result(authenticated)
         }
     }

@@ -18,23 +18,22 @@
 
 import Foundation
 import CoreGraphics
+import os.log
 
 final class DeviceIdleStateDetector {
     
     private enum Constants {
-        static let intervalBetweenIdleChecks: TimeInterval = 10
+        static let intervalBetweenIdleChecks: TimeInterval = 3
         static let idleDuration: TimeInterval = 15
     }
  
     static let shared = DeviceIdleStateDetector()
     
-    private(set) var hasPassedIdleThreshold: Bool = false
-
     private var timer: Timer?
-    private(set) var secondsSinceLastEvent: TimeInterval
+    private(set) var maximumIdleStateIntervalSinceLastAuthentication: TimeInterval
     
     private init() {
-        self.secondsSinceLastEvent = Self.secondsSinceLastEvent
+        self.maximumIdleStateIntervalSinceLastAuthentication = 0
     }
         
     func beginIdleCheckTimer() {
@@ -43,20 +42,29 @@ final class DeviceIdleStateDetector {
         }
     }
     
+    func resetIdleStateDuration() {
+        self.maximumIdleStateIntervalSinceLastAuthentication = 0
+        os_log("Reset idle duration", log: .autoLock)
+    }
+    
     private static var secondsSinceLastEvent: TimeInterval {
         let anyInputEventType = CGEventType(rawValue: ~0)!
         let secondsSinceLastEvent = CGEventSource.secondsSinceLastEventType(.hidSystemState, eventType: anyInputEventType)
  
+        os_log("Idle duration since last user input event: %f", log: .autoLock, secondsSinceLastEvent)
+        
         return secondsSinceLastEvent
     }
 
     private func checkWhetherSystemHasBecomeIdle() {
-        self.secondsSinceLastEvent = Self.secondsSinceLastEvent
+        let secondsSinceLastEvent = Self.secondsSinceLastEvent
+        self.maximumIdleStateIntervalSinceLastAuthentication = max(maximumIdleStateIntervalSinceLastAuthentication, secondsSinceLastEvent)
+        os_log("Checking whether system is idle, current max duration: %f", log: .autoLock, maximumIdleStateIntervalSinceLastAuthentication)
         
-        if self.secondsSinceLastEvent > Constants.idleDuration {
-            print("SYSTEM IDLE TOO LONG!")
-            hasPassedIdleThreshold = true
-        }
+//        if maximumIdleStateIntervalSinceLastAuthentication > Constants.idleDuration {
+//            print("SYSTEM IDLE TOO LONG!")
+//            hasPassedIdleThreshold = true
+//        }
     }
 
 }
