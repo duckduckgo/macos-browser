@@ -24,7 +24,6 @@ final class DeviceIdleStateDetector {
     
     private enum Constants {
         static let intervalBetweenIdleChecks: TimeInterval = 3
-        static let idleDuration: TimeInterval = 15
     }
  
     static let shared = DeviceIdleStateDetector()
@@ -59,12 +58,8 @@ final class DeviceIdleStateDetector {
     private func checkWhetherSystemHasBecomeIdle() {
         let secondsSinceLastEvent = Self.secondsSinceLastEvent
         self.maximumIdleStateIntervalSinceLastAuthentication = max(maximumIdleStateIntervalSinceLastAuthentication, secondsSinceLastEvent)
-        os_log("Checking whether system is idle, current max duration: %f", log: .autoLock, maximumIdleStateIntervalSinceLastAuthentication)
         
-//        if maximumIdleStateIntervalSinceLastAuthentication > Constants.idleDuration {
-//            print("SYSTEM IDLE TOO LONG!")
-//            hasPassedIdleThreshold = true
-//        }
+        os_log("Checking whether system is idle, current max duration: %f", log: .autoLock, maximumIdleStateIntervalSinceLastAuthentication)
     }
 
 }

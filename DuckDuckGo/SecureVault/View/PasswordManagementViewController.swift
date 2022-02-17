@@ -53,6 +53,10 @@ final class PasswordManagementViewController: NSViewController {
     @IBOutlet var emptyStateTitle: NSTextField!
     @IBOutlet var emptyStateMessage: NSTextField!
     @IBOutlet var emptyStateButton: NSButton!
+    
+    @IBOutlet var lockScreen: NSView!
+    @IBOutlet var lockScreenDurationLabel: NSTextField!
+    @IBOutlet var lockScreenOpenInPreferencesLabel: NSTextField!
 
     var displayedItemsCancellable: AnyCancellable?
     var editingCancellable: AnyCancellable?
@@ -99,6 +103,8 @@ final class PasswordManagementViewController: NSViewController {
 
         emptyStateTitle.attributedStringValue = NSAttributedString.make(emptyStateTitle.stringValue, lineHeight: 1.14, kern: -0.23)
         emptyStateMessage.attributedStringValue = NSAttributedString.make(emptyStateMessage.stringValue, lineHeight: 1.05, kern: -0.08)
+        
+        lockScreenDurationLabel.stringValue = UserText.pmLockScreenDuration(duration: LoginsPreferences().autoLockThreshold.title)
     }
     
     override func viewWillAppear() {
@@ -125,21 +131,21 @@ final class PasswordManagementViewController: NSViewController {
             refetchWithText(isDirty ? "" : domain ?? "", clearWhenNoMatches: true)
         }
         
-        let authenticator = DeviceAuthenticator.shared
-        if authenticator.requiresAuthentication {
-            authenticator.authorizeDevice { authorized in
-                if authorized {
-                    print("Authenticated! Remove lock screen here")
-                } else {
-                    print("Not authenticated, keep lock screen")
-                }
-            }
-        }
+        promptForAuthenticationIfNecessary()
     }
     
     override func viewDidDisappear() {
         super.viewDidDisappear()
         listView?.removeFromSuperview()
+    }
+    
+    private func promptForAuthenticationIfNecessary() {
+        let authenticator = DeviceAuthenticator.shared
+        self.lockScreen.isHidden = !authenticator.requiresAuthentication
+        
+        authenticator.authorizeDevice { authorized in
+            self.lockScreen.isHidden = authorized
+        }
     }
     
     private func showEmptyState() {
@@ -190,6 +196,10 @@ final class PasswordManagementViewController: NSViewController {
 
     @IBAction func onImportClicked(_ sender: NSButton) {
         DataImportViewController.show()
+    }
+    
+    @IBAction func deviceAuthenticationRequested(_ sender: NSButton) {
+        promptForAuthenticationIfNecessary()
     }
 
     private func refetchWithText(_ text: String,

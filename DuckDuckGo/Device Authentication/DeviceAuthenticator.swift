@@ -36,8 +36,13 @@ final class DeviceAuthenticator {
     }
     
     private(set) var isAuthenticating: Bool = false
+    private(set) var deviceIsLocked: Bool = false
     
     var requiresAuthentication: Bool {
+        guard loginsPreferences.shouldAutoLockLogins else {
+            return false
+        }
+
         let requiresAuthentication = idleStateDetector.maximumIdleStateIntervalSinceLastAuthentication >= loginsPreferences.autoLockThreshold.seconds
         os_log("Checked authentication, with result: %{bool}d", log: .autoLock, requiresAuthentication)
 
@@ -56,9 +61,13 @@ final class DeviceAuthenticator {
 
         authenticationService.authenticateDevice { authenticated in
             os_log("Completed authenticating, with result: %{bool}d", log: .autoLock, authenticated)
-
+            
+            if authenticated {
+                self.idleStateDetector.resetIdleStateDuration()
+            }
+            
             self.isAuthenticating = false
-            self.idleStateDetector.resetIdleStateDuration()
+            
             result(authenticated)
         }
     }

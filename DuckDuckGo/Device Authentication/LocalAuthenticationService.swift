@@ -23,11 +23,13 @@ final class LocalAuthenticationService: DeviceAuthenticationService {
     
     func authenticateDevice(result: @escaping DeviceAuthenticationResult) {
         let context = LAContext()
-        let reason = "Authenticating"
+        let reason = "unlock Logins+"
         
         // TODO: Handle error?
         context.evaluatePolicy(.deviceOwnerAuthenticationWithBiometricsOrWatch, localizedReason: reason) { authenticated, _ in
-            result(authenticated)
+            DispatchQueue.main.async {
+                result(authenticated)
+            }
         }
     }
     

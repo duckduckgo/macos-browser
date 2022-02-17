@@ -79,5 +79,12 @@ extension UserText {
     static let pmSortParameterDateCreated = NSLocalizedString("pm.sort.parameter.date-created", value: "Date Created", comment: "Label for Date Created sort parameter")
     static let pmSortParameterDateModified = NSLocalizedString("pm.sort.parameter.date-modified", value: "Date Modified", comment: "Label for Date Modified sort parameter")
     
+    static func pmLockScreenDuration(duration: String) -> String {
+        let localized = NSLocalizedString("pm.lock-screen.duration",
+                                          value: "Logins+ will remain unlocked until your computer is idle for %@.",
+                                          comment: "")
+        return String(format: localized, duration)
+    }
+    
 }
 // swiftlint:enable line_length
