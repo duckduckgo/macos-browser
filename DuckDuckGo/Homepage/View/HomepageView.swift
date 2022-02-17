@@ -23,29 +23,39 @@ extension Homepage.Views {
 
 struct RootView: View {
 
-    @State var sidebarVisible = true
-
     var body: some View {
 
         GeometryReader { geometry in
             Group {
                 ScrollView {
-                    VStack {
-                        VStack(alignment: .leading, spacing: 24) {
+                    VStack(spacing: 0) {
+                        PrivacySummary()
 
-                            Favorites()
+                        Favorites()
+                            .frame(maxWidth: 512)
+                            .padding(.top, max(48, geometry.size.height * 0.29))
 
-                            Spacer()
-                        }
-                        .frame(maxWidth: 512)
-                        .padding(.top, max(48, geometry.size.height / 4))
-                    }.frame(maxWidth: .infinity)
+                    }
+                    .frame(maxWidth: .infinity)
                 }
             }
             .frame(maxWidth: .infinity)
             .background(Color("NewTabPageBackgroundColor"))
         }
      }
+
+}
+
+struct PrivacySummary: View {
+
+    var body: some View {
+        HStack(alignment: .center, spacing: 2) {
+            Image("HomeShield")
+            Text("DuckDuckGo blocks trackers as you browse")
+                .fontWeight(.bold)
+        }
+        .foregroundColor(.primary.opacity(0.4))
+    }
 
 }
 
