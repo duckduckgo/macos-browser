@@ -521,6 +521,8 @@ final class Tab: NSObject {
             return
         }
 
+        guard url != .homePage else { return }
+
         // Add to global history
         historyCoordinating.addVisit(of: url)
 
