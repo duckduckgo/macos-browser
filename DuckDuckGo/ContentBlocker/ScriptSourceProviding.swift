@@ -93,7 +93,8 @@ final class DefaultScriptSourceProvider: ScriptSourceProviding {
     private func buildAutofillSource() -> AutofillUserScriptSourceProvider {
         let privacySettings = PrivacySecurityPreferences()
         return DefaultAutofillSourceProvider(privacyConfigurationManager: self.privacyConfigurationManager,
-                                             properties: ContentScopeProperties(gpcEnabled: privacySettings.gpcEnabled, sessionKey: self.sessionKey ?? ""))
+                                             properties: ContentScopeProperties(gpcEnabled: privacySettings.gpcEnabled,
+                                                                                sessionKey: self.sessionKey ?? ""))
     }
 
     private func buildContentBlockerRulesConfig() -> ContentBlockerUserScriptConfig {
