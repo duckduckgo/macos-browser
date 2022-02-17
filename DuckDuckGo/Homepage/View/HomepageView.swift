@@ -179,25 +179,32 @@ struct HoverButton: View {
     let size: CGFloat
     let backgroundColor: Color
     let imageName: String
+    let imageSize: CGFloat?
     let action: () -> Void
 
     @State var isHovering = false
 
-    init(size: CGFloat = 32, backgroundColor: Color = Color.clear, imageName: String, action: @escaping () -> Void) {
+    init(size: CGFloat = 32, backgroundColor: Color = Color.clear, imageName: String, imageSize: CGFloat? = nil, action: @escaping () -> Void) {
         self.size = size
         self.backgroundColor = backgroundColor
         self.imageName = imageName
+        self.imageSize = imageSize
         self.action = action
     }
 
     var body: some View {
-
         Group {
-            if let image = NSImage(named: imageName) {
-                Image(nsImage: image)
-            } else if #available(macOS 11, *) {
-                Image(systemName: imageName)
+            Group {
+                if let image = NSImage(named: imageName) {
+                    Image(nsImage: image)
+                        .resizable()
+                } else if #available(macOS 11, *) {
+                    Image(systemName: imageName)
+                        .resizable()
+                }
             }
+            .frame(width: imageSize ?? size, height: imageSize ?? size)
+
         }
         .frame(width: size, height: size)
         .cornerRadius(8)
@@ -222,10 +229,10 @@ struct Favorites: View {
     var body: some View {
 
         let addButton = VStack {
-            HoverButton(size: 72, backgroundColor: Color("HomeFavoritesBackgroundColor"), imageName: "Add") {
+            HoverButton(size: 72, backgroundColor: Color("HomeFavoritesBackgroundColor"), imageName: "Add", imageSize: 22) {
                 model.addNew()
             }
-            Text("Add")
+            Text("Add Favorite")
                 .font(.system(size: 10))
         }
 
@@ -239,7 +246,7 @@ struct Favorites: View {
                         } else if favorite.id == Homepage.Models.FavoriteModel.addButtonUUID {
                             addButton
                         } else {
-                            FailedAssertionView("Unknow favorites type")
+                            FailedAssertionView("Unknown favorites type")
                         }
                     }
 
