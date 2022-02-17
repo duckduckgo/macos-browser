@@ -292,15 +292,13 @@ fileprivate extension WebsiteBreakage.Category {
 
     init?(tag: Int) {
         switch tag {
-        case 0: self = .theSiteAskedToDisable
-        case 1: self = .cantSignIn
+        case 0: self = .cantSignIn
+        case 1: self = .contentIsMissing
         case 2: self = .linksDontWork
-        case 3: self = .imagesDidntLoad
-        case 4: self = .videoDidntPlay
-        case 5: self = .contentIsMissing
-        case 6: self = .commentsDidntLoad
-        case 7: self = .browserIsIncompatible
-        case 8: self = .somethingElse
+        case 3: self = .browserIsIncompatible
+        case 4: self = .theSiteAskedToDisable
+        case 5: self = .videoOrImagesDidntLoad
+        case 6: self = .somethingElse
 
         default:
             return nil

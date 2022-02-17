@@ -21,14 +21,12 @@ import Foundation
 struct WebsiteBreakage {
 
     enum Category: String, CaseIterable {
-        case theSiteAskedToDisable = "paywall"
         case cantSignIn = "login"
-        case linksDontWork = "links"
-        case imagesDidntLoad = "images"
-        case videoDidntPlay = "videos"
         case contentIsMissing = "content"
-        case commentsDidntLoad = "comments"
+        case linksDontWork = "links"
         case browserIsIncompatible = "unsupported"
+        case theSiteAskedToDisable = "paywall"
+        case videoOrImagesDidntLoad = "images"
         case somethingElse = "other"
     }
 
