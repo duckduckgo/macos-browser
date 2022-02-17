@@ -46,6 +46,7 @@ final class PasswordManagementViewController: NSViewController {
 
     @IBOutlet var listContainer: NSView!
     @IBOutlet var itemContainer: NSView!
+    @IBOutlet var addVaultItemButton: NSButton!
     @IBOutlet var searchField: NSTextField!
     @IBOutlet var divider: NSView!
     @IBOutlet var emptyState: NSView!
@@ -103,6 +104,30 @@ final class PasswordManagementViewController: NSViewController {
 
         emptyStateTitle.attributedStringValue = NSAttributedString.make(emptyStateTitle.stringValue, lineHeight: 1.14, kern: -0.23)
         emptyStateMessage.attributedStringValue = NSAttributedString.make(emptyStateMessage.stringValue, lineHeight: 1.05, kern: -0.08)
+        
+        NotificationCenter.default.addObserver(forName: .deviceBecameLocked, object: nil, queue: .main) { [weak self] _ in
+            self?.displayLockScreen()
+        }
+    }
+    
+    private func toggleLockScreen(hidden: Bool) {
+        if hidden {
+            hideLockScreen()
+        } else {
+            displayLockScreen()
+        }
+    }
+
+    private func displayLockScreen() {
+        lockScreen.isHidden = false
+        searchField.isEnabled = false
+        addVaultItemButton.isEnabled = false
+    }
+    
+    private func hideLockScreen() {
+        lockScreen.isHidden = true
+        searchField.isEnabled = true
+        addVaultItemButton.isEnabled = true
     }
     
     override func viewWillAppear() {
@@ -141,10 +166,11 @@ final class PasswordManagementViewController: NSViewController {
     
     private func promptForAuthenticationIfNecessary() {
         let authenticator = DeviceAuthenticator.shared
-        self.lockScreen.isHidden = !authenticator.requiresAuthentication
+        
+        toggleLockScreen(hidden: !authenticator.requiresAuthentication)
         
         authenticator.authorizeDevice { authorized in
-            self.lockScreen.isHidden = authorized
+            self.toggleLockScreen(hidden: authorized)
         }
     }
     

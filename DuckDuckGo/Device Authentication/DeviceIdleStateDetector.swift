@@ -35,6 +35,10 @@ final class DeviceIdleStateDetector {
         
     func beginIdleCheckTimer() {
         os_log("Beginning idle check timer", log: .autoLock)
+        
+        self.timer?.invalidate()
+        self.timer = nil
+        
         let timer = Timer(timeInterval: Constants.intervalBetweenIdleChecks, repeats: true) { [weak self] _ in
             self?.idleTimeCallback(Self.secondsSinceLastEvent)
         }

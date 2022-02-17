@@ -45,10 +45,12 @@ final class LoginsPreferencesTableCellView: NSTableCellView {
 
     @IBAction func autoLockEnabledPreferenceChanged(_ sender: AnyObject) {
         notifyDelegateOfPreferenceChanges()
+        refreshInterface()
     }
     
     @IBAction func autoLockThresholdChanged(_ sender: AnyObject) {
         notifyDelegateOfPreferenceChanges()
+        refreshInterface()
     }
 
     func update(autoLockEnabled: Bool, threshold: LoginsPreferences.AutoLockThreshold) {
@@ -66,6 +68,11 @@ final class LoginsPreferencesTableCellView: NSTableCellView {
         }
         
         autoLockThresholdPopUpButton.selectItem(withTitle: threshold.title)
+        refreshInterface()
+    }
+    
+    private func refreshInterface() {
+        autoLockThresholdPopUpButton.isEnabled = (autoLockEnabledRadioButton.state == .on)
     }
     
     private func notifyDelegateOfPreferenceChanges() {

@@ -19,11 +19,17 @@
 import Foundation
 import os.log
 
+extension NSNotification.Name {
+
+    static let deviceBecameLocked = NSNotification.Name("deviceBecameLocked")
+
+}
+
 final class DeviceAuthenticator {
     
     static let shared = DeviceAuthenticator()
 
-    private var idleStateDetector: DeviceIdleStateDetector? = nil
+    private var idleStateDetector: DeviceIdleStateDetector?
     private let authenticationService: DeviceAuthenticationService
     private let loginsPreferences: LoginsPreferences
     
@@ -34,7 +40,13 @@ final class DeviceAuthenticator {
     }
     
     private(set) var isAuthenticating: Bool = false
-    private(set) var deviceIsLocked: Bool = true
+    private(set) var deviceIsLocked: Bool = true {
+        didSet {
+            if deviceIsLocked {
+                NotificationCenter.default.post(name: .deviceBecameLocked, object: nil)
+            }
+        }
+    }
     
     var requiresAuthentication: Bool {
         guard loginsPreferences.shouldAutoLockLogins else {
