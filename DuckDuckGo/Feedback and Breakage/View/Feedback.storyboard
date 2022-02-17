@@ -140,7 +140,7 @@
                                                     <constraint firstAttribute="height" constant="47" id="w0L-qh-saU"/>
                                                 </constraints>
                                                 <textFieldCell key="cell" id="7PA-BW-gkt">
-                                                    <font key="font" metaFont="smallSystem"/>
+                                                    <font key="font" metaFont="system" size="12"/>
                                                     <string key="title">Reports sent to DuckDuckGo are 100% anonymous and only include your message, the DuckDuckGo app version, and your macOS version.</string>
                                                     <color key="textColor" name="secondaryLabelColor" catalog="System" colorSpace="catalog"/>
                                                     <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
@@ -189,8 +189,8 @@
                                                             <menuItem title="Can't sign in" id="Lcy-nr-Bvy"/>
                                                             <menuItem title="Content is missing" tag="1" id="Jbl-XF-mkd"/>
                                                             <menuItem title="Links or buttons don't work" tag="2" id="AMn-JN-Npb"/>
-                                                            <menuItem title="The browser is incompatible" tag="3" id="naz-Hr-IpO"/>
-                                                            <menuItem title="The site does not support this browser" tag="4" id="0YV-Mw-KfP"/>
+                                                            <menuItem title="The site does not support this browser" tag="3" id="naz-Hr-IpO"/>
+                                                            <menuItem title="The site asked me to disable" tag="4" id="0YV-Mw-KfP"/>
                                                             <menuItem title="Video or images didn't load" tag="5" id="ks1-6b-EFw"/>
                                                             <menuItem title="Something else" tag="6" id="Fhy-jA-gGf"/>
                                                         </items>
