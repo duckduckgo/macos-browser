@@ -30,6 +30,6 @@ struct Homepage {
     // MARK: Constants
 
     static let favoritesPerRow = 5
-    static let favoritesRowCountWhenCollapsed = 2
+    static let favoritesRowCountWhenCollapsed = 1
 
 }

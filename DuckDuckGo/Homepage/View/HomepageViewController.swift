@@ -30,7 +30,7 @@ final class HomepageViewController: NSViewController {
     private weak var host: NSView?
  
     var favoritesModel: Homepage.Models.FavoritesModel!
-    var defaultBrowserModel: Homepage.Models.DefaultBrowser!
+    var defaultBrowserModel: Homepage.Models.DefaultBrowserModel!
     var bookmarkListSubscription: AnyCancellable?
 
     @UserDefaultsWrapper(key: .defaultBrowserDismissed, defaultValue: false)
@@ -67,7 +67,7 @@ final class HomepageViewController: NSViewController {
         subscribeToBookmarks()
     }
 
-    func createDefaultBrowserModel() -> Homepage.Models.DefaultBrowser {
+    func createDefaultBrowserModel() -> Homepage.Models.DefaultBrowserModel {
         return .init(isDefault: DefaultBrowserPreferences.isDefault, wasClosed: defaultBrowserDismissed, requestSetDefault: {
             DefaultBrowserPreferences.becomeDefault { [weak self] in
                 self?.defaultBrowserModel.isDefault = DefaultBrowserPreferences.isDefault

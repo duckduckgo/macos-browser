@@ -52,7 +52,7 @@ struct RootView: View {
 
 struct DefaultBrowserPrompt: View {
 
-    @EnvironmentObject var model: Homepage.Models.DefaultBrowser
+    @EnvironmentObject var model: Homepage.Models.DefaultBrowserModel
 
     var body: some View {
 
@@ -66,7 +66,6 @@ struct DefaultBrowserPrompt: View {
 
                 Spacer()
 
-//                Image(nsImage: NSImage(named: "Logo")!.resized(to: .init(width: 38, height: 38))!)
                 Image("Logo")
                     .resizable(resizingMode: .stretch)
                     .frame(width: 38, height: 38)

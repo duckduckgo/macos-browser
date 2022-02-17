@@ -112,12 +112,12 @@
                                 </customSpacing>
                             </stackView>
                             <imageView horizontalHuggingPriority="251" verticalHuggingPriority="251" translatesAutoresizingMaskIntoConstraints="NO" id="8Aq-SD-DCb">
-                                <rect key="frame" x="33" y="2" width="43" height="44"/>
+                                <rect key="frame" x="12" y="2" width="44" height="44"/>
                                 <constraints>
                                     <constraint firstAttribute="width" secondItem="8Aq-SD-DCb" secondAttribute="height" multiplier="1:1" id="5kl-xy-buj"/>
                                     <constraint firstAttribute="height" constant="43.5" id="i3r-nh-RJU"/>
                                 </constraints>
-                                <imageCell key="cell" refusesFirstResponder="YES" alignment="left" imageScaling="proportionallyDown" image="OnboardingDax" id="KUM-i2-YQi"/>
+                                <imageCell key="cell" refusesFirstResponder="YES" alignment="left" imageScaling="proportionallyDown" image="HomepageLogo" id="KUM-i2-YQi"/>
                             </imageView>
                             <containerView translatesAutoresizingMaskIntoConstraints="NO" id="Wba-nA-FYj">
                                 <rect key="frame" x="84" y="6" width="560" height="36"/>
@@ -251,20 +251,20 @@
                             </stackView>
                         </subviews>
                         <constraints>
-                            <constraint firstItem="aWu-Jm-Oaz" firstAttribute="top" secondItem="hYV-nu-QIp" secondAttribute="top" constant="10" id="0WC-12-qLF"/>
                             <constraint firstItem="aWu-Jm-Oaz" firstAttribute="leading" relation="greaterThanOrEqual" secondItem="Wba-nA-FYj" secondAttribute="trailing" constant="8" id="1AC-G2-aTL"/>
                             <constraint firstAttribute="bottom" secondItem="EQw-GG-GMA" secondAttribute="bottom" id="4ye-CO-dDp"/>
                             <constraint firstItem="8Aq-SD-DCb" firstAttribute="centerY" secondItem="Wba-nA-FYj" secondAttribute="centerY" id="Gk6-zX-0bu"/>
                             <constraint firstItem="eEh-kf-smR" firstAttribute="leading" secondItem="hYV-nu-QIp" secondAttribute="leading" constant="12" id="MQ7-vv-adb"/>
                             <constraint firstItem="Wba-nA-FYj" firstAttribute="centerX" secondItem="hYV-nu-QIp" secondAttribute="centerX" priority="300" constant="8" id="Ofg-Pb-s0m"/>
+                            <constraint firstItem="8Aq-SD-DCb" firstAttribute="leading" secondItem="hYV-nu-QIp" secondAttribute="leading" constant="12" id="Pf2-Cq-EMk"/>
                             <constraint firstAttribute="trailing" secondItem="aWu-Jm-Oaz" secondAttribute="trailing" constant="12" id="UeG-qO-bD2"/>
                             <constraint firstItem="Wba-nA-FYj" firstAttribute="leading" relation="greaterThanOrEqual" secondItem="eEh-kf-smR" secondAttribute="trailing" priority="999" constant="8" id="W83-wu-cjA"/>
+                            <constraint firstItem="aWu-Jm-Oaz" firstAttribute="centerY" secondItem="Wba-nA-FYj" secondAttribute="centerY" id="Xav-R7-O9E"/>
                             <constraint firstItem="EQw-GG-GMA" firstAttribute="top" secondItem="hYV-nu-QIp" secondAttribute="top" id="ctd-w7-EMF"/>
                             <constraint firstItem="Wba-nA-FYj" firstAttribute="top" secondItem="hYV-nu-QIp" secondAttribute="top" constant="6" id="dZt-72-5bV"/>
                             <constraint firstItem="EQw-GG-GMA" firstAttribute="leading" secondItem="hYV-nu-QIp" secondAttribute="leading" id="hpe-5Y-XTJ"/>
                             <constraint firstAttribute="trailing" secondItem="EQw-GG-GMA" secondAttribute="trailing" id="oYK-XH-0iN"/>
                             <constraint firstItem="eEh-kf-smR" firstAttribute="top" secondItem="hYV-nu-QIp" secondAttribute="top" constant="10" id="qeF-30-DZN"/>
-                            <constraint firstItem="Wba-nA-FYj" firstAttribute="leading" secondItem="8Aq-SD-DCb" secondAttribute="trailing" constant="8" id="rsG-Gt-Q8z"/>
                             <constraint firstItem="Wba-nA-FYj" firstAttribute="leading" secondItem="hYV-nu-QIp" secondAttribute="leading" constant="84" id="t38-xG-cxS"/>
                             <constraint firstItem="Wba-nA-FYj" firstAttribute="centerY" secondItem="hYV-nu-QIp" secondAttribute="centerY" id="uOr-Zw-zxM"/>
                             <constraint firstAttribute="bottom" secondItem="Wba-nA-FYj" secondAttribute="bottom" constant="6" id="yMe-Nd-T9T"/>
@@ -763,9 +763,9 @@
         <image name="Geolocation-Active" width="16" height="16"/>
         <image name="Geolocation-Icon" width="16" height="16"/>
         <image name="HomeFavicon" width="16" height="16"/>
+        <image name="HomepageLogo" width="192" height="192"/>
         <image name="Microphone-Active" width="12" height="16"/>
         <image name="Microphone-Icon" width="12" height="16"/>
-        <image name="OnboardingDax" width="128" height="128"/>
         <image name="PasswordManagement" width="16" height="16"/>
         <image name="PopupBlocked" width="16" height="16"/>
         <image name="Refresh" width="16" height="16"/>

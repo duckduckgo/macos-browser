@@ -341,7 +341,7 @@ final class NavigationBarViewController: NSViewController {
 
     private func animateBar(_ homepage: Bool, animated: Bool = true) {
         let performAnim = animated
-        
+
         let top = performAnim ? addressBarTopConstraint.animator() : addressBarTopConstraint
         top?.constant = homepage ? 24 : 8
 
@@ -351,6 +351,8 @@ final class NavigationBarViewController: NSViewController {
         let image = performAnim ? daxLogo.animator() : daxLogo
         image?.alphaValue = homepage ? 1 : 0
 
+        let buttons = performAnim ? navigationButtons.animator() : navigationButtons
+        buttons?.isHidden = homepage
     }
 
     private func subscribeToDownloads() {

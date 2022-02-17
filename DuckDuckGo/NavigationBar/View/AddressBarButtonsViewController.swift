@@ -32,6 +32,7 @@ protocol AddressBarButtonsViewControllerDelegate: AnyObject {
 final class AddressBarButtonsViewController: NSViewController {
 
     static let homeFaviconImage = NSImage(named: "HomeFavicon")
+    static let searchImage = NSImage(named: "Search")
     static let webImage = NSImage(named: "Web")
     static let bookmarkImage = NSImage(named: "Bookmark")
     static let bookmarkFilledImage = NSImage(named: "BookmarkFilled")
@@ -593,7 +594,7 @@ final class AddressBarButtonsViewController: NSViewController {
         case .editing(isUrl: true):
             imageButton.image = Self.webImage
         case .editing(isUrl: false):
-            imageButton.image = Self.homeFaviconImage
+            imageButton.image = selectedTabViewModel.tab.content == .homepage ? Self.searchImage : Self.homeFaviconImage
         default:
             imageButton.image = nil
         }
