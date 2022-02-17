@@ -18,6 +18,7 @@
 
 import AppKit
 import Combine
+import LocalAuthentication
 
 final class GridClipTableView: NSTableView {
 
@@ -238,9 +239,22 @@ extension PreferencesListViewController: LoginsPreferencesTableCellViewDelegate 
     func loginsPreferencesTableCellView(_ cell: LoginsPreferencesTableCellView,
                                         setShouldAutoLockLogins: Bool,
                                         autoLockThreshold: LoginsPreferences.AutoLockThreshold) {
-        var preferences = LoginsPreferences()
-        preferences.shouldAutoLockLogins = setShouldAutoLockLogins
-        preferences.autoLockThreshold = autoLockThreshold
+        let context = LAContext()
+        
+        context.evaluatePolicy(.deviceOwnerAuthentication,
+                               localizedReason: "update your Auto-Lock settings") { authenticated, _ in
+            DispatchQueue.main.async {
+                var preferences = LoginsPreferences()
+                
+                if authenticated {
+                    preferences.shouldAutoLockLogins = setShouldAutoLockLogins
+                    preferences.autoLockThreshold = autoLockThreshold
+                } else {
+                    cell.update(autoLockEnabled: preferences.shouldAutoLockLogins, threshold: preferences.autoLockThreshold)
+                }
+            }
+        }
+
     }
     
 }

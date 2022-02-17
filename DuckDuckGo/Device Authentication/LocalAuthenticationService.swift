@@ -26,7 +26,7 @@ final class LocalAuthenticationService: DeviceAuthenticationService {
         let reason = "unlock Logins+"
         
         // TODO: Handle error?
-        context.evaluatePolicy(.deviceOwnerAuthenticationWithBiometricsOrWatch, localizedReason: reason) { authenticated, _ in
+        context.evaluatePolicy(.deviceOwnerAuthentication, localizedReason: reason) { authenticated, _ in
             DispatchQueue.main.async {
                 result(authenticated)
             }

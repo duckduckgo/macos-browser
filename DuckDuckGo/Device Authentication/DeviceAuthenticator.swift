@@ -37,6 +37,11 @@ final class DeviceAuthenticator {
          loginsPreferences: LoginsPreferences = LoginsPreferences()) {
         self.authenticationService = authenticationService
         self.loginsPreferences = loginsPreferences
+        
+        NotificationCenter.default.addObserver(self,
+                                               selector: #selector(updateTimerStateBasedOnAutoLockSettings),
+                                               name: .loginsAutoLockSettingsDidChange,
+                                               object: nil)
     }
     
     private(set) var isAuthenticating: Bool = false
@@ -56,6 +61,17 @@ final class DeviceAuthenticator {
         return deviceIsLocked
     }
     
+    @objc
+    private func updateTimerStateBasedOnAutoLockSettings() {
+        let preferences = LoginsPreferences()
+        
+        if preferences.shouldAutoLockLogins {
+            beginCheckingIdleTimer()
+        } else {
+            self.idleStateDetector?.cancelIdleCheckTimer()
+        }
+    }
+    
     func beginCheckingIdleTimer() {
         if self.idleStateDetector == nil {
             self.idleStateDetector = DeviceIdleStateDetector(idleTimeCallback: self.checkIdleTimeIntervalAndLockIfNecessary(interval:))
@@ -66,7 +82,6 @@ final class DeviceAuthenticator {
             return
         }
         
-        os_log("Beginning idle timer", log: .autoLock)
         idleStateDetector?.beginIdleCheckTimer()
     }
 

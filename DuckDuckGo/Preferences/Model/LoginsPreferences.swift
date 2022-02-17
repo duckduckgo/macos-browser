@@ -18,6 +18,12 @@
 
 import Foundation
 
+extension NSNotification.Name {
+
+    static let loginsAutoLockSettingsDidChange = NSNotification.Name("loginsAutoLockSettingsDidChange")
+
+}
+
 struct LoginsPreferences {
 
     private enum Keys {
@@ -69,7 +75,13 @@ struct LoginsPreferences {
     
     // TODO: Put this into secure storage, so that someone can't edit user defaults to remove auto-lock.
     @UserDefaultsWrapper(key: .autoLockLoginsEnabled, defaultValue: true)
-    public var shouldAutoLockLogins: Bool
+    public var shouldAutoLockLogins: Bool {
+        didSet {
+            if oldValue != shouldAutoLockLogins {
+                NotificationCenter.default.post(name: .loginsAutoLockSettingsDidChange, object: nil)
+            }
+        }
+    }
     
     var autoLockThreshold: AutoLockThreshold {
         get {
