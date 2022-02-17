@@ -138,6 +138,10 @@ final class Tab: NSObject {
         super.init()
 
         setupWebView(shouldLoadInBackground: shouldLoadInBackground)
+
+        if content == .homepage {
+            webView.load(.homePage)
+        }
     }
 
     deinit {

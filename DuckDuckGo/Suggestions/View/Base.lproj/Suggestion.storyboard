@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<document type="com.apple.InterfaceBuilder3.Cocoa.Storyboard.XIB" version="3.0" toolsVersion="19455" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES" initialViewController="cvc-K3-VCn">
+<document type="com.apple.InterfaceBuilder3.Cocoa.Storyboard.XIB" version="3.0" toolsVersion="19529" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES" initialViewController="cvc-K3-VCn">
     <dependencies>
         <deployment identifier="macosx"/>
-        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="19455"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="19529"/>
         <capability name="Named colors" minToolsVersion="9.0"/>
         <capability name="System colors introduced in macOS 10.14" minToolsVersion="10.0"/>
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
@@ -50,18 +50,18 @@
         <scene sceneID="uJh-kd-sy1">
             <objects>
                 <viewController storyboardIdentifier="SuggestionViewController" id="JbS-WE-3yw" customClass="SuggestionViewController" customModule="DuckDuckGo_Privacy_Browser" customModuleProvider="target" sceneMemberID="viewController">
-                    <view key="view" misplaced="YES" id="PAv-y7-vhB">
-                        <rect key="frame" x="0.0" y="0.0" width="633" height="267"/>
+                    <view key="view" id="PAv-y7-vhB">
+                        <rect key="frame" x="0.0" y="0.0" width="654" height="65"/>
                         <autoresizingMask key="autoresizingMask"/>
                         <subviews>
-                            <customView misplaced="YES" translatesAutoresizingMaskIntoConstraints="NO" id="bEL-6C-4Mq" userLabel="Layout View">
-                                <rect key="frame" x="0.0" y="0.0" width="633" height="267"/>
+                            <customView translatesAutoresizingMaskIntoConstraints="NO" id="bEL-6C-4Mq" userLabel="Layout View">
+                                <rect key="frame" x="0.0" y="0.0" width="654" height="65"/>
                                 <subviews>
-                                    <customView misplaced="YES" translatesAutoresizingMaskIntoConstraints="NO" id="KKJ-SW-5gR" userLabel="Shadow Clip View">
-                                        <rect key="frame" x="0.0" y="0.0" width="633" height="267"/>
+                                    <customView translatesAutoresizingMaskIntoConstraints="NO" id="KKJ-SW-5gR" userLabel="Shadow Clip View">
+                                        <rect key="frame" x="0.0" y="0.0" width="654" height="64"/>
                                         <subviews>
-                                            <customView misplaced="YES" translatesAutoresizingMaskIntoConstraints="NO" id="cHT-Cf-UOB" customClass="ShadowView" customModule="DuckDuckGo_Privacy_Browser" customModuleProvider="target">
-                                                <rect key="frame" x="20" y="0.0" width="613" height="267"/>
+                                            <customView translatesAutoresizingMaskIntoConstraints="NO" id="cHT-Cf-UOB" customClass="ShadowView" customModule="DuckDuckGo_Privacy_Browser" customModuleProvider="target">
+                                                <rect key="frame" x="20" y="20" width="614" height="58"/>
                                                 <userDefinedRuntimeAttributes>
                                                     <userDefinedRuntimeAttribute type="color" keyPath="shadowColor">
                                                         <color key="value" name="SuggestionsShadowColor"/>
@@ -88,14 +88,14 @@
                                             <constraint firstAttribute="trailing" secondItem="cHT-Cf-UOB" secondAttribute="trailing" constant="20" id="xH1-iA-ulc"/>
                                         </constraints>
                                     </customView>
-                                    <customView misplaced="YES" translatesAutoresizingMaskIntoConstraints="NO" id="Svf-wj-SjJ" userLabel="Clip View">
-                                        <rect key="frame" x="20" y="0.0" width="613" height="267"/>
+                                    <customView translatesAutoresizingMaskIntoConstraints="NO" id="Svf-wj-SjJ" userLabel="Clip View">
+                                        <rect key="frame" x="20" y="20" width="614" height="45"/>
                                         <subviews>
-                                            <customView misplaced="YES" translatesAutoresizingMaskIntoConstraints="NO" id="j2X-bv-VAU" userLabel="Background View" customClass="ColorView" customModule="DuckDuckGo_Privacy_Browser" customModuleProvider="target">
-                                                <rect key="frame" x="0.0" y="0.0" width="613" height="270"/>
+                                            <customView translatesAutoresizingMaskIntoConstraints="NO" id="j2X-bv-VAU" userLabel="Background View" customClass="ColorView" customModule="DuckDuckGo_Privacy_Browser" customModuleProvider="target">
+                                                <rect key="frame" x="0.0" y="0.0" width="614" height="65"/>
                                                 <subviews>
-                                                    <customView misplaced="YES" translatesAutoresizingMaskIntoConstraints="NO" id="MtO-b9-tF8" userLabel="Inner Border View" customClass="ColorView" customModule="DuckDuckGo_Privacy_Browser" customModuleProvider="target">
-                                                        <rect key="frame" x="1" y="0.0" width="612" height="270"/>
+                                                    <customView translatesAutoresizingMaskIntoConstraints="NO" id="MtO-b9-tF8" userLabel="Inner Border View" customClass="ColorView" customModule="DuckDuckGo_Privacy_Browser" customModuleProvider="target">
+                                                        <rect key="frame" x="1" y="1" width="612" height="63"/>
                                                         <userDefinedRuntimeAttributes>
                                                             <userDefinedRuntimeAttribute type="color" keyPath="borderColor">
                                                                 <color key="value" name="AddressBarInnerBorderColor"/>
@@ -108,14 +108,14 @@
                                                             </userDefinedRuntimeAttribute>
                                                         </userDefinedRuntimeAttributes>
                                                     </customView>
-                                                    <scrollView misplaced="YES" borderType="none" horizontalLineScroll="28" horizontalPageScroll="10" verticalLineScroll="28" verticalPageScroll="10" hasHorizontalScroller="NO" hasVerticalScroller="NO" usesPredominantAxisScrolling="NO" translatesAutoresizingMaskIntoConstraints="NO" id="cx3-LG-ZUH">
-                                                        <rect key="frame" x="5" y="1" width="608" height="264"/>
+                                                    <scrollView borderType="none" horizontalLineScroll="28" horizontalPageScroll="10" verticalLineScroll="28" verticalPageScroll="10" hasHorizontalScroller="NO" hasVerticalScroller="NO" usesPredominantAxisScrolling="NO" translatesAutoresizingMaskIntoConstraints="NO" id="cx3-LG-ZUH">
+                                                        <rect key="frame" x="3" y="0.0" width="608" height="44"/>
                                                         <clipView key="contentView" drawsBackground="NO" copiesOnScroll="NO" id="pb8-sX-fSc">
-                                                            <rect key="frame" x="0.0" y="0.0" width="608" height="264"/>
+                                                            <rect key="frame" x="0.0" y="0.0" width="608" height="44"/>
                                                             <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                                             <subviews>
                                                                 <tableView verticalHuggingPriority="750" allowsExpansionToolTips="YES" columnAutoresizingStyle="lastColumnOnly" selectionHighlightStyle="none" columnReordering="NO" columnResizing="NO" multipleSelection="NO" autosaveColumns="NO" rowHeight="28" viewBased="YES" id="4Z2-d8-NA2">
-                                                                    <rect key="frame" x="0.0" y="0.0" width="608" height="247"/>
+                                                                    <rect key="frame" x="0.0" y="0.0" width="608" height="44"/>
                                                                     <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                                                     <color key="backgroundColor" name="ClearColor"/>
                                                                     <color key="gridColor" name="gridColor" catalog="System" colorSpace="catalog"/>
@@ -225,7 +225,7 @@
                                                 </userDefinedRuntimeAttributes>
                                             </customView>
                                             <customView translatesAutoresizingMaskIntoConstraints="NO" id="ATb-xt-XAg" userLabel="Separator" customClass="ColorView" customModule="DuckDuckGo_Privacy_Browser" customModuleProvider="target">
-                                                <rect key="frame" x="1" y="264" width="612" height="1"/>
+                                                <rect key="frame" x="1" y="44" width="612" height="1"/>
                                                 <constraints>
                                                     <constraint firstAttribute="height" constant="1" id="G3c-nz-oCJ"/>
                                                 </constraints>

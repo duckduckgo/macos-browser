@@ -336,6 +336,9 @@ final class NavigationBarViewController: NSViewController {
             .sink(receiveValue: { [weak self] content in
                 self?.updatePasswordManagementButton()
                 self?.animateBar(content == .homepage)
+                if content == .homepage {
+                    self?.addressBarViewController?.addressBarTextField.becomeFirstResponder()
+                }
             })
     }
 

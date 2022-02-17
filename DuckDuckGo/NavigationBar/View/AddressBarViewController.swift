@@ -32,8 +32,8 @@ final class AddressBarViewController: NSViewController {
 
     private(set) var addressBarButtonsViewController: AddressBarButtonsViewController?
 
-    private var tabCollectionViewModel: TabCollectionViewModel
-    private let suggestionContainerViewModel = SuggestionContainerViewModel(suggestionContainer: SuggestionContainer())
+    private let tabCollectionViewModel: TabCollectionViewModel
+    private let suggestionContainerViewModel: SuggestionContainerViewModel
 
     enum Mode: Equatable {
         case editing(isUrl: Bool)
@@ -75,6 +75,9 @@ final class AddressBarViewController: NSViewController {
 
     init?(coder: NSCoder, tabCollectionViewModel: TabCollectionViewModel) {
         self.tabCollectionViewModel = tabCollectionViewModel
+        self.suggestionContainerViewModel = SuggestionContainerViewModel(
+            isHomePage: tabCollectionViewModel.selectedTabViewModel?.tab.content == .homepage,
+            suggestionContainer: SuggestionContainer())
 
         super.init(coder: coder)
     }

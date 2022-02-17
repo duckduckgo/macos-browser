@@ -112,7 +112,7 @@
                                 </customSpacing>
                             </stackView>
                             <imageView horizontalHuggingPriority="251" verticalHuggingPriority="251" translatesAutoresizingMaskIntoConstraints="NO" id="8Aq-SD-DCb">
-                                <rect key="frame" x="12" y="2" width="44" height="44"/>
+                                <rect key="frame" x="20" y="2" width="44" height="44"/>
                                 <constraints>
                                     <constraint firstAttribute="width" secondItem="8Aq-SD-DCb" secondAttribute="height" multiplier="1:1" id="5kl-xy-buj"/>
                                     <constraint firstAttribute="height" constant="43.5" id="i3r-nh-RJU"/>
@@ -256,7 +256,7 @@
                             <constraint firstItem="8Aq-SD-DCb" firstAttribute="centerY" secondItem="Wba-nA-FYj" secondAttribute="centerY" id="Gk6-zX-0bu"/>
                             <constraint firstItem="eEh-kf-smR" firstAttribute="leading" secondItem="hYV-nu-QIp" secondAttribute="leading" constant="12" id="MQ7-vv-adb"/>
                             <constraint firstItem="Wba-nA-FYj" firstAttribute="centerX" secondItem="hYV-nu-QIp" secondAttribute="centerX" priority="300" constant="8" id="Ofg-Pb-s0m"/>
-                            <constraint firstItem="8Aq-SD-DCb" firstAttribute="leading" secondItem="hYV-nu-QIp" secondAttribute="leading" constant="12" id="Pf2-Cq-EMk"/>
+                            <constraint firstItem="8Aq-SD-DCb" firstAttribute="leading" secondItem="hYV-nu-QIp" secondAttribute="leading" constant="20" id="Pf2-Cq-EMk"/>
                             <constraint firstAttribute="trailing" secondItem="aWu-Jm-Oaz" secondAttribute="trailing" constant="12" id="UeG-qO-bD2"/>
                             <constraint firstItem="Wba-nA-FYj" firstAttribute="leading" relation="greaterThanOrEqual" secondItem="eEh-kf-smR" secondAttribute="trailing" priority="999" constant="8" id="W83-wu-cjA"/>
                             <constraint firstItem="aWu-Jm-Oaz" firstAttribute="centerY" secondItem="Wba-nA-FYj" secondAttribute="centerY" id="Xav-R7-O9E"/>
