@@ -53,6 +53,23 @@ final class BrowserTabViewController: NSViewController {
     private var mouseDownMonitor: Any?
     private var mouseUpMonitor: Any?
     
+    
+    func registerForMouseEnteredAndExitedEvents() {
+        let trackingArea = NSTrackingArea(rect: self.view.bounds,
+                                          options: [.activeAlways, .mouseEnteredAndExited],
+                                          owner: self,
+                                          userInfo: nil)
+        self.view.addTrackingArea(trackingArea)
+    }
+
+    override func mouseEntered(with event: NSEvent) {
+        print("entered")
+    }
+
+    override func mouseExited(with event: NSEvent) {
+        print("exited")
+    }
+    
     override func mouseDown(with event: NSEvent) {
         print("click happened \(event)")
         guard event.window === self.view.window else { return }
@@ -329,16 +346,25 @@ final class BrowserTabViewController: NSViewController {
 }
 
 extension BrowserTabViewController: OverlayProtocol {
-    public func getContentOverlayPopover(_ response: AutofillMessaging) -> ContentOverlayPopover? {
+    private func getContentOverlayPopover(_ response: AutofillMessaging) -> ContentOverlayPopover? {
         guard let webView = webView else {
             return nil
         }
-        contentOverlayPopover.viewController.messageInterfaceBack = response
+        contentOverlayPopover.viewController?.messageInterfaceBack = response
         // Private API to hide the popover arrow
-        contentOverlayPopover.setValue(true, forKeyPath: "shouldHideAnchor")
+        //contentOverlayPopover.setValue(true, forKeyPath: "shouldHideAnchor")
         contentOverlayPopover.zoomFactor = webView.magnification
-        contentOverlayPopover.webView = webView
+        // contentOverlayPopover.webView = webView
         return contentOverlayPopover
+    }
+    public func setMessageInterfaceBack(_ response: AutofillMessaging) {
+        contentOverlayPopover.viewController?.messageInterfaceBack = response
+    }
+    public func closeOverlay() {
+        contentOverlayPopover.close()
+    }
+    public func displayOverlay(rect: NSRect, of: NSView, width: CGFloat, inputType: String, messageInterface: AutofillMessaging) {
+        contentOverlayPopover.display(rect: rect, of: of, width: width, inputType: inputType, messageInterface: messageInterface)
     }
 }
 
@@ -970,6 +996,7 @@ extension BrowserTabViewController {
 
     func mouseDown(with event: NSEvent) -> NSEvent? {
         self.clickPoint = event.locationInWindow
+        print("TODOJKT boop")
         guard event.window === self.view.window, let clickPoint = self.clickPoint else { return event }
         tabViewModel?.tab.clickTriggered(clickPoint: clickPoint)
         return event
