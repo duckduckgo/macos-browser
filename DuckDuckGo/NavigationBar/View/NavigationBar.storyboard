@@ -278,6 +278,7 @@
                         </userDefinedRuntimeAttributes>
                     </view>
                     <connections>
+                        <outlet property="addressBarContainer" destination="Wba-nA-FYj" id="VEq-Sp-Ns1"/>
                         <outlet property="addressBarLeftToNavButtonsConstraint" destination="W83-wu-cjA" id="cCS-Fa-hJd"/>
                         <outlet property="addressBarLeftToSuperviewConstraint" destination="t38-xG-cxS" id="cCS-Fb-hJd"/>
                         <outlet property="addressBarProportionalWidthConstraint" destination="yyv-y0-Is1" id="cCS-Fc-hJd"/>

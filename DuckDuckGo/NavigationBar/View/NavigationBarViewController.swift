@@ -38,6 +38,7 @@ final class NavigationBarViewController: NSViewController {
     @IBOutlet weak var downloadsButton: MouseOverButton!
     @IBOutlet weak var navigationButtons: NSView!
     @IBOutlet weak var daxLogo: NSView!
+    @IBOutlet weak var addressBarContainer: NSView!
 
     @IBOutlet var addressBarLeftToNavButtonsConstraint: NSLayoutConstraint!
     @IBOutlet var addressBarLeftToSuperviewConstraint: NSLayoutConstraint!
@@ -105,6 +106,9 @@ final class NavigationBarViewController: NSViewController {
 
     override func viewDidLoad() {
         super.viewDidLoad()
+
+        addressBarContainer.wantsLayer = true
+        addressBarContainer.layer?.masksToBounds = false    
 
         setupNavigationButtonMenus()
         subscribeToSelectedTabViewModel()

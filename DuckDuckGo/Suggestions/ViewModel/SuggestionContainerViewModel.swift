@@ -23,7 +23,7 @@ import BrowserServicesKit
 
 final class SuggestionContainerViewModel {
 
-    let isHomePage: Bool
+    var isHomePage: Bool
     let suggestionContainer: SuggestionContainer
     private var suggestionResultCancellable: AnyCancellable?
 

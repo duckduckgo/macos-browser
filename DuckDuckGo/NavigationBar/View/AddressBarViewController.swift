@@ -57,6 +57,13 @@ final class AddressBarViewController: NSViewController {
         }
     }
 
+    private var isHomePage = false {
+        didSet {
+            updateView()
+            suggestionContainerViewModel.isHomePage = isHomePage
+        }
+    }
+
     private var cancellables = Set<AnyCancellable>()
     private var passiveAddressBarStringCancellable: AnyCancellable?
     private var suggestionsVisibleCancellable: AnyCancellable?
@@ -84,6 +91,9 @@ final class AddressBarViewController: NSViewController {
 
     override func viewDidLoad() {
         super.viewDidLoad()
+
+        self.view.wantsLayer = true
+        self.view.layer?.masksToBounds = false
 
         updateView()
         addressBarTextField.addressBarTextFieldDelegate = self
@@ -170,10 +180,17 @@ final class AddressBarViewController: NSViewController {
 
     private func subscribeToSelectedTabViewModel() {
         tabCollectionViewModel.$selectedTabViewModel.receive(on: DispatchQueue.main).sink { [weak self] _ in
+            self?.subscribeToTabContent()
             self?.subscribeToPassiveAddressBarString()
             self?.subscribeToProgressEvents()
             // don't resign first responder on tab switching
             self?.clickPoint = nil
+        }.store(in: &cancellables)
+    }
+
+    private func subscribeToTabContent() {
+        tabCollectionViewModel.selectedTabViewModel?.tab.$content.receive(on: DispatchQueue.main).sink { [weak self] content in
+            self?.isHomePage = content == .homepage
         }.store(in: &cancellables)
     }
 
@@ -234,6 +251,7 @@ final class AddressBarViewController: NSViewController {
     }
 
     private func updateView() {
+
         let isPassiveTextFieldHidden = isFirstResponder || mode.isEditing
         addressBarTextField.alphaValue = isPassiveTextFieldHidden ? 1 : 0
         passiveTextField.alphaValue = isPassiveTextFieldHidden ? 0 : 1
@@ -243,6 +261,7 @@ final class AddressBarViewController: NSViewController {
         activeBackgroundView.alphaValue = isFirstResponder ? 1 : 0
 
         activeBackgroundView.layer?.borderColor = NSColor.controlAccentColor.withAlphaComponent(0.6).cgColor
+        activeBackgroundView.shadow = createFocusShadowWhenOnHomePage()
     }
 
     private func updateShadowView(firstResponder: Bool) {
@@ -306,6 +325,20 @@ final class AddressBarViewController: NSViewController {
                 activeBackgroundView.layer?.backgroundColor = NSColor.inactiveSearchBarBackground.cgColor
             }
         }
+    }
+
+}
+
+extension AddressBarViewController {
+
+    private func createFocusShadowWhenOnHomePage() -> NSShadow? {
+        guard isHomePage else { return nil }
+
+        let shadow = NSShadow()
+        shadow.shadowColor = .addressBarShadowColor
+        shadow.shadowOffset = .init(width: 0, height: 5)
+        shadow.shadowBlurRadius = 10
+        return shadow
     }
 
 }
