@@ -685,7 +685,7 @@ final class PasswordManagementViewController: NSViewController {
         let menu = NSMenu()
 
         func createMenuItem(title: String, action: Selector, imageName: String) -> NSMenuItem {
-            let item = NSMenuItem(title: title, action: action, keyEquivalent: "")
+            let item = NSMenuItem(title: title, action: action, target: self, keyEquivalent: "")
             item.image = NSImage(named: imageName)
             
             return item
