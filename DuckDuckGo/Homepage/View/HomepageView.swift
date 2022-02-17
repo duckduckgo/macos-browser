@@ -202,10 +202,9 @@ struct HoverButton: View {
         .frame(width: size, height: size)
         .cornerRadius(8)
         .background(RoundedRectangle(cornerRadius: 8).foregroundColor(isHovering ? Color("ButtonMouseOverColor") : backgroundColor))
-        .onHover { isHovering in
-            self.isHovering = isHovering
-        }
-        .link {
+        .link(onHoverChanged: {
+            self.isHovering = $0
+        }) {
             action()
         }
 
@@ -237,8 +236,10 @@ struct Favorites: View {
                     ForEach(model.rows[index], id: \.id) { favorite in
                         if let bookmark = favorite.bookmark {
                             Favorite(bookmark: bookmark)
-                        } else {
+                        } else if favorite.id == Homepage.Models.FavoriteModel.addButtonUUID {
                             addButton
+                        } else {
+                            FailedAssertionView("Unknow favorites type")
                         }
                     }
 
@@ -252,6 +253,18 @@ struct Favorites: View {
         }.onHover { isHovering in
             self.isHovering = isHovering
         }
+    }
+
+}
+
+struct FailedAssertionView: View {
+
+    var body: some View {
+        EmptyView()
+    }
+
+    init(_ message: String) {
+        assertionFailure(message)
     }
 
 }
@@ -295,7 +308,9 @@ struct Favorite: View {
 
         }
         .frame(width: size)
-        .link {
+        .link(onHoverChanged: {
+            isHovering = $0
+        }) {
             model.open(bookmark)
         }.contextMenu(ContextMenu(menuItems: {
             Button("Open in New Tab", action: { model.openInNewTab(bookmark) })
