@@ -289,7 +289,6 @@ class StatisticsLoaderTests: XCTestCase {
 
     func loadSuccessfulUpdateAtbStub() {
         stub(condition: isHost(URL.initialAtb.host!)) { _ in
-            print("*** atb update stub for host")
             let path = OHPathForFile("atb-with-update.json", type(of: self))!
             return fixture(filePath: path, status: 200, headers: nil)
         }
