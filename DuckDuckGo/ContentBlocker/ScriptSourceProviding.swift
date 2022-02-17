@@ -26,6 +26,7 @@ protocol ScriptSourceProviding {
     var contentBlockerRulesConfig: ContentBlockerUserScriptConfig? { get }
     var surrogatesConfig: SurrogatesUserScriptConfig? { get }
     var privacyConfigurationManager: PrivacyConfigurationManager { get }
+    var autofillSourceProvider: AutofillUserScriptSourceProvider? { get }
     var sessionKey: String? { get }
     var clickToLoadSource: String { get }
 
@@ -39,6 +40,7 @@ final class DefaultScriptSourceProvider: ScriptSourceProviding {
 
     private(set) var contentBlockerRulesConfig: ContentBlockerUserScriptConfig?
     private(set) var surrogatesConfig: SurrogatesUserScriptConfig?
+    private(set) var autofillSourceProvider: AutofillUserScriptSourceProvider?
     private(set) var sessionKey: String?
     private(set) var clickToLoadSource: String = ""
 
@@ -80,11 +82,18 @@ final class DefaultScriptSourceProvider: ScriptSourceProviding {
         surrogatesConfig = buildSurrogatesConfig()
         sessionKey = generateSessionKey()
         clickToLoadSource = buildClickToLoadSource()
+        autofillSourceProvider = buildAutofillSource()
         sourceUpdatedSubject.send( knownChanges )
     }
 
     private func generateSessionKey() -> String {
         return UUID().uuidString
+    }
+    
+    private func buildAutofillSource() -> AutofillUserScriptSourceProvider {
+        let privacySettings = PrivacySecurityPreferences()
+        return DefaultAutofillSourceProvider(privacyConfigurationManager: self.privacyConfigurationManager,
+                                             properties: ContentScopeProperties(gpcEnabled: privacySettings.gpcEnabled, sessionKey: self.sessionKey ?? ""))
     }
 
     private func buildContentBlockerRulesConfig() -> ContentBlockerUserScriptConfig {

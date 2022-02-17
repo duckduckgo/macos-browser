@@ -44,8 +44,7 @@ final class UserScripts {
         let sessionKey = sourceProvider.sessionKey ?? ""
         let prefs = ContentScopeProperties.init(gpcEnabled: privacySettings.gpcEnabled, sessionKey: sessionKey)
         contentScopeUserScript = ContentScopeUserScript(sourceProvider.privacyConfigurationManager, properties: prefs)
-        autofillScript = AutofillUserScript(privacyConfigurationManager: sourceProvider.privacyConfigurationManager,
-                                            properties: prefs)
+        autofillScript = AutofillUserScript(scriptSourceProvider: sourceProvider.autofillSourceProvider!)
     }
 
     lazy var userScripts: [UserScript] = [
