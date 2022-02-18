@@ -55,7 +55,7 @@ struct PasswordManagementListSection {
         
         return sortedKeys.map { key in
             var itemsInSection = itemsByFirstCharacter[key] ?? []
-            itemsInSection.sort { lhs, rhs in sortFunction(lhs.firstCharacter, rhs.firstCharacter) }
+            itemsInSection.sort { lhs, rhs in sortFunction(lhs.displayTitle, rhs.displayTitle) }
             return PasswordManagementListSection(title: key, items: itemsInSection)
         }
     }
