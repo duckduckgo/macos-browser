@@ -77,7 +77,7 @@
                         <action selector="toggledGPCCheckbox:" target="ZOv-mQ-BdW" id="60V-da-e9e"/>
                     </connections>
                 </button>
-                <scrollView borderType="none" horizontalLineScroll="10" horizontalPageScroll="10" verticalLineScroll="10" verticalPageScroll="10" hasHorizontalScroller="NO" hasVerticalScroller="NO" translatesAutoresizingMaskIntoConstraints="NO" id="tkg-2B-nUj">
+                <scrollView borderType="none" horizontalLineScroll="10" horizontalPageScroll="10" verticalLineScroll="10" verticalPageScroll="10" hasHorizontalScroller="NO" hasVerticalScroller="NO" translatesAutoresizingMaskIntoConstraints="NO" id="tkg-2B-nUj" customClass="ToggleableScrollView" customModule="DuckDuckGo_Privacy_Browser" customModuleProvider="target">
                     <rect key="frame" x="-5" y="16" width="468" height="70"/>
                     <clipView key="contentView" drawsBackground="NO" id="KPO-Y2-B7T">
                         <rect key="frame" x="0.0" y="0.0" width="468" height="70"/>
@@ -119,6 +119,9 @@
                         <rect key="frame" x="-100" y="-100" width="15" height="135"/>
                         <autoresizingMask key="autoresizingMask"/>
                     </scroller>
+                    <userDefinedRuntimeAttributes>
+                        <userDefinedRuntimeAttribute type="boolean" keyPath="isEnabled" value="NO"/>
+                    </userDefinedRuntimeAttributes>
                 </scrollView>
                 <box verticalHuggingPriority="750" boxType="separator" translatesAutoresizingMaskIntoConstraints="NO" id="OWb-7K-YL1">
                     <rect key="frame" x="0.0" y="-2" width="480" height="5"/>
