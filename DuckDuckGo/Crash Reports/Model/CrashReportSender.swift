@@ -34,8 +34,7 @@ final class CrashReportSender {
         request.setValue("ddg_mac", forHTTPHeaderField: "User-Agent")
         request.httpMethod = "POST"
         request.httpBody = contentData
-        request.httpShouldHandleCookies = true
-        
+
         URLSession.default.dataTask(with: request) { (_, _, error) in
             if error != nil {
                 assertionFailure("CrashReportSender: Failed to send the crash reprot")
