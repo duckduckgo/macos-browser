@@ -281,12 +281,8 @@ struct PasswordManagementSortButton: View {
             // The image is added elsewhere, because MenuButton has a bug with using Images as labels.
             MenuButton(label: Image(nsImage: NSImage())) {
                 Picker("", selection: $model.sortDescriptor.parameter) {
-                    ForEach(SecureVaultSorting.SortParameter.allCases, id: \.self) {
-                        if $0 == model.sortDescriptor.parameter {
-                            Text("✓ \($0.title)")
-                        } else {
-                            Text("    \($0.title)")
-                        }
+                    ForEach(SecureVaultSorting.SortParameter.allCases, id: \.self) { parameter in
+                        Text(menuTitle(for: parameter.title, checked: parameter == model.sortDescriptor.parameter))
                     }
                 }
                 .labelsHidden()
@@ -295,12 +291,10 @@ struct PasswordManagementSortButton: View {
                 Divider()
                 
                 Picker("", selection: $model.sortDescriptor.order) {
-                    ForEach(SecureVaultSorting.SortOrder.allCases, id: \.self) {
-                        if $0 == model.sortDescriptor.order {
-                            Text("✓ \($0.title(for: model.sortDescriptor.parameter.type))")
-                        } else {
-                            Text("    \($0.title(for: model.sortDescriptor.parameter.type))")
-                        }
+                    ForEach(SecureVaultSorting.SortOrder.allCases, id: \.self) { order in
+                        let orderTitle = order.title(for: model.sortDescriptor.parameter.type)
+                        let labelTitle = menuTitle(for: orderTitle, checked: order == model.sortDescriptor.order)
+                        Text(labelTitle)
                     }
                 }
                 .labelsHidden()
@@ -315,6 +309,16 @@ struct PasswordManagementSortButton: View {
             .foregroundColor(.red)
         }
         
+    }
+    
+    // The SwiftUI MenuButton view doesn't allow pickers which have checkmarks at the top level; they get put into a submenu.
+    // This title is used in place of a nested picker.
+    private func menuTitle(for string: String, checked: Bool) -> String {
+        if checked {
+            return "✓ \(string)"
+        } else {
+            return "    \(string)"
+        }
     }
     
 }
