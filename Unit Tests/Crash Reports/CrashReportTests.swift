@@ -36,8 +36,20 @@ class CrashReportTests: XCTestCase {
         // Verify that the content does not include the sleepWakeUUID anywhere in the report
         XCTAssertFalse(report.content!.contains("2384290E-F858-4024-9488-11D3FF94B4DD"))
         
+        // Verify that the content does not include the device identitier
+        XCTAssertFalse(report.content!.contains("483B097A-A969-596F-9F2A-357347BB1DEC"))
+        
+        // Verify that the content does not include any experiment rollout identifiers
+        XCTAssertFalse(report.content!.contains("602ad4dac86151000cf27e46"))
+        XCTAssertFalse(report.content!.contains("5fc94383418129005b4e9ae0"))
+        XCTAssertFalse(report.content!.contains("5ffde50ce2aacd000d47a95f"))
+        XCTAssertFalse(report.content!.contains("60da5e84ab0ca017dace9abf"))
+        XCTAssertFalse(report.content!.contains("607844aa04477260f58a8077"))
+        XCTAssertFalse(report.content!.contains("601d9415f79519000ccd4b69"))
+        
         // Verify that the sleepWakeUUID is definitely empty
         XCTAssert(report.content!.contains(#"sleepWakeUUID":"<removed>"#))
+        XCTAssert(report.content!.contains(#"deviceIdentifierForVendor":"<removed>"#))
     }
     
     private func ipsCrashURL() -> URL {

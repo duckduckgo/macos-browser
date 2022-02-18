@@ -64,7 +64,9 @@ struct JSONCrashReport: CrashReport {
     static let fileExtension = "ips"
 
     static let headerItemsToFilter = [
-        "sleepWakeUUID"
+        "sleepWakeUUID",
+        "deviceIdentifierForVendor",
+        "rolloutId"
     ]
 
     let url: URL
