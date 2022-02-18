@@ -40,7 +40,7 @@ final class SuggestionViewModel {
     }()
 
     lazy var tableRowViewStandardAttributes: [NSAttributedString.Key: Any] = {
-        let size: CGFloat = isHomePage ? 18 : 13
+        let size: CGFloat = isHomePage ? 15 : 13
         return [
             .font: NSFont.systemFont(ofSize: size, weight: .regular),
             .paragraphStyle: Self.paragraphStyle
@@ -48,7 +48,7 @@ final class SuggestionViewModel {
     }()
 
     lazy var tableRowViewBoldAttributes: [NSAttributedString.Key: Any] = {
-        let size: CGFloat = isHomePage ? 18 : 13
+        let size: CGFloat = isHomePage ? 15 : 13
         return [
             NSAttributedString.Key.font: NSFont.systemFont(ofSize: size, weight: .bold),
             .paragraphStyle: Self.paragraphStyle

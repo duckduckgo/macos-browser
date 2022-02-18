@@ -121,7 +121,7 @@ final class AddressBarTextField: NSTextField {
     private func subscribeToContentType() {
         contentTypeCancellable = tabCollectionViewModel.selectedTabViewModel?
             .tab.$content .receive(on: DispatchQueue.main).sink { [weak self] contentType in
-            self?.font = .systemFont(ofSize: contentType == .homepage ? 18 : 13)
+            self?.font = .systemFont(ofSize: contentType == .homepage ? 15 : 13)
         }
     }
 
@@ -411,7 +411,7 @@ final class AddressBarTextField: NSTextField {
 
             if let suffix = suffix {
                 let attributedString = NSMutableAttributedString(string: value.string, attributes: makeTextAttributes())
-                attributedString.append(suffix.toAttributedString(size: isHomePage ? 18 : 13))
+                attributedString.append(suffix.toAttributedString(size: isHomePage ? 15 : 13))
                 attributedStringValue = attributedString
             } else {
                 self.stringValue = value.string
@@ -428,7 +428,7 @@ final class AddressBarTextField: NSTextField {
     }
 
     func makeTextAttributes() -> [NSAttributedString.Key: Any] {
-        let size: CGFloat = isHomePage ? 18 : 13
+        let size: CGFloat = isHomePage ? 15 : 13
         return [
            .font: NSFont.systemFont(ofSize: size, weight: .regular),
            .foregroundColor: NSColor.textColor,
