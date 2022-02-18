@@ -233,6 +233,7 @@
 		85589E8B27BBBADC0038AD11 /* ColorExtensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 85589E8A27BBBADC0038AD11 /* ColorExtensions.swift */; };
 		85589E8D27BBBB870038AD11 /* NavigationBar.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 85589E8C27BBBB870038AD11 /* NavigationBar.storyboard */; };
 		85589E8F27BBBBF10038AD11 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 85589E8E27BBBBF10038AD11 /* Main.storyboard */; };
+		85589E9127BFB9810038AD11 /* HomepageRecentlyVisitedModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 85589E9027BFB9810038AD11 /* HomepageRecentlyVisitedModel.swift */; };
 		85625994269C8F9600EE44BC /* PasswordManager.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 85625993269C8F9600EE44BC /* PasswordManager.storyboard */; };
 		85625996269C953C00EE44BC /* PasswordManagementViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 85625995269C953C00EE44BC /* PasswordManagementViewController.swift */; };
 		85625998269C9C5F00EE44BC /* PasswordManagementPopover.swift in Sources */ = {isa = PBXBuildFile; fileRef = 85625997269C9C5F00EE44BC /* PasswordManagementPopover.swift */; };
@@ -915,6 +916,8 @@
 		85589E8A27BBBADC0038AD11 /* ColorExtensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ColorExtensions.swift; sourceTree = "<group>"; };
 		85589E8C27BBBB870038AD11 /* NavigationBar.storyboard */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.storyboard; path = NavigationBar.storyboard; sourceTree = "<group>"; };
 		85589E8E27BBBBF10038AD11 /* Main.storyboard */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.storyboard; path = Main.storyboard; sourceTree = "<group>"; };
+		85589E9027BFB9810038AD11 /* HomepageRecentlyVisitedModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HomepageRecentlyVisitedModel.swift; sourceTree = "<group>"; };
+		85589E9227BFBBD60038AD11 /* History 4.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = "History 4.xcdatamodel"; sourceTree = "<group>"; };
 		85625993269C8F9600EE44BC /* PasswordManager.storyboard */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; path = PasswordManager.storyboard; sourceTree = "<group>"; };
 		85625995269C953C00EE44BC /* PasswordManagementViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PasswordManagementViewController.swift; sourceTree = "<group>"; };
 		85625997269C9C5F00EE44BC /* PasswordManagementPopover.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PasswordManagementPopover.swift; sourceTree = "<group>"; };
@@ -2020,6 +2023,7 @@
 			children = (
 				85589E8627BBB8F20038AD11 /* HomepageFavoritesModel.swift */,
 				85AC7ADC27BEB6EE00FFB69B /* HomepageDefaultBrowserModel.swift */,
+				85589E9027BFB9810038AD11 /* HomepageRecentlyVisitedModel.swift */,
 			);
 			path = Model;
 			sourceTree = "<group>";
@@ -3976,6 +3980,7 @@
 				4BE6547E271FCD4D008D1D63 /* PasswordManagementIdentityModel.swift in Sources */,
 				85C6A29625CC1FFD00EEB5F1 /* UserDefaultsWrapper.swift in Sources */,
 				85625998269C9C5F00EE44BC /* PasswordManagementPopover.swift in Sources */,
+				85589E9127BFB9810038AD11 /* HomepageRecentlyVisitedModel.swift in Sources */,
 				4BB99CFE26FE191E001E4761 /* FirefoxBookmarksReader.swift in Sources */,
 				B6A9E4A3261475C70067D1B9 /* AppUsageActivityMonitor.swift in Sources */,
 				4BA1A6A0258B079600F6F690 /* DataEncryption.swift in Sources */,
@@ -5440,11 +5445,12 @@
 		AAE75278263B046100B973F8 /* History.xcdatamodeld */ = {
 			isa = XCVersionGroup;
 			children = (
+				85589E9227BFBBD60038AD11 /* History 4.xcdatamodel */,
 				AAC6BBEE27AC151D0006DCC2 /* History 3.xcdatamodel */,
 				AA7DE8E026A9BD000012B490 /* History 2.xcdatamodel */,
 				AAE75279263B046100B973F8 /* History.xcdatamodel */,
 			);
-			currentVersion = AAC6BBEE27AC151D0006DCC2 /* History 3.xcdatamodel */;
+			currentVersion = 85589E9227BFBBD60038AD11 /* History 4.xcdatamodel */;
 			path = History.xcdatamodeld;
 			sourceTree = "<group>";
 			versionGroupType = wrapper.xcdatamodel;

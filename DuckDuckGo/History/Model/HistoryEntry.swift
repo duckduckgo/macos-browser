@@ -17,6 +17,7 @@
 //
 
 import Foundation
+import BrowserServicesKit
 
 struct HistoryEntry {
 
@@ -26,10 +27,18 @@ struct HistoryEntry {
     var numberOfVisits: Int
     var lastVisit: Date
     var failedToLoad: Bool
+    var numberOfTrackersBlocked: Int
 
     mutating func addVisit() {
         numberOfVisits += 1
         lastVisit = Date.startOfDayToday
+    }
+
+    mutating func addDetectedTracker(tracker: DetectedTracker) {
+        print("***", #function, tracker.blocked, numberOfTrackersBlocked)
+        if tracker.blocked {
+            numberOfTrackersBlocked += 1
+        }
     }
 
 }
@@ -42,7 +51,8 @@ extension HistoryEntry {
                   title: nil,
                   numberOfVisits: 0,
                   lastVisit: Date.startOfDayToday,
-                  failedToLoad: false)
+                  failedToLoad: false,
+                  numberOfTrackersBlocked: 0)
     }
 
 }

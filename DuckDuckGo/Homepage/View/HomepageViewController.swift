@@ -31,7 +31,8 @@ final class HomepageViewController: NSViewController {
  
     var favoritesModel: Homepage.Models.FavoritesModel!
     var defaultBrowserModel: Homepage.Models.DefaultBrowserModel!
-    var bookmarkListSubscription: AnyCancellable?
+    var recentlyVisitedModel: Homepage.Models.RecentlyVisitedModel!
+    var cancellables = Set<AnyCancellable>()
 
     @UserDefaultsWrapper(key: .defaultBrowserDismissed, defaultValue: false)
     var defaultBrowserDismissed: Bool
@@ -52,12 +53,14 @@ final class HomepageViewController: NSViewController {
 
         favoritesModel = createFavoritesModel()
         defaultBrowserModel = createDefaultBrowserModel()
+        recentlyVisitedModel = createRecentlyVisitedModel()
 
         refreshFavoritesModel()
 
         let rootView = Homepage.Views.RootView()
             .environmentObject(favoritesModel)
             .environmentObject(defaultBrowserModel)
+            .environmentObject(recentlyVisitedModel)
 
         let host = NSHostingView(rootView: rootView)
         host.frame = view.frame
@@ -65,6 +68,10 @@ final class HomepageViewController: NSViewController {
         self.host = host
 
         subscribeToBookmarks()
+    }
+
+    func createRecentlyVisitedModel() -> Homepage.Models.RecentlyVisitedModel {
+        return .init()
     }
 
     func createDefaultBrowserModel() -> Homepage.Models.DefaultBrowserModel {
@@ -95,17 +102,22 @@ final class HomepageViewController: NSViewController {
         favoritesModel.favorites = list?.favoriteBookmarks ?? []
     }
 
+    func refreshRecentlyVisitedModel() {
+        recentlyVisitedModel.refreshWithHistory(HistoryCoordinator.shared.history ?? [])
+    }
+
     func subscribeToBookmarks() {
-        bookmarkListSubscription = LocalBookmarkManager.shared.listPublisher.sink { [weak self] list in
+        LocalBookmarkManager.shared.listPublisher.sink { [weak self] list in
             withAnimation {
                 self?.refreshFavoritesModel(list: list)
             }
-        }
+        }.store(in: &cancellables)
     }
 
     override func viewDidAppear() {
         super.viewDidAppear()
         refreshFavoritesModel()
+        refreshRecentlyVisitedModel()
     }
 
     override func viewDidLayout() {

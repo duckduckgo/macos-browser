@@ -30,7 +30,7 @@ struct RootView: View {
                 Group {
                     ScrollView {
                         VStack(spacing: 0) {
-                            PrivacySummary()
+                            ProtectionSummary()
 
                             Favorites()
                                 .frame(maxWidth: 512)
@@ -93,13 +93,21 @@ struct DefaultBrowserPrompt: View {
 
 }
 
-struct PrivacySummary: View {
+struct ProtectionSummary: View {
+
+    @EnvironmentObject var model: Homepage.Models.RecentlyVisitedModel
 
     var body: some View {
         HStack(alignment: .center, spacing: 2) {
             Image("HomeShield")
-            Text("DuckDuckGo blocks trackers as you browse")
-                .fontWeight(.bold)
+
+            if model.numberOfTrackersBlocked > 0 {
+                Text("\(model.numberOfTrackersBlocked) Trackers Blocked across \(model.numberOfWebsites) websites since last Burn")
+                    .fontWeight(.semibold)
+            } else {
+                Text("DuckDuckGo blocks trackers as you browse")
+                    .fontWeight(.semibold)
+            }
         }
         .foregroundColor(.primary.opacity(0.4))
     }
