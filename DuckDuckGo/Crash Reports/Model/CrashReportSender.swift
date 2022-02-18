@@ -36,11 +36,6 @@ final class CrashReportSender {
         request.httpBody = contentData
         request.httpShouldHandleCookies = true
         
-        // Visit the report service URL in a webpage and monitor the request, pull out the Duo cookie and paste it here in order for crashes to send.
-        request.setValue("", forHTTPHeaderField: "Cookie")
-
-        print("SENDING CRASH: \(request)")
-        
         URLSession.default.dataTask(with: request) { (_, _, error) in
             if error != nil {
                 assertionFailure("CrashReportSender: Failed to send the crash reprot")
