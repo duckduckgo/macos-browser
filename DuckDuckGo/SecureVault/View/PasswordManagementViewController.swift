@@ -89,6 +89,7 @@ final class PasswordManagementViewController: NSViewController {
             
             string.append(linkString)
             string.addAttributes([
+                .cursor: NSCursor.arrow,
                 .paragraphStyle: paragraphStyle,
                 .font: NSFont.systemFont(ofSize: 13, weight: .regular),
                 .foregroundColor: NSColor.secondaryLabelColor
@@ -896,6 +897,12 @@ extension PasswordManagementViewController: NSTextViewDelegate {
         }
 
         return true
+    }
+    
+    func textView(_ textView: NSTextView,
+                  willChangeSelectionFromCharacterRange oldSelectedCharRange: NSRange,
+                  toCharacterRange newSelectedCharRange: NSRange) -> NSRange {
+        return NSRange(location: 0, length: 0)
     }
 
 }
