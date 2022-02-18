@@ -49,7 +49,7 @@ final class CrashReporter {
             return
         }
 
-        // Pixel.fire(.crash)
+        Pixel.fire(.crash)
 
         latestCrashReport = latest
         promptPresenter.showPrompt(self, for: latest)
