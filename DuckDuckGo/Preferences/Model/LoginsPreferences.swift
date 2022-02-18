@@ -61,7 +61,7 @@ struct LoginsPreferences {
         }
     }
     
-    // TODO: Put this into secure storage, so that someone can't edit user defaults to remove auto-lock.
+    // This needs to be put into secure storage, so that someone can't edit user defaults to remove auto-lock.
     @UserDefaultsWrapper(key: .autoLockLoginsEnabled, defaultValue: true)
     public var shouldAutoLockLogins: Bool {
         didSet {

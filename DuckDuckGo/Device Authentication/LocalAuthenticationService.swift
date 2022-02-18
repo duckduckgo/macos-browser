@@ -24,7 +24,7 @@ final class LocalAuthenticationService: DeviceAuthenticationService {
     func authenticateDevice(reason: String, result: @escaping DeviceAuthenticationResult) {
         let context = LAContext()
 
-        context.evaluatePolicy(.deviceOwnerAuthentication, localizedReason: reason) { authenticated, error in
+        context.evaluatePolicy(.deviceOwnerAuthentication, localizedReason: reason) { authenticated, _ in
             DispatchQueue.main.async {
                 result(authenticated)
             }
