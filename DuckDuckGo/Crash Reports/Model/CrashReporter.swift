@@ -33,11 +33,11 @@ final class CrashReporter {
 
     func checkForNewReports() {
 
-//        guard let lastCheckDate = lastCheckDate else {
-//            // Initial run
-//            self.lastCheckDate = Date()
-//            return
-//        }
+        guard let lastCheckDate = lastCheckDate else {
+            // Initial run
+            self.lastCheckDate = Date()
+            return
+        }
         
         let lastCheckDate = Date.distantPast
 
