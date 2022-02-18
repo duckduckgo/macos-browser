@@ -43,7 +43,7 @@ final class CrashReportReader {
     }
 
     private func isCrashReportPath(_ path: URL) -> Bool {
-        let validExtensions = ["crash", "ips"]
+        let validExtensions = [LegacyCrashReport.fileExtension, JSONCrashReport.fileExtension]
         return validExtensions.contains(path.pathExtension)
     }
 
