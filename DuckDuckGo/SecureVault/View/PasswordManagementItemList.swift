@@ -31,6 +31,10 @@ struct ScrollOffsetKey: PreferenceKey {
 
 struct PasswordManagementItemListView: View {
 
+    private enum Constants {
+        static let dividerFadeInDistance: CGFloat = 100
+    }
+ 
     @EnvironmentObject var model: PasswordManagementItemListModel
     
     @State private var opacity = CGFloat.zero
@@ -67,8 +71,7 @@ struct PasswordManagementItemListView: View {
                                     if offset <= 0 {
                                         self.opacity = 0
                                     } else {
-                                        // Fade in the divider over 100pts of scrolling. This is picked arbitrarily, and can be changed.
-                                        self.opacity = offset / 100
+                                        self.opacity = offset / Constants.dividerFadeInDistance
                                     }
                                 }
                         }
@@ -184,7 +187,6 @@ private struct PasswordManagementItemStackContentsView: View {
                     }
                     .padding(.horizontal, 10)
                 }
-
             }
             
         }
@@ -208,7 +210,6 @@ private struct ItemView: View {
         let font = Font.custom("SFProText-Regular", size: 13)
 
         Button(action: action, label: {
-            
             HStack(spacing: 0) {
 
                 switch item {
