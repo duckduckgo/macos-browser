@@ -1,0 +1,193 @@
+//
+//  ContentOverlayViewController.swift
+//
+//  Copyright © 2022 DuckDuckGo. All rights reserved.
+//
+//  Licensed under the Apache License, Version 2.0 (the "License");
+//  you may not use this file except in compliance with the License.
+//  You may obtain a copy of the License at
+//
+//  http://www.apache.org/licenses/LICENSE-2.0
+//
+//  Unless required by applicable law or agreed to in writing, software
+//  distributed under the License is distributed on an "AS IS" BASIS,
+//  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+//  See the License for the specific language governing permissions and
+//  limitations under the License.
+//
+
+import Cocoa
+import WebKit
+import Combine
+import BrowserServicesKit
+
+public final class ContentOverlayViewController: NSViewController, EmailManagerRequestDelegate {
+    
+    @IBOutlet var webView: WKWebView!
+    private var topAutofillUserScript: AutofillUserScript?
+    private var cancellables = Set<AnyCancellable>()
+    @Published var pendingUpdates = Set<String>()
+    
+    public var autofillInterfaceToChild: AutofillMessagingToChild?
+    
+    lazy var emailManager: EmailManager = {
+        let emailManager = EmailManager()
+        emailManager.requestDelegate = self
+        return emailManager
+    }()
+    
+    lazy var vaultManager: SecureVaultManager = {
+        let manager = SecureVaultManager()
+        return manager
+    }()
+    
+    public override func viewDidLoad() {
+        initWebView()
+        addTrackingArea()
+    }
+
+    public func setType(serializedInputContext: String, zoomFactor: CGFloat?) {
+        guard let topAutofillUserScript = topAutofillUserScript else { return }
+        if let zoomFactor = zoomFactor {
+            initWebView()
+            webView.magnification = zoomFactor
+        }
+        topAutofillUserScript.serializedInputContext = serializedInputContext
+    }
+    
+    public override func mouseMoved(with event: NSEvent) {
+        // Change to flipped coordinate system
+        let outY = webView.frame.height - event.locationInWindow.y
+        messageMouseMove(x: event.locationInWindow.x, y: outY)
+    }
+    
+    private func addTrackingArea() {
+        let trackingOptions: NSTrackingArea.Options = [ .activeInActiveApp,
+                                                        .enabledDuringMouseDrag,
+                                                        .mouseMoved,
+                                                        .inVisibleRect ]
+        let trackingArea = NSTrackingArea(rect: webView.frame, options: trackingOptions, owner: self, userInfo: nil)
+        webView.addTrackingArea(trackingArea)
+    }
+
+    public override func viewWillAppear() {
+        guard let topAutofillUserScript = topAutofillUserScript else { return }
+        topAutofillUserScript.autofillInterfaceToChild = autofillInterfaceToChild
+
+        let bundleId = "BrowserServicesKit-BrowserServicesKit-resources"
+        let bundle = Bundle(identifier: bundleId)
+        let url = bundle!.url(forResource: "TopAutofill", withExtension: "html")
+        if let url = url {
+            webView.loadFileURL(url, allowingReadAccessTo: url.deletingLastPathComponent())
+            return
+        }
+    }
+
+    public override func viewWillDisappear() {
+        cancellables.removeAll()
+        // We should never see this but it's better than a flash of old content
+        webView.load(URLRequest(url: URL(string: "about:blank")!))
+    }
+
+    public func isPendingUpdates() -> Bool {
+        return !pendingUpdates.isEmpty
+    }
+    
+    public func messageMouseMove(x: CGFloat, y: CGFloat) {
+        // Fakes the elements being focused by the user as it doesn't appear there's much else we can do
+        let script = """
+        (() => {
+        const x = \(x);
+        const y = \(y);
+        window.dispatchEvent(new CustomEvent('mouseMove', {detail: {x, y}}))
+        })();
+        """
+        webView.evaluateJavaScript(script)
+    }
+
+    public func buildAutofillSource() -> AutofillUserScriptSourceProvider {
+        let scriptSourceProviding = DefaultScriptSourceProvider.shared
+        return scriptSourceProviding.buildAutofillSource()
+    }
+
+    private func initWebView() {
+        let scriptSourceProvider = buildAutofillSource()
+        self.topAutofillUserScript = AutofillUserScript(scriptSourceProvider: scriptSourceProvider, overlay: self)
+        guard let topAutofillUserScript = topAutofillUserScript else { return }
+        let configuration = WKWebViewConfiguration()
+        
+#if DEBUG
+        configuration.preferences.setValue(true, forKey: "developerExtrasEnabled")
+#endif
+        
+        final class OverlayWebView: WKWebView {
+            public override func scrollWheel(with theEvent: NSEvent) {
+                // No-op to prevent scrolling
+            }
+        }
+
+        let webView = OverlayWebView(frame: .zero, configuration: configuration)
+        webView.window?.acceptsMouseMovedEvents = true
+        webView.window?.ignoresMouseEvents = false
+        webView.configuration.userContentController.addHandler(topAutofillUserScript)
+        webView.configuration.userContentController.addUserScript(topAutofillUserScript.makeWKUserScript())
+        self.webView = webView
+        view.addAndLayout(webView)
+        topAutofillUserScript.contentOverlay = self
+        topAutofillUserScript.emailDelegate = emailManager
+        topAutofillUserScript.vaultDelegate = vaultManager
+    }
+
+    // EmailManagerRequestDelegate
+
+    // swiftlint:disable function_parameter_count
+    public func emailManager(_ emailManager: EmailManager,
+                             requested url: URL,
+                             method: String,
+                             headers: [String: String],
+                             parameters: [String: String]?,
+                             httpBody: Data?,
+                             timeoutInterval: TimeInterval,
+                             completion: @escaping (Data?, Error?) -> Void) {
+        let currentQueue = OperationQueue.current
+
+        let finalURL: URL
+
+        if let parameters = parameters {
+            finalURL = (try? url.addParameters(parameters)) ?? url
+        } else {
+            finalURL = url
+        }
+
+        var request = URLRequest(url: finalURL, timeoutInterval: timeoutInterval)
+        request.allHTTPHeaderFields = headers
+        request.httpMethod = method
+        request.httpBody = httpBody
+        URLSession.shared.dataTask(with: request) { (data, _, error) in
+            currentQueue?.addOperation {
+                completion(data, error)
+            }
+        }.resume()
+    }
+    // swiftlint:enable function_parameter_count
+    
+}
+
+extension ContentOverlayViewController: AutofillUserScriptDelegate {
+    private enum Constants {
+        static let minWidth: CGFloat = 315
+        static let minHeight: CGFloat = 56
+    }
+
+    public func setSize(height: CGFloat, width: CGFloat) {
+        var widthOut = width
+        if widthOut < Constants.minWidth {
+            widthOut = Constants.minWidth
+        }
+        var heightOut = height
+        if heightOut < Constants.minHeight {
+            heightOut = Constants.minHeight
+        }
+        self.preferredContentSize = CGSize(width: widthOut, height: heightOut)
+    }
+}

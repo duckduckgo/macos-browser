@@ -35,6 +35,7 @@ final class BrowserTabViewController: NSViewController {
     private weak var webViewContainer: NSView?
 
     var tabViewModel: TabViewModel?
+    var clickPoint: NSPoint?
 
     private let tabCollectionViewModel: TabCollectionViewModel
     private var urlCancellable: AnyCancellable?
@@ -50,6 +51,15 @@ final class BrowserTabViewController: NSViewController {
 
     private var transientTabContentViewController: NSViewController?
 
+    private var mouseDownMonitor: Any?
+    private var mouseUpMonitor: Any?
+    
+    override func mouseDown(with event: NSEvent) {
+        guard event.window === self.view.window else { return }
+        self.clickPoint = event.locationInWindow
+        tabViewModel?.tab.clickTriggered(clickPoint: event.locationInWindow)
+    }
+    
     required init?(coder: NSCoder) {
         fatalError("BrowserTabViewController: Bad initializer")
     }
@@ -75,6 +85,7 @@ final class BrowserTabViewController: NSViewController {
         hoverLabelContainer.alphaValue = 0
         subscribeToSelectedTabViewModel()
         subscribeToErrorViewState()
+        addMouseMonitors()
     }
 
     override func viewDidAppear() {
@@ -329,6 +340,39 @@ final class BrowserTabViewController: NSViewController {
         return viewController
     }()
 
+    private var cancellables = Set<AnyCancellable>()
+
+    private var _contentOverlayPopover: ContentOverlayPopover?
+    public var contentOverlayPopover: ContentOverlayPopover {
+        if _contentOverlayPopover == nil {
+            _contentOverlayPopover = ContentOverlayPopover()
+            WindowControllersManager.shared.stateChanged
+                .sink { _ in
+                    self._contentOverlayPopover?.closeOverlay()
+                }.store(in: &cancellables)
+        }
+        return _contentOverlayPopover!
+    }
+}
+
+extension BrowserTabViewController: OverlayProtocol {
+    public func setMessageInterfaceBack(_ response: AutofillMessagingToChild) {
+        contentOverlayPopover.viewController?.autofillInterfaceToChild = response
+    }
+    public func closeOverlay() {
+        contentOverlayPopover.closeOverlay()
+    }
+    public func displayOverlay(of: NSView,
+                               messageInterface: AutofillMessagingToChild,
+                               serializedInputContext: String,
+                               click: NSPoint,
+                               inputPosition: CGRect) {
+        contentOverlayPopover.displayOverlay(of: of,
+                                             messageInterface: messageInterface,
+                                             serializedInputContext: serializedInputContext,
+                                             click: click,
+                                             inputPosition: inputPosition)
+    }
 }
 
 extension BrowserTabViewController: TabDelegate {
@@ -934,6 +978,32 @@ extension BrowserTabViewController: OnboardingDelegate {
 
     func onboardingHasFinished() {
         (view.window?.windowController as? MainWindowController)?.userInteraction(prevented: false)
+    }
+
+}
+
+extension BrowserTabViewController {
+
+    func addMouseMonitors() {
+        guard mouseDownMonitor == nil else { return }
+
+        self.mouseDownMonitor = NSEvent.addLocalMonitorForEvents(matching: .leftMouseDown) { [weak self] event in
+            self?.mouseDown(with: event)
+        }
+    }
+
+    func removeMouseMonitors() {
+        if let monitor = mouseDownMonitor {
+            NSEvent.removeMonitor(monitor)
+        }
+        self.mouseDownMonitor = nil
+    }
+
+    func mouseDown(with event: NSEvent) -> NSEvent? {
+        self.clickPoint = event.locationInWindow
+        guard event.window === self.view.window, let clickPoint = self.clickPoint else { return event }
+        tabViewModel?.tab.clickTriggered(clickPoint: clickPoint)
+        return event
     }
 
 }

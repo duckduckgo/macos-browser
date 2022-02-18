@@ -23,7 +23,7 @@ import Combine
 import BrowserServicesKit
 import TrackerRadarKit
 
-protocol TabDelegate: FileDownloadManagerDelegate {
+protocol TabDelegate: FileDownloadManagerDelegate, OverlayProtocol {
     func tabWillStartNavigation(_ tab: Tab, isUserInitiated: Bool)
     func tabDidStartNavigation(_ tab: Tab)
     func tab(_ tab: Tab, requestedNewTabWith content: Tab.TabContent, selected: Bool)
@@ -560,6 +560,7 @@ extension Tab: UserContentControllerDelegate {
         userScripts.surrogatesScript.delegate = self
         userScripts.contentBlockerRulesScript.delegate = self
         userScripts.clickToLoadScript.delegate = self
+        userScripts.autofillScript.topView = self.delegate
         userScripts.autofillScript.emailDelegate = emailManager
         userScripts.autofillScript.vaultDelegate = vaultManager
         userScripts.pageObserverScript.delegate = self
@@ -570,6 +571,13 @@ extension Tab: UserContentControllerDelegate {
         attachFindInPage()
     }
 
+}
+
+extension Tab: ChildAutofillUserScriptDelegate {
+    func clickTriggered(clickPoint: NSPoint) {
+        userScripts.autofillScript.clickPoint = clickPoint
+        userScripts.autofillScript.topView = self.delegate
+    }
 }
 
 extension Tab: PrintingUserScriptDelegate {
