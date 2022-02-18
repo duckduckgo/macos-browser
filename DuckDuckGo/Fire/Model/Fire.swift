@@ -28,6 +28,7 @@ final class Fire {
     let downloadListCoordinator: DownloadListCoordinator
     let windowControllerManager: WindowControllersManager
     let faviconManagement: FaviconManagement
+    let autoconsentManagement: AutoconsentManagement?
 
     @Published private(set) var isBurning = false
 
@@ -36,13 +37,20 @@ final class Fire {
          permissionManager: PermissionManagerProtocol = PermissionManager.shared,
          downloadListCoordinator: DownloadListCoordinator = DownloadListCoordinator.shared,
          windowControllerManager: WindowControllersManager = WindowControllersManager.shared,
-         faviconManagement: FaviconManagement = FaviconManager.shared) {
+         faviconManagement: FaviconManagement = FaviconManager.shared,
+         autoconsentManagement: AutoconsentManagement? = nil) {
         self.webCacheManager = cacheManager
         self.historyCoordinating = historyCoordinating
         self.permissionManager = permissionManager
         self.downloadListCoordinator = downloadListCoordinator
         self.windowControllerManager = windowControllerManager
         self.faviconManagement = faviconManagement
+        
+        if #available(macOS 11, *), autoconsentManagement == nil {
+            self.autoconsentManagement = AutoconsentUserScript.background
+        } else {
+            self.autoconsentManagement = autoconsentManagement
+        }
     }
 
     func burnDomains(_ domains: Set<String>, completion: (() -> Void)? = nil) {
@@ -227,8 +235,8 @@ final class Fire {
     
     // MARK: - Autoconsent visit cache
     private func burnAutoconsentCache() {
-        if #available(macOS 11, *) {
-            AutoconsentUserScript.background.sitesNotifiedCache.removeAll()
+        if #available(macOS 11, *), self.autoconsentManagement != nil {
+            self.autoconsentManagement!.clearCache()
         }
     }
 

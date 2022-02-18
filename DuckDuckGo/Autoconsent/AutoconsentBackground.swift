@@ -20,10 +20,15 @@ import WebKit
 import os
 import BrowserServicesKit
 
+protocol AutoconsentManagement {
+    func clearCache()
+}
+
 /// Central controller of autoconsent rules. Used by AutoconsentUserScript to query autoconsent rules
 /// and coordinate their execution on tabs.
 @available(macOS 11, *)
-final class AutoconsentBackground: NSObject, WKScriptMessageHandlerWithReply {
+final class AutoconsentBackground: NSObject, WKScriptMessageHandlerWithReply, AutoconsentManagement {
+    
     let tabMessageName = "browserTabsMessage"
     let actionCallbackName = "actionResponse"
     let readyMessageName = "ready"
@@ -237,6 +242,10 @@ try {
             return
         }
         background.evaluateJavaScript("window.autoconsent.disableCMPs(\(cmpList));")
+    }
+    
+    func clearCache() {
+        sitesNotifiedCache.removeAll()
     }
     
     final class TabFrameTracker {
