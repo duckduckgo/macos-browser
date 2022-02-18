@@ -92,7 +92,7 @@ final class PasswordManagementViewController: NSViewController {
                 .cursor: NSCursor.arrow,
                 .paragraphStyle: paragraphStyle,
                 .font: NSFont.systemFont(ofSize: 13, weight: .regular),
-                .foregroundColor: NSColor.secondaryLabelColor
+                .foregroundColor: NSColor(named: "BlackWhite60")!
             ], range: NSRange(location: 0, length: string.length))
             
             lockScreenOpenInPreferencesTextView.textStorage?.setAttributedString(string)
