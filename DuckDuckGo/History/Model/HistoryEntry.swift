@@ -35,7 +35,6 @@ struct HistoryEntry {
     }
 
     mutating func addDetectedTracker(tracker: DetectedTracker) {
-        print("***", #function, tracker.blocked, numberOfTrackersBlocked)
         if tracker.blocked {
             numberOfTrackersBlocked += 1
         }
