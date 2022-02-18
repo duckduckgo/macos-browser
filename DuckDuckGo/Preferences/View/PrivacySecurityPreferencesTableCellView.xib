@@ -11,11 +11,11 @@
         <customObject id="-1" userLabel="First Responder" customClass="FirstResponder"/>
         <customObject id="-3" userLabel="Application" customClass="NSObject"/>
         <tableCellView id="ZOv-mQ-BdW" customClass="PrivacySecurityPreferencesTableCellView" customModule="DuckDuckGo_Privacy_Browser" customModuleProvider="target">
-            <rect key="frame" x="0.0" y="0.0" width="480" height="395"/>
+            <rect key="frame" x="0.0" y="0.0" width="480" height="385"/>
             <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
             <subviews>
                 <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="UTK-kg-11g">
-                    <rect key="frame" x="-2" y="342" width="158" height="21"/>
+                    <rect key="frame" x="-2" y="332" width="158" height="21"/>
                     <textFieldCell key="cell" lineBreakMode="clipping" title="Privacy &amp; Security" id="gee-cf-Edf">
                         <font key="font" metaFont="systemSemibold" size="18"/>
                         <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
@@ -23,7 +23,7 @@
                     </textFieldCell>
                 </textField>
                 <button verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="Fd2-fn-gaX">
-                    <rect key="frame" x="-2" y="274" width="278" height="18"/>
+                    <rect key="frame" x="-2" y="264" width="278" height="18"/>
                     <buttonCell key="cell" type="check" title="Ask to Fireproof websites when signing in" bezelStyle="regularSquare" imagePosition="left" state="on" inset="2" id="ek6-wk-QQo">
                         <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
                         <font key="font" metaFont="system"/>
@@ -33,7 +33,7 @@
                     </connections>
                 </button>
                 <button verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="3Oj-RS-EIB">
-                    <rect key="frame" x="-7" y="176" width="185" height="32"/>
+                    <rect key="frame" x="-7" y="166" width="185" height="32"/>
                     <buttonCell key="cell" type="push" title="Manage Fireproof Sites…" bezelStyle="rounded" alignment="center" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="0HE-gw-PLQ">
                         <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
                         <font key="font" metaFont="system"/>
@@ -43,7 +43,7 @@
                     </connections>
                 </button>
                 <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="4U5-6s-Y6q">
-                    <rect key="frame" x="-2" y="303" width="113" height="19"/>
+                    <rect key="frame" x="-2" y="293" width="113" height="19"/>
                     <textFieldCell key="cell" lineBreakMode="clipping" title="Fireproof Sites" id="UhZ-7t-gWn">
                         <font key="font" metaFont="systemMedium" size="16"/>
                         <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
@@ -51,7 +51,7 @@
                     </textFieldCell>
                 </textField>
                 <textField verticalHuggingPriority="750" horizontalCompressionResistancePriority="250" translatesAutoresizingMaskIntoConstraints="NO" id="1Hn-nJ-bFt">
-                    <rect key="frame" x="-2" y="215" width="467" height="48"/>
+                    <rect key="frame" x="-2" y="205" width="467" height="48"/>
                     <textFieldCell key="cell" selectable="YES" id="VcP-EL-hod">
                         <font key="font" metaFont="system"/>
                         <string key="title">Websites rely on cookies to keep you signed in. When you Fireproof a site, cookies won’t be erased and you'll stay signed in, even after using the Fire Button. We still block third-party trackers found on Fireproof websites.</string>
@@ -60,7 +60,7 @@
                     </textFieldCell>
                 </textField>
                 <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="14N-V1-min">
-                    <rect key="frame" x="-2" y="124" width="219" height="19"/>
+                    <rect key="frame" x="-2" y="114" width="219" height="19"/>
                     <textFieldCell key="cell" lineBreakMode="clipping" title="Global Privacy Control (GPC)" id="TIG-QJ-483">
                         <font key="font" metaFont="systemMedium" size="16"/>
                         <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
@@ -68,7 +68,7 @@
                     </textFieldCell>
                 </textField>
                 <button verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="CBG-hn-odn">
-                    <rect key="frame" x="-2" y="95" width="205" height="18"/>
+                    <rect key="frame" x="-2" y="85" width="205" height="18"/>
                     <buttonCell key="cell" type="check" title="Enable Global Privacy Control" bezelStyle="regularSquare" imagePosition="left" state="on" inset="2" id="ikS-HK-oiZ">
                         <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
                         <font key="font" metaFont="system"/>
@@ -78,17 +78,17 @@
                     </connections>
                 </button>
                 <scrollView borderType="none" horizontalLineScroll="10" horizontalPageScroll="10" verticalLineScroll="10" verticalPageScroll="10" hasHorizontalScroller="NO" hasVerticalScroller="NO" translatesAutoresizingMaskIntoConstraints="NO" id="tkg-2B-nUj" customClass="ToggleableScrollView" customModule="DuckDuckGo_Privacy_Browser" customModuleProvider="target">
-                    <rect key="frame" x="-5" y="16" width="468" height="70"/>
+                    <rect key="frame" x="-5" y="16" width="468" height="60"/>
                     <clipView key="contentView" drawsBackground="NO" id="KPO-Y2-B7T">
-                        <rect key="frame" x="0.0" y="0.0" width="468" height="70"/>
+                        <rect key="frame" x="0.0" y="0.0" width="468" height="60"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <subviews>
                             <textView editable="NO" importsGraphics="NO" richText="NO" verticallyResizable="NO" spellingCorrection="YES" smartInsertDelete="YES" id="s6V-Yz-UIH">
-                                <rect key="frame" x="0.0" y="0.0" width="468" height="70"/>
+                                <rect key="frame" x="0.0" y="0.0" width="468" height="60"/>
                                 <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                 <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
                                 <color key="backgroundColor" name="ClearColor"/>
-                                <size key="minSize" width="468" height="70"/>
+                                <size key="minSize" width="468" height="60"/>
                                 <size key="maxSize" width="468" height="10000000"/>
                                 <attributedString key="textStorage">
                                     <fragment>
@@ -109,8 +109,9 @@
                         <color key="backgroundColor" name="ClearColor"/>
                     </clipView>
                     <constraints>
-                        <constraint firstAttribute="height" relation="greaterThanOrEqual" constant="60" id="QEb-Jg-v8U"/>
+                        <constraint firstAttribute="height" constant="60" id="QEb-Jg-v8U"/>
                     </constraints>
+                    <edgeInsets key="contentInsets" left="0.0" right="0.0" top="0.0" bottom="0.0"/>
                     <scroller key="horizontalScroller" hidden="YES" wantsLayer="YES" verticalHuggingPriority="750" horizontal="YES" id="3cd-Cl-dGw">
                         <rect key="frame" x="-100" y="-100" width="225" height="15"/>
                         <autoresizingMask key="autoresizingMask"/>
