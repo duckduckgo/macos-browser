@@ -346,17 +346,6 @@ final class BrowserTabViewController: NSViewController {
 }
 
 extension BrowserTabViewController: OverlayProtocol {
-    private func getContentOverlayPopover(_ response: AutofillMessaging) -> ContentOverlayPopover? {
-        guard let webView = webView else {
-            return nil
-        }
-        contentOverlayPopover.viewController?.messageInterfaceBack = response
-        // Private API to hide the popover arrow
-        //contentOverlayPopover.setValue(true, forKeyPath: "shouldHideAnchor")
-        contentOverlayPopover.zoomFactor = webView.magnification
-        // contentOverlayPopover.webView = webView
-        return contentOverlayPopover
-    }
     public func setMessageInterfaceBack(_ response: AutofillMessaging) {
         contentOverlayPopover.viewController?.messageInterfaceBack = response
     }

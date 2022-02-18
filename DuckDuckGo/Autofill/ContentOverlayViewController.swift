@@ -56,24 +56,15 @@ public final class ContentOverlayViewController: NSViewController, EmailManagerR
         }
         topAutofillUserScript.inputType = inputType
     }
-    public override func mouseEntered(with event: NSEvent) {
-        print("entered")
-        //selectRow(at: event.locationInWindow)
-    }
     
     public override func mouseMoved(with event: NSEvent) {
         let outY = webView.frame.height - event.locationInWindow.y
         // TODOJKT covert coordinate properly
         messageMouseMove(x: event.locationInWindow.x, y: outY)
     }
-
-    public override func mouseExited(with event: NSEvent) {
-        print("exited")
-    }
     
     private func addTrackingArea() {
         let trackingOptions: NSTrackingArea.Options = [ .activeInActiveApp,
-                                                        .mouseEnteredAndExited,
                                                         .enabledDuringMouseDrag,
                                                         .mouseMoved,
                                                         .inVisibleRect ]
@@ -175,26 +166,18 @@ public final class ContentOverlayViewController: NSViewController, EmailManagerR
     // swiftlint:enable function_parameter_count
     
 }
-/*
-extension ContentOverlayViewController: NSPopoverDelegate {
-    public func popoverShouldDetach(_ popover: NSPopover) -> Bool {
-        return true
-    }
-    public func detachableWindow(for popover: NSPopover) -> NSWindow? {
-        nil
-    }
-    public func popoverWillShow(_ notification: Notification) {
-        print("JKTODO ... ")
-    }
-}*/
 
 extension ContentOverlayViewController: TopAutofillUserScriptDelegate {
     public func setSize(height: CGFloat, width: CGFloat) {
         var widthOut = width
+        // TODO make constants
         if (widthOut < 315) {
             widthOut = 315
         }
         var heightOut = height
+        if (heightOut < 56) {
+            heightOut = 56
+        }
         self.preferredContentSize = CGSize(width: widthOut, height: heightOut)
     }
 }

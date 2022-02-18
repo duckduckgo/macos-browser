@@ -84,32 +84,6 @@ public final class ContentOverlayPopover {
         viewController?.view.window?.ignoresMouseEvents = false
         windowController?.window?.acceptsMouseMovedEvents = true
         windowController?.window?.ignoresMouseEvents = false
-        print("TODOJKT viewController view: \(viewController?.view.window?.ignoresMouseEvents) \(windowController?.window?.ignoresMouseEvents)")
-        print("TODOJKT viewController view: \(viewController?.view.window?.acceptsMouseMovedEvents) \(windowController?.window?.acceptsMouseMovedEvents)")
-        //windowController?.view.window?.backgroundColor = .clear
-
-        /*
-        let visualEffect = NSVisualEffectView()
-        visualEffect.translatesAutoresizingMaskIntoConstraints = false
-        //visualEffect.material = .dark
-        visualEffect.appearance = NSAppearance(named: NSAppearance.Name.vibrantLight)
-        visualEffect.state = .active
-        visualEffect.wantsLayer = true
-        visualEffect.layer?.cornerRadius = 16.0
-        panel.contentView = visualEffect
-        visualEffect.addSubview(viewController.view)
-        viewController.view.autoresizingMask = [.width, .height]
-        
-        
-        guard let constraints = panel.contentView else {
-          return
-        }
-
-        visualEffect.leadingAnchor.constraint(equalTo: constraints.leadingAnchor).isActive = true
-        visualEffect.trailingAnchor.constraint(equalTo: constraints.trailingAnchor).isActive = true
-        visualEffect.topAnchor.constraint(equalTo: constraints.topAnchor).isActive = true
-        visualEffect.bottomAnchor.constraint(equalTo: constraints.bottomAnchor).isActive = true
-         */
     }
 
     public required init?(coder: NSCoder) {
@@ -117,17 +91,14 @@ public final class ContentOverlayPopover {
     }
     
     public func close() {
-        guard /*let window = window,*/ let suggestionWindow = windowController?.window else {
+        guard let windowController = windowController?.window else {
             return
         }
-        // panel.close()
-        if !suggestionWindow.isVisible { return }
-
-        //window.removeChildWindow(suggestionWindow)
-        suggestionWindow.parent?.removeChildWindow(suggestionWindow)
-        suggestionWindow.orderOut(nil)
-
-        print("TODOJKT implement close")
+        if !windowController.isVisible { return }
+        // Reset window size on close to reduce flicker
+        viewController?.setSize(height: 0, width: 0)
+        windowController.parent?.removeChildWindow(windowController)
+        windowController.orderOut(nil)
     }
     
     public func display(rect: NSRect, of: NSView, width: CGFloat, inputType: String, messageInterface: AutofillMessaging) {
@@ -137,30 +108,8 @@ public final class ContentOverlayPopover {
         if let window = windowController?.window {
             of.window!.addChildWindow(window, ordered: .above)
             let outRect = of.window!.convertToScreen(rect)
-            // window.setFrame(NSRect(x: 0, y: 0, width: width, height: 400), display: true)
             window.setFrameTopLeftPoint(NSPoint(x: outRect.minX, y: outRect.minY))
         }
-        // Ensure existing one is closed
-        //self.close()
-        /*
-        var frame: NSRect = CGRect(x: 0, y: 0, width: 400, height: 40)
-        frame.size = NSSize(width: 400, height: 60)
-        self.setFrame(frame, display: true)
-        
-        setFrameTopLeftPoint(NSPoint(x: rect.minX, y: rect.minY))
-        
-        viewController.setType(inputType: inputType, zoomFactor: zoomFactor)*/
-        /*
-        guard let insetBy = self.value(forKeyPath: "anchorSize")! as? CGSize else {
-            return
-        }*/
-        //self.delegate = viewController
-
-        // Inset the rectangle by the anchor size as setting the anchorSize to 0 seems impossible
-        // Inset removal causes positioning issues for small / iframes
-        // self.show(relativeTo: rect/*.insetBy(dx: insetBy.width, dy: insetBy.height)*/, of: of, preferredEdge: .minY)
-        // TODOJKT constant 56
-        // self.contentSize = NSSize.init(width: width, height: 56)
     }
 
 }
