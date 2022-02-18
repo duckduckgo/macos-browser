@@ -20,45 +20,6 @@ import WebKit
 import os
 import BrowserServicesKit
 
-final class TabFrameTracker {
-    weak var webview: WKWebView?
-    var frames = [Int: WKFrameInfo]()
-}
-
-struct BrowserTabMessage: Codable {
-    var messageId: Int
-    var tabId: Int
-    var frameId: Int
-    var message: ContentScriptMessage
-}
-
-struct ContentScriptMessage: Codable {
-    var type: String
-    var script: String?
-    var selectors: [String]?
-}
-
-struct ActionResponse: Codable {
-    var messageId: Int
-    var ruleName: String?
-    var result: Bool
-    var error: String?
-}
-
-enum BackgroundError: Error {
-    case invalidResponse
-    case actionError
-}
-
-enum Action {
-    case detectCMP
-    case detectPopup
-    case doOptOut
-    case selfTest
-    case prehide
-    case unhide
-}
-
 /// Central controller of autoconsent rules. Used by AutoconsentUserScript to query autoconsent rules
 /// and coordinate their execution on tabs.
 @available(macOS 11, *)
@@ -74,7 +35,7 @@ final class AutoconsentBackground: NSObject, WKScriptMessageHandlerWithReply {
     }()
 
     var tabs = [Int: TabFrameTracker]()
-    var messageCtr = 1
+    var messageCounter = 1
     var actionCallbacks = [Int: (Result<ActionResponse, Error>) -> Void]()
     private var ready = false
     private var readyCallbacks: [() async -> Void] = []
@@ -118,8 +79,8 @@ final class AutoconsentBackground: NSObject, WKScriptMessageHandlerWithReply {
     /// The result of the action is provided in an async callback.
     func callAction(in tabId: Int, action: Action, resultCallback: @escaping (Result<ActionResponse, Error>) -> Void) {
         // create a unique message ID so we can retrieve the callback when a response comes from the background page
-        let callbackId = messageCtr
-        messageCtr += 1
+        let callbackId = messageCounter
+        messageCounter += 1
         self.actionCallbacks[callbackId] = resultCallback
         background.evaluateJavaScript("window.callAction(\(callbackId), \(tabId), '\(action)')", in: nil, in: .page, completionHandler: { (result) in
             switch result {
@@ -218,7 +179,7 @@ final class AutoconsentBackground: NSObject, WKScriptMessageHandlerWithReply {
             }
             actionCallbacks[response.messageId] = nil
             if response.error != nil {
-                print("Error running action: \(response.error ?? "")")
+                os_log("Action error: %s", log: .autoconsent, type: .error, String(describing: response.error))
                 callback(.failure(BackgroundError.actionError))
             } else {
                 callback(.success(response))
@@ -276,6 +237,45 @@ try {
             return
         }
         background.evaluateJavaScript("window.autoconsent.disableCMPs(\(cmpList));")
+    }
+    
+    final class TabFrameTracker {
+        weak var webview: WKWebView?
+        var frames = [Int: WKFrameInfo]()
+    }
+
+    struct BrowserTabMessage: Codable {
+        var messageId: Int
+        var tabId: Int
+        var frameId: Int
+        var message: ContentScriptMessage
+    }
+
+    struct ContentScriptMessage: Codable {
+        var type: String
+        var script: String?
+        var selectors: [String]?
+    }
+
+    struct ActionResponse: Codable {
+        var messageId: Int
+        var ruleName: String?
+        var result: Bool
+        var error: String?
+    }
+
+    enum BackgroundError: Error {
+        case invalidResponse
+        case actionError
+    }
+
+    enum Action {
+        case detectCMP
+        case detectPopup
+        case doOptOut
+        case selfTest
+        case prehide
+        case unhide
     }
 
 }
