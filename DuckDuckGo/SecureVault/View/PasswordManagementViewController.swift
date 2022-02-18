@@ -54,7 +54,7 @@ final class PasswordManagementViewController: NSViewController {
     @IBOutlet var emptyStateMessage: NSTextField!
     @IBOutlet var emptyStateButton: NSButton!
 
-    var displayedItemsCancellable: AnyCancellable?
+    var emptyStateCancellable: AnyCancellable?
     var editingCancellable: AnyCancellable?
 
     var domain: String?
@@ -62,14 +62,19 @@ final class PasswordManagementViewController: NSViewController {
 
     var listModel: PasswordManagementItemListModel? {
         didSet {
-            displayedItemsCancellable?.cancel()
-            displayedItemsCancellable = nil
+            emptyStateCancellable?.cancel()
+            emptyStateCancellable = nil
 
-            displayedItemsCancellable = listModel?.$displayedItems.dropFirst().sink(receiveValue: { [weak self] items in
-                if items.isEmpty {
-                    self?.showEmptyState()
-                } else {
-                    self?.emptyState.isHidden = true
+            emptyStateCancellable = listModel?.$emptyState.dropFirst().sink(receiveValue: { [weak self] emptyState in
+                guard let self = self else {
+                    return
+                }
+
+                switch emptyState {
+                case .none:
+                    self.emptyState.isHidden = true
+                default:
+                    self.showEmptyState()
                 }
             })
         }
@@ -123,16 +128,11 @@ final class PasswordManagementViewController: NSViewController {
         }
         
         switch category {
-        case .allItems:
-            showDefaultEmptyState()
-        case .logins:
-            showEmptyState(imageName: "LoginsEmpty", title: UserText.pmEmptyStateLoginsTitle)
-        case .identities:
-            showEmptyState(imageName: "IdentitiesEmpty", title: UserText.pmEmptyStateIdentitiesTitle)
-        case .cards:
-            showEmptyState(imageName: "CreditCardsEmpty", title: UserText.pmEmptyStateCardsTitle)
-        case .notes:
-            showEmptyState(imageName: "NotesEmpty", title: UserText.pmEmptyStateNotesTitle)
+        case .allItems: showDefaultEmptyState()
+        case .logins: showEmptyState(imageName: "LoginsEmpty", title: UserText.pmEmptyStateLoginsTitle)
+        case .identities: showEmptyState(imageName: "IdentitiesEmpty", title: UserText.pmEmptyStateIdentitiesTitle)
+        case .cards: showEmptyState(imageName: "CreditCardsEmpty", title: UserText.pmEmptyStateCardsTitle)
+        case .notes: showEmptyState(imageName: "NotesEmpty", title: UserText.pmEmptyStateNotesTitle)
         }
     }
 

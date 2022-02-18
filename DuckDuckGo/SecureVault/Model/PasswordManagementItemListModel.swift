@@ -198,6 +198,18 @@ enum SecureVaultItem: Equatable, Identifiable, Comparable {
 ///
 /// Could maybe even abstract a bunch of this code to be more generic re-usable styled list for use elsewhere.
 final class PasswordManagementItemListModel: ObservableObject {
+    
+    enum EmptyState {
+        /// Displays nothing for the empty state. Used when data is still loading, or when filtering the All Items list.
+        case none
+        
+        /// Displays an empty state which prompts the user to import data. Used when the user has no items of any type.
+        case noData
+        case logins
+        case identities
+        case notes
+        case creditCards
+    }
 
     static let personNameComponentsFormatter: PersonNameComponentsFormatter = {
         let nameFormatter = PersonNameComponentsFormatter()
@@ -220,6 +232,7 @@ final class PasswordManagementItemListModel: ObservableObject {
     private var items = [SecureVaultItem]() {
         didSet {
             updateFilteredData()
+            calculateEmptyState()
         }
     }
 
@@ -230,8 +243,14 @@ final class PasswordManagementItemListModel: ObservableObject {
         }
     }
 
-    @Published private(set) var displayedItems = [PasswordManagementListSection]()
+    @Published private(set) var displayedItems = [PasswordManagementListSection]() {
+        didSet {
+            calculateEmptyState()
+        }
+    }
+
     @Published private(set) var selected: SecureVaultItem?
+    @Published private(set) var emptyState: EmptyState = .none
 
     private var onItemSelected: (_ old: SecureVaultItem?, _ new: SecureVaultItem?) -> Void
 
@@ -357,6 +376,26 @@ final class PasswordManagementItemListModel: ObservableObject {
         if !notes.isEmpty { sections.append(PasswordManagementListSection(title: "Notes", items: notes)) }
 
         return sections
+    }
+    
+    private func calculateEmptyState() {
+        guard !items.isEmpty else {
+            emptyState = .noData
+            return
+        }
+        
+        guard displayedItems.isEmpty else {
+            emptyState = .none
+            return
+        }
+        
+        switch sortDescriptor.category {
+        case .allItems: emptyState = .none
+        case .cards: emptyState = .creditCards
+        case .logins: emptyState = .logins
+        case .identities: emptyState = .identities
+        case .notes: emptyState = .notes
+        }
     }
 
 }
