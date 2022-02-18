@@ -37,12 +37,14 @@ struct Favorites: View {
                 .font(.system(size: 10))
         }
 
-        VStack(alignment: .leading, spacing: 12) {
+        VStack(alignment: .leading, spacing: 0) {
 
             ForEach(expanded ? model.rows.indices : model.rows.indices.prefix(Homepage.favoritesRowCountWhenCollapsed), id: \.self) { index in
                 HStack(alignment: .top, spacing: 29) {
                     ForEach(model.rows[index], id: \.id) { favorite in
-                        if let bookmark = favorite.bookmark {
+                        if !expanded && index + 1 == Homepage.favoritesRowCountWhenCollapsed && favorite.id == model.rows[index].last?.id {
+                            addButton
+                        } else if let bookmark = favorite.bookmark {
                             Favorite(bookmark: bookmark)
                         } else if favorite.id == Homepage.Models.FavoriteModel.addButtonUUID {
                             addButton
@@ -53,6 +55,7 @@ struct Favorites: View {
 
                     Spacer()
                 }
+                .frame(height: 112)
             }
 
             MoreOrLess(moreIsUp: true, expanded: $expanded)
@@ -109,11 +112,11 @@ struct Favorite: View {
         }) {
             model.open(bookmark)
         }.contextMenu(ContextMenu(menuItems: {
-            Button("Open in New Tab", action: { model.openInNewTab(bookmark) })
-            Button("Open in New Window", action: { model.openInNewWindow(bookmark) })
+            Button(UserText.openInNewTab, action: { model.openInNewTab(bookmark) })
+            Button(UserText.openInNewWindow, action: { model.openInNewWindow(bookmark) })
             Divider()
-            Button("Edit", action: { model.edit(bookmark) })
-            Button("Remove", action: { model.remove(bookmark) })
+            Button(UserText.edit, action: { model.edit(bookmark) })
+            Button(UserText.remove, action: { model.remove(bookmark) })
         }))
 
     }

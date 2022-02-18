@@ -35,7 +35,7 @@ struct MoreOrLess: View {
     var body: some View {
 
         HStack {
-            Text(expanded ? "Less" : "More")
+            Text(expanded ? UserText.moreOrLessCollapse : UserText.moreOrLessExpand)
             Group {
                 if #available(macOS 11.0, *) {
                     Image(systemName: "chevron.up")

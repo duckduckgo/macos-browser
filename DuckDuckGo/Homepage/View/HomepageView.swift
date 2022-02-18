@@ -36,6 +36,7 @@ struct RootView: View {
                                 .frame(maxWidth: 512)
                                 .padding(.top, max(48, geometry.size.height * 0.29))
 
+                            Spacer()
                         }
                         .frame(maxWidth: .infinity)
                     }
