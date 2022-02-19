@@ -167,6 +167,8 @@ final class PasswordManagementViewController: NSViewController {
         lockScreen.isHidden = false
         searchField.isEnabled = false
         addVaultItemButton.isEnabled = false
+        
+        view.window?.makeFirstResponder(nil)
     }
     
     private func hideLockScreen() {
