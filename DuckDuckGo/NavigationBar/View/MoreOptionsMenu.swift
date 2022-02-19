@@ -192,33 +192,7 @@ final class MoreOptionsMenu: NSMenu {
             .withImage(NSImage(named: "Downloads"))
             .firingPixel(Pixel.Event.MoreResult.downloads)
 
-        let loginsSubMenu = LoginsSubMenu()
-        
-        loginsSubMenu.addItem(withTitle: UserText.passwordManagementAllItems, action: #selector(openLoginsWithAllItems), keyEquivalent: "")
-            .targetting(self)
-            .firingPixel(Pixel.Event.MoreResult.loginsMenuAllItems)
-        
-        loginsSubMenu.addItem(NSMenuItem.separator())
-        
-        loginsSubMenu.addItem(withTitle: UserText.passwordManagementLogins, action: #selector(openLoginsWithLogins), keyEquivalent: "")
-            .targetting(self)
-            .withImage(NSImage(named: "LoginGlyph"))
-            .firingPixel(Pixel.Event.MoreResult.loginsMenuLogins)
-        
-        loginsSubMenu.addItem(withTitle: UserText.passwordManagementIdentities, action: #selector(openLoginsWithIdentities), keyEquivalent: "")
-            .targetting(self)
-            .withImage(NSImage(named: "IdentityGlyph"))
-            .firingPixel(Pixel.Event.MoreResult.loginsMenuIdentities)
-        
-        loginsSubMenu.addItem(withTitle: UserText.passwordManagementCreditCards, action: #selector(openLoginsWithCreditCards), keyEquivalent: "")
-            .targetting(self)
-            .withImage(NSImage(named: "CreditCardGlyph"))
-            .firingPixel(Pixel.Event.MoreResult.loginsMenuCreditCards)
-        
-        loginsSubMenu.addItem(withTitle: UserText.passwordManagementNotes, action: #selector(openLoginsWithNotes), keyEquivalent: "")
-            .targetting(self)
-            .withImage(NSImage(named: "NoteGlyph"))
-            .firingPixel(Pixel.Event.MoreResult.loginsMenuNotes)
+        let loginsSubMenu = LoginsSubMenu(targetting: self)
         
         addItem(withTitle: UserText.passwordManagement, action: nil, keyEquivalent: "")
             .withImage(NSImage(named: "PasswordManagement"))
@@ -378,12 +352,41 @@ final class ZoomSubMenu: NSMenu {
 
 final class LoginsSubMenu: NSMenu {
     
-    init() {
+    init(targetting target: AnyObject) {
         super.init(title: UserText.passwordManagement)
+        updateMenuItems(with: target)
     }
 
     required init(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
+    }
+    
+    private func updateMenuItems(with target: AnyObject) {
+        addItem(withTitle: UserText.passwordManagementAllItems, action: #selector(MoreOptionsMenu.openLoginsWithAllItems), keyEquivalent: "")
+            .targetting(target)
+            .firingPixel(Pixel.Event.MoreResult.loginsMenuAllItems)
+        
+        addItem(NSMenuItem.separator())
+        
+        addItem(withTitle: UserText.passwordManagementLogins, action: #selector(MoreOptionsMenu.openLoginsWithLogins), keyEquivalent: "")
+            .targetting(target)
+            .withImage(NSImage(named: "LoginGlyph"))
+            .firingPixel(Pixel.Event.MoreResult.loginsMenuLogins)
+        
+        addItem(withTitle: UserText.passwordManagementIdentities, action: #selector(MoreOptionsMenu.openLoginsWithIdentities), keyEquivalent: "")
+            .targetting(target)
+            .withImage(NSImage(named: "IdentityGlyph"))
+            .firingPixel(Pixel.Event.MoreResult.loginsMenuIdentities)
+        
+        addItem(withTitle: UserText.passwordManagementCreditCards, action: #selector(MoreOptionsMenu.openLoginsWithCreditCards), keyEquivalent: "")
+            .targetting(target)
+            .withImage(NSImage(named: "CreditCardGlyph"))
+            .firingPixel(Pixel.Event.MoreResult.loginsMenuCreditCards)
+        
+        addItem(withTitle: UserText.passwordManagementNotes, action: #selector(MoreOptionsMenu.openLoginsWithNotes), keyEquivalent: "")
+            .targetting(target)
+            .withImage(NSImage(named: "NoteGlyph"))
+            .firingPixel(Pixel.Event.MoreResult.loginsMenuNotes)
     }
     
 }

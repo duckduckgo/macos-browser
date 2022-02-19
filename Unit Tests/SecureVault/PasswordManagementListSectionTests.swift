@@ -56,8 +56,8 @@ final class PasswordManagementListSectionTests: XCTestCase {
         XCTAssertEqual(sections.count, 5)
         XCTAssertEqual(sections.map(\.title), ["Z", "Y", "C", "B", "A"])
         
-        XCTAssertEqual(sections.first!.items.map(\.title), ["Zulu", "Zulu Two"])
-        XCTAssertEqual(sections.last!.items.map(\.title), ["Alfa", "Alfa Two"])
+        XCTAssertEqual(sections.first!.items.map(\.title), ["Zulu Two", "Zulu"])
+        XCTAssertEqual(sections.last!.items.map(\.title), ["Alfa Two", "Alfa"])
     }
     
     func testWhenSortingItemsByTitle_AndTitlesUseDigits_ThenOctothorpeTitleIsUsed() {
