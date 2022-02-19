@@ -77,9 +77,9 @@ struct JSONCrashReport: CrashReport {
         }
         
         for itemToFilter in Self.headerItemsToFilter {
-            let patternToReplace = "\"\(itemToFilter)\"\\s*:\\s*\".*\""
+            let patternToReplace = "\"\(itemToFilter)\"\\s*:\\s*\"[^\"]*\""
             let redactedKeyValuePair = "\"\(itemToFilter)\":\"<removed>\""
-            
+
             fileContents = fileContents.replacingOccurrences(of: patternToReplace,
                                                              with: redactedKeyValuePair,
                                                              options: .regularExpression)
