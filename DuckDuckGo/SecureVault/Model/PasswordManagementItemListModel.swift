@@ -156,17 +156,21 @@ enum SecureVaultItem: Equatable, Identifiable, Comparable {
         }
     }
     
+    var category: SecureVaultSorting.Category {
+        switch self {
+        case .account: return .logins
+        case .card: return .cards
+        case .identity: return .identities
+        case .note: return .notes
+        }
+    }
+    
     func matches(category: SecureVaultSorting.Category) -> Bool {
         if category == .allItems {
             return true
         }
-
-        switch self {
-        case .account: return category == .logins
-        case .card: return category == .cards
-        case .identity: return category == .identities
-        case .note: return category == .notes
-        }
+        
+        return self.category == category
     }
 
     static func == (lhs: SecureVaultItem, rhs: SecureVaultItem) -> Bool {
@@ -263,8 +267,14 @@ final class PasswordManagementItemListModel: ObservableObject {
     }
 
     func selected(item: SecureVaultItem?, notify: Bool = true) {
+        // If selecting an item that does not exist in the current category, then swap to that category first.
+        if let item = item, sortDescriptor.category != .allItems, item.category != sortDescriptor.category {
+            sortDescriptor.category = item.category
+        }
+        
         let previous = selected
         selected = item
+        
         if notify {
             onItemSelected(previous, item)
         }
