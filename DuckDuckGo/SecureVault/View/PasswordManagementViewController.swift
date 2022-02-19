@@ -894,6 +894,7 @@ extension PasswordManagementViewController: NSTextViewDelegate {
     func textView(_ textView: NSTextView, clickedOnLink link: Any, at charIndex: Int) -> Bool {
         if let link = link as? URL, link == URL.preferences {
             WindowControllersManager.shared.showPreferencesTab()
+            self.dismiss()
         }
 
         return true
