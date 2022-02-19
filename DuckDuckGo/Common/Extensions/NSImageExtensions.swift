@@ -43,13 +43,14 @@ extension NSImage {
         return self
     }
     
-    // swiftlint:disable force_cast
     func tinted(with color: NSColor) -> NSImage {
-        let image = self.copy() as! NSImage
+        guard let image = self.copy() as? NSImage else {
+            return self
+        }
+
         image.lockFocus()
-
+        
         color.set()
-
         let imageRect = NSRect(origin: .zero, size: image.size)
         imageRect.fill(using: .sourceAtop)
 
@@ -57,6 +58,5 @@ extension NSImage {
 
         return image
     }
-    // swiftlint:enable force_cast
 
 }
