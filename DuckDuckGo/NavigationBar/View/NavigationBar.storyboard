@@ -306,7 +306,6 @@
                                 </subviews>
                                 <constraints>
                                     <constraint firstItem="4x6-Xn-fNv" firstAttribute="leading" secondItem="ENV-0H-Fcc" secondAttribute="leading" id="991-AR-3Be"/>
-                                    <constraint firstAttribute="height" constant="30" id="Iw7-li-uNF"/>
                                     <constraint firstAttribute="bottom" secondItem="4x6-Xn-fNv" secondAttribute="bottom" id="pcl-m3-yAC"/>
                                     <constraint firstAttribute="trailing" secondItem="4x6-Xn-fNv" secondAttribute="trailing" id="y94-AB-Flr"/>
                                 </constraints>
