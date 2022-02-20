@@ -33,7 +33,7 @@ struct Favorites: View {
             HoverButton(size: 72, backgroundColor: Color("HomeFavoritesBackgroundColor"), imageName: "Add", imageSize: 22) {
                 model.addNew()
             }
-            Text("Add Favorite")
+            Text(UserText.addFavorite)
                 .font(.system(size: 10))
         }
 

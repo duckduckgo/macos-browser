@@ -29,12 +29,14 @@ struct ProtectionSummary: View {
             Image("HomeShield")
 
             if model.numberOfTrackersBlocked > 0 {
-                Text("\(model.numberOfTrackersBlocked) Trackers Blocked across \(model.numberOfWebsites) websites since last Burn")
+                Text(UserText.homePageProtectionSummaryMessage(numberOfTrackersBlocked: model.numberOfTrackersBlocked,
+                                                               numberOfWebsites: model.numberOfWebsites))
                     .fontWeight(.semibold)
             } else {
-                Text("DuckDuckGo blocks trackers as you browse")
+                Text(UserText.homePageProtectionSummaryInfo)
                     .fontWeight(.semibold)
             }
+            
         }
         .foregroundColor(.primary.opacity(0.4))
     }

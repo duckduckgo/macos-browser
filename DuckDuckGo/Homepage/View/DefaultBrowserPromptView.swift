@@ -38,10 +38,10 @@ struct DefaultBrowserPrompt: View {
                     .resizable(resizingMode: .stretch)
                     .frame(width: 38, height: 38)
 
-                Text("Set DuckDuckGo as your default browser")
+                Text(UserText.defaultBrowserPromptMessage)
                     .font(.body)
 
-                let button = Button("Set Default...") {
+                let button = Button(UserText.defaultBrowserPromptMessage) {
                     self.model.requestSetDefault()
                 }
 

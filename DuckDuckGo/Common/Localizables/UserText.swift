@@ -399,4 +399,14 @@ struct UserText {
     static let moreOrLessCollapse = NSLocalizedString("more.or.less.collapse", value: "Less", comment: "For collapsing views to show less.")
     static let moreOrLessExpand = NSLocalizedString("more.or.less.expand", value: "More", comment: "For expanding views to show more.")
 
+    static let defaultBrowserPromptMessage = NSLocalizedString("default.browser.prompt.message", value: "Set DuckDuckGo as your default browser", comment: "")
+    static let defaultBrowserPromptButton = NSLocalizedString("default.browser.prompt.button", value: "Set Default Browser...", comment: "")
+
+    static let homePageProtectionSummaryInfo = NSLocalizedString("home.page.protection.summary.info", value: "DuckDuckGo blocks trackers as you browse", comment: "")
+    static func homePageProtectionSummaryMessage(numberOfTrackersBlocked: Int, numberOfWebsites: Int) -> String {
+        let localized = NSLocalizedString("home.page.protection.summary.info",
+                                          value: "%d Trackers Blocked across %d websites since last Burn",
+                                          comment: "")
+        return String(format: localized, numberOfTrackersBlocked, numberOfWebsites)
+    }
 }
