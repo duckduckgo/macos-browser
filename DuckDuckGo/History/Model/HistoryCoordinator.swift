@@ -276,10 +276,6 @@ final class HistoryCoordinator: HistoryCoordinating {
             }
 
             entry[keyPath: keyPath] = value
-
-            historyDictionary[url] = entry
-            self?.historyDictionary = historyDictionary
-            self?._history = self?.makeHistory(from: historyDictionary)
             self?.save(entry: entry)
         }
     }
