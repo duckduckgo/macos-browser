@@ -355,11 +355,11 @@ final class NavigationBarViewController: NSViewController {
         let width = performAnim ? addressBarProportionalWidthConstraint.animator() : addressBarProportionalWidthConstraint
         width?.constant = homepage ? -260 : 0
 
-        let image = performAnim ? daxLogo.animator() : daxLogo
-        image?.alphaValue = homepage ? 1 : 0
+//        let image = performAnim ? daxLogo.animator() : daxLogo
+//        image?.alphaValue = homepage ? 1 : 0
 
-        let buttons = performAnim ? navigationButtons.animator() : navigationButtons
-        buttons?.isHidden = homepage
+//        let buttons = performAnim ? navigationButtons.animator() : navigationButtons
+//        buttons?.isHidden = homepage
     }
 
     private func subscribeToDownloads() {

@@ -111,7 +111,7 @@
                                     <real value="3.4028234663852886e+38"/>
                                 </customSpacing>
                             </stackView>
-                            <imageView horizontalHuggingPriority="251" verticalHuggingPriority="251" translatesAutoresizingMaskIntoConstraints="NO" id="8Aq-SD-DCb">
+                            <imageView hidden="YES" horizontalHuggingPriority="251" verticalHuggingPriority="251" translatesAutoresizingMaskIntoConstraints="NO" id="8Aq-SD-DCb">
                                 <rect key="frame" x="20" y="2" width="44" height="44"/>
                                 <constraints>
                                     <constraint firstAttribute="width" secondItem="8Aq-SD-DCb" secondAttribute="height" multiplier="1:1" id="5kl-xy-buj"/>
@@ -260,10 +260,10 @@
                             <constraint firstItem="8Aq-SD-DCb" firstAttribute="leading" secondItem="hYV-nu-QIp" secondAttribute="leading" constant="20" id="Pf2-Cq-EMk"/>
                             <constraint firstAttribute="trailing" secondItem="aWu-Jm-Oaz" secondAttribute="trailing" constant="12" id="UeG-qO-bD2"/>
                             <constraint firstItem="Wba-nA-FYj" firstAttribute="leading" relation="greaterThanOrEqual" secondItem="eEh-kf-smR" secondAttribute="trailing" priority="999" constant="8" id="W83-wu-cjA"/>
-                            <constraint firstItem="aWu-Jm-Oaz" firstAttribute="centerY" secondItem="Wba-nA-FYj" secondAttribute="centerY" id="Xav-R7-O9E"/>
                             <constraint firstItem="EQw-GG-GMA" firstAttribute="top" secondItem="hYV-nu-QIp" secondAttribute="top" id="ctd-w7-EMF"/>
                             <constraint firstItem="Wba-nA-FYj" firstAttribute="top" secondItem="hYV-nu-QIp" secondAttribute="top" constant="6" id="eaI-DA-rCA"/>
                             <constraint firstItem="EQw-GG-GMA" firstAttribute="leading" secondItem="hYV-nu-QIp" secondAttribute="leading" id="hpe-5Y-XTJ"/>
+                            <constraint firstItem="aWu-Jm-Oaz" firstAttribute="top" secondItem="hYV-nu-QIp" secondAttribute="top" constant="10" id="n0n-sS-8zH"/>
                             <constraint firstAttribute="trailing" secondItem="EQw-GG-GMA" secondAttribute="trailing" id="oYK-XH-0iN"/>
                             <constraint firstItem="eEh-kf-smR" firstAttribute="top" secondItem="hYV-nu-QIp" secondAttribute="top" constant="10" id="qeF-30-DZN"/>
                             <constraint firstItem="Wba-nA-FYj" firstAttribute="leading" secondItem="hYV-nu-QIp" secondAttribute="leading" constant="84" id="t38-xG-cxS"/>
@@ -555,12 +555,12 @@
                                         <rect key="frame" x="0.0" y="0.0" width="32" height="32"/>
                                         <subviews>
                                             <button translatesAutoresizingMaskIntoConstraints="NO" id="psi-hX-Kh9">
-                                                <rect key="frame" x="8" y="8" width="16" height="16"/>
+                                                <rect key="frame" x="4" y="4" width="24" height="24"/>
                                                 <constraints>
-                                                    <constraint firstAttribute="height" constant="16" id="OCF-kY-RT8"/>
-                                                    <constraint firstAttribute="width" constant="16" id="n0k-5W-3ls"/>
+                                                    <constraint firstAttribute="width" secondItem="psi-hX-Kh9" secondAttribute="height" multiplier="1:1" id="6fs-gf-saq"/>
+                                                    <constraint firstAttribute="height" constant="24" id="OCF-kY-RT8"/>
                                                 </constraints>
-                                                <buttonCell key="cell" type="square" bezelStyle="shadowlessSquare" image="HomeFavicon" imagePosition="only" alignment="center" imageScaling="proportionallyDown" inset="2" id="NBl-r8-f28">
+                                                <buttonCell key="cell" type="square" bezelStyle="shadowlessSquare" image="dax" imagePosition="only" alignment="center" imageScaling="axesIndependently" inset="2" id="NBl-r8-f28">
                                                     <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
                                                     <font key="font" metaFont="system"/>
                                                 </buttonCell>
@@ -738,6 +738,7 @@
                         <outlet property="clearButton" destination="kRc-0m-oqe" id="2sv-EP-8MW"/>
                         <outlet property="geolocationButton" destination="CN6-fJ-o2J" id="FP7-Od-wu8"/>
                         <outlet property="imageButton" destination="psi-hX-Kh9" id="gEt-yl-q9m"/>
+                        <outlet property="imageButtonSize" destination="OCF-kY-RT8" id="H9S-PX-m7l"/>
                         <outlet property="imageButtonWrapper" destination="3Iv-YW-zn2" id="rzK-lJ-auZ"/>
                         <outlet property="microphoneButton" destination="uao-nC-0co" id="UHu-oA-rTl"/>
                         <outlet property="permissionButtons" destination="8UU-A8-1nD" id="gYJ-VW-MEG"/>
@@ -763,7 +764,6 @@
         <image name="Forward" width="16" height="16"/>
         <image name="Geolocation-Active" width="16" height="16"/>
         <image name="Geolocation-Icon" width="16" height="16"/>
-        <image name="HomeFavicon" width="16" height="16"/>
         <image name="HomepageLogo" width="192" height="192"/>
         <image name="Microphone-Active" width="12" height="16"/>
         <image name="Microphone-Icon" width="12" height="16"/>
@@ -771,6 +771,7 @@
         <image name="PopupBlocked" width="16" height="16"/>
         <image name="Refresh" width="16" height="16"/>
         <image name="Settings" width="16" height="16"/>
+        <image name="dax" width="132" height="132"/>
         <namedColor name="AddressBarBackgroundColor">
             <color red="1" green="1" blue="1" alpha="1" colorSpace="custom" customColorSpace="displayP3"/>
         </namedColor>
