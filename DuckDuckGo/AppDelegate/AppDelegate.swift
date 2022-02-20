@@ -25,11 +25,15 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
 
     let launchTimingPixel = TimedPixel(.launchTiming)
 
-#if DEBUG
     static var isRunningTests: Bool {
+#if DEBUG
         ProcessInfo.processInfo.environment["XCTestConfigurationFilePath"] != nil
+#else
+        return false
+#endif
     }
 
+#if DEBUG
     let disableCVDisplayLinkLogs: Void = {
         // Disable CVDisplayLink logs
         CFPreferencesSetValue("cv_note" as CFString,
