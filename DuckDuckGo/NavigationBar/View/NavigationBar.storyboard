@@ -547,7 +547,7 @@
                                                     <constraint firstAttribute="width" secondItem="psi-hX-Kh9" secondAttribute="height" multiplier="1:1" id="6fs-gf-saq"/>
                                                     <constraint firstAttribute="height" constant="16" id="OCF-kY-RT8"/>
                                                 </constraints>
-                                                <buttonCell key="cell" type="square" bezelStyle="shadowlessSquare" image="dax" imagePosition="only" alignment="center" imageScaling="axesIndependently" inset="2" id="NBl-r8-f28">
+                                                <buttonCell key="cell" type="square" bezelStyle="shadowlessSquare" image="HomepageLogo" imagePosition="only" alignment="center" imageScaling="axesIndependently" inset="2" id="NBl-r8-f28">
                                                     <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
                                                     <font key="font" metaFont="system"/>
                                                 </buttonCell>
@@ -751,13 +751,13 @@
         <image name="Forward" width="16" height="16"/>
         <image name="Geolocation-Active" width="16" height="16"/>
         <image name="Geolocation-Icon" width="16" height="16"/>
+        <image name="HomepageLogo" width="192" height="192"/>
         <image name="Microphone-Active" width="12" height="16"/>
         <image name="Microphone-Icon" width="12" height="16"/>
         <image name="PasswordManagement" width="16" height="16"/>
         <image name="PopupBlocked" width="16" height="16"/>
         <image name="Refresh" width="16" height="16"/>
         <image name="Settings" width="16" height="16"/>
-        <image name="dax" width="132" height="132"/>
         <namedColor name="AddressBarBackgroundColor">
             <color red="1" green="1" blue="1" alpha="1" colorSpace="custom" customColorSpace="displayP3"/>
         </namedColor>
