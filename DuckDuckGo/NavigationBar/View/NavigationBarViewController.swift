@@ -37,7 +37,6 @@ final class NavigationBarViewController: NSViewController {
     @IBOutlet weak var passwordManagementButton: NSButton!
     @IBOutlet weak var downloadsButton: MouseOverButton!
     @IBOutlet weak var navigationButtons: NSView!
-    @IBOutlet weak var daxLogo: NSView!
     @IBOutlet weak var addressBarContainer: NSView!
 
     @IBOutlet var addressBarLeftToNavButtonsConstraint: NSLayoutConstraint!
@@ -347,19 +346,13 @@ final class NavigationBarViewController: NSViewController {
     }
 
     private func animateBar(_ homepage: Bool, animated: Bool = true) {
-        let performAnim = animated
+        let performAnim = false // TESTFIX animated
 
         let top = performAnim ? addressBarTopConstraint.animator() : addressBarTopConstraint
         top?.constant = homepage ? 16 : 6
 
         let width = performAnim ? addressBarProportionalWidthConstraint.animator() : addressBarProportionalWidthConstraint
         width?.constant = homepage ? -260 : 0
-
-//        let image = performAnim ? daxLogo.animator() : daxLogo
-//        image?.alphaValue = homepage ? 1 : 0
-
-//        let buttons = performAnim ? navigationButtons.animator() : navigationButtons
-//        buttons?.isHidden = homepage
     }
 
     private func subscribeToDownloads() {
