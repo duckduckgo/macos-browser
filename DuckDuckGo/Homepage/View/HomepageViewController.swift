@@ -26,6 +26,7 @@ final class HomepageViewController: NSViewController {
 
     private let tabCollectionViewModel: TabCollectionViewModel
     private var bookmarkManager: BookmarkManager
+    private let historyCoordinating: HistoryCoordinating
 
     private weak var host: NSView?
  
@@ -41,9 +42,14 @@ final class HomepageViewController: NSViewController {
         fatalError("HomepageViewController: Bad initializer")
     }
 
-    init?(coder: NSCoder, tabCollectionViewModel: TabCollectionViewModel, bookmarkManager: BookmarkManager) {
+    init?(coder: NSCoder,
+          tabCollectionViewModel: TabCollectionViewModel,
+          bookmarkManager: BookmarkManager,
+          historyCoordinating: HistoryCoordinating = HistoryCoordinator.shared) {
+
         self.tabCollectionViewModel = tabCollectionViewModel
         self.bookmarkManager = bookmarkManager
+        self.historyCoordinating = historyCoordinating
 
         super.init(coder: coder)
     }
@@ -66,8 +72,16 @@ final class HomepageViewController: NSViewController {
         host.frame = view.frame
         view.addSubview(host)
         self.host = host
+    override func viewDidAppear() {
+        super.viewDidAppear()
+        refreshFavoritesModel()
+        refreshRecentlyVisitedModel()
+    }
 
         subscribeToBookmarks()
+    override func viewDidLayout() {
+        super.viewDidLayout()
+        host?.frame = self.view.frame
     }
 
     func createRecentlyVisitedModel() -> Homepage.Models.RecentlyVisitedModel {
@@ -90,39 +104,28 @@ final class HomepageViewController: NSViewController {
     func createFavoritesModel() -> Homepage.Models.FavoritesModel {
         return .init(open: { [weak self] bookmark, target in
             self?.openUrl(bookmark.url, target: target)
-        }, remove: { bookmark in
+        }, remove: { [weak self] bookmark in
             bookmark.isFavorite = false
-            LocalBookmarkManager.shared.update(bookmark: bookmark)
+            self?.bookmarkManager.update(bookmark: bookmark)
         }, addEdit: { [weak self] bookmark in
             self?.showAddEditController(for: bookmark)
         })
     }
 
-    func refreshFavoritesModel(list: BookmarkList? = LocalBookmarkManager.shared.list) {
-        favoritesModel.favorites = list?.favoriteBookmarks ?? []
+    func refreshFavoritesModel() {
+        favoritesModel.favorites = bookmarkManager.list?.favoriteBookmarks ?? []
     }
 
     func refreshRecentlyVisitedModel() {
-        recentlyVisitedModel.refreshWithHistory(HistoryCoordinator.shared.history ?? [])
+        recentlyVisitedModel.refreshWithHistory(historyCoordinating.history ?? [])
     }
 
     func subscribeToBookmarks() {
-        LocalBookmarkManager.shared.listPublisher.sink { [weak self] list in
+        bookmarkManager.listPublisher.sink { [weak self] _ in
             withAnimation {
-                self?.refreshFavoritesModel(list: list)
+                self?.refreshFavoritesModel()
             }
         }.store(in: &cancellables)
-    }
-
-    override func viewDidAppear() {
-        super.viewDidAppear()
-        refreshFavoritesModel()
-        refreshRecentlyVisitedModel()
-    }
-
-    override func viewDidLayout() {
-        super.viewDidLayout()
-        host?.frame = self.view.frame
     }
 
     private func openUrl(_ url: URL, target: Homepage.Models.FavoritesModel.OpenTarget? = nil) {

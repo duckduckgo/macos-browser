@@ -178,11 +178,8 @@ final class MainViewController: NSViewController {
     }
 
     private func subscribeToTabContent() {
-        tabCollectionViewModel.selectedTabViewModel?.tab.$content.sink(receiveValue: { [weak self] content in
-            DispatchQueue.main.async {
-                self?.animateNavigationBar(content == .homepage)
-            }
-
+        tabCollectionViewModel.selectedTabViewModel?.tab.$content.receive(on: DispatchQueue.main).sink(receiveValue: { [weak self] content in
+            self?.animateNavigationBar(content == .homepage)
         }).store(in: &self.navigationalCancellables)
     }
 
