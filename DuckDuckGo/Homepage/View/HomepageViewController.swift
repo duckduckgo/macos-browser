@@ -61,7 +61,7 @@ final class HomepageViewController: NSViewController {
         defaultBrowserModel = createDefaultBrowserModel()
         recentlyVisitedModel = createRecentlyVisitedModel()
 
-        refreshFavoritesModel()
+        refreshModels()
 
         let rootView = Homepage.Views.RootView()
             .environmentObject(favoritesModel)
@@ -78,13 +78,18 @@ final class HomepageViewController: NSViewController {
 
     override func viewDidAppear() {
         super.viewDidAppear()
-        refreshRecentlyVisitedModel()
-        refreshFavoritesModel()
+        refreshModels()
     }
 
     override func viewDidLayout() {
         super.viewDidLayout()
         host?.frame = self.view.frame
+    }
+
+    func refreshModels() {
+        guard !AppDelegate.isRunningTests else { return }
+        refreshFavoritesModel()
+        refreshRecentlyVisitedModel()
     }
 
     func createRecentlyVisitedModel() -> Homepage.Models.RecentlyVisitedModel {
