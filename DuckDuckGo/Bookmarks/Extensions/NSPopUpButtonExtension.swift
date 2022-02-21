@@ -25,6 +25,7 @@ extension NSPopUpButton {
         NotificationCenter.default
             .publisher(for: NSMenu.didSendActionNotification, object: menu)
             .map { _ in self.indexOfSelectedItem }
+            .prepend(self.indexOfSelectedItem)
             .eraseToAnyPublisher()
     }
 
