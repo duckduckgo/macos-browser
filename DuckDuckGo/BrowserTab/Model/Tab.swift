@@ -138,10 +138,6 @@ final class Tab: NSObject {
         super.init()
 
         setupWebView(shouldLoadInBackground: shouldLoadInBackground)
-
-        if content == .homepage {
-            webView.load(.homePage)
-        }
     }
 
     deinit {
@@ -368,6 +364,13 @@ final class Tab: NSObject {
         webView.load(url)
     }
 
+    private func addHomePageToWebViewIfNeeded() {
+        guard !AppDelegate.isRunningTests else { return }
+        if content == .homepage && webView.url == nil {
+            webView.load(.homePage)
+        }
+    }
+
     func stopLoading() {
         webView.stopLoading()
     }
@@ -403,6 +406,9 @@ final class Tab: NSObject {
 
         // background tab loading should start immediately
         reloadIfNeeded(shouldLoadInBackground: shouldLoadInBackground)
+        if !shouldLoadInBackground {
+            addHomePageToWebViewIfNeeded()
+        }
     }
 
     // MARK: - Open External URL

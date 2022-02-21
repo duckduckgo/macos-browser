@@ -94,14 +94,9 @@ final class AppStateChangePublisherTests: XCTestCase {
 
         let e = expectation(description: "Window Closed fires State changes")
 
-        var count = 0
         WindowControllersManager.shared.stateChanged
             .sink { _ in
-                count += 1
-                XCTAssertTrue(count <= 2)
-                if count == 2 {
-                    e.fulfill()
-                }
+                e.fulfill()
             }.store(in: &cancellables)
 
         window!.close()
