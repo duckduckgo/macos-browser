@@ -266,9 +266,7 @@ final class PasswordManagementViewController: NSViewController {
     }
 
     func clear() {
-        self.listModel?.update(items: [])
-        self.listModel?.filter = ""
-        self.listModel?.clearSelection()
+        self.listModel?.clear()
         self.itemModel?.clearSecureVaultModel()
     }
     
