@@ -242,6 +242,10 @@ final class PasswordManagementItemListModel: ObservableObject {
 
     @Published var sortDescriptor = SecureVaultSorting.default {
         didSet {
+            guard oldValue != sortDescriptor else {
+                return
+            }
+            
             updateFilteredData()
             selectFirst()
         }

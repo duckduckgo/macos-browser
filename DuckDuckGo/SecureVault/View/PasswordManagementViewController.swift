@@ -66,8 +66,8 @@ final class PasswordManagementViewController: NSViewController {
             emptyStateCancellable?.cancel()
             emptyStateCancellable = nil
 
-            emptyStateCancellable = listModel?.$emptyState.dropFirst().sink(receiveValue: { [weak self] emptyState in
-                self?.updateEmptyState()
+            emptyStateCancellable = listModel?.$emptyState.dropFirst().sink(receiveValue: { [weak self] newEmptyState in
+                self?.updateEmptyState(state: newEmptyState)
             })
         }
     }
@@ -80,9 +80,11 @@ final class PasswordManagementViewController: NSViewController {
             editingCancellable = nil
 
             editingCancellable = itemModel?.isEditingPublisher.sink(receiveValue: { [weak self] isEditing in
-                self?.isEditing = isEditing
-                self?.divider.isHidden = isEditing
-                self?.updateEmptyState()
+                guard let self = self else { return }
+                
+                self.isEditing = isEditing
+                self.divider.isHidden = isEditing
+                self.updateEmptyState(state: self.listModel?.emptyState)
             })
         }
     }
@@ -754,12 +756,12 @@ final class PasswordManagementViewController: NSViewController {
     
     // MARK: - Empty State
     
-    private func updateEmptyState() {
+    private func updateEmptyState(state: PasswordManagementItemListModel.EmptyState?) {
         guard let listModel = listModel else {
             return
         }
-
-        if isEditing || listModel.emptyState == .none {
+        
+        if isEditing || state == nil || state == PasswordManagementItemListModel.EmptyState.none {
             hideEmptyState()
         } else {
             showEmptyState(category: listModel.sortDescriptor.category)
