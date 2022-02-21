@@ -54,6 +54,13 @@ final class UserContentController: WKUserContentController {
         super.init()
 
         cancellable = assetsPublisher.receive(on: DispatchQueue.main).map { $0 }.weakAssign(to: \.contentBlockingAssets, on: self)
+
+#if DEBUG
+        // make sure delegate for UserScripts is set shortly after init
+        DispatchQueue.main.async {
+            assert(self.delegate != nil, "UserContentController delegate not set")
+        }
+#endif
     }
 
     public convenience init(privacyConfigurationManager: PrivacyConfigurationManager = ContentBlocking.shared.privacyConfigurationManager) {
@@ -91,12 +98,7 @@ final class UserContentController: WKUserContentController {
         userScripts.scripts.forEach(self.addUserScript)
         userScripts.userScripts.forEach(self.addHandler)
 
-        guard let delegate = delegate else {
-            assertionFailure("UserContentController delegate not set")
-            return
-        }
-
-        delegate.userContentController(self, didInstallUserScripts: userScripts)
+        delegate?.userContentController(self, didInstallUserScripts: userScripts)
     }
 
     override func removeAllUserScripts() {
