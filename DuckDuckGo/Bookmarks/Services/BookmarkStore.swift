@@ -90,7 +90,7 @@ final class LocalBookmarkStore: BookmarkStore {
                 fetchRequest = Bookmark.topLevelEntitiesFetchRequest()
             }
 
-            fetchRequest.sortDescriptors = [NSSortDescriptor(key: #keyPath(BookmarkManagedObject.dateAdded), ascending: false)]
+            fetchRequest.sortDescriptors = [NSSortDescriptor(key: #keyPath(BookmarkManagedObject.dateAdded), ascending: true)]
             fetchRequest.returnsObjectsAsFaults = false
 
             do {
@@ -364,17 +364,6 @@ final class LocalBookmarkStore: BookmarkStore {
 
                 let allFolders = try context.fetch(BookmarkFolder.bookmarkFoldersFetchRequest())
                 
-                if let otherBookmarks = bookmarks.topLevelFolders.otherBookmarks.children {
-                    // Reverse the top level collection so that the order matches the imported bookmarks correctly.
-                    let result = recursivelyCreateEntities(from: otherBookmarks.reversed(),
-                                                           parent: nil,
-                                                           existingBookmarkURLs: bookmarkURLs,
-                                                           markBookmarksAsFavorite: false,
-                                                           in: self.context)
-                    
-                    total += result
-                }
-                
                 let existingFavoritesFolder = allFolders.first { ($0.titleEncrypted as? String) == UserText.bookmarkImportImportedFavorites }
                 let favoritesFolder = existingFavoritesFolder ?? createFolder(titled: UserText.bookmarkImportImportedFavorites, in: self.context)
                 
@@ -385,6 +374,17 @@ final class LocalBookmarkStore: BookmarkStore {
                                                            markBookmarksAsFavorite: true,
                                                            in: self.context)
 
+                    total += result
+                }
+
+                if let otherBookmarks = bookmarks.topLevelFolders.otherBookmarks.children {
+                    // Reverse the top level collection so that the order matches the imported bookmarks correctly.
+                    let result = recursivelyCreateEntities(from: otherBookmarks,
+                                                           parent: nil,
+                                                           existingBookmarkURLs: bookmarkURLs,
+                                                           markBookmarksAsFavorite: false,
+                                                           in: self.context)
+                    
                     total += result
                 }
 

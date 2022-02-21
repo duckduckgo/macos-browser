@@ -51,9 +51,7 @@ struct BookmarkList {
             }
         }
         
-        // Reverse the order of favorites, such that new favorites appear at the top.
-        // This will be improved later with the filtering/sorting additions.
-        self.favoriteBookmarkURLsOrdered = favoriteKeysOrdered.reversed()
+        self.favoriteBookmarkURLsOrdered = favoriteKeysOrdered
         self.allBookmarkURLsOrdered = keysOrdered
         self.itemsDict = itemsDict
         self.topLevelEntities = topLevelEntities
@@ -65,7 +63,7 @@ struct BookmarkList {
             return
         }
 
-        allBookmarkURLsOrdered.insert(bookmark.url, at: 0)
+        allBookmarkURLsOrdered.append(bookmark.url) // .insert(bookmark.url, at: 0)
         itemsDict[bookmark.url] = bookmark
     }
 
