@@ -72,13 +72,16 @@ final class HomepageViewController: NSViewController {
         host.frame = view.frame
         view.addSubview(host)
         self.host = host
-    override func viewDidAppear() {
-        super.viewDidAppear()
-        refreshFavoritesModel()
-        refreshRecentlyVisitedModel()
-    }
 
         subscribeToBookmarks()
+    }
+
+    override func viewDidAppear() {
+        super.viewDidAppear()
+        refreshRecentlyVisitedModel()
+        refreshFavoritesModel()
+    }
+
     override func viewDidLayout() {
         super.viewDidLayout()
         host?.frame = self.view.frame
