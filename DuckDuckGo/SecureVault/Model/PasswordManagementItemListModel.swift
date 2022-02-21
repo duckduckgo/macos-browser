@@ -359,6 +359,16 @@ final class PasswordManagementItemListModel: ObservableObject {
             selected(item: nil)
         }
     }
+    
+    func clear() {
+        update(items: [])
+        filter = ""
+        clearSelection()
+        
+        // Setting items to an empty array will typically show the No Data empty state, but this call is used when
+        // the popover is closed so instead there should be no empty state.
+        emptyState = .none
+    }
 
     func clearSelection() {
         selected = nil
