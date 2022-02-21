@@ -797,7 +797,7 @@ extension AddressBarButtonsViewController: PermissionContextMenuDelegate {
         PermissionManager.shared.setPermission(.ask, forDomain: menu.domain, permissionType: permission)
     }
     func permissionContextMenuReloadPage(_ menu: PermissionContextMenu) {
-        tabCollectionViewModel.selectedTabViewModel?.tab.reload()
+        tabCollectionViewModel.selectedTabViewModel?.reload()
     }
 
 }

@@ -121,7 +121,7 @@ extension AppDelegate {
         savePanel.beginSheetModal(for: window) { response in
             guard response == .OK, let selectedURL = savePanel.url else { return }
 
-            let vault = try? SecureVaultFactory.default.makeVault()
+            let vault = try? SecureVaultFactory.default.makeVault(errorReporter: SecureVaultErrorReporter.shared)
             let exporter = CSVLoginExporter(secureVault: vault!)
             do {
                 try exporter.exportVaultLogins(to: selectedURL)
@@ -197,7 +197,7 @@ extension MainViewController {
         }
 
         Pixel.fire(.refresh(source: .init(sender: sender, default: .mainMenu)))
-        selectedTabViewModel.tab.reload()
+        selectedTabViewModel.reload()
     }
 
     @IBAction func stopLoadingPage(_ sender: Any) {
@@ -470,7 +470,7 @@ extension MainViewController {
     }
 
     @IBAction func resetSecureVaultData(_ sender: Any?) {
-        let vault = try? SecureVaultFactory.default.makeVault()
+        let vault = try? SecureVaultFactory.default.makeVault(errorReporter: SecureVaultErrorReporter.shared)
         let accounts = (try? vault?.accounts()) ?? []
         let accountIDs = accounts.compactMap(\.id)
 

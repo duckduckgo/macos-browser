@@ -97,7 +97,6 @@ extension Pixel {
         enum Debug: String, CustomStringConvertible {
             var description: String { rawValue }
 
-            case dbMigrationError = "dbme"
             case dbInitializationError = "dbie"
             case dbSaveExcludedHTTPSDomainsError = "dbsw"
             case dbSaveBloomFilterError = "dbsb"
@@ -132,6 +131,9 @@ extension Pixel {
             case clickToLoadAllowListCompilationFailed = "click_to_load_compilation_error_allow_list"
             case clickToLoadUnpSitesCompilationFailed = "click_to_load_compilation_error_unprotected_list"
             case clickToLoadFallbackCompilationFailed = "click_to_load_compilation_error_fallback_tds"
+
+            case secureVaultInitError = "secure_vault_init_error"
+            case secureVaultError = "secure_vault_error"
         }
 
     }
