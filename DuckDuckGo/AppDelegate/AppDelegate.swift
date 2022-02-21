@@ -20,12 +20,6 @@ import Cocoa
 import Combine
 import os.log
 
-#if DEBUG
-public let isDebugBuild = true
-#else
-public let isDebugBuild = false
-#endif
-
 @NSApplicationMain
 final class AppDelegate: NSObject, NSApplicationDelegate {
 
