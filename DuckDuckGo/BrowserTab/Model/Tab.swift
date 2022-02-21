@@ -418,7 +418,9 @@ final class Tab: NSObject {
 
 #if DEBUG
         self.isClosing = true
+
         // leaks detection: Tab and WebView should be deallocated after closing
+        guard !AppDelegate.isRunningTests else { return }
         DispatchQueue.main.asyncAfter(deadline: .now() + 1.0) { [weak self,
                                                                  weak cc=webView.configuration.userContentController] in
             assert(self == nil)
