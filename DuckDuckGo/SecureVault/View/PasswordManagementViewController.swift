@@ -139,7 +139,7 @@ final class PasswordManagementViewController: NSViewController {
     }
 
     var secureVault: SecureVault? {
-        try? SecureVaultFactory.default.makeVault()
+        try? SecureVaultFactory.default.makeVault(errorReporter: SecureVaultErrorReporter.shared)
     }
 
     override func viewDidLoad() {

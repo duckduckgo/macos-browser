@@ -695,6 +695,10 @@ extension Tab: SecureVaultManagerDelegate {
         }
     }
 
+    func secureVaultInitFailed(_ error: SecureVaultError) {
+        SecureVaultErrorReporter.shared.secureVaultInitFailed(error)
+    }
+
 }
 
 extension AutofillType {
