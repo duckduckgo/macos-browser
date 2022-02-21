@@ -97,7 +97,7 @@ final class HomepageViewController: NSViewController {
     }
 
     func createDefaultBrowserModel() -> Homepage.Models.DefaultBrowserModel {
-        return .init(isDefault: DefaultBrowserPreferences.isDefault, wasClosed: defaultBrowserDismissed, requestSetDefault: {
+        return .init(isDefault: DefaultBrowserPreferences.isDefault, wasClosed: defaultBrowserDismissed, requestSetDefault: { [weak self] in
             DefaultBrowserPreferences.becomeDefault { [weak self] in
                 self?.defaultBrowserModel.isDefault = DefaultBrowserPreferences.isDefault
             }
