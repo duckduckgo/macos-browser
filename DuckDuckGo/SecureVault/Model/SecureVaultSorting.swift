@@ -19,7 +19,7 @@
 import Foundation
 import SwiftUI
 
-struct SecureVaultSorting {
+struct SecureVaultSorting: Equatable {
     
     static let `default` = SecureVaultSorting(category: .allItems, parameter: .title, order: .ascending)
 

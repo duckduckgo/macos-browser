@@ -103,24 +103,20 @@ final class PasswordManagementViewController: NSViewController {
     var editingCancellable: AnyCancellable?
 
     var domain: String?
-    var isDirty = false
+    var isEditing = false
+    var isDirty = false {
+        didSet {
+            listModel?.canChangeCategory = !isDirty
+        }
+    }
 
     var listModel: PasswordManagementItemListModel? {
         didSet {
             emptyStateCancellable?.cancel()
             emptyStateCancellable = nil
 
-            emptyStateCancellable = listModel?.$emptyState.dropFirst().sink(receiveValue: { [weak self] emptyState in
-                guard let self = self else {
-                    return
-                }
-
-                switch emptyState {
-                case .none:
-                    self.emptyState.isHidden = true
-                default:
-                    self.showEmptyState()
-                }
+            emptyStateCancellable = listModel?.$emptyState.dropFirst().sink(receiveValue: { [weak self] newEmptyState in
+                self?.updateEmptyState(state: newEmptyState)
             })
         }
     }
@@ -133,7 +129,11 @@ final class PasswordManagementViewController: NSViewController {
             editingCancellable = nil
 
             editingCancellable = itemModel?.isEditingPublisher.sink(receiveValue: { [weak self] isEditing in
-                self?.divider.isHidden = isEditing
+                guard let self = self else { return }
+                
+                self.isEditing = isEditing
+                self.divider.isHidden = isEditing
+                self.updateEmptyState(state: self.listModel?.emptyState)
             })
         }
     }
@@ -219,40 +219,6 @@ final class PasswordManagementViewController: NSViewController {
         authenticator.authenticateUser { authorized in
             self.toggleLockScreen(hidden: authorized)
         }
-    }
-    
-    private func showEmptyState() {
-        guard let category = listModel?.sortDescriptor.category else {
-            return
-        }
-        
-        switch category {
-        case .allItems: showDefaultEmptyState()
-        case .logins: showEmptyState(imageName: "LoginsEmpty", title: UserText.pmEmptyStateLoginsTitle)
-        case .identities: showEmptyState(imageName: "IdentitiesEmpty", title: UserText.pmEmptyStateIdentitiesTitle)
-        case .cards: showEmptyState(imageName: "CreditCardsEmpty", title: UserText.pmEmptyStateCardsTitle)
-        case .notes: showEmptyState(imageName: "NotesEmpty", title: UserText.pmEmptyStateNotesTitle)
-        }
-    }
-
-    private func showDefaultEmptyState() {
-        emptyState.isHidden = false
-        emptyStateMessage.isHidden = false
-        emptyStateButton.isHidden = false
-        
-        emptyStateImageView.image = NSImage(named: "LoginsEmpty")
-
-        emptyStateTitle.attributedStringValue = NSAttributedString.make(UserText.pmEmptyStateDefaultTitle, lineHeight: 1.14, kern: -0.23)
-        emptyStateMessage.attributedStringValue = NSAttributedString.make(UserText.pmEmptyStateDefaultDescription, lineHeight: 1.05, kern: -0.08)
-    }
-    
-    private func showEmptyState(imageName: String, title: String) {
-        emptyState.isHidden = false
-        
-        emptyStateImageView.image = NSImage(named: imageName)
-        emptyStateTitle.attributedStringValue = NSAttributedString.make(title, lineHeight: 1.14, kern: -0.23)
-        emptyStateMessage.isHidden = true
-        emptyStateButton.isHidden = true
     }
 
     @IBAction func onNewClicked(_ sender: NSButton) {
@@ -879,6 +845,54 @@ final class PasswordManagementViewController: NSViewController {
         } else {
             createNew()
         }
+    }
+    
+    // MARK: - Empty State
+    
+    private func updateEmptyState(state: PasswordManagementItemListModel.EmptyState?) {
+        guard let listModel = listModel else {
+            return
+        }
+        
+        if isEditing || state == nil || state == PasswordManagementItemListModel.EmptyState.none {
+            hideEmptyState()
+        } else {
+            showEmptyState(category: listModel.sortDescriptor.category)
+        }
+    }
+    
+    private func showEmptyState(category: SecureVaultSorting.Category) {
+        switch category {
+        case .allItems: showDefaultEmptyState()
+        case .logins: showEmptyState(imageName: "LoginsEmpty", title: UserText.pmEmptyStateLoginsTitle)
+        case .identities: showEmptyState(imageName: "IdentitiesEmpty", title: UserText.pmEmptyStateIdentitiesTitle)
+        case .cards: showEmptyState(imageName: "CreditCardsEmpty", title: UserText.pmEmptyStateCardsTitle)
+        case .notes: showEmptyState(imageName: "NotesEmpty", title: UserText.pmEmptyStateNotesTitle)
+        }
+    }
+    
+    private func hideEmptyState() {
+        emptyState.isHidden = true
+    }
+
+    private func showDefaultEmptyState() {
+        emptyState.isHidden = false
+        emptyStateMessage.isHidden = false
+        emptyStateButton.isHidden = false
+        
+        emptyStateImageView.image = NSImage(named: "LoginsEmpty")
+
+        emptyStateTitle.attributedStringValue = NSAttributedString.make(UserText.pmEmptyStateDefaultTitle, lineHeight: 1.14, kern: -0.23)
+        emptyStateMessage.attributedStringValue = NSAttributedString.make(UserText.pmEmptyStateDefaultDescription, lineHeight: 1.05, kern: -0.08)
+    }
+    
+    private func showEmptyState(imageName: String, title: String) {
+        emptyState.isHidden = false
+        
+        emptyStateImageView.image = NSImage(named: imageName)
+        emptyStateTitle.attributedStringValue = NSAttributedString.make(title, lineHeight: 1.14, kern: -0.23)
+        emptyStateMessage.isHidden = true
+        emptyStateButton.isHidden = true
     }
 
 }
