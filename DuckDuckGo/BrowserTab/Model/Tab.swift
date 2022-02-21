@@ -689,6 +689,10 @@ extension Tab: SecureVaultManagerDelegate {
         Pixel.fire(.formAutofilled(kind: type.formAutofillKind))
     } 
 
+    func secureVaultInitFailed(_ error: SecureVaultError) {
+        SecureVaultErrorReporter.shared.secureVaultInitFailed(error)
+    }
+
 }
 
 extension AutofillType {
