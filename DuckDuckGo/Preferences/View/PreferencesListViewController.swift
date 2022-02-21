@@ -239,18 +239,15 @@ extension PreferencesListViewController: LoginsPreferencesTableCellViewDelegate 
     func loginsPreferencesTableCellView(_ cell: LoginsPreferencesTableCellView,
                                         setShouldAutoLockLogins: Bool,
                                         autoLockThreshold: LoginsPreferences.AutoLockThreshold) {
-        let context = LAContext()
-        
-        context.evaluatePolicy(.deviceOwnerAuthentication, localizedReason: UserText.pmAutoLockPromptChangeLoginsSettings) { authenticated, _ in
-            DispatchQueue.main.async {
-                var preferences = LoginsPreferences()
-                
-                if authenticated {
-                    preferences.shouldAutoLockLogins = setShouldAutoLockLogins
-                    preferences.autoLockThreshold = autoLockThreshold
-                } else {
-                    cell.update(autoLockEnabled: preferences.shouldAutoLockLogins, threshold: preferences.autoLockThreshold)
-                }
+
+        DeviceAuthenticator.shared.authenticateUser { authenticated in
+            var preferences = LoginsPreferences()
+
+            if authenticated {
+                preferences.shouldAutoLockLogins = setShouldAutoLockLogins
+                preferences.autoLockThreshold = autoLockThreshold
+            } else {
+                cell.update(autoLockEnabled: preferences.shouldAutoLockLogins, threshold: preferences.autoLockThreshold)
             }
         }
 

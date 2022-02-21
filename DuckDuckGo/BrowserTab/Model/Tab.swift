@@ -688,9 +688,7 @@ extension Tab: SecureVaultManagerDelegate {
     }
     
     func secureVaultManager(_: SecureVaultManager, didRequestAuthenticationWithCompletionHandler handler: @escaping (Bool) -> Void) {
-        let authenticationService = LocalAuthenticationService()
-        
-        authenticationService.authenticateDevice(reason: UserText.pmAutoLockPromptAutofill) { authenticated in
+        DeviceAuthenticator.shared.authenticateUser { authenticated in
             handler(authenticated)
         }
     }
