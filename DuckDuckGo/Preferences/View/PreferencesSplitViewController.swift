@@ -70,7 +70,7 @@ final class PreferencesSplitViewController: NSSplitViewController {
             self?.sidebarViewController.detailViewScrolledTo(rowAtIndex: index)
         }.store(in: &cancellables)
 
-        sidebarViewController.tabSwitcherButton.selectionPublisher.sink { [weak self] index in
+        sidebarViewController.tabSwitcherButton.selectionPublisher.dropFirst().sink { [weak self] index in
             self?.delegate?.selectedTab(at: index)
         }.store(in: &cancellables)
     }

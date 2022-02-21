@@ -235,7 +235,7 @@ class StatisticsLoaderTests: XCTestCase {
         let expect = expectation(description: "Search retention ATB requested")
         testee.refreshRetentionAtb(isSearch: true) {
             XCTAssertEqual(self.mockStatisticsStore.atb, "v20-1")
-            XCTAssertEqual(self.mockStatisticsStore.appRetentionAtb, "appRetentionAtb")
+            XCTAssertEqual(self.mockStatisticsStore.appRetentionAtb, "v77-5")
             XCTAssertEqual(self.mockStatisticsStore.searchRetentionAtb, "v77-5")
             expect.fulfill()
         }
