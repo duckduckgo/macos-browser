@@ -39,11 +39,11 @@ struct DefaultScriptSourceProvider: ScriptSourceProviding {
 
     let configStorage: ConfigurationStoring
     let privacyConfigurationManager: PrivacyConfigurationManager
-    let contentBlockingManager: ContentBlockerRulesManager
+    let contentBlockingManager: ContentBlockerRulesManagerProtocol
 
     init(configStorage: ConfigurationStoring = DefaultConfigurationStorage.shared,
          privacyConfigurationManager: PrivacyConfigurationManager = ContentBlocking.shared.privacyConfigurationManager,
-         contentBlockingManager: ContentBlockerRulesManager = ContentBlocking.shared.contentBlockingManager) {
+         contentBlockingManager: ContentBlockerRulesManagerProtocol = ContentBlocking.shared.contentBlockingManager) {
 
         self.configStorage = configStorage
         self.privacyConfigurationManager = privacyConfigurationManager

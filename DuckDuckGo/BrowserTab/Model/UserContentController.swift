@@ -34,6 +34,10 @@ final class UserContentController: WKUserContentController {
         let completionTokens: [ContentBlockerRulesManager.CompletionToken]
     }
     @Published private(set) var contentBlockingAssets: ContentBlockingAssets? {
+        willSet {
+            self.removeAllContentRuleLists()
+            self.removeAllUserScripts()
+        }
         didSet {
             guard let contentBlockingAssets = contentBlockingAssets else { return }
             self.installContentRuleLists(contentBlockingAssets.contentRuleLists)
@@ -62,7 +66,6 @@ final class UserContentController: WKUserContentController {
     }
 
     private func installContentRuleLists(_ contentRuleLists: [String: WKContentRuleList]) {
-        self.removeAllContentRuleLists()
         guard self.privacyConfigurationManager.privacyConfig.isEnabled(featureKey: .contentBlocking) else { return }
 
         contentRuleLists.values.forEach(self.add)
@@ -85,8 +88,6 @@ final class UserContentController: WKUserContentController {
     }
 
     private func installUserScripts(_ userScripts: UserScripts) {
-        self.removeAllUserScripts()
-
         userScripts.scripts.forEach(self.addUserScript)
         userScripts.userScripts.forEach(self.addHandler)
 

@@ -28,4 +28,6 @@ final class ContentBlockerRulesManagerMock: ContentBlockerRulesManagerProtocol {
 
     let updatesSubject = PassthroughSubject<ContentBlockerRulesManager.UpdateEvent, Never>()
 
+    var currentRules: [ContentBlockerRulesManager.Rules] = []
+
 }

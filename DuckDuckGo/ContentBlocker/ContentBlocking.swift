@@ -55,7 +55,9 @@ final class ContentBlocking {
                                                             cache: ContentBlockingRulesCache(),
                                                             errorReporting: Self.debugEvents,
                                                             logger: OSLog.contentBlocking)
-        contentBlockingUpdating = ContentBlockingUpdating(contentBlockerRulesManager: contentBlockingManager)
+        contentBlockingUpdating = ContentBlockingUpdating(contentBlockerRulesManager: contentBlockingManager,
+                                                          privacyConfigurationManager: privacyConfigurationManager,
+                                                          configStorage: configStorage)
 
     }
 
@@ -139,31 +141,52 @@ final class ContentBlocking {
 
 final class ContentBlockingUpdating {
 
-    @Published private var rulesUpdate: ContentBlockerRulesManager.UpdateEvent?
+    private struct BufferedValue {
+        let rulesUpdate: ContentBlockerRulesManager.UpdateEvent
+        let sourceProvider: ScriptSourceProviding
+
+        init(rulesUpdate: ContentBlockerRulesManager.UpdateEvent, sourceProvider: ScriptSourceProviding) {
+            self.rulesUpdate = rulesUpdate
+            self.sourceProvider = sourceProvider
+        }
+    }
+
+    @Published private var bufferedValue: BufferedValue?
     private var cancellable: AnyCancellable?
 
     private(set) var userContentBlockingAssets: AnyPublisher<UserContentController.ContentBlockingAssets, Never>!
 
     init(contentBlockerRulesManager: ContentBlockerRulesManagerProtocol,
+         privacyConfigurationManager: PrivacyConfigurationManager = ContentBlocking.shared.privacyConfigurationManager,
+         configStorage: ConfigurationStoring = DefaultConfigurationStorage.shared,
          privacySecurityPreferences: PrivacySecurityPreferences = PrivacySecurityPreferences.shared) {
+
+        let makeValue: (ContentBlockerRulesManager.UpdateEvent) -> BufferedValue = { rulesUpdate in
+            let sourceProvider = DefaultScriptSourceProvider(configStorage: configStorage,
+                                                             privacyConfigurationManager: privacyConfigurationManager,
+                                                             contentBlockingManager: contentBlockerRulesManager)
+            return BufferedValue(rulesUpdate: rulesUpdate, sourceProvider: sourceProvider)
+        }
 
         // 1. Collect updates from ContentBlockerRulesManager and generate UserScripts based on its output
         cancellable = contentBlockerRulesManager.updatesPublisher
             // regenerate UserScripts on gpcEnabled preference updated
             .combineLatest(privacySecurityPreferences.$gpcEnabled)
             .map { $0.0 } // drop gpcEnabled value: $0.1
-            .weakAssign(to: \.rulesUpdate, on: self) // buffer latest update value
+            // DefaultScriptSourceProvider instance should be created once per rules/config change and fed into UserScripts initialization
+            .map(makeValue)
+            .weakAssign(to: \.bufferedValue, on: self) // buffer latest update value
 
         // 2. Publish ContentBlockingAssets(Rules+Scripts) for WKUserContentController per subscription
-        self.userContentBlockingAssets = $rulesUpdate
+        self.userContentBlockingAssets = $bufferedValue
             .compactMap { $0 } // drop initial nil
-            .map { rulesUpdate in
-                UserContentController.ContentBlockingAssets(contentRuleLists: rulesUpdate.rules
+            .map { value in
+                UserContentController.ContentBlockingAssets(contentRuleLists: value.rulesUpdate.rules
                                                                 .reduce(into: [String: WKContentRuleList](), { result, rules in
                                                                     result[rules.name] = rules.rulesList
                                                                 }),
-                                                            userScripts: UserScripts(with: DefaultScriptSourceProvider()),
-                                                            completionTokens: rulesUpdate.completionTokens)
+                                                            userScripts: UserScripts(with: value.sourceProvider),
+                                                            completionTokens: value.rulesUpdate.completionTokens)
             }
             .eraseToAnyPublisher()
 
@@ -173,6 +196,7 @@ final class ContentBlockingUpdating {
 
 protocol ContentBlockerRulesManagerProtocol: AnyObject {
     var updatesPublisher: AnyPublisher<ContentBlockerRulesManager.UpdateEvent, Never> { get }
+    var currentRules: [ContentBlockerRulesManager.Rules] { get }
 }
 extension ContentBlockerRulesManager: ContentBlockerRulesManagerProtocol {}
 
