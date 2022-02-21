@@ -259,6 +259,7 @@ final class PasswordManagementItemListModel: ObservableObject {
 
     @Published private(set) var selected: SecureVaultItem?
     @Published private(set) var emptyState: EmptyState = .none
+    @Published var canChangeCategory: Bool = true
 
     private var onItemSelected: (_ old: SecureVaultItem?, _ new: SecureVaultItem?) -> Void
 

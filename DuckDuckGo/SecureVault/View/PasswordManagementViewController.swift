@@ -59,7 +59,11 @@ final class PasswordManagementViewController: NSViewController {
 
     var domain: String?
     var isEditing = false
-    var isDirty = false
+    var isDirty = false {
+        didSet {
+            listModel?.canChangeCategory = !isDirty
+        }
+    }
 
     var listModel: PasswordManagementItemListModel? {
         didSet {

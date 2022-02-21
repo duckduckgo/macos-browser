@@ -46,6 +46,8 @@ struct PasswordManagementItemListView: View {
                 .padding(.top, 15)
                 .padding(.bottom, 14)
                 .padding([.leading, .trailing], 10)
+                .disabled(!model.canChangeCategory)
+                .opacity(model.canChangeCategory ? 1.0 : 0.5)
             
             Divider()
                 .opacity(opacity)
