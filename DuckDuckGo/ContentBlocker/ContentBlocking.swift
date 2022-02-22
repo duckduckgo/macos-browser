@@ -164,6 +164,7 @@ final class ContentBlockingUpdating {
         let makeValue: (ContentBlockerRulesManager.UpdateEvent) -> BufferedValue = { rulesUpdate in
             let sourceProvider = DefaultScriptSourceProvider(configStorage: configStorage,
                                                              privacyConfigurationManager: privacyConfigurationManager,
+                                                             privacySettings: privacySecurityPreferences,
                                                              contentBlockingManager: contentBlockerRulesManager)
             return BufferedValue(rulesUpdate: rulesUpdate, sourceProvider: sourceProvider)
         }

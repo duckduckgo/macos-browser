@@ -25,6 +25,7 @@ protocol ScriptSourceProviding {
     var contentBlockerRulesConfig: ContentBlockerUserScriptConfig? { get }
     var surrogatesConfig: SurrogatesUserScriptConfig? { get }
     var privacyConfigurationManager: PrivacyConfigurationManager { get }
+    var autofillSourceProvider: AutofillUserScriptSourceProvider? { get }
     var sessionKey: String? { get }
     var clickToLoadSource: String { get }
 
@@ -34,29 +35,41 @@ struct DefaultScriptSourceProvider: ScriptSourceProviding {
 
     private(set) var contentBlockerRulesConfig: ContentBlockerUserScriptConfig?
     private(set) var surrogatesConfig: SurrogatesUserScriptConfig?
+    private(set) var autofillSourceProvider: AutofillUserScriptSourceProvider?
     private(set) var sessionKey: String?
     private(set) var clickToLoadSource: String = ""
 
     let configStorage: ConfigurationStoring
     let privacyConfigurationManager: PrivacyConfigurationManager
     let contentBlockingManager: ContentBlockerRulesManagerProtocol
+    let privacySettings: PrivacySecurityPreferences
 
     init(configStorage: ConfigurationStoring = DefaultConfigurationStorage.shared,
          privacyConfigurationManager: PrivacyConfigurationManager = ContentBlocking.shared.privacyConfigurationManager,
+         privacySettings: PrivacySecurityPreferences = PrivacySecurityPreferences.shared,
          contentBlockingManager: ContentBlockerRulesManagerProtocol = ContentBlocking.shared.contentBlockingManager) {
 
         self.configStorage = configStorage
         self.privacyConfigurationManager = privacyConfigurationManager
+        self.privacySettings = privacySettings
         self.contentBlockingManager = contentBlockingManager
 
         self.contentBlockerRulesConfig = buildContentBlockerRulesConfig()
         self.surrogatesConfig = buildSurrogatesConfig()
         self.sessionKey = generateSessionKey()
         self.clickToLoadSource = buildClickToLoadSource()
+        self.autofillSourceProvider = buildAutofillSource()
     }
 
     private func generateSessionKey() -> String {
         return UUID().uuidString
+    }
+    
+    private func buildAutofillSource() -> AutofillUserScriptSourceProvider {
+
+        return DefaultAutofillSourceProvider(privacyConfigurationManager: self.privacyConfigurationManager,
+                                             properties: ContentScopeProperties(gpcEnabled: privacySettings.gpcEnabled,
+                                                                                sessionKey: self.sessionKey ?? ""))
     }
 
     private func buildContentBlockerRulesConfig() -> ContentBlockerUserScriptConfig {

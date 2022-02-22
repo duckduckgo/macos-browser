@@ -112,7 +112,7 @@ extension Pixel {
         }
 
         case navigation(kind: NavigationKind, source: NavigationAccessPoint)
-        
+
         case serp
 
         case suggestionsDisplayed(hasBookmark: HasBookmark, hasFavorite: HasFavorite, hasHistoryEntry: HasHistoryEntry)
