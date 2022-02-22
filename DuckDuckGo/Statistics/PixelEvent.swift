@@ -57,7 +57,7 @@ extension Pixel {
         }
 
         case navigation(kind: NavigationKind, source: NavigationAccessPoint)
-        
+
         case serp
 
         case suggestionsDisplayed(hasBookmark: HasBookmark, hasFavorite: HasFavorite, hasHistoryEntry: HasHistoryEntry)
@@ -93,13 +93,15 @@ extension Pixel {
         case onboardingSetDefaultPressed
         case onboardingSetDefaultSkipped
         case onboardingTypingSkipped
+        
+        case autoconsentOptOutFailed
+        case autoconsentSelfTestFailed
 
         case debug(event: Debug, error: Error? = nil)
 
         enum Debug: String, CustomStringConvertible {
             var description: String { rawValue }
 
-            case dbMigrationError = "dbme"
             case dbInitializationError = "dbie"
             case dbSaveExcludedHTTPSDomainsError = "dbsw"
             case dbSaveBloomFilterError = "dbsb"
@@ -134,6 +136,9 @@ extension Pixel {
             case clickToLoadAllowListCompilationFailed = "click_to_load_compilation_error_allow_list"
             case clickToLoadUnpSitesCompilationFailed = "click_to_load_compilation_error_unprotected_list"
             case clickToLoadFallbackCompilationFailed = "click_to_load_compilation_error_fallback_tds"
+
+            case secureVaultInitError = "secure_vault_init_error"
+            case secureVaultError = "secure_vault_error"
         }
 
     }
@@ -260,6 +265,11 @@ extension Pixel.Event {
         case .onboardingTypingSkipped:
             return "m_mac_onboarding_setdefault_skipped"
 
+        case .autoconsentOptOutFailed:
+            return "m_mac_autoconsent_optout_failed"
+
+        case .autoconsentSelfTestFailed:
+            return "m_mac_autoconsent_selftest_failed"
         }
     }
 

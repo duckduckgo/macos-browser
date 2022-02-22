@@ -473,6 +473,7 @@ final class Tab: NSObject {
             userScripts.pageObserverScript.delegate = self
             userScripts.printingUserScript.delegate = self
             userScripts.hoverUserScript.delegate = self
+            userScripts.autoconsentUserScript?.delegate = self
 
             attachFindInPage()
 
@@ -535,7 +536,8 @@ final class Tab: NSObject {
     @Published var trackerInfo: TrackerInfo?
     @Published var serverTrust: ServerTrust?
     @Published var connectionUpgradedTo: URL?
-
+    @Published var cookieConsentManaged: CookieConsentInfo?
+    
     public func resetDashboardInfo(_ url: URL?) {
         trackerInfo = TrackerInfo()
         if self.serverTrust?.host != url?.host {
@@ -684,6 +686,10 @@ extension Tab: SecureVaultManagerDelegate {
     func secureVaultManager(_: SecureVaultManager, didAutofill type: AutofillType, withObjectId objectId: Int64) {
         Pixel.fire(.formAutofilled(kind: type.formAutofillKind))
     } 
+
+    func secureVaultInitFailed(_ error: SecureVaultError) {
+        SecureVaultErrorReporter.shared.secureVaultInitFailed(error)
+    }
 
 }
 
@@ -1008,5 +1014,11 @@ extension Tab: HoverUserScriptDelegate {
 
 }
 
+@available(macOS 11, *)
+extension Tab: AutoconsentUserScriptDelegate {
+    func autoconsentUserScript(consentStatus: CookieConsentInfo) {
+        self.cookieConsentManaged = consentStatus
+    }
+}
 // swiftlint:enable type_body_length
 // swiftlint:enable file_length

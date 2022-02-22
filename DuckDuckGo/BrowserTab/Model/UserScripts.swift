@@ -29,12 +29,13 @@ final class UserScripts {
     let printingUserScript = PrintingUserScript()
     let hoverUserScript = HoverUserScript()
     let debugScript = DebugUserScript()
-    let autofillScript = AutofillUserScript()
     let clickToLoadScript = ClickToLoadUserScript()
 
     let contentBlockerRulesScript: ContentBlockerRulesUserScript
     let surrogatesScript: SurrogatesUserScript
     let contentScopeUserScript: ContentScopeUserScript
+    let autofillScript: AutofillUserScript
+    let autoconsentUserScript: UserScriptWithAutoconsent?
 
     init(with sourceProvider: ScriptSourceProviding) {
 
@@ -44,6 +45,13 @@ final class UserScripts {
         let sessionKey = sourceProvider.sessionKey ?? ""
         let prefs = ContentScopeProperties.init(gpcEnabled: privacySettings.gpcEnabled, sessionKey: sessionKey)
         contentScopeUserScript = ContentScopeUserScript(sourceProvider.privacyConfigurationManager, properties: prefs)
+        autofillScript = AutofillUserScript(scriptSourceProvider: sourceProvider.autofillSourceProvider!)
+        if #available(macOS 11, *) {
+            autoconsentUserScript = AutoconsentUserScript()
+            userScripts.append(autoconsentUserScript!)
+        } else {
+            autoconsentUserScript = nil
+        }
     }
 
     lazy var userScripts: [UserScript] = [
