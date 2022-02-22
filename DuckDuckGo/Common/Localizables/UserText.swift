@@ -399,7 +399,7 @@ struct UserText {
     
     static let autoconsentPopoverMessage = NSLocalizedString("Cookie consent pop-up managed", comment: "Popover message")
     static let autoconsentPopupTitle = NSLocalizedString("Let DuckDuckGo try to manage cookie consent pop-ups?", comment: "messageText")
-    static let autoconsentPopupDescription = NSLocalizedString("We'll automatically set your cookie preferences to minimize cookies and maximize privacy, then close the pop-up.", comment: "informativeText")
+    static let autoconsentPopupDescription = NSLocalizedString("On some sites, we can automatically set preferences to minimize cookies 🍪 and maximize privacy, then close the pop-up.", comment: "informativeText")
     static let autoconsentPopupEnableButton = NSLocalizedString("Manage Cookie Pop-ups", comment: "")
     static let autoconsentPopupLaterButton = NSLocalizedString("Not Now", comment: "")
     static let autoconsentPopupNeverButton = NSLocalizedString("Don't Ask Again", comment: "")
