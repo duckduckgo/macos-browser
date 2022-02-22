@@ -170,4 +170,13 @@ final class WebView: WKWebView {
         inspectorPerform("showResources")
     }
 
+    var fullscreenWindowController: NSWindowController? {
+        guard let fullscreenWindowController = self.window?.windowController,
+              fullscreenWindowController.className.contains("FullScreen")
+        else {
+            return nil
+        }
+        return fullscreenWindowController
+    }
+
 }

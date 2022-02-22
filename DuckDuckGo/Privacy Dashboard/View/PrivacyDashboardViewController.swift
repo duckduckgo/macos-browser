@@ -37,18 +37,18 @@ final class PrivacyDashboardViewController: NSViewController {
         privacyDashboardScript.delegate = self
         initWebView()
         webView.configuration.userContentController.addHandlerNoContentWorld(privacyDashboardScript)
-
-        prepareContentBlockingCancellable(publisher: ContentBlocking.contentBlockingUpdating.contentBlockingRules)
     }
 
-    private func prepareContentBlockingCancellable(publisher: ContentBlockingUpdating.NewRulesPublisher) {
-        contentBlockinRulesUpdatedCancellable = publisher.receive(on: RunLoop.main).sink { [weak self] newRules in
+    private func prepareContentBlockingCancellable<Pub: Publisher>(publisher: Pub)
+    where Pub.Output == [ContentBlockerRulesManager.CompletionToken], Pub.Failure == Never {
+
+        publisher.receive(on: RunLoop.main).sink { [weak self] completionTokens in
             dispatchPrecondition(condition: .onQueue(.main))
 
-            guard let self = self, let newRules = newRules, !self.pendingUpdates.isEmpty else { return }
+            guard let self = self, !self.pendingUpdates.isEmpty else { return }
 
             var didUpdate = false
-            for token in newRules.completionTokens {
+            for token in completionTokens {
                 if self.pendingUpdates.removeValue(forKey: token) != nil {
                     didUpdate = true
                 }
@@ -58,12 +58,15 @@ final class PrivacyDashboardViewController: NSViewController {
                 self.sendPendingUpdates()
                 self.tabViewModel?.reload()
             }
-        }
+        }.store(in: &cancellables)
     }
 
     override func viewWillAppear() {
+        guard let tabViewModel = tabViewModel else { return }
+
         let url = Bundle.main.url(forResource: "popup", withExtension: "html", subdirectory: "duckduckgo-privacy-dashboard/build/macos/html")!
         webView.loadFileURL(url, allowingReadAccessTo: url.deletingLastPathComponent())
+        prepareContentBlockingCancellable(publisher: tabViewModel.tab.cbrCompletionTokensPublisher)
     }
 
     override func viewWillDisappear() {
@@ -144,7 +147,7 @@ final class PrivacyDashboardViewController: NSViewController {
             return
         }
 
-        let configuration = ContentBlocking.privacyConfigurationManager.privacyConfig
+        let configuration = ContentBlocking.shared.privacyConfigurationManager.privacyConfig
         let isProtected = !configuration.isUserUnprotected(domain: domain)
         self.privacyDashboardScript.setProtectionStatus(isProtected, webView: self.webView)
     }
@@ -164,7 +167,7 @@ final class PrivacyDashboardViewController: NSViewController {
             return
         }
 
-        let pageEntity = ContentBlocking.trackerDataManager.trackerData.findEntity(forHost: domain)
+        let pageEntity = ContentBlocking.shared.trackerDataManager.trackerData.findEntity(forHost: domain)
         self.privacyDashboardScript.setParentEntity(pageEntity, webView: self.webView)
     }
 
@@ -181,6 +184,16 @@ final class PrivacyDashboardViewController: NSViewController {
             })
             .store(in: &cancellables)
     }
+    
+    private func subscribeToConsentManaged() {
+        tabViewModel?.tab.$cookieConsentManaged
+            .receive(on: DispatchQueue.main)
+            .sink(receiveValue: { [weak self] consentManaged in
+                guard let self = self else { return }
+                self.privacyDashboardScript.setConsentManaged(consentManaged, webView: self.webView)
+            })
+            .store(in: &cancellables)
+    }
 
 }
 
@@ -192,14 +205,14 @@ extension PrivacyDashboardViewController: PrivacyDashboardUserScriptDelegate {
             return
         }
 
-        let configuration = ContentBlocking.privacyConfigurationManager.privacyConfig
+        let configuration = ContentBlocking.shared.privacyConfigurationManager.privacyConfig
         if isProtected {
             configuration.userEnabledProtection(forDomain: domain)
         } else {
             configuration.userDisabledProtection(forDomain: domain)
         }
 
-        let completionToken = ContentBlocking.contentBlockingManager.scheduleCompilation()
+        let completionToken = ContentBlocking.shared.contentBlockingManager.scheduleCompilation()
         pendingUpdates[completionToken] = domain
         sendPendingUpdates()
     }
@@ -233,6 +246,7 @@ extension PrivacyDashboardViewController: WKNavigationDelegate {
         sendProtectionStatus()
         sendPendingUpdates()
         sendParentEntity()
+        subscribeToConsentManaged()
     }
 
 }
