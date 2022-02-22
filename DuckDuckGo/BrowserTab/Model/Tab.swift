@@ -98,6 +98,7 @@ final class Tab: NSObject {
         }
     }
 
+    weak var autofillScript: AutofillUserScript?
     weak var delegate: TabDelegate?
     private let cbaTimeReporter: ContentBlockingAssetsCompilationTimeReporter?
 
@@ -563,6 +564,7 @@ extension Tab: UserContentControllerDelegate {
         userScripts.autofillScript.topView = self.delegate
         userScripts.autofillScript.emailDelegate = emailManager
         userScripts.autofillScript.vaultDelegate = vaultManager
+        self.autofillScript = userScripts.autofillScript
         userScripts.pageObserverScript.delegate = self
         userScripts.printingUserScript.delegate = self
         userScripts.hoverUserScript.delegate = self
@@ -575,8 +577,9 @@ extension Tab: UserContentControllerDelegate {
 
 extension Tab: ChildAutofillUserScriptDelegate {
     func clickTriggered(clickPoint: NSPoint) {
-        userScripts.autofillScript.clickPoint = clickPoint
-        userScripts.autofillScript.topView = self.delegate
+        guard let autofillScript = autofillScript else { return }
+        autofillScript.clickPoint = clickPoint
+        autofillScript.topView = self.delegate
     }
 }
 

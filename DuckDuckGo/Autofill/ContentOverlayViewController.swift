@@ -106,7 +106,7 @@ public final class ContentOverlayViewController: NSViewController, EmailManagerR
     }
 
     public func buildAutofillSource() -> AutofillUserScriptSourceProvider {
-        let scriptSourceProviding = DefaultScriptSourceProvider.shared
+        let scriptSourceProviding = DefaultScriptSourceProvider()
         return scriptSourceProviding.buildAutofillSource()
     }
 
