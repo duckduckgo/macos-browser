@@ -64,7 +64,6 @@ final class MainViewController: NSViewController {
         listenToKeyDownEvents()
         subscribeToSelectedTabViewModel()
         findInPageContainerView.applyDropShadow()
-        animateNavigationBar(tabCollectionViewModel.selectedTabViewModel?.tab.content == .homepage, animated: false)
 
     }
 
@@ -74,6 +73,8 @@ final class MainViewController: NSViewController {
             tabBarContainerView.isHidden = true
             navigationBarTopConstraint.constant = 0.0
             addressBarHeightConstraint.constant = tabBarContainerView.frame.height
+        } else {
+            resizeNavigationBarForHomePage(tabCollectionViewModel.selectedTabViewModel?.tab.content == .homepage, animated: false)
         }
     }
 
@@ -167,19 +168,31 @@ final class MainViewController: NSViewController {
         }
     }
 
-    private func animateNavigationBar(_ homepage: Bool, animated: Bool = true) {
+    private func resizeNavigationBarForHomePage(_ homePage: Bool, animated: Bool) {
         let performAnim = animated
 
+        if performAnim {
+            NSAnimationContext.beginGrouping()
+            NSAnimationContext.current.duration = 0.1
+        }
+
         let height = performAnim ? addressBarHeightConstraint.animator() : addressBarHeightConstraint
-        height?.constant = homepage ? 68 : 48
+        height?.constant = homePage ? 68 : 48
 
         let divider = performAnim ? self.divider.animator() : self.divider
-        divider?.alphaValue = homepage ? 0 : 1.0
+        divider?.alphaValue = homePage ? 0 : 1.0
+
+        navigationBarViewController.resizeAddressBarForHomePage(homePage, animated: performAnim)
+
+        if performAnim {
+            NSAnimationContext.endGrouping()
+        }
+
     }
 
     private func subscribeToTabContent() {
         tabCollectionViewModel.selectedTabViewModel?.tab.$content.receive(on: DispatchQueue.main).sink(receiveValue: { [weak self] content in
-            self?.animateNavigationBar(content == .homepage)
+            self?.resizeNavigationBarForHomePage(content == .homepage, animated: true)
         }).store(in: &self.navigationalCancellables)
     }
 

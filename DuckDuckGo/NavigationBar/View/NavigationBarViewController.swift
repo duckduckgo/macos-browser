@@ -120,8 +120,6 @@ final class NavigationBarViewController: NSViewController {
         optionsButton.sendAction(on: .leftMouseDown)
         bookmarkListButton.sendAction(on: .leftMouseDown)
         downloadsButton.sendAction(on: .leftMouseDown)
-
-        animateBar(tabCollectionViewModel.selectedTabViewModel?.tab.content == .homepage, animated: false)
     }
 
     override func viewWillAppear() {
@@ -340,27 +338,24 @@ final class NavigationBarViewController: NSViewController {
             .receive(on: DispatchQueue.main)
             .sink(receiveValue: { [weak self] content in
                 self?.updatePasswordManagementButton()
-                self?.animateBar(content == .homepage)
                 if content == .homepage {
                     self?.addressBarViewController?.addressBarTextField.becomeFirstResponder()
                 }
             })
     }
 
-    private func animateBar(_ homepage: Bool, animated: Bool = true) {
-        let performAnim = animated
+    func resizeAddressBarForHomePage(_ homePage: Bool, animated: Bool) {
+        let top = animated ? addressBarTopConstraint.animator() : addressBarTopConstraint
+        top?.constant = homePage ? 16 : 6
 
-        let top = performAnim ? addressBarTopConstraint.animator() : addressBarTopConstraint
-        top?.constant = homepage ? 16 : 6
+        let proportionalWidth = animated ? addressBarProportionalWidthConstraint.animator() : addressBarProportionalWidthConstraint
+        proportionalWidth?.isActive = !homePage
 
-        let proportionalWidth = performAnim ? addressBarProportionalWidthConstraint.animator() : addressBarProportionalWidthConstraint
-        proportionalWidth?.isActive = !homepage
+        let homepageWidth = animated ? homepageWidthConstraint.animator() : homepageWidthConstraint
+        homepageWidth?.isActive = homePage
 
-        let homepageWidth = performAnim ? homepageWidthConstraint.animator() : homepageWidthConstraint
-        homepageWidth?.isActive = homepage
-
-        let logo = performAnim ? daxLogo.animator() : daxLogo
-        logo?.isHidden = !homepage
+        let logo = animated ? daxLogo.animator() : daxLogo
+        logo?.isHidden = !homePage
     }
 
     private func subscribeToDownloads() {
