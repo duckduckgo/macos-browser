@@ -11,7 +11,7 @@
         <scene sceneID="uf3-HR-DIS">
             <objects>
                 <viewController id="o2v-eH-jTI" customClass="NavigationBarViewController" customModule="DuckDuckGo_Privacy_Browser" customModuleProvider="target" sceneMemberID="viewController">
-                    <view key="view" misplaced="YES" id="hYV-nu-QIp" customClass="ColorView" customModule="DuckDuckGo_Privacy_Browser" customModuleProvider="target">
+                    <view key="view" id="hYV-nu-QIp" customClass="ColorView" customModule="DuckDuckGo_Privacy_Browser" customModuleProvider="target">
                         <rect key="frame" x="0.0" y="0.0" width="746" height="48"/>
                         <autoresizingMask key="autoresizingMask"/>
                         <subviews>
@@ -278,6 +278,7 @@
                         </userDefinedRuntimeAttributes>
                     </view>
                     <connections>
+                        <outlet property="addressBarBottomConstraint" destination="Nbq-Kg-VCW" id="dhs-QW-hYH"/>
                         <outlet property="addressBarContainer" destination="Wba-nA-FYj" id="VEq-Sp-Ns1"/>
                         <outlet property="addressBarLeftToNavButtonsConstraint" destination="W83-wu-cjA" id="cCS-Fa-hJd"/>
                         <outlet property="addressBarLeftToSuperviewConstraint" destination="t38-xG-cxS" id="cCS-Fb-hJd"/>

@@ -177,7 +177,7 @@ final class MainViewController: NSViewController {
         }
 
         let height = performAnim ? addressBarHeightConstraint.animator() : addressBarHeightConstraint
-        height?.constant = homePage ? 68 : 48
+        height?.constant = homePage ? 62 : 48
 
         let divider = performAnim ? self.divider.animator() : self.divider
         divider?.alphaValue = homePage ? 0 : 1.0
