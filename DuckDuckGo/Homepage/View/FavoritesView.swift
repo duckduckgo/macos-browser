@@ -33,19 +33,22 @@ struct Favorites: View {
             HoverButton(size: 64, backgroundColor: Color("HomeFavoritesBackgroundColor"), imageName: "Add", imageSize: 22) {
                 model.addNew()
             }
+
             Text(UserText.addFavorite)
                 .font(.system(size: 10))
-        }
 
-        VStack(alignment: .leading, spacing: 0) {
+        }.frame(width: 72)
+
+        VStack(alignment: .leading, spacing: 8) {
 
             ForEach(expanded ? model.rows.indices : model.rows.indices.prefix(Homepage.favoritesRowCountWhenCollapsed), id: \.self) { index in
 
-                HStack(alignment: .top, spacing: 22) {
+                HStack(alignment: .top, spacing: 20) {
                     ForEach(model.rows[index], id: \.id) { favorite in
                         if !expanded && index + 1 == Homepage.favoritesRowCountWhenCollapsed && favorite.id == model.rows[index].last?.id {
                             addButton
-                        } else if let bookmark = favorite.bookmark {
+                        } else
+                        if let bookmark = favorite.bookmark {
                             Favorite(bookmark: bookmark)
                         } else if favorite.id == Homepage.Models.FavoriteModel.addButtonUUID {
                             addButton
@@ -55,15 +58,20 @@ struct Favorites: View {
                     }
 
                     Spacer()
+
                 }
+                
             }
 
             MoreOrLess(moreIsUp: true, expanded: $expanded)
                 .visibility(model.rows.count > Homepage.favoritesRowCountWhenCollapsed && isHovering ? .visible : .invisible)
 
-        }.onHover { isHovering in
+        }
+        .frame(width: 440)
+        .onHover { isHovering in
             self.isHovering = isHovering
         }
+
     }
 
 }
@@ -71,8 +79,6 @@ struct Favorites: View {
 struct Favorite: View {
 
     @EnvironmentObject var model: Homepage.Models.FavoritesModel
-
-    let size: CGFloat = 64
 
     let bookmark: Bookmark
 
@@ -85,7 +91,7 @@ struct Favorite: View {
             ZStack(alignment: .center) {
 
                 FaviconView(domain: bookmark.url.host ?? "", size: 64)
-                    .frame(width: size, height: size)
+                    .frame(width: 64, height: 64)
                     .padding(9)
                     .cornerRadius(8)
                     .blur(radius: isHovering ? 30 : 50)
@@ -95,7 +101,7 @@ struct Favorite: View {
                     .padding(9)
 
             }
-            .frame(width: size, height: size)
+            .frame(width: 64, height: 64)
             .cornerRadius(8)
             .clipped()
 
@@ -105,9 +111,8 @@ struct Favorite: View {
                 .truncationMode(.middle)
                 .font(.system(size: 10))
 
-            Spacer()
         }
-        .frame(width: size)
+        .frame(width: 72)
         .link(onHoverChanged: {
             isHovering = $0
         }) {

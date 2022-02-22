@@ -104,8 +104,6 @@ final class AddressBarViewController: NSViewController {
 
     override func viewWillAppear() {
 
-        print("***", view.layer?.masksToBounds)
-
         if view.window?.isPopUpWindow == true {
             addressBarTextField.isHidden = true
             inactiveBackgroundView.isHidden = true

@@ -37,7 +37,6 @@ struct RootView: View {
                                 Spacer()
 
                                 Favorites()
-                                    .frame(width: 440)
 
                                 Spacer()
                             }
