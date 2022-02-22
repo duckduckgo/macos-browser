@@ -269,7 +269,7 @@ final class HistoryCoordinator: HistoryCoordinating {
     /// Does the same for the root URL if it has no visits
     private func mark(url: URL, keyPath: WritableKeyPath<HistoryEntry, Bool>, value: Bool) {
         queue.async(flags: .barrier) { [weak self] in
-            guard var historyDictionary = self?.historyDictionary, var entry = historyDictionary[url] else {
+            guard let historyDictionary = self?.historyDictionary, var entry = historyDictionary[url] else {
                 os_log("Marking of %s not saved. History not loaded yet or entry doesn't exist",
                        log: .history, url.absoluteString)
                 return
