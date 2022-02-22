@@ -30,7 +30,7 @@ struct Favorites: View {
     var body: some View {
 
         let addButton = VStack {
-            HoverButton(size: 72, backgroundColor: Color("HomeFavoritesBackgroundColor"), imageName: "Add", imageSize: 22) {
+            HoverButton(size: 64, backgroundColor: Color("HomeFavoritesBackgroundColor"), imageName: "Add", imageSize: 22) {
                 model.addNew()
             }
             Text(UserText.addFavorite)
@@ -40,7 +40,8 @@ struct Favorites: View {
         VStack(alignment: .leading, spacing: 0) {
 
             ForEach(expanded ? model.rows.indices : model.rows.indices.prefix(Homepage.favoritesRowCountWhenCollapsed), id: \.self) { index in
-                HStack(alignment: .top, spacing: 29) {
+
+                HStack(alignment: .top, spacing: 22) {
                     ForEach(model.rows[index], id: \.id) { favorite in
                         if !expanded && index + 1 == Homepage.favoritesRowCountWhenCollapsed && favorite.id == model.rows[index].last?.id {
                             addButton
@@ -55,7 +56,6 @@ struct Favorites: View {
 
                     Spacer()
                 }
-                .frame(height: 112)
             }
 
             MoreOrLess(moreIsUp: true, expanded: $expanded)
@@ -72,7 +72,7 @@ struct Favorite: View {
 
     @EnvironmentObject var model: Homepage.Models.FavoritesModel
 
-    let size: CGFloat = 72
+    let size: CGFloat = 64
 
     let bookmark: Bookmark
 
@@ -84,7 +84,7 @@ struct Favorite: View {
 
             ZStack(alignment: .center) {
 
-                FaviconView(domain: bookmark.url.host ?? "", size: 72)
+                FaviconView(domain: bookmark.url.host ?? "", size: 64)
                     .frame(width: size, height: size)
                     .padding(9)
                     .cornerRadius(8)
@@ -105,6 +105,7 @@ struct Favorite: View {
                 .truncationMode(.middle)
                 .font(.system(size: 10))
 
+            Spacer()
         }
         .frame(width: size)
         .link(onHoverChanged: {

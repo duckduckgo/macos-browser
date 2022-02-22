@@ -31,7 +31,7 @@ protocol AddressBarButtonsViewControllerDelegate: AnyObject {
 // swiftlint:disable file_length
 final class AddressBarButtonsViewController: NSViewController {
 
-    static let homeFaviconImage = NSImage(named: "HomeFavicon")
+    static let homeFaviconImage = NSImage(named: "Search")
     static let searchImage = NSImage(named: "Search")
     static let webImage = NSImage(named: "Web")
     static let bookmarkImage = NSImage(named: "Bookmark")

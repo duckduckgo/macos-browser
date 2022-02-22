@@ -41,7 +41,7 @@ struct DefaultBrowserPrompt: View {
                 Text(UserText.defaultBrowserPromptMessage)
                     .font(.body)
 
-                let button = Button(UserText.defaultBrowserPromptMessage) {
+                let button = Button(UserText.defaultBrowserPromptButton) {
                     self.model.requestSetDefault()
                 }
 

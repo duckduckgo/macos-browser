@@ -38,11 +38,13 @@ final class NavigationBarViewController: NSViewController {
     @IBOutlet weak var downloadsButton: MouseOverButton!
     @IBOutlet weak var navigationButtons: NSView!
     @IBOutlet weak var addressBarContainer: NSView!
+    @IBOutlet weak var daxLogo: NSImageView!
 
     @IBOutlet var addressBarLeftToNavButtonsConstraint: NSLayoutConstraint!
     @IBOutlet var addressBarLeftToSuperviewConstraint: NSLayoutConstraint!
     @IBOutlet var addressBarProportionalWidthConstraint: NSLayoutConstraint!
     @IBOutlet var addressBarTopConstraint: NSLayoutConstraint!
+    @IBOutlet var homepageWidthConstraint: NSLayoutConstraint!
 
     lazy var downloadsProgressView: CircularProgressView = {
         let bounds = downloadsButton.bounds
@@ -346,13 +348,19 @@ final class NavigationBarViewController: NSViewController {
     }
 
     private func animateBar(_ homepage: Bool, animated: Bool = true) {
-        let performAnim = false // TESTFIX animated
+        let performAnim = animated
 
         let top = performAnim ? addressBarTopConstraint.animator() : addressBarTopConstraint
         top?.constant = homepage ? 16 : 6
 
-        let width = performAnim ? addressBarProportionalWidthConstraint.animator() : addressBarProportionalWidthConstraint
-        width?.constant = homepage ? -260 : 0
+        let proportionalWidth = performAnim ? addressBarProportionalWidthConstraint.animator() : addressBarProportionalWidthConstraint
+        proportionalWidth?.isActive = !homepage
+
+        let homepageWidth = performAnim ? homepageWidthConstraint.animator() : homepageWidthConstraint
+        homepageWidth?.isActive = homepage
+
+        let logo = performAnim ? daxLogo.animator() : daxLogo
+        logo?.isHidden = !homepage
     }
 
     private func subscribeToDownloads() {

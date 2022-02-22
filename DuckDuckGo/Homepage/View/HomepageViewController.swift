@@ -129,7 +129,7 @@ final class HomepageViewController: NSViewController {
     }
 
     func subscribeToBookmarks() {
-        bookmarkManager.listPublisher.sink { [weak self] _ in
+        bookmarkManager.listPublisher.receive(on: RunLoop.main).sink { [weak self] _ in
             withAnimation {
                 self?.refreshFavoritesModel()
             }

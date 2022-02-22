@@ -31,10 +31,16 @@ struct RootView: View {
                     ScrollView {
                         VStack(spacing: 0) {
                             ProtectionSummary()
+                                .padding(.bottom, max(48, geometry.size.height * 0.29))
 
-                            Favorites()
-                                .frame(maxWidth: 512)
-                                .padding(.top, max(48, geometry.size.height * 0.29))
+                            HStack {
+                                Spacer()
+
+                                Favorites()
+                                    .frame(width: 440)
+
+                                Spacer()
+                            }
 
                             Spacer()
                         }
