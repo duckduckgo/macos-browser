@@ -89,6 +89,8 @@ final class PasswordManagementViewController: NSViewController {
                 self.isEditing = isEditing
                 self.divider.isHidden = isEditing
                 self.updateEmptyState(state: self.listModel?.emptyState)
+                
+                self.searchField.isEditable = !isEditing
             })
         }
     }
