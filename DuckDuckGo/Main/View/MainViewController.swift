@@ -74,6 +74,12 @@ final class MainViewController: NSViewController {
             navigationBarTopConstraint.constant = 0.0
             addressBarHeightConstraint.constant = tabBarContainerView.frame.height
         } else {
+            navigationBarContainerView.wantsLayer = true
+            navigationBarContainerView.layer?.masksToBounds = false
+//
+//            navigationBarViewController.view.wantsLayer = true
+//            navigationBarViewController.view.layer?.masksToBounds = false
+
             resizeNavigationBarForHomePage(tabCollectionViewModel.selectedTabViewModel?.tab.content == .homepage, animated: false)
         }
     }

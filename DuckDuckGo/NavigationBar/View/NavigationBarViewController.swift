@@ -109,6 +109,8 @@ final class NavigationBarViewController: NSViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
 
+        view.wantsLayer = true
+        view.layer?.masksToBounds = false
         addressBarContainer.wantsLayer = true
         addressBarContainer.layer?.masksToBounds = false    
 
@@ -341,6 +343,8 @@ final class NavigationBarViewController: NSViewController {
                 self?.updatePasswordManagementButton()
                 if content == .homepage {
                     self?.addressBarViewController?.addressBarTextField.becomeFirstResponder()
+                } else {
+                    self?.addressBarViewController?.addressBarTextField.resignFirstResponder()
                 }
             })
     }

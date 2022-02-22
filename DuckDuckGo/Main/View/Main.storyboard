@@ -24,15 +24,6 @@
                                     <segue destination="Nfk-V8-FAE" kind="embed" destinationCreationSelector="createTabBarViewControllerWithCoder:sender:segueIdentifier:" id="dL6-gI-9Hl"/>
                                 </connections>
                             </containerView>
-                            <containerView translatesAutoresizingMaskIntoConstraints="NO" id="wFH-xq-50o">
-                                <rect key="frame" x="0.0" y="703" width="1024" height="48"/>
-                                <constraints>
-                                    <constraint firstAttribute="height" constant="48" id="vZS-tl-wOP"/>
-                                </constraints>
-                                <connections>
-                                    <segue destination="R9l-dg-lKa" kind="embed" destinationCreationSelector="createNavigationBarViewControllerWithCoder:sender:segueIdentifier:" id="Br9-o3-sQ8"/>
-                                </connections>
-                            </containerView>
                             <containerView translatesAutoresizingMaskIntoConstraints="NO" id="SYo-8W-jl3">
                                 <rect key="frame" x="0.0" y="0.0" width="1024" height="703"/>
                                 <constraints>
@@ -54,6 +45,15 @@
                                     </userDefinedRuntimeAttribute>
                                 </userDefinedRuntimeAttributes>
                             </customView>
+                            <containerView translatesAutoresizingMaskIntoConstraints="NO" id="wFH-xq-50o">
+                                <rect key="frame" x="0.0" y="703" width="1024" height="48"/>
+                                <constraints>
+                                    <constraint firstAttribute="height" constant="48" id="vZS-tl-wOP"/>
+                                </constraints>
+                                <connections>
+                                    <segue destination="R9l-dg-lKa" kind="embed" destinationCreationSelector="createNavigationBarViewControllerWithCoder:sender:segueIdentifier:" id="Br9-o3-sQ8"/>
+                                </connections>
+                            </containerView>
                             <containerView hidden="YES" translatesAutoresizingMaskIntoConstraints="NO" id="Jbn-9T-FNt" userLabel="Find in Page Container View">
                                 <rect key="frame" x="312" y="667" width="400" height="40"/>
                                 <constraints>

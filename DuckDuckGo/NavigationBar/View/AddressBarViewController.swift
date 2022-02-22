@@ -92,8 +92,8 @@ final class AddressBarViewController: NSViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
 
-        self.view.wantsLayer = true
-        self.view.layer?.masksToBounds = false
+        view.wantsLayer = true
+        view.layer?.masksToBounds = false
 
         updateView()
         addressBarTextField.addressBarTextFieldDelegate = self
@@ -103,6 +103,9 @@ final class AddressBarViewController: NSViewController {
     }
 
     override func viewWillAppear() {
+
+        print("***", view.layer?.masksToBounds)
+
         if view.window?.isPopUpWindow == true {
             addressBarTextField.isHidden = true
             inactiveBackgroundView.isHidden = true
@@ -336,7 +339,7 @@ extension AddressBarViewController {
 
         let shadow = NSShadow()
         shadow.shadowColor = .addressBarShadowColor
-        shadow.shadowOffset = .init(width: 0, height: 5)
+        shadow.shadowOffset = .init(width: 0, height: 0)
         shadow.shadowBlurRadius = 10
         return shadow
     }
