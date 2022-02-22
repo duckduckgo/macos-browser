@@ -56,12 +56,13 @@ class AutoconsentBackgroundTests: XCTestCase {
     
     func testUserscriptIntegration() {
         // enable the feature
-        var prefs = PrivacySecurityPreferences()
+        let prefs = PrivacySecurityPreferences.shared
         prefs.autoconsentEnabled = true
         // setup a webview with autoconsent userscript installed
-        let autoconsentUserScript = AutoconsentUserScript()
+        let autoconsentUserScript = AutoconsentUserScript(scriptSource: DefaultScriptSourceProvider(),
+                                                          config: ContentBlocking.shared.privacyConfigurationManager.privacyConfig)
         let configuration = WKWebViewConfiguration()
-        configuration.applyStandardConfiguration()
+
         configuration.userContentController.addUserScript(autoconsentUserScript.makeWKUserScript())
         configuration.userContentController.addHandler(autoconsentUserScript)
         let webview = WKWebView(frame: .zero, configuration: configuration)

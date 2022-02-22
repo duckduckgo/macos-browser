@@ -41,10 +41,6 @@ final class TabCollectionTests: XCTestCase {
         let tabCollection = TabCollection()
         let tab = Tab()
 
-        tabCollection.insert(tab: tab, at: 1)
-        XCTAssertEqual(tabCollection.tabs.count, 0)
-        XCTAssertFalse(tabCollection.tabs.contains(tab))
-
         tabCollection.insert(tab: tab, at: -1)
         XCTAssertEqual(tabCollection.tabs.count, 0)
         XCTAssertFalse(tabCollection.tabs.contains(tab))

@@ -22,7 +22,6 @@ import BrowserServicesKit
 
 protocol ScriptSourceProviding {
 
-    func reload(knownChanges: [String: ContentBlockerRulesIdentifier.Difference])
     var contentBlockerRulesConfig: ContentBlockerUserScriptConfig? { get }
     var surrogatesConfig: SurrogatesUserScriptConfig? { get }
     var privacyConfigurationManager: PrivacyConfigurationManager { get }
@@ -30,13 +29,9 @@ protocol ScriptSourceProviding {
     var sessionKey: String? { get }
     var clickToLoadSource: String { get }
 
-    var sourceUpdatedPublisher: AnyPublisher<[String: ContentBlockerRulesIdentifier.Difference], Never> { get }
-
 }
 
-final class DefaultScriptSourceProvider: ScriptSourceProviding {
-
-    static var shared: ScriptSourceProviding = DefaultScriptSourceProvider()
+struct DefaultScriptSourceProvider: ScriptSourceProviding {
 
     private(set) var contentBlockerRulesConfig: ContentBlockerUserScriptConfig?
     private(set) var surrogatesConfig: SurrogatesUserScriptConfig?
@@ -44,46 +39,26 @@ final class DefaultScriptSourceProvider: ScriptSourceProviding {
     private(set) var sessionKey: String?
     private(set) var clickToLoadSource: String = ""
 
-    private let sourceUpdatedSubject = PassthroughSubject<[String: ContentBlockerRulesIdentifier.Difference], Never>()
-    var sourceUpdatedPublisher: AnyPublisher<[String: ContentBlockerRulesIdentifier.Difference], Never> {
-        sourceUpdatedSubject.eraseToAnyPublisher()
-    }
-
     let configStorage: ConfigurationStoring
     let privacyConfigurationManager: PrivacyConfigurationManager
-    let contentBlockingManager: ContentBlockerRulesManager
+    let contentBlockingManager: ContentBlockerRulesManagerProtocol
+    let privacySettings: PrivacySecurityPreferences
 
-    var contentBlockingRulesUpdatedCancellable: AnyCancellable!
+    init(configStorage: ConfigurationStoring = DefaultConfigurationStorage.shared,
+         privacyConfigurationManager: PrivacyConfigurationManager = ContentBlocking.shared.privacyConfigurationManager,
+         privacySettings: PrivacySecurityPreferences = PrivacySecurityPreferences.shared,
+         contentBlockingManager: ContentBlockerRulesManagerProtocol = ContentBlocking.shared.contentBlockingManager) {
 
-    private init(configStorage: ConfigurationStoring = DefaultConfigurationStorage.shared,
-                 privacyConfigurationManager: PrivacyConfigurationManager = ContentBlocking.privacyConfigurationManager,
-                 contentBlockingManager: ContentBlockerRulesManager = ContentBlocking.contentBlockingManager,
-                 contentBlockingUpdating: ContentBlockingUpdating = ContentBlocking.contentBlockingUpdating) {
         self.configStorage = configStorage
         self.privacyConfigurationManager = privacyConfigurationManager
+        self.privacySettings = privacySettings
         self.contentBlockingManager = contentBlockingManager
 
-        attachListeners(contentBlockingUpdating: contentBlockingUpdating)
-
-        reload(knownChanges: [:])
-    }
-
-    private func attachListeners(contentBlockingUpdating: ContentBlockingUpdating) {
-        let cancellable = contentBlockingUpdating.contentBlockingRules.receive(on: RunLoop.main).sink(receiveValue: { [weak self] newRulesInfo in
-            guard let self = self, let newRulesInfo = newRulesInfo else { return }
-
-            self.reload(knownChanges: newRulesInfo.changes)
-        })
-        contentBlockingRulesUpdatedCancellable = cancellable
-    }
-
-    func reload(knownChanges: [String: ContentBlockerRulesIdentifier.Difference]) {
-        contentBlockerRulesConfig = buildContentBlockerRulesConfig()
-        surrogatesConfig = buildSurrogatesConfig()
-        sessionKey = generateSessionKey()
-        clickToLoadSource = buildClickToLoadSource()
-        autofillSourceProvider = buildAutofillSource()
-        sourceUpdatedSubject.send( knownChanges )
+        self.contentBlockerRulesConfig = buildContentBlockerRulesConfig()
+        self.surrogatesConfig = buildSurrogatesConfig()
+        self.sessionKey = generateSessionKey()
+        self.clickToLoadSource = buildClickToLoadSource()
+        self.autofillSourceProvider = buildAutofillSource()
     }
 
     private func generateSessionKey() -> String {
@@ -91,17 +66,17 @@ final class DefaultScriptSourceProvider: ScriptSourceProviding {
     }
     
     private func buildAutofillSource() -> AutofillUserScriptSourceProvider {
-        let privacySettings = PrivacySecurityPreferences()
+
         return DefaultAutofillSourceProvider(privacyConfigurationManager: self.privacyConfigurationManager,
                                              properties: ContentScopeProperties(gpcEnabled: privacySettings.gpcEnabled,
                                                                                 sessionKey: self.sessionKey ?? ""))
     }
 
     private func buildContentBlockerRulesConfig() -> ContentBlockerUserScriptConfig {
-        
+
         let tdsName = DefaultContentBlockerRulesListsSource.Constants.trackerDataSetRulesListName
         let trackerData = contentBlockingManager.currentRules.first(where: { $0.name == tdsName})?.trackerData
-        
+
         let ctlTrackerData = (contentBlockingManager.currentRules.first(where: {
             $0.name == ContentBlockerRulesLists.Constants.clickToLoadRulesListName
         })?.trackerData) ?? ContentBlockerRulesLists.fbTrackerDataSet
@@ -109,7 +84,7 @@ final class DefaultScriptSourceProvider: ScriptSourceProviding {
         return DefaultContentBlockerUserScriptConfig(privacyConfiguration: privacyConfigurationManager.privacyConfig,
                                                      trackerData: trackerData,
                                                      ctlTrackerData: ctlTrackerData,
-                                                     trackerDataManager: ContentBlocking.trackerDataManager)
+                                                     trackerDataManager: ContentBlocking.shared.trackerDataManager)
     }
 
     private func buildSurrogatesConfig() -> SurrogatesUserScriptConfig {
@@ -128,10 +103,10 @@ final class DefaultScriptSourceProvider: ScriptSourceProviding {
                                                  surrogates: surrogates,
                                                  trackerData: rules?.trackerData,
                                                  encodedSurrogateTrackerData: rules?.encodedTrackerData,
-                                                 trackerDataManager: ContentBlocking.trackerDataManager,
+                                                 trackerDataManager: ContentBlocking.shared.trackerDataManager,
                                                  isDebugBuild: isDebugBuild)
     }
-    
+
     private func loadTextFile(_ fileName: String, _ fileExt: String) -> String? {
         let url = Bundle.main.url(
             forResource: fileName,
@@ -141,7 +116,7 @@ final class DefaultScriptSourceProvider: ScriptSourceProviding {
             assertionFailure("Failed to load text file")
             return nil
         }
-        
+
         return data
     }
 
@@ -154,7 +129,7 @@ final class DefaultScriptSourceProvider: ScriptSourceProviding {
             assertionFailure("Failed to load font")
             return nil
         }
-        
+
         let font = "data:application/octet-stream;base64," + base64String
         return font
     }
@@ -172,4 +147,5 @@ final class DefaultScriptSourceProvider: ScriptSourceProviding {
             "${proximaBoldFont}": proximaBoldFont!
         ])
     }
+
 }

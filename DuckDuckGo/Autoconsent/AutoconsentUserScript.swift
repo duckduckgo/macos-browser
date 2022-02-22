@@ -55,8 +55,7 @@ final class AutoconsentUserScript: NSObject, UserScriptWithAutoconsent {
     var webview: WKWebView?
     weak var delegate: AutoconsentUserScriptDelegate?
 
-    init(scriptSource: ScriptSourceProviding = DefaultScriptSourceProvider.shared,
-         config: PrivacyConfiguration = ContentBlocking.privacyConfigurationManager.privacyConfig) {
+    init(scriptSource: ScriptSourceProviding, config: PrivacyConfiguration) {
         source = Self.loadJS("autoconsent-bundle", from: .main, withReplacements: [:])
         Self.globalTabCounter += 1
         tabId = Self.globalTabCounter
@@ -84,7 +83,7 @@ final class AutoconsentUserScript: NSObject, UserScriptWithAutoconsent {
     }
 
     func onPageReady(url: URL) {
-        let preferences = PrivacySecurityPreferences()
+        let preferences = PrivacySecurityPreferences.shared
         
         guard preferences.autoconsentEnabled != false else {
             os_log("autoconsent is disabled", log: .autoconsent, type: .debug)
@@ -130,7 +129,7 @@ final class AutoconsentUserScript: NSObject, UserScriptWithAutoconsent {
     }
     
     func checkUserWasPrompted(callback: @escaping (Bool) -> Void) {
-        var preferences = PrivacySecurityPreferences()
+        let preferences = PrivacySecurityPreferences.shared
         guard preferences.autoconsentEnabled == nil else {
             callback(true)
             return

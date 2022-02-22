@@ -1,7 +1,7 @@
 //
-//  WebViewConfiguration.swift
+//  ContentBlockerRulesManagerMock.swift
 //
-//  Copyright © 2020 DuckDuckGo. All rights reserved.
+//  Copyright © 2022 DuckDuckGo. All rights reserved.
 //
 //  Licensed under the Apache License, Version 2.0 (the "License");
 //  you may not use this file except in compliance with the License.
@@ -16,6 +16,18 @@
 //  limitations under the License.
 //
 
-import WebKit
+@testable import DuckDuckGo_Privacy_Browser
+import BrowserServicesKit
+import Combine
 
-typealias WebViewConfiguration = WKWebViewConfiguration
+final class ContentBlockerRulesManagerMock: ContentBlockerRulesManagerProtocol {
+
+    var updatesPublisher: AnyPublisher<ContentBlockerRulesManager.UpdateEvent, Never> {
+        updatesSubject.eraseToAnyPublisher()
+    }
+
+    let updatesSubject = PassthroughSubject<ContentBlockerRulesManager.UpdateEvent, Never>()
+
+    var currentRules: [ContentBlockerRulesManager.Rules] = []
+
+}
