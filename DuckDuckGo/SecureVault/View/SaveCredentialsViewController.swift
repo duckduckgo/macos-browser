@@ -111,7 +111,7 @@ final class SaveCredentialsViewController: NSViewController {
     @IBAction func onNotNowClicked(sender: Any?) {
         delegate?.shouldCloseSaveCredentialsViewController(self)
 
-        guard PrivacySecurityPreferences().loginDetectionEnabled else { return }
+        guard PrivacySecurityPreferences.shared.loginDetectionEnabled else { return }
 
         guard let window = view.window else {
             os_log("%s: Window is nil", type: .error, className)

@@ -23,7 +23,8 @@ protocol PrivacySecurityPreferencesTableCellViewDelegate: AnyObject {
 
     func privacySecurityPreferencesTableCellViewRequestedFireproofManagementModal(_ cell: PrivacySecurityPreferencesTableCellView)
     func privacySecurityPreferencesTableCellView(_ cell: PrivacySecurityPreferencesTableCellView, setLoginDetectionEnabled: Bool)
-    func privacySecurtyPreferencesTableCellView( _ cell: PrivacySecurityPreferencesTableCellView, setGPCEnabled: Bool)
+    func privacySecurityPreferencesTableCellView(_ cell: PrivacySecurityPreferencesTableCellView, setGPCEnabled: Bool)
+    func privacySecurityPreferencesTableCellView(_ cell: PrivacySecurityPreferencesTableCellView, setAutoconsentEnabled: Bool)
 
 }
 
@@ -39,6 +40,8 @@ final class PrivacySecurityPreferencesTableCellView: NSTableCellView {
     @IBOutlet var gpcCheckbox: NSButton!
     
     @IBOutlet var gpcDisclaimer: NSTextView!
+    
+    @IBOutlet var autoconsentCheckbox: NSButton!
 
     weak var delegate: PrivacySecurityPreferencesTableCellViewDelegate?
     
@@ -47,9 +50,10 @@ final class PrivacySecurityPreferencesTableCellView: NSTableCellView {
         appendLearnMore()
     }
     
-    func update(loginDetectionEnabled: Bool, gpcEnabled: Bool) {
+    func update(loginDetectionEnabled: Bool, gpcEnabled: Bool, autoconsentEnabled: Bool?) {
         loginDetectionCheckbox.state = loginDetectionEnabled ? .on : .off
         gpcCheckbox.state = gpcEnabled ? .on : .off
+        autoconsentCheckbox.state = autoconsentEnabled ?? false ? .on : .off
     }
 
     @IBAction func manageFireproofWebsitesButtonClicked(_ sender: NSButton) {
@@ -63,7 +67,12 @@ final class PrivacySecurityPreferencesTableCellView: NSTableCellView {
     
     @IBAction func toggledGPCCheckbox(_ sender: NSButton) {
         let gpcEnabled = gpcCheckbox.state == .on
-        delegate?.privacySecurtyPreferencesTableCellView(self, setGPCEnabled: gpcEnabled)
+        delegate?.privacySecurityPreferencesTableCellView(self, setGPCEnabled: gpcEnabled)
+    }
+    
+    @IBAction func toggledAutoconsentCheckbox(_ sender: NSButton) {
+        let autoconsentEnabled = autoconsentCheckbox.state == .on
+        delegate?.privacySecurityPreferencesTableCellView(self, setAutoconsentEnabled: autoconsentEnabled)
     }
     
     func appendLearnMore() {

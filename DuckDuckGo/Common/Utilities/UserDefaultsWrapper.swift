@@ -34,6 +34,7 @@ public struct UserDefaultsWrapper<T> {
         
         case fireproofDomains = "com.duckduckgo.fireproofing.allowedDomains"
         case unprotectedDomains = "com.duckduckgo.contentblocker.unprotectedDomains"
+        case contentBlockingRulesCache = "com.duckduckgo.contentblocker.rules.cache"
 
         case defaultBrowserDismissed = "browser.default.dismissed"
 
@@ -43,6 +44,7 @@ public struct UserDefaultsWrapper<T> {
         case loginDetectionEnabled = "fireproofing.login-detection-enabled"
         case gpcEnabled = "preferences.gpc-enabled"
         case alwaysRequestDownloadLocationKey = "preferences.download-location.always-request"
+        case autoconsentEnabled = "preferences.autoconsent-enabled"
 
         case saveAsPreferredFileType = "saveAs.selected.filetype"
 

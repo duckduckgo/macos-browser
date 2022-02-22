@@ -2,6 +2,15 @@
   "name": "macos-browser",
   "version": "1.0.0",
   "scripts": {
-    "test": "echo 'no test required'"
+    "test": "echo 'no test required'",
+    "rebuild-autoconsent": "rollup -c"
+  },
+  "devDependencies": {
+    "@rollup/plugin-json": "^4.1.0",
+    "@rollup/plugin-node-resolve": "^13.0.6",
+    "rollup": "^2.61.0"
+  },
+  "dependencies": {
+    "@cliqz/autoconsent": "1.0.2"
   }
 }

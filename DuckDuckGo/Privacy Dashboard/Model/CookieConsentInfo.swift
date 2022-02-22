@@ -1,7 +1,7 @@
 //
-//  WebViewConfiguration.swift
+//  CookieConsentInfo.swift
 //
-//  Copyright © 2020 DuckDuckGo. All rights reserved.
+//  Copyright © 2022 DuckDuckGo. All rights reserved.
 //
 //  Licensed under the Apache License, Version 2.0 (the "License");
 //  you may not use this file except in compliance with the License.
@@ -16,6 +16,10 @@
 //  limitations under the License.
 //
 
-import WebKit
+import Foundation
 
-typealias WebViewConfiguration = WKWebViewConfiguration
+struct CookieConsentInfo: Encodable {
+    let consentManaged: Bool
+    let optoutFailed: Bool?
+    let selftestFailed: Bool?
+}

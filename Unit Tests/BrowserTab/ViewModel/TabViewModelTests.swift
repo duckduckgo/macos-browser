@@ -120,6 +120,8 @@ final class TabViewModelTests: XCTestCase {
             titleExpectation.fulfill()
         } .store(in: &cancellables)
         waitForExpectations(timeout: 1, handler: nil)
+
+        tabViewModel.tab.tabWillClose()
     }
 
     func testWhenTabTitleIsNilThenTitleIsAddressBarString() {
@@ -133,6 +135,8 @@ final class TabViewModelTests: XCTestCase {
             titleExpectation.fulfill()
         } .store(in: &cancellables)
         waitForExpectations(timeout: 1, handler: nil)
+
+        tabViewModel.tab.tabWillClose()
     }
 
     // MARK: - Favicon
@@ -142,6 +146,8 @@ final class TabViewModelTests: XCTestCase {
         let tabViewModel = TabViewModel(tab: tab)
 
         XCTAssertEqual(tabViewModel.favicon, nil)
+
+        tab.tabWillClose()
     }
 
     func testWhenContentIsHomeThenFaviconIsHome() {
@@ -160,6 +166,8 @@ final class TabViewModelTests: XCTestCase {
             }
         } .store(in: &cancellables)
         waitForExpectations(timeout: 5, handler: nil)
+
+        tabViewModel.tab.tabWillClose()
     }
 
 }
