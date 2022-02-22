@@ -59,7 +59,10 @@ final class Pixel {
             let params = params?.filter { key, _ in !["appVersion", "test"].contains(key) } ?? [:]
             os_log(.debug, log: .pixel, "%@ %@", pixelName.replacingOccurrences(of: "_", with: "."), params)
 
-            onComplete(nil)
+            // simulate server response time for Dry Run mode
+            DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
+                onComplete(nil)
+            }
             return
         }
 

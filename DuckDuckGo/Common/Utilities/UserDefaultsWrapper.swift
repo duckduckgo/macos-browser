@@ -34,6 +34,7 @@ public struct UserDefaultsWrapper<T> {
         
         case fireproofDomains = "com.duckduckgo.fireproofing.allowedDomains"
         case unprotectedDomains = "com.duckduckgo.contentblocker.unprotectedDomains"
+        case contentBlockingRulesCache = "com.duckduckgo.contentblocker.rules.cache"
 
         case defaultBrowserDismissed = "browser.default.dismissed"
 

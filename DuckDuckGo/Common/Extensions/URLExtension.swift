@@ -454,7 +454,7 @@ extension URL {
     }
     
     static func isGPCEnabled(url: URL,
-                             config: PrivacyConfiguration = ContentBlocking.privacyConfigurationManager.privacyConfig) -> Bool {
+                             config: PrivacyConfiguration = ContentBlocking.shared.privacyConfigurationManager.privacyConfig) -> Bool {
         let enabledSites = gpcHeadersEnabled(config: config)
         
         for gpcHost in enabledSites {

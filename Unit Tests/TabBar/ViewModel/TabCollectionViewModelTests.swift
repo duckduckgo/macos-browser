@@ -161,7 +161,7 @@ final class TabCollectionViewModelTests: XCTestCase {
         let tabCollectionViewModel = TabCollectionViewModel.aTabCollectionViewModel()
 
         let parentTab = Tab()
-        let tab = Tab(parentTab: parentTab)
+        let tab = Tab(content: .none, parentTab: parentTab)
         tabCollectionViewModel.insertChild(tab: tab, selected: false)
 
         XCTAssert(tab !== tabCollectionViewModel.tabViewModel(at: 0)?.tab)
