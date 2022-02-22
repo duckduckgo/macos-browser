@@ -35,6 +35,13 @@ final class PrivacySecurityPreferences {
         }
     }
 
+    // This setting is an optional boolean as it has three states:
+    // - nil: User has not chosen a setting
+    // - true: Enabled by the user
+    // - false: Disabled by the user
+    @UserDefaultsWrapper(key: .autoconsentEnabled, defaultValue: nil)
+    public var autoconsentEnabled: Bool?
+
 }
 
 extension PrivacySecurityPreferences: PreferenceSection {

@@ -456,6 +456,18 @@
 		AAEF6BC8276A081C0024DCF4 /* FaviconSelector.swift in Sources */ = {isa = PBXBuildFile; fileRef = AAEF6BC7276A081C0024DCF4 /* FaviconSelector.swift */; };
 		AAFCB37F25E545D400859DD4 /* PublisherExtension.swift in Sources */ = {isa = PBXBuildFile; fileRef = AAFCB37E25E545D400859DD4 /* PublisherExtension.swift */; };
 		AAFE068326C7082D005434CC /* WebKitVersionProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = AAFE068226C7082D005434CC /* WebKitVersionProvider.swift */; };
+		B31055C427A1BA1D001AC618 /* AutoconsentUserScript.swift in Sources */ = {isa = PBXBuildFile; fileRef = B31055BC27A1BA1D001AC618 /* AutoconsentUserScript.swift */; };
+		B31055C527A1BA1D001AC618 /* autoconsent.html in Resources */ = {isa = PBXBuildFile; fileRef = B31055BD27A1BA1D001AC618 /* autoconsent.html */; };
+		B31055C627A1BA1D001AC618 /* userscript.js in Resources */ = {isa = PBXBuildFile; fileRef = B31055BE27A1BA1D001AC618 /* userscript.js */; };
+		B31055C727A1BA1D001AC618 /* browser-shim.js in Resources */ = {isa = PBXBuildFile; fileRef = B31055BF27A1BA1D001AC618 /* browser-shim.js */; };
+		B31055C827A1BA1D001AC618 /* background-bundle.js in Resources */ = {isa = PBXBuildFile; fileRef = B31055C027A1BA1D001AC618 /* background-bundle.js */; };
+		B31055C927A1BA1D001AC618 /* AutoconsentBackground.swift in Sources */ = {isa = PBXBuildFile; fileRef = B31055C127A1BA1D001AC618 /* AutoconsentBackground.swift */; };
+		B31055CA27A1BA1D001AC618 /* background.js in Resources */ = {isa = PBXBuildFile; fileRef = B31055C227A1BA1D001AC618 /* background.js */; };
+		B31055CB27A1BA1D001AC618 /* autoconsent-bundle.js in Resources */ = {isa = PBXBuildFile; fileRef = B31055C327A1BA1D001AC618 /* autoconsent-bundle.js */; };
+		B31055CE27A1BA44001AC618 /* AutoconsentBackgroundTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = B31055CD27A1BA44001AC618 /* AutoconsentBackgroundTests.swift */; };
+		B3FB198E27BC013C00513DC1 /* autoconsent-test-page.html in Resources */ = {isa = PBXBuildFile; fileRef = B3FB198D27BC013C00513DC1 /* autoconsent-test-page.html */; };
+		B3FB199027BC015600513DC1 /* autoconsent-test.js in Resources */ = {isa = PBXBuildFile; fileRef = B3FB198F27BC015600513DC1 /* autoconsent-test.js */; };
+		B3FB199327BD0AD400513DC1 /* CookieConsentInfo.swift in Sources */ = {isa = PBXBuildFile; fileRef = B3FB199227BD0AD400513DC1 /* CookieConsentInfo.swift */; };
 		B6040856274B830F00680351 /* DictionaryExtension.swift in Sources */ = {isa = PBXBuildFile; fileRef = B6040855274B830F00680351 /* DictionaryExtension.swift */; };
 		B604085C274B8FBA00680351 /* UnprotectedDomains.xcdatamodeld in Sources */ = {isa = PBXBuildFile; fileRef = B604085A274B8CA300680351 /* UnprotectedDomains.xcdatamodeld */; };
 		B6085D062743905F00A9C456 /* CoreDataStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = B6085D052743905F00A9C456 /* CoreDataStore.swift */; };
@@ -1148,6 +1160,18 @@
 		AAEF6BC7276A081C0024DCF4 /* FaviconSelector.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FaviconSelector.swift; sourceTree = "<group>"; };
 		AAFCB37E25E545D400859DD4 /* PublisherExtension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PublisherExtension.swift; sourceTree = "<group>"; };
 		AAFE068226C7082D005434CC /* WebKitVersionProvider.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WebKitVersionProvider.swift; sourceTree = "<group>"; };
+		B31055BC27A1BA1D001AC618 /* AutoconsentUserScript.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = AutoconsentUserScript.swift; path = Autoconsent/AutoconsentUserScript.swift; sourceTree = "<group>"; };
+		B31055BD27A1BA1D001AC618 /* autoconsent.html */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.html; name = autoconsent.html; path = Autoconsent/autoconsent.html; sourceTree = "<group>"; };
+		B31055BE27A1BA1D001AC618 /* userscript.js */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.javascript; name = userscript.js; path = Autoconsent/userscript.js; sourceTree = "<group>"; };
+		B31055BF27A1BA1D001AC618 /* browser-shim.js */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.javascript; name = "browser-shim.js"; path = "Autoconsent/browser-shim.js"; sourceTree = "<group>"; };
+		B31055C027A1BA1D001AC618 /* background-bundle.js */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.javascript; name = "background-bundle.js"; path = "Autoconsent/background-bundle.js"; sourceTree = "<group>"; };
+		B31055C127A1BA1D001AC618 /* AutoconsentBackground.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = AutoconsentBackground.swift; path = Autoconsent/AutoconsentBackground.swift; sourceTree = "<group>"; };
+		B31055C227A1BA1D001AC618 /* background.js */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.javascript; name = background.js; path = Autoconsent/background.js; sourceTree = "<group>"; };
+		B31055C327A1BA1D001AC618 /* autoconsent-bundle.js */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.javascript; name = "autoconsent-bundle.js"; path = "Autoconsent/autoconsent-bundle.js"; sourceTree = "<group>"; };
+		B31055CD27A1BA44001AC618 /* AutoconsentBackgroundTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = AutoconsentBackgroundTests.swift; path = Autoconsent/AutoconsentBackgroundTests.swift; sourceTree = "<group>"; };
+		B3FB198D27BC013C00513DC1 /* autoconsent-test-page.html */ = {isa = PBXFileReference; lastKnownFileType = text.html; path = "autoconsent-test-page.html"; sourceTree = "<group>"; };
+		B3FB198F27BC015600513DC1 /* autoconsent-test.js */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.javascript; path = "autoconsent-test.js"; sourceTree = "<group>"; };
+		B3FB199227BD0AD400513DC1 /* CookieConsentInfo.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CookieConsentInfo.swift; sourceTree = "<group>"; };
 		B6040855274B830F00680351 /* DictionaryExtension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DictionaryExtension.swift; sourceTree = "<group>"; };
 		B604085B274B8CA400680351 /* Permissions.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = Permissions.xcdatamodel; sourceTree = "<group>"; };
 		B6085D052743905F00A9C456 /* CoreDataStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CoreDataStore.swift; sourceTree = "<group>"; };
@@ -1537,6 +1561,7 @@
 		4B1AD89E25FC27E200261379 /* Integration Tests */ = {
 			isa = PBXGroup;
 			children = (
+				B31055CC27A1BA39001AC618 /* Autoconsent */,
 				4B1AD91625FC46FB00261379 /* CoreDataEncryptionTests.swift */,
 				4BA1A6EA258C288C00F6F690 /* EncryptionKeyStoreTests.swift */,
 				4B1AD8A125FC27E200261379 /* Info.plist */,
@@ -2349,6 +2374,7 @@
 		AA585D80248FD31100E9A3E2 /* DuckDuckGo */ = {
 			isa = PBXGroup;
 			children = (
+				B31055BB27A1BA0E001AC618 /* Autoconsent */,
 				B6A9E47526146A440067D1B9 /* API */,
 				AA4D700525545EDE00C3411E /* AppDelegate */,
 				AAC5E4C025D6A6A9007F5990 /* Bookmarks */,
@@ -3233,6 +3259,31 @@
 			path = View;
 			sourceTree = "<group>";
 		};
+		B31055BB27A1BA0E001AC618 /* Autoconsent */ = {
+			isa = PBXGroup;
+			children = (
+				B31055C327A1BA1D001AC618 /* autoconsent-bundle.js */,
+				B31055BD27A1BA1D001AC618 /* autoconsent.html */,
+				B31055C127A1BA1D001AC618 /* AutoconsentBackground.swift */,
+				B31055BC27A1BA1D001AC618 /* AutoconsentUserScript.swift */,
+				B31055C027A1BA1D001AC618 /* background-bundle.js */,
+				B31055C227A1BA1D001AC618 /* background.js */,
+				B31055BF27A1BA1D001AC618 /* browser-shim.js */,
+				B31055BE27A1BA1D001AC618 /* userscript.js */,
+			);
+			name = Autoconsent;
+			sourceTree = "<group>";
+		};
+		B31055CC27A1BA39001AC618 /* Autoconsent */ = {
+			isa = PBXGroup;
+			children = (
+				B31055CD27A1BA44001AC618 /* AutoconsentBackgroundTests.swift */,
+				B3FB198D27BC013C00513DC1 /* autoconsent-test-page.html */,
+				B3FB198F27BC015600513DC1 /* autoconsent-test.js */,
+			);
+			name = Autoconsent;
+			sourceTree = "<group>";
+		};
 		B6040859274B8C5200680351 /* Unprotected Domains */ = {
 			isa = PBXGroup;
 			children = (
@@ -3329,6 +3380,7 @@
 				B6106BA226A7BEA00013B453 /* PermissionAuthorizationState.swift */,
 				AA9B7C7D26A06E040008D425 /* TrackerInfo.swift */,
 				AA9B7C8226A197A00008D425 /* ServerTrust.swift */,
+				B3FB199227BD0AD400513DC1 /* CookieConsentInfo.swift */,
 			);
 			path = Model;
 			sourceTree = "<group>";
@@ -3668,6 +3720,8 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				B3FB199027BC015600513DC1 /* autoconsent-test.js in Resources */,
+				B3FB198E27BC013C00513DC1 /* autoconsent-test-page.html in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -3687,14 +3741,18 @@
 				AA693E5E2696E5B90007BB78 /* CrashReports.storyboard in Resources */,
 				9833913127AAA4B500DAF119 /* trackerData.json in Resources */,
 				4B0511CE262CAA5A00F6079C /* DownloadPreferencesTableCellView.xib in Resources */,
+				B31055CA27A1BA1D001AC618 /* background.js in Resources */,
 				8511E18425F82B34002F516B /* 01_Fire_really_small.json in Resources */,
 				85B7184A27677C2D00B4277F /* Onboarding.storyboard in Resources */,
 				4B0511C3262CAA5A00F6079C /* Preferences.storyboard in Resources */,
 				EA477680272A21B700419EDA /* clickToLoadConfig.json in Resources */,
 				B6B1E88226D5DAC30062C350 /* Downloads.storyboard in Resources */,
 				AA3439712754D4E900B241FA /* dark-shield.json in Resources */,
+				B31055C827A1BA1D001AC618 /* background-bundle.js in Resources */,
+				B31055CB27A1BA1D001AC618 /* autoconsent-bundle.js in Resources */,
 				85A0117425AF2EDF00FA6A0C /* FindInPage.storyboard in Resources */,
 				AA80EC89256C49B8007083E7 /* Localizable.strings in Resources */,
+				B31055C627A1BA1D001AC618 /* userscript.js in Resources */,
 				EA4617F0273A28A700F110A2 /* fb-tds.json in Resources */,
 				AAE8B102258A41C000E81239 /* Tooltip.storyboard in Resources */,
 				AA68C3D72490F821001B8783 /* README.md in Resources */,
@@ -3715,9 +3773,11 @@
 				AAE71E3825F7869300D74437 /* HomepageCollectionViewItem.xib in Resources */,
 				AA3439792754D55100B241FA /* trackers-1.json in Resources */,
 				AA34397C2754D55100B241FA /* dark-trackers-1.json in Resources */,
+				B31055C527A1BA1D001AC618 /* autoconsent.html in Resources */,
 				4B723E1126B0006C00E14D75 /* DataImport.storyboard in Resources */,
 				4B92929026670D1700AD2C21 /* BookmarkTableCellView.xib in Resources */,
 				339A6B5826A044BA00E3DAE8 /* duckduckgo-privacy-dashboard in Resources */,
+				B31055C727A1BA1D001AC618 /* browser-shim.js in Resources */,
 				4B92928E26670D1700AD2C21 /* BookmarkOutlineViewCell.xib in Resources */,
 				858C78FC2705EB5F009B2B44 /* HomepageHeader.xib in Resources */,
 				B64C84DE2692D7400048FEBE /* PermissionAuthorization.storyboard in Resources */,
@@ -3837,6 +3897,7 @@
 			files = (
 				B662D3DF275616FF0035D4D6 /* EncryptionKeyStoreMock.swift in Sources */,
 				4B1AD8E225FC390B00261379 /* EncryptionMocks.swift in Sources */,
+				B31055CE27A1BA44001AC618 /* AutoconsentBackgroundTests.swift in Sources */,
 				4B1AD91725FC46FB00261379 /* CoreDataEncryptionTests.swift in Sources */,
 				7BA4727D26F01BC400EAA165 /* CoreDataTestUtilities.swift in Sources */,
 				4B1AD92125FC474E00261379 /* CoreDataEncryptionTesting.xcdatamodeld in Sources */,
@@ -4106,6 +4167,8 @@
 				4B8D9062276D1D880078DB17 /* LocaleExtension.swift in Sources */,
 				AAFE068326C7082D005434CC /* WebKitVersionProvider.swift in Sources */,
 				B63D467A25BFC3E100874977 /* NSCoderExtensions.swift in Sources */,
+				B31055C927A1BA1D001AC618 /* AutoconsentBackground.swift in Sources */,
+				B3FB199327BD0AD400513DC1 /* CookieConsentInfo.swift in Sources */,
 				B6A5A27125B9377300AA7ADA /* StatePersistenceService.swift in Sources */,
 				B68458B025C7E76A00DC17B6 /* WindowManager+StateRestoration.swift in Sources */,
 				B68458C525C7EA0C00DC17B6 /* TabCollection+NSSecureCoding.swift in Sources */,
@@ -4265,6 +4328,7 @@
 				B6CF78DE267B099C00CD4F13 /* WKNavigationActionExtension.swift in Sources */,
 				AA7412B224D0B3AC00D22FE0 /* TabBarViewItem.swift in Sources */,
 				856C98D52570116900A22F1F /* NSWindow+Toast.swift in Sources */,
+				B31055C427A1BA1D001AC618 /* AutoconsentUserScript.swift in Sources */,
 				859E7D6B27453BF3009C2B69 /* BookmarksExporter.swift in Sources */,
 				4B5FF67826B602B100D42879 /* FirefoxDataImporter.swift in Sources */,
 				4B02198B25E05FAC00ED7DEA /* FireproofInfoViewController.swift in Sources */,

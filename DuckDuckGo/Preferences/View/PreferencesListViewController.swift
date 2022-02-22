@@ -151,7 +151,8 @@ extension PreferencesListViewController: NSTableViewDataSource, NSTableViewDeleg
             cell?.delegate = self
             let preferences = PrivacySecurityPreferences.shared
             cell?.update(loginDetectionEnabled: preferences.loginDetectionEnabled,
-                         gpcEnabled: preferences.gpcEnabled)
+                         gpcEnabled: preferences.gpcEnabled,
+                         autoconsentEnabled: preferences.autoconsentEnabled)
             return cell
         case .downloads:
             let cell: DownloadPreferencesTableCellView? = createCell(identifier: DownloadPreferencesTableCellView.identifier, tableView: tableView)
@@ -208,9 +209,13 @@ extension PreferencesListViewController: PrivacySecurityPreferencesTableCellView
     func privacySecurityPreferencesTableCellView(_ cell: PrivacySecurityPreferencesTableCellView, setLoginDetectionEnabled enabled: Bool) {
         PrivacySecurityPreferences.shared.loginDetectionEnabled = enabled
     }
-    
-    func privacySecurtyPreferencesTableCellView(_ cell: PrivacySecurityPreferencesTableCellView, setGPCEnabled enabled: Bool) {
+
+    func privacySecurityPreferencesTableCellView(_ cell: PrivacySecurityPreferencesTableCellView, setGPCEnabled enabled: Bool) {
         PrivacySecurityPreferences.shared.gpcEnabled = enabled
+    }
+    
+    func privacySecurityPreferencesTableCellView(_ cell: PrivacySecurityPreferencesTableCellView, setAutoconsentEnabled enabled: Bool) {
+        PrivacySecurityPreferences.shared.autoconsentEnabled = enabled
     }
 
 }

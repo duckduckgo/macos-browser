@@ -518,6 +518,7 @@ final class Tab: NSObject {
     @Published var trackerInfo: TrackerInfo?
     @Published var serverTrust: ServerTrust?
     @Published var connectionUpgradedTo: URL?
+    @Published var cookieConsentManaged: CookieConsentInfo?
 
     public func resetDashboardInfo(_ url: URL?) {
         trackerInfo = TrackerInfo()
@@ -564,8 +565,8 @@ extension Tab: UserContentControllerDelegate {
         userScripts.pageObserverScript.delegate = self
         userScripts.printingUserScript.delegate = self
         userScripts.hoverUserScript.delegate = self
+        userScripts.autoconsentUserScript?.delegate = self
 
-        self.findInPageScript = userScripts.findInPageScript
         attachFindInPage()
     }
 
@@ -1025,5 +1026,11 @@ extension Tab: HoverUserScriptDelegate {
 
 }
 
+@available(macOS 11, *)
+extension Tab: AutoconsentUserScriptDelegate {
+    func autoconsentUserScript(consentStatus: CookieConsentInfo) {
+        self.cookieConsentManaged = consentStatus
+    }
+}
 // swiftlint:enable type_body_length
 // swiftlint:enable file_length

@@ -184,6 +184,16 @@ final class PrivacyDashboardViewController: NSViewController {
             })
             .store(in: &cancellables)
     }
+    
+    private func subscribeToConsentManaged() {
+        tabViewModel?.tab.$cookieConsentManaged
+            .receive(on: DispatchQueue.main)
+            .sink(receiveValue: { [weak self] consentManaged in
+                guard let self = self else { return }
+                self.privacyDashboardScript.setConsentManaged(consentManaged, webView: self.webView)
+            })
+            .store(in: &cancellables)
+    }
 
 }
 
@@ -236,6 +246,7 @@ extension PrivacyDashboardViewController: WKNavigationDelegate {
         sendProtectionStatus()
         sendPendingUpdates()
         sendParentEntity()
+        subscribeToConsentManaged()
     }
 
 }

@@ -148,6 +148,9 @@ extension Pixel {
         case onboardingSetDefaultPressed
         case onboardingSetDefaultSkipped
         case onboardingTypingSkipped
+        
+        case autoconsentOptOutFailed
+        case autoconsentSelfTestFailed
 
         case debug(event: Debug, error: Error? = nil)
 
@@ -319,6 +322,11 @@ extension Pixel.Event {
         case .onboardingTypingSkipped:
             return "m_mac_onboarding_setdefault_skipped"
 
+        case .autoconsentOptOutFailed:
+            return "m_mac_autoconsent_optout_failed"
+
+        case .autoconsentSelfTestFailed:
+            return "m_mac_autoconsent_selftest_failed"
         }
     }
 
