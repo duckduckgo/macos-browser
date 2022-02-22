@@ -401,4 +401,11 @@ struct UserText {
 
     static let importFromFirefoxMoreInfo = NSLocalizedString("import.from.firefox.info", value: "You'll be asked to enter your Primary Password for Firefox.\n\nImported passwords are encrypted and only stored on this computer.", comment: "More info when importing from Firefox")
 
+    
+    static let autoconsentPopoverMessage = NSLocalizedString("Cookie consent pop-up managed", comment: "Popover message")
+    static let autoconsentPopupTitle = NSLocalizedString("Let DuckDuckGo try to manage cookie consent pop-ups?", comment: "messageText")
+    static let autoconsentPopupDescription = NSLocalizedString("On some sites, we can automatically set preferences to minimize cookies 🍪 and maximize privacy, then close the pop-up.", comment: "informativeText")
+    static let autoconsentPopupEnableButton = NSLocalizedString("Manage Cookie Pop-ups", comment: "")
+    static let autoconsentPopupLaterButton = NSLocalizedString("Not Now", comment: "")
+    static let autoconsentPopupNeverButton = NSLocalizedString("Don't Ask Again", comment: "")
 }

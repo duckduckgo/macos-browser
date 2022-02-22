@@ -211,6 +211,12 @@ final class NavigationBarViewController: NSViewController {
                                                selector: #selector(showPrivateEmailCopiedToClipboard(_:)),
                                                name: Notification.Name.privateEmailCopiedToClipboard,
                                                object: nil)
+        if #available(macOS 11, *) {
+            NotificationCenter.default.addObserver(self,
+                                                   selector: #selector(showAutoconsentFeedback(_:)),
+                                                   name: AutoconsentUserScript.Constants.newSitePopupHidden,
+                                                   object: nil)
+        }
     }
 
     @objc private func showPrivateEmailCopiedToClipboard(_ sender: Notification) {
@@ -230,6 +236,21 @@ final class NavigationBarViewController: NSViewController {
         DispatchQueue.main.async {
             let viewController = PopoverMessageViewController.createWithMessage(UserText.domainIsFireproof(domain: domain))
             viewController.show(onParent: self, relativeTo: self.optionsButton)
+        }
+    }
+    
+    @objc private func showAutoconsentFeedback(_ sender: Notification) {
+        if #available(macOS 11, *) {
+            guard view.window?.isKeyWindow == true,
+                  let host = sender.userInfo?[AutoconsentUserScript.Constants.popupHiddenHostKey] as? String,
+                  !AutoconsentUserScript.background.sitesNotifiedCache.contains(host),
+                  let relativeTarget = self.addressBarViewController?.addressBarButtonsViewController?.privacyEntryPointButton
+            else { return }
+            AutoconsentUserScript.background.sitesNotifiedCache.insert(host)
+            DispatchQueue.main.async {
+                let viewController = PopoverMessageViewController.createWithMessage(UserText.autoconsentPopoverMessage)
+                viewController.show(onParent: self, relativeTo: relativeTarget)
+            }
         }
     }
 

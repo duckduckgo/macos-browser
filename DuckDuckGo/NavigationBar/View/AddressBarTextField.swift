@@ -347,9 +347,8 @@ final class AddressBarTextField: NSTextField {
             return
         }
 
-        HTTPSUpgrade.shared.isUpgradeable(url: url) { isUpgradable in
-            completion(isUpgradable ? url.toHttps() : url, isUpgradable)
-        }
+        let isUpgradable = HTTPSUpgrade.shared.isUpgradeable(url: url)
+        completion(isUpgradable ? url.toHttps() : url, isUpgradable)
     }
 
     // MARK: - Value
