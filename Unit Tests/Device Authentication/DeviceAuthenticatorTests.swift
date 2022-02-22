@@ -1,5 +1,5 @@
 //
-//  DeviceIdleStateDetector.swift
+//  DeviceAuthenticatorTests.swift
 //
 //  Copyright © 2022 DuckDuckGo. All rights reserved.
 //
@@ -17,11 +17,11 @@
 //
 
 import Foundation
+import XCTest
+@testable import DuckDuckGo_Privacy_Browser
 
-protocol DeviceIdleStateDetector {
+class DeviceAuthenticatorTests: XCTestCase {
     
-    func beginIdleCheckTimer()
     
-    func cancelIdleCheckTimer()
     
 }
