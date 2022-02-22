@@ -31,8 +31,8 @@ final class ClickToLoadUserScript: NSObject, UserScript, WKScriptMessageHandlerW
     var messageNames: [String] { ["getImage", "enableFacebook", "initClickToLoad" ] }
     let source: String
 
-    init(source: String) {
-        self.source = source
+    init(scriptSourceProvider: ScriptSourceProviding) {
+        self.source = scriptSourceProvider.clickToLoadSource
     }
 
     weak var delegate: ClickToLoadUserScriptDelegate?

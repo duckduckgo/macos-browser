@@ -38,7 +38,7 @@ final class UserScripts {
     let autoconsentUserScript: UserScriptWithAutoconsent?
 
     init(with sourceProvider: ScriptSourceProviding) {
-        clickToLoadScript = ClickToLoadUserScript(source: sourceProvider.clickToLoadSource)
+        clickToLoadScript = ClickToLoadUserScript(scriptSourceProvider: sourceProvider)
         contentBlockerRulesScript = ContentBlockerRulesUserScript(configuration: sourceProvider.contentBlockerRulesConfig!)
         surrogatesScript = SurrogatesUserScript(configuration: sourceProvider.surrogatesConfig!)
         let privacySettings = PrivacySecurityPreferences.shared
