@@ -107,7 +107,9 @@ extension Pixel.Event {
              .waitlistFirstLaunch,
              .waitlistMigratedExistingInstall,
              .waitlistPresentedLockScreen,
-             .waitlistDismissedLockScreen:
+             .waitlistDismissedLockScreen,
+             .autoconsentOptOutFailed,
+             .autoconsentSelfTestFailed:
 
             return nil
         }
