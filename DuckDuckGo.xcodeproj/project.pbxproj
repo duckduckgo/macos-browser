@@ -66,7 +66,7 @@
 		4B1E6EF227AB5E5D00F51793 /* PasswordManagementItemList.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B1E6EF027AB5E5D00F51793 /* PasswordManagementItemList.swift */; };
 		4B2CBF412767EEC1001DF04B /* MacWaitlistStoreTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B2CBF402767EEC1001DF04B /* MacWaitlistStoreTests.swift */; };
 		4B2E7D6326FF9D6500D2DB17 /* PrintingUserScript.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B2E7D6226FF9D6500D2DB17 /* PrintingUserScript.swift */; };
-		4B379C1527BD91E3008A968E /* QuartzIdleStateDetector.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B379C1427BD91E3008A968E /* QuartzIdleStateDetector.swift */; };
+		4B379C1527BD91E3008A968E /* QuartzIdleStateProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B379C1427BD91E3008A968E /* QuartzIdleStateProvider.swift */; };
 		4B379C1727BD9D7C008A968E /* LoginsPreferencesTableCellView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B379C1627BD9D7C008A968E /* LoginsPreferencesTableCellView.swift */; };
 		4B379C1927BD9EAA008A968E /* LoginsPreferences.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B379C1827BD9EAA008A968E /* LoginsPreferences.swift */; };
 		4B379C1B27BD9F88008A968E /* LoginsPreferencesTableCellView.xib in Resources */ = {isa = PBXBuildFile; fileRef = 4B379C1A27BD9F88008A968E /* LoginsPreferencesTableCellView.xib */; };
@@ -761,7 +761,7 @@
 		4B1E6EF027AB5E5D00F51793 /* PasswordManagementItemList.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PasswordManagementItemList.swift; sourceTree = "<group>"; };
 		4B2CBF402767EEC1001DF04B /* MacWaitlistStoreTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MacWaitlistStoreTests.swift; sourceTree = "<group>"; };
 		4B2E7D6226FF9D6500D2DB17 /* PrintingUserScript.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PrintingUserScript.swift; sourceTree = "<group>"; };
-		4B379C1427BD91E3008A968E /* QuartzIdleStateDetector.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = QuartzIdleStateDetector.swift; sourceTree = "<group>"; };
+		4B379C1427BD91E3008A968E /* QuartzIdleStateProvider.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = QuartzIdleStateProvider.swift; sourceTree = "<group>"; };
 		4B379C1627BD9D7C008A968E /* LoginsPreferencesTableCellView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LoginsPreferencesTableCellView.swift; sourceTree = "<group>"; };
 		4B379C1827BD9EAA008A968E /* LoginsPreferences.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LoginsPreferences.swift; sourceTree = "<group>"; };
 		4B379C1A27BD9F88008A968E /* LoginsPreferencesTableCellView.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = LoginsPreferencesTableCellView.xib; sourceTree = "<group>"; };
@@ -1590,7 +1590,7 @@
 				4BBC169F27C4859400E00A38 /* DeviceAuthenticationService.swift */,
 				4B379C2127BDBA29008A968E /* LocalAuthenticationService.swift */,
 				4BBC16A127C485BC00E00A38 /* DeviceIdleStateDetector.swift */,
-				4B379C1427BD91E3008A968E /* QuartzIdleStateDetector.swift */,
+				4B379C1427BD91E3008A968E /* QuartzIdleStateProvider.swift */,
 				4B379C1D27BDB7FF008A968E /* DeviceAuthenticator.swift */,
 			);
 			path = "Device Authentication";
@@ -4248,7 +4248,7 @@
 				B693955426F04BEC0015B914 /* ColorView.swift in Sources */,
 				B6BBF17427475B15004F850E /* PopupBlockedPopover.swift in Sources */,
 				8589063A267BCD8E00D23B0D /* SaveCredentialsPopover.swift in Sources */,
-				4B379C1527BD91E3008A968E /* QuartzIdleStateDetector.swift in Sources */,
+				4B379C1527BD91E3008A968E /* QuartzIdleStateProvider.swift in Sources */,
 				AA72D5E325FE977F00C77619 /* AddEditFavoriteViewController.swift in Sources */,
 				B6C0B22E26E61CE70031CB7F /* DownloadViewModel.swift in Sources */,
 				B68458B825C7E8B200DC17B6 /* Tab+NSSecureCoding.swift in Sources */,
