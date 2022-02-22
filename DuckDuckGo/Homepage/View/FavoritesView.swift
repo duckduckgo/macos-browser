@@ -33,13 +33,21 @@ struct Favorites: View {
             HoverButton(size: 64, backgroundColor: Color("HomeFavoritesBackgroundColor"), imageName: "Add", imageSize: 22) {
                 model.addNew()
             }
+            .frame(width: 64, height: 64)
+            .cornerRadius(8)
+            .clipped()
 
             Text(UserText.addFavorite)
                 .font(.system(size: 10))
+                .multilineTextAlignment(.center)
+                .lineLimit(2)
+                .truncationMode(.middle)
+                .font(.system(size: 10))
+                .frame(height: 32, alignment: .top)
 
         }.frame(width: 72)
 
-        VStack(alignment: .leading, spacing: 8) {
+        VStack(alignment: .leading, spacing: 0) {
 
             ForEach(expanded ? model.rows.indices : model.rows.indices.prefix(Homepage.favoritesRowCountWhenCollapsed), id: \.self) { index in
 
@@ -47,8 +55,7 @@ struct Favorites: View {
                     ForEach(model.rows[index], id: \.id) { favorite in
                         if !expanded && index + 1 == Homepage.favoritesRowCountWhenCollapsed && favorite.id == model.rows[index].last?.id {
                             addButton
-                        } else
-                        if let bookmark = favorite.bookmark {
+                        } else if let bookmark = favorite.bookmark {
                             Favorite(bookmark: bookmark)
                         } else if favorite.id == Homepage.Models.FavoriteModel.addButtonUUID {
                             addButton
@@ -57,7 +64,9 @@ struct Favorites: View {
                         }
                     }
 
-                    Spacer()
+                    if model.rows[index].count < Homepage.favoritesPerRow {
+                        Spacer()
+                    }
 
                 }
                 
@@ -90,8 +99,9 @@ struct Favorite: View {
 
             ZStack(alignment: .center) {
 
-                FaviconView(domain: bookmark.url.host ?? "", size: 64)
-                    .frame(width: 64, height: 64)
+                // This is oversized and clipped to get the favicon's color as a blurred, tinted background
+                FaviconView(domain: bookmark.url.host ?? "", size: 72)
+                    .frame(width: 72, height: 72)
                     .padding(9)
                     .cornerRadius(8)
                     .blur(radius: isHovering ? 30 : 50)
@@ -110,6 +120,7 @@ struct Favorite: View {
                 .lineLimit(2)
                 .truncationMode(.middle)
                 .font(.system(size: 10))
+                .frame(height: 32, alignment: .top)
 
         }
         .frame(width: 72)

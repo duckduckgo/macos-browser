@@ -41,7 +41,6 @@ struct RootView: View {
                                 Spacer()
                             }
 
-                            Spacer()
                         }
                         .frame(maxWidth: .infinity)
                     }
