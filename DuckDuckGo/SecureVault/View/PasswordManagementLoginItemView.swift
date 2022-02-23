@@ -61,6 +61,8 @@ struct PasswordManagementLoginItemView: View {
 
                     WebsiteView()
 
+                    NoteView()
+
                     if !model.isEditing && !model.isNew {
                         DatesView()
                     }
@@ -280,6 +282,47 @@ private struct WebsiteView: View {
 
         }
 
+    }
+
+}
+
+private struct NoteView: View {
+
+    @EnvironmentObject var model: PasswordManagementLoginModel
+
+    var body: some View {
+        Text(UserText.pmNotes)
+            .bold()
+            .padding(.bottom, itemSpacing)
+
+        VStack(alignment: .leading, spacing: 0) {
+
+            if model.isEditing || model.isNew {
+
+                EditableTextView(text: $model.note)
+                    .overlay(
+                        RoundedRectangle(cornerRadius: 5.0)
+                            .stroke(Color.init(NSColor.roundedBorderTextFieldBorderColor), lineWidth: 1)
+                    )
+                    .padding(.bottom, interItemSpacing)
+
+            } else {
+
+                HStack {
+                    if #available(macOS 12, *) {
+                        Text(model.note)
+                            .foregroundColor(Color.primary)
+                            .textSelection(.enabled)
+                    } else {
+                        Text(model.note)
+                    }
+
+                    Spacer()
+                }
+                .padding(.bottom, interItemSpacing)
+            }
+
+        }
     }
 
 }

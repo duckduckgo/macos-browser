@@ -120,10 +120,6 @@ private struct ItemView: View {
                     Image("Identity")
                         .frame(width: 32)
                         .padding(.leading, 6)
-                case .note:
-                    Image("Note")
-                        .frame(width: 32)
-                        .padding(.leading, 6)
                 }
 
                 VStack(alignment: .leading, spacing: 4) {

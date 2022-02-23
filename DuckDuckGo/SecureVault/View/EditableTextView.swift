@@ -24,7 +24,7 @@ struct EditableTextView: NSViewRepresentable {
     @Binding var text: String
 
     var isEditable: Bool = true
-    var font: NSFont? = .systemFont(ofSize: 14, weight: .regular)
+    var font: NSFont? = .systemFont(ofSize: 13, weight: .regular)
     var onEditingChanged: () -> Void       = {}
     var onCommit: () -> Void = {}
     var onTextChange: (String) -> Void = { _ in }

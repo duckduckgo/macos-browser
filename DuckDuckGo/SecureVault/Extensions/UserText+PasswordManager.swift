@@ -56,7 +56,6 @@ extension UserText {
     static let pmPhoneNumber = NSLocalizedString("pm.phone-number", value: "Phone Number", comment: "Label for phone number title")
     static let pmEmailAddress = NSLocalizedString("pm.email-address", value: "Email Address", comment: "Label for email address title")
 
-    static let pmNote = NSLocalizedString("pm.note", value: "Note", comment: "Label for note title")
-    static let pmEmptyNote = NSLocalizedString("pm.note.empty", value: "Empty note", comment: "Label for empty note title")
+    static let pmNotes = NSLocalizedString("pm.notes", value: "Notes", comment: "Label for notes title")
 
 }

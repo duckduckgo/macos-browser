@@ -164,15 +164,6 @@ final class PasswordManagementViewController: NSViewController {
         }
     }
 
-    private func syncModelsOnNote(_ note: SecureVaultModels.Note, select: Bool = false) {
-        self.itemModel?.setSecureVaultModel(note)
-        self.listModel?.update(item: SecureVaultItem.note(note))
-
-        if select {
-            self.listModel?.selected(item: SecureVaultItem.note(note))
-        }
-    }
-
     private func syncModelsOnCreditCard(_ card: SecureVaultModels.CreditCard, select: Bool = false) {
         self.itemModel?.setSecureVaultModel(card)
         self.listModel?.update(item: SecureVaultItem.card(card))
@@ -215,24 +206,6 @@ final class PasswordManagementViewController: NSViewController {
         self.itemModel = itemModel
 
         let view = NSHostingView(rootView: PasswordManagementIdentityItemView().environmentObject(itemModel))
-        replaceItemContainerChildView(with: view)
-    }
-
-    private func createNoteItemView() {
-        let itemModel = PasswordManagementNoteModel(onDirtyChanged: { [weak self] isDirty in
-            self?.isDirty = isDirty
-            self?.postChange()
-        }, onSaveRequested: { [weak self] note in
-            self?.doSaveNote(note)
-        }, onDeleteRequested: { [weak self] note in
-            self?.promptToDelete(note: note)
-        }) { [weak self] in
-            self?.refetchWithText(self!.searchField.stringValue)
-        }
-
-        self.itemModel = itemModel
-
-        let view = NSHostingView(rootView: PasswordManagementNoteItemView().environmentObject(itemModel))
         replaceItemContainerChildView(with: view)
     }
 
@@ -321,28 +294,6 @@ final class PasswordManagementViewController: NSViewController {
         }
     }
 
-    private func doSaveNote(_ note: SecureVaultModels.Note) {
-        let isNew = note.id == nil
-
-        do {
-            guard let storedNoteID = try secureVault?.storeNote(note),
-                  let storedNote = try secureVault?.noteFor(id: storedNoteID) else { return }
-
-            itemModel?.cancel()
-            if isNew {
-                refetchWithText(searchField.stringValue) { [weak self] in
-                    self?.syncModelsOnNote(storedNote, select: true)
-                }
-            } else {
-                syncModelsOnNote(storedNote)
-            }
-            postChange()
-
-        } catch {
-            // Which errors can occur when saving notes?
-        }
-    }
-
     private func doSaveCreditCard(_ card: SecureVaultModels.CreditCard) {
         let isNew = card.id == nil
 
@@ -407,27 +358,6 @@ final class PasswordManagementViewController: NSViewController {
         }
     }
 
-    private func promptToDelete(note: SecureVaultModels.Note) {
-        guard let window = self.view.window,
-              let id = note.id else { return }
-
-        let alert = NSAlert.passwordManagerConfirmDeleteNote()
-        alert.beginSheetModal(for: window) { response in
-
-            switch response {
-            case .alertFirstButtonReturn:
-                try? self.secureVault?.deleteNoteFor(noteId: id)
-                self.itemModel?.clearSecureVaultModel()
-                self.refetchWithText(self.searchField.stringValue)
-                self.postChange()
-
-            default:
-                break // cancel, do nothing
-            }
-
-        }
-    }
-
     private func promptToDelete(card: SecureVaultModels.CreditCard) {
         guard let window = self.view.window,
               let id = card.id else { return }
@@ -475,10 +405,6 @@ final class PasswordManagementViewController: NSViewController {
                     guard let identity = try? self?.secureVault?.identityFor(id: id) else { return }
                     self?.createIdentityItemView()
                     self?.syncModelsOnIdentity(identity)
-                case .note:
-                    guard let note = try? self?.secureVault?.noteFor(id: id) else { return }
-                    self?.createNoteItemView()
-                    self?.syncModelsOnNote(note)
                 }
             }
 
@@ -533,7 +459,6 @@ final class PasswordManagementViewController: NSViewController {
             NSMenuItem(title: UserText.pmNewCard, action: #selector(createNewCreditCard), keyEquivalent: ""),
             NSMenuItem(title: UserText.pmNewLogin, action: #selector(createNewLogin), keyEquivalent: ""),
             NSMenuItem(title: UserText.pmNewIdentity, action: #selector(createNewIdentity), keyEquivalent: ""),
-            NSMenuItem(title: UserText.pmNewNote, action: #selector(createNewNote), keyEquivalent: "")
         ]
 
         return menu
@@ -548,12 +473,10 @@ final class PasswordManagementViewController: NSViewController {
         DispatchQueue.global(qos: .userInitiated).async {
             let accounts = (try? self.secureVault?.accounts()) ?? []
             let cards = (try? self.secureVault?.creditCards()) ?? []
-            let notes = (try? self.secureVault?.notes()) ?? []
             let identities = (try? self.secureVault?.identities()) ?? []
 
             let items = accounts.map(SecureVaultItem.account) +
                         cards.map(SecureVaultItem.card) +
-                        notes.map(SecureVaultItem.note) +
                         identities.map(SecureVaultItem.identity)
 
             DispatchQueue.main.async {
@@ -637,40 +560,6 @@ final class PasswordManagementViewController: NSViewController {
 
         func createNew() {
             createIdentityItemView()
-
-            listModel?.clearSelection()
-            itemModel?.createNew()
-        }
-
-        if isDirty {
-            let alert = NSAlert.passwordManagerSaveChangesToLogin()
-            alert.beginSheetModal(for: window) { response in
-
-                switch response {
-                case .alertFirstButtonReturn: // Save
-                    self.itemModel?.save()
-                    createNew()
-
-                case .alertSecondButtonReturn: // Discard
-                    self.itemModel?.cancel()
-                    createNew()
-
-                default: // Cancel
-                    break // just do nothing
-                }
-
-            }
-        } else {
-            createNew()
-        }
-    }
-
-    @objc
-    private func createNewNote() {
-        guard let window = view.window else { return }
-
-        func createNew() {
-            createNoteItemView()
 
             listModel?.clearSelection()
             itemModel?.createNew()

@@ -132,4 +132,6 @@ extension NSColor {
 
     static let buttonColor: NSColor = NSColor(named: "ButtonColor")!
 
+    static let roundedBorderTextFieldBorderColor = NSColor(named: "RoundedBorderTextFieldBorderColor")!
+
 }

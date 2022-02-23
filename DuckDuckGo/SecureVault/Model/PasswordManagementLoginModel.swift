@@ -81,6 +81,12 @@ final class PasswordManagementLoginModel: ObservableObject, PasswordManagementIt
         }
     }
 
+    @Published var note: String = "" {
+        didSet {
+            isDirty = true
+        }
+    }
+
     @Published var isEditing = false {
         didSet {
             // Experimental change suggested by the design team to mark an item as dirty as soon as it enters the editing state.
@@ -131,6 +137,7 @@ final class PasswordManagementLoginModel: ObservableObject, PasswordManagementIt
         credentials.account.title = title
         credentials.account.username = username
         credentials.account.domain = normalizedDomain(domain)
+        credentials.account.note = note
         credentials.password = password.data(using: .utf8)! // let it crash?
         onSaveRequested(credentials)
     }
@@ -168,6 +175,7 @@ final class PasswordManagementLoginModel: ObservableObject, PasswordManagementIt
         username = credentials?.account.username ?? ""
         password = String(data: credentials?.password ?? Data(), encoding: .utf8) ?? ""
         domain = normalizedDomain(credentials?.account.domain ?? "")
+        note = credentials?.account.note ?? ""
         isDirty = false
         isNew = credentials?.account.id == nil
 
