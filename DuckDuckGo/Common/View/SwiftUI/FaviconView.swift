@@ -34,7 +34,10 @@ struct FaviconView: View {
     }
 
     func refreshImage() {
-        image = faviconManagement.getCachedFavicon(for: domain, sizeCategory: .small)?.image
+        let image = faviconManagement.getCachedFavicon(for: domain, sizeCategory: .small)?.image
+        if image?.size.isSmaller(than: CGSize(width: 16, height: 16)) == false {
+            self.image = image
+        }
     }
 
     var body: some View {
@@ -54,8 +57,8 @@ struct FaviconView: View {
 
                 ZStack {
                     Rectangle()
-                        .foregroundColor(Color.forDomain(domain))
-                    Text(String(domain.capitalized.first ?? "?"))
+                        .foregroundColor(Color.forDomain(domain.dropWWW()))
+                    Text(String(domain.dropWWW().capitalized.first ?? "?"))
                         .font(.title)
                         .foregroundColor(Color.white)
                 }

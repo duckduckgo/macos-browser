@@ -45,7 +45,6 @@ final class NavigationBarViewController: NSViewController {
     @IBOutlet var addressBarProportionalWidthConstraint: NSLayoutConstraint!
     @IBOutlet var addressBarTopConstraint: NSLayoutConstraint!
     @IBOutlet var addressBarBottomConstraint: NSLayoutConstraint!
-    @IBOutlet var homepageWidthConstraint: NSLayoutConstraint!
 
     lazy var downloadsProgressView: CircularProgressView = {
         let bounds = downloadsButton.bounds
@@ -123,6 +122,7 @@ final class NavigationBarViewController: NSViewController {
         optionsButton.sendAction(on: .leftMouseDown)
         bookmarkListButton.sendAction(on: .leftMouseDown)
         downloadsButton.sendAction(on: .leftMouseDown)
+
     }
 
     override func viewWillAppear() {
@@ -378,13 +378,14 @@ final class NavigationBarViewController: NSViewController {
         bottom?.constant = homePage ? 0 : 6
 
         let proportionalWidth = animated ? addressBarProportionalWidthConstraint.animator() : addressBarProportionalWidthConstraint
-        proportionalWidth?.isActive = !homePage
+        // Big number means that the minimum width constraint will kick in
+        proportionalWidth?.constant = homePage ? -5000 : 0
 
-        let homepageWidth = animated ? homepageWidthConstraint.animator() : homepageWidthConstraint
-        homepageWidth?.isActive = homePage
+        let leading = animated ? addressBarLeftToNavButtonsConstraint.animator() : addressBarLeftToNavButtonsConstraint
+        leading?.constant = homePage ? 68 : 8
 
         let logo = animated ? daxLogo.animator() : daxLogo
-        logo?.isHidden = !homePage
+        logo?.alphaValue = homePage ? 1.0 : 0.0
     }
 
     private func subscribeToDownloads() {

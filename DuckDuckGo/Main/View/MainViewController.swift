@@ -177,11 +177,6 @@ final class MainViewController: NSViewController {
     private func resizeNavigationBarForHomePage(_ homePage: Bool, animated: Bool) {
         let performAnim = animated
 
-        if performAnim {
-            NSAnimationContext.beginGrouping()
-            NSAnimationContext.current.duration = 0.1
-        }
-
         let height = performAnim ? addressBarHeightConstraint.animator() : addressBarHeightConstraint
         height?.constant = homePage ? 62 : 48
 
@@ -189,11 +184,6 @@ final class MainViewController: NSViewController {
         divider?.alphaValue = homePage ? 0 : 1.0
 
         navigationBarViewController.resizeAddressBarForHomePage(homePage, animated: performAnim)
-
-        if performAnim {
-            NSAnimationContext.endGrouping()
-        }
-
     }
 
     private func subscribeToTabContent() {
