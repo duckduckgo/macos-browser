@@ -83,7 +83,6 @@ extension PasswordManagementPopover: NSPopoverDelegate {
             viewController.clear()
         }
         parentWindowDidResignKeyObserver = nil
-        parentWindowDidBecomeKeyObserver = nil
     }
 
 }
