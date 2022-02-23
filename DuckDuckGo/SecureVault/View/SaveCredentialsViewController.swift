@@ -44,7 +44,6 @@ final class SaveCredentialsViewController: NSViewController {
     @IBOutlet var usernameField: NSTextField!
     @IBOutlet var hiddenPasswordField: NSSecureTextField!
     @IBOutlet var visiblePasswordField: NSTextField!
-    @IBOutlet var neverButton: NSButton!
     @IBOutlet var notNowButton: NSButton!
     @IBOutlet var saveButton: NSButton!
     @IBOutlet var updateButton: NSButton!
@@ -74,7 +73,6 @@ final class SaveCredentialsViewController: NSViewController {
         self.loadFaviconForDomain(credentials.account.domain)
 
         notNowButton.isHidden = credentials.account.id != nil
-        neverButton.isHidden = credentials.account.id != nil
         saveButton.isHidden = credentials.account.id != nil
 
         updateButton.isHidden = credentials.account.id == nil
@@ -131,12 +129,6 @@ final class SaveCredentialsViewController: NSViewController {
         }
 
         Pixel.fire(.fireproofSuggested())
-    }
-
-    /// Assuming per website basis.
-    @IBAction func onNeverClicked(sender: Any?) {
-        PasswordManagerSettings().doNotPromptOnDomain(domainLabel.stringValue)
-        delegate?.shouldCloseSaveCredentialsViewController(self)
     }
 
     @IBAction func onTogglePasswordVisibility(sender: Any?) {
