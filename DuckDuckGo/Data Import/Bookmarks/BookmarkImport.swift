@@ -18,8 +18,14 @@
 
 import Foundation
 
+enum BookmarkImportSource {
+    case chrome
+    case firefox
+    case safari
+}
+
 protocol BookmarkImporter {
 
-    func importBookmarks(_ bookmarks: ImportedBookmarks) throws -> DataImport.Summary
+    func importBookmarks(_ bookmarks: ImportedBookmarks, source: BookmarkImportSource) throws -> DataImport.Summary
 
 }

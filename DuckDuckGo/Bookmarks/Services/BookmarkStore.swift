@@ -48,7 +48,7 @@ protocol BookmarkStore {
     func update(folder: BookmarkFolder)
     func add(objectsWithUUIDs: [UUID], to parent: BookmarkFolder?, completion: @escaping (Error?) -> Void)
     func update(objectsWithUUIDs uuids: [UUID], update: @escaping (BaseBookmarkEntity) -> Void, completion: @escaping (Error?) -> Void)
-    func importBookmarks(_ bookmarks: ImportedBookmarks) -> BookmarkImportResult
+    func importBookmarks(_ bookmarks: ImportedBookmarks, source: BookmarkImportSource) -> BookmarkImportResult
 
 }
 
@@ -347,7 +347,15 @@ final class LocalBookmarkStore: BookmarkStore {
 
     // MARK: - Import
 
-    func importBookmarks(_ bookmarks: ImportedBookmarks) -> BookmarkImportResult {
+    /// Imports bookmarks into the Core Data store from an `ImportedBookmarks` object.
+    /// The source is used to determine where to put bookmarks, as we want to match the source browser's structure as closely as possible.
+    ///
+    /// The import strategy is as follows:
+    ///
+    /// 1. **Safari:** Create a root level "Imported Favorites" folder to store bookmarks from the bookmarks bar, and all other bookmarks go at the root level.
+    /// 2. **Chrome:** Put all bookmarks at the root level, except for Other Bookmarks which go in a root level "Other Bookmarks" folder.
+    /// 3. **Firefox:** Put all bookmarks at the root level, except for Other Bookmarks which go in a root level "Other Bookmarks" folder.
+    func importBookmarks(_ bookmarks: ImportedBookmarks, source: BookmarkImportSource) -> BookmarkImportResult {
         var total = BookmarkImportResult(successful: 0, duplicates: 0, failed: 0)
 
         context.performAndWait {
@@ -361,31 +369,61 @@ final class LocalBookmarkStore: BookmarkStore {
                 }
 
                 let bookmarkCountBeforeImport = try context.count(for: Bookmark.bookmarksFetchRequest())
-
                 let allFolders = try context.fetch(BookmarkFolder.bookmarkFoldersFetchRequest())
                 
-                let existingFavoritesFolder = allFolders.first { ($0.titleEncrypted as? String) == UserText.bookmarkImportImportedFavorites }
-                let favoritesFolder = existingFavoritesFolder ?? createFolder(titled: UserText.bookmarkImportImportedFavorites, in: self.context)
-                
-                if let bookmarksBar = bookmarks.topLevelFolders.bookmarkBar.children {
-                    let result = recursivelyCreateEntities(from: bookmarksBar,
-                                                           parent: favoritesFolder,
-                                                           existingBookmarkURLs: bookmarkURLs,
-                                                           markBookmarksAsFavorite: true,
-                                                           in: self.context)
-
-                    total += result
-                }
-
-                if let otherBookmarks = bookmarks.topLevelFolders.otherBookmarks.children {
-                    // Reverse the top level collection so that the order matches the imported bookmarks correctly.
-                    let result = recursivelyCreateEntities(from: otherBookmarks,
-                                                           parent: nil,
-                                                           existingBookmarkURLs: bookmarkURLs,
-                                                           markBookmarksAsFavorite: false,
-                                                           in: self.context)
+                switch source {
+                case .safari:
                     
-                    total += result
+                    let existingFolder = allFolders.first { ($0.titleEncrypted as? String) == UserText.bookmarkImportImportedFavorites }
+                    let parent = existingFolder ?? createFolder(titled: UserText.bookmarkImportImportedFavorites, in: self.context)
+                    
+                    if let bookmarksBar = bookmarks.topLevelFolders.bookmarkBar.children {
+                        let result = recursivelyCreateEntities(from: bookmarksBar,
+                                                               parent: parent,
+                                                               existingBookmarkURLs: bookmarkURLs,
+                                                               markBookmarksAsFavorite: true,
+                                                               in: self.context)
+
+                        total += result
+                    }
+
+                    if let otherBookmarks = bookmarks.topLevelFolders.otherBookmarks.children {
+                        // Reverse the top level collection so that the order matches the imported bookmarks correctly.
+                        let result = recursivelyCreateEntities(from: otherBookmarks,
+                                                               parent: nil,
+                                                               existingBookmarkURLs: bookmarkURLs,
+                                                               markBookmarksAsFavorite: false,
+                                                               in: self.context)
+                        
+                        total += result
+                    }
+                    
+                case .chrome, .firefox:
+                    
+                    if let bookmarksBar = bookmarks.topLevelFolders.bookmarkBar.children {
+                        let result = recursivelyCreateEntities(from: bookmarksBar,
+                                                               parent: nil,
+                                                               existingBookmarkURLs: bookmarkURLs,
+                                                               markBookmarksAsFavorite: true,
+                                                               in: self.context)
+
+                        total += result
+                    }
+                    
+                    let existingFolder = allFolders.first { ($0.titleEncrypted as? String) == UserText.bookmarkImportOtherBookmarks }
+                    let parent = existingFolder ?? createFolder(titled: UserText.bookmarkImportOtherBookmarks, in: self.context)
+
+                    if let otherBookmarks = bookmarks.topLevelFolders.otherBookmarks.children {
+                        // Reverse the top level collection so that the order matches the imported bookmarks correctly.
+                        let result = recursivelyCreateEntities(from: otherBookmarks,
+                                                               parent: parent,
+                                                               existingBookmarkURLs: bookmarkURLs,
+                                                               markBookmarksAsFavorite: false,
+                                                               in: self.context)
+                        
+                        total += result
+                    }
+                    
                 }
 
                 try self.context.save()
