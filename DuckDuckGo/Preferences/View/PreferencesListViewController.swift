@@ -159,9 +159,10 @@ extension PreferencesListViewController: NSTableViewDataSource, NSTableViewDeleg
             let cell: PrivacySecurityPreferencesTableCellView? = createCell(identifier: PrivacySecurityPreferencesTableCellView.identifier,
                                                                             tableView: tableView)
             cell?.delegate = self
-            let preferences = PrivacySecurityPreferences()
+            let preferences = PrivacySecurityPreferences.shared
             cell?.update(loginDetectionEnabled: preferences.loginDetectionEnabled,
-                         gpcEnabled: preferences.gpcEnabled)
+                         gpcEnabled: preferences.gpcEnabled,
+                         autoconsentEnabled: preferences.autoconsentEnabled)
             return cell
         case .logins:
             let cell: LoginsPreferencesTableCellView? = createCell(identifier: LoginsPreferencesTableCellView.identifier,
@@ -223,13 +224,15 @@ extension PreferencesListViewController: PrivacySecurityPreferencesTableCellView
     }
 
     func privacySecurityPreferencesTableCellView(_ cell: PrivacySecurityPreferencesTableCellView, setLoginDetectionEnabled enabled: Bool) {
-        var preferences = PrivacySecurityPreferences()
-        preferences.loginDetectionEnabled = enabled
+        PrivacySecurityPreferences.shared.loginDetectionEnabled = enabled
+    }
+
+    func privacySecurityPreferencesTableCellView(_ cell: PrivacySecurityPreferencesTableCellView, setGPCEnabled enabled: Bool) {
+        PrivacySecurityPreferences.shared.gpcEnabled = enabled
     }
     
-    func privacySecurtyPreferencesTableCellView(_ cell: PrivacySecurityPreferencesTableCellView, setGPCEnabled enabled: Bool) {
-        var preferences = PrivacySecurityPreferences()
-        preferences.gpcEnabled = enabled
+    func privacySecurityPreferencesTableCellView(_ cell: PrivacySecurityPreferencesTableCellView, setAutoconsentEnabled enabled: Bool) {
+        PrivacySecurityPreferences.shared.autoconsentEnabled = enabled
     }
 
 }

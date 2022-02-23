@@ -78,6 +78,7 @@ extension Pixel.Event {
              .browserMadeDefault,
              .burn,
              .crash,
+             .compileRulesWait,
              .fireproof,
              .fireproofSuggested,
              .bookmark,
@@ -107,7 +108,9 @@ extension Pixel.Event {
              .waitlistFirstLaunch,
              .waitlistMigratedExistingInstall,
              .waitlistPresentedLockScreen,
-             .waitlistDismissedLockScreen:
+             .waitlistDismissedLockScreen,
+             .autoconsentOptOutFailed,
+             .autoconsentSelfTestFailed:
 
             return nil
         }

@@ -11,11 +11,11 @@
         <customObject id="-1" userLabel="First Responder" customClass="FirstResponder"/>
         <customObject id="-3" userLabel="Application" customClass="NSObject"/>
         <tableCellView id="ZOv-mQ-BdW" customClass="PrivacySecurityPreferencesTableCellView" customModule="DuckDuckGo_Privacy_Browser" customModuleProvider="target">
-            <rect key="frame" x="0.0" y="0.0" width="480" height="385"/>
+            <rect key="frame" x="0.0" y="0.0" width="480" height="536"/>
             <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
             <subviews>
                 <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="UTK-kg-11g">
-                    <rect key="frame" x="-2" y="332" width="158" height="21"/>
+                    <rect key="frame" x="-2" y="483" width="158" height="21"/>
                     <textFieldCell key="cell" lineBreakMode="clipping" title="Privacy &amp; Security" id="gee-cf-Edf">
                         <font key="font" metaFont="systemSemibold" size="18"/>
                         <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
@@ -23,7 +23,7 @@
                     </textFieldCell>
                 </textField>
                 <button verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="Fd2-fn-gaX">
-                    <rect key="frame" x="-2" y="264" width="278" height="18"/>
+                    <rect key="frame" x="1" y="415" width="278" height="18"/>
                     <buttonCell key="cell" type="check" title="Ask to Fireproof websites when signing in" bezelStyle="regularSquare" imagePosition="left" state="on" inset="2" id="ek6-wk-QQo">
                         <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
                         <font key="font" metaFont="system"/>
@@ -33,7 +33,7 @@
                     </connections>
                 </button>
                 <button verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="3Oj-RS-EIB">
-                    <rect key="frame" x="-7" y="166" width="185" height="32"/>
+                    <rect key="frame" x="-6" y="317" width="185" height="32"/>
                     <buttonCell key="cell" type="push" title="Manage Fireproof Sites…" bezelStyle="rounded" alignment="center" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="0HE-gw-PLQ">
                         <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
                         <font key="font" metaFont="system"/>
@@ -43,7 +43,7 @@
                     </connections>
                 </button>
                 <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="4U5-6s-Y6q">
-                    <rect key="frame" x="-2" y="293" width="113" height="19"/>
+                    <rect key="frame" x="-2" y="444" width="113" height="19"/>
                     <textFieldCell key="cell" lineBreakMode="clipping" title="Fireproof Sites" id="UhZ-7t-gWn">
                         <font key="font" metaFont="systemMedium" size="16"/>
                         <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
@@ -51,7 +51,7 @@
                     </textFieldCell>
                 </textField>
                 <textField verticalHuggingPriority="750" horizontalCompressionResistancePriority="250" translatesAutoresizingMaskIntoConstraints="NO" id="1Hn-nJ-bFt">
-                    <rect key="frame" x="-2" y="205" width="467" height="48"/>
+                    <rect key="frame" x="1" y="356" width="464" height="48"/>
                     <textFieldCell key="cell" selectable="YES" id="VcP-EL-hod">
                         <font key="font" metaFont="system"/>
                         <string key="title">Websites rely on cookies to keep you signed in. When you Fireproof a site, cookies won’t be erased and you'll stay signed in, even after using the Fire Button. We still block third-party trackers found on Fireproof websites.</string>
@@ -59,8 +59,35 @@
                         <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
                     </textFieldCell>
                 </textField>
+                <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="tRB-fw-cq1">
+                    <rect key="frame" x="-2" y="265" width="190" height="19"/>
+                    <textFieldCell key="cell" lineBreakMode="clipping" title="Cookie Consent Pop-ups" id="GKH-vC-pHF">
+                        <font key="font" metaFont="systemMedium" size="16"/>
+                        <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
+                        <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
+                    </textFieldCell>
+                </textField>
+                <button verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="qhZ-7l-I3R">
+                    <rect key="frame" x="-2" y="236" width="331" height="18"/>
+                    <buttonCell key="cell" type="check" title="Let DuckDuckGo manage cookie consent pop-ups" bezelStyle="regularSquare" imagePosition="left" state="on" inset="2" id="6WC-hP-931">
+                        <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
+                        <font key="font" metaFont="system"/>
+                    </buttonCell>
+                    <connections>
+                        <action selector="toggledAutoconsentCheckbox:" target="ZOv-mQ-BdW" id="WMM-qb-teq"/>
+                    </connections>
+                </button>
+                <textField verticalHuggingPriority="750" horizontalCompressionResistancePriority="250" translatesAutoresizingMaskIntoConstraints="NO" id="Nbq-mp-IDe">
+                    <rect key="frame" x="-2" y="177" width="467" height="48"/>
+                    <textFieldCell key="cell" selectable="YES" id="jGL-ur-LHs">
+                        <font key="font" metaFont="system"/>
+                        <string key="title">When DuckDuckGo detects cookie consent pop-ups on sites you visit, we'll automatically set your cookie preferences to minimize cookies and maximize privacy, then close the pop-ups.</string>
+                        <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
+                        <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
+                    </textFieldCell>
+                </textField>
                 <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="14N-V1-min">
-                    <rect key="frame" x="-2" y="114" width="219" height="19"/>
+                    <rect key="frame" x="-2" y="118" width="219" height="19"/>
                     <textFieldCell key="cell" lineBreakMode="clipping" title="Global Privacy Control (GPC)" id="TIG-QJ-483">
                         <font key="font" metaFont="systemMedium" size="16"/>
                         <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
@@ -68,7 +95,7 @@
                     </textFieldCell>
                 </textField>
                 <button verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="CBG-hn-odn">
-                    <rect key="frame" x="-2" y="85" width="205" height="18"/>
+                    <rect key="frame" x="-2" y="89" width="205" height="18"/>
                     <buttonCell key="cell" type="check" title="Enable Global Privacy Control" bezelStyle="regularSquare" imagePosition="left" state="on" inset="2" id="ikS-HK-oiZ">
                         <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
                         <font key="font" metaFont="system"/>
@@ -77,19 +104,19 @@
                         <action selector="toggledGPCCheckbox:" target="ZOv-mQ-BdW" id="60V-da-e9e"/>
                     </connections>
                 </button>
-                <scrollView borderType="none" horizontalLineScroll="10" horizontalPageScroll="10" verticalLineScroll="10" verticalPageScroll="10" hasHorizontalScroller="NO" hasVerticalScroller="NO" translatesAutoresizingMaskIntoConstraints="NO" id="tkg-2B-nUj" customClass="ToggleableScrollView" customModule="DuckDuckGo_Privacy_Browser" customModuleProvider="target">
-                    <rect key="frame" x="-5" y="16" width="468" height="60"/>
+                <scrollView borderType="none" horizontalLineScroll="10" horizontalPageScroll="10" verticalLineScroll="10" verticalPageScroll="10" hasHorizontalScroller="NO" hasVerticalScroller="NO" verticalScrollElasticity="none" translatesAutoresizingMaskIntoConstraints="NO" id="tkg-2B-nUj" customClass="ToggleableScrollView" customModule="DuckDuckGo_Privacy_Browser" customModuleProvider="target">
+                    <rect key="frame" x="0.0" y="32" width="463" height="50"/>
                     <clipView key="contentView" drawsBackground="NO" id="KPO-Y2-B7T">
-                        <rect key="frame" x="0.0" y="0.0" width="468" height="60"/>
+                        <rect key="frame" x="0.0" y="0.0" width="463" height="50"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <subviews>
-                            <textView editable="NO" importsGraphics="NO" richText="NO" verticallyResizable="NO" spellingCorrection="YES" smartInsertDelete="YES" id="s6V-Yz-UIH">
-                                <rect key="frame" x="0.0" y="0.0" width="468" height="60"/>
+                            <textView editable="NO" importsGraphics="NO" richText="NO" verticallyResizable="YES" spellingCorrection="YES" smartInsertDelete="YES" id="s6V-Yz-UIH">
+                                <rect key="frame" x="0.0" y="0.0" width="463" height="50"/>
                                 <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                 <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
                                 <color key="backgroundColor" name="ClearColor"/>
-                                <size key="minSize" width="468" height="60"/>
-                                <size key="maxSize" width="468" height="10000000"/>
+                                <size key="minSize" width="463" height="50"/>
+                                <size key="maxSize" width="463" height="10000000"/>
                                 <attributedString key="textStorage">
                                     <fragment>
                                         <string key="content">DuckDuckGo automatically blocks many trackers. With Global Privacy Control (GPC), you can also ask participating websites to restrict selling or sharing your personal data with other companies. </string>
@@ -109,9 +136,8 @@
                         <color key="backgroundColor" name="ClearColor"/>
                     </clipView>
                     <constraints>
-                        <constraint firstAttribute="height" constant="60" id="QEb-Jg-v8U"/>
+                        <constraint firstAttribute="height" relation="greaterThanOrEqual" constant="50" id="QEb-Jg-v8U"/>
                     </constraints>
-                    <edgeInsets key="contentInsets" left="0.0" right="0.0" top="0.0" bottom="0.0"/>
                     <scroller key="horizontalScroller" hidden="YES" wantsLayer="YES" verticalHuggingPriority="750" horizontal="YES" id="3cd-Cl-dGw">
                         <rect key="frame" x="-100" y="-100" width="225" height="15"/>
                         <autoresizingMask key="autoresizingMask"/>
@@ -124,41 +150,48 @@
                         <userDefinedRuntimeAttribute type="boolean" keyPath="isEnabled" value="NO"/>
                     </userDefinedRuntimeAttributes>
                 </scrollView>
-                <box verticalHuggingPriority="750" boxType="separator" translatesAutoresizingMaskIntoConstraints="NO" id="OWb-7K-YL1">
+                <box verticalHuggingPriority="750" boxType="separator" translatesAutoresizingMaskIntoConstraints="NO" id="ht8-zc-QnK">
                     <rect key="frame" x="0.0" y="-2" width="480" height="5"/>
                 </box>
             </subviews>
             <constraints>
-                <constraint firstAttribute="trailing" secondItem="OWb-7K-YL1" secondAttribute="trailing" id="1Df-PR-zPG"/>
                 <constraint firstItem="tkg-2B-nUj" firstAttribute="trailing" secondItem="1Hn-nJ-bFt" secondAttribute="trailing" id="23C-Fg-KOC"/>
-                <constraint firstItem="1Hn-nJ-bFt" firstAttribute="leading" secondItem="ZOv-mQ-BdW" secondAttribute="leading" id="F45-Xp-jFH"/>
+                <constraint firstItem="tRB-fw-cq1" firstAttribute="top" secondItem="3Oj-RS-EIB" secondAttribute="bottom" constant="40" id="2TP-W9-3vN"/>
+                <constraint firstItem="tRB-fw-cq1" firstAttribute="leading" secondItem="ZOv-mQ-BdW" secondAttribute="leading" id="DdP-eD-VKb"/>
+                <constraint firstItem="UTK-kg-11g" firstAttribute="leading" secondItem="ZOv-mQ-BdW" secondAttribute="leading" id="Ee8-bb-7jx"/>
+                <constraint firstItem="1Hn-nJ-bFt" firstAttribute="leading" secondItem="ZOv-mQ-BdW" secondAttribute="leading" constant="3" id="F45-Xp-jFH"/>
                 <constraint firstItem="4U5-6s-Y6q" firstAttribute="top" secondItem="UTK-kg-11g" secondAttribute="bottom" constant="20" id="G13-tL-MJQ"/>
-                <constraint firstItem="UTK-kg-11g" firstAttribute="leading" secondItem="3Oj-RS-EIB" secondAttribute="leading" id="NDv-h8-7Yl"/>
-                <constraint firstItem="OWb-7K-YL1" firstAttribute="leading" secondItem="ZOv-mQ-BdW" secondAttribute="leading" id="NOz-eL-0hz"/>
+                <constraint firstItem="Nbq-mp-IDe" firstAttribute="top" secondItem="qhZ-7l-I3R" secondAttribute="bottom" constant="12" id="I3Y-w2-Qma"/>
+                <constraint firstItem="ht8-zc-QnK" firstAttribute="leading" secondItem="ZOv-mQ-BdW" secondAttribute="leading" id="Kjk-Gw-O8U"/>
+                <constraint firstItem="Nbq-mp-IDe" firstAttribute="leading" secondItem="ZOv-mQ-BdW" secondAttribute="leading" id="MA9-jE-otM"/>
                 <constraint firstItem="1Hn-nJ-bFt" firstAttribute="top" secondItem="Fd2-fn-gaX" secondAttribute="bottom" constant="12" id="Qpx-ee-2UM"/>
-                <constraint firstItem="Fd2-fn-gaX" firstAttribute="leading" secondItem="ZOv-mQ-BdW" secondAttribute="leading" id="Ucq-ST-8rU"/>
-                <constraint firstAttribute="bottom" secondItem="tkg-2B-nUj" secondAttribute="bottom" constant="16" id="Xmp-Is-LRu"/>
-                <constraint firstItem="14N-V1-min" firstAttribute="top" secondItem="3Oj-RS-EIB" secondAttribute="bottom" constant="40" id="ZJC-o1-cVp"/>
-                <constraint firstItem="3Oj-RS-EIB" firstAttribute="leading" secondItem="ZOv-mQ-BdW" secondAttribute="leading" id="b4L-nr-UPf"/>
+                <constraint firstItem="Fd2-fn-gaX" firstAttribute="leading" secondItem="ZOv-mQ-BdW" secondAttribute="leading" constant="3" id="Ucq-ST-8rU"/>
+                <constraint firstItem="qhZ-7l-I3R" firstAttribute="top" secondItem="tRB-fw-cq1" secondAttribute="bottom" constant="12" id="W5u-Ve-2ak"/>
+                <constraint firstItem="14N-V1-min" firstAttribute="top" secondItem="Nbq-mp-IDe" secondAttribute="bottom" constant="40" id="ZJC-o1-cVp"/>
+                <constraint firstItem="3Oj-RS-EIB" firstAttribute="leading" secondItem="ZOv-mQ-BdW" secondAttribute="leading" constant="1" id="b4L-nr-UPf"/>
+                <constraint firstItem="qhZ-7l-I3R" firstAttribute="leading" secondItem="ZOv-mQ-BdW" secondAttribute="leading" id="cPd-cL-vvi"/>
                 <constraint firstItem="3Oj-RS-EIB" firstAttribute="top" secondItem="1Hn-nJ-bFt" secondAttribute="bottom" constant="12" id="daF-ap-Cg8"/>
-                <constraint firstItem="tkg-2B-nUj" firstAttribute="leading" secondItem="ZOv-mQ-BdW" secondAttribute="leading" constant="-5" id="eFn-2P-dIa"/>
-                <constraint firstAttribute="bottom" secondItem="OWb-7K-YL1" secondAttribute="bottom" id="ed9-E4-J9G"/>
-                <constraint firstItem="UTK-kg-11g" firstAttribute="leading" secondItem="ZOv-mQ-BdW" secondAttribute="leading" id="lry-mD-SGN"/>
+                <constraint firstItem="tkg-2B-nUj" firstAttribute="leading" secondItem="ZOv-mQ-BdW" secondAttribute="leading" id="eFn-2P-dIa"/>
+                <constraint firstAttribute="trailing" secondItem="ht8-zc-QnK" secondAttribute="trailing" id="f83-XO-nH0"/>
+                <constraint firstAttribute="trailing" secondItem="Nbq-mp-IDe" secondAttribute="trailing" constant="17" id="ga3-xa-qWL"/>
+                <constraint firstAttribute="bottom" secondItem="ht8-zc-QnK" secondAttribute="bottom" id="hSy-ZU-EQv"/>
                 <constraint firstItem="UTK-kg-11g" firstAttribute="leading" secondItem="14N-V1-min" secondAttribute="leading" id="mrY-fb-vPL"/>
                 <constraint firstItem="CBG-hn-odn" firstAttribute="top" secondItem="14N-V1-min" secondAttribute="bottom" constant="12" id="n8i-tj-2Xp"/>
-                <constraint firstItem="tkg-2B-nUj" firstAttribute="top" secondItem="CBG-hn-odn" secondAttribute="bottom" constant="10" id="p7G-w9-dKp"/>
+                <constraint firstItem="tkg-2B-nUj" firstAttribute="top" secondItem="CBG-hn-odn" secondAttribute="bottom" constant="8" id="p7G-w9-dKp"/>
                 <constraint firstItem="4U5-6s-Y6q" firstAttribute="leading" secondItem="ZOv-mQ-BdW" secondAttribute="leading" id="r09-c5-p7U"/>
                 <constraint firstAttribute="trailing" secondItem="1Hn-nJ-bFt" secondAttribute="trailing" constant="17" id="r4a-mD-LWN"/>
+                <constraint firstAttribute="bottom" secondItem="tkg-2B-nUj" secondAttribute="bottom" constant="32" id="vhM-hN-cuZ"/>
                 <constraint firstItem="UTK-kg-11g" firstAttribute="top" secondItem="ZOv-mQ-BdW" secondAttribute="top" constant="32" id="x6L-Gm-STF"/>
                 <constraint firstItem="UTK-kg-11g" firstAttribute="leading" secondItem="CBG-hn-odn" secondAttribute="leading" id="yJo-Kj-WqV"/>
                 <constraint firstItem="Fd2-fn-gaX" firstAttribute="top" secondItem="4U5-6s-Y6q" secondAttribute="bottom" constant="12" id="ycV-8V-FW2"/>
             </constraints>
             <connections>
+                <outlet property="autoconsentCheckbox" destination="qhZ-7l-I3R" id="s57-ih-T7F"/>
                 <outlet property="gpcCheckbox" destination="CBG-hn-odn" id="KuZ-PT-pmv"/>
-                <outlet property="gpcDisclaimer" destination="s6V-Yz-UIH" id="gHR-90-0rW"/>
+                <outlet property="gpcDisclaimer" destination="s6V-Yz-UIH" id="cUj-of-i03"/>
                 <outlet property="loginDetectionCheckbox" destination="Fd2-fn-gaX" id="7R3-cm-RFP"/>
             </connections>
-            <point key="canvasLocation" x="-481" y="272.5"/>
+            <point key="canvasLocation" x="-476" y="468"/>
         </tableCellView>
     </objects>
     <resources>

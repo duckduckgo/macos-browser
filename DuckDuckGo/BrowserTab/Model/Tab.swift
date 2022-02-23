@@ -101,14 +101,14 @@ final class Tab: NSObject {
     }
 
     weak var delegate: TabDelegate?
+    private let cbaTimeReporter: ContentBlockingAssetsCompilationTimeReporter?
 
     init(content: TabContent,
          faviconManagement: FaviconManagement = FaviconManager.shared,
          webCacheManager: WebCacheManager = WebCacheManager.shared,
-         webViewConfiguration: WebViewConfiguration? = nil,
+         webViewConfiguration: WKWebViewConfiguration? = nil,
          historyCoordinating: HistoryCoordinating = HistoryCoordinator.shared,
-         scriptsSource: ScriptSourceProviding = DefaultScriptSourceProvider.shared,
-         contentBlockingManager: ContentBlockerRulesManager = ContentBlocking.contentBlockingManager,
+         cbaTimeReporter: ContentBlockingAssetsCompilationTimeReporter? = ContentBlockingAssetsCompilationTimeReporter.shared,
          visitedDomains: Set<String> = Set<String>(),
          title: String? = nil,
          error: Error? = nil,
@@ -121,8 +121,7 @@ final class Tab: NSObject {
         self.content = content
         self.faviconManagement = faviconManagement
         self.historyCoordinating = historyCoordinating
-        self.scriptsSource = scriptsSource
-        self.contentBlockingManager = contentBlockingManager
+        self.cbaTimeReporter = cbaTimeReporter
         self.visitedDomains = visitedDomains
         self.title = title
         self.error = error
@@ -143,7 +142,15 @@ final class Tab: NSObject {
     }
 
     deinit {
-        userScripts?.remove(from: webView.configuration.userContentController)
+        self.userContentController.removeAllUserScripts()
+
+#if DEBUG
+        assert(self.isClosing || !content.isUrl, "tabWillClose() was not called for this Tab")
+#endif
+    }
+
+    private var userContentController: UserContentController {
+        (webView.configuration.userContentController as? UserContentController)!
     }
 
     // MARK: - Event Publishers
@@ -318,25 +325,25 @@ final class Tab: NSObject {
 
     @discardableResult
     private func setFBProtection(enabled: Bool) -> Bool {
-        guard self.fbBlockingEnabled != enabled else {
-            return false
-        }
+        guard self.fbBlockingEnabled != enabled else { return false }
 
-        if let fbRules = contentBlockingManager.currentRules.first(where: {
-            $0.name == ContentBlockerRulesLists.Constants.clickToLoadRulesListName
-        }) {
-            if self.fbBlockingEnabled {
-                self.fbBlockingEnabled = false
-                webView.configuration.userContentController.remove(fbRules.rulesList)
-            } else {
-                self.fbBlockingEnabled = true
-                webView.configuration.userContentController.add(fbRules.rulesList)
+        if enabled {
+            do {
+                try userContentController.enableContentRuleList(withIdentifier: ContentBlockerRulesLists.Constants.clickToLoadRulesListName)
+            } catch {
+                assertionFailure("Missing FB List")
+                return false
             }
-            return true
         } else {
-            assertionFailure("Missing FB List")
+            userContentController.disableContentRuleList(withIdentifier: ContentBlockerRulesLists.Constants.clickToLoadRulesListName)
         }
-        return false
+        self.fbBlockingEnabled = enabled
+
+        return true
+    }
+
+    var cbrCompletionTokensPublisher: AnyPublisher<[ContentBlockerRulesManager.CompletionToken], Never> {
+        userContentController.$contentBlockingAssets.compactMap { $0?.completionTokens }.eraseToAnyPublisher()
     }
 
     private func reloadIfNeeded(shouldLoadInBackground: Bool = false) {
@@ -387,9 +394,8 @@ final class Tab: NSObject {
         webView.navigationDelegate = self
         webView.allowsBackForwardNavigationGestures = true
         webView.allowsMagnification = true
+        userContentController.delegate = self
 
-        userScripts = UserScripts(with: scriptsSource)
-        subscribeToUserScriptChanges()
         subscribeToOpenExternalUrlEvents()
 
         superviewObserver = webView.observe(\.superview, options: .old) { [weak self] _, change in
@@ -401,6 +407,20 @@ final class Tab: NSObject {
 
         // background tab loading should start immediately
         reloadIfNeeded(shouldLoadInBackground: shouldLoadInBackground)
+    }
+
+#if DEBUG
+    private var isClosing = false
+#endif
+
+    func tabWillClose() {
+        webView.stopLoading()
+        webView.stopMediaCapture()
+        cbaTimeReporter?.tabWillClose(self)
+
+#if DEBUG
+        self.isClosing = true
+#endif
     }
 
     // MARK: - Open External URL
@@ -440,11 +460,6 @@ final class Tab: NSObject {
 
     // MARK: - User Scripts
 
-    let scriptsSource: ScriptSourceProviding
-    private var userScriptsUpdatedCancellable: AnyCancellable?
-    
-    let contentBlockingManager: ContentBlockerRulesManager
-
     lazy var emailManager: EmailManager = {
         let emailManager = EmailManager()
         emailManager.requestDelegate = self
@@ -457,41 +472,9 @@ final class Tab: NSObject {
         return manager
     }()
 
-    private var userScripts: UserScripts! {
-        willSet {
-            if let userScripts = userScripts {
-                userScripts.remove(from: webView.configuration.userContentController)
-            }
-        }
-        didSet {
-            userScripts.debugScript.instrumentation = instrumentation
-            userScripts.faviconScript.delegate = self
-            userScripts.contextMenuScript.delegate = self
-            userScripts.surrogatesScript.delegate = self
-            userScripts.contentBlockerRulesScript.delegate = self
-            userScripts.clickToLoadScript.delegate = self
-            userScripts.autofillScript.emailDelegate = emailManager
-            userScripts.autofillScript.vaultDelegate = vaultManager
-            userScripts.pageObserverScript.delegate = self
-            userScripts.printingUserScript.delegate = self
-            userScripts.hoverUserScript.delegate = self
-
-            attachFindInPage()
-
-            userScripts.install(into: webView.configuration.userContentController)
-        }
-    }
-
-    private func subscribeToUserScriptChanges() {
-        userScriptsUpdatedCancellable = scriptsSource.sourceUpdatedPublisher.receive(on: RunLoop.main).sink { [weak self] _ in
-            guard let self = self, self.delegate != nil else { return }
-
-            self.userScripts = UserScripts(with: self.scriptsSource)
-        }
-    }
-
     // MARK: - Find in Page
 
+    var findInPageScript: FindInPageUserScript?
     var findInPageCancellable: AnyCancellable?
     private func subscribeToFindInPageTextChange() {
         findInPageCancellable?.cancel()
@@ -503,7 +486,7 @@ final class Tab: NSObject {
     }
 
     private func attachFindInPage() {
-        userScripts.findInPageScript.model = findInPage
+        findInPageScript?.model = findInPage
         subscribeToFindInPageTextChange()
     }
 
@@ -537,6 +520,7 @@ final class Tab: NSObject {
     @Published var trackerInfo: TrackerInfo?
     @Published var serverTrust: ServerTrust?
     @Published var connectionUpgradedTo: URL?
+    @Published var cookieConsentManaged: CookieConsentInfo?
 
     public func resetDashboardInfo(_ url: URL?) {
         trackerInfo = TrackerInfo()
@@ -566,6 +550,27 @@ final class Tab: NSObject {
     // To avoid webpages invoking the printHandler and overwhelming the browser, this property keeps track of the active
     // print operation and ignores incoming printHandler messages if one exists.
     fileprivate var activePrintOperation: NSPrintOperation?
+
+}
+
+extension Tab: UserContentControllerDelegate {
+
+    func userContentController(_ userContentController: UserContentController, didInstallUserScripts userScripts: UserScripts) {
+        userScripts.debugScript.instrumentation = instrumentation
+        userScripts.faviconScript.delegate = self
+        userScripts.contextMenuScript.delegate = self
+        userScripts.surrogatesScript.delegate = self
+        userScripts.contentBlockerRulesScript.delegate = self
+        userScripts.clickToLoadScript.delegate = self
+        userScripts.autofillScript.emailDelegate = emailManager
+        userScripts.autofillScript.vaultDelegate = vaultManager
+        userScripts.pageObserverScript.delegate = self
+        userScripts.printingUserScript.delegate = self
+        userScripts.hoverUserScript.delegate = self
+        userScripts.autoconsentUserScript?.delegate = self
+
+        attachFindInPage()
+    }
 
 }
 
@@ -654,7 +659,7 @@ extension Tab: ClickToLoadUserScriptDelegate {
             replyHandler(true)
             return
         }
-        
+
         if setFBProtection(enabled: false) {
             replyHandler(true)
         } else {
@@ -741,9 +746,9 @@ extension Tab: WKNavigationDelegate {
 
     // swiftlint:disable cyclomatic_complexity
     // swiftlint:disable function_body_length
+    @MainActor
     func webView(_ webView: WKWebView,
-                 decidePolicyFor navigationAction: WKNavigationAction,
-                 decisionHandler: @escaping (WKNavigationActionPolicy) -> Void) {
+                 decidePolicyFor navigationAction: WKNavigationAction) async -> WKNavigationActionPolicy {
 
         webView.customUserAgent = UserAgent.for(navigationAction.request.url)
 
@@ -754,15 +759,16 @@ extension Tab: WKNavigationDelegate {
                 // Auto-cancel simulated Back action when upgrading to HTTPS or GPC from Client Redirect
                 self.webView.frozenCanGoForward = nil
                 self.webView.frozenCanGoBack = nil
-                decisionHandler(.cancel)
-                return
+
+                return .cancel
 
             } else if navigationAction.navigationType != .backForward,
                let request = GPCRequestFactory.shared.requestForGPC(basedOn: navigationAction.request) {
                 self.invalidateBackItemIfNeeded(for: navigationAction)
-                decisionHandler(.cancel)
-                webView.load(request)
-                return
+                defer {
+                    webView.load(request)
+                }
+                return .cancel
             }
         }
 
@@ -778,35 +784,23 @@ extension Tab: WKNavigationDelegate {
         let isLinkActivated = navigationAction.navigationType == .linkActivated
         let isMiddleClicked = navigationAction.buttonNumber == Constants.webkitMiddleClick
         if isLinkActivated && NSApp.isCommandPressed || isMiddleClicked {
-            decisionHandler(.cancel)
-            delegate?.tab(self, requestedNewTabWith: navigationAction.request.url.map { .url($0) } ?? .none, selected: NSApp.isShiftPressed)
-            return
+            defer {
+                delegate?.tab(self, requestedNewTabWith: navigationAction.request.url.map { .url($0) } ?? .none, selected: NSApp.isShiftPressed)
+            }
+            return .cancel
         } else if isLinkActivated && NSApp.isOptionPressed && !NSApp.isCommandPressed {
-            decisionHandler(.download(navigationAction, using: webView))
-            return
+            return .download(navigationAction, using: webView)
         }
 
         guard let url = navigationAction.request.url, let urlScheme = url.scheme else {
             self.willPerformNavigationAction(navigationAction)
-            decisionHandler(.allow)
-            return
-        }
-        
-        let privacyConfigurationManager = ContentBlocking.privacyConfigurationManager
-        let privacyConfiguration = privacyConfigurationManager.privacyConfig
-
-        let featureEnabled = privacyConfiguration.isFeature(.clickToPlay, enabledForDomain: url.host)
-        if featureEnabled {
-            setFBProtection(enabled: true)
-        } else {
-            setFBProtection(enabled: false)
+            return .allow
         }
 
         if navigationAction.shouldDownload {
             // register the navigationAction for legacy _WKDownload to be called back on the Tab
             // further download will be passed to webView:navigationAction:didBecomeDownload:
-            decisionHandler(.download(navigationAction, using: webView))
-            return
+            return .download(navigationAction, using: webView)
 
         } else if externalUrlHandler.isExternal(scheme: urlScheme) {
             // ignore <iframe src="custom://url"> but allow via address bar
@@ -817,29 +811,48 @@ extension Tab: WKNavigationDelegate {
                                       fromFrame: fromFrame,
                                       triggeredByUser: navigationAction.navigationType == .linkActivated)
 
-            decisionHandler(.cancel)
-            return
+            return .cancel
         }
 
-        HTTPSUpgrade.shared.isUpgradeable(url: url) { [weak self] isUpgradable in
-            guard let self = self else {
-                decisionHandler(.cancel)
-                return
-            }
+        let isUpgradable = HTTPSUpgrade.shared.isUpgradeable(url: url)
 
-            if isUpgradable && navigationAction.isTargetingMainFrame,
-                let upgradedUrl = url.toHttps() {
+        if isUpgradable && navigationAction.isTargetingMainFrame,
+            let upgradedUrl = url.toHttps() {
 
-                self.invalidateBackItemIfNeeded(for: navigationAction)
-                self.webView.load(upgradedUrl)
-                self.setConnectionUpgradedTo(upgradedUrl, navigationAction: navigationAction)
-                decisionHandler(.cancel)
-                return
-            }
+            self.invalidateBackItemIfNeeded(for: navigationAction)
+            self.webView.load(upgradedUrl)
+            self.setConnectionUpgradedTo(upgradedUrl, navigationAction: navigationAction)
 
-            self.willPerformNavigationAction(navigationAction)
-            decisionHandler(.allow)
+            return .cancel
         }
+
+        if navigationAction.isTargetingMainFrame,
+           !url.isDuckDuckGo {
+
+            // Ensure Content Blocking Assets (WKContentRuleList&UserScripts) are installed
+            if !userContentController.contentBlockingAssetsInstalled {
+                cbaTimeReporter?.tabWillWaitForRulesCompilation(self)
+                await userContentController.awaitContentBlockingAssetsInstalled()
+                cbaTimeReporter?.reportWaitTimeForTabFinishedWaitingForRules(self)
+            } else {
+                cbaTimeReporter?.reportNavigationDidNotWaitForRules()
+            }
+        }
+
+        // Enable/disable FBProtection only after UserScripts are installed (awaitContentBlockingAssetsInstalled)
+        let privacyConfigurationManager = ContentBlocking.shared.privacyConfigurationManager
+        let privacyConfiguration = privacyConfigurationManager.privacyConfig
+
+        let featureEnabled = privacyConfiguration.isFeature(.clickToPlay, enabledForDomain: url.host)
+        if featureEnabled {
+            setFBProtection(enabled: true)
+        } else {
+            setFBProtection(enabled: false)
+        }
+
+        self.willPerformNavigationAction(navigationAction)
+
+        return .allow
     }
     // swiftlint:enable cyclomatic_complexity
     // swiftlint:enable function_body_length
@@ -988,20 +1001,21 @@ extension Tab: WKWebViewDownloadDelegate {
 }
 
 extension Tab {
+
     private func find(text: String) {
-        userScripts.findInPageScript.find(text: text, inWebView: webView)
+        findInPageScript?.find(text: text, inWebView: webView)
     }
 
     func findDone() {
-        userScripts.findInPageScript.done(withWebView: webView)
+        findInPageScript?.done(withWebView: webView)
     }
 
     func findNext() {
-        userScripts.findInPageScript.next(withWebView: webView)
+        findInPageScript?.next(withWebView: webView)
     }
 
     func findPrevious() {
-        userScripts.findInPageScript.previous(withWebView: webView)
+        findInPageScript?.previous(withWebView: webView)
     }
 }
 
@@ -1020,5 +1034,11 @@ extension Tab: HoverUserScriptDelegate {
 
 }
 
+@available(macOS 11, *)
+extension Tab: AutoconsentUserScriptDelegate {
+    func autoconsentUserScript(consentStatus: CookieConsentInfo) {
+        self.cookieConsentManaged = consentStatus
+    }
+}
 // swiftlint:enable type_body_length
 // swiftlint:enable file_length

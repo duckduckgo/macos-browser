@@ -29,21 +29,30 @@ final class UserScripts {
     let printingUserScript = PrintingUserScript()
     let hoverUserScript = HoverUserScript()
     let debugScript = DebugUserScript()
-    let autofillScript = AutofillUserScript()
-    let clickToLoadScript = ClickToLoadUserScript()
+    let clickToLoadScript: ClickToLoadUserScript
 
     let contentBlockerRulesScript: ContentBlockerRulesUserScript
     let surrogatesScript: SurrogatesUserScript
     let contentScopeUserScript: ContentScopeUserScript
+    let autofillScript: AutofillUserScript
+    let autoconsentUserScript: UserScriptWithAutoconsent?
 
     init(with sourceProvider: ScriptSourceProviding) {
-
+        clickToLoadScript = ClickToLoadUserScript(scriptSourceProvider: sourceProvider)
         contentBlockerRulesScript = ContentBlockerRulesUserScript(configuration: sourceProvider.contentBlockerRulesConfig!)
         surrogatesScript = SurrogatesUserScript(configuration: sourceProvider.surrogatesConfig!)
-        let privacySettings = PrivacySecurityPreferences()
+        let privacySettings = PrivacySecurityPreferences.shared
         let sessionKey = sourceProvider.sessionKey ?? ""
         let prefs = ContentScopeProperties.init(gpcEnabled: privacySettings.gpcEnabled, sessionKey: sessionKey)
         contentScopeUserScript = ContentScopeUserScript(sourceProvider.privacyConfigurationManager, properties: prefs)
+        autofillScript = AutofillUserScript(scriptSourceProvider: sourceProvider.autofillSourceProvider!)
+        if #available(macOS 11, *) {
+            autoconsentUserScript = AutoconsentUserScript(scriptSource: sourceProvider,
+                                                          config: sourceProvider.privacyConfigurationManager.privacyConfig)
+            userScripts.append(autoconsentUserScript!)
+        } else {
+            autoconsentUserScript = nil
+        }
     }
 
     lazy var userScripts: [UserScript] = [
@@ -62,19 +71,5 @@ final class UserScripts {
     ]
 
     lazy var scripts = userScripts.map { $0.makeWKUserScript() }
-
-}
-
-extension UserScripts {
-
-    func install(into controller: WKUserContentController) {
-        scripts.forEach(controller.addUserScript)
-        userScripts.forEach(controller.addHandler)
-    }
-
-    func remove(from controller: WKUserContentController) {
-        controller.removeAllUserScripts()
-        userScripts.forEach(controller.removeHandler)
-    }
 
 }
