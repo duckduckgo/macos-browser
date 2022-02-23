@@ -5,9 +5,9 @@
         "package": "BrowserServicesKit",
         "repositoryURL": "https://github.com/duckduckgo/BrowserServicesKit",
         "state": {
-          "branch": null,
-          "revision": "b00ea4f240613766e303ccdcf7c5fed15f60ddd1",
-          "version": "10.0.0"
+          "branch": "jacek/smarter-encryption",
+          "revision": "2419eeebd0e17496d35c8db46a8041d9db4f3748",
+          "version": null
         }
       },
       {

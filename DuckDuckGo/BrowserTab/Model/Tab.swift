@@ -806,48 +806,52 @@ extension Tab: WKNavigationDelegate {
             return .cancel
         }
 
-        let isUpgradable = HTTPSUpgrade.shared.isUpgradeable(url: url)
-
-        if isUpgradable && navigationAction.isTargetingMainFrame,
-            let upgradedUrl = url.toHttps() {
-
-            self.invalidateBackItemIfNeeded(for: navigationAction)
-            self.webView.load(upgradedUrl)
-            self.setConnectionUpgradedTo(upgradedUrl, navigationAction: navigationAction)
-
-            return .cancel
-        }
-
-        if navigationAction.isTargetingMainFrame,
-           !url.isDuckDuckGo {
-
-            // Ensure Content Blocking Assets (WKContentRuleList&UserScripts) are installed
-            if !userContentController.contentBlockingAssetsInstalled {
-                cbaTimeReporter?.tabWillWaitForRulesCompilation(self)
-                await userContentController.awaitContentBlockingAssetsInstalled()
-                cbaTimeReporter?.reportWaitTimeForTabFinishedWaitingForRules(self)
-            } else {
-                cbaTimeReporter?.reportNavigationDidNotWaitForRules()
+        if navigationAction.isTargetingMainFrame {
+            let result = await PrivacyFeatures.httpsUpgrade.upgrade(url: url)
+            switch result {
+            case let .success(upgradedUrl):
+                urlDidUpgrade(upgradedUrl, navigationAction: navigationAction)
+                return .cancel
+            case .failure:
+                if !url.isDuckDuckGo {
+                    await reportTime()
+                }
             }
         }
-
-        // Enable/disable FBProtection only after UserScripts are installed (awaitContentBlockingAssetsInstalled)
-        let privacyConfigurationManager = ContentBlocking.shared.privacyConfigurationManager
-        let privacyConfiguration = privacyConfigurationManager.privacyConfig
-
-        let featureEnabled = privacyConfiguration.isFeature(.clickToPlay, enabledForDomain: url.host)
-        if featureEnabled {
-            setFBProtection(enabled: true)
-        } else {
-            setFBProtection(enabled: false)
-        }
-
-        self.willPerformNavigationAction(navigationAction)
+        
+        toggleFBProtection(for: url)
+        willPerformNavigationAction(navigationAction)
 
         return .allow
     }
     // swiftlint:enable cyclomatic_complexity
     // swiftlint:enable function_body_length
+    
+    private func urlDidUpgrade(_ upgradedURL: URL,
+                               navigationAction: WKNavigationAction) {
+        invalidateBackItemIfNeeded(for: navigationAction)
+        webView.load(upgradedURL)
+        setConnectionUpgradedTo(upgradedURL, navigationAction: navigationAction)
+    }
+    
+    private func reportTime() async {
+        // Ensure Content Blocking Assets (WKContentRuleList&UserScripts) are installed
+        if !userContentController.contentBlockingAssetsInstalled {
+            cbaTimeReporter?.tabWillWaitForRulesCompilation(self)
+            await userContentController.awaitContentBlockingAssetsInstalled()
+            cbaTimeReporter?.reportWaitTimeForTabFinishedWaitingForRules(self)
+        } else {
+            cbaTimeReporter?.reportNavigationDidNotWaitForRules()
+        }
+    }
+    
+    private func toggleFBProtection(for url: URL) {
+        // Enable/disable FBProtection only after UserScripts are installed (awaitContentBlockingAssetsInstalled)
+        let privacyConfiguration = ContentBlocking.shared.privacyConfigurationManager.privacyConfig
+
+        let featureEnabled = privacyConfiguration.isFeature(.clickToPlay, enabledForDomain: url.host)
+        setFBProtection(enabled: featureEnabled)
+    }
 
     private func willPerformNavigationAction(_ navigationAction: WKNavigationAction) {
         if navigationAction.isTargetingMainFrame {
