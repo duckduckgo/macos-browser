@@ -44,9 +44,15 @@ struct Waitlist {
         let lockScreenViewController = MacWaitlistLockScreenViewController.instantiate()
         let lockScreenWindow = lockScreenViewController.wrappedInWindowController()
         
-        viewController.beginSheet(lockScreenWindow)
+        let currentSheets = viewController.view.window?.sheets ?? []
+        let alreadyHasLockScreen = currentSheets.contains(where: { window in
+            return window.contentViewController is MacWaitlistLockScreenViewController
+        })
         
-        Pixel.fire(.waitlistPresentedLockScreen)
+        if !alreadyHasLockScreen {
+            viewController.beginSheet(lockScreenWindow)
+            Pixel.fire(.waitlistPresentedLockScreen)
+        }
         
         return true
     }
