@@ -359,7 +359,7 @@ final class BrowserTabViewController: NSViewController {
     }
 }
 
-extension BrowserTabViewController: AutofillOverlayDelegate {
+extension BrowserTabViewController: ChildOverlayAutofillUserScriptDelegate {
     public func autofillCloseOverlay(_ autofillUserScript: AutofillMessagingToChildDelegate?) {
         contentOverlayPopover.autofillCloseOverlay(autofillUserScript)
     }

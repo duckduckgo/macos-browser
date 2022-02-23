@@ -23,7 +23,7 @@ import Combine
 import BrowserServicesKit
 import TrackerRadarKit
 
-protocol TabDelegate: FileDownloadManagerDelegate, AutofillOverlayDelegate {
+protocol TabDelegate: FileDownloadManagerDelegate, ChildOverlayAutofillUserScriptDelegate {
     func tabWillStartNavigation(_ tab: Tab, isUserInitiated: Bool)
     func tabDidStartNavigation(_ tab: Tab)
     func tab(_ tab: Tab, requestedNewTabWith content: Tab.TabContent, selected: Bool)

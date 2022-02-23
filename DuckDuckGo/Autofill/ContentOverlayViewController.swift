@@ -173,7 +173,7 @@ public final class ContentOverlayViewController: NSViewController, EmailManagerR
     
 }
 
-extension ContentOverlayViewController: AutofillUserScriptDelegate {
+extension ContentOverlayViewController: TopOverlayAutofillUserScriptDelegate {
     private enum Constants {
         static let minWidth: CGFloat = 315
         static let minHeight: CGFloat = 56
