@@ -63,7 +63,7 @@ struct BookmarkList {
             return
         }
 
-        allBookmarkURLsOrdered.append(bookmark.url) // .insert(bookmark.url, at: 0)
+        allBookmarkURLsOrdered.insert(bookmark.url, at: 0)
         itemsDict[bookmark.url] = bookmark
     }
 

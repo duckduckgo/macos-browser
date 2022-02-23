@@ -347,6 +347,8 @@ final class LocalBookmarkStore: BookmarkStore {
 
     // MARK: - Import
 
+    // swiftlint:disable function_body_length
+    
     /// Imports bookmarks into the Core Data store from an `ImportedBookmarks` object.
     /// The source is used to determine where to put bookmarks, as we want to match the source browser's structure as closely as possible.
     ///
@@ -442,6 +444,8 @@ final class LocalBookmarkStore: BookmarkStore {
 
         return total
     }
+    
+    // swiftlint:enable function_body_length
 
     private func createFolder(titled title: String, in context: NSManagedObjectContext) -> BookmarkManagedObject {
         let folder = BookmarkManagedObject(context: self.context)
