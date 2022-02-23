@@ -28,7 +28,7 @@ public final class ContentOverlayViewController: NSViewController, EmailManagerR
     private var cancellables = Set<AnyCancellable>()
     @Published var pendingUpdates = Set<String>()
     
-    public var autofillInterfaceToChild: AutofillMessagingToChild?
+    public var autofillInterfaceToChild: AutofillMessagingToChildDelegate?
     
     lazy var emailManager: EmailManager = {
         let emailManager = EmailManager()
@@ -179,7 +179,7 @@ extension ContentOverlayViewController: AutofillUserScriptDelegate {
         static let minHeight: CGFloat = 56
     }
 
-    public func setSize(height: CGFloat, width: CGFloat) {
+    public func requestResizeToSize(width: CGFloat, height: CGFloat) {
         var widthOut = width
         if widthOut < Constants.minWidth {
             widthOut = Constants.minWidth

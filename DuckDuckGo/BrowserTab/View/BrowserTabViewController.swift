@@ -23,6 +23,10 @@ import Combine
 import SwiftUI
 import BrowserServicesKit
 
+protocol ChildAutofillUserScriptDelegate: AnyObject {
+    func browserTabViewController(_ browserTabViewController: BrowserTabViewController, didClickAtPoint: CGPoint)
+}
+
 // swiftlint:disable file_length
 final class BrowserTabViewController: NSViewController {
 
@@ -57,7 +61,7 @@ final class BrowserTabViewController: NSViewController {
     override func mouseDown(with event: NSEvent) {
         guard event.window === self.view.window else { return }
         self.clickPoint = event.locationInWindow
-        tabViewModel?.tab.clickTriggered(clickPoint: event.locationInWindow)
+        tabViewModel?.tab.browserTabViewController(self, didClickAtPoint: event.locationInWindow)
     }
     
     required init?(coder: NSCoder) {
@@ -348,27 +352,24 @@ final class BrowserTabViewController: NSViewController {
             _contentOverlayPopover = ContentOverlayPopover()
             WindowControllersManager.shared.stateChanged
                 .sink { _ in
-                    self._contentOverlayPopover?.closeOverlay()
+                    self._contentOverlayPopover?.autofillCloseOverlay(nil)
                 }.store(in: &cancellables)
         }
         return _contentOverlayPopover!
     }
 }
 
-extension BrowserTabViewController: OverlayProtocol {
-    public func setMessageInterfaceBack(_ response: AutofillMessagingToChild) {
-        contentOverlayPopover.viewController?.autofillInterfaceToChild = response
+extension BrowserTabViewController: AutofillOverlayDelegate {
+    public func autofillCloseOverlay(_ autofillUserScript: AutofillMessagingToChildDelegate?) {
+        contentOverlayPopover.autofillCloseOverlay(autofillUserScript)
     }
-    public func closeOverlay() {
-        contentOverlayPopover.closeOverlay()
-    }
-    public func displayOverlay(of: NSView,
-                               messageInterface: AutofillMessagingToChild,
-                               serializedInputContext: String,
-                               click: NSPoint,
-                               inputPosition: CGRect) {
-        contentOverlayPopover.displayOverlay(of: of,
-                                             messageInterface: messageInterface,
+    public func autofillDisplayOverlay(_ autofillUserScript: AutofillMessagingToChildDelegate,
+                                       of: NSView,
+                                       serializedInputContext: String,
+                                       click: NSPoint,
+                                       inputPosition: CGRect) {
+        contentOverlayPopover.autofillDisplayOverlay(autofillUserScript,
+                                             of: of,
                                              serializedInputContext: serializedInputContext,
                                              click: click,
                                              inputPosition: inputPosition)
@@ -1002,7 +1003,7 @@ extension BrowserTabViewController {
     func mouseDown(with event: NSEvent) -> NSEvent? {
         self.clickPoint = event.locationInWindow
         guard event.window === self.view.window, let clickPoint = self.clickPoint else { return event }
-        tabViewModel?.tab.clickTriggered(clickPoint: clickPoint)
+        tabViewModel?.tab.browserTabViewController(self, didClickAtPoint: clickPoint)
         return event
     }
 

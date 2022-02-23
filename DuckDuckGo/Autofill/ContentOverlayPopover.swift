@@ -57,32 +57,28 @@ public final class ContentOverlayPopover {
     }
 }
 
-// OverlayProtocol
-extension ContentOverlayPopover: OverlayProtocol {
+// AutofillOverlayDelegate
+extension ContentOverlayPopover: AutofillOverlayDelegate {
     public var view: NSView {
         return viewController!.view
     }
-
-    public func setMessageInterfaceBack(_ response: AutofillMessagingToChild) {
-        viewController?.autofillInterfaceToChild = response
-    }
     
-    public func closeOverlay() {
+    public func autofillCloseOverlay(_ autofillUserScript: AutofillMessagingToChildDelegate?) {
         guard let windowController = windowController?.window else {
             return
         }
         if !windowController.isVisible { return }
         // Reset window size on close to reduce flicker
-        viewController?.setSize(height: 0, width: 0)
+        viewController?.requestResizeToSize(width: 0, height: 0)
         windowController.parent?.removeChildWindow(windowController)
         windowController.orderOut(nil)
     }
 
-    public func displayOverlay(of: NSView,
-                               messageInterface: AutofillMessagingToChild,
-                               serializedInputContext: String,
-                               click: NSPoint,
-                               inputPosition: CGRect) {
+    public func autofillDisplayOverlay(_ autofillUserScript: AutofillMessagingToChildDelegate,
+                                       of: NSView,
+                                       serializedInputContext: String,
+                                       click: NSPoint,
+                                       inputPosition: CGRect) {
         // Combines native click with offset of JS click.
         let y = (click.y - (inputPosition.height - inputPosition.minY))
         let x = (click.x - inputPosition.minX)
@@ -94,8 +90,8 @@ extension ContentOverlayPopover: OverlayProtocol {
         let rect = NSRect(x: x, y: y, width: rectWidth, height: inputPosition.height)
 
         // On open initialize to default size to reduce flicker
-        viewController?.setSize(height: 0, width: 0)
-        viewController?.autofillInterfaceToChild = messageInterface
+        viewController?.requestResizeToSize(width: 0, height: 0)
+        viewController?.autofillInterfaceToChild = autofillUserScript
         viewController?.setType(serializedInputContext: serializedInputContext, zoomFactor: zoomFactor)
         if let window = windowController?.window {
             of.window!.addChildWindow(window, ordered: .above)
