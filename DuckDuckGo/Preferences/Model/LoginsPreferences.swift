@@ -31,7 +31,6 @@ struct LoginsPreferences {
     }
 
     enum AutoLockThreshold: String, CaseIterable {
-        case fifteenSeconds
         case oneMinute
         case fiveMinutes
         case fifteenMinutes
@@ -40,7 +39,6 @@ struct LoginsPreferences {
 
         var title: String {
             switch self {
-            case .fifteenSeconds: return "15 seconds"
             case .oneMinute: return "1 minute"
             case .fiveMinutes: return "5 minutes"
             case .fifteenMinutes: return "15 minutes"
@@ -51,7 +49,6 @@ struct LoginsPreferences {
         
         var seconds: TimeInterval {
             switch self {
-            case .fifteenSeconds: return 15
             case .oneMinute: return 60
             case .fiveMinutes: return 60 * 5
             case .fifteenMinutes: return 60 * 15
@@ -59,6 +56,17 @@ struct LoginsPreferences {
             case .oneHour: return 60 * 60
             }
         }
+        
+        var pixelEvent: Pixel.Event {
+            switch self {
+            case .oneMinute: return .passwordManagerLockScreenTimeoutSelected1Minute
+            case .fiveMinutes: return .passwordManagerLockScreenTimeoutSelected5Minutes
+            case .fifteenMinutes: return .passwordManagerLockScreenTimeoutSelected15Minutes
+            case .thirtyMinutes: return .passwordManagerLockScreenTimeoutSelected30Minutes
+            case .oneHour: return .passwordManagerLockScreenTimeoutSelected1Hour
+            }
+        }
+
     }
     
     // This needs to be put into secure storage, so that someone can't edit user defaults to remove auto-lock.

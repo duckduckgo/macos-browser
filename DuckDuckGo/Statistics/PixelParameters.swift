@@ -110,8 +110,15 @@ extension Pixel.Event {
              .waitlistPresentedLockScreen,
              .waitlistDismissedLockScreen,
              .autoconsentOptOutFailed,
-             .autoconsentSelfTestFailed:
-
+             .autoconsentSelfTestFailed,
+             .passwordManagerLockScreenDisabled,
+             .passwordManagerLockScreenPreferencesButtonPressed,
+             .passwordManagerLockScreenTimeoutSelected1Minute,
+             .passwordManagerLockScreenTimeoutSelected5Minutes,
+             .passwordManagerLockScreenTimeoutSelected15Minutes,
+             .passwordManagerLockScreenTimeoutSelected30Minutes,
+             .passwordManagerLockScreenTimeoutSelected1Hour:
+            
             return nil
         }
     }

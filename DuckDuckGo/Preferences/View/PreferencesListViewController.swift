@@ -247,6 +247,17 @@ extension PreferencesListViewController: LoginsPreferencesTableCellViewDelegate 
             var preferences = LoginsPreferences()
 
             if authenticated {
+                
+                // Only fire the auto-lock disabled pixel the setting is disabled and it has changed from its previous value
+                if !setShouldAutoLockLogins && setShouldAutoLockLogins != preferences.shouldAutoLockLogins {
+                    Pixel.fire(.passwordManagerLockScreenDisabled)
+                }
+                
+                // Only fire the threshold pixel if it has changed, or if the setting is being turned on again
+                if (autoLockThreshold != preferences.autoLockThreshold) || (setShouldAutoLockLogins && !preferences.shouldAutoLockLogins) {
+                    Pixel.fire(autoLockThreshold.pixelEvent)
+                }
+                
                 preferences.shouldAutoLockLogins = setShouldAutoLockLogins
                 preferences.autoLockThreshold = autoLockThreshold
             } else {
