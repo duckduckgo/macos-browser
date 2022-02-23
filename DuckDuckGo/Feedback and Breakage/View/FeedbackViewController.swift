@@ -198,7 +198,7 @@ final class FeedbackViewController: NSViewController {
     private func setContentViewHeight(_ height: CGFloat, animated: Bool) {
         if animated {
             NSAnimationContext.runAnimationGroup { [weak self] context in
-                context.duration = 1/3
+                context.duration = 1/6
                 context.timingFunction = CAMediaTimingFunction(name: .easeInEaseOut)
                 self?.contentViewHeightContraint.animator().constant = height
             }
