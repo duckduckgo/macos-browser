@@ -534,7 +534,6 @@ extension BrowserTabViewController: FileDownloadManagerDelegate {
     }
 
     func tab(_ tab: Tab, requestedSaveCredentials credentials: SecureVaultModels.WebsiteCredentials) {
-        guard PasswordManagerSettings().canPromptOnDomain(credentials.account.domain) else { return }
         tabViewModel?.credentialsToSave = credentials
     }
 
