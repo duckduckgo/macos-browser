@@ -24,6 +24,10 @@ extension Date {
         let name: String
         let index: Int
     }
+    
+    var components: DateComponents {
+        return Calendar.current.dateComponents([.day, .year, .month], from: self)
+    }
 
     static var weekAgo: Date! {
         return Calendar.current.date(byAdding: .weekOfMonth, value: -1, to: Date())!
