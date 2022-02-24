@@ -75,8 +75,8 @@ enum SecureVaultItem: Equatable, Identifiable, Comparable {
     func item(matches filter: String) -> Bool {
         switch self {
         case .account(let account):
-            return account.domain.lowercased().contains(filter) ||
-                account.username.lowercased().contains(filter) ||
+            return account.domain?.lowercased().contains(filter) ?? false ||
+                account.username?.lowercased().contains(filter) ?? false ||
                 account.title?.lowercased().contains(filter) ?? false
         case .card(let card):
             return card.title.localizedCaseInsensitiveContains(filter)
@@ -88,7 +88,7 @@ enum SecureVaultItem: Equatable, Identifiable, Comparable {
     var displayTitle: String {
         switch self {
         case .account(let account):
-            return ((account.title ?? "").isEmpty == true ? account.domain.dropWWW() : account.title) ?? ""
+            return ((account.title ?? "").isEmpty == true ? account.domain?.dropWWW() : account.title) ?? ""
         case .card(let card):
             return card.title
         case .identity(let identity):
@@ -99,7 +99,7 @@ enum SecureVaultItem: Equatable, Identifiable, Comparable {
     var displaySubtitle: String {
         switch self {
         case .account(let account):
-            return account.username
+            return account.username ?? ""
         case .card(let creditCard):
             return creditCard.displayName
         case .identity(let identity):

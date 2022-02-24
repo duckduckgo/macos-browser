@@ -155,6 +155,15 @@ final class PasswordManagementViewController: NSViewController {
         }
     }
 
+    private func syncModelsOnAccount(_ account: SecureVaultItem, select: Bool = false) {
+        self.itemModel?.setSecureVaultModel(account)
+        self.listModel?.update(item: account)
+
+        if select {
+            self.listModel?.selected(item: account)
+        }
+    }
+
     private func syncModelsOnIdentity(_ identity: SecureVaultModels.Identity, select: Bool = false) {
         self.itemModel?.setSecureVaultModel(identity)
         self.listModel?.update(item: SecureVaultItem.identity(identity))
@@ -394,9 +403,12 @@ final class PasswordManagementViewController: NSViewController {
             func loadNewItemWithID() {
                 switch newValue {
                 case .account:
-                    guard let credentials = try? self?.secureVault?.websiteCredentialsFor(accountId: id) else { return }
                     self?.createLoginItemView()
-                    self?.syncModelsOnCredentials(credentials)
+                    if let credentials = try? self?.secureVault?.websiteCredentialsFor(accountId: id) {
+                        self?.syncModelsOnCredentials(credentials)
+                    } else {
+                        self?.syncModelsOnAccount(newValue)
+                    }
                 case .card:
                     guard let card = try? self?.secureVault?.creditCardFor(id: id) else { return }
                     self?.createCreditCardItemView()

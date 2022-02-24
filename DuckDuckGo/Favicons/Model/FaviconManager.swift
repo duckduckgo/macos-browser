@@ -141,7 +141,8 @@ final class FaviconManager: FaviconManagement {
     }
 
     func getCachedFavicon(for host: String, sizeCategory: Favicon.SizeCategory) -> Favicon? {
-        guard let faviconUrl = referenceCache.getFaviconUrl(for: host, sizeCategory: sizeCategory) else {
+        guard !host.isEmpty,
+              let faviconUrl = referenceCache.getFaviconUrl(for: host, sizeCategory: sizeCategory) else {
             return nil
         }
 

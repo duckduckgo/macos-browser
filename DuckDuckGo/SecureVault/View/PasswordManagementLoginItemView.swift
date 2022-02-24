@@ -30,7 +30,7 @@ struct PasswordManagementLoginItemView: View {
 
     var body: some View {
 
-        if model.credentials != nil {
+//        if model.credentials != nil {
 
             let editMode = model.isEditing || model.isNew
 
@@ -78,7 +78,7 @@ struct PasswordManagementLoginItemView: View {
             }
             .padding(EdgeInsets(top: 10, leading: 0, bottom: 10, trailing: 10))
 
-        }
+//        }
 
     }
 

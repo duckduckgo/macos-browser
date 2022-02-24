@@ -28,7 +28,9 @@ final class PasswordManagerSettings {
         doNotPromptDomains = [String](Set<String>(doNotPromptDomains))
     }
 
-    func canPromptOnDomain(_ domain: String) -> Bool {
+    func canPromptOnDomain(_ domain: String?) -> Bool {
+        guard let domain = domain else { return false }
+
         let doNotPrompt = doNotPromptDomains.contains(domain) || doNotPromptDomains.contains(domain.dropWWW())
         return !doNotPrompt
     }

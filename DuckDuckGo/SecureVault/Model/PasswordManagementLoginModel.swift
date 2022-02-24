@@ -36,11 +36,15 @@ final class PasswordManagementLoginModel: ObservableObject, PasswordManagementIt
     var onCancelled: () -> Void
 
     func setSecureVaultModel<Model>(_ modelObject: Model) {
-        guard let modelObject = modelObject as? SecureVaultModels.WebsiteCredentials else {
+        if let modelObject = modelObject as? SecureVaultModels.WebsiteCredentials {
+            credentials = modelObject
             return
         }
 
-        credentials = modelObject
+        if let modelObject = modelObject as? SecureVaultItem {
+            account = modelObject.websiteAccount
+            return
+        }
     }
 
     func clearSecureVaultModel() {
@@ -54,6 +58,12 @@ final class PasswordManagementLoginModel: ObservableObject, PasswordManagementIt
     var credentials: SecureVaultModels.WebsiteCredentials? {
         didSet {
             populateViewModelFromCredentials()
+        }
+    }
+
+    var account: SecureVaultModels.WebsiteAccount? {
+        didSet {
+            populateViewModelFromAccount()
         }
     }
 
@@ -186,6 +196,30 @@ final class PasswordManagementLoginModel: ObservableObject, PasswordManagementIt
         }
 
         if let date = credentials?.account.lastUpdated {
+            lastUpdatedDate = Self.dateFormatter.string(from: date)
+        } else {
+            lastUpdatedDate = ""
+        }
+    }
+
+    private func populateViewModelFromAccount() {
+        let titleString = account?.title ?? ""
+        title =  titleString.isEmpty ? normalizedDomain(account?.domain ?? "") : titleString
+
+        username = account?.username ?? ""
+        password = ""
+        domain = normalizedDomain(account?.domain ?? "")
+        note = account?.note ?? ""
+        isDirty = false
+        isNew = account?.id == nil
+
+        if let date = account?.created {
+            createdDate = Self.dateFormatter.string(from: date)
+        } else {
+            createdDate = ""
+        }
+
+        if let date = account?.lastUpdated {
             lastUpdatedDate = Self.dateFormatter.string(from: date)
         } else {
             lastUpdatedDate = ""
