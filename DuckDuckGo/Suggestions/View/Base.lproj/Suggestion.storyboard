@@ -140,8 +140,16 @@
                                                                                     <rect key="frame" x="10" y="22" width="584" height="80"/>
                                                                                     <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                                                                     <subviews>
+                                                                                        <imageView horizontalHuggingPriority="251" verticalHuggingPriority="251" translatesAutoresizingMaskIntoConstraints="NO" id="vli-IP-Nr8">
+                                                                                            <rect key="frame" x="9" y="32" width="16" height="16"/>
+                                                                                            <constraints>
+                                                                                                <constraint firstAttribute="width" constant="16" id="Q25-Gx-Xzg"/>
+                                                                                                <constraint firstAttribute="height" constant="16" id="go3-c4-c3W"/>
+                                                                                            </constraints>
+                                                                                            <imageCell key="cell" refusesFirstResponder="YES" alignment="left" imageScaling="proportionallyDown" id="zsh-dc-Umh"/>
+                                                                                        </imageView>
                                                                                         <textField horizontalHuggingPriority="252" verticalHuggingPriority="750" horizontalCompressionResistancePriority="252" translatesAutoresizingMaskIntoConstraints="NO" id="bOr-Go-gyW">
-                                                                                            <rect key="frame" x="32" y="33" width="119" height="16"/>
+                                                                                            <rect key="frame" x="30" y="33" width="119" height="16"/>
                                                                                             <textFieldCell key="cell" lineBreakMode="truncatingTail" sendsActionOnEndEditing="YES" title="Search Suggestion" id="7bg-HA-vCm">
                                                                                                 <font key="font" usesAppearanceFont="YES"/>
                                                                                                 <color key="textColor" name="textColor" catalog="System" colorSpace="catalog"/>
@@ -149,31 +157,23 @@
                                                                                             </textFieldCell>
                                                                                         </textField>
                                                                                         <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" horizontalCompressionResistancePriority="252" translatesAutoresizingMaskIntoConstraints="NO" id="efo-Vy-aEh">
-                                                                                            <rect key="frame" x="147" y="33" width="431" height="15"/>
+                                                                                            <rect key="frame" x="145" y="33" width="433" height="15"/>
                                                                                             <textFieldCell key="cell" lineBreakMode="truncatingTail" sendsActionOnEndEditing="YES" title=" – Search with DuckDuckGo" id="UZv-CE-fbV">
                                                                                                 <font key="font" metaFont="cellTitle"/>
                                                                                                 <color key="textColor" name="controlAccentColor" catalog="System" colorSpace="catalog"/>
                                                                                                 <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
                                                                                             </textFieldCell>
                                                                                         </textField>
-                                                                                        <imageView horizontalHuggingPriority="251" verticalHuggingPriority="251" translatesAutoresizingMaskIntoConstraints="NO" id="vli-IP-Nr8">
-                                                                                            <rect key="frame" x="10" y="32" width="16" height="16"/>
-                                                                                            <constraints>
-                                                                                                <constraint firstAttribute="width" constant="16" id="Q25-Gx-Xzg"/>
-                                                                                                <constraint firstAttribute="height" constant="16" id="go3-c4-c3W"/>
-                                                                                            </constraints>
-                                                                                            <imageCell key="cell" refusesFirstResponder="YES" alignment="left" imageScaling="proportionallyDown" id="zsh-dc-Umh"/>
-                                                                                        </imageView>
                                                                                     </subviews>
                                                                                     <constraints>
                                                                                         <constraint firstItem="efo-Vy-aEh" firstAttribute="leading" secondItem="bOr-Go-gyW" secondAttribute="trailing" id="0fY-Lm-dCs"/>
                                                                                         <constraint firstItem="vli-IP-Nr8" firstAttribute="centerY" secondItem="kX2-C1-38Y" secondAttribute="centerY" id="ICn-31-LAg"/>
-                                                                                        <constraint firstItem="bOr-Go-gyW" firstAttribute="leading" secondItem="vli-IP-Nr8" secondAttribute="trailing" constant="8" id="JNb-pL-G7y"/>
+                                                                                        <constraint firstItem="bOr-Go-gyW" firstAttribute="leading" secondItem="vli-IP-Nr8" secondAttribute="trailing" constant="7" id="JNb-pL-G7y"/>
                                                                                         <constraint firstAttribute="trailing" secondItem="efo-Vy-aEh" secondAttribute="trailing" constant="8" id="XRI-uW-7gs"/>
                                                                                         <constraint firstItem="efo-Vy-aEh" firstAttribute="firstBaseline" secondItem="bOr-Go-gyW" secondAttribute="firstBaseline" id="lQr-ay-EDp"/>
                                                                                         <constraint firstItem="bOr-Go-gyW" firstAttribute="centerY" secondItem="kX2-C1-38Y" secondAttribute="centerY" constant="-1" id="oAf-1Z-91H"/>
                                                                                         <constraint firstItem="efo-Vy-aEh" firstAttribute="width" secondItem="bOr-Go-gyW" secondAttribute="width" multiplier="0.55" priority="250" id="xOl-gW-elN"/>
-                                                                                        <constraint firstItem="vli-IP-Nr8" firstAttribute="leading" secondItem="kX2-C1-38Y" secondAttribute="leading" constant="10" id="zgq-le-RHJ"/>
+                                                                                        <constraint firstItem="vli-IP-Nr8" firstAttribute="leading" secondItem="kX2-C1-38Y" secondAttribute="leading" constant="9" id="zgq-le-RHJ"/>
                                                                                     </constraints>
                                                                                     <connections>
                                                                                         <outlet property="iconImageView" destination="vli-IP-Nr8" id="5lX-7Q-4Cw"/>
@@ -201,8 +201,8 @@
                                                 </subviews>
                                                 <constraints>
                                                     <constraint firstItem="cx3-LG-ZUH" firstAttribute="top" secondItem="j2X-bv-VAU" secondAttribute="top" constant="21" id="4Fa-J7-BMm"/>
-                                                    <constraint firstItem="cx3-LG-ZUH" firstAttribute="leading" secondItem="j2X-bv-VAU" secondAttribute="leading" constant="3" id="XIc-AY-AdT"/>
-                                                    <constraint firstAttribute="trailing" secondItem="cx3-LG-ZUH" secondAttribute="trailing" constant="3" id="XKo-K6-XDq"/>
+                                                    <constraint firstItem="cx3-LG-ZUH" firstAttribute="leading" secondItem="j2X-bv-VAU" secondAttribute="leading" constant="4" id="XIc-AY-AdT"/>
+                                                    <constraint firstAttribute="trailing" secondItem="cx3-LG-ZUH" secondAttribute="trailing" constant="4" id="XKo-K6-XDq"/>
                                                     <constraint firstItem="MtO-b9-tF8" firstAttribute="top" secondItem="j2X-bv-VAU" secondAttribute="top" constant="1" id="btM-7K-jHw"/>
                                                     <constraint firstAttribute="bottom" secondItem="cx3-LG-ZUH" secondAttribute="bottom" id="gus-g0-iwG"/>
                                                     <constraint firstAttribute="bottom" secondItem="MtO-b9-tF8" secondAttribute="bottom" constant="1" id="jy6-YQ-i7d"/>
@@ -225,7 +225,7 @@
                                                 </userDefinedRuntimeAttributes>
                                             </customView>
                                             <customView translatesAutoresizingMaskIntoConstraints="NO" id="ATb-xt-XAg" userLabel="Separator" customClass="ColorView" customModule="DuckDuckGo_Privacy_Browser" customModuleProvider="target">
-                                                <rect key="frame" x="1" y="264" width="612" height="1"/>
+                                                <rect key="frame" x="1" y="264" width="614" height="1"/>
                                                 <constraints>
                                                     <constraint firstAttribute="height" constant="1" id="G3c-nz-oCJ"/>
                                                 </constraints>
