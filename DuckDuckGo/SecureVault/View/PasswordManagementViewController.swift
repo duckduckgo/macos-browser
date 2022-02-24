@@ -20,7 +20,6 @@ import Foundation
 import Combine
 import SwiftUI
 import BrowserServicesKit
-import LocalAuthentication
 
 // swiftlint:disable file_length
 
