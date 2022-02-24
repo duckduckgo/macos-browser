@@ -215,7 +215,7 @@ final class TabBarViewItem: NSCollectionViewItem {
             self?.currentURL = content.url
         }.store(in: &cancellables)
 
-        tabViewModel.$usedPermissions.weakAssign(to: \.usedPermissions, on: self).store(in: &cancellables)
+        tabViewModel.$usedPermissions.assign(to: \.usedPermissions, onWeaklyHeld: self).store(in: &cancellables)
     }
 
     func clear() {

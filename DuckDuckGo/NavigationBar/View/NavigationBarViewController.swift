@@ -187,7 +187,8 @@ final class NavigationBarViewController: NSViewController {
     }
 
     @IBAction func passwordManagementButtonAction(_ sender: NSButton) {
-        showPasswordManagementPopover(sender: sender)
+        // Use the category that is already selected
+        showPasswordManagementPopover(sender: sender, selectedCategory: nil)
     }
 
     @IBAction func downloadsButtonAction(_ sender: NSButton) {
@@ -280,9 +281,10 @@ final class NavigationBarViewController: NSViewController {
         Pixel.fire(.bookmarksList(source: .button))
     }
 
-    func showPasswordManagementPopover(sender: Any) {
+    func showPasswordManagementPopover(sender: Any, selectedCategory: SecureVaultSorting.Category?) {
         guard closeTransientPopovers() else { return }
         passwordManagementButton.isHidden = false
+        passwordManagementPopover.select(category: selectedCategory)
         passwordManagementPopover.show(relativeTo: passwordManagementButton.bounds.insetFromLineOfDeath(),
                                        of: passwordManagementButton,
                                        preferredEdge: .minY)
@@ -378,7 +380,7 @@ final class NavigationBarViewController: NSViewController {
                 let progress = DownloadListCoordinator.shared.progress
                 return progress.fractionCompleted == 1.0 || progress.totalUnitCount == 0 ? nil : progress.fractionCompleted
             }
-            .weakAssign(to: \.progress, on: downloadsProgressView)
+            .assign(to: \.progress, onWeaklyHeld: downloadsProgressView)
             .store(in: &downloadsCancellables)
     }
 
@@ -513,8 +515,8 @@ extension NavigationBarViewController: OptionsButtonMenuDelegate {
         showBookmarkListPopover()
     }
 
-    func optionsButtonMenuRequestedLoginsPopover(_ menu: NSMenu) {
-        showPasswordManagementPopover(sender: menu)
+    func optionsButtonMenuRequestedLoginsPopover(_ menu: NSMenu, selectedCategory: SecureVaultSorting.Category) {
+        showPasswordManagementPopover(sender: menu, selectedCategory: selectedCategory)
     }
 
     func optionsButtonMenuRequestedDownloadsPopover(_ menu: NSMenu) {
