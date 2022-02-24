@@ -127,6 +127,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         urlEventHandler.applicationDidFinishLaunching()
         
         DeviceAuthenticator.shared.beginCheckingIdleTimer()
+        UserDefaultsWrapper<Any>.clearRemovedKeys()
     }
 
     func applicationShouldTerminate(_ sender: NSApplication) -> NSApplication.TerminateReply {

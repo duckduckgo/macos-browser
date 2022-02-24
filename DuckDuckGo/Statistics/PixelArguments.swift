@@ -334,6 +334,7 @@ extension Pixel.Event {
         case newWindow = "new-window"
         case feedback = "feedback"
         case bookmarksList = "bookmarks-list"
+        case loginsMenu = "logins-menu"
         case loginsMenuAllItems = "logins-menu-all-items"
         case loginsMenuLogins = "logins-menu-logins"
         case loginsMenuIdentities = "logins-menu-identities"

@@ -194,9 +194,11 @@ final class MoreOptionsMenu: NSMenu {
 
         let loginsSubMenu = LoginsSubMenu(targetting: self)
         
-        addItem(withTitle: UserText.passwordManagement, action: nil, keyEquivalent: "")
+        addItem(withTitle: UserText.passwordManagement, action: #selector(openLoginsWithAllItems), keyEquivalent: "")
+            .targetting(self)
             .withImage(NSImage(named: "PasswordManagement"))
             .withSubmenu(loginsSubMenu)
+            .firingPixel(Pixel.Event.MoreResult.loginsMenu)
 
         addItem(NSMenuItem.separator())
     }
