@@ -34,7 +34,7 @@ protocol BookmarkManager: AnyObject {
     @discardableResult func updateUrl(of bookmark: Bookmark, to newUrl: URL) -> Bookmark?
     func add(objectsWithUUIDs uuids: [UUID], to parent: BookmarkFolder?, completion: @escaping (Error?) -> Void)
     func update(objectsWithUUIDs uuids: [UUID], update: @escaping (BaseBookmarkEntity) -> Void, completion: @escaping (Error?) -> Void)
-    func importBookmarks(_ bookmarks: ImportedBookmarks) -> BookmarkImportResult
+    func importBookmarks(_ bookmarks: ImportedBookmarks, source: BookmarkImportSource) -> BookmarkImportResult
 
     // Wrapper definition in a protocol is not supported yet
     var listPublisher: Published<BookmarkList?>.Publisher { get }
@@ -214,8 +214,8 @@ final class LocalBookmarkManager: BookmarkManager {
 
     // MARK: - Import
 
-    func importBookmarks(_ bookmarks: ImportedBookmarks) -> BookmarkImportResult {
-        let results = bookmarkStore.importBookmarks(bookmarks)
+    func importBookmarks(_ bookmarks: ImportedBookmarks, source: BookmarkImportSource) -> BookmarkImportResult {
+        let results = bookmarkStore.importBookmarks(bookmarks, source: source)
         self.loadBookmarks()
 
         return results

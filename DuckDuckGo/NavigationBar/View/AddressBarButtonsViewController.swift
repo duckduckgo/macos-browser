@@ -690,10 +690,10 @@ final class AddressBarButtonsViewController: NSViewController {
             let isNotSecure = url.scheme == URL.NavigationalScheme.http.rawValue
 
             let majorTrackerThresholdPrevalence = 25.0
-            let parentEntity = ContentBlocking.trackerDataManager.trackerData.findEntity(forHost: host)
+            let parentEntity = ContentBlocking.shared.trackerDataManager.trackerData.findEntity(forHost: host)
             let isMajorTrackingNetwork = (parentEntity?.prevalence ?? 0.0) >= majorTrackerThresholdPrevalence
 
-            let configuration = ContentBlocking.privacyConfigurationManager.privacyConfig
+            let configuration = ContentBlocking.shared.privacyConfigurationManager.privacyConfig
             let isUnprotected = configuration.isUserUnprotected(domain: host)
 
             privacyEntryPointButton.image = isNotSecure || isMajorTrackingNetwork || isUnprotected ? Self.shieldDotImage : Self.shieldImage
@@ -846,7 +846,7 @@ extension AddressBarButtonsViewController: PermissionContextMenuDelegate {
         PermissionManager.shared.setPermission(.ask, forDomain: menu.domain, permissionType: permission)
     }
     func permissionContextMenuReloadPage(_ menu: PermissionContextMenu) {
-        tabCollectionViewModel.selectedTabViewModel?.tab.reload()
+        tabCollectionViewModel.selectedTabViewModel?.reload()
     }
 
 }

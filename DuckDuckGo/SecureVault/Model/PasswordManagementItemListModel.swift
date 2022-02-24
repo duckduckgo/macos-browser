@@ -65,6 +65,19 @@ enum SecureVaultItem: Equatable, Identifiable, Comparable {
             return note.title
         }
     }
+    
+    var created: Date {
+        switch self {
+        case .account(let account):
+            return account.created
+        case .card(let card):
+            return card.created
+        case .identity(let identity):
+            return identity.created
+        case .note(let note):
+            return note.created
+        }
+    }
 
     var lastUpdated: Date {
         switch self {
@@ -128,6 +141,37 @@ enum SecureVaultItem: Equatable, Identifiable, Comparable {
             return subtitle
         }
     }
+    
+    var firstCharacter: String {
+        let defaultFirstCharacter = "#"
+
+        guard let character = self.displayTitle.first else {
+            return defaultFirstCharacter
+        }
+        
+        if character.isLetter {
+            return character.uppercased()
+        } else {
+            return defaultFirstCharacter
+        }
+    }
+    
+    var category: SecureVaultSorting.Category {
+        switch self {
+        case .account: return .logins
+        case .card: return .cards
+        case .identity: return .identities
+        case .note: return .notes
+        }
+    }
+    
+    func matches(category: SecureVaultSorting.Category) -> Bool {
+        if category == .allItems {
+            return true
+        }
+        
+        return self.category == category
+    }
 
     static func == (lhs: SecureVaultItem, rhs: SecureVaultItem) -> Bool {
         switch (lhs, rhs) {
@@ -158,40 +202,17 @@ enum SecureVaultItem: Equatable, Identifiable, Comparable {
 ///
 /// Could maybe even abstract a bunch of this code to be more generic re-usable styled list for use elsewhere.
 final class PasswordManagementItemListModel: ObservableObject {
-
-    enum ListSection {
-        case accounts([SecureVaultItem])
-        case cards([SecureVaultItem])
-        case notes([SecureVaultItem])
-        case identities([SecureVaultItem])
-
-        var title: String {
-            switch self {
-            case .accounts: return "Logins"
-            case .cards: return "Credit Cards"
-            case .notes: return "Notes"
-            case .identities: return "Identities"
-            }
-        }
-
-        var items: [SecureVaultItem] {
-            switch self {
-            case .accounts(let items): return items
-            case .cards(let items): return items
-            case .notes(let items): return items
-            case .identities(let items): return items
-            }
-        }
-
-        func withUpdatedItems(_ newItems: [SecureVaultItem]) -> ListSection {
-            switch self {
-            case .accounts: return .accounts(newItems)
-            case .cards: return .cards(newItems)
-            case .notes: return .notes(newItems)
-            case .identities: return .identities(newItems)
-            }
-        }
-
+    
+    enum EmptyState {
+        /// Displays nothing for the empty state. Used when data is still loading, or when filtering the All Items list.
+        case none
+        
+        /// Displays an empty state which prompts the user to import data. Used when the user has no items of any type.
+        case noData
+        case logins
+        case identities
+        case notes
+        case creditCards
     }
 
     static let personNameComponentsFormatter: PersonNameComponentsFormatter = {
@@ -203,7 +224,7 @@ final class PasswordManagementItemListModel: ObservableObject {
 
     var filter: String = "" {
         didSet {
-            refresh()
+            updateFilteredData()
 
             // Only select the first item if the filter has actually changed
             if oldValue != filter {
@@ -214,12 +235,31 @@ final class PasswordManagementItemListModel: ObservableObject {
 
     private var items = [SecureVaultItem]() {
         didSet {
-            refresh()
+            updateFilteredData()
+            calculateEmptyState()
         }
     }
 
-    @Published private(set) var displayedItems = [ListSection]()
+    @Published var sortDescriptor = SecureVaultSorting.default {
+        didSet {
+            guard oldValue != sortDescriptor else {
+                return
+            }
+            
+            updateFilteredData()
+            selectFirst()
+        }
+    }
+
+    @Published private(set) var displayedItems = [PasswordManagementListSection]() {
+        didSet {
+            calculateEmptyState()
+        }
+    }
+
     @Published private(set) var selected: SecureVaultItem?
+    @Published private(set) var emptyState: EmptyState = .none
+    @Published var canChangeCategory: Bool = true
 
     private var onItemSelected: (_ old: SecureVaultItem?, _ new: SecureVaultItem?) -> Void
 
@@ -232,8 +272,14 @@ final class PasswordManagementItemListModel: ObservableObject {
     }
 
     func selected(item: SecureVaultItem?, notify: Bool = true) {
+        // If selecting an item that does not exist in the current category, then swap to that category first.
+        if let item = item, sortDescriptor.category != .allItems, item.category != sortDescriptor.category {
+            sortDescriptor.category = item.category
+        }
+        
         let previous = selected
         selected = item
+        
         if notify {
             onItemSelected(previous, item)
         }
@@ -249,11 +295,9 @@ final class PasswordManagementItemListModel: ObservableObject {
     
     func selectLoginWithDomainOrFirst(domain: String, notify: Bool = true) {
         for section in displayedItems {
-            if case let .accounts(accounts) = section {
-                if let account = accounts.first(where: { $0.websiteAccount?.domain == domain }) {
-                    selected(item: account, notify: notify)
-                    return
-                }
+            if let account = section.items.first(where: { $0.websiteAccount?.domain == domain }) {
+                selected(item: account, notify: notify)
+                return
             }
         }
         
@@ -284,16 +328,25 @@ final class PasswordManagementItemListModel: ObservableObject {
         displayedItems = sections
     }
 
-    func refresh() {
+    func updateFilteredData() {
         let filter = self.filter.lowercased()
+        var itemsByCategory = items.filter { $0.matches(category: sortDescriptor.category) }
 
-        if filter.isEmpty {
-            displayedItems = sortIntoSections(items)
-        } else {
-            let filter = filter.lowercased()
-            let filteredItems = items.filter { $0.item(matches: filter) }
+        if !filter.isEmpty {
+            itemsByCategory = itemsByCategory.filter { $0.item(matches: filter) }
+        }
 
-            displayedItems = sortIntoSections(filteredItems)
+        if displayedItems.isEmpty && items.isEmpty {
+            return
+        }
+
+        switch sortDescriptor.parameter {
+        case .title:
+            displayedItems = PasswordManagementListSection.sections(with: itemsByCategory, by: \.firstCharacter, order: sortDescriptor.order)
+        case .dateCreated:
+            displayedItems = PasswordManagementListSection.sections(with: itemsByCategory, by: \.created, order: sortDescriptor.order)
+        case .dateModified:
+            displayedItems = PasswordManagementListSection.sections(with: itemsByCategory, by: \.lastUpdated, order: sortDescriptor.order)
         }
     }
 
@@ -306,12 +359,22 @@ final class PasswordManagementItemListModel: ObservableObject {
             selected(item: nil)
         }
     }
+    
+    func clear() {
+        update(items: [])
+        filter = ""
+        clearSelection()
+        
+        // Setting items to an empty array will typically show the No Data empty state, but this call is used when
+        // the popover is closed so instead there should be no empty state.
+        emptyState = .none
+    }
 
     func clearSelection() {
         selected = nil
     }
 
-    private func sortIntoSections(_ items: [SecureVaultItem]) -> [ListSection] {
+    private func sortIntoSectionsByItemType(_ items: [SecureVaultItem]) -> [PasswordManagementListSection] {
         var accounts = [SecureVaultItem]()
         var cards = [SecureVaultItem]()
         var identities = [SecureVaultItem]()
@@ -330,14 +393,34 @@ final class PasswordManagementItemListModel: ObservableObject {
             }
         }
 
-        var sections = [ListSection]()
+        var sections = [PasswordManagementListSection]()
 
-        if !accounts.isEmpty { sections.append(.accounts(accounts)) }
-        if !cards.isEmpty { sections.append(.cards(cards)) }
-        if !identities.isEmpty { sections.append(.identities(identities)) }
-        if !notes.isEmpty { sections.append(.notes(notes)) }
+        if !accounts.isEmpty { sections.append(PasswordManagementListSection(title: "Logins", items: accounts)) }
+        if !cards.isEmpty { sections.append(PasswordManagementListSection(title: "Credit Cards", items: cards)) }
+        if !identities.isEmpty { sections.append(PasswordManagementListSection(title: "Identities", items: identities)) }
+        if !notes.isEmpty { sections.append(PasswordManagementListSection(title: "Notes", items: notes)) }
 
         return sections
+    }
+    
+    private func calculateEmptyState() {
+        guard !items.isEmpty else {
+            emptyState = .noData
+            return
+        }
+        
+        guard displayedItems.isEmpty else {
+            emptyState = .none
+            return
+        }
+        
+        switch sortDescriptor.category {
+        case .allItems: emptyState = .none
+        case .cards: emptyState = .creditCards
+        case .logins: emptyState = .logins
+        case .identities: emptyState = .identities
+        case .notes: emptyState = .notes
+        }
     }
 
 }

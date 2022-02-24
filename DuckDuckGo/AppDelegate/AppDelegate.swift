@@ -26,8 +26,24 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
     let launchTimingPixel = TimedPixel(.launchTiming)
 
     static var isRunningTests: Bool {
+#if DEBUG
         ProcessInfo.processInfo.environment["XCTestConfigurationFilePath"] != nil
+#else
+        return false
+#endif
     }
+
+#if DEBUG
+    let disableCVDisplayLinkLogs: Void = {
+        // Disable CVDisplayLink logs
+        CFPreferencesSetValue("cv_note" as CFString,
+                              0 as CFPropertyList,
+                              "com.apple.corevideo" as CFString,
+                              kCFPreferencesCurrentUser,
+                              kCFPreferencesAnyHost)
+        CFPreferencesSynchronize("com.apple.corevideo" as CFString, kCFPreferencesCurrentUser, kCFPreferencesAnyHost)
+    }()
+#endif
 
     let urlEventHandler = URLEventHandler()
 
@@ -109,6 +125,8 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         crashReporter.checkForNewReports()
 #endif
         urlEventHandler.applicationDidFinishLaunching()
+        
+        UserDefaultsWrapper<Any>.clearRemovedKeys()
     }
 
     func applicationShouldTerminate(_ sender: NSApplication) -> NSApplication.TerminateReply {

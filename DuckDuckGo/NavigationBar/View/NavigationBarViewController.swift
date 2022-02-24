@@ -173,7 +173,7 @@ final class NavigationBarViewController: NSViewController {
         }
 
         Pixel.fire(.refresh(source: .init(sender: sender, default: .button)))
-        selectedTabViewModel.tab.reload()
+        selectedTabViewModel.reload()
     }
 
     @IBAction func optionsButtonAction(_ sender: NSButton) {
@@ -187,7 +187,8 @@ final class NavigationBarViewController: NSViewController {
     }
 
     @IBAction func passwordManagementButtonAction(_ sender: NSButton) {
-        showPasswordManagementPopover(sender: sender)
+        // Use the category that is already selected
+        showPasswordManagementPopover(sender: sender, selectedCategory: nil)
     }
 
     @IBAction func downloadsButtonAction(_ sender: NSButton) {
@@ -210,6 +211,12 @@ final class NavigationBarViewController: NSViewController {
                                                selector: #selector(showPrivateEmailCopiedToClipboard(_:)),
                                                name: Notification.Name.privateEmailCopiedToClipboard,
                                                object: nil)
+        if #available(macOS 11, *) {
+            NotificationCenter.default.addObserver(self,
+                                                   selector: #selector(showAutoconsentFeedback(_:)),
+                                                   name: AutoconsentUserScript.Constants.newSitePopupHidden,
+                                                   object: nil)
+        }
     }
 
     @objc private func showPrivateEmailCopiedToClipboard(_ sender: Notification) {
@@ -229,6 +236,21 @@ final class NavigationBarViewController: NSViewController {
         DispatchQueue.main.async {
             let viewController = PopoverMessageViewController.createWithMessage(UserText.domainIsFireproof(domain: domain))
             viewController.show(onParent: self, relativeTo: self.optionsButton)
+        }
+    }
+    
+    @objc private func showAutoconsentFeedback(_ sender: Notification) {
+        if #available(macOS 11, *) {
+            guard view.window?.isKeyWindow == true,
+                  let host = sender.userInfo?[AutoconsentUserScript.Constants.popupHiddenHostKey] as? String,
+                  !AutoconsentUserScript.background.sitesNotifiedCache.contains(host),
+                  let relativeTarget = self.addressBarViewController?.addressBarButtonsViewController?.privacyEntryPointButton
+            else { return }
+            AutoconsentUserScript.background.sitesNotifiedCache.insert(host)
+            DispatchQueue.main.async {
+                let viewController = PopoverMessageViewController.createWithMessage(UserText.autoconsentPopoverMessage)
+                viewController.show(onParent: self, relativeTo: relativeTarget)
+            }
         }
     }
 
@@ -259,9 +281,10 @@ final class NavigationBarViewController: NSViewController {
         Pixel.fire(.bookmarksList(source: .button))
     }
 
-    func showPasswordManagementPopover(sender: Any) {
+    func showPasswordManagementPopover(sender: Any, selectedCategory: SecureVaultSorting.Category?) {
         guard closeTransientPopovers() else { return }
         passwordManagementButton.isHidden = false
+        passwordManagementPopover.select(category: selectedCategory)
         passwordManagementPopover.show(relativeTo: passwordManagementButton.bounds.insetFromLineOfDeath(),
                                        of: passwordManagementButton,
                                        preferredEdge: .minY)
@@ -492,8 +515,8 @@ extension NavigationBarViewController: OptionsButtonMenuDelegate {
         showBookmarkListPopover()
     }
 
-    func optionsButtonMenuRequestedLoginsPopover(_ menu: NSMenu) {
-        showPasswordManagementPopover(sender: menu)
+    func optionsButtonMenuRequestedLoginsPopover(_ menu: NSMenu, selectedCategory: SecureVaultSorting.Category) {
+        showPasswordManagementPopover(sender: menu, selectedCategory: selectedCategory)
     }
 
     func optionsButtonMenuRequestedDownloadsPopover(_ menu: NSMenu) {

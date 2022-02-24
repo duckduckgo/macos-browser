@@ -17,19 +17,31 @@
 //
 
 import Foundation
+import Combine
 
-struct PrivacySecurityPreferences {
+final class PrivacySecurityPreferences {
+    static let shared = PrivacySecurityPreferences()
+
+    private init() {}
 
     @UserDefaultsWrapper(key: .loginDetectionEnabled, defaultValue: true)
-    public var loginDetectionEnabled: Bool
-    
-    @UserDefaultsWrapper(key: .gpcEnabled, defaultValue: true)
-    public var gpcEnabled: Bool {
+    var loginDetectionEnabled: Bool
+
+    @Published
+    var gpcEnabled: Bool = UserDefaultsWrapper(key: .gpcEnabled, defaultValue: true).wrappedValue {
         didSet {
-            DefaultScriptSourceProvider.shared.reload(knownChanges: [:])
-            GPCRequestFactory.shared.reloadGPCSetting()
+            var udWrapper = UserDefaultsWrapper(key: .gpcEnabled, defaultValue: true)
+            udWrapper.wrappedValue = gpcEnabled
         }
     }
+
+    // This setting is an optional boolean as it has three states:
+    // - nil: User has not chosen a setting
+    // - true: Enabled by the user
+    // - false: Disabled by the user
+    @UserDefaultsWrapper(key: .autoconsentEnabled, defaultValue: nil)
+    public var autoconsentEnabled: Bool?
+
 }
 
 extension PrivacySecurityPreferences: PreferenceSection {

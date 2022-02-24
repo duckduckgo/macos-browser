@@ -44,7 +44,6 @@ final class SaveCredentialsViewController: NSViewController {
     @IBOutlet var usernameField: NSTextField!
     @IBOutlet var hiddenPasswordField: NSSecureTextField!
     @IBOutlet var visiblePasswordField: NSTextField!
-    @IBOutlet var neverButton: NSButton!
     @IBOutlet var notNowButton: NSButton!
     @IBOutlet var saveButton: NSButton!
     @IBOutlet var updateButton: NSButton!
@@ -74,7 +73,6 @@ final class SaveCredentialsViewController: NSViewController {
         self.loadFaviconForDomain(credentials.account.domain)
 
         notNowButton.isHidden = credentials.account.id != nil
-        neverButton.isHidden = credentials.account.id != nil
         saveButton.isHidden = credentials.account.id != nil
 
         updateButton.isHidden = credentials.account.id == nil
@@ -92,7 +90,7 @@ final class SaveCredentialsViewController: NSViewController {
         let credentials = SecureVaultModels.WebsiteCredentials(account: account, password: passwordData)
 
         do {
-            try SecureVaultFactory.default.makeVault().storeWebsiteCredentials(credentials)
+            try SecureVaultFactory.default.makeVault(errorReporter: SecureVaultErrorReporter.shared).storeWebsiteCredentials(credentials)
         } catch {
             os_log("%s:%: failed to store credentials %s", type: .error, className, #function, error.localizedDescription)
         }
@@ -111,7 +109,7 @@ final class SaveCredentialsViewController: NSViewController {
     @IBAction func onNotNowClicked(sender: Any?) {
         delegate?.shouldCloseSaveCredentialsViewController(self)
 
-        guard PrivacySecurityPreferences().loginDetectionEnabled else { return }
+        guard PrivacySecurityPreferences.shared.loginDetectionEnabled else { return }
 
         guard let window = view.window else {
             os_log("%s: Window is nil", type: .error, className)
@@ -131,12 +129,6 @@ final class SaveCredentialsViewController: NSViewController {
         }
 
         Pixel.fire(.fireproofSuggested())
-    }
-
-    /// Assuming per website basis.
-    @IBAction func onNeverClicked(sender: Any?) {
-        PasswordManagerSettings().doNotPromptOnDomain(domainLabel.stringValue)
-        delegate?.shouldCloseSaveCredentialsViewController(self)
     }
 
     @IBAction func onTogglePasswordVisibility(sender: Any?) {

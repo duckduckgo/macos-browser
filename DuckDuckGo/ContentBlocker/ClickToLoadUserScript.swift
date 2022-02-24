@@ -31,8 +31,8 @@ final class ClickToLoadUserScript: NSObject, UserScript, WKScriptMessageHandlerW
     var messageNames: [String] { ["getImage", "enableFacebook", "initClickToLoad" ] }
     let source: String
 
-    init(scriptSource: ScriptSourceProviding = DefaultScriptSourceProvider.shared) {
-        source = scriptSource.clickToLoadSource
+    init(scriptSourceProvider: ScriptSourceProviding) {
+        self.source = scriptSourceProvider.clickToLoadSource
     }
 
     weak var delegate: ClickToLoadUserScriptDelegate?
@@ -87,4 +87,5 @@ final class ClickToLoadUserScript: NSObject, UserScript, WKScriptMessageHandlerW
     func userContentController(_ userContentController: WKUserContentController, didReceive message: WKScriptMessage) {
         assertionFailure("SHOULDN'T BE HERE!")
     }
+
 }

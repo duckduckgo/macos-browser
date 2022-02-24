@@ -48,16 +48,21 @@ final class TabCollection: NSObject {
         }
 
         saveLastRemovedTab(at: index)
+        tabs[index].tabWillClose()
         tabs.remove(at: index)
 
         return true
     }
 
     func removeAll(andAppend tab: Tab? = nil) {
+        tabs.forEach { $0.tabWillClose() }
         tabs = tab.map { [$0] } ?? []
     }
 
     func removeTabs(after index: Int) {
+        for i in (index + 1)..<tabs.count {
+            tabs[i].tabWillClose()
+        }
         tabs.removeSubrange((index + 1)...)
     }
 
@@ -69,6 +74,9 @@ final class TabCollection: NSObject {
             return
         }
 
+        for i in indexSet {
+            tabs[i].tabWillClose()
+        }
         tabs.remove(atOffsets: indexSet)
     }
 
@@ -95,6 +103,7 @@ final class TabCollection: NSObject {
             return
         }
 
+        tabs[index].tabWillClose()
         tabs[index] = tab
     }
 
@@ -121,6 +130,10 @@ final class TabCollection: NSObject {
 
     func cleanLastRemovedTab() {
         lastRemovedTabCache = nil
+    }
+
+    deinit {
+        tabs.forEach { $0.tabWillClose() }
     }
 
 }

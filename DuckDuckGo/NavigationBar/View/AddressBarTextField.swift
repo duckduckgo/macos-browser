@@ -281,7 +281,7 @@ final class AddressBarTextField: NSTextField {
 
         if selectedTabViewModel.tab.content.url == url {
             Pixel.fire(.refresh(source: .reloadURL))
-            selectedTabViewModel.tab.reload()
+            selectedTabViewModel.reload()
         } else {
 
             Pixel.fire(.navigation(kind: .init(url: url), source: isHomepageAddressBar ? .newTab : (suggestion != nil ? .suggestion : .addressBar)))
@@ -347,9 +347,8 @@ final class AddressBarTextField: NSTextField {
             return
         }
 
-        HTTPSUpgrade.shared.isUpgradeable(url: url) { isUpgradable in
-            completion(isUpgradable ? url.toHttps() : url, isUpgradable)
-        }
+        let isUpgradable = HTTPSUpgrade.shared.isUpgradeable(url: url)
+        completion(isUpgradable ? url.toHttps() : url, isUpgradable)
     }
 
     // MARK: - Value

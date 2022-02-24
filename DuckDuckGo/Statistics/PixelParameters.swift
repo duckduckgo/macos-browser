@@ -31,6 +31,8 @@ extension Pixel {
         static let errorCount = "c"
         static let underlyingErrorCode = "ue"
         static let underlyingErrorDesc = "ud"
+        static let underlyingErrorSQLiteCode = "sqlrc"
+        static let underlyingErrorSQLiteExtendedCode = "sqlerc"
     }
 
     enum Values {
@@ -57,9 +59,12 @@ extension Pixel.Event {
                 if let underlyingError = nsError.userInfo["NSUnderlyingError"] as? NSError {
                     params[Pixel.Parameters.underlyingErrorCode] = "\(underlyingError.code)"
                     params[Pixel.Parameters.underlyingErrorDesc] = underlyingError.domain
-                } else if let sqlErrorCode = nsError.userInfo["NSSQLiteErrorDomain"] as? NSNumber {
-                    params[Pixel.Parameters.underlyingErrorCode] = "\(sqlErrorCode.intValue)"
-                    params[Pixel.Parameters.underlyingErrorDesc] = "NSSQLiteErrorDomain"
+                }
+                if let sqlErrorCode = nsError.userInfo["SQLiteResultCode"] as? NSNumber {
+                    params[Pixel.Parameters.underlyingErrorSQLiteCode] = "\(sqlErrorCode.intValue)"
+                }
+                if let sqlExtendedErrorCode = nsError.userInfo["SQLiteExtendedResultCode"] as? NSNumber {
+                    params[Pixel.Parameters.underlyingErrorSQLiteExtendedCode] = "\(sqlExtendedErrorCode.intValue)"
                 }
             }
 
@@ -73,6 +78,7 @@ extension Pixel.Event {
              .browserMadeDefault,
              .burn,
              .crash,
+             .compileRulesWait,
              .fireproof,
              .fireproofSuggested,
              .bookmark,
@@ -102,7 +108,9 @@ extension Pixel.Event {
              .waitlistFirstLaunch,
              .waitlistMigratedExistingInstall,
              .waitlistPresentedLockScreen,
-             .waitlistDismissedLockScreen:
+             .waitlistDismissedLockScreen,
+             .autoconsentOptOutFailed,
+             .autoconsentSelfTestFailed:
 
             return nil
         }

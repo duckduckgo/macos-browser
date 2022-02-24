@@ -39,7 +39,11 @@ final class StatisticsLoader {
             dispatchPrecondition(condition: .onQueue(.main))
 
             if isSearch {
-                self.refreshSearchRetentionAtb(completion: completion)
+                self.refreshSearchRetentionAtb {
+                    self.refreshRetentionAtb(isSearch: false) {
+                        completion()
+                    }
+                }
                 Pixel.fire(.serp)
             } else if !self.statisticsStore.isAppRetentionFiredToday {
                 self.refreshAppRetentionAtb(completion: completion)

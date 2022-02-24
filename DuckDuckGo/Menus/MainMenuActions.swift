@@ -121,7 +121,7 @@ extension AppDelegate {
         savePanel.beginSheetModal(for: window) { response in
             guard response == .OK, let selectedURL = savePanel.url else { return }
 
-            let vault = try? SecureVaultFactory.default.makeVault()
+            let vault = try? SecureVaultFactory.default.makeVault(errorReporter: SecureVaultErrorReporter.shared)
             let exporter = CSVLoginExporter(secureVault: vault!)
             do {
                 try exporter.exportVaultLogins(to: selectedURL)
@@ -197,7 +197,7 @@ extension MainViewController {
         }
 
         Pixel.fire(.refresh(source: .init(sender: sender, default: .mainMenu)))
-        selectedTabViewModel.tab.reload()
+        selectedTabViewModel.reload()
     }
 
     @IBAction func stopLoadingPage(_ sender: Any) {
@@ -470,15 +470,39 @@ extension MainViewController {
     }
 
     @IBAction func resetSecureVaultData(_ sender: Any?) {
-        let vault = try? SecureVaultFactory.default.makeVault()
+        let vault = try? SecureVaultFactory.default.makeVault(errorReporter: SecureVaultErrorReporter.shared)
+        
         let accounts = (try? vault?.accounts()) ?? []
-        let accountIDs = accounts.compactMap(\.id)
+        for accountID in accounts.compactMap(\.id) {
+            try? vault?.deleteWebsiteCredentialsFor(accountId: accountID)
+        }
+        
+        let cards = (try? vault?.creditCards()) ?? []
+        for cardID in cards.compactMap(\.id) {
+            try? vault?.deleteCreditCardFor(cardId: cardID)
+        }
 
-        for accountID in accountIDs {
-            do {
-                try vault?.deleteWebsiteCredentialsFor(accountId: accountID)
-            } catch {
-                os_log("Failed to remove credential with account ID %d", type: .error, accountID)
+        let identities = (try? vault?.identities()) ?? []
+        for identityID in identities.compactMap(\.id) {
+            try? vault?.deleteIdentityFor(identityId: identityID)
+        }
+        
+        let notes = (try? vault?.notes()) ?? []
+        for noteID in notes.compactMap(\.id) {
+            try? vault?.deleteNoteFor(noteId: noteID)
+        }
+    }
+    
+    @IBAction func resetBookmarks(_ sender: Any?) {
+        guard let topLevelEntities = LocalBookmarkManager.shared.list?.topLevelEntities else {
+            return
+        }
+        
+        for entity in topLevelEntities {
+            if let folder = entity as? BookmarkFolder {
+                LocalBookmarkManager.shared.remove(folder: folder)
+            } else if let bookmark = entity as? Bookmark {
+                LocalBookmarkManager.shared.remove(bookmark: bookmark)
             }
         }
     }

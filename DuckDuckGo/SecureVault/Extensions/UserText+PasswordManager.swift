@@ -18,7 +18,18 @@
 
 import Foundation
 
+// swiftlint:disable line_length
 extension UserText {
+    
+    static let pmEmptyStateDefaultTitle = NSLocalizedString("pm.empty.default.title", value: "No logins or credit card info yet", comment: "Label for default empty state title")
+    static let pmEmptyStateDefaultDescription = NSLocalizedString("pm.empty.default.description",
+                                                                  value: "If your logins are saved in another browser, you can import them into DuckDuckGo.",
+                                                                  comment: "Label for default empty state description")
+    
+    static let pmEmptyStateLoginsTitle = NSLocalizedString("pm.empty.logins.title", value: "No Logins", comment: "Label for logins empty state title")
+    static let pmEmptyStateIdentitiesTitle = NSLocalizedString("pm.empty.identities.title", value: "No Identities", comment: "Label for identities empty state title")
+    static let pmEmptyStateCardsTitle = NSLocalizedString("pm.empty.cards.title", value: "No Cards", comment: "Label for cards empty state title")
+    static let pmEmptyStateNotesTitle = NSLocalizedString("pm.empty.notes.title", value: "No Notes", comment: "Label for notes empty state title")
 
     static let pmNewCard = NSLocalizedString("pm.new.card", value: "Credit Card", comment: "Label for new card title")
     static let pmNewLogin = NSLocalizedString("pm.new.login", value: "Login", comment: "Label for new login title")
@@ -58,5 +69,15 @@ extension UserText {
 
     static let pmNote = NSLocalizedString("pm.note", value: "Note", comment: "Label for note title")
     static let pmEmptyNote = NSLocalizedString("pm.note.empty", value: "Empty note", comment: "Label for empty note title")
-
+    
+    static let pmSortStringAscending = NSLocalizedString("pm.sort.string.ascending", value: "Alphabetically", comment: "Label for Ascending string sort order")
+    static let pmSortStringDescending = NSLocalizedString("pm.sort.string.descending", value: "Reverse Alphabetically", comment: "Label for Descending string sort order")
+    static let pmSortDateAscending = NSLocalizedString("pm.sort.date.ascending", value: "Newest First", comment: "Label for Ascending date sort order")
+    static let pmSortDateDescending = NSLocalizedString("pm.sort.date.descending", value: "Oldest First", comment: "Label for Descending date sort order")
+    
+    static let pmSortParameterTitle = NSLocalizedString("pm.sort.parameter.title", value: "Title", comment: "Label for Title sort parameter")
+    static let pmSortParameterDateCreated = NSLocalizedString("pm.sort.parameter.date-created", value: "Date Created", comment: "Label for Date Created sort parameter")
+    static let pmSortParameterDateModified = NSLocalizedString("pm.sort.parameter.date-modified", value: "Date Modified", comment: "Label for Date Modified sort parameter")
+    
 }
+// swiftlint:enable line_length

@@ -225,6 +225,11 @@ final class TabViewModel {
         }
     }
 
+    func reload() {
+        tab.reload()
+        updateAddressBarStrings()
+    }
+
     // MARK: - Privacy icon animation
 
     let trackersAnimationTriggerPublisher = PassthroughSubject<Void, Never>()

@@ -31,7 +31,8 @@ final class BrowserTabViewController: NSViewController {
     @IBOutlet weak var errorMessageLabel: NSTextField!
     @IBOutlet weak var hoverLabel: NSTextField!
     @IBOutlet weak var hoverLabelContainer: NSView!
-    weak var webView: WebView?
+    private weak var webView: WebView?
+    private weak var webViewContainer: NSView?
 
     var tabViewModel: TabViewModel?
 
@@ -76,6 +77,18 @@ final class BrowserTabViewController: NSViewController {
         subscribeToErrorViewState()
     }
 
+    override func viewDidAppear() {
+        NotificationCenter.default.addObserver(self,
+                                               selector: #selector(windowWillClose(_:)),
+                                               name: NSWindow.willCloseNotification,
+                                               object: self.view.window)
+    }
+
+    @objc
+    private func windowWillClose(_ notification: NSNotification) {
+        self.removeWebViewFromHierarchy()
+    }
+
     private func subscribeToSelectedTabViewModel() {
         selectedTabViewModelCancellable = tabCollectionViewModel.$selectedTabViewModel
             .sink { [weak self] selectedTabViewModel in
@@ -100,6 +113,18 @@ final class BrowserTabViewController: NSViewController {
         show(tabContent: tabViewModel?.tab.content)
     }
 
+    private func removeWebViewFromHierarchy(webView: WebView? = nil,
+                                            container: NSView? = nil) {
+        guard let webView = webView ?? self.webView,
+              let container = container ?? self.webViewContainer
+        else { return }
+
+        // close fullscreenWindowController when closing tab in FullScreen mode
+        webView.fullscreenWindowController?.close()
+        webView.removeFromSuperview()
+        container.removeFromSuperview()
+    }
+
     private func addWebViewToViewHierarchy(_ webView: WebView) {
         // This code should ideally use Auto Layout, but in order to enable the web inspector, it needs to use springs & structs.
         // The line at the bottom of this comment is the "correct" method of doing this, but breaks the inspector.
@@ -109,7 +134,12 @@ final class BrowserTabViewController: NSViewController {
 
         webView.frame = view.bounds
         webView.autoresizingMask = [.width, .height]
-        view.addSubview(webView)
+
+        let container = NSView(frame: view.bounds)
+        container.autoresizingMask = [.width, .height]
+        view.addSubview(container)
+        container.addSubview(webView)
+        self.webViewContainer = container
 
         // Make sure this is on top
         view.addSubview(hoverLabelContainer)
@@ -127,25 +157,20 @@ final class BrowserTabViewController: NSViewController {
             addWebViewToViewHierarchy(newWebView)
         }
 
-        func removeOldWebView(_ oldWebView: WebView?) {
-            if let oldWebView = oldWebView, view.subviews.contains(oldWebView) {
-                oldWebView.removeFromSuperview()
-            }
-        }
-
         guard let tabViewModel = tabViewModel else {
             self.tabViewModel = nil
-            removeOldWebView(webView)
+            removeWebViewFromHierarchy()
             return
         }
 
         guard self.tabViewModel !== tabViewModel else { return }
 
         let oldWebView = webView
+        let webViewContainer = webViewContainer
         displayWebView(of: tabViewModel)
         subscribeToUrl(of: tabViewModel)
         self.tabViewModel = tabViewModel
-        removeOldWebView(oldWebView)
+        removeWebViewFromHierarchy(webView: oldWebView, container: webViewContainer)
     }
 
     func subscribeToUrl(of tabViewModel: TabViewModel) {
@@ -167,13 +192,17 @@ final class BrowserTabViewController: NSViewController {
         }
     }
 
+    func makeWebViewFirstResponder() {
+        self.webView?.makeMeFirstResponder()
+    }
+
     private func setFirstResponderIfNeeded() {
         guard webView?.url != nil else {
             return
         }
 
         DispatchQueue.main.async { [weak self] in
-            self?.webView?.makeMeFirstResponder()
+            self?.makeWebViewFirstResponder()
         }
     }
 
@@ -229,7 +258,7 @@ final class BrowserTabViewController: NSViewController {
         preferencesViewController.removeCompletely()
         bookmarksViewController.removeCompletely()
         if includingWebView {
-            self.webView?.removeFromSuperview()
+            self.removeWebViewFromHierarchy()
         }
     }
 
@@ -407,7 +436,6 @@ extension BrowserTabViewController: TabDelegate {
 
     func closeTab(_ tab: Tab) {
         guard let index = tabCollectionViewModel.tabCollection.tabs.firstIndex(of: tab) else {
-
             return
         }
         tabCollectionViewModel.remove(at: index)
@@ -540,7 +568,6 @@ extension BrowserTabViewController: FileDownloadManagerDelegate {
     }
 
     func tab(_ tab: Tab, requestedSaveCredentials credentials: SecureVaultModels.WebsiteCredentials) {
-        guard PasswordManagerSettings().canPromptOnDomain(credentials.account.domain) else { return }
         tabViewModel?.credentialsToSave = credentials
     }
 

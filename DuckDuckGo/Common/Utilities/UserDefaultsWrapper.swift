@@ -34,6 +34,7 @@ public struct UserDefaultsWrapper<T> {
         
         case fireproofDomains = "com.duckduckgo.fireproofing.allowedDomains"
         case unprotectedDomains = "com.duckduckgo.contentblocker.unprotectedDomains"
+        case contentBlockingRulesCache = "com.duckduckgo.contentblocker.rules.cache"
 
         case defaultBrowserDismissed = "browser.default.dismissed"
 
@@ -43,10 +44,9 @@ public struct UserDefaultsWrapper<T> {
         case loginDetectionEnabled = "fireproofing.login-detection-enabled"
         case gpcEnabled = "preferences.gpc-enabled"
         case alwaysRequestDownloadLocationKey = "preferences.download-location.always-request"
+        case autoconsentEnabled = "preferences.autoconsent-enabled"
 
         case saveAsPreferredFileType = "saveAs.selected.filetype"
-
-        case passwordManagerDoNotPromptDomains = "com.duckduckgo.passwordmanager.do-not-prompt-domains"
 
         case lastCrashReportCheckDate = "last.crash.report.check.date"
 
@@ -64,6 +64,10 @@ public struct UserDefaultsWrapper<T> {
         case legacyStatisticsStoreDataCleared = "statistics.appretentionatb.legacy-data-cleared"
 
         case onboardingFinished = "onboarding.finished"
+    }
+    
+    enum RemovedKeys: String, CaseIterable {
+        case passwordManagerDoNotPromptDomains = "com.duckduckgo.passwordmanager.do-not-prompt-domains"
     }
 
     private let key: Key
@@ -100,6 +104,12 @@ public struct UserDefaultsWrapper<T> {
 
     static func clearAll() {
          Key.allCases.forEach { key in
+             UserDefaults.standard.removeObject(forKey: key.rawValue)
+         }
+    }
+    
+    static func clearRemovedKeys() {
+         RemovedKeys.allCases.forEach { key in
              UserDefaults.standard.removeObject(forKey: key.rawValue)
          }
     }
