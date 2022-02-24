@@ -98,7 +98,7 @@ final class Tab: NSObject {
         }
     }
 
-    weak var autofillScript: AutofillUserScript?
+    weak var autofillScript: WebsiteAutofillUserScript?
     weak var delegate: TabDelegate?
     private let cbaTimeReporter: ContentBlockingAssetsCompilationTimeReporter?
 

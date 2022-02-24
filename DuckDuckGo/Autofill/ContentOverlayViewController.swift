@@ -24,7 +24,7 @@ import BrowserServicesKit
 public final class ContentOverlayViewController: NSViewController, EmailManagerRequestDelegate {
     
     @IBOutlet var webView: WKWebView!
-    private var topAutofillUserScript: AutofillUserScript?
+    private var topAutofillUserScript: OverlayAutofillUserScript?
     private var cancellables = Set<AnyCancellable>()
     
     public var autofillInterfaceToChild: AutofillMessagingToChildDelegate?
@@ -107,7 +107,7 @@ public final class ContentOverlayViewController: NSViewController, EmailManagerR
 
     private func initWebView() {
         let scriptSourceProvider = buildAutofillSource()
-        self.topAutofillUserScript = AutofillUserScript(scriptSourceProvider: scriptSourceProvider, overlay: self)
+        self.topAutofillUserScript = OverlayAutofillUserScript(scriptSourceProvider: scriptSourceProvider, overlay: self)
         guard let topAutofillUserScript = topAutofillUserScript else { return }
         let configuration = WKWebViewConfiguration()
         
