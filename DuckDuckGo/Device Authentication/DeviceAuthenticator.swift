@@ -28,6 +28,20 @@ extension NSNotification.Name {
 
 final class DeviceAuthenticator {
     
+    enum AuthenticationReason {
+        case autofill
+        case changeLoginsSettings
+        case unlockLogins
+        
+        var localizedDescription: String {
+            switch self {
+            case .autofill: return UserText.pmAutoLockPromptAutofill
+            case .changeLoginsSettings: return UserText.pmAutoLockPromptChangeLoginsSettings
+            case .unlockLogins: return UserText.pmAutoLockPromptUnlockLogins
+            }
+        }
+    }
+    
     private enum Constants {
         static let intervalBetweenIdleChecks: TimeInterval = 1
     }
@@ -114,7 +128,7 @@ final class DeviceAuthenticator {
         return deviceIsLocked
     }
 
-    func authenticateUser(result: @escaping (Bool) -> Void) {
+    func authenticateUser(reason: AuthenticationReason, result: @escaping (Bool) -> Void) {
         guard requiresAuthentication else {
             result(true)
             return
@@ -124,7 +138,7 @@ final class DeviceAuthenticator {
         
         isAuthenticating = true
 
-        authenticationService.authenticateDevice(reason: UserText.pmAutoLockPromptUnlockLogins) { authenticated in
+        authenticationService.authenticateDevice(reason: reason.localizedDescription) { authenticated in
             os_log("Completed authenticating, with result: %{bool}d", log: .autoLock, authenticated)
             
             self.isAuthenticating = false
@@ -139,9 +153,9 @@ final class DeviceAuthenticator {
         }
     }
     
-    func authenticateUser() async -> Bool {
+    func authenticateUser(reason: AuthenticationReason) async -> Bool {
         await withCheckedContinuation { continuation in
-            authenticateUser { result in
+            authenticateUser(reason: reason) { result in
                 continuation.resume(returning: result)
             }
         }

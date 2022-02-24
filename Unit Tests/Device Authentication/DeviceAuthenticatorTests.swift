@@ -48,7 +48,7 @@ class DeviceAuthenticatorTests: XCTestCase {
         preferences.shouldAutoLockLogins = true
         
         let deviceAuthenticator = DeviceAuthenticator(authenticationService: authenticationService, loginsPreferences: preferences)
-        let authenticated = await deviceAuthenticator.authenticateUser()
+        let authenticated = await deviceAuthenticator.authenticateUser(reason: .unlockLogins)
         
         XCTAssertTrue(authenticated)
         XCTAssertFalse(deviceAuthenticator.requiresAuthentication)
@@ -60,7 +60,7 @@ class DeviceAuthenticatorTests: XCTestCase {
         preferences.shouldAutoLockLogins = true
         
         let deviceAuthenticator = DeviceAuthenticator(authenticationService: authenticationService, loginsPreferences: preferences)
-        let authenticated = await deviceAuthenticator.authenticateUser()
+        let authenticated = await deviceAuthenticator.authenticateUser(reason: .unlockLogins)
         
         XCTAssertFalse(authenticated)
         XCTAssertTrue(deviceAuthenticator.requiresAuthentication)
@@ -72,13 +72,13 @@ class DeviceAuthenticatorTests: XCTestCase {
         preferences.shouldAutoLockLogins = true
         
         let deviceAuthenticator = DeviceAuthenticator(authenticationService: authenticationService, loginsPreferences: preferences)
-        let authenticated = await deviceAuthenticator.authenticateUser()
+        let authenticated = await deviceAuthenticator.authenticateUser(reason: .unlockLogins)
         
         XCTAssertTrue(authenticated)
         XCTAssertFalse(deviceAuthenticator.requiresAuthentication)
         XCTAssertEqual(authenticationService.authenticationAttempts, 1)
         
-        let authenticatedAgain = await deviceAuthenticator.authenticateUser()
+        let authenticatedAgain = await deviceAuthenticator.authenticateUser(reason: .unlockLogins)
         
         XCTAssertTrue(authenticatedAgain)
         XCTAssertFalse(deviceAuthenticator.requiresAuthentication)
@@ -107,7 +107,7 @@ class DeviceAuthenticatorTests: XCTestCase {
                                                       authenticationService: authenticationService,
                                                       loginsPreferences: preferences)
 
-        _ = await deviceAuthenticator.authenticateUser()
+        _ = await deviceAuthenticator.authenticateUser(reason: .unlockLogins)
         
         XCTAssertFalse(deviceAuthenticator.requiresAuthentication)
         
@@ -133,7 +133,7 @@ class DeviceAuthenticatorTests: XCTestCase {
                                                       authenticationService: authenticationService,
                                                       loginsPreferences: preferences)
 
-        _ = await deviceAuthenticator.authenticateUser()
+        _ = await deviceAuthenticator.authenticateUser(reason: .unlockLogins)
         
         XCTAssertFalse(deviceAuthenticator.requiresAuthentication)
         

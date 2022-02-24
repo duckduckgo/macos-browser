@@ -693,7 +693,7 @@ extension Tab: SecureVaultManagerDelegate {
     }
     
     func secureVaultManager(_: SecureVaultManager, didRequestAuthenticationWithCompletionHandler handler: @escaping (Bool) -> Void) {
-        DeviceAuthenticator.shared.authenticateUser { authenticated in
+        DeviceAuthenticator.shared.authenticateUser(reason: .autofill) { authenticated in
             handler(authenticated)
         }
     }

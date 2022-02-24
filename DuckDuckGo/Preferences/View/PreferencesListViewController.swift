@@ -243,7 +243,7 @@ extension PreferencesListViewController: LoginsPreferencesTableCellViewDelegate 
                                         setShouldAutoLockLogins: Bool,
                                         autoLockThreshold: LoginsPreferences.AutoLockThreshold) {
 
-        DeviceAuthenticator.shared.authenticateUser { authenticated in
+        DeviceAuthenticator.shared.authenticateUser(reason: .changeLoginsSettings) { authenticated in
             var preferences = LoginsPreferences()
 
             if authenticated {

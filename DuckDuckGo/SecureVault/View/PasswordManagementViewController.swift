@@ -218,7 +218,7 @@ final class PasswordManagementViewController: NSViewController {
         
         toggleLockScreen(hidden: !authenticator.requiresAuthentication)
         
-        authenticator.authenticateUser { authorized in
+        authenticator.authenticateUser(reason: .unlockLogins) { authorized in
             self.toggleLockScreen(hidden: authorized)
         }
     }
