@@ -24,7 +24,7 @@ extension NSNotification.Name {
 
 }
 
-struct LoginsPreferences {
+final class LoginsPreferences {
 
     private enum Keys {
         static let autoLockLoginsThreshold = "preferences.logins.auto-lock-threshold"
@@ -98,10 +98,17 @@ struct LoginsPreferences {
         }
     }
     
-    private let statisticsStore: StatisticsStore
+    private var statisticsStore: StatisticsStore {
+        return injectedDependencyStore ?? defaultDependencyStore
+    }
 
-    init(statisticsStore: StatisticsStore = LocalStatisticsStore()) {
-        self.statisticsStore = statisticsStore
+    private let injectedDependencyStore: StatisticsStore?
+    private lazy var defaultDependencyStore: StatisticsStore = {
+        return LocalStatisticsStore()
+    }()
+
+    init(statisticsStore: StatisticsStore? = nil) {
+        self.injectedDependencyStore = statisticsStore
     }
 
 }
