@@ -30,8 +30,10 @@ struct RootView: View {
                 Group {
                     ScrollView {
                         VStack(spacing: 0) {
+
                             ProtectionSummary()
                                 .padding(.bottom, max(48, geometry.size.height * 0.29))
+                                .padding(.top, 8)
 
                             HStack {
                                 Spacer()
