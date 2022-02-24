@@ -23,7 +23,7 @@ final class BookmarkOutlineViewCell: NSTableCellView {
     static let identifier = NSUserInterfaceItemIdentifier("BookmarkOutlineViewCell")
     static let nib = NSNib(nibNamed: "BookmarkOutlineViewCell", bundle: Bundle.main)
 
-    private static let defaultBookmarkFavicon = NSImage(named: "Web")
+    private static let defaultBookmarkFavicon = NSImage(named: "BookmarkDefaultFavicon")
 
     @IBOutlet var faviconImageView: NSImageView! {
         didSet {

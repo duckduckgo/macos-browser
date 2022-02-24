@@ -50,9 +50,9 @@ struct BookmarkList {
                 favoriteKeysOrdered.append(bookmark.url)
             }
         }
-
-        self.allBookmarkURLsOrdered = keysOrdered
+        
         self.favoriteBookmarkURLsOrdered = favoriteKeysOrdered
+        self.allBookmarkURLsOrdered = keysOrdered
         self.itemsDict = itemsDict
         self.topLevelEntities = topLevelEntities
     }

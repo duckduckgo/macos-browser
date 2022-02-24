@@ -82,7 +82,7 @@
                 "replaceSettings": {
                     "type": "dialog",
                     "buttonText": "Unblock Content",
-                    "infoTitle": "DuckDuckGo blocked this Facebook content",
+                    "infoTitle": "DuckDuckGo blocked this content to prevent Facebook from tracking you",
                     "infoText": "We blocked Facebook from tracking you when the page loaded. If you unblock this content, Facebook will know your activity.",
                     "simpleInfoText": "We blocked Facebook from tracking you when the page loaded. If you unblock this content, Facebook will know your activity."
                 },
@@ -97,7 +97,7 @@
                 "replaceSettings": {
                     "type": "dialog",
                     "buttonText": "Unblock Content",
-                    "infoTitle": "DuckDuckGo blocked this Facebook content",
+                    "infoTitle": "DuckDuckGo blocked this content to prevent Facebook from tracking you",
                     "infoText": "We blocked Facebook from tracking you when the page loaded. If you unblock this content, Facebook will know your activity.",
                     "simpleInfoText": "We blocked Facebook from tracking you when the page loaded. If you unblock this content, Facebook will know your activity."
                 },
@@ -139,7 +139,7 @@
                 "replaceSettings": {
                     "type": "dialog",
                     "buttonText": "Unblock Comment",
-                    "infoTitle": "DuckDuckGo blocked this Facebook comment",
+                    "infoTitle": "DuckDuckGo blocked this comment to prevent Facebook from tracking you",
                     "infoText": "We blocked Facebook from tracking you when the page loaded. If you unblock this content, Facebook will know your activity.",
                     "simpleInfoText": "We blocked Facebook from tracking you when the page loaded. If you unblock this content, Facebook will know your activity."
                 },
@@ -155,7 +155,7 @@
                 "replaceSettings": {
                     "type": "dialog",
                     "buttonText": "Unblock Comments",
-                    "infoTitle": "DuckDuckGo blocked these Facebook comments",
+                    "infoTitle": "DuckDuckGo blocked these comments to prevent Facebook from tracking you",
                     "infoText": "We blocked Facebook from tracking you when the page loaded. If you unblock this content, Facebook will know your activity.",
                     "simpleInfoText": "We blocked Facebook from tracking you when the page loaded. If you unblock this content, Facebook will know your activity."
                 },
@@ -183,7 +183,7 @@
                 "replaceSettings": {
                     "type": "dialog",
                     "buttonText": "Unblock Comment",
-                    "infoTitle": "DuckDuckGo blocked this Facebook comment",
+                    "infoTitle": "DuckDuckGo blocked this comment to prevent Facebook from tracking you",
                     "infoText": "We blocked Facebook from tracking you when the page loaded. If you unblock this content, Facebook will know your activity.",
                     "simpleInfoText": "We blocked Facebook from tracking you when the page loaded. If you unblock this content, Facebook will know your activity."
                 },
@@ -218,7 +218,7 @@
                 "replaceSettings": {
                     "type": "dialog",
                     "buttonText": "Unblock Post",
-                    "infoTitle": "DuckDuckGo blocked this Facebook post",
+                    "infoTitle": "DuckDuckGo blocked this post to prevent Facebook from tracking you",
                     "infoText": "We blocked Facebook from tracking you when the page loaded. If you unblock this content, Facebook will know your activity.",
                     "simpleInfoText": "We blocked Facebook from tracking you when the page loaded. If you unblock this content, Facebook will know your activity."
                 },
@@ -233,7 +233,7 @@
                 "replaceSettings": {
                     "type": "dialog",
                     "buttonText": "Unblock Post",
-                    "infoTitle": "DuckDuckGo blocked this Facebook post",
+                    "infoTitle": "DuckDuckGo blocked this post to prevent Facebook from tracking you",
                     "infoText": "We blocked Facebook from tracking you when the page loaded. If you unblock this content, Facebook will know your activity.",
                     "simpleInfoText": "We blocked Facebook from tracking you when the page loaded. If you unblock this content, Facebook will know your activity."
                 },
@@ -270,7 +270,7 @@
                 "replaceSettings": {
                     "type": "dialog",
                     "buttonText": "Unblock Video",
-                    "infoTitle": "DuckDuckGo blocked this Facebook video",
+                    "infoTitle": "DuckDuckGo blocked this video to prevent Facebook from tracking you",
                     "infoText": "We blocked Facebook from tracking you when the page loaded. If you unblock this content, Facebook will know your activity.",
                     "simpleInfoText": "We blocked Facebook from tracking you when the page loaded. If you unblock this content, Facebook will know your activity."
                 },
@@ -285,7 +285,7 @@
                 "replaceSettings": {
                     "type": "dialog",
                     "buttonText": "Unblock Video",
-                    "infoTitle": "DuckDuckGo blocked this Facebook video",
+                    "infoTitle": "DuckDuckGo blocked this video to prevent Facebook from tracking you",
                     "infoText": "We blocked Facebook from tracking you when the page loaded. If you unblock this content, Facebook will know your activity.",
                     "simpleInfoText": "We blocked Facebook from tracking you when the page loaded. If you unblock this content, Facebook will know your activity."
                 },
@@ -322,7 +322,7 @@
                 "replaceSettings": {
                     "type": "dialog",
                     "buttonText": "Unblock Content",
-                    "infoTitle": "DuckDuckGo blocked this Facebook content",
+                    "infoTitle": "DuckDuckGo blocked this content to prevent Facebook from tracking you",
                     "infoText": "We blocked Facebook from tracking you when the page loaded. If you unblock this content, Facebook will know your activity.",
                     "simpleInfoText": "We blocked Facebook from tracking you when the page loaded. If you unblock this content, Facebook will know your activity."
                 },
@@ -337,7 +337,7 @@
                 "replaceSettings": {
                     "type": "dialog",
                     "buttonText": "Unblock Content",
-                    "infoTitle": "DuckDuckGo blocked this Facebook content",
+                    "infoTitle": "DuckDuckGo blocked this content to prevent Facebook from tracking you",
                     "infoText": "We blocked Facebook from tracking you when the page loaded. If you unblock this content, Facebook will know your activity.",
                     "simpleInfoText": "We blocked Facebook from tracking you when the page loaded. If you unblock this content, Facebook will know your activity."
                 },

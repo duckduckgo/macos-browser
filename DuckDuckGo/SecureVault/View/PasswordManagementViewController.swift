@@ -49,15 +49,33 @@ final class PasswordManagementViewController: NSViewController {
     @IBOutlet var searchField: NSTextField!
     @IBOutlet var divider: NSView!
     @IBOutlet var emptyState: NSView!
+    @IBOutlet var emptyStateImageView: NSImageView!
     @IBOutlet var emptyStateTitle: NSTextField!
     @IBOutlet var emptyStateMessage: NSTextField!
+    @IBOutlet var emptyStateButton: NSButton!
 
+    var emptyStateCancellable: AnyCancellable?
     var editingCancellable: AnyCancellable?
 
     var domain: String?
-    var isDirty = false
+    var isEditing = false
+    var isDirty = false {
+        didSet {
+            listModel?.canChangeCategory = !isDirty
+        }
+    }
 
-    var listModel: PasswordManagementItemListModel?
+    var listModel: PasswordManagementItemListModel? {
+        didSet {
+            emptyStateCancellable?.cancel()
+            emptyStateCancellable = nil
+
+            emptyStateCancellable = listModel?.$emptyState.dropFirst().sink(receiveValue: { [weak self] newEmptyState in
+                self?.updateEmptyState(state: newEmptyState)
+            })
+        }
+    }
+
     var listView: NSView?
 
     var itemModel: PasswordManagementItemModel? {
@@ -66,7 +84,13 @@ final class PasswordManagementViewController: NSViewController {
             editingCancellable = nil
 
             editingCancellable = itemModel?.isEditingPublisher.sink(receiveValue: { [weak self] isEditing in
-                self?.divider.isHidden = isEditing
+                guard let self = self else { return }
+                
+                self.isEditing = isEditing
+                self.divider.isHidden = isEditing
+                self.updateEmptyState(state: self.listModel?.emptyState)
+                
+                self.searchField.isEditable = !isEditing
             })
         }
     }
@@ -115,7 +139,8 @@ final class PasswordManagementViewController: NSViewController {
                                  selectItemMatchingDomain: String? = nil,
                                  clearWhenNoMatches: Bool = false,
                                  completion: (() -> Void)? = nil) {
-        fetchSecureVaultItems { [weak self] items in
+        let category = SecureVaultSorting.Category.allItems
+        fetchSecureVaultItems(category: category) { [weak self] items in
             self?.listModel?.update(items: items)
             self?.searchField.stringValue = text
             self?.updateFilter()
@@ -140,10 +165,20 @@ final class PasswordManagementViewController: NSViewController {
     }
 
     func clear() {
-        self.listModel?.update(items: [])
-        self.listModel?.filter = ""
-        self.listModel?.clearSelection()
+        self.listModel?.clear()
         self.itemModel?.clearSecureVaultModel()
+    }
+    
+    func select(category: SecureVaultSorting.Category?) {
+        guard let category = category else {
+            return
+        }
+
+        if let descriptor = self.listModel?.sortDescriptor {
+            self.listModel?.sortDescriptor = .init(category: category, parameter: descriptor.parameter, order: descriptor.order)
+        } else {
+            self.listModel?.sortDescriptor = .init(category: category, parameter: .title, order: .ascending)
+        }
     }
 
     private func syncModelsOnCredentials(_ credentials: SecureVaultModels.WebsiteCredentials, select: Bool = false) {
@@ -529,11 +564,18 @@ final class PasswordManagementViewController: NSViewController {
     private func createNewSecureVaultItemMenu() -> NSMenu {
         let menu = NSMenu()
 
+        func createMenuItem(title: String, action: Selector, imageName: String) -> NSMenuItem {
+            let item = NSMenuItem(title: title, action: action, keyEquivalent: "")
+            item.image = NSImage(named: imageName)
+            
+            return item
+        }
+
         menu.items = [
-            NSMenuItem(title: UserText.pmNewCard, action: #selector(createNewCreditCard), keyEquivalent: ""),
-            NSMenuItem(title: UserText.pmNewLogin, action: #selector(createNewLogin), keyEquivalent: ""),
-            NSMenuItem(title: UserText.pmNewIdentity, action: #selector(createNewIdentity), keyEquivalent: ""),
-            NSMenuItem(title: UserText.pmNewNote, action: #selector(createNewNote), keyEquivalent: "")
+            createMenuItem(title: UserText.pmNewCard, action: #selector(createNewCreditCard), imageName: "CreditCardGlyph"),
+            createMenuItem(title: UserText.pmNewLogin, action: #selector(createNewLogin), imageName: "LoginGlyph"),
+            createMenuItem(title: UserText.pmNewIdentity, action: #selector(createNewIdentity), imageName: "IdentityGlyph"),
+            createMenuItem(title: UserText.pmNewNote, action: #selector(createNewNote), imageName: "NoteGlyph")
         ]
 
         return menu
@@ -544,17 +586,34 @@ final class PasswordManagementViewController: NSViewController {
         listModel?.filter = text
     }
 
-    private func fetchSecureVaultItems(completion: @escaping ([SecureVaultItem]) -> Void) {
+    private func fetchSecureVaultItems(category: SecureVaultSorting.Category = .allItems, completion: @escaping ([SecureVaultItem]) -> Void) {
         DispatchQueue.global(qos: .userInitiated).async {
-            let accounts = (try? self.secureVault?.accounts()) ?? []
-            let cards = (try? self.secureVault?.creditCards()) ?? []
-            let notes = (try? self.secureVault?.notes()) ?? []
-            let identities = (try? self.secureVault?.identities()) ?? []
+            var items: [SecureVaultItem]
+            
+            switch category {
+            case .allItems:
+                let accounts = (try? self.secureVault?.accounts()) ?? []
+                let cards = (try? self.secureVault?.creditCards()) ?? []
+                let notes = (try? self.secureVault?.notes()) ?? []
+                let identities = (try? self.secureVault?.identities()) ?? []
 
-            let items = accounts.map(SecureVaultItem.account) +
+                items = accounts.map(SecureVaultItem.account) +
                         cards.map(SecureVaultItem.card) +
                         notes.map(SecureVaultItem.note) +
                         identities.map(SecureVaultItem.identity)
+            case .logins:
+                let accounts = (try? self.secureVault?.accounts()) ?? []
+                items = accounts.map(SecureVaultItem.account)
+            case .identities:
+                let identities = (try? self.secureVault?.identities()) ?? []
+                items = identities.map(SecureVaultItem.identity)
+            case .cards:
+                let cards = (try? self.secureVault?.creditCards()) ?? []
+                items = cards.map(SecureVaultItem.card)
+            case .notes:
+                let notes = (try? self.secureVault?.notes()) ?? []
+                items = notes.map(SecureVaultItem.note)
+            }
 
             DispatchQueue.main.async {
                 self.emptyState.isHidden = !items.isEmpty
@@ -697,6 +756,54 @@ final class PasswordManagementViewController: NSViewController {
         } else {
             createNew()
         }
+    }
+    
+    // MARK: - Empty State
+    
+    private func updateEmptyState(state: PasswordManagementItemListModel.EmptyState?) {
+        guard let listModel = listModel else {
+            return
+        }
+        
+        if isEditing || state == nil || state == PasswordManagementItemListModel.EmptyState.none {
+            hideEmptyState()
+        } else {
+            showEmptyState(category: listModel.sortDescriptor.category)
+        }
+    }
+    
+    private func showEmptyState(category: SecureVaultSorting.Category) {
+        switch category {
+        case .allItems: showDefaultEmptyState()
+        case .logins: showEmptyState(imageName: "LoginsEmpty", title: UserText.pmEmptyStateLoginsTitle)
+        case .identities: showEmptyState(imageName: "IdentitiesEmpty", title: UserText.pmEmptyStateIdentitiesTitle)
+        case .cards: showEmptyState(imageName: "CreditCardsEmpty", title: UserText.pmEmptyStateCardsTitle)
+        case .notes: showEmptyState(imageName: "NotesEmpty", title: UserText.pmEmptyStateNotesTitle)
+        }
+    }
+    
+    private func hideEmptyState() {
+        emptyState.isHidden = true
+    }
+
+    private func showDefaultEmptyState() {
+        emptyState.isHidden = false
+        emptyStateMessage.isHidden = false
+        emptyStateButton.isHidden = false
+        
+        emptyStateImageView.image = NSImage(named: "LoginsEmpty")
+
+        emptyStateTitle.attributedStringValue = NSAttributedString.make(UserText.pmEmptyStateDefaultTitle, lineHeight: 1.14, kern: -0.23)
+        emptyStateMessage.attributedStringValue = NSAttributedString.make(UserText.pmEmptyStateDefaultDescription, lineHeight: 1.05, kern: -0.08)
+    }
+    
+    private func showEmptyState(imageName: String, title: String) {
+        emptyState.isHidden = false
+        
+        emptyStateImageView.image = NSImage(named: imageName)
+        emptyStateTitle.attributedStringValue = NSAttributedString.make(title, lineHeight: 1.14, kern: -0.23)
+        emptyStateMessage.isHidden = true
+        emptyStateButton.isHidden = true
     }
 
 }

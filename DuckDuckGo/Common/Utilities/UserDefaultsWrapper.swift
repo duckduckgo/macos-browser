@@ -48,8 +48,6 @@ public struct UserDefaultsWrapper<T> {
 
         case saveAsPreferredFileType = "saveAs.selected.filetype"
 
-        case passwordManagerDoNotPromptDomains = "com.duckduckgo.passwordmanager.do-not-prompt-domains"
-
         case lastCrashReportCheckDate = "last.crash.report.check.date"
 
         case fireInfoPresentedOnce = "fire.info.presented.once"
@@ -66,6 +64,10 @@ public struct UserDefaultsWrapper<T> {
         case legacyStatisticsStoreDataCleared = "statistics.appretentionatb.legacy-data-cleared"
 
         case onboardingFinished = "onboarding.finished"
+    }
+    
+    enum RemovedKeys: String, CaseIterable {
+        case passwordManagerDoNotPromptDomains = "com.duckduckgo.passwordmanager.do-not-prompt-domains"
     }
 
     private let key: Key
@@ -102,6 +104,12 @@ public struct UserDefaultsWrapper<T> {
 
     static func clearAll() {
          Key.allCases.forEach { key in
+             UserDefaults.standard.removeObject(forKey: key.rawValue)
+         }
+    }
+    
+    static func clearRemovedKeys() {
+         RemovedKeys.allCases.forEach { key in
              UserDefaults.standard.removeObject(forKey: key.rawValue)
          }
     }
