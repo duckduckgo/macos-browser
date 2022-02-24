@@ -26,10 +26,6 @@ extension NSNotification.Name {
 
 final class LoginsPreferences {
 
-    private enum Keys {
-        static let autoLockLoginsThreshold = "preferences.logins.auto-lock-threshold"
-    }
-
     enum AutoLockThreshold: String, CaseIterable {
         case oneMinute
         case fiveMinutes
@@ -39,11 +35,11 @@ final class LoginsPreferences {
 
         var title: String {
             switch self {
-            case .oneMinute: return "1 minute"
-            case .fiveMinutes: return "5 minutes"
-            case .fifteenMinutes: return "15 minutes"
-            case .thirtyMinutes: return "30 minutes"
-            case .oneHour: return "1 hour"
+            case .oneMinute: return UserText.autoLockThreshold1Minute
+            case .fiveMinutes: return UserText.autoLockThreshold5Minutes
+            case .fifteenMinutes: return UserText.autoLockThreshold15Minutes
+            case .thirtyMinutes: return UserText.autoLockThreshold30Minutes
+            case .oneHour: return UserText.autoLockThreshold1Hour
             }
         }
         
@@ -116,7 +112,7 @@ final class LoginsPreferences {
 extension LoginsPreferences: PreferenceSection {
     
     var displayName: String {
-        return "Logins+"
+        return UserText.loginsPlus
     }
 
     var preferenceIcon: NSImage {
