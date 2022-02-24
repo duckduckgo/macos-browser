@@ -125,8 +125,6 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         crashReporter.checkForNewReports()
 #endif
         urlEventHandler.applicationDidFinishLaunching()
-        
-        DeviceAuthenticator.shared.beginCheckingIdleTimer()
 
         UserDefaultsWrapper<Any>.clearRemovedKeys()
     }
