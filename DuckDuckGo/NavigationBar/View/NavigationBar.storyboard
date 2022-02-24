@@ -559,7 +559,7 @@
                                                     <constraint firstAttribute="width" secondItem="psi-hX-Kh9" secondAttribute="height" multiplier="1:1" id="6fs-gf-saq"/>
                                                     <constraint firstAttribute="height" constant="16" id="OCF-kY-RT8"/>
                                                 </constraints>
-                                                <buttonCell key="cell" type="square" bezelStyle="shadowlessSquare" image="HomepageLogo" imagePosition="only" alignment="center" imageScaling="axesIndependently" inset="2" id="NBl-r8-f28">
+                                                <buttonCell key="cell" type="square" bezelStyle="shadowlessSquare" image="Search" imagePosition="only" alignment="center" imageScaling="proportionallyDown" inset="2" id="NBl-r8-f28">
                                                     <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
                                                     <font key="font" metaFont="system"/>
                                                 </buttonCell>
@@ -737,7 +737,6 @@
                         <outlet property="clearButton" destination="kRc-0m-oqe" id="2sv-EP-8MW"/>
                         <outlet property="geolocationButton" destination="CN6-fJ-o2J" id="FP7-Od-wu8"/>
                         <outlet property="imageButton" destination="psi-hX-Kh9" id="gEt-yl-q9m"/>
-                        <outlet property="imageButtonSize" destination="OCF-kY-RT8" id="H9S-PX-m7l"/>
                         <outlet property="imageButtonWrapper" destination="3Iv-YW-zn2" id="rzK-lJ-auZ"/>
                         <outlet property="microphoneButton" destination="uao-nC-0co" id="UHu-oA-rTl"/>
                         <outlet property="permissionButtons" destination="8UU-A8-1nD" id="gYJ-VW-MEG"/>
@@ -769,6 +768,7 @@
         <image name="PasswordManagement" width="16" height="16"/>
         <image name="PopupBlocked" width="16" height="16"/>
         <image name="Refresh" width="16" height="16"/>
+        <image name="Search" width="14" height="14"/>
         <image name="Settings" width="16" height="16"/>
         <namedColor name="AddressBarBackgroundColor">
             <color red="1" green="1" blue="1" alpha="1" colorSpace="custom" customColorSpace="displayP3"/>

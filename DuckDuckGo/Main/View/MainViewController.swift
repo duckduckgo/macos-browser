@@ -76,9 +76,6 @@ final class MainViewController: NSViewController {
         } else {
             navigationBarContainerView.wantsLayer = true
             navigationBarContainerView.layer?.masksToBounds = false
-//
-//            navigationBarViewController.view.wantsLayer = true
-//            navigationBarViewController.view.layer?.masksToBounds = false
 
             resizeNavigationBarForHomePage(tabCollectionViewModel.selectedTabViewModel?.tab.content == .homepage, animated: false)
         }
@@ -166,6 +163,7 @@ final class MainViewController: NSViewController {
 
     private func subscribeToSelectedTabViewModel() {
         selectedTabViewModelCancellable = tabCollectionViewModel.$selectedTabViewModel.receive(on: DispatchQueue.main).sink { [weak self] _ in
+            print("***", #function)
             self?.navigationalCancellables = []
             self?.subscribeToCanGoBackForward()
             self?.subscribeToFindInPage()
@@ -175,20 +173,29 @@ final class MainViewController: NSViewController {
     }
 
     private func resizeNavigationBarForHomePage(_ homePage: Bool, animated: Bool) {
-        let performAnim = animated
-
-        let height = performAnim ? addressBarHeightConstraint.animator() : addressBarHeightConstraint
+        let height = animated ? addressBarHeightConstraint.animator() : addressBarHeightConstraint
         height?.constant = homePage ? 62 : 48
 
-        let divider = performAnim ? self.divider.animator() : self.divider
+        let divider = animated ? self.divider.animator() : self.divider
         divider?.alphaValue = homePage ? 0 : 1.0
 
-        navigationBarViewController.resizeAddressBarForHomePage(homePage, animated: performAnim)
+        navigationBarViewController.resizeAddressBarForHomePage(homePage, animated: animated)
     }
 
     private func subscribeToTabContent() {
+        print("***", #function)
+        var sameTab = false
         tabCollectionViewModel.selectedTabViewModel?.tab.$content.receive(on: DispatchQueue.main).sink(receiveValue: { [weak self] content in
-            self?.resizeNavigationBarForHomePage(content == .homepage, animated: true)
+            let showUrl: Bool
+            if case .url = content {
+                showUrl = true
+            } else {
+                showUrl = false
+            }
+
+            self?.resizeNavigationBarForHomePage(content == .homepage, animated: showUrl && sameTab)
+
+            sameTab = true
         }).store(in: &self.navigationalCancellables)
     }
 

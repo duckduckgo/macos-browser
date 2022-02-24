@@ -353,24 +353,21 @@ final class NavigationBarViewController: NSViewController {
         selectedTabViewModelCancellable = tabCollectionViewModel.$selectedTabViewModel.receive(on: DispatchQueue.main).sink { [weak self] _ in
             self?.subscribeToNavigationActionFlags()
             self?.subscribeToCredentialsToSave()
-            self?.subscribeToTabUrl()
+            self?.subscribeToTabContent()
         }
     }
 
-    private func subscribeToTabUrl() {
+    private func subscribeToTabContent() {
         urlCancellable = tabCollectionViewModel.selectedTabViewModel?.tab.$content
             .receive(on: DispatchQueue.main)
-            .sink(receiveValue: { [weak self] content in
+            .sink(receiveValue: { [weak self] _ in
                 self?.updatePasswordManagementButton()
-                if content == .homepage {
-                    self?.addressBarViewController?.addressBarTextField.becomeFirstResponder()
-                } else {
-                    self?.addressBarViewController?.addressBarTextField.resignFirstResponder()
-                }
             })
     }
 
     func resizeAddressBarForHomePage(_ homePage: Bool, animated: Bool) {
+        print("***", #function, animated)
+        
         let top = animated ? addressBarTopConstraint.animator() : addressBarTopConstraint
         top?.constant = homePage ? 16 : 6
 
