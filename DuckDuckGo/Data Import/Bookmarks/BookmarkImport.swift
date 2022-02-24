@@ -19,7 +19,7 @@
 import Foundation
 
 enum BookmarkImportSource {
-    case chrome
+    case chromium
     case firefox
     case safari
 }
