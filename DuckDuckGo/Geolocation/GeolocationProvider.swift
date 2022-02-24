@@ -110,7 +110,7 @@ final class GeolocationProvider: NSObject, GeolocationProviderProtocol {
         super.init()
 
         geolocationProviderCallbacks = geolocationManager.setProvider(self)
-        appIsActiveCancellable = appIsActivePublisher.weakAssign(to: \.isAppActive, on: self)
+        appIsActiveCancellable = appIsActivePublisher.assign(to: \.isAppActive, onWeaklyHeld: self)
     }
 
     convenience init?(processPool: WKProcessPool,
