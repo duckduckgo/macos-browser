@@ -35,6 +35,7 @@ final class FeedbackSender {
         APIRequest.request(url: Self.feedbackURL, method: .post, parameters: parameters) { _, error in
             if let error = error {
                 os_log("FeedbackSender: Failed to submit feedback %s", type: .error, error.localizedDescription)
+                Pixel.fire(.debug(event: .feedbackReportingFailed, error: error))
             }
         }
     }

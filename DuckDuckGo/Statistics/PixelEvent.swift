@@ -198,6 +198,8 @@ extension Pixel {
 
             case secureVaultInitError = "secure_vault_init_error"
             case secureVaultError = "secure_vault_error"
+
+            case feedbackReportingFailed = "feedback_reporting_failed"
         }
 
     }
