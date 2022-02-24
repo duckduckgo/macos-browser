@@ -22,19 +22,10 @@ import XCTest
 
 class DeviceAuthenticatorTests: XCTestCase {
     
-    private let groupName = "device-authenticator"
-    var defaults: UserDefaults!
-    
-    override func setUp() {
-        super.setUp()
-        
-        defaults = UserDefaults(suiteName: groupName)!
-        defaults.removePersistentDomain(forName: groupName)
-    }
-
     func testWhenAutoLockIsEnabled_AndDeviceIsLocked_ThenRequiresAuthenticationIsTrue() {
+        let mockStatisticsStore = MockStatisticsStore()
         let authenticationService = MockDeviceAuthenticatorService.alwaysAuthenticate
-        var preferences = LoginsPreferences(userDefaults: defaults)
+        var preferences = LoginsPreferences(statisticsStore: mockStatisticsStore)
         preferences.shouldAutoLockLogins = true
         
         let deviceAuthenticator = DeviceAuthenticator(authenticationService: authenticationService, loginsPreferences: preferences)
@@ -43,8 +34,9 @@ class DeviceAuthenticatorTests: XCTestCase {
     }
     
     func testWhenAutoLockIsEnabled_AndDeviceIsLocked_AndAuthenticationIsGranted_ThenRequiresAuthenticationIsFalse() async {
+        let mockStatisticsStore = MockStatisticsStore()
         let authenticationService = MockDeviceAuthenticatorService.alwaysAuthenticate
-        var preferences = LoginsPreferences(userDefaults: defaults)
+        var preferences = LoginsPreferences(statisticsStore: mockStatisticsStore)
         preferences.shouldAutoLockLogins = true
         
         let deviceAuthenticator = DeviceAuthenticator(authenticationService: authenticationService, loginsPreferences: preferences)
@@ -55,8 +47,9 @@ class DeviceAuthenticatorTests: XCTestCase {
     }
     
     func testWhenAutoLockIsEnabled_AndDeviceIsLocked_AndAuthenticationIsDenied_ThenRequiresAuthenticationIsFalse() async {
+        let mockStatisticsStore = MockStatisticsStore()
         let authenticationService = MockDeviceAuthenticatorService.neverAuthenticate
-        var preferences = LoginsPreferences(userDefaults: defaults)
+        var preferences = LoginsPreferences(statisticsStore: mockStatisticsStore)
         preferences.shouldAutoLockLogins = true
         
         let deviceAuthenticator = DeviceAuthenticator(authenticationService: authenticationService, loginsPreferences: preferences)
@@ -67,8 +60,9 @@ class DeviceAuthenticatorTests: XCTestCase {
     }
     
     func testWhenAutoLockIsEnabled_AndDeviceIsUnlocked_AndAuthenticationIsRequested_ThenAuthenticationSucceedsWithoutPrompting() async {
+        let mockStatisticsStore = MockStatisticsStore()
         let authenticationService = MockDeviceAuthenticatorService.alwaysAuthenticate
-        var preferences = LoginsPreferences(userDefaults: defaults)
+        var preferences = LoginsPreferences(statisticsStore: mockStatisticsStore)
         preferences.shouldAutoLockLogins = true
         
         let deviceAuthenticator = DeviceAuthenticator(authenticationService: authenticationService, loginsPreferences: preferences)
@@ -86,8 +80,9 @@ class DeviceAuthenticatorTests: XCTestCase {
     }
     
     func testWhenAutoLockIsDisabled_ThenRequiresAuthenticationIsFalse() {
+        let mockStatisticsStore = MockStatisticsStore()
         let authenticationService = MockDeviceAuthenticatorService.alwaysAuthenticate
-        var preferences = LoginsPreferences(userDefaults: defaults)
+        var preferences = LoginsPreferences(statisticsStore: mockStatisticsStore)
         preferences.shouldAutoLockLogins = false
         
         let deviceAuthenticator = DeviceAuthenticator(authenticationService: authenticationService, loginsPreferences: preferences)
@@ -96,9 +91,10 @@ class DeviceAuthenticatorTests: XCTestCase {
     }
     
     func testWhenAutoLockIsEnabled_AndDeviceIsUnlocked_AndDeviceIsIdleForLongerThanTheThreshold_ThenDeviceBecomesLocked() async {
+        let mockStatisticsStore = MockStatisticsStore()
         let idleStateProvider = MockIdleStateProvider(idleDuration: 60 * 20) // 20 minute idle duration, to be safe
         let authenticationService = MockDeviceAuthenticatorService.alwaysAuthenticate
-        var preferences = LoginsPreferences(userDefaults: defaults)
+        var preferences = LoginsPreferences(statisticsStore: mockStatisticsStore)
         
         preferences.shouldAutoLockLogins = true
         preferences.autoLockThreshold = .fifteenMinutes
@@ -122,9 +118,10 @@ class DeviceAuthenticatorTests: XCTestCase {
     }
     
     func testWhenAutoLockIsEnabled_AndDeviceIsUnlocked_AndDeviceIsIdleForLessThanTheThreshold_ThenDeviceDoesNotLock() async {
+        let mockStatisticsStore = MockStatisticsStore()
         let idleStateProvider = MockIdleStateProvider(idleDuration: 60)
         let authenticationService = MockDeviceAuthenticatorService.alwaysAuthenticate
-        var preferences = LoginsPreferences(userDefaults: defaults)
+        var preferences = LoginsPreferences(statisticsStore: mockStatisticsStore)
         
         preferences.shouldAutoLockLogins = true
         preferences.autoLockThreshold = .fifteenMinutes

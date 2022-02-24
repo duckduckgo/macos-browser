@@ -69,11 +69,16 @@ struct LoginsPreferences {
 
     }
     
-    // This needs to be put into secure storage, so that someone can't edit user defaults to remove auto-lock.
-    @UserDefaultsWrapper(key: .autoLockLoginsEnabled, defaultValue: true)
     public var shouldAutoLockLogins: Bool {
-        didSet {
-            if oldValue != shouldAutoLockLogins {
+        get {
+            return statisticsStore.autoLockEnabled
+        }
+
+        set {
+            let oldValue = statisticsStore.autoLockEnabled
+            statisticsStore.autoLockEnabled = newValue
+            
+            if oldValue != newValue {
                 NotificationCenter.default.post(name: .loginsAutoLockSettingsDidChange, object: nil)
             }
         }
@@ -81,8 +86,7 @@ struct LoginsPreferences {
     
     var autoLockThreshold: AutoLockThreshold {
         get {
-            if let thresholdName = userDefaults.string(forKey: Keys.autoLockLoginsThreshold),
-               let threshold = AutoLockThreshold(rawValue: thresholdName) {
+            if let rawValue = statisticsStore.autoLockThreshold, let threshold = AutoLockThreshold(rawValue: rawValue) {
                 return threshold
             } else {
                 return .fifteenMinutes
@@ -90,14 +94,14 @@ struct LoginsPreferences {
         }
 
         set {
-            userDefaults.setValue(newValue.rawValue, forKey: Keys.autoLockLoginsThreshold)
+            statisticsStore.autoLockThreshold = newValue.rawValue
         }
     }
     
-    private let userDefaults: UserDefaults
+    private let statisticsStore: StatisticsStore
 
-    init(userDefaults: UserDefaults = .standard) {
-        self.userDefaults = userDefaults
+    init(statisticsStore: StatisticsStore = LocalStatisticsStore()) {
+        self.statisticsStore = statisticsStore
     }
 
 }

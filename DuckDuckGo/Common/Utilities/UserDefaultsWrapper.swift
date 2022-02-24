@@ -44,7 +44,6 @@ public struct UserDefaultsWrapper<T> {
         case loginDetectionEnabled = "fireproofing.login-detection-enabled"
         case gpcEnabled = "preferences.gpc-enabled"
         case alwaysRequestDownloadLocationKey = "preferences.download-location.always-request"
-        case autoLockLoginsEnabled = "preferences.logins.auto-lock-enabled"
         case autoconsentEnabled = "preferences.autoconsent-enabled"
 
         case saveAsPreferredFileType = "saveAs.selected.filetype"
