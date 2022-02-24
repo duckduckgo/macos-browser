@@ -99,19 +99,14 @@ struct Favorite: View {
 
             ZStack(alignment: .center) {
 
-                // This is oversized and clipped to get the favicon's color as a blurred, tinted background
-                FaviconView(domain: bookmark.url.host ?? "", size: 72)
-                    .frame(width: 72, height: 72)
-                    .padding(9)
-                    .cornerRadius(8)
-                    .blur(radius: isHovering ? 30 : 50)
-
                 FaviconView(domain: bookmark.url.host ?? "")
                     .frame(width: 32, height: 32)
                     .padding(9)
 
             }
             .frame(width: 64, height: 64)
+            .background(RoundedRectangle(cornerRadius: 8).foregroundColor(isHovering ? Color("ButtonMouseOverColor") :
+                                                                            Color("HomeFavoritesBackgroundColor")))
             .cornerRadius(8)
             .clipped()
 
