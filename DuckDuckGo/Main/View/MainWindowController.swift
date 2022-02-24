@@ -92,7 +92,7 @@ final class MainWindowController: NSWindowController {
         trafficLightsAlphaCancellable = window?.standardWindowButton(.closeButton)?
             .publisher(for: \.alphaValue)
             .map { alphaValue in TabBarViewController.HorizontalSpace.leadingStackViewPadding.rawValue * alphaValue }
-            .weakAssign(to: \.constant, on: tabBarViewController.leadingStackViewLeadingConstraint)
+            .assign(to: \.constant, onWeaklyHeld: tabBarViewController.leadingStackViewLeadingConstraint)
     }
 
     private var shouldPreventUserInteractionCancellable: AnyCancellable?
