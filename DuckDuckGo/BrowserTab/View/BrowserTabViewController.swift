@@ -56,13 +56,6 @@ final class BrowserTabViewController: NSViewController {
     private var transientTabContentViewController: NSViewController?
 
     private var mouseDownMonitor: Any?
-    private var mouseUpMonitor: Any?
-    
-    override func mouseDown(with event: NSEvent) {
-        guard event.window === self.view.window else { return }
-        self.clickPoint = event.locationInWindow
-        tabViewModel?.tab.browserTabViewController(self, didClickAtPoint: event.locationInWindow)
-    }
     
     required init?(coder: NSCoder) {
         fatalError("BrowserTabViewController: Bad initializer")

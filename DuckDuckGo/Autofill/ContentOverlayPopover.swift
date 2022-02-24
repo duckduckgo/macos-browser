@@ -57,7 +57,7 @@ public final class ContentOverlayPopover {
     }
 }
 
-// AutofillOverlayDelegate
+// ChildOverlayAutofillUserScriptDelegate
 extension ContentOverlayPopover: ChildOverlayAutofillUserScriptDelegate {
     public var view: NSView {
         return viewController!.view
