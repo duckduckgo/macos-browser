@@ -86,6 +86,11 @@ final class HomepageViewController: NSViewController {
         host?.frame = self.view.frame
     }
 
+    override func mouseDown(with event: NSEvent) {
+        super.mouseDown(with: event)
+        view.makeMeFirstResponder()
+    }
+
     func refreshModels() {
         guard !AppDelegate.isRunningTests else { return }
         refreshFavoritesModel()
