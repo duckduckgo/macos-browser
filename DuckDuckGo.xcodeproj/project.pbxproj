@@ -200,7 +200,6 @@
 		4BB99D1126FE1A84001E4761 /* SafariBookmarksReaderTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4BB99D0E26FE1A84001E4761 /* SafariBookmarksReaderTests.swift */; };
 		4BB99D1326FE1A94001E4761 /* places.sqlite in Resources */ = {isa = PBXBuildFile; fileRef = 4BB99D1226FE1A94001E4761 /* places.sqlite */; };
 		4BBE0AA727B9B027003B37A8 /* PopUpButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4BBE0AA627B9B027003B37A8 /* PopUpButton.swift */; };
-		4BBE0ADA27BC8CDE003B37A8 /* PasswordManagementListSectionTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4BBE0AD927BC8CDE003B37A8 /* PasswordManagementListSectionTests.swift */; };
 		4BC68A702759AE490029A586 /* Waitlist.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 4BC68A6F2759AE490029A586 /* Waitlist.storyboard */; };
 		4BC68A722759B2140029A586 /* Waitlist.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4BC68A712759B2140029A586 /* Waitlist.swift */; };
 		4BE0DF06267819A1006337B7 /* NSStoryboardExtension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4BE0DF0426781961006337B7 /* NSStoryboardExtension.swift */; };
@@ -220,6 +219,7 @@
 		4BEF0E722766B11200AF7C58 /* MacWaitlistLockScreenViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4BEF0E712766B11200AF7C58 /* MacWaitlistLockScreenViewModel.swift */; };
 		4BF01C00272AE74C00884A61 /* CountryList.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4BE65482271FCD53008D1D63 /* CountryList.swift */; };
 		4BF4951826C08395000547B8 /* ThirdPartyBrowserTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4BF4951726C08395000547B8 /* ThirdPartyBrowserTests.swift */; };
+		4BF4EA5027C71F26004E57C4 /* PasswordManagementListSectionTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4BF4EA4F27C71F26004E57C4 /* PasswordManagementListSectionTests.swift */; };
 		7B4CE8E726F02135009134B1 /* TabBarTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7B4CE8E626F02134009134B1 /* TabBarTests.swift */; };
 		7BA4727D26F01BC400EAA165 /* CoreDataTestUtilities.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B9292C42667104B00AD2C21 /* CoreDataTestUtilities.swift */; };
 		8511E18425F82B34002F516B /* 01_Fire_really_small.json in Resources */ = {isa = PBXBuildFile; fileRef = 8511E18325F82B34002F516B /* 01_Fire_really_small.json */; };
@@ -903,7 +903,6 @@
 		4BB99D0E26FE1A84001E4761 /* SafariBookmarksReaderTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SafariBookmarksReaderTests.swift; sourceTree = "<group>"; };
 		4BB99D1226FE1A94001E4761 /* places.sqlite */ = {isa = PBXFileReference; lastKnownFileType = file; path = places.sqlite; sourceTree = "<group>"; };
 		4BBE0AA627B9B027003B37A8 /* PopUpButton.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PopUpButton.swift; sourceTree = "<group>"; };
-		4BBE0AD927BC8CDE003B37A8 /* PasswordManagementListSectionTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PasswordManagementListSectionTests.swift; sourceTree = "<group>"; };
 		4BC68A6F2759AE490029A586 /* Waitlist.storyboard */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; path = Waitlist.storyboard; sourceTree = "<group>"; };
 		4BC68A712759B2140029A586 /* Waitlist.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Waitlist.swift; sourceTree = "<group>"; };
 		4BE0DF0426781961006337B7 /* NSStoryboardExtension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NSStoryboardExtension.swift; sourceTree = "<group>"; };
@@ -923,6 +922,7 @@
 		4BEF0E6B276676AB00AF7C58 /* MacWaitlistStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MacWaitlistStore.swift; sourceTree = "<group>"; };
 		4BEF0E712766B11200AF7C58 /* MacWaitlistLockScreenViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MacWaitlistLockScreenViewModel.swift; sourceTree = "<group>"; };
 		4BF4951726C08395000547B8 /* ThirdPartyBrowserTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ThirdPartyBrowserTests.swift; sourceTree = "<group>"; };
+		4BF4EA4F27C71F26004E57C4 /* PasswordManagementListSectionTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PasswordManagementListSectionTests.swift; sourceTree = "<group>"; };
 		7B4CE8DA26F02108009134B1 /* UI Tests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = "UI Tests.xctest"; sourceTree = BUILT_PRODUCTS_DIR; };
 		7B4CE8DE26F02108009134B1 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		7B4CE8E626F02134009134B1 /* TabBarTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TabBarTests.swift; sourceTree = "<group>"; };
@@ -2137,19 +2137,11 @@
 		858A798626A99D9000A75A42 /* PasswordManager */ = {
 			isa = PBXGroup;
 			children = (
+				4BF4EA4F27C71F26004E57C4 /* PasswordManagementListSectionTests.swift */,
 				858A798726A99DBE00A75A42 /* PasswordManagementItemListModelTests.swift */,
 				858A798926A9B35E00A75A42 /* PasswordManagementItemModelTests.swift */,
 			);
 			path = PasswordManager;
-			sourceTree = "<group>";
-		};
-		858C1BEB26974E5500E6C014 /* SecureVault */ = {
-			isa = PBXGroup;
-			children = (
-				858C1BEC26974E6600E6C014 /* PasswordManagerSettingsTests.swift */,
-				4BBE0AD927BC8CDE003B37A8 /* PasswordManagementListSectionTests.swift */,
-			);
-			path = SecureVault;
 			sourceTree = "<group>";
 		};
 		85A0115D25AF1C4700FA6A0C /* FindInPage */ = {
@@ -4439,7 +4431,6 @@
 				AA652CDB25DDAB32009059CC /* BookmarkStoreMock.swift in Sources */,
 				B62EB47C25BAD3BB005745C6 /* WKWebViewPrivateMethodsAvailabilityTests.swift in Sources */,
 				4B3F641E27A8D3BD00E0C118 /* BrowserProfileTests.swift in Sources */,
-				4BBE0ADA27BC8CDE003B37A8 /* PasswordManagementListSectionTests.swift in Sources */,
 				B6106BA026A7BE0B0013B453 /* PermissionManagerTests.swift in Sources */,
 				B662D3D92755D7AD0035D4D6 /* PixelStoreTests.swift in Sources */,
 				B6106BB526A809E60013B453 /* GeolocationProviderTests.swift in Sources */,
@@ -4500,6 +4491,7 @@
 				4B723E0526B0003E00E14D75 /* DataImportMocks.swift in Sources */,
 				4B70C00227B0793D000386ED /* CrashReportTests.swift in Sources */,
 				85AC3B1725D9BC1A00C7D2AA /* ConfigurationDownloaderTests.swift in Sources */,
+				4BF4EA5027C71F26004E57C4 /* PasswordManagementListSectionTests.swift in Sources */,
 				B693955D26F19CD70015B914 /* DownloadListStoreTests.swift in Sources */,
 				B610F2EB27AA8E4500FCEBE9 /* ContentBlockingUpdatingTests.swift in Sources */,
 				4B0511E7262CAB3700F6079C /* UserDefaultsWrapperUtilities.swift in Sources */,
