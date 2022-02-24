@@ -357,12 +357,12 @@ extension BrowserTabViewController: ChildOverlayAutofillUserScriptDelegate {
         contentOverlayPopover.autofillCloseOverlay(autofillUserScript)
     }
     public func autofillDisplayOverlay(_ autofillUserScript: AutofillMessagingToChildDelegate,
-                                       of: NSView,
+                                       of view: NSView,
                                        serializedInputContext: String,
                                        click: NSPoint,
                                        inputPosition: CGRect) {
         contentOverlayPopover.autofillDisplayOverlay(autofillUserScript,
-                                             of: of,
+                                             of: view,
                                              serializedInputContext: serializedInputContext,
                                              click: click,
                                              inputPosition: inputPosition)

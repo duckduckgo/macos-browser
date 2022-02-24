@@ -26,7 +26,6 @@ public final class ContentOverlayViewController: NSViewController, EmailManagerR
     @IBOutlet var webView: WKWebView!
     private var topAutofillUserScript: AutofillUserScript?
     private var cancellables = Set<AnyCancellable>()
-    @Published var pendingUpdates = Set<String>()
     
     public var autofillInterfaceToChild: AutofillMessagingToChildDelegate?
     
@@ -87,10 +86,6 @@ public final class ContentOverlayViewController: NSViewController, EmailManagerR
         cancellables.removeAll()
         // We should never see this but it's better than a flash of old content
         webView.load(URLRequest(url: URL(string: "about:blank")!))
-    }
-
-    public func isPendingUpdates() -> Bool {
-        return !pendingUpdates.isEmpty
     }
     
     public func messageMouseMove(x: CGFloat, y: CGFloat) {
