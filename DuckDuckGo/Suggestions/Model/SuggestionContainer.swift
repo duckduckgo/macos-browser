@@ -106,8 +106,7 @@ extension SuggestionContainer: SuggestionLoadingDataSource {
             }
         }
         
-        // The DuckDuckGo user agent is disabled for AC requests until there is enough volume from the browser.
-        var request = URLRequest.defaultRequest(with: url, useDuckDuckGoUserAgent: false)
+        var request = URLRequest.defaultRequest(with: url)
         request.timeoutInterval = 1
 
         suggestionsURLSession.dataTask(with: request) { (data, _, error) in

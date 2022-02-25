@@ -27,8 +27,7 @@ extension URLRequest {
         case referer = "Referer"
     }
 
-    // Note: Change the user agent to macOS version before the release
-    static func defaultRequest(with url: URL, useDuckDuckGoUserAgent: Bool = true) -> URLRequest {
+    static func defaultRequest(with url: URL) -> URLRequest {
         var request = URLRequest(url: url)
         request.setValue("gzip;q=1.0, compress;q=0.5",
                          forHTTPHeaderField: HeaderKey.acceptEncoding.rawValue)
@@ -36,14 +35,7 @@ extension URLRequest {
         let appVersion = AppVersion.shared.versionNumber
         let appId = AppVersion.shared.identifier
         let systemVersion = ProcessInfo.processInfo.operatingSystemVersion
-        
-        let userAgent: String
-
-        if useDuckDuckGoUserAgent {
-            userAgent = "ddg_macos/\(appVersion) (\(appId); macOS \(systemVersion))"
-        } else {
-            userAgent = UserAgent.fallbackWebViewDefault
-        }
+        let userAgent = "ddg_macos/\(appVersion) (\(appId); macOS \(systemVersion))"
         
         request.setValue(userAgent, forHTTPHeaderField: HeaderKey.userAgent.rawValue)
 
