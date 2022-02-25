@@ -18,6 +18,7 @@
 
 import Foundation
 import os.log
+import BrowserServicesKit
 
 final class Fire {
 
@@ -26,6 +27,8 @@ final class Fire {
     let permissionManager: PermissionManagerProtocol
     let downloadListCoordinator: DownloadListCoordinator
     let windowControllerManager: WindowControllersManager
+    let faviconManagement: FaviconManagement
+    let autoconsentManagement: AutoconsentManagement?
 
     @Published private(set) var isBurning = false
 
@@ -33,12 +36,21 @@ final class Fire {
          historyCoordinating: HistoryCoordinating = HistoryCoordinator.shared,
          permissionManager: PermissionManagerProtocol = PermissionManager.shared,
          downloadListCoordinator: DownloadListCoordinator = DownloadListCoordinator.shared,
-         windowControllerManager: WindowControllersManager = WindowControllersManager.shared) {
+         windowControllerManager: WindowControllersManager = WindowControllersManager.shared,
+         faviconManagement: FaviconManagement = FaviconManager.shared,
+         autoconsentManagement: AutoconsentManagement? = nil) {
         self.webCacheManager = cacheManager
         self.historyCoordinating = historyCoordinating
         self.permissionManager = permissionManager
         self.downloadListCoordinator = downloadListCoordinator
         self.windowControllerManager = windowControllerManager
+        self.faviconManagement = faviconManagement
+        
+        if #available(macOS 11, *), autoconsentManagement == nil {
+            self.autoconsentManagement = AutoconsentUserScript.background
+        } else {
+            self.autoconsentManagement = autoconsentManagement
+        }
     }
 
     func burnDomains(_ domains: Set<String>, completion: (() -> Void)? = nil) {
@@ -57,15 +69,18 @@ final class Fire {
         let burningDomains = domains.union(wwwDomains)
 
         group.enter()
-        burnWebCache(domains: burningDomains, completion: {
+        Task {
+            await burnWebCache(domains: burningDomains)
             group.leave()
-        })
+        }
 
         group.enter()
         burnHistory(of: burningDomains, completion: {
             self.burnPermissions(of: burningDomains, completion: {
-                self.burnDownloads(of: burningDomains)
-                group.leave()
+                self.burnFavicons(for: burningDomains) {
+                    self.burnDownloads(of: burningDomains)
+                    group.leave()
+                }
             })
         })
 
@@ -73,6 +88,8 @@ final class Fire {
         burnTabs(relatedTo: burningDomains, completion: {
             group.leave()
         })
+        
+        burnAutoconsentCache()
 
         group.notify(queue: .main) {
             self.isBurning = false
@@ -89,15 +106,18 @@ final class Fire {
         let group = DispatchGroup()
 
         group.enter()
-        burnWebCache {
+        Task {
+            await burnWebCache()
             group.leave()
         }
 
         group.enter()
         burnHistory {
             self.burnPermissions {
-                self.burnDownloads()
-                group.leave()
+                self.burnFavicons {
+                    self.burnDownloads()
+                    group.leave()
+                }
             }
         }
 
@@ -105,6 +125,8 @@ final class Fire {
         burnWindows(exceptOwnerOf: tabCollectionViewModel) {
             group.leave()
         }
+        
+        burnAutoconsentCache()
 
         group.notify(queue: .main) {
             self.isBurning = false
@@ -116,28 +138,16 @@ final class Fire {
 
     // MARK: - Web cache
 
-    private func burnWebCache(completion: @escaping () -> Void) {
+    private func burnWebCache() async {
         os_log("WebsiteDataStore began cookie deletion", log: .fire)
-
-        webCacheManager.clear {
-            os_log("WebsiteDataStore completed cookie deletion", log: .fire)
-
-            DispatchQueue.main.async {
-                completion()
-            }
-        }
+        await webCacheManager.clear()
+        os_log("WebsiteDataStore completed cookie deletion", log: .fire)
     }
 
-    private func burnWebCache(domains: Set<String>? = nil, completion: @escaping () -> Void) {
+    private func burnWebCache(domains: Set<String>? = nil) async {
         os_log("WebsiteDataStore began cookie deletion", log: .fire)
-
-        webCacheManager.clear(domains: domains) {
-            os_log("WebsiteDataStore completed cookie deletion", log: .fire)
-
-            DispatchQueue.main.async {
-                completion()
-            }
-        }
+        await webCacheManager.clear(domains: domains)
+        os_log("WebsiteDataStore completed cookie deletion", log: .fire)
     }
 
     // MARK: - History
@@ -168,6 +178,20 @@ final class Fire {
 
     private func burnDownloads(of domains: Set<String>) {
         self.downloadListCoordinator.cleanupInactiveDownloads(for: domains)
+    }
+
+    // MARK: - Favicons
+
+    private func burnFavicons(completion: @escaping () -> Void) {
+        self.faviconManagement.burnExcept(fireproofDomains: FireproofDomains.shared,
+                                          bookmarkManager: LocalBookmarkManager.shared,
+                                          completion: completion)
+    }
+
+    private func burnFavicons(for domains: Set<String>, completion: @escaping () -> Void) {
+        self.faviconManagement.burnDomains(domains,
+                                           except: LocalBookmarkManager.shared,
+                                           completion: completion)
     }
 
     // MARK: - Windows & Tabs
@@ -206,6 +230,13 @@ final class Fire {
             }
 
             completion()
+        }
+    }
+    
+    // MARK: - Autoconsent visit cache
+    private func burnAutoconsentCache() {
+        if #available(macOS 11, *), self.autoconsentManagement != nil {
+            self.autoconsentManagement!.clearCache()
         }
     }
 

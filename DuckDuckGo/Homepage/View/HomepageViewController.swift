@@ -131,10 +131,11 @@ final class HomepageViewController: NSViewController {
     }
 
     private func updateFavourites(from bookmarkList: BookmarkList?) {
-        guard let favorites = bookmarkList?.bookmarks().filter({ $0.isFavorite }) else {
+        guard let favorites = bookmarkList?.favoriteBookmarks else {
             return
         }
-        topFavorites = Array(favorites.prefix(Constants.maxNumberOfFavorites).reversed())
+
+        topFavorites = Array(favorites.prefix(Constants.maxNumberOfFavorites))
     }
 
     // MARK: - Add/Edit Favorite Popover

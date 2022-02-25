@@ -44,7 +44,8 @@ final class WebCacheManagerTests: XCTestCase {
 
         let expect = expectation(description: #function)
         let webCacheManager = WebCacheManager(fireproofDomains: logins, websiteDataStore: dataStore)
-        webCacheManager.clear {
+        Task {
+            await webCacheManager.clear()
             expect.fulfill()
         }
         wait(for: [expect], timeout: 15.0)
@@ -57,7 +58,7 @@ final class WebCacheManagerTests: XCTestCase {
     func testWhenClearedThenCookiesWithParentDomainsAreRetained() {
 
         let logins = MockPreservedLogins(domains: [
-            "www.example.com"
+            "example.com"
         ])
 
         let cookieStore = MockHTTPCookieStore(cookies: [
@@ -74,7 +75,8 @@ final class WebCacheManagerTests: XCTestCase {
 
         let expect = expectation(description: #function)
         let webCacheManager = WebCacheManager(fireproofDomains: logins, websiteDataStore: dataStore)
-        webCacheManager.clear {
+        Task {
+            await webCacheManager.clear()
             expect.fulfill()
         }
         wait(for: [expect], timeout: 30.0)
@@ -86,7 +88,7 @@ final class WebCacheManagerTests: XCTestCase {
 
     func testWhenClearedThenDDGCookiesAreRetained() {
         let logins = MockPreservedLogins(domains: [
-            "www.example.com"
+            "example.com"
         ])
 
         let cookieStore = MockHTTPCookieStore(cookies: [
@@ -101,7 +103,8 @@ final class WebCacheManagerTests: XCTestCase {
 
         let expect = expectation(description: #function)
         let webCacheManager = WebCacheManager(fireproofDomains: logins, websiteDataStore: dataStore)
-        webCacheManager.clear {
+        Task {
+            await webCacheManager.clear()
             expect.fulfill()
         }
         wait(for: [expect], timeout: 30.0)
@@ -112,7 +115,7 @@ final class WebCacheManagerTests: XCTestCase {
 
     func testWhenClearedThenCookiesForLoginsAreRetained() {
         let logins = MockPreservedLogins(domains: [
-            "www.example.com"
+            "example.com"
         ])
 
         let cookieStore = MockHTTPCookieStore(cookies: [
@@ -129,7 +132,8 @@ final class WebCacheManagerTests: XCTestCase {
 
         let expect = expectation(description: #function)
         let webCacheManager = WebCacheManager(fireproofDomains: logins, websiteDataStore: dataStore)
-        webCacheManager.clear {
+        Task {
+            await webCacheManager.clear()
             expect.fulfill()
         }
         wait(for: [expect], timeout: 30.0)
@@ -145,12 +149,13 @@ final class WebCacheManagerTests: XCTestCase {
 
         let expect = expectation(description: #function)
         let webCacheManager = WebCacheManager(fireproofDomains: logins, websiteDataStore: dataStore)
-        webCacheManager.clear {
+        Task {
+            await webCacheManager.clear()
             expect.fulfill()
         }
         wait(for: [expect], timeout: 5.0)
 
-        XCTAssertEqual(dataStore.removeDataCalledCount, 1)
+        XCTAssertEqual(dataStore.removeDataCalledCount, 2)
     }
 
     // MARK: Mocks
@@ -161,22 +166,32 @@ final class WebCacheManagerTests: XCTestCase {
         var records = [WKWebsiteDataRecord]()
         var removeDataCalledCount = 0
 
-        func fetchDataRecords(ofTypes dataTypes: Set<String>, completionHandler: @escaping ([WKWebsiteDataRecord]) -> Void) {
-            completionHandler(records)
+        func dataRecords(ofTypes dataTypes: Set<String>) async -> [WKWebsiteDataRecord] {
+            return records
         }
 
-        func removeData(ofTypes dataTypes: Set<String>, for dataRecords: [WKWebsiteDataRecord], completionHandler: @escaping () -> Void) {
+        func removeData(ofTypes dataTypes: Set<String>, modifiedSince date: Date) async {
             removeDataCalledCount += 1
 
             // In the real implementation, records will be selectively removed or edited based on their Fireproof status. For simplicity in this test,
             // only remove records if all data types are removed, so that we can tell whether records for given domains still exist in some form.
             if dataTypes == WKWebsiteDataStore.allWebsiteDataTypes() {
                 self.records = records.filter {
-                    !dataRecords.contains($0) && dataTypes == $0.dataTypes
+                    dataTypes == $0.dataTypes
                 }
             }
+        }
+        
+        func removeData(ofTypes dataTypes: Set<String>, for records: [WKWebsiteDataRecord]) async {
+            removeDataCalledCount += 1
 
-            completionHandler()
+            // In the real implementation, records will be selectively removed or edited based on their Fireproof status. For simplicity in this test,
+            // only remove records if all data types are removed, so that we can tell whether records for given domains still exist in some form.
+            if dataTypes == WKWebsiteDataStore.allWebsiteDataTypes() {
+                self.records = records.filter {
+                    dataTypes == $0.dataTypes
+                }
+            }
         }
 
         func removeData(ofTypes dataTypes: Set<String>, modifiedSince date: Date, completionHandler: @escaping () -> Void) {
@@ -189,14 +204,12 @@ final class WebCacheManagerTests: XCTestCase {
 
     class MockPreservedLogins: FireproofDomains {
 
-        let domains: [String]
-
-        override var fireproofDomains: [String] {
-            return domains
-        }
-
         init(domains: [String]) {
-            self.domains = domains
+            super.init(store: FireproofDomainsStoreMock())
+
+            for domain in domains {
+                super.add(domain: domain)
+            }
         }
 
     }
@@ -229,18 +242,16 @@ final class WebCacheManagerTests: XCTestCase {
             self.cookies = cookies
         }
 
-        func getAllCookies(_ completionHandler: @escaping ([HTTPCookie]) -> Void) {
-            completionHandler(cookies)
+        func allCookies() async -> [HTTPCookie] {
+            return cookies
         }
 
-        func setCookie(_ cookie: HTTPCookie, completionHandler: (() -> Void)?) {
+        func setCookie(_ cookie: HTTPCookie) async {
             cookies.append(cookie)
-            completionHandler?()
         }
 
-        func delete(_ cookie: HTTPCookie, completionHandler: (() -> Void)?) {
+        func deleteCookie(_ cookie: HTTPCookie) async {
             cookies.removeAll { $0.domain == cookie.domain }
-            completionHandler?()
         }
 
     }

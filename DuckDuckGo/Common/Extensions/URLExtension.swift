@@ -18,6 +18,7 @@
 
 import Foundation
 import os.log
+import BrowserServicesKit
 
 extension URL {
 
@@ -38,6 +39,11 @@ extension URL {
 
     static func makeSearchUrl(from searchQuery: String) -> URL? {
         let trimmedQuery = searchQuery.trimmingCharacters(in: .whitespacesAndNewlines)
+
+        guard !trimmedQuery.isEmpty else {
+            return nil
+        }
+
         do {
             var searchUrl = Self.duckDuckGo
             searchUrl = try searchUrl.addParameter(name: DuckDuckGoParameters.search.rawValue, value: trimmedQuery)
@@ -74,6 +80,10 @@ extension URL {
 
     static var homePage: URL {
         return URL(string: "about:home")!
+    }
+
+    static var welcome: URL {
+        return URL(string: "about:welcome")!
     }
 
     // MARK: Pixel
@@ -170,6 +180,7 @@ extension URL {
 
         case http
         case https
+        case file
 
         func separated() -> String {
             self.rawValue + Self.separator
@@ -279,6 +290,8 @@ extension URL {
         if URL.NavigationalScheme(rawValue: scheme) != nil,
            let host = host, host.isValidHost,
            user == nil { return true }
+
+        if scheme == URL.NavigationalScheme.file.rawValue { return true }
 
         // This effectively allows external URLs to be entered by the user.
         // Without this check single word entries get treated like domains.
@@ -429,33 +442,40 @@ extension URL {
     }
     
     // MARK: - GPC
+
+    static func gpcHeadersEnabled(config: PrivacyConfiguration) -> [String] {
+        let settings = config.settings(for: .gpc)
+
+        guard let enabledSites = settings["gpcHeaderEnabledSites"] as? [String] else {
+            return []
+        }
+
+        return enabledSites
+    }
     
     static func isGPCEnabled(url: URL,
-                             config: PrivacyConfigurationManager = PrivacyConfigurationManager.shared) -> Bool {
-        let enabledSites = config.gpcHeadersEnabled()
+                             config: PrivacyConfiguration = ContentBlocking.shared.privacyConfigurationManager.privacyConfig) -> Bool {
+        let enabledSites = gpcHeadersEnabled(config: config)
         
         for gpcHost in enabledSites {
             if url.isPart(ofDomain: gpcHost) {
-                
                 // Check if url is on exception list
                 // Since headers are only enabled for a small numbers of sites
                 // perfrom this check here for efficency
-                let exceptions = config.tempUnprotectedDomains + config.exceptionsList(forFeature: .gpc)
-                let protectionStore = DomainsProtectionUserDefaultsStore()
-                if protectionStore.unprotectedDomains.contains(url.host ?? "") {
-                    return false
-                }
-                for exception in exceptions {
-                    if url.isPart(ofDomain: exception) {
-                        return false
-                    }
-                }
-                
-                return true
+                return config.isFeature(.gpc, enabledForDomain: url.host)
             }
         }
         
         return false
+    }
+    
+    // MARK: - Waitlist
+    
+    static let developmentEndpoint = URL(string: "https://quackdev.duckduckgo.com/api/")!
+    static let productionEndpoint = URL(string: "https://quack.duckduckgo.com/api/")!
+    
+    static func redeemMacWaitlistInviteCode(endpoint: URL = .developmentEndpoint) -> URL {
+        return endpoint.appendingPathComponent("auth/invites/macosbrowser/redeem")
     }
 
 }

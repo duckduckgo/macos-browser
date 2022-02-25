@@ -74,7 +74,7 @@ final class SuggestionViewModel {
             } else {
                 return title ?? url.toString(forUserInput: userStringValue)
             }
-        case .bookmark(title: let title, url: _, isFavorite: _):
+        case .bookmark(title: let title, url: _, isFavorite: _, allowedInTopHits: _):
             return title
         case .unknown(value: let value):
             return value
@@ -93,7 +93,7 @@ final class SuggestionViewModel {
             } else {
                 return title
             }
-        case .bookmark(title: let title, url: _, isFavorite: _):
+        case .bookmark(title: let title, url: _, isFavorite: _, allowedInTopHits: _):
             return title
         }
     }
@@ -101,7 +101,7 @@ final class SuggestionViewModel {
     var autocompletionString: String {
         switch suggestion {
         case .historyEntry(title: _, url: let url, allowedInTopHits: _),
-             .bookmark(title: _, url: let url, isFavorite: _):
+             .bookmark(title: _, url: let url, isFavorite: _, allowedInTopHits: _):
 
             let userStringValue = self.userStringValue.lowercased()
             let urlString = url.toString(forUserInput: userStringValue)
@@ -127,7 +127,7 @@ final class SuggestionViewModel {
         case .phrase, .unknown, .website:
             return ""
         case .historyEntry(title: _, url: let url, allowedInTopHits: _),
-             .bookmark(title: _, url: let url, isFavorite: _):
+             .bookmark(title: _, url: let url, isFavorite: _, allowedInTopHits: _):
             if url.isDuckDuckGoSearch {
                 return " – \(UserText.searchDuckDuckGoSuffix)"
             } else {
@@ -155,9 +155,9 @@ final class SuggestionViewModel {
             return Self.webImage
         case .historyEntry(title: _, url: _, allowedInTopHits: _):
             return Self.historyImage
-        case .bookmark(title: _, url: _, isFavorite: false):
+        case .bookmark(title: _, url: _, isFavorite: false, allowedInTopHits: _):
             return Self.bookmarkImage
-        case .bookmark(title: _, url: _, isFavorite: true):
+        case .bookmark(title: _, url: _, isFavorite: true, allowedInTopHits: _):
             return Self.favoriteImage
         case .unknown(value: _):
             return Self.webImage

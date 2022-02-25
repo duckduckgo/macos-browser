@@ -73,6 +73,19 @@ final class WebView: WKWebView {
         self.configuration.userContentController.removeAllUserScripts()
     }
 
+    // MARK: - Back/Forward Navigation
+
+    var frozenCanGoBack: Bool?
+    var frozenCanGoForward: Bool?
+
+    override var canGoBack: Bool {
+        frozenCanGoBack ?? super.canGoBack
+    }
+
+    override var canGoForward: Bool {
+        frozenCanGoForward ?? super.canGoForward
+    }
+
     // MARK: - Menu
 
     override func willOpenMenu(_ menu: NSMenu, with event: NSEvent) {
@@ -133,8 +146,7 @@ final class WebView: WKWebView {
     }
 
     var isInspectorShown: Bool {
-        guard let result = inspectorPerform("isVisible") else { return false }
-        return result.toOpaque() == UnsafeMutableRawPointer(bitPattern: 0x1)
+        return inspectorPerform("isVisible") != nil
     }
 
     @nonobjc func openDeveloperTools() {
@@ -156,6 +168,15 @@ final class WebView: WKWebView {
 
     @nonobjc func showPageResources() {
         inspectorPerform("showResources")
+    }
+
+    var fullscreenWindowController: NSWindowController? {
+        guard let fullscreenWindowController = self.window?.windowController,
+              fullscreenWindowController.className.contains("FullScreen")
+        else {
+            return nil
+        }
+        return fullscreenWindowController
     }
 
 }

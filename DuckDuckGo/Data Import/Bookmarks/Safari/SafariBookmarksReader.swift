@@ -59,19 +59,21 @@ final class SafariBookmarksReader {
         var bookmarksBar: ImportedBookmarks.BookmarkOrFolder?
         var otherBookmarks: [ImportedBookmarks.BookmarkOrFolder] = []
 
-        for entry in topLevelEntries where
-            ((entry[Constants.typeKey] as? String) == Constants.listType) &&
-            (entry[Constants.bookmarkChildrenKey]) != nil {
+        for entry in topLevelEntries
+            where ((entry[Constants.typeKey] as? String) == Constants.listType) || ((entry[Constants.typeKey] as? String) == Constants.leafType) {
 
-            guard let title = entry[Constants.titleKey] as? String, title != Constants.readingListKey else { continue }
+            if let title = entry[Constants.titleKey] as? String, title == Constants.readingListKey {
+                continue
+            }
 
-            if title == Constants.bookmarksBar {
+            if let title = entry[Constants.titleKey] as? String, title == Constants.bookmarksBar {
                 bookmarksBar = bookmarkOrFolder(from: entry)
             } else {
                 if let otherBookmarkOrFolder = bookmarkOrFolder(from: entry) {
                     otherBookmarks.append(otherBookmarkOrFolder)
                 }
             }
+
         }
 
         let otherBookmarksFolder = ImportedBookmarks.BookmarkOrFolder(name: "other", type: "folder", urlString: nil, children: otherBookmarks)
@@ -84,7 +86,7 @@ final class SafariBookmarksReader {
     }
 
     private func bookmarkOrFolder(from entry: [String: AnyObject]) -> ImportedBookmarks.BookmarkOrFolder? {
-        let possibleTopLevelTitle = entry[Constants.titleKey] as? String
+        let possibleTopLevelTitle = (entry[Constants.titleKey] as? String)
         let possibleURIDictionary = entry[Constants.uriDictionaryKey] as? [String: AnyObject]
         let possibleSecondLevelTitle = possibleURIDictionary?[Constants.uriDictionaryTitleKey] as? String
 

@@ -137,12 +137,19 @@ final class PrivacyDashboardUserScript: NSObject, StaticUserScript {
                 "permission": item.state.rawValue,
                 "used": usedPermissions[item.permission] != nil,
                 "paused": usedPermissions[item.permission] == .paused,
-                "options": PermissionAuthorizationState.allCases.compactMap { decision in
+                "options": PermissionAuthorizationState.allCases.compactMap { decision -> [String: String]? in
                     // don't show Permanently Allow if can't persist Granted Decision
-                    return decision != .grant || item.permission.canPersistGrantedDecision ? [
+                    switch decision {
+                    case .grant:
+                        guard item.permission.canPersistGrantedDecision else { return nil }
+                    case .deny:
+                        guard item.permission.canPersistDeniedDecision else { return nil }
+                    case .ask: break
+                    }
+                    return [
                         "id": decision.rawValue,
-                        "title": String(format: decision.localizedFormat, domain)
-                    ] : nil
+                        "title": String(format: decision.localizedFormat(for: item.permission), domain)
+                    ]
                 }
             ]
         }
@@ -198,9 +205,16 @@ final class PrivacyDashboardUserScript: NSObject, StaticUserScript {
         evaluate(js: "window.onChangeCertificateData(\(certificateDataJson))", in: webView)
     }
 
-    func setPendingUpdates(_ pendingUpdates: Set<String>, domain: String, webView: WKWebView) {
-        let isPendingUpdates = pendingUpdates.contains(domain)
+    func setIsPendingUpdates(_ isPendingUpdates: Bool, webView: WKWebView) {
         evaluate(js: "window.onIsPendingUpdates(\(isPendingUpdates))", in: webView)
+    }
+    
+    func setConsentManaged(_ consentManaged: CookieConsentInfo?, webView: WKWebView) {
+        guard let consentDataJson = try? JSONEncoder().encode(consentManaged).utf8String() else {
+            assertionFailure("Can't encode consentInfo into JSON")
+            return
+        }
+        evaluate(js: "window.onChangeConsentManaged(\(consentDataJson))", in: webView)
     }
 
     private func evaluate(js: String, in webView: WKWebView) {
@@ -210,14 +224,16 @@ final class PrivacyDashboardUserScript: NSObject, StaticUserScript {
 }
 
 extension PermissionAuthorizationState {
-    var localizedFormat: String {
-        switch self {
-        case .ask:
-            return UserText.permissionAlwaysAskFormat
-        case .grant:
-            return UserText.permissionAlwaysAllowFormat
-        case .deny:
-            return UserText.permissionAlwaysDenyFormat
+    func localizedFormat(for permission: PermissionType) -> String {
+        switch (permission, self) {
+        case (.popups, .ask):
+            return UserText.privacyDashboardPopupsAlwaysAsk
+        case (_, .ask):
+            return UserText.privacyDashboardPermissionAsk
+        case (_, .grant):
+            return UserText.privacyDashboardPermissionAlwaysAllow
+        case (_, .deny):
+            return UserText.privacyDashboardPermissionAlwaysDeny
         }
     }
 }

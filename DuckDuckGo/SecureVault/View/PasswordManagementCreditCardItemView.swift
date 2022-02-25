@@ -32,12 +32,10 @@ struct PasswordManagementCreditCardItemView: View {
 
         if model.card != nil {
 
-            let editMode = model.isEditing || model.isNew
-
             ZStack(alignment: .top) {
                 Spacer()
 
-                if editMode {
+                if model.isInEditMode {
 
                     RoundedRectangle(cornerRadius: 8)
                         .foregroundColor(Color(NSColor.editingPanelColor))
@@ -48,11 +46,11 @@ struct PasswordManagementCreditCardItemView: View {
                 VStack(alignment: .leading, spacing: 0) {
 
                     HeaderView()
-                        .padding(.bottom, editMode ? 20 : 30)
+                        .padding(.bottom, model.isInEditMode ? 20 : 30)
 
-                    EditableIdentityField(textFieldValue: $model.cardNumber, title: UserText.pmCardNumber)
-                    EditableIdentityField(textFieldValue: $model.cardholderName, title: UserText.pmCardholderName)
-                    EditableIdentityField(textFieldValue: $model.cardSecurityCode, title: UserText.pmCardVerificationValue)
+                    EditableCreditCardField(textFieldValue: $model.cardNumber, title: UserText.pmCardNumber)
+                    EditableCreditCardField(textFieldValue: $model.cardholderName, title: UserText.pmCardholderName)
+                    EditableCreditCardField(textFieldValue: $model.cardSecurityCode, title: UserText.pmCardVerificationValue)
 
                     // Expiration:
 
@@ -185,7 +183,7 @@ private struct Buttons: View {
 
 }
 
-private struct EditableIdentityField: View {
+private struct EditableCreditCardField: View {
 
     @EnvironmentObject var model: PasswordManagementCreditCardModel
 

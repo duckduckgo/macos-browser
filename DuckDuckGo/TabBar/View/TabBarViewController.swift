@@ -22,7 +22,6 @@ import Combine
 import Lottie
 
 // swiftlint:disable file_length
-// swiftlint:disable type_body_length
 final class TabBarViewController: NSViewController {
 
     enum HorizontalSpace: CGFloat {
@@ -108,6 +107,7 @@ final class TabBarViewController: NSViewController {
 
     private func reloadSelection() {
         guard collectionView.selectionIndexPaths.first?.item != tabCollectionViewModel.selectionIndex else {
+            collectionView.updateItemsLeftToSelectedItems()
             return
         }
 
@@ -125,17 +125,6 @@ final class TabBarViewController: NSViewController {
             collectionView.animator().selectItems(at: [newSelectionIndexPath], scrollPosition: .centeredHorizontally)
         } else {
             collectionView.selectItems(at: [newSelectionIndexPath], scrollPosition: .centeredHorizontally)
-        }
-    }
-
-    private func closeWindowIfNeeded() {
-        if tabCollectionViewModel.tabCollection.tabs.isEmpty {
-            // when in fullscreen self.view.window will return NSToolbarFullScreenWindow instead of MainWindow
-            guard let window = parent?.view.window else {
-                os_log("AddressBarTextField: Window not available", type: .error)
-                return
-            }
-            window.close()
         }
     }
 
@@ -387,7 +376,6 @@ extension TabBarViewController: TabCollectionViewModelDelegate {
         let removedIndexPathSet = Set(arrayLiteral: IndexPath(item: removedIndex))
         guard let selectionIndex = selectionIndex else {
             collectionView.animator().deleteItems(at: removedIndexPathSet)
-            closeWindowIfNeeded()
             return
         }
         let selectionIndexPathSet = Set(arrayLiteral: IndexPath(item: selectionIndex))
@@ -398,30 +386,34 @@ extension TabBarViewController: TabCollectionViewModelDelegate {
         let shouldScroll = collectionView.isAtEndScrollPosition
             && (!self.view.isMouseLocationInsideBounds() || removedIndex == self.collectionView.numberOfItems(inSection: 0) - 1)
         let visiRect = collectionView.enclosingScrollView!.contentView.documentVisibleRect
-        collectionView.animator().performBatchUpdates {
-            let tabWidth = currentTabWidth(removedIndex: removedIndex)
-            if shouldScroll {
-                collectionView.animator().scroll(CGPoint(x: scrollView.contentView.bounds.origin.x - tabWidth, y: 0))
-            }
+        NSAnimationContext.runAnimationGroup { context in
+            context.duration = 0.15
 
-            if collectionView.selectionIndexPaths != selectionIndexPathSet {
-                collectionView.clearSelection()
-                collectionView.animator().selectItems(at: selectionIndexPathSet, scrollPosition: .centeredHorizontally)
-            }
-            collectionView.animator().deleteItems(at: removedIndexPathSet)
-        } completionHandler: { [weak self] _ in
-            guard let self = self else { return }
+            collectionView.animator().performBatchUpdates {
+                let tabWidth = currentTabWidth(removedIndex: removedIndex)
+                if shouldScroll {
+                    collectionView.animator().scroll(CGPoint(x: scrollView.contentView.bounds.origin.x - tabWidth, y: 0))
+                }
 
-            self.frozenLayout = self.view.isMouseLocationInsideBounds()
-            if !self.frozenLayout {
-                self.updateLayout()
-            }
-            self.updateEmptyTabArea()
-            self.enableScrollButtons()
-            self.hideTooltip()
+                if collectionView.selectionIndexPaths != selectionIndexPathSet {
+                    collectionView.clearSelection()
+                    collectionView.animator().selectItems(at: selectionIndexPathSet, scrollPosition: .centeredHorizontally)
+                }
+                collectionView.animator().deleteItems(at: removedIndexPathSet)
+            } completionHandler: { [weak self] _ in
+                guard let self = self else { return }
 
-            if !shouldScroll {
-                self.collectionView.enclosingScrollView!.contentView.scroll(to: visiRect.origin)
+                self.frozenLayout = self.view.isMouseLocationInsideBounds()
+                if !self.frozenLayout {
+                    self.updateLayout()
+                }
+                self.updateEmptyTabArea()
+                self.enableScrollButtons()
+                self.hideTooltip()
+
+                if !shouldScroll {
+                    self.collectionView.enclosingScrollView!.contentView.scroll(to: visiRect.origin)
+                }
             }
         }
     }
@@ -447,8 +439,6 @@ extension TabBarViewController: TabCollectionViewModelDelegate {
     }
 
     func tabCollectionViewModelDidMultipleChanges(_ tabCollectionViewModel: TabCollectionViewModel) {
-        closeWindowIfNeeded()
-
         collectionView.reloadData()
         reloadSelection()
 
@@ -775,17 +765,30 @@ extension TabBarViewController: TabBarViewItemDelegate {
     }
 
     func tabBarViewItemFireproofSite(_ tabBarViewItem: TabBarViewItem) {
-        if let url = tabCollectionViewModel.selectedTabViewModel?.tab.content.url,
-           let host = url.host {
-            Pixel.fire(.fireproof(kind: .init(url: url), suggested: .manual))
-            FireproofDomains.shared.addToAllowed(domain: host)
+        guard let indexPath = collectionView.indexPath(for: tabBarViewItem),
+              let tabViewModel = tabCollectionViewModel.tabViewModel(at: indexPath.item),
+              let url = tabViewModel.tab.content.url,
+              let host = url.host
+        else {
+            os_log("TabBarViewController: Failed to get url of tab bar view item", type: .error)
+            return
         }
+
+        Pixel.fire(.fireproof(kind: .init(url: url), suggested: .manual))
+        FireproofDomains.shared.add(domain: host)
     }
 
     func tabBarViewItemRemoveFireproofing(_ tabBarViewItem: TabBarViewItem) {
-        if let host = tabCollectionViewModel.selectedTabViewModel?.tab.content.url?.host {
-            FireproofDomains.shared.remove(domain: host)
+        guard let indexPath = collectionView.indexPath(for: tabBarViewItem),
+              let tabViewModel = tabCollectionViewModel.tabViewModel(at: indexPath.item),
+              let url = tabViewModel.tab.content.url,
+              let host = url.host
+        else {
+            os_log("TabBarViewController: Failed to get url of tab bar view item", type: .error)
+            return
         }
+
+        FireproofDomains.shared.remove(domain: host)
     }
 
     func otherTabBarViewItemsState(for tabBarViewItem: TabBarViewItem) -> OtherTabBarViewItemsState {
@@ -800,4 +803,3 @@ extension TabBarViewController: TabBarViewItemDelegate {
 }
 
 // swiftlint:enable type_body_length
-// swiftlint:enable file_length

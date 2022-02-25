@@ -58,7 +58,7 @@ extension NSAlert {
         alert.messageText = UserText.fireproofConfirmationTitle(domain: domain)
         alert.informativeText = UserText.fireproofConfirmationMessage
         alert.alertStyle = .warning
-        alert.icon = #imageLiteral(resourceName: "Fireproof")
+        alert.icon = NSImage(named: "Fireproof")
         alert.addButton(withTitle: UserText.fireproof)
         alert.addButton(withTitle: UserText.notNow)
         return alert
@@ -97,6 +97,34 @@ extension NSAlert {
         alert.icon = NSImage(named: "BurnAlert")
         alert.addButton(withTitle: UserText.burn)
         alert.addButton(withTitle: UserText.cancel)
+        return alert
+    }
+
+    static func exportLoginsFailed() -> NSAlert {
+        let alert = NSAlert()
+        alert.messageText = UserText.exportLoginsFailedMessage
+        alert.informativeText = UserText.exportLoginsFailedInformative
+        alert.alertStyle = .warning
+        alert.addButton(withTitle: UserText.ok)
+        return alert
+    }
+
+    static func exportBookmarksFailed() -> NSAlert {
+        let alert = NSAlert()
+        alert.messageText = UserText.exportBookmarksFailedMessage
+        alert.informativeText = UserText.exportBookmarksFailedInformative
+        alert.alertStyle = .warning
+        alert.addButton(withTitle: UserText.ok)
+        return alert
+    }
+    
+    static func cookiePopup() -> NSAlert {
+        let alert = NSAlert()
+        alert.messageText = UserText.autoconsentPopupTitle
+        alert.informativeText = UserText.autoconsentPopupDescription
+        alert.addButton(withTitle: UserText.autoconsentPopupEnableButton)
+        alert.addButton(withTitle: UserText.autoconsentPopupLaterButton)
+        alert.addButton(withTitle: UserText.autoconsentPopupNeverButton)
         return alert
     }
 

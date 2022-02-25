@@ -56,9 +56,13 @@ final class Pixel {
         headers[APIHeaders.Name.moreInfo] = "See " + URL.duckDuckGoMorePrivacyInfo.absoluteString
 
         guard !dryRun else {
-            os_log(.debug, log: .pixel, "%@", pixelName.replacingOccurrences(of: "_", with: "."))
+            let params = params?.filter { key, _ in !["appVersion", "test"].contains(key) } ?? [:]
+            os_log(.debug, log: .pixel, "%@ %@", pixelName.replacingOccurrences(of: "_", with: "."), params)
 
-            onComplete(nil)
+            // simulate server response time for Dry Run mode
+            DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
+                onComplete(nil)
+            }
             return
         }
 
@@ -68,7 +72,9 @@ final class Pixel {
         }
     }
 
-    static func fire(_ event: Pixel.Event, withAdditionalParameters parameters: [String: String]? = nil) {
+    static func fire(_ event: Pixel.Event,
+                     withAdditionalParameters parameters: [String: String]? = nil,
+                     onComplete: @escaping (Error?) -> Void = {_ in }) {
         let newParams: [String: String]?
         switch (event.parameters, parameters) {
         case (.some(let parameters), .none):
@@ -81,7 +87,9 @@ final class Pixel {
             newParams = nil
         }
 
-        Self.shared?.fire(pixelNamed: event.name, withAdditionalParameters: newParams)
+        Self.shared?.fire(pixelNamed: event.name,
+                          withAdditionalParameters: newParams,
+                          onComplete: onComplete)
     }
 
 }

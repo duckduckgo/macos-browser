@@ -16,6 +16,7 @@
 //  limitations under the License.
 //
 
+import AppKit
 import Combine
 
 extension NSPopUpButton {
@@ -24,6 +25,7 @@ extension NSPopUpButton {
         NotificationCenter.default
             .publisher(for: NSMenu.didSendActionNotification, object: menu)
             .map { _ in self.indexOfSelectedItem }
+            .prepend(self.indexOfSelectedItem)
             .eraseToAnyPublisher()
     }
 

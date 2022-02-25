@@ -42,8 +42,11 @@ final class AppStateRestorationManager {
 
         cancellable = WindowControllersManager.shared.stateChanged
             .debounce(for: .seconds(1), scheduler: RunLoop.main)
-            .sink { [unowned self] _ in
-                self.stateDidChange()
+            // There is a favicon assignment after a restored tab loads that triggered unnecessary
+            // saving of the state
+            .dropFirst()
+            .sink { [weak self] _ in
+                self?.stateDidChange()
             }
     }
 

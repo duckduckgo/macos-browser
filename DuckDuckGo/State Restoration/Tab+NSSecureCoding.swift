@@ -33,7 +33,7 @@ extension Tab: NSSecureCoding {
     static var supportsSecureCoding: Bool { true }
 
     convenience init?(coder decoder: NSCoder) {
-        guard let tabTypeRawValue = decoder.decodeIfPresent(at: NSSecureCodingKeys.tabType),
+        guard let tabTypeRawValue: Int = decoder.decodeIfPresent(at: NSSecureCodingKeys.tabType),
               let tabType = TabContent.ContentType(rawValue: tabTypeRawValue),
               let content = TabContent(type: tabType, url: decoder.decodeIfPresent(at: NSSecureCodingKeys.url))
         else { return nil }
@@ -67,6 +67,7 @@ private extension Tab.TabContent {
         case preferences = 1
         case bookmarks = 2
         case homepage = 3
+        case onboarding = 4
     }
 
     init?(type: ContentType, url: URL?) {
@@ -80,6 +81,8 @@ private extension Tab.TabContent {
             self = .bookmarks
         case .preferences:
             self = .preferences
+        case .onboarding:
+            self = .onboarding
         }
     }
 
@@ -89,6 +92,7 @@ private extension Tab.TabContent {
         case .homepage: return .homepage
         case .bookmarks: return .bookmarks
         case .preferences: return .preferences
+        case .onboarding: return .onboarding
         case .none: return .homepage
         }
     }

@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<document type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="3.0" toolsVersion="19162" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES" customObjectInstantitationMethod="direct">
+<document type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="3.0" toolsVersion="19529" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES" customObjectInstantitationMethod="direct">
     <dependencies>
         <deployment identifier="macosx"/>
-        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="19162"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="19529"/>
         <capability name="Named colors" minToolsVersion="9.0"/>
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
     </dependencies>
@@ -37,7 +37,7 @@
                             <rect key="frame" x="14" y="24" width="64" height="64"/>
                             <subviews>
                                 <imageView horizontalHuggingPriority="251" verticalHuggingPriority="251" translatesAutoresizingMaskIntoConstraints="NO" id="nhR-fJ-WxK">
-                                    <rect key="frame" x="-1" y="-1" width="66" height="66"/>
+                                    <rect key="frame" x="0.0" y="0.0" width="64" height="64"/>
                                     <imageCell key="cell" refusesFirstResponder="YES" alignment="left" imageScaling="proportionallyDown" id="gRc-Dj-q4y"/>
                                 </imageView>
                                 <customView translatesAutoresizingMaskIntoConstraints="NO" id="ROO-5P-Meg" userLabel="Overlay View" customClass="ColorView" customModule="DuckDuckGo_Privacy_Browser" customModuleProvider="target">
@@ -59,13 +59,13 @@
                             </subviews>
                             <constraints>
                                 <constraint firstAttribute="bottom" secondItem="ROO-5P-Meg" secondAttribute="bottom" constant="-1" id="Ccq-xf-kf1"/>
-                                <constraint firstItem="nhR-fJ-WxK" firstAttribute="leading" secondItem="1Vd-Cw-5GJ" secondAttribute="leading" constant="-1" id="JbX-y3-6Px"/>
+                                <constraint firstItem="nhR-fJ-WxK" firstAttribute="leading" secondItem="1Vd-Cw-5GJ" secondAttribute="leading" id="JbX-y3-6Px"/>
                                 <constraint firstItem="jXM-Ai-XYD" firstAttribute="centerY" secondItem="1Vd-Cw-5GJ" secondAttribute="centerY" constant="-1.5" id="Kql-RW-dRz"/>
                                 <constraint firstItem="ROO-5P-Meg" firstAttribute="leading" secondItem="1Vd-Cw-5GJ" secondAttribute="leading" constant="-1" id="QWQ-v4-2kk"/>
-                                <constraint firstItem="nhR-fJ-WxK" firstAttribute="top" secondItem="1Vd-Cw-5GJ" secondAttribute="top" constant="-1" id="UgW-XW-hIi"/>
-                                <constraint firstAttribute="bottom" secondItem="nhR-fJ-WxK" secondAttribute="bottom" constant="-1" id="V39-BK-ZvU"/>
+                                <constraint firstItem="nhR-fJ-WxK" firstAttribute="top" secondItem="1Vd-Cw-5GJ" secondAttribute="top" id="UgW-XW-hIi"/>
+                                <constraint firstAttribute="bottom" secondItem="nhR-fJ-WxK" secondAttribute="bottom" id="V39-BK-ZvU"/>
                                 <constraint firstItem="ROO-5P-Meg" firstAttribute="top" secondItem="1Vd-Cw-5GJ" secondAttribute="top" constant="-1" id="VCK-EA-CxR"/>
-                                <constraint firstAttribute="trailing" secondItem="nhR-fJ-WxK" secondAttribute="trailing" constant="-1" id="duI-8n-PSQ"/>
+                                <constraint firstAttribute="trailing" secondItem="nhR-fJ-WxK" secondAttribute="trailing" id="duI-8n-PSQ"/>
                                 <constraint firstItem="jXM-Ai-XYD" firstAttribute="centerX" secondItem="1Vd-Cw-5GJ" secondAttribute="centerX" id="kxO-yQ-nmN"/>
                                 <constraint firstAttribute="trailing" secondItem="ROO-5P-Meg" secondAttribute="trailing" constant="-1" id="mdi-oK-Mdg"/>
                                 <constraint firstAttribute="height" constant="64" id="y93-yy-2Y9"/>

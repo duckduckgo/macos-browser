@@ -31,6 +31,8 @@ extension Pixel {
         static let errorCount = "c"
         static let underlyingErrorCode = "ue"
         static let underlyingErrorDesc = "ud"
+        static let underlyingErrorSQLiteCode = "sqlrc"
+        static let underlyingErrorSQLiteExtendedCode = "sqlerc"
     }
 
     enum Values {
@@ -46,13 +48,8 @@ extension Pixel.Event {
 
     var parameters: [String: String]? {
         switch self {
-        case .debug(event: let event, error: let error, countedBy: let counter):
+        case .debug(event: _, error: let error):
             var params = [String: String]()
-
-            if let counter = counter {
-                let count = counter.incrementedCount(for: event)
-                params[Pixel.Parameters.errorCount] = "\(count)"
-            }
 
             if let error = error {
                 let nsError = error as NSError
@@ -62,20 +59,27 @@ extension Pixel.Event {
                 if let underlyingError = nsError.userInfo["NSUnderlyingError"] as? NSError {
                     params[Pixel.Parameters.underlyingErrorCode] = "\(underlyingError.code)"
                     params[Pixel.Parameters.underlyingErrorDesc] = underlyingError.domain
-                } else if let sqlErrorCode = nsError.userInfo["NSSQLiteErrorDomain"] as? NSNumber {
-                    params[Pixel.Parameters.underlyingErrorCode] = "\(sqlErrorCode.intValue)"
-                    params[Pixel.Parameters.underlyingErrorDesc] = "NSSQLiteErrorDomain"
+                }
+                if let sqlErrorCode = nsError.userInfo["SQLiteResultCode"] as? NSNumber {
+                    params[Pixel.Parameters.underlyingErrorSQLiteCode] = "\(sqlErrorCode.intValue)"
+                }
+                if let sqlExtendedErrorCode = nsError.userInfo["SQLiteExtendedResultCode"] as? NSNumber {
+                    params[Pixel.Parameters.underlyingErrorSQLiteExtendedCode] = "\(sqlExtendedErrorCode.intValue)"
                 }
             }
 
             return params
 
+        // Don't use default to force new items to be thought about
         case .appLaunch,
              .launchTiming,
+             .appUsage,
              .appActiveUsage,
              .browserMadeDefault,
              .burn,
              .crash,
+             .brokenSiteReport,
+             .compileRulesWait,
              .fireproof,
              .fireproofSuggested,
              .bookmark,
@@ -93,8 +97,21 @@ extension Pixel.Event {
              .importedLogins,
              .exportedLogins,
              .importedBookmarks,
+             .exportedBookmarks,
              .formAutofilled,
-             .autofillItemSaved:
+             .autofillItemSaved,
+             .onboardingStartPressed,
+             .onboardingImportPressed,
+             .onboardingImportSkipped,
+             .onboardingSetDefaultPressed,
+             .onboardingSetDefaultSkipped,
+             .onboardingTypingSkipped,
+             .waitlistFirstLaunch,
+             .waitlistMigratedExistingInstall,
+             .waitlistPresentedLockScreen,
+             .waitlistDismissedLockScreen,
+             .autoconsentOptOutFailed,
+             .autoconsentSelfTestFailed:
 
             return nil
         }

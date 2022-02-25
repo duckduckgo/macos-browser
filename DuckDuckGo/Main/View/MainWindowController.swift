@@ -35,8 +35,16 @@ final class MainWindowController: NSWindowController {
         return window?.standardWindowButton(.closeButton)?.superview
     }
 
-    init(mainViewController: MainViewController, fireViewModel: FireViewModel = FireCoordinator.fireViewModel) {
-        let window = MainWindow(frame: NSRect(x: 0, y: 0, width: 1024, height: 790))
+    init(mainViewController: MainViewController, popUp: Bool, fireViewModel: FireViewModel = FireCoordinator.fireViewModel) {
+        let makeWindow: (NSRect) -> NSWindow = popUp ? PopUpWindow.init(frame:) : MainWindow.init(frame:)
+
+        let size = mainViewController.view.frame.size
+        let moveToCenter = CGAffineTransform(translationX: ((NSScreen.main?.frame.width ?? 1024) - size.width) / 2,
+                                             y: ((NSScreen.main?.frame.height ?? 790) - size.height) / 2)
+        let frame = NSRect(origin: (NSScreen.main?.frame.origin ?? .zero).applying(moveToCenter),
+                           size: size)
+
+        let window = makeWindow(frame)
         window.contentViewController = mainViewController
         self.fireViewModel = fireViewModel
 
@@ -55,6 +63,14 @@ final class MainWindowController: NSWindowController {
     private func setupWindow() {
         window?.delegate = self
         window?.setFrameAutosaveName(Self.windowFrameSaveName)
+        
+        NotificationCenter.default.addObserver(self, selector: #selector(dismissLockScreen), name: .macWaitlistLockScreenDidUnlock, object: nil)
+    }
+    
+    @objc
+    private func dismissLockScreen() {
+        updateWindowForLockScreen(lockScreenVisible: false)
+        mainViewController.tabCollectionViewModel.selectedTabViewModel?.tab.startOnboarding()
     }
 
     private func setupToolbar() {
@@ -76,7 +92,7 @@ final class MainWindowController: NSWindowController {
         trafficLightsAlphaCancellable = window?.standardWindowButton(.closeButton)?
             .publisher(for: \.alphaValue)
             .map { alphaValue in TabBarViewController.HorizontalSpace.leadingStackViewPadding.rawValue * alphaValue }
-            .weakAssign(to: \.constant, on: tabBarViewController.leadingStackViewLeadingConstraint)
+            .assign(to: \.constant, onWeaklyHeld: tabBarViewController.leadingStackViewLeadingConstraint)
     }
 
     private var shouldPreventUserInteractionCancellable: AnyCancellable?
@@ -89,12 +105,14 @@ final class MainWindowController: NSWindowController {
             })
     }
 
-    private func userInteraction(prevented: Bool) {
+    func userInteraction(prevented: Bool) {
         mainViewController.tabCollectionViewModel.changesEnabled = !prevented
         mainViewController.tabCollectionViewModel.selectedTabViewModel?.tab.contentChangeEnabled = !prevented
 
         mainViewController.tabBarViewController.fireButton.isEnabled = !prevented
         mainViewController.navigationBarViewController.controlsForUserPrevention.forEach { $0?.isEnabled = !prevented }
+        
+        NSApplication.shared.mainMenuTyped.autoupdatingMenusForUserPrevention.forEach { $0.autoenablesItems = !prevented }
         NSApplication.shared.mainMenuTyped.menuItemsForUserPrevention.forEach { $0.isEnabled = !prevented }
 
         if prevented {
@@ -102,7 +120,7 @@ final class MainWindowController: NSWindowController {
             mainViewController.view.makeMeFirstResponder()
         } else {
             window?.styleMask.update(with: .closable)
-            mainViewController.navigationBarViewController.addressBarViewController?.addressBarTextField.makeMeFirstResponderIfNeeded()
+            mainViewController.adjustFirstResponder()
         }
     }
 
@@ -157,7 +175,36 @@ extension MainWindowController: NSWindowDelegate {
     func windowDidBecomeKey(_ notification: Notification) {
         mainViewController.windowDidBecomeMain()
         mainViewController.navigationBarViewController.windowDidBecomeMain()
-        WindowControllersManager.shared.lastKeyMainWindowController = self
+
+        if (notification.object as? NSWindow)?.isPopUpWindow == false {
+            WindowControllersManager.shared.lastKeyMainWindowController = self
+        }
+        
+        displayLockScreenIfNecessary()
+    }
+    
+    private func displayLockScreenIfNecessary() {
+        // Displaying a modal so soon after the window becoming key causes issues related to the window animation and
+        // state, such as a double animation happening as the window opens, and the address bar state being incorrect.
+        // Dispatching this change to the end of the main queue fixes it.
+        DispatchQueue.main.async {
+#if DEBUG
+            if !AppDelegate.isRunningTests {
+                if Waitlist.displayLockScreenIfNecessary(in: self.mainViewController) {
+                    self.updateWindowForLockScreen(lockScreenVisible: true)
+                }
+            }
+#else
+            if Waitlist.displayLockScreenIfNecessary(in: self.mainViewController) {
+                self.updateWindowForLockScreen(lockScreenVisible: true)
+            }
+#endif
+        }
+    }
+    
+    private func updateWindowForLockScreen(lockScreenVisible: Bool) {
+        userInteraction(prevented: lockScreenVisible)
+        window?.isMovable = lockScreenVisible
     }
 
     func windowDidResignKey(_ notification: Notification) {
@@ -184,6 +231,7 @@ extension MainWindowController: NSWindowDelegate {
             WindowControllersManager.shared.unregister(self)
         }
     }
+
 }
 
 fileprivate extension MainMenu {
@@ -196,8 +244,19 @@ fileprivate extension MainMenu {
             closeWindowMenuItem,
             closeAllWindowsMenuItem,
             closeTabMenuItem,
-            burnWebsiteDataMenuItem
+            burnWebsiteDataMenuItem,
+            importBrowserDataMenuItem,
+            manageBookmarksMenuItem,
+            importBookmarksMenuItem,
+            preferencesMenuItem
         ]
+    }
+    
+    var autoupdatingMenusForUserPrevention: [NSMenu] {
+        return [
+            preferencesMenuItem.menu,
+            manageBookmarksMenuItem.menu
+        ].compactMap { $0 }
     }
 
 }

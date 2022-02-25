@@ -37,7 +37,7 @@ enum APIRequest {
     
     private static let mainThreadCallbackSession = URLSession(configuration: .default, delegate: nil, delegateQueue: OperationQueue.main)
     private static let mainThreadCallbackEphemeralSession = URLSession(configuration: .ephemeral, delegate: nil, delegateQueue: OperationQueue.main)
-    
+
     struct Response {
         
         var data: Data?
@@ -72,7 +72,7 @@ enum APIRequest {
         let session = session(useMainThreadCallbackQueue: callBackOnMainThread, ephemeral: useEphemeralURLSession)
 
         let task = session.dataTask(with: urlRequest) { (data, response, error) in
-            
+
             let httpResponse = response as? HTTPURLResponse
 
             if let error = error {
@@ -111,6 +111,7 @@ enum APIRequest {
             return ephemeral ? defaultCallbackEphemeralSession : defaultCallbackSession
         }
     }
+
 }
 
 extension HTTPURLResponse {

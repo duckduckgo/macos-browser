@@ -18,69 +18,42 @@
 
 import Foundation
 import os.log
+import BrowserServicesKit
 
 final class HTTPSUpgrade {
 
-    typealias UpgradeCheckCompletion = (Bool) -> Void
     static let shared = HTTPSUpgrade()
     
     private let dataReloadLock = NSLock()
     private let store: HTTPSUpgradeStore
     private var bloomFilter: BloomFilterWrapper?
-    
-    private var userUnprotected: Set<String> = []
-    
+
     init(store: HTTPSUpgradeStore = HTTPSUpgradePersistence()) {
         self.store = store
-        reload()
-    }
-    
-    func reload() {
-        let protectionStore = DomainsProtectionUserDefaultsStore()
-        userUnprotected = protectionStore.unprotectedDomains
     }
 
-    func isUpgradeable(url: URL, completion: @escaping UpgradeCheckCompletion,
-                       config: PrivacyConfigurationManagment = PrivacyConfigurationManager.shared) {
+    func isUpgradeable(url: URL, config: PrivacyConfiguration = ContentBlocking.shared.privacyConfigurationManager.privacyConfig) -> Bool {
         
         guard url.scheme == URL.NavigationalScheme.http.rawValue else {
-            completion(false)
-            return
+            return false
         }
         
         guard let host = url.host else {
-            completion(false)
-            return
+            return false
         }
         
         if store.shouldExcludeDomain(host) {
-            completion(false)
-            return
+            return false
         }
-        
-        if config.isEnabled(featureKey: .https) {
-            // Check exception lists before upgrading
-            if config.tempUnprotectedDomains.contains(host) {
-                completion(false)
-                return
-            }
-            if userUnprotected.contains(host) {
-                completion(false)
-                return
-            }
-            if config.exceptionsList(forFeature: .https).contains(host) {
-                completion(false)
-                return
-            }
-        } else {
-            completion(false)
-            return
+
+        guard config.isFeature(.httpsUpgrade, enabledForDomain: host) else {
+            return false
         }
         
         waitForAnyReloadsToComplete()
         let isUpgradable = isInUpgradeList(host: host)
-        completion(isUpgradable)
-           
+
+        return isUpgradable
     }
     
     private func isInUpgradeList(host: String) -> Bool {

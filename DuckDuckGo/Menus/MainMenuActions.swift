@@ -59,20 +59,19 @@ extension AppDelegate {
 #if FEEDBACK
 
     @IBAction func openFeedback(_ sender: Any?) {
-        guard let windowController = WindowControllersManager.shared.lastKeyMainWindowController,
-              windowController.window?.isKeyWindow == true else {
-            WindowsManager.openNewWindow(with: URL.feedback)
+        // swiftlint:disable force_cast
+        let windowController = NSStoryboard.feedback.instantiateController(withIdentifier: "FeedbackWindowController") as! NSWindowController
+        // swiftlint:enable force_cast
+
+        guard let feedbackWindow = windowController.window as? FeedbackWindow,
+              let parentWindowController = WindowControllersManager.shared.lastKeyMainWindowController else {
+            assertionFailure("HomepageViewController: Failed to present FeedbackWindowController")
             return
         }
 
-        let mainViewController = windowController.mainViewController
-
-        DefaultConfigurationStorage.shared.log()
-        ConfigurationManager.shared.log()
-
-        let tab = Tab(content: .url(.feedback))
-        let tabCollectionViewModel = mainViewController.tabCollectionViewModel
-        tabCollectionViewModel.append(tab: tab)
+        feedbackWindow.feedbackViewController.currentTab =
+            parentWindowController.mainViewController.tabCollectionViewModel.selectedTabViewModel?.tab
+        parentWindowController.window?.beginSheet(feedbackWindow) { _ in }
     }
 
 #endif
@@ -107,45 +106,51 @@ extension AppDelegate {
     }
 
     @IBAction func openImportBrowserDataWindow(_ sender: Any?) {
-        guard let windowController = WindowControllersManager.shared.lastKeyMainWindowController,
-              windowController.window?.isKeyWindow == true else {
-
-            return
-        }
-
-        let viewController = DataImportViewController.create()
-        windowController.mainViewController.beginSheet(viewController)
+        DataImportViewController.show()
     }
 
-    @IBAction func openExportBrowserDataWindow(_ sender: Any?) {
+    @IBAction func openExportLogins(_ sender: Any?) {
         guard let windowController = WindowControllersManager.shared.lastKeyMainWindowController,
-              let window = windowController.window else {
-
-            return
-        }
+              let window = windowController.window else { return }
 
         let savePanel = NSSavePanel()
-        savePanel.nameFieldStringValue = "DuckDuckGo Logins"
+        savePanel.nameFieldStringValue = "DuckDuckGo \(UserText.exportLoginsFileNameSuffix)"
         savePanel.allowedFileTypes = ["csv"]
 
         savePanel.beginSheetModal(for: window) { response in
-            guard response == .OK, let selectedURL = savePanel.url else {
-                return
-            }
+            guard response == .OK, let selectedURL = savePanel.url else { return }
 
-            let vault = try? SecureVaultFactory.default.makeVault()
+            let vault = try? SecureVaultFactory.default.makeVault(errorReporter: SecureVaultErrorReporter.shared)
             let exporter = CSVLoginExporter(secureVault: vault!)
             do {
                 try exporter.exportVaultLogins(to: selectedURL)
                 Pixel.fire(.exportedLogins())
             } catch {
-                // @samsymons Move this into an extension in the followup login import PR:
-                let alert = NSAlert()
-                alert.messageText = "Failed to Export Logins"
-                alert.informativeText = "Please check that no file exists at the location you selected."
-                alert.alertStyle = .warning
-                alert.addButton(withTitle: "OK")
-                alert.beginSheetModal(for: window, completionHandler: nil)
+                NSAlert.exportLoginsFailed()
+                    .beginSheetModal(for: window, completionHandler: nil)
+            }
+        }
+    }
+
+    @IBAction func openExportBookmarks(_ sender: Any?) {
+        guard let windowController = WindowControllersManager.shared.lastKeyMainWindowController,
+              let window = windowController.window,
+              let list = LocalBookmarkManager.shared.list else { return }
+
+        let savePanel = NSSavePanel()
+        savePanel.nameFieldStringValue = "DuckDuckGo \(UserText.exportBookmarksFileNameSuffix)"
+        savePanel.allowedFileTypes = ["html"]
+
+        savePanel.beginSheetModal(for: window) { response in
+            guard response == .OK, let selectedURL = savePanel.url else { return }
+
+            let exporter = BookmarksExporter(list: list)
+            do {
+                try exporter.exportBookmarksTo(url: selectedURL)
+                Pixel.fire(.exportedBookmarks())
+            } catch {
+                NSAlert.exportBookmarksFailed()
+                    .beginSheetModal(for: window, completionHandler: nil)
             }
         }
     }
@@ -161,13 +166,13 @@ extension MainViewController {
     // MARK: - Main Menu
 
     @IBAction func openPreferences(_ sender: Any?) {
-        tabCollectionViewModel.appendNewTab(with: .preferences)
+        browserTabViewController.openNewTab(with: .preferences, selected: true)
     }
 
     // MARK: - File
 
     @IBAction func newTab(_ sender: Any?) {
-        tabCollectionViewModel.appendNewTab(with: .homepage)
+        browserTabViewController.openNewTab(with: .homepage, selected: true)
     }
 
     @IBAction func openLocation(_ sender: Any?) {
@@ -191,7 +196,7 @@ extension MainViewController {
         }
 
         Pixel.fire(.refresh(source: .init(sender: sender, default: .mainMenu)))
-        selectedTabViewModel.tab.reload()
+        selectedTabViewModel.reload()
     }
 
     @IBAction func stopLoadingPage(_ sender: Any) {
@@ -231,7 +236,20 @@ extension MainViewController {
     }
 
     @IBAction func toggleDownloads(_ sender: Any) {
-        navigationBarViewController.toggleDownloadsPopover()
+        var navigationBarViewController = self.navigationBarViewController
+        if view.window?.isPopUpWindow == true {
+            if let vc = WindowControllersManager.shared.lastKeyMainWindowController?.mainViewController.navigationBarViewController {
+                navigationBarViewController = vc
+            } else {
+                WindowsManager.openNewWindow(with: Tab(content: .homepage))
+                guard let wc = WindowControllersManager.shared.mainWindowControllers.first(where: { $0.window?.isPopUpWindow == false }) else {
+                    return
+                }
+                navigationBarViewController = wc.mainViewController.navigationBarViewController
+            }
+            navigationBarViewController?.view.window?.makeKeyAndOrderFront(nil)
+        }
+        navigationBarViewController?.toggleDownloadsPopover(keepButtonVisible: false)
     }
 
     // MARK: - History
@@ -255,6 +273,10 @@ extension MainViewController {
     }
 
     @IBAction func home(_ sender: Any?) {
+        guard view.window?.isPopUpWindow == false else {
+            browserTabViewController.openNewTab(with: .homepage, selected: true)
+            return
+        }
         guard let selectedTabViewModel = tabCollectionViewModel.selectedTabViewModel else {
             os_log("MainViewController: No tab view model selected", type: .error)
             return
@@ -283,7 +305,7 @@ extension MainViewController {
             .openBookmarkPopover(setFavorite: true, accessPoint: .init(sender: sender, default: .moreMenu))
     }
     
-    @IBAction func navigateToBookmark(_ sender: Any?) {
+    @IBAction func openBookmark(_ sender: Any?) {
         guard let menuItem = sender as? NSMenuItem else {
             os_log("MainViewController: Casting to menu item failed", type: .error)
             return
@@ -302,7 +324,7 @@ extension MainViewController {
 
         if NSApplication.shared.isCommandPressed && NSApplication.shared.isShiftPressed {
             WindowsManager.openNewWindow(with: bookmark.url)
-        } else if NSApplication.shared.isCommandPressed {
+        } else if NSApplication.shared.isCommandPressed || self.view.window?.isPopUpWindow == true {
             WindowControllersManager.shared.show(url: bookmark.url, newTab: true)
         } else {
             selectedTabViewModel.tab.setContent(.url(bookmark.url))
@@ -324,7 +346,7 @@ extension MainViewController {
     }
 
     @IBAction func showManageBookmarks(_ sender: Any?) {
-        tabCollectionViewModel.appendNewTab(with: .bookmarks)
+        browserTabViewController.openNewTab(with: .bookmarks, selected: true)
         Pixel.fire(.manageBookmarks(source: .mainMenu))
     }
 
@@ -368,7 +390,8 @@ extension MainViewController {
     }
 
     @IBAction func mergeAllWindows(_ sender: Any?) {
-        let otherWindowControllers = WindowControllersManager.shared.mainWindowControllers.filter { $0.window != view.window }
+        guard let mainWindowController = WindowControllersManager.shared.lastKeyMainWindowController else { return }
+        let otherWindowControllers = WindowControllersManager.shared.mainWindowControllers.filter { $0 !== mainWindowController }
         let otherMainViewControllers = otherWindowControllers.compactMap { $0.mainViewController }
         let otherTabCollectionViewModels = otherMainViewControllers.map { $0.tabCollectionViewModel }
         let otherTabs = otherTabCollectionViewModels.flatMap { $0.tabCollection.tabs }
@@ -382,6 +405,14 @@ extension MainViewController {
 
     @IBAction func findInPage(_ sender: Any?) {
         tabCollectionViewModel.selectedTabViewModel?.startFindInPage()
+    }
+
+    @IBAction func findInPageNext(_ sender: Any?) {
+        self.tabCollectionViewModel.selectedTabViewModel?.findInPageNext()
+    }
+
+    @IBAction func findInPagePrevious(_ sender: Any?) {
+        self.tabCollectionViewModel.selectedTabViewModel?.findInPagePrevious()
     }
 
     /// Declines handling findInPage action if there's no page loaded currently.
@@ -438,17 +469,54 @@ extension MainViewController {
     }
 
     @IBAction func resetSecureVaultData(_ sender: Any?) {
-        let vault = try? SecureVaultFactory.default.makeVault()
+        let vault = try? SecureVaultFactory.default.makeVault(errorReporter: SecureVaultErrorReporter.shared)
+        
         let accounts = (try? vault?.accounts()) ?? []
-        let accountIDs = accounts.compactMap(\.id)
+        for accountID in accounts.compactMap(\.id) {
+            try? vault?.deleteWebsiteCredentialsFor(accountId: accountID)
+        }
+        
+        let cards = (try? vault?.creditCards()) ?? []
+        for cardID in cards.compactMap(\.id) {
+            try? vault?.deleteCreditCardFor(cardId: cardID)
+        }
 
-        for accountID in accountIDs {
-            do {
-                try vault?.deleteWebsiteCredentialsFor(accountId: accountID)
-            } catch {
-                os_log("Failed to remove credential with account ID %d", type: .error, accountID)
+        let identities = (try? vault?.identities()) ?? []
+        for identityID in identities.compactMap(\.id) {
+            try? vault?.deleteIdentityFor(identityId: identityID)
+        }
+        
+        let notes = (try? vault?.notes()) ?? []
+        for noteID in notes.compactMap(\.id) {
+            try? vault?.deleteNoteFor(noteId: noteID)
+        }
+    }
+    
+    @IBAction func resetBookmarks(_ sender: Any?) {
+        guard let topLevelEntities = LocalBookmarkManager.shared.list?.topLevelEntities else {
+            return
+        }
+        
+        for entity in topLevelEntities {
+            if let folder = entity as? BookmarkFolder {
+                LocalBookmarkManager.shared.remove(folder: folder)
+            } else if let bookmark = entity as? Bookmark {
+                LocalBookmarkManager.shared.remove(bookmark: bookmark)
             }
         }
+    }
+    
+    @IBAction func resetMacWaitlistUnlockState(_ sender: Any?) {
+        OnboardingViewModel().restart()
+        let store = MacWaitlistEncryptedFileStorage()
+        store.deleteExistingMetadata()
+    }
+    
+    // Used to test the lock screen upgrade process. Users with the legacy ATB format need to be unlocked.
+    @IBAction func setFakeUserDefaultsATBValues(_ sender: Any?) {
+        var legacyStore = LocalStatisticsStore.LegacyStatisticsStore()
+        legacyStore.atb = "fake-atb-value"
+        legacyStore.installDate = Date()
     }
 
     // MARK: - Developer Tools
@@ -510,7 +578,7 @@ extension MainViewController: NSMenuItemValidation {
         case #selector(MainViewController.bookmarkThisPage(_:)),
              #selector(MainViewController.favoriteThisPage(_:)):
             return tabCollectionViewModel.selectedTabViewModel?.canBeBookmarked == true
-        case #selector(MainViewController.navigateToBookmark(_:)),
+        case #selector(MainViewController.openBookmark(_:)),
              #selector(MainViewController.showManageBookmarks(_:)):
             return true
 
@@ -585,5 +653,11 @@ extension MainViewController: FindInPageDelegate {
     func findInPageDone(_ controller: FindInPageViewController) {
         self.tabCollectionViewModel.selectedTabViewModel?.closeFindInPage()
     }
+
+}
+
+fileprivate extension NSStoryboard {
+
+    static let feedback = NSStoryboard(name: "Feedback", bundle: .main)
 
 }

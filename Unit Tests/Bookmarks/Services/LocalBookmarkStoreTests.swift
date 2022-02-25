@@ -32,7 +32,7 @@ final class LocalBookmarkStoreTests: XCTestCase {
         let savingExpectation = self.expectation(description: "Saving")
         let loadingExpectation = self.expectation(description: "Loading")
 
-        let bookmark = Bookmark(id: UUID(), url: URL.duckDuckGo, title: "DuckDuckGo", favicon: nil, isFavorite: true)
+        let bookmark = Bookmark(id: UUID(), url: URL.duckDuckGo, title: "DuckDuckGo", isFavorite: true)
 
         bookmarkStore.save(bookmark: bookmark, parent: nil) { (success, error) in
             XCTAssert(success)
@@ -63,7 +63,7 @@ final class LocalBookmarkStoreTests: XCTestCase {
         let removingExpectation = self.expectation(description: "Removing")
         let loadingExpectation = self.expectation(description: "Loading")
 
-        let bookmark = Bookmark(id: UUID(), url: URL.duckDuckGo, title: "DuckDuckGo", favicon: nil, isFavorite: true)
+        let bookmark = Bookmark(id: UUID(), url: URL.duckDuckGo, title: "DuckDuckGo", isFavorite: true)
         bookmarkStore.save(bookmark: bookmark, parent: nil) { (success, error) in
             XCTAssert(success)
             XCTAssertNil(error)
@@ -98,7 +98,7 @@ final class LocalBookmarkStoreTests: XCTestCase {
         let savingExpectation = self.expectation(description: "Saving")
         let loadingExpectation = self.expectation(description: "Loading")
 
-        let bookmark = Bookmark(id: UUID(), url: URL.duckDuckGo, title: "DuckDuckGo", favicon: nil, isFavorite: true)
+        let bookmark = Bookmark(id: UUID(), url: URL.duckDuckGo, title: "DuckDuckGo", isFavorite: true)
 
         bookmarkStore.save(bookmark: bookmark, parent: nil) { (success, error) in
             XCTAssert(success)
@@ -106,7 +106,7 @@ final class LocalBookmarkStoreTests: XCTestCase {
 
             savingExpectation.fulfill()
 
-            let modifiedBookmark = Bookmark(id: bookmark.id, url: URL.duckDuckGo, title: "New Title", favicon: nil, isFavorite: false)
+            let modifiedBookmark = Bookmark(id: bookmark.id, url: URL.duckDuckGo, title: "New Title", isFavorite: false)
             bookmarkStore.update(bookmark: modifiedBookmark)
 
             bookmarkStore.loadAll(type: .bookmarks) { bookmarks, error in
@@ -279,7 +279,7 @@ final class LocalBookmarkStoreTests: XCTestCase {
         let topLevelFolders = ImportedBookmarks.TopLevelFolders(bookmarkBar: bookmarkBar, otherBookmarks: otherBookmarks)
         let importedBookmarks = ImportedBookmarks(topLevelFolders: topLevelFolders)
 
-        let result = bookmarkStore.importBookmarks(importedBookmarks)
+        let result = bookmarkStore.importBookmarks(importedBookmarks, source: .safari)
 
         XCTAssertEqual(result.successful, 1)
         XCTAssertEqual(result.duplicates, 0)
@@ -311,8 +311,8 @@ final class LocalBookmarkStoreTests: XCTestCase {
         let importedBookmarks = ImportedBookmarks(topLevelFolders: topLevelFolders)
 
         // Import bookmarks once, and then again to test duplicates
-        _ = bookmarkStore.importBookmarks(importedBookmarks)
-        let result = bookmarkStore.importBookmarks(importedBookmarks)
+        _ = bookmarkStore.importBookmarks(importedBookmarks, source: .safari)
+        let result = bookmarkStore.importBookmarks(importedBookmarks, source: .safari)
 
         XCTAssertEqual(result.successful, 0)
         XCTAssertEqual(result.duplicates, 1)

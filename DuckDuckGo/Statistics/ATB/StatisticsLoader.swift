@@ -30,7 +30,7 @@ final class StatisticsLoader {
     private let parser = AtbParser()
     private var isAppRetentionRequestInProgress = false
     
-    init(statisticsStore: StatisticsStore = StatisticsUserDefaults()) {
+    init(statisticsStore: StatisticsStore = LocalStatisticsStore()) {
         self.statisticsStore = statisticsStore
     }
 
@@ -39,7 +39,11 @@ final class StatisticsLoader {
             dispatchPrecondition(condition: .onQueue(.main))
 
             if isSearch {
-                self.refreshSearchRetentionAtb(completion: completion)
+                self.refreshSearchRetentionAtb {
+                    self.refreshRetentionAtb(isSearch: false) {
+                        completion()
+                    }
+                }
                 Pixel.fire(.serp)
             } else if !self.statisticsStore.isAppRetentionFiredToday {
                 self.refreshAppRetentionAtb(completion: completion)
@@ -60,8 +64,12 @@ final class StatisticsLoader {
     private func requestInstallStatistics(completion: @escaping Completion = {}) {
         dispatchPrecondition(condition: .onQueue(.main))
 
+        guard !isAppRetentionRequestInProgress else { return }
+        isAppRetentionRequestInProgress = true
+
         APIRequest.request(url: URL.initialAtb) { response, error in
             DispatchQueue.main.async {
+                self.isAppRetentionRequestInProgress = false
                 if let error = error {
                     os_log("Initial atb request failed with error %s", type: .error, error.localizedDescription)
                     completion()
@@ -81,15 +89,23 @@ final class StatisticsLoader {
         dispatchPrecondition(condition: .onQueue(.main))
 
         let installAtb = atb.version + (statisticsStore.variant ?? "")
-        guard let url = URL.exti(forAtb: installAtb) else { return }
+        guard let url = URL.exti(forAtb: installAtb),
+            !isAppRetentionRequestInProgress
+        else { return }
+        self.isAppRetentionRequestInProgress = true
 
         APIRequest.request(url: url) { _, error in
             DispatchQueue.main.async {
+                self.isAppRetentionRequestInProgress = false
                 if let error = error {
                     os_log("Exti request failed with error %s", type: .error, error.localizedDescription)
                     completion()
                     return
                 }
+
+                assert(self.statisticsStore.atb == nil)
+                assert(self.statisticsStore.installDate == nil)
+
                 self.statisticsStore.installDate = Date()
                 self.statisticsStore.atb = atb.version
                 completion()

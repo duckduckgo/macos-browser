@@ -39,11 +39,12 @@ final class CrashReportReader {
             .filter({ isCrashReportPath($0) &&
                         belongsToThisApp($0) &&
                         isFile(at: $0, newerThan: lastCheckDate) })
-            .map({ CrashReport(url: $0) })
+            .compactMap(crashReport(from:))
     }
 
     private func isCrashReportPath(_ path: URL) -> Bool {
-        return path.pathExtension == "crash"
+        let validExtensions = [LegacyCrashReport.fileExtension, JSONCrashReport.fileExtension]
+        return validExtensions.contains(path.pathExtension)
     }
 
     private func belongsToThisApp(_ path: URL) -> Bool {
@@ -57,6 +58,14 @@ final class CrashReportReader {
         }
 
         return creationDate > lastCheckDate && creationDate < Date()
+    }
+    
+    private func crashReport(from url: URL) -> CrashReport? {
+        switch url.pathExtension {
+        case LegacyCrashReport.fileExtension: return LegacyCrashReport(url: url)
+        case JSONCrashReport.fileExtension: return JSONCrashReport(url: url)
+        default: return nil
+        }
     }
 
 }

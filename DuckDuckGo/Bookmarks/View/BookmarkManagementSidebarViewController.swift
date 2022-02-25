@@ -59,6 +59,15 @@ final class BookmarkManagementSidebarViewController: NSViewController {
         return [BookmarkNode]()
     }
 
+    @IBAction func onDoubleClick(_ sender: NSOutlineView) {
+        guard let item = sender.item(atRow: sender.clickedRow) else { return }
+        if sender.isItemExpanded(item) {
+            sender.animator().collapseItem(item)
+        } else {
+            sender.animator().expandItem(item)
+        }
+    }
+
     override func viewDidLoad() {
         super.viewDidLoad()
 
@@ -96,6 +105,8 @@ final class BookmarkManagementSidebarViewController: NSViewController {
 
     override func viewWillAppear() {
         super.viewWillAppear()
+        reloadData()
+
         tabSwitcherButton.select(tabType: .bookmarks)
     }
 

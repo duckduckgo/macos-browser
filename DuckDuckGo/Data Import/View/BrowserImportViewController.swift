@@ -16,7 +16,7 @@
 //  limitations under the License.
 //
 
-import Foundation
+import AppKit
 
 protocol BrowserImportViewControllerDelegate: AnyObject {
 
@@ -47,7 +47,6 @@ final class BrowserImportViewController: NSViewController {
 
     @IBOutlet var bookmarksCheckbox: NSButton!
     @IBOutlet var passwordsCheckbox: NSButton!
-    @IBOutlet var passwordDetailLabel: NSTextField!
 
     @IBOutlet var closeBrowserWarningLabel: NSTextField!
     @IBOutlet var closeBrowserWarningViewHeightConstraint: NSLayoutConstraint!
@@ -79,7 +78,7 @@ final class BrowserImportViewController: NSViewController {
             return profileList.validImportableProfiles.first
         }
 
-        return profileList.validImportableProfiles.first { $0.name == selectedProfile.title }
+        return profileList.validImportableProfiles.first { $0.profileName == selectedProfile.title }
     }
 
     let browser: DataImport.Source
@@ -117,30 +116,21 @@ final class BrowserImportViewController: NSViewController {
             profileSelectionPopUpButton.removeAllItems()
         }
 
-        // Update the disclaimer label on the password import row:
-
-        switch browser {
-        case .brave, .chrome, .edge:
-            passwordDetailLabel.stringValue = UserText.chromiumPasswordImportDisclaimer
-        case .firefox:
-            passwordDetailLabel.stringValue = UserText.firefoxPasswordImportDisclaimer
-        case .safari:
-            passwordsCheckbox.isHidden = true
-            passwordDetailLabel.isHidden = true
-        case .csv:
-            assertionFailure("Should not attempt to import a CSV file via \(#file)")
-        }
-
-        refreshCheckboxOptions()
+        passwordsCheckbox.isHidden = browser ==  .safari
 
         // Toggle the browser warning bar:
-
-        self.closeBrowserWarningLabel.stringValue = "You must close \(browser.importSourceName) before importing data."
+        self.closeBrowserWarningLabel.stringValue = UserText.closeBrowserWarningFor(browser: browser.importSourceName)
         hideOpenBrowserWarningIfNecessary()
+        
+        switch browser {
+        case .safari:
+            bookmarksCheckbox.title = UserText.bookmarkImportBookmarksAndFavorites
+        default:
+            bookmarksCheckbox.title = UserText.bookmarkImportBookmarks
+        }
     }
 
     @IBAction func selectedImportOptionsChanged(_ sender: NSButton) {
-        refreshCheckboxOptions()
         delegate?.browserImportViewController(self, didChangeSelectedImportOptions: selectedImportOptions)
     }
 
@@ -152,10 +142,6 @@ final class BrowserImportViewController: NSViewController {
         } else {
             closeBrowserWarningViewHeightConstraint.constant = 0
         }
-    }
-
-    private func refreshCheckboxOptions() {
-        passwordDetailLabel.isHidden = passwordsCheckbox.state == .off
     }
 
 }
@@ -170,9 +156,9 @@ extension NSPopUpButton {
         var selectedSourceIndex: Int?
 
         for (index, profile) in validProfiles.enumerated() {
-            addItem(withTitle: profile.name)
+            addItem(withTitle: profile.profileName)
 
-            if profile.name == defaultProfile?.name {
+            if profile.profileName == defaultProfile?.profileName {
                 selectedSourceIndex = index
             }
         }

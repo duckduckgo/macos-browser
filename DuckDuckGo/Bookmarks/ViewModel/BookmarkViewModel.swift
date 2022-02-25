@@ -16,7 +16,7 @@
 //  limitations under the License.
 //
 
-import Foundation
+import AppKit
 
 struct BookmarkViewModel {
 
@@ -47,7 +47,7 @@ struct BookmarkViewModel {
         // bookmark.isFavorite ? bookmark.favicon?.makeFavoriteOverlay() : bookmark.favicon
 
         if let bookmark = entity as? Bookmark {
-            let favicon = bookmark.favicon?.copy() as? NSImage
+            let favicon = bookmark.favicon(.small)?.copy() as? NSImage
             favicon?.size = NSSize.faviconSize
             return favicon
         } else if entity is BookmarkFolder {

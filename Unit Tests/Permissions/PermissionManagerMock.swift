@@ -29,12 +29,13 @@ final class PermissionManagerMock: PermissionManagerProtocol {
 
     var savedPermissions = [String: [PermissionType: Bool]]()
 
-    func permission(forDomain domain: String, permissionType: PermissionType) -> Bool? {
-        savedPermissions[domain.dropWWW()]?[permissionType]
+    func permission(forDomain domain: String, permissionType: PermissionType) -> PersistedPermissionDecision {
+        guard let allow = savedPermissions[domain.dropWWW()]?[permissionType] else { return .ask }
+        return PersistedPermissionDecision(allow: allow, isRemoved: false)
     }
 
-    func setPermission(_ permission: Bool, forDomain domain: String, permissionType: PermissionType) {
-        savedPermissions[domain.dropWWW(), default: [:]][permissionType] = permission
+    func setPermission(_ decision: PersistedPermissionDecision, forDomain domain: String, permissionType: PermissionType) {
+        savedPermissions[domain.dropWWW(), default: [:]][permissionType] = decision == .ask ? nil : decision.boolValue
     }
 
     func removePermission(forDomain domain: String, permissionType: PermissionType) {

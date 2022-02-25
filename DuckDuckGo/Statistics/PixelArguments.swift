@@ -29,11 +29,30 @@ extension Pixel.Event {
         case openURL = "open-url"
         case openFile = "open-file"
 
-        private static let AppInitiallyLaunchedKey = "init"
+        struct AppLaunchRepetition {
+            let store: PixelDataStore
+            let now: () -> Date
 
-        static func autoInitialOrRegular(store: PixelDataStore = LocalPixelDataStore.shared, now: Date = Date()) -> AppLaunch {
-            let launchRepetition = Repetition(key: Self.AppInitiallyLaunchedKey, store: store, now: now)
-            switch launchRepetition {
+            private static let AppInitiallyLaunchedKey = "init"
+
+            var value: Repetition {
+                Repetition(key: Self.AppInitiallyLaunchedKey, store: store, now: now(), update: false)
+            }
+
+            func update() {
+                _=Repetition(key: Self.AppInitiallyLaunchedKey, store: store, now: now(), update: true)
+            }
+        }
+
+        static func repetition(store: PixelDataStore = LocalPixelDataStore.shared,
+                               now: @autoclosure @escaping () -> Date = Date()) -> AppLaunchRepetition {
+            return AppLaunchRepetition(store: store, now: now)
+        }
+
+        static func autoInitialOrRegular(store: PixelDataStore = LocalPixelDataStore.shared,
+                                         now: @autoclosure @escaping () -> Date = Date()) -> AppLaunch {
+            let repetition = self.repetition(store: store, now: now())
+            switch repetition.value {
             case .initial:
                 return .initial
             case .dailyFirst:
@@ -67,9 +86,11 @@ extension Pixel.Event {
         case dailyFirst = "first-in-a-day"
         case repetitive = "repetitive"
 
-        init(key: String, store: PixelDataStore = LocalPixelDataStore.shared, now: Date = Date()) {
+        init(key: String, store: PixelDataStore = LocalPixelDataStore.shared, now: Date = Date(), update: Bool = true) {
             defer {
-                store.set(now.daySinceReferenceDate, forKey: key)
+                if update {
+                    store.set(now.daySinceReferenceDate, forKey: key)
+                }
             }
 
             guard let lastUsedDay: Int = store.value(forKey: key) else {
@@ -313,7 +334,12 @@ extension Pixel.Event {
         case newWindow = "new-window"
         case feedback = "feedback"
         case bookmarksList = "bookmarks-list"
-        case logins = "logins"
+        case loginsMenu = "logins-menu"
+        case loginsMenuAllItems = "logins-menu-all-items"
+        case loginsMenuLogins = "logins-menu-logins"
+        case loginsMenuIdentities = "logins-menu-identities"
+        case loginsMenuCreditCards = "logins-menu-credit-cards"
+        case loginsMenuNotes = "logins-menu-notes"
         case emailProtection = "email-protection"
         case emailProtectionCreateAddress = "email-protection-create"
         case emailProtectionOff = "email-protection-off"

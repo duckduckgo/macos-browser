@@ -24,7 +24,7 @@ import BrowserServicesKit
 protocol OptionsButtonMenuDelegate: AnyObject {
 
     func optionsButtonMenuRequestedBookmarkPopover(_ menu: NSMenu)
-    func optionsButtonMenuRequestedLoginsPopover(_ menu: NSMenu)
+    func optionsButtonMenuRequestedLoginsPopover(_ menu: NSMenu, selectedCategory: SecureVaultSorting.Category)
     func optionsButtonMenuRequestedDownloadsPopover(_ menu: NSMenu)
     func optionsButtonMenuRequestedPrint(_ menu: NSMenu)
 
@@ -45,6 +45,8 @@ final class MoreOptionsMenu: NSMenu {
         self.tabCollectionViewModel = tabCollectionViewModel
         self.emailManager = emailManager
         super.init(title: "")
+
+        self.emailManager.requestDelegate = self
 
         setupMenuItems()
     }
@@ -111,8 +113,24 @@ final class MoreOptionsMenu: NSMenu {
         actionDelegate?.optionsButtonMenuRequestedDownloadsPopover(self)
     }
 
-    @objc func openLogins(_ sender: NSMenuItem) {
-        actionDelegate?.optionsButtonMenuRequestedLoginsPopover(self)
+    @objc func openLoginsWithAllItems(_ sender: NSMenuItem) {
+        actionDelegate?.optionsButtonMenuRequestedLoginsPopover(self, selectedCategory: .allItems)
+    }
+    
+    @objc func openLoginsWithLogins(_ sender: NSMenuItem) {
+        actionDelegate?.optionsButtonMenuRequestedLoginsPopover(self, selectedCategory: .logins)
+    }
+    
+    @objc func openLoginsWithIdentities(_ sender: NSMenuItem) {
+        actionDelegate?.optionsButtonMenuRequestedLoginsPopover(self, selectedCategory: .identities)
+    }
+    
+    @objc func openLoginsWithCreditCards(_ sender: NSMenuItem) {
+        actionDelegate?.optionsButtonMenuRequestedLoginsPopover(self, selectedCategory: .cards)
+    }
+    
+    @objc func openLoginsWithNotes(_ sender: NSMenuItem) {
+        actionDelegate?.optionsButtonMenuRequestedLoginsPopover(self, selectedCategory: .notes)
     }
 
     @objc func openPreferences(_ sender: NSMenuItem) {
@@ -174,10 +192,13 @@ final class MoreOptionsMenu: NSMenu {
             .withImage(NSImage(named: "Downloads"))
             .firingPixel(Pixel.Event.MoreResult.downloads)
 
-        addItem(withTitle: UserText.passwordManagement, action: #selector(openLogins), keyEquivalent: "")
+        let loginsSubMenu = LoginsSubMenu(targetting: self)
+        
+        addItem(withTitle: UserText.passwordManagement, action: #selector(openLoginsWithAllItems), keyEquivalent: "")
             .targetting(self)
             .withImage(NSImage(named: "PasswordManagement"))
-            .firingPixel(Pixel.Event.MoreResult.logins)
+            .withSubmenu(loginsSubMenu)
+            .firingPixel(Pixel.Event.MoreResult.loginsMenu)
 
         addItem(NSMenuItem.separator())
     }
@@ -187,11 +208,13 @@ final class MoreOptionsMenu: NSMenu {
 
         if url.canFireproof, let host = url.host {
 
-            let title = FireproofDomains.shared.isFireproof(fireproofDomain: host) ? UserText.removeFireproofing : UserText.fireproofSite
+            let isFireproof = FireproofDomains.shared.isFireproof(fireproofDomain: host)
+            let title = isFireproof ? UserText.removeFireproofing : UserText.fireproofSite
+            let image = isFireproof ? NSImage(named: "Burn") : NSImage(named: "Fireproof")
 
             addItem(withTitle: title, action: #selector(toggleFireproofing(_:)), keyEquivalent: "")
                 .targetting(self)
-                .withImage(NSImage(named: "BurnProof"))
+                .withImage(image)
                 .firingPixel(Pixel.Event.MoreResult.fireproof)
 
         }
@@ -263,12 +286,17 @@ final class EmailOptionsButtonSubMenu: NSMenu {
     }
     
     @objc func createAddressAction(_ sender: NSMenuItem) {
-        guard let url = emailManager.generateTokenPageURL else {
-            assertionFailure("Could not get token page URL, token not available")
-            return
+        assert(emailManager.requestDelegate != nil, "No requestDelegate on emailManager")
+
+        emailManager.getAliasIfNeededAndConsume { [weak self] alias, error in
+            guard let alias = alias, let address = self?.emailManager.emailAddressFor(alias) else {
+                assertionFailure(error?.localizedDescription ?? "Unexpected email error")
+                return
+            }
+            NSPasteboard.general.clearContents()
+            NSPasteboard.general.setString(address, forType: .string)
+            NotificationCenter.default.post(name: NSNotification.Name.privateEmailCopiedToClipboard, object: nil)
         }
-        let tab = Tab(content: .url(url))
-        tabCollectionViewModel.append(tab: tab)
         Pixel.fire(.moreMenu(result: .emailProtectionCreateAddress))
     }
     
@@ -324,6 +352,47 @@ final class ZoomSubMenu: NSMenu {
 
 }
 
+final class LoginsSubMenu: NSMenu {
+    
+    init(targetting target: AnyObject) {
+        super.init(title: UserText.passwordManagement)
+        updateMenuItems(with: target)
+    }
+
+    required init(coder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }
+    
+    private func updateMenuItems(with target: AnyObject) {
+        addItem(withTitle: UserText.passwordManagementAllItems, action: #selector(MoreOptionsMenu.openLoginsWithAllItems), keyEquivalent: "")
+            .targetting(target)
+            .firingPixel(Pixel.Event.MoreResult.loginsMenuAllItems)
+        
+        addItem(NSMenuItem.separator())
+        
+        addItem(withTitle: UserText.passwordManagementLogins, action: #selector(MoreOptionsMenu.openLoginsWithLogins), keyEquivalent: "")
+            .targetting(target)
+            .withImage(NSImage(named: "LoginGlyph"))
+            .firingPixel(Pixel.Event.MoreResult.loginsMenuLogins)
+        
+        addItem(withTitle: UserText.passwordManagementIdentities, action: #selector(MoreOptionsMenu.openLoginsWithIdentities), keyEquivalent: "")
+            .targetting(target)
+            .withImage(NSImage(named: "IdentityGlyph"))
+            .firingPixel(Pixel.Event.MoreResult.loginsMenuIdentities)
+        
+        addItem(withTitle: UserText.passwordManagementCreditCards, action: #selector(MoreOptionsMenu.openLoginsWithCreditCards), keyEquivalent: "")
+            .targetting(target)
+            .withImage(NSImage(named: "CreditCardGlyph"))
+            .firingPixel(Pixel.Event.MoreResult.loginsMenuCreditCards)
+        
+        addItem(withTitle: UserText.passwordManagementNotes, action: #selector(MoreOptionsMenu.openLoginsWithNotes), keyEquivalent: "")
+            .targetting(target)
+            .withImage(NSImage(named: "NoteGlyph"))
+            .firingPixel(Pixel.Event.MoreResult.loginsMenuNotes)
+    }
+    
+}
+
 extension NSMenuItem {
 
     @discardableResult
@@ -351,3 +420,5 @@ extension NSMenuItem {
     }
 
 }
+
+extension MoreOptionsMenu: EmailManagerRequestDelegate { }

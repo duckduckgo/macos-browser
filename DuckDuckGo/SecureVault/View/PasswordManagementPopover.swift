@@ -44,6 +44,10 @@ final class PasswordManagementPopover: NSPopover {
     private var parentWindowDidResignKeyObserver: Any?
     private var parentWindowDidBecomeKeyObserver: Any?
 
+    func select(category: SecureVaultSorting.Category?) {
+        viewController.select(category: category)
+    }
+    
     private func setupContentController() {
         let controller = PasswordManagementViewController.create()
         contentViewController = controller

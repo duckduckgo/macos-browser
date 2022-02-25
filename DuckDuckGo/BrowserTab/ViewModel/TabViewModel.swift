@@ -27,7 +27,6 @@ final class TabViewModel {
         static let home = NSImage(named: "HomeFavicon")!
         static let preferences = NSImage(named: "Preferences")!
         static let bookmarks = NSImage(named: "Bookmarks")!
-        static let defaultFavicon = NSImage()
     }
 
     private(set) var tab: Tab
@@ -65,9 +64,12 @@ final class TabViewModel {
     var loadingStartTime: CFTimeInterval?
 
     @Published private(set) var addressBarString: String = ""
-    @PublishedAfter private(set) var passiveAddressBarString: String = ""
+    @Published private(set) var passiveAddressBarString: String = ""
+    var lastAddressBarTextFieldValue: AddressBarTextField.Value?
+    var lastHomepageTextFieldValue: AddressBarTextField.Value?
+
     @Published private(set) var title: String = UserText.tabHomeTitle
-    @Published private(set) var favicon: NSImage = Favicon.home
+    @Published private(set) var favicon: NSImage?
     @Published private(set) var findInPage: FindInPageModel = FindInPageModel()
 
     @Published private(set) var usedPermissions = Permissions()
@@ -87,15 +89,16 @@ final class TabViewModel {
     }
 
     private func subscribeToUrl() {
-        tab.$content.sink { [weak self] _ in
+        tab.$content.receive(on: DispatchQueue.main).sink { [weak self] _ in
             self?.updateCanReload()
             self?.updateAddressBarStrings()
             self?.updateCanBeBookmarked()
+            self?.updateFavicon()
         } .store(in: &cancellables)
     }
 
     private func subscribeToTitle() {
-        tab.$title.sink { [weak self] _ in self?.updateTitle() } .store(in: &cancellables)
+        tab.$title.receive(on: DispatchQueue.main).sink { [weak self] _ in self?.updateTitle() } .store(in: &cancellables)
     }
 
     private func subscribeToFavicon() {
@@ -111,9 +114,9 @@ final class TabViewModel {
     }
 
     private func subscribeToPermissions() {
-        tab.permissions.$permissions.weakAssign(to: \.usedPermissions, on: self)
+        tab.permissions.$permissions.assign(to: \.usedPermissions, onWeaklyHeld: self)
             .store(in: &cancellables)
-        tab.permissions.$authorizationQuery.weakAssign(to: \.permissionAuthorizationQuery, on: self)
+        tab.permissions.$authorizationQuery.assign(to: \.permissionAuthorizationQuery, onWeaklyHeld: self)
             .store(in: &cancellables)
     }
 
@@ -143,7 +146,7 @@ final class TabViewModel {
             return
         }
 
-        guard let url = tab.content.url else {
+        guard let url = tab.content.url ?? tab.parentTab?.content.url else {
             addressBarString = ""
             passiveAddressBarString = ""
             return
@@ -161,22 +164,15 @@ final class TabViewModel {
             return
         }
 
-        guard let host = url.host else {
+        guard let host = url.host ?? tab.parentTab?.content.url?.host else {
+            // also lands here for about:blank and about:home
             addressBarString = ""
             passiveAddressBarString = ""
             return
         }
 
-        if let searchQuery = url.searchQuery {
-            addressBarString = searchQuery
-            passiveAddressBarString = searchQuery
-        } else if [.blankPage, .homePage].contains(url) {
-            addressBarString = ""
-            passiveAddressBarString = ""
-        } else {
-            addressBarString = url.absoluteString
-            passiveAddressBarString = host.drop(prefix: URL.HostPrefix.www.separated())
-        }
+        addressBarString = url.absoluteString
+        passiveAddressBarString = host.drop(prefix: URL.HostPrefix.www.separated())
     }
 
     private func updateTitle() {
@@ -192,6 +188,8 @@ final class TabViewModel {
             title = UserText.tabBookmarksTitle
         case .homepage:
             title = UserText.tabHomeTitle
+        case .onboarding:
+            title = UserText.tabOnboardingTitle
         case .url, .none:
             if let title = tab.title {
                 self.title = title
@@ -203,7 +201,7 @@ final class TabViewModel {
 
     private func updateFavicon() {
         guard !errorViewState.isVisible else {
-            favicon = Favicon.defaultFavicon
+            favicon = nil
             return
         }
 
@@ -217,14 +215,19 @@ final class TabViewModel {
         case .bookmarks:
             favicon = Favicon.bookmarks
             return
-        case .url, .none: break
+        case .url, .onboarding, .none: break
         }
 
         if let favicon = tab.favicon {
             self.favicon = favicon
         } else {
-            favicon = Favicon.defaultFavicon
+            favicon = nil
         }
+    }
+
+    func reload() {
+        tab.reload()
+        updateAddressBarStrings()
     }
 
     // MARK: - Privacy icon animation

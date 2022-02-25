@@ -1,17 +1,100 @@
 {
     "readme": "https://github.com/duckduckgo/privacy-configuration",
+    "version": 1645459859348,
     "features": {
-        "https": {
-            "state": "enabled",
-            "exceptions": []
+        "ampLinks": {
+            "exceptions": [],
+            "settings": {
+                "linkFormats": [
+                    "^https?:\\/\\/(?:w{3}\\.)?google\\.\\S{2,}\\/amp\\/s\\/(\\S+)$",
+                    "^https?:\\/\\/\\S+ampproject\\.org\\/v\\/s\\/(\\S+)$"
+                ],
+                "keywords": [
+                    "=amp",
+                    "amp=",
+                    "&amp",
+                    "amp&",
+                    "/amp",
+                    "amp/",
+                    ".amp",
+                    "amp.",
+                    "%amp",
+                    "amp%",
+                    "_amp",
+                    "amp_",
+                    "?amp"
+                ]
+            },
+            "state": "disabled"
         },
-        "navigatorCredentials": {
-            "state": "enabled",
-            "exceptions": []
+        "autoconsent": {
+            "exceptions": [
+                {
+                    "domain": "spiegel.de",
+                    "reason": "Opt-out not possible"
+                }
+            ],
+            "settings": {
+                "disabledCMPs": []
+            },
+            "state": "enabled"
+        },
+        "autofill": {
+            "exceptions": [
+                {
+                    "domain": "asana.com",
+                    "reason": "site breakage"
+                },
+                {
+                    "domain": "fastmail.com",
+                    "reason": "site breakage"
+                }
+            ],
+            "state": "enabled"
+        },
+        "clickToPlay": {
+            "exceptions": [],
+            "state": "enabled"
         },
         "contentBlocking": {
             "state": "enabled",
             "exceptions": [
+                {
+                    "domain": "pureflix.com",
+                    "reason": "Videos not playing"
+                },
+                {
+                    "domain": "www.omahasteaks.com",
+                    "reason": "Add to cart not working"
+                },
+                {
+                    "domain": "iltalehti.fi",
+                    "reason": "Video content missing"
+                },
+                {
+                    "domain": "agame.com",
+                    "reason": "Site not loading"
+                },
+                {
+                    "domain": "wp.pl",
+                    "reason": "Adblocker wall"
+                },
+                {
+                    "domain": "digitalocean.com",
+                    "reason": "Missing site content"
+                },
+                {
+                    "domain": "ah.nl",
+                    "reason": "Missing site content"
+                },
+                {
+                    "domain": "magicgameworld.com",
+                    "reason": "Adblocker wall"
+                },
+                {
+                    "domain": "www.cbssports.com",
+                    "reason": "Video content missing"
+                },
                 {
                     "domain": "www.nhl.com",
                     "reason": "Video content missing"
@@ -19,6 +102,10 @@
                 {
                     "domain": "pnc.com",
                     "reason": "Login issues"
+                },
+                {
+                    "domain": "ea.com",
+                    "reason": "Login not displaying"
                 },
                 {
                     "domain": "www.corsair.com",
@@ -30,10 +117,6 @@
                 },
                 {
                     "domain": "53.com",
-                    "reason": "Broken sign in"
-                },
-                {
-                    "domain": "www.costco.com",
                     "reason": "Broken sign in"
                 },
                 {
@@ -61,21 +144,288 @@
                     "reason": "Missing site content"
                 },
                 {
-                    "domain": "video.ibm.com",
-                    "reason": "Broken videos"
+                    "domain": "virginmedia.com",
+                    "reason": "Chat widget blocked"
+                },
+                {
+                    "domain": "fantasynamegenerators.com",
+                    "reason": "Site not loading"
                 }
             ]
+        },
+        "fingerprintingAudio": {
+            "state": "disabled",
+            "exceptions": [
+                {
+                    "domain": "youtube.com",
+                    "reason": "site breakage"
+                },
+                {
+                    "domain": "meet.google.com",
+                    "reason": "site breakage"
+                }
+            ]
+        },
+        "fingerprintingBattery": {
+            "exceptions": [],
+            "state": "disabled"
+        },
+        "fingerprintingCanvas": {
+            "exceptions": [
+                {
+                    "domain": "walgreens.com",
+                    "reason": "Broken login"
+                },
+                {
+                    "domain": "krunker.io",
+                    "reason": "Broken game init"
+                },
+                {
+                    "domain": "usaa.com",
+                    "reason": "Broken login"
+                },
+                {
+                    "domain": "academy.com",
+                    "reason": "Broken login"
+                },
+                {
+                    "domain": "kroger.com",
+                    "reason": "Broken login"
+                }
+            ],
+            "state": "disabled"
+        },
+        "fingerprintingHardware": {
+            "exceptions": [
+                {
+                    "domain": "play.geforcenow.com",
+                    "reason": "site breakage"
+                },
+                {
+                    "domain": "stadia.google.com",
+                    "reason": "site breakage"
+                }
+            ],
+            "state": "disabled"
+        },
+        "fingerprintingScreenSize": {
+            "exceptions": [],
+            "state": "disabled"
+        },
+        "fingerprintingTemporaryStorage": {
+            "exceptions": [],
+            "state": "disabled"
+        },
+        "floc": {
+            "exceptions": [],
+            "state": "disabled"
+        },
+        "gpc": {
+            "state": "enabled",
+            "exceptions": [
+                {
+                    "domain": "newyorker.com",
+                    "reason": "Cookie consent box hiding audio"
+                }
+            ],
+            "settings": {
+                "gpcHeaderEnabledSites": [
+                    "global-privacy-control.glitch.me",
+                    "globalprivacycontrol.org",
+                    "washingtonpost.com",
+                    "nytimes.com",
+                    "privacy-test-pages.glitch.me"
+                ]
+            }
+        },
+        "https": {
+            "state": "enabled",
+            "exceptions": []
+        },
+        "navigatorCredentials": {
+            "exceptions": [],
+            "state": "enabled"
+        },
+        "navigatorInterface": {
+            "exceptions": [],
+            "state": "enabled"
+        },
+        "referrer": {
+            "exceptions": [],
+            "state": "disabled"
         },
         "trackerAllowlist": {
             "state": "enabled",
             "settings": {
-                "allowlistedTrackers": {}
+                "allowlistedTrackers": {
+                    "amazon-adsystem.com": {
+                        "rules": [
+                            {
+                                "rule": "c.amazon-adsystem.com/aax2/apstag.js",
+                                "domains": [
+                                    "seattletimes.com"
+                                ],
+                                "reason": "adwall"
+                            }
+                        ]
+                    },
+                    "cloudflare.com": {
+                        "rules": [
+                            {
+                                "rule": "cdnjs.cloudflare.com/ajax/libs/fingerprintjs2/1.8.6/fingerprint2.min.js",
+                                "domains": [
+                                    "winnipegfreepress.com"
+                                ],
+                                "reason": "content not loading"
+                            }
+                        ]
+                    },
+                    "doubleclick.net": {
+                        "rules": [
+                            {
+                                "rule": "securepubads.g.doubleclick.net/tag/js/gpt.js",
+                                "domains": [
+                                    "wunderground.com",
+                                    "youmath.it"
+                                ],
+                                "reason": "videos not loading, adwall"
+                            },
+                            {
+                                "rule": "securepubads.g.doubleclick.net/gpt/pubads_impl_",
+                                "domains": [
+                                    "wunderground.com"
+                                ],
+                                "reason": "videos not loading"
+                            }
+                        ]
+                    },
+                    "dynamicyield.com": {
+                        "rules": [
+                            {
+                                "rule": "cdn-eu.dynamicyield.com/9878090/api_static.js",
+                                "domains": [
+                                    "decathlon.co.uk"
+                                ],
+                                "reason": "checkout broken"
+                            }
+                        ]
+                    },
+                    "evidon.com": {
+                        "rules": [
+                            {
+                                "rule": "c.evidon.com/geo/country.js",
+                                "domains": [
+                                    "crunchyroll.com"
+                                ],
+                                "reason": "video not loading"
+                            },
+                            {
+                                "rule": "evidon.com/sitenotice/",
+                                "domains": [
+                                    "crunchyroll.com"
+                                ],
+                                "reason": "video not loading"
+                            }
+                        ]
+                    },
+                    "googlesyndication.com": {
+                        "rules": [
+                            {
+                                "rule": "pagead2.googlesyndication.com/pagead/js/adsbygoogle.js",
+                                "domains": [
+                                    "youmath.it"
+                                ],
+                                "reason": "adwall"
+                            },
+                            {
+                                "rule": "tpc.googlesyndication.com/pagead/js/loader21.html",
+                                "domains": [
+                                    "rumble.com"
+                                ],
+                                "reason": "adwall (video blocked)"
+                            }
+                        ]
+                    },
+                    "googletagmanager.com": {
+                        "rules": [
+                            {
+                                "rule": "googletagmanager.com/gtm.js",
+                                "domains": [
+                                    "rbcroyalbank.com"
+                                ],
+                                "reason": "page not loading"
+                            }
+                        ]
+                    },
+                    "shopeemobile.com": {
+                        "rules": [
+                            {
+                                "rule": "deo.shopeemobile.com/shopee/shopee-pcmall-live-sg//assets/2581.e008c4d7fc4804de8ba6.js",
+                                "domains": [
+                                    "shopee.co.id",
+                                    "shopee.co.th",
+                                    "shopee.com.br",
+                                    "shopee.com.my",
+                                    "shopee.ph",
+                                    "shopee.sg",
+                                    "shopee.tw",
+                                    "shopee.vn"
+                                ],
+                                "reason": "content not loading"
+                            }
+                        ]
+                    },
+                    "theplatform.com": {
+                        "rules": [
+                            {
+                                "rule": "pdk.theplatform.com/5.9.6/pdk/tpPdk.js",
+                                "domains": [
+                                    "bravotv.com",
+                                    "oxygen.com"
+                                ],
+                                "reason": "video not loading"
+                            }
+                        ]
+                    },
+                    "twitter.com": {
+                        "rules": [
+                            {
+                                "rule": "platform.twitter.com/embed/embed.modules",
+                                "domains": [
+                                    "notthebee.com",
+                                    "upworthy.com"
+                                ],
+                                "reason": "content not rendering"
+                            },
+                            {
+                                "rule": "platform.twitter.com/widgets/tweet_button",
+                                "domains": [
+                                    "winnipegfreepress.com"
+                                ],
+                                "reason": "missing tweet button"
+                            }
+                        ]
+                    }
+                }
             },
             "exceptions": []
         },
+        "trackingCookies1p": {
+            "settings": {
+                "firstPartyTrackerCookiePolicy": {
+                    "threshold": 86400,
+                    "maxAge": 86400
+                }
+            },
+            "exceptions": [
+                {
+                    "domain": "nespresso.com",
+                    "reason": "login issues"
+                }
+            ],
+            "state": "disabled"
+        },
         "trackingCookies3p": {
-            "state": "enabled",
-            "exceptions": [],
             "settings": {
                 "excludedCookieDomains": [
                     {
@@ -183,99 +533,40 @@
                         "reason": "broken videos"
                     }
                 ]
-            }
-        },
-        "trackingCookies1p": {
-            "state": "enabled",
-            "settings": {
-                "firstPartyTrackerCookiePolicy": {
-                    "threshold": 86400,
-                    "maxAge": 86400
-                }
             },
-            "exceptions": []
+            "exceptions": [],
+            "state": "disabled"
         },
-        "clickToPlay": {
-            "state": "enabled",
-            "exceptions": []
-        },
-        "fingerprintingCanvas": {
-            "state": "enabled",
-            "exceptions": [
-                {
-                    "domain": "krunker.io",
-                    "reason": "Broken game init"
-                },
-                {
-                    "domain": "usaa.com",
-                    "reason": "Broken login"
-                },
-                {
-                    "domain": "kroger.com",
-                    "reason": "Broken login"
-                }
-            ]
-        },
-        "fingerprintingAudio": {
-            "state": "disabled",
-            "exceptions": [
-                {
-                    "domain": "youtube.com",
-                    "reason": "site breakage"
-                },
-                {
-                    "domain": "meet.google.com",
-                    "reason": "site breakage"
-                }
-            ]
-        },
-        "fingerprintingTemporaryStorage": {
-            "state": "enabled",
-            "exceptions": []
-        },
-        "referrer": {
-            "state": "enabled",
-            "exceptions": []
-        },
-        "fingerprintingBattery": {
-            "state": "enabled",
-            "exceptions": []
-        },
-        "fingerprintingScreenSize": {
-            "state": "enabled",
-            "exceptions": []
-        },
-        "fingerprintingHardware": {
-            "state": "enabled",
-            "exceptions": [
-                {
-                    "domain": "play.geforcenow.com",
-                    "reason": "site breakage"
-                },
-                {
-                    "domain": "stadia.google.com",
-                    "reason": "site breakage"
-                }
-            ]
-        },
-        "floc": {
-            "state": "enabled",
-            "exceptions": []
-        },
-        "gpc": {
-            "state": "enabled",
+        "trackingParameters": {
             "exceptions": [],
             "settings": {
-                "gpcHeaderEnabledSites": [
-                    "http://global-privacy-control.glitch.me",
-                    "https://washingtonpost.com",
-                    "https://nytimes.com",
-                    "https://privacy-test-pages.glitch.me"
+                "parameters": [
+                    "utm_[a-zA-Z]*",
+                    "gclid",
+                    "fbclid",
+                    "fb_action_ids",
+                    "fb_action_types",
+                    "fb_source",
+                    "fb_ref",
+                    "ga_source",
+                    "ga_medium",
+                    "ga_term",
+                    "ga_content",
+                    "ga_campaign",
+                    "ga_place",
+                    "action_object_map",
+                    "action_type_map",
+                    "action_ref_map",
+                    "gs_l",
+                    "mkt_tok",
+                    "hmb_campaign",
+                    "hmb_source",
+                    "hmb_medium"
                 ]
-            }
+            },
+            "state": "disabled"
         },
         "userAgentRotation": {
-            "state": "disabled",
             "settings": {
                 "agentExcludePatterns": [
                     {
@@ -321,31 +612,11 @@
                     "domain": "dzcdn.net",
                     "reason": "Breaks images on deezer"
                 }
-            ]
+            ],
+            "state": "disabled"
         }
     },
-    "version": 1634748171373,
     "unprotectedTemporary": [
-        {
-            "domain": "sberbank.ru",
-            "reason": "site breakage"
-        },
-        {
-            "domain": "td.com",
-            "reason": "site breakage"
-        },
-        {
-            "domain": "ameritrade.com",
-            "reason": "site breakage"
-        },
-        {
-            "domain": "santander.com",
-            "reason": "site breakage"
-        },
-        {
-            "domain": "santander.co.uk",
-            "reason": "site breakage"
-        },
         {
             "domain": "usbank.com",
             "reason": "site breakage"

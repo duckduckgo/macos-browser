@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<document type="com.apple.InterfaceBuilder3.Cocoa.Storyboard.XIB" version="3.0" toolsVersion="19162" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES">
+<document type="com.apple.InterfaceBuilder3.Cocoa.Storyboard.XIB" version="3.0" toolsVersion="19455" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES">
     <dependencies>
         <deployment identifier="macosx"/>
-        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="19162"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="19455"/>
         <capability name="Named colors" minToolsVersion="9.0"/>
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
     </dependencies>
@@ -211,7 +211,7 @@
                                 <rect key="frame" x="21" y="361" width="217" height="24"/>
                                 <popUpButtonCell key="cell" type="bevel" title="Preferences" bezelStyle="rounded" alignment="left" controlSize="large" lineBreakMode="truncatingTail" state="on" imageScaling="proportionallyDown" inset="2" selectedItem="0iN-ch-YVA" id="Ury-Yl-asN">
                                     <behavior key="behavior" lightByBackground="YES" lightByGray="YES"/>
-                                    <font key="font" size="20" name="SFProDisplay-Semibold"/>
+                                    <font key="font" metaFont="system" size="20"/>
                                     <menu key="menu" id="Dlp-Gp-7Fm">
                                         <items>
                                             <menuItem title="Preferences" state="on" id="0iN-ch-YVA"/>
@@ -348,9 +348,9 @@
                                 </userDefinedRuntimeAttributes>
                             </customView>
                             <scrollView borderType="none" autohidesScrollers="YES" horizontalLineScroll="24" horizontalPageScroll="10" verticalLineScroll="24" verticalPageScroll="10" usesPredominantAxisScrolling="NO" translatesAutoresizingMaskIntoConstraints="NO" id="v7G-m4-y9G">
-                                <rect key="frame" x="42" y="0.0" width="429" height="306"/>
+                                <rect key="frame" x="42" y="0.0" width="471" height="306"/>
                                 <clipView key="contentView" drawsBackground="NO" id="Sca-lN-1gh">
-                                    <rect key="frame" x="0.0" y="0.0" width="429" height="306"/>
+                                    <rect key="frame" x="0.0" y="0.0" width="471" height="306"/>
                                     <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                     <subviews>
                                         <tableView verticalHuggingPriority="750" allowsExpansionToolTips="YES" columnAutoresizingStyle="lastColumnOnly" columnReordering="NO" columnSelection="YES" columnResizing="NO" multipleSelection="NO" autosaveColumns="NO" rowHeight="24" usesAutomaticRowHeights="YES" viewBased="YES" id="Hzk-42-jjV">
@@ -382,7 +382,7 @@
                                     <color key="backgroundColor" name="ClearColor"/>
                                 </clipView>
                                 <scroller key="horizontalScroller" wantsLayer="YES" verticalHuggingPriority="750" horizontal="YES" id="cBz-er-7F4">
-                                    <rect key="frame" x="0.0" y="290" width="429" height="16"/>
+                                    <rect key="frame" x="0.0" y="290" width="471" height="16"/>
                                     <autoresizingMask key="autoresizingMask"/>
                                 </scroller>
                                 <scroller key="verticalScroller" hidden="YES" wantsLayer="YES" verticalHuggingPriority="750" horizontal="NO" id="Fbd-Kx-iHN">
@@ -397,7 +397,7 @@
                             <constraint firstAttribute="bottom" secondItem="v7G-m4-y9G" secondAttribute="bottom" id="JUS-ev-gkH"/>
                             <constraint firstItem="XVp-BS-57D" firstAttribute="top" secondItem="am8-QE-ZlQ" secondAttribute="top" id="Nou-ml-npX"/>
                             <constraint firstItem="v7G-m4-y9G" firstAttribute="leading" secondItem="am8-QE-ZlQ" secondAttribute="leading" constant="42" id="Q0O-sH-5Hb"/>
-                            <constraint firstAttribute="trailing" secondItem="v7G-m4-y9G" secondAttribute="trailing" constant="42" id="SGS-ZV-udz"/>
+                            <constraint firstAttribute="trailing" secondItem="v7G-m4-y9G" secondAttribute="trailing" id="SGS-ZV-udz"/>
                             <constraint firstAttribute="bottom" secondItem="XVp-BS-57D" secondAttribute="bottom" id="uwd-dj-WXe"/>
                             <constraint firstAttribute="trailing" secondItem="XVp-BS-57D" secondAttribute="trailing" id="zce-Pi-q9P"/>
                         </constraints>

@@ -115,10 +115,10 @@ final class WebKitDownloadTask: NSObject, ProgressReporting {
         self.progress.fileDownloadingSourceURL = download.originalRequest?.url
         if let progress = (self.download as? ProgressReporting)?.progress {
             progress.publisher(for: \.totalUnitCount)
-                .weakAssign(to: \.totalUnitCount, on: self.progress)
+                .assign(to: \.totalUnitCount, onWeaklyHeld: self.progress)
                 .store(in: &self.cancellables)
             progress.publisher(for: \.completedUnitCount)
-                .weakAssign(to: \.completedUnitCount, on: self.progress)
+                .assign(to: \.completedUnitCount, onWeaklyHeld: self.progress)
                 .store(in: &self.cancellables)
         }
     }
