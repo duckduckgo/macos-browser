@@ -52,7 +52,7 @@ struct HoverButton: View {
 
         }
         .frame(width: size, height: size)
-        .cornerRadius(8)
+        .cornerRadius(4)
         .background(RoundedRectangle(cornerRadius: 8).foregroundColor(isHovering ? Color("ButtonMouseOverColor") : backgroundColor))
         .link(onHoverChanged: {
             self.isHovering = $0
