@@ -34,7 +34,7 @@ final class UserScripts {
     let contentBlockerRulesScript: ContentBlockerRulesUserScript
     let surrogatesScript: SurrogatesUserScript
     let contentScopeUserScript: ContentScopeUserScript
-    let autofillScript: AutofillUserScript
+    let autofillScript: WebsiteAutofillUserScript
     let autoconsentUserScript: UserScriptWithAutoconsent?
 
     init(with sourceProvider: ScriptSourceProviding) {
@@ -45,7 +45,7 @@ final class UserScripts {
         let sessionKey = sourceProvider.sessionKey ?? ""
         let prefs = ContentScopeProperties.init(gpcEnabled: privacySettings.gpcEnabled, sessionKey: sessionKey)
         contentScopeUserScript = ContentScopeUserScript(sourceProvider.privacyConfigurationManager, properties: prefs)
-        autofillScript = AutofillUserScript(scriptSourceProvider: sourceProvider.autofillSourceProvider!)
+        autofillScript = WebsiteAutofillUserScript(scriptSourceProvider: sourceProvider.autofillSourceProvider!)
         if #available(macOS 11, *) {
             autoconsentUserScript = AutoconsentUserScript(scriptSource: sourceProvider,
                                                           config: sourceProvider.privacyConfigurationManager.privacyConfig)
