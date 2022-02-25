@@ -822,7 +822,7 @@ extension Tab: WKNavigationDelegate {
                 }
             case .failure:
                 if !url.isDuckDuckGo {
-                    await reportTime()
+                    await prepareForContentBlocking()
                 }
             }
         }
@@ -843,7 +843,7 @@ extension Tab: WKNavigationDelegate {
         setConnectionUpgradedTo(upgradedURL, navigationAction: navigationAction)
     }
     
-    private func reportTime() async {
+    private func prepareForContentBlocking() async {
         // Ensure Content Blocking Assets (WKContentRuleList&UserScripts) are installed
         if !userContentController.contentBlockingAssetsInstalled {
             cbaTimeReporter?.tabWillWaitForRulesCompilation(self)
