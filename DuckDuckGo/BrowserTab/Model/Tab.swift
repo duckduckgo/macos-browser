@@ -23,7 +23,7 @@ import Combine
 import BrowserServicesKit
 import TrackerRadarKit
 
-protocol TabDelegate: FileDownloadManagerDelegate {
+protocol TabDelegate: FileDownloadManagerDelegate, ContentOverlayUserScriptDelegate {
     func tabWillStartNavigation(_ tab: Tab, isUserInitiated: Bool)
     func tabDidStartNavigation(_ tab: Tab)
     func tab(_ tab: Tab, requestedNewTabWith content: Tab.TabContent, selected: Bool)
@@ -98,6 +98,7 @@ final class Tab: NSObject {
         }
     }
 
+    weak var autofillScript: WebsiteAutofillUserScript?
     weak var delegate: TabDelegate?
     private let cbaTimeReporter: ContentBlockingAssetsCompilationTimeReporter?
 
@@ -560,8 +561,10 @@ extension Tab: UserContentControllerDelegate {
         userScripts.surrogatesScript.delegate = self
         userScripts.contentBlockerRulesScript.delegate = self
         userScripts.clickToLoadScript.delegate = self
+        userScripts.autofillScript.currentOverlayTab = self.delegate
         userScripts.autofillScript.emailDelegate = emailManager
         userScripts.autofillScript.vaultDelegate = vaultManager
+        self.autofillScript = userScripts.autofillScript
         userScripts.pageObserverScript.delegate = self
         userScripts.printingUserScript.delegate = self
         userScripts.hoverUserScript.delegate = self
@@ -570,6 +573,14 @@ extension Tab: UserContentControllerDelegate {
         attachFindInPage()
     }
 
+}
+
+extension Tab: ChildAutofillUserScriptDelegate {
+    func browserTabViewController(_ browserTabViewController: BrowserTabViewController, didClickAtPoint: NSPoint) {
+        guard let autofillScript = autofillScript else { return }
+        autofillScript.clickPoint = didClickAtPoint
+        autofillScript.currentOverlayTab = self.delegate
+    }
 }
 
 extension Tab: PrintingUserScriptDelegate {
