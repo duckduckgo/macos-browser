@@ -16,7 +16,7 @@
 //  limitations under the License.
 //
 
-import Combine
+import Foundation
 import BrowserServicesKit
 
 enum SecureVaultItem: Equatable, Identifiable, Comparable {

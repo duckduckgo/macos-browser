@@ -66,11 +66,25 @@ final class NavigationBarViewController: NSViewController {
         popover.delegate = self
         return popover
     }()
+
     private lazy var saveCredentialsPopover: SaveCredentialsPopover = {
         let popover = SaveCredentialsPopover()
         popover.delegate = self
         return popover
     }()
+    
+    private lazy var saveIdentityPopover: SaveIdentityPopover = {
+        let popover = SaveIdentityPopover()
+        popover.delegate = self
+        return popover
+    }()
+    
+    private lazy var savePaymentMethodPopover: SavePaymentMethodPopover = {
+        let popover = SavePaymentMethodPopover()
+        popover.delegate = self
+        return popover
+    }()
+
     private lazy var passwordManagementPopover: PasswordManagementPopover = PasswordManagementPopover()
     private lazy var downloadsPopover: DownloadsPopover = {
         let downloadsPopover = DownloadsPopover()
@@ -389,7 +403,7 @@ final class NavigationBarViewController: NSViewController {
 
         passwordManagementButton.image = NSImage(named: "PasswordManagement")
 
-        if saveCredentialsPopover.isShown {
+        if saveCredentialsPopover.isShown || saveIdentityPopover.isShown {
             return
         }
 
@@ -398,7 +412,7 @@ final class NavigationBarViewController: NSViewController {
             return
         }
 
-        passwordManagementButton.isHidden = !passwordManagementPopover.isShown
+        passwordManagementButton.isHidden = (!passwordManagementPopover.isShown && !saveIdentityPopover.isShown)
 
         passwordManagementPopover.viewController.domain = nil
         guard let url = url, let domain = url.host else {
@@ -450,27 +464,46 @@ final class NavigationBarViewController: NSViewController {
     }
 
     private func subscribeToCredentialsToSave() {
-        credentialsToSaveCancellable = tabCollectionViewModel.selectedTabViewModel?.$credentialsToSave
+        credentialsToSaveCancellable = tabCollectionViewModel.selectedTabViewModel?.$autofillDataToSave
             .receive(on: DispatchQueue.main)
             .sink(receiveValue: { [weak self] in
-                if let credentials = $0 {
-                    self?.promptToSaveCredentials(credentials)
-                    self?.tabCollectionViewModel.selectedTabViewModel?.credentialsToSave = nil
+                if let data = $0 {
+                    self?.promptToSaveAutofillData(data)
+                    self?.tabCollectionViewModel.selectedTabViewModel?.autofillDataToSave = nil
                 }
         })
     }
-
-    private func promptToSaveCredentials(_ credentials: SecureVaultModels.WebsiteCredentials) {
-        showSaveCredentialsPopover()
-        saveCredentialsPopover.viewController.saveCredentials(credentials)
+    
+    private func promptToSaveAutofillData(_ data: AutofillData) {
+        if let credentials = data.credentials {
+            showSaveCredentialsPopover()
+            saveCredentialsPopover.viewController.saveCredentials(credentials)
+        } else if let card = data.creditCard {
+            showSavePaymentMethodPopover()
+            savePaymentMethodPopover.viewController.savePaymentMethod(card)
+        } else if let identity = data.identity {
+            showSaveIdentityPopover()
+            saveIdentityPopover.viewController.saveIdentity(identity)
+        }
     }
 
     private func showSaveCredentialsPopover() {
+        show(popover: saveCredentialsPopover)
+    }
+    
+    private func showSavePaymentMethodPopover() {
+        show(popover: savePaymentMethodPopover)
+    }
+    
+    private func showSaveIdentityPopover() {
+        show(popover: saveIdentityPopover)
+    }
+    
+    private func show(popover: NSPopover) {
         passwordManagementButton.isHidden = false
-
-        saveCredentialsPopover.show(relativeTo: passwordManagementButton.bounds.insetFromLineOfDeath(),
-                                    of: passwordManagementButton,
-                                    preferredEdge: .minY)
+        popover.show(relativeTo: passwordManagementButton.bounds.insetFromLineOfDeath(),
+                     of: passwordManagementButton,
+                     preferredEdge: .minY)
     }
 
     private func subscribeToNavigationActionFlags() {
@@ -538,7 +571,7 @@ extension NavigationBarViewController: NSPopoverDelegate {
             downloadsPopoverTimer = nil
         } else if notification.object as AnyObject? === bookmarkListPopover {
             updateBookmarksButton()
-        } else if notification.object as AnyObject? === saveCredentialsPopover {
+        } else if notification.object as AnyObject? === saveCredentialsPopover || notification.object as AnyObject? === saveIdentityPopover {
             updatePasswordManagementButton()
         }
     }

@@ -1,7 +1,7 @@
 //
-//  SaveCredentialsPopover.swift
+//  SaveIdentityPopover.swift
 //
-//  Copyright © 2021 DuckDuckGo. All rights reserved.
+//  Copyright © 2022 DuckDuckGo. All rights reserved.
 //
 //  Licensed under the Apache License, Version 2.0 (the "License");
 //  you may not use this file except in compliance with the License.
@@ -19,7 +19,7 @@
 import AppKit
 import BrowserServicesKit
 
-final class SaveCredentialsPopover: NSPopover {
+final class SaveIdentityPopover: NSPopover {
 
     override init() {
         super.init()
@@ -35,20 +35,20 @@ final class SaveCredentialsPopover: NSPopover {
     }
 
     // swiftlint:disable force_cast
-    var viewController: SaveCredentialsViewController { contentViewController as! SaveCredentialsViewController }
+    var viewController: SaveIdentityViewController { contentViewController as! SaveIdentityViewController }
     // swiftlint:enable force_cast
 
     private func setupContentController() {
-        let controller = SaveCredentialsViewController.create()
+        let controller = SaveIdentityViewController.create()
         controller.delegate = self
         contentViewController = controller
     }
 
 }
 
-extension SaveCredentialsPopover: SaveCredentialsDelegate {
+extension SaveIdentityPopover: SaveIdentityDelegate {
 
-    func shouldCloseSaveCredentialsViewController(_: SaveCredentialsViewController) {
+    func shouldCloseSaveIdentityViewController(_: SaveIdentityViewController) {
         DispatchQueue.main.async {
             self.close()
         }
