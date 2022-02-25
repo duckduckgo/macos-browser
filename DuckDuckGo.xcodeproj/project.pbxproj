@@ -5498,8 +5498,8 @@
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/duckduckgo/BrowserServicesKit";
 			requirement = {
-				kind = upToNextMajorVersion;
-				minimumVersion = 10.0.1;
+				branch = "jkt/update-autofill-25feb";
+				kind = branch;
 			};
 		};
 		AA06B6B52672AF8100F541C5 /* XCRemoteSwiftPackageReference "Sparkle" */ = {
