@@ -63,7 +63,7 @@ extension ContentOverlayPopover: ContentOverlayUserScriptDelegate {
         }
         if !windowController.isVisible { return }
         // Reset window size on close to reduce flicker
-        viewController.requestResizeToSize(width: 0, height: 0)
+        viewController.requestResizeToSize(CGSize(width: 0, height: 0))
         windowController.parent?.removeChildWindow(windowController)
         windowController.orderOut(nil)
     }
@@ -83,7 +83,7 @@ extension ContentOverlayPopover: ContentOverlayUserScriptDelegate {
         let rect = NSRect(x: x, y: y, width: rectWidth, height: inputPosition.height)
 
         // On open initialize to default size to reduce flicker
-        viewController.requestResizeToSize(width: 0, height: 0)
+        viewController.requestResizeToSize(CGSize(width: 0, height: 0))
         viewController.autofillInterfaceToChild = websiteAutofillUserScript
         viewController.setType(serializedInputContext: serializedInputContext, zoomFactor: zoomFactor)
         if let overlayWindow = windowController.window, let currentTabViewWindow = currentTabView?.window {
