@@ -135,13 +135,14 @@ final class AutoconsentUserScript: NSObject, UserScriptWithAutoconsent {
             return
         }
         let now = Date.init()
-        guard Self.promptLastShown == nil || now > Self.promptLastShown!.addingTimeInterval(30) else {
+        guard Self.promptLastShown == nil || now > Self.promptLastShown!.addingTimeInterval(30),
+              let window = self.webview!.window else {
             callback(false)
             return
         }
         Self.promptLastShown = now
         let alert = NSAlert.cookiePopup()
-        alert.beginSheetModal(for: self.webview!.window!, completionHandler: { response in
+        alert.beginSheetModal(for: window, completionHandler: { response in
             switch response {
             case .alertFirstButtonReturn:
                 // User wants to turn on the feature

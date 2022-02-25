@@ -662,8 +662,7 @@ final class PasswordManagementViewController: NSViewController {
         menu.items = [
             createMenuItem(title: UserText.pmNewCard, action: #selector(createNewCreditCard), imageName: "CreditCardGlyph"),
             createMenuItem(title: UserText.pmNewLogin, action: #selector(createNewLogin), imageName: "LoginGlyph"),
-            createMenuItem(title: UserText.pmNewIdentity, action: #selector(createNewIdentity), imageName: "IdentityGlyph"),
-            createMenuItem(title: UserText.pmNewNote, action: #selector(createNewNote), imageName: "NoteGlyph")
+            createMenuItem(title: UserText.pmNewIdentity, action: #selector(createNewIdentity), imageName: "IdentityGlyph")
         ]
 
         return menu
@@ -698,9 +697,6 @@ final class PasswordManagementViewController: NSViewController {
             case .cards:
                 let cards = (try? self.secureVault?.creditCards()) ?? []
                 items = cards.map(SecureVaultItem.card)
-            case .notes:
-                let notes = (try? self.secureVault?.notes()) ?? []
-                items = notes.map(SecureVaultItem.note)
             }
 
             DispatchQueue.main.async {
@@ -811,40 +807,6 @@ final class PasswordManagementViewController: NSViewController {
             createNew()
         }
     }
-
-    @objc
-    private func createNewNote() {
-        guard let window = view.window else { return }
-
-        func createNew() {
-            createNoteItemView()
-
-            listModel?.clearSelection()
-            itemModel?.createNew()
-        }
-
-        if isDirty {
-            let alert = NSAlert.passwordManagerSaveChangesToLogin()
-            alert.beginSheetModal(for: window) { response in
-
-                switch response {
-                case .alertFirstButtonReturn: // Save
-                    self.itemModel?.save()
-                    createNew()
-
-                case .alertSecondButtonReturn: // Discard
-                    self.itemModel?.cancel()
-                    createNew()
-
-                default: // Cancel
-                    break // just do nothing
-                }
-
-            }
-        } else {
-            createNew()
-        }
-    }
     
     // MARK: - Empty State
     
@@ -866,7 +828,6 @@ final class PasswordManagementViewController: NSViewController {
         case .logins: showEmptyState(imageName: "LoginsEmpty", title: UserText.pmEmptyStateLoginsTitle)
         case .identities: showEmptyState(imageName: "IdentitiesEmpty", title: UserText.pmEmptyStateIdentitiesTitle)
         case .cards: showEmptyState(imageName: "CreditCardsEmpty", title: UserText.pmEmptyStateCardsTitle)
-        case .notes: showEmptyState(imageName: "NotesEmpty", title: UserText.pmEmptyStateNotesTitle)
         }
     }
     

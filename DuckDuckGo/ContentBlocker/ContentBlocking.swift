@@ -176,7 +176,7 @@ final class ContentBlockingUpdating {
             .map { $0.0 } // drop gpcEnabled value: $0.1
             // DefaultScriptSourceProvider instance should be created once per rules/config change and fed into UserScripts initialization
             .map(makeValue)
-            .weakAssign(to: \.bufferedValue, on: self) // buffer latest update value
+            .assign(to: \.bufferedValue, onWeaklyHeld: self) // buffer latest update value
 
         // 2. Publish ContentBlockingAssets(Rules+Scripts) for WKUserContentController per subscription
         self.userContentBlockingAssets = $bufferedValue

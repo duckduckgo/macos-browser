@@ -36,6 +36,8 @@ extension Pixel {
 
         case crash
 
+        case brokenSiteReport
+
         enum OnboardingShown: String, CustomStringConvertible {
             var description: String { rawValue }
 
@@ -204,6 +206,8 @@ extension Pixel {
 
             case secureVaultInitError = "secure_vault_init_error"
             case secureVaultError = "secure_vault_error"
+
+            case feedbackReportingFailed = "feedback_reporting_failed"
         }
 
     }
@@ -233,6 +237,9 @@ extension Pixel.Event {
 
         case .crash:
             return "m_mac_crash"
+
+        case .brokenSiteReport:
+            return "epbf"
 
         case .compileRulesWait(onboardingShown: let onboardingShown, waitTime: let waitTime, result: let result):
             return "m_mac_cbr-wait_\(onboardingShown)_\(waitTime)_\(result)"
