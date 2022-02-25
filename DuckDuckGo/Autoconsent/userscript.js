@@ -1,4 +1,4 @@
-import handleContentMessage from '@cliqz/autoconsent/lib/web/content'
+import handleContentMessage from '@duckduckgo/autoconsent/lib/web/content'
 
 window.autoconsent = (payload) => {
     return handleContentMessage(payload.message, false)
