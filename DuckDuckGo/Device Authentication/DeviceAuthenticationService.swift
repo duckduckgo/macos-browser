@@ -18,10 +18,19 @@
 
 import Foundation
 
+enum DeviceAuthenticationResult {
+    case success
+    case failure
+    
+    var authenticated: Bool {
+        return self == .success
+    }
+}
+
 protocol DeviceAuthenticationService {
     
-    typealias DeviceAuthenticationResult = (Bool) -> Void
+    typealias DeviceAuthenticationResultHandler = (DeviceAuthenticationResult) -> Void
     
-    func authenticateDevice(reason: String, result: @escaping DeviceAuthenticationResult)
+    func authenticateDevice(reason: String, result: @escaping DeviceAuthenticationResultHandler)
     
 }

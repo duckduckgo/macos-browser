@@ -128,9 +128,9 @@ final class DeviceAuthenticator {
         return deviceIsLocked
     }
 
-    func authenticateUser(reason: AuthenticationReason, result: @escaping (Bool) -> Void) {
+    func authenticateUser(reason: AuthenticationReason, result: @escaping (DeviceAuthenticationResult) -> Void) {
         guard requiresAuthentication else {
-            result(true)
+            result(.success)
             return
         }
         
@@ -138,22 +138,22 @@ final class DeviceAuthenticator {
         
         isAuthenticating = true
 
-        authenticationService.authenticateDevice(reason: reason.localizedDescription) { authenticated in
-            os_log("Completed authenticating, with result: %{bool}d", log: .autoLock, authenticated)
+        authenticationService.authenticateDevice(reason: reason.localizedDescription) { authenticationResult in
+            os_log("Completed authenticating, with result: %{bool}d", log: .autoLock, authenticationResult.authenticated)
             
             self.isAuthenticating = false
-            self.deviceIsLocked = !authenticated
+            self.deviceIsLocked = !authenticationResult.authenticated
             
-            if authenticated {
+            if authenticationResult.authenticated {
                 // Now that the user has unlocked the device, begin the idle timer again.
                 self.beginIdleCheckTimer()
             }
             
-            result(authenticated)
+            result(authenticationResult)
         }
     }
     
-    func authenticateUser(reason: AuthenticationReason) async -> Bool {
+    func authenticateUser(reason: AuthenticationReason) async -> DeviceAuthenticationResult {
         await withCheckedContinuation { continuation in
             authenticateUser(reason: reason) { result in
                 continuation.resume(returning: result)

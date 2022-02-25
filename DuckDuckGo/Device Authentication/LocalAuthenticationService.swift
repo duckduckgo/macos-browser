@@ -21,12 +21,13 @@ import LocalAuthentication
 
 final class LocalAuthenticationService: DeviceAuthenticationService {
     
-    func authenticateDevice(reason: String, result: @escaping DeviceAuthenticationResult) {
+    func authenticateDevice(reason: String, result: @escaping DeviceAuthenticationResultHandler) {
         let context = LAContext()
 
         context.evaluatePolicy(.deviceOwnerAuthentication, localizedReason: reason) { authenticated, _ in
             DispatchQueue.main.async {
-                result(authenticated)
+                let authenticationResult: DeviceAuthenticationResult = authenticated ? .success : .failure
+                result(authenticationResult)
             }
         }
     }

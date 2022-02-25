@@ -243,10 +243,10 @@ extension PreferencesListViewController: LoginsPreferencesTableCellViewDelegate 
                                         setShouldAutoLockLogins: Bool,
                                         autoLockThreshold: LoginsPreferences.AutoLockThreshold) {
 
-        DeviceAuthenticator.shared.authenticateUser(reason: .changeLoginsSettings) { authenticated in
+        DeviceAuthenticator.shared.authenticateUser(reason: .changeLoginsSettings) { authenticationResult in
             let preferences = LoginsPreferences()
 
-            if authenticated {
+            if authenticationResult.authenticated {
                 
                 // Only fire the auto-lock disabled pixel the setting is disabled and it has changed from its previous value
                 if !setShouldAutoLockLogins && setShouldAutoLockLogins != preferences.shouldAutoLockLogins {

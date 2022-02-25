@@ -40,9 +40,9 @@ class DeviceAuthenticatorTests: XCTestCase {
         preferences.shouldAutoLockLogins = true
         
         let deviceAuthenticator = DeviceAuthenticator(authenticationService: authenticationService, loginsPreferences: preferences)
-        let authenticated = await deviceAuthenticator.authenticateUser(reason: .unlockLogins)
+        let result = await deviceAuthenticator.authenticateUser(reason: .unlockLogins)
         
-        XCTAssertTrue(authenticated)
+        XCTAssertTrue(result.authenticated)
         XCTAssertFalse(deviceAuthenticator.requiresAuthentication)
     }
     
@@ -53,9 +53,9 @@ class DeviceAuthenticatorTests: XCTestCase {
         preferences.shouldAutoLockLogins = true
         
         let deviceAuthenticator = DeviceAuthenticator(authenticationService: authenticationService, loginsPreferences: preferences)
-        let authenticated = await deviceAuthenticator.authenticateUser(reason: .unlockLogins)
+        let result = await deviceAuthenticator.authenticateUser(reason: .unlockLogins)
         
-        XCTAssertFalse(authenticated)
+        XCTAssertFalse(result.authenticated)
         XCTAssertTrue(deviceAuthenticator.requiresAuthentication)
     }
     
@@ -66,15 +66,15 @@ class DeviceAuthenticatorTests: XCTestCase {
         preferences.shouldAutoLockLogins = true
         
         let deviceAuthenticator = DeviceAuthenticator(authenticationService: authenticationService, loginsPreferences: preferences)
-        let authenticated = await deviceAuthenticator.authenticateUser(reason: .unlockLogins)
+        let initialResult = await deviceAuthenticator.authenticateUser(reason: .unlockLogins)
         
-        XCTAssertTrue(authenticated)
+        XCTAssertTrue(initialResult.authenticated)
         XCTAssertFalse(deviceAuthenticator.requiresAuthentication)
         XCTAssertEqual(authenticationService.authenticationAttempts, 1)
         
-        let authenticatedAgain = await deviceAuthenticator.authenticateUser(reason: .unlockLogins)
+        let successfulResult = await deviceAuthenticator.authenticateUser(reason: .unlockLogins)
         
-        XCTAssertTrue(authenticatedAgain)
+        XCTAssertTrue(successfulResult.authenticated)
         XCTAssertFalse(deviceAuthenticator.requiresAuthentication)
         XCTAssertEqual(authenticationService.authenticationAttempts, 1)
     }
@@ -166,9 +166,9 @@ private final class MockDeviceAuthenticatorService: DeviceAuthenticationService 
         self.shouldBeAuthenticated = shouldBeAuthenticated
     }
 
-    func authenticateDevice(reason: String, result: @escaping DeviceAuthenticationResult) {
+    func authenticateDevice(reason: String, result: @escaping DeviceAuthenticationResultHandler) {
         authenticationAttempts += 1
-        result(shouldBeAuthenticated)
+        result(shouldBeAuthenticated ? .success : .failure)
     }
     
 }
