@@ -27,7 +27,7 @@ public final class ContentOverlayViewController: NSViewController, EmailManagerR
     private var topAutofillUserScript: OverlayAutofillUserScript?
     private var cancellables = Set<AnyCancellable>()
 
-    public weak var autofillInterfaceToChild: AutofillMessagingToChildDelegate?
+    public weak var autofillInterfaceToChild: OverlayAutofillUserScriptDelegate?
 
     lazy var emailManager: EmailManager = {
         let emailManager = EmailManager()
