@@ -345,7 +345,7 @@ final class BrowserTabViewController: NSViewController {
             _contentOverlayPopover = ContentOverlayPopover(currentTabView: view)
             WindowControllersManager.shared.stateChanged
                 .sink { _ in
-                    self._contentOverlayPopover?.autofillCloseOverlay(nil)
+                    self._contentOverlayPopover?.websiteAutofillUserScriptCloseOverlay(nil)
                 }.store(in: &cancellables)
         }
         return _contentOverlayPopover!
@@ -353,17 +353,17 @@ final class BrowserTabViewController: NSViewController {
 }
 
 extension BrowserTabViewController: ContentOverlayUserScriptDelegate {
-    public func autofillCloseOverlay(_ autofillUserScript: AutofillMessagingToChildDelegate?) {
-        contentOverlayPopover.autofillCloseOverlay(autofillUserScript)
+    public func websiteAutofillUserScriptCloseOverlay(_ websiteAutofillUserScript: WebsiteAutofillUserScript?) {
+        contentOverlayPopover.websiteAutofillUserScriptCloseOverlay(websiteAutofillUserScript)
     }
-    public func autofillDisplayOverlay(_ autofillUserScript: AutofillMessagingToChildDelegate,
-                                       serializedInputContext: String,
-                                       click: NSPoint,
-                                       inputPosition: CGRect) {
-        contentOverlayPopover.autofillDisplayOverlay(autofillUserScript,
-                                             serializedInputContext: serializedInputContext,
-                                             click: click,
-                                             inputPosition: inputPosition)
+    public func websiteAutofillUserScript(_ websiteAutofillUserScript: WebsiteAutofillUserScript,
+                                          willDisplayOverlayAtClick: NSPoint,
+                                          serializedInputContext: String,
+                                          inputPosition: CGRect) {
+        contentOverlayPopover.websiteAutofillUserScript(websiteAutofillUserScript,
+                                                        willDisplayOverlayAtClick: willDisplayOverlayAtClick,
+                                                        serializedInputContext: serializedInputContext,
+                                                        inputPosition: inputPosition)
     }
 }
 

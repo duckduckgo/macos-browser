@@ -57,7 +57,7 @@ public final class ContentOverlayPopover {
 
 // MARK: - WebsiteAutofillUserScriptDelegate
 extension ContentOverlayPopover: ContentOverlayUserScriptDelegate {
-    public func autofillCloseOverlay(_ autofillUserScript: AutofillMessagingToChildDelegate?) {
+    public func websiteAutofillUserScriptCloseOverlay(_ websiteAutofillUserScript: WebsiteAutofillUserScript?) {
         guard let windowController = windowController.window else {
             return
         }
@@ -68,13 +68,13 @@ extension ContentOverlayPopover: ContentOverlayUserScriptDelegate {
         windowController.orderOut(nil)
     }
 
-    public func autofillDisplayOverlay(_ autofillUserScript: AutofillMessagingToChildDelegate,
-                                       serializedInputContext: String,
-                                       click: NSPoint,
-                                       inputPosition: CGRect) {
+    public func websiteAutofillUserScript(_ websiteAutofillUserScript: WebsiteAutofillUserScript,
+                                          willDisplayOverlayAtClick: NSPoint,
+                                          serializedInputContext: String,
+                                          inputPosition: CGRect) {
         // Combines native click with offset of JS click.
-        let y = (click.y - (inputPosition.height - inputPosition.minY))
-        let x = (click.x - inputPosition.minX)
+        let y = (willDisplayOverlayAtClick.y - (inputPosition.height - inputPosition.minY))
+        let x = (willDisplayOverlayAtClick.x - inputPosition.minX)
         var rectWidth = inputPosition.width
         // If the field is wider we want to left assign the rectangle anchoring
         if inputPosition.width > 315 {
@@ -84,7 +84,7 @@ extension ContentOverlayPopover: ContentOverlayUserScriptDelegate {
 
         // On open initialize to default size to reduce flicker
         viewController.requestResizeToSize(width: 0, height: 0)
-        viewController.autofillInterfaceToChild = autofillUserScript
+        viewController.autofillInterfaceToChild = websiteAutofillUserScript
         viewController.setType(serializedInputContext: serializedInputContext, zoomFactor: zoomFactor)
         if let overlayWindow = windowController.window, let currentTabViewWindow = currentTabView?.window {
             currentTabViewWindow.addChildWindow(overlayWindow, ordered: .above)
