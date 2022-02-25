@@ -158,6 +158,8 @@ final class Tab: NSObject {
     // MARK: - Properties
 
     let webView: WebView
+    
+    private var lastUpgradedURL: URL?
 
     var userEnteredUrl = true
 
@@ -181,7 +183,7 @@ final class Tab: NSObject {
         guard contentChangeEnabled else {
             return
         }
-
+        lastUpgradedURL = nil
         self.content = content
     }
 
@@ -743,6 +745,10 @@ extension Tab: WKNavigationDelegate {
                  decidePolicyFor navigationAction: WKNavigationAction) async -> WKNavigationActionPolicy {
 
         webView.customUserAgent = UserAgent.for(navigationAction.request.url)
+                                                
+        if navigationAction.isTargetingMainFrame, navigationAction.request.mainDocumentURL?.host != lastUpgradedURL?.host {
+            lastUpgradedURL = nil
+        }
 
         if navigationAction.isTargetingMainFrame {
             if navigationAction.navigationType == .backForward,
@@ -809,9 +815,11 @@ extension Tab: WKNavigationDelegate {
         if navigationAction.isTargetingMainFrame {
             let result = await PrivacyFeatures.httpsUpgrade.upgrade(url: url)
             switch result {
-            case let .success(upgradedUrl):
-                urlDidUpgrade(upgradedUrl, navigationAction: navigationAction)
-                return .cancel
+            case let .success(upgradedURL):
+                if lastUpgradedURL != upgradedURL {
+                    urlDidUpgrade(upgradedURL, navigationAction: navigationAction)
+                    return .cancel
+                }
             case .failure:
                 if !url.isDuckDuckGo {
                     await reportTime()
@@ -829,6 +837,7 @@ extension Tab: WKNavigationDelegate {
     
     private func urlDidUpgrade(_ upgradedURL: URL,
                                navigationAction: WKNavigationAction) {
+        lastUpgradedURL = upgradedURL
         invalidateBackItemIfNeeded(for: navigationAction)
         webView.load(upgradedURL)
         setConnectionUpgradedTo(upgradedURL, navigationAction: navigationAction)
