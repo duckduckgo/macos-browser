@@ -85,6 +85,11 @@ final class BrowserTabViewController: NSViewController {
         addMouseMonitors()
     }
 
+    override func viewWillDisappear() {
+        super.viewWillDisappear()
+        removeMouseMonitors()
+    }
+
     override func viewDidAppear() {
         NotificationCenter.default.addObserver(self,
                                                selector: #selector(windowWillClose(_:)),
