@@ -37,6 +37,7 @@ public final class ContentOverlayViewController: NSViewController, EmailManagerR
 
     lazy var vaultManager: SecureVaultManager = {
         let manager = SecureVaultManager()
+        manager.delegate = self
         return manager
     }()
 
@@ -188,4 +189,26 @@ extension ContentOverlayViewController: OverlayAutofillUserScriptPresentationDel
     public func overlayAutofillUserScript(_ overlayAutofillUserScript: OverlayAutofillUserScript, requestResizeToSize: CGSize) {
         self.requestResizeToSize(requestResizeToSize)
     }
+}
+
+extension ContentOverlayViewController: SecureVaultManagerDelegate {
+
+    public func secureVaultManager(_: SecureVaultManager, promptUserToStoreCredentials credentials: SecureVaultModels.WebsiteCredentials) {
+        // No-op, the content overlay view controller should not be prompting the user to store credentials
+    }
+
+    public func secureVaultManager(_: SecureVaultManager, didAutofill type: AutofillType, withObjectId objectId: Int64) {
+        // No-op, Tab.swift handles this functionality
+    }
+    
+    public func secureVaultManager(_: SecureVaultManager, didRequestAuthenticationWithCompletionHandler handler: @escaping (Bool) -> Void) {
+        DeviceAuthenticator.shared.authenticateUser(reason: .autofill) { authenticationResult in
+            handler(authenticationResult.authenticated)
+        }
+    }
+
+    public func secureVaultInitFailed(_ error: SecureVaultError) {
+        SecureVaultErrorReporter.shared.secureVaultInitFailed(error)
+    }
+
 }
