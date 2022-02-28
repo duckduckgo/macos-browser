@@ -82,15 +82,23 @@ final class BrowserTabViewController: NSViewController {
         hoverLabelContainer.alphaValue = 0
         subscribeToSelectedTabViewModel()
         subscribeToErrorViewState()
+    }
+
+    override func viewWillAppear() {
+        super.viewWillAppear()
+
         addMouseMonitors()
     }
 
     override func viewWillDisappear() {
         super.viewWillDisappear()
+
         removeMouseMonitors()
     }
 
     override func viewDidAppear() {
+        super.viewDidAppear()
+
         NotificationCenter.default.addObserver(self,
                                                selector: #selector(windowWillClose(_:)),
                                                name: NSWindow.willCloseNotification,
