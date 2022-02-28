@@ -114,9 +114,9 @@ final class TabViewModel {
     }
 
     private func subscribeToPermissions() {
-        tab.permissions.$permissions.weakAssign(to: \.usedPermissions, on: self)
+        tab.permissions.$permissions.assign(to: \.usedPermissions, onWeaklyHeld: self)
             .store(in: &cancellables)
-        tab.permissions.$authorizationQuery.weakAssign(to: \.permissionAuthorizationQuery, on: self)
+        tab.permissions.$authorizationQuery.assign(to: \.permissionAuthorizationQuery, onWeaklyHeld: self)
             .store(in: &cancellables)
     }
 

@@ -279,7 +279,7 @@ final class LocalBookmarkStoreTests: XCTestCase {
         let topLevelFolders = ImportedBookmarks.TopLevelFolders(bookmarkBar: bookmarkBar, otherBookmarks: otherBookmarks)
         let importedBookmarks = ImportedBookmarks(topLevelFolders: topLevelFolders)
 
-        let result = bookmarkStore.importBookmarks(importedBookmarks)
+        let result = bookmarkStore.importBookmarks(importedBookmarks, source: .safari)
 
         XCTAssertEqual(result.successful, 1)
         XCTAssertEqual(result.duplicates, 0)
@@ -311,8 +311,8 @@ final class LocalBookmarkStoreTests: XCTestCase {
         let importedBookmarks = ImportedBookmarks(topLevelFolders: topLevelFolders)
 
         // Import bookmarks once, and then again to test duplicates
-        _ = bookmarkStore.importBookmarks(importedBookmarks)
-        let result = bookmarkStore.importBookmarks(importedBookmarks)
+        _ = bookmarkStore.importBookmarks(importedBookmarks, source: .safari)
+        let result = bookmarkStore.importBookmarks(importedBookmarks, source: .safari)
 
         XCTAssertEqual(result.successful, 0)
         XCTAssertEqual(result.duplicates, 1)

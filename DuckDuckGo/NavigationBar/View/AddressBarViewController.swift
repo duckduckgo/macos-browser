@@ -204,7 +204,7 @@ final class AddressBarViewController: NSViewController {
         }
         passiveAddressBarStringCancellable = selectedTabViewModel.$passiveAddressBarString
             .receive(on: DispatchQueue.main)
-            .weakAssign(to: \.stringValue, on: passiveTextField)
+            .assign(to: \.stringValue, onWeaklyHeld: passiveTextField)
     }
 
     private func subscribeToProgressEvents() {
@@ -247,7 +247,7 @@ final class AddressBarViewController: NSViewController {
     }
 
     func subscribeToButtonsWidth() {
-        addressBarButtonsViewController!.$buttonsWidth.weakAssign(to: \.constant, on: passiveTextFieldMinXConstraint)
+        addressBarButtonsViewController!.$buttonsWidth.assign(to: \.constant, onWeaklyHeld: passiveTextFieldMinXConstraint)
             .store(in: &cancellables)
     }
 

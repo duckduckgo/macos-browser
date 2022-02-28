@@ -70,7 +70,7 @@ internal class ChromiumDataImporter: DataImporter {
             switch bookmarkResult {
             case .success(let bookmarks):
                 do {
-                    let summary = try bookmarkImporter.importBookmarks(bookmarks)
+                    let summary = try bookmarkImporter.importBookmarks(bookmarks, source: .chromium)
                     summaries.append(summary)
                 } catch {
                     completion(.failure(.cannotAccessSecureVault))

@@ -48,7 +48,7 @@ protocol BookmarkStore {
     func update(folder: BookmarkFolder)
     func add(objectsWithUUIDs: [UUID], to parent: BookmarkFolder?, completion: @escaping (Error?) -> Void)
     func update(objectsWithUUIDs uuids: [UUID], update: @escaping (BaseBookmarkEntity) -> Void, completion: @escaping (Error?) -> Void)
-    func importBookmarks(_ bookmarks: ImportedBookmarks) -> BookmarkImportResult
+    func importBookmarks(_ bookmarks: ImportedBookmarks, source: BookmarkImportSource) -> BookmarkImportResult
 
 }
 
@@ -90,7 +90,7 @@ final class LocalBookmarkStore: BookmarkStore {
                 fetchRequest = Bookmark.topLevelEntitiesFetchRequest()
             }
 
-            fetchRequest.sortDescriptors = [NSSortDescriptor(key: #keyPath(BookmarkManagedObject.dateAdded), ascending: false)]
+            fetchRequest.sortDescriptors = [NSSortDescriptor(key: #keyPath(BookmarkManagedObject.dateAdded), ascending: true)]
             fetchRequest.returnsObjectsAsFaults = false
 
             do {
@@ -346,8 +346,16 @@ final class LocalBookmarkStore: BookmarkStore {
     }
 
     // MARK: - Import
-
-    func importBookmarks(_ bookmarks: ImportedBookmarks) -> BookmarkImportResult {
+    
+    /// Imports bookmarks into the Core Data store from an `ImportedBookmarks` object.
+    /// The source is used to determine where to put bookmarks, as we want to match the source browser's structure as closely as possible.
+    ///
+    /// The import strategy is as follows:
+    ///
+    /// 1. **Safari:** Create a root level "Imported Favorites" folder to store bookmarks from the bookmarks bar, and all other bookmarks go at the root level.
+    /// 2. **Chrome:** Put all bookmarks at the root level, except for Other Bookmarks which go in a root level "Other Bookmarks" folder.
+    /// 3. **Firefox:** Put all bookmarks at the root level, except for Other Bookmarks which go in a root level "Other Bookmarks" folder.
+    func importBookmarks(_ bookmarks: ImportedBookmarks, source: BookmarkImportSource) -> BookmarkImportResult {
         var total = BookmarkImportResult(successful: 0, duplicates: 0, failed: 0)
 
         context.performAndWait {
@@ -361,27 +369,13 @@ final class LocalBookmarkStore: BookmarkStore {
                 }
 
                 let bookmarkCountBeforeImport = try context.count(for: Bookmark.bookmarksFetchRequest())
-
-                if let bookmarksBar = bookmarks.topLevelFolders.bookmarkBar.children {
-                    let result = recursivelyCreateEntities(from: bookmarksBar,
-                                                           parent: nil,
-                                                           existingBookmarkURLs: bookmarkURLs,
-                                                           in: self.context)
-
-                    total += result
-                }
-
                 let allFolders = try context.fetch(BookmarkFolder.bookmarkFoldersFetchRequest())
-                let existingOtherFolder = allFolders.first { ($0.titleEncrypted as? String) == "Other Bookmarks" }
-                let otherBookmarksFolder = existingOtherFolder ?? createFolder(titled: UserText.bookmarkImportOtherBookmarks, in: self.context)
-
-                if let otherBookmarks = bookmarks.topLevelFolders.otherBookmarks.children {
-                    let result = recursivelyCreateEntities(from: otherBookmarks,
-                                              parent: otherBookmarksFolder,
-                                              existingBookmarkURLs: bookmarkURLs,
-                                              in: self.context)
-
-                    total += result
+                
+                switch source {
+                case .safari:
+                    total += createEntitiesFromSafariBookmarks(allFolders: allFolders, bookmarks: bookmarks, bookmarkURLs: bookmarkURLs)
+                case .chromium, .firefox:
+                    total += createEntitiesFromChromiumAndFirefoxBookmarks(allFolders: allFolders, bookmarks: bookmarks, bookmarkURLs: bookmarkURLs)
                 }
 
                 try self.context.save()
@@ -400,6 +394,72 @@ final class LocalBookmarkStore: BookmarkStore {
 
         return total
     }
+    
+    private func createEntitiesFromSafariBookmarks(allFolders: [BookmarkManagedObject],
+                                                   bookmarks: ImportedBookmarks,
+                                                   bookmarkURLs: Set<URL>) -> BookmarkImportResult {
+        
+        var total = BookmarkImportResult(successful: 0, duplicates: 0, failed: 0)
+        
+        let existingFolder = allFolders.first { ($0.titleEncrypted as? String) == UserText.bookmarkImportImportedFavorites }
+        let parent = existingFolder ?? createFolder(titled: UserText.bookmarkImportImportedFavorites, in: self.context)
+        
+        if let bookmarksBar = bookmarks.topLevelFolders.bookmarkBar.children {
+            let result = recursivelyCreateEntities(from: bookmarksBar,
+                                                   parent: parent,
+                                                   existingBookmarkURLs: bookmarkURLs,
+                                                   markBookmarksAsFavorite: true,
+                                                   in: self.context)
+
+            total += result
+        }
+
+        if let otherBookmarks = bookmarks.topLevelFolders.otherBookmarks.children {
+            let result = recursivelyCreateEntities(from: otherBookmarks,
+                                                   parent: nil,
+                                                   existingBookmarkURLs: bookmarkURLs,
+                                                   markBookmarksAsFavorite: false,
+                                                   in: self.context)
+            
+            total += result
+        }
+        
+        return total
+        
+    }
+    
+    private func createEntitiesFromChromiumAndFirefoxBookmarks(allFolders: [BookmarkManagedObject],
+                                                               bookmarks: ImportedBookmarks,
+                                                               bookmarkURLs: Set<URL>) -> BookmarkImportResult {
+        
+        var total = BookmarkImportResult(successful: 0, duplicates: 0, failed: 0)
+        
+        if let bookmarksBar = bookmarks.topLevelFolders.bookmarkBar.children {
+            let result = recursivelyCreateEntities(from: bookmarksBar,
+                                                   parent: nil,
+                                                   existingBookmarkURLs: bookmarkURLs,
+                                                   markBookmarksAsFavorite: true,
+                                                   in: self.context)
+
+            total += result
+        }
+        
+        let existingFolder = allFolders.first { ($0.titleEncrypted as? String) == UserText.bookmarkImportOtherBookmarks }
+        let parent = existingFolder ?? createFolder(titled: UserText.bookmarkImportOtherBookmarks, in: self.context)
+
+        if let otherBookmarks = bookmarks.topLevelFolders.otherBookmarks.children {
+            let result = recursivelyCreateEntities(from: otherBookmarks,
+                                                   parent: parent,
+                                                   existingBookmarkURLs: bookmarkURLs,
+                                                   markBookmarksAsFavorite: false,
+                                                   in: self.context)
+            
+            total += result
+        }
+        
+        return total
+        
+    }
 
     private func createFolder(titled title: String, in context: NSManagedObjectContext) -> BookmarkManagedObject {
         let folder = BookmarkManagedObject(context: self.context)
@@ -414,6 +474,7 @@ final class LocalBookmarkStore: BookmarkStore {
     private func recursivelyCreateEntities(from bookmarks: [ImportedBookmarks.BookmarkOrFolder],
                                            parent: BookmarkManagedObject?,
                                            existingBookmarkURLs: Set<URL>,
+                                           markBookmarksAsFavorite: Bool,
                                            in context: NSManagedObjectContext) -> BookmarkImportResult {
         var total = BookmarkImportResult(successful: 0, duplicates: 0, failed: 0)
 
@@ -438,12 +499,15 @@ final class LocalBookmarkStore: BookmarkStore {
             bookmarkManagedObject.urlEncrypted = bookmarkOrFolder.url as NSURL?
             bookmarkManagedObject.dateAdded = NSDate.now
             bookmarkManagedObject.parentFolder = parent
-            bookmarkManagedObject.isFavorite = false
+            
+            // Bookmarks from the bookmarks bar are imported as favorites
+            bookmarkManagedObject.isFavorite = (!bookmarkOrFolder.isFolder && markBookmarksAsFavorite)
 
             if let children = bookmarkOrFolder.children {
                 let result = recursivelyCreateEntities(from: children,
                                                        parent: bookmarkManagedObject,
                                                        existingBookmarkURLs: existingBookmarkURLs,
+                                                       markBookmarksAsFavorite: markBookmarksAsFavorite,
                                                        in: context)
 
                 total += result

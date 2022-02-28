@@ -112,7 +112,7 @@ private struct IdentificationView: View {
                     // Way too much code duplication in here, but this view may be altered a fair bit in 2022, and I'm
                     // out of time to fix it up before the end of 2021, so it's staying this way for a bit. Sorry!
                     if Locale.current.dateComponentOrder == .dayMonthYear {
-                        NSPopUpButtonView<Int?>(selection: $model.birthdayDay, popupCreator: {
+                        NSPopUpButtonView<Int?>(selection: $model.birthdayDay, viewCreator: {
                             let button = NSPopUpButton()
                             
                             let item = button.menu?.addItem(withTitle: UserText.pmDay, action: nil, keyEquivalent: "")
@@ -126,7 +126,7 @@ private struct IdentificationView: View {
                             return button
                         })
 
-                        NSPopUpButtonView<Int?>(selection: $model.birthdayMonth, popupCreator: {
+                        NSPopUpButtonView<Int?>(selection: $model.birthdayMonth, viewCreator: {
                             let button = NSPopUpButton()
                             
                             let item = button.menu?.addItem(withTitle: UserText.pmMonth, action: nil, keyEquivalent: "")
@@ -140,7 +140,7 @@ private struct IdentificationView: View {
                             return button
                         })
                     } else {
-                        NSPopUpButtonView<Int?>(selection: $model.birthdayMonth, popupCreator: {
+                        NSPopUpButtonView<Int?>(selection: $model.birthdayMonth, viewCreator: {
                             let button = NSPopUpButton()
                             
                             let item = button.menu?.addItem(withTitle: UserText.pmMonth, action: nil, keyEquivalent: "")
@@ -154,7 +154,7 @@ private struct IdentificationView: View {
                             return button
                         })
 
-                        NSPopUpButtonView<Int?>(selection: $model.birthdayDay, popupCreator: {
+                        NSPopUpButtonView<Int?>(selection: $model.birthdayDay, viewCreator: {
                             let button = NSPopUpButton()
                             
                             let item = button.menu?.addItem(withTitle: UserText.pmDay, action: nil, keyEquivalent: "")
@@ -169,7 +169,7 @@ private struct IdentificationView: View {
                         })
                     }
                     
-                    NSPopUpButtonView<Int?>(selection: $model.birthdayYear, popupCreator: {
+                    NSPopUpButtonView<Int?>(selection: $model.birthdayYear, viewCreator: {
                         let button = NSPopUpButton()
                         
                         let item = button.menu?.addItem(withTitle: UserText.pmYear, action: nil, keyEquivalent: "")
@@ -233,7 +233,7 @@ private struct AddressView: View {
                     .bold()
                     .padding(.bottom, 5)
 
-                NSPopUpButtonView<String>(selection: $model.addressCountryCode, popupCreator: {
+                NSPopUpButtonView<String>(selection: $model.addressCountryCode, viewCreator: {
                     let button = NSPopUpButton()
                     
                     let item = button.menu?.addItem(withTitle: "-", action: nil, keyEquivalent: "")
@@ -413,58 +413,3 @@ private struct EditableIdentityField: View {
     }
 
 }
-
-// swiftlint:disable force_cast
-struct NSPopUpButtonView<ItemType>: NSViewRepresentable where ItemType: Equatable {
-    
-    typealias NSViewType = NSPopUpButton
-
-    @Binding var selection: ItemType
-    var popupCreator: () -> NSPopUpButton
-    
-    func makeNSView(context: NSViewRepresentableContext<NSPopUpButtonView>) -> NSPopUpButton {
-        let newPopupButton = popupCreator()
-        setPopUpFromSelection(newPopupButton, selection: selection)
-        
-        newPopupButton.target = context.coordinator
-        newPopupButton.action = #selector(Coordinator.dropdownItemSelected(_:))
-
-        return newPopupButton
-    }
-    
-    func updateNSView(_ nsView: NSPopUpButton, context: NSViewRepresentableContext<NSPopUpButtonView>) {
-        setPopUpFromSelection(nsView, selection: selection)
-    }
-    
-    func setPopUpFromSelection(_ button: NSPopUpButton, selection: ItemType) {
-        let itemsList = button.itemArray
-        let matchedMenuItem = itemsList.filter { ($0.representedObject as! ItemType) == selection }.first
-
-        if matchedMenuItem != nil {
-            button.select(matchedMenuItem)
-        }
-    }
-    
-    func makeCoordinator() -> Coordinator {
-        return Coordinator(self)
-    }
-    
-    final class Coordinator: NSObject {
-        var parent: NSPopUpButtonView!
-        
-        init(_ parent: NSPopUpButtonView) {
-            super.init()
-            self.parent = parent
-        }
-        
-        @objc func dropdownItemSelected(_ sender: NSPopUpButton) {
-            guard let selectedItem = sender.selectedItem else {
-                assertionFailure()
-                return
-            }
-
-            parent.selection = selectedItem.representedObject as! ItemType
-        }
-    }
-}
-// swiftlint:enable force_cast

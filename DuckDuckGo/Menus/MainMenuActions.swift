@@ -59,20 +59,19 @@ extension AppDelegate {
 #if FEEDBACK
 
     @IBAction func openFeedback(_ sender: Any?) {
-        guard let windowController = WindowControllersManager.shared.lastKeyMainWindowController else {
-            WindowsManager.openNewWindow(with: URL.feedback)
+        // swiftlint:disable force_cast
+        let windowController = NSStoryboard.feedback.instantiateController(withIdentifier: "FeedbackWindowController") as! NSWindowController
+        // swiftlint:enable force_cast
+
+        guard let feedbackWindow = windowController.window as? FeedbackWindow,
+              let parentWindowController = WindowControllersManager.shared.lastKeyMainWindowController else {
+            assertionFailure("HomepageViewController: Failed to present FeedbackWindowController")
             return
         }
 
-        let mainViewController = windowController.mainViewController
-
-        DefaultConfigurationStorage.shared.log()
-        ConfigurationManager.shared.log()
-
-        let tab = Tab(content: .url(.feedback))
-        let tabCollectionViewModel = mainViewController.tabCollectionViewModel
-        tabCollectionViewModel.append(tab: tab)
-        windowController.window?.makeKeyAndOrderFront(nil)
+        feedbackWindow.feedbackViewController.currentTab =
+            parentWindowController.mainViewController.tabCollectionViewModel.selectedTabViewModel?.tab
+        parentWindowController.window?.beginSheet(feedbackWindow) { _ in }
     }
 
 #endif
@@ -471,14 +470,38 @@ extension MainViewController {
 
     @IBAction func resetSecureVaultData(_ sender: Any?) {
         let vault = try? SecureVaultFactory.default.makeVault(errorReporter: SecureVaultErrorReporter.shared)
+        
         let accounts = (try? vault?.accounts()) ?? []
-        let accountIDs = accounts.compactMap(\.id)
+        for accountID in accounts.compactMap(\.id) {
+            try? vault?.deleteWebsiteCredentialsFor(accountId: accountID)
+        }
+        
+        let cards = (try? vault?.creditCards()) ?? []
+        for cardID in cards.compactMap(\.id) {
+            try? vault?.deleteCreditCardFor(cardId: cardID)
+        }
 
-        for accountID in accountIDs {
-            do {
-                try vault?.deleteWebsiteCredentialsFor(accountId: accountID)
-            } catch {
-                os_log("Failed to remove credential with account ID %d", type: .error, accountID)
+        let identities = (try? vault?.identities()) ?? []
+        for identityID in identities.compactMap(\.id) {
+            try? vault?.deleteIdentityFor(identityId: identityID)
+        }
+        
+        let notes = (try? vault?.notes()) ?? []
+        for noteID in notes.compactMap(\.id) {
+            try? vault?.deleteNoteFor(noteId: noteID)
+        }
+    }
+    
+    @IBAction func resetBookmarks(_ sender: Any?) {
+        guard let topLevelEntities = LocalBookmarkManager.shared.list?.topLevelEntities else {
+            return
+        }
+        
+        for entity in topLevelEntities {
+            if let folder = entity as? BookmarkFolder {
+                LocalBookmarkManager.shared.remove(folder: folder)
+            } else if let bookmark = entity as? Bookmark {
+                LocalBookmarkManager.shared.remove(bookmark: bookmark)
             }
         }
     }
@@ -630,5 +653,11 @@ extension MainViewController: FindInPageDelegate {
     func findInPageDone(_ controller: FindInPageViewController) {
         self.tabCollectionViewModel.selectedTabViewModel?.closeFindInPage()
     }
+
+}
+
+fileprivate extension NSStoryboard {
+
+    static let feedback = NSStoryboard(name: "Feedback", bundle: .main)
 
 }

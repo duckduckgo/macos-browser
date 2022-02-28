@@ -1,0 +1,414 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<document type="com.apple.InterfaceBuilder3.Cocoa.Storyboard.XIB" version="3.0" toolsVersion="19529" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES">
+    <dependencies>
+        <deployment identifier="macosx"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="19529"/>
+        <capability name="Named colors" minToolsVersion="9.0"/>
+        <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
+    </dependencies>
+    <scenes>
+        <!--Window Controller-->
+        <scene sceneID="FZH-OE-Mx2">
+            <objects>
+                <windowController storyboardIdentifier="FeedbackWindowController" id="n1V-pB-Dar" sceneMemberID="viewController">
+                    <window key="window" title="Window" allowsToolTipsWhenApplicationIsInactive="NO" autorecalculatesKeyViewLoop="NO" releasedWhenClosed="NO" visibleAtLaunch="NO" frameAutosaveName="" animationBehavior="default" titlebarAppearsTransparent="YES" titleVisibility="hidden" id="1yO-BO-t61" customClass="FeedbackWindow" customModule="DuckDuckGo_Privacy_Browser" customModuleProvider="target">
+                        <windowStyleMask key="styleMask" titled="YES" closable="YES" fullSizeContentView="YES"/>
+                        <windowPositionMask key="initialPositionMask" leftStrut="YES" rightStrut="YES" topStrut="YES" bottomStrut="YES"/>
+                        <rect key="contentRect" x="216" y="264" width="360" height="320"/>
+                        <rect key="screenRect" x="0.0" y="0.0" width="1536" height="935"/>
+                        <view key="contentView" id="9E9-JX-Qhb">
+                            <rect key="frame" x="0.0" y="0.0" width="360" height="320"/>
+                            <autoresizingMask key="autoresizingMask"/>
+                        </view>
+                        <connections>
+                            <outlet property="delegate" destination="n1V-pB-Dar" id="ZwH-lt-Tw6"/>
+                        </connections>
+                    </window>
+                    <connections>
+                        <segue destination="TOa-sP-KHa" kind="relationship" relationship="window.shadowedContentViewController" id="2YK-yx-ncM"/>
+                    </connections>
+                </windowController>
+                <customObject id="Nmr-Vd-3ch" userLabel="First Responder" customClass="NSResponder" sceneMemberID="firstResponder"/>
+            </objects>
+            <point key="canvasLocation" x="-299" y="567"/>
+        </scene>
+        <!--Feedback View Controller-->
+        <scene sceneID="NVa-uK-UhP">
+            <objects>
+                <viewController id="TOa-sP-KHa" customClass="FeedbackViewController" customModule="DuckDuckGo_Privacy_Browser" customModuleProvider="target" sceneMemberID="viewController">
+                    <view key="view" id="Ie8-lu-6dX">
+                        <rect key="frame" x="0.0" y="0.0" width="360" height="229"/>
+                        <autoresizingMask key="autoresizingMask"/>
+                        <subviews>
+                            <customView translatesAutoresizingMaskIntoConstraints="NO" id="B4Q-yT-nKT" customClass="ColorView" customModule="DuckDuckGo_Privacy_Browser" customModuleProvider="target">
+                                <rect key="frame" x="0.0" y="160" width="360" height="69"/>
+                                <subviews>
+                                    <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="7KM-rJ-r28">
+                                        <rect key="frame" x="43" y="25" width="274" height="19"/>
+                                        <constraints>
+                                            <constraint firstAttribute="width" constant="270" id="WpG-jC-P2k"/>
+                                        </constraints>
+                                        <textFieldCell key="cell" alignment="center" title="Help Improve the DuckDuckGo App" id="M7g-24-ECG">
+                                            <font key="font" metaFont="systemSemibold" size="15"/>
+                                            <color key="textColor" name="GreyTextColor"/>
+                                            <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
+                                        </textFieldCell>
+                                    </textField>
+                                    <button hidden="YES" translatesAutoresizingMaskIntoConstraints="NO" id="gmY-Cl-KRc">
+                                        <rect key="frame" x="8" y="41" width="20" height="20"/>
+                                        <constraints>
+                                            <constraint firstAttribute="height" constant="20" id="5Cl-wW-X8R"/>
+                                            <constraint firstAttribute="width" constant="20" id="NJC-UV-HPf"/>
+                                        </constraints>
+                                        <buttonCell key="cell" type="square" bezelStyle="shadowlessSquare" image="Close" imagePosition="only" alignment="center" imageScaling="proportionallyUpOrDown" inset="2" id="aRg-eO-aAC">
+                                            <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
+                                            <font key="font" metaFont="system"/>
+                                        </buttonCell>
+                                    </button>
+                                </subviews>
+                                <constraints>
+                                    <constraint firstAttribute="height" constant="69" id="0od-R2-dBY"/>
+                                    <constraint firstItem="7KM-rJ-r28" firstAttribute="centerX" secondItem="B4Q-yT-nKT" secondAttribute="centerX" id="B3c-lB-0Ee"/>
+                                    <constraint firstItem="7KM-rJ-r28" firstAttribute="centerY" secondItem="B4Q-yT-nKT" secondAttribute="centerY" id="EyM-8M-vKg"/>
+                                    <constraint firstItem="gmY-Cl-KRc" firstAttribute="leading" secondItem="B4Q-yT-nKT" secondAttribute="leading" constant="8" id="JCT-9z-jBi"/>
+                                    <constraint firstItem="gmY-Cl-KRc" firstAttribute="top" secondItem="B4Q-yT-nKT" secondAttribute="top" constant="8" id="aj3-d1-Icj"/>
+                                </constraints>
+                                <userDefinedRuntimeAttributes>
+                                    <userDefinedRuntimeAttribute type="color" keyPath="backgroundColor">
+                                        <color key="value" name="FirePopoverPanelBackground"/>
+                                    </userDefinedRuntimeAttribute>
+                                </userDefinedRuntimeAttributes>
+                            </customView>
+                            <box verticalHuggingPriority="750" boxType="separator" translatesAutoresizingMaskIntoConstraints="NO" id="iPz-Dg-VNs">
+                                <rect key="frame" x="0.0" y="158" width="360" height="5"/>
+                            </box>
+                            <customView translatesAutoresizingMaskIntoConstraints="NO" id="wYB-07-s0m" customClass="ColorView" customModule="DuckDuckGo_Privacy_Browser" customModuleProvider="target">
+                                <rect key="frame" x="0.0" y="0.0" width="360" height="160"/>
+                                <subviews>
+                                    <popUpButton translatesAutoresizingMaskIntoConstraints="NO" id="7Z6-Ji-PH7">
+                                        <rect key="frame" x="17" y="106" width="326" height="37"/>
+                                        <constraints>
+                                            <constraint firstAttribute="height" constant="30" id="Fw3-Y4-XV0"/>
+                                        </constraints>
+                                        <popUpButtonCell key="cell" type="bevel" title="Select a category" bezelStyle="regularSquare" alignment="left" lineBreakMode="truncatingTail" state="on" borderStyle="border" tag="-1" inset="2" autoenablesItems="NO" selectedItem="z2T-3Y-jPK" id="gWx-cK-gfz">
+                                            <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
+                                            <font key="font" metaFont="menu"/>
+                                            <menu key="menu" autoenablesItems="NO" id="wtn-Rl-BIC">
+                                                <items>
+                                                    <menuItem title="Select a category" state="on" tag="-1" id="z2T-3Y-jPK"/>
+                                                    <menuItem isSeparatorItem="YES" id="K5Z-td-X6u"/>
+                                                    <menuItem title="Report a site not working as expected" id="uoX-qE-3kz"/>
+                                                    <menuItem title="Report problem with the DuckDuckGo App" tag="1" id="Yti-fm-YMV"/>
+                                                    <menuItem title="Request a feature" tag="2" id="I6J-ps-0Vy"/>
+                                                    <menuItem title="General feedback" tag="3" id="GSM-nJ-01d"/>
+                                                </items>
+                                            </menu>
+                                        </popUpButtonCell>
+                                        <connections>
+                                            <action selector="optionPopUpButtonAction:" target="TOa-sP-KHa" id="UAa-qp-Arp"/>
+                                        </connections>
+                                    </popUpButton>
+                                    <customView hidden="YES" translatesAutoresizingMaskIntoConstraints="NO" id="8Xi-CY-jyt" userLabel="Browser Feedback View">
+                                        <rect key="frame" x="0.0" y="-113" width="360" height="215"/>
+                                        <subviews>
+                                            <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="Obm-Wr-qrD">
+                                                <rect key="frame" x="18" y="188" width="324" height="15"/>
+                                                <constraints>
+                                                    <constraint firstAttribute="width" constant="320" id="Y8O-Rh-baf"/>
+                                                </constraints>
+                                                <textFieldCell key="cell" title="Please give us your feedback:" id="B04-A6-cRC">
+                                                    <font key="font" metaFont="cellTitle"/>
+                                                    <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
+                                                    <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
+                                                </textFieldCell>
+                                            </textField>
+                                            <textField verticalHuggingPriority="750" horizontalCompressionResistancePriority="250" translatesAutoresizingMaskIntoConstraints="NO" id="wK6-n4-LX0">
+                                                <rect key="frame" x="20" y="83" width="320" height="97"/>
+                                                <constraints>
+                                                    <constraint firstAttribute="width" constant="320" id="ICX-br-ye9"/>
+                                                    <constraint firstAttribute="height" constant="97" id="RkU-ia-Jx0"/>
+                                                </constraints>
+                                                <textFieldCell key="cell" selectable="YES" editable="YES" sendsActionOnEndEditing="YES" state="on" borderStyle="bezel" drawsBackground="YES" id="6F0-63-Q3a">
+                                                    <font key="font" metaFont="system"/>
+                                                    <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
+                                                    <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
+                                                </textFieldCell>
+                                            </textField>
+                                            <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="nm3-pj-w2B">
+                                                <rect key="frame" x="18" y="16" width="324" height="47"/>
+                                                <constraints>
+                                                    <constraint firstAttribute="width" constant="320" id="46H-7M-bu2"/>
+                                                    <constraint firstAttribute="height" constant="47" id="w0L-qh-saU"/>
+                                                </constraints>
+                                                <textFieldCell key="cell" id="7PA-BW-gkt">
+                                                    <font key="font" metaFont="cellTitle"/>
+                                                    <string key="title">Reports sent to DuckDuckGo are 100% anonymous and only include your message, the DuckDuckGo app version, and your macOS version.</string>
+                                                    <color key="textColor" name="secondaryLabelColor" catalog="System" colorSpace="catalog"/>
+                                                    <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
+                                                </textFieldCell>
+                                            </textField>
+                                        </subviews>
+                                        <constraints>
+                                            <constraint firstItem="wK6-n4-LX0" firstAttribute="top" secondItem="Obm-Wr-qrD" secondAttribute="bottom" constant="8" id="9Do-M1-64N"/>
+                                            <constraint firstAttribute="trailing" secondItem="nm3-pj-w2B" secondAttribute="trailing" constant="20" symbolic="YES" id="9nz-EV-snH"/>
+                                            <constraint firstAttribute="trailing" secondItem="Obm-Wr-qrD" secondAttribute="trailing" constant="20" id="Ex6-sU-DUY"/>
+                                            <constraint firstItem="wK6-n4-LX0" firstAttribute="leading" secondItem="8Xi-CY-jyt" secondAttribute="leading" constant="20" symbolic="YES" id="F6G-ap-cPd"/>
+                                            <constraint firstItem="nm3-pj-w2B" firstAttribute="leading" secondItem="8Xi-CY-jyt" secondAttribute="leading" constant="20" symbolic="YES" id="JfJ-gI-4XY"/>
+                                            <constraint firstItem="Obm-Wr-qrD" firstAttribute="top" secondItem="8Xi-CY-jyt" secondAttribute="top" constant="12" id="S8X-ph-cIv"/>
+                                            <constraint firstAttribute="height" constant="215" id="UQa-QI-LjA"/>
+                                            <constraint firstAttribute="trailing" secondItem="wK6-n4-LX0" secondAttribute="trailing" constant="20" symbolic="YES" id="YRR-IC-2hS"/>
+                                            <constraint firstItem="nm3-pj-w2B" firstAttribute="top" secondItem="wK6-n4-LX0" secondAttribute="bottom" constant="20" id="bZL-wM-h8Q"/>
+                                            <constraint firstItem="Obm-Wr-qrD" firstAttribute="leading" secondItem="8Xi-CY-jyt" secondAttribute="leading" constant="20" id="mEl-bd-Itj"/>
+                                        </constraints>
+                                    </customView>
+                                    <customView hidden="YES" translatesAutoresizingMaskIntoConstraints="NO" id="8B9-wf-zcP" userLabel="Website Breakage View">
+                                        <rect key="frame" x="0.0" y="-67" width="360" height="169"/>
+                                        <subviews>
+                                            <textField verticalHuggingPriority="750" horizontalCompressionResistancePriority="250" translatesAutoresizingMaskIntoConstraints="NO" id="2gs-6z-agW">
+                                                <rect key="frame" x="20" y="130" width="320" height="27"/>
+                                                <constraints>
+                                                    <constraint firstAttribute="height" constant="27" id="l1h-jz-vPJ"/>
+                                                    <constraint firstAttribute="width" constant="320" id="nBh-RP-srf"/>
+                                                </constraints>
+                                                <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" selectable="YES" editable="YES" sendsActionOnEndEditing="YES" state="on" borderStyle="bezel" drawsBackground="YES" usesSingleLineMode="YES" id="AsP-i9-AYb">
+                                                    <font key="font" metaFont="system"/>
+                                                    <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
+                                                    <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
+                                                </textFieldCell>
+                                            </textField>
+                                            <popUpButton translatesAutoresizingMaskIntoConstraints="NO" id="hUd-Rb-6Ls">
+                                                <rect key="frame" x="17" y="76" width="326" height="37"/>
+                                                <constraints>
+                                                    <constraint firstAttribute="height" constant="30" id="3Tm-Sk-Wei"/>
+                                                    <constraint firstAttribute="width" constant="320" id="AUB-ZP-wJl"/>
+                                                </constraints>
+                                                <popUpButtonCell key="cell" type="bevel" title="Select a category (optional)" bezelStyle="regularSquare" alignment="left" lineBreakMode="truncatingTail" state="on" borderStyle="border" tag="-1" inset="2" autoenablesItems="NO" selectedItem="50u-Do-Pk7" id="d1R-Kk-zzo">
+                                                    <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
+                                                    <font key="font" metaFont="menu"/>
+                                                    <menu key="menu" autoenablesItems="NO" id="5HU-z4-NLx">
+                                                        <items>
+                                                            <menuItem title="Select a category (optional)" state="on" tag="-1" id="50u-Do-Pk7"/>
+                                                            <menuItem isSeparatorItem="YES" id="VgP-Y6-9FR"/>
+                                                            <menuItem title="Can't sign in" id="Lcy-nr-Bvy"/>
+                                                            <menuItem title="Content is missing" tag="1" id="Jbl-XF-mkd"/>
+                                                            <menuItem title="Links or buttons don't work" tag="2" id="AMn-JN-Npb"/>
+                                                            <menuItem title="The site does not support this browser" tag="3" id="naz-Hr-IpO"/>
+                                                            <menuItem title="The site asked me to disable" tag="4" id="0YV-Mw-KfP"/>
+                                                            <menuItem title="Video or images didn't load" tag="5" id="ks1-6b-EFw"/>
+                                                            <menuItem title="Something else" tag="6" id="Fhy-jA-gGf"/>
+                                                        </items>
+                                                    </menu>
+                                                </popUpButtonCell>
+                                                <connections>
+                                                    <action selector="websiteBreakageCategoryPopUpButtonAction:" target="TOa-sP-KHa" id="k1b-m9-V8B"/>
+                                                </connections>
+                                            </popUpButton>
+                                            <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="NLb-RN-SpK">
+                                                <rect key="frame" x="18" y="-7" width="324" height="67"/>
+                                                <constraints>
+                                                    <constraint firstAttribute="height" constant="67" id="3gs-wF-UfX"/>
+                                                    <constraint firstAttribute="width" constant="320" id="tVZ-1G-sgl"/>
+                                                </constraints>
+                                                <textFieldCell key="cell" id="SXY-b7-hGs">
+                                                    <font key="font" metaFont="cellTitle"/>
+                                                    <string key="title">Reports sent to DuckDuckGo are 100% anonymous and only include your selection above, the URL, a list of trackers we found on the site, the DuckDuckGo app version, and your macOS version.</string>
+                                                    <color key="textColor" name="secondaryLabelColor" catalog="System" colorSpace="catalog"/>
+                                                    <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
+                                                </textFieldCell>
+                                            </textField>
+                                        </subviews>
+                                        <constraints>
+                                            <constraint firstAttribute="height" constant="169" id="3Lp-Et-qRB"/>
+                                            <constraint firstItem="2gs-6z-agW" firstAttribute="top" secondItem="8B9-wf-zcP" secondAttribute="top" constant="12" id="Boe-IN-w2P"/>
+                                            <constraint firstItem="hUd-Rb-6Ls" firstAttribute="leading" secondItem="8B9-wf-zcP" secondAttribute="leading" constant="20" id="Jed-xd-3mg"/>
+                                            <constraint firstAttribute="trailing" secondItem="NLb-RN-SpK" secondAttribute="trailing" constant="20" id="TUS-jM-vt1"/>
+                                            <constraint firstItem="2gs-6z-agW" firstAttribute="leading" secondItem="8B9-wf-zcP" secondAttribute="leading" constant="20" id="ZiI-DM-AFY"/>
+                                            <constraint firstItem="hUd-Rb-6Ls" firstAttribute="top" secondItem="2gs-6z-agW" secondAttribute="bottom" constant="20" id="gUO-WO-8Hr"/>
+                                            <constraint firstItem="NLb-RN-SpK" firstAttribute="leading" secondItem="8B9-wf-zcP" secondAttribute="leading" constant="20" id="goU-1M-ibi"/>
+                                            <constraint firstAttribute="trailing" secondItem="hUd-Rb-6Ls" secondAttribute="trailing" constant="20" id="kGb-Nb-7TU"/>
+                                            <constraint firstAttribute="trailing" secondItem="2gs-6z-agW" secondAttribute="trailing" constant="20" id="qTG-tx-tnf"/>
+                                            <constraint firstItem="NLb-RN-SpK" firstAttribute="top" secondItem="hUd-Rb-6Ls" secondAttribute="bottom" constant="20" id="tE4-8t-hsL"/>
+                                        </constraints>
+                                    </customView>
+                                    <customView translatesAutoresizingMaskIntoConstraints="NO" id="RYb-WZ-bIo" customClass="ColorView" customModule="DuckDuckGo_Privacy_Browser" customModuleProvider="target">
+                                        <rect key="frame" x="0.0" y="0.0" width="360" height="69"/>
+                                        <constraints>
+                                            <constraint firstAttribute="height" constant="69" id="Knp-n3-po1"/>
+                                        </constraints>
+                                        <userDefinedRuntimeAttributes>
+                                            <userDefinedRuntimeAttribute type="color" keyPath="backgroundColor">
+                                                <color key="value" name="InterfaceBackgroundColor"/>
+                                            </userDefinedRuntimeAttribute>
+                                        </userDefinedRuntimeAttributes>
+                                    </customView>
+                                    <button verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="Gy6-KF-A15">
+                                        <rect key="frame" x="180" y="14" width="166" height="40"/>
+                                        <constraints>
+                                            <constraint firstAttribute="height" constant="28" id="vLC-1q-2RZ"/>
+                                        </constraints>
+                                        <buttonCell key="cell" type="push" title="Submit" bezelStyle="rounded" alignment="center" controlSize="large" enabled="NO" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="ng8-Xz-jPD">
+                                            <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
+                                            <font key="font" metaFont="system"/>
+                                        </buttonCell>
+                                        <connections>
+                                            <action selector="submitButtonAction:" target="TOa-sP-KHa" id="5ag-9f-dye"/>
+                                        </connections>
+                                    </button>
+                                    <button verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="G99-8X-64H">
+                                        <rect key="frame" x="14" y="14" width="166" height="40"/>
+                                        <constraints>
+                                            <constraint firstAttribute="height" constant="28" id="ixj-c9-sMF"/>
+                                        </constraints>
+                                        <buttonCell key="cell" type="push" title="Cancel" bezelStyle="rounded" alignment="center" controlSize="large" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="B8C-ef-DG6">
+                                            <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
+                                            <font key="font" metaFont="system"/>
+                                            <string key="keyEquivalent" base64-UTF8="YES">
+Gw
+</string>
+                                        </buttonCell>
+                                        <connections>
+                                            <action selector="cancelButtonAction:" target="TOa-sP-KHa" id="kan-lY-RNY"/>
+                                        </connections>
+                                    </button>
+                                </subviews>
+                                <constraints>
+                                    <constraint firstAttribute="height" constant="160" id="0W2-HI-Vs8"/>
+                                    <constraint firstItem="Gy6-KF-A15" firstAttribute="leading" secondItem="G99-8X-64H" secondAttribute="trailing" constant="12" symbolic="YES" id="0eZ-Ps-KCz"/>
+                                    <constraint firstItem="8B9-wf-zcP" firstAttribute="top" secondItem="7Z6-Ji-PH7" secondAttribute="bottom" constant="8" id="8Zk-eQ-vBn"/>
+                                    <constraint firstItem="RYb-WZ-bIo" firstAttribute="leading" secondItem="wYB-07-s0m" secondAttribute="leading" id="Igx-KW-WiD"/>
+                                    <constraint firstAttribute="trailing" secondItem="Gy6-KF-A15" secondAttribute="trailing" constant="20" symbolic="YES" id="J4k-PJ-uFO"/>
+                                    <constraint firstAttribute="bottom" secondItem="Gy6-KF-A15" secondAttribute="bottom" constant="20" symbolic="YES" id="KOD-v1-Y2g"/>
+                                    <constraint firstAttribute="trailing" secondItem="RYb-WZ-bIo" secondAttribute="trailing" id="Mah-G4-3ac"/>
+                                    <constraint firstItem="G99-8X-64H" firstAttribute="leading" secondItem="wYB-07-s0m" secondAttribute="leading" constant="20" id="VJ3-WB-B1n"/>
+                                    <constraint firstItem="8Xi-CY-jyt" firstAttribute="top" secondItem="7Z6-Ji-PH7" secondAttribute="bottom" constant="8" id="VJI-XI-DXk"/>
+                                    <constraint firstAttribute="bottom" secondItem="G99-8X-64H" secondAttribute="bottom" constant="20" symbolic="YES" id="Vlb-cF-IG9"/>
+                                    <constraint firstItem="Gy6-KF-A15" firstAttribute="width" secondItem="G99-8X-64H" secondAttribute="width" id="XTc-rW-crW"/>
+                                    <constraint firstItem="7Z6-Ji-PH7" firstAttribute="top" secondItem="wYB-07-s0m" secondAttribute="top" constant="20" symbolic="YES" id="ZL6-G9-svI"/>
+                                    <constraint firstAttribute="trailing" secondItem="8Xi-CY-jyt" secondAttribute="trailing" id="b9w-wm-81Z"/>
+                                    <constraint firstAttribute="trailing" secondItem="8B9-wf-zcP" secondAttribute="trailing" id="nRt-k0-4pb"/>
+                                    <constraint firstItem="8B9-wf-zcP" firstAttribute="leading" secondItem="wYB-07-s0m" secondAttribute="leading" id="opY-Un-GIS"/>
+                                    <constraint firstAttribute="bottom" secondItem="RYb-WZ-bIo" secondAttribute="bottom" id="owJ-rI-cNo"/>
+                                    <constraint firstItem="8Xi-CY-jyt" firstAttribute="leading" secondItem="wYB-07-s0m" secondAttribute="leading" id="qvK-Km-IZH"/>
+                                    <constraint firstItem="7Z6-Ji-PH7" firstAttribute="leading" secondItem="wYB-07-s0m" secondAttribute="leading" constant="20" symbolic="YES" id="sQp-ga-TtJ"/>
+                                    <constraint firstAttribute="trailing" secondItem="7Z6-Ji-PH7" secondAttribute="trailing" constant="20" symbolic="YES" id="zCp-C1-Fcy"/>
+                                </constraints>
+                                <userDefinedRuntimeAttributes>
+                                    <userDefinedRuntimeAttribute type="color" keyPath="backgroundColor">
+                                        <color key="value" name="InterfaceBackgroundColor"/>
+                                    </userDefinedRuntimeAttribute>
+                                </userDefinedRuntimeAttributes>
+                            </customView>
+                            <customView hidden="YES" translatesAutoresizingMaskIntoConstraints="NO" id="C8j-UX-ywh">
+                                <rect key="frame" x="0.0" y="0.0" width="360" height="160"/>
+                                <subviews>
+                                    <button verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="3nf-Bg-7k2">
+                                        <rect key="frame" x="14" y="14" width="332" height="40"/>
+                                        <constraints>
+                                            <constraint firstAttribute="height" constant="28" id="1gW-Wq-I7c"/>
+                                        </constraints>
+                                        <buttonCell key="cell" type="push" title="OK" bezelStyle="rounded" alignment="center" controlSize="large" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="H3H-xG-326">
+                                            <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
+                                            <font key="font" metaFont="system"/>
+                                            <string key="keyEquivalent" base64-UTF8="YES">
+DQ
+</string>
+                                        </buttonCell>
+                                        <connections>
+                                            <action selector="okButtonAction:" target="TOa-sP-KHa" id="C2a-ct-tif"/>
+                                        </connections>
+                                    </button>
+                                    <imageView horizontalHuggingPriority="251" verticalHuggingPriority="251" translatesAutoresizingMaskIntoConstraints="NO" id="nOJ-4u-waA">
+                                        <rect key="frame" x="132" y="44" width="96" height="96"/>
+                                        <constraints>
+                                            <constraint firstAttribute="width" constant="96" id="OdO-XF-nm1"/>
+                                            <constraint firstAttribute="height" constant="96" id="eyV-Eu-vmp"/>
+                                        </constraints>
+                                        <imageCell key="cell" refusesFirstResponder="YES" alignment="left" imageScaling="proportionallyDown" image="ThankYou" id="Ykf-at-KNR"/>
+                                    </imageView>
+                                    <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="Pad-Pc-j6d">
+                                        <rect key="frame" x="137" y="17" width="87" height="19"/>
+                                        <textFieldCell key="cell" alignment="center" title="Thank you!" id="NFA-fu-2EM">
+                                            <font key="font" metaFont="systemSemibold" size="15"/>
+                                            <color key="textColor" name="GreyTextColor"/>
+                                            <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
+                                        </textFieldCell>
+                                    </textField>
+                                    <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="syf-sE-uUM">
+                                        <rect key="frame" x="18" y="-19" width="324" height="28"/>
+                                        <constraints>
+                                            <constraint firstAttribute="height" constant="28" id="NhF-KV-8Fz"/>
+                                            <constraint firstAttribute="width" constant="320" id="OKh-5g-IKI"/>
+                                        </constraints>
+                                        <textFieldCell key="cell" alignment="center" title="Your feedback will help us improve the DuckDuckGo app." id="cij-aI-J9r">
+                                            <font key="font" metaFont="smallSystem"/>
+                                            <color key="textColor" name="secondaryLabelColor" catalog="System" colorSpace="catalog"/>
+                                            <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
+                                        </textFieldCell>
+                                    </textField>
+                                </subviews>
+                                <constraints>
+                                    <constraint firstAttribute="trailing" secondItem="3nf-Bg-7k2" secondAttribute="trailing" constant="20" symbolic="YES" id="0ih-HM-vLb"/>
+                                    <constraint firstAttribute="bottom" secondItem="3nf-Bg-7k2" secondAttribute="bottom" constant="20" symbolic="YES" id="G6K-eI-7Wb"/>
+                                    <constraint firstItem="3nf-Bg-7k2" firstAttribute="leading" secondItem="C8j-UX-ywh" secondAttribute="leading" constant="20" symbolic="YES" id="IAg-ez-Kww"/>
+                                    <constraint firstAttribute="trailing" secondItem="syf-sE-uUM" secondAttribute="trailing" constant="20" symbolic="YES" id="Qih-Y8-L1A"/>
+                                    <constraint firstItem="nOJ-4u-waA" firstAttribute="centerX" secondItem="C8j-UX-ywh" secondAttribute="centerX" id="jIn-5G-ItS"/>
+                                    <constraint firstItem="Pad-Pc-j6d" firstAttribute="top" secondItem="nOJ-4u-waA" secondAttribute="bottom" constant="8" id="jqU-sX-T0P"/>
+                                    <constraint firstItem="Pad-Pc-j6d" firstAttribute="centerX" secondItem="C8j-UX-ywh" secondAttribute="centerX" id="kxj-pU-r3k"/>
+                                    <constraint firstItem="nOJ-4u-waA" firstAttribute="top" secondItem="C8j-UX-ywh" secondAttribute="top" constant="20" id="maw-do-guj"/>
+                                    <constraint firstItem="syf-sE-uUM" firstAttribute="leading" secondItem="C8j-UX-ywh" secondAttribute="leading" constant="20" symbolic="YES" id="psO-TK-tGb"/>
+                                    <constraint firstItem="syf-sE-uUM" firstAttribute="top" secondItem="Pad-Pc-j6d" secondAttribute="bottom" constant="8" id="uoM-1L-Ohi"/>
+                                </constraints>
+                            </customView>
+                        </subviews>
+                        <constraints>
+                            <constraint firstItem="B4Q-yT-nKT" firstAttribute="top" secondItem="Ie8-lu-6dX" secondAttribute="top" id="3Dc-AK-Lr4"/>
+                            <constraint firstAttribute="trailing" secondItem="wYB-07-s0m" secondAttribute="trailing" id="54G-1j-PDV"/>
+                            <constraint firstItem="wYB-07-s0m" firstAttribute="leading" secondItem="Ie8-lu-6dX" secondAttribute="leading" id="70v-uj-SxJ"/>
+                            <constraint firstAttribute="trailing" secondItem="C8j-UX-ywh" secondAttribute="trailing" id="8oa-Q0-m1z"/>
+                            <constraint firstItem="B4Q-yT-nKT" firstAttribute="leading" secondItem="Ie8-lu-6dX" secondAttribute="leading" id="ADl-PW-sIG"/>
+                            <constraint firstAttribute="trailing" secondItem="B4Q-yT-nKT" secondAttribute="trailing" id="Qvt-j3-DaC"/>
+                            <constraint firstAttribute="trailing" secondItem="iPz-Dg-VNs" secondAttribute="trailing" id="Xte-41-dmx"/>
+                            <constraint firstItem="C8j-UX-ywh" firstAttribute="top" secondItem="B4Q-yT-nKT" secondAttribute="bottom" id="bdh-tz-GgB"/>
+                            <constraint firstItem="C8j-UX-ywh" firstAttribute="leading" secondItem="Ie8-lu-6dX" secondAttribute="leading" id="cb2-bQ-LAr"/>
+                            <constraint firstAttribute="bottom" secondItem="wYB-07-s0m" secondAttribute="bottom" id="iNT-d7-7lc"/>
+                            <constraint firstItem="iPz-Dg-VNs" firstAttribute="bottom" secondItem="B4Q-yT-nKT" secondAttribute="bottom" id="k6G-bc-JFm"/>
+                            <constraint firstItem="wYB-07-s0m" firstAttribute="top" secondItem="B4Q-yT-nKT" secondAttribute="bottom" id="lQH-dg-3tL"/>
+                            <constraint firstItem="iPz-Dg-VNs" firstAttribute="leading" secondItem="Ie8-lu-6dX" secondAttribute="leading" id="qPT-VT-BJu"/>
+                            <constraint firstAttribute="bottom" secondItem="C8j-UX-ywh" secondAttribute="bottom" id="taz-Ft-0Yy"/>
+                        </constraints>
+                    </view>
+                    <connections>
+                        <outlet property="browserFeedbackDescriptionLabel" destination="Obm-Wr-qrD" id="Tx7-Va-Sh9"/>
+                        <outlet property="browserFeedbackTextField" destination="wK6-n4-LX0" id="iIL-8c-BX9"/>
+                        <outlet property="browserFeedbackView" destination="8Xi-CY-jyt" id="5IL-yu-IWc"/>
+                        <outlet property="contentView" destination="wYB-07-s0m" id="XXQ-Fh-tQF"/>
+                        <outlet property="contentViewHeightContraint" destination="0W2-HI-Vs8" id="vY1-me-1T6"/>
+                        <outlet property="optionPopUpButton" destination="7Z6-Ji-PH7" id="4aZ-ZE-ym6"/>
+                        <outlet property="pickOptionMenuItem" destination="z2T-3Y-jPK" id="6dO-Or-fk2"/>
+                        <outlet property="submitButton" destination="Gy6-KF-A15" id="aBn-VX-sGY"/>
+                        <outlet property="thankYouView" destination="C8j-UX-ywh" id="EQo-2a-mhp"/>
+                        <outlet property="urlTextField" destination="2gs-6z-agW" id="7CM-5N-ugt"/>
+                        <outlet property="websiteBreakageCategoryPopUpButton" destination="hUd-Rb-6Ls" id="DqR-hE-Sm5"/>
+                        <outlet property="websiteBreakageView" destination="8B9-wf-zcP" id="enA-tH-Z1l"/>
+                        <outlet property="websiteIsBrokenMenuItem" destination="uoX-qE-3kz" id="xnb-jy-aeZ"/>
+                    </connections>
+                </viewController>
+                <customObject id="FaH-Lu-sfn" userLabel="First Responder" customClass="NSResponder" sceneMemberID="firstResponder"/>
+            </objects>
+            <point key="canvasLocation" x="-299" y="1009.5"/>
+        </scene>
+    </scenes>
+    <resources>
+        <image name="Close" width="16" height="16"/>
+        <image name="ThankYou" width="96" height="96"/>
+        <namedColor name="FirePopoverPanelBackground">
+            <color red="0.98000001907348633" green="0.98000001907348633" blue="0.98000001907348633" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+        </namedColor>
+        <namedColor name="GreyTextColor">
+            <color red="0.20000000000000001" green="0.20000000000000001" blue="0.20000000000000001" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+        </namedColor>
+        <namedColor name="InterfaceBackgroundColor">
+            <color red="1" green="1" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+        </namedColor>
+    </resources>
+</document>
