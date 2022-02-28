@@ -18,11 +18,11 @@
 
 import SwiftUI
 
-extension Homepage.Views {
+extension HomePage.Views {
 
 struct ProtectionSummary: View {
 
-    @EnvironmentObject var model: Homepage.Models.RecentlyVisitedModel
+    @EnvironmentObject var model: HomePage.Models.RecentlyVisitedModel
 
     var body: some View {
         HStack(alignment: .center, spacing: 2) {

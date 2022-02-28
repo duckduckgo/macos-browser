@@ -1,5 +1,5 @@
 //
-//  Homepage.swift
+//  HomePage.swift
 //
 //  Copyright © 2022 DuckDuckGo. All rights reserved.
 //
@@ -19,7 +19,7 @@
 import Foundation
 
 /// Namespace declaration
-struct Homepage {
+struct HomePage {
 
     struct Views {
     }

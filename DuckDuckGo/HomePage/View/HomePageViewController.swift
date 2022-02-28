@@ -1,5 +1,5 @@
 //
-//  HomepageViewController.swift
+//  HomePageViewController.swift
 //
 //  Copyright © 2021 DuckDuckGo. All rights reserved.
 //
@@ -20,7 +20,7 @@ import Cocoa
 import Combine
 import SwiftUI
 
-final class HomepageViewController: NSViewController {
+final class HomePageViewController: NSViewController {
 
     private let fire = Fire()
 
@@ -30,16 +30,16 @@ final class HomepageViewController: NSViewController {
 
     private weak var host: NSView?
  
-    var favoritesModel: Homepage.Models.FavoritesModel!
-    var defaultBrowserModel: Homepage.Models.DefaultBrowserModel!
-    var recentlyVisitedModel: Homepage.Models.RecentlyVisitedModel!
+    var favoritesModel: HomePage.Models.FavoritesModel!
+    var defaultBrowserModel: HomePage.Models.DefaultBrowserModel!
+    var recentlyVisitedModel: HomePage.Models.RecentlyVisitedModel!
     var cancellables = Set<AnyCancellable>()
 
     @UserDefaultsWrapper(key: .defaultBrowserDismissed, defaultValue: false)
     var defaultBrowserDismissed: Bool
 
     required init?(coder: NSCoder) {
-        fatalError("HomepageViewController: Bad initializer")
+        fatalError("HomePageViewController: Bad initializer")
     }
 
     init?(coder: NSCoder,
@@ -63,7 +63,7 @@ final class HomepageViewController: NSViewController {
 
         refreshModels()
 
-        let rootView = Homepage.Views.RootView()
+        let rootView = HomePage.Views.RootView()
             .environmentObject(favoritesModel)
             .environmentObject(defaultBrowserModel)
             .environmentObject(recentlyVisitedModel)
@@ -97,11 +97,11 @@ final class HomepageViewController: NSViewController {
         refreshRecentlyVisitedModel()
     }
 
-    func createRecentlyVisitedModel() -> Homepage.Models.RecentlyVisitedModel {
+    func createRecentlyVisitedModel() -> HomePage.Models.RecentlyVisitedModel {
         return .init()
     }
 
-    func createDefaultBrowserModel() -> Homepage.Models.DefaultBrowserModel {
+    func createDefaultBrowserModel() -> HomePage.Models.DefaultBrowserModel {
         return .init(isDefault: DefaultBrowserPreferences.isDefault, wasClosed: defaultBrowserDismissed, requestSetDefault: { [weak self] in
             DefaultBrowserPreferences.becomeDefault { [weak self] in
                 self?.defaultBrowserModel.isDefault = DefaultBrowserPreferences.isDefault
@@ -114,7 +114,7 @@ final class HomepageViewController: NSViewController {
         })
     }
 
-    func createFavoritesModel() -> Homepage.Models.FavoritesModel {
+    func createFavoritesModel() -> HomePage.Models.FavoritesModel {
         return .init(open: { [weak self] bookmark, target in
             self?.openUrl(bookmark.url, target: target)
         }, remove: { [weak self] bookmark in
@@ -141,7 +141,7 @@ final class HomepageViewController: NSViewController {
         }.store(in: &cancellables)
     }
 
-    private func openUrl(_ url: URL, target: Homepage.Models.FavoritesModel.OpenTarget? = nil) {
+    private func openUrl(_ url: URL, target: HomePage.Models.FavoritesModel.OpenTarget? = nil) {
         if target == .newWindow || NSApplication.shared.isCommandPressed && NSApplication.shared.isOptionPressed {
             WindowsManager.openNewWindow(with: url)
             return
@@ -162,16 +162,16 @@ final class HomepageViewController: NSViewController {
 
     private func showAddEditController(for bookmark: Bookmark? = nil) {
         // swiftlint:disable force_cast
-        let windowController = NSStoryboard.homepage.instantiateController(withIdentifier: "AddEditFavoriteWindowController") as! NSWindowController
+        let windowController = NSStoryboard.homePage.instantiateController(withIdentifier: "AddEditFavoriteWindowController") as! NSWindowController
         // swiftlint:enable force_cast
 
         guard let window = windowController.window as? AddEditFavoriteWindow else {
-            assertionFailure("HomepageViewController: Failed to present AddEditFavoriteWindowController")
+            assertionFailure("HomePageViewController: Failed to present AddEditFavoriteWindowController")
             return
         }
 
         guard let screen = window.screen else {
-            assertionFailure("HomepageViewController: No screen")
+            assertionFailure("HomePageViewController: No screen")
             return
         }
 
@@ -193,6 +193,6 @@ final class HomepageViewController: NSViewController {
 
 fileprivate extension NSStoryboard {
 
-    static let homepage = NSStoryboard(name: "Homepage", bundle: .main)
+    static let homePage = NSStoryboard(name: "HomePage", bundle: .main)
 
 }

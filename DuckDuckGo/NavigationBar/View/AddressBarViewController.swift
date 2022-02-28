@@ -83,7 +83,7 @@ final class AddressBarViewController: NSViewController {
     init?(coder: NSCoder, tabCollectionViewModel: TabCollectionViewModel) {
         self.tabCollectionViewModel = tabCollectionViewModel
         self.suggestionContainerViewModel = SuggestionContainerViewModel(
-            isHomePage: tabCollectionViewModel.selectedTabViewModel?.tab.content == .homepage,
+            isHomePage: tabCollectionViewModel.selectedTabViewModel?.tab.content == .homePage,
             suggestionContainer: SuggestionContainer())
 
         super.init(coder: coder)
@@ -191,7 +191,7 @@ final class AddressBarViewController: NSViewController {
 
     private func subscribeToTabContent() {
         tabCollectionViewModel.selectedTabViewModel?.tab.$content.receive(on: DispatchQueue.main).sink { [weak self] content in
-            self?.isHomePage = content == .homepage
+            self?.isHomePage = content == .homePage
         }.store(in: &cancellables)
     }
 

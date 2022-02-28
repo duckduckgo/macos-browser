@@ -1,5 +1,5 @@
 //
-//  HomepageView.swift
+//  HomePageView.swift
 //
 //  Copyright © 2022 DuckDuckGo. All rights reserved.
 //
@@ -19,7 +19,7 @@
 import SwiftUI
 import BrowserServicesKit
 
-extension Homepage.Views {
+extension HomePage.Views {
 
 struct RootView: View {
 

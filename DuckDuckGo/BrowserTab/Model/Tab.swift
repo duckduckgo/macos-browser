@@ -45,7 +45,7 @@ protocol TabDelegate: FileDownloadManagerDelegate {
 final class Tab: NSObject {
 
     enum TabContent: Equatable {
-        case homepage
+        case homePage
         case url(URL)
         case preferences
         case bookmarks
@@ -54,7 +54,7 @@ final class Tab: NSObject {
 
         static func contentFromURL(_ url: URL?) -> TabContent {
             if url == .homePage {
-                return .homepage
+                return .homePage
             } else if url == .welcome {
                 return .onboarding
             } else {
@@ -65,7 +65,7 @@ final class Tab: NSObject {
         static var displayableTabTypes: [TabContent] {
             return [TabContent.preferences, .bookmarks].sorted { first, second in
                 switch first {
-                case .homepage, .url, .preferences, .bookmarks, .onboarding, .none: break
+                case .homePage, .url, .preferences, .bookmarks, .onboarding, .none: break
                 // !! Replace [TabContent.preferences, .bookmarks] above with new displayable Tab Types if added
                 }
                 guard let firstTitle = first.title, let secondTitle = second.title else {
@@ -77,7 +77,7 @@ final class Tab: NSObject {
 
         var title: String? {
             switch self {
-            case .url, .homepage, .none: return nil
+            case .url, .homePage, .none: return nil
             case .preferences: return UserText.tabPreferencesTitle
             case .bookmarks: return UserText.tabBookmarksTitle
             case .onboarding: return UserText.tabOnboardingTitle
@@ -299,8 +299,8 @@ final class Tab: NSObject {
         webView.go(to: item)
     }
 
-    func openHomepage() {
-        content = .homepage
+    func openHomePage() {
+        content = .homePage
     }
 
     func startOnboarding() {
@@ -349,7 +349,7 @@ final class Tab: NSObject {
         switch self.content {
         case .url(let value):
             url = value
-        case .homepage:
+        case .homePage:
             url = .homePage
         default:
             url = .blankPage
@@ -373,7 +373,7 @@ final class Tab: NSObject {
 
     private func addHomePageToWebViewIfNeeded() {
         guard !AppDelegate.isRunningTests else { return }
-        if content == .homepage && webView.url == nil {
+        if content == .homePage && webView.url == nil {
             webView.load(.homePage)
         }
     }

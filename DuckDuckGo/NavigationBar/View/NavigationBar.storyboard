@@ -117,7 +117,7 @@
                                     <constraint firstAttribute="height" constant="42" id="8rn-gB-evD"/>
                                     <constraint firstAttribute="width" constant="42" id="Lbm-pB-oQb"/>
                                 </constraints>
-                                <imageCell key="cell" refusesFirstResponder="YES" alignment="left" imageScaling="proportionallyDown" image="HomepageLogo" id="O0O-qm-kNp"/>
+                                <imageCell key="cell" refusesFirstResponder="YES" alignment="left" imageScaling="proportionallyDown" image="HomePageLogo" id="O0O-qm-kNp"/>
                             </imageView>
                             <containerView translatesAutoresizingMaskIntoConstraints="NO" id="Wba-nA-FYj">
                                 <rect key="frame" x="84" y="6" width="550" height="36"/>
@@ -762,7 +762,7 @@
         <image name="Forward" width="16" height="16"/>
         <image name="Geolocation-Active" width="16" height="16"/>
         <image name="Geolocation-Icon" width="16" height="16"/>
-        <image name="HomepageLogo" width="192" height="192"/>
+        <image name="HomePageLogo" width="128" height="128"/>
         <image name="Microphone-Active" width="12" height="16"/>
         <image name="Microphone-Icon" width="12" height="16"/>
         <image name="PasswordManagement" width="16" height="16"/>

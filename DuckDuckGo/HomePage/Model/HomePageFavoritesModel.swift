@@ -1,5 +1,5 @@
 //
-//  HomepageFavoritesModel.swift
+//  HomePageFavoritesModel.swift
 //
 //  Copyright © 2022 DuckDuckGo. All rights reserved.
 //
@@ -18,7 +18,7 @@
 
 import Foundation
 
-extension Homepage.Models {
+extension HomePage.Models {
 
     struct FavoriteModel {
 
@@ -41,7 +41,7 @@ extension Homepage.Models {
             didSet {
                 var favorites = self.favorites.map { FavoriteModel(id: $0.id, bookmark: $0) }
                 favorites.append(FavoriteModel(id: FavoriteModel.addButtonUUID, bookmark: nil))
-                self.rows = favorites.chunked(into: Homepage.favoritesPerRow)
+                self.rows = favorites.chunked(into: HomePage.favoritesPerRow)
             }
         }
 

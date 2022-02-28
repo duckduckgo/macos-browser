@@ -77,7 +77,7 @@ final class MainViewController: NSViewController {
             navigationBarContainerView.wantsLayer = true
             navigationBarContainerView.layer?.masksToBounds = false
 
-            resizeNavigationBarForHomePage(tabCollectionViewModel.selectedTabViewModel?.tab.content == .homepage, animated: false)
+            resizeNavigationBarForHomePage(tabCollectionViewModel.selectedTabViewModel?.tab.content == .homePage, animated: false)
         }
     }
 
@@ -193,7 +193,7 @@ final class MainViewController: NSViewController {
                 showUrl = false
             }
 
-            self?.resizeNavigationBarForHomePage(content == .homepage, animated: showUrl && sameTab)
+            self?.resizeNavigationBarForHomePage(content == .homePage, animated: showUrl && sameTab)
 
             sameTab = true
         }).store(in: &self.navigationalCancellables)
@@ -301,7 +301,7 @@ final class MainViewController: NSViewController {
         }
 
         switch selectedTabViewModel.tab.content {
-        case .homepage, .onboarding, .none: navigationBarViewController.addressBarViewController?.addressBarTextField.makeMeFirstResponder()
+        case .homePage, .onboarding, .none: navigationBarViewController.addressBarViewController?.addressBarTextField.makeMeFirstResponder()
         case .url:
             browserTabViewController.makeWebViewFirstResponder()
         case .preferences: browserTabViewController.preferencesViewController.view.makeMeFirstResponder()

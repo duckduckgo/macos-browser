@@ -18,11 +18,11 @@
 
 import SwiftUI
 
-extension Homepage.Views {
+extension HomePage.Views {
 
 struct Favorites: View {
 
-    @EnvironmentObject var model: Homepage.Models.FavoritesModel
+    @EnvironmentObject var model: HomePage.Models.FavoritesModel
 
     @State var expanded = false
     @State var isHovering = false
@@ -49,22 +49,22 @@ struct Favorites: View {
 
         VStack(alignment: .leading, spacing: 0) {
 
-            ForEach(expanded ? model.rows.indices : model.rows.indices.prefix(Homepage.favoritesRowCountWhenCollapsed), id: \.self) { index in
+            ForEach(expanded ? model.rows.indices : model.rows.indices.prefix(HomePage.favoritesRowCountWhenCollapsed), id: \.self) { index in
 
                 HStack(alignment: .top, spacing: 20) {
                     ForEach(model.rows[index], id: \.id) { favorite in
-                        if !expanded && index + 1 == Homepage.favoritesRowCountWhenCollapsed && favorite.id == model.rows[index].last?.id {
+                        if !expanded && index + 1 == HomePage.favoritesRowCountWhenCollapsed && favorite.id == model.rows[index].last?.id {
                             addButton
                         } else if let bookmark = favorite.bookmark {
                             Favorite(bookmark: bookmark)
-                        } else if favorite.id == Homepage.Models.FavoriteModel.addButtonUUID {
+                        } else if favorite.id == HomePage.Models.FavoriteModel.addButtonUUID {
                             addButton
                         } else {
                             FailedAssertionView("Unknown favorites type")
                         }
                     }
 
-                    if model.rows[index].count < Homepage.favoritesPerRow {
+                    if model.rows[index].count < HomePage.favoritesPerRow {
                         Spacer()
                     }
 
@@ -73,7 +73,7 @@ struct Favorites: View {
             }
 
             MoreOrLess(moreIsUp: true, expanded: $expanded)
-                .visibility(model.rows.count > Homepage.favoritesRowCountWhenCollapsed && isHovering ? .visible : .invisible)
+                .visibility(model.rows.count > HomePage.favoritesRowCountWhenCollapsed && isHovering ? .visible : .invisible)
 
         }
         .frame(width: 440)
@@ -87,7 +87,7 @@ struct Favorites: View {
 
 struct Favorite: View {
 
-    @EnvironmentObject var model: Homepage.Models.FavoritesModel
+    @EnvironmentObject var model: HomePage.Models.FavoritesModel
 
     let bookmark: Bookmark
 

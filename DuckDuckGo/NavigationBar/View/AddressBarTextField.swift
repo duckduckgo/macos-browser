@@ -121,7 +121,7 @@ final class AddressBarTextField: NSTextField {
     private func subscribeToContentType() {
         contentTypeCancellable = tabCollectionViewModel.selectedTabViewModel?
             .tab.$content .receive(on: DispatchQueue.main).sink { [weak self] contentType in
-            self?.font = .systemFont(ofSize: contentType == .homepage ? 15 : 13)
+            self?.font = .systemFont(ofSize: contentType == .homePage ? 15 : 13)
         }
     }
 
@@ -423,7 +423,7 @@ final class AddressBarTextField: NSTextField {
     // MARK: - Suffixes
 
     var isHomePage: Bool {
-        tabCollectionViewModel.selectedTabViewModel?.tab.content == .homepage
+        tabCollectionViewModel.selectedTabViewModel?.tab.content == .homePage
     }
 
     func makeTextAttributes() -> [NSAttributedString.Key: Any] {

@@ -20,7 +20,7 @@ import SwiftUI
 
 struct DefaultBrowserPrompt: View {
 
-    @EnvironmentObject var model: Homepage.Models.DefaultBrowserModel
+    @EnvironmentObject var model: HomePage.Models.DefaultBrowserModel
 
     var body: some View {
 

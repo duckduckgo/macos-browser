@@ -1,5 +1,5 @@
 //
-//  HomepageRecentlyVisitedModel.swift
+//  HomePageRecentlyVisitedModel.swift
 //
 //  Copyright © 2022 DuckDuckGo. All rights reserved.
 //
@@ -18,7 +18,7 @@
 
 import Foundation
 
-extension Homepage.Models {
+extension HomePage.Models {
 
 final class RecentlyVisitedModel: ObservableObject {
 

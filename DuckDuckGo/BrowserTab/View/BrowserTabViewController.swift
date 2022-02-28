@@ -27,7 +27,7 @@ import BrowserServicesKit
 final class BrowserTabViewController: NSViewController {
 
     @IBOutlet weak var errorView: NSView!
-    @IBOutlet weak var homepageView: NSView!
+    @IBOutlet weak var homePageView: NSView!
     @IBOutlet weak var errorMessageLabel: NSTextField!
     @IBOutlet weak var hoverLabel: NSTextField!
     @IBOutlet weak var hoverLabelContainer: NSView!
@@ -60,11 +60,11 @@ final class BrowserTabViewController: NSViewController {
         super.init(coder: coder)
     }
 
-    @IBSegueAction func createHomepageViewController(_ coder: NSCoder) -> NSViewController? {
-        guard let controller = HomepageViewController(coder: coder,
+    @IBSegueAction func createHomePageViewController(_ coder: NSCoder) -> NSViewController? {
+        guard let controller = HomePageViewController(coder: coder,
                                                       tabCollectionViewModel: tabCollectionViewModel,
                                                       bookmarkManager: LocalBookmarkManager.shared) else {
-            fatalError("BrowserTabViewController: Failed to init HomepageViewController")
+            fatalError("BrowserTabViewController: Failed to init HomePageViewController")
         }
         return controller
     }
@@ -215,7 +215,7 @@ final class BrowserTabViewController: NSViewController {
         errorMessageLabel.stringValue = message
         errorView.isHidden = !shown
         webView.isHidden = shown
-        homepageView.isHidden = shown
+        homePageView.isHidden = shown
     }
 
     func openNewTab(with content: Tab.TabContent, parentTab: Tab? = nil, selected: Bool = false, canBeClosedWithBack: Bool = false) {
@@ -253,7 +253,7 @@ final class BrowserTabViewController: NSViewController {
     }
 
     private func removeAllTabContent(includingWebView: Bool = true) {
-        self.homepageView.removeFromSuperview()
+        self.homePageView.removeFromSuperview()
         transientTabContentViewController?.removeCompletely()
         preferencesViewController.removeCompletely()
         bookmarksViewController.removeCompletely()
@@ -279,7 +279,7 @@ final class BrowserTabViewController: NSViewController {
 
     private func show(tabContent content: Tab.TabContent?) {
 
-        switch content ?? .homepage {
+        switch content ?? .homePage {
         case .bookmarks:
             removeAllTabContent()
             showTabContentController(bookmarksViewController)
@@ -301,9 +301,9 @@ final class BrowserTabViewController: NSViewController {
                 addWebViewToViewHierarchy(webView)
             }
 
-        case .homepage:
+        case .homePage:
             removeAllTabContent()
-            view.addAndLayout(homepageView)
+            view.addAndLayout(homePageView)
 
         case .none:
             removeAllTabContent()

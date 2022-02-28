@@ -173,7 +173,7 @@ extension MainViewController {
     // MARK: - File
 
     @IBAction func newTab(_ sender: Any?) {
-        browserTabViewController.openNewTab(with: .homepage, selected: true)
+        browserTabViewController.openNewTab(with: .homePage, selected: true)
     }
 
     @IBAction func openLocation(_ sender: Any?) {
@@ -242,7 +242,7 @@ extension MainViewController {
             if let vc = WindowControllersManager.shared.lastKeyMainWindowController?.mainViewController.navigationBarViewController {
                 navigationBarViewController = vc
             } else {
-                WindowsManager.openNewWindow(with: Tab(content: .homepage))
+                WindowsManager.openNewWindow(with: Tab(content: .homePage))
                 guard let wc = WindowControllersManager.shared.mainWindowControllers.first(where: { $0.window?.isPopUpWindow == false }) else {
                     return
                 }
@@ -275,7 +275,7 @@ extension MainViewController {
 
     @IBAction func home(_ sender: Any?) {
         guard view.window?.isPopUpWindow == false else {
-            browserTabViewController.openNewTab(with: .homepage, selected: true)
+            browserTabViewController.openNewTab(with: .homePage, selected: true)
             return
         }
         guard let selectedTabViewModel = tabCollectionViewModel.selectedTabViewModel else {
@@ -283,7 +283,7 @@ extension MainViewController {
             return
         }
 
-        selectedTabViewModel.tab.openHomepage()
+        selectedTabViewModel.tab.openHomePage()
     }
 
     @IBAction func reopenLastClosedTab(_ sender: Any?) {
