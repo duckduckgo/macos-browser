@@ -485,7 +485,7 @@ final class Tab: NSObject {
     }
 
     private func attachFindInPage() {
-        self.findInPageScript?.model = findInPage
+        findInPageScript?.model = findInPage
         subscribeToFindInPageTextChange()
     }
 
@@ -570,7 +570,7 @@ extension Tab: UserContentControllerDelegate {
         userScripts.hoverUserScript.delegate = self
         userScripts.autoconsentUserScript?.delegate = self
 
-        self.findInPageScript = userScripts.findInPageScript
+        findInPageScript = userScripts.findInPageScript
         attachFindInPage()
     }
 
