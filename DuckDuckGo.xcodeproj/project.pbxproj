@@ -2422,7 +2422,7 @@
 				B65536902684409300085A79 /* Geolocation */,
 				0230C09D271F52D50018F728 /* GPC */,
 				AAE75275263B036300B973F8 /* History */,
-				AAE71DB225F66A0900D74437 /* Homepage */,
+				AAE71DB225F66A0900D74437 /* HomePage */,
 				AA585DB02490E6FA00E9A3E2 /* Main */,
 				AA97BF4425135CB60014931A /* Menus */,
 				85378D9A274E618C007C5CBF /* MessageViews */,
@@ -3161,14 +3161,14 @@
 			path = Lottie;
 			sourceTree = "<group>";
 		};
-		AAE71DB225F66A0900D74437 /* Homepage */ = {
+		AAE71DB225F66A0900D74437 /* HomePage */ = {
 			isa = PBXGroup;
 			children = (
 				85589E8527BBB8DD0038AD11 /* Model */,
 				AAE71DB325F66A3F00D74437 /* View */,
 				85AC7ADA27BD628400FFB69B /* Homepage.swift */,
 			);
-			path = Homepage;
+			path = HomePage;
 			sourceTree = "<group>";
 		};
 		AAE71DB325F66A3F00D74437 /* View */ = {
