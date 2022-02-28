@@ -367,7 +367,7 @@ final class NavigationBarViewController: NSViewController {
             })
     }
 
-    func resizeAddressBarForHomePage(_ homePage: Bool, animated: Bool) {s
+    func resizeAddressBarForHomePage(_ homePage: Bool, animated: Bool) {      
         let top = animated ? addressBarTopConstraint.animator() : addressBarTopConstraint
         top?.constant = homePage ? 16 : 6
 
