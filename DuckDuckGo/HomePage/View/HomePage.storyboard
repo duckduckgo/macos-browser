@@ -10,7 +10,7 @@
         <!--Home Page View Controller-->
         <scene sceneID="lhD-K8-q8j">
             <objects>
-                <viewController id="NgM-AV-NvE" customClass="HomePageViewController" sceneMemberID="viewController">
+                <viewController id="NgM-AV-NvE" customClass="HomePageViewController" customModule="DuckDuckGo_Privacy_Browser" customModuleProvider="target" sceneMemberID="viewController">
                     <view key="view" autoresizesSubviews="NO" id="Veh-DK-43v">
                         <rect key="frame" x="0.0" y="0.0" width="628" height="381"/>
                         <autoresizingMask key="autoresizingMask"/>
