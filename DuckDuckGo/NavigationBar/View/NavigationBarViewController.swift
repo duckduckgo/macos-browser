@@ -374,10 +374,6 @@ final class NavigationBarViewController: NSViewController {
         let bottom = animated ? addressBarBottomConstraint.animator() : addressBarBottomConstraint
         bottom?.constant = homePage ? 0 : 6
 
-        let proportionalWidth = animated ? addressBarProportionalWidthConstraint.animator() : addressBarProportionalWidthConstraint
-        // Big number means that the minimum width constraint will kick in
-        proportionalWidth?.constant = homePage ? -5000 : 0
-
         let leading = animated ? addressBarLeftToNavButtonsConstraint.animator() : addressBarLeftToNavButtonsConstraint
         leading?.constant = homePage ? 68 : 8
 
