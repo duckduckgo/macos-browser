@@ -163,7 +163,6 @@ final class MainViewController: NSViewController {
 
     private func subscribeToSelectedTabViewModel() {
         selectedTabViewModelCancellable = tabCollectionViewModel.$selectedTabViewModel.receive(on: DispatchQueue.main).sink { [weak self] _ in
-            print("***", #function)
             self?.navigationalCancellables = []
             self?.subscribeToCanGoBackForward()
             self?.subscribeToFindInPage()
@@ -183,7 +182,6 @@ final class MainViewController: NSViewController {
     }
 
     private func subscribeToTabContent() {
-        print("***", #function)
         var sameTab = false
         tabCollectionViewModel.selectedTabViewModel?.tab.$content.receive(on: DispatchQueue.main).sink(receiveValue: { [weak self] content in
             let showUrl: Bool
