@@ -52,7 +52,7 @@ final class AutoconsentUserScript: NSObject, UserScriptWithAutoconsent {
     let tabId: Int
     let config: PrivacyConfiguration
     var actionInProgress = false
-    var webview: WKWebView?
+    weak var webview: WKWebView?
     weak var delegate: AutoconsentUserScriptDelegate?
 
     init(scriptSource: ScriptSourceProviding, config: PrivacyConfiguration) {
@@ -65,7 +65,7 @@ final class AutoconsentUserScript: NSObject, UserScriptWithAutoconsent {
     func userContentController(_ userContentController: WKUserContentController, didReceive message: WKScriptMessage) {
         guard let messageName = MessageName(rawValue: message.name) else { return }
         if message.webView != nil {
-            webview = message.webView!
+            webview = message.webView
         }
 
         switch messageName {
