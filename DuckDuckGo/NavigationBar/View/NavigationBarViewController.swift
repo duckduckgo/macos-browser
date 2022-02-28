@@ -39,9 +39,9 @@ final class NavigationBarViewController: NSViewController {
     @IBOutlet weak var navigationButtons: NSView!
     @IBOutlet weak var addressBarContainer: NSView!
     @IBOutlet weak var daxLogo: NSImageView!
+    @IBOutlet weak var addressBarStack: NSStackView!
 
     @IBOutlet var addressBarLeftToNavButtonsConstraint: NSLayoutConstraint!
-    @IBOutlet var addressBarLeftToSuperviewConstraint: NSLayoutConstraint!
     @IBOutlet var addressBarProportionalWidthConstraint: NSLayoutConstraint!
     @IBOutlet var addressBarTopConstraint: NSLayoutConstraint!
     @IBOutlet var addressBarBottomConstraint: NSLayoutConstraint!
@@ -122,7 +122,6 @@ final class NavigationBarViewController: NSViewController {
         optionsButton.sendAction(on: .leftMouseDown)
         bookmarkListButton.sendAction(on: .leftMouseDown)
         downloadsButton.sendAction(on: .leftMouseDown)
-
     }
 
     override func viewWillAppear() {
@@ -135,13 +134,13 @@ final class NavigationBarViewController: NSViewController {
             goForwardButton.isHidden = true
             refreshButton.isHidden = true
             optionsButton.isHidden = true
-            addressBarLeftToSuperviewConstraint.isActive = true
+            addressBarTopConstraint.constant = 0
+            addressBarBottomConstraint.constant = 0
             addressBarLeftToNavButtonsConstraint.isActive = false
             addressBarProportionalWidthConstraint.isActive = false
-        } else {
-            addressBarLeftToSuperviewConstraint.isActive = false
-            addressBarLeftToNavButtonsConstraint.isActive = true
-            addressBarProportionalWidthConstraint.isActive = true
+            NSLayoutConstraint.activate(addressBarStack.addConstraints(to: view, [
+                .leading: .leading(multiplier: 1.0, const: 72)
+            ]))
         }
     }
 
@@ -374,11 +373,8 @@ final class NavigationBarViewController: NSViewController {
         let bottom = animated ? addressBarBottomConstraint.animator() : addressBarBottomConstraint
         bottom?.constant = homePage ? 0 : 6
 
-        let leading = animated ? addressBarLeftToNavButtonsConstraint.animator() : addressBarLeftToNavButtonsConstraint
-        leading?.constant = homePage ? 68 : 8
-
         let logo = animated ? daxLogo.animator() : daxLogo
-        logo?.alphaValue = homePage ? 1.0 : 0.0
+        logo?.isHidden = !homePage
     }
 
     private func subscribeToDownloads() {
