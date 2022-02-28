@@ -27,7 +27,9 @@ protocol ChildAutofillUserScriptDelegate: AnyObject {
     func browserTabViewController(_ browserTabViewController: BrowserTabViewController, didClickAtPoint: CGPoint)
 }
 
+// swiftlint:disable type_body_length
 // swiftlint:disable file_length
+
 final class BrowserTabViewController: NSViewController {
 
     @IBOutlet weak var errorView: NSView!
@@ -1015,4 +1017,5 @@ extension BrowserTabViewController {
 
 }
 
+// swiftlint:enable type_body_length
 // swiftlint:enable file_length
