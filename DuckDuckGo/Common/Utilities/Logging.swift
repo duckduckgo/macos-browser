@@ -55,6 +55,10 @@ extension OSLog {
     static var favicons: OSLog {
         Logging.faviconLoggingEnabled ? Logging.faviconLog : .disabled
     }
+    
+    static var autoLock: OSLog {
+        Logging.autoLockLoggingEnabled ? Logging.autoLockLog : .disabled
+    }
 
 }
 
@@ -83,6 +87,9 @@ struct Logging {
 
     fileprivate static let faviconLoggingEnabled = false
     fileprivate static let faviconLog: OSLog = OSLog(subsystem: Bundle.main.bundleIdentifier ?? "DuckDuckGo", category: "Favicons")
+    
+    fileprivate static let autoLockLoggingEnabled = true
+    fileprivate static let autoLockLog: OSLog = OSLog(subsystem: Bundle.main.bundleIdentifier ?? "DuckDuckGo", category: "Auto-Lock")
 
     fileprivate static let autoconsentLoggingEnabled = false
     fileprivate static let autoconsentLog: OSLog = OSLog(subsystem: Bundle.main.bundleIdentifier ?? "DuckDuckGo", category: "Autoconsent")

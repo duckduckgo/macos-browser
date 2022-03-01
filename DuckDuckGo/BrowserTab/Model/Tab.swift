@@ -57,6 +57,8 @@ final class Tab: NSObject {
                 return .homepage
             } else if url == .welcome {
                 return .onboarding
+            } else if url == .preferences {
+                return .preferences
             } else {
                 return .url(url ?? .blankPage)
             }
@@ -699,7 +701,13 @@ extension Tab: SecureVaultManagerDelegate {
 
     func secureVaultManager(_: SecureVaultManager, didAutofill type: AutofillType, withObjectId objectId: Int64) {
         Pixel.fire(.formAutofilled(kind: type.formAutofillKind))
-    } 
+    }
+    
+    func secureVaultManager(_: SecureVaultManager, didRequestAuthenticationWithCompletionHandler handler: @escaping (Bool) -> Void) {
+        DeviceAuthenticator.shared.authenticateUser(reason: .autofill) { authenticationResult in
+            handler(authenticationResult.authenticated)
+        }
+    }
 
     func secureVaultInitFailed(_ error: SecureVaultError) {
         SecureVaultErrorReporter.shared.secureVaultInitFailed(error)

@@ -46,6 +46,7 @@ final class PasswordManagementViewController: NSViewController {
 
     @IBOutlet var listContainer: NSView!
     @IBOutlet var itemContainer: NSView!
+    @IBOutlet var addVaultItemButton: NSButton!
     @IBOutlet var searchField: NSTextField!
     @IBOutlet var divider: NSView!
     @IBOutlet var emptyState: NSView!
@@ -53,6 +54,49 @@ final class PasswordManagementViewController: NSViewController {
     @IBOutlet var emptyStateTitle: NSTextField!
     @IBOutlet var emptyStateMessage: NSTextField!
     @IBOutlet var emptyStateButton: NSButton!
+    
+    @IBOutlet var lockScreen: NSView!
+    @IBOutlet var lockScreenIconImageView: NSImageView! {
+        didSet {
+            if DeviceAuthenticator.deviceSupportsBiometrics {
+                lockScreenIconImageView.image = NSImage(named: "LoginsLockTouchID")
+            } else {
+                lockScreenIconImageView.image = NSImage(named: "LoginsLockPassword")
+            }
+        }
+    }
+
+    @IBOutlet var lockScreenDurationLabel: NSTextField!
+    @IBOutlet var lockScreenOpenInPreferencesTextView: NSTextView! {
+        didSet {
+            lockScreenOpenInPreferencesTextView.delegate = self
+
+            let linkAttributes: [NSAttributedString.Key: Any] = [
+                .foregroundColor: NSColor(named: "LinkBlueColor")!,
+                .cursor: NSCursor.pointingHand
+            ]
+            
+            lockScreenOpenInPreferencesTextView.linkTextAttributes = linkAttributes
+
+            let string = NSMutableAttributedString(string: UserText.pmLockScreenPreferencesLabel + " ")
+            let linkString = NSMutableAttributedString(string: UserText.pmLockScreenPreferencesLink, attributes: [
+                .link: URL.preferences
+            ])
+
+            let paragraphStyle = NSMutableParagraphStyle()
+            paragraphStyle.alignment = .center
+            
+            string.append(linkString)
+            string.addAttributes([
+                .cursor: NSCursor.arrow,
+                .paragraphStyle: paragraphStyle,
+                .font: NSFont.systemFont(ofSize: 13, weight: .regular),
+                .foregroundColor: NSColor(named: "BlackWhite60")!
+            ], range: NSRange(location: 0, length: string.length))
+            
+            lockScreenOpenInPreferencesTextView.textStorage?.setAttributedString(string)
+        }
+    }
 
     var emptyStateCancellable: AnyCancellable?
     var editingCancellable: AnyCancellable?
@@ -106,6 +150,43 @@ final class PasswordManagementViewController: NSViewController {
 
         emptyStateTitle.attributedStringValue = NSAttributedString.make(emptyStateTitle.stringValue, lineHeight: 1.14, kern: -0.23)
         emptyStateMessage.attributedStringValue = NSAttributedString.make(emptyStateMessage.stringValue, lineHeight: 1.05, kern: -0.08)
+        
+        NotificationCenter.default.addObserver(forName: .deviceBecameLocked, object: nil, queue: .main) { [weak self] _ in
+            self?.displayLockScreen()
+        }
+    }
+    
+    private func toggleLockScreen(hidden: Bool) {
+        if hidden {
+            hideLockScreen()
+        } else {
+            displayLockScreen()
+        }
+    }
+
+    private func displayLockScreen() {
+        lockScreen.isHidden = false
+        searchField.isEnabled = false
+        addVaultItemButton.isEnabled = false
+        
+        view.window?.makeFirstResponder(nil)
+    }
+    
+    private func hideLockScreen() {
+        lockScreen.isHidden = true
+        searchField.isEnabled = true
+        addVaultItemButton.isEnabled = true
+    }
+    
+    override func viewWillAppear() {
+        super.viewWillAppear()
+        
+        lockScreenDurationLabel.stringValue = UserText.pmLockScreenDuration(duration: LoginsPreferences().autoLockThreshold.title)
+
+        if let listView = self.listView {
+            listView.frame = listContainer.bounds
+            listContainer.addSubview(listView)
+        }
     }
 
     override func viewDidAppear() {
@@ -122,6 +203,23 @@ final class PasswordManagementViewController: NSViewController {
         } else {
             refetchWithText(isDirty ? "" : domain ?? "", clearWhenNoMatches: true)
         }
+        
+        promptForAuthenticationIfNecessary()
+    }
+    
+    override func viewDidDisappear() {
+        super.viewDidDisappear()
+        listView?.removeFromSuperview()
+    }
+    
+    private func promptForAuthenticationIfNecessary() {
+        let authenticator = DeviceAuthenticator.shared
+        
+        toggleLockScreen(hidden: !authenticator.requiresAuthentication)
+        
+        authenticator.authenticateUser(reason: .unlockLogins) { authenticationResult in
+            self.toggleLockScreen(hidden: authenticationResult.authenticated)
+        }
     }
 
     @IBAction func onNewClicked(_ sender: NSButton) {
@@ -133,6 +231,10 @@ final class PasswordManagementViewController: NSViewController {
 
     @IBAction func onImportClicked(_ sender: NSButton) {
         DataImportViewController.show()
+    }
+    
+    @IBAction func deviceAuthenticationRequested(_ sender: NSButton) {
+        promptForAuthenticationIfNecessary()
     }
 
     private func refetchWithText(_ text: String,
@@ -547,25 +649,11 @@ final class PasswordManagementViewController: NSViewController {
     }
     // swiftlint:enable function_body_length
     
-    override func viewWillAppear() {
-        super.viewWillAppear()
-        
-        if let listView = self.listView {
-            listView.frame = listContainer.bounds
-            listContainer.addSubview(listView)
-        }
-    }
-    
-    override func viewDidDisappear() {
-        super.viewDidDisappear()
-        listView?.removeFromSuperview()
-    }
-
     private func createNewSecureVaultItemMenu() -> NSMenu {
         let menu = NSMenu()
 
         func createMenuItem(title: String, action: Selector, imageName: String) -> NSMenuItem {
-            let item = NSMenuItem(title: title, action: action, keyEquivalent: "")
+            let item = NSMenuItem(title: title, action: action, target: self, keyEquivalent: "")
             item.image = NSImage(named: imageName)
             
             return item
@@ -773,6 +861,27 @@ extension PasswordManagementViewController: NSTextFieldDelegate {
 
     func controlTextDidChange(_ obj: Notification) {
         updateFilter()
+    }
+
+}
+
+extension PasswordManagementViewController: NSTextViewDelegate {
+    
+    func textView(_ textView: NSTextView, clickedOnLink link: Any, at charIndex: Int) -> Bool {
+        if let link = link as? URL, link == URL.preferences {
+            WindowControllersManager.shared.showPreferencesTab()
+            self.dismiss()
+            
+            Pixel.fire(.passwordManagerLockScreenPreferencesButtonPressed)
+        }
+
+        return true
+    }
+    
+    func textView(_ textView: NSTextView,
+                  willChangeSelectionFromCharacterRange oldSelectedCharRange: NSRange,
+                  toCharacterRange newSelectedCharRange: NSRange) -> NSRange {
+        return NSRange(location: 0, length: 0)
     }
 
 }

@@ -79,5 +79,25 @@ extension UserText {
     static let pmSortParameterDateCreated = NSLocalizedString("pm.sort.parameter.date-created", value: "Date Created", comment: "Label for Date Created sort parameter")
     static let pmSortParameterDateModified = NSLocalizedString("pm.sort.parameter.date-modified", value: "Date Modified", comment: "Label for Date Modified sort parameter")
     
+    static func pmLockScreenDuration(duration: String) -> String {
+        let localized = NSLocalizedString("pm.lock-screen.duration",
+                                          value: "Logins+ will remain unlocked until your computer is idle for %@.",
+                                          comment: "")
+        return String(format: localized, duration)
+    }
+    
+    static let pmLockScreenPreferencesLabel = NSLocalizedString("pm.lock-screen.preferences.label", value: "Change in", comment: "Label used for a button that opens preferences")
+    static let pmLockScreenPreferencesLink = NSLocalizedString("pm.lock-screen.preferences.link", value: "Preferences", comment: "Label used for a button that opens preferences")
+    
+    static let pmAutoLockPromptUnlockLogins = NSLocalizedString("pm.lock-screen.prompt.unlock-logins", value: "unlock Logins+", comment: "Label presented when unlocking Logins+")
+    static let pmAutoLockPromptChangeLoginsSettings = NSLocalizedString("pm.lock-screen.prompt.change-settings", value: "change Logins+ settings", comment: "Label presented when changing Auto-Lock settings")
+    static let pmAutoLockPromptAutofill = NSLocalizedString("pm.lock-screen.prompt.autofill", value: "autofill credit card information", comment: "Label presented when autofilling credit card information")
+    
+    static let autoLockThreshold1Minute = NSLocalizedString("pm.lock-screen.threshold.1-minute", value: "1 minute", comment: "Label used when selecting the Auto-Lock threshold")
+    static let autoLockThreshold5Minutes = NSLocalizedString("pm.lock-screen.threshold.5-minutes", value: "5 minutes", comment: "Label used when selecting the Auto-Lock threshold")
+    static let autoLockThreshold15Minutes = NSLocalizedString("pm.lock-screen.threshold.15-minutes", value: "15 minutes", comment: "Label used when selecting the Auto-Lock threshold")
+    static let autoLockThreshold30Minutes = NSLocalizedString("pm.lock-screen.threshold.30-minutes", value: "30 minutes", comment: "Label used when selecting the Auto-Lock threshold")
+    static let autoLockThreshold1Hour = NSLocalizedString("pm.lock-screen.threshold.1-hour", value: "1 hour", comment: "Label used when selecting the Auto-Lock threshold")
+    
 }
 // swiftlint:enable line_length
