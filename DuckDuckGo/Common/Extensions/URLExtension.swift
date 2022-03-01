@@ -85,6 +85,10 @@ extension URL {
     static var welcome: URL {
         return URL(string: "about:welcome")!
     }
+    
+    static var preferences: URL {
+        return URL(string: "about:preferences")!
+    }
 
     // MARK: Pixel
 
