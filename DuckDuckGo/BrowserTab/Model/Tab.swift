@@ -475,7 +475,7 @@ final class Tab: NSObject {
 
     // MARK: - Find in Page
 
-    var findInPageScript: FindInPageUserScript?
+    weak var findInPageScript: FindInPageUserScript?
     var findInPageCancellable: AnyCancellable?
     private func subscribeToFindInPageTextChange() {
         findInPageCancellable?.cancel()
@@ -572,6 +572,7 @@ extension Tab: UserContentControllerDelegate {
         userScripts.hoverUserScript.delegate = self
         userScripts.autoconsentUserScript?.delegate = self
 
+        findInPageScript = userScripts.findInPageScript
         attachFindInPage()
     }
 
