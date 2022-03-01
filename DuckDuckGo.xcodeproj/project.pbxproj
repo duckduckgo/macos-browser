@@ -5578,8 +5578,8 @@
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/duckduckgo/BrowserServicesKit";
 			requirement = {
-				branch = "sam/logins-authentication";
-				kind = branch;
+				kind = upToNextMajorVersion;
+				minimumVersion = 11.0.0;
 			};
 		};
 		AA06B6B52672AF8100F541C5 /* XCRemoteSwiftPackageReference "Sparkle" */ = {
