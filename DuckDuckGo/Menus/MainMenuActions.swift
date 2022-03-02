@@ -65,7 +65,7 @@ extension AppDelegate {
 
         guard let feedbackWindow = windowController.window as? FeedbackWindow,
               let parentWindowController = WindowControllersManager.shared.lastKeyMainWindowController else {
-            assertionFailure("HomepageViewController: Failed to present FeedbackWindowController")
+            assertionFailure("HomePageViewController: Failed to present FeedbackWindowController")
             return
         }
 
