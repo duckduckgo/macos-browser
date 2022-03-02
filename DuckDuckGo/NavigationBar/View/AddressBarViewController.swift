@@ -26,6 +26,7 @@ final class AddressBarViewController: NSViewController {
     @IBOutlet weak var passiveTextField: NSTextField!
     @IBOutlet var inactiveBackgroundView: NSView!
     @IBOutlet var activeBackgroundView: NSView!
+    @IBOutlet var activeOuterBorderView: NSView!
     @IBOutlet var activeBackgroundViewWithSuggestions: NSView!
     @IBOutlet var progressIndicator: ProgressView!
     @IBOutlet var passiveTextFieldMinXConstraint: NSLayoutConstraint!
@@ -108,6 +109,7 @@ final class AddressBarViewController: NSViewController {
             addressBarTextField.isHidden = true
             inactiveBackgroundView.isHidden = true
             activeBackgroundViewWithSuggestions.isHidden = true
+            activeOuterBorderView.isHidden = true
             activeBackgroundView.isHidden = true
             shadowView.isHidden = true
         } else {
@@ -260,9 +262,10 @@ final class AddressBarViewController: NSViewController {
         updateShadowView(firstResponder: isFirstResponder)
         inactiveBackgroundView.alphaValue = isFirstResponder ? 0 : 1
         activeBackgroundView.alphaValue = isFirstResponder ? 1 : 0
+        activeOuterBorderView.alphaValue = isFirstResponder ? 1 : 0
 
-        activeBackgroundView.layer?.borderColor = NSColor.controlAccentColor.withAlphaComponent(0.6).cgColor
-        activeBackgroundView.shadow = createFocusShadowWhenOnHomePage()
+        activeOuterBorderView.layer?.backgroundColor = NSColor.controlAccentColor.withAlphaComponent(0.2).cgColor
+        activeBackgroundView.layer?.borderColor = NSColor.controlAccentColor.withAlphaComponent(0.8).cgColor
     }
 
     private func updateShadowView(firstResponder: Bool) {
@@ -280,6 +283,7 @@ final class AddressBarViewController: NSViewController {
             self?.shadowView.shadowColor = visible ? .suggestionsShadowColor : .clear
             self?.shadowView.shadowRadius = visible ? 8.0 : 0.0
 
+            self?.activeOuterBorderView.isHidden = visible
             self?.activeBackgroundView.isHidden = visible
             self?.activeBackgroundViewWithSuggestions.isHidden = !visible
         }
@@ -326,20 +330,6 @@ final class AddressBarViewController: NSViewController {
                 activeBackgroundView.layer?.backgroundColor = NSColor.inactiveSearchBarBackground.cgColor
             }
         }
-    }
-
-}
-
-extension AddressBarViewController {
-
-    private func createFocusShadowWhenOnHomePage() -> NSShadow? {
-        guard isHomePage else { return nil }
-
-        let shadow = NSShadow()
-        shadow.shadowColor = .addressBarShadowColor
-        shadow.shadowOffset = .init(width: 0, height: 0)
-        shadow.shadowBlurRadius = 10
-        return shadow
     }
 
 }

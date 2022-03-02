@@ -333,6 +333,20 @@
                                     </userDefinedRuntimeAttribute>
                                 </userDefinedRuntimeAttributes>
                             </customView>
+                            <customView translatesAutoresizingMaskIntoConstraints="NO" id="Zjk-bE-Xft" customClass="ColorView" customModule="DuckDuckGo_Privacy_Browser" customModuleProvider="target">
+                                <rect key="frame" x="-3" y="-3" width="732" height="42"/>
+                                <userDefinedRuntimeAttributes>
+                                    <userDefinedRuntimeAttribute type="color" keyPath="backgroundColor">
+                                        <color key="value" name="systemRedColor" catalog="System" colorSpace="catalog"/>
+                                    </userDefinedRuntimeAttribute>
+                                    <userDefinedRuntimeAttribute type="number" keyPath="cornerRadius">
+                                        <integer key="value" value="8"/>
+                                    </userDefinedRuntimeAttribute>
+                                    <userDefinedRuntimeAttribute type="number" keyPath="borderWidth">
+                                        <real key="value" value="0.0"/>
+                                    </userDefinedRuntimeAttribute>
+                                </userDefinedRuntimeAttributes>
+                            </customView>
                             <customView translatesAutoresizingMaskIntoConstraints="NO" id="e0p-7S-Gan" customClass="ColorView" customModule="DuckDuckGo_Privacy_Browser" customModuleProvider="target">
                                 <rect key="frame" x="0.0" y="0.0" width="726" height="36"/>
                                 <userDefinedRuntimeAttributes>
@@ -435,8 +449,10 @@
                             </customView>
                         </subviews>
                         <constraints>
+                            <constraint firstItem="Zjk-bE-Xft" firstAttribute="leading" secondItem="wj6-L2-5rJ" secondAttribute="leading" constant="-3" id="0fn-nq-VWh"/>
                             <constraint firstAttribute="trailing" secondItem="zaX-wZ-E3D" secondAttribute="trailing" constant="45" id="0o6-qo-lcK"/>
                             <constraint firstAttribute="trailing" relation="greaterThanOrEqual" secondItem="zaX-wZ-E3D" secondAttribute="trailing" constant="45" id="3qw-n4-evE"/>
+                            <constraint firstItem="Zjk-bE-Xft" firstAttribute="top" secondItem="wj6-L2-5rJ" secondAttribute="top" constant="-3" id="7Hj-tq-lmj"/>
                             <constraint firstAttribute="trailing" secondItem="ENV-0H-Fcc" secondAttribute="trailing" constant="5" id="Cig-ek-031"/>
                             <constraint firstItem="e0p-7S-Gan" firstAttribute="leading" secondItem="wj6-L2-5rJ" secondAttribute="leading" id="E5D-iA-uu3"/>
                             <constraint firstItem="le0-Hn-ZAC" firstAttribute="centerX" secondItem="wj6-L2-5rJ" secondAttribute="centerX" id="GIk-xf-3Bn"/>
@@ -452,7 +468,9 @@
                             <constraint firstAttribute="bottom" secondItem="bOl-8Z-hTh" secondAttribute="bottom" constant="3" id="WNn-YA-PHP"/>
                             <constraint firstItem="Ij9-fc-CLI" firstAttribute="top" secondItem="wj6-L2-5rJ" secondAttribute="top" id="XhY-ag-U21"/>
                             <constraint firstItem="zaX-wZ-E3D" firstAttribute="leading" secondItem="wj6-L2-5rJ" secondAttribute="leading" constant="40" id="bY3-LA-cuF"/>
+                            <constraint firstAttribute="trailing" secondItem="Zjk-bE-Xft" secondAttribute="trailing" constant="-3" id="ctZ-aw-6Ck"/>
                             <constraint firstItem="le0-Hn-ZAC" firstAttribute="leading" relation="greaterThanOrEqual" secondItem="wj6-L2-5rJ" secondAttribute="leading" constant="37" id="eJI-rp-ptx"/>
+                            <constraint firstAttribute="bottom" secondItem="Zjk-bE-Xft" secondAttribute="bottom" constant="-3" id="ic3-He-fz0"/>
                             <constraint firstAttribute="bottom" secondItem="ENV-0H-Fcc" secondAttribute="bottom" constant="3" id="jNf-6E-eDn"/>
                             <constraint firstItem="Ij9-fc-CLI" firstAttribute="leading" secondItem="wj6-L2-5rJ" secondAttribute="leading" id="mPy-45-VDH"/>
                             <constraint firstAttribute="bottom" secondItem="e0p-7S-Gan" secondAttribute="bottom" priority="300" id="nuB-My-vJR"/>
@@ -463,6 +481,7 @@
                     <connections>
                         <outlet property="activeBackgroundView" destination="e0p-7S-Gan" id="2FB-uy-8tO"/>
                         <outlet property="activeBackgroundViewWithSuggestions" destination="Ij9-fc-CLI" id="JWC-g2-hrM"/>
+                        <outlet property="activeOuterBorderView" destination="Zjk-bE-Xft" id="u6o-fc-V76"/>
                         <outlet property="addressBarTextField" destination="zaX-wZ-E3D" id="pfO-d4-i46"/>
                         <outlet property="inactiveBackgroundView" destination="ENV-0H-Fcc" id="OV5-2s-Ggq"/>
                         <outlet property="passiveTextField" destination="le0-Hn-ZAC" id="npL-R1-gmH"/>
