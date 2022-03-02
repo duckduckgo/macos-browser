@@ -19,6 +19,7 @@
 import Foundation
 import Combine
 import BrowserServicesKit
+import Autofill
 
 protocol ScriptSourceProviding {
 

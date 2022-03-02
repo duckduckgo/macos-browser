@@ -19,6 +19,8 @@
 import Foundation
 import BrowserServicesKit
 import TrackerRadarKit
+import ContentScopeScripts
+import Autofill
 
 final class UserScripts {
 

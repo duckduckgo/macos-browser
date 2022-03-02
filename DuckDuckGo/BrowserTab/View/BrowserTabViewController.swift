@@ -22,6 +22,7 @@ import os.log
 import Combine
 import SwiftUI
 import BrowserServicesKit
+import Autofill
 
 protocol ChildAutofillUserScriptDelegate: AnyObject {
     func browserTabViewController(_ browserTabViewController: BrowserTabViewController, didClickAtPoint: CGPoint)

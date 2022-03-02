@@ -20,6 +20,7 @@ import Cocoa
 import WebKit
 import Combine
 import BrowserServicesKit
+import Autofill
 
 public final class ContentOverlayViewController: NSViewController, EmailManagerRequestDelegate {
 
@@ -74,7 +75,7 @@ public final class ContentOverlayViewController: NSViewController, EmailManagerR
         guard let topAutofillUserScript = topAutofillUserScript else { return }
         topAutofillUserScript.websiteAutofillInstance = autofillInterfaceToChild
 
-        let bundleId = "BrowserServicesKit-BrowserServicesKit-resources"
+        let bundleId = "Autofill-Autofill-resources"
         let bundle = Bundle(identifier: bundleId)
         let url = bundle!.url(forResource: "TopAutofill", withExtension: "html")
         if let url = url {
