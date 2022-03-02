@@ -408,7 +408,7 @@ final class NavigationBarViewController: NSViewController {
 
         passwordManagementButton.image = NSImage(named: "PasswordManagement")
 
-        if saveCredentialsPopover.isShown || saveIdentityPopover.isShown {
+        if saveCredentialsPopover.isShown || saveIdentityPopover.isShown || savePaymentMethodPopover.isShown {
             return
         }
 
@@ -417,7 +417,7 @@ final class NavigationBarViewController: NSViewController {
             return
         }
 
-        passwordManagementButton.isHidden = (!passwordManagementPopover.isShown && !saveIdentityPopover.isShown)
+        passwordManagementButton.isHidden = (!passwordManagementPopover.isShown && !saveIdentityPopover.isShown && !savePaymentMethodPopover.isShown)
 
         passwordManagementPopover.viewController.domain = nil
         guard let url = url, let domain = url.host else {
@@ -480,13 +480,15 @@ final class NavigationBarViewController: NSViewController {
     }
     
     private func promptToSaveAutofillData(_ data: AutofillData) {
-        if let credentials = data.credentials {
+        let loginsPreferences = LoginsPreferences()
+        
+        if loginsPreferences.askToSaveUsernamesAndPasswords, let credentials = data.credentials {
             showSaveCredentialsPopover()
             saveCredentialsPopover.viewController.saveCredentials(credentials)
-        } else if let card = data.creditCard {
+        } else if loginsPreferences.askToSavePaymentMethods, let card = data.creditCard {
             showSavePaymentMethodPopover()
             savePaymentMethodPopover.viewController.savePaymentMethod(card)
-        } else if let identity = data.identity {
+        } else if loginsPreferences.askToSaveAddresses, let identity = data.identity {
             showSaveIdentityPopover()
             saveIdentityPopover.viewController.saveIdentity(identity)
         }
@@ -576,7 +578,9 @@ extension NavigationBarViewController: NSPopoverDelegate {
             downloadsPopoverTimer = nil
         } else if notification.object as AnyObject? === bookmarkListPopover {
             updateBookmarksButton()
-        } else if notification.object as AnyObject? === saveCredentialsPopover || notification.object as AnyObject? === saveIdentityPopover {
+        } else if notification.object as AnyObject? === saveCredentialsPopover ||
+                    notification.object as AnyObject? === saveIdentityPopover ||
+                    notification.object as AnyObject? === savePaymentMethodPopover {
             updatePasswordManagementButton()
         }
     }

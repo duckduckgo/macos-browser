@@ -10,18 +10,79 @@
         <customObject id="-1" userLabel="First Responder" customClass="FirstResponder"/>
         <customObject id="-3" userLabel="Application" customClass="NSObject"/>
         <tableCellView identifier="LoginsPreferencesTableCellView" id="r9o-mb-reY" customClass="LoginsPreferencesTableCellView" customModule="DuckDuckGo_Privacy_Browser" customModuleProvider="target">
-            <rect key="frame" x="0.0" y="0.0" width="555" height="200"/>
+            <rect key="frame" x="0.0" y="0.0" width="555" height="361"/>
             <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
             <subviews>
                 <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="eM1-2o-Okg">
-                    <rect key="frame" x="-2" y="147" width="559" height="21"/>
+                    <rect key="frame" x="-2" y="308" width="559" height="21"/>
                     <textFieldCell key="cell" lineBreakMode="clipping" title="Logins+" id="3gs-0d-UT1">
                         <font key="font" metaFont="systemSemibold" size="18"/>
                         <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
                         <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
                     </textFieldCell>
                 </textField>
-                <stackView distribution="fill" orientation="vertical" alignment="leading" horizontalStackHuggingPriority="249.99998474121094" verticalStackHuggingPriority="249.99998474121094" detachesHiddenViews="YES" translatesAutoresizingMaskIntoConstraints="NO" id="qQE-Lh-xZd">
+                <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="RZA-TQ-gh7">
+                    <rect key="frame" x="-2" y="269" width="91" height="19"/>
+                    <textFieldCell key="cell" lineBreakMode="clipping" title="Ask to Save" id="JYI-Iq-OIw">
+                        <font key="font" metaFont="systemMedium" size="16"/>
+                        <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
+                        <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
+                    </textFieldCell>
+                </textField>
+                <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="eWX-pv-ufx">
+                    <rect key="frame" x="-2" y="251" width="559" height="14"/>
+                    <textFieldCell key="cell" lineBreakMode="clipping" title="Receive prompts to save new Logins+ information when filling out online forms." id="9eP-Ty-Nrd">
+                        <font key="font" metaFont="smallSystem"/>
+                        <color key="textColor" name="secondaryLabelColor" catalog="System" colorSpace="catalog"/>
+                        <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
+                    </textFieldCell>
+                </textField>
+                <stackView distribution="fill" orientation="vertical" alignment="leading" horizontalStackHuggingPriority="249.99998474121094" verticalStackHuggingPriority="249.99998474121094" detachesHiddenViews="YES" translatesAutoresizingMaskIntoConstraints="NO" id="BtJ-8i-XgJ" userLabel="Ask to Save Stack View">
+                    <rect key="frame" x="0.0" y="167" width="555" height="64"/>
+                    <subviews>
+                        <button verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="PkP-E6-Qat">
+                            <rect key="frame" x="-2" y="47" width="189" height="18"/>
+                            <buttonCell key="cell" type="check" title="Usernames and passwords" bezelStyle="regularSquare" imagePosition="left" state="on" inset="2" id="cOQ-9P-nDT">
+                                <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
+                                <font key="font" metaFont="system"/>
+                            </buttonCell>
+                            <connections>
+                                <action selector="askToSaveUsernamesAndPasswordsChanged:" target="r9o-mb-reY" id="VE2-qp-8cw"/>
+                            </connections>
+                        </button>
+                        <button verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="XJN-g2-eWj">
+                            <rect key="frame" x="-2" y="23" width="90" height="18"/>
+                            <buttonCell key="cell" type="check" title="Addresses" bezelStyle="regularSquare" imagePosition="left" state="on" inset="2" id="qb1-z7-Zz6">
+                                <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
+                                <font key="font" metaFont="system"/>
+                            </buttonCell>
+                            <connections>
+                                <action selector="askToSaveAddressesChanged:" target="r9o-mb-reY" id="2L3-XU-NLD"/>
+                            </connections>
+                        </button>
+                        <button verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="lVS-UD-J3W">
+                            <rect key="frame" x="-2" y="-1" width="136" height="18"/>
+                            <buttonCell key="cell" type="check" title="Payment methods" bezelStyle="regularSquare" imagePosition="left" state="on" inset="2" id="odv-en-2FO">
+                                <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
+                                <font key="font" metaFont="system"/>
+                            </buttonCell>
+                            <connections>
+                                <action selector="askToSavePaymentMethodsChanged:" target="r9o-mb-reY" id="a5Q-KZ-glo"/>
+                            </connections>
+                        </button>
+                    </subviews>
+                    <visibilityPriorities>
+                        <integer value="1000"/>
+                        <integer value="1000"/>
+                        <integer value="1000"/>
+                    </visibilityPriorities>
+                    <customSpacing>
+                        <real value="3.4028234663852886e+38"/>
+                        <real value="3.4028234663852886e+38"/>
+                        <real value="3.4028234663852886e+38"/>
+                    </customSpacing>
+                </stackView>
+                <stackView distribution="fill" orientation="vertical" alignment="leading" horizontalStackHuggingPriority="249.99998474121094" verticalStackHuggingPriority="249.99998474121094" detachesHiddenViews="YES" translatesAutoresizingMaskIntoConstraints="NO" id="qQE-Lh-xZd" userLabel="Auto-Lock Stack View">
                     <rect key="frame" x="0.0" y="20" width="555" height="107"/>
                     <subviews>
                         <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="5n4-x6-cpb">
@@ -118,23 +179,34 @@
                 </box>
             </subviews>
             <constraints>
+                <constraint firstItem="RZA-TQ-gh7" firstAttribute="leading" secondItem="r9o-mb-reY" secondAttribute="leading" id="0UX-TJ-x2K"/>
+                <constraint firstItem="RZA-TQ-gh7" firstAttribute="top" secondItem="eM1-2o-Okg" secondAttribute="bottom" constant="20" id="4JU-Rg-oRv"/>
                 <constraint firstItem="eM1-2o-Okg" firstAttribute="top" secondItem="r9o-mb-reY" secondAttribute="top" constant="32" id="7Po-DE-cKR"/>
-                <constraint firstItem="qQE-Lh-xZd" firstAttribute="top" secondItem="eM1-2o-Okg" secondAttribute="bottom" constant="20" id="AZN-Dr-5ER"/>
                 <constraint firstAttribute="trailing" secondItem="eM1-2o-Okg" secondAttribute="trailing" id="Aev-kb-Yy0"/>
                 <constraint firstAttribute="trailing" secondItem="f9p-z4-bcp" secondAttribute="trailing" id="KDu-jK-3rU"/>
+                <constraint firstItem="BtJ-8i-XgJ" firstAttribute="leading" secondItem="r9o-mb-reY" secondAttribute="leading" id="RRO-EE-amT"/>
                 <constraint firstAttribute="bottom" secondItem="qQE-Lh-xZd" secondAttribute="bottom" priority="750" constant="20" symbolic="YES" id="TsU-yS-Eza"/>
                 <constraint firstItem="f9p-z4-bcp" firstAttribute="leading" secondItem="r9o-mb-reY" secondAttribute="leading" id="V6c-aG-8GX"/>
                 <constraint firstItem="eM1-2o-Okg" firstAttribute="leading" secondItem="r9o-mb-reY" secondAttribute="leading" id="XBt-XP-7ew"/>
                 <constraint firstItem="qQE-Lh-xZd" firstAttribute="leading" secondItem="r9o-mb-reY" secondAttribute="leading" id="bAh-BF-kb5"/>
                 <constraint firstAttribute="trailing" secondItem="qQE-Lh-xZd" secondAttribute="trailing" id="bn1-Nf-5LS"/>
+                <constraint firstAttribute="trailing" secondItem="eWX-pv-ufx" secondAttribute="trailing" id="jSM-4Z-fpJ"/>
+                <constraint firstItem="eWX-pv-ufx" firstAttribute="top" secondItem="RZA-TQ-gh7" secondAttribute="bottom" constant="4" id="sd9-Dt-0cr"/>
+                <constraint firstItem="BtJ-8i-XgJ" firstAttribute="top" secondItem="eWX-pv-ufx" secondAttribute="bottom" constant="20" id="tuc-Re-f5i"/>
+                <constraint firstAttribute="trailing" secondItem="BtJ-8i-XgJ" secondAttribute="trailing" id="wj2-4F-qhR"/>
                 <constraint firstAttribute="bottom" secondItem="f9p-z4-bcp" secondAttribute="bottom" id="woG-kF-CDj"/>
+                <constraint firstItem="eWX-pv-ufx" firstAttribute="leading" secondItem="r9o-mb-reY" secondAttribute="leading" id="zq2-Fh-IAv"/>
+                <constraint firstItem="qQE-Lh-xZd" firstAttribute="top" secondItem="BtJ-8i-XgJ" secondAttribute="bottom" constant="40" id="zvl-YC-R0a"/>
             </constraints>
             <connections>
+                <outlet property="askToSaveAddressesCheckbox" destination="XJN-g2-eWj" id="j0M-fO-Ckj"/>
+                <outlet property="askToSavePaymentMethodsCheckbox" destination="lVS-UD-J3W" id="9hs-kg-wsS"/>
+                <outlet property="askToSaveUsernamesAndPasswordsCheckbox" destination="PkP-E6-Qat" id="V4G-WR-nft"/>
                 <outlet property="autoLockDisabledRadioButton" destination="WXS-rX-FCz" id="RrQ-s7-FM8"/>
                 <outlet property="autoLockEnabledRadioButton" destination="F7W-Ms-h4H" id="QWr-Vy-h5x"/>
                 <outlet property="autoLockThresholdPopUpButton" destination="s81-XX-UWd" id="5km-PN-SJU"/>
             </connections>
-            <point key="canvasLocation" x="316.5" y="188.5"/>
+            <point key="canvasLocation" x="316.5" y="291"/>
         </tableCellView>
     </objects>
 </document>

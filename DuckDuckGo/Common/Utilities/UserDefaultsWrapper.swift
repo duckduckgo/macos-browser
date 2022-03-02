@@ -46,6 +46,10 @@ public struct UserDefaultsWrapper<T> {
         case alwaysRequestDownloadLocationKey = "preferences.download-location.always-request"
         case autoconsentEnabled = "preferences.autoconsent-enabled"
 
+        case askToSaveUsernamesAndPasswords = "preferences.ask-to-save.usernames-passwords"
+        case askToSaveAddresses = "preferences.ask-to-save.addresses"
+        case askToSavePaymentMethods = "preferences.ask-to-save.payment-methods"
+
         case saveAsPreferredFileType = "saveAs.selected.filetype"
 
         case lastCrashReportCheckDate = "last.crash.report.check.date"
