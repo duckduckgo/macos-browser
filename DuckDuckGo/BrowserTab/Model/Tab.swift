@@ -678,6 +678,33 @@ extension Tab: ContentBlockerRulesUserScriptDelegate {
 
 }
 
+extension HistoryCoordinating {
+
+    func addDetectedTracker(_ tracker: DetectedTracker, onURL url: URL, contentBlocking: ContentBlocking = ContentBlocking.shared) {
+        guard tracker.blocked,
+              let domain = tracker.domain,
+              let entityName = contentBlocking.entityName(forDomain: domain) else { return }
+
+        addBlockedTracker(entityName: entityName, onURL: url)
+    }
+
+}
+
+extension ContentBlocking {
+
+    func entityName(forDomain domain: String) -> String? {
+        var entityName: String?
+        var parts = domain.components(separatedBy: ".")
+        while parts.count > 1 && entityName == nil {
+            let host = parts.joined(separator: ".")
+            entityName = trackerDataManager.trackerData.domains[host]
+            parts.removeFirst()
+        }
+        return entityName
+    }
+
+}
+
 extension Tab: ClickToLoadUserScriptDelegate {
 
     func clickToLoadUserScriptAllowFB(_ script: UserScript, replyHandler: @escaping (Bool) -> Void) {

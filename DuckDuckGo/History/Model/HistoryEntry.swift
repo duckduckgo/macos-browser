@@ -28,16 +28,18 @@ struct HistoryEntry {
     var lastVisit: Date
     var failedToLoad: Bool
     var numberOfTrackersBlocked: Int
+    var blockedTrackingEntities: Set<String>
 
     mutating func addVisit() {
         numberOfVisits += 1
-        lastVisit = Date.startOfDayToday
+        lastVisit = Date()
     }
 
-    mutating func addDetectedTracker(tracker: DetectedTracker) {
-        if tracker.blocked {
-            numberOfTrackersBlocked += 1
-        }
+    mutating func addBlockedTracker(entityName: String) {
+        numberOfTrackersBlocked += 1
+
+        assert(!entityName.trimWhitespace().isEmpty)
+        blockedTrackingEntities.insert(entityName)
     }
 
 }
@@ -49,9 +51,10 @@ extension HistoryEntry {
                   url: url,
                   title: nil,
                   numberOfVisits: 0,
-                  lastVisit: Date.startOfDayToday,
+                  lastVisit: Date(),
                   failedToLoad: false,
-                  numberOfTrackersBlocked: 0)
+                  numberOfTrackersBlocked: 0,
+                  blockedTrackingEntities: Set<String>())
     }
 
 }

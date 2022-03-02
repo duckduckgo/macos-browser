@@ -24,35 +24,29 @@ extension HomePage.Views {
 struct RootView: View {
 
     var body: some View {
+        ZStack {
+            ScrollView {
+                VStack(spacing: 0) {
+                    HStack {
+                        Spacer()
 
-        GeometryReader { geometry in
-            ZStack {
-                Group {
-                    ScrollView {
-                        VStack(spacing: 0) {
+                        Favorites()
 
-                            ProtectionSummary()
-                                .padding(.bottom, max(48, geometry.size.height * 0.29))
-                                .padding(.top, 8)
-
-                            HStack {
-                                Spacer()
-
-                                Favorites()
-
-                                Spacer()
-                            }
-
-                        }
-                        .frame(maxWidth: .infinity)
+                        Spacer()
                     }
-                }
+                    .padding(.top, 54)
+                    .padding(.bottom, 54)
 
-                DefaultBrowserPrompt()
+                    RecentlyVisited()
+
+                }
+                .frame(maxWidth: .infinity)
             }
-            .frame(maxWidth: .infinity)
-            .background(Color("NewTabPageBackgroundColor"))
+
+            DefaultBrowserPrompt()
         }
+        .frame(maxWidth: .infinity)
+        .background(Color("NewTabPageBackgroundColor"))
      }
 
 }

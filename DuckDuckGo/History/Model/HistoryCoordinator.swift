@@ -28,7 +28,7 @@ protocol HistoryCoordinating: AnyObject {
     var history: History? { get }
 
     func addVisit(of url: URL)
-    func addDetectedTracker(_ tracker: DetectedTracker, onURL url: URL)
+    func addBlockedTracker(entityName: String, onURL url: URL)
     func updateTitleIfNeeded(title: String, url: URL)
     func markFailedToLoadUrl(_ url: URL)
     func title(for url: URL) -> String?
@@ -88,7 +88,7 @@ final class HistoryCoordinator: HistoryCoordinating {
         }
     }
 
-    func addDetectedTracker(_ tracker: DetectedTracker, onURL url: URL) {
+    func addBlockedTracker(entityName: String, onURL url: URL) {
         queue.async(flags: .barrier) { [weak self] in
             guard let historyDictionary = self?.historyDictionary else {
                 os_log("Add tracker to %s ignored, no history", log: .history, url.absoluteString)
@@ -100,7 +100,7 @@ final class HistoryCoordinator: HistoryCoordinating {
                 return
             }
 
-            entry.addDetectedTracker(tracker: tracker)
+            entry.addBlockedTracker(entityName: entityName)
             self?.save(entry: entry)
         }
     }

@@ -211,6 +211,7 @@ fileprivate extension HistoryEntry {
         let title = historyMO.titleEncrypted as? String
         let numberOfVisits = historyMO.numberOfVisits
         let numberOfTrackersBlocked = historyMO.numberOfTrackersBlocked
+        let blockedTrackingEntities = historyMO.blockedTrackingEntities ?? ""
 
         self.init(identifier: identifier,
                   url: url,
@@ -218,7 +219,8 @@ fileprivate extension HistoryEntry {
                   numberOfVisits: Int(numberOfVisits),
                   lastVisit: lastVisit,
                   failedToLoad: historyMO.failedToLoad,
-                  numberOfTrackersBlocked: Int(numberOfTrackersBlocked))
+                  numberOfTrackersBlocked: Int(numberOfTrackersBlocked),
+                  blockedTrackingEntities: Set<String>(blockedTrackingEntities.components(separatedBy: "|")))
     }
 
 }
@@ -242,6 +244,7 @@ fileprivate extension HistoryEntryManagedObject {
         lastVisit = entry.lastVisit
         failedToLoad = entry.failedToLoad
         numberOfTrackersBlocked = Int64(entry.numberOfTrackersBlocked)
+        blockedTrackingEntities = entry.blockedTrackingEntities.isEmpty ? "" : entry.blockedTrackingEntities.joined(separator: "|")
     }
 
 }
