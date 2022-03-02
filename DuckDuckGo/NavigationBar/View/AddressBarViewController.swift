@@ -20,6 +20,7 @@ import Cocoa
 import os.log
 import Combine
 
+// swiftlint:disable type_body_length
 final class AddressBarViewController: NSViewController {
 
     @IBOutlet weak var addressBarTextField: AddressBarTextField!
@@ -324,15 +325,20 @@ final class AddressBarViewController: NSViewController {
                 activeBackgroundView.layer?.borderWidth = 2.0
                 activeBackgroundView.layer?.borderColor = NSColor.controlAccentColor.withAlphaComponent(0.6).cgColor
                 activeBackgroundView.layer?.backgroundColor = NSColor.addressBarBackgroundColor.cgColor
+
+                activeOuterBorderView.isHidden = false
             } else {
                 activeBackgroundView.layer?.borderWidth = 0
                 activeBackgroundView.layer?.borderColor = nil
                 activeBackgroundView.layer?.backgroundColor = NSColor.inactiveSearchBarBackground.cgColor
+
+                activeOuterBorderView.isHidden = true
             }
         }
     }
 
 }
+// swiftlint:enable type_body_length
 
 extension AddressBarViewController {
 

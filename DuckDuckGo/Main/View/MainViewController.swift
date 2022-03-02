@@ -173,7 +173,7 @@ final class MainViewController: NSViewController {
 
     private func resizeNavigationBarForHomePage(_ homePage: Bool, animated: Bool) {
         let height = animated ? addressBarHeightConstraint.animator() : addressBarHeightConstraint
-        height?.constant = homePage ? 62 : 48
+        height?.constant = homePage ? 66 : 48
 
         let divider = animated ? self.divider.animator() : self.divider
         divider?.alphaValue = homePage ? 0 : 1.0

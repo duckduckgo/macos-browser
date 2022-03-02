@@ -45,6 +45,7 @@ final class NavigationBarViewController: NSViewController {
     @IBOutlet var addressBarProportionalWidthConstraint: NSLayoutConstraint!
     @IBOutlet var addressBarTopConstraint: NSLayoutConstraint!
     @IBOutlet var addressBarBottomConstraint: NSLayoutConstraint!
+    @IBOutlet var buttonsTopConstraint: NSLayoutConstraint!
 
     lazy var downloadsProgressView: CircularProgressView = {
         let bounds = downloadsButton.bounds
@@ -371,9 +372,12 @@ final class NavigationBarViewController: NSViewController {
             })
     }
 
-    func resizeAddressBarForHomePage(_ homePage: Bool, animated: Bool) {      
-        let top = animated ? addressBarTopConstraint.animator() : addressBarTopConstraint
-        top?.constant = homePage ? 16 : 6
+    func resizeAddressBarForHomePage(_ homePage: Bool, animated: Bool) {
+        let buttonsTop = animated ? buttonsTopConstraint.animator() : buttonsTopConstraint
+        buttonsTop?.constant = homePage ? 18 : 10
+
+        let barTop = animated ? addressBarTopConstraint.animator() : addressBarTopConstraint
+        barTop?.constant = homePage ? 26 : 6
 
         let bottom = animated ? addressBarBottomConstraint.animator() : addressBarBottomConstraint
         bottom?.constant = homePage ? 0 : 6
