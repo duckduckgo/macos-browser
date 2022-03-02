@@ -19,6 +19,7 @@
 
 import Foundation
 import os.log
+import BrowserServicesKit
 
 typealias APIRequestCompletion = (APIRequest.Response?, Error?) -> Void
 

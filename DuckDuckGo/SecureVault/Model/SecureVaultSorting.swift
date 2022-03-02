@@ -30,7 +30,6 @@ struct SecureVaultSorting: Equatable {
         case logins
         case identities
         case cards
-        case notes
         
         var title: String {
             switch self {
@@ -38,7 +37,6 @@ struct SecureVaultSorting: Equatable {
             case .logins: return UserText.passwordManagementLogins
             case .identities: return UserText.passwordManagementIdentities
             case .cards: return UserText.passwordManagementCreditCards
-            case .notes: return UserText.passwordManagementNotes
             }
         }
         
@@ -48,7 +46,6 @@ struct SecureVaultSorting: Equatable {
             case .logins: return "LoginGlyph"
             case .identities: return "IdentityGlyph"
             case .cards: return "CreditCardGlyph"
-            case .notes: return "NoteGlyph"
             }
         }
         
@@ -58,7 +55,6 @@ struct SecureVaultSorting: Equatable {
             case .logins: return NSColor(named: "LoginsColor")!
             case .identities: return NSColor(named: "IdentitiesColor")!
             case .cards: return NSColor(named: "CardsColor")!
-            case .notes: return NSColor(named: "NotesColor")!
             }
         }
         
@@ -68,7 +64,6 @@ struct SecureVaultSorting: Equatable {
             case .logins: return .black
             case .identities: return .black
             case .cards: return .white
-            case .notes: return .black
             }
         }
     }

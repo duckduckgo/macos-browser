@@ -202,7 +202,12 @@ final class NavigationBarViewController: NSViewController {
 
     @IBAction func passwordManagementButtonAction(_ sender: NSButton) {
         // Use the category that is already selected
-        showPasswordManagementPopover(sender: sender, selectedCategory: nil)
+        
+        if passwordManagementPopover.isShown {
+            passwordManagementPopover.close()
+        } else {
+            showPasswordManagementPopover(sender: sender, selectedCategory: nil)
+        }
     }
 
     @IBAction func downloadsButtonAction(_ sender: NSButton) {

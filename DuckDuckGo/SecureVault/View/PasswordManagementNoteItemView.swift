@@ -32,26 +32,16 @@ struct PasswordManagementNoteItemView: View {
         
         if model.note != nil {
             
-            let editMode = model.isEditing || model.isNew
-            
             ZStack(alignment: .top) {
                 Spacer()
-                
-                if editMode {
-                    
-                    RoundedRectangle(cornerRadius: 8)
-                        .foregroundColor(Color(NSColor.editingPanelColor))
-                        .shadow(radius: 6)
-                    
-                }
                 
                 VStack(alignment: .leading, spacing: 0) {
                     
                     HeaderView()
-                        .padding(.bottom, editMode ? 20 : 30)
+                        .padding(.bottom, 30)
                     
                     TextView()
-                    
+
                     Spacer(minLength: 0)
                     
                     Buttons()
@@ -78,38 +68,16 @@ private struct Buttons: View {
     var body: some View {
         HStack {
 
-            if model.isEditing && !model.isNew {
-                Button(UserText.pmDelete) {
-                    model.requestDelete()
-                }
-                .buttonStyle(StandardButtonStyle())
-            }
+            Text("⚠️ Notes are deprecated.")
+                .font(.body)
+                .foregroundColor(Color.secondary)
 
             Spacer()
 
-            if model.isEditing || model.isNew {
-                Button(UserText.pmCancel) {
-                    model.cancel()
-                }
-                .buttonStyle(StandardButtonStyle())
-                Button(UserText.pmSave) {
-                    model.save()
-                }
-                .disabled(!model.isDirty)
-                .buttonStyle(DefaultActionButtonStyle(enabled: model.isDirty))
-
-            } else {
-                Button(UserText.pmDelete) {
-                    model.requestDelete()
-                }
-                .buttonStyle(StandardButtonStyle())
-
-                Button(UserText.pmEdit) {
-                    model.edit()
-                }
-                .buttonStyle(StandardButtonStyle())
-
+            Button(UserText.pmDelete) {
+                model.requestDelete()
             }
+            .buttonStyle(StandardButtonStyle())
 
         }
     }
@@ -143,21 +111,10 @@ private struct TextView: View {
     var body: some View {
         VStack(alignment: .leading, spacing: 0) {
 
-            if model.isEditing || model.isNew {
-
-                EditableTextView(text: $model.text)
-                    .overlay(
-                        RoundedRectangle(cornerRadius: 4.0)
-                        .stroke(Color.init(NSColor.tertiaryLabelColor), lineWidth: 1)
-                    )
-                    .padding(.bottom, interItemSpacing)
-
-            } else {
-
                 HStack {
                     if #available(macOS 12, *) {
                         Text(model.text)
-                            .foregroundColor(Color.primary)
+                            .foregroundColor(Color.secondary)
                             .textSelection(.enabled)
                     } else {
                         Text(model.text)
@@ -166,7 +123,6 @@ private struct TextView: View {
                     Spacer()
                 }
                 .padding(.bottom, interItemSpacing)
-            }
 
         }
     }
@@ -184,17 +140,9 @@ private struct HeaderView: View {
             Image("Note")
                 .padding(.trailing, 10)
 
-            if model.isNew || model.isEditing {
-
-                TextField("", text: $model.title)
-                    .font(.title)
-
-            } else {
-
-                Text(model.title)
-                    .font(.title)
-
-            }
+            Text(model.title)
+                .font(.title)
+                .foregroundColor(Color.secondary)
 
         }
 

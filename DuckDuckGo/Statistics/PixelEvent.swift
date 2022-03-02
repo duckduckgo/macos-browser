@@ -36,6 +36,8 @@ extension Pixel {
 
         case crash
 
+        case brokenSiteReport
+
         enum OnboardingShown: String, CustomStringConvertible {
             var description: String { rawValue }
 
@@ -151,6 +153,14 @@ extension Pixel {
         
         case autoconsentOptOutFailed
         case autoconsentSelfTestFailed
+        
+        case passwordManagerLockScreenPreferencesButtonPressed
+        case passwordManagerLockScreenDisabled
+        case passwordManagerLockScreenTimeoutSelected1Minute
+        case passwordManagerLockScreenTimeoutSelected5Minutes
+        case passwordManagerLockScreenTimeoutSelected15Minutes
+        case passwordManagerLockScreenTimeoutSelected30Minutes
+        case passwordManagerLockScreenTimeoutSelected1Hour
 
         case debug(event: Debug, error: Error? = nil)
 
@@ -196,6 +206,8 @@ extension Pixel {
 
             case secureVaultInitError = "secure_vault_init_error"
             case secureVaultError = "secure_vault_error"
+
+            case feedbackReportingFailed = "feedback_reporting_failed"
         }
 
     }
@@ -225,6 +237,9 @@ extension Pixel.Event {
 
         case .crash:
             return "m_mac_crash"
+
+        case .brokenSiteReport:
+            return "epbf"
 
         case .compileRulesWait(onboardingShown: let onboardingShown, waitTime: let waitTime, result: let result):
             return "m_mac_cbr-wait_\(onboardingShown)_\(waitTime)_\(result)"
@@ -327,6 +342,27 @@ extension Pixel.Event {
 
         case .autoconsentSelfTestFailed:
             return "m_mac_autoconsent_selftest_failed"
+            
+        case .passwordManagerLockScreenPreferencesButtonPressed:
+            return "m_mac_password_mananger_lock_screen_preferences_button_pressed"
+            
+        case .passwordManagerLockScreenDisabled:
+            return "m_mac_password_mananger_lock_screen_disabled"
+            
+        case .passwordManagerLockScreenTimeoutSelected1Minute:
+            return "m_mac_password_mananger_lock_screen_timeout_selected_1_minute"
+
+        case .passwordManagerLockScreenTimeoutSelected5Minutes:
+            return "m_mac_password_mananger_lock_screen_timeout_selected_5_minutes"
+            
+        case .passwordManagerLockScreenTimeoutSelected15Minutes:
+            return "m_mac_password_mananger_lock_screen_timeout_selected_15_minutes"
+            
+        case .passwordManagerLockScreenTimeoutSelected30Minutes:
+            return "m_mac_password_mananger_lock_screen_timeout_selected_30_minutes"
+            
+        case .passwordManagerLockScreenTimeoutSelected1Hour:
+            return "m_mac_password_mananger_lock_screen_timeout_selected_1_hour"
         }
     }
 

@@ -23,7 +23,13 @@ import Combine
 import SwiftUI
 import BrowserServicesKit
 
+protocol ChildAutofillUserScriptDelegate: AnyObject {
+    func browserTabViewController(_ browserTabViewController: BrowserTabViewController, didClickAtPoint: CGPoint)
+}
+
+// swiftlint:disable type_body_length
 // swiftlint:disable file_length
+
 final class BrowserTabViewController: NSViewController {
 
     @IBOutlet weak var errorView: NSView!
@@ -35,6 +41,7 @@ final class BrowserTabViewController: NSViewController {
     private weak var webViewContainer: NSView?
 
     var tabViewModel: TabViewModel?
+    var clickPoint: NSPoint?
 
     private let tabCollectionViewModel: TabCollectionViewModel
     private var urlCancellable: AnyCancellable?
@@ -50,6 +57,8 @@ final class BrowserTabViewController: NSViewController {
 
     private var transientTabContentViewController: NSViewController?
 
+    private var mouseDownMonitor: Any?
+    
     required init?(coder: NSCoder) {
         fatalError("BrowserTabViewController: Bad initializer")
     }
@@ -77,7 +86,21 @@ final class BrowserTabViewController: NSViewController {
         subscribeToErrorViewState()
     }
 
+    override func viewWillAppear() {
+        super.viewWillAppear()
+
+        addMouseMonitors()
+    }
+
+    override func viewWillDisappear() {
+        super.viewWillDisappear()
+
+        removeMouseMonitors()
+    }
+
     override func viewDidAppear() {
+        super.viewDidAppear()
+
         NotificationCenter.default.addObserver(self,
                                                selector: #selector(windowWillClose(_:)),
                                                name: NSWindow.willCloseNotification,
@@ -329,6 +352,36 @@ final class BrowserTabViewController: NSViewController {
         return viewController
     }()
 
+    private var cancellables = Set<AnyCancellable>()
+
+    private var _contentOverlayPopover: ContentOverlayPopover?
+    public var contentOverlayPopover: ContentOverlayPopover {
+        guard let overlay = _contentOverlayPopover else {
+            let overlayPopover = ContentOverlayPopover(currentTabView: view)
+            WindowControllersManager.shared.stateChanged
+                .sink { _ in
+                    self._contentOverlayPopover?.websiteAutofillUserScriptCloseOverlay(nil)
+                }.store(in: &cancellables)
+            _contentOverlayPopover = overlayPopover
+            return overlayPopover
+        }
+        return overlay
+    }
+}
+
+extension BrowserTabViewController: ContentOverlayUserScriptDelegate {
+    public func websiteAutofillUserScriptCloseOverlay(_ websiteAutofillUserScript: WebsiteAutofillUserScript?) {
+        contentOverlayPopover.websiteAutofillUserScriptCloseOverlay(websiteAutofillUserScript)
+    }
+    public func websiteAutofillUserScript(_ websiteAutofillUserScript: WebsiteAutofillUserScript,
+                                          willDisplayOverlayAtClick: NSPoint,
+                                          serializedInputContext: String,
+                                          inputPosition: CGRect) {
+        contentOverlayPopover.websiteAutofillUserScript(websiteAutofillUserScript,
+                                                        willDisplayOverlayAtClick: willDisplayOverlayAtClick,
+                                                        serializedInputContext: serializedInputContext,
+                                                        inputPosition: inputPosition)
+    }
 }
 
 extension BrowserTabViewController: TabDelegate {
@@ -938,4 +991,31 @@ extension BrowserTabViewController: OnboardingDelegate {
 
 }
 
+extension BrowserTabViewController {
+
+    func addMouseMonitors() {
+        guard mouseDownMonitor == nil else { return }
+
+        self.mouseDownMonitor = NSEvent.addLocalMonitorForEvents(matching: .leftMouseDown) { [weak self] event in
+            self?.mouseDown(with: event)
+        }
+    }
+
+    func removeMouseMonitors() {
+        if let monitor = mouseDownMonitor {
+            NSEvent.removeMonitor(monitor)
+        }
+        self.mouseDownMonitor = nil
+    }
+
+    func mouseDown(with event: NSEvent) -> NSEvent? {
+        self.clickPoint = event.locationInWindow
+        guard event.window === self.view.window, let clickPoint = self.clickPoint else { return event }
+        tabViewModel?.tab.browserTabViewController(self, didClickAtPoint: clickPoint)
+        return event
+    }
+
+}
+
+// swiftlint:enable type_body_length
 // swiftlint:enable file_length

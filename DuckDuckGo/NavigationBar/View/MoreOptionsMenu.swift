@@ -128,10 +128,6 @@ final class MoreOptionsMenu: NSMenu {
     @objc func openLoginsWithCreditCards(_ sender: NSMenuItem) {
         actionDelegate?.optionsButtonMenuRequestedLoginsPopover(self, selectedCategory: .cards)
     }
-    
-    @objc func openLoginsWithNotes(_ sender: NSMenuItem) {
-        actionDelegate?.optionsButtonMenuRequestedLoginsPopover(self, selectedCategory: .notes)
-    }
 
     @objc func openPreferences(_ sender: NSMenuItem) {
         WindowControllersManager.shared.showPreferencesTab()
@@ -384,11 +380,6 @@ final class LoginsSubMenu: NSMenu {
             .targetting(target)
             .withImage(NSImage(named: "CreditCardGlyph"))
             .firingPixel(Pixel.Event.MoreResult.loginsMenuCreditCards)
-        
-        addItem(withTitle: UserText.passwordManagementNotes, action: #selector(MoreOptionsMenu.openLoginsWithNotes), keyEquivalent: "")
-            .targetting(target)
-            .withImage(NSImage(named: "NoteGlyph"))
-            .firingPixel(Pixel.Event.MoreResult.loginsMenuNotes)
     }
     
 }
