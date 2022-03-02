@@ -232,6 +232,12 @@ extension PrivacyDashboardViewController: PrivacyDashboardUserScriptDelegate {
 
     func userScript(_ userScript: PrivacyDashboardUserScript, setHeight height: Int) {
         self.preferredContentSize = CGSize(width: self.view.frame.width, height: CGFloat(height))
+        NSAnimationContext.runAnimationGroup { [weak self] context in
+            guard let self = self else { return }
+//            context.duration = 2.0
+            context.allowsImplicitAnimation = true
+            self.view.layoutSubtreeIfNeeded()
+        }
     }
 
 }

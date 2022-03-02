@@ -29,6 +29,8 @@ final class PrivacyDashboardPopover: NSPopover {
         behavior = .transient
 #endif
 
+        animates = true
+        
         setupContentController()
     }
 
@@ -45,8 +47,14 @@ final class PrivacyDashboardPopover: NSPopover {
         let storyboard = NSStoryboard(name: "PrivacyDashboard", bundle: nil)
         let controller = storyboard
             .instantiateController(withIdentifier: "PrivacyDashboardViewController") as! PrivacyDashboardViewController
-        contentViewController = controller
+        
+        let container = PrivacyDashboardContainerViewController()
+        container.addViewController(child: controller)
+        
+        contentViewController = container
     }
     // swiftlint:enable force_cast
+    
+    
 
 }
