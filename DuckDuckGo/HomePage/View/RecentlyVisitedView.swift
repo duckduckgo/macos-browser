@@ -27,28 +27,105 @@ struct RecentlyVisited: View {
     @EnvironmentObject var model: HomePage.Models.RecentlyVisitedModel
 
     var body: some View {
-        Text("Recently Visited")
 
-        ForEach(model.recentSites, id: \.domain) { site in
-            VStack {
-                Text(site.domain)
-                    .font(.headline)
-                Text(site.blockedEntityDisplayNames.joined(separator: " • "))
-                    .font(.caption)
+        VStack {
+            ProtectionSummary()
 
-                ForEach(site.pages, id: \.url) { page in
-                    HStack {
-                        Text(page.displayTitle)
-                        Text(dateFormatter.localizedString(fromTimeInterval: page.visited.timeIntervalSinceNow))
+            if #available(macOS 11, *) {
+                LazyVStack {
+                    ForEach(model.recentSites, id: \.domain) {
+                        RecentlyVisitedSite(site: $0)
                     }
-                }.padding(.leading, 16)
-
-                Divider()
+                }
+            } else {
+                VStack {
+                    ForEach(model.recentSites, id: \.domain) {
+                        RecentlyVisitedSite(site: $0)
+                    }
+                }
             }
-        }
+            
+        }.padding(.bottom, 24)
 
     }
 
 }
+
+struct RecentlyVisitedSite: View {
+
+    @ObservedObject var site: HomePage.Models.RecentlyVisitedSiteModel
+
+    @State var isHovering = false
+
+    var body: some View {
+        ZStack {
+
+            RoundedRectangle(cornerRadius: 8)
+                .fill(Color("HomePageBackgroundColor"))
+                .shadow(color: .black.opacity(0.08), radius: 8, x: 0, y: 4)
+                .shadow(color: .black.opacity(0.1), radius: 8, x: 0, y: 1)
+                .visibility(isHovering ? .visible : .gone)
+
+            HStack(alignment: .top) {
+
+                VStack(spacing: 0) {
+                    RoundedRectangle(cornerRadius: 8)
+                        .fill(.gray)
+                        .frame(width: 32, height: 32)
+
+                    Rectangle()
+                        .fill(.gray)
+                        .frame(width: 1)
+                        .frame(maxHeight: .infinity)
+                }
+
+                VStack(alignment: .leading) {
+
+                    HStack {
+                        Text(site.domain)
+                            .font(.system(size: 15, weight: .bold, design: .default))
+
+                        Spacer()
+
+                        HoverButton(imageName: "Favorite") {
+                        }
+                        .tooltip("Add to Favorites")
+
+                        HoverButton(imageName: "Burn") {
+                        }
+                        .tooltip("Burn History and Site data")
+
+                    }
+
+                    Text("Some trackers were blocked")
+                        .font(.system(size: 13))
+
+                }.padding(.bottom, 12)
+
+                Spacer()
+
+            }.padding([.leading, .trailing, .top], 12)
+
+        }
+        .onHover {
+            isHovering = $0
+        }
+        .frame(maxWidth: .infinity)
+
+    }
+
+}
+
+}
+
+extension View {
+
+    @ViewBuilder func tooltip(_ message: String) -> some View {
+        if #available(macOS 11, *) {
+            self.help(message)
+        } else {
+            self
+        }
+    }
 
 }

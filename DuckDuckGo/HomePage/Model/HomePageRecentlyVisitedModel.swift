@@ -95,7 +95,7 @@ final class RecentlyVisitedSiteModel: ObservableObject {
 
                 } else {
 
-                    // Remember we've seen this title 
+                    // Remember we've seen this title
                     pagesByTitle[actualTitle] = $0
 
                 }
@@ -103,7 +103,6 @@ final class RecentlyVisitedSiteModel: ObservableObject {
             }
         }
 
-        print("*** removing URLs", urlsToRemove)
         pages = pages.filter { !urlsToRemove.contains($0.url) }
     }
 
@@ -129,7 +128,8 @@ final class RecentlyVisitedModel: ObservableObject {
         var recentSites = [RecentlyVisitedSiteModel]()
         var sitesByDomain = [String: RecentlyVisitedSiteModel]()
 
-        history.forEach {
+        history.filter { !$0.failedToLoad }.sorted(by: { $0.lastVisit > $1.lastVisit }).forEach {
+
             numberOfTrackersBlocked += $0.numberOfTrackersBlocked
             guard let host = $0.url.host?.dropWWW() else { return }
 

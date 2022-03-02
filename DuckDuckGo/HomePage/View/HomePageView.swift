@@ -38,6 +38,7 @@ struct RootView: View {
                     .padding(.bottom, 54)
 
                     RecentlyVisited()
+                        .frame(width: 482)
 
                 }
                 .frame(maxWidth: .infinity)
