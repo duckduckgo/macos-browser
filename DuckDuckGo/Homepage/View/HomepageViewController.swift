@@ -98,10 +98,12 @@ final class HomePageViewController: NSViewController {
     }
 
     func createRecentlyVisitedModel() -> HomePage.Models.RecentlyVisitedModel {
+        assert(recentlyVisitedModel == nil)
         return .init()
     }
 
     func createDefaultBrowserModel() -> HomePage.Models.DefaultBrowserModel {
+        assert(defaultBrowserModel == nil)
         return .init(isDefault: DefaultBrowserPreferences.isDefault, wasClosed: defaultBrowserDismissed, requestSetDefault: { [weak self] in
             DefaultBrowserPreferences.becomeDefault { [weak self] in
                 self?.defaultBrowserModel.isDefault = DefaultBrowserPreferences.isDefault
@@ -115,6 +117,7 @@ final class HomePageViewController: NSViewController {
     }
 
     func createFavoritesModel() -> HomePage.Models.FavoritesModel {
+        assert(favoritesModel == nil)
         return .init(open: { [weak self] bookmark, target in
             self?.openUrl(bookmark.url, target: target)
         }, remove: { [weak self] bookmark in

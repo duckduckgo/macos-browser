@@ -17,6 +17,7 @@
 //
 
 import SwiftUI
+import Lottie
 
 extension HomePage.Views {
 
@@ -53,9 +54,12 @@ struct RecentlyVisited: View {
 
 struct RecentlyVisitedSite: View {
 
+    @EnvironmentObject var model: HomePage.Models.RecentlyVisitedModel
     @ObservedObject var site: HomePage.Models.RecentlyVisitedSiteModel
 
     @State var isHovering = false
+    @State var isBurning = false
+    @State var isHidden = false
 
     var body: some View {
         ZStack {
@@ -92,6 +96,11 @@ struct RecentlyVisitedSite: View {
                         .tooltip("Add to Favorites")
 
                         HoverButton(imageName: "Burn") {
+                            isHovering = false
+                            isBurning = true
+                            withAnimation(.default.delay(0.4)) {
+                                isHidden = true
+                            }
                         }
                         .tooltip("Burn History and Site data")
 
@@ -104,7 +113,24 @@ struct RecentlyVisitedSite: View {
 
                 Spacer()
 
-            }.padding([.leading, .trailing, .top], 12)
+            }
+            .padding([.leading, .trailing, .top], 12)
+            .visibility(isHidden ? .invisible : .visible)
+
+            FireAnimation()
+                .cornerRadius(8)
+                .visibility(isBurning ? .visible : .gone)
+                .zIndex(100)
+                .onAppear {
+                    withAnimation(.default.delay(1.0)) {
+                        isBurning = false
+                    }
+                }
+                .onDisappear {
+                    withAnimation {
+                        model.burn(site)
+                    }
+                }
 
         }
         .onHover {
@@ -112,6 +138,34 @@ struct RecentlyVisitedSite: View {
         }
         .frame(maxWidth: .infinity)
 
+    }
+
+}
+
+struct FireAnimation: NSViewRepresentable {
+
+    static let animation = Animation.named("01_Fire_really_small")
+
+    func makeNSView(context: NSViewRepresentableContext<FireAnimation>) -> NSView {
+        let view = NSView(frame: .zero)
+
+        let animationView = AnimationView()
+        animationView.animation = Self.animation
+        animationView.contentMode = .scaleAspectFill
+        animationView.loopMode = .playOnce
+        animationView.play()
+
+        animationView.translatesAutoresizingMaskIntoConstraints = false
+        view.addSubview(animationView)
+        NSLayoutConstraint.activate([
+            animationView.heightAnchor.constraint(equalTo: view.heightAnchor),
+            animationView.widthAnchor.constraint(equalTo: view.widthAnchor)
+        ])
+
+        return view
+    }
+
+    func updateNSView(_ nsView: NSViewType, context: Context) {
     }
 
 }

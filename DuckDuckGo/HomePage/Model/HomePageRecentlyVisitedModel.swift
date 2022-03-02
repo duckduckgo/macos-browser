@@ -17,8 +17,58 @@
 //
 
 import Foundation
+import SwiftUI
 
 extension HomePage.Models {
+
+final class RecentlyVisitedModel: ObservableObject {
+
+    @Published var numberOfTrackersBlocked = 0
+    @Published var numberOfWebsites = 0
+    @Published var recentSites = [RecentlyVisitedSiteModel]()
+
+    let fire = Fire()
+
+    func refreshWithHistory(_ history: [HistoryEntry]) {
+        var numberOfTrackersBlocked = 0
+
+        var recentSites = [RecentlyVisitedSiteModel]()
+        var sitesByDomain = [String: RecentlyVisitedSiteModel]()
+
+        history.filter { !$0.failedToLoad }.sorted(by: { $0.lastVisit > $1.lastVisit }).forEach {
+
+            numberOfTrackersBlocked += $0.numberOfTrackersBlocked
+            guard let host = $0.url.host?.dropWWW() else { return }
+
+            var site = sitesByDomain[host]
+            if site == nil {
+                let newSite = RecentlyVisitedSiteModel(domain: host)
+                sitesByDomain[host] = newSite
+                recentSites.append(newSite)
+                site = newSite
+            }
+
+            site?.addBlockedEntities($0.blockedTrackingEntities)
+            site?.addPage(fromHistory: $0)
+        }
+
+        recentSites.forEach {
+            $0.fixDisplayTitles()
+            $0.fixDisplayEntities()
+        }
+
+        self.numberOfTrackersBlocked = numberOfTrackersBlocked
+        self.numberOfWebsites = sitesByDomain.count
+        self.recentSites = recentSites
+    }
+
+    func burn(_ site: RecentlyVisitedSiteModel) {
+        // TODO update the numbers blocked once they decide what it should be
+        fire.burnDomains(Set<String>([site.domain]))
+        recentSites = recentSites.filter { $0.domain != site.domain }
+    }
+
+}
 
 final class RecentlyVisitedPageModel: ObservableObject {
 
@@ -112,47 +162,6 @@ final class RecentlyVisitedSiteModel: ObservableObject {
         }).map {
             contentBlocking.displayNameForEntity(named: $0)
         }
-    }
-
-}
-
-final class RecentlyVisitedModel: ObservableObject {
-
-    @Published var numberOfTrackersBlocked = 0
-    @Published var numberOfWebsites = 0
-    @Published var recentSites = [RecentlyVisitedSiteModel]()
-
-    func refreshWithHistory(_ history: [HistoryEntry]) {
-        var numberOfTrackersBlocked = 0
-
-        var recentSites = [RecentlyVisitedSiteModel]()
-        var sitesByDomain = [String: RecentlyVisitedSiteModel]()
-
-        history.filter { !$0.failedToLoad }.sorted(by: { $0.lastVisit > $1.lastVisit }).forEach {
-
-            numberOfTrackersBlocked += $0.numberOfTrackersBlocked
-            guard let host = $0.url.host?.dropWWW() else { return }
-
-            var site = sitesByDomain[host]
-            if site == nil {
-                let newSite = RecentlyVisitedSiteModel(domain: host)
-                sitesByDomain[host] = newSite
-                recentSites.append(newSite)
-                site = newSite
-            }
-
-            site?.addBlockedEntities($0.blockedTrackingEntities)
-            site?.addPage(fromHistory: $0)
-        }
-
-        recentSites.forEach {
-            $0.fixDisplayTitles()
-            $0.fixDisplayEntities()
-        }
-
-        self.numberOfTrackersBlocked = numberOfTrackersBlocked
-        self.numberOfWebsites = sitesByDomain.count
-        self.recentSites = recentSites
     }
 
 }
