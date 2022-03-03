@@ -61,7 +61,7 @@ struct RecentlyVisitedSite: View {
     @State var isHidden = false
 
     var body: some View {
-        ZStack {
+        ZStack(alignment: .top) {
 
             RoundedRectangle(cornerRadius: 8)
                 .fill(Color("HomePageBackgroundColor"))
@@ -87,44 +87,46 @@ struct RecentlyVisitedSite: View {
                         .frame(maxHeight: .infinity)
                 }
 
-                VStack(alignment: .leading) {
+                VStack(alignment: .leading, spacing: 6) {
 
-                    HStack {
-                        Text(site.domain)
-                            .font(.system(size: 15, weight: .semibold, design: .default))
-                            .foregroundColor(Color("HomeFeedItemTitleColor"))
+                    Text(site.domain)
+                        .font(.system(size: 15, weight: .semibold, design: .default))
+                        .foregroundColor(Color("HomeFeedItemTitleColor"))
 
-                        Spacer()
+                    SiteTrackerSummary(site: site)
+                        .visibility(site.numberOfTrackersBlocked > 0 ? .visible : .invisible)
 
-                        HoverButton(imageName: site.isFavorite ? "FavoriteFilled" : "Favorite") {
-                            model.toggleFavoriteSite(site)
-                        }
-                        .foregroundColor(Color("HomeFeedItemButtonTintColor"))
-                        .tooltip("Add to Favorites")
-
-                        HoverButton(imageName: "Burn") {
-                            isHovering = false
-                            isBurning = true
-                            withAnimation(.default.delay(0.4)) {
-                                isHidden = true
-                            }
-                        }
-                        .foregroundColor(Color("HomeFeedItemButtonTintColor"))
-                        .tooltip("Burn History and Site data")
-
-                    }
-
-                    if site.numberOfTrackersBlocked > 0 {
-                        SiteTrackerSummary(site: site)
-                    }
-
-                }.padding(.bottom, 12)
+                }
+                .padding([.leading, .bottom], 12)
+                .padding(.trailing, 32 + 12 + 32)
 
                 Spacer()
 
             }
             .padding([.leading, .trailing, .top], 12)
             .visibility(isHidden ? .invisible : .visible)
+
+            HStack {
+
+                Spacer()
+
+                HoverButton(imageName: site.isFavorite ? "FavoriteFilled" : "Favorite") {
+                    model.toggleFavoriteSite(site)
+                }
+                .foregroundColor(Color("HomeFeedItemButtonTintColor"))
+                .tooltip("Add to Favorites")
+
+                HoverButton(imageName: "Burn") {
+                    isHovering = false
+                    isBurning = true
+                    withAnimation(.default.delay(0.4)) {
+                        isHidden = true
+                    }
+                }
+                .foregroundColor(Color("HomeFeedItemButtonTintColor"))
+                .tooltip("Burn History and Site data")
+
+            }.padding([.top, .trailing], 12)
 
             FireAnimation()
                 .cornerRadius(8)
@@ -156,7 +158,7 @@ struct SiteTrackerSummary: View {
     @ObservedObject var site: HomePage.Models.RecentlyVisitedSiteModel
 
     var body: some View {
-        HStack {
+        HStack(spacing: 0) {
 
             // Top 3 entities
             HStack(spacing: 2) {
@@ -173,15 +175,17 @@ struct SiteTrackerSummary: View {
                     SmallCircleText(text: "+\(remainingCount)")
                 }
             }
+            .padding(.trailing, 6)
 
             // Text summary
-            if #available(macOS 11, *) {
+            if #available(macOS 12, *) {
                 Text("**\(site.numberOfTrackersBlocked)** Tracking Attempts Blocked")
                     .font(.system(size: 13))
             } else {
                 Text("\(site.numberOfTrackersBlocked)")
                     .font(.system(size: 13))
                     .fontWeight(.bold)
+                    .padding(.trailing, 2)
                 Text(" Tracking Attempts Blocked")
                     .font(.system(size: 13))
             }
