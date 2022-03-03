@@ -72,12 +72,17 @@ struct RecentlyVisitedSite: View {
             HStack(alignment: .top) {
 
                 VStack(spacing: 0) {
-                    RoundedRectangle(cornerRadius: 8)
-                        .fill(.gray)
-                        .frame(width: 32, height: 32)
+                    ZStack {
+                        RoundedRectangle(cornerRadius: 8)
+                            .fill(Color("HomeFeedItemVerticalConnectorColor"))
+
+                        FaviconView(domain: site.domain, size: 22)
+
+                    }
+                    .frame(width: 32, height: 32)
 
                     Rectangle()
-                        .fill(.gray)
+                        .fill(Color("HomeFeedItemVerticalConnectorColor"))
                         .frame(width: 1)
                         .frame(maxHeight: .infinity)
                 }

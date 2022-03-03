@@ -26,11 +26,12 @@ struct FireAnimation: NSViewRepresentable {
     func makeNSView(context: NSViewRepresentableContext<FireAnimation>) -> NSView {
         let view = NSView(frame: .zero)
 
-        let animationView = AnimationView()
-        animationView.animation = Self.animation
+        let animationView = AnimationView(animation: Self.animation)
         animationView.contentMode = .scaleAspectFill
         animationView.loopMode = .playOnce
-        animationView.play()
+        animationView.play { _ in
+            animationView.removeFromSuperview()
+        }
 
         animationView.translatesAutoresizingMaskIntoConstraints = false
         view.addSubview(animationView)
