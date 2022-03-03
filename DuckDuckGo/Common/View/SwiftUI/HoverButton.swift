@@ -28,7 +28,7 @@ struct HoverButton: View {
 
     @State var isHovering = false
 
-    init(size: CGFloat = 32, backgroundColor: Color = Color.clear, imageName: String, imageSize: CGFloat? = nil, action: @escaping () -> Void) {
+    init(size: CGFloat = 32, backgroundColor: Color = Color.clear, imageName: String, imageSize: CGFloat = 16, action: @escaping () -> Void) {
         self.size = size
         self.backgroundColor = backgroundColor
         self.imageName = imageName
@@ -41,6 +41,7 @@ struct HoverButton: View {
             Group {
                 if NSImage(named: imageName) != nil {
                     Image(imageName)
+                        .resizable()
                 } else if #available(macOS 11, *) {
                     Image(systemName: imageName)
                         .resizable()

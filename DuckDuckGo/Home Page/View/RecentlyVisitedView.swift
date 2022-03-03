@@ -83,6 +83,7 @@ struct RecentlyVisitedSite: View {
                         .visibility(site.numberOfTrackersBlocked > 0 ? .visible : .gone)
 
                     RecentlyVisitedPageList(site: site)
+                        .visibility(isHovering ? .visible : .invisible)
 
                 }
                 .padding([.leading, .bottom], 12)
@@ -144,6 +145,8 @@ struct RecentlyVisitedSite: View {
 
 struct RecentlyVisitedPageList: View {
 
+    let collapsedPageCount = 2
+
     let formatter: RelativeDateTimeFormatter = {
         let f = RelativeDateTimeFormatter()
         f.unitsStyle = .abbreviated
@@ -152,9 +155,15 @@ struct RecentlyVisitedPageList: View {
 
     @ObservedObject var site: HomePage.Models.RecentlyVisitedSiteModel
 
+    @State var isExpanded = false
+
+    var visiblePages: [HomePage.Models.RecentlyVisitedPageModel] {
+        isExpanded ? site.pages : [HomePage.Models.RecentlyVisitedPageModel](site.pages.prefix(collapsedPageCount))
+    }
+
     var body: some View {
         VStack(alignment: .leading, spacing: 9) {
-            ForEach(site.pages, id: \.url) { page in
+            ForEach(visiblePages, id: \.url) { page in
                 HStack {
 
                     Text(page.displayTitle)
@@ -166,6 +175,14 @@ struct RecentlyVisitedPageList: View {
                     Text(formatter.localizedString(fromTimeInterval: page.visited.timeIntervalSinceNow))
                         .font(.system(size: 11))
                         .foregroundColor(Color("HomeFeedItemTimeTextColor"))
+
+                    if page.url == visiblePages.last?.url && site.pages.count > collapsedPageCount {
+                        HoverButton(imageName: "HomeArrowDown") {
+                            withAnimation {
+                                isExpanded.toggle()
+                            }
+                        }.rotationEffect(.degrees(isExpanded ? 180 : 0))
+                    }
 
                     Spacer()
                 }.frame(maxHeight: 13)
