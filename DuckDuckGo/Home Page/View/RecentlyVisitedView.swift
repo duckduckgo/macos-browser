@@ -86,7 +86,6 @@ struct RecentlyVisitedSite: View {
 
                 }
                 .padding([.leading, .bottom], 12)
-                .padding(.trailing, 32 + 12 + 32)
 
                 Spacer()
 
@@ -102,7 +101,7 @@ struct RecentlyVisitedSite: View {
                     model.toggleFavoriteSite(site)
                 }
                 .foregroundColor(Color("HomeFeedItemButtonTintColor"))
-                .tooltip("Add to Favorites")
+                .tooltip(UserText.tooltipAddToFavorites)
 
                 HoverButton(imageName: "Burn") {
                     isHovering = false
@@ -112,7 +111,7 @@ struct RecentlyVisitedSite: View {
                     }
                 }
                 .foregroundColor(Color("HomeFeedItemButtonTintColor"))
-                .tooltip("Burn History and Site data")
+                .tooltip(UserText.tooltipBurn)
 
             }
             .padding([.top, .trailing], 12)
@@ -226,17 +225,8 @@ struct SiteTrackerSummary: View {
             .padding(.trailing, 6)
 
             // Text summary
-            if #available(macOS 12, *) {
-                Text("**\(site.numberOfTrackersBlocked)** Tracking Attempts Blocked")
-                    .font(.system(size: 13))
-            } else {
-                Text("\(site.numberOfTrackersBlocked)")
-                    .font(.system(size: 13))
-                    .fontWeight(.bold)
-                    .padding(.trailing, 2)
-                Text(" Tracking Attempts Blocked")
-                    .font(.system(size: 13))
-            }
+            Text(UserText.pageTrackersMessage(numberOfTrackersBlocked: site.numberOfTrackersBlocked))
+                .font(.system(size: 13))
 
             Spacer()
         }

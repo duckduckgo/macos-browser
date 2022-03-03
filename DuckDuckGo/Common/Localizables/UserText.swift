@@ -419,10 +419,20 @@ struct UserText {
     static let homePageProtectionSummaryInfo = NSLocalizedString("home.page.protection.summary.info", value: "DuckDuckGo blocks trackers as you browse", comment: "")
     static func homePageProtectionSummaryMessage(numberOfTrackersBlocked: Int) -> String {
         let localized = NSLocalizedString("home.page.protection.summary.info",
-                                          value: "%d Trackers Blocked in the past 7 days",
+                                          value: "%d Tracking attempts blocked in the past 7 days",
                                           comment: "")
         return String(format: localized, numberOfTrackersBlocked)
     }
+
+    static func pageTrackersMessage(numberOfTrackersBlocked: Int) -> String {
+        let localized = NSLocalizedString("page.trackers.message",
+                                          value: "%d Tracking attempts blocked",
+                                          comment: "")
+        return String(format: localized, numberOfTrackersBlocked)
+    }
+
+    static let tooltipAddToFavorites = NSLocalizedString("tooltip.addToFavorites", value: "Add to Favorites", comment: "Tooltip for add to favorites button")
+    static let tooltipBurn = NSLocalizedString("tooltip.burn", value: "Burn History and Site Data", comment: "Tooltip for burn button")
     
     static let autoconsentPopoverMessage = NSLocalizedString("Cookie consent pop-up managed", comment: "Popover message")
     static let autoconsentPopupTitle = NSLocalizedString("Let DuckDuckGo try to manage cookie consent pop-ups?", comment: "messageText")
