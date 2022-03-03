@@ -61,8 +61,6 @@ struct RecentlyVisitedSite: View {
     @State var isBurning = false
     @State var isHidden = false
 
-    @State var isFavorite = false
-
     var body: some View {
         ZStack {
 
@@ -89,12 +87,13 @@ struct RecentlyVisitedSite: View {
 
                     HStack {
                         Text(site.domain)
-                            .font(.system(size: 15, weight: .bold, design: .default))
+                            .font(.system(size: 15, weight: .semibold, design: .default))
+                            .foregroundColor(Color("HomeFeedItemTitleColor"))
 
                         Spacer()
 
-                        HoverButton(imageName: isFavorite ? "FavoriteFilled" : "Favorite") {
-                            isFavorite = model.toggleFavoriteSite(site)
+                        HoverButton(imageName: site.isFavorite ? "FavoriteFilled" : "Favorite") {
+                            model.toggleFavoriteSite(site)
                         }
                         .tooltip("Add to Favorites")
 
@@ -139,9 +138,6 @@ struct RecentlyVisitedSite: View {
         .onHover {
             isHovering = $0
         }
-        .onAppear(perform: {
-            isFavorite = model.isFavoriteSite(site)
-        })
         .frame(maxWidth: .infinity)
 
     }
