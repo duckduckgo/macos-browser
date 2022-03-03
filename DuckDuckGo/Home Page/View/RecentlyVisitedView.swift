@@ -73,7 +73,7 @@ struct RecentlyVisitedSite: View {
 
                 VStack(spacing: 0) {
                     ZStack {
-                        RoundedRectangle(cornerRadius: 8)
+                        RoundedRectangle(cornerRadius: 6)
                             .fill(Color("HomeFeedItemVerticalConnectorColor"))
 
                         FaviconView(domain: site.domain, size: 22)
