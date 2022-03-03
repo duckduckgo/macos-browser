@@ -80,7 +80,7 @@ struct RecentlyVisitedSite: View {
                         .foregroundColor(Color("HomeFeedItemTitleColor"))
 
                     SiteTrackerSummary(site: site)
-                        .visibility(site.numberOfTrackersBlocked > 0 ? .visible : .invisible)
+                        .visibility(site.numberOfTrackersBlocked > 0 ? .visible : .gone)
 
                     RecentlyVisitedPageList(site: site)
 
