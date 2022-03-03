@@ -182,18 +182,9 @@ final class MainViewController: NSViewController {
     }
 
     private func subscribeToTabContent() {
-        var sameTab = false
         tabCollectionViewModel.selectedTabViewModel?.tab.$content.receive(on: DispatchQueue.main).sink(receiveValue: { [weak self] content in
-            let showUrl: Bool
-            if case .url = content {
-                showUrl = true
-            } else {
-                showUrl = false
-            }
-
-            self?.resizeNavigationBarForHomePage(content == .homePage, animated: showUrl && sameTab)
-
-            sameTab = true
+            // Animations disabled for time being (maybe forever)
+            self?.resizeNavigationBarForHomePage(content == .homePage, animated: false)
         }).store(in: &self.navigationalCancellables)
     }
 
