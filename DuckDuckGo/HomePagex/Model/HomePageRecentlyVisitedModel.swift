@@ -63,7 +63,7 @@ final class RecentlyVisitedModel: ObservableObject {
     }
 
     func burn(_ site: RecentlyVisitedSiteModel) {
-        // TODO update the numbers blocked once they decide what it should be
+        // BRINDY update the numbers blocked once they decide what it should be
         fire.burnDomains(Set<String>([site.domain]))
         recentSites = recentSites.filter { $0.domain != site.domain }
     }
