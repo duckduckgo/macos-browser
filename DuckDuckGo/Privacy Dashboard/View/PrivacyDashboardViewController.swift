@@ -24,6 +24,7 @@ import BrowserServicesKit
 final class PrivacyDashboardViewController: NSViewController {
 
     @IBOutlet var webView: WKWebView!
+    private var contentHeightConstraint: NSLayoutConstraint!
     private let privacyDashboardScript = PrivacyDashboardUserScript()
     private var cancellables = Set<AnyCancellable>()
     @Published var pendingUpdates = [String: String]()
@@ -88,6 +89,9 @@ final class PrivacyDashboardViewController: NSViewController {
         webView.navigationDelegate = self
         self.webView = webView
         view.addAndLayout(webView)
+        
+        contentHeightConstraint = view.heightAnchor.constraint(equalToConstant: 550)
+        contentHeightConstraint.isActive = true
     }
 
     private func subscribeToPermissions() {
@@ -231,7 +235,11 @@ extension PrivacyDashboardViewController: PrivacyDashboardUserScriptDelegate {
     }
 
     func userScript(_ userScript: PrivacyDashboardUserScript, setHeight height: Int) {
-        self.preferredContentSize = CGSize(width: self.view.frame.width, height: CGFloat(height))
+        NSAnimationContext.runAnimationGroup { [weak self] context in
+            context.duration = 1/3
+            context.timingFunction = CAMediaTimingFunction(name: .easeInEaseOut)
+            self?.contentHeightConstraint.animator().constant = CGFloat(height)
+        }
     }
 
 }
