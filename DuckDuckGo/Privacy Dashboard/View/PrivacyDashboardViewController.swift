@@ -22,6 +22,10 @@ import Combine
 import BrowserServicesKit
 
 final class PrivacyDashboardViewController: NSViewController {
+    
+    struct Constants {
+        static let initialContentHeight: CGFloat = 550
+    }
 
     @IBOutlet var webView: WKWebView!
     private var contentHeightConstraint: NSLayoutConstraint!
@@ -90,7 +94,7 @@ final class PrivacyDashboardViewController: NSViewController {
         self.webView = webView
         view.addAndLayout(webView)
         
-        contentHeightConstraint = view.heightAnchor.constraint(equalToConstant: 550)
+        contentHeightConstraint = view.heightAnchor.constraint(equalToConstant: Constants.initialContentHeight)
         contentHeightConstraint.isActive = true
     }
 
