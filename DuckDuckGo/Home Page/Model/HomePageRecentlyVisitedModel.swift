@@ -68,6 +68,25 @@ final class RecentlyVisitedModel: ObservableObject {
         recentSites = recentSites.filter { $0.domain != site.domain }
     }
 
+    func isFavoriteSite(_ site: RecentlyVisitedSiteModel, bookmarkManager: BookmarkManager = LocalBookmarkManager.shared) -> Bool {
+        if let url = site.domain.url {
+            return bookmarkManager.isUrlFavorited(url: url)
+        }
+        return false
+    }
+
+    func toggleFavoriteSite(_ site: RecentlyVisitedSiteModel, bookmarkManager: BookmarkManager = LocalBookmarkManager.shared) -> Bool {
+        guard let url = site.domain.url else { return false }
+        if let bookmark = bookmarkManager.getBookmark(for: url) {
+            bookmark.isFavorite.toggle()
+            bookmarkManager.update(bookmark: bookmark)
+            return bookmark.isFavorite
+        } else {
+            bookmarkManager.makeBookmark(for: url, title: site.domain.dropWWW(), isFavorite: true)
+            return true
+        }
+    }
+
 }
 
 final class RecentlyVisitedPageModel: ObservableObject {

@@ -61,6 +61,8 @@ struct RecentlyVisitedSite: View {
     @State var isBurning = false
     @State var isHidden = false
 
+    @State var isFavorite = false
+
     var body: some View {
         ZStack {
 
@@ -91,7 +93,8 @@ struct RecentlyVisitedSite: View {
 
                         Spacer()
 
-                        HoverButton(imageName: "Favorite") {
+                        HoverButton(imageName: isFavorite ? "FavoriteFilled" : "Favorite") {
+                            isFavorite = model.toggleFavoriteSite(site)
                         }
                         .tooltip("Add to Favorites")
 
@@ -136,6 +139,9 @@ struct RecentlyVisitedSite: View {
         .onHover {
             isHovering = $0
         }
+        .onAppear(perform: {
+            isFavorite = model.isFavoriteSite(site)
+        })
         .frame(maxWidth: .infinity)
 
     }
