@@ -419,7 +419,7 @@ struct UserText {
     static let homePageProtectionSummaryInfo = NSLocalizedString("home.page.protection.summary.info", value: "DuckDuckGo blocks trackers as you browse", comment: "")
     static func homePageProtectionSummaryMessage(numberOfTrackersBlocked: Int) -> String {
         let localized = NSLocalizedString("home.page.protection.summary.info",
-                                          value: "%d Trackers Blocked in the last week",
+                                          value: "%d Trackers Blocked in the past 7 days",
                                           comment: "")
         return String(format: localized, numberOfTrackersBlocked)
     }

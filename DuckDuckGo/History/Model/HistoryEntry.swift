@@ -32,7 +32,7 @@ struct HistoryEntry {
 
     mutating func addVisit() {
         numberOfVisits += 1
-        lastVisit = Date()
+        lastVisit = Date.startOfMinuteNow
     }
 
     mutating func addBlockedTracker(entityName: String) {
@@ -51,7 +51,7 @@ extension HistoryEntry {
                   url: url,
                   title: nil,
                   numberOfVisits: 0,
-                  lastVisit: Date(),
+                  lastVisit: Date.startOfMinuteNow,
                   failedToLoad: false,
                   numberOfTrackersBlocked: 0,
                   blockedTrackingEntities: Set<String>())

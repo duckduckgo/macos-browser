@@ -71,23 +71,9 @@ struct RecentlyVisitedSite: View {
 
             HStack(alignment: .top) {
 
-                VStack(spacing: 0) {
-                    ZStack {
-                        RoundedRectangle(cornerRadius: 6)
-                            .fill(Color("HomeFeedItemVerticalConnectorColor"))
+                SiteIcon(site: site)
 
-                        FaviconView(domain: site.domain, size: 22)
-
-                    }
-                    .frame(width: 32, height: 32)
-
-                    Rectangle()
-                        .fill(Color("HomeFeedItemVerticalConnectorColor"))
-                        .frame(width: 1)
-                        .frame(maxHeight: .infinity)
-                }
-
-                VStack(alignment: .leading, spacing: 6) {
+                VStack(alignment: .leading, spacing: 12) {
 
                     Text(site.domain)
                         .font(.system(size: 15, weight: .semibold, design: .default))
@@ -95,6 +81,8 @@ struct RecentlyVisitedSite: View {
 
                     SiteTrackerSummary(site: site)
                         .visibility(site.numberOfTrackersBlocked > 0 ? .visible : .invisible)
+
+                    RecentlyVisitedPageList(site: site)
 
                 }
                 .padding([.leading, .bottom], 12)
@@ -151,6 +139,64 @@ struct RecentlyVisitedSite: View {
         }
         .frame(maxWidth: .infinity)
 
+    }
+
+}
+
+struct RecentlyVisitedPageList: View {
+
+    let formatter: RelativeDateTimeFormatter = {
+        let f = RelativeDateTimeFormatter()
+        f.unitsStyle = .abbreviated
+        return f
+    } ()
+
+    @ObservedObject var site: HomePage.Models.RecentlyVisitedSiteModel
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: 9) {
+            ForEach(site.pages, id: \.url) { page in
+                HStack {
+
+                    Text(page.displayTitle)
+                        .font(.system(size: 11))
+                        .lineLimit(1)
+                        .truncationMode(.middle)
+                        .foregroundColor(Color("HomeFeedItemPageTextColor"))
+
+                    Text(formatter.localizedString(fromTimeInterval: page.visited.timeIntervalSinceNow))
+                        .font(.system(size: 11))
+                        .foregroundColor(Color("HomeFeedItemTimeTextColor"))
+
+                    Spacer()
+                }.frame(maxHeight: 13)
+
+            }
+        }
+    }
+
+}
+
+struct SiteIcon: View {
+
+    var site: HomePage.Models.RecentlyVisitedSiteModel
+
+    var body: some View {
+        VStack(spacing: 0) {
+            ZStack {
+                RoundedRectangle(cornerRadius: 6)
+                    .fill(Color("HomeFeedItemVerticalConnectorColor"))
+
+                FaviconView(domain: site.domain, size: 22)
+
+            }
+            .frame(width: 32, height: 32)
+
+            Rectangle()
+                .fill(Color("HomeFeedItemVerticalConnectorColor"))
+                .frame(width: 1)
+                .frame(maxHeight: .infinity)
+        }
     }
 
 }

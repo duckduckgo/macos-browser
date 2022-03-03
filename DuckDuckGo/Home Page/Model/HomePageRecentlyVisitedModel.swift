@@ -34,9 +34,12 @@ final class RecentlyVisitedModel: ObservableObject {
         var recentSites = [RecentlyVisitedSiteModel]()
         var sitesByDomain = [String: RecentlyVisitedSiteModel]()
 
-        history.filter { !$0.failedToLoad }.sorted(by: { $0.lastVisit > $1.lastVisit }).forEach {
+        let aWeekAgo = Date.weekAgo
 
-            // BRINDY if last visit was within the last 7 days
+        history.filter { !$0.failedToLoad && $0.lastVisit > aWeekAgo }
+            .sorted(by: { $0.lastVisit > $1.lastVisit })
+            .forEach {
+
             numberOfTrackersBlocked += $0.numberOfTrackersBlocked
             guard let host = $0.url.host?.dropWWW() else { return }
 
@@ -120,21 +123,30 @@ final class RecentlyVisitedSiteModel: ObservableObject {
         blockedEntities = [String](Set<String>(blockedEntities).union(entities))
     }
 
-    func addPage(fromHistory history: HistoryEntry, bookmarkManager: BookmarkManager = LocalBookmarkManager.shared) {
-        numberOfTrackersBlocked += history.numberOfTrackersBlocked
-        if !history.url.isRoot {
-            pages.append(RecentlyVisitedPageModel(actualTitle: history.title, url: history.url, visited: history.lastVisit))
-        }
+    func addPage(fromHistory entry: HistoryEntry, bookmarkManager: BookmarkManager = LocalBookmarkManager.shared) {
+        numberOfTrackersBlocked += entry.numberOfTrackersBlocked
+
+        // Skip root URLs and non-search DDG urls
+        guard !entry.url.isRoot || (entry.url.isDuckDuckGo && !entry.url.isDuckDuckGoSearch) else { return  }
+
+        pages.append(RecentlyVisitedPageModel(actualTitle: entry.title, url: entry.url, visited: entry.lastVisit))
+
     }
 
     func fixDisplayTitles() {
         var pagesByTitle = [String: RecentlyVisitedPageModel]()
+        var searches = Set<String>()
         var urlsToRemove = [URL]()
 
         pages.forEach {
-            if $0.url.isRoot { // Don't show root pages
 
-                urlsToRemove.append($0.url)
+            if $0.url.isDuckDuckGoSearch {
+
+                if searches.insert($0.url.searchQuery ?? "?").inserted {
+                    $0.displayTitle = $0.url.searchQuery ?? "?"
+                } else {
+                    urlsToRemove.append($0.url)
+                }
 
             } else if $0.actualTitle == nil || $0.actualTitle?.trimWhitespace().isEmpty == true { // Blank titles
 
@@ -142,24 +154,13 @@ final class RecentlyVisitedSiteModel: ObservableObject {
 
             } else if let actualTitle = $0.actualTitle {
 
-                if $0.url.isDuckDuckGoSearch {
-                    $0.displayTitle = $0.url.searchQuery ?? actualTitle
-                }
-
-                if let previousPageWithTitle = pagesByTitle[actualTitle] { // Duplicate titles
-                    // This is a duplicate title.  If it's a search, remove the duplicate, otherwise make the display title unique
-                    if $0.url.isDuckDuckGoSearch {
-                        urlsToRemove.append($0.url)
-                    } else {
-                        $0.displayTitle = $0.url.path
-                        previousPageWithTitle.displayTitle = $0.url.path
-                    }
-
+                if let previousPageWithTitle = pagesByTitle[actualTitle] { 
+                    // This is a duplicate title so make it unique using the path
+                    $0.displayTitle = $0.url.path
+                    previousPageWithTitle.displayTitle = $0.url.path
                 } else {
-
                     // Remember we've seen this title
                     pagesByTitle[actualTitle] = $0
-
                 }
 
             }
