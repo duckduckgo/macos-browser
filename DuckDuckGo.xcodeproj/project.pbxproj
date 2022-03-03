@@ -308,6 +308,7 @@
 		85B7184E27677CBB00B4277F /* RootView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 85B7184D27677CBB00B4277F /* RootView.swift */; };
 		85C48CCC278D808F00D3263E /* NSAttributedStringExtension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 85C48CCB278D808F00D3263E /* NSAttributedStringExtension.swift */; };
 		85C48CD127908C1000D3263E /* BrowserImportMoreInfoViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 85C48CD027908C1000D3263E /* BrowserImportMoreInfoViewController.swift */; };
+		85C5991B27D10CF000E605B2 /* FireAnimationView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 85C5991A27D10CF000E605B2 /* FireAnimationView.swift */; };
 		85C6A29625CC1FFD00EEB5F1 /* UserDefaultsWrapper.swift in Sources */ = {isa = PBXBuildFile; fileRef = 85C6A29525CC1FFD00EEB5F1 /* UserDefaultsWrapper.swift */; };
 		85CC1D7B26A05ECF0062F04E /* PasswordManagementItemListModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 85CC1D7A26A05ECF0062F04E /* PasswordManagementItemListModel.swift */; };
 		85CC1D7D26A05F250062F04E /* PasswordManagementItemModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 85CC1D7C26A05F250062F04E /* PasswordManagementItemModel.swift */; };
@@ -1042,6 +1043,7 @@
 		85B7184D27677CBB00B4277F /* RootView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RootView.swift; sourceTree = "<group>"; };
 		85C48CCB278D808F00D3263E /* NSAttributedStringExtension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NSAttributedStringExtension.swift; sourceTree = "<group>"; };
 		85C48CD027908C1000D3263E /* BrowserImportMoreInfoViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BrowserImportMoreInfoViewController.swift; sourceTree = "<group>"; };
+		85C5991A27D10CF000E605B2 /* FireAnimationView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FireAnimationView.swift; sourceTree = "<group>"; };
 		85C6A29525CC1FFD00EEB5F1 /* UserDefaultsWrapper.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UserDefaultsWrapper.swift; sourceTree = "<group>"; };
 		85CC1D7A26A05ECF0062F04E /* PasswordManagementItemListModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PasswordManagementItemListModel.swift; sourceTree = "<group>"; };
 		85CC1D7C26A05F250062F04E /* PasswordManagementItemModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PasswordManagementItemModel.swift; sourceTree = "<group>"; };
@@ -2196,10 +2198,11 @@
 				85589E8A27BBBADC0038AD11 /* ColorExtensions.swift */,
 				85589E9527BFE25D0038AD11 /* FailedAssertionView.swift */,
 				85589E9927BFE3C30038AD11 /* FaviconView.swift */,
+				85C5991A27D10CF000E605B2 /* FireAnimationView.swift */,
 				85589E9727BFE2DA0038AD11 /* HoverButton.swift */,
 				4BE65484271FCD7B008D1D63 /* LoginFaviconView.swift */,
-				85707F2D276A394C00DC0649 /* ViewExtensions.swift */,
 				85589E9F27BFE60E0038AD11 /* MoreOrLessView.swift */,
+				85707F2D276A394C00DC0649 /* ViewExtensions.swift */,
 			);
 			path = SwiftUI;
 			sourceTree = "<group>";
@@ -4371,6 +4374,7 @@
 				B684592F25C93FBF00DC17B6 /* AppStateRestorationManager.swift in Sources */,
 				EA0BA3A9272217E6002A0B6C /* ClickToLoadUserScript.swift in Sources */,
 				AAA892EA250A4CEF005B37B2 /* WindowControllersManager.swift in Sources */,
+				85C5991B27D10CF000E605B2 /* FireAnimationView.swift in Sources */,
 				AA6197C4276B314D008396F0 /* FaviconUrlReference.swift in Sources */,
 				AAC5E4C825D6A6E8007F5990 /* BookmarkPopoverViewController.swift in Sources */,
 				85CC1D7B26A05ECF0062F04E /* PasswordManagementItemListModel.swift in Sources */,

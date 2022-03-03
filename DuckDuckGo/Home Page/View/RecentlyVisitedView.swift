@@ -17,7 +17,6 @@
 //
 
 import SwiftUI
-import Lottie
 
 extension HomePage.Views {
 
@@ -95,6 +94,7 @@ struct RecentlyVisitedSite: View {
                         HoverButton(imageName: site.isFavorite ? "FavoriteFilled" : "Favorite") {
                             model.toggleFavoriteSite(site)
                         }
+                        .foregroundColor(Color("HomeFeedItemButtonTintColor"))
                         .tooltip("Add to Favorites")
 
                         HoverButton(imageName: "Burn") {
@@ -104,12 +104,14 @@ struct RecentlyVisitedSite: View {
                                 isHidden = true
                             }
                         }
+                        .foregroundColor(Color("HomeFeedItemButtonTintColor"))
                         .tooltip("Burn History and Site data")
 
                     }
 
-                    Text("Some trackers were blocked")
-                        .font(.system(size: 13))
+                    if site.numberOfTrackersBlocked > 0 {
+                        SiteTrackerSummary(site: site)
+                    }
 
                 }.padding(.bottom, 12)
 
@@ -144,32 +146,101 @@ struct RecentlyVisitedSite: View {
 
 }
 
-struct FireAnimation: NSViewRepresentable {
+struct SiteTrackerSummary: View {
 
-    static let animation = Animation.named("01_Fire_really_small")
+    @ObservedObject var site: HomePage.Models.RecentlyVisitedSiteModel
 
-    func makeNSView(context: NSViewRepresentableContext<FireAnimation>) -> NSView {
-        let view = NSView(frame: .zero)
+    var body: some View {
+        HStack {
 
-        let animationView = AnimationView()
-        animationView.animation = Self.animation
-        animationView.contentMode = .scaleAspectFill
-        animationView.loopMode = .playOnce
-        animationView.play()
+            // Top 3 entities
+            HStack(spacing: 2) {
+                ForEach(site.blockedEntities.prefix(3), id: \.self) {
+                    EntityIcon(imageName: site.entityImageName($0), displayName: site.entityDisplayName($0))
+                }
 
-        animationView.translatesAutoresizingMaskIntoConstraints = false
-        view.addSubview(animationView)
-        NSLayoutConstraint.activate([
-            animationView.heightAnchor.constraint(equalTo: view.heightAnchor),
-            animationView.widthAnchor.constraint(equalTo: view.widthAnchor)
-        ])
+                // Count of other entities, if any
+                let remainingCount = site.blockedEntities.count - 3
+                if remainingCount > 9 {
+                    SmallCircleText(text: "++")
+                        .tooltip("+\(remainingCount)")
+                } else if remainingCount > 0 {
+                    SmallCircleText(text: "+\(remainingCount)")
+                }
+            }
 
-        return view
+            // Text summary
+            if #available(macOS 11, *) {
+                Text("**\(site.numberOfTrackersBlocked)** Tracking Attempts Blocked")
+                    .font(.system(size: 13))
+            } else {
+                Text("\(site.numberOfTrackersBlocked)")
+                    .font(.system(size: 13))
+                    .fontWeight(.bold)
+                Text(" Tracking Attempts Blocked")
+                    .font(.system(size: 13))
+            }
+
+            Spacer()
+        }
     }
 
-    func updateNSView(_ nsView: NSViewType, context: Context) {
+}
+
+struct EntityIcon: View {
+
+    let size: CGFloat = 18
+
+    var imageName: String
+    var displayName: String
+
+    var body: some View {
+
+        Group {
+
+            if let image = NSImage(named: "feed-" + imageName) {
+                Image(nsImage: image)
+                    .resizable()
+                    .aspectRatio(contentMode: .fit)
+                    .tooltip(displayName)
+
+            } else {
+
+                SmallCircleText(text: String(displayName.first ?? "?"))
+                    .tooltip(displayName)
+
+            }
+
+        }.frame(width: size, height: size, alignment: .center)
+
     }
 
+}
+
+struct SmallCircleText: View {
+
+    let text: String
+    let backgroundColor: Color
+    let textColor: Color
+
+    init(text: String, backgroundColor: Color = Color("HomeEntityIconBackgroundColor"), textColor: Color = Color("HomeEntityIconTextColor")) {
+        self.text = text
+        self.backgroundColor = backgroundColor
+        self.textColor = textColor
+    }
+
+    var body: some View {
+        ZStack {
+
+            Circle()
+                .foregroundColor(backgroundColor)
+
+            Text(String(text))
+                .foregroundColor(textColor)
+                .font(.system(size: 10, weight: .bold, design: .default))
+
+        }.frame(width: 18, height: 18, alignment: .center)
+    }
 }
 
 }

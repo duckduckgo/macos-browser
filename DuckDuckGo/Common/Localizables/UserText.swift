@@ -417,11 +417,11 @@ struct UserText {
     static let defaultBrowserPromptButton = NSLocalizedString("default.browser.prompt.button", value: "Set Default Browser...", comment: "")
 
     static let homePageProtectionSummaryInfo = NSLocalizedString("home.page.protection.summary.info", value: "DuckDuckGo blocks trackers as you browse", comment: "")
-    static func homePageProtectionSummaryMessage(numberOfTrackersBlocked: Int, numberOfWebsites: Int) -> String {
+    static func homePageProtectionSummaryMessage(numberOfTrackersBlocked: Int) -> String {
         let localized = NSLocalizedString("home.page.protection.summary.info",
-                                          value: "%d Trackers Blocked across %d websites since last Burn",
+                                          value: "%d Trackers Blocked in the last week",
                                           comment: "")
-        return String(format: localized, numberOfTrackersBlocked, numberOfWebsites)
+        return String(format: localized, numberOfTrackersBlocked)
     }
     
     static let autoconsentPopoverMessage = NSLocalizedString("Cookie consent pop-up managed", comment: "Popover message")

@@ -29,8 +29,7 @@ struct ProtectionSummary: View {
             Image("HomeShield")
 
             if model.numberOfTrackersBlocked > 0 {
-                Text(UserText.homePageProtectionSummaryMessage(numberOfTrackersBlocked: model.numberOfTrackersBlocked,
-                                                               numberOfWebsites: model.numberOfWebsites))
+                Text(UserText.homePageProtectionSummaryMessage(numberOfTrackersBlocked: model.numberOfTrackersBlocked))
                     .fontWeight(.semibold)
             } else {
                 Text(UserText.homePageProtectionSummaryInfo)

@@ -24,7 +24,6 @@ extension HomePage.Models {
 final class RecentlyVisitedModel: ObservableObject {
 
     @Published var numberOfTrackersBlocked = 0
-    @Published var numberOfWebsites = 0
     @Published var recentSites = [RecentlyVisitedSiteModel]()
 
     let fire = Fire()
@@ -37,6 +36,7 @@ final class RecentlyVisitedModel: ObservableObject {
 
         history.filter { !$0.failedToLoad }.sorted(by: { $0.lastVisit > $1.lastVisit }).forEach {
 
+            // BRINDY if last visit was within the last 7 days
             numberOfTrackersBlocked += $0.numberOfTrackersBlocked
             guard let host = $0.url.host?.dropWWW() else { return }
 
@@ -54,11 +54,10 @@ final class RecentlyVisitedModel: ObservableObject {
 
         recentSites.forEach {
             $0.fixDisplayTitles()
-            $0.fixDisplayEntities()
+            $0.fixEntities()
         }
 
         self.numberOfTrackersBlocked = numberOfTrackersBlocked
-        self.numberOfWebsites = sitesByDomain.count
         self.recentSites = recentSites
     }
 
@@ -103,11 +102,10 @@ final class RecentlyVisitedSiteModel: ObservableObject {
 
     let domain: String
 
-    var blockedEntities = Set<String>()
-
     @Published var isFavorite: Bool
-    @Published var blockedEntityDisplayNames = [String]()
+    @Published var blockedEntities = [String]()
     @Published var pages = [RecentlyVisitedPageModel]()
+    @Published var numberOfTrackersBlocked = 0
 
     init(domain: String, bookmarkManager: BookmarkManager = LocalBookmarkManager.shared) {
         self.domain = domain
@@ -119,12 +117,14 @@ final class RecentlyVisitedSiteModel: ObservableObject {
     }
 
     func addBlockedEntities(_ entities: Set<String>) {
-        blockedEntities = blockedEntities.union(entities)
+        blockedEntities = [String](Set<String>(blockedEntities).union(entities))
     }
 
     func addPage(fromHistory history: HistoryEntry, bookmarkManager: BookmarkManager = LocalBookmarkManager.shared) {
-        guard !history.url.isRoot else { return }
-        pages.append(RecentlyVisitedPageModel(actualTitle: history.title, url: history.url, visited: history.lastVisit))
+        numberOfTrackersBlocked += history.numberOfTrackersBlocked
+        if !history.url.isRoot {
+            pages.append(RecentlyVisitedPageModel(actualTitle: history.title, url: history.url, visited: history.lastVisit))
+        }
     }
 
     func fixDisplayTitles() {
@@ -168,12 +168,18 @@ final class RecentlyVisitedSiteModel: ObservableObject {
         pages = pages.filter { !urlsToRemove.contains($0.url) }
     }
 
-    func fixDisplayEntities(_ contentBlocking: ContentBlocking = ContentBlocking.shared) {
-        blockedEntityDisplayNames = blockedEntities.filter { !$0.isEmpty }.sorted(by: { l, r in
+    func fixEntities(_ contentBlocking: ContentBlocking = ContentBlocking.shared) {
+        blockedEntities = blockedEntities.filter { !$0.isEmpty }.sorted(by: { l, r in
             contentBlocking.prevalenceForEntity(named: l) > contentBlocking.prevalenceForEntity(named: r)
-        }).map {
-            contentBlocking.displayNameForEntity(named: $0)
-        }
+        })
+    }
+
+    func entityImageName(_ entityName: String) -> String {
+        return entityDisplayName(entityName).slugfiscated()
+    }
+
+    func entityDisplayName(_ entityName: String, _ contentBlocking: ContentBlocking = ContentBlocking.shared) -> String {
+        return contentBlocking.displayNameForEntity(named: entityName)
     }
 
 }
@@ -188,6 +194,20 @@ extension ContentBlocking {
 
     func displayNameForEntity(named entityName: String) -> String {
         return trackerDataManager.trackerData.entities[entityName]?.displayName ?? entityName
+    }
+
+}
+
+extension String {
+
+    static let tldSuffixes = (try? NSRegularExpression(pattern: "\\.[a-z]+$", options: []))!
+    static let removeNonAlpha = (try? NSRegularExpression(pattern: "[^a-z0-9]", options: []))!
+
+    func slugfiscated() -> String {
+        let lower = NSMutableString(string: self.lowercased())
+        Self.tldSuffixes.replaceMatches(in: lower, options: [], range: NSRange(location: 0, length: lower.length), withTemplate: "")
+        Self.removeNonAlpha.replaceMatches(in: lower, options: [], range: NSRange(location: 0, length: lower.length), withTemplate: "")
+        return lower as String
     }
 
 }
