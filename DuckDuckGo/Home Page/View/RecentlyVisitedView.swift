@@ -126,7 +126,9 @@ struct RecentlyVisitedSite: View {
                 .foregroundColor(Color("HomeFeedItemButtonTintColor"))
                 .tooltip("Burn History and Site data")
 
-            }.padding([.top, .trailing], 12)
+            }
+            .padding([.top, .trailing], 12)
+            .visibility(isHidden ? .invisible : .visible)
 
             FireAnimation()
                 .cornerRadius(8)
