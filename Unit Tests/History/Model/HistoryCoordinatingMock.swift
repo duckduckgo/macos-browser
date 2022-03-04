@@ -34,9 +34,9 @@ final class HistoryCoordinatingMock: HistoryCoordinating {
         updateTitleIfNeededCalled = true
     }
 
-    var addDetectedTrackerCalled = false
-    func addDetectedTracker(_ tracker: DetectedTracker, onURL url: URL) {
-        addDetectedTrackerCalled = true
+    var addBlockedTrackerCalled = false
+    func addBlockedTracker(entityName: String, onURL url: URL) {
+        addBlockedTrackerCalled = true
     }
 
     var burnCalled = false

@@ -164,7 +164,8 @@ fileprivate extension HistoryEntry {
                   numberOfVisits: numberOfVisits,
                   lastVisit: lastVisit,
                   failedToLoad: false,
-                  numberOfTrackersBlocked: 0)
+                  numberOfTrackersBlocked: 0,
+                  blockedTrackingEntities: .init())
     }
 
 }
