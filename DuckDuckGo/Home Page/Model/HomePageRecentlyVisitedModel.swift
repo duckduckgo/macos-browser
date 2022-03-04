@@ -82,6 +82,7 @@ final class RecentlyVisitedModel: ObservableObject {
     func burn(_ site: RecentlyVisitedSiteModel) {
         fire.burnDomains(Set<String>([site.domain]))
         recentSites = recentSites.filter { $0.domain != site.domain }
+        numberOfTrackersBlocked -= site.numberOfTrackersBlocked
     }
 
     func toggleFavoriteSite(_ site: RecentlyVisitedSiteModel, bookmarkManager: BookmarkManager = LocalBookmarkManager.shared) {
