@@ -23,6 +23,7 @@ extension HomePage.Models {
     struct FavoriteModel {
 
         static let addButtonUUID = UUID()
+        static let ghostButtonUUID = UUID()
 
         let id: UUID
         let bookmark: Bookmark?
@@ -39,8 +40,16 @@ extension HomePage.Models {
 
         @Published var favorites: [Bookmark] = [] {
             didSet {
+                let addButton = FavoriteModel(id: FavoriteModel.addButtonUUID, bookmark: nil)
+                let ghostButton = FavoriteModel(id: FavoriteModel.ghostButtonUUID, bookmark: nil)
+
                 var favorites = self.favorites.map { FavoriteModel(id: $0.id, bookmark: $0) }
-                favorites.append(FavoriteModel(id: FavoriteModel.addButtonUUID, bookmark: nil))
+                favorites.append(addButton)
+
+                let lastRowCount = favorites.count % HomePage.favoritesPerRow
+                let missing = lastRowCount > 0 ? HomePage.favoritesPerRow - lastRowCount : 0
+                favorites.append(contentsOf: Array(repeating: ghostButton, count: missing))
+
                 self.rows = favorites.chunked(into: HomePage.favoritesPerRow)
             }
         }

@@ -22,6 +22,7 @@ struct HoverButton: View {
 
     let size: CGFloat
     let backgroundColor: Color
+    let mouseOverColor: Color
     let imageName: String
     let imageSize: CGFloat?
     let action: () -> Void
@@ -29,25 +30,36 @@ struct HoverButton: View {
     @State var isHovering = false
 
     var radius: CGFloat {
-        if size >= 32 {
+        if size > 32 {
+            return 12
+        } else if size > 16 {
             return 8
-        } else if size >= 16 {
-            return 4
         } else {
-            return 2
+            return 4
         }
     }
 
-    init(size: CGFloat = 32, backgroundColor: Color = Color.clear, imageName: String, imageSize: CGFloat = 16, action: @escaping () -> Void) {
+    init(size: CGFloat = 32,
+         backgroundColor: Color = Color.clear,
+         mouseOverColor: Color = Color("ButtonMouseOverColor"),
+         imageName: String,
+         imageSize: CGFloat = 16,
+         action: @escaping () -> Void) {
+        
         self.size = size
         self.backgroundColor = backgroundColor
+        self.mouseOverColor = mouseOverColor
         self.imageName = imageName
         self.imageSize = imageSize
         self.action = action
     }
 
     var body: some View {
-        Group {
+        ZStack {
+
+            RoundedRectangle(cornerRadius: radius)
+                .fill(isHovering ? mouseOverColor : backgroundColor)
+
             Group {
                 if NSImage(named: imageName) != nil {
                     Image(imageName)
@@ -63,7 +75,6 @@ struct HoverButton: View {
 
         }
         .frame(width: size, height: size)
-        .background(RoundedRectangle(cornerRadius: radius).foregroundColor(isHovering ? Color("ButtonMouseOverColor") : backgroundColor))
         .link(onHoverChanged: {
             self.isHovering = $0
         }) {

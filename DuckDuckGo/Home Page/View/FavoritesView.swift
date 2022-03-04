@@ -24,30 +24,41 @@ struct Favorites: View {
 
     @EnvironmentObject var model: HomePage.Models.FavoritesModel
 
-    @State var expanded = false
+    @State var expanded = true
     @State var isHovering = false
 
     var body: some View {
 
-        let addButton = VStack {
-            HoverButton(size: 64, backgroundColor: Color("HomeFavoritesBackgroundColor"), imageName: "Add", imageSize: 22) {
-                model.addNew()
+        let addButton =
+        ZStack(alignment: .top) {
+            RoundedRectangle(cornerRadius: 12)
+                .stroke(Color("HomeFavoritesGhostColor"), style: StrokeStyle(lineWidth: 1.5))
+                .frame(width: 64, height: 64)
+
+            VStack {
+                HoverButton(size: 64, imageName: "Add", imageSize: 22) {
+                    model.addNew()
+                }
+                .frame(width: 64, height: 64)
+                .clipped()
+
+                Text(UserText.addFavorite)
+                    .font(.system(size: 10))
+                    .multilineTextAlignment(.center)
+                    .lineLimit(2)
+                    .truncationMode(.middle)
+                    .font(.system(size: 10))
+                    .frame(height: 32, alignment: .top)
             }
-            .frame(width: 64, height: 64)
-            .cornerRadius(8)
-            .clipped()
-
-            Text(UserText.addFavorite)
-                .font(.system(size: 10))
-                .multilineTextAlignment(.center)
-                .lineLimit(2)
-                .truncationMode(.middle)
-                .font(.system(size: 10))
-                .frame(height: 32, alignment: .top)
-
         }.frame(width: 72)
 
-        VStack(alignment: .leading, spacing: 0) {
+        let ghostButton = VStack {
+            RoundedRectangle(cornerRadius: 12)
+                .stroke(Color("HomeFavoritesGhostColor"), style: StrokeStyle(lineWidth: 1.5, dash: [4.0, 2.0]))
+                .frame(width: 64, height: 64)
+        }.frame(width: 72)
+
+        VStack(alignment: .leading, spacing: 4) {
 
             ForEach(expanded ? model.rows.indices : model.rows.indices.prefix(HomePage.favoritesRowCountWhenCollapsed), id: \.self) { index in
 
@@ -59,6 +70,8 @@ struct Favorites: View {
                             Favorite(bookmark: bookmark)
                         } else if favorite.id == HomePage.Models.FavoriteModel.addButtonUUID {
                             addButton
+                        } else if favorite.id == HomePage.Models.FavoriteModel.ghostButtonUUID {
+                            ghostButton
                         } else {
                             FailedAssertionView("Unknown favorites type")
                         }
