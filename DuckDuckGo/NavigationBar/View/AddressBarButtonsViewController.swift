@@ -394,7 +394,7 @@ final class AddressBarButtonsViewController: NSViewController {
 
     private func setupButtons() {
         if view.window?.isPopUpWindow == true {
-            privacyEntryPointButton.position = .free
+            privacyEntryPointButton.position = .free            
             cameraButton.position = .free
             geolocationButton.position = .free
             popupsButton.position = .free

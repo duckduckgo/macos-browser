@@ -139,6 +139,8 @@ final class NavigationBarViewController: NSViewController {
             addressBarBottomConstraint.constant = 0
             addressBarLeftToNavButtonsConstraint.isActive = false
             addressBarProportionalWidthConstraint.isActive = false
+
+            // This pulls the dashboard button to the left for the popup
             NSLayoutConstraint.activate(addressBarStack.addConstraints(to: view, [
                 .leading: .leading(multiplier: 1.0, const: 72)
             ]))
@@ -373,14 +375,16 @@ final class NavigationBarViewController: NSViewController {
     }
 
     func resizeAddressBarForHomePage(_ homePage: Bool, animated: Bool) {
+        let verticalPadding: CGFloat = view.window?.isPopUpWindow == true ? 0 : 6
+
         let buttonsTop = animated ? buttonsTopConstraint.animator() : buttonsTopConstraint
         buttonsTop?.constant = homePage ? 18 : 10
 
         let barTop = animated ? addressBarTopConstraint.animator() : addressBarTopConstraint
-        barTop?.constant = homePage ? 26 : 6
+        barTop?.constant = homePage ? 26 : verticalPadding
 
         let bottom = animated ? addressBarBottomConstraint.animator() : addressBarBottomConstraint
-        bottom?.constant = homePage ? 0 : 6
+        bottom?.constant = homePage ? 0 : verticalPadding
 
         let logo = animated ? daxLogo.animator() : daxLogo
         logo?.isHidden = !homePage
