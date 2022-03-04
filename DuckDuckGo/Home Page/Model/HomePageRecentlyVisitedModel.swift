@@ -23,10 +23,22 @@ extension HomePage.Models {
 
 final class RecentlyVisitedModel: ObservableObject {
 
+    let fire = Fire()
+
+    @UserDefaultsWrapper(key: .homePageShowPagesOnHover, defaultValue: true)
+    private static var showPagesOnHoverSetting: Bool
+
     @Published var numberOfTrackersBlocked = 0
     @Published var recentSites = [RecentlyVisitedSiteModel]()
+    @Published var showPagesOnHover: Bool {
+        didSet {
+            Self.showPagesOnHoverSetting = showPagesOnHover
+        }
+    }
 
-    let fire = Fire()
+    init() {
+        showPagesOnHover = Self.showPagesOnHoverSetting
+    }
 
     func refreshWithHistory(_ history: [HistoryEntry]) {
         var numberOfTrackersBlocked = 0

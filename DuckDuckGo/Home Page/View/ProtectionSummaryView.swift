@@ -31,6 +31,9 @@ struct ProtectionSummary: View {
             Image("HomeShield")
                 .resizable()
                 .frame(width: 32, height: 32)
+                .onTapGesture(count: 2) {
+                    model.showPagesOnHover.toggle()
+                }
 
             Group {
                 if model.numberOfTrackersBlocked > 0 {

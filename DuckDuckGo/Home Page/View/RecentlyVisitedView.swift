@@ -88,7 +88,7 @@ struct RecentlyVisitedSite: View {
                         .visibility(site.numberOfTrackersBlocked > 0 ? .visible : .gone)
 
                     RecentlyVisitedPageList(site: site)
-                        .visibility(isHovering ? .visible : .invisible)
+                        .visibility(!model.showPagesOnHover || isHovering ? .visible : .invisible)
 
                 }
                 .padding([.leading, .bottom], 12)
@@ -181,13 +181,14 @@ struct RecentlyVisitedPageList: View {
                         .font(.system(size: 11))
                         .foregroundColor(Color("HomeFeedItemTimeTextColor"))
 
-                    if page.url == visiblePages.last?.url && site.pages.count > collapsedPageCount {
-                        HoverButton(size: 16, imageName: "HomeArrowDown", imageSize: 8) {
-                            withAnimation {
-                                isExpanded.toggle()
-                            }
-                        }.rotationEffect(.degrees(isExpanded ? 180 : 0))
+                    HoverButton(size: 16, imageName: "HomeArrowDown", imageSize: 8) {
+                        withAnimation {
+                            isExpanded.toggle()
+                        }
                     }
+                    .rotationEffect(.degrees(isExpanded ? 180 : 0))
+                    .visibility(page.url == visiblePages.last?.url &&
+                                site.pages.count > collapsedPageCount ? .visible : .gone)
 
                     Spacer()
                 }.frame(maxHeight: 13)
