@@ -27,10 +27,12 @@ struct RootView: View {
         ZStack {
             ScrollView {
                 VStack(spacing: 0) {
+
                     HStack {
                         Spacer()
 
                         Favorites()
+                            .frame(width: 482)
 
                         Spacer()
                     }

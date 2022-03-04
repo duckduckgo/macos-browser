@@ -17,42 +17,46 @@
 //
 
 import SwiftUI
+extension HomePage.Views {
 
 struct MoreOrLess: View {
 
-    let moreIsUp: Bool
-
-    @Binding var expanded: Bool
-
-    var upRotation: Double {
-        moreIsUp ? 0 : 180
-    }
-
-    var downRotation: Double {
-        moreIsUp ? 180 : 0
-    }
+    @Binding var isExpanded: Bool
 
     var body: some View {
 
-        HStack {
-            Text(expanded ? UserText.moreOrLessCollapse : UserText.moreOrLessExpand)
-            Group {
-                if #available(macOS 11.0, *) {
-                    Image(systemName: "chevron.up")
-                } else {
-                    Text("^")
+        HStack(spacing: 20) {
+
+            VStack {
+                Divider()
+            }.frame(maxWidth: .infinity)
+
+            HStack {
+                Text(isExpanded ? UserText.moreOrLessCollapse : UserText.moreOrLessExpand)
+                Group {
+                    if #available(macOS 11.0, *) {
+                        Image("HomeArrowUp")
+                    } else {
+                        Text("^")
+                    }
                 }
+                .rotationEffect(.degrees(isExpanded ? 180 : 0))
             }
-            .rotationEffect(.degrees(expanded ? upRotation : downRotation))
+            .foregroundColor(Color("LinkBlueColor"))
+
+            VStack {
+                Divider()
+            }.frame(maxWidth: .infinity)
         }
-        .font(.system(size: 11, weight: .light))
-        .foregroundColor(.secondary)
+        .font(.system(size: 11))
         .link {
             withAnimation {
-                expanded = !expanded
+                isExpanded = !isExpanded
             }
         }
 
     }
+
+}
 
 }

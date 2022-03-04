@@ -2201,7 +2201,6 @@
 				85C5991A27D10CF000E605B2 /* FireAnimationView.swift */,
 				85589E9727BFE2DA0038AD11 /* HoverButton.swift */,
 				4BE65484271FCD7B008D1D63 /* LoginFaviconView.swift */,
-				85589E9F27BFE60E0038AD11 /* MoreOrLessView.swift */,
 				85707F2D276A394C00DC0649 /* ViewExtensions.swift */,
 			);
 			path = SwiftUI;
@@ -3320,6 +3319,7 @@
 				85AC7AD827BD625000FFB69B /* HomePageAssets.xcassets */,
 				85589E7C27BBB8630038AD11 /* HomePageView.swift */,
 				85589E7D27BBB8630038AD11 /* HomePageViewController.swift */,
+				85589E9F27BFE60E0038AD11 /* MoreOrLessView.swift */,
 				85589EA127BFE6420038AD11 /* ProtectionSummaryView.swift */,
 				85F0FF1227CFAB04001C7C6E /* RecentlyVisitedView.swift */,
 			);

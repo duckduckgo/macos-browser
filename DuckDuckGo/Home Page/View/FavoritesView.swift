@@ -24,7 +24,7 @@ struct Favorites: View {
 
     @EnvironmentObject var model: HomePage.Models.FavoritesModel
 
-    @State var expanded = true
+    @State var isExpanded = false
     @State var isHovering = false
 
     var body: some View {
@@ -60,11 +60,13 @@ struct Favorites: View {
 
         VStack(alignment: .leading, spacing: 4) {
 
-            ForEach(expanded ? model.rows.indices : model.rows.indices.prefix(HomePage.favoritesRowCountWhenCollapsed), id: \.self) { index in
+            ForEach(isExpanded ? model.rows.indices : model.rows.indices.prefix(HomePage.favoritesRowCountWhenCollapsed), id: \.self) { index in
 
                 HStack(alignment: .top, spacing: 20) {
                     ForEach(model.rows[index], id: \.id) { favorite in
-                        if !expanded && index + 1 == HomePage.favoritesRowCountWhenCollapsed && favorite.id == model.rows[index].last?.id {
+                        if !isExpanded && index + 1 == HomePage.favoritesRowCountWhenCollapsed &&
+                            favorite.id == model.rows[index].last?.id {
+                            // When collapsed, replace last favorite with add button
                             addButton
                         } else if let bookmark = favorite.bookmark {
                             Favorite(bookmark: bookmark)
@@ -76,20 +78,16 @@ struct Favorites: View {
                             FailedAssertionView("Unknown favorites type")
                         }
                     }
-
-                    if model.rows[index].count < HomePage.favoritesPerRow {
-                        Spacer()
-                    }
-
                 }
                 
             }
 
-            MoreOrLess(moreIsUp: true, expanded: $expanded)
+            MoreOrLess(isExpanded: $isExpanded)
+                .padding(.top, 12)
                 .visibility(model.rows.count > HomePage.favoritesRowCountWhenCollapsed && isHovering ? .visible : .invisible)
 
         }
-        .frame(width: 440)
+        .frame(maxWidth: .infinity)
         .onHover { isHovering in
             self.isHovering = isHovering
         }

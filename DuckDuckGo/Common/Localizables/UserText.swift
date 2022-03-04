@@ -410,8 +410,8 @@ struct UserText {
 
     static let importFromFirefoxMoreInfo = NSLocalizedString("import.from.firefox.info", value: "You'll be asked to enter your Primary Password for Firefox.\n\nImported passwords are encrypted and only stored on this computer.", comment: "More info when importing from Firefox")
 
-    static let moreOrLessCollapse = NSLocalizedString("more.or.less.collapse", value: "Less", comment: "For collapsing views to show less.")
-    static let moreOrLessExpand = NSLocalizedString("more.or.less.expand", value: "More", comment: "For expanding views to show more.")
+    static let moreOrLessCollapse = NSLocalizedString("more.or.less.collapse", value: "Show Less", comment: "For collapsing views to show less.")
+    static let moreOrLessExpand = NSLocalizedString("more.or.less.expand", value: "Show More", comment: "For expanding views to show more.")
 
     static let defaultBrowserPromptMessage = NSLocalizedString("default.browser.prompt.message", value: "Set DuckDuckGo as your default browser", comment: "")
     static let defaultBrowserPromptButton = NSLocalizedString("default.browser.prompt.button", value: "Set Default Browser...", comment: "")
