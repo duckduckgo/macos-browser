@@ -36,7 +36,10 @@ final class RecentlyVisitedModel: ObservableObject {
         }
     }
 
-    init() {
+    let open: (URL) -> Void
+
+    init(open: @escaping (URL) -> Void) {
+        self.open = open
         showPagesOnHover = Self.showPagesOnHoverSetting
     }
 
@@ -77,7 +80,6 @@ final class RecentlyVisitedModel: ObservableObject {
     }
 
     func burn(_ site: RecentlyVisitedSiteModel) {
-        // BRINDY update the numbers blocked once they decide what it should be
         fire.burnDomains(Set<String>([site.domain]))
         recentSites = recentSites.filter { $0.domain != site.domain }
     }

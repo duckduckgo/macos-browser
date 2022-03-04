@@ -1,5 +1,5 @@
 //
-//  HomePageView.swift
+//  HyperLink.swift
 //
 //  Copyright © 2022 DuckDuckGo. All rights reserved.
 //
@@ -17,37 +17,27 @@
 //
 
 import SwiftUI
-import BrowserServicesKit
 
-extension HomePage.Views {
+struct HyperLink: View {
 
-struct RootView: View {
+    let text: String
+    let action: () -> Void
 
-    let targetWidth: CGFloat = 482
+    @State var isHovering = false
+
+    init(_ text: String, _ action: @escaping () -> Void) {
+        self.text = text
+        self.action = action
+    }
 
     var body: some View {
-        ZStack {
-            ScrollView {
-                VStack(spacing: 0) {
-                    Group {
-
-                        Favorites()
-
-                        RecentlyVisited()
-
-                    }
-                    .frame(width: 484)
-                    .padding(.top, 54)
-                }
-                .frame(maxWidth: .infinity)
+        Text(text)
+            .foregroundColor(isHovering ? Color("LinkBlueColor") : Color("HomeFeedItemTitleColor"))
+            .link {
+                isHovering = $0
+            } clicked: {
+                action()
             }
-
-            DefaultBrowserPrompt()
-        }
-        .frame(maxWidth: .infinity)
-        .background(Color("NewTabPageBackgroundColor"))
-     }
-
-}
+    }
 
 }

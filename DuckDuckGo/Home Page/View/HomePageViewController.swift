@@ -98,7 +98,9 @@ final class HomePageViewController: NSViewController {
     }
 
     func createRecentlyVisitedModel() -> HomePage.Models.RecentlyVisitedModel {
-        return .init()
+        return .init { [weak self] url in
+            self?.openUrl(url)
+        }
     }
 
     func createDefaultBrowserModel() -> HomePage.Models.DefaultBrowserModel {

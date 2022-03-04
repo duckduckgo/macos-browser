@@ -40,7 +40,6 @@ struct Favorites: View {
                     model.addNew()
                 }
                 .frame(width: 64, height: 64)
-                .clipped()
 
                 Text(UserText.addFavorite)
                     .font(.system(size: 10))
@@ -50,13 +49,13 @@ struct Favorites: View {
                     .font(.system(size: 10))
                     .frame(height: 32, alignment: .top)
             }
-        }.frame(width: 72)
+        }.frame(width: 64)
 
         let ghostButton = VStack {
             RoundedRectangle(cornerRadius: 12)
                 .stroke(Color("HomeFavoritesGhostColor"), style: StrokeStyle(lineWidth: 1.5, dash: [4.0, 2.0]))
                 .frame(width: 64, height: 64)
-        }.frame(width: 72)
+        }.frame(width: 64)
 
         VStack(alignment: .leading, spacing: 4) {
 
@@ -110,26 +109,26 @@ struct Favorite: View {
 
             ZStack(alignment: .center) {
 
+                RoundedRectangle(cornerRadius: 12)
+                    .foregroundColor(isHovering ? Color("ButtonMouseOverColor") : Color("HomeFavoritesBackgroundColor"))
+
                 FaviconView(domain: bookmark.url.host ?? "")
                     .frame(width: 32, height: 32)
                     .padding(9)
 
             }
             .frame(width: 64, height: 64)
-            .background(RoundedRectangle(cornerRadius: 8).foregroundColor(isHovering ? Color("ButtonMouseOverColor") :
-                                                                            Color("HomeFavoritesBackgroundColor")))
-            .cornerRadius(8)
             .clipped()
 
             Text(bookmark.title)
                 .multilineTextAlignment(.center)
                 .lineLimit(2)
-                .truncationMode(.middle)
                 .font(.system(size: 10))
                 .frame(height: 32, alignment: .top)
 
         }
-        .frame(width: 72)
+        .frame(width: 64)
+        .frame(maxWidth: 64)
         .link(onHoverChanged: {
             isHovering = $0
         }) {

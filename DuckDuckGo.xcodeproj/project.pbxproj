@@ -279,6 +279,7 @@
 		85707F2E276A394C00DC0649 /* ViewExtensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 85707F2D276A394C00DC0649 /* ViewExtensions.swift */; };
 		85707F31276A7DCA00DC0649 /* OnboardingViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 85707F30276A7DCA00DC0649 /* OnboardingViewModel.swift */; };
 		85799C1825DEBB3F0007EC87 /* Logging.swift in Sources */ = {isa = PBXBuildFile; fileRef = 85799C1725DEBB3F0007EC87 /* Logging.swift */; };
+		857FFEC027D239DC00415E7A /* HyperLink.swift in Sources */ = {isa = PBXBuildFile; fileRef = 857FFEBF27D239DC00415E7A /* HyperLink.swift */; };
 		8585B63826D6E66C00C1416F /* ButtonStyles.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8585B63726D6E66C00C1416F /* ButtonStyles.swift */; };
 		8589063A267BCD8E00D23B0D /* SaveCredentialsPopover.swift in Sources */ = {isa = PBXBuildFile; fileRef = 85890639267BCD8E00D23B0D /* SaveCredentialsPopover.swift */; };
 		8589063C267BCDC000D23B0D /* SaveCredentialsViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8589063B267BCDC000D23B0D /* SaveCredentialsViewController.swift */; };
@@ -1014,6 +1015,7 @@
 		85707F2D276A394C00DC0649 /* ViewExtensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ViewExtensions.swift; sourceTree = "<group>"; };
 		85707F30276A7DCA00DC0649 /* OnboardingViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OnboardingViewModel.swift; sourceTree = "<group>"; };
 		85799C1725DEBB3F0007EC87 /* Logging.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Logging.swift; sourceTree = "<group>"; };
+		857FFEBF27D239DC00415E7A /* HyperLink.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HyperLink.swift; sourceTree = "<group>"; };
 		8585B63726D6E66C00C1416F /* ButtonStyles.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ButtonStyles.swift; sourceTree = "<group>"; };
 		85890639267BCD8E00D23B0D /* SaveCredentialsPopover.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SaveCredentialsPopover.swift; sourceTree = "<group>"; };
 		8589063B267BCDC000D23B0D /* SaveCredentialsViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SaveCredentialsViewController.swift; sourceTree = "<group>"; };
@@ -3319,6 +3321,7 @@
 				85AC7AD827BD625000FFB69B /* HomePageAssets.xcassets */,
 				85589E7C27BBB8630038AD11 /* HomePageView.swift */,
 				85589E7D27BBB8630038AD11 /* HomePageViewController.swift */,
+				857FFEBF27D239DC00415E7A /* HyperLink.swift */,
 				85589E9F27BFE60E0038AD11 /* MoreOrLessView.swift */,
 				85589EA127BFE6420038AD11 /* ProtectionSummaryView.swift */,
 				85F0FF1227CFAB04001C7C6E /* RecentlyVisitedView.swift */,
@@ -4122,6 +4125,7 @@
 				B68458CD25C7EB9000DC17B6 /* WKWebViewConfigurationExtensions.swift in Sources */,
 				85AC7ADD27BEB6EE00FFB69B /* HomePageDefaultBrowserModel.swift in Sources */,
 				AAC30A26268DFEE200D2D9CD /* CrashReporter.swift in Sources */,
+				857FFEC027D239DC00415E7A /* HyperLink.swift in Sources */,
 				4B9292A426670D2A00AD2C21 /* PasteboardWriting.swift in Sources */,
 				4B0511BE262CAA5A00F6079C /* DownloadPreferences.swift in Sources */,
 				4B0511BC262CAA5A00F6079C /* AppearancePreferences.swift in Sources */,

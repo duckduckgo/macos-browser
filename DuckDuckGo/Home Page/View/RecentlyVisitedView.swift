@@ -80,9 +80,12 @@ struct RecentlyVisitedSite: View {
 
                 VStack(alignment: .leading, spacing: 12) {
 
-                    Text(site.domain)
-                        .font(.system(size: 15, weight: .semibold, design: .default))
-                        .foregroundColor(Color("HomeFeedItemTitleColor"))
+                    HyperLink(site.domain) {
+                        guard let url = site.domain.url else { return }
+                        model.open(url)
+                    }
+                    .font(.system(size: 15, weight: .semibold, design: .default))
+                    .foregroundColor(Color("HomeFeedItemTitleColor"))
 
                     SiteTrackerSummary(site: site)
                         .visibility(site.numberOfTrackersBlocked > 0 ? .visible : .gone)
@@ -158,6 +161,7 @@ struct RecentlyVisitedPageList: View {
         return f
     } ()
 
+    @EnvironmentObject var model: HomePage.Models.RecentlyVisitedModel
     @ObservedObject var site: HomePage.Models.RecentlyVisitedSiteModel
 
     @State var isExpanded = false
@@ -171,11 +175,13 @@ struct RecentlyVisitedPageList: View {
             ForEach(visiblePages, id: \.url) { page in
                 HStack {
 
-                    Text(page.displayTitle)
-                        .font(.system(size: 11))
-                        .lineLimit(1)
-                        .truncationMode(.middle)
-                        .foregroundColor(Color("HomeFeedItemPageTextColor"))
+                    HyperLink(page.displayTitle) {
+                        model.open(page.url)    
+                    }
+                    .font(.system(size: 11))
+                    .lineLimit(1)
+                    .truncationMode(.middle)
+                    .foregroundColor(Color("HomeFeedItemPageTextColor"))
 
                     Text(formatter.localizedString(fromTimeInterval: page.visited.timeIntervalSinceNow))
                         .font(.system(size: 11))
