@@ -34,6 +34,10 @@ protocol StatisticsStore: AnyObject {
     
     var waitlistUpgradeCheckComplete: Bool { get set }
     var waitlistUnlocked: Bool { get set }
+
+    var autoLockEnabled: Bool { get set }
+    var autoLockThreshold: String? { get set }
+    
 }
 
 extension StatisticsStore {

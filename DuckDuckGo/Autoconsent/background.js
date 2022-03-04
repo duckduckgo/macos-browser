@@ -1,6 +1,6 @@
 /* global browser */
-import AutoConsent from '@cliqz/autoconsent/lib/web'
-import * as rules from '@cliqz/autoconsent/rules/rules.json'
+import AutoConsent from '@duckduckgo/autoconsent/lib/web'
+import * as rules from '@duckduckgo/autoconsent/rules/rules.json'
 
 const consent = new AutoConsent(browser, browser.tabs.sendMessage)
 

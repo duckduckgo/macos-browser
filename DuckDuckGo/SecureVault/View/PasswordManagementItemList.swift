@@ -233,12 +233,22 @@ private struct ItemView: View {
                 }
 
                 VStack(alignment: .leading, spacing: 4) {
-                    Text(item.displayTitle)
-                        .foregroundColor(textColor)
-                        .font(font)
-                    Text(item.displaySubtitle)
-                        .foregroundColor(textColor.opacity(0.8))
-                        .font(font)
+                    switch item {
+                    case .note:
+                        Text(item.displayTitle)
+                            .foregroundColor(textColor.opacity(0.7))
+                            .font(font)
+                        Text(item.displaySubtitle)
+                            .foregroundColor(textColor.opacity(0.5))
+                            .font(font)
+                    default:
+                        Text(item.displayTitle)
+                            .foregroundColor(textColor)
+                            .font(font)
+                        Text(item.displaySubtitle)
+                            .foregroundColor(textColor.opacity(0.8))
+                            .font(font)
+                    }
                 }
                 .padding(.leading, 4)
             }

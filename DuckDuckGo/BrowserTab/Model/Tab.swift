@@ -23,7 +23,7 @@ import Combine
 import BrowserServicesKit
 import TrackerRadarKit
 
-protocol TabDelegate: FileDownloadManagerDelegate {
+protocol TabDelegate: FileDownloadManagerDelegate, ContentOverlayUserScriptDelegate {
     func tabWillStartNavigation(_ tab: Tab, isUserInitiated: Bool)
     func tabDidStartNavigation(_ tab: Tab)
     func tab(_ tab: Tab, requestedNewTabWith content: Tab.TabContent, selected: Bool)
@@ -57,6 +57,8 @@ final class Tab: NSObject {
                 return .homepage
             } else if url == .welcome {
                 return .onboarding
+            } else if url == .preferences {
+                return .preferences
             } else {
                 return .url(url ?? .blankPage)
             }
@@ -98,6 +100,7 @@ final class Tab: NSObject {
         }
     }
 
+    weak var autofillScript: WebsiteAutofillUserScript?
     weak var delegate: TabDelegate?
     private let cbaTimeReporter: ContentBlockingAssetsCompilationTimeReporter?
 
@@ -472,7 +475,7 @@ final class Tab: NSObject {
 
     // MARK: - Find in Page
 
-    var findInPageScript: FindInPageUserScript?
+    weak var findInPageScript: FindInPageUserScript?
     var findInPageCancellable: AnyCancellable?
     private func subscribeToFindInPageTextChange() {
         findInPageCancellable?.cancel()
@@ -560,16 +563,27 @@ extension Tab: UserContentControllerDelegate {
         userScripts.surrogatesScript.delegate = self
         userScripts.contentBlockerRulesScript.delegate = self
         userScripts.clickToLoadScript.delegate = self
+        userScripts.autofillScript.currentOverlayTab = self.delegate
         userScripts.autofillScript.emailDelegate = emailManager
         userScripts.autofillScript.vaultDelegate = vaultManager
+        self.autofillScript = userScripts.autofillScript
         userScripts.pageObserverScript.delegate = self
         userScripts.printingUserScript.delegate = self
         userScripts.hoverUserScript.delegate = self
         userScripts.autoconsentUserScript?.delegate = self
 
+        findInPageScript = userScripts.findInPageScript
         attachFindInPage()
     }
 
+}
+
+extension Tab: ChildAutofillUserScriptDelegate {
+    func browserTabViewController(_ browserTabViewController: BrowserTabViewController, didClickAtPoint: NSPoint) {
+        guard let autofillScript = autofillScript else { return }
+        autofillScript.clickPoint = didClickAtPoint
+        autofillScript.currentOverlayTab = self.delegate
+    }
 }
 
 extension Tab: PrintingUserScriptDelegate {
@@ -688,7 +702,13 @@ extension Tab: SecureVaultManagerDelegate {
 
     func secureVaultManager(_: SecureVaultManager, didAutofill type: AutofillType, withObjectId objectId: Int64) {
         Pixel.fire(.formAutofilled(kind: type.formAutofillKind))
-    } 
+    }
+    
+    func secureVaultManager(_: SecureVaultManager, didRequestAuthenticationWithCompletionHandler handler: @escaping (Bool) -> Void) {
+        DeviceAuthenticator.shared.authenticateUser(reason: .autofill) { authenticationResult in
+            handler(authenticationResult.authenticated)
+        }
+    }
 
     func secureVaultInitFailed(_ error: SecureVaultError) {
         SecureVaultErrorReporter.shared.secureVaultInitFailed(error)
