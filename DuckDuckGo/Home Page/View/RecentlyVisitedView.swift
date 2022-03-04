@@ -26,25 +26,30 @@ struct RecentlyVisited: View {
 
     @EnvironmentObject var model: HomePage.Models.RecentlyVisitedModel
 
+    @State var isExpanded = true
+
     var body: some View {
 
         VStack {
-            ProtectionSummary()
+            ProtectionSummary(isExpanded: $isExpanded)
 
-            if #available(macOS 11, *) {
-                LazyVStack {
-                    ForEach(model.recentSites, id: \.domain) {
-                        RecentlyVisitedSite(site: $0)
+            Group {
+                if #available(macOS 11, *) {
+                    LazyVStack {
+                        ForEach(model.recentSites, id: \.domain) {
+                            RecentlyVisitedSite(site: $0)
+                        }
+                    }
+                } else {
+                    VStack {
+                        ForEach(model.recentSites, id: \.domain) {
+                            RecentlyVisitedSite(site: $0)
+                        }
                     }
                 }
-            } else {
-                VStack {
-                    ForEach(model.recentSites, id: \.domain) {
-                        RecentlyVisitedSite(site: $0)
-                    }
-                }
-            }
-            
+
+            }.visibility(isExpanded ? .visible : .gone)
+
         }.padding(.bottom, 24)
 
     }
@@ -177,7 +182,7 @@ struct RecentlyVisitedPageList: View {
                         .foregroundColor(Color("HomeFeedItemTimeTextColor"))
 
                     if page.url == visiblePages.last?.url && site.pages.count > collapsedPageCount {
-                        HoverButton(imageName: "HomeArrowDown") {
+                        HoverButton(size: 16, imageName: "HomeArrowDown", imageSize: 8) {
                             withAnimation {
                                 isExpanded.toggle()
                             }

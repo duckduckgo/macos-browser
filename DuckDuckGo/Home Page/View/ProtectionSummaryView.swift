@@ -24,20 +24,34 @@ struct ProtectionSummary: View {
 
     @EnvironmentObject var model: HomePage.Models.RecentlyVisitedModel
 
-    var body: some View {
-        HStack(alignment: .center, spacing: 2) {
-            Image("HomeShield")
+    @Binding var isExpanded: Bool
 
-            if model.numberOfTrackersBlocked > 0 {
-                Text(UserText.homePageProtectionSummaryMessage(numberOfTrackersBlocked: model.numberOfTrackersBlocked))
-                    .fontWeight(.semibold)
-            } else {
-                Text(UserText.homePageProtectionSummaryInfo)
-                    .fontWeight(.semibold)
+    var body: some View {
+        HStack(alignment: .center, spacing: 12) {
+            Image("HomeShield")
+                .resizable()
+                .frame(width: 32, height: 32)
+
+            Group {
+                if model.numberOfTrackersBlocked > 0 {
+                    Text(UserText.homePageProtectionSummaryMessage(numberOfTrackersBlocked: model.numberOfTrackersBlocked))
+                } else {
+                    Text(UserText.homePageProtectionSummaryInfo)
+                }
             }
-            
+            .multilineTextAlignment(.center)
+            .lineLimit(2)
+            .font(.system(size: 17, weight: .bold, design: .default))
+
+            Spacer()
+                .visibility(isExpanded ? .visible : .gone)
+
+            HoverButton(size: 24, imageName: "HomeArrowUp", imageSize: 16) {
+                withAnimation {
+                    isExpanded.toggle()
+                }
+            }.rotationEffect(.degrees(isExpanded ? 0 : 180))
         }
-        .foregroundColor(.primary.opacity(0.4))
     }
 
 }

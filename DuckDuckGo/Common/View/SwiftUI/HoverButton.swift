@@ -28,6 +28,16 @@ struct HoverButton: View {
 
     @State var isHovering = false
 
+    var radius: CGFloat {
+        if size >= 32 {
+            return 8
+        } else if size >= 16 {
+            return 4
+        } else {
+            return 2
+        }
+    }
+
     init(size: CGFloat = 32, backgroundColor: Color = Color.clear, imageName: String, imageSize: CGFloat = 16, action: @escaping () -> Void) {
         self.size = size
         self.backgroundColor = backgroundColor
@@ -53,8 +63,7 @@ struct HoverButton: View {
 
         }
         .frame(width: size, height: size)
-        .cornerRadius(4)
-        .background(RoundedRectangle(cornerRadius: 8).foregroundColor(isHovering ? Color("ButtonMouseOverColor") : backgroundColor))
+        .background(RoundedRectangle(cornerRadius: radius).foregroundColor(isHovering ? Color("ButtonMouseOverColor") : backgroundColor))
         .link(onHoverChanged: {
             self.isHovering = $0
         }) {
