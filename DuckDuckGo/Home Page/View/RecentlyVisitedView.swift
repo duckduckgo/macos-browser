@@ -201,9 +201,7 @@ struct RecentlyVisitedSite: View {
 
         }
         .onHover { isHovering in
-            withAnimation {
-                self.isHovering = isHovering
-            }
+            self.isHovering = isHovering
         }
         .frame(maxWidth: .infinity, minHeight: 126)
 
