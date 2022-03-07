@@ -42,7 +42,6 @@ final class PasswordManagementPopover: NSPopover {
     // swiftlint:enable force_cast
 
     private var parentWindowDidResignKeyObserver: Any?
-    private var parentWindowDidBecomeKeyObserver: Any?
 
     func select(category: SecureVaultSorting.Category?) {
         viewController.select(category: category)
@@ -58,22 +57,19 @@ final class PasswordManagementPopover: NSPopover {
 extension PasswordManagementPopover: NSPopoverDelegate {
 
     func popoverDidShow(_ notification: Notification) {
-        parentWindowDidBecomeKeyObserver = NotificationCenter.default.addObserver(forName: NSWindow.didBecomeMainNotification,
-                                                                                  object: nil,
-                                                                                  queue: OperationQueue.main) { [weak self] _ in
-            guard let self = self, self.isShown else { return }
-            self.close()
-        }
         parentWindowDidResignKeyObserver = NotificationCenter.default.addObserver(forName: NSWindow.didResignMainNotification,
                                                                                   object: nil,
                                                                                   queue: OperationQueue.main) { [weak self] _ in
             guard let self = self, self.isShown else { return }
-            self.close()
+            
+            if !DeviceAuthenticator.shared.isAuthenticating {
+                self.close()
+            }
         }
     }
 
     func popoverShouldClose(_ popover: NSPopover) -> Bool {
-        return true
+        return !DeviceAuthenticator.shared.isAuthenticating
     }
 
     func popoverDidClose(_ notification: Notification) {
@@ -87,7 +83,6 @@ extension PasswordManagementPopover: NSPopoverDelegate {
             viewController.clear()
         }
         parentWindowDidResignKeyObserver = nil
-        parentWindowDidBecomeKeyObserver = nil
     }
 
 }

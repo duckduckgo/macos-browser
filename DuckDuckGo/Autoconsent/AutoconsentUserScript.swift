@@ -52,7 +52,7 @@ final class AutoconsentUserScript: NSObject, UserScriptWithAutoconsent {
     let tabId: Int
     let config: PrivacyConfiguration
     var actionInProgress = false
-    var webview: WKWebView?
+    weak var webview: WKWebView?
     weak var delegate: AutoconsentUserScriptDelegate?
 
     init(scriptSource: ScriptSourceProviding, config: PrivacyConfiguration) {
@@ -65,7 +65,7 @@ final class AutoconsentUserScript: NSObject, UserScriptWithAutoconsent {
     func userContentController(_ userContentController: WKUserContentController, didReceive message: WKScriptMessage) {
         guard let messageName = MessageName(rawValue: message.name) else { return }
         if message.webView != nil {
-            webview = message.webView!
+            webview = message.webView
         }
 
         switch messageName {
@@ -109,12 +109,12 @@ final class AutoconsentUserScript: NSObject, UserScriptWithAutoconsent {
             // push current privacy config settings to the background page
             Self.background.updateSettings(settings: self.config.settings(for: .autoconsent))
             let cmp = await Self.background.detectCmp(in: self.tabId)
-            guard cmp?.result == true else {
+            guard let cmp = cmp, cmp.result == true else {
                 os_log("no CMP detected", log: .autoconsent, type: .info)
                 self.actionInProgress = false
                 return
             }
-            os_log("popup found from %s", log: .autoconsent, type: .info, String(describing: cmp?.ruleName))
+            os_log("popup found from %s", log: .autoconsent, type: .info, String(describing: cmp.ruleName))
             // check if the user has explicitly enabled the feature
             self.checkUserWasPrompted { enabled in
                 guard enabled else {
@@ -122,7 +122,7 @@ final class AutoconsentUserScript: NSObject, UserScriptWithAutoconsent {
                     return
                 }
                 Task {
-                    await self.runOptOut(for: cmp!, on: url)
+                    await self.runOptOut(for: cmp, on: url)
                 }
             }
         }
@@ -135,13 +135,14 @@ final class AutoconsentUserScript: NSObject, UserScriptWithAutoconsent {
             return
         }
         let now = Date.init()
-        guard Self.promptLastShown == nil || now > Self.promptLastShown!.addingTimeInterval(30) else {
+        guard Self.promptLastShown == nil || now > Self.promptLastShown!.addingTimeInterval(30),
+              let window = self.webview?.window else {
             callback(false)
             return
         }
         Self.promptLastShown = now
         let alert = NSAlert.cookiePopup()
-        alert.beginSheetModal(for: self.webview!.window!, completionHandler: { response in
+        alert.beginSheetModal(for: window, completionHandler: { response in
             switch response {
             case .alertFirstButtonReturn:
                 // User wants to turn on the feature

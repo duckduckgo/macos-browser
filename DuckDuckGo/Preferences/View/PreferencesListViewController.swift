@@ -18,6 +18,13 @@
 
 import AppKit
 import Combine
+import LocalAuthentication
+
+final class GridClipTableView: NSTableView {
+
+    override func drawGrid(inClipRect clipRect: NSRect) { }
+
+}
 
 final class PreferencesListViewController: NSViewController {
 
@@ -31,7 +38,7 @@ final class PreferencesListViewController: NSViewController {
         return storyboard.instantiateController(identifier: Constants.identifier)
     }
 
-    @IBOutlet var preferencesTableView: NSTableView!
+    @IBOutlet var preferencesTableView: GridClipTableView!
 
     @Published var firstVisibleCellIndex: Int = 0
 
@@ -42,6 +49,7 @@ final class PreferencesListViewController: NSViewController {
         case defaultBrowser
         case appearance
         case privacySecurity
+        case logins
         case downloads
     }
 
@@ -49,7 +57,6 @@ final class PreferencesListViewController: NSViewController {
         super.viewDidLoad()
 
         preferencesTableView.selectionHighlightStyle = .none
-        preferencesTableView.gridStyleMask = [.solidHorizontalGridLineMask]
 
         let defaultBrowserNib = DefaultBrowserTableCellView.nib()
         preferencesTableView.register(defaultBrowserNib, forIdentifier: DefaultBrowserTableCellView.identifier)
@@ -60,6 +67,9 @@ final class PreferencesListViewController: NSViewController {
         let privacySecurityNib = PrivacySecurityPreferencesTableCellView.nib()
         preferencesTableView.register(privacySecurityNib, forIdentifier: PrivacySecurityPreferencesTableCellView.identifier)
 
+        let loginsNib = LoginsPreferencesTableCellView.nib()
+        preferencesTableView.register(loginsNib, forIdentifier: LoginsPreferencesTableCellView.identifier)
+        
         let downloadsNib = DownloadPreferencesTableCellView.nib()
         preferencesTableView.register(downloadsNib, forIdentifier: DownloadPreferencesTableCellView.identifier)
 
@@ -154,6 +164,13 @@ extension PreferencesListViewController: NSTableViewDataSource, NSTableViewDeleg
                          gpcEnabled: preferences.gpcEnabled,
                          autoconsentEnabled: preferences.autoconsentEnabled)
             return cell
+        case .logins:
+            let cell: LoginsPreferencesTableCellView? = createCell(identifier: LoginsPreferencesTableCellView.identifier,
+                                                                   tableView: tableView)
+            cell?.delegate = self
+            let preferences = LoginsPreferences()
+            cell?.update(autoLockEnabled: preferences.shouldAutoLockLogins, threshold: preferences.autoLockThreshold)
+            return cell
         case .downloads:
             let cell: DownloadPreferencesTableCellView? = createCell(identifier: DownloadPreferencesTableCellView.identifier, tableView: tableView)
             cell?.update(downloadLocation: downloadPreferences.selectedDownloadLocation,
@@ -218,4 +235,36 @@ extension PreferencesListViewController: PrivacySecurityPreferencesTableCellView
         PrivacySecurityPreferences.shared.autoconsentEnabled = enabled
     }
 
+}
+
+extension PreferencesListViewController: LoginsPreferencesTableCellViewDelegate {
+    
+    func loginsPreferencesTableCellView(_ cell: LoginsPreferencesTableCellView,
+                                        setShouldAutoLockLogins: Bool,
+                                        autoLockThreshold: LoginsPreferences.AutoLockThreshold) {
+
+        DeviceAuthenticator.shared.authenticateUser(reason: .changeLoginsSettings) { authenticationResult in
+            let preferences = LoginsPreferences()
+
+            if authenticationResult.authenticated {
+                
+                // Only fire the auto-lock disabled pixel the setting is disabled and it has changed from its previous value
+                if !setShouldAutoLockLogins && setShouldAutoLockLogins != preferences.shouldAutoLockLogins {
+                    Pixel.fire(.passwordManagerLockScreenDisabled)
+                }
+                
+                // Only fire the threshold pixel if it has changed, or if the setting is being turned on again
+                if (autoLockThreshold != preferences.autoLockThreshold) || (setShouldAutoLockLogins && !preferences.shouldAutoLockLogins) {
+                    Pixel.fire(autoLockThreshold.pixelEvent)
+                }
+                
+                preferences.shouldAutoLockLogins = setShouldAutoLockLogins
+                preferences.autoLockThreshold = autoLockThreshold
+            } else {
+                cell.update(autoLockEnabled: preferences.shouldAutoLockLogins, threshold: preferences.autoLockThreshold)
+            }
+        }
+
+    }
+    
 }

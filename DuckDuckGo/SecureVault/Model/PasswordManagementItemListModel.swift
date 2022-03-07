@@ -161,7 +161,7 @@ enum SecureVaultItem: Equatable, Identifiable, Comparable {
         case .account: return .logins
         case .card: return .cards
         case .identity: return .identities
-        case .note: return .notes
+        case .note: return .allItems
         }
     }
     
@@ -419,7 +419,6 @@ final class PasswordManagementItemListModel: ObservableObject {
         case .cards: emptyState = .creditCards
         case .logins: emptyState = .logins
         case .identities: emptyState = .identities
-        case .notes: emptyState = .notes
         }
     }
 
