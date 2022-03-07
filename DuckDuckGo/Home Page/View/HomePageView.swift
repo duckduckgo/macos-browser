@@ -23,10 +23,12 @@ extension HomePage.Views {
 
 struct RootView: View {
 
+    let backgroundColor = Color("NewTabPageBackgroundColor")
     let targetWidth: CGFloat = 482
 
     var body: some View {
-        ZStack {
+        ZStack(alignment: .top) {
+
             ScrollView {
                 VStack(spacing: 0) {
                     Group {
@@ -44,10 +46,15 @@ struct RootView: View {
                 .frame(maxWidth: .infinity)
             }
 
+            Rectangle()
+                .fill(backgroundColor)
+                .mask(LinearGradient(colors: [backgroundColor.opacity(1), backgroundColor.opacity(0)], startPoint: .top, endPoint: .bottom))
+                .frame(height: 16)
+                .padding(.trailing, 12) // don't fade the scroll bar
             DefaultBrowserPrompt()
         }
         .frame(maxWidth: .infinity)
-        .background(Color("NewTabPageBackgroundColor"))
+        .background(backgroundColor)
      }
 
 }
