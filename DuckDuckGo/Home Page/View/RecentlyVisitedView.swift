@@ -251,7 +251,7 @@ struct RecentlyVisitedPageList: View {
                     }
                     .rotationEffect(.degrees(isExpanded ? 180 : 0))
                     .visibility(page.url == visiblePages.last?.url &&
-                                site.pages.count > collapsedPageCount ? .visible : .gone)
+                                site.pages.count > collapsedPageCount ? .visible : .invisible)
 
                     Spacer()
                 }.frame(maxHeight: 13)
