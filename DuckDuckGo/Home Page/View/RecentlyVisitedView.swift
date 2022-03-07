@@ -131,9 +131,6 @@ struct RecentlyVisitedSite: View {
             HStack(alignment: .top, spacing: 12) {
 
                 SiteIconAndConnector(site: site)
-                    .link {
-                        model.open(site)
-                    }
 
                 VStack(alignment: .leading, spacing: 6) {
 
@@ -265,21 +262,31 @@ struct RecentlyVisitedPageList: View {
 
 struct SiteIconAndConnector: View {
 
-    var site: HomePage.Models.RecentlyVisitedSiteModel
+    let backgroundColor = Color("HomeFavoritesBackgroundColor") // HomeFeedItemVerticalConnectorColor")
+    let mouseOverColor: Color = Color("HomeFavoritesHoverColor")
+
+    @EnvironmentObject var model: HomePage.Models.RecentlyVisitedModel
+    @ObservedObject var site: HomePage.Models.RecentlyVisitedSiteModel
+
+    @State var isHovering = false
 
     var body: some View {
         VStack(spacing: 0) {
             ZStack {
                 RoundedRectangle(cornerRadius: 6)
-                    .fill(Color("HomeFeedItemVerticalConnectorColor"))
+                    .fill(isHovering ? mouseOverColor : backgroundColor)
 
                 FaviconView(domain: site.domain, size: 22)
-
             }
+            .link(onHoverChanged: {
+                self.isHovering = $0
+            }, clicked: {
+                model.open(site)
+            })
             .frame(width: 32, height: 32)
 
             Rectangle()
-                .fill(Color("HomeFeedItemVerticalConnectorColor"))
+                .fill(backgroundColor)
                 .frame(width: 1)
                 .frame(maxHeight: .infinity)
         }

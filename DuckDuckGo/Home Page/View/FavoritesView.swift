@@ -112,7 +112,7 @@ struct Favorite: View {
             ZStack(alignment: .center) {
 
                 RoundedRectangle(cornerRadius: 12)
-                    .foregroundColor(isHovering ? Color("ButtonMouseOverColor") : Color("HomeFavoritesBackgroundColor"))
+                    .foregroundColor(isHovering ? Color("HomeFavoritesHoverColor") : Color("HomeFavoritesBackgroundColor"))
 
                 FaviconView(domain: bookmark.url.host ?? "")
                     .frame(width: 32, height: 32)
