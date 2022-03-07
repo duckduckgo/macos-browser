@@ -75,6 +75,7 @@ final class PrivacyDashboardViewController: NSViewController {
     }
 
     override func viewWillDisappear() {
+        contentHeightConstraint.constant = Constants.initialContentHeight
         cancellables.removeAll()
     }
 
