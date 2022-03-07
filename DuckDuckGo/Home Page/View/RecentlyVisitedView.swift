@@ -147,6 +147,7 @@ struct RecentlyVisitedSite: View {
 
                 }
                 .padding([.leading, .bottom], 12)
+                .padding(.top, 6)
 
                 Spacer()
 
