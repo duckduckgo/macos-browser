@@ -23,11 +23,10 @@ import Combine
 import SwiftUI
 import BrowserServicesKit
 
-protocol ChildAutofillUserScriptDelegate: AnyObject {
+protocol BrowserTabViewControllerClickDelegate: AnyObject {
     func browserTabViewController(_ browserTabViewController: BrowserTabViewController, didClickAtPoint: CGPoint)
 }
 
-// swiftlint:disable type_body_length
 // swiftlint:disable file_length
 
 final class BrowserTabViewController: NSViewController {
@@ -1007,5 +1006,4 @@ extension BrowserTabViewController {
 
 }
 
-// swiftlint:enable type_body_length
 // swiftlint:enable file_length
