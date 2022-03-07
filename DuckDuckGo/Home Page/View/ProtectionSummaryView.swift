@@ -36,7 +36,7 @@ struct ProtectionSummary: View {
                 }
 
             Group {
-                if model.numberOfTrackersBlocked > 0 {
+                if model.recentSites.count > 0 {
                     Text(UserText.homePageProtectionSummaryMessage(numberOfTrackersBlocked: model.numberOfTrackersBlocked))
                 } else {
                     Text(UserText.homePageProtectionSummaryInfo)
@@ -45,16 +45,17 @@ struct ProtectionSummary: View {
             .multilineTextAlignment(.center)
             .lineLimit(2)
             .font(.system(size: 17, weight: .bold, design: .default))
+            .foregroundColor(Color("HomeFeedTitleColor"))
 
             Spacer()
-                .visibility(isExpanded ? .visible : .gone)
 
             HoverButton(size: 24, imageName: "HomeArrowUp", imageSize: 16) {
                 withAnimation {
                     isExpanded.toggle()
                 }
             }.rotationEffect(.degrees(isExpanded ? 0 : 180))
-        }
+
+        }.padding([.leading, .trailing], 12)
     }
 
 }

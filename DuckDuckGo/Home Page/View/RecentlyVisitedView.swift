@@ -35,22 +35,74 @@ struct RecentlyVisited: View {
 
             Group {
                 if #available(macOS 11, *) {
-                    LazyVStack {
+                    LazyVStack(spacing: 0) {
                         ForEach(model.recentSites, id: \.domain) {
                             RecentlyVisitedSite(site: $0)
                         }
                     }
                 } else {
-                    VStack {
+                    VStack(spacing: 0) {
                         ForEach(model.recentSites, id: \.domain) {
                             RecentlyVisitedSite(site: $0)
                         }
                     }
                 }
 
-            }.visibility(isExpanded ? .visible : .gone)
+                RecentlyVisitedSiteEmptyState()
+                    .visibility(model.recentSites.isEmpty ? .visible : .gone)
+
+            }
+            .visibility(isExpanded ? .visible : .gone)
 
         }.padding(.bottom, 24)
+
+    }
+
+}
+
+struct RecentlyVisitedSiteEmptyState: View {
+
+    let textColor = Color("HomeFeedEmptyStateTextColor")
+    let connectorColor = Color("HomeFeedItemVerticalConnectorColor")
+
+    var body: some View {
+
+        HStack(spacing: 12) {
+            ZStack {
+                RoundedRectangle(cornerRadius: 6)
+                    .fill(connectorColor)
+                Image("Web")
+                    .resizable()
+                    .frame(width: 22, height: 22)
+                    .foregroundColor(textColor)
+            }
+            .frame(width: 32, height: 32)
+
+            VStack(alignment: .leading, spacing: 6) {
+
+                Text("Recently visited sites appear here")
+                    .font(.system(size: 15, weight: .semibold))
+                    .foregroundColor(textColor)
+
+                Text("Keep browsing to see how many trackers were blocked")
+                    .font(.system(size: 13))
+                    .foregroundColor(textColor)
+
+            }
+
+            Spacer()
+
+            HStack(spacing: 2) {
+                RoundedRectangle(cornerRadius: 6)
+                    .fill(connectorColor)
+                    .frame(width: 24, height: 24)
+
+                RoundedRectangle(cornerRadius: 8)
+                    .fill(connectorColor)
+                    .frame(width: 24, height: 24)
+            }
+
+        }.padding([.leading, .trailing], 12)
 
     }
 
@@ -74,7 +126,7 @@ struct RecentlyVisitedSite: View {
                 .shadow(color: .black.opacity(0.1), radius: 8, x: 0, y: 1)
                 .visibility(isHovering ? .visible : .gone)
 
-            HStack(alignment: .top) {
+            HStack {
 
                 SiteIcon(site: site)
 
@@ -102,17 +154,17 @@ struct RecentlyVisitedSite: View {
             .padding([.leading, .trailing, .top], 12)
             .visibility(isHidden ? .invisible : .visible)
 
-            HStack {
+            HStack(spacing: 2) {
 
                 Spacer()
 
-                HoverButton(imageName: site.isFavorite ? "FavoriteFilled" : "Favorite") {
+                HoverButton(size: 24, imageName: site.isFavorite ? "FavoriteFilled" : "Favorite", imageSize: 16) {
                     model.toggleFavoriteSite(site)
                 }
                 .foregroundColor(Color("HomeFeedItemButtonTintColor"))
                 .tooltip(UserText.tooltipAddToFavorites)
 
-                HoverButton(imageName: "Burn") {
+                HoverButton(size: 24, imageName: "Burn", imageSize: 16) {
                     isHovering = false
                     isBurning = true
                     withAnimation(.default.delay(0.4)) {
@@ -231,6 +283,8 @@ struct SiteIcon: View {
 
 struct SiteTrackerSummary: View {
 
+    let trackerIconCount = 2
+
     @ObservedObject var site: HomePage.Models.RecentlyVisitedSiteModel
 
     var body: some View {
@@ -238,12 +292,12 @@ struct SiteTrackerSummary: View {
 
             // Top 3 entities
             HStack(spacing: 2) {
-                ForEach(site.blockedEntities.prefix(3), id: \.self) {
+                ForEach(site.blockedEntities.prefix(trackerIconCount), id: \.self) {
                     EntityIcon(imageName: site.entityImageName($0), displayName: site.entityDisplayName($0))
                 }
 
                 // Count of other entities, if any
-                let remainingCount = site.blockedEntities.count - 3
+                let remainingCount = site.blockedEntities.count - trackerIconCount
                 if remainingCount > 9 {
                     SmallCircleText(text: "++")
                         .tooltip("+\(remainingCount)")

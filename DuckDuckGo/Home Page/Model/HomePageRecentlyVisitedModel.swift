@@ -23,7 +23,7 @@ extension HomePage.Models {
 
 final class RecentlyVisitedModel: ObservableObject {
 
-    let fire = Fire()
+    private let fire = Fire()
 
     @UserDefaultsWrapper(key: .homePageShowPagesOnHover, defaultValue: true)
     private static var showPagesOnHoverSetting: Bool

@@ -416,7 +416,7 @@ struct UserText {
     static let defaultBrowserPromptMessage = NSLocalizedString("default.browser.prompt.message", value: "Set DuckDuckGo as your default browser", comment: "")
     static let defaultBrowserPromptButton = NSLocalizedString("default.browser.prompt.button", value: "Set Default Browser...", comment: "")
 
-    static let homePageProtectionSummaryInfo = NSLocalizedString("home.page.protection.summary.info", value: "DuckDuckGo blocks trackers as you browse", comment: "")
+    static let homePageProtectionSummaryInfo = NSLocalizedString("home.page.protection.summary.info", value: "No recent activity", comment: "")
     static func homePageProtectionSummaryMessage(numberOfTrackersBlocked: Int) -> String {
         let localized = NSLocalizedString("home.page.protection.summary.info",
                                           value: "%d trackers blocked in the past 7 days",
