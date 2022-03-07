@@ -48,6 +48,7 @@ struct ProtectionSummary: View {
             .foregroundColor(Color("HomeFeedTitleColor"))
 
             Spacer()
+                .visibility(isExpanded ? .visible : .gone)
 
             HoverButton(size: 24, imageName: "HomeArrowUp", imageSize: 16) {
                 withAnimation {
