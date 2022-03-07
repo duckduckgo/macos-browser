@@ -308,7 +308,7 @@ struct SiteTrackerSummary: View {
                     .visibility(remaining > 0 ? .visible : .gone)
             }
             .padding(.trailing, 6)
-            .visibility(site.blockedEntities.isEmpty ? .gone : .invisible)
+            .visibility(site.blockedEntities.isEmpty ? .gone : .visible)
 
             Group {
                 if site.blockedEntities.isEmpty {
