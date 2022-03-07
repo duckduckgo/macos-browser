@@ -425,9 +425,7 @@ struct UserText {
     }
 
     static func pageTrackersMessage(numberOfTrackersBlocked: Int) -> String {
-        let localized = NSLocalizedString("page.trackers.message",
-                                          value: "%d tracking attempts blocked",
-                                          comment: "")
+        let localized = NSLocalizedString("**%d** tracking attempts blocked", comment: "")
         return String(format: localized, numberOfTrackersBlocked)
     }
 

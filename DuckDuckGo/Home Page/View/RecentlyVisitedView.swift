@@ -126,9 +126,9 @@ struct RecentlyVisitedSite: View {
                 .shadow(color: Color("HomeFeedItemHoverShadow2Color"), radius: 4, x: 0, y: 1)
                 .visibility(isHovering ? .visible : .gone)
 
-            HStack {
+            HStack(alignment: .top, spacing: 12) {
 
-                SiteIcon(site: site)
+                SiteIconAndConnector(site: site)
 
                 VStack(alignment: .leading, spacing: 6) {
 
@@ -146,7 +146,7 @@ struct RecentlyVisitedSite: View {
                         .visibility(!model.showPagesOnHover || isHovering ? .visible : .invisible)
 
                 }
-                .padding([.leading, .bottom], 12)
+                .padding(.bottom, 12)
                 .padding(.top, 6)
 
                 Spacer()
@@ -176,7 +176,8 @@ struct RecentlyVisitedSite: View {
                 .tooltip(UserText.tooltipBurn)
 
             }
-            .padding([.top, .trailing], 12)
+            .padding(.trailing, 12)
+            .padding(.top, 13)
             .visibility(isHidden ? .invisible : .visible)
 
             FireAnimation()
@@ -198,7 +199,7 @@ struct RecentlyVisitedSite: View {
         .onHover {
             isHovering = $0
         }
-        .frame(maxWidth: .infinity)
+        .frame(maxWidth: .infinity, minHeight: 126)
 
     }
 
@@ -258,7 +259,7 @@ struct RecentlyVisitedPageList: View {
 
 }
 
-struct SiteIcon: View {
+struct SiteIconAndConnector: View {
 
     var site: HomePage.Models.RecentlyVisitedSiteModel
 
@@ -298,19 +299,22 @@ struct SiteTrackerSummary: View {
                 }
 
                 // Count of other entities, if any
-                let remainingCount = site.blockedEntities.count - trackerIconCount
-                if remainingCount > 9 {
-                    SmallCircleText(text: "++")
-                        .tooltip("+\(remainingCount)")
-                } else if remainingCount > 0 {
-                    SmallCircleText(text: "+\(remainingCount)")
-                }
+                let remaining = site.blockedEntities.count - trackerIconCount
+                SmallCircleText(text: "+\(remaining)")
+                    .allowsTightening(true)
+                    .minimumScaleFactor(0.5)
+                    .visibility(remaining > 0 ? .visible : .gone)
             }
             .padding(.trailing, 6)
 
-            // Text summary
-            Text(UserText.pageTrackersMessage(numberOfTrackersBlocked: site.numberOfTrackersBlocked))
-                .font(.system(size: 13))
+            // This will get localised but this formatting is required
+            Group {
+                if #available(macOS 12, *) {
+                    Text("**\(site.numberOfTrackersBlocked)** tracking attempts blocked")
+                } else {
+                    Text("\(site.numberOfTrackersBlocked) tracking attempts blocked")
+                }
+            }.font(.system(size: 13))
 
             Spacer()
         }
@@ -369,6 +373,7 @@ struct SmallCircleText: View {
             Text(String(text))
                 .foregroundColor(textColor)
                 .font(.system(size: 10, weight: .bold, design: .default))
+                .padding([.leading, .trailing], 1)
 
         }.frame(width: 18, height: 18, alignment: .center)
     }
