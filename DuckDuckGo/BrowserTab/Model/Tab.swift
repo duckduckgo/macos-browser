@@ -523,9 +523,9 @@ final class Tab: NSObject {
     @Published var connectionUpgradedTo: URL?
     @Published var cookieConsentManaged: CookieConsentInfo?
 
-    public func resetDashboardInfo(_ url: URL?) {
+    public func resetDashboardInfo() {
         trackerInfo = TrackerInfo()
-        if self.serverTrust?.host != url?.host {
+        if self.serverTrust?.host != content.url?.host {
             serverTrust = nil
         }
     }
@@ -912,6 +912,7 @@ extension Tab: WKNavigationDelegate {
         if error != nil { error = nil }
 
         invalidateSessionStateData()
+        resetDashboardInfo()
     }
 
     func webView(_ webView: WKWebView, didFinish navigation: WKNavigation!) {
