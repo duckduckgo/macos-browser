@@ -40,7 +40,7 @@ struct MoreOrLess: View {
                         Text("^")
                     }
                 }
-                .rotationEffect(.degrees(isExpanded ? 180 : 0))
+                .rotationEffect(.degrees(isExpanded ? 0 : 180))
             }
             .foregroundColor(Color("LinkBlueColor"))
 

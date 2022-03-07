@@ -121,7 +121,7 @@ struct RecentlyVisitedSite: View {
         ZStack(alignment: .top) {
 
             RoundedRectangle(cornerRadius: 8)
-                .fill(Color("HomePageBackgroundColor"))
+                .fill(Color("HomeFeedItemHoverBackgroundColor"))
                 .shadow(color: .black.opacity(0.08), radius: 8, x: 0, y: 4)
                 .shadow(color: .black.opacity(0.1), radius: 8, x: 0, y: 1)
                 .visibility(isHovering ? .visible : .gone)

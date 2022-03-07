@@ -20,13 +20,18 @@ import Foundation
 
 extension HomePage.Models {
 
+    enum FavoriteType {
+
+        case bookmark(Bookmark)
+        case addButton
+        case ghostButton
+
+    }
+
     struct FavoriteModel {
 
-        static let addButtonUUID = UUID()
-        static let ghostButtonUUID = UUID()
-
         let id: UUID
-        let bookmark: Bookmark?
+        let favoriteType: FavoriteType
 
     }
 
@@ -40,15 +45,15 @@ extension HomePage.Models {
 
         @Published var favorites: [Bookmark] = [] {
             didSet {
-                let addButton = FavoriteModel(id: FavoriteModel.addButtonUUID, bookmark: nil)
-                let ghostButton = FavoriteModel(id: FavoriteModel.ghostButtonUUID, bookmark: nil)
-
-                var favorites = self.favorites.map { FavoriteModel(id: $0.id, bookmark: $0) }
-                favorites.append(addButton)
+                var favorites = self.favorites.map { FavoriteModel(id: $0.id, favoriteType: .bookmark($0)) }
+                favorites.append(.init(id: UUID(), favoriteType: .addButton))
 
                 let lastRowCount = favorites.count % HomePage.favoritesPerRow
                 let missing = lastRowCount > 0 ? HomePage.favoritesPerRow - lastRowCount : 0
-                favorites.append(contentsOf: Array(repeating: ghostButton, count: missing))
+
+                (0 ..< missing).forEach { _ in 
+                    favorites.append(FavoriteModel(id: UUID(), favoriteType: .ghostButton))
+                }
 
                 self.rows = favorites.chunked(into: HomePage.favoritesPerRow)
             }

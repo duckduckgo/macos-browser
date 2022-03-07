@@ -63,18 +63,20 @@ struct Favorites: View {
 
                 HStack(alignment: .top, spacing: 20) {
                     ForEach(model.rows[index], id: \.id) { favorite in
-                        if !isExpanded && index + 1 == HomePage.favoritesRowCountWhenCollapsed &&
-                            favorite.id == model.rows[index].last?.id {
-                            // When collapsed, replace last favorite with add button
+
+                        switch favorite.favoriteType {
+                        case .bookmark(let bookmark):
+                            if !isExpanded && index + 1 == HomePage.favoritesRowCountWhenCollapsed && favorite.id == model.rows[index].last?.id {
+                                addButton
+                            } else {
+                                Favorite(bookmark: bookmark)
+                            }
+
+                        case .addButton:
                             addButton
-                        } else if let bookmark = favorite.bookmark {
-                            Favorite(bookmark: bookmark)
-                        } else if favorite.id == HomePage.Models.FavoriteModel.addButtonUUID {
-                            addButton
-                        } else if favorite.id == HomePage.Models.FavoriteModel.ghostButtonUUID {
+
+                        case .ghostButton:
                             ghostButton
-                        } else {
-                            FailedAssertionView("Unknown favorites type")
                         }
                     }
                 }
