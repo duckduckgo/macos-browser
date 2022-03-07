@@ -123,8 +123,8 @@ struct RecentlyVisitedSite: View {
 
             RoundedRectangle(cornerRadius: 8)
                 .fill(Color("HomeFeedItemHoverBackgroundColor"))
-                .shadow(color: Color("HomeFeedItemHoverShadow1Color"), radius: 8, x: 0, y: 4)
-                .shadow(color: Color("HomeFeedItemHoverShadow2Color"), radius: 4, x: 0, y: 1)
+                .shadow(color: Color("HomeFeedItemHoverShadow1Color"), radius: 4, x: 0, y: 4)
+                .shadow(color: Color("HomeFeedItemHoverShadow2Color"), radius: 2, x: 0, y: 1)
                 .visibility(isHovering ? .visible : .gone)
 
             HStack(alignment: .top, spacing: 12) {
@@ -143,6 +143,7 @@ struct RecentlyVisitedSite: View {
                     .foregroundColor(Color("HomeFeedItemTitleColor"))
 
                     SiteTrackerSummary(site: site)
+                        .padding(.bottom, 6)
 
                     RecentlyVisitedPageList(site: site)
                         .visibility(!model.showPagesOnHover || isHovering ? .visible : .invisible)
