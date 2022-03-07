@@ -28,7 +28,7 @@ struct DefaultBrowserPrompt: View {
             Spacer()
 
             HStack {
-                HoverButton(imageName: "Close", imageSize: 22) {
+                HoverButton(imageName: "Close", imageSize: 22, cornerRadius: 4) {
                     self.model.close()
                 }.padding()
 

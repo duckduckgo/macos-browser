@@ -64,6 +64,7 @@ struct RecentlyVisited: View {
 struct RecentlyVisitedSiteEmptyState: View {
 
     let textColor = Color("HomeFeedEmptyStateTextColor")
+    let iconColor = Color("HomeFeedEmptyStateIconColor")
     let connectorColor = Color("HomeFeedItemVerticalConnectorColor")
 
     var body: some View {
@@ -162,13 +163,13 @@ struct RecentlyVisitedSite: View {
 
                 Spacer()
 
-                HoverButton(size: 24, imageName: site.isFavorite ? "FavoriteFilled" : "Favorite", imageSize: 16) {
+                HoverButton(size: 24, imageName: site.isFavorite ? "FavoriteFilled" : "Favorite", imageSize: 16, cornerRadius: 4) {
                     model.toggleFavoriteSite(site)
                 }
                 .foregroundColor(Color("HomeFeedItemButtonTintColor"))
                 .tooltip(UserText.tooltipAddToFavorites)
 
-                HoverButton(size: 24, imageName: "Burn", imageSize: 16) {
+                HoverButton(size: 24, imageName: "Burn", imageSize: 16, cornerRadius: 4) {
                     isHovering = false
                     isBurning = true
                     withAnimation(.default.delay(0.4)) {
@@ -199,8 +200,10 @@ struct RecentlyVisitedSite: View {
                 }
 
         }
-        .onHover {
-            isHovering = $0
+        .onHover { isHovering in
+            withAnimation {
+                self.isHovering = isHovering
+            }
         }
         .frame(maxWidth: .infinity, minHeight: 126)
 
@@ -244,7 +247,7 @@ struct RecentlyVisitedPageList: View {
                         .font(.system(size: 11))
                         .foregroundColor(Color("HomeFeedItemTimeTextColor"))
 
-                    HoverButton(size: 16, imageName: "HomeArrowDown", imageSize: 8) {
+                    HoverButton(size: 16, imageName: "HomeArrowDown", imageSize: 8, cornerRadius: 4) {
                         withAnimation {
                             isExpanded.toggle()
                         }

@@ -50,7 +50,7 @@ struct ProtectionSummary: View {
             Spacer()
                 .visibility(isExpanded ? .visible : .gone)
 
-            HoverButton(size: 24, imageName: "HomeArrowUp", imageSize: 16) {
+            HoverButton(size: 24, imageName: "HomeArrowUp", imageSize: 16, cornerRadius: 4) {
                 withAnimation {
                     isExpanded.toggle()
                 }

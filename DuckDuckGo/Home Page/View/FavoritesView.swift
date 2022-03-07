@@ -36,7 +36,7 @@ struct Favorites: View {
                 .frame(width: 64, height: 64)
 
             VStack(spacing: 5) {
-                HoverButton(size: 64, imageName: "Add", imageSize: 22) {
+                HoverButton(size: 64, imageName: "Add", imageSize: 22, cornerRadius: 12) {
                     model.addNew()
                 }
                 .frame(width: 64, height: 64)
