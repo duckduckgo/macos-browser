@@ -1,7 +1,17 @@
 {
   "images" : [
     {
-      "filename" : "Protections Shield Dark.svg",
+      "filename" : "Shield - 64 - Dark-1.svg",
+      "idiom" : "universal"
+    },
+    {
+      "appearances" : [
+        {
+          "appearance" : "luminosity",
+          "value" : "dark"
+        }
+      ],
+      "filename" : "Shield - 64 - Light.svg",
       "idiom" : "universal"
     }
   ],

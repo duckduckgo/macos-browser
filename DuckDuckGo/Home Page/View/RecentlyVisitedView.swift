@@ -32,6 +32,7 @@ struct RecentlyVisited: View {
 
         VStack {
             ProtectionSummary(isExpanded: $isExpanded)
+                .padding(.bottom, 6)
 
             Group {
                 if #available(macOS 11, *) {
@@ -129,18 +130,19 @@ struct RecentlyVisitedSite: View {
             HStack(alignment: .top, spacing: 12) {
 
                 SiteIconAndConnector(site: site)
+                    .link {
+                        model.open(site)
+                    }
 
                 VStack(alignment: .leading, spacing: 6) {
 
                     HyperLink(site.domain) {
-                        guard let url = site.domain.url else { return }
-                        model.open(url)
+                        model.open(site)
                     }
                     .font(.system(size: 15, weight: .semibold, design: .default))
                     .foregroundColor(Color("HomeFeedItemTitleColor"))
 
                     SiteTrackerSummary(site: site)
-                        .visibility(site.numberOfTrackersBlocked > 0 ? .visible : .gone)
 
                     RecentlyVisitedPageList(site: site)
                         .visibility(!model.showPagesOnHover || isHovering ? .visible : .invisible)
@@ -306,15 +308,21 @@ struct SiteTrackerSummary: View {
                     .visibility(remaining > 0 ? .visible : .gone)
             }
             .padding(.trailing, 6)
+            .visibility(site.blockedEntities.isEmpty ? .gone : .invisible)
 
-            // This will get localised but this formatting is required
             Group {
-                if #available(macOS 12, *) {
-                    Text("**\(site.numberOfTrackersBlocked)** tracking attempts blocked")
+                if site.blockedEntities.isEmpty {
+                    Text("No trackers blocked")
                 } else {
-                    Text("\(site.numberOfTrackersBlocked) tracking attempts blocked")
+                    // This will get localised but this formatting is required
+                    if #available(macOS 12, *) {
+                        Text("**\(site.numberOfTrackersBlocked)** trackers blocked")
+                    } else {
+                        Text("\(site.numberOfTrackersBlocked) trackers blocked")
+                    }
                 }
-            }.font(.system(size: 13))
+            }
+            .font(.system(size: 13))
 
             Spacer()
         }
