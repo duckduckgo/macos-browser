@@ -518,12 +518,12 @@ final class Tab: NSObject {
 
     // MARK: - Dashboard Info
 
-    @Published var trackerInfo: TrackerInfo?
-    @Published var serverTrust: ServerTrust?
-    @Published var connectionUpgradedTo: URL?
-    @Published var cookieConsentManaged: CookieConsentInfo?
+    @Published private(set) var trackerInfo: TrackerInfo?
+    @Published private(set) var serverTrust: ServerTrust?
+    @Published private(set) var connectionUpgradedTo: URL?
+    @Published private(set) var cookieConsentManaged: CookieConsentInfo?
 
-    public func resetDashboardInfo() {
+    private func resetDashboardInfo() {
         trackerInfo = TrackerInfo()
         if self.serverTrust?.host != content.url?.host {
             serverTrust = nil
