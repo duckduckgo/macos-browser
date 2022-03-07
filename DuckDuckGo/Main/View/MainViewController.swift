@@ -175,7 +175,7 @@ final class MainViewController: NSViewController {
         let nonHomePageHeight: CGFloat = view.window?.isPopUpWindow == true ? 42 : 48
 
         let height = animated ? addressBarHeightConstraint.animator() : addressBarHeightConstraint
-        height?.constant = homePage ? 66 : nonHomePageHeight
+        height?.constant = homePage ? 56 : nonHomePageHeight
 
         let divider = animated ? self.divider.animator() : self.divider
         divider?.alphaValue = homePage ? 0 : 1.0

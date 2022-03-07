@@ -378,7 +378,7 @@ final class NavigationBarViewController: NSViewController {
         let verticalPadding: CGFloat = view.window?.isPopUpWindow == true ? 0 : 6
 
         let barTop = animated ? addressBarTopConstraint.animator() : addressBarTopConstraint
-        barTop?.constant = homePage ? 26 : verticalPadding
+        barTop?.constant = homePage ? 16 : verticalPadding
 
         let bottom = animated ? addressBarBottomConstraint.animator() : addressBarBottomConstraint
         bottom?.constant = homePage ? 0 : verticalPadding
