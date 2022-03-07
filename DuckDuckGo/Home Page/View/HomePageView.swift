@@ -50,7 +50,6 @@ struct RootView: View {
                 .fill(backgroundColor)
                 .mask(LinearGradient(colors: [backgroundColor.opacity(1), backgroundColor.opacity(0)], startPoint: .top, endPoint: .bottom))
                 .frame(height: 16)
-                .padding(.trailing, 12) // don't fade the scroll bar
             DefaultBrowserPrompt()
         }
         .frame(maxWidth: .infinity)

@@ -68,7 +68,7 @@ struct RecentlyVisitedSiteEmptyState: View {
 
     var body: some View {
 
-        HStack(spacing: 12) {
+        HStack(alignment: .top, spacing: 12) {
             ZStack {
                 RoundedRectangle(cornerRadius: 6)
                     .fill(connectorColor)
@@ -89,7 +89,7 @@ struct RecentlyVisitedSiteEmptyState: View {
                     .font(.system(size: 13))
                     .foregroundColor(textColor)
 
-            }
+            }.padding(.top, 6)
 
             Spacer()
 
@@ -252,7 +252,7 @@ struct RecentlyVisitedPageList: View {
                     .rotationEffect(.degrees(isExpanded ? 180 : 0))
                     .visibility(page.url == visiblePages.last?.url &&
                                 site.pages.count > collapsedPageCount ? .visible : .invisible)
-
+                        
                     Spacer()
                 }.frame(maxHeight: 13)
 
