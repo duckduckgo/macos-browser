@@ -35,7 +35,7 @@ struct Favorites: View {
                 .stroke(Color("HomeFavoritesGhostColor"), style: StrokeStyle(lineWidth: 1.5))
                 .frame(width: 64, height: 64)
 
-            VStack {
+            VStack(spacing: 5) {
                 HoverButton(size: 64, imageName: "Add", imageSize: 22) {
                     model.addNew()
                 }
@@ -107,7 +107,7 @@ struct Favorite: View {
 
     var body: some View {
 
-        VStack {
+        VStack(spacing: 5) {
 
             ZStack(alignment: .center) {
 

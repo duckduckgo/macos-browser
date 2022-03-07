@@ -122,15 +122,15 @@ struct RecentlyVisitedSite: View {
 
             RoundedRectangle(cornerRadius: 8)
                 .fill(Color("HomeFeedItemHoverBackgroundColor"))
-                .shadow(color: .black.opacity(0.08), radius: 8, x: 0, y: 4)
-                .shadow(color: .black.opacity(0.1), radius: 8, x: 0, y: 1)
+                .shadow(color: Color("HomeFeedItemHoverShadow1Color"), radius: 8, x: 0, y: 4)
+                .shadow(color: Color("HomeFeedItemHoverShadow2Color"), radius: 4, x: 0, y: 1)
                 .visibility(isHovering ? .visible : .gone)
 
             HStack {
 
                 SiteIcon(site: site)
 
-                VStack(alignment: .leading, spacing: 12) {
+                VStack(alignment: .leading, spacing: 6) {
 
                     HyperLink(site.domain) {
                         guard let url = site.domain.url else { return }

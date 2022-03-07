@@ -32,12 +32,14 @@ struct RootView: View {
                     Group {
 
                         Favorites()
+                            .padding(.top, 72)
 
                         RecentlyVisited()
+                            .padding(.top, 54)
+                            .padding(.bottom, 16)
 
                     }
                     .frame(width: 484)
-                    .padding(.top, 54)
                 }
                 .frame(maxWidth: .infinity)
             }
