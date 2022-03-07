@@ -76,7 +76,7 @@ struct RecentlyVisitedSiteEmptyState: View {
                 Image("Web")
                     .resizable()
                     .frame(width: 22, height: 22)
-                    .foregroundColor(textColor)
+                    .foregroundColor(iconColor)
             }
             .frame(width: 32, height: 32)
 
