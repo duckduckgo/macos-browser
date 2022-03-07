@@ -149,7 +149,6 @@ final class RecentlyVisitedSiteModel: ObservableObject {
     }
 
     func fixDisplayTitles() {
-        var pagesByTitle = [String: RecentlyVisitedPageModel]()
         var searches = Set<String>()
         var urlsToRemove = [URL]()
 
@@ -163,20 +162,13 @@ final class RecentlyVisitedSiteModel: ObservableObject {
                     urlsToRemove.append($0.url)
                 }
 
-            } else if $0.actualTitle == nil || $0.actualTitle?.trimWhitespace().isEmpty == true { // Blank titles
+            } else if $0.actualTitle?.isEmpty ?? true { // Blank titles
 
                 $0.displayTitle = $0.url.path
 
-            } else if let actualTitle = $0.actualTitle {
+            } else {
 
-                if let previousPageWithTitle = pagesByTitle[actualTitle] { 
-                    // This is a duplicate title so make it unique using the path
-                    $0.displayTitle = $0.url.path
-                    previousPageWithTitle.displayTitle = $0.url.path
-                } else {
-                    // Remember we've seen this title
-                    pagesByTitle[actualTitle] = $0
-                }
+                $0.displayTitle = $0.actualTitle ?? $0.url.path
 
             }
         }
