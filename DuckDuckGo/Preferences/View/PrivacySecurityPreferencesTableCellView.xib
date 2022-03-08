@@ -81,7 +81,7 @@
                     <rect key="frame" x="-2" y="177" width="467" height="48"/>
                     <textFieldCell key="cell" selectable="YES" id="jGL-ur-LHs">
                         <font key="font" metaFont="system"/>
-                        <string key="title">When DuckDuckGo detects cookie consent pop-ups on sites you visit, we'll automatically set your cookie preferences to minimize cookies and maximize privacy, then close the pop-ups.</string>
+                        <string key="title">On some sites, we can detect cookie consent pop-ups and automatically set your cookie preferences to minimize cookies and maximize privacy, then close the pop-ups.</string>
                         <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
                         <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
                     </textFieldCell>
