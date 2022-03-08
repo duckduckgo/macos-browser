@@ -347,8 +347,19 @@ final class AddressBarTextField: NSTextField {
             return
         }
 
-        let isUpgradable = HTTPSUpgrade.shared.isUpgradeable(url: url)
-        completion(isUpgradable ? url.toHttps() : url, isUpgradable)
+        upgradeToHttps(url: url, completion: completion)
+    }
+    
+    private func upgradeToHttps(url: URL, completion: @escaping (URL?, Bool) -> Void) {
+        Task {
+            let result = await PrivacyFeatures.httpsUpgrade.upgrade(url: url)
+            switch result {
+            case let .success(upgradedUrl):
+                completion(upgradedUrl, true)
+            case .failure:
+                completion(url, false)
+            }
+        }
     }
 
     // MARK: - Value

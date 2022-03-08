@@ -30,12 +30,10 @@ final class SuggestionTableRowView: NSTableRowView {
         updateBackgroundColor()
     }
 
-    // swiftlint:disable unused_setter_value
     override var isEmphasized: Bool {
         get { return true }
         set {}
     }
-    // swiftlint:enable unused_setter_value
 
     override var isSelected: Bool {
         didSet {
