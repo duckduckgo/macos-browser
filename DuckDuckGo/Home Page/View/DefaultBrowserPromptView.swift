@@ -24,38 +24,34 @@ struct DefaultBrowserPrompt: View {
 
     var body: some View {
 
-        VStack {
-            Spacer()
+        ZStack {
+
+            RoundedRectangle(cornerRadius: 8)
+                .fill(Color("HomeDefaultBrowserPromptBackgroundColor"))
 
             HStack {
-                HoverButton(imageName: "Close", imageSize: 22, cornerRadius: 4) {
-                    self.model.close()
-                }.padding()
-
                 Spacer()
 
-                Image("Logo")
-                    .resizable(resizingMode: .stretch)
-                    .frame(width: 38, height: 38)
-
                 Text(UserText.defaultBrowserPromptMessage)
-                    .font(.body)
+                    .font(.system(size: 13, weight: .medium))
 
                 let button = Button(UserText.defaultBrowserPromptButton) {
                     self.model.requestSetDefault()
                 }
 
-                if #available(macOS 12.0, *) {
-                    button.buttonStyle(.borderedProminent)
-                } else {
-                    button.buttonStyle(.bordered)
-                }
+                button.buttonStyle(.bordered)
 
                 Spacer()
-            }
-            .background(Color("BrowserTabBackgroundColor").shadow(radius: 3))
 
-        }.visibility(model.shouldShow ? .visible : .gone)
+                HoverButton(imageName: "Close", imageSize: 22, cornerRadius: 4) {
+                    self.model.close()
+                }.padding()
+
+            }
+
+        }
+        .visibility(model.shouldShow ? .visible : .gone)
+        .padding(.top, 24)
 
     }
 

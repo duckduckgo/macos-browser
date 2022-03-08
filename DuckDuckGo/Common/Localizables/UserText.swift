@@ -414,7 +414,7 @@ struct UserText {
     static let moreOrLessExpand = NSLocalizedString("more.or.less.expand", value: "Show More", comment: "For expanding views to show more.")
 
     static let defaultBrowserPromptMessage = NSLocalizedString("default.browser.prompt.message", value: "Set DuckDuckGo as your default browser", comment: "")
-    static let defaultBrowserPromptButton = NSLocalizedString("default.browser.prompt.button", value: "Set Default Browser...", comment: "")
+    static let defaultBrowserPromptButton = NSLocalizedString("default.browser.prompt.button", value: "Set Default...", comment: "")
 
     static let homePageProtectionSummaryInfo = NSLocalizedString("home.page.protection.summary.info", value: "No recent activity", comment: "")
     static func homePageProtectionSummaryMessage(numberOfTrackersBlocked: Int) -> String {

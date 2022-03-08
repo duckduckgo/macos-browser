@@ -32,6 +32,7 @@ struct RootView: View {
             ScrollView {
                 VStack(spacing: 0) {
                     Group {
+                        DefaultBrowserPrompt()
 
                         Favorites()
                             .padding(.top, 72)
@@ -46,8 +47,6 @@ struct RootView: View {
                 .frame(maxWidth: .infinity)
             }
 
-            DefaultBrowserPrompt()
-            
         }
         .frame(maxWidth: .infinity)
         .background(backgroundColor)
