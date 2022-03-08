@@ -67,10 +67,13 @@ final class HomePageViewController: NSViewController {
             .environmentObject(favoritesModel)
             .environmentObject(defaultBrowserModel)
             .environmentObject(recentlyVisitedModel)
+            .onTapGesture { [weak self] in
+                // Remove focus from the address bar if interacting with this view.
+                self?.view.makeMeFirstResponder()
+            }
 
         let host = NSHostingView(rootView: rootView)
         host.frame = view.frame
-        host.addGestureRecognizer(NSClickGestureRecognizer(target: self, action: #selector(onClick)))
         view.addSubview(host)
         self.host = host
 
@@ -85,10 +88,6 @@ final class HomePageViewController: NSViewController {
     override func viewDidLayout() {
         super.viewDidLayout()
         host?.frame = self.view.frame
-    }
-
-    @IBAction func onClick(_ sender: Any?) {
-        view.makeMeFirstResponder()
     }
 
     func refreshModels() {

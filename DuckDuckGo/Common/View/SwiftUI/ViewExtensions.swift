@@ -42,13 +42,6 @@ extension View {
 
     func link(onHoverChanged: ((Bool) -> Void)? = nil, clicked: @escaping () -> Void) -> some View {
         self.onHover { over in
-            if over {
-                DispatchQueue.main.async { // rendering undersets this, so do it next frame
-                    NSCursor.pointingHand.push()
-                }
-            } else {
-                NSCursor.arrow.set()
-            }
             onHoverChanged?(over)
         }.onTapGesture {
             clicked()
