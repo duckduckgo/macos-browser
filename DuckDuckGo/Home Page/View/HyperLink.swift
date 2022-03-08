@@ -21,18 +21,20 @@ import SwiftUI
 struct HyperLink: View {
 
     let text: String
+    let textColor: Color
     let action: () -> Void
 
     @State var isHovering = false
 
-    init(_ text: String, _ action: @escaping () -> Void) {
+    init(_ text: String, textColor: Color, _ action: @escaping () -> Void) {
         self.text = text
+        self.textColor = textColor
         self.action = action
     }
 
     var body: some View {
         Text(text)
-            .foregroundColor(isHovering ? Color("LinkBlueColor") : Color("HomeFeedItemTitleColor"))
+            .foregroundColor(isHovering ? Color("LinkBlueColor") : textColor)
             .link {
                 isHovering = $0
             } clicked: {

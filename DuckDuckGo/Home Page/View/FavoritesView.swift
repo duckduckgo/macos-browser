@@ -66,11 +66,7 @@ struct Favorites: View {
 
                         switch favorite.favoriteType {
                         case .bookmark(let bookmark):
-                            if !isExpanded && index + 1 == HomePage.favoritesRowCountWhenCollapsed && favorite.id == model.rows[index].last?.id {
-                                addButton
-                            } else {
-                                Favorite(bookmark: bookmark)
-                            }
+                            Favorite(bookmark: bookmark)
 
                         case .addButton:
                             addButton

@@ -3,16 +3,6 @@
     {
       "filename" : "Dax_default.svg",
       "idiom" : "universal"
-    },
-    {
-      "appearances" : [
-        {
-          "appearance" : "luminosity",
-          "value" : "dark"
-        }
-      ],
-      "filename" : "Dax Logo Dark.svg",
-      "idiom" : "universal"
     }
   ],
   "info" : {

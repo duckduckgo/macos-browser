@@ -25,7 +25,7 @@ final class RecentlyVisitedModel: ObservableObject {
 
     private let fire = Fire()
 
-    @UserDefaultsWrapper(key: .homePageShowPagesOnHover, defaultValue: true)
+    @UserDefaultsWrapper(key: .homePageShowPagesOnHover, defaultValue: false)
     private static var showPagesOnHoverSetting: Bool
 
     @Published var numberOfTrackersBlocked = 0
@@ -123,6 +123,8 @@ final class RecentlyVisitedPageModel: ObservableObject {
 
 final class RecentlyVisitedSiteModel: ObservableObject {
 
+    let maxPageListSize = 10
+
     let domain: String
 
     @Published var isFavorite: Bool
@@ -149,8 +151,10 @@ final class RecentlyVisitedSiteModel: ObservableObject {
         // Skip root URLs and non-search DDG urls
         guard !entry.url.isRoot || (entry.url.isDuckDuckGo && !entry.url.isDuckDuckGoSearch) else { return  }
 
-        pages.append(RecentlyVisitedPageModel(actualTitle: entry.title, url: entry.url, visited: entry.lastVisit))
+        // Max pages that should be shown is 10
+        guard pages.count < maxPageListSize else { return }
 
+        pages.append(RecentlyVisitedPageModel(actualTitle: entry.title, url: entry.url, visited: entry.lastVisit))
     }
 
     func fixDisplayTitles() {

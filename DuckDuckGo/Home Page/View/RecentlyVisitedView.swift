@@ -30,9 +30,9 @@ struct RecentlyVisited: View {
 
     var body: some View {
 
-        VStack {
+        VStack(spacing: 0) {
             ProtectionSummary(isExpanded: $isExpanded)
-                .padding(.bottom, 6)
+                .padding(.bottom, 18)
 
             Group {
                 if #available(macOS 11, *) {
@@ -134,11 +134,10 @@ struct RecentlyVisitedSite: View {
 
                 VStack(alignment: .leading, spacing: 6) {
 
-                    HyperLink(site.domain) {
+                    HyperLink(site.domain, textColor: Color("HomeFeedItemTitleColor")) {
                         model.open(site)
                     }
                     .font(.system(size: 15, weight: .semibold, design: .default))
-                    .foregroundColor(Color("HomeFeedItemTitleColor"))
 
                     SiteTrackerSummary(site: site)
                         .padding(.bottom, 6)
@@ -230,13 +229,12 @@ struct RecentlyVisitedPageList: View {
             ForEach(visiblePages, id: \.url) { page in
                 HStack {
 
-                    HyperLink(page.displayTitle) {
+                    HyperLink(page.displayTitle, textColor: Color("HomeFeedItemPageTextColor")) {
                         model.open(page.url)    
                     }
                     .font(.system(size: 11))
                     .lineLimit(1)
                     .truncationMode(.middle)
-                    .foregroundColor(Color("HomeFeedItemPageTextColor"))
 
                     Text(formatter.localizedString(fromTimeInterval: page.visited.timeIntervalSinceNow))
                         .font(.system(size: 11))

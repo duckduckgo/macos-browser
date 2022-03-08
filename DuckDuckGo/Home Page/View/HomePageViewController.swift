@@ -70,6 +70,7 @@ final class HomePageViewController: NSViewController {
 
         let host = NSHostingView(rootView: rootView)
         host.frame = view.frame
+        host.addGestureRecognizer(NSClickGestureRecognizer(target: self, action: #selector(onClick)))
         view.addSubview(host)
         self.host = host
 
@@ -84,6 +85,10 @@ final class HomePageViewController: NSViewController {
     override func viewDidLayout() {
         super.viewDidLayout()
         host?.frame = self.view.frame
+    }
+
+    @IBAction func onClick(_ sender: Any?) {
+        view.makeMeFirstResponder()
     }
 
     func refreshModels() {

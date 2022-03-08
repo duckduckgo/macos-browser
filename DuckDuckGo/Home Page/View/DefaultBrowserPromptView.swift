@@ -32,8 +32,12 @@ struct DefaultBrowserPrompt: View {
             HStack {
                 Spacer()
 
+                Image("DefaultBrowser")
+                    .frame(width: 32, height: 32)
+
                 Text(UserText.defaultBrowserPromptMessage)
                     .font(.system(size: 13, weight: .medium))
+                    .foregroundColor(Color("HomeDefaultBrowserPromptTextColor"))
 
                 let button = Button(UserText.defaultBrowserPromptButton) {
                     self.model.requestSetDefault()
@@ -50,7 +54,7 @@ struct DefaultBrowserPrompt: View {
             }
 
         }
-        .visibility(model.shouldShow ? .visible : .gone)
+        // .visibility(model.shouldShow ? .visible : .gone)
         .padding(.top, 24)
 
     }
