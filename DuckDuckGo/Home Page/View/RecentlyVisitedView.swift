@@ -126,7 +126,7 @@ struct RecentlyVisitedSite: View {
                 .fill(Color("HomeFeedItemHoverBackgroundColor"))
                 .shadow(color: Color("HomeFeedItemHoverShadow1Color"), radius: 4, x: 0, y: 4)
                 .shadow(color: Color("HomeFeedItemHoverShadow2Color"), radius: 2, x: 0, y: 1)
-                .visibility(isHovering ? .visible : .gone)
+                .visibility(isHovering && model.showPagesOnHover ? .visible : .gone)
 
             HStack(alignment: .top, spacing: 12) {
 

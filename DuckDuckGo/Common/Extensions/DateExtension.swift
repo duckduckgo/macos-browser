@@ -53,7 +53,6 @@ extension Date {
     static var startOfMinuteNow: Date {
         let date = Calendar.current.date(bySetting: .second, value: 0, of: Date())!
         let start = Calendar.current.date(byAdding: .minute, value: -1, to: date)!
-        print(start)
         return start
     }
 

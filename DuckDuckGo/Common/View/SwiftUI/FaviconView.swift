@@ -26,7 +26,7 @@ struct FaviconView: View {
     let size: CGFloat
 
     @State var image: NSImage?
-    @State private var timer = Timer.publish(every: 0.3, tolerance: 0, on: .main, in: .default, options: nil).autoconnect()
+    @State private var timer = Timer.publish(every: 0.1, tolerance: 0, on: .main, in: .default, options: nil).autoconnect()
 
     init(domain: String, size: CGFloat = 32) {
         self.domain = domain
@@ -69,6 +69,7 @@ struct FaviconView: View {
         }.onAppear {
             refreshImage()
         }.onReceive(timer) { _ in
+            guard faviconManagement.areFaviconsLoaded else { return }
             timer.upstream.connect().cancel()
             refreshImage()
         }

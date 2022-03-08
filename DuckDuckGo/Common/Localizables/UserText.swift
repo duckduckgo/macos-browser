@@ -424,11 +424,6 @@ struct UserText {
         return String(format: localized, numberOfTrackersBlocked)
     }
 
-    static func pageTrackersMessage(numberOfTrackersBlocked: Int) -> String {
-        let localized = NSLocalizedString("**%d** tracking attempts blocked", comment: "")
-        return String(format: localized, numberOfTrackersBlocked)
-    }
-
     static let tooltipAddToFavorites = NSLocalizedString("tooltip.addToFavorites", value: "Add to Favorites", comment: "Tooltip for add to favorites button")
     static let tooltipBurn = NSLocalizedString("tooltip.burn", value: "Burn History and Site Data", comment: "Tooltip for burn button")
     
