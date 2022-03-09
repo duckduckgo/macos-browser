@@ -31,7 +31,7 @@ struct RecentlyVisited: View {
     var body: some View {
 
         VStack(spacing: 0) {
-            ProtectionSummary(isExpanded: $isExpanded)
+            RecentlyVisitedTitle(isExpanded: $isExpanded)
                 .padding(.bottom, 18)
 
             Group {
@@ -82,11 +82,11 @@ struct RecentlyVisitedSiteEmptyState: View {
 
             VStack(alignment: .leading, spacing: 6) {
 
-                Text("Recently visited sites appear here")
+                Text(UserText.homePageEmptyStateItemTitle)
                     .font(.system(size: 15, weight: .semibold))
                     .foregroundColor(textColor)
 
-                Text("Keep browsing to see how many trackers were blocked")
+                Text(UserText.homePageEmptyStateItemMessage)
                     .font(.system(size: 13))
                     .foregroundColor(textColor)
 
@@ -258,6 +258,48 @@ struct RecentlyVisitedPageList: View {
 
 }
 
+struct RecentlyVisitedTitle: View {
+
+    @EnvironmentObject var model: HomePage.Models.RecentlyVisitedModel
+
+    @Binding var isExpanded: Bool
+
+    var body: some View {
+        HStack(alignment: .center, spacing: 12) {
+            Image("HomeShield")
+                .resizable()
+                .frame(width: 32, height: 32)
+                .onTapGesture(count: 2) {
+                    model.showPagesOnHover.toggle()
+                }
+
+            Group {
+                if model.recentSites.count > 0 {
+                    Text(UserText.homePageProtectionSummaryMessage(numberOfTrackersBlocked: model.numberOfTrackersBlocked))
+                } else {
+                    Text(UserText.homePageProtectionSummaryInfo)
+                }
+            }
+            .minimumScaleFactor(0.8)
+            .multilineTextAlignment(.center)
+            .lineLimit(1)
+            .font(.system(size: 17, weight: .bold, design: .default))
+            .foregroundColor(Color("HomeFeedTitleColor"))
+
+            Spacer()
+                .visibility(isExpanded ? .visible : .gone)
+
+            HoverButton(size: 24, imageName: "HomeArrowUp", imageSize: 16, cornerRadius: 4) {
+                withAnimation {
+                    isExpanded.toggle()
+                }
+            }.rotationEffect(.degrees(isExpanded ? 0 : 180))
+
+        }.padding([.leading, .trailing], 12)
+    }
+
+}
+
 struct SiteIconAndConnector: View {
 
     let backgroundColor = Color("HomeFavoritesBackgroundColor") // HomeFeedItemVerticalConnectorColor")
@@ -319,13 +361,13 @@ struct SiteTrackerSummary: View {
 
             Group {
                 if site.blockedEntities.isEmpty {
-                    Text("No trackers blocked")
+                    Text("No tracking attempts blocked")
                 } else {
                     // This will get localised but this formatting is required
                     if #available(macOS 12, *) {
-                        Text("**\(site.numberOfTrackersBlocked)** trackers blocked")
+                        Text("**\(site.numberOfTrackersBlocked)** tracking attempts blocked")
                     } else {
-                        Text("\(site.numberOfTrackersBlocked) trackers blocked")
+                        Text("\(site.numberOfTrackersBlocked) tracking attempts blocked")
                     }
                 }
             }
