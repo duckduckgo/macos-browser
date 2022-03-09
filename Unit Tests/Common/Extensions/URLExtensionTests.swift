@@ -83,10 +83,12 @@ final class URLExtensionTests: XCTestCase {
         }
     }
 
-    func testWhenOneSlashIsMissingAfterHTTPScheme_ThenItShouldBeAdded() {
+    func testWhenOneSlashIsMissingAfterHypertextScheme_ThenItShouldBeAdded() {
         let data: [(string: String, expected: String?)] = [
             ("http:/duckduckgo.com", "http://duckduckgo.com"),
+            ("http://duckduckgo.com", "http://duckduckgo.com"),
             ("https:/duckduckgo.com", "https://duckduckgo.com"),
+            ("https://duckduckgo.com", "https://duckduckgo.com"),
             ("file:/Users/user/file.txt", "file:/Users/user/file.txt"),
             ("file://domain/file.txt", "file://domain/file.txt"),
             ("file:///Users/user/file.txt", "file:///Users/user/file.txt")
