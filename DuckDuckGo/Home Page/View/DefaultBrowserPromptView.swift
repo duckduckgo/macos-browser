@@ -54,7 +54,7 @@ struct DefaultBrowserPrompt: View {
             }
 
         }
-        // .visibility(model.shouldShow ? .visible : .gone)
+        .visibility(model.shouldShow ? .visible : .gone)
         .padding(.top, 24)
 
     }
