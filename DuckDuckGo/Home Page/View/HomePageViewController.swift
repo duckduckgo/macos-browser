@@ -119,8 +119,7 @@ final class HomePageViewController: NSViewController {
         return .init(open: { [weak self] bookmark, target in
             self?.openUrl(bookmark.url, target: target)
         }, remove: { [weak self] bookmark in
-            bookmark.isFavorite = false
-            self?.bookmarkManager.update(bookmark: bookmark)
+            self?.bookmarkManager.remove(bookmark: bookmark)
         }, addEdit: { [weak self] bookmark in
             self?.showAddEditController(for: bookmark)
         })
