@@ -65,7 +65,7 @@ struct RecentlyVisitedSiteEmptyState: View {
 
     let textColor = Color("HomeFeedEmptyStateTextColor")
     let iconColor = Color("HomeFeedEmptyStateIconColor")
-    let connectorColor = Color("HomeFeedItemVerticalConnectorColor")
+    let connectorColor = Color("HomeFavoritesBackgroundColor")
 
     var body: some View {
 
@@ -302,7 +302,7 @@ struct RecentlyVisitedTitle: View {
 
 struct SiteIconAndConnector: View {
 
-    let backgroundColor = Color("HomeFavoritesBackgroundColor") // HomeFeedItemVerticalConnectorColor")
+    let backgroundColor = Color("HomeFavoritesBackgroundColor")
     let mouseOverColor: Color = Color("HomeFavoritesHoverColor")
 
     @EnvironmentObject var model: HomePage.Models.RecentlyVisitedModel
