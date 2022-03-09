@@ -16,18 +16,10 @@
 //  limitations under the License.
 //
 
-import Foundation
+import BrowserServicesKit
 
-struct HTTPSBloomFilterSpecification: Equatable, Decodable {
-    let bitCount: Int
-    let errorRate: Double
-    let totalEntries: Int
-    let sha256: String
-    
-    static func == (lhs: HTTPSBloomFilterSpecification, rhs: HTTPSBloomFilterSpecification) -> Bool {
-        return lhs.bitCount == rhs.bitCount && lhs.errorRate == rhs.errorRate && lhs.totalEntries == rhs.totalEntries && lhs.sha256 == rhs.sha256
-    }
-    
+extension HTTPSBloomFilterSpecification {
+   
     static func copy(storedSpecification specification: HTTPSStoredBloomFilterSpecification?) -> HTTPSBloomFilterSpecification? {
         guard let specification = specification else { return nil }
         return HTTPSBloomFilterSpecification(bitCount: Int(specification.bitCount),
@@ -35,4 +27,5 @@ struct HTTPSBloomFilterSpecification: Equatable, Decodable {
                                              totalEntries: Int(specification.totalEntries),
                                              sha256: specification.sha256!)
     }
+    
 }

@@ -1,7 +1,7 @@
 //
-//  HTTPSExcludedDomains.swift
+//  PrivacyFeatures.swift
 //
-//  Copyright © 2020 DuckDuckGo. All rights reserved.
+//  Copyright © 2022 DuckDuckGo. All rights reserved.
 //
 //  Licensed under the Apache License, Version 2.0 (the "License");
 //  you may not use this file except in compliance with the License.
@@ -18,6 +18,11 @@
 
 import Foundation
 
-struct HTTPSExcludedDomains: Decodable {
-    let data: [String]
+import BrowserServicesKit
+
+public final class PrivacyFeatures {
+    
+    public static let httpsUpgradeStore = AppHTTPSUpgradeStore()
+    public static let httpsUpgrade = HTTPSUpgrade(store: httpsUpgradeStore, privacyManager: ContentBlocking.shared.privacyConfigurationManager)
+    
 }

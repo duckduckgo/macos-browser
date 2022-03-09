@@ -232,7 +232,7 @@ extension MainViewController {
             return
         }
 
-        selectedTabViewModel.tab.webView.magnification = 1.0
+        selectedTabViewModel.tab.webView.zoomLevel = 1.0
     }
 
     @IBAction func toggleDownloads(_ sender: Any) {

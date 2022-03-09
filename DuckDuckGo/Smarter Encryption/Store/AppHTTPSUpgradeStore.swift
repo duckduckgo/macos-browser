@@ -1,5 +1,5 @@
 //
-//  HTTPSUpgradeStore.swift
+//  AppHTTPSUpgradeStore.swift
 //
 //  Copyright © 2020 DuckDuckGo. All rights reserved.
 //
@@ -19,21 +19,12 @@
 import Foundation
 import CoreData
 import os.log
+import BrowserServicesKit
 
-protocol HTTPSUpgradeStore {
-    
-    func bloomFilter() -> BloomFilterWrapper?
-    
-    func bloomFilterSpecification() -> HTTPSBloomFilterSpecification?
-    
-    @discardableResult func persistBloomFilter(specification: HTTPSBloomFilterSpecification, data: Data) -> Bool
-    
-    func shouldExcludeDomain(_ domain: String) -> Bool
-    
-    @discardableResult func persistExcludedDomains(_ domains: [String]) -> Bool
-}
+extension HTTPSStoredBloomFilterSpecification: Managed {}
+extension HTTPSExcludedDomain: Managed {}
 
-final class HTTPSUpgradePersistence: HTTPSUpgradeStore {
+public final class AppHTTPSUpgradeStore: HTTPSUpgradeStore {
     
     private struct Resource {
         static var bloomFilter: URL {
@@ -59,15 +50,15 @@ final class HTTPSUpgradePersistence: HTTPSUpgradeStore {
         return (try? Resource.bloomFilter.checkResourceIsReachable()) ?? false
     }
     
-    func bloomFilter() -> BloomFilterWrapper? {
-        let storedSpecification = hasBloomFilterData ? bloomFilterSpecification() : loadEmbeddedData()?.specification
+    public var bloomFilter: BloomFilterWrapper? {
+        let storedSpecification = hasBloomFilterData ? bloomFilterSpecification : loadEmbeddedData()?.specification
         guard let specification = storedSpecification else { return nil }
         return BloomFilterWrapper(fromPath: Resource.bloomFilter.path,
                                   withBitCount: Int32(specification.bitCount),
                                   andTotalItems: Int32(specification.totalEntries))
     }
     
-    func bloomFilterSpecification() -> HTTPSBloomFilterSpecification? {
+    public var bloomFilterSpecification: HTTPSBloomFilterSpecification? {
         var specification: HTTPSBloomFilterSpecification?
         context.performAndWait {
             let request: NSFetchRequest<HTTPSStoredBloomFilterSpecification> = HTTPSStoredBloomFilterSpecification.fetchRequest()
@@ -118,18 +109,12 @@ final class HTTPSUpgradePersistence: HTTPSUpgradeStore {
         
         context.performAndWait {
             deleteBloomFilterSpecification()
-            
-            let entityName = String(describing: HTTPSStoredBloomFilterSpecification.self)
-            
-            if let storedEntity = NSEntityDescription.insertNewObject(
-                forEntityName: entityName,
-                into: context) as? HTTPSStoredBloomFilterSpecification {
-                
-                storedEntity.bitCount = Int64(specification.bitCount)
-                storedEntity.totalEntries = Int64(specification.totalEntries)
-                storedEntity.errorRate = specification.errorRate
-                storedEntity.sha256 = specification.sha256
-            }
+                        
+            let storedEntity: HTTPSStoredBloomFilterSpecification = context.insertObject()
+            storedEntity.bitCount = Int64(specification.bitCount)
+            storedEntity.totalEntries = Int64(specification.totalEntries)
+            storedEntity.errorRate = specification.errorRate
+            storedEntity.sha256 = specification.sha256
             
             do {
                 try context.save()
@@ -145,7 +130,7 @@ final class HTTPSUpgradePersistence: HTTPSUpgradeStore {
         }
     }
     
-    func shouldExcludeDomain(_ domain: String) -> Bool {
+    public func hasExcludedDomain(_ domain: String) -> Bool {
         var result = false
         context.performAndWait {
             let request: NSFetchRequest<HTTPSExcludedDomain> = HTTPSExcludedDomain.fetchRequest()
@@ -156,16 +141,14 @@ final class HTTPSUpgradePersistence: HTTPSUpgradeStore {
         return result
     }
     
-    @discardableResult func persistExcludedDomains(_ domains: [String]) -> Bool {
+    @discardableResult public func persistExcludedDomains(_ domains: [String]) -> Bool {
         var result = true
         context.performAndWait {
             deleteExcludedDomains()
             
             for domain in domains {
-                let entityName = String(describing: HTTPSExcludedDomain.self)
-                if let storedDomain = NSEntityDescription.insertNewObject(forEntityName: entityName, into: context) as? HTTPSExcludedDomain {
-                    storedDomain.domain = domain.lowercased()
-                }
+                let storedDomain: HTTPSExcludedDomain = context.insertObject()
+                storedDomain.domain = domain.lowercased()
             }
             do {
                 try context.save()
