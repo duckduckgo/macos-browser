@@ -38,7 +38,7 @@ struct RootView: View {
                             .padding(.top, 72)
 
                         RecentlyVisited()
-                            .padding(.top, 54)
+                            .padding(.top, 66)
                             .padding(.bottom, 16)
 
                     }

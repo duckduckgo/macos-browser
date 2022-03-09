@@ -80,7 +80,7 @@ struct Favorites: View {
             }
 
             MoreOrLess(isExpanded: $isExpanded)
-                .padding(.top, 12)
+                .padding(.top, 2)
                 .visibility(model.rows.count > HomePage.favoritesRowCountWhenCollapsed && isHovering ? .visible : .invisible)
 
         }

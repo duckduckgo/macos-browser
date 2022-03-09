@@ -29,6 +29,7 @@ struct MoreOrLess: View {
 
             VStack {
                 Divider()
+                    .foregroundColor(Color("HomePageMoreOrLessTextColor"))
             }.frame(maxWidth: .infinity)
 
             HStack {
@@ -42,10 +43,11 @@ struct MoreOrLess: View {
                 }
                 .rotationEffect(.degrees(isExpanded ? 0 : 180))
             }
-            .foregroundColor(Color("LinkBlueColor"))
+            .foregroundColor(Color("HomePageMoreOrLessTextColor"))
 
             VStack {
                 Divider()
+                    .foregroundColor(Color("HomePageMoreOrLessTextColor"))
             }.frame(maxWidth: .infinity)
         }
         .font(.system(size: 11))
