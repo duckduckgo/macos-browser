@@ -799,6 +799,7 @@ extension AddressBarTextField: NSTextViewDelegate {
 
     func textView(_ textView: NSTextView, willChangeSelectionFromCharacterRange _: NSRange, toCharacterRange range: NSRange) -> NSRange {
         defer {
+            // artifacts can appear when the selection changes, especially if the size of the field has changed, this clears them
             textView.needsDisplay = true
         }
         return self.filterSuffix(fromSelectionRange: range, for: textView.string)
