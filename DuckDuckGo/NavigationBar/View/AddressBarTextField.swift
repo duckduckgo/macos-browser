@@ -798,6 +798,9 @@ extension AddressBarTextField: SuggestionViewControllerDelegate {
 extension AddressBarTextField: NSTextViewDelegate {
 
     func textView(_ textView: NSTextView, willChangeSelectionFromCharacterRange _: NSRange, toCharacterRange range: NSRange) -> NSRange {
+        defer {
+            textView.needsDisplay = true
+        }
         return self.filterSuffix(fromSelectionRange: range, for: textView.string)
     }
 
