@@ -2328,15 +2328,8 @@
 				4B723E1726B000DC00E14D75 /* TemporaryFileCreator.swift */,
 				4B9292C42667104B00AD2C21 /* CoreDataTestUtilities.swift */,
 				AAEC74B92642E66600C2EFBC /* Extensions */,
-				B65783EB25F8AB9200D8DB33 /* String+PunycodeTests.swift */,
-				85F69B3B25EDE81F00978E59 /* URLExtensionTests.swift */,
-				AADE11BF26D916D70032D8A7 /* StringExtensionTests.swift */,
 				4B0511E6262CAB3700F6079C /* UserDefaultsWrapperUtilities.swift */,
-				B67C6C462654C643006C872E /* FileManagerExtensionTests.swift */,
 				B6B3E0952654DACD0040E0A2 /* UTTypeTests.swift */,
-				B65349A9265CF45000DCC645 /* DispatchQueueExtensionsTests.swift */,
-				B6C0B24526E9CB190031CB7F /* RunLoopExtensionTests.swift */,
-				4B8AD0B027A86D9200AE44D6 /* WKWebsiteDataStoreExtensionTests.swift */,
 				B693956626F352940015B914 /* TestsBridging.h */,
 			);
 			path = Common;
@@ -3329,8 +3322,15 @@
 		AAEC74B92642E66600C2EFBC /* Extensions */ = {
 			isa = PBXGroup;
 			children = (
-				AAEC74BA2642E67C00C2EFBC /* NSPersistentContainerExtension.swift */,
 				4B4F72EB266B2ED300814C60 /* CollectionExtension.swift */,
+				B65349A9265CF45000DCC645 /* DispatchQueueExtensionsTests.swift */,
+				B67C6C462654C643006C872E /* FileManagerExtensionTests.swift */,
+				AAEC74BA2642E67C00C2EFBC /* NSPersistentContainerExtension.swift */,
+				B6C0B24526E9CB190031CB7F /* RunLoopExtensionTests.swift */,
+				B65783EB25F8AB9200D8DB33 /* String+PunycodeTests.swift */,
+				AADE11BF26D916D70032D8A7 /* StringExtensionTests.swift */,
+				85F69B3B25EDE81F00978E59 /* URLExtensionTests.swift */,
+				4B8AD0B027A86D9200AE44D6 /* WKWebsiteDataStoreExtensionTests.swift */,
 			);
 			path = Extensions;
 			sourceTree = "<group>";
