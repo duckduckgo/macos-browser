@@ -42,7 +42,7 @@ struct RootView: View {
                             .padding(.bottom, 16)
 
                     }
-                    .frame(width: 484)
+                    .frame(width: 508)
                 }
                 .frame(maxWidth: .infinity)
             }

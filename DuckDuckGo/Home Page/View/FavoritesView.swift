@@ -57,7 +57,7 @@ struct Favorites: View {
                 .frame(width: 64, height: 64)
         }.frame(width: 64)
 
-        VStack(alignment: .leading, spacing: 4) {
+        VStack(spacing: 4) {
 
             ForEach(isExpanded ? model.rows.indices : model.rows.indices.prefix(HomePage.favoritesRowCountWhenCollapsed), id: \.self) { index in
 

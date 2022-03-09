@@ -280,9 +280,8 @@ struct RecentlyVisitedTitle: View {
                     Text(UserText.homePageProtectionSummaryInfo)
                 }
             }
-            .minimumScaleFactor(0.8)
             .multilineTextAlignment(.center)
-            .lineLimit(1)
+            .lineLimit(2)
             .font(.system(size: 17, weight: .bold, design: .default))
             .foregroundColor(Color("HomeFeedTitleColor"))
 
@@ -295,7 +294,8 @@ struct RecentlyVisitedTitle: View {
                 }
             }.rotationEffect(.degrees(isExpanded ? 0 : 180))
 
-        }.padding([.leading, .trailing], 12)
+        }
+        .padding([.leading, .trailing], 12)
     }
 
 }
