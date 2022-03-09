@@ -357,24 +357,19 @@ struct SiteTrackerSummary: View {
                     .visibility(remaining > 0 ? .visible : .gone)
             }
             .padding(.trailing, 6)
-            .visibility(site.blockedEntities.isEmpty ? .gone : .visible)
 
             Group {
-                if site.blockedEntities.isEmpty {
-                    Text("No tracking attempts blocked")
+                if #available(macOS 12, *) {
+                    Text("**\(site.numberOfTrackersBlocked)** tracking attempts blocked")
                 } else {
-                    // This will get localised but this formatting is required
-                    if #available(macOS 12, *) {
-                        Text("**\(site.numberOfTrackersBlocked)** tracking attempts blocked")
-                    } else {
-                        Text("\(site.numberOfTrackersBlocked) tracking attempts blocked")
-                    }
+                    Text("\(site.numberOfTrackersBlocked) tracking attempts blocked")
                 }
             }
             .font(.system(size: 13))
 
             Spacer()
         }
+        .visibility(site.blockedEntities.isEmpty ? .gone : .visible)
     }
 
 }
