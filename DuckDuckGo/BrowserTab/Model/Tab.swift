@@ -267,6 +267,7 @@ final class Tab: NSObject {
     }
     private var mainFrameLoadState: FrameLoadState = .finished
     private var clientRedirectedDuringNavigationURL: URL?
+    private var externalSchemeOpenedPerPageLoad = false
 
     var canGoForward: Bool {
         webView.canGoForward
@@ -781,8 +782,12 @@ extension Tab: WKNavigationDelegate {
 
         } else if url.isExternalSchemeLink {
             // ignore <iframe src="custom://url"> but allow via address bar
-            guard navigationAction.sourceFrame.isMainFrame else { return .cancel }
+            guard navigationAction.sourceFrame.isMainFrame,
+                  // ignore 2nd+ external scheme navigation not initiated by user
+                  !self.externalSchemeOpenedPerPageLoad || navigationAction.isUserInitiated
+            else { return .cancel }
 
+            self.externalSchemeOpenedPerPageLoad = true
             self.delegate?.tab(self, requestedOpenExternalURL: url, forUserEnteredURL: userEnteredUrl)
 
             return .cancel
@@ -832,9 +837,10 @@ extension Tab: WKNavigationDelegate {
     // swiftlint:enable function_body_length
 
     private func willPerformNavigationAction(_ navigationAction: WKNavigationAction) {
-        if navigationAction.isTargetingMainFrame {
-            delegate?.tabWillStartNavigation(self, isUserInitiated: navigationAction.isUserInitiated)
-        }
+        guard navigationAction.isTargetingMainFrame else { return }
+
+        self.externalSchemeOpenedPerPageLoad = false
+        delegate?.tabWillStartNavigation(self, isUserInitiated: navigationAction.isUserInitiated)
     }
 
     private func invalidateBackItemIfNeeded(for navigationAction: WKNavigationAction) {
