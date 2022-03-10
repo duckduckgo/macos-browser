@@ -84,6 +84,10 @@ final class NavigationBarViewController: NSViewController {
         popover.delegate = self
         return popover
     }()
+    
+    private var popovers: [NSPopover] {
+        return [saveCredentialsPopover, saveIdentityPopover, savePaymentMethodPopover]
+    }
 
     private lazy var passwordManagementPopover: PasswordManagementPopover = PasswordManagementPopover()
     private lazy var downloadsPopover: DownloadsPopover = {
@@ -274,7 +278,7 @@ final class NavigationBarViewController: NSViewController {
     }
 
     func closeTransientPopovers() -> Bool {
-        guard !saveCredentialsPopover.isShown else {
+        guard popovers.allSatisfy({ !$0.isShown }) else {
             return false
         }
 
@@ -408,7 +412,7 @@ final class NavigationBarViewController: NSViewController {
 
         passwordManagementButton.image = NSImage(named: "PasswordManagement")
 
-        if saveCredentialsPopover.isShown || saveIdentityPopover.isShown || savePaymentMethodPopover.isShown {
+        if popovers.contains(where: { $0.isShown }) {
             return
         }
 
@@ -578,9 +582,7 @@ extension NavigationBarViewController: NSPopoverDelegate {
             downloadsPopoverTimer = nil
         } else if notification.object as AnyObject? === bookmarkListPopover {
             updateBookmarksButton()
-        } else if notification.object as AnyObject? === saveCredentialsPopover ||
-                    notification.object as AnyObject? === saveIdentityPopover ||
-                    notification.object as AnyObject? === savePaymentMethodPopover {
+        } else if popovers.contains(where: { notification.object as AnyObject? === $0 }) {
             updatePasswordManagementButton()
         }
     }
