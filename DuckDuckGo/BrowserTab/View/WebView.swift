@@ -43,30 +43,46 @@ final class WebView: WKWebView {
         "WKMenuItemIdentifierSearchWeb": UserText.searchWithDuckDuckGo
     ]
 
-    static private let maxMagnification: CGFloat = 3.0
-    static private let minMagnification: CGFloat = 0.5
-    static private let magnificationStep: CGFloat = 0.1
+    static private let maxZoomLevel: CGFloat = 3.0
+    static private let minZoomLevel: CGFloat = 0.5
+    static private let zoomLevelStep: CGFloat = 0.1
+    
+    var zoomLevel: CGFloat {
+        get {
+            if #available(macOS 11.0, *) {
+                return pageZoom
+            }
+            return magnification
+        }
+        set {
+            if #available(macOS 11.0, *) {
+                pageZoom = newValue
+            } else {
+                magnification = newValue
+            }
+        }
+    }
 
     var canZoomToActualSize: Bool {
-        self.window != nil && self.magnification != 1.0
+        self.window != nil && self.zoomLevel != 1.0
     }
 
     var canZoomIn: Bool {
-        self.window != nil && self.magnification < Self.maxMagnification
+        self.window != nil && self.zoomLevel < Self.maxZoomLevel
     }
 
     var canZoomOut: Bool {
-        self.window != nil && self.magnification > Self.minMagnification
+        self.window != nil && self.zoomLevel > Self.minZoomLevel
     }
 
     func zoomIn() {
         guard canZoomIn else { return }
-        self.magnification = min(self.magnification + Self.magnificationStep, Self.maxMagnification)
+        self.zoomLevel = min(self.zoomLevel + Self.zoomLevelStep, Self.maxZoomLevel)
     }
 
     func zoomOut() {
         guard canZoomOut else { return }
-        self.magnification = max(self.magnification - Self.magnificationStep, Self.minMagnification)
+        self.zoomLevel = max(self.zoomLevel - Self.zoomLevelStep, Self.minZoomLevel)
     }
 
     deinit {

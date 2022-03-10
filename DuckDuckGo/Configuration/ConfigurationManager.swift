@@ -19,6 +19,7 @@
 import Foundation
 import Combine
 import os
+import BrowserServicesKit
 
 final class ConfigurationManager {
 
@@ -168,12 +169,12 @@ final class ConfigurationManager {
 
         let spec = try JSONDecoder().decode(HTTPSBloomFilterSpecification.self, from: specData)
 
-        let httpsStore = HTTPSUpgradePersistence()
+        let httpsStore = AppHTTPSUpgradeStore()
         guard httpsStore.persistBloomFilter(specification: spec, data: bloomFilterData) else {
             throw Error.bloomFilterPersistenceFailed
         }
 
-        HTTPSUpgrade.shared.loadData()
+        PrivacyFeatures.httpsUpgrade.loadData()
     }
 
     private func updateBloomFilterExclusions() throws {
@@ -185,12 +186,12 @@ final class ConfigurationManager {
 
         let excludedDomains = try JSONDecoder().decode(HTTPSExcludedDomains.self, from: bloomFilterExclusions).data
 
-        let httpsStore = HTTPSUpgradePersistence()
+        let httpsStore = AppHTTPSUpgradeStore()
         guard httpsStore.persistExcludedDomains(excludedDomains) else {
             throw Error.bloomFilterExclusionsPersistenceFailed
         }
 
-        HTTPSUpgrade.shared.loadData()
+        PrivacyFeatures.httpsUpgrade.loadData()
     }
 
 }
