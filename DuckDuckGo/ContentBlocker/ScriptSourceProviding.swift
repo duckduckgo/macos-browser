@@ -28,6 +28,7 @@ protocol ScriptSourceProviding {
     var autofillSourceProvider: AutofillUserScriptSourceProvider? { get }
     var sessionKey: String? { get }
     var clickToLoadSource: String { get }
+    func buildAutofillSource() -> AutofillUserScriptSourceProvider
 
 }
 
@@ -65,7 +66,7 @@ struct DefaultScriptSourceProvider: ScriptSourceProviding {
         return UUID().uuidString
     }
     
-    private func buildAutofillSource() -> AutofillUserScriptSourceProvider {
+    public func buildAutofillSource() -> AutofillUserScriptSourceProvider {
 
         return DefaultAutofillSourceProvider(privacyConfigurationManager: self.privacyConfigurationManager,
                                              properties: ContentScopeProperties(gpcEnabled: privacySettings.gpcEnabled,

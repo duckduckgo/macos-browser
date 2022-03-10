@@ -85,6 +85,10 @@ extension URL {
     static var welcome: URL {
         return URL(string: "about:welcome")!
     }
+    
+    static var preferences: URL {
+        return URL(string: "about:preferences")!
+    }
 
     // MARK: Pixel
 
@@ -131,46 +135,6 @@ extension URL {
     static func exti(forAtb atb: String) -> URL? {
         let extiUrl = URL(string: Self.exti)!
         return try? extiUrl.addParameter(name: DuckDuckGoParameters.ATB.atb, value: atb)
-    }
-    
-    // MARK: - Parameters
-
-    enum ParameterError: Error {
-        case parsingFailed
-        case encodingFailed
-        case creatingFailed
-    }
-
-    func addParameters(_ parameters: [String: String]) throws -> URL {
-        var url = self
-
-        for parameter in parameters {
-            url = try url.addParameter(name: parameter.key, value: parameter.value)
-        }
-
-        return url
-    }
-
-    func addParameter(name: String, value: String) throws -> URL {
-        guard var components = URLComponents(url: self, resolvingAgainstBaseURL: false) else { throw ParameterError.parsingFailed }
-        var queryItems = components.queryItems ?? [URLQueryItem]()
-        let newQueryItem = URLQueryItem(name: name, value: value)
-        queryItems.append(newQueryItem)
-        components.queryItems = queryItems
-        guard let encodedQuery = components.percentEncodedQuery else { throw ParameterError.encodingFailed }
-        components.percentEncodedQuery = encodedQuery.encodingPluses()
-        guard let newUrl = components.url else { throw ParameterError.creatingFailed }
-        return newUrl
-    }
-
-    func getParameter(name: String) throws -> String? {
-        guard var components = URLComponents(url: self, resolvingAgainstBaseURL: false) else { throw ParameterError.parsingFailed }
-        guard let encodedQuery = components.percentEncodedQuery else { throw ParameterError.encodingFailed }
-        components.percentEncodedQuery = encodedQuery.encodingPlusesAsSpaces()
-        let queryItem = components.queryItems?.first(where: { (queryItem) -> Bool in
-            queryItem.name == name
-        })
-        return queryItem?.value
     }
 
     // MARK: - Components
@@ -381,15 +345,6 @@ extension URL {
     }
 
 #endif
-
-    // MARK: - HTTPS
-
-    func toHttps() -> URL? {
-        guard var components = URLComponents(url: self, resolvingAgainstBaseURL: false) else { return self }
-        guard components.scheme == NavigationalScheme.http.rawValue else { return self }
-        components.scheme = NavigationalScheme.https.rawValue
-        return components.url
-    }
 
     // MARK: - Punycode
 

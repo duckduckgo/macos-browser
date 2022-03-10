@@ -64,6 +64,8 @@ final class LocalStatisticsStore: StatisticsStore {
         static let lastAppRetentionRequestDate = "stats.appretentionatb.last.request.key"
         static let waitlistUpgradeCheckComplete = "waitlist.upgradecomplete"
         static let waitlistUnlocked = "waitlist.unlocked"
+        static let autoLockEnabled = "auto-lock.enabled"
+        static let autoLockThreshold = "auto-lock.threshold"
     }
 
     // These are the original ATB keys that have been replaced in order to resolve retention data issues.
@@ -211,6 +213,32 @@ final class LocalStatisticsStore: StatisticsStore {
                 // Let the absense of a value represent false, so that anyone digging into the SQLite database won't
                 // see a false key and simply set it to true. The database is encrypted, so risk of this is low.
                 pixelDataStore.removeValue(forKey: Keys.waitlistUnlocked)
+            }
+        }
+    }
+    
+    var autoLockEnabled: Bool {
+        get {
+            guard let booleanStringValue: String = pixelDataStore.value(forKey: Keys.autoLockEnabled) else {
+                return true // Auto-Lock is enabled by default
+            }
+            return Bool(booleanStringValue) ?? true
+        }
+        set {
+            let booleanAsString = String(newValue)
+            pixelDataStore.set(booleanAsString, forKey: Keys.autoLockEnabled)
+        }
+    }
+    
+    var autoLockThreshold: String? {
+        get {
+            pixelDataStore.value(forKey: Keys.autoLockThreshold)
+        }
+        set {
+            if let value = newValue {
+                pixelDataStore.set(value, forKey: Keys.autoLockThreshold)
+            } else {
+                pixelDataStore.removeValue(forKey: Keys.autoLockThreshold)
             }
         }
     }

@@ -1,7 +1,7 @@
 //
-//  HTTPSExcludedDomains.swift
+//  DeviceAuthenticationService.swift
 //
-//  Copyright © 2020 DuckDuckGo. All rights reserved.
+//  Copyright © 2022 DuckDuckGo. All rights reserved.
 //
 //  Licensed under the Apache License, Version 2.0 (the "License");
 //  you may not use this file except in compliance with the License.
@@ -18,6 +18,19 @@
 
 import Foundation
 
-struct HTTPSExcludedDomains: Decodable {
-    let data: [String]
+enum DeviceAuthenticationResult {
+    case success
+    case failure
+    
+    var authenticated: Bool {
+        return self == .success
+    }
+}
+
+protocol DeviceAuthenticationService {
+    
+    typealias DeviceAuthenticationResultHandler = (DeviceAuthenticationResult) -> Void
+    
+    func authenticateDevice(reason: String, result: @escaping DeviceAuthenticationResultHandler)
+    
 }

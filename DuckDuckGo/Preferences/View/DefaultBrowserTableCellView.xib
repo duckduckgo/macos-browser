@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<document type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="3.0" toolsVersion="17701" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES" customObjectInstantitationMethod="direct">
+<document type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="3.0" toolsVersion="19529" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES" customObjectInstantitationMethod="direct">
     <dependencies>
         <deployment identifier="macosx"/>
-        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="17701"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="19529"/>
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
     </dependencies>
     <objects>
@@ -10,11 +10,11 @@
         <customObject id="-1" userLabel="First Responder" customClass="FirstResponder"/>
         <customObject id="-3" userLabel="Application" customClass="NSObject"/>
         <tableCellView id="i5F-Rb-uh7" customClass="DefaultBrowserTableCellView" customModule="DuckDuckGo_Privacy_Browser" customModuleProvider="target">
-            <rect key="frame" x="0.0" y="0.0" width="521" height="99"/>
+            <rect key="frame" x="0.0" y="0.0" width="521" height="123"/>
             <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
             <subviews>
                 <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="W0Z-t7-7IU">
-                    <rect key="frame" x="-2" y="58" width="195" height="21"/>
+                    <rect key="frame" x="-2" y="70" width="195" height="21"/>
                     <textFieldCell key="cell" lineBreakMode="clipping" title="Set as Default Browser" id="huk-b6-6M3">
                         <font key="font" metaFont="systemSemibold" size="18"/>
                         <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
@@ -22,7 +22,7 @@
                     </textFieldCell>
                 </textField>
                 <imageView horizontalHuggingPriority="251" verticalHuggingPriority="251" translatesAutoresizingMaskIntoConstraints="NO" id="BT0-tY-1Mx" userLabel="Status Image View">
-                    <rect key="frame" x="0.0" y="22" width="16" height="16"/>
+                    <rect key="frame" x="0.0" y="34" width="16" height="16"/>
                     <constraints>
                         <constraint firstAttribute="height" constant="16" id="8bW-my-a02"/>
                         <constraint firstAttribute="width" constant="16" id="BFP-0L-7pK"/>
@@ -30,7 +30,7 @@
                     <imageCell key="cell" refusesFirstResponder="YES" alignment="left" imageScaling="proportionallyDown" image="Warning" id="aC2-ay-EvU"/>
                 </imageView>
                 <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="mqd-MQ-SXo">
-                    <rect key="frame" x="22" y="22" width="249" height="16"/>
+                    <rect key="frame" x="22" y="34" width="249" height="16"/>
                     <textFieldCell key="cell" lineBreakMode="clipping" title="DuckDuckGo is not your default browser" id="Po6-PR-gyg">
                         <font key="font" metaFont="system"/>
                         <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
@@ -38,7 +38,7 @@
                     </textFieldCell>
                 </textField>
                 <button verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="Atx-oK-RIE">
-                    <rect key="frame" x="270" y="13" width="113" height="32"/>
+                    <rect key="frame" x="270" y="25" width="112" height="32"/>
                     <buttonCell key="cell" type="push" title="Set Default…" bezelStyle="rounded" alignment="center" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="23K-EG-jIK">
                         <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
                         <font key="font" metaFont="system"/>
@@ -47,17 +47,23 @@
                         <action selector="requestSetDefaultBrowser:" target="i5F-Rb-uh7" id="WF4-Po-9RJ"/>
                     </connections>
                 </button>
+                <box verticalHuggingPriority="750" boxType="separator" translatesAutoresizingMaskIntoConstraints="NO" id="0z3-0D-FfN">
+                    <rect key="frame" x="0.0" y="-2" width="521" height="5"/>
+                </box>
             </subviews>
             <constraints>
-                <constraint firstAttribute="bottom" secondItem="Atx-oK-RIE" secondAttribute="bottom" constant="20" symbolic="YES" id="3P8-rh-I2Y"/>
+                <constraint firstAttribute="bottom" secondItem="Atx-oK-RIE" secondAttribute="bottom" constant="32" id="3P8-rh-I2Y"/>
+                <constraint firstAttribute="bottom" secondItem="0z3-0D-FfN" secondAttribute="bottom" id="Ao8-BX-Phc"/>
                 <constraint firstItem="Atx-oK-RIE" firstAttribute="leading" secondItem="mqd-MQ-SXo" secondAttribute="trailing" constant="8" symbolic="YES" id="JZ2-mc-KU3"/>
                 <constraint firstItem="mqd-MQ-SXo" firstAttribute="centerY" secondItem="BT0-tY-1Mx" secondAttribute="centerY" id="NQU-HE-7pf"/>
                 <constraint firstItem="Atx-oK-RIE" firstAttribute="centerY" secondItem="mqd-MQ-SXo" secondAttribute="centerY" id="OXa-FP-Fjq"/>
                 <constraint firstItem="W0Z-t7-7IU" firstAttribute="leading" secondItem="i5F-Rb-uh7" secondAttribute="leading" id="W6D-cj-jHa"/>
                 <constraint firstItem="BT0-tY-1Mx" firstAttribute="leading" secondItem="i5F-Rb-uh7" secondAttribute="leading" id="ZpL-8j-YXJ"/>
-                <constraint firstItem="W0Z-t7-7IU" firstAttribute="top" secondItem="i5F-Rb-uh7" secondAttribute="top" constant="20" symbolic="YES" id="awV-dc-Xvu"/>
+                <constraint firstItem="W0Z-t7-7IU" firstAttribute="top" secondItem="i5F-Rb-uh7" secondAttribute="top" constant="32" id="awV-dc-Xvu"/>
                 <constraint firstItem="BT0-tY-1Mx" firstAttribute="top" secondItem="W0Z-t7-7IU" secondAttribute="bottom" constant="20" id="kg2-1U-Y1S"/>
                 <constraint firstItem="mqd-MQ-SXo" firstAttribute="leading" secondItem="BT0-tY-1Mx" secondAttribute="trailing" constant="8" id="r5M-jM-3ev"/>
+                <constraint firstAttribute="trailing" secondItem="0z3-0D-FfN" secondAttribute="trailing" id="ssW-bR-YJj"/>
+                <constraint firstItem="0z3-0D-FfN" firstAttribute="leading" secondItem="i5F-Rb-uh7" secondAttribute="leading" id="uqI-Iy-g93"/>
             </constraints>
             <connections>
                 <outlet property="requestDefaultBrowserButton" destination="Atx-oK-RIE" id="jTr-TS-oc7"/>

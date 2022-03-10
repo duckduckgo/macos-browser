@@ -90,18 +90,6 @@ extension String {
         return matches(.ipAddress)
     }
 
-    // Replaces plus symbols in a string with the space character encoding
-    // Space UTF-8 encoding is 0x20
-    func encodingPlusesAsSpaces() -> String {
-        return replacingOccurrences(of: "+", with: "%20")
-    }
-
-    // Encodes plus symbols in a string so they are not treated as spaces on the web
-    // Plus sign UTF-8 encoding is 0x2B
-    func encodingPluses() -> String {
-        replacingOccurrences(of: "+", with: "%2B")
-    }
-
     func dropSubdomain() -> String? {
         let parts = components(separatedBy: ".")
         guard parts.count > 1 else { return nil }

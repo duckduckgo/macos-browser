@@ -31,6 +31,8 @@ final class SuggestionContainer {
     private let loading: SuggestionLoading
 
     private var latestQuery: Query?
+    
+    fileprivate let suggestionsURLSession = URLSession(configuration: .ephemeral)
 
     init(suggestionLoading: SuggestionLoading, historyCoordinating: HistoryCoordinating, bookmarkManager: BookmarkManager) {
         self.bookmarkManager = bookmarkManager
@@ -103,10 +105,11 @@ extension SuggestionContainer: SuggestionLoadingDataSource {
                 assertionFailure("SuggestionContainer: Failed to add parameter")
             }
         }
+        
         var request = URLRequest.defaultRequest(with: url)
         request.timeoutInterval = 1
 
-        URLSession.default.dataTask(with: request) { (data, _, error) in
+        suggestionsURLSession.dataTask(with: request) { (data, _, error) in
             completion(data, error)
         }.resume()
     }

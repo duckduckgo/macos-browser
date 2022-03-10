@@ -59,20 +59,19 @@ extension AppDelegate {
 #if FEEDBACK
 
     @IBAction func openFeedback(_ sender: Any?) {
-        guard let windowController = WindowControllersManager.shared.lastKeyMainWindowController else {
-            WindowsManager.openNewWindow(with: URL.feedback)
+        // swiftlint:disable force_cast
+        let windowController = NSStoryboard.feedback.instantiateController(withIdentifier: "FeedbackWindowController") as! NSWindowController
+        // swiftlint:enable force_cast
+
+        guard let feedbackWindow = windowController.window as? FeedbackWindow,
+              let parentWindowController = WindowControllersManager.shared.lastKeyMainWindowController else {
+            assertionFailure("HomepageViewController: Failed to present FeedbackWindowController")
             return
         }
 
-        let mainViewController = windowController.mainViewController
-
-        DefaultConfigurationStorage.shared.log()
-        ConfigurationManager.shared.log()
-
-        let tab = Tab(content: .url(.feedback))
-        let tabCollectionViewModel = mainViewController.tabCollectionViewModel
-        tabCollectionViewModel.append(tab: tab)
-        windowController.window?.makeKeyAndOrderFront(nil)
+        feedbackWindow.feedbackViewController.currentTab =
+            parentWindowController.mainViewController.tabCollectionViewModel.selectedTabViewModel?.tab
+        parentWindowController.window?.beginSheet(feedbackWindow) { _ in }
     }
 
 #endif
@@ -233,7 +232,7 @@ extension MainViewController {
             return
         }
 
-        selectedTabViewModel.tab.webView.magnification = 1.0
+        selectedTabViewModel.tab.webView.zoomLevel = 1.0
     }
 
     @IBAction func toggleDownloads(_ sender: Any) {
@@ -654,5 +653,11 @@ extension MainViewController: FindInPageDelegate {
     func findInPageDone(_ controller: FindInPageViewController) {
         self.tabCollectionViewModel.selectedTabViewModel?.closeFindInPage()
     }
+
+}
+
+fileprivate extension NSStoryboard {
+
+    static let feedback = NSStoryboard(name: "Feedback", bundle: .main)
 
 }

@@ -45,6 +45,8 @@ final class FaviconManager: FaviconManagement {
     static let shared = FaviconManager()
 
     private lazy var store: FaviconStoring = FaviconStore()
+    
+    private let faviconURLSession = URLSession(configuration: .ephemeral)
 
     func loadFavicons() {
         imageCache.loadFavicons { _ in
@@ -215,7 +217,7 @@ final class FaviconManager: FaviconManagement {
             }
 
             group.enter()
-            URLSession.default.dataTask(with: faviconUrl) { data, _, error in
+            faviconURLSession.dataTask(with: faviconUrl) { data, _, error in
                 guard let data = data, error == nil else {
                     group.leave()
                     return
