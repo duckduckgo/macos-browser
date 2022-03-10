@@ -27,17 +27,14 @@ extension URLRequest {
         case referer = "Referer"
     }
 
-    // Note: Change the user agent to macOS version before the release
     static func defaultRequest(with url: URL) -> URLRequest {
         var request = URLRequest(url: url)
         request.setValue("gzip;q=1.0, compress;q=0.5",
                          forHTTPHeaderField: HeaderKey.acceptEncoding.rawValue)
 
-        let appVersion = AppVersion.shared.versionNumber
-        let appId = AppVersion.shared.identifier
-        let systemVersion = ProcessInfo.processInfo.operatingSystemVersion
-        request.setValue("ddg_macos/\(appVersion) (\(appId); macOS \(systemVersion))",
-                         forHTTPHeaderField: HeaderKey.userAgent.rawValue)
+        let userAgent = UserAgent.duckDuckGoUserAgent()
+        
+        request.setValue(userAgent, forHTTPHeaderField: HeaderKey.userAgent.rawValue)
 
         let languages = Locale.preferredLanguages.prefix(6)
         let acceptLanguage = languages.enumerated().map { index, language in

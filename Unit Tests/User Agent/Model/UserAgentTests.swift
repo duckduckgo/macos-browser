@@ -38,5 +38,14 @@ final class UserAgentTests: XCTestCase {
         XCTAssert(!UserAgent.for(URL.duckDuckGo).contains("Safari"))
         XCTAssert(!UserAgent.for(URL.duckDuckGo).contains("Chrome"))
     }
+    
+    func testWhenUserAgentIsDuckDuckGo_ThenUserAgentContainsExpectedParameters() {
+        let appVersion = "app_version"
+        let appID = "app_id"
+        let systemVersion = "system_version"
+        let userAgent = UserAgent.duckDuckGoUserAgent(appVersion: appVersion, appID: appID, systemVersion: systemVersion)
+        
+        XCTAssertEqual(userAgent, "ddg_macos/\(appVersion) (\(appID); macOS \(systemVersion))")
+    }
 
 }

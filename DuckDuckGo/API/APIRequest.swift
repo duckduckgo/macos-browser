@@ -24,6 +24,20 @@ import BrowserServicesKit
 typealias APIRequestCompletion = (APIRequest.Response?, Error?) -> Void
 
 enum APIRequest {
+    
+    private static var defaultCallbackQueue: OperationQueue = {
+        let queue = OperationQueue()
+        queue.name = "APIRequest default callback queue"
+        queue.qualityOfService = .userInitiated
+        queue.maxConcurrentOperationCount = 1
+        return queue
+    }()
+
+    private static let defaultCallbackSession = URLSession(configuration: .default, delegate: nil, delegateQueue: defaultCallbackQueue)
+    private static let defaultCallbackEphemeralSession = URLSession(configuration: .ephemeral, delegate: nil, delegateQueue: defaultCallbackQueue)
+    
+    private static let mainThreadCallbackSession = URLSession(configuration: .default, delegate: nil, delegateQueue: OperationQueue.main)
+    private static let mainThreadCallbackEphemeralSession = URLSession(configuration: .ephemeral, delegate: nil, delegateQueue: OperationQueue.main)
 
     struct Response {
         
@@ -51,12 +65,12 @@ enum APIRequest {
                         parameters: [String: String]? = nil,
                         headers: HTTPHeaders = APIHeaders().defaultHeaders,
                         timeoutInterval: TimeInterval = 60.0,
+                        useEphemeralURLSession: Bool = true, // URL requests must opt into using shared storage
                         callBackOnMainThread: Bool = false,
                         completion: @escaping APIRequestCompletion) -> URLSessionDataTask {
         
         let urlRequest = urlRequestFor(url: url, method: method, parameters: parameters, headers: headers, timeoutInterval: timeoutInterval)
-        
-        let session: URLSession = callBackOnMainThread ? .mainThreadCallbackSession : .default
+        let session = session(useMainThreadCallbackQueue: callBackOnMainThread, ephemeral: useEphemeralURLSession)
 
         let task = session.dataTask(with: urlRequest) { (data, response, error) in
 
@@ -89,6 +103,14 @@ enum APIRequest {
         urlRequest.httpMethod = method.rawValue
         urlRequest.timeoutInterval = timeoutInterval
         return urlRequest
+    }
+    
+    private static func session(useMainThreadCallbackQueue: Bool, ephemeral: Bool) -> URLSession {
+        if useMainThreadCallbackQueue {
+            return ephemeral ? mainThreadCallbackEphemeralSession : mainThreadCallbackSession
+        } else {
+            return ephemeral ? defaultCallbackEphemeralSession : defaultCallbackSession
+        }
     }
 
 }
