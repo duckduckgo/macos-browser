@@ -32,10 +32,7 @@ extension URLRequest {
         request.setValue("gzip;q=1.0, compress;q=0.5",
                          forHTTPHeaderField: HeaderKey.acceptEncoding.rawValue)
 
-        let appVersion = AppVersion.shared.versionNumber
-        let appId = AppVersion.shared.identifier
-        let systemVersion = ProcessInfo.processInfo.operatingSystemVersion
-        let userAgent = "ddg_macos/\(appVersion) (\(appId); macOS \(systemVersion))"
+        let userAgent = UserAgent.duckDuckGoUserAgent()
         
         request.setValue(userAgent, forHTTPHeaderField: HeaderKey.userAgent.rawValue)
 
