@@ -91,41 +91,26 @@ final class SaveIdentityViewController: NSViewController {
             view.removeFromSuperview()
         }
 
-        identityStackView.addArrangedSubview(label(titled: identity.formattedName))
+        identityStackView.addArrangedSubview(NSTextField.optionalLabel(titled: identity.formattedName))
         
         identityStackView.setCustomSpacingAfterLastView(20)
         
-        identityStackView.addArrangedSubview(label(titled: identity.addressStreet))
-        identityStackView.addArrangedSubview(label(titled: identity.addressStreet2))
-        identityStackView.addArrangedSubview(label(titled: identity.addressCity))
-        identityStackView.addArrangedSubview(label(titled: identity.addressProvince))
-        identityStackView.addArrangedSubview(label(titled: identity.addressPostalCode))
-        identityStackView.addArrangedSubview(label(titled: identity.addressCountryCode))
+        identityStackView.addArrangedSubview(NSTextField.optionalLabel(titled: identity.addressStreet))
+        identityStackView.addArrangedSubview(NSTextField.optionalLabel(titled: identity.addressStreet2))
+        identityStackView.addArrangedSubview(NSTextField.optionalLabel(titled: identity.addressCity))
+        identityStackView.addArrangedSubview(NSTextField.optionalLabel(titled: identity.addressProvince))
+        identityStackView.addArrangedSubview(NSTextField.optionalLabel(titled: identity.addressPostalCode))
+        identityStackView.addArrangedSubview(NSTextField.optionalLabel(titled: identity.addressCountryCode))
         
         identityStackView.setCustomSpacingAfterLastView(20)
         
-        identityStackView.addArrangedSubview(label(titled: identity.homePhone))
-        identityStackView.addArrangedSubview(label(titled: identity.mobilePhone))
+        identityStackView.addArrangedSubview(NSTextField.optionalLabel(titled: identity.homePhone))
+        identityStackView.addArrangedSubview(NSTextField.optionalLabel(titled: identity.mobilePhone))
         
         identityStackView.setCustomSpacingAfterLastView(20)
         
-        identityStackView.addArrangedSubview(label(titled: identity.emailAddress))
+        identityStackView.addArrangedSubview(NSTextField.optionalLabel(titled: identity.emailAddress))
 
-    }
-    
-    private func label(titled title: String?) -> NSTextField? {
-        guard let title = title else {
-            return nil
-        }
-
-        let label = NSTextField(string: title)
-        label.isEditable = false
-        label.isBordered = false
-        label.isSelectable = false
-        label.isBezeled = false
-        label.backgroundColor = .clear
-        
-        return label
     }
 
 }
