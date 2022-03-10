@@ -72,6 +72,7 @@ final class SaveIdentityViewController: NSViewController {
     
     @IBAction func onOpenPreferencesClicked(sender: NSButton) {
         WindowControllersManager.shared.showPreferencesTab()
+        self.delegate?.shouldCloseSaveIdentityViewController(self)
     }
     
     // MARK: - Public
