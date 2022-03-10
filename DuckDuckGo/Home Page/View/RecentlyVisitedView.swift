@@ -199,7 +199,8 @@ struct RecentlyVisitedSite: View {
         .onHover { isHovering in
             self.isHovering = isHovering
         }
-        .frame(maxWidth: .infinity, minHeight: 126)
+        .frame(maxWidth: .infinity, minHeight: model.showPagesOnHover ? 126 : 0)
+        .padding(.bottom, model.showPagesOnHover ? 0 : 12)
 
     }
 
