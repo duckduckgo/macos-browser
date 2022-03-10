@@ -274,10 +274,19 @@ private struct WebsiteView: View {
                 .padding(.bottom, interItemSpacing)
 
         } else {
-
-            Text(model.domain)
+            if let domainURL = model.domain.url {
+                Button {
+                    model.openURL(domainURL)
+                } label: {
+                    Text(model.domain)
+                        .foregroundColor(Color("LinkBlueColor"))
+                }
+                .buttonStyle(.plain)
                 .padding(.bottom, interItemSpacing)
-
+            } else {
+                Text(model.domain)
+                    .padding(.bottom, interItemSpacing)
+            }
         }
 
     }
