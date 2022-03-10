@@ -359,8 +359,8 @@ final class BrowserTabViewController: NSViewController {
         guard let overlay = _contentOverlayPopover else {
             let overlayPopover = ContentOverlayPopover(currentTabView: view)
             WindowControllersManager.shared.stateChanged
-                .sink { _ in
-                    self._contentOverlayPopover?.websiteAutofillUserScriptCloseOverlay(nil)
+                .sink { [weak self] _ in
+                    self?._contentOverlayPopover?.websiteAutofillUserScriptCloseOverlay(nil)
                 }.store(in: &cancellables)
             _contentOverlayPopover = overlayPopover
             return overlayPopover
