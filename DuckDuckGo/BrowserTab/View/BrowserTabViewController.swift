@@ -44,7 +44,7 @@ final class BrowserTabViewController: NSViewController {
     var clickPoint: NSPoint?
 
     private let tabCollectionViewModel: TabCollectionViewModel
-    private var urlCancellable: AnyCancellable?
+    private var tabContentCancellable: AnyCancellable?
     private var selectedTabViewModelCancellable: AnyCancellable?
     private var errorViewStateCancellable: AnyCancellable?
 
@@ -115,25 +115,11 @@ final class BrowserTabViewController: NSViewController {
     private func subscribeToSelectedTabViewModel() {
         selectedTabViewModelCancellable = tabCollectionViewModel.$selectedTabViewModel
             .sink { [weak self] selectedTabViewModel in
-                self?.updateInterface(tabViewModel: selectedTabViewModel)
+                self?.tabViewModel = selectedTabViewModel
+                self?.showTabContent(of: selectedTabViewModel)
                 self?.subscribeToErrorViewState()
+                self?.subscribeToTabContent(of: selectedTabViewModel)
         }
-    }
-
-    /// Takes a URL and decided what to do with the UI. There are three states:
-    ///
-    /// 1. No URL is provided, so the webview should be hidden in favor of showing the default UI elements.
-    /// 2. A URL is provided for the first time, so the webview should be added as a subview and the URL should be loaded.
-    /// 3. A URL is provided after already adding the webview, so the webview should be reloaded.
-    private func updateInterface(tabViewModel: TabViewModel?) {
-        if tabCollectionViewModel.tabCollection.tabs.isEmpty {
-            view.window?.close()
-            return
-        }
-
-        changeWebView(tabViewModel: tabViewModel)
-        scheduleHoverLabelUpdatesForUrl(nil)
-        show(tabContent: tabViewModel?.tab.content)
     }
 
     private func removeWebViewFromHierarchy(webView: WebView? = nil,
@@ -145,7 +131,9 @@ final class BrowserTabViewController: NSViewController {
         // close fullscreenWindowController when closing tab in FullScreen mode
         webView.fullscreenWindowController?.close()
         webView.removeFromSuperview()
+        self.webView = nil
         container.removeFromSuperview()
+        self.webViewContainer = nil
     }
 
     private func addWebViewToViewHierarchy(_ webView: WebView) {
@@ -181,29 +169,27 @@ final class BrowserTabViewController: NSViewController {
         }
 
         guard let tabViewModel = tabViewModel else {
-            self.tabViewModel = nil
             removeWebViewFromHierarchy()
             return
         }
 
-        guard self.tabViewModel !== tabViewModel else { return }
-
         let oldWebView = webView
         let webViewContainer = webViewContainer
         displayWebView(of: tabViewModel)
-        subscribeToUrl(of: tabViewModel)
-        self.tabViewModel = tabViewModel
-        removeWebViewFromHierarchy(webView: oldWebView, container: webViewContainer)
+        if let oldWebView = oldWebView, let webViewContainer = webViewContainer {
+            removeWebViewFromHierarchy(webView: oldWebView, container: webViewContainer)
+        }
     }
 
-    func subscribeToUrl(of tabViewModel: TabViewModel) {
-         urlCancellable?.cancel()
-         urlCancellable = tabViewModel.tab.$content
+    func subscribeToTabContent(of tabViewModel: TabViewModel?) {
+        tabContentCancellable?.cancel()
+        tabContentCancellable = tabViewModel?.tab.$content
+            .dropFirst()
             .removeDuplicates()
             .receive(on: DispatchQueue.main)
             .sink { [weak self] _ in
-                self?.updateInterface(tabViewModel: tabViewModel)
-         }
+                self?.showTabContent(of: tabViewModel)
+            }
     }
 
     private func subscribeToErrorViewState() {
@@ -231,7 +217,13 @@ final class BrowserTabViewController: NSViewController {
 
     private func displayErrorView(_ shown: Bool, message: String) {
         guard let webView = webView else {
-            os_log("BrowserTabViewController: Web view is nil", type: .error)
+            return
+        }
+
+        if !shown &&
+            errorView.isHidden &&
+            !webView.isHidden &&
+            !homepageView.isHidden {
             return
         }
 
@@ -272,7 +264,7 @@ final class BrowserTabViewController: NSViewController {
     private func show(displayableTabAtIndex index: Int) {
         // The tab switcher only displays displayable tab types.
         tabCollectionViewModel.selectedTabViewModel?.tab.setContent(Tab.TabContent.displayableTabTypes[index])
-        updateInterface(tabViewModel: tabCollectionViewModel.selectedTabViewModel)
+        showTabContent(of: tabCollectionViewModel.selectedTabViewModel)
     }
 
     private func removeAllTabContent(includingWebView: Bool = true) {
@@ -300,9 +292,14 @@ final class BrowserTabViewController: NSViewController {
         (view.window?.windowController as? MainWindowController)?.userInteraction(prevented: true)
     }
 
-    private func show(tabContent content: Tab.TabContent?) {
+    private func showTabContent(of tabViewModel: TabViewModel?) {
+        guard !tabCollectionViewModel.tabCollection.tabs.isEmpty else {
+            view.window?.close()
+            return
+        }
+        scheduleHoverLabelUpdatesForUrl(nil)
 
-        switch content ?? .homepage {
+        switch tabViewModel?.tab.content {
         case .bookmarks:
             removeAllTabContent()
             showTabContentController(bookmarksViewController)
@@ -319,16 +316,17 @@ final class BrowserTabViewController: NSViewController {
             showTransientTabContentController(OnboardingViewController.create(withDelegate: self))
 
         case .url:
-            removeAllTabContent(includingWebView: false)
-            if let webView = self.webView, webView.superview == nil {
-                addWebViewToViewHierarchy(webView)
+            // Adjust webviews if there was a tab switch or content type switch
+            if webView != tabViewModel?.tab.webView || tabViewModel?.tab.webView.superview == nil {
+                removeAllTabContent(includingWebView: false)
+                changeWebView(tabViewModel: tabViewModel)
             }
 
         case .homepage:
             removeAllTabContent()
             view.addAndLayout(homepageView)
 
-        case .none:
+        case nil, .some(.none):
             removeAllTabContent()
         }
         
