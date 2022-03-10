@@ -140,7 +140,6 @@ extension Pixel {
         case autofillItemSaved(kind: FormAutofillKind)
         
         case waitlistFirstLaunch
-        case waitlistMigratedExistingInstall
         case waitlistPresentedLockScreen
         case waitlistDismissedLockScreen
 
@@ -306,9 +305,6 @@ extension Pixel.Event {
             
         case .waitlistFirstLaunch:
             return "m_mac_waitlist_first_launch_while_locked"
-            
-        case .waitlistMigratedExistingInstall:
-            return "m_mac_waitlist_migrated_existing_install"
             
         case .waitlistPresentedLockScreen:
             return "m_mac_waitlist_lock_screen_presented"

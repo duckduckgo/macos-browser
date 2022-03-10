@@ -62,7 +62,6 @@ final class LocalStatisticsStore: StatisticsStore {
         static let appRetentionAtb = "stats.appretentionatb.key"
         static let variant = "stats.variant.key"
         static let lastAppRetentionRequestDate = "stats.appretentionatb.last.request.key"
-        static let waitlistUpgradeCheckComplete = "waitlist.upgradecomplete"
         static let waitlistUnlocked = "waitlist.unlocked"
         static let autoLockEnabled = "auto-lock.enabled"
         static let autoLockThreshold = "auto-lock.threshold"
@@ -186,17 +185,6 @@ final class LocalStatisticsStore: StatisticsStore {
             } else {
                 pixelDataStore.removeValue(forKey: Keys.lastAppRetentionRequestDate)
             }
-        }
-    }
-    
-    var waitlistUpgradeCheckComplete: Bool {
-        get {
-            guard let booleanStringValue: String = pixelDataStore.value(forKey: Keys.waitlistUpgradeCheckComplete) else { return false }
-            return Bool(booleanStringValue) ?? false
-        }
-        set {
-            let booleanAsString = String(newValue)
-            pixelDataStore.set(booleanAsString, forKey: Keys.waitlistUpgradeCheckComplete)
         }
     }
     
