@@ -300,6 +300,7 @@ final class MainViewController: NSViewController {
         case .homePage, .onboarding, .none: navigationBarViewController.addressBarViewController?.addressBarTextField.makeMeFirstResponder()
         case .url:
             browserTabViewController.makeWebViewFirstResponder()
+        case .newPreferences: browserTabViewController.newPreferencesViewController.view.makeMeFirstResponder()
         case .preferences: browserTabViewController.preferencesViewController.view.makeMeFirstResponder()
         case .bookmarks: browserTabViewController.bookmarksViewController.view.makeMeFirstResponder()
         }

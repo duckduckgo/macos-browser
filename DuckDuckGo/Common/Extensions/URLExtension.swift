@@ -119,6 +119,10 @@ extension URL {
         return URL(string: "about:preferences")!
     }
 
+    static var newPreferences: URL {
+        return URL(string: "about:newpreferences")!
+    }
+
     // MARK: Pixel
 
     static let pixelBase = ProcessInfo.processInfo.environment["PIXEL_BASE_URL", default: "https://improving.duckduckgo.com"]

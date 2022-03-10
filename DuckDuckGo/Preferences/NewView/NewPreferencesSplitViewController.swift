@@ -1,7 +1,7 @@
 //
-//  PreferenceSections.swift
+//  NewPreferencesSplitViewController.swift
 //
-//  Copyright © 2021 DuckDuckGo. All rights reserved.
+//  Copyright © 2022 DuckDuckGo. All rights reserved.
 //
 //  Licensed under the Apache License, Version 2.0 (the "License");
 //  you may not use this file except in compliance with the License.
@@ -16,25 +16,22 @@
 //  limitations under the License.
 //
 
-import Foundation
+import Cocoa
+import SwiftUI
 
-protocol PreferenceSection {
-    var displayName: String { get }
-    var preferenceIcon: NSImage { get }
-}
+final class NewPreferencesSplitViewController: NSViewController {
 
-struct PreferenceSections {
-
-    let sections: [PreferenceSection]
-
-    init(sections: [PreferenceSection] = [
-        DefaultBrowserPreferences(),
-        AppearancePreferences(),
-        PrivacySecurityPreferences.shared,
-        LoginsPreferences(),
-        DownloadPreferences()
-    ]) {
-        self.sections = sections
+    weak var delegate: BrowserTabSelectionDelegate?
+    
+    override func loadView() {
+        view = NSView()
     }
 
+    override func viewDidLoad() {
+        super.viewDidLoad()
+
+        let host = NSHostingView(rootView: Preferences.RootView())
+        view.addAndLayout(host)
+    }
+    
 }

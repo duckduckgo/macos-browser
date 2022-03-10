@@ -36,6 +36,7 @@ final class MainMenu: NSMenu {
     @IBOutlet weak var printMenuItem: NSMenuItem?
     @IBOutlet weak var shareMenuItem: NSMenuItem!
     @IBOutlet weak var importBrowserDataMenuItem: NSMenuItem!
+    @IBOutlet weak var newPreferencesMenuItem: NSMenuItem!
     @IBOutlet weak var preferencesMenuItem: NSMenuItem!
 
     @IBOutlet weak var checkSpellingWhileTypingMenuItem: NSMenuItem?

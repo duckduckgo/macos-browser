@@ -26,9 +26,15 @@
                                             </connections>
                                         </menuItem>
                                         <menuItem isSeparatorItem="YES" id="VOq-y0-SEH"/>
-                                        <menuItem title="Preferences…" keyEquivalent="," id="BOF-NM-1cW">
+                                        <menuItem title="New Preferences…" keyEquivalent="," id="BOF-NM-1cW">
+                                            <modifierMask key="keyEquivalentModifierMask" shift="YES" command="YES"/>
                                             <connections>
-                                                <action selector="openPreferences:" target="Ady-hI-5gd" id="hyM-Fd-dVF"/>
+                                                <action selector="openNewPreferences:" target="Ady-hI-5gd" id="ET9-e7-kRS"/>
+                                            </connections>
+                                        </menuItem>
+                                        <menuItem title="Preferences…" keyEquivalent="," id="yD7-Ol-cRF">
+                                            <connections>
+                                                <action selector="openPreferences:" target="Ady-hI-5gd" id="iF9-8m-hce"/>
                                             </connections>
                                         </menuItem>
                                         <menuItem isSeparatorItem="YES" id="t1R-yn-9NQ"/>

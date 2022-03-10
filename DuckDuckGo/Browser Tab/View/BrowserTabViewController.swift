@@ -298,6 +298,10 @@ final class BrowserTabViewController: NSViewController {
             removeAllTabContent()
             showTabContentController(bookmarksViewController)
 
+        case .newPreferences:
+            removeAllTabContent()
+            showTabContentController(newPreferencesViewController)
+
         case .preferences:
             removeAllTabContent()
             showTabContentController(preferencesViewController)
@@ -327,6 +331,13 @@ final class BrowserTabViewController: NSViewController {
     }
 
     // MARK: - Preferences
+
+    private(set) lazy var newPreferencesViewController: NewPreferencesSplitViewController = {
+        let viewController = NewPreferencesSplitViewController()
+        viewController.delegate = self
+
+        return viewController
+    }()
 
     private(set) lazy var preferencesViewController: PreferencesSplitViewController = {
         let viewController = PreferencesSplitViewController.create()

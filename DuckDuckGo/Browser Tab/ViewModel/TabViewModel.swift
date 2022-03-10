@@ -182,6 +182,8 @@ final class TabViewModel {
         }
 
         switch tab.content {
+        case .newPreferences:
+            title = "New " + UserText.tabPreferencesTitle
         case .preferences:
             title = UserText.tabPreferencesTitle
         case .bookmarks:
@@ -209,7 +211,7 @@ final class TabViewModel {
         case .homePage:
             favicon = Favicon.home
             return
-        case .preferences:
+        case .preferences, .newPreferences:
             favicon = Favicon.preferences
             return
         case .bookmarks:
