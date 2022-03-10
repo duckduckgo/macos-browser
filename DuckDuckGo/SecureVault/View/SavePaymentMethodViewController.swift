@@ -74,11 +74,13 @@ final class SavePaymentMethodViewController: NSViewController {
             self.delegate?.shouldCloseSavePaymentMethodViewController(self)
         }
         
-        guard let paymentMethod = paymentMethod else {
+        guard var paymentMethod = paymentMethod else {
             assertionFailure("Tried to save payment method, but the view controller didn't have one")
             return
         }
         
+        paymentMethod.title = CreditCardValidation.type(for: paymentMethod.cardNumber).displayName
+
         do {
             try SecureVaultFactory.default.makeVault(errorReporter: SecureVaultErrorReporter.shared).storeCreditCard(paymentMethod)
         } catch {
