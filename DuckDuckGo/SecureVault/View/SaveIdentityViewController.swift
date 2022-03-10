@@ -58,10 +58,12 @@ final class SaveIdentityViewController: NSViewController {
             self.delegate?.shouldCloseSaveIdentityViewController(self)
         }
         
-        guard let identity = identity else {
+        guard var identity = identity else {
             assertionFailure("Tried to save identity, but the view controller didn't have one")
             return
         }
+        
+        identity.title = UserText.pmDefaultIdentityAutofillTitle
         
         do {
             try SecureVaultFactory.default.makeVault(errorReporter: SecureVaultErrorReporter.shared).storeIdentity(identity)
