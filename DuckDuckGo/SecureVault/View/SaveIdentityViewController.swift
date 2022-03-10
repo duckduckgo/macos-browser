@@ -94,7 +94,7 @@ final class SaveIdentityViewController: NSViewController {
             view.removeFromSuperview()
         }
 
-        identityStackView.addArrangedSubview(NSTextField.optionalLabel(titled: identity.formattedName))
+        identityStackView.addArrangedSubview(NSTextField.optionalLabel(titled: identity.longFormattedName))
         
         identityStackView.setCustomSpacingAfterLastView(20)
         
