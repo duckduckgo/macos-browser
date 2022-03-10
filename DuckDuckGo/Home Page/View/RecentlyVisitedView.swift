@@ -22,8 +22,6 @@ extension HomePage.Views {
 
 struct RecentlyVisited: View {
 
-    let dateFormatter = RelativeDateTimeFormatter()
-
     @EnvironmentObject var model: HomePage.Models.RecentlyVisitedModel
 
     @State var isExpanded = true
@@ -210,12 +208,6 @@ struct RecentlyVisitedPageList: View {
 
     let collapsedPageCount = 2
 
-    let formatter: RelativeDateTimeFormatter = {
-        let f = RelativeDateTimeFormatter()
-        f.unitsStyle = .abbreviated
-        return f
-    } ()
-
     @EnvironmentObject var model: HomePage.Models.RecentlyVisitedModel
     @ObservedObject var site: HomePage.Models.RecentlyVisitedSiteModel
 
@@ -223,6 +215,10 @@ struct RecentlyVisitedPageList: View {
 
     var visiblePages: [HomePage.Models.RecentlyVisitedPageModel] {
         isExpanded ? site.pages : [HomePage.Models.RecentlyVisitedPageModel](site.pages.prefix(collapsedPageCount))
+    }
+
+    func relativeTime(_ page: HomePage.Models.RecentlyVisitedPageModel) -> String {
+        return model.relativeTime(page.visited)
     }
 
     var body: some View {
@@ -237,7 +233,7 @@ struct RecentlyVisitedPageList: View {
                     .lineLimit(1)
                     .truncationMode(.middle)
 
-                    Text(formatter.localizedString(fromTimeInterval: page.visited.timeIntervalSinceNow))
+                    Text(relativeTime(page))
                         .font(.system(size: 11))
                         .foregroundColor(Color("HomeFeedItemTimeTextColor"))
 

@@ -23,6 +23,12 @@ extension HomePage.Models {
 
 final class RecentlyVisitedModel: ObservableObject {
 
+    private static let relativeDateFormatter: RelativeDateTimeFormatter = {
+        let f = RelativeDateTimeFormatter()
+        f.unitsStyle = .abbreviated
+        return f
+    } ()
+
     private let fire = Fire()
 
     @UserDefaultsWrapper(key: .homePageShowPagesOnHover, defaultValue: false)
@@ -100,6 +106,14 @@ final class RecentlyVisitedModel: ObservableObject {
     func open(_ site: RecentlyVisitedSiteModel) {
         guard let url = site.domain.url else { return }
         self.open(url)
+    }
+
+    func relativeTime(_ date: Date) -> String {
+        let interval = date.timeIntervalSinceNow
+        if interval > -60 {
+            return "Just now"
+        }
+        return Self.relativeDateFormatter.localizedString(fromTimeInterval: date.timeIntervalSinceNow)
     }
 
 }
