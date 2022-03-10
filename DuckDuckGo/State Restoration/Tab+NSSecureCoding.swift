@@ -66,14 +66,14 @@ private extension Tab.TabContent {
         case url = 0
         case preferences = 1
         case bookmarks = 2
-        case homepage = 3
+        case homePage = 3
         case onboarding = 4
     }
 
     init?(type: ContentType, url: URL?) {
         switch type {
-        case .homepage:
-            self = .homepage
+        case .homePage:
+            self = .homePage
         case .url:
             guard let url = url else { return nil }
             self = .url(url)
@@ -89,11 +89,11 @@ private extension Tab.TabContent {
     var type: ContentType {
         switch self {
         case .url: return .url
-        case .homepage: return .homepage
+        case .homePage: return .homePage
         case .bookmarks: return .bookmarks
         case .preferences: return .preferences
         case .onboarding: return .onboarding
-        case .none: return .homepage
+        case .none: return .homePage
         }
     }
 

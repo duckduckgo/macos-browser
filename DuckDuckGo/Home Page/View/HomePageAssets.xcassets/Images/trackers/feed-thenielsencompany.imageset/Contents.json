@@ -1,0 +1,12 @@
+{
+  "images" : [
+    {
+      "filename" : "thenielsencompany.svg",
+      "idiom" : "universal"
+    }
+  ],
+  "info" : {
+    "author" : "xcode",
+    "version" : 1
+  }
+}

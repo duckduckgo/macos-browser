@@ -89,7 +89,7 @@ final class TabBarViewController: NSViewController {
     }
 
     @IBAction func addButtonAction(_ sender: NSButton) {
-        tabCollectionViewModel.appendNewTab(with: .homepage)
+        tabCollectionViewModel.appendNewTab(with: .homePage)
     }
     @IBAction func rightScrollButtonAction(_ sender: NSButton) {
         collectionView.scrollToEnd()

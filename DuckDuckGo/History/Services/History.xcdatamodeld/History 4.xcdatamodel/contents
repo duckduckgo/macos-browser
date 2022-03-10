@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<model type="com.apple.IDECoreDataModeler.DataModel" documentVersion="1.0" lastSavedToolsVersion="19574" systemVersion="21D62" minimumToolsVersion="Automatic" sourceLanguage="Swift" userDefinedModelVersionIdentifier="">
+    <entity name="HistoryEntryManagedObject" representedClassName="HistoryEntryManagedObject" syncable="YES" codeGenerationType="class">
+        <attribute name="blockedTrackingEntities" optional="YES" attributeType="String"/>
+        <attribute name="failedToLoad" attributeType="Boolean" defaultValueString="NO" usesScalarValueType="YES"/>
+        <attribute name="identifier" attributeType="UUID" usesScalarValueType="NO"/>
+        <attribute name="lastVisit" attributeType="Date" usesScalarValueType="NO"/>
+        <attribute name="numberOfTrackersBlocked" optional="YES" attributeType="Integer 64" defaultValueString="0" usesScalarValueType="YES"/>
+        <attribute name="numberOfVisits" attributeType="Integer 64" defaultValueString="0" usesScalarValueType="YES"/>
+        <attribute name="titleEncrypted" optional="YES" attributeType="Transformable" valueTransformerName="NSStringTransformer"/>
+        <attribute name="urlEncrypted" attributeType="Transformable" valueTransformerName="NSURLTransformer"/>
+    </entity>
+    <elements>
+        <element name="HistoryEntryManagedObject" positionX="-63" positionY="-18" width="128" height="149"/>
+    </elements>
+</model>

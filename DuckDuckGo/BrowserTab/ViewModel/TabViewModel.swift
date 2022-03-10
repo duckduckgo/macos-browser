@@ -66,7 +66,7 @@ final class TabViewModel {
     @Published private(set) var addressBarString: String = ""
     @Published private(set) var passiveAddressBarString: String = ""
     var lastAddressBarTextFieldValue: AddressBarTextField.Value?
-    var lastHomepageTextFieldValue: AddressBarTextField.Value?
+    var lastHomePageTextFieldValue: AddressBarTextField.Value?
 
     @Published private(set) var title: String = UserText.tabHomeTitle
     @Published private(set) var favicon: NSImage?
@@ -186,7 +186,7 @@ final class TabViewModel {
             title = UserText.tabPreferencesTitle
         case .bookmarks:
             title = UserText.tabBookmarksTitle
-        case .homepage:
+        case .homePage:
             title = UserText.tabHomeTitle
         case .onboarding:
             title = UserText.tabOnboardingTitle
@@ -206,7 +206,7 @@ final class TabViewModel {
         }
 
         switch tab.content {
-        case .homepage:
+        case .homePage:
             favicon = Favicon.home
             return
         case .preferences:

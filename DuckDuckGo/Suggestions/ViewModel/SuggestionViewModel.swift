@@ -21,10 +21,12 @@ import BrowserServicesKit
 
 final class SuggestionViewModel {
 
+    let isHomePage: Bool
     let suggestion: Suggestion
     let userStringValue: String
 
-    init(suggestion: Suggestion, userStringValue: String) {
+    init(isHomePage: Bool, suggestion: Suggestion, userStringValue: String) {
+        self.isHomePage = isHomePage
         self.suggestion = suggestion
         self.userStringValue = userStringValue
     }
@@ -37,15 +39,21 @@ final class SuggestionViewModel {
         return style
     }()
 
-    static let tableRowViewStandardAttributes: [NSAttributedString.Key: Any] = [
-        .font: NSFont.systemFont(ofSize: 13, weight: .regular),
-        .paragraphStyle: paragraphStyle
-    ]
+    lazy var tableRowViewStandardAttributes: [NSAttributedString.Key: Any] = {
+        let size: CGFloat = isHomePage ? 15 : 13
+        return [
+            .font: NSFont.systemFont(ofSize: size, weight: .regular),
+            .paragraphStyle: Self.paragraphStyle
+        ]
+    }()
 
-    static let tableRowViewBoldAttributes: [NSAttributedString.Key: Any] = [
-        NSAttributedString.Key.font: NSFont.systemFont(ofSize: 13, weight: .bold),
-        .paragraphStyle: paragraphStyle
-    ]
+    lazy var tableRowViewBoldAttributes: [NSAttributedString.Key: Any] = {
+        let size: CGFloat = isHomePage ? 15 : 13
+        return [
+            NSAttributedString.Key.font: NSFont.systemFont(ofSize: size, weight: .bold),
+            .paragraphStyle: Self.paragraphStyle
+        ]
+    }()
 
     var tableCellViewAttributedString: NSAttributedString {
         var firstPart = ""
@@ -55,8 +63,8 @@ final class SuggestionViewModel {
             boldPart = String(string.dropFirst(userStringValue.count))
         }
 
-        let attributedString = NSMutableAttributedString(string: firstPart, attributes: Self.tableRowViewStandardAttributes)
-        let boldAttributedString = NSAttributedString(string: boldPart, attributes: Self.tableRowViewBoldAttributes)
+        let attributedString = NSMutableAttributedString(string: firstPart, attributes: tableRowViewStandardAttributes)
+        let boldAttributedString = NSAttributedString(string: boldPart, attributes: tableRowViewBoldAttributes)
         attributedString.append(boldAttributedString)
 
         return attributedString

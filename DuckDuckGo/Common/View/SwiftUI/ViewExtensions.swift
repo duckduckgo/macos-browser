@@ -27,9 +27,9 @@ enum ViewVisibility: CaseIterable {
     
 }
 
-// https://swiftuirecipes.com/blog/how-to-hide-a-swiftui-view-visible-invisible-gone
 extension View {
 
+    // https://swiftuirecipes.com/blog/how-to-hide-a-swiftui-view-visible-invisible-gone
     @ViewBuilder func visibility(_ visibility: ViewVisibility) -> some View {
         if visibility != .gone {
             if visibility == .visible {
@@ -37,6 +37,14 @@ extension View {
             } else {
                 hidden()
             }
+        }
+    }
+
+    func link(onHoverChanged: ((Bool) -> Void)? = nil, clicked: @escaping () -> Void) -> some View {
+        self.onHover { over in
+            onHoverChanged?(over)
+        }.onTapGesture {
+            clicked()
         }
     }
 

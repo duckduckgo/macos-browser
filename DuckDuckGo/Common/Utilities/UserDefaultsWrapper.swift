@@ -68,6 +68,8 @@ public struct UserDefaultsWrapper<T> {
         case legacyStatisticsStoreDataCleared = "statistics.appretentionatb.legacy-data-cleared"
 
         case onboardingFinished = "onboarding.finished"
+
+        case homePageShowPagesOnHover = "home.page.show.pages.on.hover"
     }
     
     enum RemovedKeys: String, CaseIterable {

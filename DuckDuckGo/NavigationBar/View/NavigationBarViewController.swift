@@ -36,10 +36,16 @@ final class NavigationBarViewController: NSViewController {
     @IBOutlet weak var bookmarkListButton: NSButton!
     @IBOutlet weak var passwordManagementButton: NSButton!
     @IBOutlet weak var downloadsButton: MouseOverButton!
+    @IBOutlet weak var navigationButtons: NSView!
+    @IBOutlet weak var addressBarContainer: NSView!
+    @IBOutlet weak var daxLogo: NSImageView!
+    @IBOutlet weak var addressBarStack: NSStackView!
 
     @IBOutlet var addressBarLeftToNavButtonsConstraint: NSLayoutConstraint!
-    @IBOutlet var addressBarLeftToSuperviewConstraint: NSLayoutConstraint!
     @IBOutlet var addressBarProportionalWidthConstraint: NSLayoutConstraint!
+    @IBOutlet var addressBarTopConstraint: NSLayoutConstraint!
+    @IBOutlet var addressBarBottomConstraint: NSLayoutConstraint!
+    @IBOutlet var buttonsTopConstraint: NSLayoutConstraint!
 
     lazy var downloadsProgressView: CircularProgressView = {
         let bounds = downloadsButton.bounds
@@ -121,6 +127,11 @@ final class NavigationBarViewController: NSViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
 
+        view.wantsLayer = true
+        view.layer?.masksToBounds = false
+        addressBarContainer.wantsLayer = true
+        addressBarContainer.layer?.masksToBounds = false    
+
         setupNavigationButtonMenus()
         subscribeToSelectedTabViewModel()
         listenToPasswordManagerNotifications()
@@ -142,13 +153,15 @@ final class NavigationBarViewController: NSViewController {
             goForwardButton.isHidden = true
             refreshButton.isHidden = true
             optionsButton.isHidden = true
-            addressBarLeftToSuperviewConstraint.isActive = true
+            addressBarTopConstraint.constant = 0
+            addressBarBottomConstraint.constant = 0
             addressBarLeftToNavButtonsConstraint.isActive = false
             addressBarProportionalWidthConstraint.isActive = false
-        } else {
-            addressBarLeftToSuperviewConstraint.isActive = false
-            addressBarLeftToNavButtonsConstraint.isActive = true
-            addressBarProportionalWidthConstraint.isActive = true
+
+            // This pulls the dashboard button to the left for the popup
+            NSLayoutConstraint.activate(addressBarStack.addConstraints(to: view, [
+                .leading: .leading(multiplier: 1.0, const: 72)
+            ]))
         }
     }
 
@@ -367,16 +380,29 @@ final class NavigationBarViewController: NSViewController {
         selectedTabViewModelCancellable = tabCollectionViewModel.$selectedTabViewModel.receive(on: DispatchQueue.main).sink { [weak self] _ in
             self?.subscribeToNavigationActionFlags()
             self?.subscribeToCredentialsToSave()
-            self?.subscribeToTabUrl()
+            self?.subscribeToTabContent()
         }
     }
 
-    private func subscribeToTabUrl() {
+    private func subscribeToTabContent() {
         urlCancellable = tabCollectionViewModel.selectedTabViewModel?.tab.$content
             .receive(on: DispatchQueue.main)
             .sink(receiveValue: { [weak self] _ in
                 self?.updatePasswordManagementButton()
             })
+    }
+
+    func resizeAddressBarForHomePage(_ homePage: Bool, animated: Bool) {
+        let verticalPadding: CGFloat = view.window?.isPopUpWindow == true ? 0 : 6
+
+        let barTop = animated ? addressBarTopConstraint.animator() : addressBarTopConstraint
+        barTop?.constant = homePage ? 16 : verticalPadding
+
+        let bottom = animated ? addressBarBottomConstraint.animator() : addressBarBottomConstraint
+        bottom?.constant = homePage ? 0 : verticalPadding
+
+        let logo = animated ? daxLogo.animator() : daxLogo
+        logo?.isHidden = !homePage
     }
 
     private func subscribeToDownloads() {

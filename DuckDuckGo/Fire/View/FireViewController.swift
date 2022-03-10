@@ -35,6 +35,7 @@ final class FireViewController: NSViewController {
     @IBOutlet weak var fireAnimationView: AnimationView!
     @IBOutlet weak var progressIndicatorWrapper: NSView!
     @IBOutlet weak var progressIndicator: NSProgressIndicator!
+    @IBOutlet weak var progressIndicatorWrapperBG: NSView!
 
     required init?(coder: NSCoder) {
         fatalError("TabBarViewController: Bad initializer")
@@ -112,6 +113,7 @@ final class FireViewController: NSViewController {
             self.fireViewModel.isAnimationPlaying = false
             if self.fireViewModel.fire.isBurning {
                 self.progressIndicatorWrapper.isHidden = false
+                self.progressIndicatorWrapperBG.applyDropShadow()
             }
         }
     }

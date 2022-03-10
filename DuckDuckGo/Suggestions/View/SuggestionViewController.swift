@@ -73,6 +73,7 @@ final class SuggestionViewController: NSViewController {
         self.view.window!.backgroundColor = .clear
         
         addMonitors()
+        tableView.rowHeight = suggestionContainerViewModel.isHomePage ? 34 : 28
     }
 
     override func viewWillDisappear() {
