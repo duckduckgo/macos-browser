@@ -129,19 +129,3 @@ final class SaveIdentityViewController: NSViewController {
     }
 
 }
-
-private extension NSStackView {
-    
-    func addArrangedSubview(_ view: NSView?) {
-        if let view = view {
-            self.addArrangedSubview(view)
-        }
-    }
-    
-    func setCustomSpacingAfterLastView(_ spacing: CGFloat) {
-        if let view = arrangedSubviews.last {
-            setCustomSpacing(spacing, after: view)
-        }
-    }
-    
-}

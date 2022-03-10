@@ -421,7 +421,7 @@ final class NavigationBarViewController: NSViewController {
             return
         }
 
-        passwordManagementButton.isHidden = (!passwordManagementPopover.isShown && !saveIdentityPopover.isShown && !savePaymentMethodPopover.isShown)
+        passwordManagementButton.isHidden = !popovers.contains(where: { $0.isShown })
 
         passwordManagementPopover.viewController.domain = nil
         guard let url = url, let domain = url.host else {
