@@ -67,6 +67,7 @@ final class TabDataCleaner: NSObject, WKNavigationDelegate {
     }
     
     func webView(_ webView: WKWebView, didFail navigation: WKNavigation!, withError error: Error) {
+        Pixel.fire(.debug(event: .blankNavigationOnBurnFailed, error: error))
         processedTabs += 1
         
         notifyIfDone()

@@ -207,6 +207,8 @@ extension Pixel {
             case secureVaultError = "secure_vault_error"
 
             case feedbackReportingFailed = "feedback_reporting_failed"
+            
+            case blankNavigationOnBurnFailed = "blank_navigation_on_burn_failed"
         }
 
     }
