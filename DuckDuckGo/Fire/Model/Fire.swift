@@ -21,26 +21,36 @@ import os.log
 import BrowserServicesKit
 import WebKit
 
-protocol DataClearing {
-    func prepareForDataClearing(caller: InitialDataClearing)
+protocol TabDataClearing {
+    func prepareForDataClearing(caller: TabDataCleaner)
 }
 
-final class InitialDataClearing: NSObject, WKNavigationDelegate {
+/**
+ Initiates cleanup of WebKit related data from Tabs:
+ - Detach listeners and observers.
+ - Flush WebView data by navigating to empty page.
+ 
+ Once done, remove Tab objects.
+ */
+final class TabDataCleaner: NSObject, WKNavigationDelegate {
     
     private var numberOfTabs = 0
     private var processedTabs = 0
     
     private var completion: (() -> Void)?
     
-    func prepare(tabs: [Tab],
-                 models: [TabViewModel],
-                 completion: @escaping () -> Void) {
+    func prepareModelsForCleanup(_ models: [TabViewModel],
+                                 completion: @escaping () -> Void) {
+        guard !models.isEmpty else {
+            completion()
+            return
+        }
+        
         assert(self.completion == nil)
         self.completion = completion
         
-        numberOfTabs = tabs.count
+        numberOfTabs = models.count
         models.forEach { $0.prepareForDataClearing(caller: self) }
-        tabs.forEach { $0.prepareForDataClearing(caller: self) }
     }
     
     private func notifyIfDone() {
@@ -64,6 +74,8 @@ final class InitialDataClearing: NSObject, WKNavigationDelegate {
 }
 
 final class Fire {
+    
+    private typealias TabCollectionsCleanupInfo = [TabCollectionViewModel: [TabCollectionViewModel.TabCleanupInfo]]
 
     let webCacheManager: WebCacheManager
     let historyCoordinating: HistoryCoordinating
@@ -73,7 +85,7 @@ final class Fire {
     let faviconManagement: FaviconManagement
     let autoconsentManagement: AutoconsentManagement?
     
-    let initialClearing = InitialDataClearing()
+    let tabsCleaner = TabDataCleaner()
 
     @Published private(set) var isBurning = false
 
@@ -111,20 +123,23 @@ final class Fire {
             return domain
         })
         let burningDomains = domains.union(wwwDomains)
+        let collectionsCleanupInfo = tabViewModelsFor(domains: burningDomains)
         
-        var collectionsInfo = [TabCollectionViewModel: [TabCollectionViewModel.PendingTabCleanup]]()
-        for window in windowControllerManager.mainWindowControllers {
-            let tabCollectionViewModel = window.mainViewController.tabCollectionViewModel
-            
-            collectionsInfo[tabCollectionViewModel] = tabCollectionViewModel.prepareCleanupForTabs(relatedToDomains: burningDomains)
+        // Prepare all Tabs that are going to be burned
+        let modelsToRemove = collectionsCleanupInfo.values.flatMap { tabViewModelsCleanupInfo in
+            tabViewModelsCleanupInfo.filter({ $0.action == .burn }).compactMap { $0.tabViewModel }
         }
         
-        let tabsToRemove = collectionsInfo.values.flatMap { array in array.filter({ $0.action == .burn }).map { $0.tab } }
-        let modelsToDetach = collectionsInfo.values.flatMap { array in array.filter({ $0.action == .burn }).compactMap { $0.viewModel } }
-        
-        initialClearing.prepare(tabs: tabsToRemove, models: modelsToDetach) {
+        tabsCleaner.prepareModelsForCleanup(modelsToRemove) {
 
             let group = DispatchGroup()
+            
+            group.enter()
+            self.burnTabsFrom(collectionViewModels: collectionsCleanupInfo,
+                         relatedToDomains: burningDomains) {
+                group.leave()
+            }
+            
             group.enter()
             Task {
                 await self.burnWebCache(domains: burningDomains)
@@ -141,10 +156,6 @@ final class Fire {
                 })
             })
 
-            for (viewModel, cleanupInfoForModel) in collectionsInfo {
-                viewModel.clearData(cleanupInfoForModel, forDomains: burningDomains)
-            }
-            
             self.burnAutoconsentCache()
 
             group.notify(queue: .main) {
@@ -160,22 +171,7 @@ final class Fire {
         os_log("Fire started", log: .fire)
         isBurning = true
         
-        var allTabs = [Tab]()
-        var allModels = [TabViewModel]()
-        
-        for window in windowControllerManager.mainWindowControllers {
-            let tabCollectionViewModel = window.mainViewController.tabCollectionViewModel
-            
-            allTabs.append(contentsOf: tabCollectionViewModel.tabCollection.tabs)
-            for tab in tabCollectionViewModel.tabCollection.tabs {
-                if let tabViewModel = tabCollectionViewModel.tabViewModels[tab] {
-                    allModels.append(tabViewModel)
-                }
-            }
-        }
-        
-        initialClearing.prepare(tabs: allTabs,
-                                models: allModels) {
+        tabsCleaner.prepareModelsForCleanup(allTabViewModels()) {
             let group = DispatchGroup()
             group.enter()
             Task {
@@ -207,6 +203,29 @@ final class Fire {
                 os_log("Fire finished", log: .fire)
             }
         }
+    }
+    
+    // MARK: - Tab Models
+    
+    private func allTabViewModels() -> [TabViewModel] {
+        var allTabViewModels = [TabViewModel] ()
+        for window in windowControllerManager.mainWindowControllers {
+            let tabCollectionViewModel = window.mainViewController.tabCollectionViewModel
+            
+            allTabViewModels.append(contentsOf: tabCollectionViewModel.tabViewModels.values)
+        }
+        return allTabViewModels
+    }
+    
+    private func tabViewModelsFor(domains: Set<String>) -> TabCollectionsCleanupInfo {
+        var collectionsCleanupInfo = TabCollectionsCleanupInfo()
+        for window in windowControllerManager.mainWindowControllers {
+            let tabCollectionViewModel = window.mainViewController.tabCollectionViewModel
+            
+            collectionsCleanupInfo[tabCollectionViewModel] = tabCollectionViewModel.prepareCleanupInfoForTabs(relatedToDomains: domains)
+        }
+        
+        return collectionsCleanupInfo
     }
 
     // MARK: - Web cache
@@ -292,6 +311,19 @@ final class Fire {
         }
     }
     
+    private func burnTabsFrom(collectionViewModels: TabCollectionsCleanupInfo,
+                              relatedToDomains domains: Set<String>,
+                              completion: @escaping () -> Void) {
+        // Close tabs where specified domains are currently loaded
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
+            for (tabCollectionViewModel, tabsCleanupInfo) in collectionViewModels {
+                tabCollectionViewModel.clearData(tabsCleanupInfo, forDomains: domains)
+            }
+
+            completion()
+        }
+    }
+    
     // MARK: - Autoconsent visit cache
     private func burnAutoconsentCache() {
         if #available(macOS 11, *), self.autoconsentManagement != nil {
@@ -303,25 +335,22 @@ final class Fire {
 
 fileprivate extension TabCollectionViewModel {
     
-    struct PendingTabCleanup {
-        let tab: Tab
-        let viewModel: TabViewModel?
-        let index: Int
+    struct TabCleanupInfo {
+        let tabViewModel: TabViewModel
         let action: Tab.FireAction
     }
     
-    func prepareCleanupForTabs(relatedToDomains domains: Set<String>) -> [PendingTabCleanup] {
+    func prepareCleanupInfoForTabs(relatedToDomains domains: Set<String>) -> [TabCleanupInfo] {
         
-        var result = [PendingTabCleanup]()
-        for (index, tab) in tabCollection.tabs.enumerated() {
+        var result = [TabCleanupInfo]()
+    
+        for (tab, tabViewModel) in tabViewModels {
             let action = tab.fireAction(for: domains)
             switch action {
             case .none: continue
             case .replace, .burn:
-                result.append(PendingTabCleanup(tab: tab,
-                                                viewModel: tabViewModels[tab],
-                                                index: index,
-                                                action: action))
+                result.append(TabCleanupInfo(tabViewModel: tabViewModel,
+                                             action: action))
             }
         }
         
@@ -329,17 +358,22 @@ fileprivate extension TabCollectionViewModel {
     }
 
     // Burns data related to domains from the collection of tabs
-    func clearData(_ cleanupInfo: [PendingTabCleanup], forDomains domains: Set<String>) {
+    func clearData(_ cleanupInfo: [TabCleanupInfo], forDomains domains: Set<String>) {
         // Go one by one and execute the fire action
         var toRemove = IndexSet()
         for tabCleanupInfo in cleanupInfo {
+            guard let tabIndex = tabCollection.tabs.firstIndex(of: tabCleanupInfo.tabViewModel.tab) else {
+                assertionFailure("Tab index not found for given TabViewModel")
+                continue
+            }
             switch tabCleanupInfo.action {
             case .none: continue
             case .replace:
-                let tab = Tab(content: tabCleanupInfo.tab.content, shouldLoadInBackground: true)
-                replaceTab(at: tabCleanupInfo.index, with: tab, forceChange: true)
+                
+                let tab = Tab(content: tabCleanupInfo.tabViewModel.tab.content, shouldLoadInBackground: true)
+                replaceTab(at: tabIndex, with: tab, forceChange: true)
             case .burn:
-                toRemove.insert(tabCleanupInfo.index)
+                toRemove.insert(tabIndex)
             }
         }
         removeTabsAndAppendNew(at: toRemove, forceChange: true)

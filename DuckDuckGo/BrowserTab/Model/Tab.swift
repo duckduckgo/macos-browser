@@ -1109,9 +1109,10 @@ extension Tab: AutoconsentUserScriptDelegate {
     }
 }
 
-extension Tab: DataClearing {
-    func prepareForDataClearing(caller: InitialDataClearing) {
+extension Tab: TabDataClearing {
+    func prepareForDataClearing(caller: TabDataCleaner) {
         webView.stopLoading()
+        userContentController.removeAllUserScripts()
         
         webView.navigationDelegate = caller
         webView.load(URL(string: "about:blank")!)

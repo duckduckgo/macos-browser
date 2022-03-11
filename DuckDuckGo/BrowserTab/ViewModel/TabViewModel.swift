@@ -267,10 +267,12 @@ extension TabViewModel {
 
 }
 
-extension TabViewModel: DataClearing {
+extension TabViewModel: TabDataClearing {
     
-    func prepareForDataClearing(caller: InitialDataClearing) {
+    func prepareForDataClearing(caller: TabDataCleaner) {
         webViewStateObserver?.stopObserving()
+        
+        tab.prepareForDataClearing(caller: caller)
     }
     
 }
