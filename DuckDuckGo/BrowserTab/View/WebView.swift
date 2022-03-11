@@ -43,6 +43,12 @@ final class WebView: WKWebView {
         "WKMenuItemIdentifierSearchWeb": UserText.searchWithDuckDuckGo
     ]
 
+    deinit {
+        self.configuration.userContentController.removeAllUserScripts()
+    }
+
+    // MARK: - Zoom
+
     static private let maxMagnification: CGFloat = 3.0
     static private let minMagnification: CGFloat = 0.5
     static private let magnificationStep: CGFloat = 0.1
@@ -67,10 +73,6 @@ final class WebView: WKWebView {
     func zoomOut() {
         guard canZoomOut else { return }
         self.magnification = max(self.magnification - Self.magnificationStep, Self.minMagnification)
-    }
-
-    deinit {
-        self.configuration.userContentController.removeAllUserScripts()
     }
 
     // MARK: - Back/Forward Navigation
@@ -126,6 +128,13 @@ final class WebView: WKWebView {
 
     // MARK: - Developer Tools
 
+    override func viewDidMoveToWindow() {
+        super.viewDidMoveToWindow()
+        if self.isInspectorShown {
+            self.openDeveloperTools()
+        }
+    }
+
     @nonobjc var mainFrame: AnyObject? {
         guard self.responds(to: NSSelectorFromString("_mainFrame")) else {
             assertionFailure("WKWebView does not respond to _mainFrame")
@@ -169,6 +178,8 @@ final class WebView: WKWebView {
     @nonobjc func showPageResources() {
         inspectorPerform("showResources")
     }
+
+    // MARK: - Fullscreen
 
     var fullscreenWindowController: NSWindowController? {
         guard let fullscreenWindowController = self.window?.windowController,
