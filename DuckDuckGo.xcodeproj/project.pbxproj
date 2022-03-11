@@ -979,6 +979,7 @@
 		7B4CE8DA26F02108009134B1 /* UI Tests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = "UI Tests.xctest"; sourceTree = BUILT_PRODUCTS_DIR; };
 		7B4CE8DE26F02108009134B1 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		7B4CE8E626F02134009134B1 /* TabBarTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TabBarTests.swift; sourceTree = "<group>"; };
+		7BA2ECD827EB4138002F8DCF /* BrowserServicesKit */ = {isa = PBXFileReference; lastKnownFileType = wrapper; name = BrowserServicesKit; path = ../BrowserServicesKit; sourceTree = "<group>"; };
 		8511E18325F82B34002F516B /* 01_Fire_really_small.json */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.json; path = 01_Fire_really_small.json; sourceTree = "<group>"; };
 		853014D525E671A000FB8205 /* PageObserverUserScript.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PageObserverUserScript.swift; sourceTree = "<group>"; };
 		85308E24267FC9F2001ABD76 /* NSAlertExtension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NSAlertExtension.swift; sourceTree = "<group>"; };
@@ -2241,6 +2242,7 @@
 		85AE2FF024A33A2D002D507F /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				7BA2ECD827EB4138002F8DCF /* BrowserServicesKit */,
 				85AE2FF124A33A2D002D507F /* WebKit.framework */,
 			);
 			name = Frameworks;
@@ -2491,6 +2493,7 @@
 			isa = PBXGroup;
 			children = (
 				B31055BB27A1BA0E001AC618 /* Autoconsent */,
+				7B1E819A27C8874900FF0E60 /* Autofill */,
 				B6A9E47526146A440067D1B9 /* API */,
 				AA4D700525545EDE00C3411E /* App Delegate */,
 				AAC5E4C025D6A6A9007F5990 /* Bookmarks */,
@@ -3403,7 +3406,6 @@
 		B31055BB27A1BA0E001AC618 /* Autoconsent */ = {
 			isa = PBXGroup;
 			children = (
-				7B1E819A27C8874900FF0E60 /* Autofill */,
 				B31055C327A1BA1D001AC618 /* autoconsent-bundle.js */,
 				B31055BD27A1BA1D001AC618 /* autoconsent.html */,
 				B31055C127A1BA1D001AC618 /* AutoconsentBackground.swift */,
@@ -5740,8 +5742,8 @@
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/duckduckgo/BrowserServicesKit";
 			requirement = {
-				kind = exactVersion;
-				version = 12.2.1;
+				kind = revision;
+				revision = 9e5c0733169001e44d22e6a8aaa655f2efff70d8;
 			};
 		};
 		AA06B6B52672AF8100F541C5 /* XCRemoteSwiftPackageReference "Sparkle" */ = {
