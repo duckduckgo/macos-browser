@@ -123,7 +123,7 @@ final class TabCollection: NSObject {
             return
         }
 
-        let tab = Tab(content: lastRemovedTabCache.url.map(Tab.TabContent.url) ?? .homepage)
+        let tab = Tab(content: lastRemovedTabCache.url.map(Tab.TabContent.url) ?? .homePage)
         insert(tab: tab, at: min(lastRemovedTabCache.index, tabs.count))
         self.lastRemovedTabCache = nil
     }

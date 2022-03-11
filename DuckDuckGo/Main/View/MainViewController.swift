@@ -30,6 +30,8 @@ final class MainViewController: NSViewController {
     @IBOutlet var navigationBarTopConstraint: NSLayoutConstraint!
     @IBOutlet var addressBarHeightConstraint: NSLayoutConstraint!
 
+    @IBOutlet var divider: NSView!
+
     private(set) var tabBarViewController: TabBarViewController!
     private(set) var navigationBarViewController: NavigationBarViewController!
     private(set) var browserTabViewController: BrowserTabViewController!
@@ -71,9 +73,14 @@ final class MainViewController: NSViewController {
             tabBarContainerView.isHidden = true
             navigationBarTopConstraint.constant = 0.0
             addressBarHeightConstraint.constant = tabBarContainerView.frame.height
+        } else {
+            navigationBarContainerView.wantsLayer = true
+            navigationBarContainerView.layer?.masksToBounds = false
+
+            resizeNavigationBarForHomePage(tabCollectionViewModel.selectedTabViewModel?.tab.content == .homePage, animated: false)
         }
     }
-    
+
     override func viewDidLayout() {
         findInPageContainerView.applyDropShadow()
     }
@@ -159,8 +166,28 @@ final class MainViewController: NSViewController {
             self?.navigationalCancellables = []
             self?.subscribeToCanGoBackForward()
             self?.subscribeToFindInPage()
+            self?.subscribeToTabContent()
             self?.adjustFirstResponder()
         }
+    }
+
+    private func resizeNavigationBarForHomePage(_ homePage: Bool, animated: Bool) {
+        let nonHomePageHeight: CGFloat = view.window?.isPopUpWindow == true ? 42 : 48
+
+        let height = animated ? addressBarHeightConstraint.animator() : addressBarHeightConstraint
+        height?.constant = homePage ? 56 : nonHomePageHeight
+
+        let divider = animated ? self.divider.animator() : self.divider
+        divider?.alphaValue = homePage ? 0 : 1.0
+
+        navigationBarViewController.resizeAddressBarForHomePage(homePage, animated: animated)
+    }
+
+    private func subscribeToTabContent() {
+        tabCollectionViewModel.selectedTabViewModel?.tab.$content.receive(on: DispatchQueue.main).sink(receiveValue: { [weak self] content in
+            // Animations disabled for time being (maybe forever)
+            self?.resizeNavigationBarForHomePage(content == .homePage, animated: false)
+        }).store(in: &self.navigationalCancellables)
     }
 
     private func subscribeToFindInPage() {
@@ -265,7 +292,7 @@ final class MainViewController: NSViewController {
         }
 
         switch selectedTabViewModel.tab.content {
-        case .homepage, .onboarding, .none: navigationBarViewController.addressBarViewController?.addressBarTextField.makeMeFirstResponder()
+        case .homePage, .onboarding, .none: navigationBarViewController.addressBarViewController?.addressBarTextField.makeMeFirstResponder()
         case .url:
             browserTabViewController.makeWebViewFirstResponder()
         case .preferences: browserTabViewController.preferencesViewController.view.makeMeFirstResponder()

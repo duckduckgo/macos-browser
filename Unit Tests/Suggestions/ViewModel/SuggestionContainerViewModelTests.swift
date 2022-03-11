@@ -139,6 +139,10 @@ extension SuggestionContainerViewModel {
         return suggestionContainerViewModel
     }
 
+    convenience init(suggestionContainer: SuggestionContainer) {
+        self.init(isHomePage: false, suggestionContainer: suggestionContainer)
+    }
+
 }
 
 extension SuggestionResult {

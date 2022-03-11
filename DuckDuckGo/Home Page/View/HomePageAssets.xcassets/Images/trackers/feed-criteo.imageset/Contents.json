@@ -1,0 +1,12 @@
+{
+  "images" : [
+    {
+      "filename" : "criteo.svg",
+      "idiom" : "universal"
+    }
+  ],
+  "info" : {
+    "author" : "xcode",
+    "version" : 1
+  }
+}

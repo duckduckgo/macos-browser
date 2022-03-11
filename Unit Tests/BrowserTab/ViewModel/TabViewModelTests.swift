@@ -152,7 +152,7 @@ final class TabViewModelTests: XCTestCase {
 
     func testWhenContentIsHomeThenFaviconIsHome() {
         let tabViewModel = TabViewModel.aTabViewModel
-        tabViewModel.tab.setContent(.homepage)
+        tabViewModel.tab.setContent(.homePage)
 
         let faviconExpectation = expectation(description: "Favicon")
         var fulfilled = false

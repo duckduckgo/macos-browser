@@ -31,7 +31,8 @@ protocol AddressBarButtonsViewControllerDelegate: AnyObject {
 // swiftlint:disable file_length
 final class AddressBarButtonsViewController: NSViewController {
 
-    static let homeFaviconImage = NSImage(named: "HomeFavicon")
+    static let homeFaviconImage = NSImage(named: "Search")
+    static let searchImage = NSImage(named: "Search")
     static let webImage = NSImage(named: "Web")
     static let bookmarkImage = NSImage(named: "Bookmark")
     static let bookmarkFilledImage = NSImage(named: "BookmarkFilled")
@@ -77,7 +78,6 @@ final class AddressBarButtonsViewController: NSViewController {
     @IBOutlet weak var imageButtonWrapper: NSView!
     @IBOutlet weak var imageButton: NSButton!
     @IBOutlet weak var clearButton: NSButton!
-
     @IBOutlet weak var buttonsContainer: NSStackView!
 
     @IBOutlet weak var animationWrapperView: NSView!
@@ -435,7 +435,7 @@ final class AddressBarButtonsViewController: NSViewController {
 
     private func setupButtons() {
         if view.window?.isPopUpWindow == true {
-            privacyEntryPointButton.position = .free
+            privacyEntryPointButton.position = .free            
             cameraButton.position = .free
             geolocationButton.position = .free
             popupsButton.position = .free
@@ -643,6 +643,7 @@ final class AddressBarButtonsViewController: NSViewController {
         default:
             imageButton.image = nil
         }
+
     }
 
     private func updatePrivacyEntryPoint() {
