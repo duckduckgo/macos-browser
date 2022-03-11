@@ -56,7 +56,9 @@ extension Array where Element == PermissionType {
 final class PermissionAuthorizationViewController: NSViewController {
 
     @IBOutlet var descriptionLabel: NSTextField!
-    @IBOutlet var rememberChoiceCheckbox: NSButton!
+    @IBOutlet var domainNameLabel: NSTextField!
+    @IBOutlet var alwaysAllowCheckbox: NSButton!
+    @IBOutlet var alwaysAllowStackView: NSStackView!
 
     weak var query: PermissionAuthorizationQuery? {
         didSet {
@@ -69,7 +71,7 @@ final class PermissionAuthorizationViewController: NSViewController {
     }
 
     override func viewWillAppear() {
-        rememberChoiceCheckbox.state = .off
+        alwaysAllowCheckbox.state = .off
     }
 
     private func updateText() {
@@ -88,17 +90,22 @@ final class PermissionAuthorizationViewController: NSViewController {
             format = UserText.externalSchemePermissionAuthorizationFormat
         }
         self.descriptionLabel.stringValue = String(format: format, query.domain, query.permissions.localizedDescription)
-        self.rememberChoiceCheckbox.isHidden = !query.shouldShowRememberChoiceCheckbox
+        self.domainNameLabel.stringValue = "“" + query.domain + "”"
+        self.alwaysAllowStackView.isHidden = !query.shouldShowAlwaysAllowCheckbox
+    }
+
+    @IBAction func alwaysAllowLabelClick(_ sender: Any) {
+        alwaysAllowCheckbox.setNextState()
     }
 
     @IBAction func grantAction(_ sender: NSButton) {
         self.dismiss()
-        query?.handleDecision(grant: true, remember: !rememberChoiceCheckbox.isHidden && rememberChoiceCheckbox.state == .on)
+        query?.handleDecision(grant: true, remember: query!.shouldShowAlwaysAllowCheckbox && alwaysAllowCheckbox.state == .on)
     }
 
     @IBAction func denyAction(_ sender: NSButton) {
         self.dismiss()
-        query?.handleDecision(grant: false, remember: !rememberChoiceCheckbox.isHidden && rememberChoiceCheckbox.state == .on)
+        query?.handleDecision(grant: false)
     }
 
 }

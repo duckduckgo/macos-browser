@@ -282,7 +282,7 @@ final class AddressBarButtonsViewController: NSViewController {
                 guard !query.wasShownOnce else { return }
                 button = externalSchemeButton
                 popover.behavior = .transient
-                query.shouldShowRememberChoiceCheckbox = true
+                query.shouldShowAlwaysAllowCheckbox = true
             default:
                 assertionFailure("Unexpected permissions")
                 query.handleDecision(grant: false)

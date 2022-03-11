@@ -58,8 +58,8 @@ final class PermissionContextMenu: NSMenu {
         })
         setupOtherPermissionMenuItems(for: remainingPermission)
         addRevokeItems()
-        addPersistenceItems()
         setupPopupsPermissionsMenuItems()
+        addPersistenceItems()
     }
 
     private func setupCameraPermissionsMenuItems(_ permissions: Permissions) -> Permissions {
@@ -143,15 +143,6 @@ final class PermissionContextMenu: NSMenu {
 
             addItem(.openPopup(query: query, permission: permission, target: self))
         }
-        guard popupsItemsAdded else { return }
-
-        addItem(.separator())
-
-        if case .ask = PermissionManager.shared.permission(forDomain: domain, permissionType: .popups) {
-            addItem(.alwaysAllow(.popups, on: domain, target: self))
-        } else {
-            addItem(.alwaysAsk(.popups, on: domain, target: self))
-        }
     }
 
     private func addRevokeItems() {
@@ -168,25 +159,27 @@ final class PermissionContextMenu: NSMenu {
     private func addPersistenceItems() {
         addSeparator(if: numberOfItems > 0)
 
-        for (permission, state) in permissions {
-            switch state {
-            case .active, .inactive, .paused:
-                if case .ask = PermissionManager.shared.permission(forDomain: domain, permissionType: permission) {
-                    guard permission.canPersistGrantedDecision else { continue }
-                    addItem(.alwaysAllow(permission, on: domain, target: self))
-                } else {
-                    addItem(.alwaysAsk(permission, on: domain, target: self))
-                }
+        var headerAdded = false
+        func addHeaderIfNeeded() {
+            guard !headerAdded else { return }
 
-            case .denied:
-                if case .ask = PermissionManager.shared.permission(forDomain: domain, permissionType: permission) {
-                    guard permission.canPersistDeniedDecision else { continue }
-                    addItem(.alwaysDeny(permission, on: domain, target: self))
-                } else {
-                    addItem(.alwaysAsk(permission, on: domain, target: self))
-                }
+            headerAdded = true
+        }
+        for (permission, _) in permissions {
+            guard permission.canPersistGrantedDecision || permission.canPersistDeniedDecision else { continue }
 
-            case .revoking, .requested, .disabled, .reloading: break
+            addSeparator(if: numberOfItems > 0)
+            addItem(.persistenceHeaderItem(for: permission, on: domain))
+
+            let persistedValue = PermissionManager.shared.permission(forDomain: domain, permissionType: permission)
+            addItem(.alwaysAsk(permission, on: domain, target: self, isChecked: persistedValue == .ask))
+
+            if permission.canPersistGrantedDecision {
+                addItem(.alwaysAllow(permission, on: domain, target: self, isChecked: persistedValue == .allow))
+            }
+
+            if permission.canPersistDeniedDecision {
+                addItem(.alwaysDeny(permission, on: domain, target: self, isChecked: persistedValue == .deny))
             }
         }
     }
@@ -340,52 +333,49 @@ private extension NSMenuItem {
         return item
     }
 
-    static func alwaysAllow(_ permission: PermissionType, on domain: String, target: PermissionContextMenu) -> NSMenuItem {
-        let title: String
-        switch permission {
-        case .camera, .microphone, .geolocation:
-            title = String(format: UserText.permissionAlwaysAllowDeviceFormat, permission.localizedDescription, domain)
-        case .externalScheme:
-            title = String(format: UserText.permissionAlwaysAllowExternalSchemeFormat, domain, permission.localizedDescription)
-        case .popups:
-            title = String(format: UserText.permissionAlwaysAllowPopupsFormat, domain)
-        }
-
+    static func alwaysAllow(_ permission: PermissionType, on domain: String, target: PermissionContextMenu, isChecked: Bool) -> NSMenuItem {
+        let title = UserText.privacyDashboardPermissionAlwaysAllow
         let item = NSMenuItem(title: title,
                               action: #selector(PermissionContextMenu.alwaysAllowPermission),
                               keyEquivalent: "")
         item.representedObject = permission
         item.target = target
+        if isChecked {
+            item.state = .on
+        }
         return item
     }
 
-    static func alwaysAsk(_ permission: PermissionType, on domain: String, target: PermissionContextMenu) -> NSMenuItem {
-        let title = String(format: UserText.permissionAlwaysAskDeviceFormat, permission.localizedDescription, domain)
+    static func alwaysAsk(_ permission: PermissionType, on domain: String, target: PermissionContextMenu, isChecked: Bool) -> NSMenuItem {
+        let title: String
+        switch permission {
+        case .camera, .microphone, .geolocation, .externalScheme:
+            title = UserText.privacyDashboardPermissionAsk
+        case .popups:
+            title = UserText.privacyDashboardPopupsAlwaysAsk
+        }
+
         let item = NSMenuItem(title: title,
                               action: #selector(PermissionContextMenu.alwaysAskPermission),
                               keyEquivalent: "")
         item.representedObject = permission
         item.target = target
+        if isChecked {
+            item.state = .on
+        }
         return item
     }
 
-    static func alwaysDeny(_ permission: PermissionType, on domain: String, target: PermissionContextMenu) -> NSMenuItem {
-        let title: String
-        switch permission {
-        case .popups:
-            assertionFailure("Always Deny not supported for Popups")
-            fallthrough
-        case .camera, .microphone, .geolocation:
-            title = String(format: UserText.permissionAlwaysDenyDeviceFormat, permission.localizedDescription, domain)
-        case .externalScheme:
-            title = String(format: UserText.permissionAlwaysDenyExternalSchemeFormat, domain, permission.localizedDescription)
-        }
-
+    static func alwaysDeny(_ permission: PermissionType, on domain: String, target: PermissionContextMenu, isChecked: Bool) -> NSMenuItem {
+        let title = UserText.privacyDashboardPermissionAlwaysDeny
         let item = NSMenuItem(title: title,
                               action: #selector(PermissionContextMenu.alwaysDenyPermission),
                               keyEquivalent: "")
         item.representedObject = permission
         item.target = target
+        if isChecked {
+            item.state = .on
+        }
         return item
     }
 
@@ -413,6 +403,26 @@ private extension NSMenuItem {
 
     static func popupPermissionRequested(domain: String?) -> NSMenuItem {
         let title = UserText.permissionPopupTitle
+        let attributedTitle = NSMutableAttributedString(string: title)
+        attributedTitle.setAttributes([.font: NSFont.systemFont(ofSize: 11.0)], range: title.nsRange())
+
+        let menuItem = NSMenuItem(title: "", action: nil, keyEquivalent: "")
+        menuItem.attributedTitle = attributedTitle
+
+        return menuItem
+    }
+
+    static func persistenceHeaderItem(for permission: PermissionType, on domain: String) -> NSMenuItem {
+        let title: String
+        switch permission {
+        case .camera, .microphone, .geolocation:
+            title = String(format: UserText.devicePermissionAuthorizationFormat, domain, permission.localizedDescription)
+        case .externalScheme(scheme: let scheme):
+            title = String(format: UserText.permissionMenuHeaderExternalSchemeFormat, permission.localizedDescription, scheme)
+        case .popups:
+            title = String(format: UserText.permissionMenuHeaderPopupWindowsFormat, domain)
+        }
+
         let attributedTitle = NSMutableAttributedString(string: title)
         attributedTitle.setAttributes([.font: NSFont.systemFont(ofSize: 11.0)], range: title.nsRange())
 

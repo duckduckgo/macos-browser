@@ -23,7 +23,7 @@ final class PermissionAuthorizationQuery {
     let domain: String
     let permissions: [PermissionType]
     var wasShownOnce: Bool = false
-    var shouldShowRememberChoiceCheckbox: Bool = false
+    var shouldShowAlwaysAllowCheckbox: Bool = false
     var retry: (() -> Void)?
 
     enum Decision {
