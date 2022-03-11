@@ -42,7 +42,7 @@ final class TabCollectionViewModel: NSObject {
 
     var changesEnabled = true
 
-    private var tabViewModels = [Tab: TabViewModel]()
+    private(set) var tabViewModels = [Tab: TabViewModel]()
     @Published private(set) var selectionIndex: Int? {
         didSet {
             updateSelectedTabViewModel()

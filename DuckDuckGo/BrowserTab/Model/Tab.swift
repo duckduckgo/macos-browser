@@ -1066,5 +1066,14 @@ extension Tab: AutoconsentUserScriptDelegate {
         self.cookieConsentManaged = consentStatus
     }
 }
+
+extension Tab: DataClearing {
+    func prepareForDataClearing(caller: InitialDataClearing) {
+        webView.stopLoading()
+        
+        webView.navigationDelegate = caller
+        webView.load(URL(string: "about:blank")!)
+    }
+}
 // swiftlint:enable type_body_length
 // swiftlint:enable file_length
