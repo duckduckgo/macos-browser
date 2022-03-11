@@ -20,20 +20,22 @@ import Cocoa
 import os.log
 import Combine
 
+// swiftlint:disable type_body_length
 final class AddressBarViewController: NSViewController {
 
     @IBOutlet weak var addressBarTextField: AddressBarTextField!
     @IBOutlet weak var passiveTextField: NSTextField!
     @IBOutlet var inactiveBackgroundView: NSView!
     @IBOutlet var activeBackgroundView: NSView!
+    @IBOutlet var activeOuterBorderView: NSView!
     @IBOutlet var activeBackgroundViewWithSuggestions: NSView!
     @IBOutlet var progressIndicator: ProgressView!
     @IBOutlet var passiveTextFieldMinXConstraint: NSLayoutConstraint!
 
     private(set) var addressBarButtonsViewController: AddressBarButtonsViewController?
-    
-    private var tabCollectionViewModel: TabCollectionViewModel
-    private let suggestionContainerViewModel = SuggestionContainerViewModel(suggestionContainer: SuggestionContainer())
+
+    private let tabCollectionViewModel: TabCollectionViewModel
+    private let suggestionContainerViewModel: SuggestionContainerViewModel
 
     enum Mode: Equatable {
         case editing(isUrl: Bool)
@@ -43,7 +45,7 @@ final class AddressBarViewController: NSViewController {
             return self != .browsing
         }
     }
-    
+
     private var mode: Mode = .editing(isUrl: false) {
         didSet {
             addressBarButtonsViewController?.controllerMode = mode
@@ -54,6 +56,13 @@ final class AddressBarViewController: NSViewController {
         didSet {
             updateView()
             self.addressBarButtonsViewController?.isTextFieldEditorFirstResponder = isFirstResponder
+        }
+    }
+
+    private var isHomePage = false {
+        didSet {
+            updateView()
+            suggestionContainerViewModel.isHomePage = isHomePage
         }
     }
 
@@ -75,12 +84,18 @@ final class AddressBarViewController: NSViewController {
 
     init?(coder: NSCoder, tabCollectionViewModel: TabCollectionViewModel) {
         self.tabCollectionViewModel = tabCollectionViewModel
+        self.suggestionContainerViewModel = SuggestionContainerViewModel(
+            isHomePage: tabCollectionViewModel.selectedTabViewModel?.tab.content == .homePage,
+            suggestionContainer: SuggestionContainer())
 
         super.init(coder: coder)
     }
 
     override func viewDidLoad() {
         super.viewDidLoad()
+
+        view.wantsLayer = true
+        view.layer?.masksToBounds = false
 
         updateView()
         addressBarTextField.addressBarTextFieldDelegate = self
@@ -90,10 +105,12 @@ final class AddressBarViewController: NSViewController {
     }
 
     override func viewWillAppear() {
+
         if view.window?.isPopUpWindow == true {
             addressBarTextField.isHidden = true
             inactiveBackgroundView.isHidden = true
             activeBackgroundViewWithSuggestions.isHidden = true
+            activeOuterBorderView.isHidden = true
             activeBackgroundView.isHidden = true
             shadowView.isHidden = true
         } else {
@@ -162,15 +179,22 @@ final class AddressBarViewController: NSViewController {
         controller?.delegate = self
         return addressBarButtonsViewController
     }
-    
+
     @IBOutlet var shadowView: ShadowView!
 
     private func subscribeToSelectedTabViewModel() {
         tabCollectionViewModel.$selectedTabViewModel.receive(on: DispatchQueue.main).sink { [weak self] _ in
+            self?.subscribeToTabContent()
             self?.subscribeToPassiveAddressBarString()
             self?.subscribeToProgressEvents()
             // don't resign first responder on tab switching
             self?.clickPoint = nil
+        }.store(in: &cancellables)
+    }
+
+    private func subscribeToTabContent() {
+        tabCollectionViewModel.selectedTabViewModel?.tab.$content.receive(on: DispatchQueue.main).sink { [weak self] content in
+            self?.isHomePage = content == .homePage
         }.store(in: &cancellables)
     }
 
@@ -189,7 +213,7 @@ final class AddressBarViewController: NSViewController {
     private func subscribeToProgressEvents() {
         progressCancellable = nil
         loadingCancellable = nil
-        
+
         guard let selectedTabViewModel = tabCollectionViewModel.selectedTabViewModel else {
             progressIndicator.hide(animated: false)
             return
@@ -231,6 +255,7 @@ final class AddressBarViewController: NSViewController {
     }
 
     private func updateView() {
+
         let isPassiveTextFieldHidden = isFirstResponder || mode.isEditing
         addressBarTextField.alphaValue = isPassiveTextFieldHidden ? 1 : 0
         passiveTextField.alphaValue = isPassiveTextFieldHidden ? 0 : 1
@@ -238,8 +263,10 @@ final class AddressBarViewController: NSViewController {
         updateShadowView(firstResponder: isFirstResponder)
         inactiveBackgroundView.alphaValue = isFirstResponder ? 0 : 1
         activeBackgroundView.alphaValue = isFirstResponder ? 1 : 0
-        
-        activeBackgroundView.layer?.borderColor = NSColor.controlAccentColor.withAlphaComponent(0.6).cgColor
+        activeOuterBorderView.alphaValue = isFirstResponder && isHomePage ? 1 : 0
+
+        activeOuterBorderView.layer?.backgroundColor = NSColor.controlAccentColor.withAlphaComponent(0.2).cgColor
+        activeBackgroundView.layer?.borderColor = NSColor.controlAccentColor.withAlphaComponent(0.8).cgColor
     }
 
     private func updateShadowView(firstResponder: Bool) {
@@ -256,7 +283,8 @@ final class AddressBarViewController: NSViewController {
             self?.shadowView.shadowSides = visible ? [.left, .top, .right] : []
             self?.shadowView.shadowColor = visible ? .suggestionsShadowColor : .clear
             self?.shadowView.shadowRadius = visible ? 8.0 : 0.0
-            
+
+            self?.activeOuterBorderView.isHidden = visible
             self?.activeBackgroundView.isHidden = visible
             self?.activeBackgroundViewWithSuggestions.isHidden = !visible
         }
@@ -297,15 +325,20 @@ final class AddressBarViewController: NSViewController {
                 activeBackgroundView.layer?.borderWidth = 2.0
                 activeBackgroundView.layer?.borderColor = NSColor.controlAccentColor.withAlphaComponent(0.6).cgColor
                 activeBackgroundView.layer?.backgroundColor = NSColor.addressBarBackgroundColor.cgColor
+
+                activeOuterBorderView.isHidden = !isHomePage
             } else {
                 activeBackgroundView.layer?.borderWidth = 0
                 activeBackgroundView.layer?.borderColor = nil
                 activeBackgroundView.layer?.backgroundColor = NSColor.inactiveSearchBarBackground.cgColor
+
+                activeOuterBorderView.isHidden = true
             }
         }
     }
 
 }
+// swiftlint:enable type_body_length
 
 extension AddressBarViewController {
 
@@ -316,7 +349,7 @@ extension AddressBarViewController {
             isFirstResponder = false
         }
     }
-    
+
 }
 
 // MARK: - Mouse states

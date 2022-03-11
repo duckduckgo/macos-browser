@@ -36,7 +36,15 @@ struct DefaultBrowserPreferences {
         return ddgBrowserURL == defaultBrowserURL
     }
 
-    static func becomeDefault() {
+    static func becomeDefault(_ completion: (() -> Void)? = nil) {
+        if completion != nil {
+            var observer: Any?
+            observer = NotificationCenter.default.addObserver(forName: NSApplication.didBecomeActiveNotification, object: nil, queue: .main) { _ in
+                NotificationCenter.default.removeObserver(observer as Any)
+                completion?()
+            }
+        }
+
         if !presentDefaultBrowserPromptIfPossible() {
             openSystemPreferences()
         }

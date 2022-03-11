@@ -17,6 +17,7 @@
 //
 
 import Foundation
+import BrowserServicesKit
 
 struct HistoryEntry {
 
@@ -26,10 +27,19 @@ struct HistoryEntry {
     var numberOfVisits: Int
     var lastVisit: Date
     var failedToLoad: Bool
+    var numberOfTrackersBlocked: Int
+    var blockedTrackingEntities: Set<String>
 
     mutating func addVisit() {
         numberOfVisits += 1
-        lastVisit = Date.startOfDayToday
+        lastVisit = Date.startOfMinuteNow
+    }
+
+    mutating func addBlockedTracker(entityName: String) {
+        numberOfTrackersBlocked += 1
+
+        assert(!entityName.trimWhitespace().isEmpty)
+        blockedTrackingEntities.insert(entityName)
     }
 
 }
@@ -41,8 +51,10 @@ extension HistoryEntry {
                   url: url,
                   title: nil,
                   numberOfVisits: 0,
-                  lastVisit: Date.startOfDayToday,
-                  failedToLoad: false)
+                  lastVisit: Date.startOfMinuteNow,
+                  failedToLoad: false,
+                  numberOfTrackersBlocked: 0,
+                  blockedTrackingEntities: Set<String>())
     }
 
 }

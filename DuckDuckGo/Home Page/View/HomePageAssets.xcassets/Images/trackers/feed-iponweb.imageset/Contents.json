@@ -1,0 +1,12 @@
+{
+  "images" : [
+    {
+      "filename" : "iponweb.svg",
+      "idiom" : "universal"
+    }
+  ],
+  "info" : {
+    "author" : "xcode",
+    "version" : 1
+  }
+}

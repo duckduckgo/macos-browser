@@ -62,7 +62,7 @@ extension Tab {
             content.url
         }
         set {
-            setContent(newValue.map(TabContent.url) ?? .homepage)
+            setContent(newValue.map(TabContent.url) ?? .homePage)
         }
     }
 }

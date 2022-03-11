@@ -17,6 +17,7 @@
 //
 
 import XCTest
+import BrowserServicesKit
 @testable import DuckDuckGo_Privacy_Browser
 
 final class HistoryCoordinatingMock: HistoryCoordinating {
@@ -31,6 +32,11 @@ final class HistoryCoordinatingMock: HistoryCoordinating {
     var updateTitleIfNeededCalled = false
     func updateTitleIfNeeded(title: String, url: URL) {
         updateTitleIfNeededCalled = true
+    }
+
+    var addBlockedTrackerCalled = false
+    func addBlockedTracker(entityName: String, onURL url: URL) {
+        addBlockedTrackerCalled = true
     }
 
     var burnCalled = false

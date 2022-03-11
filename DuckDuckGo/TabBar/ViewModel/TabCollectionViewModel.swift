@@ -70,7 +70,7 @@ final class TabCollectionViewModel: NSObject {
         subscribeToLastRemovedTab()
 
         if tabCollection.tabs.isEmpty {
-            appendNewTab(with: .homepage)
+            appendNewTab(with: .homePage)
         }
         if self.selectionIndex != selectionIndex {
             self.selectionIndex = selectionIndex
@@ -143,8 +143,8 @@ final class TabCollectionViewModel: NSObject {
 
     // MARK: - Addition
 
-    func appendNewTab(with content: Tab.TabContent = .homepage, forceChange: Bool = false) {
-        append(tab: Tab(content: content), selected: true)
+    func appendNewTab(with content: Tab.TabContent = .homePage, selected: Bool = true, forceChange: Bool = false) {
+        append(tab: Tab(content: content), selected: selected, forceChange: forceChange)
     }
 
     func append(tab: Tab, selected: Bool = true, forceChange: Bool = false) {
@@ -268,14 +268,14 @@ final class TabCollectionViewModel: NSObject {
         if !tabCollection.tabs.indices.contains(selectionIndex ?? -1) {
             selectionIndex = tabCollection.tabs.indices.last
         }
-        
+
         delegate?.tabCollectionViewModelDidMultipleChanges(self)
     }
 
     func removeAllTabsAndAppendNew(forceChange: Bool = false) {
         guard changesEnabled || forceChange else { return }
 
-        tabCollection.removeAll(andAppend: Tab(content: .homepage))
+        tabCollection.removeAll(andAppend: Tab(content: .homePage))
         select(at: 0, forceChange: forceChange)
 
         delegate?.tabCollectionViewModelDidMultipleChanges(self)
@@ -290,7 +290,7 @@ final class TabCollectionViewModel: NSObject {
 
         tabCollection.removeTabs(at: indexSet)
         if tabCollection.tabs.isEmpty {
-            tabCollection.append(tab: Tab(content: .homepage))
+            tabCollection.append(tab: Tab(content: .homePage))
             select(at: 0, forceChange: forceChange)
         } else {
             let selectionDiff = indexSet.reduce(0) { result, index in

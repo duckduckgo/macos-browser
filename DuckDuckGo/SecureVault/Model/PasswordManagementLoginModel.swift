@@ -161,6 +161,10 @@ final class PasswordManagementLoginModel: ObservableObject, PasswordManagementIt
         isEditing = true
     }
 
+    func openURL(_ url: URL) {
+        WindowControllersManager.shared.show(url: url, newTab: true)
+    }
+
     private func populateViewModelFromCredentials() {
         let titleString = credentials?.account.title ?? ""
         title =  titleString.isEmpty ? normalizedDomain(credentials?.account.domain ?? "") : titleString
