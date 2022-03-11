@@ -45,7 +45,7 @@ protocol TabDelegate: FileDownloadManagerDelegate, ContentOverlayUserScriptDeleg
 final class Tab: NSObject {
 
     enum TabContent: Equatable {
-        case homepage
+        case homePage
         case url(URL)
         case preferences
         case bookmarks
@@ -54,7 +54,7 @@ final class Tab: NSObject {
 
         static func contentFromURL(_ url: URL?) -> TabContent {
             if url == .homePage {
-                return .homepage
+                return .homePage
             } else if url == .welcome {
                 return .onboarding
             } else if url == .preferences {
@@ -67,7 +67,7 @@ final class Tab: NSObject {
         static var displayableTabTypes: [TabContent] {
             return [TabContent.preferences, .bookmarks].sorted { first, second in
                 switch first {
-                case .homepage, .url, .preferences, .bookmarks, .onboarding, .none: break
+                case .homePage, .url, .preferences, .bookmarks, .onboarding, .none: break
                 // !! Replace [TabContent.preferences, .bookmarks] above with new displayable Tab Types if added
                 }
                 guard let firstTitle = first.title, let secondTitle = second.title else {
@@ -79,7 +79,7 @@ final class Tab: NSObject {
 
         var title: String? {
             switch self {
-            case .url, .homepage, .none: return nil
+            case .url, .homePage, .none: return nil
             case .preferences: return UserText.tabPreferencesTitle
             case .bookmarks: return UserText.tabBookmarksTitle
             case .onboarding: return UserText.tabOnboardingTitle
@@ -161,6 +161,8 @@ final class Tab: NSObject {
     // MARK: - Properties
 
     let webView: WebView
+    
+    private var lastUpgradedURL: URL?
 
     var userEnteredUrl = true
 
@@ -184,7 +186,7 @@ final class Tab: NSObject {
         guard contentChangeEnabled else {
             return
         }
-
+        lastUpgradedURL = nil
         self.content = content
     }
 
@@ -302,8 +304,8 @@ final class Tab: NSObject {
         webView.go(to: item)
     }
 
-    func openHomepage() {
-        content = .homepage
+    func openHomePage() {
+        content = .homePage
     }
 
     func startOnboarding() {
@@ -352,7 +354,7 @@ final class Tab: NSObject {
         switch self.content {
         case .url(let value):
             url = value
-        case .homepage:
+        case .homePage:
             url = .homePage
         default:
             url = .blankPage
@@ -372,6 +374,13 @@ final class Tab: NSObject {
             }
         }
         webView.load(url)
+    }
+
+    private func addHomePageToWebViewIfNeeded() {
+        guard !AppDelegate.isRunningTests else { return }
+        if content == .homePage && webView.url == nil {
+            webView.load(.homePage)
+        }
     }
 
     func stopLoading() {
@@ -408,6 +417,9 @@ final class Tab: NSObject {
 
         // background tab loading should start immediately
         reloadIfNeeded(shouldLoadInBackground: shouldLoadInBackground)
+        if !shouldLoadInBackground {
+            addHomePageToWebViewIfNeeded()
+        }
     }
 
 #if DEBUG
@@ -503,6 +515,8 @@ final class Tab: NSObject {
             return
         }
 
+        guard url != .homePage else { return }
+
         // Add to global history
         historyCoordinating.addVisit(of: url)
 
@@ -518,14 +532,14 @@ final class Tab: NSObject {
 
     // MARK: - Dashboard Info
 
-    @Published var trackerInfo: TrackerInfo?
-    @Published var serverTrust: ServerTrust?
-    @Published var connectionUpgradedTo: URL?
-    @Published var cookieConsentManaged: CookieConsentInfo?
+    @Published private(set) var trackerInfo: TrackerInfo?
+    @Published private(set) var serverTrust: ServerTrust?
+    @Published private(set) var connectionUpgradedTo: URL?
+    @Published private(set) var cookieConsentManaged: CookieConsentInfo?
 
-    public func resetDashboardInfo(_ url: URL?) {
+    private func resetDashboardInfo() {
         trackerInfo = TrackerInfo()
-        if self.serverTrust?.host != url?.host {
+        if self.serverTrust?.host != content.url?.host {
             serverTrust = nil
         }
     }
@@ -660,6 +674,35 @@ extension Tab: ContentBlockerRulesUserScriptDelegate {
 
     func contentBlockerRulesUserScript(_ script: ContentBlockerRulesUserScript, detectedTracker tracker: DetectedTracker) {
         trackerInfo?.add(detectedTracker: tracker)
+        guard let url = webView.url else { return }
+        historyCoordinating.addDetectedTracker(tracker, onURL: url)
+    }
+
+}
+
+extension HistoryCoordinating {
+
+    func addDetectedTracker(_ tracker: DetectedTracker, onURL url: URL, contentBlocking: ContentBlocking = ContentBlocking.shared) {
+        guard tracker.blocked,
+              let domain = tracker.domain,
+              let entityName = contentBlocking.entityName(forDomain: domain) else { return }
+
+        addBlockedTracker(entityName: entityName, onURL: url)
+    }
+
+}
+
+extension ContentBlocking {
+
+    func entityName(forDomain domain: String) -> String? {
+        var entityName: String?
+        var parts = domain.components(separatedBy: ".")
+        while parts.count > 1 && entityName == nil {
+            let host = parts.joined(separator: ".")
+            entityName = trackerDataManager.trackerData.domains[host]
+            parts.removeFirst()
+        }
+        return entityName
     }
 
 }
@@ -687,8 +730,9 @@ extension Tab: SurrogatesUserScriptDelegate {
 
     func surrogatesUserScript(_ script: SurrogatesUserScript, detectedTracker tracker: DetectedTracker, withSurrogate host: String) {
         trackerInfo?.add(installedSurrogateHost: host)
-
         trackerInfo?.add(detectedTracker: tracker)
+        guard let url = webView.url else { return }
+        historyCoordinating.addDetectedTracker(tracker, onURL: url)
     }
 }
 
@@ -763,6 +807,10 @@ extension Tab: WKNavigationDelegate {
                  decidePolicyFor navigationAction: WKNavigationAction) async -> WKNavigationActionPolicy {
 
         webView.customUserAgent = UserAgent.for(navigationAction.request.url)
+                                                
+        if navigationAction.isTargetingMainFrame, navigationAction.request.mainDocumentURL?.host != lastUpgradedURL?.host {
+            lastUpgradedURL = nil
+        }
 
         if navigationAction.isTargetingMainFrame {
             if navigationAction.navigationType == .backForward,
@@ -826,48 +874,55 @@ extension Tab: WKNavigationDelegate {
             return .cancel
         }
 
-        let isUpgradable = HTTPSUpgrade.shared.isUpgradeable(url: url)
-
-        if isUpgradable && navigationAction.isTargetingMainFrame,
-            let upgradedUrl = url.toHttps() {
-
-            self.invalidateBackItemIfNeeded(for: navigationAction)
-            self.webView.load(upgradedUrl)
-            self.setConnectionUpgradedTo(upgradedUrl, navigationAction: navigationAction)
-
-            return .cancel
-        }
-
-        if navigationAction.isTargetingMainFrame,
-           !url.isDuckDuckGo {
-
-            // Ensure Content Blocking Assets (WKContentRuleList&UserScripts) are installed
-            if !userContentController.contentBlockingAssetsInstalled {
-                cbaTimeReporter?.tabWillWaitForRulesCompilation(self)
-                await userContentController.awaitContentBlockingAssetsInstalled()
-                cbaTimeReporter?.reportWaitTimeForTabFinishedWaitingForRules(self)
-            } else {
-                cbaTimeReporter?.reportNavigationDidNotWaitForRules()
+        if navigationAction.isTargetingMainFrame {
+            let result = await PrivacyFeatures.httpsUpgrade.upgrade(url: url)
+            switch result {
+            case let .success(upgradedURL):
+                if lastUpgradedURL != upgradedURL {
+                    urlDidUpgrade(upgradedURL, navigationAction: navigationAction)
+                    return .cancel
+                }
+            case .failure:
+                if !url.isDuckDuckGo {
+                    await prepareForContentBlocking()
+                }
             }
         }
-
-        // Enable/disable FBProtection only after UserScripts are installed (awaitContentBlockingAssetsInstalled)
-        let privacyConfigurationManager = ContentBlocking.shared.privacyConfigurationManager
-        let privacyConfiguration = privacyConfigurationManager.privacyConfig
-
-        let featureEnabled = privacyConfiguration.isFeature(.clickToPlay, enabledForDomain: url.host)
-        if featureEnabled {
-            setFBProtection(enabled: true)
-        } else {
-            setFBProtection(enabled: false)
-        }
-
-        self.willPerformNavigationAction(navigationAction)
+        
+        toggleFBProtection(for: url)
+        willPerformNavigationAction(navigationAction)
 
         return .allow
     }
     // swiftlint:enable cyclomatic_complexity
     // swiftlint:enable function_body_length
+    
+    private func urlDidUpgrade(_ upgradedURL: URL,
+                               navigationAction: WKNavigationAction) {
+        lastUpgradedURL = upgradedURL
+        invalidateBackItemIfNeeded(for: navigationAction)
+        webView.load(upgradedURL)
+        setConnectionUpgradedTo(upgradedURL, navigationAction: navigationAction)
+    }
+    
+    private func prepareForContentBlocking() async {
+        // Ensure Content Blocking Assets (WKContentRuleList&UserScripts) are installed
+        if !userContentController.contentBlockingAssetsInstalled {
+            cbaTimeReporter?.tabWillWaitForRulesCompilation(self)
+            await userContentController.awaitContentBlockingAssetsInstalled()
+            cbaTimeReporter?.reportWaitTimeForTabFinishedWaitingForRules(self)
+        } else {
+            cbaTimeReporter?.reportNavigationDidNotWaitForRules()
+        }
+    }
+    
+    private func toggleFBProtection(for url: URL) {
+        // Enable/disable FBProtection only after UserScripts are installed (awaitContentBlockingAssetsInstalled)
+        let privacyConfiguration = ContentBlocking.shared.privacyConfigurationManager.privacyConfig
+
+        let featureEnabled = privacyConfiguration.isFeature(.clickToPlay, enabledForDomain: url.host)
+        setFBProtection(enabled: featureEnabled)
+    }
 
     private func willPerformNavigationAction(_ navigationAction: WKNavigationAction) {
         if navigationAction.isTargetingMainFrame {
@@ -912,6 +967,7 @@ extension Tab: WKNavigationDelegate {
         if error != nil { error = nil }
 
         invalidateSessionStateData()
+        resetDashboardInfo()
     }
 
     func webView(_ webView: WKWebView, didFinish navigation: WKNavigation!) {

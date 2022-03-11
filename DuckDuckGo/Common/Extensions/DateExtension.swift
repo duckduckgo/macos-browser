@@ -29,7 +29,7 @@ extension Date {
         return Calendar.current.dateComponents([.day, .year, .month], from: self)
     }
 
-    static var weekAgo: Date! {
+    static var weekAgo: Date {
         return Calendar.current.date(byAdding: .weekOfMonth, value: -1, to: Date())!
     }
 
@@ -48,6 +48,12 @@ extension Date {
 
     static var startOfDayToday: Date {
         return Calendar.current.startOfDay(for: Date())
+    }
+
+    static var startOfMinuteNow: Date {
+        let date = Calendar.current.date(bySetting: .second, value: 0, of: Date())!
+        let start = Calendar.current.date(byAdding: .minute, value: -1, to: date)!
+        return start
     }
 
     static var monthsWithIndex: [IndexedMonth] {

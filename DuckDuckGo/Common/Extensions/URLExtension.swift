@@ -61,11 +61,40 @@ extension URL {
             return addressBarUrl
         }
 
+        if let addressBarUrl = makeURLIfMissingSlash(trimmed) {
+            return addressBarUrl
+        }
+
         if let searchUrl = URL.makeSearchUrl(from: trimmed) {
             return searchUrl
         }
 
         os_log("URL extension: Making URL from %s failed", type: .error, addressBarString)
+        return nil
+    }
+
+    // Creates URL even if user enters one slash "/" instead of two slashes "//" after the hypertext scheme component
+    private static func makeURLIfMissingSlash(_ trimmedAddressBarString: String) -> URL? {
+        for scheme in URL.NavigationalScheme.hypertextSchemes {
+            guard trimmedAddressBarString.hasPrefix(scheme.rawValue) else {
+                continue
+            }
+
+            let droppedSchemeString = trimmedAddressBarString.drop(prefix: scheme.rawValue)
+            guard droppedSchemeString.hasPrefix(":/") && !droppedSchemeString.hasPrefix("://") else {
+                continue
+            }
+
+            let droppedSeparatorString = droppedSchemeString.drop(prefix: ":/")
+            let correctedString = scheme.separated() + droppedSeparatorString
+
+            guard let url = correctedString.punycodedUrl, url.isValid else {
+                break
+            }
+
+            return url
+        }
+
         return nil
     }
 
@@ -148,6 +177,10 @@ extension URL {
 
         func separated() -> String {
             self.rawValue + Self.separator
+        }
+
+        static var hypertextSchemes: [NavigationalScheme] {
+            return [.http, .https]
         }
     }
 
@@ -341,15 +374,6 @@ extension URL {
     }
 
 #endif
-
-    // MARK: - HTTPS
-
-    func toHttps() -> URL? {
-        guard var components = URLComponents(url: self, resolvingAgainstBaseURL: false) else { return self }
-        guard components.scheme == NavigationalScheme.http.rawValue else { return self }
-        components.scheme = NavigationalScheme.https.rawValue
-        return components.url
-    }
 
     // MARK: - Punycode
 

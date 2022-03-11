@@ -107,7 +107,6 @@ extension Pixel.Event {
              .onboardingSetDefaultSkipped,
              .onboardingTypingSkipped,
              .waitlistFirstLaunch,
-             .waitlistMigratedExistingInstall,
              .waitlistPresentedLockScreen,
              .waitlistDismissedLockScreen,
              .autoconsentOptOutFailed,

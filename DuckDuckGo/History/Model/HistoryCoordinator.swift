@@ -28,6 +28,7 @@ protocol HistoryCoordinating: AnyObject {
     var history: History? { get }
 
     func addVisit(of url: URL)
+    func addBlockedTracker(entityName: String, onURL url: URL)
     func updateTitleIfNeeded(title: String, url: URL)
     func markFailedToLoadUrl(_ url: URL)
     func title(for url: URL) -> String?
@@ -74,7 +75,7 @@ final class HistoryCoordinator: HistoryCoordinating {
 
     func addVisit(of url: URL) {
         queue.async(flags: .barrier) { [weak self] in
-            guard var historyDictionary = self?.historyDictionary else {
+            guard let historyDictionary = self?.historyDictionary else {
                 os_log("Visit of %s ignored", log: .history, url.absoluteString)
                 return
             }
@@ -83,16 +84,30 @@ final class HistoryCoordinator: HistoryCoordinating {
             entry.addVisit()
             entry.failedToLoad = false
 
-            historyDictionary[url] = entry
-            self?.historyDictionary = historyDictionary
-            self?._history = self?.makeHistory(from: historyDictionary)
+            self?.save(entry: entry)
+        }
+    }
+
+    func addBlockedTracker(entityName: String, onURL url: URL) {
+        queue.async(flags: .barrier) { [weak self] in
+            guard let historyDictionary = self?.historyDictionary else {
+                os_log("Add tracker to %s ignored, no history", log: .history, url.absoluteString)
+                return
+            }
+
+            guard var entry = historyDictionary[url] else {
+                os_log("Add tracker to %s ignored, no entry", log: .history, url.absoluteString)
+                return
+            }
+
+            entry.addBlockedTracker(entityName: entityName)
             self?.save(entry: entry)
         }
     }
 
     func updateTitleIfNeeded(title: String, url: URL) {
         queue.async(flags: .barrier) { [weak self] in
-            guard var historyDictionary = self?.historyDictionary else { return }
+            guard let historyDictionary = self?.historyDictionary else { return }
             guard var entry = historyDictionary[url] else {
                 os_log("Title update ignored - URL not part of history yet", type: .debug)
                 return
@@ -100,9 +115,6 @@ final class HistoryCoordinator: HistoryCoordinating {
             guard !title.isEmpty, entry.title != title else { return }
 
             entry.title = title
-            historyDictionary[url] = entry
-            self?.historyDictionary = historyDictionary
-            self?._history = self?.makeHistory(from: historyDictionary)
             self?.save(entry: entry)
         }
     }
@@ -230,6 +242,11 @@ final class HistoryCoordinator: HistoryCoordinating {
     }
 
     private func save(entry: HistoryEntry) {
+        var historyDictionary = self.historyDictionary ?? [:]
+        historyDictionary[entry.url] = entry
+        self.historyDictionary = historyDictionary
+        self._history = self.makeHistory(from: historyDictionary)
+
         self.historyStoring.save(entry: entry)
             .receive(on: self.queue, options: .init(flags: .barrier))
             .sink(receiveCompletion: { completion in
@@ -252,17 +269,13 @@ final class HistoryCoordinator: HistoryCoordinating {
     /// Does the same for the root URL if it has no visits
     private func mark(url: URL, keyPath: WritableKeyPath<HistoryEntry, Bool>, value: Bool) {
         queue.async(flags: .barrier) { [weak self] in
-            guard var historyDictionary = self?.historyDictionary, var entry = historyDictionary[url] else {
+            guard let historyDictionary = self?.historyDictionary, var entry = historyDictionary[url] else {
                 os_log("Marking of %s not saved. History not loaded yet or entry doesn't exist",
                        log: .history, url.absoluteString)
                 return
             }
 
             entry[keyPath: keyPath] = value
-
-            historyDictionary[url] = entry
-            self?.historyDictionary = historyDictionary
-            self?._history = self?.makeHistory(from: historyDictionary)
             self?.save(entry: entry)
         }
     }

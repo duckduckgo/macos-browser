@@ -43,7 +43,7 @@ final class SuggestionViewModelTests: XCTestCase {
         let urlString = "https://spreadprivacy.com"
         let url = URL(string: urlString)!
         let suggestion = Suggestion.website(url: url)
-        let suggestionViewModel = SuggestionViewModel(suggestion: suggestion, userStringValue: "w")
+        let suggestionViewModel = SuggestionViewModel(isHomePage: true, suggestion: suggestion, userStringValue: "w")
 
         XCTAssertEqual(suggestionViewModel.string, "www.spreadprivacy.com")
     }
@@ -158,4 +158,10 @@ final class SuggestionViewModelTests: XCTestCase {
         XCTAssertEqual(suggestionViewModel.title, query)
     }
 
+}
+
+extension SuggestionViewModel {
+    convenience init(suggestion: Suggestion, userStringValue: String) {
+        self.init(isHomePage: false, suggestion: suggestion, userStringValue: userStringValue)
+    }
 }

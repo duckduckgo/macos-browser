@@ -30,22 +30,6 @@ class MacWaitlistStoreTests: XCTestCase {
         super.tearDown()
         UserDefaultsWrapper<Any>.clearAll()
     }
-
-    func testWhenNoInstallStatisticsAreFound_ThenTheAppIsNotAnExistingInstall() {
-        let mockStatisticsStore = mockStatisticsStore()
-        let store = MacWaitlistEncryptedFileStorage(statisticsStore: mockStatisticsStore)
-        
-        XCTAssertFalse(store.isExistingInstall())
-    }
-    
-    func testWhenInstallStatisticsAreFound_ThenTheAppIsAnExistingInstall() {
-        let mockStatisticsStore = mockStatisticsStore()
-        mockStatisticsStore.atb = "atb"
-
-        let store = MacWaitlistEncryptedFileStorage(statisticsStore: mockStatisticsStore)
-        
-        XCTAssertTrue(store.isExistingInstall())
-    }
     
     func testWhenStoreDoesNotHaveInstallMetadata_ThenIsUnlockedReturnsFalse() {
         let mockStatisticsStore = mockStatisticsStore()
@@ -67,10 +51,8 @@ class MacWaitlistStoreTests: XCTestCase {
         let mockStatisticsStore = mockStatisticsStore()
         let store = MacWaitlistEncryptedFileStorage(statisticsStore: mockStatisticsStore)
         
-        XCTAssertFalse(mockStatisticsStore.waitlistUpgradeCheckComplete)
         XCTAssertFalse(mockStatisticsStore.waitlistUnlocked)
         store.unlock()
-        XCTAssertTrue(mockStatisticsStore.waitlistUpgradeCheckComplete)
         XCTAssertTrue(mockStatisticsStore.waitlistUnlocked)
     }
     
@@ -79,62 +61,10 @@ class MacWaitlistStoreTests: XCTestCase {
         let store = MacWaitlistEncryptedFileStorage(statisticsStore: mockStatisticsStore)
         
         store.unlock()
-        XCTAssertTrue(mockStatisticsStore.waitlistUpgradeCheckComplete)
         XCTAssertTrue(mockStatisticsStore.waitlistUnlocked)
         
         store.deleteExistingMetadata()
-        XCTAssertFalse(mockStatisticsStore.waitlistUpgradeCheckComplete)
         XCTAssertFalse(mockStatisticsStore.waitlistUnlocked)
-    }
-    
-    func testWhenUnlockingExistingInstall_And_ATBIsSet_ThenInstallIsUnlocked() {
-        let mockStatisticsStore = mockStatisticsStore()
-        mockStatisticsStore.atb = "atb"
-
-        let store = MacWaitlistEncryptedFileStorage(statisticsStore: mockStatisticsStore)
-        
-        store.unlockExistingInstallIfNecessary()
-        
-        XCTAssertTrue(store.isUnlocked())
-    }
-    
-    func testWhenUnlockingExistingInstall_And_LegacyATBIsSet_ThenInstallIsUnlocked() {
-        var legacyStore = LocalStatisticsStore.LegacyStatisticsStore()
-        legacyStore.atb = "atb"
-
-        let mockStatisticsStore = mockStatisticsStore()
-        let store = MacWaitlistEncryptedFileStorage(statisticsStore: mockStatisticsStore)
-        
-        store.unlockExistingInstallIfNecessary()
-        
-        XCTAssertTrue(store.isUnlocked())
-    }
-    
-    func testWhenUnlockingExistingInstall_And_ATBIsNotSet_ThenInstallRemainsLocked() {
-        let mockStatisticsStore = mockStatisticsStore()
-        let store = MacWaitlistEncryptedFileStorage(statisticsStore: mockStatisticsStore)
-        
-        store.unlockExistingInstallIfNecessary()
-        
-        XCTAssertFalse(store.isUnlocked())
-    }
-    
-    func testWhenUnlockingExistingInstall_AndATBIsNotSet_AndATBIsLaterSet_ThenInstallRemainsLocked() {
-        let mockStatisticsStore = mockStatisticsStore()
-
-        let store = MacWaitlistEncryptedFileStorage(statisticsStore: mockStatisticsStore)
-        store.unlockExistingInstallIfNecessary()
-        XCTAssertFalse(store.isUnlocked())
-        
-        // Verify that the store remembers that ATB was not initially set and can't be tricked into unlocking by setting
-        // it and trying again.
-        mockStatisticsStore.atb = "atb"
-        store.unlockExistingInstallIfNecessary()
-        XCTAssertFalse(store.isUnlocked())
-        
-        // When receiving a legitimate unlock attempt at this point, it should unlock.
-        store.unlock()
-        XCTAssertTrue(store.isUnlocked())
     }
     
     private func mockStatisticsStore() -> StatisticsStore {
