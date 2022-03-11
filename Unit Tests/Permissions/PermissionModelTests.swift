@@ -158,7 +158,8 @@ final class PermissionModelTests: XCTestCase {
 
     func testWhenCameraAndMicPermissionIsGrantedThenItIsProvidedToDecisionHandler() {
         let c = model.$authorizationQuery.sink {
-            $0?.handleDecision(grant: true)
+            guard let query = $0 else { return }
+            self.model.allow(query)
         }
 
         let e = expectation(description: "Permission granted")
@@ -180,6 +181,60 @@ final class PermissionModelTests: XCTestCase {
         }
         XCTAssertEqual(model.permissions, [.camera: .active,
                                            .microphone: .active])
+        XCTAssertEqual(permissionManagerMock.permission(forDomain: URL.duckDuckGo.host!, permissionType: .camera), .ask)
+        XCTAssertEqual(permissionManagerMock.permission(forDomain: URL.duckDuckGo.host!, permissionType: .microphone), .ask)
+    }
+
+    func testWhenPermissionIsGrantedAndStoredThenItIsStored() {
+        let c = model.$authorizationQuery.sink {
+            guard let query = $0 else { return }
+            query.shouldShowAlwaysAllowCheckbox = true
+            query.handleDecision(grant: true, remember: true)
+        }
+
+        let e = expectation(description: "Permission granted")
+        self.webView(webView, requestUserMediaAuthorizationFor: [.microphone, .camera],
+                     url: .duckDuckGo,
+                     mainFrameURL: .duckDuckGo) { granted in
+            XCTAssertTrue(granted)
+            e.fulfill()
+            if #available(macOS 12, *) {
+                self.webView.cameraCaptureState = .active
+                self.webView.microphoneCaptureState = .active
+            } else {
+                self.webView.mediaCaptureState = [.activeCamera, .activeMicrophone]
+            }
+        }
+
+        withExtendedLifetime(c) {
+            waitForExpectations(timeout: 1)
+        }
+        XCTAssertEqual(model.permissions, [.camera: .active,
+                                           .microphone: .active])
+        XCTAssertEqual(permissionManagerMock.permission(forDomain: URL.duckDuckGo.host!, permissionType: .camera), .allow)
+        XCTAssertEqual(permissionManagerMock.permission(forDomain: URL.duckDuckGo.host!, permissionType: .microphone), .allow)
+    }
+
+    func testWhenPermissionIsDeniedAndStoredThenItIsStored() {
+        let c = model.$authorizationQuery.sink {
+            guard let query = $0 else { return }
+            query.shouldShowAlwaysAllowCheckbox = true
+            query.handleDecision(grant: false, remember: true)
+        }
+
+        let e = expectation(description: "Permission granted")
+        self.webView(webView, requestUserMediaAuthorizationFor: [.microphone, .camera],
+                     url: .duckDuckGo,
+                     mainFrameURL: .duckDuckGo) { granted in
+            XCTAssertFalse(granted)
+            e.fulfill()
+        }
+
+        withExtendedLifetime(c) {
+            waitForExpectations(timeout: 1)
+        }
+        XCTAssertEqual(permissionManagerMock.permission(forDomain: URL.duckDuckGo.host!, permissionType: .camera), .deny)
+        XCTAssertEqual(permissionManagerMock.permission(forDomain: URL.duckDuckGo.host!, permissionType: .microphone), .deny)
     }
 
     func testWhenLocationPermissionIsGrantedThenItIsProvidedToDecisionHandler() {
@@ -239,6 +294,32 @@ final class PermissionModelTests: XCTestCase {
             waitForExpectations(timeout: 1)
         }
         XCTAssertEqual(model.permissions, [:])
+    }
+
+    func testWhenAllowPermissionIsPersistedThenPermissionQueryIsGranted() {
+        let e = expectation(description: "Permission granted")
+        self.webView.urlValue = URL.duckDuckGo
+        self.webView(webView, requestGeolocationPermissionFor: frameInfo) { granted in
+            XCTAssertTrue(granted)
+            e.fulfill()
+        }
+
+        self.permissionManagerMock.setPermission(.allow, forDomain: URL.duckDuckGo.host!, permissionType: .geolocation)
+        permissionManagerMock.permissionSubject.send( (URL.duckDuckGo.host!, .geolocation, .allow) )
+        waitForExpectations(timeout: 1)
+    }
+
+    func testWhenDenyPermissionIsPersistedThenPermissionQueryIsDenied() {
+        let e = expectation(description: "Permission granted")
+        self.webView.urlValue = URL.duckDuckGo
+        self.webView(webView, requestGeolocationPermissionFor: frameInfo) { granted in
+            XCTAssertFalse(granted)
+            e.fulfill()
+        }
+
+        self.permissionManagerMock.setPermission(.deny, forDomain: URL.duckDuckGo.host!, permissionType: .geolocation)
+        permissionManagerMock.permissionSubject.send( (URL.duckDuckGo.host!, .geolocation, .deny) )
+        waitForExpectations(timeout: 1)
     }
 
     func testWhenSystemMediaPermissionIsDeniedThenStateIsDisabled() {
@@ -371,6 +452,30 @@ final class PermissionModelTests: XCTestCase {
         XCTAssertEqual(model.permissions, [.geolocation: .disabled(systemWide: false)])
     }
 
+//    func testWhenSystemLocationIsNotDeterminedAndDisabledByUserThenStateIsDisabled() {
+//        geolocationServiceMock.authorizationStatus = .notDetermined
+//        var e: XCTestExpectation!
+//        if #available(macOS 12, *) {
+//            self.webView(webView, requestGeolocationPermissionFor: securityOrigin, initiatedBy: frameInfo) { decision in
+//                XCTAssertEqual(decision, .grant)
+//                e.fulfill()
+//            }
+//        } else {
+//            self.webView(webView, requestGeolocationPermissionFor: frameInfo) { granted in
+//                XCTAssertTrue(granted)
+//                e.fulfill()
+//            }
+//        }
+//        XCTAssertEqual(model.permissions, [.geolocation: .requested(model.authorizationQuery!)])
+//        e = expectation(description: "permission granted")
+//        model.authorizationQuery!.handleDecision(grant: true)
+//        waitForExpectations(timeout: 1)
+//
+//        geolocationProviderMock.isActive = true
+//        geolocationServiceMock.authorizationStatus = .restricted
+//        XCTAssertEqual(model.permissions, [.geolocation: .disabled(systemWide: false)])
+//    }
+
     func testWhenSystemLocationIsDisabledThenStateIsDisabled() {
         geolocationServiceMock.authorizationStatus = .authorized
         geolocationProviderMock.isActive = true
@@ -404,6 +509,58 @@ final class PermissionModelTests: XCTestCase {
         geolocationServiceMock.authorizationStatus = .authorized
         geolocationServiceMock.locationServicesEnabledValue = true
         XCTAssertEqual(model.permissions, [.geolocation: .active])
+    }
+
+    func testWhenLocationRequeriedAfterSystemLocationIsDisabledThenStateIsDisabled() {
+        geolocationServiceMock.authorizationStatus = .denied
+        geolocationServiceMock.locationServicesEnabledValue = true
+        geolocationServiceMock.authorizationStatus = .denied
+        geolocationProviderMock.isActive = true
+
+        var e: XCTestExpectation!
+        if #available(macOS 12, *) {
+            self.webView(webView, requestGeolocationPermissionFor: securityOrigin, initiatedBy: frameInfo) { decision in
+                XCTAssertEqual(decision, .grant)
+                e.fulfill()
+            }
+        } else {
+            self.webView(webView, requestGeolocationPermissionFor: frameInfo) { granted in
+                XCTAssertTrue(granted)
+                e.fulfill()
+            }
+        }
+        e = expectation(description: "permission granted")
+        model.authorizationQuery!.handleDecision(grant: true)
+        waitForExpectations(timeout: 1)
+        geolocationProviderMock.isActive = true
+
+        XCTAssertEqual(model.permissions, [.geolocation: .disabled(systemWide: false)])
+    }
+
+    func testWhenLocationRequeriedAfterSystemLocationIsDisabledSystemWideThenStateIsDisabledSystemWide() {
+        geolocationServiceMock.authorizationStatus = .denied
+        geolocationServiceMock.locationServicesEnabledValue = false
+        geolocationServiceMock.authorizationStatus = .denied
+        geolocationProviderMock.isActive = true
+
+        var e: XCTestExpectation!
+        if #available(macOS 12, *) {
+            self.webView(webView, requestGeolocationPermissionFor: securityOrigin, initiatedBy: frameInfo) { decision in
+                XCTAssertEqual(decision, .grant)
+                e.fulfill()
+            }
+        } else {
+            self.webView(webView, requestGeolocationPermissionFor: frameInfo) { granted in
+                XCTAssertTrue(granted)
+                e.fulfill()
+            }
+        }
+        e = expectation(description: "permission granted")
+        model.authorizationQuery!.handleDecision(grant: true)
+        waitForExpectations(timeout: 1)
+        geolocationProviderMock.isActive = true
+
+        XCTAssertEqual(model.permissions, [.geolocation: .disabled(systemWide: true)])
     }
 
     func testWhenPageIsReloadedThenInactivePermissionStateIsReset() {
@@ -587,6 +744,40 @@ final class PermissionModelTests: XCTestCase {
         permissionManagerMock.permissionSubject.send( (URL.duckDuckGo.host!, .camera, .deny) )
 
         waitForExpectations(timeout: 1)
+    }
+
+    func testWhenPopupsGrantedPermissionIsStoredAndRevokedThenStoredPermissionIsRemoved() {
+        permissionManagerMock.setPermission(.allow, forDomain: URL.duckDuckGo.host!, permissionType: .popups)
+        permissionManagerMock.setPermission(.allow, forDomain: URL.duckDuckGo.host!, permissionType: .externalScheme(scheme: "asdf"))
+
+        webView.urlValue = URL.duckDuckGo
+        model.permissions.popups.popupOpened(nextQuery: nil)
+        model.revoke(.popups)
+
+        XCTAssertEqual(permissionManagerMock.permission(forDomain: URL.duckDuckGo.host!, permissionType: .popups),
+                       .ask)
+        XCTAssertEqual(permissionManagerMock.permission(forDomain: URL.duckDuckGo.host!, permissionType: .externalScheme(scheme: "asdf")),
+                       .allow)
+        XCTAssertEqual(model.permissions.popups, .denied(retry: nil))
+    }
+
+    func testWhenExternalAppGrantedPermissionIsStoredAndRevokedThenStoredPermissionIsRemoved() {
+        permissionManagerMock.setPermission(.allow, forDomain: URL.duckDuckGo.host!, permissionType: .popups)
+        permissionManagerMock.setPermission(.allow, forDomain: URL.duckDuckGo.host!, permissionType: .externalScheme(scheme: "asdf"))
+        permissionManagerMock.setPermission(.allow, forDomain: URL.duckDuckGo.host!, permissionType: .externalScheme(scheme: "sdfg"))
+
+        webView.urlValue = URL.duckDuckGo
+        model.permissions[.externalScheme(scheme: "asdf")].externalSchemeOpened()
+        model.permissions[.externalScheme(scheme: "sdfg")].externalSchemeOpened()
+
+        model.revoke(.externalScheme(scheme: "asdf"))
+
+        XCTAssertEqual(permissionManagerMock.permission(forDomain: URL.duckDuckGo.host!, permissionType: .popups),
+                       .allow)
+        XCTAssertEqual(permissionManagerMock.permission(forDomain: URL.duckDuckGo.host!, permissionType: .externalScheme(scheme: "asdf")),
+                       .ask)
+        XCTAssertEqual(permissionManagerMock.permission(forDomain: URL.duckDuckGo.host!, permissionType: .externalScheme(scheme: "sdfg")),
+                       .allow)
     }
 
     func testWhenGrantedPermissionIsRemovedThenActivePermissionStaysActive() {
@@ -894,6 +1085,41 @@ final class PermissionModelTests: XCTestCase {
 
         model.revoke(.geolocation)
         XCTAssertEqual(model.permissions, [.geolocation: .denied])
+    }
+
+    func testWhenAllowAndRetryCalledOnDeniedPermissionThenRetryIsCalled() {
+        let e = expectation(description: "retry called")
+        model.permissions([.externalScheme(scheme: "asd")], requestedForDomain: URL.duckDuckGo.host!, url: URL.duckDuckGo, retryHandler: {
+            e.fulfill()
+        }, decisionHandler: { grant in
+            XCTAssertFalse(grant)
+        })
+
+        guard case .requested(let query) = model.permissions.externalScheme else {
+            XCTFail("unexpected permission state")
+            return
+        }
+        query.handleDecision(grant: false, remember: false)
+
+        model.allowAndRetry(.externalScheme(scheme: "asd"))
+        waitForExpectations(timeout: 0)
+    }
+
+    func testWhenAllowAndRetryCalledForStoredDenyPermissionThenRetryIsCalledAndStoredPermissionIsRemoved() {
+        permissionManagerMock.setPermission(.deny, forDomain: URL.duckDuckGo.host!, permissionType: .externalScheme(scheme: "asd"))
+
+        webView.urlValue = URL.duckDuckGo
+        let e = expectation(description: "retry called")
+        model.permissions([.externalScheme(scheme: "asd")], requestedForDomain: URL.duckDuckGo.host!, url: URL.duckDuckGo, retryHandler: {
+            e.fulfill()
+        }, decisionHandler: { grant in
+            XCTAssertFalse(grant)
+        })
+
+        model.allowAndRetry(.externalScheme(scheme: "asd"))
+        waitForExpectations(timeout: 0)
+        XCTAssertEqual(permissionManagerMock.permission(forDomain: URL.duckDuckGo.host!, permissionType: .externalScheme(scheme: "asd")),
+                       .ask)
     }
 
 }
