@@ -37,6 +37,7 @@ final class BrowserTabViewController: NSViewController {
     @IBOutlet weak var hoverLabel: NSTextField!
     @IBOutlet weak var hoverLabelContainer: NSView!
     private weak var webView: WebView?
+    private weak var webViewContainer: NSView?
 
     var tabViewModel: TabViewModel?
     var clickPoint: NSPoint?
@@ -134,13 +135,16 @@ final class BrowserTabViewController: NSViewController {
         show(tabContent: tabViewModel?.tab.content)
     }
 
-    private func removeWebViewFromHierarchy(webView: WebView? = nil) {
-        guard let webView = webView ?? self.webView
+    private func removeWebViewFromHierarchy(webView: WebView? = nil,
+                                            container: NSView? = nil) {
+        guard let webView = webView ?? self.webView,
+              let container = container ?? self.webViewContainer
         else { return }
 
         // close fullscreenWindowController when closing tab in FullScreen mode
         webView.fullscreenWindowController?.close()
         webView.removeFromSuperview()
+        container.removeFromSuperview()
     }
 
     private func addWebViewToViewHierarchy(_ webView: WebView) {
@@ -152,7 +156,12 @@ final class BrowserTabViewController: NSViewController {
 
         webView.frame = view.bounds
         webView.autoresizingMask = [.width, .height]
-        view.addSubview(webView)
+
+        let container = NSView(frame: view.bounds)
+        container.autoresizingMask = [.width, .height]
+        view.addSubview(container)
+        container.addSubview(webView)
+        self.webViewContainer = container
 
         // Make sure this is on top
         view.addSubview(hoverLabelContainer)
@@ -179,10 +188,11 @@ final class BrowserTabViewController: NSViewController {
         guard self.tabViewModel !== tabViewModel else { return }
 
         let oldWebView = webView
+        let webViewContainer = webViewContainer
         displayWebView(of: tabViewModel)
         subscribeToUrl(of: tabViewModel)
         self.tabViewModel = tabViewModel
-        removeWebViewFromHierarchy(webView: oldWebView)
+        removeWebViewFromHierarchy(webView: oldWebView, container: webViewContainer)
     }
 
     func subscribeToUrl(of tabViewModel: TabViewModel) {
