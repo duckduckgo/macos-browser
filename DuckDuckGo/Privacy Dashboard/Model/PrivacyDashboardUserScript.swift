@@ -88,7 +88,12 @@ final class PrivacyDashboardUserScript: NSObject, StaticUserScript {
             return
         }
 
-        Pixel.shared?.fire(pixelNamed: pixel)
+        let etag = DefaultConfigurationStorage.shared.loadEtag(for: .trackerRadar)?
+                    .trimmingCharacters(in: CharacterSet(charactersIn: "\"")) ?? ""
+        Pixel.shared?.fire(pixelNamed: pixel,
+                           withAdditionalParameters: [
+                            "tds": etag
+        ])
     }
 
     private func handleSetPermission(message: WKScriptMessage) {
