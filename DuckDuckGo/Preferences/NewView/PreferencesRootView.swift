@@ -21,11 +21,31 @@ import SwiftUI
 extension Preferences {
     
     struct RootView: View {
+        
+        @ObservedObject var model: PreferencesModel
+        
         var body: some View {
             HStack(spacing: 0) {
-                Preferences.Sidebar(model: PreferencesSidebarModel()).frame(width: 252)
+                Preferences.Sidebar().environmentObject(model).frame(width: 252)
                 Color(NSColor.separatorColor).frame(width: 1)
-                Color("WindowBackgroundColor")
+
+                ScrollView(.vertical) {
+                    Group {
+                        
+                        switch model.selectedPane {
+                        case .defaultBrowser:
+                            DefaultBrowserView(model: DefaultBrowserPreferencesModel())
+                        case .about:
+                            AboutView(model: .init())
+                        }
+                    }
+                    .frame(maxWidth: 600, maxHeight: .infinity, alignment: .topLeading)
+                    .padding(.vertical, 40)
+                }
+                .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .topLeading)
+                .background(Color("WindowBackgroundColor"))
+                .padding(.horizontal, 40)
+                
             }
             .frame(maxWidth: .infinity, maxHeight: .infinity)
         }
@@ -35,6 +55,6 @@ extension Preferences {
 
 struct PreferencesRootView_Previews: PreviewProvider {
     static var previews: some View {
-        Preferences.RootView()
+        Preferences.RootView(model: .init())
     }
 }

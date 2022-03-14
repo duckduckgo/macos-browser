@@ -18,35 +18,6 @@
 
 import SwiftUI
 
-final class PreferencesSidebarModel: ObservableObject {
-    
-    let sections: [PreferencesSection]
-    
-    @Published var selectedPane: PreferencePane?
-    
-    init(sections: [PreferencesSection] = [
-        .init(
-            id: .regularPreferencePanes,
-            panes: [
-                DefaultBrowserPreferences(),
-                AppearancePreferences(),
-                PrivacySecurityPreferences.shared,
-                LoginsPreferences(),
-                DownloadPreferences()
-            ]
-                .map(PreferencePane.init(preferenceSection:))
-        ),
-        .init(
-            id: .about,
-            panes: [.init(displayName: "About", preferenceIcon: NSImage(named: "About")!)]
-        )
-    ]) {
-        self.sections = sections
-        selectedPane = sections.first?.panes.first
-    }
-
-}
-
 private struct PreferencesSidebarItemButtonStyle: ButtonStyle {
 
     let bgColor: Color
@@ -65,9 +36,9 @@ private struct PreferencesSidebarItemButtonStyle: ButtonStyle {
 extension Preferences {
     
     struct SidebarItem: View {
-        @EnvironmentObject var model: PreferencesSidebarModel
+        @EnvironmentObject var model: PreferencesModel
 
-        let pane: PreferencePane
+        let pane: PreferencePaneIdentifier
         let action: () -> Void
         
         var body: some View {
@@ -75,8 +46,8 @@ extension Preferences {
 
             Button(action: action) {
                 HStack(spacing: 6) {
-                    Image(nsImage: pane.preferenceIcon).frame(width: 16, height: 16)
-                    Text(pane.displayName).font(Const.Font.sideBarItem)
+                    Image(pane.preferenceIconName).frame(width: 16, height: 16)
+                    Text(pane.displayName).font(Const.Fonts.sideBarItem)
                 }
             }
             .buttonStyle(selected ?
@@ -87,11 +58,7 @@ extension Preferences {
     }
 
     struct Sidebar: View {
-        @ObservedObject var model: PreferencesSidebarModel
-        
-        init(model: PreferencesSidebarModel) {
-            self.model = model
-        }
+        @EnvironmentObject var model: PreferencesModel
 
         @State var selectedTab: Tab.TabContent = .newPreferences
 
@@ -99,7 +66,7 @@ extension Preferences {
             VStack(spacing: 0) {
                 NSPopUpButtonView<Tab.TabContent>(selection: $selectedTab, viewCreator: {
                     let button = NSPopUpButton()
-                    button.font = Const.Font.popUpButton
+                    button.font = Const.Fonts.popUpButton
                     button.setButtonType(.momentaryLight)
                     button.isBordered = false
                     

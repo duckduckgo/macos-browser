@@ -1,5 +1,5 @@
 //
-//  NewPreferencesSplitViewController.swift
+//  AboutModel.swift
 //
 //  Copyright © 2022 DuckDuckGo. All rights reserved.
 //
@@ -16,22 +16,16 @@
 //  limitations under the License.
 //
 
-import Cocoa
 import SwiftUI
 
-final class NewPreferencesSplitViewController: NSViewController {
-
-    weak var delegate: BrowserTabSelectionDelegate?
+final class AboutModel: ObservableObject {
+    let appVersion = AppVersion()
     
-    override func loadView() {
-        view = NSView()
+    func openURL(_ url: URL) {
+        WindowControllersManager.shared.show(url: url, newTab: true)
     }
 
-    override func viewDidLoad() {
-        super.viewDidLoad()
-
-        let host = NSHostingView(rootView: Preferences.RootView(model: .init()))
-        view.addAndLayout(host)
+    func openFeedbackForm() {
+        FeedbackPresenter.presentFeedbackForm()
     }
-    
 }

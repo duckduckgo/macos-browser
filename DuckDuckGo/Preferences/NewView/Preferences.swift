@@ -16,65 +16,83 @@
 //  limitations under the License.
 //
 
-import AppKit
 import SwiftUI
 
 enum Preferences {
-    
     enum Const {
-        enum Font {
-            static let popUpButton = NSFont.systemFont(ofSize: 22, weight: .semibold)
-            static let sideBarItem = SwiftUI.Font.system(size: 13, weight: .medium)
+        enum Fonts {
+
+            static let popUpButton: NSFont = {
+                if #available(macOS 11.0, *) {
+                    return .preferredFont(forTextStyle: .title1, options: [:])
+                } else {
+                    return NSFont.systemFont(ofSize: 22, weight: .semibold)
+                }
+            }()
+
+            static let sideBarItem: Font = {
+                if #available(macOS 11.0, *) {
+                    return .body.weight(.medium)
+                } else {
+                    return .system(size: 13, weight: .medium)
+                }
+            }()
+
+            static let preferencePaneTitle: Font = {
+                if #available(macOS 11.0, *) {
+                    return .title2.weight(.semibold)
+                } else {
+                    return .system(size: 22, weight: .semibold)
+                }
+            }()
         }
     }
 }
 
-enum PreferencesListSectionIdentifier: Hashable, CaseIterable {
+enum PreferencesSectionIdentifier: Hashable, CaseIterable {
     case regularPreferencePanes
     case about
 }
 
+enum PreferencePaneIdentifier: Hashable, Identifiable {
+    case defaultBrowser
+    case about
+    
+    var id: Self {
+        self
+    }
+
+    var displayName: String {
+        switch self {
+        case .defaultBrowser:
+            return UserText.defaultBrowser
+        case .about:
+            return "About"
+        }
+    }
+
+    var preferenceIconName: String {
+        switch self {
+        case .defaultBrowser:
+            return "DefaultBrowser"
+        case .about:
+            return "About"
+        }
+    }
+}
+
 struct PreferencesSection: Hashable, Identifiable {
-    let id: PreferencesListSectionIdentifier
-    let panes: [PreferencePane]
-}
-
-struct PreferencePane: PreferenceSection, Hashable, Identifiable {
-    let id = UUID()
-    let displayName: String
-    let preferenceIcon: NSImage
+    let id: PreferencesSectionIdentifier
+    let panes: [PreferencePaneIdentifier]
     
-    init(displayName: String, preferenceIcon: NSImage) {
-        self.displayName = displayName
-        self.preferenceIcon = preferenceIcon
-    }
-    
-    init(preferenceSection: PreferenceSection) {
-        displayName = preferenceSection.displayName
-        preferenceIcon = preferenceSection.preferenceIcon
-    }
-}
-
-struct PreferencesSections {
-    let sections: [PreferencesSection]
-    
-    init(sections: [PreferencesSection] = [
+    static let defaultSections: [PreferencesSection] = [
         .init(
             id: .regularPreferencePanes,
-            panes: [
-                DefaultBrowserPreferences(),
-                AppearancePreferences(),
-                PrivacySecurityPreferences.shared,
-                LoginsPreferences(),
-                DownloadPreferences()
-            ]
-                .map(PreferencePane.init(preferenceSection:))
+            panes: [.defaultBrowser]
         ),
         .init(
             id: .about,
-            panes: [.init(displayName: "About", preferenceIcon: NSImage(named: "About")!)]
+            panes: [.about]
         )
-    ]) {
-        self.sections = sections
-    }
+    ]
 }
