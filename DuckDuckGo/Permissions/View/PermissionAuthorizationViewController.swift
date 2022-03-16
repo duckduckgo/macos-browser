@@ -71,7 +71,7 @@ final class PermissionAuthorizationViewController: NSViewController {
             : UserText.devicePermissionAuthorizationFormat
         self.descriptionLabel.stringValue = String(format: format,
                                                    query.domain,
-                                                   query.permissions.localizedDescription)
+                                                   query.permissions.localizedDescription.localizedLowercase)
     }
 
     @IBAction func grantAction(_ sender: NSButton) {
