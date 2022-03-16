@@ -523,7 +523,7 @@ DQ
                                 <constraints>
                                     <constraint firstAttribute="width" constant="280" id="YS3-eh-JOs"/>
                                 </constraints>
-                                <textFieldCell key="cell" alignment="center" title="Use the Fire Button to clear your tabs and windows and to delete your browsing history and cookies." id="ciA-Pp-IT3">
+                                <textFieldCell key="cell" alignment="center" title="Data, browsing history, and cookies can build up in your browser over time. Use the Fire Button to clear it all away." id="ciA-Pp-IT3">
                                     <font key="font" metaFont="system"/>
                                     <color key="textColor" name="GreyTextColor"/>
                                     <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
