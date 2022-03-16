@@ -172,21 +172,26 @@ final class MainViewController: NSViewController {
     }
 
     private func resizeNavigationBarForHomePage(_ homePage: Bool, animated: Bool) {
-        let nonHomePageHeight: CGFloat = view.window?.isPopUpWindow == true ? 42 : 48
+        NSAnimationContext.runAnimationGroup { context in
+            context.duration = 0.1
 
-        let height = animated ? addressBarHeightConstraint.animator() : addressBarHeightConstraint
-        height?.constant = homePage ? 56 : nonHomePageHeight
+            let nonHomePageHeight: CGFloat = view.window?.isPopUpWindow == true ? 42 : 48
 
-        let divider = animated ? self.divider.animator() : self.divider
-        divider?.alphaValue = homePage ? 0 : 1.0
+            let height = animated ? addressBarHeightConstraint.animator() : addressBarHeightConstraint
+            height?.constant = homePage ? 56 : nonHomePageHeight
 
-        navigationBarViewController.resizeAddressBarForHomePage(homePage, animated: animated)
+            let divider = animated ? self.divider.animator() : self.divider
+            divider?.alphaValue = homePage ? 0 : 1.0
+
+            navigationBarViewController.resizeAddressBarForHomePage(homePage, animated: animated)
+        }
     }
 
+    var lastTabContent: Tab.TabContent?
     private func subscribeToTabContent() {
         tabCollectionViewModel.selectedTabViewModel?.tab.$content.receive(on: DispatchQueue.main).sink(receiveValue: { [weak self] content in
-            // Animations disabled for time being (maybe forever)
-            self?.resizeNavigationBarForHomePage(content == .homePage, animated: false)
+            self?.resizeNavigationBarForHomePage(content == .homePage, animated: content == .homePage && self?.lastTabContent != .homePage)
+            self?.lastTabContent = content
         }).store(in: &self.navigationalCancellables)
     }
 
