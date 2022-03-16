@@ -1,2 +1,47 @@
-"loc" = "Loc";
+// OK button
+"ok" = "OK";
 
+// Cancel button
+"cancel" = "Cancel";
+
+// Not Now button
+"notnow" = "Not Now";
+
+// Open button
+"open" = "Open";
+
+// Save button
+"save" = "Save";
+
+// Edit button
+"edit" = "Edit";
+
+// Remove button
+"remove" = "Remove";
+
+// Quit button
+"quit" = "Quit";
+
+// Don’t Quit button
+"dont-quit" = "Don’t Quit";
+
+// Next button
+"next" = "Next";
+
+// Menu item. Duplicate as a verb
+"duplicate-tab" = "Duplicate Tab";
+
+// Menu item
+"menu.close-tab" = "Close Tab";
+
+// Menu item
+"menu.close-other-tabs" = "Close Other Tabs";
+
+// Menu item
+"menu.close-tabs-to-the-right" = "Close Tabs to the Right";
+
+// Menu item that opens the link in a new tab
+"menu.open-in-new-tab" = "Open in New Tab";
+
+// Menu item that opens the link in a new window
+"menu.open-in-new-window" = "Open in New Window";
