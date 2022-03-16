@@ -262,25 +262,32 @@ struct RecentlyVisitedTitle: View {
     @Binding var isExpanded: Bool
 
     var body: some View {
-        HStack(alignment: .center, spacing: 12) {
+        HStack(alignment: .top, spacing: 12) {
             Image("HomeShield")
                 .resizable()
-                .frame(width: 32, height: 32)
+                .frame(width: 22, height: 22)
                 .onTapGesture(count: 2) {
                     model.showPagesOnHover.toggle()
                 }
 
-            Group {
-                if model.recentSites.count > 0 {
+            VStack(alignment: isExpanded ? .leading : .center, spacing: 8) {
+                Group {
                     Text(UserText.homePageProtectionSummaryMessage(numberOfTrackersBlocked: model.numberOfTrackersBlocked))
-                } else {
-                    Text(UserText.homePageProtectionSummaryInfo)
                 }
-            }
-            .multilineTextAlignment(.center)
-            .lineLimit(2)
-            .font(.system(size: 17, weight: .bold, design: .default))
-            .foregroundColor(Color("HomeFeedTitleColor"))
+                .font(.system(size: 17, weight: .bold, design: .default))
+                .foregroundColor(Color("HomeFeedTitleColor"))
+
+                Group {
+                    Text(UserText.homePageProtectionDurationInfo)
+                }
+                .font(.system(size: 13, weight: .medium, design: .default))
+                .foregroundColor(Color("HomeFeedItemTimeTextColor"))
+            }.visibility(model.recentSites.count > 0 ? .visible : .gone)
+
+            Text(UserText.homePageProtectionSummaryInfo)
+                .font(.system(size: 17, weight: .bold, design: .default))
+                .foregroundColor(Color("HomeFeedTitleColor"))
+                .visibility(model.recentSites.count > 0 ? .gone : .visible)
 
             Spacer()
                 .visibility(isExpanded ? .visible : .gone)

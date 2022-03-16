@@ -35,14 +35,14 @@ struct Favorites: View {
                 .stroke(Color("HomeFavoritesGhostColor"), style: StrokeStyle(lineWidth: 1.5))
                 .frame(width: 64, height: 64)
 
-            VStack(spacing: 5) {
+            VStack(spacing: 4) {
                 HoverButton(size: 64, imageName: "Add", imageSize: 22, cornerRadius: 12) {
                     model.addNew()
                 }
                 .frame(width: 64, height: 64)
 
                 Text(UserText.addFavorite)
-                    .font(.system(size: 10))
+                    .font(.system(size: 11))
                     .multilineTextAlignment(.center)
                     .lineLimit(2)
                     .truncationMode(.middle)
