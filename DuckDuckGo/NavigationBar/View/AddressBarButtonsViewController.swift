@@ -330,20 +330,20 @@ final class AddressBarButtonsViewController: NSViewController {
     }
 
     @IBAction func cameraButtonAction(_ sender: NSButton) {
-        guard let selectedTabViewModel = tabCollectionViewModel.selectedTabViewModel,
-              let state = selectedTabViewModel.usedPermissions.camera.combined(with: selectedTabViewModel.usedPermissions.microphone)
-        else {
-            os_log("%s: Selected tab view model is nil or no camera state", type: .error, className)
+        guard let selectedTabViewModel = tabCollectionViewModel.selectedTabViewModel else {
+            os_log("%s: Selected tab view model is nil", type: .error, className)
             return
         }
-        if case .requested(let query) = state {
+        if case .requested(let query) = selectedTabViewModel.usedPermissions.camera {
             openPermissionAuthorizationPopover(for: query)
             return
         }
 
         var permissions = Permissions()
         permissions.camera = selectedTabViewModel.usedPermissions.camera
-        permissions.microphone = selectedTabViewModel.usedPermissions.microphone
+        if microphoneButton.isHidden {
+            permissions.microphone = selectedTabViewModel.usedPermissions.microphone
+        }
 
         PermissionContextMenu(permissions: permissions.map { ($0, $1) },
                               domain: selectedTabViewModel.tab.content.url?.host ?? "",
@@ -588,11 +588,12 @@ final class AddressBarButtonsViewController: NSViewController {
         guard let selectedTabViewModel = tabCollectionViewModel.selectedTabViewModel else { return }
 
         geolocationButton.buttonState = selectedTabViewModel.usedPermissions.geolocation
-        cameraButton.buttonState = selectedTabViewModel.usedPermissions.camera
-            .combined(with: selectedTabViewModel.usedPermissions.microphone)
-        microphoneButton.buttonState = selectedTabViewModel.usedPermissions.camera == nil
-            ? selectedTabViewModel.usedPermissions.microphone
-            : nil
+
+        let (camera, microphone) = PermissionState?.combineCamera(selectedTabViewModel.usedPermissions.camera,
+                                                                  withMicrophone: selectedTabViewModel.usedPermissions.microphone)
+        cameraButton.buttonState = camera
+        microphoneButton.buttonState = microphone
+
         popupsButton.buttonState = selectedTabViewModel.usedPermissions.popups?.isRequested == true // show only when there're popups blocked
             ? selectedTabViewModel.usedPermissions.popups
             : nil

@@ -69,18 +69,18 @@ final class PermissionContextMenu: NSMenu {
         switch permissions.camera {
         case .active:
             if ![.active, .inactive].contains(permissions.microphone) || WKWebView.canMuteCameraAndMicrophoneSeparately {
-                addItem(.mute(.camera, target: self))
+                addItem(.mute(.camera, for: domain, target: self))
             } else {
-                addItem(.mute(permissionTypes, target: self))
+                addItem(.mute(permissionTypes, for: domain, target: self))
                 permissions.microphone = nil
             }
             permissions.camera = nil
 
         case .paused:
             if permissions.microphone != .paused || WKWebView.canMuteCameraAndMicrophoneSeparately {
-                addItem(.unmute(.camera, target: self))
+                addItem(.unmute(.camera, for: domain, target: self))
             } else {
-                addItem(.unmute(permissionTypes, target: self))
+                addItem(.unmute(permissionTypes, for: domain, target: self))
                 permissions.microphone = nil
             }
             permissions.camera = nil
@@ -101,9 +101,9 @@ final class PermissionContextMenu: NSMenu {
         for (idx, (permission, state)) in permissions.sorted(by: { lhs, _ in lhs.key == .camera }).enumerated() {
             switch state {
             case .active:
-                addItem(.mute([permission], target: self))
+                addItem(.mute([permission], for: domain, target: self))
             case .paused:
-                addItem(.unmute([permission], target: self))
+                addItem(.unmute([permission], for: domain, target: self))
             case .inactive:
                 break
 
@@ -153,20 +153,13 @@ final class PermissionContextMenu: NSMenu {
         addSeparator(if: numberOfItems > 0)
 
         let permissionTypes = permissions.map(\.key).sorted(by: { lhs, _ in lhs == .camera })
-        addItem(.revoke(permissionTypes, target: self))
+        addItem(.revoke(permissionTypes, for: domain, target: self))
     }
 
     private func addPersistenceItems() {
-        addSeparator(if: numberOfItems > 0)
-
-        var headerAdded = false
-        func addHeaderIfNeeded() {
-            guard !headerAdded else { return }
-
-            headerAdded = true
-        }
-        for (permission, _) in permissions {
+        for (permission, state) in permissions {
             guard permission.canPersistGrantedDecision || permission.canPersistDeniedDecision else { continue }
+            if case .disabled = state { continue }
 
             addSeparator(if: numberOfItems > 0)
             addItem(.persistenceHeaderItem(for: permission, on: domain))
@@ -277,8 +270,8 @@ final class PermissionContextMenu: NSMenu {
 
 private extension NSMenuItem {
 
-    static func mute(_ permissions: [PermissionType], target: PermissionContextMenu) -> NSMenuItem {
-        let title = String(format: UserText.permissionMuteFormat, permissions.localizedDescription)
+    static func mute(_ permissions: [PermissionType], for domain: String, target: PermissionContextMenu) -> NSMenuItem {
+        let title = String(format: UserText.permissionMuteFormat, permissions.localizedDescription.lowercased(), domain)
         let item = NSMenuItem(title: title,
                               action: #selector(PermissionContextMenu.mutePermissions),
                               keyEquivalent: "")
@@ -287,8 +280,8 @@ private extension NSMenuItem {
         return item
     }
 
-    static func unmute(_ permissions: [PermissionType], target: PermissionContextMenu) -> NSMenuItem {
-        let title = String(format: UserText.permissionUnmuteFormat, permissions.localizedDescription)
+    static func unmute(_ permissions: [PermissionType], for domain: String, target: PermissionContextMenu) -> NSMenuItem {
+        let title = String(format: UserText.permissionUnmuteFormat, permissions.localizedDescription.lowercased(), domain)
         let item = NSMenuItem(title: title,
                               action: #selector(PermissionContextMenu.unmutePermissions),
                               keyEquivalent: "")
@@ -297,8 +290,8 @@ private extension NSMenuItem {
         return item
     }
 
-    static func revoke(_ permissions: [PermissionType], target: PermissionContextMenu) -> NSMenuItem {
-        let title = String(format: UserText.permissionRevokeFormat, permissions.localizedDescription)
+    static func revoke(_ permissions: [PermissionType], for domain: String, target: PermissionContextMenu) -> NSMenuItem {
+        let title = String(format: UserText.permissionRevokeFormat, domain, permissions.localizedDescription.lowercased())
         let item = NSMenuItem(title: title,
                               action: #selector(PermissionContextMenu.revokePermissions),
                               keyEquivalent: "")
@@ -386,8 +379,8 @@ private extension NSMenuItem {
             title = UserText.permissionGeolocationServicesDisabled
         } else {
             title = String(format: UserText.permissionAppPermissionDisabledFormat,
-                           Bundle.main.displayName ?? "DuckDuckGo",
-                           permission.localizedDescription)
+                           permission.localizedDescription,
+                           Bundle.main.displayName ?? "DuckDuckGo")
         }
         return NSMenuItem(title: title, action: nil, keyEquivalent: "")
     }
@@ -416,9 +409,9 @@ private extension NSMenuItem {
         let title: String
         switch permission {
         case .camera, .microphone, .geolocation:
-            title = String(format: UserText.devicePermissionAuthorizationFormat, domain, permission.localizedDescription)
+            title = String(format: UserText.devicePermissionAuthorizationFormat, domain, permission.localizedDescription.lowercased())
         case .externalScheme(scheme: let scheme):
-            title = String(format: UserText.permissionMenuHeaderExternalSchemeFormat, permission.localizedDescription, scheme)
+            title = String(format: UserText.permissionMenuHeaderExternalSchemeFormat, permission.localizedDescription.lowercased(), scheme)
         case .popups:
             title = String(format: UserText.permissionMenuHeaderPopupWindowsFormat, domain)
         }

@@ -69,28 +69,33 @@ extension Optional where Wrapped == PermissionState {
         self == .paused
     }
 
-    func combined(with other: PermissionState?) -> PermissionState? {
-        guard let lhs = self else { return nil }
-        guard let rhs = other else { return lhs }
+    static func combineCamera(_ camera: PermissionState?,
+                              withMicrophone microphone: PermissionState?) -> (camera: PermissionState?, microphone: PermissionState?) {
+        guard let camera = camera,
+              let microphone = microphone
+        else { return (camera, microphone) }
 
-        switch (lhs, rhs) {
-        case (.active, _), (_, .active):
-            return .active
-        case (.paused, _), (_, .paused):
-            return .paused
-        case (.inactive, _), (_, .inactive):
-            return .inactive
-        case (.requested(let query), _), (_, .requested(let query)):
-            return .requested(query)
+        switch (camera, microphone) {
+        case (.active, .active),
+             (.active, .paused),
+             (.paused, .active),
+             (.active, .inactive):
+            return (camera: .active, microphone: nil)
+        case (.inactive, .inactive):
+            return (camera: .inactive, microphone: nil)
+        case (.paused, .paused):
+            return (camera: .paused, microphone: nil)
+        case (.revoking, .revoking):
+            return (camera: .revoking, microphone: nil)
+        case (.denied, .denied):
+            return (camera: .denied, microphone: nil)
+        case (.reloading, .reloading):
+            return (camera: .reloading, microphone: nil)
+        case (.requested(let query), .requested):
+            return (camera: .requested(query), microphone: nil)
 
-        case (.revoking, _), (_, .revoking):
-            return .revoking
-        case (.reloading, _), (_, .reloading):
-            return .reloading
-        case (.denied, _), (_, .denied):
-            return .denied(retry: nil)
-        case (.disabled(let systemWide), _), (_, .disabled(let systemWide)):
-            return .disabled(systemWide: systemWide)
+        default:
+            return (camera, microphone)
         }
     }
 

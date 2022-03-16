@@ -59,6 +59,7 @@ final class PermissionAuthorizationViewController: NSViewController {
     @IBOutlet var domainNameLabel: NSTextField!
     @IBOutlet var alwaysAllowCheckbox: NSButton!
     @IBOutlet var alwaysAllowStackView: NSStackView!
+    @IBOutlet var denyButton: NSButton!
 
     weak var query: PermissionAuthorizationQuery? {
         didSet {
@@ -72,6 +73,11 @@ final class PermissionAuthorizationViewController: NSViewController {
 
     override func viewWillAppear() {
         alwaysAllowCheckbox.state = .off
+        if case.externalScheme = self.query?.permissions.first {
+            denyButton.title = UserText.cancel
+        } else {
+            denyButton.title = UserText.permissionPopoverDenyButton
+        }
     }
 
     private func updateText() {
