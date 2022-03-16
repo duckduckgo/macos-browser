@@ -592,7 +592,7 @@ extension Tab: UserContentControllerDelegate {
 
 }
 
-extension Tab: ChildAutofillUserScriptDelegate {
+extension Tab: BrowserTabViewControllerClickDelegate {
     func browserTabViewController(_ browserTabViewController: BrowserTabViewController, didClickAtPoint: NSPoint) {
         guard let autofillScript = autofillScript else { return }
         autofillScript.clickPoint = didClickAtPoint

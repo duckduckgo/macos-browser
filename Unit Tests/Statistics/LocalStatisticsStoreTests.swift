@@ -63,15 +63,6 @@ class LocalStatisticsStoreTests: XCTestCase {
         XCTAssertEqual(pixelStore.data.count, 0)
     }
     
-    func testWaitlistUpgradeCheckComplete() {
-        let pixelStore = PixelStoreMock()
-        let store = LocalStatisticsStore(pixelDataStore: pixelStore)
-        
-        XCTAssertFalse(store.waitlistUpgradeCheckComplete)
-        store.waitlistUpgradeCheckComplete = true
-        XCTAssertTrue(store.waitlistUpgradeCheckComplete)
-    }
-    
     // Legacy Statistics:
 
     func testWhenInitializingTheLocalStatisticsStore_ThenLegacyStatisticsAreCleared() {
