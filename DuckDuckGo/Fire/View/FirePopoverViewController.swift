@@ -119,11 +119,7 @@ final class FirePopoverViewController: NSViewController {
             return
         }
 
-        switch firePopoverViewModel.clearingOption {
-        case .currentTab: closeDetailsButton.title = "     \(UserText.currentTabDescription)"
-        case .currentWindow: closeDetailsButton.title = "     \(UserText.currentWindowDescription)"
-        case .allData: closeDetailsButton.title = "     \(UserText.allDataDescription)"
-        }
+        closeDetailsButton.title = "     \(UserText.fireDialogDetails)"
     }
 
     private func updateWarningWrapperView() {
