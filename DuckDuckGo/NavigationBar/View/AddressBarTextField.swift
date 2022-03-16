@@ -500,7 +500,7 @@ final class AddressBarTextField: NSTextField {
 
         func toAttributedString(size: CGFloat) -> NSAttributedString {
             let attrs = [NSAttributedString.Key.font: NSFont.systemFont(ofSize: size, weight: .light),
-                            .foregroundColor: NSColor.addressBarSuffixColor]
+                         .foregroundColor: NSColor.addressBarSuffixColor]
             return NSAttributedString(string: string, attributes: attrs)
         }
 
@@ -518,9 +518,9 @@ final class AddressBarTextField: NSTextField {
                     return Self.searchSuffix
                 } else {
                     return " – " + url.toString(decodePunycode: false,
-                                                  dropScheme: true,
-                                                  needsWWW: false,
-                                                  dropTrailingSlash: false)
+                                                dropScheme: true,
+                                                needsWWW: false,
+                                                dropTrailingSlash: false)
                 }
             case .title(let title):
                 return " – " + title
@@ -798,7 +798,7 @@ extension AddressBarTextField: SuggestionViewControllerDelegate {
 extension AddressBarTextField: NSTextViewDelegate {
 
     func textView(_ textView: NSTextView, willChangeSelectionFromCharacterRange _: NSRange, toCharacterRange range: NSRange) -> NSRange {
-        defer {
+        DispatchQueue.main.async {
             // artifacts can appear when the selection changes, especially if the size of the field has changed, this clears them
             textView.needsDisplay = true
         }
