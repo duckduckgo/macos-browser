@@ -269,8 +269,9 @@ struct RecentlyVisitedTitle: View {
                 .onTapGesture(count: 2) {
                     model.showPagesOnHover.toggle()
                 }
+                .padding(.leading, isExpanded ? 5 : 0)
 
-            VStack(alignment: isExpanded ? .leading : .center, spacing: 8) {
+            VStack(alignment: isExpanded ? .leading : .center, spacing: 6) {
                 Group {
                     Text(UserText.homePageProtectionSummaryMessage(numberOfTrackersBlocked: model.numberOfTrackersBlocked))
                 }
@@ -282,7 +283,9 @@ struct RecentlyVisitedTitle: View {
                 }
                 .font(.system(size: 13, weight: .medium, design: .default))
                 .foregroundColor(Color("HomeFeedItemTimeTextColor"))
-            }.visibility(model.recentSites.count > 0 ? .visible : .gone)
+            }
+            .visibility(model.recentSites.count > 0 ? .visible : .gone)
+            .padding(.leading, 4)
 
             Text(UserText.homePageProtectionSummaryInfo)
                 .font(.system(size: 17, weight: .bold, design: .default))
