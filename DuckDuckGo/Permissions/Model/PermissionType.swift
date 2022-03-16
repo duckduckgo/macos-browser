@@ -80,9 +80,9 @@ extension PermissionType {
     }
     var canPersistDeniedDecision: Bool {
         switch self {
-        case .camera, .microphone, .geolocation, .externalScheme:
+        case .camera, .microphone, .geolocation:
             return true
-        case .popups:
+        case .popups, .externalScheme:
             return false
         }
     }

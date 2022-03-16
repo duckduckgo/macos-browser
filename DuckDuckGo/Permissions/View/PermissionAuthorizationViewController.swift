@@ -87,15 +87,19 @@ final class PermissionAuthorizationViewController: NSViewController {
         else { return }
 
         let format: String
+        let permissions: String
         switch query.permissions[0] {
         case .camera, .microphone, .geolocation:
             format = UserText.devicePermissionAuthorizationFormat
+            permissions = query.permissions.localizedDescription.lowercased()
         case .popups:
             format = UserText.popupWindowsPermissionAuthorizationFormat
+            permissions = query.permissions.localizedDescription.lowercased()
         case .externalScheme:
             format = UserText.externalSchemePermissionAuthorizationFormat
+            permissions = query.permissions.localizedDescription
         }
-        self.descriptionLabel.stringValue = String(format: format, query.domain, query.permissions.localizedDescription)
+        self.descriptionLabel.stringValue = String(format: format, query.domain, permissions)
         self.domainNameLabel.stringValue = "“" + query.domain + "”"
         self.alwaysAllowStackView.isHidden = !query.shouldShowAlwaysAllowCheckbox
     }

@@ -35,11 +35,11 @@ extension AVCaptureDevice: AVCaptureDevice_Swizzled {
 
     static func swizzleAuthorizationStatusForMediaType(with replacement: @escaping ((AVMediaType, inout AVAuthorizationStatus) -> Void)) {
         dispatchPrecondition(condition: .onQueue(.main))
-        guard !self.isSwizzled,
-              let originalAuthorizationStatusForMediaType = originalAuthorizationStatusForMediaType,
+        guard !self.isSwizzled else { return }
+        guard let originalAuthorizationStatusForMediaType = originalAuthorizationStatusForMediaType,
               let swizzledAuthorizationStatusForMediaType = swizzledAuthorizationStatusForMediaType
         else {
-            assertionFailure("Already swizzled")
+            assertionFailure("Methods not available")
             return
         }
 
@@ -49,11 +49,11 @@ extension AVCaptureDevice: AVCaptureDevice_Swizzled {
 
     static func restoreAuthorizationStatusForMediaType() {
         dispatchPrecondition(condition: .onQueue(.main))
-        guard self.isSwizzled,
-              let originalAuthorizationStatusForMediaType = originalAuthorizationStatusForMediaType,
+        guard self.isSwizzled else { return }
+        guard let originalAuthorizationStatusForMediaType = originalAuthorizationStatusForMediaType,
               let swizzledAuthorizationStatusForMediaType = swizzledAuthorizationStatusForMediaType
         else {
-            assertionFailure("Method is not swizzled")
+            assertionFailure("Methods not available")
             return
         }
 

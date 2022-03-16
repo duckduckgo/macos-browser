@@ -251,25 +251,36 @@ final class PermissionModel {
         // If media capture is denied in the System Preferences, reflect it in the current permissions
         // AVCaptureDevice.authorizationStatus(for:mediaType) is swizzled to determine requested media type
         // otherwise WebView won't call any other delegate methods if System Permission is denied
-        AVCaptureDevice.swizzleAuthorizationStatusForMediaType { mediaType, authorizationStatus in
+        var checkedPermissions = Set<PermissionType>()
+        AVCaptureDevice.swizzleAuthorizationStatusForMediaType { [weak self] mediaType, authorizationStatus in
+            let permission: PermissionType
+            // media type for Camera/Microphone can be only determined separately
+            switch mediaType {
+            case .audio:
+                permission = .microphone
+            case .video:
+                permission = .camera
+            default: return
+            }
             switch authorizationStatus {
             case .denied, .restricted:
-                // media type for Camera/Microphone can be only determined separately
-                switch mediaType {
-                case .audio:
-                    self.permissions.microphone.systemAuthorizationDenied(systemWide: false)
-                case .video:
-                    self.permissions.camera.systemAuthorizationDenied(systemWide: false)
-                default: break
-                }
+                self?.permissions[permission].systemAuthorizationDenied(systemWide: false)
+                AVCaptureDevice.restoreAuthorizationStatusForMediaType()
 
-            case .notDetermined, .authorized: break
+            case .notDetermined, .authorized:
+                checkedPermissions.insert(permission)
+                if checkedPermissions == [.camera, .microphone] {
+                    AVCaptureDevice.restoreAuthorizationStatusForMediaType()
+                }
             @unknown default: break
             }
         }
         decisionHandler(/*salt - seems not used anywhere:*/ "",
                         /*includeSensitiveMediaDeviceDetails:*/ false)
-        AVCaptureDevice.restoreAuthorizationStatusForMediaType()
+        // make sure to swizzle it back after reasonable interval in case it wasn't called
+        DispatchQueue.main.asyncAfter(deadline: .now() + 5) {
+            AVCaptureDevice.restoreAuthorizationStatusForMediaType()
+        }
     }
 
     private func shouldGrantPermission(for permissions: [PermissionType], requestedForDomain domain: String) -> Bool? {
