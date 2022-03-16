@@ -45,7 +45,12 @@ extension Project {
             bundleId: "com.duckduckgo.macos.browser.debug",
             infoPlist: .extendingDefault(with: infoPlist),
             sources: ["\(name)/Sources/**"],
-            resources: ["\(name)/Resources/**"],
+            resources: [
+                "\(name)/Resources/**",
+                "Submodules/duckduckgo-find-in-page/dist/findinpage.js",
+                .folderReference(path: "\(name)/FolderReferences/ContentBlocker/social_images"),
+                .folderReference(path: "Submodules/duckduckgo-privacy-dashboard")
+            ],
             headers: .headers(project: "\(name)/Headers/**"),
             entitlements: "\(name)/Other/DuckDuckGo.entitlements",
             dependencies: dependencies + [
