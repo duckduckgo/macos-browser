@@ -272,17 +272,13 @@ struct RecentlyVisitedTitle: View {
                 .padding(.leading, isExpanded ? 5 : 0)
 
             VStack(alignment: isExpanded ? .leading : .center, spacing: 6) {
-                Group {
-                    Text(UserText.homePageProtectionSummaryMessage(numberOfTrackersBlocked: model.numberOfTrackersBlocked))
-                }
-                .font(.system(size: 17, weight: .bold, design: .default))
-                .foregroundColor(Color("HomeFeedTitleColor"))
+                Text(UserText.homePageProtectionSummaryMessage(numberOfTrackersBlocked: model.numberOfTrackersBlocked))
+                    .font(.system(size: 17, weight: .bold, design: .default))
+                    .foregroundColor(Color("HomeFeedTitleColor"))
 
-                Group {
-                    Text(UserText.homePageProtectionDurationInfo)
-                }
-                .font(.system(size: 13, weight: .medium, design: .default))
-                .foregroundColor(Color("HomeFeedItemTimeTextColor"))
+                Text(UserText.homePageProtectionDurationInfo)
+                    .font(.system(size: 13, weight: .medium, design: .default))
+                    .foregroundColor(Color("HomeFeedItemTimeTextColor"))
             }
             .visibility(model.recentSites.count > 0 ? .visible : .gone)
             .padding(.leading, 4)
