@@ -22,7 +22,6 @@ import WebKit
 protocol PermissionContextMenuDelegate: AnyObject {
     func permissionContextMenu(_ menu: PermissionContextMenu, mutePermissions: [PermissionType])
     func permissionContextMenu(_ menu: PermissionContextMenu, unmutePermissions: [PermissionType])
-    func permissionContextMenu(_ menu: PermissionContextMenu, revokePermissions: [PermissionType])
     func permissionContextMenu(_ menu: PermissionContextMenu, allowPermissionQuery: PermissionAuthorizationQuery)
     func permissionContextMenu(_ menu: PermissionContextMenu, alwaysAllowPermission: PermissionType)
     func permissionContextMenu(_ menu: PermissionContextMenu, alwaysDenyPermission: PermissionType)
@@ -57,7 +56,6 @@ final class PermissionContextMenu: NSMenu {
             $0[$1.key] = $1.value
         })
         setupOtherPermissionMenuItems(for: remainingPermission)
-        addRevokeItems()
         setupPopupsPermissionsMenuItems()
         addPersistenceItems()
     }
@@ -145,17 +143,6 @@ final class PermissionContextMenu: NSMenu {
         }
     }
 
-    private func addRevokeItems() {
-        guard permissions.contains(where: {
-            [.active, .inactive, .paused].contains($0.value) && $0.key != .popups && !$0.key.isExternalScheme
-        }) else { return }
-
-        addSeparator(if: numberOfItems > 0)
-
-        let permissionTypes = permissions.map(\.key).sorted(by: { lhs, _ in lhs == .camera })
-        addItem(.revoke(permissionTypes, for: domain, target: self))
-    }
-
     private func addPersistenceItems() {
         for (permission, state) in permissions {
             guard permission.canPersistGrantedDecision || permission.canPersistDeniedDecision else { continue }
@@ -196,13 +183,6 @@ final class PermissionContextMenu: NSMenu {
             return
         }
         actionDelegate?.permissionContextMenu(self, unmutePermissions: permissions)
-    }
-    @objc func revokePermissions(_ sender: NSMenuItem) {
-        guard let permissions = sender.representedObject as? [PermissionType] else {
-            assertionFailure("Expected [PermissionType]")
-            return
-        }
-        actionDelegate?.permissionContextMenu(self, revokePermissions: permissions)
     }
     @objc func alwaysAllowPermission(_ sender: NSMenuItem) {
         guard let permission = sender.representedObject as? PermissionType else {
@@ -284,16 +264,6 @@ private extension NSMenuItem {
         let title = String(format: UserText.permissionUnmuteFormat, permissions.localizedDescription.lowercased(), domain)
         let item = NSMenuItem(title: title,
                               action: #selector(PermissionContextMenu.unmutePermissions),
-                              keyEquivalent: "")
-        item.representedObject = permissions
-        item.target = target
-        return item
-    }
-
-    static func revoke(_ permissions: [PermissionType], for domain: String, target: PermissionContextMenu) -> NSMenuItem {
-        let title = String(format: UserText.permissionRevokeFormat, domain, permissions.localizedDescription.lowercased())
-        let item = NSMenuItem(title: title,
-                              action: #selector(PermissionContextMenu.revokePermissions),
                               keyEquivalent: "")
         item.representedObject = permissions
         item.target = target

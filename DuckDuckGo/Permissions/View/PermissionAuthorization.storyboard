@@ -11,14 +11,14 @@
             <objects>
                 <viewController storyboardIdentifier="PermissionAuthorizationViewController" id="1ds-EH-Sa3" customClass="PermissionAuthorizationViewController" customModule="DuckDuckGo_Privacy_Browser" customModuleProvider="target" sceneMemberID="viewController">
                     <view key="view" id="6Y6-ej-1GX">
-                        <rect key="frame" x="0.0" y="0.0" width="551" height="124"/>
+                        <rect key="frame" x="0.0" y="0.0" width="320" height="140"/>
                         <autoresizingMask key="autoresizingMask"/>
                         <subviews>
                             <stackView distribution="fill" orientation="vertical" alignment="centerX" spacing="16" horizontalStackHuggingPriority="750" verticalStackHuggingPriority="750" horizontalHuggingPriority="752" verticalHuggingPriority="752" horizontalCompressionResistancePriority="249" verticalCompressionResistancePriority="250" detachesHiddenViews="YES" translatesAutoresizingMaskIntoConstraints="NO" id="DDy-au-YqK">
-                                <rect key="frame" x="16" y="56" width="519" height="48"/>
+                                <rect key="frame" x="16" y="56" width="288" height="64"/>
                                 <subviews>
                                     <textField horizontalHuggingPriority="751" verticalHuggingPriority="750" horizontalCompressionResistancePriority="250" translatesAutoresizingMaskIntoConstraints="NO" id="7nK-UI-YT3">
-                                        <rect key="frame" x="-2" y="32" width="523" height="16"/>
+                                        <rect key="frame" x="-2" y="32" width="292" height="32"/>
                                         <textFieldCell key="cell" alignment="center" title="Allow “longname.chat.somewebsite.com” to use your Camera and Microphone?" id="z9s-AY-68S">
                                             <font key="font" metaFont="systemBold"/>
                                             <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
@@ -26,20 +26,20 @@
                                         </textFieldCell>
                                     </textField>
                                     <stackView distribution="fill" orientation="horizontal" alignment="top" spacing="0.0" horizontalStackHuggingPriority="249.99998474121094" verticalStackHuggingPriority="750" horizontalHuggingPriority="752" verticalHuggingPriority="750" horizontalCompressionResistancePriority="250" verticalCompressionResistancePriority="250" detachesHiddenViews="YES" translatesAutoresizingMaskIntoConstraints="NO" id="5JO-km-2KL">
-                                        <rect key="frame" x="0.0" y="0.0" width="519" height="16"/>
+                                        <rect key="frame" x="0.0" y="0.0" width="288" height="16"/>
                                         <subviews>
                                             <button horizontalHuggingPriority="750" verticalHuggingPriority="750" horizontalCompressionResistancePriority="751" translatesAutoresizingMaskIntoConstraints="NO" id="4Qg-BR-C50">
-                                                <rect key="frame" x="-2" y="-1" width="123" height="18"/>
-                                                <buttonCell key="cell" type="check" title="Always Allow on" bezelStyle="regularSquare" imagePosition="left" state="on" inset="2" id="Mak-WM-Obe">
+                                                <rect key="frame" x="-2" y="-1" width="122" height="18"/>
+                                                <buttonCell key="cell" type="check" title="Always allow on" bezelStyle="regularSquare" imagePosition="left" state="on" inset="2" id="Mak-WM-Obe">
                                                     <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
                                                     <font key="font" metaFont="system"/>
                                                 </buttonCell>
                                             </button>
                                             <customView translatesAutoresizingMaskIntoConstraints="NO" id="PEB-5b-R8e">
-                                                <rect key="frame" x="121" y="0.0" width="398" height="16"/>
+                                                <rect key="frame" x="120" y="0.0" width="168" height="16"/>
                                                 <subviews>
                                                     <textField horizontalHuggingPriority="751" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="Qnx-0b-4zc">
-                                                        <rect key="frame" x="-2" y="0.0" width="402" height="16"/>
+                                                        <rect key="frame" x="-2" y="0.0" width="172" height="16"/>
                                                         <constraints>
                                                             <constraint firstAttribute="width" relation="lessThanOrEqual" constant="550" id="qpi-AI-9P3"/>
                                                         </constraints>
@@ -50,7 +50,7 @@
                                                         </textFieldCell>
                                                     </textField>
                                                     <button verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="G5q-Z6-RNg">
-                                                        <rect key="frame" x="0.0" y="0.0" width="398" height="16"/>
+                                                        <rect key="frame" x="0.0" y="0.0" width="168" height="16"/>
                                                         <buttonCell key="cell" type="bevel" bezelStyle="rounded" alignment="center" transparent="YES" imageScaling="proportionallyDown" inset="2" id="jsw-nv-RIO">
                                                             <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
                                                             <font key="font" metaFont="system"/>
@@ -83,7 +83,7 @@
                                     </stackView>
                                 </subviews>
                                 <constraints>
-                                    <constraint firstAttribute="width" relation="greaterThanOrEqual" constant="288" id="aRP-TF-Mru"/>
+                                    <constraint firstAttribute="width" constant="288" id="aRP-TF-Mru"/>
                                 </constraints>
                                 <visibilityPriorities>
                                     <integer value="1000"/>
@@ -95,7 +95,7 @@
                                 </customSpacing>
                             </stackView>
                             <button verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="STv-Br-1F5">
-                                <rect key="frame" x="396" y="9" width="146" height="32"/>
+                                <rect key="frame" x="165" y="9" width="146" height="32"/>
                                 <constraints>
                                     <constraint firstAttribute="width" constant="132" id="zDw-7c-cxw"/>
                                 </constraints>
@@ -108,7 +108,7 @@
                                 </connections>
                             </button>
                             <button verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="nJj-cz-fYJ">
-                                <rect key="frame" x="252" y="9" width="146" height="32"/>
+                                <rect key="frame" x="21" y="9" width="146" height="32"/>
                                 <buttonCell key="cell" type="push" title="Cancel" bezelStyle="rounded" alignment="center" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="tHA-lk-nXO">
                                     <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
                                     <font key="font" metaFont="system"/>
@@ -144,7 +144,7 @@ Gw
                 </viewController>
                 <customObject id="Pct-h6-WSE" userLabel="First Responder" customClass="NSResponder" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="-723.5" y="-104"/>
+            <point key="canvasLocation" x="-724" y="-104"/>
         </scene>
         <!--Popup Blocked View Controller-->
         <scene sceneID="raf-VW-y7g">

@@ -283,6 +283,7 @@ final class AddressBarButtonsViewController: NSViewController {
                 button = externalSchemeButton
                 popover.behavior = .transient
                 query.shouldShowAlwaysAllowCheckbox = true
+                query.shouldShowCancelInsteadOfDeny = true
             default:
                 assertionFailure("Unexpected permissions")
                 query.handleDecision(grant: false)
@@ -826,11 +827,6 @@ extension AddressBarButtonsViewController: PermissionContextMenuDelegate {
     }
     func permissionContextMenu(_ menu: PermissionContextMenu, unmutePermissions permissions: [PermissionType]) {
         tabCollectionViewModel.selectedTabViewModel?.tab.permissions.set(permissions, muted: false)
-    }
-    func permissionContextMenu(_ menu: PermissionContextMenu, revokePermissions permissions: [PermissionType]) {
-        for permission in permissions {
-            tabCollectionViewModel.selectedTabViewModel?.tab.permissions.revoke(permission)
-        }
     }
     func permissionContextMenu(_ menu: PermissionContextMenu, allowPermissionQuery query: PermissionAuthorizationQuery) {
         tabCollectionViewModel.selectedTabViewModel?.tab.permissions.allow(query)

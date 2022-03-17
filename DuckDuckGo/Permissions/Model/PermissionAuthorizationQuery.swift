@@ -24,6 +24,7 @@ final class PermissionAuthorizationQuery {
     let permissions: [PermissionType]
     var wasShownOnce: Bool = false
     var shouldShowAlwaysAllowCheckbox: Bool = false
+    var shouldShowCancelInsteadOfDeny: Bool = false
     var retry: (() -> Void)?
 
     enum Decision {

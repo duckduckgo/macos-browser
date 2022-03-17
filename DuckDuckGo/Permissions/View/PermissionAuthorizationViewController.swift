@@ -73,7 +73,7 @@ final class PermissionAuthorizationViewController: NSViewController {
 
     override func viewWillAppear() {
         alwaysAllowCheckbox.state = .off
-        if case.externalScheme = self.query?.permissions.first {
+        if query?.shouldShowCancelInsteadOfDeny == true {
             denyButton.title = UserText.cancel
         } else {
             denyButton.title = UserText.permissionPopoverDenyButton
@@ -115,7 +115,11 @@ final class PermissionAuthorizationViewController: NSViewController {
 
     @IBAction func denyAction(_ sender: NSButton) {
         self.dismiss()
-        query?.handleDecision(grant: false)
+        guard let query = query,
+              !query.shouldShowCancelInsteadOfDeny
+        else { return }
+
+        query.handleDecision(grant: false)
     }
 
 }
