@@ -608,9 +608,11 @@ final class AddressBarButtonsViewController: NSViewController {
 
         for permission in selectedTabViewModel.usedPermissions.keys {
             guard case .requested(let query) = selectedTabViewModel.usedPermissions[permission] else { continue }
-            if !permissionAuthorizationPopover.isShown {
-                openPermissionAuthorizationPopover(for: query)
+            guard !permissionAuthorizationPopover.isShown else {
+                if permissionAuthorizationPopover.viewController.query === query { return }
+                permissionAuthorizationPopover.close()
             }
+            openPermissionAuthorizationPopover(for: query)
             return
         }
         if _permissionAuthorizationPopover?.isShown == true {
