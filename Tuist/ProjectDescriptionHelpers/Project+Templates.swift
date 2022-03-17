@@ -15,11 +15,8 @@ extension Project {
                        organizationName: "DuckDuckGo",
                        packages: [
                         .remote(url: "https://github.com/duckduckgo/TrackerRadarKit.git", requirement: .exact("1.0.3")),
-                        .remote(url: "https://github.com/airbnb/lottie-ios", requirement: .upToNextMajor(from: "3.3.0")),
-                        .remote(url: "https://github.com/gumob/PunycodeSwift.git", requirement: .upToNextMajor(from: "2.1.0")),
-                        .remote(url: "https://github.com/AliSoftware/OHHTTPStubs.git", requirement: .upToNextMajor(from: "9.1.0")),
-                        .remote(url: "https://github.com/sparkle-project/Sparkle.git", requirement: .exact("1.27.1")),
-                        .remote(url: "https://github.com/duckduckgo/BrowserServicesKit", requirement: .upToNextMajor(from: "11.2.2"))
+                        .remote(url: "https://github.com/duckduckgo/BrowserServicesKit", requirement: .upToNextMajor(from: "11.2.2")),
+                        .remote(url: "https://github.com/airbnb/lottie-ios", requirement: .upToNextMajor(from: "3.3.0"))
                        ],
                        targets: targets)
     }
@@ -55,11 +52,11 @@ extension Project {
             entitlements: "\(name)/Other/DuckDuckGo.entitlements",
             dependencies: dependencies + [
                 .package(product: "BrowserServicesKit"),
-                .package(product: "Lottie"),
-                .package(product: "OHHTTPStubs"),
-                .package(product: "Punnycode"),
-                .package(product: "Sparkle"),
                 .package(product: "TrackerRadarKit"),
+                .package(product: "Lottie"),
+                .external(name: "OHHTTPStubs"),
+                .external(name: "Punnycode"),
+                .external(name: "Sparkle"),
                 .sdk(name: "WebKit", type: .framework, status: .required)
             ],
             settings: .settings(base: [
@@ -99,6 +96,7 @@ extension Project {
                 "CLANG_WARN__DUPLICATE_METHOD_MATCH": "YES",
                 "COPY_PHASE_STRIP": "NO",
                 "DEVELOPMENT_TEAM": "HKE973VLUW",
+                "ENABLE_HARDENED_RUNTIME": "YES",
                 "ENABLE_STRICT_OBJC_MSGSEND": "YES",
                 "GCC_C_LANGUAGE_STANDARD": "gnu11",
                 "GCC_NO_COMMON_BLOCKS": "YES",
