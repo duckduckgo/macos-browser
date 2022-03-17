@@ -15,6 +15,7 @@
 //  See the License for the specific language governing permissions and
 //  limitations under the License.
 //
+
 import Foundation
 import os
 
@@ -70,7 +71,7 @@ struct Logging {
     fileprivate static let fireLoggingEnabled = false
     fileprivate static let fireLog: OSLog = OSLog(subsystem: Bundle.main.bundleIdentifier ?? "DuckDuckGo", category: "Fire")
 
-    fileprivate static let passwordManagerEnabled = false
+    fileprivate static let passwordManagerEnabled = true
     fileprivate static let passwordManagerLog: OSLog = OSLog(subsystem: Bundle.main.bundleIdentifier ?? "DuckDuckGo", category: "Password Manager")
 
     fileprivate static let historyLoggingEnabled = false
