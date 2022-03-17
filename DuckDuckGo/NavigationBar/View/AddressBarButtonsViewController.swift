@@ -611,6 +611,7 @@ final class AddressBarButtonsViewController: NSViewController {
             guard !permissionAuthorizationPopover.isShown else {
                 if permissionAuthorizationPopover.viewController.query === query { return }
                 permissionAuthorizationPopover.close()
+                return
             }
             openPermissionAuthorizationPopover(for: query)
             return
