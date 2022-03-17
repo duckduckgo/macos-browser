@@ -20,6 +20,7 @@ import Foundation
 import XCTest
 import WebKit
 import Combine
+import AVFoundation
 @testable import DuckDuckGo_Privacy_Browser
 
 // swiftlint:disable file_length
@@ -51,6 +52,10 @@ final class PermissionModelTests: XCTestCase {
                                 geolocationService: geolocationServiceMock)
 
         AVCaptureDeviceMock.authorizationStatuses = nil
+    }
+
+    override func tearDown() {
+        AVCaptureDevice.restoreAuthorizationStatusForMediaType()
     }
 
     func testWhenCameraIsActivatedThenCameraPermissionChangesToActive() {
