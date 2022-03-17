@@ -88,7 +88,7 @@ final class PrivacyDashboardUserScript: NSObject, StaticUserScript {
             return
         }
 
-        let etag = DefaultConfigurationStorage.shared.loadEtag(for: .trackerRadar)?
+        let etag = ContentBlocking.shared.contentBlockingManager.currentRules.first?.etag
                     .trimmingCharacters(in: CharacterSet(charactersIn: "\"")) ?? ""
         Pixel.shared?.fire(pixelNamed: pixel,
                            withAdditionalParameters: [
