@@ -25,7 +25,6 @@ final class PermissionAuthorizationQuery {
     var wasShownOnce: Bool = false
     var shouldShowAlwaysAllowCheckbox: Bool = false
     var shouldShowCancelInsteadOfDeny: Bool = false
-    var retry: (() -> Void)?
 
     enum Decision {
         case granted(PermissionAuthorizationQuery)
@@ -37,13 +36,11 @@ final class PermissionAuthorizationQuery {
     init(domain: String,
          url: URL?,
          permissions: [PermissionType],
-         retryHandler: (() -> Void)?,
          decisionHandler: @escaping (Decision, Bool?) -> Void) {
 
         self.domain = domain
         self.url = url
         self.permissions = permissions
-        self.retry = retryHandler
         self.decisionHandler = decisionHandler
     }
 

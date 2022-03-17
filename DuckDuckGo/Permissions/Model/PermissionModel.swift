@@ -120,13 +120,11 @@ final class PermissionModel {
     private func queryAuthorization(for permissions: [PermissionType],
                                     domain: String,
                                     url: URL?,
-                                    retryHandler: (() -> Void)?,
                                     decisionHandler: @escaping (Bool) -> Void) {
 
         let query = PermissionAuthorizationQuery(domain: domain,
                                                  url: url,
-                                                 permissions: permissions,
-                                                 retryHandler: retryHandler) { [weak self] decision, remember in
+                                                 permissions: permissions) { [weak self] decision, remember in
 
             let query: PermissionAuthorizationQuery?
             let granted: Bool
@@ -140,7 +138,7 @@ final class PermissionModel {
                 granted = false
 
                 for permission in permissions {
-                    self?.permissions[permission].denied(retry: completedQuery.retry)
+                    self?.permissions[permission].denied()
                 }
 
             case .granted(let completedQuery):
@@ -227,21 +225,8 @@ final class PermissionModel {
             webView?.revokePermissions([permission])
 
         case .popups, .externalScheme:
-            self.permissions[permission].denied(retry: nil)
+            self.permissions[permission].denied()
         }
-    }
-
-    func allowAndRetry(_ permission: PermissionType) {
-        if let domain = webView?.url?.host,
-           case .deny = permissionManager.permission(forDomain: domain, permissionType: permission) {
-            permissionManager.setPermission(.ask, forDomain: domain, permissionType: permission)
-        }
-
-        guard case .denied(retry: let retry) = self.permissions[permission] else {
-            assertionFailure("Retry not supported for \(permission)")
-            return
-        }
-        retry?()
     }
 
     // MARK: - WebView delegated methods
@@ -323,7 +308,6 @@ final class PermissionModel {
     func permissions(_ permissions: [PermissionType],
                      requestedForDomain domain: String?,
                      url: URL? = nil,
-                     retryHandler: (() -> Void)? = nil,
                      decisionHandler: @escaping (Bool) -> Void) {
 
         guard let domain = domain,
@@ -338,13 +322,13 @@ final class PermissionModel {
         let shouldGrant = shouldGrantPermission(for: permissions, requestedForDomain: domain)
         switch shouldGrant {
         case .none:
-            queryAuthorization(for: permissions, domain: domain, url: url, retryHandler: retryHandler, decisionHandler: decisionHandler)
+            queryAuthorization(for: permissions, domain: domain, url: url, decisionHandler: decisionHandler)
         case .some(true):
             decisionHandler(true)
         case .some(false):
             decisionHandler(false)
             for permission in permissions {
-                self.permissions[permission].denied(retry: retryHandler)
+                self.permissions[permission].denied()
             }
         }
     }

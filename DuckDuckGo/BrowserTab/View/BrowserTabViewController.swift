@@ -438,16 +438,10 @@ extension BrowserTabViewController: TabDelegate {
         self.view.makeMeFirstResponder()
 
         let permissionType = PermissionType.externalScheme(scheme: url.scheme ?? "")
-        let retryHandler = { [weak self, weak tab] in
-            // `Allow` requested from context menu after denying
-            guard let self = self, let tab = tab else { return }
-            self.tab(tab, openExternalURL: url, touchingPermissionType: permissionType)
-        }
 
         tab.permissions.permissions([permissionType],
                                     requestedForDomain: webView?.url?.host ?? "localhost",
-                                    url: url,
-                                    retryHandler: retryHandler) { [weak self, weak tab] granted in
+                                    url: url) { [weak self, weak tab] granted in
             guard granted, let tab = tab else {
                 if userEntered {
                     searchForExternalUrl()

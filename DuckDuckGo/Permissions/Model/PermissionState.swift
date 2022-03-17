@@ -25,7 +25,7 @@ enum PermissionState: Equatable {
     case active
     case revoking
     case reloading
-    case denied(retry: (() -> Void)?)
+    case denied
     case paused
     case inactive
 
@@ -54,8 +54,6 @@ enum PermissionState: Equatable {
         if case .denied = self { return true }
         return false
     }
-
-    static var denied: PermissionState { .denied(retry: nil) }
     
 }
 
@@ -124,8 +122,8 @@ extension Optional where Wrapped == PermissionState {
         self = .inactive
     }
 
-    mutating func denied(retry: (() -> Void)?) {
-        self = .denied(retry: retry)
+    mutating func denied() {
+        self = .denied
     }
 
     mutating func popupOpened(nextQuery: PermissionAuthorizationQuery?) {
@@ -175,7 +173,7 @@ extension Optional where Wrapped == PermissionState {
 
         // Permission revoked
         case (.revoking, .none):
-            self = .denied(retry: nil)
+            self = .denied
 
         // Permission revoked on page reload
         case (.reloading, .none):

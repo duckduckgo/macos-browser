@@ -758,7 +758,7 @@ final class PermissionModelTests: XCTestCase {
                        .ask)
         XCTAssertEqual(permissionManagerMock.permission(forDomain: URL.duckDuckGo.host!, permissionType: .externalScheme(scheme: "asdf")),
                        .allow)
-        XCTAssertEqual(model.permissions.popups, .denied(retry: nil))
+        XCTAssertEqual(model.permissions.popups, .denied)
     }
 
     func testWhenExternalAppGrantedPermissionIsStoredAndRevokedThenStoredPermissionIsRemoved() {
@@ -1085,41 +1085,6 @@ final class PermissionModelTests: XCTestCase {
 
         model.revoke(.geolocation)
         XCTAssertEqual(model.permissions, [.geolocation: .denied])
-    }
-
-    func testWhenAllowAndRetryCalledOnDeniedPermissionThenRetryIsCalled() {
-        let e = expectation(description: "retry called")
-        model.permissions([.externalScheme(scheme: "asd")], requestedForDomain: URL.duckDuckGo.host!, url: URL.duckDuckGo, retryHandler: {
-            e.fulfill()
-        }, decisionHandler: { grant in
-            XCTAssertFalse(grant)
-        })
-
-        guard case .requested(let query) = model.permissions.externalScheme else {
-            XCTFail("unexpected permission state")
-            return
-        }
-        query.handleDecision(grant: false, remember: false)
-
-        model.allowAndRetry(.externalScheme(scheme: "asd"))
-        waitForExpectations(timeout: 0)
-    }
-
-    func testWhenAllowAndRetryCalledForStoredDenyPermissionThenRetryIsCalledAndStoredPermissionIsRemoved() {
-        permissionManagerMock.setPermission(.deny, forDomain: URL.duckDuckGo.host!, permissionType: .externalScheme(scheme: "asd"))
-
-        webView.urlValue = URL.duckDuckGo
-        let e = expectation(description: "retry called")
-        model.permissions([.externalScheme(scheme: "asd")], requestedForDomain: URL.duckDuckGo.host!, url: URL.duckDuckGo, retryHandler: {
-            e.fulfill()
-        }, decisionHandler: { grant in
-            XCTAssertFalse(grant)
-        })
-
-        model.allowAndRetry(.externalScheme(scheme: "asd"))
-        waitForExpectations(timeout: 0)
-        XCTAssertEqual(permissionManagerMock.permission(forDomain: URL.duckDuckGo.host!, permissionType: .externalScheme(scheme: "asd")),
-                       .ask)
     }
 
 }
