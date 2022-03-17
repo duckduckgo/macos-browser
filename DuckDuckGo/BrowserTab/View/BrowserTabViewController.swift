@@ -130,10 +130,16 @@ final class BrowserTabViewController: NSViewController {
 
         // close fullscreenWindowController when closing tab in FullScreen mode
         webView.fullscreenWindowController?.close()
+
         webView.removeFromSuperview()
-        self.webView = nil
+        if self.webView == webView {
+            self.webView = nil
+        }
+
         container.removeFromSuperview()
-        self.webViewContainer = nil
+        if self.webViewContainer == container {
+            self.webViewContainer = nil
+        }
     }
 
     private func addWebViewToViewHierarchy(_ webView: WebView) {
@@ -216,20 +222,17 @@ final class BrowserTabViewController: NSViewController {
     }
 
     private func displayErrorView(_ shown: Bool, message: String) {
-        guard let webView = webView else {
-            return
-        }
-
-        if !shown &&
+        if let webView = webView,
+            !shown &&
             errorView.isHidden &&
-            !webView.isHidden &&
+            !webView.isHidden  &&
             !homePageView.isHidden {
             return
         }
 
         errorMessageLabel.stringValue = message
         errorView.isHidden = !shown
-        webView.isHidden = shown
+        webView?.isHidden = shown
         homePageView.isHidden = shown
     }
 
