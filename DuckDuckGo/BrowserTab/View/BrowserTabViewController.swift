@@ -222,14 +222,6 @@ final class BrowserTabViewController: NSViewController {
     }
 
     private func displayErrorView(_ shown: Bool, message: String) {
-        if let webView = webView,
-            !shown &&
-            errorView.isHidden &&
-            !webView.isHidden  &&
-            !homePageView.isHidden {
-            return
-        }
-
         errorMessageLabel.stringValue = message
         errorView.isHidden = !shown
         webView?.isHidden = shown
