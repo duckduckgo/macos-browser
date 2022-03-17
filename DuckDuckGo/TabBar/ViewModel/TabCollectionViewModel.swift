@@ -200,7 +200,7 @@ final class TabCollectionViewModel: NSObject {
 
         // Insert at the end of the child tabs
         var newIndex = parentTabIndex + 1
-        while tabCollection.tabs[safe:newIndex]?.parentTab === parentTab { newIndex += 1 }
+        while tabCollection.tabs[safe: newIndex]?.parentTab === parentTab { newIndex += 1 }
         insert(tab: tab, at: newIndex, selected: selected)
     }
 

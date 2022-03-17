@@ -32,10 +32,8 @@ final class FeedbackWindow: NSWindow {
 
     override var canBecomeMain: Bool { false }
 
-    // swiftlint:disable force_cast
     var feedbackViewController: FeedbackViewController {
+        // swiftlint:disable:next force_cast
         contentViewController as! FeedbackViewController
     }
-    // swiftlint:enable force_cast
-
 }
