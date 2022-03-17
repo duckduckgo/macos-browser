@@ -327,7 +327,7 @@ private extension NSMenuItem {
     }
 
     static func alwaysAsk(_ permission: PermissionType, on domain: String, target: PermissionContextMenu) -> NSMenuItem {
-        let title = String(format: UserText.permissionAlwaysAskDeviceFormat, permission.localizedDescription.localizedLowercase, domain)
+        let title = String(format: UserText.permissionAlwaysAskDeviceFormat, permission.localizedDescription, domain)
         let item = NSMenuItem(title: title,
                               action: #selector(PermissionContextMenu.alwaysAskPermission),
                               keyEquivalent: "")
@@ -337,7 +337,7 @@ private extension NSMenuItem {
     }
 
     static func alwaysDeny(_ permission: PermissionType, on domain: String, target: PermissionContextMenu) -> NSMenuItem {
-        let title = String(format: UserText.permissionAlwaysDenyDeviceFormat, permission.localizedDescription.localizedLowercase, domain)
+        let title = String(format: UserText.permissionAlwaysDenyDeviceFormat, permission.localizedDescription, domain)
         let item = NSMenuItem(title: title,
                               action: #selector(PermissionContextMenu.alwaysDenyPermission),
                               keyEquivalent: "")
