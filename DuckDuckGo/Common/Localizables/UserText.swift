@@ -180,14 +180,14 @@ struct UserText {
                                                                              comment: "Popover asking for domain %@ to open Popup Window")
     static let permissionMicrophone = NSLocalizedString("permission.microphone", value: "Microphone", comment: "Microphone input media device name")
     static let permissionCamera = NSLocalizedString("permission.camera", value: "Camera", comment: "Camera input media device name")
-    static let permissionCameraAndMicrophone = NSLocalizedString("permission.cameraAndmicrophone", value: "use your camera and microphone", comment: "camera and microphone input media devices name")
+    static let permissionCameraAndMicrophone = NSLocalizedString("permission.cameraAndmicrophone", value: "use your Camera and Microphone", comment: "camera and microphone input media devices name")
     static let permissionGeolocation = NSLocalizedString("permission.geolocation", value: "Geolocation", comment: "User's Geolocation permission access name")
     static let permissionPopups = NSLocalizedString("permission.popups", value: "Pop-ups", comment: "Open Pop Up Windows permission access name")
 
     static let permissionMuteFormat = NSLocalizedString("permission.mute", value: "Pause %@", comment: "Temporarily pause input media device %@ access")
     static let permissionUnmuteFormat = NSLocalizedString("permission.unmute", value: "Resume %@", comment: "Resume input media device %@ access")
     static let permissionRevokeFormat = NSLocalizedString("permission.revoke", value: "Stop %@ Access", comment: "Revoke input media device %@ access")
-    static let permissionReloadToEnable = NSLocalizedString("permission.reloadPage", value: "Reload to ask again", comment: "Reload webpage to ask for input media device access permission again")
+    static let permissionReloadToEnable = NSLocalizedString("permission.reloadPage", value: "Reload to Ask Again", comment: "Reload webpage to ask for input media device access permission again")
 
     static let permissionAlwaysAllowFormat = NSLocalizedString("permission.always.allow", value: "Always Allow on “%@“", comment: "Make input media device access permanently allowed for current domain")
     static let permissionAlwaysAskFormat = NSLocalizedString("permission.always.ask", value: "Always Ask on “%@“", comment: "Make input media device access always asked from user for current domain")
@@ -196,7 +196,7 @@ struct UserText {
     static let permissionAlwaysAllowDeviceFormat = NSLocalizedString("permission.always.allow", value: "Always Allow %@ on “%@“", comment: "Make input media device access permanently allowed for current domain")
     static let permissionAlwaysAllowPopupsFormat = NSLocalizedString("permission.always.allow.popups", value: "Always Allow on “%@“", comment: "Make popups permanently allowed for current domain")
     static let permissionAlwaysAskDeviceFormat = NSLocalizedString("permission.always.ask", value: "Always Ask for %@ on “%@“", comment: "Make input media device access always asked from user for current domain")
-    static let permissionAlwaysDenyDeviceFormat = NSLocalizedString("permission.always.deny.device", value: "Never ask for %@ again for “%@“", comment: "Make input media device access permanently allowed for current domain")
+    static let permissionAlwaysDenyDeviceFormat = NSLocalizedString("permission.always.deny.device", value: "Never Ask for %@ again for “%@“", comment: "Make input media device access permanently allowed for current domain")
 
     static let permissionAppPermissionDisabledFormat = NSLocalizedString("permission.disabled.app", value: "%@ %@ access is disabled", comment: "The app (%@) has no access permission to %@ media device")
     static let permissionGeolocationServicesDisabled = NSLocalizedString("permission.disabled.system", value: "System Geolocation Services are disabled", comment: "Geolocation Services are disabled in System Preferences")
