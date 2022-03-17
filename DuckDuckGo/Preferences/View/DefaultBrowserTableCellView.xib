@@ -14,8 +14,8 @@
             <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
             <subviews>
                 <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="W0Z-t7-7IU">
-                    <rect key="frame" x="-2" y="70" width="195" height="21"/>
-                    <textFieldCell key="cell" lineBreakMode="clipping" title="Set as Default Browser" id="huk-b6-6M3">
+                    <rect key="frame" x="-2" y="70" width="139" height="21"/>
+                    <textFieldCell key="cell" lineBreakMode="clipping" title="Default Browser" id="huk-b6-6M3">
                         <font key="font" metaFont="systemSemibold" size="18"/>
                         <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
                         <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
