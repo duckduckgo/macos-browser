@@ -23,6 +23,7 @@ import Combine
 protocol BookmarkManager: AnyObject {
 
     func isUrlBookmarked(url: URL) -> Bool
+    func isUrlFavorited(url: URL) -> Bool
     func isHostInBookmarks(host: String) -> Bool
     func getBookmark(for url: URL) -> Bookmark?
     @discardableResult func makeBookmark(for url: URL, title: String, isFavorite: Bool) -> Bookmark?
@@ -81,6 +82,10 @@ final class LocalBookmarkManager: BookmarkManager {
 
     func isUrlBookmarked(url: URL) -> Bool {
         return list?[url] != nil
+    }
+
+    func isUrlFavorited(url: URL) -> Bool {
+        return list?[url]?.isFavorite == true
     }
 
     func isHostInBookmarks(host: String) -> Bool {

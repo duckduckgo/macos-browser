@@ -80,14 +80,14 @@ extension WindowControllersManager {
 
             if tabCollection.tabs.count == 1,
                let firstTab = tabCollection.tabs.first,
-               case .homepage = firstTab.content,
+               case .homePage = firstTab.content,
                !newTab {
-                firstTab.setContent(url.map { .url($0) } ?? .homepage)
+                firstTab.setContent(url.map { .url($0) } ?? .homePage)
             } else if let tab = tabCollectionViewModel.selectedTabViewModel?.tab, !newTab {
-                tab.setContent(url.map { .url($0) } ?? .homepage)
+                tab.setContent(url.map { .url($0) } ?? .homePage)
             } else {
-                let newTab = Tab(content: url.map { .url($0) } ?? .homepage)
-                newTab.setContent(url.map { .url($0) } ?? .homepage)
+                let newTab = Tab(content: url.map { .url($0) } ?? .homePage)
+                newTab.setContent(url.map { .url($0) } ?? .homePage)
                 tabCollectionViewModel.append(tab: newTab)
             }
         }

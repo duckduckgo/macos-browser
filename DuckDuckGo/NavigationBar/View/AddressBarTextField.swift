@@ -59,13 +59,12 @@ final class AddressBarTextField: NSTextField {
         suggestionWindowController?.window?.isVisible == true
     }
 
-    @IBInspectable var isHomepageAddressBar: Bool = false
-
     private var suggestionResultCancellable: AnyCancellable?
     private var selectedSuggestionViewModelCancellable: AnyCancellable?
     private var selectedTabViewModelCancellable: AnyCancellable?
     private var searchSuggestionsCancellable: AnyCancellable?
     private var addressBarStringCancellable: AnyCancellable?
+    private var contentTypeCancellable: AnyCancellable?
 
     override func awakeFromNib() {
         super.awakeFromNib()
@@ -115,6 +114,14 @@ final class AddressBarTextField: NSTextField {
         selectedTabViewModelCancellable = tabCollectionViewModel.$selectedTabViewModel.receive(on: DispatchQueue.main).sink { [weak self] _ in
             self?.restoreValueIfPossible()
             self?.subscribeToAddressBarString()
+            self?.subscribeToContentType()
+        }
+    }
+
+    private func subscribeToContentType() {
+        contentTypeCancellable = tabCollectionViewModel.selectedTabViewModel?
+            .tab.$content .receive(on: DispatchQueue.main).sink { [weak self] contentType in
+            self?.font = .systemFont(ofSize: contentType == .homePage ? 15 : 13)
         }
     }
 
@@ -131,11 +138,6 @@ final class AddressBarTextField: NSTextField {
     }
 
     private func updateValue() {
-        guard !isHomepageAddressBar else {
-            value = .text("")
-            return
-        }
-
         guard let selectedTabViewModel = tabCollectionViewModel.selectedTabViewModel else {
             return
         }
@@ -150,11 +152,7 @@ final class AddressBarTextField: NSTextField {
             return
         }
 
-        if isHomepageAddressBar {
-            selectedTabViewModel.lastHomepageTextFieldValue = value
-        } else {
-            selectedTabViewModel.lastAddressBarTextFieldValue = value
-        }
+        selectedTabViewModel.lastAddressBarTextFieldValue = value
     }
 
     private func restoreValueIfPossible() {
@@ -167,12 +165,7 @@ final class AddressBarTextField: NSTextField {
             return
         }
 
-        let lastAddressBarTextFieldValue: AddressBarTextField.Value?
-        if isHomepageAddressBar {
-            lastAddressBarTextFieldValue = selectedTabViewModel.lastHomepageTextFieldValue
-        } else {
-            lastAddressBarTextFieldValue = selectedTabViewModel.lastAddressBarTextFieldValue
-        }
+        let lastAddressBarTextFieldValue = selectedTabViewModel.lastAddressBarTextFieldValue
 
         switch lastAddressBarTextFieldValue {
         case .text(let text):
@@ -284,7 +277,7 @@ final class AddressBarTextField: NSTextField {
             selectedTabViewModel.reload()
         } else {
 
-            Pixel.fire(.navigation(kind: .init(url: url), source: isHomepageAddressBar ? .newTab : (suggestion != nil ? .suggestion : .addressBar)))
+            Pixel.fire(.navigation(kind: .init(url: url), source: suggestion != nil ? .suggestion : .addressBar))
             selectedTabViewModel.tab.update(url: url)
         }
 
@@ -314,7 +307,7 @@ final class AddressBarTextField: NSTextField {
             return
         }
 
-        Pixel.fire(.navigation(kind: .init(url: url), source: isHomepageAddressBar ? .newTab : (suggestion != nil ? .suggestion : .addressBar)))
+        Pixel.fire(.navigation(kind: .init(url: url), source: suggestion != nil ? .suggestion : .addressBar))
         let tab = Tab(content: .url(url), shouldLoadInBackground: true)
         tabCollectionViewModel.append(tab: tab, selected: selected)
     }
@@ -427,8 +420,8 @@ final class AddressBarTextField: NSTextField {
             suffix = Suffix(value: value)
 
             if let suffix = suffix {
-                let attributedString = NSMutableAttributedString(string: value.string, attributes: Self.textAttributes)
-                attributedString.append(suffix.attributedString)
+                let attributedString = NSMutableAttributedString(string: value.string, attributes: makeTextAttributes())
+                attributedString.append(suffix.toAttributedString(size: isHomePage ? 15 : 13))
                 attributedStringValue = attributedString
             } else {
                 self.stringValue = value.string
@@ -440,11 +433,18 @@ final class AddressBarTextField: NSTextField {
 
     // MARK: - Suffixes
 
-    static let textAttributes: [NSAttributedString.Key: Any] = [
-        .font: NSFont.systemFont(ofSize: 13, weight: .regular),
-        .foregroundColor: NSColor.textColor,
-        .kern: -0.16
-    ]
+    var isHomePage: Bool {
+        tabCollectionViewModel.selectedTabViewModel?.tab.content == .homePage
+    }
+
+    func makeTextAttributes() -> [NSAttributedString.Key: Any] {
+        let size: CGFloat = isHomePage ? 15 : 13
+        return [
+           .font: NSFont.systemFont(ofSize: size, weight: .regular),
+           .foregroundColor: NSColor.textColor,
+           .kern: -0.16
+       ]
+    }
 
     enum Suffix {
         init?(value: Value) {
@@ -498,11 +498,10 @@ final class AddressBarTextField: NSTextField {
         case url(URL)
         case title(String)
 
-        static let suffixAttributes = [NSAttributedString.Key.font: NSFont.systemFont(ofSize: 13, weight: .light),
-                                       .foregroundColor: NSColor.addressBarSuffixColor]
-
-        var attributedString: NSAttributedString {
-            NSAttributedString(string: string, attributes: Self.suffixAttributes)
+        func toAttributedString(size: CGFloat) -> NSAttributedString {
+            let attrs = [NSAttributedString.Key.font: NSFont.systemFont(ofSize: size, weight: .light),
+                         .foregroundColor: NSColor.addressBarSuffixColor]
+            return NSAttributedString(string: string, attributes: attrs)
         }
 
         static let searchSuffix = " – \(UserText.searchDuckDuckGoSuffix)"
@@ -519,9 +518,9 @@ final class AddressBarTextField: NSTextField {
                     return Self.searchSuffix
                 } else {
                     return " – " + url.toString(decodePunycode: false,
-                                                  dropScheme: true,
-                                                  needsWWW: false,
-                                                  dropTrailingSlash: false)
+                                                dropScheme: true,
+                                                needsWWW: false,
+                                                dropTrailingSlash: false)
                 }
             case .title(let title):
                 return " – " + title
@@ -697,7 +696,7 @@ extension AddressBarTextField: NSTextFieldDelegate {
            let editor = currentEditor(),
            editor.selectedRange.location == stringValueWithoutSuffix.utf16.count {
 
-            self.value = .suggestion(SuggestionViewModel(suggestion: suggestion.suggestion,
+            self.value = .suggestion(SuggestionViewModel(isHomePage: isHomePage, suggestion: suggestion.suggestion,
                                                          userStringValue: stringValueWithoutSuffix))
             self.selectToTheEnd(from: stringValueWithoutSuffix.count)
 
@@ -799,6 +798,10 @@ extension AddressBarTextField: SuggestionViewControllerDelegate {
 extension AddressBarTextField: NSTextViewDelegate {
 
     func textView(_ textView: NSTextView, willChangeSelectionFromCharacterRange _: NSRange, toCharacterRange range: NSRange) -> NSRange {
+        DispatchQueue.main.async {
+            // artifacts can appear when the selection changes, especially if the size of the field has changed, this clears them
+            textView.needsDisplay = true
+        }
         return self.filterSuffix(fromSelectionRange: range, for: textView.string)
     }
 

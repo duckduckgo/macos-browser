@@ -23,10 +23,12 @@ import BrowserServicesKit
 
 final class SuggestionContainerViewModel {
 
+    var isHomePage: Bool
     let suggestionContainer: SuggestionContainer
     private var suggestionResultCancellable: AnyCancellable?
 
-    init(suggestionContainer: SuggestionContainer) {
+    init(isHomePage: Bool, suggestionContainer: SuggestionContainer) {
+        self.isHomePage = isHomePage
         self.suggestionContainer = suggestionContainer
         subscribeToSuggestionResult()
     }
@@ -105,7 +107,7 @@ final class SuggestionContainerViewModel {
             return nil
         }
 
-        return SuggestionViewModel(suggestion: items[index], userStringValue: userStringValue ?? "")
+        return SuggestionViewModel(isHomePage: isHomePage, suggestion: items[index], userStringValue: userStringValue ?? "")
     }
 
     func select(at index: Int) {

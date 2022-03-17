@@ -91,8 +91,9 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
     func applicationDidFinishLaunching(_ notification: Notification) {
         guard !Self.isRunningTests else { return }
 
-        // IMPORTANT: This call needs to run before ATB is initialized, as it is used to determine whether this is an existing install being migrated.
+#if DEBUG || REVIEW
         Waitlist.unlockExistingInstallIfNecessary()
+#endif
 
         PrivacyFeatures.httpsUpgrade.loadDataAsync()
         LocalBookmarkManager.shared.loadBookmarks()

@@ -68,7 +68,7 @@ struct BookmarkViewModel {
         NSColor.bookmarkRepresentingColor5
     ]
 
-    // Representing color is a color shown as a background of homepage item when
+    // Representing color is a color shown as a background of home page item when
     // the bookmark has no favicon
     var representingColor: NSColor {
         guard let bookmark = entity as? Bookmark else {
