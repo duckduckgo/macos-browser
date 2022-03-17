@@ -513,19 +513,19 @@ final class NavigationBarViewController: NSViewController {
         let loginsPreferences = LoginsPreferences()
         
         if loginsPreferences.askToSaveUsernamesAndPasswords, let credentials = data.credentials {
-            os_log("Presenting Save Credentials popover", log: .passwordManager, type: .info)
+            os_log("Presenting Save Credentials popover", log: .passwordManager)
             showSaveCredentialsPopover()
             saveCredentialsPopover.viewController.saveCredentials(credentials)
         } else if loginsPreferences.askToSavePaymentMethods, let card = data.creditCard {
-            os_log("Presenting Save Payment Method popover", log: .passwordManager, type: .info)
+            os_log("Presenting Save Payment Method popover", log: .passwordManager)
             showSavePaymentMethodPopover()
             savePaymentMethodPopover.viewController.savePaymentMethod(card)
         } else if loginsPreferences.askToSaveAddresses, let identity = data.identity {
-            os_log("Presenting Save Identity popover", log: .passwordManager, type: .info)
+            os_log("Presenting Save Identity popover", log: .passwordManager)
             showSaveIdentityPopover()
             saveIdentityPopover.viewController.saveIdentity(identity)
         } else {
-            os_log("Received save autofill data call, but there was no data to present", log: .passwordManager, type: .info)
+            os_log("Received save autofill data call, but there was no data to present", log: .passwordManager)
         }
     }
 
