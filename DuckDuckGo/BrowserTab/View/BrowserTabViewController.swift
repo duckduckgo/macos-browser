@@ -28,7 +28,6 @@ protocol BrowserTabViewControllerClickDelegate: AnyObject {
 }
 
 // swiftlint:disable file_length
-// swiftlint:disable type_body_length
 
 final class BrowserTabViewController: NSViewController {
 
@@ -1006,5 +1005,4 @@ extension BrowserTabViewController {
 
 }
 
-// swiftlint:enable type_body_length
 // swiftlint:enable file_length
