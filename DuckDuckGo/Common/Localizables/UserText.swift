@@ -419,10 +419,11 @@ struct UserText {
     static let homePageProtectionSummaryInfo = NSLocalizedString("home.page.protection.summary.info", value: "No recent activity", comment: "")
     static func homePageProtectionSummaryMessage(numberOfTrackersBlocked: Int) -> String {
         let localized = NSLocalizedString("home.page.protection.summary.info",
-                                          value: "%@ tracking attempts blocked in past 7 days",
+                                          value: "%@ tracking attempts blocked",
                                           comment: "")
         return String(format: localized, NumberFormatter.localizedString(from: NSNumber(value: numberOfTrackersBlocked), number: .decimal))
     }
+    static let homePageProtectionDurationInfo = NSLocalizedString("home.page.protection.duration", value: "PAST 7 DAYS", comment: "Past 7 days in uppercase.")
 
     static let homePageEmptyStateItemTitle = NSLocalizedString("home.page.empty.state.item.title", value: "Recently visited sites appear here", comment: "")
     static let homePageEmptyStateItemMessage = NSLocalizedString("home.page.empty.state.item.message", value: "Keep browsing to see how many trackers were blocked", comment: "")
