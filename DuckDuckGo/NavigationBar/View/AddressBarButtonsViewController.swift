@@ -415,14 +415,17 @@ final class AddressBarButtonsViewController: NSViewController {
     }
 
     private var animationViewCache = [String: AnimationView]()
-    private func getAnimationView(for animationName: String) -> AnimationView {
+    private func getAnimationView(for animationName: String) -> AnimationView? {
         if let animationView = animationViewCache[animationName] {
             return animationView
         }
 
-        let animation = Animation.named(animationName, animationCache: LottieAnimationCache.shared)
-        let animationView = AnimationView(animation: animation, imageProvider: trackerAnimationImageProvider)
-        animationView.identifier = NSUserInterfaceItemIdentifier(rawValue: animationName)
+        guard let animationView = AnimationView(named: animationName,
+                                                imageProvider: trackerAnimationImageProvider) else {
+            assertionFailure("Missing animation file")
+            return nil
+        }
+
         animationViewCache[animationName] = animationView
         return animationView
     }
@@ -440,7 +443,7 @@ final class AddressBarButtonsViewController: NSViewController {
                 newAnimationView = AnimationView()
             } else {
                 // For unknown reason, this caused infinite execution of various unit tests.
-                newAnimationView = getAnimationView(for: animationName)
+                newAnimationView = getAnimationView(for: animationName) ?? AnimationView()
             }
             animationWrapperView.addAndLayout(newAnimationView)
             newAnimationView.isHidden = true

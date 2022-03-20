@@ -1,0 +1,134 @@
+//
+//  MouseOverAnimationButton.swift
+//
+//  Copyright © 2022 DuckDuckGo. All rights reserved.
+//
+//  Licensed under the Apache License, Version 2.0 (the "License");
+//  you may not use this file except in compliance with the License.
+//  You may obtain a copy of the License at
+//
+//  http://www.apache.org/licenses/LICENSE-2.0
+//
+//  Unless required by applicable law or agreed to in writing, software
+//  distributed under the License is distributed on an "AS IS" BASIS,
+//  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+//  See the License for the specific language governing permissions and
+//  limitations under the License.
+//
+
+import Foundation
+import Lottie
+import Combine
+
+final class MouseOverAnimationButton: MouseOverButton {
+
+    // MARK: - Mouse Over Events
+
+    override func awakeFromNib() {
+        super.awakeFromNib()
+
+        subscribeToIsMouseOver()
+    }
+
+    private var isMouseOverCancellable: AnyCancellable?
+
+    private func subscribeToIsMouseOver() {
+        isMouseOverCancellable = $isMouseOver
+            .dropFirst()
+            .sink { [weak self] isMouseOver in
+                if isMouseOver {
+                    self?.animate()
+                } else {
+                    self?.stopAnimation()
+                }
+            }
+    }
+
+    // MARK: - Loading & Updating of Animation Views
+
+    struct AnimationNames {
+        let aqua: String
+        let dark: String
+    }
+
+    var animationNames: AnimationNames? {
+        didSet {
+            loadAnimationViews()
+            updateAnimationView()
+        }
+    }
+
+    struct AnimationViews {
+        let aqua: AnimationView
+        let dark: AnimationView
+    }
+
+    private var animationViewCache: AnimationViews?
+
+    private func loadAnimationViews() {
+        guard let animationNames = animationNames,
+              let aquaAnimationView = AnimationView(named: animationNames.aqua),
+              let darkAnimationView = AnimationView(named: animationNames.dark) else {
+            assertionFailure("Missing animation names or animation files in the bundle")
+            return
+        }
+
+        animationViewCache = AnimationViews(
+            aqua: aquaAnimationView,
+            dark: darkAnimationView)
+    }
+
+    private var currentAnimationView: AnimationView?
+
+    private func updateAnimationView() {
+        guard let animationViewCache = animationViewCache else {
+            assertionFailure("No animations loaded")
+            return
+        }
+
+        let isAquaMode = NSApp.effectiveAppearance.name == NSAppearance.Name.aqua
+        let newAnimationView: AnimationView
+        // Animation view causes problems in tests
+        if AppDelegate.isRunningTests {
+            newAnimationView = AnimationView()
+        } else {
+            newAnimationView = isAquaMode ? animationViewCache.aqua : animationViewCache.dark
+        }
+
+        guard currentAnimationView?.identifier != newAnimationView.identifier else {
+            // No need to update
+            return
+        }
+
+        currentAnimationView?.removeFromSuperview()
+        currentAnimationView = newAnimationView
+
+        addAndLayout(newAnimationView)
+    }
+
+    // MARK: - Animating
+
+    private var imageCache: NSImage?
+
+    private func hideImage() {
+        imageCache = image
+        image = nil
+    }
+
+    private func showImage() {
+        if let imageCache = imageCache {
+            image = imageCache
+        }
+    }
+
+    private func animate() {
+        hideImage()
+        currentAnimationView?.play()
+    }
+
+    private func stopAnimation() {
+        currentAnimationView?.stop()
+        showImage()
+    }
+
+}
