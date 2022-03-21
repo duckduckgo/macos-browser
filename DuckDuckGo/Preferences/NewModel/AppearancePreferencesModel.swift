@@ -61,14 +61,14 @@ final class AppearancePreferencesModel: ObservableObject {
     
     @Published var currentThemeName: ThemeName = .systemDefault {
         didSet {
-            currentThemeNameRawValue = currentThemeName.rawValue
+            currentThemeNameDefaultsValue = currentThemeName.rawValue
             updateUserInterfaceStyle()
         }
     }
 
     @Published var showFullURL: Bool = false {
         didSet {
-            showFullURLRawValue = showFullURL
+            showFullURLDefaultsValue = showFullURL
         }
     }
 
@@ -77,12 +77,12 @@ final class AppearancePreferencesModel: ObservableObject {
     }
 
     @UserDefaultsWrapper(key: .showFullURL, defaultValue: false)
-    private var showFullURLRawValue: Bool
+    private var showFullURLDefaultsValue: Bool
     @UserDefaultsWrapper(key: .currentThemeName, defaultValue: ThemeName.systemDefault.rawValue)
-    private var currentThemeNameRawValue: String
+    private var currentThemeNameDefaultsValue: String
 
     init() {
-        currentThemeName = .init(rawValue: currentThemeNameRawValue) ?? .systemDefault
-        showFullURL = showFullURLRawValue
+        currentThemeName = .init(rawValue: currentThemeNameDefaultsValue) ?? .systemDefault
+        showFullURL = showFullURLDefaultsValue
     }
 }
