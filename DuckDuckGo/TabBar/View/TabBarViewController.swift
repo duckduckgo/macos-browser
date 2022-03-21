@@ -107,7 +107,7 @@ final class TabBarViewController: NSViewController {
     }
 
     private func setupFireButton() {
-        fireButton.animationNames = MouseOverAnimationButton.AnimationNames(aqua: "flame", dark: "dark-flame")
+        fireButton.animationNames = MouseOverAnimationButton.AnimationNames(aqua: "flame-mouse-over", dark: "dark-flame-mouse-over")
     }
 
     private func reloadSelection() {

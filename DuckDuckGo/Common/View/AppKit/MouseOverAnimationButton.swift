@@ -20,7 +20,7 @@ import Foundation
 import Lottie
 import Combine
 
-final class MouseOverAnimationButton: MouseOverButton {
+final class MouseOverAnimationButton: AddressBarButton {
 
     // MARK: - Events
 
@@ -58,15 +58,17 @@ final class MouseOverAnimationButton: MouseOverButton {
 
     // MARK: - Loading & Updating of Animation Views
 
-    struct AnimationNames {
+    struct AnimationNames: Equatable {
         let aqua: String
         let dark: String
     }
 
     var animationNames: AnimationNames? {
         didSet {
-            loadAnimationViews()
-            updateAnimationView()
+            if oldValue != animationNames {
+                loadAnimationViews()
+                updateAnimationView()
+            }
         }
     }
 
@@ -121,11 +123,27 @@ final class MouseOverAnimationButton: MouseOverButton {
 
     // MARK: - Animating
 
-    private var imageCache: NSImage?
+    @Published var isAnimationViewVisible = false
+
+    override var image: NSImage? {
+        get {
+            return super.image
+        }
+
+        set {
+            if isAnimationViewVisible {
+                imageCache = newValue
+            } else {
+                super.image = newValue
+            }
+        }
+    }
+
+    var imageCache: NSImage?
 
     private func hideImage() {
         imageCache = image
-        image = nil
+        super.image = nil
     }
 
     private func showImage() {
@@ -138,10 +156,12 @@ final class MouseOverAnimationButton: MouseOverButton {
 
     private func hideAnimation() {
         currentAnimationView?.isHidden = true
+        isAnimationViewVisible = false
     }
 
     private func showAnimation() {
         currentAnimationView?.isHidden = false
+        isAnimationViewVisible = true
     }
 
     private func animate() {

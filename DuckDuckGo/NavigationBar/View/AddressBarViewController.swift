@@ -19,6 +19,7 @@
 import Cocoa
 import os.log
 import Combine
+import Lottie
 
 // swiftlint:disable type_body_length
 final class AddressBarViewController: NSViewController {
@@ -375,7 +376,7 @@ extension AddressBarViewController {
         let point = self.view.convert(event.locationInWindow, from: nil)
         let view = self.view.hitTest(point)
 
-        if view is NSButton {
+        if view is NSButton || view is AnimationView {
             NSCursor.arrow.set()
         } else {
             NSCursor.iBeam.set()
@@ -417,7 +418,7 @@ extension AddressBarViewController {
 
         if let point = self.view.mouseLocationInsideBounds(event.locationInWindow) {
             guard self.view.window?.firstResponder !== addressBarTextField.currentEditor(),
-                !(self.view.hitTest(point) is NSButton)
+                  !(self.view.hitTest(point) is NSButton || self.view.hitTest(point) is AnimationView)
             else { return event }
 
             // bookmark button visibility is usually determined by hover state, but we def need to hide it right now
