@@ -34,7 +34,9 @@ extension Preferences {
                         .font(Const.Fonts.preferencePaneSectionHeader)
 
                     Toggle(UserText.fireproofCheckboxTitle, isOn: $model.isLoginDetectionEnabled)
+                        .fixMultilineScrollableText()
                     Text(UserText.fireproofExplanation)
+                        .fixMultilineScrollableText()
                     Button(UserText.manageFireproofSites) {
                         model.presentManageFireproofSitesDialog()
                     }
@@ -46,7 +48,10 @@ extension Preferences {
                         .font(Const.Fonts.preferencePaneSectionHeader)
 
                     Toggle(UserText.autoconsentCheckboxTitle, isOn: $model.isAutoconsentEnabled)
+                        .fixMultilineScrollableText()
+
                     Text(UserText.autoconsentExplanation)
+                        .fixMultilineScrollableText()
                 }
                 .padding(.bottom, 42)
 
@@ -58,6 +63,8 @@ extension Preferences {
 
                     VStack(alignment: .leading, spacing: 0) {
                         Text(UserText.gpcExplanation)
+                            .fixMultilineScrollableText()
+
                         Button {
                             model.openURL(.gpcLearnMore)
                         } label: {
