@@ -21,7 +21,7 @@ import Lottie
 
 extension AnimationView {
 
-    convenience init?(named animationName: String, imageProvider:AnimationImageProvider? = nil) {
+    convenience init?(named animationName: String, imageProvider: AnimationImageProvider? = nil) {
         guard let animation = Animation.named(animationName, animationCache: LottieAnimationCache.shared) else {
             return nil
         }

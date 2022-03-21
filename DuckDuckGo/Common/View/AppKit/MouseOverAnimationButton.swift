@@ -22,12 +22,13 @@ import Combine
 
 final class MouseOverAnimationButton: MouseOverButton {
 
-    // MARK: - Mouse Over Events
+    // MARK: - Events
 
     override func awakeFromNib() {
         super.awakeFromNib()
 
         subscribeToIsMouseOver()
+        subscribeToEffectiveAppearance()
     }
 
     private var isMouseOverCancellable: AnyCancellable?
@@ -41,6 +42,17 @@ final class MouseOverAnimationButton: MouseOverButton {
                 } else {
                     self?.stopAnimation()
                 }
+            }
+    }
+
+    private var effectiveAppearanceCancellable: AnyCancellable?
+
+    private func subscribeToEffectiveAppearance() {
+        effectiveAppearanceCancellable = NSApp.publisher(for: \.effectiveAppearance)
+            .dropFirst()
+            .receive(on: DispatchQueue.main)
+            .sink { [weak self] _ in
+                self?.updateAnimationView()
             }
     }
 
@@ -103,6 +115,7 @@ final class MouseOverAnimationButton: MouseOverButton {
         currentAnimationView?.removeFromSuperview()
         currentAnimationView = newAnimationView
 
+        newAnimationView.isHidden = true
         addAndLayout(newAnimationView)
     }
 
@@ -117,18 +130,30 @@ final class MouseOverAnimationButton: MouseOverButton {
 
     private func showImage() {
         if let imageCache = imageCache {
-            image = imageCache
+            NSAppearance.withAppAppearance {
+                image = imageCache
+            }
         }
+    }
+
+    private func hideAnimation() {
+        currentAnimationView?.isHidden = true
+    }
+
+    private func showAnimation() {
+        currentAnimationView?.isHidden = false
     }
 
     private func animate() {
         hideImage()
+        showAnimation()
         currentAnimationView?.play()
     }
 
     private func stopAnimation() {
-        currentAnimationView?.stop()
+        hideAnimation()
         showImage()
+        currentAnimationView?.stop()
     }
 
 }
