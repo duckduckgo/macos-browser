@@ -37,6 +37,8 @@ extension Preferences {
                             DefaultBrowserView(model: DefaultBrowserPreferencesModel())
                         case .appearance:
                             AppearanceView(model: AppearancePreferencesModel())
+                        case .privacyAndSecurity:
+                            PrivacyView(model: PrivacyPreferencesModel())
                         case .about:
                             AboutView(model: .init())
                         }

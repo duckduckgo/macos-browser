@@ -65,6 +65,7 @@ enum PreferencesSectionIdentifier: Hashable, CaseIterable {
 enum PreferencePaneIdentifier: Hashable, Identifiable {
     case defaultBrowser
     case appearance
+    case privacyAndSecurity
     case about
     
     var id: Self {
@@ -77,6 +78,8 @@ enum PreferencePaneIdentifier: Hashable, Identifiable {
             return UserText.defaultBrowser
         case .appearance:
             return UserText.appearance
+        case .privacyAndSecurity:
+            return UserText.privacy
         case .about:
             return "About"
         }
@@ -88,6 +91,8 @@ enum PreferencePaneIdentifier: Hashable, Identifiable {
             return "DefaultBrowser"
         case .appearance:
             return "Appearance"
+        case .privacyAndSecurity:
+            return "Privacy"
         case .about:
             return "About"
         }
@@ -101,7 +106,7 @@ struct PreferencesSection: Hashable, Identifiable {
     static let defaultSections: [PreferencesSection] = [
         .init(
             id: .regularPreferencePanes,
-            panes: [.defaultBrowser, .appearance]
+            panes: [.defaultBrowser, .appearance, .privacyAndSecurity]
         ),
         .init(
             id: .about,

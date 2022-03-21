@@ -67,7 +67,9 @@ extension Preferences {
         
         private func isThemeSelected(_ theme: ThemeName) -> Binding<Bool> {
             .init(
-                get: { model.currentThemeName == theme },
+                get: {
+                    model.currentThemeName == theme
+                },
                 set: { isSelected in
                     if isSelected {
                         model.currentThemeName = theme

@@ -92,6 +92,10 @@ struct UserText {
     static let shareMenuItem = NSLocalizedString("share.menu.item", value: "Share", comment: "Menu item title")
     static let printMenuItem = NSLocalizedString("print.menu.item", value: "Print…", comment: "Menu item title")
     static let newWindowMenuItem = NSLocalizedString("new.window.menu.item", value: "New Window", comment: "Menu item title")
+    
+    static let fireproofCheckboxTitle = NSLocalizedString("fireproof.checkbox.title", value: "Ask to Fireproof websites when signing in", comment: "Fireproof settings checkbox title")
+    static let fireproofExplanation = NSLocalizedString("fireproof.explanation", value: "Websites rely on cookies to keep you signed in. When you Fireproof a site, cookies won’t be erased and you'll stay signed in, even after using the Fire Button. We still block third-party trackers found on Fireproof websites.", comment: "Fireproofing mechanism explanation")
+    static let manageFireproofSites = NSLocalizedString("fireproof.manage-sites", value: "Manage Fireproof Sites...", comment: "Fireproof settings button caption")
 
     static let fireDialogFireproofSites = NSLocalizedString("fire.dialog.fireproof.sites", value: "Fireproof Sites", comment: "Category of domains in fire button dialog")
     static let fireDialogClearSites = NSLocalizedString("fire.dialog.clear.sites", value: "Clear data for the following sites", comment: "Category of domains in fire button dialog")
@@ -122,7 +126,14 @@ struct UserText {
     static let fireproofConfirmationMessage = NSLocalizedString("fireproof.confirmation.message",
                                                                 value: "Fireproofing this site will keep you signed in after using the Fire Button.",
                                                                 comment: "Fireproof confirmation message")
-    
+
+    static let autoconsentSettingsTitle = NSLocalizedString("autoconsent.title", value: "Cookie Consent Pop-ups", comment: "Autoconsent settings section title")
+    static let autoconsentCheckboxTitle = NSLocalizedString("autoconsent.checkbox.title", value: "Let DuckDuckGo manage cookie consent pop-ups", comment: "Autoconsent settings checkbox title")
+    static let autoconsentExplanation = NSLocalizedString("autoconsent.explanation", value: "When DuckDuckGo detects cookie consent pop-ups on sites you visit, we'll automatically set your cookie preferences to minimize cookies and maximize privacy, then close the pop-ups.", comment: "Autoconsent feature explanation in settings")
+
+    static let gpcSettingsTitle = NSLocalizedString("gpc.title", value: "Global Privacy Control (GPC)", comment: "GPC settings title")
+    static let gpcCheckboxTitle = NSLocalizedString("gpc.checkbox.title", value: "Enable Global Privacy Control", comment: "GPC settings checkbox title")
+    static let gpcExplanation = NSLocalizedString("gpc.explanation", value: "DuckDuckGo automatically blocks many trackers. With Global Privacy Control (GPC), you can also ask participating websites to restrict selling or sharing your personal data with other companies.", comment: "GPC explanation in settings")
     static let gpcLearnMore = NSLocalizedString("gpc.learnmore.link", value: "Learn More", comment: "Learn More link")
 
     static let passwordManagement = NSLocalizedString("passsword.management", value: "Logins+", comment: "Used as title for password management user interface")
@@ -201,6 +212,7 @@ struct UserText {
 
     static let defaultBrowser = NSLocalizedString("preferences.default-browser", value: "Default Browser", comment: "Show default browser preferences")
     static let appearance = NSLocalizedString("preferences.appearance", value: "Appearance", comment: "Show appearance preferences")
+    static let privacy = NSLocalizedString("preferences.privacy", value: "Privacy", comment: "Show privacy browser preferences")
     static let privacyAndSecurity = NSLocalizedString("preferences.privacy-and-security", value: "Privacy & Security", comment: "Show privacy and security browser preferences")
     static let downloads = NSLocalizedString("preferences.downloads", value: "Downloads", comment: "Show downloads browser preferences")
     static let isDefaultBrowser = NSLocalizedString("preferences.default-browser.active", value: "DuckDuckGo is your default browser", comment: "Indicate that the browser is the default")

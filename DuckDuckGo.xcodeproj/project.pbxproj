@@ -28,6 +28,8 @@
 		37AFCE8E27DB6AC200471A10 /* DefaultBrowserPreferencesModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37AFCE8D27DB6AC200471A10 /* DefaultBrowserPreferencesModel.swift */; };
 		37AFCE9027DB70E500471A10 /* PreferencesModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37AFCE8F27DB70E500471A10 /* PreferencesModel.swift */; };
 		37AFCE9227DB8CAD00471A10 /* PreferencesAboutView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37AFCE9127DB8CAD00471A10 /* PreferencesAboutView.swift */; };
+		37CC53EC27E8A4D10028713D /* PreferencesPrivacyView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37CC53EB27E8A4D10028713D /* PreferencesPrivacyView.swift */; };
+		37CC53EE27E8AA3A0028713D /* PrivacyPreferencesModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37CC53ED27E8AA3A0028713D /* PrivacyPreferencesModel.swift */; };
 		37D2771527E870D4003365FD /* PreferencesAppearanceView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37D2771427E870D4003365FD /* PreferencesAppearanceView.swift */; };
 		37D2771727E874D1003365FD /* AppearancePreferencesModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37D2771627E874D1003365FD /* AppearancePreferencesModel.swift */; };
 		4B0135CE2729F1AA00D54834 /* NSPasteboardExtension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B0135CD2729F1AA00D54834 /* NSPasteboardExtension.swift */; };
@@ -776,6 +778,8 @@
 		37AFCE8D27DB6AC200471A10 /* DefaultBrowserPreferencesModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DefaultBrowserPreferencesModel.swift; sourceTree = "<group>"; };
 		37AFCE8F27DB70E500471A10 /* PreferencesModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PreferencesModel.swift; sourceTree = "<group>"; };
 		37AFCE9127DB8CAD00471A10 /* PreferencesAboutView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PreferencesAboutView.swift; sourceTree = "<group>"; };
+		37CC53EB27E8A4D10028713D /* PreferencesPrivacyView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PreferencesPrivacyView.swift; sourceTree = "<group>"; };
+		37CC53ED27E8AA3A0028713D /* PrivacyPreferencesModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PrivacyPreferencesModel.swift; sourceTree = "<group>"; };
 		37D2771427E870D4003365FD /* PreferencesAppearanceView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PreferencesAppearanceView.swift; sourceTree = "<group>"; };
 		37D2771627E874D1003365FD /* AppearancePreferencesModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppearancePreferencesModel.swift; sourceTree = "<group>"; };
 		4B0135CD2729F1AA00D54834 /* NSPasteboardExtension.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = NSPasteboardExtension.swift; sourceTree = "<group>"; };
@@ -1570,6 +1574,7 @@
 				37AFCE8427DA2D3900471A10 /* PreferencesSidebar.swift */,
 				37AFCE8A27DB69BC00471A10 /* PreferencesDefaultBrowserView.swift */,
 				37D2771427E870D4003365FD /* PreferencesAppearanceView.swift */,
+				37CC53EB27E8A4D10028713D /* PreferencesPrivacyView.swift */,
 				37AFCE9127DB8CAD00471A10 /* PreferencesAboutView.swift */,
 			);
 			path = NewView;
@@ -1581,6 +1586,7 @@
 				37AFCE8F27DB70E500471A10 /* PreferencesModel.swift */,
 				37AFCE8D27DB6AC200471A10 /* DefaultBrowserPreferencesModel.swift */,
 				37D2771627E874D1003365FD /* AppearancePreferencesModel.swift */,
+				37CC53ED27E8AA3A0028713D /* PrivacyPreferencesModel.swift */,
 				3797402D27DF41CB003090EE /* AboutModel.swift */,
 			);
 			path = NewModel;
@@ -4363,6 +4369,7 @@
 				B6E61EE3263AC0C8004E11AB /* FileManagerExtension.swift in Sources */,
 				B6DB3CFB26A17CB800D459B7 /* PermissionModel.swift in Sources */,
 				4B92929C26670D2A00AD2C21 /* PasteboardFolder.swift in Sources */,
+				37CC53EE27E8AA3A0028713D /* PrivacyPreferencesModel.swift in Sources */,
 				B6106BAB26A7BF1D0013B453 /* PermissionType.swift in Sources */,
 				85707F2A276A35FE00DC0649 /* ActionSpeech.swift in Sources */,
 				8585B63826D6E66C00C1416F /* ButtonStyles.swift in Sources */,
@@ -4461,6 +4468,7 @@
 				4BB99D0126FE191E001E4761 /* ChromiumBookmarksReader.swift in Sources */,
 				B6C0B23426E71BCD0031CB7F /* Downloads.xcdatamodeld in Sources */,
 				AAE8B110258A456C00E81239 /* TabPreviewViewController.swift in Sources */,
+				37CC53EC27E8A4D10028713D /* PreferencesPrivacyView.swift in Sources */,
 				4B0135CE2729F1AA00D54834 /* NSPasteboardExtension.swift in Sources */,
 				85707F31276A7DCA00DC0649 /* OnboardingViewModel.swift in Sources */,
 				85AC3B0525D6B1D800C7D2AA /* ScriptSourceProviding.swift in Sources */,
