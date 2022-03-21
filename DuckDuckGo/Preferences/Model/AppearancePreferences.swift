@@ -18,23 +18,6 @@
 
 import Foundation
 
-enum ThemeName: String {
-    case systemDefault
-    case light
-    case dark
-
-    var appearance: NSAppearance? {
-        switch self {
-        case .dark:
-            return NSAppearance(named: .darkAqua)
-        case .light:
-            return NSAppearance(named: .aqua)
-        default:
-            return nil
-        }
-    }
-}
-
 struct AppearancePreferences {
 
     private struct Keys {

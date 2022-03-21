@@ -42,7 +42,15 @@ enum Preferences {
                 if #available(macOS 11.0, *) {
                     return .title2.weight(.semibold)
                 } else {
-                    return .system(size: 22, weight: .semibold)
+                    return .system(size: 17, weight: .semibold)
+                }
+            }()
+
+            static let preferencePaneSectionHeader: Font = {
+                if #available(macOS 11.0, *) {
+                    return .title3.weight(.semibold)
+                } else {
+                    return .system(size: 15, weight: .semibold)
                 }
             }()
         }
@@ -56,6 +64,7 @@ enum PreferencesSectionIdentifier: Hashable, CaseIterable {
 
 enum PreferencePaneIdentifier: Hashable, Identifiable {
     case defaultBrowser
+    case appearance
     case about
     
     var id: Self {
@@ -66,6 +75,8 @@ enum PreferencePaneIdentifier: Hashable, Identifiable {
         switch self {
         case .defaultBrowser:
             return UserText.defaultBrowser
+        case .appearance:
+            return UserText.appearance
         case .about:
             return "About"
         }
@@ -75,6 +86,8 @@ enum PreferencePaneIdentifier: Hashable, Identifiable {
         switch self {
         case .defaultBrowser:
             return "DefaultBrowser"
+        case .appearance:
+            return "Appearance"
         case .about:
             return "About"
         }
@@ -88,7 +101,7 @@ struct PreferencesSection: Hashable, Identifiable {
     static let defaultSections: [PreferencesSection] = [
         .init(
             id: .regularPreferencePanes,
-            panes: [.defaultBrowser]
+            panes: [.defaultBrowser, .appearance]
         ),
         .init(
             id: .about,

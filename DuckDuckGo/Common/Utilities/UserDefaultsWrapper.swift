@@ -55,6 +55,9 @@ public struct UserDefaultsWrapper<T> {
         case lastCrashReportCheckDate = "last.crash.report.check.date"
 
         case fireInfoPresentedOnce = "fire.info.presented.once"
+        
+        case currentThemeName = "com.duckduckgo.macos.currentThemeNameKey"
+        case showFullURL = "preferences.appearance.show-full-url"
 
         // ATB
         case installDate = "statistics.installdate.key"
