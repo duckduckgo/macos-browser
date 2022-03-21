@@ -38,6 +38,7 @@ extension Preferences {
                     Button(UserText.downloadsChangeDirectory) {
                         model.presentDownloadDirectoryPanel()
                     }
+                    .frame(minWidth: 82)
                 }
                 .disabled(model.alwaysRequestDownloadLocation)
                 .padding(.bottom, 12)

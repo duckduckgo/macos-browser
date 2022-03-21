@@ -107,7 +107,6 @@ extension Preferences {
             }
             .padding(.top, 18)
             .padding(.horizontal, 24)
-            .background(Color("WindowBackgroundColor"))
         }
     }
 

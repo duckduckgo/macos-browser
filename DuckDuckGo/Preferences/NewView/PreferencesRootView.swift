@@ -28,34 +28,37 @@ extension Preferences {
             HStack(spacing: 0) {
                 Preferences.Sidebar().environmentObject(model).frame(width: 252)
                 Color(NSColor.separatorColor).frame(width: 1)
-
-                ScrollView(.vertical) {
-                    Group {
-                        
-                        switch model.selectedPane {
-                        case .defaultBrowser:
-                            DefaultBrowserView(model: DefaultBrowserPreferencesModel())
-                        case .appearance:
-                            AppearanceView(model: AppearancePreferencesModel())
-                        case .privacy:
-                            PrivacyView(model: PrivacyPreferencesModel())
-                        case .loginsPlus:
-                            Group {}
-                        case .downloads:
-                            DownloadsView(model: DownloadsPreferencesModel())
-                        case .about:
-                            AboutView(model: .init())
-                        }
-                    }
-                    .frame(maxWidth: 600, maxHeight: .infinity, alignment: .topLeading)
-                    .padding(.vertical, 40)
-                }
-                .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .topLeading)
-                .background(Color("WindowBackgroundColor"))
-                .padding(.horizontal, 40)
                 
+                ScrollView(.vertical) {
+                    HStack(alignment: .top) {
+                        Spacer()
+
+                        VStack(alignment: .leading) {
+                            
+                            switch model.selectedPane {
+                            case .defaultBrowser:
+                                DefaultBrowserView(model: DefaultBrowserPreferencesModel())
+                            case .appearance:
+                                AppearanceView(model: AppearancePreferencesModel())
+                            case .privacy:
+                                PrivacyView(model: PrivacyPreferencesModel())
+                            case .loginsPlus:
+                                Group {}
+                            case .downloads:
+                                DownloadsView(model: DownloadsPreferencesModel())
+                            case .about:
+                                AboutView(model: .init())
+                            }
+                        }
+                        .frame(maxWidth: 512, maxHeight: .infinity, alignment: .topLeading)
+                        .padding(40)
+
+                        Spacer()
+                    }
+                }
             }
             .frame(maxWidth: .infinity, maxHeight: .infinity)
+            .background(Color("InterfaceBackgroundColor"))
         }
     }
 
