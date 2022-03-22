@@ -18,8 +18,6 @@
 
 import Foundation
 
-#if OUT_OF_APPSTORE
-
 final class CrashReportReader {
 
     static let displayName = Bundle.main.displayName
@@ -84,5 +82,3 @@ fileprivate extension FileManager {
     }
 
 }
-
-#endif

@@ -18,8 +18,6 @@
 
 import Foundation
 
-#if OUT_OF_APPSTORE
-
 protocol CrashReport {
     
     static var fileExtension: String { get }
@@ -93,5 +91,3 @@ struct JSONCrashReport: CrashReport {
     }
 
 }
-
-#endif

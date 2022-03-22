@@ -18,8 +18,6 @@
 
 import Foundation
 
-#if OUT_OF_APPSTORE
-
 struct SafariVersionReader {
 
     static let safariPlistPath = "/Applications/Safari.app/Contents/Info.plist"
@@ -35,5 +33,3 @@ struct SafariVersionReader {
     }
 
 }
-
-#endif

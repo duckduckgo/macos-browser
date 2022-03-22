@@ -52,13 +52,8 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
     private var fileStore: FileStore!
     private var stateRestorationManager: AppStateRestorationManager!
     private var grammarFeaturesManager = GrammarFeaturesManager()
-
-#if OUT_OF_APPSTORE
-
-    let updateController = UpdateController()
-    let crashReporter = CrashReporter()
-
-#endif
+    private let updateController = UpdateController()
+    private let crashReporter = CrashReporter()
 
     var appUsageActivityMonitor: AppUsageActivityMonitor?
 
