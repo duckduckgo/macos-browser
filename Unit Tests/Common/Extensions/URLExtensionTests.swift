@@ -52,7 +52,7 @@ final class URLExtensionTests: XCTestCase {
             ("local ", "https://duckduckgo.com/?q=local"),
             ("test string with spaces", "https://duckduckgo.com/?q=test%20string%20with%20spaces"),
             ("http://💩.la:8080 ", "http://xn--ls8h.la:8080"),
-            ("http:// 💩.la:8080 ", "https://duckduckgo.com/?q=http://%20%F0%9F%92%A9.la:8080"),
+            ("http:// 💩.la:8080 ", "https://duckduckgo.com/?q=http%3A%2F%2F%20%F0%9F%92%A9.la%3A8080"),
             ("https://xn--ls8h.la/path/to/resource", "https://xn--ls8h.la/path/to/resource")
         ]
 
