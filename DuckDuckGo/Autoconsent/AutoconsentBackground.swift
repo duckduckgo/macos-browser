@@ -55,7 +55,6 @@ final class AutoconsentBackground: NSObject, WKScriptMessageHandlerWithReply, Au
     @MainActor
     let background: WKWebView
 
-    @MainActor
     var sitesNotifiedCache = Set<String>()
     
     override init() {
@@ -255,8 +254,8 @@ try {
         background.evaluateJavaScript("window.autoconsent.disableCMPs(\(cmpList));")
     }
 
-    @MainActor
     func clearCache() {
+        dispatchPrecondition(condition: .onQueue(.main))
         sitesNotifiedCache.removeAll()
     }
     
