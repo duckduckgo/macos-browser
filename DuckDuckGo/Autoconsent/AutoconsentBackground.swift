@@ -28,10 +28,12 @@ protocol AutoconsentManagement {
 /// and coordinate their execution on tabs.
 @available(macOS 11, *)
 final class AutoconsentBackground: NSObject, WKScriptMessageHandlerWithReply, AutoconsentManagement {
-    
-    let tabMessageName = "browserTabsMessage"
-    let actionCallbackName = "actionResponse"
-    let readyMessageName = "ready"
+
+    enum Constants {
+        static let tabMessageName = "browserTabsMessage"
+        static let actionCallbackName = "actionResponse"
+        static let readyMessageName = "ready"
+    }
     
     var injectionTime: WKUserScriptInjectionTime { .atDocumentStart }
     var forMainFrameOnly: Bool { true }
@@ -39,15 +41,21 @@ final class AutoconsentBackground: NSObject, WKScriptMessageHandlerWithReply, Au
         AutoconsentUserScript.loadJS("browser-shim", from: .main)
     }()
 
-    var tabs = [Int: TabFrameTracker]()
-    var messageCounter = 1
-    var actionCallbacks = [Int: (Result<ActionResponse, Error>) -> Void]()
+    @MainActor
+    private var tabs = [Int: TabFrameTracker]()
+    @MainActor
+    private var messageCounter = 1
+    @MainActor
+    private var actionCallbacks = [Int: (Result<ActionResponse, Error>) -> Void]()
+    @MainActor
     private var ready = false
+    @MainActor
     private var readyCallbacks: [() async -> Void] = []
 
+    @MainActor
     let background: WKWebView
-    let decoder = JSONDecoder()
-    
+
+    @MainActor
     var sitesNotifiedCache = Set<String>()
     
     override init() {
@@ -57,17 +65,18 @@ final class AutoconsentBackground: NSObject, WKScriptMessageHandlerWithReply, Au
         // configure background webview for two-way messaging.
         configuration.userContentController.addUserScript(WKUserScript(source: source,
                                               injectionTime: injectionTime, forMainFrameOnly: true, in: .page))
-        configuration.userContentController.addScriptMessageHandler(self, contentWorld: .page, name: tabMessageName)
-        configuration.userContentController.addScriptMessageHandler(self, contentWorld: .page, name: actionCallbackName)
-        configuration.userContentController.addScriptMessageHandler(self, contentWorld: .page, name: readyMessageName)
+        configuration.userContentController.addScriptMessageHandler(self, contentWorld: .page, name: Constants.tabMessageName)
+        configuration.userContentController.addScriptMessageHandler(self, contentWorld: .page, name: Constants.actionCallbackName)
+        configuration.userContentController.addScriptMessageHandler(self, contentWorld: .page, name: Constants.readyMessageName)
         let url = Bundle.main.url(forResource: "autoconsent", withExtension: "html")!
         background.loadFileURL(url, allowingReadAccessTo: url.deletingLastPathComponent())
     }
-    
+
+    @MainActor
     func ready(onReady: @escaping () async -> Void) {
         if ready {
-            DispatchQueue.main.async {
-                Task { await onReady() }
+            Task {
+                await onReady()
             }
             
         } else {
@@ -82,7 +91,7 @@ final class AutoconsentBackground: NSObject, WKScriptMessageHandlerWithReply, Au
     ///  - `selfTest`: If implemented for thie CMP, read back the consent state to check that the opt out was successful.
     ///
     /// The result of the action is provided in an async callback.
-    func callAction(in tabId: Int, action: Action, resultCallback: @escaping (Result<ActionResponse, Error>) -> Void) {
+    @MainActor func callAction(in tabId: Int, action: Action, resultCallback: @escaping (Result<ActionResponse, Error>) -> Void) {
         // create a unique message ID so we can retrieve the callback when a response comes from the background page
         let callbackId = messageCounter
         messageCounter += 1
@@ -138,6 +147,7 @@ final class AutoconsentBackground: NSObject, WKScriptMessageHandlerWithReply, Au
     }
     
     /// Process a message sent from the autoconsent userscript.
+    @MainActor
     func onUserScriptMessage(in tabId: Int, _ message: WKScriptMessage) {
         let webview = message.webView
         let frame = message.frameInfo
@@ -162,11 +172,12 @@ final class AutoconsentBackground: NSObject, WKScriptMessageHandlerWithReply, Au
         let script = "_nativeMessageHandler(\(tabId), \(frameId), \(message.body));"
         return background.evaluateJavaScript(script)
     }
-    
+
+    @MainActor
     func userContentController(_ userContentController: WKUserContentController,
                                didReceive message: WKScriptMessage,
                                replyHandler: @escaping (Any?, String?) -> Void) {
-        if message.name == tabMessageName {
+        if message.name == Constants.tabMessageName {
             // This is a message sent from the background to a specific tab and frame. We have to find the correct WKWebview and FrameInfo
             // instances in order to push the message to the Userscript.
             guard let jsonMessage = message.body as? String else {
@@ -174,10 +185,10 @@ final class AutoconsentBackground: NSObject, WKScriptMessageHandlerWithReply, Au
                 return
             }
             forwardMessageToTab(message: jsonMessage, replyHandler: replyHandler)
-        } else if message.name == actionCallbackName {
+        } else if message.name == Constants.actionCallbackName {
             // This is a message response to a call to #callAction.
             guard let jsonMessage = message.body as? String,
-                  let response = try? decoder.decode(ActionResponse.self, from: Data(jsonMessage.utf8)),
+                  let response = try? JSONDecoder().decode(ActionResponse.self, from: Data(jsonMessage.utf8)),
                   let callback = actionCallbacks[response.messageId] else {
                 replyHandler(nil, "Failed to parse message")
                 return
@@ -190,18 +201,17 @@ final class AutoconsentBackground: NSObject, WKScriptMessageHandlerWithReply, Au
                 callback(.success(response))
             }
             replyHandler("OK", nil)
-        } else if message.name == readyMessageName {
+        } else if message.name == Constants.readyMessageName {
             ready = true
-            DispatchQueue.main.async {
-                self.readyCallbacks.forEach({ cb in Task { await cb() } })
-                self.readyCallbacks.removeAll()
-            }
+            self.readyCallbacks.forEach({ cb in Task { await cb() } })
+            self.readyCallbacks.removeAll()
             replyHandler("OK", nil)
         }
     }
-    
+
+    @MainActor
     func forwardMessageToTab(message jsonMessage: String, replyHandler: @escaping (Any?, String?) -> Void) {
-        guard let payload = try? decoder.decode(BrowserTabMessage.self, from: Data(jsonMessage.utf8)) else {
+        guard let payload = try? JSONDecoder().decode(BrowserTabMessage.self, from: Data(jsonMessage.utf8)) else {
             replyHandler(false, "data decoding error")
             return
         }
@@ -234,6 +244,7 @@ try {
         })
     }
     
+    @MainActor
     func updateSettings(settings: [String: Any]?) {
         let encoder = JSONEncoder()
         guard let disabledCMPs = settings?["disabledCMPs"] as? [String],
@@ -243,7 +254,8 @@ try {
         }
         background.evaluateJavaScript("window.autoconsent.disableCMPs(\(cmpList));")
     }
-    
+
+    @MainActor
     func clearCache() {
         sitesNotifiedCache.removeAll()
     }
