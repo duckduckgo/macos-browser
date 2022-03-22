@@ -457,30 +457,6 @@ final class PermissionModelTests: XCTestCase {
         XCTAssertEqual(model.permissions, [.geolocation: .disabled(systemWide: false)])
     }
 
-//    func testWhenSystemLocationIsNotDeterminedAndDisabledByUserThenStateIsDisabled() {
-//        geolocationServiceMock.authorizationStatus = .notDetermined
-//        var e: XCTestExpectation!
-//        if #available(macOS 12, *) {
-//            self.webView(webView, requestGeolocationPermissionFor: securityOrigin, initiatedBy: frameInfo) { decision in
-//                XCTAssertEqual(decision, .grant)
-//                e.fulfill()
-//            }
-//        } else {
-//            self.webView(webView, requestGeolocationPermissionFor: frameInfo) { granted in
-//                XCTAssertTrue(granted)
-//                e.fulfill()
-//            }
-//        }
-//        XCTAssertEqual(model.permissions, [.geolocation: .requested(model.authorizationQuery!)])
-//        e = expectation(description: "permission granted")
-//        model.authorizationQuery!.handleDecision(grant: true)
-//        waitForExpectations(timeout: 1)
-//
-//        geolocationProviderMock.isActive = true
-//        geolocationServiceMock.authorizationStatus = .restricted
-//        XCTAssertEqual(model.permissions, [.geolocation: .disabled(systemWide: false)])
-//    }
-
     func testWhenSystemLocationIsDisabledThenStateIsDisabled() {
         geolocationServiceMock.authorizationStatus = .authorized
         geolocationProviderMock.isActive = true
