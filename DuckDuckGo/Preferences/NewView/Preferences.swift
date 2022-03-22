@@ -24,9 +24,10 @@ enum Preferences {
 
             static let popUpButton: NSFont = {
                 if #available(macOS 11.0, *) {
-                    return .preferredFont(forTextStyle: .title1, options: [:])
+                    let titleFont = NSFont.preferredFont(forTextStyle: .title1, options: [:])
+                    return .systemFont(ofSize: titleFont.pointSize, weight: .semibold)
                 } else {
-                    return NSFont.systemFont(ofSize: 22, weight: .semibold)
+                    return .systemFont(ofSize: 22, weight: .semibold)
                 }
             }()
 
@@ -95,7 +96,7 @@ enum PreferencePaneIdentifier: Hashable, Identifiable {
         case .downloads:
             return UserText.downloads
         case .about:
-            return "About"
+            return UserText.about
         }
     }
 

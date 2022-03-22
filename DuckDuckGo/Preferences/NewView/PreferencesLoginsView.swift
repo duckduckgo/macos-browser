@@ -35,6 +35,7 @@ extension Preferences {
                 
                 Text(UserText.loginsPlusAskToSaveExplanation)
                     .font(Const.Fonts.preferencePaneCaption)
+                    .foregroundColor(Color("GreyTextColor"))
                     .fixMultilineScrollableText()
                     .padding(.bottom, 12)
                 
@@ -72,8 +73,10 @@ extension Preferences {
                     .pickerStyle(.radioGroup)
                     .offset(x: -8)
                     .padding(.bottom, 6)
+
                 Text(UserText.loginsPlusNeverLockWarning)
                     .font(Const.Fonts.preferencePaneCaption)
+                    .foregroundColor(Color("GreyTextColor"))
                     .fixMultilineScrollableText()
                     .offset(x: 18)
             }

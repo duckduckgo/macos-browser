@@ -63,7 +63,7 @@ extension Preferences {
         @State var selectedTab: Tab.TabContent = .newPreferences
 
         var body: some View {
-            VStack(spacing: 0) {
+            VStack(spacing: 12) {
                 NSPopUpButtonView<Tab.TabContent>(selection: $selectedTab, viewCreator: {
                     let button = NSPopUpButton()
                     button.font = Const.Fonts.popUpButton
@@ -83,7 +83,7 @@ extension Preferences {
                     return button
                 })
                     .padding(.horizontal, 3)
-                    .frame(maxHeight: 60)
+                    .frame(height: 60)
                 
                 ScrollView {
                     VStack(spacing: 0) {
@@ -97,8 +97,7 @@ extension Preferences {
                             if section != model.sections.last {
                                 Color(NSColor.separatorColor)
                                     .frame(height: 1)
-                                    .padding(.vertical, 6)
-                                    .padding(.horizontal, 6)
+                                    .padding(6)
                             }
                         }
                     }
