@@ -94,15 +94,14 @@ struct UserText {
     static let newWindowMenuItem = NSLocalizedString("new.window.menu.item", value: "New Window", comment: "Menu item title")
 
     static let fireDialogFireproofSites = NSLocalizedString("fire.dialog.fireproof.sites", value: "Fireproof Sites", comment: "Category of domains in fire button dialog")
-    static let fireDialogClearSites = NSLocalizedString("fire.dialog.clear.sites", value: "Clear These Sites", comment: "Category of domains in fire button dialog")
-    static let allData = NSLocalizedString("fire.all-data", value: "All Data", comment: "Configuration option for fire button")
-    static let currentTab = NSLocalizedString("fire.currentTab", value: "Current Tab", comment: "Configuration option for fire button")
-    static let currentWindow = NSLocalizedString("fire.currentWindow", value: "Current Window", comment: "Configuration option for fire button")
+    static let fireDialogClearSites = NSLocalizedString("fire.dialog.clear.sites", value: "Clear data for the following sites", comment: "Category of domains in fire button dialog")
+    static let allData = NSLocalizedString("fire.all-data", value: "All data", comment: "Configuration option for fire button")
+    static let currentTab = NSLocalizedString("fire.currentTab", value: "Current tab", comment: "Configuration option for fire button")
+    static let currentWindow = NSLocalizedString("fire.currentWindow", value: "Current window", comment: "Configuration option for fire button")
     static let allDataDescription = NSLocalizedString("fire.all-data.description", value: "Clear all tabs and related site data", comment: "Description of the 'All Data' configuration option for the fire button")
-    static let currentTabDescription = NSLocalizedString("fire.current-tab.description", value: "Close current tab and clear related site data", comment: "Description of the 'Current Tab' configuration option for the fire button")
     static let currentWindowDescription = NSLocalizedString("fire.current-window.description", value: "Clear current window and related site data", comment: "Description of the 'Current Window' configuration option for the fire button")
     static let selectedDomainsDescription = NSLocalizedString("fire.selected-domains.description", value: "Clear selected domains and related site data", comment: "Description of the 'Current Window' configuration option for the fire button")
-    static let fireDialogNothingToBurn = NSLocalizedString("fire.dialog.nothing-to-burn", value: "Nothing to burn", comment: "Information label to inform there is no domain for burning")
+    static let fireDialogNothingToBurn = NSLocalizedString("fire.dialog.nothing-to-burn", value: "No data to clear", comment: "Information label to inform there is no domain for burning")
     static let fireDialogDetails = NSLocalizedString("fire.dialog.details", value: "Details", comment: "Button to show more details")
     static let fireproofSite = NSLocalizedString("options.menu.fireproof-site", value: "Fireproof This Site", comment: "Context menu item")
     static let removeFireproofing = NSLocalizedString("options.menu.remove-fireproofing", value: "Remove Fireproofing", comment: "Context menu item")
@@ -145,7 +144,7 @@ struct UserText {
     static let zoom = NSLocalizedString("zoom", value: "Zoom", comment: "Menu with Zooming commands")
 
     static let emailOptionsMenuItem = NSLocalizedString("email.optionsMenu", value: "Email Protection", comment: "Menu item email feature")
-    static let emailOptionsMenuCreateAddressSubItem = NSLocalizedString("email.optionsMenu.createAddress", value: "Create a Duck Address", comment: "Create an email alias sub menu item")
+    static let emailOptionsMenuCreateAddressSubItem = NSLocalizedString("email.optionsMenu.createAddress", value: "Generate Private Duck Address", comment: "Create an email alias sub menu item")
     static let emailOptionsMenuTurnOffSubItem = NSLocalizedString("email.optionsMenu.turnOff", value: "Disable Email Protection", comment: "Disable email sub menu item")
     static let emailOptionsMenuTurnOnSubItem = NSLocalizedString("email.optionsMenu.turnOn", value: "Enable Email Protection", comment: "Enable email sub menu item")
     static let privateEmailCopiedToClipboard = NSLocalizedString("email.copied", value: "New address copied to your clipboard", comment: "Private email address was copied to clipboard message")
@@ -406,10 +405,11 @@ struct UserText {
     static let homePageProtectionSummaryInfo = NSLocalizedString("home.page.protection.summary.info", value: "No recent activity", comment: "")
     static func homePageProtectionSummaryMessage(numberOfTrackersBlocked: Int) -> String {
         let localized = NSLocalizedString("home.page.protection.summary.info",
-                                          value: "%@ tracking attempts blocked in past 7 days",
+                                          value: "%@ tracking attempts blocked",
                                           comment: "")
         return String(format: localized, NumberFormatter.localizedString(from: NSNumber(value: numberOfTrackersBlocked), number: .decimal))
     }
+    static let homePageProtectionDurationInfo = NSLocalizedString("home.page.protection.duration", value: "PAST 7 DAYS", comment: "Past 7 days in uppercase.")
 
     static let homePageEmptyStateItemTitle = NSLocalizedString("home.page.empty.state.item.title", value: "Recently visited sites appear here", comment: "")
     static let homePageEmptyStateItemMessage = NSLocalizedString("home.page.empty.state.item.message", value: "Keep browsing to see how many trackers were blocked", comment: "")
@@ -420,7 +420,7 @@ struct UserText {
     static let autoconsentPopoverMessage = NSLocalizedString("Cookie consent pop-up managed", comment: "Popover message")
     static let autoconsentPopupTitle = NSLocalizedString("Let DuckDuckGo try to manage cookie consent pop-ups?", comment: "messageText")
     static let autoconsentPopupDescription = NSLocalizedString("On some sites, we can automatically set preferences to minimize cookies 🍪 and maximize privacy, then close the pop-up.", comment: "informativeText")
-    static let autoconsentPopupEnableButton = NSLocalizedString("Manage Cookie Pop-ups", comment: "")
+    static let autoconsentPopupEnableButton = NSLocalizedString("Manage Them for Me", comment: "")
     static let autoconsentPopupLaterButton = NSLocalizedString("Not Now", comment: "")
     static let autoconsentPopupNeverButton = NSLocalizedString("Don't Ask Again", comment: "")
 

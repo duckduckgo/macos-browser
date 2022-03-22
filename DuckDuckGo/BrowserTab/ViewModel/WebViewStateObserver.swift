@@ -24,6 +24,8 @@ final class WebViewStateObserver: NSObject {
 
     weak var webView: WKWebView?
     weak var tabViewModel: TabViewModel?
+    
+    private var isObserving = false
 
     init(webView: WKWebView,
          tabViewModel: TabViewModel) {
@@ -34,14 +36,21 @@ final class WebViewStateObserver: NSObject {
         matchFlagValues()
         observe(webView: webView)
     }
-
-    deinit {
+    
+    func stopObserving() {
+        guard isObserving else { return }
         webView?.removeObserver(self, forKeyPath: #keyPath(WKWebView.url))
         webView?.removeObserver(self, forKeyPath: #keyPath(WKWebView.canGoBack))
         webView?.removeObserver(self, forKeyPath: #keyPath(WKWebView.canGoForward))
         webView?.removeObserver(self, forKeyPath: #keyPath(WKWebView.isLoading))
         webView?.removeObserver(self, forKeyPath: #keyPath(WKWebView.title))
         webView?.removeObserver(self, forKeyPath: #keyPath(WKWebView.estimatedProgress))
+        
+        isObserving = false
+    }
+
+    deinit {
+        stopObserving()
     }
 
     private func matchFlagValues() {
@@ -67,6 +76,8 @@ final class WebViewStateObserver: NSObject {
         webView.addObserver(self, forKeyPath: #keyPath(WKWebView.isLoading), options: .new, context: nil)
         webView.addObserver(self, forKeyPath: #keyPath(WKWebView.title), options: .new, context: nil)
         webView.addObserver(self, forKeyPath: #keyPath(WKWebView.estimatedProgress), options: .new, context: nil)
+        
+        isObserving = true
     }
 
     override func observeValue(forKeyPath keyPath: String?,

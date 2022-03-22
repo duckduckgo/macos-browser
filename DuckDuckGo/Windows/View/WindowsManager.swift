@@ -63,16 +63,7 @@ final class WindowsManager {
     }
 
     class func openNewWindow(with initialUrl: URL) {
-        let mainWindowController = makeNewWindow()
-        mainWindowController.showWindow(self)
-
-        let mainViewController = mainWindowController.mainViewController
-        guard let newTab = mainViewController.tabCollectionViewModel.tabCollection.tabs.first else {
-            os_log("MainWindowController: Failed to get initial tab", type: .error)
-            return
-        }
-
-        newTab.setContent(.url(initialUrl))
+        openNewWindow(with: Tab(content: .contentFromURL(initialUrl)))
     }
 
     class func openPopUpWindow(with tab: Tab, contentSize: NSSize?) {

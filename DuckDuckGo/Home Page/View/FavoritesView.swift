@@ -29,27 +29,17 @@ struct Favorites: View {
 
     var body: some View {
 
-        let addButton =
-        ZStack(alignment: .top) {
-            RoundedRectangle(cornerRadius: 12)
-                .stroke(Color("HomeFavoritesGhostColor"), style: StrokeStyle(lineWidth: 1.5))
-                .frame(width: 64, height: 64)
-
-            VStack(spacing: 5) {
-                HoverButton(size: 64, imageName: "Add", imageSize: 22, cornerRadius: 12) {
-                    model.addNew()
-                }
-                .frame(width: 64, height: 64)
-
-                Text(UserText.addFavorite)
-                    .font(.system(size: 10))
-                    .multilineTextAlignment(.center)
-                    .lineLimit(2)
-                    .truncationMode(.middle)
-                    .font(.system(size: 10))
-                    .frame(height: 32, alignment: .top)
-            }
-        }.frame(width: 64)
+        let addButton = ZStack(alignment: .top) {
+            FavoriteTemplate(title: UserText.addFavorite, domain: nil)
+            ZStack {
+                Image("Add")
+                    .resizable()
+                    .frame(width: 22, height: 22)
+            }.frame(width: 64, height: 64)
+        }
+        .link {
+            model.addNew()
+        }
 
         let ghostButton = VStack {
             RoundedRectangle(cornerRadius: 12)
@@ -93,6 +83,46 @@ struct Favorites: View {
 
 }
 
+struct FavoriteTemplate: View {
+
+    let title: String
+    let domain: String?
+
+    @State var isHovering = false
+
+    var body: some View {
+        VStack(spacing: 5) {
+
+            ZStack(alignment: .center) {
+
+                RoundedRectangle(cornerRadius: 12)
+                    .foregroundColor(isHovering ? Color("HomeFavoritesHoverColor") : Color("HomeFavoritesBackgroundColor"))
+
+                if let domain = domain {
+                    FaviconView(domain: domain)
+                        .frame(width: 32, height: 32)
+                        .padding(9)
+                }
+            }
+            .frame(width: 64, height: 64)
+            .clipped()
+
+            Text(title)
+                .multilineTextAlignment(.center)
+                .lineLimit(2)
+                .font(.system(size: 11))
+                .frame(height: 32, alignment: .top)
+
+        }
+        .frame(width: 64)
+        .frame(maxWidth: 64)
+        .onHover { isHovering in
+            self.isHovering = isHovering
+        }
+    }
+
+}
+
 struct Favorite: View {
 
     @EnvironmentObject var model: HomePage.Models.FavoritesModel
@@ -103,33 +133,8 @@ struct Favorite: View {
 
     var body: some View {
 
-        VStack(spacing: 5) {
-
-            ZStack(alignment: .center) {
-
-                RoundedRectangle(cornerRadius: 12)
-                    .foregroundColor(isHovering ? Color("HomeFavoritesHoverColor") : Color("HomeFavoritesBackgroundColor"))
-
-                FaviconView(domain: bookmark.url.host ?? "")
-                    .frame(width: 32, height: 32)
-                    .padding(9)
-
-            }
-            .frame(width: 64, height: 64)
-            .clipped()
-
-            Text(bookmark.title)
-                .multilineTextAlignment(.center)
-                .lineLimit(2)
-                .font(.system(size: 10))
-                .frame(height: 32, alignment: .top)
-
-        }
-        .frame(width: 64)
-        .frame(maxWidth: 64)
-        .link(onHoverChanged: {
-            isHovering = $0
-        }) {
+        FavoriteTemplate(title: bookmark.title, domain: bookmark.url.host)
+        .link {
             model.open(bookmark)
         }.contextMenu(ContextMenu(menuItems: {
             Button(UserText.openInNewTab, action: { model.openInNewTab(bookmark) })
