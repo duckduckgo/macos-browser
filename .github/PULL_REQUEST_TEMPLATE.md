@@ -16,6 +16,8 @@ CC:
 **Testing checklist**:
 
 * [ ] Test with Release configuration
+* [ ] Test proper deallocation of tabs
+* [ ] Make sure commited submodule changes are desired
 
 ---
 ###### Internal references:
