@@ -55,10 +55,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
 
 #if OUT_OF_APPSTORE
 
-#if !BETA
     let updateController = UpdateController()
-#endif
-
     let crashReporter = CrashReporter()
 
 #endif
@@ -66,8 +63,6 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
     var appUsageActivityMonitor: AppUsageActivityMonitor?
 
     func applicationWillFinishLaunching(_ notification: Notification) {
-        ExpirationChecker.check()
-
         if !Self.isRunningTests {
 #if DEBUG
             Pixel.setUp(dryRun: true)

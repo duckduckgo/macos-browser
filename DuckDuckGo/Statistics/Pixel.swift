@@ -48,9 +48,6 @@ final class Pixel {
         #if DEBUG
             newParams[Parameters.test] = Values.test
         #endif
-        #if BETA
-            newParams[Parameters.beta] = Values.beta
-        #endif
 
         var headers = headers
         headers[APIHeaders.Name.moreInfo] = "See " + URL.duckDuckGoMorePrivacyInfo.absoluteString
