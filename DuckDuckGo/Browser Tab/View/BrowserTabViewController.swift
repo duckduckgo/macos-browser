@@ -181,6 +181,7 @@ final class BrowserTabViewController: NSViewController {
         let oldWebView = webView
         let webViewContainer = webViewContainer
         displayWebView(of: tabViewModel)
+        tabViewModel.updateAddressBarStrings()
         if let oldWebView = oldWebView, let webViewContainer = webViewContainer {
             removeWebViewFromHierarchy(webView: oldWebView, container: webViewContainer)
         }

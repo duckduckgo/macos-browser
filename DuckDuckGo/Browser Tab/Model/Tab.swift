@@ -1110,5 +1110,3 @@ extension Tab: TabDataClearing {
         webView.load(URL(string: "about:blank")!)
     }
 }
-// swiftlint:enable type_body_length
-// swiftlint:enable file_length

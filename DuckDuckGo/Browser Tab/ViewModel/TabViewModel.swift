@@ -138,7 +138,7 @@ final class TabViewModel {
         canBeBookmarked = tab.content.url ?? .blankPage != .blankPage
     }
 
-    private func updateAddressBarStrings() {
+    func updateAddressBarStrings() {
         guard !errorViewState.isVisible else {
             let failingUrl = tab.error?.failingUrl
             addressBarString = failingUrl?.absoluteString ?? ""
@@ -172,7 +172,12 @@ final class TabViewModel {
         }
 
         addressBarString = url.absoluteString
-        passiveAddressBarString = host.drop(prefix: URL.HostPrefix.www.separated())
+
+        if AppearancePreferencesModel.shared.showFullURL {
+            passiveAddressBarString = url.toString(decodePunycode: false, dropScheme: true, needsWWW: true, dropTrailingSlash: true)
+        } else {
+            passiveAddressBarString = host.drop(prefix: URL.HostPrefix.www.separated())
+        }
     }
 
     private func updateTitle() {

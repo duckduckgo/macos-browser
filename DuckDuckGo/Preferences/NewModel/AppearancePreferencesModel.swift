@@ -58,6 +58,8 @@ enum ThemeName: String, Equatable, CaseIterable {
 }
 
 final class AppearancePreferencesModel: ObservableObject {
+
+    static let shared = AppearancePreferencesModel()
     
     @Published var currentThemeName: ThemeName = .systemDefault {
         didSet {
@@ -81,7 +83,7 @@ final class AppearancePreferencesModel: ObservableObject {
     @UserDefaultsWrapper(key: .currentThemeName, defaultValue: ThemeName.systemDefault.rawValue)
     private var currentThemeNameDefaultsValue: String
 
-    init() {
+    private init() {
         currentThemeName = .init(rawValue: currentThemeNameDefaultsValue) ?? .systemDefault
         showFullURL = showFullURLDefaultsValue
     }

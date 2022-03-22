@@ -102,6 +102,6 @@ extension Preferences {
 
 struct PreferencesAppearanceView_Previews: PreviewProvider {
     static var previews: some View {
-        Preferences.AppearanceView(model: .init())
+        Preferences.AppearanceView(model: .shared)
     }
 }
