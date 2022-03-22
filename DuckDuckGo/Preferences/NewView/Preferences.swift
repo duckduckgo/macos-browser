@@ -53,6 +53,14 @@ enum Preferences {
                     return .system(size: 15, weight: .semibold)
                 }
             }()
+
+            static let preferencePaneCaption: Font = {
+                if #available(macOS 11.0, *) {
+                    return .subheadline
+                } else {
+                    return .system(size: 10)
+                }
+            }()
         }
     }
 }
@@ -116,7 +124,7 @@ struct PreferencesSection: Hashable, Identifiable {
     static let defaultSections: [PreferencesSection] = [
         .init(
             id: .regularPreferencePanes,
-            panes: [.defaultBrowser, .appearance, .privacy, .downloads]
+            panes: [.defaultBrowser, .appearance, .privacy, .loginsPlus, .downloads]
         ),
         .init(
             id: .about,

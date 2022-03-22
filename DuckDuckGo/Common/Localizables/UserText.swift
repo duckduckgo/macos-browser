@@ -136,6 +136,16 @@ struct UserText {
     static let gpcExplanation = NSLocalizedString("gpc.explanation", value: "DuckDuckGo automatically blocks many trackers. With Global Privacy Control (GPC), you can also ask participating websites to restrict selling or sharing your personal data with other companies.", comment: "GPC explanation in settings")
     static let gpcLearnMore = NSLocalizedString("gpc.learnmore.link", value: "Learn More", comment: "Learn More link")
     
+    static let loginsPlusAskToSave = NSLocalizedString("loginsplus.ask-to-save", value: "Ask to Save", comment: "Logins+ settings section title")
+    static let loginsPlusAskToSaveExplanation = NSLocalizedString("loginsplus.ask-to-save.explanation", value: "Receive prompts to save new Logins+ information when filling out online forms.", comment: "Description of Logins+ autosaving feature - used in settings")
+    static let loginsPlusUsernamesAndPasswords = NSLocalizedString("loginsplus.usernames-and-passwords", value: "Usernames and passwords", comment: "Logins+ autosaved data type")
+    static let loginsPlusAddresses = NSLocalizedString("loginsplus.addresses", value: "Addresses", comment: "Logins+ autosaved data type")
+    static let loginsPlusPaymentMethods = NSLocalizedString("loginsplus.payment-methods", value: "Payment methods", comment: "Logins+ autosaved data type")
+    static let loginsPlusAutoLock = NSLocalizedString("loginsplus.auto-lock", value: "Auto-lock", comment: "Logins+ settings section title")
+    static let loginsPlusLockWhenIdle = NSLocalizedString("loginsplus.lock-when-idle", value: "Lock Logins+ after computer is idle for", comment: "Logins+ auto-lock setting")
+    static let loginsPlusNeverLock = NSLocalizedString("loginsplus.never-lock", value: "Never lock Logins+", comment: "Logins+ auto-lock setting")
+    static let loginsPlusNeverLockWarning = NSLocalizedString("loginsplus.never-lock-warning", value: "Anyone with access to your device will be able to use and modify your Logins+ data.", comment: "Logins+ disabled auto-lock warning")
+
     static let downloadsLocation = NSLocalizedString("downloads.location", value: "Location", comment: "Downloads directory location")
     static let downloadsAlwaysAsk = NSLocalizedString("downloads.always-ask", value: "Always ask where to save files", comment: "Downloads preferences checkbox")
     static let downloadsChangeDirectory = NSLocalizedString("downloads.change", value: "Change...", comment: "Change downloads directory button")

@@ -43,7 +43,7 @@ extension Preferences {
                             case .privacy:
                                 PrivacyView(model: PrivacyPreferencesModel())
                             case .loginsPlus:
-                                Group {}
+                                LoginsView(model: LoginsPreferencesModel())
                             case .downloads:
                                 DownloadsView(model: DownloadsPreferencesModel())
                             case .about:

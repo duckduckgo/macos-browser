@@ -21,6 +21,8 @@
 		371C0A2927E33EDC0070591F /* FeedbackPresenter.swift in Sources */ = {isa = PBXBuildFile; fileRef = 371C0A2827E33EDC0070591F /* FeedbackPresenter.swift */; };
 		371E141927E92E42009E3B5B /* MultilineScrollableTextFix.swift in Sources */ = {isa = PBXBuildFile; fileRef = 371E141827E92E42009E3B5B /* MultilineScrollableTextFix.swift */; };
 		3797402E27DF41CB003090EE /* AboutModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3797402D27DF41CB003090EE /* AboutModel.swift */; };
+		379DE4BD27EA31AC002CC3DE /* PreferencesLoginsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 379DE4BC27EA31AC002CC3DE /* PreferencesLoginsView.swift */; };
+		379DE4BF27EA3240002CC3DE /* LoginsPreferencesModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 379DE4BE27EA3240002CC3DE /* LoginsPreferencesModel.swift */; };
 		37AFCE8127DA2CA600471A10 /* NewPreferencesSplitViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37AFCE8027DA2CA600471A10 /* NewPreferencesSplitViewController.swift */; };
 		37AFCE8527DA2D3900471A10 /* PreferencesSidebar.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37AFCE8427DA2D3900471A10 /* PreferencesSidebar.swift */; };
 		37AFCE8727DA334800471A10 /* PreferencesRootView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37AFCE8627DA334800471A10 /* PreferencesRootView.swift */; };
@@ -775,6 +777,8 @@
 		371C0A2827E33EDC0070591F /* FeedbackPresenter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FeedbackPresenter.swift; sourceTree = "<group>"; };
 		371E141827E92E42009E3B5B /* MultilineScrollableTextFix.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MultilineScrollableTextFix.swift; sourceTree = "<group>"; };
 		3797402D27DF41CB003090EE /* AboutModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AboutModel.swift; sourceTree = "<group>"; };
+		379DE4BC27EA31AC002CC3DE /* PreferencesLoginsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PreferencesLoginsView.swift; sourceTree = "<group>"; };
+		379DE4BE27EA3240002CC3DE /* LoginsPreferencesModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LoginsPreferencesModel.swift; sourceTree = "<group>"; };
 		37AFCE8027DA2CA600471A10 /* NewPreferencesSplitViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NewPreferencesSplitViewController.swift; sourceTree = "<group>"; };
 		37AFCE8427DA2D3900471A10 /* PreferencesSidebar.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PreferencesSidebar.swift; sourceTree = "<group>"; };
 		37AFCE8627DA334800471A10 /* PreferencesRootView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PreferencesRootView.swift; sourceTree = "<group>"; };
@@ -1584,6 +1588,7 @@
 				37AFCE8A27DB69BC00471A10 /* PreferencesDefaultBrowserView.swift */,
 				37D2771427E870D4003365FD /* PreferencesAppearanceView.swift */,
 				37CC53EB27E8A4D10028713D /* PreferencesPrivacyView.swift */,
+				379DE4BC27EA31AC002CC3DE /* PreferencesLoginsView.swift */,
 				37CC53EF27E8D1440028713D /* PreferencesDownloadsView.swift */,
 				37AFCE9127DB8CAD00471A10 /* PreferencesAboutView.swift */,
 			);
@@ -1599,6 +1604,7 @@
 				37CC53ED27E8AA3A0028713D /* PrivacyPreferencesModel.swift */,
 				37CC53F127E8D2C90028713D /* DownloadsPreferencesModel.swift */,
 				3797402D27DF41CB003090EE /* AboutModel.swift */,
+				379DE4BE27EA3240002CC3DE /* LoginsPreferencesModel.swift */,
 			);
 			path = NewModel;
 			sourceTree = "<group>";
@@ -4191,6 +4197,7 @@
 				AAC30A26268DFEE200D2D9CD /* CrashReporter.swift in Sources */,
 				857FFEC027D239DC00415E7A /* HyperLink.swift in Sources */,
 				4B9292A426670D2A00AD2C21 /* PasteboardWriting.swift in Sources */,
+				379DE4BF27EA3240002CC3DE /* LoginsPreferencesModel.swift in Sources */,
 				37AFCE8E27DB6AC200471A10 /* DefaultBrowserPreferencesModel.swift in Sources */,
 				4B0511BE262CAA5A00F6079C /* DownloadPreferences.swift in Sources */,
 				4B0511BC262CAA5A00F6079C /* AppearancePreferences.swift in Sources */,
@@ -4510,6 +4517,7 @@
 				AA8EDF2724923EC70071C2E8 /* StringExtension.swift in Sources */,
 				85378DA2274E7F25007C5CBF /* EmailManagerRequestDelegate.swift in Sources */,
 				B68172A9269C487D006D1092 /* PrivacyDashboardUserScript.swift in Sources */,
+				379DE4BD27EA31AC002CC3DE /* PreferencesLoginsView.swift in Sources */,
 				858A797F26A79EAA00A75A42 /* UserText+PasswordManager.swift in Sources */,
 				B693954E26F04BEB0015B914 /* ProgressView.swift in Sources */,
 				B69B503C2726A12500758A2B /* StatisticsStore.swift in Sources */,
