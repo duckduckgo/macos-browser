@@ -52,8 +52,8 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
     private var fileStore: FileStore!
     private var stateRestorationManager: AppStateRestorationManager!
     private var grammarFeaturesManager = GrammarFeaturesManager()
-    private let updateController = UpdateController()
     private let crashReporter = CrashReporter()
+    let updateController = UpdateController()
 
     var appUsageActivityMonitor: AppUsageActivityMonitor?
 
