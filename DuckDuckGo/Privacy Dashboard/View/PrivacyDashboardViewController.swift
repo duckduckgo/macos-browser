@@ -116,14 +116,15 @@ final class PrivacyDashboardViewController: NSViewController {
             return
         }
 
-        let authState: PrivacyDashboardUserScript.AuthorizationState = PermissionType.allCases.compactMap { permissionType in
+        let authState: PrivacyDashboardUserScript.AuthorizationState
+        authState = PermissionManager.shared.persistedPermissionTypes.union(usedPermissions.keys).compactMap { permissionType in
             guard PermissionManager.shared.hasPermissionPersisted(forDomain: domain, permissionType: permissionType)
                     || usedPermissions[permissionType] != nil
             else {
                 return nil
             }
             let decision = PermissionManager.shared.permission(forDomain: domain, permissionType: permissionType)
-            return (permissionType, .init(decision: decision))
+            return (permissionType, PermissionAuthorizationState(decision: decision))
         }
 
         privacyDashboardScript.setPermissions(usedPermissions, authorizationState: authState, domain: domain, in: webView)
@@ -236,7 +237,7 @@ extension PrivacyDashboardViewController: PrivacyDashboardUserScriptDelegate {
     }
 
     func userScript(_ userScript: PrivacyDashboardUserScript, setPermission permission: PermissionType, paused: Bool) {
-        tabViewModel?.tab.permissions.set(permission, muted: paused)
+        tabViewModel?.tab.permissions.set([permission], muted: paused)
     }
 
     func userScript(_ userScript: PrivacyDashboardUserScript, setHeight height: Int) {

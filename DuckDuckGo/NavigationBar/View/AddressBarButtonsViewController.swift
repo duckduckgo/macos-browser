@@ -116,6 +116,13 @@ final class AddressBarButtonsViewController: NSViewController {
             popupsButton.action = #selector(popupsButtonAction(_:))
         }
     }
+    @IBOutlet weak var externalSchemeButton: PermissionButton! {
+        didSet {
+            externalSchemeButton.isHidden = true
+            externalSchemeButton.target = self
+            externalSchemeButton.action = #selector(externalSchemeButtonAction(_:))
+        }
+    }
 
     @Published private(set) var buttonsWidth: CGFloat = 0
 
@@ -255,21 +262,33 @@ final class AddressBarButtonsViewController: NSViewController {
     func openPermissionAuthorizationPopover(for query: PermissionAuthorizationQuery) {
         let button: NSButton
         var popover: NSPopover = permissionAuthorizationPopover
+        popover.behavior = .applicationDefined
+
         if query.permissions.contains(.camera)
             || (query.permissions.contains(.microphone) && microphoneButton.isHidden && !cameraButton.isHidden) {
             button = cameraButton
-        } else if query.permissions.contains(.microphone) {
-            button = microphoneButton
-        } else if query.permissions.contains(.geolocation) {
-            button = geolocationButton
-        } else if query.permissions.contains(.popups) {
-            guard !query.wasShownOnce else { return }
-            button = popupsButton
-            popover = popupBlockedPopover
         } else {
-            assertionFailure("Unexpected permissions")
-            query.handleDecision(grant: false)
-            return
+            assert(query.permissions.count == 1)
+            switch query.permissions.first {
+            case .microphone:
+                button = microphoneButton
+            case .geolocation:
+                button = geolocationButton
+            case .popups:
+                guard !query.wasShownOnce else { return }
+                button = popupsButton
+                popover = popupBlockedPopover
+            case .externalScheme:
+                guard !query.wasShownOnce else { return }
+                button = externalSchemeButton
+                popover.behavior = .transient
+                query.shouldShowAlwaysAllowCheckbox = true
+                query.shouldShowCancelInsteadOfDeny = true
+            default:
+                assertionFailure("Unexpected permissions")
+                query.handleDecision(grant: false)
+                return
+            }
         }
         guard !button.isHidden,
               !permissionButtons.isHidden
@@ -312,20 +331,20 @@ final class AddressBarButtonsViewController: NSViewController {
     }
 
     @IBAction func cameraButtonAction(_ sender: NSButton) {
-        guard let selectedTabViewModel = tabCollectionViewModel.selectedTabViewModel,
-              let state = selectedTabViewModel.usedPermissions.camera.combined(with: selectedTabViewModel.usedPermissions.microphone)
-        else {
-            os_log("%s: Selected tab view model is nil or no camera state", type: .error, className)
+        guard let selectedTabViewModel = tabCollectionViewModel.selectedTabViewModel else {
+            os_log("%s: Selected tab view model is nil", type: .error, className)
             return
         }
-        if case .requested(let query) = state {
+        if case .requested(let query) = selectedTabViewModel.usedPermissions.camera {
             openPermissionAuthorizationPopover(for: query)
             return
         }
 
         var permissions = Permissions()
-        permissions[.camera] = selectedTabViewModel.usedPermissions.camera
-        permissions[.microphone] = selectedTabViewModel.usedPermissions.microphone
+        permissions.camera = selectedTabViewModel.usedPermissions.camera
+        if microphoneButton.isHidden {
+            permissions.microphone = selectedTabViewModel.usedPermissions.microphone
+        }
 
         PermissionContextMenu(permissions: permissions.map { ($0, $1) },
                               domain: selectedTabViewModel.tab.content.url?.host ?? "",
@@ -373,7 +392,7 @@ final class AddressBarButtonsViewController: NSViewController {
         guard let selectedTabViewModel = tabCollectionViewModel.selectedTabViewModel,
               let state = selectedTabViewModel.usedPermissions.popups
         else {
-            os_log("%s: Selected tab view model is nil or no geolocation state", type: .error, className)
+            os_log("%s: Selected tab view model is nil or no popups state", type: .error, className)
             return
         }
 
@@ -392,6 +411,29 @@ final class AddressBarButtonsViewController: NSViewController {
             .popUp(positioning: nil, at: NSPoint(x: 0, y: sender.bounds.height), in: sender)
     }
 
+    @IBAction func externalSchemeButtonAction(_ sender: NSButton) {
+        guard let selectedTabViewModel = tabCollectionViewModel.selectedTabViewModel,
+              let (permissionType, state) = selectedTabViewModel.usedPermissions.first(where: { $0.key.isExternalScheme })
+        else {
+            os_log("%s: Selected tab view model is nil or no externalScheme state", type: .error, className)
+            return
+        }
+
+        let permissions: [(PermissionType, PermissionState)]
+        if case .requested(let query) = state {
+            query.wasShownOnce = false
+            openPermissionAuthorizationPopover(for: query)
+            return
+        }
+
+        permissions = [(permissionType, state)]
+        
+        PermissionContextMenu(permissions: permissions,
+                              domain: selectedTabViewModel.tab.content.url?.host ?? "",
+                              delegate: self)
+            .popUp(positioning: nil, at: NSPoint(x: 0, y: sender.bounds.height), in: sender)
+    }
+
     private func setupButtons() {
         if view.window?.isPopUpWindow == true {
             privacyEntryPointButton.position = .free            
@@ -399,6 +441,7 @@ final class AddressBarButtonsViewController: NSViewController {
             geolocationButton.position = .free
             popupsButton.position = .free
             microphoneButton.position = .free
+            externalSchemeButton.position = .free
             bookmarkButton.isHidden = true
         } else {
             bookmarkButton.position = .right
@@ -412,6 +455,7 @@ final class AddressBarButtonsViewController: NSViewController {
         microphoneButton.sendAction(on: .leftMouseDown)
         geolocationButton.sendAction(on: .leftMouseDown)
         popupsButton.sendAction(on: .leftMouseDown)
+        externalSchemeButton.sendAction(on: .leftMouseDown)
     }
 
     private var animationViewCache = [String: AnimationView]()
@@ -535,7 +579,9 @@ final class AddressBarButtonsViewController: NSViewController {
     }
 
     private func updatePermissionButtons() {
-        permissionButtons.isHidden = isTextFieldEditorFirstResponder || isAnyTrackerAnimationPlaying
+        permissionButtons.isHidden = isTextFieldEditorFirstResponder
+            || isAnyTrackerAnimationPlaying
+            || (tabCollectionViewModel.selectedTabViewModel?.errorViewState.isVisible ?? true)
         defer {
             showOrHidePermissionPopoverIfNeeded()
         }
@@ -543,14 +589,16 @@ final class AddressBarButtonsViewController: NSViewController {
         guard let selectedTabViewModel = tabCollectionViewModel.selectedTabViewModel else { return }
 
         geolocationButton.buttonState = selectedTabViewModel.usedPermissions.geolocation
-        cameraButton.buttonState = selectedTabViewModel.usedPermissions.camera
-            .combined(with: selectedTabViewModel.usedPermissions.microphone)
-        microphoneButton.buttonState = selectedTabViewModel.usedPermissions.camera == nil
-            ? selectedTabViewModel.usedPermissions.microphone
-            : nil
+
+        let (camera, microphone) = PermissionState?.combineCamera(selectedTabViewModel.usedPermissions.camera,
+                                                                  withMicrophone: selectedTabViewModel.usedPermissions.microphone)
+        cameraButton.buttonState = camera
+        microphoneButton.buttonState = microphone
+
         popupsButton.buttonState = selectedTabViewModel.usedPermissions.popups?.isRequested == true // show only when there're popups blocked
             ? selectedTabViewModel.usedPermissions.popups
             : nil
+        externalSchemeButton.buttonState = selectedTabViewModel.usedPermissions.externalScheme
 
         showOrHidePermissionPopoverIfNeeded()
     }
@@ -558,11 +606,14 @@ final class AddressBarButtonsViewController: NSViewController {
     private func showOrHidePermissionPopoverIfNeeded() {
         guard let selectedTabViewModel = tabCollectionViewModel.selectedTabViewModel else { return }
 
-        for permission in PermissionType.allCases {
+        for permission in selectedTabViewModel.usedPermissions.keys {
             guard case .requested(let query) = selectedTabViewModel.usedPermissions[permission] else { continue }
-            if !permissionAuthorizationPopover.isShown {
-                openPermissionAuthorizationPopover(for: query)
+            guard !permissionAuthorizationPopover.isShown else {
+                if permissionAuthorizationPopover.viewController.query === query { return }
+                permissionAuthorizationPopover.close()
+                return
             }
+            openPermissionAuthorizationPopover(for: query)
             return
         }
         if _permissionAuthorizationPopover?.isShown == true {
@@ -779,11 +830,6 @@ extension AddressBarButtonsViewController: PermissionContextMenuDelegate {
     }
     func permissionContextMenu(_ menu: PermissionContextMenu, unmutePermissions permissions: [PermissionType]) {
         tabCollectionViewModel.selectedTabViewModel?.tab.permissions.set(permissions, muted: false)
-    }
-    func permissionContextMenu(_ menu: PermissionContextMenu, revokePermissions permissions: [PermissionType]) {
-        for permission in permissions {
-            tabCollectionViewModel.selectedTabViewModel?.tab.permissions.revoke(permission)
-        }
     }
     func permissionContextMenu(_ menu: PermissionContextMenu, allowPermissionQuery query: PermissionAuthorizationQuery) {
         tabCollectionViewModel.selectedTabViewModel?.tab.permissions.allow(query)

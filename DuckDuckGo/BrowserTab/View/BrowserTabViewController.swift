@@ -388,38 +388,66 @@ extension BrowserTabViewController: TabDelegate {
         }
     }
 
-	func tab(_ tab: Tab, requestedOpenExternalURL url: URL, forUserEnteredURL userEntered: Bool) {
-        guard let window = self.view.window else {
-            os_log("%s: Window is nil", type: .error, className)
+    func tab(_ tab: Tab, requestedOpenExternalURL url: URL, forUserEnteredURL userEntered: Bool) {
+
+        let searchForExternalUrl = { [weak tab] in
+            tab?.update(url: URL.makeSearchUrl(from: url.absoluteString), userEntered: false)
+        }
+
+        // there is a hacky way you can detect whether an app is installed to handle a protocol:
+        // https://www.npmjs.com/package/custom-protocol-check
+        // > Safari: using hidden iframe onBlur to detect whether the focus is stolen.
+        // > When the focus is stolen, it assumes that the custom protocol launches external app and therefore it exists.
+        // Which, looking at the Zoom launcher code, is almost what they're doing:
+        /*
+            document.body.focus();
+            var t = function() {
+                return window.removeEventListener("blur", o)
+            };
+            function o() {
+                n(),
+                t()
+            }
+            var s = i.isMobile ? Ar : Cr;
+            if (setTimeout((function() {
+                n({
+                    code: 1001,
+                    message: "urlscheme no blur within timout " + s + "ms"
+                }),
+                t()
+            }), s), window.addEventListener("blur", o)
+            ...
+        */
+        // The code immediately after that then creates an iframe with the zoommtg:// link in it
+        // if the app is installed, the browser protocol handler will show, which triggers a blur event
+        // So, we'll steal a WebView focus if the app is installed, otherwise download should be triggered
+        guard NSWorkspace.shared.urlForApplication(toOpen: url) != nil else {
+            if userEntered {
+                searchForExternalUrl()
+            }
             return
         }
+        self.view.makeMeFirstResponder()
 
-        guard tabCollectionViewModel.selectedTabViewModel?.tab == tab else {
-            // Only allow the selected tab to open external apps
-            return
+        let permissionType = PermissionType.externalScheme(scheme: url.scheme ?? "")
+
+        tab.permissions.permissions([permissionType],
+                                    requestedForDomain: webView?.url?.host ?? "localhost",
+                                    url: url) { [weak self, weak tab] granted in
+            guard granted, let tab = tab else {
+                if userEntered {
+                    searchForExternalUrl()
+                }
+                return
+            }
+
+            self?.tab(tab, openExternalURL: url, touchingPermissionType: permissionType)
         }
+    }
 
-		func searchForExternalUrl() {
-			tab.update(url: URL.makeSearchUrl(from: url.absoluteString), userEntered: false)
-		}
-
-        guard let appUrl = NSWorkspace.shared.urlForApplication(toOpen: url) else {
-			if userEntered {
-				searchForExternalUrl()
-			} else {
-				NSAlert.unableToOpenExernalURLAlert().beginSheetModal(for: window)
-			}
-            return
-        }
-
-        let externalAppName = Bundle(url: appUrl)?.infoDictionary?["CFBundleName"] as? String
-        NSAlert.openExternalURLAlert(with: externalAppName).beginSheetModal(for: window) { response in
-            if response == NSApplication.ModalResponse.alertFirstButtonReturn {
-                NSWorkspace.shared.open(url)
-			} else if userEntered {
-				searchForExternalUrl()
-			}
-        }
+    private func tab(_ tab: Tab, openExternalURL url: URL, touchingPermissionType permissionType: PermissionType) {
+        NSWorkspace.shared.open(url)
+        tab.permissions.permissions[permissionType].externalSchemeOpened()
     }
 
     func tabPageDOMLoaded(_ tab: Tab) {
@@ -723,7 +751,7 @@ extension BrowserTabViewController: WKUIDelegate {
         var shouldOpenPopUp = navigationAction.isUserInitiated
         if !shouldOpenPopUp {
             let url = navigationAction.request.url
-            parentTab.permissions.permissions([.popups], requestedForDomain: webView.url?.host, url: url) { [weak parentTab] granted in
+            parentTab.permissions.permissions(.popups, requestedForDomain: webView.url?.host, url: url) { [weak parentTab] granted in
 
                 guard let parentTab = parentTab else { return }
 
@@ -820,7 +848,7 @@ extension BrowserTabViewController: WKUIDelegate {
     // https://github.com/WebKit/WebKit/blob/9d7278159234e0bfa3d27909a19e695928f3b31e/Source/WebKit/UIProcess/API/Cocoa/WKUIDelegatePrivate.h#L131
     @objc(_webView:requestGeolocationPermissionForFrame:decisionHandler:)
     func webView(_ webView: WKWebView, requestGeolocationPermissionFor frame: WKFrameInfo, decisionHandler: @escaping (Bool) -> Void) {
-        webView.tab?.permissions.permissions([.geolocation], requestedForDomain: frame.request.url?.host, decisionHandler: decisionHandler)
+        webView.tab?.permissions.permissions(.geolocation, requestedForDomain: frame.request.url?.host, decisionHandler: decisionHandler)
             ?? /* Tab deallocated: */ {
                 decisionHandler(false)
             }()
@@ -833,7 +861,7 @@ extension BrowserTabViewController: WKUIDelegate {
                  requestGeolocationPermissionFor origin: WKSecurityOrigin,
                  initiatedBy frame: WKFrameInfo,
                  decisionHandler: @escaping (WKPermissionDecision) -> Void) {
-        webView.tab?.permissions.permissions([.geolocation], requestedForDomain: frame.request.url?.host) { granted in
+        webView.tab?.permissions.permissions(.geolocation, requestedForDomain: frame.request.url?.host) { granted in
             decisionHandler(granted ? .grant : .deny)
         } ?? /* Tab deallocated: */ {
             decisionHandler(.deny)

@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<document type="com.apple.InterfaceBuilder3.Cocoa.Storyboard.XIB" version="3.0" toolsVersion="19528" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES">
+<document type="com.apple.InterfaceBuilder3.Cocoa.Storyboard.XIB" version="3.0" toolsVersion="19529" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES">
     <dependencies>
         <deployment identifier="macosx"/>
-        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="19528"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="19529"/>
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
     </dependencies>
     <scenes>
@@ -11,22 +11,94 @@
             <objects>
                 <viewController storyboardIdentifier="PermissionAuthorizationViewController" id="1ds-EH-Sa3" customClass="PermissionAuthorizationViewController" customModule="DuckDuckGo_Privacy_Browser" customModuleProvider="target" sceneMemberID="viewController">
                     <view key="view" id="6Y6-ej-1GX">
-                        <rect key="frame" x="0.0" y="0.0" width="312" height="122"/>
+                        <rect key="frame" x="0.0" y="0.0" width="320" height="140"/>
                         <autoresizingMask key="autoresizingMask"/>
                         <subviews>
-                            <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="7nK-UI-YT3">
-                                <rect key="frame" x="14" y="64" width="284" height="32"/>
+                            <stackView distribution="fill" orientation="vertical" alignment="centerX" spacing="16" horizontalStackHuggingPriority="750" verticalStackHuggingPriority="750" horizontalHuggingPriority="752" verticalHuggingPriority="752" horizontalCompressionResistancePriority="249" verticalCompressionResistancePriority="250" detachesHiddenViews="YES" translatesAutoresizingMaskIntoConstraints="NO" id="DDy-au-YqK">
+                                <rect key="frame" x="16" y="56" width="288" height="64"/>
+                                <subviews>
+                                    <textField horizontalHuggingPriority="751" verticalHuggingPriority="750" horizontalCompressionResistancePriority="250" translatesAutoresizingMaskIntoConstraints="NO" id="7nK-UI-YT3">
+                                        <rect key="frame" x="-2" y="32" width="292" height="32"/>
+                                        <textFieldCell key="cell" alignment="center" title="Allow “longname.chat.somewebsite.com” to use your Camera and Microphone?" id="z9s-AY-68S">
+                                            <font key="font" metaFont="systemBold"/>
+                                            <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
+                                            <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
+                                        </textFieldCell>
+                                    </textField>
+                                    <stackView distribution="fill" orientation="horizontal" alignment="top" spacing="0.0" horizontalStackHuggingPriority="249.99998474121094" verticalStackHuggingPriority="750" horizontalHuggingPriority="752" verticalHuggingPriority="750" horizontalCompressionResistancePriority="250" verticalCompressionResistancePriority="250" detachesHiddenViews="YES" translatesAutoresizingMaskIntoConstraints="NO" id="5JO-km-2KL">
+                                        <rect key="frame" x="0.0" y="0.0" width="288" height="16"/>
+                                        <subviews>
+                                            <button horizontalHuggingPriority="750" verticalHuggingPriority="750" horizontalCompressionResistancePriority="751" translatesAutoresizingMaskIntoConstraints="NO" id="4Qg-BR-C50">
+                                                <rect key="frame" x="-2" y="-1" width="122" height="18"/>
+                                                <buttonCell key="cell" type="check" title="Always allow on" bezelStyle="regularSquare" imagePosition="left" state="on" inset="2" id="Mak-WM-Obe">
+                                                    <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
+                                                    <font key="font" metaFont="system"/>
+                                                </buttonCell>
+                                            </button>
+                                            <customView translatesAutoresizingMaskIntoConstraints="NO" id="PEB-5b-R8e">
+                                                <rect key="frame" x="120" y="0.0" width="168" height="16"/>
+                                                <subviews>
+                                                    <textField horizontalHuggingPriority="751" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="Qnx-0b-4zc">
+                                                        <rect key="frame" x="-2" y="0.0" width="172" height="16"/>
+                                                        <constraints>
+                                                            <constraint firstAttribute="width" relation="lessThanOrEqual" constant="550" id="qpi-AI-9P3"/>
+                                                        </constraints>
+                                                        <textFieldCell key="cell" lineBreakMode="truncatingMiddle" title="“verylonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglongdomainname.com”" id="25k-iy-jgN">
+                                                            <font key="font" metaFont="system"/>
+                                                            <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
+                                                            <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
+                                                        </textFieldCell>
+                                                    </textField>
+                                                    <button verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="G5q-Z6-RNg">
+                                                        <rect key="frame" x="0.0" y="0.0" width="168" height="16"/>
+                                                        <buttonCell key="cell" type="bevel" bezelStyle="rounded" alignment="center" transparent="YES" imageScaling="proportionallyDown" inset="2" id="jsw-nv-RIO">
+                                                            <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
+                                                            <font key="font" metaFont="system"/>
+                                                        </buttonCell>
+                                                        <connections>
+                                                            <action selector="alwaysAllowLabelClick:" target="1ds-EH-Sa3" id="luD-es-ydX"/>
+                                                        </connections>
+                                                    </button>
+                                                </subviews>
+                                                <constraints>
+                                                    <constraint firstItem="Qnx-0b-4zc" firstAttribute="top" secondItem="PEB-5b-R8e" secondAttribute="top" id="20O-J2-oWj"/>
+                                                    <constraint firstAttribute="bottom" secondItem="Qnx-0b-4zc" secondAttribute="bottom" id="28g-UY-BZb"/>
+                                                    <constraint firstItem="Qnx-0b-4zc" firstAttribute="leading" secondItem="PEB-5b-R8e" secondAttribute="leading" id="MRs-tm-d1u"/>
+                                                    <constraint firstAttribute="trailing" secondItem="Qnx-0b-4zc" secondAttribute="trailing" id="Vvv-kO-ayb"/>
+                                                    <constraint firstAttribute="trailing" secondItem="G5q-Z6-RNg" secondAttribute="trailing" id="geH-Np-o4l"/>
+                                                    <constraint firstAttribute="bottom" secondItem="G5q-Z6-RNg" secondAttribute="bottom" id="kw8-fX-K6N"/>
+                                                    <constraint firstItem="G5q-Z6-RNg" firstAttribute="top" secondItem="PEB-5b-R8e" secondAttribute="top" id="mG4-Ly-eT4"/>
+                                                    <constraint firstItem="G5q-Z6-RNg" firstAttribute="leading" secondItem="PEB-5b-R8e" secondAttribute="leading" id="sDl-ni-gCi"/>
+                                                </constraints>
+                                            </customView>
+                                        </subviews>
+                                        <visibilityPriorities>
+                                            <integer value="1000"/>
+                                            <integer value="1000"/>
+                                        </visibilityPriorities>
+                                        <customSpacing>
+                                            <real value="3.4028234663852886e+38"/>
+                                            <real value="3.4028234663852886e+38"/>
+                                        </customSpacing>
+                                    </stackView>
+                                </subviews>
                                 <constraints>
-                                    <constraint firstAttribute="width" relation="lessThanOrEqual" constant="280" id="QYG-Ij-tMj"/>
+                                    <constraint firstAttribute="width" constant="288" id="aRP-TF-Mru"/>
                                 </constraints>
-                                <textFieldCell key="cell" title="website.com asks for permission to use your geolocation, allow?" id="z9s-AY-68S">
-                                    <font key="font" metaFont="systemBold"/>
-                                    <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
-                                    <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
-                                </textFieldCell>
-                            </textField>
+                                <visibilityPriorities>
+                                    <integer value="1000"/>
+                                    <integer value="1000"/>
+                                </visibilityPriorities>
+                                <customSpacing>
+                                    <real value="3.4028234663852886e+38"/>
+                                    <real value="3.4028234663852886e+38"/>
+                                </customSpacing>
+                            </stackView>
                             <button verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="STv-Br-1F5">
-                                <rect key="frame" x="153" y="9" width="146" height="32"/>
+                                <rect key="frame" x="165" y="9" width="146" height="32"/>
+                                <constraints>
+                                    <constraint firstAttribute="width" constant="132" id="zDw-7c-cxw"/>
+                                </constraints>
                                 <buttonCell key="cell" type="push" title="Allow" bezelStyle="rounded" alignment="center" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="eOa-90-vwm">
                                     <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
                                     <font key="font" metaFont="system"/>
@@ -36,10 +108,13 @@
                                 </connections>
                             </button>
                             <button verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="nJj-cz-fYJ">
-                                <rect key="frame" x="9" y="9" width="146" height="32"/>
-                                <buttonCell key="cell" type="push" title="Deny" bezelStyle="rounded" alignment="center" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="tHA-lk-nXO">
+                                <rect key="frame" x="21" y="9" width="146" height="32"/>
+                                <buttonCell key="cell" type="push" title="Cancel" bezelStyle="rounded" alignment="center" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="tHA-lk-nXO">
                                     <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
                                     <font key="font" metaFont="system"/>
+                                    <string key="keyEquivalent" base64-UTF8="YES">
+Gw
+</string>
                                 </buttonCell>
                                 <connections>
                                     <action selector="denyAction:" target="1ds-EH-Sa3" id="3f0-ZY-jHN"/>
@@ -48,24 +123,28 @@
                         </subviews>
                         <constraints>
                             <constraint firstItem="STv-Br-1F5" firstAttribute="width" secondItem="nJj-cz-fYJ" secondAttribute="width" id="5oP-rX-XmW"/>
-                            <constraint firstItem="nJj-cz-fYJ" firstAttribute="leading" secondItem="6Y6-ej-1GX" secondAttribute="leading" constant="16" id="OD8-zs-d8T"/>
-                            <constraint firstItem="7nK-UI-YT3" firstAttribute="top" secondItem="6Y6-ej-1GX" secondAttribute="top" constant="26" id="QSn-2H-Xo2"/>
-                            <constraint firstItem="STv-Br-1F5" firstAttribute="top" secondItem="7nK-UI-YT3" secondAttribute="bottom" constant="28" id="UZw-81-kcM"/>
-                            <constraint firstAttribute="trailing" secondItem="STv-Br-1F5" secondAttribute="trailing" constant="20" symbolic="YES" id="fYb-Vo-gC9"/>
-                            <constraint firstItem="7nK-UI-YT3" firstAttribute="leading" secondItem="6Y6-ej-1GX" secondAttribute="leading" constant="16" id="kAG-t8-mxX"/>
+                            <constraint firstItem="STv-Br-1F5" firstAttribute="top" secondItem="DDy-au-YqK" secondAttribute="bottom" constant="20" id="GHI-g5-V0g"/>
+                            <constraint firstItem="nJj-cz-fYJ" firstAttribute="leading" relation="greaterThanOrEqual" secondItem="6Y6-ej-1GX" secondAttribute="leading" constant="16" id="OD8-zs-d8T"/>
+                            <constraint firstItem="DDy-au-YqK" firstAttribute="top" secondItem="6Y6-ej-1GX" secondAttribute="top" constant="20" id="Skm-gh-V3K"/>
+                            <constraint firstAttribute="trailing" secondItem="DDy-au-YqK" secondAttribute="trailing" constant="16" id="isC-Zf-Hmg"/>
                             <constraint firstItem="STv-Br-1F5" firstAttribute="leading" secondItem="nJj-cz-fYJ" secondAttribute="trailing" constant="12" symbolic="YES" id="mUt-ZG-eUB"/>
                             <constraint firstAttribute="bottom" secondItem="nJj-cz-fYJ" secondAttribute="bottom" constant="16" id="nRi-XJ-2MT"/>
                             <constraint firstAttribute="bottom" secondItem="STv-Br-1F5" secondAttribute="bottom" constant="16" id="nrt-Ld-8oq"/>
-                            <constraint firstAttribute="trailing" secondItem="7nK-UI-YT3" secondAttribute="trailing" constant="16" id="vPs-sd-8Ti"/>
+                            <constraint firstAttribute="trailing" secondItem="STv-Br-1F5" secondAttribute="trailing" constant="16" id="oC6-g0-jDX"/>
+                            <constraint firstItem="DDy-au-YqK" firstAttribute="leading" secondItem="6Y6-ej-1GX" secondAttribute="leading" constant="16" id="onV-OP-Sdk"/>
                         </constraints>
                     </view>
                     <connections>
+                        <outlet property="alwaysAllowCheckbox" destination="4Qg-BR-C50" id="mOB-Cq-IBs"/>
+                        <outlet property="alwaysAllowStackView" destination="5JO-km-2KL" id="gfB-hu-D8L"/>
+                        <outlet property="denyButton" destination="nJj-cz-fYJ" id="J7s-Xi-CEU"/>
                         <outlet property="descriptionLabel" destination="7nK-UI-YT3" id="3j0-fM-dKc"/>
+                        <outlet property="domainNameLabel" destination="Qnx-0b-4zc" id="NxM-TF-b10"/>
                     </connections>
                 </viewController>
                 <customObject id="Pct-h6-WSE" userLabel="First Responder" customClass="NSResponder" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="-588" y="-104"/>
+            <point key="canvasLocation" x="-724" y="-104"/>
         </scene>
         <!--Popup Blocked View Controller-->
         <scene sceneID="raf-VW-y7g">

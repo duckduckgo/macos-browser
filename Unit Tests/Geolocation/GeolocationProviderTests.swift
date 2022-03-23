@@ -567,7 +567,7 @@ final class GeolocationProviderTests: XCTestCase {
         let e1 = expectation(description: "location received")
         geolocationHandler = { webView, body in
             XCTAssertEqual(try Response(body), Response(location1.removingAltitude()))
-            webView.revokePermissions([.geolocation])
+            webView.revokePermissions(.geolocation)
             e1.fulfill()
         }
         let e2 = expectation(description: "subscription cancelled")

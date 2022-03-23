@@ -133,7 +133,8 @@ final class PrivacyDashboardUserScript: NSObject, StaticUserScript {
         let allowedPermissions = authorizationState.map { item in
             [
                 "key": item.permission.rawValue,
-                "title": item.permission.localizedDescription,
+                "icon": item.permission.jsStyle,
+                "title": item.permission.jsTitle,
                 "permission": item.state.rawValue,
                 "used": usedPermissions[item.permission] != nil,
                 "paused": usedPermissions[item.permission] == .paused,
@@ -236,4 +237,26 @@ extension PermissionAuthorizationState {
             return UserText.privacyDashboardPermissionAlwaysDeny
         }
     }
+}
+
+extension PermissionType {
+
+    var jsStyle: String {
+        switch self {
+        case .camera, .microphone, .geolocation, .popups:
+            return self.rawValue
+        case .externalScheme:
+            return "externalScheme"
+        }
+    }
+
+    var jsTitle: String {
+        switch self {
+        case .camera, .microphone, .geolocation, .popups:
+            return self.localizedDescription
+        case .externalScheme:
+            return String(format: UserText.permissionExternalSchemeOpenFormat, self.localizedDescription)
+        }
+    }
+
 }

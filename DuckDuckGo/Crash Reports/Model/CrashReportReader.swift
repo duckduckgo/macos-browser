@@ -48,7 +48,7 @@ final class CrashReportReader {
     }
 
     private func belongsToThisApp(_ path: URL) -> Bool {
-        return path.lastPathComponent.hasPrefix(Self.displayName)
+        return path.lastPathComponent.hasPrefix(Self.displayName ?? "DuckDuckGo")
     }
 
     private func isFile(at path: URL, newerThan lastCheckDate: Date) -> Bool {

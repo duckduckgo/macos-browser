@@ -20,11 +20,14 @@ import Cocoa
 
 final class PermissionAuthorizationPopover: NSPopover {
 
+    @nonobjc private var didShow: Bool = false
+
     override init() {
         super.init()
 
         behavior = .applicationDefined
         setupContentController()
+        self.delegate = self
     }
 
     required init?(coder: NSCoder) {
@@ -43,5 +46,22 @@ final class PermissionAuthorizationPopover: NSPopover {
         contentViewController = controller
     }
     // swiftlint:enable force_cast
+
+}
+
+extension PermissionAuthorizationPopover: NSPopoverDelegate {
+
+    func popoverWillShow(_ notification: Notification) {
+        self.didShow = false
+    }
+
+    func popoverDidShow(_ notification: Notification) {
+        self.didShow = true
+    }
+
+    func popoverShouldClose(_ popover: NSPopover) -> Bool {
+        guard didShow else { return false } // don't close on mouse-up
+        return true
+    }
 
 }
