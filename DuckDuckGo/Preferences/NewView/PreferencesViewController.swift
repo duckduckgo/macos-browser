@@ -1,5 +1,5 @@
 //
-//  NewPreferencesSplitViewController.swift
+//  PreferencesViewController.swift
 //
 //  Copyright © 2022 DuckDuckGo. All rights reserved.
 //
@@ -18,10 +18,14 @@
 
 import Cocoa
 import SwiftUI
+import Combine
 
-final class NewPreferencesSplitViewController: NSViewController {
+final class PreferencesViewController: NSViewController {
 
     weak var delegate: BrowserTabSelectionDelegate?
+    
+    let model = PreferencesModel()
+    private var selectedTabIndexCancellable: AnyCancellable?
     
     override func loadView() {
         view = NSView()
@@ -29,9 +33,15 @@ final class NewPreferencesSplitViewController: NSViewController {
 
     override func viewDidLoad() {
         super.viewDidLoad()
-
-        let host = NSHostingView(rootView: Preferences.RootView(model: .init()))
+        
+        let host = NSHostingView(rootView: Preferences.RootView(model: model))
         view.addAndLayout(host)
+        
+        selectedTabIndexCancellable = model.$selectedTabIndex
+            .dropFirst()
+            .sink { [unowned self] index in
+                delegate?.selectedTab(at: index)
+            }
     }
     
 }

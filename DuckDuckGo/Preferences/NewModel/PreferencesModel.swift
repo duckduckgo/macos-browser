@@ -22,12 +22,25 @@ final class PreferencesModel: ObservableObject {
     
     let sections: [PreferencesSection]
     
+    let tabSwitcherTabs: [Tab.TabContent] = Tab.TabContent.displayableTabTypes
+    
+    @Published var selectedTabIndex: Int = 0
+    
     @Published var selectedPane: PreferencePaneIdentifier = .defaultBrowser
 
     init(sections: [PreferencesSection] = PreferencesSection.defaultSections) {
         self.sections = sections
+        resetTabSelectionIfNeeded()
         if let firstPane = sections.first?.panes.first {
             selectedPane = firstPane
+        }
+    }
+    
+    func resetTabSelectionIfNeeded() {
+        if let preferencesTabIndex = tabSwitcherTabs.firstIndex(of: .preferences) {
+            if preferencesTabIndex != selectedTabIndex {
+                selectedTabIndex = preferencesTabIndex
+            }
         }
     }
         

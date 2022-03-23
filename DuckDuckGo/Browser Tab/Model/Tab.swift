@@ -47,7 +47,6 @@ final class Tab: NSObject {
     enum TabContent: Equatable {
         case homePage
         case url(URL)
-        case newPreferences
         case preferences
         case bookmarks
         case onboarding
@@ -58,8 +57,6 @@ final class Tab: NSObject {
                 return .homePage
             } else if url == .welcome {
                 return .onboarding
-            } else if url == .newPreferences {
-                return .newPreferences
             } else if url == .preferences {
                 return .preferences
             } else {
@@ -68,9 +65,9 @@ final class Tab: NSObject {
         }
 
         static var displayableTabTypes: [TabContent] {
-            return [TabContent.preferences, .newPreferences, .bookmarks].sorted { first, second in
+            return [TabContent.preferences, .bookmarks].sorted { first, second in
                 switch first {
-                case .homePage, .url, .newPreferences, .preferences, .bookmarks, .onboarding, .none: break
+                case .homePage, .url, .preferences, .bookmarks, .onboarding, .none: break
                 // !! Replace [TabContent.preferences, .bookmarks] above with new displayable Tab Types if added
                 }
                 guard let firstTitle = first.title, let secondTitle = second.title else {
@@ -83,7 +80,6 @@ final class Tab: NSObject {
         var title: String? {
             switch self {
             case .url, .homePage, .none: return nil
-            case .newPreferences: return "New " + UserText.tabPreferencesTitle
             case .preferences: return UserText.tabPreferencesTitle
             case .bookmarks: return UserText.tabBookmarksTitle
             case .onboarding: return UserText.tabOnboardingTitle

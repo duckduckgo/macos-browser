@@ -60,30 +60,29 @@ extension Preferences {
     struct Sidebar: View {
         @EnvironmentObject var model: PreferencesModel
 
-        @State var selectedTab: Tab.TabContent = .newPreferences
-
         var body: some View {
             VStack(spacing: 12) {
-                NSPopUpButtonView<Tab.TabContent>(selection: $selectedTab, viewCreator: {
+                NSPopUpButtonView(selection: $model.selectedTabIndex, viewCreator: {
                     let button = NSPopUpButton()
                     button.font = Const.Fonts.popUpButton
                     button.setButtonType(.momentaryLight)
                     button.isBordered = false
                     
-                    for type in Tab.TabContent.displayableTabTypes {
+                    for (index, type) in model.tabSwitcherTabs.enumerated() {
                         guard let tabTitle = type.title else {
                             assertionFailure("Attempted to display standard tab type in tab switcher")
                             continue
                         }
                         
                         let item = button.menu?.addItem(withTitle: tabTitle, action: nil, keyEquivalent: "")
-                        item?.representedObject = type
+                        item?.representedObject = index
                     }
                     
                     return button
                 })
                     .padding(.horizontal, 3)
                     .frame(height: 60)
+                    .onAppear(perform: model.resetTabSelectionIfNeeded)
                 
                 ScrollView {
                     VStack(spacing: 0) {

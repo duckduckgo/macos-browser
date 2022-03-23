@@ -149,10 +149,6 @@ extension MainViewController {
 
     // MARK: - Main Menu
 
-    @IBAction func openNewPreferences(_ sender: Any?) {
-        browserTabViewController.openNewTab(with: .newPreferences, selected: true)
-    }
-
     @IBAction func openPreferences(_ sender: Any?) {
         browserTabViewController.openNewTab(with: .preferences, selected: true)
     }

@@ -71,7 +71,7 @@ extension Preferences {
                     Text(UserText.loginsPlusNeverLock).tag(false)
                 }, label: {})
                     .pickerStyle(.radioGroup)
-                    .offset(x: -8)
+                    .offset(x: autoLockPickerHorizontalOffset)
                     .padding(.bottom, 6)
 
                 Text(UserText.loginsPlusNeverLockWarning)
@@ -79,6 +79,14 @@ extension Preferences {
                     .foregroundColor(Color("GreyTextColor"))
                     .fixMultilineScrollableText()
                     .offset(x: 18)
+            }
+        }
+        
+        var autoLockPickerHorizontalOffset: CGFloat {
+            if #available(macOS 12.0, *) {
+                return -8
+            } else {
+                return 0
             }
         }
     }
