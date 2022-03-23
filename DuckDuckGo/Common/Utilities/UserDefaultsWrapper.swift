@@ -31,7 +31,7 @@ public struct UserDefaultsWrapper<T> {
         case configStorageSurrogatesEtag = "config.storage.surrogates.etag"
         case configStoragePrivacyConfigurationEtag = "config.storage.privacyconfiguration.etag"
         case configFBConfigEtag = "config.storage.fbconfig.etag"
-        
+
         case fireproofDomains = "com.duckduckgo.fireproofing.allowedDomains"
         case unprotectedDomains = "com.duckduckgo.contentblocker.unprotectedDomains"
         case contentBlockingRulesCache = "com.duckduckgo.contentblocker.rules.cache"
@@ -56,7 +56,7 @@ public struct UserDefaultsWrapper<T> {
         case lastCrashReportCheckDate = "last.crash.report.check.date"
 
         case fireInfoPresentedOnce = "fire.info.presented.once"
-        
+
         case currentThemeName = "com.duckduckgo.macos.currentThemeNameKey"
         case showFullURL = "preferences.appearance.show-full-url"
 
@@ -66,7 +66,7 @@ public struct UserDefaultsWrapper<T> {
         case searchRetentionAtb = "statistics.retentionatb.key"
         case appRetentionAtb = "statistics.appretentionatb.key"
         case lastAppRetentionRequestDate = "statistics.appretentionatb.last.request.key"
-        
+
         // Used to detect whether a user had old User Defaults ATB data at launch, in order to grant them implicitly
         // unlocked status with regards to the lock screen
         case legacyStatisticsStoreDataCleared = "statistics.appretentionatb.legacy-data-cleared"
@@ -75,7 +75,7 @@ public struct UserDefaultsWrapper<T> {
 
         case homePageShowPagesOnHover = "home.page.show.pages.on.hover"
     }
-    
+
     enum RemovedKeys: String, CaseIterable {
         case passwordManagerDoNotPromptDomains = "com.duckduckgo.passwordmanager.do-not-prompt-domains"
     }
@@ -113,15 +113,15 @@ public struct UserDefaultsWrapper<T> {
     }
 
     static func clearAll() {
-         Key.allCases.forEach { key in
-             UserDefaults.standard.removeObject(forKey: key.rawValue)
-         }
+        Key.allCases.forEach { key in
+            UserDefaults.standard.removeObject(forKey: key.rawValue)
+        }
     }
-    
+
     static func clearRemovedKeys() {
-         RemovedKeys.allCases.forEach { key in
-             UserDefaults.standard.removeObject(forKey: key.rawValue)
-         }
+        RemovedKeys.allCases.forEach { key in
+            UserDefaults.standard.removeObject(forKey: key.rawValue)
+        }
     }
 
     static func clear(_ key: Key) {

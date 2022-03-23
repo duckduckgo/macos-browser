@@ -63,14 +63,14 @@ final class AppearancePreferencesModel: ObservableObject {
     
     @Published var currentThemeName: ThemeName = .systemDefault {
         didSet {
-            currentThemeNameDefaultsValue = currentThemeName.rawValue
+            persistor.currentThemeName = currentThemeName.rawValue
             updateUserInterfaceStyle()
         }
     }
 
     @Published var showFullURL: Bool = false {
         didSet {
-            showFullURLDefaultsValue = showFullURL
+            persistor.showFullURL = showFullURL
         }
     }
 
@@ -78,13 +78,24 @@ final class AppearancePreferencesModel: ObservableObject {
         NSApp.appearance = currentThemeName.appearance
     }
 
-    @UserDefaultsWrapper(key: .showFullURL, defaultValue: false)
-    private var showFullURLDefaultsValue: Bool
-    @UserDefaultsWrapper(key: .currentThemeName, defaultValue: ThemeName.systemDefault.rawValue)
-    private var currentThemeNameDefaultsValue: String
-
-    private init() {
-        currentThemeName = .init(rawValue: currentThemeNameDefaultsValue) ?? .systemDefault
-        showFullURL = showFullURLDefaultsValue
+    private var persistor: AppearancePreferencesPersistor
+    
+    init(persistor: AppearancePreferencesPersistor = AppearancePreferencesUserDefaultsPersistor()) {
+        self.persistor = persistor
+        currentThemeName = .init(rawValue: persistor.currentThemeName) ?? .systemDefault
+        showFullURL = persistor.showFullURL
     }
+}
+
+protocol AppearancePreferencesPersistor {
+    var showFullURL: Bool { get set }
+    var currentThemeName: String { get set }
+}
+
+struct AppearancePreferencesUserDefaultsPersistor: AppearancePreferencesPersistor {
+    @UserDefaultsWrapper(key: .showFullURL, defaultValue: false)
+    var showFullURL: Bool
+
+    @UserDefaultsWrapper(key: .currentThemeName, defaultValue: ThemeName.systemDefault.rawValue)
+    var currentThemeName: String
 }
