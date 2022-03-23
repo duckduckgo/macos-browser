@@ -1,5 +1,5 @@
 //
-//  NSApplication+BuildTime.m
+//  UpdateController.swift
 //
 //  Copyright © 2021 DuckDuckGo. All rights reserved.
 //
@@ -16,18 +16,32 @@
 //  limitations under the License.
 //
 
-#import "NSApplication+BuildTime.h"
+import Foundation
+import Sparkle
 
-@implementation NSApplication (BuildTime)
+final class UpdateController: NSObject {
 
-- (NSDate *)buildDate {
-    NSString *buildDateTime = [[NSString stringWithUTF8String:__DATE__] stringByAppendingFormat:@" %s", __TIME__];
-    NSDateFormatter *df = [[NSDateFormatter alloc] init];
-    
-    [df setDateFormat:@"MMM d yyyy HH:mm:ss"];
-    [df setLocale: [NSLocale localeWithLocaleIdentifier:@"en_US"]];
+    private let updater = SUUpdater()
 
-    return [df dateFromString:buildDateTime];
+    override init() {
+        super.init()
+
+        configureUpdater()
+    }
+
+    func checkForUpdates(_ sender: Any!) {
+        updater.checkForUpdates(sender)
+    }
+
+    private func configureUpdater() {
+    // The default configuration of Sparkle updates is in Info.plist
+
+#if DEBUG
+
+        updater.automaticallyChecksForUpdates = false
+        updater.updateCheckInterval = 0
+
+#endif
+    }
+
 }
-
-@end

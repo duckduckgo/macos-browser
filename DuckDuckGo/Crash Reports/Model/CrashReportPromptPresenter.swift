@@ -18,8 +18,6 @@
 
 import Cocoa
 
-#if OUT_OF_APPSTORE
-
 final class CrashReportPromptPresenter {
 
     lazy var windowController: NSWindowController = {
@@ -42,5 +40,3 @@ final class CrashReportPromptPresenter {
     }
 
 }
-
-#endif
