@@ -103,12 +103,12 @@ class CBRCompileTimeReporterTests: XCTestCase {
                                       (0.5, .lessThan1s),
                                       (1, .lessThan1s),
                                       (2, .lessThan5s),
-                                      (5, .lessThan5s),
+                                      (4.5, .lessThan5s),
                                       (6, .lessThan10s),
-                                      (10, .lessThan10s),
-                                      (20, .lessThan20s),
+                                      (9.5, .lessThan10s),
+                                      (19.5, .lessThan20s),
                                       (21, .lessThan40s),
-                                      (40, .lessThan40s),
+                                      (39.5, .lessThan40s),
                                       (41, .more),
                                       (60, .more)]
 

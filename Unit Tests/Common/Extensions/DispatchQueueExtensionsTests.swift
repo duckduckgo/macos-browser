@@ -45,7 +45,7 @@ final class DispatchQueueExtensionsTests: XCTestCase {
         }
         DispatchQueue.main.dispatch(job, sync: false)
         e = expectation(description: "DispatchWorkItem dispatched")
-        waitForExpectations(timeout: 0.1)
+        waitForExpectations(timeout: 1)
     }
 
 }

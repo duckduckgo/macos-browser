@@ -58,4 +58,8 @@ extension Dictionary where Key == PermissionType, Value == PermissionState {
         }
     }
 
+    var externalScheme: PermissionState? {
+        return self.first(where: { $0.key.isExternalScheme })?.value
+    }
+
 }
