@@ -87,9 +87,11 @@ final class FirePopoverViewModel {
 
                 return tab.visitedDomains
             case .currentWindow:
-                return tabCollectionViewModel.tabCollection.tabs.reduce(Set<String>()) { result, tab in
+                let visitedDomainsOfClosedTabs = tabCollectionViewModel.tabCollection.visitedDomainsOfRemovedTabs
+                let visitedDomainsOfCurrentTabs = tabCollectionViewModel.tabCollection.tabs.reduce(Set<String>()) { result, tab in
                     return result.union(tab.visitedDomains)
                 }
+                return visitedDomainsOfClosedTabs.union(visitedDomainsOfCurrentTabs)
             case .allData:
                 return historyCoordinating.history?.reduce(Set<String>(), { result, historyEntry in
                     if let host = historyEntry.url.host {

@@ -28,6 +28,10 @@ final class TabCollection: NSObject {
         self.tabs = tabs
     }
 
+    deinit {
+        tabs.forEach { $0.tabWillClose() }
+    }
+
     func append(tab: Tab) {
         tabs.append(tab)
     }
@@ -48,21 +52,19 @@ final class TabCollection: NSObject {
         }
 
         saveLastRemovedTab(at: index)
-        tabs[index].tabWillClose()
+        tabWillClose(at: index)
         tabs.remove(at: index)
 
         return true
     }
 
     func removeAll(andAppend tab: Tab? = nil) {
-        tabs.forEach { $0.tabWillClose() }
+        tabsWillClose(range: 0..<tabs.count)
         tabs = tab.map { [$0] } ?? []
     }
 
     func removeTabs(after index: Int) {
-        for i in (index + 1)..<tabs.count {
-            tabs[i].tabWillClose()
-        }
+        tabsWillClose(range: (index + 1)..<tabs.count)
         tabs.removeSubrange((index + 1)...)
     }
 
@@ -75,9 +77,21 @@ final class TabCollection: NSObject {
         }
 
         for i in indexSet {
-            tabs[i].tabWillClose()
+            tabWillClose(at: i)
         }
         tabs.remove(atOffsets: indexSet)
+    }
+
+    private func tabWillClose(at index: Int) {
+        keepVisitedDomains(of: tabs[index])
+        tabs[index].tabWillClose()
+    }
+
+    private func tabsWillClose(range: Range<Int>) {
+        for i in range {
+            keepVisitedDomains(of: tabs[i])
+            tabs[i].tabWillClose()
+        }
     }
 
     func moveTab(at index: Int, to newIndex: Int) {
@@ -104,8 +118,11 @@ final class TabCollection: NSObject {
         }
 
         tabs[index].tabWillClose()
+        keepVisitedDomains(of: tabs[index])
         tabs[index] = tab
     }
+
+    // MARK: - Last Removed Tab
 
     private func saveLastRemovedTab(at index: Int) {
         guard index >= 0, index < tabs.count else {
@@ -132,8 +149,13 @@ final class TabCollection: NSObject {
         lastRemovedTabCache = nil
     }
 
-    deinit {
-        tabs.forEach { $0.tabWillClose() }
+    // MARK: - Fire button
+
+    // Visited domains of removed tabs used for fire button logic
+    private(set) var visitedDomainsOfRemovedTabs = Set<String>()
+
+    private func keepVisitedDomains(of tab: Tab) {
+        visitedDomainsOfRemovedTabs.formUnion(tab.visitedDomains)
     }
 
 }
