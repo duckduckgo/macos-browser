@@ -20,6 +20,7 @@
 		339A6B5826A044BA00E3DAE8 /* duckduckgo-privacy-dashboard in Resources */ = {isa = PBXBuildFile; fileRef = 339A6B5726A044BA00E3DAE8 /* duckduckgo-privacy-dashboard */; };
 		371C0A2927E33EDC0070591F /* FeedbackPresenter.swift in Sources */ = {isa = PBXBuildFile; fileRef = 371C0A2827E33EDC0070591F /* FeedbackPresenter.swift */; };
 		371E141927E92E42009E3B5B /* MultilineScrollableTextFix.swift in Sources */ = {isa = PBXBuildFile; fileRef = 371E141827E92E42009E3B5B /* MultilineScrollableTextFix.swift */; };
+		376705AF27EB488600DD8D76 /* RoundedSelectionRowView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B0511B3262CAA5A00F6079C /* RoundedSelectionRowView.swift */; };
 		3797402E27DF41CB003090EE /* AboutModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3797402D27DF41CB003090EE /* AboutModel.swift */; };
 		379DE4BD27EA31AC002CC3DE /* PreferencesLoginsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 379DE4BC27EA31AC002CC3DE /* PreferencesLoginsView.swift */; };
 		379DE4BF27EA3240002CC3DE /* LoginsPreferencesModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 379DE4BE27EA3240002CC3DE /* LoginsPreferencesModel.swift */; };
@@ -51,22 +52,8 @@
 		4B0511BD262CAA5A00F6079C /* PrivacySecurityPreferences.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B0511A6262CAA5A00F6079C /* PrivacySecurityPreferences.swift */; };
 		4B0511BE262CAA5A00F6079C /* DownloadPreferences.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B0511A7262CAA5A00F6079C /* DownloadPreferences.swift */; };
 		4B0511BF262CAA5A00F6079C /* PreferenceSections.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B0511A8262CAA5A00F6079C /* PreferenceSections.swift */; };
-		4B0511C1262CAA5A00F6079C /* PrivacySecurityPreferencesTableCellView.xib in Resources */ = {isa = PBXBuildFile; fileRef = 4B0511AB262CAA5A00F6079C /* PrivacySecurityPreferencesTableCellView.xib */; };
-		4B0511C2262CAA5A00F6079C /* PreferencesAboutViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B0511AC262CAA5A00F6079C /* PreferencesAboutViewController.swift */; };
-		4B0511C3262CAA5A00F6079C /* Preferences.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 4B0511AD262CAA5A00F6079C /* Preferences.storyboard */; };
-		4B0511C4262CAA5A00F6079C /* PreferencesSidebarViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B0511AE262CAA5A00F6079C /* PreferencesSidebarViewController.swift */; };
-		4B0511C5262CAA5A00F6079C /* PrivacySecurityPreferencesTableCellView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B0511AF262CAA5A00F6079C /* PrivacySecurityPreferencesTableCellView.swift */; };
-		4B0511C6262CAA5A00F6079C /* DefaultBrowserTableCellView.xib in Resources */ = {isa = PBXBuildFile; fileRef = 4B0511B0262CAA5A00F6079C /* DefaultBrowserTableCellView.xib */; };
-		4B0511C7262CAA5A00F6079C /* PreferenceTableCellView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B0511B1262CAA5A00F6079C /* PreferenceTableCellView.swift */; };
-		4B0511C8262CAA5A00F6079C /* PreferencesListViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B0511B2262CAA5A00F6079C /* PreferencesListViewController.swift */; };
-		4B0511C9262CAA5A00F6079C /* RoundedSelectionRowView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B0511B3262CAA5A00F6079C /* RoundedSelectionRowView.swift */; };
+		4B0511C3262CAA5A00F6079C /* FireproofDomains.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 4B0511AD262CAA5A00F6079C /* FireproofDomains.storyboard */; };
 		4B0511CA262CAA5A00F6079C /* FireproofDomainsViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B0511B4262CAA5A00F6079C /* FireproofDomainsViewController.swift */; };
-		4B0511CB262CAA5A00F6079C /* DownloadPreferencesTableCellView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B0511B5262CAA5A00F6079C /* DownloadPreferencesTableCellView.swift */; };
-		4B0511CC262CAA5A00F6079C /* PreferencesSplitViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B0511B6262CAA5A00F6079C /* PreferencesSplitViewController.swift */; };
-		4B0511CD262CAA5A00F6079C /* DefaultBrowserTableCellView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B0511B7262CAA5A00F6079C /* DefaultBrowserTableCellView.swift */; };
-		4B0511CE262CAA5A00F6079C /* DownloadPreferencesTableCellView.xib in Resources */ = {isa = PBXBuildFile; fileRef = 4B0511B8262CAA5A00F6079C /* DownloadPreferencesTableCellView.xib */; };
-		4B0511CF262CAA5A00F6079C /* AppearancePreferencesTableCellView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B0511B9262CAA5A00F6079C /* AppearancePreferencesTableCellView.swift */; };
-		4B0511D0262CAA5A00F6079C /* AppearancePreferencesTableCellView.xib in Resources */ = {isa = PBXBuildFile; fileRef = 4B0511BA262CAA5A00F6079C /* AppearancePreferencesTableCellView.xib */; };
 		4B0511E1262CAA8600F6079C /* NSOpenPanelExtensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B0511DF262CAA8600F6079C /* NSOpenPanelExtensions.swift */; };
 		4B0511E2262CAA8600F6079C /* NSViewControllerExtension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B0511E0262CAA8600F6079C /* NSViewControllerExtension.swift */; };
 		4B0511E7262CAB3700F6079C /* UserDefaultsWrapperUtilities.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B0511E6262CAB3700F6079C /* UserDefaultsWrapperUtilities.swift */; };
@@ -87,9 +74,7 @@
 		4B2CBF412767EEC1001DF04B /* MacWaitlistStoreTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B2CBF402767EEC1001DF04B /* MacWaitlistStoreTests.swift */; };
 		4B2E7D6326FF9D6500D2DB17 /* PrintingUserScript.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B2E7D6226FF9D6500D2DB17 /* PrintingUserScript.swift */; };
 		4B379C1527BD91E3008A968E /* QuartzIdleStateProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B379C1427BD91E3008A968E /* QuartzIdleStateProvider.swift */; };
-		4B379C1727BD9D7C008A968E /* LoginsPreferencesTableCellView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B379C1627BD9D7C008A968E /* LoginsPreferencesTableCellView.swift */; };
 		4B379C1927BD9EAA008A968E /* LoginsPreferences.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B379C1827BD9EAA008A968E /* LoginsPreferences.swift */; };
-		4B379C1B27BD9F88008A968E /* LoginsPreferencesTableCellView.xib in Resources */ = {isa = PBXBuildFile; fileRef = 4B379C1A27BD9F88008A968E /* LoginsPreferencesTableCellView.xib */; };
 		4B379C1E27BDB7FF008A968E /* DeviceAuthenticator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B379C1D27BDB7FF008A968E /* DeviceAuthenticator.swift */; };
 		4B379C2227BDBA29008A968E /* LocalAuthenticationService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B379C2127BDBA29008A968E /* LocalAuthenticationService.swift */; };
 		4B379C2427BDE1B0008A968E /* FlatButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B379C2327BDE1B0008A968E /* FlatButton.swift */; };
@@ -807,22 +792,9 @@
 		4B0511A6262CAA5A00F6079C /* PrivacySecurityPreferences.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PrivacySecurityPreferences.swift; sourceTree = "<group>"; };
 		4B0511A7262CAA5A00F6079C /* DownloadPreferences.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = DownloadPreferences.swift; sourceTree = "<group>"; };
 		4B0511A8262CAA5A00F6079C /* PreferenceSections.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PreferenceSections.swift; sourceTree = "<group>"; };
-		4B0511AB262CAA5A00F6079C /* PrivacySecurityPreferencesTableCellView.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = PrivacySecurityPreferencesTableCellView.xib; sourceTree = "<group>"; };
-		4B0511AC262CAA5A00F6079C /* PreferencesAboutViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PreferencesAboutViewController.swift; sourceTree = "<group>"; };
-		4B0511AD262CAA5A00F6079C /* Preferences.storyboard */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.storyboard; path = Preferences.storyboard; sourceTree = "<group>"; };
-		4B0511AE262CAA5A00F6079C /* PreferencesSidebarViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PreferencesSidebarViewController.swift; sourceTree = "<group>"; };
-		4B0511AF262CAA5A00F6079C /* PrivacySecurityPreferencesTableCellView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PrivacySecurityPreferencesTableCellView.swift; sourceTree = "<group>"; };
-		4B0511B0262CAA5A00F6079C /* DefaultBrowserTableCellView.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = DefaultBrowserTableCellView.xib; sourceTree = "<group>"; };
-		4B0511B1262CAA5A00F6079C /* PreferenceTableCellView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PreferenceTableCellView.swift; sourceTree = "<group>"; };
-		4B0511B2262CAA5A00F6079C /* PreferencesListViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PreferencesListViewController.swift; sourceTree = "<group>"; };
+		4B0511AD262CAA5A00F6079C /* FireproofDomains.storyboard */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.storyboard; path = FireproofDomains.storyboard; sourceTree = "<group>"; };
 		4B0511B3262CAA5A00F6079C /* RoundedSelectionRowView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = RoundedSelectionRowView.swift; sourceTree = "<group>"; };
 		4B0511B4262CAA5A00F6079C /* FireproofDomainsViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = FireproofDomainsViewController.swift; sourceTree = "<group>"; };
-		4B0511B5262CAA5A00F6079C /* DownloadPreferencesTableCellView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = DownloadPreferencesTableCellView.swift; sourceTree = "<group>"; };
-		4B0511B6262CAA5A00F6079C /* PreferencesSplitViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PreferencesSplitViewController.swift; sourceTree = "<group>"; };
-		4B0511B7262CAA5A00F6079C /* DefaultBrowserTableCellView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = DefaultBrowserTableCellView.swift; sourceTree = "<group>"; };
-		4B0511B8262CAA5A00F6079C /* DownloadPreferencesTableCellView.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = DownloadPreferencesTableCellView.xib; sourceTree = "<group>"; };
-		4B0511B9262CAA5A00F6079C /* AppearancePreferencesTableCellView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AppearancePreferencesTableCellView.swift; sourceTree = "<group>"; };
-		4B0511BA262CAA5A00F6079C /* AppearancePreferencesTableCellView.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = AppearancePreferencesTableCellView.xib; sourceTree = "<group>"; };
 		4B0511DF262CAA8600F6079C /* NSOpenPanelExtensions.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = NSOpenPanelExtensions.swift; sourceTree = "<group>"; };
 		4B0511E0262CAA8600F6079C /* NSViewControllerExtension.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = NSViewControllerExtension.swift; sourceTree = "<group>"; };
 		4B0511E6262CAB3700F6079C /* UserDefaultsWrapperUtilities.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UserDefaultsWrapperUtilities.swift; sourceTree = "<group>"; };
@@ -842,9 +814,7 @@
 		4B2CBF402767EEC1001DF04B /* MacWaitlistStoreTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MacWaitlistStoreTests.swift; sourceTree = "<group>"; };
 		4B2E7D6226FF9D6500D2DB17 /* PrintingUserScript.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PrintingUserScript.swift; sourceTree = "<group>"; };
 		4B379C1427BD91E3008A968E /* QuartzIdleStateProvider.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = QuartzIdleStateProvider.swift; sourceTree = "<group>"; };
-		4B379C1627BD9D7C008A968E /* LoginsPreferencesTableCellView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LoginsPreferencesTableCellView.swift; sourceTree = "<group>"; };
 		4B379C1827BD9EAA008A968E /* LoginsPreferences.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LoginsPreferences.swift; sourceTree = "<group>"; };
-		4B379C1A27BD9F88008A968E /* LoginsPreferencesTableCellView.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = LoginsPreferencesTableCellView.xib; sourceTree = "<group>"; };
 		4B379C1D27BDB7FF008A968E /* DeviceAuthenticator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DeviceAuthenticator.swift; sourceTree = "<group>"; };
 		4B379C2127BDBA29008A968E /* LocalAuthenticationService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LocalAuthenticationService.swift; sourceTree = "<group>"; };
 		4B379C2327BDE1B0008A968E /* FlatButton.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FlatButton.swift; sourceTree = "<group>"; };
@@ -1577,24 +1547,6 @@
 			path = dist;
 			sourceTree = "<group>";
 		};
-		37AFCE7F27DA2C7B00471A10 /* NewView */ = {
-			isa = PBXGroup;
-			children = (
-				37CC53F327E8D4620028713D /* NSPathControlView.swift */,
-				37AFCE8027DA2CA600471A10 /* PreferencesViewController.swift */,
-				37AFCE8827DA33BA00471A10 /* Preferences.swift */,
-				37AFCE8627DA334800471A10 /* PreferencesRootView.swift */,
-				37AFCE8427DA2D3900471A10 /* PreferencesSidebar.swift */,
-				37AFCE8A27DB69BC00471A10 /* PreferencesDefaultBrowserView.swift */,
-				37D2771427E870D4003365FD /* PreferencesAppearanceView.swift */,
-				37CC53EB27E8A4D10028713D /* PreferencesPrivacyView.swift */,
-				379DE4BC27EA31AC002CC3DE /* PreferencesLoginsView.swift */,
-				37CC53EF27E8D1440028713D /* PreferencesDownloadsView.swift */,
-				37AFCE9127DB8CAD00471A10 /* PreferencesAboutView.swift */,
-			);
-			path = NewView;
-			sourceTree = "<group>";
-		};
 		37AFCE8C27DB6AA900471A10 /* NewModel */ = {
 			isa = PBXGroup;
 			children = (
@@ -1661,7 +1613,6 @@
 			isa = PBXGroup;
 			children = (
 				37AFCE8C27DB6AA900471A10 /* NewModel */,
-				37AFCE7F27DA2C7B00471A10 /* NewView */,
 				4B0511A3262CAA5A00F6079C /* Model */,
 				4B0511AA262CAA5A00F6079C /* View */,
 			);
@@ -1684,24 +1635,19 @@
 		4B0511AA262CAA5A00F6079C /* View */ = {
 			isa = PBXGroup;
 			children = (
-				4B0511AB262CAA5A00F6079C /* PrivacySecurityPreferencesTableCellView.xib */,
-				4B0511AC262CAA5A00F6079C /* PreferencesAboutViewController.swift */,
-				4B0511AD262CAA5A00F6079C /* Preferences.storyboard */,
-				4B0511AE262CAA5A00F6079C /* PreferencesSidebarViewController.swift */,
-				4B0511AF262CAA5A00F6079C /* PrivacySecurityPreferencesTableCellView.swift */,
-				4B0511B0262CAA5A00F6079C /* DefaultBrowserTableCellView.xib */,
-				4B0511B1262CAA5A00F6079C /* PreferenceTableCellView.swift */,
-				4B0511B2262CAA5A00F6079C /* PreferencesListViewController.swift */,
-				4B0511B3262CAA5A00F6079C /* RoundedSelectionRowView.swift */,
+				4B0511AD262CAA5A00F6079C /* FireproofDomains.storyboard */,
 				4B0511B4262CAA5A00F6079C /* FireproofDomainsViewController.swift */,
-				4B0511B5262CAA5A00F6079C /* DownloadPreferencesTableCellView.swift */,
-				4B0511B6262CAA5A00F6079C /* PreferencesSplitViewController.swift */,
-				4B0511B7262CAA5A00F6079C /* DefaultBrowserTableCellView.swift */,
-				4B0511B8262CAA5A00F6079C /* DownloadPreferencesTableCellView.xib */,
-				4B0511B9262CAA5A00F6079C /* AppearancePreferencesTableCellView.swift */,
-				4B0511BA262CAA5A00F6079C /* AppearancePreferencesTableCellView.xib */,
-				4B379C1627BD9D7C008A968E /* LoginsPreferencesTableCellView.swift */,
-				4B379C1A27BD9F88008A968E /* LoginsPreferencesTableCellView.xib */,
+				37CC53F327E8D4620028713D /* NSPathControlView.swift */,
+				37AFCE8027DA2CA600471A10 /* PreferencesViewController.swift */,
+				37AFCE8827DA33BA00471A10 /* Preferences.swift */,
+				37AFCE8627DA334800471A10 /* PreferencesRootView.swift */,
+				37AFCE8427DA2D3900471A10 /* PreferencesSidebar.swift */,
+				37AFCE8A27DB69BC00471A10 /* PreferencesDefaultBrowserView.swift */,
+				37D2771427E870D4003365FD /* PreferencesAppearanceView.swift */,
+				37CC53EB27E8A4D10028713D /* PreferencesPrivacyView.swift */,
+				379DE4BC27EA31AC002CC3DE /* PreferencesLoginsView.swift */,
+				37CC53EF27E8D1440028713D /* PreferencesDownloadsView.swift */,
+				37AFCE9127DB8CAD00471A10 /* PreferencesAboutView.swift */,
 			);
 			path = View;
 			sourceTree = "<group>";
@@ -3195,6 +3141,7 @@
 				AAC5E4C625D6A6E8007F5990 /* Bookmarks.storyboard */,
 				AAC5E4C425D6A6E8007F5990 /* BookmarkPopover.swift */,
 				AAC5E4C525D6A6E8007F5990 /* BookmarkPopoverViewController.swift */,
+				4B0511B3262CAA5A00F6079C /* RoundedSelectionRowView.swift */,
 			);
 			path = View;
 			sourceTree = "<group>";
@@ -3989,12 +3936,11 @@
 				AA80EC73256C46A2007083E7 /* Suggestion.storyboard in Resources */,
 				AA693E5E2696E5B90007BB78 /* CrashReports.storyboard in Resources */,
 				9833913127AAA4B500DAF119 /* trackerData.json in Resources */,
-				4B0511CE262CAA5A00F6079C /* DownloadPreferencesTableCellView.xib in Resources */,
 				B31055CA27A1BA1D001AC618 /* background.js in Resources */,
 				AA7EB6ED27E880B600036718 /* dark-shield-dot-mouse-over.json in Resources */,
 				8511E18425F82B34002F516B /* 01_Fire_really_small.json in Resources */,
 				85B7184A27677C2D00B4277F /* Onboarding.storyboard in Resources */,
-				4B0511C3262CAA5A00F6079C /* Preferences.storyboard in Resources */,
+				4B0511C3262CAA5A00F6079C /* FireproofDomains.storyboard in Resources */,
 				EA477680272A21B700419EDA /* clickToLoadConfig.json in Resources */,
 				B6B1E88226D5DAC30062C350 /* Downloads.storyboard in Resources */,
 				AA3439712754D4E900B241FA /* dark-shield.json in Resources */,
@@ -4031,7 +3977,6 @@
 				85AC7AD927BD625000FFB69B /* HomePageAssets.xcassets in Resources */,
 				339A6B5826A044BA00E3DAE8 /* duckduckgo-privacy-dashboard in Resources */,
 				AA7EB6E727E8809D00036718 /* shield-mouse-over.json in Resources */,
-				4B379C1B27BD9F88008A968E /* LoginsPreferencesTableCellView.xib in Resources */,
 				B31055C727A1BA1D001AC618 /* browser-shim.js in Resources */,
 				4B92928E26670D1700AD2C21 /* BookmarkOutlineViewCell.xib in Resources */,
 				B64C84DE2692D7400048FEBE /* PermissionAuthorization.storyboard in Resources */,
@@ -4045,7 +3990,6 @@
 				AA80EC8F256C49BC007083E7 /* Localizable.stringsdict in Resources */,
 				EAC80DE0271F6C0100BBF02D /* fb-sdk.js in Resources */,
 				85625994269C8F9600EE44BC /* PasswordManager.storyboard in Resources */,
-				4B0511C6262CAA5A00F6079C /* DefaultBrowserTableCellView.xib in Resources */,
 				AA7EB6E327E7D05500036718 /* dark-flame-mouse-over.json in Resources */,
 				AA7EB6E227E7D05500036718 /* flame-mouse-over.json in Resources */,
 				4B677433255DBEB800025BD8 /* httpsMobileV2Bloom.bin in Resources */,
@@ -4057,10 +4001,8 @@
 				AAE246F42709EF3B00BEEAEE /* FirePopoverCollectionViewItem.xib in Resources */,
 				EAA29AE9278D2E43007070CF /* ProximaNova-Bold-webfont.woff2 in Resources */,
 				AA3439702754D4E900B241FA /* dark-shield-dot.json in Resources */,
-				4B0511C1262CAA5A00F6079C /* PrivacySecurityPreferencesTableCellView.xib in Resources */,
 				AA34397A2754D55100B241FA /* trackers-2.json in Resources */,
 				EAA29AEA278D2E43007070CF /* ProximaNova-Reg-webfont.woff2 in Resources */,
-				4B0511D0262CAA5A00F6079C /* AppearancePreferencesTableCellView.xib in Resources */,
 				EAFAD6CA2728BD1200F9DF00 /* clickToLoad.js in Resources */,
 				336D5B18262D8D3C0052E0C9 /* findinpage.js in Resources */,
 			);
@@ -4179,7 +4121,6 @@
 				4B7A60A1273E0BE400BBDFEB /* WKWebsiteDataStoreExtension.swift in Sources */,
 				B693955326F04BEC0015B914 /* WindowDraggingView.swift in Sources */,
 				4B1E6EED27AB5E5100F51793 /* SecureVaultSorting.swift in Sources */,
-				4B0511C4262CAA5A00F6079C /* PreferencesSidebarViewController.swift in Sources */,
 				B61EF3F1266F922200B4D78F /* WKProcessPool+DownloadDelegate.swift in Sources */,
 				B6106BAD26A7BF390013B453 /* PermissionState.swift in Sources */,
 				85707F2E276A394C00DC0649 /* ViewExtensions.swift in Sources */,
@@ -4283,7 +4224,6 @@
 				4B78A86B26BB3ADD0071BB16 /* BrowserImportSummaryViewController.swift in Sources */,
 				AA512D1424D99D9800230283 /* FaviconManager.swift in Sources */,
 				AABEE6AB24ACA0F90043105B /* SuggestionTableRowView.swift in Sources */,
-				4B0511CB262CAA5A00F6079C /* DownloadPreferencesTableCellView.swift in Sources */,
 				4B9292AA26670D3700AD2C21 /* Bookmark.xcmappingmodel in Sources */,
 				4B1E6EF227AB5E5D00F51793 /* PasswordManagementItemList.swift in Sources */,
 				AAC5E4D025D6A709007F5990 /* Bookmark.swift in Sources */,
@@ -4297,7 +4237,6 @@
 				37CC53F227E8D2C90028713D /* DownloadsPreferencesModel.swift in Sources */,
 				4B92928C26670D1700AD2C21 /* OutlineSeparatorViewCell.swift in Sources */,
 				4BB99D0426FE191E001E4761 /* SafariDataImporter.swift in Sources */,
-				4B0511CD262CAA5A00F6079C /* DefaultBrowserTableCellView.swift in Sources */,
 				B69B503A2726A12500758A2B /* StatisticsLoader.swift in Sources */,
 				B6F1C80B2761C45400334924 /* LocalUnprotectedDomains.swift in Sources */,
 				858A798526A8BB5D00A75A42 /* NSTextViewExtension.swift in Sources */,
@@ -4378,7 +4317,6 @@
 				4BE65478271FCD41008D1D63 /* PasswordManagementNoteItemView.swift in Sources */,
 				AA5C8F632591021700748EB7 /* NSApplicationExtension.swift in Sources */,
 				AA9E9A5625A3AE8400D1959D /* NSWindowExtension.swift in Sources */,
-				4B0511C9262CAA5A00F6079C /* RoundedSelectionRowView.swift in Sources */,
 				AAC5E4C725D6A6E8007F5990 /* BookmarkPopover.swift in Sources */,
 				37CC53F027E8D1440028713D /* PreferencesDownloadsView.swift in Sources */,
 				B68C2FB227706E6A00BF2C7D /* ProcessExtension.swift in Sources */,
@@ -4480,7 +4418,6 @@
 				B6A9E47726146A570067D1B9 /* PixelEvent.swift in Sources */,
 				AA2CB1352587C29500AA6FBE /* TabBarFooter.swift in Sources */,
 				B6C0B23926E742610031CB7F /* FileDownloadError.swift in Sources */,
-				4B0511C2262CAA5A00F6079C /* PreferencesAboutViewController.swift in Sources */,
 				4B9292AB26670D3700AD2C21 /* BookmarkMigrationPolicy.swift in Sources */,
 				85589EA027BFE60E0038AD11 /* MoreOrLessView.swift in Sources */,
 				AA92126F25ACCB1100600CD4 /* ErrorExtension.swift in Sources */,
@@ -4503,9 +4440,7 @@
 				AA7EB6E527E7D6DC00036718 /* AnimationView.swift in Sources */,
 				8562599A269CA0A600EE44BC /* NSRectExtension.swift in Sources */,
 				37AFCE9027DB70E500471A10 /* PreferencesModel.swift in Sources */,
-				4B0511C5262CAA5A00F6079C /* PrivacySecurityPreferencesTableCellView.swift in Sources */,
 				B6040856274B830F00680351 /* DictionaryExtension.swift in Sources */,
-				4B0511C8262CAA5A00F6079C /* PreferencesListViewController.swift in Sources */,
 				B684592725C93C0500DC17B6 /* Publishers.NestedObjectChanges.swift in Sources */,
 				85589E9A27BFE3C30038AD11 /* FaviconView.swift in Sources */,
 				85707F2C276A364E00DC0649 /* OnboardingFlow.swift in Sources */,
@@ -4546,13 +4481,13 @@
 				AA97BF4625135DD30014931A /* ApplicationDockMenu.swift in Sources */,
 				4B8A4DFF27C83B29005F40E8 /* SaveIdentityViewController.swift in Sources */,
 				4BA1A69B258B076900F6F690 /* FileStore.swift in Sources */,
-				4B0511CC262CAA5A00F6079C /* PreferencesSplitViewController.swift in Sources */,
 				B6A9E47F26146A800067D1B9 /* PixelArguments.swift in Sources */,
 				AAC5E4D225D6A709007F5990 /* BookmarkList.swift in Sources */,
 				4B9292D12667123700AD2C21 /* BookmarkTableRowView.swift in Sources */,
 				B66E9DD42670EB4A00E53BB5 /* WKDownload+WebKitDownload.swift in Sources */,
 				85589E9427BFE1E70038AD11 /* FavoritesView.swift in Sources */,
 				85AC7ADB27BD628400FFB69B /* HomePage.swift in Sources */,
+				376705AF27EB488600DD8D76 /* RoundedSelectionRowView.swift in Sources */,
 				B69B503F2726A12500758A2B /* LocalStatisticsStore.swift in Sources */,
 				B689ECD526C247DB006FB0C5 /* BackForwardListItem.swift in Sources */,
 				85C48CD127908C1000D3263E /* BrowserImportMoreInfoViewController.swift in Sources */,
@@ -4562,7 +4497,6 @@
 				85F0FF1327CFAB04001C7C6E /* RecentlyVisitedView.swift in Sources */,
 				AA7EB6DF27E7C57D00036718 /* MouseOverAnimationButton.swift in Sources */,
 				AA7412B724D1687000D22FE0 /* TabBarScrollView.swift in Sources */,
-				4B0511C7262CAA5A00F6079C /* PreferenceTableCellView.swift in Sources */,
 				4B9292D92667124B00AD2C21 /* BookmarkListTreeControllerDataSource.swift in Sources */,
 				14D9B8FB24F7E089000D4D13 /* AddressBarViewController.swift in Sources */,
 				B65536A62685B82B00085A79 /* Permissions.swift in Sources */,
@@ -4576,7 +4510,6 @@
 				85B7184C27677C6500B4277F /* OnboardingViewController.swift in Sources */,
 				4B379C1E27BDB7FF008A968E /* DeviceAuthenticator.swift in Sources */,
 				1456D6E124EFCBC300775049 /* TabBarCollectionView.swift in Sources */,
-				4B379C1727BD9D7C008A968E /* LoginsPreferencesTableCellView.swift in Sources */,
 				85308E25267FC9F2001ABD76 /* NSAlertExtension.swift in Sources */,
 				4BEF0E6A276676A500AF7C58 /* WaitlistRequest.swift in Sources */,
 				4B59024826B3673600489384 /* ThirdPartyBrowser.swift in Sources */,
@@ -4605,7 +4538,6 @@
 				4BB99D0226FE191E001E4761 /* ImportedBookmarks.swift in Sources */,
 				AA6EF9B3250785D5004754E6 /* NSMenuExtension.swift in Sources */,
 				AA7412B524D1536B00D22FE0 /* MainWindowController.swift in Sources */,
-				4B0511CF262CAA5A00F6079C /* AppearancePreferencesTableCellView.swift in Sources */,
 				AA9FF95924A1ECF20039E328 /* Tab.swift in Sources */,
 				B63D467125BFA6C100874977 /* DispatchQueueExtensions.swift in Sources */,
 				B64C84EB2692DD650048FEBE /* PermissionAuthorizationPopover.swift in Sources */,
