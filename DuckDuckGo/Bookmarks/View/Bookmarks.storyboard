@@ -99,13 +99,13 @@
                                 </connections>
                             </scrollView>
                             <popUpButton translatesAutoresizingMaskIntoConstraints="NO" id="oJB-Na-CzV">
-                                <rect key="frame" x="21" y="422" width="219" height="60"/>
+                                <rect key="frame" x="18" y="422" width="217" height="60"/>
                                 <constraints>
                                     <constraint firstAttribute="height" constant="60" id="gqw-kD-NlW"/>
                                 </constraints>
                                 <popUpButtonCell key="cell" type="bevel" title="Bookmarks" bezelStyle="rounded" alignment="left" controlSize="large" lineBreakMode="truncatingTail" state="on" imageScaling="proportionallyDown" inset="2" selectedItem="Pxw-Jh-Zh0" id="Hfh-Gh-9qt">
                                     <behavior key="behavior" lightByBackground="YES" lightByGray="YES"/>
-                                    <font key="font" metaFont="systemSemibold" size="22"/>
+                                    <font key="font" metaFont="system" size="22"/>
                                     <menu key="menu" id="VEx-gs-amO">
                                         <items>
                                             <menuItem title="Bookmarks" state="on" id="Pxw-Jh-Zh0"/>
@@ -116,10 +116,10 @@
                         </subviews>
                         <constraints>
                             <constraint firstAttribute="trailing" secondItem="SqK-FW-C0t" secondAttribute="trailing" constant="12" id="6Zz-Nc-u6E"/>
-                            <constraint firstAttribute="trailing" secondItem="oJB-Na-CzV" secondAttribute="trailing" constant="18" id="7d2-Rx-hjg"/>
+                            <constraint firstAttribute="trailing" secondItem="oJB-Na-CzV" secondAttribute="trailing" constant="23" id="7d2-Rx-hjg"/>
                             <constraint firstItem="SqK-FW-C0t" firstAttribute="top" secondItem="oJB-Na-CzV" secondAttribute="bottom" constant="12" id="Owf-hJ-AhH"/>
                             <constraint firstItem="eJ4-cO-2QO" firstAttribute="leading" secondItem="oQD-6b-AhT" secondAttribute="leading" id="QcT-qP-dwG"/>
-                            <constraint firstItem="oJB-Na-CzV" firstAttribute="leading" secondItem="oQD-6b-AhT" secondAttribute="leading" constant="26" id="QuW-mr-Xwh"/>
+                            <constraint firstItem="oJB-Na-CzV" firstAttribute="leading" secondItem="oQD-6b-AhT" secondAttribute="leading" constant="23" id="QuW-mr-Xwh"/>
                             <constraint firstItem="SqK-FW-C0t" firstAttribute="leading" secondItem="oQD-6b-AhT" secondAttribute="leading" constant="12" id="RiX-eQ-VCL"/>
                             <constraint firstAttribute="bottom" secondItem="SqK-FW-C0t" secondAttribute="bottom" id="Tc8-Ir-jea"/>
                             <constraint firstAttribute="trailing" secondItem="eJ4-cO-2QO" secondAttribute="trailing" id="qjZ-an-5zF"/>

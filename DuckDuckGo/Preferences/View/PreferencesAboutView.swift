@@ -65,6 +65,7 @@ extension Preferences {
                     Button("Send Feedback") {
                         model.openFeedbackForm()
                     }
+                    Spacer()
 #endif
                 }
                 

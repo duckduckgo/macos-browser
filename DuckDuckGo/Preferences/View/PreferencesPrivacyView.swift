@@ -41,7 +41,7 @@ extension Preferences {
                         model.presentManageFireproofSitesDialog()
                     }
                 }
-                .padding(.bottom, 42)
+                .padding(.bottom, 40)
 
                 VStack(alignment: .leading, spacing: 12) {
                     Text(UserText.autoconsentSettingsTitle)
@@ -53,7 +53,7 @@ extension Preferences {
                     Text(UserText.autoconsentExplanation)
                         .fixMultilineScrollableText()
                 }
-                .padding(.bottom, 42)
+                .padding(.bottom, 40)
 
                 VStack(alignment: .leading, spacing: 12) {
                     Text(UserText.gpcSettingsTitle)

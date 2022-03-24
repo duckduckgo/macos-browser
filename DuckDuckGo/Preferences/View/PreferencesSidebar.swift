@@ -18,21 +18,6 @@
 
 import SwiftUI
 
-private struct PreferencesSidebarItemButtonStyle: ButtonStyle {
-
-    let bgColor: Color
-
-    func makeBody(configuration: Self.Configuration) -> some View {
-
-        configuration.label
-            .padding(.horizontal, 16)
-            .frame(maxWidth: .infinity, minHeight: 40, alignment: .leading)
-            .truncationMode(.tail)
-            .background(RoundedRectangle(cornerRadius: 8, style: .continuous).fill(bgColor))
-
-    }
-}
-
 extension Preferences {
     
     struct SidebarItem: View {
@@ -96,7 +81,7 @@ extension Preferences {
                             if section != model.sections.last {
                                 Color(NSColor.separatorColor)
                                     .frame(height: 1)
-                                    .padding(6)
+                                    .padding(8)
                             }
                         }
                     }
@@ -104,7 +89,7 @@ extension Preferences {
 
             }
             .padding(.top, 18)
-            .padding(.horizontal, 24)
+            .padding(.horizontal, 20)
         }
     }
 
@@ -118,5 +103,20 @@ struct Sidebar_Previews: PreviewProvider {
     static var previews: some View {
         Preferences.Sidebar(model: .init())
             .frame(width: 250)
+    }
+}
+
+private struct PreferencesSidebarItemButtonStyle: ButtonStyle {
+
+    let bgColor: Color
+
+    func makeBody(configuration: Self.Configuration) -> some View {
+
+        configuration.label
+            .padding(.horizontal, 16)
+            .frame(maxWidth: .infinity, minHeight: 40, alignment: .leading)
+            .truncationMode(.tail)
+            .background(RoundedRectangle(cornerRadius: 8, style: .continuous).fill(bgColor))
+
     }
 }

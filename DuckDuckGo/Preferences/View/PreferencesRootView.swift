@@ -26,7 +26,7 @@ extension Preferences {
         
         var body: some View {
             HStack(spacing: 0) {
-                Preferences.Sidebar().environmentObject(model).frame(width: 252)
+                Preferences.Sidebar().environmentObject(model).frame(width: 256)
                 Color(NSColor.separatorColor).frame(width: 1)
                 
                 ScrollView(.vertical) {

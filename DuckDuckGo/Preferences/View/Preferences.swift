@@ -24,18 +24,17 @@ enum Preferences {
 
             static let popUpButton: NSFont = {
                 if #available(macOS 11.0, *) {
-                    let titleFont = NSFont.preferredFont(forTextStyle: .title1, options: [:])
-                    return .systemFont(ofSize: titleFont.pointSize, weight: .semibold)
+                    return .preferredFont(forTextStyle: .title1, options: [:])
                 } else {
-                    return .systemFont(ofSize: 22, weight: .semibold)
+                    return .systemFont(ofSize: 22)
                 }
             }()
 
             static let sideBarItem: Font = {
                 if #available(macOS 11.0, *) {
-                    return .body.weight(.medium)
+                    return .body
                 } else {
-                    return .system(size: 13, weight: .medium)
+                    return .system(size: 13)
                 }
             }()
 
