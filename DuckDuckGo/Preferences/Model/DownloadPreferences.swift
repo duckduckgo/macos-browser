@@ -81,15 +81,3 @@ struct DownloadPreferences {
     }
 
 }
-
-extension DownloadPreferences: PreferenceSection {
-
-    var displayName: String {
-        return UserText.downloads
-    }
-
-    var preferenceIcon: NSImage {
-        return NSImage(named: "Downloads")!
-    }
-
-}

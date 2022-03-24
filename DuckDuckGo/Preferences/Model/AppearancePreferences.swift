@@ -54,15 +54,3 @@ struct AppearancePreferences {
     }
 
 }
-
-extension AppearancePreferences: PreferenceSection {
-
-    var displayName: String {
-        return UserText.appearance
-    }
-
-    var preferenceIcon: NSImage {
-        return NSImage(named: "Appearance")!
-    }
-
-}

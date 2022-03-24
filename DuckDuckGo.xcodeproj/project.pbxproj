@@ -52,7 +52,6 @@
 		4B0511BC262CAA5A00F6079C /* AppearancePreferences.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B0511A5262CAA5A00F6079C /* AppearancePreferences.swift */; };
 		4B0511BD262CAA5A00F6079C /* PrivacySecurityPreferences.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B0511A6262CAA5A00F6079C /* PrivacySecurityPreferences.swift */; };
 		4B0511BE262CAA5A00F6079C /* DownloadPreferences.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B0511A7262CAA5A00F6079C /* DownloadPreferences.swift */; };
-		4B0511BF262CAA5A00F6079C /* PreferenceSections.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B0511A8262CAA5A00F6079C /* PreferenceSections.swift */; };
 		4B0511C3262CAA5A00F6079C /* FireproofDomains.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 4B0511AD262CAA5A00F6079C /* FireproofDomains.storyboard */; };
 		4B0511CA262CAA5A00F6079C /* FireproofDomainsViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B0511B4262CAA5A00F6079C /* FireproofDomainsViewController.swift */; };
 		4B0511E1262CAA8600F6079C /* NSOpenPanelExtensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B0511DF262CAA8600F6079C /* NSOpenPanelExtensions.swift */; };
@@ -793,7 +792,6 @@
 		4B0511A5262CAA5A00F6079C /* AppearancePreferences.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AppearancePreferences.swift; sourceTree = "<group>"; };
 		4B0511A6262CAA5A00F6079C /* PrivacySecurityPreferences.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PrivacySecurityPreferences.swift; sourceTree = "<group>"; };
 		4B0511A7262CAA5A00F6079C /* DownloadPreferences.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = DownloadPreferences.swift; sourceTree = "<group>"; };
-		4B0511A8262CAA5A00F6079C /* PreferenceSections.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PreferenceSections.swift; sourceTree = "<group>"; };
 		4B0511AD262CAA5A00F6079C /* FireproofDomains.storyboard */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.storyboard; path = FireproofDomains.storyboard; sourceTree = "<group>"; };
 		4B0511B3262CAA5A00F6079C /* RoundedSelectionRowView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = RoundedSelectionRowView.swift; sourceTree = "<group>"; };
 		4B0511B4262CAA5A00F6079C /* FireproofDomainsViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = FireproofDomainsViewController.swift; sourceTree = "<group>"; };
@@ -1630,7 +1628,6 @@
 				4B0511A6262CAA5A00F6079C /* PrivacySecurityPreferences.swift */,
 				4B0511A7262CAA5A00F6079C /* DownloadPreferences.swift */,
 				4B379C1827BD9EAA008A968E /* LoginsPreferences.swift */,
-				4B0511A8262CAA5A00F6079C /* PreferenceSections.swift */,
 			);
 			path = Model;
 			sourceTree = "<group>";
@@ -4152,7 +4149,6 @@
 				4B9292D72667124000AD2C21 /* NSPopUpButtonExtension.swift in Sources */,
 				85D33F1225C82EB3002B91A6 /* ConfigurationManager.swift in Sources */,
 				B6A9E48426146AAB0067D1B9 /* PixelParameters.swift in Sources */,
-				4B0511BF262CAA5A00F6079C /* PreferenceSections.swift in Sources */,
 				AA5FA697275F90C400DCE9C9 /* FaviconImageCache.swift in Sources */,
 				1430DFF524D0580F00B8978C /* TabBarViewController.swift in Sources */,
 				4B92929B26670D2A00AD2C21 /* BookmarkOutlineViewDataSource.swift in Sources */,

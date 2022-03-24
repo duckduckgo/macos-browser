@@ -117,15 +117,3 @@ final class LoginsPreferences {
     }
 
 }
-
-extension LoginsPreferences: PreferenceSection {
-    
-    var displayName: String {
-        return UserText.loginsPlus
-    }
-
-    var preferenceIcon: NSImage {
-        return NSImage(named: "Logins+")!
-    }
-
-}

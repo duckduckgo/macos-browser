@@ -155,7 +155,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
     }
 
     private func applyPreferredTheme() {
-        let appearancePreferences = AppearancePreferences()
+        let appearancePreferences = AppearancePreferencesModel()
         appearancePreferences.updateUserInterfaceStyle()
     }
 

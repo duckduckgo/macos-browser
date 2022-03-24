@@ -64,15 +64,3 @@ struct DefaultBrowserPreferences {
     }
 
 }
-
-extension DefaultBrowserPreferences: PreferenceSection {
-
-    var displayName: String {
-        return UserText.defaultBrowser
-    }
-
-    var preferenceIcon: NSImage {
-        return NSImage(named: "DefaultBrowser")!
-    }
-
-}
