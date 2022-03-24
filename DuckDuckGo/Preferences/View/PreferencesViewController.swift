@@ -16,7 +16,7 @@
 //  limitations under the License.
 //
 
-import Cocoa
+import AppKit
 import SwiftUI
 import Combine
 
@@ -36,12 +36,20 @@ final class PreferencesViewController: NSViewController {
         
         let host = NSHostingView(rootView: Preferences.RootView(model: model))
         view.addAndLayout(host)
-        
+    }
+
+    override func viewDidAppear() {
+        super.viewDidAppear()
         selectedTabIndexCancellable = model.$selectedTabIndex
             .dropFirst()
-            .sink { [unowned self] index in
-                delegate?.selectedTab(at: index)
+            .sink { [weak self] index in
+                self?.delegate?.selectedTab(at: index)
             }
     }
-    
+
+    override func viewWillDisappear() {
+        super.viewWillDisappear()
+        selectedTabIndexCancellable?.cancel()
+        selectedTabIndexCancellable = nil
+    }
 }

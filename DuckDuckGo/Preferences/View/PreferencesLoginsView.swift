@@ -78,7 +78,7 @@ extension Preferences {
                     .font(Const.Fonts.preferencePaneCaption)
                     .foregroundColor(Color("GreyTextColor"))
                     .fixMultilineScrollableText()
-                    .offset(x: 18)
+                    .offset(x: autoLockWarningOffset)
             }
         }
         
@@ -87,6 +87,14 @@ extension Preferences {
                 return -8
             } else {
                 return 0
+            }
+        }
+
+        var autoLockWarningOffset: CGFloat {
+            if #available(macOS 12.0, *) {
+                return 18
+            } else {
+                return 20
             }
         }
     }
