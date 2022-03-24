@@ -91,7 +91,7 @@ final class TabCollectionTests: XCTestCase {
         XCTAssertEqual(tabCollection.tabs[1], tab3)
     }
 
-    func testWhenTabIsRemoved_ThenItsVisitedDomainsAreKeptInTabCollection() {
+    func testWhenTabIsRemoved_ThenItsLocalHistoryIsKeptInTabCollection() {
         let url = URL.duckDuckGo
 
         let tabCollection = TabCollection()
@@ -103,7 +103,7 @@ final class TabCollectionTests: XCTestCase {
         tab2.addVisit(of: url)
 
         tabCollection.removeAll()
-        XCTAssert(tabCollection.visitedDomainsOfRemovedTabs.contains(url.host!))
+        XCTAssert(tabCollection.localHistoryOfRemovedTabs.contains(url.host!))
     }
 
     // MARK: - Move

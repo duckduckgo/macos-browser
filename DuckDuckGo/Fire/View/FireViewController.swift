@@ -110,8 +110,8 @@ final class FireViewController: NSViewController {
         switch burningData {
         case .all: break
         case .specificDomains(let burningDomains):
-            let visitedDomains = tabCollectionViewModel.tabCollection.visitedDomains
-            if visitedDomains.isDisjoint(with: burningDomains) {
+            let localHistory = tabCollectionViewModel.tabCollection.localHistory
+            if localHistory.isDisjoint(with: burningDomains) {
                 // Do not play animation in this window since tabs aren't influenced
                 return
             }

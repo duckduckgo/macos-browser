@@ -83,13 +83,13 @@ final class TabCollection: NSObject {
     }
 
     private func tabWillClose(at index: Int) {
-        keepVisitedDomains(of: tabs[index])
+        keepLocalHistory(of: tabs[index])
         tabs[index].tabWillClose()
     }
 
     private func tabsWillClose(range: Range<Int>) {
         for i in range {
-            keepVisitedDomains(of: tabs[i])
+            keepLocalHistory(of: tabs[i])
             tabs[i].tabWillClose()
         }
     }
@@ -118,7 +118,7 @@ final class TabCollection: NSObject {
         }
 
         tabs[index].tabWillClose()
-        keepVisitedDomains(of: tabs[index])
+        keepLocalHistory(of: tabs[index])
         tabs[index] = tab
     }
 
@@ -152,10 +152,10 @@ final class TabCollection: NSObject {
     // MARK: - Fire button
 
     // Visited domains of removed tabs used for fire button logic
-    var visitedDomainsOfRemovedTabs = Set<String>()
+    var localHistoryOfRemovedTabs = Set<String>()
 
-    private func keepVisitedDomains(of tab: Tab) {
-        visitedDomainsOfRemovedTabs.formUnion(tab.visitedDomains)
+    private func keepLocalHistory(of tab: Tab) {
+        localHistoryOfRemovedTabs.formUnion(tab.localHistory)
     }
 
 }

@@ -383,8 +383,8 @@ fileprivate extension TabCollectionViewModel {
         }
         removeTabsAndAppendNew(at: toRemove, forceChange: true)
 
-        // Clean visited domains of closed tab
-        tabCollection.visitedDomainsOfRemovedTabs.subtract(domains)
+        // Clean local history of closed tabs
+        tabCollection.localHistoryOfRemovedTabs.subtract(domains)
 
         // Clean last removed tab if needed
         if let lastRemovedTabHost = tabCollection.lastRemovedTabCache?.url?.host,
@@ -415,7 +415,7 @@ fileprivate extension Tab {
         }
 
         // If tab visited one of domains in past, replace (to clean internal data)
-        if visitedDomains.contains(where: { visitedDomain in
+        if localHistory.contains(where: { visitedDomain in
             domains.contains(visitedDomain)
         }) {
             return .replace
@@ -427,12 +427,12 @@ fileprivate extension Tab {
 
 extension TabCollection {
 
-    // Set of visited domains by one instance of TabCollection including domains of already closed tabs
-    var visitedDomains: Set<String> {
-        let visitedDomainsOfCurrentTabs = tabs.reduce(Set<String>()) { result, tab in
-            return result.union(tab.visitedDomains)
+    // Local history of TabCollection instance including history of already closed tabs
+    var localHistory: Set<String> {
+        let localHistoryOfCurrentTabs = tabs.reduce(Set<String>()) { result, tab in
+            return result.union(tab.localHistory)
         }
-        return visitedDomainsOfRemovedTabs.union(visitedDomainsOfCurrentTabs)
+        return localHistoryOfRemovedTabs.union(localHistoryOfCurrentTabs)
     }
 
 }

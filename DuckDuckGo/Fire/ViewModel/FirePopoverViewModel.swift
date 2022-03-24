@@ -88,9 +88,9 @@ final class FirePopoverViewModel {
                     return Set<String>()
                 }
 
-                return tab.visitedDomains
+                return tab.localHistory
             case .currentWindow:
-                return tabCollectionViewModel.tabCollection.visitedDomains
+                return tabCollectionViewModel.tabCollection.localHistory
             case .allData:
                 return historyCoordinating.history?.visitedDomains ?? Set<String>()
             }
