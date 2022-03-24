@@ -88,7 +88,11 @@ final class Fire {
     
     let tabsCleaner = TabDataCleaner()
 
-    @Published private(set) var isBurning = false
+    enum BurningData {
+        case specificDomains(_ domains: Set<String>)
+        case all
+    }
+    @Published private(set) var burningData: BurningData?
 
     init(cacheManager: WebCacheManager = WebCacheManager.shared,
          historyCoordinating: HistoryCoordinating = HistoryCoordinator.shared,
@@ -114,7 +118,7 @@ final class Fire {
     func burnDomains(_ domains: Set<String>, completion: (() -> Void)? = nil) {
         os_log("Fire started", log: .fire)
 
-        isBurning = true
+        burningData = .specificDomains(domains)
 
         // Add www prefixes
         let wwwDomains = Set(domains.map { domain -> String in
@@ -160,7 +164,7 @@ final class Fire {
             self.burnAutoconsentCache()
 
             group.notify(queue: .main) {
-                self.isBurning = false
+                self.burningData = nil
                 completion?()
 
                 os_log("Fire finished", log: .fire)
@@ -170,7 +174,7 @@ final class Fire {
 
     func burnAll(tabCollectionViewModel: TabCollectionViewModel, completion: (() -> Void)? = nil) {
         os_log("Fire started", log: .fire)
-        isBurning = true
+        burningData = .all
         
         tabsCleaner.prepareModelsForCleanup(allTabViewModels()) {
             let group = DispatchGroup()
@@ -198,7 +202,7 @@ final class Fire {
             self.burnAutoconsentCache()
             
             group.notify(queue: .main) {
-                self.isBurning = false
+                self.burningData = nil
                 completion?()
                 
                 os_log("Fire finished", log: .fire)
@@ -379,6 +383,9 @@ fileprivate extension TabCollectionViewModel {
         }
         removeTabsAndAppendNew(at: toRemove, forceChange: true)
 
+        // Clean visited domains of closed tab
+        tabCollection.visitedDomainsOfRemovedTabs.subtract(domains)
+
         // Clean last removed tab if needed
         if let lastRemovedTabHost = tabCollection.lastRemovedTabCache?.url?.host,
            domains.contains(lastRemovedTabHost) {
@@ -416,4 +423,30 @@ fileprivate extension Tab {
 
         return .none
     }
+}
+
+extension TabCollection {
+
+    // Set of visited domains by one instance of TabCollection including domains of already closed tabs
+    var visitedDomains: Set<String> {
+        let visitedDomainsOfCurrentTabs = tabs.reduce(Set<String>()) { result, tab in
+            return result.union(tab.visitedDomains)
+        }
+        return visitedDomainsOfRemovedTabs.union(visitedDomainsOfCurrentTabs)
+    }
+
+}
+
+extension History {
+
+    var visitedDomains: Set<String> {
+        return reduce(Set<String>(), { result, historyEntry in
+            if let host = historyEntry.url.host {
+                return result.union([host.dropWWW()])
+            } else {
+                return result
+            }
+        })
+    }
+
 }

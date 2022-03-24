@@ -152,7 +152,7 @@ final class TabCollection: NSObject {
     // MARK: - Fire button
 
     // Visited domains of removed tabs used for fire button logic
-    private(set) var visitedDomainsOfRemovedTabs = Set<String>()
+    var visitedDomainsOfRemovedTabs = Set<String>()
 
     private func keepVisitedDomains(of tab: Tab) {
         visitedDomainsOfRemovedTabs.formUnion(tab.visitedDomains)

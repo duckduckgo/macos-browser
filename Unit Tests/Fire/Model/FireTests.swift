@@ -89,8 +89,8 @@ final class FireTests: XCTestCase {
         let isBurningExpectation = expectation(description: "Burning")
         let finishedBurningExpectation = expectation(description: "Finished burning")
 
-        fire.$isBurning.dropFirst().sink { isBurning in
-            if isBurning {
+        fire.$burningData.dropFirst().sink { burningData in
+            if burningData != nil {
                 isBurningExpectation.fulfill()
             } else {
                 finishedBurningExpectation.fulfill()

@@ -508,7 +508,7 @@ final class Tab: NSObject {
 
         // Add to local history
         if let host = url.host, !host.isEmpty {
-            visitedDomains.insert(host)
+            visitedDomains.insert(host.dropWWW())
         }
     }
 

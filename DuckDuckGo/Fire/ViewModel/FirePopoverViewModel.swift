@@ -90,27 +90,13 @@ final class FirePopoverViewModel {
 
                 return tab.visitedDomains
             case .currentWindow:
-                let visitedDomainsOfClosedTabs = tabCollectionViewModel.tabCollection.visitedDomainsOfRemovedTabs
-                let visitedDomainsOfCurrentTabs = tabCollectionViewModel.tabCollection.tabs.reduce(Set<String>()) { result, tab in
-                    return result.union(tab.visitedDomains)
-                }
-                return visitedDomainsOfClosedTabs.union(visitedDomainsOfCurrentTabs)
+                return tabCollectionViewModel.tabCollection.visitedDomains
             case .allData:
-                return historyCoordinating.history?.reduce(Set<String>(), { result, historyEntry in
-                    if let host = historyEntry.url.host {
-                        return result.union([host])
-                    } else {
-                        return result
-                    }
-                }) ?? Set<String>()
+                return historyCoordinating.history?.visitedDomains ?? Set<String>()
             }
         }
 
-        func dropWWW(domains: Set<String>) -> Set<String> {
-            return Set(domains.map { $0.dropWWW() })
-        }
-
-        let visitedDomains = dropWWW(domains: visitedDomains(basedOn: clearingOption))
+        let visitedDomains = visitedDomains(basedOn: clearingOption)
 
         let fireproofed = visitedDomains
             .filter { domain in
