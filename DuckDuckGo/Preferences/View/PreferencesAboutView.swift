@@ -48,7 +48,7 @@ extension Preferences {
                     .font(Const.Fonts.preferencePaneTitle)
                 
                 HStack {
-                    Image("Logo")
+                    Image("AboutPageLogo")
                     VStack(alignment: .leading, spacing: 6) {
                         Text("DuckDuckGo").font(.companyName)
                         Text("Privacy, simplified").font(.privacySimplified)
