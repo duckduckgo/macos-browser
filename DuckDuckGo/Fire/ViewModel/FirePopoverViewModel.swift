@@ -71,7 +71,11 @@ final class FirePopoverViewModel {
 
     @Published private(set) var selectable: [Item] = []
     @Published private(set) var fireproofed: [Item] = []
-    @Published private(set) var selected: Set<Int> = Set()
+    @Published private(set) var selected: Set<Int> = Set() {
+        didSet {
+            updateAreOtherTabsInfluenced()
+        }
+    }
 
     let selectableSectionIndex = 0
     let fireproofedSectionIndex = 1
@@ -141,6 +145,34 @@ final class FirePopoverViewModel {
         selected.remove(index)
     }
 
+    private var selectedDomains: Set<String> {
+        return Set<String>(selected.compactMap {
+            guard let selectedDomain = selectable[safe: $0]?.domain else {
+                assertionFailure("Wrong index")
+                return nil
+            }
+            return selectedDomain
+        })
+    }
+
+    // MARK: - Warning
+
+    @Published private(set) var areOtherTabsInfluenced = false
+
+    private func updateAreOtherTabsInfluenced() {
+        let selectedTab = tabCollectionViewModel.selectedTabViewModel?.tab
+        let allTabs = WindowControllersManager.shared.mainWindowControllers.flatMap {
+            $0.mainViewController.tabCollectionViewModel.tabCollection.tabs
+        }
+        let otherTabs = allTabs.filter({ $0 != selectedTab })
+
+        let otherTabsLocalHistory = otherTabs.reduce(Set<String>()) { result, tab in
+            return result.union(tab.localHistory)
+        }
+
+        areOtherTabsInfluenced = !otherTabsLocalHistory.isDisjoint(with: selectedDomains)
+    }
+
     // MARK: - Burning
 
     func burn() {
@@ -150,14 +182,6 @@ final class FirePopoverViewModel {
             fireViewModel.fire.burnAll(tabCollectionViewModel: tabCollectionViewModel) { timedPixel.fire() }
         } else {
             // Burn selected domains
-            let selectedDomains = Set<String>(selected.compactMap {
-                guard let selectedDomain = selectable[safe: $0]?.domain else {
-                    assertionFailure("Wrong index")
-                    return nil
-                }
-                return selectedDomain
-            })
-
             fireViewModel.fire.burnDomains(selectedDomains) { timedPixel.fire() }
         }
     }

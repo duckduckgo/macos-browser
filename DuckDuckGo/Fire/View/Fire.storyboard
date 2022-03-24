@@ -356,9 +356,6 @@
                                             <font key="font" metaFont="smallSystem"/>
                                         </buttonCell>
                                         <color key="contentTintColor" name="GreyTextColor"/>
-                                        <connections>
-                                            <action selector="closeDetailsButtonAction:" target="DMI-mh-xLJ" id="mLs-dU-owR"/>
-                                        </connections>
                                     </button>
                                 </subviews>
                                 <constraints>

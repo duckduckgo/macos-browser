@@ -57,6 +57,7 @@ final class FirePopoverViewController: NSViewController {
 
     private var viewModelCancellable: AnyCancellable?
     private var selectedCancellable: AnyCancellable?
+    private var areOtherTabsInfluencedCancellable: AnyCancellable?
 
     required init?(coder: NSCoder) {
         fatalError("FirePopoverViewController: Bad initializer")
@@ -93,6 +94,7 @@ final class FirePopoverViewController: NSViewController {
 
         subscribeToViewModel()
         subscribeToSelected()
+        subscribeToAreOtherTabsInfluenced()
     }
 
     @IBAction func optionsButtonAction(_ sender: NSPopUpButton) {
@@ -125,7 +127,7 @@ final class FirePopoverViewController: NSViewController {
 
     private func updateWarningWrapperView() {
         warningWrapperView.isHidden = firePopoverViewModel.clearingOption == .allData ||
-        firePopoverViewModel.selectable.isEmpty || detailsWrapperView.isHidden
+        !firePopoverViewModel.areOtherTabsInfluenced || detailsWrapperView.isHidden
 
         collectionViewBottomConstraint.constant = warningWrapperView.isHidden ? 0 : 32
     }
@@ -168,6 +170,15 @@ final class FirePopoverViewController: NSViewController {
             }
     }
 
+    private func subscribeToAreOtherTabsInfluenced() {
+        areOtherTabsInfluencedCancellable = firePopoverViewModel.$areOtherTabsInfluenced
+            .receive(on: DispatchQueue.main)
+            .sink { [weak self] _ in
+                guard let self = self else { return }
+                self.updateWarningWrapperView()
+            }
+    }
+
     private func toggleDetails() {
         let showDetails = detailsWrapperView.isHidden
         openWrapperView.isHidden = showDetails
@@ -194,7 +205,8 @@ final class FirePopoverViewController: NSViewController {
             return Constants.minimumContentHeight
         } else {
             if let contentHeight = collectionView.collectionViewLayout?.collectionViewContentSize.height {
-                let height = contentHeight + closeWrapperView.frame.height + warningWrapperView.frame.height
+                let warningWrapperViewHeight = warningWrapperView.isHidden ? 0 : warningWrapperView.frame.height
+                let height = contentHeight + closeWrapperView.frame.height + warningWrapperViewHeight
                 return min(Constants.maximumContentHeight, height)
             } else {
                 return Constants.maximumContentHeight
