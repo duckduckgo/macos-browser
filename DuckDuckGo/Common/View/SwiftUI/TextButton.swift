@@ -1,5 +1,5 @@
 //
-//  AboutModel.swift
+//  TextButton.swift
 //
 //  Copyright © 2022 DuckDuckGo. All rights reserved.
 //
@@ -18,17 +18,21 @@
 
 import SwiftUI
 
-final class AboutModel: ObservableObject {
-    let appVersion = AppVersion()
+struct TextButton: View {
     
-    let displayableAboutURL: String = URL.aboutDuckDuckGo
-        .toString(decodePunycode: false, dropScheme: true, needsWWW: false, dropTrailingSlash: false)
+    let title: String
+    let action: () -> Void
     
-    func openURL(_ url: URL) {
-        WindowControllersManager.shared.show(url: url, newTab: true)
+    init(_ title: String, action: @escaping () -> Void) {
+        self.title = title
+        self.action = action
     }
-
-    func openFeedbackForm() {
-        FeedbackPresenter.presentFeedbackForm()
+    
+    var body: some View {
+        Button(action: action) {
+            Text(title)
+                .foregroundColor(Color("LinkBlueColor"))
+        }
+        .buttonStyle(.plain)
     }
 }

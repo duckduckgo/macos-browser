@@ -22,15 +22,16 @@ extension Preferences {
     
     struct RootView: View {
         
-        @ObservedObject var model: PreferencesModel
+        @ObservedObject var model: PreferencesSidebarModel
         
         var body: some View {
             HStack(spacing: 0) {
                 Preferences.Sidebar().environmentObject(model).frame(width: 256)
+
                 Color(NSColor.separatorColor).frame(width: 1)
                 
                 ScrollView(.vertical) {
-                    HStack(alignment: .top) {
+                    HStack(alignment: .top, spacing: 0) {
                         Spacer()
 
                         VStack(alignment: .leading) {

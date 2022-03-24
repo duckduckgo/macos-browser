@@ -18,7 +18,7 @@
 
 import SwiftUI
 
-final class PreferencesModel: ObservableObject {
+final class PreferencesSidebarModel: ObservableObject {
     
     let sections: [PreferencesSection]
     

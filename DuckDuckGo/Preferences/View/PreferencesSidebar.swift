@@ -21,62 +21,67 @@ import SwiftUI
 extension Preferences {
     
     struct SidebarItem: View {
-        @EnvironmentObject var model: PreferencesModel
-
         let pane: PreferencePaneIdentifier
+        let isSelected: Bool
         let action: () -> Void
         
         var body: some View {
-            let selected = model.selectedPane == pane
-
             Button(action: action) {
                 HStack(spacing: 6) {
                     Image(pane.preferenceIconName).frame(width: 16, height: 16)
                     Text(pane.displayName).font(Const.Fonts.sideBarItem)
                 }
             }
-            .buttonStyle(selected ?
-                         PreferencesSidebarItemButtonStyle(bgColor: Color("RowHoverColor")) :
+            .buttonStyle(isSelected ?
+                         SidebarItemButtonStyle(bgColor: Color("RowHoverColor")) :
                             // Almost clear, so that whole view is clickable
-                         PreferencesSidebarItemButtonStyle(bgColor: Color(NSColor.windowBackgroundColor.withAlphaComponent(0.001))))
+                         SidebarItemButtonStyle(bgColor: Color(NSColor.windowBackgroundColor.withAlphaComponent(0.001))))
+        }
+    }
+    
+    struct TabSwitcher: View {
+        @EnvironmentObject var model: PreferencesSidebarModel
+
+        var body: some View {
+            NSPopUpButtonView(selection: $model.selectedTabIndex, viewCreator: {
+                let button = NSPopUpButton()
+                button.font = Const.Fonts.popUpButton
+                button.setButtonType(.momentaryLight)
+                button.isBordered = false
+                
+                for (index, type) in model.tabSwitcherTabs.enumerated() {
+                    guard let tabTitle = type.title else {
+                        assertionFailure("Attempted to display standard tab type in tab switcher")
+                        continue
+                    }
+                    
+                    let item = button.menu?.addItem(withTitle: tabTitle, action: nil, keyEquivalent: "")
+                    item?.representedObject = index
+                }
+                
+                return button
+            })
+                .padding(.horizontal, 3)
+                .frame(height: 60)
+                .onAppear(perform: model.resetTabSelectionIfNeeded)
         }
     }
 
     struct Sidebar: View {
-        @EnvironmentObject var model: PreferencesModel
+        @EnvironmentObject var model: PreferencesSidebarModel
 
         var body: some View {
             VStack(spacing: 12) {
-                NSPopUpButtonView(selection: $model.selectedTabIndex, viewCreator: {
-                    let button = NSPopUpButton()
-                    button.font = Const.Fonts.popUpButton
-                    button.setButtonType(.momentaryLight)
-                    button.isBordered = false
-                    
-                    for (index, type) in model.tabSwitcherTabs.enumerated() {
-                        guard let tabTitle = type.title else {
-                            assertionFailure("Attempted to display standard tab type in tab switcher")
-                            continue
-                        }
-                        
-                        let item = button.menu?.addItem(withTitle: tabTitle, action: nil, keyEquivalent: "")
-                        item?.representedObject = index
-                    }
-                    
-                    return button
-                })
-                    .padding(.horizontal, 3)
-                    .frame(height: 60)
-                    .onAppear(perform: model.resetTabSelectionIfNeeded)
+                TabSwitcher()
+                    .environmentObject(model)
                 
                 ScrollView {
                     VStack(spacing: 0) {
                         ForEach(model.sections) { section in
                             ForEach(section.panes) { pane in
-                                SidebarItem(pane: pane) {
+                                SidebarItem(pane: pane, isSelected: model.selectedPane == pane) {
                                     model.selectedPane = pane
                                 }
-                                .environmentObject(model)
                             }
                             if section != model.sections.last {
                                 Color(NSColor.separatorColor)
@@ -93,6 +98,20 @@ extension Preferences {
         }
     }
 
+    private struct SidebarItemButtonStyle: ButtonStyle {
+
+        let bgColor: Color
+
+        func makeBody(configuration: Self.Configuration) -> some View {
+
+            configuration.label
+                .padding(.horizontal, 16)
+                .frame(maxWidth: .infinity, minHeight: 40, alignment: .leading)
+                .truncationMode(.tail)
+                .background(RoundedRectangle(cornerRadius: 8, style: .continuous).fill(bgColor))
+
+        }
+    }
 }
 
 typealias Const = Preferences.Const
@@ -103,20 +122,5 @@ struct Sidebar_Previews: PreviewProvider {
     static var previews: some View {
         Preferences.Sidebar(model: .init())
             .frame(width: 250)
-    }
-}
-
-private struct PreferencesSidebarItemButtonStyle: ButtonStyle {
-
-    let bgColor: Color
-
-    func makeBody(configuration: Self.Configuration) -> some View {
-
-        configuration.label
-            .padding(.horizontal, 16)
-            .frame(maxWidth: .infinity, minHeight: 40, alignment: .leading)
-            .truncationMode(.tail)
-            .background(RoundedRectangle(cornerRadius: 8, style: .continuous).fill(bgColor))
-
     }
 }

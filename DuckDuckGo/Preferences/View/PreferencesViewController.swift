@@ -24,7 +24,7 @@ final class PreferencesViewController: NSViewController {
 
     weak var delegate: BrowserTabSelectionDelegate?
     
-    let model = PreferencesModel()
+    let model = PreferencesSidebarModel()
     private var selectedTabIndexCancellable: AnyCancellable?
     
     override func loadView() {

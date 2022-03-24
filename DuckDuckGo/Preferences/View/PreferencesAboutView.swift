@@ -18,25 +18,6 @@
 
 import SwiftUI
 
-struct TextButton: View {
-    
-    let title: String
-    let action: () -> Void
-    
-    init(_ title: String, action: @escaping () -> Void) {
-        self.title = title
-        self.action = action
-    }
-    
-    var body: some View {
-        Button(action: action) {
-            Text(title)
-                .foregroundColor(Color("LinkBlueColor"))
-        }
-        .buttonStyle(.plain)
-    }
-}
-
 extension Preferences {
     
     struct AboutView: View {
@@ -57,7 +38,7 @@ extension Preferences {
                 }
 
                 HStack {
-                    TextButton("More at duckduckgo.com/about") {
+                    TextButton("More at \(model.displayableAboutURL)") {
                         model.openURL(.aboutDuckDuckGo)
                     }
 #if FEEDBACK

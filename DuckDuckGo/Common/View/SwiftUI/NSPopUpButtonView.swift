@@ -19,7 +19,6 @@
 import AppKit
 import SwiftUI
 
-// swiftlint:disable force_cast
 struct NSPopUpButtonView<ItemType>: NSViewRepresentable where ItemType: Equatable {
     
     typealias NSViewType = NSPopUpButton
@@ -69,8 +68,8 @@ struct NSPopUpButtonView<ItemType>: NSViewRepresentable where ItemType: Equatabl
                 return
             }
 
+            // swiftlint:disable:next force_cast
             parent.selection = selectedItem.representedObject as! ItemType
         }
     }
 }
-// swiftlint:enable force_cast
