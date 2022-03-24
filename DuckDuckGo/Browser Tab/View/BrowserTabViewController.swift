@@ -242,6 +242,10 @@ final class BrowserTabViewController: NSViewController {
             return
         }
 
+        guard tabCollectionViewModel.selectDisplayableTabIfPresent(content) == false else {
+            return
+        }
+
         let tab = Tab(content: content,
                       parentTab: parentTab,
                       shouldLoadInBackground: true,
