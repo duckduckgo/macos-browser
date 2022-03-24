@@ -26,18 +26,21 @@ extension Preferences {
         @ObservedObject var model: DefaultBrowserPreferencesModel
         
         var body: some View {
-            VStack(alignment: .leading, spacing: 24) {
+            VStack(alignment: .leading, spacing: 0) {
                 Text(UserText.defaultBrowser)
                     .font(Const.Fonts.preferencePaneTitle)
-                HStack {
-                    if model.isDefault {
-                        Image("SolidCheckmark")
-                        Text(UserText.isDefaultBrowser)
-                    } else {
-                        Image("Warning")
-                        Text(UserText.isNotDefaultBrowser)
-                        Button("Make DuckDuckGo Default...") {
-                            model.becomeDefault()
+                
+                Section {
+                    HStack {
+                        if model.isDefault {
+                            Image("SolidCheckmark")
+                            Text(UserText.isDefaultBrowser)
+                        } else {
+                            Image("Warning")
+                            Text(UserText.isNotDefaultBrowser)
+                            Button("Make DuckDuckGo Default...") {
+                                model.becomeDefault()
+                            }
                         }
                     }
                 }

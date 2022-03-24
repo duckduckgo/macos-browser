@@ -83,18 +83,22 @@ extension Preferences {
         @ObservedObject var model: AppearancePreferencesModel
         
         var body: some View {
-            VStack(alignment: .leading, spacing: 24) {
+            VStack(alignment: .leading, spacing: 0) {
                 Text(UserText.appearance)
                     .font(Const.Fonts.preferencePaneTitle)
+                
+                Section {
+                    Text("Theme")
+                        .font(Const.Fonts.preferencePaneSectionHeader)
+                    ThemePicker()
+                        .environmentObject(model)
+                }
 
-                Text("Theme")
-                    .font(Const.Fonts.preferencePaneSectionHeader)
-                ThemePicker()
-                    .environmentObject(model)
-
-                Text("Address Bar")
-                    .font(Const.Fonts.preferencePaneSectionHeader)
-                Toggle("Show full website address", isOn: $model.showFullURL)
+                Section {
+                    Text("Address Bar")
+                        .font(Const.Fonts.preferencePaneSectionHeader)
+                    Toggle("Show full website address", isOn: $model.showFullURL)
+                }
             }
         }
     }

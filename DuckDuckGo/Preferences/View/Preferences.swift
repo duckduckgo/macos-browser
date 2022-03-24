@@ -19,6 +19,23 @@
 import SwiftUI
 
 enum Preferences {
+
+    struct Section<Content>: View where Content: View {
+        
+        let spacing: CGFloat
+        @ViewBuilder let content: () -> Content
+        
+        init(spacing: CGFloat = 12, @ViewBuilder content: @escaping () -> Content) {
+            self.spacing = spacing
+            self.content = content
+        }
+
+        var body: some View {
+            VStack(alignment: .leading, spacing: spacing, content: content)
+                .padding(.vertical, 20)
+        }
+    }
+
     enum Const {
         enum Fonts {
 
@@ -63,72 +80,4 @@ enum Preferences {
             }()
         }
     }
-}
-
-enum PreferencesSectionIdentifier: Hashable, CaseIterable {
-    case regularPreferencePanes
-    case about
-}
-
-enum PreferencePaneIdentifier: Hashable, Identifiable {
-    case defaultBrowser
-    case appearance
-    case privacy
-    case loginsPlus
-    case downloads
-    case about
-    
-    var id: Self {
-        self
-    }
-
-    var displayName: String {
-        switch self {
-        case .defaultBrowser:
-            return UserText.defaultBrowser
-        case .appearance:
-            return UserText.appearance
-        case .privacy:
-            return UserText.privacy
-        case .loginsPlus:
-            return UserText.loginsPlus
-        case .downloads:
-            return UserText.downloads
-        case .about:
-            return UserText.about
-        }
-    }
-
-    var preferenceIconName: String {
-        switch self {
-        case .defaultBrowser:
-            return "DefaultBrowser"
-        case .appearance:
-            return "Appearance"
-        case .privacy:
-            return "Privacy"
-        case .loginsPlus:
-            return "Logins+"
-        case .downloads:
-            return "DownloadsPreferences"
-        case .about:
-            return "About"
-        }
-    }
-}
-
-struct PreferencesSection: Hashable, Identifiable {
-    let id: PreferencesSectionIdentifier
-    let panes: [PreferencePaneIdentifier]
-    
-    static let defaultSections: [PreferencesSection] = [
-        .init(
-            id: .regularPreferencePanes,
-            panes: [.defaultBrowser, .appearance, .privacy, .loginsPlus, .downloads]
-        ),
-        .init(
-            id: .about,
-            panes: [.about]
-        )
-    ]
 }

@@ -27,23 +27,22 @@ extension Preferences {
             VStack(alignment: .leading, spacing: 0) {
                 Text(UserText.downloads)
                     .font(Const.Fonts.preferencePaneTitle)
-                    .padding(.bottom, 24)
                 
-                Text(UserText.downloadsLocation)
-                    .font(Const.Fonts.preferencePaneSectionHeader)
-                    .padding(.bottom, 12)
-                
-                HStack {
-                    NSPathControlView(url: model.selectedDownloadLocation)
-                    Button(UserText.downloadsChangeDirectory) {
-                        model.presentDownloadDirectoryPanel()
+                Section {
+                    Text(UserText.downloadsLocation)
+                        .font(Const.Fonts.preferencePaneSectionHeader)
+                    
+                    HStack {
+                        NSPathControlView(url: model.selectedDownloadLocation)
+                        Button(UserText.downloadsChangeDirectory) {
+                            model.presentDownloadDirectoryPanel()
+                        }
+                        .frame(minWidth: 82)
                     }
-                    .frame(minWidth: 82)
-                }
-                .disabled(model.alwaysRequestDownloadLocation)
-                .padding(.bottom, 12)
+                    .disabled(model.alwaysRequestDownloadLocation)
 
-                Toggle(UserText.downloadsAlwaysAsk, isOn: $model.alwaysRequestDownloadLocation)
+                    Toggle(UserText.downloadsAlwaysAsk, isOn: $model.alwaysRequestDownloadLocation)
+                }
             }
         }
     }

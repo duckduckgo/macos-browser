@@ -21,6 +21,7 @@
 		371C0A2927E33EDC0070591F /* FeedbackPresenter.swift in Sources */ = {isa = PBXBuildFile; fileRef = 371C0A2827E33EDC0070591F /* FeedbackPresenter.swift */; };
 		371E141927E92E42009E3B5B /* MultilineScrollableTextFix.swift in Sources */ = {isa = PBXBuildFile; fileRef = 371E141827E92E42009E3B5B /* MultilineScrollableTextFix.swift */; };
 		376705AF27EB488600DD8D76 /* RoundedSelectionRowView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B0511B3262CAA5A00F6079C /* RoundedSelectionRowView.swift */; };
+		376705B127EC7AFD00DD8D76 /* PreferencesSection.swift in Sources */ = {isa = PBXBuildFile; fileRef = 376705B027EC7AFD00DD8D76 /* PreferencesSection.swift */; };
 		3797402E27DF41CB003090EE /* AboutModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3797402D27DF41CB003090EE /* AboutModel.swift */; };
 		379DE4BD27EA31AC002CC3DE /* PreferencesLoginsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 379DE4BC27EA31AC002CC3DE /* PreferencesLoginsView.swift */; };
 		379DE4BF27EA3240002CC3DE /* LoginsPreferencesModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 379DE4BE27EA3240002CC3DE /* LoginsPreferencesModel.swift */; };
@@ -761,6 +762,7 @@
 		339A6B5726A044BA00E3DAE8 /* duckduckgo-privacy-dashboard */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; name = "duckduckgo-privacy-dashboard"; path = "Submodules/duckduckgo-privacy-dashboard"; sourceTree = SOURCE_ROOT; };
 		371C0A2827E33EDC0070591F /* FeedbackPresenter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FeedbackPresenter.swift; sourceTree = "<group>"; };
 		371E141827E92E42009E3B5B /* MultilineScrollableTextFix.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MultilineScrollableTextFix.swift; sourceTree = "<group>"; };
+		376705B027EC7AFD00DD8D76 /* PreferencesSection.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PreferencesSection.swift; sourceTree = "<group>"; };
 		3797402D27DF41CB003090EE /* AboutModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AboutModel.swift; sourceTree = "<group>"; };
 		379DE4BC27EA31AC002CC3DE /* PreferencesLoginsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PreferencesLoginsView.swift; sourceTree = "<group>"; };
 		379DE4BE27EA3240002CC3DE /* LoginsPreferencesModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LoginsPreferencesModel.swift; sourceTree = "<group>"; };
@@ -1550,6 +1552,7 @@
 		37AFCE8C27DB6AA900471A10 /* NewModel */ = {
 			isa = PBXGroup;
 			children = (
+				376705B027EC7AFD00DD8D76 /* PreferencesSection.swift */,
 				37AFCE8F27DB70E500471A10 /* PreferencesModel.swift */,
 				37AFCE8D27DB6AC200471A10 /* DefaultBrowserPreferencesModel.swift */,
 				37D2771627E874D1003365FD /* AppearancePreferencesModel.swift */,
@@ -4334,6 +4337,7 @@
 				B6106BAB26A7BF1D0013B453 /* PermissionType.swift in Sources */,
 				85707F2A276A35FE00DC0649 /* ActionSpeech.swift in Sources */,
 				8585B63826D6E66C00C1416F /* ButtonStyles.swift in Sources */,
+				376705B127EC7AFD00DD8D76 /* PreferencesSection.swift in Sources */,
 				4B0511BD262CAA5A00F6079C /* PrivacySecurityPreferences.swift in Sources */,
 				B6830963274CDEC7004B46BB /* FireproofDomainsStore.swift in Sources */,
 				AA9FF95F24A1FB690039E328 /* TabCollectionViewModel.swift in Sources */,

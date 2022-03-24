@@ -49,7 +49,7 @@ extension Preferences {
                 
                 HStack {
                     Image("AboutPageLogo")
-                    VStack(alignment: .leading, spacing: 6) {
+                    VStack(alignment: .leading, spacing: 8) {
                         Text("DuckDuckGo").font(.companyName)
                         Text("Privacy, simplified").font(.privacySimplified)
                         Text(UserText.versionLabel(version: model.appVersion.versionNumber, build: model.appVersion.buildNumber))

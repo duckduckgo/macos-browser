@@ -27,9 +27,8 @@ extension Preferences {
             VStack(alignment: .leading, spacing: 0) {
                 Text(UserText.privacy)
                     .font(Const.Fonts.preferencePaneTitle)
-                    .padding(.bottom, 24)
                 
-                VStack(alignment: .leading, spacing: 12) {
+                Section {
                     Text(UserText.fireDialogFireproofSites)
                         .font(Const.Fonts.preferencePaneSectionHeader)
 
@@ -41,9 +40,8 @@ extension Preferences {
                         model.presentManageFireproofSitesDialog()
                     }
                 }
-                .padding(.bottom, 40)
 
-                VStack(alignment: .leading, spacing: 12) {
+                Section {
                     Text(UserText.autoconsentSettingsTitle)
                         .font(Const.Fonts.preferencePaneSectionHeader)
 
@@ -53,9 +51,8 @@ extension Preferences {
                     Text(UserText.autoconsentExplanation)
                         .fixMultilineScrollableText()
                 }
-                .padding(.bottom, 40)
 
-                VStack(alignment: .leading, spacing: 12) {
+                Section {
                     Text(UserText.gpcSettingsTitle)
                         .font(Const.Fonts.preferencePaneSectionHeader)
 
