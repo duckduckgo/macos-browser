@@ -69,9 +69,12 @@ final class FirePopoverViewModel {
     private let fireproofDomains: FireproofDomains
     private let faviconManagement: FaviconManagement
 
-    @Published private(set) var fireproofed: [Item] = []
     @Published private(set) var selectable: [Item] = []
+    @Published private(set) var fireproofed: [Item] = []
     @Published private(set) var selected: Set<Int> = Set()
+
+    let selectableSectionIndex = 0
+    let fireproofedSectionIndex = 1
 
     // MARK: - Options
 
@@ -116,12 +119,13 @@ final class FirePopoverViewModel {
         let selectable = visitedDomains
             .subtracting(fireproofed)
 
-        self.fireproofed = fireproofed
-            .map { Item(domain: $0, favicon: faviconManagement.getCachedFavicon(for: $0, sizeCategory: .small)?.image) }
-            .sorted { $0.domain < $1.domain }
         self.selectable = selectable
             .map { Item(domain: $0, favicon: faviconManagement.getCachedFavicon(for: $0, sizeCategory: .small)?.image) }
             .sorted { $0.domain < $1.domain }
+        self.fireproofed = fireproofed
+            .map { Item(domain: $0, favicon: faviconManagement.getCachedFavicon(for: $0, sizeCategory: .small)?.image) }
+            .sorted { $0.domain < $1.domain }
+
         selectAll()
     }
 

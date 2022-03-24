@@ -160,10 +160,11 @@ final class FirePopoverViewController: NSViewController {
         selectedCancellable = firePopoverViewModel.$selected
             .receive(on: DispatchQueue.main)
             .sink { [weak self] selected in
-                let selectionIndexPaths = Set(selected.map {IndexPath(item: $0, section: 1)})
-                self?.collectionView.selectionIndexPaths = selectionIndexPaths
-                self?.updateCloseDetailsButton()
-                self?.updateClearButton()
+                guard let self = self else { return }
+                let selectionIndexPaths = Set(selected.map {IndexPath(item: $0, section: self.firePopoverViewModel.selectableSectionIndex)})
+                self.collectionView.selectionIndexPaths = selectionIndexPaths
+                self.updateCloseDetailsButton()
+                self.updateClearButton()
             }
     }
 
@@ -225,7 +226,7 @@ extension FirePopoverViewController: NSCollectionViewDataSource {
     }
 
     func collectionView(_ collectionView: NSCollectionView, numberOfItemsInSection section: Int) -> Int {
-        return section == 0 ? firePopoverViewModel.fireproofed.count : firePopoverViewModel.selectable.count
+        return section == firePopoverViewModel.selectableSectionIndex ? firePopoverViewModel.selectable.count: firePopoverViewModel.fireproofed.count
     }
 
     func collectionView(_ collectionView: NSCollectionView, itemForRepresentedObjectAt indexPath: IndexPath) -> NSCollectionViewItem {
@@ -233,9 +234,10 @@ extension FirePopoverViewController: NSCollectionViewDataSource {
         guard let firePopoverItem = item as? FirePopoverCollectionViewItem else { return item }
 
         firePopoverItem.delegate = self
-        let sectionList = (indexPath.section == 0 ? firePopoverViewModel.fireproofed : firePopoverViewModel.selectable)
+        let isSelectableSection = indexPath.section == firePopoverViewModel.selectableSectionIndex
+        let sectionList = isSelectableSection ? firePopoverViewModel.selectable: firePopoverViewModel.fireproofed
         let listItem = sectionList[indexPath.item]
-        firePopoverItem.setItem(listItem, isFireproofed: indexPath.section == 0)
+        firePopoverItem.setItem(listItem, isFireproofed: indexPath.section == firePopoverViewModel.fireproofedSectionIndex)
         return firePopoverItem
     }
 
@@ -248,10 +250,10 @@ extension FirePopoverViewController: NSCollectionViewDataSource {
                                                         for: indexPath) as! FirePopoverCollectionViewHeader
         // swiftlint:enable force_cast
 
-        if indexPath.section == 0 {
-            view.title.stringValue = UserText.fireDialogFireproofSites
-        } else {
+        if indexPath.section == firePopoverViewModel.selectableSectionIndex {
             view.title.stringValue = UserText.fireDialogClearSites
+        } else {
+            view.title.stringValue = UserText.fireDialogFireproofSites
         }
 
         return view
@@ -270,8 +272,8 @@ extension FirePopoverViewController: NSCollectionViewDelegateFlowLayout {
                         referenceSizeForHeaderInSection section: Int) -> NSSize {
         let count: Int
         switch section {
-        case 0: count = firePopoverViewModel.fireproofed.count
-        case 1: count = firePopoverViewModel.selectable.count
+        case firePopoverViewModel.selectableSectionIndex: count = firePopoverViewModel.selectable.count
+        case firePopoverViewModel.fireproofedSectionIndex: count = firePopoverViewModel.fireproofed.count
         default: count = 0
         }
         return NSSize(width: collectionView.bounds.width, height: count == 0 ? 0 : Constants.headerHeight)
@@ -282,8 +284,8 @@ extension FirePopoverViewController: NSCollectionViewDelegateFlowLayout {
                         referenceSizeForFooterInSection section: Int) -> NSSize {
         let count: Int
         switch section {
-        case 0: count = firePopoverViewModel.fireproofed.count
-        case 1: count = firePopoverViewModel.selectable.count
+        case firePopoverViewModel.selectableSectionIndex: count = firePopoverViewModel.selectable.count
+        case firePopoverViewModel.fireproofedSectionIndex: count = firePopoverViewModel.fireproofed.count
         default: count = 0
         }
         return NSSize(width: collectionView.bounds.width, height: count == 0 ? 0 : Constants.footerHeight)
