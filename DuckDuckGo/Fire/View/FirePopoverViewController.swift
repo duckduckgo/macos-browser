@@ -48,6 +48,7 @@ final class FirePopoverViewController: NSViewController {
     @IBOutlet weak var detailsWrapperView: NSView!
     @IBOutlet weak var contentHeightConstraint: NSLayoutConstraint!
     @IBOutlet weak var detailsWrapperViewHeightContraint: NSLayoutConstraint!
+    @IBOutlet weak var openWrapperView: NSView!
     @IBOutlet weak var closeWrapperView: NSView!
     @IBOutlet weak var collectionView: NSCollectionView!
     @IBOutlet weak var collectionViewBottomConstraint: NSLayoutConstraint!
@@ -168,7 +169,7 @@ final class FirePopoverViewController: NSViewController {
 
     private func toggleDetails() {
         let showDetails = detailsWrapperView.isHidden
-        openDetailsButton.isHidden = showDetails
+        openWrapperView.isHidden = showDetails
         detailsWrapperView.isHidden = !showDetails
 
         adjustContentHeight()
