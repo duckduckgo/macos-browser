@@ -84,7 +84,7 @@ final class PermissionModel {
     private func resetPermissions() {
         webView?.configuration.processPool.geolocationProvider?.reset()
         webView?.revokePermissions([.camera, .microphone])
-        for permission in PermissionType.allCases {
+        for permission in permissions.keys {
             // await permission deactivation and transition to .none
             permissions[permission].willReload()
         }
@@ -93,7 +93,7 @@ final class PermissionModel {
 
     private func updatePermissions() {
         guard let webView = webView else { return }
-        for permissionType in PermissionType.allCases {
+        for permissionType in PermissionType.permissionsUpdatedExternally {
             switch permissionType {
             case .microphone:
                 permissions.microphone.update(with: webView.microphoneState)
@@ -111,7 +111,7 @@ final class PermissionModel {
                 } else {
                     permissions.geolocation.update(with: webView.geolocationState)
                 }
-            case .popups:
+            case .popups, .externalScheme:
                 continue
             }
         }
@@ -121,7 +121,11 @@ final class PermissionModel {
                                     domain: String,
                                     url: URL?,
                                     decisionHandler: @escaping (Bool) -> Void) {
-        let query = PermissionAuthorizationQuery(domain: domain, url: url, permissions: permissions) { [weak self] decision in
+
+        let query = PermissionAuthorizationQuery(domain: domain,
+                                                 url: url,
+                                                 permissions: permissions) { [weak self] decision, remember in
+
             let query: PermissionAuthorizationQuery?
             let granted: Bool
             switch decision {
@@ -156,6 +160,12 @@ final class PermissionModel {
                 return
             }
             self.authorizationQueries.remove(at: idx)
+
+            if remember == true {
+                for permission in permissions {
+                    self.permissionManager.setPermission(granted ? .allow : .deny, forDomain: domain, permissionType: permission)
+                }
+            }
         }
 
         // When Geolocation queried by a website but System Permission is denied: switch to `disabled`
@@ -196,10 +206,6 @@ final class PermissionModel {
         webView?.setPermissions(permissions, muted: muted)
     }
 
-    func set(_ permission: PermissionType, muted: Bool) {
-        webView?.setPermissions([permission], muted: muted)
-    }
-
     func allow(_ query: PermissionAuthorizationQuery) {
         guard self.authorizationQueries.contains(where: { $0 === query }) else {
             assertionFailure("unexpected Permission state")
@@ -213,8 +219,14 @@ final class PermissionModel {
            case .allow = permissionManager.permission(forDomain: domain, permissionType: permission) {
             permissionManager.setPermission(.ask, forDomain: domain, permissionType: permission)
         }
-        self.permissions[permission].revoke() // await deactivation
-        webView?.revokePermissions([permission])
+        switch permission {
+        case .camera, .microphone, .geolocation:
+            self.permissions[permission].revoke() // await deactivation
+            webView?.revokePermissions([permission])
+
+        case .popups, .externalScheme:
+            self.permissions[permission].denied()
+        }
     }
 
     // MARK: - WebView delegated methods
@@ -224,25 +236,36 @@ final class PermissionModel {
         // If media capture is denied in the System Preferences, reflect it in the current permissions
         // AVCaptureDevice.authorizationStatus(for:mediaType) is swizzled to determine requested media type
         // otherwise WebView won't call any other delegate methods if System Permission is denied
-        AVCaptureDevice.swizzleAuthorizationStatusForMediaType { mediaType, authorizationStatus in
+        var checkedPermissions = Set<PermissionType>()
+        AVCaptureDevice.swizzleAuthorizationStatusForMediaType { [weak self] mediaType, authorizationStatus in
+            let permission: PermissionType
+            // media type for Camera/Microphone can be only determined separately
+            switch mediaType {
+            case .audio:
+                permission = .microphone
+            case .video:
+                permission = .camera
+            default: return
+            }
             switch authorizationStatus {
             case .denied, .restricted:
-                // media type for Camera/Microphone can be only determined separately
-                switch mediaType {
-                case .audio:
-                    self.permissions.microphone.systemAuthorizationDenied(systemWide: false)
-                case .video:
-                    self.permissions.camera.systemAuthorizationDenied(systemWide: false)
-                default: break
-                }
+                self?.permissions[permission].systemAuthorizationDenied(systemWide: false)
+                AVCaptureDevice.restoreAuthorizationStatusForMediaType()
 
-            case .notDetermined, .authorized: break
+            case .notDetermined, .authorized:
+                checkedPermissions.insert(permission)
+                if checkedPermissions == [.camera, .microphone] {
+                    AVCaptureDevice.restoreAuthorizationStatusForMediaType()
+                }
             @unknown default: break
             }
         }
         decisionHandler(/*salt - seems not used anywhere:*/ "",
                         /*includeSensitiveMediaDeviceDetails:*/ false)
-        AVCaptureDevice.restoreAuthorizationStatusForMediaType()
+        // make sure to swizzle it back after reasonable interval in case it wasn't called
+        DispatchQueue.main.asyncAfter(deadline: .now() + 5) {
+            AVCaptureDevice.restoreAuthorizationStatusForMediaType()
+        }
     }
 
     private func shouldGrantPermission(for permissions: [PermissionType], requestedForDomain domain: String) -> Bool? {
@@ -286,6 +309,7 @@ final class PermissionModel {
                      requestedForDomain domain: String?,
                      url: URL? = nil,
                      decisionHandler: @escaping (Bool) -> Void) {
+
         guard let domain = domain,
               !domain.isEmpty,
               !permissions.isEmpty

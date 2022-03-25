@@ -164,7 +164,7 @@ final class Tab: NSObject {
     
     private var lastUpgradedURL: URL?
 
-    var userEnteredUrl = true
+    var userEnteredUrl = false
 
     var contentChangeEnabled = true
     
@@ -272,6 +272,7 @@ final class Tab: NSObject {
     }
     private var mainFrameLoadState: FrameLoadState = .finished
     private var clientRedirectedDuringNavigationURL: URL?
+    private var externalSchemeOpenedPerPageLoad = false
 
     var canGoForward: Bool {
         webView.canGoForward
@@ -406,8 +407,6 @@ final class Tab: NSObject {
         webView.allowsMagnification = true
         userContentController.delegate = self
 
-        subscribeToOpenExternalUrlEvents()
-
         superviewObserver = webView.observe(\.superview, options: .old) { [weak self] _, change in
             // if the webView is being added to superview - reload if needed
             if case .some(.none) = change.oldValue {
@@ -434,19 +433,6 @@ final class Tab: NSObject {
 #if DEBUG
         self.isClosing = true
 #endif
-    }
-
-    // MARK: - Open External URL
-
-    let externalUrlHandler = ExternalURLHandler()
-    var openExternalUrlEventsCancellable: AnyCancellable?
-
-    private func subscribeToOpenExternalUrlEvents() {
-        openExternalUrlEventsCancellable = externalUrlHandler.openExternalUrlPublisher.sink { [weak self] in
-            if let self = self {
-                self.delegate?.tab(self, requestedOpenExternalURL: $0, forUserEnteredURL: self.userEnteredUrl)
-            }
-        }
     }
 
     // MARK: - Favicon
@@ -852,7 +838,7 @@ extension Tab: WKNavigationDelegate {
             return .download(navigationAction, using: webView)
         }
 
-        guard let url = navigationAction.request.url, let urlScheme = url.scheme else {
+        guard let url = navigationAction.request.url, url.scheme != nil else {
             self.willPerformNavigationAction(navigationAction)
             return .allow
         }
@@ -862,14 +848,15 @@ extension Tab: WKNavigationDelegate {
             // further download will be passed to webView:navigationAction:didBecomeDownload:
             return .download(navigationAction, using: webView)
 
-        } else if externalUrlHandler.isExternal(scheme: urlScheme) {
+        } else if url.isExternalSchemeLink {
             // ignore <iframe src="custom://url"> but allow via address bar
-            let fromFrame = !(navigationAction.sourceFrame.isMainFrame || self.userEnteredUrl)
+            guard navigationAction.sourceFrame.isMainFrame,
+                  // ignore 2nd+ external scheme navigation not initiated by user
+                  !self.externalSchemeOpenedPerPageLoad || navigationAction.isUserInitiated
+            else { return .cancel }
 
-            externalUrlHandler.handle(url: url,
-                                      onPage: webView.url,
-                                      fromFrame: fromFrame,
-                                      triggeredByUser: navigationAction.navigationType == .linkActivated)
+            self.externalSchemeOpenedPerPageLoad = true
+            self.delegate?.tab(self, requestedOpenExternalURL: url, forUserEnteredURL: userEnteredUrl)
 
             return .cancel
         }
@@ -925,9 +912,10 @@ extension Tab: WKNavigationDelegate {
     }
 
     private func willPerformNavigationAction(_ navigationAction: WKNavigationAction) {
-        if navigationAction.isTargetingMainFrame {
-            delegate?.tabWillStartNavigation(self, isUserInitiated: navigationAction.isUserInitiated)
-        }
+        guard navigationAction.isTargetingMainFrame else { return }
+
+        self.externalSchemeOpenedPerPageLoad = false
+        delegate?.tabWillStartNavigation(self, isUserInitiated: navigationAction.isUserInitiated)
     }
 
     private func invalidateBackItemIfNeeded(for navigationAction: WKNavigationAction) {
@@ -1106,6 +1094,16 @@ extension Tab: HoverUserScriptDelegate {
 extension Tab: AutoconsentUserScriptDelegate {
     func autoconsentUserScript(consentStatus: CookieConsentInfo) {
         self.cookieConsentManaged = consentStatus
+    }
+}
+
+extension Tab: TabDataClearing {
+    func prepareForDataClearing(caller: TabDataCleaner) {
+        webView.stopLoading()
+        userContentController.removeAllUserScripts()
+        
+        webView.navigationDelegate = caller
+        webView.load(URL(string: "about:blank")!)
     }
 }
 // swiftlint:enable type_body_length

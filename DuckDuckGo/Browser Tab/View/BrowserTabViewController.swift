@@ -28,7 +28,6 @@ protocol BrowserTabViewControllerClickDelegate: AnyObject {
 }
 
 // swiftlint:disable file_length
-// swiftlint:disable type_body_length
 
 final class BrowserTabViewController: NSViewController {
 
@@ -44,7 +43,7 @@ final class BrowserTabViewController: NSViewController {
     var clickPoint: NSPoint?
 
     private let tabCollectionViewModel: TabCollectionViewModel
-    private var urlCancellable: AnyCancellable?
+    private var tabContentCancellable: AnyCancellable?
     private var selectedTabViewModelCancellable: AnyCancellable?
     private var errorViewStateCancellable: AnyCancellable?
 
@@ -115,25 +114,11 @@ final class BrowserTabViewController: NSViewController {
     private func subscribeToSelectedTabViewModel() {
         selectedTabViewModelCancellable = tabCollectionViewModel.$selectedTabViewModel
             .sink { [weak self] selectedTabViewModel in
-                self?.updateInterface(tabViewModel: selectedTabViewModel)
+                self?.tabViewModel = selectedTabViewModel
+                self?.showTabContent(of: selectedTabViewModel)
                 self?.subscribeToErrorViewState()
+                self?.subscribeToTabContent(of: selectedTabViewModel)
         }
-    }
-
-    /// Takes a URL and decided what to do with the UI. There are three states:
-    ///
-    /// 1. No URL is provided, so the webview should be hidden in favor of showing the default UI elements.
-    /// 2. A URL is provided for the first time, so the webview should be added as a subview and the URL should be loaded.
-    /// 3. A URL is provided after already adding the webview, so the webview should be reloaded.
-    private func updateInterface(tabViewModel: TabViewModel?) {
-        if tabCollectionViewModel.tabCollection.tabs.isEmpty {
-            view.window?.close()
-            return
-        }
-
-        changeWebView(tabViewModel: tabViewModel)
-        scheduleHoverLabelUpdatesForUrl(nil)
-        show(tabContent: tabViewModel?.tab.content)
     }
 
     private func removeWebViewFromHierarchy(webView: WebView? = nil,
@@ -144,8 +129,16 @@ final class BrowserTabViewController: NSViewController {
 
         // close fullscreenWindowController when closing tab in FullScreen mode
         webView.fullscreenWindowController?.close()
+
         webView.removeFromSuperview()
+        if self.webView == webView {
+            self.webView = nil
+        }
+
         container.removeFromSuperview()
+        if self.webViewContainer == container {
+            self.webViewContainer = nil
+        }
     }
 
     private func addWebViewToViewHierarchy(_ webView: WebView) {
@@ -181,29 +174,27 @@ final class BrowserTabViewController: NSViewController {
         }
 
         guard let tabViewModel = tabViewModel else {
-            self.tabViewModel = nil
             removeWebViewFromHierarchy()
             return
         }
 
-        guard self.tabViewModel !== tabViewModel else { return }
-
         let oldWebView = webView
         let webViewContainer = webViewContainer
         displayWebView(of: tabViewModel)
-        subscribeToUrl(of: tabViewModel)
-        self.tabViewModel = tabViewModel
-        removeWebViewFromHierarchy(webView: oldWebView, container: webViewContainer)
+        if let oldWebView = oldWebView, let webViewContainer = webViewContainer {
+            removeWebViewFromHierarchy(webView: oldWebView, container: webViewContainer)
+        }
     }
 
-    func subscribeToUrl(of tabViewModel: TabViewModel) {
-         urlCancellable?.cancel()
-         urlCancellable = tabViewModel.tab.$content
+    func subscribeToTabContent(of tabViewModel: TabViewModel?) {
+        tabContentCancellable?.cancel()
+        tabContentCancellable = tabViewModel?.tab.$content
+            .dropFirst()
             .removeDuplicates()
             .receive(on: DispatchQueue.main)
             .sink { [weak self] _ in
-                self?.updateInterface(tabViewModel: tabViewModel)
-         }
+                self?.showTabContent(of: tabViewModel)
+            }
     }
 
     private func subscribeToErrorViewState() {
@@ -230,14 +221,9 @@ final class BrowserTabViewController: NSViewController {
     }
 
     private func displayErrorView(_ shown: Bool, message: String) {
-        guard let webView = webView else {
-            os_log("BrowserTabViewController: Web view is nil", type: .error)
-            return
-        }
-
         errorMessageLabel.stringValue = message
         errorView.isHidden = !shown
-        webView.isHidden = shown
+        webView?.isHidden = shown
         homePageView.isHidden = shown
     }
 
@@ -272,7 +258,7 @@ final class BrowserTabViewController: NSViewController {
     private func show(displayableTabAtIndex index: Int) {
         // The tab switcher only displays displayable tab types.
         tabCollectionViewModel.selectedTabViewModel?.tab.setContent(Tab.TabContent.displayableTabTypes[index])
-        updateInterface(tabViewModel: tabCollectionViewModel.selectedTabViewModel)
+        showTabContent(of: tabCollectionViewModel.selectedTabViewModel)
     }
 
     private func removeAllTabContent(includingWebView: Bool = true) {
@@ -300,9 +286,14 @@ final class BrowserTabViewController: NSViewController {
         (view.window?.windowController as? MainWindowController)?.userInteraction(prevented: true)
     }
 
-    private func show(tabContent content: Tab.TabContent?) {
+    private func showTabContent(of tabViewModel: TabViewModel?) {
+        guard !tabCollectionViewModel.tabCollection.tabs.isEmpty else {
+            view.window?.close()
+            return
+        }
+        scheduleHoverLabelUpdatesForUrl(nil)
 
-        switch content ?? .homePage {
+        switch tabViewModel?.tab.content {
         case .bookmarks:
             removeAllTabContent()
             showTabContentController(bookmarksViewController)
@@ -319,16 +310,17 @@ final class BrowserTabViewController: NSViewController {
             showTransientTabContentController(OnboardingViewController.create(withDelegate: self))
 
         case .url:
-            removeAllTabContent(includingWebView: false)
-            if let webView = self.webView, webView.superview == nil {
-                addWebViewToViewHierarchy(webView)
+            // Adjust webviews if there was a tab switch or content type switch
+            if webView != tabViewModel?.tab.webView || tabViewModel?.tab.webView.superview == nil {
+                removeAllTabContent(includingWebView: false)
+                changeWebView(tabViewModel: tabViewModel)
             }
 
         case .homePage:
             removeAllTabContent()
             view.addAndLayout(homePageView)
 
-        case .none:
+        case nil, .some(.none):
             removeAllTabContent()
         }
         
@@ -396,38 +388,66 @@ extension BrowserTabViewController: TabDelegate {
         }
     }
 
-	func tab(_ tab: Tab, requestedOpenExternalURL url: URL, forUserEnteredURL userEntered: Bool) {
-        guard let window = self.view.window else {
-            os_log("%s: Window is nil", type: .error, className)
+    func tab(_ tab: Tab, requestedOpenExternalURL url: URL, forUserEnteredURL userEntered: Bool) {
+
+        let searchForExternalUrl = { [weak tab] in
+            tab?.update(url: URL.makeSearchUrl(from: url.absoluteString), userEntered: false)
+        }
+
+        // there is a hacky way you can detect whether an app is installed to handle a protocol:
+        // https://www.npmjs.com/package/custom-protocol-check
+        // > Safari: using hidden iframe onBlur to detect whether the focus is stolen.
+        // > When the focus is stolen, it assumes that the custom protocol launches external app and therefore it exists.
+        // Which, looking at the Zoom launcher code, is almost what they're doing:
+        /*
+            document.body.focus();
+            var t = function() {
+                return window.removeEventListener("blur", o)
+            };
+            function o() {
+                n(),
+                t()
+            }
+            var s = i.isMobile ? Ar : Cr;
+            if (setTimeout((function() {
+                n({
+                    code: 1001,
+                    message: "urlscheme no blur within timout " + s + "ms"
+                }),
+                t()
+            }), s), window.addEventListener("blur", o)
+            ...
+        */
+        // The code immediately after that then creates an iframe with the zoommtg:// link in it
+        // if the app is installed, the browser protocol handler will show, which triggers a blur event
+        // So, we'll steal a WebView focus if the app is installed, otherwise download should be triggered
+        guard NSWorkspace.shared.urlForApplication(toOpen: url) != nil else {
+            if userEntered {
+                searchForExternalUrl()
+            }
             return
         }
+        self.view.makeMeFirstResponder()
 
-        guard tabCollectionViewModel.selectedTabViewModel?.tab == tab else {
-            // Only allow the selected tab to open external apps
-            return
+        let permissionType = PermissionType.externalScheme(scheme: url.scheme ?? "")
+
+        tab.permissions.permissions([permissionType],
+                                    requestedForDomain: webView?.url?.host ?? "localhost",
+                                    url: url) { [weak self, weak tab] granted in
+            guard granted, let tab = tab else {
+                if userEntered {
+                    searchForExternalUrl()
+                }
+                return
+            }
+
+            self?.tab(tab, openExternalURL: url, touchingPermissionType: permissionType)
         }
+    }
 
-		func searchForExternalUrl() {
-			tab.update(url: URL.makeSearchUrl(from: url.absoluteString), userEntered: false)
-		}
-
-        guard let appUrl = NSWorkspace.shared.urlForApplication(toOpen: url) else {
-			if userEntered {
-				searchForExternalUrl()
-			} else {
-				NSAlert.unableToOpenExernalURLAlert().beginSheetModal(for: window)
-			}
-            return
-        }
-
-        let externalAppName = Bundle(url: appUrl)?.infoDictionary?["CFBundleName"] as? String
-        NSAlert.openExternalURLAlert(with: externalAppName).beginSheetModal(for: window) { response in
-            if response == NSApplication.ModalResponse.alertFirstButtonReturn {
-                NSWorkspace.shared.open(url)
-			} else if userEntered {
-				searchForExternalUrl()
-			}
-        }
+    private func tab(_ tab: Tab, openExternalURL url: URL, touchingPermissionType permissionType: PermissionType) {
+        NSWorkspace.shared.open(url)
+        tab.permissions.permissions[permissionType].externalSchemeOpened()
     }
 
     func tabPageDOMLoaded(_ tab: Tab) {
@@ -731,7 +751,7 @@ extension BrowserTabViewController: WKUIDelegate {
         var shouldOpenPopUp = navigationAction.isUserInitiated
         if !shouldOpenPopUp {
             let url = navigationAction.request.url
-            parentTab.permissions.permissions([.popups], requestedForDomain: webView.url?.host, url: url) { [weak parentTab] granted in
+            parentTab.permissions.permissions(.popups, requestedForDomain: webView.url?.host, url: url) { [weak parentTab] granted in
 
                 guard let parentTab = parentTab else { return }
 
@@ -828,7 +848,7 @@ extension BrowserTabViewController: WKUIDelegate {
     // https://github.com/WebKit/WebKit/blob/9d7278159234e0bfa3d27909a19e695928f3b31e/Source/WebKit/UIProcess/API/Cocoa/WKUIDelegatePrivate.h#L131
     @objc(_webView:requestGeolocationPermissionForFrame:decisionHandler:)
     func webView(_ webView: WKWebView, requestGeolocationPermissionFor frame: WKFrameInfo, decisionHandler: @escaping (Bool) -> Void) {
-        webView.tab?.permissions.permissions([.geolocation], requestedForDomain: frame.request.url?.host, decisionHandler: decisionHandler)
+        webView.tab?.permissions.permissions(.geolocation, requestedForDomain: frame.request.url?.host, decisionHandler: decisionHandler)
             ?? /* Tab deallocated: */ {
                 decisionHandler(false)
             }()
@@ -841,7 +861,7 @@ extension BrowserTabViewController: WKUIDelegate {
                  requestGeolocationPermissionFor origin: WKSecurityOrigin,
                  initiatedBy frame: WKFrameInfo,
                  decisionHandler: @escaping (WKPermissionDecision) -> Void) {
-        webView.tab?.permissions.permissions([.geolocation], requestedForDomain: frame.request.url?.host) { granted in
+        webView.tab?.permissions.permissions(.geolocation, requestedForDomain: frame.request.url?.host) { granted in
             decisionHandler(granted ? .grant : .deny)
         } ?? /* Tab deallocated: */ {
             decisionHandler(.deny)
@@ -1013,5 +1033,4 @@ extension BrowserTabViewController {
 
 }
 
-// swiftlint:enable type_body_length
 // swiftlint:enable file_length

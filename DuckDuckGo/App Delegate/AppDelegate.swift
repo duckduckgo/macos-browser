@@ -52,22 +52,12 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
     private var fileStore: FileStore!
     private var stateRestorationManager: AppStateRestorationManager!
     private var grammarFeaturesManager = GrammarFeaturesManager()
-
-#if OUT_OF_APPSTORE
-
-#if !BETA
+    private let crashReporter = CrashReporter()
     let updateController = UpdateController()
-#endif
-
-    let crashReporter = CrashReporter()
-
-#endif
 
     var appUsageActivityMonitor: AppUsageActivityMonitor?
 
     func applicationWillFinishLaunching(_ notification: Notification) {
-        ExpirationChecker.check()
-
         if !Self.isRunningTests {
 #if DEBUG
             Pixel.setUp(dryRun: true)

@@ -18,8 +18,6 @@
 
 import Foundation
 
-#if OUT_OF_APPSTORE
-
 final class CrashReporter {
 
     private let reader = CrashReportReader()
@@ -77,5 +75,3 @@ extension CrashReporter: CrashReportPromptViewControllerDelegate {
     }
 
 }
-
-#endif

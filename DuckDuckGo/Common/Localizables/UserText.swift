@@ -94,15 +94,14 @@ struct UserText {
     static let newWindowMenuItem = NSLocalizedString("new.window.menu.item", value: "New Window", comment: "Menu item title")
 
     static let fireDialogFireproofSites = NSLocalizedString("fire.dialog.fireproof.sites", value: "Fireproof Sites", comment: "Category of domains in fire button dialog")
-    static let fireDialogClearSites = NSLocalizedString("fire.dialog.clear.sites", value: "Clear These Sites", comment: "Category of domains in fire button dialog")
-    static let allData = NSLocalizedString("fire.all-data", value: "All Data", comment: "Configuration option for fire button")
-    static let currentTab = NSLocalizedString("fire.currentTab", value: "Current Tab", comment: "Configuration option for fire button")
-    static let currentWindow = NSLocalizedString("fire.currentWindow", value: "Current Window", comment: "Configuration option for fire button")
+    static let fireDialogClearSites = NSLocalizedString("fire.dialog.clear.sites", value: "Clear data for the following sites", comment: "Category of domains in fire button dialog")
+    static let allData = NSLocalizedString("fire.all-data", value: "All data", comment: "Configuration option for fire button")
+    static let currentTab = NSLocalizedString("fire.currentTab", value: "Current tab", comment: "Configuration option for fire button")
+    static let currentWindow = NSLocalizedString("fire.currentWindow", value: "Current window", comment: "Configuration option for fire button")
     static let allDataDescription = NSLocalizedString("fire.all-data.description", value: "Clear all tabs and related site data", comment: "Description of the 'All Data' configuration option for the fire button")
-    static let currentTabDescription = NSLocalizedString("fire.current-tab.description", value: "Close current tab and clear related site data", comment: "Description of the 'Current Tab' configuration option for the fire button")
     static let currentWindowDescription = NSLocalizedString("fire.current-window.description", value: "Clear current window and related site data", comment: "Description of the 'Current Window' configuration option for the fire button")
     static let selectedDomainsDescription = NSLocalizedString("fire.selected-domains.description", value: "Clear selected domains and related site data", comment: "Description of the 'Current Window' configuration option for the fire button")
-    static let fireDialogNothingToBurn = NSLocalizedString("fire.dialog.nothing-to-burn", value: "Nothing to burn", comment: "Information label to inform there is no domain for burning")
+    static let fireDialogNothingToBurn = NSLocalizedString("fire.dialog.nothing-to-burn", value: "No data to clear", comment: "Information label to inform there is no domain for burning")
     static let fireDialogDetails = NSLocalizedString("fire.dialog.details", value: "Details", comment: "Button to show more details")
     static let fireproofSite = NSLocalizedString("options.menu.fireproof-site", value: "Fireproof This Site", comment: "Context menu item")
     static let removeFireproofing = NSLocalizedString("options.menu.remove-fireproofing", value: "Remove Fireproofing", comment: "Context menu item")
@@ -145,7 +144,7 @@ struct UserText {
     static let zoom = NSLocalizedString("zoom", value: "Zoom", comment: "Menu with Zooming commands")
 
     static let emailOptionsMenuItem = NSLocalizedString("email.optionsMenu", value: "Email Protection", comment: "Menu item email feature")
-    static let emailOptionsMenuCreateAddressSubItem = NSLocalizedString("email.optionsMenu.createAddress", value: "Create a Duck Address", comment: "Create an email alias sub menu item")
+    static let emailOptionsMenuCreateAddressSubItem = NSLocalizedString("email.optionsMenu.createAddress", value: "Generate Private Duck Address", comment: "Create an email alias sub menu item")
     static let emailOptionsMenuTurnOffSubItem = NSLocalizedString("email.optionsMenu.turnOff", value: "Disable Email Protection", comment: "Disable email sub menu item")
     static let emailOptionsMenuTurnOnSubItem = NSLocalizedString("email.optionsMenu.turnOn", value: "Enable Email Protection", comment: "Enable email sub menu item")
     static let privateEmailCopiedToClipboard = NSLocalizedString("email.copied", value: "New address copied to your clipboard", comment: "Private email address was copied to clipboard message")
@@ -154,22 +153,6 @@ struct UserText {
     static let renameFolder = NSLocalizedString("folder.optionsMenu.renameFolder", value: "Rename Folder", comment: "Option for renaming a folder")
     static let deleteFolder = NSLocalizedString("folder.optionsMenu.deleteFolder", value: "Delete Folder", comment: "Option for deleting a folder")
 
-    static func openExternalURLTitle(forAppName appName: String) -> String {
-        let localized = NSLocalizedString("open.external.url.title",
-                                          value: "Open in %@?",
-                                          comment: "Open URL in another app dialog title with app name")
-        return String(format: localized, appName)
-    }
-
-    static func openExternalURLMessage(forAppName appName: String) -> String {
-        let localized = NSLocalizedString("open.external.url.message",
-                                          value: "Do you want to view this content in the %@ app?",
-                                          comment: "Open URL in another app dialog message with app name")
-        return String(format: localized, appName)
-    }
-
-    static let openExternalURLTitleUnknownApp = NSLocalizedString("open.external.url.title.unknown.app", value: "Open in Another App?", comment: "Open URL in another app dialog title for unknown app")
-    static let openExternalURLMessageUnknownApp = NSLocalizedString("open.external.url.message.unknown.app", value: "Do you want to view this content in another app?", comment: "Open URL in another app dialog message for unknown app")
     static let failedToOpenExternally = NSLocalizedString("open.externally.failed", value: "The app required to open that link can’t be found", comment: "’Link’ is link on a website")
 
     static let devicePermissionAuthorizationFormat = NSLocalizedString("permission.authorization.format",
@@ -178,36 +161,39 @@ struct UserText {
     static let popupWindowsPermissionAuthorizationFormat = NSLocalizedString("permission.authorization.popups",
                                                                              value: "Allow “%@“ to open PopUp Window?",
                                                                              comment: "Popover asking for domain %@ to open Popup Window")
+    static let permissionMenuHeaderPopupWindowsFormat = NSLocalizedString("permission.authorization.popups",
+                                                                          value: "Allow “%@“ to open PopUp Windows?",
+                                                                          comment: "Popover asking for domain %@ to open Popup Window")
+    static let externalSchemePermissionAuthorizationFormat = NSLocalizedString("permission.authorization.externalScheme.format",
+                                                                               value: "“%@” would like to open this link in %@",
+                                                                               comment: "Popover asking for domain %@ to open link in External App (%@)")
+
     static let permissionMicrophone = NSLocalizedString("permission.microphone", value: "Microphone", comment: "Microphone input media device name")
     static let permissionCamera = NSLocalizedString("permission.camera", value: "Camera", comment: "Camera input media device name")
-    static let permissionCameraAndMicrophone = NSLocalizedString("permission.cameraAndmicrophone", value: "use your Camera and Microphone", comment: "camera and microphone input media devices name")
-    static let permissionGeolocation = NSLocalizedString("permission.geolocation", value: "Geolocation", comment: "User's Geolocation permission access name")
+    static let permissionCameraAndMicrophone = NSLocalizedString("permission.cameraAndmicrophone", value: "Camera and Microphone", comment: "camera and microphone input media devices name")
+    static let permissionGeolocation = NSLocalizedString("permission.geolocation", value: "Location", comment: "User's Geolocation permission access name")
     static let permissionPopups = NSLocalizedString("permission.popups", value: "Pop-ups", comment: "Open Pop Up Windows permission access name")
 
-    static let permissionMuteFormat = NSLocalizedString("permission.mute", value: "Pause %@", comment: "Temporarily pause input media device %@ access")
-    static let permissionUnmuteFormat = NSLocalizedString("permission.unmute", value: "Resume %@", comment: "Resume input media device %@ access")
-    static let permissionRevokeFormat = NSLocalizedString("permission.revoke", value: "Stop %@ Access", comment: "Revoke input media device %@ access")
-    static let permissionReloadToEnable = NSLocalizedString("permission.reloadPage", value: "Reload to Ask Again", comment: "Reload webpage to ask for input media device access permission again")
+    static let permissionMuteFormat = NSLocalizedString("permission.mute", value: "Pause %@ use on “%@”", comment: "Temporarily pause input media device %@ access for %@2 website")
+    static let permissionUnmuteFormat = NSLocalizedString("permission.unmute", value: "Resume %@ use on “%@”", comment: "Resume input media device %@ access for %@ website")
+    static let permissionReloadToEnable = NSLocalizedString("permission.reloadPage", value: "Reload to ask permission again", comment: "Reload webpage to ask for input media device access permission again")
 
-    static let permissionAlwaysAllowFormat = NSLocalizedString("permission.always.allow", value: "Always Allow on “%@“", comment: "Make input media device access permanently allowed for current domain")
-    static let permissionAlwaysAskFormat = NSLocalizedString("permission.always.ask", value: "Always Ask on “%@“", comment: "Make input media device access always asked from user for current domain")
-    static let permissionAlwaysDenyFormat = NSLocalizedString("permission.always.deny.dashboard", value: "Always Deny on “%@“", comment: "Make input media device access permanently disabled for current domain (Option in Privacy Dashboard)")
+    static let permissionAllowExternalSchemeFormat = NSLocalizedString("permission.allow.externalScheme", value: "Allow “%@“ to open %@", comment: "Allow to open External Link (%@ 2) to open on current domain (%@ 1)")
+    static let permissionMenuHeaderExternalSchemeFormat = NSLocalizedString("permission.allow.externalScheme", value: "Allow the %@ to open “%@” links", comment: "Allow the App Name(%@ 1) to open “URL Scheme”(%@ 2) links")
 
-    static let permissionAlwaysAllowDeviceFormat = NSLocalizedString("permission.always.allow", value: "Always Allow %@ on “%@“", comment: "Make input media device access permanently allowed for current domain")
-    static let permissionAlwaysAllowPopupsFormat = NSLocalizedString("permission.always.allow.popups", value: "Always Allow on “%@“", comment: "Make popups permanently allowed for current domain")
-    static let permissionAlwaysAskDeviceFormat = NSLocalizedString("permission.always.ask", value: "Always Ask for %@ on “%@“", comment: "Make input media device access always asked from user for current domain")
-    static let permissionAlwaysDenyDeviceFormat = NSLocalizedString("permission.always.deny.device", value: "Never Ask for %@ again for “%@“", comment: "Make input media device access permanently allowed for current domain")
-
-    static let permissionAppPermissionDisabledFormat = NSLocalizedString("permission.disabled.app", value: "%@ %@ access is disabled", comment: "The app (%@) has no access permission to %@ media device")
-    static let permissionGeolocationServicesDisabled = NSLocalizedString("permission.disabled.system", value: "System Geolocation Services are disabled", comment: "Geolocation Services are disabled in System Preferences")
+    static let permissionAppPermissionDisabledFormat = NSLocalizedString("permission.disabled.app", value: "%@ access is disabled for %@", comment: "The app (DuckDuckGo: %@ 2) has no access permission to (%@ 1) media device")
+    static let permissionGeolocationServicesDisabled = NSLocalizedString("permission.disabled.system", value: "System location services are disabled", comment: "Geolocation Services are disabled in System Preferences")
     static let permissionOpenSystemPreferences = NSLocalizedString("permission.open.preferences", value: "Open System Preferences", comment: "Open System Preferences (to re-enable permission for the App)")
 
-    static let permissionPopupTitleFormat = NSLocalizedString("permission.popup.title.format", value: "Blocked Pop-ups", comment: "Website requested permission to open a Popup with %@ URL")
+    static let permissionPopupTitle = NSLocalizedString("permission.popup.title", value: "Blocked Pop-ups", comment: "List of blocked popups Title")
     static let permissionPopupOpenFormat = NSLocalizedString("permission.popup.open.format", value: "%@", comment: "Open %@ URL Pop-up")
 
-    static let privacyDashboardPermissionAsk = NSLocalizedString("dashboard.permission.ask", value: "Ask", comment: "Privacy Dashboard: Website should always Ask for permission for input media device access")
-    static let privacyDashboardPermissionAlwaysAllow = NSLocalizedString("dashboard.permission.allow", value: "Allow Always", comment: "Privacy Dashboard: Website can always access input media device")
-    static let privacyDashboardPermissionAlwaysDeny = NSLocalizedString("dashboard.permission.deny", value: "Deny Always", comment: "Privacy Dashboard: Website can never access input media device")
+    static let permissionExternalSchemeOpenFormat = NSLocalizedString("permission.externalScheme.open.format", value: "Open %@", comment: "Open %@ App Name")
+
+    static let privacyDashboardPermissionAsk = NSLocalizedString("dashboard.permission.ask", value: "Ask every time", comment: "Privacy Dashboard: Website should always Ask for permission for input media device access")
+    static let privacyDashboardPermissionAlwaysAllow = NSLocalizedString("dashboard.permission.allow", value: "Always allow", comment: "Privacy Dashboard: Website can always access input media device")
+    static let privacyDashboardPermissionAlwaysDeny = NSLocalizedString("dashboard.permission.deny", value: "Always deny", comment: "Privacy Dashboard: Website can never access input media device")
+    static let permissionPopoverDenyButton = NSLocalizedString("permission.popover.deny", value: "Deny", comment: "Permission Popover: Deny Website input media device access")
 
     static let privacyDashboardPopupsAlwaysAsk = NSLocalizedString("dashboard.popups.ask", value: "Notify", comment: "Make PopUp Windows always asked from user for current domain")
 
@@ -419,10 +405,11 @@ struct UserText {
     static let homePageProtectionSummaryInfo = NSLocalizedString("home.page.protection.summary.info", value: "No recent activity", comment: "")
     static func homePageProtectionSummaryMessage(numberOfTrackersBlocked: Int) -> String {
         let localized = NSLocalizedString("home.page.protection.summary.info",
-                                          value: "%@ tracking attempts blocked in past 7 days",
+                                          value: "%@ tracking attempts blocked",
                                           comment: "")
         return String(format: localized, NumberFormatter.localizedString(from: NSNumber(value: numberOfTrackersBlocked), number: .decimal))
     }
+    static let homePageProtectionDurationInfo = NSLocalizedString("home.page.protection.duration", value: "PAST 7 DAYS", comment: "Past 7 days in uppercase.")
 
     static let homePageEmptyStateItemTitle = NSLocalizedString("home.page.empty.state.item.title", value: "Recently visited sites appear here", comment: "")
     static let homePageEmptyStateItemMessage = NSLocalizedString("home.page.empty.state.item.message", value: "Keep browsing to see how many trackers were blocked", comment: "")
@@ -433,7 +420,7 @@ struct UserText {
     static let autoconsentPopoverMessage = NSLocalizedString("Cookie consent pop-up managed", comment: "Popover message")
     static let autoconsentPopupTitle = NSLocalizedString("Let DuckDuckGo try to manage cookie consent pop-ups?", comment: "messageText")
     static let autoconsentPopupDescription = NSLocalizedString("On some sites, we can automatically set preferences to minimize cookies 🍪 and maximize privacy, then close the pop-up.", comment: "informativeText")
-    static let autoconsentPopupEnableButton = NSLocalizedString("Manage Cookie Pop-ups", comment: "")
+    static let autoconsentPopupEnableButton = NSLocalizedString("Manage Them for Me", comment: "")
     static let autoconsentPopupLaterButton = NSLocalizedString("Not Now", comment: "")
     static let autoconsentPopupNeverButton = NSLocalizedString("Don't Ask Again", comment: "")
 

@@ -28,13 +28,9 @@ extension AppDelegate {
 
     // MARK: - DuckDuckGo
 
-#if OUT_OF_APPSTORE && !BETA
-
     @IBAction func checkForUpdates(_ sender: Any?) {
         updateController.checkForUpdates(sender)
     }
-
-#endif
 
     // MARK: - File
 
@@ -59,19 +55,7 @@ extension AppDelegate {
 #if FEEDBACK
 
     @IBAction func openFeedback(_ sender: Any?) {
-        // swiftlint:disable force_cast
-        let windowController = NSStoryboard.feedback.instantiateController(withIdentifier: "FeedbackWindowController") as! NSWindowController
-        // swiftlint:enable force_cast
-
-        guard let feedbackWindow = windowController.window as? FeedbackWindow,
-              let parentWindowController = WindowControllersManager.shared.lastKeyMainWindowController else {
-            assertionFailure("HomePageViewController: Failed to present FeedbackWindowController")
-            return
-        }
-
-        feedbackWindow.feedbackViewController.currentTab =
-            parentWindowController.mainViewController.tabCollectionViewModel.selectedTabViewModel?.tab
-        parentWindowController.window?.beginSheet(feedbackWindow) { _ in }
+        FeedbackPresenter.presentFeedbackForm()
     }
 
 #endif
@@ -653,11 +637,5 @@ extension MainViewController: FindInPageDelegate {
     func findInPageDone(_ controller: FindInPageViewController) {
         self.tabCollectionViewModel.selectedTabViewModel?.closeFindInPage()
     }
-
-}
-
-fileprivate extension NSStoryboard {
-
-    static let feedback = NSStoryboard(name: "Feedback", bundle: .main)
 
 }

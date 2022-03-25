@@ -196,6 +196,11 @@ CA
                                                 <action selector="pasteAsPlainText:" target="Ady-hI-5gd" id="cEh-KX-wJQ"/>
                                             </connections>
                                         </menuItem>
+                                        <menuItem title="Paste and Match Style" alternate="YES" keyEquivalent="V" id="aSK-Ud-Crj">
+                                            <connections>
+                                                <action selector="pasteAsPlainText:" target="Ady-hI-5gd" id="79p-cJ-JKN"/>
+                                            </connections>
+                                        </menuItem>
                                         <menuItem title="Delete" id="pa3-QI-u2k">
                                             <modifierMask key="keyEquivalentModifierMask"/>
                                             <connections>

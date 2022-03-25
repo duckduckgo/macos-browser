@@ -42,7 +42,7 @@ final class TabCollectionViewModel: NSObject {
 
     var changesEnabled = true
 
-    private var tabViewModels = [Tab: TabViewModel]()
+    private(set) var tabViewModels = [Tab: TabViewModel]()
     @Published private(set) var selectionIndex: Int? {
         didSet {
             updateSelectedTabViewModel()
@@ -200,7 +200,7 @@ final class TabCollectionViewModel: NSObject {
 
         // Insert at the end of the child tabs
         var newIndex = parentTabIndex + 1
-        while tabCollection.tabs[safe:newIndex]?.parentTab === parentTab { newIndex += 1 }
+        while tabCollection.tabs[safe: newIndex]?.parentTab === parentTab { newIndex += 1 }
         insert(tab: tab, at: newIndex, selected: selected)
     }
 

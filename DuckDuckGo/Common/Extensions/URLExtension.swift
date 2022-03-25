@@ -299,6 +299,10 @@ extension URL {
         return scheme == "data"
     }
 
+    var isExternalSchemeLink: Bool {
+        return !["https", "http", "about", "file", "blob", "data"].contains(scheme)
+    }
+
     // MARK: - DuckDuckGo
 
     static var duckDuckGo: URL {
@@ -360,20 +364,6 @@ extension URL {
         guard isDuckDuckGoSearch else { return nil }
         return try? getParameter(name: DuckDuckGoParameters.search.rawValue)
     }
-
-    // MARK: - Feedback
-
-#if FEEDBACK
-
-    static var feedback: URL {
-    #if BETA
-        return URL(string: "https://www.surveymonkey.com/r/WTBLLJR")!
-    #else
-        return URL(string: "https://form.asana.com/?k=HzdxNoIgDZUBf4w0_cafIQ&d=137249556945")!
-    #endif
-    }
-
-#endif
 
     // MARK: - Punycode
 

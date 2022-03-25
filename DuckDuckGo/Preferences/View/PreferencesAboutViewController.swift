@@ -48,7 +48,7 @@ final class PreferencesAboutViewController: NSViewController {
 
     @IBAction func sendFeedback(_ sender: NSButton) {
 #if FEEDBACK
-        openURLInNewTab(URL.feedback)
+        FeedbackPresenter.presentFeedbackForm()
 #else
         assertionFailure("\(#file): Failed to open feedback link")
 #endif
@@ -65,7 +65,7 @@ final class PreferencesAboutViewController: NSViewController {
     private func openURLInNewTab(_ url: URL) {
         guard let windowController = WindowControllersManager.shared.lastKeyMainWindowController,
               windowController.window?.isKeyWindow == true else {
-            WindowsManager.openNewWindow(with: URL.feedback)
+            WindowsManager.openNewWindow(with: url)
             return
         }
 

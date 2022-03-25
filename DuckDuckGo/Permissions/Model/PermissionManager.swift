@@ -52,12 +52,19 @@ final class PermissionManager: PermissionManagerProtocol {
         do {
             let entities = try store.loadPermissions()
             for entity in entities {
-                self.permissions[entity.domain.dropWWW(), default: [:]][entity.type] = entity.permission
+                self.set(entity.permission, forDomain: entity.domain.dropWWW(), permissionType: entity.type)
             }
         } catch {
             os_log("PermissionStore: Failed to load permissions", type: .error)
         }
     }
+
+    private func set(_ permission: StoredPermission, forDomain domain: String, permissionType: PermissionType) {
+        self.permissions[domain, default: [:]][permissionType] = permission
+        persistedPermissionTypes.insert(permissionType)
+    }
+
+    private(set) var persistedPermissionTypes = Set<PermissionType>()
 
     func permission(forDomain domain: String, permissionType: PermissionType) -> PersistedPermissionDecision {
         return permissions[domain.dropWWW()]?[permissionType]?.decision ?? .ask
@@ -70,9 +77,10 @@ final class PermissionManager: PermissionManagerProtocol {
     func setPermission(_ decision: PersistedPermissionDecision, forDomain domain: String, permissionType: PermissionType) {
         assert(permissionType.canPersistGrantedDecision || decision != .allow)
         assert(permissionType.canPersistDeniedDecision || decision != .deny)
-        
+
         let storedPermission: StoredPermission
         let domain = domain.dropWWW()
+        guard self.permission(forDomain: domain, permissionType: permissionType) != decision else { return }
 
         defer {
             self.permissionSubject.send( (domain, permissionType, decision) )
@@ -89,7 +97,7 @@ final class PermissionManager: PermissionManagerProtocol {
                 return
             }
         }
-        self.permissions[domain, default: [:]][permissionType] = storedPermission
+        self.set(storedPermission, forDomain: domain, permissionType: permissionType)
     }
 
     func burnPermissions(except fireproofDomains: FireproofDomains, completion: @escaping () -> Void) {

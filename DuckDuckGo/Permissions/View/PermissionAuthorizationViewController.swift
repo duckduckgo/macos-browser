@@ -29,6 +29,12 @@ extension PermissionType {
             return UserText.permissionGeolocation
         case .popups:
             return UserText.permissionPopups
+        case .externalScheme(scheme: let scheme):
+            guard let url = URL(string: scheme + URL.NavigationalScheme.separator),
+                  let app = NSWorkspace.shared.application(toOpen: url)
+            else { return scheme }
+
+            return app
         }
     }
 }
@@ -50,6 +56,10 @@ extension Array where Element == PermissionType {
 final class PermissionAuthorizationViewController: NSViewController {
 
     @IBOutlet var descriptionLabel: NSTextField!
+    @IBOutlet var domainNameLabel: NSTextField!
+    @IBOutlet var alwaysAllowCheckbox: NSButton!
+    @IBOutlet var alwaysAllowStackView: NSStackView!
+    @IBOutlet var denyButton: NSButton!
 
     weak var query: PermissionAuthorizationQuery? {
         didSet {
@@ -61,27 +71,55 @@ final class PermissionAuthorizationViewController: NSViewController {
         updateText()
     }
 
+    override func viewWillAppear() {
+        alwaysAllowCheckbox.state = .off
+        if query?.shouldShowCancelInsteadOfDeny == true {
+            denyButton.title = UserText.cancel
+        } else {
+            denyButton.title = UserText.permissionPopoverDenyButton
+        }
+    }
+
     private func updateText() {
         guard isViewLoaded,
-              let query = query
+              let query = query,
+              !query.permissions.isEmpty
         else { return }
 
-        let format = query.permissions == [.popups]
-            ? UserText.popupWindowsPermissionAuthorizationFormat
-            : UserText.devicePermissionAuthorizationFormat
-        self.descriptionLabel.stringValue = String(format: format,
-                                                   query.domain,
-                                                   query.permissions.localizedDescription)
+        let format: String
+        let permissions: String
+        switch query.permissions[0] {
+        case .camera, .microphone, .geolocation:
+            format = UserText.devicePermissionAuthorizationFormat
+            permissions = query.permissions.localizedDescription.lowercased()
+        case .popups:
+            format = UserText.popupWindowsPermissionAuthorizationFormat
+            permissions = query.permissions.localizedDescription.lowercased()
+        case .externalScheme:
+            format = UserText.externalSchemePermissionAuthorizationFormat
+            permissions = query.permissions.localizedDescription
+        }
+        self.descriptionLabel.stringValue = String(format: format, query.domain, permissions)
+        self.domainNameLabel.stringValue = "“" + query.domain + "”"
+        self.alwaysAllowStackView.isHidden = !query.shouldShowAlwaysAllowCheckbox
+    }
+
+    @IBAction func alwaysAllowLabelClick(_ sender: Any) {
+        alwaysAllowCheckbox.setNextState()
     }
 
     @IBAction func grantAction(_ sender: NSButton) {
         self.dismiss()
-        query?.handleDecision(grant: true)
+        query?.handleDecision(grant: true, remember: query!.shouldShowAlwaysAllowCheckbox && alwaysAllowCheckbox.state == .on)
     }
 
     @IBAction func denyAction(_ sender: NSButton) {
         self.dismiss()
-        query?.handleDecision(grant: false)
+        guard let query = query,
+              !query.shouldShowCancelInsteadOfDeny
+        else { return }
+
+        query.handleDecision(grant: false)
     }
 
 }

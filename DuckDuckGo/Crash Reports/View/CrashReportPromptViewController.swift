@@ -18,8 +18,6 @@
 
 import Cocoa
 
-#if OUT_OF_APPSTORE
-
 protocol CrashReportPromptViewControllerDelegate: AnyObject {
 
     func crashReportPromptViewController(_ crashReportPromptViewController: CrashReportPromptViewController,
@@ -58,5 +56,3 @@ final class CrashReportPromptViewController: NSViewController {
     }
     
 }
-
-#endif

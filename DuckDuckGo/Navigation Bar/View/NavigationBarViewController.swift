@@ -46,6 +46,7 @@ final class NavigationBarViewController: NSViewController {
     @IBOutlet var addressBarTopConstraint: NSLayoutConstraint!
     @IBOutlet var addressBarBottomConstraint: NSLayoutConstraint!
     @IBOutlet var buttonsTopConstraint: NSLayoutConstraint!
+    @IBOutlet var logoWidthConstraint: NSLayoutConstraint!
 
     lazy var downloadsProgressView: CircularProgressView = {
         let bounds = downloadsButton.bounds
@@ -392,7 +393,10 @@ final class NavigationBarViewController: NSViewController {
             })
     }
 
+    var daxFadeInAnimation: DispatchWorkItem?
     func resizeAddressBarForHomePage(_ homePage: Bool, animated: Bool) {
+        daxFadeInAnimation?.cancel()
+
         let verticalPadding: CGFloat = view.window?.isPopUpWindow == true ? 0 : 6
 
         let barTop = animated ? addressBarTopConstraint.animator() : addressBarTopConstraint
@@ -401,8 +405,24 @@ final class NavigationBarViewController: NSViewController {
         let bottom = animated ? addressBarBottomConstraint.animator() : addressBarBottomConstraint
         bottom?.constant = homePage ? 0 : verticalPadding
 
-        let logo = animated ? daxLogo.animator() : daxLogo
-        logo?.isHidden = !homePage
+        let logoWidth = animated ? logoWidthConstraint.animator() : logoWidthConstraint
+        logoWidth?.constant = homePage ? 44 : 0
+
+        daxLogo.alphaValue = homePage ? 0 : 1 // initial value to animate from
+
+        if animated {
+            let fadeIn = DispatchWorkItem { [weak self] in
+                NSAnimationContext.runAnimationGroup { ctx in
+                    ctx.duration = 0.2
+                    self?.daxLogo.animator().alphaValue = homePage ? 1 : 0
+                }
+            }
+            DispatchQueue.main.asyncAfter(deadline: .now() + 0.1, execute: fadeIn)
+            self.daxFadeInAnimation = fadeIn
+        } else {
+            daxLogo.alphaValue = homePage ? 1 : 0
+        }
+
     }
 
     private func subscribeToDownloads() {
