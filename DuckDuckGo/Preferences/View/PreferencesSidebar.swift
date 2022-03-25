@@ -32,10 +32,7 @@ extension Preferences {
                     Text(pane.displayName).font(Const.Fonts.sideBarItem)
                 }
             }
-            .buttonStyle(isSelected ?
-                         SidebarItemButtonStyle(bgColor: Color("RowHoverColor")) :
-                            // Almost clear, so that whole view is clickable
-                         SidebarItemButtonStyle(bgColor: Color(NSColor.windowBackgroundColor.withAlphaComponent(0.001))))
+            .buttonStyle(SidebarItemButtonStyle(isSelected: isSelected))
         }
     }
     
@@ -100,16 +97,30 @@ extension Preferences {
 
     private struct SidebarItemButtonStyle: ButtonStyle {
 
-        let bgColor: Color
+        let isSelected: Bool
+
+        @State private var isHovered: Bool = false
 
         func makeBody(configuration: Self.Configuration) -> some View {
+
+            let bgColor: Color = {
+                if isSelected {
+                    return Color("RowHoverColor")
+                }
+                if isHovered {
+                    return Color("ButtonMouseOverColor")
+                }
+                return Color(NSColor.clear.withAlphaComponent(0.001))
+            }()
 
             configuration.label
                 .padding(.horizontal, 16)
                 .frame(maxWidth: .infinity, minHeight: 40, alignment: .leading)
                 .truncationMode(.tail)
                 .background(RoundedRectangle(cornerRadius: 8, style: .continuous).fill(bgColor))
-
+                .onHover { inside in
+                    self.isHovered = inside
+                }
         }
     }
 }
