@@ -22,6 +22,8 @@ import Combine
 import Lottie
 
 // swiftlint:disable file_length
+// swiftlint:disable type_body_length
+
 final class TabBarViewController: NSViewController {
 
     enum HorizontalSpace: CGFloat {
@@ -38,7 +40,7 @@ final class TabBarViewController: NSViewController {
     @IBOutlet weak var rightShadowImageView: NSImageView!
     @IBOutlet weak var leftShadowImageView: NSImageView!
     @IBOutlet weak var plusButton: LongPressButton!
-    @IBOutlet weak var fireButton: MouseOverButton!
+    @IBOutlet weak var fireButton: MouseOverAnimationButton!
     @IBOutlet weak var draggingSpace: NSView!
     @IBOutlet weak var windowDraggingViewLeadingConstraint: NSLayoutConstraint!
 
@@ -65,6 +67,7 @@ final class TabBarViewController: NSViewController {
         scrollView.updateScrollElasticity(with: tabMode)
         observeToScrollNotifications()
         subscribeToSelectionIndex()
+        setupFireButton()
     }
 
     override func viewWillAppear() {
@@ -103,6 +106,10 @@ final class TabBarViewController: NSViewController {
         selectionIndexCancellable = tabCollectionViewModel.$selectionIndex.receive(on: DispatchQueue.main).sink { [weak self] _ in
             self?.reloadSelection()
         }
+    }
+
+    private func setupFireButton() {
+        fireButton.animationNames = MouseOverAnimationButton.AnimationNames(aqua: "flame-mouse-over", dark: "dark-flame-mouse-over")
     }
 
     private func reloadSelection() {
@@ -801,5 +808,3 @@ extension TabBarViewController: TabBarViewItemDelegate {
     }
 
 }
-
-// swiftlint:enable type_body_length

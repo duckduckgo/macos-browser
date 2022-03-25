@@ -121,12 +121,14 @@ internal class MouseOverButton: NSButton {
     @Published private(set) var isMouseOver = false {
         didSet {
             updateTintColor()
+            updateLayer()
         }
     }
 
     var isMouseDown = false {
         didSet {
             updateTintColor()
+            updateLayer()
         }
     }
 
@@ -140,7 +142,6 @@ internal class MouseOverButton: NSButton {
                 self.contentTintColor = self.normalTintColor
             }
         }
-        updateLayer()
     }
 
     override func updateLayer() {
