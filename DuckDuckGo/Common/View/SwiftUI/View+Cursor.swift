@@ -1,5 +1,5 @@
 //
-//  TextButton.swift
+//  View+WithCursor.swift
 //
 //  Copyright © 2022 DuckDuckGo. All rights reserved.
 //
@@ -17,23 +17,29 @@
 //
 
 import SwiftUI
+import AppKit
 
-struct TextButton: View {
-    
-    let title: String
-    let action: () -> Void
-    
-    init(_ title: String, action: @escaping () -> Void) {
-        self.title = title
-        self.action = action
+extension View {
+    /**
+     * Displays `cursor` when the view is hovered.
+     */
+    func cursor(_ cursor: NSCursor) -> some View {
+        modifier(CursorModifier(cursor: cursor))
     }
+}
+
+private struct CursorModifier: ViewModifier {
     
-    var body: some View {
-        Button(action: action) {
-            Text(title)
-                .foregroundColor(Color("LinkBlueColor"))
-        }
-        .buttonStyle(.plain)
-        .cursor(.pointingHand)
+    let cursor: NSCursor
+    
+    func body(content: Content) -> some View {
+        return content
+            .onHover { inside in
+                if inside {
+                    cursor.push()
+                } else {
+                    NSCursor.pop()
+                }
+            }
     }
 }

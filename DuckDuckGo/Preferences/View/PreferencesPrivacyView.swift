@@ -62,13 +62,9 @@ extension Preferences {
                         Text(UserText.gpcExplanation)
                             .fixMultilineScrollableText()
 
-                        Button {
+                        TextButton(UserText.gpcLearnMore) {
                             model.openURL(.gpcLearnMore)
-                        } label: {
-                            Text(UserText.gpcLearnMore)
-                                .foregroundColor(Color("LinkBlueColor"))
                         }
-                        .buttonStyle(.plain)
                     }
                 }
             }
