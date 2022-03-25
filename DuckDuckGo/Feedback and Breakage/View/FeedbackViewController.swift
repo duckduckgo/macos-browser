@@ -274,7 +274,7 @@ final class FeedbackViewController: NSViewController {
                                                   siteUrlString: urlTextField.stringValue,
                                                   osVersion: "\(ProcessInfo.processInfo.operatingSystemVersion)",
                                                   upgradedHttps: currentTab?.connectionUpgradedTo != nil,
-                                                  tdsETag: DefaultConfigurationStorage.shared.loadEtag(for: .trackerRadar),
+                                                  tdsETag: ContentBlocking.shared.contentBlockingManager.currentRules.first?.etag,
                                                   blockedTrackerDomains: blockedTrackerDomains,
                                                   installedSurrogates: installedSurrogates)
             websiteBreakageSender.sendWebsiteBreakage(websiteBreakage)
