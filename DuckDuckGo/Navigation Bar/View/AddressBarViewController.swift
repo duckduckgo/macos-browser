@@ -376,7 +376,7 @@ extension AddressBarViewController {
         let point = self.view.convert(event.locationInWindow, from: nil)
         let view = self.view.hitTest(point)
 
-        if view is NSButton || view is AnimationView {
+        if view?.shouldShowArrowCursor == true {
             NSCursor.arrow.set()
         } else {
             NSCursor.iBeam.set()
@@ -418,7 +418,7 @@ extension AddressBarViewController {
 
         if let point = self.view.mouseLocationInsideBounds(event.locationInWindow) {
             guard self.view.window?.firstResponder !== addressBarTextField.currentEditor(),
-                  !(self.view.hitTest(point) is NSButton || self.view.hitTest(point) is AnimationView)
+                  self.view.hitTest(point)?.shouldShowArrowCursor == false
             else { return event }
 
             // bookmark button visibility is usually determined by hover state, but we def need to hide it right now
@@ -468,6 +468,14 @@ extension AddressBarViewController: AddressBarTextFieldDelegate {
         updateMode(value: value)
         addressBarButtonsViewController?.textFieldValue = value
         updateView()
+    }
+
+}
+
+fileprivate extension NSView {
+
+    var shouldShowArrowCursor: Bool {
+        self is NSButton || self is AnimationView
     }
 
 }
