@@ -1,7 +1,7 @@
 //
-//  NSApplication+BuildTime.m
+//  NSWorkspaceExtension.swift
 //
-//  Copyright © 2021 DuckDuckGo. All rights reserved.
+//  Copyright © 2022 DuckDuckGo. All rights reserved.
 //
 //  Licensed under the Apache License, Version 2.0 (the "License");
 //  you may not use this file except in compliance with the License.
@@ -16,18 +16,16 @@
 //  limitations under the License.
 //
 
-#import "NSApplication+BuildTime.h"
+import AppKit
 
-@implementation NSApplication (BuildTime)
+extension NSWorkspace {
 
-- (NSDate *)buildDate {
-    NSString *buildDateTime = [[NSString stringWithUTF8String:__DATE__] stringByAppendingFormat:@" %s", __TIME__];
-    NSDateFormatter *df = [[NSDateFormatter alloc] init];
-    
-    [df setDateFormat:@"MMM d yyyy HH:mm:ss"];
-    [df setLocale: [NSLocale localeWithLocaleIdentifier:@"en_US"]];
+    func application(toOpen url: URL) -> String? {
+        guard let appURL = urlForApplication(toOpen: url),
+              let bundle = Bundle(url: appURL)
+        else { return nil }
 
-    return [df dateFromString:buildDateTime];
+        return bundle.displayName
+    }
+
 }
-
-@end

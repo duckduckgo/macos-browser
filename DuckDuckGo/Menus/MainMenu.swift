@@ -91,13 +91,6 @@ final class MainMenu: NSMenu {
         }
         sharingMenu.title = shareMenuItem.title
         shareMenuItem.submenu = sharingMenu
-
-#if !OUT_OF_APPSTORE
-
-        checkForUpdatesMenuItem?.removeFromParent()
-        checkForUpdatesSeparatorItem?.removeFromParent()
-
-#endif
     }
 
     private func setup() {

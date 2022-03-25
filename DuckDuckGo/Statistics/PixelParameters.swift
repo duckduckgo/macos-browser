@@ -21,9 +21,6 @@ extension Pixel {
     enum Parameters {
         static let duration = "duration"
         static let test = "test"
-    #if BETA
-        static let beta = "beta"
-    #endif
         static let appVersion = "appVersion"
 
         static let errorCode = "e"
@@ -37,9 +34,6 @@ extension Pixel {
 
     enum Values {
         static let test = "1"
-    #if BETA
-        static let beta = "1"
-    #endif
     }
 
 }

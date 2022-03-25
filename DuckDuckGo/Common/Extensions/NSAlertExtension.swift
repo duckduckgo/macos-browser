@@ -64,31 +64,6 @@ extension NSAlert {
         return alert
     }
 
-    static func openExternalURLAlert(with appName: String?) -> NSAlert {
-        let alert = NSAlert()
-
-        if let appName = appName {
-            alert.messageText = UserText.openExternalURLTitle(forAppName: appName)
-            alert.informativeText = UserText.openExternalURLMessage(forAppName: appName)
-        } else {
-            alert.messageText = UserText.openExternalURLTitleUnknownApp
-            alert.informativeText = UserText.openExternalURLMessageUnknownApp
-        }
-
-        alert.alertStyle = .warning
-        alert.addButton(withTitle: UserText.open)
-        alert.addButton(withTitle: UserText.cancel)
-        return alert
-    }
-
-    static func unableToOpenExernalURLAlert() -> NSAlert {
-        let alert = NSAlert()
-        alert.messageText = UserText.failedToOpenExternally
-        alert.alertStyle = .warning
-        alert.addButton(withTitle: UserText.ok)
-        return alert
-    }
-
     static func fireButtonAlert() -> NSAlert {
         let alert = NSAlert()
         alert.messageText = UserText.burnAlertMessageText
