@@ -96,7 +96,6 @@ final class MouseOverAnimationButton: AddressBarButton {
 
     private func updateAnimationView() {
         guard let animationViewCache = animationViewCache else {
-            assertionFailure("No animations loaded")
             return
         }
 
