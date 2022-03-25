@@ -229,6 +229,10 @@ struct UserText {
 
     static let csvImportDescription = NSLocalizedString("import.logins.csv.description", value: "The CSV importer will try to match column headers to their position.\nIf there is no header, it supports two formats:\n\n1. URL, Username, Password\n2. Title, URL, Username, Password", comment: "Description text for the CSV importer")
     static let importLoginsSelectCSVFile = NSLocalizedString("import.logins.select-csv-file", value: "Select CSV File…", comment: "Button text for selecting a CSV file")
+    static let importLoginsSelectSafariCSVFile = NSLocalizedString("import.logins.select-safari-csv-file", value: "Select Passwords CSV File…", comment: "Button text for selecting a Safari CSV file")
+    static let importLoginsSelect1PasswordCSVFile = NSLocalizedString("import.logins.select-1password-csv-file", value: "Select 1Password CSV File…", comment: "Button text for selecting a 1Password CSV file")
+    static let importLoginsSelectLastPassCSVFile = NSLocalizedString("import.logins.select-lastpass-csv-file", value: "Select LastPass CSV File…", comment: "Button text for selecting a LastPass CSV file")
+
     static let importLoginsSelectAnotherFile = NSLocalizedString("import.logins.select-another-file", value: "Select Another CSV File…", comment: "Button text for selecting another file")
     static let importLoginsFailedToReadCSVFile = NSLocalizedString("import.logins.failed-to-read-file", value: "Failed to get CSV file URL", comment: "Error text when importing a CSV file")
 

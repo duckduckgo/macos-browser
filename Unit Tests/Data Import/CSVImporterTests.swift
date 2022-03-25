@@ -68,8 +68,11 @@ class CSVImporterTests: XCTestCase {
         csvImporter.importData(types: [.logins], from: nil) { result in
             switch result {
             case .success(let summary):
-                let expectedSummary = DataImport.Summary.logins(successfulImports: ["username"], duplicateImports: [], failedImports: [])
-                XCTAssertEqual(summary, [expectedSummary])
+                let expectedSummary = DataImport.Summary(bookmarksResult: nil,
+                                                         loginsResult: .completed(.init(successfulImports: ["username"],
+                                                                                        duplicateImports: [],
+                                                                                        failedImports: [])))
+                XCTAssertEqual(summary, expectedSummary)
                 XCTAssertEqual(mockLoginImporter.importedLogins, expectedSummary)
             case .failure(let error):
                 XCTFail(error.localizedDescription)
@@ -90,8 +93,11 @@ class CSVImporterTests: XCTestCase {
         csvImporter.importData(types: [.logins], from: nil) { result in
             switch result {
             case .success(let summary):
-                let expectedSummary = DataImport.Summary.logins(successfulImports: ["username"], duplicateImports: [], failedImports: [])
-                XCTAssertEqual(summary, [expectedSummary])
+                let expectedSummary = DataImport.Summary(bookmarksResult: nil,
+                                                         loginsResult: .completed(.init(successfulImports: ["username"],
+                                                                                        duplicateImports: [],
+                                                                                        failedImports: [])))
+                XCTAssertEqual(summary, expectedSummary)
                 XCTAssertEqual(mockLoginImporter.importedLogins, expectedSummary)
             case .failure(let error):
                 XCTFail(error.localizedDescription)

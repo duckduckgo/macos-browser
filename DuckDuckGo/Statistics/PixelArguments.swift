@@ -390,6 +390,8 @@ extension Pixel.Event {
         case brave = "source-brave"
         case chrome = "source-chrome"
         case csv = "source-csv"
+        case lastPass = "source-lastpass"
+        case onePassword = "source-1password"
         case edge = "source-edge"
         case firefox = "source-firefox"
         case safari = "source-safari"

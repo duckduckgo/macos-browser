@@ -26,6 +26,8 @@ enum DataImport {
         case edge
         case firefox
         case safari
+        case onePassword
+        case lastPass
         case csv
 
         var importSourceName: String {
@@ -40,6 +42,10 @@ enum DataImport {
                 return "Firefox"
             case .safari:
                 return "Safari"
+            case .lastPass:
+                return "LastPass"
+            case .onePassword:
+                return "1Password"
             case .csv:
                 return UserText.importLoginsCSV
             }
@@ -59,9 +65,24 @@ enum DataImport {
         case logins
     }
 
-    enum Summary: Equatable {
-        case bookmarks(result: BookmarkImportResult)
-        case logins(successfulImports: [String], duplicateImports: [String], failedImports: [String])
+    struct CompletedLoginsResult: Equatable {
+        let successfulImports: [String]
+        let duplicateImports: [String]
+        let failedImports: [String]
+    }
+
+    enum LoginsResult: Equatable {
+        case awaited
+        case completed(CompletedLoginsResult)
+    }
+
+    struct Summary: Equatable {
+        var bookmarksResult: BookmarkImportResult?
+        var loginsResult: LoginsResult?
+
+        var isEmpty: Bool {
+            bookmarksResult == nil && loginsResult == nil
+        }
     }
 
     struct BrowserProfileList {
@@ -92,6 +113,8 @@ enum DataImport {
                 self.profiles = profileURLs.map(BrowserProfile.from(profileURL:)).sorted()
             case .safari:
                 self.profiles = profileURLs.map(BrowserProfile.from(profileURL:)).sorted()
+            case .lastPass, .onePassword:
+                self.profiles = []
             }
         }
 
@@ -105,7 +128,7 @@ enum DataImport {
                 return profiles.first { $0.profileName == "Default" } ?? profiles.first
             case .firefox:
                 return profiles.first { $0.profileName == "default-release" } ?? profiles.first
-            case .safari:
+            case .safari, .lastPass, .onePassword:
                 return nil
             }
         }
@@ -227,6 +250,6 @@ protocol DataImporter {
 
     func importData(types: [DataImport.DataType],
                     from profile: DataImport.BrowserProfile?,
-                    completion: @escaping (Result<[DataImport.Summary], DataImportError>) -> Void)
+                    completion: @escaping (Result<DataImport.Summary, DataImportError>) -> Void)
 
 }
