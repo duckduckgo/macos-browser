@@ -689,7 +689,7 @@ final class AddressBarButtonsViewController: NSViewController {
             return
         }
 
-        guard !isAnyTrackerAnimationPlaying else {
+        guard !isAnyShieldAnimationPlaying else {
             privacyEntryPointButton.image = nil
             return
         }
@@ -800,6 +800,11 @@ final class AddressBarButtonsViewController: NSViewController {
         trackerAnimationView3.isAnimationPlaying
     }
 
+    private var isAnyShieldAnimationPlaying: Bool {
+        shieldAnimationView.isAnimationPlaying ||
+        shieldDotAnimationView.isAnimationPlaying
+    }
+
     private func stopAnimationsAfterFocus() {
         if isTextFieldEditorFirstResponder {
             stopAnimations()
@@ -845,8 +850,12 @@ final class AddressBarButtonsViewController: NSViewController {
     private func subscribeToIsMouseOverAnimationVisible() {
         isMouseOverAnimationVisibleCancellable = privacyEntryPointButton.$isAnimationViewVisible
             .dropFirst()
-            .sink { [weak self] _ in
-                self?.stopAnimations(trackerAnimations: false, shieldAnimations: true)
+            .sink { [weak self] isAnimationViewVisible in
+                if isAnimationViewVisible {
+                    self?.stopAnimations(trackerAnimations: false, shieldAnimations: true)
+                } else {
+                    self?.updatePrivacyEntryPointIcon()
+                }
             }
     }
 
