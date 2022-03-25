@@ -934,8 +934,8 @@ Gw
                                         <rect key="frame" x="0.0" y="344" width="472" height="214"/>
                                         <subviews>
                                             <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="0eU-q7-pCD">
-                                                <rect key="frame" x="-2" y="199" width="272" height="15"/>
-                                                <textFieldCell key="cell" alignment="left" title="Step 1: Export your passwords from Safari" id="6rh-eQ-bcN">
+                                                <rect key="frame" x="-2" y="199" width="292" height="15"/>
+                                                <textFieldCell key="cell" alignment="left" title="Step 1: Export your passwords from LastPass" id="6rh-eQ-bcN">
                                                     <font key="font" size="13" name="SFProText-Semibold"/>
                                                     <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
                                                     <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
@@ -1704,7 +1704,7 @@ Gw
                 </viewController>
                 <customObject id="Xcz-bj-sHR" userLabel="First Responder" customClass="NSResponder" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="75" y="1091"/>
+            <point key="canvasLocation" x="70" y="1337"/>
         </scene>
         <!--Request File Permission View Controller-->
         <scene sceneID="nXf-mC-09w">
@@ -1812,7 +1812,7 @@ Third line</string>
             <color red="1" green="1" blue="1" alpha="0.0" colorSpace="custom" customColorSpace="sRGB"/>
         </namedColor>
         <namedColor name="GlobalBackgroundColor">
-            <color red="0.22352941176470589" green="0.41176470588235292" blue="0.93725490196078431" alpha="0.12" colorSpace="custom" customColorSpace="sRGB"/>
+            <color red="0.22352941176470589" green="0.41176470588235292" blue="0.93725490196078431" alpha="0.11999999731779099" colorSpace="custom" customColorSpace="sRGB"/>
         </namedColor>
         <namedColor name="OnboardingActionButtonColor">
             <color red="0.2235293984413147" green="0.41176474094390869" blue="0.93725490570068359" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>

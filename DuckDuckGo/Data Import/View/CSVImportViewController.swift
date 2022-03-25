@@ -53,7 +53,11 @@ final class CSVImportViewController: NSViewController {
     @IBOutlet var lastPassInfoView: NSView!
     @IBOutlet var onePasswordInfoView: NSView!
 
-    var importSource: DataImport.Source = .csv
+    var importSource: DataImport.Source = .csv {
+        didSet {
+            renderCurrentState()
+        }
+    }
     weak var delegate: CSVImportViewControllerDelegate?
 
     // MARK: - View State
@@ -74,6 +78,7 @@ final class CSVImportViewController: NSViewController {
     }
 
     private func renderCurrentState() {
+        guard isViewLoaded else { return }
         render(state: currentImportState)
     }
 
