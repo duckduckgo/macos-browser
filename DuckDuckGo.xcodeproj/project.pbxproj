@@ -452,7 +452,7 @@
 		AAC5E4E425D6BA9C007F5990 /* NSSizeExtension.swift in Sources */ = {isa = PBXBuildFile; fileRef = AAC5E4E325D6BA9C007F5990 /* NSSizeExtension.swift */; };
 		AAC5E4F125D6BF10007F5990 /* AddressBarButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = AAC5E4F025D6BF10007F5990 /* AddressBarButton.swift */; };
 		AAC5E4F625D6BF2C007F5990 /* AddressBarButtonsViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = AAC5E4F525D6BF2C007F5990 /* AddressBarButtonsViewController.swift */; };
-		AAC82C60258B6CB5009B6B42 /* TooltipWindowController.swift in Sources */ = {isa = PBXBuildFile; fileRef = AAC82C5F258B6CB5009B6B42 /* TooltipWindowController.swift */; };
+		AAC82C60258B6CB5009B6B42 /* TabPreviewWindowController.swift in Sources */ = {isa = PBXBuildFile; fileRef = AAC82C5F258B6CB5009B6B42 /* TabPreviewWindowController.swift */; };
 		AAC9C01524CAFBCE00AD1325 /* TabTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = AAC9C01424CAFBCE00AD1325 /* TabTests.swift */; };
 		AAC9C01724CAFBDC00AD1325 /* TabCollectionTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = AAC9C01624CAFBDC00AD1325 /* TabCollectionTests.swift */; };
 		AAC9C01C24CB594C00AD1325 /* TabViewModelTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = AAC9C01B24CB594C00AD1325 /* TabViewModelTests.swift */; };
@@ -473,8 +473,8 @@
 		AAE7527C263B056C00B973F8 /* HistoryStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = AAE7527B263B056C00B973F8 /* HistoryStore.swift */; };
 		AAE7527E263B05C600B973F8 /* HistoryEntry.swift in Sources */ = {isa = PBXBuildFile; fileRef = AAE7527D263B05C600B973F8 /* HistoryEntry.swift */; };
 		AAE75280263B0A4D00B973F8 /* HistoryCoordinator.swift in Sources */ = {isa = PBXBuildFile; fileRef = AAE7527F263B0A4D00B973F8 /* HistoryCoordinator.swift */; };
-		AAE8B102258A41C000E81239 /* Tooltip.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = AAE8B101258A41C000E81239 /* Tooltip.storyboard */; };
-		AAE8B110258A456C00E81239 /* TooltipViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = AAE8B10F258A456C00E81239 /* TooltipViewController.swift */; };
+		AAE8B102258A41C000E81239 /* TabPreview.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = AAE8B101258A41C000E81239 /* TabPreview.storyboard */; };
+		AAE8B110258A456C00E81239 /* TabPreviewViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = AAE8B10F258A456C00E81239 /* TabPreviewViewController.swift */; };
 		AAE99B8927088A19008B6BD9 /* FirePopover.swift in Sources */ = {isa = PBXBuildFile; fileRef = AAE99B8827088A19008B6BD9 /* FirePopover.swift */; };
 		AAEC74B22642C57200C2EFBC /* HistoryCoordinatingMock.swift in Sources */ = {isa = PBXBuildFile; fileRef = AAEC74B12642C57200C2EFBC /* HistoryCoordinatingMock.swift */; };
 		AAEC74B42642C69300C2EFBC /* HistoryCoordinatorTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = AAEC74B32642C69300C2EFBC /* HistoryCoordinatorTests.swift */; };
@@ -535,8 +535,8 @@
 		B63ED0E026AFE32F00A9DAD1 /* GeolocationProviderMock.swift in Sources */ = {isa = PBXBuildFile; fileRef = B63ED0DF26AFE32F00A9DAD1 /* GeolocationProviderMock.swift */; };
 		B63ED0E326B3E7FA00A9DAD1 /* CLLocationManagerMock.swift in Sources */ = {isa = PBXBuildFile; fileRef = B63ED0E226B3E7FA00A9DAD1 /* CLLocationManagerMock.swift */; };
 		B63ED0E526BB8FB900A9DAD1 /* SharingMenu.swift in Sources */ = {isa = PBXBuildFile; fileRef = B63ED0E426BB8FB900A9DAD1 /* SharingMenu.swift */; };
-		B643BF1427ABF772000BACEC /* NSWorkspaceExtension.swift in Sources */ = {isa = PBXBuildFile; fileRef = B643BF1327ABF772000BACEC /* NSWorkspaceExtension.swift */; };
 		B642738227B65BAC0005DFD1 /* SecureVaultErrorReporter.swift in Sources */ = {isa = PBXBuildFile; fileRef = B642738127B65BAC0005DFD1 /* SecureVaultErrorReporter.swift */; };
+		B643BF1427ABF772000BACEC /* NSWorkspaceExtension.swift in Sources */ = {isa = PBXBuildFile; fileRef = B643BF1327ABF772000BACEC /* NSWorkspaceExtension.swift */; };
 		B64C84DE2692D7400048FEBE /* PermissionAuthorization.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = B64C84DD2692D7400048FEBE /* PermissionAuthorization.storyboard */; };
 		B64C84E32692DC9F0048FEBE /* PermissionAuthorizationViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = B64C84E22692DC9F0048FEBE /* PermissionAuthorizationViewController.swift */; };
 		B64C84EB2692DD650048FEBE /* PermissionAuthorizationPopover.swift in Sources */ = {isa = PBXBuildFile; fileRef = B64C84EA2692DD650048FEBE /* PermissionAuthorizationPopover.swift */; };
@@ -1184,7 +1184,7 @@
 		AAC5E4F025D6BF10007F5990 /* AddressBarButton.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AddressBarButton.swift; sourceTree = "<group>"; };
 		AAC5E4F525D6BF2C007F5990 /* AddressBarButtonsViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AddressBarButtonsViewController.swift; sourceTree = "<group>"; };
 		AAC6BBEE27AC151D0006DCC2 /* History 3.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = "History 3.xcdatamodel"; sourceTree = "<group>"; };
-		AAC82C5F258B6CB5009B6B42 /* TooltipWindowController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TooltipWindowController.swift; sourceTree = "<group>"; };
+		AAC82C5F258B6CB5009B6B42 /* TabPreviewWindowController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TabPreviewWindowController.swift; sourceTree = "<group>"; };
 		AAC9C01424CAFBCE00AD1325 /* TabTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TabTests.swift; sourceTree = "<group>"; };
 		AAC9C01624CAFBDC00AD1325 /* TabCollectionTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TabCollectionTests.swift; sourceTree = "<group>"; };
 		AAC9C01B24CB594C00AD1325 /* TabViewModelTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TabViewModelTests.swift; sourceTree = "<group>"; };
@@ -1206,8 +1206,8 @@
 		AAE7527B263B056C00B973F8 /* HistoryStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HistoryStore.swift; sourceTree = "<group>"; };
 		AAE7527D263B05C600B973F8 /* HistoryEntry.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HistoryEntry.swift; sourceTree = "<group>"; };
 		AAE7527F263B0A4D00B973F8 /* HistoryCoordinator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HistoryCoordinator.swift; sourceTree = "<group>"; };
-		AAE8B101258A41C000E81239 /* Tooltip.storyboard */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; path = Tooltip.storyboard; sourceTree = "<group>"; };
-		AAE8B10F258A456C00E81239 /* TooltipViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TooltipViewController.swift; sourceTree = "<group>"; };
+		AAE8B101258A41C000E81239 /* TabPreview.storyboard */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; path = TabPreview.storyboard; sourceTree = "<group>"; };
+		AAE8B10F258A456C00E81239 /* TabPreviewViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TabPreviewViewController.swift; sourceTree = "<group>"; };
 		AAE99B8827088A19008B6BD9 /* FirePopover.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FirePopover.swift; sourceTree = "<group>"; };
 		AAEC74B12642C57200C2EFBC /* HistoryCoordinatingMock.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HistoryCoordinatingMock.swift; sourceTree = "<group>"; };
 		AAEC74B32642C69300C2EFBC /* HistoryCoordinatorTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HistoryCoordinatorTests.swift; sourceTree = "<group>"; };
@@ -1270,8 +1270,8 @@
 		B63ED0DF26AFE32F00A9DAD1 /* GeolocationProviderMock.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GeolocationProviderMock.swift; sourceTree = "<group>"; };
 		B63ED0E226B3E7FA00A9DAD1 /* CLLocationManagerMock.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CLLocationManagerMock.swift; sourceTree = "<group>"; };
 		B63ED0E426BB8FB900A9DAD1 /* SharingMenu.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SharingMenu.swift; sourceTree = "<group>"; };
-		B643BF1327ABF772000BACEC /* NSWorkspaceExtension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NSWorkspaceExtension.swift; sourceTree = "<group>"; };
 		B642738127B65BAC0005DFD1 /* SecureVaultErrorReporter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SecureVaultErrorReporter.swift; sourceTree = "<group>"; };
+		B643BF1327ABF772000BACEC /* NSWorkspaceExtension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NSWorkspaceExtension.swift; sourceTree = "<group>"; };
 		B64C84DD2692D7400048FEBE /* PermissionAuthorization.storyboard */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; path = PermissionAuthorization.storyboard; sourceTree = "<group>"; };
 		B64C84E22692DC9F0048FEBE /* PermissionAuthorizationViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PermissionAuthorizationViewController.swift; sourceTree = "<group>"; };
 		B64C84EA2692DD650048FEBE /* PermissionAuthorizationPopover.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PermissionAuthorizationPopover.swift; sourceTree = "<group>"; };
@@ -2521,7 +2521,7 @@
 				4B677447255DBF1400025BD8 /* Submodules */,
 				AACB8E7224A4C8BC005F2218 /* Suggestions */,
 				AA86491124D8318F001BABEE /* Tab Bar */,
-				AAE8B0FD258A416F00E81239 /* Tooltip */,
+				AAE8B0FD258A416F00E81239 /* Tab Preview */,
 				B6040859274B8C5200680351 /* Unprotected Domains */,
 				AACF6FD426BC35C200CF09F9 /* User Agent */,
 				4BC68A6C2759ADC20029A586 /* Waitlist */,
@@ -3299,20 +3299,20 @@
 			path = Model;
 			sourceTree = "<group>";
 		};
-		AAE8B0FD258A416F00E81239 /* Tooltip */ = {
+		AAE8B0FD258A416F00E81239 /* Tab Preview */ = {
 			isa = PBXGroup;
 			children = (
 				AAE8B0FE258A417D00E81239 /* View */,
 			);
-			path = Tooltip;
+			path = "Tab Preview";
 			sourceTree = "<group>";
 		};
 		AAE8B0FE258A417D00E81239 /* View */ = {
 			isa = PBXGroup;
 			children = (
-				AAE8B101258A41C000E81239 /* Tooltip.storyboard */,
-				AAC82C5F258B6CB5009B6B42 /* TooltipWindowController.swift */,
-				AAE8B10F258A456C00E81239 /* TooltipViewController.swift */,
+				AAE8B101258A41C000E81239 /* TabPreview.storyboard */,
+				AAC82C5F258B6CB5009B6B42 /* TabPreviewWindowController.swift */,
+				AAE8B10F258A456C00E81239 /* TabPreviewViewController.swift */,
 			);
 			path = View;
 			sourceTree = "<group>";
@@ -3885,7 +3885,7 @@
 				AA80EC89256C49B8007083E7 /* Localizable.strings in Resources */,
 				B31055C627A1BA1D001AC618 /* userscript.js in Resources */,
 				EA4617F0273A28A700F110A2 /* fb-tds.json in Resources */,
-				AAE8B102258A41C000E81239 /* Tooltip.storyboard in Resources */,
+				AAE8B102258A41C000E81239 /* TabPreview.storyboard in Resources */,
 				AA68C3D72490F821001B8783 /* README.md in Resources */,
 				AA585D86248FD31400E9A3E2 /* Assets.xcassets in Resources */,
 				85589E8D27BBBB870038AD11 /* NavigationBar.storyboard in Resources */,
@@ -4347,7 +4347,7 @@
 				AA75A0AE26F3500C0086B667 /* PrivacyIconViewModel.swift in Sources */,
 				4BB99D0126FE191E001E4761 /* ChromiumBookmarksReader.swift in Sources */,
 				B6C0B23426E71BCD0031CB7F /* Downloads.xcdatamodeld in Sources */,
-				AAE8B110258A456C00E81239 /* TooltipViewController.swift in Sources */,
+				AAE8B110258A456C00E81239 /* TabPreviewViewController.swift in Sources */,
 				4B0135CE2729F1AA00D54834 /* NSPasteboardExtension.swift in Sources */,
 				85707F31276A7DCA00DC0649 /* OnboardingViewModel.swift in Sources */,
 				85AC3B0525D6B1D800C7D2AA /* ScriptSourceProviding.swift in Sources */,
@@ -4417,7 +4417,7 @@
 				4B9292D92667124B00AD2C21 /* BookmarkListTreeControllerDataSource.swift in Sources */,
 				14D9B8FB24F7E089000D4D13 /* AddressBarViewController.swift in Sources */,
 				B65536A62685B82B00085A79 /* Permissions.swift in Sources */,
-				AAC82C60258B6CB5009B6B42 /* TooltipWindowController.swift in Sources */,
+				AAC82C60258B6CB5009B6B42 /* TabPreviewWindowController.swift in Sources */,
 				AAC5E4E425D6BA9C007F5990 /* NSSizeExtension.swift in Sources */,
 				AA6820EB25503D6A005ED0D5 /* Fire.swift in Sources */,
 				B6AAAC3E26048F690029438D /* RandomAccessCollectionExtension.swift in Sources */,
