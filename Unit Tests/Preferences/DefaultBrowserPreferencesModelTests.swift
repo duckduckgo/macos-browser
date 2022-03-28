@@ -40,7 +40,7 @@ final class DefaultBrowserProviderMock: DefaultBrowserProvider {
     }
 }
 
-class DefaultBrowserPreferencesModelTests: XCTestCase {
+final class DefaultBrowserPreferencesModelTests: XCTestCase {
 
     // swiftlint:disable:next implicitly_unwrapped_optional
     var provider: DefaultBrowserProviderMock!

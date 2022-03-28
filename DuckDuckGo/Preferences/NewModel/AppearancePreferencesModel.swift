@@ -18,6 +18,19 @@
 
 import Foundation
 
+protocol AppearancePreferencesPersistor {
+    var showFullURL: Bool { get set }
+    var currentThemeName: String { get set }
+}
+
+struct AppearancePreferencesUserDefaultsPersistor: AppearancePreferencesPersistor {
+    @UserDefaultsWrapper(key: .showFullURL, defaultValue: false)
+    var showFullURL: Bool
+
+    @UserDefaultsWrapper(key: .currentThemeName, defaultValue: ThemeName.systemDefault.rawValue)
+    var currentThemeName: String
+}
+
 enum ThemeName: String, Equatable, CaseIterable {
     case light
     case dark
@@ -33,7 +46,7 @@ enum ThemeName: String, Equatable, CaseIterable {
             return nil
         }
     }
-    
+
     var displayName: String {
         switch self {
         case .light:
@@ -60,15 +73,15 @@ enum ThemeName: String, Equatable, CaseIterable {
 final class AppearancePreferencesModel: ObservableObject {
 
     static let shared = AppearancePreferencesModel()
-    
-    @Published var currentThemeName: ThemeName = .systemDefault {
+
+    @Published var currentThemeName: ThemeName {
         didSet {
             persistor.currentThemeName = currentThemeName.rawValue
             updateUserInterfaceStyle()
         }
     }
 
-    @Published var showFullURL: Bool = false {
+    @Published var showFullURL: Bool {
         didSet {
             persistor.showFullURL = showFullURL
         }
@@ -79,23 +92,10 @@ final class AppearancePreferencesModel: ObservableObject {
     }
 
     private var persistor: AppearancePreferencesPersistor
-    
+
     init(persistor: AppearancePreferencesPersistor = AppearancePreferencesUserDefaultsPersistor()) {
         self.persistor = persistor
         currentThemeName = .init(rawValue: persistor.currentThemeName) ?? .systemDefault
         showFullURL = persistor.showFullURL
     }
-}
-
-protocol AppearancePreferencesPersistor {
-    var showFullURL: Bool { get set }
-    var currentThemeName: String { get set }
-}
-
-struct AppearancePreferencesUserDefaultsPersistor: AppearancePreferencesPersistor {
-    @UserDefaultsWrapper(key: .showFullURL, defaultValue: false)
-    var showFullURL: Bool
-
-    @UserDefaultsWrapper(key: .currentThemeName, defaultValue: ThemeName.systemDefault.rawValue)
-    var currentThemeName: String
 }

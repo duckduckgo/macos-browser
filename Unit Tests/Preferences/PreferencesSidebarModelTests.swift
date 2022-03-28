@@ -19,7 +19,7 @@
 import XCTest
 @testable import DuckDuckGo_Privacy_Browser
 
-class PreferencesSidebarModelTests: XCTestCase {
+final class PreferencesSidebarModelTests: XCTestCase {
 
     func testWhenInitializedThenFirstPaneInFirstSectionIsSelected() throws {
         let sections: [PreferencesSection] = [.init(id: .regularPreferencePanes, panes: [.appearance, .downloads, .loginsPlus])]
