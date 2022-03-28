@@ -6,7 +6,7 @@
         "repositoryURL": "https://github.com/duckduckgo/BrowserServicesKit",
         "state": {
           "branch": "sam/autofill-cards-and-identities",
-          "revision": "0646b4c3127aab9d377f701dc151841ecb4d365e",
+          "revision": "f15f6192fa6c4833c2ae86f5e7e720039ac27951",
           "version": null
         }
       },
@@ -62,6 +62,15 @@
           "branch": null,
           "revision": "6b2aa2748a7881eebb9f84fb10c01293e15b52ca",
           "version": "0.5.0"
+        }
+      },
+      {
+        "package": "TrackerRadarKit",
+        "repositoryURL": "https://github.com/duckduckgo/TrackerRadarKit.git",
+        "state": {
+          "branch": null,
+          "revision": "5f4caf35b8418700a48c64c7c61eb43308c8dacc",
+          "version": "1.0.3"
         }
       }
     ]
