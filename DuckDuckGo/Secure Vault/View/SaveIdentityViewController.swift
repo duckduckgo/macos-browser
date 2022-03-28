@@ -68,7 +68,7 @@ final class SaveIdentityViewController: NSViewController {
         do {
             try SecureVaultFactory.default.makeVault(errorReporter: SecureVaultErrorReporter.shared).storeIdentity(identity)
         } catch {
-            os_log("%s:%: failed to store identity %s", type: .error, className, #function, error.localizedDescription)
+            os_log("%s:%s: failed to store identity %s", type: .error, className, #function, error.localizedDescription)
         }
     }
     

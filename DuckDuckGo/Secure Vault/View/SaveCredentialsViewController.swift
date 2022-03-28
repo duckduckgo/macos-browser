@@ -91,7 +91,7 @@ final class SaveCredentialsViewController: NSViewController {
         do {
             try SecureVaultFactory.default.makeVault(errorReporter: SecureVaultErrorReporter.shared).storeWebsiteCredentials(credentials)
         } catch {
-            os_log("%s:%: failed to store credentials %s", type: .error, className, #function, error.localizedDescription)
+            os_log("%s:%s: failed to store credentials %s", type: .error, className, #function, error.localizedDescription)
         }
 
         Pixel.fire(.autofillItemSaved(kind: .password))

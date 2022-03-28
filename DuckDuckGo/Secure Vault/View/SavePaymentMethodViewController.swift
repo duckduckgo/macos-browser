@@ -84,7 +84,7 @@ final class SavePaymentMethodViewController: NSViewController {
         do {
             try SecureVaultFactory.default.makeVault(errorReporter: SecureVaultErrorReporter.shared).storeCreditCard(paymentMethod)
         } catch {
-            os_log("%s:%: failed to store payment method %s", type: .error, className, #function, error.localizedDescription)
+            os_log("%s:%s: failed to store payment method %s", type: .error, className, #function, error.localizedDescription)
         }
     }
     
