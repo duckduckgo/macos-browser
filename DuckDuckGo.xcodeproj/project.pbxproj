@@ -1865,7 +1865,7 @@
 			path = "Data Export";
 			sourceTree = "<group>";
 		};
-		4B82E9B725B6A04B00656FE7 /* ContentBlocker */ = {
+		4B82E9B725B6A04B00656FE7 /* Content Blocker */ = {
 			isa = PBXGroup;
 			children = (
 				98EB5D0F27516A4800681FE6 /* AppPrivacyConfigurationTests.swift */,
@@ -1875,7 +1875,7 @@
 				B610F2E527AA388100FCEBE9 /* ContentBlockingUpdatingTests.swift */,
 				B610F2E727AA397100FCEBE9 /* ContentBlockerRulesManagerMock.swift */,
 			);
-			path = ContentBlocker;
+			path = "Content Blocker";
 			sourceTree = "<group>";
 		};
 		4B8AC93726B489C500879451 /* Firefox */ = {
@@ -1897,7 +1897,7 @@
 			path = Extensions;
 			sourceTree = "<group>";
 		};
-		4BA1A691258B06F600F6F690 /* FileSystem */ = {
+		4BA1A691258B06F600F6F690 /* File System */ = {
 			isa = PBXGroup;
 			children = (
 				4BA1A69A258B076900F6F690 /* FileStore.swift */,
@@ -1905,7 +1905,7 @@
 				4BA1A6A4258B07DF00F6F690 /* EncryptedValueTransformer.swift */,
 				4BA1A6A9258B07F400F6F690 /* EncryptionKeys */,
 			);
-			path = FileSystem;
+			path = "File System";
 			sourceTree = "<group>";
 		};
 		4BA1A6A9258B07F400F6F690 /* EncryptionKeys */ = {
@@ -1918,7 +1918,7 @@
 			path = EncryptionKeys;
 			sourceTree = "<group>";
 		};
-		4BA1A6CE258BF58C00F6F690 /* FileSystem */ = {
+		4BA1A6CE258BF58C00F6F690 /* File System */ = {
 			isa = PBXGroup;
 			children = (
 				4BA1A6D8258C0CB300F6F690 /* DataEncryptionTests.swift */,
@@ -1932,7 +1932,7 @@
 				B6A5A27825B93FFE00AA7ADA /* StateRestorationManagerTests.swift */,
 				B6A5A27D25B9403E00AA7ADA /* FileStoreMock.swift */,
 			);
-			path = FileSystem;
+			path = "File System";
 			sourceTree = "<group>";
 		};
 		4BB46E9F26B8953900222970 /* Primary Password */ = {
@@ -2085,7 +2085,7 @@
 			path = "Message Views";
 			sourceTree = "<group>";
 		};
-		8553FF50257523630029327F /* FileDownload */ = {
+		8553FF50257523630029327F /* File Download */ = {
 			isa = PBXGroup;
 			children = (
 				8553FF51257523760029327F /* URLSuggestedFilenameTests.swift */,
@@ -2098,7 +2098,7 @@
 				B693956726F352DB0015B914 /* DownloadsWebViewMock.h */,
 				B693956826F352DB0015B914 /* DownloadsWebViewMock.m */,
 			);
-			path = FileDownload;
+			path = "File Download";
 			sourceTree = "<group>";
 		};
 		8556A60C256C15C60092FA9D /* File Download */ = {
@@ -2199,14 +2199,14 @@
 			path = "Secure Vault";
 			sourceTree = "<group>";
 		};
-		858A798626A99D9000A75A42 /* PasswordManager */ = {
+		858A798626A99D9000A75A42 /* Secure Vault */ = {
 			isa = PBXGroup;
 			children = (
 				4BF4EA4F27C71F26004E57C4 /* PasswordManagementListSectionTests.swift */,
 				858A798726A99DBE00A75A42 /* PasswordManagementItemListModelTests.swift */,
 				858A798926A9B35E00A75A42 /* PasswordManagementItemModelTests.swift */,
 			);
-			path = PasswordManager;
+			path = "Secure Vault";
 			sourceTree = "<group>";
 		};
 		85A0115D25AF1C4700FA6A0C /* Find In Page */ = {
@@ -2333,12 +2333,12 @@
 			path = Extensions;
 			sourceTree = "<group>";
 		};
-		85F1B0C725EF9747004792B6 /* AppDelegate */ = {
+		85F1B0C725EF9747004792B6 /* App Delegate */ = {
 			isa = PBXGroup;
 			children = (
 				85F1B0C825EF9759004792B6 /* URLEventHandlerTests.swift */,
 			);
-			path = AppDelegate;
+			path = "App Delegate";
 			sourceTree = "<group>";
 		};
 		85F487B3276A8F1B003CE668 /* Onboarding */ = {
@@ -2354,7 +2354,10 @@
 			children = (
 				4B723E1726B000DC00E14D75 /* TemporaryFileCreator.swift */,
 				4B9292C42667104B00AD2C21 /* CoreDataTestUtilities.swift */,
+				B683097A274DCFE3004B46BB /* Database */,
 				AAEC74B92642E66600C2EFBC /* Extensions */,
+				4BA1A6CE258BF58C00F6F690 /* File System */,
+				B6AE74322609AFBB005B9B1A /* Progress */,
 				4B0511E6262CAB3700F6079C /* UserDefaultsWrapperUtilities.swift */,
 				B6B3E0952654DACD0040E0A2 /* UTTypeTests.swift */,
 				B693956626F352940015B914 /* TestsBridging.h */,
@@ -2540,34 +2543,31 @@
 			children = (
 				4B2CBF3F2767EEB2001DF04B /* Waitlist */,
 				B6A5A28C25B962CB00AA7ADA /* App */,
-				85F1B0C725EF9747004792B6 /* AppDelegate */,
+				85F1B0C725EF9747004792B6 /* App Delegate */,
 				AA652CAB25DD820D009059CC /* Bookmarks */,
-				AA92ACAE24EFE1F5005F41C9 /* BrowserTab */,
+				AA92ACAE24EFE1F5005F41C9 /* Browser Tab */,
 				85F69B3A25EDE7F800978E59 /* Common */,
 				85AC3B1525D9BBFA00C7D2AA /* Configuration */,
-				4B82E9B725B6A04B00656FE7 /* ContentBlocker */,
+				4B82E9B725B6A04B00656FE7 /* Content Blocker */,
 				4B70BFFD27B0793D000386ED /* Crash Reports */,
 				4B723E0226B0003E00E14D75 /* Data Export */,
-				B683097A274DCFE3004B46BB /* Database */,
 				4B723DFE26B0003E00E14D75 /* Data Import */,
 				4BBC16A327C488B900E00A38 /* Device Authentication */,
-				8553FF50257523630029327F /* FileDownload */,
-				4BA1A6CE258BF58C00F6F690 /* FileSystem */,
+				8553FF50257523630029327F /* File Download */,
 				AA9C361D25518AAB004B1BA3 /* Fire */,
 				4B02199725E063DE00ED7DEA /* Fireproofing */,
 				B68172AC269EB415006D1092 /* Geolocation */,
 				AAEC74AE2642C47300C2EFBC /* History */,
-				AA585D96248FD31400E9A3E2 /* Info.plist */,
-				AA91F83627076ED100771A0D /* NavigationBar */,
+				AA91F83627076ED100771A0D /* Navigation Bar */,
 				85F487B3276A8F1B003CE668 /* Onboarding */,
-				858A798626A99D9000A75A42 /* PasswordManager */,
 				B6106BA126A7BE430013B453 /* Permissions */,
 				4B0511EE262CAEB300F6079C /* Preferences */,
-				B6AE74322609AFBB005B9B1A /* Progress */,
+				858A798626A99D9000A75A42 /* Secure Vault */,
 				B6DA440F2616C0F200DD1EC2 /* Statistics */,
 				AA63744E24C9BB4A00AB2AC4 /* Suggestions */,
-				AAC9C01224CAFBB700AD1325 /* TabBar */,
+				AAC9C01224CAFBB700AD1325 /* Tab Bar */,
 				AA0877B626D515EE00B05660 /* User Agent */,
+				AA585D96248FD31400E9A3E2 /* Info.plist */,
 			);
 			path = "Unit Tests";
 			sourceTree = "<group>";
@@ -2770,7 +2770,7 @@
 				B6A9E4602614608B0067D1B9 /* AppVersion.swift */,
 				4B67743D255DBEEA00025BD8 /* Database */,
 				AADC60E92493B305008F8EF7 /* Extensions */,
-				4BA1A691258B06F600F6F690 /* FileSystem */,
+				4BA1A691258B06F600F6F690 /* File System */,
 				AA80EC52256BE33A007083E7 /* Localizables */,
 				85AC3B3325DA828900C7D2AA /* Network */,
 				4BB88B4E25B7BA20006F6B06 /* Utilities */,
@@ -2878,12 +2878,12 @@
 			path = ViewModel;
 			sourceTree = "<group>";
 		};
-		AA91F83627076ED100771A0D /* NavigationBar */ = {
+		AA91F83627076ED100771A0D /* Navigation Bar */ = {
 			isa = PBXGroup;
 			children = (
 				AA91F83727076EEE00771A0D /* ViewModel */,
 			);
-			path = NavigationBar;
+			path = "Navigation Bar";
 			sourceTree = "<group>";
 		};
 		AA91F83727076EEE00771A0D /* ViewModel */ = {
@@ -2894,7 +2894,7 @@
 			path = ViewModel;
 			sourceTree = "<group>";
 		};
-		AA92ACAE24EFE1F5005F41C9 /* BrowserTab */ = {
+		AA92ACAE24EFE1F5005F41C9 /* Browser Tab */ = {
 			isa = PBXGroup;
 			children = (
 				B62EB47B25BAD3BB005745C6 /* WKWebViewPrivateMethodsAvailabilityTests.swift */,
@@ -2904,7 +2904,7 @@
 				AA92ACB024EFE210005F41C9 /* Model */,
 				AA9C362625518B61004B1BA3 /* Services */,
 			);
-			path = BrowserTab;
+			path = "Browser Tab";
 			sourceTree = "<group>";
 		};
 		AA92ACAF24EFE209005F41C9 /* ViewModel */ = {
@@ -3114,13 +3114,13 @@
 			path = Services;
 			sourceTree = "<group>";
 		};
-		AAC9C01224CAFBB700AD1325 /* TabBar */ = {
+		AAC9C01224CAFBB700AD1325 /* Tab Bar */ = {
 			isa = PBXGroup;
 			children = (
 				AAC9C01A24CB592E00AD1325 /* ViewModel */,
 				AAC9C01324CAFBBE00AD1325 /* Model */,
 			);
-			path = TabBar;
+			path = "Tab Bar";
 			sourceTree = "<group>";
 		};
 		AAC9C01324CAFBBE00AD1325 /* Model */ = {
