@@ -66,6 +66,7 @@ public struct UserDefaultsWrapper<T> {
         case onboardingFinished = "onboarding.finished"
 
         case homePageShowPagesOnHover = "home.page.show.pages.on.hover"
+        case homePageShowAllFavorites = "home.page.show.all.favorites"
     }
     
     enum RemovedKeys: String, CaseIterable {

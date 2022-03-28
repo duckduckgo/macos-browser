@@ -24,8 +24,11 @@ struct Favorites: View {
 
     @EnvironmentObject var model: HomePage.Models.FavoritesModel
 
-    @State var isExpanded = false
     @State var isHovering = false
+
+    var rowIndices: Range<Int> {
+        model.showAllFavorites ? model.rows.indices : model.rows.indices.prefix(HomePage.favoritesRowCountWhenCollapsed)
+    }
 
     var body: some View {
 
@@ -49,7 +52,7 @@ struct Favorites: View {
 
         VStack(spacing: 4) {
 
-            ForEach(isExpanded ? model.rows.indices : model.rows.indices.prefix(HomePage.favoritesRowCountWhenCollapsed), id: \.self) { index in
+            ForEach(rowIndices, id: \.self) { index in
 
                 HStack(alignment: .top, spacing: 20) {
                     ForEach(model.rows[index], id: \.id) { favorite in
@@ -69,7 +72,7 @@ struct Favorites: View {
                 
             }
 
-            MoreOrLess(isExpanded: $isExpanded)
+            MoreOrLess(isExpanded: $model.showAllFavorites)
                 .padding(.top, 2)
                 .visibility(model.rows.count > HomePage.favoritesRowCountWhenCollapsed && isHovering ? .visible : .invisible)
 
