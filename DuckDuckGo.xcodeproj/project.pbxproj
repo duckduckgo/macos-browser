@@ -40,6 +40,8 @@
 		37CC53F227E8D2C90028713D /* DownloadsPreferencesModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37CC53F127E8D2C90028713D /* DownloadsPreferencesModel.swift */; };
 		37CC53F427E8D4620028713D /* NSPathControlView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37CC53F327E8D4620028713D /* NSPathControlView.swift */; };
 		37CD54B327EE509700F1F7B9 /* View+Cursor.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37CD54B227EE509700F1F7B9 /* View+Cursor.swift */; };
+		37CD54B527F1AC1300F1F7B9 /* PreferencesSidebarModelTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37CD54B427F1AC1300F1F7B9 /* PreferencesSidebarModelTests.swift */; };
+		37CD54B727F1B28A00F1F7B9 /* DefaultBrowserPreferencesModelTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37CD54B627F1B28A00F1F7B9 /* DefaultBrowserPreferencesModelTests.swift */; };
 		37D2771527E870D4003365FD /* PreferencesAppearanceView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37D2771427E870D4003365FD /* PreferencesAppearanceView.swift */; };
 		37D2771727E874D1003365FD /* AppearancePreferencesModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37D2771627E874D1003365FD /* AppearancePreferencesModel.swift */; };
 		4B0135CE2729F1AA00D54834 /* NSPasteboardExtension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B0135CD2729F1AA00D54834 /* NSPasteboardExtension.swift */; };
@@ -782,6 +784,8 @@
 		37CC53F127E8D2C90028713D /* DownloadsPreferencesModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DownloadsPreferencesModel.swift; sourceTree = "<group>"; };
 		37CC53F327E8D4620028713D /* NSPathControlView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NSPathControlView.swift; sourceTree = "<group>"; };
 		37CD54B227EE509700F1F7B9 /* View+Cursor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "View+Cursor.swift"; sourceTree = "<group>"; };
+		37CD54B427F1AC1300F1F7B9 /* PreferencesSidebarModelTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PreferencesSidebarModelTests.swift; sourceTree = "<group>"; };
+		37CD54B627F1B28A00F1F7B9 /* DefaultBrowserPreferencesModelTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DefaultBrowserPreferencesModelTests.swift; sourceTree = "<group>"; };
 		37D2771427E870D4003365FD /* PreferencesAppearanceView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PreferencesAppearanceView.swift; sourceTree = "<group>"; };
 		37D2771627E874D1003365FD /* AppearancePreferencesModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppearancePreferencesModel.swift; sourceTree = "<group>"; };
 		4B0135CD2729F1AA00D54834 /* NSPasteboardExtension.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = NSPasteboardExtension.swift; sourceTree = "<group>"; };
@@ -1660,6 +1664,8 @@
 			children = (
 				4B0511EF262CAEC900F6079C /* AppearancePreferencesTests.swift */,
 				4B0511F7262CB20F00F6079C /* DownloadPreferencesTests.swift */,
+				37CD54B427F1AC1300F1F7B9 /* PreferencesSidebarModelTests.swift */,
+				37CD54B627F1B28A00F1F7B9 /* DefaultBrowserPreferencesModelTests.swift */,
 			);
 			path = Preferences;
 			sourceTree = "<group>";
@@ -4609,6 +4615,7 @@
 				4BA1A6DE258C100A00F6F690 /* FileStoreTests.swift in Sources */,
 				4B0511F0262CAEC900F6079C /* AppearancePreferencesTests.swift in Sources */,
 				AAC9C01C24CB594C00AD1325 /* TabViewModelTests.swift in Sources */,
+				37CD54B727F1B28A00F1F7B9 /* DefaultBrowserPreferencesModelTests.swift in Sources */,
 				B65349AA265CF45000DCC645 /* DispatchQueueExtensionsTests.swift in Sources */,
 				858A798A26A9B35E00A75A42 /* PasswordManagementItemModelTests.swift in Sources */,
 				B6DA441E2616C84600DD1EC2 /* PixelStoreMock.swift in Sources */,
@@ -4710,6 +4717,7 @@
 				B63ED0DA26AE7AF400A9DAD1 /* PermissionManagerMock.swift in Sources */,
 				AA9C362825518C44004B1BA3 /* WebsiteDataStoreMock.swift in Sources */,
 				4B723E0826B0003E00E14D75 /* MockSecureVault.swift in Sources */,
+				37CD54B527F1AC1300F1F7B9 /* PreferencesSidebarModelTests.swift in Sources */,
 				AAEC74B22642C57200C2EFBC /* HistoryCoordinatingMock.swift in Sources */,
 				AAEC74B62642CC6A00C2EFBC /* HistoryStoringMock.swift in Sources */,
 				AA652CB125DD825B009059CC /* LocalBookmarkStoreTests.swift in Sources */,

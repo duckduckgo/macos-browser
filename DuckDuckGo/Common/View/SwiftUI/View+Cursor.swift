@@ -1,5 +1,5 @@
 //
-//  View+WithCursor.swift
+//  View+Cursor.swift
 //
 //  Copyright © 2022 DuckDuckGo. All rights reserved.
 //
@@ -29,9 +29,9 @@ extension View {
 }
 
 private struct CursorModifier: ViewModifier {
-    
+
     let cursor: NSCursor
-    
+
     func body(content: Content) -> some View {
         return content
             .onHover { inside in

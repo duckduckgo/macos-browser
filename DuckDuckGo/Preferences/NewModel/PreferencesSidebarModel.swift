@@ -1,5 +1,5 @@
 //
-//  PreferencesModel.swift
+//  PreferencesSidebarModel.swift
 //
 //  Copyright © 2022 DuckDuckGo. All rights reserved.
 //
@@ -19,23 +19,26 @@
 import SwiftUI
 
 final class PreferencesSidebarModel: ObservableObject {
-    
+
     let sections: [PreferencesSection]
-    
-    let tabSwitcherTabs: [Tab.TabContent] = Tab.TabContent.displayableTabTypes
-    
+    let tabSwitcherTabs: [Tab.TabContent]
+
     @Published var selectedTabIndex: Int = 0
-    
+
     @Published var selectedPane: PreferencePaneIdentifier = .defaultBrowser
 
-    init(sections: [PreferencesSection] = PreferencesSection.defaultSections) {
+    init(
+        sections: [PreferencesSection] = PreferencesSection.defaultSections,
+        tabSwitcherTabs: [Tab.TabContent] = Tab.TabContent.displayableTabTypes
+    ) {
         self.sections = sections
+        self.tabSwitcherTabs = tabSwitcherTabs
         resetTabSelectionIfNeeded()
         if let firstPane = sections.first?.panes.first {
             selectedPane = firstPane
         }
     }
-    
+
     func resetTabSelectionIfNeeded() {
         if let preferencesTabIndex = tabSwitcherTabs.firstIndex(of: .preferences) {
             if preferencesTabIndex != selectedTabIndex {
@@ -43,5 +46,4 @@ final class PreferencesSidebarModel: ObservableObject {
             }
         }
     }
-        
 }

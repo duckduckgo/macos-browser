@@ -20,55 +20,82 @@ import Foundation
 import SwiftUI
 import Combine
 
-final class DefaultBrowserPreferencesModel: ObservableObject {
-    
-    @Published var isDefault: Bool = false
-    
-    private var appDidBecomeActiveCancellable: AnyCancellable?
-    
-    init() {
-        appDidBecomeActiveCancellable = NSApp.isActivePublisher()
-            .filter { $0 }
-            .sink { [unowned self] _ in
-                checkIfDefault()
-            }
-        
-        checkIfDefault()
+protocol DefaultBrowserProvider {
+    var bundleIdentifier: String { get }
+    var isDefault: Bool { get }
+    func presentDefaultBrowserPrompt() throws
+    func openSystemPreferences()
+}
+
+struct SystemDefaultBrowserProvider: DefaultBrowserProvider {
+
+    enum SystemDefaultBrowserProviderError: Error {
+        case unableToSetDefaultURLHandler
     }
-    
-    func checkIfDefault() {
-        var bundleID = AppVersion.shared.identifier
+
+    let bundleIdentifier: String
+
+    var isDefault: Bool {
+        guard let defaultBrowserURL = NSWorkspace.shared.urlForApplication(toOpen: URL(string: "http://")!),
+              let ddgBrowserURL = NSWorkspace.shared.urlForApplication(withBundleIdentifier: bundleIdentifier)
+        else {
+            return false
+        }
+
+        return ddgBrowserURL == defaultBrowserURL
+    }
+
+    init(bundleIdentifier: String = AppVersion.shared.identifier) {
+        var bundleID = bundleIdentifier
         #if DEBUG
         bundleID = bundleID.drop(suffix: ".debug")
         #endif
+        self.bundleIdentifier = bundleIdentifier
+    }
 
-        guard let defaultBrowserURL = NSWorkspace.shared.urlForApplication(toOpen: URL(string: "http://")!),
-              // Another App Instance of the Browser may be already registered as the scheme handler
-              let ddgBrowserURL = NSWorkspace.shared.urlForApplication(withBundleIdentifier: bundleID)
-        else {
-            isDefault = false
-            return
+    func presentDefaultBrowserPrompt() throws {
+        let result = LSSetDefaultHandlerForURLScheme("http" as CFString, bundleIdentifier as CFString)
+        if result != 0 {
+            throw SystemDefaultBrowserProviderError.unableToSetDefaultURLHandler
         }
+    }
 
-        isDefault = ddgBrowserURL == defaultBrowserURL
+    func openSystemPreferences() {
+        // Apple provides a more general URL for opening System Preferences
+        // in the form of "x-apple.systempreferences:com.apple.preference" but it doesn't support
+        // opening the Appearance prefpane directly.
+        NSWorkspace.shared.open(URL(fileURLWithPath: "/System/Library/PreferencePanes/Appearance.prefPane"))
+    }
+}
+
+final class DefaultBrowserPreferencesModel: ObservableObject {
+
+    @Published var isDefault: Bool = false
+
+    private var appDidBecomeActiveCancellable: AnyCancellable?
+    private let defaultBrowserProvider: DefaultBrowserProvider
+
+    init(defaultBrowserProvider: DefaultBrowserProvider = SystemDefaultBrowserProvider()) {
+        self.defaultBrowserProvider = defaultBrowserProvider
+
+        appDidBecomeActiveCancellable = NSApp.isActivePublisher()
+            .filter { $0 }
+            .sink { [weak self] _ in
+                self?.checkIfDefault()
+            }
+
+        checkIfDefault()
+    }
+
+    func checkIfDefault() {
+        isDefault = defaultBrowserProvider.isDefault
     }
 
     func becomeDefault() {
-        if !presentDefaultBrowserPromptIfPossible() {
-            openSystemPreferences()
+        do {
+            try defaultBrowserProvider.presentDefaultBrowserPrompt()
+        } catch {
+            defaultBrowserProvider.openSystemPreferences()
         }
-    }
-
-    private func presentDefaultBrowserPromptIfPossible() -> Bool {
-        let bundleID = AppVersion.shared.identifier
-
-        let result = LSSetDefaultHandlerForURLScheme("http" as CFString, bundleID as CFString)
-        return result == 0
-    }
-
-    private func openSystemPreferences() {
-        // Apple provides a more general URL for opening System Preferences in the form of "x-apple.systempreferences:com.apple.preference" but it
-        // doesn't support opening the Appearance prefpane directly.
-        NSWorkspace.shared.open(URL(fileURLWithPath: "/System/Library/PreferencePanes/Appearance.prefPane"))
     }
 }
