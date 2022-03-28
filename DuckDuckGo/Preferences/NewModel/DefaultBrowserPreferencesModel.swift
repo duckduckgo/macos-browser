@@ -70,7 +70,7 @@ struct SystemDefaultBrowserProvider: DefaultBrowserProvider {
 
 final class DefaultBrowserPreferencesModel: ObservableObject {
 
-    @Published var isDefault: Bool = false
+    @Published private(set) var isDefault: Bool = false
 
     private var appDidBecomeActiveCancellable: AnyCancellable?
     private let defaultBrowserProvider: DefaultBrowserProvider
@@ -78,8 +78,8 @@ final class DefaultBrowserPreferencesModel: ObservableObject {
     init(defaultBrowserProvider: DefaultBrowserProvider = SystemDefaultBrowserProvider()) {
         self.defaultBrowserProvider = defaultBrowserProvider
 
-        appDidBecomeActiveCancellable = NSApp.isActivePublisher()
-            .filter { $0 }
+        appDidBecomeActiveCancellable = NotificationCenter.default
+            .publisher(for: NSApplication.didBecomeActiveNotification)
             .sink { [weak self] _ in
                 self?.checkIfDefault()
             }
@@ -91,7 +91,15 @@ final class DefaultBrowserPreferencesModel: ObservableObject {
         isDefault = defaultBrowserProvider.isDefault
     }
 
-    func becomeDefault() {
+    func becomeDefault(_ completion: ((Bool) -> Void)? = nil) {
+        if let receiveValue = completion {
+            // Skip initial value and wait for the next event (happening on appDidBecomeActive)
+            // Take only one value, which ensures that the subscription is automatically disposed of.
+            $isDefault.dropFirst().prefix(1).subscribe(
+                Subscribers.Sink(receiveCompletion: { _ in }, receiveValue: receiveValue)
+            )
+        }
+
         do {
             try defaultBrowserProvider.presentDefaultBrowserPrompt()
         } catch {

@@ -29,7 +29,7 @@ final class HomePageViewController: NSViewController {
     private let historyCoordinating: HistoryCoordinating
 
     private weak var host: NSView?
- 
+
     var favoritesModel: HomePage.Models.FavoritesModel!
     var defaultBrowserModel: HomePage.Models.DefaultBrowserModel!
     var recentlyVisitedModel: HomePage.Models.RecentlyVisitedModel!
@@ -103,9 +103,11 @@ final class HomePageViewController: NSViewController {
     }
 
     func createDefaultBrowserModel() -> HomePage.Models.DefaultBrowserModel {
-        return .init(isDefault: DefaultBrowserPreferences.isDefault, wasClosed: defaultBrowserDismissed, requestSetDefault: { [weak self] in
-            DefaultBrowserPreferences.becomeDefault { [weak self] in
-                self?.defaultBrowserModel.isDefault = DefaultBrowserPreferences.isDefault
+        return .init(isDefault: DefaultBrowserPreferencesModel().isDefault, wasClosed: defaultBrowserDismissed, requestSetDefault: { [weak self] in
+            let defaultBrowserPreferencesModel = DefaultBrowserPreferencesModel()
+            defaultBrowserPreferencesModel.becomeDefault { [weak self] isDefault in
+                _ = defaultBrowserPreferencesModel
+                self?.defaultBrowserModel.isDefault = isDefault
             }
         }, close: { [weak self] in
             self?.defaultBrowserDismissed = true

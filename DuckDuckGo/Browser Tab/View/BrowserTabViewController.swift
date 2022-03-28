@@ -57,7 +57,7 @@ final class BrowserTabViewController: NSViewController {
     private var transientTabContentViewController: NSViewController?
 
     private var mouseDownMonitor: Any?
-    
+
     required init?(coder: NSCoder) {
         fatalError("BrowserTabViewController: Bad initializer")
     }
@@ -118,7 +118,7 @@ final class BrowserTabViewController: NSViewController {
                 self?.showTabContent(of: selectedTabViewModel)
                 self?.subscribeToErrorViewState()
                 self?.subscribeToTabContent(of: selectedTabViewModel)
-        }
+            }
     }
 
     private func removeWebViewFromHierarchy(webView: WebView? = nil,
@@ -235,7 +235,7 @@ final class BrowserTabViewController: NSViewController {
             if let parentTab = tabCollectionViewModel.selectedTabViewModel?.tab.parentTab, parentTab.delegate !== self {
                 parentTab.delegate?.tab(parentTab, requestedNewTabWith: content, selected: true)
                 parentTab.webView.window?.makeKeyAndOrderFront(nil)
-            // Act as default URL Handler if no Parent
+                // Act as default URL Handler if no Parent
             } else {
                 WindowControllersManager.shared.showTab(with: content)
             }
@@ -328,7 +328,7 @@ final class BrowserTabViewController: NSViewController {
         case nil, .some(.none):
             removeAllTabContent()
         }
-        
+
     }
 
     // MARK: - Preferences
@@ -405,24 +405,24 @@ extension BrowserTabViewController: TabDelegate {
         // > When the focus is stolen, it assumes that the custom protocol launches external app and therefore it exists.
         // Which, looking at the Zoom launcher code, is almost what they're doing:
         /*
-            document.body.focus();
-            var t = function() {
-                return window.removeEventListener("blur", o)
-            };
-            function o() {
-                n(),
-                t()
-            }
-            var s = i.isMobile ? Ar : Cr;
-            if (setTimeout((function() {
-                n({
-                    code: 1001,
-                    message: "urlscheme no blur within timout " + s + "ms"
-                }),
-                t()
-            }), s), window.addEventListener("blur", o)
-            ...
-        */
+         document.body.focus();
+         var t = function() {
+         return window.removeEventListener("blur", o)
+         };
+         function o() {
+         n(),
+         t()
+         }
+         var s = i.isMobile ? Ar : Cr;
+         if (setTimeout((function() {
+         n({
+         code: 1001,
+         message: "urlscheme no blur within timout " + s + "ms"
+         }),
+         t()
+         }), s), window.addEventListener("blur", o)
+         ...
+         */
         // The code immediately after that then creates an iframe with the zoommtg:// link in it
         // if the app is installed, the browser protocol handler will show, which triggers a blur event
         // So, we'll steal a WebView focus if the app is installed, otherwise download should be triggered
@@ -993,17 +993,18 @@ extension BrowserTabViewController: OnboardingDelegate {
     }
 
     func onboardingDidRequestSetDefault(completion: @escaping () -> Void) {
-        if DefaultBrowserPreferences.isDefault {
+        let defaultBrowserPreferences = DefaultBrowserPreferencesModel()
+        if defaultBrowserPreferences.isDefault {
             completion()
             return
         }
 
-        DefaultBrowserPreferences.becomeDefault {
+        defaultBrowserPreferences.becomeDefault { _ in
+            _ = defaultBrowserPreferences
             withAnimation {
                 completion()
             }
         }
-
     }
 
     func onboardingHasFinished() {

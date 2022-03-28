@@ -58,8 +58,8 @@ final class DefaultBrowserPreferencesModelTests: XCTestCase {
     }
 
     func testWhenCheckIfDefaultIsCalledThenValueIsUpdatedFromProvider() throws {
+        provider.isDefault = false
         let model = DefaultBrowserPreferencesModel(defaultBrowserProvider: provider)
-        model.isDefault = false
         provider.isDefault = true
 
         XCTAssertNotEqual(model.isDefault, provider.isDefault)

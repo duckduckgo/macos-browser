@@ -114,13 +114,9 @@ extension URL {
     static var welcome: URL {
         return URL(string: "about:welcome")!
     }
-    
+
     static var preferences: URL {
         return URL(string: "about:preferences")!
-    }
-
-    static var newPreferences: URL {
-        return URL(string: "about:newpreferences")!
     }
 
     // MARK: Pixel
@@ -138,11 +134,11 @@ extension URL {
     // MARK: ATB
 
     static var devMode: String {
-    #if DEBUG
+        #if DEBUG
         return "?test=1"
-    #else
+        #else
         return ""
-    #endif
+        #endif
     }
 
     static let atb = "\(Self.duckDuckGo)atb.js\(devMode)"
@@ -277,7 +273,7 @@ extension URL {
 
         return filename
     }
-    
+
     public func isPart(ofDomain domain: String) -> Bool {
         guard let host = host else { return false }
         return host == domain || host.hasSuffix(".\(domain)")
@@ -321,7 +317,7 @@ extension URL {
     static var aboutDuckDuckGo: URL {
         return URL(string: "https://duckduckgo.com/about")!
     }
-    
+
     static var gpcLearnMore: URL {
         return URL(string: "https://help.duckduckgo.com/duckduckgo-help-pages/privacy/gpc/")!
     }
@@ -422,7 +418,7 @@ extension URL {
         }
 
     }
-    
+
     // MARK: - GPC
 
     static func gpcHeadersEnabled(config: PrivacyConfiguration) -> [String] {
@@ -434,11 +430,11 @@ extension URL {
 
         return enabledSites
     }
-    
+
     static func isGPCEnabled(url: URL,
                              config: PrivacyConfiguration = ContentBlocking.shared.privacyConfigurationManager.privacyConfig) -> Bool {
         let enabledSites = gpcHeadersEnabled(config: config)
-        
+
         for gpcHost in enabledSites {
             if url.isPart(ofDomain: gpcHost) {
                 // Check if url is on exception list
@@ -447,15 +443,15 @@ extension URL {
                 return config.isFeature(.gpc, enabledForDomain: url.host)
             }
         }
-        
+
         return false
     }
-    
+
     // MARK: - Waitlist
-    
+
     static let developmentEndpoint = URL(string: "https://quackdev.duckduckgo.com/api/")!
     static let productionEndpoint = URL(string: "https://quack.duckduckgo.com/api/")!
-    
+
     static func redeemMacWaitlistInviteCode(endpoint: URL = .developmentEndpoint) -> URL {
         return endpoint.appendingPathComponent("auth/invites/macosbrowser/redeem")
     }
