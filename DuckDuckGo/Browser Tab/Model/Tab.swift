@@ -145,9 +145,9 @@ final class Tab: NSObject {
     deinit {
         self.userContentController.removeAllUserScripts()
 
-#if DEBUG
+        #if DEBUG
         assert(self.isClosing || !content.isUrl, "tabWillClose() was not called for this Tab")
-#endif
+        #endif
     }
 
     private var userContentController: UserContentController {
@@ -161,15 +161,15 @@ final class Tab: NSObject {
     // MARK: - Properties
 
     let webView: WebView
-    
+
     private var lastUpgradedURL: URL?
 
     var userEnteredUrl = false
 
     var contentChangeEnabled = true
-    
+
     var fbBlockingEnabled = true
-    
+
     @Published private(set) var content: TabContent {
         didSet {
             handleFavicon(oldContent: oldValue)
@@ -232,7 +232,7 @@ final class Tab: NSObject {
 
         // This function is called when the user has manually typed in a new address, which should reset the login detection flow.
         userEnteredUrl = userEntered
-     }
+    }
 
     // Used to track if an error was caused by a download navigation.
     private var currentDownload: URL?
@@ -247,7 +247,7 @@ final class Tab: NSObject {
         webView.getMimeType { mimeType in
             if case .some(.html) = mimeType.flatMap(UTType.init(mimeType:)) {
                 self.delegate?.chooseDestination(suggestedFilename: self.webView.suggestedFilename,
-                                                 directoryURL: DownloadPreferences().selectedDownloadLocation,
+                                                 directoryURL: DownloadsPreferencesModel().effectiveDownloadLocation,
                                                  fileTypes: [.html, .webArchive, .pdf]) { url, fileType in
                     guard let url = url else {
                         completionHandler?(.failure(URLError(.cancelled)))
@@ -397,7 +397,7 @@ final class Tab: NSObject {
         if added {
             Pixel.fire(.fireproof(kind: .init(url: url), suggested: .manual))
         }
-     }
+    }
 
     private var superviewObserver: NSKeyValueObservation?
 
@@ -421,18 +421,18 @@ final class Tab: NSObject {
         }
     }
 
-#if DEBUG
+    #if DEBUG
     private var isClosing = false
-#endif
+    #endif
 
     func tabWillClose() {
         webView.stopLoading()
         webView.stopMediaCapture()
         cbaTimeReporter?.tabWillClose(self)
 
-#if DEBUG
+        #if DEBUG
         self.isClosing = true
-#endif
+        #endif
     }
 
     // MARK: - Favicon
@@ -545,9 +545,9 @@ final class Tab: NSObject {
         if upgradedUrl == nil { return }
         connectionUpgradedTo = upgradedUrl
     }
-    
+
     // MARK: - Printing
-    
+
     // To avoid webpages invoking the printHandler and overwhelming the browser, this property keeps track of the active
     // print operation and ignores incoming printHandler messages if one exists.
     fileprivate var activePrintOperation: NSPrintOperation?
@@ -590,11 +590,11 @@ extension Tab: PrintingUserScriptDelegate {
 
     func printingUserScriptDidRequestPrintController(_ script: PrintingUserScript) {
         guard activePrintOperation == nil else { return }
-        
+
         guard let window = webView.window,
               let printOperation = webView.printOperation()
-              else { return }
-        
+        else { return }
+
         self.activePrintOperation = printOperation
 
         if printOperation.view?.frame.isEmpty == true {
@@ -604,7 +604,7 @@ extension Tab: PrintingUserScriptDelegate {
         let selector = #selector(printOperationDidRun(printOperation: success: contextInfo:))
         printOperation.runModal(for: window, delegate: self, didRun: selector, contextInfo: nil)
     }
-    
+
     @objc func printOperationDidRun(printOperation: NSPrintOperation,
                                     success: Bool,
                                     contextInfo: UnsafeMutableRawPointer?) {
@@ -711,7 +711,7 @@ extension Tab: ClickToLoadUserScriptDelegate {
 
 extension Tab: SurrogatesUserScriptDelegate {
     func surrogatesUserScriptShouldProcessTrackers(_ script: SurrogatesUserScript) -> Bool {
-         return true
+        return true
     }
 
     func surrogatesUserScript(_ script: SurrogatesUserScript, detectedTracker tracker: DetectedTracker, withSurrogate host: String) {
@@ -733,7 +733,7 @@ extension Tab: SecureVaultManagerDelegate {
     func secureVaultManager(_: SecureVaultManager, didAutofill type: AutofillType, withObjectId objectId: Int64) {
         Pixel.fire(.formAutofilled(kind: type.formAutofillKind))
     }
-    
+
     func secureVaultManager(_: SecureVaultManager, didRequestAuthenticationWithCompletionHandler handler: @escaping (Bool) -> Void) {
         DeviceAuthenticator.shared.authenticateUser(reason: .autofill) { authenticationResult in
             handler(authenticationResult.authenticated)
@@ -762,7 +762,7 @@ extension Tab: WKNavigationDelegate {
         static let frameLoadInterrupted = 102
         static let internetConnectionOffline = -1009
     }
-    
+
     func webView(_ webView: WKWebView,
                  didReceive challenge: URLAuthenticationChallenge,
                  completionHandler: @escaping (URLSession.AuthChallengeDisposition, URLCredential?) -> Void) {
@@ -793,7 +793,7 @@ extension Tab: WKNavigationDelegate {
                  decidePolicyFor navigationAction: WKNavigationAction) async -> WKNavigationActionPolicy {
 
         webView.customUserAgent = UserAgent.for(navigationAction.request.url)
-                                                
+
         if navigationAction.isTargetingMainFrame, navigationAction.request.mainDocumentURL?.host != lastUpgradedURL?.host {
             lastUpgradedURL = nil
         }
@@ -809,7 +809,7 @@ extension Tab: WKNavigationDelegate {
                 return .cancel
 
             } else if navigationAction.navigationType != .backForward,
-               let request = GPCRequestFactory.shared.requestForGPC(basedOn: navigationAction.request) {
+                      let request = GPCRequestFactory.shared.requestForGPC(basedOn: navigationAction.request) {
                 self.invalidateBackItemIfNeeded(for: navigationAction)
                 defer {
                     webView.load(request)
@@ -875,7 +875,7 @@ extension Tab: WKNavigationDelegate {
                 }
             }
         }
-        
+
         toggleFBProtection(for: url)
         willPerformNavigationAction(navigationAction)
 
@@ -883,7 +883,7 @@ extension Tab: WKNavigationDelegate {
     }
     // swiftlint:enable cyclomatic_complexity
     // swiftlint:enable function_body_length
-    
+
     private func urlDidUpgrade(_ upgradedURL: URL,
                                navigationAction: WKNavigationAction) {
         lastUpgradedURL = upgradedURL
@@ -891,7 +891,7 @@ extension Tab: WKNavigationDelegate {
         webView.load(upgradedURL)
         setConnectionUpgradedTo(upgradedURL, navigationAction: navigationAction)
     }
-    
+
     private func prepareForContentBlocking() async {
         // Ensure Content Blocking Assets (WKContentRuleList&UserScripts) are installed
         if !userContentController.contentBlockingAssetsInstalled {
@@ -902,7 +902,7 @@ extension Tab: WKNavigationDelegate {
             cbaTimeReporter?.reportNavigationDidNotWaitForRules()
         }
     }
-    
+
     private func toggleFBProtection(for url: URL) {
         // Enable/disable FBProtection only after UserScripts are installed (awaitContentBlockingAssetsInstalled)
         let privacyConfiguration = ContentBlocking.shared.privacyConfigurationManager.privacyConfig
@@ -966,7 +966,7 @@ extension Tab: WKNavigationDelegate {
     func webView(_ webView: WKWebView, didFail navigation: WKNavigation!, withError error: Error) {
         // Failing not captured. Seems the method is called after calling the webview's method goBack()
         // https://app.asana.com/0/1199230911884351/1200381133504356/f
-//        hasError = true
+        //        hasError = true
 
         invalidateSessionStateData()
     }
@@ -1101,7 +1101,7 @@ extension Tab: TabDataClearing {
     func prepareForDataClearing(caller: TabDataCleaner) {
         webView.stopLoading()
         userContentController.removeAllUserScripts()
-        
+
         webView.navigationDelegate = caller
         webView.load(URL(string: "about:blank")!)
     }

@@ -37,10 +37,10 @@ final class FileDownloadManager: FileDownloadManagerProtocol {
 
     static let shared = FileDownloadManager()
     private let workspace: NSWorkspace
-    private let preferences: DownloadPreferences
+    private let preferences: DownloadsPreferencesModel
 
     init(workspace: NSWorkspace = NSWorkspace.shared,
-         preferences: DownloadPreferences = .init()) {
+         preferences: DownloadsPreferencesModel = .init()) {
         self.workspace = workspace
         self.preferences = preferences
     }
@@ -52,9 +52,9 @@ final class FileDownloadManager: FileDownloadManagerProtocol {
     }
 
     typealias FileNameChooserCallback = (/*suggestedFilename:*/ String?,
-                                         /*directoryURL:*/      URL?,
-                                         /*fileTypes:*/         [UTType],
-                                         /*completionHandler*/  @escaping (URL?, UTType?) -> Void) -> Void
+                                                                /*directoryURL:*/      URL?,
+                                                                /*fileTypes:*/         [UTType],
+                                                                /*completionHandler*/  @escaping (URL?, UTType?) -> Void) -> Void
     typealias FileIconOriginalRectCallback = (WebKitDownloadTask) -> NSRect?
 
     private var destinationChooserCallbacks = [WebKitDownloadTask: FileNameChooserCallback]()
@@ -154,7 +154,7 @@ extension FileDownloadManager: WebKitDownloadTaskDelegate {
             self.fileIconOriginalRectCallbacks[task] = nil
         }
 
-        let selectedDownloadLocation = preferences.selectedDownloadLocation
+        let downloadLocation = preferences.effectiveDownloadLocation
         let fileType = task.suggestedFileType
 
         guard task.shouldPromptForLocation || preferences.alwaysRequestDownloadLocation,
@@ -165,7 +165,7 @@ extension FileDownloadManager: WebKitDownloadTaskDelegate {
             if fileName.isEmpty {
                 fileName = .uniqueFilename(for: fileType)
             }
-            if let url = selectedDownloadLocation?.appendingPathComponent(fileName) {
+            if let url = downloadLocation?.appendingPathComponent(fileName) {
                 completion(url, fileType)
             } else {
                 os_log("Failed to access Downloads folder")
@@ -181,7 +181,7 @@ extension FileDownloadManager: WebKitDownloadTaskDelegate {
             suggestedFilename = suggestedFilename.drop(suffix: "." + ext)
         }
 
-        locationChooser(suggestedFilename, selectedDownloadLocation, fileType.map { [$0] } ?? []) { url, fileType in
+        locationChooser(suggestedFilename, downloadLocation, fileType.map { [$0] } ?? []) { url, fileType in
             if let url = url,
                FileManager.default.fileExists(atPath: url.path) {
                 // if SavePanel points to an existing location that means overwrite was chosen

@@ -718,9 +718,9 @@ extension BrowserTabViewController: WKUIDelegate {
             progress.completedUnitCount = progress.totalUnitCount
         }
 
-        let prefs = DownloadPreferences()
+        let prefs = DownloadsPreferencesModel()
         if !prefs.alwaysRequestDownloadLocation,
-           let location = prefs.selectedDownloadLocation {
+           let location = prefs.effectiveDownloadLocation {
             let url = location.appendingPathComponent(suggestedFilename)
             try? write(to: url)
 
@@ -728,7 +728,7 @@ extension BrowserTabViewController: WKUIDelegate {
         }
 
         chooseDestination(suggestedFilename: suggestedFilename,
-                          directoryURL: prefs.selectedDownloadLocation,
+                          directoryURL: prefs.effectiveDownloadLocation,
                           fileTypes: UTType(mimeType: mimeType).map { [$0] } ?? []) { url, _ in
             guard let url = url else { return }
             try? write(to: url)

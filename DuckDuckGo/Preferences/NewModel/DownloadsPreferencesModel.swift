@@ -18,24 +18,68 @@
 
 import Foundation
 
+protocol DownloadsPreferencesPersistor {
+    var selectedDownloadLocation: String? { get set }
+    var alwaysRequestDownloadLocation: Bool { get set }
+
+    var defaultDownloadLocation: URL? { get }
+    func isDownloadLocationValid(_ location: URL) -> Bool
+}
+
+struct DownloadsPreferencesUserDefaultsPersistor: DownloadsPreferencesPersistor {
+    @UserDefaultsWrapper(key: .selectedDownloadLocationKey, defaultValue: nil)
+    var selectedDownloadLocation: String?
+
+    @UserDefaultsWrapper(key: .alwaysRequestDownloadLocationKey, defaultValue: false)
+    var alwaysRequestDownloadLocation: Bool
+
+    var defaultDownloadLocation: URL? {
+        let fileManager = FileManager.default
+        let folders = fileManager.urls(for: .downloadsDirectory, in: .userDomainMask)
+
+        guard let folderURL = folders.first,
+              let resolvedURL = try? URL(resolvingAliasFileAt: folderURL),
+              fileManager.isWritableFile(atPath: resolvedURL.path) else { return nil }
+
+        return resolvedURL
+    }
+
+    func isDownloadLocationValid(_ directoryLocation: URL) -> Bool {
+        let fileManager = FileManager.default
+        guard let resolvedURL = try? URL(resolvingAliasFileAt: directoryLocation) else { return false }
+
+        return fileManager.isWritableFile(atPath: resolvedURL.path)
+    }
+}
+
 final class DownloadsPreferencesModel: ObservableObject {
+
+    var effectiveDownloadLocation: URL? {
+        if let selectedLocation = persistor.selectedDownloadLocation,
+           let selectedLocationURL = URL(string: selectedLocation),
+           Self.isDownloadLocationValid(selectedLocationURL) {
+            return selectedLocationURL
+        }
+
+        return Self.defaultDownloadLocation()
+    }
 
     @Published var selectedDownloadLocation: URL? {
         didSet {
             guard let newDownloadLocation = selectedDownloadLocation else {
-                selectedDownloadLocationDefaultsValue = nil
+                persistor.selectedDownloadLocation = nil
                 return
             }
 
             if Self.isDownloadLocationValid(newDownloadLocation) {
-                selectedDownloadLocationDefaultsValue = newDownloadLocation.absoluteString
+                persistor.selectedDownloadLocation = newDownloadLocation.absoluteString
             }
         }
     }
-    
+
     @Published var alwaysRequestDownloadLocation: Bool = false {
         didSet {
-            alwaysRequestDownloadLocationDefaultsValue = alwaysRequestDownloadLocation
+            persistor.alwaysRequestDownloadLocation = alwaysRequestDownloadLocation
         }
     }
 
@@ -47,28 +91,25 @@ final class DownloadsPreferencesModel: ObservableObject {
             selectedDownloadLocation = selectedURL
         }
     }
-    
-    init() {
-        alwaysRequestDownloadLocation = alwaysRequestDownloadLocationDefaultsValue
+
+    init(persistor: DownloadsPreferencesPersistor = DownloadsPreferencesUserDefaultsPersistor()) {
+        self.persistor = persistor
+        alwaysRequestDownloadLocation = persistor.alwaysRequestDownloadLocation
         selectedDownloadLocation = {
-            if let selectedLocation = selectedDownloadLocationDefaultsValue,
+            if let selectedLocation = persistor.selectedDownloadLocation,
                let selectedLocationURL = URL(string: selectedLocation),
                Self.isDownloadLocationValid(selectedLocationURL) {
+
                 return selectedLocationURL
             }
 
-            return defaultDownloadLocation()
+            return Self.defaultDownloadLocation()
         }()
     }
 
-    @UserDefaultsWrapper(key: .selectedDownloadLocationKey, defaultValue: nil)
-    private var selectedDownloadLocationDefaultsValue: String?
+    private var persistor: DownloadsPreferencesPersistor
 
-    @UserDefaultsWrapper(key: .alwaysRequestDownloadLocationKey, defaultValue: false)
-    // swiftlint:disable:next identifier_name
-    private var alwaysRequestDownloadLocationDefaultsValue: Bool
-
-    private func defaultDownloadLocation() -> URL? {
+    static func defaultDownloadLocation() -> URL? {
         let fileManager = FileManager.default
         let folders = fileManager.urls(for: .downloadsDirectory, in: .userDomainMask)
 
@@ -79,12 +120,7 @@ final class DownloadsPreferencesModel: ObservableObject {
         return resolvedURL
     }
 
-    private static func isDownloadLocationValid(_ directoryLocation: String) -> Bool {
-        guard let directoryURL = URL(string: directoryLocation) else { return false }
-        return isDownloadLocationValid(directoryURL)
-    }
-
-    private static func isDownloadLocationValid(_ directoryLocation: URL) -> Bool {
+    static func isDownloadLocationValid(_ directoryLocation: URL) -> Bool {
         let fileManager = FileManager.default
         guard let resolvedURL = try? URL(resolvingAliasFileAt: directoryLocation) else { return false }
 
