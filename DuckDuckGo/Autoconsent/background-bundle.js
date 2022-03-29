@@ -690,51 +690,12 @@
         }
     }
 
-    // translations for optout button text
-    const buttonText = [
-        "Only allow essential cookies",
-        "Nur erforderliche Cookies erlauben",
-        "Permitir solo cookies imprescindibles"
-    ].join('|');
-    const promptText = [
-        "Allow the use of cookies",
-        "Die Verwendung von Cookies",
-        "Permitir el uso de cookies"
-    ].join('|');
-    class Instagram extends AutoConsentBase {
-        constructor() {
-            super("Instagram");
-        }
-        async detectCmp(tab) {
-            await waitFor(() => tab.eval("document.readyState === 'complete'"), 40, 50);
-            return tab.eval(`!!document.querySelector('div > h2').innerText.match('${promptText}')`);
-        }
-        async detectPopup(tab) {
-            return true;
-        }
-        async optOut(tab) {
-            await tab.eval(`Array.from(document.querySelectorAll('div > button')).filter(el => el.innerText.match('${buttonText}'))[0].click()`);
-            return true;
-        }
-        async optIn(tab) {
-            return true;
-        }
-        async openCmp(tab) {
-            return true;
-        }
-        async test() {
-            // TODO
-            return true;
-        }
-    }
-
     const rules$3 = [
         new TrustArc(),
         new Cookiebot(),
         new SourcePoint(),
         new ConsentManager(),
         new Evidon(),
-        new Instagram(),
     ];
     function createAutoCMP(config) {
         return new AutoConsent$1(config);
