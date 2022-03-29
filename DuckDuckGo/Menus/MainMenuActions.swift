@@ -476,6 +476,16 @@ extension MainViewController {
         }
     }
     
+    @IBAction func generateRandomizedCredential(_ sender: Any?) {
+        let vault = try? SecureVaultFactory.default.makeVault(errorReporter: SecureVaultErrorReporter.shared)
+        
+        let account = SecureVaultModels.WebsiteAccount(title: UUID().uuidString, username: "", domain: "\(UUID().uuidString).com")
+        let password = UUID().uuidString.data(using: .utf8)!
+        let credentials = SecureVaultModels.WebsiteCredentials(account: account, password: password)
+
+        _ = try? vault?.storeWebsiteCredentials(credentials)
+    }
+    
     @IBAction func resetBookmarks(_ sender: Any?) {
         guard let topLevelEntities = LocalBookmarkManager.shared.list?.topLevelEntities else {
             return
