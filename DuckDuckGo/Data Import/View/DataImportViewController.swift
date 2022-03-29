@@ -33,7 +33,7 @@ final class DataImportViewController: NSViewController {
         case unableToImport
         case permissionsRequired([DataImport.DataType])
         case ableToImport
-        case moreInfoAvailabile
+        case moreInfoAvailable
         case failedToImport
         case completedImport([DataImport.Summary])
     }
@@ -45,7 +45,7 @@ final class DataImportViewController: NSViewController {
         static func defaultState() -> ViewState {
             if let firstInstalledBrowser = ThirdPartyBrowser.installedBrowsers.first {
                 return ViewState(selectedImportSource: firstInstalledBrowser.importSource,
-                                 interactionState: firstInstalledBrowser.importSource == .safari ? .ableToImport : .moreInfoAvailabile)
+                                 interactionState: firstInstalledBrowser.importSource == .safari ? .ableToImport : .moreInfoAvailable)
             } else {
                 return ViewState(selectedImportSource: .csv, interactionState: .ableToImport)
             }
@@ -118,7 +118,7 @@ final class DataImportViewController: NSViewController {
 
     @IBAction func cancelButtonClicked(_ sender: Any) {
         if currentChildViewController is BrowserImportMoreInfoViewController {
-            viewState = .init(selectedImportSource: viewState.selectedImportSource, interactionState: .moreInfoAvailabile)
+            viewState = .init(selectedImportSource: viewState.selectedImportSource, interactionState: .moreInfoAvailable)
             importSourcePopUpButton.isEnabled = true
             cancelButton.title = UserText.cancel
         } else {
@@ -130,7 +130,7 @@ final class DataImportViewController: NSViewController {
         switch viewState.interactionState {
         case .ableToImport, .failedToImport: beginImport()
         case .completedImport: dismiss()
-        case .moreInfoAvailabile: showMoreInfo()
+        case .moreInfoAvailable: showMoreInfo()
         default:
             assertionFailure("\(#file): Import button should be disabled when unable to import")
         }
@@ -164,7 +164,7 @@ final class DataImportViewController: NSViewController {
 
         case .chrome, .firefox, .brave, .edge:
             self.viewState = ViewState(selectedImportSource: source,
-                                       interactionState: loginsSelected ? .moreInfoAvailabile : .ableToImport)
+                                       interactionState: loginsSelected ? .moreInfoAvailable : .ableToImport)
         }
 
     }
@@ -198,7 +198,7 @@ final class DataImportViewController: NSViewController {
             importButton.title = UserText.initiateImport
             importButton.isEnabled = true
             cancelButton.isHidden = false
-        case .moreInfoAvailabile:
+        case .moreInfoAvailable:
             importSourcePopUpButton.isHidden = false
             importButton.title = UserText.next
             importButton.isEnabled = true
