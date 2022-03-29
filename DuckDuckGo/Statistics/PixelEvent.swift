@@ -160,6 +160,8 @@ extension Pixel {
         case passwordManagerLockScreenTimeoutSelected15Minutes
         case passwordManagerLockScreenTimeoutSelected30Minutes
         case passwordManagerLockScreenTimeoutSelected1Hour
+        
+        case ampBlockingRulesCompilationFailed
 
         case debug(event: Debug, error: Error? = nil)
 
@@ -361,6 +363,9 @@ extension Pixel.Event {
             
         case .passwordManagerLockScreenTimeoutSelected1Hour:
             return "m_mac_password_mananger_lock_screen_timeout_selected_1_hour"
+            
+        case .ampBlockingRulesCompilationFailed:
+            return "m_mac_amp_rules_compilation_failed"
         }
     }
 
