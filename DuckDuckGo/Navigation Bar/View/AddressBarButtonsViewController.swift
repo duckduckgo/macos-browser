@@ -73,7 +73,7 @@ final class AddressBarButtonsViewController: NSViewController {
     }
     @IBOutlet weak var privacyDashboardPositioningView: NSView!
 
-    @IBOutlet weak var privacyEntryPointButton: AddressBarButton!
+    @IBOutlet weak var privacyEntryPointButton: MouseOverAnimationButton!
     @IBOutlet weak var bookmarkButton: AddressBarButton!
     @IBOutlet weak var imageButtonWrapper: NSView!
     @IBOutlet weak var imageButton: NSButton!
@@ -154,6 +154,7 @@ final class AddressBarButtonsViewController: NSViewController {
     private var effectiveAppearanceCancellable: AnyCancellable?
     private var permissionsCancellables = Set<AnyCancellable>()
     private var trackerAnimationTriggerCancellable: AnyCancellable?
+    private var isMouseOverAnimationVisibleCancellable: AnyCancellable?
 
     required init?(coder: NSCoder) {
         fatalError("AddressBarButtonsViewController: Bad initializer")
@@ -174,6 +175,7 @@ final class AddressBarButtonsViewController: NSViewController {
         subscribeToBookmarkList()
         subscribePrivacyDashboardPendingUpdates()
         subscribeToEffectiveAppearance()
+        subscribeToIsMouseOverAnimationVisible()
         updateBookmarkButtonVisibility()
     }
 
@@ -459,14 +461,17 @@ final class AddressBarButtonsViewController: NSViewController {
     }
 
     private var animationViewCache = [String: AnimationView]()
-    private func getAnimationView(for animationName: String) -> AnimationView {
+    private func getAnimationView(for animationName: String) -> AnimationView? {
         if let animationView = animationViewCache[animationName] {
             return animationView
         }
 
-        let animation = Animation.named(animationName, animationCache: LottieAnimationCache.shared)
-        let animationView = AnimationView(animation: animation, imageProvider: trackerAnimationImageProvider)
-        animationView.identifier = NSUserInterfaceItemIdentifier(rawValue: animationName)
+        guard let animationView = AnimationView(named: animationName,
+                                                imageProvider: trackerAnimationImageProvider) else {
+            assertionFailure("Missing animation file")
+            return nil
+        }
+
         animationViewCache[animationName] = animationView
         return animationView
     }
@@ -484,7 +489,7 @@ final class AddressBarButtonsViewController: NSViewController {
                 newAnimationView = AnimationView()
             } else {
                 // For unknown reason, this caused infinite execution of various unit tests.
-                newAnimationView = getAnimationView(for: animationName)
+                newAnimationView = getAnimationView(for: animationName) ?? AnimationView()
             }
             animationWrapperView.addAndLayout(newAnimationView)
             newAnimationView.isHidden = true
@@ -684,7 +689,7 @@ final class AddressBarButtonsViewController: NSViewController {
             return
         }
 
-        guard !isAnyTrackerAnimationPlaying else {
+        guard !isAnyShieldAnimationPlaying else {
             privacyEntryPointButton.image = nil
             return
         }
@@ -702,7 +707,15 @@ final class AddressBarButtonsViewController: NSViewController {
             let configuration = ContentBlocking.shared.privacyConfigurationManager.privacyConfig
             let isUnprotected = configuration.isUserUnprotected(domain: host)
 
-            privacyEntryPointButton.image = isNotSecure || isMajorTrackingNetwork || isUnprotected ? Self.shieldDotImage : Self.shieldImage
+            let isShieldDotVisible = isNotSecure || isMajorTrackingNetwork || isUnprotected
+
+            privacyEntryPointButton.image = isShieldDotVisible ? Self.shieldDotImage : Self.shieldImage
+
+            let shieldDotMouseOverAnimationNames = MouseOverAnimationButton.AnimationNames(aqua: "shield-dot-mouse-over",
+                                                                                           dark: "dark-shield-dot-mouse-over")
+            let shieldMouseOverAnimationNames = MouseOverAnimationButton.AnimationNames(aqua: "shield-mouse-over",
+                                                                                        dark: "dark-shield-mouse-over")
+            privacyEntryPointButton.animationNames = isShieldDotVisible ? shieldDotMouseOverAnimationNames: shieldMouseOverAnimationNames
         default:
             break
         }
@@ -718,6 +731,11 @@ final class AddressBarButtonsViewController: NSViewController {
 
         switch selectedTabViewModel.tab.content {
         case .url(let url):
+            // Don't play the shield animation if mouse is over
+            guard !privacyEntryPointButton.isAnimationViewVisible else {
+                break
+            }
+
             var animationView: AnimationView
             if url.scheme == "http" {
                 animationView = shieldDotAnimationView
@@ -757,7 +775,7 @@ final class AddressBarButtonsViewController: NSViewController {
         updatePermissionButtons()
     }
 
-    private func stopAnimations() {
+    private func stopAnimations(trackerAnimations: Bool = true, shieldAnimations: Bool = true) {
         func stopAnimation(_ animationView: AnimationView) {
             if animationView.isAnimationPlaying || !animationView.isHidden {
                 animationView.isHidden = true
@@ -765,17 +783,26 @@ final class AddressBarButtonsViewController: NSViewController {
             }
         }
 
-        stopAnimation(trackerAnimationView1)
-        stopAnimation(trackerAnimationView2)
-        stopAnimation(trackerAnimationView3)
-        stopAnimation(shieldAnimationView)
-        stopAnimation(shieldDotAnimationView)
+        if trackerAnimations {
+            stopAnimation(trackerAnimationView1)
+            stopAnimation(trackerAnimationView2)
+            stopAnimation(trackerAnimationView3)
+        }
+        if shieldAnimations {
+            stopAnimation(shieldAnimationView)
+            stopAnimation(shieldDotAnimationView)
+        }
     }
 
     private var isAnyTrackerAnimationPlaying: Bool {
         trackerAnimationView1.isAnimationPlaying ||
         trackerAnimationView2.isAnimationPlaying ||
         trackerAnimationView3.isAnimationPlaying
+    }
+
+    private var isAnyShieldAnimationPlaying: Bool {
+        shieldAnimationView.isAnimationPlaying ||
+        shieldDotAnimationView.isAnimationPlaying
     }
 
     private func stopAnimationsAfterFocus() {
@@ -817,6 +844,18 @@ final class AddressBarButtonsViewController: NSViewController {
             .sink { [weak self] _ in
                 self?.setupAnimationViews()
                 self?.updatePrivacyEntryPointIcon()
+            }
+    }
+
+    private func subscribeToIsMouseOverAnimationVisible() {
+        isMouseOverAnimationVisibleCancellable = privacyEntryPointButton.$isAnimationViewVisible
+            .dropFirst()
+            .sink { [weak self] isAnimationViewVisible in
+                if isAnimationViewVisible {
+                    self?.stopAnimations(trackerAnimations: false, shieldAnimations: true)
+                } else {
+                    self?.updatePrivacyEntryPointIcon()
+                }
             }
     }
 

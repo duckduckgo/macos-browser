@@ -399,6 +399,14 @@
 		AA7412B724D1687000D22FE0 /* TabBarScrollView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA7412B624D1687000D22FE0 /* TabBarScrollView.swift */; };
 		AA7412BD24D2BEEE00D22FE0 /* MainWindow.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA7412BC24D2BEEE00D22FE0 /* MainWindow.swift */; };
 		AA75A0AE26F3500C0086B667 /* PrivacyIconViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA75A0AD26F3500C0086B667 /* PrivacyIconViewModel.swift */; };
+		AA7EB6DF27E7C57D00036718 /* MouseOverAnimationButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA7EB6DE27E7C57D00036718 /* MouseOverAnimationButton.swift */; };
+		AA7EB6E227E7D05500036718 /* flame-mouse-over.json in Resources */ = {isa = PBXBuildFile; fileRef = AA7EB6E027E7D05500036718 /* flame-mouse-over.json */; };
+		AA7EB6E327E7D05500036718 /* dark-flame-mouse-over.json in Resources */ = {isa = PBXBuildFile; fileRef = AA7EB6E127E7D05500036718 /* dark-flame-mouse-over.json */; };
+		AA7EB6E527E7D6DC00036718 /* AnimationView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA7EB6E427E7D6DC00036718 /* AnimationView.swift */; };
+		AA7EB6E727E8809D00036718 /* shield-mouse-over.json in Resources */ = {isa = PBXBuildFile; fileRef = AA7EB6E627E8809D00036718 /* shield-mouse-over.json */; };
+		AA7EB6E927E880A600036718 /* shield-dot-mouse-over.json in Resources */ = {isa = PBXBuildFile; fileRef = AA7EB6E827E880A600036718 /* shield-dot-mouse-over.json */; };
+		AA7EB6EB27E880AE00036718 /* dark-shield-mouse-over.json in Resources */ = {isa = PBXBuildFile; fileRef = AA7EB6EA27E880AE00036718 /* dark-shield-mouse-over.json */; };
+		AA7EB6ED27E880B600036718 /* dark-shield-dot-mouse-over.json in Resources */ = {isa = PBXBuildFile; fileRef = AA7EB6EC27E880B600036718 /* dark-shield-dot-mouse-over.json */; };
 		AA80EC54256BE3BC007083E7 /* UserText.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA80EC53256BE3BC007083E7 /* UserText.swift */; };
 		AA80EC67256C4691007083E7 /* BrowserTab.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = AA80EC69256C4691007083E7 /* BrowserTab.storyboard */; };
 		AA80EC73256C46A2007083E7 /* Suggestion.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = AA80EC75256C46A2007083E7 /* Suggestion.storyboard */; };
@@ -1135,6 +1143,14 @@
 		AA7412BC24D2BEEE00D22FE0 /* MainWindow.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MainWindow.swift; sourceTree = "<group>"; };
 		AA75A0AD26F3500C0086B667 /* PrivacyIconViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PrivacyIconViewModel.swift; sourceTree = "<group>"; };
 		AA7DE8E026A9BD000012B490 /* History 2.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = "History 2.xcdatamodel"; sourceTree = "<group>"; };
+		AA7EB6DE27E7C57D00036718 /* MouseOverAnimationButton.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MouseOverAnimationButton.swift; sourceTree = "<group>"; };
+		AA7EB6E027E7D05500036718 /* flame-mouse-over.json */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.json; path = "flame-mouse-over.json"; sourceTree = "<group>"; };
+		AA7EB6E127E7D05500036718 /* dark-flame-mouse-over.json */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.json; path = "dark-flame-mouse-over.json"; sourceTree = "<group>"; };
+		AA7EB6E427E7D6DC00036718 /* AnimationView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AnimationView.swift; sourceTree = "<group>"; };
+		AA7EB6E627E8809D00036718 /* shield-mouse-over.json */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.json; path = "shield-mouse-over.json"; sourceTree = "<group>"; };
+		AA7EB6E827E880A600036718 /* shield-dot-mouse-over.json */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.json; path = "shield-dot-mouse-over.json"; sourceTree = "<group>"; };
+		AA7EB6EA27E880AE00036718 /* dark-shield-mouse-over.json */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.json; path = "dark-shield-mouse-over.json"; sourceTree = "<group>"; };
+		AA7EB6EC27E880B600036718 /* dark-shield-dot-mouse-over.json */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.json; path = "dark-shield-dot-mouse-over.json"; sourceTree = "<group>"; };
 		AA80EC53256BE3BC007083E7 /* UserText.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UserText.swift; sourceTree = "<group>"; };
 		AA80EC68256C4691007083E7 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/BrowserTab.storyboard; sourceTree = "<group>"; };
 		AA80EC74256C46A2007083E7 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/Suggestion.storyboard; sourceTree = "<group>"; };
@@ -2183,6 +2199,7 @@
 				B693954426F04BE90015B914 /* LongPressButton.swift */,
 				B693953F26F04BE80015B914 /* MouseClickView.swift */,
 				B693954926F04BEB0015B914 /* MouseOverButton.swift */,
+				AA7EB6DE27E7C57D00036718 /* MouseOverAnimationButton.swift */,
 				4B379C2327BDE1B0008A968E /* FlatButton.swift */,
 				B693953D26F04BE70015B914 /* MouseOverView.swift */,
 				B693953C26F04BE70015B914 /* NibLoadable.swift */,
@@ -2742,6 +2759,29 @@
 			path = View;
 			sourceTree = "<group>";
 		};
+		AA7EB6EE27E880EA00036718 /* Animations */ = {
+			isa = PBXGroup;
+			children = (
+				AA3439732754D55100B241FA /* trackers-1.json */,
+				AA3439742754D55100B241FA /* trackers-2.json */,
+				AA3439752754D55100B241FA /* trackers-3.json */,
+				AA34396A2754D4E200B241FA /* shield.json */,
+				AA34396B2754D4E300B241FA /* shield-dot.json */,
+				AA7EB6E027E7D05500036718 /* flame-mouse-over.json */,
+				AA7EB6E627E8809D00036718 /* shield-mouse-over.json */,
+				AA7EB6E827E880A600036718 /* shield-dot-mouse-over.json */,
+				AA3439762754D55100B241FA /* dark-trackers-1.json */,
+				AA3439722754D55100B241FA /* dark-trackers-2.json */,
+				AA3439772754D55100B241FA /* dark-trackers-3.json */,
+				AA34396F2754D4E900B241FA /* dark-shield.json */,
+				AA34396E2754D4E900B241FA /* dark-shield-dot.json */,
+				AA7EB6E127E7D05500036718 /* dark-flame-mouse-over.json */,
+				AA7EB6EA27E880AE00036718 /* dark-shield-mouse-over.json */,
+				AA7EB6EC27E880B600036718 /* dark-shield-dot-mouse-over.json */,
+			);
+			path = Animations;
+			sourceTree = "<group>";
+		};
 		AA80EC52256BE33A007083E7 /* Localizables */ = {
 			isa = PBXGroup;
 			children = (
@@ -2816,6 +2856,7 @@
 		AA86491624D8339A001BABEE /* View */ = {
 			isa = PBXGroup;
 			children = (
+				AA7EB6EE27E880EA00036718 /* Animations */,
 				85589E8C27BBBB870038AD11 /* NavigationBar.storyboard */,
 				AA68C3D22490ED62001B8783 /* NavigationBarViewController.swift */,
 				14D9B8F924F7E089000D4D13 /* AddressBarViewController.swift */,
@@ -2824,16 +2865,6 @@
 				AAC5E4F025D6BF10007F5990 /* AddressBarButton.swift */,
 				AAA0CC32252F181A0079BC96 /* NavigationButtonMenuDelegate.swift */,
 				AAA0CC462533833C0079BC96 /* MoreOptionsMenu.swift */,
-				AA3439732754D55100B241FA /* trackers-1.json */,
-				AA3439742754D55100B241FA /* trackers-2.json */,
-				AA3439752754D55100B241FA /* trackers-3.json */,
-				AA34396A2754D4E200B241FA /* shield.json */,
-				AA34396B2754D4E300B241FA /* shield-dot.json */,
-				AA3439762754D55100B241FA /* dark-trackers-1.json */,
-				AA3439722754D55100B241FA /* dark-trackers-2.json */,
-				AA3439772754D55100B241FA /* dark-trackers-3.json */,
-				AA34396F2754D4E900B241FA /* dark-shield.json */,
-				AA34396E2754D4E900B241FA /* dark-shield-dot.json */,
 			);
 			path = View;
 			sourceTree = "<group>";
@@ -3187,6 +3218,7 @@
 			children = (
 				B6DB3CF826A00E2D00D459B7 /* AVCaptureDevice+SwizzledAuthState.swift */,
 				AA61C0D12727F59B00E6B681 /* ArrayExtension.swift */,
+				AA7EB6E427E7D6DC00036718 /* AnimationView.swift */,
 				B6106B9D26A565DA0013B453 /* BundleExtension.swift */,
 				4BA1A6C1258B0A1300F6F690 /* ContiguousBytesExtension.swift */,
 				85AC3AF625D5DBFD00C7D2AA /* DataExtension.swift */,
@@ -3886,6 +3918,7 @@
 				9833913127AAA4B500DAF119 /* trackerData.json in Resources */,
 				4B0511CE262CAA5A00F6079C /* DownloadPreferencesTableCellView.xib in Resources */,
 				B31055CA27A1BA1D001AC618 /* background.js in Resources */,
+				AA7EB6ED27E880B600036718 /* dark-shield-dot-mouse-over.json in Resources */,
 				8511E18425F82B34002F516B /* 01_Fire_really_small.json in Resources */,
 				85B7184A27677C2D00B4277F /* Onboarding.storyboard in Resources */,
 				4B0511C3262CAA5A00F6079C /* Preferences.storyboard in Resources */,
@@ -3893,6 +3926,7 @@
 				B6B1E88226D5DAC30062C350 /* Downloads.storyboard in Resources */,
 				AA3439712754D4E900B241FA /* dark-shield.json in Resources */,
 				B31055C827A1BA1D001AC618 /* background-bundle.js in Resources */,
+				AA7EB6EB27E880AE00036718 /* dark-shield-mouse-over.json in Resources */,
 				B31055CB27A1BA1D001AC618 /* autoconsent-bundle.js in Resources */,
 				7B1E819F27C8874900FF0E60 /* ContentOverlay.storyboard in Resources */,
 				85A0117425AF2EDF00FA6A0C /* FindInPage.storyboard in Resources */,
@@ -3923,6 +3957,7 @@
 				4B92929026670D1700AD2C21 /* BookmarkTableCellView.xib in Resources */,
 				85AC7AD927BD625000FFB69B /* HomePageAssets.xcassets in Resources */,
 				339A6B5826A044BA00E3DAE8 /* duckduckgo-privacy-dashboard in Resources */,
+				AA7EB6E727E8809D00036718 /* shield-mouse-over.json in Resources */,
 				4B379C1B27BD9F88008A968E /* LoginsPreferencesTableCellView.xib in Resources */,
 				B31055C727A1BA1D001AC618 /* browser-shim.js in Resources */,
 				4B92928E26670D1700AD2C21 /* BookmarkOutlineViewCell.xib in Resources */,
@@ -3933,10 +3968,13 @@
 				AAB7320726DD0C37002FACF9 /* Fire.storyboard in Resources */,
 				85589E8F27BBBBF10038AD11 /* Main.storyboard in Resources */,
 				EA18D1CA272F0DC8006DC101 /* social_images in Resources */,
+				AA7EB6E927E880A600036718 /* shield-dot-mouse-over.json in Resources */,
 				AA80EC8F256C49BC007083E7 /* Localizable.stringsdict in Resources */,
 				EAC80DE0271F6C0100BBF02D /* fb-sdk.js in Resources */,
 				85625994269C8F9600EE44BC /* PasswordManager.storyboard in Resources */,
 				4B0511C6262CAA5A00F6079C /* DefaultBrowserTableCellView.xib in Resources */,
+				AA7EB6E327E7D05500036718 /* dark-flame-mouse-over.json in Resources */,
+				AA7EB6E227E7D05500036718 /* flame-mouse-over.json in Resources */,
 				4B677433255DBEB800025BD8 /* httpsMobileV2Bloom.bin in Resources */,
 				AA34397B2754D55100B241FA /* trackers-3.json in Resources */,
 				026ADE1426C3010C002518EE /* macos-config.json in Resources */,
@@ -4375,6 +4413,7 @@
 				4B9292A326670D2A00AD2C21 /* BookmarkManagedObject.swift in Sources */,
 				4B723E1326B0007A00E14D75 /* CSVLoginExporter.swift in Sources */,
 				85C48CCC278D808F00D3263E /* NSAttributedStringExtension.swift in Sources */,
+				AA7EB6E527E7D6DC00036718 /* AnimationView.swift in Sources */,
 				8562599A269CA0A600EE44BC /* NSRectExtension.swift in Sources */,
 				4B0511C5262CAA5A00F6079C /* PrivacySecurityPreferencesTableCellView.swift in Sources */,
 				B6040856274B830F00680351 /* DictionaryExtension.swift in Sources */,
@@ -4432,6 +4471,7 @@
 				B693954A26F04BEB0015B914 /* NibLoadable.swift in Sources */,
 				AA3D531527A1ED9300074EC1 /* FeedbackWindow.swift in Sources */,
 				85F0FF1327CFAB04001C7C6E /* RecentlyVisitedView.swift in Sources */,
+				AA7EB6DF27E7C57D00036718 /* MouseOverAnimationButton.swift in Sources */,
 				AA7412B724D1687000D22FE0 /* TabBarScrollView.swift in Sources */,
 				4B0511C7262CAA5A00F6079C /* PreferenceTableCellView.swift in Sources */,
 				4B9292D92667124B00AD2C21 /* BookmarkListTreeControllerDataSource.swift in Sources */,
@@ -4830,7 +4870,7 @@
 				CODE_SIGN_IDENTITY = "";
 				CODE_SIGN_STYLE = Manual;
 				COMBINE_HIDPI_IMAGES = YES;
-				CURRENT_PROJECT_VERSION = 0.21.0;
+				CURRENT_PROJECT_VERSION = 0.21.1;
 				DEVELOPMENT_TEAM = "";
 				ENABLE_HARDENED_RUNTIME = YES;
 				INFOPLIST_FILE = DuckDuckGo/Info.plist;
@@ -4838,7 +4878,7 @@
 					"$(inherited)",
 					"@executable_path/../Frameworks",
 				);
-				MARKETING_VERSION = 0.21.0;
+				MARKETING_VERSION = 0.21.1;
 				PRODUCT_BUNDLE_IDENTIFIER = com.duckduckgo.macos.browser.debug;
 				PRODUCT_MODULE_NAME = "$(TARGET_NAME:c99extidentifier)";
 				PRODUCT_NAME = DuckDuckGo;
@@ -5083,7 +5123,7 @@
 				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
-				CURRENT_PROJECT_VERSION = 0.21.0;
+				CURRENT_PROJECT_VERSION = 0.21.1;
 				DEVELOPMENT_TEAM = HKE973VLUW;
 				ENABLE_HARDENED_RUNTIME = YES;
 				INFOPLIST_FILE = DuckDuckGo/Info.plist;
@@ -5091,7 +5131,7 @@
 					"$(inherited)",
 					"@executable_path/../Frameworks",
 				);
-				MARKETING_VERSION = 0.21.0;
+				MARKETING_VERSION = 0.21.1;
 				PRODUCT_BUNDLE_IDENTIFIER = com.duckduckgo.macos.browser.debug;
 				PRODUCT_MODULE_NAME = "$(TARGET_NAME:c99extidentifier)";
 				PRODUCT_NAME = DuckDuckGo;
@@ -5112,7 +5152,7 @@
 				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
-				CURRENT_PROJECT_VERSION = 0.21.0;
+				CURRENT_PROJECT_VERSION = 0.21.1;
 				DEVELOPMENT_TEAM = HKE973VLUW;
 				ENABLE_HARDENED_RUNTIME = YES;
 				INFOPLIST_FILE = DuckDuckGo/Info.plist;
@@ -5120,7 +5160,7 @@
 					"$(inherited)",
 					"@executable_path/../Frameworks",
 				);
-				MARKETING_VERSION = 0.21.0;
+				MARKETING_VERSION = 0.21.1;
 				PRODUCT_BUNDLE_IDENTIFIER = com.duckduckgo.macos.browser;
 				PRODUCT_MODULE_NAME = "$(TARGET_NAME:c99extidentifier)";
 				PRODUCT_NAME = DuckDuckGo;
@@ -5245,7 +5285,7 @@
 				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
-				CURRENT_PROJECT_VERSION = 0.21.0;
+				CURRENT_PROJECT_VERSION = 0.21.1;
 				DEVELOPMENT_TEAM = HKE973VLUW;
 				ENABLE_HARDENED_RUNTIME = YES;
 				GCC_PREPROCESSOR_DEFINITIONS = "REVIEW=1";
@@ -5254,7 +5294,7 @@
 					"$(inherited)",
 					"@executable_path/../Frameworks",
 				);
-				MARKETING_VERSION = 0.21.0;
+				MARKETING_VERSION = 0.21.1;
 				PRODUCT_BUNDLE_IDENTIFIER = com.duckduckgo.macos.browser.review;
 				PRODUCT_MODULE_NAME = "$(TARGET_NAME:c99extidentifier)";
 				PRODUCT_NAME = "DuckDuckGo Review";
