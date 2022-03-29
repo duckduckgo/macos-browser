@@ -22,7 +22,7 @@ import SwiftUI
 struct PreferencesSection: Hashable, Identifiable {
     let id: PreferencesSectionIdentifier
     let panes: [PreferencePaneIdentifier]
-    
+
     static let defaultSections: [PreferencesSection] = [
         .init(
             id: .regularPreferencePanes,
@@ -47,7 +47,7 @@ enum PreferencePaneIdentifier: Hashable, Identifiable {
     case loginsPlus
     case downloads
     case about
-    
+
     var id: Self {
         self
     }

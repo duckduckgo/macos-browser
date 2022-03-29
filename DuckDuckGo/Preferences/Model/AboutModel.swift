@@ -20,10 +20,10 @@ import SwiftUI
 
 final class AboutModel: ObservableObject {
     let appVersion = AppVersion()
-    
+
     let displayableAboutURL: String = URL.aboutDuckDuckGo
         .toString(decodePunycode: false, dropScheme: true, needsWWW: false, dropTrailingSlash: false)
-    
+
     func openURL(_ url: URL) {
         WindowControllersManager.shared.show(url: url, newTab: true)
     }

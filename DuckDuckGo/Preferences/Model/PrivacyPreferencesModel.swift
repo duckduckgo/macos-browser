@@ -19,7 +19,7 @@
 import Foundation
 
 final class PrivacyPreferencesModel: ObservableObject {
-    
+
     let privacySecurityPreferences: PrivacySecurityPreferences
 
     init(privacySecurityPreferences: PrivacySecurityPreferences = .shared) {
@@ -48,20 +48,20 @@ final class PrivacyPreferencesModel: ObservableObject {
             privacySecurityPreferences.autoconsentEnabled = isAutoconsentEnabled
         }
     }
-    
+
     func presentManageFireproofSitesDialog() {
         let fireproofDomainsWindowController = FireproofDomainsViewController.create().wrappedInWindowController()
-        
+
         guard let fireproofDomainsWindow = fireproofDomainsWindowController.window,
               let parentWindowController = WindowControllersManager.shared.lastKeyMainWindowController
         else {
-            assertionFailure("FeedbackPresenter: Failed to present FeedbackWindow")
+            assertionFailure("Privacy Preferences: Failed to present FireproofDomainsViewController")
             return
         }
 
         parentWindowController.window?.beginSheet(fireproofDomainsWindow)
     }
-    
+
     func openURL(_ url: URL) {
         WindowControllersManager.shared.show(url: url, newTab: true)
     }
