@@ -690,12 +690,51 @@
         }
     }
 
+    // translations for optout button text
+    const buttonText = [
+        "Only allow essential cookies",
+        "Nur erforderliche Cookies erlauben",
+        "Permitir solo cookies imprescindibles"
+    ].join('|');
+    const promptText = [
+        "Allow the use of cookies",
+        "Die Verwendung von Cookies",
+        "Permitir el uso de cookies"
+    ].join('|');
+    class Instagram extends AutoConsentBase {
+        constructor() {
+            super("Instagram");
+        }
+        async detectCmp(tab) {
+            await waitFor(() => tab.eval("document.readyState === 'complete'"), 40, 50);
+            return tab.eval(`!!document.querySelector('div > h2').innerText.match('${promptText}')`);
+        }
+        async detectPopup(tab) {
+            return true;
+        }
+        async optOut(tab) {
+            await tab.eval(`Array.from(document.querySelectorAll('div > button')).filter(el => el.innerText.match('${buttonText}'))[0].click()`);
+            return true;
+        }
+        async optIn(tab) {
+            return true;
+        }
+        async openCmp(tab) {
+            return true;
+        }
+        async test() {
+            // TODO
+            return true;
+        }
+    }
+
     const rules$3 = [
         new TrustArc(),
         new Cookiebot(),
         new SourcePoint(),
         new ConsentManager(),
         new Evidon(),
+        new Instagram(),
     ];
     function createAutoCMP(config) {
         return new AutoConsent$1(config);
@@ -854,6 +893,32 @@
 
     var autoconsent = [
     	{
+    		name: "arzt-auskunft",
+    		prehideSelectors: [
+    			"#cookiescript_injected"
+    		],
+    		detectCmp: [
+    			{
+    				exists: "#cookiescript_injected"
+    			}
+    		],
+    		detectPopup: [
+    			{
+    				visible: "#cookiescript_injected"
+    			}
+    		],
+    		optOut: [
+    			{
+    				click: "#cookiescript_reject"
+    			}
+    		],
+    		optIn: [
+    			{
+    				click: "#cookiescript_accept"
+    			}
+    		]
+    	},
+    	{
     		name: "asus",
     		detectCmp: [
     			{
@@ -1005,6 +1070,61 @@
     		]
     	},
     	{
+    		name: "corona-in-zahlen-de",
+    		prehideSelectors: [
+    			".cookiealert"
+    		],
+    		detectCmp: [
+    			{
+    				exists: ".cookiealert"
+    			}
+    		],
+    		detectPopup: [
+    			{
+    				visible: ".cookiealert"
+    			}
+    		],
+    		optOut: [
+    			{
+    				click: ".configurecookies"
+    			},
+    			{
+    				click: ".confirmcookies"
+    			}
+    		],
+    		optIn: [
+    			{
+    				click: ".acceptcookies"
+    			}
+    		]
+    	},
+    	{
+    		name: "deepl",
+    		prehideSelectors: [
+    			".dl_cookieBanner_container"
+    		],
+    		detectCmp: [
+    			{
+    				exists: ".dl_cookieBanner_container"
+    			}
+    		],
+    		detectPopup: [
+    			{
+    				visible: ".dl_cookieBanner_container"
+    			}
+    		],
+    		optOut: [
+    			{
+    				click: ".dl_cookieBanner--buttonSelected"
+    			}
+    		],
+    		optIn: [
+    			{
+    				click: ".dl_cookieBanner--buttonAll"
+    			}
+    		]
+    	},
+    	{
     		name: "Drupal",
     		detectCmp: [
     			{
@@ -1099,6 +1219,56 @@
     		]
     	},
     	{
+    		name: "hl-co-uk",
+    		prehideSelectors: [
+    			".cookieModalContent",
+    			"#cookie-banner-overlay"
+    		],
+    		detectCmp: [
+    			{
+    				exists: "#cookie-banner-overlay"
+    			}
+    		],
+    		detectPopup: [
+    			{
+    				exists: "#cookie-banner-overlay"
+    			}
+    		],
+    		optIn: [
+    			{
+    				click: "#acceptCookieButton"
+    			}
+    		],
+    		optOut: [
+    			{
+    				click: "#manageCookie"
+    			},
+    			{
+    				hide: [
+    					".cookieSettingsModal"
+    				]
+    			},
+    			{
+    				wait: 500
+    			},
+    			{
+    				click: "#AOCookieToggle"
+    			},
+    			{
+    				"eval": "document.querySelector('#AOCookieToggle').getAttribute('aria-pressed') === 'false'"
+    			},
+    			{
+    				click: "#TPCookieToggle"
+    			},
+    			{
+    				"eval": "document.querySelector('#TPCookieToggle').getAttribute('aria-pressed') === 'false'"
+    			},
+    			{
+    				click: "#updateCookieButton"
+    			}
+    		]
+    	},
+    	{
     		name: "hubspot",
     		detectCmp: [
     			{
@@ -1118,6 +1288,45 @@
     		optOut: [
     			{
     				click: "#hs-eu-decline-button"
+    			}
+    		]
+    	},
+    	{
+    		name: "johnlweis",
+    		prehideSelectors: [
+    			"div[class^=pecr-cookie-banner-]"
+    		],
+    		detectCmp: [
+    			{
+    				exists: "div[class^=pecr-cookie-banner-]"
+    			}
+    		],
+    		detectPopup: [
+    			{
+    				exists: "div[class^=pecr-cookie-banner-]"
+    			}
+    		],
+    		optOut: [
+    			{
+    				click: "button[data-test^=manage-cookies]"
+    			},
+    			{
+    				wait: "500"
+    			},
+    			{
+    				"eval": "!!Array.from(document.querySelectorAll('label[data-test^=toggle]')).forEach(e => e.click())",
+    				optional: true
+    			},
+    			{
+    				"eval": "Array.from(document.querySelectorAll('label[data-test^=toggle]')).filter(e => e.className.match('checked') && !e.className.match('disabled')).length === 0"
+    			},
+    			{
+    				click: "button[data-test=save-preferences]"
+    			}
+    		],
+    		optIn: [
+    			{
+    				click: "button[data-test=allow-all]"
     			}
     		]
     	},
@@ -1146,6 +1355,174 @@
     		test: [
     			{
     				"eval": "Object.values(klaro.getManager().consents).every(c => !c)"
+    			}
+    		]
+    	},
+    	{
+    		name: "mediamarkt-de",
+    		prehideSelectors: [
+    			"div[aria-labelledby^=pwa-consent-layer-title]",
+    			"div[class^=StyledConsentLayerWrapper"
+    		],
+    		detectCmp: [
+    			{
+    				exists: "div[aria-labelledby^=pwa-consent-layer-title]"
+    			}
+    		],
+    		detectPopup: [
+    			{
+    				exists: "div[aria-labelledby^=pwa-consent-layer-title]"
+    			}
+    		],
+    		optOut: [
+    			{
+    				click: "button[data-test^=pwa-consent-layer-deny-all]"
+    			}
+    		],
+    		optIn: [
+    			{
+    				click: "'button[data-test^=pwa-consent-layer-accept-all'"
+    			}
+    		]
+    	},
+    	{
+    		name: "metoffice-gov-uk",
+    		prehideSelectors: [
+    			"#ccc-module"
+    		],
+    		detectCmp: [
+    			{
+    				exists: "#ccc-module"
+    			}
+    		],
+    		detectPopup: [
+    			{
+    				exists: "#ccc-module"
+    			}
+    		],
+    		optOut: [
+    			{
+    				click: "#ccc-reject-settings"
+    			}
+    		],
+    		optIn: [
+    			{
+    				click: "#ccc-recommended-settings"
+    			}
+    		]
+    	},
+    	{
+    		name: "microsoft",
+    		prehideSelectors: [
+    			"#wcpConsentBannerCtrl"
+    		],
+    		detectCmp: [
+    			{
+    				exists: "#wcpConsentBannerCtrl"
+    			}
+    		],
+    		detectPopup: [
+    			{
+    				exists: "#wcpConsentBannerCtrl"
+    			}
+    		],
+    		optOut: [
+    			{
+    				"eval": "Array.from(document.querySelectorAll('div > button')).filter(el => el.innerText.match('Reject|Ablehnen'))[0].click() || true"
+    			}
+    		],
+    		optIn: [
+    			{
+    				"eval": "Array.from(document.querySelectorAll('div > button')).filter(el => el.innerText.match('Accept|Annehmen'))[0].click()"
+    			}
+    		],
+    		test: [
+    			{
+    				"eval": "!!document.cookie.match('MSCC')"
+    			}
+    		]
+    	},
+    	{
+    		name: "moneysavingexpert",
+    		detectCmp: [
+    			{
+    				exists: "dialog[data-testid=accept-our-cookies-dialog]"
+    			}
+    		],
+    		detectPopup: [
+    			{
+    				visible: "dialog[data-testid=accept-our-cookies-dialog]"
+    			}
+    		],
+    		optIn: [
+    			{
+    				click: "#banner-accept"
+    			}
+    		],
+    		optOut: [
+    			{
+    				click: "#banner-manage"
+    			},
+    			{
+    				click: "#pc-confirm"
+    			}
+    		]
+    	},
+    	{
+    		name: "national-lottery-co-uk",
+    		prehideSelectors: [
+    			".cuk_cookie_consent"
+    		],
+    		detectCmp: [
+    			{
+    				exists: ".cuk_cookie_consent"
+    			}
+    		],
+    		detectPopup: [
+    			{
+    				visible: ".cuk_cookie_consent"
+    			}
+    		],
+    		optOut: [
+    			{
+    				click: ".cuk_cookie_consent_manage_pref"
+    			},
+    			{
+    				click: ".cuk_cookie_consent_save_pref"
+    			},
+    			{
+    				click: ".cuk_cookie_consent_close"
+    			}
+    		],
+    		optIn: [
+    			{
+    				click: ".cuk_cookie_consent_accept_all"
+    			}
+    		]
+    	},
+    	{
+    		name: "nhs",
+    		prehideSelectors: [
+    			"#nhsuk-cookie-banner"
+    		],
+    		detectCmp: [
+    			{
+    				exists: "#nhsuk-cookie-banner"
+    			}
+    		],
+    		detectPopup: [
+    			{
+    				exists: "#nhsuk-cookie-banner"
+    			}
+    		],
+    		optOut: [
+    			{
+    				click: "#nhsuk-cookie-banner__link_accept"
+    			}
+    		],
+    		optIn: [
+    			{
+    				click: "#nhsuk-cookie-banner__link_accept_analytics"
     			}
     		]
     	},
@@ -1186,12 +1563,12 @@
     		isHidingRule: true,
     		detectCmp: [
     			{
-    				exists: "#onetrust-banner-sdk,.optanon-alert-box-wrapper"
+    				exists: "#onetrust-banner-sdk,.optanon-alert-box-wrapper,#onetrust-pc-sdk"
     			}
     		],
     		detectPopup: [
     			{
-    				visible: "#onetrust-banner-sdk,.optanon-alert-box-wrapper"
+    				visible: "#onetrust-banner-sdk,.optanon-alert-box-wrapper,#onetrust-pc-sdk"
     			}
     		],
     		optOut: [
@@ -1298,6 +1675,60 @@
     		]
     	},
     	{
+    		name: "snigel",
+    		detectCmp: [
+    			{
+    				exists: ".snigel-cmp-framework"
+    			}
+    		],
+    		detectPopup: [
+    			{
+    				visible: ".snigel-cmp-framework"
+    			}
+    		],
+    		optOut: [
+    			{
+    				click: "#sn-b-custom"
+    			},
+    			{
+    				click: "#sn-b-save"
+    			}
+    		],
+    		test: [
+    			{
+    				"eval": "!!document.cookie.match('snconsent')"
+    			}
+    		]
+    	},
+    	{
+    		name: "steampowered",
+    		detectCmp: [
+    			{
+    				exists: ".cookiepreferences_popup"
+    			}
+    		],
+    		detectPopup: [
+    			{
+    				visible: ".cookiepreferences_popup"
+    			}
+    		],
+    		optOut: [
+    			{
+    				click: "#rejectAllButton"
+    			}
+    		],
+    		optIn: [
+    			{
+    				click: "#acceptAllButton"
+    			}
+    		],
+    		test: [
+    			{
+    				"eval": "!!document.cookie.match('cookieSettings')"
+    			}
+    		]
+    	},
+    	{
     		name: "Tealium",
     		prehideSelectors: [
     			"#__tealiumGDPRecModal,#__tealiumGDPRcpPrefs,#consent-layer"
@@ -1375,6 +1806,63 @@
     		test: [
     			{
     				"eval": "window.results.results[0] === 'button_clicked'"
+    			}
+    		]
+    	},
+    	{
+    		name: "thefreedictionary",
+    		prehideSelectors: [
+    			"#cmpBanner"
+    		],
+    		detectCmp: [
+    			{
+    				exists: "#cmpBanner"
+    			}
+    		],
+    		detectPopup: [
+    			{
+    				visible: "#cmpBanner"
+    			}
+    		],
+    		optIn: [
+    			{
+    				"eval": "cmpUi.allowAll()"
+    			}
+    		],
+    		optOut: [
+    			{
+    				"eval": "cmpUi.showPurposes() || cmpUi.rejectAll() || true"
+    			}
+    		]
+    	},
+    	{
+    		name: "xing",
+    		detectCmp: [
+    			{
+    				exists: "div[class^=cookie-consent-CookieConsent]"
+    			}
+    		],
+    		detectPopup: [
+    			{
+    				exists: "div[class^=cookie-consent-CookieConsent]"
+    			}
+    		],
+    		optIn: [
+    			{
+    				click: "#consent-accept-button"
+    			}
+    		],
+    		optOut: [
+    			{
+    				click: "#consent-settings-button"
+    			},
+    			{
+    				click: ".consent-banner-button-accept-overlay"
+    			}
+    		],
+    		test: [
+    			{
+    				"eval": "document.cookie.includes('userConsent=%7B%22marketing%22%3Afalse'"
     			}
     		]
     	}
@@ -3909,11 +4397,6 @@
     loadRules();
 
     browser.webNavigation.onCommitted.addListener((details) => {
-        if (details.frameId === 0) {
-            consent.removeTab(details.tabId);
-        }
-    }, {
-        url: [{ schemes: ['http', 'https'] }]
     });
 
     browser.webNavigation.onCompleted.addListener(consent.onFrame.bind(consent), {
@@ -3935,6 +4418,8 @@
         };
 
         if (action === 'detectCMP') {
+            consent.removeTab(tabId);
+
             consent.checkTab(tabId).then(async (cmp) => {
                 try {
                     await cmp.checked;
