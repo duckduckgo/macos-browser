@@ -18,8 +18,6 @@
 
 import Foundation
 
-#if OUT_OF_APPSTORE
-
 final class CrashReportSender {
 
     static let reportServiceUrl = URL(string: "https://duckduckgo.com/crash.js")!
@@ -45,5 +43,3 @@ final class CrashReportSender {
     }
 
 }
-
-#endif

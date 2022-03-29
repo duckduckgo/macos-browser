@@ -15,6 +15,7 @@
 //  See the License for the specific language governing permissions and
 //  limitations under the License.
 //
+
 import Foundation
 import os
 
@@ -88,7 +89,7 @@ struct Logging {
     fileprivate static let faviconLoggingEnabled = false
     fileprivate static let faviconLog: OSLog = OSLog(subsystem: Bundle.main.bundleIdentifier ?? "DuckDuckGo", category: "Favicons")
     
-    fileprivate static let autoLockLoggingEnabled = true
+    fileprivate static let autoLockLoggingEnabled = false
     fileprivate static let autoLockLog: OSLog = OSLog(subsystem: Bundle.main.bundleIdentifier ?? "DuckDuckGo", category: "Auto-Lock")
 
     fileprivate static let autoconsentLoggingEnabled = false
