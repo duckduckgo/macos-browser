@@ -349,32 +349,62 @@ final class Tab: NSObject {
     var cbrCompletionTokensPublisher: AnyPublisher<[ContentBlockerRulesManager.CompletionToken], Never> {
         userContentController.$contentBlockingAssets.compactMap { $0?.completionTokens }.eraseToAnyPublisher()
     }
-
-    private func reloadIfNeeded(shouldLoadInBackground: Bool = false) {
-        let url: URL
-        switch self.content {
-        case .url(let value):
-            url = value
-        case .homePage:
-            url = .homePage
-        default:
-            url = .blankPage
+    
+    private static let debugEvents = EventMapping<AMPProtectionDebugEvents> { event, _, _, _, _ in
+        switch event {
+        case .ampBlockingRulesCompilationFailed:
+            Pixel.fire(.ampBlockingRulesCompilationFailed)
         }
-        guard webView.superview != nil || shouldLoadInBackground,
-              webView.url != url
-                // Initial Home Page shouldn't show Back Button
-                && webView.url != self.content.url
-        else { return }
-
+    }
+    
+    private lazy var ampProtection: AMPProtection = {
+        AMPProtection(privacyManager: ContentBlocking.shared.privacyConfigurationManager,
+                      contentBlockingManager: ContentBlocking.shared.contentBlockingManager,
+                      errorReporting: Self.debugEvents)
+    }()
+    
+    private func reloadIfNeeded(shouldLoadInBackground: Bool = false) {
+        DispatchQueue.main.async { [self] in
+            Task {
+                let url = await ampProtection.getCleanURL(from: contentURL, onExtracting: {})
+                if shouldLoadURL(url, shouldLoadInBackground: shouldLoadInBackground) {
+                    let didRestore = restoreSessionStateDataIfNeeded()
+                    if !didRestore {
+                        webView.load(url)
+                    }
+                }
+            }
+        }
+    }
+    
+    private var contentURL: URL {
+        switch content {
+        case .url(let value):
+            return value
+        case .homePage:
+            return .homePage
+        default:
+            return .blankPage
+        }
+    }
+    
+    private func shouldLoadURL(_ url: URL, shouldLoadInBackground: Bool = false) -> Bool {
+        return (webView.superview != nil || shouldLoadInBackground)
+        && webView.url != url
+        && webView.url != content.url // Initial Home Page shouldn't show Back Button
+    }
+    
+    private func restoreSessionStateDataIfNeeded() -> Bool {
+        var didRestore: Bool = false
         if let sessionStateData = self.sessionStateData {
             do {
                 try webView.restoreSessionState(from: sessionStateData)
-                return
+                didRestore = true
             } catch {
                 os_log("Tab:setupWebView could not restore session state %s", "\(error)")
             }
         }
-        webView.load(url)
+        return didRestore
     }
 
     private func addHomePageToWebViewIfNeeded() {
@@ -791,6 +821,25 @@ extension Tab: WKNavigationDelegate {
     @MainActor
     func webView(_ webView: WKWebView,
                  decidePolicyFor navigationAction: WKNavigationAction) async -> WKNavigationActionPolicy {
+        
+        // This check needs to happen before GPC checks. Otherwise the navigation type may be rewritten to `.other`
+        // which would skip link rewrites.
+        if navigationAction.navigationType == .linkActivated {
+            let navigationActionPolicy = await ampProtection.requestTrackingLinkRewrite(initiatingURL: webView.url,
+                                                                                        navigationAction: navigationAction,
+                                                                                        onExtracting: { },
+                                                                                        onLinkRewrite: { [weak self] url, navigationAction in
+                guard let self = self else { return }
+                if self.isRequestingNewTab(navigationAction: navigationAction) {
+                    self.delegate?.tab(self, requestedNewTabWith: .url(url), selected: NSApp.isShiftPressed)
+                } else {
+                    webView.load(url)
+                }
+            })
+            if let navigationActionPolicy = navigationActionPolicy, navigationActionPolicy == .cancel {
+                return navigationActionPolicy
+            }
+        }
 
         webView.customUserAgent = UserAgent.for(navigationAction.request.url)
                                                 
@@ -828,8 +877,7 @@ extension Tab: WKNavigationDelegate {
         self.resetConnectionUpgradedTo(navigationAction: navigationAction)
 
         let isLinkActivated = navigationAction.navigationType == .linkActivated
-        let isMiddleClicked = navigationAction.buttonNumber == Constants.webkitMiddleClick
-        if isLinkActivated && NSApp.isCommandPressed || isMiddleClicked {
+        if isRequestingNewTab(navigationAction: navigationAction) {
             defer {
                 delegate?.tab(self, requestedNewTabWith: navigationAction.request.url.map { .url($0) } ?? .none, selected: NSApp.isShiftPressed)
             }
@@ -881,6 +929,13 @@ extension Tab: WKNavigationDelegate {
 
         return .allow
     }
+    
+    private func isRequestingNewTab(navigationAction: WKNavigationAction) -> Bool {
+        let isLinkActivated = navigationAction.navigationType == .linkActivated
+        let isMiddleClicked = navigationAction.buttonNumber == Constants.webkitMiddleClick
+        return isLinkActivated && NSApp.isCommandPressed || isMiddleClicked
+    }
+    
     // swiftlint:enable cyclomatic_complexity
     // swiftlint:enable function_body_length
     
@@ -956,6 +1011,7 @@ extension Tab: WKNavigationDelegate {
 
         invalidateSessionStateData()
         resetDashboardInfo()
+        ampProtection.cancelOngoingExtraction()
     }
 
     func webView(_ webView: WKWebView, didFinish navigation: WKNavigation!) {
