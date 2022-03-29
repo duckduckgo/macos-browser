@@ -1,5 +1,5 @@
 //
-//  DownloadsPreferencesModel.swift
+//  DownloadsPreferences.swift
 //
 //  Copyright © 2022 DuckDuckGo. All rights reserved.
 //
@@ -52,7 +52,7 @@ struct DownloadsPreferencesUserDefaultsPersistor: DownloadsPreferencesPersistor 
     }
 }
 
-final class DownloadsPreferencesModel: ObservableObject {
+final class DownloadsPreferences: ObservableObject {
 
     var effectiveDownloadLocation: URL? {
         if let selectedLocation = persistor.selectedDownloadLocation,

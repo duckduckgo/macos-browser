@@ -27,14 +27,14 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
     let launchTimingPixel = TimedPixel(.launchTiming)
 
     static var isRunningTests: Bool {
-#if DEBUG
+        #if DEBUG
         ProcessInfo.processInfo.environment["XCTestConfigurationFilePath"] != nil
-#else
+        #else
         return false
-#endif
+        #endif
     }
 
-#if DEBUG
+    #if DEBUG
     let disableCVDisplayLinkLogs: Void = {
         // Disable CVDisplayLink logs
         CFPreferencesSetValue("cv_note" as CFString,
@@ -44,7 +44,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
                               kCFPreferencesAnyHost)
         CFPreferencesSynchronize("com.apple.corevideo" as CFString, kCFPreferencesCurrentUser, kCFPreferencesAnyHost)
     }()
-#endif
+    #endif
 
     let urlEventHandler = URLEventHandler()
 
@@ -59,11 +59,11 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
 
     func applicationWillFinishLaunching(_ notification: Notification) {
         if !Self.isRunningTests {
-#if DEBUG
+            #if DEBUG
             Pixel.setUp(dryRun: true)
-#else
+            #else
             Pixel.setUp()
-#endif
+            #endif
 
             Database.shared.loadStore()
         }
@@ -81,9 +81,9 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
     func applicationDidFinishLaunching(_ notification: Notification) {
         guard !Self.isRunningTests else { return }
 
-#if DEBUG || REVIEW
+        #if DEBUG || REVIEW
         Waitlist.unlockExistingInstallIfNecessary()
-#endif
+        #endif
 
         PrivacyFeatures.httpsUpgrade.loadDataAsync()
         LocalBookmarkManager.shared.loadBookmarks()
@@ -113,9 +113,9 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
 
         appUsageActivityMonitor = AppUsageActivityMonitor(delegate: self)
 
-#if OUT_OF_APPSTORE
+        #if OUT_OF_APPSTORE
         crashReporter.checkForNewReports()
-#endif
+        #endif
         urlEventHandler.applicationDidFinishLaunching()
 
         UserDefaultsWrapper<Any>.clearRemovedKeys()
@@ -155,7 +155,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
     }
 
     private func applyPreferredTheme() {
-        let appearancePreferences = AppearancePreferencesModel()
+        let appearancePreferences = AppearancePreferences()
         appearancePreferences.updateUserInterfaceStyle()
     }
 
@@ -171,7 +171,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
             }
         }
     }
-    
+
     private func fireWaitlistLaunchPixel() {
         if Pixel.Event.AppLaunch.repetition().value == .initial && !Waitlist.isUnlocked {
             Pixel.fire(.waitlistFirstLaunch)

@@ -37,10 +37,10 @@ final class FileDownloadManager: FileDownloadManagerProtocol {
 
     static let shared = FileDownloadManager()
     private let workspace: NSWorkspace
-    private let preferences: DownloadsPreferencesModel
+    private let preferences: DownloadsPreferences
 
     init(workspace: NSWorkspace = NSWorkspace.shared,
-         preferences: DownloadsPreferencesModel = .init()) {
+         preferences: DownloadsPreferences = .init()) {
         self.workspace = workspace
         self.preferences = preferences
     }

@@ -51,7 +51,7 @@ extension Preferences {
     }
 
     struct ThemePicker: View {
-        @EnvironmentObject var model: AppearancePreferencesModel
+        @EnvironmentObject var model: AppearancePreferences
 
         var body: some View {
             HStack(spacing: 24) {
@@ -80,7 +80,7 @@ extension Preferences {
     }
 
     struct AppearanceView: View {
-        @ObservedObject var model: AppearancePreferencesModel
+        @ObservedObject var model: AppearancePreferences
 
         var body: some View {
             VStack(alignment: .leading, spacing: 0) {

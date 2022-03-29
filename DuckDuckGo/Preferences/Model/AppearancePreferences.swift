@@ -1,5 +1,5 @@
 //
-//  AppearancePreferencesModel.swift
+//  AppearancePreferences.swift
 //
 //  Copyright © 2022 DuckDuckGo. All rights reserved.
 //
@@ -70,9 +70,9 @@ enum ThemeName: String, Equatable, CaseIterable {
     }
 }
 
-final class AppearancePreferencesModel: ObservableObject {
+final class AppearancePreferences: ObservableObject {
 
-    static let shared = AppearancePreferencesModel()
+    static let shared = AppearancePreferences()
 
     @Published var currentThemeName: ThemeName {
         didSet {
@@ -91,11 +91,11 @@ final class AppearancePreferencesModel: ObservableObject {
         NSApp.appearance = currentThemeName.appearance
     }
 
-    private var persistor: AppearancePreferencesPersistor
-
     init(persistor: AppearancePreferencesPersistor = AppearancePreferencesUserDefaultsPersistor()) {
         self.persistor = persistor
         currentThemeName = .init(rawValue: persistor.currentThemeName) ?? .systemDefault
         showFullURL = persistor.showFullURL
     }
+
+    private var persistor: AppearancePreferencesPersistor
 }

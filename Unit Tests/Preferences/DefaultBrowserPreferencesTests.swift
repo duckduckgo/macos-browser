@@ -1,5 +1,5 @@
 //
-//  DefaultBrowserPreferencesModelTests.swift
+//  DefaultBrowserPreferencesTests.swift
 //
 //  Copyright © 2022 DuckDuckGo. All rights reserved.
 //
@@ -24,7 +24,7 @@ final class DefaultBrowserProviderMock: DefaultBrowserProvider {
         case generic
     }
 
-    var bundleIdentifier: String = "com.duckduckgo.DefaultBrowserPreferencesModelTests"
+    var bundleIdentifier: String = "com.duckduckgo.DefaultBrowserPreferencesTests"
     var isDefault: Bool = false
     // swiftlint:disable identifier_name
     var _presentDefaultBrowserPrompt: () throws -> Void = {}
@@ -40,7 +40,7 @@ final class DefaultBrowserProviderMock: DefaultBrowserProvider {
     }
 }
 
-final class DefaultBrowserPreferencesModelTests: XCTestCase {
+final class DefaultBrowserPreferencesTests: XCTestCase {
 
     // swiftlint:disable:next implicitly_unwrapped_optional
     var provider: DefaultBrowserProviderMock!
@@ -51,15 +51,15 @@ final class DefaultBrowserPreferencesModelTests: XCTestCase {
 
     func testWhenInitializedThenIsDefaultIsTakenFromProvider() throws {
         provider.isDefault = true
-        XCTAssertTrue(DefaultBrowserPreferencesModel(defaultBrowserProvider: provider).isDefault)
+        XCTAssertTrue(DefaultBrowserPreferences(defaultBrowserProvider: provider).isDefault)
 
         provider.isDefault = false
-        XCTAssertFalse(DefaultBrowserPreferencesModel(defaultBrowserProvider: provider).isDefault)
+        XCTAssertFalse(DefaultBrowserPreferences(defaultBrowserProvider: provider).isDefault)
     }
 
     func testWhenCheckIfDefaultIsCalledThenValueIsUpdatedFromProvider() throws {
         provider.isDefault = false
-        let model = DefaultBrowserPreferencesModel(defaultBrowserProvider: provider)
+        let model = DefaultBrowserPreferences(defaultBrowserProvider: provider)
         provider.isDefault = true
 
         XCTAssertNotEqual(model.isDefault, provider.isDefault)
@@ -69,7 +69,7 @@ final class DefaultBrowserPreferencesModelTests: XCTestCase {
     }
 
     func testWhenBecomeDefaultIsCalledThenDefaultBrowserPromptIsRequested() throws {
-        let model = DefaultBrowserPreferencesModel(defaultBrowserProvider: provider)
+        let model = DefaultBrowserPreferences(defaultBrowserProvider: provider)
 
         let browserPromptExpectation = self.expectation(description: "presentDefaultBrowserPrompt")
 
@@ -83,7 +83,7 @@ final class DefaultBrowserPreferencesModelTests: XCTestCase {
     }
 
     func testWhenDefaultBrowserPromptFailsThenPreferencesAreOpened() throws {
-        let model = DefaultBrowserPreferencesModel(defaultBrowserProvider: provider)
+        let model = DefaultBrowserPreferences(defaultBrowserProvider: provider)
 
         let browserPromptExpectation = self.expectation(description: "presentDefaultBrowserPrompt")
         let openPreferencesExpectation = self.expectation(description: "openSystemPreferences")

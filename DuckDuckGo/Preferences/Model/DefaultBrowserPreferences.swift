@@ -1,5 +1,5 @@
 //
-//  DefaultBrowserPreferencesModel.swift
+//  DefaultBrowserPreferences.swift
 //
 //  Copyright © 2022 DuckDuckGo. All rights reserved.
 //
@@ -68,12 +68,9 @@ struct SystemDefaultBrowserProvider: DefaultBrowserProvider {
     }
 }
 
-final class DefaultBrowserPreferencesModel: ObservableObject {
+final class DefaultBrowserPreferences: ObservableObject {
 
     @Published private(set) var isDefault: Bool = false
-
-    private var appDidBecomeActiveCancellable: AnyCancellable?
-    private let defaultBrowserProvider: DefaultBrowserProvider
 
     init(defaultBrowserProvider: DefaultBrowserProvider = SystemDefaultBrowserProvider()) {
         self.defaultBrowserProvider = defaultBrowserProvider
@@ -106,4 +103,7 @@ final class DefaultBrowserPreferencesModel: ObservableObject {
             defaultBrowserProvider.openSystemPreferences()
         }
     }
+
+    private var appDidBecomeActiveCancellable: AnyCancellable?
+    private let defaultBrowserProvider: DefaultBrowserProvider
 }

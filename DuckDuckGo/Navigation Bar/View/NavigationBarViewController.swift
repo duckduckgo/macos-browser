@@ -545,7 +545,7 @@ final class NavigationBarViewController: NSViewController {
     }
 
     private func promptToSaveAutofillData(_ data: AutofillData) {
-        let loginsPreferences = LoginsPreferencesModel()
+        let loginsPreferences = LoginsPreferences()
 
         if loginsPreferences.askToSaveUsernamesAndPasswords, let credentials = data.credentials {
             os_log("Presenting Save Credentials popover", log: .passwordManager)

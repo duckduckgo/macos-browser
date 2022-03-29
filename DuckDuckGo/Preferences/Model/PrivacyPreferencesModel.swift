@@ -20,15 +20,6 @@ import Foundation
 
 final class PrivacyPreferencesModel: ObservableObject {
 
-    let privacySecurityPreferences: PrivacySecurityPreferences
-
-    init(privacySecurityPreferences: PrivacySecurityPreferences = .shared) {
-        self.privacySecurityPreferences = privacySecurityPreferences
-        isLoginDetectionEnabled = privacySecurityPreferences.loginDetectionEnabled
-        isGPCEnabled = privacySecurityPreferences.gpcEnabled
-        isAutoconsentEnabled = privacySecurityPreferences.autoconsentEnabled ?? false
-    }
-
     @Published
     var isLoginDetectionEnabled: Bool {
         didSet {
@@ -65,4 +56,13 @@ final class PrivacyPreferencesModel: ObservableObject {
     func openURL(_ url: URL) {
         WindowControllersManager.shared.show(url: url, newTab: true)
     }
+
+    init(privacySecurityPreferences: PrivacySecurityPreferences = .shared) {
+        self.privacySecurityPreferences = privacySecurityPreferences
+        isLoginDetectionEnabled = privacySecurityPreferences.loginDetectionEnabled
+        isGPCEnabled = privacySecurityPreferences.gpcEnabled
+        isAutoconsentEnabled = privacySecurityPreferences.autoconsentEnabled ?? false
+    }
+
+    private let privacySecurityPreferences: PrivacySecurityPreferences
 }

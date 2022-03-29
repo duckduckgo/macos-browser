@@ -27,7 +27,7 @@ final class FileDownloadManagerTests: XCTestCase {
     var defaults: UserDefaults!
     var workspace: TestWorkspace!
     var dm: FileDownloadManager!
-    var preferences: DownloadsPreferencesModel!
+    var preferences: DownloadsPreferences!
     let fm = FileManager.default
     let testFile = "downloaded file"
 
@@ -37,7 +37,7 @@ final class FileDownloadManagerTests: XCTestCase {
     override func setUp() {
         defaults = UserDefaults(suiteName: testGroupName)!
         defaults.removePersistentDomain(forName: testGroupName)
-        preferences = DownloadsPreferencesModel(persistor: DownloadsPreferencesPersistorMock())
+        preferences = DownloadsPreferences(persistor: DownloadsPreferencesPersistorMock())
         preferences.alwaysRequestDownloadLocation = false
         self.workspace = TestWorkspace()
         self.dm = FileDownloadManager(workspace: workspace, preferences: preferences)

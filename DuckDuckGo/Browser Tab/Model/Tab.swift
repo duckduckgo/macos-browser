@@ -28,7 +28,7 @@ protocol TabDelegate: FileDownloadManagerDelegate, ContentOverlayUserScriptDeleg
     func tabDidStartNavigation(_ tab: Tab)
     func tab(_ tab: Tab, requestedNewTabWith content: Tab.TabContent, selected: Bool)
     func tab(_ tab: Tab, willShowContextMenuAt position: NSPoint, image: URL?, link: URL?, selectedText: String?)
-	func tab(_ tab: Tab, requestedOpenExternalURL url: URL, forUserEnteredURL: Bool)
+    func tab(_ tab: Tab, requestedOpenExternalURL url: URL, forUserEnteredURL: Bool)
     func tab(_ tab: Tab, requestedSaveAutofillData autofillData: AutofillData)
     func tab(_ tab: Tab,
              requestedBasicAuthenticationChallengeWith protectionSpace: URLProtectionSpace,
@@ -247,7 +247,7 @@ final class Tab: NSObject {
         webView.getMimeType { mimeType in
             if case .some(.html) = mimeType.flatMap(UTType.init(mimeType:)) {
                 self.delegate?.chooseDestination(suggestedFilename: self.webView.suggestedFilename,
-                                                 directoryURL: DownloadsPreferencesModel().effectiveDownloadLocation,
+                                                 directoryURL: DownloadsPreferences().effectiveDownloadLocation,
                                                  fileTypes: [.html, .webArchive, .pdf]) { url, fileType in
                     guard let url = url else {
                         completionHandler?(.failure(URLError(.cancelled)))

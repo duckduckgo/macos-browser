@@ -44,15 +44,15 @@ extension Preferences {
 
                             switch model.selectedPane {
                             case .defaultBrowser:
-                                DefaultBrowserView(model: DefaultBrowserPreferencesModel())
+                                DefaultBrowserView(model: DefaultBrowserPreferences())
                             case .appearance:
                                 AppearanceView(model: .shared)
                             case .privacy:
                                 PrivacyView(model: PrivacyPreferencesModel())
                             case .loginsPlus:
-                                LoginsView(model: LoginsPreferencesModel())
+                                LoginsView(model: LoginsPreferences())
                             case .downloads:
-                                DownloadsView(model: DownloadsPreferencesModel())
+                                DownloadsView(model: DownloadsPreferences())
                             case .about:
                                 AboutView(model: .init())
                             }

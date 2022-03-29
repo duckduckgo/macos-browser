@@ -23,7 +23,7 @@ import Combine
 extension Preferences {
 
     struct DefaultBrowserView: View {
-        @ObservedObject var model: DefaultBrowserPreferencesModel
+        @ObservedObject var model: DefaultBrowserPreferences
 
         var body: some View {
             VStack(alignment: .leading, spacing: 0) {

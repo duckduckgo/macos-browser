@@ -103,8 +103,8 @@ final class HomePageViewController: NSViewController {
     }
 
     func createDefaultBrowserModel() -> HomePage.Models.DefaultBrowserModel {
-        return .init(isDefault: DefaultBrowserPreferencesModel().isDefault, wasClosed: defaultBrowserDismissed, requestSetDefault: { [weak self] in
-            let defaultBrowserPreferencesModel = DefaultBrowserPreferencesModel()
+        return .init(isDefault: DefaultBrowserPreferences().isDefault, wasClosed: defaultBrowserDismissed, requestSetDefault: { [weak self] in
+            let defaultBrowserPreferencesModel = DefaultBrowserPreferences()
             defaultBrowserPreferencesModel.becomeDefault { [weak self] isDefault in
                 _ = defaultBrowserPreferencesModel
                 self?.defaultBrowserModel.isDefault = isDefault

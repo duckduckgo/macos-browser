@@ -75,7 +75,7 @@ extension Pixel.Event {
         }
 
         init() {
-            self.init(isDefault: DefaultBrowserPreferencesModel().isDefault)
+            self.init(isDefault: DefaultBrowserPreferences().isDefault)
         }
     }
 

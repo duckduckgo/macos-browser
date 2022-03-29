@@ -73,7 +73,7 @@ final class DeviceAuthenticator {
 
     private var idleStateProvider: DeviceIdleStateProvider
     private let authenticationService: DeviceAuthenticationService
-    private let loginsPreferences: LoginsPreferencesModel
+    private let loginsPreferences: LoginsPreferences
 
     // MARK: - Private State
 
@@ -106,7 +106,7 @@ final class DeviceAuthenticator {
 
     init(idleStateProvider: DeviceIdleStateProvider = QuartzIdleStateProvider(),
          authenticationService: DeviceAuthenticationService = LocalAuthenticationService(),
-         loginsPreferences: LoginsPreferencesModel = LoginsPreferencesModel()) {
+         loginsPreferences: LoginsPreferences = LoginsPreferences()) {
         self.idleStateProvider = idleStateProvider
         self.authenticationService = authenticationService
         self.loginsPreferences = loginsPreferences
@@ -189,7 +189,7 @@ final class DeviceAuthenticator {
 
     @objc
     private func updateTimerStateBasedOnAutoLockSettings() {
-        let preferences = LoginsPreferencesModel()
+        let preferences = LoginsPreferences()
 
         if preferences.shouldAutoLockLogins {
             beginCheckingIdleTimer()

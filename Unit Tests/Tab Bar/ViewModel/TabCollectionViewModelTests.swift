@@ -19,6 +19,7 @@
 import XCTest
 @testable import DuckDuckGo_Privacy_Browser
 
+// swiftlint:disable:next type_body_length
 final class TabCollectionViewModelTests: XCTestCase {
 
     // MARK: - TabViewModel
@@ -49,22 +50,22 @@ final class TabCollectionViewModelTests: XCTestCase {
 
         XCTAssert(tabCollectionViewModel.selectedTabViewModel === tabCollectionViewModel.tabViewModel(at: 0))
     }
-    
+
     func testWhenSelectionIndexIsOutOfBoundsThenSelectedTabViewModelIsNil() {
         let tabCollectionViewModel = TabCollectionViewModel.aTabCollectionViewModel()
-        
+
         tabCollectionViewModel.select(at: 1)
-        
+
         XCTAssertNil(tabCollectionViewModel.selectedTabViewModel)
     }
-    
+
     func testWhenSelectionIndexPointsToTabThenSelectedTabViewModelReturnsTheTab() {
         let tabCollectionViewModel = TabCollectionViewModel.aTabCollectionViewModel()
 
         tabCollectionViewModel.appendNewTab()
         tabCollectionViewModel.appendNewTab()
         tabCollectionViewModel.select(at: 0)
-        
+
         XCTAssert(tabCollectionViewModel.selectedTabViewModel === tabCollectionViewModel.tabViewModel(at: 0))
     }
 

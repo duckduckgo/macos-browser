@@ -104,7 +104,7 @@ final class DownloadsViewController: NSViewController {
     // MARK: User Actions
 
     @IBAction func openDownloadsFolderAction(_ sender: Any) {
-        guard let url = DownloadsPreferencesModel().effectiveDownloadLocation
+        guard let url = DownloadsPreferences().effectiveDownloadLocation
                 ?? FileManager.default.urls(for: .downloadsDirectory, in: .userDomainMask).first
         else {
             return

@@ -28,7 +28,7 @@ protocol BrowserTabViewControllerClickDelegate: AnyObject {
 }
 
 // swiftlint:disable file_length
-
+// swiftlint:disable:next type_body_length
 final class BrowserTabViewController: NSViewController {
 
     @IBOutlet weak var errorView: NSView!
@@ -718,7 +718,7 @@ extension BrowserTabViewController: WKUIDelegate {
             progress.completedUnitCount = progress.totalUnitCount
         }
 
-        let prefs = DownloadsPreferencesModel()
+        let prefs = DownloadsPreferences()
         if !prefs.alwaysRequestDownloadLocation,
            let location = prefs.effectiveDownloadLocation {
             let url = location.appendingPathComponent(suggestedFilename)
@@ -993,7 +993,7 @@ extension BrowserTabViewController: OnboardingDelegate {
     }
 
     func onboardingDidRequestSetDefault(completion: @escaping () -> Void) {
-        let defaultBrowserPreferences = DefaultBrowserPreferencesModel()
+        let defaultBrowserPreferences = DefaultBrowserPreferences()
         if defaultBrowserPreferences.isDefault {
             completion()
             return

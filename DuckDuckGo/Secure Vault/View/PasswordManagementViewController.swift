@@ -181,7 +181,7 @@ final class PasswordManagementViewController: NSViewController {
     override func viewWillAppear() {
         super.viewWillAppear()
 
-        lockScreenDurationLabel.stringValue = UserText.pmLockScreenDuration(duration: LoginsPreferencesModel().autoLockThreshold.title)
+        lockScreenDurationLabel.stringValue = UserText.pmLockScreenDuration(duration: LoginsPreferences().autoLockThreshold.title)
 
         if let listView = self.listView {
             listView.frame = listContainer.bounds

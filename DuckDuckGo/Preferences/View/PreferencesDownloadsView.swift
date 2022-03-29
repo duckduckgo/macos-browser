@@ -21,7 +21,7 @@ import SwiftUI
 extension Preferences {
 
     struct DownloadsView: View {
-        @ObservedObject var model: DownloadsPreferencesModel
+        @ObservedObject var model: DownloadsPreferences
 
         var body: some View {
             VStack(alignment: .leading, spacing: 0) {

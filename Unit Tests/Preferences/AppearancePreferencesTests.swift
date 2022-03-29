@@ -1,5 +1,5 @@
 //
-//  AppearancePreferencesModelTests.swift
+//  AppearancePreferencesTests.swift
 //
 //  Copyright © 2022 DuckDuckGo. All rights reserved.
 //
@@ -29,10 +29,10 @@ struct AppearancePreferencesPersistorMock: AppearancePreferencesPersistor {
     }
 }
 
-final class AppearancePreferencesModelTests: XCTestCase {
+final class AppearancePreferencesTests: XCTestCase {
 
     func testWhenInitializedThenItLoadsPersistedValues() throws {
-        var model = AppearancePreferencesModel(
+        var model = AppearancePreferences(
             persistor: AppearancePreferencesPersistorMock(
                 showFullURL: false,
                 currentThemeName: ThemeName.systemDefault.rawValue
@@ -42,7 +42,7 @@ final class AppearancePreferencesModelTests: XCTestCase {
         XCTAssertEqual(model.showFullURL, false)
         XCTAssertEqual(model.currentThemeName, ThemeName.systemDefault)
 
-        model = AppearancePreferencesModel(
+        model = AppearancePreferences(
             persistor: AppearancePreferencesPersistorMock(
                 showFullURL: true,
                 currentThemeName: ThemeName.light.rawValue
@@ -54,7 +54,7 @@ final class AppearancePreferencesModelTests: XCTestCase {
     }
 
     func testWhenInitializedWithGarbageThenThemeIsSetToSystemDefault() throws {
-        let model = AppearancePreferencesModel(
+        let model = AppearancePreferences(
             persistor: AppearancePreferencesPersistorMock(
                 showFullURL: false,
                 currentThemeName: "garbage"
@@ -71,7 +71,7 @@ final class AppearancePreferencesModelTests: XCTestCase {
     }
 
     func testWhenThemeNameIsUpdatedThenApplicationAppearanceIsUpdated() throws {
-        let model = AppearancePreferencesModel(persistor: AppearancePreferencesPersistorMock())
+        let model = AppearancePreferences(persistor: AppearancePreferencesPersistorMock())
 
         model.currentThemeName = ThemeName.systemDefault
         XCTAssertEqual(NSApp.appearance?.name, ThemeName.systemDefault.appearance?.name)

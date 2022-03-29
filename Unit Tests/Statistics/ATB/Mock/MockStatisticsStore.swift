@@ -34,6 +34,6 @@ final class MockStatisticsStore: StatisticsStore {
     var waitlistUnlocked: Bool = false
 
     var autoLockEnabled: Bool = true
-    var autoLockThreshold: String? = LoginsPreferencesModel.AutoLockThreshold.fifteenMinutes.rawValue
+    var autoLockThreshold: String? = LoginsPreferences.AutoLockThreshold.fifteenMinutes.rawValue
 
 }

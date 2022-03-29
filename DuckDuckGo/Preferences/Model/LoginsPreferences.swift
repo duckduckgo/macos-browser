@@ -1,5 +1,5 @@
 //
-//  LoginsPreferencesModel.swift
+//  LoginsPreferences.swift
 //
 //  Copyright © 2022 DuckDuckGo. All rights reserved.
 //
@@ -39,7 +39,7 @@ struct LoginsPreferencesUserDefaultsPersistor: LoginsPreferencesPersistor {
     var askToSavePaymentMethods: Bool
 }
 
-final class LoginsPreferencesModel: ObservableObject {
+final class LoginsPreferences: ObservableObject {
 
     enum AutoLockThreshold: String, CaseIterable {
         case oneMinute
@@ -114,9 +114,6 @@ final class LoginsPreferencesModel: ObservableObject {
         }
     }
 
-    private var statisticsStore: StatisticsStore
-    private var persistor: LoginsPreferencesPersistor
-
     init(
         statisticsStore: StatisticsStore = LocalStatisticsStore(),
         persistor: LoginsPreferencesPersistor = LoginsPreferencesUserDefaultsPersistor()
@@ -138,4 +135,6 @@ final class LoginsPreferencesModel: ObservableObject {
         }()
     }
 
+    private var statisticsStore: StatisticsStore
+    private var persistor: LoginsPreferencesPersistor
 }

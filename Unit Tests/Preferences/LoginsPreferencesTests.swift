@@ -1,5 +1,5 @@
 //
-//  LoginsPreferencesModelTests.swift
+//  LoginsPreferencesTests.swift
 //
 //  Copyright © 2022 DuckDuckGo. All rights reserved.
 //
@@ -26,10 +26,10 @@ final class LoginsPreferencesPersistorMock: LoginsPreferencesPersistor {
     var askToSavePaymentMethods: Bool = true
 }
 
-final class LoginsPreferencesModelTests: XCTestCase {
+final class LoginsPreferencesTests: XCTestCase {
 
     func testWhenShouldAutoLockLoginsIsChangedThenNotificationIsSent() throws {
-        let model = LoginsPreferencesModel(statisticsStore: MockStatisticsStore(), persistor: LoginsPreferencesPersistorMock())
+        let model = LoginsPreferences(statisticsStore: MockStatisticsStore(), persistor: LoginsPreferencesPersistorMock())
 
         _ = expectation(forNotification: .loginsAutoLockSettingsDidChange, object: nil)
         model.shouldAutoLockLogins.toggle()
@@ -41,7 +41,7 @@ final class LoginsPreferencesModelTests: XCTestCase {
         let statisticsStore = MockStatisticsStore()
         statisticsStore.autoLockThreshold = nil
 
-        let model = LoginsPreferencesModel(statisticsStore: statisticsStore, persistor: LoginsPreferencesPersistorMock())
+        let model = LoginsPreferences(statisticsStore: statisticsStore, persistor: LoginsPreferencesPersistorMock())
 
         XCTAssertEqual(model.autoLockThreshold, .fifteenMinutes)
     }
@@ -49,10 +49,10 @@ final class LoginsPreferencesModelTests: XCTestCase {
     func testThatPreferencesArePersisted() throws {
         let statisticsStore = MockStatisticsStore()
         let persistor = LoginsPreferencesPersistorMock()
-        let model = LoginsPreferencesModel(statisticsStore: statisticsStore, persistor: persistor)
+        let model = LoginsPreferences(statisticsStore: statisticsStore, persistor: persistor)
 
         model.autoLockThreshold = .fiveMinutes
-        XCTAssertEqual(statisticsStore.autoLockThreshold, LoginsPreferencesModel.AutoLockThreshold.fiveMinutes.rawValue)
+        XCTAssertEqual(statisticsStore.autoLockThreshold, LoginsPreferences.AutoLockThreshold.fiveMinutes.rawValue)
 
         model.shouldAutoLockLogins.toggle()
         XCTAssertEqual(statisticsStore.autoLockEnabled, model.shouldAutoLockLogins)
