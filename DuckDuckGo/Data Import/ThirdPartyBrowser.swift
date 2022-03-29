@@ -57,9 +57,9 @@ enum ThirdPartyBrowser: CaseIterable {
 
     var isInstalled: Bool {
         let detectedApplicationPath = applicationPath != nil
-        let detectedBrowserProfiles = !(browserProfiles?.profiles.isEmpty ?? true)
+        let detectedBrowserProfiles = !(browserProfiles?.profiles.isEmpty ?? false)
         
-        return detectedApplicationPath && (detectedBrowserProfiles || [.lastPass, .onePassword].contains(self))
+        return detectedApplicationPath && detectedBrowserProfiles
     }
 
     var isRunning: Bool {

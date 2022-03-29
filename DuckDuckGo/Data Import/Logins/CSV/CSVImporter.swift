@@ -20,7 +20,7 @@ import Foundation
 
 final class CSVImporter: DataImporter {
 
-    struct InferredCredentialColumnPositions {
+    struct ColumnPositions {
 
         let maximumIndex: Int
 
@@ -66,39 +66,51 @@ final class CSVImporter: DataImporter {
             }
         }
 
+        init?(source: DataImport.Source) {
+            switch source {
+            case .onePassword:
+                self.init(titleIndex: 3, urlIndex: 5, usernameIndex: 6, passwordIndex: 2, maximumIndex: 7)
+            case .lastPass, .firefox, .edge, .chrome, .brave, .safari, .csv:
+                return nil
+            }
+        }
+
     }
 
     private let fileURL: URL
-    private let loginImporter: LoginImporter
+    private let loginImporter: LoginImporter?
+    private let defaultColumnPositions: ColumnPositions?
 
-    init(fileURL: URL, loginImporter: LoginImporter) {
+    init(fileURL: URL, loginImporter: LoginImporter?, defaultColumnPositions: ColumnPositions? = nil) {
         self.fileURL = fileURL
         self.loginImporter = loginImporter
+        self.defaultColumnPositions = defaultColumnPositions
     }
 
-    static func totalValidLogins(in fileURL: URL) -> Int {
+    func totalValidLogins() -> Int {
         guard let fileContents = try? String(contentsOf: fileURL, encoding: .utf8) else {
             return 0
         }
 
         var seen: [String: Bool] = [:]
 
-        let logins = extractLogins(from: fileContents)
+        let logins = Self.extractLogins(from: fileContents, defaultColumnPositions: self.defaultColumnPositions)
         let uniqueLogins = logins.filter { seen.updateValue(true, forKey: "\($0.url)-\($0.username)") == nil }
         
         return uniqueLogins.count
     }
 
-    static func extractLogins(from fileContents: String) -> [ImportedLoginCredential] {
+    static func extractLogins(from fileContents: String,
+                              defaultColumnPositions: ColumnPositions?) -> [ImportedLoginCredential] {
         let parsed = CSVParser.parse(string: fileContents)
 
-        if let possibleHeaderRow = parsed.first, let inferredColumnPositions = InferredCredentialColumnPositions(csvValues: possibleHeaderRow) {
+        if let possibleHeaderRow = parsed.first, let inferredColumnPositions = ColumnPositions(csvValues: possibleHeaderRow) {
             return parsed.dropFirst().compactMap {
                 ImportedLoginCredential(row: $0, inferredColumnPositions: inferredColumnPositions)
             }
         } else {
             return parsed.compactMap {
-                ImportedLoginCredential(row: $0)
+                ImportedLoginCredential(row: $0, inferredColumnPositions: defaultColumnPositions)
             }
         }
     }
@@ -119,12 +131,16 @@ final class CSVImporter: DataImporter {
             completion(.failure(.cannotReadFile))
             return
         }
+        guard let loginImporter = self.loginImporter else {
+            completion(.failure(.cannotAccessSecureVault))
+            return
+        }
 
         DispatchQueue.global(qos: .userInitiated).async {
-            let loginCredentials = Self.extractLogins(from: fileContents)
+            let loginCredentials = Self.extractLogins(from: fileContents, defaultColumnPositions: self.defaultColumnPositions)
 
             do {
-                let result = try self.loginImporter.importLogins(loginCredentials)
+                let result = try loginImporter.importLogins(loginCredentials)
                 DispatchQueue.main.async { completion(.success(.init(bookmarksResult: nil,
                                                                      loginsResult: .completed(result)))) }
             } catch {

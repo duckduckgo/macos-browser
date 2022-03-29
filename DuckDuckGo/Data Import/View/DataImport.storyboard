@@ -663,7 +663,7 @@ Gw
                                                                         </textFieldCell>
                                                                     </textField>
                                                                     <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="3Kn-7N-pW9">
-                                                                        <rect key="frame" x="165" y="3" width="138" height="15"/>
+                                                                        <rect key="frame" x="165" y="3" width="137" height="15"/>
                                                                         <textFieldCell key="cell" lineBreakMode="clipping" title="Safari → Preferences" allowsEditingTextAttributes="YES" id="Qrg-TI-8eN">
                                                                             <font key="font" size="13" name="SFProText-Semibold"/>
                                                                             <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
@@ -671,7 +671,7 @@ Gw
                                                                         </textFieldCell>
                                                                     </textField>
                                                                     <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="RPt-Zb-v1a">
-                                                                        <rect key="frame" x="302" y="3" width="118" height="15"/>
+                                                                        <rect key="frame" x="301" y="3" width="118" height="15"/>
                                                                         <textFieldCell key="cell" lineBreakMode="clipping" title="from the Menu Bar" allowsEditingTextAttributes="YES" id="dyn-av-2xr">
                                                                             <font key="font" size="13" name="SFProText-Regular"/>
                                                                             <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
@@ -1395,7 +1395,7 @@ Gw
                                                                         </textFieldCell>
                                                                     </textField>
                                                                     <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="LsE-Cz-hKr">
-                                                                        <rect key="frame" x="64" y="3" width="124" height="15"/>
+                                                                        <rect key="frame" x="64" y="3" width="122" height="15"/>
                                                                         <textFieldCell key="cell" lineBreakMode="clipping" title="File → Export → All" allowsEditingTextAttributes="YES" id="Oox-l5-5X3">
                                                                             <font key="font" size="13" name="SFProText-Semibold"/>
                                                                             <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
@@ -1403,7 +1403,7 @@ Gw
                                                                         </textFieldCell>
                                                                     </textField>
                                                                     <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="82n-UF-vqX">
-                                                                        <rect key="frame" x="187" y="3" width="156" height="15"/>
+                                                                        <rect key="frame" x="185" y="3" width="156" height="15"/>
                                                                         <textFieldCell key="cell" lineBreakMode="clipping" title="Items from the Menu Bar" allowsEditingTextAttributes="YES" id="fak-DP-rKk">
                                                                             <font key="font" size="13" name="SFProText-Regular"/>
                                                                             <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
@@ -1501,8 +1501,8 @@ Gw
                                                                         <color key="fillColor" name="GlobalBackgroundColor"/>
                                                                     </box>
                                                                     <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="mML-4d-67p">
-                                                                        <rect key="frame" x="22" y="3" width="322" height="15"/>
-                                                                        <textFieldCell key="cell" lineBreakMode="clipping" title="Select the File Format: Comma Delimited Text (.csv)" allowsEditingTextAttributes="YES" id="Het-gV-9jS">
+                                                                        <rect key="frame" x="22" y="3" width="282" height="15"/>
+                                                                        <textFieldCell key="cell" lineBreakMode="clipping" title="Select the File Format: iCloud Keychain (.csv)" allowsEditingTextAttributes="YES" id="Het-gV-9jS">
                                                                             <font key="font" size="13" name="SFProText-Regular"/>
                                                                             <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
                                                                             <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>

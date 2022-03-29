@@ -47,6 +47,7 @@ final class PasswordManagementViewController: NSViewController {
     @IBOutlet var listContainer: NSView!
     @IBOutlet var itemContainer: NSView!
     @IBOutlet var addVaultItemButton: NSButton!
+    @IBOutlet var moreButton: NSButton!
     @IBOutlet var searchField: NSTextField!
     @IBOutlet var divider: NSView!
     @IBOutlet var emptyState: NSView!
@@ -150,12 +151,15 @@ final class PasswordManagementViewController: NSViewController {
 
         emptyStateTitle.attributedStringValue = NSAttributedString.make(emptyStateTitle.stringValue, lineHeight: 1.14, kern: -0.23)
         emptyStateMessage.attributedStringValue = NSAttributedString.make(emptyStateMessage.stringValue, lineHeight: 1.05, kern: -0.08)
-        
+
+        addVaultItemButton.sendAction(on: .leftMouseDown)
+        moreButton.sendAction(on: .leftMouseDown)
+
         NotificationCenter.default.addObserver(forName: .deviceBecameLocked, object: nil, queue: .main) { [weak self] _ in
             self?.displayLockScreen()
         }
     }
-    
+
     private func toggleLockScreen(hidden: Bool) {
         if hidden {
             hideLockScreen()
@@ -229,12 +233,36 @@ final class PasswordManagementViewController: NSViewController {
         menu.popUp(positioning: nil, at: location, in: sender.superview)
     }
 
+    @IBAction func moreButtonAction(_ sender: NSButton) {
+        let location = NSPoint(x: sender.frame.origin.x, y: sender.frame.origin.y - (sender.frame.height / 2) + 6)
+        sender.menu?.popUp(positioning: nil, at: location, in: sender.superview)
+    }
+
+    @IBAction func openPreferences(_ sender: Any) {
+        self.dismiss()
+        NSApp.sendAction(#selector(openPreferences(_:)), to: nil, from: sender)
+    }
+
+    @IBAction func openImportBrowserDataWindow(_ sender: Any?) {
+        self.dismiss()
+        NSApp.sendAction(#selector(openImportBrowserDataWindow(_:)), to: nil, from: sender)
+    }
+
     @IBAction func onImportClicked(_ sender: NSButton) {
+        self.dismiss()
         DataImportViewController.show()
     }
-    
+
     @IBAction func deviceAuthenticationRequested(_ sender: NSButton) {
         promptForAuthenticationIfNecessary()
+    }
+
+    @IBAction func toggleLock(_ sender: Any) {
+        if DeviceAuthenticator.shared.requiresAuthentication {
+            promptForAuthenticationIfNecessary()
+        } else {
+            DeviceAuthenticator.shared.lock()
+        }
     }
 
     private func refetchWithText(_ text: String,
@@ -853,6 +881,22 @@ final class PasswordManagementViewController: NSViewController {
         emptyStateTitle.attributedStringValue = NSAttributedString.make(title, lineHeight: 1.14, kern: -0.23)
         emptyStateMessage.isHidden = true
         emptyStateButton.isHidden = true
+    }
+
+}
+
+extension PasswordManagementViewController: NSMenuDelegate {
+
+    func menuNeedsUpdate(_ menu: NSMenu) {
+        if let lockItem = menu.items.first(where: { $0.action == #selector(toggleLock(_:)) }) {
+            let authenticator = DeviceAuthenticator.shared
+            if authenticator.shouldAutoLockLogins {
+                lockItem.isHidden = false
+                lockItem.title = authenticator.requiresAuthentication ? UserText.passwordManagementUnlock : UserText.passwordManagementLock
+            } else {
+                lockItem.isHidden = true
+            }
+        }
     }
 
 }

@@ -280,11 +280,7 @@ final class DataImportViewController: NSViewController {
 
         case .csv, .onePassword, .lastPass:
             if case let .completedImport(summary) = interactionState {
-                if let csvImportViewController = currentChildViewController as? CSVImportViewController {
-                    csvImportViewController.importSource = importSource
-                    return nil
-                }
-                return CSVImportSummaryViewController.create(summary: summary)
+                return BrowserImportSummaryViewController.create(importSummary: summary)
             } else {
                 if let csvImportViewController = currentChildViewController as? CSVImportViewController {
                     csvImportViewController.importSource = importSource
@@ -472,12 +468,22 @@ extension DataImportViewController: CSVImportViewControllerDelegate {
         do {
             let secureVault = try SecureVaultFactory.default.makeVault(errorReporter: SecureVaultErrorReporter.shared)
             let secureVaultImporter = SecureVaultLoginImporter(secureVault: secureVault)
-            self.dataImporter = CSVImporter(fileURL: url, loginImporter: secureVaultImporter)
+            self.dataImporter = CSVImporter(fileURL: url,
+                                            loginImporter: secureVaultImporter,
+                                            defaultColumnPositions: .init(source: self.viewState.selectedImportSource))
             self.viewState.interactionState = .ableToImport
         } catch {
             self.viewState.interactionState = .unableToImport
             self.presentAlert(for: .cannotAccessSecureVault)
         }
+    }
+
+    func totalValidLogins(in url: URL) -> Int? {
+
+        let importer = CSVImporter(fileURL: url,
+                                   loginImporter: nil,
+                                   defaultColumnPositions: .init(source: self.viewState.selectedImportSource))
+        return importer.totalValidLogins()
     }
 
 }
@@ -515,10 +521,10 @@ extension NSPopUpButton {
         removeAllItems()
 
         let validSources = DataImport.Source.allCases.filter(\.canImportData)
-
         for source in validSources {
             // The CSV row is at the bottom of the picker, and requires a separator above it.
-            if source == .csv {
+            if source == .onePassword || source == .csv {
+
                 let separator = NSMenuItem.separator()
                 menu?.addItem(separator)
             }

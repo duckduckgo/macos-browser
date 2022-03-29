@@ -21,6 +21,7 @@ import AppKit
 protocol CSVImportViewControllerDelegate: AnyObject {
 
     func csvImportViewController(_ viewController: CSVImportViewController, didSelectCSVFileWithURL: URL?)
+    func totalValidLogins(in fileURL: URL) -> Int?
 
 }
 
@@ -123,7 +124,7 @@ final class CSVImportViewController: NSViewController {
             selectedFileContainer.isHidden = true
             renderAwaitingFileSelectionState()
         case .selectedValidFile(let fileURL):
-            let totalLoginsToImport = CSVImporter.totalValidLogins(in: fileURL)
+            let totalLoginsToImport = self.delegate?.totalValidLogins(in: fileURL) ?? 0
             selectedFileContainer.isHidden = false
             selectedFileLabel.stringValue = fileURL.path
             selectFileButton.title = UserText.importLoginsSelectAnotherFile

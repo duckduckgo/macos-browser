@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<document type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="3.0" toolsVersion="19529" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES" customObjectInstantitationMethod="direct">
+<document type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="3.0" toolsVersion="20037" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES" customObjectInstantitationMethod="direct">
     <dependencies>
         <deployment identifier="macosx"/>
-        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="19529"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="20037"/>
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
     </dependencies>
     <objects>
@@ -10,11 +10,11 @@
         <customObject id="-1" userLabel="First Responder" customClass="FirstResponder"/>
         <customObject id="-3" userLabel="Application" customClass="NSObject"/>
         <tableCellView identifier="LoginsPreferencesTableCellView" id="r9o-mb-reY" customClass="LoginsPreferencesTableCellView" customModule="DuckDuckGo_Privacy_Browser" customModuleProvider="target">
-            <rect key="frame" x="0.0" y="0.0" width="555" height="200"/>
+            <rect key="frame" x="0.0" y="0.0" width="555" height="244"/>
             <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
             <subviews>
                 <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="eM1-2o-Okg">
-                    <rect key="frame" x="-2" y="147" width="559" height="21"/>
+                    <rect key="frame" x="-2" y="191" width="559" height="21"/>
                     <textFieldCell key="cell" lineBreakMode="clipping" title="Logins+" id="3gs-0d-UT1">
                         <font key="font" metaFont="systemSemibold" size="18"/>
                         <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
@@ -22,10 +22,10 @@
                     </textFieldCell>
                 </textField>
                 <stackView distribution="fill" orientation="vertical" alignment="leading" horizontalStackHuggingPriority="249.99998474121094" verticalStackHuggingPriority="249.99998474121094" detachesHiddenViews="YES" translatesAutoresizingMaskIntoConstraints="NO" id="qQE-Lh-xZd">
-                    <rect key="frame" x="0.0" y="20" width="555" height="107"/>
+                    <rect key="frame" x="0.0" y="20" width="555" height="151"/>
                     <subviews>
                         <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="5n4-x6-cpb">
-                            <rect key="frame" x="-2" y="88" width="77" height="19"/>
+                            <rect key="frame" x="-2" y="132" width="77" height="19"/>
                             <textFieldCell key="cell" lineBreakMode="clipping" title="Auto-lock" id="VnR-0N-eZu">
                                 <font key="font" metaFont="systemMedium" size="16"/>
                                 <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
@@ -33,13 +33,13 @@
                             </textFieldCell>
                         </textField>
                         <box boxType="custom" borderType="none" borderWidth="0.0" titlePosition="noTitle" transparent="YES" translatesAutoresizingMaskIntoConstraints="NO" id="qM0-e2-nV3">
-                            <rect key="frame" x="0.0" y="0.0" width="555" height="80"/>
+                            <rect key="frame" x="0.0" y="0.0" width="555" height="124"/>
                             <view key="contentView" id="W3M-NP-UBd">
-                                <rect key="frame" x="0.0" y="0.0" width="555" height="80"/>
+                                <rect key="frame" x="0.0" y="0.0" width="555" height="124"/>
                                 <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                 <subviews>
                                     <button verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="F7W-Ms-h4H">
-                                        <rect key="frame" x="-2" y="59" width="260" height="18"/>
+                                        <rect key="frame" x="-2" y="103" width="260" height="18"/>
                                         <buttonCell key="cell" type="radio" title="Lock Logins+ after computer is idle for" bezelStyle="regularSquare" imagePosition="left" alignment="left" inset="2" id="Zrs-rh-X6V">
                                             <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
                                             <font key="font" metaFont="system"/>
@@ -49,7 +49,7 @@
                                         </connections>
                                     </button>
                                     <popUpButton verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="s81-XX-UWd">
-                                        <rect key="frame" x="259" y="54" width="91" height="25"/>
+                                        <rect key="frame" x="259" y="98" width="91" height="25"/>
                                         <popUpButtonCell key="cell" type="push" title="Duration" bezelStyle="rounded" alignment="left" lineBreakMode="truncatingTail" state="on" borderStyle="borderAndBezel" imageScaling="proportionallyDown" inset="2" selectedItem="av6-7R-067" id="DOR-AC-NR6">
                                             <behavior key="behavior" lightByBackground="YES" lightByGray="YES"/>
                                             <font key="font" metaFont="menu"/>
@@ -66,7 +66,7 @@
                                         </connections>
                                     </popUpButton>
                                     <button verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="WXS-rX-FCz">
-                                        <rect key="frame" x="-2" y="37" width="557" height="18"/>
+                                        <rect key="frame" x="-2" y="81" width="557" height="18"/>
                                         <buttonCell key="cell" type="radio" title="Never lock Logins+" bezelStyle="regularSquare" imagePosition="left" alignment="left" inset="2" id="Gx5-Z5-NwI">
                                             <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
                                             <font key="font" metaFont="system"/>
@@ -76,19 +76,30 @@
                                         </connections>
                                     </button>
                                     <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="HFP-kq-s8f">
-                                        <rect key="frame" x="18" y="20" width="519" height="14"/>
+                                        <rect key="frame" x="18" y="64" width="519" height="14"/>
                                         <textFieldCell key="cell" lineBreakMode="clipping" title="Anyone with access to your device will be able to use and modify your Logins+ data." id="tDt-LX-aY1">
                                             <font key="font" metaFont="smallSystem"/>
                                             <color key="textColor" name="secondaryLabelColor" catalog="System" colorSpace="catalog"/>
                                             <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
                                         </textFieldCell>
                                     </textField>
+                                    <button verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="yvC-6J-62c">
+                                        <rect key="frame" x="-7" y="13" width="251" height="32"/>
+                                        <buttonCell key="cell" type="push" title="Import Bookmarks and Passwords..." bezelStyle="rounded" alignment="center" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="L1Y-jZ-Lim">
+                                            <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
+                                            <font key="font" metaFont="system"/>
+                                        </buttonCell>
+                                        <connections>
+                                            <action selector="openImportBrowserDataWindow:" target="-1" id="iVv-sQ-jbe"/>
+                                        </connections>
+                                    </button>
                                 </subviews>
                                 <constraints>
                                     <constraint firstItem="F7W-Ms-h4H" firstAttribute="leading" secondItem="W3M-NP-UBd" secondAttribute="leading" id="2ih-sj-jTW"/>
                                     <constraint firstItem="s81-XX-UWd" firstAttribute="leading" secondItem="F7W-Ms-h4H" secondAttribute="trailing" constant="4" id="79p-DY-0uJ"/>
+                                    <constraint firstItem="yvC-6J-62c" firstAttribute="top" secondItem="HFP-kq-s8f" secondAttribute="bottom" constant="24" id="GZb-dC-2IS"/>
+                                    <constraint firstItem="yvC-6J-62c" firstAttribute="leading" secondItem="W3M-NP-UBd" secondAttribute="leading" id="IBK-4a-rZ8"/>
                                     <constraint firstItem="s81-XX-UWd" firstAttribute="centerY" secondItem="F7W-Ms-h4H" secondAttribute="centerY" id="NeK-4O-sIe"/>
-                                    <constraint firstAttribute="bottom" secondItem="HFP-kq-s8f" secondAttribute="bottom" constant="20" symbolic="YES" id="PUb-GH-3JU"/>
                                     <constraint firstAttribute="trailing" secondItem="HFP-kq-s8f" secondAttribute="trailing" constant="20" symbolic="YES" id="ReS-1C-Auo"/>
                                     <constraint firstAttribute="trailing" secondItem="WXS-rX-FCz" secondAttribute="trailing" id="Tav-5V-Bjf"/>
                                     <constraint firstItem="WXS-rX-FCz" firstAttribute="top" secondItem="F7W-Ms-h4H" secondAttribute="bottom" constant="6" symbolic="YES" id="Ymk-nu-Qel"/>
@@ -97,6 +108,7 @@
                                     <constraint firstItem="F7W-Ms-h4H" firstAttribute="top" secondItem="W3M-NP-UBd" secondAttribute="top" constant="4" id="hPk-c8-QBN"/>
                                     <constraint firstItem="HFP-kq-s8f" firstAttribute="top" secondItem="WXS-rX-FCz" secondAttribute="bottom" constant="4" id="jSj-z4-F0Y"/>
                                     <constraint firstItem="WXS-rX-FCz" firstAttribute="leading" secondItem="W3M-NP-UBd" secondAttribute="leading" id="n4r-NA-NRK"/>
+                                    <constraint firstAttribute="bottom" secondItem="yvC-6J-62c" secondAttribute="bottom" constant="20" symbolic="YES" id="zGF-aM-XBD"/>
                                 </constraints>
                             </view>
                         </box>
@@ -134,7 +146,7 @@
                 <outlet property="autoLockEnabledRadioButton" destination="F7W-Ms-h4H" id="QWr-Vy-h5x"/>
                 <outlet property="autoLockThresholdPopUpButton" destination="s81-XX-UWd" id="5km-PN-SJU"/>
             </connections>
-            <point key="canvasLocation" x="316.5" y="188.5"/>
+            <point key="canvasLocation" x="316.5" y="200.5"/>
         </tableCellView>
     </objects>
 </document>
