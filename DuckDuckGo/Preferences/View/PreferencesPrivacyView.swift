@@ -27,7 +27,7 @@ extension Preferences {
             VStack(alignment: .leading, spacing: 0) {
                 Text(UserText.privacy)
                     .font(Const.Fonts.preferencePaneTitle)
-                
+
                 Section {
                     Text(UserText.fireDialogFireproofSites)
                         .font(Const.Fonts.preferencePaneSectionHeader)
@@ -69,13 +69,5 @@ extension Preferences {
                 }
             }
         }
-    }
-}
-
-struct PreferencesPrivacyView_Previews: PreviewProvider {
-    static var previews: some View {
-        Preferences.PrivacyView(model: .init())
-            .padding()
-            .frame(maxWidth: 300)
     }
 }

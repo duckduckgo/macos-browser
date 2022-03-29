@@ -24,12 +24,12 @@ extension Preferences {
 
     struct DefaultBrowserView: View {
         @ObservedObject var model: DefaultBrowserPreferencesModel
-        
+
         var body: some View {
             VStack(alignment: .leading, spacing: 0) {
                 Text(UserText.defaultBrowser)
                     .font(Const.Fonts.preferencePaneTitle)
-                
+
                 Section {
                     HStack {
                         if model.isDefault {
@@ -46,11 +46,5 @@ extension Preferences {
                 }
             }
         }
-    }
-}
-
-struct PreferencesDefaultBrowserView_Previews: PreviewProvider {
-    static var previews: some View {
-        Preferences.DefaultBrowserView(model: .init())
     }
 }

@@ -27,17 +27,16 @@ extension Preferences {
             VStack(alignment: .leading, spacing: 0) {
                 Text(UserText.downloads)
                     .font(Const.Fonts.preferencePaneTitle)
-                
+
                 Section {
                     Text(UserText.downloadsLocation)
                         .font(Const.Fonts.preferencePaneSectionHeader)
-                    
+
                     HStack {
                         NSPathControlView(url: model.selectedDownloadLocation)
                         Button(UserText.downloadsChangeDirectory) {
                             model.presentDownloadDirectoryPanel()
                         }
-                        .frame(minWidth: 82)
                     }
                     .disabled(model.alwaysRequestDownloadLocation)
 
@@ -45,11 +44,5 @@ extension Preferences {
                 }
             }
         }
-    }
-}
-
-struct PreferencesDownloadsView_Previews: PreviewProvider {
-    static var previews: some View {
-        Preferences.DownloadsView(model: .init())
     }
 }

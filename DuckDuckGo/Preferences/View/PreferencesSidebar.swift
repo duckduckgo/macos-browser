@@ -19,12 +19,12 @@
 import SwiftUI
 
 extension Preferences {
-    
+
     struct SidebarItem: View {
         let pane: PreferencePaneIdentifier
         let isSelected: Bool
         let action: () -> Void
-        
+
         var body: some View {
             Button(action: action) {
                 HStack(spacing: 6) {
@@ -35,7 +35,7 @@ extension Preferences {
             .buttonStyle(SidebarItemButtonStyle(isSelected: isSelected))
         }
     }
-    
+
     struct TabSwitcher: View {
         @EnvironmentObject var model: PreferencesSidebarModel
 
@@ -45,22 +45,22 @@ extension Preferences {
                 button.font = Const.Fonts.popUpButton
                 button.setButtonType(.momentaryLight)
                 button.isBordered = false
-                
+
                 for (index, type) in model.tabSwitcherTabs.enumerated() {
                     guard let tabTitle = type.title else {
                         assertionFailure("Attempted to display standard tab type in tab switcher")
                         continue
                     }
-                    
+
                     let item = button.menu?.addItem(withTitle: tabTitle, action: nil, keyEquivalent: "")
                     item?.representedObject = index
                 }
-                
+
                 return button
             })
-                .padding(.horizontal, 3)
-                .frame(height: 60)
-                .onAppear(perform: model.resetTabSelectionIfNeeded)
+            .padding(.horizontal, 3)
+            .frame(height: 60)
+            .onAppear(perform: model.resetTabSelectionIfNeeded)
         }
     }
 
@@ -71,7 +71,7 @@ extension Preferences {
             VStack(spacing: 12) {
                 TabSwitcher()
                     .environmentObject(model)
-                
+
                 ScrollView {
                     VStack(spacing: 0) {
                         ForEach(model.sections) { section in
@@ -122,16 +122,5 @@ extension Preferences {
                     self.isHovered = inside
                 }
         }
-    }
-}
-
-typealias Const = Preferences.Const
-typealias SidebarItem = Preferences.SidebarItem
-
-struct Sidebar_Previews: PreviewProvider {
-    
-    static var previews: some View {
-        Preferences.Sidebar(model: .init())
-            .frame(width: 250)
     }
 }

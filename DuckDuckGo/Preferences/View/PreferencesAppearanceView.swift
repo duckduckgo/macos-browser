@@ -19,12 +19,12 @@
 import SwiftUI
 
 extension Preferences {
-    
+
     struct ThemeButton: View {
         let title: String
         let imageName: String
         @Binding var isSelected: Bool
-        
+
         var body: some View {
             VStack {
                 Button(action: { isSelected.toggle() }) {
@@ -47,16 +47,16 @@ extension Preferences {
                     .stroke(Color("LinkBlueColor"), lineWidth: 2)
             }
         }
-        
+
     }
 
     struct ThemePicker: View {
         @EnvironmentObject var model: AppearancePreferencesModel
-        
+
         var body: some View {
             HStack(spacing: 24) {
                 ForEach(ThemeName.allCases, id: \.self) { theme in
-                    Preferences.ThemeButton(
+                    ThemeButton(
                         title: theme.displayName,
                         imageName: theme.imageName,
                         isSelected: isThemeSelected(theme)
@@ -64,7 +64,7 @@ extension Preferences {
                 }
             }
         }
-        
+
         private func isThemeSelected(_ theme: ThemeName) -> Binding<Bool> {
             .init(
                 get: {
@@ -78,15 +78,15 @@ extension Preferences {
             )
         }
     }
-    
+
     struct AppearanceView: View {
         @ObservedObject var model: AppearancePreferencesModel
-        
+
         var body: some View {
             VStack(alignment: .leading, spacing: 0) {
                 Text(UserText.appearance)
                     .font(Const.Fonts.preferencePaneTitle)
-                
+
                 Section {
                     Text("Theme")
                         .font(Const.Fonts.preferencePaneSectionHeader)
@@ -101,11 +101,5 @@ extension Preferences {
                 }
             }
         }
-    }
-}
-
-struct PreferencesAppearanceView_Previews: PreviewProvider {
-    static var previews: some View {
-        Preferences.AppearanceView(model: .shared)
     }
 }

@@ -18,24 +18,30 @@
 
 import SwiftUI
 
+fileprivate extension Preferences.Const {
+    static let sidebarWidth: CGFloat = 256
+    static let paneContentWidth: CGFloat = 512
+    static let panePadding: CGFloat = 40
+}
+
 extension Preferences {
-    
+
     struct RootView: View {
-        
+
         @ObservedObject var model: PreferencesSidebarModel
-        
+
         var body: some View {
             HStack(spacing: 0) {
-                Preferences.Sidebar().environmentObject(model).frame(width: 256)
+                Sidebar().environmentObject(model).frame(width: Const.sidebarWidth)
 
                 Color(NSColor.separatorColor).frame(width: 1)
-                
+
                 ScrollView(.vertical) {
                     HStack(alignment: .top, spacing: 0) {
                         Spacer()
 
                         VStack(alignment: .leading) {
-                            
+
                             switch model.selectedPane {
                             case .defaultBrowser:
                                 DefaultBrowserView(model: DefaultBrowserPreferencesModel())
@@ -51,8 +57,8 @@ extension Preferences {
                                 AboutView(model: .init())
                             }
                         }
-                        .frame(maxWidth: 512, maxHeight: .infinity, alignment: .topLeading)
-                        .padding(40)
+                        .frame(maxWidth: Const.paneContentWidth, maxHeight: .infinity, alignment: .topLeading)
+                        .padding(Const.panePadding)
 
                         Spacer()
                     }
@@ -63,10 +69,4 @@ extension Preferences {
         }
     }
 
-}
-
-struct PreferencesRootView_Previews: PreviewProvider {
-    static var previews: some View {
-        Preferences.RootView(model: .init())
-    }
 }

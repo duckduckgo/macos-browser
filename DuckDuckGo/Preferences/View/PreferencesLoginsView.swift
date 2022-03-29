@@ -18,6 +18,25 @@
 
 import SwiftUI
 
+fileprivate extension Preferences.Const {
+    static let autoLockPickerHorizontalOffset: CGFloat = {
+        if #available(macOS 12.0, *) {
+            return -8
+        } else {
+            return 0
+        }
+    }()
+
+    static let autoLockWarningOffset: CGFloat = {
+        if #available(macOS 12.0, *) {
+            return 18
+        } else {
+            return 20
+        }
+    }()
+
+}
+
 extension Preferences {
 
     struct LoginsView: View {
@@ -72,39 +91,16 @@ extension Preferences {
                         Text(UserText.loginsPlusNeverLock).tag(false)
                     }, label: {})
                     .pickerStyle(.radioGroup)
-                    .offset(x: autoLockPickerHorizontalOffset)
+                    .offset(x: Const.autoLockPickerHorizontalOffset)
                     .padding(.bottom, 6)
 
                     Text(UserText.loginsPlusNeverLockWarning)
                         .font(Const.Fonts.preferencePaneCaption)
                         .foregroundColor(Color("GreyTextColor"))
                         .fixMultilineScrollableText()
-                        .offset(x: autoLockWarningOffset)
+                        .offset(x: Const.autoLockWarningOffset)
                 }
             }
         }
-
-        var autoLockPickerHorizontalOffset: CGFloat {
-            if #available(macOS 12.0, *) {
-                return -8
-            } else {
-                return 0
-            }
-        }
-
-        var autoLockWarningOffset: CGFloat {
-            if #available(macOS 12.0, *) {
-                return 18
-            } else {
-                return 20
-            }
-        }
-    }
-
-}
-
-struct PreferencesLoginsView_Previews: PreviewProvider {
-    static var previews: some View {
-        Preferences.LoginsView(model: .init())
     }
 }

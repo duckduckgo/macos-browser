@@ -18,16 +18,27 @@
 
 import SwiftUI
 
+fileprivate extension Font {
+    static let companyName: Font = .title
+    static let privacySimplified: Font = {
+        if #available(macOS 11.0, *) {
+            return .title3.weight(.semibold)
+        } else {
+            return .system(size: 15, weight: .semibold)
+        }
+    }()
+}
+
 extension Preferences {
-    
+
     struct AboutView: View {
         @ObservedObject var model: AboutModel
-        
+
         var body: some View {
             VStack(alignment: .leading, spacing: 20) {
                 Text("About DuckDuckGo")
                     .font(Const.Fonts.preferencePaneTitle)
-                
+
                 HStack {
                     Image("AboutPageLogo")
                     VStack(alignment: .leading, spacing: 8) {
@@ -41,37 +52,20 @@ extension Preferences {
                     TextButton("More at \(model.displayableAboutURL)") {
                         model.openURL(.aboutDuckDuckGo)
                     }
-#if FEEDBACK
+                    #if FEEDBACK
                     Spacer()
                     Button("Send Feedback") {
                         model.openFeedbackForm()
                     }
                     Spacer()
-#endif
+                    #endif
                 }
-                
+
                 TextButton("Privacy Policy") {
                     model.openURL(.privacyPolicy)
                 }
             }
         }
     }
-    
-}
 
-fileprivate extension Font {
-    static let companyName: Font = .title
-    static let privacySimplified: Font = {
-        if #available(macOS 11.0, *) {
-            return .title3.weight(.semibold)
-        } else {
-            return .system(size: 15, weight: .semibold)
-        }
-    }()
-}
-
-struct PreferencesAboutView_Previews: PreviewProvider {
-    static var previews: some View {
-        Preferences.AboutView(model: .init())
-    }
 }
