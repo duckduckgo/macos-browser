@@ -154,6 +154,10 @@ final class PasswordManagementViewController: NSViewController {
         NotificationCenter.default.addObserver(forName: .deviceBecameLocked, object: nil, queue: .main) { [weak self] _ in
             self?.displayLockScreen()
         }
+        
+        NotificationCenter.default.addObserver(forName: .dataImportComplete, object: nil, queue: .main) { [weak self] _ in
+            self?.refreshData()
+        }
     }
     
     private func toggleLockScreen(hidden: Bool) {
@@ -327,9 +331,9 @@ final class PasswordManagementViewController: NSViewController {
             self?.doSaveCredentials(credentials)
         }, onDeleteRequested: { [weak self] credentials in
             self?.promptToDelete(credentials: credentials)
-        }) { [weak self] in
+        }, onCancelled: { [weak self] in
             self?.refetchWithText(self!.searchField.stringValue)
-        }
+        })
 
         self.itemModel = itemModel
 
@@ -345,9 +349,9 @@ final class PasswordManagementViewController: NSViewController {
             self?.doSaveIdentity(note)
         }, onDeleteRequested: { [weak self] identity in
             self?.promptToDelete(identity: identity)
-        }) { [weak self] in
+        }, onCancelled: { [weak self] in
             self?.refetchWithText(self!.searchField.stringValue)
-        }
+        })
 
         self.itemModel = itemModel
 
@@ -363,9 +367,9 @@ final class PasswordManagementViewController: NSViewController {
             self?.doSaveNote(note)
         }, onDeleteRequested: { [weak self] note in
             self?.promptToDelete(note: note)
-        }) { [weak self] in
+        }, onCancelled: { [weak self] in
             self?.refetchWithText(self!.searchField.stringValue)
-        }
+        })
 
         self.itemModel = itemModel
 
@@ -381,9 +385,9 @@ final class PasswordManagementViewController: NSViewController {
             self?.doSaveCreditCard(card)
         }, onDeleteRequested: { [weak self] card in
             self?.promptToDelete(card: card)
-        }) { [weak self] in
+        }, onCancelled: { [weak self] in
             self?.refetchWithText(self!.searchField.stringValue)
-        }
+        })
 
         self.itemModel = itemModel
 
@@ -512,9 +516,7 @@ final class PasswordManagementViewController: NSViewController {
             switch response {
             case .alertFirstButtonReturn:
                 try? self.secureVault?.deleteWebsiteCredentialsFor(accountId: id)
-                self.itemModel?.clearSecureVaultModel()
-                self.refetchWithText(self.searchField.stringValue)
-                self.postChange()
+                self.refreshData()
 
             default:
                 break // cancel, do nothing
@@ -533,9 +535,7 @@ final class PasswordManagementViewController: NSViewController {
             switch response {
             case .alertFirstButtonReturn:
                 try? self.secureVault?.deleteIdentityFor(identityId: id)
-                self.itemModel?.clearSecureVaultModel()
-                self.refetchWithText(self.searchField.stringValue)
-                self.postChange()
+                self.refreshData()
 
             default:
                 break // cancel, do nothing
@@ -554,9 +554,7 @@ final class PasswordManagementViewController: NSViewController {
             switch response {
             case .alertFirstButtonReturn:
                 try? self.secureVault?.deleteNoteFor(noteId: id)
-                self.itemModel?.clearSecureVaultModel()
-                self.refetchWithText(self.searchField.stringValue)
-                self.postChange()
+                self.refreshData()
 
             default:
                 break // cancel, do nothing
@@ -575,15 +573,19 @@ final class PasswordManagementViewController: NSViewController {
             switch response {
             case .alertFirstButtonReturn:
                 try? self.secureVault?.deleteCreditCardFor(cardId: id)
-                self.itemModel?.clearSecureVaultModel()
-                self.refetchWithText(self.searchField.stringValue)
-                self.postChange()
+                self.refreshData()
 
             default:
                 break // cancel, do nothing
             }
 
         }
+    }
+    
+    private func refreshData() {
+        self.itemModel?.clearSecureVaultModel()
+        self.refetchWithText(self.searchField.stringValue)
+        self.postChange()
     }
 
     // swiftlint:disable function_body_length

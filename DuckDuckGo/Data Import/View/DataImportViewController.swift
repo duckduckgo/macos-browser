@@ -359,6 +359,8 @@ final class DataImportViewController: NSViewController {
                 } else if importTypes.contains(.bookmarks) {
                     self.fireImportBookmarksPixelForSelectedImportSource()
                 }
+                
+                NotificationCenter.default.post(name: .dataImportComplete, object: nil)
             case .failure(let error):
                 switch error {
                 case .needsLoginPrimaryPassword:
