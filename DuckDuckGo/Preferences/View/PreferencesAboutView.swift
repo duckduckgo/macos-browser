@@ -36,32 +36,32 @@ extension Preferences {
 
         var body: some View {
             VStack(alignment: .leading, spacing: 20) {
-                Text("About DuckDuckGo")
+                Text(UserText.aboutDuckDuckGo)
                     .font(Const.Fonts.preferencePaneTitle)
 
                 HStack {
                     Image("AboutPageLogo")
                     VStack(alignment: .leading, spacing: 8) {
                         Text("DuckDuckGo").font(.companyName)
-                        Text("Privacy, simplified").font(.privacySimplified)
+                        Text(UserText.privacySimplified).font(.privacySimplified)
                         Text(UserText.versionLabel(version: model.appVersion.versionNumber, build: model.appVersion.buildNumber))
                     }
                 }
 
                 HStack {
-                    TextButton("More at \(model.displayableAboutURL)") {
+                    TextButton(UserText.moreAt(url: model.displayableAboutURL)) {
                         model.openURL(.aboutDuckDuckGo)
                     }
                     #if FEEDBACK
                     Spacer()
-                    Button("Send Feedback") {
+                    Button(UserText.sendFeedback) {
                         model.openFeedbackForm()
                     }
                     Spacer()
                     #endif
                 }
 
-                TextButton("Privacy Policy") {
+                TextButton(UserText.privacyPolicy) {
                     model.openURL(.privacyPolicy)
                 }
             }

@@ -88,16 +88,16 @@ extension Preferences {
                     .font(Const.Fonts.preferencePaneTitle)
 
                 Section {
-                    Text("Theme")
+                    Text(UserText.theme)
                         .font(Const.Fonts.preferencePaneSectionHeader)
                     ThemePicker()
                         .environmentObject(model)
                 }
 
                 Section {
-                    Text("Address Bar")
+                    Text(UserText.addressBar)
                         .font(Const.Fonts.preferencePaneSectionHeader)
-                    Toggle("Show full website address", isOn: $model.showFullURL)
+                    Toggle(UserText.showFullWebsiteAddress, isOn: $model.showFullURL)
                 }
             }
         }

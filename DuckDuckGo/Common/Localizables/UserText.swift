@@ -229,13 +229,24 @@ struct UserText {
     static let privacy = NSLocalizedString("preferences.privacy", value: "Privacy", comment: "Show privacy browser preferences")
     static let about = NSLocalizedString("preferences.about", value: "About", comment: "Show about screen")
 
-    // TODO: remove
-    static let privacyAndSecurity = NSLocalizedString("preferences.privacy-and-security", value: "Privacy & Security", comment: "Show privacy and security browser preferences")
-    
     static let downloads = NSLocalizedString("preferences.downloads", value: "Downloads", comment: "Show downloads browser preferences")
     static let isDefaultBrowser = NSLocalizedString("preferences.default-browser.active", value: "DuckDuckGo is your default browser", comment: "Indicate that the browser is the default")
     static let isNotDefaultBrowser = NSLocalizedString("preferences.default-browser.inactive", value: "DuckDuckGo is not your default browser.", comment: "Indicate that the browser is not the default")
+    static let makeDefaultBrowser = NSLocalizedString("preferences.default-browser.button.make-default", value: "Make DuckDuckGo Default...", comment: "")
+    static let theme = NSLocalizedString("preferences.appearance.theme", value: "Theme", comment: "Theme preferences")
+    static let addressBar = NSLocalizedString("preferences.appearance.address-bar", value: "Address Bar", comment: "Theme preferences")
+    static let showFullWebsiteAddress = NSLocalizedString("preferences.appearance.show-full-url", value: "Show full website address", comment: "Option to show full URL in the address bar")
     static let loginsPlus = NSLocalizedString("preferences.logins-plus", value: "Logins+", comment: "Show Logins+ preferences")
+    
+    static let aboutDuckDuckGo = NSLocalizedString("preferences.about.about-duckduckgo", value: "About DuckDuckGo", comment: "About screen")
+    static let privacySimplified = NSLocalizedString("preferences.about.privacy-simplified", value: "Privacy, simplified", comment: "About screen")
+
+    static func moreAt(url: String) -> String {
+        let localized = NSLocalizedString("preferences.about.more-at", value: "More at %@", comment: "Link to the about page")
+        return String(format: localized, url)
+    }
+
+    static let sendFeedback = NSLocalizedString("preferences.about.send-feedback", value: "Send Feedback", comment: "Feedback button in the about preferences page")
 
     static let feedbackBugDescription = NSLocalizedString("feedback.bug.description", value: "Please describe the problem in as much detail as possible:", comment: "Label in the feedback form")
     static let feedbackFeatureRequestDescription = NSLocalizedString("feedback.feature.request.description", value: "What feature would you like to see?", comment: "Label in the feedback form")
@@ -247,6 +258,8 @@ struct UserText {
                                           comment: "Displays the version and build numbers")
         return String(format: localized, version, build)
     }
+
+    static let privacyPolicy = NSLocalizedString("preferences.about.privacy-policy", value: "Privacy Policy", comment: "Link to privacy policy page")
 
     // MARK: - Login Import & Export
 

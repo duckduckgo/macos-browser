@@ -38,7 +38,7 @@ extension Preferences {
                         } else {
                             Image("Warning")
                             Text(UserText.isNotDefaultBrowser)
-                            Button("Make DuckDuckGo Default...") {
+                            Button(UserText.makeDefaultBrowser) {
                                 model.becomeDefault()
                             }
                         }
