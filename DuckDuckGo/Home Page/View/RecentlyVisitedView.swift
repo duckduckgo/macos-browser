@@ -73,7 +73,7 @@ struct RecentlyVisitedSiteEmptyState: View {
                     .fill(connectorColor)
                 Image("Web")
                     .resizable()
-                    .frame(width: 22, height: 22)
+                    .frame(width: 16, height: 16)
                     .foregroundColor(iconColor)
             }
             .frame(width: 32, height: 32)
@@ -91,16 +91,6 @@ struct RecentlyVisitedSiteEmptyState: View {
             }.padding(.top, 6)
 
             Spacer()
-
-            HStack(spacing: 2) {
-                RoundedRectangle(cornerRadius: 6)
-                    .fill(connectorColor)
-                    .frame(width: 24, height: 24)
-
-                RoundedRectangle(cornerRadius: 8)
-                    .fill(connectorColor)
-                    .frame(width: 24, height: 24)
-            }
 
         }.padding([.leading, .trailing], 12)
 
@@ -229,12 +219,12 @@ struct RecentlyVisitedPageList: View {
                     HyperLink(page.displayTitle, textColor: Color("HomeFeedItemPageTextColor")) {
                         model.open(page.url)    
                     }
-                    .font(.system(size: 11))
+                    .font(.system(size: 12))
                     .lineLimit(1)
                     .truncationMode(.middle)
 
                     Text(relativeTime(page))
-                        .font(.system(size: 11))
+                        .font(.system(size: 12))
                         .foregroundColor(Color("HomeFeedItemTimeTextColor"))
 
                     HoverButton(size: 16, imageName: "HomeArrowDown", imageSize: 8, cornerRadius: 4) {
