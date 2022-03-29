@@ -71,7 +71,7 @@ struct Logging {
     fileprivate static let fireLoggingEnabled = false
     fileprivate static let fireLog: OSLog = OSLog(subsystem: Bundle.main.bundleIdentifier ?? "DuckDuckGo", category: "Fire")
 
-    fileprivate static let passwordManagerEnabled = true
+    fileprivate static let passwordManagerEnabled = false
     fileprivate static let passwordManagerLog: OSLog = OSLog(subsystem: Bundle.main.bundleIdentifier ?? "DuckDuckGo", category: "Password Manager")
 
     fileprivate static let historyLoggingEnabled = false
