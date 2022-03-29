@@ -106,5 +106,13 @@ final class MockSecureVault: SecureVault {
     func deleteCreditCardFor(cardId: Int64) throws {
         storedCards = storedCards.filter { $0.id != cardId }
     }
+    
+    func existingIdentityForAutofill(matching proposedIdentity: SecureVaultModels.Identity) throws -> SecureVaultModels.Identity? {
+        return nil
+    }
+    
+    func existingCardForAutofill(matching proposedCard: SecureVaultModels.CreditCard) throws -> SecureVaultModels.CreditCard? {
+        return nil
+    }
 
 }

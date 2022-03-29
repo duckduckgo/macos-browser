@@ -73,11 +73,29 @@ final class NavigationBarViewController: NSViewController {
         popover.delegate = self
         return popover
     }()
+
     private lazy var saveCredentialsPopover: SaveCredentialsPopover = {
         let popover = SaveCredentialsPopover()
         popover.delegate = self
         return popover
     }()
+    
+    private lazy var saveIdentityPopover: SaveIdentityPopover = {
+        let popover = SaveIdentityPopover()
+        popover.delegate = self
+        return popover
+    }()
+    
+    private lazy var savePaymentMethodPopover: SavePaymentMethodPopover = {
+        let popover = SavePaymentMethodPopover()
+        popover.delegate = self
+        return popover
+    }()
+    
+    private var popovers: [NSPopover] {
+        return [saveCredentialsPopover, saveIdentityPopover, savePaymentMethodPopover]
+    }
+
     private lazy var passwordManagementPopover: PasswordManagementPopover = PasswordManagementPopover()
     private lazy var downloadsPopover: DownloadsPopover = {
         let downloadsPopover = DownloadsPopover()
@@ -274,7 +292,7 @@ final class NavigationBarViewController: NSViewController {
     }
 
     func closeTransientPopovers() -> Bool {
-        guard !saveCredentialsPopover.isShown else {
+        guard popovers.allSatisfy({ !$0.isShown }) else {
             return false
         }
 
@@ -440,7 +458,7 @@ final class NavigationBarViewController: NSViewController {
 
         passwordManagementButton.image = NSImage(named: "PasswordManagement")
 
-        if saveCredentialsPopover.isShown {
+        if popovers.contains(where: { $0.isShown }) {
             return
         }
 
@@ -501,27 +519,53 @@ final class NavigationBarViewController: NSViewController {
     }
 
     private func subscribeToCredentialsToSave() {
-        credentialsToSaveCancellable = tabCollectionViewModel.selectedTabViewModel?.$credentialsToSave
+        credentialsToSaveCancellable = tabCollectionViewModel.selectedTabViewModel?.$autofillDataToSave
             .receive(on: DispatchQueue.main)
             .sink(receiveValue: { [weak self] in
-                if let credentials = $0 {
-                    self?.promptToSaveCredentials(credentials)
-                    self?.tabCollectionViewModel.selectedTabViewModel?.credentialsToSave = nil
+                if let data = $0 {
+                    self?.promptToSaveAutofillData(data)
+                    self?.tabCollectionViewModel.selectedTabViewModel?.autofillDataToSave = nil
                 }
         })
     }
-
-    private func promptToSaveCredentials(_ credentials: SecureVaultModels.WebsiteCredentials) {
-        showSaveCredentialsPopover()
-        saveCredentialsPopover.viewController.saveCredentials(credentials)
+    
+    private func promptToSaveAutofillData(_ data: AutofillData) {
+        let loginsPreferences = LoginsPreferences()
+        
+        if loginsPreferences.askToSaveUsernamesAndPasswords, let credentials = data.credentials {
+            os_log("Presenting Save Credentials popover", log: .passwordManager)
+            showSaveCredentialsPopover()
+            saveCredentialsPopover.viewController.saveCredentials(credentials)
+        } else if loginsPreferences.askToSavePaymentMethods, let card = data.creditCard {
+            os_log("Presenting Save Payment Method popover", log: .passwordManager)
+            showSavePaymentMethodPopover()
+            savePaymentMethodPopover.viewController.savePaymentMethod(card)
+        } else if loginsPreferences.askToSaveAddresses, let identity = data.identity {
+            os_log("Presenting Save Identity popover", log: .passwordManager)
+            showSaveIdentityPopover()
+            saveIdentityPopover.viewController.saveIdentity(identity)
+        } else {
+            os_log("Received save autofill data call, but there was no data to present", log: .passwordManager)
+        }
     }
 
     private func showSaveCredentialsPopover() {
+        show(popover: saveCredentialsPopover)
+    }
+    
+    private func showSavePaymentMethodPopover() {
+        show(popover: savePaymentMethodPopover)
+    }
+    
+    private func showSaveIdentityPopover() {
+        show(popover: saveIdentityPopover)
+    }
+    
+    private func show(popover: NSPopover) {
         passwordManagementButton.isHidden = false
-
-        saveCredentialsPopover.show(relativeTo: passwordManagementButton.bounds.insetFromLineOfDeath(),
-                                    of: passwordManagementButton,
-                                    preferredEdge: .minY)
+        popover.show(relativeTo: passwordManagementButton.bounds.insetFromLineOfDeath(),
+                     of: passwordManagementButton,
+                     preferredEdge: .minY)
     }
 
     private func subscribeToNavigationActionFlags() {
@@ -589,7 +633,7 @@ extension NavigationBarViewController: NSPopoverDelegate {
             downloadsPopoverTimer = nil
         } else if notification.object as AnyObject? === bookmarkListPopover {
             updateBookmarksButton()
-        } else if notification.object as AnyObject? === saveCredentialsPopover {
+        } else if popovers.contains(where: { notification.object as AnyObject? === $0 }) {
             updatePasswordManagementButton()
         }
     }

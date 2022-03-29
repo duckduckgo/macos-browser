@@ -193,8 +193,8 @@ extension ContentOverlayViewController: OverlayAutofillUserScriptPresentationDel
 
 extension ContentOverlayViewController: SecureVaultManagerDelegate {
 
-    public func secureVaultManager(_: SecureVaultManager, promptUserToStoreCredentials credentials: SecureVaultModels.WebsiteCredentials) {
-        // No-op, the content overlay view controller should not be prompting the user to store credentials
+    public func secureVaultManager(_: SecureVaultManager, promptUserToStoreAutofillData data: AutofillData) {
+        // No-op, the content overlay view controller should not be prompting the user to store data
     }
 
     public func secureVaultManager(_: SecureVaultManager, didAutofill type: AutofillType, withObjectId objectId: Int64) {

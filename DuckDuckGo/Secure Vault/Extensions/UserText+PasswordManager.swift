@@ -70,6 +70,8 @@ extension UserText {
     static let pmNote = NSLocalizedString("pm.note", value: "Note", comment: "Label for note title")
     static let pmEmptyNote = NSLocalizedString("pm.note.empty", value: "Empty note", comment: "Label for empty note title")
     
+    static let pmDefaultIdentityAutofillTitle = NSLocalizedString("pm.identity.autofill.title.default", value: "Address", comment: "Default title for Addresses/Identities")
+    
     static let pmSortStringAscending = NSLocalizedString("pm.sort.string.ascending", value: "Alphabetically", comment: "Label for Ascending string sort order")
     static let pmSortStringDescending = NSLocalizedString("pm.sort.string.descending", value: "Reverse Alphabetically", comment: "Label for Descending string sort order")
     static let pmSortDateAscending = NSLocalizedString("pm.sort.date.ascending", value: "Newest First", comment: "Label for Ascending date sort order")

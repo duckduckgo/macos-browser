@@ -605,8 +605,8 @@ extension BrowserTabViewController: FileDownloadManagerDelegate {
         return dockScreenRect
     }
 
-    func tab(_ tab: Tab, requestedSaveCredentials credentials: SecureVaultModels.WebsiteCredentials) {
-        tabViewModel?.credentialsToSave = credentials
+    func tab(_ tab: Tab, requestedSaveAutofillData autofillData: AutofillData) {
+        tabViewModel?.autofillDataToSave = autofillData
     }
 
 }

@@ -42,7 +42,6 @@ final class ChromiumBookmarksReader {
             let decodedBookmarks = try JSONDecoder().decode(ImportedBookmarks.self, from: bookmarksFileData)
             return .success(decodedBookmarks)
         } catch {
-            print(error)
             return .failure(.bookmarksFileDecodingFailed)
         }
     }
