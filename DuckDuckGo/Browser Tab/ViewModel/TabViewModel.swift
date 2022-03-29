@@ -59,7 +59,7 @@ final class TabViewModel {
         }
     }
 
-    @Published var credentialsToSave: SecureVaultModels.WebsiteCredentials?
+    @Published var autofillDataToSave: AutofillData?
 
     var loadingStartTime: CFTimeInterval?
 

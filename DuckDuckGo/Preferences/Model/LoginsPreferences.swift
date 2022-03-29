@@ -94,6 +94,15 @@ final class LoginsPreferences {
         }
     }
     
+    @UserDefaultsWrapper(key: .askToSaveUsernamesAndPasswords, defaultValue: true)
+    var askToSaveUsernamesAndPasswords: Bool
+    
+    @UserDefaultsWrapper(key: .askToSaveAddresses, defaultValue: true)
+    var askToSaveAddresses: Bool
+    
+    @UserDefaultsWrapper(key: .askToSavePaymentMethods, defaultValue: true)
+    var askToSavePaymentMethods: Bool
+    
     private var statisticsStore: StatisticsStore {
         return injectedDependencyStore ?? defaultDependencyStore
     }

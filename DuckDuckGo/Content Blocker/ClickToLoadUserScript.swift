@@ -26,7 +26,7 @@ protocol ClickToLoadUserScriptDelegate: AnyObject {
 
 final class ClickToLoadUserScript: NSObject, UserScript, WKScriptMessageHandlerWithReply {
 
-    var injectionTime: WKUserScriptInjectionTime { .atDocumentStart }
+    var injectionTime: WKUserScriptInjectionTime { .atDocumentEnd }
     var forMainFrameOnly: Bool { false }
     var messageNames: [String] { ["getImage", "enableFacebook", "initClickToLoad" ] }
     let source: String
