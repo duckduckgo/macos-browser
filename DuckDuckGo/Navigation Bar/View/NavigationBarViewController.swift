@@ -79,19 +79,19 @@ final class NavigationBarViewController: NSViewController {
         popover.delegate = self
         return popover
     }()
-    
+
     private lazy var saveIdentityPopover: SaveIdentityPopover = {
         let popover = SaveIdentityPopover()
         popover.delegate = self
         return popover
     }()
-    
+
     private lazy var savePaymentMethodPopover: SavePaymentMethodPopover = {
         let popover = SavePaymentMethodPopover()
         popover.delegate = self
         return popover
     }()
-    
+
     private var popovers: [NSPopover] {
         return [saveCredentialsPopover, saveIdentityPopover, savePaymentMethodPopover]
     }
@@ -131,7 +131,7 @@ final class NavigationBarViewController: NSViewController {
         view.wantsLayer = true
         view.layer?.masksToBounds = false
         addressBarContainer.wantsLayer = true
-        addressBarContainer.layer?.masksToBounds = false    
+        addressBarContainer.layer?.masksToBounds = false
 
         setupNavigationButtonMenus()
         subscribeToSelectedTabViewModel()
@@ -235,7 +235,7 @@ final class NavigationBarViewController: NSViewController {
 
     @IBAction func passwordManagementButtonAction(_ sender: NSButton) {
         // Use the category that is already selected
-        
+
         if passwordManagementPopover.isShown {
             passwordManagementPopover.close()
         } else {
@@ -283,14 +283,14 @@ final class NavigationBarViewController: NSViewController {
 
     @objc private func showFireproofingFeedback(_ sender: Notification) {
         guard view.window?.isKeyWindow == true,
-            let domain = sender.userInfo?[FireproofDomains.Constants.newFireproofDomainKey] as? String else { return }
+              let domain = sender.userInfo?[FireproofDomains.Constants.newFireproofDomainKey] as? String else { return }
 
         DispatchQueue.main.async {
             let viewController = PopoverMessageViewController.createWithMessage(UserText.domainIsFireproof(domain: domain))
             viewController.show(onParent: self, relativeTo: self.optionsButton)
         }
     }
-    
+
     @objc private func showAutoconsentFeedback(_ sender: Notification) {
         if #available(macOS 11, *) {
             guard view.window?.isKeyWindow == true,
@@ -541,12 +541,12 @@ final class NavigationBarViewController: NSViewController {
                     self?.promptToSaveAutofillData(data)
                     self?.tabCollectionViewModel.selectedTabViewModel?.autofillDataToSave = nil
                 }
-        })
+            })
     }
-    
+
     private func promptToSaveAutofillData(_ data: AutofillData) {
-        let loginsPreferences = LoginsPreferences()
-        
+        let loginsPreferences = LoginsPreferencesModel()
+
         if loginsPreferences.askToSaveUsernamesAndPasswords, let credentials = data.credentials {
             os_log("Presenting Save Credentials popover", log: .passwordManager)
             showSaveCredentialsPopover()
@@ -567,15 +567,15 @@ final class NavigationBarViewController: NSViewController {
     private func showSaveCredentialsPopover() {
         show(popover: saveCredentialsPopover)
     }
-    
+
     private func showSavePaymentMethodPopover() {
         show(popover: savePaymentMethodPopover)
     }
-    
+
     private func showSaveIdentityPopover() {
         show(popover: saveIdentityPopover)
     }
-    
+
     private func show(popover: NSPopover) {
         passwordManagementButton.isHidden = false
         popover.show(relativeTo: passwordManagementButton.bounds.insetFromLineOfDeath(),

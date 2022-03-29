@@ -18,6 +18,27 @@
 
 import Foundation
 
+extension NSNotification.Name {
+    static let loginsAutoLockSettingsDidChange = NSNotification.Name("loginsAutoLockSettingsDidChange")
+}
+
+protocol LoginsPreferencesPersistor {
+    var askToSaveUsernamesAndPasswords: Bool { get set }
+    var askToSaveAddresses: Bool { get set }
+    var askToSavePaymentMethods: Bool { get set }
+}
+
+struct LoginsPreferencesUserDefaultsPersistor: LoginsPreferencesPersistor {
+    @UserDefaultsWrapper(key: .askToSaveUsernamesAndPasswords, defaultValue: true)
+    var askToSaveUsernamesAndPasswords: Bool
+
+    @UserDefaultsWrapper(key: .askToSaveAddresses, defaultValue: true)
+    var askToSaveAddresses: Bool
+
+    @UserDefaultsWrapper(key: .askToSavePaymentMethods, defaultValue: true)
+    var askToSavePaymentMethods: Bool
+}
+
 final class LoginsPreferencesModel: ObservableObject {
 
     enum AutoLockThreshold: String, CaseIterable {
@@ -36,7 +57,7 @@ final class LoginsPreferencesModel: ObservableObject {
             case .oneHour: return UserText.autoLockThreshold1Hour
             }
         }
-        
+
         var seconds: TimeInterval {
             switch self {
             case .oneMinute: return 60
@@ -46,7 +67,7 @@ final class LoginsPreferencesModel: ObservableObject {
             case .oneHour: return 60 * 60
             }
         }
-        
+
         var pixelEvent: Pixel.Event {
             switch self {
             case .oneMinute: return .passwordManagerLockScreenTimeoutSelected1Minute
@@ -58,37 +79,58 @@ final class LoginsPreferencesModel: ObservableObject {
         }
 
     }
-    
+
     @Published var shouldAutoLockLogins: Bool = true {
         didSet {
             statisticsStore.autoLockEnabled = shouldAutoLockLogins
-            
+
             if oldValue != shouldAutoLockLogins {
                 NotificationCenter.default.post(name: .loginsAutoLockSettingsDidChange, object: nil)
             }
         }
     }
-    
+
     @Published var autoLockThreshold: AutoLockThreshold = .fifteenMinutes {
         didSet {
             statisticsStore.autoLockThreshold = autoLockThreshold.rawValue
         }
     }
-    
-    private var statisticsStore: StatisticsStore {
-        return injectedDependencyStore ?? defaultDependencyStore
+
+    @Published var askToSaveUsernamesAndPasswords: Bool {
+        didSet {
+            persistor.askToSaveUsernamesAndPasswords = askToSaveUsernamesAndPasswords
+        }
     }
 
-    private let injectedDependencyStore: StatisticsStore?
-    private lazy var defaultDependencyStore: StatisticsStore = {
-        return LocalStatisticsStore()
-    }()
+    @Published var askToSaveAddresses: Bool {
+        didSet {
+            persistor.askToSaveAddresses = askToSaveAddresses
+        }
+    }
 
-    init(statisticsStore: StatisticsStore? = nil) {
-        self.injectedDependencyStore = statisticsStore
-        shouldAutoLockLogins = self.statisticsStore.autoLockEnabled
+    @Published var askToSavePaymentMethods: Bool {
+        didSet {
+            persistor.askToSavePaymentMethods = askToSavePaymentMethods
+        }
+    }
+
+    private var statisticsStore: StatisticsStore
+    private var persistor: LoginsPreferencesPersistor
+
+    init(
+        statisticsStore: StatisticsStore = LocalStatisticsStore(),
+        persistor: LoginsPreferencesPersistor = LoginsPreferencesUserDefaultsPersistor()
+    ) {
+        self.statisticsStore = statisticsStore
+        self.persistor = persistor
+
+        askToSaveUsernamesAndPasswords = persistor.askToSaveUsernamesAndPasswords
+        askToSaveAddresses = persistor.askToSaveAddresses
+        askToSavePaymentMethods = persistor.askToSavePaymentMethods
+
+        shouldAutoLockLogins = statisticsStore.autoLockEnabled
         autoLockThreshold = {
-            if let rawValue = self.statisticsStore.autoLockThreshold, let threshold = AutoLockThreshold(rawValue: rawValue) {
+            if let rawValue = statisticsStore.autoLockThreshold, let threshold = AutoLockThreshold(rawValue: rawValue) {
                 return threshold
             } else {
                 return .fifteenMinutes

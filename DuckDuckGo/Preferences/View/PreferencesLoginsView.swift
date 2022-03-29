@@ -19,7 +19,7 @@
 import SwiftUI
 
 extension Preferences {
-    
+
     struct LoginsView: View {
         @ObservedObject var model: LoginsPreferencesModel
 
@@ -27,40 +27,40 @@ extension Preferences {
             VStack(alignment: .leading, spacing: 0) {
                 Text(UserText.loginsPlus)
                     .font(Const.Fonts.preferencePaneTitle)
-                
+
                 Section(spacing: 0) {
                     Text(UserText.loginsPlusAskToSave)
                         .font(Const.Fonts.preferencePaneSectionHeader)
                         .padding(.bottom, 6)
-                    
+
                     Text(UserText.loginsPlusAskToSaveExplanation)
                         .font(Const.Fonts.preferencePaneCaption)
                         .foregroundColor(Color("GreyTextColor"))
                         .fixMultilineScrollableText()
                         .padding(.bottom, 12)
-                    
+
                     VStack(alignment: .leading, spacing: 6) {
-                        Toggle(UserText.loginsPlusUsernamesAndPasswords, isOn: .constant(true))
+                        Toggle(UserText.loginsPlusUsernamesAndPasswords, isOn: $model.askToSaveUsernamesAndPasswords)
                             .fixMultilineScrollableText()
-                        Toggle(UserText.loginsPlusAddresses, isOn: .constant(true))
+                        Toggle(UserText.loginsPlusAddresses, isOn: $model.askToSaveAddresses)
                             .fixMultilineScrollableText()
-                        Toggle(UserText.loginsPlusPaymentMethods, isOn: .constant(true))
+                        Toggle(UserText.loginsPlusPaymentMethods, isOn: $model.askToSavePaymentMethods)
                             .fixMultilineScrollableText()
                     }
                 }
-                
+
                 Section(spacing: 0) {
                     Text(UserText.loginsPlusAutoLock)
                         .font(Const.Fonts.preferencePaneSectionHeader)
                         .padding(.bottom, 12)
-                    
+
                     Picker(selection: $model.shouldAutoLockLogins, content: {
                         HStack {
                             Text(UserText.loginsPlusLockWhenIdle)
                             NSPopUpButtonView(selection: $model.autoLockThreshold) {
                                 let button = NSPopUpButton()
                                 button.setContentHuggingPriority(.defaultHigh, for: .horizontal)
-                                
+
                                 for threshold in LoginsPreferencesModel.AutoLockThreshold.allCases {
                                     let item = button.menu?.addItem(withTitle: threshold.title, action: nil, keyEquivalent: "")
                                     item?.representedObject = threshold
@@ -71,9 +71,9 @@ extension Preferences {
                         }.tag(true)
                         Text(UserText.loginsPlusNeverLock).tag(false)
                     }, label: {})
-                        .pickerStyle(.radioGroup)
-                        .offset(x: autoLockPickerHorizontalOffset)
-                        .padding(.bottom, 6)
+                    .pickerStyle(.radioGroup)
+                    .offset(x: autoLockPickerHorizontalOffset)
+                    .padding(.bottom, 6)
 
                     Text(UserText.loginsPlusNeverLockWarning)
                         .font(Const.Fonts.preferencePaneCaption)
@@ -83,7 +83,7 @@ extension Preferences {
                 }
             }
         }
-        
+
         var autoLockPickerHorizontalOffset: CGFloat {
             if #available(macOS 12.0, *) {
                 return -8
