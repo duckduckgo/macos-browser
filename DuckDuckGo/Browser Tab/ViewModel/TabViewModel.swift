@@ -38,6 +38,7 @@ final class TabViewModel {
     @Published private(set) var canGoBack: Bool = false
     @Published private(set) var canReload: Bool = false
     @Published var canBeBookmarked: Bool = false
+    @Published var isWebViewLoading: Bool = false
     @Published var isLoading: Bool = false {
         willSet {
             if newValue {
@@ -86,6 +87,9 @@ final class TabViewModel {
         subscribeToTabError()
         subscribeToPermissions()
         subscribeToWebViewDidFinishNavigation()
+        $isWebViewLoading.combineLatest(tab.$isAMPProtectionExtracting) { $0 || $1 }
+            .assign(to: \.isLoading, onWeaklyHeld: self)
+            .store(in: &cancellables)
     }
 
     private func subscribeToUrl() {

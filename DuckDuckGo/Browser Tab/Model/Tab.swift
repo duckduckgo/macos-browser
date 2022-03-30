@@ -157,6 +157,8 @@ final class Tab: NSObject {
     // MARK: - Event Publishers
 
     let webViewDidFinishNavigationPublisher = PassthroughSubject<Void, Never>()
+    
+    @Published var isAMPProtectionExtracting: Bool = false
 
     // MARK: - Properties
 
@@ -357,16 +359,16 @@ final class Tab: NSObject {
         }
     }
     
-    private lazy var ampProtection: AMPProtection = {
-        AMPProtection(privacyManager: ContentBlocking.shared.privacyConfigurationManager,
-                      contentBlockingManager: ContentBlocking.shared.contentBlockingManager,
-                      errorReporting: Self.debugEvents)
+    lazy var linkProtection: LinkProtection = {
+        LinkProtection(privacyManager: ContentBlocking.shared.privacyConfigurationManager,
+                       contentBlockingManager: ContentBlocking.shared.contentBlockingManager,
+                       errorReporting: Self.debugEvents)
     }()
     
     private func reloadIfNeeded(shouldLoadInBackground: Bool = false) {
         DispatchQueue.main.async { [self] in
             Task {
-                let url = await ampProtection.getCleanURL(from: contentURL, onExtracting: {})
+                let url = await linkProtection.getCleanURL(from: contentURL, onExtracting: { isAMPProtectionExtracting = true })
                 if shouldLoadURL(url, shouldLoadInBackground: shouldLoadInBackground) {
                     let didRestore = restoreSessionStateDataIfNeeded()
                     if !didRestore {
@@ -825,10 +827,10 @@ extension Tab: WKNavigationDelegate {
         // This check needs to happen before GPC checks. Otherwise the navigation type may be rewritten to `.other`
         // which would skip link rewrites.
         if navigationAction.navigationType == .linkActivated {
-            let navigationActionPolicy = await ampProtection.requestTrackingLinkRewrite(initiatingURL: webView.url,
-                                                                                        navigationAction: navigationAction,
-                                                                                        onExtracting: { },
-                                                                                        onLinkRewrite: { [weak self] url, navigationAction in
+            let navigationActionPolicy = await linkProtection.requestTrackingLinkRewrite(initiatingURL: webView.url,
+                                                                                         navigationAction: navigationAction,
+                                                                                         onExtracting: { isAMPProtectionExtracting = true },
+                                                                                         onLinkRewrite: { [weak self] url, navigationAction in
                 guard let self = self else { return }
                 if self.isRequestingNewTab(navigationAction: navigationAction) {
                     self.delegate?.tab(self, requestedNewTabWith: .url(url), selected: NSApp.isShiftPressed)
@@ -1011,12 +1013,13 @@ extension Tab: WKNavigationDelegate {
 
         invalidateSessionStateData()
         resetDashboardInfo()
-        ampProtection.cancelOngoingExtraction()
+        linkProtection.cancelOngoingExtraction()
     }
 
     func webView(_ webView: WKWebView, didFinish navigation: WKNavigation!) {
         invalidateSessionStateData()
         webViewDidFinishNavigationPublisher.send()
+        isAMPProtectionExtracting = false
     }
 
     func webView(_ webView: WKWebView, didFail navigation: WKNavigation!, withError error: Error) {
