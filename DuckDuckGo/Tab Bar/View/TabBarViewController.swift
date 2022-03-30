@@ -284,7 +284,7 @@ final class TabBarViewController: NSViewController {
                 guard let self = self else { return }
                 self.updateLayout()
                 self.enableScrollButtons()
-                self.hideTooltip()
+                self.hideTabPreview()
             })
         }
     }
@@ -302,7 +302,7 @@ final class TabBarViewController: NSViewController {
 
     @objc private func scrollViewBoundsDidChange(_ sender: Any) {
         enableScrollButtons()
-        hideTooltip()
+        hideTabPreview()
     }
 
     private func enableScrollButtons() {
@@ -318,38 +318,38 @@ final class TabBarViewController: NSViewController {
         leftShadowImageView.isHidden = scrollViewsAreHidden
     }
 
-    // MARK: - Tooltip
+    // MARK: - Tab Preview
 
     // swiftlint:disable force_cast
-    private var tooltipWindowController: TooltipWindowController = {
-        let storyboard = NSStoryboard(name: "Tooltip", bundle: nil)
-        return storyboard.instantiateController(withIdentifier: "TooltipWindowController") as! TooltipWindowController
+    private var tabPreviewWindowController: TabPreviewWindowController = {
+        let storyboard = NSStoryboard(name: "TabPreview", bundle: nil)
+        return storyboard.instantiateController(withIdentifier: "TabPreviewWindowController") as! TabPreviewWindowController
     }()
     // swiftlint:enable force_cast
 
-    func showTooltip(for tabBarViewItem: TabBarViewItem) {
+    func showTabPreview(for tabBarViewItem: TabBarViewItem) {
         guard let indexPath = collectionView.indexPath(for: tabBarViewItem),
               let tabViewModel = tabCollectionViewModel.tabViewModel(at: indexPath.item) else {
             return
         }
 
-        tooltipWindowController.tooltipViewController.display(tabViewModel: tabViewModel)
+        tabPreviewWindowController.tabPreviewViewController.display(tabViewModel: tabViewModel)
 
         guard let window = view.window, let clipView = collectionView.clipView else {
-            os_log("TabBarViewController: Showing of tooltip window failed", type: .error)
+            os_log("TabBarViewController: Showing of tab preview window failed", type: .error)
             return
         }
 
         var point = view.bounds.origin
-        point.y -= TooltipWindowController.VerticalSpace.tooltipPadding.rawValue
+        point.y -= TabPreviewWindowController.VerticalSpace.padding.rawValue
         point.x += scrollView.frame.origin.x + tabBarViewItem.view.frame.origin.x - clipView.bounds.origin.x
         let converted = window.convertPoint(toScreen: view.convert(point, to: nil))
-        let timerInterval = TooltipWindowController.TimerInterval(from: tabBarViewItem.widthStage)
-        tooltipWindowController.scheduleShowing(parentWindow: window, timerInterval: timerInterval, topLeftPoint: converted)
+        let timerInterval = TabPreviewWindowController.TimerInterval(from: tabBarViewItem.widthStage)
+        tabPreviewWindowController.scheduleShowing(parentWindow: window, timerInterval: timerInterval, topLeftPoint: converted)
     }
 
-    func hideTooltip() {
-        tooltipWindowController.hide()
+    func hideTabPreview() {
+        tabPreviewWindowController.hide()
     }
 
 }
@@ -374,7 +374,7 @@ extension TabBarViewController: TabCollectionViewModelDelegate {
 
         updateTabMode()
         updateEmptyTabArea()
-        hideTooltip()
+        hideTabPreview()
     }
 
     func tabCollectionViewModel(_ tabCollectionViewModel: TabCollectionViewModel,
@@ -416,7 +416,7 @@ extension TabBarViewController: TabCollectionViewModelDelegate {
                 }
                 self.updateEmptyTabArea()
                 self.enableScrollButtons()
-                self.hideTooltip()
+                self.hideTabPreview()
 
                 if !shouldScroll {
                     self.collectionView.enclosingScrollView!.contentView.scroll(to: visiRect.origin)
@@ -431,7 +431,7 @@ extension TabBarViewController: TabCollectionViewModelDelegate {
         collectionView.animator().moveItem(at: indexPath, to: newIndexPath)
 
         updateTabMode()
-        hideTooltip()
+        hideTabPreview()
     }
 
     func tabCollectionViewModel(_ tabCollectionViewModel: TabCollectionViewModel, didSelectAt selectionIndex: Int?) {
@@ -451,7 +451,7 @@ extension TabBarViewController: TabCollectionViewModelDelegate {
 
         updateTabMode()
         enableScrollButtons()
-        hideTooltip()
+        hideTabPreview()
         updateEmptyTabArea()
 
         if frozenLayout {
@@ -487,7 +487,7 @@ extension TabBarViewController: TabCollectionViewModelDelegate {
             }
         }
         updateEmptyTabArea()
-        hideTooltip()
+        hideTabPreview()
     }
 
 }
@@ -571,7 +571,7 @@ extension TabBarViewController: NSCollectionViewDelegate {
             }
         }
 
-        hideTooltip()
+        hideTabPreview()
     }
 
     func collectionView(_ collectionView: NSCollectionView,
@@ -602,7 +602,7 @@ extension TabBarViewController: NSCollectionViewDelegate {
         }
         currentDraggingIndexPath = indexPath
         TabDragAndDropManager.shared.setSource(tabCollectionViewModel: tabCollectionViewModel, indexPath: indexPath)
-        hideTooltip()
+        hideTabPreview()
     }
 
     static let dropToOpenDistance: CGFloat = 100
@@ -685,12 +685,12 @@ extension TabBarViewController: TabBarViewItemDelegate {
 
     func tabBarViewItem(_ tabBarViewItem: TabBarViewItem, isMouseOver: Bool) {
         if isMouseOver {
-            // Show tooltip for visible tab bar items
+            // Show tab preview for visible tab bar items
             if collectionView.visibleRect.intersects(tabBarViewItem.view.frame) {
-                showTooltip(for: tabBarViewItem)
+                showTabPreview(for: tabBarViewItem)
             }
         } else {
-            tooltipWindowController.scheduleHiding()
+            tabPreviewWindowController.scheduleHiding()
         }
     }
 

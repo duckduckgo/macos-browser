@@ -1,5 +1,5 @@
 //
-//  TooltipViewController.swift
+//  TabPreviewViewController.swift
 //
 //  Copyright © 2020 DuckDuckGo. All rights reserved.
 //
@@ -18,7 +18,7 @@
 
 import Cocoa
 
-final class TooltipViewController: NSViewController {
+final class TabPreviewViewController: NSViewController {
 
     @IBOutlet weak var titleTextField: NSTextField!
     @IBOutlet weak var urlTextField: NSTextField!
@@ -26,7 +26,7 @@ final class TooltipViewController: NSViewController {
 
 }
 
-extension TooltipViewController {
+extension TabPreviewViewController {
 
     enum TextFieldMaskGradientSize: CGFloat {
         case width = 6
