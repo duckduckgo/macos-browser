@@ -394,19 +394,29 @@ struct SiteTrackerSummary: View {
                     .visibility(remaining > 0 ? .visible : .gone)
             }
             .padding(.trailing, 6)
+            .visibility(site.blockedEntities.isEmpty ? .gone : .visible)
 
             Group {
-                if #available(macOS 12, *) {
-                    Text("**\(site.numberOfTrackersBlocked)** tracking attempts blocked")
-                } else {
-                    Text("\(site.numberOfTrackersBlocked) tracking attempts blocked")
+                Group {
+                    if #available(macOS 12, *) {
+                        Text("**\(site.numberOfTrackersBlocked)** tracking attempts blocked")
+                    } else {
+                        Text("\(site.numberOfTrackersBlocked) tracking attempts blocked")
+                    }
                 }
+                .visibility(site.blockedEntities.isEmpty ? .gone : .visible)
+
+                Text(UserText.homePageNoTrackersFound)
+                    .visibility(site.blockedEntities.isEmpty && !site.trackersFound ? .visible : .gone)
+
+                Text(UserText.homePageNoTrackersBlocked)
+                    .visibility(site.blockedEntities.isEmpty && site.trackersFound ? .visible : .gone)
+
             }
             .font(.system(size: 13))
 
             Spacer()
         }
-        .visibility(site.blockedEntities.isEmpty ? .gone : .visible)
     }
 
 }

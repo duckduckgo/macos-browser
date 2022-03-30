@@ -669,6 +669,8 @@ extension Tab: ContentBlockerRulesUserScriptDelegate {
 extension HistoryCoordinating {
 
     func addDetectedTracker(_ tracker: DetectedTracker, onURL url: URL, contentBlocking: ContentBlocking = ContentBlocking.shared) {
+        trackerFound(onURL: url)
+
         guard tracker.blocked,
               let domain = tracker.domain,
               let entityName = contentBlocking.entityName(forDomain: domain) else { return }

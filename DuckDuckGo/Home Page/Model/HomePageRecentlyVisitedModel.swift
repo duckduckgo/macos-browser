@@ -150,6 +150,7 @@ final class RecentlyVisitedSiteModel: ObservableObject {
     @Published var blockedEntities = [String]()
     @Published var pages = [RecentlyVisitedPageModel]()
     @Published var numberOfTrackersBlocked = 0
+    @Published var trackersFound = false
 
     init(domain: String, bookmarkManager: BookmarkManager = LocalBookmarkManager.shared) {
         self.domain = domain
@@ -166,6 +167,10 @@ final class RecentlyVisitedSiteModel: ObservableObject {
 
     func addPage(fromHistory entry: HistoryEntry, bookmarkManager: BookmarkManager = LocalBookmarkManager.shared) {
         numberOfTrackersBlocked += entry.numberOfTrackersBlocked
+
+        if entry.trackersFound {
+            trackersFound = true
+        }
 
         // Skip root URLs and non-search DDG urls
         guard !entry.url.isRoot || (entry.url.isDuckDuckGo && !entry.url.isDuckDuckGoSearch) else { return  }
