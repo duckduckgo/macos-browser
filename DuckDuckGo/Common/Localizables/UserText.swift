@@ -413,8 +413,8 @@ struct UserText {
 
     static let homePageEmptyStateItemTitle = NSLocalizedString("home.page.empty.state.item.title", value: "Recently visited sites appear here", comment: "")
     static let homePageEmptyStateItemMessage = NSLocalizedString("home.page.empty.state.item.message", value: "Keep browsing to see how many trackers were blocked", comment: "")
-    static let homePageNoTrackersFound = "No trackers found"
-    static let homePageNoTrackersBlocked = "No trackers blocked"
+    static let homePageNoTrackersFound = NSLocalizedString("home.page.no.trackers.found", value: "No trackers found", comment: "")
+    static let homePageNoTrackersBlocked = NSLocalizedString("home.page.no.trackers.blocked", value: "No trackers blocked", comment: "")
 
     static let tooltipAddToFavorites = NSLocalizedString("tooltip.addToFavorites", value: "Add to Favorites", comment: "Tooltip for add to favorites button")
     static let tooltipBurn = NSLocalizedString("tooltip.burn", value: "Burn History and Site Data", comment: "Tooltip for burn button")

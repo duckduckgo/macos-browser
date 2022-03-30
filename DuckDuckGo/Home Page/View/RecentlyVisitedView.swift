@@ -307,6 +307,7 @@ struct RecentlyVisitedTitle: View {
             }
             .visibility(model.recentSites.count > 0 ? .visible : .gone)
             .padding(.leading, 4)
+            .padding(.top, 4)
 
             Text(UserText.homePageProtectionSummaryInfo)
                 .font(.system(size: 17, weight: .bold, design: .default))
