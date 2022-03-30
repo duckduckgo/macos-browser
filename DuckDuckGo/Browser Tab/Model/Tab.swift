@@ -1019,7 +1019,7 @@ extension Tab: WKNavigationDelegate {
     func webView(_ webView: WKWebView, didFinish navigation: WKNavigation!) {
         invalidateSessionStateData()
         webViewDidFinishNavigationPublisher.send()
-        isAMPProtectionExtracting = false
+        if isAMPProtectionExtracting { isAMPProtectionExtracting = false }
     }
 
     func webView(_ webView: WKWebView, didFail navigation: WKNavigation!, withError error: Error) {
