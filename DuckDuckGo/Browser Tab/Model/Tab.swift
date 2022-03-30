@@ -158,6 +158,7 @@ final class Tab: NSObject {
 
     let webViewDidFinishNavigationPublisher = PassthroughSubject<Void, Never>()
     
+    @MainActor
     @Published var isAMPProtectionExtracting: Bool = false
 
     // MARK: - Properties
@@ -176,7 +177,9 @@ final class Tab: NSObject {
         didSet {
             handleFavicon(oldContent: oldValue)
             invalidateSessionStateData()
-            reloadIfNeeded()
+            Task {
+                await reloadIfNeeded()
+            }
 
             if let title = content.title {
                 self.title = title
@@ -365,20 +368,18 @@ final class Tab: NSObject {
                        errorReporting: Self.debugEvents)
     }()
     
-    private func reloadIfNeeded(shouldLoadInBackground: Bool = false) {
-        DispatchQueue.main.async { [self] in
-            Task {
-                let url = await linkProtection.getCleanURL(from: contentURL, onExtracting: { isAMPProtectionExtracting = true })
-                if shouldLoadURL(url, shouldLoadInBackground: shouldLoadInBackground) {
-                    let didRestore = restoreSessionStateDataIfNeeded()
-                    if !didRestore {
-                        webView.load(url)
-                    }
-                }
+    @MainActor
+    private func reloadIfNeeded(shouldLoadInBackground: Bool = false) async {
+        let url = await linkProtection.getCleanURL(from: contentURL, onExtracting: { isAMPProtectionExtracting = true })
+        if shouldLoadURL(url, shouldLoadInBackground: shouldLoadInBackground) {
+            let didRestore = restoreSessionStateDataIfNeeded()
+            if !didRestore {
+                webView.load(url)
             }
         }
     }
     
+    @MainActor
     private var contentURL: URL {
         switch content {
         case .url(let value):
@@ -390,12 +391,14 @@ final class Tab: NSObject {
         }
     }
     
+    @MainActor
     private func shouldLoadURL(_ url: URL, shouldLoadInBackground: Bool = false) -> Bool {
         return (webView.superview != nil || shouldLoadInBackground)
         && webView.url != url
         && webView.url != content.url // Initial Home Page shouldn't show Back Button
     }
     
+    @MainActor
     private func restoreSessionStateDataIfNeeded() -> Bool {
         var didRestore: Bool = false
         if let sessionStateData = self.sessionStateData {
@@ -409,6 +412,7 @@ final class Tab: NSObject {
         return didRestore
     }
 
+    @MainActor
     private func addHomePageToWebViewIfNeeded() {
         guard !AppDelegate.isRunningTests else { return }
         if content == .homePage && webView.url == nil {
@@ -442,14 +446,18 @@ final class Tab: NSObject {
         superviewObserver = webView.observe(\.superview, options: .old) { [weak self] _, change in
             // if the webView is being added to superview - reload if needed
             if case .some(.none) = change.oldValue {
-                self?.reloadIfNeeded()
+                Task { [weak self] in
+                    await self?.reloadIfNeeded()
+                }
             }
         }
 
         // background tab loading should start immediately
-        reloadIfNeeded(shouldLoadInBackground: shouldLoadInBackground)
-        if !shouldLoadInBackground {
-            addHomePageToWebViewIfNeeded()
+        Task {
+            await reloadIfNeeded(shouldLoadInBackground: shouldLoadInBackground)
+            if !shouldLoadInBackground {
+                await addHomePageToWebViewIfNeeded()
+            }
         }
     }
 
@@ -1016,6 +1024,7 @@ extension Tab: WKNavigationDelegate {
         linkProtection.cancelOngoingExtraction()
     }
 
+    @MainActor
     func webView(_ webView: WKWebView, didFinish navigation: WKNavigation!) {
         invalidateSessionStateData()
         webViewDidFinishNavigationPublisher.send()
