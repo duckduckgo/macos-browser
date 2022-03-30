@@ -121,6 +121,13 @@ struct FavoriteTemplate: View {
         .frame(maxWidth: 64)
         .onHover { isHovering in
             self.isHovering = isHovering
+            
+            if isHovering {
+                NSCursor.pointingHand.push()
+            } else {
+                NSCursor.pointingHand.pop()
+            }
+
         }
     }
 
@@ -135,17 +142,7 @@ struct Favorite: View {
     var body: some View {
 
         FavoriteTemplate(title: bookmark.title, domain: bookmark.url.host)
-            .link(onHoverChanged: { isHovering in
-
-                if isHovering {
-                    DispatchQueue.main.async {
-                        NSCursor.pointingHand.push()
-                    }
-                } else {
-                    NSCursor.pointingHand.pop()
-                }
-
-            }) {
+            .link {
                 model.open(bookmark)
             }.contextMenu(ContextMenu(menuItems: {
                 Button(UserText.openInNewTab, action: { model.openInNewTab(bookmark) })

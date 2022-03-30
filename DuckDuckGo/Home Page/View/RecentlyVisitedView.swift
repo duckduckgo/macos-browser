@@ -252,9 +252,7 @@ struct RecentlyVisitedPage: View {
                 self.isHovering = isHovering
 
                 if isHovering {
-                    DispatchQueue.main.async {
-                        NSCursor.pointingHand.push()
-                    }
+                    NSCursor.pointingHand.push()
                 } else {
                     NSCursor.pointingHand.pop()
                 }
@@ -347,20 +345,18 @@ struct SiteIconAndConnector: View {
 
                 FaviconView(domain: site.domain, size: 22)
             }
-            .link(onHoverChanged: {
+            .link {
                 self.isHovering = $0
 
                 if isHovering {
-                    DispatchQueue.main.async {
-                        NSCursor.pointingHand.push()
-                    }
+                    NSCursor.pointingHand.push()
                 } else {
                     NSCursor.pointingHand.pop()
                 }
                 
-            }, clicked: {
+            } clicked: {
                 model.open(site)
-            })
+            }
             .frame(width: 32, height: 32)
 
             Rectangle()

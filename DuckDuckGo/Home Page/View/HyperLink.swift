@@ -40,9 +40,7 @@ struct HyperLink: View {
                 isHovering = $0
 
                 if isHovering {
-                    DispatchQueue.main.async {
-                        NSCursor.pointingHand.push()
-                    }
+                    NSCursor.pointingHand.push()
                 } else {
                     NSCursor.pointingHand.pop()
                 }
