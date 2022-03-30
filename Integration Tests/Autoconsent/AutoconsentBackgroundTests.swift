@@ -21,7 +21,8 @@ import XCTest
 
 @available(macOS 11, *)
 class AutoconsentBackgroundTests: XCTestCase {
-    
+
+    @MainActor
     func testStartupPerformance() {
         // This is an example of a performance test case.
         self.measure {
@@ -35,6 +36,7 @@ class AutoconsentBackgroundTests: XCTestCase {
         }
     }
 
+    @MainActor
     func testAutoconsentIsCreated() {
         let bg = AutoconsentBackground()
         let expectation = XCTestExpectation(description: "Async call")

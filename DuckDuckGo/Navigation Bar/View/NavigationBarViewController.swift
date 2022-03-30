@@ -186,7 +186,12 @@ final class NavigationBarViewController: NSViewController {
             return
         }
 
-        selectedTabViewModel.tab.goBack()
+        if NSApp.isCommandPressed,
+           let backItem = selectedTabViewModel.tab.webView.backForwardList.backItem {
+            openNewChildTab(with: backItem.url)
+        } else {
+            selectedTabViewModel.tab.goBack()
+        }
     }
 
     @IBAction func goForwardAction(_ sender: NSButton) {
@@ -195,7 +200,17 @@ final class NavigationBarViewController: NSViewController {
             return
         }
 
-        selectedTabViewModel.tab.goForward()
+        if NSApp.isCommandPressed,
+           let forwardItem = selectedTabViewModel.tab.webView.backForwardList.forwardItem {
+            openNewChildTab(with: forwardItem.url)
+        } else {
+            selectedTabViewModel.tab.goForward()
+        }
+    }
+
+    private func openNewChildTab(with url: URL) {
+        let tab = Tab(content: .url(url), parentTab: tabCollectionViewModel.selectedTabViewModel?.tab, shouldLoadInBackground: true)
+        tabCollectionViewModel.insertChild(tab: tab, selected: false)
     }
 
     @IBAction func refreshAction(_ sender: NSButton) {
