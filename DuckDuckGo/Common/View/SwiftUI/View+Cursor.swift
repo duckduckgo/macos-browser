@@ -22,24 +22,47 @@ import AppKit
 extension View {
     /**
      * Displays `cursor` when the view is hovered.
+     *
+     * This modifier uses `.onHover` under the hood, so it takes an optional
+     * closure parameter that would be called inside the `.onHover` modifier
+     * before updating the cursor, removing the need to add a separate `.onHover`
+     * modifier.
      */
-    func cursor(_ cursor: NSCursor) -> some View {
-        modifier(CursorModifier(cursor: cursor))
+    func cursor(_ cursor: NSCursor, onHover: ((Bool) -> Void)? = nil) -> some View {
+        modifier(CursorModifier(cursor: cursor, onHoverChanged: onHover))
     }
 }
 
 private struct CursorModifier: ViewModifier {
 
     let cursor: NSCursor
+    let onHoverChanged: ((Bool) -> Void)?
 
     func body(content: Content) -> some View {
-        return content
+        content
             .onHover { inside in
-                if inside {
-                    cursor.push()
+
+                if let onHoverChanged = onHoverChanged {
+
+                    onHoverChanged(inside)
+
+                    // Async dispatch is required here in case when onHoverChanged
+                    // updates a State variable that triggers view re-rendering.
+                    // As seen on https://stackoverflow.com/a/67890394.
+                    DispatchQueue.main.async {
+                        updateCursor(isHovered: inside)
+                    }
                 } else {
-                    NSCursor.pop()
+                    updateCursor(isHovered: inside)
                 }
             }
+    }
+
+    func updateCursor(isHovered: Bool) {
+        if isHovered {
+            cursor.push()
+        } else {
+            NSCursor.pop()
+        }
     }
 }
