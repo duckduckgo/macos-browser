@@ -27,6 +27,8 @@ final class WebsiteBreakageSender {
                                             "tds": websiteBreakage.tdsETag?.trimmingCharacters(in: CharacterSet(charactersIn: "\"")) ?? "",
                                             "blockedTrackers": websiteBreakage.blockedTrackerDomains.joined(separator: ","),
                                             "surrogates": websiteBreakage.installedSurrogates.joined(separator: ","),
+                                            "ampUrl": websiteBreakage.ampURL,
+                                            "urlParametersRemoved": websiteBreakage.urlParametersRemoved ? "true" : "false",
                                             "os": websiteBreakage.osVersion,
                                             "manufacturer": "Apple"]
 
