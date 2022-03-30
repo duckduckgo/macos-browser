@@ -52,7 +52,7 @@ final class DeallocationTests: XCTestCase {
 
     // MARK: -
 
-    func testWhenTabIsClosedThenStateChangePublished() {
+    func testWindowsDeallocation() {
         autoreleasepool {
             weak var window1: NSWindow! = WindowsManager.openNewWindow()
             weak var window2: NSWindow! = WindowsManager.openNewWindow()
@@ -80,7 +80,13 @@ final class DeallocationTests: XCTestCase {
             window1.close()
             window2.close()
         }
-        waitForExpectations(timeout: 5, handler: nil)
+
+        let start = CACurrentMediaTime()
+        waitForExpectations(timeout: 0.1) { error in
+            if let error = error {
+                print(error)
+            }
+        }
     }
 
 }
