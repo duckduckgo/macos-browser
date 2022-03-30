@@ -174,7 +174,7 @@ final class TabViewModel {
         addressBarString = url.absoluteString
 
         if AppearancePreferences.shared.showFullURL {
-            passiveAddressBarString = url.toString(decodePunycode: false, dropScheme: true, needsWWW: true, dropTrailingSlash: true)
+            passiveAddressBarString = url.toString(decodePunycode: false, dropScheme: false, needsWWW: true, dropTrailingSlash: true)
         } else {
             passiveAddressBarString = host.drop(prefix: URL.HostPrefix.www.separated())
         }
