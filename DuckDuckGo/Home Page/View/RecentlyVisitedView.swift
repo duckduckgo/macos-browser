@@ -207,40 +207,75 @@ struct RecentlyVisitedPageList: View {
         isExpanded ? site.pages : [HomePage.Models.RecentlyVisitedPageModel](site.pages.prefix(collapsedPageCount))
     }
 
-    func relativeTime(_ page: HomePage.Models.RecentlyVisitedPageModel) -> String {
-        return model.relativeTime(page.visited)
+    var body: some View {
+        VStack(alignment: .leading, spacing: 0) {
+            ForEach(visiblePages, id: \.url) { page in
+                RecentlyVisitedPage(page: page,
+                                    showExpandButton: page.url == visiblePages.last?.url && site.pages.count > collapsedPageCount,
+                                    isExpanded: $isExpanded)
+            }
+        }
     }
 
-    var body: some View {
-        VStack(alignment: .leading, spacing: 9) {
-            ForEach(visiblePages, id: \.url) { page in
-                HStack {
+}
 
-                    HyperLink(page.displayTitle, textColor: Color("HomeFeedItemPageTextColor")) {
-                        model.open(page.url)    
-                    }
+struct RecentlyVisitedPage: View {
+
+    @EnvironmentObject var model: HomePage.Models.RecentlyVisitedModel
+
+    let linkColor = Color("LinkBlueColor")
+    let pageTextColor = Color("HomeFeedItemPageTextColor")
+    let timeTextColor = Color("HomeFeedItemTimeTextColor")
+
+    let page: HomePage.Models.RecentlyVisitedPageModel
+    let showExpandButton: Bool
+    @Binding var isExpanded: Bool
+
+    @State var isHovering = false
+
+    var body: some View {
+        HStack {
+            HStack {
+                Text(page.displayTitle)
+                    .optionalUnderline(isHovering)
                     .font(.system(size: 12))
                     .lineLimit(1)
                     .truncationMode(.middle)
+                    .foregroundColor(isHovering ? linkColor : pageTextColor)
 
-                    Text(relativeTime(page))
-                        .font(.system(size: 12))
-                        .foregroundColor(Color("HomeFeedItemTimeTextColor"))
-
-                    HoverButton(size: 16, imageName: "HomeArrowDown", imageSize: 8, cornerRadius: 4) {
-                        withAnimation {
-                            isExpanded.toggle()
-                        }
-                    }
-                    .rotationEffect(.degrees(isExpanded ? 180 : 0))
-                    .visibility(page.url == visiblePages.last?.url &&
-                                site.pages.count > collapsedPageCount ? .visible : .invisible)
-                        
-                    Spacer()
-                }.frame(maxHeight: 13)
-
+                Text(model.relativeTime(page.visited))
+                    .font(.system(size: 12))
+                    .foregroundColor(timeTextColor)
             }
+            .frame(height: 21)
+            .link { isHovering in
+                self.isHovering = isHovering
+
+                if isHovering {
+                    DispatchQueue.main.async {
+                        NSCursor.pointingHand.push()
+                    }
+                } else {
+                    NSCursor.pointingHand.pop()
+                }
+
+            } clicked: {
+                model.open(page.url)
+            }
+
+            HoverButton(size: 16, imageName: "HomeArrowDown", imageSize: 8, cornerRadius: 4) {
+                withAnimation {
+                    isExpanded.toggle()
+                }
+            }
+            .rotationEffect(.degrees(isExpanded ? 180 : 0))
+            .visibility(
+                showExpandButton ? .visible : .invisible
+            )
+
+            Spacer()
         }
+
     }
 
 }
@@ -313,6 +348,15 @@ struct SiteIconAndConnector: View {
             }
             .link(onHoverChanged: {
                 self.isHovering = $0
+
+                if isHovering {
+                    DispatchQueue.main.async {
+                        NSCursor.pointingHand.push()
+                    }
+                } else {
+                    NSCursor.pointingHand.pop()
+                }
+                
             }, clicked: {
                 model.open(site)
             })
@@ -433,6 +477,18 @@ extension View {
             self.help(message)
         } else {
             self
+        }
+    }
+
+}
+
+extension Text {
+
+    func optionalUnderline(_ underline: Bool) -> Text {
+        if underline {
+            return self.underline()
+        } else {
+            return self
         }
     }
 

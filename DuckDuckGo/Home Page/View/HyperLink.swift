@@ -35,8 +35,17 @@ struct HyperLink: View {
     var body: some View {
         Text(text)
             .foregroundColor(isHovering ? Color("LinkBlueColor") : textColor)
+            .optionalUnderline(isHovering)
             .link {
                 isHovering = $0
+
+                if isHovering {
+                    DispatchQueue.main.async {
+                        NSCursor.pointingHand.push()
+                    }
+                } else {
+                    NSCursor.pointingHand.pop()
+                }
             } clicked: {
                 action()
             }

@@ -132,20 +132,28 @@ struct Favorite: View {
 
     let bookmark: Bookmark
 
-    @State var isHovering = false
-
     var body: some View {
 
         FavoriteTemplate(title: bookmark.title, domain: bookmark.url.host)
-        .link {
-            model.open(bookmark)
-        }.contextMenu(ContextMenu(menuItems: {
-            Button(UserText.openInNewTab, action: { model.openInNewTab(bookmark) })
-            Button(UserText.openInNewWindow, action: { model.openInNewWindow(bookmark) })
-            Divider()
-            Button(UserText.edit, action: { model.edit(bookmark) })
-            Button(UserText.remove, action: { model.remove(bookmark) })
-        }))
+            .link(onHoverChanged: { isHovering in
+
+                if isHovering {
+                    DispatchQueue.main.async {
+                        NSCursor.pointingHand.push()
+                    }
+                } else {
+                    NSCursor.pointingHand.pop()
+                }
+
+            }) {
+                model.open(bookmark)
+            }.contextMenu(ContextMenu(menuItems: {
+                Button(UserText.openInNewTab, action: { model.openInNewTab(bookmark) })
+                Button(UserText.openInNewWindow, action: { model.openInNewWindow(bookmark) })
+                Divider()
+                Button(UserText.edit, action: { model.edit(bookmark) })
+                Button(UserText.remove, action: { model.remove(bookmark) })
+            }))
 
     }
 
