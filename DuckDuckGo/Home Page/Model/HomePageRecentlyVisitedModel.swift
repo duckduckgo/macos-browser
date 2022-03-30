@@ -130,12 +130,17 @@ final class RecentlyVisitedPageModel: ObservableObject {
         self.actualTitle = actualTitle
         self.url = url
         self.visited = visited
-        self.displayTitle = actualTitle ?? "" // Default, but might change
+
+        // This gets fixed in the parent model, when iterating over history items
+        self.displayTitle = actualTitle ?? ""
     }
 
 }
 
 final class RecentlyVisitedSiteModel: ObservableObject {
+
+    @UserDefaultsWrapper(key: .homePageShowPageTitles, defaultValue: false)
+    private var showTitlesForPagesSetting: Bool
 
     let maxPageListSize = 10
 
@@ -184,6 +189,13 @@ final class RecentlyVisitedSiteModel: ObservableObject {
                 } else {
                     urlsToRemove.append($0.url)
                 }
+
+            } else if !showTitlesForPagesSetting {
+
+                $0.displayTitle = $0.url.absoluteString
+                    .drop(prefix: "https://")
+                    .drop(prefix: "http://")
+                    .drop(prefix: $0.url.host ?? "")
 
             } else if $0.actualTitle?.isEmpty ?? true { // Blank titles
 
