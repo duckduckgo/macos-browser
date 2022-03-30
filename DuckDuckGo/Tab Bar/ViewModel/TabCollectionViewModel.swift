@@ -194,7 +194,7 @@ final class TabCollectionViewModel: NSObject {
         guard changesEnabled else { return }
         guard let parentTab = tab.parentTab,
               let parentTabIndex = tabCollection.tabs.firstIndex(where: { $0 === parentTab }) else {
-            os_log("TabCollection: No tab selected", type: .error)
+            os_log("TabCollection: No parent tab", type: .error)
             return
         }
 
