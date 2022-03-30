@@ -80,13 +80,7 @@ final class DeallocationTests: XCTestCase {
             window1.close()
             window2.close()
         }
-
-        let start = CACurrentMediaTime()
-        waitForExpectations(timeout: 0.1) { error in
-            if let error = error {
-                print(error)
-            }
-        }
+        waitForExpectations(timeout: 1, handler: nil)
     }
 
 }
