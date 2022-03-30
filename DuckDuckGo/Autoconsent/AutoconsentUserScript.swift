@@ -31,8 +31,8 @@ protocol UserScriptWithAutoconsent: UserScript {
 @available(macOS 11, *)
 final class AutoconsentUserScript: NSObject, UserScriptWithAutoconsent {
 
-    static var globalTabCounter = 0
-    static var promptLastShown: Date?
+    private static var globalTabCounter = 0
+    private static var promptLastShown: Date?
     static let background = AutoconsentBackground()
     
     var injectionTime: WKUserScriptInjectionTime { .atDocumentStart }
@@ -49,10 +49,10 @@ final class AutoconsentUserScript: NSObject, UserScriptWithAutoconsent {
     }
     public var messageNames: [String] { MessageName.allCases.map(\.rawValue) }
     let source: String
-    let tabId: Int
-    let config: PrivacyConfiguration
-    var actionInProgress = false
-    weak var webview: WKWebView?
+    private let tabId: Int
+    private let config: PrivacyConfiguration
+    private var actionInProgress = false
+    private weak var webview: WKWebView?
     weak var delegate: AutoconsentUserScriptDelegate?
 
     init(scriptSource: ScriptSourceProviding, config: PrivacyConfiguration) {
@@ -61,7 +61,8 @@ final class AutoconsentUserScript: NSObject, UserScriptWithAutoconsent {
         tabId = Self.globalTabCounter
         self.config = config
     }
-    
+
+    @MainActor
     func userContentController(_ userContentController: WKUserContentController, didReceive message: WKScriptMessage) {
         guard let messageName = MessageName(rawValue: message.name) else { return }
         if message.webView != nil {
@@ -82,6 +83,7 @@ final class AutoconsentUserScript: NSObject, UserScriptWithAutoconsent {
         }
     }
 
+    @MainActor
     func onPageReady(url: URL) {
         let preferences = PrivacySecurityPreferences.shared
         
@@ -127,7 +129,8 @@ final class AutoconsentUserScript: NSObject, UserScriptWithAutoconsent {
             }
         }
     }
-    
+
+    @MainActor
     func checkUserWasPrompted(callback: @escaping (Bool) -> Void) {
         let preferences = PrivacySecurityPreferences.shared
         guard preferences.autoconsentEnabled == nil else {
@@ -160,7 +163,8 @@ final class AutoconsentUserScript: NSObject, UserScriptWithAutoconsent {
             }
         })
     }
-    
+
+    @MainActor
     func runOptOut(for cmp: AutoconsentBackground.ActionResponse, on url: URL) async {
         guard await Self.background.isPopupOpen(in: self.tabId) else {
             os_log("popup not open", log: .autoconsent, type: .debug)
@@ -196,4 +200,5 @@ final class AutoconsentUserScript: NSObject, UserScriptWithAutoconsent {
         }
         self.actionInProgress = false
     }
+
 }
