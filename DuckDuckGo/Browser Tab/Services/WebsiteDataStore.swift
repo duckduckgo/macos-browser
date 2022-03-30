@@ -159,12 +159,10 @@ internal class WebCacheManager {
         guard let pool = try? DatabasePool(path: databasePath.absoluteString) else {
             return
         }
-        
-        _ = try? pool.writeWithoutTransaction {
-            try $0.checkpoint()
-        }
 
         try? pool.write { database in
+            try database.execute(sql: "PRAGMA wal_checkpoint(TRUNCATE);")
+            
             let tables = try String.fetchAll(database, sql: "SELECT name FROM sqlite_master WHERE type='table'")
             
             for table in tables {
