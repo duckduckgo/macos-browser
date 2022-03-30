@@ -37,6 +37,14 @@ struct Favicon {
             }
             self = .other
         }
+
+        var string: String {
+            switch self {
+            case .favicon: return "favicon"
+            case .icon: return "icon"
+            case .other: return "other"
+            }
+        }
     }
 
     enum SizeCategory: CGFloat {

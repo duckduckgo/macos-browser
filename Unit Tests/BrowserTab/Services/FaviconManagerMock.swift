@@ -26,8 +26,8 @@ final class FaviconManagerMock: FaviconManagement {
     func loadFavicons() {}
     var areFaviconsLoaded: Bool { return true }
 
-    func handleFaviconLinks(_ faviconLinks: [FaviconUserScript.FaviconLink], documentUrl: URL, completion: @escaping (Favicon?) -> Void) {
-        completion(nil)
+    func handleFaviconLinks(_ faviconLinks: [FaviconUserScript.FaviconLink], documentUrl: URL, onSmallFaviconReady: @escaping (Favicon?) -> Void) {
+        onSmallFaviconReady(nil)
     }
 
     func getCachedFavicon(for documentUrl: URL, sizeCategory: Favicon.SizeCategory) -> Favicon? {

@@ -30,7 +30,7 @@ protocol FaviconUserScriptDelegate: AnyObject {
 
 final class FaviconUserScript: NSObject, StaticUserScript {
 
-    struct FaviconLink {
+    struct FaviconLink: Equatable {
         let href: String
         let rel: String
     }
