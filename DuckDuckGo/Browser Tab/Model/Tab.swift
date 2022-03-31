@@ -849,14 +849,16 @@ extension Tab: WKNavigationDelegate {
             return .download(navigationAction, using: webView)
 
         } else if url.isExternalSchemeLink {
-            // allow external links via address bar, but ignore <iframe src="custom://url">
-            guard userEnteredUrl || navigationAction.sourceFrame.isMainFrame,
-                  !self.externalSchemeOpenedPerPageLoad || navigationAction.isUserInitiated
-            else { return .cancel }
+            // always allow user entered URLs
+            if !userEnteredUrl {
+                // allow external links via address bar, but ignore <iframe src="custom://url">
+                guard navigationAction.sourceFrame.isMainFrame,
+                      !self.externalSchemeOpenedPerPageLoad || navigationAction.isUserInitiated
+                else { return .cancel }
 
-            self.externalSchemeOpenedPerPageLoad = true
+                self.externalSchemeOpenedPerPageLoad = true
+            }
             self.delegate?.tab(self, requestedOpenExternalURL: url, forUserEnteredURL: userEnteredUrl)
-
             return .cancel
         }
 
