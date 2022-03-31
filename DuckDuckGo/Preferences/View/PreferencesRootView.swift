@@ -49,7 +49,7 @@ extension Preferences {
                                 AppearanceView(model: .shared)
                             case .privacy:
                                 PrivacyView(model: PrivacyPreferencesModel())
-                            case .loginsPlus:
+                            case .autofill:
                                 LoginsView(model: LoginsPreferences())
                             case .downloads:
                                 DownloadsView(model: DownloadsPreferences())

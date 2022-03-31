@@ -44,38 +44,38 @@ extension Preferences {
 
         var body: some View {
             VStack(alignment: .leading, spacing: 0) {
-                Text(UserText.loginsPlus)
+                Text(UserText.autofill)
                     .font(Const.Fonts.preferencePaneTitle)
 
                 Section(spacing: 0) {
-                    Text(UserText.loginsPlusAskToSave)
+                    Text(UserText.autofillAskToSave)
                         .font(Const.Fonts.preferencePaneSectionHeader)
                         .padding(.bottom, 6)
 
-                    Text(UserText.loginsPlusAskToSaveExplanation)
+                    Text(UserText.autofillAskToSaveExplanation)
                         .font(Const.Fonts.preferencePaneCaption)
                         .foregroundColor(Color("GreyTextColor"))
                         .fixMultilineScrollableText()
                         .padding(.bottom, 12)
 
                     VStack(alignment: .leading, spacing: 6) {
-                        Toggle(UserText.loginsPlusUsernamesAndPasswords, isOn: $model.askToSaveUsernamesAndPasswords)
+                        Toggle(UserText.autofillUsernamesAndPasswords, isOn: $model.askToSaveUsernamesAndPasswords)
                             .fixMultilineScrollableText()
-                        Toggle(UserText.loginsPlusAddresses, isOn: $model.askToSaveAddresses)
+                        Toggle(UserText.autofillAddresses, isOn: $model.askToSaveAddresses)
                             .fixMultilineScrollableText()
-                        Toggle(UserText.loginsPlusPaymentMethods, isOn: $model.askToSavePaymentMethods)
+                        Toggle(UserText.autofillPaymentMethods, isOn: $model.askToSavePaymentMethods)
                             .fixMultilineScrollableText()
                     }
                 }
 
                 Section(spacing: 0) {
-                    Text(UserText.loginsPlusAutoLock)
+                    Text(UserText.autofillAutoLock)
                         .font(Const.Fonts.preferencePaneSectionHeader)
                         .padding(.bottom, 12)
 
                     Picker(selection: $model.shouldAutoLockLogins, content: {
                         HStack {
-                            Text(UserText.loginsPlusLockWhenIdle)
+                            Text(UserText.autofillLockWhenIdle)
                             NSPopUpButtonView(selection: $model.autoLockThreshold) {
                                 let button = NSPopUpButton()
                                 button.setContentHuggingPriority(.defaultHigh, for: .horizontal)
@@ -88,13 +88,13 @@ extension Preferences {
                             }
                             .disabled(!model.shouldAutoLockLogins)
                         }.tag(true)
-                        Text(UserText.loginsPlusNeverLock).tag(false)
+                        Text(UserText.autofillNeverLock).tag(false)
                     }, label: {})
                     .pickerStyle(.radioGroup)
                     .offset(x: Const.autoLockPickerHorizontalOffset)
                     .padding(.bottom, 6)
 
-                    Text(UserText.loginsPlusNeverLockWarning)
+                    Text(UserText.autofillNeverLockWarning)
                         .font(Const.Fonts.preferencePaneCaption)
                         .foregroundColor(Color("GreyTextColor"))
                         .fixMultilineScrollableText()

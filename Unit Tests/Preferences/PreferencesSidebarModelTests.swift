@@ -22,7 +22,7 @@ import XCTest
 final class PreferencesSidebarModelTests: XCTestCase {
 
     func testWhenInitializedThenFirstPaneInFirstSectionIsSelected() throws {
-        let sections: [PreferencesSection] = [.init(id: .regularPreferencePanes, panes: [.appearance, .downloads, .loginsPlus])]
+        let sections: [PreferencesSection] = [.init(id: .regularPreferencePanes, panes: [.appearance, .downloads, .autofill])]
         let model = PreferencesSidebarModel(sections: sections)
 
         XCTAssertEqual(model.selectedPane, .appearance)
