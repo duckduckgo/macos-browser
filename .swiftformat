@@ -1,0 +1,92 @@
+# DuckDuckGo SwiftFormat options:
+
+--swiftversion 5.5
+
+# Xcode Formatting
+
+--rules wrap
+--maxwidth 150
+--wrapternary before-operators
+
+--rules indent
+--indent 4
+--ifdef no-indent
+--indentstrings true
+
+--rules trailingSpace
+--trimwhitespace always
+
+# Style
+
+--rules redundantType
+--redundanttype inferred
+
+--rules redundantSelf
+--self remove
+
+--rules strongifiedSelf
+
+--rules trailingCommas
+--commas always
+
+--rules redundantParens
+--rules redundantPattern
+
+--rules hoistPatternLet
+--patternlet inline
+
+--rules wrapAttributes
+--funcattributes prev-line
+--typeattributes prev-line
+
+--rules wrapArguments
+--wraparguments before-first
+--wrapparameters before-first
+--wrapcollections before-first
+--wrapconditions before-first
+--wrapreturntype if-multiline
+--closingparen same-line
+--wraptypealiases before-first
+
+--rules typeSugar
+--rules redundantInit
+--rules braces
+--rules spaceInsideBraces
+--rules spaceAroundBraces
+
+--rules blockComments
+
+# Functions
+
+--rules redundantVoidReturnType
+
+--rules unusedArguments
+
+# Patterns
+
+--rules redundantFileprivate
+--rules enumNamespaces
+--rules redundantRawValues
+--rules redundantReturn
+--rules anyObjectProtocol
+
+--rules extensionAccessControl
+--extensionacl on-declarations
+
+--rules redundantClosure
+--rules redundantGet
+
+# File Organization
+
+--rules sortedImports
+--importgrouping testable-bottom
+
+--rules duplicateImports
+--rules consecutiveSpaces
+--rules blankLinesBetweenScopes
+--rules markTypes
+
+--rules organizeDeclarations
+--structthreshold 20
+--enumthreshold 20
+--organizetypes class,struct,enum,extension
