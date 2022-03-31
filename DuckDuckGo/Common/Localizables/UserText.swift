@@ -125,12 +125,12 @@ struct UserText {
     
     static let gpcLearnMore = NSLocalizedString("gpc.learnmore.link", value: "Learn More", comment: "Learn More link")
 
-    static let passwordManagement = NSLocalizedString("passsword.management", value: "Logins+", comment: "Used as title for password management user interface")
-    static let passwordManagementAllItems = NSLocalizedString("passsword.management.all-items", value: "All Items", comment: "Used as title for the Logins+ All Items option")
-    static let passwordManagementLogins = NSLocalizedString("passsword.management.logins", value: "Logins", comment: "Used as title for the Logins+ Logins option")
-    static let passwordManagementIdentities = NSLocalizedString("passsword.management.identities", value: "Identities", comment: "Used as title for the Logins+ Identities option")
-    static let passwordManagementCreditCards = NSLocalizedString("passsword.management.credit-cards", value: "Credit Cards", comment: "Used as title for the Logins+ Credit Cards option")
-    static let passwordManagementNotes = NSLocalizedString("passsword.management.notes", value: "Notes", comment: "Used as title for the Logins+ Notes option")
+    static let passwordManagement = NSLocalizedString("passsword.management", value: "Autofill", comment: "Used as title for password management user interface")
+    static let passwordManagementAllItems = NSLocalizedString("passsword.management.all-items", value: "All Items", comment: "Used as title for the Autofill All Items option")
+    static let passwordManagementLogins = NSLocalizedString("passsword.management.logins", value: "Logins", comment: "Used as title for the Autofill Logins option")
+    static let passwordManagementIdentities = NSLocalizedString("passsword.management.identities", value: "Identities", comment: "Used as title for the Autofill Identities option")
+    static let passwordManagementCreditCards = NSLocalizedString("passsword.management.credit-cards", value: "Credit Cards", comment: "Used as title for the Autofill Credit Cards option")
+    static let passwordManagementNotes = NSLocalizedString("passsword.management.notes", value: "Notes", comment: "Used as title for the Autofill Notes option")
 
     static let bookmarks = NSLocalizedString("bookmarks", value: "Bookmarks", comment: "Button for bookmarks")
     static let bookmarksOpenInNewTabs = NSLocalizedString("bookmarks.open.in.new.tabs", value: "Open in New Tabs", comment: "Open all bookmarks in folder in new tabs")
@@ -205,7 +205,7 @@ struct UserText {
     static let downloads = NSLocalizedString("preferences.downloads", value: "Downloads", comment: "Show downloads browser preferences")
     static let isDefaultBrowser = NSLocalizedString("preferences.default-browser.active", value: "DuckDuckGo is your default browser", comment: "Indicate that the browser is the default")
     static let isNotDefaultBrowser = NSLocalizedString("preferences.default-browser.inactive", value: "DuckDuckGo is not your default browser.", comment: "Indicate that the browser is not the default")
-    static let loginsPlus = NSLocalizedString("preferences.logins-plus", value: "Logins+", comment: "Show Logins+ preferences")
+    static let loginsPlus = NSLocalizedString("preferences.logins-plus", value: "Autofill", comment: "Show Autofill preferences")
 
     static let feedbackBugDescription = NSLocalizedString("feedback.bug.description", value: "Please describe the problem in as much detail as possible:", comment: "Label in the feedback form")
     static let feedbackFeatureRequestDescription = NSLocalizedString("feedback.feature.request.description", value: "What feature would you like to see?", comment: "Label in the feedback form")
@@ -414,6 +414,8 @@ struct UserText {
 
     static let homePageEmptyStateItemTitle = NSLocalizedString("home.page.empty.state.item.title", value: "Recently visited sites appear here", comment: "")
     static let homePageEmptyStateItemMessage = NSLocalizedString("home.page.empty.state.item.message", value: "Keep browsing to see how many trackers were blocked", comment: "")
+    static let homePageNoTrackersFound = NSLocalizedString("home.page.no.trackers.found", value: "No trackers found", comment: "")
+    static let homePageNoTrackersBlocked = NSLocalizedString("home.page.no.trackers.blocked", value: "No trackers blocked", comment: "")
 
     static let tooltipAddToFavorites = NSLocalizedString("tooltip.addToFavorites", value: "Add to Favorites", comment: "Tooltip for add to favorites button")
     static let tooltipBurn = NSLocalizedString("tooltip.burn", value: "Burn History and Site Data", comment: "Tooltip for burn button")
