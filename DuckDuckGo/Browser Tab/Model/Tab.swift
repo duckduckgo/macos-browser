@@ -849,9 +849,8 @@ extension Tab: WKNavigationDelegate {
             return .download(navigationAction, using: webView)
 
         } else if url.isExternalSchemeLink {
-            // ignore <iframe src="custom://url"> but allow via address bar
-            guard navigationAction.sourceFrame.isMainFrame,
-                  // ignore 2nd+ external scheme navigation not initiated by user
+            // allow external links via address bar, but ignore <iframe src="custom://url">
+            guard userEnteredUrl || navigationAction.sourceFrame.isMainFrame,
                   !self.externalSchemeOpenedPerPageLoad || navigationAction.isUserInitiated
             else { return .cancel }
 
