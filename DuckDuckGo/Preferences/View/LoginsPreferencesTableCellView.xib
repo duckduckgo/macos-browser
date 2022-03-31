@@ -50,24 +50,24 @@
                                 <action selector="askToSaveUsernamesAndPasswordsChanged:" target="r9o-mb-reY" id="VE2-qp-8cw"/>
                             </connections>
                         </button>
-                        <button verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="XJN-g2-eWj">
-                            <rect key="frame" x="-2" y="23" width="90" height="18"/>
-                            <buttonCell key="cell" type="check" title="Addresses" bezelStyle="regularSquare" imagePosition="left" state="on" inset="2" id="qb1-z7-Zz6">
-                                <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
-                                <font key="font" metaFont="system"/>
-                            </buttonCell>
-                            <connections>
-                                <action selector="askToSaveAddressesChanged:" target="r9o-mb-reY" id="2L3-XU-NLD"/>
-                            </connections>
-                        </button>
                         <button verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="lVS-UD-J3W">
-                            <rect key="frame" x="-2" y="-1" width="136" height="18"/>
+                            <rect key="frame" x="-2" y="23" width="136" height="18"/>
                             <buttonCell key="cell" type="check" title="Payment methods" bezelStyle="regularSquare" imagePosition="left" state="on" inset="2" id="odv-en-2FO">
                                 <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
                                 <font key="font" metaFont="system"/>
                             </buttonCell>
                             <connections>
                                 <action selector="askToSavePaymentMethodsChanged:" target="r9o-mb-reY" id="a5Q-KZ-glo"/>
+                            </connections>
+                        </button>
+                        <button verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="XJN-g2-eWj">
+                            <rect key="frame" x="-2" y="-1" width="263" height="18"/>
+                            <buttonCell key="cell" type="check" title="Other info (e.g., your contact info, etc.)" bezelStyle="regularSquare" imagePosition="left" state="on" inset="2" id="qb1-z7-Zz6">
+                                <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
+                                <font key="font" metaFont="system"/>
+                            </buttonCell>
+                            <connections>
+                                <action selector="askToSaveAddressesChanged:" target="r9o-mb-reY" id="2L3-XU-NLD"/>
                             </connections>
                         </button>
                     </subviews>
