@@ -56,7 +56,7 @@ enum DataImport {
         }
 
         var canImportData: Bool {
-            return ThirdPartyBrowser.browser(for: self)?.isInstalled ?? [.csv, .onePassword, .lastPass].contains(self)
+            return (ThirdPartyBrowser.browser(for: self)?.isInstalled ?? false) || [.csv, .onePassword, .lastPass].contains(self)
         }
     }
 
