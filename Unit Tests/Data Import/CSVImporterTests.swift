@@ -110,7 +110,7 @@ class CSVImporterTests: XCTestCase {
 
     func testWhenInferringColumnPostions_AndColumnsAreValid_AndTitleIsIncluded_ThenPositionsAreCalculated() {
         let csvValues = ["url", "username", "password", "title"]
-        let inferred = CSVImporter.InferredCredentialColumnPositions(csvValues: csvValues)
+        let inferred = CSVImporter.ColumnPositions(csvValues: csvValues)
 
         XCTAssertEqual(inferred?.urlIndex, 0)
         XCTAssertEqual(inferred?.usernameIndex, 1)
@@ -120,7 +120,7 @@ class CSVImporterTests: XCTestCase {
 
     func testWhenInferringColumnPostions_AndColumnsAreValid_AndTitleIsNotIncluded_ThenPositionsAreCalculated() {
         let csvValues = ["url", "username", "password"]
-        let inferred = CSVImporter.InferredCredentialColumnPositions(csvValues: csvValues)
+        let inferred = CSVImporter.ColumnPositions(csvValues: csvValues)
 
         XCTAssertEqual(inferred?.urlIndex, 0)
         XCTAssertEqual(inferred?.usernameIndex, 1)
@@ -130,7 +130,7 @@ class CSVImporterTests: XCTestCase {
 
     func testWhenInferringColumnPostions_AndColumnsAreInvalidThenPositionsAreCalculated() {
         let csvValues = ["url", "username", "title"] // `password` is required, this test verifies that the inference fails when it's missing
-        let inferred = CSVImporter.InferredCredentialColumnPositions(csvValues: csvValues)
+        let inferred = CSVImporter.ColumnPositions(csvValues: csvValues)
 
         XCTAssertNil(inferred)
     }

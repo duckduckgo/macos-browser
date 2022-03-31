@@ -101,7 +101,7 @@ final class CSVImporter: DataImporter {
     }
 
     static func extractLogins(from fileContents: String,
-                              defaultColumnPositions: ColumnPositions?) -> [ImportedLoginCredential] {
+                              defaultColumnPositions: ColumnPositions? = nil) -> [ImportedLoginCredential] {
         let parsed = CSVParser.parse(string: fileContents)
 
         if let possibleHeaderRow = parsed.first, let inferredColumnPositions = ColumnPositions(csvValues: possibleHeaderRow) {
