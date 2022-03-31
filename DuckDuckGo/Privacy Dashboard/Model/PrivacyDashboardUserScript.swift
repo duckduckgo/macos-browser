@@ -88,7 +88,12 @@ final class PrivacyDashboardUserScript: NSObject, StaticUserScript {
             return
         }
 
-        Pixel.shared?.fire(pixelNamed: pixel)
+        let etag = ContentBlocking.shared.contentBlockingManager.currentRules.first?.etag
+                    .trimmingCharacters(in: CharacterSet(charactersIn: "\"")) ?? ""
+        Pixel.shared?.fire(pixelNamed: pixel,
+                           withAdditionalParameters: [
+                            "tds": etag
+        ])
     }
 
     private func handleSetPermission(message: WKScriptMessage) {

@@ -35,6 +35,10 @@ final class LoginsPreferencesTableCellView: NSTableCellView {
         return NSNib(nibNamed: nibName, bundle: Bundle.main)!
     }
     
+    @IBOutlet var askToSaveUsernamesAndPasswordsCheckbox: NSButton!
+    @IBOutlet var askToSaveAddressesCheckbox: NSButton!
+    @IBOutlet var askToSavePaymentMethodsCheckbox: NSButton!
+    
     @IBOutlet var autoLockEnabledRadioButton: NSButton!
     @IBOutlet var autoLockDisabledRadioButton: NSButton!
     @IBOutlet var autoLockThresholdPopUpButton: NSPopUpButton!
@@ -50,6 +54,21 @@ final class LoginsPreferencesTableCellView: NSTableCellView {
     
     @IBAction func autoLockThresholdChanged(_ sender: AnyObject) {
         notifyDelegateOfPreferenceChanges()
+        refreshInterface()
+    }
+    
+    @IBAction func askToSaveUsernamesAndPasswordsChanged(_ sender: AnyObject) {
+        loginPreferences.askToSaveUsernamesAndPasswords = (askToSaveUsernamesAndPasswordsCheckbox.state == .on)
+        refreshInterface()
+    }
+    
+    @IBAction func askToSaveAddressesChanged(_ sender: AnyObject) {
+        loginPreferences.askToSaveAddresses = (askToSaveAddressesCheckbox.state == .on)
+        refreshInterface()
+    }
+    
+    @IBAction func askToSavePaymentMethodsChanged(_ sender: AnyObject) {
+        loginPreferences.askToSavePaymentMethods = (askToSavePaymentMethodsCheckbox.state == .on)
         refreshInterface()
     }
 
@@ -72,6 +91,10 @@ final class LoginsPreferencesTableCellView: NSTableCellView {
     }
     
     private func refreshInterface() {
+        askToSaveUsernamesAndPasswordsCheckbox.state = loginPreferences.askToSaveUsernamesAndPasswords ? .on : .off
+        askToSaveAddressesCheckbox.state = loginPreferences.askToSaveAddresses ? .on : .off
+        askToSavePaymentMethodsCheckbox.state = loginPreferences.askToSavePaymentMethods ? .on : .off
+        
         autoLockThresholdPopUpButton.isEnabled = (autoLockEnabledRadioButton.state == .on)
     }
     
