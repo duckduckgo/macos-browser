@@ -110,7 +110,7 @@ final class MainViewController: NSViewController {
             mouseNavButtonsMonitor = nil
         }
 
-        tabBarViewController?.hideTooltip()
+        tabBarViewController?.hideTabPreview()
     }
 
     @IBSegueAction

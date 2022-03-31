@@ -1,5 +1,5 @@
 //
-//  TooltipWindowController.swift
+//  TabPreviewWindowController.swift
 //
 //  Copyright © 2020 DuckDuckGo. All rights reserved.
 //
@@ -19,10 +19,10 @@
 import Cocoa
 import os.log
 
-final class TooltipWindowController: NSWindowController {
+final class TabPreviewWindowController: NSWindowController {
 
     enum VerticalSpace: CGFloat {
-        case tooltipPadding = 2
+        case padding = 2
     }
 
     enum TimerInterval: TimeInterval {
@@ -37,8 +37,8 @@ final class TooltipWindowController: NSWindowController {
     private var isHiding = false
 
     // swiftlint:disable force_cast
-    var tooltipViewController: TooltipViewController {
-        contentViewController as! TooltipViewController
+    var tabPreviewViewController: TabPreviewViewController {
+        contentViewController as! TabPreviewViewController
     }
     // swiftlint:enable force_cast
 
@@ -60,21 +60,21 @@ final class TooltipWindowController: NSWindowController {
         if isHiding { return }
 
         guard let childWindows = parentWindow.childWindows,
-              let tooltipWindow = self.window else {
-            os_log("TooltipWindowController: Showing tooltip window failed", type: .error)
+              let tabPreviewWindow = self.window else {
+            os_log("TabPreviewWindowController: Showing tab preview window failed", type: .error)
             return
         }
 
         hidingTimer?.invalidate()
 
-        if childWindows.contains(tooltipWindow) {
+        if childWindows.contains(tabPreviewWindow) {
             layout(topLeftPoint: topLeftPoint)
             return
         }
 
         showingTimer?.invalidate()
         showingTimer = Timer.scheduledTimer(withTimeInterval: timerInterval.rawValue, repeats: false, block: { [weak self] _ in
-            parentWindow.addChildWindow(tooltipWindow, ordered: .above)
+            parentWindow.addChildWindow(tabPreviewWindow, ordered: .above)
             self?.layout(topLeftPoint: topLeftPoint)
         })
     }
@@ -83,7 +83,7 @@ final class TooltipWindowController: NSWindowController {
         showingTimer?.invalidate()
 
         guard let window = window else {
-            os_log("TooltipWindowController: Window not available", type: .error)
+            os_log("TabPreviewWindowController: Window not available", type: .error)
             return
         }
 
@@ -102,7 +102,7 @@ final class TooltipWindowController: NSWindowController {
             return
         }
         guard let parentWindow = window.parent else {
-            os_log("TooltipWindowController: Tooltip window not available", type: .error)
+            os_log("TabPreviewWindowController: Tab preview window not available", type: .error)
             return
         }
 
@@ -116,7 +116,7 @@ final class TooltipWindowController: NSWindowController {
 
     private func layout(topLeftPoint: NSPoint) {
         guard let window = window else {
-            os_log("TabBarCollectionView: Tooltip window not available", type: .error)
+            os_log("TabBarCollectionView: Tab preview window not available", type: .error)
             return
         }
 
@@ -126,7 +126,7 @@ final class TooltipWindowController: NSWindowController {
 
 }
 
-extension TooltipWindowController {
+extension TabPreviewWindowController {
 
     @objc func suggestionWindowOpenNotification(_ notification: Notification) {
         hide()
@@ -134,7 +134,7 @@ extension TooltipWindowController {
 
 }
 
-extension TooltipWindowController.TimerInterval {
+extension TabPreviewWindowController.TimerInterval {
 
     init(from tabWidthStage: TabBarViewItem.WidthStage) {
         switch tabWidthStage {
