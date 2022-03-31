@@ -264,7 +264,9 @@ final class AddressBarViewController: NSViewController {
         updateShadowView(firstResponder: isFirstResponder)
         inactiveBackgroundView.alphaValue = isFirstResponder ? 0 : 1
         activeBackgroundView.alphaValue = isFirstResponder ? 1 : 0
-        activeOuterBorderView.alphaValue = isFirstResponder && isHomePage ? 1 : 0
+
+        let isKey = self.view.window?.isKeyWindow ?? false
+        activeOuterBorderView.alphaValue = isKey && isFirstResponder && isHomePage ? 1 : 0
 
         activeOuterBorderView.layer?.backgroundColor = NSColor.controlAccentColor.withAlphaComponent(0.2).cgColor
         activeBackgroundView.layer?.borderColor = NSColor.controlAccentColor.withAlphaComponent(0.8).cgColor

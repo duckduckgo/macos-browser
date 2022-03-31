@@ -43,6 +43,15 @@ extension HomePage.Models {
 
         }
 
+        @UserDefaultsWrapper(key: .homePageShowAllFavorites, defaultValue: false)
+        private static var showAllFavoritesSetting: Bool
+
+        @Published var showAllFavorites: Bool {
+            didSet {
+                Self.showAllFavoritesSetting = showAllFavorites
+            }
+        }
+
         @Published var favorites: [Bookmark] = [] {
             didSet {
                 var favorites = self.favorites.map { FavoriteModel(id: $0.id, favoriteType: .bookmark($0)) }
@@ -69,6 +78,7 @@ extension HomePage.Models {
              remove: @escaping (Bookmark) -> Void,
              addEdit:  @escaping (Bookmark?) -> Void) {
 
+            self.showAllFavorites = Self.showAllFavoritesSetting
             self.open = open
             self.remove = remove
             self.addEdit = addEdit

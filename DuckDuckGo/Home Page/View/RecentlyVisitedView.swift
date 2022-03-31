@@ -73,7 +73,7 @@ struct RecentlyVisitedSiteEmptyState: View {
                     .fill(connectorColor)
                 Image("Web")
                     .resizable()
-                    .frame(width: 22, height: 22)
+                    .frame(width: 16, height: 16)
                     .foregroundColor(iconColor)
             }
             .frame(width: 32, height: 32)
@@ -91,16 +91,6 @@ struct RecentlyVisitedSiteEmptyState: View {
             }.padding(.top, 6)
 
             Spacer()
-
-            HStack(spacing: 2) {
-                RoundedRectangle(cornerRadius: 6)
-                    .fill(connectorColor)
-                    .frame(width: 24, height: 24)
-
-                RoundedRectangle(cornerRadius: 8)
-                    .fill(connectorColor)
-                    .frame(width: 24, height: 24)
-            }
 
         }.padding([.leading, .trailing], 12)
 
@@ -217,40 +207,73 @@ struct RecentlyVisitedPageList: View {
         isExpanded ? site.pages : [HomePage.Models.RecentlyVisitedPageModel](site.pages.prefix(collapsedPageCount))
     }
 
-    func relativeTime(_ page: HomePage.Models.RecentlyVisitedPageModel) -> String {
-        return model.relativeTime(page.visited)
-    }
-
     var body: some View {
-        VStack(alignment: .leading, spacing: 9) {
+        VStack(alignment: .leading, spacing: 0) {
             ForEach(visiblePages, id: \.url) { page in
-                HStack {
-
-                    HyperLink(page.displayTitle, textColor: Color("HomeFeedItemPageTextColor")) {
-                        model.open(page.url)    
-                    }
-                    .font(.system(size: 11))
-                    .lineLimit(1)
-                    .truncationMode(.middle)
-
-                    Text(relativeTime(page))
-                        .font(.system(size: 11))
-                        .foregroundColor(Color("HomeFeedItemTimeTextColor"))
-
-                    HoverButton(size: 16, imageName: "HomeArrowDown", imageSize: 8, cornerRadius: 4) {
-                        withAnimation {
-                            isExpanded.toggle()
-                        }
-                    }
-                    .rotationEffect(.degrees(isExpanded ? 180 : 0))
-                    .visibility(page.url == visiblePages.last?.url &&
-                                site.pages.count > collapsedPageCount ? .visible : .invisible)
-                        
-                    Spacer()
-                }.frame(maxHeight: 13)
-
+                RecentlyVisitedPage(page: page,
+                                    showExpandButton: page.url == visiblePages.last?.url && site.pages.count > collapsedPageCount,
+                                    isExpanded: $isExpanded)
             }
         }
+    }
+
+}
+
+struct RecentlyVisitedPage: View {
+
+    @EnvironmentObject var model: HomePage.Models.RecentlyVisitedModel
+
+    let linkColor = Color("LinkBlueColor")
+    let pageTextColor = Color("HomeFeedItemPageTextColor")
+    let timeTextColor = Color("HomeFeedItemTimeTextColor")
+
+    let page: HomePage.Models.RecentlyVisitedPageModel
+    let showExpandButton: Bool
+    @Binding var isExpanded: Bool
+
+    @State var isHovering = false
+
+    var body: some View {
+        HStack {
+            HStack {
+                Text(page.displayTitle)
+                    .optionalUnderline(isHovering)
+                    .font(.system(size: 12))
+                    .lineLimit(1)
+                    .truncationMode(.middle)
+                    .foregroundColor(isHovering ? linkColor : pageTextColor)
+
+                Text(model.relativeTime(page.visited))
+                    .font(.system(size: 12))
+                    .foregroundColor(timeTextColor)
+            }
+            .frame(height: 21)
+            .link { isHovering in
+                self.isHovering = isHovering
+
+                if isHovering {
+                    NSCursor.pointingHand.push()
+                } else {
+                    NSCursor.pointingHand.pop()
+                }
+
+            } clicked: {
+                model.open(page.url)
+            }
+
+            HoverButton(size: 16, imageName: "HomeArrowDown", imageSize: 8, cornerRadius: 4) {
+                withAnimation {
+                    isExpanded.toggle()
+                }
+            }
+            .rotationEffect(.degrees(isExpanded ? 180 : 0))
+            .visibility(
+                showExpandButton ? .visible : .invisible
+            )
+
+            Spacer()
+        }
+
     }
 
 }
@@ -282,6 +305,7 @@ struct RecentlyVisitedTitle: View {
             }
             .visibility(model.recentSites.count > 0 ? .visible : .gone)
             .padding(.leading, 4)
+            .padding(.top, 4)
 
             Text(UserText.homePageProtectionSummaryInfo)
                 .font(.system(size: 17, weight: .bold, design: .default))
@@ -321,11 +345,18 @@ struct SiteIconAndConnector: View {
 
                 FaviconView(domain: site.domain, size: 22)
             }
-            .link(onHoverChanged: {
+            .link {
                 self.isHovering = $0
-            }, clicked: {
+
+                if isHovering {
+                    NSCursor.pointingHand.push()
+                } else {
+                    NSCursor.pointingHand.pop()
+                }
+                
+            } clicked: {
                 model.open(site)
-            })
+            }
             .frame(width: 32, height: 32)
 
             Rectangle()
@@ -360,19 +391,29 @@ struct SiteTrackerSummary: View {
                     .visibility(remaining > 0 ? .visible : .gone)
             }
             .padding(.trailing, 6)
+            .visibility(site.blockedEntities.isEmpty ? .gone : .visible)
 
             Group {
-                if #available(macOS 12, *) {
-                    Text("**\(site.numberOfTrackersBlocked)** tracking attempts blocked")
-                } else {
-                    Text("\(site.numberOfTrackersBlocked) tracking attempts blocked")
+                Group {
+                    if #available(macOS 12, *) {
+                        Text("**\(site.numberOfTrackersBlocked)** tracking attempts blocked")
+                    } else {
+                        Text("\(site.numberOfTrackersBlocked) tracking attempts blocked")
+                    }
                 }
+                .visibility(site.blockedEntities.isEmpty ? .gone : .visible)
+
+                Text(UserText.homePageNoTrackersFound)
+                    .visibility(site.blockedEntities.isEmpty && !site.trackersFound ? .visible : .gone)
+
+                Text(UserText.homePageNoTrackersBlocked)
+                    .visibility(site.blockedEntities.isEmpty && site.trackersFound ? .visible : .gone)
+
             }
             .font(.system(size: 13))
 
             Spacer()
         }
-        .visibility(site.blockedEntities.isEmpty ? .gone : .visible)
     }
 
 }
@@ -443,6 +484,18 @@ extension View {
             self.help(message)
         } else {
             self
+        }
+    }
+
+}
+
+extension Text {
+
+    func optionalUnderline(_ underline: Bool) -> Text {
+        if underline {
+            return self.underline()
+        } else {
+            return self
         }
     }
 
