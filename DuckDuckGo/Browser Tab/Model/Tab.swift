@@ -851,7 +851,8 @@ extension Tab: WKNavigationDelegate {
         } else if url.isExternalSchemeLink {
             // always allow user entered URLs
             if !userEnteredUrl {
-                // allow external links via address bar, but ignore <iframe src="custom://url">
+                // ignore <iframe src="custom://url">
+                // ignore 2nd+ external scheme navigation not initiated by user
                 guard navigationAction.sourceFrame.isMainFrame,
                       !self.externalSchemeOpenedPerPageLoad || navigationAction.isUserInitiated
                 else { return .cancel }
