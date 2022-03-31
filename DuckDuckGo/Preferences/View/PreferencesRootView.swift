@@ -21,7 +21,8 @@ import SwiftUI
 fileprivate extension Preferences.Const {
     static let sidebarWidth: CGFloat = 256
     static let paneContentWidth: CGFloat = 512
-    static let panePadding: CGFloat = 40
+    static let panePaddingHorizontal: CGFloat = 48
+    static let panePaddingVertical: CGFloat = 40
 }
 
 extension Preferences {
@@ -37,11 +38,9 @@ extension Preferences {
                 Color(NSColor.separatorColor).frame(width: 1)
 
                 ScrollView(.vertical) {
-                    HStack(alignment: .top, spacing: 0) {
-                        Spacer()
-
+                    HStack(spacing: 0) {
                         VStack(alignment: .leading) {
-
+                            
                             switch model.selectedPane {
                             case .defaultBrowser:
                                 DefaultBrowserView(model: DefaultBrowserPreferences())
@@ -58,11 +57,13 @@ extension Preferences {
                             }
                         }
                         .frame(maxWidth: Const.paneContentWidth, maxHeight: .infinity, alignment: .topLeading)
-                        .padding(Const.panePadding)
+                        .padding(.vertical, Const.panePaddingVertical)
+                        .padding(.horizontal, Const.panePaddingHorizontal)
 
                         Spacer()
                     }
                 }
+                .frame(maxWidth: .infinity)
             }
             .frame(maxWidth: .infinity, maxHeight: .infinity)
             .background(Color("InterfaceBackgroundColor"))

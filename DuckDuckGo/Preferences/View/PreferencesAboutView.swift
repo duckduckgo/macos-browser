@@ -35,34 +35,35 @@ extension Preferences {
         @ObservedObject var model: AboutModel
 
         var body: some View {
-            VStack(alignment: .leading, spacing: 20) {
+            VStack(alignment: .leading, spacing: 0) {
                 Text(UserText.aboutDuckDuckGo)
                     .font(Const.Fonts.preferencePaneTitle)
 
-                HStack {
-                    Image("AboutPageLogo")
-                    VStack(alignment: .leading, spacing: 8) {
-                        Text("DuckDuckGo").font(.companyName)
-                        Text(UserText.privacySimplified).font(.privacySimplified)
-                        Text(UserText.versionLabel(version: model.appVersion.versionNumber, build: model.appVersion.buildNumber))
+                Section {
+                    HStack {
+                        Image("AboutPageLogo")
+                        VStack(alignment: .leading, spacing: 8) {
+                            Text("DuckDuckGo").font(.companyName)
+                            Text(UserText.privacySimplified).font(.privacySimplified)
+                            Text(UserText.versionLabel(version: model.appVersion.versionNumber, build: model.appVersion.buildNumber))
+                        }
                     }
-                }
+                    .padding(.bottom, 8)
 
-                HStack {
                     TextButton(UserText.moreAt(url: model.displayableAboutURL)) {
                         model.openURL(.aboutDuckDuckGo)
                     }
+
+                    TextButton(UserText.privacyPolicy) {
+                        model.openURL(.privacyPolicy)
+                    }
+
                     #if FEEDBACK
-                    Spacer()
                     Button(UserText.sendFeedback) {
                         model.openFeedbackForm()
                     }
-                    Spacer()
+                    .padding(.top, 4)
                     #endif
-                }
-
-                TextButton(UserText.privacyPolicy) {
-                    model.openURL(.privacyPolicy)
                 }
             }
         }
