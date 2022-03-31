@@ -150,10 +150,10 @@ final class FirePopoverViewController: NSViewController {
             .sink { [weak self] _ in
                 guard let self = self else { return }
                 self.collectionView.reloadData()
-                self.adjustContentHeight()
                 if self.firePopoverViewModel.selectable.isEmpty && !self.detailsWrapperView.isHidden {
                     self.toggleDetails()
                 }
+                self.adjustContentHeight()
                 self.updateOpenDetailsButton()
             }
     }
@@ -184,8 +184,8 @@ final class FirePopoverViewController: NSViewController {
         openWrapperView.isHidden = showDetails
         detailsWrapperView.isHidden = !showDetails
 
-        adjustContentHeight()
         updateWarningWrapperView()
+        adjustContentHeight()
     }
 
     private func adjustContentHeight() {
