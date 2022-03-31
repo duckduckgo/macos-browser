@@ -110,7 +110,7 @@ extension AppDelegate {
             accessory.alignment = .center
             accessory.sizeToFit()
 
-            let accessoryContainer = accessory.wrappedInContainer(with: NSEdgeInsets(top: 5, left: 5, bottom: -5, right: -5))
+            let accessoryContainer = accessory.wrappedInContainer(padding: 5)
             accessoryContainer.frame.size = accessoryContainer.fittingSize
 
             savePanel.accessoryView = accessoryContainer
@@ -654,22 +654,4 @@ extension MainViewController: FindInPageDelegate {
         self.tabCollectionViewModel.selectedTabViewModel?.closeFindInPage()
     }
 
-}
-
-extension NSView {
-    
-    func wrappedInContainer(with padding: NSEdgeInsets) -> NSView {
-        self.translatesAutoresizingMaskIntoConstraints = false
-
-        let containerView = NSView(frame: self.frame)
-        containerView.addSubview(self)
-
-        self.topAnchor.constraint(equalTo: containerView.topAnchor, constant: padding.top).isActive = true
-        self.leftAnchor.constraint(equalTo: containerView.leftAnchor, constant: padding.left).isActive = true
-        self.rightAnchor.constraint(equalTo: containerView.rightAnchor, constant: padding.right).isActive = true
-        self.bottomAnchor.constraint(equalTo: containerView.bottomAnchor, constant: padding.bottom).isActive = true
-        
-        return containerView
-    }
-    
 }
