@@ -92,6 +92,7 @@ extension UserText {
     static let pmLockScreenPreferencesLink = NSLocalizedString("pm.lock-screen.preferences.link", value: "Preferences", comment: "Label used for a button that opens preferences")
     
     static let pmAutoLockPromptUnlockLogins = NSLocalizedString("pm.lock-screen.prompt.unlock-logins", value: "unlock Logins+", comment: "Label presented when unlocking Logins+")
+    static let pmAutoLockPromptExportLogins = NSLocalizedString("pm.lock-screen.prompt.export-logins", value: "export your usernames and passwords", comment: "Label presented when exporting logins")
     static let pmAutoLockPromptChangeLoginsSettings = NSLocalizedString("pm.lock-screen.prompt.change-settings", value: "change Logins+ settings", comment: "Label presented when changing Auto-Lock settings")
     static let pmAutoLockPromptAutofill = NSLocalizedString("pm.lock-screen.prompt.autofill", value: "autofill credit card information", comment: "Label presented when autofilling credit card information")
     

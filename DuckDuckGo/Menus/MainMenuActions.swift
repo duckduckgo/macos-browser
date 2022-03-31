@@ -97,21 +97,37 @@ extension AppDelegate {
         guard let windowController = WindowControllersManager.shared.lastKeyMainWindowController,
               let window = windowController.window else { return }
 
-        let savePanel = NSSavePanel()
-        savePanel.nameFieldStringValue = "DuckDuckGo \(UserText.exportLoginsFileNameSuffix)"
-        savePanel.allowedFileTypes = ["csv"]
+        DeviceAuthenticator.shared.authenticateUser(reason: .exportLogins) { authenticationResult in
+            guard authenticationResult.authenticated else {
+                return
+            }
 
-        savePanel.beginSheetModal(for: window) { response in
-            guard response == .OK, let selectedURL = savePanel.url else { return }
+            let savePanel = NSSavePanel()
+            savePanel.nameFieldStringValue = "DuckDuckGo \(UserText.exportLoginsFileNameSuffix)"
+            
+            let accessory = NSTextField.label(titled: UserText.exportLoginsWarning)
+            accessory.textColor = .red
+            accessory.alignment = .center
+            accessory.sizeToFit()
 
-            let vault = try? SecureVaultFactory.default.makeVault(errorReporter: SecureVaultErrorReporter.shared)
-            let exporter = CSVLoginExporter(secureVault: vault!)
-            do {
-                try exporter.exportVaultLogins(to: selectedURL)
-                Pixel.fire(.exportedLogins())
-            } catch {
-                NSAlert.exportLoginsFailed()
-                    .beginSheetModal(for: window, completionHandler: nil)
+            let accessoryContainer = accessory.wrappedInContainer(with: NSEdgeInsets(top: 5, left: 5, bottom: -5, right: -5))
+            accessoryContainer.frame.size = accessoryContainer.fittingSize
+
+            savePanel.accessoryView = accessoryContainer
+            savePanel.allowedFileTypes = ["csv"]
+
+            savePanel.beginSheetModal(for: window) { response in
+                guard response == .OK, let selectedURL = savePanel.url else { return }
+
+                let vault = try? SecureVaultFactory.default.makeVault(errorReporter: SecureVaultErrorReporter.shared)
+                let exporter = CSVLoginExporter(secureVault: vault!)
+                do {
+                    try exporter.exportVaultLogins(to: selectedURL)
+                    Pixel.fire(.exportedLogins())
+                } catch {
+                    NSAlert.exportLoginsFailed()
+                        .beginSheetModal(for: window, completionHandler: nil)
+                }
             }
         }
     }
@@ -638,4 +654,22 @@ extension MainViewController: FindInPageDelegate {
         self.tabCollectionViewModel.selectedTabViewModel?.closeFindInPage()
     }
 
+}
+
+extension NSView {
+    
+    func wrappedInContainer(with padding: NSEdgeInsets) -> NSView {
+        self.translatesAutoresizingMaskIntoConstraints = false
+
+        let containerView = NSView(frame: self.frame)
+        containerView.addSubview(self)
+
+        self.topAnchor.constraint(equalTo: containerView.topAnchor, constant: padding.top).isActive = true
+        self.leftAnchor.constraint(equalTo: containerView.leftAnchor, constant: padding.left).isActive = true
+        self.rightAnchor.constraint(equalTo: containerView.rightAnchor, constant: padding.right).isActive = true
+        self.bottomAnchor.constraint(equalTo: containerView.bottomAnchor, constant: padding.bottom).isActive = true
+        
+        return containerView
+    }
+    
 }
