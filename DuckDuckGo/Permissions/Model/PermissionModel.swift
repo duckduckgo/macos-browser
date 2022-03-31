@@ -151,7 +151,12 @@ final class PermissionModel {
             }
 
             defer {
-                decisionHandler(granted)
+                switch decision {
+                case .deinitialized:
+                    break
+                default:
+                    decisionHandler(granted)
+                }
             }
             guard let self = self,
                   let query = query, // otherwise handling decision on Query deallocation
