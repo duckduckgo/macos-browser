@@ -19,20 +19,30 @@
 import Foundation
 
 final class WebsiteBreakageSender {
-
+    
     func sendWebsiteBreakage(_ websiteBreakage: WebsiteBreakage) {
-        let parameters: [String: String] = ["category": websiteBreakage.category?.rawValue ?? "",
-                                            "siteUrl": websiteBreakage.siteUrlString,
-                                            "upgradedHttps": websiteBreakage.upgradedHttps ? "true" : "false",
-                                            "tds": websiteBreakage.tdsETag?.trimmingCharacters(in: CharacterSet(charactersIn: "\"")) ?? "",
-                                            "blockedTrackers": websiteBreakage.blockedTrackerDomains.joined(separator: ","),
-                                            "surrogates": websiteBreakage.installedSurrogates.joined(separator: ","),
-                                            "ampUrl": websiteBreakage.ampURL,
-                                            "urlParametersRemoved": websiteBreakage.urlParametersRemoved ? "true" : "false",
-                                            "os": websiteBreakage.osVersion,
-                                            "manufacturer": "Apple"]
-
-        Pixel.fire(.brokenSiteReport, withAdditionalParameters: parameters)
+        Pixel.fire(
+            .brokenSiteReport,
+            withAdditionalParameters: parameters(from: websiteBreakage),
+            allowedQueryReservedCharacters: Self.allowedQueryReservedCharacters
+        )
+    }
+    
+    func parameters(from websiteBreakage: WebsiteBreakage) -> [String: String] {
+        [
+            "category": websiteBreakage.category?.rawValue ?? "",
+            "siteUrl": websiteBreakage.siteUrlString,
+            "upgradedHttps": websiteBreakage.upgradedHttps ? "true" : "false",
+            "tds": websiteBreakage.tdsETag?.trimmingCharacters(in: CharacterSet(charactersIn: "\"")) ?? "",
+            "blockedTrackers": websiteBreakage.blockedTrackerDomains.joined(separator: ","),
+            "surrogates": websiteBreakage.installedSurrogates.joined(separator: ","),
+            "gpc": websiteBreakage.isGPCEnabled ? "true" : "false",
+            "ampUrl": websiteBreakage.ampURL,
+            "urlParametersRemoved": websiteBreakage.urlParametersRemoved ? "true" : "false",
+            "os": websiteBreakage.osVersion,
+            "manufacturer": websiteBreakage.manufacturer
+        ]
     }
 
+    static let allowedQueryReservedCharacters =  CharacterSet(charactersIn: ",")
 }

@@ -37,7 +37,39 @@ struct WebsiteBreakage {
     let tdsETag: String?
     let blockedTrackerDomains: [String]
     let installedSurrogates: [String]
+    let isGPCEnabled: Bool
     let ampURL: String
     let urlParametersRemoved: Bool
+    let manufacturer: String
+    
+    init(
+        category: Category?,
+        siteUrlString: String,
+        osVersion: String,
+        upgradedHttps: Bool,
+        tdsETag: String?,
+        blockedTrackerDomains: [String],
+        installedSurrogates: [String],
+        isGPCEnabled: Bool,
+        ampURL: String,
+        urlParametersRemoved: Bool,
+        manufacturer: String = "Apple"
+    ) {
+        var siteUrlComponents = URLComponents(string: siteUrlString)
+        siteUrlComponents?.query = nil
+        siteUrlComponents?.fragment = nil
+
+        self.category = category
+        self.siteUrlString = siteUrlComponents?.url?.absoluteString ?? siteUrlString
+        self.osVersion = osVersion
+        self.upgradedHttps = upgradedHttps
+        self.tdsETag = tdsETag
+        self.blockedTrackerDomains = blockedTrackerDomains
+        self.installedSurrogates = installedSurrogates
+        self.isGPCEnabled = isGPCEnabled
+        self.ampURL = ampURL
+        self.urlParametersRemoved = urlParametersRemoved
+        self.manufacturer = manufacturer
+    }
 
 }

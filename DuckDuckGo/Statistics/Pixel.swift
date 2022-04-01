@@ -40,6 +40,7 @@ final class Pixel {
 
     func fire(pixelNamed pixelName: String,
               withAdditionalParameters params: [String: String]? = nil,
+              allowedQueryReservedCharacters: CharacterSet? = nil,
               withHeaders headers: HTTPHeaders = APIHeaders().defaultHeaders,
               onComplete: @escaping (Error?) -> Void = {_ in }) {
 
@@ -64,13 +65,20 @@ final class Pixel {
         }
 
         let url = URL.pixelUrl(forPixelNamed: pixelName)
-        APIRequest.request(url: url, parameters: newParams, headers: headers, callBackOnMainThread: true) { (_, error) in
+        APIRequest.request(
+            url: url,
+            parameters: newParams,
+            allowedQueryReservedCharacters: allowedQueryReservedCharacters,
+            headers: headers,
+            callBackOnMainThread: true
+        ) { (_, error) in
             onComplete(error)
         }
     }
 
     static func fire(_ event: Pixel.Event,
                      withAdditionalParameters parameters: [String: String]? = nil,
+                     allowedQueryReservedCharacters: CharacterSet? = nil,
                      onComplete: @escaping (Error?) -> Void = {_ in }) {
         let newParams: [String: String]?
         switch (event.parameters, parameters) {
@@ -86,6 +94,7 @@ final class Pixel {
 
         Self.shared?.fire(pixelNamed: event.name,
                           withAdditionalParameters: newParams,
+                          allowedQueryReservedCharacters: allowedQueryReservedCharacters,
                           onComplete: onComplete)
     }
 
