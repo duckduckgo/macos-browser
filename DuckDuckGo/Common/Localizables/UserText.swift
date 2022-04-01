@@ -378,7 +378,7 @@ struct UserText {
 
     static let exportLoginsFileNameSuffix = NSLocalizedString("export.logins.file.name.suffix", value: "Logins", comment: "The last part of the suggested file name for exporting logins")
     static let exportBookmarksFileNameSuffix = NSLocalizedString("export.bookmarks.file.name.suffix", value: "Bookmarks", comment: "The last part of the suggested file for exporting bookmarks")
-    static let exportLoginsWarning = NSLocalizedString("export.logins.warning", value: "Make sure to save this file in a safe location and delete it when done.\nAnyone who can access it will be able to read your passwords.", comment: "Warning text presented when exporting logins.")
+    static let exportLoginsWarning = NSLocalizedString("export.logins.warning", value: "This file contains your passwords in plain text and should be saved in a secure location and deleted when you are done.\nAnyone with access to this file will be able to read your passwords.", comment: "Warning text presented when exporting logins.")
 
     static let onboardingWelcomeTitle = NSLocalizedString("onboarding.welcome.title", value: "Welcome to DuckDuckGo!", comment: "General welcome to the app title")
     static let onboardingWelcomeText = NSLocalizedString("onboarding.welcome.text", value: "Tired of being tracked online? You've come to the right place 👍\n\nI'll help you stay private️ as you search and browse the web. Trackers be gone!", comment: "Detailed welcome to the app text")
