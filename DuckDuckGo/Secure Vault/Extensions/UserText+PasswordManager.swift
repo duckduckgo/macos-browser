@@ -103,4 +103,3 @@ extension UserText {
     static let autoLockThreshold1Hour = NSLocalizedString("pm.lock-screen.threshold.1-hour", value: "1 hour", comment: "Label used when selecting the Auto-Lock threshold")
     
 }
-// swiftlint:enable line_length

@@ -37,5 +37,7 @@ struct WebsiteBreakage {
     let tdsETag: String?
     let blockedTrackerDomains: [String]
     let installedSurrogates: [String]
+    let ampURL: String
+    let urlParametersRemoved: Bool
 
 }

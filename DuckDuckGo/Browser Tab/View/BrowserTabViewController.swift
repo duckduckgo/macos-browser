@@ -28,7 +28,7 @@ protocol BrowserTabViewControllerClickDelegate: AnyObject {
 }
 
 // swiftlint:disable file_length
-
+// swiftlint:disable:next type_body_length
 final class BrowserTabViewController: NSViewController {
 
     @IBOutlet weak var errorView: NSView!
@@ -57,7 +57,7 @@ final class BrowserTabViewController: NSViewController {
     private var transientTabContentViewController: NSViewController?
 
     private var mouseDownMonitor: Any?
-    
+
     required init?(coder: NSCoder) {
         fatalError("BrowserTabViewController: Bad initializer")
     }
@@ -118,7 +118,7 @@ final class BrowserTabViewController: NSViewController {
                 self?.showTabContent(of: selectedTabViewModel)
                 self?.subscribeToErrorViewState()
                 self?.subscribeToTabContent(of: selectedTabViewModel)
-        }
+            }
     }
 
     private func removeWebViewFromHierarchy(webView: WebView? = nil,
@@ -181,6 +181,7 @@ final class BrowserTabViewController: NSViewController {
         let oldWebView = webView
         let webViewContainer = webViewContainer
         displayWebView(of: tabViewModel)
+        tabViewModel.updateAddressBarStrings()
         if let oldWebView = oldWebView, let webViewContainer = webViewContainer {
             removeWebViewFromHierarchy(webView: oldWebView, container: webViewContainer)
         }
@@ -234,10 +235,14 @@ final class BrowserTabViewController: NSViewController {
             if let parentTab = tabCollectionViewModel.selectedTabViewModel?.tab.parentTab, parentTab.delegate !== self {
                 parentTab.delegate?.tab(parentTab, requestedNewTabWith: content, selected: true)
                 parentTab.webView.window?.makeKeyAndOrderFront(nil)
-            // Act as default URL Handler if no Parent
+                // Act as default URL Handler if no Parent
             } else {
                 WindowControllersManager.shared.showTab(with: content)
             }
+            return
+        }
+
+        guard tabCollectionViewModel.selectDisplayableTabIfPresent(content) == false else {
             return
         }
 
@@ -323,13 +328,13 @@ final class BrowserTabViewController: NSViewController {
         case nil, .some(.none):
             removeAllTabContent()
         }
-        
+
     }
 
     // MARK: - Preferences
 
-    private(set) lazy var preferencesViewController: PreferencesSplitViewController = {
-        let viewController = PreferencesSplitViewController.create()
+    private(set) lazy var preferencesViewController: PreferencesViewController = {
+        let viewController = PreferencesViewController()
         viewController.delegate = self
 
         return viewController
@@ -394,33 +399,8 @@ extension BrowserTabViewController: TabDelegate {
             tab?.update(url: URL.makeSearchUrl(from: url.absoluteString), userEntered: false)
         }
 
-        // there is a hacky way you can detect whether an app is installed to handle a protocol:
-        // https://www.npmjs.com/package/custom-protocol-check
-        // > Safari: using hidden iframe onBlur to detect whether the focus is stolen.
-        // > When the focus is stolen, it assumes that the custom protocol launches external app and therefore it exists.
-        // Which, looking at the Zoom launcher code, is almost what they're doing:
-        /*
-            document.body.focus();
-            var t = function() {
-                return window.removeEventListener("blur", o)
-            };
-            function o() {
-                n(),
-                t()
-            }
-            var s = i.isMobile ? Ar : Cr;
-            if (setTimeout((function() {
-                n({
-                    code: 1001,
-                    message: "urlscheme no blur within timout " + s + "ms"
-                }),
-                t()
-            }), s), window.addEventListener("blur", o)
-            ...
-        */
-        // The code immediately after that then creates an iframe with the zoommtg:// link in it
-        // if the app is installed, the browser protocol handler will show, which triggers a blur event
-        // So, we'll steal a WebView focus if the app is installed, otherwise download should be triggered
+        // Another way of detecting whether an app is installed to handle a protocol is described in Asana:
+        // https://app.asana.com/0/1201037661562251/1202055908401751/f
         guard NSWorkspace.shared.urlForApplication(toOpen: url) != nil else {
             if userEntered {
                 searchForExternalUrl()
@@ -713,9 +693,9 @@ extension BrowserTabViewController: WKUIDelegate {
             progress.completedUnitCount = progress.totalUnitCount
         }
 
-        let prefs = DownloadPreferences()
+        let prefs = DownloadsPreferences()
         if !prefs.alwaysRequestDownloadLocation,
-           let location = prefs.selectedDownloadLocation {
+           let location = prefs.effectiveDownloadLocation {
             let url = location.appendingPathComponent(suggestedFilename)
             try? write(to: url)
 
@@ -723,7 +703,7 @@ extension BrowserTabViewController: WKUIDelegate {
         }
 
         chooseDestination(suggestedFilename: suggestedFilename,
-                          directoryURL: prefs.selectedDownloadLocation,
+                          directoryURL: prefs.effectiveDownloadLocation,
                           fileTypes: UTType(mimeType: mimeType).map { [$0] } ?? []) { url, _ in
             guard let url = url else { return }
             try? write(to: url)
@@ -988,17 +968,18 @@ extension BrowserTabViewController: OnboardingDelegate {
     }
 
     func onboardingDidRequestSetDefault(completion: @escaping () -> Void) {
-        if DefaultBrowserPreferences.isDefault {
+        let defaultBrowserPreferences = DefaultBrowserPreferences()
+        if defaultBrowserPreferences.isDefault {
             completion()
             return
         }
 
-        DefaultBrowserPreferences.becomeDefault {
+        defaultBrowserPreferences.becomeDefault { _ in
+            _ = defaultBrowserPreferences
             withAnimation {
                 completion()
             }
         }
-
     }
 
     func onboardingHasFinished() {
