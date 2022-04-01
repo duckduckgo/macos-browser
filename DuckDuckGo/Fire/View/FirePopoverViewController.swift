@@ -48,6 +48,7 @@ final class FirePopoverViewController: NSViewController {
     @IBOutlet weak var detailsWrapperView: NSView!
     @IBOutlet weak var contentHeightConstraint: NSLayoutConstraint!
     @IBOutlet weak var detailsWrapperViewHeightContraint: NSLayoutConstraint!
+    @IBOutlet weak var openWrapperView: NSView!
     @IBOutlet weak var closeWrapperView: NSView!
     @IBOutlet weak var collectionView: NSCollectionView!
     @IBOutlet weak var collectionViewBottomConstraint: NSLayoutConstraint!
@@ -56,6 +57,7 @@ final class FirePopoverViewController: NSViewController {
 
     private var viewModelCancellable: AnyCancellable?
     private var selectedCancellable: AnyCancellable?
+    private var areOtherTabsInfluencedCancellable: AnyCancellable?
 
     required init?(coder: NSCoder) {
         fatalError("FirePopoverViewController: Bad initializer")
@@ -92,6 +94,7 @@ final class FirePopoverViewController: NSViewController {
 
         subscribeToViewModel()
         subscribeToSelected()
+        subscribeToAreOtherTabsInfluenced()
     }
 
     @IBAction func optionsButtonAction(_ sender: NSPopUpButton) {
@@ -124,7 +127,7 @@ final class FirePopoverViewController: NSViewController {
 
     private func updateWarningWrapperView() {
         warningWrapperView.isHidden = firePopoverViewModel.clearingOption == .allData ||
-        firePopoverViewModel.selectable.isEmpty || detailsWrapperView.isHidden
+        !firePopoverViewModel.areOtherTabsInfluenced || detailsWrapperView.isHidden
 
         collectionViewBottomConstraint.constant = warningWrapperView.isHidden ? 0 : 32
     }
@@ -147,10 +150,10 @@ final class FirePopoverViewController: NSViewController {
             .sink { [weak self] _ in
                 guard let self = self else { return }
                 self.collectionView.reloadData()
-                self.adjustContentHeight()
                 if self.firePopoverViewModel.selectable.isEmpty && !self.detailsWrapperView.isHidden {
                     self.toggleDetails()
                 }
+                self.adjustContentHeight()
                 self.updateOpenDetailsButton()
             }
     }
@@ -159,20 +162,30 @@ final class FirePopoverViewController: NSViewController {
         selectedCancellable = firePopoverViewModel.$selected
             .receive(on: DispatchQueue.main)
             .sink { [weak self] selected in
-                let selectionIndexPaths = Set(selected.map {IndexPath(item: $0, section: 1)})
-                self?.collectionView.selectionIndexPaths = selectionIndexPaths
-                self?.updateCloseDetailsButton()
-                self?.updateClearButton()
+                guard let self = self else { return }
+                let selectionIndexPaths = Set(selected.map {IndexPath(item: $0, section: self.firePopoverViewModel.selectableSectionIndex)})
+                self.collectionView.selectionIndexPaths = selectionIndexPaths
+                self.updateCloseDetailsButton()
+                self.updateClearButton()
+            }
+    }
+
+    private func subscribeToAreOtherTabsInfluenced() {
+        areOtherTabsInfluencedCancellable = firePopoverViewModel.$areOtherTabsInfluenced
+            .receive(on: DispatchQueue.main)
+            .sink { [weak self] _ in
+                guard let self = self else { return }
+                self.updateWarningWrapperView()
             }
     }
 
     private func toggleDetails() {
         let showDetails = detailsWrapperView.isHidden
-        openDetailsButton.isHidden = showDetails
+        openWrapperView.isHidden = showDetails
         detailsWrapperView.isHidden = !showDetails
 
-        adjustContentHeight()
         updateWarningWrapperView()
+        adjustContentHeight()
     }
 
     private func adjustContentHeight() {
@@ -192,7 +205,8 @@ final class FirePopoverViewController: NSViewController {
             return Constants.minimumContentHeight
         } else {
             if let contentHeight = collectionView.collectionViewLayout?.collectionViewContentSize.height {
-                let height = contentHeight + closeWrapperView.frame.height + warningWrapperView.frame.height
+                let warningWrapperViewHeight = warningWrapperView.isHidden ? 0 : warningWrapperView.frame.height
+                let height = contentHeight + closeWrapperView.frame.height + warningWrapperViewHeight
                 return min(Constants.maximumContentHeight, height)
             } else {
                 return Constants.maximumContentHeight
@@ -224,7 +238,7 @@ extension FirePopoverViewController: NSCollectionViewDataSource {
     }
 
     func collectionView(_ collectionView: NSCollectionView, numberOfItemsInSection section: Int) -> Int {
-        return section == 0 ? firePopoverViewModel.fireproofed.count : firePopoverViewModel.selectable.count
+        return section == firePopoverViewModel.selectableSectionIndex ? firePopoverViewModel.selectable.count: firePopoverViewModel.fireproofed.count
     }
 
     func collectionView(_ collectionView: NSCollectionView, itemForRepresentedObjectAt indexPath: IndexPath) -> NSCollectionViewItem {
@@ -232,9 +246,10 @@ extension FirePopoverViewController: NSCollectionViewDataSource {
         guard let firePopoverItem = item as? FirePopoverCollectionViewItem else { return item }
 
         firePopoverItem.delegate = self
-        let sectionList = (indexPath.section == 0 ? firePopoverViewModel.fireproofed : firePopoverViewModel.selectable)
+        let isSelectableSection = indexPath.section == firePopoverViewModel.selectableSectionIndex
+        let sectionList = isSelectableSection ? firePopoverViewModel.selectable: firePopoverViewModel.fireproofed
         let listItem = sectionList[indexPath.item]
-        firePopoverItem.setItem(listItem, isFireproofed: indexPath.section == 0)
+        firePopoverItem.setItem(listItem, isFireproofed: indexPath.section == firePopoverViewModel.fireproofedSectionIndex)
         return firePopoverItem
     }
 
@@ -247,10 +262,10 @@ extension FirePopoverViewController: NSCollectionViewDataSource {
                                                         for: indexPath) as! FirePopoverCollectionViewHeader
         // swiftlint:enable force_cast
 
-        if indexPath.section == 0 {
-            view.title.stringValue = UserText.fireDialogFireproofSites
-        } else {
+        if indexPath.section == firePopoverViewModel.selectableSectionIndex {
             view.title.stringValue = UserText.fireDialogClearSites
+        } else {
+            view.title.stringValue = UserText.fireDialogFireproofSites
         }
 
         return view
@@ -269,8 +284,8 @@ extension FirePopoverViewController: NSCollectionViewDelegateFlowLayout {
                         referenceSizeForHeaderInSection section: Int) -> NSSize {
         let count: Int
         switch section {
-        case 0: count = firePopoverViewModel.fireproofed.count
-        case 1: count = firePopoverViewModel.selectable.count
+        case firePopoverViewModel.selectableSectionIndex: count = firePopoverViewModel.selectable.count
+        case firePopoverViewModel.fireproofedSectionIndex: count = firePopoverViewModel.fireproofed.count
         default: count = 0
         }
         return NSSize(width: collectionView.bounds.width, height: count == 0 ? 0 : Constants.headerHeight)
@@ -281,8 +296,8 @@ extension FirePopoverViewController: NSCollectionViewDelegateFlowLayout {
                         referenceSizeForFooterInSection section: Int) -> NSSize {
         let count: Int
         switch section {
-        case 0: count = firePopoverViewModel.fireproofed.count
-        case 1: count = firePopoverViewModel.selectable.count
+        case firePopoverViewModel.selectableSectionIndex: count = firePopoverViewModel.selectable.count
+        case firePopoverViewModel.fireproofedSectionIndex: count = firePopoverViewModel.fireproofed.count
         default: count = 0
         }
         return NSSize(width: collectionView.bounds.width, height: count == 0 ? 0 : Constants.footerHeight)

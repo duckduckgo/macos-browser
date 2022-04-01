@@ -110,7 +110,7 @@ final class Tab: NSObject {
          webViewConfiguration: WKWebViewConfiguration? = nil,
          historyCoordinating: HistoryCoordinating = HistoryCoordinator.shared,
          cbaTimeReporter: ContentBlockingAssetsCompilationTimeReporter? = ContentBlockingAssetsCompilationTimeReporter.shared,
-         visitedDomains: Set<String> = Set<String>(),
+         localHistory: Set<String> = Set<String>(),
          title: String? = nil,
          error: Error? = nil,
          favicon: NSImage? = nil,
@@ -123,7 +123,7 @@ final class Tab: NSObject {
         self.faviconManagement = faviconManagement
         self.historyCoordinating = historyCoordinating
         self.cbaTimeReporter = cbaTimeReporter
-        self.visitedDomains = visitedDomains
+        self.localHistory = localHistory
         self.title = title
         self.error = error
         self.favicon = favicon
@@ -493,7 +493,7 @@ final class Tab: NSObject {
 
     private var historyCoordinating: HistoryCoordinating
     private var shouldStoreNextVisit = true
-    private(set) var visitedDomains: Set<String>
+    private(set) var localHistory: Set<String>
 
     func addVisit(of url: URL) {
         guard shouldStoreNextVisit else {
@@ -508,7 +508,7 @@ final class Tab: NSObject {
 
         // Add to local history
         if let host = url.host, !host.isEmpty {
-            visitedDomains.insert(host)
+            localHistory.insert(host.dropWWW())
         }
     }
 
