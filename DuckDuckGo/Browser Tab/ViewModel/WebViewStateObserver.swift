@@ -66,7 +66,7 @@ final class WebViewStateObserver: NSObject {
 
         tabViewModel.updateCanGoBack()
         tabViewModel.canGoForward = webView.canGoForward
-        tabViewModel.isLoading = webView.isLoading
+        tabViewModel.isWebViewLoading = webView.isLoading
     }
 
     private func observe(webView: WKWebView) {
@@ -99,7 +99,7 @@ final class WebViewStateObserver: NSObject {
 
         case #keyPath(WKWebView.canGoBack): tabViewModel.updateCanGoBack()
         case #keyPath(WKWebView.canGoForward): tabViewModel.canGoForward = webView.canGoForward
-        case #keyPath(WKWebView.isLoading): tabViewModel.isLoading = webView.isLoading
+        case #keyPath(WKWebView.isLoading): tabViewModel.isWebViewLoading = webView.isLoading
         case #keyPath(WKWebView.title):
             updateTitle()
             if let title = webView.title, let url = webView.url {

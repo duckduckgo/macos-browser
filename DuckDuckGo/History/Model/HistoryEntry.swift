@@ -29,6 +29,7 @@ struct HistoryEntry {
     var failedToLoad: Bool
     var numberOfTrackersBlocked: Int
     var blockedTrackingEntities: Set<String>
+    var trackersFound: Bool
 
     mutating func addVisit() {
         numberOfVisits += 1
@@ -54,7 +55,8 @@ extension HistoryEntry {
                   lastVisit: Date.startOfMinuteNow,
                   failedToLoad: false,
                   numberOfTrackersBlocked: 0,
-                  blockedTrackingEntities: Set<String>())
+                  blockedTrackingEntities: Set<String>(),
+                  trackersFound: false)
     }
 
 }

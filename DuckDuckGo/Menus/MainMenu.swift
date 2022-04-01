@@ -81,7 +81,7 @@ final class MainMenu: NSMenu {
 
         setup()
     }
-  
+
     override func update() {
         super.update()
 
@@ -95,7 +95,7 @@ final class MainMenu: NSMenu {
 
     private func setup() {
         self.delegate = self
-#if !FEEDBACK
+        #if !FEEDBACK
 
         guard let helpMenuItemSubmenu = helpMenuItem?.submenu,
               let helpSeparatorMenuItem = helpSeparatorMenuItem,
@@ -107,7 +107,7 @@ final class MainMenu: NSMenu {
         helpMenuItemSubmenu.removeItem(helpSeparatorMenuItem)
         helpMenuItemSubmenu.removeItem(sendFeedbackMenuItem)
 
-#endif
+        #endif
 
         subscribeToBookmarkList()
     }
@@ -212,10 +212,10 @@ extension MainMenu: NSMenuDelegate {
 }
 
 fileprivate extension NSMenuItem {
-    
+
     convenience init(bookmarkViewModel: BookmarkViewModel) {
         self.init()
-        
+
         title = bookmarkViewModel.menuTitle
         image = bookmarkViewModel.menuFavicon
         representedObject = bookmarkViewModel.entity

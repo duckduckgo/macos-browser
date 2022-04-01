@@ -49,18 +49,18 @@
                                 <rect key="frame" x="0.0" y="0.0" width="258" height="500"/>
                                 <userDefinedRuntimeAttributes>
                                     <userDefinedRuntimeAttribute type="color" keyPath="backgroundColor">
-                                        <color key="value" name="HomePageBackgroundColor"/>
+                                        <color key="value" name="InterfaceBackgroundColor"/>
                                     </userDefinedRuntimeAttribute>
                                 </userDefinedRuntimeAttributes>
                             </customView>
                             <scrollView borderType="none" autohidesScrollers="YES" horizontalLineScroll="28" horizontalPageScroll="10" verticalLineScroll="28" verticalPageScroll="10" hasHorizontalScroller="NO" usesPredominantAxisScrolling="NO" translatesAutoresizingMaskIntoConstraints="NO" id="SqK-FW-C0t">
-                                <rect key="frame" x="12" y="0.0" width="234" height="436"/>
+                                <rect key="frame" x="12" y="0.0" width="234" height="410"/>
                                 <clipView key="contentView" drawsBackground="NO" id="4R3-QO-s8T">
-                                    <rect key="frame" x="0.0" y="0.0" width="234" height="436"/>
+                                    <rect key="frame" x="0.0" y="0.0" width="234" height="410"/>
                                     <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                     <subviews>
                                         <outlineView verticalHuggingPriority="750" allowsExpansionToolTips="YES" columnAutoresizingStyle="lastColumnOnly" columnResizing="NO" multipleSelection="NO" emptySelection="NO" autosaveColumns="NO" rowHeight="28" viewBased="YES" indentationPerLevel="13" outlineTableColumn="Eur-dh-ZOY" id="dHL-py-g9k" customClass="BookmarksOutlineView" customModule="DuckDuckGo_Privacy_Browser" customModuleProvider="target">
-                                            <rect key="frame" x="0.0" y="0.0" width="234" height="436"/>
+                                            <rect key="frame" x="0.0" y="0.0" width="234" height="410"/>
                                             <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                             <size key="intercellSpacing" width="17" height="0.0"/>
                                             <color key="backgroundColor" name="ClearColor"/>
@@ -99,10 +99,13 @@
                                 </connections>
                             </scrollView>
                             <popUpButton translatesAutoresizingMaskIntoConstraints="NO" id="oJB-Na-CzV">
-                                <rect key="frame" x="21" y="456" width="219" height="24"/>
+                                <rect key="frame" x="18" y="422" width="217" height="60"/>
+                                <constraints>
+                                    <constraint firstAttribute="height" constant="60" id="gqw-kD-NlW"/>
+                                </constraints>
                                 <popUpButtonCell key="cell" type="bevel" title="Bookmarks" bezelStyle="rounded" alignment="left" controlSize="large" lineBreakMode="truncatingTail" state="on" imageScaling="proportionallyDown" inset="2" selectedItem="Pxw-Jh-Zh0" id="Hfh-Gh-9qt">
                                     <behavior key="behavior" lightByBackground="YES" lightByGray="YES"/>
-                                    <font key="font" size="20" name="SFProDisplay-Semibold"/>
+                                    <font key="font" metaFont="system" size="22"/>
                                     <menu key="menu" id="VEx-gs-amO">
                                         <items>
                                             <menuItem title="Bookmarks" state="on" id="Pxw-Jh-Zh0"/>
@@ -113,16 +116,16 @@
                         </subviews>
                         <constraints>
                             <constraint firstAttribute="trailing" secondItem="SqK-FW-C0t" secondAttribute="trailing" constant="12" id="6Zz-Nc-u6E"/>
-                            <constraint firstAttribute="trailing" secondItem="oJB-Na-CzV" secondAttribute="trailing" constant="18" id="7d2-Rx-hjg"/>
-                            <constraint firstItem="SqK-FW-C0t" firstAttribute="top" secondItem="oJB-Na-CzV" secondAttribute="bottom" constant="20" id="Owf-hJ-AhH"/>
+                            <constraint firstAttribute="trailing" secondItem="oJB-Na-CzV" secondAttribute="trailing" constant="23" id="7d2-Rx-hjg"/>
+                            <constraint firstItem="SqK-FW-C0t" firstAttribute="top" secondItem="oJB-Na-CzV" secondAttribute="bottom" constant="12" id="Owf-hJ-AhH"/>
                             <constraint firstItem="eJ4-cO-2QO" firstAttribute="leading" secondItem="oQD-6b-AhT" secondAttribute="leading" id="QcT-qP-dwG"/>
-                            <constraint firstItem="oJB-Na-CzV" firstAttribute="leading" secondItem="oQD-6b-AhT" secondAttribute="leading" constant="26" id="QuW-mr-Xwh"/>
+                            <constraint firstItem="oJB-Na-CzV" firstAttribute="leading" secondItem="oQD-6b-AhT" secondAttribute="leading" constant="23" id="QuW-mr-Xwh"/>
                             <constraint firstItem="SqK-FW-C0t" firstAttribute="leading" secondItem="oQD-6b-AhT" secondAttribute="leading" constant="12" id="RiX-eQ-VCL"/>
                             <constraint firstAttribute="bottom" secondItem="SqK-FW-C0t" secondAttribute="bottom" id="Tc8-Ir-jea"/>
                             <constraint firstAttribute="trailing" secondItem="eJ4-cO-2QO" secondAttribute="trailing" id="qjZ-an-5zF"/>
                             <constraint firstAttribute="bottom" secondItem="eJ4-cO-2QO" secondAttribute="bottom" id="rV2-0V-grm"/>
                             <constraint firstItem="eJ4-cO-2QO" firstAttribute="top" secondItem="oQD-6b-AhT" secondAttribute="top" id="uMg-uU-iHE"/>
-                            <constraint firstItem="oJB-Na-CzV" firstAttribute="top" secondItem="oQD-6b-AhT" secondAttribute="top" constant="20" id="vPa-lb-Lo1"/>
+                            <constraint firstItem="oJB-Na-CzV" firstAttribute="top" secondItem="oQD-6b-AhT" secondAttribute="top" constant="18" id="vPa-lb-Lo1"/>
                         </constraints>
                     </view>
                     <connections>
@@ -152,7 +155,7 @@
                                 <rect key="frame" x="0.0" y="0.0" width="676" height="629"/>
                                 <userDefinedRuntimeAttributes>
                                     <userDefinedRuntimeAttribute type="color" keyPath="backgroundColor">
-                                        <color key="value" name="HomePageBackgroundColor"/>
+                                        <color key="value" name="InterfaceBackgroundColor"/>
                                     </userDefinedRuntimeAttribute>
                                 </userDefinedRuntimeAttributes>
                             </customView>
@@ -681,9 +684,9 @@ Gw
                                 <color key="fillColor" name="PopoverBackgroundColor"/>
                             </box>
                             <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="TJx-89-ls4">
-                                <rect key="frame" x="13" y="421" width="89" height="20"/>
+                                <rect key="frame" x="13" y="421" width="90" height="20"/>
                                 <textFieldCell key="cell" lineBreakMode="clipping" title="Bookmarks" id="HqW-8W-PJu">
-                                    <font key="font" size="17" name="SFProDisplay-Semibold"/>
+                                    <font key="font" metaFont="system" size="17"/>
                                     <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
                                     <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
                                 </textFieldCell>
@@ -930,8 +933,8 @@ Gw
         <namedColor name="ClearColor">
             <color red="1" green="1" blue="1" alpha="0.0" colorSpace="custom" customColorSpace="sRGB"/>
         </namedColor>
-        <namedColor name="HomePageBackgroundColor">
-            <color red="0.97647058823529409" green="0.98039215686274506" blue="0.98039215686274506" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+        <namedColor name="InterfaceBackgroundColor">
+            <color red="1" green="1" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
         </namedColor>
         <namedColor name="PopoverBackgroundColor">
             <color red="0.94900000095367432" green="0.94099998474121094" blue="0.94099998474121094" alpha="0.89999997615814209" colorSpace="custom" customColorSpace="sRGB"/>

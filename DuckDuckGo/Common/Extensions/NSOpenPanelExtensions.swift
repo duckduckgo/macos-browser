@@ -21,10 +21,10 @@ import AppKit
 extension NSOpenPanel {
 
     static func downloadDirectoryPanel() -> NSOpenPanel {
-        let downloadPreferences = DownloadPreferences()
+        let downloadPreferences = DownloadsPreferences()
         let panel = NSOpenPanel()
 
-        panel.directoryURL = downloadPreferences.selectedDownloadLocation
+        panel.directoryURL = downloadPreferences.effectiveDownloadLocation
         panel.canChooseFiles = false
         panel.canChooseDirectories = true
         panel.canCreateDirectories = true

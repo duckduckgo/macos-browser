@@ -21,7 +21,7 @@ import Foundation
 // swiftlint:disable line_length
 extension UserText {
     
-    static let pmEmptyStateDefaultTitle = NSLocalizedString("pm.empty.default.title", value: "No logins or credit card info yet", comment: "Label for default empty state title")
+    static let pmEmptyStateDefaultTitle = NSLocalizedString("pm.empty.default.title", value: "No Logins or Payment Methods saved yet", comment: "Label for default empty state title")
     static let pmEmptyStateDefaultDescription = NSLocalizedString("pm.empty.default.description",
                                                                   value: "If your logins are saved in another browser, you can import them into DuckDuckGo.",
                                                                   comment: "Label for default empty state description")
@@ -83,7 +83,7 @@ extension UserText {
     
     static func pmLockScreenDuration(duration: String) -> String {
         let localized = NSLocalizedString("pm.lock-screen.duration",
-                                          value: "Logins+ will remain unlocked until your computer is idle for %@.",
+                                          value: "Your Autofill info will remain unlocked until your computer is idle for %@.",
                                           comment: "")
         return String(format: localized, duration)
     }
@@ -91,8 +91,8 @@ extension UserText {
     static let pmLockScreenPreferencesLabel = NSLocalizedString("pm.lock-screen.preferences.label", value: "Change in", comment: "Label used for a button that opens preferences")
     static let pmLockScreenPreferencesLink = NSLocalizedString("pm.lock-screen.preferences.link", value: "Preferences", comment: "Label used for a button that opens preferences")
     
-    static let pmAutoLockPromptUnlockLogins = NSLocalizedString("pm.lock-screen.prompt.unlock-logins", value: "unlock Logins+", comment: "Label presented when unlocking Logins+")
-    static let pmAutoLockPromptChangeLoginsSettings = NSLocalizedString("pm.lock-screen.prompt.change-settings", value: "change Logins+ settings", comment: "Label presented when changing Auto-Lock settings")
+    static let pmAutoLockPromptUnlockLogins = NSLocalizedString("pm.lock-screen.prompt.unlock-logins", value: "unlock access to your Autofill info", comment: "Label presented when unlocking Autofill")
+    static let pmAutoLockPromptChangeLoginsSettings = NSLocalizedString("pm.lock-screen.prompt.change-settings", value: "change your Autofill info access settings", comment: "Label presented when changing Auto-Lock settings")
     static let pmAutoLockPromptAutofill = NSLocalizedString("pm.lock-screen.prompt.autofill", value: "autofill credit card information", comment: "Label presented when autofilling credit card information")
     
     static let autoLockThreshold1Minute = NSLocalizedString("pm.lock-screen.threshold.1-minute", value: "1 minute", comment: "Label used when selecting the Auto-Lock threshold")
@@ -102,4 +102,3 @@ extension UserText {
     static let autoLockThreshold1Hour = NSLocalizedString("pm.lock-screen.threshold.1-hour", value: "1 hour", comment: "Label used when selecting the Auto-Lock threshold")
     
 }
-// swiftlint:enable line_length

@@ -29,6 +29,7 @@ protocol HistoryCoordinating: AnyObject {
 
     func addVisit(of url: URL)
     func addBlockedTracker(entityName: String, onURL url: URL)
+    func trackerFound(onURL: URL)
     func updateTitleIfNeeded(title: String, url: URL)
     func markFailedToLoadUrl(_ url: URL)
     func title(for url: URL) -> String?
@@ -101,6 +102,23 @@ final class HistoryCoordinator: HistoryCoordinating {
             }
 
             entry.addBlockedTracker(entityName: entityName)
+            self?.save(entry: entry)
+        }
+    }
+
+    func trackerFound(onURL url: URL) {
+        queue.async(flags: .barrier) { [weak self] in
+            guard let historyDictionary = self?.historyDictionary else {
+                os_log("Add tracker to %s ignored, no history", log: .history, url.absoluteString)
+                return
+            }
+
+            guard var entry = historyDictionary[url] else {
+                os_log("Add tracker to %s ignored, no entry", log: .history, url.absoluteString)
+                return
+            }
+
+            entry.trackersFound = true
             self?.save(entry: entry)
         }
     }

@@ -34,7 +34,7 @@ struct FaviconView: View {
     }
 
     func refreshImage() {
-        let image = faviconManagement.getCachedFavicon(for: domain, sizeCategory: .small)?.image
+        let image = faviconManagement.getCachedFavicon(for: domain, sizeCategory: .medium)?.image
         if image?.size.isSmaller(than: CGSize(width: 16, height: 16)) == false {
             self.image = image
         }

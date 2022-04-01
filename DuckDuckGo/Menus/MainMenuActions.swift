@@ -379,10 +379,12 @@ extension MainViewController {
         let otherMainViewControllers = otherWindowControllers.compactMap { $0.mainViewController }
         let otherTabCollectionViewModels = otherMainViewControllers.map { $0.tabCollectionViewModel }
         let otherTabs = otherTabCollectionViewModels.flatMap { $0.tabCollection.tabs }
+        let otherLocalHistoryOfRemovedTabs = Set(otherTabCollectionViewModels.flatMap { $0.tabCollection.localHistoryOfRemovedTabs })
 
         WindowsManager.closeWindows(except: view.window)
 
         tabCollectionViewModel.append(tabs: otherTabs)
+        tabCollectionViewModel.tabCollection.localHistoryOfRemovedTabs.formUnion(otherLocalHistoryOfRemovedTabs)
     }
 
     // MARK: - Edit
