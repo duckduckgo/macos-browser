@@ -160,18 +160,28 @@ internal class WebCacheManager {
             return
         }
 
-        try? pool.write { database in
-            try database.execute(sql: "PRAGMA wal_checkpoint(TRUNCATE);")
-            
-            let tables = try String.fetchAll(database, sql: "SELECT name FROM sqlite_master WHERE type='table'")
-            
-            for table in tables {
-                try database.execute(sql: "DELETE FROM \(table)")
+        removeObservationsData(from: pool)
+        try? pool.vacuum()
+        
+        // For an unknown reason, domains may be still present in the database binary when running `strings` over it, despite SQL queries returning an
+        // empty array, and despite vacuuming the database. Delete again to be safe.
+        removeObservationsData(from: pool)
+    }
+    
+    private func removeObservationsData(from pool: DatabasePool) {
+        do {
+            try pool.write { database in
+                try database.execute(sql: "PRAGMA wal_checkpoint(TRUNCATE);")
+                
+                let tables = try String.fetchAll(database, sql: "SELECT name FROM sqlite_master WHERE type='table'")
+                
+                for table in tables {
+                    try database.execute(sql: "DELETE FROM \(table)")
+                }
             }
-            
-            try database.execute(sql: "VACUUM")
+        } catch {
+            os_log("Failed to clear observations database: %s", log: .fire, error.localizedDescription)
         }
-
     }
 
 }
