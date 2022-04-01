@@ -917,15 +917,17 @@ extension Tab: WKNavigationDelegate {
             return .download(navigationAction, using: webView)
 
         } else if url.isExternalSchemeLink {
-            // ignore <iframe src="custom://url"> but allow via address bar
-            guard navigationAction.sourceFrame.isMainFrame,
-                  // ignore 2nd+ external scheme navigation not initiated by user
-                  !self.externalSchemeOpenedPerPageLoad || navigationAction.isUserInitiated
-            else { return .cancel }
+            // always allow user entered URLs
+            if !userEnteredUrl {
+                // ignore <iframe src="custom://url">
+                // ignore 2nd+ external scheme navigation not initiated by user
+                guard navigationAction.sourceFrame.isMainFrame,
+                      !self.externalSchemeOpenedPerPageLoad || navigationAction.isUserInitiated
+                else { return .cancel }
 
-            self.externalSchemeOpenedPerPageLoad = true
+                self.externalSchemeOpenedPerPageLoad = true
+            }
             self.delegate?.tab(self, requestedOpenExternalURL: url, forUserEnteredURL: userEnteredUrl)
-
             return .cancel
         }
 
