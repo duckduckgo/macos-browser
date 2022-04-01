@@ -75,7 +75,7 @@ extension Pixel.Event {
         }
 
         init() {
-            self.init(isDefault: DefaultBrowserPreferences.isDefault)
+            self.init(isDefault: DefaultBrowserPreferences().isDefault)
         }
     }
 
@@ -226,8 +226,8 @@ extension Pixel.Event {
             case let menuItem as NSMenuItem:
                 if mainMenuCheck(menuItem.topMenu) {
                     if let event = NSApp.currentEvent,
-                        case .keyDown = event.type,
-                        event.characters == menuItem.keyEquivalent {
+                       case .keyDown = event.type,
+                       event.characters == menuItem.keyEquivalent {
 
                         self = .hotKey
                     } else {
@@ -363,8 +363,8 @@ extension Pixel.Event {
             case let menuItem as NSMenuItem:
                 if mainMenuCheck(menuItem.topMenu) {
                     if let event = NSApp.currentEvent,
-                        case .keyDown = event.type,
-                        event.characters == menuItem.keyEquivalent {
+                       case .keyDown = event.type,
+                       event.characters == menuItem.keyEquivalent {
 
                         self = .hotKey
                     } else {

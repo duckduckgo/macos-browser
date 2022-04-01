@@ -1,7 +1,7 @@
 //
-//  PreferenceSections.swift
+//  TextButton.swift
 //
-//  Copyright © 2021 DuckDuckGo. All rights reserved.
+//  Copyright © 2022 DuckDuckGo. All rights reserved.
 //
 //  Licensed under the Apache License, Version 2.0 (the "License");
 //  you may not use this file except in compliance with the License.
@@ -16,27 +16,24 @@
 //  limitations under the License.
 //
 
-import Foundation
+import SwiftUI
 
-protocol PreferenceSection {
-
-    var displayName: String { get }
-    var preferenceIcon: NSImage { get }
-
-}
-
-struct PreferenceSections {
-
-    let sections: [PreferenceSection]
-
-    init(sections: [PreferenceSection] = [
-        DefaultBrowserPreferences(),
-        AppearancePreferences(),
-        PrivacySecurityPreferences.shared,
-        LoginsPreferences(),
-        DownloadPreferences()
-    ]) {
-        self.sections = sections
+struct TextButton: View {
+    
+    let title: String
+    let action: () -> Void
+    
+    init(_ title: String, action: @escaping () -> Void) {
+        self.title = title
+        self.action = action
     }
-
+    
+    var body: some View {
+        Button(action: action) {
+            Text(title)
+                .foregroundColor(Color("LinkBlueColor"))
+        }
+        .buttonStyle(.plain)
+        .cursor(.pointingHand)
+    }
 }

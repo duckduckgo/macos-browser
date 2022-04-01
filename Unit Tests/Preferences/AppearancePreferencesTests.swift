@@ -1,7 +1,7 @@
 //
 //  AppearancePreferencesTests.swift
 //
-//  Copyright © 2021 DuckDuckGo. All rights reserved.
+//  Copyright © 2022 DuckDuckGo. All rights reserved.
 //
 //  Licensed under the Apache License, Version 2.0 (the "License");
 //  you may not use this file except in compliance with the License.
@@ -19,48 +19,70 @@
 import XCTest
 @testable import DuckDuckGo_Privacy_Browser
 
+struct AppearancePreferencesPersistorMock: AppearancePreferencesPersistor {
+    var showFullURL: Bool
+    var currentThemeName: String
+
+    init(showFullURL: Bool = false, currentThemeName: String = ThemeName.systemDefault.rawValue) {
+        self.showFullURL = showFullURL
+        self.currentThemeName = currentThemeName
+    }
+}
+
 final class AppearancePreferencesTests: XCTestCase {
 
-    private let testGroupName = "test"
+    func testWhenInitializedThenItLoadsPersistedValues() throws {
+        var model = AppearancePreferences(
+            persistor: AppearancePreferencesPersistorMock(
+                showFullURL: false,
+                currentThemeName: ThemeName.systemDefault.rawValue
+            )
+        )
 
-    override func setUp() {
-        super.setUp()
-        UserDefaults(suiteName: testGroupName)?.removePersistentDomain(forName: testGroupName)
+        XCTAssertEqual(model.showFullURL, false)
+        XCTAssertEqual(model.currentThemeName, ThemeName.systemDefault)
+
+        model = AppearancePreferences(
+            persistor: AppearancePreferencesPersistorMock(
+                showFullURL: true,
+                currentThemeName: ThemeName.light.rawValue
+            )
+        )
+
+        XCTAssertEqual(model.showFullURL, true)
+        XCTAssertEqual(model.currentThemeName, ThemeName.light)
     }
 
-    func testWhenGettingNSAppearanceFromThemeThenAppearanceMatchesTheme() {
-        let darkTheme = ThemeName.dark
-        let lightTheme = ThemeName.light
-        let systemTheme = ThemeName.systemDefault
+    func testWhenInitializedWithGarbageThenThemeIsSetToSystemDefault() throws {
+        let model = AppearancePreferences(
+            persistor: AppearancePreferencesPersistorMock(
+                showFullURL: false,
+                currentThemeName: "garbage"
+            )
+        )
 
-        XCTAssertEqual(darkTheme.appearance, NSAppearance(named: .darkAqua))
-        XCTAssertEqual(lightTheme.appearance, NSAppearance(named: .aqua))
-        XCTAssertNil(systemTheme.appearance)
+        XCTAssertEqual(model.currentThemeName, ThemeName.systemDefault)
     }
 
-    func testWhenSettingCurrentThemeThenThemeIsPersisted() {
-        var appearancePreferences = createAppearancePreferences()
-
-        XCTAssertEqual(appearancePreferences.currentThemeName, .systemDefault)
-
-        appearancePreferences.currentThemeName = .dark
-        XCTAssertEqual(appearancePreferences.currentThemeName, .dark)
-
-        appearancePreferences.currentThemeName = .light
-        XCTAssertEqual(appearancePreferences.currentThemeName, .light)
-
-        appearancePreferences.currentThemeName = .systemDefault
-        XCTAssertEqual(appearancePreferences.currentThemeName, .systemDefault)
+    func testThemeNameReturnsCorrectAppearanceObject() throws {
+        XCTAssertEqual(ThemeName.systemDefault.appearance, nil)
+        XCTAssertEqual(ThemeName.light.appearance, NSAppearance(named: .aqua))
+        XCTAssertEqual(ThemeName.dark.appearance, NSAppearance(named: .darkAqua))
     }
 
-    func testWhenReadingCurrentThemeDefaultThenSystemAppearanceIsReturned() {
-        let appearancePreferences = createAppearancePreferences()
-        XCTAssertEqual(appearancePreferences.currentThemeName, .systemDefault)
-    }
+    func testWhenThemeNameIsUpdatedThenApplicationAppearanceIsUpdated() throws {
+        let model = AppearancePreferences(persistor: AppearancePreferencesPersistorMock())
 
-    private func createAppearancePreferences() -> AppearancePreferences {
-        let testUserDefaults = UserDefaults(suiteName: testGroupName)
-        return AppearancePreferences(userDefaults: testUserDefaults!)
-    }
+        model.currentThemeName = ThemeName.systemDefault
+        XCTAssertEqual(NSApp.appearance?.name, ThemeName.systemDefault.appearance?.name)
 
+        model.currentThemeName = ThemeName.light
+        XCTAssertEqual(NSApp.appearance?.name, ThemeName.light.appearance?.name)
+
+        model.currentThemeName = ThemeName.dark
+        XCTAssertEqual(NSApp.appearance?.name, ThemeName.dark.appearance?.name)
+
+        model.currentThemeName = ThemeName.systemDefault
+        XCTAssertEqual(NSApp.appearance?.name, ThemeName.systemDefault.appearance?.name)
+    }
 }

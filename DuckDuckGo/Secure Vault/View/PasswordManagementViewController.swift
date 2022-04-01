@@ -54,7 +54,7 @@ final class PasswordManagementViewController: NSViewController {
     @IBOutlet var emptyStateTitle: NSTextField!
     @IBOutlet var emptyStateMessage: NSTextField!
     @IBOutlet var emptyStateButton: NSButton!
-    
+
     @IBOutlet var lockScreen: NSView!
     @IBOutlet var lockScreenIconImageView: NSImageView! {
         didSet {
@@ -75,7 +75,7 @@ final class PasswordManagementViewController: NSViewController {
                 .foregroundColor: NSColor(named: "LinkBlueColor")!,
                 .cursor: NSCursor.pointingHand
             ]
-            
+
             lockScreenOpenInPreferencesTextView.linkTextAttributes = linkAttributes
 
             let string = NSMutableAttributedString(string: UserText.pmLockScreenPreferencesLabel + " ")
@@ -85,7 +85,7 @@ final class PasswordManagementViewController: NSViewController {
 
             let paragraphStyle = NSMutableParagraphStyle()
             paragraphStyle.alignment = .center
-            
+
             string.append(linkString)
             string.addAttributes([
                 .cursor: NSCursor.arrow,
@@ -93,7 +93,7 @@ final class PasswordManagementViewController: NSViewController {
                 .font: NSFont.systemFont(ofSize: 13, weight: .regular),
                 .foregroundColor: NSColor(named: "BlackWhite60")!
             ], range: NSRange(location: 0, length: string.length))
-            
+
             lockScreenOpenInPreferencesTextView.textStorage?.setAttributedString(string)
         }
     }
@@ -129,11 +129,11 @@ final class PasswordManagementViewController: NSViewController {
 
             editingCancellable = itemModel?.isEditingPublisher.sink(receiveValue: { [weak self] isEditing in
                 guard let self = self else { return }
-                
+
                 self.isEditing = isEditing
                 self.divider.isHidden = isEditing
                 self.updateEmptyState(state: self.listModel?.emptyState)
-                
+
                 self.searchField.isEditable = !isEditing
             })
         }
@@ -150,12 +150,12 @@ final class PasswordManagementViewController: NSViewController {
 
         emptyStateTitle.attributedStringValue = NSAttributedString.make(emptyStateTitle.stringValue, lineHeight: 1.14, kern: -0.23)
         emptyStateMessage.attributedStringValue = NSAttributedString.make(emptyStateMessage.stringValue, lineHeight: 1.05, kern: -0.08)
-        
+
         NotificationCenter.default.addObserver(forName: .deviceBecameLocked, object: nil, queue: .main) { [weak self] _ in
             self?.displayLockScreen()
         }
     }
-    
+
     private func toggleLockScreen(hidden: Bool) {
         if hidden {
             hideLockScreen()
@@ -168,19 +168,19 @@ final class PasswordManagementViewController: NSViewController {
         lockScreen.isHidden = false
         searchField.isEnabled = false
         addVaultItemButton.isEnabled = false
-        
+
         view.window?.makeFirstResponder(nil)
     }
-    
+
     private func hideLockScreen() {
         lockScreen.isHidden = true
         searchField.isEnabled = true
         addVaultItemButton.isEnabled = true
     }
-    
+
     override func viewWillAppear() {
         super.viewWillAppear()
-        
+
         lockScreenDurationLabel.stringValue = UserText.pmLockScreenDuration(duration: LoginsPreferences().autoLockThreshold.title)
 
         if let listView = self.listView {
@@ -203,20 +203,20 @@ final class PasswordManagementViewController: NSViewController {
         } else {
             refetchWithText(isDirty ? "" : domain ?? "", clearWhenNoMatches: true)
         }
-        
+
         promptForAuthenticationIfNecessary()
     }
-    
+
     override func viewDidDisappear() {
         super.viewDidDisappear()
         listView?.removeFromSuperview()
     }
-    
+
     private func promptForAuthenticationIfNecessary() {
         let authenticator = DeviceAuthenticator.shared
-        
+
         toggleLockScreen(hidden: !authenticator.requiresAuthentication)
-        
+
         authenticator.authenticateUser(reason: .unlockLogins) { authenticationResult in
             self.toggleLockScreen(hidden: authenticationResult.authenticated)
         }
@@ -232,7 +232,7 @@ final class PasswordManagementViewController: NSViewController {
     @IBAction func onImportClicked(_ sender: NSButton) {
         DataImportViewController.show()
     }
-    
+
     @IBAction func deviceAuthenticationRequested(_ sender: NSButton) {
         promptForAuthenticationIfNecessary()
     }
@@ -249,7 +249,7 @@ final class PasswordManagementViewController: NSViewController {
 
             if clearWhenNoMatches && self?.listModel?.displayedItems.isEmpty == true {
                 self?.searchField.stringValue = ""
-                self?.updateFilter()                
+                self?.updateFilter()
             } else if self?.isDirty == false {
                 if let selectItemMatchingDomain = selectItemMatchingDomain {
                     self?.listModel?.selectLoginWithDomainOrFirst(domain: selectItemMatchingDomain)
@@ -270,7 +270,7 @@ final class PasswordManagementViewController: NSViewController {
         self.listModel?.clear()
         self.itemModel?.clearSecureVaultModel()
     }
-    
+
     func select(category: SecureVaultSorting.Category?) {
         guard let category = category else {
             return
@@ -592,11 +592,11 @@ final class PasswordManagementViewController: NSViewController {
             guard let newValue = newValue,
                   let id = newValue.secureVaultID,
                   let window = self?.view.window else {
-                      self?.itemModel = nil
-                      self?.clearSelectedItem()
+                self?.itemModel = nil
+                self?.clearSelectedItem()
 
-                      return
-                  }
+                return
+            }
 
             func loadNewItemWithID() {
                 switch newValue {
@@ -648,14 +648,14 @@ final class PasswordManagementViewController: NSViewController {
         self.listView = NSHostingView(rootView: PasswordManagementItemListView().environmentObject(listModel))
     }
     // swiftlint:enable function_body_length
-    
+
     private func createNewSecureVaultItemMenu() -> NSMenu {
         let menu = NSMenu()
 
         func createMenuItem(title: String, action: Selector, imageName: String) -> NSMenuItem {
             let item = NSMenuItem(title: title, action: action, target: self, keyEquivalent: "")
             item.image = NSImage(named: imageName)
-            
+
             return item
         }
 
@@ -676,7 +676,7 @@ final class PasswordManagementViewController: NSViewController {
     private func fetchSecureVaultItems(category: SecureVaultSorting.Category = .allItems, completion: @escaping ([SecureVaultItem]) -> Void) {
         DispatchQueue.global(qos: .userInitiated).async {
             var items: [SecureVaultItem]
-            
+
             switch category {
             case .allItems:
                 let accounts = (try? self.secureVault?.accounts()) ?? []
@@ -685,9 +685,9 @@ final class PasswordManagementViewController: NSViewController {
                 let identities = (try? self.secureVault?.identities()) ?? []
 
                 items = accounts.map(SecureVaultItem.account) +
-                        cards.map(SecureVaultItem.card) +
-                        notes.map(SecureVaultItem.note) +
-                        identities.map(SecureVaultItem.identity)
+                    cards.map(SecureVaultItem.card) +
+                    notes.map(SecureVaultItem.note) +
+                    identities.map(SecureVaultItem.identity)
             case .logins:
                 let accounts = (try? self.secureVault?.accounts()) ?? []
                 items = accounts.map(SecureVaultItem.account)
@@ -807,21 +807,21 @@ final class PasswordManagementViewController: NSViewController {
             createNew()
         }
     }
-    
+
     // MARK: - Empty State
-    
+
     private func updateEmptyState(state: PasswordManagementItemListModel.EmptyState?) {
         guard let listModel = listModel else {
             return
         }
-        
+
         if isEditing || state == nil || state == PasswordManagementItemListModel.EmptyState.none {
             hideEmptyState()
         } else {
             showEmptyState(category: listModel.sortDescriptor.category)
         }
     }
-    
+
     private func showEmptyState(category: SecureVaultSorting.Category) {
         switch category {
         case .allItems: showDefaultEmptyState()
@@ -830,7 +830,7 @@ final class PasswordManagementViewController: NSViewController {
         case .cards: showEmptyState(imageName: "CreditCardsEmpty", title: UserText.pmEmptyStateCardsTitle)
         }
     }
-    
+
     private func hideEmptyState() {
         emptyState.isHidden = true
     }
@@ -839,16 +839,16 @@ final class PasswordManagementViewController: NSViewController {
         emptyState.isHidden = false
         emptyStateMessage.isHidden = false
         emptyStateButton.isHidden = false
-        
+
         emptyStateImageView.image = NSImage(named: "LoginsEmpty")
 
         emptyStateTitle.attributedStringValue = NSAttributedString.make(UserText.pmEmptyStateDefaultTitle, lineHeight: 1.14, kern: -0.23)
         emptyStateMessage.attributedStringValue = NSAttributedString.make(UserText.pmEmptyStateDefaultDescription, lineHeight: 1.05, kern: -0.08)
     }
-    
+
     private func showEmptyState(imageName: String, title: String) {
         emptyState.isHidden = false
-        
+
         emptyStateImageView.image = NSImage(named: imageName)
         emptyStateTitle.attributedStringValue = NSAttributedString.make(title, lineHeight: 1.14, kern: -0.23)
         emptyStateMessage.isHidden = true
@@ -866,18 +866,18 @@ extension PasswordManagementViewController: NSTextFieldDelegate {
 }
 
 extension PasswordManagementViewController: NSTextViewDelegate {
-    
+
     func textView(_ textView: NSTextView, clickedOnLink link: Any, at charIndex: Int) -> Bool {
         if let link = link as? URL, link == URL.preferences {
             WindowControllersManager.shared.showPreferencesTab()
             self.dismiss()
-            
+
             Pixel.fire(.passwordManagerLockScreenPreferencesButtonPressed)
         }
 
         return true
     }
-    
+
     func textView(_ textView: NSTextView,
                   willChangeSelectionFromCharacterRange oldSelectedCharRange: NSRange,
                   toCharacterRange newSelectedCharRange: NSRange) -> NSRange {

@@ -27,6 +27,7 @@ final class FileDownloadManagerTests: XCTestCase {
     var defaults: UserDefaults!
     var workspace: TestWorkspace!
     var dm: FileDownloadManager!
+    var preferences: DownloadsPreferences!
     let fm = FileManager.default
     let testFile = "downloaded file"
 
@@ -36,10 +37,10 @@ final class FileDownloadManagerTests: XCTestCase {
     override func setUp() {
         defaults = UserDefaults(suiteName: testGroupName)!
         defaults.removePersistentDomain(forName: testGroupName)
-        var prefs = DownloadPreferences(userDefaults: defaults)
-        prefs.alwaysRequestDownloadLocation = false
+        preferences = DownloadsPreferences(persistor: DownloadsPreferencesPersistorMock())
+        preferences.alwaysRequestDownloadLocation = false
         self.workspace = TestWorkspace()
-        self.dm = FileDownloadManager(workspace: workspace, preferences: DownloadPreferences(userDefaults: defaults))
+        self.dm = FileDownloadManager(workspace: workspace, preferences: preferences)
         let tempDir = fm.temporaryDirectory
         for file in (try? fm.contentsOfDirectory(atPath: tempDir.path)) ?? [] where file.hasPrefix(testFile) {
             try? fm.removeItem(at: tempDir.appendingPathComponent(file))
@@ -102,9 +103,8 @@ final class FileDownloadManagerTests: XCTestCase {
     }
 
     func testWhenRequiredByDownloadRequestThenDownloadLocationChooserIsCalled() {
-        var prefs = DownloadPreferences(userDefaults: defaults)
         let downloadsURL = fm.temporaryDirectory
-        prefs.selectedDownloadLocation = downloadsURL
+        preferences.selectedDownloadLocation = downloadsURL
 
         let e1 = expectation(description: "chooseDestinationCallback called")
         self.chooseDestination = { suggestedFilename, directoryURL, fileTypes, callback in
@@ -134,10 +134,9 @@ final class FileDownloadManagerTests: XCTestCase {
     }
 
     func testWhenRequiredByPreferencesThenDownloadLocationChooserIsCalled() {
-        var prefs = DownloadPreferences(userDefaults: defaults)
-        prefs.alwaysRequestDownloadLocation = true
+        preferences.alwaysRequestDownloadLocation = true
         let downloadsURL = fm.temporaryDirectory
-        prefs.selectedDownloadLocation = downloadsURL
+        preferences.selectedDownloadLocation = downloadsURL
 
         let localURL = downloadsURL.appendingPathComponent(testFile)
         let e1 = expectation(description: "chooseDestinationCallback called")
@@ -191,9 +190,8 @@ final class FileDownloadManagerTests: XCTestCase {
     }
 
     func testWhenNotRequiredByPreferencesThenDefaultDownloadLocationIsChosen() {
-        var prefs = DownloadPreferences(userDefaults: defaults)
         let downloadsURL = fm.temporaryDirectory
-        prefs.selectedDownloadLocation = downloadsURL
+        preferences.selectedDownloadLocation = downloadsURL
 
         let download = WKDownloadMock()
         dm.add(download, delegate: self, location: .auto, postflight: .none)
@@ -211,9 +209,8 @@ final class FileDownloadManagerTests: XCTestCase {
     }
 
     func testWhenSuggestedFilenameIsEmptyThenItsUniquelyGenerated() {
-        var prefs = DownloadPreferences(userDefaults: defaults)
         let downloadsURL = fm.temporaryDirectory
-        prefs.selectedDownloadLocation = downloadsURL
+        preferences.selectedDownloadLocation = downloadsURL
 
         let download = WKDownloadMock()
         dm.add(download, delegate: self, location: .auto, postflight: .none)
@@ -233,8 +230,7 @@ final class FileDownloadManagerTests: XCTestCase {
     }
 
     func testWhenDefaultDownloadsLocationIsReadOnlyThenDownloadFails() {
-        var prefs = DownloadPreferences(userDefaults: defaults)
-        prefs.selectedDownloadLocation = nil
+        preferences.selectedDownloadLocation = nil
         FileManager.swizzleUrlsForIn { _, _ in
             [URL(fileURLWithPath: "/")]
         }

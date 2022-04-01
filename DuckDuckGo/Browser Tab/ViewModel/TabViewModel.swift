@@ -31,7 +31,7 @@ final class TabViewModel {
 
     private(set) var tab: Tab
     private var cancellables = Set<AnyCancellable>()
-    
+
     private var webViewStateObserver: WebViewStateObserver?
 
     @Published var canGoForward: Bool = false
@@ -142,7 +142,7 @@ final class TabViewModel {
         canBeBookmarked = tab.content.url ?? .blankPage != .blankPage
     }
 
-    private func updateAddressBarStrings() {
+    func updateAddressBarStrings() {
         guard !errorViewState.isVisible else {
             let failingUrl = tab.error?.failingUrl
             addressBarString = failingUrl?.absoluteString ?? ""
@@ -176,7 +176,12 @@ final class TabViewModel {
         }
 
         addressBarString = url.absoluteString
-        passiveAddressBarString = host.drop(prefix: URL.HostPrefix.www.separated())
+
+        if AppearancePreferences.shared.showFullURL {
+            passiveAddressBarString = url.toString(decodePunycode: false, dropScheme: false, needsWWW: true, dropTrailingSlash: true)
+        } else {
+            passiveAddressBarString = host.drop(prefix: URL.HostPrefix.www.separated())
+        }
     }
 
     private func updateTitle() {
@@ -272,11 +277,11 @@ extension TabViewModel {
 }
 
 extension TabViewModel: TabDataClearing {
-    
+
     func prepareForDataClearing(caller: TabDataCleaner) {
         webViewStateObserver?.stopObserving()
-        
+
         tab.prepareForDataClearing(caller: caller)
     }
-    
+
 }
