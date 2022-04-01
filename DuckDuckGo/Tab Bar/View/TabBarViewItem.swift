@@ -220,6 +220,7 @@ final class TabBarViewItem: NSCollectionViewItem {
 
     func clear() {
         clearSubscriptions()
+        usedPermissions = Permissions()
         faviconImageView.image = nil
         titleTextField.stringValue = ""
     }
@@ -241,9 +242,7 @@ final class TabBarViewItem: NSCollectionViewItem {
     }
 
     private func clearSubscriptions() {
-        cancellables.forEach { (cancellable) in
-            cancellable.cancel()
-        }
+        cancellables.removeAll()
     }
 
     private func updateSubviews() {

@@ -549,6 +549,14 @@ extension TabBarViewController: NSCollectionViewDataSource {
         }
         return view
     }
+    
+    func collectionView(
+        _ collectionView: NSCollectionView,
+        didEndDisplaying item: NSCollectionViewItem,
+        forRepresentedObjectAt indexPath: IndexPath) {
+
+            (item as? TabBarViewItem)?.clear()
+    }
 }
 
 extension TabBarViewController: NSCollectionViewDelegate {
