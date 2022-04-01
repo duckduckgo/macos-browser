@@ -151,8 +151,8 @@ final class PermissionModel {
             }
 
             defer {
-                switch decision {
-                case .deinitialized:
+                switch (permissions.first, decision) {
+                case (.externalScheme, .deinitialized):
                     break
                 default:
                     decisionHandler(granted)
