@@ -663,19 +663,6 @@ CQ
                                                 <action selector="resetSecureVaultData:" target="Ady-hI-5gd" id="5uS-MI-2BN"/>
                                             </connections>
                                         </menuItem>
-                                        <menuItem title="Generate Randomized Logins+ Data" id="kfK-C8-6Pr">
-                                            <modifierMask key="keyEquivalentModifierMask"/>
-                                            <menu key="submenu" title="Generate Randomized Logins+ Data" id="07A-79-wa2">
-                                                <items>
-                                                    <menuItem title="Generate Randomized Credential" id="L2V-vU-uoo">
-                                                        <modifierMask key="keyEquivalentModifierMask"/>
-                                                        <connections>
-                                                            <action selector="generateRandomizedCredential:" target="Ady-hI-5gd" id="xas-fV-uTP"/>
-                                                        </connections>
-                                                    </menuItem>
-                                                </items>
-                                            </menu>
-                                        </menuItem>
                                         <menuItem title="Reset Bookmarks" id="xqA-t4-jNd">
                                             <modifierMask key="keyEquivalentModifierMask"/>
                                             <connections>
