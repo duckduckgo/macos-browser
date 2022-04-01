@@ -28,7 +28,7 @@ protocol TabDelegate: FileDownloadManagerDelegate, ContentOverlayUserScriptDeleg
     func tabDidStartNavigation(_ tab: Tab)
     func tab(_ tab: Tab, requestedNewTabWith content: Tab.TabContent, selected: Bool)
     func tab(_ tab: Tab, willShowContextMenuAt position: NSPoint, image: URL?, link: URL?, selectedText: String?)
-	func tab(_ tab: Tab, requestedOpenExternalURL url: URL, forUserEnteredURL: Bool)
+    func tab(_ tab: Tab, requestedOpenExternalURL url: URL, forUserEnteredURL: Bool)
     func tab(_ tab: Tab, requestedSaveAutofillData autofillData: AutofillData)
     func tab(_ tab: Tab,
              requestedBasicAuthenticationChallengeWith protectionSpace: URLProtectionSpace,
@@ -110,7 +110,7 @@ final class Tab: NSObject {
          webViewConfiguration: WKWebViewConfiguration? = nil,
          historyCoordinating: HistoryCoordinating = HistoryCoordinator.shared,
          cbaTimeReporter: ContentBlockingAssetsCompilationTimeReporter? = ContentBlockingAssetsCompilationTimeReporter.shared,
-         visitedDomains: Set<String> = Set<String>(),
+         localHistory: Set<String> = Set<String>(),
          title: String? = nil,
          error: Error? = nil,
          favicon: NSImage? = nil,
@@ -123,7 +123,7 @@ final class Tab: NSObject {
         self.faviconManagement = faviconManagement
         self.historyCoordinating = historyCoordinating
         self.cbaTimeReporter = cbaTimeReporter
-        self.visitedDomains = visitedDomains
+        self.localHistory = localHistory
         self.title = title
         self.error = error
         self.favicon = favicon
@@ -145,9 +145,9 @@ final class Tab: NSObject {
     deinit {
         self.userContentController.removeAllUserScripts()
 
-#if DEBUG
+        #if DEBUG
         assert(self.isClosing || !content.isUrl, "tabWillClose() was not called for this Tab")
-#endif
+        #endif
     }
 
     private var userContentController: UserContentController {
@@ -157,24 +157,29 @@ final class Tab: NSObject {
     // MARK: - Event Publishers
 
     let webViewDidFinishNavigationPublisher = PassthroughSubject<Void, Never>()
+    
+    @MainActor
+    @Published var isAMPProtectionExtracting: Bool = false
 
     // MARK: - Properties
 
     let webView: WebView
-    
+
     private var lastUpgradedURL: URL?
 
     var userEnteredUrl = false
 
     var contentChangeEnabled = true
-    
+
     var fbBlockingEnabled = true
-    
+
     @Published private(set) var content: TabContent {
         didSet {
             handleFavicon(oldContent: oldValue)
             invalidateSessionStateData()
-            reloadIfNeeded()
+            Task {
+                await reloadIfNeeded()
+            }
 
             if let title = content.title {
                 self.title = title
@@ -232,7 +237,7 @@ final class Tab: NSObject {
 
         // This function is called when the user has manually typed in a new address, which should reset the login detection flow.
         userEnteredUrl = userEntered
-     }
+    }
 
     // Used to track if an error was caused by a download navigation.
     private var currentDownload: URL?
@@ -247,7 +252,7 @@ final class Tab: NSObject {
         webView.getMimeType { mimeType in
             if case .some(.html) = mimeType.flatMap(UTType.init(mimeType:)) {
                 self.delegate?.chooseDestination(suggestedFilename: self.webView.suggestedFilename,
-                                                 directoryURL: DownloadPreferences().selectedDownloadLocation,
+                                                 directoryURL: DownloadsPreferences().effectiveDownloadLocation,
                                                  fileTypes: [.html, .webArchive, .pdf]) { url, fileType in
                     guard let url = url else {
                         completionHandler?(.failure(URLError(.cancelled)))
@@ -349,34 +354,69 @@ final class Tab: NSObject {
     var cbrCompletionTokensPublisher: AnyPublisher<[ContentBlockerRulesManager.CompletionToken], Never> {
         userContentController.$contentBlockingAssets.compactMap { $0?.completionTokens }.eraseToAnyPublisher()
     }
-
-    private func reloadIfNeeded(shouldLoadInBackground: Bool = false) {
-        let url: URL
-        switch self.content {
-        case .url(let value):
-            url = value
-        case .homePage:
-            url = .homePage
-        default:
-            url = .blankPage
+    
+    private static let debugEvents = EventMapping<AMPProtectionDebugEvents> { event, _, _, _, _ in
+        switch event {
+        case .ampBlockingRulesCompilationFailed:
+            Pixel.fire(.ampBlockingRulesCompilationFailed)
         }
-        guard webView.superview != nil || shouldLoadInBackground,
-              webView.url != url
-                // Initial Home Page shouldn't show Back Button
-                && webView.url != self.content.url
-        else { return }
-
+    }
+    
+    lazy var linkProtection: LinkProtection = {
+        LinkProtection(privacyManager: ContentBlocking.shared.privacyConfigurationManager,
+                       contentBlockingManager: ContentBlocking.shared.contentBlockingManager,
+                       errorReporting: Self.debugEvents)
+    }()
+    
+    @MainActor
+    private func reloadIfNeeded(shouldLoadInBackground: Bool = false) async {
+        let url = await linkProtection.getCleanURL(from: contentURL, onStartExtracting: {
+            isAMPProtectionExtracting = true
+        }, onFinishExtracting: {
+            [weak self] in self?.isAMPProtectionExtracting = false }
+        )
+        if shouldLoadURL(url, shouldLoadInBackground: shouldLoadInBackground) {
+            let didRestore = restoreSessionStateDataIfNeeded()
+            if !didRestore {
+                webView.load(url)
+            }
+        }
+    }
+    
+    @MainActor
+    private var contentURL: URL {
+        switch content {
+        case .url(let value):
+            return value
+        case .homePage:
+            return .homePage
+        default:
+            return .blankPage
+        }
+    }
+    
+    @MainActor
+    private func shouldLoadURL(_ url: URL, shouldLoadInBackground: Bool = false) -> Bool {
+        return (webView.superview != nil || shouldLoadInBackground)
+        && webView.url != url
+        && webView.url != content.url // Initial Home Page shouldn't show Back Button
+    }
+    
+    @MainActor
+    private func restoreSessionStateDataIfNeeded() -> Bool {
+        var didRestore: Bool = false
         if let sessionStateData = self.sessionStateData {
             do {
                 try webView.restoreSessionState(from: sessionStateData)
-                return
+                didRestore = true
             } catch {
                 os_log("Tab:setupWebView could not restore session state %s", "\(error)")
             }
         }
-        webView.load(url)
+        return didRestore
     }
 
+    @MainActor
     private func addHomePageToWebViewIfNeeded() {
         guard !AppDelegate.isRunningTests else { return }
         if content == .homePage && webView.url == nil {
@@ -397,7 +437,7 @@ final class Tab: NSObject {
         if added {
             Pixel.fire(.fireproof(kind: .init(url: url), suggested: .manual))
         }
-     }
+    }
 
     private var superviewObserver: NSKeyValueObservation?
 
@@ -410,29 +450,33 @@ final class Tab: NSObject {
         superviewObserver = webView.observe(\.superview, options: .old) { [weak self] _, change in
             // if the webView is being added to superview - reload if needed
             if case .some(.none) = change.oldValue {
-                self?.reloadIfNeeded()
+                Task { [weak self] in
+                    await self?.reloadIfNeeded()
+                }
             }
         }
 
         // background tab loading should start immediately
-        reloadIfNeeded(shouldLoadInBackground: shouldLoadInBackground)
-        if !shouldLoadInBackground {
-            addHomePageToWebViewIfNeeded()
+        Task {
+            await reloadIfNeeded(shouldLoadInBackground: shouldLoadInBackground)
+            if !shouldLoadInBackground {
+                await addHomePageToWebViewIfNeeded()
+            }
         }
     }
 
-#if DEBUG
+    #if DEBUG
     private var isClosing = false
-#endif
+    #endif
 
     func tabWillClose() {
         webView.stopLoading()
         webView.stopMediaCapture()
         cbaTimeReporter?.tabWillClose(self)
 
-#if DEBUG
+        #if DEBUG
         self.isClosing = true
-#endif
+        #endif
     }
 
     // MARK: - Favicon
@@ -493,7 +537,7 @@ final class Tab: NSObject {
 
     private var historyCoordinating: HistoryCoordinating
     private var shouldStoreNextVisit = true
-    private(set) var visitedDomains: Set<String>
+    private(set) var localHistory: Set<String>
 
     func addVisit(of url: URL) {
         guard shouldStoreNextVisit else {
@@ -508,7 +552,7 @@ final class Tab: NSObject {
 
         // Add to local history
         if let host = url.host, !host.isEmpty {
-            visitedDomains.insert(host)
+            localHistory.insert(host.dropWWW())
         }
     }
 
@@ -545,9 +589,9 @@ final class Tab: NSObject {
         if upgradedUrl == nil { return }
         connectionUpgradedTo = upgradedUrl
     }
-    
+
     // MARK: - Printing
-    
+
     // To avoid webpages invoking the printHandler and overwhelming the browser, this property keeps track of the active
     // print operation and ignores incoming printHandler messages if one exists.
     fileprivate var activePrintOperation: NSPrintOperation?
@@ -590,11 +634,11 @@ extension Tab: PrintingUserScriptDelegate {
 
     func printingUserScriptDidRequestPrintController(_ script: PrintingUserScript) {
         guard activePrintOperation == nil else { return }
-        
+
         guard let window = webView.window,
               let printOperation = webView.printOperation()
-              else { return }
-        
+        else { return }
+
         self.activePrintOperation = printOperation
 
         if printOperation.view?.frame.isEmpty == true {
@@ -604,7 +648,7 @@ extension Tab: PrintingUserScriptDelegate {
         let selector = #selector(printOperationDidRun(printOperation: success: contextInfo:))
         printOperation.runModal(for: window, delegate: self, didRun: selector, contextInfo: nil)
     }
-    
+
     @objc func printOperationDidRun(printOperation: NSPrintOperation,
                                     success: Bool,
                                     contextInfo: UnsafeMutableRawPointer?) {
@@ -669,6 +713,8 @@ extension Tab: ContentBlockerRulesUserScriptDelegate {
 extension HistoryCoordinating {
 
     func addDetectedTracker(_ tracker: DetectedTracker, onURL url: URL, contentBlocking: ContentBlocking = ContentBlocking.shared) {
+        trackerFound(onURL: url)
+
         guard tracker.blocked,
               let domain = tracker.domain,
               let entityName = contentBlocking.entityName(forDomain: domain) else { return }
@@ -711,7 +757,7 @@ extension Tab: ClickToLoadUserScriptDelegate {
 
 extension Tab: SurrogatesUserScriptDelegate {
     func surrogatesUserScriptShouldProcessTrackers(_ script: SurrogatesUserScript) -> Bool {
-         return true
+        return true
     }
 
     func surrogatesUserScript(_ script: SurrogatesUserScript, detectedTracker tracker: DetectedTracker, withSurrogate host: String) {
@@ -733,7 +779,7 @@ extension Tab: SecureVaultManagerDelegate {
     func secureVaultManager(_: SecureVaultManager, didAutofill type: AutofillType, withObjectId objectId: Int64) {
         Pixel.fire(.formAutofilled(kind: type.formAutofillKind))
     }
-    
+
     func secureVaultManager(_: SecureVaultManager, didRequestAuthenticationWithCompletionHandler handler: @escaping (Bool) -> Void) {
         DeviceAuthenticator.shared.authenticateUser(reason: .autofill) { authenticationResult in
             handler(authenticationResult.authenticated)
@@ -762,7 +808,7 @@ extension Tab: WKNavigationDelegate {
         static let frameLoadInterrupted = 102
         static let internetConnectionOffline = -1009
     }
-    
+
     func webView(_ webView: WKWebView,
                  didReceive challenge: URLAuthenticationChallenge,
                  completionHandler: @escaping (URLSession.AuthChallengeDisposition, URLCredential?) -> Void) {
@@ -791,9 +837,31 @@ extension Tab: WKNavigationDelegate {
     @MainActor
     func webView(_ webView: WKWebView,
                  decidePolicyFor navigationAction: WKNavigationAction) async -> WKNavigationActionPolicy {
-
+        
+        let isRequestingNewTab = isRequestingNewTab(navigationAction: navigationAction)
+        // This check needs to happen before GPC checks. Otherwise the navigation type may be rewritten to `.other`
+        // which would skip link rewrites.
+        if navigationAction.navigationType == .linkActivated {
+            let navigationActionPolicy = await linkProtection
+                .requestTrackingLinkRewrite(initiatingURL: webView.url,
+                                            navigationAction: navigationAction,
+                                            onStartExtracting: { if !isRequestingNewTab { isAMPProtectionExtracting = true }},
+                                            onFinishExtracting: { [weak self] in self?.isAMPProtectionExtracting = false },
+                                            onLinkRewrite: { [weak self] url, _ in
+                    guard let self = self else { return }
+                    if isRequestingNewTab {
+                        self.delegate?.tab(self, requestedNewTabWith: .url(url), selected: NSApp.isShiftPressed)
+                    } else {
+                        webView.load(url)
+                    }
+                })
+            if let navigationActionPolicy = navigationActionPolicy, navigationActionPolicy == .cancel {
+                return navigationActionPolicy
+            }
+        }
+        
         webView.customUserAgent = UserAgent.for(navigationAction.request.url)
-                                                
+
         if navigationAction.isTargetingMainFrame, navigationAction.request.mainDocumentURL?.host != lastUpgradedURL?.host {
             lastUpgradedURL = nil
         }
@@ -809,7 +877,7 @@ extension Tab: WKNavigationDelegate {
                 return .cancel
 
             } else if navigationAction.navigationType != .backForward,
-               let request = GPCRequestFactory.shared.requestForGPC(basedOn: navigationAction.request) {
+                      let request = GPCRequestFactory.shared.requestForGPC(basedOn: navigationAction.request) {
                 self.invalidateBackItemIfNeeded(for: navigationAction)
                 defer {
                     webView.load(request)
@@ -828,8 +896,7 @@ extension Tab: WKNavigationDelegate {
         self.resetConnectionUpgradedTo(navigationAction: navigationAction)
 
         let isLinkActivated = navigationAction.navigationType == .linkActivated
-        let isMiddleClicked = navigationAction.buttonNumber == Constants.webkitMiddleClick
-        if isLinkActivated && NSApp.isCommandPressed || isMiddleClicked {
+        if isRequestingNewTab {
             defer {
                 delegate?.tab(self, requestedNewTabWith: navigationAction.request.url.map { .url($0) } ?? .none, selected: NSApp.isShiftPressed)
             }
@@ -877,15 +944,22 @@ extension Tab: WKNavigationDelegate {
                 }
             }
         }
-        
+
         toggleFBProtection(for: url)
         willPerformNavigationAction(navigationAction)
 
         return .allow
     }
+    
+    private func isRequestingNewTab(navigationAction: WKNavigationAction) -> Bool {
+        let isLinkActivated = navigationAction.navigationType == .linkActivated
+        let isMiddleClicked = navigationAction.buttonNumber == Constants.webkitMiddleClick
+        return isLinkActivated && NSApp.isCommandPressed || isMiddleClicked
+    }
+    
     // swiftlint:enable cyclomatic_complexity
     // swiftlint:enable function_body_length
-    
+
     private func urlDidUpgrade(_ upgradedURL: URL,
                                navigationAction: WKNavigationAction) {
         lastUpgradedURL = upgradedURL
@@ -893,7 +967,7 @@ extension Tab: WKNavigationDelegate {
         webView.load(upgradedURL)
         setConnectionUpgradedTo(upgradedURL, navigationAction: navigationAction)
     }
-    
+
     private func prepareForContentBlocking() async {
         // Ensure Content Blocking Assets (WKContentRuleList&UserScripts) are installed
         if !userContentController.contentBlockingAssetsInstalled {
@@ -904,7 +978,7 @@ extension Tab: WKNavigationDelegate {
             cbaTimeReporter?.reportNavigationDidNotWaitForRules()
         }
     }
-    
+
     private func toggleFBProtection(for url: URL) {
         // Enable/disable FBProtection only after UserScripts are installed (awaitContentBlockingAssetsInstalled)
         let privacyConfiguration = ContentBlocking.shared.privacyConfigurationManager.privacyConfig
@@ -958,17 +1032,20 @@ extension Tab: WKNavigationDelegate {
 
         invalidateSessionStateData()
         resetDashboardInfo()
+        linkProtection.cancelOngoingExtraction()
     }
 
+    @MainActor
     func webView(_ webView: WKWebView, didFinish navigation: WKNavigation!) {
         invalidateSessionStateData()
         webViewDidFinishNavigationPublisher.send()
+        if isAMPProtectionExtracting { isAMPProtectionExtracting = false }
     }
 
     func webView(_ webView: WKWebView, didFail navigation: WKNavigation!, withError error: Error) {
         // Failing not captured. Seems the method is called after calling the webview's method goBack()
         // https://app.asana.com/0/1199230911884351/1200381133504356/f
-//        hasError = true
+        //        hasError = true
 
         invalidateSessionStateData()
     }
@@ -1103,10 +1180,8 @@ extension Tab: TabDataClearing {
     func prepareForDataClearing(caller: TabDataCleaner) {
         webView.stopLoading()
         userContentController.removeAllUserScripts()
-        
+
         webView.navigationDelegate = caller
         webView.load(URL(string: "about:blank")!)
     }
 }
-// swiftlint:enable type_body_length
-// swiftlint:enable file_length

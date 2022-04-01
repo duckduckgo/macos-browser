@@ -21,7 +21,7 @@ import AppKit
 final class FireproofDomainsViewController: NSViewController {
 
     enum Constants {
-        static let storyboardName = "Preferences"
+        static let storyboardName = "FireproofDomains"
         static let identifier = "FireproofDomainsViewController"
         static let cellIdentifier = NSUserInterfaceItemIdentifier(rawValue: "FireproofDomainCell")
     }

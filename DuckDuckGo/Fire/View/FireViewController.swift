@@ -90,11 +90,14 @@ final class FireViewController: NSViewController {
     }
 
     private func subscribeToIsBurning() {
-        fireViewModel.fire.$isBurning
-            .sink(receiveValue: { [weak self] isBurning in
-                if isBurning {
-                    self?.animateFire()
-                }
+        fireViewModel.fire.$burningData
+            .sink(receiveValue: { [weak self] burningData in
+                guard let burningData = burningData,
+                    let self = self else {
+                        return
+                    }
+
+                self.animateFire(burningData: burningData)
             })
             .store(in: &cancellables)
     }
@@ -103,7 +106,16 @@ final class FireViewController: NSViewController {
         presentAsModalWindow(fireDialogViewController)
     }
 
-    func animateFire() {
+    func animateFire(burningData: Fire.BurningData) {
+        switch burningData {
+        case .all: break
+        case .specificDomains(let burningDomains):
+            let localHistory = tabCollectionViewModel.tabCollection.localHistory
+            if localHistory.isDisjoint(with: burningDomains) {
+                // Do not play animation in this window since tabs aren't influenced
+                return
+            }
+        }
         progressIndicatorWrapper.isHidden = true
 
         fireViewModel.isAnimationPlaying = true
@@ -111,7 +123,7 @@ final class FireViewController: NSViewController {
             guard let self = self else { return }
 
             self.fireViewModel.isAnimationPlaying = false
-            if self.fireViewModel.fire.isBurning {
+            if self.fireViewModel.fire.burningData != nil {
                 self.progressIndicatorWrapper.isHidden = false
                 self.progressIndicatorWrapperBG.applyDropShadow()
             }

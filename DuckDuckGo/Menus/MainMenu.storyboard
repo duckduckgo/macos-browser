@@ -26,9 +26,9 @@
                                             </connections>
                                         </menuItem>
                                         <menuItem isSeparatorItem="YES" id="VOq-y0-SEH"/>
-                                        <menuItem title="Preferences…" keyEquivalent="," id="BOF-NM-1cW">
+                                        <menuItem title="Preferences…" keyEquivalent="," id="yD7-Ol-cRF">
                                             <connections>
-                                                <action selector="openPreferences:" target="Ady-hI-5gd" id="hyM-Fd-dVF"/>
+                                                <action selector="openPreferences:" target="Ady-hI-5gd" id="iF9-8m-hce"/>
                                             </connections>
                                         </menuItem>
                                         <menuItem isSeparatorItem="YES" id="t1R-yn-9NQ"/>
@@ -736,7 +736,7 @@ CQ
                             <outlet property="newTabMenuItem" destination="9qI-62-tsd" id="6SI-rG-P34"/>
                             <outlet property="newWindowMenuItem" destination="Was-JA-tGl" id="uyQ-qR-DFk"/>
                             <outlet property="openLocationMenuItem" destination="xnU-dQ-JR1" id="DYS-Dt-ydU"/>
-                            <outlet property="preferencesMenuItem" destination="BOF-NM-1cW" id="wju-ps-laD"/>
+                            <outlet property="preferencesMenuItem" destination="yD7-Ol-cRF" id="f58-zA-Auu"/>
                             <outlet property="printMenuItem" destination="uFk-FD-FTB" id="mOP-Xp-myS"/>
                             <outlet property="printSeparatorItem" destination="anH-0y-7dE" id="E6b-rl-clQ"/>
                             <outlet property="reloadMenuItem" destination="aKZ-VG-MOp" id="J3D-X3-Xg3"/>

@@ -62,4 +62,9 @@ final class HistoryCoordinatingMock: HistoryCoordinating {
         return nil
     }
 
+    var trackerFoundCalled = false
+    func trackerFound(onURL: URL) {
+        trackerFoundCalled = true
+    }
+
 }

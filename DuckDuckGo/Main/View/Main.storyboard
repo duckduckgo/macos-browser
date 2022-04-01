@@ -79,10 +79,10 @@
                             <constraint firstAttribute="trailing" secondItem="lYg-bX-QrJ" secondAttribute="trailing" id="HkZ-fV-qYb"/>
                             <constraint firstItem="lYg-bX-QrJ" firstAttribute="top" secondItem="m2S-Jp-Qdl" secondAttribute="top" id="PNG-fr-pcs"/>
                             <constraint firstItem="Jbn-9T-FNt" firstAttribute="centerX" secondItem="wFH-xq-50o" secondAttribute="centerX" id="PQa-4m-EpD"/>
-                            <constraint firstItem="SYo-8W-jl3" firstAttribute="top" secondItem="wFH-xq-50o" secondAttribute="bottom" id="SOg-lH-g5P"/>
                             <constraint firstItem="wFH-xq-50o" firstAttribute="top" secondItem="m2S-Jp-Qdl" secondAttribute="top" constant="38" id="TRm-AX-VcL"/>
                             <constraint firstItem="wFH-xq-50o" firstAttribute="leading" secondItem="m2S-Jp-Qdl" secondAttribute="leading" id="XQv-BZ-2ci"/>
                             <constraint firstItem="af1-Eb-VaG" firstAttribute="top" secondItem="wFH-xq-50o" secondAttribute="bottom" id="ajK-M4-7Qf"/>
+                            <constraint firstItem="SYo-8W-jl3" firstAttribute="top" secondItem="m2S-Jp-Qdl" secondAttribute="top" constant="86" id="js0-Db-kRi"/>
                             <constraint firstItem="lYg-bX-QrJ" firstAttribute="leading" secondItem="m2S-Jp-Qdl" secondAttribute="leading" id="kVB-Sz-8Sv"/>
                             <constraint firstItem="af1-Eb-VaG" firstAttribute="leading" secondItem="m2S-Jp-Qdl" secondAttribute="leading" id="oLA-yb-nB8"/>
                             <constraint firstItem="UE1-Pg-JIe" firstAttribute="leading" secondItem="m2S-Jp-Qdl" secondAttribute="leading" id="qA7-89-XxQ"/>

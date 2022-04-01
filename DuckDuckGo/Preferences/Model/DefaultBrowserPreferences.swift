@@ -1,7 +1,7 @@
 //
 //  DefaultBrowserPreferences.swift
 //
-//  Copyright © 2021 DuckDuckGo. All rights reserved.
+//  Copyright © 2022 DuckDuckGo. All rights reserved.
 //
 //  Licensed under the Apache License, Version 2.0 (the "License");
 //  you may not use this file except in compliance with the License.
@@ -17,18 +17,27 @@
 //
 
 import Foundation
+import SwiftUI
+import Combine
 
-struct DefaultBrowserPreferences {
+protocol DefaultBrowserProvider {
+    var bundleIdentifier: String { get }
+    var isDefault: Bool { get }
+    func presentDefaultBrowserPrompt() throws
+    func openSystemPreferences()
+}
 
-    static var isDefault: Bool {
-        var bundleID = AppVersion.shared.identifier
-        #if DEBUG
-        bundleID = bundleID.drop(suffix: ".debug")
-        #endif
+struct SystemDefaultBrowserProvider: DefaultBrowserProvider {
 
+    enum SystemDefaultBrowserProviderError: Error {
+        case unableToSetDefaultURLHandler
+    }
+
+    let bundleIdentifier: String
+
+    var isDefault: Bool {
         guard let defaultBrowserURL = NSWorkspace.shared.urlForApplication(toOpen: URL(string: "http://")!),
-              // Another App Instance of the Browser may be already registered as the scheme handler
-              let ddgBrowserURL = NSWorkspace.shared.urlForApplication(withBundleIdentifier: bundleID)
+              let ddgBrowserURL = NSWorkspace.shared.urlForApplication(withBundleIdentifier: bundleIdentifier)
         else {
             return false
         }
@@ -36,43 +45,65 @@ struct DefaultBrowserPreferences {
         return ddgBrowserURL == defaultBrowserURL
     }
 
-    static func becomeDefault(_ completion: (() -> Void)? = nil) {
-        if completion != nil {
-            var observer: Any?
-            observer = NotificationCenter.default.addObserver(forName: NSApplication.didBecomeActiveNotification, object: nil, queue: .main) { _ in
-                NotificationCenter.default.removeObserver(observer as Any)
-                completion?()
-            }
-        }
+    init(bundleIdentifier: String = AppVersion.shared.identifier) {
+        var bundleID = bundleIdentifier
+        #if DEBUG
+        bundleID = bundleID.drop(suffix: ".debug")
+        #endif
+        self.bundleIdentifier = bundleIdentifier
+    }
 
-        if !presentDefaultBrowserPromptIfPossible() {
-            openSystemPreferences()
+    func presentDefaultBrowserPrompt() throws {
+        let result = LSSetDefaultHandlerForURLScheme("http" as CFString, bundleIdentifier as CFString)
+        if result != 0 {
+            throw SystemDefaultBrowserProviderError.unableToSetDefaultURLHandler
         }
     }
 
-    private static func presentDefaultBrowserPromptIfPossible() -> Bool {
-        let bundleID = AppVersion.shared.identifier
-
-        let result = LSSetDefaultHandlerForURLScheme("http" as CFString, bundleID as CFString)
-        return result == 0
-    }
-
-    private static func openSystemPreferences() {
-        // Apple provides a more general URL for opening System Preferences in the form of "x-apple.systempreferences:com.apple.preference" but it
-        // doesn't support opening the Appearance prefpane directly.
+    func openSystemPreferences() {
+        // Apple provides a more general URL for opening System Preferences
+        // in the form of "x-apple.systempreferences:com.apple.preference" but it doesn't support
+        // opening the Appearance prefpane directly.
         NSWorkspace.shared.open(URL(fileURLWithPath: "/System/Library/PreferencePanes/Appearance.prefPane"))
     }
-
 }
 
-extension DefaultBrowserPreferences: PreferenceSection {
+final class DefaultBrowserPreferences: ObservableObject {
 
-    var displayName: String {
-        return UserText.defaultBrowser
+    @Published private(set) var isDefault: Bool = false
+
+    init(defaultBrowserProvider: DefaultBrowserProvider = SystemDefaultBrowserProvider()) {
+        self.defaultBrowserProvider = defaultBrowserProvider
+
+        appDidBecomeActiveCancellable = NotificationCenter.default
+            .publisher(for: NSApplication.didBecomeActiveNotification)
+            .sink { [weak self] _ in
+                self?.checkIfDefault()
+            }
+
+        checkIfDefault()
     }
 
-    var preferenceIcon: NSImage {
-        return NSImage(named: "DefaultBrowser")!
+    func checkIfDefault() {
+        isDefault = defaultBrowserProvider.isDefault
     }
 
+    func becomeDefault(_ completion: ((Bool) -> Void)? = nil) {
+        if let receiveValue = completion {
+            // Skip initial value and wait for the next event (happening on appDidBecomeActive)
+            // Take only one value, which ensures that the subscription is automatically disposed of.
+            $isDefault.dropFirst().prefix(1).subscribe(
+                Subscribers.Sink(receiveCompletion: { _ in }, receiveValue: receiveValue)
+            )
+        }
+
+        do {
+            try defaultBrowserProvider.presentDefaultBrowserPrompt()
+        } catch {
+            defaultBrowserProvider.openSystemPreferences()
+        }
+    }
+
+    private var appDidBecomeActiveCancellable: AnyCancellable?
+    private let defaultBrowserProvider: DefaultBrowserProvider
 }

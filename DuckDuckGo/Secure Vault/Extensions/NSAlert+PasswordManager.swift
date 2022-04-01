@@ -51,7 +51,7 @@ extension NSAlert {
 
     static func passwordManagerConfirmDeleteCard() -> NSAlert {
         let alert = NSAlert()
-        alert.messageText = "Are you sure you want to delete this card?"
+        alert.messageText = "Are you sure you want to delete this Payment Method from Autofill?"
         alert.informativeText = "This action cannot be undone."
         alert.alertStyle = .warning
         alert.addButton(withTitle: "Delete")
@@ -61,7 +61,7 @@ extension NSAlert {
 
     static func passwordManagerConfirmDeleteIdentity() -> NSAlert {
         let alert = NSAlert()
-        alert.messageText = "Are you sure you want to delete this identity?"
+        alert.messageText = "Are you sure you want to delete this Info from Autofill?"
         alert.informativeText = "This action cannot be undone."
         alert.alertStyle = .warning
         alert.addButton(withTitle: "Delete")

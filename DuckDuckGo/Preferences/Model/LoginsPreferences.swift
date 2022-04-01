@@ -19,12 +19,27 @@
 import Foundation
 
 extension NSNotification.Name {
-
     static let loginsAutoLockSettingsDidChange = NSNotification.Name("loginsAutoLockSettingsDidChange")
-
 }
 
-final class LoginsPreferences {
+protocol LoginsPreferencesPersistor {
+    var askToSaveUsernamesAndPasswords: Bool { get set }
+    var askToSaveAddresses: Bool { get set }
+    var askToSavePaymentMethods: Bool { get set }
+}
+
+struct LoginsPreferencesUserDefaultsPersistor: LoginsPreferencesPersistor {
+    @UserDefaultsWrapper(key: .askToSaveUsernamesAndPasswords, defaultValue: true)
+    var askToSaveUsernamesAndPasswords: Bool
+
+    @UserDefaultsWrapper(key: .askToSaveAddresses, defaultValue: true)
+    var askToSaveAddresses: Bool
+
+    @UserDefaultsWrapper(key: .askToSavePaymentMethods, defaultValue: true)
+    var askToSavePaymentMethods: Bool
+}
+
+final class LoginsPreferences: ObservableObject {
 
     enum AutoLockThreshold: String, CaseIterable {
         case oneMinute
@@ -42,7 +57,7 @@ final class LoginsPreferences {
             case .oneHour: return UserText.autoLockThreshold1Hour
             }
         }
-        
+
         var seconds: TimeInterval {
             switch self {
             case .oneMinute: return 60
@@ -52,7 +67,7 @@ final class LoginsPreferences {
             case .oneHour: return 60 * 60
             }
         }
-        
+
         var pixelEvent: Pixel.Event {
             switch self {
             case .oneMinute: return .passwordManagerLockScreenTimeoutSelected1Minute
@@ -64,68 +79,62 @@ final class LoginsPreferences {
         }
 
     }
-    
-    public var shouldAutoLockLogins: Bool {
-        get {
-            return statisticsStore.autoLockEnabled
-        }
 
-        set {
-            let oldValue = statisticsStore.autoLockEnabled
-            statisticsStore.autoLockEnabled = newValue
-            
-            if oldValue != newValue {
+    @Published var shouldAutoLockLogins: Bool = true {
+        didSet {
+            statisticsStore.autoLockEnabled = shouldAutoLockLogins
+
+            if oldValue != shouldAutoLockLogins {
                 NotificationCenter.default.post(name: .loginsAutoLockSettingsDidChange, object: nil)
             }
         }
     }
-    
-    var autoLockThreshold: AutoLockThreshold {
-        get {
+
+    @Published var autoLockThreshold: AutoLockThreshold = .fifteenMinutes {
+        didSet {
+            statisticsStore.autoLockThreshold = autoLockThreshold.rawValue
+        }
+    }
+
+    @Published var askToSaveUsernamesAndPasswords: Bool {
+        didSet {
+            persistor.askToSaveUsernamesAndPasswords = askToSaveUsernamesAndPasswords
+        }
+    }
+
+    @Published var askToSaveAddresses: Bool {
+        didSet {
+            persistor.askToSaveAddresses = askToSaveAddresses
+        }
+    }
+
+    @Published var askToSavePaymentMethods: Bool {
+        didSet {
+            persistor.askToSavePaymentMethods = askToSavePaymentMethods
+        }
+    }
+
+    init(
+        statisticsStore: StatisticsStore = LocalStatisticsStore(),
+        persistor: LoginsPreferencesPersistor = LoginsPreferencesUserDefaultsPersistor()
+    ) {
+        self.statisticsStore = statisticsStore
+        self.persistor = persistor
+
+        askToSaveUsernamesAndPasswords = persistor.askToSaveUsernamesAndPasswords
+        askToSaveAddresses = persistor.askToSaveAddresses
+        askToSavePaymentMethods = persistor.askToSavePaymentMethods
+
+        shouldAutoLockLogins = statisticsStore.autoLockEnabled
+        autoLockThreshold = {
             if let rawValue = statisticsStore.autoLockThreshold, let threshold = AutoLockThreshold(rawValue: rawValue) {
                 return threshold
             } else {
                 return .fifteenMinutes
             }
-        }
-
-        set {
-            statisticsStore.autoLockThreshold = newValue.rawValue
-        }
-    }
-    
-    @UserDefaultsWrapper(key: .askToSaveUsernamesAndPasswords, defaultValue: true)
-    var askToSaveUsernamesAndPasswords: Bool
-    
-    @UserDefaultsWrapper(key: .askToSaveAddresses, defaultValue: true)
-    var askToSaveAddresses: Bool
-    
-    @UserDefaultsWrapper(key: .askToSavePaymentMethods, defaultValue: true)
-    var askToSavePaymentMethods: Bool
-    
-    private var statisticsStore: StatisticsStore {
-        return injectedDependencyStore ?? defaultDependencyStore
+        }()
     }
 
-    private let injectedDependencyStore: StatisticsStore?
-    private lazy var defaultDependencyStore: StatisticsStore = {
-        return LocalStatisticsStore()
-    }()
-
-    init(statisticsStore: StatisticsStore? = nil) {
-        self.injectedDependencyStore = statisticsStore
-    }
-
-}
-
-extension LoginsPreferences: PreferenceSection {
-    
-    var displayName: String {
-        return UserText.loginsPlus
-    }
-
-    var preferenceIcon: NSImage {
-        return NSImage(named: "Logins+")!
-    }
-
+    private var statisticsStore: StatisticsStore
+    private var persistor: LoginsPreferencesPersistor
 }
