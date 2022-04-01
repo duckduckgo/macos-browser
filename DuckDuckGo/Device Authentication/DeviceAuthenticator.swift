@@ -69,6 +69,11 @@ final class DeviceAuthenticator {
         }
     }
 
+    func lock() {
+        self.deviceIsLocked = true
+        self.cancelIdleCheckTimer()
+    }
+
     // MARK: - Private Dependencies
 
     private var idleStateProvider: DeviceIdleStateProvider
@@ -126,6 +131,10 @@ final class DeviceAuthenticator {
         }
 
         return deviceIsLocked
+    }
+
+    var shouldAutoLockLogins: Bool {
+        loginsPreferences.shouldAutoLockLogins
     }
 
     func authenticateUser(reason: AuthenticationReason, result: @escaping (DeviceAuthenticationResult) -> Void) {
@@ -214,8 +223,7 @@ final class DeviceAuthenticator {
 
     private func checkIdleTimeIntervalAndLockIfNecessary(interval: TimeInterval) {
         if interval >= loginsPreferences.autoLockThreshold.seconds {
-            self.deviceIsLocked = true
-            self.cancelIdleCheckTimer()
+            self.lock()
         }
     }
 

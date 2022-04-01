@@ -37,13 +37,13 @@ final class FirefoxDataImporter: DataImporter {
     // swiftlint:disable cyclomatic_complexity
     func importData(types: [DataImport.DataType],
                     from profile: DataImport.BrowserProfile?,
-                    completion: @escaping (Result<[DataImport.Summary], DataImportError>) -> Void) {
+                    completion: @escaping (Result<DataImport.Summary, DataImportError>) -> Void) {
         guard let firefoxProfileURL = profile?.profileURL ?? defaultFirefoxProfilePath() else {
             completion(.failure(.cannotReadFile))
             return
         }
 
-        var summaries = [DataImport.Summary]()
+        var summary = DataImport.Summary()
 
         if types.contains(.logins) {
             let loginReader = FirefoxLoginReader(firefoxProfileURL: firefoxProfileURL, primaryPassword: self.primaryPassword)
@@ -52,8 +52,7 @@ final class FirefoxDataImporter: DataImporter {
             switch loginResult {
             case .success(let logins):
                 do {
-                    let summary = try loginImporter.importLogins(logins)
-                    summaries.append(summary)
+                    summary.loginsResult = .completed(try loginImporter.importLogins(logins))
                 } catch {
                     completion(.failure(.cannotAccessSecureVault))
                 }
@@ -76,8 +75,7 @@ final class FirefoxDataImporter: DataImporter {
             switch bookmarkResult {
             case .success(let bookmarks):
                 do {
-                    let summary = try bookmarkImporter.importBookmarks(bookmarks, source: .firefox)
-                    summaries.append(summary)
+                    summary.bookmarksResult = try bookmarkImporter.importBookmarks(bookmarks, source: .firefox)
                 } catch {
                     completion(.failure(.cannotAccessSecureVault))
                     return
@@ -88,7 +86,7 @@ final class FirefoxDataImporter: DataImporter {
             }
         }
 
-        completion(.success(summaries))
+        completion(.success(summary))
     }
     // swiftlint:enable cyclomatic_complexity
 
