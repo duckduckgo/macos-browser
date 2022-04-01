@@ -110,7 +110,7 @@ extension AppDelegate {
             accessory.alignment = .center
             accessory.sizeToFit()
 
-            let accessoryContainer = accessory.wrappedInContainer(padding: 5)
+            let accessoryContainer = accessory.wrappedInContainer(padding: 10)
             accessoryContainer.frame.size = accessoryContainer.fittingSize
 
             savePanel.accessoryView = accessoryContainer
