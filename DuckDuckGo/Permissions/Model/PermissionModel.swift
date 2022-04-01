@@ -126,36 +126,14 @@ final class PermissionModel {
                                                  url: url,
                                                  permissions: permissions) { [weak self] decision, remember in
 
-            let query: PermissionAuthorizationQuery?
-            let granted: Bool
-            switch decision {
-            case .deinitialized:
-                query = nil
-                granted = false
-
-            case .denied(let completedQuery):
-                query = completedQuery
-                granted = false
-
-                for permission in permissions {
-                    self?.permissions[permission].denied()
-                }
-
-            case .granted(let completedQuery):
-                query = completedQuery
-                granted = true
-
-                for permission in permissions {
-                    self?.permissions[permission].granted()
-                }
-            }
+            let (query, isGranted) = self?.handleQueryDecision(decision, requestedPermissions: permissions) ?? (nil, false)
 
             defer {
                 switch (permissions.first, decision) {
                 case (.externalScheme, .deinitialized):
                     break
                 default:
-                    decisionHandler(granted)
+                    decisionHandler(isGranted)
                 }
             }
             guard let self = self,
@@ -168,7 +146,7 @@ final class PermissionModel {
 
             if remember == true {
                 for permission in permissions {
-                    self.permissionManager.setPermission(granted ? .allow : .deny, forDomain: domain, permissionType: permission)
+                    self.permissionManager.setPermission(isGranted ? .allow : .deny, forDomain: domain, permissionType: permission)
                 }
             }
         }
@@ -183,6 +161,36 @@ final class PermissionModel {
 
         permissions.forEach { self.permissions[$0].authorizationQueried(query) }
         authorizationQueries.append(query)
+    }
+
+    private func handleQueryDecision(_ decision: PermissionAuthorizationQuery.Decision, requestedPermissions: [PermissionType])
+    -> (completedQuery: PermissionAuthorizationQuery?, isGranted: Bool) {
+
+        let query: PermissionAuthorizationQuery?
+        let isGranted: Bool
+        switch decision {
+        case .deinitialized:
+            query = nil
+            isGranted = false
+
+        case .denied(let completedQuery):
+            query = completedQuery
+            isGranted = false
+
+            for permission in requestedPermissions {
+                permissions[permission].denied()
+            }
+
+        case .granted(let completedQuery):
+            query = completedQuery
+            isGranted = true
+
+            for permission in requestedPermissions {
+                permissions[permission].granted()
+            }
+        }
+
+        return (query, isGranted)
     }
 
     private func permissionManager(_: PermissionManagerProtocol,
