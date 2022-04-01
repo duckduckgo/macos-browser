@@ -32,12 +32,14 @@ final class DeviceAuthenticator {
         case autofill
         case changeLoginsSettings
         case unlockLogins
+        case exportLogins
 
         var localizedDescription: String {
             switch self {
             case .autofill: return UserText.pmAutoLockPromptAutofill
             case .changeLoginsSettings: return UserText.pmAutoLockPromptChangeLoginsSettings
             case .unlockLogins: return UserText.pmAutoLockPromptUnlockLogins
+            case .exportLogins: return UserText.pmAutoLockPromptExportLogins
             }
         }
     }

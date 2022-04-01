@@ -97,21 +97,37 @@ extension AppDelegate {
         guard let windowController = WindowControllersManager.shared.lastKeyMainWindowController,
               let window = windowController.window else { return }
 
-        let savePanel = NSSavePanel()
-        savePanel.nameFieldStringValue = "DuckDuckGo \(UserText.exportLoginsFileNameSuffix)"
-        savePanel.allowedFileTypes = ["csv"]
+        DeviceAuthenticator.shared.authenticateUser(reason: .exportLogins) { authenticationResult in
+            guard authenticationResult.authenticated else {
+                return
+            }
 
-        savePanel.beginSheetModal(for: window) { response in
-            guard response == .OK, let selectedURL = savePanel.url else { return }
+            let savePanel = NSSavePanel()
+            savePanel.nameFieldStringValue = "DuckDuckGo \(UserText.exportLoginsFileNameSuffix)"
+            
+            let accessory = NSTextField.label(titled: UserText.exportLoginsWarning)
+            accessory.textColor = .red
+            accessory.alignment = .center
+            accessory.sizeToFit()
 
-            let vault = try? SecureVaultFactory.default.makeVault(errorReporter: SecureVaultErrorReporter.shared)
-            let exporter = CSVLoginExporter(secureVault: vault!)
-            do {
-                try exporter.exportVaultLogins(to: selectedURL)
-                Pixel.fire(.exportedLogins())
-            } catch {
-                NSAlert.exportLoginsFailed()
-                    .beginSheetModal(for: window, completionHandler: nil)
+            let accessoryContainer = accessory.wrappedInContainer(padding: 10)
+            accessoryContainer.frame.size = accessoryContainer.fittingSize
+
+            savePanel.accessoryView = accessoryContainer
+            savePanel.allowedFileTypes = ["csv"]
+
+            savePanel.beginSheetModal(for: window) { response in
+                guard response == .OK, let selectedURL = savePanel.url else { return }
+
+                let vault = try? SecureVaultFactory.default.makeVault(errorReporter: SecureVaultErrorReporter.shared)
+                let exporter = CSVLoginExporter(secureVault: vault!)
+                do {
+                    try exporter.exportVaultLogins(to: selectedURL)
+                    Pixel.fire(.exportedLogins())
+                } catch {
+                    NSAlert.exportLoginsFailed()
+                        .beginSheetModal(for: window, completionHandler: nil)
+                }
             }
         }
     }
