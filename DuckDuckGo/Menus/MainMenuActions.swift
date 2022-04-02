@@ -97,21 +97,37 @@ extension AppDelegate {
         guard let windowController = WindowControllersManager.shared.lastKeyMainWindowController,
               let window = windowController.window else { return }
 
-        let savePanel = NSSavePanel()
-        savePanel.nameFieldStringValue = "DuckDuckGo \(UserText.exportLoginsFileNameSuffix)"
-        savePanel.allowedFileTypes = ["csv"]
+        DeviceAuthenticator.shared.authenticateUser(reason: .exportLogins) { authenticationResult in
+            guard authenticationResult.authenticated else {
+                return
+            }
 
-        savePanel.beginSheetModal(for: window) { response in
-            guard response == .OK, let selectedURL = savePanel.url else { return }
+            let savePanel = NSSavePanel()
+            savePanel.nameFieldStringValue = "DuckDuckGo \(UserText.exportLoginsFileNameSuffix)"
+            
+            let accessory = NSTextField.label(titled: UserText.exportLoginsWarning)
+            accessory.textColor = .red
+            accessory.alignment = .center
+            accessory.sizeToFit()
 
-            let vault = try? SecureVaultFactory.default.makeVault(errorReporter: SecureVaultErrorReporter.shared)
-            let exporter = CSVLoginExporter(secureVault: vault!)
-            do {
-                try exporter.exportVaultLogins(to: selectedURL)
-                Pixel.fire(.exportedLogins())
-            } catch {
-                NSAlert.exportLoginsFailed()
-                    .beginSheetModal(for: window, completionHandler: nil)
+            let accessoryContainer = accessory.wrappedInContainer(padding: 10)
+            accessoryContainer.frame.size = accessoryContainer.fittingSize
+
+            savePanel.accessoryView = accessoryContainer
+            savePanel.allowedFileTypes = ["csv"]
+
+            savePanel.beginSheetModal(for: window) { response in
+                guard response == .OK, let selectedURL = savePanel.url else { return }
+
+                let vault = try? SecureVaultFactory.default.makeVault(errorReporter: SecureVaultErrorReporter.shared)
+                let exporter = CSVLoginExporter(secureVault: vault!)
+                do {
+                    try exporter.exportVaultLogins(to: selectedURL)
+                    Pixel.fire(.exportedLogins())
+                } catch {
+                    NSAlert.exportLoginsFailed()
+                        .beginSheetModal(for: window, completionHandler: nil)
+                }
             }
         }
     }
@@ -379,10 +395,12 @@ extension MainViewController {
         let otherMainViewControllers = otherWindowControllers.compactMap { $0.mainViewController }
         let otherTabCollectionViewModels = otherMainViewControllers.map { $0.tabCollectionViewModel }
         let otherTabs = otherTabCollectionViewModels.flatMap { $0.tabCollection.tabs }
+        let otherLocalHistoryOfRemovedTabs = Set(otherTabCollectionViewModels.flatMap { $0.tabCollection.localHistoryOfRemovedTabs })
 
         WindowsManager.closeWindows(except: view.window)
 
         tabCollectionViewModel.append(tabs: otherTabs)
+        tabCollectionViewModel.tabCollection.localHistoryOfRemovedTabs.formUnion(otherLocalHistoryOfRemovedTabs)
     }
 
     // MARK: - Edit

@@ -53,7 +53,7 @@ final class FeedbackViewController: NSViewController {
 
     @IBOutlet weak var browserFeedbackView: NSView!
     @IBOutlet weak var browserFeedbackDescriptionLabel: NSTextField!
-    @IBOutlet weak var browserFeedbackTextField: NSTextField!
+    @IBOutlet weak var browserFeedbackTextView: NSTextView!
 
     @IBOutlet weak var websiteBreakageView: NSView!
     @IBOutlet weak var urlTextField: NSTextField!
@@ -79,8 +79,8 @@ final class FeedbackViewController: NSViewController {
 
     override func viewDidLoad() {
         super.viewDidLoad()
-        browserFeedbackTextField.delegate = self
-        urlTextField.delegate = self
+        setContentViewHeight(Constants.defaultContentHeight, animated: false)
+        setupTextViews()
     }
 
     override func viewDidAppear() {
@@ -150,6 +150,12 @@ final class FeedbackViewController: NSViewController {
         sheetParent.endSheet(window, returnCode: .cancel)
     }
 
+    private func setupTextViews() {
+        urlTextField.delegate = self
+        browserFeedbackTextView.delegate = self
+        browserFeedbackTextView.font = NSFont.systemFont(ofSize: 12)
+    }
+
     private var selectedFormOption: FormOption? {
         guard let item = optionPopUpButton.selectedItem, item.tag >= 0 else {
             return nil
@@ -185,7 +191,7 @@ final class FeedbackViewController: NSViewController {
             browserFeedbackView.isHidden = false
             contentHeight = Constants.feedbackContentHeight
             updateBrowserFeedbackDescriptionLabel(for: feedbackCategory)
-            browserFeedbackTextField.makeMeFirstResponder()
+            browserFeedbackTextView.makeMeFirstResponder()
         case .websiteBreakage:
             browserFeedbackView.isHidden = true
             contentHeight = Constants.websiteBreakageContentHeight
@@ -215,7 +221,7 @@ final class FeedbackViewController: NSViewController {
 
         switch selectedFormOption {
         case .feedback:
-            if !browserFeedbackTextField.stringValue.trimmingWhitespaces().isEmpty {
+            if !browserFeedbackTextView.string.trimmingWhitespaces().isEmpty {
                 submitButton.isEnabled = true
             } else {
                 submitButton.isEnabled = false
@@ -252,7 +258,7 @@ final class FeedbackViewController: NSViewController {
         case .websiteBreakage: assertionFailure("Wrong method executed")
         case .feedback(feedbackCategory: let feedbackCategory):
             let feedback = Feedback(category: feedbackCategory,
-                                    comment: browserFeedbackTextField.stringValue,
+                                    comment: browserFeedbackTextView.string,
                                     appVersion: "\(AppVersion.shared.versionNumber)",
                                     osVersion: "\(ProcessInfo.processInfo.operatingSystemVersion)")
             feedbackSender.sendFeedback(feedback)
@@ -270,13 +276,17 @@ final class FeedbackViewController: NSViewController {
         case .websiteBreakage:
             let blockedTrackerDomains = currentTab?.trackerInfo?.trackersBlocked.compactMap { $0.domain } ?? []
             let installedSurrogates = currentTab?.trackerInfo?.installedSurrogates.map {$0} ?? []
+            let ampURL = currentTab?.linkProtection.lastAMPURLString ?? ""
+            let urlParametersRemoved = currentTab?.linkProtection.urlParametersRemoved ?? false
             let websiteBreakage = WebsiteBreakage(category: selectedWebsiteBreakageCategory,
                                                   siteUrlString: urlTextField.stringValue,
                                                   osVersion: "\(ProcessInfo.processInfo.operatingSystemVersion)",
                                                   upgradedHttps: currentTab?.connectionUpgradedTo != nil,
                                                   tdsETag: ContentBlocking.shared.contentBlockingManager.currentRules.first?.etag,
                                                   blockedTrackerDomains: blockedTrackerDomains,
-                                                  installedSurrogates: installedSurrogates)
+                                                  installedSurrogates: installedSurrogates,
+                                                  ampURL: ampURL,
+                                                  urlParametersRemoved: urlParametersRemoved)
             websiteBreakageSender.sendWebsiteBreakage(websiteBreakage)
         }
     }
@@ -317,12 +327,12 @@ extension FeedbackViewController: NSTextFieldDelegate {
         updateSubmitButton()
     }
 
-    func control(_ control: NSControl, textView: NSTextView, doCommandBy commandSelector: Selector) -> Bool {
-        if commandSelector == #selector(NSStandardKeyBindingResponding.insertNewline(_:)) {
-            textView.insertNewlineIgnoringFieldEditor(self)
-            return true
-        }
-        return false
+}
+
+extension FeedbackViewController: NSTextViewDelegate {
+
+    func textDidChange(_ notification: Notification) {
+        updateSubmitButton()
     }
 
 }

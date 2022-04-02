@@ -68,8 +68,11 @@ class CSVImporterTests: XCTestCase {
         csvImporter.importData(types: [.logins], from: nil) { result in
             switch result {
             case .success(let summary):
-                let expectedSummary = DataImport.Summary.logins(successfulImports: ["username"], duplicateImports: [], failedImports: [])
-                XCTAssertEqual(summary, [expectedSummary])
+                let expectedSummary = DataImport.Summary(bookmarksResult: nil,
+                                                         loginsResult: .completed(.init(successfulImports: ["username"],
+                                                                                        duplicateImports: [],
+                                                                                        failedImports: [])))
+                XCTAssertEqual(summary, expectedSummary)
                 XCTAssertEqual(mockLoginImporter.importedLogins, expectedSummary)
             case .failure(let error):
                 XCTFail(error.localizedDescription)
@@ -90,8 +93,11 @@ class CSVImporterTests: XCTestCase {
         csvImporter.importData(types: [.logins], from: nil) { result in
             switch result {
             case .success(let summary):
-                let expectedSummary = DataImport.Summary.logins(successfulImports: ["username"], duplicateImports: [], failedImports: [])
-                XCTAssertEqual(summary, [expectedSummary])
+                let expectedSummary = DataImport.Summary(bookmarksResult: nil,
+                                                         loginsResult: .completed(.init(successfulImports: ["username"],
+                                                                                        duplicateImports: [],
+                                                                                        failedImports: [])))
+                XCTAssertEqual(summary, expectedSummary)
                 XCTAssertEqual(mockLoginImporter.importedLogins, expectedSummary)
             case .failure(let error):
                 XCTFail(error.localizedDescription)
@@ -104,7 +110,7 @@ class CSVImporterTests: XCTestCase {
 
     func testWhenInferringColumnPostions_AndColumnsAreValid_AndTitleIsIncluded_ThenPositionsAreCalculated() {
         let csvValues = ["url", "username", "password", "title"]
-        let inferred = CSVImporter.InferredCredentialColumnPositions(csvValues: csvValues)
+        let inferred = CSVImporter.ColumnPositions(csvValues: csvValues)
 
         XCTAssertEqual(inferred?.urlIndex, 0)
         XCTAssertEqual(inferred?.usernameIndex, 1)
@@ -114,7 +120,7 @@ class CSVImporterTests: XCTestCase {
 
     func testWhenInferringColumnPostions_AndColumnsAreValid_AndTitleIsNotIncluded_ThenPositionsAreCalculated() {
         let csvValues = ["url", "username", "password"]
-        let inferred = CSVImporter.InferredCredentialColumnPositions(csvValues: csvValues)
+        let inferred = CSVImporter.ColumnPositions(csvValues: csvValues)
 
         XCTAssertEqual(inferred?.urlIndex, 0)
         XCTAssertEqual(inferred?.usernameIndex, 1)
@@ -124,7 +130,7 @@ class CSVImporterTests: XCTestCase {
 
     func testWhenInferringColumnPostions_AndColumnsAreInvalidThenPositionsAreCalculated() {
         let csvValues = ["url", "username", "title"] // `password` is required, this test verifies that the inference fails when it's missing
-        let inferred = CSVImporter.InferredCredentialColumnPositions(csvValues: csvValues)
+        let inferred = CSVImporter.ColumnPositions(csvValues: csvValues)
 
         XCTAssertNil(inferred)
     }

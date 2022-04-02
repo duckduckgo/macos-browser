@@ -45,9 +45,9 @@ struct ImportedLoginCredential: Equatable {
         self.password = password
     }
 
-    init?(row: [String], inferredColumnPositions: CSVImporter.InferredCredentialColumnPositions? = nil) {
+    init?(row: [String], inferredColumnPositions: CSVImporter.ColumnPositions? = nil) {
         if let inferredPositions = inferredColumnPositions {
-            guard row.count - 1 == inferredPositions.maximumIndex else { return nil }
+            guard row.count > inferredPositions.maximumIndex else { return nil }
 
             var title: String?
 
@@ -77,6 +77,6 @@ struct ImportedLoginCredential: Equatable {
 
 protocol LoginImporter {
 
-    func importLogins(_ logins: [ImportedLoginCredential]) throws -> DataImport.Summary
+    func importLogins(_ logins: [ImportedLoginCredential]) throws -> DataImport.CompletedLoginsResult
 
 }

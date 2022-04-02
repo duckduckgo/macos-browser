@@ -107,6 +107,21 @@ final class TabCollectionViewModel: NSObject {
         return true
     }
 
+    @discardableResult func selectDisplayableTabIfPresent(_ content: Tab.TabContent) -> Bool {
+        guard changesEnabled else { return false }
+        guard Tab.TabContent.displayableTabTypes.contains(content),
+              let index = tabCollection.tabs.firstIndex(where: { $0.content == content })
+        else {
+            return false
+        }
+
+        if select(at: index) {
+            delegate?.tabCollectionViewModel(self, didSelectAt: index)
+            return true
+        }
+        return false
+    }
+
     func selectNext() {
         guard changesEnabled else { return }
         guard tabCollection.tabs.count > 0 else {
@@ -194,7 +209,7 @@ final class TabCollectionViewModel: NSObject {
         guard changesEnabled else { return }
         guard let parentTab = tab.parentTab,
               let parentTabIndex = tabCollection.tabs.firstIndex(where: { $0 === parentTab }) else {
-            os_log("TabCollection: No tab selected", type: .error)
+            os_log("TabCollection: No parent tab", type: .error)
             return
         }
 

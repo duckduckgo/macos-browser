@@ -21,6 +21,7 @@ import AppKit
 protocol CSVImportViewControllerDelegate: AnyObject {
 
     func csvImportViewController(_ viewController: CSVImportViewController, didSelectCSVFileWithURL: URL?)
+    func totalValidLogins(in fileURL: URL) -> Int?
 
 }
 
@@ -29,12 +30,18 @@ final class CSVImportViewController: NSViewController {
     enum Constants {
         static let storyboardName = "DataImport"
         static let identifier = "CSVImportViewController"
+        static let wideStackViewSpacing: CGFloat = 20
+        static let narrowStackViewSpacing: CGFloat = 12
     }
 
-    static func create() -> CSVImportViewController {
+    static func create(importSource: DataImport.Source) -> CSVImportViewController {
         let storyboard = NSStoryboard(name: Constants.storyboardName, bundle: nil)
-        return storyboard.instantiateController(identifier: Constants.identifier)
+        let controller: CSVImportViewController = storyboard.instantiateController(identifier: Constants.identifier)
+        controller.importSource = importSource
+        return controller
     }
+
+    @IBOutlet var stackView: NSStackView!
 
     @IBOutlet var descriptionLabel: NSTextField!
     @IBOutlet var selectFileButton: NSButton!
@@ -43,6 +50,15 @@ final class CSVImportViewController: NSViewController {
     @IBOutlet var selectedFileLabel: NSTextField!
     @IBOutlet var totalValidLoginsLabel: NSTextField!
 
+    @IBOutlet var safariInfoView: NSView!
+    @IBOutlet var lastPassInfoView: NSView!
+    @IBOutlet var onePasswordInfoView: NSView!
+
+    var importSource: DataImport.Source = .csv {
+        didSet {
+            renderCurrentState()
+        }
+    }
     weak var delegate: CSVImportViewControllerDelegate?
 
     // MARK: - View State
@@ -63,7 +79,41 @@ final class CSVImportViewController: NSViewController {
     }
 
     private func renderCurrentState() {
+        guard isViewLoaded else { return }
         render(state: currentImportState)
+    }
+
+    private func renderAwaitingFileSelectionState() {
+        switch importSource {
+        case .safari:
+            descriptionLabel.isHidden = true
+            safariInfoView.isHidden = false
+            lastPassInfoView.isHidden = true
+            onePasswordInfoView.isHidden = true
+            selectFileButton.title = UserText.importLoginsSelectSafariCSVFile
+        case .onePassword:
+            descriptionLabel.isHidden = true
+            safariInfoView.isHidden = true
+            lastPassInfoView.isHidden = true
+            onePasswordInfoView.isHidden = false
+            selectFileButton.title = UserText.importLoginsSelect1PasswordCSVFile
+        case .lastPass:
+            descriptionLabel.isHidden = true
+            safariInfoView.isHidden = true
+            lastPassInfoView.isHidden = false
+            onePasswordInfoView.isHidden = true
+            selectFileButton.title = UserText.importLoginsSelectLastPassCSVFile
+
+        case .brave, .chrome, .edge, .firefox:
+            assertionFailure("CSV Import not supported for \(importSource)")
+            fallthrough
+        case .csv:
+            descriptionLabel.isHidden = false
+            safariInfoView.isHidden = true
+            lastPassInfoView.isHidden = true
+            onePasswordInfoView.isHidden = true
+            selectFileButton.title = UserText.importLoginsSelectCSVFile
+        }
     }
 
     private func render(state: ImportState) {
@@ -72,9 +122,9 @@ final class CSVImportViewController: NSViewController {
         switch state {
         case .awaitingFileSelection:
             selectedFileContainer.isHidden = true
-            selectFileButton.title = UserText.importLoginsSelectCSVFile
+            renderAwaitingFileSelectionState()
         case .selectedValidFile(let fileURL):
-            let totalLoginsToImport = CSVImporter.totalValidLogins(in: fileURL)
+            let totalLoginsToImport = self.delegate?.totalValidLogins(in: fileURL) ?? 0
             selectedFileContainer.isHidden = false
             selectedFileLabel.stringValue = fileURL.path
             selectFileButton.title = UserText.importLoginsSelectAnotherFile

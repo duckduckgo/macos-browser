@@ -47,6 +47,7 @@ final class BrowserImportViewController: NSViewController {
 
     @IBOutlet var bookmarksCheckbox: NSButton!
     @IBOutlet var passwordsCheckbox: NSButton!
+    @IBOutlet var passwordsWarningLabel: NSTextField!
 
     @IBOutlet var closeBrowserWarningLabel: NSTextField!
     @IBOutlet var closeBrowserWarningViewHeightConstraint: NSLayoutConstraint!
@@ -116,8 +117,6 @@ final class BrowserImportViewController: NSViewController {
             profileSelectionPopUpButton.removeAllItems()
         }
 
-        passwordsCheckbox.isHidden = browser ==  .safari
-
         // Toggle the browser warning bar:
         self.closeBrowserWarningLabel.stringValue = UserText.closeBrowserWarningFor(browser: browser.importSourceName)
         hideOpenBrowserWarningIfNecessary()
@@ -125,8 +124,10 @@ final class BrowserImportViewController: NSViewController {
         switch browser {
         case .safari:
             bookmarksCheckbox.title = UserText.bookmarkImportBookmarksAndFavorites
+            passwordsWarningLabel.isHidden = false
         default:
             bookmarksCheckbox.title = UserText.bookmarkImportBookmarks
+            passwordsWarningLabel.isHidden = true
         }
     }
 

@@ -192,28 +192,51 @@
                                     <constraint firstItem="acV-lE-jVh" firstAttribute="centerX" secondItem="3Jn-h4-fXL" secondAttribute="centerX" id="jdZ-Ii-nMi"/>
                                 </constraints>
                             </customView>
-                            <button translatesAutoresizingMaskIntoConstraints="NO" id="ACx-m8-z0K" customClass="MouseOverButton" customModule="DuckDuckGo_Privacy_Browser" customModuleProvider="target">
+                            <customView translatesAutoresizingMaskIntoConstraints="NO" id="sbc-pJ-bul" userLabel="Open Wrapper View">
                                 <rect key="frame" x="0.0" y="60" width="320" height="42"/>
+                                <subviews>
+                                    <imageView horizontalHuggingPriority="251" verticalHuggingPriority="251" translatesAutoresizingMaskIntoConstraints="NO" id="8qK-6q-RQT">
+                                        <rect key="frame" x="288" y="13" width="32" height="16"/>
+                                        <constraints>
+                                            <constraint firstAttribute="height" constant="16" id="CF5-0A-jcP"/>
+                                            <constraint firstAttribute="width" constant="32" id="br4-Fc-8RE"/>
+                                        </constraints>
+                                        <imageCell key="cell" refusesFirstResponder="YES" alignment="left" imageScaling="proportionallyDown" image="ExpandDownPadding" id="GO4-t8-rcv"/>
+                                        <color key="contentTintColor" name="GreyTextColor"/>
+                                    </imageView>
+                                    <button translatesAutoresizingMaskIntoConstraints="NO" id="ACx-m8-z0K" customClass="MouseOverButton" customModule="DuckDuckGo_Privacy_Browser" customModuleProvider="target">
+                                        <rect key="frame" x="0.0" y="0.0" width="320" height="42"/>
+                                        <constraints>
+                                            <constraint firstAttribute="height" constant="42" id="lCs-Fg-DUS"/>
+                                        </constraints>
+                                        <buttonCell key="cell" type="square" title="        Details" bezelStyle="shadowlessSquare" imagePosition="trailing" alignment="center" inset="2" id="mkO-Cm-jWy">
+                                            <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
+                                            <font key="font" metaFont="smallSystem"/>
+                                        </buttonCell>
+                                        <color key="contentTintColor" name="GreyTextColor"/>
+                                        <userDefinedRuntimeAttributes>
+                                            <userDefinedRuntimeAttribute type="color" keyPath="mouseOverColor">
+                                                <color key="value" name="ButtonMouseOverColorLight"/>
+                                            </userDefinedRuntimeAttribute>
+                                            <userDefinedRuntimeAttribute type="color" keyPath="mouseDownColor">
+                                                <color key="value" name="ButtonMouseDownColorLight"/>
+                                            </userDefinedRuntimeAttribute>
+                                        </userDefinedRuntimeAttributes>
+                                        <connections>
+                                            <action selector="openDetailsButtonAction:" target="DMI-mh-xLJ" id="AXs-B1-jCk"/>
+                                        </connections>
+                                    </button>
+                                </subviews>
                                 <constraints>
-                                    <constraint firstAttribute="height" constant="42" id="lCs-Fg-DUS"/>
+                                    <constraint firstAttribute="bottom" secondItem="ACx-m8-z0K" secondAttribute="bottom" id="0uf-Ws-JW8"/>
+                                    <constraint firstAttribute="height" constant="42" id="Byp-9b-ZNK"/>
+                                    <constraint firstAttribute="trailing" secondItem="8qK-6q-RQT" secondAttribute="trailing" id="OtM-Fv-MAA"/>
+                                    <constraint firstItem="ACx-m8-z0K" firstAttribute="leading" secondItem="sbc-pJ-bul" secondAttribute="leading" id="U5c-uk-KXG"/>
+                                    <constraint firstAttribute="trailing" secondItem="ACx-m8-z0K" secondAttribute="trailing" id="ZX1-Pc-cMt"/>
+                                    <constraint firstItem="8qK-6q-RQT" firstAttribute="centerY" secondItem="sbc-pJ-bul" secondAttribute="centerY" id="fyP-YS-Gf9"/>
+                                    <constraint firstItem="ACx-m8-z0K" firstAttribute="top" secondItem="sbc-pJ-bul" secondAttribute="top" id="yEJ-wl-GeC"/>
                                 </constraints>
-                                <buttonCell key="cell" type="square" title="Details" bezelStyle="shadowlessSquare" image="ExpandDownPadding" imagePosition="trailing" alignment="center" inset="2" id="mkO-Cm-jWy">
-                                    <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
-                                    <font key="font" metaFont="smallSystem"/>
-                                </buttonCell>
-                                <color key="contentTintColor" name="GreyTextColor"/>
-                                <userDefinedRuntimeAttributes>
-                                    <userDefinedRuntimeAttribute type="color" keyPath="mouseOverColor">
-                                        <color key="value" name="ButtonMouseOverColorLight"/>
-                                    </userDefinedRuntimeAttribute>
-                                    <userDefinedRuntimeAttribute type="color" keyPath="mouseDownColor">
-                                        <color key="value" name="ButtonMouseDownColorLight"/>
-                                    </userDefinedRuntimeAttribute>
-                                </userDefinedRuntimeAttributes>
-                                <connections>
-                                    <action selector="openDetailsButtonAction:" target="DMI-mh-xLJ" id="AXs-B1-jCk"/>
-                                </connections>
-                            </button>
+                            </customView>
                             <customView hidden="YES" translatesAutoresizingMaskIntoConstraints="NO" id="6vZ-d2-qnR" userLabel="Details Wrapper View">
                                 <rect key="frame" x="0.0" y="-161" width="320" height="263"/>
                                 <subviews>
@@ -328,14 +351,11 @@
                                     <button fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="Bir-wk-iOW">
                                         <rect key="frame" x="20" y="0.0" width="280" height="32"/>
                                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
-                                        <buttonCell key="cell" type="square" title="   All tabs open to these sites will close" bezelStyle="shadowlessSquare" image="WarningTriangle" imagePosition="leading" alignment="left" inset="2" id="6NW-yL-FoB">
+                                        <buttonCell key="cell" type="square" title="   All tabs open to selected sites will close" bezelStyle="shadowlessSquare" image="WarningTriangle" imagePosition="leading" alignment="left" inset="2" id="6NW-yL-FoB">
                                             <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
                                             <font key="font" metaFont="smallSystem"/>
                                         </buttonCell>
                                         <color key="contentTintColor" name="GreyTextColor"/>
-                                        <connections>
-                                            <action selector="closeDetailsButtonAction:" target="DMI-mh-xLJ" id="mLs-dU-owR"/>
-                                        </connections>
                                     </button>
                                 </subviews>
                                 <constraints>
@@ -406,22 +426,22 @@ Gw
                             </customView>
                         </subviews>
                         <constraints>
-                            <constraint firstAttribute="trailing" secondItem="ACx-m8-z0K" secondAttribute="trailing" id="3dH-oe-VKH"/>
+                            <constraint firstItem="sbc-pJ-bul" firstAttribute="top" secondItem="3Jn-h4-fXL" secondAttribute="bottom" id="67G-na-i7a"/>
                             <constraint firstItem="6vZ-d2-qnR" firstAttribute="leading" secondItem="dGd-Gc-P2e" secondAttribute="leading" id="Anc-Gh-sNK"/>
-                            <constraint firstItem="ACx-m8-z0K" firstAttribute="leading" secondItem="dGd-Gc-P2e" secondAttribute="leading" id="FH3-vT-iON"/>
                             <constraint firstAttribute="trailing" secondItem="6vZ-d2-qnR" secondAttribute="trailing" id="Kyw-38-ua5"/>
                             <constraint firstItem="nId-He-RIU" firstAttribute="leading" secondItem="dGd-Gc-P2e" secondAttribute="leading" id="R5q-Fw-y3V"/>
                             <constraint firstItem="6vZ-d2-qnR" firstAttribute="top" secondItem="3Jn-h4-fXL" secondAttribute="bottom" id="SiT-y0-otC"/>
                             <constraint firstAttribute="trailing" secondItem="nId-He-RIU" secondAttribute="trailing" id="UP0-3m-4QV"/>
+                            <constraint firstAttribute="trailing" secondItem="sbc-pJ-bul" secondAttribute="trailing" id="VG0-5p-cwB"/>
                             <constraint firstItem="3Jn-h4-fXL" firstAttribute="leading" secondItem="dGd-Gc-P2e" secondAttribute="leading" id="ZK2-xe-fKM"/>
                             <constraint firstItem="r7f-Ig-GcB" firstAttribute="leading" secondItem="dGd-Gc-P2e" secondAttribute="leading" id="ZOG-ov-blY"/>
                             <constraint firstItem="3Jn-h4-fXL" firstAttribute="top" secondItem="dGd-Gc-P2e" secondAttribute="top" id="bUr-Qo-pGT"/>
-                            <constraint firstItem="ACx-m8-z0K" firstAttribute="top" secondItem="3Jn-h4-fXL" secondAttribute="bottom" id="ds2-Vf-W5U"/>
                             <constraint firstItem="nId-He-RIU" firstAttribute="top" secondItem="r7f-Ig-GcB" secondAttribute="bottom" id="f1V-n7-jhp"/>
                             <constraint firstItem="nId-He-RIU" firstAttribute="top" secondItem="3Jn-h4-fXL" secondAttribute="bottom" constant="42" id="hbg-4i-hjT"/>
                             <constraint firstAttribute="trailing" secondItem="r7f-Ig-GcB" secondAttribute="trailing" id="kNz-fP-3Iv"/>
                             <constraint firstAttribute="trailing" secondItem="3Jn-h4-fXL" secondAttribute="trailing" id="nnI-mg-tvm"/>
                             <constraint firstAttribute="bottom" secondItem="nId-He-RIU" secondAttribute="bottom" id="oF4-VF-B5Y"/>
+                            <constraint firstItem="sbc-pJ-bul" firstAttribute="leading" secondItem="dGd-Gc-P2e" secondAttribute="leading" id="pKH-pe-Sua"/>
                         </constraints>
                         <userDefinedRuntimeAttributes>
                             <userDefinedRuntimeAttribute type="color" keyPath="backgroundColor">
@@ -439,6 +459,7 @@ Gw
                         <outlet property="detailsWrapperView" destination="6vZ-d2-qnR" id="TKb-Ux-TIk"/>
                         <outlet property="detailsWrapperViewHeightContraint" destination="sJt-dl-rlH" id="7pa-Kc-9xB"/>
                         <outlet property="openDetailsButton" destination="ACx-m8-z0K" id="cu4-zz-MhA"/>
+                        <outlet property="openWrapperView" destination="sbc-pJ-bul" id="dUO-6T-MLY"/>
                         <outlet property="optionsButton" destination="ckJ-6G-38h" id="xSK-KE-yMk"/>
                         <outlet property="warningWrapperView" destination="r7f-Ig-GcB" id="cSU-Xr-Bin"/>
                     </connections>
@@ -594,7 +615,7 @@ DQ
             <color red="0.20000000000000001" green="0.20000000000000001" blue="0.20000000000000001" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
         </namedColor>
         <namedColor name="HomePageBackgroundColor">
-            <color red="0.97647058823529409" green="0.98039215686274506" blue="0.98039215686274506" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+            <color red="0.97600001096725464" green="0.98000001907348633" blue="0.98000001907348633" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
         </namedColor>
         <namedColor name="InterfaceBackgroundColor">
             <color red="1" green="1" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>

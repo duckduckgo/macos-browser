@@ -25,11 +25,11 @@ final class BrowserImportSummaryViewController: NSViewController {
         static let identifier = "BrowserImportSummaryViewController"
     }
 
-    static func create(importSummaries: [DataImport.Summary]) -> BrowserImportSummaryViewController {
+    static func create(importSummary: DataImport.Summary) -> BrowserImportSummaryViewController {
         let storyboard = NSStoryboard(name: Constants.storyboardName, bundle: nil)
 
         return storyboard.instantiateController(identifier: Constants.identifier) { (coder) -> BrowserImportSummaryViewController? in
-            return BrowserImportSummaryViewController(coder: coder, summaries: importSummaries)
+            return BrowserImportSummaryViewController(coder: coder, summary: importSummary)
         }
     }
 
@@ -47,10 +47,10 @@ final class BrowserImportSummaryViewController: NSViewController {
     @IBOutlet var passwordSummaryRow: NSView!
     @IBOutlet var passwordSummaryLabel: NSTextField!
 
-    private let summaries: [DataImport.Summary]
+    private let summary: DataImport.Summary
 
-    init?(coder: NSCoder, summaries: [DataImport.Summary]) {
-        self.summaries = summaries
+    init?(coder: NSCoder, summary: DataImport.Summary) {
+        self.summary = summary
         super.init(coder: coder)
     }
 
@@ -68,29 +68,28 @@ final class BrowserImportSummaryViewController: NSViewController {
             arrangedSubview.isHidden = true
         }
 
-        for summary in summaries {
-            switch summary {
-            case .bookmarks(let result):
-                bookmarkSummaryRow.isHidden = false
-                bookmarkSummaryLabel.stringValue = UserText.successfulBookmarkImports(result.successful)
+        if let result = summary.bookmarksResult {
+            bookmarkSummaryRow.isHidden = false
+            bookmarkSummaryLabel.stringValue = UserText.successfulBookmarkImports(result.successful)
 
-                if result.duplicates > 0 {
-                    bookmarkDuplicatesRow.isHidden = false
-                    bookmarkDuplicatesLabel.stringValue = UserText.duplicateBookmarkImports(result.duplicates)
-                } else {
-                    bookmarkDuplicatesRow.isHidden = true
-                }
-
-                if result.failed > 0 {
-                    bookmarkFailureRow.isHidden = false
-                    bookmarkFailureLabel.stringValue = UserText.failedBookmarkImports(result.failed)
-                } else {
-                    bookmarkFailureRow.isHidden = true
-                }
-            case .logins(let successfulImports, _, _):
-                passwordSummaryRow.isHidden = false
-                passwordSummaryLabel.stringValue = UserText.loginImportSuccessfulBrowserImports(totalSuccessfulImports: successfulImports.count)
+            if result.duplicates > 0 {
+                bookmarkDuplicatesRow.isHidden = false
+                bookmarkDuplicatesLabel.stringValue = UserText.duplicateBookmarkImports(result.duplicates)
+            } else {
+                bookmarkDuplicatesRow.isHidden = true
             }
+
+            if result.failed > 0 {
+                bookmarkFailureRow.isHidden = false
+                bookmarkFailureLabel.stringValue = UserText.failedBookmarkImports(result.failed)
+            } else {
+                bookmarkFailureRow.isHidden = true
+            }
+        }
+        if case .completed(let result) = summary.loginsResult {
+            passwordSummaryRow.isHidden = false
+            passwordSummaryLabel.stringValue = UserText
+                .loginImportSuccessfulBrowserImports(totalSuccessfulImports: result.successfulImports.count)
         }
     }
 
