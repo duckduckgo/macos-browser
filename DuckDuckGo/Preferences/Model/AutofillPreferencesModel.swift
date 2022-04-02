@@ -50,6 +50,10 @@ final class AutofillPreferencesModel: ObservableObject {
         }
     }
 
+    func openImportBrowserDataWindow() {
+        NSApp.sendAction(#selector(AppDelegate.openImportBrowserDataWindow(_:)), to: nil, from: nil)
+    }
+
     init(persistor: AutofillPreferencesPersistor = AutofillPreferences()) {
         self.persistor = persistor
 

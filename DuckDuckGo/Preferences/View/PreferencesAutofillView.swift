@@ -103,7 +103,7 @@ extension Preferences {
 
                 Section(spacing: 0) {
                     Button(UserText.importBrowserData) {
-                        NSApp.sendAction(#selector(AppDelegate.openImportBrowserDataWindow(_:)), to: nil, from: nil)
+                        model.openImportBrowserDataWindow()
                     }
                 }
             }
