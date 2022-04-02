@@ -40,7 +40,7 @@ extension Preferences {
                 ScrollView(.vertical) {
                     HStack(spacing: 0) {
                         VStack(alignment: .leading) {
-                            
+
                             switch model.selectedPane {
                             case .defaultBrowser:
                                 DefaultBrowserView(model: DefaultBrowserPreferences())
@@ -49,7 +49,7 @@ extension Preferences {
                             case .privacy:
                                 PrivacyView(model: PrivacyPreferencesModel())
                             case .autofill:
-                                LoginsView(model: LoginsPreferencesModel())
+                                AutofillView(model: AutofillPreferencesModel())
                             case .downloads:
                                 DownloadsView(model: DownloadsPreferences())
                             case .about:

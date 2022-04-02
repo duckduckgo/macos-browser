@@ -1,5 +1,5 @@
 //
-//  LoginsPreferencesTests.swift
+//  AutofillPreferencesTests.swift
 //
 //  Copyright © 2022 DuckDuckGo. All rights reserved.
 //
@@ -19,22 +19,22 @@
 import XCTest
 @testable import DuckDuckGo_Privacy_Browser
 
-class LoginsPreferencesTests: XCTestCase {
+class AutofillPreferencesTests: XCTestCase {
 
     func testThatAutoLockThresholdDefaultsTo15Minutes() throws {
         let statisticsStore = MockStatisticsStore()
         statisticsStore.autoLockThreshold = nil
-    
-        let preferences = LoginsPreferences(statisticsStore: statisticsStore)
-    
+
+        let preferences = AutofillPreferences(statisticsStore: statisticsStore)
+
         XCTAssertEqual(preferences.autoLockThreshold, .fifteenMinutes)
     }
 
     func testWhenShouldAutoLockLoginsIsChangedThenNotificationIsSent() throws {
-        let preferences = LoginsPreferences(statisticsStore: MockStatisticsStore())
+        let preferences = AutofillPreferences(statisticsStore: MockStatisticsStore())
 
-        _ = expectation(forNotification: .loginsAutoLockSettingsDidChange, object: nil)
-        preferences.shouldAutoLockLogins.toggle()
+        _ = expectation(forNotification: .autofillAutoLockSettingsDidChange, object: nil)
+        preferences.isAutoLockEnabled.toggle()
 
         waitForExpectations(timeout: 0.1, handler: nil)
     }

@@ -1,5 +1,5 @@
 //
-//  LoginsPreferencesModel.swift
+//  AutofillPreferencesModel.swift
 //
 //  Copyright © 2022 DuckDuckGo. All rights reserved.
 //
@@ -18,15 +18,15 @@
 
 import Foundation
 
-final class LoginsPreferencesModel: ObservableObject {
+final class AutofillPreferencesModel: ObservableObject {
 
-    @Published var shouldAutoLockLogins: Bool {
+    @Published var isAutoLockEnabled: Bool {
         didSet {
-            persistor.shouldAutoLockLogins = shouldAutoLockLogins
+            persistor.isAutoLockEnabled = isAutoLockEnabled
         }
     }
 
-    @Published var autoLockThreshold: LoginsAutoLockThreshold {
+    @Published var autoLockThreshold: AutofillAutoLockThreshold {
         didSet {
             persistor.autoLockThreshold = autoLockThreshold
         }
@@ -50,15 +50,15 @@ final class LoginsPreferencesModel: ObservableObject {
         }
     }
 
-    init(persistor: LoginsPreferencesPersistor = LoginsPreferences()) {
+    init(persistor: AutofillPreferencesPersistor = AutofillPreferences()) {
         self.persistor = persistor
 
-        shouldAutoLockLogins = persistor.shouldAutoLockLogins
+        isAutoLockEnabled = persistor.isAutoLockEnabled
         autoLockThreshold = persistor.autoLockThreshold
         askToSaveUsernamesAndPasswords = persistor.askToSaveUsernamesAndPasswords
         askToSaveAddresses = persistor.askToSaveAddresses
         askToSavePaymentMethods = persistor.askToSavePaymentMethods
     }
 
-    private var persistor: LoginsPreferencesPersistor
+    private var persistor: AutofillPreferencesPersistor
 }

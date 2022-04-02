@@ -1,5 +1,5 @@
 //
-//  LoginsPreferencesModelTests.swift
+//  AutofillPreferencesModelTests.swift
 //
 //  Copyright © 2022 DuckDuckGo. All rights reserved.
 //
@@ -20,25 +20,25 @@ import XCTest
 import Combine
 @testable import DuckDuckGo_Privacy_Browser
 
-final class LoginsPreferencesPersistorMock: LoginsPreferencesPersistor {
-    var shouldAutoLockLogins: Bool = true
-    var autoLockThreshold: LoginsAutoLockThreshold = .fifteenMinutes
+final class AutofillPreferencesPersistorMock: AutofillPreferencesPersistor {
+    var isAutoLockEnabled: Bool = true
+    var autoLockThreshold: AutofillAutoLockThreshold = .fifteenMinutes
     var askToSaveUsernamesAndPasswords: Bool = true
     var askToSaveAddresses: Bool = true
     var askToSavePaymentMethods: Bool = true
 }
 
-final class LoginsPreferencesModelTests: XCTestCase {
+final class AutofillPreferencesModelTests: XCTestCase {
 
     func testThatPreferencesArePersisted() throws {
-        let persistor = LoginsPreferencesPersistorMock()
-        let model = LoginsPreferencesModel(persistor: persistor)
+        let persistor = AutofillPreferencesPersistorMock()
+        let model = AutofillPreferencesModel(persistor: persistor)
 
-        model.shouldAutoLockLogins.toggle()
-        XCTAssertEqual(persistor.shouldAutoLockLogins, model.shouldAutoLockLogins)
+        model.isAutoLockEnabled.toggle()
+        XCTAssertEqual(persistor.isAutoLockEnabled, model.isAutoLockEnabled)
 
         model.autoLockThreshold = .fiveMinutes
-        XCTAssertEqual(persistor.autoLockThreshold, LoginsAutoLockThreshold.fiveMinutes)
+        XCTAssertEqual(persistor.autoLockThreshold, AutofillAutoLockThreshold.fiveMinutes)
 
         model.askToSaveUsernamesAndPasswords.toggle()
         XCTAssertEqual(persistor.askToSaveUsernamesAndPasswords, model.askToSaveUsernamesAndPasswords)

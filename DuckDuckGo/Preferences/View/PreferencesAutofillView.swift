@@ -1,5 +1,5 @@
 //
-//  PreferencesLoginsView.swift
+//  PreferencesAutofillView.swift
 //
 //  Copyright © 2022 DuckDuckGo. All rights reserved.
 //
@@ -39,8 +39,8 @@ fileprivate extension Preferences.Const {
 
 extension Preferences {
 
-    struct LoginsView: View {
-        @ObservedObject var model: LoginsPreferencesModel
+    struct AutofillView: View {
+        @ObservedObject var model: AutofillPreferencesModel
 
         var body: some View {
             VStack(alignment: .leading, spacing: 0) {
@@ -73,20 +73,20 @@ extension Preferences {
                         .font(Const.Fonts.preferencePaneSectionHeader)
                         .padding(.bottom, 12)
 
-                    Picker(selection: $model.shouldAutoLockLogins, content: {
+                    Picker(selection: $model.isAutoLockEnabled, content: {
                         HStack {
                             Text(UserText.autofillLockWhenIdle)
                             NSPopUpButtonView(selection: $model.autoLockThreshold) {
                                 let button = NSPopUpButton()
                                 button.setContentHuggingPriority(.defaultHigh, for: .horizontal)
 
-                                for threshold in LoginsAutoLockThreshold.allCases {
+                                for threshold in AutofillAutoLockThreshold.allCases {
                                     let item = button.menu?.addItem(withTitle: threshold.title, action: nil, keyEquivalent: "")
                                     item?.representedObject = threshold
                                 }
                                 return button
                             }
-                            .disabled(!model.shouldAutoLockLogins)
+                            .disabled(!model.isAutoLockEnabled)
                         }.tag(true)
                         Text(UserText.autofillNeverLock).tag(false)
                     }, label: {})
