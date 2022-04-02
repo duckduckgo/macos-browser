@@ -49,7 +49,7 @@ extension Preferences {
                             case .privacy:
                                 PrivacyView(model: PrivacyPreferencesModel())
                             case .autofill:
-                                LoginsView(model: LoginsPreferences())
+                                LoginsView(model: LoginsPreferencesModel())
                             case .downloads:
                                 DownloadsView(model: DownloadsPreferences())
                             case .about:

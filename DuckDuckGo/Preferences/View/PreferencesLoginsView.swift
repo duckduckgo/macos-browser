@@ -40,7 +40,7 @@ fileprivate extension Preferences.Const {
 extension Preferences {
 
     struct LoginsView: View {
-        @ObservedObject var model: LoginsPreferences
+        @ObservedObject var model: LoginsPreferencesModel
 
         var body: some View {
             VStack(alignment: .leading, spacing: 0) {
@@ -80,7 +80,7 @@ extension Preferences {
                                 let button = NSPopUpButton()
                                 button.setContentHuggingPriority(.defaultHigh, for: .horizontal)
 
-                                for threshold in LoginsPreferences.AutoLockThreshold.allCases {
+                                for threshold in LoginsAutoLockThreshold.allCases {
                                     let item = button.menu?.addItem(withTitle: threshold.title, action: nil, keyEquivalent: "")
                                     item?.representedObject = threshold
                                 }

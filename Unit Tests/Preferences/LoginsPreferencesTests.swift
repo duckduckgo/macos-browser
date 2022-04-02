@@ -17,53 +17,25 @@
 //
 
 import XCTest
-import Combine
 @testable import DuckDuckGo_Privacy_Browser
 
-final class LoginsPreferencesPersistorMock: LoginsPreferencesPersistor {
-    var askToSaveUsernamesAndPasswords: Bool = true
-    var askToSaveAddresses: Bool = true
-    var askToSavePaymentMethods: Bool = true
-}
-
-final class LoginsPreferencesTests: XCTestCase {
-
-    func testWhenShouldAutoLockLoginsIsChangedThenNotificationIsSent() throws {
-        let model = LoginsPreferences(statisticsStore: MockStatisticsStore(), persistor: LoginsPreferencesPersistorMock())
-
-        _ = expectation(forNotification: .loginsAutoLockSettingsDidChange, object: nil)
-        model.shouldAutoLockLogins.toggle()
-
-        waitForExpectations(timeout: 0.1, handler: nil)
-    }
+class LoginsPreferencesTests: XCTestCase {
 
     func testThatAutoLockThresholdDefaultsTo15Minutes() throws {
         let statisticsStore = MockStatisticsStore()
         statisticsStore.autoLockThreshold = nil
-
-        let model = LoginsPreferences(statisticsStore: statisticsStore, persistor: LoginsPreferencesPersistorMock())
-
-        XCTAssertEqual(model.autoLockThreshold, .fifteenMinutes)
+    
+        let preferences = LoginsPreferences(statisticsStore: statisticsStore)
+    
+        XCTAssertEqual(preferences.autoLockThreshold, .fifteenMinutes)
     }
 
-    func testThatPreferencesArePersisted() throws {
-        let statisticsStore = MockStatisticsStore()
-        let persistor = LoginsPreferencesPersistorMock()
-        let model = LoginsPreferences(statisticsStore: statisticsStore, persistor: persistor)
+    func testWhenShouldAutoLockLoginsIsChangedThenNotificationIsSent() throws {
+        let preferences = LoginsPreferences(statisticsStore: MockStatisticsStore())
 
-        model.autoLockThreshold = .fiveMinutes
-        XCTAssertEqual(statisticsStore.autoLockThreshold, LoginsPreferences.AutoLockThreshold.fiveMinutes.rawValue)
+        _ = expectation(forNotification: .loginsAutoLockSettingsDidChange, object: nil)
+        preferences.shouldAutoLockLogins.toggle()
 
-        model.shouldAutoLockLogins.toggle()
-        XCTAssertEqual(statisticsStore.autoLockEnabled, model.shouldAutoLockLogins)
-
-        model.askToSaveUsernamesAndPasswords.toggle()
-        XCTAssertEqual(persistor.askToSaveUsernamesAndPasswords, model.askToSaveUsernamesAndPasswords)
-
-        model.askToSaveAddresses.toggle()
-        XCTAssertEqual(persistor.askToSaveAddresses, model.askToSaveAddresses)
-
-        model.askToSavePaymentMethods.toggle()
-        XCTAssertEqual(persistor.askToSavePaymentMethods, model.askToSavePaymentMethods)
+        waitForExpectations(timeout: 0.1, handler: nil)
     }
 }
