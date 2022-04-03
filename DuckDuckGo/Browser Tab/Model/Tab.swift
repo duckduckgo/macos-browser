@@ -370,14 +370,18 @@ final class Tab: NSObject {
 
     @MainActor
     private func reloadIfNeeded(shouldLoadInBackground: Bool = false) async {
-        let url = await linkProtection.getCleanURL(from: contentURL, onStartExtracting: {
-            isAMPProtectionExtracting = true
-        }, onFinishExtracting: { [weak self]
-            in self?.isAMPProtectionExtracting = false
-
-        })
+        let url: URL = await {
+            if contentURL.isFileURL {
+                return contentURL
+            }
+            return await linkProtection.getCleanURL(from: contentURL, onStartExtracting: {
+                isAMPProtectionExtracting = true
+            }, onFinishExtracting: { [weak self]
+                in self?.isAMPProtectionExtracting = false
+            })
+        }()
         if shouldLoadURL(url, shouldLoadInBackground: shouldLoadInBackground) {
-            let didRestore = restoreSessionStateDataIfNeeded()
+            let didRestore = !url.isFileURL && restoreSessionStateDataIfNeeded()
             if !didRestore {
                 webView.load(url)
             }
@@ -839,23 +843,29 @@ extension Tab: WKNavigationDelegate {
     func webView(_ webView: WKWebView,
                  decidePolicyFor navigationAction: WKNavigationAction) async -> WKNavigationActionPolicy {
 
+        if navigationAction.request.url?.isFileURL ?? false {
+            return .allow
+        }
+
         let isRequestingNewTab = isRequestingNewTab(navigationAction: navigationAction)
         // This check needs to happen before GPC checks. Otherwise the navigation type may be rewritten to `.other`
         // which would skip link rewrites.
         if navigationAction.navigationType == .linkActivated {
             let navigationActionPolicy = await linkProtection
-                .requestTrackingLinkRewrite(initiatingURL: webView.url,
-                                            navigationAction: navigationAction,
-                                            onStartExtracting: { if !isRequestingNewTab { isAMPProtectionExtracting = true }},
-                                            onFinishExtracting: { [weak self] in self?.isAMPProtectionExtracting = false },
-                                            onLinkRewrite: { [weak self] url, _ in
-                                                guard let self = self else { return }
-                                                if isRequestingNewTab {
-                                                    self.delegate?.tab(self, requestedNewTabWith: .url(url), selected: NSApp.isShiftPressed)
-                                                } else {
-                                                    webView.load(url)
-                                                }
-                                            })
+                .requestTrackingLinkRewrite(
+                    initiatingURL: webView.url,
+                    navigationAction: navigationAction,
+                    onStartExtracting: { if !isRequestingNewTab { isAMPProtectionExtracting = true }},
+                    onFinishExtracting: { [weak self] in self?.isAMPProtectionExtracting = false },
+                    onLinkRewrite: { [weak self] url, _ in
+                        guard let self = self else { return }
+                        if isRequestingNewTab {
+                            self.delegate?.tab(self, requestedNewTabWith: .url(url), selected: NSApp.isShiftPressed)
+                        } else {
+                            webView.load(url)
+                        }
+                    }
+                )
             if let navigationActionPolicy = navigationActionPolicy, navigationActionPolicy == .cancel {
                 return navigationActionPolicy
             }
