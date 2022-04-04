@@ -41,7 +41,7 @@ struct WebsiteBreakage {
     let ampURL: String
     let urlParametersRemoved: Bool
     let manufacturer: String
-    
+
     init(
         category: Category?,
         siteUrlString: String,
@@ -55,12 +55,8 @@ struct WebsiteBreakage {
         urlParametersRemoved: Bool,
         manufacturer: String = "Apple"
     ) {
-        var siteUrlComponents = URLComponents(string: siteUrlString)
-        siteUrlComponents?.query = nil
-        siteUrlComponents?.fragment = nil
-
         self.category = category
-        self.siteUrlString = siteUrlComponents?.url?.absoluteString ?? siteUrlString
+        self.siteUrlString = siteUrlString
         self.osVersion = osVersion
         self.upgradedHttps = upgradedHttps
         self.tdsETag = tdsETag
@@ -72,4 +68,19 @@ struct WebsiteBreakage {
         self.manufacturer = manufacturer
     }
 
+    var requestParameters: [String: String] {
+        [
+            "category": category?.rawValue ?? "",
+            "siteUrl": siteUrlString,
+            "upgradedHttps": upgradedHttps ? "true" : "false",
+            "tds": tdsETag?.trimmingCharacters(in: CharacterSet(charactersIn: "\"")) ?? "",
+            "blockedTrackers": blockedTrackerDomains.joined(separator: ","),
+            "surrogates": installedSurrogates.joined(separator: ","),
+            "gpc": isGPCEnabled ? "true" : "false",
+            "ampUrl": ampURL,
+            "urlParametersRemoved": urlParametersRemoved ? "true" : "false",
+            "os": osVersion,
+            "manufacturer": manufacturer
+        ]
+    }
 }

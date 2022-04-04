@@ -39,17 +39,16 @@ class WebsiteBreakageReportTests: XCTestCase {
             ampURL: "https://example.test",
             urlParametersRemoved: false
         )
-        
-        let parameters = WebsiteBreakageSender().parameters(from: breakage)
-        let urlRequest = makeURLRequest(with: parameters)
-        
+
+        let urlRequest = makeURLRequest(with: breakage.requestParameters)
+
         let url = try XCTUnwrap(urlRequest.url)
         let components = try XCTUnwrap(URLComponents(url: url, resolvingAgainstBaseURL: true))
         let queryItems = try XCTUnwrap(components.percentEncodedQueryItems)
 
         XCTAssertEqual(url.host, "improving.duckduckgo.com")
         XCTAssertEqual(url.path, "/t/epbf")
-        
+
         XCTAssertEqual(queryItems[valueFor: "category"], "content")
         XCTAssertEqual(queryItems[valueFor: "siteUrl"], "https%3A%2F%2Fexample.test%2F")
         XCTAssertEqual(queryItems[valueFor: "upgradedHttps"], "true")
@@ -58,42 +57,10 @@ class WebsiteBreakageReportTests: XCTestCase {
         XCTAssertEqual(queryItems[valueFor: "surrogates"], "surrogate.domain.test")
     }
 
-    func testThatSiteURLGetsTrimmedAndPathQueryAndFragmentAreDropped() throws {
-        let breakage = WebsiteBreakage(
-            category: .theSiteAskedToDisable,
-            siteUrlString: "https://sub.example.test/path/to/thing.html?query=value#item123",
-            osVersion: "12.3.0",
-            upgradedHttps: false,
-            tdsETag: "abc123",
-            blockedTrackerDomains: [],
-            installedSurrogates: [],
-            isGPCEnabled: false,
-            ampURL: "https://example.test",
-            urlParametersRemoved: false
-        )
-        
-        let parameters = WebsiteBreakageSender().parameters(from: breakage)
-        let urlRequest = makeURLRequest(with: parameters)
-
-        let url = try XCTUnwrap(urlRequest.url)
-        let components = try XCTUnwrap(URLComponents(url: url, resolvingAgainstBaseURL: true))
-        let queryItems = try XCTUnwrap(components.percentEncodedQueryItems)
-
-        XCTAssertEqual(url.host, "improving.duckduckgo.com")
-        XCTAssertEqual(url.path, "/t/epbf")
-        
-        XCTAssertEqual(queryItems[valueFor: "category"], "paywall")
-        XCTAssertEqual(queryItems[valueFor: "siteUrl"], "https%3A%2F%2Fsub.example.test%2Fpath%2Fto%2Fthing.html")
-        XCTAssertEqual(queryItems[valueFor: "upgradedHttps"], "false")
-        XCTAssertEqual(queryItems[valueFor: "tds"], "abc123")
-        XCTAssertEqual(queryItems[valueFor: "blockedTrackers"], "")
-        XCTAssertEqual(queryItems[valueFor: "surrogates"], "")
-    }
-
     func testThatNativeAppSpecificFieldsAreReported() throws {
         let breakage = WebsiteBreakage(
             category: .videoOrImagesDidntLoad,
-            siteUrlString: "http://unsafe.example.test/path/to/thing.html?query=value#item123",
+            siteUrlString: "http://unsafe.example.test/path/to/thing.html",
             osVersion: "12",
             upgradedHttps: false,
             tdsETag: "abc123",
@@ -109,9 +76,8 @@ class WebsiteBreakageReportTests: XCTestCase {
             urlParametersRemoved: false,
             manufacturer: "IBM"
         )
-        
-        let parameters = WebsiteBreakageSender().parameters(from: breakage)
-        let urlRequest = makeURLRequest(with: parameters)
+
+        let urlRequest = makeURLRequest(with: breakage.requestParameters)
 
         let url = try XCTUnwrap(urlRequest.url)
         let components = try XCTUnwrap(URLComponents(url: url, resolvingAgainstBaseURL: true))
@@ -119,7 +85,7 @@ class WebsiteBreakageReportTests: XCTestCase {
 
         XCTAssertEqual(url.host, "improving.duckduckgo.com")
         XCTAssertEqual(url.path, "/t/epbf")
-        
+
         XCTAssertEqual(queryItems[valueFor: "category"], "images")
         XCTAssertEqual(queryItems[valueFor: "siteUrl"], "http%3A%2F%2Funsafe.example.test%2Fpath%2Fto%2Fthing.html")
         XCTAssertEqual(queryItems[valueFor: "upgradedHttps"], "false")
@@ -144,7 +110,7 @@ class WebsiteBreakageReportTests: XCTestCase {
 }
 
 fileprivate extension Array where Element == URLQueryItem {
-    
+
     subscript(valueFor name: String) -> String? {
         return first(where: { $0.name == name })?.value
     }
