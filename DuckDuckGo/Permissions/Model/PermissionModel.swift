@@ -274,7 +274,7 @@ final class PermissionModel {
             }
         }
         decisionHandler(/*salt - seems not used anywhere:*/ "",
-                        /*includeSensitiveMediaDeviceDetails:*/ false)
+                                                            /*includeSensitiveMediaDeviceDetails:*/ false)
         // make sure to swizzle it back after reasonable interval in case it wasn't called
         DispatchQueue.main.asyncAfter(deadline: .now() + 5) {
             AVCaptureDevice.restoreAuthorizationStatusForMediaType()

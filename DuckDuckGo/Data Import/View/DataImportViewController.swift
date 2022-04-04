@@ -41,7 +41,7 @@ final class DataImportViewController: NSViewController {
     private struct ViewState {
         var selectedImportSource: DataImport.Source
         var interactionState: InteractionState
-        
+
         static func defaultState() -> ViewState {
             if let firstInstalledBrowser = ThirdPartyBrowser.installedBrowsers.first {
                 return ViewState(selectedImportSource: firstInstalledBrowser.importSource,
@@ -130,16 +130,16 @@ final class DataImportViewController: NSViewController {
         switch viewState.interactionState {
         // Import click on first screen with Bookmarks checkmark: Can't read bookmarks: request permission
         case .ableToImport where viewState.selectedImportSource == .safari
-            && selectedImportOptions.contains(.bookmarks)
-            && !SafariDataImporter.canReadBookmarksFile():
+                && selectedImportOptions.contains(.bookmarks)
+                && !SafariDataImporter.canReadBookmarksFile():
 
             self.viewState = ViewState(selectedImportSource: viewState.selectedImportSource, interactionState: .permissionsRequired([.bookmarks]))
 
         // Import click on first screen with Passwords bookmark or Next click on Bookmarks Import Done screen: show CSV Import
         case .ableToImport where viewState.selectedImportSource == .safari
-            && selectedImportOptions.contains(.logins)
-            && (dataImporter is CSVImporter || selectedImportOptions == [.logins])
-            && !(currentChildViewController is CSVImportViewController):
+                && selectedImportOptions.contains(.logins)
+                && (dataImporter is CSVImporter || selectedImportOptions == [.logins])
+                && !(currentChildViewController is CSVImportViewController):
             // Only Safari Passwords selected, switch to CSV select
             self.viewState = .init(selectedImportSource: viewState.selectedImportSource, interactionState: .permissionsRequired([.logins]))
 
@@ -337,8 +337,8 @@ final class DataImportViewController: NSViewController {
 
     private func beginImport() {
         if let browser = ThirdPartyBrowser.browser(for: viewState.selectedImportSource),
-            browser.isRunning,
-            browser.shouldQuitBeforeImport {
+           browser.isRunning,
+           browser.shouldQuitBeforeImport {
 
             let alert = NSAlert.closeRunningBrowserAlert(source: viewState.selectedImportSource)
             let result = alert.runModal()
@@ -397,7 +397,7 @@ final class DataImportViewController: NSViewController {
                 if summary.bookmarksResult != nil {
                     self.fireImportBookmarksPixelForSelectedImportSource()
                 }
-                
+
                 NotificationCenter.default.post(name: .dataImportComplete, object: nil)
             case .failure(let error):
                 switch error {

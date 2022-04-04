@@ -96,7 +96,7 @@ final class CSVImporter: DataImporter {
 
         let logins = Self.extractLogins(from: fileContents, defaultColumnPositions: self.defaultColumnPositions)
         let uniqueLogins = logins.filter { seen.updateValue(true, forKey: "\($0.url)-\($0.username)") == nil }
-        
+
         return uniqueLogins.count
     }
 

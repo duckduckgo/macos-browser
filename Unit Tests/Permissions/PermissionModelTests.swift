@@ -75,7 +75,7 @@ final class PermissionModelTests: XCTestCase {
         }
         XCTAssertEqual(model.permissions, [.microphone: .active])
     }
-    
+
     func testWhenCameraAndMicIsActivatedThenCameraAndMicPermissionChangesToActive() {
         if #available(macOS 12, *) {
             webView.cameraCaptureState = .active

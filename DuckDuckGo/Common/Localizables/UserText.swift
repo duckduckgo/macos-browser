@@ -240,7 +240,7 @@ struct UserText {
     static let theme = NSLocalizedString("preferences.appearance.theme", value: "Theme", comment: "Theme preferences")
     static let addressBar = NSLocalizedString("preferences.appearance.address-bar", value: "Address Bar", comment: "Theme preferences")
     static let showFullWebsiteAddress = NSLocalizedString("preferences.appearance.show-full-url", value: "Show full website address", comment: "Option to show full URL in the address bar")
-    static let autofill = NSLocalizedString("preferences.logins-plus", value: "Autofill", comment: "Show Autofill preferences")
+    static let autofill = NSLocalizedString("preferences.autofill", value: "Autofill", comment: "Show Autofill preferences")
     
     static let aboutDuckDuckGo = NSLocalizedString("preferences.about.about-duckduckgo", value: "About DuckDuckGo", comment: "About screen")
     static let privacySimplified = NSLocalizedString("preferences.about.privacy-simplified", value: "Privacy, simplified", comment: "About screen")

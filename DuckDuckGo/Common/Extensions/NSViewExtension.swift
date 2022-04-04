@@ -34,7 +34,7 @@ extension NSView {
     func wrappedInContainer(padding: CGFloat = 0) -> NSView {
         return wrappedInContainer(padding: NSEdgeInsets(top: padding, left: padding, bottom: padding, right: padding))
     }
-    
+
     func wrappedInContainer(padding: NSEdgeInsets = NSEdgeInsets()) -> NSView {
         self.translatesAutoresizingMaskIntoConstraints = false
 
@@ -45,7 +45,7 @@ extension NSView {
         self.leftAnchor.constraint(equalTo: containerView.leftAnchor, constant: padding.left).isActive = true
         self.rightAnchor.constraint(equalTo: containerView.rightAnchor, constant: -padding.right).isActive = true
         self.bottomAnchor.constraint(equalTo: containerView.bottomAnchor, constant: -padding.bottom).isActive = true
-        
+
         return containerView
     }
 

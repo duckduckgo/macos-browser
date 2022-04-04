@@ -57,18 +57,26 @@ enum APIRequest {
         case trace = "TRACE"
         case patch = "PATCH"
     }
-    
+
     @discardableResult
     static func request(url: URL,
                         method: HTTPMethod = .get,
                         parameters: [String: String]? = nil,
+                        allowedQueryReservedCharacters: CharacterSet? = nil,
                         headers: HTTPHeaders = APIHeaders().defaultHeaders,
                         timeoutInterval: TimeInterval = 60.0,
                         useEphemeralURLSession: Bool = true, // URL requests must opt into using shared storage
                         callBackOnMainThread: Bool = false,
                         completion: @escaping APIRequestCompletion) -> URLSessionDataTask {
         
-        let urlRequest = urlRequestFor(url: url, method: method, parameters: parameters, headers: headers, timeoutInterval: timeoutInterval)
+        let urlRequest = urlRequestFor(
+            url: url,
+            method: method,
+            parameters: parameters,
+            allowedQueryReservedCharacters: allowedQueryReservedCharacters,
+            headers: headers,
+            timeoutInterval: timeoutInterval
+        )
         let session = session(useMainThreadCallbackQueue: callBackOnMainThread, ephemeral: useEphemeralURLSession)
 
         let task = session.dataTask(with: urlRequest) { (data, response, error) in
@@ -94,9 +102,16 @@ enum APIRequest {
     static func urlRequestFor(url: URL,
                               method: HTTPMethod = .get,
                               parameters: [String: String]? = nil,
+                              allowedQueryReservedCharacters: CharacterSet? = nil,
                               headers: HTTPHeaders = APIHeaders().defaultHeaders,
                               timeoutInterval: TimeInterval = 60.0) -> URLRequest {
-        let url = (try? parameters?.reduce(url) { try $0.addParameter(name: $1.key, value: $1.value) }) ?? url
+        let url = (try? parameters?.reduce(url) { partialResult, parameter in
+            try partialResult.addParameter(
+                name: parameter.key,
+                value: parameter.value,
+                allowedReservedCharacters: allowedQueryReservedCharacters
+            )
+        }) ?? url
         var urlRequest = URLRequest(url: url)
         urlRequest.allHTTPHeaderFields = headers
         urlRequest.httpMethod = method.rawValue
