@@ -28,17 +28,22 @@ final class AutofillPreferencesPersistorMock: AutofillPreferencesPersistor {
     var askToSavePaymentMethods: Bool = true
 }
 
+final class UserAuthenticatorMock: UserAuthenticating {
+    // swiftlint:disable:next identifier_name
+    var _authenticateUser: (DeviceAuthenticator.AuthenticationReason) -> DeviceAuthenticationResult = { _ in return .success }
+
+    func authenticateUser(reason: DeviceAuthenticator.AuthenticationReason, result: @escaping (DeviceAuthenticationResult) -> Void) {
+        let authenticationResult = _authenticateUser(reason)
+        result(authenticationResult)
+    }
+}
+
 final class AutofillPreferencesModelTests: XCTestCase {
 
     func testThatPreferencesArePersisted() throws {
         let persistor = AutofillPreferencesPersistorMock()
-        let model = AutofillPreferencesModel(persistor: persistor)
-
-        model.isAutoLockEnabled.toggle()
-        XCTAssertEqual(persistor.isAutoLockEnabled, model.isAutoLockEnabled)
-
-        model.autoLockThreshold = .fiveMinutes
-        XCTAssertEqual(persistor.autoLockThreshold, AutofillAutoLockThreshold.fiveMinutes)
+        let userAuthenticator = UserAuthenticatorMock()
+        let model = AutofillPreferencesModel(persistor: persistor, userAuthenticator: userAuthenticator)
 
         model.askToSaveUsernamesAndPasswords.toggle()
         XCTAssertEqual(persistor.askToSaveUsernamesAndPasswords, model.askToSaveUsernamesAndPasswords)
@@ -48,5 +53,54 @@ final class AutofillPreferencesModelTests: XCTestCase {
 
         model.askToSavePaymentMethods.toggle()
         XCTAssertEqual(persistor.askToSavePaymentMethods, model.askToSavePaymentMethods)
+    }
+
+    func testWhenUserIsAuthenticatedThenAutoLockCanBeDisabled() throws {
+        let persistor = AutofillPreferencesPersistorMock()
+        let userAuthenticator = UserAuthenticatorMock()
+        let model = AutofillPreferencesModel(persistor: persistor, userAuthenticator: userAuthenticator)
+
+        userAuthenticator._authenticateUser = { _ in return .success}
+
+        model.authorizeAutoLockSettingsChange(isEnabled: false)
+        XCTAssertEqual(model.isAutoLockEnabled, false)
+        XCTAssertEqual(persistor.isAutoLockEnabled, model.isAutoLockEnabled)
+    }
+
+    func testWhenUserIsNotAuthenticatedThenAutoLockCannotBeDisabled() throws {
+        let persistor = AutofillPreferencesPersistorMock()
+        let userAuthenticator = UserAuthenticatorMock()
+        let model = AutofillPreferencesModel(persistor: persistor, userAuthenticator: userAuthenticator)
+
+        userAuthenticator._authenticateUser = { _ in return .failure}
+
+        model.authorizeAutoLockSettingsChange(isEnabled: false)
+        XCTAssertEqual(model.isAutoLockEnabled, true)
+        XCTAssertEqual(persistor.isAutoLockEnabled, model.isAutoLockEnabled)
+    }
+
+    func testWhenUserIsAuthenticatedThenAutoLockThresholdCanBeChanged() throws {
+        let persistor = AutofillPreferencesPersistorMock()
+        let userAuthenticator = UserAuthenticatorMock()
+        let model = AutofillPreferencesModel(persistor: persistor, userAuthenticator: userAuthenticator)
+
+        userAuthenticator._authenticateUser = { _ in return .success}
+
+        model.authorizeAutoLockSettingsChange(threshold: .oneHour)
+        XCTAssertEqual(model.isAutoLockEnabled, true)
+        XCTAssertEqual(model.autoLockThreshold, .oneHour)
+        XCTAssertEqual(persistor.autoLockThreshold, model.autoLockThreshold)
+    }
+
+    func testWhenUserIsNotAuthenticatedThenAutoLockThresholdCannotBeChanged() throws {
+        let persistor = AutofillPreferencesPersistorMock()
+        let userAuthenticator = UserAuthenticatorMock()
+        let model = AutofillPreferencesModel(persistor: persistor, userAuthenticator: userAuthenticator)
+
+        userAuthenticator._authenticateUser = { _ in return .failure}
+
+        model.authorizeAutoLockSettingsChange(threshold: .oneHour)
+        XCTAssertNotEqual(model.autoLockThreshold, .oneHour)
+        XCTAssertEqual(persistor.autoLockThreshold, model.autoLockThreshold)
     }
 }

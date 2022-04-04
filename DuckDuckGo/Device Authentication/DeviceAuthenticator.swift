@@ -26,7 +26,11 @@ extension NSNotification.Name {
 
 }
 
-final class DeviceAuthenticator {
+protocol UserAuthenticating {
+    func authenticateUser(reason: DeviceAuthenticator.AuthenticationReason, result: @escaping (DeviceAuthenticationResult) -> Void)
+}
+
+final class DeviceAuthenticator: UserAuthenticating {
 
     enum AuthenticationReason {
         case autofill
@@ -128,7 +132,7 @@ final class DeviceAuthenticator {
     var requiresAuthentication: Bool {
         // shouldAutoLockLogins can only be changed by the user authenticating themselves, so it's safe to
         // use it to early return from the authentication check.
-        guard autofillPreferences.isAutoLockEnabled else {
+        guard shouldAutoLockLogins else {
             return false
         }
 

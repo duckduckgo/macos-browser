@@ -42,6 +42,22 @@ extension Preferences {
     struct AutofillView: View {
         @ObservedObject var model: AutofillPreferencesModel
 
+        var isAutoLockEnabledBinding: Binding<Bool> {
+            .init {
+                model.isAutoLockEnabled
+            } set: { newValue in
+                model.authorizeAutoLockSettingsChange(isEnabled: newValue)
+            }
+        }
+
+        var autoLockThresholdBinding: Binding<AutofillAutoLockThreshold> {
+            .init {
+                model.autoLockThreshold
+            } set: { newValue in
+                model.authorizeAutoLockSettingsChange(threshold: newValue)
+            }
+        }
+
         var body: some View {
             VStack(alignment: .leading, spacing: 0) {
                 Text(UserText.autofill)
@@ -73,10 +89,10 @@ extension Preferences {
                         .font(Const.Fonts.preferencePaneSectionHeader)
                         .padding(.bottom, 12)
 
-                    Picker(selection: $model.isAutoLockEnabled, content: {
+                    Picker(selection: isAutoLockEnabledBinding, content: {
                         HStack {
                             Text(UserText.autofillLockWhenIdle)
-                            NSPopUpButtonView(selection: $model.autoLockThreshold) {
+                            NSPopUpButtonView(selection: autoLockThresholdBinding) {
                                 let button = NSPopUpButton()
                                 button.setContentHuggingPriority(.defaultHigh, for: .horizontal)
 

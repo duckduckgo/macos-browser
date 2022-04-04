@@ -20,18 +20,6 @@ import Foundation
 
 final class AutofillPreferencesModel: ObservableObject {
 
-    @Published var isAutoLockEnabled: Bool {
-        didSet {
-            persistor.isAutoLockEnabled = isAutoLockEnabled
-        }
-    }
-
-    @Published var autoLockThreshold: AutofillAutoLockThreshold {
-        didSet {
-            persistor.autoLockThreshold = autoLockThreshold
-        }
-    }
-
     @Published var askToSaveUsernamesAndPasswords: Bool {
         didSet {
             persistor.askToSaveUsernamesAndPasswords = askToSaveUsernamesAndPasswords
@@ -50,12 +38,66 @@ final class AutofillPreferencesModel: ObservableObject {
         }
     }
 
+    @Published private(set) var isAutoLockEnabled: Bool {
+        didSet {
+            persistor.isAutoLockEnabled = isAutoLockEnabled
+        }
+    }
+
+    @Published private(set) var autoLockThreshold: AutofillAutoLockThreshold {
+        didSet {
+            persistor.autoLockThreshold = autoLockThreshold
+        }
+    }
+
+    func authorizeAutoLockSettingsChange(
+        isEnabled isAutoLockEnabledNewValue: Bool? = nil,
+        threshold autoLockThresholdNewValue: AutofillAutoLockThreshold? = nil
+    ) {
+        guard isAutoLockEnabledNewValue != nil || autoLockThresholdNewValue != nil else {
+            return
+        }
+
+        let isAutoLockEnabled = isAutoLockEnabledNewValue ?? self.isAutoLockEnabled
+        let autoLockThreshold = autoLockThresholdNewValue ?? self.autoLockThreshold
+
+        userAuthenticator.authenticateUser(reason: .changeLoginsSettings) { [weak self] authenticationResult in
+            guard let self = self else {
+                return
+            }
+
+            if authenticationResult.authenticated {
+
+                // Only fire the auto-lock disabled pixel the setting is disabled and it has changed from its previous value
+                if !isAutoLockEnabled && self.isAutoLockEnabled {
+                    Pixel.fire(.passwordManagerLockScreenDisabled)
+                }
+
+                // Only fire the threshold pixel if it has changed, or if the setting is being turned on again
+                if (autoLockThreshold != self.autoLockThreshold) || (isAutoLockEnabled && !self.isAutoLockEnabled) {
+                    Pixel.fire(self.autoLockThreshold.pixelEvent)
+                }
+
+                if isAutoLockEnabled != self.isAutoLockEnabled {
+                    self.isAutoLockEnabled = isAutoLockEnabled
+                }
+                if autoLockThreshold != self.autoLockThreshold {
+                    self.autoLockThreshold = autoLockThreshold
+                }
+            }
+        }
+    }
+
     func openImportBrowserDataWindow() {
         NSApp.sendAction(#selector(AppDelegate.openImportBrowserDataWindow(_:)), to: nil, from: nil)
     }
 
-    init(persistor: AutofillPreferencesPersistor = AutofillPreferences()) {
+    init(
+        persistor: AutofillPreferencesPersistor = AutofillPreferences(),
+        userAuthenticator: UserAuthenticating = DeviceAuthenticator.shared
+    ) {
         self.persistor = persistor
+        self.userAuthenticator = userAuthenticator
 
         isAutoLockEnabled = persistor.isAutoLockEnabled
         autoLockThreshold = persistor.autoLockThreshold
@@ -65,4 +107,5 @@ final class AutofillPreferencesModel: ObservableObject {
     }
 
     private var persistor: AutofillPreferencesPersistor
+    private var userAuthenticator: UserAuthenticating
 }
