@@ -47,6 +47,7 @@ final class PasswordManagementViewController: NSViewController {
     @IBOutlet var listContainer: NSView!
     @IBOutlet var itemContainer: NSView!
     @IBOutlet var addVaultItemButton: NSButton!
+    @IBOutlet var moreButton: NSButton!
     @IBOutlet var searchField: NSTextField!
     @IBOutlet var divider: NSView!
     @IBOutlet var emptyState: NSView!
@@ -151,8 +152,15 @@ final class PasswordManagementViewController: NSViewController {
         emptyStateTitle.attributedStringValue = NSAttributedString.make(emptyStateTitle.stringValue, lineHeight: 1.14, kern: -0.23)
         emptyStateMessage.attributedStringValue = NSAttributedString.make(emptyStateMessage.stringValue, lineHeight: 1.05, kern: -0.08)
 
+        addVaultItemButton.sendAction(on: .leftMouseDown)
+        moreButton.sendAction(on: .leftMouseDown)
+
         NotificationCenter.default.addObserver(forName: .deviceBecameLocked, object: nil, queue: .main) { [weak self] _ in
             self?.displayLockScreen()
+        }
+
+        NotificationCenter.default.addObserver(forName: .dataImportComplete, object: nil, queue: .main) { [weak self] _ in
+            self?.refreshData()
         }
     }
 
@@ -181,7 +189,7 @@ final class PasswordManagementViewController: NSViewController {
     override func viewWillAppear() {
         super.viewWillAppear()
 
-        lockScreenDurationLabel.stringValue = UserText.pmLockScreenDuration(duration: LoginsPreferences().autoLockThreshold.title)
+        lockScreenDurationLabel.stringValue = UserText.pmLockScreenDuration(duration: AutofillPreferences().autoLockThreshold.title)
 
         if let listView = self.listView {
             listView.frame = listContainer.bounds
@@ -229,12 +237,36 @@ final class PasswordManagementViewController: NSViewController {
         menu.popUp(positioning: nil, at: location, in: sender.superview)
     }
 
+    @IBAction func moreButtonAction(_ sender: NSButton) {
+        let location = NSPoint(x: sender.frame.origin.x, y: sender.frame.origin.y - (sender.frame.height / 2) + 6)
+        sender.menu?.popUp(positioning: nil, at: location, in: sender.superview)
+    }
+
+    @IBAction func openPreferences(_ sender: Any) {
+        self.dismiss()
+        NSApp.sendAction(#selector(openPreferences(_:)), to: nil, from: sender)
+    }
+
+    @IBAction func openImportBrowserDataWindow(_ sender: Any?) {
+        self.dismiss()
+        NSApp.sendAction(#selector(openImportBrowserDataWindow(_:)), to: nil, from: sender)
+    }
+
     @IBAction func onImportClicked(_ sender: NSButton) {
+        self.dismiss()
         DataImportViewController.show()
     }
 
     @IBAction func deviceAuthenticationRequested(_ sender: NSButton) {
         promptForAuthenticationIfNecessary()
+    }
+
+    @IBAction func toggleLock(_ sender: Any) {
+        if DeviceAuthenticator.shared.requiresAuthentication {
+            promptForAuthenticationIfNecessary()
+        } else {
+            DeviceAuthenticator.shared.lock()
+        }
     }
 
     private func refetchWithText(_ text: String,
@@ -327,9 +359,9 @@ final class PasswordManagementViewController: NSViewController {
             self?.doSaveCredentials(credentials)
         }, onDeleteRequested: { [weak self] credentials in
             self?.promptToDelete(credentials: credentials)
-        }) { [weak self] in
+        }, onCancelled: { [weak self] in
             self?.refetchWithText(self!.searchField.stringValue)
-        }
+        })
 
         self.itemModel = itemModel
 
@@ -345,9 +377,9 @@ final class PasswordManagementViewController: NSViewController {
             self?.doSaveIdentity(note)
         }, onDeleteRequested: { [weak self] identity in
             self?.promptToDelete(identity: identity)
-        }) { [weak self] in
+        }, onCancelled: { [weak self] in
             self?.refetchWithText(self!.searchField.stringValue)
-        }
+        })
 
         self.itemModel = itemModel
 
@@ -363,9 +395,9 @@ final class PasswordManagementViewController: NSViewController {
             self?.doSaveNote(note)
         }, onDeleteRequested: { [weak self] note in
             self?.promptToDelete(note: note)
-        }) { [weak self] in
+        }, onCancelled: { [weak self] in
             self?.refetchWithText(self!.searchField.stringValue)
-        }
+        })
 
         self.itemModel = itemModel
 
@@ -381,9 +413,9 @@ final class PasswordManagementViewController: NSViewController {
             self?.doSaveCreditCard(card)
         }, onDeleteRequested: { [weak self] card in
             self?.promptToDelete(card: card)
-        }) { [weak self] in
+        }, onCancelled: { [weak self] in
             self?.refetchWithText(self!.searchField.stringValue)
-        }
+        })
 
         self.itemModel = itemModel
 
@@ -512,9 +544,7 @@ final class PasswordManagementViewController: NSViewController {
             switch response {
             case .alertFirstButtonReturn:
                 try? self.secureVault?.deleteWebsiteCredentialsFor(accountId: id)
-                self.itemModel?.clearSecureVaultModel()
-                self.refetchWithText(self.searchField.stringValue)
-                self.postChange()
+                self.refreshData()
 
             default:
                 break // cancel, do nothing
@@ -533,9 +563,7 @@ final class PasswordManagementViewController: NSViewController {
             switch response {
             case .alertFirstButtonReturn:
                 try? self.secureVault?.deleteIdentityFor(identityId: id)
-                self.itemModel?.clearSecureVaultModel()
-                self.refetchWithText(self.searchField.stringValue)
-                self.postChange()
+                self.refreshData()
 
             default:
                 break // cancel, do nothing
@@ -554,9 +582,7 @@ final class PasswordManagementViewController: NSViewController {
             switch response {
             case .alertFirstButtonReturn:
                 try? self.secureVault?.deleteNoteFor(noteId: id)
-                self.itemModel?.clearSecureVaultModel()
-                self.refetchWithText(self.searchField.stringValue)
-                self.postChange()
+                self.refreshData()
 
             default:
                 break // cancel, do nothing
@@ -575,15 +601,19 @@ final class PasswordManagementViewController: NSViewController {
             switch response {
             case .alertFirstButtonReturn:
                 try? self.secureVault?.deleteCreditCardFor(cardId: id)
-                self.itemModel?.clearSecureVaultModel()
-                self.refetchWithText(self.searchField.stringValue)
-                self.postChange()
+                self.refreshData()
 
             default:
                 break // cancel, do nothing
             }
 
         }
+    }
+
+    private func refreshData() {
+        self.itemModel?.clearSecureVaultModel()
+        self.refetchWithText(self.searchField.stringValue)
+        self.postChange()
     }
 
     // swiftlint:disable function_body_length
@@ -853,6 +883,22 @@ final class PasswordManagementViewController: NSViewController {
         emptyStateTitle.attributedStringValue = NSAttributedString.make(title, lineHeight: 1.14, kern: -0.23)
         emptyStateMessage.isHidden = true
         emptyStateButton.isHidden = true
+    }
+
+}
+
+extension PasswordManagementViewController: NSMenuDelegate {
+
+    func menuNeedsUpdate(_ menu: NSMenu) {
+        if let lockItem = menu.items.first(where: { $0.action == #selector(toggleLock(_:)) }) {
+            let authenticator = DeviceAuthenticator.shared
+            if authenticator.shouldAutoLockLogins {
+                lockItem.isHidden = false
+                lockItem.title = authenticator.requiresAuthentication ? UserText.passwordManagementUnlock : UserText.passwordManagementLock
+            } else {
+                lockItem.isHidden = true
+            }
+        }
     }
 
 }

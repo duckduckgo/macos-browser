@@ -26,18 +26,24 @@ extension NSNotification.Name {
 
 }
 
-final class DeviceAuthenticator {
+protocol UserAuthenticating {
+    func authenticateUser(reason: DeviceAuthenticator.AuthenticationReason, result: @escaping (DeviceAuthenticationResult) -> Void)
+}
+
+final class DeviceAuthenticator: UserAuthenticating {
 
     enum AuthenticationReason {
         case autofill
         case changeLoginsSettings
         case unlockLogins
+        case exportLogins
 
         var localizedDescription: String {
             switch self {
             case .autofill: return UserText.pmAutoLockPromptAutofill
             case .changeLoginsSettings: return UserText.pmAutoLockPromptChangeLoginsSettings
             case .unlockLogins: return UserText.pmAutoLockPromptUnlockLogins
+            case .exportLogins: return UserText.pmAutoLockPromptExportLogins
             }
         }
     }
@@ -69,11 +75,16 @@ final class DeviceAuthenticator {
         }
     }
 
+    func lock() {
+        self.deviceIsLocked = true
+        self.cancelIdleCheckTimer()
+    }
+
     // MARK: - Private Dependencies
 
     private var idleStateProvider: DeviceIdleStateProvider
     private let authenticationService: DeviceAuthenticationService
-    private let loginsPreferences: LoginsPreferences
+    private let autofillPreferences: AutofillPreferences
 
     // MARK: - Private State
 
@@ -106,26 +117,30 @@ final class DeviceAuthenticator {
 
     init(idleStateProvider: DeviceIdleStateProvider = QuartzIdleStateProvider(),
          authenticationService: DeviceAuthenticationService = LocalAuthenticationService(),
-         loginsPreferences: LoginsPreferences = LoginsPreferences()) {
+         autofillPreferences: AutofillPreferences = AutofillPreferences()) {
         self.idleStateProvider = idleStateProvider
         self.authenticationService = authenticationService
-        self.loginsPreferences = loginsPreferences
-        self.deviceIsLocked = loginsPreferences.shouldAutoLockLogins
+        self.autofillPreferences = autofillPreferences
+        self.deviceIsLocked = autofillPreferences.isAutoLockEnabled
 
         NotificationCenter.default.addObserver(self,
                                                selector: #selector(updateTimerStateBasedOnAutoLockSettings),
-                                               name: .loginsAutoLockSettingsDidChange,
+                                               name: .autofillAutoLockSettingsDidChange,
                                                object: nil)
     }
 
     var requiresAuthentication: Bool {
         // shouldAutoLockLogins can only be changed by the user authenticating themselves, so it's safe to
         // use it to early return from the authentication check.
-        guard loginsPreferences.shouldAutoLockLogins else {
+        guard shouldAutoLockLogins else {
             return false
         }
 
         return deviceIsLocked
+    }
+
+    var shouldAutoLockLogins: Bool {
+        autofillPreferences.isAutoLockEnabled
     }
 
     func authenticateUser(reason: AuthenticationReason, result: @escaping (DeviceAuthenticationResult) -> Void) {
@@ -189,9 +204,9 @@ final class DeviceAuthenticator {
 
     @objc
     private func updateTimerStateBasedOnAutoLockSettings() {
-        let preferences = LoginsPreferences()
+        let preferences = AutofillPreferences()
 
-        if preferences.shouldAutoLockLogins {
+        if preferences.isAutoLockEnabled {
             beginCheckingIdleTimer()
         } else {
             cancelIdleCheckTimer()
@@ -204,7 +219,7 @@ final class DeviceAuthenticator {
             return
         }
 
-        guard loginsPreferences.shouldAutoLockLogins else {
+        guard autofillPreferences.isAutoLockEnabled else {
             os_log("Tried to start idle timer but device should not auto-lock", log: .autoLock)
             return
         }
@@ -213,9 +228,8 @@ final class DeviceAuthenticator {
     }
 
     private func checkIdleTimeIntervalAndLockIfNecessary(interval: TimeInterval) {
-        if interval >= loginsPreferences.autoLockThreshold.seconds {
-            self.deviceIsLocked = true
-            self.cancelIdleCheckTimer()
+        if interval >= autofillPreferences.autoLockThreshold.seconds {
+            self.lock()
         }
     }
 

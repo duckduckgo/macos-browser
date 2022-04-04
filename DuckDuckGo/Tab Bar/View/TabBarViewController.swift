@@ -122,7 +122,7 @@ final class TabBarViewController: NSViewController {
             os_log("TabBarViewController: Selection index is nil", type: .error)
             return
         }
-        
+
         if collectionView.selectionIndexPaths.count > 0 {
             collectionView.clearSelection()
         }
@@ -510,11 +510,11 @@ extension TabBarViewController: NSCollectionViewDelegateFlowLayout {
 }
 
 extension TabBarViewController: NSCollectionViewDataSource {
-    
+
     func numberOfSections(in collectionView: NSCollectionView) -> Int {
         return 1
     }
-    
+
     func collectionView(_ collectionView: NSCollectionView, numberOfItemsInSection section: Int) -> Int {
         return tabCollectionViewModel.tabCollection.tabs.count
     }
@@ -548,6 +548,14 @@ extension TabBarViewController: NSCollectionViewDataSource {
             footer.addButton?.action = #selector(addButtonAction(_:))
         }
         return view
+    }
+
+    func collectionView(
+        _ collectionView: NSCollectionView,
+        didEndDisplaying item: NSCollectionViewItem,
+        forRepresentedObjectAt indexPath: IndexPath) {
+
+        (item as? TabBarViewItem)?.clear()
     }
 }
 

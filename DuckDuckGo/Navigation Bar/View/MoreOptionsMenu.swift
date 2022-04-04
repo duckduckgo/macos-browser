@@ -55,7 +55,7 @@ final class MoreOptionsMenu: NSMenu {
 
     private func setupMenuItems() {
 
-#if FEEDBACK
+        #if FEEDBACK
 
         addItem(withTitle: "Send Feedback", action: #selector(AppDelegate.openFeedback(_:)), keyEquivalent: "")
             .withImage(NSImage(named: "BetaLabel"))
@@ -63,7 +63,7 @@ final class MoreOptionsMenu: NSMenu {
 
         addItem(NSMenuItem.separator())
 
-#endif
+        #endif
 
         addWindowItems()
 
@@ -101,7 +101,7 @@ final class MoreOptionsMenu: NSMenu {
             os_log("MainViewController: No tab view model selected", type: .error)
             return
         }
-        
+
         selectedTabViewModel.tab.requestFireproofToggle()
     }
 
@@ -113,19 +113,19 @@ final class MoreOptionsMenu: NSMenu {
         actionDelegate?.optionsButtonMenuRequestedDownloadsPopover(self)
     }
 
-    @objc func openLoginsWithAllItems(_ sender: NSMenuItem) {
+    @objc func openAutofillWithAllItems(_ sender: NSMenuItem) {
         actionDelegate?.optionsButtonMenuRequestedLoginsPopover(self, selectedCategory: .allItems)
     }
-    
-    @objc func openLoginsWithLogins(_ sender: NSMenuItem) {
+
+    @objc func openAutofillWithLogins(_ sender: NSMenuItem) {
         actionDelegate?.optionsButtonMenuRequestedLoginsPopover(self, selectedCategory: .logins)
     }
-    
-    @objc func openLoginsWithIdentities(_ sender: NSMenuItem) {
+
+    @objc func openAutofillWithIdentities(_ sender: NSMenuItem) {
         actionDelegate?.optionsButtonMenuRequestedLoginsPopover(self, selectedCategory: .identities)
     }
-    
-    @objc func openLoginsWithCreditCards(_ sender: NSMenuItem) {
+
+    @objc func openAutofillWithCreditCards(_ sender: NSMenuItem) {
         actionDelegate?.optionsButtonMenuRequestedLoginsPopover(self, selectedCategory: .cards)
     }
 
@@ -189,8 +189,8 @@ final class MoreOptionsMenu: NSMenu {
             .firingPixel(Pixel.Event.MoreResult.downloads)
 
         let loginsSubMenu = LoginsSubMenu(targetting: self)
-        
-        addItem(withTitle: UserText.passwordManagement, action: #selector(openLoginsWithAllItems), keyEquivalent: "")
+
+        addItem(withTitle: UserText.passwordManagement, action: #selector(openAutofillWithAllItems), keyEquivalent: "")
             .targetting(self)
             .withImage(NSImage(named: "PasswordManagement"))
             .withSubmenu(loginsSubMenu)
@@ -237,17 +237,17 @@ final class MoreOptionsMenu: NSMenu {
 }
 
 final class EmailOptionsButtonSubMenu: NSMenu {
-    
+
     private let tabCollectionViewModel: TabCollectionViewModel
     private let emailManager: EmailManager
-        
+
     init(tabCollectionViewModel: TabCollectionViewModel, emailManager: EmailManager) {
         self.tabCollectionViewModel = tabCollectionViewModel
         self.emailManager = emailManager
         super.init(title: UserText.emailOptionsMenuItem)
 
         updateMenuItems()
-        
+
         NotificationCenter.default.addObserver(self,
                                                selector: #selector(emailDidSignInNotification(_:)),
                                                name: .emailDidSignIn,
@@ -257,11 +257,11 @@ final class EmailOptionsButtonSubMenu: NSMenu {
                                                name: .emailDidSignOut,
                                                object: nil)
     }
-    
+
     required init(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
-    
+
     private func updateMenuItems() {
         removeAllItems()
         if emailManager.isSignedIn {
@@ -280,7 +280,7 @@ final class EmailOptionsButtonSubMenu: NSMenu {
 
         }
     }
-    
+
     @objc func createAddressAction(_ sender: NSMenuItem) {
         assert(emailManager.requestDelegate != nil, "No requestDelegate on emailManager")
 
@@ -295,12 +295,12 @@ final class EmailOptionsButtonSubMenu: NSMenu {
         }
         Pixel.fire(.moreMenu(result: .emailProtectionCreateAddress))
     }
-    
+
     @objc func turnOffEmailAction(_ sender: NSMenuItem) {
         emailManager.signOut()
         Pixel.fire(.moreMenu(result: .emailProtectionOff))
     }
-    
+
     @objc func turnOnEmailAction(_ sender: NSMenuItem) {
         let tab = Tab(content: .url(EmailUrls().emailLandingPage))
         tabCollectionViewModel.append(tab: tab)
@@ -310,7 +310,7 @@ final class EmailOptionsButtonSubMenu: NSMenu {
     @objc func emailDidSignInNotification(_ notification: Notification) {
         updateMenuItems()
     }
-    
+
     @objc func emailDidSignOutNotification(_ notification: Notification) {
         updateMenuItems()
     }
@@ -349,7 +349,7 @@ final class ZoomSubMenu: NSMenu {
 }
 
 final class LoginsSubMenu: NSMenu {
-    
+
     init(targetting target: AnyObject) {
         super.init(title: UserText.passwordManagement)
         updateMenuItems(with: target)
@@ -358,30 +358,30 @@ final class LoginsSubMenu: NSMenu {
     required init(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
-    
+
     private func updateMenuItems(with target: AnyObject) {
-        addItem(withTitle: UserText.passwordManagementAllItems, action: #selector(MoreOptionsMenu.openLoginsWithAllItems), keyEquivalent: "")
+        addItem(withTitle: UserText.passwordManagementAllItems, action: #selector(MoreOptionsMenu.openAutofillWithAllItems), keyEquivalent: "")
             .targetting(target)
             .firingPixel(Pixel.Event.MoreResult.loginsMenuAllItems)
-        
+
         addItem(NSMenuItem.separator())
-        
-        addItem(withTitle: UserText.passwordManagementLogins, action: #selector(MoreOptionsMenu.openLoginsWithLogins), keyEquivalent: "")
+
+        addItem(withTitle: UserText.passwordManagementLogins, action: #selector(MoreOptionsMenu.openAutofillWithLogins), keyEquivalent: "")
             .targetting(target)
             .withImage(NSImage(named: "LoginGlyph"))
             .firingPixel(Pixel.Event.MoreResult.loginsMenuLogins)
-        
-        addItem(withTitle: UserText.passwordManagementIdentities, action: #selector(MoreOptionsMenu.openLoginsWithIdentities), keyEquivalent: "")
+
+        addItem(withTitle: UserText.passwordManagementIdentities, action: #selector(MoreOptionsMenu.openAutofillWithIdentities), keyEquivalent: "")
             .targetting(target)
             .withImage(NSImage(named: "IdentityGlyph"))
             .firingPixel(Pixel.Event.MoreResult.loginsMenuIdentities)
-        
-        addItem(withTitle: UserText.passwordManagementCreditCards, action: #selector(MoreOptionsMenu.openLoginsWithCreditCards), keyEquivalent: "")
+
+        addItem(withTitle: UserText.passwordManagementCreditCards, action: #selector(MoreOptionsMenu.openAutofillWithCreditCards), keyEquivalent: "")
             .targetting(target)
             .withImage(NSImage(named: "CreditCardGlyph"))
             .firingPixel(Pixel.Event.MoreResult.loginsMenuCreditCards)
     }
-    
+
 }
 
 extension NSMenuItem {

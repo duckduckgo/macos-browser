@@ -61,8 +61,8 @@ internal class SafariDataImporter: DataImporter {
 
     func importData(types: [DataImport.DataType],
                     from profile: DataImport.BrowserProfile?,
-                    completion: @escaping (Result<[DataImport.Summary], DataImportError>) -> Void) {
-        var summaries = [DataImport.Summary]()
+                    completion: @escaping (Result<DataImport.Summary, DataImportError>) -> Void) {
+        var summary = DataImport.Summary()
 
         if types.contains(.bookmarks) {
             let bookmarkReader = SafariBookmarksReader(safariBookmarksFileURL: Self.bookmarksFileURL)
@@ -71,8 +71,7 @@ internal class SafariDataImporter: DataImporter {
             switch bookmarkResult {
             case .success(let bookmarks):
                 do {
-                    let summary = try bookmarkImporter.importBookmarks(bookmarks, source: .safari)
-                    summaries.append(summary)
+                    summary.bookmarksResult = try bookmarkImporter.importBookmarks(bookmarks, source: .safari)
                 } catch {
                     completion(.failure(.cannotAccessSecureVault))
                     return
@@ -82,8 +81,11 @@ internal class SafariDataImporter: DataImporter {
                 return
             }
         }
+        if types.contains(.logins) {
+            summary.loginsResult = .awaited
+        }
 
-        completion(.success(summaries))
+        completion(.success(summary))
     }
 
 }

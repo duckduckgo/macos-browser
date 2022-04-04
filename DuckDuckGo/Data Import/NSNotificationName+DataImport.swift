@@ -1,7 +1,7 @@
 //
-//  DataImportMocks.swift
+//  NSNotificationName+DataImport.swift
 //
-//  Copyright © 2021 DuckDuckGo. All rights reserved.
+//  Copyright © 2022 DuckDuckGo. All rights reserved.
 //
 //  Licensed under the Apache License, Version 2.0 (the "License");
 //  you may not use this file except in compliance with the License.
@@ -17,17 +17,9 @@
 //
 
 import Foundation
-@testable import DuckDuckGo_Privacy_Browser
 
-final class MockLoginImporter: LoginImporter {
+extension NSNotification.Name {
 
-    var importedLogins: DataImport.Summary?
-
-    func importLogins(_ logins: [ImportedLoginCredential]) throws -> DataImport.CompletedLoginsResult {
-        let summary = DataImport.CompletedLoginsResult(successfulImports: logins.map(\.username), duplicateImports: [], failedImports: [])
-
-        self.importedLogins = .init(bookmarksResult: nil, loginsResult: .completed(summary))
-        return summary
-    }
+    static let dataImportComplete = NSNotification.Name("DataImportComplete")
 
 }

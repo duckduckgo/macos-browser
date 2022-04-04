@@ -220,6 +220,7 @@ final class TabBarViewItem: NSCollectionViewItem {
 
     func clear() {
         clearSubscriptions()
+        usedPermissions = Permissions()
         faviconImageView.image = nil
         titleTextField.stringValue = ""
     }
@@ -241,9 +242,7 @@ final class TabBarViewItem: NSCollectionViewItem {
     }
 
     private func clearSubscriptions() {
-        cancellables.forEach { (cancellable) in
-            cancellable.cancel()
-        }
+        cancellables.removeAll()
     }
 
     private func updateSubviews() {
@@ -256,7 +255,7 @@ final class TabBarViewItem: NSCollectionViewItem {
         let showCloseButton = (isMouseOver && !widthStage.isCloseButtonHidden) || isSelected
         closeButton.isHidden = !showCloseButton
         updateSeparatorView()
-        permissionCloseButtonTrailingConstraint.isActive = !closeButton.isHidden 
+        permissionCloseButtonTrailingConstraint.isActive = !closeButton.isHidden
         titleTextField.isHidden = widthStage.isTitleHidden && faviconImageView.image != nil
 
         faviconWrapperViewCenterConstraint.priority = titleTextField.isHidden ? .defaultHigh : .defaultLow
@@ -315,7 +314,7 @@ final class TabBarViewItem: NSCollectionViewItem {
 
     private func updateFavicon(_ favicon: NSImage?) {
         faviconWrapperView.isHidden = favicon == nil
-        titleTextFieldLeadingConstraint.constant = faviconWrapperView.isHidden ? Constants.textFieldPaddingNoFavicon : Constants.textFieldPadding 
+        titleTextFieldLeadingConstraint.constant = faviconWrapperView.isHidden ? Constants.textFieldPaddingNoFavicon : Constants.textFieldPadding
         faviconImageView.image = favicon
     }
 

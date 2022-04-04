@@ -157,7 +157,7 @@ final class Tab: NSObject {
     // MARK: - Event Publishers
 
     let webViewDidFinishNavigationPublisher = PassthroughSubject<Void, Never>()
-    
+
     @MainActor
     @Published var isAMPProtectionExtracting: Bool = false
 
@@ -354,27 +354,28 @@ final class Tab: NSObject {
     var cbrCompletionTokensPublisher: AnyPublisher<[ContentBlockerRulesManager.CompletionToken], Never> {
         userContentController.$contentBlockingAssets.compactMap { $0?.completionTokens }.eraseToAnyPublisher()
     }
-    
+
     private static let debugEvents = EventMapping<AMPProtectionDebugEvents> { event, _, _, _, _ in
         switch event {
         case .ampBlockingRulesCompilationFailed:
             Pixel.fire(.ampBlockingRulesCompilationFailed)
         }
     }
-    
+
     lazy var linkProtection: LinkProtection = {
         LinkProtection(privacyManager: ContentBlocking.shared.privacyConfigurationManager,
                        contentBlockingManager: ContentBlocking.shared.contentBlockingManager,
                        errorReporting: Self.debugEvents)
     }()
-    
+
     @MainActor
     private func reloadIfNeeded(shouldLoadInBackground: Bool = false) async {
         let url = await linkProtection.getCleanURL(from: contentURL, onStartExtracting: {
             isAMPProtectionExtracting = true
-        }, onFinishExtracting: {
-            [weak self] in self?.isAMPProtectionExtracting = false }
-        )
+        }, onFinishExtracting: { [weak self]
+            in self?.isAMPProtectionExtracting = false
+
+        })
         if shouldLoadURL(url, shouldLoadInBackground: shouldLoadInBackground) {
             let didRestore = restoreSessionStateDataIfNeeded()
             if !didRestore {
@@ -382,7 +383,7 @@ final class Tab: NSObject {
             }
         }
     }
-    
+
     @MainActor
     private var contentURL: URL {
         switch content {
@@ -394,14 +395,14 @@ final class Tab: NSObject {
             return .blankPage
         }
     }
-    
+
     @MainActor
     private func shouldLoadURL(_ url: URL, shouldLoadInBackground: Bool = false) -> Bool {
         return (webView.superview != nil || shouldLoadInBackground)
-        && webView.url != url
-        && webView.url != content.url // Initial Home Page shouldn't show Back Button
+            && webView.url != url
+            && webView.url != content.url // Initial Home Page shouldn't show Back Button
     }
-    
+
     @MainActor
     private func restoreSessionStateDataIfNeeded() -> Bool {
         var didRestore: Bool = false
@@ -837,7 +838,7 @@ extension Tab: WKNavigationDelegate {
     @MainActor
     func webView(_ webView: WKWebView,
                  decidePolicyFor navigationAction: WKNavigationAction) async -> WKNavigationActionPolicy {
-        
+
         let isRequestingNewTab = isRequestingNewTab(navigationAction: navigationAction)
         // This check needs to happen before GPC checks. Otherwise the navigation type may be rewritten to `.other`
         // which would skip link rewrites.
@@ -848,18 +849,18 @@ extension Tab: WKNavigationDelegate {
                                             onStartExtracting: { if !isRequestingNewTab { isAMPProtectionExtracting = true }},
                                             onFinishExtracting: { [weak self] in self?.isAMPProtectionExtracting = false },
                                             onLinkRewrite: { [weak self] url, _ in
-                    guard let self = self else { return }
-                    if isRequestingNewTab {
-                        self.delegate?.tab(self, requestedNewTabWith: .url(url), selected: NSApp.isShiftPressed)
-                    } else {
-                        webView.load(url)
-                    }
-                })
+                                                guard let self = self else { return }
+                                                if isRequestingNewTab {
+                                                    self.delegate?.tab(self, requestedNewTabWith: .url(url), selected: NSApp.isShiftPressed)
+                                                } else {
+                                                    webView.load(url)
+                                                }
+                                            })
             if let navigationActionPolicy = navigationActionPolicy, navigationActionPolicy == .cancel {
                 return navigationActionPolicy
             }
         }
-        
+
         webView.customUserAgent = UserAgent.for(navigationAction.request.url)
 
         if navigationAction.isTargetingMainFrame, navigationAction.request.mainDocumentURL?.host != lastUpgradedURL?.host {
@@ -916,15 +917,17 @@ extension Tab: WKNavigationDelegate {
             return .download(navigationAction, using: webView)
 
         } else if url.isExternalSchemeLink {
-            // ignore <iframe src="custom://url"> but allow via address bar
-            guard navigationAction.sourceFrame.isMainFrame,
-                  // ignore 2nd+ external scheme navigation not initiated by user
-                  !self.externalSchemeOpenedPerPageLoad || navigationAction.isUserInitiated
-            else { return .cancel }
+            // always allow user entered URLs
+            if !userEnteredUrl {
+                // ignore <iframe src="custom://url">
+                // ignore 2nd+ external scheme navigation not initiated by user
+                guard navigationAction.sourceFrame.isMainFrame,
+                      !self.externalSchemeOpenedPerPageLoad || navigationAction.isUserInitiated
+                else { return .cancel }
 
-            self.externalSchemeOpenedPerPageLoad = true
+                self.externalSchemeOpenedPerPageLoad = true
+            }
             self.delegate?.tab(self, requestedOpenExternalURL: url, forUserEnteredURL: userEnteredUrl)
-
             return .cancel
         }
 
@@ -948,13 +951,13 @@ extension Tab: WKNavigationDelegate {
 
         return .allow
     }
-    
+
     private func isRequestingNewTab(navigationAction: WKNavigationAction) -> Bool {
         let isLinkActivated = navigationAction.navigationType == .linkActivated
         let isMiddleClicked = navigationAction.buttonNumber == Constants.webkitMiddleClick
         return isLinkActivated && NSApp.isCommandPressed || isMiddleClicked
     }
-    
+
     // swiftlint:enable cyclomatic_complexity
     // swiftlint:enable function_body_length
 

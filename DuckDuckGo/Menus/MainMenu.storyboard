@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<document type="com.apple.InterfaceBuilder3.Cocoa.Storyboard.XIB" version="3.0" toolsVersion="19529" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES">
+<document type="com.apple.InterfaceBuilder3.Cocoa.Storyboard.XIB" version="3.0" toolsVersion="20037" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES">
     <dependencies>
         <deployment identifier="macosx"/>
-        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="19529"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="20037"/>
     </dependencies>
     <scenes>
         <!--Application-->
@@ -122,7 +122,7 @@ CA
                                             </connections>
                                         </menuItem>
                                         <menuItem isSeparatorItem="YES" id="u7E-4A-OQP"/>
-                                        <menuItem title="Import Browser Data..." id="gTV-od-6G5">
+                                        <menuItem title="Import Bookmarks and Passwords..." id="gTV-od-6G5">
                                             <modifierMask key="keyEquivalentModifierMask"/>
                                             <connections>
                                                 <action selector="openImportBrowserDataWindow:" target="Ady-hI-5gd" id="UU7-vO-0ol"/>
@@ -484,7 +484,7 @@ CA
                                             </connections>
                                         </menuItem>
                                         <menuItem isSeparatorItem="YES" id="aPG-H0-BrG"/>
-                                        <menuItem title="Import Bookmarks..." id="tNX-Bv-yM3" userLabel="Import Bookmarks...">
+                                        <menuItem title="Import Bookmarks and Passwords..." id="tNX-Bv-yM3" userLabel="Import Bookmarks...">
                                             <modifierMask key="keyEquivalentModifierMask"/>
                                             <connections>
                                                 <action selector="openImportBrowserDataWindow:" target="Ady-hI-5gd" id="NdE-Lt-CL5"/>

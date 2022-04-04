@@ -52,7 +52,7 @@ internal class WebCacheManager {
         await self.clearFileCache()
 
         await removeAllSafelyRemovableDataTypes()
-        
+
         await removeLocalStorageAndIndexedDBForNonFireproofDomains()
 
         await removeCookies(forDomains: domains)
@@ -93,17 +93,17 @@ internal class WebCacheManager {
         // Remove all data except cookies, local storage, and IndexedDB for all domains, and then filter cookies to preserve those allowed by Fireproofing.
         await websiteDataStore.removeData(ofTypes: safelyRemovableTypes, modifiedSince: Date.distantPast)
     }
-    
+
     @MainActor
     private func removeLocalStorageAndIndexedDBForNonFireproofDomains() async {
         let allRecords = await websiteDataStore.dataRecords(ofTypes: WKWebsiteDataStore.allWebsiteDataTypes())
-        
+
         let removableRecords = allRecords.filter { record in
             // For Local Storage, only remove records that *exactly match* the display name.
             // Subdomains or root domains should be excluded.
             !fireproofDomains.fireproofDomains.contains(record.displayName)
         }
-        
+
         await websiteDataStore.removeData(ofTypes: WKWebsiteDataStore.allWebsiteDataTypesExceptCookies, for: removableRecords)
     }
 
@@ -117,8 +117,8 @@ internal class WebCacheManager {
             cookies = cookies.filter { cookie in
                 domains.contains {
                     $0 == cookie.domain
-                    || ".\($0)" == cookie.domain
-                    || (cookie.domain.hasPrefix(".") && $0.hasSuffix(cookie.domain))
+                        || ".\($0)" == cookie.domain
+                        || (cookie.domain.hasPrefix(".") && $0.hasSuffix(cookie.domain))
                 }
             }
         }
@@ -133,7 +133,7 @@ internal class WebCacheManager {
             await cookieStore.deleteCookie(cookie)
         }
     }
-    
+
     // WKWebView doesn't provide a way to remove the observations database, which contains domains that have been
     // visited by the user. This database is removed directly as a part of the Fire button process.
     private func removeResourceLoadStatisticsDatabase() async {
@@ -143,29 +143,44 @@ internal class WebCacheManager {
         }
 
         libraryURL.appendPathComponent("WebKit/\(bundleID)/WebsiteData/ResourceLoadStatistics")
-        
+
         let contentsOfDirectory = (try? FileManager.default.contentsOfDirectory(at: libraryURL, includingPropertiesForKeys: [.nameKey])) ?? []
         let fileNames = contentsOfDirectory.compactMap(\.suggestedFilename)
-        
+
         guard fileNames.contains("observations.db") else {
             return
         }
 
         // We've confirmed that the observations.db exists, now it can be cleaned out. We can't delete it entirely, as
         // WebKit won't recreate it until next app launch.
-        
+
         let databasePath = libraryURL.appendingPathComponent("observations.db")
 
         guard let pool = try? DatabasePool(path: databasePath.absoluteString) else {
             return
         }
-        
-        try? pool.write { database in
-            let tables = try String.fetchAll(database, sql: "SELECT name FROM sqlite_master WHERE type='table'")
-            
-            for table in tables {
-                try database.execute(sql: "DELETE FROM \(table)")
+
+        removeObservationsData(from: pool)
+        try? pool.vacuum()
+
+        // For an unknown reason, domains may be still present in the database binary when running `strings` over it, despite SQL queries returning an
+        // empty array, and despite vacuuming the database. Delete again to be safe.
+        removeObservationsData(from: pool)
+    }
+
+    private func removeObservationsData(from pool: DatabasePool) {
+        do {
+            try pool.write { database in
+                try database.execute(sql: "PRAGMA wal_checkpoint(TRUNCATE);")
+
+                let tables = try String.fetchAll(database, sql: "SELECT name FROM sqlite_master WHERE type='table'")
+
+                for table in tables {
+                    try database.execute(sql: "DELETE FROM \(table)")
+                }
             }
+        } catch {
+            os_log("Failed to clear observations database: %s", log: .fire, error.localizedDescription)
         }
     }
 

@@ -156,6 +156,10 @@ struct UserText {
     static let passwordManagementIdentities = NSLocalizedString("passsword.management.identities", value: "Identities", comment: "Used as title for the Autofill Identities option")
     static let passwordManagementCreditCards = NSLocalizedString("passsword.management.credit-cards", value: "Credit Cards", comment: "Used as title for the Autofill Credit Cards option")
     static let passwordManagementNotes = NSLocalizedString("passsword.management.notes", value: "Notes", comment: "Used as title for the Autofill Notes option")
+    static let passwordManagementLock = NSLocalizedString("passsword.management.lock", value: "Lock", comment: "Lock Logins Vault menu")
+    static let passwordManagementUnlock = NSLocalizedString("passsword.management.unlock", value: "Unlock", comment: "Unlock Logins Vault menu")
+
+    static let importBrowserData = NSLocalizedString("import.browser.data", value: "Import Bookmarks and Passwords…", comment: "Opens Import Browser Data dialog")
 
     static let bookmarks = NSLocalizedString("bookmarks", value: "Bookmarks", comment: "Button for bookmarks")
     static let bookmarksOpenInNewTabs = NSLocalizedString("bookmarks.open.in.new.tabs", value: "Open in New Tabs", comment: "Open all bookmarks in folder in new tabs")
@@ -236,7 +240,7 @@ struct UserText {
     static let theme = NSLocalizedString("preferences.appearance.theme", value: "Theme", comment: "Theme preferences")
     static let addressBar = NSLocalizedString("preferences.appearance.address-bar", value: "Address Bar", comment: "Theme preferences")
     static let showFullWebsiteAddress = NSLocalizedString("preferences.appearance.show-full-url", value: "Show full website address", comment: "Option to show full URL in the address bar")
-    static let autofill = NSLocalizedString("preferences.logins-plus", value: "Autofill", comment: "Show Autofill preferences")
+    static let autofill = NSLocalizedString("preferences.autofill", value: "Autofill", comment: "Show Autofill preferences")
     
     static let aboutDuckDuckGo = NSLocalizedString("preferences.about.about-duckduckgo", value: "About DuckDuckGo", comment: "About screen")
     static let privacySimplified = NSLocalizedString("preferences.about.privacy-simplified", value: "Privacy, simplified", comment: "About screen")
@@ -272,6 +276,10 @@ struct UserText {
 
     static let csvImportDescription = NSLocalizedString("import.logins.csv.description", value: "The CSV importer will try to match column headers to their position.\nIf there is no header, it supports two formats:\n\n1. URL, Username, Password\n2. Title, URL, Username, Password", comment: "Description text for the CSV importer")
     static let importLoginsSelectCSVFile = NSLocalizedString("import.logins.select-csv-file", value: "Select CSV File…", comment: "Button text for selecting a CSV file")
+    static let importLoginsSelectSafariCSVFile = NSLocalizedString("import.logins.select-safari-csv-file", value: "Select Passwords CSV File…", comment: "Button text for selecting a Safari CSV file")
+    static let importLoginsSelect1PasswordCSVFile = NSLocalizedString("import.logins.select-1password-csv-file", value: "Select 1Password CSV File…", comment: "Button text for selecting a 1Password CSV file")
+    static let importLoginsSelectLastPassCSVFile = NSLocalizedString("import.logins.select-lastpass-csv-file", value: "Select LastPass CSV File…", comment: "Button text for selecting a LastPass CSV file")
+
     static let importLoginsSelectAnotherFile = NSLocalizedString("import.logins.select-another-file", value: "Select Another CSV File…", comment: "Button text for selecting another file")
     static let importLoginsFailedToReadCSVFile = NSLocalizedString("import.logins.failed-to-read-file", value: "Failed to get CSV file URL", comment: "Error text when importing a CSV file")
 
@@ -421,6 +429,7 @@ struct UserText {
 
     static let exportLoginsFileNameSuffix = NSLocalizedString("export.logins.file.name.suffix", value: "Logins", comment: "The last part of the suggested file name for exporting logins")
     static let exportBookmarksFileNameSuffix = NSLocalizedString("export.bookmarks.file.name.suffix", value: "Bookmarks", comment: "The last part of the suggested file for exporting bookmarks")
+    static let exportLoginsWarning = NSLocalizedString("export.logins.warning", value: "This file contains your passwords in plain text and should be saved in a secure location and deleted when you are done.\nAnyone with access to this file will be able to read your passwords.", comment: "Warning text presented when exporting logins.")
 
     static let onboardingWelcomeTitle = NSLocalizedString("onboarding.welcome.title", value: "Welcome to DuckDuckGo!", comment: "General welcome to the app title")
     static let onboardingWelcomeText = NSLocalizedString("onboarding.welcome.text", value: "Tired of being tracked online? You've come to the right place 👍\n\nI'll help you stay private️ as you search and browse the web. Trackers be gone!", comment: "Detailed welcome to the app text")

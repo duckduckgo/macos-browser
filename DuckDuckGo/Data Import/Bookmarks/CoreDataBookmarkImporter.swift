@@ -26,9 +26,8 @@ final class CoreDataBookmarkImporter: BookmarkImporter {
         self.bookmarkManager = bookmarkManager
     }
 
-    func importBookmarks(_ bookmarks: ImportedBookmarks, source: BookmarkImportSource) throws -> DataImport.Summary {
-        let result = bookmarkManager.importBookmarks(bookmarks, source: source)
-        return .bookmarks(result: result)
+    func importBookmarks(_ bookmarks: ImportedBookmarks, source: BookmarkImportSource) throws -> BookmarkImportResult {
+        return bookmarkManager.importBookmarks(bookmarks, source: source)
     }
 
 }

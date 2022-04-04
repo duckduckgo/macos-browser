@@ -31,6 +31,24 @@ extension NSView {
         subView.widthAnchor.constraint(equalTo: widthAnchor).isActive = true
     }
 
+    func wrappedInContainer(padding: CGFloat = 0) -> NSView {
+        return wrappedInContainer(padding: NSEdgeInsets(top: padding, left: padding, bottom: padding, right: padding))
+    }
+
+    func wrappedInContainer(padding: NSEdgeInsets = NSEdgeInsets()) -> NSView {
+        self.translatesAutoresizingMaskIntoConstraints = false
+
+        let containerView = NSView(frame: self.frame)
+        containerView.addSubview(self)
+
+        self.topAnchor.constraint(equalTo: containerView.topAnchor, constant: padding.top).isActive = true
+        self.leftAnchor.constraint(equalTo: containerView.leftAnchor, constant: padding.left).isActive = true
+        self.rightAnchor.constraint(equalTo: containerView.rightAnchor, constant: -padding.right).isActive = true
+        self.bottomAnchor.constraint(equalTo: containerView.bottomAnchor, constant: -padding.bottom).isActive = true
+
+        return containerView
+    }
+
     func makeMeFirstResponder() {
         guard let window = window else {
             os_log("%s: Window not available", type: .error, className)
