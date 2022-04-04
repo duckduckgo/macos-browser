@@ -37,7 +37,50 @@ struct WebsiteBreakage {
     let tdsETag: String?
     let blockedTrackerDomains: [String]
     let installedSurrogates: [String]
+    let isGPCEnabled: Bool
     let ampURL: String
     let urlParametersRemoved: Bool
+    let manufacturer: String
 
+    init(
+        category: Category?,
+        siteUrlString: String,
+        osVersion: String,
+        upgradedHttps: Bool,
+        tdsETag: String?,
+        blockedTrackerDomains: [String],
+        installedSurrogates: [String],
+        isGPCEnabled: Bool,
+        ampURL: String,
+        urlParametersRemoved: Bool,
+        manufacturer: String = "Apple"
+    ) {
+        self.category = category
+        self.siteUrlString = siteUrlString
+        self.osVersion = osVersion
+        self.upgradedHttps = upgradedHttps
+        self.tdsETag = tdsETag
+        self.blockedTrackerDomains = blockedTrackerDomains
+        self.installedSurrogates = installedSurrogates
+        self.isGPCEnabled = isGPCEnabled
+        self.ampURL = ampURL
+        self.urlParametersRemoved = urlParametersRemoved
+        self.manufacturer = manufacturer
+    }
+
+    var requestParameters: [String: String] {
+        [
+            "category": category?.rawValue ?? "",
+            "siteUrl": siteUrlString,
+            "upgradedHttps": upgradedHttps ? "true" : "false",
+            "tds": tdsETag?.trimmingCharacters(in: CharacterSet(charactersIn: "\"")) ?? "",
+            "blockedTrackers": blockedTrackerDomains.joined(separator: ","),
+            "surrogates": installedSurrogates.joined(separator: ","),
+            "gpc": isGPCEnabled ? "true" : "false",
+            "ampUrl": ampURL,
+            "urlParametersRemoved": urlParametersRemoved ? "true" : "false",
+            "os": osVersion,
+            "manufacturer": manufacturer
+        ]
+    }
 }

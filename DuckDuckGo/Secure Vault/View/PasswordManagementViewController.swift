@@ -158,7 +158,7 @@ final class PasswordManagementViewController: NSViewController {
         NotificationCenter.default.addObserver(forName: .deviceBecameLocked, object: nil, queue: .main) { [weak self] _ in
             self?.displayLockScreen()
         }
-        
+
         NotificationCenter.default.addObserver(forName: .dataImportComplete, object: nil, queue: .main) { [weak self] _ in
             self?.refreshData()
         }
@@ -609,7 +609,7 @@ final class PasswordManagementViewController: NSViewController {
 
         }
     }
-    
+
     private func refreshData() {
         self.itemModel?.clearSecureVaultModel()
         self.refetchWithText(self.searchField.stringValue)

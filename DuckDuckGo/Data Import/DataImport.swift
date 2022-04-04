@@ -102,8 +102,8 @@ enum DataImport {
                 let potentialProfiles = profileURLs.map(BrowserProfile.from(profileURL:))
                 let filteredProfiles =  potentialProfiles.filter {
                     $0.hasNonDefaultProfileName ||
-                    $0.profileName == "Default" ||
-                    $0.profileName.hasPrefix("Profile ")
+                        $0.profileName == "Default" ||
+                        $0.profileName.hasPrefix("Profile ")
                 }
 
                 let sortedProfiles = filteredProfiles.sorted()
@@ -145,7 +145,7 @@ enum DataImport {
         var profileName: String {
             return detectedChromePreferencesProfileName ?? fallbackProfileName
         }
-        
+
         var hasNonDefaultProfileName: Bool {
             return detectedChromePreferencesProfileName != nil
         }
@@ -153,7 +153,7 @@ enum DataImport {
         private let fileStore: FileStore
         private let fallbackProfileName: String
         private let detectedChromePreferencesProfileName: String?
-        
+
         static func from(profileURL: URL) -> BrowserProfile {
             return BrowserProfile(profileURL: profileURL)
         }
@@ -180,29 +180,29 @@ enum DataImport {
         private static func getDefaultProfileName(at profileURL: URL) -> String {
             return profileURL.lastPathComponent.components(separatedBy: ".").last ?? profileURL.lastPathComponent
         }
-        
+
         private static func getChromeProfileName(at profileURL: URL, fileStore: FileStore) -> String? {
             guard let profileDirectoryContents = try? fileStore.directoryContents(at: profileURL.path) else {
                 return nil
             }
-            
+
             guard profileURL.lastPathComponent != Constants.chromiumSystemProfileName else {
                 return nil
             }
-            
+
             if profileDirectoryContents.contains(Constants.chromiumPreferencesFileName),
                let chromePreferenceData = fileStore.loadData(at: profileURL.appendingPathComponent(Constants.chromiumPreferencesFileName)),
                let chromePreferences = try? JSONDecoder().decode(ChromePreferences.self, from: chromePreferenceData) {
                 return chromePreferences.profile.name
             }
-            
+
             return nil
         }
 
         static func < (lhs: DataImport.BrowserProfile, rhs: DataImport.BrowserProfile) -> Bool {
             return lhs.profileName.localizedCompare(rhs.profileName) == .orderedAscending
         }
-        
+
         static func == (lhs: DataImport.BrowserProfile, rhs: DataImport.BrowserProfile) -> Bool {
             return lhs.profileURL == rhs.profileURL
         }

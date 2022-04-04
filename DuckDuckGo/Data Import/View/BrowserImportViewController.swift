@@ -120,7 +120,7 @@ final class BrowserImportViewController: NSViewController {
         // Toggle the browser warning bar:
         self.closeBrowserWarningLabel.stringValue = UserText.closeBrowserWarningFor(browser: browser.importSourceName)
         hideOpenBrowserWarningIfNecessary()
-        
+
         switch browser {
         case .safari:
             bookmarksCheckbox.title = UserText.bookmarkImportBookmarksAndFavorites

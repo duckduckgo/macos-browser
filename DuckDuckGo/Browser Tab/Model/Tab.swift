@@ -383,7 +383,7 @@ final class Tab: NSObject {
             }
         }
     }
-    
+
     @MainActor
     private var contentURL: URL {
         switch content {
@@ -399,8 +399,8 @@ final class Tab: NSObject {
     @MainActor
     private func shouldLoadURL(_ url: URL, shouldLoadInBackground: Bool = false) -> Bool {
         return (webView.superview != nil || shouldLoadInBackground)
-        && webView.url != url
-        && webView.url != content.url // Initial Home Page shouldn't show Back Button
+            && webView.url != url
+            && webView.url != content.url // Initial Home Page shouldn't show Back Button
     }
 
     @MainActor
@@ -849,13 +849,13 @@ extension Tab: WKNavigationDelegate {
                                             onStartExtracting: { if !isRequestingNewTab { isAMPProtectionExtracting = true }},
                                             onFinishExtracting: { [weak self] in self?.isAMPProtectionExtracting = false },
                                             onLinkRewrite: { [weak self] url, _ in
-                    guard let self = self else { return }
-                    if isRequestingNewTab {
-                        self.delegate?.tab(self, requestedNewTabWith: .url(url), selected: NSApp.isShiftPressed)
-                    } else {
-                        webView.load(url)
-                    }
-                })
+                                                guard let self = self else { return }
+                                                if isRequestingNewTab {
+                                                    self.delegate?.tab(self, requestedNewTabWith: .url(url), selected: NSApp.isShiftPressed)
+                                                } else {
+                                                    webView.load(url)
+                                                }
+                                            })
             if let navigationActionPolicy = navigationActionPolicy, navigationActionPolicy == .cancel {
                 return navigationActionPolicy
             }

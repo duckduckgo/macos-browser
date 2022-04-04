@@ -285,6 +285,7 @@ final class FeedbackViewController: NSViewController {
                                                   tdsETag: ContentBlocking.shared.contentBlockingManager.currentRules.first?.etag,
                                                   blockedTrackerDomains: blockedTrackerDomains,
                                                   installedSurrogates: installedSurrogates,
+                                                  isGPCEnabled: PrivacySecurityPreferences.shared.gpcEnabled,
                                                   ampURL: ampURL,
                                                   urlParametersRemoved: urlParametersRemoved)
             websiteBreakageSender.sendWebsiteBreakage(websiteBreakage)
