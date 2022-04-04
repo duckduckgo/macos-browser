@@ -51,8 +51,8 @@ final class CSVImportSummaryViewController: NSViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
 
-        if case let .logins(successful, _, _) = summary {
-            successfulImportsLabel.stringValue = UserText.loginImportSuccessfulCSVImports(totalSuccessfulImports: successful.count)
+        if case .completed(let result) = summary?.loginsResult {
+            successfulImportsLabel.stringValue = UserText.loginImportSuccessfulCSVImports(totalSuccessfulImports: result.successfulImports.count)
         } else {
             successfulImportsLabel.isHidden = true
         }

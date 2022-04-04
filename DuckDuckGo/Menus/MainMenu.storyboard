@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<document type="com.apple.InterfaceBuilder3.Cocoa.Storyboard.XIB" version="3.0" toolsVersion="19529" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES">
+<document type="com.apple.InterfaceBuilder3.Cocoa.Storyboard.XIB" version="3.0" toolsVersion="20037" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES">
     <dependencies>
         <deployment identifier="macosx"/>
-        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="19529"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="20037"/>
     </dependencies>
     <scenes>
         <!--Application-->
@@ -26,9 +26,9 @@
                                             </connections>
                                         </menuItem>
                                         <menuItem isSeparatorItem="YES" id="VOq-y0-SEH"/>
-                                        <menuItem title="Preferences…" keyEquivalent="," id="BOF-NM-1cW">
+                                        <menuItem title="Preferences…" keyEquivalent="," id="yD7-Ol-cRF">
                                             <connections>
-                                                <action selector="openPreferences:" target="Ady-hI-5gd" id="hyM-Fd-dVF"/>
+                                                <action selector="openPreferences:" target="Ady-hI-5gd" id="iF9-8m-hce"/>
                                             </connections>
                                         </menuItem>
                                         <menuItem isSeparatorItem="YES" id="t1R-yn-9NQ"/>
@@ -122,7 +122,7 @@ CA
                                             </connections>
                                         </menuItem>
                                         <menuItem isSeparatorItem="YES" id="u7E-4A-OQP"/>
-                                        <menuItem title="Import Browser Data..." id="gTV-od-6G5">
+                                        <menuItem title="Import Bookmarks and Passwords..." id="gTV-od-6G5">
                                             <modifierMask key="keyEquivalentModifierMask"/>
                                             <connections>
                                                 <action selector="openImportBrowserDataWindow:" target="Ady-hI-5gd" id="UU7-vO-0ol"/>
@@ -484,7 +484,7 @@ CA
                                             </connections>
                                         </menuItem>
                                         <menuItem isSeparatorItem="YES" id="aPG-H0-BrG"/>
-                                        <menuItem title="Import Bookmarks..." id="tNX-Bv-yM3" userLabel="Import Bookmarks...">
+                                        <menuItem title="Import Bookmarks and Passwords..." id="tNX-Bv-yM3" userLabel="Import Bookmarks...">
                                             <modifierMask key="keyEquivalentModifierMask"/>
                                             <connections>
                                                 <action selector="openImportBrowserDataWindow:" target="Ady-hI-5gd" id="NdE-Lt-CL5"/>
@@ -736,7 +736,7 @@ CQ
                             <outlet property="newTabMenuItem" destination="9qI-62-tsd" id="6SI-rG-P34"/>
                             <outlet property="newWindowMenuItem" destination="Was-JA-tGl" id="uyQ-qR-DFk"/>
                             <outlet property="openLocationMenuItem" destination="xnU-dQ-JR1" id="DYS-Dt-ydU"/>
-                            <outlet property="preferencesMenuItem" destination="BOF-NM-1cW" id="wju-ps-laD"/>
+                            <outlet property="preferencesMenuItem" destination="yD7-Ol-cRF" id="f58-zA-Auu"/>
                             <outlet property="printMenuItem" destination="uFk-FD-FTB" id="mOP-Xp-myS"/>
                             <outlet property="printSeparatorItem" destination="anH-0y-7dE" id="E6b-rl-clQ"/>
                             <outlet property="reloadMenuItem" destination="aKZ-VG-MOp" id="J3D-X3-Xg3"/>

@@ -301,6 +301,25 @@ final class PermissionModelTests: XCTestCase {
         XCTAssertEqual(model.permissions, [:])
     }
 
+    func testWhenExternalSchemePermissionQueryIsResetThenItDoesNotTriggerDecisionHandler() {
+        let c = model.$authorizationQuery.sink {
+            if $0 != nil {
+                self.model!.tabDidStartNavigation()
+            }
+        }
+
+        let e = expectation(description: "Permission granted")
+        e.isInverted = true
+        model.permissions([.externalScheme(scheme: "mailto")], requestedForDomain: "test@example.com") { _ in
+            e.fulfill()
+        }
+
+        withExtendedLifetime(c) {
+            waitForExpectations(timeout: 0.1)
+        }
+        XCTAssertEqual(model.permissions, [:])
+    }
+
     func testWhenAllowPermissionIsPersistedThenPermissionQueryIsGranted() {
         let e = expectation(description: "Permission granted")
         self.webView.urlValue = URL.duckDuckGo

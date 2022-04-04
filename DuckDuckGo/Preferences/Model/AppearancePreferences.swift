@@ -1,7 +1,7 @@
 //
 //  AppearancePreferences.swift
 //
-//  Copyright © 2021 DuckDuckGo. All rights reserved.
+//  Copyright © 2022 DuckDuckGo. All rights reserved.
 //
 //  Licensed under the Apache License, Version 2.0 (the "License");
 //  you may not use this file except in compliance with the License.
@@ -18,68 +18,84 @@
 
 import Foundation
 
-enum ThemeName: String {
-    case systemDefault
+protocol AppearancePreferencesPersistor {
+    var showFullURL: Bool { get set }
+    var currentThemeName: String { get set }
+}
+
+struct AppearancePreferencesUserDefaultsPersistor: AppearancePreferencesPersistor {
+    @UserDefaultsWrapper(key: .showFullURL, defaultValue: false)
+    var showFullURL: Bool
+
+    @UserDefaultsWrapper(key: .currentThemeName, defaultValue: ThemeName.systemDefault.rawValue)
+    var currentThemeName: String
+}
+
+enum ThemeName: String, Equatable, CaseIterable {
     case light
     case dark
+    case systemDefault
 
     var appearance: NSAppearance? {
         switch self {
-        case .dark:
-            return NSAppearance(named: .darkAqua)
         case .light:
             return NSAppearance(named: .aqua)
+        case .dark:
+            return NSAppearance(named: .darkAqua)
         default:
             return nil
         }
     }
+
+    var displayName: String {
+        switch self {
+        case .light:
+            return "Light"
+        case .dark:
+            return "Dark"
+        case .systemDefault:
+            return "System"
+        }
+    }
+
+    var imageName: String {
+        switch self {
+        case .light:
+            return "LightModePreview"
+        case .dark:
+            return "DarkModePreview"
+        case .systemDefault:
+            return "SystemDefaultPreview"
+        }
+    }
 }
 
-struct AppearancePreferences {
+final class AppearancePreferences: ObservableObject {
 
-    private struct Keys {
-        static let currentThemeNameKey = "com.duckduckgo.macos.currentThemeNameKey"
-    }
+    static let shared = AppearancePreferences()
 
-    var currentThemeName: ThemeName {
-
-        get {
-            var currentThemeName: ThemeName?
-
-            if let stringName = userDefaults.string(forKey: Keys.currentThemeNameKey) {
-                currentThemeName = ThemeName(rawValue: stringName)
-            }
-
-            return currentThemeName ?? .systemDefault
-        }
-
-        set {
-            userDefaults.setValue(newValue.rawValue, forKey: Keys.currentThemeNameKey)
+    @Published var currentThemeName: ThemeName {
+        didSet {
+            persistor.currentThemeName = currentThemeName.rawValue
             updateUserInterfaceStyle()
         }
-
     }
 
-    private let userDefaults: UserDefaults
-
-    init(userDefaults: UserDefaults = .standard) {
-        self.userDefaults = userDefaults
+    @Published var showFullURL: Bool {
+        didSet {
+            persistor.showFullURL = showFullURL
+        }
     }
 
     func updateUserInterfaceStyle() {
         NSApp.appearance = currentThemeName.appearance
     }
 
-}
-
-extension AppearancePreferences: PreferenceSection {
-
-    var displayName: String {
-        return UserText.appearance
+    init(persistor: AppearancePreferencesPersistor = AppearancePreferencesUserDefaultsPersistor()) {
+        self.persistor = persistor
+        currentThemeName = .init(rawValue: persistor.currentThemeName) ?? .systemDefault
+        showFullURL = persistor.showFullURL
     }
 
-    var preferenceIcon: NSImage {
-        return NSImage(named: "Appearance")!
-    }
-
+    private var persistor: AppearancePreferencesPersistor
 }

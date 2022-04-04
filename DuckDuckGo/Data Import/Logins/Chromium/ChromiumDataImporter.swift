@@ -40,8 +40,8 @@ internal class ChromiumDataImporter: DataImporter {
 
     func importData(types: [DataImport.DataType],
                     from profile: DataImport.BrowserProfile?,
-                    completion: @escaping (Result<[DataImport.Summary], DataImportError>) -> Void) {
-        var summaries = [DataImport.Summary]()
+                    completion: @escaping (Result<DataImport.Summary, DataImportError>) -> Void) {
+        var summary = DataImport.Summary()
         let dataDirectoryPath = profile?.profileURL.path ?? applicationDataDirectoryPath
 
         if types.contains(.logins) {
@@ -51,8 +51,7 @@ internal class ChromiumDataImporter: DataImporter {
             switch loginResult {
             case .success(let logins):
                 do {
-                    let summary = try loginImporter.importLogins(logins)
-                    summaries.append(summary)
+                    summary.loginsResult = .completed(try loginImporter.importLogins(logins))
                 } catch {
                     completion(.failure(.cannotAccessSecureVault))
                     return
@@ -70,8 +69,7 @@ internal class ChromiumDataImporter: DataImporter {
             switch bookmarkResult {
             case .success(let bookmarks):
                 do {
-                    let summary = try bookmarkImporter.importBookmarks(bookmarks, source: .chromium)
-                    summaries.append(summary)
+                    summary.bookmarksResult = try bookmarkImporter.importBookmarks(bookmarks, source: .chromium)
                 } catch {
                     completion(.failure(.cannotAccessSecureVault))
                     return
@@ -81,8 +79,8 @@ internal class ChromiumDataImporter: DataImporter {
                 case .noBookmarksFileFound:
                     // If there are no bookmarks, treat it as a successful import of zero bookmarks.
                     let result = BookmarkImportResult.init(successful: 0, duplicates: 0, failed: 0)
-                    let summary = DataImport.Summary.bookmarks(result: result)
-                    summaries.append(summary)
+                    summary.bookmarksResult = result
+
                 case .bookmarksFileDecodingFailed:
                     completion(.failure(.cannotReadFile))
                     return
@@ -90,7 +88,7 @@ internal class ChromiumDataImporter: DataImporter {
             }
         }
 
-        completion(.success(summaries))
+        completion(.success(summary))
     }
 
 }
