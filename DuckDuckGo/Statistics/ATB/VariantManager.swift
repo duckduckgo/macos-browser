@@ -134,7 +134,7 @@ final class Arc4RandomUniformVariantRNG: VariantRNG {
     init() { }
     
     func nextInt(upperBound: Int) -> Int {
-        return Int(arc4random_uniform(UInt32(upperBound)))
+        return .random(in: 0..<upperBound)
     }
     
 }
