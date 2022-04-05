@@ -26,6 +26,7 @@
 		3776582F27F82E62009A6B35 /* AutofillPreferences.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3776582E27F82E62009A6B35 /* AutofillPreferences.swift */; };
 		3776583127F8325B009A6B35 /* AutofillPreferencesTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3776583027F8325B009A6B35 /* AutofillPreferencesTests.swift */; };
 		379DE4BD27EA31AC002CC3DE /* PreferencesAutofillView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 379DE4BC27EA31AC002CC3DE /* PreferencesAutofillView.swift */; };
+		37A803D927FC68F900052F4C /* Login Data For Account in Resources */ = {isa = PBXBuildFile; fileRef = 37A803D827FC68F400052F4C /* Login Data For Account */; };
 		37AFCE8127DA2CA600471A10 /* PreferencesViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37AFCE8027DA2CA600471A10 /* PreferencesViewController.swift */; };
 		37AFCE8527DA2D3900471A10 /* PreferencesSidebar.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37AFCE8427DA2D3900471A10 /* PreferencesSidebar.swift */; };
 		37AFCE8727DA334800471A10 /* PreferencesRootView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37AFCE8627DA334800471A10 /* PreferencesRootView.swift */; };
@@ -771,6 +772,7 @@
 		3776582E27F82E62009A6B35 /* AutofillPreferences.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AutofillPreferences.swift; sourceTree = "<group>"; };
 		3776583027F8325B009A6B35 /* AutofillPreferencesTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AutofillPreferencesTests.swift; sourceTree = "<group>"; };
 		379DE4BC27EA31AC002CC3DE /* PreferencesAutofillView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PreferencesAutofillView.swift; sourceTree = "<group>"; };
+		37A803D827FC68F400052F4C /* Login Data For Account */ = {isa = PBXFileReference; lastKnownFileType = file; path = "Login Data For Account"; sourceTree = "<group>"; };
 		37AFCE8027DA2CA600471A10 /* PreferencesViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PreferencesViewController.swift; sourceTree = "<group>"; };
 		37AFCE8427DA2D3900471A10 /* PreferencesSidebar.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PreferencesSidebar.swift; sourceTree = "<group>"; };
 		37AFCE8627DA334800471A10 /* PreferencesRootView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PreferencesRootView.swift; sourceTree = "<group>"; };
@@ -2005,6 +2007,7 @@
 			children = (
 				4BB99D0A26FE1A7B001E4761 /* Bookmarks */,
 				4B59024926B38B0B00489384 /* Login Data */,
+				37A803D827FC68F400052F4C /* Login Data For Account */,
 			);
 			path = "Test Chrome Data";
 			sourceTree = "<group>";
@@ -4039,6 +4042,7 @@
 				4B8AC94126B49BEE00879451 /* key4.db in Resources */,
 				B67C6C422654BF49006C872E /* DuckDuckGo-Symbol.jpg in Resources */,
 				B69B50552726CD8100758A2B /* invalid.json in Resources */,
+				37A803D927FC68F900052F4C /* Login Data For Account in Resources */,
 				4B8AC94026B49BEE00879451 /* logins.json in Resources */,
 				4B59024A26B38B0B00489384 /* Login Data in Resources */,
 				4BB46EA226B8954500222970 /* logins-encrypted.json in Resources */,
