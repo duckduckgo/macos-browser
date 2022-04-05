@@ -22,6 +22,7 @@ import os
 import Combine
 import BrowserServicesKit
 import TrackerRadarKit
+import PhishCore
 
 protocol TabDelegate: FileDownloadManagerDelegate, ContentOverlayUserScriptDelegate {
     func tabWillStartNavigation(_ tab: Tab, isUserInitiated: Bool)
@@ -836,6 +837,17 @@ extension Tab: WKNavigationDelegate {
             return .cancel
         } else if isLinkActivated && NSApp.isOptionPressed && !NSApp.isCommandPressed {
             return .download(navigationAction, using: webView)
+        }
+        
+        if let url = navigationAction.request.url {
+            let me = RustRes(url.absoluteString)
+            print("Phishing check: \(me.name)")
+            if me.name != "ok" {
+                // TODO route to an internal resource
+                let phishUrl = "https://screenrant.com/wp-content/uploads/2018/01/Admiral-Ackbar-in-Star-Wars.jpg"
+                webView.load(URL.init(string: phishUrl)!)
+                return .cancel
+            }
         }
 
         guard let url = navigationAction.request.url, url.scheme != nil else {
