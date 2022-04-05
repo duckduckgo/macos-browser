@@ -1323,7 +1323,7 @@
     		name: "mediamarkt-de",
     		prehideSelectors: [
     			"div[aria-labelledby^=pwa-consent-layer-title]",
-    			"div[class^=StyledConsentLayerWrapper"
+    			"div[class^=StyledConsentLayerWrapper]"
     		],
     		detectCmp: [
     			{
@@ -1524,12 +1524,12 @@
     		isHidingRule: true,
     		detectCmp: [
     			{
-    				exists: "#onetrust-banner-sdk,.optanon-alert-box-wrapper,#onetrust-pc-sdk"
+    				exists: "#onetrust-banner-sdk,.optanon-alert-box-wrapper"
     			}
     		],
     		detectPopup: [
     			{
-    				visible: "#onetrust-banner-sdk,.optanon-alert-box-wrapper,#onetrust-pc-sdk"
+    				visible: "#onetrust-banner-sdk,.optanon-alert-box-wrapper"
     			}
     		],
     		optOut: [
