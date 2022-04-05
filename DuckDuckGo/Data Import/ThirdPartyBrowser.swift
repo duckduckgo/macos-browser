@@ -89,7 +89,11 @@ enum ThirdPartyBrowser: CaseIterable {
 
     var applicationIcon: NSImage? {
         guard let applicationPath = applicationPath else {
-            return nil
+            switch self {
+            case .lastPass: return NSImage(named: "LastPassIcon")
+            case .onePassword: return NSImage(named: "1PasswordIcon")
+            default: return nil
+            }
         }
 
         return NSWorkspace.shared.icon(forFile: applicationPath)
