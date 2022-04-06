@@ -26,6 +26,7 @@
 		3776582F27F82E62009A6B35 /* AutofillPreferences.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3776582E27F82E62009A6B35 /* AutofillPreferences.swift */; };
 		3776583127F8325B009A6B35 /* AutofillPreferencesTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3776583027F8325B009A6B35 /* AutofillPreferencesTests.swift */; };
 		379DE4BD27EA31AC002CC3DE /* PreferencesAutofillView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 379DE4BC27EA31AC002CC3DE /* PreferencesAutofillView.swift */; };
+		37A803DB27FD69D300052F4C /* Data Import Resources in Resources */ = {isa = PBXBuildFile; fileRef = 37A803DA27FD69D300052F4C /* Data Import Resources */; };
 		37AFCE8127DA2CA600471A10 /* PreferencesViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37AFCE8027DA2CA600471A10 /* PreferencesViewController.swift */; };
 		37AFCE8527DA2D3900471A10 /* PreferencesSidebar.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37AFCE8427DA2D3900471A10 /* PreferencesSidebar.swift */; };
 		37AFCE8727DA334800471A10 /* PreferencesRootView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37AFCE8627DA334800471A10 /* PreferencesRootView.swift */; };
@@ -91,7 +92,6 @@
 		4B59024126B35F3600489384 /* BraveDataImporter.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B59023C26B35F3600489384 /* BraveDataImporter.swift */; };
 		4B59024326B35F7C00489384 /* BrowserImportViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B59024226B35F7C00489384 /* BrowserImportViewController.swift */; };
 		4B59024826B3673600489384 /* ThirdPartyBrowser.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B59024726B3673600489384 /* ThirdPartyBrowser.swift */; };
-		4B59024A26B38B0B00489384 /* Login Data in Resources */ = {isa = PBXBuildFile; fileRef = 4B59024926B38B0B00489384 /* Login Data */; };
 		4B59024C26B38BB800489384 /* ChromiumLoginReaderTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B59024B26B38BB800489384 /* ChromiumLoginReaderTests.swift */; };
 		4B5A4F4C27F3A5AA008FBD88 /* NSNotificationName+DataImport.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B5A4F4B27F3A5AA008FBD88 /* NSNotificationName+DataImport.swift */; };
 		4B5FF67826B602B100D42879 /* FirefoxDataImporter.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B5FF67726B602B100D42879 /* FirefoxDataImporter.swift */; };
@@ -132,8 +132,6 @@
 		4B8AC93926B48A5100879451 /* FirefoxLoginReader.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B8AC93826B48A5100879451 /* FirefoxLoginReader.swift */; };
 		4B8AC93B26B48ADF00879451 /* ASN1Parser.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B8AC93A26B48ADF00879451 /* ASN1Parser.swift */; };
 		4B8AC93D26B49BE600879451 /* FirefoxLoginReaderTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B8AC93C26B49BE600879451 /* FirefoxLoginReaderTests.swift */; };
-		4B8AC94026B49BEE00879451 /* logins.json in Resources */ = {isa = PBXBuildFile; fileRef = 4B8AC93E26B49BEE00879451 /* logins.json */; };
-		4B8AC94126B49BEE00879451 /* key4.db in Resources */ = {isa = PBXBuildFile; fileRef = 4B8AC93F26B49BEE00879451 /* key4.db */; };
 		4B8AD0B127A86D9200AE44D6 /* WKWebsiteDataStoreExtensionTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B8AD0B027A86D9200AE44D6 /* WKWebsiteDataStoreExtensionTests.swift */; };
 		4B8D9062276D1D880078DB17 /* LocaleExtension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B8D9061276D1D880078DB17 /* LocaleExtension.swift */; };
 		4B92928B26670D1700AD2C21 /* BookmarksOutlineView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B92928526670D1600AD2C21 /* BookmarksOutlineView.swift */; };
@@ -192,8 +190,6 @@
 		4BA1A6FE258C5C1300F6F690 /* EncryptedValueTransformerTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4BA1A6FD258C5C1300F6F690 /* EncryptedValueTransformerTests.swift */; };
 		4BA7C91627695EA500FEBA8E /* MacWaitlistRequestTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4BA7C91527695EA500FEBA8E /* MacWaitlistRequestTests.swift */; };
 		4BA7C91B276984AF00FEBA8E /* MacWaitlistLockScreenViewModelTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4BA7C91A276984AF00FEBA8E /* MacWaitlistLockScreenViewModelTests.swift */; };
-		4BB46EA226B8954500222970 /* logins-encrypted.json in Resources */ = {isa = PBXBuildFile; fileRef = 4BB46EA026B8954500222970 /* logins-encrypted.json */; };
-		4BB46EA326B8954500222970 /* key4-encrypted.db in Resources */ = {isa = PBXBuildFile; fileRef = 4BB46EA126B8954500222970 /* key4-encrypted.db */; };
 		4BB6CE5F26B77ED000EC5860 /* Cryptography.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4BB6CE5E26B77ED000EC5860 /* Cryptography.swift */; };
 		4BB88B4525B7B55C006F6B06 /* DebugUserScript.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4BB88B4425B7B55C006F6B06 /* DebugUserScript.swift */; };
 		4BB88B4A25B7B690006F6B06 /* SequenceExtensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4BB88B4925B7B690006F6B06 /* SequenceExtensions.swift */; };
@@ -207,12 +203,9 @@
 		4BB99D0326FE191E001E4761 /* SafariBookmarksReader.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4BB99CFC26FE191E001E4761 /* SafariBookmarksReader.swift */; };
 		4BB99D0426FE191E001E4761 /* SafariDataImporter.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4BB99CFD26FE191E001E4761 /* SafariDataImporter.swift */; };
 		4BB99D0626FE1979001E4761 /* RequestFilePermissionViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4BB99D0526FE1979001E4761 /* RequestFilePermissionViewController.swift */; };
-		4BB99D0926FE1A6D001E4761 /* Bookmarks.plist in Resources */ = {isa = PBXBuildFile; fileRef = 4BB99D0826FE1A6D001E4761 /* Bookmarks.plist */; };
-		4BB99D0B26FE1A7B001E4761 /* Bookmarks in Resources */ = {isa = PBXBuildFile; fileRef = 4BB99D0A26FE1A7B001E4761 /* Bookmarks */; };
 		4BB99D0F26FE1A84001E4761 /* ChromiumBookmarksReaderTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4BB99D0C26FE1A83001E4761 /* ChromiumBookmarksReaderTests.swift */; };
 		4BB99D1026FE1A84001E4761 /* FirefoxBookmarksReaderTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4BB99D0D26FE1A83001E4761 /* FirefoxBookmarksReaderTests.swift */; };
 		4BB99D1126FE1A84001E4761 /* SafariBookmarksReaderTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4BB99D0E26FE1A84001E4761 /* SafariBookmarksReaderTests.swift */; };
-		4BB99D1326FE1A94001E4761 /* places.sqlite in Resources */ = {isa = PBXBuildFile; fileRef = 4BB99D1226FE1A94001E4761 /* places.sqlite */; };
 		4BBC16A027C4859400E00A38 /* DeviceAuthenticationService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4BBC169F27C4859400E00A38 /* DeviceAuthenticationService.swift */; };
 		4BBC16A227C485BC00E00A38 /* DeviceIdleStateDetector.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4BBC16A127C485BC00E00A38 /* DeviceIdleStateDetector.swift */; };
 		4BBC16A527C488C900E00A38 /* DeviceAuthenticatorTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4BBC16A427C488C900E00A38 /* DeviceAuthenticatorTests.swift */; };
@@ -771,6 +764,7 @@
 		3776582E27F82E62009A6B35 /* AutofillPreferences.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AutofillPreferences.swift; sourceTree = "<group>"; };
 		3776583027F8325B009A6B35 /* AutofillPreferencesTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AutofillPreferencesTests.swift; sourceTree = "<group>"; };
 		379DE4BC27EA31AC002CC3DE /* PreferencesAutofillView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PreferencesAutofillView.swift; sourceTree = "<group>"; };
+		37A803DA27FD69D300052F4C /* Data Import Resources */ = {isa = PBXFileReference; lastKnownFileType = folder; path = "Data Import Resources"; sourceTree = "<group>"; };
 		37AFCE8027DA2CA600471A10 /* PreferencesViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PreferencesViewController.swift; sourceTree = "<group>"; };
 		37AFCE8427DA2D3900471A10 /* PreferencesSidebar.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PreferencesSidebar.swift; sourceTree = "<group>"; };
 		37AFCE8627DA334800471A10 /* PreferencesRootView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PreferencesRootView.swift; sourceTree = "<group>"; };
@@ -836,7 +830,6 @@
 		4B59023C26B35F3600489384 /* BraveDataImporter.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = BraveDataImporter.swift; sourceTree = "<group>"; };
 		4B59024226B35F7C00489384 /* BrowserImportViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = BrowserImportViewController.swift; sourceTree = "<group>"; };
 		4B59024726B3673600489384 /* ThirdPartyBrowser.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ThirdPartyBrowser.swift; sourceTree = "<group>"; };
-		4B59024926B38B0B00489384 /* Login Data */ = {isa = PBXFileReference; lastKnownFileType = file; path = "Login Data"; sourceTree = "<group>"; };
 		4B59024B26B38BB800489384 /* ChromiumLoginReaderTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChromiumLoginReaderTests.swift; sourceTree = "<group>"; };
 		4B5A4F4B27F3A5AA008FBD88 /* NSNotificationName+DataImport.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "NSNotificationName+DataImport.swift"; sourceTree = "<group>"; };
 		4B5FF67726B602B100D42879 /* FirefoxDataImporter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FirefoxDataImporter.swift; sourceTree = "<group>"; };
@@ -877,8 +870,6 @@
 		4B8AC93826B48A5100879451 /* FirefoxLoginReader.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FirefoxLoginReader.swift; sourceTree = "<group>"; };
 		4B8AC93A26B48ADF00879451 /* ASN1Parser.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ASN1Parser.swift; sourceTree = "<group>"; };
 		4B8AC93C26B49BE600879451 /* FirefoxLoginReaderTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FirefoxLoginReaderTests.swift; sourceTree = "<group>"; };
-		4B8AC93E26B49BEE00879451 /* logins.json */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.json; path = logins.json; sourceTree = "<group>"; };
-		4B8AC93F26B49BEE00879451 /* key4.db */ = {isa = PBXFileReference; lastKnownFileType = file; path = key4.db; sourceTree = "<group>"; };
 		4B8AD0B027A86D9200AE44D6 /* WKWebsiteDataStoreExtensionTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WKWebsiteDataStoreExtensionTests.swift; sourceTree = "<group>"; };
 		4B8D9061276D1D880078DB17 /* LocaleExtension.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = LocaleExtension.swift; sourceTree = "<group>"; };
 		4B92928526670D1600AD2C21 /* BookmarksOutlineView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = BookmarksOutlineView.swift; sourceTree = "<group>"; };
@@ -939,8 +930,6 @@
 		4BA1A6FD258C5C1300F6F690 /* EncryptedValueTransformerTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EncryptedValueTransformerTests.swift; sourceTree = "<group>"; };
 		4BA7C91527695EA500FEBA8E /* MacWaitlistRequestTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MacWaitlistRequestTests.swift; sourceTree = "<group>"; };
 		4BA7C91A276984AF00FEBA8E /* MacWaitlistLockScreenViewModelTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MacWaitlistLockScreenViewModelTests.swift; sourceTree = "<group>"; };
-		4BB46EA026B8954500222970 /* logins-encrypted.json */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.json; path = "logins-encrypted.json"; sourceTree = "<group>"; };
-		4BB46EA126B8954500222970 /* key4-encrypted.db */ = {isa = PBXFileReference; lastKnownFileType = file; path = "key4-encrypted.db"; sourceTree = "<group>"; };
 		4BB6CE5E26B77ED000EC5860 /* Cryptography.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Cryptography.swift; sourceTree = "<group>"; };
 		4BB88B4425B7B55C006F6B06 /* DebugUserScript.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DebugUserScript.swift; sourceTree = "<group>"; };
 		4BB88B4925B7B690006F6B06 /* SequenceExtensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SequenceExtensions.swift; sourceTree = "<group>"; };
@@ -954,12 +943,9 @@
 		4BB99CFC26FE191E001E4761 /* SafariBookmarksReader.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SafariBookmarksReader.swift; sourceTree = "<group>"; };
 		4BB99CFD26FE191E001E4761 /* SafariDataImporter.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SafariDataImporter.swift; sourceTree = "<group>"; };
 		4BB99D0526FE1979001E4761 /* RequestFilePermissionViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = RequestFilePermissionViewController.swift; sourceTree = "<group>"; };
-		4BB99D0826FE1A6D001E4761 /* Bookmarks.plist */ = {isa = PBXFileReference; lastKnownFileType = file.bplist; path = Bookmarks.plist; sourceTree = "<group>"; };
-		4BB99D0A26FE1A7B001E4761 /* Bookmarks */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = Bookmarks; sourceTree = "<group>"; };
 		4BB99D0C26FE1A83001E4761 /* ChromiumBookmarksReaderTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ChromiumBookmarksReaderTests.swift; sourceTree = "<group>"; };
 		4BB99D0D26FE1A83001E4761 /* FirefoxBookmarksReaderTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = FirefoxBookmarksReaderTests.swift; sourceTree = "<group>"; };
 		4BB99D0E26FE1A84001E4761 /* SafariBookmarksReaderTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SafariBookmarksReaderTests.swift; sourceTree = "<group>"; };
-		4BB99D1226FE1A94001E4761 /* places.sqlite */ = {isa = PBXFileReference; lastKnownFileType = file; path = places.sqlite; sourceTree = "<group>"; };
 		4BBC169F27C4859400E00A38 /* DeviceAuthenticationService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DeviceAuthenticationService.swift; sourceTree = "<group>"; };
 		4BBC16A127C485BC00E00A38 /* DeviceIdleStateDetector.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DeviceIdleStateDetector.swift; sourceTree = "<group>"; };
 		4BBC16A427C488C900E00A38 /* DeviceAuthenticatorTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DeviceAuthenticatorTests.swift; sourceTree = "<group>"; };
@@ -1717,25 +1703,6 @@
 			path = Chromium;
 			sourceTree = "<group>";
 		};
-		4B5FF67526B5F26D00D42879 /* Test Firefox Data */ = {
-			isa = PBXGroup;
-			children = (
-				4BB99D1226FE1A94001E4761 /* places.sqlite */,
-				4BB46E9F26B8953900222970 /* Primary Password */,
-				4B5FF67626B5F27800D42879 /* No Primary Password */,
-			);
-			path = "Test Firefox Data";
-			sourceTree = "<group>";
-		};
-		4B5FF67626B5F27800D42879 /* No Primary Password */ = {
-			isa = PBXGroup;
-			children = (
-				4B8AC93F26B49BEE00879451 /* key4.db */,
-				4B8AC93E26B49BEE00879451 /* logins.json */,
-			);
-			path = "No Primary Password";
-			sourceTree = "<group>";
-		};
 		4B6160D125B14E5E007DE5B2 /* Content Blocker */ = {
 			isa = PBXGroup;
 			children = (
@@ -1904,9 +1871,7 @@
 				4B8AC93C26B49BE600879451 /* FirefoxLoginReaderTests.swift */,
 				4BB99D0E26FE1A84001E4761 /* SafariBookmarksReaderTests.swift */,
 				4BF4951726C08395000547B8 /* ThirdPartyBrowserTests.swift */,
-				4BB46EA526B8974500222970 /* Test Chrome Data */,
-				4B5FF67526B5F26D00D42879 /* Test Firefox Data */,
-				4BB99D0726FE1A6D001E4761 /* Test Safari Data */,
+				37A803DA27FD69D300052F4C /* Data Import Resources */,
 			);
 			path = "Data Import";
 			sourceTree = "<group>";
@@ -1991,24 +1956,6 @@
 			path = "File System";
 			sourceTree = "<group>";
 		};
-		4BB46E9F26B8953900222970 /* Primary Password */ = {
-			isa = PBXGroup;
-			children = (
-				4BB46EA126B8954500222970 /* key4-encrypted.db */,
-				4BB46EA026B8954500222970 /* logins-encrypted.json */,
-			);
-			path = "Primary Password";
-			sourceTree = "<group>";
-		};
-		4BB46EA526B8974500222970 /* Test Chrome Data */ = {
-			isa = PBXGroup;
-			children = (
-				4BB99D0A26FE1A7B001E4761 /* Bookmarks */,
-				4B59024926B38B0B00489384 /* Login Data */,
-			);
-			path = "Test Chrome Data";
-			sourceTree = "<group>";
-		};
 		4BB88B4E25B7BA20006F6B06 /* Utilities */ = {
 			isa = PBXGroup;
 			children = (
@@ -2058,14 +2005,6 @@
 				4BB99CFD26FE191E001E4761 /* SafariDataImporter.swift */,
 			);
 			path = Safari;
-			sourceTree = "<group>";
-		};
-		4BB99D0726FE1A6D001E4761 /* Test Safari Data */ = {
-			isa = PBXGroup;
-			children = (
-				4BB99D0826FE1A6D001E4761 /* Bookmarks.plist */,
-			);
-			path = "Test Safari Data";
 			sourceTree = "<group>";
 		};
 		4BBC16A327C488B900E00A38 /* Device Authentication */ = {
@@ -4029,19 +3968,12 @@
 			buildActionMask = 2147483647;
 			files = (
 				B69B50532726CD8100758A2B /* empty in Resources */,
-				4BB46EA326B8954500222970 /* key4-encrypted.db in Resources */,
-				4BB99D1326FE1A94001E4761 /* places.sqlite in Resources */,
-				4BB99D0926FE1A6D001E4761 /* Bookmarks.plist in Resources */,
 				B69B50542726CD8100758A2B /* atb-with-update.json in Resources */,
+				37A803DB27FD69D300052F4C /* Data Import Resources in Resources */,
 				B69B50522726CD8100758A2B /* atb.json in Resources */,
-				4BB99D0B26FE1A7B001E4761 /* Bookmarks in Resources */,
 				4B70C00127B0793D000386ED /* DuckDuckGo-ExampleCrash.ips in Resources */,
-				4B8AC94126B49BEE00879451 /* key4.db in Resources */,
 				B67C6C422654BF49006C872E /* DuckDuckGo-Symbol.jpg in Resources */,
 				B69B50552726CD8100758A2B /* invalid.json in Resources */,
-				4B8AC94026B49BEE00879451 /* logins.json in Resources */,
-				4B59024A26B38B0B00489384 /* Login Data in Resources */,
-				4BB46EA226B8954500222970 /* logins-encrypted.json in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
