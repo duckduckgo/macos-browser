@@ -17,6 +17,10 @@ async function loadRules () {
 loadRules()
 
 browser.webNavigation.onCommitted.addListener((details) => {
+    if (details.frameId === 0) {
+        consent.removeTab(details.tabId)
+    }
+}, {
     url: [{ schemes: ['http', 'https'] }]
 })
 
@@ -39,8 +43,6 @@ window.callAction = (messageId, tabId, action) => {
     }
 
     if (action === 'detectCMP') {
-        consent.removeTab(tabId);
-
         consent.checkTab(tabId).then(async (cmp) => {
             try {
                 await cmp.checked
