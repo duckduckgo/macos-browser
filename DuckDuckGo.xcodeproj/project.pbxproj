@@ -574,7 +574,6 @@
 		B65536A62685B82B00085A79 /* Permissions.swift in Sources */ = {isa = PBXBuildFile; fileRef = B65536A52685B82B00085A79 /* Permissions.swift */; };
 		B65536AE2685E17200085A79 /* GeolocationService.swift in Sources */ = {isa = PBXBuildFile; fileRef = B65536AD2685E17100085A79 /* GeolocationService.swift */; };
 		B65783E725F8AAFB00D8DB33 /* String+Punycode.swift in Sources */ = {isa = PBXBuildFile; fileRef = B65783E625F8AAFB00D8DB33 /* String+Punycode.swift */; };
-		B65783EC25F8AB9300D8DB33 /* String+PunycodeTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = B65783EB25F8AB9200D8DB33 /* String+PunycodeTests.swift */; };
 		B65783F525F8ACA400D8DB33 /* Punnycode in Frameworks */ = {isa = PBXBuildFile; productRef = B65783F425F8ACA400D8DB33 /* Punnycode */; };
 		B657841A25FA484B00D8DB33 /* NSException+Catch.m in Sources */ = {isa = PBXBuildFile; fileRef = B657841925FA484B00D8DB33 /* NSException+Catch.m */; };
 		B657841F25FA497600D8DB33 /* NSException+Catch.swift in Sources */ = {isa = PBXBuildFile; fileRef = B657841E25FA497600D8DB33 /* NSException+Catch.swift */; };
@@ -1333,7 +1332,6 @@
 		B65536A52685B82B00085A79 /* Permissions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Permissions.swift; sourceTree = "<group>"; };
 		B65536AD2685E17100085A79 /* GeolocationService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GeolocationService.swift; sourceTree = "<group>"; };
 		B65783E625F8AAFB00D8DB33 /* String+Punycode.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "String+Punycode.swift"; sourceTree = "<group>"; };
-		B65783EB25F8AB9200D8DB33 /* String+PunycodeTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "String+PunycodeTests.swift"; sourceTree = "<group>"; };
 		B657841825FA484B00D8DB33 /* NSException+Catch.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "NSException+Catch.h"; sourceTree = "<group>"; };
 		B657841925FA484B00D8DB33 /* NSException+Catch.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = "NSException+Catch.m"; sourceTree = "<group>"; };
 		B657841E25FA497600D8DB33 /* NSException+Catch.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "NSException+Catch.swift"; sourceTree = "<group>"; };
@@ -3435,7 +3433,6 @@
 				B67C6C462654C643006C872E /* FileManagerExtensionTests.swift */,
 				AAEC74BA2642E67C00C2EFBC /* NSPersistentContainerExtension.swift */,
 				B6C0B24526E9CB190031CB7F /* RunLoopExtensionTests.swift */,
-				B65783EB25F8AB9200D8DB33 /* String+PunycodeTests.swift */,
 				AADE11BF26D916D70032D8A7 /* StringExtensionTests.swift */,
 				85F69B3B25EDE81F00978E59 /* URLExtensionTests.swift */,
 				4B8AD0B027A86D9200AE44D6 /* WKWebsiteDataStoreExtensionTests.swift */,
@@ -4650,7 +4647,6 @@
 				B63ED0E326B3E7FA00A9DAD1 /* CLLocationManagerMock.swift in Sources */,
 				37CD54BB27F25A4000F1F7B9 /* DownloadsPreferencesTests.swift in Sources */,
 				4B02199C25E063DE00ED7DEA /* FireproofDomainsTests.swift in Sources */,
-				B65783EC25F8AB9300D8DB33 /* String+PunycodeTests.swift in Sources */,
 				AA0F3DB7261A566C0077F2D9 /* SuggestionLoadingMock.swift in Sources */,
 				4B9292BE2667103100AD2C21 /* PasteboardFolderTests.swift in Sources */,
 				4B9292C52667104B00AD2C21 /* CoreDataTestUtilities.swift in Sources */,

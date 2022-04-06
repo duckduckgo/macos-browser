@@ -70,7 +70,7 @@ extension String {
     // MARK: - URL
 
     var url: URL? {
-        return punycodedUrl
+        return URL(trimmedAddressBarString: self)
     }
 
     static let localhost = "localhost"

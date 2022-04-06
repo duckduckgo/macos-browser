@@ -412,7 +412,7 @@ extension BrowserTabViewController: TabDelegate {
         let permissionType = PermissionType.externalScheme(scheme: url.scheme ?? "")
 
         tab.permissions.permissions([permissionType],
-                                    requestedForDomain: webView?.url?.host ?? "localhost",
+                                    requestedForDomain: webView?.url?.host,
                                     url: url) { [weak self, weak tab] granted in
             guard granted, let tab = tab else {
                 if userEntered {
