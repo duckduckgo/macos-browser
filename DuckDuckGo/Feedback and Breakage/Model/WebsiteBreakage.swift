@@ -31,6 +31,7 @@ struct WebsiteBreakage {
     }
 
     let category: Category?
+    let description: String?
     let siteUrlString: String
     let osVersion: String
     let upgradedHttps: Bool
@@ -44,6 +45,7 @@ struct WebsiteBreakage {
 
     init(
         category: Category?,
+        description: String?,
         siteUrlString: String,
         osVersion: String,
         upgradedHttps: Bool,
@@ -56,6 +58,7 @@ struct WebsiteBreakage {
         manufacturer: String = "Apple"
     ) {
         self.category = category
+        self.description = description
         self.siteUrlString = siteUrlString
         self.osVersion = osVersion
         self.upgradedHttps = upgradedHttps
@@ -71,6 +74,7 @@ struct WebsiteBreakage {
     var requestParameters: [String: String] {
         [
             "category": category?.rawValue ?? "",
+            "description": description ?? "",
             "siteUrl": siteUrlString,
             "upgradedHttps": upgradedHttps ? "true" : "false",
             "tds": tdsETag?.trimmingCharacters(in: CharacterSet(charactersIn: "\"")) ?? "",

@@ -108,11 +108,11 @@
                                             <action selector="optionPopUpButtonAction:" target="TOa-sP-KHa" id="UAa-qp-Arp"/>
                                         </connections>
                                     </popUpButton>
-                                    <customView hidden="YES" translatesAutoresizingMaskIntoConstraints="NO" id="8Xi-CY-jyt" userLabel="Browser Feedback View">
+                                    <customView hidden="YES" ambiguous="YES" translatesAutoresizingMaskIntoConstraints="NO" id="8Xi-CY-jyt" userLabel="Browser Feedback View">
                                         <rect key="frame" x="0.0" y="227" width="360" height="215"/>
                                         <subviews>
                                             <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="Obm-Wr-qrD">
-                                                <rect key="frame" x="18" y="188" width="324" height="15"/>
+                                                <rect key="frame" x="18" y="208" width="324" height="15"/>
                                                 <constraints>
                                                     <constraint firstAttribute="width" constant="320" id="Y8O-Rh-baf"/>
                                                 </constraints>
@@ -123,17 +123,17 @@
                                                 </textFieldCell>
                                             </textField>
                                             <scrollView focusRingType="exterior" borderType="none" horizontalLineScroll="10" horizontalPageScroll="10" verticalLineScroll="10" verticalPageScroll="10" hasHorizontalScroller="NO" translatesAutoresizingMaskIntoConstraints="NO" id="heN-iP-EsM">
-                                                <rect key="frame" x="20" y="83" width="320" height="97"/>
+                                                <rect key="frame" x="20" y="103" width="320" height="97"/>
                                                 <clipView key="contentView" drawsBackground="NO" id="PTf-L1-DK2">
-                                                    <rect key="frame" x="0.0" y="0.0" width="320" height="97"/>
+                                                    <rect key="frame" x="0.0" y="0.0" width="305" height="97"/>
                                                     <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                                     <subviews>
                                                         <textView importsGraphics="NO" richText="NO" verticallyResizable="YES" smartInsertDelete="YES" id="F3N-ft-DgV">
-                                                            <rect key="frame" x="0.0" y="0.0" width="320" height="97"/>
+                                                            <rect key="frame" x="0.0" y="0.0" width="305" height="97"/>
                                                             <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                                             <color key="textColor" name="textColor" catalog="System" colorSpace="catalog"/>
                                                             <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
-                                                            <size key="minSize" width="320" height="97"/>
+                                                            <size key="minSize" width="305" height="97"/>
                                                             <size key="maxSize" width="320" height="10000000"/>
                                                             <color key="insertionPointColor" name="textColor" catalog="System" colorSpace="catalog"/>
                                                         </textView>
@@ -148,19 +148,19 @@
                                                     <autoresizingMask key="autoresizingMask"/>
                                                 </scroller>
                                                 <scroller key="verticalScroller" wantsLayer="YES" verticalHuggingPriority="750" horizontal="NO" id="MIn-YA-XiI">
-                                                    <rect key="frame" x="304" y="0.0" width="16" height="97"/>
+                                                    <rect key="frame" x="305" y="0.0" width="15" height="97"/>
                                                     <autoresizingMask key="autoresizingMask"/>
                                                 </scroller>
                                             </scrollView>
                                             <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="nm3-pj-w2B">
-                                                <rect key="frame" x="18" y="16" width="324" height="47"/>
+                                                <rect key="frame" x="18" y="18" width="324" height="65"/>
                                                 <constraints>
                                                     <constraint firstAttribute="width" constant="320" id="46H-7M-bu2"/>
-                                                    <constraint firstAttribute="height" constant="47" id="w0L-qh-saU"/>
+                                                    <constraint firstAttribute="height" constant="65" id="R9C-cp-9Jj"/>
                                                 </constraints>
                                                 <textFieldCell key="cell" id="7PA-BW-gkt">
                                                     <font key="font" metaFont="cellTitle"/>
-                                                    <string key="title">Reports sent to DuckDuckGo are 100% anonymous and only include your message, the DuckDuckGo app version, and your macOS version.</string>
+                                                    <string key="title">Reports sent to DuckDuckGo are 100% anonymous and only include your selection above, your message, the URL, a list of trackers we found on the site, the DuckDuckGo app version, and your macOS version.</string>
                                                     <color key="textColor" name="secondaryLabelColor" catalog="System" colorSpace="catalog"/>
                                                     <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
                                                 </textFieldCell>
@@ -173,17 +173,17 @@
                                             <constraint firstItem="nm3-pj-w2B" firstAttribute="top" secondItem="heN-iP-EsM" secondAttribute="bottom" constant="20" id="K3s-7i-8OO"/>
                                             <constraint firstItem="Obm-Wr-qrD" firstAttribute="top" secondItem="8Xi-CY-jyt" secondAttribute="top" constant="12" id="S8X-ph-cIv"/>
                                             <constraint firstItem="heN-iP-EsM" firstAttribute="leading" secondItem="8Xi-CY-jyt" secondAttribute="leading" constant="20" symbolic="YES" id="SmD-G6-K0m"/>
-                                            <constraint firstAttribute="height" constant="215" id="UQa-QI-LjA"/>
+                                            <constraint firstAttribute="height" constant="235" id="UQa-QI-LjA"/>
                                             <constraint firstAttribute="trailing" secondItem="heN-iP-EsM" secondAttribute="trailing" constant="20" symbolic="YES" id="hGl-iA-cWw"/>
                                             <constraint firstItem="Obm-Wr-qrD" firstAttribute="leading" secondItem="8Xi-CY-jyt" secondAttribute="leading" constant="20" id="mEl-bd-Itj"/>
                                             <constraint firstItem="heN-iP-EsM" firstAttribute="top" secondItem="Obm-Wr-qrD" secondAttribute="bottom" constant="8" symbolic="YES" id="rDo-Qd-TbN"/>
                                         </constraints>
                                     </customView>
                                     <customView hidden="YES" translatesAutoresizingMaskIntoConstraints="NO" id="8B9-wf-zcP" userLabel="Website Breakage View">
-                                        <rect key="frame" x="0.0" y="273" width="360" height="169"/>
+                                        <rect key="frame" x="0.0" y="342" width="360" height="100"/>
                                         <subviews>
                                             <textField verticalHuggingPriority="750" horizontalCompressionResistancePriority="250" translatesAutoresizingMaskIntoConstraints="NO" id="2gs-6z-agW">
-                                                <rect key="frame" x="20" y="130" width="320" height="27"/>
+                                                <rect key="frame" x="20" y="61" width="320" height="27"/>
                                                 <constraints>
                                                     <constraint firstAttribute="height" constant="27" id="l1h-jz-vPJ"/>
                                                     <constraint firstAttribute="width" constant="320" id="nBh-RP-srf"/>
@@ -195,7 +195,7 @@
                                                 </textFieldCell>
                                             </textField>
                                             <popUpButton translatesAutoresizingMaskIntoConstraints="NO" id="hUd-Rb-6Ls">
-                                                <rect key="frame" x="17" y="76" width="326" height="37"/>
+                                                <rect key="frame" x="17" y="7" width="326" height="37"/>
                                                 <constraints>
                                                     <constraint firstAttribute="height" constant="30" id="3Tm-Sk-Wei"/>
                                                     <constraint firstAttribute="width" constant="320" id="AUB-ZP-wJl"/>
@@ -221,31 +221,15 @@
                                                     <action selector="websiteBreakageCategoryPopUpButtonAction:" target="TOa-sP-KHa" id="k1b-m9-V8B"/>
                                                 </connections>
                                             </popUpButton>
-                                            <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="NLb-RN-SpK">
-                                                <rect key="frame" x="18" y="-7" width="324" height="67"/>
-                                                <constraints>
-                                                    <constraint firstAttribute="height" constant="67" id="3gs-wF-UfX"/>
-                                                    <constraint firstAttribute="width" constant="320" id="tVZ-1G-sgl"/>
-                                                </constraints>
-                                                <textFieldCell key="cell" id="SXY-b7-hGs">
-                                                    <font key="font" metaFont="cellTitle"/>
-                                                    <string key="title">Reports sent to DuckDuckGo are 100% anonymous and only include your selection above, the URL, a list of trackers we found on the site, the DuckDuckGo app version, and your macOS version.</string>
-                                                    <color key="textColor" name="secondaryLabelColor" catalog="System" colorSpace="catalog"/>
-                                                    <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
-                                                </textFieldCell>
-                                            </textField>
                                         </subviews>
                                         <constraints>
-                                            <constraint firstAttribute="height" constant="169" id="3Lp-Et-qRB"/>
+                                            <constraint firstAttribute="height" constant="100" id="3Lp-Et-qRB"/>
                                             <constraint firstItem="2gs-6z-agW" firstAttribute="top" secondItem="8B9-wf-zcP" secondAttribute="top" constant="12" id="Boe-IN-w2P"/>
                                             <constraint firstItem="hUd-Rb-6Ls" firstAttribute="leading" secondItem="8B9-wf-zcP" secondAttribute="leading" constant="20" id="Jed-xd-3mg"/>
-                                            <constraint firstAttribute="trailing" secondItem="NLb-RN-SpK" secondAttribute="trailing" constant="20" id="TUS-jM-vt1"/>
                                             <constraint firstItem="2gs-6z-agW" firstAttribute="leading" secondItem="8B9-wf-zcP" secondAttribute="leading" constant="20" id="ZiI-DM-AFY"/>
                                             <constraint firstItem="hUd-Rb-6Ls" firstAttribute="top" secondItem="2gs-6z-agW" secondAttribute="bottom" constant="20" id="gUO-WO-8Hr"/>
-                                            <constraint firstItem="NLb-RN-SpK" firstAttribute="leading" secondItem="8B9-wf-zcP" secondAttribute="leading" constant="20" id="goU-1M-ibi"/>
                                             <constraint firstAttribute="trailing" secondItem="hUd-Rb-6Ls" secondAttribute="trailing" constant="20" id="kGb-Nb-7TU"/>
                                             <constraint firstAttribute="trailing" secondItem="2gs-6z-agW" secondAttribute="trailing" constant="20" id="qTG-tx-tnf"/>
-                                            <constraint firstItem="NLb-RN-SpK" firstAttribute="top" secondItem="hUd-Rb-6Ls" secondAttribute="bottom" constant="20" id="tE4-8t-hsL"/>
                                         </constraints>
                                     </customView>
                                     <customView translatesAutoresizingMaskIntoConstraints="NO" id="RYb-WZ-bIo" customClass="ColorView" customModule="DuckDuckGo_Privacy_Browser" customModuleProvider="target">
@@ -298,7 +282,6 @@ Gw
                                     <constraint firstAttribute="bottom" secondItem="Gy6-KF-A15" secondAttribute="bottom" constant="20" symbolic="YES" id="KOD-v1-Y2g"/>
                                     <constraint firstAttribute="trailing" secondItem="RYb-WZ-bIo" secondAttribute="trailing" id="Mah-G4-3ac"/>
                                     <constraint firstItem="G99-8X-64H" firstAttribute="leading" secondItem="wYB-07-s0m" secondAttribute="leading" constant="20" id="VJ3-WB-B1n"/>
-                                    <constraint firstItem="8Xi-CY-jyt" firstAttribute="top" secondItem="7Z6-Ji-PH7" secondAttribute="bottom" constant="8" id="VJI-XI-DXk"/>
                                     <constraint firstAttribute="bottom" secondItem="G99-8X-64H" secondAttribute="bottom" constant="20" symbolic="YES" id="Vlb-cF-IG9"/>
                                     <constraint firstItem="Gy6-KF-A15" firstAttribute="width" secondItem="G99-8X-64H" secondAttribute="width" id="XTc-rW-crW"/>
                                     <constraint firstItem="7Z6-Ji-PH7" firstAttribute="top" secondItem="wYB-07-s0m" secondAttribute="top" constant="20" symbolic="YES" id="ZL6-G9-svI"/>
@@ -397,6 +380,7 @@ DQ
                     </view>
                     <connections>
                         <outlet property="browserFeedbackDescriptionLabel" destination="Obm-Wr-qrD" id="Tx7-Va-Sh9"/>
+                        <outlet property="browserFeedbackDisclaimerTextVIew" destination="nm3-pj-w2B" id="82M-Nk-Jk9"/>
                         <outlet property="browserFeedbackTextView" destination="F3N-ft-DgV" id="amf-uR-AYI"/>
                         <outlet property="browserFeedbackView" destination="8Xi-CY-jyt" id="5IL-yu-IWc"/>
                         <outlet property="contentView" destination="wYB-07-s0m" id="XXQ-Fh-tQF"/>
@@ -423,7 +407,7 @@ DQ
             <color red="0.98000001907348633" green="0.98000001907348633" blue="0.98000001907348633" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
         </namedColor>
         <namedColor name="GreyTextColor">
-            <color red="0.20000000000000001" green="0.20000000000000001" blue="0.20000000000000001" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+            <color red="0.0" green="0.0" blue="0.0" alpha="0.60000002384185791" colorSpace="custom" customColorSpace="sRGB"/>
         </namedColor>
         <namedColor name="InterfaceBackgroundColor">
             <color red="1" green="1" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
