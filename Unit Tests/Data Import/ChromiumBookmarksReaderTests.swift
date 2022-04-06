@@ -37,7 +37,7 @@ class ChromiumBookmarksReaderTests: XCTestCase {
 
     private func resourcePath() -> String {
         let bundle = Bundle(for: ChromiumBookmarksReaderTests.self)
-        return bundle.resourcePath!
+        return bundle.resourceURL!.appendingPathComponent("Data Import Resources/Test Chrome Data").path
     }
 
 }

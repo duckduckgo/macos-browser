@@ -32,6 +32,10 @@ final class ChromiumLoginReader {
     private let processName: String
     private let decryptionKey: String?
 
+    private static let sqlSelectWithPasswordTimestamp = "SELECT signon_realm, username_value, password_value, date_password_modified FROM logins;"
+    private static let sqlSelectWithCreatedTimestamp = "SELECT signon_realm, username_value, password_value, date_created FROM logins;"
+    private static let sqlSelectWithoutTimestamp = "SELECT signon_realm, username_value, password_value FROM logins;"
+
     init(chromiumDataDirectoryPath: String, processName: String, decryptionKey: String? = nil) {
         self.chromiumLocalLoginDirectoryPath = chromiumDataDirectoryPath + "/Login Data"
         self.chromiumGoogleAccountLoginDirectoryPath = chromiumDataDirectoryPath + "/Login Data For Account"
@@ -60,16 +64,20 @@ final class ChromiumLoginReader {
                 var rows = [ChromiumCredential]()
 
                 try queue.read { database in
-                    rows = try ChromiumCredential.fetchAll(
-                        database,
-                        sql: "SELECT signon_realm, username_value, password_value, date_password_modified FROM logins;"
-                    )
+                    rows = try fetchCredentials(from: database)
                 }
 
                 for row in rows {
-                    let existingRowTimestamp: Int64 = loginRows[row.id]?.passwordModifiedAt ?? 0
-                    if existingRowTimestamp < row.passwordModifiedAt {
+                    let existingRowTimestamp = loginRows[row.id]?.passwordModifiedAt
+                    let newRowTimestamp = row.passwordModifiedAt
+
+                    switch (newRowTimestamp, existingRowTimestamp) {
+                    case let (.some(new), .some(existing)) where new > existing:
                         loginRows[row.id] = row
+                    case (_, .none):
+                        loginRows[row.id] = row
+                    default:
+                        break
                     }
                 }
 
@@ -92,6 +100,26 @@ final class ChromiumLoginReader {
             }
 
         return .success(importedLogins)
+    }
+
+    private func fetchCredentials(from database: GRDB.Database) throws -> [ChromiumCredential] {
+        do {
+            return try ChromiumCredential.fetchAll(database, sql: Self.sqlSelectWithPasswordTimestamp)
+        } catch let databaseError as DatabaseError {
+            guard databaseError.isMissingColumnError else {
+                throw databaseError
+            }
+
+            do {
+                return try ChromiumCredential.fetchAll(database, sql: Self.sqlSelectWithCreatedTimestamp)
+            } catch let databaseError as DatabaseError {
+                guard databaseError.isMissingColumnError else {
+                    throw databaseError
+                }
+
+                return try ChromiumCredential.fetchAll(database, sql: Self.sqlSelectWithoutTimestamp)
+            }
+        }
     }
 
     // Step 1: Prompt for permission to access the user's Chromium Safe Storage key.
@@ -155,7 +183,7 @@ private struct ChromiumCredential: Identifiable {
     let url: String
     let username: String
     let encryptedPassword: Data
-    let passwordModifiedAt: Int64
+    let passwordModifiedAt: Int64?
 }
 
 extension ChromiumCredential: FetchableRecord {
@@ -167,4 +195,13 @@ extension ChromiumCredential: FetchableRecord {
         passwordModifiedAt = row["date_password_modified"]
     }
 
+}
+
+fileprivate extension DatabaseError {
+    var isMissingColumnError: Bool {
+        guard let message = message else {
+            return false
+        }
+        return message.hasPrefix("no such column")
+    }
 }
