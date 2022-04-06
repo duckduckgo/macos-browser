@@ -534,6 +534,10 @@ extension NSPopUpButton {
             addItem(withTitle: source.importSourceName)
             lastItem?.image = source.importSourceImage?.resized(to: NSSize(width: 16, height: 16))
         }
+
+        if let preferredSource = DataImport.Source.preferredSources.first(where: { validSources.contains($0) }) {
+            selectItem(withTitle: preferredSource.importSourceName)
+        }
     }
 
 }
