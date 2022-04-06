@@ -29,7 +29,7 @@ func regex(_ pattern: String, _ options: NSRegularExpression.Options = []) -> NS
 
 private extension RegEx {
     // from https://stackoverflow.com/a/25717506/73479
-    static let hostName = regex("^(((?!-)[A-Za-z0-9-]{1,63}(?<!-)\\.)+[A-Za-z0-9-]{2,63})$", .caseInsensitive)
+    static let hostName = regex("^(((?!-)[A-Za-z0-9-]{1,63}(?<!-)\\.)*[A-Za-z0-9-]{2,63})$", .caseInsensitive)
     // from https://stackoverflow.com/a/30023010/73479
     static let ipAddress = regex("^((25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\\.){3}(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$",
                                  .caseInsensitive)

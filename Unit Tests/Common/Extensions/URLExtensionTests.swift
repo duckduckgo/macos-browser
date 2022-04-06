@@ -32,18 +32,22 @@ final class URLExtensionTests: XCTestCase {
         XCTAssertTrue("http://example.com".url!.isValid)
         XCTAssertTrue("https://example.com".url!.isValid)
         XCTAssertTrue("http://localhost".url!.isValid)
-        // XCTAssertTrue("http://localdomain".url!.isValid) // local domain URLs are not supported at this time
+        XCTAssertTrue("http://localdomain".url!.isValid)
     }
 
     func test_when_no_scheme_in_string_url_has_scheme() {
         XCTAssertEqual("duckduckgo.com".url!.absoluteString, "http://duckduckgo.com")
         XCTAssertEqual("example.com".url!.absoluteString, "http://example.com")
         XCTAssertEqual("localhost".url!.absoluteString, "http://localhost")
+        XCTAssertNil("localdomain".url)
     }
 
     func test_makeURL_from_addressBarString() {
         let data: [(string: String, expected: String)] = [
             ("https://duckduckgo.com/?q=search string with spaces", "https://duckduckgo.com/?q=search%20string%20with%20spaces"),
+            ("define: foo", "https://duckduckgo.com/?q=define%3A%20foo"),
+            ("test://hello/", "test://hello/"),
+            ("localdomain", "https://duckduckgo.com/?q=localdomain"),
             ("   http://example.com\n", "http://example.com"),
             (" duckduckgo.com", "http://duckduckgo.com"),
             (" duckduckgo.c ", "https://duckduckgo.com/?q=duckduckgo.c"),
@@ -123,10 +127,13 @@ final class URLExtensionTests: XCTestCase {
     func testAddressBarURLParsing() {
         let addresses = [
             "user@somehost.local:9091/index.html",
+            "something.local:9100",
             "user@localhost:5000",
             "user:password@localhost:5000",
             "localhost",
             "localhost:5000",
+            "sms://+44123123123",
+            "mailto:test@example.com",
             "https://",
             "http://duckduckgo.com",
             "https://duckduckgo.com",

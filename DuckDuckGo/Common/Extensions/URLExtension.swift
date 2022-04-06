@@ -93,6 +93,14 @@ extension URL {
             } else if url.scheme != nil {
                 self = url
                 return
+
+            } else if let hostname = s.split(separator: "/").first {
+                guard hostname.contains(".") || String(hostname) == .localhost else {
+                    // could be a local domain but user needs to use the protocol to specify that
+                    return nil
+                }
+            } else {
+                return nil
             }
 
             s = NavigationalScheme.http.separated() + s
