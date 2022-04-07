@@ -37,7 +37,7 @@ class SafariBookmarksReaderTests: XCTestCase {
 
     private func bookmarksFileURL() -> URL {
         let bundle = Bundle(for: FirefoxBookmarksReaderTests.self)
-        return bundle.resourceURL!.appendingPathComponent("Bookmarks.plist")
+        return bundle.resourceURL!.appendingPathComponent("Data Import Resources/Test Safari Data/Bookmarks.plist")
     }
 
 }

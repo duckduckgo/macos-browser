@@ -37,7 +37,7 @@ class FirefoxBookmarksReaderTests: XCTestCase {
 
     private func resourcePath() -> String {
         let bundle = Bundle(for: FirefoxBookmarksReaderTests.self)
-        return bundle.resourcePath!
+        return bundle.resourceURL!.appendingPathComponent("Data Import Resources/Test Firefox Data").path
     }
 
 }
