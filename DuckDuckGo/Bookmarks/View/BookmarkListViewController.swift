@@ -100,7 +100,7 @@ final class BookmarkListViewController: NSViewController {
     private func reloadData() {
         let selectedNodes = self.selectedNodes
         
-        treeController.rebuild()
+        dataSource.reloadData()
         outlineView.reloadData()
         
         expandAndRestore(selectedNodes: selectedNodes)
