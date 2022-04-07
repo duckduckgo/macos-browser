@@ -24,6 +24,7 @@ class WebsiteBreakageReportTests: XCTestCase {
     func testCommonSetOfFields() throws {
         let breakage = WebsiteBreakage(
             category: .contentIsMissing,
+            description: nil,
             siteUrlString: "https://example.test/",
             osVersion: "12.3.0",
             upgradedHttps: true,
@@ -60,6 +61,7 @@ class WebsiteBreakageReportTests: XCTestCase {
     func testThatNativeAppSpecificFieldsAreReported() throws {
         let breakage = WebsiteBreakage(
             category: .videoOrImagesDidntLoad,
+            description: nil,
             siteUrlString: "http://unsafe.example.test/path/to/thing.html",
             osVersion: "12",
             upgradedHttps: false,
