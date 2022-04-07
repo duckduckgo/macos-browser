@@ -27,7 +27,7 @@
 --rules strongifiedSelf
 
 --rules trailingCommas
---commas always
+--commas inline # Deviation
 
 --rules redundantParens
 --rules redundantPattern
