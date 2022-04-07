@@ -89,10 +89,20 @@ enum ThirdPartyBrowser: CaseIterable {
 
     var applicationIcon: NSImage? {
         guard let applicationPath = applicationPath else {
-            return nil
+            return fallbackApplicationIcon
         }
 
         return NSWorkspace.shared.icon(forFile: applicationPath)
+    }
+    
+    /// Used when specific apps are not installed, but still need to be displayed in the list.
+    /// Browsers are hidden when not installed, so this only applies to password managers.
+    var fallbackApplicationIcon: NSImage? {
+        switch self {
+        case .lastPass: return NSImage(named: "LastPassIcon")
+        case .onePassword: return NSImage(named: "1PasswordIcon")
+        default: return nil
+        }
     }
 
     var browserProfiles: DataImport.BrowserProfileList? {
