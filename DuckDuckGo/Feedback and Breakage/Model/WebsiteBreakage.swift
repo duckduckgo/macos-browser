@@ -84,7 +84,8 @@ struct WebsiteBreakage {
             "ampUrl": ampURL,
             "urlParametersRemoved": urlParametersRemoved ? "true" : "false",
             "os": osVersion,
-            "manufacturer": manufacturer
+            "manufacturer": manufacturer,
+            "reportFlow": "native"
         ]
     }
 }
