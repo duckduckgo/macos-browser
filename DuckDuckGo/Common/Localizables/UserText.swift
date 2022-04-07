@@ -252,7 +252,7 @@ struct UserText {
 
     static let sendFeedback = NSLocalizedString("preferences.about.send-feedback", value: "Send Feedback", comment: "Feedback button in the about preferences page")
 
-    static let feedbackBreakageDisclaimer = NSLocalizedString("feedback.breakage.disclaimer", value: "Reports sent to DuckDuckGo are 100% anonymous and only include your selection above, your message, the URL, a list of trackers we found on the site, the DuckDuckGo app version, and your macOS version.", comment: "Disclaimer in breakage form")
+    static let feedbackBreakageDisclaimer = NSLocalizedString("feedback.breakage.disclaimer", value: "Reports sent to DuckDuckGo are 100% anonymous and only include your selection above, your optional message, the URL, a list of trackers we found on the site, the DuckDuckGo app version, and your macOS version.", comment: "Disclaimer in breakage form")
     static let feedbackDisclaimer = NSLocalizedString("feedback.disclaimer", value: "Reports sent to DuckDuckGo are 100% anonymous and only include your message, the DuckDuckGo app version, and your macOS version.", comment: "Disclaimer in breakage form")
     
     static let feedbackBugDescription = NSLocalizedString("feedback.bug.description", value: "Please describe the problem in as much detail as possible:", comment: "Label in the feedback form")

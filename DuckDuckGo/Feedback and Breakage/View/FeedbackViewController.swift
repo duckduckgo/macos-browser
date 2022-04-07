@@ -25,7 +25,7 @@ final class FeedbackViewController: NSViewController {
     enum Constants {
         static let defaultContentHeight: CGFloat = 160
         static let feedbackContentHeight: CGFloat = 338
-        static let websiteBreakageContentHeight: CGFloat = 467
+        static let websiteBreakageContentHeight: CGFloat = 472
         static let thankYouContentHeight: CGFloat = 262
 
     }
