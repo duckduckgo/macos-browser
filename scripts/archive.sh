@@ -42,7 +42,7 @@ set_up_environment() {
             ;;
     esac
 
-    CWD="$(dirname $0)"
+    CWD="$(dirname "$0")"
     XCPRETTY="xcpretty"
     WORKDIR="${PWD}/release"
     ARCHIVE="${WORKDIR}/DuckDuckGo.xcarchive"
@@ -84,7 +84,7 @@ get_developer_credentials() {
             echo "Please enter Apple ID that will be used for requesting notarization"
             echo "Set it in XCODE_DEVELOPER_APPLE_ID environment variable to not be asked again."
             echo
-            read -p "Apple ID: " DEVELOPER_APPLE_ID
+            read -rp "Apple ID: " DEVELOPER_APPLE_ID
             echo
         done
 
@@ -102,7 +102,7 @@ get_developer_credentials() {
                 echo "Set password in XCODE_DEVELOPER_PASSWORD environment variable to not be asked for password."
                 echo "Currently only application-specific password is supported (create one at https://appleid.apple.com)."
                 echo
-                read -sp "Password for ${DEVELOPER_APPLE_ID}: " DEVELOPER_PASSWORD
+                read -srp "Password for ${DEVELOPER_APPLE_ID}: " DEVELOPER_PASSWORD
                 echo
             done
 
@@ -119,7 +119,7 @@ clean_working_directory() {
 check_xcpretty() {
     if ! command -v xcpretty &> /dev/null; then
         echo
-        echo 'xcpretty not found - not prettifying Xcode logs. You can install it using `gem install xcpretty`.'
+        echo "xcpretty not found - not prettifying Xcode logs. You can install it using 'gem install xcpretty'."
         echo
         XCPRETTY='tee'
     fi
@@ -183,11 +183,11 @@ upload_for_notarization() {
 }
 
 get_notarization_info() {
-    echo $(/usr/libexec/PlistBuddy -c "Print :notarization-upload:RequestUUID" "${NOTARIZATION_INFO_PLIST}")
+    /usr/libexec/PlistBuddy -c "Print :notarization-upload:RequestUUID" "${NOTARIZATION_INFO_PLIST}"
 }
 
 get_notarization_status() {
-    echo $(/usr/libexec/PlistBuddy -c "Print :notarization-info:Status" "${NOTARIZATION_STATUS_INFO_PLIST}")
+    /usr/libexec/PlistBuddy -c "Print :notarization-info:Status" "${NOTARIZATION_STATUS_INFO_PLIST}"
 }
 
 altool_check_notarization_status () {
@@ -230,7 +230,7 @@ compress_app_and_dsym() {
 }
 
 main() {
-    set_up_environment $@
+    set_up_environment "$@"
     get_developer_credentials
     clean_working_directory
     check_xcpretty
@@ -250,4 +250,4 @@ main() {
     fi
 }
 
-main $@
+main "$@"
