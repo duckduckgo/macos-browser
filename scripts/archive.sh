@@ -49,6 +49,7 @@ get_developer_credentials() {
     fi
     while [[ -z "${DEVELOPER_PASSWORD}" ]]; do
         echo "Set password in XCODE_DEVELOPER_PASSWORD environment variable to not be asked for password."
+        echo "Currently only application-specific password is supported (create one at https://appleid.apple.com)."
         read -sp "Password for ${DEVELOPER_APPLE_ID}: " DEVELOPER_PASSWORD
         echo
     done
