@@ -37,22 +37,63 @@ set_up_environment() {
     NOTARIZATION_STATUS_INFO_PLIST="${WORKDIR}/notarization-status-info.plist"
 }
 
+user_has_password_in_keychain() {
+    security find-generic-password \
+        -s ddg-macos-app-archive-script \
+        -a "$1" \
+        >/dev/null 2>&1
+}
+
+retrieve_password_from_keychain() {
+    security find-generic-password \
+        -s ddg-macos-app-archive-script \
+        -a "$1" \
+        -w \
+        2>&1
+}
+
+store_password_in_keychain() {
+    security add-generic-password \
+        -s ddg-macos-app-archive-script \
+        -a "$1" \
+        -w "$2"
+}
+
 get_developer_credentials() {
     DEVELOPER_APPLE_ID="${XCODE_DEVELOPER_APPLE_ID}"
     DEVELOPER_PASSWORD="${XCODE_DEVELOPER_PASSWORD}"
+
     if [[ -z "${DEVELOPER_APPLE_ID}" ]]; then
-        echo "Please enter Apple ID that will be used for requesting notarization"
-        echo "Set it in XCODE_DEVELOPER_APPLE_ID environment variable to not be asked again."
-        read -p "Apple ID: " DEVELOPER_APPLE_ID
+
+        while [[ -z "${DEVELOPER_APPLE_ID}" ]]; do
+            echo "Please enter Apple ID that will be used for requesting notarization"
+            echo "Set it in XCODE_DEVELOPER_APPLE_ID environment variable to not be asked again."
+            echo
+            read -p "Apple ID: " DEVELOPER_APPLE_ID
+            echo
+        done
+
     else
         echo "Using ${DEVELOPER_APPLE_ID} Apple ID"
     fi
-    while [[ -z "${DEVELOPER_PASSWORD}" ]]; do
-        echo "Set password in XCODE_DEVELOPER_PASSWORD environment variable to not be asked for password."
-        echo "Currently only application-specific password is supported (create one at https://appleid.apple.com)."
-        read -sp "Password for ${DEVELOPER_APPLE_ID}: " DEVELOPER_PASSWORD
-        echo
-    done
+
+    if [[ -z "${DEVELOPER_PASSWORD}" ]]; then
+
+        if user_has_password_in_keychain "${DEVELOPER_APPLE_ID}"; then
+            echo "Found Apple ID password in the keychain"
+            DEVELOPER_PASSWORD=$(retrieve_password_from_keychain "${DEVELOPER_APPLE_ID}")
+        else
+            while [[ -z "${DEVELOPER_PASSWORD}" ]]; do
+                echo "Set password in XCODE_DEVELOPER_PASSWORD environment variable to not be asked for password."
+                echo "Currently only application-specific password is supported (create one at https://appleid.apple.com)."
+                echo
+                read -sp "Password for ${DEVELOPER_APPLE_ID}: " DEVELOPER_PASSWORD
+                echo
+            done
+
+            store_password_in_keychain "${DEVELOPER_APPLE_ID}" "${DEVELOPER_PASSWORD}"
+        fi
+    fi
 }
 
 clean_working_directory() {
