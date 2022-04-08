@@ -20,6 +20,14 @@ clean_keychain() {
 }
 
 set_up_environment() {
+    CWD="$(dirname "$0")"
+    XCPRETTY="xcpretty"
+    WORKDIR="${PWD}/release"
+    ARCHIVE="${WORKDIR}/DuckDuckGo.xcarchive"
+    NOTARIZATION_ZIP_PATH="${WORKDIR}/DuckDuckGo-for-notarization.zip"
+    NOTARIZATION_INFO_PLIST="${WORKDIR}/notarization-info.plist"
+    NOTARIZATION_STATUS_INFO_PLIST="${WORKDIR}/notarization-status-info.plist"
+
     if [ $# -lt 1 ]; then
         print_usage_and_exit
     fi
@@ -45,19 +53,13 @@ set_up_environment() {
     esac
 
     if [[ -z $CI ]]; then
-        :
+        EXPORT_OPTIONS_PLIST="${CWD}/ExportOptions.plist"
     else
+        EXPORT_OPTIONS_PLIST="${CWD}/ExportOptions_CI.plist"
         CONFIGURATION="CI_${CONFIGURATION}"
     fi
 
-    CWD="$(dirname "$0")"
-    XCPRETTY="xcpretty"
-    WORKDIR="${PWD}/release"
-    ARCHIVE="${WORKDIR}/DuckDuckGo.xcarchive"
     APP_PATH="${WORKDIR}/${APP_NAME}.app"
-    NOTARIZATION_ZIP_PATH="${WORKDIR}/DuckDuckGo-for-notarization.zip"
-    NOTARIZATION_INFO_PLIST="${WORKDIR}/notarization-info.plist"
-    NOTARIZATION_STATUS_INFO_PLIST="${WORKDIR}/notarization-status-info.plist"
 }
 
 user_has_password_in_keychain() {
@@ -133,6 +135,18 @@ check_xcpretty() {
     fi
 }
 
+prepare_export_options() {
+    if [[ -z $CI ]]; then
+        :
+    else
+        SIGNING_CERTIFICATE=$(security find-certificate -Z -c "Developer ID Application:" | grep "SHA-1" | awk 'NF { print $NF }')
+        TEAM_ID=$(security find-certificate -c "Developer ID Application:" | grep "alis" | awk 'NF { print $NF }' | tr -d \(\)\")
+
+        plutil -replace signingCertificate -string "${SIGNING_CERTIFICATE}" "${EXPORT_OPTIONS_PLIST}"
+        plutil -replace teamID -string "${TEAM_ID}" "${EXPORT_OPTIONS_PLIST}"
+    fi
+}
+
 archive_and_export() {
     echo
     echo "Building and archiving the app ..."
@@ -148,10 +162,12 @@ archive_and_export() {
     echo "Exporting archive ..."
     echo
 
+    prepare_export_options
+
     xcrun xcodebuild -exportArchive \
         -archivePath "${ARCHIVE}" \
         -exportPath "${WORKDIR}" \
-        -exportOptionsPlist "${CWD}/ExportOptions.plist" \
+        -exportOptionsPlist "${EXPORT_OPTIONS_PLIST}" \
         -configuration "${CONFIGURATION}" \
         | ${XCPRETTY}
 }
