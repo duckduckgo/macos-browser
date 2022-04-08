@@ -9,7 +9,7 @@
 	<key>provisioningProfiles</key>
 	<dict>
 		<key>com.duckduckgo.macos.browser</key>
-		<string>MacOS Browser Product Review</string>
+		<string>MacOS Browser</string>
 		<key>com.duckduckgo.macos.browser.review</key>
 		<string>MacOS Browser Product Review</string>
 	</dict>
