@@ -165,11 +165,12 @@ staple_notarized_app() {
     xcrun stapler staple "${APP_PATH}"
 }
 
-compress_app() {
-    pushd "${WORKDIR}"
-    rm -rf DuckDuckGo.zip
-    zip -r9 DuckDuckGo.zip "$(basename "${APP_PATH}")"
-    popd
+compress_app_and_dsym() {
+    echo
+    echo "Compressing app and dSYMs ..."
+    echo
+    ditto -c -k --keepParent "${APP_PATH}" "${WORKDIR}/DuckDuckGo.zip"
+    ditto -c -k --keepParent "${ARCHIVE}/dSYMs/${APP_NAME}.app.dSYM" "${WORKDIR}/${APP_NAME}.app.dSYM.zip"
 }
 
 main() {
@@ -181,11 +182,12 @@ main() {
     upload_for_notarization
     wait_for_notarization
     staple_notarized_app
-    compress_app
+    compress_app_and_dsym
 
     echo
     echo "Notarized app ready at ${APP_PATH}"
     echo "Compressed app ready at ${WORKDIR}/DuckDuckGo.zip"
+    echo "Compressed debug symbols ready at ${WORKDIR}/${APP_NAME}.app.dSYM.zip"
 
     if [[ -z $CI ]]; then
         open "${WORKDIR}"
