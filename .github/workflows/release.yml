@@ -33,8 +33,8 @@ jobs:
         # create variables
         CERTIFICATE_PATH=$RUNNER_TEMP/build_certificate.p12
         KEYCHAIN_PATH=$RUNNER_TEMP/app-signing.keychain-db
-        REVIEW_PP_PATH=$RUNNER_TEMP/review_pp.provisionprofile
-        RELEASE_PP_PATH=$RUNNER_TEMP/release_pp.provisionprofile
+        REVIEW_PP_PATH=$RUNNER_TEMP/f49b0ee4-9585-4758-8b3a-ee167778d644.provisionprofile
+        RELEASE_PP_PATH=$RUNNER_TEMP/73559d64-439f-4aba-b32e-6af7cb1b9d9b.provisionprofile
 
         # import certificate from secrets
         echo -n "$BUILD_CERTIFICATE_BASE64" | base64 --decode --output $CERTIFICATE_PATH
