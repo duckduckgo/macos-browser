@@ -28,10 +28,12 @@ set_up_environment() {
         review)
             APP_NAME="DuckDuckGo Review"
             SCHEME="Product Review Release"
+            CONFIGURATION="Review"
             ;;
         release)
             APP_NAME="DuckDuckGo"
             SCHEME="DuckDuckGo Privacy Browser"
+            CONFIGURATION="Release"
             ;;
         clean-keychain)
             clean_keychain
@@ -41,6 +43,12 @@ set_up_environment() {
             print_usage_and_exit
             ;;
     esac
+
+    if [[ -z $CI ]]; then
+        :
+    else
+        CONFIGURATION="CI_${CONFIGURATION}"
+    fi
 
     CWD="$(dirname "$0")"
     XCPRETTY="xcpretty"
@@ -129,9 +137,10 @@ archive_and_export() {
     echo
     echo "Building and archiving the app ..."
     echo
-
+    
     xcrun xcodebuild archive \
         -scheme "${SCHEME}" \
+        -configuration "${CONFIGURATION}" \
         -archivePath "${WORKDIR}/DuckDuckGo" \
         | ${XCPRETTY}
 
@@ -143,7 +152,7 @@ archive_and_export() {
         -archivePath "${ARCHIVE}" \
         -exportPath "${WORKDIR}" \
         -exportOptionsPlist "${CWD}/ExportOptions.plist" \
-        -configuration Release \
+        -configuration "${CONFIGURATION}" \
         | ${XCPRETTY}
 }
 
