@@ -53,6 +53,7 @@ jobs:
         # apply provisioning profile
         mkdir -p ~/Library/MobileDevice/Provisioning\ Profiles
         cp $REVIEW_PP_PATH $RELEASE_PP_PATH ~/Library/MobileDevice/Provisioning\ Profiles
+        ls -l ~/Library/MobileDevice/Provisioning\ Profiles
 
     - name: Register SSH keys for submodules access
       uses: webfactory/ssh-agent@v0.5.4
