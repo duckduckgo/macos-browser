@@ -1,6 +1,9 @@
 name: Make release build
 
 on: 
+  push:
+    branches:
+      - 'dominik/release-automation'
   workflow_dispatch:
     inputs:
       release-type:
@@ -57,16 +60,16 @@ jobs:
       env:
         XCODE_DEVELOPER_APPLE_ID: ${{ secrets.XCODE_DEVELOPER_APPLE_ID }}
         XCODE_DEVELOPER_PASSWORD: ${{ secrets.XCODE_DEVELOPER_PASSWORD }}
-      run: ./scripts/archive.sh ${{ github.event.inputs.release-type }}
+      run: ./scripts/archive.sh review #${{ github.event.inputs.release-type }}
 
     - name: Upload app artifact
       uses: actions/upload-artifact@v3
       with:
-        name: DuckDuckGo-macos-${{ github.event.inputs.release-type }}
+        name: DuckDuckGo-macos-review #${{ github.event.inputs.release-type }}
         path: ${{ github.workspace }}/release/DuckDuckGo.zip
 
     - name: Upload dSYMs artifact
       uses: actions/upload-artifact@v3
       with:
-        name: DuckDuckGo-macos-${{ github.event.inputs.release-type }}-dSYM
+        name: DuckDuckGo-macos-review-dSYM #${{ github.event.inputs.release-type }}-dSYM
         path: ${{ github.workspace }}/release/DuckDuckGo*.app.dSYM.zip
