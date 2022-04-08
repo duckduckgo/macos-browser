@@ -3,8 +3,20 @@
 set -eo pipefail
 
 print_usage_and_exit() {
-    echo "usage: $0 <review|release>"
+    echo "Usage:"
+    echo "  $ $0 <review|release>"
+    echo
+    echo "To clean keychain entries:"
+    echo "  $ $0 clean-keychain"
     exit 1
+}
+
+clean_keychain() {
+    while security delete-generic-password -s ddg-macos-app-archive-script >/dev/null 2>&1; do
+        true
+    done
+    echo "Removed keychain entries used by the script."
+    exit 0
 }
 
 set_up_environment() {
@@ -20,6 +32,9 @@ set_up_environment() {
         release)
             APP_NAME="DuckDuckGo"
             SCHEME="DuckDuckGo Privacy Browser"
+            ;;
+        clean-keychain)
+            clean_keychain
             ;;
         *)
             echo "Unknown build type '$1'"
