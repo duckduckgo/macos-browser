@@ -2,16 +2,40 @@
 
 set -eo pipefail
 
-CWD="$(dirname $0)"
-WORKDIR="${PWD}/release"
-ARCHIVE="${WORKDIR}/DuckDuckGo"
-APP_PATH="${ARCHIVE} Review.app"
-ZIP_PATH="${ARCHIVE} Review.zip"
-NOTARIZATION_INFO_PLIST="${WORKDIR}/notarization-info.plist"
-NOTARIZATION_STATUS_INFO_PLIST="${WORKDIR}/notarization-status-info.plist"
+print_usage_and_exit() {
+    echo "usage: $0 <review|release>"
+    exit 1
+}
 
-SCHEME="Product Review Release"
-XCPRETTY="xcpretty"
+set_up_environment() {
+    if [ $# -lt 1 ]; then
+        print_usage_and_exit
+    fi
+
+    case $1 in
+        review)
+            APP_NAME="DuckDuckGo Review"
+            SCHEME="Product Review Release"
+            ;;
+        release)
+            APP_NAME="DuckDuckGo"
+            SCHEME="DuckDuckGo Privacy Browser"
+            ;;
+        *)
+            echo "Unknown build type '$1'"
+            print_usage_and_exit
+            ;;
+    esac
+
+    CWD="$(dirname $0)"
+    XCPRETTY="xcpretty"
+    WORKDIR="${PWD}/release"
+    ARCHIVE="${WORKDIR}/DuckDuckGo.xcarchive"
+    APP_PATH="${WORKDIR}/${APP_NAME}.app"
+    NOTARIZATION_ZIP_PATH="${WORKDIR}/DuckDuckGo-for-notarization.zip"
+    NOTARIZATION_INFO_PLIST="${WORKDIR}/notarization-info.plist"
+    NOTARIZATION_STATUS_INFO_PLIST="${WORKDIR}/notarization-status-info.plist"
+}
 
 get_developer_credentials() {
     DEVELOPER_APPLE_ID="${XCODE_DEVELOPER_APPLE_ID}"
@@ -59,7 +83,7 @@ archive_and_export() {
     echo
 
     xcrun xcodebuild -exportArchive \
-        -archivePath "${ARCHIVE}.xcarchive" \
+        -archivePath "${ARCHIVE}" \
         -exportPath "${WORKDIR}" \
         -exportOptionsPlist "${CWD}/ExportOptions.plist" \
         -configuration Release \
@@ -68,17 +92,17 @@ archive_and_export() {
 
 altool_upload() {
     xcrun altool --notarize-app \
-        --primary-bundle-id "com.duckduckgo.macos.browser.review" \
+        --primary-bundle-id "com.duckduckgo.macos.browser" \
         -u "${DEVELOPER_APPLE_ID}" \
         -p "${DEVELOPER_PASSWORD}" \
-        -f "${ZIP_PATH}" \
+        -f "${NOTARIZATION_ZIP_PATH}" \
         --output-format xml \
         2>/dev/null \
         > "${NOTARIZATION_INFO_PLIST}"
 }
 
 upload_for_notarization() {
-    ditto -c -k --keepParent "${APP_PATH}" "${ZIP_PATH}"
+    ditto -c -k --keepParent "${APP_PATH}" "${NOTARIZATION_ZIP_PATH}"
 
     retries=3
     while true; do
@@ -140,7 +164,15 @@ staple_notarized_app() {
     xcrun stapler staple "${APP_PATH}"
 }
 
+compress_app() {
+    pushd "${WORKDIR}"
+    rm -rf DuckDuckGo.zip
+    zip -r9 DuckDuckGo.zip "$(basename "${APP_PATH}")"
+    popd
+}
+
 main() {
+    set_up_environment $@
     get_developer_credentials
     clean_working_directory
     check_xcpretty
@@ -148,13 +180,15 @@ main() {
     upload_for_notarization
     wait_for_notarization
     staple_notarized_app
+    compress_app
 
     echo
     echo "Notarized app ready at ${APP_PATH}"
+    echo "Compressed app ready at ${WORKDIR}/DuckDuckGo.zip"
 
     if [[ -z $CI ]]; then
         open "${WORKDIR}"
     fi
 }
 
-main
+main $@

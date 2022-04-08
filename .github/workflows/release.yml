@@ -1,0 +1,59 @@
+name: Make release build
+
+on: 
+  workflow_dispatch:
+    inputs:
+      release-type:
+        description: "Build type (product review or public release)"
+        required: true
+        default: 'review'
+        type: choice
+        options:
+        - review
+        - release
+
+
+jobs:
+  export-notarized-app:
+
+    runs-on: macos-latest
+
+    steps:
+    - name: Install Apple Developer ID Application certificate
+      env:
+        BUILD_CERTIFICATE_BASE64: ${{ secrets.BUILD_CERTIFICATE_BASE64 }}
+        P12_PASSWORD: ${{ secrets.P12_PASSWORD }}
+        KEYCHAIN_PASSWORD: ${{ secrets.KEYCHAIN_PASSWORD }}
+      run: |
+        # create variables
+        CERTIFICATE_PATH=$RUNNER_TEMP/build_certificate.p12
+        KEYCHAIN_PATH=$RUNNER_TEMP/app-signing.keychain-db
+
+        # import certificate from secrets
+        echo -n "$BUILD_CERTIFICATE_BASE64" | base64 --decode --output $CERTIFICATE_PATH
+
+        # create temporary keychain
+        security create-keychain -p "$KEYCHAIN_PASSWORD" $KEYCHAIN_PATH
+        security set-keychain-settings -lut 21600 $KEYCHAIN_PATH
+        security unlock-keychain -p "$KEYCHAIN_PASSWORD" $KEYCHAIN_PATH
+
+        # import certificate to keychain
+        security import $CERTIFICATE_PATH -P "$P12_PASSWORD" -A -t cert -f pkcs12 -k $KEYCHAIN_PATH
+        security list-keychain -d user -s $KEYCHAIN_PATH
+
+    - name: Check out the code
+      uses: actions/checkout@v3
+      with:
+        submodules: recursive
+
+    - name: Archive and notarize the app
+      env:
+        XCODE_DEVELOPER_APPLE_ID: ${{ secrets.XCODE_DEVELOPER_APPLE_ID }}
+        XCODE_DEVELOPER_PASSWORD: ${{ secrets.XCODE_DEVELOPER_PASSWORD }}
+      run: ./scripts/archive.sh ${{ github.event.inputs.release-type }}
+
+    - name: Upload app artifact
+      uses: actions/upload-artifact@v3
+      with:
+        name: DuckDuckGo-macos-${{ github.event.inputs.release-type }}
+        path: ${{ github.workspace }}/release/DuckDuckGo.zip
