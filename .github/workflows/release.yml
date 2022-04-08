@@ -53,7 +53,6 @@ jobs:
         # apply provisioning profile
         mkdir -p ~/Library/MobileDevice/Provisioning\ Profiles
         cp $REVIEW_PP_PATH $RELEASE_PP_PATH ~/Library/MobileDevice/Provisioning\ Profiles
-        ls -l ~/Library/MobileDevice/Provisioning\ Profiles
 
     - name: Register SSH keys for submodules access
       uses: webfactory/ssh-agent@v0.5.4
@@ -71,7 +70,9 @@ jobs:
       env:
         XCODE_DEVELOPER_APPLE_ID: ${{ secrets.XCODE_DEVELOPER_APPLE_ID }}
         XCODE_DEVELOPER_PASSWORD: ${{ secrets.XCODE_DEVELOPER_PASSWORD }}
-      run: ./scripts/archive.sh review #${{ github.event.inputs.release-type }}
+      run: |
+        ls -l ~/Library/MobileDevice/Provisioning\ Profiles
+        ./scripts/archive.sh review #${{ github.event.inputs.release-type }}
 
     - name: Upload app artifact
       uses: actions/upload-artifact@v3
