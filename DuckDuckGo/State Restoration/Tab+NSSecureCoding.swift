@@ -28,6 +28,7 @@ extension Tab: NSSecureCoding {
         static let favicon = "icon"
         static let tabType = "tabType"
         static let visitedDomains = "visitedDomains"
+        static let currentDownload = "currentDownload"
     }
 
     static var supportsSecureCoding: Bool { true }
@@ -39,12 +40,14 @@ extension Tab: NSSecureCoding {
         else { return nil }
 
         let visitedDomains = decoder.decodeObject(of: [NSArray.self, NSString.self], forKey: NSSecureCodingKeys.visitedDomains) as? [String] ?? []
+        let currentDownload = decoder.decodeObject(of: NSURL.self, forKey: NSSecureCodingKeys.currentDownload) as? URL
 
         self.init(content: content,
                   localHistory: Set(visitedDomains),
                   title: decoder.decodeIfPresent(at: NSSecureCodingKeys.title),
                   favicon: decoder.decodeIfPresent(at: NSSecureCodingKeys.favicon),
-                  sessionStateData: decoder.decodeIfPresent(at: NSSecureCodingKeys.sessionStateData))
+                  sessionStateData: decoder.decodeIfPresent(at: NSSecureCodingKeys.sessionStateData),
+                  currentDownload: currentDownload)
     }
 
     func encode(with coder: NSCoder) {
@@ -56,6 +59,7 @@ extension Tab: NSSecureCoding {
         favicon.map(coder.encode(forKey: NSSecureCodingKeys.favicon))
         getActualSessionStateData().map(coder.encode(forKey: NSSecureCodingKeys.sessionStateData))
         coder.encode(content.type.rawValue, forKey: NSSecureCodingKeys.tabType)
+        coder.encode(currentDownload, forKey: NSSecureCodingKeys.currentDownload)
     }
 
 }
