@@ -19,7 +19,7 @@
 # Style
 
 --rules redundantType
---redundanttype inferred
+--redundanttype infer-locals-only
 
 --rules redundantSelf
 --self remove
