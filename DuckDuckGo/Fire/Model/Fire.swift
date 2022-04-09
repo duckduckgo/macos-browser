@@ -215,7 +215,7 @@ final class Fire {
     // MARK: - Tab Models
 
     private func allTabViewModels() -> [TabViewModel] {
-        var allTabViewModels = [TabViewModel] ()
+        var allTabViewModels = [TabViewModel]()
         for window in windowControllerManager.mainWindowControllers {
             let tabCollectionViewModel = window.mainViewController.tabCollectionViewModel
 

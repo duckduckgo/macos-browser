@@ -28,7 +28,7 @@ final class PasswordManagementLoginModel: ObservableObject, PasswordManagementIt
         dateFormatter.dateStyle = .medium
         dateFormatter.timeStyle = .medium
         return dateFormatter
-    } ()
+    }()
 
     var onDirtyChanged: (Bool) -> Void
     var onSaveRequested: (SecureVaultModels.WebsiteCredentials) -> Void

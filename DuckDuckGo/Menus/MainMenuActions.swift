@@ -20,6 +20,8 @@ import BrowserServicesKit
 import Cocoa
 import os.log
 
+// swiftlint:disable file_length
+
 // Actions are sent to objects of responder chain
 
 // MARK: - Main Menu Actions
@@ -714,3 +716,5 @@ extension MainViewController: FindInPageDelegate {
     }
 
 }
+
+// swiftlint:enable file_length

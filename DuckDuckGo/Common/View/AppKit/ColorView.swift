@@ -57,7 +57,7 @@ final class ColorView: NSView {
         }
     }
 
-    @IBInspectable var interceptClickEvents = false
+    @IBInspectable var interceptClickEvents: Bool = false
 
     func setupView() {
         wantsLayer = true

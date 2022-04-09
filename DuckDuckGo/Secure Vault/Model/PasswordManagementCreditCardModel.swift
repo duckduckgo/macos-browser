@@ -27,7 +27,7 @@ final class PasswordManagementCreditCardModel: ObservableObject, PasswordManagem
         let dateFormatter = DateFormatter()
         dateFormatter.dateFormat = "MMMM, yyyy"
         return dateFormatter
-    } ()
+    }()
 
     var onDirtyChanged: (Bool) -> Void
     var onSaveRequested: (Model) -> Void

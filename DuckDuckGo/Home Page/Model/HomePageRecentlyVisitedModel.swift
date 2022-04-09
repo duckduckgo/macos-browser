@@ -27,7 +27,7 @@ extension HomePage.Models {
             let f = RelativeDateTimeFormatter()
             f.unitsStyle = .abbreviated
             return f
-        } ()
+        }()
 
         private let fire = Fire()
 

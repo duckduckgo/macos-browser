@@ -279,29 +279,29 @@ private struct WKGeolocationManager {
 
 // https://github.com/WebKit/WebKit/blob/8afe31a018b11741abdf9b4d5bb973d7c1d9ff05/Source/WebKit/UIProcess/API/C/WKGeolocationPosition.h
 private typealias WKGeolocationPositionCreate_c_type = @convention(c) // swiftlint:disable:this type_name
-    (///timestamp:
-        Double, ///latitude:
-        Double, ///longitude:
-        Double, ///accuracy:
-        Double,
-        /*providesAltitude:*/ Bool, ///altitude:
-        Double, ///providesAltitudeAccuracy:
-        Bool,
-        /*altitudeAccuracy:*/ Double, ///providesHeading:
-        Bool, ///heading:
-        Double,
-        /*providesSpeed:*/ Bool, ///speed:
-        Double, ///providesFloorLevel:
-        Bool, ///floorLevel:
-        Double)
+    (
+        Double, // timestamp
+        Double, // latitude
+        Double, // longitude
+        Double, // accuracy
+        Bool, // providesAltitude
+        Double, // altitude
+        Bool, // providesAltitudeAccuracy
+        Double, // altitudeAccuracy
+        Bool, // providesHeading
+        Double, // heading
+        Bool, // providesSpeed
+        Double, // speed
+        Bool, // providesFloorLevel
+        Double) // floorLevel
     -> UnsafeRawPointer?
 
 private let WKGeolocationPositionCreate_c: WKGeolocationPositionCreate_c_type? = // swiftlint:disable:this identifier_name
     dynamicSymbol(named: "WKGeolocationPositionCreate_c")
 
 private func createWKGeolocationPosition(_ location: CLLocation) -> UnsafeRawPointer? {
-    WKGeolocationPositionCreate_c?(///timestamp:
-        location.timestamp.timeIntervalSinceReferenceDate,
+    WKGeolocationPositionCreate_c?(
+        /*timestamp:*/location.timestamp.timeIntervalSinceReferenceDate,
         /*latitude:*/ location.coordinate.latitude,
         /*longitude:*/ location.coordinate.longitude,
         /*accuracy:*/ location.horizontalAccuracy,

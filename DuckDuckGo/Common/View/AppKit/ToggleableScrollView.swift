@@ -22,7 +22,7 @@ import Foundation
 
 public class ToggleableScrollView: NSScrollView {
 
-    @IBInspectable public var isEnabled = true
+    @IBInspectable public var isEnabled: Bool = true
 
     public override func scrollWheel(with event: NSEvent) {
         if isEnabled {

@@ -53,8 +53,8 @@ final class FileDownloadManager: FileDownloadManagerProtocol {
         downloadAddedSubject.eraseToAnyPublisher()
     }
 
-    typealias FileNameChooserCallback = (///suggestedFilename:
-        String?,
+    typealias FileNameChooserCallback = (
+        /*suggestedFilename:*/ String?,
         /*directoryURL:*/ URL?,
         /*fileTypes:*/ [UTType],
         /*completionHandler*/ @escaping (URL?, UTType?) -> Void) -> Void

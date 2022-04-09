@@ -282,7 +282,7 @@ final class PermissionModel {
             @unknown default: break
             }
         }
-        decisionHandler(///salt - seems not used anywhere:
+        decisionHandler( // salt - seems not used anywhere:
             "",
             /*includeSensitiveMediaDeviceDetails:*/ false)
         // make sure to swizzle it back after reasonable interval in case it wasn't called

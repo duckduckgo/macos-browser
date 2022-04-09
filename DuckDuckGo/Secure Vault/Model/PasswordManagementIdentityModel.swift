@@ -28,7 +28,7 @@ final class PasswordManagementIdentityModel: ObservableObject, PasswordManagemen
         dateFormatter.dateStyle = .medium
         dateFormatter.timeStyle = .none
         return dateFormatter
-    } ()
+    }()
 
     var onDirtyChanged: (Bool) -> Void
     var onSaveRequested: (SecureVaultModels.Identity) -> Void

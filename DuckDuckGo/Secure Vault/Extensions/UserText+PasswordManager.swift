@@ -18,7 +18,6 @@
 
 import Foundation
 
-// swiftlint:disable line_length
 extension UserText {
 
     static let pmEmptyStateDefaultTitle = NSLocalizedString(
