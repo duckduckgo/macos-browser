@@ -27,14 +27,14 @@ extension Preferences {
 
         var body: some View {
             VStack {
-                Button(action: { isSelected.toggle() }) {
+                Button(action: { isSelected.toggle() }, label: {
                     VStack(spacing: 2) {
                         Image(imageName)
                             .padding(2)
                             .background(selectionBackground)
                         Text(title)
                     }
-                }
+                })
                 .padding(.horizontal, 2)
                 .buttonStyle(.plain)
             }

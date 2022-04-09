@@ -81,6 +81,7 @@ final class WebViewStateObserver: NSObject {
         isObserving = true
     }
 
+    // swiftlint:disable:next block_based_kvo
     override func observeValue(
         forKeyPath keyPath: String?,
         of object: Any?,

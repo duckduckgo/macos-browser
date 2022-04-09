@@ -150,7 +150,7 @@ final class FaviconReferenceCache {
             return hostReference.dateCreated < Date.monthAgo &&
                 !fireproofDomains.isFireproof(fireproofDomain: host) &&
                 !bookmarkManager.isHostInBookmarks(host: host)
-        }) {
+        }, completionHandler: {
             // Remove URL references
             self.removeUrlReferences(filter: { urlReference in
                 guard let host = urlReference.documentUrl.host else {
@@ -160,7 +160,7 @@ final class FaviconReferenceCache {
                     !fireproofDomains.isFireproof(fireproofDomain: host) &&
                     !bookmarkManager.isHostInBookmarks(host: host)
             }, completionHandler: completion)
-        }
+        })
     }
 
     // MARK: - Burning
@@ -179,7 +179,7 @@ final class FaviconReferenceCache {
         removeHostReferences(filter: { hostReference in
             let host = hostReference.host
             return !isHostApproved(host: host)
-        }) {
+        }, completionHandler: {
             // Remove URL references
             self.removeUrlReferences(filter: { urlReference in
                 guard let host = urlReference.documentUrl.host else {
@@ -187,7 +187,7 @@ final class FaviconReferenceCache {
                 }
                 return !isHostApproved(host: host)
             }, completionHandler: completion)
-        }
+        })
     }
 
     func burnDomains(
@@ -198,7 +198,7 @@ final class FaviconReferenceCache {
         removeHostReferences(filter: { hostReference in
             let host = hostReference.host
             return domains.contains(host) && !bookmarkManager.isHostInBookmarks(host: host)
-        }) {
+        }, completionHandler: {
             // Remove URL references
             self.removeUrlReferences(filter: { urlReference in
                 guard let host = urlReference.documentUrl.host else {
@@ -206,7 +206,7 @@ final class FaviconReferenceCache {
                 }
                 return domains.contains(host) && !bookmarkManager.isHostInBookmarks(host: host)
             }, completionHandler: completion)
-        }
+        })
     }
 
     // MARK: - Private

@@ -123,11 +123,11 @@ final class DefaultConfigurationDownloader: ConfigurationDownloading {
                         promise(.failure(error))
                     }
 
-                }) { value in
+                }, receiveValue: { value in
 
                     promise(.success(value))
 
-                }.store(in: &self.cancellables)
+                }).store(in: &self.cancellables)
 
         }.eraseToAnyPublisher()
 

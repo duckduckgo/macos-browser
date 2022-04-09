@@ -71,9 +71,9 @@ struct HoverButton: View {
         .frame(width: size, height: size)
         .link(onHoverChanged: {
             self.isHovering = $0
-        }) {
+        }, clicked: {
             action()
-        }
+        })
 
     }
 
