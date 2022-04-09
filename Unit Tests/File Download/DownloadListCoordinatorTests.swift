@@ -86,7 +86,7 @@ final class DownloadListCoordinatorTests: XCTestCase {
         let e = expectation(description: "clear older than date called")
         store.fetchBlock = { date, _ in
             e.fulfill()
-            XCTAssertEqual(Int(clearDate.timeIntervalSinceReferenceDate), Int(date.timeIntervalSinceReferenceDate))
+            XCTAssertEqual(Int(clearDate!.timeIntervalSinceReferenceDate), Int(date.timeIntervalSinceReferenceDate))
         }
         setUpCoordinator()
 
