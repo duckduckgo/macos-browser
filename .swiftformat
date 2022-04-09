@@ -27,7 +27,7 @@
 --rules strongifiedSelf
 
 --rules trailingCommas
---commas inline # TODO: Do we want this?
+--commas inline
 
 --rules redundantParens
 --rules redundantPattern
@@ -62,7 +62,7 @@
 
 # Patterns
 
---rules redundantFileprivate
+# --rules redundantFileprivate
 --rules enumNamespaces
 --rules redundantRawValues
 --rules redundantReturn
@@ -82,9 +82,10 @@
 --rules duplicateImports
 --rules consecutiveSpaces
 --rules blankLinesBetweenScopes
---rules markTypes
+# --rules markTypes
 
---rules organizeDeclarations # TODO: Do we want this to MARK every section?
---structthreshold 20
---enumthreshold 20
---organizetypes class,struct,enum,extension
+# --rules organizeDeclarations # TODO: Do we want this to MARK every section?
+# --markcategories false
+# --structthreshold 20
+# --enumthreshold 20
+# --organizetypes class,struct,enum,extension
