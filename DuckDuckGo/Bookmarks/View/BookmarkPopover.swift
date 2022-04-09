@@ -27,7 +27,7 @@ final class BookmarkPopover: NSPopover {
         setupContentController()
     }
 
-    required init?(coder: NSCoder) {
+    required init?(coder _: NSCoder) {
         fatalError("BookmarksPopover: Bad initializer")
     }
 
@@ -48,7 +48,7 @@ final class BookmarkPopover: NSPopover {
 
 extension BookmarkPopover: BookmarkPopoverViewControllerDelegate {
 
-    func popoverShouldClose(_ bookmarkPopoverViewController: BookmarkPopoverViewController) {
+    func popoverShouldClose(_: BookmarkPopoverViewController) {
         close()
     }
 

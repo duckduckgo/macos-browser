@@ -17,8 +17,8 @@
 //
 
 import Cocoa
-import os.log
 import Combine
+import os.log
 
 struct OtherTabBarViewItemsState {
 
@@ -70,7 +70,7 @@ final class TabBarViewItem: NSCollectionViewItem {
         }
     }
 
-    var isLeftToSelected: Bool = false {
+    var isLeftToSelected = false {
         didSet {
             updateSeparatorView()
         }
@@ -81,6 +81,7 @@ final class TabBarViewItem: NSCollectionViewItem {
             faviconImageView.applyFaviconStyle()
         }
     }
+
     @IBOutlet weak var permissionButton: NSButton!
 
     @IBOutlet weak var titleTextField: NSTextField!
@@ -149,30 +150,36 @@ final class TabBarViewItem: NSCollectionViewItem {
         return super.draggingImageComponents
     }
 
-    @objc func duplicateAction(_ sender: NSButton) {
+    @objc
+    func duplicateAction(_: NSButton) {
         delegate?.tabBarViewItemDuplicateAction(self)
     }
 
-    @objc func fireproofSiteAction(_ sender: NSButton) {
+    @objc
+    func fireproofSiteAction(_: NSButton) {
         delegate?.tabBarViewItemFireproofSite(self)
     }
 
-    @objc func removeFireproofingAction(_ sender: NSButton) {
+    @objc
+    func removeFireproofingAction(_: NSButton) {
         delegate?.tabBarViewItemRemoveFireproofing(self)
     }
 
-    @objc func bookmarkThisPageAction(_ sender: Any) {
+    @objc
+    func bookmarkThisPageAction(_: Any) {
         delegate?.tabBarViewItemBookmarkThisPageAction(self)
     }
 
     private var lastKnownIndexPath: IndexPath?
 
-    @IBAction func closeButtonAction(_ sender: NSButton) {
-        guard let indexPath = self.collectionView?.indexPath(for: self) else {
+    @IBAction
+    func closeButtonAction(_: NSButton) {
+        guard let indexPath = collectionView?.indexPath(for: self) else {
             // doubleclick event arrived at point when we're already removed
             // pass the closeButton action to the next TabBarViewItem
-            if let indexPath = self.lastKnownIndexPath,
-               let nextItem = self.collectionView?.item(at: indexPath) as? Self {
+            if
+                let indexPath = lastKnownIndexPath,
+                let nextItem = collectionView?.item(at: indexPath) as? Self {
                 // and set its lastKnownIndexPath in case clicks continue to arrive
                 nextItem.lastKnownIndexPath = indexPath
                 delegate?.tabBarViewItemCloseAction(nextItem)
@@ -180,23 +187,27 @@ final class TabBarViewItem: NSCollectionViewItem {
             return
         }
 
-        self.lastKnownIndexPath = indexPath
+        lastKnownIndexPath = indexPath
         delegate?.tabBarViewItemCloseAction(self)
     }
 
-    @IBAction func permissionButtonAction(_ sender: NSButton) {
+    @IBAction
+    func permissionButtonAction(_: NSButton) {
         delegate?.tabBarViewItemTogglePermissionAction(self)
     }
 
-    @objc func closeOtherAction(_ sender: NSMenuItem) {
+    @objc
+    func closeOtherAction(_: NSMenuItem) {
         delegate?.tabBarViewItemCloseOtherAction(self)
     }
 
-    @objc func closeToTheRightAction(_ sender: NSMenuItem) {
+    @objc
+    func closeToTheRightAction(_: NSMenuItem) {
         delegate?.tabBarViewItemCloseToTheRightAction(self)
     }
 
-    @objc func moveToNewWindowAction(_ sender: NSMenuItem) {
+    @objc
+    func moveToNewWindowAction(_: NSMenuItem) {
         delegate?.tabBarViewItemMoveToNewWindowAction(self)
     }
 
@@ -268,6 +279,7 @@ final class TabBarViewItem: NSCollectionViewItem {
             updateTitleTextFieldMask()
         }
     }
+
     private func updateUsedPermissions() {
         if usedPermissions.camera.isActive {
             permissionButton.image = .cameraActiveImage
@@ -353,8 +365,9 @@ extension TabBarViewItem: NSMenuDelegate {
         closeMenuItem.target = self
         menu.addItem(closeMenuItem)
 
-        let otherItemsState = delegate?.otherTabBarViewItemsState(for: self) ?? .init(hasItemsToTheLeft: true,
-                                                                                      hasItemsToTheRight: true)
+        let otherItemsState = delegate?.otherTabBarViewItemsState(for: self) ?? .init(
+            hasItemsToTheLeft: true,
+            hasItemsToTheRight: true)
 
         updateWithTabsToTheSides(menu, otherItemsState)
 
@@ -371,9 +384,10 @@ extension TabBarViewItem: NSMenuDelegate {
         }
 
         if otherItemsState.hasItemsToTheRight {
-            let closeTabsToTheRightMenuItem = NSMenuItem(title: UserText.closeTabsToTheRight,
-                                                         action: #selector(closeToTheRightAction(_:)),
-                                                         keyEquivalent: "")
+            let closeTabsToTheRightMenuItem = NSMenuItem(
+                title: UserText.closeTabsToTheRight,
+                action: #selector(closeToTheRightAction(_:)),
+                keyEquivalent: "")
             closeTabsToTheRightMenuItem.target = self
             menu.addItem(closeTabsToTheRightMenuItem)
         }
@@ -384,7 +398,7 @@ extension TabBarViewItem: NSMenuDelegate {
 
 extension TabBarViewItem: MouseOverViewDelegate {
 
-    func mouseOverView(_ mouseOverView: MouseOverView, isMouseOver: Bool) {
+    func mouseOverView(_: MouseOverView, isMouseOver: Bool) {
         delegate?.tabBarViewItem(self, isMouseOver: isMouseOver)
         self.isMouseOver = isMouseOver
         view.needsLayout = true
@@ -394,22 +408,23 @@ extension TabBarViewItem: MouseOverViewDelegate {
 
 extension TabBarViewItem: MouseClickViewDelegate {
 
-    func mouseClickView(_ mouseClickView: MouseClickView, otherMouseDownEvent: NSEvent) {
+    func mouseClickView(_: MouseClickView, otherMouseDownEvent: NSEvent) {
         // close on middle-click
         guard otherMouseDownEvent.buttonNumber == 2 else { return }
 
-        guard let indexPath = self.collectionView?.indexPath(for: self) else {
+        guard let indexPath = collectionView?.indexPath(for: self) else {
             // doubleclick event arrived at point when we're already removed
             // pass the closeButton action to the next TabBarViewItem
-            if let indexPath = self.lastKnownIndexPath,
-               let nextItem = self.collectionView?.item(at: indexPath) as? Self {
+            if
+                let indexPath = lastKnownIndexPath,
+                let nextItem = collectionView?.item(at: indexPath) as? Self {
                 // and set its lastKnownIndexPath in case clicks continue to arrive
                 nextItem.lastKnownIndexPath = indexPath
                 delegate?.tabBarViewItemCloseAction(nextItem)
             }
             return
         }
-        self.lastKnownIndexPath = indexPath
+        lastKnownIndexPath = indexPath
         delegate?.tabBarViewItemCloseAction(self)
     }
 
@@ -447,8 +462,8 @@ extension TabBarViewItem {
 
 }
 
-private extension TabBarViewItem {
-    enum TextFieldMaskGradientSize {
+extension TabBarViewItem {
+    fileprivate enum TextFieldMaskGradientSize {
         static let width: CGFloat = 6
         static let trailingSpace: CGFloat = 0
         static let trailingSpaceWithButton: CGFloat = 20
@@ -456,10 +471,10 @@ private extension TabBarViewItem {
     }
 }
 
-private extension NSImage {
-    static let cameraActiveImage = NSImage(named: "Camera-Tab-Active")
-    static let cameraBlockedImage = NSImage(named: "Camera-Tab-Blocked")
+extension NSImage {
+    fileprivate static let cameraActiveImage = NSImage(named: "Camera-Tab-Active")
+    fileprivate static let cameraBlockedImage = NSImage(named: "Camera-Tab-Blocked")
 
-    static let micActiveImage = NSImage(named: "Microphone-Active")
-    static let micBlockedImage = NSImage(named: "Microphone-Icon")
+    fileprivate static let micActiveImage = NSImage(named: "Microphone-Active")
+    fileprivate static let micBlockedImage = NSImage(named: "Microphone-Icon")
 }

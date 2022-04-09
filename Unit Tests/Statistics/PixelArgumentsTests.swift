@@ -16,8 +16,8 @@
 //  limitations under the License.
 //
 
-import XCTest
 import Carbon
+import XCTest
 @testable import DuckDuckGo_Privacy_Browser
 
 class PixelArgumentsTests: XCTestCase {
@@ -47,7 +47,7 @@ class PixelArgumentsTests: XCTestCase {
     }
 
     // MARK: NavigationKind
-    
+
     func testWhenInitWithURLThenNavigationKindIsURL() {
         let url = URL(string: "https://duckduckgo.com")!
 
@@ -107,10 +107,17 @@ class PixelArgumentsTests: XCTestCase {
 
     func testWhenInitWithHotKeyThenAccessPointIsHotKey() {
         let mainMenu = makeMenu()
-        let event = NSEvent.keyEvent(with: .keyDown, location: .zero, modifierFlags: .command,
-                                     timestamp: Date().timeIntervalSinceReferenceDate, windowNumber: 0,
-                                     context: nil, characters: "x", charactersIgnoringModifiers: "",
-                                     isARepeat: false, keyCode: UInt16(kVK_ANSI_X))!
+        let event = NSEvent.keyEvent(
+            with: .keyDown,
+            location: .zero,
+            modifierFlags: .command,
+            timestamp: Date().timeIntervalSinceReferenceDate,
+            windowNumber: 0,
+            context: nil,
+            characters: "x",
+            charactersIgnoringModifiers: "",
+            isARepeat: false,
+            keyCode: UInt16(kVK_ANSI_X))!
         NSApp.setValue(event, forKey: "currentEvent")
         let ap = Pixel.Event.AccessPoint(sender: mainMenu.item, default: .tabMenu) { $0 === mainMenu.menu }
         XCTAssertEqual(ap, .hotKey)
@@ -118,10 +125,17 @@ class PixelArgumentsTests: XCTestCase {
 
     func testWhenInitWithMenuChosenByCmdEnterThenAccessPointIsMainMenu() {
         let mainMenu = makeMenu()
-        let event = NSEvent.keyEvent(with: .keyDown, location: .zero, modifierFlags: .command,
-                                     timestamp: Date().timeIntervalSinceReferenceDate, windowNumber: 0,
-                                     context: nil, characters: "\n", charactersIgnoringModifiers: "",
-                                     isARepeat: false, keyCode: UInt16(kVK_Return))!
+        let event = NSEvent.keyEvent(
+            with: .keyDown,
+            location: .zero,
+            modifierFlags: .command,
+            timestamp: Date().timeIntervalSinceReferenceDate,
+            windowNumber: 0,
+            context: nil,
+            characters: "\n",
+            charactersIgnoringModifiers: "",
+            isARepeat: false,
+            keyCode: UInt16(kVK_Return))!
         NSApp.setValue(event, forKey: "currentEvent")
         let ap = Pixel.Event.AccessPoint(sender: mainMenu.item, default: .tabMenu) { $0 === mainMenu.menu }
         XCTAssertEqual(ap, .mainMenu)
@@ -129,10 +143,17 @@ class PixelArgumentsTests: XCTestCase {
 
     func testWhenInitWithMenuChosenByCmdSpaceThenAccessPointIsMainMenu() {
         let mainMenu = makeMenu()
-        let event = NSEvent.keyEvent(with: .keyDown, location: .zero, modifierFlags: .command,
-                                     timestamp: Date().timeIntervalSinceReferenceDate, windowNumber: 0,
-                                     context: nil, characters: " ", charactersIgnoringModifiers: "",
-                                     isARepeat: false, keyCode: UInt16(kVK_Space))!
+        let event = NSEvent.keyEvent(
+            with: .keyDown,
+            location: .zero,
+            modifierFlags: .command,
+            timestamp: Date().timeIntervalSinceReferenceDate,
+            windowNumber: 0,
+            context: nil,
+            characters: " ",
+            charactersIgnoringModifiers: "",
+            isARepeat: false,
+            keyCode: UInt16(kVK_Space))!
         NSApp.setValue(event, forKey: "currentEvent")
         let ap = Pixel.Event.AccessPoint(sender: mainMenu.item, default: .tabMenu) { $0 === mainMenu.menu }
         XCTAssertEqual(ap, .mainMenu)

@@ -16,27 +16,30 @@
 //  limitations under the License.
 //
 
-import Foundation
 import Combine
+import Foundation
 @testable import DuckDuckGo_Privacy_Browser
 
 final class FileDownloadManagerMock: FileDownloadManagerProtocol {
 
     var downloads = Set<WebKitDownloadTask>()
-    
+
     var downloadAddedSubject = PassthroughSubject<WebKitDownloadTask, Never>()
     var downloadsPublisher: AnyPublisher<WebKitDownloadTask, Never> {
         downloadAddedSubject.eraseToAnyPublisher()
     }
 
-    var addDownloadBlock: ((WebKitDownload,
-                            FileDownloadManagerDelegate?,
-                            FileDownloadManager.DownloadLocationPreference,
-                            FileDownloadManager.PostflightAction?) -> WebKitDownloadTask)?
-    func add(_ download: WebKitDownload,
-             delegate: FileDownloadManagerDelegate?,
-             location: FileDownloadManager.DownloadLocationPreference,
-             postflight: FileDownloadManager.PostflightAction?) -> WebKitDownloadTask {
+    var addDownloadBlock: ((
+        WebKitDownload,
+        FileDownloadManagerDelegate?,
+        FileDownloadManager.DownloadLocationPreference,
+        FileDownloadManager.PostflightAction?) -> WebKitDownloadTask)?
+    func add(
+        _ download: WebKitDownload,
+        delegate: FileDownloadManagerDelegate?,
+        location: FileDownloadManager.DownloadLocationPreference,
+        postflight: FileDownloadManager.PostflightAction?)
+        -> WebKitDownloadTask {
         addDownloadBlock!(download, delegate, location, postflight)
     }
 

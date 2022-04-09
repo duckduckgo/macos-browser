@@ -27,7 +27,7 @@ extension NSMenuItem {
 
     convenience init(action selector: Selector?) {
         self.init()
-        self.action = selector
+        action = selector
     }
 
     var topMenu: NSMenu? {

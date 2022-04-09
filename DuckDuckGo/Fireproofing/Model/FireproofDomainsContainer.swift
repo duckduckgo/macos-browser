@@ -16,8 +16,8 @@
 //  limitations under the License.
 //
 
-import Foundation
 import CoreData
+import Foundation
 
 struct FireproofDomainsContainer {
 
@@ -34,7 +34,7 @@ struct FireproofDomainsContainer {
     private var superdomainsToSubdomains = [String: Set<String>]()
 
     var domains: [String] {
-        return Array(domainsToIds.keys)
+        Array(domainsToIds.keys)
     }
 
     @discardableResult
@@ -87,7 +87,7 @@ struct FireproofDomainsContainer {
     }
 
     func contains(superdomain: String) -> Bool {
-        return superdomainsToSubdomains[superdomain] != nil
+        superdomainsToSubdomains[superdomain] != nil
     }
 
 }

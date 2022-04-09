@@ -24,7 +24,7 @@ import XCTest
 final class WebCacheManagerMock: WebCacheManager {
 
     var clearCalled = false
-    override func clear(domains: Set<String>? = nil) async {
+    override func clear(domains _: Set<String>? = nil) async {
         clearCalled = true
     }
 
@@ -32,11 +32,13 @@ final class WebCacheManagerMock: WebCacheManager {
 
 extension HTTPCookie {
 
-    static func make(name: String = "name",
-                     value: String = "value",
-                     domain: String = "example.com",
-                     path: String = "/",
-                     policy: HTTPCookieStringPolicy? = nil) -> HTTPCookie {
+    static func make(
+        name: String = "name",
+        value: String = "value",
+        domain: String = "example.com",
+        path: String = "/",
+        policy: HTTPCookieStringPolicy? = nil)
+        -> HTTPCookie {
 
         var properties: [HTTPCookiePropertyKey: Any] = [
             .name: name,

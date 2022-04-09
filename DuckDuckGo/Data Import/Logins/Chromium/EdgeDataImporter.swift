@@ -21,7 +21,7 @@ import Foundation
 final class EdgeDataImporter: ChromiumDataImporter {
 
     override var processName: String {
-        return "Microsoft Edge"
+        "Microsoft Edge"
     }
 
     init(loginImporter: LoginImporter, bookmarkImporter: BookmarkImporter) {

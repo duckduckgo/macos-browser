@@ -37,7 +37,7 @@ final class SuggestionViewController: NSViewController {
 
     let suggestionContainerViewModel: SuggestionContainerViewModel
 
-    required init?(coder: NSCoder) {
+    required init?(coder _: NSCoder) {
         fatalError("SuggestionViewController: Bad initializer")
     }
 
@@ -69,9 +69,9 @@ final class SuggestionViewController: NSViewController {
     override func viewWillAppear() {
         super.viewWillAppear()
 
-        self.view.window!.isOpaque = false
-        self.view.window!.backgroundColor = .clear
-        
+        view.window!.isOpaque = false
+        view.window!.backgroundColor = .clear
+
         addMonitors()
         tableView.rowHeight = suggestionContainerViewModel.isHomePage ? 34 : 28
     }
@@ -90,11 +90,13 @@ final class SuggestionViewController: NSViewController {
     }
 
     private func addTrackingArea() {
-        let trackingOptions: NSTrackingArea.Options = [ .activeInActiveApp,
-                                                        .mouseEnteredAndExited,
-                                                        .enabledDuringMouseDrag,
-                                                        .mouseMoved,
-                                                        .inVisibleRect ]
+        let trackingOptions: NSTrackingArea.Options = [
+            .activeInActiveApp,
+            .mouseEnteredAndExited,
+            .enabledDuringMouseDrag,
+            .mouseMoved,
+            .inVisibleRect
+        ]
         let trackingArea = NSTrackingArea(rect: tableView.frame, options: trackingOptions, owner: self, userInfo: nil)
         tableView.addTrackingArea(trackingArea)
     }
@@ -110,11 +112,12 @@ final class SuggestionViewController: NSViewController {
             self?.mouseDown(with: event)
         }
 
-        appObserver = NotificationCenter.default.addObserver(forName: NSApplication.didResignActiveNotification,
-                                                             object: nil,
-                                                             queue: nil) { [weak self] _ in
-            self?.closeWindow()
-        }
+        appObserver = NotificationCenter.default.addObserver(
+            forName: NSApplication.didResignActiveNotification,
+            object: nil,
+            queue: nil) { [weak self] _ in
+                self?.closeWindow()
+            }
     }
 
     private func removeMouseEventsMonitor() {
@@ -133,8 +136,8 @@ final class SuggestionViewController: NSViewController {
         suggestionResultCancellable = suggestionContainerViewModel.suggestionContainer.$result
             .receive(on: DispatchQueue.main)
             .sink { [weak self] _ in
-            self?.displayNewSuggestions()
-        }
+                self?.displayNewSuggestions()
+            }
     }
 
     private func subscribeToSelectionIndex() {
@@ -156,18 +159,19 @@ final class SuggestionViewController: NSViewController {
         if suggestionContainerViewModel.suggestionContainer.result != nil {
             updateHeight()
             tableView.reloadData()
-            self.selectRow(at: self.suggestionContainerViewModel.selectionIndex)
+            selectRow(at: suggestionContainerViewModel.selectionIndex)
         }
     }
 
     private func selectRow(at index: Int?) {
         if tableView.selectedRow == index { return }
 
-        guard let index = index,
-              index >= 0,
-              suggestionContainerViewModel.numberOfSuggestions != 0,
-              index < suggestionContainerViewModel.numberOfSuggestions else {
-            self.clearSelection()
+        guard
+            let index = index,
+            index >= 0,
+            suggestionContainerViewModel.numberOfSuggestions != 0,
+            index < suggestionContainerViewModel.numberOfSuggestions else {
+            clearSelection()
             return
         }
 
@@ -188,7 +192,7 @@ final class SuggestionViewController: NSViewController {
         selectRow(at: event.locationInWindow)
     }
 
-    override func mouseExited(with event: NSEvent) {
+    override func mouseExited(with _: NSEvent) {
         clearSelection()
     }
 
@@ -199,13 +203,14 @@ final class SuggestionViewController: NSViewController {
         if delegate?.shouldCloseSuggestionWindow(forMouseEvent: event) ?? true {
             closeWindow()
         }
-        
+
         return event
     }
 
     func mouseUp(with event: NSEvent) -> NSEvent? {
-        if event.window === view.window,
-           tableView.isMouseLocationInsideBounds(event.locationInWindow) {
+        if
+            event.window === view.window,
+            tableView.isMouseLocationInsideBounds(event.locationInWindow) {
 
             delegate?.suggestionViewControllerDidConfirmSelection(self)
             closeWindow()
@@ -240,18 +245,19 @@ final class SuggestionViewController: NSViewController {
 
 extension SuggestionViewController: NSTableViewDataSource {
 
-    func numberOfRows(in tableView: NSTableView) -> Int {
-        return suggestionContainerViewModel.numberOfSuggestions
+    func numberOfRows(in _: NSTableView) -> Int {
+        suggestionContainerViewModel.numberOfSuggestions
     }
 
 }
 
 extension SuggestionViewController: NSTableViewDelegate {
 
-    func tableView(_ tableView: NSTableView, viewFor tableColumn: NSTableColumn?, row: Int) -> NSView? {
-        guard let suggestionTableCellView = tableView.makeView(
+    func tableView(_ tableView: NSTableView, viewFor _: NSTableColumn?, row: Int) -> NSView? {
+        guard
+            let suggestionTableCellView = tableView.makeView(
                 withIdentifier: NSUserInterfaceItemIdentifier(rawValue: SuggestionTableCellView.identifier), owner: self)
-                as? SuggestionTableCellView else {
+            as? SuggestionTableCellView else {
             assertionFailure("SuggestionViewController: Making of table cell view failed")
             return nil
         }
@@ -265,17 +271,18 @@ extension SuggestionViewController: NSTableViewDelegate {
         return suggestionTableCellView
     }
 
-    func tableView(_ tableView: NSTableView, rowViewForRow row: Int) -> NSTableRowView? {
-        guard let suggestionTableRowView = tableView.makeView(
+    func tableView(_ tableView: NSTableView, rowViewForRow _: Int) -> NSTableRowView? {
+        guard
+            let suggestionTableRowView = tableView.makeView(
                 withIdentifier: NSUserInterfaceItemIdentifier(rawValue: SuggestionTableRowView.identifier), owner: self)
-                as? SuggestionTableRowView else {
+            as? SuggestionTableRowView else {
             assertionFailure("SuggestionViewController: Making of table row view failed")
             return nil
         }
         return suggestionTableRowView
     }
 
-    func tableViewSelectionDidChange(_ notification: Notification) {
+    func tableViewSelectionDidChange(_: Notification) {
         if tableView.selectedRow == -1 {
             suggestionContainerViewModel.clearSelection()
             return

@@ -16,8 +16,8 @@
 //  limitations under the License.
 //
 
-import Foundation
 import BrowserServicesKit
+import Foundation
 
 final class MockSecureVault: SecureVault {
 
@@ -27,22 +27,22 @@ final class MockSecureVault: SecureVault {
     var storedIdentities: [SecureVaultModels.Identity] = []
     var storedCards: [SecureVaultModels.CreditCard] = []
 
-    func authWith(password: Data) throws -> SecureVault {
-        return self
+    func authWith(password _: Data) throws -> SecureVault {
+        self
     }
 
-    func resetL2Password(oldPassword: Data?, newPassword: Data) throws {}
+    func resetL2Password(oldPassword _: Data?, newPassword _: Data) throws {}
 
     func accounts() throws -> [SecureVaultModels.WebsiteAccount] {
-        return storedAccounts
+        storedAccounts
     }
 
     func accountsFor(domain: String) throws -> [SecureVaultModels.WebsiteAccount] {
-        return storedAccounts.filter { $0.domain == domain }
+        storedAccounts.filter { $0.domain == domain }
     }
 
     func websiteCredentialsFor(accountId: Int64) throws -> SecureVaultModels.WebsiteCredentials? {
-        return storedCredentials[accountId]
+        storedCredentials[accountId]
     }
 
     func storeWebsiteCredentials(_ credentials: SecureVaultModels.WebsiteCredentials) throws -> Int64 {
@@ -57,11 +57,11 @@ final class MockSecureVault: SecureVault {
     }
 
     func notes() throws -> [SecureVaultModels.Note] {
-        return storedNotes
+        storedNotes
     }
 
     func noteFor(id: Int64) throws -> SecureVaultModels.Note? {
-        return storedNotes.first { $0.id == id }
+        storedNotes.first { $0.id == id }
     }
 
     func storeNote(_ note: SecureVaultModels.Note) throws -> Int64 {
@@ -74,11 +74,11 @@ final class MockSecureVault: SecureVault {
     }
 
     func identities() throws -> [SecureVaultModels.Identity] {
-        return storedIdentities
+        storedIdentities
     }
 
     func identityFor(id: Int64) throws -> SecureVaultModels.Identity? {
-        return storedIdentities.first { $0.id == id }
+        storedIdentities.first { $0.id == id }
     }
 
     func storeIdentity(_ identity: SecureVaultModels.Identity) throws -> Int64 {
@@ -91,11 +91,11 @@ final class MockSecureVault: SecureVault {
     }
 
     func creditCards() throws -> [SecureVaultModels.CreditCard] {
-        return storedCards
+        storedCards
     }
 
     func creditCardFor(id: Int64) throws -> SecureVaultModels.CreditCard? {
-        return storedCards.first { $0.id == id }
+        storedCards.first { $0.id == id }
     }
 
     func storeCreditCard(_ card: SecureVaultModels.CreditCard) throws -> Int64 {
@@ -106,13 +106,13 @@ final class MockSecureVault: SecureVault {
     func deleteCreditCardFor(cardId: Int64) throws {
         storedCards = storedCards.filter { $0.id != cardId }
     }
-    
-    func existingIdentityForAutofill(matching proposedIdentity: SecureVaultModels.Identity) throws -> SecureVaultModels.Identity? {
-        return nil
+
+    func existingIdentityForAutofill(matching _: SecureVaultModels.Identity) throws -> SecureVaultModels.Identity? {
+        nil
     }
-    
-    func existingCardForAutofill(matching proposedCard: SecureVaultModels.CreditCard) throws -> SecureVaultModels.CreditCard? {
-        return nil
+
+    func existingCardForAutofill(matching _: SecureVaultModels.CreditCard) throws -> SecureVaultModels.CreditCard? {
+        nil
     }
 
 }

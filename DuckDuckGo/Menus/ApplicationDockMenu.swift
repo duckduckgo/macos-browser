@@ -61,7 +61,8 @@ final class ApplicationDockMenu: NSMenu {
 
     }
 
-    @objc func menuItemAction(_ sender: Any?) {
+    @objc
+    func menuItemAction(_ sender: Any?) {
         guard let menuItem = sender as? NSMenuItem else {
             os_log("ApplicationDockMenu: Sender is not instance of NSMenuItem", type: .error)
             return

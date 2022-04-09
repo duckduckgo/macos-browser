@@ -28,8 +28,8 @@ final class RoundedSelectionRowView: NSTableRowView {
 
     var insets = NSEdgeInsets()
 
-    override func drawDraggingDestinationFeedback(in dirtyRect: NSRect) {
-        var selectionRect = self.bounds
+    override func drawDraggingDestinationFeedback(in _: NSRect) {
+        var selectionRect = bounds
 
         selectionRect.origin.x += insets.left
         selectionRect.origin.y += insets.top
@@ -41,8 +41,8 @@ final class RoundedSelectionRowView: NSTableRowView {
         path.fill()
     }
 
-    override func drawSelection(in dirtyRect: NSRect) {
-        var selectionRect = self.bounds
+    override func drawSelection(in _: NSRect) {
+        var selectionRect = bounds
 
         selectionRect.origin.x += insets.left
         selectionRect.origin.y += insets.top
@@ -54,10 +54,10 @@ final class RoundedSelectionRowView: NSTableRowView {
         path.fill()
     }
 
-    override func drawBackground(in: NSRect) {
+    override func drawBackground(in _: NSRect) {
         guard highlight else { return }
 
-        var selectionRect = self.bounds
+        var selectionRect = bounds
 
         selectionRect.origin.x += insets.left
         selectionRect.origin.y += insets.top
@@ -70,7 +70,7 @@ final class RoundedSelectionRowView: NSTableRowView {
     }
 
     override var interiorBackgroundStyle: NSView.BackgroundStyle {
-        return .light
+        .light
     }
 
 }

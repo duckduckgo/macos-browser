@@ -29,11 +29,12 @@ extension URLRequest {
 
     static func defaultRequest(with url: URL) -> URLRequest {
         var request = URLRequest(url: url)
-        request.setValue("gzip;q=1.0, compress;q=0.5",
-                         forHTTPHeaderField: HeaderKey.acceptEncoding.rawValue)
+        request.setValue(
+            "gzip;q=1.0, compress;q=0.5",
+            forHTTPHeaderField: HeaderKey.acceptEncoding.rawValue)
 
         let userAgent = UserAgent.duckDuckGoUserAgent()
-        
+
         request.setValue(userAgent, forHTTPHeaderField: HeaderKey.userAgent.rawValue)
 
         let languages = Locale.preferredLanguages.prefix(6)
@@ -42,8 +43,9 @@ extension URLRequest {
             return "\(language);q=\(q)"
         }.joined(separator: ", ")
 
-        request.setValue(acceptLanguage,
-                         forHTTPHeaderField: HeaderKey.acceptLanguage.rawValue)
+        request.setValue(
+            acceptLanguage,
+            forHTTPHeaderField: HeaderKey.acceptLanguage.rawValue)
         return request
     }
 

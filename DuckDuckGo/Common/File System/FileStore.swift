@@ -16,8 +16,8 @@
 //  limitations under the License.
 //
 
-import Foundation
 import CryptoKit
+import Foundation
 
 protocol FileStore {
     func persist(_ data: Data, url: URL) -> Bool
@@ -39,7 +39,7 @@ final class EncryptedFileStore: FileStore {
         do {
             let dataToWrite: Data
 
-            if let key = self.encryptionKey {
+            if let key = encryptionKey {
                 dataToWrite = try DataEncryption.encrypt(data: data, key: key)
             } else {
                 dataToWrite = data
@@ -49,8 +49,9 @@ final class EncryptedFileStore: FileStore {
 
             return true
         } catch {
-            Pixel.fire(.debug(event: .fileStoreWriteFailed, error: error),
-                       withAdditionalParameters: ["config": url.lastPathComponent])
+            Pixel.fire(
+                .debug(event: .fileStoreWriteFailed, error: error),
+                withAdditionalParameters: ["config": url.lastPathComponent])
             return false
         }
     }
@@ -60,7 +61,7 @@ final class EncryptedFileStore: FileStore {
             return nil
         }
 
-        if let key = self.encryptionKey {
+        if let key = encryptionKey {
             return try? DataEncryption.decrypt(data: data, key: key)
         } else {
             return data
@@ -68,11 +69,11 @@ final class EncryptedFileStore: FileStore {
     }
 
     func hasData(at url: URL) -> Bool {
-        return FileManager.default.fileExists(atPath: url.path)
+        FileManager.default.fileExists(atPath: url.path)
     }
-    
+
     func directoryContents(at path: String) throws -> [String] {
-        return try FileManager.default.contentsOfDirectory(atPath: path)
+        try FileManager.default.contentsOfDirectory(atPath: path)
     }
 
     func remove(fileAtURL url: URL) {
@@ -100,11 +101,11 @@ extension FileManager: FileStore {
     }
 
     func hasData(at url: URL) -> Bool {
-        return fileExists(atPath: url.path)
+        fileExists(atPath: url.path)
     }
-    
+
     func directoryContents(at path: String) throws -> [String] {
-        return try contentsOfDirectory(atPath: path)
+        try contentsOfDirectory(atPath: path)
     }
 
     func remove(fileAtURL url: URL) {

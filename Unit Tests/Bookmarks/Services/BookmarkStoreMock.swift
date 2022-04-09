@@ -26,7 +26,7 @@ final class BookmarkStoreMock: BookmarkStore {
     var loadAllCalled = false
     var bookmarks: [BaseBookmarkEntity]?
     var loadError: Error?
-    func loadAll(type: BookmarkStoreFetchPredicateType, completion: @escaping ([BaseBookmarkEntity]?, Error?) -> Void) {
+    func loadAll(type _: BookmarkStoreFetchPredicateType, completion: @escaping ([BaseBookmarkEntity]?, Error?) -> Void) {
         loadAllCalled = true
         completion(bookmarks, loadError)
     }
@@ -34,7 +34,7 @@ final class BookmarkStoreMock: BookmarkStore {
     var saveBookmarkCalled = false
     var saveBookmarkSuccess = true
     var saveBookmarkError: Error?
-    func save(bookmark: Bookmark, parent: BookmarkFolder?, completion: @escaping (Bool, Error?) -> Void) {
+    func save(bookmark: Bookmark, parent _: BookmarkFolder?, completion: @escaping (Bool, Error?) -> Void) {
         saveBookmarkCalled = true
         bookmarks?.append(bookmark)
         completion(saveBookmarkSuccess, saveBookmarkError)
@@ -43,7 +43,7 @@ final class BookmarkStoreMock: BookmarkStore {
     var saveFolderCalled = false
     var saveFolderSuccess = true
     var saveFolderError: Error?
-    func save(folder: BookmarkFolder, parent: BookmarkFolder?, completion: @escaping (Bool, Error?) -> Void) {
+    func save(folder _: BookmarkFolder, parent _: BookmarkFolder?, completion: @escaping (Bool, Error?) -> Void) {
         saveFolderCalled = true
         completion(saveFolderSuccess, saveFolderError)
     }
@@ -63,27 +63,27 @@ final class BookmarkStoreMock: BookmarkStore {
     }
 
     var updateBookmarkCalled = false
-    func update(bookmark: Bookmark) {
+    func update(bookmark _: Bookmark) {
         updateBookmarkCalled = true
     }
 
     var updateFolderCalled = false
-    func update(folder: BookmarkFolder) {
+    func update(folder _: BookmarkFolder) {
         updateFolderCalled = true
     }
 
     var addChildCalled = false
-    func add(objectsWithUUIDs: [UUID], to parent: BookmarkFolder?, completion: @escaping (Error?) -> Void) {
+    func add(objectsWithUUIDs _: [UUID], to _: BookmarkFolder?, completion _: @escaping (Error?) -> Void) {
         addChildCalled = true
     }
 
     var updateObjectsCalled = false
-    func update(objectsWithUUIDs uuids: [UUID], update: @escaping (BaseBookmarkEntity) -> Void, completion: @escaping (Error?) -> Void) {
+    func update(objectsWithUUIDs _: [UUID], update _: @escaping (BaseBookmarkEntity) -> Void, completion _: @escaping (Error?) -> Void) {
         updateObjectsCalled = true
     }
 
     var importBookmarksCalled = false
-    func importBookmarks(_ bookmarks: ImportedBookmarks, source: BookmarkImportSource) -> BookmarkImportResult {
+    func importBookmarks(_: ImportedBookmarks, source _: BookmarkImportSource) -> BookmarkImportResult {
         importBookmarksCalled = true
         return BookmarkImportResult(successful: 0, duplicates: 0, failed: 0)
     }

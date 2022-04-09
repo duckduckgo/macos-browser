@@ -16,8 +16,8 @@
 //  limitations under the License.
 //
 
-import Foundation
 import CoreData
+import Foundation
 
 internal class BookmarkMigrationPolicy: NSEntityMigrationPolicy {
 

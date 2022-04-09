@@ -43,6 +43,7 @@ enum PermissionState: Equatable {
         }
         return false
     }
+
     // swiftlint:enable cyclomatic_complexity
 
     var isRequested: Bool {
@@ -54,7 +55,7 @@ enum PermissionState: Equatable {
         if case .denied = self { return true }
         return false
     }
-    
+
 }
 
 extension Optional where Wrapped == PermissionState {
@@ -67,10 +68,12 @@ extension Optional where Wrapped == PermissionState {
         self == .paused
     }
 
-    static func combineCamera(_ camera: PermissionState?,
-                              withMicrophone microphone: PermissionState?) -> (camera: PermissionState?, microphone: PermissionState?) {
-        guard let camera = camera,
-              let microphone = microphone
+    static func combineCamera(
+        _ camera: PermissionState?,
+        withMicrophone microphone: PermissionState?) -> (camera: PermissionState?, microphone: PermissionState?) {
+        guard
+            let camera = camera,
+            let microphone = microphone
         else { return (camera, microphone) }
 
         switch (camera, microphone) {

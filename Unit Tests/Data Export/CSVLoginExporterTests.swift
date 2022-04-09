@@ -16,9 +16,9 @@
 //  limitations under the License.
 //
 
+import BrowserServicesKit
 import Foundation
 import XCTest
-import BrowserServicesKit
 @testable import DuckDuckGo_Privacy_Browser
 
 class CSVLoginExporterTests: XCTestCase {
@@ -48,10 +48,11 @@ class CSVLoginExporterTests: XCTestCase {
         var credentials = [Int64: SecureVaultModels.WebsiteCredentials]()
 
         for identifier in identifiers {
-            let account = SecureVaultModels.WebsiteAccount(id: identifier,
-                                                           title: "title-\(identifier)",
-                                                           username: "user-\(identifier)",
-                                                           domain: "domain-\(identifier)")
+            let account = SecureVaultModels.WebsiteAccount(
+                id: identifier,
+                title: "title-\(identifier)",
+                username: "user-\(identifier)",
+                domain: "domain-\(identifier)")
             let credential = SecureVaultModels.WebsiteCredentials(account: account, password: "password\"containing\"quotes".data(using: .utf8)!)
             credentials[identifier] = credential
         }

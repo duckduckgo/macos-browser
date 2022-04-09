@@ -16,8 +16,8 @@
 //  limitations under the License.
 //
 
-import Foundation
 import BrowserServicesKit
+import Foundation
 
 final class PasswordManagementNoteModel: ObservableObject, PasswordManagementItemModel {
 
@@ -36,7 +36,7 @@ final class PasswordManagementNoteModel: ObservableObject, PasswordManagementIte
     var onCancelled: () -> Void
 
     var isEditingPublisher: Published<Bool>.Publisher {
-        return $isEditing
+        $isEditing
     }
 
     var note: SecureVaultModels.Note? {
@@ -56,13 +56,13 @@ final class PasswordManagementNoteModel: ObservableObject, PasswordManagementIte
 
     @Published var isNew = false
 
-    @Published var title: String = "" {
+    @Published var title = "" {
         didSet {
             isDirty = true
         }
     }
 
-    @Published var text: String = "" {
+    @Published var text = "" {
         didSet {
             isDirty = true
         }
@@ -70,17 +70,18 @@ final class PasswordManagementNoteModel: ObservableObject, PasswordManagementIte
 
     var isDirty = false {
         didSet {
-            self.onDirtyChanged(isDirty)
+            onDirtyChanged(isDirty)
         }
     }
 
-    var lastUpdatedDate: String = ""
-    var createdDate: String = ""
+    var lastUpdatedDate = ""
+    var createdDate = ""
 
-    init(onDirtyChanged: @escaping (Bool) -> Void,
-         onSaveRequested: @escaping (SecureVaultModels.Note) -> Void,
-         onDeleteRequested: @escaping (SecureVaultModels.Note) -> Void,
-         onCancelled: @escaping () -> Void) {
+    init(
+        onDirtyChanged: @escaping (Bool) -> Void,
+        onSaveRequested: @escaping (SecureVaultModels.Note) -> Void,
+        onDeleteRequested: @escaping (SecureVaultModels.Note) -> Void,
+        onCancelled: @escaping () -> Void) {
         self.onDirtyChanged = onDirtyChanged
         self.onSaveRequested = onSaveRequested
         self.onDeleteRequested = onDeleteRequested

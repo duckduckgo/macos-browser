@@ -16,10 +16,10 @@
 //  limitations under the License.
 //
 
-import XCTest
-import WebKit
-import TrackerRadarKit
 import BrowserServicesKit
+import TrackerRadarKit
+import WebKit
+import XCTest
 @testable import DuckDuckGo_Privacy_Browser
 
 class ContentBlockingUpdatingTests: XCTestCase {
@@ -36,6 +36,7 @@ class ContentBlockingUpdatingTests: XCTestCase {
         // let it just leak
         WKContentRuleList.swizzleDealloc()
     }
+
     override static func tearDown() {
         WKContentRuleList.restoreDealloc()
     }
@@ -134,34 +135,40 @@ class ContentBlockingUpdatingTests: XCTestCase {
 
     // MARK: - Test data
 
-    static let tracker = KnownTracker(domain: "tracker.com",
-                               defaultAction: .block,
-                               owner: KnownTracker.Owner(name: "Tracker Inc",
-                                                         displayName: "Tracker Inc company"),
-                               prevalence: 0.1,
-                               subdomains: nil,
-                               categories: nil,
-                               rules: nil)
+    static let tracker = KnownTracker(
+        domain: "tracker.com",
+        defaultAction: .block,
+        owner: KnownTracker.Owner(
+            name: "Tracker Inc",
+            displayName: "Tracker Inc company"),
+        prevalence: 0.1,
+        subdomains: nil,
+        categories: nil,
+        rules: nil)
 
-    static let tds = TrackerData(trackers: ["tracker.com": tracker],
-                                 entities: ["Tracker Inc": Entity(displayName: "Trackr Inc company",
-                                                                  domains: ["tracker.com"],
-                                                                  prevalence: 0.1)],
-                                 domains: ["tracker.com": "Tracker Inc"],
-                                 cnames: [:])
+    static let tds = TrackerData(
+        trackers: ["tracker.com": tracker],
+        entities: ["Tracker Inc": Entity(
+            displayName: "Trackr Inc company",
+            domains: ["tracker.com"],
+            prevalence: 0.1)],
+        domains: ["tracker.com": "Tracker Inc"],
+        cnames: [:])
     static let encodedTrackerData = String(data: (try? JSONEncoder().encode(tds))!, encoding: .utf8)!
 
     static func testRules() -> [ContentBlockerRulesManager.Rules] {
-        [.init(name: "test",
-               rulesList: WKContentRuleList(),
-               trackerData: tds,
-               encodedTrackerData: encodedTrackerData,
-               etag: "asd",
-               identifier: ContentBlockerRulesIdentifier(name: "test",
-                                                         tdsEtag: "asd",
-                                                         tempListEtag: nil,
-                                                         allowListEtag: nil,
-                                                         unprotectedSitesHash: nil))]
+        [.init(
+            name: "test",
+            rulesList: WKContentRuleList(),
+            trackerData: tds,
+            encodedTrackerData: encodedTrackerData,
+            etag: "asd",
+            identifier: ContentBlockerRulesIdentifier(
+                name: "test",
+                tdsEtag: "asd",
+                tempListEtag: nil,
+                allowListEtag: nil,
+                unprotectedSitesHash: nil))]
     }
 
     static func testUpdate() -> ContentBlockerRulesManager.UpdateEvent {
@@ -172,29 +179,26 @@ class ContentBlockingUpdatingTests: XCTestCase {
 
 extension UserContentController.ContentBlockingAssets {
     var isValid: Bool {
-        return self.contentRuleLists["test"] != nil && self.userScripts.userScripts.isEmpty == false
+        contentRuleLists["test"] != nil && userScripts.userScripts.isEmpty == false
     }
 }
 
 extension WKContentRuleList {
 
     private static var isSwizzled = false
-    private static let originalDealloc = {
-        class_getInstanceMethod(WKContentRuleList.self, NSSelectorFromString("dealloc"))!
-    }()
-    private static let swizzledDealloc = {
-        class_getInstanceMethod(WKContentRuleList.self, #selector(swizzled_dealloc))!
-    }()
+    private static let originalDealloc = class_getInstanceMethod(WKContentRuleList.self, NSSelectorFromString("dealloc"))!
+
+    private static let swizzledDealloc = class_getInstanceMethod(WKContentRuleList.self, #selector(swizzled_dealloc))!
 
     static func swizzleDealloc() {
-        guard !self.isSwizzled else { return }
-        self.isSwizzled = true
+        guard !isSwizzled else { return }
+        isSwizzled = true
         method_exchangeImplementations(originalDealloc, swizzledDealloc)
     }
 
     static func restoreDealloc() {
-        guard self.isSwizzled else { return }
-        self.isSwizzled = false
+        guard isSwizzled else { return }
+        isSwizzled = false
         method_exchangeImplementations(originalDealloc, swizzledDealloc)
     }
 

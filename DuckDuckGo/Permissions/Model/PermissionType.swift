@@ -65,7 +65,7 @@ enum PermissionType: Hashable {
 extension PermissionType {
 
     static var permissionsUpdatedExternally: [PermissionType] {
-        return [.camera, .microphone, .geolocation]
+        [.camera, .microphone, .geolocation]
     }
 
     var canPersistGrantedDecision: Bool {
@@ -78,6 +78,7 @@ extension PermissionType {
             return true
         }
     }
+
     var canPersistDeniedDecision: Bool {
         switch self {
         case .camera, .microphone, .geolocation:
@@ -132,6 +133,6 @@ extension Array where Element == PermissionType {
     static var microphone: Self { [.microphone] }
     static var geolocation: Self { [.geolocation] }
     static var popups: Self { [.popups] }
-    static func externalScheme(_ scheme: String) -> Self { return [.externalScheme(scheme: scheme)] }
+    static func externalScheme(_ scheme: String) -> Self { [.externalScheme(scheme: scheme)] }
 
 }

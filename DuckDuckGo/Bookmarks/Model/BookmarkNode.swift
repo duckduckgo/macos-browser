@@ -32,9 +32,10 @@ final class BookmarkNode: Hashable {
     }
 
     class func bookmarkNodesSortedAlphabetically(_ nodes: [BookmarkNode]) -> [BookmarkNode] {
-        return nodes.sorted { (firstNode, secondNode) -> Bool in
-            guard let firstBookmark = firstNode.representedObject as? BaseBookmarkEntity,
-                  let secondBookmark = secondNode.representedObject as? BaseBookmarkEntity else {
+        nodes.sorted { firstNode, secondNode -> Bool in
+            guard
+                let firstBookmark = firstNode.representedObject as? BaseBookmarkEntity,
+                let secondBookmark = secondNode.representedObject as? BaseBookmarkEntity else {
                 return false
             }
 
@@ -50,11 +51,11 @@ final class BookmarkNode: Hashable {
     var childNodes = [BookmarkNode]()
 
     var isRoot: Bool {
-        return parent == nil
+        parent == nil
     }
 
     var numberOfChildNodes: Int {
-        return childNodes.count
+        childNodes.count
     }
 
     var indexPath: IndexPath {
@@ -81,23 +82,24 @@ final class BookmarkNode: Hashable {
     init(representedObject: AnyObject, parent: BookmarkNode?) {
         self.representedObject = representedObject
         self.parent = parent
-        self.uniqueID = BookmarkNode.incrementingID
+        uniqueID = BookmarkNode.incrementingID
 
         BookmarkNode.incrementingID += 1
     }
 
     func representedObjectEquals(_ otherRepresentedObject: AnyObject) -> Bool {
-        if let entity = otherRepresentedObject as? BaseBookmarkEntity,
-           let nodeEntity = self.representedObject as? BaseBookmarkEntity,
-           entity == nodeEntity {
+        if
+            let entity = otherRepresentedObject as? BaseBookmarkEntity,
+            let nodeEntity = representedObject as? BaseBookmarkEntity,
+            entity == nodeEntity {
             return true
         }
 
-        if let folder = otherRepresentedObject as? PseudoFolder, let nodeFolder = self.representedObject as? PseudoFolder, folder == nodeFolder {
+        if let folder = otherRepresentedObject as? PseudoFolder, let nodeFolder = representedObject as? PseudoFolder, folder == nodeFolder {
             return true
         }
 
-        if self.representedObject === otherRepresentedObject {
+        if representedObject === otherRepresentedObject {
             return true
         }
 
@@ -113,7 +115,7 @@ final class BookmarkNode: Hashable {
     }
 
     func createChildNode(_ representedObject: AnyObject) -> BookmarkNode {
-        return BookmarkNode(representedObject: representedObject, parent: self)
+        BookmarkNode(representedObject: representedObject, parent: self)
     }
 
     func childAtIndex(_ index: Int) -> BookmarkNode? {
@@ -125,17 +127,17 @@ final class BookmarkNode: Hashable {
     }
 
     func indexOfChild(_ node: BookmarkNode) -> Int? {
-        return childNodes.firstIndex { (childNode) -> Bool in
+        childNodes.firstIndex { childNode -> Bool in
             childNode === node
         }
     }
 
     func childNodeRepresenting(object: AnyObject) -> BookmarkNode? {
-        return findNodeRepresenting(object: object, recursively: false)
+        findNodeRepresenting(object: object, recursively: false)
     }
 
     func descendantNodeRepresenting(object: AnyObject) -> BookmarkNode? {
-        return findNodeRepresenting(object: object, recursively: true)
+        findNodeRepresenting(object: object, recursively: true)
     }
 
     func isAncestor(of node: BookmarkNode) -> Bool {
@@ -175,9 +177,9 @@ final class BookmarkNode: Hashable {
     func hash(into hasher: inout Hasher) {
         // The Node class will most frequently represent Bookmark entities and PseudoFolders. Because of this, their unique properties are
         // used to derive the hash for the node so that equality can be handled based on the represented object.
-        if let entity = self.representedObject as? BaseBookmarkEntity {
+        if let entity = representedObject as? BaseBookmarkEntity {
             hasher.combine(entity.id)
-        } else if let folder = self.representedObject as? PseudoFolder {
+        } else if let folder = representedObject as? PseudoFolder {
             hasher.combine(folder.name)
         } else {
             hasher.combine(uniqueID)
@@ -187,7 +189,7 @@ final class BookmarkNode: Hashable {
     // MARK: - Equatable
 
     class func == (lhs: BookmarkNode, rhs: BookmarkNode) -> Bool {
-        return lhs === rhs
+        lhs === rhs
     }
 
 }
@@ -209,7 +211,7 @@ extension BookmarkNode {
                 currentNode = parent
             }
 
-            self.components = pathComponents.reversed()
+            components = pathComponents.reversed()
         }
 
         init?(representedObject: AnyObject, treeController: BookmarkTreeController) {
@@ -229,11 +231,11 @@ extension BookmarkNode {
 extension Array where Element == BookmarkNode {
 
     func representedObjects() -> [AnyObject] {
-        return self.map { $0.representedObject }
+        map { $0.representedObject }
     }
 
     func bookmarksSortedAlphabetically() -> [BookmarkNode] {
-        return BookmarkNode.bookmarkNodesSortedAlphabetically(self)
+        BookmarkNode.bookmarkNodesSortedAlphabetically(self)
     }
 
 }

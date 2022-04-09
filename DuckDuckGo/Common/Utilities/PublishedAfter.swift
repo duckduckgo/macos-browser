@@ -32,7 +32,7 @@ struct PublishedAfter<Value> {
     }
 
     var projectedValue: CurrentValueSubject<Value, Never> {
-        return subject
+        subject
     }
 
     @available(*, unavailable, message: "@PublishedAfter is only available on properties of classes")
@@ -45,9 +45,9 @@ struct PublishedAfter<Value> {
 
     static subscript<EnclosingSelf: AnyObject>(
         _enclosingInstance object: EnclosingSelf,
-        wrapped wrappedKeyPath: ReferenceWritableKeyPath<EnclosingSelf, Value>,
-        storage storageKeyPath: ReferenceWritableKeyPath<EnclosingSelf, PublishedAfter<Value>>
-    ) -> Value {
+        wrapped _: ReferenceWritableKeyPath<EnclosingSelf, Value>,
+        storage storageKeyPath: ReferenceWritableKeyPath<EnclosingSelf, PublishedAfter<Value>>)
+        -> Value {
         get {
             object[keyPath: storageKeyPath].subject.value
         }

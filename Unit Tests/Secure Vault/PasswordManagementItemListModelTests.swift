@@ -16,8 +16,8 @@
 //  limitations under the License.
 //
 
-import XCTest
 import BrowserServicesKit
+import XCTest
 @testable import DuckDuckGo_Privacy_Browser
 
 final class PasswordManagementItemListModelTests: XCTestCase {
@@ -41,7 +41,7 @@ final class PasswordManagementItemListModelTests: XCTestCase {
 
         model.selectFirst()
         XCTAssertEqual(model.selected?.id, String(describing: accounts[0]))
-        
+
     }
 
     func testWhenFilterAppliedThenDisplayedAccountsOnlyContainFilteredMatches() {
@@ -80,48 +80,49 @@ final class PasswordManagementItemListModelTests: XCTestCase {
         let model = PasswordManagementItemListModel(onItemSelected: onItemSelected)
         XCTAssertEqual(model.emptyState, .none)
     }
-    
+
     func testWhenGettingEmptyState_AndViewModelGetsGivenEmptyDataSet_ThenEmptyStateIsNoData() {
         let model = PasswordManagementItemListModel(onItemSelected: onItemSelected)
         model.update(items: [])
 
         XCTAssertEqual(model.emptyState, .noData)
     }
-    
+
     func testWhenGettingEmptyState_AndViewModelHasData_AndCategoryIsAllItems_AndViewModelIsFiltered_ThenEmptyStateIsNone() {
         let accounts = (0 ..< 10).map { makeAccount(id: $0, domain: "domain\($0)") }
         let model = PasswordManagementItemListModel(onItemSelected: onItemSelected)
-        
+
         model.update(items: accounts)
         XCTAssertEqual(model.emptyState, .none)
-        
+
         model.filter = "domain"
         XCTAssertEqual(model.emptyState, .none)
-        
+
         model.filter = "filter that won't match"
         XCTAssertEqual(model.emptyState, .none)
     }
-    
+
     func testWhenGettingEmptyState_AndViewModelHasData_AndCategoryIsLogins_AndViewModelIsFiltered_ThenEmptyStateIsLogins() {
         let accounts = (0 ..< 10).map { makeAccount(id: $0, domain: "domain\($0)") }
         let model = PasswordManagementItemListModel(onItemSelected: onItemSelected)
-        
+
         model.update(items: accounts)
         model.sortDescriptor.category = .logins
         XCTAssertEqual(model.emptyState, .none)
-        
+
         model.filter = "domain"
         XCTAssertEqual(model.emptyState, .none)
-        
+
         model.filter = "filter that won't match"
         XCTAssertEqual(model.emptyState, .logins)
     }
-    
+
     func makeAccount(id: Int64, title: String? = nil, username: String = "username", domain: String = "domain") -> SecureVaultItem {
-        let account = SecureVaultModels.WebsiteAccount(id: id,
-                                                title: title,
-                                                username: username,
-                                                domain: domain)
+        let account = SecureVaultModels.WebsiteAccount(
+            id: id,
+            title: title,
+            username: username,
+            domain: domain)
         return .account(account)
     }
 

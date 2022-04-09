@@ -23,8 +23,8 @@ private struct BundleIdentifiers {
     let all: [String]
 
     init(productionBundleID: String, relatedBundleIDs: [String]) {
-        self.production = productionBundleID
-        self.all = [productionBundleID] + relatedBundleIDs
+        production = productionBundleID
+        all = [productionBundleID] + relatedBundleIDs
     }
 }
 
@@ -39,7 +39,7 @@ enum ThirdPartyBrowser: CaseIterable {
     case onePassword
 
     static var installedBrowsers: [ThirdPartyBrowser] {
-        return allCases.filter(\.isInstalled)
+        allCases.filter(\.isInstalled)
     }
 
     static func browser(for source: DataImport.Source) -> ThirdPartyBrowser? {
@@ -63,7 +63,7 @@ enum ThirdPartyBrowser: CaseIterable {
     }
 
     var isRunning: Bool {
-        return !findRunningApplications().isEmpty
+        !findRunningApplications().isEmpty
     }
 
     var shouldQuitBeforeImport: Bool {
@@ -94,7 +94,7 @@ enum ThirdPartyBrowser: CaseIterable {
 
         return NSWorkspace.shared.icon(forFile: applicationPath)
     }
-    
+
     /// Used when specific apps are not installed, but still need to be displayed in the list.
     /// Browsers are hidden when not installed, so this only applies to password managers.
     var fallbackApplicationIcon: NSImage? {
@@ -106,14 +106,17 @@ enum ThirdPartyBrowser: CaseIterable {
     }
 
     var browserProfiles: DataImport.BrowserProfileList? {
-        guard let profilePath = profilesDirectory(),
-              let potentialProfileURLs = try? FileManager.default.contentsOfDirectory(at: profilePath,
-                                                                                      includingPropertiesForKeys: nil,
-                                                                                      options: [.skipsHiddenFiles]).filter(\.hasDirectoryPath) else {
+        guard
+            let profilePath = profilesDirectory(),
+            let potentialProfileURLs = try? FileManager.default.contentsOfDirectory(
+                at: profilePath,
+                includingPropertiesForKeys: nil,
+                options: [.skipsHiddenFiles]).filter(\.hasDirectoryPath) else {
             // Safari is an exception, as it may need permissions granted before being able to read the contents of the profile path. To be safe,
             // return the profile anyway and check the file system permissions when preparing to import.
-            if self == .safari,
-               let profilePath = profilesDirectory() {
+            if
+                self == .safari,
+                let profilePath = profilesDirectory() {
                 return DataImport.BrowserProfileList(browser: self, profileURLs: [profilePath])
             } else {
                 return nil
@@ -141,17 +144,17 @@ enum ThirdPartyBrowser: CaseIterable {
         case .chrome: return BundleIdentifiers(productionBundleID: "com.google.Chrome", relatedBundleIDs: ["com.google.Chrome.canary"])
         case .edge: return BundleIdentifiers(productionBundleID: "com.microsoft.edgemac", relatedBundleIDs: [])
         case .firefox: return BundleIdentifiers(productionBundleID: "org.mozilla.firefox", relatedBundleIDs: [
-            "org.mozilla.nightly",
-            "org.mozilla.firefoxdeveloperedition"
-        ])
+                "org.mozilla.nightly",
+                "org.mozilla.firefoxdeveloperedition"
+            ])
         case .safari: return BundleIdentifiers(productionBundleID: "com.apple.safari", relatedBundleIDs: [])
         case .onePassword: return BundleIdentifiers(productionBundleID: "com.agilebits.onepassword7", relatedBundleIDs: [
-            "com.agilebits.onepassword",
-            "com.agilebits.onepassword4"
-        ])
+                "com.agilebits.onepassword",
+                "com.agilebits.onepassword4"
+            ])
         case .lastPass: return BundleIdentifiers(productionBundleID: "com.lastpass.lastpassmacdesktop", relatedBundleIDs: [
-            "com.lastpass.lastpass"
-        ])
+                "com.lastpass.lastpass"
+            ])
         }
     }
 

@@ -16,11 +16,11 @@
 //  limitations under the License.
 //
 
-import Foundation
-import Combine
-import WebKit
 import AVFoundation
+import Combine
 import CoreLocation
+import Foundation
+import WebKit
 
 // swiftlint:disable:next type_body_length
 final class PermissionModel {
@@ -39,15 +39,16 @@ final class PermissionModel {
     private weak var webView: WKWebView?
     private var cancellables = Set<AnyCancellable>()
 
-    init(webView: WKWebView,
-         permissionManager: PermissionManagerProtocol = PermissionManager.shared,
-         geolocationService: GeolocationServiceProtocol = GeolocationService.shared) {
+    init(
+        webView: WKWebView,
+        permissionManager: PermissionManagerProtocol = PermissionManager.shared,
+        geolocationService: GeolocationServiceProtocol = GeolocationService.shared) {
         self.permissionManager = permissionManager
         self.webView = webView
         self.geolocationService = geolocationService
 
-        self.subscribe(to: webView)
-        self.subscribe(to: permissionManager)
+        subscribe(to: webView)
+        subscribe(to: permissionManager)
     }
 
     private func subscribe(to webView: WKWebView) {
@@ -74,10 +75,11 @@ final class PermissionModel {
 
     private func subscribe(to permissionManager: PermissionManagerProtocol) {
         permissionManager.permissionPublisher.sink { [weak self] value in
-            self?.permissionManager(permissionManager,
-                                    didChangePermanentDecisionFor: value.permissionType,
-                                    forDomain: value.domain,
-                                    to: value.decision)
+            self?.permissionManager(
+                permissionManager,
+                didChangePermanentDecisionFor: value.permissionType,
+                forDomain: value.domain,
+                to: value.decision)
         }.store(in: &cancellables)
     }
 
@@ -104,8 +106,9 @@ final class PermissionModel {
                 // Geolocation Authorization is queried before checking the System Permission
                 // if it is nil means there was no query made,
                 // if query was made but System Permission is disabled: switch to Disabled state
-                if permissions.geolocation != nil,
-                   [.denied, .restricted].contains(authorizationStatus) {
+                if
+                    permissions.geolocation != nil,
+                    [.denied, .restricted].contains(authorizationStatus) {
                     permissions.geolocation
                         .systemAuthorizationDenied(systemWide: !geolocationService.locationServicesEnabled())
                 } else {
@@ -117,43 +120,47 @@ final class PermissionModel {
         }
     }
 
-    private func queryAuthorization(for permissions: [PermissionType],
-                                    domain: String,
-                                    url: URL?,
-                                    decisionHandler: @escaping (Bool) -> Void) {
+    private func queryAuthorization(
+        for permissions: [PermissionType],
+        domain: String,
+        url: URL?,
+        decisionHandler: @escaping (Bool) -> Void) {
 
-        let query = PermissionAuthorizationQuery(domain: domain,
-                                                 url: url,
-                                                 permissions: permissions) { [weak self] decision, remember in
+        let query = PermissionAuthorizationQuery(
+            domain: domain,
+            url: url,
+            permissions: permissions) { [weak self] decision, remember in
 
-            let (query, isGranted) = self?.handleQueryDecision(decision, requestedPermissions: permissions) ?? (nil, false)
+                let (query, isGranted) = self?.handleQueryDecision(decision, requestedPermissions: permissions) ?? (nil, false)
 
-            defer {
-                switch (permissions.first, decision) {
-                case (.externalScheme, .deinitialized):
-                    break
-                default:
-                    decisionHandler(isGranted)
+                defer {
+                    switch (permissions.first, decision) {
+                    case (.externalScheme, .deinitialized):
+                        break
+                    default:
+                        decisionHandler(isGranted)
+                    }
+                }
+                guard
+                    let self = self,
+                    let query = query, // otherwise handling decision on Query deallocation
+                    let idx = self.authorizationQueries.firstIndex(where: { $0 === query })
+                else {
+                    return
+                }
+                self.authorizationQueries.remove(at: idx)
+
+                if remember == true {
+                    for permission in permissions {
+                        self.permissionManager.setPermission(isGranted ? .allow : .deny, forDomain: domain, permissionType: permission)
+                    }
                 }
             }
-            guard let self = self,
-                  let query = query, // otherwise handling decision on Query deallocation
-                  let idx = self.authorizationQueries.firstIndex(where: { $0 === query })
-            else {
-                return
-            }
-            self.authorizationQueries.remove(at: idx)
-
-            if remember == true {
-                for permission in permissions {
-                    self.permissionManager.setPermission(isGranted ? .allow : .deny, forDomain: domain, permissionType: permission)
-                }
-            }
-        }
 
         // When Geolocation queried by a website but System Permission is denied: switch to `disabled`
-        if permissions.contains(.geolocation),
-           [.denied, .restricted].contains(self.geolocationService.authorizationStatus)
+        if
+            permissions.contains(.geolocation),
+            [.denied, .restricted].contains(geolocationService.authorizationStatus)
             || !geolocationService.locationServicesEnabled() {
             self.permissions.geolocation
                 .systemAuthorizationDenied(systemWide: !geolocationService.locationServicesEnabled())
@@ -164,7 +171,7 @@ final class PermissionModel {
     }
 
     private func handleQueryDecision(_ decision: PermissionAuthorizationQuery.Decision, requestedPermissions: [PermissionType])
-    -> (completedQuery: PermissionAuthorizationQuery?, isGranted: Bool) {
+        -> (completedQuery: PermissionAuthorizationQuery?, isGranted: Bool) {
 
         let query: PermissionAuthorizationQuery?
         let isGranted: Bool
@@ -193,20 +200,21 @@ final class PermissionModel {
         return (query, isGranted)
     }
 
-    private func permissionManager(_: PermissionManagerProtocol,
-                                   didChangePermanentDecisionFor permissionType: PermissionType,
-                                   forDomain domain: String,
-                                   to decision: PersistedPermissionDecision) {
+    private func permissionManager(
+        _: PermissionManagerProtocol,
+        didChangePermanentDecisionFor permissionType: PermissionType,
+        forDomain domain: String,
+        to decision: PersistedPermissionDecision) {
 
         // If Always Allow/Deny for the current host: Grant/Revoke the permission
         guard webView?.url?.host?.dropWWW() == domain else { return }
 
-        switch (decision, self.permissions[permissionType]) {
+        switch (decision, permissions[permissionType]) {
         case (.deny, .some):
-            self.revoke(permissionType)
+            revoke(permissionType)
             fallthrough
         case (.allow, .requested):
-            while let query = self.authorizationQueries.first(where: { $0.permissions == [permissionType] }) {
+            while let query = authorizationQueries.first(where: { $0.permissions == [permissionType] }) {
                 query.handleDecision(grant: decision == .allow)
             }
         default: break
@@ -220,7 +228,7 @@ final class PermissionModel {
     }
 
     func allow(_ query: PermissionAuthorizationQuery) {
-        guard self.authorizationQueries.contains(where: { $0 === query }) else {
+        guard authorizationQueries.contains(where: { $0 === query }) else {
             assertionFailure("unexpected Permission state")
             return
         }
@@ -228,24 +236,25 @@ final class PermissionModel {
     }
 
     func revoke(_ permission: PermissionType) {
-        if let domain = webView?.url?.host,
-           case .allow = permissionManager.permission(forDomain: domain, permissionType: permission) {
+        if
+            let domain = webView?.url?.host,
+            case .allow = permissionManager.permission(forDomain: domain, permissionType: permission) {
             permissionManager.setPermission(.ask, forDomain: domain, permissionType: permission)
         }
         switch permission {
         case .camera, .microphone, .geolocation:
-            self.permissions[permission].revoke() // await deactivation
+            permissions[permission].revoke() // await deactivation
             webView?.revokePermissions([permission])
 
         case .popups, .externalScheme:
-            self.permissions[permission].denied()
+            permissions[permission].denied()
         }
     }
 
     // MARK: - WebView delegated methods
 
     // Called before requestMediaCapturePermissionFor: to validate System Permissions
-    func checkUserMediaPermission(for url: URL, mainFrameURL: URL, decisionHandler: @escaping (String, Bool) -> Void) {
+    func checkUserMediaPermission(for _: URL, mainFrameURL _: URL, decisionHandler: @escaping (String, Bool) -> Void) {
         // If media capture is denied in the System Preferences, reflect it in the current permissions
         // AVCaptureDevice.authorizationStatus(for:mediaType) is swizzled to determine requested media type
         // otherwise WebView won't call any other delegate methods if System Permission is denied
@@ -273,8 +282,9 @@ final class PermissionModel {
             @unknown default: break
             }
         }
-        decisionHandler(/*salt - seems not used anywhere:*/ "",
-                                                            /*includeSensitiveMediaDeviceDetails:*/ false)
+        decisionHandler(///salt - seems not used anywhere:
+            "",
+            /*includeSensitiveMediaDeviceDetails:*/ false)
         // make sure to swizzle it back after reasonable interval in case it wasn't called
         DispatchQueue.main.asyncAfter(deadline: .now() + 5) {
             AVCaptureDevice.restoreAuthorizationStatusForMediaType()
@@ -318,14 +328,16 @@ final class PermissionModel {
         return true
     }
 
-    func permissions(_ permissions: [PermissionType],
-                     requestedForDomain domain: String?,
-                     url: URL? = nil,
-                     decisionHandler: @escaping (Bool) -> Void) {
+    func permissions(
+        _ permissions: [PermissionType],
+        requestedForDomain domain: String?,
+        url: URL? = nil,
+        decisionHandler: @escaping (Bool) -> Void) {
 
-        guard let domain = domain,
-              !domain.isEmpty,
-              !permissions.isEmpty
+        guard
+            let domain = domain,
+            !domain.isEmpty,
+            !permissions.isEmpty
         else {
             assertionFailure("Unexpected permissions/domain")
             decisionHandler(false)
@@ -359,12 +371,13 @@ final class PermissionModel {
         case (.authorized, true), (.authorizedAlways, true):
             // if a website awaits a Query Authorization while System Permission is disabled
             // show the Authorization Popover
-            if let query = self.authorizationQueries.first(where: { $0.permissions.contains(.geolocation) }),
-               case .disabled = self.permissions.geolocation {
+            if
+                let query = authorizationQueries.first(where: { $0.permissions.contains(.geolocation) }),
+                case .disabled = self.permissions.geolocation {
                 // switch to `requested` state
-                self.permissions.geolocation.systemAuthorizationGranted(pendingQuery: query)
+                permissions.geolocation.systemAuthorizationGranted(pendingQuery: query)
             } else {
-                self.updatePermissions()
+                updatePermissions()
             }
 
         case (.notDetermined, true):
@@ -372,13 +385,13 @@ final class PermissionModel {
 
         case (.denied, true), (.restricted, true):
             // do not switch to `disabled` state if a website didn't ask for Location
-            guard self.permissions.geolocation != nil else { break }
-            self.permissions.geolocation
+            guard permissions.geolocation != nil else { break }
+            permissions.geolocation
                 .systemAuthorizationDenied(systemWide: false)
 
         case (_, false): // Geolocation Services disabled globally
-            guard self.permissions.geolocation != nil else { break }
-            self.permissions.geolocation
+            guard permissions.geolocation != nil else { break }
+            permissions.geolocation
                 .systemAuthorizationDenied(systemWide: true)
 
         @unknown default: break

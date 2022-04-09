@@ -16,27 +16,30 @@
 //  limitations under the License.
 //
 
+import BrowserServicesKit
 import Cocoa
 import Combine
-import BrowserServicesKit
 
 protocol FaviconManagement {
 
     var areFaviconsLoaded: Bool { get }
     func loadFavicons()
 
-    func handleFaviconLinks(_ faviconLinks: [FaviconUserScript.FaviconLink],
-                            documentUrl: URL,
-                            completion: @escaping (Favicon?) -> Void)
+    func handleFaviconLinks(
+        _ faviconLinks: [FaviconUserScript.FaviconLink],
+        documentUrl: URL,
+        completion: @escaping (Favicon?) -> Void)
     func getCachedFavicon(for documentUrl: URL, sizeCategory: Favicon.SizeCategory) -> Favicon?
     func getCachedFavicon(for host: String, sizeCategory: Favicon.SizeCategory) -> Favicon?
 
-    func burnExcept(fireproofDomains: FireproofDomains,
-                    bookmarkManager: BookmarkManager,
-                    completion: @escaping () -> Void)
-    func burnDomains(_ domains: Set<String>,
-                     except bookmarkManager: BookmarkManager,
-                     completion: @escaping () -> Void)
+    func burnExcept(
+        fireproofDomains: FireproofDomains,
+        bookmarkManager: BookmarkManager,
+        completion: @escaping () -> Void)
+    func burnDomains(
+        _ domains: Set<String>,
+        except bookmarkManager: BookmarkManager,
+        completion: @escaping () -> Void)
 
 }
 
@@ -45,18 +48,20 @@ final class FaviconManager: FaviconManagement {
     static let shared = FaviconManager()
 
     private lazy var store: FaviconStoring = FaviconStore()
-    
+
     private let faviconURLSession = URLSession(configuration: .ephemeral)
 
     func loadFavicons() {
         imageCache.loadFavicons { _ in
-            self.imageCache.cleanOldExcept(fireproofDomains: FireproofDomains.shared,
-                                           bookmarkManager: LocalBookmarkManager.shared) {
-                self.referenceCache.loadReferences { _ in
-                    self.referenceCache.cleanOldExcept(fireproofDomains: FireproofDomains.shared,
-                                                       bookmarkManager: LocalBookmarkManager.shared)
+            self.imageCache.cleanOldExcept(
+                fireproofDomains: FireproofDomains.shared,
+                bookmarkManager: LocalBookmarkManager.shared) {
+                    self.referenceCache.loadReferences { _ in
+                        self.referenceCache.cleanOldExcept(
+                            fireproofDomains: FireproofDomains.shared,
+                            bookmarkManager: LocalBookmarkManager.shared)
+                    }
                 }
-            }
         }
     }
 
@@ -69,9 +74,10 @@ final class FaviconManager: FaviconManagement {
     private lazy var imageCache = FaviconImageCache(faviconStoring: store)
     private lazy var referenceCache = FaviconReferenceCache(faviconStoring: store)
 
-    func handleFaviconLinks(_ faviconLinks: [FaviconUserScript.FaviconLink],
-                            documentUrl: URL,
-                            completion: @escaping (Favicon?) -> Void) {
+    func handleFaviconLinks(
+        _ faviconLinks: [FaviconUserScript.FaviconLink],
+        documentUrl: URL,
+        completion: @escaping (Favicon?) -> Void) {
         // Manually add favicon.ico into links
         let faviconLinks = addingFaviconIco(into: faviconLinks, documentUrl: documentUrl)
 
@@ -103,7 +109,7 @@ final class FaviconManager: FaviconManagement {
             let newFaviconLoaded = !newFavicons.isEmpty
             let currentSmallFaviconUrl = self.referenceCache.getFaviconUrl(for: documentUrl, sizeCategory: .small)
             let currentMediumFaviconUrl = self.referenceCache.getFaviconUrl(for: documentUrl, sizeCategory: .medium)
-            let cachedFaviconUrls = cachedFavicons.map {$0.url}
+            let cachedFaviconUrls = cachedFavicons.map { $0.url }
             let faviconsOutdated: Bool = {
                 if let currentSmallFaviconUrl = currentSmallFaviconUrl, !cachedFaviconUrls.contains(currentSmallFaviconUrl) {
                     return true
@@ -123,11 +129,12 @@ final class FaviconManager: FaviconManagement {
                 self.referenceCache.insert(faviconUrls: (smallFavicon?.url, mediumFavicon?.url), documentUrl: documentUrl)
                 completion(smallFavicon)
             } else {
-                guard let currentSmallFaviconUrl = currentSmallFaviconUrl,
-                      let cachedFavicon = self.imageCache.get(faviconUrl: currentSmallFaviconUrl) else {
-                          completion(nil)
-                          return
-                      }
+                guard
+                    let currentSmallFaviconUrl = currentSmallFaviconUrl,
+                    let cachedFavicon = self.imageCache.get(faviconUrl: currentSmallFaviconUrl) else {
+                    completion(nil)
+                    return
+                }
 
                 completion(cachedFavicon)
             }
@@ -152,22 +159,26 @@ final class FaviconManager: FaviconManagement {
 
     // MARK: - Burning
 
-    func burnExcept(fireproofDomains: FireproofDomains,
-                    bookmarkManager: BookmarkManager,
-                    completion: @escaping () -> Void) {
-        self.referenceCache.burnExcept(fireproofDomains: fireproofDomains,
-                                       bookmarkManager: bookmarkManager) {
-            self.imageCache.burnExcept(fireproofDomains: fireproofDomains,
-                                       bookmarkManager: bookmarkManager) {
-                completion()
+    func burnExcept(
+        fireproofDomains: FireproofDomains,
+        bookmarkManager: BookmarkManager,
+        completion: @escaping () -> Void) {
+        referenceCache.burnExcept(
+            fireproofDomains: fireproofDomains,
+            bookmarkManager: bookmarkManager) {
+                self.imageCache.burnExcept(
+                    fireproofDomains: fireproofDomains,
+                    bookmarkManager: bookmarkManager) {
+                        completion()
+                    }
             }
-        }
     }
 
-    func burnDomains(_ domains: Set<String>,
-                     except bookmarkManager: BookmarkManager,
-                     completion: @escaping () -> Void) {
-        self.referenceCache.burnDomains(domains, except: bookmarkManager) {
+    func burnDomains(
+        _ domains: Set<String>,
+        except bookmarkManager: BookmarkManager,
+        completion: @escaping () -> Void) {
+        referenceCache.burnDomains(domains, except: bookmarkManager) {
             self.imageCache.burnDomains(domains, except: bookmarkManager) {
                 DispatchQueue.main.async {
                     completion()
@@ -181,15 +192,16 @@ final class FaviconManager: FaviconManagement {
     private func addingFaviconIco(into faviconLinks: [FaviconUserScript.FaviconLink], documentUrl: URL) -> [FaviconUserScript.FaviconLink] {
         var faviconLinks = faviconLinks
         if let host = documentUrl.host {
-            let faviconIcoLink = FaviconUserScript.FaviconLink(href: "\(URL.NavigationalScheme.https.separated())\(host)/favicon.ico",
-                                                               rel: "favicon.ico")
+            let faviconIcoLink = FaviconUserScript.FaviconLink(
+                href: "\(URL.NavigationalScheme.https.separated())\(host)/favicon.ico",
+                rel: "favicon.ico")
             faviconLinks.append(faviconIcoLink)
         }
         return faviconLinks
     }
 
     private func filteringAlreadyFetchedFaviconLinks(from faviconLinks: [FaviconUserScript.FaviconLink]) -> [FaviconUserScript.FaviconLink] {
-        return faviconLinks.filter { faviconLink in
+        faviconLinks.filter { faviconLink in
             guard let faviconUrl = URL(string: faviconLink.href) else {
                 return false
             }
@@ -223,12 +235,13 @@ final class FaviconManager: FaviconManagement {
                     return
                 }
 
-                let favicon = Favicon(identifier: UUID(),
-                                      url: faviconUrl,
-                                      image: NSImage(data: data),
-                                      relationString: faviconLink.rel,
-                                      documentUrl: documentUrl,
-                                      dateCreated: Date())
+                let favicon = Favicon(
+                    identifier: UUID(),
+                    url: faviconUrl,
+                    image: NSImage(data: data),
+                    relationString: faviconLink.rel,
+                    documentUrl: documentUrl,
+                    dateCreated: Date())
                 DispatchQueue.main.async {
                     favicons.append(favicon)
                     group.leave()

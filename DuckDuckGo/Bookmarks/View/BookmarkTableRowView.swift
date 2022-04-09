@@ -36,7 +36,7 @@ final class BookmarkTableRowView: NSTableRowView {
         }
     }
 
-    var mouseInside: Bool = false {
+    var mouseInside = false {
         didSet {
             needsDisplay = true
         }
@@ -101,16 +101,16 @@ final class BookmarkTableRowView: NSTableRowView {
         }
     }
 
-    override func mouseEntered(with event: NSEvent) {
+    override func mouseEntered(with _: NSEvent) {
         mouseInside = true
     }
 
-    override func mouseExited(with event: NSEvent) {
+    override func mouseExited(with _: NSEvent) {
         mouseInside = false
     }
 
     override var interiorBackgroundStyle: NSView.BackgroundStyle {
-        return .light
+        .light
     }
 
 }

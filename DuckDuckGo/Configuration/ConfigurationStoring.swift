@@ -57,7 +57,7 @@ final class DefaultConfigurationStorage: ConfigurationStoring {
 
     @UserDefaultsWrapper(key: .configStorageSurrogatesEtag, defaultValue: nil)
     private var surrogatesEtag: String?
-    
+
     @UserDefaultsWrapper(key: .configStoragePrivacyConfigurationEtag, defaultValue: nil)
     private var privacyConfigurationEtag: String?
 
@@ -82,7 +82,7 @@ final class DefaultConfigurationStorage: ConfigurationStoring {
 
         case .trackerRadar:
             return trackerRadarEtag
-            
+
         case .privacyConfiguration:
             return privacyConfigurationEtag
 
@@ -107,7 +107,7 @@ final class DefaultConfigurationStorage: ConfigurationStoring {
 
         case .trackerRadar:
             trackerRadarEtag = etag
-            
+
         case .privacyConfiguration:
             privacyConfigurationEtag = etag
 
@@ -121,9 +121,9 @@ final class DefaultConfigurationStorage: ConfigurationStoring {
         do {
             return try Data(contentsOf: file)
         } catch {
-#if DEBUG
-        guard !AppDelegate.isRunningTests else { return nil }
-#endif
+            #if DEBUG
+            guard !AppDelegate.isRunningTests else { return nil }
+            #endif
 
             Pixel.fire(.debug(event: .trackerDataCouldNotBeLoaded, error: error))
             return nil

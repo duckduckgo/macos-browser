@@ -20,28 +20,28 @@ import XCTest
 @testable import DuckDuckGo_Privacy_Browser
 
 class MacWaitlistStoreTests: XCTestCase {
-    
+
     override func setUp() {
         super.setUp()
         UserDefaultsWrapper<Any>.clearAll()
     }
-    
+
     override func tearDown() {
         super.tearDown()
         UserDefaultsWrapper<Any>.clearAll()
     }
-    
+
     func testWhenStoreDoesNotHaveInstallMetadata_ThenIsUnlockedReturnsFalse() {
         let mockStatisticsStore = mockStatisticsStore()
         let store = MacWaitlistEncryptedFileStorage(statisticsStore: mockStatisticsStore)
-        
+
         XCTAssertFalse(store.isUnlocked())
     }
-    
+
     func testWhenStoreHasInstallMetadata_ThenIsUnlockedReturnsTrue() {
         let mockStatisticsStore = mockStatisticsStore()
         let store = MacWaitlistEncryptedFileStorage(statisticsStore: mockStatisticsStore)
-        
+
         store.unlock()
 
         XCTAssertTrue(store.isUnlocked())
@@ -50,26 +50,26 @@ class MacWaitlistStoreTests: XCTestCase {
     func testWhenStoreUnlocks_ThenMetadataIsStoredToDisk() {
         let mockStatisticsStore = mockStatisticsStore()
         let store = MacWaitlistEncryptedFileStorage(statisticsStore: mockStatisticsStore)
-        
+
         XCTAssertFalse(mockStatisticsStore.waitlistUnlocked)
         store.unlock()
         XCTAssertTrue(mockStatisticsStore.waitlistUnlocked)
     }
-    
+
     func testWhenStoreDeletesMetadata_ThenMetadataIsRemoved() {
         let mockStatisticsStore = mockStatisticsStore()
         let store = MacWaitlistEncryptedFileStorage(statisticsStore: mockStatisticsStore)
-        
+
         store.unlock()
         XCTAssertTrue(mockStatisticsStore.waitlistUnlocked)
-        
+
         store.deleteExistingMetadata()
         XCTAssertFalse(mockStatisticsStore.waitlistUnlocked)
     }
-    
+
     private func mockStatisticsStore() -> StatisticsStore {
         let pixelStore = PixelStoreMock()
         return LocalStatisticsStore(pixelDataStore: pixelStore)
     }
-    
+
 }

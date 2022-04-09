@@ -16,8 +16,8 @@
 //  limitations under the License.
 //
 
-import Foundation
 import CryptoKit
+import Foundation
 
 enum EncryptionKeyStoreError: Error {
     case storageFailed
@@ -26,7 +26,7 @@ enum EncryptionKeyStoreError: Error {
 }
 
 final class EncryptionKeyStore: EncryptionKeyStoring {
-    
+
     enum Constants {
         static let encryptionKeyAccount = "com.duckduckgo.macos.browser"
         static let encryptionKeyService = "DuckDuckGo Privacy Browser Data Encryption Key"
@@ -36,7 +36,7 @@ final class EncryptionKeyStore: EncryptionKeyStoring {
     private let account: String
 
     private var defaultKeychainQueryAttributes: [String: Any] {
-        return [
+        [
             kSecClass: kSecClassGenericPassword,
             kSecAttrAccount: account,
             kSecUseDataProtectionKeychain: true
@@ -84,7 +84,7 @@ final class EncryptionKeyStore: EncryptionKeyStoring {
 
     // MARK: - Private
 
-    private func readKeyFromKeychain(account: String) throws -> SymmetricKey? {
+    private func readKeyFromKeychain(account _: String) throws -> SymmetricKey? {
         var query = defaultKeychainQueryAttributes
         query[kSecReturnData as String] = true
 

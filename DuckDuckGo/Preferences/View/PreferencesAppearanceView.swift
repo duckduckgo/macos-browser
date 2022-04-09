@@ -59,8 +59,7 @@ extension Preferences {
                     ThemeButton(
                         title: theme.displayName,
                         imageName: theme.imageName,
-                        isSelected: isThemeSelected(theme)
-                    )
+                        isSelected: isThemeSelected(theme))
                 }
             }
         }
@@ -74,8 +73,7 @@ extension Preferences {
                     if isSelected {
                         model.currentThemeName = theme
                     }
-                }
-            )
+                })
         }
     }
 

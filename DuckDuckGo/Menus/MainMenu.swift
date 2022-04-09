@@ -17,8 +17,8 @@
 //
 
 import Cocoa
-import os.log
 import Combine
+import os.log
 
 final class MainMenu: NSMenu {
 
@@ -94,12 +94,13 @@ final class MainMenu: NSMenu {
     }
 
     private func setup() {
-        self.delegate = self
+        delegate = self
         #if !FEEDBACK
 
-        guard let helpMenuItemSubmenu = helpMenuItem?.submenu,
-              let helpSeparatorMenuItem = helpSeparatorMenuItem,
-              let sendFeedbackMenuItem = sendFeedbackMenuItem else {
+        guard
+            let helpMenuItemSubmenu = helpMenuItem?.submenu,
+            let helpSeparatorMenuItem = helpSeparatorMenuItem,
+            let sendFeedbackMenuItem = sendFeedbackMenuItem else {
             os_log("MainMenuManager: Failed to setup main menu", type: .error)
             return
         }
@@ -177,11 +178,12 @@ final class MainMenu: NSMenu {
                 }
         }
 
-        guard let bookmarksMenu = bookmarksMenuItem?.submenu,
-              let favoritesSeparatorIndex = bookmarksMenu.items.lastIndex(where: { $0.isSeparatorItem }),
-              let favoritesMenuItem = favoritesMenuItem,
-              let favoritesMenu = favoritesMenuItem.submenu,
-              let favoriteThisPageSeparatorIndex = favoritesMenu.items.lastIndex(where: { $0.isSeparatorItem }) else {
+        guard
+            let bookmarksMenu = bookmarksMenuItem?.submenu,
+            let favoritesSeparatorIndex = bookmarksMenu.items.lastIndex(where: { $0.isSeparatorItem }),
+            let favoritesMenuItem = favoritesMenuItem,
+            let favoritesMenu = favoritesMenuItem.submenu,
+            let favoriteThisPageSeparatorIndex = favoritesMenu.items.lastIndex(where: { $0.isSeparatorItem }) else {
             os_log("MainMenuManager: Failed to reference bookmarks menu items", type: .error)
             return
         }
@@ -200,10 +202,12 @@ final class MainMenu: NSMenu {
 
 extension MainMenu: NSMenuDelegate {
 
-    func menuHasKeyEquivalent(_ menu: NSMenu,
-                              for event: NSEvent,
-                              target: AutoreleasingUnsafeMutablePointer<AnyObject?>,
-                              action: UnsafeMutablePointer<Selector?>) -> Bool {
+    func menuHasKeyEquivalent(
+        _: NSMenu,
+        for _: NSEvent,
+        target _: AutoreleasingUnsafeMutablePointer<AnyObject?>,
+        action _: UnsafeMutablePointer<Selector?>)
+        -> Bool {
         sharingMenu.update()
         shareMenuItem.submenu = sharingMenu
         return false
@@ -211,9 +215,9 @@ extension MainMenu: NSMenuDelegate {
 
 }
 
-fileprivate extension NSMenuItem {
+extension NSMenuItem {
 
-    convenience init(bookmarkViewModel: BookmarkViewModel) {
+    fileprivate convenience init(bookmarkViewModel: BookmarkViewModel) {
         self.init()
 
         title = bookmarkViewModel.menuTitle
@@ -222,7 +226,7 @@ fileprivate extension NSMenuItem {
         action = #selector(MainViewController.openBookmark(_:))
     }
 
-    convenience init(bookmarkViewModels: [BookmarkViewModel]) {
+    fileprivate convenience init(bookmarkViewModels: [BookmarkViewModel]) {
         self.init()
 
         title = UserText.bookmarksOpenInNewTabs
@@ -230,7 +234,7 @@ fileprivate extension NSMenuItem {
         action = #selector(MainViewController.openAllInTabs(_:))
     }
 
-    func removeFromParent() {
+    fileprivate func removeFromParent() {
         parent?.submenu?.removeItem(self)
     }
 

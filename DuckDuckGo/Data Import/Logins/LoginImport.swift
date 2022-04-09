@@ -55,19 +55,22 @@ struct ImportedLoginCredential: Equatable {
                 title = row[titleIndex]
             }
 
-            self.init(title: title,
-                      url: row[inferredPositions.urlIndex],
-                      username: row[inferredPositions.usernameIndex],
-                      password: row[inferredPositions.passwordIndex])
+            self.init(
+                title: title,
+                url: row[inferredPositions.urlIndex],
+                username: row[inferredPositions.usernameIndex],
+                password: row[inferredPositions.passwordIndex])
         } else if row.count >= 4 {
-            self.init(title: row[RowFormatWithTitle.title.rawValue],
-                      url: row[RowFormatWithTitle.url.rawValue],
-                      username: row[RowFormatWithTitle.username.rawValue],
-                      password: row[RowFormatWithTitle.password.rawValue])
+            self.init(
+                title: row[RowFormatWithTitle.title.rawValue],
+                url: row[RowFormatWithTitle.url.rawValue],
+                username: row[RowFormatWithTitle.username.rawValue],
+                password: row[RowFormatWithTitle.password.rawValue])
         } else if row.count >= 3 {
-            self.init(url: row[RowFormatWithoutTitle.url.rawValue],
-                      username: row[RowFormatWithoutTitle.username.rawValue],
-                      password: row[RowFormatWithoutTitle.password.rawValue])
+            self.init(
+                url: row[RowFormatWithoutTitle.url.rawValue],
+                username: row[RowFormatWithoutTitle.username.rawValue],
+                password: row[RowFormatWithoutTitle.password.rawValue])
         } else {
             return nil
         }

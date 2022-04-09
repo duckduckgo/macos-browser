@@ -47,9 +47,10 @@ final class ProgressEstimationTests: XCTestCase {
         var sum: CFTimeInterval = 0.0
         for (idx, milestone) in milestones[..<milestones.index(before: milestones.endIndex)].enumerated() {
             sum += milestone.interval
-            let event = Event.nextStep(for: milestone.progress,
-                                       lastProgressEvent: Event(progress: milestone.progress, interval: sum),
-                                       milestones: milestones)
+            let event = Event.nextStep(
+                for: milestone.progress,
+                lastProgressEvent: Event(progress: milestone.progress, interval: sum),
+                milestones: milestones)
 
             XCTAssertEqual(event, milestones[idx + 1])
         }

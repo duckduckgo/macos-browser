@@ -20,7 +20,7 @@ import Foundation
 
 struct MacWaitlistRedeemSuccessResponse: Decodable {
     var hasExpectedStatusMessage: Bool {
-        return status == "redeemed"
+        status == "redeemed"
     }
 
     let status: String
@@ -31,16 +31,17 @@ enum MacWaitlistRedeemError: Error {
 }
 
 protocol MacWaitlistRequest {
-    
-    func unlock(with inviteCode: String,
-                completion: @escaping (Result<MacWaitlistRedeemSuccessResponse, MacWaitlistRedeemError>) -> Void)
-    
+
+    func unlock(
+        with inviteCode: String,
+        completion: @escaping (Result<MacWaitlistRedeemSuccessResponse, MacWaitlistRedeemError>) -> Void)
+
 }
 
 struct MacWaitlistAPIRequest: MacWaitlistRequest {
-        
+
     private let endpoint: URL
-    
+
     init(endpoint: URL? = nil) {
         if let endpoint = endpoint {
             self.endpoint = endpoint
@@ -52,23 +53,25 @@ struct MacWaitlistAPIRequest: MacWaitlistRequest {
             #endif
         }
     }
-    
-    func unlock(with inviteCode: String,
-                completion: @escaping (Result<MacWaitlistRedeemSuccessResponse, MacWaitlistRedeemError>) -> Void) {
-        
+
+    func unlock(
+        with inviteCode: String,
+        completion: @escaping (Result<MacWaitlistRedeemSuccessResponse, MacWaitlistRedeemError>) -> Void) {
+
         let parameters = [ "code": inviteCode ]
-        
+
         APIRequest.request(url: endpoint, method: .post, parameters: parameters, callBackOnMainThread: true) { response, _ in
             let decoder = JSONDecoder()
 
-            if let responseData = response?.data,
-               let decodedResponse = try? decoder.decode(MacWaitlistRedeemSuccessResponse.self, from: responseData) {
+            if
+                let responseData = response?.data,
+                let decodedResponse = try? decoder.decode(MacWaitlistRedeemSuccessResponse.self, from: responseData) {
                 completion(.success(decodedResponse))
             } else {
                 completion(.failure(.redemptionError))
             }
         }
-        
+
     }
-    
+
 }

@@ -21,7 +21,7 @@ import Foundation
 final class ChromeDataImporter: ChromiumDataImporter {
 
     override var processName: String {
-        return "Chrome"
+        "Chrome"
     }
 
     init(loginImporter: LoginImporter, bookmarkImporter: BookmarkImporter) {

@@ -28,7 +28,7 @@ final class ProgressView: NSView, CAAnimationDelegate {
     private var lastEvent: ProgressEvent?
 
     private var lastKnownBounds: CGRect = .zero
-    private var targetProgress: Double = 0.0
+    private var targetProgress = 0.0
     private var targetTime: CFTimeInterval = 0.0
 
     var isShown: Bool {
@@ -48,7 +48,7 @@ final class ProgressView: NSView, CAAnimationDelegate {
     }
 
     private func configureLayers() {
-        self.wantsLayer = true
+        wantsLayer = true
         layer!.backgroundColor = NSColor.clear.cgColor
 
         var progressFrame = bounds
@@ -85,7 +85,7 @@ final class ProgressView: NSView, CAAnimationDelegate {
     func show(progress: Double? = nil, startTime: CFTimeInterval? = nil) {
         let progress = progress.map { max($0, Constants.initialValue) } ?? Constants.initialValue
         self.startTime = startTime ?? CACurrentMediaTime()
-        self.lastEvent = nil
+        lastEvent = nil
 
         progressMask.removeAllAnimations()
 
@@ -103,8 +103,8 @@ final class ProgressView: NSView, CAAnimationDelegate {
     }
 
     func increaseProgress(to progress: Double) {
-        self.lastEvent = ProgressEvent(progress: progress, interval: CACurrentMediaTime() - startTime)
-        self.increaseProgress(to: progress, animationDuration: Constants.animationDuration)
+        lastEvent = ProgressEvent(progress: progress, interval: CACurrentMediaTime() - startTime)
+        increaseProgress(to: progress, animationDuration: Constants.animationDuration)
     }
 
     private func increaseProgress(to progress: Double, animationDuration: TimeInterval? = nil) {
@@ -114,8 +114,9 @@ final class ProgressView: NSView, CAAnimationDelegate {
     }
 
     func finishAndHide() {
-        guard progressMask.opacity > 0
-                && progressMask.animation(forKey: Constants.fadeOutAnimationKey) == nil
+        guard
+            progressMask.opacity > 0
+            && progressMask.animation(forKey: Constants.fadeOutAnimationKey) == nil
         else { return }
 
         increaseProgress(to: Constants.max, animationDuration: Constants.hideAnimationDuration)
@@ -134,7 +135,7 @@ final class ProgressView: NSView, CAAnimationDelegate {
         guard progressRect.width < bounds.width else {
             return 1.0
         }
-        return Double(progressRect.width / (parentBounds ?? self.bounds).width) * 2.0
+        return Double(progressRect.width / (parentBounds ?? bounds).width) * 2.0
     }
 
     // Currently displayed progress
@@ -145,7 +146,7 @@ final class ProgressView: NSView, CAAnimationDelegate {
     private func updateProgressMask(to progressValue: Double, animationDuration: TimeInterval?) {
         guard progressMask.animation(forKey: Constants.fadeOutAnimationKey) == nil else { return }
 
-        let actualProgress = self.currentProgress()
+        let actualProgress = currentProgress()
 
         if progressMask.animation(forKey: Constants.progressAnimationKey) != nil {
             progressMask.removeAnimation(forKey: Constants.progressAnimationKey)
@@ -153,12 +154,12 @@ final class ProgressView: NSView, CAAnimationDelegate {
 
         guard progressValue > actualProgress else {
             // proceed to next fake step or hide
-            self.progressAnimationDidStop(finished: true)
+            progressAnimationDidStop(finished: true)
             return
         }
 
-        self.targetProgress = progressValue
-        self.targetTime = CACurrentMediaTime() + (animationDuration ?? 0)
+        targetProgress = progressValue
+        targetTime = CACurrentMediaTime() + (animationDuration ?? 0)
 
         let progressFrame = calculateProgressMaskRect(for: progressValue)
         if let animationDuration = animationDuration, animationDuration > 0.05 {
@@ -179,21 +180,22 @@ final class ProgressView: NSView, CAAnimationDelegate {
         if (animationDuration ?? 0) > 0 {
             CATransaction.commit()
         } else {
-            self.progressAnimationDidStop(finished: true)
+            progressAnimationDidStop(finished: true)
         }
     }
 
-    func animationDidStop(_ animation: CAAnimation, finished: Bool) {
-        self.progressAnimationDidStop(finished: finished)
+    func animationDidStop(_: CAAnimation, finished: Bool) {
+        progressAnimationDidStop(finished: finished)
     }
 
     private func progressAnimationDidStop(finished: Bool) {
-        let currentProgress = self.currentProgress()
+        let currentProgress = currentProgress()
         if currentProgress >= Constants.max {
             hide(animated: true)
 
-        } else if finished,
-                  let nextStep = ProgressEvent.nextStep(for: currentProgress, lastProgressEvent: self.lastEvent) {
+        } else if
+            finished,
+            let nextStep = ProgressEvent.nextStep(for: currentProgress, lastProgressEvent: lastEvent) {
 
             increaseProgress(to: nextStep.progress, animationDuration: nextStep.interval)
         }
@@ -208,12 +210,12 @@ final class ProgressView: NSView, CAAnimationDelegate {
         }
         guard isShown else { return }
 
-        let currentProgress = self.currentProgress(parentBounds: lastKnownBounds)
+        let currentProgress = currentProgress(parentBounds: lastKnownBounds)
         progressMask.frame = calculateProgressMaskRect(for: currentProgress)
         progressMask.removeAnimation(forKey: Constants.progressAnimationKey)
 
         if targetProgress > currentProgress {
-            self.increaseProgress(to: targetProgress, animationDuration: min(0, targetTime - CACurrentMediaTime()))
+            increaseProgress(to: targetProgress, animationDuration: min(0, targetTime - CACurrentMediaTime()))
         }
     }
 
@@ -261,7 +263,7 @@ final class ProgressView: NSView, CAAnimationDelegate {
 
 extension ProgressView {
 
-    struct Constants {
+    enum Constants {
         static let gradientAnimationKey = "animateGradient"
         static let progressAnimationKey = "animateProgress"
         static let fadeOutAnimationKey = "animateFadeOut"
@@ -297,9 +299,11 @@ extension ProgressView {
             self.interval = interval
         }
 
-        static func nextStep(for currentProgress: Double,
-                             lastProgressEvent: ProgressEvent?,
-                             milestones: [ProgressEvent] = Constants.milestones) -> Self? {
+        static func nextStep(
+            for currentProgress: Double,
+            lastProgressEvent: ProgressEvent?,
+            milestones: [ProgressEvent] = Constants.milestones)
+            -> Self? {
             var estimatedElapsedTime: CFTimeInterval = 0.0
             var nextStepIdx: Int!
 
@@ -333,8 +337,9 @@ extension ProgressView {
 
             // multiply next step duration by (actual / estimated) elapsed time
             let multiplier = estimatedElapsedTime > 0
-                ? min(Constants.maxMultiplier, max(Constants.minMultiplier,
-                                                   (lastProgressEvent?.interval ?? 0.0) / estimatedElapsedTime))
+                ? min(Constants.maxMultiplier, max(
+                    Constants.minMultiplier,
+                    (lastProgressEvent?.interval ?? 0.0) / estimatedElapsedTime))
                 : 1.0
             nextStep.interval = max(multiplier * nextStep.interval, Constants.animationDuration)
 

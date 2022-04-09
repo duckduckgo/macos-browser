@@ -22,7 +22,7 @@ import os.log
 final class WindowsManager {
 
     class var windows: [NSWindow] {
-        return NSApplication.shared.windows
+        NSApplication.shared.windows
     }
 
     class func closeWindows(except window: NSWindow? = nil) {
@@ -34,11 +34,13 @@ final class WindowsManager {
     }
 
     @discardableResult
-    class func openNewWindow(with tabCollectionViewModel: TabCollectionViewModel? = nil,
-                             droppingPoint: NSPoint? = nil,
-                             contentSize: NSSize? = nil,
-                             showWindow: Bool = true,
-                             popUp: Bool = false) -> NSWindow? {
+    class func openNewWindow(
+        with tabCollectionViewModel: TabCollectionViewModel? = nil,
+        droppingPoint: NSPoint? = nil,
+        contentSize _: NSSize? = nil,
+        showWindow: Bool = true,
+        popUp: Bool = false)
+        -> NSWindow? {
         let mainWindowController = makeNewWindow(tabCollectionViewModel: tabCollectionViewModel, popUp: popUp)
 
         if let droppingPoint = droppingPoint {
@@ -56,10 +58,11 @@ final class WindowsManager {
     class func openNewWindow(with tab: Tab, droppingPoint: NSPoint? = nil, contentSize: NSSize? = nil, popUp: Bool = false) {
         let tabCollection = TabCollection()
         tabCollection.append(tab: tab)
-        openNewWindow(with: TabCollectionViewModel(tabCollection: tabCollection),
-                      droppingPoint: droppingPoint,
-                      contentSize: contentSize,
-                      popUp: popUp)
+        openNewWindow(
+            with: TabCollectionViewModel(tabCollection: tabCollection),
+            droppingPoint: droppingPoint,
+            contentSize: contentSize,
+            popUp: popUp)
     }
 
     class func openNewWindow(with initialUrl: URL) {
@@ -67,18 +70,21 @@ final class WindowsManager {
     }
 
     class func openPopUpWindow(with tab: Tab, contentSize: NSSize?) {
-        if let mainWindowController = WindowControllersManager.shared.lastKeyMainWindowController,
-           mainWindowController.window?.styleMask.contains(.fullScreen) == true,
-           mainWindowController.window?.isPopUpWindow == false {
+        if
+            let mainWindowController = WindowControllersManager.shared.lastKeyMainWindowController,
+            mainWindowController.window?.styleMask.contains(.fullScreen) == true,
+            mainWindowController.window?.isPopUpWindow == false {
             mainWindowController.mainViewController.tabCollectionViewModel.insertChild(tab: tab, selected: true)
         } else {
-            self.openNewWindow(with: tab, contentSize: contentSize, popUp: true)
+            openNewWindow(with: tab, contentSize: contentSize, popUp: true)
         }
     }
 
-    private class func makeNewWindow(tabCollectionViewModel: TabCollectionViewModel? = nil,
-                                     contentSize: NSSize? = nil,
-                                     popUp: Bool = false) -> MainWindowController {
+    private class func makeNewWindow(
+        tabCollectionViewModel: TabCollectionViewModel? = nil,
+        contentSize: NSSize? = nil,
+        popUp: Bool = false)
+        -> MainWindowController {
         let mainViewController: MainViewController
         do {
             mainViewController = try NSException.catch {
@@ -89,11 +95,11 @@ final class WindowsManager {
                     }
             }
         } catch {
-#if DEBUG
+            #if DEBUG
             fatalError("WindowsManager.makeNewWindow: \(error)")
-#else
+            #else
             fatalError("WindowsManager.makeNewWindow: the App Bundle seems to be removed")
-#endif
+            #endif
         }
 
         var contentSize = contentSize ?? NSSize(width: 1024, height: 790)
@@ -106,6 +112,6 @@ final class WindowsManager {
 
 }
 
-fileprivate extension NSStoryboard.SceneIdentifier {
-    static let mainViewController = NSStoryboard.SceneIdentifier("mainViewController")
+extension NSStoryboard.SceneIdentifier {
+    fileprivate static let mainViewController = NSStoryboard.SceneIdentifier("mainViewController")
 }

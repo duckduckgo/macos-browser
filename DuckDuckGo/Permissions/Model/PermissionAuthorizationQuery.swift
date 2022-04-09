@@ -22,21 +22,23 @@ final class PermissionAuthorizationQuery {
     let url: URL?
     let domain: String
     let permissions: [PermissionType]
-    var wasShownOnce: Bool = false
-    var shouldShowAlwaysAllowCheckbox: Bool = false
-    var shouldShowCancelInsteadOfDeny: Bool = false
+    var wasShownOnce = false
+    var shouldShowAlwaysAllowCheckbox = false
+    var shouldShowCancelInsteadOfDeny = false
 
     enum Decision {
         case granted(PermissionAuthorizationQuery)
         case denied(PermissionAuthorizationQuery)
         case deinitialized
     }
+
     private var decisionHandler: ((Decision, Bool?) -> Void)?
 
-    init(domain: String,
-         url: URL?,
-         permissions: [PermissionType],
-         decisionHandler: @escaping (Decision, Bool?) -> Void) {
+    init(
+        domain: String,
+        url: URL?,
+        permissions: [PermissionType],
+        decisionHandler: @escaping (Decision, Bool?) -> Void) {
 
         self.domain = domain
         self.url = url

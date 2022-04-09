@@ -103,63 +103,76 @@ final class DownloadsViewController: NSViewController {
 
     // MARK: User Actions
 
-    @IBAction func openDownloadsFolderAction(_ sender: Any) {
-        guard let url = DownloadsPreferences().effectiveDownloadLocation
-                ?? FileManager.default.urls(for: .downloadsDirectory, in: .userDomainMask).first
+    @IBAction
+    func openDownloadsFolderAction(_: Any) {
+        guard
+            let url = DownloadsPreferences().effectiveDownloadLocation
+            ?? FileManager.default.urls(for: .downloadsDirectory, in: .userDomainMask).first
         else {
             return
         }
-        self.dismiss()
+        dismiss()
         NSWorkspace.shared.selectFile(nil, inFileViewerRootedAtPath: url.path)
     }
 
-    @IBAction func clearDownloadsAction(_ sender: Any) {
+    @IBAction
+    func clearDownloadsAction(_: Any) {
         viewModel.cleanupInactiveDownloads()
-        self.dismiss()
+        dismiss()
         delegate?.clearDownloadsActionTriggered()
     }
 
-    @IBAction func openDownloadedFileAction(_ sender: Any) {
-        guard let index = index(for: sender),
-              let url = viewModel.items[safe: index]?.localURL
+    @IBAction
+    func openDownloadedFileAction(_ sender: Any) {
+        guard
+            let index = index(for: sender),
+            let url = viewModel.items[safe: index]?.localURL
         else { return }
         NSWorkspace.shared.open(url)
     }
 
-    @IBAction func cancelDownloadAction(_ sender: Any) {
+    @IBAction
+    func cancelDownloadAction(_ sender: Any) {
         guard let index = index(for: sender) else { return }
         viewModel.cancelDownload(at: index)
     }
 
-    @IBAction func removeDownloadAction(_ sender: Any) {
+    @IBAction
+    func removeDownloadAction(_ sender: Any) {
         guard let index = index(for: sender) else { return }
         viewModel.removeDownload(at: index)
     }
 
-    @IBAction func revealDownloadAction(_ sender: Any) {
-        guard let index = index(for: sender),
-              let url = viewModel.items[safe: index]?.localURL
+    @IBAction
+    func revealDownloadAction(_ sender: Any) {
+        guard
+            let index = index(for: sender),
+            let url = viewModel.items[safe: index]?.localURL
         else { return }
-        self.dismiss()
+        dismiss()
         NSWorkspace.shared.activateFileViewerSelecting([url])
     }
 
     func openDownloadAction(_ sender: Any) {
-        guard let index = index(for: sender),
-              let url = viewModel.items[safe: index]?.localURL
+        guard
+            let index = index(for: sender),
+            let url = viewModel.items[safe: index]?.localURL
         else { return }
-        self.dismiss()
+        dismiss()
         NSWorkspace.shared.open(url)
     }
 
-    @IBAction func restartDownloadAction(_ sender: Any) {
+    @IBAction
+    func restartDownloadAction(_ sender: Any) {
         guard let index = index(for: sender) else { return }
         viewModel.restartDownload(at: index)
     }
 
-    @IBAction func copyDownloadLinkAction(_ sender: Any) {
-        guard let index = index(for: sender),
-              let url = viewModel.items[safe: index]?.url as NSURL?
+    @IBAction
+    func copyDownloadLinkAction(_ sender: Any) {
+        guard
+            let index = index(for: sender),
+            let url = viewModel.items[safe: index]?.url as NSURL?
         else { return }
 
         let pasteboard = NSPasteboard.general
@@ -168,16 +181,19 @@ final class DownloadsViewController: NSViewController {
         pasteboard.setString(url.absoluteString ?? "", forType: .string)
     }
 
-    @IBAction func openOriginatingWebsiteAction(_ sender: Any) {
-        guard let index = index(for: sender),
-              let url = viewModel.items[safe: index]?.websiteURL
+    @IBAction
+    func openOriginatingWebsiteAction(_ sender: Any) {
+        guard
+            let index = index(for: sender),
+            let url = viewModel.items[safe: index]?.websiteURL
         else { return }
 
-        self.dismiss()
+        dismiss()
         WindowControllersManager.shared.show(url: url, newTab: true)
     }
 
-    @IBAction func doubleClickAction(_ sender: Any) {
+    @IBAction
+    func doubleClickAction(_ sender: Any) {
         if index(for: sender) != nil {
             openDownloadAction(sender)
         } else {
@@ -191,8 +207,9 @@ extension DownloadsViewController: NSMenuDelegate {
 
     // swiftlint:disable cyclomatic_complexity
     func menuNeedsUpdate(_ menu: NSMenu) {
-        guard let index = index(for: menu),
-              let item = viewModel.items[safe: index]
+        guard
+            let index = index(for: menu),
+            let item = viewModel.items[safe: index]
         else {
             menu.cancelTracking()
             return
@@ -202,8 +219,9 @@ extension DownloadsViewController: NSMenuDelegate {
             switch menuItem.action {
             case #selector(openDownloadedFileAction(_:)),
                  #selector(revealDownloadAction(_:)):
-                if case .complete(.some(let url)) = item.state,
-                   FileManager.default.fileExists(atPath: url.path) {
+                if
+                    case .complete(.some(let url)) = item.state,
+                    FileManager.default.fileExists(atPath: url.path) {
                     menuItem.isHidden = false
                 } else {
                     menuItem.isHidden = true
@@ -234,15 +252,15 @@ extension DownloadsViewController: NSMenuDelegate {
 
 extension DownloadsViewController: NSTableViewDataSource, NSTableViewDelegate {
 
-    func numberOfRows(in tableView: NSTableView) -> Int {
-        return viewModel.items.count + 1
+    func numberOfRows(in _: NSTableView) -> Int {
+        viewModel.items.count + 1
     }
 
-    func tableView(_ tableView: NSTableView, objectValueFor tableColumn: NSTableColumn?, row: Int) -> Any? {
-        return viewModel.items[safe: row]
+    func tableView(_: NSTableView, objectValueFor _: NSTableColumn?, row: Int) -> Any? {
+        viewModel.items[safe: row]
     }
 
-    func tableView(_ tableView: NSTableView, viewFor tableColumn: NSTableColumn?, row: Int) -> NSView? {
+    func tableView(_ tableView: NSTableView, viewFor _: NSTableColumn?, row: Int) -> NSView? {
         let identifier: NSUserInterfaceItemIdentifier
         if viewModel.items.isEmpty {
             identifier = .noDownloadsCell
@@ -258,7 +276,7 @@ extension DownloadsViewController: NSTableViewDataSource, NSTableViewDelegate {
         return cell
     }
 
-    func tableView(_ tableView: NSTableView, shouldSelectRow row: Int) -> Bool {
+    func tableView(_: NSTableView, shouldSelectRow row: Int) -> Bool {
         if viewModel.items.indices.contains(row) {
             return true
         } else {
@@ -266,7 +284,7 @@ extension DownloadsViewController: NSTableViewDataSource, NSTableViewDelegate {
         }
     }
 
-    func tableViewSelectionIsChanging(_ notification: Notification) {
+    func tableViewSelectionIsChanging(_: Notification) {
         func changeCellSelection(in row: Int?, selected: Bool) {
             guard let row = row else { return }
 
@@ -285,8 +303,8 @@ extension DownloadsViewController: NSTableViewDataSource, NSTableViewDelegate {
     }
 }
 
-private extension NSUserInterfaceItemIdentifier {
-    static let downloadCell = NSUserInterfaceItemIdentifier(rawValue: "cell")
-    static let noDownloadsCell = NSUserInterfaceItemIdentifier(rawValue: "NoDownloads")
-    static let openDownloadsCell = NSUserInterfaceItemIdentifier(rawValue: "OpenDownloads")
+extension NSUserInterfaceItemIdentifier {
+    fileprivate static let downloadCell = NSUserInterfaceItemIdentifier(rawValue: "cell")
+    fileprivate static let noDownloadsCell = NSUserInterfaceItemIdentifier(rawValue: "NoDownloads")
+    fileprivate static let openDownloadsCell = NSUserInterfaceItemIdentifier(rawValue: "OpenDownloads")
 }

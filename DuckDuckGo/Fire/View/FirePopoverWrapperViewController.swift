@@ -29,27 +29,32 @@ final class FirePopoverWrapperViewController: NSViewController {
     private let fireViewModel: FireViewModel
     private let tabCollectionViewModel: TabCollectionViewModel
 
-    required init?(coder: NSCoder) {
+    required init?(coder _: NSCoder) {
         fatalError("FirePopoverWrapperViewController: Bad initializer")
     }
 
-    init?(coder: NSCoder,
-          fireViewModel: FireViewModel,
-          tabCollectionViewModel: TabCollectionViewModel) {
+    init?(
+        coder: NSCoder,
+        fireViewModel: FireViewModel,
+        tabCollectionViewModel: TabCollectionViewModel) {
         self.fireViewModel = fireViewModel
         self.tabCollectionViewModel = tabCollectionViewModel
 
         super.init(coder: coder)
     }
-    @IBSegueAction func createFirePopoverViewController(_ coder: NSCoder) -> FirePopoverViewController? {
-        let firePopoverViewController = FirePopoverViewController(coder: coder,
-                                                                  fireViewModel: fireViewModel,
-                                                                  tabCollectionViewModel: tabCollectionViewModel)
+
+    @IBSegueAction
+    func createFirePopoverViewController(_ coder: NSCoder) -> FirePopoverViewController? {
+        let firePopoverViewController = FirePopoverViewController(
+            coder: coder,
+            fireViewModel: fireViewModel,
+            tabCollectionViewModel: tabCollectionViewModel)
         firePopoverViewController?.delegate = self
         return firePopoverViewController
     }
 
-    @IBSegueAction func createFireInfoViewController(_ coder: NSCoder) -> FireInfoViewController? {
+    @IBSegueAction
+    func createFireInfoViewController(_ coder: NSCoder) -> FireInfoViewController? {
         let fireInfoViewController = FireInfoViewController(coder: coder)
         fireInfoViewController?.delegate = self
         return fireInfoViewController
@@ -71,7 +76,7 @@ final class FirePopoverWrapperViewController: NSViewController {
 
 extension FirePopoverWrapperViewController: FireInfoViewControllerDelegate {
 
-    func fireInfoViewControllerDidConfirm(_ fireInfoViewController: FireInfoViewController) {
+    func fireInfoViewControllerDidConfirm(_: FireInfoViewController) {
         infoPresentedOnce = true
         hideInfoContainerViewIfNeeded()
     }
@@ -80,11 +85,11 @@ extension FirePopoverWrapperViewController: FireInfoViewControllerDelegate {
 
 extension FirePopoverWrapperViewController: FirePopoverViewControllerDelegate {
 
-    func firePopoverViewControllerDidClear(_ firePopoverViewController: FirePopoverViewController) {
+    func firePopoverViewControllerDidClear(_: FirePopoverViewController) {
         dismiss()
     }
 
-    func firePopoverViewControllerDidCancel(_ firePopoverViewController: FirePopoverViewController) {
+    func firePopoverViewControllerDidCancel(_: FirePopoverViewController) {
         dismiss()
     }
 

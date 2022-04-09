@@ -99,9 +99,10 @@ class DeviceAuthenticatorTests: XCTestCase {
         preferences.isAutoLockEnabled = true
         preferences.autoLockThreshold = .fifteenMinutes
 
-        let deviceAuthenticator = DeviceAuthenticator(idleStateProvider: idleStateProvider,
-                                                      authenticationService: authenticationService,
-                                                      autofillPreferences: preferences)
+        let deviceAuthenticator = DeviceAuthenticator(
+            idleStateProvider: idleStateProvider,
+            authenticationService: authenticationService,
+            autofillPreferences: preferences)
 
         _ = await deviceAuthenticator.authenticateUser(reason: .unlockLogins)
 
@@ -126,9 +127,10 @@ class DeviceAuthenticatorTests: XCTestCase {
         preferences.isAutoLockEnabled = true
         preferences.autoLockThreshold = .fifteenMinutes
 
-        let deviceAuthenticator = DeviceAuthenticator(idleStateProvider: idleStateProvider,
-                                                      authenticationService: authenticationService,
-                                                      autofillPreferences: preferences)
+        let deviceAuthenticator = DeviceAuthenticator(
+            idleStateProvider: idleStateProvider,
+            authenticationService: authenticationService,
+            autofillPreferences: preferences)
 
         _ = await deviceAuthenticator.authenticateUser(reason: .unlockLogins)
 
@@ -166,7 +168,7 @@ private final class MockDeviceAuthenticatorService: DeviceAuthenticationService 
         self.shouldBeAuthenticated = shouldBeAuthenticated
     }
 
-    func authenticateDevice(reason: String, result: @escaping DeviceAuthenticationResultHandler) {
+    func authenticateDevice(reason _: String, result: @escaping DeviceAuthenticationResultHandler) {
         authenticationAttempts += 1
         result(shouldBeAuthenticated ? .success : .failure)
     }
@@ -178,7 +180,7 @@ private struct MockIdleStateProvider: DeviceIdleStateProvider {
     let idleDuration: TimeInterval
 
     func secondsSinceLastEvent() -> TimeInterval {
-        return idleDuration
+        idleDuration
     }
 
 }

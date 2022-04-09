@@ -38,7 +38,7 @@ final class RunLoopExtensionTests: XCTestCase {
 
         waitForExpectations(timeout: 1)
     }
-    
+
     func testWhenConditionIsResolvedThenWaitIsFinished() {
         let condition = RunLoop.ResumeCondition()
 

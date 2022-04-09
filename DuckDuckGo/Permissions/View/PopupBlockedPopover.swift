@@ -27,7 +27,7 @@ final class PopupBlockedPopover: NSPopover {
         setupContentController()
     }
 
-    required init?(coder: NSCoder) {
+    required init?(coder _: NSCoder) {
         fatalError("PopupBlockedPopover: Bad initializer")
     }
 

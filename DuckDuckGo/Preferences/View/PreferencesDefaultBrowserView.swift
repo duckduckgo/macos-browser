@@ -16,9 +16,9 @@
 //  limitations under the License.
 //
 
-import SwiftUI
 import AppKit
 import Combine
+import SwiftUI
 
 extension Preferences {
 

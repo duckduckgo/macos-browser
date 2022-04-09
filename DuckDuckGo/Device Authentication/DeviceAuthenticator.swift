@@ -63,7 +63,7 @@ final class DeviceAuthenticator: UserAuthenticating {
 
     private(set) var isAuthenticating: Bool {
         get {
-            return queue.sync {
+            queue.sync {
                 _isAuthenticating
             }
         }
@@ -76,8 +76,8 @@ final class DeviceAuthenticator: UserAuthenticating {
     }
 
     func lock() {
-        self.deviceIsLocked = true
-        self.cancelIdleCheckTimer()
+        deviceIsLocked = true
+        cancelIdleCheckTimer()
     }
 
     // MARK: - Private Dependencies
@@ -92,12 +92,12 @@ final class DeviceAuthenticator: UserAuthenticating {
 
     private var timer: Timer?
 
-    private var _isAuthenticating: Bool = false
-    private var _deviceIsLocked: Bool = false
+    private var _isAuthenticating = false
+    private var _deviceIsLocked = false
 
     private var deviceIsLocked: Bool {
         get {
-            return queue.sync {
+            queue.sync {
                 _deviceIsLocked
             }
         }
@@ -115,18 +115,20 @@ final class DeviceAuthenticator: UserAuthenticating {
         }
     }
 
-    init(idleStateProvider: DeviceIdleStateProvider = QuartzIdleStateProvider(),
-         authenticationService: DeviceAuthenticationService = LocalAuthenticationService(),
-         autofillPreferences: AutofillPreferences = AutofillPreferences()) {
+    init(
+        idleStateProvider: DeviceIdleStateProvider = QuartzIdleStateProvider(),
+        authenticationService: DeviceAuthenticationService = LocalAuthenticationService(),
+        autofillPreferences: AutofillPreferences = AutofillPreferences()) {
         self.idleStateProvider = idleStateProvider
         self.authenticationService = authenticationService
         self.autofillPreferences = autofillPreferences
-        self.deviceIsLocked = autofillPreferences.isAutoLockEnabled
+        deviceIsLocked = autofillPreferences.isAutoLockEnabled
 
-        NotificationCenter.default.addObserver(self,
-                                               selector: #selector(updateTimerStateBasedOnAutoLockSettings),
-                                               name: .autofillAutoLockSettingsDidChange,
-                                               object: nil)
+        NotificationCenter.default.addObserver(
+            self,
+            selector: #selector(updateTimerStateBasedOnAutoLockSettings),
+            name: .autofillAutoLockSettingsDidChange,
+            object: nil)
     }
 
     var requiresAuthentication: Bool {
@@ -198,8 +200,8 @@ final class DeviceAuthenticator: UserAuthenticating {
 
     private func cancelIdleCheckTimer() {
         os_log("Cancelling idle check timer", log: .autoLock)
-        self.timer?.invalidate()
-        self.timer = nil
+        timer?.invalidate()
+        timer = nil
     }
 
     @objc
@@ -229,7 +231,7 @@ final class DeviceAuthenticator: UserAuthenticating {
 
     private func checkIdleTimeIntervalAndLockIfNecessary(interval: TimeInterval) {
         if interval >= autofillPreferences.autoLockThreshold.seconds {
-            self.lock()
+            lock()
         }
     }
 

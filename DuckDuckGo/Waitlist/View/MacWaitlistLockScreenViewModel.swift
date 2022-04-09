@@ -23,35 +23,35 @@ extension Notification.Name {
 }
 
 final class MacWaitlistLockScreenViewModel: ObservableObject {
-    
+
     enum ViewState {
         case requiresUnlock
         case unlockRequestInFlight
         case unlockSuccess
         case unlockFailure
     }
-    
+
     @Published var state: ViewState
-    
+
     private let store: MacWaitlistStore
     private let waitlistRequest: MacWaitlistRequest
-    
+
     init(store: MacWaitlistStore = MacWaitlistEncryptedFileStorage(), waitlistRequest: MacWaitlistRequest = MacWaitlistAPIRequest()) {
         self.store = store
         self.waitlistRequest = waitlistRequest
-        
-        self.state = .requiresUnlock
+
+        state = .requiresUnlock
     }
-    
+
     public func attemptUnlock(code: String) {
         if state == .unlockRequestInFlight {
             if !AppDelegate.isRunningTests {
                 assertionFailure("Attempted to unlock while a request was active")
             }
-            
+
             return
         }
-        
+
         state = .unlockRequestInFlight
 
         #if DEBUG || REVIEW
@@ -61,7 +61,7 @@ final class MacWaitlistLockScreenViewModel: ObservableObject {
                 self.store.unlock()
                 self.state = .unlockSuccess
             }
-            
+
             return
         }
         #endif
@@ -80,5 +80,5 @@ final class MacWaitlistLockScreenViewModel: ObservableObject {
             }
         }
     }
-    
+
 }

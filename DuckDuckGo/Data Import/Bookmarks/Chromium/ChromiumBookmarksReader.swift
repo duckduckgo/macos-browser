@@ -28,7 +28,7 @@ final class ChromiumBookmarksReader {
     private let chromiumLoginDirectoryPath: String
 
     init(chromiumDataDirectoryPath: String, bookmarksFileName: String = "Bookmarks") {
-        self.chromiumLoginDirectoryPath = chromiumDataDirectoryPath + "/\(bookmarksFileName)"
+        chromiumLoginDirectoryPath = chromiumDataDirectoryPath + "/\(bookmarksFileName)"
     }
 
     func readBookmarks() -> Result<ImportedBookmarks, ChromiumBookmarksReader.ImportError> {

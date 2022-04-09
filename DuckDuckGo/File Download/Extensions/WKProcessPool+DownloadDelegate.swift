@@ -23,26 +23,26 @@ extension WKProcessPool {
 
     @nonobjc var downloadDelegate: Any? {
         get {
-            return self.value(forKey: Self.downloadDelegateKey)
+            value(forKey: Self.downloadDelegateKey)
         }
         set {
-            self.setValue(newValue, forKey: WKProcessPool.downloadDelegateKey)
+            setValue(newValue, forKey: WKProcessPool.downloadDelegateKey)
             objc_setAssociatedObject(self, Self.downloadDelegateKey, newValue, .OBJC_ASSOCIATION_RETAIN)
         }
     }
 
     @discardableResult
     func setDownloadDelegateIfNeeded(using makeDelegate: () -> LegacyWebKitDownloadDelegate)
-    -> LegacyWebKitDownloadDelegate? {
+        -> LegacyWebKitDownloadDelegate? {
         // we don't need LegacyWebKitDownloadDelegate if WKDownload is already supported
         if #available(macOS 11.3, *) { return nil }
 
-        if let downloadDelegate = self.downloadDelegate as? LegacyWebKitDownloadDelegate {
+        if let downloadDelegate = downloadDelegate as? LegacyWebKitDownloadDelegate {
             return downloadDelegate
         }
 
         let delegate = makeDelegate()
-        self.downloadDelegate = delegate
+        downloadDelegate = delegate
         return delegate
     }
 

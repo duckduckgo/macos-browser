@@ -21,25 +21,26 @@ import Foundation
 final class CSVParser {
 
     static func parse(string: String) -> [[String]] {
-        return string.parseCSV()
+        string.parseCSV()
     }
 
 }
 
-private extension String {
+extension String {
 
-    func parseCSV() -> [[String]] {
+    fileprivate func parseCSV() -> [[String]] {
         var result: [[String]] = [[]]
         var currentField = "".unicodeScalars
         var inQuotes = false
         var hasPrecedingBackslash = false
 
-        @inline(__always) func flush() {
+        @inline(__always)
+        func flush() {
             result[result.endIndex - 1].append(String(currentField))
             currentField.removeAll()
         }
 
-        for character in self.unicodeScalars {
+        for character in unicodeScalars {
             switch (character, inQuotes, hasPrecedingBackslash) {
             case (",", false, _):
                 hasPrecedingBackslash = false

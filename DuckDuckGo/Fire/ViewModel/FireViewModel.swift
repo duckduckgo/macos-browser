@@ -16,11 +16,11 @@
 //  limitations under the License.
 //
 
-import WebKit
 import Combine
+import WebKit
 
 final class FireViewModel {
-    
+
     let fire: Fire
 
     @Published var isAnimationPlaying = false
@@ -29,8 +29,8 @@ final class FireViewModel {
     var shouldPreventUserInteraction: AnyPublisher<Bool, Never> {
         Publishers
             .CombineLatest($isAnimationPlaying, fire.$burningData)
-            .map { (isAnimationPlaying, burningData) -> (Bool) in
-                return isAnimationPlaying || burningData != nil
+            .map { isAnimationPlaying, burningData -> (Bool) in
+                isAnimationPlaying || burningData != nil
             }
             .eraseToAnyPublisher()
     }

@@ -30,7 +30,7 @@ final class PopoverMessageViewController: NSViewController {
         let storyboard = NSStoryboard(name: Constants.storyboardName, bundle: nil)
 
         return storyboard.instantiateController(identifier: Constants.identifier) { coder in
-            return PopoverMessageViewController(coder: coder, message: message)
+            PopoverMessageViewController(coder: coder, message: message)
         }
     }
 
@@ -44,7 +44,7 @@ final class PopoverMessageViewController: NSViewController {
         super.init(coder: coder)
     }
 
-    required init?(coder: NSCoder) {
+    required init?(coder _: NSCoder) {
         fatalError("You must create this view controller with a message.")
     }
 
@@ -54,9 +54,9 @@ final class PopoverMessageViewController: NSViewController {
 
     override func viewDidLoad() {
         super.viewDidLoad()
-        self.titleLabel.stringValue = message
+        titleLabel.stringValue = message
 
-        if let mouseOverView = self.view as? MouseOverView {
+        if let mouseOverView = view as? MouseOverView {
             mouseOverView.delegate = self
         }
     }
@@ -68,11 +68,12 @@ final class PopoverMessageViewController: NSViewController {
 
     func show(onParent parent: NSViewController, relativeTo view: NSView) {
         let rect = view.bounds.insetFromLineOfDeath()
-        parent.present(self,
-                     asPopoverRelativeTo: rect,
-                     of: view,
-                     preferredEdge: .maxY,
-                     behavior: .applicationDefined)
+        parent.present(
+            self,
+            asPopoverRelativeTo: rect,
+            of: view,
+            preferredEdge: .maxY,
+            behavior: .applicationDefined)
     }
 
     private func cancelAutoDismissTimer() {
@@ -92,7 +93,7 @@ final class PopoverMessageViewController: NSViewController {
 
 extension PopoverMessageViewController: MouseOverViewDelegate {
 
-    func mouseOverView(_ mouseOverView: MouseOverView, isMouseOver: Bool) {
+    func mouseOverView(_: MouseOverView, isMouseOver: Bool) {
         if isMouseOver {
             cancelAutoDismissTimer()
         } else {

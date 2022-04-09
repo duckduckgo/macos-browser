@@ -27,6 +27,7 @@ internal class MouseOverButton: NSButton {
             updateLayer()
         }
     }
+
     @IBInspectable var mouseDownColor: NSColor? {
         didSet {
             updateLayer()
@@ -38,11 +39,13 @@ internal class MouseOverButton: NSButton {
             updateTintColor()
         }
     }
+
     @IBInspectable var mouseOverTintColor: NSColor? {
         didSet {
             updateTintColor()
         }
     }
+
     @IBInspectable var mouseDownTintColor: NSColor? {
         didSet {
             updateTintColor()
@@ -80,19 +83,19 @@ internal class MouseOverButton: NSButton {
     }
 
     private func configureLayers() {
-        self.wantsLayer = true
-        self.layerUsesCoreImageFilters = true
-        self.layer?.backgroundColor = NSColor.clear.cgColor
-        self.backgroundLayer.masksToBounds = true
-        self.layer?.addSublayer(backgroundLayer)
+        wantsLayer = true
+        layerUsesCoreImageFilters = true
+        layer?.backgroundColor = NSColor.clear.cgColor
+        backgroundLayer.masksToBounds = true
+        layer?.addSublayer(backgroundLayer)
     }
 
     override func awakeFromNib() {
-        normalTintColor = self.contentTintColor
+        normalTintColor = contentTintColor
         addTrackingArea()
     }
 
-    override func viewWillMove(toWindow newWindow: NSWindow?) {
+    override func viewWillMove(toWindow _: NSWindow?) {
         isMouseDown = false
         isMouseOver = false
     }
@@ -111,8 +114,9 @@ internal class MouseOverButton: NSButton {
         isMouseDown = true
         super.mouseDown(with: event)
         isMouseDown = false
-        if isMouseOver,
-           window?.isKeyWindow != true || isMouseLocationInsideBounds(window?.mouseLocationOutsideOfEventStream) != true {
+        if
+            isMouseOver,
+            window?.isKeyWindow != true || isMouseLocationInsideBounds(window?.mouseLocationOutsideOfEventStream) != true {
 
             mouseExited(with: event)
         }

@@ -16,8 +16,8 @@
 //  limitations under the License.
 //
 
-import Foundation
 import Combine
+import Foundation
 
 final class DownloadViewModel {
 
@@ -27,10 +27,11 @@ final class DownloadViewModel {
 
     @Published private(set) var localURL: URL? {
         didSet {
-            self.filename = localURL?.lastPathComponent ?? ""
+            filename = localURL?.lastPathComponent ?? ""
         }
     }
-    @Published private(set) var filename: String = ""
+
+    @Published private(set) var filename = ""
     @Published private(set) var fileType: UTType?
 
     enum State {
@@ -58,28 +59,29 @@ final class DownloadViewModel {
             }
         }
     }
+
     @Published private(set) var state: State
 
     init(item: DownloadListItem) {
-        self.id = item.identifier
-        self.url = item.url
-        self.websiteURL = item.websiteURL
-        self.state = .init(item: item)
+        id = item.identifier
+        url = item.url
+        websiteURL = item.websiteURL
+        state = .init(item: item)
 
-        self.update(with: item)
+        update(with: item)
     }
 
     func update(with item: DownloadListItem) {
-        self.localURL = item.destinationURL
-        self.filename = item.destinationURL?.lastPathComponent ?? ""
-        self.fileType = item.fileType
-        self.state = .init(item: item)
+        localURL = item.destinationURL
+        filename = item.destinationURL?.lastPathComponent ?? ""
+        fileType = item.fileType
+        state = .init(item: item)
     }
 
 }
 
 extension DownloadViewModel {
-    
+
     var error: FileDownloadError? {
         guard case .failed(let error) = state else { return nil }
         return error

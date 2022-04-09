@@ -24,11 +24,11 @@ class AtbParserTests: XCTestCase {
 
     private var testee = AtbParser()
     private var data = """
-        {
-            "version": "v77-5",
-            "updateVersion": "v20-1"
-        }
-    """.data(using: .utf8)!
+            {
+                "version": "v77-5",
+                "updateVersion": "v20-1"
+            }
+        """.data(using: .utf8)!
 
     func testWhenDataEmptyThenInvalidJsonErrorThrown() {
         XCTAssertThrowsError(try testee.convert(fromJsonData: Data()), "")

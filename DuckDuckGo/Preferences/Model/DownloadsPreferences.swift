@@ -37,9 +37,10 @@ struct DownloadsPreferencesUserDefaultsPersistor: DownloadsPreferencesPersistor 
         let fileManager = FileManager.default
         let folders = fileManager.urls(for: .downloadsDirectory, in: .userDomainMask)
 
-        guard let folderURL = folders.first,
-              let resolvedURL = try? URL(resolvingAliasFileAt: folderURL),
-              fileManager.isWritableFile(atPath: resolvedURL.path) else { return nil }
+        guard
+            let folderURL = folders.first,
+            let resolvedURL = try? URL(resolvingAliasFileAt: folderURL),
+            fileManager.isWritableFile(atPath: resolvedURL.path) else { return nil }
 
         return resolvedURL
     }
@@ -55,9 +56,10 @@ struct DownloadsPreferencesUserDefaultsPersistor: DownloadsPreferencesPersistor 
 final class DownloadsPreferences: ObservableObject {
 
     var effectiveDownloadLocation: URL? {
-        if let selectedLocation = persistor.selectedDownloadLocation,
-           let selectedLocationURL = URL(string: selectedLocation),
-           Self.isDownloadLocationValid(selectedLocationURL) {
+        if
+            let selectedLocation = persistor.selectedDownloadLocation,
+            let selectedLocationURL = URL(string: selectedLocation),
+            Self.isDownloadLocationValid(selectedLocationURL) {
             return selectedLocationURL
         }
 
@@ -77,7 +79,7 @@ final class DownloadsPreferences: ObservableObject {
         }
     }
 
-    @Published var alwaysRequestDownloadLocation: Bool = false {
+    @Published var alwaysRequestDownloadLocation = false {
         didSet {
             persistor.alwaysRequestDownloadLocation = alwaysRequestDownloadLocation
         }
@@ -96,9 +98,10 @@ final class DownloadsPreferences: ObservableObject {
         self.persistor = persistor
         alwaysRequestDownloadLocation = persistor.alwaysRequestDownloadLocation
         selectedDownloadLocation = {
-            if let selectedLocation = persistor.selectedDownloadLocation,
-               let selectedLocationURL = URL(string: selectedLocation),
-               Self.isDownloadLocationValid(selectedLocationURL) {
+            if
+                let selectedLocation = persistor.selectedDownloadLocation,
+                let selectedLocationURL = URL(string: selectedLocation),
+                Self.isDownloadLocationValid(selectedLocationURL) {
 
                 return selectedLocationURL
             }
@@ -113,9 +116,10 @@ final class DownloadsPreferences: ObservableObject {
         let fileManager = FileManager.default
         let folders = fileManager.urls(for: .downloadsDirectory, in: .userDomainMask)
 
-        guard let folderURL = folders.first,
-              let resolvedURL = try? URL(resolvingAliasFileAt: folderURL),
-              fileManager.isWritableFile(atPath: resolvedURL.path) else { return nil }
+        guard
+            let folderURL = folders.first,
+            let resolvedURL = try? URL(resolvingAliasFileAt: folderURL),
+            fileManager.isWritableFile(atPath: resolvedURL.path) else { return nil }
 
         return resolvedURL
     }

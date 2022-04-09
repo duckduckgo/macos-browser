@@ -16,26 +16,26 @@
 //  limitations under the License.
 //
 
-import Foundation
 import BrowserServicesKit
+import Foundation
 
 final class AppPrivacyConfigurationDataProvider: EmbeddedDataProvider {
 
-    public struct Constants {
+    public enum Constants {
         public static let embeddedConfigETag = "a18405692732951d628f86b7ba1a1e1d"
         public static let embeddedConfigurationSHA = "ef78422d8a7b1a324d6cbdb70b3605eca4934aa0b090a25548e51e42cffda53e"
     }
 
     var embeddedDataEtag: String {
-        return Constants.embeddedConfigETag
+        Constants.embeddedConfigETag
     }
 
     var embeddedData: Data {
-        return Self.loadEmbeddedAsData()
+        Self.loadEmbeddedAsData()
     }
 
     static var embeddedUrl: URL {
-        return Bundle.main.url(forResource: "macos-config", withExtension: "json")!
+        Bundle.main.url(forResource: "macos-config", withExtension: "json")!
     }
 
     static func loadEmbeddedAsData() -> Data {

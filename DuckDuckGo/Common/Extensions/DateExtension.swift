@@ -24,21 +24,21 @@ extension Date {
         let name: String
         let index: Int
     }
-    
+
     var components: DateComponents {
-        return Calendar.current.dateComponents([.day, .year, .month], from: self)
+        Calendar.current.dateComponents([.day, .year, .month], from: self)
     }
 
     static var weekAgo: Date {
-        return Calendar.current.date(byAdding: .weekOfMonth, value: -1, to: Date())!
+        Calendar.current.date(byAdding: .weekOfMonth, value: -1, to: Date())!
     }
 
     static var monthAgo: Date! {
-        return Calendar.current.date(byAdding: .month, value: -1, to: Date())!
+        Calendar.current.date(byAdding: .month, value: -1, to: Date())!
     }
 
     static func daysAgo(_ days: Int) -> Date! {
-        return Calendar.current.date(byAdding: .day, value: -days, to: Date())!
+        Calendar.current.date(byAdding: .day, value: -days, to: Date())!
     }
 
     static var startOfDayTomorrow: Date {
@@ -47,7 +47,7 @@ extension Date {
     }
 
     static var startOfDayToday: Date {
-        return Calendar.current.startOfDay(for: Date())
+        Calendar.current.startOfDay(for: Date())
     }
 
     static var startOfMinuteNow: Date {
@@ -60,13 +60,11 @@ extension Date {
         let months = Calendar.current.monthSymbols
 
         return months.enumerated().map { index, month in
-            return IndexedMonth(name: month, index: index + 1)
+            IndexedMonth(name: month, index: index + 1)
         }
     }
 
-    static var daysInMonth: [Int] = {
-        return Array(1...31)
-    }()
+    static var daysInMonth: [Int] = Array(1...31)
 
     static var nextTenYears: [Int] = {
         let offsetComponents = DateComponents(year: 1)
@@ -101,7 +99,7 @@ extension Date {
     }()
 
     var daySinceReferenceDate: Int {
-        Int(self.timeIntervalSinceReferenceDate / TimeInterval.day)
+        Int(timeIntervalSinceReferenceDate / TimeInterval.day)
     }
 
 }

@@ -18,28 +18,29 @@
 
 import Foundation
 
-@IBDesignable class FlatButton: NSButton {
+@IBDesignable
+final class FlatButton: NSButton {
 
     @IBInspectable var cornerRadius: CGFloat = 5
     @IBInspectable var horizontalPadding: CGFloat = 10
     @IBInspectable var verticalPadding: CGFloat = 10
     @IBInspectable var backgroundColor: NSColor = .blue
-    
+
     override func draw(_ dirtyRect: NSRect) {
-        
-        self.wantsLayer = true
-        self.layer?.cornerRadius = cornerRadius
-        
+
+        wantsLayer = true
+        layer?.cornerRadius = cornerRadius
+
         if isHighlighted {
             layer?.backgroundColor = backgroundColor.blended(withFraction: 0.2, of: .black)?.cgColor
         } else {
             layer?.backgroundColor = backgroundColor.cgColor
         }
 
-        let originalBounds = self.bounds
+        let originalBounds = bounds
         defer { self.bounds = originalBounds }
 
-        self.bounds = originalBounds.insetBy(dx: horizontalPadding, dy: verticalPadding)
+        bounds = originalBounds.insetBy(dx: horizontalPadding, dy: verticalPadding)
 
         super.draw(dirtyRect)
     }

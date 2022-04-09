@@ -16,10 +16,10 @@
 //  limitations under the License.
 //
 
-import Foundation
-import Combine
-import SwiftUI
 import BrowserServicesKit
+import Combine
+import Foundation
+import SwiftUI
 
 // swiftlint:disable file_length
 
@@ -191,7 +191,7 @@ final class PasswordManagementViewController: NSViewController {
 
         lockScreenDurationLabel.stringValue = UserText.pmLockScreenDuration(duration: AutofillPreferences().autoLockThreshold.title)
 
-        if let listView = self.listView {
+        if let listView = listView {
             listView.frame = listContainer.bounds
             listContainer.addSubview(listView)
         }
@@ -230,38 +230,45 @@ final class PasswordManagementViewController: NSViewController {
         }
     }
 
-    @IBAction func onNewClicked(_ sender: NSButton) {
+    @IBAction
+    func onNewClicked(_ sender: NSButton) {
         let menu = createNewSecureVaultItemMenu()
         let location = NSPoint(x: sender.frame.origin.x, y: sender.frame.origin.y - (sender.frame.height / 2) + 6)
 
         menu.popUp(positioning: nil, at: location, in: sender.superview)
     }
 
-    @IBAction func moreButtonAction(_ sender: NSButton) {
+    @IBAction
+    func moreButtonAction(_ sender: NSButton) {
         let location = NSPoint(x: sender.frame.origin.x, y: sender.frame.origin.y - (sender.frame.height / 2) + 6)
         sender.menu?.popUp(positioning: nil, at: location, in: sender.superview)
     }
 
-    @IBAction func openPreferences(_ sender: Any) {
-        self.dismiss()
+    @IBAction
+    func openPreferences(_ sender: Any) {
+        dismiss()
         NSApp.sendAction(#selector(openPreferences(_:)), to: nil, from: sender)
     }
 
-    @IBAction func openImportBrowserDataWindow(_ sender: Any?) {
-        self.dismiss()
+    @IBAction
+    func openImportBrowserDataWindow(_ sender: Any?) {
+        dismiss()
         NSApp.sendAction(#selector(openImportBrowserDataWindow(_:)), to: nil, from: sender)
     }
 
-    @IBAction func onImportClicked(_ sender: NSButton) {
-        self.dismiss()
+    @IBAction
+    func onImportClicked(_: NSButton) {
+        dismiss()
         DataImportViewController.show()
     }
 
-    @IBAction func deviceAuthenticationRequested(_ sender: NSButton) {
+    @IBAction
+    func deviceAuthenticationRequested(_: NSButton) {
         promptForAuthenticationIfNecessary()
     }
 
-    @IBAction func toggleLock(_ sender: Any) {
+    @IBAction
+    func toggleLock(_: Any) {
         if DeviceAuthenticator.shared.requiresAuthentication {
             promptForAuthenticationIfNecessary()
         } else {
@@ -269,10 +276,11 @@ final class PasswordManagementViewController: NSViewController {
         }
     }
 
-    private func refetchWithText(_ text: String,
-                                 selectItemMatchingDomain: String? = nil,
-                                 clearWhenNoMatches: Bool = false,
-                                 completion: (() -> Void)? = nil) {
+    private func refetchWithText(
+        _ text: String,
+        selectItemMatchingDomain: String? = nil,
+        clearWhenNoMatches: Bool = false,
+        completion: (() -> Void)? = nil) {
         let category = SecureVaultSorting.Category.allItems
         fetchSecureVaultItems(category: category) { [weak self] items in
             self?.listModel?.update(items: items)
@@ -299,8 +307,8 @@ final class PasswordManagementViewController: NSViewController {
     }
 
     func clear() {
-        self.listModel?.clear()
-        self.itemModel?.clearSecureVaultModel()
+        listModel?.clear()
+        itemModel?.clearSecureVaultModel()
     }
 
     func select(category: SecureVaultSorting.Category?) {
@@ -308,46 +316,46 @@ final class PasswordManagementViewController: NSViewController {
             return
         }
 
-        if let descriptor = self.listModel?.sortDescriptor {
-            self.listModel?.sortDescriptor = .init(category: category, parameter: descriptor.parameter, order: descriptor.order)
+        if let descriptor = listModel?.sortDescriptor {
+            listModel?.sortDescriptor = .init(category: category, parameter: descriptor.parameter, order: descriptor.order)
         } else {
-            self.listModel?.sortDescriptor = .init(category: category, parameter: .title, order: .ascending)
+            listModel?.sortDescriptor = .init(category: category, parameter: .title, order: .ascending)
         }
     }
 
     private func syncModelsOnCredentials(_ credentials: SecureVaultModels.WebsiteCredentials, select: Bool = false) {
-        self.itemModel?.setSecureVaultModel(credentials)
-        self.listModel?.update(item: SecureVaultItem.account(credentials.account))
+        itemModel?.setSecureVaultModel(credentials)
+        listModel?.update(item: SecureVaultItem.account(credentials.account))
 
         if select {
-            self.listModel?.selected(item: SecureVaultItem.account(credentials.account))
+            listModel?.selected(item: SecureVaultItem.account(credentials.account))
         }
     }
 
     private func syncModelsOnIdentity(_ identity: SecureVaultModels.Identity, select: Bool = false) {
-        self.itemModel?.setSecureVaultModel(identity)
-        self.listModel?.update(item: SecureVaultItem.identity(identity))
+        itemModel?.setSecureVaultModel(identity)
+        listModel?.update(item: SecureVaultItem.identity(identity))
 
         if select {
-            self.listModel?.selected(item: SecureVaultItem.identity(identity))
+            listModel?.selected(item: SecureVaultItem.identity(identity))
         }
     }
 
     private func syncModelsOnNote(_ note: SecureVaultModels.Note, select: Bool = false) {
-        self.itemModel?.setSecureVaultModel(note)
-        self.listModel?.update(item: SecureVaultItem.note(note))
+        itemModel?.setSecureVaultModel(note)
+        listModel?.update(item: SecureVaultItem.note(note))
 
         if select {
-            self.listModel?.selected(item: SecureVaultItem.note(note))
+            listModel?.selected(item: SecureVaultItem.note(note))
         }
     }
 
     private func syncModelsOnCreditCard(_ card: SecureVaultModels.CreditCard, select: Bool = false) {
-        self.itemModel?.setSecureVaultModel(card)
-        self.listModel?.update(item: SecureVaultItem.card(card))
+        itemModel?.setSecureVaultModel(card)
+        listModel?.update(item: SecureVaultItem.card(card))
 
         if select {
-            self.listModel?.selected(item: SecureVaultItem.card(card))
+            listModel?.selected(item: SecureVaultItem.card(card))
         }
     }
 
@@ -446,8 +454,9 @@ final class PasswordManagementViewController: NSViewController {
         let isNew = credentials.account.id == nil
 
         do {
-            guard let id = try secureVault?.storeWebsiteCredentials(credentials),
-                  let savedCredentials = try secureVault?.websiteCredentialsFor(accountId: id) else {
+            guard
+                let id = try secureVault?.storeWebsiteCredentials(credentials),
+                let savedCredentials = try secureVault?.websiteCredentialsFor(accountId: id) else {
                 return
             }
 
@@ -472,8 +481,9 @@ final class PasswordManagementViewController: NSViewController {
         let isNew = identity.id == nil
 
         do {
-            guard let storedIdentityID = try secureVault?.storeIdentity(identity),
-                  let storedIdentity = try secureVault?.identityFor(id: storedIdentityID) else { return }
+            guard
+                let storedIdentityID = try secureVault?.storeIdentity(identity),
+                let storedIdentity = try secureVault?.identityFor(id: storedIdentityID) else { return }
 
             itemModel?.cancel()
             if isNew {
@@ -494,8 +504,9 @@ final class PasswordManagementViewController: NSViewController {
         let isNew = note.id == nil
 
         do {
-            guard let storedNoteID = try secureVault?.storeNote(note),
-                  let storedNote = try secureVault?.noteFor(id: storedNoteID) else { return }
+            guard
+                let storedNoteID = try secureVault?.storeNote(note),
+                let storedNote = try secureVault?.noteFor(id: storedNoteID) else { return }
 
             itemModel?.cancel()
             if isNew {
@@ -516,8 +527,9 @@ final class PasswordManagementViewController: NSViewController {
         let isNew = card.id == nil
 
         do {
-            guard let storedCardID = try secureVault?.storeCreditCard(card),
-                  let storedCard = try secureVault?.creditCardFor(id: storedCardID) else { return }
+            guard
+                let storedCardID = try secureVault?.storeCreditCard(card),
+                let storedCard = try secureVault?.creditCardFor(id: storedCardID) else { return }
 
             itemModel?.cancel()
             if isNew {
@@ -535,8 +547,9 @@ final class PasswordManagementViewController: NSViewController {
     }
 
     private func promptToDelete(credentials: SecureVaultModels.WebsiteCredentials) {
-        guard let window = self.view.window,
-              let id = credentials.account.id else { return }
+        guard
+            let window = view.window,
+            let id = credentials.account.id else { return }
 
         let alert = NSAlert.passwordManagerConfirmDeleteLogin()
         alert.beginSheetModal(for: window) { response in
@@ -554,8 +567,9 @@ final class PasswordManagementViewController: NSViewController {
     }
 
     private func promptToDelete(identity: SecureVaultModels.Identity) {
-        guard let window = self.view.window,
-              let id = identity.id else { return }
+        guard
+            let window = view.window,
+            let id = identity.id else { return }
 
         let alert = NSAlert.passwordManagerConfirmDeleteIdentity()
         alert.beginSheetModal(for: window) { response in
@@ -573,8 +587,9 @@ final class PasswordManagementViewController: NSViewController {
     }
 
     private func promptToDelete(note: SecureVaultModels.Note) {
-        guard let window = self.view.window,
-              let id = note.id else { return }
+        guard
+            let window = view.window,
+            let id = note.id else { return }
 
         let alert = NSAlert.passwordManagerConfirmDeleteNote()
         alert.beginSheetModal(for: window) { response in
@@ -592,8 +607,9 @@ final class PasswordManagementViewController: NSViewController {
     }
 
     private func promptToDelete(card: SecureVaultModels.CreditCard) {
-        guard let window = self.view.window,
-              let id = card.id else { return }
+        guard
+            let window = view.window,
+            let id = card.id else { return }
 
         let alert = NSAlert.passwordManagerConfirmDeleteCard()
         alert.beginSheetModal(for: window) { response in
@@ -611,17 +627,18 @@ final class PasswordManagementViewController: NSViewController {
     }
 
     private func refreshData() {
-        self.itemModel?.clearSecureVaultModel()
-        self.refetchWithText(self.searchField.stringValue)
-        self.postChange()
+        itemModel?.clearSecureVaultModel()
+        refetchWithText(searchField.stringValue)
+        postChange()
     }
 
     // swiftlint:disable function_body_length
     private func createListView() {
         let listModel = PasswordManagementItemListModel { [weak self] previousValue, newValue in
-            guard let newValue = newValue,
-                  let id = newValue.secureVaultID,
-                  let window = self?.view.window else {
+            guard
+                let newValue = newValue,
+                let id = newValue.secureVaultID,
+                let window = self?.view.window else {
                 self?.itemModel = nil
                 self?.clearSelectedItem()
 
@@ -675,8 +692,9 @@ final class PasswordManagementViewController: NSViewController {
         }
 
         self.listModel = listModel
-        self.listView = NSHostingView(rootView: PasswordManagementItemListView().environmentObject(listModel))
+        listView = NSHostingView(rootView: PasswordManagementItemListView().environmentObject(listModel))
     }
+
     // swiftlint:enable function_body_length
 
     private func createNewSecureVaultItemMenu() -> NSMenu {
@@ -905,7 +923,7 @@ extension PasswordManagementViewController: NSMenuDelegate {
 
 extension PasswordManagementViewController: NSTextFieldDelegate {
 
-    func controlTextDidChange(_ obj: Notification) {
+    func controlTextDidChange(_: Notification) {
         updateFilter()
     }
 
@@ -913,10 +931,10 @@ extension PasswordManagementViewController: NSTextFieldDelegate {
 
 extension PasswordManagementViewController: NSTextViewDelegate {
 
-    func textView(_ textView: NSTextView, clickedOnLink link: Any, at charIndex: Int) -> Bool {
+    func textView(_: NSTextView, clickedOnLink link: Any, at _: Int) -> Bool {
         if let link = link as? URL, link == URL.preferences {
             WindowControllersManager.shared.showPreferencesTab()
-            self.dismiss()
+            dismiss()
 
             Pixel.fire(.passwordManagerLockScreenPreferencesButtonPressed)
         }
@@ -924,10 +942,12 @@ extension PasswordManagementViewController: NSTextViewDelegate {
         return true
     }
 
-    func textView(_ textView: NSTextView,
-                  willChangeSelectionFromCharacterRange oldSelectedCharRange: NSRange,
-                  toCharacterRange newSelectedCharRange: NSRange) -> NSRange {
-        return NSRange(location: 0, length: 0)
+    func textView(
+        _: NSTextView,
+        willChangeSelectionFromCharacterRange _: NSRange,
+        toCharacterRange _: NSRange)
+        -> NSRange {
+        NSRange(location: 0, length: 0)
     }
 
 }

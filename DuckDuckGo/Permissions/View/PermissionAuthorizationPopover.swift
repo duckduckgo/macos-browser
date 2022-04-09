@@ -20,17 +20,17 @@ import Cocoa
 
 final class PermissionAuthorizationPopover: NSPopover {
 
-    @nonobjc private var didShow: Bool = false
+    @nonobjc private var didShow = false
 
     override init() {
         super.init()
 
         behavior = .applicationDefined
         setupContentController()
-        self.delegate = self
+        delegate = self
     }
 
-    required init?(coder: NSCoder) {
+    required init?(coder _: NSCoder) {
         fatalError("PermissionAuthorizationPopover: Bad initializer")
     }
 
@@ -51,15 +51,15 @@ final class PermissionAuthorizationPopover: NSPopover {
 
 extension PermissionAuthorizationPopover: NSPopoverDelegate {
 
-    func popoverWillShow(_ notification: Notification) {
-        self.didShow = false
+    func popoverWillShow(_: Notification) {
+        didShow = false
     }
 
-    func popoverDidShow(_ notification: Notification) {
-        self.didShow = true
+    func popoverDidShow(_: Notification) {
+        didShow = true
     }
 
-    func popoverShouldClose(_ popover: NSPopover) -> Bool {
+    func popoverShouldClose(_: NSPopover) -> Bool {
         guard didShow else { return false } // don't close on mouse-up
         return true
     }

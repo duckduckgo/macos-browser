@@ -21,11 +21,11 @@ import os.log
 
 final class URLEventHandler {
 
-    private let handler: ((URL) -> Void)
+    private let handler: (URL) -> Void
 
     private var didFinishLaunching = false
     private var urlsToOpen = [URL]()
-    
+
     init(handler: @escaping ((URL) -> Void) = openURL) {
         self.handler = handler
 
@@ -33,36 +33,38 @@ final class URLEventHandler {
             self,
             andSelector: #selector(handleUrlEvent(event:reply:)),
             forEventClass: AEEventClass(kInternetEventClass),
-            andEventID: AEEventID(kAEGetURL)
-        )
+            andEventID: AEEventID(kAEGetURL))
     }
 
     func applicationDidFinishLaunching() {
         if !urlsToOpen.isEmpty {
 
             for url in urlsToOpen {
-                self.handler(url)
+                handler(url)
             }
 
             Pixel.fire(.appLaunch(launch: urlsToOpen[0].isFileURL ? .openFile : .openURL))
-            self.urlsToOpen = []
+            urlsToOpen = []
         }
-        
+
         didFinishLaunching = true
     }
 
-    @objc func handleUrlEvent(event: NSAppleEventDescriptor, reply: NSAppleEventDescriptor) {
+    @objc
+    func handleUrlEvent(event: NSAppleEventDescriptor, reply _: NSAppleEventDescriptor) {
         guard let stringValue = event.paramDescriptor(forKeyword: keyDirectObject)?.stringValue else {
             os_log("UrlEventListener: unable to determine path", type: .error)
-            Pixel.fire(.debug(event: .appOpenURLFailed,
-                              error: NSError(domain: "CouldNotGetPath", code: -1, userInfo: nil)))
+            Pixel.fire(.debug(
+                event: .appOpenURLFailed,
+                error: NSError(domain: "CouldNotGetPath", code: -1, userInfo: nil)))
             return
         }
 
         guard let url = URL.makeURL(from: stringValue) else {
             os_log("UrlEventListener: failed to construct URL from path %s", type: .error, stringValue)
-            Pixel.fire(.debug(event: .appOpenURLFailed,
-                              error: NSError(domain: "CouldNotConstructURL", code: -1, userInfo: nil)))
+            Pixel.fire(.debug(
+                event: .appOpenURLFailed,
+                error: NSError(domain: "CouldNotConstructURL", code: -1, userInfo: nil)))
             return
         }
 
@@ -71,8 +73,9 @@ final class URLEventHandler {
 
     func handleFiles(_ files: [String]) {
         let urls: [URL] = files.compactMap {
-            if let url = URL(string: $0),
-               ["http", "https", "file"].contains(url.scheme) {
+            if
+                let url = URL(string: $0),
+                ["http", "https", "file"].contains(url.scheme) {
                 guard !url.isFileURL || FileManager.default.fileExists(atPath: url.path) else { return nil }
                 return url
             } else if FileManager.default.fileExists(atPath: $0) {
@@ -87,9 +90,9 @@ final class URLEventHandler {
 
     private func handleURLs(_ urls: [URL]) {
         if didFinishLaunching {
-            urls.forEach(self.handler)
+            urls.forEach(handler)
         } else {
-            self.urlsToOpen.append(contentsOf: urls)
+            urlsToOpen.append(contentsOf: urls)
         }
     }
 

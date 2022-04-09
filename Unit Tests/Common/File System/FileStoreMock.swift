@@ -41,7 +41,7 @@ final class FileStoreMock: NSObject, FileStore {
             yield &_fileStorage
         }
     }
-    
+
     private var _directoryStorage = [String: [String]]()
     private let directoryStorageLock = NSLock()
     @objc dynamic var directoryStorage: [String: [String]] {
@@ -86,9 +86,9 @@ final class FileStoreMock: NSObject, FileStore {
     }
 
     func directoryContents(at path: String) throws -> [String] {
-        return directoryStorage[path] ?? []
+        directoryStorage[path] ?? []
     }
-    
+
     func remove(fileAtURL url: URL) {
         storage[url.lastPathComponent] = nil
     }

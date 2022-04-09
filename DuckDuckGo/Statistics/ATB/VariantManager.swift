@@ -29,13 +29,14 @@ enum FeatureName: String {
 
 struct Variant {
 
-    struct When {
-        static let always = { return true }
+    enum When {
+        static let always = { true }
 
-        static let inRequiredCountry = { return ["AU", "AT", "DK", "FI", "FR", "DE", "IT", "IE", "NZ", "NO", "ES", "SE", "GB"]
-            .contains(where: { Locale.current.regionCode == $0 }) }
+        static let inRequiredCountry = { ["AU", "AT", "DK", "FI", "FR", "DE", "IT", "IE", "NZ", "NO", "ES", "SE", "GB"]
+            .contains(where: { Locale.current.regionCode == $0 })
+        }
 
-        static let inEnglish = { return Locale.current.languageCode == "en" }
+        static let inEnglish = { Locale.current.languageCode == "en" }
     }
 
     static let doNotAllocate = 0
@@ -77,16 +78,17 @@ final class DefaultVariantManager: VariantManager {
     private let storage: StatisticsStore
     private let rng: VariantRNG
 
-    init(variants: [Variant] = Variant.defaultVariants,
-         storage: StatisticsStore = LocalStatisticsStore(),
-         rng: VariantRNG = Arc4RandomUniformVariantRNG()) {
+    init(
+        variants: [Variant] = Variant.defaultVariants,
+        storage: StatisticsStore = LocalStatisticsStore(),
+        rng: VariantRNG = Arc4RandomUniformVariantRNG()) {
         self.variants = variants
         self.storage = storage
         self.rng = rng
     }
 
     func isSupported(feature: FeatureName) -> Bool {
-        return currentVariant?.features.contains(feature) ?? false
+        currentVariant?.features.contains(feature) ?? false
     }
 
     func assignVariantIfNeeded(_ newInstallCompletion: (VariantManager) -> Void) {
@@ -135,7 +137,7 @@ final class Arc4RandomUniformVariantRNG: VariantRNG {
 
     func nextInt(upperBound: Int) -> Int {
         // swiftlint:disable:next legacy_random
-        return Int(arc4random_uniform(UInt32(upperBound)))
+        Int(arc4random_uniform(UInt32(upperBound)))
     }
 
 }

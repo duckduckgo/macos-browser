@@ -68,11 +68,13 @@ enum UserAgent {
         // use default WKWebView user agent for duckduckgo domain to remove CTA
         regex("https://duckduckgo\\.com/.*"): UserAgent.webViewDefault
     ]
-    
-    static func duckDuckGoUserAgent(appVersion: String = AppVersion.shared.versionNumber,
-                                    appID: String = AppVersion.shared.identifier,
-                                    systemVersion: String = ProcessInfo.processInfo.operatingSystemVersionString) -> String {
-        return "ddg_macos/\(appVersion) (\(appID); macOS \(systemVersion))"
+
+    static func duckDuckGoUserAgent(
+        appVersion: String = AppVersion.shared.versionNumber,
+        appID: String = AppVersion.shared.identifier,
+        systemVersion: String = ProcessInfo.processInfo.operatingSystemVersionString)
+        -> String {
+        "ddg_macos/\(appVersion) (\(appID); macOS \(systemVersion))"
     }
 
     static func `for`(_ url: URL?) -> String {

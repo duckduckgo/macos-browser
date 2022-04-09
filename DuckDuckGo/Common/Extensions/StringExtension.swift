@@ -23,16 +23,17 @@ typealias RegEx = NSRegularExpression
 
 func regex(_ pattern: String, _ options: NSRegularExpression.Options = []) -> NSRegularExpression {
     // swiftlint:disable force_try
-    return try! NSRegularExpression(pattern: pattern, options: options)
+    try! NSRegularExpression(pattern: pattern, options: options)
     // swiftlint:enable force_try
 }
 
-private extension RegEx {
+extension RegEx {
     // from https://stackoverflow.com/a/25717506/73479
-    static let hostName = regex("^(((?!-)[A-Za-z0-9-]{1,63}(?<!-)\\.)+[A-Za-z0-9-]{2,63})$", .caseInsensitive)
+    fileprivate static let hostName = regex("^(((?!-)[A-Za-z0-9-]{1,63}(?<!-)\\.)+[A-Za-z0-9-]{2,63})$", .caseInsensitive)
     // from https://stackoverflow.com/a/30023010/73479
-    static let ipAddress = regex("^((25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\\.){3}(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$",
-                                 .caseInsensitive)
+    fileprivate static let ipAddress = regex(
+        "^((25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\\.){3}(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$",
+        .caseInsensitive)
 }
 
 extension String {
@@ -45,15 +46,16 @@ extension String {
 
     func nsRange(from range: Range<String.Index>? = nil) -> NSRange {
         if let range = range {
-            return NSRange(location: self[..<range.lowerBound].utf16.count,
-                           length: self[range].utf16.count)
+            return NSRange(
+                location: self[..<range.lowerBound].utf16.count,
+                length: self[range].utf16.count)
         } else {
             return NSRange(location: 0, length: utf16.count)
         }
     }
 
     func truncated(length: Int, trailing: String = "…") -> String {
-      return (self.count > length) ? self.prefix(length) + trailing : self
+        (count > length) ? prefix(length) + trailing : self
     }
 
     subscript (_ range: NSRange) -> Self {
@@ -63,20 +65,20 @@ extension String {
     // MARK: - Regular Expression
 
     func matches(_ regex: NSRegularExpression) -> Bool {
-        let matches = regex.matches(in: self, options: .anchored, range: NSRange(location: 0, length: self.utf16.count))
+        let matches = regex.matches(in: self, options: .anchored, range: NSRange(location: 0, length: utf16.count))
         return matches.count == 1
     }
 
     // MARK: - URL
 
     var url: URL? {
-        return punycodedUrl
+        punycodedUrl
     }
 
     static let localhost = "localhost"
 
     var isValidHost: Bool {
-        return isValidHostname || isValidIpHost
+        isValidHostname || isValidIpHost
     }
 
     var isValidHostname: Bool {
@@ -87,7 +89,7 @@ extension String {
     }
 
     var isValidIpHost: Bool {
-        return matches(.ipAddress)
+        matches(.ipAddress)
     }
 
     func dropSubdomain() -> String? {
@@ -97,7 +99,7 @@ extension String {
     }
 
     func dropWWW() -> String {
-        self.drop(prefix: URL.HostPrefix.www.separated())
+        drop(prefix: URL.HostPrefix.www.separated())
     }
 
     static func uniqueFilename(for fileType: UTType? = nil) -> String {
@@ -112,24 +114,25 @@ extension String {
 
     // MARK: - Mutating
 
-    @inlinable mutating func prepend(_ string: String) {
+    @inlinable
+    mutating func prepend(_ string: String) {
         self = string + self
     }
 
     // MARK: - Prefix
 
     func hasOrIsPrefix(of other: String) -> Bool {
-        return hasPrefix(other) || other.hasPrefix(self)
+        hasPrefix(other) || other.hasPrefix(self)
     }
 
     func drop(prefix: String) -> String {
-        return hasPrefix(prefix) ? String(dropFirst(prefix.count)) : self
+        hasPrefix(prefix) ? String(dropFirst(prefix.count)) : self
     }
 
     // MARK: - Suffix
 
     func drop(suffix: String) -> String {
-        return hasSuffix(suffix) ? String(dropLast(suffix.count)) : self
+        hasSuffix(suffix) ? String(dropLast(suffix.count)) : self
     }
 
 }

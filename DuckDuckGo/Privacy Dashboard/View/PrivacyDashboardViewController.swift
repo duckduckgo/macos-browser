@@ -16,14 +16,14 @@
 //  limitations under the License.
 //
 
-import Cocoa
-import WebKit
-import Combine
 import BrowserServicesKit
+import Cocoa
+import Combine
+import WebKit
 
 final class PrivacyDashboardViewController: NSViewController {
-    
-    struct Constants {
+
+    enum Constants {
         static let initialContentHeight: CGFloat = 550
     }
 
@@ -45,7 +45,7 @@ final class PrivacyDashboardViewController: NSViewController {
     }
 
     private func prepareContentBlockingCancellable<Pub: Publisher>(publisher: Pub)
-    where Pub.Output == [ContentBlockerRulesManager.CompletionToken], Pub.Failure == Never {
+        where Pub.Output == [ContentBlockerRulesManager.CompletionToken], Pub.Failure == Never {
 
         publisher.receive(on: RunLoop.main).sink { [weak self] completionTokens in
             dispatchPrecondition(condition: .onQueue(.main))
@@ -80,21 +80,21 @@ final class PrivacyDashboardViewController: NSViewController {
     }
 
     public func isPendingUpdates() -> Bool {
-        return !pendingUpdates.isEmpty
+        !pendingUpdates.isEmpty
     }
 
     private func initWebView() {
         let configuration = WKWebViewConfiguration()
-        
-#if DEBUG
+
+        #if DEBUG
         configuration.preferences.setValue(true, forKey: "developerExtrasEnabled")
-#endif
-        
+        #endif
+
         let webView = WKWebView(frame: .zero, configuration: configuration)
         webView.navigationDelegate = self
         self.webView = webView
         view.addAndLayout(webView)
-        
+
         contentHeightConstraint = view.heightAnchor.constraint(equalToConstant: Constants.initialContentHeight)
         contentHeightConstraint.isActive = true
     }
@@ -118,8 +118,9 @@ final class PrivacyDashboardViewController: NSViewController {
 
         let authState: PrivacyDashboardUserScript.AuthorizationState
         authState = PermissionManager.shared.persistedPermissionTypes.union(usedPermissions.keys).compactMap { permissionType in
-            guard PermissionManager.shared.hasPermissionPersisted(forDomain: domain, permissionType: permissionType)
-                    || usedPermissions[permissionType] != nil
+            guard
+                PermissionManager.shared.hasPermissionPersisted(forDomain: domain, permissionType: permissionType)
+                || usedPermissions[permissionType] != nil
             else {
                 return nil
             }
@@ -159,7 +160,7 @@ final class PrivacyDashboardViewController: NSViewController {
 
         let configuration = ContentBlocking.shared.privacyConfigurationManager.privacyConfig
         let isProtected = !configuration.isUserUnprotected(domain: domain)
-        self.privacyDashboardScript.setProtectionStatus(isProtected, webView: self.webView)
+        privacyDashboardScript.setProtectionStatus(isProtected, webView: webView)
     }
 
     private func sendPendingUpdates() {
@@ -168,7 +169,7 @@ final class PrivacyDashboardViewController: NSViewController {
             return
         }
 
-        self.privacyDashboardScript.setIsPendingUpdates(pendingUpdates.values.contains(domain), webView: self.webView)
+        privacyDashboardScript.setIsPendingUpdates(pendingUpdates.values.contains(domain), webView: webView)
     }
 
     private func sendParentEntity() {
@@ -178,7 +179,7 @@ final class PrivacyDashboardViewController: NSViewController {
         }
 
         let pageEntity = ContentBlocking.shared.trackerDataManager.trackerData.findEntity(forHost: domain)
-        self.privacyDashboardScript.setParentEntity(pageEntity, webView: self.webView)
+        privacyDashboardScript.setParentEntity(pageEntity, webView: webView)
     }
 
     private func subscribeToServerTrust() {
@@ -194,7 +195,7 @@ final class PrivacyDashboardViewController: NSViewController {
             })
             .store(in: &cancellables)
     }
-    
+
     private func subscribeToConsentManaged() {
         tabViewModel?.tab.$cookieConsentManaged
             .receive(on: DispatchQueue.main)
@@ -209,7 +210,7 @@ final class PrivacyDashboardViewController: NSViewController {
 
 extension PrivacyDashboardViewController: PrivacyDashboardUserScriptDelegate {
 
-    func userScript(_ userScript: PrivacyDashboardUserScript, didChangeProtectionStateTo isProtected: Bool) {
+    func userScript(_: PrivacyDashboardUserScript, didChangeProtectionStateTo isProtected: Bool) {
         guard let domain = tabViewModel?.tab.content.url?.host else {
             assertionFailure("PrivacyDashboardViewController: no domain available")
             return
@@ -227,7 +228,7 @@ extension PrivacyDashboardViewController: PrivacyDashboardUserScriptDelegate {
         sendPendingUpdates()
     }
 
-    func userScript(_ userScript: PrivacyDashboardUserScript, didSetPermission permission: PermissionType, to state: PermissionAuthorizationState) {
+    func userScript(_: PrivacyDashboardUserScript, didSetPermission permission: PermissionType, to state: PermissionAuthorizationState) {
         guard let domain = tabViewModel?.tab.content.url?.host else {
             assertionFailure("PrivacyDashboardViewController: no domain available")
             return
@@ -236,11 +237,11 @@ extension PrivacyDashboardViewController: PrivacyDashboardUserScriptDelegate {
         PermissionManager.shared.setPermission(state.persistedPermissionDecision, forDomain: domain, permissionType: permission)
     }
 
-    func userScript(_ userScript: PrivacyDashboardUserScript, setPermission permission: PermissionType, paused: Bool) {
+    func userScript(_: PrivacyDashboardUserScript, setPermission permission: PermissionType, paused: Bool) {
         tabViewModel?.tab.permissions.set([permission], muted: paused)
     }
 
-    func userScript(_ userScript: PrivacyDashboardUserScript, setHeight height: Int) {
+    func userScript(_: PrivacyDashboardUserScript, setHeight height: Int) {
         NSAnimationContext.runAnimationGroup { [weak self] context in
             context.duration = 1/3
             context.timingFunction = CAMediaTimingFunction(name: .easeInEaseOut)
@@ -252,7 +253,7 @@ extension PrivacyDashboardViewController: PrivacyDashboardUserScriptDelegate {
 
 extension PrivacyDashboardViewController: WKNavigationDelegate {
 
-    func webView(_ webView: WKWebView, didFinish navigation: WKNavigation!) {
+    func webView(_: WKWebView, didFinish _: WKNavigation!) {
         subscribeToPermissions()
         subscribeToTrackerInfo()
         subscribeToConnectionUpgradedTo()

@@ -20,13 +20,12 @@ import Foundation
 
 final class WebsiteBreakageSender {
 
-    static let allowedQueryReservedCharacters =  CharacterSet(charactersIn: ",")
+    static let allowedQueryReservedCharacters = CharacterSet(charactersIn: ",")
 
     func sendWebsiteBreakage(_ websiteBreakage: WebsiteBreakage) {
         Pixel.fire(
             .brokenSiteReport,
             withAdditionalParameters: websiteBreakage.requestParameters,
-            allowedQueryReservedCharacters: Self.allowedQueryReservedCharacters
-        )
+            allowedQueryReservedCharacters: Self.allowedQueryReservedCharacters)
     }
 }

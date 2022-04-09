@@ -16,10 +16,10 @@
 //  limitations under the License.
 //
 
-import WebKit
-import os
 import BrowserServicesKit
+import os
 import TrackerRadarKit
+import WebKit
 
 protocol PrivacyDashboardUserScriptDelegate: AnyObject {
 
@@ -42,14 +42,14 @@ final class PrivacyDashboardUserScript: NSObject, StaticUserScript {
 
     static var injectionTime: WKUserScriptInjectionTime { .atDocumentStart }
     static var forMainFrameOnly: Bool { false }
-    static var source: String = ""
+    static var source = ""
     static var script: WKUserScript = PrivacyDashboardUserScript.makeWKUserScript()
     var messageNames: [String] { MessageNames.allCases.map(\.rawValue) }
 
     weak var delegate: PrivacyDashboardUserScriptDelegate?
     weak var model: FindInPageModel?
 
-    func userContentController(_ userContentController: WKUserContentController, didReceive message: WKScriptMessage) {
+    func userContentController(_: WKUserContentController, didReceive message: WKScriptMessage) {
         guard let messageType = MessageNames(rawValue: message.name) else {
             assertionFailure("PrivacyDashboardUserScript: unexpected message name \(message.name)")
             return
@@ -89,17 +89,19 @@ final class PrivacyDashboardUserScript: NSObject, StaticUserScript {
         }
 
         let etag = ContentBlocking.shared.contentBlockingManager.currentRules.first?.etag
-                    .trimmingCharacters(in: CharacterSet(charactersIn: "\"")) ?? ""
-        Pixel.shared?.fire(pixelNamed: pixel,
-                           withAdditionalParameters: [
-                            "tds": etag
-        ])
+            .trimmingCharacters(in: CharacterSet(charactersIn: "\"")) ?? ""
+        Pixel.shared?.fire(
+            pixelNamed: pixel,
+            withAdditionalParameters: [
+                "tds": etag
+            ])
     }
 
     private func handleSetPermission(message: WKScriptMessage) {
-        guard let dict = message.body as? [String: Any],
-              let permission = (dict["permission"] as? String).flatMap(PermissionType.init(rawValue:)),
-              let state = (dict["value"] as? String).flatMap(PermissionAuthorizationState.init(rawValue:))
+        guard
+            let dict = message.body as? [String: Any],
+            let permission = (dict["permission"] as? String).flatMap(PermissionType.init(rawValue:)),
+            let state = (dict["value"] as? String).flatMap(PermissionAuthorizationState.init(rawValue:))
         else {
             assertionFailure("privacyDashboardSetPermission: expected { permission: PermissionType, value: PermissionAuthorizationState }")
             return
@@ -109,9 +111,10 @@ final class PrivacyDashboardUserScript: NSObject, StaticUserScript {
     }
 
     private func handleSetPermissionPaused(message: WKScriptMessage) {
-        guard let dict = message.body as? [String: Any],
-              let permission = (dict["permission"] as? String).flatMap(PermissionType.init(rawValue:)),
-              let paused = dict["paused"] as? Bool
+        guard
+            let dict = message.body as? [String: Any],
+            let permission = (dict["permission"] as? String).flatMap(PermissionType.init(rawValue:)),
+            let paused = dict["paused"] as? Bool
         else {
             assertionFailure("handleSetPermissionPaused: expected { permission: PermissionType, paused: Bool }")
             return
@@ -130,10 +133,11 @@ final class PrivacyDashboardUserScript: NSObject, StaticUserScript {
     }
 
     typealias AuthorizationState = [(permission: PermissionType, state: PermissionAuthorizationState)]
-    func setPermissions(_ usedPermissions: Permissions,
-                        authorizationState: AuthorizationState,
-                        domain: String,
-                        in webView: WKWebView) {
+    func setPermissions(
+        _ usedPermissions: Permissions,
+        authorizationState: AuthorizationState,
+        domain: String,
+        in webView: WKWebView) {
 
         let allowedPermissions = authorizationState.map { item in
             [
@@ -159,8 +163,10 @@ final class PrivacyDashboardUserScript: NSObject, StaticUserScript {
                 }
             ]
         }
-        guard let allowedPermissionsJson = (try? JSONSerialization.data(withJSONObject: allowedPermissions,
-                                                                        options: []))?.utf8String()
+        guard
+            let allowedPermissionsJson = (try? JSONSerialization.data(
+                withJSONObject: allowedPermissions,
+                options: []))?.utf8String()
         else {
             assertionFailure("PrivacyDashboardUserScript: could not serialize permissions object")
             return
@@ -214,7 +220,7 @@ final class PrivacyDashboardUserScript: NSObject, StaticUserScript {
     func setIsPendingUpdates(_ isPendingUpdates: Bool, webView: WKWebView) {
         evaluate(js: "window.onIsPendingUpdates(\(isPendingUpdates))", in: webView)
     }
-    
+
     func setConsentManaged(_ consentManaged: CookieConsentInfo?, webView: WKWebView) {
         guard let consentDataJson = try? JSONEncoder().encode(consentManaged).utf8String() else {
             assertionFailure("Can't encode consentInfo into JSON")
@@ -249,7 +255,7 @@ extension PermissionType {
     var jsStyle: String {
         switch self {
         case .camera, .microphone, .geolocation, .popups:
-            return self.rawValue
+            return rawValue
         case .externalScheme:
             return "externalScheme"
         }
@@ -258,9 +264,9 @@ extension PermissionType {
     var jsTitle: String {
         switch self {
         case .camera, .microphone, .geolocation, .popups:
-            return self.localizedDescription
+            return localizedDescription
         case .externalScheme:
-            return String(format: UserText.permissionExternalSchemeOpenFormat, self.localizedDescription)
+            return String(format: UserText.permissionExternalSchemeOpenFormat, localizedDescription)
         }
     }
 

@@ -43,10 +43,12 @@ internal class AddressBarButton: MouseOverButton {
             case .right:
                 backgroundLayer.maskedCorners = [.layerMaxXMaxYCorner, .layerMaxXMinYCorner]
             case .free:
-                backgroundLayer.maskedCorners = [.layerMaxXMaxYCorner,
-                                                 .layerMaxXMinYCorner,
-                                                 .layerMinXMaxYCorner,
-                                                 .layerMinXMinYCorner]
+                backgroundLayer.maskedCorners = [
+                    .layerMaxXMaxYCorner,
+                    .layerMaxXMinYCorner,
+                    .layerMinXMaxYCorner,
+                    .layerMinXMinYCorner
+                ]
             }
             backgroundLayer.masksToBounds = true
         }

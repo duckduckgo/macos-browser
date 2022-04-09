@@ -19,16 +19,16 @@
 import AppKit
 
 final class DownloadsPopover: NSPopover {
-    
+
     override init() {
         super.init()
 
-        self.behavior = .semitransient
+        behavior = .semitransient
 
         setupContentController()
     }
 
-    required init?(coder: NSCoder) {
+    required init?(coder _: NSCoder) {
         fatalError("\(Self.self): Bad initializer")
     }
 

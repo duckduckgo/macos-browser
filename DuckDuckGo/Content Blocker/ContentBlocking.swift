@@ -16,11 +16,11 @@
 //  limitations under the License.
 //
 
-import Foundation
-import WebKit
-import Combine
-import os.log
 import BrowserServicesKit
+import Combine
+import Foundation
+import os.log
+import WebKit
 
 final class ContentBlocking {
     static let shared = ContentBlocking()
@@ -36,35 +36,39 @@ final class ContentBlocking {
     // keeping whole ContentBlocking state initialization in one place to avoid races between updates publishing and rules storing
     private init() {
         let configStorage = DefaultConfigurationStorage.shared
-        privacyConfigurationManager = PrivacyConfigurationManager(fetchedETag: configStorage.loadEtag(for: .privacyConfiguration),
-                                                                  fetchedData: configStorage.loadData(for: .privacyConfiguration),
-                                                                  embeddedDataProvider: AppPrivacyConfigurationDataProvider(),
-                                                                  localProtection: LocalUnprotectedDomains.shared,
-                                                                  errorReporting: Self.debugEvents)
+        privacyConfigurationManager = PrivacyConfigurationManager(
+            fetchedETag: configStorage.loadEtag(for: .privacyConfiguration),
+            fetchedData: configStorage.loadData(for: .privacyConfiguration),
+            embeddedDataProvider: AppPrivacyConfigurationDataProvider(),
+            localProtection: LocalUnprotectedDomains.shared,
+            errorReporting: Self.debugEvents)
 
-        trackerDataManager = TrackerDataManager(etag: DefaultConfigurationStorage.shared.loadEtag(for: .trackerRadar),
-                                                data: DefaultConfigurationStorage.shared.loadData(for: .trackerRadar),
-                                                embeddedDataProvider: AppTrackerDataSetProvider(),
-                                                errorReporting: Self.debugEvents)
+        trackerDataManager = TrackerDataManager(
+            etag: DefaultConfigurationStorage.shared.loadEtag(for: .trackerRadar),
+            data: DefaultConfigurationStorage.shared.loadData(for: .trackerRadar),
+            embeddedDataProvider: AppTrackerDataSetProvider(),
+            errorReporting: Self.debugEvents)
 
         contentBlockerRulesSource = ContentBlockerRulesLists(trackerDataManger: trackerDataManager)
         exceptionsSource = DefaultContentBlockerRulesExceptionsSource(privacyConfigManager: privacyConfigurationManager)
 
-        contentBlockingManager = ContentBlockerRulesManager(rulesSource: contentBlockerRulesSource,
-                                                            exceptionsSource: exceptionsSource,
-                                                            cache: ContentBlockingRulesCache(),
-                                                            errorReporting: Self.debugEvents,
-                                                            logger: OSLog.contentBlocking)
-        contentBlockingUpdating = ContentBlockingUpdating(contentBlockerRulesManager: contentBlockingManager,
-                                                          privacyConfigurationManager: privacyConfigurationManager,
-                                                          configStorage: configStorage)
+        contentBlockingManager = ContentBlockerRulesManager(
+            rulesSource: contentBlockerRulesSource,
+            exceptionsSource: exceptionsSource,
+            cache: ContentBlockingRulesCache(),
+            errorReporting: Self.debugEvents,
+            logger: OSLog.contentBlocking)
+        contentBlockingUpdating = ContentBlockingUpdating(
+            contentBlockerRulesManager: contentBlockingManager,
+            privacyConfigurationManager: privacyConfigurationManager,
+            configStorage: configStorage)
 
     }
 
     private static let debugEvents = EventMapping<ContentBlockerDebugEvents> { event, scope, error, parameters, onComplete in
-#if DEBUG
+        #if DEBUG
         guard !AppDelegate.isRunningTests else { return }
-#endif
+        #endif
 
         let domainEvent: Pixel.Event.Debug
         switch event {
@@ -156,16 +160,18 @@ final class ContentBlockingUpdating {
 
     private(set) var userContentBlockingAssets: AnyPublisher<UserContentController.ContentBlockingAssets, Never>!
 
-    init(contentBlockerRulesManager: ContentBlockerRulesManagerProtocol,
-         privacyConfigurationManager: PrivacyConfigurationManager = ContentBlocking.shared.privacyConfigurationManager,
-         configStorage: ConfigurationStoring = DefaultConfigurationStorage.shared,
-         privacySecurityPreferences: PrivacySecurityPreferences = PrivacySecurityPreferences.shared) {
+    init(
+        contentBlockerRulesManager: ContentBlockerRulesManagerProtocol,
+        privacyConfigurationManager: PrivacyConfigurationManager = ContentBlocking.shared.privacyConfigurationManager,
+        configStorage: ConfigurationStoring = DefaultConfigurationStorage.shared,
+        privacySecurityPreferences: PrivacySecurityPreferences = PrivacySecurityPreferences.shared) {
 
         let makeValue: (ContentBlockerRulesManager.UpdateEvent) -> BufferedValue = { rulesUpdate in
-            let sourceProvider = DefaultScriptSourceProvider(configStorage: configStorage,
-                                                             privacyConfigurationManager: privacyConfigurationManager,
-                                                             privacySettings: privacySecurityPreferences,
-                                                             contentBlockingManager: contentBlockerRulesManager)
+            let sourceProvider = DefaultScriptSourceProvider(
+                configStorage: configStorage,
+                privacyConfigurationManager: privacyConfigurationManager,
+                privacySettings: privacySecurityPreferences,
+                contentBlockingManager: contentBlockerRulesManager)
             return BufferedValue(rulesUpdate: rulesUpdate, sourceProvider: sourceProvider)
         }
 
@@ -179,15 +185,16 @@ final class ContentBlockingUpdating {
             .assign(to: \.bufferedValue, onWeaklyHeld: self) // buffer latest update value
 
         // 2. Publish ContentBlockingAssets(Rules+Scripts) for WKUserContentController per subscription
-        self.userContentBlockingAssets = $bufferedValue
+        userContentBlockingAssets = $bufferedValue
             .compactMap { $0 } // drop initial nil
             .map { value in
-                UserContentController.ContentBlockingAssets(contentRuleLists: value.rulesUpdate.rules
-                                                                .reduce(into: [String: WKContentRuleList](), { result, rules in
-                                                                    result[rules.name] = rules.rulesList
-                                                                }),
-                                                            userScripts: UserScripts(with: value.sourceProvider),
-                                                            completionTokens: value.rulesUpdate.completionTokens)
+                UserContentController.ContentBlockingAssets(
+                    contentRuleLists: value.rulesUpdate.rules
+                        .reduce(into: [String: WKContentRuleList](), { result, rules in
+                            result[rules.name] = rules.rulesList
+                        }),
+                    userScripts: UserScripts(with: value.sourceProvider),
+                    completionTokens: value.rulesUpdate.completionTokens)
             }
             .eraseToAnyPublisher()
 
@@ -199,6 +206,7 @@ protocol ContentBlockerRulesManagerProtocol: AnyObject {
     var updatesPublisher: AnyPublisher<ContentBlockerRulesManager.UpdateEvent, Never> { get }
     var currentRules: [ContentBlockerRulesManager.Rules] { get }
 }
+
 extension ContentBlockerRulesManager: ContentBlockerRulesManagerProtocol {}
 
 final class ContentBlockingRulesCache: ContentBlockerRulesCaching {

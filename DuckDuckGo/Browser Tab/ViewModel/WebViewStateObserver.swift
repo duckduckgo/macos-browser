@@ -17,18 +17,19 @@
 //
 
 import Cocoa
-import WebKit
 import os.log
+import WebKit
 
 final class WebViewStateObserver: NSObject {
 
     weak var webView: WKWebView?
     weak var tabViewModel: TabViewModel?
-    
+
     private var isObserving = false
 
-    init(webView: WKWebView,
-         tabViewModel: TabViewModel) {
+    init(
+        webView: WKWebView,
+        tabViewModel: TabViewModel) {
         self.webView = webView
         self.tabViewModel = tabViewModel
         super.init()
@@ -36,7 +37,7 @@ final class WebViewStateObserver: NSObject {
         matchFlagValues()
         observe(webView: webView)
     }
-    
+
     func stopObserving() {
         guard isObserving else { return }
         webView?.removeObserver(self, forKeyPath: #keyPath(WKWebView.url))
@@ -45,7 +46,7 @@ final class WebViewStateObserver: NSObject {
         webView?.removeObserver(self, forKeyPath: #keyPath(WKWebView.isLoading))
         webView?.removeObserver(self, forKeyPath: #keyPath(WKWebView.title))
         webView?.removeObserver(self, forKeyPath: #keyPath(WKWebView.estimatedProgress))
-        
+
         isObserving = false
     }
 
@@ -76,14 +77,15 @@ final class WebViewStateObserver: NSObject {
         webView.addObserver(self, forKeyPath: #keyPath(WKWebView.isLoading), options: .new, context: nil)
         webView.addObserver(self, forKeyPath: #keyPath(WKWebView.title), options: .new, context: nil)
         webView.addObserver(self, forKeyPath: #keyPath(WKWebView.estimatedProgress), options: .new, context: nil)
-        
+
         isObserving = true
     }
 
-    override func observeValue(forKeyPath keyPath: String?,
-                               of object: Any?,
-                               change: [NSKeyValueChangeKey: Any]?,
-                               context: UnsafeMutableRawPointer?) {
+    override func observeValue(
+        forKeyPath keyPath: String?,
+        of object: Any?,
+        change: [NSKeyValueChangeKey: Any]?,
+        context: UnsafeMutableRawPointer?) {
         guard let keyPath = keyPath, let tabViewModel = tabViewModel, let webView = webView else {
             assertionFailure("Invalid state: keyPath, tabViewModel or webView is nil")
             return

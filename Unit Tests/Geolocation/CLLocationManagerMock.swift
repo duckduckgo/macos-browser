@@ -16,8 +16,8 @@
 //  limitations under the License.
 //
 
-import Foundation
 import CoreLocation
+import Foundation
 
 final class CLLocationManagerMock: CLLocationManager {
     private static var instances = [NSValue]()
@@ -31,7 +31,8 @@ final class CLLocationManagerMock: CLLocationManager {
             }
         }
     }
-    static var systemLocationServicesEnabled: Bool = false {
+
+    static var systemLocationServicesEnabled = false {
         didSet {
             for value in instances {
                 guard let instance = value.nonretainedObjectValue as? CLLocationManagerMock else { fatalError() }
@@ -46,7 +47,7 @@ final class CLLocationManagerMock: CLLocationManager {
     override init() {
         super.init()
 
-        selfRef = NSValue.init(nonretainedObject: self)
+        selfRef = NSValue(nonretainedObject: self)
         Self.instances.append(selfRef)
     }
 
@@ -64,21 +65,24 @@ final class CLLocationManagerMock: CLLocationManager {
 
     var currentLocation: CLLocation? {
         didSet {
-            if isUpdatingLocation,
-               let location = currentLocation {
+            if
+                isUpdatingLocation,
+                let location = currentLocation {
                 delegate?.locationManager?(self, didUpdateLocations: [location])
             }
         }
     }
+
     var error: Error? {
         didSet {
-            if isUpdatingLocation,
-               let error = error {
+            if
+                isUpdatingLocation,
+                let error = error {
                 delegate?.locationManager?(self, didFailWithError: error)
             }
         }
     }
-    
+
     override var location: CLLocation? {
         currentLocation
     }

@@ -22,7 +22,7 @@ typealias PasteboardAttributes = [String: String]
 
 struct PasteboardBookmark: Hashable {
 
-    private struct Key {
+    private enum Key {
         static let id = "id"
         static let url = "URL"
         static let title = "title"
@@ -51,8 +51,9 @@ struct PasteboardBookmark: Hashable {
     init?(pasteboardItem: NSPasteboardItem) {
         let type = BookmarkPasteboardWriter.bookmarkUTIInternalType
 
-        guard pasteboardItem.types.contains(type),
-              let dictionary = pasteboardItem.propertyList(forType: type) as? PasteboardAttributes else { return nil }
+        guard
+            pasteboardItem.types.contains(type),
+            let dictionary = pasteboardItem.propertyList(forType: type) as? PasteboardAttributes else { return nil }
 
         self.init(dictionary: dictionary)
     }
@@ -69,7 +70,7 @@ struct PasteboardBookmark: Hashable {
     // MARK: - Dictionary Representations
 
     var internalDictionaryRepresentation: PasteboardAttributes {
-        return [
+        [
             Key.id: id,
             Key.url: url,
             Key.title: title
@@ -92,17 +93,18 @@ extension BaseBookmarkEntity: PasteboardWriting {
 
 }
 
-@objc final class BookmarkPasteboardWriter: NSObject, NSPasteboardWriting {
+@objc
+final class BookmarkPasteboardWriter: NSObject, NSPasteboardWriting {
 
     static let bookmarkUTIInternal = "com.duckduckgo.bookmark.internal"
     static let bookmarkUTIInternalType = NSPasteboard.PasteboardType(rawValue: bookmarkUTIInternal)
 
     var pasteboardBookmark: PasteboardBookmark {
-        return PasteboardBookmark(id: bookmarkID, url: bookmarkURL, title: bookmarkTitle)
+        PasteboardBookmark(id: bookmarkID, url: bookmarkURL, title: bookmarkTitle)
     }
 
     var internalDictionary: PasteboardAttributes {
-        return pasteboardBookmark.internalDictionaryRepresentation
+        pasteboardBookmark.internalDictionaryRepresentation
     }
 
     private let bookmarkID: String
@@ -110,15 +112,15 @@ extension BaseBookmarkEntity: PasteboardWriting {
     private let bookmarkTitle: String
 
     init(bookmark: Bookmark) {
-        self.bookmarkID = bookmark.id.uuidString
-        self.bookmarkURL = bookmark.url.absoluteString
-        self.bookmarkTitle = bookmark.title
+        bookmarkID = bookmark.id.uuidString
+        bookmarkURL = bookmark.url.absoluteString
+        bookmarkTitle = bookmark.title
     }
 
     // MARK: - NSPasteboardWriting
 
-    func writableTypes(for pasteboard: NSPasteboard) -> [NSPasteboard.PasteboardType] {
-        return [.URL, .string, BookmarkPasteboardWriter.bookmarkUTIInternalType]
+    func writableTypes(for _: NSPasteboard) -> [NSPasteboard.PasteboardType] {
+        [.URL, .string, BookmarkPasteboardWriter.bookmarkUTIInternalType]
     }
 
     func pasteboardPropertyList(forType type: NSPasteboard.PasteboardType) -> Any? {

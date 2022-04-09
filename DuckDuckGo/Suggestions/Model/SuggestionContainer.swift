@@ -16,9 +16,9 @@
 //  limitations under the License.
 //
 
+import BrowserServicesKit
 import Foundation
 import os.log
-import BrowserServicesKit
 
 final class SuggestionContainer {
 
@@ -31,24 +31,25 @@ final class SuggestionContainer {
     private let loading: SuggestionLoading
 
     private var latestQuery: Query?
-    
-    fileprivate let suggestionsURLSession = URLSession(configuration: .ephemeral)
+
+    private let suggestionsURLSession = URLSession(configuration: .ephemeral)
 
     init(suggestionLoading: SuggestionLoading, historyCoordinating: HistoryCoordinating, bookmarkManager: BookmarkManager) {
         self.bookmarkManager = bookmarkManager
         self.historyCoordinating = historyCoordinating
-        self.loading = suggestionLoading
-        self.loading.dataSource = self
+        loading = suggestionLoading
+        loading.dataSource = self
     }
 
     convenience init () {
         let urlFactory = { urlString in
-            return URL.makeURL(fromSuggestionPhrase: urlString)
+            URL.makeURL(fromSuggestionPhrase: urlString)
         }
 
-        self.init(suggestionLoading: SuggestionLoader(urlFactory: urlFactory),
-                  historyCoordinating: HistoryCoordinator.shared,
-                  bookmarkManager: LocalBookmarkManager.shared)
+        self.init(
+            suggestionLoading: SuggestionLoader(urlFactory: urlFactory),
+            historyCoordinating: HistoryCoordinator.shared,
+            bookmarkManager: LocalBookmarkManager.shared)
     }
 
     func getSuggestions(for query: String) {
@@ -59,18 +60,20 @@ final class SuggestionContainer {
             guard self?.latestQuery == query else { return }
             guard let result = result else {
                 self?.result = nil
-                os_log("Suggestions: Failed to get suggestions - %s",
-                       type: .error,
-                       "\(String(describing: error))")
+                os_log(
+                    "Suggestions: Failed to get suggestions - %s",
+                    type: .error,
+                    "\(String(describing: error))")
                 Pixel.fire(.debug(event: .suggestionsFetchFailed, error: error))
                 return
             }
 
             if let error = error {
                 // Fetching remote suggestions failed but local can be presented
-                os_log("Suggestions: Error when getting suggestions - %s",
-                       type: .error,
-                       "\(String(describing: error))")
+                os_log(
+                    "Suggestions: Error when getting suggestions - %s",
+                    type: .error,
+                    "\(String(describing: error))")
             }
 
             self?.result = result
@@ -85,18 +88,19 @@ final class SuggestionContainer {
 
 extension SuggestionContainer: SuggestionLoadingDataSource {
 
-    func history(for suggestionLoading: SuggestionLoading) -> [BrowserServicesKit.HistoryEntry] {
-        return historyCoordinating.history ?? []
+    func history(for _: SuggestionLoading) -> [BrowserServicesKit.HistoryEntry] {
+        historyCoordinating.history ?? []
     }
 
-    func bookmarks(for suggestionLoading: SuggestionLoading) -> [BrowserServicesKit.Bookmark] {
+    func bookmarks(for _: SuggestionLoading) -> [BrowserServicesKit.Bookmark] {
         bookmarkManager.list?.bookmarks() ?? []
     }
 
-    func suggestionLoading(_ suggestionLoading: SuggestionLoading,
-                           suggestionDataFromUrl url: URL,
-                           withParameters parameters: [String: String],
-                           completion: @escaping (Data?, Error?) -> Void) {
+    func suggestionLoading(
+        _: SuggestionLoading,
+        suggestionDataFromUrl url: URL,
+        withParameters parameters: [String: String],
+        completion: @escaping (Data?, Error?) -> Void) {
         var url = url
         parameters.forEach {
             if let newUrl = try? url.addParameter(name: $0.key, value: $0.value) {
@@ -105,11 +109,11 @@ extension SuggestionContainer: SuggestionLoadingDataSource {
                 assertionFailure("SuggestionContainer: Failed to add parameter")
             }
         }
-        
+
         var request = URLRequest.defaultRequest(with: url)
         request.timeoutInterval = 1
 
-        suggestionsURLSession.dataTask(with: request) { (data, _, error) in
+        suggestionsURLSession.dataTask(with: request) { data, _, error in
             completion(data, error)
         }.resume()
     }

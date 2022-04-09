@@ -61,16 +61,17 @@ struct PermissionEntity: Equatable {
     }
 
     init?(managedObject: PermissionManagedObject) {
-        guard let domain = managedObject.domainEncrypted as? String,
-              let permissionTypeString = managedObject.permissionType,
-              let permissionType = PermissionType(rawValue: permissionTypeString) else {
+        guard
+            let domain = managedObject.domainEncrypted as? String,
+            let permissionTypeString = managedObject.permissionType,
+            let permissionType = PermissionType(rawValue: permissionTypeString) else {
             assertionFailure("\(#file): Failed to create PermissionEntity from PermissionManagedObject")
             return nil
         }
 
-        self.permission = StoredPermission(id: managedObject.objectID, decision: managedObject.decision)
+        permission = StoredPermission(id: managedObject.objectID, decision: managedObject.decision)
         self.domain = domain
-        self.type = permissionType
+        type = permissionType
     }
 
 }
@@ -79,15 +80,15 @@ extension PermissionManagedObject {
 
     var decision: PersistedPermissionDecision {
         get {
-            return .init(allow: self.allow, isRemoved: self.isRemoved)
+            .init(allow: allow, isRemoved: isRemoved)
         }
         set {
             if case .ask = newValue {
                 self.isRemoved = true
                 self.allow = false
             } else {
-                self.allow = newValue.boolValue
-                self.isRemoved = false
+                allow = newValue.boolValue
+                isRemoved = false
             }
         }
     }

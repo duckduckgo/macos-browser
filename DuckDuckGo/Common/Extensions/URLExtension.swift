@@ -16,9 +16,9 @@
 //  limitations under the License.
 //
 
+import BrowserServicesKit
 import Foundation
 import os.log
-import BrowserServicesKit
 
 extension URL {
 
@@ -104,19 +104,19 @@ extension URL {
     }
 
     static var blankPage: URL {
-        return URL(string: "about:blank")!
+        URL(string: "about:blank")!
     }
 
     static var homePage: URL {
-        return URL(string: "about:home")!
+        URL(string: "about:home")!
     }
 
     static var welcome: URL {
-        return URL(string: "about:welcome")!
+        URL(string: "about:welcome")!
     }
 
     static var preferences: URL {
-        return URL(string: "about:preferences")!
+        URL(string: "about:preferences")!
     }
 
     // MARK: Pixel
@@ -145,17 +145,17 @@ extension URL {
     static let exti = "\(Self.duckDuckGo)exti/\(devMode)"
 
     static var initialAtb: URL {
-        return URL(string: Self.atb)!
+        URL(string: Self.atb)!
     }
 
     static func searchAtb(atbWithVariant: String, setAtb: String) -> URL? {
-        return try? Self.initialAtb
+        try? Self.initialAtb
             .addParameter(name: DuckDuckGoParameters.ATB.atb, value: atbWithVariant)
             .addParameter(name: DuckDuckGoParameters.ATB.setAtb, value: setAtb)
     }
 
     static func appRetentionAtb(atbWithVariant: String, setAtb: String) -> URL? {
-        return try? Self.initialAtb
+        try? Self.initialAtb
             .addParameter(name: DuckDuckGoParameters.ATB.activityType, value: DuckDuckGoParameters.ATB.appUsageValue)
             .addParameter(name: DuckDuckGoParameters.ATB.atb, value: atbWithVariant)
             .addParameter(name: DuckDuckGoParameters.ATB.setAtb, value: setAtb)
@@ -176,11 +176,11 @@ extension URL {
         case file
 
         func separated() -> String {
-            self.rawValue + Self.separator
+            rawValue + Self.separator
         }
 
         static var hypertextSchemes: [NavigationalScheme] {
-            return [.http, .https]
+            [.http, .https]
         }
     }
 
@@ -188,26 +188,30 @@ extension URL {
         case www
 
         func separated() -> String {
-            self.rawValue + "."
+            rawValue + "."
         }
     }
 
     var separatedScheme: String? {
-        self.scheme.map { $0 + NavigationalScheme.separator }
+        scheme.map { $0 + NavigationalScheme.separator }
     }
 
-    func toString(decodePunycode: Bool,
-                  dropScheme: Bool,
-                  needsWWW: Bool? = nil,
-                  dropTrailingSlash: Bool) -> String {
-        guard let components = URLComponents(url: self, resolvingAgainstBaseURL: true),
-              var string = components.string
+    func toString(
+        decodePunycode: Bool,
+        dropScheme: Bool,
+        needsWWW: Bool? = nil,
+        dropTrailingSlash: Bool)
+        -> String {
+        guard
+            let components = URLComponents(url: self, resolvingAgainstBaseURL: true),
+            var string = components.string
         else {
             return absoluteString
         }
 
-        if var host = components.host,
-           let hostRange = components.rangeOfHost {
+        if
+            var host = components.host,
+            let hostRange = components.rangeOfHost {
 
             switch (needsWWW, host.hasPrefix(HostPrefix.www.separated())) {
             case (.some(true), true),
@@ -220,24 +224,27 @@ extension URL {
                 host = HostPrefix.www.separated() + host
             }
 
-            if decodePunycode,
-               let decodedHost = host.idnaDecoded {
+            if
+                decodePunycode,
+                let decodedHost = host.idnaDecoded {
                 host = decodedHost
             }
 
             string.replaceSubrange(hostRange, with: host)
         }
 
-        if dropScheme,
-           let schemeRange = components.rangeOfScheme {
+        if
+            dropScheme,
+            let schemeRange = components.rangeOfScheme {
             string.replaceSubrange(schemeRange, with: "")
             if string.hasPrefix(URL.NavigationalScheme.separator) {
                 string = string.drop(prefix: URL.NavigationalScheme.separator)
             }
         }
 
-        if dropTrailingSlash,
-           string.hasSuffix("/") {
+        if
+            dropTrailingSlash,
+            string.hasSuffix("/") {
             string = String(string.dropLast(1))
         }
 
@@ -245,16 +252,17 @@ extension URL {
     }
 
     func toString(forUserInput input: String, decodePunycode: Bool = true) -> String {
-        let hasInputScheme = input.hasOrIsPrefix(of: self.separatedScheme ?? "")
-        let hasInputWww = input.drop(prefix: self.separatedScheme ?? "").hasOrIsPrefix(of: URL.HostPrefix.www.rawValue)
+        let hasInputScheme = input.hasOrIsPrefix(of: separatedScheme ?? "")
+        let hasInputWww = input.drop(prefix: separatedScheme ?? "").hasOrIsPrefix(of: URL.HostPrefix.www.rawValue)
         let hasInputHost = (decodePunycode ? host?.idnaDecoded : host)?.hasOrIsPrefix(of: input) ?? false
 
-        return self.toString(decodePunycode: decodePunycode,
-                             dropScheme: input.isEmpty || !(hasInputScheme && !hasInputHost),
-                             needsWWW: !input.drop(prefix: self.separatedScheme ?? "").isEmpty
-                                && hasInputWww
-                                && !hasInputHost,
-                             dropTrailingSlash: !input.hasSuffix("/"))
+        return toString(
+            decodePunycode: decodePunycode,
+            dropScheme: input.isEmpty || !(hasInputScheme && !hasInputHost),
+            needsWWW: !input.drop(prefix: separatedScheme ?? "").isEmpty
+                && hasInputWww
+                && !hasInputHost,
+            dropTrailingSlash: !input.hasSuffix("/"))
     }
 
     /// Tries to use the file name part of the URL, if available, adjusting for content type, if available.
@@ -262,8 +270,9 @@ extension URL {
         let url = self
 
         var filename: String
-        if !url.pathComponents.isEmpty,
-           url.pathComponents != [ "/" ] {
+        if
+            !url.pathComponents.isEmpty,
+            url.pathComponents != [ "/" ] {
 
             filename = url.lastPathComponent
         } else {
@@ -284,9 +293,10 @@ extension URL {
     var isValid: Bool {
         guard let scheme = scheme else { return false }
 
-        if URL.NavigationalScheme(rawValue: scheme) != nil,
-           let host = host, host.isValidHost,
-           user == nil { return true }
+        if
+            URL.NavigationalScheme(rawValue: scheme) != nil,
+            let host = host, host.isValidHost,
+            user == nil { return true }
 
         if scheme == URL.NavigationalScheme.file.rawValue { return true }
 
@@ -296,11 +306,11 @@ extension URL {
     }
 
     var isDataURL: Bool {
-        return scheme == "data"
+        scheme == "data"
     }
 
     var isExternalSchemeLink: Bool {
-        return !["https", "http", "about", "file", "blob", "data"].contains(scheme)
+        !["https", "http", "about", "file", "blob", "data"].contains(scheme)
     }
 
     // MARK: - DuckDuckGo
@@ -315,15 +325,15 @@ extension URL {
     }
 
     static var aboutDuckDuckGo: URL {
-        return URL(string: "https://duckduckgo.com/about")!
+        URL(string: "https://duckduckgo.com/about")!
     }
 
     static var gpcLearnMore: URL {
-        return URL(string: "https://help.duckduckgo.com/duckduckgo-help-pages/privacy/gpc/")!
+        URL(string: "https://help.duckduckgo.com/duckduckgo-help-pages/privacy/gpc/")!
     }
 
     static var privacyPolicy: URL {
-        return URL(string: "https://duckduckgo.com/privacy")!
+        URL(string: "https://duckduckgo.com/privacy")!
     }
 
     static var duckDuckGoEmail = URL(string: "https://duckduckgo.com/email-protection")!
@@ -342,6 +352,7 @@ extension URL {
 
         return false
     }
+
     // swiftlint:enable unused_optional_binding
 
     enum DuckDuckGoParameters: String {
@@ -368,19 +379,20 @@ extension URL {
     // MARK: - Punycode
 
     var punycodeDecodedString: String? {
-        return self.toString(decodePunycode: true, dropScheme: false, dropTrailingSlash: false)
+        toString(decodePunycode: true, dropScheme: false, dropTrailingSlash: false)
     }
 
     // MARK: - File URL
 
     var volume: URL? {
-        try? self.resourceValues(forKeys: [.volumeURLKey]).volume
+        try? resourceValues(forKeys: [.volumeURLKey]).volume
     }
 
     func sanitizedForQuarantine() -> URL? {
-        guard !self.isFileURL,
-              !["data", "blob"].contains(self.scheme),
-              var components = URLComponents.init(url: self, resolvingAgainstBaseURL: false)
+        guard
+            !isFileURL,
+            !["data", "blob"].contains(scheme),
+            var components = URLComponents(url: self, resolvingAgainstBaseURL: false)
         else {
             return nil
         }
@@ -392,8 +404,9 @@ extension URL {
     }
 
     func setQuarantineAttributes(sourceURL: URL?, referrerURL: URL?) throws {
-        guard self.isFileURL,
-              FileManager.default.fileExists(atPath: self.path)
+        guard
+            isFileURL,
+            FileManager.default.fileExists(atPath: path)
         else {
             throw CocoaError(CocoaError.Code.fileNoSuchFile)
         }
@@ -401,7 +414,7 @@ extension URL {
         let sourceURL = sourceURL?.sanitizedForQuarantine()
         let referrerURL = referrerURL?.sanitizedForQuarantine()
 
-        if var quarantineProperties = try self.resourceValues(forKeys: [.quarantinePropertiesKey]).quarantineProperties {
+        if var quarantineProperties = try resourceValues(forKeys: [.quarantinePropertiesKey]).quarantineProperties {
             quarantineProperties[kLSQuarantineAgentBundleIdentifierKey as String] = Bundle.main.bundleIdentifier
             quarantineProperties[kLSQuarantineAgentNameKey as String] = Bundle.main.displayName
 
@@ -431,8 +444,10 @@ extension URL {
         return enabledSites
     }
 
-    static func isGPCEnabled(url: URL,
-                             config: PrivacyConfiguration = ContentBlocking.shared.privacyConfigurationManager.privacyConfig) -> Bool {
+    static func isGPCEnabled(
+        url: URL,
+        config: PrivacyConfiguration = ContentBlocking.shared.privacyConfigurationManager.privacyConfig)
+        -> Bool {
         let enabledSites = gpcHeadersEnabled(config: config)
 
         for gpcHost in enabledSites {
@@ -453,7 +468,7 @@ extension URL {
     static let productionEndpoint = URL(string: "https://quack.duckduckgo.com/api/")!
 
     static func redeemMacWaitlistInviteCode(endpoint: URL = .developmentEndpoint) -> URL {
-        return endpoint.appendingPathComponent("auth/invites/macosbrowser/redeem")
+        endpoint.appendingPathComponent("auth/invites/macosbrowser/redeem")
     }
 
 }

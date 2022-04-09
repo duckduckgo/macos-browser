@@ -16,8 +16,8 @@
 //  limitations under the License.
 //
 
-import WebKit
 import BrowserServicesKit
+import WebKit
 
 protocol ClickToLoadUserScriptDelegate: AnyObject {
 
@@ -32,13 +32,15 @@ final class ClickToLoadUserScript: NSObject, UserScript, WKScriptMessageHandlerW
     let source: String
 
     init(scriptSourceProvider: ScriptSourceProviding) {
-        self.source = scriptSourceProvider.clickToLoadSource
+        source = scriptSourceProvider.clickToLoadSource
     }
 
     weak var delegate: ClickToLoadUserScriptDelegate?
 
-    func userContentController(_ userContentController: WKUserContentController, didReceive message: WKScriptMessage,
-                               replyHandler: @escaping (Any?, String?) -> Void) {
+    func userContentController(
+        _ userContentController: WKUserContentController,
+        didReceive message: WKScriptMessage,
+        replyHandler: @escaping (Any?, String?) -> Void) {
         if message.name == "initClickToLoad" {
             let host = message.body as? String
             let controller = userContentController as? UserContentController
@@ -56,7 +58,7 @@ final class ClickToLoadUserScript: NSObject, UserScript, WKScriptMessageHandlerW
         }
         if message.name == "enableFacebook" {
             guard let delegate = delegate else { return }
-            delegate.clickToLoadUserScriptAllowFB(self) { (_) -> Void in
+            delegate.clickToLoadUserScriptAllowFB(self) { _ in
                 guard let isLogin = message.body as? Bool else {
                     replyHandler(nil, nil)
                     return
@@ -83,8 +85,8 @@ final class ClickToLoadUserScript: NSObject, UserScript, WKScriptMessageHandlerW
         }
         replyHandler(image, nil)
     }
-    
-    func userContentController(_ userContentController: WKUserContentController, didReceive message: WKScriptMessage) {
+
+    func userContentController(_: WKUserContentController, didReceive _: WKScriptMessage) {
         assertionFailure("SHOULDN'T BE HERE!")
     }
 

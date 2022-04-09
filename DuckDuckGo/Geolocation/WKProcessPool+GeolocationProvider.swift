@@ -23,7 +23,7 @@ extension WKProcessPool {
 
     @nonobjc var geolocationProvider: GeolocationProviderProtocol? {
         get {
-            return objc_getAssociatedObject(self, Self.geolocationProviderKey) as? GeolocationProviderProtocol
+            objc_getAssociatedObject(self, Self.geolocationProviderKey) as? GeolocationProviderProtocol
         }
         set {
             objc_setAssociatedObject(self, Self.geolocationProviderKey, newValue, .OBJC_ASSOCIATION_RETAIN)

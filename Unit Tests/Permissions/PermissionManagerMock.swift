@@ -16,9 +16,9 @@
 //  limitations under the License.
 //
 
+import Combine
 import Foundation
 @testable import DuckDuckGo_Privacy_Browser
-import Combine
 
 final class PermissionManagerMock: PermissionManagerProtocol {
 
@@ -50,7 +50,7 @@ final class PermissionManagerMock: PermissionManagerProtocol {
     }
 
     var burnPermissionsOfDomainsCalled = false
-    func burnPermissions(of domains: Set<String>, completion: @escaping () -> Void) {
+    func burnPermissions(of _: Set<String>, completion: @escaping () -> Void) {
         burnPermissionsOfDomainsCalled = true
         completion()
     }

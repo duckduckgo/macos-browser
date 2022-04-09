@@ -33,7 +33,7 @@ struct KeySetDictionary<Key: Hashable, Value>: ExpressibleByDictionaryLiteral {
 
     subscript(key: Key) -> Value? {
         get {
-            return dict[key]
+            dict[key]
         }
         set {
             dict[key] = newValue

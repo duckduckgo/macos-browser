@@ -160,9 +160,9 @@ final class LocalBookmarkManagerTests: XCTestCase {
 
 }
 
-fileprivate extension LocalBookmarkManager {
+extension LocalBookmarkManager {
 
-    static var aManager: (LocalBookmarkManager, BookmarkStoreMock) {
+    fileprivate static var aManager: (LocalBookmarkManager, BookmarkStoreMock) {
         let bookmarkStoreMock = BookmarkStoreMock()
         let faviconManagerMock = FaviconManagerMock()
         let bookmarkManager = LocalBookmarkManager(bookmarkStore: bookmarkStoreMock, faviconManagement: faviconManagerMock)
@@ -175,11 +175,12 @@ fileprivate extension LocalBookmarkManager {
 
 }
 
-fileprivate extension Bookmark {
+extension Bookmark {
 
-    static var aBookmark: Bookmark = Bookmark(id: UUID(),
-                                              url: URL.duckDuckGo,
-                                              title: "Title",
-                                              isFavorite: false)
+    fileprivate static var aBookmark = Bookmark(
+        id: UUID(),
+        url: URL.duckDuckGo,
+        title: "Title",
+        isFavorite: false)
 
 }

@@ -33,18 +33,20 @@ extension Tab: NSSecureCoding {
     static var supportsSecureCoding: Bool { true }
 
     convenience init?(coder decoder: NSCoder) {
-        guard let tabTypeRawValue: Int = decoder.decodeIfPresent(at: NSSecureCodingKeys.tabType),
-              let tabType = TabContent.ContentType(rawValue: tabTypeRawValue),
-              let content = TabContent(type: tabType, url: decoder.decodeIfPresent(at: NSSecureCodingKeys.url))
+        guard
+            let tabTypeRawValue: Int = decoder.decodeIfPresent(at: NSSecureCodingKeys.tabType),
+            let tabType = TabContent.ContentType(rawValue: tabTypeRawValue),
+            let content = TabContent(type: tabType, url: decoder.decodeIfPresent(at: NSSecureCodingKeys.url))
         else { return nil }
 
         let visitedDomains = decoder.decodeObject(of: [NSArray.self, NSString.self], forKey: NSSecureCodingKeys.visitedDomains) as? [String] ?? []
 
-        self.init(content: content,
-                  localHistory: Set(visitedDomains),
-                  title: decoder.decodeIfPresent(at: NSSecureCodingKeys.title),
-                  favicon: decoder.decodeIfPresent(at: NSSecureCodingKeys.favicon),
-                  sessionStateData: decoder.decodeIfPresent(at: NSSecureCodingKeys.sessionStateData))
+        self.init(
+            content: content,
+            localHistory: Set(visitedDomains),
+            title: decoder.decodeIfPresent(at: NSSecureCodingKeys.title),
+            favicon: decoder.decodeIfPresent(at: NSSecureCodingKeys.favicon),
+            sessionStateData: decoder.decodeIfPresent(at: NSSecureCodingKeys.sessionStateData))
     }
 
     func encode(with coder: NSCoder) {
@@ -60,9 +62,9 @@ extension Tab: NSSecureCoding {
 
 }
 
-private extension Tab.TabContent {
+extension Tab.TabContent {
 
-    enum ContentType: Int, CaseIterable {
+    fileprivate enum ContentType: Int, CaseIterable {
         case url = 0
         case preferences = 1
         case bookmarks = 2
@@ -70,7 +72,7 @@ private extension Tab.TabContent {
         case onboarding = 4
     }
 
-    init?(type: ContentType, url: URL?) {
+    fileprivate init?(type: ContentType, url: URL?) {
         switch type {
         case .homePage:
             self = .homePage
@@ -86,7 +88,7 @@ private extension Tab.TabContent {
         }
     }
 
-    var type: ContentType {
+    fileprivate var type: ContentType {
         switch self {
         case .url: return .url
         case .homePage: return .homePage

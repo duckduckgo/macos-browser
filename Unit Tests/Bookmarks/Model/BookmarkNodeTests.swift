@@ -112,7 +112,7 @@ class BookmarkNodeTests: XCTestCase {
         let rootNode = BookmarkNode(representedObject: TestObject(), parent: nil)
         let indexPath = rootNode.indexPath
 
-        XCTAssertEqual(indexPath, IndexPath.init(index: 0))
+        XCTAssertEqual(indexPath, IndexPath(index: 0))
     }
 
     func testWhenGettingIndexPath_AndNodeIsChild_ThenChildIndexPathIsReturned() {

@@ -24,13 +24,13 @@ final class SaveIdentityPopover: NSPopover {
     override init() {
         super.init()
 
-        self.animates = false
-        self.behavior = .applicationDefined
+        animates = false
+        behavior = .applicationDefined
 
         setupContentController()
     }
 
-    required init?(coder: NSCoder) {
+    required init?(coder _: NSCoder) {
         fatalError("\(Self.self): Bad initializer")
     }
 

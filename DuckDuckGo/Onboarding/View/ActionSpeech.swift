@@ -20,46 +20,46 @@ import SwiftUI
 
 extension Onboarding {
 
-struct ActionSpeech: View {
+    struct ActionSpeech: View {
 
-    let text: String
-    let actionName: String
-    let action: () -> Void
-    let skip: () -> Void
+        let text: String
+        let actionName: String
+        let action: () -> Void
+        let skip: () -> Void
 
-    @State var typingFinished = false
+        @State var typingFinished = false
 
-    var body: some View {
-        VStack(spacing: 15) {
-            DaxSpeech(text: text) {
-                withAnimation {
-                    typingFinished = true
-                }
-            }
-            
-            HStack(spacing: 12) {
-
-                Button(UserText.onboardingNotNowButton) {
+        var body: some View {
+            VStack(spacing: 15) {
+                DaxSpeech(text: text) {
                     withAnimation {
-                        skip()
+                        typingFinished = true
                     }
                 }
-                .buttonStyle(SkipButtonStyle())
 
-                Button(actionName) {
-                    withAnimation {
-                        action()
+                HStack(spacing: 12) {
+
+                    Button(UserText.onboardingNotNowButton) {
+                        withAnimation {
+                            skip()
+                        }
                     }
+                    .buttonStyle(SkipButtonStyle())
+
+                    Button(actionName) {
+                        withAnimation {
+                            action()
+                        }
+                    }
+                    .buttonStyle(ActionButtonStyle())
+
                 }
-                .buttonStyle(ActionButtonStyle())
+                .visibility(typingFinished ? .visible : .gone)
+                .frame(width: speechWidth)
 
             }
-            .visibility(typingFinished ? .visible : .gone)
-            .frame(width: speechWidth)
-
         }
-    }
 
-}
+    }
 
 }

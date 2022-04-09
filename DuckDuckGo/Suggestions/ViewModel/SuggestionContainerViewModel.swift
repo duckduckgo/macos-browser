@@ -16,10 +16,10 @@
 //  limitations under the License.
 //
 
-import Foundation
-import Combine
-import os.log
 import BrowserServicesKit
+import Combine
+import Foundation
+import os.log
 
 final class SuggestionContainerViewModel {
 
@@ -50,11 +50,12 @@ final class SuggestionContainerViewModel {
     private var shouldSelectTopSuggestion: Bool {
         guard let result = suggestionContainer.result, !result.isEmpty else { return false }
 
-        if self.isTopSuggestionSelectionExpected,
-           result.canBeAutocompleted,
-           let userStringValue = self.userStringValue,
-           let firstSuggestion = self.suggestionViewModel(at: 0),
-           firstSuggestion.autocompletionString.lowercased().hasPrefix(userStringValue.lowercased()) {
+        if
+            isTopSuggestionSelectionExpected,
+            result.canBeAutocompleted,
+            let userStringValue = userStringValue,
+            let firstSuggestion = suggestionViewModel(at: 0),
+            firstSuggestion.autocompletionString.lowercased().hasPrefix(userStringValue.lowercased()) {
             return true
         } else {
             return false
@@ -64,12 +65,13 @@ final class SuggestionContainerViewModel {
     private func subscribeToSuggestionResult() {
         suggestionResultCancellable = suggestionContainer.$result.receive(on: DispatchQueue.main)
             .sink { [weak self] _ in
-            guard let self = self,
-                  self.shouldSelectTopSuggestion
-            else { return }
+                guard
+                    let self = self,
+                    self.shouldSelectTopSuggestion
+                else { return }
 
-            self.select(at: 0)
-        }
+                self.select(at: 0)
+            }
     }
 
     func setUserStringValue(_ userStringValue: String, userAppendedStringToTheEnd: Bool) {
@@ -82,12 +84,12 @@ final class SuggestionContainerViewModel {
         }
         guard userStringValue.lowercased() != oldValue?.lowercased() else { return }
 
-        self.isTopSuggestionSelectionExpected = userAppendedStringToTheEnd && !userStringValue.contains(" ")
+        isTopSuggestionSelectionExpected = userAppendedStringToTheEnd && !userStringValue.contains(" ")
         suggestionContainer.getSuggestions(for: userStringValue)
     }
 
     func clearUserStringValue() {
-        self.userStringValue = nil
+        userStringValue = nil
         suggestionContainer.stopGettingSuggestions()
     }
 
@@ -98,7 +100,7 @@ final class SuggestionContainerViewModel {
             selectedSuggestionViewModel = nil
         }
     }
-    
+
     func suggestionViewModel(at index: Int) -> SuggestionViewModel? {
         let items = suggestionContainer.result?.all ?? []
 
@@ -117,7 +119,7 @@ final class SuggestionContainerViewModel {
             return
         }
 
-        if suggestionViewModel(at: index) !== self.selectedSuggestionViewModel {
+        if suggestionViewModel(at: index) !== selectedSuggestionViewModel {
             selectionIndex = index
         }
     }
@@ -161,5 +163,5 @@ final class SuggestionContainerViewModel {
         let newIndex = max(0, selectionIndex - 1)
         select(at: newIndex)
     }
-    
+
 }

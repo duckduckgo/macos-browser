@@ -16,8 +16,8 @@
 //  limitations under the License.
 //
 
-import XCTest
 import BrowserServicesKit
+import XCTest
 @testable import DuckDuckGo_Privacy_Browser
 
 final class HistoryCoordinatingMock: HistoryCoordinating {
@@ -25,45 +25,45 @@ final class HistoryCoordinatingMock: HistoryCoordinating {
     var history: History?
 
     var addVisitCalled = false
-    func addVisit(of url: URL) {
+    func addVisit(of _: URL) {
         addVisitCalled = true
     }
 
     var updateTitleIfNeededCalled = false
-    func updateTitleIfNeeded(title: String, url: URL) {
+    func updateTitleIfNeeded(title _: String, url _: URL) {
         updateTitleIfNeededCalled = true
     }
 
     var addBlockedTrackerCalled = false
-    func addBlockedTracker(entityName: String, onURL url: URL) {
+    func addBlockedTracker(entityName _: String, onURL _: URL) {
         addBlockedTrackerCalled = true
     }
 
     var burnCalled = false
-    func burn(except fireproofDomains: FireproofDomains, completion: @escaping () -> Void) {
+    func burn(except _: FireproofDomains, completion: @escaping () -> Void) {
         burnCalled = true
         completion()
     }
 
     var burnDomainsCalled = false
-    func burnDomains(_ domains: Set<String>, completion: @escaping () -> Void) {
+    func burnDomains(_: Set<String>, completion: @escaping () -> Void) {
         burnDomainsCalled = true
         completion()
     }
 
     var markFailedToLoadUrlCalled = false
-    func markFailedToLoadUrl(_ url: URL) {
+    func markFailedToLoadUrl(_: URL) {
         markFailedToLoadUrlCalled = true
     }
 
     var titleForUrlCalled = false
-    func title(for url: URL) -> String? {
+    func title(for _: URL) -> String? {
         titleForUrlCalled = true
         return nil
     }
 
     var trackerFoundCalled = false
-    func trackerFound(onURL: URL) {
+    func trackerFound(onURL _: URL) {
         trackerFoundCalled = true
     }
 

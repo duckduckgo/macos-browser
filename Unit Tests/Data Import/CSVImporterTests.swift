@@ -31,9 +31,9 @@ class CSVImporterTests: XCTestCase {
 
     func testWhenImportingCSVFileWithHeader_ThenHeaderRowIsExcluded() {
         let csvFileContents = """
-        title,url,username,password
-        Some Title,duck.com,username,p4ssw0rd
-        """
+            title,url,username,password
+            Some Title,duck.com,username,p4ssw0rd
+            """
 
         let logins = CSVImporter.extractLogins(from: csvFileContents)
         XCTAssertEqual(logins, [ImportedLoginCredential(title: "Some Title", url: "duck.com", username: "username", password: "p4ssw0rd")])
@@ -41,9 +41,9 @@ class CSVImporterTests: XCTestCase {
 
     func testWhenImportingCSVFileWithHeader_ThenHeaderColumnPositionsAreRespected() {
         let csvFileContents = """
-        Password,Title,Username,Url
-        p4ssw0rd,"Some Title",username,duck.com
-        """
+            Password,Title,Username,Url
+            p4ssw0rd,"Some Title",username,duck.com
+            """
 
         let logins = CSVImporter.extractLogins(from: csvFileContents)
         XCTAssertEqual(logins, [ImportedLoginCredential(title: "Some Title", url: "duck.com", username: "username", password: "p4ssw0rd")])
@@ -51,8 +51,8 @@ class CSVImporterTests: XCTestCase {
 
     func testWhenImportingCSVFileWithoutHeader_ThenNoRowsAreExcluded() {
         let csvFileContents = """
-        Some Title,duck.com,username,p4ssw0rd
-        """
+            Some Title,duck.com,username,p4ssw0rd
+            """
 
         let logins = CSVImporter.extractLogins(from: csvFileContents)
         XCTAssertEqual(logins, [ImportedLoginCredential(title: "Some Title", url: "duck.com", username: "username", password: "p4ssw0rd")])
@@ -68,10 +68,12 @@ class CSVImporterTests: XCTestCase {
         csvImporter.importData(types: [.logins], from: nil) { result in
             switch result {
             case .success(let summary):
-                let expectedSummary = DataImport.Summary(bookmarksResult: nil,
-                                                         loginsResult: .completed(.init(successfulImports: ["username"],
-                                                                                        duplicateImports: [],
-                                                                                        failedImports: [])))
+                let expectedSummary = DataImport.Summary(
+                    bookmarksResult: nil,
+                    loginsResult: .completed(.init(
+                        successfulImports: ["username"],
+                        duplicateImports: [],
+                        failedImports: [])))
                 XCTAssertEqual(summary, expectedSummary)
                 XCTAssertEqual(mockLoginImporter.importedLogins, expectedSummary)
             case .failure(let error):
@@ -93,10 +95,12 @@ class CSVImporterTests: XCTestCase {
         csvImporter.importData(types: [.logins], from: nil) { result in
             switch result {
             case .success(let summary):
-                let expectedSummary = DataImport.Summary(bookmarksResult: nil,
-                                                         loginsResult: .completed(.init(successfulImports: ["username"],
-                                                                                        duplicateImports: [],
-                                                                                        failedImports: [])))
+                let expectedSummary = DataImport.Summary(
+                    bookmarksResult: nil,
+                    loginsResult: .completed(.init(
+                        successfulImports: ["username"],
+                        duplicateImports: [],
+                        failedImports: [])))
                 XCTAssertEqual(summary, expectedSummary)
                 XCTAssertEqual(mockLoginImporter.importedLogins, expectedSummary)
             case .failure(let error):

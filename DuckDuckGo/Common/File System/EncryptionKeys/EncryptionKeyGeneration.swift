@@ -16,8 +16,8 @@
 //  limitations under the License.
 //
 
-import Foundation
 import CryptoKit
+import Foundation
 
 protocol EncryptionKeyGenerating {
     func randomKey() -> SymmetricKey

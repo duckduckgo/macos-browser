@@ -26,7 +26,7 @@ class ChromiumBookmarksReaderTests: XCTestCase {
         let bookmarksReader = ChromiumBookmarksReader(chromiumDataDirectoryPath: resourcePath())
         let bookmarks = bookmarksReader.readBookmarks()
 
-        guard case let .success(bookmarks) = bookmarks else {
+        guard case .success(let bookmarks) = bookmarks else {
             XCTFail("Failed to decode bookmarks")
             return
         }

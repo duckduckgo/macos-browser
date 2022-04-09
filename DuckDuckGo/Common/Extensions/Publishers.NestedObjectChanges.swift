@@ -16,8 +16,8 @@
 //  limitations under the License.
 //
 
-import Foundation
 import Combine
+import Foundation
 
 extension Publisher where Output: Sequence, Output.Element: Hashable, Failure == Never {
 
@@ -34,10 +34,10 @@ extension Publisher where Output: Sequence, Output.Element: Hashable, Failure ==
 extension Publishers {
 
     struct NestedObjectChanges<NestedPublisher: Publisher, Upstream: Publisher>: Publisher
-    where Upstream.Output: Swift.Sequence,
-          Upstream.Output.Element: Hashable,
-          Upstream.Failure == Never,
-          NestedPublisher.Failure == Never {
+        where Upstream.Output: Swift.Sequence,
+        Upstream.Output.Element: Hashable,
+        Upstream.Failure == Never,
+        NestedPublisher.Failure == Never {
 
         typealias Output = Void
         typealias Failure = Never
@@ -78,12 +78,12 @@ extension Publishers.NestedObjectChanges {
             self.parent = parent
             self.subscriber = subscriber
 
-            self.cancellable = parent.upstream.sink { [weak self] value in
+            cancellable = parent.upstream.sink { [weak self] value in
                 self?.valueChanged(value)
             }
         }
 
-        func request(_ demand: Subscribers.Demand) {
+        func request(_: Subscribers.Demand) {
             // only notifying on change, not by-request
         }
 
@@ -99,22 +99,22 @@ extension Publishers.NestedObjectChanges {
             dispatchPrecondition(condition: .onQueue(.main))
 
             let set = Set(newValue)
-            let added = set.subtracting(self.current)
-            let removed = self.current.subtracting(set)
-            self.current = set
+            let added = set.subtracting(current)
+            let removed = current.subtracting(set)
+            current = set
 
             subscribe(to: added)
             removeSubscriptions(for: removed)
 
             // skip initial sink
-            if case .some = self.cancellable {
+            if case .some = cancellable {
                 _=subscriber.receive( () )
             }
         }
 
         private func subscribe(to added: Set<Element>) {
             for item in added {
-                self.nested[item] = parent.transform(item).sink { [weak self] _ in
+                nested[item] = parent.transform(item).sink { [weak self] _ in
                     dispatchPrecondition(condition: .onQueue(.main))
                     // skip initial sink
                     guard case .some = self?.nested[item] else { return }
@@ -126,7 +126,7 @@ extension Publishers.NestedObjectChanges {
 
         private func removeSubscriptions(for removed: Set<Element>) {
             for item in removed {
-                self.nested[item] = nil
+                nested[item] = nil
             }
         }
 

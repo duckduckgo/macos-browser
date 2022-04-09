@@ -16,8 +16,8 @@
 //  limitations under the License.
 //
 
-import XCTest
 import BrowserServicesKit
+import XCTest
 @testable import DuckDuckGo_Privacy_Browser
 
 final class PasswordManagementItemModelTests: XCTestCase {
@@ -29,19 +29,21 @@ final class PasswordManagementItemModelTests: XCTestCase {
 
     func testWhenCancelPressedThenOnCancelledCalled() {
         XCTAssertFalse(cancelled)
-        let model = PasswordManagementLoginModel(onDirtyChanged: onDirtyChanged,
-                                                onSaveRequested: onSaveRequested,
-                                                onDeleteRequested: onDeleteRequested,
-                                                onCancelled: onCancelled)
+        let model = PasswordManagementLoginModel(
+            onDirtyChanged: onDirtyChanged,
+            onSaveRequested: onSaveRequested,
+            onDeleteRequested: onDeleteRequested,
+            onCancelled: onCancelled)
         model.cancel()
         XCTAssertTrue(cancelled)
     }
 
     func testWhenCredentialsAreSavedThenSaveIsRequested() {
-        let model = PasswordManagementLoginModel(onDirtyChanged: onDirtyChanged,
-                                                onSaveRequested: onSaveRequested,
-                                                onDeleteRequested: onDeleteRequested,
-                                                onCancelled: onCancelled)
+        let model = PasswordManagementLoginModel(
+            onDirtyChanged: onDirtyChanged,
+            onSaveRequested: onSaveRequested,
+            onDeleteRequested: onDeleteRequested,
+            onCancelled: onCancelled)
 
         model.credentials = makeCredentials(id: 1)
         model.save()
@@ -51,10 +53,11 @@ final class PasswordManagementItemModelTests: XCTestCase {
     }
 
     func testWhenCredentialsAreDeletedThenDeleteIsRequested() {
-        let model = PasswordManagementLoginModel(onDirtyChanged: onDirtyChanged,
-                                                onSaveRequested: onSaveRequested,
-                                                onDeleteRequested: onDeleteRequested,
-                                                onCancelled: onCancelled)
+        let model = PasswordManagementLoginModel(
+            onDirtyChanged: onDirtyChanged,
+            onSaveRequested: onSaveRequested,
+            onDeleteRequested: onDeleteRequested,
+            onCancelled: onCancelled)
 
         model.credentials = makeCredentials(id: 1)
         model.requestDelete()
@@ -64,10 +67,11 @@ final class PasswordManagementItemModelTests: XCTestCase {
     }
 
     func testWhenCredentialsHasNoIdThenModelStateIsNew() {
-        let model = PasswordManagementLoginModel(onDirtyChanged: onDirtyChanged,
-                                                onSaveRequested: onSaveRequested,
-                                                onDeleteRequested: onDeleteRequested,
-                                                onCancelled: onCancelled)
+        let model = PasswordManagementLoginModel(
+            onDirtyChanged: onDirtyChanged,
+            onSaveRequested: onSaveRequested,
+            onDeleteRequested: onDeleteRequested,
+            onCancelled: onCancelled)
 
         model.createNew()
 
@@ -79,10 +83,11 @@ final class PasswordManagementItemModelTests: XCTestCase {
     }
 
     func testWhenModelIsEditedThenStateIsUpdated() {
-        let model = PasswordManagementLoginModel(onDirtyChanged: onDirtyChanged,
-                                                onSaveRequested: onSaveRequested,
-                                                onDeleteRequested: onDeleteRequested,
-                                                onCancelled: onCancelled)
+        let model = PasswordManagementLoginModel(
+            onDirtyChanged: onDirtyChanged,
+            onSaveRequested: onSaveRequested,
+            onDeleteRequested: onDeleteRequested,
+            onCancelled: onCancelled)
 
         model.credentials = makeCredentials(id: 1)
         XCTAssertEqual(model.domain, "domain")
@@ -130,13 +135,15 @@ final class PasswordManagementItemModelTests: XCTestCase {
     }
 
     func onCancelled() {
-        self.cancelled = true
+        cancelled = true
     }
 
-    func makeCredentials(id: Int64,
-                         username: String = "username",
-                         domain: String = "domain",
-                         password: String = "password") -> SecureVaultModels.WebsiteCredentials {
+    func makeCredentials(
+        id: Int64,
+        username: String = "username",
+        domain: String = "domain",
+        password: String = "password")
+        -> SecureVaultModels.WebsiteCredentials {
 
         let account = SecureVaultModels.WebsiteAccount(id: id, username: username, domain: domain)
         return SecureVaultModels.WebsiteCredentials(account: account, password: password.data(using: .utf8)!)

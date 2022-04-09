@@ -56,12 +56,13 @@ internal class SafariDataImporter: DataImporter {
     }
 
     func importableTypes() -> [DataImport.DataType] {
-        return [.bookmarks]
+        [.bookmarks]
     }
 
-    func importData(types: [DataImport.DataType],
-                    from profile: DataImport.BrowserProfile?,
-                    completion: @escaping (Result<DataImport.Summary, DataImportError>) -> Void) {
+    func importData(
+        types: [DataImport.DataType],
+        from _: DataImport.BrowserProfile?,
+        completion: @escaping (Result<DataImport.Summary, DataImportError>) -> Void) {
         var summary = DataImport.Summary()
 
         if types.contains(.bookmarks) {

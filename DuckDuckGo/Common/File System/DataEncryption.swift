@@ -16,15 +16,15 @@
 //  limitations under the License.
 //
 
-import Foundation
 import CryptoKit
+import Foundation
 
 enum DataEncryptionError: Error {
     case invalidData
     case decryptionFailed
 }
 
-final class DataEncryption {
+enum DataEncryption {
 
     static func encrypt(data: Data, key: SymmetricKey) throws -> Data {
         try ChaChaPoly.seal(data, using: key).combined

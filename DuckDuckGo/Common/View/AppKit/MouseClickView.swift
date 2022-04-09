@@ -28,9 +28,9 @@ protocol MouseClickViewDelegate: AnyObject {
 
 extension MouseClickViewDelegate {
 
-    func mouseClickView(_ mouseClickView: MouseClickView, mouseDownEvent: NSEvent) {}
-    func mouseClickView(_ mouseClickView: MouseClickView, rightMouseDownEvent: NSEvent) {}
-    func mouseClickView(_ mouseClickView: MouseClickView, otherMouseDownEvent: NSEvent) {}
+    func mouseClickView(_: MouseClickView, mouseDownEvent _: NSEvent) {}
+    func mouseClickView(_: MouseClickView, rightMouseDownEvent _: NSEvent) {}
+    func mouseClickView(_: MouseClickView, otherMouseDownEvent _: NSEvent) {}
 
 }
 
@@ -40,17 +40,19 @@ final class MouseClickView: NSView {
 
     private func repostMultiClickEventIfNeeded(_ event: NSEvent) -> Bool {
         // don't let more-than-doubleclicks get in
-        guard event.clickCount > 2,
-            let newEvent = NSEvent.mouseEvent(with: event.type,
-                                              location: event.locationInWindow,
-                                              modifierFlags: event.modifierFlags,
-                                              timestamp: event.timestamp,
-                                              windowNumber: event.windowNumber,
-                                              context: nil,
-                                              eventNumber: event.eventNumber,
-                                              clickCount: 1,
-                                              pressure: event.pressure),
-            let window = self.window
+        guard
+            event.clickCount > 2,
+            let newEvent = NSEvent.mouseEvent(
+                with: event.type,
+                location: event.locationInWindow,
+                modifierFlags: event.modifierFlags,
+                timestamp: event.timestamp,
+                windowNumber: event.windowNumber,
+                context: nil,
+                eventNumber: event.eventNumber,
+                clickCount: 1,
+                pressure: event.pressure),
+            let window = window
         else { return false }
 
         // break the growing clickCount event cycle by sending a new 1-click event to the window

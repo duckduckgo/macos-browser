@@ -16,9 +16,9 @@
 //  limitations under the License.
 //
 
+import Combine
 import Foundation
 import Lottie
-import Combine
 
 final class MouseOverAnimationButton: AddressBarButton {
 
@@ -80,9 +80,10 @@ final class MouseOverAnimationButton: AddressBarButton {
     private var animationViewCache: AnimationViews?
 
     private func loadAnimationViews() {
-        guard let animationNames = animationNames,
-              let aquaAnimationView = AnimationView(named: animationNames.aqua),
-              let darkAnimationView = AnimationView(named: animationNames.dark) else {
+        guard
+            let animationNames = animationNames,
+            let aquaAnimationView = AnimationView(named: animationNames.aqua),
+            let darkAnimationView = AnimationView(named: animationNames.dark) else {
             assertionFailure("Missing animation names or animation files in the bundle")
             return
         }
@@ -126,7 +127,7 @@ final class MouseOverAnimationButton: AddressBarButton {
 
     override var image: NSImage? {
         get {
-            return super.image
+            super.image
         }
 
         set {

@@ -16,10 +16,10 @@
 //  limitations under the License.
 //
 
+import BrowserServicesKit
 import Cocoa
 import os.log
 import WebKit
-import BrowserServicesKit
 
 protocol OptionsButtonMenuDelegate: AnyObject {
 
@@ -37,7 +37,7 @@ final class MoreOptionsMenu: NSMenu {
     private let tabCollectionViewModel: TabCollectionViewModel
     private let emailManager: EmailManager
 
-    required init(coder: NSCoder) {
+    required init(coder _: NSCoder) {
         fatalError("MoreOptionsMenu: Bad initializer")
     }
 
@@ -88,15 +88,18 @@ final class MoreOptionsMenu: NSMenu {
         addItem(preferencesItem)
     }
 
-    @objc func newTab(_ sender: NSMenuItem) {
+    @objc
+    func newTab(_: NSMenuItem) {
         tabCollectionViewModel.appendNewTab()
     }
 
-    @objc func newWindow(_ sender: NSMenuItem) {
+    @objc
+    func newWindow(_: NSMenuItem) {
         WindowsManager.openNewWindow()
     }
 
-    @objc func toggleFireproofing(_ sender: NSMenuItem) {
+    @objc
+    func toggleFireproofing(_: NSMenuItem) {
         guard let selectedTabViewModel = tabCollectionViewModel.selectedTabViewModel else {
             os_log("MainViewController: No tab view model selected", type: .error)
             return
@@ -105,39 +108,48 @@ final class MoreOptionsMenu: NSMenu {
         selectedTabViewModel.tab.requestFireproofToggle()
     }
 
-    @objc func openBookmarks(_ sender: NSMenuItem) {
+    @objc
+    func openBookmarks(_: NSMenuItem) {
         actionDelegate?.optionsButtonMenuRequestedBookmarkPopover(self)
     }
 
-    @objc func openDownloads(_ sender: NSMenuItem) {
+    @objc
+    func openDownloads(_: NSMenuItem) {
         actionDelegate?.optionsButtonMenuRequestedDownloadsPopover(self)
     }
 
-    @objc func openAutofillWithAllItems(_ sender: NSMenuItem) {
+    @objc
+    func openAutofillWithAllItems(_: NSMenuItem) {
         actionDelegate?.optionsButtonMenuRequestedLoginsPopover(self, selectedCategory: .allItems)
     }
 
-    @objc func openAutofillWithLogins(_ sender: NSMenuItem) {
+    @objc
+    func openAutofillWithLogins(_: NSMenuItem) {
         actionDelegate?.optionsButtonMenuRequestedLoginsPopover(self, selectedCategory: .logins)
     }
 
-    @objc func openAutofillWithIdentities(_ sender: NSMenuItem) {
+    @objc
+    func openAutofillWithIdentities(_: NSMenuItem) {
         actionDelegate?.optionsButtonMenuRequestedLoginsPopover(self, selectedCategory: .identities)
     }
 
-    @objc func openAutofillWithCreditCards(_ sender: NSMenuItem) {
+    @objc
+    func openAutofillWithCreditCards(_: NSMenuItem) {
         actionDelegate?.optionsButtonMenuRequestedLoginsPopover(self, selectedCategory: .cards)
     }
 
-    @objc func openPreferences(_ sender: NSMenuItem) {
+    @objc
+    func openPreferences(_: NSMenuItem) {
         WindowControllersManager.shared.showPreferencesTab()
     }
 
-    @objc func findInPage(_ sender: NSMenuItem) {
+    @objc
+    func findInPage(_: NSMenuItem) {
         tabCollectionViewModel.selectedTabViewModel?.findInPage.show()
     }
 
-    @objc func doPrint(_ sender: NSMenuItem) {
+    @objc
+    func doPrint(_: NSMenuItem) {
         actionDelegate?.optionsButtonMenuRequestedPrint(self)
     }
 
@@ -146,7 +158,7 @@ final class MoreOptionsMenu: NSMenu {
             super.performActionForItem(at: index)
         }
 
-        guard let item = self.item(at: index) else {
+        guard let item = item(at: index) else {
             assertionFailure("MainViewController: No Menu Item at index \(index)")
             return
         }
@@ -248,17 +260,19 @@ final class EmailOptionsButtonSubMenu: NSMenu {
 
         updateMenuItems()
 
-        NotificationCenter.default.addObserver(self,
-                                               selector: #selector(emailDidSignInNotification(_:)),
-                                               name: .emailDidSignIn,
-                                               object: nil)
-        NotificationCenter.default.addObserver(self,
-                                               selector: #selector(emailDidSignOutNotification(_:)),
-                                               name: .emailDidSignOut,
-                                               object: nil)
+        NotificationCenter.default.addObserver(
+            self,
+            selector: #selector(emailDidSignInNotification(_:)),
+            name: .emailDidSignIn,
+            object: nil)
+        NotificationCenter.default.addObserver(
+            self,
+            selector: #selector(emailDidSignOutNotification(_:)),
+            name: .emailDidSignOut,
+            object: nil)
     }
 
-    required init(coder: NSCoder) {
+    required init(coder _: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
 
@@ -281,7 +295,8 @@ final class EmailOptionsButtonSubMenu: NSMenu {
         }
     }
 
-    @objc func createAddressAction(_ sender: NSMenuItem) {
+    @objc
+    func createAddressAction(_: NSMenuItem) {
         assert(emailManager.requestDelegate != nil, "No requestDelegate on emailManager")
 
         emailManager.getAliasIfNeededAndConsume { [weak self] alias, error in
@@ -296,22 +311,26 @@ final class EmailOptionsButtonSubMenu: NSMenu {
         Pixel.fire(.moreMenu(result: .emailProtectionCreateAddress))
     }
 
-    @objc func turnOffEmailAction(_ sender: NSMenuItem) {
+    @objc
+    func turnOffEmailAction(_: NSMenuItem) {
         emailManager.signOut()
         Pixel.fire(.moreMenu(result: .emailProtectionOff))
     }
 
-    @objc func turnOnEmailAction(_ sender: NSMenuItem) {
+    @objc
+    func turnOnEmailAction(_: NSMenuItem) {
         let tab = Tab(content: .url(EmailUrls().emailLandingPage))
         tabCollectionViewModel.append(tab: tab)
         Pixel.fire(.moreMenu(result: .emailProtection))
     }
 
-    @objc func emailDidSignInNotification(_ notification: Notification) {
+    @objc
+    func emailDidSignInNotification(_: Notification) {
         updateMenuItems()
     }
 
-    @objc func emailDidSignOutNotification(_ notification: Notification) {
+    @objc
+    func emailDidSignOutNotification(_: Notification) {
         updateMenuItems()
     }
 }
@@ -324,11 +343,11 @@ final class ZoomSubMenu: NSMenu {
         updateMenuItems(with: tabCollectionViewModel)
     }
 
-    required init(coder: NSCoder) {
+    required init(coder _: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
 
-    private func updateMenuItems(with tabCollectionViewModel: TabCollectionViewModel) {
+    private func updateMenuItems(with _: TabCollectionViewModel) {
         removeAllItems()
 
         let fullScreenItem = (NSApplication.shared.mainMenuTyped.toggleFullscreenMenuItem?.copy() as? NSMenuItem)!
@@ -355,7 +374,7 @@ final class LoginsSubMenu: NSMenu {
         updateMenuItems(with: target)
     }
 
-    required init(coder: NSCoder) {
+    required init(coder _: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
 

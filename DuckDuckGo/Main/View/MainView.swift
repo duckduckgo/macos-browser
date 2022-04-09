@@ -19,10 +19,11 @@
 import Cocoa
 
 final class MainView: NSView {
-    private typealias CFWebServicesCopyProviderInfoType = @convention(c) (CFString, UnsafeRawPointer?) -> NSDictionary?
+    private typealias CFWebServicesCopyProviderInfoType = @convention(c)
+        (CFString, UnsafeRawPointer?) -> NSDictionary?
 
     // PDF Plugin context menu
-    override func willOpenMenu(_ menu: NSMenu, with event: NSEvent) {
+    override func willOpenMenu(_ menu: NSMenu, with _: NSEvent) {
         setupSearchContextMenuItem(menu: menu)
     }
 
@@ -31,10 +32,11 @@ final class MainView: NSView {
         PDFSearchTextMenuItemHandler.swizzleInvokeWithPasteboardOnce()
 
         // Get system default Search Engine name
-        guard let CFWebServicesCopyProviderInfo: CFWebServicesCopyProviderInfoType? = dynamicSymbol(named: "_CFWebServicesCopyProviderInfo"),
-              let info = CFWebServicesCopyProviderInfo?("NSWebServicesProviderWebSearch" as CFString, nil),
-              let providerDisplayName = info["NSDefaultDisplayName"] as? String,
-              providerDisplayName != "DuckDuckGo"
+        guard
+            let CFWebServicesCopyProviderInfo: CFWebServicesCopyProviderInfoType? = dynamicSymbol(named: "_CFWebServicesCopyProviderInfo"),
+            let info = CFWebServicesCopyProviderInfo?("NSWebServicesProviderWebSearch" as CFString, nil),
+            let providerDisplayName = info["NSDefaultDisplayName"] as? String,
+            providerDisplayName != "DuckDuckGo"
         else { return }
 
         // Find the "Search with %@" item and replace %@ with DuckDuckGo

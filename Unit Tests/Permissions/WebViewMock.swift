@@ -20,28 +20,32 @@ import Foundation
 import WebKit
 @testable import DuckDuckGo_Privacy_Browser
 
-@objc protocol WebViewPermissionsDelegate: WKUIDelegate {
+@objc
+protocol WebViewPermissionsDelegate: WKUIDelegate {
     @objc(_webView:checkUserMediaPermissionForURL:mainFrameURL:frameIdentifier:decisionHandler:)
-    func webView(_ webView: WKWebView,
-                 checkUserMediaPermissionFor url: URL,
-                 mainFrameURL: URL,
-                 frameIdentifier frame: UInt,
-                 decisionHandler: @escaping (String, Bool) -> Void)
+    func webView(
+        _ webView: WKWebView,
+        checkUserMediaPermissionFor url: URL,
+        mainFrameURL: URL,
+        frameIdentifier frame: UInt,
+        decisionHandler: @escaping (String, Bool) -> Void)
 
     @objc(webView:requestMediaCapturePermissionForOrigin:initiatedByFrame:type:decisionHandler:)
     @available(macOS 12.0, *)
-    optional func webView(_ webView: WKWebView,
-                          requestMediaCapturePermissionFor origin: WKSecurityOrigin,
-                          initiatedByFrame frame: WKFrameInfo,
-                          type: WKMediaCaptureType,
-                          decisionHandler: @escaping (WKPermissionDecision) -> Void)
+    optional func webView(
+        _ webView: WKWebView,
+        requestMediaCapturePermissionFor origin: WKSecurityOrigin,
+        initiatedByFrame frame: WKFrameInfo,
+        type: WKMediaCaptureType,
+        decisionHandler: @escaping (WKPermissionDecision) -> Void)
 
     @objc(_webView:requestUserMediaAuthorizationForDevices:url:mainFrameURL:decisionHandler:)
-    func webView(_ webView: WKWebView,
-                 requestUserMediaAuthorizationFor devices: _WKCaptureDevices,
-                 url: URL,
-                 mainFrameURL: URL,
-                 decisionHandler: @escaping (Bool) -> Void)
+    func webView(
+        _ webView: WKWebView,
+        requestUserMediaAuthorizationFor devices: _WKCaptureDevices,
+        url: URL,
+        mainFrameURL: URL,
+        decisionHandler: @escaping (Bool) -> Void)
 
     @objc(_webView:mediaCaptureStateDidChange:)
     func webView(_ webView: WKWebView, mediaCaptureStateDidChange state: _WKMediaCaptureStateDeprecated)
@@ -51,10 +55,11 @@ import WebKit
 
     @objc(_webView:requestGeolocationPermissionForOrigin:initiatedByFrame:decisionHandler:)
     @available(macOS 12, *)
-    func webView(_ webView: WKWebView,
-                 requestGeolocationPermissionFor origin: WKSecurityOrigin,
-                 initiatedBy frame: WKFrameInfo,
-                 decisionHandler: @escaping (WKPermissionDecision) -> Void)
+    func webView(
+        _ webView: WKWebView,
+        requestGeolocationPermissionFor origin: WKSecurityOrigin,
+        initiatedBy frame: WKFrameInfo,
+        decisionHandler: @escaping (WKPermissionDecision) -> Void)
 
 }
 
@@ -65,7 +70,7 @@ final class WebViewMock: WKWebView {
         urlValue
     }
 
-    private var microphoneStateValue: Int = 0
+    private var microphoneStateValue = 0
     @available(macOS 12.0, *)
     override var microphoneCaptureState: WKMediaCaptureState {
         get {
@@ -78,7 +83,7 @@ final class WebViewMock: WKWebView {
         }
     }
 
-    private var cameraStateValue: Int = 0
+    private var cameraStateValue = 0
     @available(macOS 12.0, *)
     override var cameraCaptureState: WKMediaCaptureState {
         get {
@@ -97,6 +102,7 @@ final class WebViewMock: WKWebView {
                 .webView(self, mediaCaptureStateDidChange: mediaCaptureState)
         }
     }
+
     override var _mediaCaptureState: _WKMediaCaptureStateDeprecated {
         mediaCaptureState
     }
@@ -120,7 +126,7 @@ final class WebViewMock: WKWebView {
 
     var setCameraCaptureStateHandler: ((Bool?) -> Void)?
     @available(macOS 12.0, *)
-    override func setCameraCaptureState(_ state: WKMediaCaptureState, completionHandler: (() -> Void)?) {
+    override func setCameraCaptureState(_ state: WKMediaCaptureState, completionHandler _: (() -> Void)?) {
         cameraCaptureState = state
         switch state {
         case .none: setCameraCaptureStateHandler?(.none)
@@ -132,7 +138,7 @@ final class WebViewMock: WKWebView {
 
     var setMicCaptureStateHandler: ((Bool?) -> Void)?
     @available(macOS 12.0, *)
-    override func setMicrophoneCaptureState(_ state: WKMediaCaptureState, completionHandler: (() -> Void)?) {
+    override func setMicrophoneCaptureState(_ state: WKMediaCaptureState, completionHandler _: (() -> Void)?) {
         microphoneCaptureState = state
         switch state {
         case .none: setMicCaptureStateHandler?(.none)
@@ -144,7 +150,8 @@ final class WebViewMock: WKWebView {
 
 }
 
-@objc final class WKSecurityOriginMock: WKSecurityOrigin {
+@objc
+final class WKSecurityOriginMock: WKSecurityOrigin {
     var _protocol: String! // swiftlint:disable:this identifier_name
     override var `protocol`: String { _protocol }
     var _host: String! // swiftlint:disable:this identifier_name
@@ -153,13 +160,13 @@ final class WebViewMock: WKWebView {
     override var port: Int { _port }
 
     internal func setURL(_ url: URL) {
-        self._protocol = url.scheme!
-        self._host = url.host!
-        self._port = url.port ?? (url.scheme == "https" ? 443 : 80)
+        _protocol = url.scheme!
+        _host = url.host!
+        _port = url.port ?? (url.scheme == "https" ? 443 : 80)
     }
 
     class func new(url: URL) -> WKSecurityOriginMock {
-        let mock = (self.perform(NSSelectorFromString("alloc")).takeUnretainedValue() as? WKSecurityOriginMock)!
+        let mock = (perform(NSSelectorFromString("alloc")).takeUnretainedValue() as? WKSecurityOriginMock)!
         mock.setURL(url)
         return mock
     }
@@ -177,10 +184,10 @@ final class WKFrameInfoMock: WKFrameInfo {
     override var webView: WKWebView? { _webView }
 
     init(webView: WKWebView, securityOrigin: WKSecurityOrigin, request: URLRequest, isMainFrame: Bool) {
-        self._webView = webView
-        self._securityOrigin = securityOrigin
-        self._request = request
-        self._isMainFrame = isMainFrame
+        _webView = webView
+        _securityOrigin = securityOrigin
+        _request = request
+        _isMainFrame = isMainFrame
     }
 
 }

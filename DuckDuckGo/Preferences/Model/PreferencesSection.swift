@@ -26,12 +26,10 @@ struct PreferencesSection: Hashable, Identifiable {
     static let defaultSections: [PreferencesSection] = [
         .init(
             id: .regularPreferencePanes,
-            panes: [.defaultBrowser, .appearance, .privacy, .autofill, .downloads]
-        ),
+            panes: [.defaultBrowser, .appearance, .privacy, .autofill, .downloads]),
         .init(
             id: .about,
-            panes: [.about]
-        )
+            panes: [.about])
     ]
 }
 

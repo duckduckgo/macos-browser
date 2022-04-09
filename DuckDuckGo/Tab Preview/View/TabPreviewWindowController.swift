@@ -40,16 +40,18 @@ final class TabPreviewWindowController: NSWindowController {
     var tabPreviewViewController: TabPreviewViewController {
         contentViewController as! TabPreviewViewController
     }
+
     // swiftlint:enable force_cast
 
     override func windowDidLoad() {
         super.windowDidLoad()
-    
+
         window?.animationBehavior = .utilityWindow
-        NotificationCenter.default.addObserver(self,
-                                               selector: #selector(suggestionWindowOpenNotification(_:)),
-                                               name: .suggestionWindowOpen,
-                                               object: nil)
+        NotificationCenter.default.addObserver(
+            self,
+            selector: #selector(suggestionWindowOpenNotification(_:)),
+            name: .suggestionWindowOpen,
+            object: nil)
     }
 
     deinit {
@@ -59,8 +61,9 @@ final class TabPreviewWindowController: NSWindowController {
     func scheduleShowing(parentWindow: NSWindow, timerInterval: TimerInterval, topLeftPoint: NSPoint) {
         if isHiding { return }
 
-        guard let childWindows = parentWindow.childWindows,
-              let tabPreviewWindow = self.window else {
+        guard
+            let childWindows = parentWindow.childWindows,
+            let tabPreviewWindow = window else {
             os_log("TabPreviewWindowController: Showing tab preview window failed", type: .error)
             return
         }
@@ -108,7 +111,7 @@ final class TabPreviewWindowController: NSWindowController {
 
         isHiding = true
         parentWindow.removeChildWindow(window)
-        (window).orderOut(nil)
+        window.orderOut(nil)
         DispatchQueue.main.asyncAfter(deadline: .now() + 1/4) { [weak self] in
             if self?.isHiding ?? false { self?.isHiding = false }
         }
@@ -128,7 +131,8 @@ final class TabPreviewWindowController: NSWindowController {
 
 extension TabPreviewWindowController {
 
-    @objc func suggestionWindowOpenNotification(_ notification: Notification) {
+    @objc
+    func suggestionWindowOpenNotification(_: Notification) {
         hide()
     }
 

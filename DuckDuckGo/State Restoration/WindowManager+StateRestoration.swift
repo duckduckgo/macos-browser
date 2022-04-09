@@ -22,20 +22,22 @@ import os.log
 extension WindowsManager {
 
     class func restoreState(from coder: NSCoder) throws {
-        guard let state = coder.decodeObject(of: WindowManagerStateRestoration.self,
-                                             forKey: NSKeyedArchiveRootObjectKey) else {
+        guard
+            let state = coder.decodeObject(
+                of: WindowManagerStateRestoration.self,
+                forKey: NSKeyedArchiveRootObjectKey) else {
             throw coder.error ?? NSError(domain: "WindowsManagerStateRestoration", code: -1, userInfo: nil)
         }
 
-        self.restoreWindows(from: state)
+        restoreWindows(from: state)
     }
 
     private class func restoreWindows(from state: WindowManagerStateRestoration) {
-        let isOriginalKeyWindowPresent = Self.windows.contains(where: {$0.isKeyWindow})
+        let isOriginalKeyWindowPresent = Self.windows.contains(where: { $0.isKeyWindow })
 
         var newKeyWindow: NSWindow?
         for (idx, item) in state.windows.enumerated() {
-            guard let window = self.openNewWindow(with: item.model, showWindow: false) else { continue }
+            guard let window = openNewWindow(with: item.model, showWindow: false) else { continue }
             window.setContentSize(item.frame.size)
             window.setFrameOrigin(item.frame.origin)
 
@@ -57,8 +59,9 @@ extension WindowsManager {
 extension WindowControllersManager {
 
     func encodeState(with coder: NSCoder) {
-        coder.encode(WindowManagerStateRestoration(windowControllersManager: self),
-                     forKey: NSKeyedArchiveRootObjectKey)
+        coder.encode(
+            WindowManagerStateRestoration(windowControllersManager: self),
+            forKey: NSKeyedArchiveRootObjectKey)
     }
 
 }
@@ -76,14 +79,18 @@ final class WindowManagerStateRestoration: NSObject, NSSecureCoding {
     let keyWindowIndex: Int?
 
     init?(coder: NSCoder) {
-        guard let restorationArray = coder.decodeObject(of: [NSArray.self, WindowRestorationItem.self],
-                                             forKey: NSSecureCodingKeys.controllers) as? [WindowRestorationItem] else {
-            os_log("WindowsManager:initWithCoder: could not decode Restoration Array: %s", type: .error,
-                   String(describing: coder.error))
+        guard
+            let restorationArray = coder.decodeObject(
+                of: [NSArray.self, WindowRestorationItem.self],
+                forKey: NSSecureCodingKeys.controllers) as? [WindowRestorationItem] else {
+            os_log(
+                "WindowsManager:initWithCoder: could not decode Restoration Array: %s",
+                type: .error,
+                String(describing: coder.error))
             return nil
         }
-        self.windows = restorationArray
-        self.keyWindowIndex = coder.containsValue(forKey: NSSecureCodingKeys.keyWindowIndex)
+        windows = restorationArray
+        keyWindowIndex = coder.containsValue(forKey: NSSecureCodingKeys.keyWindowIndex)
             ? coder.decodeInteger(forKey: NSSecureCodingKeys.keyWindowIndex)
             : nil
 
@@ -91,10 +98,10 @@ final class WindowManagerStateRestoration: NSObject, NSSecureCoding {
     }
 
     init(windowControllersManager: WindowControllersManager) {
-        self.windows = windowControllersManager.mainWindowControllers
+        windows = windowControllersManager.mainWindowControllers
             .filter { $0.window?.isPopUpWindow == false }
             .map(WindowRestorationItem.init(windowController:))
-        self.keyWindowIndex = windowControllersManager.lastKeyMainWindowController.flatMap {
+        keyWindowIndex = windowControllersManager.lastKeyMainWindowController.flatMap {
             windowControllersManager.mainWindowControllers.firstIndex(of: $0)
         }
     }
@@ -117,8 +124,8 @@ final class WindowRestorationItem: NSObject, NSSecureCoding {
     let frame: NSRect
 
     init(windowController: MainWindowController) {
-        self.frame = windowController.window!.frame
-        self.model = windowController.mainViewController.tabCollectionViewModel
+        frame = windowController.window!.frame
+        model = windowController.mainViewController.tabCollectionViewModel
     }
 
     static var supportsSecureCoding: Bool { true }
@@ -129,7 +136,7 @@ final class WindowRestorationItem: NSObject, NSSecureCoding {
             return nil
         }
         self.model = model
-        self.frame = coder.decodeRect(forKey: NSSecureCodingKeys.frame)
+        frame = coder.decodeRect(forKey: NSSecureCodingKeys.frame)
     }
 
     func encode(with coder: NSCoder) {

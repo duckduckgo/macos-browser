@@ -16,18 +16,18 @@
 //  limitations under the License.
 //
 
+import BrowserServicesKit
 import Cocoa
 import WebKit
-import BrowserServicesKit
 
 public final class ContentOverlayPopover {
-    
+
     public var zoomFactor: CGFloat?
     public weak var currentTabView: NSView?
 
     public var viewController: ContentOverlayViewController
     public var windowController: NSWindowController
-    
+
     public init(currentTabView: NSView) {
         let storyboard = NSStoryboard(name: "ContentOverlay", bundle: Bundle.main)
         viewController = storyboard.instantiateController(identifier: "ContentOverlayViewController")
@@ -36,13 +36,13 @@ public final class ContentOverlayPopover {
         windowController.window?.hasShadow = true
         windowController.window?.acceptsMouseMovedEvents = true
         windowController.window?.ignoresMouseEvents = false
-        
+
         viewController.view.wantsLayer = true
         if let layer = viewController.view.layer {
             layer.masksToBounds = true
             layer.cornerRadius = 6
             layer.borderWidth = 0.5
-            layer.borderColor = CGColor.init(gray: 0, alpha: 0.3) // Looks a little lighter than 0.2 in the CSS
+            layer.borderColor = CGColor(gray: 0, alpha: 0.3) // Looks a little lighter than 0.2 in the CSS
         }
         viewController.view.window?.backgroundColor = .clear
         viewController.view.window?.acceptsMouseMovedEvents = true
@@ -50,14 +50,14 @@ public final class ContentOverlayPopover {
         self.currentTabView = currentTabView
     }
 
-    public required init?(coder: NSCoder) {
+    public required init?(coder _: NSCoder) {
         fatalError("ContentOverlayPopover: Bad initializer")
     }
 }
 
 // MARK: - WebsiteAutofillUserScriptDelegate
 extension ContentOverlayPopover: ContentOverlayUserScriptDelegate {
-    public func websiteAutofillUserScriptCloseOverlay(_ websiteAutofillUserScript: WebsiteAutofillUserScript?) {
+    public func websiteAutofillUserScriptCloseOverlay(_: WebsiteAutofillUserScript?) {
         guard let windowController = windowController.window else {
             return
         }
@@ -68,10 +68,11 @@ extension ContentOverlayPopover: ContentOverlayUserScriptDelegate {
         windowController.orderOut(nil)
     }
 
-    public func websiteAutofillUserScript(_ websiteAutofillUserScript: WebsiteAutofillUserScript,
-                                          willDisplayOverlayAtClick: NSPoint,
-                                          serializedInputContext: String,
-                                          inputPosition: CGRect) {
+    public func websiteAutofillUserScript(
+        _ websiteAutofillUserScript: WebsiteAutofillUserScript,
+        willDisplayOverlayAtClick: NSPoint,
+        serializedInputContext: String,
+        inputPosition: CGRect) {
         // Combines native click with offset of JS click.
         let y = (willDisplayOverlayAtClick.y - (inputPosition.height - inputPosition.minY))
         let x = (willDisplayOverlayAtClick.x - inputPosition.minX)

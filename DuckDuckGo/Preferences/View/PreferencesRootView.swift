@@ -18,11 +18,11 @@
 
 import SwiftUI
 
-fileprivate extension Preferences.Const {
-    static let sidebarWidth: CGFloat = 256
-    static let paneContentWidth: CGFloat = 512
-    static let panePaddingHorizontal: CGFloat = 48
-    static let panePaddingVertical: CGFloat = 40
+extension Preferences.Const {
+    fileprivate static let sidebarWidth: CGFloat = 256
+    fileprivate static let paneContentWidth: CGFloat = 512
+    fileprivate static let panePaddingHorizontal: CGFloat = 48
+    fileprivate static let panePaddingVertical: CGFloat = 40
 }
 
 extension Preferences {

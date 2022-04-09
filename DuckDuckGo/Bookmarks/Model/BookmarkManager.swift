@@ -17,8 +17,8 @@
 //
 
 import Cocoa
-import os.log
 import Combine
+import os.log
 
 protocol BookmarkManager: AnyObject {
 
@@ -26,13 +26,16 @@ protocol BookmarkManager: AnyObject {
     func isUrlFavorited(url: URL) -> Bool
     func isHostInBookmarks(host: String) -> Bool
     func getBookmark(for url: URL) -> Bookmark?
-    @discardableResult func makeBookmark(for url: URL, title: String, isFavorite: Bool) -> Bookmark?
-    @discardableResult func makeFolder(for title: String, parent: BookmarkFolder?) -> BookmarkFolder
+    @discardableResult
+    func makeBookmark(for url: URL, title: String, isFavorite: Bool) -> Bookmark?
+    @discardableResult
+    func makeFolder(for title: String, parent: BookmarkFolder?) -> BookmarkFolder
     func remove(bookmark: Bookmark)
     func remove(folder: BookmarkFolder)
     func update(bookmark: Bookmark)
     func update(folder: BookmarkFolder)
-    @discardableResult func updateUrl(of bookmark: Bookmark, to newUrl: URL) -> Bookmark?
+    @discardableResult
+    func updateUrl(of bookmark: Bookmark, to newUrl: URL) -> Bookmark?
     func add(objectsWithUUIDs uuids: [UUID], to parent: BookmarkFolder?, completion: @escaping (Error?) -> Void)
     func update(objectsWithUUIDs uuids: [UUID], update: @escaping (BaseBookmarkEntity) -> Void, completion: @escaping (Error?) -> Void)
     func importBookmarks(_ bookmarks: ImportedBookmarks, source: BookmarkImportSource) -> BookmarkImportResult
@@ -63,13 +66,13 @@ final class LocalBookmarkManager: BookmarkManager {
     // MARK: - Bookmarks
 
     func loadBookmarks() {
-        bookmarkStore.loadAll(type: .topLevelEntities) { [weak self] (topLevelEntities, error) in
+        bookmarkStore.loadAll(type: .topLevelEntities) { [weak self] topLevelEntities, error in
             guard error == nil, let topLevelEntities = topLevelEntities else {
                 os_log("LocalBookmarkManager: Failed to fetch entities.", type: .error)
                 return
             }
 
-            self?.bookmarkStore.loadAll(type: .bookmarks) { [weak self] (bookmarks, error) in
+            self?.bookmarkStore.loadAll(type: .bookmarks) { [weak self] bookmarks, error in
                 guard error == nil, let bookmarks = bookmarks else {
                     os_log("LocalBookmarkManager: Failed to fetch bookmarks.", type: .error)
                     return
@@ -81,24 +84,25 @@ final class LocalBookmarkManager: BookmarkManager {
     }
 
     func isUrlBookmarked(url: URL) -> Bool {
-        return list?[url] != nil
+        list?[url] != nil
     }
 
     func isUrlFavorited(url: URL) -> Bool {
-        return list?[url]?.isFavorite == true
+        list?[url]?.isFavorite == true
     }
 
     func isHostInBookmarks(host: String) -> Bool {
-        return list?.allBookmarkURLsOrdered.contains(where: { url in
+        list?.allBookmarkURLsOrdered.contains(where: { url in
             url.host == host
         }) ?? false
     }
 
     func getBookmark(for url: URL) -> Bookmark? {
-        return list?[url]
+        list?[url]
     }
 
-    @discardableResult func makeBookmark(for url: URL, title: String, isFavorite: Bool) -> Bookmark? {
+    @discardableResult
+    func makeBookmark(for url: URL, title: String, isFavorite: Bool) -> Bookmark? {
         guard list != nil else { return nil }
 
         guard !isUrlBookmarked(url: url) else {
@@ -110,7 +114,7 @@ final class LocalBookmarkManager: BookmarkManager {
         let bookmark = Bookmark(id: id, url: url, title: title, isFavorite: isFavorite)
 
         list?.insert(bookmark)
-        bookmarkStore.save(bookmark: bookmark, parent: nil) { [weak self] success, _  in
+        bookmarkStore.save(bookmark: bookmark, parent: nil) { [weak self] success, _ in
             guard success else {
                 self?.list?.remove(bookmark)
                 return
@@ -179,10 +183,11 @@ final class LocalBookmarkManager: BookmarkManager {
 
     // MARK: - Folders
 
-    @discardableResult func makeFolder(for title: String, parent: BookmarkFolder?) -> BookmarkFolder {
+    @discardableResult
+    func makeFolder(for title: String, parent: BookmarkFolder?) -> BookmarkFolder {
         let folder = BookmarkFolder(id: UUID(), title: title, parentFolderUUID: parent?.id, children: [])
 
-        bookmarkStore.save(folder: folder, parent: parent) { [weak self] success, _  in
+        bookmarkStore.save(folder: folder, parent: parent) { [weak self] success, _ in
             guard success else {
                 return
             }
@@ -221,7 +226,7 @@ final class LocalBookmarkManager: BookmarkManager {
 
     func importBookmarks(_ bookmarks: ImportedBookmarks, source: BookmarkImportSource) -> BookmarkImportResult {
         let results = bookmarkStore.importBookmarks(bookmarks, source: source)
-        self.loadBookmarks()
+        loadBookmarks()
 
         return results
     }

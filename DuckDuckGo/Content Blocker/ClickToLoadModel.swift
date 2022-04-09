@@ -30,8 +30,7 @@ struct ClickToLoadModel {
 
         let imgURL = Bundle.main.url(
             forResource: filePath,
-            withExtension: fileExt
-        )
+            withExtension: fileExt)
         if imgURL == nil {
             return nil
         }
@@ -39,9 +38,9 @@ struct ClickToLoadModel {
         let image = "data:image/" + (fileExt == "svg" ? "svg+xml" : fileExt) + ";base64," + base64String
         return image
     }
-    
+
     static let getImage: [String: String] = {
-        return [
+        [
             "dax.png": Self.loadFile(name: "dax.png")!,
             "loading_light.svg": Self.loadFile(name: "loading_light.svg")!,
             "loading_dark.svg": Self.loadFile(name: "loading_dark.svg")!,

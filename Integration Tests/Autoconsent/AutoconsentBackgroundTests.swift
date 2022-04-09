@@ -25,7 +25,7 @@ class AutoconsentBackgroundTests: XCTestCase {
     @MainActor
     func testStartupPerformance() {
         // This is an example of a performance test case.
-        self.measure {
+        measure {
             // Put the code you want to measure the time of here.
             let expectation = XCTestExpectation(description: "Startup")
             let bg = AutoconsentBackground()
@@ -55,14 +55,15 @@ class AutoconsentBackgroundTests: XCTestCase {
         }
         wait(for: [expectation], timeout: 2)
     }
-    
+
     func testUserscriptIntegration() {
         // enable the feature
         let prefs = PrivacySecurityPreferences.shared
         prefs.autoconsentEnabled = true
         // setup a webview with autoconsent userscript installed
-        let autoconsentUserScript = AutoconsentUserScript(scriptSource: DefaultScriptSourceProvider(),
-                                                          config: ContentBlocking.shared.privacyConfigurationManager.privacyConfig)
+        let autoconsentUserScript = AutoconsentUserScript(
+            scriptSource: DefaultScriptSourceProvider(),
+            config: ContentBlocking.shared.privacyConfigurationManager.privacyConfig)
         let configuration = WKWebViewConfiguration()
 
         configuration.userContentController.addUserScript(autoconsentUserScript.makeWKUserScript())

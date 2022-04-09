@@ -26,7 +26,7 @@ final class MockLoginImporter: LoginImporter {
     func importLogins(_ logins: [ImportedLoginCredential]) throws -> DataImport.CompletedLoginsResult {
         let summary = DataImport.CompletedLoginsResult(successfulImports: logins.map(\.username), duplicateImports: [], failedImports: [])
 
-        self.importedLogins = .init(bookmarksResult: nil, loginsResult: .completed(summary))
+        importedLogins = .init(bookmarksResult: nil, loginsResult: .completed(summary))
         return summary
     }
 

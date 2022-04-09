@@ -24,7 +24,7 @@ extension DispatchQueue {
         if sync {
             self.sync(execute: workItem)
         } else {
-            self.async(execute: workItem)
+            async(execute: workItem)
         }
     }
 

@@ -16,9 +16,9 @@
 //  limitations under the License.
 //
 
+import Combine
 import Foundation
 import WebKit
-import Combine
 
 final class LegacyWebKitDownloadDelegate: NSObject {
 
@@ -34,7 +34,7 @@ final class LegacyWebKitDownloadDelegate: NSObject {
             assertionFailure("WKNavigationAction.request.url is nil")
             return
         }
-        self.navigationActions[url] = navigationAction
+        navigationActions[url] = navigationAction
     }
 
     func registerDownloadNavigationResponse(_ navigationResponse: WKNavigationResponse) {
@@ -42,15 +42,16 @@ final class LegacyWebKitDownloadDelegate: NSObject {
             assertionFailure("WKNavigationResponse.request.url is nil")
             return
         }
-        self.navigationResponses[url] = navigationResponse
+        navigationResponses[url] = navigationResponse
     }
 
 }
 
 // https://github.com/WebKit/webkit/blob/main/Source/WebKit/UIProcess/API/Cocoa/_WKDownloadDelegate.h
-private extension LegacyWebKitDownloadDelegate {
+extension LegacyWebKitDownloadDelegate {
 
-    @objc func _downloadDidStart(_ download: WebKitDownload) {
+    @objc
+    private func _downloadDidStart(_ download: WebKitDownload) {
         guard let webView = download.webView, let url = download.originalRequest?.url else {
             assertionFailure("WebKitDownload webView or url is nil")
             return
@@ -60,22 +61,25 @@ private extension LegacyWebKitDownloadDelegate {
             return
         }
 
-        if let navigationAction = self.navigationActions[url] {
-            self.navigationActions[url] = nil
+        if let navigationAction = navigationActions[url] {
+            navigationActions[url] = nil
             delegate.webView(webView, navigationAction: navigationAction, didBecomeDownload: download)
-        } else if let navigationResponse = self.navigationResponses[url] {
-            self.navigationResponses[url] = nil
+        } else if let navigationResponse = navigationResponses[url] {
+            navigationResponses[url] = nil
             delegate.webView(webView, navigationResponse: navigationResponse, didBecomeDownload: download)
         }
     }
 
-    @objc func _download(_ download: WebKitDownload, didReceiveResponse response: URLResponse) {
-        self.responseCache[download.asNSObject()] = response
+    @objc
+    private func _download(_ download: WebKitDownload, didReceiveResponse response: URLResponse) {
+        responseCache[download.asNSObject()] = response
     }
 
-    @objc func _download(_ download: WebKitDownload,
-                         decideDestinationWithSuggestedFilename suggestedFilename: String,
-                         completionHandler: @escaping (Bool, String?) -> Void) {
+    @objc
+    private func _download(
+        _ download: WebKitDownload,
+        decideDestinationWithSuggestedFilename suggestedFilename: String,
+        completionHandler: @escaping (Bool, String?) -> Void) {
         defer {
             self.responseCache[download.asNSObject()] = nil
         }
@@ -85,33 +89,37 @@ private extension LegacyWebKitDownloadDelegate {
             return
         }
 
-        delegate.download(download, decideDestinationUsing: self.responseCache[download.asNSObject()], suggestedFilename: suggestedFilename) { url in
+        delegate.download(download, decideDestinationUsing: responseCache[download.asNSObject()], suggestedFilename: suggestedFilename) { url in
             completionHandler(false, url?.path)
         }
     }
 
-    @objc func _downloadDidFinish(_ download: WebKitDownload) {
+    @objc
+    private func _downloadDidFinish(_ download: WebKitDownload) {
         download.downloadDelegate?.downloadDidFinish(download)
     }
 
-    @objc func _downloadDidCancel(_ download: WebKitDownload) {
+    @objc
+    private func _downloadDidCancel(_ download: WebKitDownload) {
         download.downloadDelegate?.download(download, didFailWithError: URLError(.cancelled), resumeData: nil)
     }
 
-    @objc func _download(_ download: WebKitDownload, didFailWithError error: Error) {
+    @objc
+    private func _download(_ download: WebKitDownload, didFailWithError error: Error) {
         download.downloadDelegate?.download(download, didFailWithError: error, resumeData: nil)
     }
 
     @objc(_download:didReceiveAuthenticationChallenge:completionHandler:)
-    func _download(_ download: WebKitDownload,
-                   didReceive challenge: URLAuthenticationChallenge,
-                   completionHandler: @escaping (URLSession.AuthChallengeDisposition, URLCredential?) -> Void) {
+    private func _download(
+        _ download: WebKitDownload,
+        didReceive challenge: URLAuthenticationChallenge,
+        completionHandler: @escaping (URLSession.AuthChallengeDisposition, URLCredential?) -> Void) {
         download.downloadDelegate?.download(download, didReceive: challenge, completionHandler: completionHandler)
             ?? download.webView?.navigationDelegate?.webView?(download.webView!, didReceive: challenge, completionHandler: completionHandler)
     }
 
     @objc(_download:didReceiveData:)
-    func _download(_ download: WebKitDownload, didReceiveData length: UInt64) {
+    private func _download(_ download: WebKitDownload, didReceiveData length: UInt64) {
         download.downloadDelegate?.download(download, didReceiveData: length)
     }
 

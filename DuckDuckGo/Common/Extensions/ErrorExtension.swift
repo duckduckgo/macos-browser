@@ -21,7 +21,7 @@ import Foundation
 extension Error {
 
     var failingUrl: URL? {
-        return (self as NSError).userInfo["NSErrorFailingURLKey"] as? URL
+        (self as NSError).userInfo["NSErrorFailingURLKey"] as? URL
     }
 
 }

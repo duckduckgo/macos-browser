@@ -52,7 +52,7 @@ final class FocusRingView: NSView {
 
     func updateView(stroke: Bool) {
         self.stroke = stroke
-        self.needsLayout = true
+        needsLayout = true
     }
 
     private func addSublayers() {
@@ -76,26 +76,29 @@ final class FocusRingView: NSView {
         shadowLayer.opacity = stroke ? 0.4 : 0
         strokeLayer.opacity = stroke ? 1.0 : 0
 
-        backgroundLayer.backgroundColor = stroke ?
-            strokedBackgroundColor.cgColor : unstrokedBackgroundColor.cgColor
+        backgroundLayer.backgroundColor = stroke
+            ? strokedBackgroundColor.cgColor
+            : unstrokedBackgroundColor.cgColor
 
         shadowLayer.backgroundColor = NSColor.controlAccentColor.cgColor
         strokeLayer.backgroundColor = NSColor.controlAccentColor.cgColor
 
         shadowLayer.frame = layer.bounds
         shadowLayer.cornerRadius = Size.backgroundRadius.rawValue + Size.shadow.rawValue + Size.stroke.rawValue
-        strokeLayer.frame = NSRect(x: layer.bounds.origin.x + Size.shadow.rawValue,
-                                   y: layer.bounds.origin.y + Size.shadow.rawValue,
-                                   width: layer.bounds.size.width - 2 * Size.shadow.rawValue,
-                                   height: layer.bounds.size.height - 2 * Size.shadow.rawValue)
+        strokeLayer.frame = NSRect(
+            x: layer.bounds.origin.x + Size.shadow.rawValue,
+            y: layer.bounds.origin.y + Size.shadow.rawValue,
+            width: layer.bounds.size.width - 2 * Size.shadow.rawValue,
+            height: layer.bounds.size.height - 2 * Size.shadow.rawValue)
         strokeLayer.cornerRadius = Size.backgroundRadius.rawValue + Size.stroke.rawValue
-        backgroundLayer.frame = NSRect(x: layer.bounds.origin.x + Size.shadow.rawValue + Size.stroke.rawValue,
-                                       y: layer.bounds.origin.y + Size.shadow.rawValue + Size.stroke.rawValue,
-                                       width: layer.bounds.size.width - 2 * (Size.shadow.rawValue + Size.stroke.rawValue),
-                                       height: layer.bounds.size.height - 2 * (Size.shadow.rawValue + Size.stroke.rawValue))
+        backgroundLayer.frame = NSRect(
+            x: layer.bounds.origin.x + Size.shadow.rawValue + Size.stroke.rawValue,
+            y: layer.bounds.origin.y + Size.shadow.rawValue + Size.stroke.rawValue,
+            width: layer.bounds.size.width - 2 * (Size.shadow.rawValue + Size.stroke.rawValue),
+            height: layer.bounds.size.height - 2 * (Size.shadow.rawValue + Size.stroke.rawValue))
         backgroundLayer.cornerRadius = Size.backgroundRadius.rawValue
 
         CATransaction.commit()
     }
-    
+
 }

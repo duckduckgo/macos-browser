@@ -32,19 +32,19 @@ extension NSView {
     }
 
     func wrappedInContainer(padding: CGFloat = 0) -> NSView {
-        return wrappedInContainer(padding: NSEdgeInsets(top: padding, left: padding, bottom: padding, right: padding))
+        wrappedInContainer(padding: NSEdgeInsets(top: padding, left: padding, bottom: padding, right: padding))
     }
 
     func wrappedInContainer(padding: NSEdgeInsets = NSEdgeInsets()) -> NSView {
-        self.translatesAutoresizingMaskIntoConstraints = false
+        translatesAutoresizingMaskIntoConstraints = false
 
-        let containerView = NSView(frame: self.frame)
+        let containerView = NSView(frame: frame)
         containerView.addSubview(self)
 
-        self.topAnchor.constraint(equalTo: containerView.topAnchor, constant: padding.top).isActive = true
-        self.leftAnchor.constraint(equalTo: containerView.leftAnchor, constant: padding.left).isActive = true
-        self.rightAnchor.constraint(equalTo: containerView.rightAnchor, constant: -padding.right).isActive = true
-        self.bottomAnchor.constraint(equalTo: containerView.bottomAnchor, constant: -padding.bottom).isActive = true
+        topAnchor.constraint(equalTo: containerView.topAnchor, constant: padding.top).isActive = true
+        leftAnchor.constraint(equalTo: containerView.leftAnchor, constant: padding.left).isActive = true
+        rightAnchor.constraint(equalTo: containerView.rightAnchor, constant: -padding.right).isActive = true
+        bottomAnchor.constraint(equalTo: containerView.bottomAnchor, constant: -padding.bottom).isActive = true
 
         return containerView
     }
@@ -73,18 +73,23 @@ extension NSView {
         static func top(multiplier: CGFloat = 1.0, const: CGFloat = 0.0) -> NSLayoutConstraintToAttribute {
             NSLayoutConstraintToAttribute(attribute: .top, multiplier: multiplier, constant: const)
         }
+
         static func bottom(multiplier: CGFloat = 1.0, const: CGFloat = 0.0) -> NSLayoutConstraintToAttribute {
             NSLayoutConstraintToAttribute(attribute: .bottom, multiplier: multiplier, constant: const)
         }
+
         static func leading(multiplier: CGFloat = 1.0, const: CGFloat = 0.0) -> NSLayoutConstraintToAttribute {
             NSLayoutConstraintToAttribute(attribute: .leading, multiplier: multiplier, constant: const)
         }
+
         static func trailing(multiplier: CGFloat = 1.0, const: CGFloat = 0.0) -> NSLayoutConstraintToAttribute {
             NSLayoutConstraintToAttribute(attribute: .trailing, multiplier: multiplier, constant: const)
         }
+
         static func width(multiplier: CGFloat = 1.0, const: CGFloat = 0.0) -> NSLayoutConstraintToAttribute {
             NSLayoutConstraintToAttribute(attribute: .width, multiplier: multiplier, constant: const)
         }
+
         static func height(multiplier: CGFloat = 1.0, const: CGFloat = 0.0) -> NSLayoutConstraintToAttribute {
             NSLayoutConstraintToAttribute(attribute: .width, multiplier: multiplier, constant: const)
         }
@@ -94,9 +99,10 @@ extension NSView {
         }
     }
 
-    func addConstraints(to view: NSView?,
-                        _ attributes: KeyValuePairs<NSLayoutConstraint.Attribute, NSLayoutConstraintToAttribute>)
-    -> [NSLayoutConstraint] {
+    func addConstraints(
+        to view: NSView?,
+        _ attributes: KeyValuePairs<NSLayoutConstraint.Attribute, NSLayoutConstraintToAttribute>)
+        -> [NSLayoutConstraint] {
         attributes.map { fromAttr, toAttr in
             NSLayoutConstraint(
                 item: self,
@@ -105,13 +111,12 @@ extension NSView {
                 toItem: toAttr.attribute == .notAnAttribute ? nil : view,
                 attribute: toAttr.attribute,
                 multiplier: toAttr.multiplier,
-                constant: toAttr.constant
-            )
+                constant: toAttr.constant)
         }
     }
 
     func isMouseLocationInsideBounds(_ point: NSPoint? = nil) -> Bool {
-        return mouseLocationInsideBounds(point) != nil
+        mouseLocationInsideBounds(point) != nil
     }
 
     func withMouseLocationInViewCoordinates<T>(_ point: NSPoint? = nil, convert: (NSPoint) -> T?) -> T? {

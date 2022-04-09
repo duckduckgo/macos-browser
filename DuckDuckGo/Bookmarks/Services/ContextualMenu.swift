@@ -85,23 +85,23 @@ struct ContextualMenu {
     // MARK: - Menu Items
 
     static func newFolderMenuItem() -> NSMenuItem {
-        return menuItem(UserText.newFolder, #selector(FolderMenuItemSelectors.newFolder(_:)))
+        menuItem(UserText.newFolder, #selector(FolderMenuItemSelectors.newFolder(_:)))
     }
 
     static func renameFolderMenuItem(folder: BookmarkFolder) -> NSMenuItem {
-        return menuItem(UserText.renameFolder, #selector(FolderMenuItemSelectors.renameFolder(_:)), folder)
+        menuItem(UserText.renameFolder, #selector(FolderMenuItemSelectors.renameFolder(_:)), folder)
     }
 
     static func deleteFolderMenuItem(folder: BookmarkFolder) -> NSMenuItem {
-        return menuItem(UserText.deleteFolder, #selector(FolderMenuItemSelectors.deleteFolder(_:)), folder)
+        menuItem(UserText.deleteFolder, #selector(FolderMenuItemSelectors.deleteFolder(_:)), folder)
     }
 
     static func openBookmarkInNewTabMenuItem(bookmark: Bookmark) -> NSMenuItem {
-        return menuItem(UserText.openInNewTab, #selector(BookmarkMenuItemSelectors.openBookmarkInNewTab(_:)), bookmark)
+        menuItem(UserText.openInNewTab, #selector(BookmarkMenuItemSelectors.openBookmarkInNewTab(_:)), bookmark)
     }
 
     static func openBookmarkInNewWindowMenuItem(bookmark: Bookmark) -> NSMenuItem {
-        return menuItem(UserText.openInNewWindow, #selector(BookmarkMenuItemSelectors.openBookmarkInNewWindow(_:)), bookmark)
+        menuItem(UserText.openInNewWindow, #selector(BookmarkMenuItemSelectors.openBookmarkInNewWindow(_:)), bookmark)
     }
 
     static func addBookmarkToFavoritesMenuItem(bookmark: Bookmark) -> NSMenuItem {

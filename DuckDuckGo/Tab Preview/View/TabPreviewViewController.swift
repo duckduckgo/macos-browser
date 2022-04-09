@@ -43,9 +43,10 @@ extension TabPreviewViewController {
         titleTextField.stringValue = tabViewModel.title
 
         // Search queries can match valid URL formats, so prevent creating a URL object from the address bar string if on a search page.
-        if !(tabViewModel.tab.content.url?.isDuckDuckGoSearch ?? false),
-           let url = tabViewModel.addressBarString.punycodedUrl,
-           let punycodeDecoded = url.punycodeDecodedString {
+        if
+            !(tabViewModel.tab.content.url?.isDuckDuckGoSearch ?? false),
+            let url = tabViewModel.addressBarString.punycodedUrl,
+            let punycodeDecoded = url.punycodeDecodedString {
             urlTextField.stringValue = punycodeDecoded
         } else {
             urlTextField.stringValue = tabViewModel.addressBarString
@@ -55,11 +56,13 @@ extension TabPreviewViewController {
 
     private func setupGradients() {
         titleTextField.wantsLayer = true
-        titleTextField.gradient(width: TextFieldMaskGradientSize.width.rawValue,
-                                trailingPadding: TextFieldMaskGradientSize.trailingSpace.rawValue)
+        titleTextField.gradient(
+            width: TextFieldMaskGradientSize.width.rawValue,
+            trailingPadding: TextFieldMaskGradientSize.trailingSpace.rawValue)
         urlTextField.wantsLayer = true
-        urlTextField.gradient(width: TextFieldMaskGradientSize.width.rawValue,
-                              trailingPadding: TextFieldMaskGradientSize.trailingSpace.rawValue)
+        urlTextField.gradient(
+            width: TextFieldMaskGradientSize.width.rawValue,
+            trailingPadding: TextFieldMaskGradientSize.trailingSpace.rawValue)
     }
 
 }

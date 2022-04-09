@@ -20,8 +20,9 @@ import Cocoa
 
 protocol CrashReportPromptViewControllerDelegate: AnyObject {
 
-    func crashReportPromptViewController(_ crashReportPromptViewController: CrashReportPromptViewController,
-                                         userDidAllowToReport: Bool)
+    func crashReportPromptViewController(
+        _ crashReportPromptViewController: CrashReportPromptViewController,
+        userDidAllowToReport: Bool)
 
 }
 
@@ -45,14 +46,16 @@ final class CrashReportPromptViewController: NSViewController {
         textView?.string = content
     }
 
-    @IBAction func sendAction(_ sender: Any) {
+    @IBAction
+    func sendAction(_: Any) {
         delegate?.crashReportPromptViewController(self, userDidAllowToReport: true)
         view.window?.close()
     }
 
-    @IBAction func dontSendAction(_ sender: Any) {
+    @IBAction
+    func dontSendAction(_: Any) {
         delegate?.crashReportPromptViewController(self, userDidAllowToReport: false)
         view.window?.close()
     }
-    
+
 }

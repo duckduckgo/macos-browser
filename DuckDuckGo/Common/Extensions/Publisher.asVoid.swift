@@ -20,6 +20,6 @@ import Combine
 
 extension Publisher {
     func asVoid() -> Publishers.Map<Self, Void> {
-        self.map { _ in () }
+        map { _ in () }
     }
 }

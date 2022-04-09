@@ -16,8 +16,8 @@
 //  limitations under the License.
 //
 
-import Foundation
 import CoreData
+import Foundation
 
 struct PixelDataRecord {
 
@@ -29,11 +29,11 @@ struct PixelDataRecord {
 extension PixelData {
 
     func valueRepresentation() -> PixelDataRecord? {
-        guard let key = self.key else {
+        guard let key = key else {
             assertionFailure("PixelData: Key should not be nil")
             return nil
         }
-        guard let data = self.valueEncrypted as? Data else {
+        guard let data = valueEncrypted as? Data else {
             assertionFailure("PixelData: valueEncrypted is not Data")
             return nil
         }
@@ -48,16 +48,16 @@ extension PixelData {
     }
 
     func update(with record: PixelDataRecord) throws {
-        if self.key != record.key {
-            guard self.key == nil else {
+        if key != record.key {
+            guard key == nil else {
                 assertionFailure("PixelData: Keys does not match")
                 return
             }
-            self.key = record.key
+            key = record.key
         }
 
         let data = try NSKeyedArchiver.archivedData(withRootObject: record.value, requiringSecureCoding: true)
-        self.valueEncrypted = data as NSData
+        valueEncrypted = data as NSData
     }
 
 }

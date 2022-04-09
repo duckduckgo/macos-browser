@@ -21,10 +21,11 @@ import Foundation
 struct WebKitVersionProvider {
 
     static func getVersion() -> String? {
-        guard let userAgent = WKWebView().value(forKey: "userAgent") as? String,
-              let regularExpression = try? NSRegularExpression(pattern: #"AppleWebKit\s*\/\s*([\d.]+)"#, options: []),
-              let match = regularExpression.firstMatch(in: userAgent, options: [], range: userAgent.nsRange()),
-              match.numberOfRanges >= 1 else {
+        guard
+            let userAgent = WKWebView().value(forKey: "userAgent") as? String,
+            let regularExpression = try? NSRegularExpression(pattern: #"AppleWebKit\s*\/\s*([\d.]+)"#, options: []),
+            let match = regularExpression.firstMatch(in: userAgent, options: [], range: userAgent.nsRange()),
+            match.numberOfRanges >= 1 else {
             return nil
         }
 

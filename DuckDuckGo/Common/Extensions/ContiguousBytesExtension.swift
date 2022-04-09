@@ -19,9 +19,9 @@
 import Foundation
 
 extension ContiguousBytes {
-    
+
     var dataRepresentation: Data {
-        return self.withUnsafeBytes { bytes in
+        withUnsafeBytes { bytes in
             let data = CFDataCreateWithBytesNoCopy(nil, bytes.baseAddress?.assumingMemoryBound(to: UInt8.self), bytes.count, kCFAllocatorNull)
             return ((data as NSData?) as Data?) ?? Data()
         }

@@ -20,8 +20,8 @@ import Foundation
 
 final class BookmarkSidebarTreeController: BookmarkTreeControllerDataSource {
 
-    func treeController(treeController: BookmarkTreeController, childNodesFor node: BookmarkNode) -> [BookmarkNode] {
-        return node.isRoot ? childNodesForRootNode(node) : childNodes(for: node)
+    func treeController(treeController _: BookmarkTreeController, childNodesFor node: BookmarkNode) -> [BookmarkNode] {
+        node.isRoot ? childNodesForRootNode(node) : childNodes(for: node)
     }
 
     private let bookmarkManager: BookmarkManager
@@ -68,7 +68,7 @@ final class BookmarkSidebarTreeController: BookmarkTreeControllerDataSource {
     }
 
     private func childNodesForBookmarksPseudoFolder(_ parent: BookmarkNode) -> [BookmarkNode] {
-        let nodes = bookmarkManager.list?.topLevelEntities.compactMap { (possibleFolder) -> BookmarkNode? in
+        let nodes = bookmarkManager.list?.topLevelEntities.compactMap { possibleFolder -> BookmarkNode? in
             guard let folder = possibleFolder as? BookmarkFolder else { return nil }
 
             let folderNode = parent.findOrCreateChildNode(with: folder)

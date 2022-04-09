@@ -30,14 +30,15 @@ struct HoverButton: View {
 
     @State var isHovering = false
 
-    init(size: CGFloat = 32,
-         backgroundColor: Color = Color.clear,
-         mouseOverColor: Color = Color("ButtonMouseOverColor"),
-         imageName: String,
-         imageSize: CGFloat = 16,
-         cornerRadius: CGFloat,
-         action: @escaping () -> Void) {
-        
+    init(
+        size: CGFloat = 32,
+        backgroundColor: Color = Color.clear,
+        mouseOverColor: Color = Color("ButtonMouseOverColor"),
+        imageName: String,
+        imageSize: CGFloat = 16,
+        cornerRadius: CGFloat,
+        action: @escaping () -> Void) {
+
         self.size = size
         self.backgroundColor = backgroundColor
         self.mouseOverColor = mouseOverColor

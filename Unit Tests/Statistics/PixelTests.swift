@@ -17,13 +17,13 @@
 //  limitations under the License.
 //
 
-import XCTest
 import OHHTTPStubs
 import OHHTTPStubsSwift
+import XCTest
 @testable import DuckDuckGo_Privacy_Browser
 
 class PixelTests: XCTestCase {
-    
+
     let host = "improving.duckduckgo.com"
     let testAgent = "Test Agent"
     let userAgentName = "User-Agent"
@@ -40,16 +40,16 @@ class PixelTests: XCTestCase {
 
     func testWhenTimedPixelFiredThenCorrectDurationIsSet() {
         let expectation = XCTestExpectation()
-        
+
         let date: CFTimeInterval = 0
         let now: CFTimeInterval = 1
-        
+
         stub(condition: { request -> Bool in
             if let url = request.url {
                 XCTAssertEqual("1.0", try? url.getParameter(name: "duration"))
                 return true
             }
-            
+
             XCTFail("Did not found param dur")
             return true
         }, response: { _ -> HTTPStubsResponse in
@@ -60,10 +60,10 @@ class PixelTests: XCTestCase {
         let pixel = TimedPixel(.appLaunch(isDefault: .default, launch: .regular), time: date)
 
         pixel.fire(now)
-        
+
         wait(for: [expectation], timeout: 1.0)
     }
-    
+
     func testWhenPixelFiredThenAPIHeadersAreAdded() {
         let expectation = XCTestExpectation()
 
@@ -148,7 +148,7 @@ class PixelTests: XCTestCase {
         let expectation = XCTestExpectation()
 
         stub(condition: isHost(host)) { _ -> HTTPStubsResponse in
-            return HTTPStubsResponse(data: Data(), statusCode: 200, headers: nil)
+            HTTPStubsResponse(data: Data(), statusCode: 200, headers: nil)
         }
 
         Pixel.shared!.fire(pixelNamed: "test") { error in
@@ -163,7 +163,7 @@ class PixelTests: XCTestCase {
         let expectation = XCTestExpectation()
 
         stub(condition: isHost(host)) { _ -> HTTPStubsResponse in
-            return HTTPStubsResponse(data: Data(), statusCode: 404, headers: nil)
+            HTTPStubsResponse(data: Data(), statusCode: 404, headers: nil)
         }
 
         Pixel.shared!.fire(pixelNamed: "test") { error in

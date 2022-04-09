@@ -35,8 +35,8 @@ final class BrowserImportViewController: NSViewController {
     static func create(with browser: DataImport.Source, profileList: DataImport.BrowserProfileList) -> BrowserImportViewController {
         let storyboard = NSStoryboard(name: Constants.storyboardName, bundle: nil)
 
-        return storyboard.instantiateController(identifier: Constants.identifier) { (coder) -> BrowserImportViewController? in
-            return BrowserImportViewController(coder: coder, browser: browser, profileList: profileList)
+        return storyboard.instantiateController(identifier: Constants.identifier) { coder -> BrowserImportViewController? in
+            BrowserImportViewController(coder: coder, browser: browser, profileList: profileList)
         }
     }
 
@@ -92,25 +92,27 @@ final class BrowserImportViewController: NSViewController {
         super.init(coder: coder)
     }
 
-    required init?(coder: NSCoder) {
+    required init?(coder _: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
 
     override func viewDidLoad() {
         super.viewDidLoad()
 
-        NotificationCenter.default.addObserver(self,
-                                               selector: #selector(hideOpenBrowserWarningIfNecessary),
-                                               name: NSApplication.didBecomeActiveNotification,
-                                               object: nil)
+        NotificationCenter.default.addObserver(
+            self,
+            selector: #selector(hideOpenBrowserWarningIfNecessary),
+            name: NSApplication.didBecomeActiveNotification,
+            object: nil)
 
         // Update the profile picker:
 
         importOptionsStackView.setCustomSpacing(18, after: profileSelectionPopUpButton)
 
         if profileList.showProfilePicker {
-            profileSelectionPopUpButton.displayBrowserProfiles(profiles: profileList.validImportableProfiles,
-                                                               defaultProfile: profileList.defaultProfile)
+            profileSelectionPopUpButton.displayBrowserProfiles(
+                profiles: profileList.validImportableProfiles,
+                defaultProfile: profileList.defaultProfile)
         } else {
             profileSelectionLabel.isHidden = true
             profileSelectionPopUpButton.isHidden = true
@@ -118,7 +120,7 @@ final class BrowserImportViewController: NSViewController {
         }
 
         // Toggle the browser warning bar:
-        self.closeBrowserWarningLabel.stringValue = UserText.closeBrowserWarningFor(browser: browser.importSourceName)
+        closeBrowserWarningLabel.stringValue = UserText.closeBrowserWarningFor(browser: browser.importSourceName)
         hideOpenBrowserWarningIfNecessary()
 
         switch browser {
@@ -131,7 +133,8 @@ final class BrowserImportViewController: NSViewController {
         }
     }
 
-    @IBAction func selectedImportOptionsChanged(_ sender: NSButton) {
+    @IBAction
+    func selectedImportOptionsChanged(_: NSButton) {
         delegate?.browserImportViewController(self, didChangeSelectedImportOptions: selectedImportOptions)
     }
 

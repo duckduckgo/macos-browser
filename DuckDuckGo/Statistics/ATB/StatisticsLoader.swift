@@ -21,15 +21,15 @@ import Foundation
 import os.log
 
 final class StatisticsLoader {
-    
-    typealias Completion =  (() -> Void)
-    
+
+    typealias Completion = () -> Void
+
     static let shared = StatisticsLoader()
-    
+
     private let statisticsStore: StatisticsStore
     private let parser = AtbParser()
     private var isAppRetentionRequestInProgress = false
-    
+
     init(statisticsStore: StatisticsStore = LocalStatisticsStore()) {
         self.statisticsStore = statisticsStore
     }
@@ -60,7 +60,7 @@ final class StatisticsLoader {
         }
         requestInstallStatistics(completion: completion)
     }
-    
+
     private func requestInstallStatistics(completion: @escaping Completion = {}) {
         dispatchPrecondition(condition: .onQueue(.main))
 
@@ -76,7 +76,7 @@ final class StatisticsLoader {
                     return
                 }
 
-                if let data = response?.data, let atb  = try? self.parser.convert(fromJsonData: data) {
+                if let data = response?.data, let atb = try? self.parser.convert(fromJsonData: data) {
                     self.requestExti(atb: atb, completion: completion)
                 } else {
                     completion()
@@ -84,15 +84,16 @@ final class StatisticsLoader {
             }
         }
     }
-    
+
     private func requestExti(atb: Atb, completion: @escaping Completion = {}) {
         dispatchPrecondition(condition: .onQueue(.main))
 
         let installAtb = atb.version + (statisticsStore.variant ?? "")
-        guard let url = URL.exti(forAtb: installAtb),
+        guard
+            let url = URL.exti(forAtb: installAtb),
             !isAppRetentionRequestInProgress
         else { return }
-        self.isAppRetentionRequestInProgress = true
+        isAppRetentionRequestInProgress = true
 
         APIRequest.request(url: url) { _, error in
             DispatchQueue.main.async {
@@ -112,13 +113,14 @@ final class StatisticsLoader {
             }
         }
     }
-    
+
     func refreshSearchRetentionAtb(completion: @escaping Completion = {}) {
         dispatchPrecondition(condition: .onQueue(.main))
 
-        guard let atbWithVariant = statisticsStore.atbWithVariant,
-              let searchRetentionAtb = statisticsStore.searchRetentionAtb ?? statisticsStore.atb,
-              let url = URL.searchAtb(atbWithVariant: atbWithVariant, setAtb: searchRetentionAtb)
+        guard
+            let atbWithVariant = statisticsStore.atbWithVariant,
+            let searchRetentionAtb = statisticsStore.searchRetentionAtb ?? statisticsStore.atb,
+            let url = URL.searchAtb(atbWithVariant: atbWithVariant, setAtb: searchRetentionAtb)
         else {
             requestInstallStatistics(completion: completion)
             return
@@ -131,7 +133,7 @@ final class StatisticsLoader {
                     completion()
                     return
                 }
-                if let data = response?.data, let atb  = try? self.parser.convert(fromJsonData: data) {
+                if let data = response?.data, let atb = try? self.parser.convert(fromJsonData: data) {
                     self.statisticsStore.searchRetentionAtb = atb.version
                     self.storeUpdateVersionIfPresent(atb)
                 }
@@ -139,14 +141,15 @@ final class StatisticsLoader {
             }
         }
     }
-    
+
     func refreshAppRetentionAtb(completion: @escaping Completion = {}) {
         dispatchPrecondition(condition: .onQueue(.main))
 
-        guard !isAppRetentionRequestInProgress,
-              let atbWithVariant = statisticsStore.atbWithVariant,
-              let appRetentionAtb = statisticsStore.appRetentionAtb ?? statisticsStore.atb,
-              let url = URL.appRetentionAtb(atbWithVariant: atbWithVariant, setAtb: appRetentionAtb)
+        guard
+            !isAppRetentionRequestInProgress,
+            let atbWithVariant = statisticsStore.atbWithVariant,
+            let appRetentionAtb = statisticsStore.appRetentionAtb ?? statisticsStore.atb,
+            let url = URL.appRetentionAtb(atbWithVariant: atbWithVariant, setAtb: appRetentionAtb)
         else {
             requestInstallStatistics(completion: completion)
             return
@@ -162,7 +165,7 @@ final class StatisticsLoader {
                     completion()
                     return
                 }
-                if let data = response?.data, let atb  = try? self.parser.convert(fromJsonData: data) {
+                if let data = response?.data, let atb = try? self.parser.convert(fromJsonData: data) {
                     self.statisticsStore.appRetentionAtb = atb.version
                     self.statisticsStore.lastAppRetentionRequestDate = Date()
                     self.storeUpdateVersionIfPresent(atb)
@@ -174,7 +177,7 @@ final class StatisticsLoader {
 
     func storeUpdateVersionIfPresent(_ atb: Atb) {
         dispatchPrecondition(condition: .onQueue(.main))
-        
+
         if let updateVersion = atb.updateVersion {
             statisticsStore.atb = updateVersion
         }

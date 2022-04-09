@@ -16,9 +16,9 @@
 //  limitations under the License.
 //
 
-import XCTest
 import OHHTTPStubs
 import OHHTTPStubsSwift
+import XCTest
 @testable import DuckDuckGo_Privacy_Browser
 
 class MacWaitlistRequestTests: XCTestCase {
@@ -31,18 +31,18 @@ class MacWaitlistRequestTests: XCTestCase {
     func testWhenMakingSuccessfulRequest_ThenRedeemedResponseIsReturned() {
         let expect = expectation(description: #function)
         let request = MacWaitlistAPIRequest()
-        
+
         stub(condition: isHost(URL.redeemMacWaitlistInviteCode().host!)) { _ in
             let jsonData = """
-            {
-                "status": "redeemed"
-            }
-            """.data(using: .utf8)!
+                {
+                    "status": "redeemed"
+                }
+                """.data(using: .utf8)!
             return HTTPStubsResponse(data: jsonData, statusCode: 200, headers: nil)
         }
-        
+
         request.unlock(with: "code") { result in
-            if case let .success(response) = result {
+            if case .success(let response) = result {
                 XCTAssertTrue(response.hasExpectedStatusMessage)
                 XCTAssertEqual(response.status, "redeemed")
             } else {
@@ -51,25 +51,25 @@ class MacWaitlistRequestTests: XCTestCase {
 
             expect.fulfill()
         }
-        
+
         waitForExpectations(timeout: 1, handler: nil)
     }
-    
+
     func testWhenRedeemingExistingCode_ThenErrorResponseIsReturned() {
         let expect = expectation(description: #function)
         let request = MacWaitlistAPIRequest()
-        
+
         stub(condition: isHost(URL.redeemMacWaitlistInviteCode().host!)) { _ in
             let jsonData = """
-            {
-                "error": "already_redeemed_invite_code"
-            }
-            """.data(using: .utf8)!
+                {
+                    "error": "already_redeemed_invite_code"
+                }
+                """.data(using: .utf8)!
             return HTTPStubsResponse(data: jsonData, statusCode: 400, headers: nil)
         }
-        
+
         request.unlock(with: "code") { result in
-            if case let .failure(error) = result {
+            if case .failure(let error) = result {
                 XCTAssertEqual(error, .redemptionError)
             } else {
                 XCTFail("Failed to get the expected response")
@@ -77,8 +77,8 @@ class MacWaitlistRequestTests: XCTestCase {
 
             expect.fulfill()
         }
-        
+
         waitForExpectations(timeout: 1, handler: nil)
     }
-    
+
 }

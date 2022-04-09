@@ -40,7 +40,7 @@ extension WKNavigationAction {
 
     var isUserInitiated: Bool {
         guard Self.supportsIsUserInitiated else { return true }
-        return self.value(forKey: Self._isUserInitiated) as? Bool ?? true
+        return value(forKey: Self._isUserInitiated) as? Bool ?? true
     }
 
 }

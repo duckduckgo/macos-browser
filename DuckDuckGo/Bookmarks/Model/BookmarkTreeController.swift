@@ -52,7 +52,7 @@ final class BookmarkTreeController {
     }
 
     func node(representing object: AnyObject) -> BookmarkNode? {
-        return nodeInArrayRepresentingObject(nodes: [rootNode], representedObject: object)
+        nodeInArrayRepresentingObject(nodes: [rootNode], representedObject: object)
     }
 
     // MARK: - Private

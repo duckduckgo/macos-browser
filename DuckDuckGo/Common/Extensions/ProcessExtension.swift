@@ -22,10 +22,10 @@ extension Process {
 
     convenience init(_ command: String, _ args: String..., workDirectory: URL? = nil) {
         self.init()
-        self.executableURL = URL(fileURLWithPath: command)
-        self.arguments = args
+        executableURL = URL(fileURLWithPath: command)
+        arguments = args
         if let workDirectory = workDirectory {
-            self.currentDirectoryURL = workDirectory
+            currentDirectoryURL = workDirectory
         }
     }
 

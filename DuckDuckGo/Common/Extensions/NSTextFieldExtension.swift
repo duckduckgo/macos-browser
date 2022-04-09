@@ -23,21 +23,21 @@ extension NSTextField {
 
     static func label(titled title: String) -> NSTextField {
         let label = NSTextField(string: title)
-        
+
         label.isEditable = false
         label.isBordered = false
         label.isSelectable = false
         label.isBezeled = false
         label.backgroundColor = .clear
-        
+
         return label
     }
-    
+
     static func optionalLabel(titled title: String?) -> NSTextField? {
         guard let title = title else {
             return nil
         }
-        
+
         return label(titled: title)
     }
 
@@ -71,5 +71,5 @@ extension NSTextField {
 
         CATransaction.commit()
     }
-    
+
 }

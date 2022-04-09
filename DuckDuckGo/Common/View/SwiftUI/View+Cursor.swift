@@ -16,18 +16,16 @@
 //  limitations under the License.
 //
 
-import SwiftUI
 import AppKit
+import SwiftUI
 
 extension View {
-    /**
-     * Displays `cursor` when the view is hovered.
-     *
-     * This modifier uses `.onHover` under the hood, so it takes an optional
-     * closure parameter that would be called inside the `.onHover` modifier
-     * before updating the cursor, removing the need to add a separate `.onHover`
-     * modifier.
-     */
+    /// Displays `cursor` when the view is hovered.
+    ///
+    /// This modifier uses `.onHover` under the hood, so it takes an optional
+    /// closure parameter that would be called inside the `.onHover` modifier
+    /// before updating the cursor, removing the need to add a separate `.onHover`
+    /// modifier.
     func cursor(_ cursor: NSCursor, onHover: ((Bool) -> Void)? = nil) -> some View {
         modifier(CursorModifier(cursor: cursor, onHoverChanged: onHover))
     }

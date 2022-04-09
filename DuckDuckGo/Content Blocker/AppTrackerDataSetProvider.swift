@@ -16,26 +16,26 @@
 //  limitations under the License.
 //
 
-import Foundation
 import BrowserServicesKit
+import Foundation
 
 final class AppTrackerDataSetProvider: EmbeddedDataProvider {
 
-    public struct Constants {
+    public enum Constants {
         public static let embeddedDataSetETag = "\"b5a369bfb768bc327fb22575c792a348\""
         public static let embeddedDataSetSHA = "b85c321da42d5f2286982e1242d2d1985307d443a7e3c2d195fda92d012f77ef"
     }
 
     var embeddedDataEtag: String {
-        return Constants.embeddedDataSetETag
+        Constants.embeddedDataSetETag
     }
 
     var embeddedData: Data {
-        return Self.loadEmbeddedAsData()
+        Self.loadEmbeddedAsData()
     }
 
     static var embeddedUrl: URL {
-        return Bundle.main.url(forResource: "trackerData", withExtension: "json")!
+        Bundle.main.url(forResource: "trackerData", withExtension: "json")!
     }
 
     static func loadEmbeddedAsData() -> Data {

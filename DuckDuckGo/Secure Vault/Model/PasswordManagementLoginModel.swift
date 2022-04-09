@@ -16,8 +16,8 @@
 //  limitations under the License.
 //
 
-import Combine
 import BrowserServicesKit
+import Combine
 
 final class PasswordManagementLoginModel: ObservableObject, PasswordManagementItemModel {
 
@@ -48,7 +48,7 @@ final class PasswordManagementLoginModel: ObservableObject, PasswordManagementIt
     }
 
     var isEditingPublisher: Published<Bool>.Publisher {
-        return $isEditing
+        $isEditing
     }
 
     var credentials: SecureVaultModels.WebsiteCredentials? {
@@ -57,25 +57,25 @@ final class PasswordManagementLoginModel: ObservableObject, PasswordManagementIt
         }
     }
 
-    @Published var title: String = "" {
+    @Published var title = "" {
         didSet {
             isDirty = true
         }
     }
 
-    @Published var username: String = "" {
+    @Published var username = "" {
         didSet {
             isDirty = true
         }
     }
 
-    @Published var password: String = "" {
+    @Published var password = "" {
         didSet {
             isDirty = true
         }
     }
 
-    @Published var domain: String = "" {
+    @Published var domain = "" {
         didSet {
             isDirty = true
         }
@@ -94,7 +94,7 @@ final class PasswordManagementLoginModel: ObservableObject, PasswordManagementIt
 
     var isDirty = false {
         didSet {
-            self.onDirtyChanged(isDirty)
+            onDirtyChanged(isDirty)
         }
     }
 
@@ -109,13 +109,14 @@ final class PasswordManagementLoginModel: ObservableObject, PasswordManagementIt
         return URLComponents(string: "https://\(noSchemeOrWWW)")?.host ?? ""
     }
 
-    var lastUpdatedDate: String = ""
-    var createdDate: String = ""
+    var lastUpdatedDate = ""
+    var createdDate = ""
 
-    init(onDirtyChanged: @escaping (Bool) -> Void,
-         onSaveRequested: @escaping (SecureVaultModels.WebsiteCredentials) -> Void,
-         onDeleteRequested: @escaping (SecureVaultModels.WebsiteCredentials) -> Void,
-         onCancelled: @escaping () -> Void) {
+    init(
+        onDirtyChanged: @escaping (Bool) -> Void,
+        onSaveRequested: @escaping (SecureVaultModels.WebsiteCredentials) -> Void,
+        onDeleteRequested: @escaping (SecureVaultModels.WebsiteCredentials) -> Void,
+        onCancelled: @escaping () -> Void) {
         self.onDirtyChanged = onDirtyChanged
         self.onSaveRequested = onSaveRequested
         self.onDeleteRequested = onDeleteRequested
@@ -167,7 +168,7 @@ final class PasswordManagementLoginModel: ObservableObject, PasswordManagementIt
 
     private func populateViewModelFromCredentials() {
         let titleString = credentials?.account.title ?? ""
-        title =  titleString.isEmpty ? normalizedDomain(credentials?.account.domain ?? "") : titleString
+        title = titleString.isEmpty ? normalizedDomain(credentials?.account.domain ?? "") : titleString
 
         username = credentials?.account.username ?? ""
         password = String(data: credentials?.password ?? Data(), encoding: .utf8) ?? ""

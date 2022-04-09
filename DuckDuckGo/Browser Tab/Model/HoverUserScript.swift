@@ -29,25 +29,25 @@ final class HoverUserScript: NSObject, UserScript {
 
     public weak var delegate: HoverUserScriptDelegate?
 
-    public var source: String = """
-(function() {
+    public var source = """
+        (function() {
 
-    document.addEventListener("mouseover", function(event) {
-        var anchor = event.target.closest('a')
-        let href = anchor ? anchor.href : null
-        webkit.messageHandlers.hoverHandler.postMessage({ href: href });
-    }, true);
+            document.addEventListener("mouseover", function(event) {
+                var anchor = event.target.closest('a')
+                let href = anchor ? anchor.href : null
+                webkit.messageHandlers.hoverHandler.postMessage({ href: href });
+            }, true);
 
-}) ();
-"""
+        }) ();
+        """
 
     public var injectionTime: WKUserScriptInjectionTime = .atDocumentStart
-    public var forMainFrameOnly: Bool = false
-    public var messageNames: [String] = ["hoverHandler"]
+    public var forMainFrameOnly = false
+    public var messageNames = ["hoverHandler"]
 
     private(set) var lastURL: URL?
 
-    public func userContentController(_ userContentController: WKUserContentController, didReceive message: WKScriptMessage) {
+    public func userContentController(_: WKUserContentController, didReceive message: WKScriptMessage) {
 
         guard let dict = message.body as? [String: Any] else { return }
 

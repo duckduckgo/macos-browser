@@ -16,55 +16,59 @@
 //  limitations under the License.
 //
 
-import Foundation
 import AVFoundation
+import Foundation
 
-@objc private protocol AVCaptureDevice_Swizzled {
+@objc
+private protocol AVCaptureDevice_Swizzled {
     static func swizzled_authorizationStatus(for mediaType: AVMediaType) -> AVAuthorizationStatus
 }
+
 extension AVCaptureDevice: AVCaptureDevice_Swizzled {
     private static var authorizationStatusForMediaType: ((AVMediaType, inout AVAuthorizationStatus) -> Void)?
     private static var isSwizzled: Bool { authorizationStatusForMediaType != nil }
 
-    private static let originalAuthorizationStatusForMediaType = {
-        class_getClassMethod(AVCaptureDevice.self, #selector(authorizationStatus(for:)))
-    }()
-    private static let swizzledAuthorizationStatusForMediaType = {
-        class_getClassMethod(AVCaptureDevice.self, #selector(swizzled_authorizationStatus(for:)))
-    }()
+    private static let originalAuthorizationStatusForMediaType = class_getClassMethod(AVCaptureDevice.self, #selector(authorizationStatus(for:)))
+
+    private static let swizzledAuthorizationStatusForMediaType = class_getClassMethod(
+        AVCaptureDevice.self,
+        #selector(swizzled_authorizationStatus(for:)))
 
     static func swizzleAuthorizationStatusForMediaType(with replacement: @escaping ((AVMediaType, inout AVAuthorizationStatus) -> Void)) {
         dispatchPrecondition(condition: .onQueue(.main))
-        guard !self.isSwizzled else { return }
-        guard let originalAuthorizationStatusForMediaType = originalAuthorizationStatusForMediaType,
-              let swizzledAuthorizationStatusForMediaType = swizzledAuthorizationStatusForMediaType
+        guard !isSwizzled else { return }
+        guard
+            let originalAuthorizationStatusForMediaType = originalAuthorizationStatusForMediaType,
+            let swizzledAuthorizationStatusForMediaType = swizzledAuthorizationStatusForMediaType
         else {
             assertionFailure("Methods not available")
             return
         }
 
         method_exchangeImplementations(originalAuthorizationStatusForMediaType, swizzledAuthorizationStatusForMediaType)
-        self.authorizationStatusForMediaType = replacement
+        authorizationStatusForMediaType = replacement
     }
 
     static func restoreAuthorizationStatusForMediaType() {
         dispatchPrecondition(condition: .onQueue(.main))
-        guard self.isSwizzled else { return }
-        guard let originalAuthorizationStatusForMediaType = originalAuthorizationStatusForMediaType,
-              let swizzledAuthorizationStatusForMediaType = swizzledAuthorizationStatusForMediaType
+        guard isSwizzled else { return }
+        guard
+            let originalAuthorizationStatusForMediaType = originalAuthorizationStatusForMediaType,
+            let swizzledAuthorizationStatusForMediaType = swizzledAuthorizationStatusForMediaType
         else {
             assertionFailure("Methods not available")
             return
         }
 
         method_exchangeImplementations(originalAuthorizationStatusForMediaType, swizzledAuthorizationStatusForMediaType)
-        self.authorizationStatusForMediaType = nil
+        authorizationStatusForMediaType = nil
     }
 
     static func swizzled_authorizationStatus(for mediaType: AVMediaType) -> AVAuthorizationStatus {
         var result = (self as AVCaptureDevice_Swizzled.Type).swizzled_authorizationStatus(for: mediaType)
-        if Thread.isMainThread,
-           let authorizationStatusForMediaType = Self.authorizationStatusForMediaType {
+        if
+            Thread.isMainThread,
+            let authorizationStatusForMediaType = Self.authorizationStatusForMediaType {
             authorizationStatusForMediaType(mediaType, &result)
         }
         return result

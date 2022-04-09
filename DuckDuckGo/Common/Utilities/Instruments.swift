@@ -41,21 +41,26 @@ final class Instruments {
     func startTimedEvent(_ event: TimedEvent, info: String? = nil) -> Any? {
         let id = OSSignpostID(log: Instruments.eventsLog)
 
-        os_signpost(.begin,
-                    log: Instruments.eventsLog,
-                    name: "Timed Event",
-                    signpostID: id,
-                    "Event: %@ info: %@", event.rawValue, info ?? "")
+        os_signpost(
+            .begin,
+            log: Instruments.eventsLog,
+            name: "Timed Event",
+            signpostID: id,
+            "Event: %@ info: %@",
+            event.rawValue,
+            info ?? "")
         return id
     }
 
     func endTimedEvent(for spid: Any?, result: String? = nil) {
         if let id = spid as? OSSignpostID {
-            os_signpost(.end,
-                        log: Instruments.eventsLog,
-                        name: "Timed Event",
-                        signpostID: id,
-                        "Result: %@", result ?? "")
+            os_signpost(
+                .end,
+                log: Instruments.eventsLog,
+                name: "Timed Event",
+                signpostID: id,
+                "Result: %@",
+                result ?? "")
         }
     }
 }

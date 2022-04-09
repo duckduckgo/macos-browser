@@ -21,8 +21,9 @@ import AppKit
 extension NSWorkspace {
 
     func application(toOpen url: URL) -> String? {
-        guard let appURL = urlForApplication(toOpen: url),
-              let bundle = Bundle(url: appURL)
+        guard
+            let appURL = urlForApplication(toOpen: url),
+            let bundle = Bundle(url: appURL)
         else { return nil }
 
         return bundle.displayName

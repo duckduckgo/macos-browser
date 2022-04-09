@@ -16,34 +16,34 @@
 //  limitations under the License.
 //
 
-import Foundation
 import CoreData
+import Foundation
 @testable import DuckDuckGo_Privacy_Browser
 
 final class CoreData {
 
     static func bookmarkContainer() -> NSPersistentContainer {
-        return createInMemoryPersistentContainer(modelName: "Bookmark", bundle: Bundle(for: AppDelegate.self))
+        createInMemoryPersistentContainer(modelName: "Bookmark", bundle: Bundle(for: AppDelegate.self))
     }
 
     static func permissionContainer() -> NSPersistentContainer {
-        return createInMemoryPersistentContainer(modelName: "Permissions", bundle: Bundle(for: AppDelegate.self))
+        createInMemoryPersistentContainer(modelName: "Permissions", bundle: Bundle(for: AppDelegate.self))
     }
 
     static func fireproofingContainer() -> NSPersistentContainer {
-        return createInMemoryPersistentContainer(modelName: "FireproofDomains", bundle: Bundle(for: AppDelegate.self))
+        createInMemoryPersistentContainer(modelName: "FireproofDomains", bundle: Bundle(for: AppDelegate.self))
     }
 
     static func coreDataStoreTestsContainer() -> NSPersistentContainer {
-        return createInMemoryPersistentContainer(modelName: "TestDataModel", bundle: Bundle(for: Self.self))
+        createInMemoryPersistentContainer(modelName: "TestDataModel", bundle: Bundle(for: Self.self))
     }
 
     static func downloadsContainer() -> NSPersistentContainer {
-        return createInMemoryPersistentContainer(modelName: "Downloads", bundle: Bundle(for: AppDelegate.self))
+        createInMemoryPersistentContainer(modelName: "Downloads", bundle: Bundle(for: AppDelegate.self))
     }
 
     static func encryptionContainer() -> NSPersistentContainer {
-        return createInMemoryPersistentContainer(modelName: "CoreDataEncryptionTesting", bundle: Bundle(for: CoreData.self))
+        createInMemoryPersistentContainer(modelName: "CoreDataEncryptionTesting", bundle: Bundle(for: CoreData.self))
     }
 
     static func createInMemoryPersistentContainer(modelName: String, bundle: Bundle) -> NSPersistentContainer {

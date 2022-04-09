@@ -105,7 +105,7 @@ struct ServerTrustViewModel: Encodable {
             if let type = attrs?[kSecAttrType] as? String {
                 self.type = Self.typeToString(type)
             } else {
-                self.type = nil
+                type = nil
             }
 
         }

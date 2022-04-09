@@ -31,7 +31,7 @@ final class SuggestionTableRowView: NSTableRowView {
     }
 
     override var isEmphasized: Bool {
-        get { return true }
+        get { true }
         set {}
     }
 

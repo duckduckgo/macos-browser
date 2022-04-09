@@ -16,10 +16,10 @@
 //  limitations under the License.
 //
 
-import Cocoa
-import WebKit
-import Combine
 import BrowserServicesKit
+import Cocoa
+import Combine
+import WebKit
 
 public final class ContentOverlayViewController: NSViewController, EmailManagerRequestDelegate {
 
@@ -62,10 +62,12 @@ public final class ContentOverlayViewController: NSViewController, EmailManagerR
     }
 
     private func addTrackingArea() {
-        let trackingOptions: NSTrackingArea.Options = [ .activeInActiveApp,
-                                                        .enabledDuringMouseDrag,
-                                                        .mouseMoved,
-                                                        .inVisibleRect ]
+        let trackingOptions: NSTrackingArea.Options = [
+            .activeInActiveApp,
+            .enabledDuringMouseDrag,
+            .mouseMoved,
+            .inVisibleRect
+        ]
         let trackingArea = NSTrackingArea(rect: webView.frame, options: trackingOptions, owner: self, userInfo: nil)
         webView.addTrackingArea(trackingArea)
     }
@@ -92,12 +94,12 @@ public final class ContentOverlayViewController: NSViewController, EmailManagerR
     public func messageMouseMove(x: CGFloat, y: CGFloat) {
         // Fakes the elements being focused by the user as it doesn't appear there's much else we can do
         let script = """
-        (() => {
-        const x = \(x);
-        const y = \(y);
-        window.dispatchEvent(new CustomEvent('mouseMove', {detail: {x, y}}))
-        })();
-        """
+            (() => {
+            const x = \(x);
+            const y = \(y);
+            window.dispatchEvent(new CustomEvent('mouseMove', {detail: {x, y}}))
+            })();
+            """
         webView.evaluateJavaScript(script)
     }
 
@@ -112,12 +114,12 @@ public final class ContentOverlayViewController: NSViewController, EmailManagerR
         guard let topAutofillUserScript = topAutofillUserScript else { return }
         let configuration = WKWebViewConfiguration()
 
-#if DEBUG
+        #if DEBUG
         configuration.preferences.setValue(true, forKey: "developerExtrasEnabled")
-#endif
+        #endif
 
         final class OverlayWebView: WKWebView {
-            public override func scrollWheel(with theEvent: NSEvent) {
+            public override func scrollWheel(with _: NSEvent) {
                 // No-op to prevent scrolling
             }
         }
@@ -137,14 +139,15 @@ public final class ContentOverlayViewController: NSViewController, EmailManagerR
     // EmailManagerRequestDelegate
 
     // swiftlint:disable function_parameter_count
-    public func emailManager(_ emailManager: EmailManager,
-                             requested url: URL,
-                             method: String,
-                             headers: [String: String],
-                             parameters: [String: String]?,
-                             httpBody: Data?,
-                             timeoutInterval: TimeInterval,
-                             completion: @escaping (Data?, Error?) -> Void) {
+    public func emailManager(
+        _: EmailManager,
+        requested url: URL,
+        method: String,
+        headers: [String: String],
+        parameters: [String: String]?,
+        httpBody: Data?,
+        timeoutInterval: TimeInterval,
+        completion: @escaping (Data?, Error?) -> Void) {
         let currentQueue = OperationQueue.current
 
         let finalURL: URL
@@ -159,12 +162,13 @@ public final class ContentOverlayViewController: NSViewController, EmailManagerR
         request.allHTTPHeaderFields = headers
         request.httpMethod = method
         request.httpBody = httpBody
-        URLSession.shared.dataTask(with: request) { (data, _, error) in
+        URLSession.shared.dataTask(with: request) { data, _, error in
             currentQueue?.addOperation {
                 completion(data, error)
             }
         }.resume()
     }
+
     // swiftlint:enable function_parameter_count
 
     private enum Constants {
@@ -181,26 +185,26 @@ public final class ContentOverlayViewController: NSViewController, EmailManagerR
         if heightOut < Constants.minHeight {
             heightOut = Constants.minHeight
         }
-        self.preferredContentSize = CGSize(width: widthOut, height: heightOut)
+        preferredContentSize = CGSize(width: widthOut, height: heightOut)
     }
 }
 
 extension ContentOverlayViewController: OverlayAutofillUserScriptPresentationDelegate {
-    public func overlayAutofillUserScript(_ overlayAutofillUserScript: OverlayAutofillUserScript, requestResizeToSize: CGSize) {
+    public func overlayAutofillUserScript(_: OverlayAutofillUserScript, requestResizeToSize: CGSize) {
         self.requestResizeToSize(requestResizeToSize)
     }
 }
 
 extension ContentOverlayViewController: SecureVaultManagerDelegate {
 
-    public func secureVaultManager(_: SecureVaultManager, promptUserToStoreAutofillData data: AutofillData) {
+    public func secureVaultManager(_: SecureVaultManager, promptUserToStoreAutofillData _: AutofillData) {
         // No-op, the content overlay view controller should not be prompting the user to store data
     }
 
-    public func secureVaultManager(_: SecureVaultManager, didAutofill type: AutofillType, withObjectId objectId: Int64) {
+    public func secureVaultManager(_: SecureVaultManager, didAutofill _: AutofillType, withObjectId _: Int64) {
         // No-op, Tab.swift handles this functionality
     }
-    
+
     public func secureVaultManager(_: SecureVaultManager, didRequestAuthenticationWithCompletionHandler handler: @escaping (Bool) -> Void) {
         DeviceAuthenticator.shared.authenticateUser(reason: .autofill) { authenticationResult in
             handler(authenticationResult.authenticated)

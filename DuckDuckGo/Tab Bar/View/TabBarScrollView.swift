@@ -25,14 +25,14 @@ final class TabBarScrollView: NSScrollView {
     }
 
     // Hiding scrollers in storyboard doesn't work. It's a known bug
-    
+
     override var hasHorizontalScroller: Bool {
-        get { return false }
+        get { false }
         set { super.hasHorizontalScroller = newValue }
     }
 
     override var horizontalScroller: NSScroller? {
-        get { return nil }
+        get { nil }
         set { super.horizontalScroller = newValue }
     }
 

@@ -28,6 +28,7 @@ final class CircularProgressView: NSView {
             progressLayer.lineWidth = lineWidth
         }
     }
+
     @IBInspectable var backgroundLineWidth: CGFloat = 2.0 {
         didSet {
             backgroundLayer.lineWidth = lineWidth
@@ -39,6 +40,7 @@ final class CircularProgressView: NSView {
             progressLayer.strokeColor = strokeColor.cgColor
         }
     }
+
     @IBInspectable var backgroundStrokeColor: NSColor = .buttonMouseOverColor {
         didSet {
             backgroundLayer.fillColor = backgroundStrokeColor.cgColor
@@ -68,36 +70,38 @@ final class CircularProgressView: NSView {
     }
 
     private func configureLayers() {
-        self.wantsLayer = true
-        self.layer!.backgroundColor = NSColor.clear.cgColor
+        wantsLayer = true
+        layer!.backgroundColor = NSColor.clear.cgColor
 
-        let radius = min(self.bounds.width, self.bounds.height) * 0.5 - max(lineWidth, backgroundLineWidth)
+        let radius = min(bounds.width, bounds.height) * 0.5 - max(lineWidth, backgroundLineWidth)
 
         backgroundLayer.configureCircle(radius: radius, lineWidth: backgroundLineWidth)
         backgroundLayer.strokeStart = 1.0
         backgroundLayer.strokeEnd = 1.0
-        self.layer!.addSublayer(backgroundLayer)
+        layer!.addSublayer(backgroundLayer)
 
         progressLayer.configureCircle(radius: radius, lineWidth: lineWidth)
         progressLayer.strokeStart = 1.0
         progressLayer.strokeEnd = 1.0
-        self.layer!.addSublayer(progressLayer)
+        layer!.addSublayer(progressLayer)
 
-        self.updateLayer()
+        updateLayer()
     }
 
     override func updateLayer() {
-        let bounds = self.layer!.bounds
-        progressLayer.frame = CGRect(x: (bounds.width - progressLayer.bounds.width) * 0.5,
-                                     y: (bounds.height - progressLayer.bounds.height) * 0.5,
-                                     width: progressLayer.bounds.width,
-                                     height: progressLayer.bounds.height)
-        backgroundLayer.frame = CGRect(x: (bounds.width - backgroundLayer.bounds.width) * 0.5,
-                                       y: (bounds.height - backgroundLayer.bounds.height) * 0.5,
-                                       width: backgroundLayer.bounds.width,
-                                       height: backgroundLayer.bounds.height)
-        progressLayer.strokeColor = self.strokeColor.cgColor
-        backgroundLayer.strokeColor = self.backgroundStrokeColor.cgColor
+        let bounds = layer!.bounds
+        progressLayer.frame = CGRect(
+            x: (bounds.width - progressLayer.bounds.width) * 0.5,
+            y: (bounds.height - progressLayer.bounds.height) * 0.5,
+            width: progressLayer.bounds.width,
+            height: progressLayer.bounds.height)
+        backgroundLayer.frame = CGRect(
+            x: (bounds.width - backgroundLayer.bounds.width) * 0.5,
+            y: (bounds.height - backgroundLayer.bounds.height) * 0.5,
+            width: backgroundLayer.bounds.width,
+            height: backgroundLayer.bounds.height)
+        progressLayer.strokeColor = strokeColor.cgColor
+        backgroundLayer.strokeColor = backgroundStrokeColor.cgColor
     }
 
     private enum AnimationKeys {
@@ -116,7 +120,7 @@ final class CircularProgressView: NSView {
             || backgroundLayer.animation(forKey: AnimationKeys.strokeEnd) != nil
         let isProgressShown = (backgroundLayer.strokeStart == 0.0 && backgroundLayer.strokeEnd != 0.0)
 
-        guard self.window != nil else {
+        guard window != nil else {
             backgroundLayer.removeAllAnimations()
             progressLayer.removeAllAnimations()
 
@@ -126,7 +130,7 @@ final class CircularProgressView: NSView {
             progressLayer.strokeEnd = 1.0
             progressLayer.strokeStart = (progress == nil)
                 ? 1.0
-                : (progress! > 0) ? (1.0 - CGFloat(progress!)) : self.indeterminateProgressValue
+                : (progress! > 0) ? (1.0 - CGFloat(progress!)) : indeterminateProgressValue
             return
         }
         guard !isBackgroundAnimating else {
@@ -134,7 +138,7 @@ final class CircularProgressView: NSView {
             return
         }
 
-        switch (isProgressShown, (progress != nil)) {
+        switch (isProgressShown, progress != nil) {
         case (false, true):
             showProgressAnimated()
         case (true, false):
@@ -150,9 +154,9 @@ final class CircularProgressView: NSView {
         backgroundLayer.removeAllAnimations()
         progressLayer.removeAllAnimations()
 
-        self.backgroundLayer.strokeEnd = 1.0
-        self.progressLayer.strokeStart = 1.0
-        self.progressLayer.strokeEnd = 1.0
+        backgroundLayer.strokeEnd = 1.0
+        progressLayer.strokeStart = 1.0
+        progressLayer.strokeEnd = 1.0
 
         NSAnimationContext.runAnimationGroup { context in
             context.duration = self.animationDuration
@@ -179,26 +183,27 @@ final class CircularProgressView: NSView {
         let rotation = CABasicAnimation(keyPath: "transform.rotation")
         rotation.fromValue = currentRotation
         rotation.toValue = currentRotation - CGFloat.pi * 2
-        rotation.duration = self.rotationDuration
+        rotation.duration = rotationDuration
         rotation.repeatCount = .greatestFiniteMagnitude
 
-        self.progressLayer.add(rotation, forKey: AnimationKeys.rotation)
+        progressLayer.add(rotation, forKey: AnimationKeys.rotation)
     }
 
     private func stopRotation() {
-        guard progressLayer.animation(forKey: AnimationKeys.rotation) != nil,
-              progressLayer.animation(forKey: AnimationKeys.stopRotation) == nil
+        guard
+            progressLayer.animation(forKey: AnimationKeys.rotation) != nil,
+            progressLayer.animation(forKey: AnimationKeys.stopRotation) == nil
         else { return }
 
         let currentRotation = progressLayer.presentation()?.value(forKeyPath: "transform.rotation") as? CGFloat ?? 0.0
-        self.progressLayer.removeAnimation(forKey: AnimationKeys.rotation)
+        progressLayer.removeAnimation(forKey: AnimationKeys.rotation)
 
         let stopRotationAnimation = CABasicAnimation(keyPath: "transform.rotation")
         stopRotationAnimation.fromValue = currentRotation
         stopRotationAnimation.toValue = -CGFloat.pi * 2
         stopRotationAnimation.isRemovedOnCompletion = true
 
-        self.progressLayer.add(stopRotationAnimation, forKey: AnimationKeys.stopRotation)
+        progressLayer.add(stopRotationAnimation, forKey: AnimationKeys.stopRotation)
     }
 
     private func updateProgressAnimated() {
@@ -215,9 +220,10 @@ final class CircularProgressView: NSView {
             let animation = CABasicAnimation(keyPath: "strokeStart")
             let currentStrokeStart = progressLayer.strokeStart
             self.progressLayer.removeAnimation(forKey: AnimationKeys.strokeStart)
-            let newStrokeStart = 1.0 - (progress >= 0.0
-                                            ? CGFloat(progress)
-                                            : max(self.indeterminateProgressValue, min(0.9, 1.0 - currentStrokeStart)))
+            let newStrokeStart = 1.0 - (
+                progress >= 0.0
+                    ? CGFloat(progress)
+                    : max(self.indeterminateProgressValue, min(0.9, 1.0 - currentStrokeStart)))
             self.progressLayer.strokeStart = newStrokeStart
             animation.fromValue = currentStrokeStart
             animation.isRemovedOnCompletion = true
@@ -269,16 +275,16 @@ final class CircularProgressView: NSView {
 
 }
 
-private extension CAShapeLayer {
+extension CAShapeLayer {
 
-    func configureCircle(radius: CGFloat, lineWidth: CGFloat) {
-        self.bounds = CGRect(x: 0, y: 0, width: (radius + lineWidth) * 2, height: (radius + lineWidth) * 2)
+    fileprivate func configureCircle(radius: CGFloat, lineWidth: CGFloat) {
+        bounds = CGRect(x: 0, y: 0, width: (radius + lineWidth) * 2, height: (radius + lineWidth) * 2)
 
         let rect = NSRect(x: lineWidth, y: lineWidth, width: radius * 2, height: radius * 2)
-        self.path = NSBezierPath(roundedRect: rect, xRadius: radius, yRadius: radius).cgPath
+        path = NSBezierPath(roundedRect: rect, xRadius: radius, yRadius: radius).cgPath
 
         self.lineWidth = lineWidth
-        self.fillColor = NSColor.clear.cgColor
+        fillColor = NSColor.clear.cgColor
     }
 
 }

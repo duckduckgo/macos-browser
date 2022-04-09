@@ -27,7 +27,7 @@ final class SuggestionTableCellView: NSTableCellView {
     static let suffixColor = NSColor.addressBarSuffixColor
     static let iconColor = NSColor.suggestionIconColor
     static let selectedTintColor = NSColor.selectedSuggestionTintColor
-    
+
     @IBOutlet weak var iconImageView: NSImageView!
     @IBOutlet weak var suffixTextField: NSTextField!
 
@@ -35,7 +35,7 @@ final class SuggestionTableCellView: NSTableCellView {
         suffixTextField.textColor = Self.suffixColor
     }
 
-    var isSelected: Bool = false {
+    var isSelected = false {
         didSet {
             updateIconImageView()
             updateTextField()

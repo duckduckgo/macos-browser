@@ -23,8 +23,10 @@ extension TabCollection: NSSecureCoding {
     static var supportsSecureCoding: Bool { true }
 
     convenience init?(coder decoder: NSCoder) {
-        guard let tabs = decoder.decodeObject(of: [NSArray.self, Tab.self],
-                                              forKey: NSKeyedArchiveRootObjectKey) as? [Tab] else {
+        guard
+            let tabs = decoder.decodeObject(
+                of: [NSArray.self, Tab.self],
+                forKey: NSKeyedArchiveRootObjectKey) as? [Tab] else {
             return nil
         }
         self.init(tabs: tabs)

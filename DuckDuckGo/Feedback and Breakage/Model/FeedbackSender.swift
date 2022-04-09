@@ -42,9 +42,9 @@ final class FeedbackSender {
 
 }
 
-fileprivate extension Feedback.Category {
+extension Feedback.Category {
 
-    var asanaId: String {
+    fileprivate var asanaId: String {
         switch self {
         case .bug: return "1199184518165816"
         case .featureRequest: return "1199184518165815"

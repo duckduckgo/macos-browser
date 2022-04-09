@@ -16,8 +16,8 @@
 //  limitations under the License.
 //
 
-import Foundation
 import Combine
+import Foundation
 
 final class DownloadListViewModel {
 
@@ -32,7 +32,7 @@ final class DownloadListViewModel {
 
         let items = coordinator.downloads(sortedBy: \.added, ascending: false).map(DownloadViewModel.init)
         self.items = items
-        self.viewModels = items.reduce(into: [:]) { $0[$1.id] = $1 }
+        viewModels = items.reduce(into: [:]) { $0[$1.id] = $1 }
         cancellable = coordinator.updates.receive(on: DispatchQueue.main).sink { [weak self] update in
             self?.handleDownloadsUpdate(of: update.kind, item: update.item)
         }
@@ -43,16 +43,16 @@ final class DownloadListViewModel {
         switch kind {
         case .added:
             let viewModel = DownloadViewModel(item: item)
-            self.viewModels[item.identifier] = viewModel
-            self.items.insert(viewModel, at: 0)
+            viewModels[item.identifier] = viewModel
+            items.insert(viewModel, at: 0)
         case .updated:
-            self.viewModels[item.identifier]?.update(with: item)
+            viewModels[item.identifier]?.update(with: item)
         case .removed:
-            guard let index = self.items.firstIndex(where: { $0.id == item.identifier }) else {
+            guard let index = items.firstIndex(where: { $0.id == item.identifier }) else {
                 return
             }
-            self.viewModels[item.identifier] = nil
-            self.items.remove(at: index)
+            viewModels[item.identifier] = nil
+            items.remove(at: index)
         }
     }
 

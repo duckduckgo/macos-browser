@@ -16,15 +16,16 @@
 //  limitations under the License.
 //
 
+import BrowserServicesKit
 import Foundation
 import WebKit
-import BrowserServicesKit
 
 protocol FaviconUserScriptDelegate: AnyObject {
 
-    func faviconUserScript(_ faviconUserScript: FaviconUserScript,
-                           didFindFaviconLinks faviconLinks: [FaviconUserScript.FaviconLink],
-                           for documentUrl: URL)
+    func faviconUserScript(
+        _ faviconUserScript: FaviconUserScript,
+        didFindFaviconLinks faviconLinks: [FaviconUserScript.FaviconLink],
+        for documentUrl: URL)
 
 }
 
@@ -42,17 +43,19 @@ final class FaviconUserScript: NSObject, StaticUserScript {
 
     weak var delegate: FaviconUserScriptDelegate?
 
-    func userContentController(_ userContentController: WKUserContentController, didReceive message: WKScriptMessage) {
-        guard let body = message.body as? [String: Any],
-              let favicons = body["favicons"] as? [[String: Any]],
-              let documentUrlString = body["documentUrl"] as? String else {
-                  assertionFailure("FaviconUserScript: Bad message body")
-                  return
-              }
+    func userContentController(_: WKUserContentController, didReceive message: WKScriptMessage) {
+        guard
+            let body = message.body as? [String: Any],
+            let favicons = body["favicons"] as? [[String: Any]],
+            let documentUrlString = body["documentUrl"] as? String else {
+            assertionFailure("FaviconUserScript: Bad message body")
+            return
+        }
 
         let faviconLinks = favicons.compactMap { favicon -> FaviconLink? in
-            if let href = favicon["href"] as? String,
-               let rel = favicon["rel"] as? String {
+            if
+                let href = favicon["href"] as? String,
+                let rel = favicon["rel"] as? String {
                 return FaviconLink(href: href, rel: rel)
             } else {
                 assertionFailure("FaviconUserScript: Failed to get favicon link data")
@@ -69,42 +72,42 @@ final class FaviconUserScript: NSObject, StaticUserScript {
     }
 
     static let source = """
-(function() {
-    function getFavicon() {
-        return findFavicons()[0];
-    };
+        (function() {
+            function getFavicon() {
+                return findFavicons()[0];
+            };
 
-    function findFavicons() {
-         var selectors = [
-            "link[rel='favicon']",
-            "link[rel~='icon']",
-            "link[rel='apple-touch-icon']",
-            "link[rel='apple-touch-icon-precomposed']"
-        ];
-        var favicons = [];
-        while (selectors.length > 0) {
-            var selector = selectors.pop()
-            var icons = document.head.querySelectorAll(selector);
-            for (var i = 0; i < icons.length; i++) {
-                var href = icons[i].href;
-                var rel = icons[i].rel;
+            function findFavicons() {
+                 var selectors = [
+                    "link[rel='favicon']",
+                    "link[rel~='icon']",
+                    "link[rel='apple-touch-icon']",
+                    "link[rel='apple-touch-icon-precomposed']"
+                ];
+                var favicons = [];
+                while (selectors.length > 0) {
+                    var selector = selectors.pop()
+                    var icons = document.head.querySelectorAll(selector);
+                    for (var i = 0; i < icons.length; i++) {
+                        var href = icons[i].href;
+                        var rel = icons[i].rel;
 
-                // Exclude SVGs since we can't handle them
-                if (href.indexOf("svg") >= 0 || (icons[i].type && icons[i].type.indexOf("svg") >= 0)) {
-                    continue;
+                        // Exclude SVGs since we can't handle them
+                        if (href.indexOf("svg") >= 0 || (icons[i].type && icons[i].type.indexOf("svg") >= 0)) {
+                            continue;
+                        }
+                        favicons.push({ href: href, rel: rel });
+                    }
                 }
-                favicons.push({ href: href, rel: rel });
+                return favicons;
+            };
+            try {
+                var favicons = findFavicons();
+                webkit.messageHandlers.faviconFound.postMessage({ favicons: favicons, documentUrl: document.URL });
+            } catch(error) {
+                // webkit might not be defined
             }
-        }
-        return favicons;
-    };
-    try {
-        var favicons = findFavicons();
-        webkit.messageHandlers.faviconFound.postMessage({ favicons: favicons, documentUrl: document.URL });
-    } catch(error) {
-        // webkit might not be defined
-    }
-}) ();
-"""
+        }) ();
+        """
 
 }

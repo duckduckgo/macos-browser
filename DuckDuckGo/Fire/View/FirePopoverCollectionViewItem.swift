@@ -34,10 +34,10 @@ final class FirePopoverCollectionViewItem: NSCollectionViewItem {
     @IBOutlet weak var domainTextField: NSTextField!
     @IBOutlet weak var checkButton: NSButton!
     @IBOutlet weak var faviconImageView: NSImageView! {
-       didSet {
-           faviconImageView.applyFaviconStyle()
-       }
-   }
+        didSet {
+            faviconImageView.applyFaviconStyle()
+        }
+    }
 
     func setItem(_ item: FirePopoverViewModel.Item, isFireproofed: Bool) {
         domainTextField.stringValue = item.domain
@@ -45,11 +45,12 @@ final class FirePopoverCollectionViewItem: NSCollectionViewItem {
         checkButton.isHidden = isFireproofed
     }
 
-    @IBAction func checkButtonAction(_ sender: Any) {
+    @IBAction
+    func checkButtonAction(_: Any) {
         delegate?.firePopoverCollectionViewItemDidToggle(self)
     }
 
-    override func mouseDown(with event: NSEvent) {
+    override func mouseDown(with _: NSEvent) {
         delegate?.firePopoverCollectionViewItemDidToggle(self)
     }
 

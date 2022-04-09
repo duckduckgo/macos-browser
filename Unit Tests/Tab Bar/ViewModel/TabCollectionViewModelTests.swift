@@ -33,8 +33,9 @@ final class TabCollectionViewModelTests: XCTestCase {
     func testWhenTabViewModelIsCalledThenAppropriateTabViewModelIsReturned() {
         let tabCollectionViewModel = TabCollectionViewModel.aTabCollectionViewModel()
 
-        XCTAssertEqual(tabCollectionViewModel.tabViewModel(at: 0)?.tab,
-                       tabCollectionViewModel.tabCollection.tabs[0])
+        XCTAssertEqual(
+            tabCollectionViewModel.tabViewModel(at: 0)?.tab,
+            tabCollectionViewModel.tabCollection.tabs[0])
     }
 
     func testWhenTabViewModelIsCalledWithSameIndexThenTheResultHasSameIdentity() {
@@ -403,9 +404,9 @@ final class TabCollectionViewModelTests: XCTestCase {
 
 }
 
-fileprivate extension TabCollectionViewModel {
+extension TabCollectionViewModel {
 
-    static func aTabCollectionViewModel() -> TabCollectionViewModel {
+    fileprivate static func aTabCollectionViewModel() -> TabCollectionViewModel {
         let tabCollection = TabCollection()
         return TabCollectionViewModel(tabCollection: tabCollection)
     }

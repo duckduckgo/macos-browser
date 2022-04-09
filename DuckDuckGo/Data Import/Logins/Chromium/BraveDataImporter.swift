@@ -21,7 +21,7 @@ import Foundation
 final class BraveDataImporter: ChromiumDataImporter {
 
     override var processName: String {
-        return "Brave"
+        "Brave"
     }
 
     init(loginImporter: LoginImporter, bookmarkImporter: BookmarkImporter) {

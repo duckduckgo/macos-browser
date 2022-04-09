@@ -16,9 +16,9 @@
 //  limitations under the License.
 //
 
-import Foundation
 import Combine
 import CoreLocation
+import Foundation
 
 protocol GeolocationServiceProtocol: AnyObject {
     var currentLocation: Result<CLLocation, Error>? { get }
@@ -39,8 +39,9 @@ final class GeolocationService: NSObject, GeolocationServiceProtocol {
     @PublishedAfter private var currentLocationPublished: Result<CLLocation, Error>?
     @PublishedAfter private(set) var authorizationStatus: CLAuthorizationStatus {
         didSet {
-            if case .notDetermined = oldValue,
-               [.denied, .restricted].contains(authorizationStatus) {
+            if
+                case .notDetermined = oldValue,
+                [.denied, .restricted].contains(authorizationStatus) {
                 currentLocationPublished = .failure(CLError(.denied))
             }
         }
@@ -52,21 +53,25 @@ final class GeolocationService: NSObject, GeolocationServiceProtocol {
     var currentLocation: Result<CLLocation, Error>? {
         currentLocationPublished
     }
+
     var locationPublisher: AnyPublisher<Result<CLLocation, Error>?, Never> {
         locationPublisherEventsHandler
     }
+
     var authorizationStatusPublisher: AnyPublisher<CLAuthorizationStatus, Never> {
         $authorizationStatus.eraseToAnyPublisher()
     }
+
     var highAccuracyPublisher: AnyPublisher<Void, Never> {
         highAccuracyEventsHandler
     }
+
     private(set) var locationServicesEnabled: () -> Bool
 
     init(locationManager: CLLocationManager = .init()) {
         self.locationManager = locationManager
-        self.authorizationStatus = type(of: locationManager).authorizationStatus()
-        self.locationServicesEnabled = type(of: locationManager).locationServicesEnabled
+        authorizationStatus = type(of: locationManager).authorizationStatus()
+        locationServicesEnabled = type(of: locationManager).locationServicesEnabled
         super.init()
 
         locationManager.delegate = self
@@ -76,12 +81,14 @@ final class GeolocationService: NSObject, GeolocationServiceProtocol {
 
     private func setupEventsHandlers() {
         locationPublisherEventsHandler = $currentLocationPublished
-            .handleEvents(receiveSubscription: self.didReceiveGeolocationSubscription,
-                          receiveCancel: self.didReceiveGeolocationCancel)
+            .handleEvents(
+                receiveSubscription: didReceiveGeolocationSubscription,
+                receiveCancel: didReceiveGeolocationCancel)
             .eraseToAnyPublisher()
         highAccuracyEventsHandler = $currentLocationPublished.map { _ in }
-            .handleEvents(receiveSubscription: self.didReceiveHighAccuracySubscription,
-                          receiveCancel: self.didReceiveHighAccuracyCancel)
+            .handleEvents(
+                receiveSubscription: didReceiveHighAccuracySubscription,
+                receiveCancel: didReceiveHighAccuracyCancel)
             .eraseToAnyPublisher()
     }
 
@@ -101,7 +108,7 @@ final class GeolocationService: NSObject, GeolocationServiceProtocol {
         }
     }
 
-    private func didReceiveGeolocationSubscription(_ s: Subscription) {
+    private func didReceiveGeolocationSubscription(_: Subscription) {
         geolocationSubscriptionCounter += 1
     }
 
@@ -122,7 +129,7 @@ final class GeolocationService: NSObject, GeolocationServiceProtocol {
         }
     }
 
-    private func didReceiveHighAccuracySubscription(_ s: Subscription) {
+    private func didReceiveHighAccuracySubscription(_: Subscription) {
         highAccuracySubscriptionCounter += 1
     }
 
@@ -134,20 +141,21 @@ final class GeolocationService: NSObject, GeolocationServiceProtocol {
 
 extension GeolocationService: CLLocationManagerDelegate {
 
-    func locationManager(_ manager: CLLocationManager, didChangeAuthorization status: CLAuthorizationStatus) {
-        self.authorizationStatus = status
+    func locationManager(_: CLLocationManager, didChangeAuthorization status: CLAuthorizationStatus) {
+        authorizationStatus = status
     }
 
-    func locationManager(_ manager: CLLocationManager, didUpdateLocations locations: [CLLocation]) {
+    func locationManager(_: CLLocationManager, didUpdateLocations locations: [CLLocation]) {
         for location in locations {
             currentLocationPublished = .success(location)
         }
     }
 
-    func locationManager(_ manager: CLLocationManager, didFailWithError error: Error) {
+    func locationManager(_: CLLocationManager, didFailWithError error: Error) {
         guard geolocationSubscriptionCounter > 0, authorizationStatus != .notDetermined else { return }
-        if case .success = currentLocationPublished,
-           error as? CLError == CLError(.locationUnknown) {
+        if
+            case .success = currentLocationPublished,
+            error as? CLError == CLError(.locationUnknown) {
             return
         }
         currentLocationPublished = .failure(error)

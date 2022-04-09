@@ -16,8 +16,8 @@
 //  limitations under the License.
 //
 
-import Cocoa
 import BrowserServicesKit
+import Cocoa
 
 final class SuggestionViewModel {
 
@@ -111,25 +111,26 @@ final class SuggestionViewModel {
         case .historyEntry(title: _, url: let url, allowedInTopHits: _),
              .bookmark(title: _, url: let url, isFavorite: _, allowedInTopHits: _):
 
-            let userStringValue = self.userStringValue.lowercased()
+            let userStringValue = userStringValue.lowercased()
             let urlString = url.toString(forUserInput: userStringValue)
-            if !urlString.hasPrefix(userStringValue),
-               let title = self.title,
-               title.lowercased().hasPrefix(userStringValue) {
+            if
+                !urlString.hasPrefix(userStringValue),
+                let title = title,
+                title.lowercased().hasPrefix(userStringValue) {
                 return title
             }
 
             return urlString
 
         default:
-            return self.string
+            return string
         }
     }
 
     var suffix: String {
         switch suggestion {
         // for punycoded urls display real url as a suffix
-        case .website(url: let url) where url.toString(forUserInput: userStringValue, decodePunycode: false) != self.string:
+        case .website(url: let url) where url.toString(forUserInput: userStringValue, decodePunycode: false) != string:
             return " – " + url.toString(decodePunycode: false, dropScheme: true, needsWWW: false, dropTrailingSlash: true)
 
         case .phrase, .unknown, .website:
@@ -139,10 +140,11 @@ final class SuggestionViewModel {
             if url.isDuckDuckGoSearch {
                 return " – \(UserText.searchDuckDuckGoSuffix)"
             } else {
-                return " – " + url.toString(decodePunycode: true,
-                                              dropScheme: true,
-                                              needsWWW: false,
-                                              dropTrailingSlash: true)
+                return " – " + url.toString(
+                    decodePunycode: true,
+                    dropScheme: true,
+                    needsWWW: false,
+                    dropTrailingSlash: true)
             }
         }
     }

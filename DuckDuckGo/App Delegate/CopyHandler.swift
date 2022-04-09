@@ -22,10 +22,12 @@ final class CopyHandler: NSObject {
 
     static let copySelector = #selector(Self.copy(_:))
 
-    @IBAction func copy(_ sender: Any?) {
+    @IBAction
+    func copy(_: Any?) {
 
-        guard let responder = NSApp.keyWindow?.firstResponder,
-              let editor = responder as? AddressBarTextEditor else {
+        guard
+            let responder = NSApp.keyWindow?.firstResponder,
+            let editor = responder as? AddressBarTextEditor else {
             NSApp.keyWindow?.firstResponder?.perform(Self.copySelector)
             return
         }
@@ -42,8 +44,9 @@ final class CopyHandler: NSObject {
             NSPasteboard.general.setString(url.absoluteString, forType: .URL)
         }
 
-        if let controller = NSApp.keyWindow?.contentViewController as? MainViewController,
-           let url = controller.tabCollectionViewModel.selectedTabViewModel?.tab.content.url {
+        if
+            let controller = NSApp.keyWindow?.contentViewController as? MainViewController,
+            let url = controller.tabCollectionViewModel.selectedTabViewModel?.tab.content.url {
             let targetCopy = url.isDuckDuckGoSearch ? url.searchQuery : url.absoluteString
             if editor.selectedText != targetCopy {
                 copyRange()

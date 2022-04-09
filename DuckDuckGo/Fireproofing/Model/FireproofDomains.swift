@@ -16,8 +16,8 @@
 //  limitations under the License.
 //
 
-import Foundation
 import CoreData
+import Foundation
 import os.log
 
 internal class FireproofDomains {
@@ -51,8 +51,9 @@ internal class FireproofDomains {
     private func loadFireproofDomains() -> FireproofDomainsContainer {
         dispatchPrecondition(condition: .onQueue(.main))
         do {
-            if let domains = legacyUserDefaultsFireproofDomains?.map({ $0.dropWWW() }),
-               !domains.isEmpty {
+            if
+                let domains = legacyUserDefaultsFireproofDomains?.map({ $0.dropWWW() }),
+                !domains.isEmpty {
 
                 var container = FireproofDomainsContainer()
                 do {
@@ -61,7 +62,7 @@ internal class FireproofDomains {
                         try container.add(domain: domain, withId: id)
                     }
 
-                    self.legacyUserDefaultsFireproofDomains = nil
+                    legacyUserDefaultsFireproofDomains = nil
                 } catch {}
 
                 return container
@@ -133,7 +134,7 @@ internal class FireproofDomains {
     }
 
     func isFireproof(fireproofDomain domain: String) -> Bool {
-        return container.contains(domain: domain)
+        container.contains(domain: domain)
     }
 
     func isURLFireproof(url: URL) -> Bool {

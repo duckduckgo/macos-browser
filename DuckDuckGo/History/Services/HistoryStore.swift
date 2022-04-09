@@ -16,9 +16,9 @@
 //  limitations under the License.
 //
 
-import Foundation
-import CoreData
 import Combine
+import CoreData
+import Foundation
 import os.log
 
 protocol HistoryStoring {
@@ -45,7 +45,7 @@ final class HistoryStore: HistoryStoring {
     private lazy var context = Database.shared.makeContext(concurrencyType: .privateQueueConcurrencyType, name: "History")
 
     func removeEntries(_ entries: [HistoryEntry]) -> Future<History, Error> {
-        return Future { [weak self] promise in
+        Future { [weak self] promise in
             self?.context.perform {
                 guard let self = self else {
                     promise(.failure(HistoryStoreError.storeDeallocated))
@@ -65,7 +65,7 @@ final class HistoryStore: HistoryStoring {
     }
 
     func cleanOld(until date: Date) -> Future<History, Error> {
-        return Future { [weak self] promise in
+        Future { [weak self] promise in
             self?.context.perform {
                 guard let self = self else {
                     promise(.failure(HistoryStoreError.storeDeallocated))
@@ -140,7 +140,7 @@ final class HistoryStore: HistoryStoring {
     }
 
     func save(entry: HistoryEntry) -> Future<Void, Error> {
-        return Future { [weak self] promise in
+        Future { [weak self] promise in
             self?.context.perform { [weak self] in
                 guard let self = self else {
                     promise(.failure(HistoryStoreError.storeDeallocated))
@@ -186,9 +186,9 @@ final class HistoryStore: HistoryStoring {
     }
 }
 
-fileprivate extension History {
+extension History {
 
-    init(historyEntries: [HistoryEntryManagedObject]) {
+    fileprivate init(historyEntries: [HistoryEntryManagedObject]) {
         self = historyEntries.reduce(into: History(), {
             if let historyEntry = HistoryEntry(historyMO: $1) {
                 $0.append(historyEntry)
@@ -198,12 +198,13 @@ fileprivate extension History {
 
 }
 
-fileprivate extension HistoryEntry {
+extension HistoryEntry {
 
-    init?(historyMO: HistoryEntryManagedObject) {
-        guard let url = historyMO.urlEncrypted as? URL,
-              let identifier = historyMO.identifier,
-              let lastVisit = historyMO.lastVisit else {
+    fileprivate init?(historyMO: HistoryEntryManagedObject) {
+        guard
+            let url = historyMO.urlEncrypted as? URL,
+            let identifier = historyMO.identifier,
+            let lastVisit = historyMO.lastVisit else {
             assertionFailure("HistoryEntry: Failed to init HistoryEntry from HistoryEntryManagedObject")
             return nil
         }
@@ -213,22 +214,23 @@ fileprivate extension HistoryEntry {
         let numberOfTrackersBlocked = historyMO.numberOfTrackersBlocked
         let blockedTrackingEntities = historyMO.blockedTrackingEntities ?? ""
 
-        self.init(identifier: identifier,
-                  url: url,
-                  title: title,
-                  numberOfVisits: Int(numberOfVisits),
-                  lastVisit: lastVisit,
-                  failedToLoad: historyMO.failedToLoad,
-                  numberOfTrackersBlocked: Int(numberOfTrackersBlocked),
-                  blockedTrackingEntities: Set<String>(blockedTrackingEntities.components(separatedBy: "|")),
-                  trackersFound: historyMO.trackersFound)
+        self.init(
+            identifier: identifier,
+            url: url,
+            title: title,
+            numberOfVisits: Int(numberOfVisits),
+            lastVisit: lastVisit,
+            failedToLoad: historyMO.failedToLoad,
+            numberOfTrackersBlocked: Int(numberOfTrackersBlocked),
+            blockedTrackingEntities: Set<String>(blockedTrackingEntities.components(separatedBy: "|")),
+            trackersFound: historyMO.trackersFound)
     }
 
 }
 
-fileprivate extension HistoryEntryManagedObject {
+extension HistoryEntryManagedObject {
 
-    func update(with entry: HistoryEntry, afterInsertion: Bool = false) {
+    fileprivate func update(with entry: HistoryEntry, afterInsertion: Bool = false) {
         if afterInsertion {
             identifier = entry.identifier
             urlEncrypted = entry.url as NSURL
@@ -239,7 +241,7 @@ fileprivate extension HistoryEntryManagedObject {
 
         urlEncrypted = entry.url as NSURL
         if let title = entry.title, !title.isEmpty {
-            self.titleEncrypted = title as NSString
+            titleEncrypted = title as NSString
         }
         numberOfVisits = Int64(entry.numberOfVisits)
         lastVisit = entry.lastVisit

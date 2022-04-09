@@ -23,12 +23,12 @@ final class FirePopover: NSPopover {
     init(fireViewModel: FireViewModel, tabCollectionViewModel: TabCollectionViewModel) {
         super.init()
 
-        self.behavior = .transient
+        behavior = .transient
 
         setupContentController(fireViewModel: fireViewModel, tabCollectionViewModel: tabCollectionViewModel)
     }
 
-    required init?(coder: NSCoder) {
+    required init?(coder _: NSCoder) {
         fatalError("\(Self.self): Bad initializer")
     }
 
@@ -40,7 +40,7 @@ final class FirePopover: NSPopover {
         let storyboard = NSStoryboard(name: "Fire", bundle: nil)
         let controller = storyboard.instantiateController(
             identifier: "FirePopoverWrapperViewController") { coder -> FirePopoverWrapperViewController? in
-                return FirePopoverWrapperViewController(coder: coder, fireViewModel: fireViewModel, tabCollectionViewModel: tabCollectionViewModel)
+                FirePopoverWrapperViewController(coder: coder, fireViewModel: fireViewModel, tabCollectionViewModel: tabCollectionViewModel)
             }
         contentViewController = controller
     }

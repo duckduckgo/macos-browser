@@ -32,7 +32,7 @@ extension _WKDownload: WebKitDownload {
 
     var downloadDelegate: WebKitDownloadDelegate? {
         get {
-            return (objc_getAssociatedObject(self, Self.downloadDelegateKey) as? WeakDownloadDelegateRef)?.delegate
+            (objc_getAssociatedObject(self, Self.downloadDelegateKey) as? WeakDownloadDelegateRef)?.delegate
         }
         set {
             objc_setAssociatedObject(self, Self.downloadDelegateKey, WeakDownloadDelegateRef(newValue), .OBJC_ASSOCIATION_RETAIN)

@@ -23,9 +23,9 @@ struct EditableTextView: NSViewRepresentable {
 
     @Binding var text: String
 
-    var isEditable: Bool = true
+    var isEditable = true
     var font: NSFont? = .systemFont(ofSize: 14, weight: .regular)
-    var onEditingChanged: () -> Void       = {}
+    var onEditingChanged: () -> Void = {}
     var onCommit: () -> Void = {}
     var onTextChange: (String) -> Void = { _ in }
 
@@ -37,8 +37,7 @@ struct EditableTextView: NSViewRepresentable {
         let textView = CustomTextView(
             text: text,
             isEditable: isEditable,
-            font: font
-        )
+            font: font)
         textView.delegate = context.coordinator
         return textView
     }
@@ -66,8 +65,8 @@ extension EditableTextView {
                 return
             }
 
-            self.parent.text = textView.string
-            self.parent.onEditingChanged()
+            parent.text = textView.string
+            parent.onEditingChanged()
         }
 
         func textDidChange(_ notification: Notification) {
@@ -75,8 +74,8 @@ extension EditableTextView {
                 return
             }
 
-            self.parent.text = textView.string
-            self.selectedRanges = textView.selectedRanges
+            parent.text = textView.string
+            selectedRanges = textView.selectedRanges
         }
 
     }
@@ -158,7 +157,7 @@ final class CustomTextView: NSView {
         super.init(frame: .zero)
     }
 
-    required init?(coder: NSCoder) {
+    required init?(coder _: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
 

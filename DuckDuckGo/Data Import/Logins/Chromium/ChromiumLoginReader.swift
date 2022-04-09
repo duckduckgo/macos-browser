@@ -16,8 +16,8 @@
 //  limitations under the License.
 //
 
-import Foundation
 import CommonCrypto
+import Foundation
 import GRDB
 
 final class ChromiumLoginReader {
@@ -37,14 +37,14 @@ final class ChromiumLoginReader {
     private static let sqlSelectWithoutTimestamp = "SELECT signon_realm, username_value, password_value FROM logins;"
 
     init(chromiumDataDirectoryPath: String, processName: String, decryptionKey: String? = nil) {
-        self.chromiumLocalLoginDirectoryPath = chromiumDataDirectoryPath + "/Login Data"
-        self.chromiumGoogleAccountLoginDirectoryPath = chromiumDataDirectoryPath + "/Login Data For Account"
+        chromiumLocalLoginDirectoryPath = chromiumDataDirectoryPath + "/Login Data"
+        chromiumGoogleAccountLoginDirectoryPath = chromiumDataDirectoryPath + "/Login Data For Account"
         self.processName = processName
         self.decryptionKey = decryptionKey
     }
 
     func readLogins() -> Result<[ImportedLoginCredential], ChromiumLoginReader.ImportError> {
-        guard let key = self.decryptionKey ?? promptForChromiumPasswordKeychainAccess(), let derivedKey = deriveKey(from: key) else {
+        guard let key = decryptionKey ?? promptForChromiumPasswordKeychainAccess(), let derivedKey = deriveKey(from: key) else {
             return .failure(.decryptionFailed)
         }
 
@@ -72,7 +72,7 @@ final class ChromiumLoginReader {
                     let newRowTimestamp = row.passwordModifiedAt
 
                     switch (newRowTimestamp, existingRowTimestamp) {
-                    case let (.some(new), .some(existing)) where new > existing:
+                    case (.some(let new), .some(let existing)) where new > existing:
                         loginRows[row.id] = row
                     case (_, .none):
                         loginRows[row.id] = row
@@ -95,8 +95,7 @@ final class ChromiumLoginReader {
                 return ImportedLoginCredential(
                     url: row.url,
                     username: row.username,
-                    password: decryptedPassword
-                )
+                    password: decryptedPassword)
             }
 
         return .success(importedLogins)
@@ -131,7 +130,8 @@ final class ChromiumLoginReader {
             kSecClass as String: kSecClassGenericPassword,
             kSecAttrLabel as String: key,
             kSecReturnData as String: kCFBooleanTrue!,
-            kSecMatchLimit as String: kSecMatchLimitOne] as [String: Any]
+            kSecMatchLimit as String: kSecMatchLimitOne
+        ] as [String: Any]
 
         var dataFromKeychain: AnyObject?
         let status: OSStatus = SecItemCopyMatching(query as CFDictionary, &dataFromKeychain)
@@ -146,11 +146,12 @@ final class ChromiumLoginReader {
     // Step 2: Derive the decryption key from the Chromium Safe Storage key.
     //         This step uses fixed salt and iteration values that are hardcoded in Chromium.
     private func deriveKey(from password: String) -> Data? {
-        return Cryptography.decryptPBKDF2(password: .utf8(password),
-                                          salt: "saltysalt".data(using: .utf8)!,
-                                          keyByteCount: 16,
-                                          rounds: 1003,
-                                          kdf: .sha1)
+        Cryptography.decryptPBKDF2(
+            password: .utf8(password),
+            salt: "saltysalt".data(using: .utf8)!,
+            keyByteCount: 16,
+            rounds: 1003,
+            kdf: .sha1)
     }
 
     // Step 3: Decrypt password values from the credential database.
@@ -161,9 +162,10 @@ final class ChromiumLoginReader {
 
         let trimmedPasswordData = passwordData[3...]
 
-        guard let iv = String(repeating: " ", count: 16).data(using: .utf8),
-              let decrypted = Cryptography.decryptAESCBC(data: trimmedPasswordData, key: key, iv: iv),
-              passwordData.count >= 4 else {
+        guard
+            let iv = String(repeating: " ", count: 16).data(using: .utf8),
+            let decrypted = Cryptography.decryptAESCBC(data: trimmedPasswordData, key: key, iv: iv),
+            passwordData.count >= 4 else {
             return nil
         }
 
@@ -197,8 +199,8 @@ extension ChromiumCredential: FetchableRecord {
 
 }
 
-fileprivate extension DatabaseError {
-    var isMissingColumnError: Bool {
+extension DatabaseError {
+    fileprivate var isMissingColumnError: Bool {
         guard let message = message else {
             return false
         }

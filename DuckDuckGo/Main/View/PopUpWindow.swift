@@ -20,33 +20,33 @@ import Cocoa
 
 extension NSWindow {
     var isPopUpWindow: Bool {
-        return self is PopUpWindow
+        self is PopUpWindow
     }
 }
 
 final class PopUpWindow: NSPanel {
 
     override var canBecomeKey: Bool {
-        return true
+        true
     }
 
     override var canBecomeMain: Bool {
-        return true
+        true
     }
 
     init(frame: NSRect) {
-        super.init(contentRect: frame,
-                   styleMask: [.titled, .closable, .miniaturizable, .resizable, .fullSizeContentView],
-                   backing: .buffered,
-                   defer: true)
+        super.init(
+            contentRect: frame,
+            styleMask: [.titled, .closable, .miniaturizable, .resizable, .fullSizeContentView],
+            backing: .buffered,
+            defer: true)
 
         setupWindow()
     }
 
     // To avoid beep sounds, this keyDown method catches events that go through the
     // responder chain when no other responders process it
-    override func keyDown(with event: NSEvent) {
-        return
+    override func keyDown(with _: NSEvent) {
     }
 
     private func setupWindow() {
@@ -81,8 +81,9 @@ final class PopUpWindow: NSPanel {
     }
 
     override func endEditing(for object: Any?) {
-        if case .leftMouseUp = NSApp.currentEvent?.type,
-           object is AddressBarTextEditor {
+        if
+            case .leftMouseUp = NSApp.currentEvent?.type,
+            object is AddressBarTextEditor {
             // prevent deactivation of Address Bar on Toolbar click
             return
         }

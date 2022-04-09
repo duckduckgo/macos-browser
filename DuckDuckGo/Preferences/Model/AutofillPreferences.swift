@@ -72,7 +72,7 @@ final class AutofillPreferences: AutofillPreferencesPersistor {
 
     public var isAutoLockEnabled: Bool {
         get {
-            return statisticsStore.autoLockEnabled
+            statisticsStore.autoLockEnabled
         }
 
         set {
@@ -109,16 +109,14 @@ final class AutofillPreferences: AutofillPreferencesPersistor {
     var askToSavePaymentMethods: Bool
 
     private var statisticsStore: StatisticsStore {
-        return injectedDependencyStore ?? defaultDependencyStore
+        injectedDependencyStore ?? defaultDependencyStore
     }
 
     private let injectedDependencyStore: StatisticsStore?
-    private lazy var defaultDependencyStore: StatisticsStore = {
-        return LocalStatisticsStore()
-    }()
+    private lazy var defaultDependencyStore: StatisticsStore = LocalStatisticsStore()
 
     init(statisticsStore: StatisticsStore? = nil) {
-        self.injectedDependencyStore = statisticsStore
+        injectedDependencyStore = statisticsStore
     }
 
 }

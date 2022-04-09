@@ -16,9 +16,9 @@
 //  limitations under the License.
 //
 
-import Foundation
-import CoreLocation
 import Combine
+import CoreLocation
+import Foundation
 
 protocol GeolocationProviderProtocol: AnyObject {
     var isActive: Bool { get }
@@ -44,11 +44,12 @@ final class GeolocationProvider: NSObject, GeolocationProviderProtocol {
     private var appIsActiveCancellable: AnyCancellable?
     private var highAccuracyCancellable: AnyCancellable?
 
-    @PublishedAfter private var publishedIsActive: Bool = false {
+    @PublishedAfter private var publishedIsActive = false {
         didSet {
             updateLocationSubscription()
         }
     }
+
     private(set) var isActive: Bool {
         get {
             publishedIsActive
@@ -57,15 +58,17 @@ final class GeolocationProvider: NSObject, GeolocationProviderProtocol {
             publishedIsActive = newValue
         }
     }
+
     var isActivePublisher: AnyPublisher<Bool, Never> {
         $publishedIsActive.eraseToAnyPublisher()
     }
 
-    @PublishedAfter private var publishedIsPaused: Bool = false {
+    @PublishedAfter private var publishedIsPaused = false {
         didSet {
             updateLocationSubscription()
         }
     }
+
     var isPaused: Bool {
         get {
             publishedIsPaused
@@ -74,31 +77,35 @@ final class GeolocationProvider: NSObject, GeolocationProviderProtocol {
             publishedIsPaused = newValue
         }
     }
+
     var isPausedPublisher: AnyPublisher<Bool, Never> {
         $publishedIsPaused.eraseToAnyPublisher()
     }
-    private var isAppActive: Bool = false {
+
+    private var isAppActive = false {
         didSet {
             updateLocationSubscription()
         }
     }
 
-    private(set) var isRevoked: Bool = false {
+    private(set) var isRevoked = false {
         didSet {
             updateLocationSubscription()
         }
     }
 
     var authorizationStatusPublisher: AnyPublisher<CLAuthorizationStatus, Never> {
-        self.geolocationService.authorizationStatusPublisher
-    }
-    var authorizationStatus: CLAuthorizationStatus {
-        self.geolocationService.authorizationStatus
+        geolocationService.authorizationStatusPublisher
     }
 
-    init?<P: Publisher>(processPool: WKProcessPool,
-                        geolocationService: GeolocationServiceProtocol = GeolocationService.shared,
-                        appIsActivePublisher: P) where P.Output == Bool, P.Failure == Never {
+    var authorizationStatus: CLAuthorizationStatus {
+        geolocationService.authorizationStatus
+    }
+
+    init?<P: Publisher>(
+        processPool: WKProcessPool,
+        geolocationService: GeolocationServiceProtocol = GeolocationService.shared,
+        appIsActivePublisher: P) where P.Output == Bool, P.Failure == Never {
 
         guard let geolocationManager = processPool.geolocationManager else {
             assertionFailure("GeolocationProveder: WKContextGetGeolocationManager returned null")
@@ -113,11 +120,13 @@ final class GeolocationProvider: NSObject, GeolocationProviderProtocol {
         appIsActiveCancellable = appIsActivePublisher.assign(to: \.isAppActive, onWeaklyHeld: self)
     }
 
-    convenience init?(processPool: WKProcessPool,
-                      geolocationService: GeolocationServiceProtocol = GeolocationService.shared) {
-        self.init(processPool: processPool,
-                  geolocationService: geolocationService,
-                  appIsActivePublisher: NSApp.isActivePublisher())
+    convenience init?(
+        processPool: WKProcessPool,
+        geolocationService: GeolocationServiceProtocol = GeolocationService.shared) {
+        self.init(
+            processPool: processPool,
+            geolocationService: geolocationService,
+            appIsActivePublisher: NSApp.isActivePublisher())
     }
 
     deinit {
@@ -125,21 +134,22 @@ final class GeolocationProvider: NSObject, GeolocationProviderProtocol {
     }
 
     func revoke() {
-        self.isActive = false
-        self.isRevoked = true
+        isActive = false
+        isRevoked = true
     }
 
     func reset() {
-        self.isActive = false
-        self.isRevoked = false
-        self.isPaused = false
+        isActive = false
+        isRevoked = false
+        isPaused = false
     }
 
     private func updateLocationSubscription() {
-        guard self.isActive,
-              self.isAppActive,
-              !self.isRevoked,
-              !self.isPaused
+        guard
+            isActive,
+            isAppActive,
+            !isRevoked,
+            !isPaused
         else {
             locationCancellable?.cancel()
             locationCancellable = nil
@@ -157,16 +167,16 @@ final class GeolocationProvider: NSObject, GeolocationProviderProtocol {
             geolocationManager.providerDidFailToDeterminePosition(GeolocationDisabled())
             return
         }
-        self.isActive = true
+        isActive = true
     }
 
     private func updateLocation(with result: Result<CLLocation, Error>?) {
-        guard self.isActive else { return }
-        guard !self.isRevoked else {
+        guard isActive else { return }
+        guard !isRevoked else {
             geolocationManager.providerDidFailToDeterminePosition(GeolocationDisabled())
             return
         }
-        guard !self.isPaused else { return }
+        guard !isPaused else { return }
 
         switch result {
         case .none:
@@ -178,14 +188,14 @@ final class GeolocationProvider: NSObject, GeolocationProviderProtocol {
         }
     }
 
-    fileprivate func stopUpdatingLocation(geolocationManager: WKGeolocationManager) {
-        self.isActive = false
+    fileprivate func stopUpdatingLocation(geolocationManager _: WKGeolocationManager) {
+        isActive = false
         highAccuracyCancellable?.cancel()
         highAccuracyCancellable = nil
         updateLocationSubscription()
     }
 
-    fileprivate func geolocationManager(_ geolocationManager: WKGeolocationManager, setEnableHighAccuracyCallback enable: Bool) {
+    fileprivate func geolocationManager(_: WKGeolocationManager, setEnableHighAccuracyCallback enable: Bool) {
         highAccuracyCancellable = enable ? geolocationService.highAccuracyPublisher.sink { _ in } : nil
     }
 
@@ -199,16 +209,16 @@ func dynamicSymbol<T>(named symbolName: String) -> T? {
     return unsafeBitCast(f, to: T.self)
 }
 
-private extension WKProcessPool {
+extension WKProcessPool {
 
     // https://github.com/WebKit/WebKit/blob/8afe31a018b11741abdf9b4d5bb973d7c1d9ff05/Source/WebKit/UIProcess/API/C/WKContext.h#L171
-    typealias WKContextGetGeolocationManagerType = @convention(c)
+    fileprivate typealias WKContextGetGeolocationManagerType = @convention(c)
         (UnsafeRawPointer?) -> UnsafeRawPointer?
 
-    static let getGeolocationManager: WKContextGetGeolocationManagerType? =
+    fileprivate static let getGeolocationManager: WKContextGetGeolocationManagerType? =
         dynamicSymbol(named: "WKContextGetGeolocationManager")
 
-    var geolocationManager: WKGeolocationManager? {
+    fileprivate var geolocationManager: WKGeolocationManager? {
         Self.getGeolocationManager?(Unmanaged.passUnretained(self).toOpaque()).map(WKGeolocationManager.init)
     }
 
@@ -245,10 +255,11 @@ private struct WKGeolocationManager {
         let clientInfo = provider.map { Unmanaged.passUnretained($0).toOpaque() }
         let providerCallbacks = UnsafeMutablePointer<WKGeolocationProviderV1>.allocate(capacity: 1)
 
-        providerCallbacks.initialize(to: WKGeolocationProviderV1(base: .init(version: 1, clientInfo: clientInfo),
-                                                                 startUpdating: startUpdatingCallback,
-                                                                 stopUpdating: stopUpdatingCallback,
-                                                                 setEnableHighAccuracy: setEnableHighAccuracyCallback))
+        providerCallbacks.initialize(to: WKGeolocationProviderV1(
+            base: .init(version: 1, clientInfo: clientInfo),
+            startUpdating: startUpdatingCallback,
+            stopUpdating: stopUpdatingCallback,
+            setEnableHighAccuracy: setEnableHighAccuracyCallback))
 
         WKGeolocationManager.setProvider?(geolocationManager, &providerCallbacks.pointee.base)
         return UnsafeRawPointer(providerCallbacks)
@@ -260,59 +271,74 @@ private struct WKGeolocationManager {
         position.deallocate()
     }
 
-    func providerDidFailToDeterminePosition(_ error: Error?) {
+    func providerDidFailToDeterminePosition(_: Error?) {
         WKGeolocationManager.failedToDeterminePosition?(geolocationManager)
     }
 
 }
 
 // https://github.com/WebKit/WebKit/blob/8afe31a018b11741abdf9b4d5bb973d7c1d9ff05/Source/WebKit/UIProcess/API/C/WKGeolocationPosition.h
-private typealias WKGeolocationPositionCreate_c_type =  @convention(c) // swiftlint:disable:this type_name
-    (/*timestamp:*/ Double, /*latitude:*/ Double, /*longitude:*/ Double, /*accuracy:*/ Double,
-     /*providesAltitude:*/ Bool, /*altitude:*/ Double, /*providesAltitudeAccuracy:*/ Bool,
-     /*altitudeAccuracy:*/ Double, /*providesHeading:*/ Bool, /*heading:*/ Double,
-     /*providesSpeed:*/ Bool, /*speed:*/ Double, /*providesFloorLevel:*/ Bool, /*floorLevel:*/ Double)
+private typealias WKGeolocationPositionCreate_c_type = @convention(c) // swiftlint:disable:this type_name
+    (///timestamp:
+        Double, ///latitude:
+        Double, ///longitude:
+        Double, ///accuracy:
+        Double,
+        /*providesAltitude:*/ Bool, ///altitude:
+        Double, ///providesAltitudeAccuracy:
+        Bool,
+        /*altitudeAccuracy:*/ Double, ///providesHeading:
+        Bool, ///heading:
+        Double,
+        /*providesSpeed:*/ Bool, ///speed:
+        Double, ///providesFloorLevel:
+        Bool, ///floorLevel:
+        Double)
     -> UnsafeRawPointer?
 
 private let WKGeolocationPositionCreate_c: WKGeolocationPositionCreate_c_type? = // swiftlint:disable:this identifier_name
     dynamicSymbol(named: "WKGeolocationPositionCreate_c")
 
 private func createWKGeolocationPosition(_ location: CLLocation) -> UnsafeRawPointer? {
-    WKGeolocationPositionCreate_c?(/*timestamp:*/ location.timestamp.timeIntervalSinceReferenceDate,
-                                   /*latitude:*/ location.coordinate.latitude,
-                                   /*longitude:*/ location.coordinate.longitude,
-                                   /*accuracy:*/ location.horizontalAccuracy,
-                                   /*providesAltitude:*/ false,
-                                   /*altitude:*/ 0.0,
-                                   /*providesAltitudeAccuracy:*/ false,
-                                   /*altitudeAccuracy:*/ 0.0,
-                                   /*providesHeading:*/ location.course >= 0.0,
-                                   /*heading:*/ location.course >= 0.0 ? location.course : 0.0,
-                                   /*providesSpeed:*/ location.speed >= 0.0,
-                                   /*speed:*/ location.speed >= 0.0 ? location.speed : 0.0,
-                                   /*providesFloorLevel:*/ location.floor != nil,
-                                   /*floorLevel:*/ location.floor.map { Double($0.level) } ?? 0.0)
+    WKGeolocationPositionCreate_c?(///timestamp:
+        location.timestamp.timeIntervalSinceReferenceDate,
+        /*latitude:*/ location.coordinate.latitude,
+        /*longitude:*/ location.coordinate.longitude,
+        /*accuracy:*/ location.horizontalAccuracy,
+        /*providesAltitude:*/ false,
+        /*altitude:*/ 0.0,
+        /*providesAltitudeAccuracy:*/ false,
+        /*altitudeAccuracy:*/ 0.0,
+        /*providesHeading:*/ location.course >= 0.0,
+        /*heading:*/ location.course >= 0.0 ? location.course : 0.0,
+        /*providesSpeed:*/ location.speed >= 0.0,
+        /*speed:*/ location.speed >= 0.0 ? location.speed : 0.0,
+        /*providesFloorLevel:*/ location.floor != nil,
+        /*floorLevel:*/ location.floor.map { Double($0.level) } ?? 0.0)
 }
 
 private func startUpdatingCallback(geolocationManager: UnsafeRawPointer?, clientInfo: UnsafeRawPointer?) {
-    guard let clientInfo = clientInfo,
-          let geolocationManager = geolocationManager.map(WKGeolocationManager.init)
+    guard
+        let clientInfo = clientInfo,
+        let geolocationManager = geolocationManager.map(WKGeolocationManager.init)
     else { return }
     Unmanaged<GeolocationProvider>.fromOpaque(clientInfo).takeUnretainedValue()
         .startUpdatingLocation(geolocationManager: geolocationManager)
 }
 
 private func stopUpdatingCallback(geolocationManager: UnsafeRawPointer?, clientInfo: UnsafeRawPointer?) {
-    guard let clientInfo = clientInfo,
-          let geolocationManager = geolocationManager.map(WKGeolocationManager.init)
+    guard
+        let clientInfo = clientInfo,
+        let geolocationManager = geolocationManager.map(WKGeolocationManager.init)
     else { return }
     Unmanaged<GeolocationProvider>.fromOpaque(clientInfo).takeUnretainedValue()
         .stopUpdatingLocation(geolocationManager: geolocationManager)
 }
 
 private func setEnableHighAccuracyCallback(geolocationManager: UnsafeRawPointer?, enable: Bool, clientInfo: UnsafeRawPointer?) {
-    guard let clientInfo = clientInfo,
-          let geolocationManager = geolocationManager.map(WKGeolocationManager.init)
+    guard
+        let clientInfo = clientInfo,
+        let geolocationManager = geolocationManager.map(WKGeolocationManager.init)
     else { return }
     Unmanaged<GeolocationProvider>.fromOpaque(clientInfo).takeUnretainedValue()
         .geolocationManager(geolocationManager, setEnableHighAccuracyCallback: enable)

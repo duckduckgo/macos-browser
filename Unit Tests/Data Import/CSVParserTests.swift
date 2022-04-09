@@ -38,8 +38,8 @@ final class CSVParserTests: XCTestCase {
 
     func testWhenParsingRowsSurroundedByQuotesThenQuotesAreRemoved() {
         let string = """
-        "url","username","password"
-        """
+            "url","username","password"
+            """
 
         let parsed = CSVParser.parse(string: string)
 
@@ -48,8 +48,8 @@ final class CSVParserTests: XCTestCase {
 
     func testWhenParsingRowsWithAnEscapedQuoteThenQuoteIsUnescaped() {
         let string = """
-        "url","username","password\\\"with\\\"quotes"
-        """
+            "url","username","password\\\"with\\\"quotes"
+            """
 
         let parsed = CSVParser.parse(string: string)
 
@@ -58,8 +58,8 @@ final class CSVParserTests: XCTestCase {
 
     func testWhenParsingQuotedRowsContainingCommasThenTheyAreTreatedAsOneColumnEntry() {
         let string = """
-        "url","username","password,with,commas"
-        """
+            "url","username","password,with,commas"
+            """
 
         let parsed = CSVParser.parse(string: string)
 

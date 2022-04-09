@@ -22,9 +22,7 @@ import XCTest
 
 final class PermissionManagerTests: XCTestCase {
     var store: PermissionStoreMock!
-    lazy var manager: PermissionManager! = {
-        PermissionManager(store: store)
-    }()
+    lazy var manager: PermissionManager! = PermissionManager(store: store)
 
     override func setUp() {
         store = PermissionStoreMock()
@@ -32,10 +30,12 @@ final class PermissionManagerTests: XCTestCase {
 
     func testWhenPermissionManagerInitializedThenPermissionsAreLoaded() {
         store.permissions = [.entity1, .entity2]
-        let result1 = manager.permission(forDomain: "www." + PermissionEntity.entity1.domain,
-                                         permissionType: PermissionEntity.entity1.type)
-        let result2 = manager.permission(forDomain: PermissionEntity.entity2.domain.dropWWW(),
-                                         permissionType: PermissionEntity.entity2.type)
+        let result1 = manager.permission(
+            forDomain: "www." + PermissionEntity.entity1.domain,
+            permissionType: PermissionEntity.entity1.type)
+        let result2 = manager.permission(
+            forDomain: PermissionEntity.entity2.domain.dropWWW(),
+            permissionType: PermissionEntity.entity2.type)
         let result3 = manager.permission(forDomain: "otherdomain.com", permissionType: .microphone)
 
         XCTAssertEqual(store.history, [.load])
@@ -47,36 +47,47 @@ final class PermissionManagerTests: XCTestCase {
     func testWhenLoadPermissionsFailsThenPermissionsInitializedEmpty() {
         struct SomethingReallyBad: Error {}
         store.error = SomethingReallyBad()
-        XCTAssertEqual(manager.permission(forDomain: PermissionEntity.entity1.domain, permissionType: PermissionEntity.entity1.type),
-                       .ask)
+        XCTAssertEqual(
+            manager.permission(forDomain: PermissionEntity.entity1.domain, permissionType: PermissionEntity.entity1.type),
+            .ask)
 
         store.error = nil
-        manager.setPermission(.allow,
-                              forDomain: PermissionEntity.entity1.domain,
-                              permissionType: PermissionEntity.entity1.type)
+        manager.setPermission(
+            .allow,
+            forDomain: PermissionEntity.entity1.domain,
+            permissionType: PermissionEntity.entity1.type)
 
-        let result = manager.permission(forDomain: PermissionEntity.entity1.domain,
-                                        permissionType: PermissionEntity.entity1.type)
+        let result = manager.permission(
+            forDomain: PermissionEntity.entity1.domain,
+            permissionType: PermissionEntity.entity1.type)
 
-        XCTAssertEqual(store.history, [.load,
-                                       .add(domain: PermissionEntity.entity1.domain,
-                                            permissionType: PermissionEntity.entity1.type,
-                                            decision: .allow)])
+        XCTAssertEqual(store.history, [
+            .load,
+            .add(
+                domain: PermissionEntity.entity1.domain,
+                permissionType: PermissionEntity.entity1.type,
+                decision: .allow)
+        ])
         XCTAssertEqual(result, .allow)
     }
 
     func testWhenPermissionUpdatedThenItsValueIsUpdated() {
         store.permissions = [.entity1]
-        manager.setPermission(.deny,
-                              forDomain: "www." + PermissionEntity.entity1.domain,
-                              permissionType: PermissionEntity.entity1.type)
+        manager.setPermission(
+            .deny,
+            forDomain: "www." + PermissionEntity.entity1.domain,
+            permissionType: PermissionEntity.entity1.type)
 
-        let result = manager.permission(forDomain: PermissionEntity.entity1.domain,
-                                        permissionType: PermissionEntity.entity1.type)
+        let result = manager.permission(
+            forDomain: PermissionEntity.entity1.domain,
+            permissionType: PermissionEntity.entity1.type)
 
-        XCTAssertEqual(store.history, [.load,
-                                       .update(id: PermissionEntity.entity1.permission.id,
-                                               decision: .deny)])
+        XCTAssertEqual(store.history, [
+            .load,
+            .update(
+                id: PermissionEntity.entity1.permission.id,
+                decision: .deny)
+        ])
         XCTAssertEqual(result, .deny)
     }
 
@@ -84,40 +95,53 @@ final class PermissionManagerTests: XCTestCase {
         store.permissions = [.entity1]
         manager.setPermission(.ask, forDomain: PermissionEntity.entity1.domain, permissionType: PermissionEntity.entity1.type)
 
-        let result = manager.permission(forDomain: PermissionEntity.entity1.domain,
-                                        permissionType: PermissionEntity.entity1.type)
+        let result = manager.permission(
+            forDomain: PermissionEntity.entity1.domain,
+            permissionType: PermissionEntity.entity1.type)
 
-        XCTAssertEqual(store.history, [.load,
-                                       .update(id: PermissionEntity.entity1.permission.id, decision: .ask)])
+        XCTAssertEqual(store.history, [
+            .load,
+            .update(id: PermissionEntity.entity1.permission.id, decision: .ask)
+        ])
         XCTAssertEqual(result, .ask)
     }
 
     func testWhenNewPermissionIsSetThenItIsSavedAndUpdated() {
         store.permissions = []
-        XCTAssertEqual(manager.permission(forDomain: PermissionEntity.entity1.domain, permissionType: PermissionEntity.entity1.type),
-                       .ask)
-        XCTAssertEqual(manager.permission(forDomain: PermissionEntity.entity2.domain, permissionType: PermissionEntity.entity2.type),
-                     .ask)
+        XCTAssertEqual(
+            manager.permission(forDomain: PermissionEntity.entity1.domain, permissionType: PermissionEntity.entity1.type),
+            .ask)
+        XCTAssertEqual(
+            manager.permission(forDomain: PermissionEntity.entity2.domain, permissionType: PermissionEntity.entity2.type),
+            .ask)
 
-        manager.setPermission(.allow,
-                              forDomain: PermissionEntity.entity1.domain,
-                              permissionType: PermissionEntity.entity1.type)
-        manager.setPermission(.deny,
-                              forDomain: PermissionEntity.entity2.domain,
-                              permissionType: PermissionEntity.entity2.type)
+        manager.setPermission(
+            .allow,
+            forDomain: PermissionEntity.entity1.domain,
+            permissionType: PermissionEntity.entity1.type)
+        manager.setPermission(
+            .deny,
+            forDomain: PermissionEntity.entity2.domain,
+            permissionType: PermissionEntity.entity2.type)
 
-        let result1 = manager.permission(forDomain: PermissionEntity.entity1.domain,
-                                         permissionType: PermissionEntity.entity1.type)
-        let result2 = manager.permission(forDomain: PermissionEntity.entity2.domain,
-                                         permissionType: PermissionEntity.entity2.type)
+        let result1 = manager.permission(
+            forDomain: PermissionEntity.entity1.domain,
+            permissionType: PermissionEntity.entity1.type)
+        let result2 = manager.permission(
+            forDomain: PermissionEntity.entity2.domain,
+            permissionType: PermissionEntity.entity2.type)
 
-        XCTAssertEqual(store.history, [.load,
-                                       .add(domain: PermissionEntity.entity1.domain,
-                                            permissionType: PermissionEntity.entity1.type,
-                                            decision: .allow),
-                                       .add(domain: PermissionEntity.entity2.domain.dropWWW(),
-                                            permissionType: PermissionEntity.entity2.type,
-                                            decision: .deny)])
+        XCTAssertEqual(store.history, [
+            .load,
+            .add(
+                domain: PermissionEntity.entity1.domain,
+                permissionType: PermissionEntity.entity1.type,
+                decision: .allow),
+            .add(
+                domain: PermissionEntity.entity2.domain.dropWWW(),
+                permissionType: PermissionEntity.entity2.type,
+                decision: .deny)
+        ])
         XCTAssertEqual(result1, .allow)
         XCTAssertEqual(result2, .deny)
     }
@@ -131,9 +155,10 @@ final class PermissionManagerTests: XCTestCase {
             e.fulfill()
         }
 
-        manager.setPermission(.allow,
-                              forDomain: PermissionEntity.entity1.domain,
-                              permissionType: PermissionEntity.entity1.type)
+        manager.setPermission(
+            .allow,
+            forDomain: PermissionEntity.entity1.domain,
+            permissionType: PermissionEntity.entity1.type)
         withExtendedLifetime(c) {
             waitForExpectations(timeout: 1)
         }
@@ -150,9 +175,10 @@ final class PermissionManagerTests: XCTestCase {
 
         struct AddingError: Error {}
         store.error = AddingError()
-        manager.setPermission(.deny,
-                              forDomain: PermissionEntity.entity1.domain,
-                              permissionType: PermissionEntity.entity1.type)
+        manager.setPermission(
+            .deny,
+            forDomain: PermissionEntity.entity1.domain,
+            permissionType: PermissionEntity.entity1.type)
         withExtendedLifetime(c) {
             waitForExpectations(timeout: 1)
         }
@@ -169,9 +195,10 @@ final class PermissionManagerTests: XCTestCase {
             e.fulfill()
         }
 
-        manager.setPermission(.deny,
-                              forDomain: PermissionEntity.entity1.domain,
-                              permissionType: PermissionEntity.entity1.type)
+        manager.setPermission(
+            .deny,
+            forDomain: PermissionEntity.entity1.domain,
+            permissionType: PermissionEntity.entity1.type)
         withExtendedLifetime(c) {
             waitForExpectations(timeout: 1)
         }
@@ -188,9 +215,10 @@ final class PermissionManagerTests: XCTestCase {
             e.fulfill()
         }
 
-        manager.setPermission(.ask,
-                              forDomain: PermissionEntity.entity2.domain,
-                              permissionType: PermissionEntity.entity2.type)
+        manager.setPermission(
+            .ask,
+            forDomain: PermissionEntity.entity2.domain,
+            permissionType: PermissionEntity.entity2.type)
         withExtendedLifetime(c) {
             waitForExpectations(timeout: 1)
         }
@@ -205,11 +233,14 @@ final class PermissionManagerTests: XCTestCase {
         manager.burnPermissions(except: fireproofDomains) {}
 
         XCTAssertEqual(store.history, [.load, .clear(exceptions: [PermissionEntity.entity1.permission])])
-        XCTAssertEqual(manager.permission(forDomain: PermissionEntity.entity1.domain,
-                                         permissionType: PermissionEntity.entity1.type),
-                       .allow)
-        XCTAssertEqual(manager.permission(forDomain: PermissionEntity.entity2.domain, permissionType: PermissionEntity.entity2.type),
-                     .ask)
+        XCTAssertEqual(
+            manager.permission(
+                forDomain: PermissionEntity.entity1.domain,
+                permissionType: PermissionEntity.entity1.type),
+            .allow)
+        XCTAssertEqual(
+            manager.permission(forDomain: PermissionEntity.entity2.domain, permissionType: PermissionEntity.entity2.type),
+            .ask)
     }
 
     func testWhenPermissionsForDomainsBurnedThenTheyAreCleared() {
@@ -221,20 +252,25 @@ final class PermissionManagerTests: XCTestCase {
         manager.burnPermissions(of: [PermissionEntity.entity2.domain.dropWWW()]) {}
 
         XCTAssertEqual(store.history, [.load, .clear(exceptions: [PermissionEntity.entity1.permission])])
-        XCTAssertEqual(manager.permission(forDomain: PermissionEntity.entity1.domain,
-                                         permissionType: PermissionEntity.entity1.type),
-                       .allow)
-        XCTAssertEqual(manager.permission(forDomain: PermissionEntity.entity2.domain, permissionType: PermissionEntity.entity2.type),
-                     .ask)
+        XCTAssertEqual(
+            manager.permission(
+                forDomain: PermissionEntity.entity1.domain,
+                permissionType: PermissionEntity.entity1.type),
+            .allow)
+        XCTAssertEqual(
+            manager.permission(forDomain: PermissionEntity.entity2.domain, permissionType: PermissionEntity.entity2.type),
+            .ask)
     }
 
 }
 
-fileprivate extension PermissionEntity {
-    static let entity1 = PermissionEntity(permission: .init(id: .init(), decision: .allow),
-                                          domain: "duckduckgo.com",
-                                          type: .camera)
-    static let entity2 = PermissionEntity(permission: .init(id: .init(), decision: .deny),
-                                          domain: "www.domain2.com",
-                                          type: .microphone)
+extension PermissionEntity {
+    fileprivate static let entity1 = PermissionEntity(
+        permission: .init(id: .init(), decision: .allow),
+        domain: "duckduckgo.com",
+        type: .camera)
+    fileprivate static let entity2 = PermissionEntity(
+        permission: .init(id: .init(), decision: .deny),
+        domain: "www.domain2.com",
+        type: .microphone)
 }

@@ -16,9 +16,9 @@
 //  limitations under the License.
 //
 
-import WebKit
-import os
 import BrowserServicesKit
+import os
+import WebKit
 
 protocol AutoconsentUserScriptDelegate: AnyObject {
     func autoconsentUserScript(consentStatus: CookieConsentInfo)
@@ -34,19 +34,20 @@ final class AutoconsentUserScript: NSObject, UserScriptWithAutoconsent {
     private static var globalTabCounter = 0
     private static var promptLastShown: Date?
     static let background = AutoconsentBackground()
-    
+
     var injectionTime: WKUserScriptInjectionTime { .atDocumentStart }
     var forMainFrameOnly: Bool { false }
-    
+
     enum Constants {
         static let newSitePopupHidden = Notification.Name("newSitePopupHidden")
         static let popupHiddenHostKey = "popupHiddenHostKey"
     }
-    
+
     private enum MessageName: String, CaseIterable {
         case autoconsentBackgroundMessage
         case autoconsentPageReady
     }
+
     public var messageNames: [String] { MessageName.allCases.map(\.rawValue) }
     let source: String
     private let tabId: Int
@@ -55,7 +56,7 @@ final class AutoconsentUserScript: NSObject, UserScriptWithAutoconsent {
     private weak var webview: WKWebView?
     weak var delegate: AutoconsentUserScriptDelegate?
 
-    init(scriptSource: ScriptSourceProviding, config: PrivacyConfiguration) {
+    init(scriptSource _: ScriptSourceProviding, config: PrivacyConfiguration) {
         source = Self.loadJS("autoconsent-bundle", from: .main, withReplacements: [:])
         Self.globalTabCounter += 1
         tabId = Self.globalTabCounter
@@ -63,7 +64,7 @@ final class AutoconsentUserScript: NSObject, UserScriptWithAutoconsent {
     }
 
     @MainActor
-    func userContentController(_ userContentController: WKUserContentController, didReceive message: WKScriptMessage) {
+    func userContentController(_: WKUserContentController, didReceive message: WKScriptMessage) {
         guard let messageName = MessageName(rawValue: message.name) else { return }
         if message.webView != nil {
             webview = message.webView
@@ -86,26 +87,26 @@ final class AutoconsentUserScript: NSObject, UserScriptWithAutoconsent {
     @MainActor
     func onPageReady(url: URL) {
         let preferences = PrivacySecurityPreferences.shared
-        
+
         guard preferences.autoconsentEnabled != false else {
             os_log("autoconsent is disabled", log: .autoconsent, type: .debug)
             return
         }
-        
+
         // reset dashboard state
-        self.delegate?.autoconsentUserScript(consentStatus: CookieConsentInfo(
+        delegate?.autoconsentUserScript(consentStatus: CookieConsentInfo(
             consentManaged: Self.background.sitesNotifiedCache.contains(url.host ?? ""), optoutFailed: nil, selftestFailed: nil))
 
         guard config.isFeature(.autoconsent, enabledForDomain: url.host) else {
             os_log("disabled for site: %s", log: .autoconsent, type: .info, String(describing: url.absoluteString))
             return
         }
-        
+
         guard actionInProgress == false else {
             return
         }
 
-        self.actionInProgress = true
+        actionInProgress = true
 
         Self.background.ready {
             // push current privacy config settings to the background page
@@ -137,9 +138,10 @@ final class AutoconsentUserScript: NSObject, UserScriptWithAutoconsent {
             callback(true)
             return
         }
-        let now = Date.init()
-        guard Self.promptLastShown == nil || now > Self.promptLastShown!.addingTimeInterval(30),
-              let window = self.webview?.window else {
+        let now = Date()
+        guard
+            Self.promptLastShown == nil || now > Self.promptLastShown!.addingTimeInterval(30),
+            let window = webview?.window else {
             callback(false)
             return
         }
@@ -166,18 +168,18 @@ final class AutoconsentUserScript: NSObject, UserScriptWithAutoconsent {
 
     @MainActor
     func runOptOut(for cmp: AutoconsentBackground.ActionResponse, on url: URL) async {
-        guard await Self.background.isPopupOpen(in: self.tabId) else {
+        guard await Self.background.isPopupOpen(in: tabId) else {
             os_log("popup not open", log: .autoconsent, type: .debug)
-            self.actionInProgress = false
+            actionInProgress = false
             return
         }
-        
-        let optOutSuccessful = await Self.background.doOptOut(in: self.tabId)
+
+        let optOutSuccessful = await Self.background.doOptOut(in: tabId)
         guard optOutSuccessful else {
             os_log("opt out failed: %s", log: .autoconsent, type: .error, String(describing: cmp.ruleName))
-            self.delegate?.autoconsentUserScript(consentStatus: CookieConsentInfo(
+            delegate?.autoconsentUserScript(consentStatus: CookieConsentInfo(
                 consentManaged: true, optoutFailed: true, selftestFailed: nil))
-            self.actionInProgress = false
+            actionInProgress = false
             return
         }
         os_log("opted out: %s", log: .autoconsent, type: .info, String(describing: cmp.ruleName))
@@ -189,16 +191,16 @@ final class AutoconsentUserScript: NSObject, UserScriptWithAutoconsent {
         }
 
         do {
-            let response = try await Self.background.testOptOutWorked(in: self.tabId)
+            let response = try await Self.background.testOptOutWorked(in: tabId)
             os_log("self test successful?: %s", log: .autoconsent, type: .debug, String(describing: response.result))
-            self.delegate?.autoconsentUserScript(consentStatus: CookieConsentInfo(
+            delegate?.autoconsentUserScript(consentStatus: CookieConsentInfo(
                 consentManaged: true, optoutFailed: false, selftestFailed: false))
         } catch {
             os_log("self test error: %s", log: .autoconsent, type: .error, error.localizedDescription)
-            self.delegate?.autoconsentUserScript(consentStatus: CookieConsentInfo(
+            delegate?.autoconsentUserScript(consentStatus: CookieConsentInfo(
                 consentManaged: true, optoutFailed: false, selftestFailed: true))
         }
-        self.actionInProgress = false
+        actionInProgress = false
     }
 
 }

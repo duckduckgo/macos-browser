@@ -16,15 +16,15 @@
 //  limitations under the License.
 //
 
-import XCTest
 import BrowserServicesKit
+import XCTest
 @testable import DuckDuckGo_Privacy_Browser
 
 final class SuggestionLoadingMock: SuggestionLoading {
 
     var getSuggestionsCalled = false
     var completion: ((SuggestionResult?, Error?) -> Void)?
-    func getSuggestions(query: Query, completion: @escaping (SuggestionResult?, Error?) -> Void) {
+    func getSuggestions(query _: Query, completion: @escaping (SuggestionResult?, Error?) -> Void) {
         getSuggestionsCalled = true
         self.completion = completion
     }

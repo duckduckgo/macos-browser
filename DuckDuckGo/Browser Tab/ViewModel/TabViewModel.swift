@@ -16,10 +16,10 @@
 //  limitations under the License.
 //
 
+import BrowserServicesKit
 import Cocoa
 import Combine
 import os.log
-import BrowserServicesKit
 
 final class TabViewModel {
 
@@ -34,24 +34,26 @@ final class TabViewModel {
 
     private var webViewStateObserver: WebViewStateObserver?
 
-    @Published var canGoForward: Bool = false
-    @Published private(set) var canGoBack: Bool = false
-    @Published private(set) var canReload: Bool = false
-    @Published var canBeBookmarked: Bool = false
-    @Published var isWebViewLoading: Bool = false
-    @Published var isLoading: Bool = false {
+    @Published var canGoForward = false
+    @Published private(set) var canGoBack = false
+    @Published private(set) var canReload = false
+    @Published var canBeBookmarked = false
+    @Published var isWebViewLoading = false
+    @Published var isLoading = false {
         willSet {
             if newValue {
                 loadingStartTime = CACurrentMediaTime()
             }
         }
     }
-    @Published var progress: Double = 0.0
+
+    @Published var progress = 0.0
 
     struct ErrorViewState {
-        var isVisible: Bool = false
+        var isVisible = false
         var message: String?
     }
+
     @Published var errorViewState = ErrorViewState() {
         didSet {
             updateAddressBarStrings()
@@ -64,14 +66,14 @@ final class TabViewModel {
 
     var loadingStartTime: CFTimeInterval?
 
-    @Published private(set) var addressBarString: String = ""
-    @Published private(set) var passiveAddressBarString: String = ""
+    @Published private(set) var addressBarString = ""
+    @Published private(set) var passiveAddressBarString = ""
     var lastAddressBarTextFieldValue: AddressBarTextField.Value?
     var lastHomePageTextFieldValue: AddressBarTextField.Value?
 
     @Published private(set) var title: String = UserText.tabHomeTitle
     @Published private(set) var favicon: NSImage?
-    @Published private(set) var findInPage: FindInPageModel = FindInPageModel()
+    @Published private(set) var findInPage = FindInPageModel()
 
     @Published private(set) var usedPermissions = Permissions()
     @Published private(set) var permissionAuthorizationQuery: PermissionAuthorizationQuery?
@@ -246,8 +248,8 @@ final class TabViewModel {
     private var trackerAnimationTimer: Timer?
 
     private func sendAnimationTrigger() {
-        if self.tab.trackerInfo?.trackersBlocked.count ?? 0 > 0 {
-            self.trackersAnimationTriggerPublisher.send()
+        if tab.trackerInfo?.trackersBlocked.count ?? 0 > 0 {
+            trackersAnimationTriggerPublisher.send()
         }
     }
 

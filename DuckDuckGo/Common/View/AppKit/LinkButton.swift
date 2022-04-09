@@ -22,7 +22,7 @@ final class LinkButton: NSButton {
 
     override func resetCursorRects() {
         super.resetCursorRects()
-        addCursorRect(self.bounds, cursor: .pointingHand)
+        addCursorRect(bounds, cursor: .pointingHand)
     }
 
     override func layout() {

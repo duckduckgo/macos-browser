@@ -16,9 +16,9 @@
 //  limitations under the License.
 //
 
-import WebKit
-import os
 import BrowserServicesKit
+import os
+import WebKit
 
 protocol TabInstrumentationProtocol: AnyObject {
     func request(url: String, allowedIn timeInMs: Double)
@@ -41,16 +41,17 @@ final class DebugUserScript: NSObject, StaticUserScript {
     var messageNames: [String] { MessageNames.allCases.map(\.rawValue) }
     static let source: String = {
         #if DEBUG
-            return DebugUserScript.debugMessagingEnabledSource
+        return DebugUserScript.debugMessagingEnabledSource
         #else
-            return DebugUserScript.debugMessagingDisabledSource
+        return DebugUserScript.debugMessagingDisabledSource
         #endif
     }()
+
     static var script: WKUserScript = DebugUserScript.makeWKUserScript()
 
     weak var instrumentation: TabInstrumentationProtocol?
 
-    func userContentController(_ userContentController: WKUserContentController, didReceive message: WKScriptMessage) {
+    func userContentController(_: WKUserContentController, didReceive message: WKScriptMessage) {
         let messageType = MessageNames(rawValue: message.name)
 
         switch messageType {
@@ -65,33 +66,38 @@ final class DebugUserScript: NSObject, StaticUserScript {
         }
     }
 
-    private func handleLog(message: WKScriptMessage) {
+    private func handleLog(message _: WKScriptMessage) {
         // Used to log JS debug events. This is noisy every time a new tab is opened, so it's commented out unless needed.
         // os_log("%s", type: .debug, String(describing: message.body))
     }
 
     private func handleSignpost(message: WKScriptMessage) {
-        guard let dict = message.body as? [String: Any],
-        let event = dict["event"] as? String else { return }
+        guard
+            let dict = message.body as? [String: Any],
+            let event = dict["event"] as? String else { return }
 
         if event == "Request Allowed" {
-            if let elapsedTimeInMs = dict["time"] as? Double,
+            if
+                let elapsedTimeInMs = dict["time"] as? Double,
                 let url = dict["url"] as? String {
                 instrumentation?.request(url: url, allowedIn: elapsedTimeInMs)
             }
         } else if event == "Tracker Allowed" {
-            if let elapsedTimeInMs = dict["time"] as? Double,
+            if
+                let elapsedTimeInMs = dict["time"] as? Double,
                 let url = dict["url"] as? String,
                 let reason = dict["reason"] as? String? {
                 instrumentation?.tracker(url: url, allowedIn: elapsedTimeInMs, reason: reason)
             }
         } else if event == "Tracker Blocked" {
-            if let elapsedTimeInMs = dict["time"] as? Double,
+            if
+                let elapsedTimeInMs = dict["time"] as? Double,
                 let url = dict["url"] as? String {
                 instrumentation?.tracker(url: url, blockedIn: elapsedTimeInMs)
             }
         } else if event == "Generic" {
-            if let name = dict["name"] as? String,
+            if
+                let name = dict["name"] as? String,
                 let elapsedTimeInMs = dict["time"] as? Double {
                 instrumentation?.jsEvent(name: name, executedIn: elapsedTimeInMs)
             }
@@ -102,39 +108,39 @@ final class DebugUserScript: NSObject, StaticUserScript {
 extension DebugUserScript {
 
     static let debugMessagingEnabledSource = """
-var duckduckgoDebugMessaging = function() {
+        var duckduckgoDebugMessaging = function() {
 
-    function signpostEvent(data) {
-        try {
-            webkit.messageHandlers.signpostMessage.postMessage(data);
-        } catch(error) {}
-    }
+            function signpostEvent(data) {
+                try {
+                    webkit.messageHandlers.signpostMessage.postMessage(data);
+                } catch(error) {}
+            }
 
-    function log() {
-        try {
-            webkit.messageHandlers.log.postMessage(JSON.stringify(arguments));
-        } catch(error) {}
-    }
+            function log() {
+                try {
+                    webkit.messageHandlers.log.postMessage(JSON.stringify(arguments));
+                } catch(error) {}
+            }
 
-    return {
-        signpostEvent: signpostEvent,
-        log: log
-    }
-}()
-"""
+            return {
+                signpostEvent: signpostEvent,
+                log: log
+            }
+        }()
+        """
 
     static let debugMessagingDisabledSource = """
-var duckduckgoDebugMessaging = function() {
+        var duckduckgoDebugMessaging = function() {
 
-    function signpostEvent(data) {}
+            function signpostEvent(data) {}
 
-    function log() {}
+            function log() {}
 
-    return {
-        signpostEvent: signpostEvent,
-        log: log
-    }
-}()
-"""
+            return {
+                signpostEvent: signpostEvent,
+                log: log
+            }
+        }()
+        """
 
 }

@@ -25,9 +25,10 @@ final class CrashReportReader {
     func getCrashReports(since lastCheckDate: Date) -> [CrashReport] {
         let allPaths: [URL]
         do {
-            allPaths = try FileManager.default.contentsOfDirectory(at: FileManager.diagnosticReports,
-                                                                   includingPropertiesForKeys: nil,
-                                                                   options: [])
+            allPaths = try FileManager.default.contentsOfDirectory(
+                at: FileManager.diagnosticReports,
+                includingPropertiesForKeys: nil,
+                options: [])
         } catch {
             assertionFailure("CrashReportReader: Can't read content of diagnostic reports \(error.localizedDescription)")
             return []
@@ -35,8 +36,8 @@ final class CrashReportReader {
 
         return allPaths
             .filter({ isCrashReportPath($0) &&
-                        belongsToThisApp($0) &&
-                        isFile(at: $0, newerThan: lastCheckDate) })
+                    belongsToThisApp($0) &&
+                    isFile(at: $0, newerThan: lastCheckDate) })
             .compactMap(crashReport(from:))
     }
 
@@ -46,7 +47,7 @@ final class CrashReportReader {
     }
 
     private func belongsToThisApp(_ path: URL) -> Bool {
-        return path.lastPathComponent.hasPrefix(Self.displayName ?? "DuckDuckGo")
+        path.lastPathComponent.hasPrefix(Self.displayName ?? "DuckDuckGo")
     }
 
     private func isFile(at path: URL, newerThan lastCheckDate: Date) -> Bool {
@@ -57,7 +58,7 @@ final class CrashReportReader {
 
         return creationDate > lastCheckDate && creationDate < Date()
     }
-    
+
     private func crashReport(from url: URL) -> CrashReport? {
         switch url.pathExtension {
         case LegacyCrashReport.fileExtension: return LegacyCrashReport(url: url)
@@ -68,16 +69,16 @@ final class CrashReportReader {
 
 }
 
-fileprivate extension FileManager {
+extension FileManager {
 
-    static let diagnosticReports: URL = {
+    fileprivate static let diagnosticReports: URL = {
         let homeDirectoryURL = FileManager.default.homeDirectoryForCurrentUser
         return homeDirectoryURL
             .appendingPathComponent("Library/Logs/DiagnosticReports")
     }()
 
-    func fileCreationDate(url: URL) -> Date? {
-        let fileAttributes: [FileAttributeKey: Any] = (try? self.attributesOfItem(atPath: url.path)) ?? [:]
+    fileprivate func fileCreationDate(url: URL) -> Date? {
+        let fileAttributes: [FileAttributeKey: Any] = (try? attributesOfItem(atPath: url.path)) ?? [:]
         return fileAttributes[.creationDate] as? Date
     }
 

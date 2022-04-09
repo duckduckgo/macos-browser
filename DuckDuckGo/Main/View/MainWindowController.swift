@@ -17,8 +17,8 @@
 //
 
 import Cocoa
-import os.log
 import Combine
+import os.log
 
 final class MainWindowController: NSWindowController {
 
@@ -32,17 +32,19 @@ final class MainWindowController: NSWindowController {
     }
 
     var titlebarView: NSView? {
-        return window?.standardWindowButton(.closeButton)?.superview
+        window?.standardWindowButton(.closeButton)?.superview
     }
 
     init(mainViewController: MainViewController, popUp: Bool, fireViewModel: FireViewModel = FireCoordinator.fireViewModel) {
         let makeWindow: (NSRect) -> NSWindow = popUp ? PopUpWindow.init(frame:) : MainWindow.init(frame:)
 
         let size = mainViewController.view.frame.size
-        let moveToCenter = CGAffineTransform(translationX: ((NSScreen.main?.frame.width ?? 1024) - size.width) / 2,
-                                             y: ((NSScreen.main?.frame.height ?? 790) - size.height) / 2)
-        let frame = NSRect(origin: (NSScreen.main?.frame.origin ?? .zero).applying(moveToCenter),
-                           size: size)
+        let moveToCenter = CGAffineTransform(
+            translationX: ((NSScreen.main?.frame.width ?? 1024) - size.width) / 2,
+            y: ((NSScreen.main?.frame.height ?? 790) - size.height) / 2)
+        let frame = NSRect(
+            origin: (NSScreen.main?.frame.origin ?? .zero).applying(moveToCenter),
+            size: size)
 
         let window = makeWindow(frame)
         window.contentViewController = mainViewController
@@ -56,17 +58,17 @@ final class MainWindowController: NSWindowController {
         subscribeToShouldPreventUserInteraction()
     }
 
-    required init?(coder: NSCoder) {
+    required init?(coder _: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
 
     private func setupWindow() {
         window?.delegate = self
         window?.setFrameAutosaveName(Self.windowFrameSaveName)
-        
+
         NotificationCenter.default.addObserver(self, selector: #selector(dismissLockScreen), name: .macWaitlistLockScreenDidUnlock, object: nil)
     }
-    
+
     @objc
     private func dismissLockScreen() {
         updateWindowForLockScreen(lockScreenVisible: false)
@@ -111,7 +113,7 @@ final class MainWindowController: NSWindowController {
 
         mainViewController.tabBarViewController.fireButton.isEnabled = !prevented
         mainViewController.navigationBarViewController.controlsForUserPrevention.forEach { $0?.isEnabled = !prevented }
-        
+
         NSApplication.shared.mainMenuTyped.autoupdatingMenusForUserPrevention.forEach { $0.autoenablesItems = !prevented }
         NSApplication.shared.mainMenuTyped.menuItemsForUserPrevention.forEach { $0.isEnabled = !prevented }
 
@@ -125,8 +127,9 @@ final class MainWindowController: NSWindowController {
     }
 
     private func moveTabBarView(toTitlebarView: Bool) {
-        guard let newParentView = toTitlebarView ? titlebarView : mainViewController.view,
-              let tabBarViewController = mainViewController.tabBarViewController else {
+        guard
+            let newParentView = toTitlebarView ? titlebarView : mainViewController.view,
+            let tabBarViewController = mainViewController.tabBarViewController else {
             assertionFailure("Failed to move tab bar view")
             return
         }
@@ -167,9 +170,11 @@ final class MainWindowController: NSWindowController {
 
 extension MainWindowController: NSWindowDelegate {
 
-    func window(_ window: NSWindow,
-                willUseFullScreenPresentationOptions: NSApplication.PresentationOptions) -> NSApplication.PresentationOptions {
-        return [.fullScreen, .autoHideMenuBar]
+    func window(
+        _: NSWindow,
+        willUseFullScreenPresentationOptions _: NSApplication.PresentationOptions)
+        -> NSApplication.PresentationOptions {
+        [.fullScreen, .autoHideMenuBar]
     }
 
     func windowDidBecomeKey(_ notification: Notification) {
@@ -179,47 +184,47 @@ extension MainWindowController: NSWindowDelegate {
         if (notification.object as? NSWindow)?.isPopUpWindow == false {
             WindowControllersManager.shared.lastKeyMainWindowController = self
         }
-        
+
         displayLockScreenIfNecessary()
     }
-    
+
     private func displayLockScreenIfNecessary() {
         // Displaying a modal so soon after the window becoming key causes issues related to the window animation and
         // state, such as a double animation happening as the window opens, and the address bar state being incorrect.
         // Dispatching this change to the end of the main queue fixes it.
         DispatchQueue.main.async {
-#if DEBUG
+            #if DEBUG
             if !AppDelegate.isRunningTests {
                 if Waitlist.displayLockScreenIfNecessary(in: self.mainViewController) {
                     self.updateWindowForLockScreen(lockScreenVisible: true)
                 }
             }
-#else
+            #else
             if Waitlist.displayLockScreenIfNecessary(in: self.mainViewController) {
                 self.updateWindowForLockScreen(lockScreenVisible: true)
             }
-#endif
+            #endif
         }
     }
-    
+
     private func updateWindowForLockScreen(lockScreenVisible: Bool) {
         userInteraction(prevented: lockScreenVisible)
         window?.isMovable = lockScreenVisible
     }
 
-    func windowDidResignKey(_ notification: Notification) {
+    func windowDidResignKey(_: Notification) {
         mainViewController.windowDidResignKey()
     }
 
-    func windowWillEnterFullScreen(_ notification: Notification) {
+    func windowWillEnterFullScreen(_: Notification) {
         mainViewController.tabBarViewController.draggingSpace.isHidden = true
     }
 
-    func windowWillExitFullScreen(_ notification: Notification) {
+    func windowWillExitFullScreen(_: Notification) {
         mainViewController.tabBarViewController.draggingSpace.isHidden = false
     }
 
-    func windowWillClose(_ notification: Notification) {
+    func windowWillClose(_: Notification) {
         mainViewController.windowWillClose()
 
         window?.resignKey()
@@ -234,10 +239,10 @@ extension MainWindowController: NSWindowDelegate {
 
 }
 
-fileprivate extension MainMenu {
+extension MainMenu {
 
-    var menuItemsForUserPrevention: [NSMenuItem] {
-        return [
+    fileprivate var menuItemsForUserPrevention: [NSMenuItem] {
+        [
             newWindowMenuItem,
             newTabMenuItem,
             openLocationMenuItem,
@@ -251,9 +256,9 @@ fileprivate extension MainMenu {
             preferencesMenuItem
         ]
     }
-    
-    var autoupdatingMenusForUserPrevention: [NSMenu] {
-        return [
+
+    fileprivate var autoupdatingMenusForUserPrevention: [NSMenu] {
+        [
             preferencesMenuItem.menu,
             manageBookmarksMenuItem.menu
         ].compactMap { $0 }
@@ -261,17 +266,18 @@ fileprivate extension MainMenu {
 
 }
 
-fileprivate extension NavigationBarViewController {
+extension NavigationBarViewController {
 
-    var controlsForUserPrevention: [NSControl?] {
-        return [goBackButton,
-                goForwardButton,
-                refreshButton,
-                optionsButton,
-                bookmarkListButton,
-                passwordManagementButton,
-                addressBarViewController?.addressBarTextField,
-                addressBarViewController?.passiveTextField
+    fileprivate var controlsForUserPrevention: [NSControl?] {
+        [
+            goBackButton,
+            goForwardButton,
+            refreshButton,
+            optionsButton,
+            bookmarkListButton,
+            passwordManagementButton,
+            addressBarViewController?.addressBarTextField,
+            addressBarViewController?.passiveTextField
         ]
     }
 

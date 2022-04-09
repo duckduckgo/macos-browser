@@ -16,8 +16,8 @@
 //  limitations under the License.
 //
 
-import Foundation
 import CoreData
+import Foundation
 
 extension NSPersistentContainer {
 
@@ -38,9 +38,9 @@ extension NSPersistentContainer {
         container.persistentStoreDescriptions = [description]
 
         container.loadPersistentStores(completionHandler: { _, error in
-          if let error = error as NSError? {
-            fatalError("Failed to load stores: \(error), \(error.userInfo)")
-          }
+            if let error = error as NSError? {
+                fatalError("Failed to load stores: \(error), \(error.userInfo)")
+            }
         })
 
         return container
@@ -52,7 +52,7 @@ extension NSPersistentContainer {
         // `NSInMemoryStoreType` option for doing this.
         //
         // This approach is apparently the recommended choice: https://www.donnywals.com/setting-up-a-core-data-store-for-unit-tests/
-        return createPersistentContainer(at: URL(fileURLWithPath: "/dev/null"), modelName: modelName, bundle: bundle)
+        createPersistentContainer(at: URL(fileURLWithPath: "/dev/null"), modelName: modelName, bundle: bundle)
     }
 
 }

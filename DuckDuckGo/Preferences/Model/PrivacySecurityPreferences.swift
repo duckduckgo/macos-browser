@@ -16,8 +16,8 @@
 //  limitations under the License.
 //
 
-import Foundation
 import Combine
+import Foundation
 
 final class PrivacySecurityPreferences {
     static let shared = PrivacySecurityPreferences()

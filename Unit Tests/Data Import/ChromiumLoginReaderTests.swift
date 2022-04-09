@@ -42,8 +42,7 @@ class ChromiumLoginReaderTests: XCTestCase {
         let reader = ChromiumLoginReader(
             chromiumDataDirectoryPath: ChromiumLoginStore.v32.databaseDirectoryPath,
             processName: "Chrome",
-            decryptionKey: ChromiumLoginStore.v32.decryptionKey
-        )
+            decryptionKey: ChromiumLoginStore.v32.decryptionKey)
 
         let loginsResult = reader.readLogins()
 
@@ -70,8 +69,7 @@ class ChromiumLoginReaderTests: XCTestCase {
         let reader = ChromiumLoginReader(
             chromiumDataDirectoryPath: ChromiumLoginStore.legacy.databaseDirectoryPath,
             processName: "Chrome",
-            decryptionKey: ChromiumLoginStore.legacy.decryptionKey
-        )
+            decryptionKey: ChromiumLoginStore.legacy.decryptionKey)
 
         let loginsResult = reader.readLogins()
 

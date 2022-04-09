@@ -16,9 +16,9 @@
 //  limitations under the License.
 //
 
-@testable import DuckDuckGo_Privacy_Browser
 import BrowserServicesKit
 import Combine
+@testable import DuckDuckGo_Privacy_Browser
 
 final class ContentBlockerRulesManagerMock: ContentBlockerRulesManagerProtocol {
 

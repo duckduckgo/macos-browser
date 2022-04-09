@@ -16,8 +16,8 @@
 //  limitations under the License.
 //
 
-import Foundation
 import BrowserServicesKit
+import Foundation
 import TrackerRadarKit
 
 final class UserScripts {
@@ -43,12 +43,13 @@ final class UserScripts {
         surrogatesScript = SurrogatesUserScript(configuration: sourceProvider.surrogatesConfig!)
         let privacySettings = PrivacySecurityPreferences.shared
         let sessionKey = sourceProvider.sessionKey ?? ""
-        let prefs = ContentScopeProperties.init(gpcEnabled: privacySettings.gpcEnabled, sessionKey: sessionKey)
+        let prefs = ContentScopeProperties(gpcEnabled: privacySettings.gpcEnabled, sessionKey: sessionKey)
         contentScopeUserScript = ContentScopeUserScript(sourceProvider.privacyConfigurationManager, properties: prefs)
         autofillScript = WebsiteAutofillUserScript(scriptSourceProvider: sourceProvider.autofillSourceProvider!)
         if #available(macOS 11, *) {
-            autoconsentUserScript = AutoconsentUserScript(scriptSource: sourceProvider,
-                                                          config: sourceProvider.privacyConfigurationManager.privacyConfig)
+            autoconsentUserScript = AutoconsentUserScript(
+                scriptSource: sourceProvider,
+                config: sourceProvider.privacyConfigurationManager.privacyConfig)
             userScripts.append(autoconsentUserScript!)
         } else {
             autoconsentUserScript = nil

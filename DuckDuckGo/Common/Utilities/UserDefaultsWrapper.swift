@@ -94,8 +94,9 @@ public struct UserDefaultsWrapper<T> {
 
     public var wrappedValue: T {
         get {
-            if let storedValue = UserDefaults.standard.object(forKey: key.rawValue),
-               let typedValue = storedValue as? T {
+            if
+                let storedValue = UserDefaults.standard.object(forKey: key.rawValue),
+                let typedValue = storedValue as? T {
                 return typedValue
             }
 

@@ -37,8 +37,7 @@ class WebsiteBreakageReportTests: XCTestCase {
             ],
             isGPCEnabled: true,
             ampURL: "https://example.test",
-            urlParametersRemoved: false
-        )
+            urlParametersRemoved: false)
 
         let urlRequest = makeURLRequest(with: breakage.requestParameters)
 
@@ -74,8 +73,7 @@ class WebsiteBreakageReportTests: XCTestCase {
             isGPCEnabled: true,
             ampURL: "https://example.test",
             urlParametersRemoved: false,
-            manufacturer: "IBM"
-        )
+            manufacturer: "IBM")
 
         let urlRequest = makeURLRequest(with: breakage.requestParameters)
 
@@ -104,14 +102,13 @@ class WebsiteBreakageReportTests: XCTestCase {
             parameters: parameters,
             allowedQueryReservedCharacters: WebsiteBreakageSender.allowedQueryReservedCharacters,
             headers: [:],
-            timeoutInterval: 60
-        )
+            timeoutInterval: 60)
     }
 }
 
-fileprivate extension Array where Element == URLQueryItem {
+extension Array where Element == URLQueryItem {
 
-    subscript(valueFor name: String) -> String? {
-        return first(where: { $0.name == name })?.value
+    fileprivate subscript(valueFor name: String) -> String? {
+        first(where: { $0.name == name })?.value
     }
 }

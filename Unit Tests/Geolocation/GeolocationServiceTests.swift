@@ -16,17 +16,15 @@
 //  limitations under the License.
 //
 
-import Foundation
-import XCTest
 import Combine
 import CoreLocation
+import Foundation
+import XCTest
 @testable import DuckDuckGo_Privacy_Browser
 
 final class GeolocationServiceTests: XCTestCase {
     var locationManagerMock: CLLocationManagerMock!
-    lazy var service: GeolocationService = {
-        GeolocationService(locationManager: locationManagerMock)
-    }()
+    lazy var service = GeolocationService(locationManager: locationManagerMock)
 
     override func setUp() {
         CLLocationManagerMock.authStatus = .notDetermined
@@ -196,6 +194,7 @@ final class GeolocationServiceTests: XCTestCase {
             waitForExpectations(timeout: 1)
         }
     }
+
     // swiftlint:enable cyclomatic_complexity
     // swiftlint:enable function_body_length
 

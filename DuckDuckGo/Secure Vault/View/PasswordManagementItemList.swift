@@ -16,10 +16,10 @@
 //  limitations under the License.
 //
 
-import Foundation
-import SwiftUI
 import BrowserServicesKit
 import Combine
+import Foundation
+import SwiftUI
 
 struct ScrollOffsetKey: PreferenceKey {
     typealias Value = CGFloat
@@ -34,9 +34,9 @@ struct PasswordManagementItemListView: View {
     private enum Constants {
         static let dividerFadeInDistance: CGFloat = 100
     }
- 
+
     @EnvironmentObject var model: PasswordManagementItemListModel
-    
+
     @State private var opacity = CGFloat.zero
 
     var body: some View {
@@ -48,10 +48,10 @@ struct PasswordManagementItemListView: View {
                 .padding([.leading, .trailing], 10)
                 .disabled(!model.canChangeCategory)
                 .opacity(model.canChangeCategory ? 1.0 : 0.5)
-            
+
             Divider()
                 .opacity(opacity)
-            
+
             if #available(macOS 11.0, *) {
                 GeometryReader { outsideProxy in
                     ScrollView {
@@ -66,8 +66,9 @@ struct PasswordManagementItemListView: View {
                                     }
                                 }
                                 .background(GeometryReader { insideProxy in
-                                    Color.clear.preference(key: ScrollOffsetKey.self,
-                                                           value: self.calculateContentOffset(from: outsideProxy, to: insideProxy))
+                                    Color.clear.preference(
+                                        key: ScrollOffsetKey.self,
+                                        value: self.calculateContentOffset(from: outsideProxy, to: insideProxy))
                                 })
                                 .onPreferenceChange(ScrollOffsetKey.self) { offset in
                                     if offset <= 0 {
@@ -85,53 +86,54 @@ struct PasswordManagementItemListView: View {
                 }
             }
         }
-        
+
     }
-    
+
     private func calculateContentOffset(from outsideProxy: GeometryProxy, to insideProxy: GeometryProxy) -> CGFloat {
-        return outsideProxy.frame(in: .global).minY - insideProxy.frame(in: .global).minY
+        outsideProxy.frame(in: .global).minY - insideProxy.frame(in: .global).minY
     }
 
 }
 
 struct PasswordManagementItemListCategoryView: View {
-    
+
     @EnvironmentObject var model: PasswordManagementItemListModel
 
     var body: some View {
-        
+
         HStack(alignment: .center) {
-            
+
             NSPopUpButtonView<SecureVaultSorting.Category>(selection: $model.sortDescriptor.category, viewCreator: {
                 let button = PopUpButton()
-                
+
                 for category in SecureVaultSorting.Category.allCases {
-                    button.addItem(withTitle: category.title,
-                                   foregroundColor: category.foregroundColor,
-                                   backgroundColor: category.backgroundColor)
-                    
+                    button.addItem(
+                        withTitle: category.title,
+                        foregroundColor: category.foregroundColor,
+                        backgroundColor: category.backgroundColor)
+
                     if let imageName = category.imageName {
                         button.lastItem?.image = NSImage(named: imageName)
                     }
-                    
+
                     button.lastItem?.representedObject = category
-                    
+
                     if category == .allItems {
                         button.menu?.addItem(NSMenuItem.separator())
                     }
                 }
-                
+
                 button.sizeToFit()
-                
+
                 return button
             })
-                .alignmentGuide(VerticalAlignment.center) { _ in
-                    // Magic number to line up the pop up button with the sort button.
-                    // The custom pop up button cell isn't getting the expected frame, making it look misaligned, so this is used
-                    // to account for it.
-                    return 11
-                }
-            
+            .alignmentGuide(VerticalAlignment.center) { _ in
+                // Magic number to line up the pop up button with the sort button.
+                // The custom pop up button cell isn't getting the expected frame, making it look misaligned, so this is used
+                // to account for it.
+                11
+            }
+
             Spacer()
 
             // MenuButton incorrectly displays a disabled state when you re-render it with a different image.
@@ -141,23 +143,23 @@ struct PasswordManagementItemListCategoryView: View {
             // So, as a last resort, both buttons are kept in a ZStack with their image and opacity is used to determine whether they're visible, which so far seems reliable.
             //
             // Reference: https://stackoverflow.com/questions/65602163/swiftui-menu-button-displayed-as-disabled-initially
-            
+
             if model.sortDescriptor.order == .ascending {
                 PasswordManagementSortButton(imageName: "SortAscending")
             } else {
                 PasswordManagementSortButton(imageName: "SortDescending")
             }
         }
-        
+
     }
 }
 
 struct PasswordManagementItemListStackView: View {
-    
+
     @EnvironmentObject var model: PasswordManagementItemListModel
-    
+
     var body: some View {
-        
+
         if #available(macOS 11.0, *) {
             LazyVStack(alignment: .leading) {
                 PasswordManagementItemStackContentsView()
@@ -167,22 +169,22 @@ struct PasswordManagementItemListStackView: View {
                 PasswordManagementItemStackContentsView()
             }
         }
-        
+
     }
-    
+
 }
 
 private struct PasswordManagementItemStackContentsView: View {
-    
+
     @EnvironmentObject var model: PasswordManagementItemListModel
 
     var body: some View {
         Spacer(minLength: 10)
-        
+
         ForEach(Array(model.displayedItems.enumerated()), id: \.offset) { index, section in
-            
+
             Section(header: Text(section.title).padding(.leading, 18).padding(.top, index == 0 ? 0 : 10)) {
-                
+
                 ForEach(section.items, id: \.id) { item in
                     ItemView(item: item) {
                         model.selected(item: item)
@@ -190,12 +192,12 @@ private struct PasswordManagementItemStackContentsView: View {
                     .padding(.horizontal, 10)
                 }
             }
-            
+
         }
-        
+
         Spacer(minLength: 10)
     }
-    
+
 }
 
 private struct ItemView: View {
@@ -206,7 +208,7 @@ private struct ItemView: View {
     let action: () -> Void
 
     var body: some View {
- 
+
         let selected = model.selected == item
         let textColor = selected ? .white : Color(NSColor.controlTextColor)
         let font = Font.custom("SFProText-Regular", size: 13)
@@ -253,11 +255,11 @@ private struct ItemView: View {
                 .padding(.leading, 4)
             }
         })
-            .frame(maxHeight: 48)
-            .buttonStyle(selected ?
-                         PasswordManagerItemButtonStyle(bgColor: Color.accentColor) :
-                            // Almost clear, so that whole view is clickable
-                         PasswordManagerItemButtonStyle(bgColor: Color(NSColor.windowBackgroundColor.withAlphaComponent(0.001))))
+        .frame(maxHeight: 48)
+        .buttonStyle(
+            selected
+                ? PasswordManagerItemButtonStyle(bgColor: Color.accentColor)
+                : PasswordManagerItemButtonStyle(bgColor: Color(NSColor.windowBackgroundColor.withAlphaComponent(0.001))))
     }
 
 }
@@ -278,18 +280,18 @@ private struct PasswordManagerItemButtonStyle: ButtonStyle {
 }
 
 struct PasswordManagementSortButton: View {
-    
+
     @EnvironmentObject var model: PasswordManagementItemListModel
 
-    @State var sortHover: Bool = false
-    
+    @State var sortHover = false
+
     let imageName: String
-    
+
     var body: some View {
-        
+
         ZStack {
             Image(imageName)
-            
+
             // The image is added elsewhere, because MenuButton has a bug with using Images as labels.
             MenuButton(label: Image(nsImage: NSImage())) {
                 Picker("", selection: $model.sortDescriptor.parameter) {
@@ -299,9 +301,9 @@ struct PasswordManagementSortButton: View {
                 }
                 .labelsHidden()
                 .pickerStyle(.radioGroup)
-                
+
                 Divider()
-                
+
                 Picker("", selection: $model.sortDescriptor.order) {
                     ForEach(SecureVaultSorting.SortOrder.allCases, id: \.self) { order in
                         let orderTitle = order.title(for: model.sortDescriptor.parameter.type)
@@ -320,9 +322,9 @@ struct PasswordManagementSortButton: View {
             }
             .foregroundColor(.red)
         }
-        
+
     }
-    
+
     // The SwiftUI MenuButton view doesn't allow pickers which have checkmarks at the top level; they get put into a submenu.
     // This title is used in place of a nested picker.
     private func menuTitle(for string: String, checked: Bool) -> String {
@@ -332,5 +334,5 @@ struct PasswordManagementSortButton: View {
             return "    \(string)"
         }
     }
-    
+
 }

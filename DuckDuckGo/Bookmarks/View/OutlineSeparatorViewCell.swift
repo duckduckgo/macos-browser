@@ -32,7 +32,7 @@ final class OutlineSeparatorViewCell: NSTableCellView {
         super.init(frame: .zero)
 
         // Previous value of 20 was being ignored anyway and causes lots of console logging
-        self.heightAnchor.constraint(equalToConstant: 28).isActive = true
+        heightAnchor.constraint(equalToConstant: 28).isActive = true
 
         if separatorVisible {
             addSubview(separatorView)
@@ -43,7 +43,7 @@ final class OutlineSeparatorViewCell: NSTableCellView {
         }
     }
 
-    required init?(coder: NSCoder) {
+    required init?(coder _: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
 

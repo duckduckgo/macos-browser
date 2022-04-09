@@ -16,14 +16,14 @@
 //  limitations under the License.
 //
 
-import Foundation
 import BrowserServicesKit
+import Foundation
 
 final class GPCRequestFactory {
-    
+
     static let shared = GPCRequestFactory()
-    
-    struct Constants {
+
+    enum Constants {
         static let secGPCHeader = "Sec-GPC"
     }
 
@@ -32,34 +32,35 @@ final class GPCRequestFactory {
     init(privacySecurityPreferences: PrivacySecurityPreferences = PrivacySecurityPreferences.shared) {
         self.privacySecurityPreferences = privacySecurityPreferences
     }
-    
-    func requestForGPC(basedOn incomingRequest: URLRequest,
-                       config: PrivacyConfiguration = ContentBlocking.shared.privacyConfigurationManager.privacyConfig) -> URLRequest? {
+
+    func requestForGPC(
+        basedOn incomingRequest: URLRequest,
+        config: PrivacyConfiguration = ContentBlocking.shared.privacyConfigurationManager.privacyConfig)
+        -> URLRequest? {
         func removingHeader(fromRequest incomingRequest: URLRequest) -> URLRequest? {
             var request = incomingRequest
             if let headers = request.allHTTPHeaderFields, headers.firstIndex(where: { $0.key == Constants.secGPCHeader }) != nil {
                 request.setValue(nil, forHTTPHeaderField: Constants.secGPCHeader)
                 return request
             }
-            
+
             return nil
         }
-        
-        /*
-         For now, the GPC header is only applied to sites known to be honoring GPC (nytimes.com, washingtonpost.com),
-         while the DOM signal is available to all websites.
-         This is done to avoid an issue with back navigation when adding the header (e.g. with 't.co').
-         */
+
+        // For now, the GPC header is only applied to sites known to be honoring GPC (nytimes.com, washingtonpost.com),
+        // while the DOM signal is available to all websites.
+        // This is done to avoid an issue with back navigation when adding the header (e.g. with 't.co').
         guard let url = incomingRequest.url, URL.isGPCEnabled(url: url) else {
             // Remove GPC header if its still there (or nil)
             return removingHeader(fromRequest: incomingRequest)
         }
-        
+
         // Add GPC header if needed
         if config.isEnabled(featureKey: .gpc) && privacySecurityPreferences.gpcEnabled {
             var request = incomingRequest
-            if let headers = request.allHTTPHeaderFields,
-               headers.firstIndex(where: { $0.key == Constants.secGPCHeader }) == nil {
+            if
+                let headers = request.allHTTPHeaderFields,
+                headers.firstIndex(where: { $0.key == Constants.secGPCHeader }) == nil {
                 request.addValue("1", forHTTPHeaderField: Constants.secGPCHeader)
                 return request
             }
@@ -67,7 +68,7 @@ final class GPCRequestFactory {
             // Check if GPC header is still there and remove it
             return removingHeader(fromRequest: incomingRequest)
         }
-        
+
         return nil
     }
 

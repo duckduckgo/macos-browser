@@ -40,7 +40,7 @@ final class FireproofDomainsViewController: NSViewController {
     private var filteredFireproofDomains: [String]?
 
     private var fireproofDomains: [String] {
-        return filteredFireproofDomains ?? allFireproofDomains
+        filteredFireproofDomains ?? allFireproofDomains
     }
 
     override func viewDidLoad() {
@@ -55,19 +55,21 @@ final class FireproofDomainsViewController: NSViewController {
     }
 
     fileprivate func reloadData() {
-        allFireproofDomains = FireproofDomains.shared.fireproofDomains.sorted { (lhs, rhs) -> Bool in
-            return lhs < rhs
+        allFireproofDomains = FireproofDomains.shared.fireproofDomains.sorted { lhs, rhs -> Bool in
+            lhs < rhs
         }
 
         tableView.reloadData()
         updateRemoveButtonState()
     }
 
-    @IBAction func doneButtonClicked(_ sender: NSButton) {
+    @IBAction
+    func doneButtonClicked(_: NSButton) {
         dismiss()
     }
 
-    @IBAction func removeSelectedDomain(_ sender: NSButton) {
+    @IBAction
+    func removeSelectedDomain(_: NSButton) {
         guard tableView.selectedRow > -1 else {
             updateRemoveButtonState()
             return
@@ -78,7 +80,8 @@ final class FireproofDomainsViewController: NSViewController {
         reloadData()
     }
 
-    @IBAction func removeAllDomains(_ sender: NSButton) {
+    @IBAction
+    func removeAllDomains(_: NSButton) {
         FireproofDomains.shared.clearAll()
         reloadData()
     }
@@ -87,15 +90,15 @@ final class FireproofDomainsViewController: NSViewController {
 
 extension FireproofDomainsViewController: NSTableViewDataSource, NSTableViewDelegate {
 
-    func numberOfRows(in tableView: NSTableView) -> Int {
-        return fireproofDomains.count
+    func numberOfRows(in _: NSTableView) -> Int {
+        fireproofDomains.count
     }
 
-    func tableView(_ tableView: NSTableView, objectValueFor tableColumn: NSTableColumn?, row: Int) -> Any? {
-        return fireproofDomains[row]
+    func tableView(_: NSTableView, objectValueFor _: NSTableColumn?, row: Int) -> Any? {
+        fireproofDomains[row]
     }
 
-    func tableView(_ tableView: NSTableView, viewFor tableColumn: NSTableColumn?, row: Int) -> NSView? {
+    func tableView(_ tableView: NSTableView, viewFor _: NSTableColumn?, row: Int) -> NSView? {
         if let cell = tableView.makeView(withIdentifier: Constants.cellIdentifier, owner: nil) as? NSTableCellView {
             let domain = fireproofDomains[row]
             cell.textField?.stringValue = domain.dropWWW()
@@ -108,7 +111,7 @@ extension FireproofDomainsViewController: NSTableViewDataSource, NSTableViewDele
         return nil
     }
 
-    func tableViewSelectionDidChange(_ notification: Notification) {
+    func tableViewSelectionDidChange(_: Notification) {
         updateRemoveButtonState()
     }
 

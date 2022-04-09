@@ -28,7 +28,7 @@ protocol NibLoadable {
 extension NibLoadable where Self: NSView {
 
     static var nibName: String {
-        return String(describing: Self.self)
+        String(describing: Self.self)
     }
 
     static func createFromNib(in bundle: Bundle = Bundle.main) -> Self {

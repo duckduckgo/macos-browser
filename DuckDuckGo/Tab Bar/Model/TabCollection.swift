@@ -69,9 +69,10 @@ final class TabCollection: NSObject {
     }
 
     func removeTabs(at indexSet: IndexSet) {
-        guard !indexSet.contains(where: { index in
-            index < 0 && index >= tabs.count
-        }) else {
+        guard
+            !indexSet.contains(where: { index in
+                index < 0 && index >= tabs.count
+            }) else {
             os_log("TabCollection: Index out of bounds", type: .error)
             return
         }
@@ -106,7 +107,7 @@ final class TabCollection: NSObject {
             return
         }
 
-        var tabs = self.tabs
+        var tabs = tabs
         tabs.insert(tabs.remove(at: index), at: newIndex)
         self.tabs = tabs
     }

@@ -53,7 +53,7 @@ final class TabTests: XCTestCase {
         tab.tabWillClose()
         tab2.tabWillClose()
     }
-    
+
 }
 
 extension Tab {

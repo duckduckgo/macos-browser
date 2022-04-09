@@ -22,14 +22,14 @@ extension NSViewController {
 
     /// Applies a modal window style to a view controller if it is being presented by another view controller.
     func applyModalWindowStyleIfNeeded() {
-        guard self.presentingViewController != nil else { return }
+        guard presentingViewController != nil else { return }
 
-        self.view.window?.titleVisibility = .hidden
-        self.view.window?.titlebarAppearsTransparent = true
-        self.view.window?.standardWindowButton(.zoomButton)?.isHidden = true
-        self.view.window?.standardWindowButton(.closeButton)?.isHidden = true
-        self.view.window?.standardWindowButton(.miniaturizeButton)?.isHidden = true
-        self.view.window?.styleMask = [.resizable, .titled, .fullSizeContentView]
+        view.window?.titleVisibility = .hidden
+        view.window?.titlebarAppearsTransparent = true
+        view.window?.standardWindowButton(.zoomButton)?.isHidden = true
+        view.window?.standardWindowButton(.closeButton)?.isHidden = true
+        view.window?.standardWindowButton(.miniaturizeButton)?.isHidden = true
+        view.window?.styleMask = [.resizable, .titled, .fullSizeContentView]
     }
 
     func wrappedInWindowController() -> NSWindowController {

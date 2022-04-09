@@ -34,18 +34,20 @@ final class DownloadListStoreTests: XCTestCase {
 
     func testWhenDownloadItemIsSavedMultipleTimes_ThenTheNewestValueMustBeLoadedFromStore() {
         var item = DownloadListItem.testItem
-        let firstSavingExpectation = self.expectation(description: "Saving")
+        let firstSavingExpectation = expectation(description: "Saving")
         save(item, expectation: firstSavingExpectation)
 
         item.destinationURL = URL(fileURLWithPath: "/new/path")
-        item.error = .failedToCompleteDownloadTask(underlyingError: NSError(domain: "test",
-                                                                            code: 42,
-                                                                            userInfo: [NSLocalizedDescriptionKey: "localized description"]),
-                                                   resumeData: "resumeData".data(using: .utf8)!)
-        let secondSavingExpectation = self.expectation(description: "Saving")
+        item.error = .failedToCompleteDownloadTask(
+            underlyingError: NSError(
+                domain: "test",
+                code: 42,
+                userInfo: [NSLocalizedDescriptionKey: "localized description"]),
+            resumeData: "resumeData".data(using: .utf8)!)
+        let secondSavingExpectation = expectation(description: "Saving")
         save(item, expectation: secondSavingExpectation)
 
-        let loadingExpectation = self.expectation(description: "Loading")
+        let loadingExpectation = expectation(description: "Loading")
         store.fetch { result in
             loadingExpectation.fulfill()
             guard case .success(let items) = result else { XCTFail("unexpected failure \(result)"); return }
@@ -64,24 +66,25 @@ final class DownloadListStoreTests: XCTestCase {
     }
 
     func testWhenFetchClearingItemsOlderThanIsCalled_ThenOlderItemsThanDateAreCleaned() {
-        let oldItem = DownloadListItem(identifier: UUID(),
-                                       added: Date.daysAgo(30),
-                                       modified: Date.daysAgo(3),
-                                       url: URL(string: "https://duckduckgo.com")!,
-                                       websiteURL: nil,
-                                       progress: nil,
-                                       fileType: .pdf,
-                                       destinationURL: URL(fileURLWithPath: "/test/path"),
-                                       tempURL: nil,
-                                       error: nil)
+        let oldItem = DownloadListItem(
+            identifier: UUID(),
+            added: Date.daysAgo(30),
+            modified: Date.daysAgo(3),
+            url: URL(string: "https://duckduckgo.com")!,
+            websiteURL: nil,
+            progress: nil,
+            fileType: .pdf,
+            destinationURL: URL(fileURLWithPath: "/test/path"),
+            tempURL: nil,
+            error: nil)
         let notSoOldItem = DownloadListItem.olderItem
         let newItem = DownloadListItem.testItem
 
-        save(oldItem, expectation: self.expectation(description: "Saving 1"))
-        save(notSoOldItem, expectation: self.expectation(description: "Saving 2"))
-        save(newItem, expectation: self.expectation(description: "Saving 3"))
+        save(oldItem, expectation: expectation(description: "Saving 1"))
+        save(notSoOldItem, expectation: expectation(description: "Saving 2"))
+        save(newItem, expectation: expectation(description: "Saving 3"))
 
-        let loadingExpectation = self.expectation(description: "Loading")
+        let loadingExpectation = expectation(description: "Loading")
         store.fetch(clearingItemsOlderThan: Date.daysAgo(2)) { result in
             loadingExpectation.fulfill()
             guard case .success(let items) = result else { XCTFail("unexpected failure \(result)"); return }
@@ -97,12 +100,12 @@ final class DownloadListStoreTests: XCTestCase {
     func testWhenDownloadIsRemoved_ThenItShouldntBeLoadedFromStore() throws {
         let item1 = DownloadListItem.testItem
         let item2 = DownloadListItem.olderItem
-        save(item1, expectation: self.expectation(description: "Saving 1"))
-        save(item2, expectation: self.expectation(description: "Saving 2"))
+        save(item1, expectation: expectation(description: "Saving 1"))
+        save(item2, expectation: expectation(description: "Saving 2"))
 
         store.remove(item1)
 
-        let loadingExpectation = self.expectation(description: "Loading")
+        let loadingExpectation = expectation(description: "Loading")
         store.fetch { result in
             loadingExpectation.fulfill()
             guard case .success(let items) = result else { XCTFail("unexpected failure \(result)"); return }
@@ -114,12 +117,12 @@ final class DownloadListStoreTests: XCTestCase {
     }
 
     func testWhenDownloadsCleared_ThenNoItemsLoaded() throws {
-        save(.testItem, expectation: self.expectation(description: "Saving 1"))
-        save(.olderItem, expectation: self.expectation(description: "Saving 2"))
+        save(.testItem, expectation: expectation(description: "Saving 1"))
+        save(.olderItem, expectation: expectation(description: "Saving 2"))
 
         store.clear()
 
-        let loadingExpectation = self.expectation(description: "Loading")
+        let loadingExpectation = expectation(description: "Loading")
         store.fetch { result in
             loadingExpectation.fulfill()
             guard case .success(let items) = result else { XCTFail("unexpected failure \(result)"); return }
@@ -133,24 +136,26 @@ final class DownloadListStoreTests: XCTestCase {
 }
 
 extension DownloadListItem {
-    static let testItem = DownloadListItem(identifier: UUID(),
-                                           added: Date(),
-                                           modified: Date(),
-                                           url: URL(string: "https://duckduckgo.com/testdload")!,
-                                           websiteURL: URL(string: "https://duckduckgo.com"),
-                                           progress: nil,
-                                           fileType: .pdf,
-                                           destinationURL: URL(fileURLWithPath: "/test/file/path"),
-                                           tempURL: URL(fileURLWithPath: "/temp/file/path"),
-                                           error: nil)
-    static let olderItem = DownloadListItem(identifier: UUID(),
-                                            added: Date.daysAgo(30),
-                                            modified: Date.daysAgo(1),
-                                            url: URL(string: "https://testdownload.com")!,
-                                            websiteURL: nil,
-                                            progress: nil,
-                                            fileType: .jpeg,
-                                            destinationURL: URL(fileURLWithPath: "/test/path.jpeg"),
-                                            tempURL: nil,
-                                            error: nil)
+    static let testItem = DownloadListItem(
+        identifier: UUID(),
+        added: Date(),
+        modified: Date(),
+        url: URL(string: "https://duckduckgo.com/testdload")!,
+        websiteURL: URL(string: "https://duckduckgo.com"),
+        progress: nil,
+        fileType: .pdf,
+        destinationURL: URL(fileURLWithPath: "/test/file/path"),
+        tempURL: URL(fileURLWithPath: "/temp/file/path"),
+        error: nil)
+    static let olderItem = DownloadListItem(
+        identifier: UUID(),
+        added: Date.daysAgo(30),
+        modified: Date.daysAgo(1),
+        url: URL(string: "https://testdownload.com")!,
+        websiteURL: nil,
+        progress: nil,
+        fileType: .jpeg,
+        destinationURL: URL(fileURLWithPath: "/test/path.jpeg"),
+        tempURL: nil,
+        error: nil)
 }

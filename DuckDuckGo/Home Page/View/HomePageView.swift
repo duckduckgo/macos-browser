@@ -16,42 +16,42 @@
 //  limitations under the License.
 //
 
-import SwiftUI
 import BrowserServicesKit
+import SwiftUI
 
 extension HomePage.Views {
 
-struct RootView: View {
+    struct RootView: View {
 
-    let backgroundColor = Color("NewTabPageBackgroundColor")
-    let targetWidth: CGFloat = 482
+        let backgroundColor = Color("NewTabPageBackgroundColor")
+        let targetWidth: CGFloat = 482
 
-    var body: some View {
-        ZStack(alignment: .top) {
+        var body: some View {
+            ZStack(alignment: .top) {
 
-            ScrollView {
-                VStack(spacing: 0) {
-                    Group {
-                        DefaultBrowserPrompt()
+                ScrollView {
+                    VStack(spacing: 0) {
+                        Group {
+                            DefaultBrowserPrompt()
 
-                        Favorites()
-                            .padding(.top, 72)
+                            Favorites()
+                                .padding(.top, 72)
 
-                        RecentlyVisited()
-                            .padding(.top, 66)
-                            .padding(.bottom, 16)
+                            RecentlyVisited()
+                                .padding(.top, 66)
+                                .padding(.bottom, 16)
 
+                        }
+                        .frame(width: 508)
                     }
-                    .frame(width: 508)
+                    .frame(maxWidth: .infinity)
                 }
-                .frame(maxWidth: .infinity)
+
             }
-
+            .frame(maxWidth: .infinity)
+            .background(backgroundColor)
         }
-        .frame(maxWidth: .infinity)
-        .background(backgroundColor)
-     }
 
-}
+    }
 
 }

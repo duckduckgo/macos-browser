@@ -20,40 +20,41 @@ import SwiftUI
 
 extension Onboarding {
 
-struct ActionButtonStyle: ButtonStyle {
+    struct ActionButtonStyle: ButtonStyle {
 
-    func makeBody(configuration: Self.Configuration) -> some View {
+        func makeBody(configuration: Self.Configuration) -> some View {
 
-        let color = configuration.isPressed ? Color("OnboardingActionButtonPressedColor") : Color("OnboardingActionButtonColor")
+            let color = configuration.isPressed ? Color("OnboardingActionButtonPressedColor") : Color("OnboardingActionButtonColor")
 
-        configuration.label
-            .padding(.vertical, 8)
-            .frame(maxWidth: .infinity)
-            .truncationMode(.tail)
-            .background(RoundedRectangle(cornerRadius: 8, style: .continuous).fill(color))
-            .foregroundColor(.white)
-            .font(.system(size: 13, weight: .semibold, design: .default))
+            configuration.label
+                .padding(.vertical, 8)
+                .frame(maxWidth: .infinity)
+                .truncationMode(.tail)
+                .background(RoundedRectangle(cornerRadius: 8, style: .continuous).fill(color))
+                .foregroundColor(.white)
+                .font(.system(size: 13, weight: .semibold, design: .default))
 
+        }
     }
-}
 
-struct SkipButtonStyle: ButtonStyle {
+    struct SkipButtonStyle: ButtonStyle {
 
-    func makeBody(configuration: Self.Configuration) -> some View {
+        func makeBody(configuration: Self.Configuration) -> some View {
 
-        let color = configuration.isPressed ? Color("OnboardingSkipButtonPressedColor") : Color("OnboardingSkipButtonColor")
+            let color = configuration.isPressed ? Color("OnboardingSkipButtonPressedColor") : Color("OnboardingSkipButtonColor")
 
-        configuration.label
-            .padding(.vertical, 8)
-            .frame(maxWidth: .infinity)
-            .truncationMode(.tail)
-            .foregroundColor(.black)
-            .font(.system(size: 13, weight: .semibold, design: .default))
-            .background(RoundedRectangle(cornerRadius: 8, style: .continuous).fill(color)
-                                // background for the background to prevent transparency show matt anderson details
-                                .background(RoundedRectangle(cornerRadius: 8, style: .continuous).fill(Color("OnboardingSkipButtonBaseColor"))))
+            configuration.label
+                .padding(.vertical, 8)
+                .frame(maxWidth: .infinity)
+                .truncationMode(.tail)
+                .foregroundColor(.black)
+                .font(.system(size: 13, weight: .semibold, design: .default))
+                .background(
+                    RoundedRectangle(cornerRadius: 8, style: .continuous).fill(color)
+                        // background for the background to prevent transparency show matt anderson details
+                        .background(RoundedRectangle(cornerRadius: 8, style: .continuous).fill(Color("OnboardingSkipButtonBaseColor"))))
 
+        }
     }
-}
 
 }

@@ -16,8 +16,8 @@
 //  limitations under the License.
 //
 
-import Foundation
 import Combine
+import Foundation
 import os.log
 
 private func getFirstAvailableWebView() -> WKWebView? {
@@ -51,15 +51,17 @@ final class DownloadListCoordinator {
         case removed
         case updated
     }
+
     typealias Update = (kind: UpdateKind, item: DownloadListItem)
     private let updatesSubject = PassthroughSubject<Update, Never>()
 
     let progress = Progress()
 
-    init(store: DownloadListStoring = DownloadListStore(),
-         downloadManager: FileDownloadManagerProtocol = FileDownloadManager.shared,
-         clearItemsOlderThan clearDate: Date = .daysAgo(2),
-         webViewProvider: @escaping () -> WKWebView? = getFirstAvailableWebView) {
+    init(
+        store: DownloadListStoring = DownloadListStore(),
+        downloadManager: FileDownloadManagerProtocol = FileDownloadManager.shared,
+        clearItemsOlderThan clearDate: Date = .daysAgo(2),
+        webViewProvider: @escaping () -> WKWebView? = getFirstAvailableWebView) {
 
         self.store = store
         self.downloadManager = downloadManager
@@ -110,7 +112,7 @@ final class DownloadListCoordinator {
         }
         // skip already known task: it's already subscribed
         guard downloadTaskCancellables[task] == nil else { return }
-        
+
         let item = item ?? DownloadListItem(task: task)
 
         task.$location
@@ -120,16 +122,16 @@ final class DownloadListCoordinator {
             .sink { [weak self] location in
                 self?.addItemOrUpdateLocation(for: item, destinationURL: location.destinationURL, tempURL: location.tempURL)
             }
-            .store(in: &self.downloadTaskCancellables[task, default: []])
+            .store(in: &downloadTaskCancellables[task, default: []])
 
         task.output
             .receive(on: DispatchQueue.main)
             .sink { [weak self] completion in
                 self?.downloadTask(task, withId: item.identifier, completedWith: completion)
             } receiveValue: { _ in }
-            .store(in: &self.downloadTaskCancellables[task, default: []])
+            .store(in: &downloadTaskCancellables[task, default: []])
 
-        self.subscribeToProgress(of: task)
+        subscribeToProgress(of: task)
     }
 
     private func addItemOrUpdateLocation(for initialItem: DownloadListItem, destinationURL: URL?, tempURL: URL?) {
@@ -149,13 +151,13 @@ final class DownloadListCoordinator {
         task.progress.publisher(for: \.totalUnitCount)
             .combineLatest(task.progress.publisher(for: \.completedUnitCount))
             .throttle(for: 0.2, scheduler: DispatchQueue.main, latest: true)
-            .sink { [weak self] (total, completed) in
+            .sink { [weak self] total, completed in
                 guard let self = self else { return }
                 self.progress.totalUnitCount += (total - lastKnownProgress.total)
                 self.progress.completedUnitCount += (completed - lastKnownProgress.completed)
                 lastKnownProgress = (total, completed)
             }
-            .store(in: &self.taskProgressCancellables[task, default: []])
+            .store(in: &taskProgressCancellables[task, default: []])
 
         task.output.receive(on: DispatchQueue.main)
             .sink { [weak self] _ in
@@ -165,7 +167,7 @@ final class DownloadListCoordinator {
                 self.taskProgressCancellables[task] = nil
 
             } receiveValue: { _ in }
-            .store(in: &self.taskProgressCancellables[task, default: []])
+            .store(in: &taskProgressCancellables[task, default: []])
     }
 
     private func downloadTask(_ task: WebKitDownloadTask, withId identifier: UUID, completedWith result: Subscribers.Completion<FileDownloadError>) {
@@ -178,36 +180,36 @@ final class DownloadListCoordinator {
             item?.progress = nil
         }
 
-        self.downloadTaskCancellables[task] = nil
+        downloadTaskCancellables[task] = nil
     }
 
     private func updateItem(withId identifier: UUID, mutate: (inout DownloadListItem?) -> Void) {
         dispatchPrecondition(condition: .onQueue(.main))
 
-        let original = self.items[identifier]
+        let original = items[identifier]
         var modified = original
         mutate(&modified)
         guard modified != original else { return }
 
-        self.items[identifier] = modified
+        items[identifier] = modified
 
         switch (original, modified) {
         case (.none, .none):
             break
         case (.none, .some(let item)):
-            self.updatesSubject.send((.added, item))
+            updatesSubject.send((.added, item))
             store.save(item)
         case (.some, .some(let item)):
-            self.updatesSubject.send((.updated, item))
+            updatesSubject.send((.updated, item))
             store.save(item)
         case (.some(let item), .none):
-            self.updatesSubject.send((.removed, item))
+            updatesSubject.send((.removed, item))
             store.remove(item)
         }
     }
 
     private func downloadRestartedCallback(for item: DownloadListItem, webView: WKWebView) -> (WebKitDownload) -> Void {
-        return { download in
+        { download in
             // Important: WebKitDownloadTask (as well as WKWebView) should be deallocated on the Main Thread
             dispatchPrecondition(condition: .onQueue(.main))
             withExtendedLifetime(webView) {
@@ -231,7 +233,7 @@ final class DownloadListCoordinator {
     }
 
     var mostRecentModification: Date? {
-        return items.values.max { a, b in
+        items.values.max { a, b in
             a.modified < b.modified
         }?.modified
     }
@@ -245,35 +247,37 @@ final class DownloadListCoordinator {
     }
 
     var updates: AnyPublisher<Update, Never> {
-        return updatesSubject.eraseToAnyPublisher()
+        updatesSubject.eraseToAnyPublisher()
     }
 
     func restart(downloadWithIdentifier identifier: UUID) {
         dispatchPrecondition(condition: .onQueue(.main))
 
-        guard let item = items[identifier], let webView = self.webViewProvider() else { return }
+        guard let item = items[identifier], let webView = webViewProvider() else { return }
         do {
-            guard let resumeData = item.error?.resumeData,
-                  let tempURL = item.tempURL,
-                  FileManager.default.fileExists(atPath: tempURL.path),
-                  item.destinationURL != nil
+            guard
+                let resumeData = item.error?.resumeData,
+                let tempURL = item.tempURL,
+                FileManager.default.fileExists(atPath: tempURL.path),
+                item.destinationURL != nil
             else {
                 struct ThrowableError: Error {}
                 throw ThrowableError()
             }
-            try webView.resumeDownload(from: resumeData,
-                                       to: tempURL,
-                                       completionHandler: self.downloadRestartedCallback(for: item, webView: webView))
+            try webView.resumeDownload(
+                from: resumeData,
+                to: tempURL,
+                completionHandler: downloadRestartedCallback(for: item, webView: webView))
         } catch {
             let request = item.createRequest()
-            webView.startDownload(request, completionHandler: self.downloadRestartedCallback(for: item, webView: webView))
+            webView.startDownload(request, completionHandler: downloadRestartedCallback(for: item, webView: webView))
         }
     }
 
     func cleanupInactiveDownloads() {
         dispatchPrecondition(condition: .onQueue(.main))
 
-        for (id, item) in self.items where item.progress == nil {
+        for (id, item) in items where item.progress == nil {
             self.items[id] = nil
             self.updatesSubject.send((.removed, item))
         }
@@ -282,8 +286,9 @@ final class DownloadListCoordinator {
     }
 
     func cleanupInactiveDownloads(for domains: Set<String>) {
-        for (id, item) in self.items where item.progress == nil {
-            if domains.contains(item.websiteURL?.host ?? "") ||
+        for (id, item) in items where item.progress == nil {
+            if
+                domains.contains(item.websiteURL?.host ?? "") ||
                 domains.contains(item.url.host ?? "") {
                 self.items[id] = nil
                 self.updatesSubject.send((.removed, item))
@@ -303,7 +308,7 @@ final class DownloadListCoordinator {
 
     func cancel(downloadWithIdentifier identifier: UUID) {
         dispatchPrecondition(condition: .onQueue(.main))
-        guard let item = self.items[identifier] else {
+        guard let item = items[identifier] else {
             assertionFailure("Item with identifier \(identifier) not found")
             return
         }
@@ -328,28 +333,29 @@ extension DownloadListCoordinator: FileDownloadManagerDelegate {
         delegate.chooseDestination(suggestedFilename: suggestedFilename, directoryURL: directoryURL, fileTypes: fileTypes, callback: callback)
     }
 
-    func fileIconFlyAnimationOriginalRect(for downloadTask: WebKitDownloadTask) -> NSRect? {
-        return nil
+    func fileIconFlyAnimationOriginalRect(for _: WebKitDownloadTask) -> NSRect? {
+        nil
     }
 
 }
 
-private extension DownloadListItem {
+extension DownloadListItem {
 
-    init(task: WebKitDownloadTask) {
+    fileprivate init(task: WebKitDownloadTask) {
         let now = Date()
-        self.init(identifier: UUID(),
-                  added: now,
-                  modified: now,
-                  url: task.originalRequest?.url ?? .blankPage,
-                  websiteURL: task.originalRequest?.mainDocumentURL,
-                  progress: task.progress,
-                  destinationURL: nil,
-                  tempURL: nil,
-                  error: nil)
+        self.init(
+            identifier: UUID(),
+            added: now,
+            modified: now,
+            url: task.originalRequest?.url ?? .blankPage,
+            websiteURL: task.originalRequest?.mainDocumentURL,
+            progress: task.progress,
+            destinationURL: nil,
+            tempURL: nil,
+            error: nil)
     }
 
-    func createRequest() -> URLRequest {
+    fileprivate func createRequest() -> URLRequest {
         var request = URLRequest(url: url)
         request.setValue(websiteURL?.absoluteString, forHTTPHeaderField: URLRequest.HeaderKey.referer.rawValue)
         return request

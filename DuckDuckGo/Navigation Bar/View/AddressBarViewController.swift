@@ -17,9 +17,9 @@
 //
 
 import Cocoa
-import os.log
 import Combine
 import Lottie
+import os.log
 
 // swiftlint:disable type_body_length
 final class AddressBarViewController: NSViewController {
@@ -43,7 +43,7 @@ final class AddressBarViewController: NSViewController {
         case browsing
 
         var isEditing: Bool {
-            return self != .browsing
+            self != .browsing
         }
     }
 
@@ -56,7 +56,7 @@ final class AddressBarViewController: NSViewController {
     private var isFirstResponder = false {
         didSet {
             updateView()
-            self.addressBarButtonsViewController?.isTextFieldEditorFirstResponder = isFirstResponder
+            addressBarButtonsViewController?.isTextFieldEditorFirstResponder = isFirstResponder
         }
     }
 
@@ -79,13 +79,13 @@ final class AddressBarViewController: NSViewController {
     private var mouseDownMonitor: Any?
     private var mouseUpMonitor: Any?
 
-    required init?(coder: NSCoder) {
+    required init?(coder _: NSCoder) {
         fatalError("AddressBarViewController: Bad initializer")
     }
 
     init?(coder: NSCoder, tabCollectionViewModel: TabCollectionViewModel) {
         self.tabCollectionViewModel = tabCollectionViewModel
-        self.suggestionContainerViewModel = SuggestionContainerViewModel(
+        suggestionContainerViewModel = SuggestionContainerViewModel(
             isHomePage: tabCollectionViewModel.selectedTabViewModel?.tab.content == .homePage,
             suggestionContainer: SuggestionContainer())
 
@@ -119,24 +119,28 @@ final class AddressBarViewController: NSViewController {
 
             registerForMouseEnteredAndExitedEvents()
 
-            NotificationCenter.default.addObserver(self,
-                                                   selector: #selector(refreshAddressBarAppearance(_:)),
-                                                   name: FireproofDomains.Constants.allowedDomainsChangedNotification,
-                                                   object: nil)
+            NotificationCenter.default.addObserver(
+                self,
+                selector: #selector(refreshAddressBarAppearance(_:)),
+                name: FireproofDomains.Constants.allowedDomainsChangedNotification,
+                object: nil)
 
-            NotificationCenter.default.addObserver(self,
-                                                   selector: #selector(refreshAddressBarAppearance(_:)),
-                                                   name: NSWindow.didBecomeKeyNotification,
-                                                   object: nil)
+            NotificationCenter.default.addObserver(
+                self,
+                selector: #selector(refreshAddressBarAppearance(_:)),
+                name: NSWindow.didBecomeKeyNotification,
+                object: nil)
 
-            NotificationCenter.default.addObserver(self,
-                                                   selector: #selector(refreshAddressBarAppearance(_:)),
-                                                   name: NSWindow.didResignKeyNotification,
-                                                   object: nil)
-            NotificationCenter.default.addObserver(self,
-                                                   selector: #selector(textFieldFirstReponderNotification(_:)),
-                                                   name: .firstResponder,
-                                                   object: nil)
+            NotificationCenter.default.addObserver(
+                self,
+                selector: #selector(refreshAddressBarAppearance(_:)),
+                name: NSWindow.didResignKeyNotification,
+                object: nil)
+            NotificationCenter.default.addObserver(
+                self,
+                selector: #selector(textFieldFirstReponderNotification(_:)),
+                name: .firstResponder,
+                object: nil)
             addMouseMonitors()
         }
         subscribeToButtonsWidth()
@@ -147,6 +151,7 @@ final class AddressBarViewController: NSViewController {
         NotificationCenter.default.removeObserver(self)
         removeMouseMonitors()
     }
+
     // swiftlint:enable notification_center_detachment
 
     override func viewDidLayout() {
@@ -173,10 +178,11 @@ final class AddressBarViewController: NSViewController {
         return true
     }
 
-    @IBSegueAction func createAddressBarButtonsViewController(_ coder: NSCoder) -> AddressBarButtonsViewController? {
+    @IBSegueAction
+    func createAddressBarButtonsViewController(_ coder: NSCoder) -> AddressBarButtonsViewController? {
         let controller = AddressBarButtonsViewController(coder: coder, tabCollectionViewModel: tabCollectionViewModel)
 
-        self.addressBarButtonsViewController = controller
+        addressBarButtonsViewController = controller
         controller?.delegate = self
         return addressBarButtonsViewController
     }
@@ -227,9 +233,10 @@ final class AddressBarViewController: NSViewController {
         }
 
         progressCancellable = selectedTabViewModel.$progress.sink { [weak self] value in
-            guard selectedTabViewModel.isLoading,
-                  let progressIndicator = self?.progressIndicator,
-                  progressIndicator.isShown
+            guard
+                selectedTabViewModel.isLoading,
+                let progressIndicator = self?.progressIndicator,
+                progressIndicator.isShown
             else { return }
 
             progressIndicator.increaseProgress(to: value)
@@ -239,15 +246,16 @@ final class AddressBarViewController: NSViewController {
             .sink { [weak self] isLoading in
                 guard let progressIndicator = self?.progressIndicator else { return }
 
-                if isLoading,
-                   selectedTabViewModel.tab.content.url?.isDuckDuckGoSearch == false {
+                if
+                    isLoading,
+                    selectedTabViewModel.tab.content.url?.isDuckDuckGoSearch == false {
 
                     progressIndicator.show(progress: selectedTabViewModel.progress, startTime: selectedTabViewModel.loadingStartTime)
 
                 } else if progressIndicator.isShown {
                     progressIndicator.finishAndHide()
                 }
-        }
+            }
     }
 
     func subscribeToButtonsWidth() {
@@ -265,7 +273,7 @@ final class AddressBarViewController: NSViewController {
         inactiveBackgroundView.alphaValue = isFirstResponder ? 0 : 1
         activeBackgroundView.alphaValue = isFirstResponder ? 1 : 0
 
-        let isKey = self.view.window?.isKeyWindow ?? false
+        let isKey = view.window?.isKeyWindow ?? false
         activeOuterBorderView.alphaValue = isKey && isFirstResponder && isHomePage ? 1 : 0
 
         activeOuterBorderView.layer?.backgroundColor = NSColor.controlAccentColor.withAlphaComponent(0.2).cgColor
@@ -273,7 +281,8 @@ final class AddressBarViewController: NSViewController {
     }
 
     private func updateShadowView(firstResponder: Bool) {
-        guard firstResponder,
+        guard
+            firstResponder,
             view.window?.isPopUpWindow == false
         else {
             suggestionsVisibleCancellable = nil
@@ -291,7 +300,7 @@ final class AddressBarViewController: NSViewController {
             self?.activeBackgroundView.isHidden = visible
             self?.activeBackgroundViewWithSuggestions.isHidden = !visible
         }
-        frameCancellable = self.view.superview?.publisher(for: \.frame).sink { [weak self] _ in
+        frameCancellable = view.superview?.publisher(for: \.frame).sink { [weak self] _ in
             self?.layoutShadowView()
         }
         view.window?.contentView?.addSubview(shadowView)
@@ -300,26 +309,27 @@ final class AddressBarViewController: NSViewController {
     private func layoutShadowView() {
         guard let superview = shadowView.superview else { return }
 
-        let winFrame = self.view.convert(self.view.bounds, to: nil)
+        let winFrame = view.convert(view.bounds, to: nil)
         let frame = superview.convert(winFrame, from: nil)
         shadowView.frame = frame
     }
 
     private func updateMode(value: AddressBarTextField.Value? = nil) {
-        switch value ?? self.addressBarTextField.value {
-        case .text: self.mode = .editing(isUrl: false)
-        case .url(urlString: _, url: _, userTyped: let userTyped): self.mode = userTyped ? .editing(isUrl: true) : .browsing
+        switch value ?? addressBarTextField.value {
+        case .text: mode = .editing(isUrl: false)
+        case .url(urlString: _, url: _, userTyped: let userTyped): mode = userTyped ? .editing(isUrl: true) : .browsing
         case .suggestion(let suggestionViewModel):
             switch suggestionViewModel.suggestion {
-            case .phrase, .unknown: self.mode = .editing(isUrl: false)
-            case .website, .bookmark, .historyEntry: self.mode = .editing(isUrl: true)
+            case .phrase, .unknown: mode = .editing(isUrl: false)
+            case .website, .bookmark, .historyEntry: mode = .editing(isUrl: true)
             }
         }
     }
 
-    @objc private func refreshAddressBarAppearance(_ sender: Any) {
-        self.updateMode()
-        self.addressBarButtonsViewController?.updateButtons()
+    @objc
+    private func refreshAddressBarAppearance(_: Any) {
+        updateMode()
+        addressBarButtonsViewController?.updateButtons()
 
         guard let window = view.window else { return }
 
@@ -341,11 +351,13 @@ final class AddressBarViewController: NSViewController {
     }
 
 }
+
 // swiftlint:enable type_body_length
 
 extension AddressBarViewController {
 
-    @objc func textFieldFirstReponderNotification(_ notification: Notification) {
+    @objc
+    func textFieldFirstReponderNotification(_: Notification) {
         if view.window?.firstResponder == addressBarTextField.currentEditor() {
             isFirstResponder = true
         } else {
@@ -360,11 +372,12 @@ extension AddressBarViewController {
 extension AddressBarViewController {
 
     func registerForMouseEnteredAndExitedEvents() {
-        let trackingArea = NSTrackingArea(rect: self.view.bounds,
-                                          options: [.activeAlways, .mouseEnteredAndExited, .mouseMoved],
-                                          owner: self,
-                                          userInfo: nil)
-        self.view.addTrackingArea(trackingArea)
+        let trackingArea = NSTrackingArea(
+            rect: view.bounds,
+            options: [.activeAlways, .mouseEnteredAndExited, .mouseMoved],
+            owner: self,
+            userInfo: nil)
+        view.addTrackingArea(trackingArea)
     }
 
     override func mouseEntered(with event: NSEvent) {
@@ -375,8 +388,8 @@ extension AddressBarViewController {
     override func mouseMoved(with event: NSEvent) {
         guard event.window === self.view.window else { return }
 
-        let point = self.view.convert(event.locationInWindow, from: nil)
-        let view = self.view.hitTest(point)
+        let point = view.convert(event.locationInWindow, from: nil)
+        let view = view.hitTest(point)
 
         if view?.shouldShowArrowCursor == true {
             NSCursor.arrow.set()
@@ -395,10 +408,10 @@ extension AddressBarViewController {
     func addMouseMonitors() {
         guard mouseDownMonitor == nil, mouseUpMonitor == nil else { return }
 
-        self.mouseDownMonitor = NSEvent.addLocalMonitorForEvents(matching: .leftMouseDown) { [weak self] event in
+        mouseDownMonitor = NSEvent.addLocalMonitorForEvents(matching: .leftMouseDown) { [weak self] event in
             self?.mouseDown(with: event)
         }
-        self.mouseUpMonitor = NSEvent.addLocalMonitorForEvents(matching: .leftMouseUp) { [weak self] event in
+        mouseUpMonitor = NSEvent.addLocalMonitorForEvents(matching: .leftMouseUp) { [weak self] event in
             self?.mouseUp(with: event)
         }
     }
@@ -410,25 +423,26 @@ extension AddressBarViewController {
         if let monitor = mouseUpMonitor {
             NSEvent.removeMonitor(monitor)
         }
-        self.mouseUpMonitor = nil
-        self.mouseDownMonitor = nil
+        mouseUpMonitor = nil
+        mouseDownMonitor = nil
     }
 
     func mouseDown(with event: NSEvent) -> NSEvent? {
-        self.clickPoint = nil
-        guard event.window === self.view.window else { return event }
+        clickPoint = nil
+        guard event.window === view.window else { return event }
 
-        if let point = self.view.mouseLocationInsideBounds(event.locationInWindow) {
-            guard self.view.window?.firstResponder !== addressBarTextField.currentEditor(),
-                  self.view.hitTest(point)?.shouldShowArrowCursor == false
+        if let point = view.mouseLocationInsideBounds(event.locationInWindow) {
+            guard
+                view.window?.firstResponder !== addressBarTextField.currentEditor(),
+                view.hitTest(point)?.shouldShowArrowCursor == false
             else { return event }
 
             // bookmark button visibility is usually determined by hover state, but we def need to hide it right now
-            self.addressBarButtonsViewController?.bookmarkButton.isHidden = true
+            addressBarButtonsViewController?.bookmarkButton.isHidden = true
 
             // first activate app and window if needed, then make it first responder
-            if self.view.window?.isMainWindow == true {
-                self.addressBarTextField.makeMeFirstResponder()
+            if view.window?.isMainWindow == true {
+                addressBarTextField.makeMeFirstResponder()
                 return nil
             } else {
                 DispatchQueue.main.async {
@@ -436,20 +450,21 @@ extension AddressBarViewController {
                 }
             }
 
-        } else if self.view.window?.isMainWindow == true {
-            self.clickPoint = event.locationInWindow
+        } else if view.window?.isMainWindow == true {
+            clickPoint = event.locationInWindow
         }
         return event
     }
 
     func mouseUp(with event: NSEvent) -> NSEvent? {
         // click (same position down+up) outside of the field: resign first responder
-        guard event.window === self.view.window,
-              self.view.window?.firstResponder === addressBarTextField.currentEditor(),
-              self.clickPoint == event.locationInWindow
+        guard
+            event.window === view.window,
+            view.window?.firstResponder === addressBarTextField.currentEditor(),
+            clickPoint == event.locationInWindow
         else { return event }
 
-        self.view.window?.makeFirstResponder(nil)
+        view.window?.makeFirstResponder(nil)
 
         return event
     }
@@ -458,7 +473,7 @@ extension AddressBarViewController {
 
 extension AddressBarViewController: AddressBarButtonsViewControllerDelegate {
 
-    func addressBarButtonsViewControllerClearButtonClicked(_ addressBarButtonsViewController: AddressBarButtonsViewController) {
+    func addressBarButtonsViewControllerClearButtonClicked(_: AddressBarButtonsViewController) {
         addressBarTextField.clearValue()
     }
 
@@ -466,7 +481,7 @@ extension AddressBarViewController: AddressBarButtonsViewControllerDelegate {
 
 extension AddressBarViewController: AddressBarTextFieldDelegate {
 
-    func adressBarTextField(_ addressBarTextField: AddressBarTextField, didChangeValue value: AddressBarTextField.Value) {
+    func adressBarTextField(_: AddressBarTextField, didChangeValue value: AddressBarTextField.Value) {
         updateMode(value: value)
         addressBarButtonsViewController?.textFieldValue = value
         updateView()
@@ -474,9 +489,9 @@ extension AddressBarViewController: AddressBarTextFieldDelegate {
 
 }
 
-fileprivate extension NSView {
+extension NSView {
 
-    var shouldShowArrowCursor: Bool {
+    fileprivate var shouldShowArrowCursor: Bool {
         self is NSButton || self is AnimationView
     }
 

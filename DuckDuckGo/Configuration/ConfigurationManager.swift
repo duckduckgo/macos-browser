@@ -16,10 +16,10 @@
 //  limitations under the License.
 //
 
-import Foundation
-import Combine
-import os
 import BrowserServicesKit
+import Combine
+import Foundation
+import os
 
 final class ConfigurationManager {
 
@@ -32,27 +32,27 @@ final class ConfigurationManager {
         case bloomFilterExclusionsPersistenceFailed
     }
 
-    struct Constants {
+    enum Constants {
         static let downloadTimeoutSeconds = 60.0 * 5
-#if DEBUG
+        #if DEBUG
         static let refreshPeriodSeconds = 60.0 * 2 // 2 minutes when in debug mode
-#else
+        #else
         static let refreshPeriodSeconds = 60.0 * 30 // 30 minutes
-#endif
+        #endif
         static let retryDelaySeconds = 60.0 * 60 * 1 // 1 hour delay before checking again if something went wrong last time
         static let refreshCheckIntervalSeconds = 60.0 // Check if we need a refresh every minute
     }
 
     static let shared = ConfigurationManager()
 
-    static let queue: DispatchQueue = DispatchQueue(label: "Configuration Manager")
+    static let queue = DispatchQueue(label: "Configuration Manager")
 
     @UserDefaultsWrapper(key: .configLastUpdated, defaultValue: .distantPast)
     var lastUpdateTime: Date
 
     private var timerCancellable: AnyCancellable?
     private var refreshCancellable: AnyCancellable?
-    private var lastRefreshCheckTime: Date = Date()
+    private var lastRefreshCheckTime = Date()
 
     private let configDownloader: ConfigurationDownloading
 
@@ -85,18 +85,16 @@ final class ConfigurationManager {
                     .trackerRadar,
                     .surrogates,
                     .privacyConfiguration
-                ], self.updateTrackerBlockingDependencies),
+                ], updateTrackerBlockingDependencies),
 
                 configDownloader.refreshDataThenUpdate(for: [
                     .bloomFilterBinary,
                     .bloomFilterSpec
-                ], self.updateBloomFilter),
+                ], updateBloomFilter),
 
                 configDownloader.refreshDataThenUpdate(for: [
                     .bloomFilterExcludedDomains
-                ], self.updateBloomFilterExclusions)
-
-            )
+                ], updateBloomFilterExclusions))
             .collect()
             .timeout(.seconds(Constants.downloadTimeoutSeconds), scheduler: Self.queue, options: nil, customError: { Error.timeout })
             .sink { [self] completion in
@@ -123,7 +121,7 @@ final class ConfigurationManager {
     }
 
     private func refreshIfNeeded() {
-        guard self.isReadyToRefresh(), refreshCancellable == nil else {
+        guard isReadyToRefresh(), refreshCancellable == nil else {
             os_log("Configuration refresh is not needed at this time", log: .config, type: .debug)
             return
         }
@@ -131,7 +129,7 @@ final class ConfigurationManager {
     }
 
     private func isReadyToRefresh() -> Bool {
-        return Date().timeIntervalSince(lastUpdateTime) > Constants.refreshPeriodSeconds
+        Date().timeIntervalSince(lastUpdateTime) > Constants.refreshPeriodSeconds
     }
 
     private func tryAgainLater() {

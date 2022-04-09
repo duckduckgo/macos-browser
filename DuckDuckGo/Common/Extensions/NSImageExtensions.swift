@@ -16,8 +16,8 @@
 //  limitations under the License.
 //
 
-import Foundation
 import CoreGraphics
+import Foundation
 
 extension NSImage {
 
@@ -29,27 +29,28 @@ extension NSImage {
         image.lockFocus()
         let graphicsContext = NSGraphicsContext.current
         graphicsContext?.imageInterpolation = .high
-        self.draw(in: targetRect, from: currentRect, operation: .copy, fraction: 1)
+        draw(in: targetRect, from: currentRect, operation: .copy, fraction: 1)
         image.unlockFocus()
 
         return image
     }
 
     func resizedToFaviconSize() -> NSImage? {
-        if size.width > NSSize.faviconSize.width ||
+        if
+            size.width > NSSize.faviconSize.width ||
             size.height > NSSize.faviconSize.height {
             return resized(to: .faviconSize)
         }
         return self
     }
-    
+
     func tinted(with color: NSColor) -> NSImage {
-        guard let image = self.copy() as? NSImage else {
+        guard let image = copy() as? NSImage else {
             return self
         }
 
         image.lockFocus()
-        
+
         color.set()
         let imageRect = NSRect(origin: .zero, size: image.size)
         imageRect.fill(using: .sourceAtop)

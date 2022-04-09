@@ -24,13 +24,14 @@ enum ViewVisibility: CaseIterable {
     case visible, // view is fully visible
          invisible, // view is hidden but takes up space
          gone // view is fully removed from the view hierarchy
-    
+
 }
 
 extension View {
 
     // https://swiftuirecipes.com/blog/how-to-hide-a-swiftui-view-visible-invisible-gone
-    @ViewBuilder func visibility(_ visibility: ViewVisibility) -> some View {
+    @ViewBuilder
+    func visibility(_ visibility: ViewVisibility) -> some View {
         if visibility != .gone {
             if visibility == .visible {
                 self
@@ -41,7 +42,7 @@ extension View {
     }
 
     func link(onHoverChanged: ((Bool) -> Void)? = nil, clicked: @escaping () -> Void) -> some View {
-        self.onHover { over in
+        onHover { over in
             onHoverChanged?(over)
         }.onTapGesture {
             clicked()

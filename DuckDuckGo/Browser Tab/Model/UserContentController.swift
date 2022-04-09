@@ -16,9 +16,9 @@
 //  limitations under the License.
 //
 
-import WebKit
-import Combine
 import BrowserServicesKit
+import Combine
+import WebKit
 
 protocol UserContentControllerDelegate: AnyObject {
     func userContentController(_ userContentController: UserContentController, didInstallUserScripts userScripts: UserScripts)
@@ -33,77 +33,79 @@ final class UserContentController: WKUserContentController {
         let userScripts: UserScripts
         let completionTokens: [ContentBlockerRulesManager.CompletionToken]
     }
+
     @Published private(set) var contentBlockingAssets: ContentBlockingAssets? {
         willSet {
-            self.removeAllContentRuleLists()
-            self.removeAllUserScripts()
+            removeAllContentRuleLists()
+            removeAllUserScripts()
         }
         didSet {
             guard let contentBlockingAssets = contentBlockingAssets else { return }
-            self.installContentRuleLists(contentBlockingAssets.contentRuleLists)
-            self.installUserScripts(contentBlockingAssets.userScripts)
+            installContentRuleLists(contentBlockingAssets.contentRuleLists)
+            installUserScripts(contentBlockingAssets.userScripts)
         }
     }
 
     private var cancellable: AnyCancellable?
 
     public init<Pub: Publisher>(assetsPublisher: Pub, privacyConfigurationManager: PrivacyConfigurationManager)
-    where Pub.Failure == Never, Pub.Output == ContentBlockingAssets {
+        where Pub.Failure == Never, Pub.Output == ContentBlockingAssets {
 
         self.privacyConfigurationManager = privacyConfigurationManager
         super.init()
 
         cancellable = assetsPublisher.receive(on: DispatchQueue.main).map { $0 }.assign(to: \.contentBlockingAssets, onWeaklyHeld: self)
 
-#if DEBUG
+        #if DEBUG
         // make sure delegate for UserScripts is set shortly after init
         DispatchQueue.main.async { [weak self] in
             assert(self == nil || self?.delegate != nil, "UserContentController delegate not set")
         }
-#endif
+        #endif
     }
 
     public convenience init(privacyConfigurationManager: PrivacyConfigurationManager = ContentBlocking.shared.privacyConfigurationManager) {
-        self.init(assetsPublisher: ContentBlocking.shared.contentBlockingUpdating.userContentBlockingAssets,
-                  privacyConfigurationManager: privacyConfigurationManager)
+        self.init(
+            assetsPublisher: ContentBlocking.shared.contentBlockingUpdating.userContentBlockingAssets,
+            privacyConfigurationManager: privacyConfigurationManager)
     }
 
-    required init?(coder: NSCoder) {
+    required init?(coder _: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
 
     private func installContentRuleLists(_ contentRuleLists: [String: WKContentRuleList]) {
-        guard self.privacyConfigurationManager.privacyConfig.isEnabled(featureKey: .contentBlocking) else { return }
+        guard privacyConfigurationManager.privacyConfig.isEnabled(featureKey: .contentBlocking) else { return }
 
-        contentRuleLists.values.forEach(self.add)
+        contentRuleLists.values.forEach(add)
     }
 
     struct ContentRulesNotFoundError: Error {}
     func enableContentRuleList(withIdentifier identifier: String) throws {
-        guard let ruleList = self.contentBlockingAssets?.contentRuleLists[identifier] else {
+        guard let ruleList = contentBlockingAssets?.contentRuleLists[identifier] else {
             throw ContentRulesNotFoundError()
         }
-        self.add(ruleList)
+        add(ruleList)
     }
 
     func disableContentRuleList(withIdentifier identifier: String) {
-        guard let ruleList = self.contentBlockingAssets?.contentRuleLists[identifier] else {
+        guard let ruleList = contentBlockingAssets?.contentRuleLists[identifier] else {
             assertionFailure("Rule list not installed")
             return
         }
-        self.remove(ruleList)
+        remove(ruleList)
     }
 
     private func installUserScripts(_ userScripts: UserScripts) {
-        userScripts.scripts.forEach(self.addUserScript)
-        userScripts.userScripts.forEach(self.addHandler)
+        userScripts.scripts.forEach(addUserScript)
+        userScripts.userScripts.forEach(addHandler)
 
         delegate?.userContentController(self, didInstallUserScripts: userScripts)
     }
 
     override func removeAllUserScripts() {
         super.removeAllUserScripts()
-        self.contentBlockingAssets?.userScripts.userScripts.forEach(self.removeHandler)
+        contentBlockingAssets?.userScripts.userScripts.forEach(removeHandler)
     }
 
 }

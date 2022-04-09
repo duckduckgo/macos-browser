@@ -59,6 +59,7 @@ final class CSVImportViewController: NSViewController {
             renderCurrentState()
         }
     }
+
     weak var delegate: CSVImportViewControllerDelegate?
 
     // MARK: - View State
@@ -124,7 +125,7 @@ final class CSVImportViewController: NSViewController {
             selectedFileContainer.isHidden = true
             renderAwaitingFileSelectionState()
         case .selectedValidFile(let fileURL):
-            let totalLoginsToImport = self.delegate?.totalValidLogins(in: fileURL) ?? 0
+            let totalLoginsToImport = delegate?.totalValidLogins(in: fileURL) ?? 0
             selectedFileContainer.isHidden = false
             selectedFileLabel.stringValue = fileURL.path
             selectFileButton.title = UserText.importLoginsSelectAnotherFile
@@ -136,7 +137,8 @@ final class CSVImportViewController: NSViewController {
         }
     }
 
-    @IBAction func selectFileButtonClicked(_ sender: Any) {
+    @IBAction
+    func selectFileButtonClicked(_: Any) {
         let panel = NSOpenPanel.filePanel(allowedExtension: "csv")
         let result = panel.runModal()
 

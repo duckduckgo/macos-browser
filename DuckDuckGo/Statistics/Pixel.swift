@@ -38,16 +38,17 @@ final class Pixel {
         self.dryRun = dryRun
     }
 
-    func fire(pixelNamed pixelName: String,
-              withAdditionalParameters params: [String: String]? = nil,
-              allowedQueryReservedCharacters: CharacterSet? = nil,
-              withHeaders headers: HTTPHeaders = APIHeaders().defaultHeaders,
-              onComplete: @escaping (Error?) -> Void = {_ in }) {
+    func fire(
+        pixelNamed pixelName: String,
+        withAdditionalParameters params: [String: String]? = nil,
+        allowedQueryReservedCharacters: CharacterSet? = nil,
+        withHeaders headers: HTTPHeaders = APIHeaders().defaultHeaders,
+        onComplete: @escaping (Error?) -> Void = { _ in }) {
 
         var newParams = params ?? [:]
         newParams[Parameters.appVersion] = AppVersion.shared.versionNumber
         #if DEBUG
-            newParams[Parameters.test] = Values.test
+        newParams[Parameters.test] = Values.test
         #endif
 
         var headers = headers
@@ -70,16 +71,16 @@ final class Pixel {
             parameters: newParams,
             allowedQueryReservedCharacters: allowedQueryReservedCharacters,
             headers: headers,
-            callBackOnMainThread: true
-        ) { (_, error) in
-            onComplete(error)
-        }
+            callBackOnMainThread: true) { _, error in
+                onComplete(error)
+            }
     }
 
-    static func fire(_ event: Pixel.Event,
-                     withAdditionalParameters parameters: [String: String]? = nil,
-                     allowedQueryReservedCharacters: CharacterSet? = nil,
-                     onComplete: @escaping (Error?) -> Void = {_ in }) {
+    static func fire(
+        _ event: Pixel.Event,
+        withAdditionalParameters parameters: [String: String]? = nil,
+        allowedQueryReservedCharacters: CharacterSet? = nil,
+        onComplete: @escaping (Error?) -> Void = { _ in }) {
         let newParams: [String: String]?
         switch (event.parameters, parameters) {
         case (.some(let parameters), .none):
@@ -92,10 +93,11 @@ final class Pixel {
             newParams = nil
         }
 
-        Self.shared?.fire(pixelNamed: event.name,
-                          withAdditionalParameters: newParams,
-                          allowedQueryReservedCharacters: allowedQueryReservedCharacters,
-                          onComplete: onComplete)
+        Self.shared?.fire(
+            pixelNamed: event.name,
+            withAdditionalParameters: newParams,
+            allowedQueryReservedCharacters: allowedQueryReservedCharacters,
+            onComplete: onComplete)
     }
 
 }

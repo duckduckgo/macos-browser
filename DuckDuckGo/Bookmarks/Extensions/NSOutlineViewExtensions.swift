@@ -21,13 +21,13 @@ import AppKit
 extension NSOutlineView {
 
     var selectedItems: [AnyObject] {
-        return selectedRowIndexes.compactMap { (index) -> AnyObject? in
-            return item(atRow: index) as AnyObject
+        selectedRowIndexes.compactMap { index -> AnyObject? in
+            item(atRow: index) as AnyObject
         }
     }
 
     var selectedNodes: [BookmarkNode] {
-        return (selectedItems as? [BookmarkNode]) ?? []
+        (selectedItems as? [BookmarkNode]) ?? []
     }
 
     var selectedFolders: [BookmarkFolder] {

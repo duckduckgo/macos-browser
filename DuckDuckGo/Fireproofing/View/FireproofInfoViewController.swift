@@ -29,7 +29,7 @@ final class FireproofInfoViewController: NSViewController {
         let storyboard = NSStoryboard(name: Constants.storyboardName, bundle: nil)
 
         return storyboard.instantiateController(identifier: Constants.identifier) { coder in
-            return FireproofInfoViewController(coder: coder, domain: domain.dropWWW())
+            FireproofInfoViewController(coder: coder, domain: domain.dropWWW())
         }
     }
 
@@ -38,6 +38,7 @@ final class FireproofInfoViewController: NSViewController {
             doneButton.bezelStyle = .rounded
         }
     }
+
     @IBOutlet weak var titleLabel: NSTextField!
     @IBOutlet weak var separator: NSView! {
         didSet {
@@ -53,21 +54,23 @@ final class FireproofInfoViewController: NSViewController {
         super.init(coder: coder)
     }
 
-    required init?(coder: NSCoder) {
+    required init?(coder _: NSCoder) {
         fatalError("You must create this view controller with a domain.")
     }
 
     override func viewDidLoad() {
         super.viewDidLoad()
-        self.titleLabel.stringValue = UserText.domainIsFireproof(domain: domain)
+        titleLabel.stringValue = UserText.domainIsFireproof(domain: domain)
     }
 
-    @IBAction func removeFireproofing(_ sender: AnyObject) {
+    @IBAction
+    func removeFireproofing(_: AnyObject) {
         FireproofDomains.shared.remove(domain: domain)
         presentingViewController?.dismiss(self)
     }
 
-    @IBAction func dismiss(_ sender: AnyObject) {
+    @IBAction
+    func dismiss(_: AnyObject) {
         presentingViewController?.dismiss(self)
     }
 

@@ -20,37 +20,37 @@ import Foundation
 
 extension HomePage.Models {
 
-final class DefaultBrowserModel: ObservableObject {
+    final class DefaultBrowserModel: ObservableObject {
 
-    @Published var shouldShow: Bool = false
+        @Published var shouldShow = false
 
-    var wasClosed: Bool {
-        didSet {
+        var wasClosed: Bool {
+            didSet {
+                updateShowState()
+            }
+        }
+
+        var isDefault: Bool {
+            didSet {
+                updateShowState()
+            }
+        }
+
+        let requestSetDefault: () -> Void
+        let close: () -> Void
+
+        init(isDefault: Bool, wasClosed: Bool, requestSetDefault: @escaping () -> Void, close: @escaping () -> Void) {
+            self.isDefault = isDefault
+            self.wasClosed = wasClosed
+            self.requestSetDefault = requestSetDefault
+            self.close = close
+
             updateShowState()
         }
-    }
 
-    var isDefault: Bool {
-        didSet {
-            updateShowState()
+        private func updateShowState() {
+            shouldShow = !wasClosed && !isDefault
         }
     }
-
-    let requestSetDefault: () -> Void
-    let close: () -> Void
-
-    init(isDefault: Bool, wasClosed: Bool, requestSetDefault: @escaping () -> Void, close: @escaping () -> Void) {
-        self.isDefault = isDefault
-        self.wasClosed = wasClosed
-        self.requestSetDefault = requestSetDefault
-        self.close = close
-
-        updateShowState()
-    }
-
-    private func updateShowState() {
-        shouldShow = !wasClosed && !isDefault
-    }
-}
 
 }

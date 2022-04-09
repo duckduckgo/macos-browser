@@ -16,16 +16,17 @@
 //  limitations under the License.
 //
 
-import WebKit
 import BrowserServicesKit
+import WebKit
 
 protocol ContextMenuDelegate: AnyObject {
 
-    func contextMenu(forUserScript script: ContextMenuUserScript,
-                     willShowAt position: NSPoint,
-                     image: URL?,
-                     link: URL?,
-                     selectedText: String?)
+    func contextMenu(
+        forUserScript script: ContextMenuUserScript,
+        willShowAt position: NSPoint,
+        image: URL?,
+        link: URL?,
+        selectedText: String?)
 
 }
 
@@ -41,10 +42,11 @@ final class ContextMenuUserScript: NSObject, StaticUserScript {
     var lastAnchor: URL?
     var lastImage: URL?
 
-    func userContentController(_ userContentController: WKUserContentController, didReceive message: WKScriptMessage) {
+    func userContentController(_: WKUserContentController, didReceive message: WKScriptMessage) {
 
-        guard let dict = message.body as? [String: Any],
-              let point = point(from: dict) else { return }
+        guard
+            let dict = message.body as? [String: Any],
+            let point = point(from: dict) else { return }
 
         var image: URL?
         var link: URL?
@@ -66,73 +68,75 @@ final class ContextMenuUserScript: NSObject, StaticUserScript {
             }
         }
 
-        delegate?.contextMenu(forUserScript: self,
-                              willShowAt: point,
-                              image: image,
-                              link: link,
-                              selectedText: selectedText)
+        delegate?.contextMenu(
+            forUserScript: self,
+            willShowAt: point,
+            image: image,
+            link: link,
+            selectedText: selectedText)
     }
 
     private func point(from dict: [String: Any]) -> NSPoint? {
-        guard let position = dict["position"] as? [String: Int],
-              let x = position["x"],
-              let y = position["y"] else { return nil }
+        guard
+            let position = dict["position"] as? [String: Int],
+            let x = position["x"],
+            let y = position["y"] else { return nil }
         return NSPoint(x: x, y: y)
     }
 
     static let source = """
-(function() {
+        (function() {
 
-    function linkFrom(element) {
-        return {
-            "tagName": "A",
-            "url": element.href
-        };
-    }
-
-    function findParentLink(element) {
-        var parent;
-        while (parent = element.parentElement) {
-            if (parent.tagName === "A") {
-                return linkFrom(parent);
-            }
-            element = parent;
-        }
-        return null;
-    }
-
-    document.addEventListener("contextmenu", function(e) {
-
-        var context = {
-            "position": {
-                "x": e.clientX,
-                "y": e.clientY
-            },
-            "elements": [
-            ],
-            "selectedText": window.getSelection().toString()
-        };
-
-        if (e.srcElement.tagName === "A") {
-            context.elements.push(linkFrom(e.srcElement));
-        } else {
-            if (e.srcElement.tagName === "IMG") {
-                context.elements.push({
-                    "tagName": "IMG",
-                    "url": e.srcElement.src
-                });
+            function linkFrom(element) {
+                return {
+                    "tagName": "A",
+                    "url": element.href
+                };
             }
 
-            var parentLink = findParentLink(e.srcElement);
-            if (parentLink) {
-                context.elements.push(parentLink);
+            function findParentLink(element) {
+                var parent;
+                while (parent = element.parentElement) {
+                    if (parent.tagName === "A") {
+                        return linkFrom(parent);
+                    }
+                    element = parent;
+                }
+                return null;
             }
-        }
 
-        webkit.messageHandlers.contextMenu.postMessage(context);
-    });
+            document.addEventListener("contextmenu", function(e) {
 
-}) ();
-"""
+                var context = {
+                    "position": {
+                        "x": e.clientX,
+                        "y": e.clientY
+                    },
+                    "elements": [
+                    ],
+                    "selectedText": window.getSelection().toString()
+                };
+
+                if (e.srcElement.tagName === "A") {
+                    context.elements.push(linkFrom(e.srcElement));
+                } else {
+                    if (e.srcElement.tagName === "IMG") {
+                        context.elements.push({
+                            "tagName": "IMG",
+                            "url": e.srcElement.src
+                        });
+                    }
+
+                    var parentLink = findParentLink(e.srcElement);
+                    if (parentLink) {
+                        context.elements.push(parentLink);
+                    }
+                }
+
+                webkit.messageHandlers.contextMenu.postMessage(context);
+            });
+
+        }) ();
+        """
 
 }

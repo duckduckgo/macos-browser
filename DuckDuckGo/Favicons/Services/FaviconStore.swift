@@ -17,8 +17,8 @@
 //
 
 import Cocoa
-import CoreData
 import Combine
+import CoreData
 import os.log
 
 protocol FaviconStoring {
@@ -52,7 +52,7 @@ final class FaviconStore: FaviconStoring {
     }
 
     func loadFavicons() -> Future<[Favicon], Error> {
-        return Future { [weak self] promise in
+        Future { [weak self] promise in
             self?.context.perform {
                 guard let self = self else {
                     promise(.failure(FaviconStoreError.storeDeallocated))
@@ -80,7 +80,7 @@ final class FaviconStore: FaviconStoring {
     }
 
     func save(favicon: Favicon) -> Future<Void, Error> {
-        return Future { [weak self] promise in
+        Future { [weak self] promise in
             self?.context.perform { [weak self] in
                 guard let self = self else {
                     promise(.failure(FaviconStoreError.storeDeallocated))
@@ -107,7 +107,7 @@ final class FaviconStore: FaviconStoring {
     }
 
     func loadFaviconReferences() -> Future<([FaviconHostReference], [FaviconUrlReference]), Error> {
-        return Future { [weak self] promise in
+        Future { [weak self] promise in
             self?.context.perform {
                 guard let self = self else {
                     promise(.failure(FaviconStoreError.storeDeallocated))
@@ -143,15 +143,16 @@ final class FaviconStore: FaviconStoring {
     }
 
     func save(hostReference: FaviconHostReference) -> Future<Void, Error> {
-        return Future { [weak self] promise in
+        Future { [weak self] promise in
             self?.context.perform { [weak self] in
                 guard let self = self else {
                     promise(.failure(FaviconStoreError.storeDeallocated))
                     return
                 }
 
-                let insertedObject = NSEntityDescription.insertNewObject(forEntityName: FaviconHostReferenceManagedObject.className(),
-                                                                         into: self.context)
+                let insertedObject = NSEntityDescription.insertNewObject(
+                    forEntityName: FaviconHostReferenceManagedObject.className(),
+                    into: self.context)
                 guard let faviconHostReferenceMO = insertedObject as? FaviconHostReferenceManagedObject else {
                     promise(.failure(FaviconStoreError.savingFailed))
                     return
@@ -171,15 +172,16 @@ final class FaviconStore: FaviconStoring {
     }
 
     func save(urlReference: FaviconUrlReference) -> Future<Void, Error> {
-        return Future { [weak self] promise in
+        Future { [weak self] promise in
             self?.context.perform { [weak self] in
                 guard let self = self else {
                     promise(.failure(FaviconStoreError.storeDeallocated))
                     return
                 }
 
-                let insertedObject = NSEntityDescription.insertNewObject(forEntityName: FaviconUrlReferenceManagedObject.className(),
-                                                                         into: self.context)
+                let insertedObject = NSEntityDescription.insertNewObject(
+                    forEntityName: FaviconUrlReferenceManagedObject.className(),
+                    into: self.context)
                 guard let faviconUrlReferenceMO = insertedObject as? FaviconUrlReferenceManagedObject else {
                     promise(.failure(FaviconStoreError.savingFailed))
                     return
@@ -211,7 +213,7 @@ final class FaviconStore: FaviconStoring {
     // MARK: - Private
 
     private func remove(identifiers: [UUID], entityName: String) -> Future<Void, Error> {
-        return Future { [weak self] promise in
+        Future { [weak self] promise in
             self?.context.perform {
                 guard let self = self else {
                     promise(.failure(FaviconStoreError.storeDeallocated))
@@ -244,14 +246,15 @@ final class FaviconStore: FaviconStoring {
 
 }
 
-fileprivate extension Favicon {
+extension Favicon {
 
-    init?(faviconMO: FaviconManagedObject) {
-        guard let identifier = faviconMO.identifier,
-              let url = faviconMO.urlEncrypted as? URL,
-              let documentUrl = faviconMO.documentUrlEncrypted as? URL,
-              let dateCreated = faviconMO.dateCreated,
-              let relation = Favicon.Relation(rawValue: Int(faviconMO.relation)) else {
+    fileprivate init?(faviconMO: FaviconManagedObject) {
+        guard
+            let identifier = faviconMO.identifier,
+            let url = faviconMO.urlEncrypted as? URL,
+            let documentUrl = faviconMO.documentUrlEncrypted as? URL,
+            let dateCreated = faviconMO.dateCreated,
+            let relation = Favicon.Relation(rawValue: Int(faviconMO.relation)) else {
             assertionFailure("Favicon: Failed to init Favicon from FaviconManagedObject")
             return nil
         }
@@ -263,13 +266,14 @@ fileprivate extension Favicon {
 
 }
 
-fileprivate extension FaviconHostReference {
+extension FaviconHostReference {
 
-    init?(faviconHostReferenceMO: FaviconHostReferenceManagedObject) {
-        guard let identifier = faviconHostReferenceMO.identifier,
-              let host = faviconHostReferenceMO.hostEncrypted as? String,
-              let documentUrl = faviconHostReferenceMO.documentUrlEncrypted as? URL,
-              let dateCreated = faviconHostReferenceMO.dateCreated else {
+    fileprivate init?(faviconHostReferenceMO: FaviconHostReferenceManagedObject) {
+        guard
+            let identifier = faviconHostReferenceMO.identifier,
+            let host = faviconHostReferenceMO.hostEncrypted as? String,
+            let documentUrl = faviconHostReferenceMO.documentUrlEncrypted as? URL,
+            let dateCreated = faviconHostReferenceMO.dateCreated else {
             assertionFailure("Favicon: Failed to init FaviconHostReference from FaviconHostReferenceManagedObject")
             return nil
         }
@@ -277,22 +281,24 @@ fileprivate extension FaviconHostReference {
         let smallFaviconUrl = faviconHostReferenceMO.smallFaviconUrlEncrypted as? URL
         let mediumFaviconUrl = faviconHostReferenceMO.mediumFaviconUrlEncrypted as? URL
 
-        self.init(identifier: identifier,
-                  smallFaviconUrl: smallFaviconUrl,
-                  mediumFaviconUrl: mediumFaviconUrl,
-                  host: host,
-                  documentUrl: documentUrl,
-                  dateCreated: dateCreated)
+        self.init(
+            identifier: identifier,
+            smallFaviconUrl: smallFaviconUrl,
+            mediumFaviconUrl: mediumFaviconUrl,
+            host: host,
+            documentUrl: documentUrl,
+            dateCreated: dateCreated)
     }
 
 }
 
-fileprivate extension FaviconUrlReference {
+extension FaviconUrlReference {
 
-    init?(faviconUrlReferenceMO: FaviconUrlReferenceManagedObject) {
-        guard let identifier = faviconUrlReferenceMO.identifier,
-              let documentUrl = faviconUrlReferenceMO.documentUrlEncrypted as? URL,
-              let dateCreated = faviconUrlReferenceMO.dateCreated else {
+    fileprivate init?(faviconUrlReferenceMO: FaviconUrlReferenceManagedObject) {
+        guard
+            let identifier = faviconUrlReferenceMO.identifier,
+            let documentUrl = faviconUrlReferenceMO.documentUrlEncrypted as? URL,
+            let dateCreated = faviconUrlReferenceMO.dateCreated else {
             assertionFailure("Favicon: Failed to init FaviconUrlReference from FaviconUrlReferenceManagedObject")
             return nil
         }
@@ -300,18 +306,19 @@ fileprivate extension FaviconUrlReference {
         let smallFaviconUrl = faviconUrlReferenceMO.smallFaviconUrlEncrypted as? URL
         let mediumFaviconUrl = faviconUrlReferenceMO.mediumFaviconUrlEncrypted as? URL
 
-        self.init(identifier: identifier,
-                  smallFaviconUrl: smallFaviconUrl,
-                  mediumFaviconUrl: mediumFaviconUrl,
-                  documentUrl: documentUrl,
-                  dateCreated: dateCreated)
+        self.init(
+            identifier: identifier,
+            smallFaviconUrl: smallFaviconUrl,
+            mediumFaviconUrl: mediumFaviconUrl,
+            documentUrl: documentUrl,
+            dateCreated: dateCreated)
     }
 
 }
 
-fileprivate extension FaviconManagedObject {
+extension FaviconManagedObject {
 
-    func update(favicon: Favicon) {
+    fileprivate func update(favicon: Favicon) {
         identifier = favicon.identifier
         imageEncrypted = favicon.image
         relation = Int64(favicon.relation.rawValue)
@@ -322,9 +329,9 @@ fileprivate extension FaviconManagedObject {
 
 }
 
-fileprivate extension FaviconHostReferenceManagedObject {
+extension FaviconHostReferenceManagedObject {
 
-    func update(hostReference: FaviconHostReference) {
+    fileprivate func update(hostReference: FaviconHostReference) {
         identifier = hostReference.identifier
         smallFaviconUrlEncrypted = hostReference.smallFaviconUrl as NSURL?
         mediumFaviconUrlEncrypted = hostReference.mediumFaviconUrl as NSURL?
@@ -335,9 +342,9 @@ fileprivate extension FaviconHostReferenceManagedObject {
 
 }
 
-fileprivate extension FaviconUrlReferenceManagedObject {
+extension FaviconUrlReferenceManagedObject {
 
-    func update(urlReference: FaviconUrlReference) {
+    fileprivate func update(urlReference: FaviconUrlReference) {
         identifier = urlReference.identifier
         smallFaviconUrlEncrypted = urlReference.smallFaviconUrl as NSURL?
         mediumFaviconUrlEncrypted = urlReference.mediumFaviconUrl as NSURL?

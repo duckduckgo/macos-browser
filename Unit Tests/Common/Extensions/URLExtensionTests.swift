@@ -16,8 +16,8 @@
 //  limitations under the License.
 //
 
-import XCTest
 import Combine
+import XCTest
 @testable import DuckDuckGo_Privacy_Browser
 
 final class URLExtensionTests: XCTestCase {
@@ -72,8 +72,9 @@ final class URLExtensionTests: XCTestCase {
             ("blob://afasdg", nil),
             ("http://user:pass@duckduckgo.com", "http://duckduckgo.com"),
             ("https://user:pass@duckduckgo.com", "https://duckduckgo.com"),
-            ("https://user:pass@releases.usercontent.com/asdfg?arg=AWS4-HMAC&Credential=AKIA",
-             "https://releases.usercontent.com/asdfg?arg=AWS4-HMAC&Credential=AKIA"),
+            (
+                "https://user:pass@releases.usercontent.com/asdfg?arg=AWS4-HMAC&Credential=AKIA",
+                "https://releases.usercontent.com/asdfg?arg=AWS4-HMAC&Credential=AKIA"),
             ("ftp://user:pass@duckduckgo.com", "ftp://duckduckgo.com")
         ]
 

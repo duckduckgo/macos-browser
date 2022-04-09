@@ -20,14 +20,15 @@ import AppKit
 import Combine
 
 final class MacWaitlistLockScreenViewController: NSViewController {
-    
+
     // swiftlint:disable force_cast
     static func instantiate() -> NSViewController {
         let storyboard = NSStoryboard(name: "Waitlist", bundle: Bundle.main)
         return storyboard.instantiateController(withIdentifier: "WaitlistLockScreenViewController") as! NSViewController
     }
+
     // swiftlint:enable force_cast
-    
+
     @IBOutlet var logoImageView: NSImageView! {
         didSet {
             logoImageView.wantsLayer = true
@@ -38,53 +39,55 @@ final class MacWaitlistLockScreenViewController: NSViewController {
             logoImageView.layer?.shadowOpacity = 0.3
         }
     }
-    
+
     @IBOutlet var inviteCodeStateGroup: NSView!
     @IBOutlet var successStateGroup: NSView!
-    
+
     @IBOutlet var inviteCodeTextField: NSTextField!
     @IBOutlet var quitButton: NSButton!
     @IBOutlet var continueButton: NSButton!
-    
+
     @IBOutlet var networkRequestSpinner: NSProgressIndicator!
     @IBOutlet var errorLabel: NSTextField!
-    
+
     private let viewModel = MacWaitlistLockScreenViewModel()
     private var viewStateCancellable: AnyCancellable?
 
     override func viewDidLoad() {
         super.viewDidLoad()
-        
+
         // Force the key equivalent to equal the return key. This value wasn't being consistently applied when set in the Storyboard.
         continueButton.keyEquivalent = "\r"
 
         // The unlock screen background uses a light mode background, so those UI elements are hardcoded.
         inviteCodeTextField.appearance = NSAppearance(named: .aqua)
         networkRequestSpinner.appearance = NSAppearance(named: .aqua)
-        
+
         viewStateCancellable = viewModel.$state.sink { [weak self] newState in
             self?.render(state: newState)
         }
-        
+
         renderCurrentState()
-        
+
         NotificationCenter.default.addObserver(self, selector: #selector(dismissIfNecessary(_:)), name: .macWaitlistLockScreenDidUnlock, object: nil)
     }
-    
-    @IBAction func quit(_ sender: NSButton) {
+
+    @IBAction
+    func quit(_: NSButton) {
         exit(0)
     }
-    
-    @IBAction func continueButtonClicked(_ sender: NSButton) {
+
+    @IBAction
+    func continueButtonClicked(_: NSButton) {
         if viewModel.state == .unlockSuccess {
-            self.dismiss()
+            dismiss()
             NotificationCenter.default.post(name: .macWaitlistLockScreenDidUnlock, object: self)
             Pixel.fire(.waitlistDismissedLockScreen)
         } else {
             viewModel.attemptUnlock(code: inviteCodeTextField.stringValue)
         }
     }
-    
+
     @objc
     private func dismissIfNecessary(_ notification: Notification) {
         // In the case that there are somehow multiple windows active when the app launches and displays the unlock
@@ -94,7 +97,7 @@ final class MacWaitlistLockScreenViewController: NSViewController {
             dismiss()
         }
     }
-    
+
     private func renderCurrentState() {
         render(state: viewModel.state)
     }
@@ -104,7 +107,7 @@ final class MacWaitlistLockScreenViewController: NSViewController {
         case .requiresUnlock:
             inviteCodeStateGroup.isHidden = false
             successStateGroup.isHidden = true
-            
+
             continueButton.isEnabled = false
             errorLabel.isHidden = true
             networkRequestSpinner.isHidden = true
@@ -120,17 +123,17 @@ final class MacWaitlistLockScreenViewController: NSViewController {
         case .unlockSuccess:
             inviteCodeStateGroup.isHidden = true
             successStateGroup.isHidden = false
-            
+
             networkRequestSpinner.isHidden = true
             errorLabel.isHidden = true
-            
+
             quitButton.isHidden = true
             continueButton.isEnabled = true
             continueButton.title = UserText.waitlistGetStarted
         case .unlockFailure:
             inviteCodeStateGroup.isHidden = false
             successStateGroup.isHidden = true
-            
+
             inviteCodeTextField.isEnabled = true
             inviteCodeTextField.makeMeFirstResponder()
 
@@ -139,17 +142,17 @@ final class MacWaitlistLockScreenViewController: NSViewController {
             errorLabel.isHidden = false
         }
     }
-    
+
 }
 
 extension MacWaitlistLockScreenViewController: NSTextFieldDelegate {
-    
+
     func controlTextDidChange(_ notification: Notification) {
         if let info = notification.userInfo, let text = info["NSFieldEditor"] as? NSText {
             text.string = text.string.uppercased()
         }
-        
+
         continueButton.isEnabled = !inviteCodeTextField.stringValue.isEmpty
     }
-    
+
 }

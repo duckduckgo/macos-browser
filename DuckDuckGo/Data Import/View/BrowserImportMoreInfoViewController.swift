@@ -28,8 +28,8 @@ final class BrowserImportMoreInfoViewController: NSViewController {
     static func create(source: DataImport.Source) -> Self {
         let storyboard = NSStoryboard(name: Constants.storyboardName, bundle: nil)
 
-        return storyboard.instantiateController(identifier: Constants.identifier) { (coder) -> Self? in
-            return Self.init(coder: coder, source: source)
+        return storyboard.instantiateController(identifier: Constants.identifier) { coder -> Self? in
+            Self(coder: coder, source: source)
         }
     }
 
@@ -40,7 +40,7 @@ final class BrowserImportMoreInfoViewController: NSViewController {
         super.init(coder: coder)
     }
 
-    required init?(coder: NSCoder) {
+    required init?(coder _: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
 

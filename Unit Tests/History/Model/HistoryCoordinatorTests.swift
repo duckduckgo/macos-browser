@@ -199,9 +199,9 @@ class HistoryCoordinatorTests: XCTestCase {
 
 }
 
-fileprivate extension HistoryCoordinator {
+extension HistoryCoordinator {
 
-    static var aHistoryCoordinator: (HistoryStoringMock, HistoryCoordinator) {
+    fileprivate static var aHistoryCoordinator: (HistoryStoringMock, HistoryCoordinator) {
         let historyStoringMock = HistoryStoringMock()
         historyStoringMock.cleanOldResult = .success(History())
         historyStoringMock.removeEntriesResult = .success(History())

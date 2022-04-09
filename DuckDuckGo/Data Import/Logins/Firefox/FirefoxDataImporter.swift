@@ -31,13 +31,14 @@ final class FirefoxDataImporter: DataImporter {
     }
 
     func importableTypes() -> [DataImport.DataType] {
-        return [.logins, .bookmarks]
+        [.logins, .bookmarks]
     }
 
     // swiftlint:disable cyclomatic_complexity
-    func importData(types: [DataImport.DataType],
-                    from profile: DataImport.BrowserProfile?,
-                    completion: @escaping (Result<DataImport.Summary, DataImportError>) -> Void) {
+    func importData(
+        types: [DataImport.DataType],
+        from profile: DataImport.BrowserProfile?,
+        completion: @escaping (Result<DataImport.Summary, DataImportError>) -> Void) {
         guard let firefoxProfileURL = profile?.profileURL ?? defaultFirefoxProfilePath() else {
             completion(.failure(.cannotReadFile))
             return
@@ -46,7 +47,7 @@ final class FirefoxDataImporter: DataImporter {
         var summary = DataImport.Summary()
 
         if types.contains(.logins) {
-            let loginReader = FirefoxLoginReader(firefoxProfileURL: firefoxProfileURL, primaryPassword: self.primaryPassword)
+            let loginReader = FirefoxLoginReader(firefoxProfileURL: firefoxProfileURL, primaryPassword: primaryPassword)
             let loginResult = loginReader.readLogins()
 
             switch loginResult {
@@ -88,6 +89,7 @@ final class FirefoxDataImporter: DataImporter {
 
         completion(.success(summary))
     }
+
     // swiftlint:enable cyclomatic_complexity
 
     private func defaultFirefoxProfilePath() -> URL? {

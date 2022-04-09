@@ -16,8 +16,8 @@
 //  limitations under the License.
 //
 
-import XCTest
 import WebKit
+import XCTest
 @testable import DuckDuckGo_Privacy_Browser
 
 final class WebViewExtensionTests: XCTestCase {
@@ -70,7 +70,7 @@ final class TestNavigationDelegate: NSObject, WKNavigationDelegate {
         self.e = e
     }
 
-    func webView(_ webView: WKWebView, didFinish navigation: WKNavigation!) {
+    func webView(_: WKWebView, didFinish _: WKNavigation!) {
         e.fulfill()
     }
 }

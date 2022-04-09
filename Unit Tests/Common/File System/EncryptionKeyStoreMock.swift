@@ -16,9 +16,9 @@
 //  limitations under the License.
 //
 
+import CryptoKit
 import Foundation
 @testable import DuckDuckGo_Privacy_Browser
-import CryptoKit
 
 @objc(EncryptionKeyStoreMock)
 final class EncryptionKeyStoreMock: NSObject, EncryptionKeyStoring {
@@ -33,7 +33,7 @@ final class EncryptionKeyStoreMock: NSObject, EncryptionKeyStoring {
     }
 
     override init() {
-        self.generator = EncryptionKeyGenerator()
+        generator = EncryptionKeyGenerator()
         super.init()
     }
 
@@ -54,7 +54,7 @@ final class EncryptionKeyStoreMock: NSObject, EncryptionKeyStoring {
 
     func deleteKey() throws {
         if let error = error { throw error }
-        self.key = nil
+        key = nil
     }
 
 }

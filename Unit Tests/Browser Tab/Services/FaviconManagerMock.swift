@@ -16,37 +16,39 @@
 //  limitations under the License.
 //
 
-import XCTest
-import Combine
 import BrowserServicesKit
+import Combine
+import XCTest
 @testable import DuckDuckGo_Privacy_Browser
 
 final class FaviconManagerMock: FaviconManagement {
 
     func loadFavicons() {}
-    var areFaviconsLoaded: Bool { return true }
+    var areFaviconsLoaded: Bool { true }
 
-    func handleFaviconLinks(_ faviconLinks: [FaviconUserScript.FaviconLink], documentUrl: URL, completion: @escaping (Favicon?) -> Void) {
+    func handleFaviconLinks(_: [FaviconUserScript.FaviconLink], documentUrl _: URL, completion: @escaping (Favicon?) -> Void) {
         completion(nil)
     }
 
-    func getCachedFavicon(for documentUrl: URL, sizeCategory: Favicon.SizeCategory) -> Favicon? {
-        return nil
+    func getCachedFavicon(for _: URL, sizeCategory _: Favicon.SizeCategory) -> Favicon? {
+        nil
     }
 
-    func getCachedFavicon(for host: String, sizeCategory: Favicon.SizeCategory) -> Favicon? {
-        return nil
+    func getCachedFavicon(for _: String, sizeCategory _: Favicon.SizeCategory) -> Favicon? {
+        nil
     }
 
-    func burnExcept(fireproofDomains: FireproofDomains,
-                    bookmarkManager: BookmarkManager,
-                    completion: @escaping () -> Void) {
+    func burnExcept(
+        fireproofDomains _: FireproofDomains,
+        bookmarkManager _: BookmarkManager,
+        completion: @escaping () -> Void) {
         completion()
     }
 
-    func burnDomains(_ domains: Set<String>,
-                     except bookmarkManager: BookmarkManager,
-                     completion: @escaping () -> Void) {
+    func burnDomains(
+        _: Set<String>,
+        except _: BookmarkManager,
+        completion: @escaping () -> Void) {
         completion()
     }
 

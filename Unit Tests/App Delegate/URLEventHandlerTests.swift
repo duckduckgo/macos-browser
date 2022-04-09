@@ -38,12 +38,14 @@ final class URLEventHandlerTests: XCTestCase {
             handlerCalled.fulfill()
         }
 
-        let event = NSAppleEventDescriptor(eventClass: AEEventClass(kInternetEventClass),
-                                           eventID: AEEventID(kAEGetURL),
-                                           targetDescriptor: .init(descriptorType: typeApplicationBundleID,
-                                                                   data: Bundle.main.bundleIdentifier!.data(using: .utf8)!),
-                                           returnID: 0,
-                                           transactionID: 0)
+        let event = NSAppleEventDescriptor(
+            eventClass: AEEventClass(kInternetEventClass),
+            eventID: AEEventID(kAEGetURL),
+            targetDescriptor: .init(
+                descriptorType: typeApplicationBundleID,
+                data: Bundle.main.bundleIdentifier!.data(using: .utf8)!),
+            returnID: 0,
+            transactionID: 0)
         event.setParam(.init(string: urlString), forKeyword: keyDirectObject)
         listener.applicationDidFinishLaunching()
         listener.handleUrlEvent(event: event, reply: NSAppleEventDescriptor())

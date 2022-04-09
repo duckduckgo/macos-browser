@@ -38,11 +38,13 @@ final class AddEditFavoriteViewController: NSViewController {
         subscribeToInputTextFields()
     }
 
-    @IBAction func cancelAction(_ sender: NSButton) {
+    @IBAction
+    func cancelAction(_: NSButton) {
         view.window?.close()
     }
 
-    @IBAction func saveAction(_ sender: NSButton) {
+    @IBAction
+    func saveAction(_: NSButton) {
 
         func update(bookmark: Bookmark, newTitle: String, newUrl: URL? = nil) {
             let bookmark = bookmark

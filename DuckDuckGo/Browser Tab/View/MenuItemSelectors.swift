@@ -18,7 +18,8 @@
 
 import Cocoa
 
-@objc protocol LinkMenuItemSelectors {
+@objc
+protocol LinkMenuItemSelectors {
 
     func openLinkInNewTab(_ sender: NSMenuItem)
     func openLinkInNewWindow(_ sender: NSMenuItem)
@@ -27,7 +28,8 @@ import Cocoa
 
 }
 
-@objc protocol ImageMenuItemSelectors {
+@objc
+protocol ImageMenuItemSelectors {
 
     func openImageInNewTab(_ sender: NSMenuItem)
     func openImageInNewWindow(_ sender: NSMenuItem)
@@ -36,13 +38,15 @@ import Cocoa
 
 }
 
-@objc protocol MenuItemSelectors {
+@objc
+protocol MenuItemSelectors {
 
     func search(_ sender: NSMenuItem)
 
 }
 
-@objc protocol FolderMenuItemSelectors {
+@objc
+protocol FolderMenuItemSelectors {
 
     func newFolder(_ sender: NSMenuItem)
     func renameFolder(_ sender: NSMenuItem)
@@ -50,7 +54,8 @@ import Cocoa
 
 }
 
-@objc protocol BookmarkMenuItemSelectors {
+@objc
+protocol BookmarkMenuItemSelectors {
 
     func openBookmarkInNewTab(_ sender: NSMenuItem)
     func openBookmarkInNewWindow(_ sender: NSMenuItem)

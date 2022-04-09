@@ -38,14 +38,15 @@ final class HomePageViewController: NSViewController {
     @UserDefaultsWrapper(key: .defaultBrowserDismissed, defaultValue: false)
     var defaultBrowserDismissed: Bool
 
-    required init?(coder: NSCoder) {
+    required init?(coder _: NSCoder) {
         fatalError("HomePageViewController: Bad initializer")
     }
 
-    init?(coder: NSCoder,
-          tabCollectionViewModel: TabCollectionViewModel,
-          bookmarkManager: BookmarkManager,
-          historyCoordinating: HistoryCoordinating = HistoryCoordinator.shared) {
+    init?(
+        coder: NSCoder,
+        tabCollectionViewModel: TabCollectionViewModel,
+        bookmarkManager: BookmarkManager,
+        historyCoordinating: HistoryCoordinating = HistoryCoordinator.shared) {
 
         self.tabCollectionViewModel = tabCollectionViewModel
         self.bookmarkManager = bookmarkManager
@@ -87,7 +88,7 @@ final class HomePageViewController: NSViewController {
 
     override func viewDidLayout() {
         super.viewDidLayout()
-        host?.frame = self.view.frame
+        host?.frame = view.frame
     }
 
     func refreshModels() {
@@ -97,13 +98,13 @@ final class HomePageViewController: NSViewController {
     }
 
     func createRecentlyVisitedModel() -> HomePage.Models.RecentlyVisitedModel {
-        return .init { [weak self] url in
+        .init { [weak self] url in
             self?.openUrl(url)
         }
     }
 
     func createDefaultBrowserModel() -> HomePage.Models.DefaultBrowserModel {
-        return .init(isDefault: DefaultBrowserPreferences().isDefault, wasClosed: defaultBrowserDismissed, requestSetDefault: { [weak self] in
+        .init(isDefault: DefaultBrowserPreferences().isDefault, wasClosed: defaultBrowserDismissed, requestSetDefault: { [weak self] in
             let defaultBrowserPreferencesModel = DefaultBrowserPreferences()
             defaultBrowserPreferencesModel.becomeDefault { [weak self] isDefault in
                 _ = defaultBrowserPreferencesModel
@@ -118,7 +119,7 @@ final class HomePageViewController: NSViewController {
     }
 
     func createFavoritesModel() -> HomePage.Models.FavoritesModel {
-        return .init(open: { [weak self] bookmark, target in
+        .init(open: { [weak self] bookmark, target in
             self?.openUrl(bookmark.url, target: target)
         }, remove: { [weak self] bookmark in
             self?.bookmarkManager.remove(bookmark: bookmark)
@@ -181,10 +182,11 @@ final class HomePageViewController: NSViewController {
             window.addEditFavoriteViewController.edit(bookmark: bookmark)
         }
 
-        let windowFrame = NSRect(x: screen.frame.origin.x + screen.frame.size.width / 2.0 - AddEditFavoriteWindow.Size.width / 2.0,
-                                 y: screen.frame.origin.y + screen.frame.size.height / 2.0 - AddEditFavoriteWindow.Size.height / 2.0,
-                                 width: AddEditFavoriteWindow.Size.width,
-                                 height: AddEditFavoriteWindow.Size.height)
+        let windowFrame = NSRect(
+            x: screen.frame.origin.x + screen.frame.size.width / 2.0 - AddEditFavoriteWindow.Size.width / 2.0,
+            y: screen.frame.origin.y + screen.frame.size.height / 2.0 - AddEditFavoriteWindow.Size.height / 2.0,
+            width: AddEditFavoriteWindow.Size.width,
+            height: AddEditFavoriteWindow.Size.height)
 
         view.window?.addChildWindow(window, ordered: .above)
         window.setFrame(windowFrame, display: true)
@@ -193,8 +195,8 @@ final class HomePageViewController: NSViewController {
 
 }
 
-fileprivate extension NSStoryboard {
+extension NSStoryboard {
 
-    static let homePage = NSStoryboard(name: "HomePage", bundle: .main)
+    fileprivate static let homePage = NSStoryboard(name: "HomePage", bundle: .main)
 
 }

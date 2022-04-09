@@ -16,8 +16,8 @@
 //  limitations under the License.
 //
 
-import XCTest
 import Combine
+import XCTest
 @testable import DuckDuckGo_Privacy_Browser
 
 final class AppStateChangePublisherTests: XCTestCase {
@@ -53,7 +53,7 @@ final class AppStateChangePublisherTests: XCTestCase {
         }
     }
 
-    func expect(description expectationDescription: String, events: Int) -> MultiExpectation {
+    func expect(description _: String, events: Int) -> MultiExpectation {
         MultiExpectation(e: expectation(description: description), count: events)
     }
 
@@ -82,7 +82,7 @@ final class AppStateChangePublisherTests: XCTestCase {
                 e.fulfill()
             }.store(in: &cancellables)
 
-        for _ in (0..<n) {
+        for _ in 0..<n {
             WindowsManager.openNewWindow()
         }
 

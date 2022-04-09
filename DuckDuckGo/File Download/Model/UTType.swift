@@ -36,7 +36,7 @@ struct UTType: RawRepresentable, Hashable {
         else {
             return nil
         }
-        self.rawValue = contentType.takeRetainedValue()
+        rawValue = contentType.takeRetainedValue()
     }
 
     init?(fileExtension: String) {
@@ -44,7 +44,7 @@ struct UTType: RawRepresentable, Hashable {
         else {
             return nil
         }
-        self.rawValue = uti.takeRetainedValue()
+        rawValue = uti.takeRetainedValue()
     }
 
 }
@@ -52,15 +52,15 @@ struct UTType: RawRepresentable, Hashable {
 extension UTType {
 
     var mimeType: String? {
-        UTTypeCopyPreferredTagWithClass(self.rawValue, kUTTagClassMIMEType)?.takeRetainedValue() as String?
+        UTTypeCopyPreferredTagWithClass(rawValue, kUTTagClassMIMEType)?.takeRetainedValue() as String?
     }
 
     var fileExtension: String? {
-        UTTypeCopyPreferredTagWithClass(self.rawValue, kUTTagClassFilenameExtension)?.takeRetainedValue() as String?
+        UTTypeCopyPreferredTagWithClass(rawValue, kUTTagClassFilenameExtension)?.takeRetainedValue() as String?
     }
 
     var description: String? {
-        UTTypeCopyDescription(self.rawValue)?.takeRetainedValue() as String?
+        UTTypeCopyDescription(rawValue)?.takeRetainedValue() as String?
     }
 
     @available(OSX 11.0, *)
@@ -72,7 +72,7 @@ extension UTType {
         guard #available(OSX 11.0, *) else {
             return NSWorkspace.shared.icon(forFileType: rawValue as String)
         }
-        return NSWorkspace.shared.icon(for: self.utType)
+        return NSWorkspace.shared.icon(for: utType)
     }
 
 }

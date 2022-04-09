@@ -16,8 +16,8 @@
 //  limitations under the License.
 //
 
-import Foundation
 import Combine
+import Foundation
 import os.log
 
 protocol PermissionManagerProtocol: AnyObject {
@@ -52,7 +52,7 @@ final class PermissionManager: PermissionManagerProtocol {
         do {
             let entities = try store.loadPermissions()
             for entity in entities {
-                self.set(entity.permission, forDomain: entity.domain.dropWWW(), permissionType: entity.type)
+                set(entity.permission, forDomain: entity.domain.dropWWW(), permissionType: entity.type)
             }
         } catch {
             os_log("PermissionStore: Failed to load permissions", type: .error)
@@ -60,18 +60,18 @@ final class PermissionManager: PermissionManagerProtocol {
     }
 
     private func set(_ permission: StoredPermission, forDomain domain: String, permissionType: PermissionType) {
-        self.permissions[domain, default: [:]][permissionType] = permission
+        permissions[domain, default: [:]][permissionType] = permission
         persistedPermissionTypes.insert(permissionType)
     }
 
     private(set) var persistedPermissionTypes = Set<PermissionType>()
 
     func permission(forDomain domain: String, permissionType: PermissionType) -> PersistedPermissionDecision {
-        return permissions[domain.dropWWW()]?[permissionType]?.decision ?? .ask
+        permissions[domain.dropWWW()]?[permissionType]?.decision ?? .ask
     }
 
     func hasPermissionPersisted(forDomain domain: String, permissionType: PermissionType) -> Bool {
-        return permissions[domain.dropWWW()]?[permissionType] != nil
+        permissions[domain.dropWWW()]?[permissionType] != nil
     }
 
     func setPermission(_ decision: PersistedPermissionDecision, forDomain domain: String, permissionType: PermissionType) {
@@ -80,7 +80,7 @@ final class PermissionManager: PermissionManagerProtocol {
 
         let storedPermission: StoredPermission
         let domain = domain.dropWWW()
-        guard self.permission(forDomain: domain, permissionType: permissionType) != decision else { return }
+        guard permission(forDomain: domain, permissionType: permissionType) != decision else { return }
 
         defer {
             self.permissionSubject.send( (domain, permissionType, decision) )
@@ -97,7 +97,7 @@ final class PermissionManager: PermissionManagerProtocol {
                 return
             }
         }
-        self.set(storedPermission, forDomain: domain, permissionType: permissionType)
+        set(storedPermission, forDomain: domain, permissionType: permissionType)
     }
 
     func burnPermissions(except fireproofDomains: FireproofDomains, completion: @escaping () -> Void) {
@@ -108,7 +108,7 @@ final class PermissionManager: PermissionManagerProtocol {
         }
         store.clear(except: permissions.values.reduce(into: [StoredPermission](), {
             $0.append(contentsOf: $1.values)
-        }), completionHandler: { _ in 
+        }), completionHandler: { _ in
             completion()
         })
     }

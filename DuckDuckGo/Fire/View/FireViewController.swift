@@ -17,8 +17,8 @@
 //
 
 import Cocoa
-import Lottie
 import Combine
+import Lottie
 
 final class FireViewController: NSViewController {
 
@@ -37,13 +37,14 @@ final class FireViewController: NSViewController {
     @IBOutlet weak var progressIndicator: NSProgressIndicator!
     @IBOutlet weak var progressIndicatorWrapperBG: NSView!
 
-    required init?(coder: NSCoder) {
+    required init?(coder _: NSCoder) {
         fatalError("TabBarViewController: Bad initializer")
     }
 
-    init?(coder: NSCoder,
-          tabCollectionViewModel: TabCollectionViewModel,
-          fireViewModel: FireViewModel = FireCoordinator.fireViewModel) {
+    init?(
+        coder: NSCoder,
+        tabCollectionViewModel: TabCollectionViewModel,
+        fireViewModel: FireViewModel = FireCoordinator.fireViewModel) {
         self.tabCollectionViewModel = tabCollectionViewModel
         self.fireViewModel = fireViewModel
 
@@ -61,7 +62,7 @@ final class FireViewController: NSViewController {
     override func viewWillAppear() {
         super.viewWillAppear()
 
-        self.view.superview?.isHidden = true
+        view.superview?.isHidden = true
         subscribeToShouldPreventUserInteraction()
         progressIndicator.startAnimation(self)
     }
@@ -92,10 +93,11 @@ final class FireViewController: NSViewController {
     private func subscribeToIsBurning() {
         fireViewModel.fire.$burningData
             .sink(receiveValue: { [weak self] burningData in
-                guard let burningData = burningData,
+                guard
+                    let burningData = burningData,
                     let self = self else {
-                        return
-                    }
+                    return
+                }
 
                 self.animateFire(burningData: burningData)
             })

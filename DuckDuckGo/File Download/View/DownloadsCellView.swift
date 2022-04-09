@@ -50,7 +50,7 @@ final class DownloadsCellView: NSTableCellView {
 
     private static let byteFormatter = ByteCountFormatter()
 
-    var isSelected: Bool = false {
+    var isSelected = false {
         didSet {
             separator.isHidden = isSelected
         }
@@ -84,8 +84,8 @@ final class DownloadsCellView: NSTableCellView {
             let fileType = UTType(fileExtension: (filename as NSString).pathExtension) ?? .data
             return fileType.icon
         }
-            .assign(to: \.image, on: imageView!)
-            .store(in: &cancellables)
+        .assign(to: \.image, on: imageView!)
+        .store(in: &cancellables)
         viewModel.$filename.combineLatest(viewModel.$state)
             .sink { [weak self] filename, state in
                 self?.updateFilename(filename, state: state)
@@ -95,15 +95,17 @@ final class DownloadsCellView: NSTableCellView {
         viewModel.$state.map {
             $0.progress?.publisher(for: \.fractionCompleted).map { .some($0) }.eraseToAnyPublisher() ?? Just(.none).eraseToAnyPublisher()
         }
-            .switchToLatest()
-            .dropFirst()
-            .assign(to: \.progress, on: progressView)
-            .store(in: &cancellables)
+        .switchToLatest()
+        .dropFirst()
+        .assign(to: \.progress, on: progressView)
+        .store(in: &cancellables)
         progressView.progress = viewModel.state.progress?.fractionCompleted
     }
 
-    private static let fileRemovedTitleAttributes: [NSAttributedString.Key: Any] = [.strikethroughStyle: 1,
-                                                                                    .foregroundColor: NSColor.disabledControlTextColor]
+    private static let fileRemovedTitleAttributes: [NSAttributedString.Key: Any] = [
+        .strikethroughStyle: 1,
+        .foregroundColor: NSColor.disabledControlTextColor
+    ]
 
     private func updateFilename(_ filename: String, state: DownloadViewModel.State) {
         var attributes: [NSAttributedString.Key: Any]?
@@ -128,8 +130,8 @@ final class DownloadsCellView: NSTableCellView {
             updateDownloadFailed(with: .downloadFailed(error))
         }
 
-        self.titleLabel.attributedStringValue = NSAttributedString(string: filename, attributes: attributes)
-        self.titleLabel.toolTip = filename
+        titleLabel.attributedStringValue = NSAttributedString(string: filename, attributes: attributes)
+        titleLabel.toolTip = filename
     }
 
     private var onButtonMouseOverChange: ((Bool) -> Void)?
@@ -151,25 +153,25 @@ final class DownloadsCellView: NSTableCellView {
                 }
             }
 
-            self.detailLabel.toolTip = progress.localizedDescription
+            detailLabel.toolTip = progress.localizedDescription
         }
 
-        self.detailLabel.stringValue = details
+        detailLabel.stringValue = details
     }
 
     private func subscribe(to progress: Progress) {
-        self.progressView.isHidden = false
+        progressView.isHidden = false
         progressCancellable = progress.publisher(for: \.completedUnitCount)
             .throttle(for: 0.2, scheduler: DispatchQueue.main, latest: true)
             .sink { [weak self] _ in
                 self?.updateDetails(with: progress)
-        }
+            }
 
-        self.cancelButton.isHidden = false
-        self.restartButton.isHidden = true
-        self.revealButton.isHidden = true
+        cancelButton.isHidden = false
+        restartButton.isHidden = true
+        revealButton.isHidden = true
 
-        self.imageView?.alphaValue = 1.0
+        imageView?.alphaValue = 1.0
 
         onButtonMouseOverChange = { [weak self] _ in
             self?.updateDetails(with: progress)
@@ -179,13 +181,13 @@ final class DownloadsCellView: NSTableCellView {
 
     private func updateCompletedFile(fileSize: Int) {
         progressCancellable = nil
-        self.progressView.isHidden = true
+        progressView.isHidden = true
 
-        self.cancelButton.isHidden = true
-        self.restartButton.isHidden = true
-        self.revealButton.isHidden = false
+        cancelButton.isHidden = true
+        restartButton.isHidden = true
+        revealButton.isHidden = false
 
-        self.imageView?.alphaValue = 1.0
+        imageView?.alphaValue = 1.0
 
         onButtonMouseOverChange = { [weak self] isMouseOver in
             if isMouseOver {
@@ -200,16 +202,16 @@ final class DownloadsCellView: NSTableCellView {
 
     private func updateDownloadFailed(with error: DownloadError) {
         progressCancellable = nil
-        self.progressView.isHidden = true
+        progressView.isHidden = true
 
-        self.cancelButton.isHidden = true
-        self.restartButton.isHidden = false
-        self.revealButton.isHidden = true
+        cancelButton.isHidden = true
+        restartButton.isHidden = false
+        revealButton.isHidden = true
 
         if case .fileRemoved = error {
             self.imageView?.alphaValue = 0.3
         } else {
-            self.imageView?.alphaValue = 1.0
+            imageView?.alphaValue = 1.0
         }
 
         onButtonMouseOverChange = { [weak self] isMouseOver in

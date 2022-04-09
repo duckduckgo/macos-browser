@@ -18,8 +18,8 @@
 
 import Foundation
 
-import XCTest
 import CryptoKit
+import XCTest
 @testable import DuckDuckGo_Privacy_Browser
 
 final class CoreDataEncryptionTests: XCTestCase {
@@ -81,7 +81,7 @@ final class CoreDataEncryptionTests: XCTestCase {
     }
 
     func testValueTransformers() {
-        let transformer = self.mockValueTransformer
+        let transformer = mockValueTransformer
         let container = CoreData.encryptionContainer()
         let context = container.viewContext
 

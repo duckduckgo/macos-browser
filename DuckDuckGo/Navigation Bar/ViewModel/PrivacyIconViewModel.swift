@@ -47,7 +47,8 @@ struct PrivacyIconViewModel {
 
         let blockedEntities: Set<LightEntity> =
             // Filter entity duplicates by using Set
-            Set(trackerInfo.trackersBlocked
+            Set(
+                trackerInfo.trackersBlocked
                     // Filter trackers without entity or entity name
                     .compactMap {
                         if let entityName = $0.entity?.displayName, entityName.count > 0 {
@@ -59,15 +60,15 @@ struct PrivacyIconViewModel {
         return blockedEntities
             // Sort by prevalence
             .sorted { l, r -> Bool in
-                return l.prevalence > r.prevalence
+                l.prevalence > r.prevalence
             }
             // Get first character
             .map {
-                return $0.name.lowercased()
+                $0.name.lowercased()
             }
             // Prioritise entities with images
             .sorted { _, r -> Bool in
-                return "aeiou".contains(r[r.startIndex])
+                "aeiou".contains(r[r.startIndex])
             }
     }
 
@@ -104,7 +105,7 @@ struct PrivacyIconViewModel {
     }
 
     static let lettersAqua: [Character: CGImage] = {
-        return [
+        [
             "a": NSImage(named: "a")!.cgImage(forProposedRect: nil, context: .current, hints: nil)!,
             "b": NSImage(named: "b")!.cgImage(forProposedRect: nil, context: .current, hints: nil)!,
             "c": NSImage(named: "c")!.cgImage(forProposedRect: nil, context: .current, hints: nil)!,
@@ -135,7 +136,7 @@ struct PrivacyIconViewModel {
     }()
 
     static let lettersDark: [Character: CGImage] = {
-        return [
+        [
             "a": NSImage(named: "a_dark")!.cgImage(forProposedRect: nil, context: .current, hints: nil)!,
             "b": NSImage(named: "b_dark")!.cgImage(forProposedRect: nil, context: .current, hints: nil)!,
             "c": NSImage(named: "c_dark")!.cgImage(forProposedRect: nil, context: .current, hints: nil)!,
@@ -174,7 +175,7 @@ struct PrivacyIconViewModel {
     }
 
     static let logosAqua: [String: CGImage] = {
-        return [
+        [
             "adform": NSImage(named: "adform")!.cgImage(forProposedRect: nil, context: .current, hints: nil)!,
             "adobe": NSImage(named: "adobe")!.cgImage(forProposedRect: nil, context: .current, hints: nil)!,
             "amazon": NSImage(named: "amazon")!.cgImage(forProposedRect: nil, context: .current, hints: nil)!,
@@ -218,7 +219,7 @@ struct PrivacyIconViewModel {
     }()
 
     static let logosDark: [String: CGImage] = {
-        return [
+        [
             "adform": NSImage(named: "adform_dark")!.cgImage(forProposedRect: nil, context: .current, hints: nil)!,
             "adobe": NSImage(named: "adobe_dark")!.cgImage(forProposedRect: nil, context: .current, hints: nil)!,
             "amazon": NSImage(named: "amazon_dark")!.cgImage(forProposedRect: nil, context: .current, hints: nil)!,

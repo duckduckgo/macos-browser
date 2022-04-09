@@ -39,7 +39,7 @@ final class NavigationButtonMenuDelegate: NSObject {
 
 extension NavigationButtonMenuDelegate: NSMenuDelegate {
 
-    func numberOfItems(in menu: NSMenu) -> Int {
+    func numberOfItems(in _: NSMenu) -> Int {
         if listItems.count > 1 {
             return listItems.count
         } else if tabCollectionViewModel.selectedTabViewModel?.tab.canBeClosedWithBack == true {
@@ -48,11 +48,12 @@ extension NavigationButtonMenuDelegate: NSMenuDelegate {
         return 0
     }
 
-    func menu(_ menu: NSMenu, update item: NSMenuItem, at index: Int, shouldCancel: Bool) -> Bool {
-        let listItems = self.listItems
+    func menu(_: NSMenu, update item: NSMenuItem, at index: Int, shouldCancel _: Bool) -> Bool {
+        let listItems = listItems
         let listItem: BackForwardListItem
-        if listItems.count > 1,
-           let item = listItems[safe: index] {
+        if
+            listItems.count > 1,
+            let item = listItems[safe: index] {
             listItem = .backForwardListItem(item)
         } else if let parentTab = tabCollectionViewModel.selectedTabViewModel?.tab.parentTab {
             listItem = .goBackToCloseItem(parentTab: parentTab)
@@ -61,14 +62,15 @@ extension NavigationButtonMenuDelegate: NSMenuDelegate {
             return true
         }
 
-        let listItemViewModel = WKBackForwardListItemViewModel(backForwardListItem: listItem,
-                                                               faviconManagement: FaviconManager.shared,
-                                                               historyCoordinating: HistoryCoordinator.shared,
-                                                               isCurrentItem: listItems[safe: index] === currentListItem)
+        let listItemViewModel = WKBackForwardListItemViewModel(
+            backForwardListItem: listItem,
+            faviconManagement: FaviconManager.shared,
+            historyCoordinating: HistoryCoordinator.shared,
+            isCurrentItem: listItems[safe: index] === currentListItem)
 
         item.title = listItemViewModel.title
         item.image = listItemViewModel.image
-        item.state =  listItemViewModel.state
+        item.state = listItemViewModel.state
 
         item.target = self
         item.action = listItemViewModel.isGoBackToCloseItem ? #selector(goBackAction(_:)) : #selector(menuItemAction(_:))
@@ -76,9 +78,10 @@ extension NavigationButtonMenuDelegate: NSMenuDelegate {
         return true
     }
 
-    @objc func menuItemAction(_ sender: NSMenuItem) {
+    @objc
+    func menuItemAction(_ sender: NSMenuItem) {
         let index = sender.tag
-        let listItems = self.listItems
+        let listItems = listItems
 
         guard index < listItems.count else {
             os_log("%s: Index out of bounds", type: .error, className)
@@ -98,7 +101,8 @@ extension NavigationButtonMenuDelegate: NSMenuDelegate {
         selectedTabViewModel.tab.go(to: listItem)
     }
 
-    @objc func goBackAction(_: NSMenuItem) {
+    @objc
+    func goBackAction(_: NSMenuItem) {
         tabCollectionViewModel.selectedTabViewModel?.tab.goBack()
     }
 

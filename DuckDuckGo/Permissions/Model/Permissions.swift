@@ -30,7 +30,7 @@ extension Dictionary where Key == PermissionType, Value == PermissionState {
             self[.microphone] = newValue
         }
     }
-    
+
     var camera: PermissionState? {
         get {
             self[.camera]
@@ -59,7 +59,7 @@ extension Dictionary where Key == PermissionType, Value == PermissionState {
     }
 
     var externalScheme: PermissionState? {
-        return self.first(where: { $0.key.isExternalScheme })?.value
+        first(where: { $0.key.isExternalScheme })?.value
     }
 
 }

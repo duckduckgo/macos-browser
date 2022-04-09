@@ -30,9 +30,10 @@ extension Pixel {
 
         case browserMadeDefault
 
-        case burn(repetition: Repetition = .init(key: "fire"),
-                  burnedTabs: BurnedTabs = .init(),
-                  burnedWindows: BurnedWindows = .init())
+        case burn(
+            repetition: Repetition = .init(key: "fire"),
+            burnedTabs: BurnedTabs = .init(),
+            burnedWindows: BurnedWindows = .init())
 
         case crash
 
@@ -48,6 +49,7 @@ extension Pixel {
                     self = .regularNavigation
                 }
             }
+
             case onboardingShown = "onboarding-shown"
             case regularNavigation = "regular-nav"
         }
@@ -69,8 +71,9 @@ extension Pixel {
             case lessThan10s = "10"
             case lessThan20s = "20"
             case lessThan40s = "40"
-            case more = "more"
+            case more
         }
+
         case compileRulesWait(onboardingShown: OnboardingShown, waitTime: CompileRulesWaitTime, result: WaitResult)
         static func compileRulesWait(onboardingShown: Bool, waitTime interval: TimeInterval, result: WaitResult) -> Event {
             let waitTime: CompileRulesWaitTime
@@ -90,9 +93,10 @@ extension Pixel {
             default:
                 waitTime = .more
             }
-            return .compileRulesWait(onboardingShown: OnboardingShown(onboardingShown),
-                                     waitTime: waitTime,
-                                     result: result)
+            return .compileRulesWait(
+                onboardingShown: OnboardingShown(onboardingShown),
+                waitTime: waitTime,
+                result: result)
         }
 
         case fireproof(kind: FireproofKind, repetition: Repetition = .init(key: "fireproof"), suggested: FireproofingSuggested)
@@ -120,9 +124,10 @@ extension Pixel {
         case suggestionsDisplayed(hasBookmark: HasBookmark, hasFavorite: HasFavorite, hasHistoryEntry: HasHistoryEntry)
 
         static func suggestionsDisplayed(_ characteristics: SuggestionListChacteristics) -> Event {
-            return .suggestionsDisplayed(hasBookmark: characteristics.hasBookmark ? .hasBookmark : .noBookmarks,
-                                         hasFavorite: characteristics.hasFavorite ? .hasFavorite : .noFavorites,
-                                         hasHistoryEntry: characteristics.hasHistoryEntry ? .hasHistoryEntry : .noHistoryEntry)
+            .suggestionsDisplayed(
+                hasBookmark: characteristics.hasBookmark ? .hasBookmark : .noBookmarks,
+                hasFavorite: characteristics.hasFavorite ? .hasFavorite : .noFavorites,
+                hasHistoryEntry: characteristics.hasHistoryEntry ? .hasHistoryEntry : .noHistoryEntry)
         }
 
         case sharingMenu(repetition: Repetition = .init(key: "sharing"), result: SharingResult)
@@ -138,7 +143,7 @@ extension Pixel {
 
         case formAutofilled(kind: FormAutofillKind)
         case autofillItemSaved(kind: FormAutofillKind)
-        
+
         case waitlistFirstLaunch
         case waitlistPresentedLockScreen
         case waitlistDismissedLockScreen
@@ -149,10 +154,10 @@ extension Pixel {
         case onboardingSetDefaultPressed
         case onboardingSetDefaultSkipped
         case onboardingTypingSkipped
-        
+
         case autoconsentOptOutFailed
         case autoconsentSelfTestFailed
-        
+
         case passwordManagerLockScreenPreferencesButtonPressed
         case passwordManagerLockScreenDisabled
         case passwordManagerLockScreenTimeoutSelected1Minute
@@ -160,7 +165,7 @@ extension Pixel {
         case passwordManagerLockScreenTimeoutSelected15Minutes
         case passwordManagerLockScreenTimeoutSelected30Minutes
         case passwordManagerLockScreenTimeoutSelected1Hour
-        
+
         case ampBlockingRulesCompilationFailed
 
         case debug(event: Debug, error: Error? = nil)
@@ -177,7 +182,7 @@ extension Pixel {
             case trackerDataParseFailed = "tds_p"
             case trackerDataReloadFailed = "tds_r"
             case trackerDataCouldNotBeLoaded = "tds_l"
-            
+
             case privacyConfigurationParseFailed = "pcf_p"
             case privacyConfigurationReloadFailed = "pcf_r"
             case privacyConfigurationCouldNotBeLoaded = "pcf_l"
@@ -188,7 +193,7 @@ extension Pixel {
             case suggestionsFetchFailed = "sgf"
             case appOpenURLFailed = "url"
             case appStateRestorationFailed = "srf"
-            
+
             case contentBlockingErrorReportingIssue = "content_blocking_error_reporting_issue"
 
             case contentBlockingTDSCompilationFailed = "content_blocking_compilation_error_fetched_tds"
@@ -209,12 +214,13 @@ extension Pixel {
             case secureVaultError = "secure_vault_error"
 
             case feedbackReportingFailed = "feedback_reporting_failed"
-            
+
             case blankNavigationOnBurnFailed = "blank_navigation_on_burn_failed"
         }
 
     }
 }
+
 // swiftlint:enable identifier_name
 
 extension Pixel.Event {
@@ -273,7 +279,7 @@ extension Pixel.Event {
 
         case .navigation(kind: let kind, source: let source):
             return "m_mac_navigation_\(kind)_\(source)"
-            
+
         case .serp:
             return "m_mac_navigation_search"
 
@@ -306,13 +312,13 @@ extension Pixel.Event {
 
         case .autofillItemSaved(kind: let kind):
             return "m_mac_save_\(kind)"
-            
+
         case .waitlistFirstLaunch:
             return "m_mac_waitlist_first_launch_while_locked"
-            
+
         case .waitlistPresentedLockScreen:
             return "m_mac_waitlist_lock_screen_presented"
-            
+
         case .waitlistDismissedLockScreen:
             return "m_mac_waitlist_lock_screen_dismissed"
 
@@ -342,28 +348,28 @@ extension Pixel.Event {
 
         case .autoconsentSelfTestFailed:
             return "m_mac_autoconsent_selftest_failed"
-            
+
         case .passwordManagerLockScreenPreferencesButtonPressed:
             return "m_mac_password_mananger_lock_screen_preferences_button_pressed"
-            
+
         case .passwordManagerLockScreenDisabled:
             return "m_mac_password_mananger_lock_screen_disabled"
-            
+
         case .passwordManagerLockScreenTimeoutSelected1Minute:
             return "m_mac_password_mananger_lock_screen_timeout_selected_1_minute"
 
         case .passwordManagerLockScreenTimeoutSelected5Minutes:
             return "m_mac_password_mananger_lock_screen_timeout_selected_5_minutes"
-            
+
         case .passwordManagerLockScreenTimeoutSelected15Minutes:
             return "m_mac_password_mananger_lock_screen_timeout_selected_15_minutes"
-            
+
         case .passwordManagerLockScreenTimeoutSelected30Minutes:
             return "m_mac_password_mananger_lock_screen_timeout_selected_30_minutes"
-            
+
         case .passwordManagerLockScreenTimeoutSelected1Hour:
             return "m_mac_password_mananger_lock_screen_timeout_selected_1_hour"
-            
+
         case .ampBlockingRulesCompilationFailed:
             return "m_mac_amp_rules_compilation_failed"
         }

@@ -27,7 +27,7 @@ final class CrashReportPromptPresenter {
 
     var viewController: CrashReportPromptViewController {
         // swiftlint:disable force_cast
-        return windowController.contentViewController as! CrashReportPromptViewController
+        windowController.contentViewController as! CrashReportPromptViewController
         // swiftlint:enable force_cast
     }
 

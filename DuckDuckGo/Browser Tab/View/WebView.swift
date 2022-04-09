@@ -17,8 +17,8 @@
 //
 
 import Cocoa
-import WebKit
 import os.log
+import WebKit
 
 final class WebView: WKWebView {
 
@@ -42,17 +42,17 @@ final class WebView: WKWebView {
         "WKMenuItemIdentifierDownloadLinkedFile": UserText.downloadLinkedFileAs,
         "WKMenuItemIdentifierSearchWeb": UserText.searchWithDuckDuckGo
     ]
-  
+
     deinit {
         self.configuration.userContentController.removeAllUserScripts()
     }
-  
+
     // MARK: - Zoom
 
     static private let maxZoomLevel: CGFloat = 3.0
     static private let minZoomLevel: CGFloat = 0.5
     static private let zoomLevelStep: CGFloat = 0.1
-    
+
     var zoomLevel: CGFloat {
         get {
             if #available(macOS 11.0, *) {
@@ -70,25 +70,25 @@ final class WebView: WKWebView {
     }
 
     var canZoomToActualSize: Bool {
-        self.window != nil && self.zoomLevel != 1.0
+        window != nil && zoomLevel != 1.0
     }
 
     var canZoomIn: Bool {
-        self.window != nil && self.zoomLevel < Self.maxZoomLevel
+        window != nil && zoomLevel < Self.maxZoomLevel
     }
 
     var canZoomOut: Bool {
-        self.window != nil && self.zoomLevel > Self.minZoomLevel
+        window != nil && zoomLevel > Self.minZoomLevel
     }
 
     func zoomIn() {
         guard canZoomIn else { return }
-        self.zoomLevel = min(self.zoomLevel + Self.zoomLevelStep, Self.maxZoomLevel)
+        zoomLevel = min(zoomLevel + Self.zoomLevelStep, Self.maxZoomLevel)
     }
 
     func zoomOut() {
         guard canZoomOut else { return }
-        self.zoomLevel = max(self.zoomLevel - Self.zoomLevelStep, Self.minZoomLevel)
+        zoomLevel = max(zoomLevel - Self.zoomLevelStep, Self.minZoomLevel)
     }
 
     // MARK: - Back/Forward Navigation
@@ -111,17 +111,19 @@ final class WebView: WKWebView {
 
         updateActionsAndTitles(menu.items)
 
-        menu.insertItemBeforeItemWithIdentifier("WKMenuItemIdentifierOpenImageInNewWindow",
-                                                title: UserText.openImageInNewTab,
-                                                target: uiDelegate,
-                                                selector: #selector(ImageMenuItemSelectors.openImageInNewTab(_:)))
+        menu.insertItemBeforeItemWithIdentifier(
+            "WKMenuItemIdentifierOpenImageInNewWindow",
+            title: UserText.openImageInNewTab,
+            target: uiDelegate,
+            selector: #selector(ImageMenuItemSelectors.openImageInNewTab(_:)))
 
         menu.insertSeparatorBeforeItemWithIdentifier("WKMenuItemIdentifierCopyImage")
 
-        menu.insertItemBeforeItemWithIdentifier("WKMenuItemIdentifierCopyImage",
-                                                title: UserText.copyImageAddress,
-                                                target: uiDelegate,
-                                                selector: #selector(ImageMenuItemSelectors.copyImageAddress(_:)))
+        menu.insertItemBeforeItemWithIdentifier(
+            "WKMenuItemIdentifierCopyImage",
+            title: UserText.copyImageAddress,
+            target: uiDelegate,
+            selector: #selector(ImageMenuItemSelectors.copyImageAddress(_:)))
 
         // calling .menuWillOpen here manually as it's already calling the latter Menu Owner's willOpenMenu at this point
         (uiDelegate as? NSMenuDelegate)?.menuWillOpen?(menu)
@@ -146,24 +148,25 @@ final class WebView: WKWebView {
 
     override func viewDidMoveToWindow() {
         super.viewDidMoveToWindow()
-        if self.isInspectorShown {
-            self.openDeveloperTools()
+        if isInspectorShown {
+            openDeveloperTools()
         }
     }
 
     @nonobjc var mainFrame: AnyObject? {
-        guard self.responds(to: NSSelectorFromString("_mainFrame")) else {
+        guard responds(to: NSSelectorFromString("_mainFrame")) else {
             assertionFailure("WKWebView does not respond to _mainFrame")
             return nil
         }
-        return self.perform(NSSelectorFromString("_mainFrame"))?.takeUnretainedValue()
+        return perform(NSSelectorFromString("_mainFrame"))?.takeUnretainedValue()
     }
 
     @discardableResult
     private func inspectorPerform(_ selectorName: String, with object: Any? = nil) -> Unmanaged<AnyObject>? {
-        guard self.responds(to: NSSelectorFromString("_inspector")),
-              let inspector = self.value(forKey: "_inspector") as? NSObject,
-              inspector.responds(to: NSSelectorFromString(selectorName)) else {
+        guard
+            responds(to: NSSelectorFromString("_inspector")),
+            let inspector = value(forKey: "_inspector") as? NSObject,
+            inspector.responds(to: NSSelectorFromString(selectorName)) else {
             assertionFailure("_WKInspector does not respond to \(selectorName)")
             return nil
         }
@@ -171,35 +174,41 @@ final class WebView: WKWebView {
     }
 
     var isInspectorShown: Bool {
-        return inspectorPerform("isVisible") != nil
+        inspectorPerform("isVisible") != nil
     }
 
-    @nonobjc func openDeveloperTools() {
+    @nonobjc
+    func openDeveloperTools() {
         inspectorPerform("show")
     }
 
-    @nonobjc func closeDeveloperTools() {
+    @nonobjc
+    func closeDeveloperTools() {
         inspectorPerform("close")
     }
 
-    @nonobjc func openJavaScriptConsole() {
+    @nonobjc
+    func openJavaScriptConsole() {
         inspectorPerform("showConsole")
     }
 
-    @nonobjc func showPageSource() {
-        guard let mainFrameHandle = self.mainFrame else { return }
+    @nonobjc
+    func showPageSource() {
+        guard let mainFrameHandle = mainFrame else { return }
         inspectorPerform("showMainResourceForFrame:", with: mainFrameHandle)
     }
 
-    @nonobjc func showPageResources() {
+    @nonobjc
+    func showPageResources() {
         inspectorPerform("showResources")
     }
 
     // MARK: - Fullscreen
 
     var fullscreenWindowController: NSWindowController? {
-        guard let fullscreenWindowController = self.window?.windowController,
-              fullscreenWindowController.className.contains("FullScreen")
+        guard
+            let fullscreenWindowController = window?.windowController,
+            fullscreenWindowController.className.contains("FullScreen")
         else {
             return nil
         }

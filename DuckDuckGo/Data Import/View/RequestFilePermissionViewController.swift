@@ -34,8 +34,8 @@ final class RequestFilePermissionViewController: NSViewController {
     static func create(importSource: DataImport.Source, permissionsRequired: [DataImport.DataType]) -> RequestFilePermissionViewController {
         let storyboard = NSStoryboard(name: Constants.storyboardName, bundle: nil)
 
-        return storyboard.instantiateController(identifier: Constants.identifier) { (coder) -> RequestFilePermissionViewController? in
-            return RequestFilePermissionViewController(coder: coder, importSource: importSource, permissionsRequired: permissionsRequired)
+        return storyboard.instantiateController(identifier: Constants.identifier) { coder -> RequestFilePermissionViewController? in
+            RequestFilePermissionViewController(coder: coder, importSource: importSource, permissionsRequired: permissionsRequired)
         }
     }
 
@@ -54,7 +54,7 @@ final class RequestFilePermissionViewController: NSViewController {
         super.init(coder: coder)
     }
 
-    required init?(coder: NSCoder) {
+    required init?(coder _: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
 
@@ -65,7 +65,8 @@ final class RequestFilePermissionViewController: NSViewController {
         requestPermissionButton.title = UserText.bookmarkImportSafariRequestPermissionButtonTitle
     }
 
-    @IBAction private func presentBookmarksOpenPanel(_ sender: AnyObject) {
+    @IBAction
+    private func presentBookmarksOpenPanel(_: AnyObject) {
         if let url = SafariDataImporter.requestBookmarksFilePermission(), (try? Data(contentsOf: url)) != nil {
             delegate?.requestFilePermissionViewControllerDidReceivePermission(self)
         }

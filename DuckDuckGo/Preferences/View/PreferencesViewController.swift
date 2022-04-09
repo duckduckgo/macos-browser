@@ -17,23 +17,23 @@
 //
 
 import AppKit
-import SwiftUI
 import Combine
+import SwiftUI
 
 final class PreferencesViewController: NSViewController {
 
     weak var delegate: BrowserTabSelectionDelegate?
-    
+
     let model = PreferencesSidebarModel()
     private var selectedTabIndexCancellable: AnyCancellable?
-    
+
     override func loadView() {
         view = NSView()
     }
 
     override func viewDidLoad() {
         super.viewDidLoad()
-        
+
         let host = NSHostingView(rootView: Preferences.RootView(model: model))
         view.addAndLayout(host)
     }

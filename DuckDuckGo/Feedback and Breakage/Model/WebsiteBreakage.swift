@@ -53,8 +53,7 @@ struct WebsiteBreakage {
         isGPCEnabled: Bool,
         ampURL: String,
         urlParametersRemoved: Bool,
-        manufacturer: String = "Apple"
-    ) {
+        manufacturer: String = "Apple") {
         self.category = category
         self.siteUrlString = siteUrlString
         self.osVersion = osVersion

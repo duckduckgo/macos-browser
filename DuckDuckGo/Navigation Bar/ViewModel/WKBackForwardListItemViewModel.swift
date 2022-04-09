@@ -26,10 +26,11 @@ final class WKBackForwardListItemViewModel {
     private let historyCoordinating: HistoryCoordinating
     private let isCurrentItem: Bool
 
-    init(backForwardListItem: BackForwardListItem,
-         faviconManagement: FaviconManagement,
-         historyCoordinating: HistoryCoordinating,
-         isCurrentItem: Bool) {
+    init(
+        backForwardListItem: BackForwardListItem,
+        faviconManagement: FaviconManagement,
+        historyCoordinating: HistoryCoordinating,
+        isCurrentItem: Bool) {
         self.backForwardListItem = backForwardListItem
         self.faviconManagement = faviconManagement
         self.historyCoordinating = historyCoordinating
@@ -54,8 +55,9 @@ final class WKBackForwardListItemViewModel {
                 item.url.absoluteString
 
         case .goBackToCloseItem(parentTab: let tab):
-            if let title = tab.title,
-               !title.isEmpty {
+            if
+                let title = tab.title,
+                !title.isEmpty {
                 return String(format: UserText.closeAndReturnToParentFormat, title)
             } else {
                 return UserText.closeAndReturnToParent
@@ -68,9 +70,10 @@ final class WKBackForwardListItemViewModel {
             return NSImage(named: "HomeFavicon")
         }
 
-        if let url = backForwardListItem.url,
-           let favicon = faviconManagement.getCachedFavicon(for: url, sizeCategory: .small),
-           let image = favicon.image?.resizedToFaviconSize() {
+        if
+            let url = backForwardListItem.url,
+            let favicon = faviconManagement.getCachedFavicon(for: url, sizeCategory: .small),
+            let image = favicon.image?.resizedToFaviconSize() {
             return image
         }
 

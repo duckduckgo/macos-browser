@@ -17,21 +17,22 @@
 //  limitations under the License.
 //
 
-import XCTest
-import TrackerRadarKit
 import BrowserServicesKit
+import TrackerRadarKit
+import XCTest
 @testable import DuckDuckGo_Privacy_Browser
 
 class ClickToLoadTDSTests: XCTestCase {
-    
+
     func testEnsureClickToLoadTDSCompiles() throws {
-        
+
         let tds = ContentBlockerRulesLists.fbTrackerDataSet
         let builder = ContentBlockerRulesBuilder(trackerData: tds)
 
-        let rules = builder.buildRules(withExceptions: [],
-                                       andTemporaryUnprotectedDomains: [],
-                                       andTrackerAllowlist: [])
+        let rules = builder.buildRules(
+            withExceptions: [],
+            andTemporaryUnprotectedDomains: [],
+            andTrackerAllowlist: [])
 
         let data = try JSONEncoder().encode(rules)
         let ruleList = String(data: data, encoding: .utf8)!
@@ -39,22 +40,23 @@ class ClickToLoadTDSTests: XCTestCase {
         let identifier = UUID().uuidString
 
         let compiled = expectation(description: "Rules compiled")
-        
-        WKContentRuleListStore.default().compileContentRuleList(forIdentifier: identifier,
-                                                                encodedContentRuleList: ruleList) { result, error in
-            XCTAssertNotNil(result)
-            XCTAssertNil(error)
-            compiled.fulfill()
-                    }
-        
+
+        WKContentRuleListStore.default().compileContentRuleList(
+            forIdentifier: identifier,
+            encodedContentRuleList: ruleList) { result, error in
+                XCTAssertNotNil(result)
+                XCTAssertNil(error)
+                compiled.fulfill()
+            }
+
         wait(for: [compiled], timeout: 30.0)
-        
+
         let removed = expectation(description: "Rules removed")
-        
+
         WKContentRuleListStore.default().removeContentRuleList(forIdentifier: identifier) { _ in
             removed.fulfill()
         }
-        
+
         wait(for: [removed], timeout: 5.0)
     }
 }

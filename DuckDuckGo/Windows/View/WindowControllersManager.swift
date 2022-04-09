@@ -17,8 +17,8 @@
 //
 
 import Cocoa
-import os.log
 import Combine
+import os.log
 
 final class WindowControllersManager {
 
@@ -68,7 +68,7 @@ extension WindowControllersManager {
             show(url: bookmark.url)
         }
     }
-    
+
     func show(url: URL?, newTab: Bool = false) {
 
         func show(url: URL?, in windowController: MainWindowController) {
@@ -78,10 +78,11 @@ extension WindowControllersManager {
             let tabCollectionViewModel = viewController.tabCollectionViewModel
             let tabCollection = tabCollectionViewModel.tabCollection
 
-            if tabCollection.tabs.count == 1,
-               let firstTab = tabCollection.tabs.first,
-               case .homePage = firstTab.content,
-               !newTab {
+            if
+                tabCollection.tabs.count == 1,
+                let firstTab = tabCollection.tabs.first,
+                case .homePage = firstTab.content,
+                !newTab {
                 firstTab.setContent(url.map { .url($0) } ?? .homePage)
             } else if let tab = tabCollectionViewModel.selectedTabViewModel?.tab, !newTab {
                 tab.setContent(url.map { .url($0) } ?? .homePage)
@@ -93,13 +94,16 @@ extension WindowControllersManager {
         }
 
         // If there is a main window, open the URL in it
-        if let windowController = mainWindowControllers.first(where: { $0.window?.isMainWindow == true && $0.window?.isPopUpWindow == false })
+
+        let firstNonPopUpWindow = mainWindowControllers.first?.window?.isPopUpWindow == false ? mainWindowControllers.first : nil
+        if
+            let windowController = mainWindowControllers.first(where: { $0.window?.isMainWindow == true && $0.window?.isPopUpWindow == false })
             // If a last key window is available, open the URL in it
             ?? lastKeyMainWindowController
             // If there is any open window on the current screen, open the URL in it
             ?? mainWindowControllers.first(where: { $0.window?.screen == NSScreen.main && $0.window?.isPopUpWindow == false })
             // If there is any window available, open the URL in it
-            ?? { mainWindowControllers.first?.window?.isPopUpWindow == false ? mainWindowControllers.first : nil }() {
+            ?? firstNonPopUpWindow {
 
             show(url: url, in: windowController)
             return
@@ -114,12 +118,13 @@ extension WindowControllersManager {
     }
 
     func showTab(with content: Tab.TabContent) {
-        guard let windowController = mainWindowControllers.first(where: {
-            let isMain = $0.window?.isMainWindow ?? false
-            let hasMainChildWindow = $0.window?.childWindows?.contains { $0.isMainWindow } ?? false
+        guard
+            let windowController = mainWindowControllers.first(where: {
+                let isMain = $0.window?.isMainWindow ?? false
+                let hasMainChildWindow = $0.window?.childWindows?.contains { $0.isMainWindow } ?? false
 
-            return $0.window?.isPopUpWindow == false && (isMain || hasMainChildWindow)
-        }) else { return }
+                return $0.window?.isPopUpWindow == false && (isMain || hasMainChildWindow)
+            }) else { return }
 
         let viewController = windowController.mainViewController
         let tabCollectionViewModel = viewController.tabCollectionViewModel
@@ -133,11 +138,11 @@ extension WindowControllersManager {
 
 extension WindowControllersManager: ApplicationDockMenuDataSource {
 
-    func numberOfWindowMenuItems(in applicationDockMenu: ApplicationDockMenu) -> Int {
-        return mainWindowControllers.count
+    func numberOfWindowMenuItems(in _: ApplicationDockMenu) -> Int {
+        mainWindowControllers.count
     }
 
-    func applicationDockMenu(_ applicationDockMenu: ApplicationDockMenu, windowTitleFor windowMenuItemIndex: Int) -> String {
+    func applicationDockMenu(_: ApplicationDockMenu, windowTitleFor windowMenuItemIndex: Int) -> String {
         guard windowMenuItemIndex >= 0, windowMenuItemIndex < mainWindowControllers.count else {
             os_log("WindowControllersManager: Index out of bounds", type: .error)
             return "-"
@@ -153,7 +158,7 @@ extension WindowControllersManager: ApplicationDockMenuDataSource {
         return selectedTabViewModel.title
     }
 
-    func indexOfSelectedWindowMenuItem(in applicationDockMenu: ApplicationDockMenu) -> Int? {
+    func indexOfSelectedWindowMenuItem(in _: ApplicationDockMenu) -> Int? {
         guard let lastKeyMainWindowController = lastKeyMainWindowController else {
             os_log("WindowControllersManager: Last key main window controller property is nil", type: .error)
             return nil
@@ -166,7 +171,7 @@ extension WindowControllersManager: ApplicationDockMenuDataSource {
 
 extension WindowControllersManager: ApplicationDockMenuDelegate {
 
-    func applicationDockMenu(_ applicationDockMenu: ApplicationDockMenu, selectWindowWith index: Int) {
+    func applicationDockMenu(_: ApplicationDockMenu, selectWindowWith index: Int) {
         guard index >= 0, index < mainWindowControllers.count else {
             os_log("WindowControllersManager: Index out of bounds", type: .error)
             return

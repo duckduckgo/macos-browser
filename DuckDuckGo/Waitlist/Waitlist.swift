@@ -19,17 +19,17 @@
 import Foundation
 
 struct Waitlist {
-    
+
     static var isUnlocked: Bool {
-        return MacWaitlistEncryptedFileStorage().isUnlocked()
+        MacWaitlistEncryptedFileStorage().isUnlocked()
     }
-    
-#if DEBUG || REVIEW
+
+    #if DEBUG || REVIEW
     static func unlockExistingInstallIfNecessary() {
         MacWaitlistEncryptedFileStorage().unlock()
     }
-#endif
-    
+    #endif
+
     static func displayLockScreenIfNecessary(in viewController: NSViewController) -> Bool {
         guard !isUnlocked else {
             return false
@@ -37,18 +37,18 @@ struct Waitlist {
 
         let lockScreenViewController = MacWaitlistLockScreenViewController.instantiate()
         let lockScreenWindow = lockScreenViewController.wrappedInWindowController()
-        
+
         let currentSheets = viewController.view.window?.sheets ?? []
         let alreadyHasLockScreen = currentSheets.contains(where: { window in
-            return window.contentViewController is MacWaitlistLockScreenViewController
+            window.contentViewController is MacWaitlistLockScreenViewController
         })
-        
+
         if !alreadyHasLockScreen {
             viewController.beginSheet(lockScreenWindow)
             Pixel.fire(.waitlistPresentedLockScreen)
         }
-        
+
         return true
     }
-    
+
 }

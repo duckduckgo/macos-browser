@@ -73,10 +73,10 @@ final class StatePersistenceService {
     }
 
     func restoreState(using restore: @escaping (NSCoder) throws -> Void) throws {
-        guard let data = fileStore.loadData(at: URL.persistenceLocation(for: self.fileName)) else {
+        guard let data = fileStore.loadData(at: URL.persistenceLocation(for: fileName)) else {
             throw CocoaError(.fileReadNoSuchFile)
         }
-        let unarchiver = try NSKeyedUnarchiver.init(forReadingFrom: data)
+        let unarchiver = try NSKeyedUnarchiver(forReadingFrom: data)
         try restore(unarchiver)
     }
 

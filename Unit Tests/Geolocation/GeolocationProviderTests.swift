@@ -16,11 +16,11 @@
 //  limitations under the License.
 //
 
-import Foundation
-import XCTest
 import Combine
 import CoreLocation
+import Foundation
 import WebKit
+import XCTest
 @testable import DuckDuckGo_Privacy_Browser
 
 // swiftlint:disable file_length
@@ -37,32 +37,32 @@ final class GeolocationProviderTests: XCTestCase {
     var geolocationHandler: ((WKWebView, Any) throws -> Void)?
 
     static let coordinatesCallback = """
-        function(e) {
-            webkit.messageHandlers.testHandler.postMessage({
-                coordinates: {
-                    latitude: e.coords.latitude,
-                    longitude: e.coords.longitude,
-                    altitude: e.coords.altitude,
-                    accuracy: e.coords.accuracy,
-                    altitudeAccuracy: e.coords.altitudeAccuracy,
-                    heading: e.coords.heading,
-                    speed: e.coords.speed
-                },
-                timestamp: e.timestamp
-            })
-        }
-    """
+            function(e) {
+                webkit.messageHandlers.testHandler.postMessage({
+                    coordinates: {
+                        latitude: e.coords.latitude,
+                        longitude: e.coords.longitude,
+                        altitude: e.coords.altitude,
+                        accuracy: e.coords.accuracy,
+                        altitudeAccuracy: e.coords.altitudeAccuracy,
+                        heading: e.coords.heading,
+                        speed: e.coords.speed
+                    },
+                    timestamp: e.timestamp
+                })
+            }
+        """
     static let errorCallback = """
-        function(e) {
-            webkit.messageHandlers.testHandler.postMessage({ code: e.code, message: e.message });
-        }
-    """
+            function(e) {
+                webkit.messageHandlers.testHandler.postMessage({ code: e.code, message: e.message });
+            }
+        """
 
     static let getCurrentPosition = """
-        <script>
-            navigator.geolocation.getCurrentPosition(\(coordinatesCallback), \(errorCallback));
-        </script>
-    """
+            <script>
+                navigator.geolocation.getCurrentPosition(\(coordinatesCallback), \(errorCallback));
+            </script>
+        """
     class func watchPosition(enableHighAccuracy: Bool = false, maxAge: TimeInterval = 0) -> String {
         """
             <script>
@@ -89,9 +89,10 @@ final class GeolocationProviderTests: XCTestCase {
         view.addSubview(webView)
         webViews.append(webView)
 
-        let geolocationProvider = GeolocationProvider(processPool: webView.configuration.processPool,
-                                                      geolocationService: geolocationServiceMock,
-                                                      appIsActivePublisher: appIsActive)
+        let geolocationProvider = GeolocationProvider(
+            processPool: webView.configuration.processPool,
+            geolocationService: geolocationServiceMock,
+            appIsActivePublisher: appIsActive)
         webView.configuration.processPool.geolocationProvider = geolocationProvider
         webView.configuration.userContentController.add(self, name: "testHandler")
 
@@ -139,23 +140,26 @@ final class GeolocationProviderTests: XCTestCase {
         webView.window?.orderFrontRegardless()
 
         waitForExpectations(timeout: 10.0)
-        XCTAssertEqual(geolocationServiceMock.history, [.subscribed,
-                                                        .locationPublished,
-                                                        .cancelled])
+        XCTAssertEqual(geolocationServiceMock.history, [
+            .subscribed,
+            .locationPublished,
+            .cancelled
+        ])
     }
 
     func testWhenGeolocationContainsOptionalFieldsThenTheyAreAvailableInCallback() {
         let coordinate: CLLocation
         if #available(macOS 10.15.4, *) {
-            coordinate = CLLocation(coordinate: CLLocationCoordinate2D(latitude: -26.8, longitude: -54.1),
-                                    altitude: 12.8,
-                                    horizontalAccuracy: 0.8,
-                                    verticalAccuracy: 0.9,
-                                    course: 0.15,
-                                    courseAccuracy: 0.5,
-                                    speed: 123,
-                                    speedAccuracy: 0.9,
-                                    timestamp: Date())
+            coordinate = CLLocation(
+                coordinate: CLLocationCoordinate2D(latitude: -26.8, longitude: -54.1),
+                altitude: 12.8,
+                horizontalAccuracy: 0.8,
+                verticalAccuracy: 0.9,
+                course: 0.15,
+                courseAccuracy: 0.5,
+                speed: 123,
+                speedAccuracy: 0.9,
+                timestamp: Date())
         } else {
             fatalError()
         }
@@ -221,10 +225,12 @@ final class GeolocationProviderTests: XCTestCase {
 
         waitForExpectations(timeout: 10.0)
 
-        XCTAssertEqual(geolocationServiceMock.history, [.subscribed,
-                                                        .locationPublished,
-                                                        .locationPublished,
-                                                        .cancelled])
+        XCTAssertEqual(geolocationServiceMock.history, [
+            .subscribed,
+            .locationPublished,
+            .locationPublished,
+            .cancelled
+        ])
     }
 
     func testWhenHighAccuracyIsRequestedThenHighAccuracyIsActivated() {
@@ -239,8 +245,10 @@ final class GeolocationProviderTests: XCTestCase {
 
         waitForExpectations(timeout: 5.0)
 
-        XCTAssertEqual(geolocationServiceMock.history, [.highAccuracyRequested,
-                                                        .subscribed])
+        XCTAssertEqual(geolocationServiceMock.history, [
+            .highAccuracyRequested,
+            .subscribed
+        ])
     }
 
     func testWhenGeolocationWatchIsCancelledThenHighAccuracyIsReset() {
@@ -260,10 +268,12 @@ final class GeolocationProviderTests: XCTestCase {
 
         waitForExpectations(timeout: 5.0)
 
-        XCTAssertEqual(geolocationServiceMock.history, [.highAccuracyRequested,
-                                                        .subscribed,
-                                                        .cancelled,
-                                                        .highAccuracyCancelled])
+        XCTAssertEqual(geolocationServiceMock.history, [
+            .highAccuracyRequested,
+            .subscribed,
+            .cancelled,
+            .highAccuracyCancelled
+        ])
     }
 
     func testWhenMultipleWebViewsRequestLocationThenItIsSubscribedAndCancelledCorrectly() {
@@ -323,12 +333,14 @@ final class GeolocationProviderTests: XCTestCase {
         }
         waitForExpectations(timeout: 3.0)
 
-        XCTAssertEqual(geolocationServiceMock.history, [.locationPublished,
-                                                        .subscribed,
-                                                        .subscribed,
-                                                        .locationPublished,
-                                                        .cancelled,
-                                                        .cancelled])
+        XCTAssertEqual(geolocationServiceMock.history, [
+            .locationPublished,
+            .subscribed,
+            .subscribed,
+            .locationPublished,
+            .cancelled,
+            .cancelled
+        ])
     }
 
     func testWhenGeolocationProviderIsPausedThenLocationSubscriptionIsCancelled() {
@@ -352,9 +364,11 @@ final class GeolocationProviderTests: XCTestCase {
 
         waitForExpectations(timeout: 10.0)
 
-        XCTAssertEqual(geolocationServiceMock.history, [.locationPublished,
-                                                        .subscribed,
-                                                        .cancelled])
+        XCTAssertEqual(geolocationServiceMock.history, [
+            .locationPublished,
+            .subscribed,
+            .cancelled
+        ])
     }
 
     func testWhenAppIsDeactivatedThenLocationSubscriptionIsCancelled() {
@@ -385,10 +399,12 @@ final class GeolocationProviderTests: XCTestCase {
 
         waitForExpectations(timeout: 10.0)
 
-        XCTAssertEqual(geolocationServiceMock.history, [.locationPublished,
-                                                        .subscribed,
-                                                        .cancelled,
-                                                        .subscribed])
+        XCTAssertEqual(geolocationServiceMock.history, [
+            .locationPublished,
+            .subscribed,
+            .cancelled,
+            .subscribed
+        ])
     }
 
     func testWhenOneWebViewGeolocationIsPausedThenAnotherWebViewContinuesReceivingLocationUpdates() {
@@ -448,12 +464,14 @@ final class GeolocationProviderTests: XCTestCase {
         }
         waitForExpectations(timeout: 3.0)
 
-        XCTAssertEqual(geolocationServiceMock.history, [.locationPublished,
-                                                        .subscribed,
-                                                        .subscribed,
-                                                        .cancelled,
-                                                        .locationPublished,
-                                                        .cancelled])
+        XCTAssertEqual(geolocationServiceMock.history, [
+            .locationPublished,
+            .subscribed,
+            .subscribed,
+            .cancelled,
+            .locationPublished,
+            .cancelled
+        ])
     }
 
     func testWhenGeolocationProviderIsResumedThenItContinuesReceivingLocation() {
@@ -484,11 +502,13 @@ final class GeolocationProviderTests: XCTestCase {
 
         waitForExpectations(timeout: 10.0)
 
-        XCTAssertEqual(geolocationServiceMock.history, [.locationPublished,
-                                                        .subscribed,
-                                                        .cancelled,
-                                                        .locationPublished,
-                                                        .subscribed])
+        XCTAssertEqual(geolocationServiceMock.history, [
+            .locationPublished,
+            .subscribed,
+            .cancelled,
+            .locationPublished,
+            .subscribed
+        ])
     }
 
     func testWhenWebViewIsHiddenThenItStopsGeolocationProvider() {
@@ -534,11 +554,13 @@ final class GeolocationProviderTests: XCTestCase {
         windows[0].contentView!.addSubview(webView)
         waitForExpectations(timeout: 5)
 
-        XCTAssertEqual(geolocationServiceMock.history, [.locationPublished,
-                                                        .subscribed,
-                                                        .cancelled,
-                                                        .locationPublished,
-                                                        .subscribed])
+        XCTAssertEqual(geolocationServiceMock.history, [
+            .locationPublished,
+            .subscribed,
+            .cancelled,
+            .locationPublished,
+            .subscribed
+        ])
     }
 
     func testWhenPermissionIsDeniedThenGeolocationProviderIsNotStarted() {
@@ -555,7 +577,7 @@ final class GeolocationProviderTests: XCTestCase {
         webView.loadHTMLString(Self.getCurrentPosition, baseURL: .duckDuckGo)
         NSApp.activate(ignoringOtherApps: true)
         webView.window?.orderFrontRegardless()
-        
+
         waitForExpectations(timeout: 5)
     }
 
@@ -593,10 +615,12 @@ final class GeolocationProviderTests: XCTestCase {
 
         waitForExpectations(timeout: 5)
 
-        XCTAssertEqual(geolocationServiceMock.history, [.locationPublished,
-                                                        .subscribed,
-                                                        .cancelled,
-                                                        .locationPublished])
+        XCTAssertEqual(geolocationServiceMock.history, [
+            .locationPublished,
+            .subscribed,
+            .cancelled,
+            .locationPublished
+        ])
     }
 
     func testWhenGeolocationPermissionRevokedBeforeLocationRequestThenErrorIsReceivedAfterRequest() {
@@ -659,21 +683,23 @@ final class GeolocationProviderTests: XCTestCase {
     }
 
 }
+
 // swiftlint:enable type_body_length
 // swiftlint:enable function_body_length
 
 extension GeolocationProviderTests: WKUIDelegate {
     @objc(_webView:requestGeolocationPermissionForFrame:decisionHandler:)
-    func webView(_ webView: WKWebView, requestGeolocationPermissionFor frame: WKFrameInfo, decisionHandler: @escaping (Bool) -> Void) {
+    func webView(_: WKWebView, requestGeolocationPermissionFor _: WKFrameInfo, decisionHandler: @escaping (Bool) -> Void) {
         decisionHandler(shouldGrant)
     }
 
     @objc(_webView:requestGeolocationPermissionForOrigin:initiatedByFrame:decisionHandler:)
     @available(macOS 12, *)
-    func webView(_ webView: WKWebView,
-                 requestGeolocationPermissionFor origin: WKSecurityOrigin,
-                 initiatedBy frame: WKFrameInfo,
-                 decisionHandler: @escaping (WKPermissionDecision) -> Void) {
+    func webView(
+        _: WKWebView,
+        requestGeolocationPermissionFor _: WKSecurityOrigin,
+        initiatedBy _: WKFrameInfo,
+        decisionHandler: @escaping (WKPermissionDecision) -> Void) {
         decisionHandler(shouldGrant ? .grant : .deny)
     }
 }
@@ -682,7 +708,7 @@ extension GeolocationProviderTests: WKScriptMessageHandler {
     func userContentController(_ userContentController: WKUserContentController, didReceive message: WKScriptMessage) {
         let webView = webViews.first(where: { $0.configuration.userContentController === userContentController })!
         XCTAssertNoThrow(try geolocationHandler?(webView, message.body))
-        
+
     }
 }
 
@@ -704,14 +730,14 @@ extension GeolocationProviderTests {
         let timestamp: Int
 
         init(_ location: CLLocation) {
-            self.latitude = location.coordinate.latitude
-            self.longitude = location.coordinate.longitude
-            self.altitude = location.verticalAccuracy >= 0 ? location.altitude : nil
-            self.accuracy = location.horizontalAccuracy
-            self.altitudeAccuracy = location.verticalAccuracy >= 0 ? location.verticalAccuracy : nil
-            self.heading = location.course >= 0 ? location.course : nil
-            self.speed = location.speed >= 0.0 ? location.speed : nil
-            self.timestamp = Int(location.timestamp.timeIntervalSinceReferenceDate * 1000)
+            latitude = location.coordinate.latitude
+            longitude = location.coordinate.longitude
+            altitude = location.verticalAccuracy >= 0 ? location.altitude : nil
+            accuracy = location.horizontalAccuracy
+            altitudeAccuracy = location.verticalAccuracy >= 0 ? location.verticalAccuracy : nil
+            heading = location.course >= 0 ? location.course : nil
+            speed = location.speed >= 0.0 ? location.speed : nil
+            timestamp = Int(location.timestamp.timeIntervalSinceReferenceDate * 1000)
         }
 
         init(_ object: Any) throws {
@@ -719,11 +745,13 @@ extension GeolocationProviderTests {
                 fatalError("Unexpected type of \(object)")
             }
 
-            guard let coords = dict["coordinates"] as? [String: Any],
-                  let timestamp = dict["timestamp"] as? Double
+            guard
+                let coords = dict["coordinates"] as? [String: Any],
+                let timestamp = dict["timestamp"] as? Double
             else {
-                if let code = dict["code"] as? Int,
-                   let message = dict["message"] as? String {
+                if
+                    let code = dict["code"] as? Int,
+                    let message = dict["message"] as? String {
                     throw ResponseError(code: code, message: message)
                 }
                 fatalError("Unexpected \(dict)")
@@ -752,18 +780,20 @@ extension GeolocationProviderTests {
 
     }
 }
+
 extension CLLocation {
     func removingAltitude() -> CLLocation {
         if #available(macOS 10.15.4, *) {
-            return CLLocation(coordinate: coordinate,
-                              altitude: -1,
-                              horizontalAccuracy: horizontalAccuracy,
-                              verticalAccuracy: -1,
-                              course: course,
-                              courseAccuracy: courseAccuracy,
-                              speed: speed,
-                              speedAccuracy: speedAccuracy,
-                              timestamp: timestamp)
+            return CLLocation(
+                coordinate: coordinate,
+                altitude: -1,
+                horizontalAccuracy: horizontalAccuracy,
+                verticalAccuracy: -1,
+                course: course,
+                courseAccuracy: courseAccuracy,
+                speed: speed,
+                speedAccuracy: speedAccuracy,
+                timestamp: timestamp)
         } else {
             fatalError()
         }

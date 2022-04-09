@@ -16,8 +16,8 @@
 //  limitations under the License.
 //
 
-import XCTest
 import CoreData
+import XCTest
 @testable import DuckDuckGo_Privacy_Browser
 
 class BookmarkManagedObjectTests: XCTestCase {

@@ -37,11 +37,12 @@ final class AbstractContentBlockingAssetsCompilationTimeReporter<Caller: AnyObje
 
     override init() {
         super.init()
-        self.onboardingShown = !onboardingFinished
-        NotificationCenter.default.addObserver(self,
-                                               selector: #selector(applicationWillTerminate(_:)),
-                                               name: NSApplication.willTerminateNotification,
-                                               object: nil)
+        onboardingShown = !onboardingFinished
+        NotificationCenter.default.addObserver(
+            self,
+            selector: #selector(applicationWillTerminate(_:)),
+            name: NSApplication.willTerminateNotification,
+            object: nil)
     }
 
     /// Called when a Tab is going  to wait for Content Blocking Rules compilation
@@ -58,17 +59,19 @@ final class AbstractContentBlockingAssetsCompilationTimeReporter<Caller: AnyObje
         // report only once
         isFinished = true
 
-        Pixel.fire(.compileRulesWait(onboardingShown: self.onboardingShown, waitTime: waitTime, result: result),
-                   withAdditionalParameters: ["waitTime": String(waitTime)],
-                   onComplete: completionHandler)
+        Pixel.fire(
+            .compileRulesWait(onboardingShown: onboardingShown, waitTime: waitTime, result: result),
+            withAdditionalParameters: ["waitTime": String(waitTime)],
+            onComplete: completionHandler)
     }
 
     /// Called when Rules compilation finishes
     func reportWaitTimeForTabFinishedWaitingForRules(_ tab: Caller) {
         defer { waiters.removeObject(forKey: tab) }
-        guard waiters.object(forKey: tab) != nil,
-              !isFinished,
-              let waitStart = waitStart
+        guard
+            waiters.object(forKey: tab) != nil,
+            !isFinished,
+            let waitStart = waitStart
         else { return }
 
         report(waitTime: currentTime() - waitStart, result: .success)
@@ -77,19 +80,22 @@ final class AbstractContentBlockingAssetsCompilationTimeReporter<Caller: AnyObje
     /// If Tab is going to close while the rules are still being compiled: report wait time with Tab .closed argument
     func tabWillClose(_ tab: Caller) {
         defer { waiters.removeObject(forKey: tab) }
-        guard waiters.object(forKey: tab) != nil,
-              !isFinished,
-              let waitStart = self.waitStart
+        guard
+            waiters.object(forKey: tab) != nil,
+            !isFinished,
+            let waitStart = waitStart
         else { return }
 
         report(waitTime: currentTime() - waitStart, result: .closed)
     }
 
     /// If App is going to close while the rules are still being compiled: report wait time with .quit argument
-    @objc func applicationWillTerminate(_: Notification) {
-        guard !isFinished,
-              waiters.count > 0,
-              let waitStart = self.waitStart
+    @objc
+    func applicationWillTerminate(_: Notification) {
+        guard
+            !isFinished,
+            waiters.count > 0,
+            let waitStart = waitStart
         else { return }
         // Run the loop until Pixel is sent
         let condition = RunLoop.ResumeCondition()

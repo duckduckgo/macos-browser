@@ -28,8 +28,9 @@ final class FireCoordinator {
         let burningWindow: NSWindow
         let waitForOpening: Bool
 
-        if let lastKeyWindow = WindowControllersManager.shared.lastKeyMainWindowController?.window,
-           lastKeyWindow.isVisible {
+        if
+            let lastKeyWindow = WindowControllersManager.shared.lastKeyMainWindowController?.window,
+            lastKeyWindow.isVisible {
             burningWindow = lastKeyWindow
             burningWindow.makeKeyAndOrderFront(nil)
             waitForOpening = false
@@ -45,21 +46,24 @@ final class FireCoordinator {
 
         if waitForOpening {
             DispatchQueue.main.asyncAfter(deadline: .now() + 1/3) {
-                showFirePopover(relativeTo: mainViewController.tabBarViewController.fireButton,
-                                tabCollectionViewModel: mainViewController.tabCollectionViewModel)
+                showFirePopover(
+                    relativeTo: mainViewController.tabBarViewController.fireButton,
+                    tabCollectionViewModel: mainViewController.tabCollectionViewModel)
             }
         } else {
-            showFirePopover(relativeTo: mainViewController.tabBarViewController.fireButton,
-                            tabCollectionViewModel: mainViewController.tabCollectionViewModel)
+            showFirePopover(
+                relativeTo: mainViewController.tabBarViewController.fireButton,
+                tabCollectionViewModel: mainViewController.tabCollectionViewModel)
         }
     }
 
     static func showFirePopover(relativeTo positioningView: NSView, tabCollectionViewModel: TabCollectionViewModel) {
         if !(firePopover?.isShown ?? false) {
             firePopover = FirePopover(fireViewModel: fireViewModel, tabCollectionViewModel: tabCollectionViewModel)
-            firePopover?.show(relativeTo: positioningView.bounds.insetFromLineOfDeath(),
-                             of: positioningView,
-                             preferredEdge: .maxY)
+            firePopover?.show(
+                relativeTo: positioningView.bounds.insetFromLineOfDeath(),
+                of: positioningView,
+                preferredEdge: .maxY)
         }
     }
 

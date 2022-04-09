@@ -16,8 +16,8 @@
 //  limitations under the License.
 //
 
-import Cocoa
 import BrowserServicesKit
+import Cocoa
 
 final class FirePopoverViewModel {
 
@@ -42,18 +42,19 @@ final class FirePopoverViewModel {
         var favicon: NSImage?
     }
 
-    init(fireViewModel: FireViewModel,
-         tabCollectionViewModel: TabCollectionViewModel,
-         historyCoordinating: HistoryCoordinating,
-         fireproofDomains: FireproofDomains,
-         faviconManagement: FaviconManagement,
-         initialClearingOption: ClearingOption = .allData) {
+    init(
+        fireViewModel: FireViewModel,
+        tabCollectionViewModel: TabCollectionViewModel,
+        historyCoordinating: HistoryCoordinating,
+        fireproofDomains: FireproofDomains,
+        faviconManagement: FaviconManagement,
+        initialClearingOption: ClearingOption = .allData) {
         self.fireViewModel = fireViewModel
         self.tabCollectionViewModel = tabCollectionViewModel
         self.historyCoordinating = historyCoordinating
         self.fireproofDomains = fireproofDomains
         self.faviconManagement = faviconManagement
-        self.clearingOption = initialClearingOption
+        clearingOption = initialClearingOption
         updateItems(for: initialClearingOption)
     }
 
@@ -126,7 +127,7 @@ final class FirePopoverViewModel {
     }
 
     private func selectAll() {
-        self.selected = Set(0..<selectable.count)
+        selected = Set(0..<selectable.count)
     }
 
     func select(index: Int) {
@@ -146,7 +147,7 @@ final class FirePopoverViewModel {
     }
 
     private var selectedDomains: Set<String> {
-        return Set<String>(selected.compactMap {
+        Set<String>(selected.compactMap {
             guard let selectedDomain = selectable[safe: $0]?.domain else {
                 assertionFailure("Wrong index")
                 return nil
@@ -167,7 +168,7 @@ final class FirePopoverViewModel {
         let otherTabs = allTabs.filter({ $0 != selectedTab })
 
         let otherTabsLocalHistory = otherTabs.reduce(Set<String>()) { result, tab in
-            return result.union(tab.localHistory)
+            result.union(tab.localHistory)
         }
 
         areOtherTabsInfluenced = !otherTabsLocalHistory.isDisjoint(with: selectedDomains)

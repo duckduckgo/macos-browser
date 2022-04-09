@@ -16,8 +16,8 @@
 //  limitations under the License.
 //
 
-import Foundation
 import CoreData
+import Foundation
 
 extension BookmarkManagedObject {
 
@@ -67,7 +67,7 @@ extension BookmarkManagedObject {
         var currentFolder: BookmarkManagedObject? = self
 
         while let current = currentFolder {
-            if current.parentFolder?.id == self.id {
+            if current.parentFolder?.id == id {
                 throw BookmarkError.folderStructureHasCycle
             }
 
@@ -78,7 +78,7 @@ extension BookmarkManagedObject {
             currentFolder = currentFolder?.parentFolder
         }
 
-        let childUUIDs = Set(self.children?.compactMap { child -> UUID? in
+        let childUUIDs = Set(children?.compactMap { child -> UUID? in
             let bookmark = child as? BookmarkManagedObject
             return bookmark?.id
         } ?? [UUID]())

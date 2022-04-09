@@ -16,9 +16,9 @@
 //  limitations under the License.
 //
 
-import WebKit
 import GRDB
 import os
+import WebKit
 
 public protocol HTTPCookieStore {
     func allCookies() async -> [HTTPCookie]
@@ -41,15 +41,16 @@ internal class WebCacheManager {
     private let fireproofDomains: FireproofDomains
     private let websiteDataStore: WebsiteDataStore
 
-    init(fireproofDomains: FireproofDomains = FireproofDomains.shared,
-         websiteDataStore: WebsiteDataStore = WKWebsiteDataStore.default()) {
+    init(
+        fireproofDomains: FireproofDomains = FireproofDomains.shared,
+        websiteDataStore: WebsiteDataStore = WKWebsiteDataStore.default()) {
         self.fireproofDomains = fireproofDomains
         self.websiteDataStore = websiteDataStore
     }
 
     func clear(domains: Set<String>? = nil) async {
         // first cleanup ~/Library/Caches
-        await self.clearFileCache()
+        await clearFileCache()
 
         await removeAllSafelyRemovableDataTypes()
 
@@ -57,7 +58,7 @@ internal class WebCacheManager {
 
         await removeCookies(forDomains: domains)
 
-        await self.removeResourceLoadStatisticsDatabase()
+        await removeResourceLoadStatisticsDatabase()
     }
 
     private func clearFileCache() async {
@@ -79,9 +80,10 @@ internal class WebCacheManager {
             try? fm.moveItem(at: cachesDir.appendingPathComponent(name), to: tmpDir.appendingPathComponent(name))
         }
 
-        try? fm.createDirectory(at: cachesDir.appendingPathComponent("WebKit"),
-                                withIntermediateDirectories: false,
-                                attributes: nil)
+        try? fm.createDirectory(
+            at: cachesDir.appendingPathComponent("WebKit"),
+            withIntermediateDirectories: false,
+            attributes: nil)
 
         Process("/bin/rm", "-rf", tmpDir.path).launch()
     }
@@ -137,8 +139,9 @@ internal class WebCacheManager {
     // WKWebView doesn't provide a way to remove the observations database, which contains domains that have been
     // visited by the user. This database is removed directly as a part of the Fire button process.
     private func removeResourceLoadStatisticsDatabase() async {
-        guard let bundleID = Bundle.main.bundleIdentifier,
-              var libraryURL = FileManager.default.urls(for: .libraryDirectory, in: .userDomainMask).first else {
+        guard
+            let bundleID = Bundle.main.bundleIdentifier,
+            var libraryURL = FileManager.default.urls(for: .libraryDirectory, in: .userDomainMask).first else {
             return
         }
 

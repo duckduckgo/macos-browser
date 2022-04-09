@@ -21,8 +21,9 @@ import os.signpost
 
 final class TabInstrumentation: TabInstrumentationProtocol {
 
-    static let tabsLog = OSLog(subsystem: "com.duckduckgo.instrumentation",
-                               category: "TabInstrumentation")
+    static let tabsLog = OSLog(
+        subsystem: "com.duckduckgo.instrumentation",
+        category: "TabInstrumentation")
 
     static var tabMaxIdentifier: UInt64 = 0
 
@@ -50,22 +51,27 @@ final class TabInstrumentation: TabInstrumentationProtocol {
 
         let id = OSSignpostID(log: type(of: self).tabsLog)
         siteLoadingSPID = id
-        os_signpost(.begin,
-                    log: type(of: self).tabsLog,
-                    name: "Load Page",
-                    signpostID: id,
-                    "Loading URL: %@ in %llu", url.absoluteString, currentTabIdentifier)
+        os_signpost(
+            .begin,
+            log: type(of: self).tabsLog,
+            name: "Load Page",
+            signpostID: id,
+            "Loading URL: %@ in %llu",
+            url.absoluteString,
+            currentTabIdentifier)
 
     }
 
     func didLoadURL() {
 
         if let id = siteLoadingSPID as? OSSignpostID {
-            os_signpost(.end,
-                        log: type(of: self).tabsLog,
-                        name: "Load Page",
-                        signpostID: id,
-                        "Loading Finished: %{private}@", "T")
+            os_signpost(
+                .end,
+                log: type(of: self).tabsLog,
+                name: "Load Page",
+                signpostID: id,
+                "Loading Finished: %{private}@",
+                "T")
         }
     }
 
@@ -84,34 +90,45 @@ final class TabInstrumentation: TabInstrumentationProtocol {
     }
 
     private func request(url: String, isTracker: Bool, blocked: Bool, reason: String = "", in timeInMs: Double) {
-        let currentURL = self.currentURL ?? "unknown"
+        let currentURL = currentURL ?? "unknown"
         let requestType = isTracker ? "Tracker" : "Regular"
         let status = blocked ? "Blocked" : "Allowed"
 
         // 0 is treated as 1ms
         let timeInNS: UInt64 = timeInMs.asNanos
 
-        os_log(.debug,
-               log: type(of: self).tabsLog,
-               "[%@] Request: %@ - %@ - %@ (%@) in %llu", currentURL, url, requestType, status, reason, timeInNS)
+        os_log(
+            .debug,
+            log: type(of: self).tabsLog,
+            "[%@] Request: %@ - %@ - %@ (%@) in %llu",
+            currentURL,
+            url,
+            requestType,
+            status,
+            reason,
+            timeInNS)
     }
 
     func jsEvent(name: String, executedIn timeInMs: Double) {
 
-        let currentURL = self.currentURL ?? "unknown"
+        let currentURL = currentURL ?? "unknown"
         // 0 is treated as 1ms
         let timeInNS: UInt64 = timeInMs.asNanos
 
-        os_log(.debug,
-               log: type(of: self).tabsLog,
-               "[%@] JSEvent: %@ executedIn: %llu", currentURL, name, timeInNS)
+        os_log(
+            .debug,
+            log: type(of: self).tabsLog,
+            "[%@] JSEvent: %@ executedIn: %llu",
+            currentURL,
+            name,
+            timeInNS)
     }
 }
 
 extension Double {
 
     var asNanos: UInt64 {
-        return self > 0 ? UInt64(self * 1000 * 1000) : 1000000
+        self > 0 ? UInt64(self * 1000 * 1000) : 1000000
     }
 
 }

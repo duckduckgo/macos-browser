@@ -16,10 +16,10 @@
 //  See the License for the specific language governing permissions and
 //  limitations under the License.
 //
-import Foundation
-import CoreData
-import os.log
 import BrowserServicesKit
+import CoreData
+import Foundation
+import os.log
 
 typealias UnprotectedDomainsStore = CoreDataStore<UnprotectedDomainManagedObject>
 final class LocalUnprotectedDomains: DomainsProtectionStore {
@@ -60,14 +60,15 @@ final class LocalUnprotectedDomains: DomainsProtectionStore {
 
     private func loadUnprotectedDomains() -> UnprotectedDomainsContainer {
         do {
-            if let data = legacyUserDefaultsUnprotectedDomainsData,
-               let domains = try? NSKeyedUnarchiver.unarchivedObject(ofClass: NSSet.self, from: data) as? Set<String>,
-               !domains.isEmpty {
+            if
+                let data = legacyUserDefaultsUnprotectedDomainsData,
+                let domains = try? NSKeyedUnarchiver.unarchivedObject(ofClass: NSSet.self, from: data) as? Set<String>,
+                !domains.isEmpty {
 
                 var result = UnprotectedDomainsContainer()
                 do {
                     result = try store.add(domains).reduce(into: [:]) { $0[$1.value] = $1.id }
-                    self.legacyUserDefaultsUnprotectedDomainsData = nil
+                    legacyUserDefaultsUnprotectedDomainsData = nil
                 } catch {}
 
                 return result
@@ -107,11 +108,11 @@ final class LocalUnprotectedDomains: DomainsProtectionStore {
 extension UnprotectedDomainManagedObject: ValueRepresentableManagedObject {
 
     func valueRepresentation() -> String? {
-        self.domainEncrypted as? String
+        domainEncrypted as? String
     }
 
     func update(with domain: String) {
-        self.domainEncrypted = domain as NSString
+        domainEncrypted = domain as NSString
     }
 
 }

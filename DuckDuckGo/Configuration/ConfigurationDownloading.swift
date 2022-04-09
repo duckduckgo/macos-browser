@@ -16,14 +16,14 @@
 //  limitations under the License.
 //
 
-import Foundation
-import Combine
 import BrowserServicesKit
+import Combine
+import Foundation
 
 protocol ConfigurationDownloading {
 
     func refreshDataThenUpdate(for locations: [ConfigurationLocation], _ updater: @escaping () throws -> Void)
-            -> AnyPublisher<[ConfigurationDownloadMeta?], Swift.Error>
+        -> AnyPublisher<[ConfigurationDownloadMeta?], Swift.Error>
     func cancelAll()
 
 }
@@ -45,7 +45,7 @@ enum ConfigurationLocation: String, CaseIterable {
     case privacyConfiguration = "https://staticcdn.duckduckgo.com/trackerblocking/config/v1/macos-config.json"
     // In archived repo, to be refactored shortly (https://staticcdn.duckduckgo.com/useragents/social_ctp_configuration.json)
     case FBConfig = "https://staticcdn.duckduckgo.com/useragents/"
-    
+
 }
 
 final class DefaultConfigurationDownloader: ConfigurationDownloading {
@@ -60,7 +60,7 @@ final class DefaultConfigurationDownloader: ConfigurationDownloading {
 
     }
 
-    struct Constants {
+    enum Constants {
         static let ifNoneMatchField = "If-None-Match"
         static let etagField = "Etag"
         static let notModifiedResponseCode = 304
@@ -73,9 +73,10 @@ final class DefaultConfigurationDownloader: ConfigurationDownloading {
     private var cancellables = Set<AnyCancellable>()
     private let deliveryQueue: DispatchQueue
 
-    init(storage: ConfigurationStoring = DefaultConfigurationStorage.shared,
-         dataTaskProvider: DataTaskProviding = SharedURLSessionDataTaskProvider(),
-         deliveryQueue: DispatchQueue) {
+    init(
+        storage: ConfigurationStoring = DefaultConfigurationStorage.shared,
+        dataTaskProvider: DataTaskProviding = SharedURLSessionDataTaskProvider(),
+        deliveryQueue: DispatchQueue) {
         self.storage = storage
         self.dataTaskProvider = dataTaskProvider
         self.deliveryQueue = deliveryQueue
@@ -123,8 +124,8 @@ final class DefaultConfigurationDownloader: ConfigurationDownloading {
                     }
 
                 }) { value in
-                    
-                    promise(.success((value)))
+
+                    promise(.success(value))
 
                 }.store(in: &self.cancellables)
 
@@ -134,7 +135,7 @@ final class DefaultConfigurationDownloader: ConfigurationDownloading {
 
     func cancelAll() {
 
-        let cancellables = self.cancellables
+        let cancellables = cancellables
         self.cancellables.removeAll()
         cancellables.forEach { $0.cancel() }
 
@@ -149,21 +150,20 @@ final class DefaultConfigurationDownloader: ConfigurationDownloading {
     }
 
     func refreshDataThenUpdate(for locations: [ConfigurationLocation], _ updater: @escaping () throws -> Void)
-            -> AnyPublisher<[ConfigurationDownloadMeta?], Swift.Error> {
+        -> AnyPublisher<[ConfigurationDownloadMeta?], Swift.Error> {
 
         Publishers.MergeMany(
             locations.map {
                 download($0, embeddedEtag: embeddedEtag(for: $0))
-            }
-        )
-        .receive(on: self.deliveryQueue)
-        .collect()
-        .tryMap { result -> [ConfigurationDownloadMeta?] in
-            if !result.compactMap({$0}).isEmpty {
-                try updater()
-            }
-            return result
-        }.eraseToAnyPublisher()
+            })
+            .receive(on: deliveryQueue)
+            .collect()
+            .tryMap { result -> [ConfigurationDownloadMeta?] in
+                if !result.compactMap({ $0 }).isEmpty {
+                    try updater()
+                }
+                return result
+            }.eraseToAnyPublisher()
 
     }
 

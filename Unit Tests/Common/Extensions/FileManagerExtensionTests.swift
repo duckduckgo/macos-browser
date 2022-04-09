@@ -111,7 +111,7 @@ class FileManagerExtensionTests: XCTestCase {
         let srcURL = fm.temporaryDirectory.appendingPathComponent(testFile)
         try? testData.write(to: srcURL)
 
-        XCTAssertThrowsError(try fm.copyItem(at: srcURL, to: srcURL, incrementingIndexIfExists: false), "should throw file exists") { (error) in
+        XCTAssertThrowsError(try fm.copyItem(at: srcURL, to: srcURL, incrementingIndexIfExists: false), "should throw file exists") { error in
             XCTAssertEqual((error as? CocoaError)?.code, CocoaError.fileWriteFileExists)
         }
     }
@@ -160,9 +160,11 @@ class FileManagerExtensionTests: XCTestCase {
         try? testData.write(to: srcURL)
         try? testData.write(to: existingURL)
 
-        let result = try? fm.moveItem(at: srcURL, to: existingURL,
-                                      incrementingIndexIfExists: true,
-                                      pathExtension: testExtension1 + "." + testExtension2)
+        let result = try? fm.moveItem(
+            at: srcURL,
+            to: existingURL,
+            incrementingIndexIfExists: true,
+            pathExtension: testExtension1 + "." + testExtension2)
         XCTAssertEqual(result, destURL)
         XCTAssertTrue(fm.fileExists(atPath: result!.path))
     }
@@ -178,9 +180,11 @@ class FileManagerExtensionTests: XCTestCase {
         try? testData.write(to: srcURL)
         try? testData.write(to: existingURL)
 
-        let result = try? fm.moveItem(at: srcURL, to: existingURL,
-                                      incrementingIndexIfExists: true,
-                                      pathExtension: testExtension1)
+        let result = try? fm.moveItem(
+            at: srcURL,
+            to: existingURL,
+            incrementingIndexIfExists: true,
+            pathExtension: testExtension1)
         XCTAssertEqual(result, destURL)
         XCTAssertTrue(fm.fileExists(atPath: result!.path))
     }
@@ -191,9 +195,10 @@ class FileManagerExtensionTests: XCTestCase {
 
         let destURL = URL(fileURLWithPath: "/ro_volume_file")
 
-        XCTAssertThrowsError(try fm.moveItem(at: srcURL, to: destURL, incrementingIndexIfExists: true), "should throw error") { (error) in
-            XCTAssertTrue((error as? CocoaError)?.code == CocoaError.fileWriteNoPermission
-                          || (error as? CocoaError)?.code == CocoaError.fileWriteVolumeReadOnly)
+        XCTAssertThrowsError(try fm.moveItem(at: srcURL, to: destURL, incrementingIndexIfExists: true), "should throw error") { error in
+            XCTAssertTrue(
+                (error as? CocoaError)?.code == CocoaError.fileWriteNoPermission
+                    || (error as? CocoaError)?.code == CocoaError.fileWriteVolumeReadOnly)
         }
     }
 

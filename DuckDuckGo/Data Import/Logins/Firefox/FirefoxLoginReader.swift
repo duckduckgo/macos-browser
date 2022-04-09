@@ -16,9 +16,9 @@
 //  limitations under the License.
 //
 
-import Foundation
 import CommonCrypto
 import CryptoKit
+import Foundation
 import GRDB
 
 final class FirefoxLoginReader {
@@ -47,13 +47,14 @@ final class FirefoxLoginReader {
     ///
     /// - Parameter firefoxProfileURL: The path to the profile being imported from. This should be the base path of the profile, containing the `key4.db` and `logins.json` files.
     /// - Parameter primaryPassword: The password used to decrypt the login data. This is optional, as Firefox's primary password feature is optional.
-    init(firefoxProfileURL: URL,
-         primaryPassword: String? = nil,
-         databaseFileName: String = Constants.defaultKeyDatabaseName,
-         loginsFileName: String = Constants.defaultLoginsFileNane) {
+    init(
+        firefoxProfileURL: URL,
+        primaryPassword: String? = nil,
+        databaseFileName: String = Constants.defaultKeyDatabaseName,
+        loginsFileName: String = Constants.defaultLoginsFileNane) {
 
         self.primaryPassword = primaryPassword
-        self.keyDatabaseName = databaseFileName
+        keyDatabaseName = databaseFileName
         self.loginsFileName = loginsFileName
         self.firefoxProfileURL = firefoxProfileURL
     }
@@ -62,13 +63,13 @@ final class FirefoxLoginReader {
         let databasePath = firefoxProfileURL.appendingPathComponent(keyDatabaseName).path
 
         let loginsPath = firefoxProfileURL.appendingPathComponent(loginsFileName).path
-        
+
         // If there isn't a file where logins are expected, consider it a successful import of 0 logins
         // to avoid showing an error state.
         guard FileManager.default.fileExists(atPath: loginsPath) else {
             return .success([])
         }
-        
+
         guard let logins = readLoginsFile(from: loginsPath) else {
             return .failure(.couldNotReadLoginsFile)
         }
@@ -100,9 +101,10 @@ final class FirefoxLoginReader {
                 let globalSalt: Data = metadataRow["item1"]
                 let item2: Data = metadataRow["item2"]
 
-                guard let decodedItem2 = try? ASN1Parser.parse(data: item2),
-                      let iv = extractInitializationVector(from: decodedItem2),
-                      let decryptedItem2 = aesDecrypt(tlv: decodedItem2, iv: iv, globalSalt: globalSalt) else {
+                guard
+                    let decodedItem2 = try? ASN1Parser.parse(data: item2),
+                    let iv = extractInitializationVector(from: decodedItem2),
+                    let decryptedItem2 = aesDecrypt(tlv: decodedItem2, iv: iv, globalSalt: globalSalt) else {
                     error = .decryptionFailed
                     return
                 }
@@ -152,24 +154,29 @@ final class FirefoxLoginReader {
         return try? JSONDecoder().decode(EncryptedFirefoxLogins.self, from: loginsFileData)
     }
 
-    private func aesDecrypt(tlv: ASN1Parser.Node,
-                            iv: Data,
-                            globalSalt: Data) -> Data? {
-        guard let data = extractCiphertext(from: tlv),
-              let entrySalt = extractEntrySalt(from: tlv),
-              let iterationCount = extractIterationCount(from: tlv),
-              let keyLength = extractKeyLength(from: tlv) else { return nil }
+    private func aesDecrypt(
+        tlv: ASN1Parser.Node,
+        iv: Data,
+        globalSalt: Data)
+        -> Data? {
+        guard
+            let data = extractCiphertext(from: tlv),
+            let entrySalt = extractEntrySalt(from: tlv),
+            let iterationCount = extractIterationCount(from: tlv),
+            let keyLength = extractKeyLength(from: tlv) else { return nil }
 
         assert(keyLength == 32)
 
         let passwordData = globalSalt + (primaryPassword ?? "").data(using: .utf8)!
         let hashData = SHA.from(data: passwordData)
 
-        guard let commonCryptoKey = Cryptography.decryptPBKDF2(password: .base64(hashData.base64EncodedString()),
-                                                               salt: entrySalt,
-                                                               keyByteCount: keyLength,
-                                                               rounds: iterationCount,
-                                                               kdf: .sha256) else { return nil }
+        guard
+            let commonCryptoKey = Cryptography.decryptPBKDF2(
+                password: .base64(hashData.base64EncodedString()),
+                salt: entrySalt,
+                keyByteCount: keyLength,
+                rounds: iterationCount,
+                kdf: .sha256) else { return nil }
 
         let iv = Data([4, 14]) + iv
         guard let decryptedData = Cryptography.decryptAESCBC(data: data, key: commonCryptoKey.dataRepresentation, iv: iv) else {
@@ -204,10 +211,11 @@ final class FirefoxLoginReader {
 
         let asn1Decoded = try? ASN1Parser.parse(data: base64Decoded)
 
-        guard case let .sequence(topLevelValues) = asn1Decoded,
-              case let .sequence(initializationVectorValues) = topLevelValues[1],
-              case let .octetString(initializationVector) = initializationVectorValues[1],
-              case let .octetString(ciphertext) = topLevelValues[2] else {
+        guard
+            case .sequence(let topLevelValues) = asn1Decoded,
+            case .sequence(let initializationVectorValues) = topLevelValues[1],
+            case .octetString(let initializationVector) = initializationVectorValues[1],
+            case .octetString(let ciphertext) = topLevelValues[2] else {
             return nil
         }
 
@@ -236,37 +244,37 @@ private struct EncryptedFirefoxLogins: Decodable {
 extension FirefoxLoginReader {
 
     private func extractEntrySalt(from tlv: ASN1Parser.Node) -> Data? {
-        guard case let .sequence(values1) = tlv else {
+        guard case .sequence(let values1) = tlv else {
             return nil
         }
 
         let firstValue = values1[0]
 
-        guard case let .sequence(values2) = firstValue else {
+        guard case .sequence(let values2) = firstValue else {
             return nil
         }
 
         let secondValue = values2[1]
 
-        guard case let .sequence(values3) = secondValue else {
+        guard case .sequence(let values3) = secondValue else {
             return nil
         }
 
         let thirdValue = values3[0]
 
-        guard case let .sequence(values4) = thirdValue else {
+        guard case .sequence(let values4) = thirdValue else {
             return nil
         }
 
         let fourthValue = values4[1]
 
-        guard case let .sequence(values5) = fourthValue else {
+        guard case .sequence(let values5) = fourthValue else {
             return nil
         }
 
         let fifthValue = values5[0]
 
-        guard case let .octetString(data: data) = fifthValue else {
+        guard case .octetString(data: let data) = fifthValue else {
             return nil
         }
 
@@ -274,37 +282,37 @@ extension FirefoxLoginReader {
     }
 
     private func extractIterationCount(from tlv: ASN1Parser.Node) -> Int? {
-        guard case let .sequence(values1) = tlv else {
+        guard case .sequence(let values1) = tlv else {
             return nil
         }
 
         let firstValue = values1[0]
 
-        guard case let .sequence(values2) = firstValue else {
+        guard case .sequence(let values2) = firstValue else {
             return nil
         }
 
         let secondValue = values2[1]
 
-        guard case let .sequence(values3) = secondValue else {
+        guard case .sequence(let values3) = secondValue else {
             return nil
         }
 
         let thirdValue = values3[0]
 
-        guard case let .sequence(values4) = thirdValue else {
+        guard case .sequence(let values4) = thirdValue else {
             return nil
         }
 
         let fourthValue = values4[1]
 
-        guard case let .sequence(values5) = fourthValue else {
+        guard case .sequence(let values5) = fourthValue else {
             return nil
         }
 
         let fifthValue = values5[1]
 
-        guard case let .integer(data: data) = fifthValue else {
+        guard case .integer(data: let data) = fifthValue else {
             return nil
         }
 
@@ -312,37 +320,37 @@ extension FirefoxLoginReader {
     }
 
     private func extractKeyLength(from tlv: ASN1Parser.Node) -> Int? {
-        guard case let .sequence(values1) = tlv else {
+        guard case .sequence(let values1) = tlv else {
             return nil
         }
 
         let firstValue = values1[0]
 
-        guard case let .sequence(values2) = firstValue else {
+        guard case .sequence(let values2) = firstValue else {
             return nil
         }
 
         let secondValue = values2[1]
 
-        guard case let .sequence(values3) = secondValue else {
+        guard case .sequence(let values3) = secondValue else {
             return nil
         }
 
         let thirdValue = values3[0]
 
-        guard case let .sequence(values4) = thirdValue else {
+        guard case .sequence(let values4) = thirdValue else {
             return nil
         }
 
         let fourthValue = values4[1]
 
-        guard case let .sequence(values5) = fourthValue else {
+        guard case .sequence(let values5) = fourthValue else {
             return nil
         }
 
         let fifthValue = values5[2]
 
-        guard case let .integer(data: data) = fifthValue else {
+        guard case .integer(data: let data) = fifthValue else {
             return nil
         }
 
@@ -350,31 +358,31 @@ extension FirefoxLoginReader {
     }
 
     private func extractInitializationVector(from tlv: ASN1Parser.Node) -> Data? {
-        guard case let .sequence(values1) = tlv else {
+        guard case .sequence(let values1) = tlv else {
             return nil
         }
 
         let firstValue = values1[0]
 
-        guard case let .sequence(values2) = firstValue else {
+        guard case .sequence(let values2) = firstValue else {
             return nil
         }
 
         let secondValue = values2[1]
 
-        guard case let .sequence(values3) = secondValue else {
+        guard case .sequence(let values3) = secondValue else {
             return nil
         }
 
         let thirdValue = values3[1]
 
-        guard case let .sequence(values4) = thirdValue else {
+        guard case .sequence(let values4) = thirdValue else {
             return nil
         }
 
         let fourthValue = values4[1]
 
-        guard case let .octetString(data: data) = fourthValue else {
+        guard case .octetString(data: let data) = fourthValue else {
             return nil
         }
 
@@ -382,11 +390,11 @@ extension FirefoxLoginReader {
     }
 
     private func extractCiphertext(from tlv: ASN1Parser.Node) -> Data? {
-        guard case let .sequence(values) = tlv else {
+        guard case .sequence(let values) = tlv else {
             return nil
         }
 
-        guard case let .octetString(data: data) = values[1] else {
+        guard case .octetString(data: let data) = values[1] else {
             return nil
         }
 
@@ -395,7 +403,7 @@ extension FirefoxLoginReader {
 
 }
 
-private struct SHA {
+private enum SHA {
 
     static func from(data: Data) -> Data {
         var digest = [UInt8](repeating: 0, count: Int(CC_SHA1_DIGEST_LENGTH))

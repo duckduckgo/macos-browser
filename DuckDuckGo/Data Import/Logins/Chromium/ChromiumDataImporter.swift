@@ -35,12 +35,13 @@ internal class ChromiumDataImporter: DataImporter {
     }
 
     func importableTypes() -> [DataImport.DataType] {
-        return [.logins, .bookmarks]
+        [.logins, .bookmarks]
     }
 
-    func importData(types: [DataImport.DataType],
-                    from profile: DataImport.BrowserProfile?,
-                    completion: @escaping (Result<DataImport.Summary, DataImportError>) -> Void) {
+    func importData(
+        types: [DataImport.DataType],
+        from profile: DataImport.BrowserProfile?,
+        completion: @escaping (Result<DataImport.Summary, DataImportError>) -> Void) {
         var summary = DataImport.Summary()
         let dataDirectoryPath = profile?.profileURL.path ?? applicationDataDirectoryPath
 
@@ -78,7 +79,7 @@ internal class ChromiumDataImporter: DataImporter {
                 switch error {
                 case .noBookmarksFileFound:
                     // If there are no bookmarks, treat it as a successful import of zero bookmarks.
-                    let result = BookmarkImportResult.init(successful: 0, duplicates: 0, failed: 0)
+                    let result = BookmarkImportResult(successful: 0, duplicates: 0, failed: 0)
                     summary.bookmarksResult = result
 
                 case .bookmarksFileDecodingFailed:

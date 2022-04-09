@@ -16,13 +16,13 @@
 //  limitations under the License.
 //
 
-import XCTest
 import CryptoKit
+import XCTest
 @testable import DuckDuckGo_Privacy_Browser
 
 final class MockEncryptionKeyGenerator: EncryptionKeyGenerating {
 
-    var numberOfKeysGenerated: Int = 0
+    var numberOfKeysGenerated = 0
 
     func randomKey() -> SymmetricKey {
         numberOfKeysGenerated += 1

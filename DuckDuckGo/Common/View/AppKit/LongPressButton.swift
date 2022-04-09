@@ -21,14 +21,14 @@ import Cocoa
 final class LongPressButton: MouseOverButton {
 
     override func rightMouseDown(with event: NSEvent) {
-        guard let menu = self.menu else {
+        guard let menu = menu else {
             super.rightMouseDown(with: event)
             return
         }
 
-        self.isMouseDown = true
+        isMouseDown = true
         displayMenu(menu)
-        self.isMouseDown = false
+        isMouseDown = false
     }
 
     private var menuTimer: Timer?
@@ -37,12 +37,12 @@ final class LongPressButton: MouseOverButton {
         menuTimer?.invalidate()
         menuTimer = nil
 
-        guard let menu = self.menu else {
+        guard let menu = menu else {
             super.mouseDown(with: event)
             return
         }
 
-        self.isMouseDown = true
+        isMouseDown = true
 
         let timer = Timer(timeInterval: 0.3, repeats: false) { [weak self] _ in
             self?.displayMenu(menu)
@@ -58,33 +58,36 @@ final class LongPressButton: MouseOverButton {
         menuTimer?.invalidate()
         menuTimer = nil
 
-        self.isMouseDown = false
+        isMouseDown = false
     }
 
     private func trackMouseEvents(withDelayedMenu menu: NSMenu, previousEvent: NSEvent) {
-        while let event = self.window?.nextEvent(matching: [.leftMouseDragged, .leftMouseUp]) {
+        while let event = window?.nextEvent(matching: [.leftMouseDragged, .leftMouseUp]) {
             switch event.type {
             case .leftMouseDragged:
                 // ignore and return if menu was already shown
                 guard menuTimer != nil else { return }
                 // if on vertical mouse movement show menu instantly; ignore and return on X mouse-out
-                guard self.withMouseLocationInViewCoordinates(event.locationInWindow, convert: { locationInView in
-                    (self.bounds.minX...self.bounds.maxX).contains(locationInView.x)
-                }) == true else { return }
+                guard
+                    withMouseLocationInViewCoordinates(event.locationInWindow, convert: { locationInView in
+                        (self.bounds.minX...self.bounds.maxX).contains(locationInView.x)
+                    }) == true else { return }
                 // should be a real mouse dragged event otherwise wait for next
-                guard Int(event.locationInWindow.x) != Int(previousEvent.locationInWindow.x),
-                      Int(event.locationInWindow.y) != Int(previousEvent.locationInWindow.y)
+                guard
+                    Int(event.locationInWindow.x) != Int(previousEvent.locationInWindow.x),
+                    Int(event.locationInWindow.y) != Int(previousEvent.locationInWindow.y)
                 else { break }
 
-                self.displayMenu(menu)
+                displayMenu(menu)
                 return
 
             case .leftMouseUp:
-                guard menuTimer != nil,
-                      self.isMouseLocationInsideBounds(event.locationInWindow)
+                guard
+                    menuTimer != nil,
+                    isMouseLocationInsideBounds(event.locationInWindow)
                 else { return }
                 // mouseUp before menu shown means click
-                self.sendAction(self.action, to: self.target)
+                sendAction(action, to: target)
                 return
 
             default:
@@ -98,21 +101,22 @@ final class LongPressButton: MouseOverButton {
         menuTimer?.invalidate()
         menuTimer = nil
 
-        menu.popUp(positioning: nil, at: NSPoint(x: 0, y: self.bounds.height + 4), in: self)
+        menu.popUp(positioning: nil, at: NSPoint(x: 0, y: bounds.height + 4), in: self)
     }
 
 }
 
-private extension NSEvent {
-    func makeMouseUpEvent() -> NSEvent? {
-        return NSEvent.mouseEvent(with: .leftMouseUp,
-                                  location: self.locationInWindow,
-                                  modifierFlags: self.modifierFlags,
-                                  timestamp: self.timestamp,
-                                  windowNumber: self.windowNumber,
-                                  context: nil,
-                                  eventNumber: self.eventNumber,
-                                  clickCount: self.clickCount,
-                                  pressure: self.pressure)
+extension NSEvent {
+    fileprivate func makeMouseUpEvent() -> NSEvent? {
+        NSEvent.mouseEvent(
+            with: .leftMouseUp,
+            location: locationInWindow,
+            modifierFlags: modifierFlags,
+            timestamp: timestamp,
+            windowNumber: windowNumber,
+            context: nil,
+            eventNumber: eventNumber,
+            clickCount: clickCount,
+            pressure: pressure)
     }
 }

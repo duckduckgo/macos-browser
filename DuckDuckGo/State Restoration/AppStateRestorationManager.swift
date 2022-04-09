@@ -16,8 +16,8 @@
 //  limitations under the License.
 //
 
-import Foundation
 import Combine
+import Foundation
 import os.log
 
 final class AppStateRestorationManager {
@@ -27,7 +27,7 @@ final class AppStateRestorationManager {
     private var cancellable: AnyCancellable!
 
     init(fileStore: FileStore) {
-        self.service = StatePersistenceService(fileStore: fileStore, fileName: AppStateRestorationManager.fileName)
+        service = StatePersistenceService(fileStore: fileStore, fileName: AppStateRestorationManager.fileName)
     }
 
     func applicationDidFinishLaunching() {

@@ -61,8 +61,8 @@ final class PermissionButton: AddressBarButton {
         super.awakeFromNib()
 
         wantsLayer = true
-        defaultImage = self.image
-        defaultTint = self.contentTintColor
+        defaultImage = image
+        defaultTint = contentTintColor
         buttonState = .inactive
     }
 

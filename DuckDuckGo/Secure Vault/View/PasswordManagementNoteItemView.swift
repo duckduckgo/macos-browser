@@ -18,8 +18,8 @@
 
 import Foundation
 
-import SwiftUI
 import BrowserServicesKit
+import SwiftUI
 
 private let interItemSpacing: CGFloat = 23
 private let itemSpacing: CGFloat = 13
@@ -29,32 +29,32 @@ struct PasswordManagementNoteItemView: View {
     @EnvironmentObject var model: PasswordManagementNoteModel
 
     var body: some View {
-        
+
         if model.note != nil {
-            
+
             ZStack(alignment: .top) {
                 Spacer()
-                
+
                 VStack(alignment: .leading, spacing: 0) {
-                    
+
                     HeaderView()
                         .padding(.bottom, 30)
-                    
+
                     TextView()
 
                     Spacer(minLength: 0)
-                    
+
                     Buttons()
-                    
+
                 }
                 .frame(maxWidth: .infinity, maxHeight: .infinity)
                 .padding()
-                
+
             }
             .padding(EdgeInsets(top: 10, leading: 0, bottom: 10, trailing: 10))
-            
+
         }
-        
+
     }
 
 }
@@ -111,18 +111,18 @@ private struct TextView: View {
     var body: some View {
         VStack(alignment: .leading, spacing: 0) {
 
-                HStack {
-                    if #available(macOS 12, *) {
-                        Text(model.text)
-                            .foregroundColor(Color.secondary)
-                            .textSelection(.enabled)
-                    } else {
-                        Text(model.text)
-                    }
-
-                    Spacer()
+            HStack {
+                if #available(macOS 12, *) {
+                    Text(model.text)
+                        .foregroundColor(Color.secondary)
+                        .textSelection(.enabled)
+                } else {
+                    Text(model.text)
                 }
-                .padding(.bottom, interItemSpacing)
+
+                Spacer()
+            }
+            .padding(.bottom, interItemSpacing)
 
         }
     }

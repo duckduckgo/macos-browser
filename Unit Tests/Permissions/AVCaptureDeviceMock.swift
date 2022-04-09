@@ -24,20 +24,20 @@ final class AVCaptureDeviceMock: AVCaptureDevice {
         didSet {
             switch (oldValue, authorizationStatuses) {
             case (.none, .some), (.some, .none):
-                method_exchangeImplementations(originalAuthorizationStatusForMediaType,
-                                               swizzledAuthorizationStatusForMediaType)
+                method_exchangeImplementations(
+                    originalAuthorizationStatusForMediaType,
+                    swizzledAuthorizationStatusForMediaType)
             default:
                 break
             }
         }
     }
 
-    private static let originalAuthorizationStatusForMediaType = {
-        class_getClassMethod(AVCaptureDevice.self, #selector(authorizationStatus(for:)))!
-    }()
-    private static let swizzledAuthorizationStatusForMediaType = {
-        class_getClassMethod(AVCaptureDevice.self, #selector(mocked_authorizationStatus(for:)))!
-    }()
+    private static let originalAuthorizationStatusForMediaType = class_getClassMethod(AVCaptureDevice.self, #selector(authorizationStatus(for:)))!
+
+    private static let swizzledAuthorizationStatusForMediaType = class_getClassMethod(
+        AVCaptureDevice.self,
+        #selector(mocked_authorizationStatus(for:)))!
 
 }
 

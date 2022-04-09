@@ -19,36 +19,36 @@
 import Foundation
 
 protocol MacWaitlistStore {
-    
+
     func isUnlocked() -> Bool
     func unlock()
-    
+
 }
 
 final class MacWaitlistEncryptedFileStorage: MacWaitlistStore {
-    
+
     private var encryptedMetadataFilePath: URL {
-        return containerURL.appendingPathComponent("Configuration").appendingPathComponent("LaunchConfiguration")
+        containerURL.appendingPathComponent("Configuration").appendingPathComponent("LaunchConfiguration")
     }
 
     private let containerURL: URL
     private let statisticsStore: StatisticsStore
-    
+
     init(containerURL: URL = .sandboxApplicationSupportURL, statisticsStore: StatisticsStore = LocalStatisticsStore()) {
         self.containerURL = containerURL
         self.statisticsStore = statisticsStore
     }
-    
+
     func isUnlocked() -> Bool {
-        return statisticsStore.waitlistUnlocked
+        statisticsStore.waitlistUnlocked
     }
-    
+
     func unlock() {
         statisticsStore.waitlistUnlocked = true
     }
-    
+
     func deleteExistingMetadata() {
         statisticsStore.waitlistUnlocked = false
     }
-    
+
 }

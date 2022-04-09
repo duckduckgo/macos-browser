@@ -113,7 +113,7 @@ extension Pixel.Event {
              .passwordManagerLockScreenTimeoutSelected30Minutes,
              .passwordManagerLockScreenTimeoutSelected1Hour,
              .ampBlockingRulesCompilationFailed:
-            
+
             return nil
         }
     }

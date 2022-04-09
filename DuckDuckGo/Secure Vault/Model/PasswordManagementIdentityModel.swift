@@ -16,8 +16,8 @@
 //  limitations under the License.
 //
 
-import Foundation
 import BrowserServicesKit
+import Foundation
 
 final class PasswordManagementIdentityModel: ObservableObject, PasswordManagementItemModel {
 
@@ -36,7 +36,7 @@ final class PasswordManagementIdentityModel: ObservableObject, PasswordManagemen
     var onCancelled: () -> Void
 
     var isEditingPublisher: Published<Bool>.Publisher {
-        return $isEditing
+        $isEditing
     }
 
     var identity: SecureVaultModels.Identity? {
@@ -46,7 +46,7 @@ final class PasswordManagementIdentityModel: ObservableObject, PasswordManagemen
     }
 
     var isInEditMode: Bool {
-        return isEditing || isNew
+        isEditing || isNew
     }
 
     @Published var isEditing = false {
@@ -60,25 +60,25 @@ final class PasswordManagementIdentityModel: ObservableObject, PasswordManagemen
 
     @Published var isNew = false
 
-    @Published var title: String = "" {
+    @Published var title = "" {
         didSet {
             isDirty = true
         }
     }
 
-    @Published var firstName: String = "" {
+    @Published var firstName = "" {
         didSet {
             isDirty = true
         }
     }
 
-    @Published var middleName: String = "" {
+    @Published var middleName = "" {
         didSet {
             isDirty = true
         }
     }
 
-    @Published var lastName: String = "" {
+    @Published var lastName = "" {
         didSet {
             isDirty = true
         }
@@ -102,55 +102,55 @@ final class PasswordManagementIdentityModel: ObservableObject, PasswordManagemen
         }
     }
 
-    @Published var addressStreet: String = "" {
-        didSet {
-            isDirty = true
-        }
-    }
-    
-    @Published var addressStreet2: String = "" {
+    @Published var addressStreet = "" {
         didSet {
             isDirty = true
         }
     }
 
-    @Published var addressCity: String = "" {
+    @Published var addressStreet2 = "" {
         didSet {
             isDirty = true
         }
     }
 
-    @Published var addressProvince: String = "" {
+    @Published var addressCity = "" {
         didSet {
             isDirty = true
         }
     }
 
-    @Published var addressPostalCode: String = "" {
+    @Published var addressProvince = "" {
         didSet {
             isDirty = true
         }
     }
 
-    @Published var addressCountryCode: String = "" {
+    @Published var addressPostalCode = "" {
         didSet {
             isDirty = true
         }
     }
 
-    @Published var homePhone: String = "" {
+    @Published var addressCountryCode = "" {
         didSet {
             isDirty = true
         }
     }
 
-    @Published var mobilePhone: String = "" {
+    @Published var homePhone = "" {
         didSet {
             isDirty = true
         }
     }
 
-    @Published var emailAddress: String = "" {
+    @Published var mobilePhone = "" {
+        didSet {
+            isDirty = true
+        }
+    }
+
+    @Published var emailAddress = "" {
         didSet {
             isDirty = true
         }
@@ -158,17 +158,18 @@ final class PasswordManagementIdentityModel: ObservableObject, PasswordManagemen
 
     var isDirty = false {
         didSet {
-            self.onDirtyChanged(isDirty)
+            onDirtyChanged(isDirty)
         }
     }
 
-    var lastUpdatedDate: String = ""
-    var createdDate: String = ""
+    var lastUpdatedDate = ""
+    var createdDate = ""
 
-    init(onDirtyChanged: @escaping (Bool) -> Void,
-         onSaveRequested: @escaping (SecureVaultModels.Identity) -> Void,
-         onDeleteRequested: @escaping (SecureVaultModels.Identity) -> Void,
-         onCancelled: @escaping () -> Void) {
+    init(
+        onDirtyChanged: @escaping (Bool) -> Void,
+        onSaveRequested: @escaping (SecureVaultModels.Identity) -> Void,
+        onDeleteRequested: @escaping (SecureVaultModels.Identity) -> Void,
+        onCancelled: @escaping () -> Void) {
         self.onDirtyChanged = onDirtyChanged
         self.onSaveRequested = onSaveRequested
         self.onDeleteRequested = onDeleteRequested

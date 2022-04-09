@@ -16,8 +16,8 @@
 //  limitations under the License.
 //
 
-import Foundation
 import Combine
+import Foundation
 
 /// A testable abstraction of a data task publisher, which you can usually get from URLSession.dataTaskPublisher(for: )
 protocol DataTaskProviding {
@@ -30,7 +30,7 @@ protocol DataTaskProviding {
 struct SharedURLSessionDataTaskProvider: DataTaskProviding {
 
     func dataTaskPublisher(for request: URLRequest) -> AnyPublisher<(data: Data, response: URLResponse), URLError> {
-        return URLSession.shared.dataTaskPublisher(for: request)
+        URLSession.shared.dataTaskPublisher(for: request)
             .eraseToAnyPublisher()
     }
 

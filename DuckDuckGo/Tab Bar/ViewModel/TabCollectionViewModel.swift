@@ -16,17 +16,18 @@
 //  limitations under the License.
 //
 
+import Combine
 import Foundation
 import os.log
-import Combine
 
 protocol TabCollectionViewModelDelegate: AnyObject {
 
     func tabCollectionViewModelDidAppend(_ tabCollectionViewModel: TabCollectionViewModel, selected: Bool)
     func tabCollectionViewModelDidInsert(_ tabCollectionViewModel: TabCollectionViewModel, at index: Int, selected: Bool)
-    func tabCollectionViewModel(_ tabCollectionViewModel: TabCollectionViewModel,
-                                didRemoveTabAt removalIndex: Int,
-                                andSelectTabAt selectionIndex: Int?)
+    func tabCollectionViewModel(
+        _ tabCollectionViewModel: TabCollectionViewModel,
+        didRemoveTabAt removalIndex: Int,
+        andSelectTabAt selectionIndex: Int?)
     func tabCollectionViewModel(_ tabCollectionViewModel: TabCollectionViewModel, didMoveTabAt index: Int, to newIndex: Int)
     func tabCollectionViewModel(_ tabCollectionViewModel: TabCollectionViewModel, didSelectAt selectionIndex: Int?)
     func tabCollectionViewModelDidMultipleChanges(_ tabCollectionViewModel: TabCollectionViewModel)
@@ -48,14 +49,16 @@ final class TabCollectionViewModel: NSObject {
             updateSelectedTabViewModel()
         }
     }
+
     @Published private(set) var selectedTabViewModel: TabViewModel? {
         didSet {
             previouslySelectedTabViewModel = oldValue
         }
     }
+
     private weak var previouslySelectedTabViewModel: TabViewModel?
 
-    @Published private(set) var canInsertLastRemovedTab: Bool = false
+    @Published private(set) var canInsertLastRemovedTab = false
 
     // In a special occasion, we want to select the "parent" tab after closing the currently selected tab
     private var selectParentOnRemoval = false
@@ -94,7 +97,8 @@ final class TabCollectionViewModel: NSObject {
 
     // MARK: - Selection
 
-    @discardableResult func select(at index: Int, forceChange: Bool = false) -> Bool {
+    @discardableResult
+    func select(at index: Int, forceChange: Bool = false) -> Bool {
         guard changesEnabled || forceChange else { return false }
         guard index >= 0, index < tabCollection.tabs.count else {
             os_log("TabCollectionViewModel: Index out of bounds", type: .error)
@@ -107,10 +111,12 @@ final class TabCollectionViewModel: NSObject {
         return true
     }
 
-    @discardableResult func selectDisplayableTabIfPresent(_ content: Tab.TabContent) -> Bool {
+    @discardableResult
+    func selectDisplayableTabIfPresent(_ content: Tab.TabContent) -> Bool {
         guard changesEnabled else { return false }
-        guard Tab.TabContent.displayableTabTypes.contains(content),
-              let index = tabCollection.tabs.firstIndex(where: { $0.content == content })
+        guard
+            Tab.TabContent.displayableTabTypes.contains(content),
+            let index = tabCollection.tabs.firstIndex(where: { $0.content == content })
         else {
             return false
         }
@@ -175,7 +181,7 @@ final class TabCollectionViewModel: NSObject {
         }
 
         if selected {
-            self.selectParentOnRemoval = true
+            selectParentOnRemoval = true
         }
     }
 
@@ -201,14 +207,15 @@ final class TabCollectionViewModel: NSObject {
         delegate?.tabCollectionViewModelDidInsert(self, at: index, selected: selected)
 
         if selected {
-            self.selectParentOnRemoval = true
+            selectParentOnRemoval = true
         }
     }
 
     func insertChild(tab: Tab, selected: Bool) {
         guard changesEnabled else { return }
-        guard let parentTab = tab.parentTab,
-              let parentTabIndex = tabCollection.tabs.firstIndex(where: { $0 === parentTab }) else {
+        guard
+            let parentTab = tab.parentTab,
+            let parentTabIndex = tabCollection.tabs.firstIndex(where: { $0 === parentTab }) else {
             os_log("TabCollection: No parent tab", type: .error)
             return
         }
@@ -239,17 +246,19 @@ final class TabCollectionViewModel: NSObject {
         }
 
         let newSelectionIndex: Int
-        if selectionIndex == index,
-           selectParentOnRemoval,
-           let parentTab = parentTab,
-           let parentTabIndex = tabCollection.tabs.firstIndex(of: parentTab) {
+        if
+            selectionIndex == index,
+            selectParentOnRemoval,
+            let parentTab = parentTab,
+            let parentTabIndex = tabCollection.tabs.firstIndex(of: parentTab) {
             // Select parent tab
             newSelectionIndex = parentTabIndex
-        } else if selectionIndex == index,
-                  let parentTab = parentTab,
-                  let leftTab = tabCollection.tabs[safe: index - 1],
-                  let rightTab = tabCollection.tabs[safe: index],
-                  rightTab.parentTab !== parentTab && (leftTab.parentTab === parentTab || leftTab === parentTab) {
+        } else if
+            selectionIndex == index,
+            let parentTab = parentTab,
+            let leftTab = tabCollection.tabs[safe: index - 1],
+            let rightTab = tabCollection.tabs[safe: index],
+            rightTab.parentTab !== parentTab && (leftTab.parentTab === parentTab || leftTab === parentTab) {
             // Select parent tab on left or another child tab on left instead of the tab on right
             newSelectionIndex = max(selectionIndex - 1, 0)
         } else if selectionIndex > index {
@@ -330,7 +339,7 @@ final class TabCollectionViewModel: NSObject {
             return
         }
 
-        self.remove(at: index)
+        remove(at: index)
     }
 
     func removeSelected() {
@@ -341,7 +350,7 @@ final class TabCollectionViewModel: NSObject {
             return
         }
 
-        self.remove(at: selectionIndex)
+        remove(at: selectionIndex)
     }
 
     // MARK: - Others
@@ -442,4 +451,5 @@ final class TabCollectionViewModel: NSObject {
     }
 
 }
+
 // swiftlint:enable type_body_length

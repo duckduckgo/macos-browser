@@ -16,14 +16,14 @@
 //  limitations under the License.
 //
 
-import SwiftUI
 import Lottie
+import SwiftUI
 
 struct FireAnimation: NSViewRepresentable {
 
     static let animation = Animation.named("01_Fire_really_small")
 
-    func makeNSView(context: NSViewRepresentableContext<FireAnimation>) -> NSView {
+    func makeNSView(context _: NSViewRepresentableContext<FireAnimation>) -> NSView {
         let view = NSView(frame: .zero)
 
         let animationView = AnimationView(animation: Self.animation)
@@ -43,7 +43,7 @@ struct FireAnimation: NSViewRepresentable {
         return view
     }
 
-    func updateNSView(_ nsView: NSViewType, context: Context) {
+    func updateNSView(_: NSViewType, context _: Context) {
     }
 
 }

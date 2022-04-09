@@ -16,9 +16,9 @@
 //  limitations under the License.
 //
 
-import XCTest
-import TrackerRadarKit
 import BrowserServicesKit
+import TrackerRadarKit
+import XCTest
 @testable import DuckDuckGo_Privacy_Browser
 
 class AppPrivacyConfigurationTests: XCTestCase {
@@ -27,9 +27,10 @@ class AppPrivacyConfigurationTests: XCTestCase {
 
         let data = AppPrivacyConfigurationDataProvider.loadEmbeddedAsData()
 
-        XCTAssertEqual(data.sha256,
-                       AppPrivacyConfigurationDataProvider.Constants.embeddedConfigurationSHA,
-                       "Error: please update SHA and ETag when changing embedded config")
+        XCTAssertEqual(
+            data.sha256,
+            AppPrivacyConfigurationDataProvider.Constants.embeddedConfigurationSHA,
+            "Error: please update SHA and ETag when changing embedded config")
     }
 
 }

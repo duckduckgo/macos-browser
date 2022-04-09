@@ -24,8 +24,8 @@ final class DefaultBrowserProviderMock: DefaultBrowserProvider {
         case generic
     }
 
-    var bundleIdentifier: String = "com.duckduckgo.DefaultBrowserPreferencesTests"
-    var isDefault: Bool = false
+    var bundleIdentifier = "com.duckduckgo.DefaultBrowserPreferencesTests"
+    var isDefault = false
     // swiftlint:disable identifier_name
     var _presentDefaultBrowserPrompt: () throws -> Void = {}
     var _openSystemPreferences: () -> Void = {}
@@ -71,7 +71,7 @@ final class DefaultBrowserPreferencesTests: XCTestCase {
     func testWhenBecomeDefaultIsCalledThenDefaultBrowserPromptIsRequested() throws {
         let model = DefaultBrowserPreferences(defaultBrowserProvider: provider)
 
-        let browserPromptExpectation = self.expectation(description: "presentDefaultBrowserPrompt")
+        let browserPromptExpectation = expectation(description: "presentDefaultBrowserPrompt")
 
         provider._presentDefaultBrowserPrompt = {
             browserPromptExpectation.fulfill()
@@ -85,8 +85,8 @@ final class DefaultBrowserPreferencesTests: XCTestCase {
     func testWhenDefaultBrowserPromptFailsThenPreferencesAreOpened() throws {
         let model = DefaultBrowserPreferences(defaultBrowserProvider: provider)
 
-        let browserPromptExpectation = self.expectation(description: "presentDefaultBrowserPrompt")
-        let openPreferencesExpectation = self.expectation(description: "openSystemPreferences")
+        let browserPromptExpectation = expectation(description: "presentDefaultBrowserPrompt")
+        let openPreferencesExpectation = expectation(description: "openSystemPreferences")
 
         provider._presentDefaultBrowserPrompt = {
             browserPromptExpectation.fulfill()

@@ -24,16 +24,16 @@ extension WKWebView {
 
     @nonobjc
     func sessionStateData() throws -> Data? {
-        guard self.responds(to: #selector(WKWebView._sessionStateData))
-            else { throw DoesNotSupportRestoreFromSessionData() }
-        return self._sessionStateData()
+        guard responds(to: #selector(WKWebView._sessionStateData))
+        else { throw DoesNotSupportRestoreFromSessionData() }
+        return _sessionStateData()
     }
 
     @nonobjc
     func restoreSessionState(from data: Data) throws {
-        guard self.responds(to: #selector(WKWebView._restore(fromSessionStateData:)))
-            else { throw DoesNotSupportRestoreFromSessionData() }
-        self._restore(fromSessionStateData: data)
+        guard responds(to: #selector(WKWebView._restore(fromSessionStateData:)))
+        else { throw DoesNotSupportRestoreFromSessionData() }
+        _restore(fromSessionStateData: data)
     }
 
 }

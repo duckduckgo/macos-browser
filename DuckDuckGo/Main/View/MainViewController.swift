@@ -16,8 +16,8 @@
 //  limitations under the License.
 //
 
-import Cocoa
 import Carbon.HIToolbox
+import Cocoa
 import Combine
 import os.log
 
@@ -49,7 +49,7 @@ final class MainViewController: NSViewController {
     private var mouseNavButtonsMonitor: Any?
 
     required init?(coder: NSCoder) {
-        self.tabCollectionViewModel = TabCollectionViewModel()
+        tabCollectionViewModel = TabCollectionViewModel()
         super.init(coder: coder)
     }
 
@@ -96,7 +96,7 @@ final class MainViewController: NSViewController {
         browserTabViewController.windowDidResignKey()
     }
 
-    override func encodeRestorableState(with coder: NSCoder) {
+    override func encodeRestorableState(with _: NSCoder) {
         fatalError("Default AppKit State Restoration should not be used")
     }
 
@@ -114,9 +114,11 @@ final class MainViewController: NSViewController {
     }
 
     @IBSegueAction
-    func createTabBarViewController(coder: NSCoder, sender: Any?, segueIdentifier: String?) -> TabBarViewController? {
-        guard let tabBarViewController = TabBarViewController(coder: coder,
-                                                              tabCollectionViewModel: tabCollectionViewModel) else {
+    func createTabBarViewController(coder: NSCoder, sender _: Any?, segueIdentifier _: String?) -> TabBarViewController? {
+        guard
+            let tabBarViewController = TabBarViewController(
+                coder: coder,
+                tabCollectionViewModel: tabCollectionViewModel) else {
             fatalError("MainViewController: Failed to init TabBarViewController")
         }
 
@@ -125,7 +127,7 @@ final class MainViewController: NSViewController {
     }
 
     @IBSegueAction
-    func createNavigationBarViewController(coder: NSCoder, sender: Any?, segueIdentifier: String?) -> NavigationBarViewController? {
+    func createNavigationBarViewController(coder: NSCoder, sender _: Any?, segueIdentifier _: String?) -> NavigationBarViewController? {
         guard let navigationBarViewController = NavigationBarViewController(coder: coder, tabCollectionViewModel: tabCollectionViewModel) else {
             fatalError("MainViewController: Failed to init NavigationBarViewController")
         }
@@ -135,9 +137,11 @@ final class MainViewController: NSViewController {
     }
 
     @IBSegueAction
-    func createWebViewController(coder: NSCoder, sender: Any?, segueIdentifier: String?) -> BrowserTabViewController? {
-        guard let browserTabViewController = BrowserTabViewController(coder: coder,
-                                                                      tabCollectionViewModel: tabCollectionViewModel) else {
+    func createWebViewController(coder: NSCoder, sender _: Any?, segueIdentifier _: String?) -> BrowserTabViewController? {
+        guard
+            let browserTabViewController = BrowserTabViewController(
+                coder: coder,
+                tabCollectionViewModel: tabCollectionViewModel) else {
             fatalError("MainViewController: Failed to init BrowserTabViewController")
         }
 
@@ -146,7 +150,7 @@ final class MainViewController: NSViewController {
     }
 
     @IBSegueAction
-    func createFindInPageViewController(coder: NSCoder, sender: Any?, segueIdentifier: String?) -> FindInPageViewController? {
+    func createFindInPageViewController(coder: NSCoder, sender _: Any?, segueIdentifier _: String?) -> FindInPageViewController? {
         let findInPageViewController = FindInPageViewController(coder: coder)
         findInPageViewController?.delegate = self
         self.findInPageViewController = findInPageViewController
@@ -154,9 +158,10 @@ final class MainViewController: NSViewController {
     }
 
     @IBSegueAction
-    func createFireViewController(coder: NSCoder, sender: Any?, segueIdentifier: String?) -> FireViewController? {
-        let fireViewController = FireViewController(coder: coder,
-                                                    tabCollectionViewModel: tabCollectionViewModel)
+    func createFireViewController(coder: NSCoder, sender _: Any?, segueIdentifier _: String?) -> FireViewController? {
+        let fireViewController = FireViewController(
+            coder: coder,
+            tabCollectionViewModel: tabCollectionViewModel)
         self.fireViewController = fireViewController
         return fireViewController
     }
@@ -192,29 +197,29 @@ final class MainViewController: NSViewController {
         tabCollectionViewModel.selectedTabViewModel?.tab.$content.receive(on: DispatchQueue.main).sink(receiveValue: { [weak self] content in
             self?.resizeNavigationBarForHomePage(content == .homePage, animated: content == .homePage && self?.lastTabContent != .homePage)
             self?.lastTabContent = content
-        }).store(in: &self.navigationalCancellables)
+        }).store(in: &navigationalCancellables)
     }
 
     private func subscribeToFindInPage() {
         let model = tabCollectionViewModel.selectedTabViewModel?.findInPage
         model?.$visible.receive(on: DispatchQueue.main).sink { [weak self] _ in
             self?.updateFindInPage()
-        }.store(in: &self.navigationalCancellables)
+        }.store(in: &navigationalCancellables)
     }
 
     private func subscribeToCanGoBackForward() {
         tabCollectionViewModel.selectedTabViewModel?.$canGoBack.receive(on: DispatchQueue.main).sink { [weak self] _ in
             self?.updateBackMenuItem()
-        }.store(in: &self.navigationalCancellables)
+        }.store(in: &navigationalCancellables)
         tabCollectionViewModel.selectedTabViewModel?.$canGoForward.receive(on: DispatchQueue.main).sink { [weak self] _ in
             self?.updateForwardMenuItem()
-        }.store(in: &self.navigationalCancellables)
+        }.store(in: &navigationalCancellables)
         tabCollectionViewModel.selectedTabViewModel?.$canReload.receive(on: DispatchQueue.main).sink { [weak self] _ in
             self?.updateReloadMenuItem()
-        }.store(in: &self.navigationalCancellables)
+        }.store(in: &navigationalCancellables)
         tabCollectionViewModel.selectedTabViewModel?.$isLoading.receive(on: DispatchQueue.main).sink { [weak self] _ in
             self?.updateStopMenuItem()
-        }.store(in: &self.navigationalCancellables)
+        }.store(in: &navigationalCancellables)
     }
 
     private func updateFindInPage() {
@@ -233,7 +238,7 @@ final class MainViewController: NSViewController {
     }
 
     private func updateBackMenuItem() {
-        guard self.view.window?.isMainWindow == true else { return }
+        guard view.window?.isMainWindow == true else { return }
         guard let selectedTabViewModel = tabCollectionViewModel.selectedTabViewModel else {
             os_log("MainViewController: No tab view model selected", type: .error)
             return
@@ -247,7 +252,7 @@ final class MainViewController: NSViewController {
     }
 
     private func updateForwardMenuItem() {
-        guard self.view.window?.isMainWindow == true else { return }
+        guard view.window?.isMainWindow == true else { return }
         guard let selectedTabViewModel = tabCollectionViewModel.selectedTabViewModel else {
             os_log("MainViewController: No tab view model selected", type: .error)
             return
@@ -261,12 +266,12 @@ final class MainViewController: NSViewController {
     }
 
     private func updateReloadMenuItem() {
-        guard self.view.window?.isMainWindow == true else { return }
+        guard view.window?.isMainWindow == true else { return }
         guard let selectedTabViewModel = tabCollectionViewModel.selectedTabViewModel else {
             os_log("MainViewController: No tab view model selected", type: .error)
             return
         }
-        guard let reloadMenuItem =  NSApplication.shared.mainMenuTyped.reloadMenuItem else {
+        guard let reloadMenuItem = NSApplication.shared.mainMenuTyped.reloadMenuItem else {
             assertionFailure("MainViewController: Failed to get reference to Reload menu item")
             return
         }
@@ -275,12 +280,12 @@ final class MainViewController: NSViewController {
     }
 
     private func updateStopMenuItem() {
-        guard self.view.window?.isMainWindow == true else { return }
+        guard view.window?.isMainWindow == true else { return }
         guard let selectedTabViewModel = tabCollectionViewModel.selectedTabViewModel else {
             os_log("MainViewController: No tab view model selected", type: .error)
             return
         }
-        guard let stopMenuItem =  NSApplication.shared.mainMenuTyped.stopMenuItem else {
+        guard let stopMenuItem = NSApplication.shared.mainMenuTyped.stopMenuItem else {
             assertionFailure("MainViewController: Failed to get reference to Stop menu item")
             return
         }
@@ -320,18 +325,19 @@ extension MainViewController {
             keyDownMonitor = nil
         }
 
-        self.keyDownMonitor = NSEvent.addLocalMonitorForEvents(matching: .keyDown) { [weak self] event in
+        keyDownMonitor = NSEvent.addLocalMonitorForEvents(matching: .keyDown) { [weak self] event in
             guard let self = self else { return nil }
             return self.customKeyDown(with: event) ? nil : event
         }
-        self.mouseNavButtonsMonitor = NSEvent.addLocalMonitorForEvents(matching: .otherMouseUp) { [weak self] event in
-            return self?.otherMouseUp(with: event)
+        mouseNavButtonsMonitor = NSEvent.addLocalMonitorForEvents(matching: .otherMouseUp) { [weak self] event in
+            self?.otherMouseUp(with: event)
         }
     }
 
     func customKeyDown(with event: NSEvent) -> Bool {
-       guard let locWindow = self.view.window,
-          NSApplication.shared.keyWindow === locWindow else { return false }
+        guard
+            let locWindow = view.window,
+            NSApplication.shared.keyWindow === locWindow else { return false }
 
         let flags = event.modifierFlags.intersection(.deviceIndependentFlagsMask)
             .subtracting(.capsLock)
@@ -365,16 +371,19 @@ extension MainViewController {
     }
 
     func otherMouseUp(with event: NSEvent) -> NSEvent? {
-        guard event.window === self.view.window,
-              self.webContainerView.isMouseLocationInsideBounds(event.locationInWindow)
+        guard
+            event.window === view.window,
+            webContainerView.isMouseLocationInsideBounds(event.locationInWindow)
         else { return event }
 
-        if event.buttonNumber == 3,
-           tabCollectionViewModel.selectedTabViewModel?.canGoBack == true {
+        if
+            event.buttonNumber == 3,
+            tabCollectionViewModel.selectedTabViewModel?.canGoBack == true {
             tabCollectionViewModel.selectedTabViewModel?.tab.goBack()
             return nil
-        } else if event.buttonNumber == 4,
-                  tabCollectionViewModel.selectedTabViewModel?.canGoForward == true {
+        } else if
+            event.buttonNumber == 4,
+            tabCollectionViewModel.selectedTabViewModel?.canGoForward == true {
             tabCollectionViewModel.selectedTabViewModel?.tab.goForward()
             return nil
         }

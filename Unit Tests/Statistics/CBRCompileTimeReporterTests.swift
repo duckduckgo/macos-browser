@@ -16,9 +16,9 @@
 //  limitations under the License.
 //
 
-import XCTest
 import OHHTTPStubs
 import OHHTTPStubsSwift
+import XCTest
 @testable import DuckDuckGo_Privacy_Browser
 
 class CBRCompileTimeReporterTests: XCTestCase {
@@ -49,20 +49,23 @@ class CBRCompileTimeReporterTests: XCTestCase {
     }
 
     @discardableResult
-    func performTest(withOnboardingFinished onboardingFinished: Bool,
-                     waitTime: TimeInterval,
-                     expectedWaitTime: Pixel.Event.CompileRulesWaitTime,
-                     result: Pixel.Event.WaitResult,
-                     runBeforeFinishing: ((Reporter) throws -> Void)? = nil) rethrows -> Reporter {
+    func performTest(
+        withOnboardingFinished onboardingFinished: Bool,
+        waitTime: TimeInterval,
+        expectedWaitTime: Pixel.Event.CompileRulesWaitTime,
+        result: Pixel.Event.WaitResult,
+        runBeforeFinishing: ((Reporter) throws -> Void)? = nil) rethrows
+        -> Reporter {
 
         HTTPStubs.removeAllStubs()
         defer {
             HTTPStubs.removeAllStubs()
         }
         let reporter = initReporter(onboardingFinished: onboardingFinished)
-        let pixel = Pixel.Event.compileRulesWait(onboardingShown: onboardingFinished ? .regularNavigation : .onboardingShown,
-                                                 waitTime: expectedWaitTime,
-                                                 result: result)
+        let pixel = Pixel.Event.compileRulesWait(
+            onboardingShown: onboardingFinished ? .regularNavigation : .onboardingShown,
+            waitTime: expectedWaitTime,
+            result: result)
 
         reporter.tabWillWaitForRulesCompilation(tab)
 
@@ -89,9 +92,10 @@ class CBRCompileTimeReporterTests: XCTestCase {
         case .closed:
             reporter.tabWillClose(tab)
         case .quit:
-            NotificationCenter.default.post(Notification(name: NSApplication.willTerminateNotification,
-                                                         object: NSApp,
-                                                         userInfo: nil))
+            NotificationCenter.default.post(Notification(
+                name: NSApplication.willTerminateNotification,
+                object: NSApp,
+                userInfo: nil))
         }
 
         waitForExpectations(timeout: 5)
@@ -99,18 +103,20 @@ class CBRCompileTimeReporterTests: XCTestCase {
     }
 
     typealias Pair = (TimeInterval, Pixel.Event.CompileRulesWaitTime)
-    let waitExpectationSeq: [Pair] = [(0, .noWait),
-                                      (0.5, .lessThan1s),
-                                      (1, .lessThan1s),
-                                      (2, .lessThan5s),
-                                      (4.5, .lessThan5s),
-                                      (6, .lessThan10s),
-                                      (9.5, .lessThan10s),
-                                      (19.5, .lessThan20s),
-                                      (21, .lessThan40s),
-                                      (39.5, .lessThan40s),
-                                      (41, .more),
-                                      (60, .more)]
+    let waitExpectationSeq: [Pair] = [
+        (0, .noWait),
+        (0.5, .lessThan1s),
+        (1, .lessThan1s),
+        (2, .lessThan5s),
+        (4.5, .lessThan5s),
+        (6, .lessThan10s),
+        (9.5, .lessThan10s),
+        (19.5, .lessThan20s),
+        (21, .lessThan40s),
+        (39.5, .lessThan40s),
+        (41, .more),
+        (60, .more)
+    ]
 
     func testWhenWaitingSucceedsDuringOnboardingThenPixelIsFired() {
         for (time, expectation) in waitExpectationSeq {
@@ -169,13 +175,14 @@ class CBRCompileTimeReporterTests: XCTestCase {
         }
 
         reporter.tabWillClose(tab)
-        NotificationCenter.default.post(Notification(name: NSApplication.willTerminateNotification,
-                                                     object: NSApp,
-                                                     userInfo: nil))
+        NotificationCenter.default.post(Notification(
+            name: NSApplication.willTerminateNotification,
+            object: NSApp,
+            userInfo: nil))
     }
 
     func testWhenMoreThanOneTabWaitThenOnlyOnePixelIsFiredAndTabsDeallocated() {
-        weak var tab1 = self.tab
+        weak var tab1 = tab
         weak var tab2: NSObject!
         weak var tab3: NSObject!
 
@@ -202,7 +209,7 @@ class CBRCompileTimeReporterTests: XCTestCase {
     }
 
     func testWhenNoWaitIsPerformedAndMoreThanOneTabWaitThenOnlyNoWaitPixelIsFired() {
-        weak var tab1 = self.tab
+        weak var tab1 = tab
         weak var tab2: NSObject!
         weak var tab3: NSObject!
 
@@ -229,7 +236,7 @@ class CBRCompileTimeReporterTests: XCTestCase {
     }
 
     func testWhenTabDisappearsWithoutTabWillCloseItIsDeallocated() {
-        weak var tab1 = self.tab
+        weak var tab1 = tab
 
         struct Err: Error {}
         autoreleasepool {
@@ -239,7 +246,7 @@ class CBRCompileTimeReporterTests: XCTestCase {
             }
         }
         XCTAssertNil(tab1)
-        
+
     }
 
 }

@@ -25,10 +25,11 @@ protocol FileDownloadManagerProtocol: AnyObject {
     var downloadsPublisher: AnyPublisher<WebKitDownloadTask, Never> { get }
 
     @discardableResult
-    func add(_ download: WebKitDownload,
-             delegate: FileDownloadManagerDelegate?,
-             location: FileDownloadManager.DownloadLocationPreference,
-             postflight: FileDownloadManager.PostflightAction?) -> WebKitDownloadTask
+    func add(
+        _ download: WebKitDownload,
+        delegate: FileDownloadManagerDelegate?,
+        location: FileDownloadManager.DownloadLocationPreference,
+        postflight: FileDownloadManager.PostflightAction?) -> WebKitDownloadTask
 
     func cancelAll(waitUntilDone: Bool)
 }
@@ -39,8 +40,9 @@ final class FileDownloadManager: FileDownloadManagerProtocol {
     private let workspace: NSWorkspace
     private let preferences: DownloadsPreferences
 
-    init(workspace: NSWorkspace = NSWorkspace.shared,
-         preferences: DownloadsPreferences = .init()) {
+    init(
+        workspace: NSWorkspace = NSWorkspace.shared,
+        preferences: DownloadsPreferences = .init()) {
         self.workspace = workspace
         self.preferences = preferences
     }
@@ -51,10 +53,11 @@ final class FileDownloadManager: FileDownloadManagerProtocol {
         downloadAddedSubject.eraseToAnyPublisher()
     }
 
-    typealias FileNameChooserCallback = (/*suggestedFilename:*/ String?,
-                                                                /*directoryURL:*/      URL?,
-                                                                /*fileTypes:*/         [UTType],
-                                                                /*completionHandler*/  @escaping (URL?, UTType?) -> Void) -> Void
+    typealias FileNameChooserCallback = (///suggestedFilename:
+        String?,
+        /*directoryURL:*/ URL?,
+        /*fileTypes:*/ [UTType],
+        /*completionHandler*/ @escaping (URL?, UTType?) -> Void) -> Void
     typealias FileIconOriginalRectCallback = (WebKitDownloadTask) -> NSRect?
 
     private var destinationChooserCallbacks = [WebKitDownloadTask: FileNameChooserCallback]()
@@ -89,20 +92,23 @@ final class FileDownloadManager: FileDownloadManagerProtocol {
     }
 
     @discardableResult
-    func add(_ download: WebKitDownload,
-             delegate: FileDownloadManagerDelegate?,
-             location: DownloadLocationPreference,
-             postflight: PostflightAction?) -> WebKitDownloadTask {
+    func add(
+        _ download: WebKitDownload,
+        delegate: FileDownloadManagerDelegate?,
+        location: DownloadLocationPreference,
+        postflight: PostflightAction?)
+        -> WebKitDownloadTask {
         dispatchPrecondition(condition: .onQueue(.main))
 
-        let task = WebKitDownloadTask(download: download,
-                                      promptForLocation: location.promptForLocation,
-                                      destinationURL: location.destinationURL,
-                                      tempURL: location.tempURL,
-                                      postflight: postflight)
+        let task = WebKitDownloadTask(
+            download: download,
+            promptForLocation: location.promptForLocation,
+            destinationURL: location.destinationURL,
+            tempURL: location.tempURL,
+            postflight: postflight)
 
-        self.destinationChooserCallbacks[task] = delegate?.chooseDestination
-        self.fileIconOriginalRectCallbacks[task] = delegate?.fileIconFlyAnimationOriginalRect
+        destinationChooserCallbacks[task] = delegate?.chooseDestination
+        fileIconOriginalRectCallbacks[task] = delegate?.fileIconFlyAnimationOriginalRect
 
         downloads.insert(task)
         downloadAddedSubject.send(task)
@@ -122,7 +128,7 @@ final class FileDownloadManager: FileDownloadManagerProtocol {
                 task.output.sink { _ in
                     dispatchGroup?.leave()
                 } receiveValue: { _ in }
-                .store(in: &cancellables)
+                    .store(in: &cancellables)
             }
 
             task.cancel()
@@ -136,14 +142,16 @@ final class FileDownloadManager: FileDownloadManagerProtocol {
 
 extension FileDownloadManager: WebKitDownloadTaskDelegate {
 
-    func fileDownloadTaskNeedsDestinationURL(_ task: WebKitDownloadTask,
-                                             suggestedFilename: String,
-                                             completionHandler: @escaping (URL?, UTType?) -> Void) {
+    func fileDownloadTaskNeedsDestinationURL(
+        _ task: WebKitDownloadTask,
+        suggestedFilename: String,
+        completionHandler: @escaping (URL?, UTType?) -> Void) {
         dispatchPrecondition(condition: .onQueue(.main))
 
         let completion: (URL?, UTType?) -> Void = { url, fileType in
-            if let url = url,
-               let originalRect = self.fileIconOriginalRectCallbacks[task]?(task) {
+            if
+                let url = url,
+                let originalRect = self.fileIconOriginalRectCallbacks[task]?(task) {
                 task.progress.flyToImage = (UTType(fileExtension: url.pathExtension) ?? fileType)?.icon
                 task.progress.fileIconOriginalRect = originalRect
             }
@@ -157,8 +165,9 @@ extension FileDownloadManager: WebKitDownloadTaskDelegate {
         let downloadLocation = preferences.effectiveDownloadLocation
         let fileType = task.suggestedFileType
 
-        guard task.shouldPromptForLocation || preferences.alwaysRequestDownloadLocation,
-              let locationChooser = self.destinationChooserCallbacks[task]
+        guard
+            task.shouldPromptForLocation || preferences.alwaysRequestDownloadLocation,
+            let locationChooser = destinationChooserCallbacks[task]
         else {
             // download to default Downloads destination
             var fileName = suggestedFilename
@@ -182,8 +191,9 @@ extension FileDownloadManager: WebKitDownloadTaskDelegate {
         }
 
         locationChooser(suggestedFilename, downloadLocation, fileType.map { [$0] } ?? []) { url, fileType in
-            if let url = url,
-               FileManager.default.fileExists(atPath: url.path) {
+            if
+                let url = url,
+                FileManager.default.fileExists(atPath: url.path) {
                 // if SavePanel points to an existing location that means overwrite was chosen
                 try? FileManager.default.removeItem(at: url)
             }
@@ -202,8 +212,9 @@ extension FileDownloadManager: WebKitDownloadTaskDelegate {
         }
 
         if case .success(let url) = result {
-            try? url.setQuarantineAttributes(sourceURL: task.originalRequest?.url,
-                                             referrerURL: task.originalRequest?.mainDocumentURL)
+            try? url.setQuarantineAttributes(
+                sourceURL: task.originalRequest?.url,
+                referrerURL: task.originalRequest?.mainDocumentURL)
 
             switch task.postflight {
             case .open:

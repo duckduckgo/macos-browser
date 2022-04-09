@@ -20,140 +20,140 @@ import SwiftUI
 
 extension HomePage.Views {
 
-struct Favorites: View {
+    struct Favorites: View {
 
-    @EnvironmentObject var model: HomePage.Models.FavoritesModel
+        @EnvironmentObject var model: HomePage.Models.FavoritesModel
 
-    @State var isHovering = false
+        @State var isHovering = false
 
-    var rowIndices: Range<Int> {
-        model.showAllFavorites ? model.rows.indices : model.rows.indices.prefix(HomePage.favoritesRowCountWhenCollapsed)
-    }
-
-    var body: some View {
-
-        let addButton = ZStack(alignment: .top) {
-            FavoriteTemplate(title: UserText.addFavorite, domain: nil)
-            ZStack {
-                Image("Add")
-                    .resizable()
-                    .frame(width: 22, height: 22)
-            }.frame(width: 64, height: 64)
-        }
-        .link {
-            model.addNew()
+        var rowIndices: Range<Int> {
+            model.showAllFavorites ? model.rows.indices : model.rows.indices.prefix(HomePage.favoritesRowCountWhenCollapsed)
         }
 
-        let ghostButton = VStack {
-            RoundedRectangle(cornerRadius: 12)
-                .stroke(Color("HomeFavoritesGhostColor"), style: StrokeStyle(lineWidth: 1.5, dash: [4.0, 2.0]))
-                .frame(width: 64, height: 64)
-        }.frame(width: 64)
+        var body: some View {
 
-        VStack(spacing: 4) {
+            let addButton = ZStack(alignment: .top) {
+                FavoriteTemplate(title: UserText.addFavorite, domain: nil)
+                ZStack {
+                    Image("Add")
+                        .resizable()
+                        .frame(width: 22, height: 22)
+                }.frame(width: 64, height: 64)
+            }
+            .link {
+                model.addNew()
+            }
 
-            ForEach(rowIndices, id: \.self) { index in
+            let ghostButton = VStack {
+                RoundedRectangle(cornerRadius: 12)
+                    .stroke(Color("HomeFavoritesGhostColor"), style: StrokeStyle(lineWidth: 1.5, dash: [4.0, 2.0]))
+                    .frame(width: 64, height: 64)
+            }.frame(width: 64)
 
-                HStack(alignment: .top, spacing: 20) {
-                    ForEach(model.rows[index], id: \.id) { favorite in
+            VStack(spacing: 4) {
 
-                        switch favorite.favoriteType {
-                        case .bookmark(let bookmark):
-                            Favorite(bookmark: bookmark)
+                ForEach(rowIndices, id: \.self) { index in
 
-                        case .addButton:
-                            addButton
+                    HStack(alignment: .top, spacing: 20) {
+                        ForEach(model.rows[index], id: \.id) { favorite in
 
-                        case .ghostButton:
-                            ghostButton
+                            switch favorite.favoriteType {
+                            case .bookmark(let bookmark):
+                                Favorite(bookmark: bookmark)
+
+                            case .addButton:
+                                addButton
+
+                            case .ghostButton:
+                                ghostButton
+                            }
                         }
                     }
+
                 }
-                
+
+                MoreOrLess(isExpanded: $model.showAllFavorites)
+                    .padding(.top, 2)
+                    .visibility(model.rows.count > HomePage.favoritesRowCountWhenCollapsed && isHovering ? .visible : .invisible)
+
+            }
+            .frame(maxWidth: .infinity)
+            .onHover { isHovering in
+                self.isHovering = isHovering
             }
 
-            MoreOrLess(isExpanded: $model.showAllFavorites)
-                .padding(.top, 2)
-                .visibility(model.rows.count > HomePage.favoritesRowCountWhenCollapsed && isHovering ? .visible : .invisible)
-
-        }
-        .frame(maxWidth: .infinity)
-        .onHover { isHovering in
-            self.isHovering = isHovering
         }
 
     }
 
-}
+    struct FavoriteTemplate: View {
 
-struct FavoriteTemplate: View {
+        let title: String
+        let domain: String?
 
-    let title: String
-    let domain: String?
+        @State var isHovering = false
 
-    @State var isHovering = false
+        var body: some View {
+            VStack(spacing: 5) {
 
-    var body: some View {
-        VStack(spacing: 5) {
+                ZStack(alignment: .center) {
 
-            ZStack(alignment: .center) {
+                    RoundedRectangle(cornerRadius: 12)
+                        .foregroundColor(isHovering ? Color("HomeFavoritesHoverColor") : Color("HomeFavoritesBackgroundColor"))
 
-                RoundedRectangle(cornerRadius: 12)
-                    .foregroundColor(isHovering ? Color("HomeFavoritesHoverColor") : Color("HomeFavoritesBackgroundColor"))
-
-                if let domain = domain {
-                    FaviconView(domain: domain)
-                        .frame(width: 32, height: 32)
-                        .padding(9)
+                    if let domain = domain {
+                        FaviconView(domain: domain)
+                            .frame(width: 32, height: 32)
+                            .padding(9)
+                    }
                 }
+                .frame(width: 64, height: 64)
+                .clipped()
+
+                Text(title)
+                    .multilineTextAlignment(.center)
+                    .lineLimit(2)
+                    .font(.system(size: 11))
+                    .frame(height: 32, alignment: .top)
+
             }
-            .frame(width: 64, height: 64)
-            .clipped()
+            .frame(width: 64)
+            .frame(maxWidth: 64)
+            .onHover { isHovering in
+                self.isHovering = isHovering
 
-            Text(title)
-                .multilineTextAlignment(.center)
-                .lineLimit(2)
-                .font(.system(size: 11))
-                .frame(height: 32, alignment: .top)
+                if isHovering {
+                    NSCursor.pointingHand.push()
+                } else {
+                    NSCursor.pointingHand.pop()
+                }
 
-        }
-        .frame(width: 64)
-        .frame(maxWidth: 64)
-        .onHover { isHovering in
-            self.isHovering = isHovering
-            
-            if isHovering {
-                NSCursor.pointingHand.push()
-            } else {
-                NSCursor.pointingHand.pop()
             }
-
         }
-    }
-
-}
-
-struct Favorite: View {
-
-    @EnvironmentObject var model: HomePage.Models.FavoritesModel
-
-    let bookmark: Bookmark
-
-    var body: some View {
-
-        FavoriteTemplate(title: bookmark.title, domain: bookmark.url.host)
-            .link {
-                model.open(bookmark)
-            }.contextMenu(ContextMenu(menuItems: {
-                Button(UserText.openInNewTab, action: { model.openInNewTab(bookmark) })
-                Button(UserText.openInNewWindow, action: { model.openInNewWindow(bookmark) })
-                Divider()
-                Button(UserText.edit, action: { model.edit(bookmark) })
-                Button(UserText.remove, action: { model.remove(bookmark) })
-            }))
 
     }
 
-}
+    struct Favorite: View {
+
+        @EnvironmentObject var model: HomePage.Models.FavoritesModel
+
+        let bookmark: Bookmark
+
+        var body: some View {
+
+            FavoriteTemplate(title: bookmark.title, domain: bookmark.url.host)
+                .link {
+                    model.open(bookmark)
+                }.contextMenu(ContextMenu(menuItems: {
+                    Button(UserText.openInNewTab, action: { model.openInNewTab(bookmark) })
+                    Button(UserText.openInNewWindow, action: { model.openInNewWindow(bookmark) })
+                    Divider()
+                    Button(UserText.edit, action: { model.edit(bookmark) })
+                    Button(UserText.remove, action: { model.remove(bookmark) })
+                }))
+
+        }
+
+    }
 
 }

@@ -31,9 +31,11 @@ extension PermissionStore {
     func update(objectWithId id: NSManagedObjectID, decision: PersistedPermissionDecision?) {
         update(objectWithId: id, decision: decision, completionHandler: nil)
     }
+
     func remove(objectWithId id: NSManagedObjectID) {
         remove(objectWithId: id, completionHandler: nil)
     }
+
     func clear(except exceptions: [StoredPermission]) {
         clear(except: exceptions, completionHandler: nil)
     }
@@ -43,12 +45,12 @@ final class LocalPermissionStore: PermissionStore {
     private var _context: NSManagedObjectContext??
     private var context: NSManagedObjectContext? {
         if case .none = _context {
-#if DEBUG
+            #if DEBUG
             if AppDelegate.isRunningTests {
                 _context = .some(.none)
                 return .none
             }
-#endif
+            #endif
             _context = Database.shared.makeContext(concurrencyType: .privateQueueConcurrencyType, name: "Permissions")
         }
         return _context!
@@ -58,7 +60,7 @@ final class LocalPermissionStore: PermissionStore {
     }
 
     init(context: NSManagedObjectContext) {
-        self._context = .some(context)
+        _context = .some(context)
     }
 
     func loadPermissions() throws -> [PermissionEntity] {
@@ -134,8 +136,9 @@ final class LocalPermissionStore: PermissionStore {
 
         context.perform { [context] in
             let deleteRequest = NSFetchRequest<NSFetchRequestResult>(entityName: PermissionManagedObject.className())
-            deleteRequest.predicate = NSPredicate(format: "NOT (self IN %@)",
-                                                  exceptions.map { context.object(with: $0.id) })
+            deleteRequest.predicate = NSPredicate(
+                format: "NOT (self IN %@)",
+                exceptions.map { context.object(with: $0.id) })
             let batchDeleteRequest = NSBatchDeleteRequest(fetchRequest: deleteRequest)
             batchDeleteRequest.resultType = .resultTypeObjectIDs
 
@@ -151,15 +154,17 @@ final class LocalPermissionStore: PermissionStore {
         }
     }
 
-    private func performAdd(domain: String,
-                            permissionType: PermissionType,
-                            decision: PersistedPermissionDecision) -> Result<NSManagedObjectID, Error>? {
+    private func performAdd(
+        domain: String,
+        permissionType: PermissionType,
+        decision: PersistedPermissionDecision) -> Result<NSManagedObjectID, Error>? {
         guard let context = context else { return nil }
 
         var result: Result<NSManagedObjectID, Error>?
         context.performAndWait { [context] in
             let entityName = PermissionManagedObject.className()
-            guard let managedObject = NSEntityDescription
+            guard
+                let managedObject = NSEntityDescription
                     .insertNewObject(forEntityName: entityName, into: context) as? PermissionManagedObject
             else { return }
 

@@ -23,39 +23,40 @@ final class TabCollectionViewModelDelegateMock: TabCollectionViewModelDelegate {
 
     var didAppendCalled = false
 
-    func tabCollectionViewModelDidAppend(_ tabCollectionViewModel: TabCollectionViewModel, selected: Bool) {
+    func tabCollectionViewModelDidAppend(_: TabCollectionViewModel, selected _: Bool) {
         didAppendCalled = true
     }
 
     var didInsertCalled = false
 
-    func tabCollectionViewModelDidInsert(_ tabCollectionViewModel: TabCollectionViewModel, at index: Int, selected: Bool) {
+    func tabCollectionViewModelDidInsert(_: TabCollectionViewModel, at _: Int, selected _: Bool) {
         didInsertCalled = true
     }
 
     var didRemoveCalled = false
 
-    func tabCollectionViewModel(_ tabCollectionViewModel: TabCollectionViewModel,
-                                didRemoveTabAt removalIndex: Int,
-                                andSelectTabAt selectionIndex: Int?) {
+    func tabCollectionViewModel(
+        _: TabCollectionViewModel,
+        didRemoveTabAt _: Int,
+        andSelectTabAt _: Int?) {
         didRemoveCalled = true
     }
 
     var didMoveCalled = false
 
-    func tabCollectionViewModel(_ tabCollectionViewModel: TabCollectionViewModel, didMoveTabAt index: Int, to newIndex: Int) {
+    func tabCollectionViewModel(_: TabCollectionViewModel, didMoveTabAt _: Int, to _: Int) {
         didMoveCalled = true
     }
 
     var didSelectCalled = false
 
-    func tabCollectionViewModel(_ tabCollectionViewModel: TabCollectionViewModel, didSelectAt selectionIndex: Int?) {
+    func tabCollectionViewModel(_: TabCollectionViewModel, didSelectAt _: Int?) {
         didSelectCalled = true
     }
 
     var didMultipleChangesCalled = false
 
-    func tabCollectionViewModelDidMultipleChanges(_ tabCollectionViewModel: TabCollectionViewModel) {
+    func tabCollectionViewModelDidMultipleChanges(_: TabCollectionViewModel) {
         didMultipleChangesCalled = true
     }
 

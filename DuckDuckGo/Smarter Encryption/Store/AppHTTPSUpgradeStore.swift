@@ -16,48 +16,49 @@
 //  limitations under the License.
 //
 
-import Foundation
-import CoreData
-import os.log
 import BrowserServicesKit
+import CoreData
+import Foundation
+import os.log
 
 extension HTTPSStoredBloomFilterSpecification: Managed {}
 extension HTTPSExcludedDomain: Managed {}
 
 public final class AppHTTPSUpgradeStore: HTTPSUpgradeStore {
-    
-    private struct Resource {
+
+    private enum Resource {
         static var bloomFilter: URL {
-            return URL.sandboxApplicationSupportURL.appendingPathComponent("HttpsBloomFilter.bin")
+            URL.sandboxApplicationSupportURL.appendingPathComponent("HttpsBloomFilter.bin")
         }
     }
-    
-    private struct EmbeddedResource {
+
+    private enum EmbeddedResource {
         static let bloomSpecification = Bundle.main.url(forResource: "httpsMobileV2BloomSpec", withExtension: "json")!
         static let bloomFilter = Bundle.main.url(forResource: "httpsMobileV2Bloom", withExtension: "bin")!
         static let excludedDomains = Bundle.main.url(forResource: "httpsMobileV2FalsePositives", withExtension: "json")!
     }
-    
+
     private struct EmbeddedBloomData {
         let specification: HTTPSBloomFilterSpecification
         let bloomFilter: Data
         let excludedDomains: [String]
     }
-    
+
     private let context = Database.shared.makeContext(concurrencyType: .privateQueueConcurrencyType, name: "HTTPSUpgrade")
-    
+
     private var hasBloomFilterData: Bool {
-        return (try? Resource.bloomFilter.checkResourceIsReachable()) ?? false
+        (try? Resource.bloomFilter.checkResourceIsReachable()) ?? false
     }
-    
+
     public var bloomFilter: BloomFilterWrapper? {
         let storedSpecification = hasBloomFilterData ? bloomFilterSpecification : loadEmbeddedData()?.specification
         guard let specification = storedSpecification else { return nil }
-        return BloomFilterWrapper(fromPath: Resource.bloomFilter.path,
-                                  withBitCount: Int32(specification.bitCount),
-                                  andTotalItems: Int32(specification.totalEntries))
+        return BloomFilterWrapper(
+            fromPath: Resource.bloomFilter.path,
+            withBitCount: Int32(specification.bitCount),
+            andTotalItems: Int32(specification.totalEntries))
     }
-    
+
     public var bloomFilterSpecification: HTTPSBloomFilterSpecification? {
         var specification: HTTPSBloomFilterSpecification?
         context.performAndWait {
@@ -69,14 +70,15 @@ public final class AppHTTPSUpgradeStore: HTTPSUpgradeStore {
         }
         return specification ?? loadEmbeddedData()?.specification
     }
-    
+
     private func loadEmbeddedData() -> EmbeddedBloomData? {
         os_log("Loading embedded https data")
-        guard let specificationData = try? Data(contentsOf: EmbeddedResource.bloomSpecification),
-              let specification = try? JSONDecoder().decode(HTTPSBloomFilterSpecification.self, from: specificationData),
-              let bloomData = try? Data(contentsOf: EmbeddedResource.bloomFilter),
-              let excludedDomainsData = try? Data(contentsOf: EmbeddedResource.excludedDomains),
-              let excludedDomains = try? JSONDecoder().decode(HTTPSExcludedDomains.self, from: excludedDomainsData)
+        guard
+            let specificationData = try? Data(contentsOf: EmbeddedResource.bloomSpecification),
+            let specification = try? JSONDecoder().decode(HTTPSBloomFilterSpecification.self, from: specificationData),
+            let bloomData = try? Data(contentsOf: EmbeddedResource.bloomFilter),
+            let excludedDomainsData = try? Data(contentsOf: EmbeddedResource.excludedDomains),
+            let excludedDomains = try? JSONDecoder().decode(HTTPSExcludedDomains.self, from: excludedDomainsData)
         else {
             return nil
         }
@@ -84,14 +86,15 @@ public final class AppHTTPSUpgradeStore: HTTPSUpgradeStore {
         persistExcludedDomains(excludedDomains.data)
         return EmbeddedBloomData(specification: specification, bloomFilter: bloomData, excludedDomains: excludedDomains.data)
     }
-    
-    @discardableResult func persistBloomFilter(specification: HTTPSBloomFilterSpecification, data: Data) -> Bool {
+
+    @discardableResult
+    func persistBloomFilter(specification: HTTPSBloomFilterSpecification, data: Data) -> Bool {
         guard data.sha256 == specification.sha256 else { return false }
         guard persistBloomFilter(data: data) else { return false }
         persistBloomFilterSpecification(specification)
         return true
     }
-    
+
     private func persistBloomFilter(data: Data) -> Bool {
         do {
             try data.write(to: Resource.bloomFilter, options: .atomic)
@@ -100,22 +103,22 @@ public final class AppHTTPSUpgradeStore: HTTPSUpgradeStore {
             return false
         }
     }
-    
+
     private func deleteBloomFilter() {
         try? FileManager.default.removeItem(at: Resource.bloomFilter)
     }
-    
+
     func persistBloomFilterSpecification(_ specification: HTTPSBloomFilterSpecification) {
-        
+
         context.performAndWait {
             deleteBloomFilterSpecification()
-                        
+
             let storedEntity: HTTPSStoredBloomFilterSpecification = context.insertObject()
             storedEntity.bitCount = Int64(specification.bitCount)
             storedEntity.totalEntries = Int64(specification.totalEntries)
             storedEntity.errorRate = specification.errorRate
             storedEntity.sha256 = specification.sha256
-            
+
             do {
                 try context.save()
             } catch {
@@ -123,13 +126,13 @@ public final class AppHTTPSUpgradeStore: HTTPSUpgradeStore {
             }
         }
     }
-    
+
     private func deleteBloomFilterSpecification() {
         context.performAndWait {
             context.deleteAll(matching: HTTPSStoredBloomFilterSpecification.fetchRequest())
         }
     }
-    
+
     public func hasExcludedDomain(_ domain: String) -> Bool {
         var result = false
         context.performAndWait {
@@ -140,12 +143,13 @@ public final class AppHTTPSUpgradeStore: HTTPSUpgradeStore {
         }
         return result
     }
-    
-    @discardableResult public func persistExcludedDomains(_ domains: [String]) -> Bool {
+
+    @discardableResult
+    public func persistExcludedDomains(_ domains: [String]) -> Bool {
         var result = true
         context.performAndWait {
             deleteExcludedDomains()
-            
+
             for domain in domains {
                 let storedDomain: HTTPSExcludedDomain = context.insertObject()
                 storedDomain.domain = domain.lowercased()
@@ -159,13 +163,13 @@ public final class AppHTTPSUpgradeStore: HTTPSUpgradeStore {
         }
         return result
     }
-    
+
     private func deleteExcludedDomains() {
         context.performAndWait {
             context.deleteAll(matching: HTTPSExcludedDomain.fetchRequest())
         }
     }
-    
+
     func reset() {
         deleteBloomFilterSpecification()
         deleteBloomFilter()

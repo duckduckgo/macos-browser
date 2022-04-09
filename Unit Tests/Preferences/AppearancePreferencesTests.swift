@@ -35,9 +35,7 @@ final class AppearancePreferencesTests: XCTestCase {
         var model = AppearancePreferences(
             persistor: AppearancePreferencesPersistorMock(
                 showFullURL: false,
-                currentThemeName: ThemeName.systemDefault.rawValue
-            )
-        )
+                currentThemeName: ThemeName.systemDefault.rawValue))
 
         XCTAssertEqual(model.showFullURL, false)
         XCTAssertEqual(model.currentThemeName, ThemeName.systemDefault)
@@ -45,9 +43,7 @@ final class AppearancePreferencesTests: XCTestCase {
         model = AppearancePreferences(
             persistor: AppearancePreferencesPersistorMock(
                 showFullURL: true,
-                currentThemeName: ThemeName.light.rawValue
-            )
-        )
+                currentThemeName: ThemeName.light.rawValue))
 
         XCTAssertEqual(model.showFullURL, true)
         XCTAssertEqual(model.currentThemeName, ThemeName.light)
@@ -57,9 +53,7 @@ final class AppearancePreferencesTests: XCTestCase {
         let model = AppearancePreferences(
             persistor: AppearancePreferencesPersistorMock(
                 showFullURL: false,
-                currentThemeName: "garbage"
-            )
-        )
+                currentThemeName: "garbage"))
 
         XCTAssertEqual(model.currentThemeName, ThemeName.systemDefault)
     }

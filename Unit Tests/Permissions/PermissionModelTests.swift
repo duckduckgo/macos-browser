@@ -16,11 +16,11 @@
 //  limitations under the License.
 //
 
-import Foundation
-import XCTest
-import WebKit
-import Combine
 import AVFoundation
+import Combine
+import Foundation
+import WebKit
+import XCTest
 @testable import DuckDuckGo_Privacy_Browser
 
 // swiftlint:disable file_length
@@ -47,9 +47,10 @@ final class PermissionModelTests: XCTestCase {
 
         geolocationProviderMock = GeolocationProviderMock(geolocationService: geolocationServiceMock)
         webView.configuration.processPool.geolocationProvider = geolocationProviderMock
-        model = PermissionModel(webView: webView,
-                                permissionManager: permissionManagerMock,
-                                geolocationService: geolocationServiceMock)
+        model = PermissionModel(
+            webView: webView,
+            permissionManager: permissionManagerMock,
+            geolocationService: geolocationServiceMock)
 
         AVCaptureDeviceMock.authorizationStatuses = nil
     }
@@ -83,8 +84,10 @@ final class PermissionModelTests: XCTestCase {
         } else {
             webView.mediaCaptureState = [.activeCamera, .activeMicrophone]
         }
-        XCTAssertEqual(model.permissions, [.microphone: .active,
-                                           .camera: .active])
+        XCTAssertEqual(model.permissions, [
+            .microphone: .active,
+            .camera: .active
+        ])
     }
 
     func testWhenLocationIsActivatedThenLocationPermissionChangesToActive() {
@@ -105,8 +108,10 @@ final class PermissionModelTests: XCTestCase {
             webView.mediaCaptureState = []
         }
 
-        XCTAssertEqual(model.permissions, [.microphone: .inactive,
-                                           .camera: .inactive])
+        XCTAssertEqual(model.permissions, [
+            .microphone: .inactive,
+            .camera: .inactive
+        ])
     }
 
     func testWhenLocationIsDeactivatedThenStateChangesToInactive() {
@@ -127,14 +132,18 @@ final class PermissionModelTests: XCTestCase {
             e.fulfill()
         }
 
-        self.webView(webView, requestUserMediaAuthorizationFor: [.microphone, .camera],
-                     url: .duckDuckGo,
-                     mainFrameURL: .duckDuckGo) { _ in }
+        webView(
+            webView,
+            requestUserMediaAuthorizationFor: [.microphone, .camera],
+            url: .duckDuckGo,
+            mainFrameURL: .duckDuckGo) { _ in }
 
         withExtendedLifetime(c) {
             waitForExpectations(timeout: 1)
-            XCTAssertEqual(model.permissions, [.camera: .requested(model.authorizationQuery!),
-                                               .microphone: .requested(model.authorizationQuery!)])
+            XCTAssertEqual(model.permissions, [
+                .camera: .requested(model.authorizationQuery!),
+                .microphone: .requested(model.authorizationQuery!)
+            ])
         }
     }
 
@@ -150,10 +159,11 @@ final class PermissionModelTests: XCTestCase {
             e.fulfill()
         }
 
-        self.webView(webView,
-                     requestMediaCapturePermissionFor: securityOrigin,
-                     initiatedByFrame: frameInfo,
-                     type: .microphone) { _ in }
+        webView(
+            webView,
+            requestMediaCapturePermissionFor: securityOrigin,
+            initiatedByFrame: frameInfo,
+            type: .microphone) { _ in }
 
         withExtendedLifetime(c) {
             waitForExpectations(timeout: 1)
@@ -168,24 +178,28 @@ final class PermissionModelTests: XCTestCase {
         }
 
         let e = expectation(description: "Permission granted")
-        self.webView(webView, requestUserMediaAuthorizationFor: [.microphone, .camera],
-                     url: .duckDuckGo,
-                     mainFrameURL: .duckDuckGo) { granted in
-            XCTAssertTrue(granted)
-            e.fulfill()
-            if #available(macOS 12, *) {
-                self.webView.cameraCaptureState = .active
-                self.webView.microphoneCaptureState = .active
-            } else {
-                self.webView.mediaCaptureState = [.activeCamera, .activeMicrophone]
+        webView(
+            webView,
+            requestUserMediaAuthorizationFor: [.microphone, .camera],
+            url: .duckDuckGo,
+            mainFrameURL: .duckDuckGo) { granted in
+                XCTAssertTrue(granted)
+                e.fulfill()
+                if #available(macOS 12, *) {
+                    self.webView.cameraCaptureState = .active
+                    self.webView.microphoneCaptureState = .active
+                } else {
+                    self.webView.mediaCaptureState = [.activeCamera, .activeMicrophone]
+                }
             }
-        }
 
         withExtendedLifetime(c) {
             waitForExpectations(timeout: 1)
         }
-        XCTAssertEqual(model.permissions, [.camera: .active,
-                                           .microphone: .active])
+        XCTAssertEqual(model.permissions, [
+            .camera: .active,
+            .microphone: .active
+        ])
         XCTAssertEqual(permissionManagerMock.permission(forDomain: URL.duckDuckGo.host!, permissionType: .camera), .ask)
         XCTAssertEqual(permissionManagerMock.permission(forDomain: URL.duckDuckGo.host!, permissionType: .microphone), .ask)
     }
@@ -198,24 +212,28 @@ final class PermissionModelTests: XCTestCase {
         }
 
         let e = expectation(description: "Permission granted")
-        self.webView(webView, requestUserMediaAuthorizationFor: [.microphone, .camera],
-                     url: .duckDuckGo,
-                     mainFrameURL: .duckDuckGo) { granted in
-            XCTAssertTrue(granted)
-            e.fulfill()
-            if #available(macOS 12, *) {
-                self.webView.cameraCaptureState = .active
-                self.webView.microphoneCaptureState = .active
-            } else {
-                self.webView.mediaCaptureState = [.activeCamera, .activeMicrophone]
+        webView(
+            webView,
+            requestUserMediaAuthorizationFor: [.microphone, .camera],
+            url: .duckDuckGo,
+            mainFrameURL: .duckDuckGo) { granted in
+                XCTAssertTrue(granted)
+                e.fulfill()
+                if #available(macOS 12, *) {
+                    self.webView.cameraCaptureState = .active
+                    self.webView.microphoneCaptureState = .active
+                } else {
+                    self.webView.mediaCaptureState = [.activeCamera, .activeMicrophone]
+                }
             }
-        }
 
         withExtendedLifetime(c) {
             waitForExpectations(timeout: 1)
         }
-        XCTAssertEqual(model.permissions, [.camera: .active,
-                                           .microphone: .active])
+        XCTAssertEqual(model.permissions, [
+            .camera: .active,
+            .microphone: .active
+        ])
         XCTAssertEqual(permissionManagerMock.permission(forDomain: URL.duckDuckGo.host!, permissionType: .camera), .allow)
         XCTAssertEqual(permissionManagerMock.permission(forDomain: URL.duckDuckGo.host!, permissionType: .microphone), .allow)
     }
@@ -228,12 +246,14 @@ final class PermissionModelTests: XCTestCase {
         }
 
         let e = expectation(description: "Permission granted")
-        self.webView(webView, requestUserMediaAuthorizationFor: [.microphone, .camera],
-                     url: .duckDuckGo,
-                     mainFrameURL: .duckDuckGo) { granted in
-            XCTAssertFalse(granted)
-            e.fulfill()
-        }
+        webView(
+            webView,
+            requestUserMediaAuthorizationFor: [.microphone, .camera],
+            url: .duckDuckGo,
+            mainFrameURL: .duckDuckGo) { granted in
+                XCTAssertFalse(granted)
+                e.fulfill()
+            }
 
         withExtendedLifetime(c) {
             waitForExpectations(timeout: 1)
@@ -243,13 +263,13 @@ final class PermissionModelTests: XCTestCase {
     }
 
     func testWhenLocationPermissionIsGrantedThenItIsProvidedToDecisionHandler() {
-        self.geolocationServiceMock.authorizationStatus = .authorized
+        geolocationServiceMock.authorizationStatus = .authorized
         let c = model.$authorizationQuery.sink {
             $0?.handleDecision(grant: true)
         }
 
         let e = expectation(description: "Permission granted")
-        self.webView(webView, requestGeolocationPermissionFor: frameInfo) { granted in
+        webView(webView, requestGeolocationPermissionFor: frameInfo) { granted in
             XCTAssertTrue(granted)
             e.fulfill()
             self.geolocationProviderMock.isActive = true
@@ -269,12 +289,14 @@ final class PermissionModelTests: XCTestCase {
         }
 
         let e = expectation(description: "Permission granted")
-        self.webView(webView, requestUserMediaAuthorizationFor: [.microphone, .camera],
-                     url: .duckDuckGo,
-                     mainFrameURL: .duckDuckGo) { granted in
-            XCTAssertFalse(granted)
-            e.fulfill()
-        }
+        webView(
+            webView,
+            requestUserMediaAuthorizationFor: [.microphone, .camera],
+            url: .duckDuckGo,
+            mainFrameURL: .duckDuckGo) { granted in
+                XCTAssertFalse(granted)
+                e.fulfill()
+            }
 
         withExtendedLifetime(c) {
             waitForExpectations(timeout: 1)
@@ -290,7 +312,7 @@ final class PermissionModelTests: XCTestCase {
         }
 
         let e = expectation(description: "Permission granted")
-        self.webView(webView, requestGeolocationPermissionFor: frameInfo) { granted in
+        webView(webView, requestGeolocationPermissionFor: frameInfo) { granted in
             XCTAssertFalse(granted)
             e.fulfill()
         }
@@ -322,26 +344,26 @@ final class PermissionModelTests: XCTestCase {
 
     func testWhenAllowPermissionIsPersistedThenPermissionQueryIsGranted() {
         let e = expectation(description: "Permission granted")
-        self.webView.urlValue = URL.duckDuckGo
-        self.webView(webView, requestGeolocationPermissionFor: frameInfo) { granted in
+        webView.urlValue = URL.duckDuckGo
+        webView(webView, requestGeolocationPermissionFor: frameInfo) { granted in
             XCTAssertTrue(granted)
             e.fulfill()
         }
 
-        self.permissionManagerMock.setPermission(.allow, forDomain: URL.duckDuckGo.host!, permissionType: .geolocation)
+        permissionManagerMock.setPermission(.allow, forDomain: URL.duckDuckGo.host!, permissionType: .geolocation)
         permissionManagerMock.permissionSubject.send( (URL.duckDuckGo.host!, .geolocation, .allow) )
         waitForExpectations(timeout: 1)
     }
 
     func testWhenDenyPermissionIsPersistedThenPermissionQueryIsDenied() {
         let e = expectation(description: "Permission granted")
-        self.webView.urlValue = URL.duckDuckGo
-        self.webView(webView, requestGeolocationPermissionFor: frameInfo) { granted in
+        webView.urlValue = URL.duckDuckGo
+        webView(webView, requestGeolocationPermissionFor: frameInfo) { granted in
             XCTAssertFalse(granted)
             e.fulfill()
         }
 
-        self.permissionManagerMock.setPermission(.deny, forDomain: URL.duckDuckGo.host!, permissionType: .geolocation)
+        permissionManagerMock.setPermission(.deny, forDomain: URL.duckDuckGo.host!, permissionType: .geolocation)
         permissionManagerMock.permissionSubject.send( (URL.duckDuckGo.host!, .geolocation, .deny) )
         waitForExpectations(timeout: 1)
     }
@@ -349,7 +371,7 @@ final class PermissionModelTests: XCTestCase {
     func testWhenSystemMediaPermissionIsDeniedThenStateIsDisabled() {
         let e = expectation(description: "decisionHandler called")
         AVCaptureDeviceMock.authorizationStatuses = [.audio: .denied]
-        self.webView(webView, checkUserMediaPermissionFor: .duckDuckGo, mainFrameURL: .duckDuckGo, frameIdentifier: 0) { _, flag in
+        webView(webView, checkUserMediaPermissionFor: .duckDuckGo, mainFrameURL: .duckDuckGo, frameIdentifier: 0) { _, flag in
             XCTAssertFalse(flag)
             e.fulfill()
 
@@ -363,7 +385,7 @@ final class PermissionModelTests: XCTestCase {
     func testWhenSystemMediaPermissionIsRestrictedThenStateIsDisabled() {
         let e = expectation(description: "decisionHandler called")
         AVCaptureDeviceMock.authorizationStatuses = [.video: .restricted]
-        self.webView(webView, checkUserMediaPermissionFor: .duckDuckGo, mainFrameURL: .duckDuckGo, frameIdentifier: 0) { _, flag in
+        webView(webView, checkUserMediaPermissionFor: .duckDuckGo, mainFrameURL: .duckDuckGo, frameIdentifier: 0) { _, flag in
             XCTAssertFalse(flag)
             e.fulfill()
 
@@ -377,7 +399,7 @@ final class PermissionModelTests: XCTestCase {
     func testWhenSystemMediaPermissionIsNotDeterminedThenStateIsNotUpdated() {
         let e = expectation(description: "decisionHandler called")
         AVCaptureDeviceMock.authorizationStatuses = [.audio: .notDetermined]
-        self.webView(webView, checkUserMediaPermissionFor: .duckDuckGo, mainFrameURL: .duckDuckGo, frameIdentifier: 0) { _, flag in
+        webView(webView, checkUserMediaPermissionFor: .duckDuckGo, mainFrameURL: .duckDuckGo, frameIdentifier: 0) { _, flag in
             XCTAssertFalse(flag)
             e.fulfill()
 
@@ -391,7 +413,7 @@ final class PermissionModelTests: XCTestCase {
     func testWhenSystemMediaPermissionIsAuthorizedThenStateIsNotUpdated() {
         let e = expectation(description: "decisionHandler called")
         AVCaptureDeviceMock.authorizationStatuses = [.audio: .authorized]
-        self.webView(webView, checkUserMediaPermissionFor: .duckDuckGo, mainFrameURL: .duckDuckGo, frameIdentifier: 0) { _, flag in
+        webView(webView, checkUserMediaPermissionFor: .duckDuckGo, mainFrameURL: .duckDuckGo, frameIdentifier: 0) { _, flag in
             XCTAssertFalse(flag)
             e.fulfill()
 
@@ -411,7 +433,7 @@ final class PermissionModelTests: XCTestCase {
                 e.fulfill()
             }
         } else {
-            self.webView(webView, requestGeolocationPermissionFor: frameInfo) { granted in
+            webView(webView, requestGeolocationPermissionFor: frameInfo) { granted in
                 XCTAssertTrue(granted)
                 e.fulfill()
             }
@@ -437,7 +459,7 @@ final class PermissionModelTests: XCTestCase {
                 e.fulfill()
             }
         } else {
-            self.webView(webView, requestGeolocationPermissionFor: frameInfo) { granted in
+            webView(webView, requestGeolocationPermissionFor: frameInfo) { granted in
                 XCTAssertTrue(granted)
                 e.fulfill()
             }
@@ -461,7 +483,7 @@ final class PermissionModelTests: XCTestCase {
                 e.fulfill()
             }
         } else {
-            self.webView(webView, requestGeolocationPermissionFor: frameInfo) { granted in
+            webView(webView, requestGeolocationPermissionFor: frameInfo) { granted in
                 XCTAssertTrue(granted)
                 e.fulfill()
             }
@@ -524,7 +546,7 @@ final class PermissionModelTests: XCTestCase {
                 e.fulfill()
             }
         } else {
-            self.webView(webView, requestGeolocationPermissionFor: frameInfo) { granted in
+            webView(webView, requestGeolocationPermissionFor: frameInfo) { granted in
                 XCTAssertTrue(granted)
                 e.fulfill()
             }
@@ -550,7 +572,7 @@ final class PermissionModelTests: XCTestCase {
                 e.fulfill()
             }
         } else {
-            self.webView(webView, requestGeolocationPermissionFor: frameInfo) { granted in
+            webView(webView, requestGeolocationPermissionFor: frameInfo) { granted in
                 XCTAssertTrue(granted)
                 e.fulfill()
             }
@@ -599,15 +621,17 @@ final class PermissionModelTests: XCTestCase {
         }
 
         let e2 = expectation(description: "Permission granted")
-        self.webView(webView, requestUserMediaAuthorizationFor: [.microphone, .camera],
-                     url: .duckDuckGo,
-                     mainFrameURL: .duckDuckGo) { granted in
-            XCTAssertTrue(granted)
-            e2.fulfill()
+        webView(
+            webView,
+            requestUserMediaAuthorizationFor: [.microphone, .camera],
+            url: .duckDuckGo,
+            mainFrameURL: .duckDuckGo) { granted in
+                XCTAssertTrue(granted)
+                e2.fulfill()
 
-            self.webView.mediaCaptureState = [.activeCamera, .activeMicrophone]
-            self.webView.mediaCaptureState = []
-        }
+                self.webView.mediaCaptureState = [.activeCamera, .activeMicrophone]
+                self.webView.mediaCaptureState = []
+            }
 
         waitForExpectations(timeout: 1)
 
@@ -618,12 +642,14 @@ final class PermissionModelTests: XCTestCase {
             e3.fulfill()
         }
         let e4 = expectation(description: "Permission granted again")
-        self.webView(webView, requestUserMediaAuthorizationFor: [.microphone, .camera],
-                     url: .duckDuckGo,
-                     mainFrameURL: .duckDuckGo) { granted in
-            XCTAssertFalse(granted)
-            e4.fulfill()
-        }
+        webView(
+            webView,
+            requestUserMediaAuthorizationFor: [.microphone, .camera],
+            url: .duckDuckGo,
+            mainFrameURL: .duckDuckGo) { granted in
+                XCTAssertFalse(granted)
+                e4.fulfill()
+            }
 
         withExtendedLifetime(c) { waitForExpectations(timeout: 1) }
     }
@@ -637,22 +663,26 @@ final class PermissionModelTests: XCTestCase {
         }
 
         let e2 = expectation(description: "Permission granted")
-        self.webView(webView, requestUserMediaAuthorizationFor: .camera,
-                     url: .duckDuckGo,
-                     mainFrameURL: .duckDuckGo) { granted in
-            XCTAssertFalse(granted)
-            e2.fulfill()
-        }
+        webView(
+            webView,
+            requestUserMediaAuthorizationFor: .camera,
+            url: .duckDuckGo,
+            mainFrameURL: .duckDuckGo) { granted in
+                XCTAssertFalse(granted)
+                e2.fulfill()
+            }
 
         waitForExpectations(timeout: 1)
 
         let e3 = expectation(description: "Permission granted again")
-        self.webView(webView, requestUserMediaAuthorizationFor: [.microphone, .camera],
-                     url: .duckDuckGo,
-                     mainFrameURL: .duckDuckGo) { granted in
-            XCTAssertFalse(granted)
-            e3.fulfill()
-        }
+        webView(
+            webView,
+            requestUserMediaAuthorizationFor: [.microphone, .camera],
+            url: .duckDuckGo,
+            mainFrameURL: .duckDuckGo) { granted in
+                XCTAssertFalse(granted)
+                e3.fulfill()
+            }
 
         withExtendedLifetime(c) { waitForExpectations(timeout: 1) }
     }
@@ -666,12 +696,14 @@ final class PermissionModelTests: XCTestCase {
             XCTFail("Unexpected query")
         }
         let e = expectation(description: "Permission denied")
-        self.webView(webView, requestUserMediaAuthorizationFor: [.microphone, .camera],
-                     url: .duckDuckGo,
-                     mainFrameURL: .duckDuckGo) { granted in
-            XCTAssertFalse(granted)
-            e.fulfill()
-        }
+        webView(
+            webView,
+            requestUserMediaAuthorizationFor: [.microphone, .camera],
+            url: .duckDuckGo,
+            mainFrameURL: .duckDuckGo) { granted in
+                XCTAssertFalse(granted)
+                e.fulfill()
+            }
         withExtendedLifetime(c) {
             waitForExpectations(timeout: 1)
         }
@@ -686,12 +718,14 @@ final class PermissionModelTests: XCTestCase {
             XCTFail("Unexpected query")
         }
         let e = expectation(description: "Permission granted")
-        self.webView(webView, requestUserMediaAuthorizationFor: [.microphone, .camera],
-                     url: .duckDuckGo,
-                     mainFrameURL: .duckDuckGo) { granted in
-            XCTAssertTrue(granted)
-            e.fulfill()
-        }
+        webView(
+            webView,
+            requestUserMediaAuthorizationFor: [.microphone, .camera],
+            url: .duckDuckGo,
+            mainFrameURL: .duckDuckGo) { granted in
+                XCTAssertTrue(granted)
+                e.fulfill()
+            }
         withExtendedLifetime(c) {
             waitForExpectations(timeout: 1)
         }
@@ -706,10 +740,12 @@ final class PermissionModelTests: XCTestCase {
             e.fulfill()
         }
 
-        self.webView(webView, requestUserMediaAuthorizationFor: [.microphone, .camera],
-                     url: .duckDuckGo,
-                     mainFrameURL: .duckDuckGo) { _ in
-        }
+        webView(
+            webView,
+            requestUserMediaAuthorizationFor: [.microphone, .camera],
+            url: .duckDuckGo,
+            mainFrameURL: .duckDuckGo) { _ in
+            }
         withExtendedLifetime(c) {
             waitForExpectations(timeout: 1)
         }
@@ -754,10 +790,12 @@ final class PermissionModelTests: XCTestCase {
         model.permissions.popups.popupOpened(nextQuery: nil)
         model.revoke(.popups)
 
-        XCTAssertEqual(permissionManagerMock.permission(forDomain: URL.duckDuckGo.host!, permissionType: .popups),
-                       .ask)
-        XCTAssertEqual(permissionManagerMock.permission(forDomain: URL.duckDuckGo.host!, permissionType: .externalScheme(scheme: "asdf")),
-                       .allow)
+        XCTAssertEqual(
+            permissionManagerMock.permission(forDomain: URL.duckDuckGo.host!, permissionType: .popups),
+            .ask)
+        XCTAssertEqual(
+            permissionManagerMock.permission(forDomain: URL.duckDuckGo.host!, permissionType: .externalScheme(scheme: "asdf")),
+            .allow)
         XCTAssertEqual(model.permissions.popups, .denied)
     }
 
@@ -772,12 +810,15 @@ final class PermissionModelTests: XCTestCase {
 
         model.revoke(.externalScheme(scheme: "asdf"))
 
-        XCTAssertEqual(permissionManagerMock.permission(forDomain: URL.duckDuckGo.host!, permissionType: .popups),
-                       .allow)
-        XCTAssertEqual(permissionManagerMock.permission(forDomain: URL.duckDuckGo.host!, permissionType: .externalScheme(scheme: "asdf")),
-                       .ask)
-        XCTAssertEqual(permissionManagerMock.permission(forDomain: URL.duckDuckGo.host!, permissionType: .externalScheme(scheme: "sdfg")),
-                       .allow)
+        XCTAssertEqual(
+            permissionManagerMock.permission(forDomain: URL.duckDuckGo.host!, permissionType: .popups),
+            .allow)
+        XCTAssertEqual(
+            permissionManagerMock.permission(forDomain: URL.duckDuckGo.host!, permissionType: .externalScheme(scheme: "asdf")),
+            .ask)
+        XCTAssertEqual(
+            permissionManagerMock.permission(forDomain: URL.duckDuckGo.host!, permissionType: .externalScheme(scheme: "sdfg")),
+            .allow)
     }
 
     func testWhenGrantedPermissionIsRemovedThenActivePermissionStaysActive() {
@@ -786,7 +827,7 @@ final class PermissionModelTests: XCTestCase {
             self.webView.cameraCaptureState = .active
             self.webView.microphoneCaptureState = .active
         } else {
-            self.webView.mediaCaptureState = [.activeCamera, .activeMicrophone]
+            webView.mediaCaptureState = [.activeCamera, .activeMicrophone]
         }
         permissionManagerMock.setPermission(.allow, forDomain: URL.duckDuckGo.host!, permissionType: .camera)
 
@@ -812,7 +853,7 @@ final class PermissionModelTests: XCTestCase {
             self.webView.cameraCaptureState = .active
             self.webView.microphoneCaptureState = .active
         } else {
-            self.webView.mediaCaptureState = [.activeCamera, .activeMicrophone]
+            webView.mediaCaptureState = [.activeCamera, .activeMicrophone]
         }
 
         let e = expectation(description: "mic muted")
@@ -848,7 +889,7 @@ final class PermissionModelTests: XCTestCase {
             self.webView.cameraCaptureState = .active
             self.webView.microphoneCaptureState = .active
         } else {
-            self.webView.mediaCaptureState = [.activeCamera, .activeMicrophone]
+            webView.mediaCaptureState = [.activeCamera, .activeMicrophone]
         }
 
         let e = expectation(description: "camera muted")
@@ -984,7 +1025,7 @@ final class PermissionModelTests: XCTestCase {
             self.webView.cameraCaptureState = .active
             self.webView.microphoneCaptureState = .active
         } else {
-            self.webView.mediaCaptureState = [.activeCamera, .activeMicrophone]
+            webView.mediaCaptureState = [.activeCamera, .activeMicrophone]
         }
 
         let e = expectation(description: "mic stopped")
@@ -1016,7 +1057,7 @@ final class PermissionModelTests: XCTestCase {
             self.webView.cameraCaptureState = .active
             self.webView.microphoneCaptureState = .active
         } else {
-            self.webView.mediaCaptureState = [.activeCamera, .activeMicrophone]
+            webView.mediaCaptureState = [.activeCamera, .activeMicrophone]
         }
 
         let e = expectation(description: "camera stopped")
@@ -1049,7 +1090,7 @@ final class PermissionModelTests: XCTestCase {
             self.webView.cameraCaptureState = .active
             self.webView.microphoneCaptureState = .active
         } else {
-            self.webView.mediaCaptureState = [.activeCamera, .activeMicrophone]
+            webView.mediaCaptureState = [.activeCamera, .activeMicrophone]
         }
 
         let e1 = expectation(description: "camera stopped")
@@ -1092,60 +1133,64 @@ final class PermissionModelTests: XCTestCase {
 extension PermissionModelTests: WebViewPermissionsDelegate {
 
     @objc(_webView:checkUserMediaPermissionForURL:mainFrameURL:frameIdentifier:decisionHandler:)
-    func webView(_ webView: WKWebView,
-                 checkUserMediaPermissionFor url: URL,
-                 mainFrameURL: URL,
-                 frameIdentifier frame: UInt,
-                 decisionHandler: @escaping (String, Bool) -> Void) {
-        self.model.checkUserMediaPermission(for: url, mainFrameURL: mainFrameURL, decisionHandler: decisionHandler)
+    func webView(
+        _: WKWebView,
+        checkUserMediaPermissionFor url: URL,
+        mainFrameURL: URL,
+        frameIdentifier _: UInt,
+        decisionHandler: @escaping (String, Bool) -> Void) {
+        model.checkUserMediaPermission(for: url, mainFrameURL: mainFrameURL, decisionHandler: decisionHandler)
     }
 
     @objc(webView:requestMediaCapturePermissionForOrigin:initiatedByFrame:type:decisionHandler:)
     @available(macOS 12, *)
-    func webView(_ webView: WKWebView,
-                 requestMediaCapturePermissionFor origin: WKSecurityOrigin,
-                 initiatedByFrame frame: WKFrameInfo,
-                 type: WKMediaCaptureType,
-                 decisionHandler: @escaping (WKPermissionDecision) -> Void) {
+    func webView(
+        _: WKWebView,
+        requestMediaCapturePermissionFor origin: WKSecurityOrigin,
+        initiatedByFrame _: WKFrameInfo,
+        type: WKMediaCaptureType,
+        decisionHandler: @escaping (WKPermissionDecision) -> Void) {
         guard let permissions = [PermissionType](devices: type) else {
             fatalError()
         }
 
-        self.model.permissions(permissions, requestedForDomain: origin.host) { granted in
+        model.permissions(permissions, requestedForDomain: origin.host) { granted in
             decisionHandler(granted ? .grant : .deny)
         }
     }
 
     @objc(_webView:requestUserMediaAuthorizationForDevices:url:mainFrameURL:decisionHandler:)
-    func webView(_ webView: WKWebView,
-                 requestUserMediaAuthorizationFor devices: _WKCaptureDevices,
-                 url: URL,
-                 mainFrameURL: URL,
-                 decisionHandler: @escaping (Bool) -> Void) {
+    func webView(
+        _: WKWebView,
+        requestUserMediaAuthorizationFor devices: _WKCaptureDevices,
+        url: URL,
+        mainFrameURL _: URL,
+        decisionHandler: @escaping (Bool) -> Void) {
         guard let permissions = [PermissionType](devices: devices) else {
             fatalError()
         }
 
-        self.model.permissions(permissions, requestedForDomain: url.host, decisionHandler: decisionHandler)
+        model.permissions(permissions, requestedForDomain: url.host, decisionHandler: decisionHandler)
     }
 
     @objc(_webView:mediaCaptureStateDidChange:)
-    func webView(_ webView: WKWebView, mediaCaptureStateDidChange state: _WKMediaCaptureStateDeprecated) {
-        self.model.mediaCaptureStateDidChange()
+    func webView(_: WKWebView, mediaCaptureStateDidChange _: _WKMediaCaptureStateDeprecated) {
+        model.mediaCaptureStateDidChange()
     }
 
     @objc(_webView:requestGeolocationPermissionForFrame:decisionHandler:)
-    func webView(_ webView: WKWebView, requestGeolocationPermissionFor frame: WKFrameInfo, decisionHandler: @escaping (Bool) -> Void) {
-        self.model.permissions(.geolocation, requestedForDomain: frame.request.url?.host, decisionHandler: decisionHandler)
+    func webView(_: WKWebView, requestGeolocationPermissionFor frame: WKFrameInfo, decisionHandler: @escaping (Bool) -> Void) {
+        model.permissions(.geolocation, requestedForDomain: frame.request.url?.host, decisionHandler: decisionHandler)
     }
 
     @objc(_webView:requestGeolocationPermissionForOrigin:initiatedByFrame:decisionHandler:)
     @available(macOS 12, *)
-    func webView(_ webView: WKWebView,
-                 requestGeolocationPermissionFor origin: WKSecurityOrigin,
-                 initiatedBy frame: WKFrameInfo,
-                 decisionHandler: @escaping (WKPermissionDecision) -> Void) {
-        self.model.permissions(.geolocation, requestedForDomain: frame.request.url?.host) { granted in
+    func webView(
+        _: WKWebView,
+        requestGeolocationPermissionFor _: WKSecurityOrigin,
+        initiatedBy frame: WKFrameInfo,
+        decisionHandler: @escaping (WKPermissionDecision) -> Void) {
+        model.permissions(.geolocation, requestedForDomain: frame.request.url?.host) { granted in
             decisionHandler(granted ? .grant : .deny)
         }
     }

@@ -23,7 +23,7 @@ import os.log
 typealias APIRequestCompletion = (APIRequest.Response?, Error?) -> Void
 
 enum APIRequest {
-    
+
     private static var defaultCallbackQueue: OperationQueue = {
         let queue = OperationQueue()
         queue.name = "APIRequest default callback queue"
@@ -34,18 +34,18 @@ enum APIRequest {
 
     private static let defaultCallbackSession = URLSession(configuration: .default, delegate: nil, delegateQueue: defaultCallbackQueue)
     private static let defaultCallbackEphemeralSession = URLSession(configuration: .ephemeral, delegate: nil, delegateQueue: defaultCallbackQueue)
-    
+
     private static let mainThreadCallbackSession = URLSession(configuration: .default, delegate: nil, delegateQueue: OperationQueue.main)
     private static let mainThreadCallbackEphemeralSession = URLSession(configuration: .ephemeral, delegate: nil, delegateQueue: OperationQueue.main)
 
     struct Response {
-        
+
         var data: Data?
         var etag: String?
         var urlResponse: URLResponse?
-        
+
     }
-    
+
     enum HTTPMethod: String {
         case get = "GET"
         case head = "HEAD"
@@ -59,37 +59,38 @@ enum APIRequest {
     }
 
     @discardableResult
-    static func request(url: URL,
-                        method: HTTPMethod = .get,
-                        parameters: [String: String]? = nil,
-                        allowedQueryReservedCharacters: CharacterSet? = nil,
-                        headers: HTTPHeaders = APIHeaders().defaultHeaders,
-                        timeoutInterval: TimeInterval = 60.0,
-                        useEphemeralURLSession: Bool = true, // URL requests must opt into using shared storage
-                        callBackOnMainThread: Bool = false,
-                        completion: @escaping APIRequestCompletion) -> URLSessionDataTask {
-        
+    static func request(
+        url: URL,
+        method: HTTPMethod = .get,
+        parameters: [String: String]? = nil,
+        allowedQueryReservedCharacters: CharacterSet? = nil,
+        headers: HTTPHeaders = APIHeaders().defaultHeaders,
+        timeoutInterval: TimeInterval = 60.0,
+        useEphemeralURLSession: Bool = true, // URL requests must opt into using shared storage
+        callBackOnMainThread: Bool = false,
+        completion: @escaping APIRequestCompletion)
+        -> URLSessionDataTask {
+
         let urlRequest = urlRequestFor(
             url: url,
             method: method,
             parameters: parameters,
             allowedQueryReservedCharacters: allowedQueryReservedCharacters,
             headers: headers,
-            timeoutInterval: timeoutInterval
-        )
+            timeoutInterval: timeoutInterval)
         let session = session(useMainThreadCallbackQueue: callBackOnMainThread, ephemeral: useEphemeralURLSession)
 
-        let task = session.dataTask(with: urlRequest) { (data, response, error) in
+        let task = session.dataTask(with: urlRequest) { data, response, error in
 
             let httpResponse = response as? HTTPURLResponse
 
             if let error = error {
                 completion(nil, error)
-            } else if let error = httpResponse?.validateStatusCode(statusCode: 200..<300) { 
+            } else if let error = httpResponse?.validateStatusCode(statusCode: 200..<300) {
                 completion(nil, error)
             } else {
                 var etag = httpResponse?.headerValue(for: APIHeaders.Name.etag)
-                
+
                 // Handle weak etags
                 etag = etag?.drop(prefix: "W/")
                 completion(Response(data: data, etag: etag, urlResponse: response), nil)
@@ -98,19 +99,20 @@ enum APIRequest {
         task.resume()
         return task
     }
-    
-    static func urlRequestFor(url: URL,
-                              method: HTTPMethod = .get,
-                              parameters: [String: String]? = nil,
-                              allowedQueryReservedCharacters: CharacterSet? = nil,
-                              headers: HTTPHeaders = APIHeaders().defaultHeaders,
-                              timeoutInterval: TimeInterval = 60.0) -> URLRequest {
+
+    static func urlRequestFor(
+        url: URL,
+        method: HTTPMethod = .get,
+        parameters: [String: String]? = nil,
+        allowedQueryReservedCharacters: CharacterSet? = nil,
+        headers: HTTPHeaders = APIHeaders().defaultHeaders,
+        timeoutInterval: TimeInterval = 60.0)
+        -> URLRequest {
         let url = (try? parameters?.reduce(url) { partialResult, parameter in
             try partialResult.addParameter(
                 name: parameter.key,
                 value: parameter.value,
-                allowedReservedCharacters: allowedQueryReservedCharacters
-            )
+                allowedReservedCharacters: allowedQueryReservedCharacters)
         }) ?? url
         var urlRequest = URLRequest(url: url)
         urlRequest.allHTTPHeaderFields = headers
@@ -118,7 +120,7 @@ enum APIRequest {
         urlRequest.timeoutInterval = timeoutInterval
         return urlRequest
     }
-    
+
     private static func session(useMainThreadCallbackQueue: Bool, ephemeral: Bool) -> URLSession {
         if useMainThreadCallbackQueue {
             return ephemeral ? mainThreadCallbackEphemeralSession : mainThreadCallbackSession
@@ -130,15 +132,15 @@ enum APIRequest {
 }
 
 extension HTTPURLResponse {
-        
+
     enum HTTPURLResponseError: Error {
         case invalidStatusCode
     }
-    
+
     func validateStatusCode<S: Sequence>(statusCode acceptedStatusCodes: S) -> Error? where S.Iterator.Element == Int {
-        return acceptedStatusCodes.contains(statusCode) ? nil : HTTPURLResponseError.invalidStatusCode
+        acceptedStatusCodes.contains(statusCode) ? nil : HTTPURLResponseError.invalidStatusCode
     }
-    
+
     fileprivate func headerValue(for name: String) -> String? {
         let lname = name.lowercased()
         return allHeaderFields.filter { ($0.key as? String)?.lowercased() == lname }.first?.value as? String

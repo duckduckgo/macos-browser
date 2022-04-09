@@ -39,16 +39,17 @@ internal class BaseBookmarkEntity {
     }
 
     static func bookmarksAndFoldersFetchRequest() -> NSFetchRequest<BookmarkManagedObject> {
-        return BookmarkManagedObject.fetchRequest()
+        BookmarkManagedObject.fetchRequest()
     }
 
     let id: UUID
     var title: String
     let isFolder: Bool
 
-    fileprivate init(id: UUID,
-                     title: String,
-                     isFolder: Bool) {
+    fileprivate init(
+        id: UUID,
+        title: String,
+        isFolder: Bool) {
 
         self.id = id
         self.title = title
@@ -56,8 +57,9 @@ internal class BaseBookmarkEntity {
     }
 
     static func from(managedObject: BookmarkManagedObject, parentFolderUUID: UUID? = nil) -> BaseBookmarkEntity? {
-        guard let id = managedObject.id,
-              let title = managedObject.titleEncrypted as? String else {
+        guard
+            let id = managedObject.id,
+            let title = managedObject.titleEncrypted as? String else {
             assertionFailure("\(#file): Failed to create BaseBookmarkEntity from BookmarkManagedObject")
             return nil
         }
@@ -77,12 +79,13 @@ internal class BaseBookmarkEntity {
                 return nil
             }
 
-            return Bookmark(id: id,
-                            url: url,
-                            title: title,
-                            oldFavicon: managedObject.faviconEncrypted as? NSImage,
-                            isFavorite: managedObject.isFavorite,
-                            parentFolderUUID: parentFolderUUID)
+            return Bookmark(
+                id: id,
+                url: url,
+                title: title,
+                oldFavicon: managedObject.faviconEncrypted as? NSImage,
+                isFavorite: managedObject.isFavorite,
+                parentFolderUUID: parentFolderUUID)
         }
     }
 
@@ -101,25 +104,26 @@ final class BookmarkFolder: BaseBookmarkEntity {
     let totalChildBookmarks: Int
 
     var childBookmarks: [Bookmark] {
-        return children.compactMap { $0 as? Bookmark }
+        children.compactMap { $0 as? Bookmark }
     }
 
     var childFolders: [BookmarkFolder] {
-        return children.compactMap { $0 as? BookmarkFolder }
+        children.compactMap { $0 as? BookmarkFolder }
     }
 
-    init(id: UUID,
-         title: String,
-         parentFolderUUID: UUID? = nil,
-         children: [BaseBookmarkEntity] = []) {
+    init(
+        id: UUID,
+        title: String,
+        parentFolderUUID: UUID? = nil,
+        children: [BaseBookmarkEntity] = []) {
         self.parentFolderUUID = parentFolderUUID
         self.children = children
 
         let childFolders = children.compactMap({ $0 as? BookmarkFolder })
         let childBookmarks = children.compactMap({ $0 as? Bookmark })
-        let subfolderBookmarksCount = childFolders.reduce(0) { total, folder in return total + folder.totalChildBookmarks }
+        let subfolderBookmarksCount = childFolders.reduce(0) { total, folder in total + folder.totalChildBookmarks }
 
-        self.totalChildBookmarks = childBookmarks.count + subfolderBookmarksCount
+        totalChildBookmarks = childBookmarks.count + subfolderBookmarksCount
 
         super.init(id: id, title: title, isFolder: true)
     }
@@ -141,16 +145,17 @@ final class Bookmark: BaseBookmarkEntity {
     var oldFavicon: NSImage?
     let faviconManagement: FaviconManagement
     func favicon(_ sizeCategory: Favicon.SizeCategory) -> NSImage? {
-        return faviconManagement.getCachedFavicon(for: url, sizeCategory: sizeCategory)?.image ?? oldFavicon
+        faviconManagement.getCachedFavicon(for: url, sizeCategory: sizeCategory)?.image ?? oldFavicon
     }
 
-    init(id: UUID,
-         url: URL,
-         title: String,
-         oldFavicon: NSImage? = nil,
-         isFavorite: Bool,
-         parentFolderUUID: UUID? = nil,
-         faviconManagement: FaviconManagement = FaviconManager.shared) {
+    init(
+        id: UUID,
+        url: URL,
+        title: String,
+        oldFavicon: NSImage? = nil,
+        isFavorite: Bool,
+        parentFolderUUID: UUID? = nil,
+        faviconManagement: FaviconManagement = FaviconManager.shared) {
 
         self.url = url
         self.oldFavicon = oldFavicon
@@ -162,11 +167,12 @@ final class Bookmark: BaseBookmarkEntity {
     }
 
     convenience init(from bookmark: Bookmark, with newUrl: URL) {
-        self.init(id: bookmark.id,
-                  url: newUrl,
-                  title: bookmark.title,
-                  oldFavicon: nil,
-                  isFavorite: bookmark.isFavorite)
+        self.init(
+            id: bookmark.id,
+            url: newUrl,
+            title: bookmark.title,
+            oldFavicon: nil,
+            isFavorite: bookmark.isFavorite)
     }
 
 }
@@ -174,7 +180,7 @@ final class Bookmark: BaseBookmarkEntity {
 extension BaseBookmarkEntity: Equatable {
 
     static func == (lhs: BaseBookmarkEntity, rhs: BaseBookmarkEntity) -> Bool {
-        return lhs.id == rhs.id
+        lhs.id == rhs.id
     }
 
 }

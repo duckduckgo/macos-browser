@@ -16,8 +16,8 @@
 //  limitations under the License.
 //
 
-import XCTest
 import BrowserServicesKit
+import XCTest
 @testable import DuckDuckGo_Privacy_Browser
 
 final class SuggestionContainerTests: XCTestCase {
@@ -25,9 +25,10 @@ final class SuggestionContainerTests: XCTestCase {
     func testWhenGetSuggestionsIsCalled_ThenContainerAsksAndHoldsSuggestionsFromLoader() {
         let suggestionLoadingMock = SuggestionLoadingMock()
         let historyCoordinatingMock = HistoryCoordinatingMock()
-        let suggestionContainer = SuggestionContainer(suggestionLoading: suggestionLoadingMock,
-                                                      historyCoordinating: historyCoordinatingMock,
-                                                      bookmarkManager: LocalBookmarkManager.shared)
+        let suggestionContainer = SuggestionContainer(
+            suggestionLoading: suggestionLoadingMock,
+            historyCoordinating: historyCoordinatingMock,
+            bookmarkManager: LocalBookmarkManager.shared)
 
         let e = expectation(description: "Suggestions updated")
         let cancellable = suggestionContainer.$result.sink {
@@ -50,9 +51,10 @@ final class SuggestionContainerTests: XCTestCase {
     func testWhenStopGettingSuggestionsIsCalled_ThenNoSuggestionsArePublished() {
         let suggestionLoadingMock = SuggestionLoadingMock()
         let historyCoordinatingMock = HistoryCoordinatingMock()
-        let suggestionContainer = SuggestionContainer(suggestionLoading: suggestionLoadingMock,
-                                                      historyCoordinating: historyCoordinatingMock,
-                                              bookmarkManager: LocalBookmarkManager.shared)
+        let suggestionContainer = SuggestionContainer(
+            suggestionLoading: suggestionLoadingMock,
+            historyCoordinating: historyCoordinatingMock,
+            bookmarkManager: LocalBookmarkManager.shared)
 
         suggestionContainer.getSuggestions(for: "test")
         suggestionContainer.stopGettingSuggestions()

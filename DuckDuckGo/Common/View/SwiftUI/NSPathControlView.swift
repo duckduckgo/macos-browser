@@ -17,18 +17,18 @@
 //
 
 import AppKit
-import SwiftUI
 import Combine
+import SwiftUI
 
 struct NSPathControlView: NSViewRepresentable {
-    
+
     typealias NSViewType = NSPathControl
 
     var url: URL?
-    
+
     func makeNSView(context: NSViewRepresentableContext<NSPathControlView>) -> NSPathControl {
         let newPathControl = NSPathControl()
-        
+
         newPathControl.wantsLayer = true
         newPathControl.isEditable = false
         newPathControl.refusesFirstResponder = true
@@ -53,15 +53,15 @@ struct NSPathControlView: NSViewRepresentable {
 
         return newPathControl
     }
-    
-    func updateNSView(_ nsView: NSPathControl, context: NSViewRepresentableContext<NSPathControlView>) {
+
+    func updateNSView(_ nsView: NSPathControl, context _: NSViewRepresentableContext<NSPathControlView>) {
         nsView.url = url
     }
-    
+
     func makeCoordinator() -> Coordinator {
-        return Coordinator()
+        Coordinator()
     }
-    
+
     final class Coordinator {
         var alphaCancellable: AnyCancellable?
         var borderColorCancellable: AnyCancellable?

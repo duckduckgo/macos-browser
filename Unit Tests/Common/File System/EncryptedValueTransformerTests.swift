@@ -16,8 +16,8 @@
 //  limitations under the License.
 //
 
-import XCTest
 import CryptoKit
+import XCTest
 @testable import DuckDuckGo_Privacy_Browser
 
 final class EncryptedValueTransformerTests: XCTestCase {

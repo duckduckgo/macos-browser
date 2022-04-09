@@ -18,16 +18,17 @@
 
 import Foundation
 
-@IBDesignable class PaddedImageButton: NSButton {
+@IBDesignable
+final class PaddedImageButton: NSButton {
 
     @IBInspectable var verticalImagePadding: CGFloat = 0
     @IBInspectable var horizontalImagePadding: CGFloat = 0
 
     override func draw(_ dirtyRect: NSRect) {
-        let originalBounds = self.bounds
+        let originalBounds = bounds
         defer { self.bounds = originalBounds }
 
-        self.bounds = originalBounds.insetBy(dx: horizontalImagePadding, dy: verticalImagePadding)
+        bounds = originalBounds.insetBy(dx: horizontalImagePadding, dy: verticalImagePadding)
 
         super.draw(dirtyRect)
     }

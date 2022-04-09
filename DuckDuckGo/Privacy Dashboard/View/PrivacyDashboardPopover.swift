@@ -23,16 +23,16 @@ final class PrivacyDashboardPopover: NSPopover {
     override init() {
         super.init()
 
-#if DEBUG
+        #if DEBUG
         behavior = .semitransient
-#else
+        #else
         behavior = .transient
-#endif
+        #endif
 
         setupContentController()
     }
 
-    required init?(coder: NSCoder) {
+    required init?(coder _: NSCoder) {
         fatalError("PrivacyDashboardPopover: Bad initializer")
     }
 

@@ -16,8 +16,8 @@
 //  limitations under the License.
 //
 
-import Cocoa
 import Carbon.HIToolbox
+import Cocoa
 import Combine
 
 protocol FindInPageDelegate: AnyObject {
@@ -32,7 +32,7 @@ final class FindInPageViewController: NSViewController {
 
     weak var delegate: FindInPageDelegate?
 
-    @Published var model: FindInPageModel? 
+    @Published var model: FindInPageModel?
 
     @IBOutlet weak var textField: NSTextField!
     @IBOutlet weak var focusRingView: FocusRingView!
@@ -51,22 +51,26 @@ final class FindInPageViewController: NSViewController {
         updateFieldStates()
     }
 
-    @IBAction func findInPageNext(_ sender: Any?) {
+    @IBAction
+    func findInPageNext(_: Any?) {
         delegate?.findInPageNext(self)
     }
 
-    @IBAction func findInPagePrevious(_ sender: Any?) {
+    @IBAction
+    func findInPagePrevious(_: Any?) {
         delegate?.findInPagePrevious(self)
     }
 
-    @IBAction func findInPageDone(_ sender: Any?) {
+    @IBAction
+    func findInPageDone(_: Any?) {
         delegate?.findInPageDone(self)
     }
 
-    func control(_ control: NSControl, textView: NSTextView, doCommandBy commandSelector: Selector) -> Bool {
+    func control(_: NSControl, textView _: NSTextView, doCommandBy _: Selector) -> Bool {
         // Handle pressing enter here rather than didEndEditing otherwise it moving to the next match doesn't work.
-        guard NSApp.isReturnOrEnterPressed,
-           var modifiers = NSApp.currentEvent?.modifierFlags.intersection(.deviceIndependentFlagsMask)
+        guard
+            NSApp.isReturnOrEnterPressed,
+            var modifiers = NSApp.currentEvent?.modifierFlags.intersection(.deviceIndependentFlagsMask)
         else {
             return false
         }
@@ -94,8 +98,9 @@ final class FindInPageViewController: NSViewController {
 
             self?.updateFieldStates()
 
-            guard let self = self,
-                  let model = self.model else { return }
+            guard
+                let self = self,
+                let model = self.model else { return }
 
             model.$text.receive(on: DispatchQueue.main).sink { [weak self] text in
                 self?.textField.stringValue = text
@@ -117,7 +122,7 @@ final class FindInPageViewController: NSViewController {
         guard let model = model else { return }
         statusField.stringValue = String(format: UserText.findInPage, model.currentSelection, model.matchesFound)
     }
-    
+
     private func updateView(firstResponder: Bool) {
         focusRingView.updateView(stroke: firstResponder)
     }
@@ -129,17 +134,19 @@ final class FindInPageViewController: NSViewController {
     }
 
     private func listenForTextFieldResponderNotifications() {
-        NotificationCenter.default.addObserver(self,
-                                               selector: #selector(textFieldFirstReponderNotification(_:)),
-                                               name: .firstResponder,
-                                               object: nil)
+        NotificationCenter.default.addObserver(
+            self,
+            selector: #selector(textFieldFirstReponderNotification(_:)),
+            name: .firstResponder,
+            object: nil)
     }
 
 }
 
 extension FindInPageViewController {
 
-    @objc func textFieldFirstReponderNotification(_ notification: Notification) {
+    @objc
+    func textFieldFirstReponderNotification(_: Notification) {
         if view.window?.firstResponder == textField.currentEditor() {
             updateView(firstResponder: true)
         } else {
@@ -151,7 +158,7 @@ extension FindInPageViewController {
 
 extension FindInPageViewController: NSTextFieldDelegate {
 
-    func controlTextDidChange(_ obj: Notification) {
+    func controlTextDidChange(_: Notification) {
         model?.update(text: textField.stringValue)
     }
 

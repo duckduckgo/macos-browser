@@ -24,17 +24,17 @@ final class HistoryCoordinatorMock: HistoryCoordinating {
     var history: History?
 
     var addVisitCalled = false
-    func addVisit(of url: URL) {
+    func addVisit(of _: URL) {
         addVisitCalled = true
     }
 
     var updateTitleIfNeededCalled = false
-    func updateTitleIfNeeded(title: String, url: URL) {
+    func updateTitleIfNeeded(title _: String, url _: URL) {
         updateTitleIfNeededCalled = true
     }
 
     var burnHistoryCalled = false
-    func burnHistory(except fireproofDomains: FireproofDomains) {
+    func burnHistory(except _: FireproofDomains) {
         burnHistoryCalled = true
     }
 

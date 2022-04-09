@@ -35,16 +35,17 @@ final class PermissionContextMenu: NSMenu {
     let permissions: [(key: PermissionType, value: PermissionState)]
     weak var actionDelegate: PermissionContextMenuDelegate?
 
-    required init(coder: NSCoder) {
+    required init(coder _: NSCoder) {
         fatalError("PermissionContextMenu: Bad initializer")
     }
 
-    init(permissions: [(key: PermissionType, value: PermissionState)],
-         domain: String,
-         delegate: PermissionContextMenuDelegate?) {
+    init(
+        permissions: [(key: PermissionType, value: PermissionState)],
+        domain: String,
+        delegate: PermissionContextMenuDelegate?) {
         self.domain = domain.dropWWW()
         self.permissions = permissions
-        self.actionDelegate = delegate
+        actionDelegate = delegate
         super.init(title: "")
 
         setupMenuItems()
@@ -167,46 +168,58 @@ final class PermissionContextMenu: NSMenu {
         }
     }
 
-    @objc func mutePermissions(_ sender: NSMenuItem) {
+    @objc
+    func mutePermissions(_ sender: NSMenuItem) {
         guard let permissions = sender.representedObject as? [PermissionType] else {
             assertionFailure("Expected [PermissionType]")
             return
         }
         actionDelegate?.permissionContextMenu(self, mutePermissions: permissions)
     }
-    @objc func unmutePermissions(_ sender: NSMenuItem) {
+
+    @objc
+    func unmutePermissions(_ sender: NSMenuItem) {
         guard let permissions = sender.representedObject as? [PermissionType] else {
             assertionFailure("Expected [PermissionType]")
             return
         }
         actionDelegate?.permissionContextMenu(self, unmutePermissions: permissions)
     }
-    @objc func alwaysAllowPermission(_ sender: NSMenuItem) {
+
+    @objc
+    func alwaysAllowPermission(_ sender: NSMenuItem) {
         guard let permission = sender.representedObject as? PermissionType else {
             assertionFailure("Expected PermissionType")
             return
         }
         actionDelegate?.permissionContextMenu(self, alwaysAllowPermission: permission)
     }
-    @objc func alwaysAskPermission(_ sender: NSMenuItem) {
+
+    @objc
+    func alwaysAskPermission(_ sender: NSMenuItem) {
         guard let permission = sender.representedObject as? PermissionType else {
             assertionFailure("Expected PermissionType")
             return
         }
         actionDelegate?.permissionContextMenu(self, resetStoredPermission: permission)
     }
-    @objc func alwaysDenyPermission(_ sender: NSMenuItem) {
+
+    @objc
+    func alwaysDenyPermission(_ sender: NSMenuItem) {
         guard let permission = sender.representedObject as? PermissionType else {
             assertionFailure("Expected PermissionType")
             return
         }
         actionDelegate?.permissionContextMenu(self, alwaysDenyPermission: permission)
     }
-    @objc func reload(_ sender: NSMenuItem) {
+
+    @objc
+    func reload(_: NSMenuItem) {
         actionDelegate?.permissionContextMenuReloadPage(self)
     }
 
-    @objc func allowPermissionQuery(_ sender: NSMenuItem) {
+    @objc
+    func allowPermissionQuery(_ sender: NSMenuItem) {
         guard let query = sender.representedObject as? PermissionAuthorizationQuery else {
             assertionFailure("Expected PermissionAuthorizationQuery")
             return
@@ -214,7 +227,8 @@ final class PermissionContextMenu: NSMenu {
         actionDelegate?.permissionContextMenu(self, allowPermissionQuery: query)
     }
 
-    @objc func openSystemPreferences(_ sender: NSMenuItem) {
+    @objc
+    func openSystemPreferences(_ sender: NSMenuItem) {
         guard let permission = sender.representedObject as? PermissionType else {
             assertionFailure("Expected PermissionType")
             return
@@ -237,41 +251,45 @@ final class PermissionContextMenu: NSMenu {
 
 }
 
-private extension NSMenuItem {
+extension NSMenuItem {
 
-    static func mute(_ permissions: [PermissionType], for domain: String, target: PermissionContextMenu) -> NSMenuItem {
+    fileprivate static func mute(_ permissions: [PermissionType], for domain: String, target: PermissionContextMenu) -> NSMenuItem {
         let title = String(format: UserText.permissionMuteFormat, permissions.localizedDescription.lowercased(), domain)
-        let item = NSMenuItem(title: title,
-                              action: #selector(PermissionContextMenu.mutePermissions),
-                              keyEquivalent: "")
+        let item = NSMenuItem(
+            title: title,
+            action: #selector(PermissionContextMenu.mutePermissions),
+            keyEquivalent: "")
         item.representedObject = permissions
         item.target = target
         return item
     }
 
-    static func unmute(_ permissions: [PermissionType], for domain: String, target: PermissionContextMenu) -> NSMenuItem {
+    fileprivate static func unmute(_ permissions: [PermissionType], for domain: String, target: PermissionContextMenu) -> NSMenuItem {
         let title = String(format: UserText.permissionUnmuteFormat, permissions.localizedDescription.lowercased(), domain)
-        let item = NSMenuItem(title: title,
-                              action: #selector(PermissionContextMenu.unmutePermissions),
-                              keyEquivalent: "")
+        let item = NSMenuItem(
+            title: title,
+            action: #selector(PermissionContextMenu.unmutePermissions),
+            keyEquivalent: "")
         item.representedObject = permissions
         item.target = target
         return item
     }
 
-    static func reload(target: PermissionContextMenu) -> NSMenuItem {
-        let item = NSMenuItem(title: UserText.permissionReloadToEnable,
-                              action: #selector(PermissionContextMenu.reload),
-                              keyEquivalent: "")
+    fileprivate static func reload(target: PermissionContextMenu) -> NSMenuItem {
+        let item = NSMenuItem(
+            title: UserText.permissionReloadToEnable,
+            action: #selector(PermissionContextMenu.reload),
+            keyEquivalent: "")
         item.target = target
         return item
     }
 
-    static func alwaysAllow(_ permission: PermissionType, on domain: String, target: PermissionContextMenu, isChecked: Bool) -> NSMenuItem {
+    fileprivate static func alwaysAllow(_ permission: PermissionType, on _: String, target: PermissionContextMenu, isChecked: Bool) -> NSMenuItem {
         let title = UserText.privacyDashboardPermissionAlwaysAllow
-        let item = NSMenuItem(title: title,
-                              action: #selector(PermissionContextMenu.alwaysAllowPermission),
-                              keyEquivalent: "")
+        let item = NSMenuItem(
+            title: title,
+            action: #selector(PermissionContextMenu.alwaysAllowPermission),
+            keyEquivalent: "")
         item.representedObject = permission
         item.target = target
         if isChecked {
@@ -280,7 +298,7 @@ private extension NSMenuItem {
         return item
     }
 
-    static func alwaysAsk(_ permission: PermissionType, on domain: String, target: PermissionContextMenu, isChecked: Bool) -> NSMenuItem {
+    fileprivate static func alwaysAsk(_ permission: PermissionType, on _: String, target: PermissionContextMenu, isChecked: Bool) -> NSMenuItem {
         let title: String
         switch permission {
         case .camera, .microphone, .geolocation, .externalScheme:
@@ -289,9 +307,10 @@ private extension NSMenuItem {
             title = UserText.privacyDashboardPopupsAlwaysAsk
         }
 
-        let item = NSMenuItem(title: title,
-                              action: #selector(PermissionContextMenu.alwaysAskPermission),
-                              keyEquivalent: "")
+        let item = NSMenuItem(
+            title: title,
+            action: #selector(PermissionContextMenu.alwaysAskPermission),
+            keyEquivalent: "")
         item.representedObject = permission
         item.target = target
         if isChecked {
@@ -300,11 +319,12 @@ private extension NSMenuItem {
         return item
     }
 
-    static func alwaysDeny(_ permission: PermissionType, on domain: String, target: PermissionContextMenu, isChecked: Bool) -> NSMenuItem {
+    fileprivate static func alwaysDeny(_ permission: PermissionType, on _: String, target: PermissionContextMenu, isChecked: Bool) -> NSMenuItem {
         let title = UserText.privacyDashboardPermissionAlwaysDeny
-        let item = NSMenuItem(title: title,
-                              action: #selector(PermissionContextMenu.alwaysDenyPermission),
-                              keyEquivalent: "")
+        let item = NSMenuItem(
+            title: title,
+            action: #selector(PermissionContextMenu.alwaysDenyPermission),
+            keyEquivalent: "")
         item.representedObject = permission
         item.target = target
         if isChecked {
@@ -313,29 +333,31 @@ private extension NSMenuItem {
         return item
     }
 
-    static func permissionDisabled(_ permission: PermissionType, systemWide: Bool) -> NSMenuItem {
+    fileprivate static func permissionDisabled(_ permission: PermissionType, systemWide: Bool) -> NSMenuItem {
         let title: String
         if systemWide {
             assert(permission == .geolocation)
             title = UserText.permissionGeolocationServicesDisabled
         } else {
-            title = String(format: UserText.permissionAppPermissionDisabledFormat,
-                           permission.localizedDescription,
-                           Bundle.main.displayName ?? "DuckDuckGo")
+            title = String(
+                format: UserText.permissionAppPermissionDisabledFormat,
+                permission.localizedDescription,
+                Bundle.main.displayName ?? "DuckDuckGo")
         }
         return NSMenuItem(title: title, action: nil, keyEquivalent: "")
     }
 
-    static func openSystemPreferences(for permission: PermissionType, target: PermissionContextMenu) -> NSMenuItem {
-        let item = NSMenuItem(title: UserText.permissionOpenSystemPreferences,
-                              action: #selector(PermissionContextMenu.openSystemPreferences),
-                              keyEquivalent: "")
+    fileprivate static func openSystemPreferences(for permission: PermissionType, target: PermissionContextMenu) -> NSMenuItem {
+        let item = NSMenuItem(
+            title: UserText.permissionOpenSystemPreferences,
+            action: #selector(PermissionContextMenu.openSystemPreferences),
+            keyEquivalent: "")
         item.representedObject = permission
         item.target = target
         return item
     }
 
-    static func popupPermissionRequested(domain: String?) -> NSMenuItem {
+    fileprivate static func popupPermissionRequested(domain _: String?) -> NSMenuItem {
         let title = UserText.permissionPopupTitle
         let attributedTitle = NSMutableAttributedString(string: title)
         attributedTitle.setAttributes([.font: NSFont.systemFont(ofSize: 11.0)], range: title.nsRange())
@@ -346,7 +368,7 @@ private extension NSMenuItem {
         return menuItem
     }
 
-    static func persistenceHeaderItem(for permission: PermissionType, on domain: String) -> NSMenuItem {
+    fileprivate static func persistenceHeaderItem(for permission: PermissionType, on domain: String) -> NSMenuItem {
         let title: String
         switch permission {
         case .camera, .microphone, .geolocation:
@@ -366,9 +388,11 @@ private extension NSMenuItem {
         return menuItem
     }
 
-    static func openPopup(query: PermissionAuthorizationQuery,
-                          permission: PermissionType,
-                          target: PermissionContextMenu) -> NSMenuItem {
+    fileprivate static func openPopup(
+        query: PermissionAuthorizationQuery,
+        permission _: PermissionType,
+        target: PermissionContextMenu)
+        -> NSMenuItem {
 
         let title = String(format: UserText.permissionPopupOpenFormat, query.url?.absoluteString ?? "“”")
         let item = NSMenuItem(title: title, action: #selector(PermissionContextMenu.allowPermissionQuery), keyEquivalent: "")

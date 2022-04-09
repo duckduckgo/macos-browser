@@ -16,17 +16,17 @@
 //  limitations under the License.
 //
 
-import Foundation
-import TrackerRadarKit
 import BrowserServicesKit
 import CryptoKit
+import Foundation
+import TrackerRadarKit
 
 final class ContentBlockerRulesLists: DefaultContentBlockerRulesListsSource {
-    
+
     enum Constants {
         static let clickToLoadRulesListName = "ClickToLoad"
     }
-    
+
     static var fbTrackerDataFile: Data = {
         do {
             let url = Bundle.main.url(forResource: "fb-tds", withExtension: "json")!
@@ -43,24 +43,25 @@ final class ContentBlockerRulesLists: DefaultContentBlockerRulesListsSource {
             fatalError("Failed to JSON decode FB-TDS")
         }
     }()
-    
+
     func MD5(data: Data) -> String {
         let digest = Insecure.MD5.hash(data: data)
 
         return digest.map {
             String(format: "%02hhx", $0)
         }.joined()
-    }    
-    
+    }
+
     override var contentBlockerRulesLists: [ContentBlockerRulesList] {
         var result = super.contentBlockerRulesLists
-        
+
         // Add new ones
         let etag = MD5(data: Self.fbTrackerDataFile)
-        let dataSet: TrackerDataManager.DataSet = TrackerDataManager.DataSet(Self.fbTrackerDataSet, etag)
-        let additionalRulesList = ContentBlockerRulesList(name: Constants.clickToLoadRulesListName,
-                                                          trackerData: nil,
-                                                          fallbackTrackerData: dataSet)
+        let dataSet = TrackerDataManager.DataSet(Self.fbTrackerDataSet, etag)
+        let additionalRulesList = ContentBlockerRulesList(
+            name: Constants.clickToLoadRulesListName,
+            trackerData: nil,
+            fallbackTrackerData: dataSet)
 
         result.append(additionalRulesList)
         return result

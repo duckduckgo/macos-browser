@@ -54,17 +54,17 @@ extension HomePage.Models {
 
         @Published var favorites: [Bookmark] = [] {
             didSet {
-                var favorites = self.favorites.map { FavoriteModel(id: $0.id, favoriteType: .bookmark($0)) }
+                var favorites = favorites.map { FavoriteModel(id: $0.id, favoriteType: .bookmark($0)) }
                 favorites.append(.init(id: UUID(), favoriteType: .addButton))
 
                 let lastRowCount = favorites.count % HomePage.favoritesPerRow
                 let missing = lastRowCount > 0 ? HomePage.favoritesPerRow - lastRowCount : 0
 
-                (0 ..< missing).forEach { _ in 
+                (0 ..< missing).forEach { _ in
                     favorites.append(FavoriteModel(id: UUID(), favoriteType: .ghostButton))
                 }
 
-                self.rows = favorites.chunked(into: HomePage.favoritesPerRow)
+                rows = favorites.chunked(into: HomePage.favoritesPerRow)
             }
         }
 
@@ -74,11 +74,12 @@ extension HomePage.Models {
         let remove: (Bookmark) -> Void
         let addEdit: (Bookmark?) -> Void
 
-        init(open: @escaping (Bookmark, OpenTarget) -> Void,
-             remove: @escaping (Bookmark) -> Void,
-             addEdit:  @escaping (Bookmark?) -> Void) {
+        init(
+            open: @escaping (Bookmark, OpenTarget) -> Void,
+            remove: @escaping (Bookmark) -> Void,
+            addEdit: @escaping (Bookmark?) -> Void) {
 
-            self.showAllFavorites = Self.showAllFavoritesSetting
+            showAllFavorites = Self.showAllFavoritesSetting
             self.open = open
             self.remove = remove
             self.addEdit = addEdit
@@ -104,5 +105,5 @@ extension HomePage.Models {
             addEdit(nil)
         }
     }
-    
+
 }

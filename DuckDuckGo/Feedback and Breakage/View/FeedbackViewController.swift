@@ -86,10 +86,11 @@ final class FeedbackViewController: NSViewController {
     override func viewDidAppear() {
         super.viewDidAppear()
 
-        NotificationCenter.default.addObserver(self,
-                                               selector: #selector(popUpButtonOpened(_:)),
-                                               name: NSPopUpButton.willPopUpNotification,
-                                               object: nil)
+        NotificationCenter.default.addObserver(
+            self,
+            selector: #selector(popUpButtonOpened(_:)),
+            name: NSPopUpButton.willPopUpNotification,
+            object: nil)
         updateBrokenWebsiteMenuItem()
     }
 
@@ -101,15 +102,18 @@ final class FeedbackViewController: NSViewController {
         // swiftlint:enable notification_center_detachment
     }
 
-    @IBAction func optionPopUpButtonAction(_ sender: Any) {
+    @IBAction
+    func optionPopUpButtonAction(_: Any) {
         updateViews()
     }
 
-    @IBAction func websiteBreakageCategoryPopUpButtonAction(_ sender: Any) {
+    @IBAction
+    func websiteBreakageCategoryPopUpButtonAction(_: Any) {
         updateViews()
     }
 
-    @objc func popUpButtonOpened(_ notification: Notification) {
+    @objc
+    func popUpButtonOpened(_ notification: Notification) {
         guard let popUpButton = notification.object as? NSPopUpButton else {
             assertionFailure("No popup button")
             return
@@ -120,7 +124,8 @@ final class FeedbackViewController: NSViewController {
         }
     }
 
-    @IBAction func submitButtonAction(_ sender: Any) {
+    @IBAction
+    func submitButtonAction(_: Any) {
         switch selectedFormOption {
         case .none: assertionFailure("Submit shouldn't be enabled"); return
         case .websiteBreakage: sendWebsiteBreakage()
@@ -130,22 +135,26 @@ final class FeedbackViewController: NSViewController {
         showThankYou()
     }
 
-    @IBAction func okButtonAction(_ sender: Any) {
-        guard let window = view.window,
-              let sheetParent = window.sheetParent else {
-                  assertionFailure("No sheet parent")
-                  return
-              }
+    @IBAction
+    func okButtonAction(_: Any) {
+        guard
+            let window = view.window,
+            let sheetParent = window.sheetParent else {
+            assertionFailure("No sheet parent")
+            return
+        }
 
         sheetParent.endSheet(window, returnCode: .OK)
     }
 
-    @IBAction func cancelButtonAction(_ sender: Any) {
-        guard let window = self.view.window,
-              let sheetParent = window.sheetParent else {
-                  assertionFailure("No sheet parent")
-                  return
-              }
+    @IBAction
+    func cancelButtonAction(_: Any) {
+        guard
+            let window = view.window,
+            let sheetParent = window.sheetParent else {
+            assertionFailure("No sheet parent")
+            return
+        }
 
         sheetParent.endSheet(window, returnCode: .cancel)
     }
@@ -165,10 +174,11 @@ final class FeedbackViewController: NSViewController {
     }
 
     private var selectedWebsiteBreakageCategory: WebsiteBreakage.Category? {
-        guard let subcategoryItem = websiteBreakageCategoryPopUpButton.selectedItem,
-              let subcategory = WebsiteBreakage.Category(tag: subcategoryItem.tag) else {
-                  return nil
-              }
+        guard
+            let subcategoryItem = websiteBreakageCategoryPopUpButton.selectedItem,
+            let subcategory = WebsiteBreakage.Category(tag: subcategoryItem.tag) else {
+            return nil
+        }
         return subcategory
     }
 
@@ -257,10 +267,11 @@ final class FeedbackViewController: NSViewController {
         switch selectedFormOption {
         case .websiteBreakage: assertionFailure("Wrong method executed")
         case .feedback(feedbackCategory: let feedbackCategory):
-            let feedback = Feedback(category: feedbackCategory,
-                                    comment: browserFeedbackTextView.string,
-                                    appVersion: "\(AppVersion.shared.versionNumber)",
-                                    osVersion: "\(ProcessInfo.processInfo.operatingSystemVersion)")
+            let feedback = Feedback(
+                category: feedbackCategory,
+                comment: browserFeedbackTextView.string,
+                appVersion: "\(AppVersion.shared.versionNumber)",
+                osVersion: "\(ProcessInfo.processInfo.operatingSystemVersion)")
             feedbackSender.sendFeedback(feedback)
         }
     }
@@ -275,19 +286,20 @@ final class FeedbackViewController: NSViewController {
         case .feedback: assertionFailure("Wrong method executed")
         case .websiteBreakage:
             let blockedTrackerDomains = currentTab?.trackerInfo?.trackersBlocked.compactMap { $0.domain } ?? []
-            let installedSurrogates = currentTab?.trackerInfo?.installedSurrogates.map {$0} ?? []
+            let installedSurrogates = currentTab?.trackerInfo?.installedSurrogates.map { $0 } ?? []
             let ampURL = currentTab?.linkProtection.lastAMPURLString ?? ""
             let urlParametersRemoved = currentTab?.linkProtection.urlParametersRemoved ?? false
-            let websiteBreakage = WebsiteBreakage(category: selectedWebsiteBreakageCategory,
-                                                  siteUrlString: urlTextField.stringValue,
-                                                  osVersion: "\(ProcessInfo.processInfo.operatingSystemVersion)",
-                                                  upgradedHttps: currentTab?.connectionUpgradedTo != nil,
-                                                  tdsETag: ContentBlocking.shared.contentBlockingManager.currentRules.first?.etag,
-                                                  blockedTrackerDomains: blockedTrackerDomains,
-                                                  installedSurrogates: installedSurrogates,
-                                                  isGPCEnabled: PrivacySecurityPreferences.shared.gpcEnabled,
-                                                  ampURL: ampURL,
-                                                  urlParametersRemoved: urlParametersRemoved)
+            let websiteBreakage = WebsiteBreakage(
+                category: selectedWebsiteBreakageCategory,
+                siteUrlString: urlTextField.stringValue,
+                osVersion: "\(ProcessInfo.processInfo.operatingSystemVersion)",
+                upgradedHttps: currentTab?.connectionUpgradedTo != nil,
+                tdsETag: ContentBlocking.shared.contentBlockingManager.currentRules.first?.etag,
+                blockedTrackerDomains: blockedTrackerDomains,
+                installedSurrogates: installedSurrogates,
+                isGPCEnabled: PrivacySecurityPreferences.shared.gpcEnabled,
+                ampURL: ampURL,
+                urlParametersRemoved: urlParametersRemoved)
             websiteBreakageSender.sendWebsiteBreakage(websiteBreakage)
         }
     }
@@ -299,9 +311,9 @@ final class FeedbackViewController: NSViewController {
     }
 }
 
-fileprivate extension WebsiteBreakage.Category {
+extension WebsiteBreakage.Category {
 
-    init?(tag: Int) {
+    fileprivate init?(tag: Int) {
         switch tag {
         case 0: self = .cantSignIn
         case 1: self = .contentIsMissing
@@ -320,11 +332,11 @@ fileprivate extension WebsiteBreakage.Category {
 
 extension FeedbackViewController: NSTextFieldDelegate {
 
-    func control(_ control: NSControl, textShouldBeginEditing fieldEditor: NSText) -> Bool {
-        return control != urlTextField
+    func control(_ control: NSControl, textShouldBeginEditing _: NSText) -> Bool {
+        control != urlTextField
     }
 
-    func controlTextDidChange(_ notification: Notification) {
+    func controlTextDidChange(_: Notification) {
         updateSubmitButton()
     }
 
@@ -332,15 +344,15 @@ extension FeedbackViewController: NSTextFieldDelegate {
 
 extension FeedbackViewController: NSTextViewDelegate {
 
-    func textDidChange(_ notification: Notification) {
+    func textDidChange(_: Notification) {
         updateSubmitButton()
     }
 
 }
 
-private extension URL {
+extension URL {
 
-    func trimmingQueryItemsAndFragment() -> URL? {
+    fileprivate func trimmingQueryItemsAndFragment() -> URL? {
         var components = URLComponents(url: self, resolvingAgainstBaseURL: true)
         components?.queryItems = nil
         components?.fragment = nil

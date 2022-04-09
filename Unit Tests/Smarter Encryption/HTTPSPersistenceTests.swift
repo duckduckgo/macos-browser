@@ -80,7 +80,7 @@ class HTTPSPersistenceTests: XCTestCase {
     }
 
     func testWhenBloomFilterSpecificationIsPersistedThenOldSpecificationIsReplaced() {
-        let originalSpecification =  HTTPSBloomFilterSpecification(bitCount: 100, errorRate: 0.01, totalEntries: 100, sha256: "abc")
+        let originalSpecification = HTTPSBloomFilterSpecification(bitCount: 100, errorRate: 0.01, totalEntries: 100, sha256: "abc")
         testee.persistBloomFilterSpecification(originalSpecification)
 
         let newSpecification = HTTPSBloomFilterSpecification(bitCount: 101, errorRate: 0.01, totalEntries: 101, sha256: "abc")

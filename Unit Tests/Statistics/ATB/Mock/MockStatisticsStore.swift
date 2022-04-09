@@ -22,7 +22,7 @@ import Foundation
 
 final class MockStatisticsStore: StatisticsStore {
 
-    var hasCurrentOrDeprecatedInstallStatistics: Bool = false
+    var hasCurrentOrDeprecatedInstallStatistics = false
     var installDate: Date?
     var atb: String?
     var searchRetentionAtb: String?
@@ -31,9 +31,9 @@ final class MockStatisticsStore: StatisticsStore {
     var variant: String?
     var lastAppRetentionRequestDate: Date?
 
-    var waitlistUnlocked: Bool = false
+    var waitlistUnlocked = false
 
-    var autoLockEnabled: Bool = true
+    var autoLockEnabled = true
     var autoLockThreshold: String? = AutofillAutoLockThreshold.fifteenMinutes.rawValue
 
 }

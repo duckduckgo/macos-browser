@@ -16,8 +16,8 @@
 //  limitations under the License.
 //
 
-import Carbon.HIToolbox
 import AppKit
+import Carbon.HIToolbox
 import SwiftUI
 
 final class OnboardingViewController: NSViewController {
@@ -30,7 +30,7 @@ final class OnboardingViewController: NSViewController {
         // swiftlint:enable force_cast
         return controller
     }
-    
+
     @IBOutlet var backgroundImageView: NSImageView! {
         didSet {
             // NSImageView magic to improve image resizing performance.

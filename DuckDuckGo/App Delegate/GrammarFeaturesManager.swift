@@ -31,12 +31,12 @@ final class GrammarFeaturesManager {
             case .continuousSpellChecking: return [.WebContinuousSpellCheckingEnabled]
             case .grammarChecking: return [.WebGrammarCheckingEnabled]
             case .autocorrection: return [
-                .WebAutomaticSpellingCorrectionEnabled,
-                .WebAutomaticTextReplacementEnabled,
-                .WebAutomaticQuoteSubstitutionEnabled,
-                .WebAutomaticLinkDetectionEnabled,
-                .WebAutomaticDashSubstitutionEnabled
-            ]
+                    .WebAutomaticSpellingCorrectionEnabled,
+                    .WebAutomaticTextReplacementEnabled,
+                    .WebAutomaticQuoteSubstitutionEnabled,
+                    .WebAutomaticLinkDetectionEnabled,
+                    .WebAutomaticDashSubstitutionEnabled
+                ]
             }
         }
     }
@@ -57,6 +57,7 @@ final class GrammarFeaturesManager {
         case WebAutomaticLinkDetectionEnabled
         case WebAutomaticDashSubstitutionEnabled
     }
+
     // swiftlint:enable identifier_name
 
     @UserDefaultsWrapper(key: .spellingCheckEnabledOnce, defaultValue: false)

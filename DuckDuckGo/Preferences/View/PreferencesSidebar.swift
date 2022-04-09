@@ -99,7 +99,7 @@ extension Preferences {
 
         let isSelected: Bool
 
-        @State private var isHovered: Bool = false
+        @State private var isHovered = false
 
         func makeBody(configuration: Self.Configuration) -> some View {
 

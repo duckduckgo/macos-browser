@@ -21,12 +21,12 @@ import Foundation
 extension RandomAccessCollection {
 
     subscript(safe index: Index) -> Element? {
-        guard self.indices.contains(index) else { return nil }
+        guard indices.contains(index) else { return nil }
         return self[index]
     }
 
     subscript(_ index: Index, default value: Element) -> Element {
-        return self[safe: index] ?? value
+        self[safe: index] ?? value
     }
 
 }

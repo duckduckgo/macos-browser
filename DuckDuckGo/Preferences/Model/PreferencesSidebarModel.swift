@@ -23,14 +23,13 @@ final class PreferencesSidebarModel: ObservableObject {
     let sections: [PreferencesSection]
     let tabSwitcherTabs: [Tab.TabContent]
 
-    @Published var selectedTabIndex: Int = 0
+    @Published var selectedTabIndex = 0
 
     @Published var selectedPane: PreferencePaneIdentifier = .defaultBrowser
 
     init(
         sections: [PreferencesSection] = PreferencesSection.defaultSections,
-        tabSwitcherTabs: [Tab.TabContent] = Tab.TabContent.displayableTabTypes
-    ) {
+        tabSwitcherTabs: [Tab.TabContent] = Tab.TabContent.displayableTabTypes) {
         self.sections = sections
         self.tabSwitcherTabs = tabSwitcherTabs
         resetTabSelectionIfNeeded()

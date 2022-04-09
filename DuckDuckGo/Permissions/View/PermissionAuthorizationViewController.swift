@@ -30,8 +30,9 @@ extension PermissionType {
         case .popups:
             return UserText.permissionPopups
         case .externalScheme(scheme: let scheme):
-            guard let url = URL(string: scheme + URL.NavigationalScheme.separator),
-                  let app = NSWorkspace.shared.application(toOpen: url)
+            guard
+                let url = URL(string: scheme + URL.NavigationalScheme.separator),
+                let app = NSWorkspace.shared.application(toOpen: url)
             else { return scheme }
 
             return app
@@ -44,11 +45,11 @@ extension Array where Element == PermissionType {
     var localizedDescription: String {
         if Set(self) == Set([.camera, .microphone]) {
             return UserText.permissionCameraAndMicrophone
-        } else if self.count == 1 {
+        } else if count == 1 {
             return self[0].localizedDescription
         }
         assertionFailure("Unexpected Permissions combination")
-        return self.map(\.localizedDescription).joined(separator: ", ")
+        return map(\.localizedDescription).joined(separator: ", ")
     }
 
 }
@@ -81,9 +82,10 @@ final class PermissionAuthorizationViewController: NSViewController {
     }
 
     private func updateText() {
-        guard isViewLoaded,
-              let query = query,
-              !query.permissions.isEmpty
+        guard
+            isViewLoaded,
+            let query = query,
+            !query.permissions.isEmpty
         else { return }
 
         let format: String
@@ -99,24 +101,28 @@ final class PermissionAuthorizationViewController: NSViewController {
             format = UserText.externalSchemePermissionAuthorizationFormat
             permissions = query.permissions.localizedDescription
         }
-        self.descriptionLabel.stringValue = String(format: format, query.domain, permissions)
-        self.domainNameLabel.stringValue = "“" + query.domain + "”"
-        self.alwaysAllowStackView.isHidden = !query.shouldShowAlwaysAllowCheckbox
+        descriptionLabel.stringValue = String(format: format, query.domain, permissions)
+        domainNameLabel.stringValue = "“" + query.domain + "”"
+        alwaysAllowStackView.isHidden = !query.shouldShowAlwaysAllowCheckbox
     }
 
-    @IBAction func alwaysAllowLabelClick(_ sender: Any) {
+    @IBAction
+    func alwaysAllowLabelClick(_: Any) {
         alwaysAllowCheckbox.setNextState()
     }
 
-    @IBAction func grantAction(_ sender: NSButton) {
-        self.dismiss()
+    @IBAction
+    func grantAction(_: NSButton) {
+        dismiss()
         query?.handleDecision(grant: true, remember: query!.shouldShowAlwaysAllowCheckbox && alwaysAllowCheckbox.state == .on)
     }
 
-    @IBAction func denyAction(_ sender: NSButton) {
-        self.dismiss()
-        guard let query = query,
-              !query.shouldShowCancelInsteadOfDeny
+    @IBAction
+    func denyAction(_: NSButton) {
+        dismiss()
+        guard
+            let query = query,
+            !query.shouldShowCancelInsteadOfDeny
         else { return }
 
         query.handleDecision(grant: false)

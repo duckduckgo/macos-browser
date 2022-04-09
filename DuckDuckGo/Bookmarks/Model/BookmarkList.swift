@@ -28,11 +28,11 @@ struct BookmarkList {
     private var itemsDict: [URL: Bookmark]
 
     var totalBookmarks: Int {
-        return allBookmarkURLsOrdered.count
+        allBookmarkURLsOrdered.count
     }
 
     var favoriteBookmarks: [Bookmark] {
-        return favoriteBookmarkURLsOrdered.compactMap {
+        favoriteBookmarkURLsOrdered.compactMap {
             itemsDict[$0]
         }
     }
@@ -50,9 +50,9 @@ struct BookmarkList {
                 favoriteKeysOrdered.append(bookmark.url)
             }
         }
-        
-        self.favoriteBookmarkURLsOrdered = favoriteKeysOrdered
-        self.allBookmarkURLsOrdered = keysOrdered
+
+        favoriteBookmarkURLsOrdered = favoriteKeysOrdered
+        allBookmarkURLsOrdered = keysOrdered
         self.itemsDict = itemsDict
         self.topLevelEntities = topLevelEntities
     }
@@ -68,7 +68,7 @@ struct BookmarkList {
     }
 
     subscript(url: URL) -> Bookmark? {
-        return itemsDict[url]
+        itemsDict[url]
     }
 
     mutating func remove(_ bookmark: Bookmark) {

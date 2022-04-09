@@ -16,8 +16,8 @@
 //  limitations under the License.
 //
 
-import Foundation
 import Cocoa
+import Foundation
 
 extension NSAlert {
 
@@ -92,7 +92,7 @@ extension NSAlert {
         alert.addButton(withTitle: UserText.ok)
         return alert
     }
-    
+
     static func cookiePopup() -> NSAlert {
         let alert = NSAlert()
         alert.messageText = UserText.autoconsentPopupTitle

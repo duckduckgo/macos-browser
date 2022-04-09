@@ -20,36 +20,36 @@ import SwiftUI
 
 extension Onboarding {
 
-struct CallToAction: View {
+    struct CallToAction: View {
 
-    let text: String
-    let cta: String
+        let text: String
+        let cta: String
 
-    let onNext: () -> Void
+        let onNext: () -> Void
 
-    @State var typingFinished = false
+        @State var typingFinished = false
 
-    var body: some View {
-        VStack(spacing: 15) {
-            DaxSpeech(text: text) {
-                withAnimation {
-                    typingFinished = true
+        var body: some View {
+            VStack(spacing: 15) {
+                DaxSpeech(text: text) {
+                    withAnimation {
+                        typingFinished = true
+                    }
                 }
-            }
 
-            Button {
-                withAnimation {
-                    onNext()
+                Button {
+                    withAnimation {
+                        onNext()
+                    }
+                } label: {
+                    Text(cta)
                 }
-            } label: {
-                Text(cta)
+                .frame(width: speechWidth)
+                .buttonStyle(ActionButtonStyle())
+                .visibility(typingFinished ? .visible : .gone)
             }
-            .frame(width: speechWidth)
-            .buttonStyle(ActionButtonStyle())
-            .visibility(typingFinished ? .visible : .gone)
         }
-    }
 
-}
+    }
 
 }

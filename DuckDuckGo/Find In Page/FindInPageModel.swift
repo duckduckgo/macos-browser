@@ -20,10 +20,10 @@ import Foundation
 
 final class FindInPageModel {
 
-    @Published private(set) var text: String = ""
-    @Published private(set) var currentSelection: Int = 1
-    @Published private(set) var matchesFound: Int = 0
-    @Published private(set) var visible: Bool = false
+    @Published private(set) var text = ""
+    @Published private(set) var currentSelection = 1
+    @Published private(set) var matchesFound = 0
+    @Published private(set) var visible = false
 
     func update(text: String) {
         self.text = text

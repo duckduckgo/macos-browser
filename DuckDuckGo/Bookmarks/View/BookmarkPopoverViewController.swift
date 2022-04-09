@@ -55,18 +55,21 @@ final class BookmarkPopoverViewController: NSViewController {
         updateSubviews()
     }
 
-    @IBAction func removeButtonAction(_ sender: NSButton) {
+    @IBAction
+    func removeButtonAction(_: NSButton) {
         guard let bookmark = bookmark else { return }
         bookmarkManager.remove(bookmark: bookmark)
-        
+
         delegate?.popoverShouldClose(self)
     }
 
-    @IBAction func doneButtonAction(_ sender: NSButton) {
+    @IBAction
+    func doneButtonAction(_: NSButton) {
         delegate?.popoverShouldClose(self)
     }
-    
-    @IBAction func favoritesButtonAction(_ sender: Any) {
+
+    @IBAction
+    func favoritesButtonAction(_: Any) {
         guard let bookmark = bookmark else { return }
         bookmark.isFavorite = !bookmark.isFavorite
         self.bookmark = bookmark
@@ -96,7 +99,7 @@ final class BookmarkPopoverViewController: NSViewController {
 
 extension BookmarkPopoverViewController: NSTextFieldDelegate {
 
-    func controlTextDidChange(_ obj: Notification) {
+    func controlTextDidChange(_: Notification) {
         guard let bookmark = bookmark else { return }
         bookmark.title = textField.stringValue
         self.bookmark = bookmark

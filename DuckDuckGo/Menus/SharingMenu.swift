@@ -21,8 +21,8 @@ import Cocoa
 final class SharingMenu: NSMenu {
 
     override func update() {
-        self.removeAllItems()
-        self.autoenablesItems = false
+        removeAllItems()
+        autoenablesItems = false
 
         let isEnabled = WindowControllersManager.shared.lastKeyMainWindowController?.mainViewController
             .tabCollectionViewModel.selectedTabViewModel?.canReload ?? false
@@ -34,18 +34,20 @@ final class SharingMenu: NSMenu {
             menuItem.target = self
             menuItem.action = #selector(sharingItemSelected(_:))
             menuItem.isEnabled = isEnabled
-            self.addItem(menuItem)
+            addItem(menuItem)
         }
 
-        let moreItem = NSMenuItem(title: UserText.moreMenuItem,
-                                  action: #selector(openSharingPreferences(_:)),
-                                  keyEquivalent: "")
+        let moreItem = NSMenuItem(
+            title: UserText.moreMenuItem,
+            action: #selector(openSharingPreferences(_:)),
+            keyEquivalent: "")
         moreItem.target = self
         moreItem.image = .more
-        self.addItem(moreItem)
+        addItem(moreItem)
     }
 
-    @objc func openSharingPreferences(_ sender: NSMenuItem) {
+    @objc
+    func openSharingPreferences(_: NSMenuItem) {
         let url = URL(fileURLWithPath: "/System/Library/PreferencePanes/Extensions.prefPane")
         let plist = [
             "action": "revealExtensionPoint",
@@ -54,21 +56,24 @@ final class SharingMenu: NSMenu {
         let data = try? PropertyListSerialization.data(fromPropertyList: plist, format: .xml, options: 0)
         let descriptor = NSAppleEventDescriptor(descriptorType: .openSharingSubpane, data: data)
 
-        NSWorkspace.shared.open([url],
-                                withAppBundleIdentifier: nil,
-                                options: .async,
-                                additionalEventParamDescriptor: descriptor,
-                                launchIdentifiers: nil)
+        NSWorkspace.shared.open(
+            [url],
+            withAppBundleIdentifier: nil,
+            options: .async,
+            additionalEventParamDescriptor: descriptor,
+            launchIdentifiers: nil)
     }
 
-    @objc func sharingItemSelected(_ sender: NSMenuItem) {
+    @objc
+    func sharingItemSelected(_ sender: NSMenuItem) {
         guard let service = sender.representedObject as? NSSharingService else {
             assertionFailure("representedObject is not NSSharingService")
             return
         }
-        guard let tabViewModel = WindowControllersManager.shared.lastKeyMainWindowController?.mainViewController
+        guard
+            let tabViewModel = WindowControllersManager.shared.lastKeyMainWindowController?.mainViewController
                 .tabCollectionViewModel.selectedTabViewModel,
-              let url = tabViewModel.tab.content.url
+            let url = tabViewModel.tab.content.url
         else {
             return
         }
@@ -82,39 +87,40 @@ final class SharingMenu: NSMenu {
 
 extension SharingMenu: NSSharingServiceDelegate {
 
-    func sharingService(_ sharingService: NSSharingService, didShareItems items: [Any]) {
+    func sharingService(_: NSSharingService, didShareItems _: [Any]) {
         Pixel.fire(.sharingMenu(result: .success))
     }
 
-    func sharingService(_ sharingService: NSSharingService, didFailToShareItems items: [Any], error: Error) {
+    func sharingService(_: NSSharingService, didFailToShareItems _: [Any], error _: Error) {
         Pixel.fire(.sharingMenu(result: .failure))
     }
 
 }
 
-private extension NSMenuItem {
+extension NSMenuItem {
 
-    convenience init(service: NSSharingService) {
+    fileprivate convenience init(service: NSSharingService) {
         var isMailService = false
-        if service.responds(to: NSSelectorFromString("name")),
-           let name = service.value(forKey: "name") as? NSSharingService.Name,
-           name == .composeEmail {
+        if
+            service.responds(to: NSSelectorFromString("name")),
+            let name = service.value(forKey: "name") as? NSSharingService.Name,
+            name == .composeEmail {
             isMailService = true
         }
 
         self.init(title: service.menuItemTitle, action: nil, keyEquivalent: isMailService ? "I" : "")
         if isMailService {
-            self.keyEquivalentModifierMask = [.command, .shift]
+            keyEquivalentModifierMask = [.command, .shift]
         }
-        self.image = service.image
-        self.representedObject = service
+        image = service.image
+        representedObject = service
     }
 
 }
 
-private extension NSImage {
+extension NSImage {
 
-    static var more: NSImage? {
+    fileprivate static var more: NSImage? {
         let sharedMoreMenuImageSelector = NSSelectorFromString("sharedMoreMenuImage")
         guard NSSharingServicePicker.responds(to: sharedMoreMenuImageSelector) else { return nil }
         return NSSharingServicePicker.perform(sharedMoreMenuImageSelector)?.takeUnretainedValue() as? NSImage
@@ -122,8 +128,8 @@ private extension NSImage {
 
 }
 
-private extension DescType {
+extension DescType {
 
-    static let openSharingSubpane: DescType = 0x70747275
+    fileprivate static let openSharingSubpane: DescType = 0x70747275
 
 }

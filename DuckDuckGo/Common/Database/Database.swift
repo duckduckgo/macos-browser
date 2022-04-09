@@ -16,36 +16,37 @@
 //  limitations under the License.
 //
 
-import Foundation
 import CoreData
+import Foundation
 
 final class Database {
-    
-    fileprivate struct Constants {
+
+    fileprivate enum Constants {
         static let databaseName = "Database"
     }
-    
+
     static let shared: Database = {
-#if DEBUG
+        #if DEBUG
         if AppDelegate.isRunningTests {
             let keyStoreMockClass = (NSClassFromString("EncryptionKeyStoreMock") as? NSObject.Type)!
             let keyStoreMock = (keyStoreMockClass.init() as? EncryptionKeyStoring)!
             return Database(keyStore: keyStoreMock)
         }
-#endif
+        #endif
         return Database()
     }()
 
     private let container: NSPersistentContainer
     private let storeLoadedCondition = RunLoop.ResumeCondition()
-    
+
     var model: NSManagedObjectModel {
-        return container.managedObjectModel
+        container.managedObjectModel
     }
 
-    init(name: String = Constants.databaseName,
-         model: NSManagedObjectModel = NSManagedObjectModel.mergedModel(from: [.main])!,
-         keyStore: EncryptionKeyStoring = EncryptionKeyStore(generator: EncryptionKeyGenerator())) {
+    init(
+        name: String = Constants.databaseName,
+        model: NSManagedObjectModel = NSManagedObjectModel.mergedModel(from: [.main])!,
+        keyStore: EncryptionKeyStoring = EncryptionKeyStore(generator: EncryptionKeyGenerator())) {
         do {
             try EncryptedValueTransformer<NSImage>.registerTransformer(keyStore: keyStore)
             try EncryptedValueTransformer<NSString>.registerTransformer(keyStore: keyStore)
@@ -59,7 +60,7 @@ final class Database {
 
         container = DDGPersistentContainer(name: name, managedObjectModel: model)
     }
-    
+
     func loadStore(migrationHandler: @escaping (NSManagedObjectContext) -> Void = { _ in }) {
         container.loadPersistentStores { _, error in
             if let error = error {
@@ -68,7 +69,7 @@ final class Database {
                 Thread.sleep(forTimeInterval: 1)
                 fatalError("Could not load DB: \(error.localizedDescription)")
             }
-            
+
             let context = NSManagedObjectContext(concurrencyType: .privateQueueConcurrencyType)
             context.persistentStoreCoordinator = self.container.persistentStoreCoordinator
             context.name = "Migration"
@@ -79,37 +80,37 @@ final class Database {
             }
         }
     }
-    
+
     func makeContext(concurrencyType: NSManagedObjectContextConcurrencyType, name: String? = nil) -> NSManagedObjectContext {
         RunLoop.current.run(until: storeLoadedCondition)
 
         let context = NSManagedObjectContext(concurrencyType: concurrencyType)
         context.persistentStoreCoordinator = container.persistentStoreCoordinator
         context.name = name
-        
+
         return context
     }
 }
 
 extension NSManagedObjectContext {
-    
+
     func deleteAll(entities: [NSManagedObject] = []) {
         for entity in entities {
             delete(entity)
         }
     }
-    
+
     func deleteAll<T: NSManagedObject>(matching request: NSFetchRequest<T>) {
         if let result = try? fetch(request) {
             deleteAll(entities: result)
         }
     }
-    
+
     func deleteAll(entityDescriptions: [NSEntityDescription] = []) {
         for entityDescription in entityDescriptions {
             let request = NSFetchRequest<NSManagedObject>()
             request.entity = entityDescription
-            
+
             deleteAll(matching: request)
         }
     }
@@ -120,7 +121,7 @@ protocol Managed: NSFetchRequestResult {
 }
 
 extension Managed where Self: NSManagedObject {
-    static var entityName: String { return entity().name! }
+    static var entityName: String { entity().name! }
 }
 
 extension NSManagedObjectContext {
@@ -135,7 +136,7 @@ extension NSManagedObjectContext {
 private class DDGPersistentContainer: NSPersistentContainer {
 
     override class func defaultDirectoryURL() -> URL {
-        return URL.sandboxApplicationSupportURL
+        URL.sandboxApplicationSupportURL
     }
 
 }

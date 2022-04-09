@@ -18,8 +18,8 @@
 
 import Foundation
 
-import SwiftUI
 import BrowserServicesKit
+import SwiftUI
 
 private let interItemSpacing: CGFloat = 23
 private let itemSpacing: CGFloat = 13

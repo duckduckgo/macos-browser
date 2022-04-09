@@ -16,9 +16,9 @@
 //  limitations under the License.
 //
 
-import Foundation
-import Combine
 import BrowserServicesKit
+import Combine
+import Foundation
 
 protocol ScriptSourceProviding {
 
@@ -38,54 +38,58 @@ struct DefaultScriptSourceProvider: ScriptSourceProviding {
     private(set) var surrogatesConfig: SurrogatesUserScriptConfig?
     private(set) var autofillSourceProvider: AutofillUserScriptSourceProvider?
     private(set) var sessionKey: String?
-    private(set) var clickToLoadSource: String = ""
+    private(set) var clickToLoadSource = ""
 
     let configStorage: ConfigurationStoring
     let privacyConfigurationManager: PrivacyConfigurationManager
     let contentBlockingManager: ContentBlockerRulesManagerProtocol
     let privacySettings: PrivacySecurityPreferences
 
-    init(configStorage: ConfigurationStoring = DefaultConfigurationStorage.shared,
-         privacyConfigurationManager: PrivacyConfigurationManager = ContentBlocking.shared.privacyConfigurationManager,
-         privacySettings: PrivacySecurityPreferences = PrivacySecurityPreferences.shared,
-         contentBlockingManager: ContentBlockerRulesManagerProtocol = ContentBlocking.shared.contentBlockingManager) {
+    init(
+        configStorage: ConfigurationStoring = DefaultConfigurationStorage.shared,
+        privacyConfigurationManager: PrivacyConfigurationManager = ContentBlocking.shared.privacyConfigurationManager,
+        privacySettings: PrivacySecurityPreferences = PrivacySecurityPreferences.shared,
+        contentBlockingManager: ContentBlockerRulesManagerProtocol = ContentBlocking.shared.contentBlockingManager) {
 
         self.configStorage = configStorage
         self.privacyConfigurationManager = privacyConfigurationManager
         self.privacySettings = privacySettings
         self.contentBlockingManager = contentBlockingManager
 
-        self.contentBlockerRulesConfig = buildContentBlockerRulesConfig()
-        self.surrogatesConfig = buildSurrogatesConfig()
-        self.sessionKey = generateSessionKey()
-        self.clickToLoadSource = buildClickToLoadSource()
-        self.autofillSourceProvider = buildAutofillSource()
+        contentBlockerRulesConfig = buildContentBlockerRulesConfig()
+        surrogatesConfig = buildSurrogatesConfig()
+        sessionKey = generateSessionKey()
+        clickToLoadSource = buildClickToLoadSource()
+        autofillSourceProvider = buildAutofillSource()
     }
 
     private func generateSessionKey() -> String {
-        return UUID().uuidString
+        UUID().uuidString
     }
-    
+
     public func buildAutofillSource() -> AutofillUserScriptSourceProvider {
 
-        return DefaultAutofillSourceProvider(privacyConfigurationManager: self.privacyConfigurationManager,
-                                             properties: ContentScopeProperties(gpcEnabled: privacySettings.gpcEnabled,
-                                                                                sessionKey: self.sessionKey ?? ""))
+        DefaultAutofillSourceProvider(
+            privacyConfigurationManager: privacyConfigurationManager,
+            properties: ContentScopeProperties(
+                gpcEnabled: privacySettings.gpcEnabled,
+                sessionKey: sessionKey ?? ""))
     }
 
     private func buildContentBlockerRulesConfig() -> ContentBlockerUserScriptConfig {
 
         let tdsName = DefaultContentBlockerRulesListsSource.Constants.trackerDataSetRulesListName
-        let trackerData = contentBlockingManager.currentRules.first(where: { $0.name == tdsName})?.trackerData
+        let trackerData = contentBlockingManager.currentRules.first(where: { $0.name == tdsName })?.trackerData
 
         let ctlTrackerData = (contentBlockingManager.currentRules.first(where: {
             $0.name == ContentBlockerRulesLists.Constants.clickToLoadRulesListName
         })?.trackerData) ?? ContentBlockerRulesLists.fbTrackerDataSet
 
-        return DefaultContentBlockerUserScriptConfig(privacyConfiguration: privacyConfigurationManager.privacyConfig,
-                                                     trackerData: trackerData,
-                                                     ctlTrackerData: ctlTrackerData,
-                                                     trackerDataManager: ContentBlocking.shared.trackerDataManager)
+        return DefaultContentBlockerUserScriptConfig(
+            privacyConfiguration: privacyConfigurationManager.privacyConfig,
+            trackerData: trackerData,
+            ctlTrackerData: ctlTrackerData,
+            trackerDataManager: ContentBlocking.shared.trackerDataManager)
     }
 
     private func buildSurrogatesConfig() -> SurrogatesUserScriptConfig {
@@ -99,20 +103,20 @@ struct DefaultScriptSourceProvider: ScriptSourceProviding {
 
         let surrogates = configStorage.loadData(for: .surrogates)?.utf8String() ?? ""
         let tdsName = DefaultContentBlockerRulesListsSource.Constants.trackerDataSetRulesListName
-        let rules = contentBlockingManager.currentRules.first(where: { $0.name == tdsName})
-        return DefaultSurrogatesUserScriptConfig(privacyConfig: privacyConfigurationManager.privacyConfig,
-                                                 surrogates: surrogates,
-                                                 trackerData: rules?.trackerData,
-                                                 encodedSurrogateTrackerData: rules?.encodedTrackerData,
-                                                 trackerDataManager: ContentBlocking.shared.trackerDataManager,
-                                                 isDebugBuild: isDebugBuild)
+        let rules = contentBlockingManager.currentRules.first(where: { $0.name == tdsName })
+        return DefaultSurrogatesUserScriptConfig(
+            privacyConfig: privacyConfigurationManager.privacyConfig,
+            surrogates: surrogates,
+            trackerData: rules?.trackerData,
+            encodedSurrogateTrackerData: rules?.encodedTrackerData,
+            trackerDataManager: ContentBlocking.shared.trackerDataManager,
+            isDebugBuild: isDebugBuild)
     }
 
     private func loadTextFile(_ fileName: String, _ fileExt: String) -> String? {
         let url = Bundle.main.url(
             forResource: fileName,
-            withExtension: fileExt
-        )
+            withExtension: fileExt)
         guard let data = try? String(contentsOf: url!) else {
             assertionFailure("Failed to load text file")
             return nil
@@ -124,8 +128,7 @@ struct DefaultScriptSourceProvider: ScriptSourceProviding {
     private func loadFont(_ fileName: String, _ fileExt: String) -> String? {
         let url = Bundle.main.url(
             forResource: fileName,
-            withExtension: fileExt
-        )
+            withExtension: fileExt)
         guard let base64String = try? Data(contentsOf: url!).base64EncodedString() else {
             assertionFailure("Failed to load font")
             return nil

@@ -20,10 +20,10 @@ import AppKit
 import Combine
 
 protocol AddFolderModalViewControllerDelegate: AnyObject {
-    
+
     func addFolderViewController(_ viewController: AddFolderModalViewController, addedFolderWith name: String)
     func addFolderViewController(_ viewController: AddFolderModalViewController, saved folder: BookmarkFolder)
-    
+
 }
 
 final class AddFolderModalViewController: NSViewController {
@@ -57,7 +57,7 @@ final class AddFolderModalViewController: NSViewController {
     }
 
     func edit(folder: BookmarkFolder) {
-        self.originalFolder = folder
+        originalFolder = folder
     }
 
     private func updateInterface() {
@@ -74,11 +74,13 @@ final class AddFolderModalViewController: NSViewController {
         }
     }
 
-    @IBAction private func cancel(_ sender: NSButton) {
+    @IBAction
+    private func cancel(_: NSButton) {
         dismiss()
     }
 
-    @IBAction private func addFolder(_ sender: NSButton) {
+    @IBAction
+    private func addFolder(_: NSButton) {
         guard !folderNameTextField.stringValue.isEmpty else { return }
 
         if let folder = originalFolder {
@@ -99,7 +101,7 @@ final class AddFolderModalViewController: NSViewController {
 
 extension AddFolderModalViewController: NSTextFieldDelegate {
 
-    func controlTextDidChange(_ notification: Notification) {
+    func controlTextDidChange(_: Notification) {
         updateConfirmButton()
     }
 

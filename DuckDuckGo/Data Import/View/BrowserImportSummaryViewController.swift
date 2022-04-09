@@ -28,8 +28,8 @@ final class BrowserImportSummaryViewController: NSViewController {
     static func create(importSummary: DataImport.Summary) -> BrowserImportSummaryViewController {
         let storyboard = NSStoryboard(name: Constants.storyboardName, bundle: nil)
 
-        return storyboard.instantiateController(identifier: Constants.identifier) { (coder) -> BrowserImportSummaryViewController? in
-            return BrowserImportSummaryViewController(coder: coder, summary: importSummary)
+        return storyboard.instantiateController(identifier: Constants.identifier) { coder -> BrowserImportSummaryViewController? in
+            BrowserImportSummaryViewController(coder: coder, summary: importSummary)
         }
     }
 
@@ -54,7 +54,7 @@ final class BrowserImportSummaryViewController: NSViewController {
         super.init(coder: coder)
     }
 
-    required init?(coder: NSCoder) {
+    required init?(coder _: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
 

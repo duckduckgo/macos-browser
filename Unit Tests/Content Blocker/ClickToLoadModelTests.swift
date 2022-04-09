@@ -16,9 +16,9 @@
 //  limitations under the License.
 //
 
-import XCTest
-import TrackerRadarKit
 import BrowserServicesKit
+import TrackerRadarKit
+import XCTest
 @testable import DuckDuckGo_Privacy_Browser
 
 class ClickToLoadModelTests: XCTestCase {
@@ -37,7 +37,7 @@ class ClickToLoadModelTests: XCTestCase {
             "blocked_video.svg"
         ]
 
-        for (image) in expectedImages {
+        for image in expectedImages {
             XCTAssertNotNil(nmodelImages[image], "Error: missing ClickToLoadModel image: " + image)
         }
     }

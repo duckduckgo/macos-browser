@@ -45,11 +45,11 @@ final class AuthenticationAlert: NSAlert {
 
         super.init()
 
-        self.messageText = UserText.authAlertTitle
+        messageText = UserText.authAlertTitle
         if isEncrypted {
-            self.informativeText = String(format: UserText.authAlertEncryptedConnectionMessageFormat, host)
+            informativeText = String(format: UserText.authAlertEncryptedConnectionMessageFormat, host)
         } else {
-            self.informativeText = String(format: UserText.authAlertPlainConnectionMessageFormat, host)
+            informativeText = String(format: UserText.authAlertPlainConnectionMessageFormat, host)
         }
 
         usernameTextField.delegate = self
@@ -62,7 +62,7 @@ final class AuthenticationAlert: NSAlert {
         let cancelButton = addButton(withTitle: UserText.cancel)
         cancelButton.tag = NSApplication.ModalResponse.cancel.rawValue
 
-        self.accessoryView = stackView
+        accessoryView = stackView
 
         updateButtons()
     }
@@ -75,11 +75,11 @@ final class AuthenticationAlert: NSAlert {
 
 extension AuthenticationAlert: NSTextFieldDelegate {
 
-    func controlTextDidChange(_ obj: Notification) {
+    func controlTextDidChange(_: Notification) {
         updateButtons()
     }
 
-    func controlTextDidEndEditing(_ obj: Notification) {
+    func controlTextDidEndEditing(_: Notification) {
         updateButtons()
     }
 

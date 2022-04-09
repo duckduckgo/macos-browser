@@ -16,8 +16,8 @@
 //  limitations under the License.
 //
 
-import XCTest
 import CoreData
+import XCTest
 @testable import DuckDuckGo_Privacy_Browser
 
 class BookmarkMigrationTests: XCTestCase {
@@ -47,10 +47,11 @@ class BookmarkMigrationTests: XCTestCase {
         let model = createObjectModel(withVersion: modelVersion)
         let storeCoordinator = NSPersistentStoreCoordinator(managedObjectModel: model!)
 
-        _ = try? storeCoordinator.addPersistentStore(ofType: storeType,
-                                                 configurationName: nil,
-                                                 at: storeURL(modelVersion),
-                                                 options: nil)
+        _ = try? storeCoordinator.addPersistentStore(
+            ofType: storeType,
+            configurationName: nil,
+            at: storeURL(modelVersion),
+            options: nil)
 
         return storeCoordinator
     }
@@ -59,19 +60,21 @@ class BookmarkMigrationTests: XCTestCase {
         let store = createStore(modelVersion: initialVersion)
         let nextVersionObjectModel = createObjectModel(withVersion: newVersion)!
 
-        let mappingModel = NSMappingModel(from: [Bundle.main, Bundle(for: AppDelegate.self)],
-                                          forSourceModel: store.managedObjectModel,
-                                          destinationModel: nextVersionObjectModel)!
+        let mappingModel = NSMappingModel(
+            from: [Bundle.main, Bundle(for: AppDelegate.self)],
+            forSourceModel: store.managedObjectModel,
+            destinationModel: nextVersionObjectModel)!
         let migrationManager = NSMigrationManager(sourceModel: store.managedObjectModel, destinationModel: nextVersionObjectModel)
 
         do {
-            try migrationManager.migrateStore(from: store.persistentStores.first!.url!,
-                                              sourceType: storeType,
-                                              options: nil,
-                                              with: mappingModel,
-                                              toDestinationURL: storeURL(newVersion)!,
-                                              destinationType: NSSQLiteStoreType,
-                                              destinationOptions: nil)
+            try migrationManager.migrateStore(
+                from: store.persistentStores.first!.url!,
+                sourceType: storeType,
+                options: nil,
+                with: mappingModel,
+                toDestinationURL: storeURL(newVersion)!,
+                destinationType: NSSQLiteStoreType,
+                destinationOptions: nil)
         } catch {
             XCTAssertNil(error)
         }

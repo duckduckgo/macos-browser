@@ -16,8 +16,8 @@
 //  limitations under the License.
 //
 
-import Foundation
 import CoreData
+import Foundation
 
 protocol ValueRepresentableManagedObject: NSManagedObject {
     associatedtype ValueType
@@ -59,12 +59,12 @@ internal class CoreDataStore<ManagedObject: ValueRepresentableManagedObject> {
 
     private var readContext: NSManagedObjectContext? {
         if case .none = _readContext {
-#if DEBUG
+            #if DEBUG
             if AppDelegate.isRunningTests {
                 _readContext = .some(.none)
                 return .none
             }
-#endif
+            #endif
             _readContext = Database.shared.makeContext(concurrencyType: .privateQueueConcurrencyType, name: tableName)
         }
         return _readContext!
@@ -82,7 +82,7 @@ internal class CoreDataStore<ManagedObject: ValueRepresentableManagedObject> {
 
     init(context: NSManagedObjectContext? = nil, tableName: String) {
         if let context = context {
-            self._readContext = .some(context)
+            _readContext = .some(context)
         }
         self.tableName = tableName
     }
@@ -90,10 +90,12 @@ internal class CoreDataStore<ManagedObject: ValueRepresentableManagedObject> {
     typealias Value = ManagedObject.ValueType
     typealias IDValueTuple = (id: NSManagedObjectID, value: Value)
 
-    func load<Result>(objectsWithPredicate predicate: NSPredicate? = nil,
-                      sortDescriptors: [NSSortDescriptor]? = nil,
-                      into initialResult: Result,
-                      _ accumulate: (inout Result, IDValueTuple) throws -> Void) throws -> Result {
+    func load<Result>(
+        objectsWithPredicate predicate: NSPredicate? = nil,
+        sortDescriptors: [NSSortDescriptor]? = nil,
+        into initialResult: Result,
+        _ accumulate: (inout Result, IDValueTuple) throws -> Void) throws
+        -> Result {
 
         var result = initialResult
         var coreDataError: Error?
@@ -134,7 +136,8 @@ internal class CoreDataStore<ManagedObject: ValueRepresentableManagedObject> {
 
             do {
                 for value in values {
-                    guard let managedObject = NSEntityDescription
+                    guard
+                        let managedObject = NSEntityDescription
                             .insertNewObject(forEntityName: entityName, into: context) as? ManagedObject
                     else {
                         result = .failure(CoreDataStoreError.invalidManagedObject)
@@ -212,10 +215,11 @@ internal class CoreDataStore<ManagedObject: ValueRepresentableManagedObject> {
         }
     }
 
-    func remove<T>(objectsWithPredicate predicate: NSPredicate,
-                   identifiedBy identifierKeyPath: KeyPath<ManagedObject, T>,
-                   completionHandler: ((Result<[T], Error>) -> Void)?) {
-        guard let context = self.writeContext() else { return }
+    func remove<T>(
+        objectsWithPredicate predicate: NSPredicate,
+        identifiedBy identifierKeyPath: KeyPath<ManagedObject, T>,
+        completionHandler: ((Result<[T], Error>) -> Void)?) {
+        guard let context = writeContext() else { return }
 
         func mainQueueCompletion(_ result: Result<[T], Error>) {
             guard completionHandler != nil else { return }
@@ -246,8 +250,9 @@ internal class CoreDataStore<ManagedObject: ValueRepresentableManagedObject> {
         }
     }
 
-    func remove(objectsWithPredicate predicate: NSPredicate,
-                completionHandler: ((Result<[NSManagedObjectID], Error>) -> Void)?) {
+    func remove(
+        objectsWithPredicate predicate: NSPredicate,
+        completionHandler: ((Result<[NSManagedObjectID], Error>) -> Void)?) {
         remove(objectsWithPredicate: predicate, identifiedBy: \ManagedObject.objectID, completionHandler: completionHandler)
     }
 

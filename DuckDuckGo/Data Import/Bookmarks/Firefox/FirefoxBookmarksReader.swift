@@ -83,9 +83,10 @@ final class FirefoxBookmarksReader {
         let foldersByParent: [Int: [FolderRow]]
         let bookmarksByFolder: [Int: [BookmarkRow]]
 
-        init(topLevelFolders: [FirefoxBookmarksReader.FolderRow],
-             foldersByParent: [Int: [FirefoxBookmarksReader.FolderRow]],
-             bookmarksByFolder: [Int: [FirefoxBookmarksReader.BookmarkRow]]) {
+        init(
+            topLevelFolders: [FirefoxBookmarksReader.FolderRow],
+            foldersByParent: [Int: [FirefoxBookmarksReader.FolderRow]],
+            bookmarksByFolder: [Int: [FirefoxBookmarksReader.BookmarkRow]]) {
             self.topLevelFolders = topLevelFolders
             self.foldersByParent = foldersByParent
             self.bookmarksByFolder = bookmarksByFolder
@@ -119,20 +120,22 @@ final class FirefoxBookmarksReader {
     }
 
     private func mapDatabaseBookmarksToImportedBookmarks(_ databaseBookmarks: DatabaseBookmarks) -> ImportedBookmarks? {
-        guard let menu = databaseBookmarks.topLevelFolders.first(where: { $0.title == "menu" }),
-              let toolbar = databaseBookmarks.topLevelFolders.first(where: { $0.title == "toolbar" }),
-              let unfiled = databaseBookmarks.topLevelFolders.first(where: { $0.title == "unfiled" }) else {
-                return nil
-              }
+        guard
+            let menu = databaseBookmarks.topLevelFolders.first(where: { $0.title == "menu" }),
+            let toolbar = databaseBookmarks.topLevelFolders.first(where: { $0.title == "toolbar" }),
+            let unfiled = databaseBookmarks.topLevelFolders.first(where: { $0.title == "unfiled" }) else {
+            return nil
+        }
 
         let menuBookmarksAndFolders = children(parentID: menu.id, bookmarks: databaseBookmarks)
         let toolbarBookmarksAndFolders = children(parentID: toolbar.id, bookmarks: databaseBookmarks)
         let unfiledBookmarksAndFolders = children(parentID: unfiled.id, bookmarks: databaseBookmarks)
 
-        let toolbarFolder = ImportedBookmarks.BookmarkOrFolder(name: "bar",
-                                                               type: "folder",
-                                                               urlString: nil,
-                                                               children: toolbarBookmarksAndFolders + menuBookmarksAndFolders)
+        let toolbarFolder = ImportedBookmarks.BookmarkOrFolder(
+            name: "bar",
+            type: "folder",
+            urlString: nil,
+            children: toolbarBookmarksAndFolders + menuBookmarksAndFolders)
         let unfiledFolder = ImportedBookmarks.BookmarkOrFolder(name: "other", type: "folder", urlString: nil, children: unfiledBookmarksAndFolders)
         let folders = ImportedBookmarks.TopLevelFolders(bookmarkBar: toolbarFolder, otherBookmarks: unfiledFolder)
         return ImportedBookmarks(topLevelFolders: folders)
@@ -160,15 +163,15 @@ final class FirefoxBookmarksReader {
     // It's expected that this will have an id of 1, but it's unclear if that is guaranteed. To be safe, we extract the root entry and use that to
     // look up the root folders.
     func rootEntryQuery() -> String {
-        return "SELECT id,type,title,parent FROM moz_bookmarks WHERE parent = 0;"
+        "SELECT id,type,title,parent FROM moz_bookmarks WHERE parent = 0;"
     }
 
     func foldersWithParentQuery() -> String {
-        return "SELECT id,type,title,parent FROM moz_bookmarks WHERE parent = ?;"
+        "SELECT id,type,title,parent FROM moz_bookmarks WHERE parent = ?;"
     }
 
     func allBookmarksQuery() -> String {
-        return """
+        """
         SELECT
             moz_places.id,
             moz_bookmarks.title,
@@ -189,7 +192,7 @@ final class FirefoxBookmarksReader {
     }
 
     func allFoldersQuery() -> String {
-        return """
+        """
         SELECT
             id,
             title,
@@ -214,13 +217,15 @@ final class FirefoxBookmarksReader {
 
 extension ImportedBookmarks.BookmarkOrFolder {
 
-    fileprivate static func from(folderRow: FirefoxBookmarksReader.FolderRow,
-                                 children: [ImportedBookmarks.BookmarkOrFolder]) -> ImportedBookmarks.BookmarkOrFolder {
-        return ImportedBookmarks.BookmarkOrFolder(name: folderRow.title, type: "folder", urlString: nil, children: children)
+    fileprivate static func from(
+        folderRow: FirefoxBookmarksReader.FolderRow,
+        children: [ImportedBookmarks.BookmarkOrFolder])
+        -> ImportedBookmarks.BookmarkOrFolder {
+        ImportedBookmarks.BookmarkOrFolder(name: folderRow.title, type: "folder", urlString: nil, children: children)
     }
 
     fileprivate static func from(bookmarkRow: FirefoxBookmarksReader.BookmarkRow) -> ImportedBookmarks.BookmarkOrFolder {
-        return ImportedBookmarks.BookmarkOrFolder(name: bookmarkRow.title, type: "bookmark", urlString: bookmarkRow.url, children: nil)
+        ImportedBookmarks.BookmarkOrFolder(name: bookmarkRow.title, type: "bookmark", urlString: bookmarkRow.url, children: nil)
     }
 
 }

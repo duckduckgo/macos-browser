@@ -23,15 +23,15 @@ extension NSColor {
     static var homePageBackgroundColor: NSColor {
         NSColor(named: "HomePageBackgroundColor")!
     }
-    
+
     static var homePageSearchBarBackgroundColor: NSColor {
-         return NSColor(named: "HomePageSearchBarBackgroundColor")!
-     }
+        NSColor(named: "HomePageSearchBarBackgroundColor")!
+    }
 
     static var addressBarFocusedBackgroundColor: NSColor {
         NSColor(named: "AddressBarFocusedBackgroundColor")!
     }
-    
+
     static var addressBarBackgroundColor: NSColor {
         NSColor(named: "AddressBarBackgroundColor")!
     }
@@ -57,15 +57,15 @@ extension NSColor {
     static var findInPageFocusedBackgroundColor: NSColor {
         NSColor(named: "FindInPageFocusedBackgroundColor")!
     }
-    
+
     static var inactiveSearchBarBackground: NSColor {
         NSColor(named: "InactiveSearchBarBackground")!
     }
-    
+
     static var suggestionTextColor: NSColor {
         NSColor(named: "SuggestionTextColor")!
     }
-    
+
     static var suggestionIconColor: NSColor {
         NSColor(named: "SuggestionIconColor")!
     }
@@ -77,7 +77,7 @@ extension NSColor {
     static var interfaceBackgroundColor: NSColor {
         NSColor(named: "InterfaceBackgroundColor")!
     }
-    
+
     static var tabMouseOverColor: NSColor {
         NSColor(named: "TabMouseOverColor")!
     }
@@ -130,6 +130,6 @@ extension NSColor {
         NSColor(named: "ButtonMouseDownColor")!
     }
 
-    static let buttonColor: NSColor = NSColor(named: "ButtonColor")!
+    static let buttonColor = NSColor(named: "ButtonColor")!
 
 }

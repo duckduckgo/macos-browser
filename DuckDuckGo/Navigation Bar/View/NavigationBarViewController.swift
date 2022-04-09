@@ -16,10 +16,10 @@
 //  limitations under the License.
 //
 
+import BrowserServicesKit
 import Cocoa
 import Combine
 import os.log
-import BrowserServicesKit
 
 // swiftlint:disable type_body_length
 final class NavigationBarViewController: NSViewController {
@@ -56,6 +56,7 @@ final class NavigationBarViewController: NSViewController {
         downloadsButton.addSubview(progressView)
         return progressView
     }()
+
     private static let activeDownloadsImage = NSImage(named: "DownloadsActive")
     private static let inactiveDownloadsImage = NSImage(named: "Downloads")
 
@@ -93,16 +94,17 @@ final class NavigationBarViewController: NSViewController {
     }()
 
     private var popovers: [NSPopover] {
-        return [saveCredentialsPopover, saveIdentityPopover, savePaymentMethodPopover]
+        [saveCredentialsPopover, saveIdentityPopover, savePaymentMethodPopover]
     }
 
-    private lazy var passwordManagementPopover: PasswordManagementPopover = PasswordManagementPopover()
+    private lazy var passwordManagementPopover = PasswordManagementPopover()
     private lazy var downloadsPopover: DownloadsPopover = {
         let downloadsPopover = DownloadsPopover()
         downloadsPopover.delegate = self
         (downloadsPopover.contentViewController as? DownloadsViewController)?.delegate = self
         return downloadsPopover
     }()
+
     var isDownloadsPopoverShown: Bool {
         downloadsPopover.isShown
     }
@@ -114,7 +116,7 @@ final class NavigationBarViewController: NSViewController {
     private var navigationButtonsCancellables = Set<AnyCancellable>()
     private var downloadsCancellables = Set<AnyCancellable>()
 
-    required init?(coder: NSCoder) {
+    required init?(coder _: NSCoder) {
         fatalError("NavigationBarViewController: Bad initializer")
     }
 
@@ -170,9 +172,12 @@ final class NavigationBarViewController: NSViewController {
         updateNavigationButtons()
     }
 
-    @IBSegueAction func createAddressBarViewController(_ coder: NSCoder) -> AddressBarViewController? {
-        guard let addressBarViewController = AddressBarViewController(coder: coder,
-                                                                      tabCollectionViewModel: tabCollectionViewModel) else {
+    @IBSegueAction
+    func createAddressBarViewController(_ coder: NSCoder) -> AddressBarViewController? {
+        guard
+            let addressBarViewController = AddressBarViewController(
+                coder: coder,
+                tabCollectionViewModel: tabCollectionViewModel) else {
             fatalError("NavigationBarViewController: Failed to init AddressBarViewController")
         }
 
@@ -180,28 +185,32 @@ final class NavigationBarViewController: NSViewController {
         return addressBarViewController
     }
 
-    @IBAction func goBackAction(_ sender: NSButton) {
+    @IBAction
+    func goBackAction(_: NSButton) {
         guard let selectedTabViewModel = tabCollectionViewModel.selectedTabViewModel else {
             os_log("%s: Selected tab view model is nil", type: .error, className)
             return
         }
 
-        if NSApp.isCommandPressed,
-           let backItem = selectedTabViewModel.tab.webView.backForwardList.backItem {
+        if
+            NSApp.isCommandPressed,
+            let backItem = selectedTabViewModel.tab.webView.backForwardList.backItem {
             openNewChildTab(with: backItem.url)
         } else {
             selectedTabViewModel.tab.goBack()
         }
     }
 
-    @IBAction func goForwardAction(_ sender: NSButton) {
+    @IBAction
+    func goForwardAction(_: NSButton) {
         guard let selectedTabViewModel = tabCollectionViewModel.selectedTabViewModel else {
             os_log("%s: Selected tab view model is nil", type: .error, className)
             return
         }
 
-        if NSApp.isCommandPressed,
-           let forwardItem = selectedTabViewModel.tab.webView.backForwardList.forwardItem {
+        if
+            NSApp.isCommandPressed,
+            let forwardItem = selectedTabViewModel.tab.webView.backForwardList.forwardItem {
             openNewChildTab(with: forwardItem.url)
         } else {
             selectedTabViewModel.tab.goForward()
@@ -213,7 +222,8 @@ final class NavigationBarViewController: NSViewController {
         tabCollectionViewModel.insertChild(tab: tab, selected: false)
     }
 
-    @IBAction func refreshAction(_ sender: NSButton) {
+    @IBAction
+    func refreshAction(_ sender: NSButton) {
         guard let selectedTabViewModel = tabCollectionViewModel.selectedTabViewModel else {
             os_log("%s: Selected tab view model is nil", type: .error, className)
             return
@@ -223,17 +233,20 @@ final class NavigationBarViewController: NSViewController {
         selectedTabViewModel.reload()
     }
 
-    @IBAction func optionsButtonAction(_ sender: NSButton) {
+    @IBAction
+    func optionsButtonAction(_ sender: NSButton) {
         let menu = MoreOptionsMenu(tabCollectionViewModel: tabCollectionViewModel)
         menu.actionDelegate = self
         menu.popUp(positioning: nil, at: NSPoint(x: 0, y: sender.bounds.height + 4), in: sender)
     }
 
-    @IBAction func bookmarksButtonAction(_ sender: NSButton) {
+    @IBAction
+    func bookmarksButtonAction(_: NSButton) {
         showBookmarkListPopover()
     }
 
-    @IBAction func passwordManagementButtonAction(_ sender: NSButton) {
+    @IBAction
+    func passwordManagementButtonAction(_ sender: NSButton) {
         // Use the category that is already selected
 
         if passwordManagementPopover.isShown {
@@ -243,7 +256,8 @@ final class NavigationBarViewController: NSViewController {
         }
     }
 
-    @IBAction func downloadsButtonAction(_ sender: NSButton) {
+    @IBAction
+    func downloadsButtonAction(_: NSButton) {
         toggleDownloadsPopover(keepButtonVisible: false)
     }
 
@@ -254,24 +268,28 @@ final class NavigationBarViewController: NSViewController {
     }
 
     func listenToMessageNotifications() {
-        NotificationCenter.default.addObserver(self,
-                                               selector: #selector(showFireproofingFeedback(_:)),
-                                               name: FireproofDomains.Constants.newFireproofDomainNotification,
-                                               object: nil)
+        NotificationCenter.default.addObserver(
+            self,
+            selector: #selector(showFireproofingFeedback(_:)),
+            name: FireproofDomains.Constants.newFireproofDomainNotification,
+            object: nil)
 
-        NotificationCenter.default.addObserver(self,
-                                               selector: #selector(showPrivateEmailCopiedToClipboard(_:)),
-                                               name: Notification.Name.privateEmailCopiedToClipboard,
-                                               object: nil)
+        NotificationCenter.default.addObserver(
+            self,
+            selector: #selector(showPrivateEmailCopiedToClipboard(_:)),
+            name: Notification.Name.privateEmailCopiedToClipboard,
+            object: nil)
         if #available(macOS 11, *) {
-            NotificationCenter.default.addObserver(self,
-                                                   selector: #selector(showAutoconsentFeedback(_:)),
-                                                   name: AutoconsentUserScript.Constants.newSitePopupHidden,
-                                                   object: nil)
+            NotificationCenter.default.addObserver(
+                self,
+                selector: #selector(showAutoconsentFeedback(_:)),
+                name: AutoconsentUserScript.Constants.newSitePopupHidden,
+                object: nil)
         }
     }
 
-    @objc private func showPrivateEmailCopiedToClipboard(_ sender: Notification) {
+    @objc
+    private func showPrivateEmailCopiedToClipboard(_: Notification) {
         guard view.window?.isKeyWindow == true else { return }
 
         DispatchQueue.main.async {
@@ -281,9 +299,11 @@ final class NavigationBarViewController: NSViewController {
 
     }
 
-    @objc private func showFireproofingFeedback(_ sender: Notification) {
-        guard view.window?.isKeyWindow == true,
-              let domain = sender.userInfo?[FireproofDomains.Constants.newFireproofDomainKey] as? String else { return }
+    @objc
+    private func showFireproofingFeedback(_ sender: Notification) {
+        guard
+            view.window?.isKeyWindow == true,
+            let domain = sender.userInfo?[FireproofDomains.Constants.newFireproofDomainKey] as? String else { return }
 
         DispatchQueue.main.async {
             let viewController = PopoverMessageViewController.createWithMessage(UserText.domainIsFireproof(domain: domain))
@@ -291,12 +311,14 @@ final class NavigationBarViewController: NSViewController {
         }
     }
 
-    @objc private func showAutoconsentFeedback(_ sender: Notification) {
+    @objc
+    private func showAutoconsentFeedback(_ sender: Notification) {
         if #available(macOS 11, *) {
-            guard view.window?.isKeyWindow == true,
-                  let host = sender.userInfo?[AutoconsentUserScript.Constants.popupHiddenHostKey] as? String,
-                  !AutoconsentUserScript.background.sitesNotifiedCache.contains(host),
-                  let relativeTarget = self.addressBarViewController?.addressBarButtonsViewController?.privacyEntryPointButton
+            guard
+                view.window?.isKeyWindow == true,
+                let host = sender.userInfo?[AutoconsentUserScript.Constants.popupHiddenHostKey] as? String,
+                !AutoconsentUserScript.background.sitesNotifiedCache.contains(host),
+                let relativeTarget = self.addressBarViewController?.addressBarButtonsViewController?.privacyEntryPointButton
             else { return }
             AutoconsentUserScript.background.sitesNotifiedCache.insert(host)
             DispatchQueue.main.async {
@@ -340,9 +362,10 @@ final class NavigationBarViewController: NSViewController {
         guard closeTransientPopovers() else { return }
         passwordManagementButton.isHidden = false
         passwordManagementPopover.select(category: selectedCategory)
-        passwordManagementPopover.show(relativeTo: passwordManagementButton.bounds.insetFromLineOfDeath(),
-                                       of: passwordManagementButton,
-                                       preferredEdge: .minY)
+        passwordManagementPopover.show(
+            relativeTo: passwordManagementButton.bounds.insetFromLineOfDeath(),
+            of: passwordManagementButton,
+            preferredEdge: .minY)
         Pixel.fire(.manageLogins(source: sender is NSButton ? .button : (sender is MainMenu ? .mainMenu : .moreMenu)))
     }
 
@@ -351,8 +374,9 @@ final class NavigationBarViewController: NSViewController {
             downloadsPopover.close()
             return
         }
-        guard closeTransientPopovers(),
-              downloadsButton.window != nil
+        guard
+            closeTransientPopovers(),
+            downloadsButton.window != nil
         else { return }
 
         downloadsButton.isHidden = false
@@ -377,12 +401,13 @@ final class NavigationBarViewController: NSViewController {
             }
         }
 
-        if !self.downloadsPopover.isShown {
-            self.toggleDownloadsPopover(keepButtonVisible: true, shouldFirePixel: false)
+        if !downloadsPopover.isShown {
+            toggleDownloadsPopover(keepButtonVisible: true, shouldFirePixel: false)
 
-            downloadsPopoverTimer = Timer.scheduledTimer(withTimeInterval: Constants.downloadsPopoverAutoHidingInterval,
-                                                         repeats: false,
-                                                         block: timerBlock)
+            downloadsPopoverTimer = Timer.scheduledTimer(
+                withTimeInterval: Constants.downloadsPopoverAutoHidingInterval,
+                repeats: false,
+                block: timerBlock)
         }
     }
 
@@ -436,7 +461,7 @@ final class NavigationBarViewController: NSViewController {
                 }
             }
             DispatchQueue.main.asyncAfter(deadline: .now() + 0.1, execute: fadeIn)
-            self.daxFadeInAnimation = fadeIn
+            daxFadeInAnimation = fadeIn
         } else {
             daxLogo.alphaValue = homePage ? 1 : 0
         }
@@ -516,18 +541,19 @@ final class NavigationBarViewController: NSViewController {
             self.hideDownloadButtonIfPossible()
         }
 
-        downloadsButtonHidingTimer = Timer.scheduledTimer(withTimeInterval: Constants.downloadsButtonAutoHidingInterval,
-                                                          repeats: false,
-                                                          block: timerBlock)
+        downloadsButtonHidingTimer = Timer.scheduledTimer(
+            withTimeInterval: Constants.downloadsButtonAutoHidingInterval,
+            repeats: false,
+            block: timerBlock)
     }
 
     private func invalideDownloadButtonHidingTimer() {
-        self.downloadsButtonHidingTimer?.invalidate()
-        self.downloadsButtonHidingTimer = nil
+        downloadsButtonHidingTimer?.invalidate()
+        downloadsButtonHidingTimer = nil
     }
 
     private func hideDownloadButtonIfPossible() {
-        if DownloadListCoordinator.shared.hasActiveDownloads || self.downloadsPopover.isShown { return }
+        if DownloadListCoordinator.shared.hasActiveDownloads || downloadsPopover.isShown { return }
 
         downloadsButton.isHidden = true
     }
@@ -581,9 +607,10 @@ final class NavigationBarViewController: NSViewController {
 
     private func show(popover: NSPopover) {
         passwordManagementButton.isHidden = false
-        popover.show(relativeTo: passwordManagementButton.bounds.insetFromLineOfDeath(),
-                     of: passwordManagementButton,
-                     preferredEdge: .minY)
+        popover.show(
+            relativeTo: passwordManagementButton.bounds.insetFromLineOfDeath(),
+            of: passwordManagementButton,
+            preferredEdge: .minY)
     }
 
     private func subscribeToNavigationActionFlags() {
@@ -620,11 +647,12 @@ final class NavigationBarViewController: NSViewController {
     }
 
 }
+
 // swiftlint:enable type_body_length
 
 extension NavigationBarViewController: OptionsButtonMenuDelegate {
 
-    func optionsButtonMenuRequestedBookmarkPopover(_ menu: NSMenu) {
+    func optionsButtonMenuRequestedBookmarkPopover(_: NSMenu) {
         showBookmarkListPopover()
     }
 
@@ -632,11 +660,11 @@ extension NavigationBarViewController: OptionsButtonMenuDelegate {
         showPasswordManagementPopover(sender: menu, selectedCategory: selectedCategory)
     }
 
-    func optionsButtonMenuRequestedDownloadsPopover(_ menu: NSMenu) {
+    func optionsButtonMenuRequestedDownloadsPopover(_: NSMenu) {
         toggleDownloadsPopover(keepButtonVisible: false)
     }
 
-    func optionsButtonMenuRequestedPrint(_ menu: NSMenu) {
+    func optionsButtonMenuRequestedPrint(_: NSMenu) {
         WindowControllersManager.shared.lastKeyMainWindowController?.mainViewController.printWebView(self)
     }
 

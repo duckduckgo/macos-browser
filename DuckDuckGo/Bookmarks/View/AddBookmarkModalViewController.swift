@@ -32,11 +32,11 @@ final class AddBookmarkModalViewController: NSViewController {
         let title: String?
 
         init?(_ tab: Tab) {
-            guard case let .url(url) = tab.content else {
+            guard case .url(let url) = tab.content else {
                 return nil
             }
             self.url = url
-            self.title = tab.title
+            title = tab.title
         }
     }
 
@@ -83,11 +83,13 @@ final class AddBookmarkModalViewController: NSViewController {
         applyModalWindowStyleIfNeeded()
     }
 
-    @IBAction private func cancel(_ sender: NSButton) {
+    @IBAction
+    private func cancel(_: NSButton) {
         dismiss()
     }
 
-    @IBAction private func addBookmark(_ sender: NSButton) {
+    @IBAction
+    private func addBookmark(_: NSButton) {
         guard let url = urlTextField.stringValue.url else {
             return
         }
@@ -112,7 +114,7 @@ final class AddBookmarkModalViewController: NSViewController {
 
 extension AddBookmarkModalViewController: NSTextFieldDelegate {
 
-    func controlTextDidChange(_ notification: Notification) {
+    func controlTextDidChange(_: Notification) {
         updateAddButton()
     }
 

@@ -22,7 +22,7 @@ import Foundation
 struct AppVersion {
 
     static let shared = AppVersion()
-    
+
     private let bundle: Bundle
 
     init(bundle: Bundle = .main) {
@@ -30,23 +30,23 @@ struct AppVersion {
     }
 
     var name: String {
-        return bundle.object(forInfoDictionaryKey: Bundle.Keys.name) as? String ?? ""
+        bundle.object(forInfoDictionaryKey: Bundle.Keys.name) as? String ?? ""
     }
 
     var identifier: String {
-        return bundle.object(forInfoDictionaryKey: Bundle.Keys.identifier) as? String ?? ""
+        bundle.object(forInfoDictionaryKey: Bundle.Keys.identifier) as? String ?? ""
     }
-    
+
     var majorVersionNumber: String {
-        return String(versionNumber.split(separator: ".").first ?? "")
+        String(versionNumber.split(separator: ".").first ?? "")
     }
 
     var versionNumber: String {
-        return bundle.object(forInfoDictionaryKey: Bundle.Keys.versionNumber) as? String ?? ""
+        bundle.object(forInfoDictionaryKey: Bundle.Keys.versionNumber) as? String ?? ""
     }
 
     var buildNumber: String {
-        return bundle.object(forInfoDictionaryKey: Bundle.Keys.buildNumber) as? String ?? ""
+        bundle.object(forInfoDictionaryKey: Bundle.Keys.buildNumber) as? String ?? ""
     }
-    
+
 }

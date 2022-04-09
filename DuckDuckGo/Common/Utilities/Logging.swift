@@ -44,7 +44,7 @@ extension OSLog {
     static var pixel: OSLog {
         Logging.pixelLoggingEnabled ? Logging.pixelLog : .disabled
     }
-    
+
     static var autoconsent: OSLog {
         Logging.autoconsentLoggingEnabled ? Logging.autoconsentLog : .disabled
     }
@@ -56,43 +56,43 @@ extension OSLog {
     static var favicons: OSLog {
         Logging.faviconLoggingEnabled ? Logging.faviconLog : .disabled
     }
-    
+
     static var autoLock: OSLog {
         Logging.autoLockLoggingEnabled ? Logging.autoLockLog : .disabled
     }
 
 }
 
-struct Logging {
+enum Logging {
 
     fileprivate static let configLoggingEnabled = false
-    fileprivate static let configLog: OSLog = OSLog(subsystem: Bundle.main.bundleIdentifier ?? "DuckDuckGo", category: "Configuration Downloading")
+    fileprivate static let configLog = OSLog(subsystem: Bundle.main.bundleIdentifier ?? "DuckDuckGo", category: "Configuration Downloading")
 
     fileprivate static let fireLoggingEnabled = false
-    fileprivate static let fireLog: OSLog = OSLog(subsystem: Bundle.main.bundleIdentifier ?? "DuckDuckGo", category: "Fire")
+    fileprivate static let fireLog = OSLog(subsystem: Bundle.main.bundleIdentifier ?? "DuckDuckGo", category: "Fire")
 
     fileprivate static let passwordManagerEnabled = false
-    fileprivate static let passwordManagerLog: OSLog = OSLog(subsystem: Bundle.main.bundleIdentifier ?? "DuckDuckGo", category: "Password Manager")
+    fileprivate static let passwordManagerLog = OSLog(subsystem: Bundle.main.bundleIdentifier ?? "DuckDuckGo", category: "Password Manager")
 
     fileprivate static let historyLoggingEnabled = false
-    fileprivate static let historyLog: OSLog = OSLog(subsystem: Bundle.main.bundleIdentifier ?? "DuckDuckGo", category: "History")
+    fileprivate static let historyLog = OSLog(subsystem: Bundle.main.bundleIdentifier ?? "DuckDuckGo", category: "History")
 
     fileprivate static let dataImportExportLoggingEnabled = false
-    fileprivate static let dataImportExportLog: OSLog = OSLog(subsystem: Bundle.main.bundleIdentifier ?? "DuckDuckGo", category: "Data Import/Export")
+    fileprivate static let dataImportExportLog = OSLog(subsystem: Bundle.main.bundleIdentifier ?? "DuckDuckGo", category: "Data Import/Export")
 
     fileprivate static let pixelLoggingEnabled = false
-    fileprivate static let pixelLog: OSLog = OSLog(subsystem: Bundle.main.bundleIdentifier ?? "DuckDuckGo", category: "Pixel")
+    fileprivate static let pixelLog = OSLog(subsystem: Bundle.main.bundleIdentifier ?? "DuckDuckGo", category: "Pixel")
 
     fileprivate static let contentBlockingLoggingEnabled = false
-    fileprivate static let contentBlockingLog: OSLog = OSLog(subsystem: Bundle.main.bundleIdentifier ?? "DuckDuckGo", category: "Content Blocking")
+    fileprivate static let contentBlockingLog = OSLog(subsystem: Bundle.main.bundleIdentifier ?? "DuckDuckGo", category: "Content Blocking")
 
     fileprivate static let faviconLoggingEnabled = false
-    fileprivate static let faviconLog: OSLog = OSLog(subsystem: Bundle.main.bundleIdentifier ?? "DuckDuckGo", category: "Favicons")
-    
+    fileprivate static let faviconLog = OSLog(subsystem: Bundle.main.bundleIdentifier ?? "DuckDuckGo", category: "Favicons")
+
     fileprivate static let autoLockLoggingEnabled = false
-    fileprivate static let autoLockLog: OSLog = OSLog(subsystem: Bundle.main.bundleIdentifier ?? "DuckDuckGo", category: "Auto-Lock")
+    fileprivate static let autoLockLog = OSLog(subsystem: Bundle.main.bundleIdentifier ?? "DuckDuckGo", category: "Auto-Lock")
 
     fileprivate static let autoconsentLoggingEnabled = false
-    fileprivate static let autoconsentLog: OSLog = OSLog(subsystem: Bundle.main.bundleIdentifier ?? "DuckDuckGo", category: "Autoconsent")
+    fileprivate static let autoconsentLog = OSLog(subsystem: Bundle.main.bundleIdentifier ?? "DuckDuckGo", category: "Autoconsent")
 
 }

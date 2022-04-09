@@ -22,12 +22,12 @@ import os.log
 final class TabBarCollectionView: NSCollectionView {
 
     override var acceptsFirstResponder: Bool {
-        return false
+        false
     }
-    
+
     override func awakeFromNib() {
         super.awakeFromNib()
-        
+
         let nib = NSNib(nibNamed: "TabBarViewItem", bundle: nil)
         register(nib, forItemWithIdentifier: TabBarViewItem.identifier)
 
@@ -50,7 +50,7 @@ final class TabBarCollectionView: NSCollectionView {
             deselectItems(at: selectionIndexPaths)
         }
     }
-    
+
     func scrollToSelected() {
         guard selectionIndexPaths.count == 1, let indexPath = selectionIndexPaths.first else {
             os_log("TabBarCollectionView: More than 1 item or no item highlighted", type: .error)
@@ -62,7 +62,7 @@ final class TabBarCollectionView: NSCollectionView {
             animator().scrollToVisible(rect)
         }, completionHandler: nil)
     }
-    
+
     func scrollToEnd(completionHandler: ((Bool) -> Void)? = nil) {
         animator().performBatchUpdates({
             animator().scroll(CGPoint(x: self.bounds.size.width, y: 0))
@@ -96,7 +96,7 @@ final class TabBarCollectionView: NSCollectionView {
 extension NSCollectionView {
 
     var clipView: NSClipView? {
-        return enclosingScrollView?.contentView
+        enclosingScrollView?.contentView
     }
 
     var isAtEndScrollPosition: Bool {

@@ -56,7 +56,7 @@ final class BookmarkManagementDetailViewController: NSViewController {
     }
 
     private var isEditing: Bool {
-        return editingBookmarkIndex != nil
+        editingBookmarkIndex != nil
     }
 
     private var editingBookmarkIndex: EditedBookmarkMetadata? {
@@ -86,15 +86,17 @@ final class BookmarkManagementDetailViewController: NSViewController {
         let nib = NSNib(nibNamed: "BookmarkTableCellView", bundle: Bundle.main)
         tableView.register(nib, forIdentifier: Constants.bookmarkCellIdentifier)
         tableView.setDraggingSourceOperationMask([.move], forLocal: true)
-        tableView.registerForDraggedTypes([BookmarkPasteboardWriter.bookmarkUTIInternalType,
-                                           FolderPasteboardWriter.folderUTIInternalType])
+        tableView.registerForDraggedTypes([
+            BookmarkPasteboardWriter.bookmarkUTIInternalType,
+            FolderPasteboardWriter.folderUTIInternalType
+        ])
 
         reloadData()
-        self.tableView.selectionHighlightStyle = .none
+        tableView.selectionHighlightStyle = .none
 
         emptyStateTitle.attributedStringValue = NSAttributedString.make(emptyStateTitle.stringValue, lineHeight: 1.14, kern: -0.23)
         emptyStateMessage.attributedStringValue = NSAttributedString.make(emptyStateMessage.stringValue, lineHeight: 1.05, kern: -0.08)
-   }
+    }
 
     override func viewDidDisappear() {
         super.viewDidDisappear()
@@ -102,7 +104,7 @@ final class BookmarkManagementDetailViewController: NSViewController {
         reloadData()
     }
 
-    override func mouseUp(with event: NSEvent) {
+    override func mouseUp(with _: NSEvent) {
         // Clicking anywhere outside of the table view should end editing mode for a given cell.
         updateEditingState(forRowAt: -1)
     }
@@ -113,14 +115,16 @@ final class BookmarkManagementDetailViewController: NSViewController {
             return
         }
         emptyState.isHidden = !(bookmarkManager.list?.topLevelEntities.isEmpty ?? true)
-        self.tableView.reloadData()
+        tableView.reloadData()
     }
 
-    @IBAction func onImportClicked(_ sender: NSButton) {
+    @IBAction
+    func onImportClicked(_: NSButton) {
         DataImportViewController.show()
     }
 
-    @IBAction func handleDoubleClick(_ sender: NSTableView) {
+    @IBAction
+    func handleDoubleClick(_ sender: NSTableView) {
         let index = sender.clickedRow
 
         guard index != -1, editingBookmarkIndex?.index != index, let entity = fetchEntity(at: index) else {
@@ -142,7 +146,8 @@ final class BookmarkManagementDetailViewController: NSViewController {
         }
     }
 
-    @IBAction func handleClick(_ sender: NSTableView) {
+    @IBAction
+    func handleClick(_ sender: NSTableView) {
         let index = sender.clickedRow
 
         if index != editingBookmarkIndex?.index {
@@ -150,13 +155,15 @@ final class BookmarkManagementDetailViewController: NSViewController {
         }
     }
 
-    @IBAction func presentAddBookmarkModal(_ sender: Any) {
+    @IBAction
+    func presentAddBookmarkModal(_: Any) {
         let addBookmarkViewController = AddBookmarkModalViewController.create()
         addBookmarkViewController.delegate = self
         beginSheet(addBookmarkViewController)
     }
 
-    @IBAction func presentAddFolderModal(_ sender: Any) {
+    @IBAction
+    func presentAddFolderModal(_: Any) {
         let addFolderViewController = AddFolderModalViewController.create()
         addFolderViewController.delegate = self
         beginSheet(addFolderViewController)
@@ -166,7 +173,7 @@ final class BookmarkManagementDetailViewController: NSViewController {
         if let editingIndex = editingBookmarkIndex?.index {
             animateEditingState(forRowAt: editingIndex, editing: false)
         }
-        self.editingBookmarkIndex = nil
+        editingBookmarkIndex = nil
     }
 
     private func updateEditingState(forRowAt index: Int) {
@@ -188,8 +195,9 @@ final class BookmarkManagementDetailViewController: NSViewController {
     }
 
     private func animateEditingState(forRowAt index: Int, editing: Bool, completion: (() -> Void)? = nil) {
-        if let cell = tableView.view(atColumn: 0, row: index, makeIfNecessary: false) as? BookmarkTableCellView,
-           let row = tableView.rowView(atRow: index, makeIfNecessary: false) as? BookmarkTableRowView {
+        if
+            let cell = tableView.view(atColumn: 0, row: index, makeIfNecessary: false) as? BookmarkTableCellView,
+            let row = tableView.rowView(atRow: index, makeIfNecessary: false) as? BookmarkTableRowView {
 
             tableView.beginUpdates()
             NSAnimationContext.runAnimationGroup { context in
@@ -225,22 +233,22 @@ final class BookmarkManagementDetailViewController: NSViewController {
 // MARK: - Modal Delegates
 
 extension BookmarkManagementDetailViewController: AddBookmarkModalViewControllerDelegate, AddFolderModalViewControllerDelegate {
-    
-    func addBookmarkViewController(_ viewController: AddBookmarkModalViewController, addedBookmarkWithTitle title: String, url: URL) {
+
+    func addBookmarkViewController(_: AddBookmarkModalViewController, addedBookmarkWithTitle title: String, url: URL) {
         if !bookmarkManager.isUrlBookmarked(url: url) {
             bookmarkManager.makeBookmark(for: url, title: title, isFavorite: false)
         }
     }
 
-    func addFolderViewController(_ viewController: AddFolderModalViewController, addedFolderWith name: String) {
-        if case let .folder(selectedFolder) = selectionState {
+    func addFolderViewController(_: AddFolderModalViewController, addedFolderWith name: String) {
+        if case .folder(let selectedFolder) = selectionState {
             bookmarkManager.makeFolder(for: name, parent: selectedFolder)
         } else {
             bookmarkManager.makeFolder(for: name, parent: nil)
         }
     }
 
-    func addFolderViewController(_ viewController: AddFolderModalViewController, saved folder: BookmarkFolder) {
+    func addFolderViewController(_: AddFolderModalViewController, saved folder: BookmarkFolder) {
         bookmarkManager.update(folder: folder)
     }
 
@@ -250,15 +258,15 @@ extension BookmarkManagementDetailViewController: AddBookmarkModalViewController
 
 extension BookmarkManagementDetailViewController: NSTableViewDelegate, NSTableViewDataSource {
 
-    func numberOfRows(in tableView: NSTableView) -> Int {
-        return totalRows()
+    func numberOfRows(in _: NSTableView) -> Int {
+        totalRows()
     }
 
-    func tableView(_ tableView: NSTableView, objectValueFor tableColumn: NSTableColumn?, row: Int) -> Any? {
-        return fetchEntity(at: row)
+    func tableView(_: NSTableView, objectValueFor _: NSTableColumn?, row: Int) -> Any? {
+        fetchEntity(at: row)
     }
 
-    func tableView(_ tableView: NSTableView, rowViewForRow row: Int) -> NSTableRowView? {
+    func tableView(_: NSTableView, rowViewForRow row: Int) -> NSTableRowView? {
         let rowView = BookmarkTableRowView()
         rowView.onSelectionChanged = onSelectionChanged
 
@@ -271,7 +279,7 @@ extension BookmarkManagementDetailViewController: NSTableViewDelegate, NSTableVi
         return rowView
     }
 
-    func tableView(_ tableView: NSTableView, viewFor tableColumn: NSTableColumn?, row: Int) -> NSView? {
+    func tableView(_ tableView: NSTableView, viewFor _: NSTableColumn?, row: Int) -> NSView? {
         guard let entity = fetchEntity(at: row) else { return nil }
 
         if let cell = tableView.makeView(withIdentifier: Constants.bookmarkCellIdentifier, owner: nil) as? BookmarkTableCellView {
@@ -293,20 +301,23 @@ extension BookmarkManagementDetailViewController: NSTableViewDelegate, NSTableVi
         return nil
     }
 
-    func tableView(_ tableView: NSTableView, pasteboardWriterForRow row: Int) -> NSPasteboardWriting? {
+    func tableView(_: NSTableView, pasteboardWriterForRow row: Int) -> NSPasteboardWriting? {
         guard let entity = fetchEntity(at: row) else { return nil }
         return entity.pasteboardWriter
     }
 
-    func tableView(_ tableView: NSTableView,
-                   validateDrop info: NSDraggingInfo,
-                   proposedRow row: Int,
-                   proposedDropOperation dropOperation: NSTableView.DropOperation) -> NSDragOperation {
+    func tableView(
+        _: NSTableView,
+        validateDrop info: NSDraggingInfo,
+        proposedRow row: Int,
+        proposedDropOperation dropOperation: NSTableView.DropOperation)
+        -> NSDragOperation {
 
-        guard dropOperation == .on,
-              row < totalRows(),
-              let proposedDestination = fetchEntity(at: row),
-              proposedDestination.isFolder else {
+        guard
+            dropOperation == .on,
+            row < totalRows(),
+            let proposedDestination = fetchEntity(at: row),
+            proposedDestination.isFolder else {
             return .none
         }
 
@@ -321,7 +332,7 @@ extension BookmarkManagementDetailViewController: NSTableViewDelegate, NSTableVi
         return .none
     }
 
-    private func validateDrop(for draggedBookmarks: Set<PasteboardBookmark>, destination: BaseBookmarkEntity) -> NSDragOperation {
+    private func validateDrop(for _: Set<PasteboardBookmark>, destination: BaseBookmarkEntity) -> NSDragOperation {
         guard destination is BookmarkFolder else {
             return .none
         }
@@ -335,7 +346,7 @@ extension BookmarkManagementDetailViewController: NSTableViewDelegate, NSTableVi
         }
 
         let tryingToDragOntoSameFolder = draggedFolders.contains { folder in
-            return folder.id == destination.id.uuidString
+            folder.id == destination.id.uuidString
         }
 
         if tryingToDragOntoSameFolder {
@@ -345,7 +356,7 @@ extension BookmarkManagementDetailViewController: NSTableViewDelegate, NSTableVi
         return .move
     }
 
-    func tableView(_ tableView: NSTableView, acceptDrop info: NSDraggingInfo, row: Int, dropOperation: NSTableView.DropOperation) -> Bool {
+    func tableView(_ tableView: NSTableView, acceptDrop info: NSDraggingInfo, row: Int, dropOperation _: NSTableView.DropOperation) -> Bool {
         let draggingLocation = info.draggingLocation
         let draggingLocationInTableViewCoordinates = tableView.convert(draggingLocation, to: nil)
         let draggingLocationRow = tableView.row(at: draggingLocationInTableViewCoordinates)
@@ -395,8 +406,8 @@ extension BookmarkManagementDetailViewController: NSTableViewDelegate, NSTableVi
     }
 
     fileprivate func selectedItems() -> [AnyObject] {
-        return tableView.selectedRowIndexes.compactMap { (index) -> AnyObject? in
-            return fetchEntity(at: index) as AnyObject
+        tableView.selectedRowIndexes.compactMap { index -> AnyObject? in
+            fetchEntity(at: index) as AnyObject
         }
     }
 
@@ -406,16 +417,16 @@ extension BookmarkManagementDetailViewController: NSTableViewDelegate, NSTableVi
 
         let indexes = tableView.selectedRowIndexes
         for index in 0 ..< totalRows() {
-            let row = self.tableView.rowView(atRow: index, makeIfNecessary: false) as? BookmarkTableRowView
+            let row = tableView.rowView(atRow: index, makeIfNecessary: false) as? BookmarkTableRowView
             row?.hasPrevious = indexes.contains(index - 1)
             row?.hasNext = indexes.contains(index + 1)
 
-            let cell = self.tableView.view(atColumn: 0, row: index, makeIfNecessary: false) as? BookmarkTableCellView
+            let cell = tableView.view(atColumn: 0, row: index, makeIfNecessary: false) as? BookmarkTableCellView
             cell?.isSelected = false
         }
     }
-        
-    func tableViewSelectionDidChange(_ notification: Notification) {
+
+    func tableViewSelectionDidChange(_: Notification) {
         onSelectionChanged()
     }
 
@@ -434,7 +445,7 @@ extension BookmarkManagementDetailViewController: NSTableViewDelegate, NSTableVi
 
 extension BookmarkManagementDetailViewController: BookmarkTableCellViewDelegate {
 
-    func bookmarkTableCellViewRequestedMenu(_ sender: NSButton, cell: BookmarkTableCellView) {
+    func bookmarkTableCellViewRequestedMenu(_: NSButton, cell: BookmarkTableCellView) {
         guard !isEditing else { return }
 
         let row = tableView.row(for: cell)
@@ -444,13 +455,13 @@ extension BookmarkManagementDetailViewController: BookmarkTableCellViewDelegate 
             return
         }
 
-        if let contextMenu = ContextualMenu.menu(for: [bookmark]), let cursorLocation = self.view.window?.mouseLocationOutsideOfEventStream {
-            let convertedLocation = self.view.convert(cursorLocation, from: nil)
+        if let contextMenu = ContextualMenu.menu(for: [bookmark]), let cursorLocation = view.window?.mouseLocationOutsideOfEventStream {
+            let convertedLocation = view.convert(cursorLocation, from: nil)
             contextMenu.items.forEach { item in
                 item.target = self
             }
 
-            contextMenu.popUp(positioning: nil, at: convertedLocation, in: self.view)
+            contextMenu.popUp(positioning: nil, at: convertedLocation, in: view)
         }
     }
 
@@ -466,7 +477,7 @@ extension BookmarkManagementDetailViewController: BookmarkTableCellViewDelegate 
         LocalBookmarkManager.shared.update(bookmark: bookmark)
     }
 
-    func bookmarkTableCellView(_ cell: BookmarkTableCellView, updatedBookmarkWithUUID uuid: UUID, newTitle: String, newUrl: String) {
+    func bookmarkTableCellView(_ cell: BookmarkTableCellView, updatedBookmarkWithUUID _: UUID, newTitle: String, newUrl: String) {
         let row = tableView.row(for: cell)
 
         guard let bookmark = fetchEntity(at: row) as? Bookmark, bookmark.id == editingBookmarkIndex?.uuid else {
@@ -497,7 +508,7 @@ extension BookmarkManagementDetailViewController: NSMenuDelegate {
         }
 
         if tableView.selectedRowIndexes.contains(row) {
-            return ContextualMenu.menu(for: self.selectedItems())
+            return ContextualMenu.menu(for: selectedItems())
         }
 
         if let item = fetchEntity(at: row) {
@@ -609,5 +620,5 @@ extension BookmarkManagementDetailViewController: BookmarkMenuItemSelectors {
 
         LocalBookmarkManager.shared.remove(bookmark: bookmark)
     }
-    
+
 }

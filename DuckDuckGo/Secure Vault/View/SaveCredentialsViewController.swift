@@ -65,11 +65,11 @@ final class SaveCredentialsViewController: NSViewController {
     /// Note that if the credentials.account.id is not nil, then we consider this an update rather than a save.
     func saveCredentials(_ credentials: SecureVaultModels.WebsiteCredentials) {
         self.credentials = credentials
-        self.domainLabel.stringValue = credentials.account.domain
-        self.usernameField.stringValue = credentials.account.username
-        self.hiddenPasswordField.stringValue = String(data: credentials.password, encoding: .utf8) ?? ""
-        self.visiblePasswordField.stringValue = self.hiddenPasswordField.stringValue
-        self.loadFaviconForDomain(credentials.account.domain)
+        domainLabel.stringValue = credentials.account.domain
+        usernameField.stringValue = credentials.account.username
+        hiddenPasswordField.stringValue = String(data: credentials.password, encoding: .utf8) ?? ""
+        visiblePasswordField.stringValue = hiddenPasswordField.stringValue
+        loadFaviconForDomain(credentials.account.domain)
 
         notNowButton.isHidden = credentials.account.id != nil
         saveButton.isHidden = credentials.account.id != nil
@@ -78,13 +78,15 @@ final class SaveCredentialsViewController: NSViewController {
         dontUpdateButton.isHidden = credentials.account.id == nil
     }
 
-    @IBAction func onSaveClicked(sender: Any?) {
+    @IBAction
+    func onSaveClicked(sender _: Any?) {
         defer {
             self.delegate?.shouldCloseSaveCredentialsViewController(self)
         }
 
-        var account = SecureVaultModels.WebsiteAccount(username: usernameField.stringValue.trimmingWhitespaces(),
-                                                       domain: domainLabel.stringValue)
+        var account = SecureVaultModels.WebsiteAccount(
+            username: usernameField.stringValue.trimmingWhitespaces(),
+            domain: domainLabel.stringValue)
         account.id = credentials?.account.id
         let credentials = SecureVaultModels.WebsiteCredentials(account: account, password: passwordData)
 
@@ -95,17 +97,19 @@ final class SaveCredentialsViewController: NSViewController {
         }
 
         Pixel.fire(.autofillItemSaved(kind: .password))
-        if self.fireproofCheck.state == .on {
+        if fireproofCheck.state == .on {
             Pixel.fire(.fireproof(kind: .pwm, suggested: .pwm))
             FireproofDomains.shared.add(domain: account.domain)
         }
     }
 
-    @IBAction func onDontUpdateClicked(_ sender: Any) {
+    @IBAction
+    func onDontUpdateClicked(_: Any) {
         delegate?.shouldCloseSaveCredentialsViewController(self)
     }
 
-    @IBAction func onNotNowClicked(sender: Any?) {
+    @IBAction
+    func onNotNowClicked(sender _: Any?) {
         delegate?.shouldCloseSaveCredentialsViewController(self)
 
         guard PrivacySecurityPreferences.shared.loginDetectionEnabled else { return }
@@ -130,7 +134,8 @@ final class SaveCredentialsViewController: NSViewController {
         Pixel.fire(.fireproofSuggested())
     }
 
-    @IBAction func onTogglePasswordVisibility(sender: Any?) {
+    @IBAction
+    func onTogglePasswordVisibility(sender _: Any?) {
         updatePasswordFieldVisibility(visible: !hiddenPasswordField.isHidden)
     }
 

@@ -34,12 +34,11 @@ struct DownloadsPreferencesPersistorMock: DownloadsPreferencesPersistor {
         selectedDownloadLocation: String? = nil,
         alwaysRequestDownloadLocation: Bool = false,
         defaultDownloadLocation: URL? = FileManager.default.temporaryDirectory,
-        isDownloadLocationValid: @escaping (URL) -> Bool = { _ in true }
-    ) {
+        isDownloadLocationValid: @escaping (URL) -> Bool = { _ in true }) {
         self.selectedDownloadLocation = selectedDownloadLocation
         self.alwaysRequestDownloadLocation = alwaysRequestDownloadLocation
         self.defaultDownloadLocation = defaultDownloadLocation
-        self._isDownloadLocationValid = isDownloadLocationValid
+        _isDownloadLocationValid = isDownloadLocationValid
     }
 }
 

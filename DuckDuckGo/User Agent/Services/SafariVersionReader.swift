@@ -23,8 +23,9 @@ struct SafariVersionReader {
     static let safariPlistPath = "/Applications/Safari.app/Contents/Info.plist"
 
     static func getVersion() -> String? {
-        guard let plist = NSDictionary(contentsOfFile: Self.safariPlistPath),
-              let versionNumber = plist.object(forKey: Bundle.Keys.versionNumber) as? String else {
+        guard
+            let plist = NSDictionary(contentsOfFile: Self.safariPlistPath),
+            let versionNumber = plist.object(forKey: Bundle.Keys.versionNumber) as? String else {
             assertionFailure("Reading the version of Safari failed")
             return nil
         }

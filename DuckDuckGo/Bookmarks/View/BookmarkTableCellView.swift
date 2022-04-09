@@ -18,7 +18,8 @@
 
 import Foundation
 
-@objc protocol BookmarkTableCellViewDelegate: AnyObject {
+@objc
+protocol BookmarkTableCellViewDelegate: AnyObject {
 
     func bookmarkTableCellViewRequestedMenu(_ sender: NSButton, cell: BookmarkTableCellView)
     func bookmarkTableCellViewToggledFavorite(cell: BookmarkTableCellView)
@@ -77,11 +78,13 @@ final class BookmarkTableCellView: NSTableCellView, NibLoadable {
     @IBOutlet var titleLabelTopConstraint: NSLayoutConstraint!
     @IBOutlet var titleLabelBottomConstraint: NSLayoutConstraint!
 
-    @IBAction func cellMenuButtonClicked(_ sender: NSButton) {
+    @IBAction
+    func cellMenuButtonClicked(_ sender: NSButton) {
         delegate?.bookmarkTableCellViewRequestedMenu(sender, cell: self)
     }
 
-    @IBAction func favoriteButtonClicked(_ sender: NSButton) {
+    @IBAction
+    func favoriteButtonClicked(_: NSButton) {
         guard entity is Bookmark else {
             assertionFailure("\(#file): Tried to favorite non-Bookmark object")
             return
@@ -92,7 +95,7 @@ final class BookmarkTableCellView: NSTableCellView, NibLoadable {
 
     @IBOutlet weak var delegate: BookmarkTableCellViewDelegate?
 
-    var editing: Bool = false {
+    var editing = false {
         didSet {
             if editing {
                 enterEditingMode()
@@ -112,7 +115,7 @@ final class BookmarkTableCellView: NSTableCellView, NibLoadable {
 
     private var entity: BaseBookmarkEntity?
     private var trackingArea: NSTrackingArea?
-    private var mouseInside: Bool = false {
+    private var mouseInside = false {
         didSet {
             guard self.entity is Bookmark else {
                 menuButton.isHidden = true
@@ -148,11 +151,11 @@ final class BookmarkTableCellView: NSTableCellView, NibLoadable {
         }
     }
 
-    override func mouseEntered(with event: NSEvent) {
+    override func mouseEntered(with _: NSEvent) {
         mouseInside = true
     }
 
-    override func mouseExited(with event: NSEvent) {
+    override func mouseExited(with _: NSEvent) {
         mouseInside = false
     }
 
@@ -167,7 +170,7 @@ final class BookmarkTableCellView: NSTableCellView, NibLoadable {
     }
 
     func update(from bookmark: Bookmark) {
-        self.entity = bookmark
+        entity = bookmark
 
         faviconImageView.image = bookmark.favicon(.small) ?? NSImage(named: "BookmarkDefaultFavicon")
         accessoryImageView.image = bookmark.isFavorite ? Self.favoriteAccessoryViewImage : nil
@@ -178,7 +181,7 @@ final class BookmarkTableCellView: NSTableCellView, NibLoadable {
     }
 
     func update(from folder: BookmarkFolder) {
-        self.entity = folder
+        entity = folder
 
         faviconImageView.image = NSImage(named: "Folder")
         accessoryImageView.image = Self.folderAccessoryViewImage
@@ -187,7 +190,7 @@ final class BookmarkTableCellView: NSTableCellView, NibLoadable {
     }
 
     private func resetCellState() {
-        self.entity = nil
+        entity = nil
         editing = false
         mouseInside = false
         bookmarkURLLabel.isHidden = true
@@ -233,12 +236,14 @@ final class BookmarkTableCellView: NSTableCellView, NibLoadable {
         favoriteButton.isHidden = true
         titleLabelBottomConstraint.priority = .required
 
-        if let editedBookmark = self.entity as? Bookmark,
-           titleLabel.stringValue != editedBookmark.title || bookmarkURLLabel.stringValue != editedBookmark.url.absoluteString {
-            delegate?.bookmarkTableCellView(self,
-                                            updatedBookmarkWithUUID: editedBookmark.id,
-                                            newTitle: titleLabel.stringValue,
-                                            newUrl: bookmarkURLLabel.stringValue)
+        if
+            let editedBookmark = entity as? Bookmark,
+            titleLabel.stringValue != editedBookmark.title || bookmarkURLLabel.stringValue != editedBookmark.url.absoluteString {
+            delegate?.bookmarkTableCellView(
+                self,
+                updatedBookmarkWithUUID: editedBookmark.id,
+                newTitle: titleLabel.stringValue,
+                newUrl: bookmarkURLLabel.stringValue)
         }
     }
 
@@ -270,9 +275,9 @@ final class BookmarkTableCellView: NSTableCellView, NibLoadable {
     }
 
     private func resetAppearanceFromBookmark() {
-        if let bookmark = self.entity as? Bookmark {
+        if let bookmark = entity as? Bookmark {
             update(from: bookmark)
-        } else if let folder = self.entity as? BookmarkFolder {
+        } else if let folder = entity as? BookmarkFolder {
             update(from: folder)
         } else {
             assertionFailure("\(#file): Failed to update cell from bookmark entity")

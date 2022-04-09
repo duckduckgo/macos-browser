@@ -26,7 +26,7 @@ final class LottieAnimationCache: AnimationCacheProvider {
     private var cache = [String: Animation]()
 
     func animation(forKey: String) -> Animation? {
-        return cache[forKey]
+        cache[forKey]
     }
 
     func setAnimation(_ animation: Animation, forKey: String) {

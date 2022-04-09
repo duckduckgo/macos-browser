@@ -33,12 +33,13 @@ final class BookmarkManagementSplitViewController: NSSplitViewController {
 
     // swiftlint:disable force_cast
     var sidebarViewController: BookmarkManagementSidebarViewController {
-        return splitViewItems[0].viewController as! BookmarkManagementSidebarViewController
+        splitViewItems[0].viewController as! BookmarkManagementSidebarViewController
     }
 
     var detailViewController: BookmarkManagementDetailViewController {
-        return splitViewItems[1].viewController as! BookmarkManagementDetailViewController
+        splitViewItems[1].viewController as! BookmarkManagementDetailViewController
     }
+
     // swiftlint:enable force_cast
 
     weak var delegate: BrowserTabSelectionDelegate?
@@ -62,8 +63,9 @@ final class BookmarkManagementSplitViewController: NSSplitViewController {
 
 extension BookmarkManagementSplitViewController: BookmarkManagementSidebarViewControllerDelegate {
 
-    func bookmarkManagementSidebarViewController(_ sidebarViewController: BookmarkManagementSidebarViewController,
-                                                 enteredState state: BookmarkManagementSidebarViewController.SelectionState) {
+    func bookmarkManagementSidebarViewController(
+        _: BookmarkManagementSidebarViewController,
+        enteredState state: BookmarkManagementSidebarViewController.SelectionState) {
         detailViewController.update(selectionState: state)
     }
 

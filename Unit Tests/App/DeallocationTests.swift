@@ -16,8 +16,8 @@
 //  limitations under the License.
 //
 
-import XCTest
 import Combine
+import XCTest
 @testable import DuckDuckGo_Privacy_Browser
 
 final class DeallocationTests: XCTestCase {
@@ -39,6 +39,7 @@ final class DeallocationTests: XCTestCase {
         init(e: XCTestExpectation) {
             self.e = e
         }
+
         deinit {
             e.fulfill()
         }

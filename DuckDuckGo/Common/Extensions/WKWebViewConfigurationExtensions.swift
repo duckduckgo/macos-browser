@@ -16,8 +16,8 @@
 //  limitations under the License.
 //
 
-import WebKit
 import Combine
+import WebKit
 
 extension WKWebViewConfiguration {
 
@@ -34,8 +34,8 @@ extension WKWebViewConfiguration {
             preferences.javaScriptCanOpenWindowsAutomatically = false
         }
         preferences.isFraudulentWebsiteWarningEnabled = false
-        self.userContentController = UserContentController()
-        self.processPool.geolocationProvider = GeolocationProvider(processPool: self.processPool)
-     }
+        userContentController = UserContentController()
+        processPool.geolocationProvider = GeolocationProvider(processPool: processPool)
+    }
 
 }

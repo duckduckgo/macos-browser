@@ -16,9 +16,9 @@
 //  limitations under the License.
 //
 
+import Combine
 import Foundation
 import SwiftUI
-import Combine
 
 protocol DefaultBrowserProvider {
     var bundleIdentifier: String { get }
@@ -36,8 +36,9 @@ struct SystemDefaultBrowserProvider: DefaultBrowserProvider {
     let bundleIdentifier: String
 
     var isDefault: Bool {
-        guard let defaultBrowserURL = NSWorkspace.shared.urlForApplication(toOpen: URL(string: "http://")!),
-              let ddgBrowserURL = NSWorkspace.shared.urlForApplication(withBundleIdentifier: bundleIdentifier)
+        guard
+            let defaultBrowserURL = NSWorkspace.shared.urlForApplication(toOpen: URL(string: "http://")!),
+            let ddgBrowserURL = NSWorkspace.shared.urlForApplication(withBundleIdentifier: bundleIdentifier)
         else {
             return false
         }
@@ -70,7 +71,7 @@ struct SystemDefaultBrowserProvider: DefaultBrowserProvider {
 
 final class DefaultBrowserPreferences: ObservableObject {
 
-    @Published private(set) var isDefault: Bool = false
+    @Published private(set) var isDefault = false
 
     init(defaultBrowserProvider: DefaultBrowserProvider = SystemDefaultBrowserProvider()) {
         self.defaultBrowserProvider = defaultBrowserProvider
@@ -93,8 +94,7 @@ final class DefaultBrowserPreferences: ObservableObject {
             // Skip initial value and wait for the next event (happening on appDidBecomeActive)
             // Take only one value, which ensures that the subscription is automatically disposed of.
             $isDefault.dropFirst().prefix(1).subscribe(
-                Subscribers.Sink(receiveCompletion: { _ in }, receiveValue: receiveValue)
-            )
+                Subscribers.Sink(receiveCompletion: { _ in }, receiveValue: receiveValue))
         }
 
         do {

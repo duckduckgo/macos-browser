@@ -19,7 +19,8 @@
 import Foundation
 import WebKit
 
-@objc protocol WebKitDownload: AnyObject {
+@objc
+protocol WebKitDownload: AnyObject {
     var downloadDelegate: WebKitDownloadDelegate? { get set }
     var originalRequest: URLRequest? { get }
     var webView: WKWebView? { get }
@@ -33,17 +34,17 @@ extension WKDownload: WebKitDownload {
 
     var downloadDelegate: WebKitDownloadDelegate? {
         get {
-            let wrapper = self.delegate as? WKDownloadDelegateWrapper
+            let wrapper = delegate as? WKDownloadDelegateWrapper
             return wrapper?.delegate
         }
         set {
             let delegateWrapper = newValue.map(WKDownloadDelegateWrapper.init(delegate:))
-            self.delegate = delegateWrapper
+            delegate = delegateWrapper
         }
     }
 
     func cancel() {
-        self.cancel { [weak self] resumeData in
+        cancel { [weak self] resumeData in
             // WKDownload.cancel(_:) does not produce delegate method call whereas _WKDownload.cancel calls _downloadDidCancel(:_)
             // calling delegate method here to make it consistent
             self?.downloadDelegate?.download(self!, didFailWithError: URLError(.cancelled), resumeData: resumeData)
@@ -71,17 +72,19 @@ final private class WKDownloadDelegateWrapper: NSObject, WKDownloadDelegate {
         objc_setAssociatedObject(delegate, Self.delegateWrapperKey, self, .OBJC_ASSOCIATION_RETAIN)
     }
 
-    func download(_ download: WKDownload,
-                  decideDestinationUsing response: URLResponse,
-                  suggestedFilename: String,
-                  completionHandler: @escaping (URL?) -> Void) {
+    func download(
+        _ download: WKDownload,
+        decideDestinationUsing response: URLResponse,
+        suggestedFilename: String,
+        completionHandler: @escaping (URL?) -> Void) {
         delegate?.download(download, decideDestinationUsing: response, suggestedFilename: suggestedFilename, completionHandler: completionHandler)
     }
 
-    func download(_ download: WKDownload,
-                  willPerformHTTPRedirection response: HTTPURLResponse,
-                  newRequest request: URLRequest,
-                  decisionHandler: @escaping (WKDownload.RedirectPolicy) -> Void) {
+    func download(
+        _ download: WKDownload,
+        willPerformHTTPRedirection response: HTTPURLResponse,
+        newRequest request: URLRequest,
+        decisionHandler: @escaping (WKDownload.RedirectPolicy) -> Void) {
         delegate?.download(download, willPerformHTTPRedirection: response, newRequest: request) {
             switch $0 {
             case .cancel:
@@ -89,17 +92,14 @@ final private class WKDownloadDelegateWrapper: NSObject, WKDownloadDelegate {
             case .allow:
                 decisionHandler(.allow)
             }
-        } ?? {
-            decisionHandler(.allow)
-        }()
+        } ?? decisionHandler(.allow)
     }
 
-    func download(_ download: WKDownload,
-                  didReceive challenge: URLAuthenticationChallenge,
-                  completionHandler: @escaping (URLSession.AuthChallengeDisposition, URLCredential?) -> Void) {
-        delegate?.download(download, didReceive: challenge, completionHandler: completionHandler) ?? {
-            completionHandler(.performDefaultHandling, nil)
-        }()
+    func download(
+        _ download: WKDownload,
+        didReceive challenge: URLAuthenticationChallenge,
+        completionHandler: @escaping (URLSession.AuthChallengeDisposition, URLCredential?) -> Void) {
+        delegate?.download(download, didReceive: challenge, completionHandler: completionHandler) ?? completionHandler(.performDefaultHandling, nil)
     }
 
     func downloadDidFinish(_ download: WKDownload) {

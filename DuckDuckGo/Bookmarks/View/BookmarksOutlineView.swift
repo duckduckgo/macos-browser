@@ -53,10 +53,11 @@ final class BookmarksOutlineView: NSOutlineView {
     override func awakeFromNib() {
         guard let scrollView = enclosingScrollView else { fatalError() }
 
-        let trackingArea = NSTrackingArea(rect: scrollView.frame,
-                                          options: [.mouseMoved, .activeInKeyWindow, .inVisibleRect],
-                                          owner: self,
-                                          userInfo: nil)
+        let trackingArea = NSTrackingArea(
+            rect: scrollView.frame,
+            options: [.mouseMoved, .activeInKeyWindow, .inVisibleRect],
+            owner: self,
+            userInfo: nil)
         scrollView.addTrackingArea(trackingArea)
     }
 

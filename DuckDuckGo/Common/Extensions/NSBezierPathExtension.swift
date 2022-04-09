@@ -25,19 +25,19 @@ extension NSBezierPath {
     var cgPath: CGPath {
         let path = CGMutablePath()
         var points = [CGPoint](repeating: .zero, count: 3)
-        for i in 0 ..< self.elementCount {
-            let type = self.element(at: i, associatedPoints: &points)
+        for i in 0 ..< elementCount {
+            let type = element(at: i, associatedPoints: &points)
             switch type {
             case .moveTo:
-              path.move(to: points[0])
+                path.move(to: points[0])
             case .lineTo:
-              path.addLine(to: points[0])
+                path.addLine(to: points[0])
             case .curveTo:
-              path.addCurve(to: points[2], control1: points[0], control2: points[1])
+                path.addCurve(to: points[2], control1: points[0], control2: points[1])
             case .closePath:
-              path.closeSubpath()
+                path.closeSubpath()
             @unknown default:
-              break
+                break
             }
         }
         return path
@@ -58,16 +58,14 @@ extension NSBezierPath {
     convenience init(roundedRect rect: CGRect, forCorners corners: [Corners], cornerRadius: CGFloat) {
         self.init()
 
-        /*
-                 1      2
-           c4     _______   c1
-                 /       \
-               8 |       | 3
-                 |       |
-               7 |       | 4
-           c3    \_______/   c2
-                 6       5
-         */
+        //        1      2
+        //  c4     _______   c1
+        //        /       \
+        //      8 |       | 3
+        //        |       |
+        //      7 |       | 4
+        //  c3    \_______/   c2
+        //        6       5
 
         func addCorner(_ rounded: Bool, _ cornerPoint: CGPoint, _ nextPoint: CGPoint) {
             if rounded {
@@ -121,14 +119,14 @@ extension NSBezierPath {
 
 }
 
-fileprivate extension CGPoint {
+extension CGPoint {
 
-    func adjustingX(_ offset: CGFloat) -> CGPoint {
-        return CGPoint(x: x + offset, y: y)
+    fileprivate func adjustingX(_ offset: CGFloat) -> CGPoint {
+        CGPoint(x: x + offset, y: y)
     }
 
-    func adjustingY(_ offset: CGFloat) -> CGPoint {
-        return CGPoint(x: x, y: y + offset)
+    fileprivate func adjustingY(_ offset: CGFloat) -> CGPoint {
+        CGPoint(x: x, y: y + offset)
     }
 
 }

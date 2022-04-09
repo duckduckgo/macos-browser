@@ -80,16 +80,16 @@ final class BookmarkOutlineViewDataSource: NSObject, NSOutlineViewDataSource, NS
         return item
     }
 
-    func outlineView(_ outlineView: NSOutlineView, numberOfChildrenOfItem item: Any?) -> Int {
-        return nodeForItem(item).numberOfChildNodes
+    func outlineView(_: NSOutlineView, numberOfChildrenOfItem item: Any?) -> Int {
+        nodeForItem(item).numberOfChildNodes
     }
 
-    func outlineView(_ outlineView: NSOutlineView, child index: Int, ofItem item: Any?) -> Any {
-        return nodeForItem(item).childNodes[index]
+    func outlineView(_: NSOutlineView, child index: Int, ofItem item: Any?) -> Any {
+        nodeForItem(item).childNodes[index]
     }
 
-    func outlineView(_ outlineView: NSOutlineView, isItemExpandable item: Any) -> Bool {
-        return nodeForItem(item).canHaveChildNodes
+    func outlineView(_: NSOutlineView, isItemExpandable item: Any) -> Bool {
+        nodeForItem(item).canHaveChildNodes
     }
 
     func outlineViewSelectionDidChange(_ notification: Notification) {
@@ -109,9 +109,10 @@ final class BookmarkOutlineViewDataSource: NSObject, NSOutlineViewDataSource, NS
         }
     }
 
-    func outlineView(_ outlineView: NSOutlineView, viewFor tableColumn: NSTableColumn?, item: Any) -> NSView? {
-        guard let node = item as? BookmarkNode,
-              let cell = outlineView.makeView(withIdentifier: BookmarkOutlineViewCell.identifier, owner: self) as? BookmarkOutlineViewCell else {
+    func outlineView(_ outlineView: NSOutlineView, viewFor _: NSTableColumn?, item: Any) -> NSView? {
+        guard
+            let node = item as? BookmarkNode,
+            let cell = outlineView.makeView(withIdentifier: BookmarkOutlineViewCell.identifier, owner: self) as? BookmarkOutlineViewCell else {
             assertionFailure("\(#file): Failed to create BookmarkOutlineViewCell or cast item to Node")
             return nil
         }
@@ -141,15 +142,17 @@ final class BookmarkOutlineViewDataSource: NSObject, NSOutlineViewDataSource, NS
         return OutlineSeparatorViewCell(separatorVisible: contentMode == .bookmarksAndFolders)
     }
 
-    func outlineView(_ outlineView: NSOutlineView, pasteboardWriterForItem item: Any) -> NSPasteboardWriting? {
+    func outlineView(_: NSOutlineView, pasteboardWriterForItem item: Any) -> NSPasteboardWriting? {
         guard let node = item as? BookmarkNode, let entity = node.representedObject as? BaseBookmarkEntity else { return nil }
         return entity.pasteboardWriter
     }
 
-    func outlineView(_ outlineView: NSOutlineView,
-                     validateDrop info: NSDraggingInfo,
-                     proposedItem item: Any?,
-                     proposedChildIndex index: Int) -> NSDragOperation {
+    func outlineView(
+        _: NSOutlineView,
+        validateDrop info: NSDraggingInfo,
+        proposedItem item: Any?,
+        proposedChildIndex index: Int)
+        -> NSDragOperation {
         guard index == -1 else {
             return .none
         }
@@ -167,7 +170,7 @@ final class BookmarkOutlineViewDataSource: NSObject, NSOutlineViewDataSource, NS
         return .none
     }
 
-    func validateDrop(for draggedBookmarks: Set<PasteboardBookmark>, destination: BookmarkNode) -> NSDragOperation {
+    func validateDrop(for _: Set<PasteboardBookmark>, destination: BookmarkNode) -> NSDragOperation {
         guard destination.representedObject is BookmarkFolder || destination.representedObject is PseudoFolder || destination.isRoot else {
             return .none
         }
@@ -191,7 +194,7 @@ final class BookmarkOutlineViewDataSource: NSObject, NSOutlineViewDataSource, NS
         // Folders cannot be dragged onto themselves:
 
         let containsDestination = draggedFolders.contains { draggedFolder in
-            return draggedFolder.id == destinationFolder.id.uuidString
+            draggedFolder.id == destinationFolder.id.uuidString
         }
 
         if containsDestination {
@@ -219,7 +222,7 @@ final class BookmarkOutlineViewDataSource: NSObject, NSOutlineViewDataSource, NS
         return .move
     }
 
-    func outlineView(_ outlineView: NSOutlineView, acceptDrop info: NSDraggingInfo, item: Any?, childIndex index: Int) -> Bool {
+    func outlineView(_: NSOutlineView, acceptDrop info: NSDraggingInfo, item: Any?, childIndex _: Int) -> Bool {
         let representedObject = (item as? BookmarkNode)?.representedObject
         let draggedBookmarks = PasteboardBookmark.pasteboardBookmarks(with: info.draggingPasteboard) ?? Set<PasteboardBookmark>()
         let draggedFolders = PasteboardFolder.pasteboardFolders(with: info.draggingPasteboard) ?? Set<PasteboardFolder>()
@@ -267,7 +270,7 @@ final class BookmarkOutlineViewDataSource: NSObject, NSOutlineViewDataSource, NS
         return true
     }
 
-    func outlineView(_ outlineView: NSOutlineView, rowViewForItem item: Any) -> NSTableRowView? {
+    func outlineView(_: NSOutlineView, rowViewForItem _: Any) -> NSTableRowView? {
         let view = RoundedSelectionRowView()
         view.insets = NSEdgeInsets(top: 0, left: 8, bottom: 0, right: 8)
 
@@ -276,7 +279,7 @@ final class BookmarkOutlineViewDataSource: NSObject, NSOutlineViewDataSource, NS
 
     // MARK: - NSTableViewDelegate
 
-    func outlineView(_ outlineView: NSOutlineView, shouldSelectItem item: Any) -> Bool {
+    func outlineView(_: NSOutlineView, shouldSelectItem item: Any) -> Bool {
         if let node = item as? BookmarkNode, node.representedObject is SpacerNode {
             return false
         }

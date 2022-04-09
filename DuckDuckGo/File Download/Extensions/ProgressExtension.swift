@@ -20,12 +20,13 @@ import Foundation
 
 extension Progress {
 
-    convenience init(totalUnitCount: Int64,
-                     fileOperationKind: FileOperationKind,
-                     kind: ProgressKind,
-                     isPausable: Bool,
-                     isCancellable: Bool,
-                     fileURL: URL) {
+    convenience init(
+        totalUnitCount: Int64,
+        fileOperationKind: FileOperationKind,
+        kind: ProgressKind,
+        isPausable: Bool,
+        isCancellable: Bool,
+        fileURL: URL) {
         self.init(totalUnitCount: totalUnitCount)
 
         self.fileOperationKind = fileOperationKind
@@ -37,75 +38,76 @@ extension Progress {
 
     var fileDownloadingSourceURL: URL? {
         get {
-            self.userInfo[.fileDownloadingSourceURLKey] as? URL
+            userInfo[.fileDownloadingSourceURLKey] as? URL
         }
         set {
-            self.setUserInfoObject(newValue, forKey: .fileDownloadingSourceURLKey)
+            setUserInfoObject(newValue, forKey: .fileDownloadingSourceURLKey)
         }
     }
 
     var fileURL: URL? {
         get {
-            self.userInfo[.fileURLKey] as? URL
+            userInfo[.fileURLKey] as? URL
         }
         set {
             if newValue != self.fileURL {
-                self.setUserInfoObject(newValue, forKey: .fileURLKey)
+                setUserInfoObject(newValue, forKey: .fileURLKey)
             }
         }
     }
 
     var flyToImage: NSImage? {
         get {
-            self.userInfo[.flyToImageKey] as? NSImage
+            userInfo[.flyToImageKey] as? NSImage
         }
         set {
-            self.setUserInfoObject(newValue, forKey: .flyToImageKey)
+            setUserInfoObject(newValue, forKey: .flyToImageKey)
         }
     }
 
     var fileIconOriginalRect: NSRect? {
         get {
-            (self.userInfo[.fileIconOriginalRectKey] as? NSValue)?.rectValue
+            (userInfo[.fileIconOriginalRectKey] as? NSValue)?.rectValue
         }
         set {
-            self.setUserInfoObject(newValue.map(NSValue.init(rect:)), forKey: .fileIconOriginalRectKey)
+            setUserInfoObject(newValue.map(NSValue.init(rect:)), forKey: .fileIconOriginalRectKey)
         }
     }
 
     var isPublished: Bool {
         get {
-            self.userInfo[.isPublishedKey] as? Bool ?? false
+            userInfo[.isPublishedKey] as? Bool ?? false
         }
         set {
-            self.setUserInfoObject(newValue, forKey: .isPublishedKey)
+            setUserInfoObject(newValue, forKey: .isPublishedKey)
         }
     }
 
     var isUnpublished: Bool {
         get {
-            self.userInfo[.isUnpublishedKey] as? Bool ?? false
+            userInfo[.isUnpublishedKey] as? Bool ?? false
         }
         set {
-            self.setUserInfoObject(newValue, forKey: .isUnpublishedKey)
+            setUserInfoObject(newValue, forKey: .isUnpublishedKey)
         }
     }
 
     func publishIfNotPublished() {
         dispatchPrecondition(condition: .onQueue(.main))
-        guard !self.isPublished else { return }
-        self.isPublished = true
+        guard !isPublished else { return }
+        isPublished = true
 
-        self.publish()
+        publish()
     }
 
     func unpublishIfNeeded() {
-        guard self.isPublished,
-              !self.isUnpublished
+        guard
+            isPublished,
+            !isUnpublished
         else { return }
-        self.isUnpublished = true
+        isUnpublished = true
 
-        self.unpublish()
+        unpublish()
     }
 
 }

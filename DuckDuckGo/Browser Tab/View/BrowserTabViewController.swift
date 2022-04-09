@@ -16,12 +16,12 @@
 //  limitations under the License.
 //
 
-import Cocoa
-import WebKit
-import os.log
-import Combine
-import SwiftUI
 import BrowserServicesKit
+import Cocoa
+import Combine
+import os.log
+import SwiftUI
+import WebKit
 
 protocol BrowserTabViewControllerClickDelegate: AnyObject {
     func browserTabViewController(_ browserTabViewController: BrowserTabViewController, didClickAtPoint: CGPoint)
@@ -58,7 +58,7 @@ final class BrowserTabViewController: NSViewController {
 
     private var mouseDownMonitor: Any?
 
-    required init?(coder: NSCoder) {
+    required init?(coder _: NSCoder) {
         fatalError("BrowserTabViewController: Bad initializer")
     }
 
@@ -68,10 +68,13 @@ final class BrowserTabViewController: NSViewController {
         super.init(coder: coder)
     }
 
-    @IBSegueAction func createHomePageViewController(_ coder: NSCoder) -> NSViewController? {
-        guard let controller = HomePageViewController(coder: coder,
-                                                      tabCollectionViewModel: tabCollectionViewModel,
-                                                      bookmarkManager: LocalBookmarkManager.shared) else {
+    @IBSegueAction
+    func createHomePageViewController(_ coder: NSCoder) -> NSViewController? {
+        guard
+            let controller = HomePageViewController(
+                coder: coder,
+                tabCollectionViewModel: tabCollectionViewModel,
+                bookmarkManager: LocalBookmarkManager.shared) else {
             fatalError("BrowserTabViewController: Failed to init HomePageViewController")
         }
         return controller
@@ -100,15 +103,16 @@ final class BrowserTabViewController: NSViewController {
     override func viewDidAppear() {
         super.viewDidAppear()
 
-        NotificationCenter.default.addObserver(self,
-                                               selector: #selector(windowWillClose(_:)),
-                                               name: NSWindow.willCloseNotification,
-                                               object: self.view.window)
+        NotificationCenter.default.addObserver(
+            self,
+            selector: #selector(windowWillClose(_:)),
+            name: NSWindow.willCloseNotification,
+            object: view.window)
     }
 
     @objc
-    private func windowWillClose(_ notification: NSNotification) {
-        self.removeWebViewFromHierarchy()
+    private func windowWillClose(_: NSNotification) {
+        removeWebViewFromHierarchy()
     }
 
     private func subscribeToSelectedTabViewModel() {
@@ -121,10 +125,12 @@ final class BrowserTabViewController: NSViewController {
             }
     }
 
-    private func removeWebViewFromHierarchy(webView: WebView? = nil,
-                                            container: NSView? = nil) {
-        guard let webView = webView ?? self.webView,
-              let container = container ?? self.webViewContainer
+    private func removeWebViewFromHierarchy(
+        webView: WebView? = nil,
+        container: NSView? = nil) {
+        guard
+            let webView = webView ?? self.webView,
+            let container = container ?? webViewContainer
         else { return }
 
         // close fullscreenWindowController when closing tab in FullScreen mode
@@ -136,8 +142,8 @@ final class BrowserTabViewController: NSViewController {
         }
 
         container.removeFromSuperview()
-        if self.webViewContainer == container {
-            self.webViewContainer = nil
+        if webViewContainer == container {
+            webViewContainer = nil
         }
     }
 
@@ -155,7 +161,7 @@ final class BrowserTabViewController: NSViewController {
         container.autoresizingMask = [.width, .height]
         view.addSubview(container)
         container.addSubview(webView)
-        self.webViewContainer = container
+        webViewContainer = container
 
         // Make sure this is on top
         view.addSubview(hoverLabelContainer)
@@ -202,13 +208,12 @@ final class BrowserTabViewController: NSViewController {
         errorViewStateCancellable = tabViewModel?.$errorViewState.receive(on: DispatchQueue.main).sink { [weak self] _ in
             self?.displayErrorView(
                 self?.tabViewModel?.errorViewState.isVisible ?? false,
-                message: self?.tabViewModel?.errorViewState.message ?? UserText.unknownErrorMessage
-            )
+                message: self?.tabViewModel?.errorViewState.message ?? UserText.unknownErrorMessage)
         }
     }
 
     func makeWebViewFirstResponder() {
-        self.webView?.makeMeFirstResponder()
+        webView?.makeMeFirstResponder()
     }
 
     private func setFirstResponderIfNeeded() {
@@ -246,10 +251,11 @@ final class BrowserTabViewController: NSViewController {
             return
         }
 
-        let tab = Tab(content: content,
-                      parentTab: parentTab,
-                      shouldLoadInBackground: true,
-                      canBeClosedWithBack: canBeClosedWithBack)
+        let tab = Tab(
+            content: content,
+            parentTab: parentTab,
+            shouldLoadInBackground: true,
+            canBeClosedWithBack: canBeClosedWithBack)
 
         if parentTab != nil {
             tabCollectionViewModel.insertChild(tab: tab, selected: selected)
@@ -267,17 +273,17 @@ final class BrowserTabViewController: NSViewController {
     }
 
     private func removeAllTabContent(includingWebView: Bool = true) {
-        self.homePageView.removeFromSuperview()
+        homePageView.removeFromSuperview()
         transientTabContentViewController?.removeCompletely()
         preferencesViewController.removeCompletely()
         bookmarksViewController.removeCompletely()
         if includingWebView {
-            self.removeWebViewFromHierarchy()
+            removeWebViewFromHierarchy()
         }
     }
 
     private func showTabContentController(_ vc: NSViewController) {
-        self.addChild(vc)
+        addChild(vc)
         view.addAndLayout(vc.view)
     }
 
@@ -370,24 +376,28 @@ extension BrowserTabViewController: ContentOverlayUserScriptDelegate {
     public func websiteAutofillUserScriptCloseOverlay(_ websiteAutofillUserScript: WebsiteAutofillUserScript?) {
         contentOverlayPopover.websiteAutofillUserScriptCloseOverlay(websiteAutofillUserScript)
     }
-    public func websiteAutofillUserScript(_ websiteAutofillUserScript: WebsiteAutofillUserScript,
-                                          willDisplayOverlayAtClick: NSPoint,
-                                          serializedInputContext: String,
-                                          inputPosition: CGRect) {
-        contentOverlayPopover.websiteAutofillUserScript(websiteAutofillUserScript,
-                                                        willDisplayOverlayAtClick: willDisplayOverlayAtClick,
-                                                        serializedInputContext: serializedInputContext,
-                                                        inputPosition: inputPosition)
+
+    public func websiteAutofillUserScript(
+        _ websiteAutofillUserScript: WebsiteAutofillUserScript,
+        willDisplayOverlayAtClick: NSPoint,
+        serializedInputContext: String,
+        inputPosition: CGRect) {
+        contentOverlayPopover.websiteAutofillUserScript(
+            websiteAutofillUserScript,
+            willDisplayOverlayAtClick: willDisplayOverlayAtClick,
+            serializedInputContext: serializedInputContext,
+            inputPosition: inputPosition)
     }
 }
 
 extension BrowserTabViewController: TabDelegate {
 
-    func tabWillStartNavigation(_ tab: Tab, isUserInitiated: Bool) {
-        if isUserInitiated,
-           let window = self.view.window,
-           window.isPopUpWindow == true,
-           window.isKeyWindow == false {
+    func tabWillStartNavigation(_: Tab, isUserInitiated: Bool) {
+        if
+            isUserInitiated,
+            let window = view.window,
+            window.isPopUpWindow == true,
+            window.isKeyWindow == false {
 
             window.makeKeyAndOrderFront(nil)
         }
@@ -407,22 +417,23 @@ extension BrowserTabViewController: TabDelegate {
             }
             return
         }
-        self.view.makeMeFirstResponder()
+        view.makeMeFirstResponder()
 
         let permissionType = PermissionType.externalScheme(scheme: url.scheme ?? "")
 
-        tab.permissions.permissions([permissionType],
-                                    requestedForDomain: webView?.url?.host ?? "localhost",
-                                    url: url) { [weak self, weak tab] granted in
-            guard granted, let tab = tab else {
-                if userEntered {
-                    searchForExternalUrl()
+        tab.permissions.permissions(
+            [permissionType],
+            requestedForDomain: webView?.url?.host ?? "localhost",
+            url: url) { [weak self, weak tab] granted in
+                guard granted, let tab = tab else {
+                    if userEntered {
+                        searchForExternalUrl()
+                    }
+                    return
                 }
-                return
-            }
 
-            self?.tab(tab, openExternalURL: url, touchingPermissionType: permissionType)
-        }
+                self?.tab(tab, openExternalURL: url, touchingPermissionType: permissionType)
+            }
     }
 
     private func tab(_ tab: Tab, openExternalURL url: URL, touchingPermissionType permissionType: PermissionType) {
@@ -442,8 +453,9 @@ extension BrowserTabViewController: TabDelegate {
 
         tabViewModel.closeFindInPage()
         tab.permissions.tabDidStartNavigation()
-        if !tabViewModel.isLoading,
-           tabViewModel.tab.webView.isLoading {
+        if
+            !tabViewModel.isLoading,
+            tabViewModel.tab.webView.isLoading {
             tabViewModel.isLoading = true
         }
     }
@@ -459,20 +471,22 @@ extension BrowserTabViewController: TabDelegate {
         tabCollectionViewModel.remove(at: index)
     }
 
-    func tab(_ tab: Tab,
-             willShowContextMenuAt position: NSPoint,
-             image: URL?,
-             link: URL?,
-             selectedText: String?) {
+    func tab(
+        _: Tab,
+        willShowContextMenuAt _: NSPoint,
+        image: URL?,
+        link: URL?,
+        selectedText: String?) {
         contextMenuImage = image
         contextMenuLink = link
         contextMenuExpected = true
         contextMenuSelectedText = selectedText
     }
 
-    func tab(_ tab: Tab,
-             requestedBasicAuthenticationChallengeWith protectionSpace: URLProtectionSpace,
-             completionHandler: @escaping (URLSession.AuthChallengeDisposition, URLCredential?) -> Void) {
+    func tab(
+        _: Tab,
+        requestedBasicAuthenticationChallengeWith protectionSpace: URLProtectionSpace,
+        completionHandler: @escaping (URLSession.AuthChallengeDisposition, URLCredential?) -> Void) {
         guard let window = view.window else {
             completionHandler(.cancelAuthenticationChallenge, nil)
             return
@@ -480,21 +494,23 @@ extension BrowserTabViewController: TabDelegate {
 
         let alert = AuthenticationAlert(host: protectionSpace.host, isEncrypted: protectionSpace.receivesCredentialSecurely)
         alert.beginSheetModal(for: window) { response in
-            guard case .OK = response,
-                  !alert.usernameTextField.stringValue.isEmpty,
-                  !alert.passwordTextField.stringValue.isEmpty
+            guard
+                case .OK = response,
+                !alert.usernameTextField.stringValue.isEmpty,
+                !alert.passwordTextField.stringValue.isEmpty
             else {
                 completionHandler(.performDefaultHandling, nil)
                 return
             }
-            completionHandler(.useCredential, URLCredential(user: alert.usernameTextField.stringValue,
-                                                            password: alert.passwordTextField.stringValue,
-                                                            persistence: .none))
+            completionHandler(.useCredential, URLCredential(
+                user: alert.usernameTextField.stringValue,
+                password: alert.passwordTextField.stringValue,
+                persistence: .none))
 
         }
     }
 
-    func tab(_ tab: Tab, didChangeHoverLink url: URL?) {
+    func tab(_: Tab, didChangeHoverLink url: URL?) {
         scheduleHoverLabelUpdatesForUrl(url)
     }
 
@@ -540,9 +556,10 @@ extension BrowserTabViewController: FileDownloadManagerDelegate {
         dispatchPrecondition(condition: .onQueue(.main))
 
         var fileTypes = fileTypes
-        if fileTypes.isEmpty || (fileTypes.count == 1 && (fileTypes[0].fileExtension?.isEmpty ?? true)),
-           let fileExt = (suggestedFilename as NSString?)?.pathExtension,
-           let utType = UTType(fileExtension: fileExt) {
+        if
+            fileTypes.isEmpty || (fileTypes.count == 1 && (fileTypes[0].fileExtension?.isEmpty ?? true)),
+            let fileExt = (suggestedFilename as NSString?)?.pathExtension,
+            let utType = UTType(fileExtension: fileExt) {
             // When no file extension is set by default generate fileType from file extension
             fileTypes.insert(utType, at: 0)
         }
@@ -561,17 +578,18 @@ extension BrowserTabViewController: FileDownloadManagerDelegate {
             callback(savePanel.url, savePanel.selectedFileType)
         }
 
-        if let window = self.view.window {
+        if let window = view.window {
             savePanel.beginSheetModal(for: window, completionHandler: completionHandler)
         } else {
             completionHandler(savePanel.runModal())
         }
     }
 
-    func fileIconFlyAnimationOriginalRect(for downloadTask: WebKitDownloadTask) -> NSRect? {
+    func fileIconFlyAnimationOriginalRect(for _: WebKitDownloadTask) -> NSRect? {
         dispatchPrecondition(condition: .onQueue(.main))
-        guard let window = self.view.window,
-              let dockScreen = NSScreen.dockScreen
+        guard
+            let window = view.window,
+            let dockScreen = NSScreen.dockScreen
         else { return nil }
 
         // fly 64x64 icon from the center of Address Bar
@@ -585,7 +603,7 @@ extension BrowserTabViewController: FileDownloadManagerDelegate {
         return dockScreenRect
     }
 
-    func tab(_ tab: Tab, requestedSaveAutofillData autofillData: AutofillData) {
+    func tab(_: Tab, requestedSaveAutofillData autofillData: AutofillData) {
         tabViewModel?.autofillDataToSave = autofillData
     }
 
@@ -593,7 +611,7 @@ extension BrowserTabViewController: FileDownloadManagerDelegate {
 
 extension BrowserTabViewController: NSMenuDelegate {
 
-    func menuWillOpen(_ menu: NSMenu) {
+    func menuWillOpen(_: NSMenu) {
         guard contextMenuExpected else {
             os_log("%s: Unexpected menuWillOpen", type: .error, className)
             contextMenuLink = nil
@@ -607,24 +625,25 @@ extension BrowserTabViewController: NSMenuDelegate {
 
 extension BrowserTabViewController: LinkMenuItemSelectors {
 
-    func openLinkInNewTab(_ sender: NSMenuItem) {
+    func openLinkInNewTab(_: NSMenuItem) {
         guard let url = contextMenuLink else { return }
         openNewTab(with: .url(url), parentTab: tabViewModel?.tab)
     }
 
-    func openLinkInNewWindow(_ sender: NSMenuItem) {
+    func openLinkInNewWindow(_: NSMenuItem) {
         guard let url = contextMenuLink else { return }
         WindowsManager.openNewWindow(with: url)
     }
 
-    func downloadLinkedFileAs(_ sender: NSMenuItem) {
-        guard let tab = tabCollectionViewModel.selectedTabViewModel?.tab,
-              let url = contextMenuLink else { return }
+    func downloadLinkedFileAs(_: NSMenuItem) {
+        guard
+            let tab = tabCollectionViewModel.selectedTabViewModel?.tab,
+            let url = contextMenuLink else { return }
 
         tab.download(from: url)
     }
 
-    func copyLink(_ sender: NSMenuItem) {
+    func copyLink(_: NSMenuItem) {
         guard let url = contextMenuLink as NSURL? else { return }
 
         let pasteboard = NSPasteboard.general
@@ -637,24 +656,25 @@ extension BrowserTabViewController: LinkMenuItemSelectors {
 
 extension BrowserTabViewController: ImageMenuItemSelectors {
 
-    func openImageInNewTab(_ sender: NSMenuItem) {
+    func openImageInNewTab(_: NSMenuItem) {
         guard let url = contextMenuImage else { return }
         openNewTab(with: .url(url), parentTab: tabViewModel?.tab)
     }
 
-    func openImageInNewWindow(_ sender: NSMenuItem) {
+    func openImageInNewWindow(_: NSMenuItem) {
         guard let url = contextMenuImage else { return }
         WindowsManager.openNewWindow(with: url)
     }
 
-    func saveImageAs(_ sender: NSMenuItem) {
-        guard let tab = tabCollectionViewModel.selectedTabViewModel?.tab,
-              let url = contextMenuImage else { return }
+    func saveImageAs(_: NSMenuItem) {
+        guard
+            let tab = tabCollectionViewModel.selectedTabViewModel?.tab,
+            let url = contextMenuImage else { return }
 
         tab.download(from: url)
     }
 
-    func copyImageAddress(_ sender: NSMenuItem) {
+    func copyImageAddress(_: NSMenuItem) {
         guard let url = contextMenuImage else { return }
         NSPasteboard.general.clearContents()
         NSPasteboard.general.setString(url.absoluteString, forType: .string)
@@ -665,7 +685,7 @@ extension BrowserTabViewController: ImageMenuItemSelectors {
 
 extension BrowserTabViewController: MenuItemSelectors {
 
-    func search(_ sender: NSMenuItem) {
+    func search(_: NSMenuItem) {
         let selectedText = contextMenuSelectedText ?? ""
         guard let url = URL.makeSearchUrl(from: selectedText) else { return }
         openNewTab(with: .url(url), parentTab: tabViewModel?.tab, selected: true)
@@ -676,14 +696,15 @@ extension BrowserTabViewController: MenuItemSelectors {
 extension BrowserTabViewController: WKUIDelegate {
 
     @objc(_webView:saveDataToFile:suggestedFilename:mimeType:originatingURL:)
-    func webView(_ webView: WKWebView, saveDataToFile data: Data, suggestedFilename: String, mimeType: String, originatingURL: URL) {
+    func webView(_: WKWebView, saveDataToFile data: Data, suggestedFilename: String, mimeType: String, originatingURL _: URL) {
         func write(to url: URL) throws {
-            let progress = Progress(totalUnitCount: 1,
-                                    fileOperationKind: .downloading,
-                                    kind: .file,
-                                    isPausable: false,
-                                    isCancellable: false,
-                                    fileURL: url)
+            let progress = Progress(
+                totalUnitCount: 1,
+                fileOperationKind: .downloading,
+                kind: .file,
+                isPausable: false,
+                isCancellable: false,
+                fileURL: url)
             progress.publish()
             defer {
                 progress.unpublish()
@@ -694,33 +715,38 @@ extension BrowserTabViewController: WKUIDelegate {
         }
 
         let prefs = DownloadsPreferences()
-        if !prefs.alwaysRequestDownloadLocation,
-           let location = prefs.effectiveDownloadLocation {
+        if
+            !prefs.alwaysRequestDownloadLocation,
+            let location = prefs.effectiveDownloadLocation {
             let url = location.appendingPathComponent(suggestedFilename)
             try? write(to: url)
 
             return
         }
 
-        chooseDestination(suggestedFilename: suggestedFilename,
-                          directoryURL: prefs.effectiveDownloadLocation,
-                          fileTypes: UTType(mimeType: mimeType).map { [$0] } ?? []) { url, _ in
-            guard let url = url else { return }
-            try? write(to: url)
-        }
+        chooseDestination(
+            suggestedFilename: suggestedFilename,
+            directoryURL: prefs.effectiveDownloadLocation,
+            fileTypes: UTType(mimeType: mimeType).map { [$0] } ?? []) { url, _ in
+                guard let url = url else { return }
+                try? write(to: url)
+            }
     }
 
-    func webView(_ webView: WKWebView,
-                 createWebViewWith configuration: WKWebViewConfiguration,
-                 for navigationAction: WKNavigationAction,
-                 windowFeatures: WKWindowFeatures) -> WKWebView? {
+    func webView(
+        _ webView: WKWebView,
+        createWebViewWith configuration: WKWebViewConfiguration,
+        for navigationAction: WKNavigationAction,
+        windowFeatures: WKWindowFeatures)
+        -> WKWebView? {
 
         func makeTab(parentTab: Tab, content: Tab.TabContent) -> Tab {
             // Returned web view must be created with the specified configuration.
-            return Tab(content: content,
-                       webViewConfiguration: configuration,
-                       parentTab: parentTab,
-                       canBeClosedWithBack: true)
+            Tab(
+                content: content,
+                webViewConfiguration: configuration,
+                parentTab: parentTab,
+                canBeClosedWithBack: true)
         }
         guard let parentTab = webView.tab else { return nil }
         func nextQuery(parentTab: Tab) -> PermissionAuthorizationQuery? {
@@ -770,25 +796,25 @@ extension BrowserTabViewController: WKUIDelegate {
     }
 
     @objc(_webView:checkUserMediaPermissionForURL:mainFrameURL:frameIdentifier:decisionHandler:)
-    func webView(_ webView: WKWebView,
-                 checkUserMediaPermissionFor url: URL,
-                 mainFrameURL: URL,
-                 frameIdentifier frame: UInt,
-                 decisionHandler: @escaping (String, Bool) -> Void) {
+    func webView(
+        _ webView: WKWebView,
+        checkUserMediaPermissionFor url: URL,
+        mainFrameURL: URL,
+        frameIdentifier _: UInt,
+        decisionHandler: @escaping (String, Bool) -> Void) {
         webView.tab?.permissions.checkUserMediaPermission(for: url, mainFrameURL: mainFrameURL, decisionHandler: decisionHandler)
-            ?? /* Tab deallocated: */ {
-                decisionHandler("", false)
-            }()
+            ?? /* Tab deallocated: */ decisionHandler("", false)
     }
 
     // https://github.com/WebKit/WebKit/blob/995f6b1595611c934e742a4f3a9af2e678bc6b8d/Source/WebKit/UIProcess/API/Cocoa/WKUIDelegate.h#L147
     @objc(webView:requestMediaCapturePermissionForOrigin:initiatedByFrame:type:decisionHandler:)
     @available(macOS 12, *)
-    func webView(_ webView: WKWebView,
-                 requestMediaCapturePermissionFor origin: WKSecurityOrigin,
-                 initiatedByFrame frame: WKFrameInfo,
-                 type: WKMediaCaptureType,
-                 decisionHandler: @escaping (WKPermissionDecision) -> Void) {
+    func webView(
+        _ webView: WKWebView,
+        requestMediaCapturePermissionFor origin: WKSecurityOrigin,
+        initiatedByFrame _: WKFrameInfo,
+        type: WKMediaCaptureType,
+        decisionHandler: @escaping (WKPermissionDecision) -> Void) {
         guard let permissions = [PermissionType](devices: type) else {
             assertionFailure("Could not decode PermissionType")
             decisionHandler(.deny)
@@ -797,31 +823,28 @@ extension BrowserTabViewController: WKUIDelegate {
 
         webView.tab?.permissions.permissions(permissions, requestedForDomain: origin.host) { granted in
             decisionHandler(granted ? .grant : .deny)
-        } ?? /* Tab deallocated: */ {
-            decisionHandler(.deny)
-        }()
+        } ?? /* Tab deallocated: */ decisionHandler(.deny)
     }
 
     // https://github.com/WebKit/WebKit/blob/9d7278159234e0bfa3d27909a19e695928f3b31e/Source/WebKit/UIProcess/API/Cocoa/WKUIDelegatePrivate.h#L126
     @objc(_webView:requestUserMediaAuthorizationForDevices:url:mainFrameURL:decisionHandler:)
-    func webView(_ webView: WKWebView,
-                 requestUserMediaAuthorizationFor devices: _WKCaptureDevices,
-                 url: URL,
-                 mainFrameURL: URL,
-                 decisionHandler: @escaping (Bool) -> Void) {
+    func webView(
+        _ webView: WKWebView,
+        requestUserMediaAuthorizationFor devices: _WKCaptureDevices,
+        url: URL,
+        mainFrameURL _: URL,
+        decisionHandler: @escaping (Bool) -> Void) {
         guard let permissions = [PermissionType](devices: devices) else {
             decisionHandler(false)
             return
         }
 
         webView.tab?.permissions.permissions(permissions, requestedForDomain: url.host, decisionHandler: decisionHandler)
-            ?? /* Tab deallocated: */ {
-                decisionHandler(false)
-            }()
+            ?? /* Tab deallocated: */ decisionHandler(false)
     }
 
     @objc(_webView:mediaCaptureStateDidChange:)
-    func webView(_ webView: WKWebView, mediaCaptureStateDidChange state: _WKMediaCaptureStateDeprecated) {
+    func webView(_ webView: WKWebView, mediaCaptureStateDidChange _: _WKMediaCaptureStateDeprecated) {
         webView.tab?.permissions.mediaCaptureStateDidChange()
     }
 
@@ -829,29 +852,27 @@ extension BrowserTabViewController: WKUIDelegate {
     @objc(_webView:requestGeolocationPermissionForFrame:decisionHandler:)
     func webView(_ webView: WKWebView, requestGeolocationPermissionFor frame: WKFrameInfo, decisionHandler: @escaping (Bool) -> Void) {
         webView.tab?.permissions.permissions(.geolocation, requestedForDomain: frame.request.url?.host, decisionHandler: decisionHandler)
-            ?? /* Tab deallocated: */ {
-                decisionHandler(false)
-            }()
+            ?? /* Tab deallocated: */ decisionHandler(false)
     }
 
     // https://github.com/WebKit/WebKit/blob/9d7278159234e0bfa3d27909a19e695928f3b31e/Source/WebKit/UIProcess/API/Cocoa/WKUIDelegatePrivate.h#L132
     @objc(_webView:requestGeolocationPermissionForOrigin:initiatedByFrame:decisionHandler:)
     @available(macOS 12, *)
-    func webView(_ webView: WKWebView,
-                 requestGeolocationPermissionFor origin: WKSecurityOrigin,
-                 initiatedBy frame: WKFrameInfo,
-                 decisionHandler: @escaping (WKPermissionDecision) -> Void) {
+    func webView(
+        _ webView: WKWebView,
+        requestGeolocationPermissionFor _: WKSecurityOrigin,
+        initiatedBy frame: WKFrameInfo,
+        decisionHandler: @escaping (WKPermissionDecision) -> Void) {
         webView.tab?.permissions.permissions(.geolocation, requestedForDomain: frame.request.url?.host) { granted in
             decisionHandler(granted ? .grant : .deny)
-        } ?? /* Tab deallocated: */ {
-            decisionHandler(.deny)
-        }()
+        } ?? /* Tab deallocated: */ decisionHandler(.deny)
     }
 
-    func webView(_ webView: WKWebView,
-                 runOpenPanelWith parameters: WKOpenPanelParameters,
-                 initiatedByFrame frame: WKFrameInfo,
-                 completionHandler: @escaping ([URL]?) -> Void) {
+    func webView(
+        _: WKWebView,
+        runOpenPanelWith parameters: WKOpenPanelParameters,
+        initiatedByFrame _: WKFrameInfo,
+        completionHandler: @escaping ([URL]?) -> Void) {
 
         guard let window = view.window else {
             os_log("%s: Window is nil", type: .error, className)
@@ -871,10 +892,11 @@ extension BrowserTabViewController: WKUIDelegate {
         }
     }
 
-    func webView(_ webView: WKWebView,
-                 runJavaScriptAlertPanelWithMessage message: String,
-                 initiatedByFrame frame: WKFrameInfo,
-                 completionHandler: @escaping () -> Void) {
+    func webView(
+        _: WKWebView,
+        runJavaScriptAlertPanelWithMessage message: String,
+        initiatedByFrame _: WKFrameInfo,
+        completionHandler: @escaping () -> Void) {
 
         guard let window = view.window else {
             os_log("%s: Window is nil", type: .error, className)
@@ -888,10 +910,11 @@ extension BrowserTabViewController: WKUIDelegate {
         }
     }
 
-    func webView(_ webView: WKWebView,
-                 runJavaScriptConfirmPanelWithMessage message: String,
-                 initiatedByFrame frame: WKFrameInfo,
-                 completionHandler: @escaping (Bool) -> Void) {
+    func webView(
+        _: WKWebView,
+        runJavaScriptConfirmPanelWithMessage message: String,
+        initiatedByFrame _: WKFrameInfo,
+        completionHandler: @escaping (Bool) -> Void) {
 
         guard let window = view.window else {
             os_log("%s: Window is nil", type: .error, className)
@@ -905,11 +928,12 @@ extension BrowserTabViewController: WKUIDelegate {
         }
     }
 
-    func webView(_ webView: WKWebView,
-                 runJavaScriptTextInputPanelWithPrompt prompt: String,
-                 defaultText: String?,
-                 initiatedByFrame frame: WKFrameInfo,
-                 completionHandler: @escaping (String?) -> Void) {
+    func webView(
+        _: WKWebView,
+        runJavaScriptTextInputPanelWithPrompt prompt: String,
+        defaultText: String?,
+        initiatedByFrame _: WKFrameInfo,
+        completionHandler: @escaping (String?) -> Void) {
 
         guard let window = view.window else {
             os_log("%s: Window is nil", type: .error, className)
@@ -948,10 +972,10 @@ extension BrowserTabViewController: BrowserTabSelectionDelegate {
 
 }
 
-private extension WKWebView {
+extension WKWebView {
 
-    var tab: Tab? {
-        guard let navigationDelegate = self.navigationDelegate else { return nil }
+    fileprivate var tab: Tab? {
+        guard let navigationDelegate = navigationDelegate else { return nil }
         guard let tab = navigationDelegate as? Tab else {
             assertionFailure("webView.navigationDelegate is not a Tab")
             return nil
@@ -993,7 +1017,7 @@ extension BrowserTabViewController {
     func addMouseMonitors() {
         guard mouseDownMonitor == nil else { return }
 
-        self.mouseDownMonitor = NSEvent.addLocalMonitorForEvents(matching: .leftMouseDown) { [weak self] event in
+        mouseDownMonitor = NSEvent.addLocalMonitorForEvents(matching: .leftMouseDown) { [weak self] event in
             self?.mouseDown(with: event)
         }
     }
@@ -1002,12 +1026,12 @@ extension BrowserTabViewController {
         if let monitor = mouseDownMonitor {
             NSEvent.removeMonitor(monitor)
         }
-        self.mouseDownMonitor = nil
+        mouseDownMonitor = nil
     }
 
     func mouseDown(with event: NSEvent) -> NSEvent? {
         self.clickPoint = event.locationInWindow
-        guard event.window === self.view.window, let clickPoint = self.clickPoint else { return event }
+        guard event.window === view.window, let clickPoint = clickPoint else { return event }
         tabViewModel?.tab.browserTabViewController(self, didClickAtPoint: clickPoint)
         return event
     }

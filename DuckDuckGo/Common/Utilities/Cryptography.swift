@@ -85,15 +85,15 @@ struct Cryptography {
     }
 
     static func decryptAESCBC(data: Data, key: Data, iv: Data) -> Data? {
-        return decrypt(with: CCAlgorithm(kCCAlgorithmAES128), data: data, key: key, iv: iv)
+        decrypt(with: CCAlgorithm(kCCAlgorithmAES128), data: data, key: key, iv: iv)
     }
 
     static func decrypt3DES(data: Data, key: Data, iv: Data) -> Data? {
-        return decrypt(with: CCAlgorithm(kCCAlgorithm3DES), data: data, key: key, iv: iv)
+        decrypt(with: CCAlgorithm(kCCAlgorithm3DES), data: data, key: key, iv: iv)
     }
 
     static func decrypt(with algorithm: CCAlgorithm, data: Data, key: Data, iv: Data) -> Data? {
-        var outLength: Int = 0
+        var outLength = 0
         var outBytes = [UInt8](repeating: 0, count: data.count)
         var status = CCCryptorStatus(kCCSuccess)
 
@@ -106,17 +106,18 @@ struct Cryptography {
                 key.withUnsafeBytes { keyBytes in
                     let keyRawBytes = keyBytes.bindMemory(to: UInt8.self).baseAddress
 
-                    status = CCCrypt(CCOperation(kCCDecrypt),
-                                     algorithm,
-                                     CCOptions(kCCOptionPKCS7Padding),
-                                     keyRawBytes,
-                                     key.count,
-                                     ivRawBytes,
-                                     dataRawBytes,
-                                     data.count,
-                                     &outBytes,
-                                     outBytes.count,
-                                     &outLength)
+                    status = CCCrypt(
+                        CCOperation(kCCDecrypt),
+                        algorithm,
+                        CCOptions(kCCOptionPKCS7Padding),
+                        keyRawBytes,
+                        key.count,
+                        ivRawBytes,
+                        dataRawBytes,
+                        data.count,
+                        &outBytes,
+                        outBytes.count,
+                        &outLength)
                 }
             }
         }

@@ -16,9 +16,9 @@
 //  limitations under the License.
 //
 
-import Foundation
-import CoreData
 import Combine
+import CoreData
+import Foundation
 
 protocol DownloadListStoring {
 
@@ -51,12 +51,12 @@ final class DownloadListStore: DownloadListStoring {
     private var _context: NSManagedObjectContext??
     private var context: NSManagedObjectContext? {
         if case .none = _context {
-#if DEBUG
+            #if DEBUG
             if AppDelegate.isRunningTests {
                 _context = .some(.none)
                 return .none
             }
-#endif
+            #endif
             _context = Database.shared.makeContext(concurrencyType: .privateQueueConcurrencyType, name: "Downloads")
         }
         return _context!
@@ -66,7 +66,7 @@ final class DownloadListStore: DownloadListStoring {
     }
 
     init(context: NSManagedObjectContext) {
-        self._context = .some(context)
+        _context = .some(context)
     }
 
     enum HistoryStoreError: Error {
@@ -75,7 +75,7 @@ final class DownloadListStore: DownloadListStoring {
     }
 
     private func remove(itemsWithPredicate predicate: NSPredicate, completionHandler: ((Error?) -> Void)?) {
-        guard let context = self.context else { return }
+        guard let context = context else { return }
 
         func mainQueueCompletion(_ error: Error?) {
             guard completionHandler != nil else { return }
@@ -103,17 +103,19 @@ final class DownloadListStore: DownloadListStoring {
     }
 
     func clear(itemsOlderThan date: Date, completionHandler: ((Error?) -> Void)?) {
-        remove(itemsWithPredicate: NSPredicate(format: (\DownloadManagedObject.modified)._kvcKeyPathString! + " < %@", date as NSDate),
-               completionHandler: completionHandler)
+        remove(
+            itemsWithPredicate: NSPredicate(format: (\DownloadManagedObject.modified)._kvcKeyPathString! + " < %@", date as NSDate),
+            completionHandler: completionHandler)
     }
 
     func remove(_ item: DownloadListItem, completionHandler: ((Error?) -> Void)?) {
-        remove(itemsWithPredicate: NSPredicate(format: (\DownloadManagedObject.identifier)._kvcKeyPathString! + " == %@", item.identifier as CVarArg),
-               completionHandler: completionHandler)
+        remove(
+            itemsWithPredicate: NSPredicate(format: (\DownloadManagedObject.identifier)._kvcKeyPathString! + " == %@", item.identifier as CVarArg),
+            completionHandler: completionHandler)
     }
 
     func fetch(completionHandler: @escaping (Result<[DownloadListItem], Error>) -> Void) {
-        guard let context = self.context else { return }
+        guard let context = context else { return }
 
         func mainQueueCompletion(_ result: Result<[DownloadListItem], Error>) {
             DispatchQueue.main.async {
@@ -141,8 +143,8 @@ final class DownloadListStore: DownloadListStoring {
     }
 
     func save(_ item: DownloadListItem, completionHandler: ((Error?) -> Void)?) {
-        guard let context = self.context else { return }
-        
+        guard let context = context else { return }
+
         func mainQueueCompletion(_ error: Error?) {
             guard completionHandler != nil else { return }
             DispatchQueue.main.async {
@@ -153,8 +155,9 @@ final class DownloadListStore: DownloadListStoring {
         context.perform { [context] in
             // Check for existence
             let fetchRequest = DownloadManagedObject.fetchRequest() as NSFetchRequest<DownloadManagedObject>
-            fetchRequest.predicate = NSPredicate(format: (\DownloadManagedObject.identifier)._kvcKeyPathString! + " == %@",
-                                                 item.identifier as CVarArg)
+            fetchRequest.predicate = NSPredicate(
+                format: (\DownloadManagedObject.identifier)._kvcKeyPathString! + " == %@",
+                item.identifier as CVarArg)
             let fetchedObjects: [DownloadManagedObject]
             do {
                 fetchedObjects = try context.fetch(fetchRequest)
@@ -165,9 +168,11 @@ final class DownloadListStore: DownloadListStoring {
 
             assert(fetchedObjects.count <= 1, "More than 1 downloads item with the same identifier")
 
-            guard let managedObject = fetchedObjects.first
-                    ?? NSEntityDescription.insertNewObject(forEntityName: DownloadManagedObject.className(),
-                                                           into: context) as? DownloadManagedObject else {
+            guard
+                let managedObject = fetchedObjects.first
+                ?? NSEntityDescription.insertNewObject(
+                    forEntityName: DownloadManagedObject.className(),
+                    into: context) as? DownloadManagedObject else {
                 assertionFailure("DownloadManagedObject insertion failed")
                 struct DownloadManagedObjectInsertionError: Error {}
                 mainQueueCompletion(DownloadManagedObjectInsertionError())
@@ -198,24 +203,26 @@ final class DownloadListStore: DownloadListStoring {
 extension DownloadListItem {
 
     init?(managedObject: DownloadManagedObject) {
-        guard let identifier = managedObject.identifier,
-              let added = managedObject.added,
-              let modified = managedObject.modified,
-              let url = managedObject.urlEncrypted as? URL
+        guard
+            let identifier = managedObject.identifier,
+            let added = managedObject.added,
+            let modified = managedObject.modified,
+            let url = managedObject.urlEncrypted as? URL
         else {
             assertionFailure("DownloadListItem: Failed to init from ManagedObject")
             return nil
         }
 
-        self.init(identifier: identifier,
-                  added: added,
-                  modified: modified,
-                  url: url,
-                  websiteURL: managedObject.websiteURLEncrypted as? URL,
-                  fileType: managedObject.fileType.map { UTType(rawValue: $0 as CFString) },
-                  destinationURL: managedObject.destinationURLEncrypted as? URL,
-                  tempURL: managedObject.tempURLEncrypted as? URL,
-                  error: (managedObject.errorEncrypted as? NSError).map(FileDownloadError.init))
+        self.init(
+            identifier: identifier,
+            added: added,
+            modified: modified,
+            url: url,
+            websiteURL: managedObject.websiteURLEncrypted as? URL,
+            fileType: managedObject.fileType.map { UTType(rawValue: $0 as CFString) },
+            destinationURL: managedObject.destinationURLEncrypted as? URL,
+            tempURL: managedObject.tempURLEncrypted as? URL,
+            error: (managedObject.errorEncrypted as? NSError).map(FileDownloadError.init))
     }
 
 }

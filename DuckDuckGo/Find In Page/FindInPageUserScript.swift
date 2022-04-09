@@ -16,8 +16,8 @@
 //  limitations under the License.
 //
 
-import WebKit
 import BrowserServicesKit
+import WebKit
 
 final class FindInPageUserScript: NSObject, StaticUserScript {
 
@@ -29,7 +29,7 @@ final class FindInPageUserScript: NSObject, StaticUserScript {
 
     weak var model: FindInPageModel?
 
-    func userContentController(_ userContentController: WKUserContentController, didReceive message: WKScriptMessage) {
+    func userContentController(_: WKUserContentController, didReceive message: WKScriptMessage) {
         guard let dict = message.body as? [String: Any] else { return }
 
         let currentResult = dict["currentResult"] as? Int

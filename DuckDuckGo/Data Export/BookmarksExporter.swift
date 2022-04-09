@@ -33,10 +33,11 @@ struct BookmarksExporter {
         var content = [String]()
         for entity in entities {
             if let bookmark = entity as? Bookmark {
-                content.append(Template.bookmark(level: level,
-                                                 title: bookmark.title.escapedForHTML,
-                                                 url: bookmark.url,
-                                                 isFavorite: bookmark.isFavorite))
+                content.append(Template.bookmark(
+                    level: level,
+                    title: bookmark.title.escapedForHTML,
+                    url: bookmark.url,
+                    isFavorite: bookmark.isFavorite))
             }
 
             if let folder = entity as? BookmarkFolder {
@@ -54,22 +55,22 @@ struct BookmarksExporter {
 
 extension BookmarksExporter {
 
-    struct Template {
+    enum Template {
 
         static var header =
-        """
-        <!DOCTYPE NETSCAPE-Bookmark-file-1>
-            <HTML xmlns:duckduckgo="https://duckduckgo.com/bookmarks">
-            <META HTTP-EQUIV="Content-Type" CONTENT="text/html; charset=UTF-8">
-            <Title>\(UserText.exportBookmarksFileNameSuffix)</Title>
-            <H1>\(UserText.exportBookmarksFileNameSuffix)</H1>
+            """
+            <!DOCTYPE NETSCAPE-Bookmark-file-1>
+                <HTML xmlns:duckduckgo="https://duckduckgo.com/bookmarks">
+                <META HTTP-EQUIV="Content-Type" CONTENT="text/html; charset=UTF-8">
+                <Title>\(UserText.exportBookmarksFileNameSuffix)</Title>
+                <H1>\(UserText.exportBookmarksFileNameSuffix)</H1>
 
-        """
+            """
 
         static let footer =
-        """
-        </HTML>
-        """
+            """
+            </HTML>
+            """
 
         static func bookmark(level: Int, title: String, url: URL, isFavorite: Bool = false) -> String {
             """
@@ -98,16 +99,16 @@ extension BookmarksExporter {
 
 }
 
-fileprivate extension String {
+extension String {
 
-    var escapedForHTML: String {
-        self.replacingOccurrences(of: "&", with: "&amp;")
+    fileprivate var escapedForHTML: String {
+        replacingOccurrences(of: "&", with: "&amp;")
             .replacingOccurrences(of: "<", with: "&lt;")
             .replacingOccurrences(of: ">", with: "&gt;")
     }
 
-    static func indent(by level: Int) -> String {
-        return String(repeating: "\t", count: level)
+    fileprivate static func indent(by level: Int) -> String {
+        String(repeating: "\t", count: level)
     }
 
 }

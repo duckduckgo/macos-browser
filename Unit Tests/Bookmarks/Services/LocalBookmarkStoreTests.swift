@@ -29,12 +29,12 @@ final class LocalBookmarkStoreTests: XCTestCase {
 
         let bookmarkStore = LocalBookmarkStore(context: context)
 
-        let savingExpectation = self.expectation(description: "Saving")
-        let loadingExpectation = self.expectation(description: "Loading")
+        let savingExpectation = expectation(description: "Saving")
+        let loadingExpectation = expectation(description: "Loading")
 
         let bookmark = Bookmark(id: UUID(), url: URL.duckDuckGo, title: "DuckDuckGo", isFavorite: true)
 
-        bookmarkStore.save(bookmark: bookmark, parent: nil) { (success, error) in
+        bookmarkStore.save(bookmark: bookmark, parent: nil) { success, error in
             XCTAssert(success)
             XCTAssertNil(error)
 
@@ -59,18 +59,18 @@ final class LocalBookmarkStoreTests: XCTestCase {
 
         let bookmarkStore = LocalBookmarkStore(context: context)
 
-        let savingExpectation = self.expectation(description: "Saving")
-        let removingExpectation = self.expectation(description: "Removing")
-        let loadingExpectation = self.expectation(description: "Loading")
+        let savingExpectation = expectation(description: "Saving")
+        let removingExpectation = expectation(description: "Removing")
+        let loadingExpectation = expectation(description: "Loading")
 
         let bookmark = Bookmark(id: UUID(), url: URL.duckDuckGo, title: "DuckDuckGo", isFavorite: true)
-        bookmarkStore.save(bookmark: bookmark, parent: nil) { (success, error) in
+        bookmarkStore.save(bookmark: bookmark, parent: nil) { success, error in
             XCTAssert(success)
             XCTAssertNil(error)
 
             savingExpectation.fulfill()
 
-            bookmarkStore.remove(objectsWithUUIDs: [bookmark.id]) { (success, error) in
+            bookmarkStore.remove(objectsWithUUIDs: [bookmark.id]) { success, error in
                 XCTAssert(success)
                 XCTAssertNil(error)
 
@@ -95,12 +95,12 @@ final class LocalBookmarkStoreTests: XCTestCase {
 
         let bookmarkStore = LocalBookmarkStore(context: context)
 
-        let savingExpectation = self.expectation(description: "Saving")
-        let loadingExpectation = self.expectation(description: "Loading")
+        let savingExpectation = expectation(description: "Saving")
+        let loadingExpectation = expectation(description: "Loading")
 
         let bookmark = Bookmark(id: UUID(), url: URL.duckDuckGo, title: "DuckDuckGo", isFavorite: true)
 
-        bookmarkStore.save(bookmark: bookmark, parent: nil) { (success, error) in
+        bookmarkStore.save(bookmark: bookmark, parent: nil) { success, error in
             XCTAssert(success)
             XCTAssertNil(error)
 
@@ -128,12 +128,12 @@ final class LocalBookmarkStoreTests: XCTestCase {
 
         let bookmarkStore = LocalBookmarkStore(context: context)
 
-        let savingExpectation = self.expectation(description: "Saving")
-        let loadingExpectation = self.expectation(description: "Loading")
+        let savingExpectation = expectation(description: "Saving")
+        let loadingExpectation = expectation(description: "Loading")
 
         let folder = BookmarkFolder(id: UUID(), title: "Folder")
 
-        bookmarkStore.save(folder: folder, parent: nil) { (success, error) in
+        bookmarkStore.save(folder: folder, parent: nil) { success, error in
             XCTAssert(success)
             XCTAssertNil(error)
 
@@ -157,20 +157,20 @@ final class LocalBookmarkStoreTests: XCTestCase {
         let context = container.viewContext
         let bookmarkStore = LocalBookmarkStore(context: context)
 
-        let saveParentExpectation = self.expectation(description: "Save Parent Folder")
-        let saveChildExpectation = self.expectation(description: "Save Child Folder")
-        let loadingExpectation = self.expectation(description: "Loading")
+        let saveParentExpectation = expectation(description: "Save Parent Folder")
+        let saveChildExpectation = expectation(description: "Save Child Folder")
+        let loadingExpectation = expectation(description: "Loading")
 
         let parentFolder = BookmarkFolder(id: UUID(), title: "Parent")
         let childFolder = BookmarkFolder(id: UUID(), title: "Child")
 
-        bookmarkStore.save(folder: parentFolder, parent: nil) { (success, error) in
+        bookmarkStore.save(folder: parentFolder, parent: nil) { success, error in
             XCTAssert(success)
             XCTAssertNil(error)
 
             saveParentExpectation.fulfill()
 
-            bookmarkStore.save(folder: childFolder, parent: parentFolder) { (success, error) in
+            bookmarkStore.save(folder: childFolder, parent: parentFolder) { success, error in
                 XCTAssert(success)
                 XCTAssertNil(error)
 
@@ -201,18 +201,18 @@ final class LocalBookmarkStoreTests: XCTestCase {
         let context = container.viewContext
         let bookmarkStore = LocalBookmarkStore(context: context)
 
-        let firstSaveExpectation = self.expectation(description: "First Save")
-        let secondSaveExpectation = self.expectation(description: "Second Save")
+        let firstSaveExpectation = expectation(description: "First Save")
+        let secondSaveExpectation = expectation(description: "Second Save")
 
         let folder = BookmarkFolder(id: UUID(), title: "Folder")
 
-        bookmarkStore.save(folder: folder, parent: nil) { (success, error) in
+        bookmarkStore.save(folder: folder, parent: nil) { success, error in
             XCTAssert(success)
             XCTAssertNil(error)
 
             firstSaveExpectation.fulfill()
 
-            bookmarkStore.save(folder: folder, parent: nil) { (success, error) in
+            bookmarkStore.save(folder: folder, parent: nil) { success, error in
                 XCTAssertFalse(success)
                 XCTAssertNotNil(error)
 
@@ -228,20 +228,20 @@ final class LocalBookmarkStoreTests: XCTestCase {
         let context = container.viewContext
         let bookmarkStore = LocalBookmarkStore(context: context)
 
-        let saveFolderExpectation = self.expectation(description: "Save Parent Folder")
-        let saveBookmarkExpectation = self.expectation(description: "Save Bookmark")
-        let loadingExpectation = self.expectation(description: "Loading")
+        let saveFolderExpectation = expectation(description: "Save Parent Folder")
+        let saveBookmarkExpectation = expectation(description: "Save Bookmark")
+        let loadingExpectation = expectation(description: "Loading")
 
         let folder = BookmarkFolder(id: UUID(), title: "Parent")
         let bookmark = Bookmark(id: UUID(), url: URL(string: "https://example.com")!, title: "Example", isFavorite: false)
 
-        bookmarkStore.save(folder: folder, parent: nil) { (success, error) in
+        bookmarkStore.save(folder: folder, parent: nil) { success, error in
             XCTAssert(success)
             XCTAssertNil(error)
 
             saveFolderExpectation.fulfill()
 
-            bookmarkStore.save(bookmark: bookmark, parent: folder) { (success, error) in
+            bookmarkStore.save(bookmark: bookmark, parent: folder) { success, error in
                 XCTAssert(success)
                 XCTAssertNil(error)
 
@@ -285,7 +285,7 @@ final class LocalBookmarkStoreTests: XCTestCase {
         XCTAssertEqual(result.duplicates, 0)
         XCTAssertEqual(result.failed, 0)
 
-        let loadingExpectation = self.expectation(description: "Loading")
+        let loadingExpectation = expectation(description: "Loading")
 
         bookmarkStore.loadAll(type: .bookmarks) { bookmarks, error in
             XCTAssertNotNil(bookmarks)
@@ -318,7 +318,7 @@ final class LocalBookmarkStoreTests: XCTestCase {
         XCTAssertEqual(result.duplicates, 1)
         XCTAssertEqual(result.failed, 0)
 
-        let loadingExpectation = self.expectation(description: "Loading")
+        let loadingExpectation = expectation(description: "Loading")
 
         bookmarkStore.loadAll(type: .bookmarks) { bookmarks, error in
             XCTAssertNotNil(bookmarks)

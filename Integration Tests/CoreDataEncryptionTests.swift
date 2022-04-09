@@ -18,9 +18,9 @@
 
 import Foundation
 
-import XCTest
-import CryptoKit
 import CoreData
+import CryptoKit
+import XCTest
 
 @testable import DuckDuckGo_Privacy_Browser
 

@@ -69,7 +69,7 @@ extension WKWebView {
     var microphoneState: CaptureState {
         if #available(macOS 12.0, *) {
             return CaptureState(self.microphoneCaptureState)
-        } else if self.responds(to: #selector(getter: WKWebView._mediaCaptureState)) {
+        } else if responds(to: #selector(getter: WKWebView._mediaCaptureState)) {
             return CaptureState(permissionType: .microphone, mediaCaptureState: self._mediaCaptureState)
         }
         assertionFailure("WKWebView does not respond to selector _mediaCaptureState")
@@ -79,7 +79,7 @@ extension WKWebView {
     var cameraState: CaptureState {
         if #available(macOS 12.0, *) {
             return CaptureState(self.cameraCaptureState)
-        } else if self.responds(to: #selector(getter: WKWebView._mediaCaptureState)) {
+        } else if responds(to: #selector(getter: WKWebView._mediaCaptureState)) {
             return CaptureState(permissionType: .camera, mediaCaptureState: self._mediaCaptureState)
         }
         assertionFailure("WKWebView does not respond to selector _mediaCaptureState")
@@ -87,10 +87,11 @@ extension WKWebView {
     }
 
     var geolocationState: CaptureState {
-        guard let geolocationProvider = self.configuration.processPool.geolocationProvider,
-              [.authorizedAlways, .authorized].contains(geolocationProvider.authorizationStatus),
-              !geolocationProvider.isRevoked,
-              geolocationProvider.isActive
+        guard
+            let geolocationProvider = configuration.processPool.geolocationProvider,
+            [.authorizedAlways, .authorized].contains(geolocationProvider.authorizationStatus),
+            !geolocationProvider.isRevoked,
+            geolocationProvider.isActive
         else {
             return .none
         }
@@ -101,7 +102,7 @@ extension WKWebView {
     }
 
     private func setMediaCaptureMuted(_ muted: Bool) {
-        guard self.responds(to: #selector(WKWebView._setPageMuted(_:))) else {
+        guard responds(to: #selector(WKWebView._setPageMuted(_:))) else {
             assertionFailure("WKWebView does not respond to selector _stopMediaCapture")
             return
         }
@@ -116,15 +117,15 @@ extension WKWebView {
             newState.remove(.captureDevicesMuted)
         }
         guard newState != mutedState else { return }
-        self._setPageMuted(newState)
+        _setPageMuted(newState)
     }
 
     func stopMediaCapture() {
-        guard self.responds(to: #selector(_stopMediaCapture)) else {
+        guard responds(to: #selector(_stopMediaCapture)) else {
             assertionFailure("WKWebView does not respond to _stopMediaCapture")
             return
         }
-        self._stopMediaCapture()
+        _stopMediaCapture()
     }
 
     func setPermissions(_ permissions: [PermissionType], muted: Bool) {
@@ -134,39 +135,39 @@ extension WKWebView {
                 if #available(macOS 12.0, *) {
                     self.setCameraCaptureState(muted ? .muted : .active, completionHandler: {})
                 } else {
-                    self.setMediaCaptureMuted(muted)
+                    setMediaCaptureMuted(muted)
                 }
             case .microphone:
                 if #available(macOS 12.0, *) {
                     self.setMicrophoneCaptureState(muted ? .muted : .active, completionHandler: {})
                 } else {
-                    self.setMediaCaptureMuted(muted)
+                    setMediaCaptureMuted(muted)
                 }
             case .geolocation:
-                self.configuration.processPool.geolocationProvider?.isPaused = muted
+                configuration.processPool.geolocationProvider?.isPaused = muted
             case .popups, .externalScheme:
                 assertionFailure("The permission don't support pausing")
             }
         }
     }
 
-    func revokePermissions(_ permissions: [PermissionType], completionHandler: (() -> Void)? = nil) {
+    func revokePermissions(_ permissions: [PermissionType], completionHandler _: (() -> Void)? = nil) {
         for permission in permissions {
             switch permission {
             case .camera:
                 if #available(macOS 12.0, *) {
                     self.setCameraCaptureState(.none, completionHandler: {})
                 } else {
-                    self.stopMediaCapture()
+                    stopMediaCapture()
                 }
             case .microphone:
                 if #available(macOS 12.0, *) {
                     self.setMicrophoneCaptureState(.none, completionHandler: {})
                 } else {
-                    self.stopMediaCapture()
+                    stopMediaCapture()
                 }
             case .geolocation:
-                self.configuration.processPool.geolocationProvider?.revoke()
+                configuration.processPool.geolocationProvider?.revoke()
             case .popups, .externalScheme:
                 continue
             }
@@ -185,7 +186,7 @@ extension WKWebView {
     }
 
     func getMimeType(callback: @escaping (String?) -> Void) {
-        self.evaluateJavaScript("document.contentType") { (result, _) in
+        evaluateJavaScript("document.contentType") { result, _ in
             callback(result as? String)
         }
     }
@@ -194,18 +195,18 @@ extension WKWebView {
         if #available(macOS 11.0, *) {
             return true
         } else {
-            return self.instancesRespond(to: #selector(WKWebView._printOperation(with:)))
+            return instancesRespond(to: #selector(WKWebView._printOperation(with:)))
         }
     }
-    
+
     func printOperation() -> NSPrintOperation? {
         if #available(macOS 11.0, *) {
             return self.printOperation(with: .shared)
         }
 
-        guard self.responds(to: #selector(WKWebView._printOperation(with:))) else { return nil }
+        guard responds(to: #selector(WKWebView._printOperation(with:))) else { return nil }
 
-        return self._printOperation(with: .shared)
+        return _printOperation(with: .shared)
     }
 
 }

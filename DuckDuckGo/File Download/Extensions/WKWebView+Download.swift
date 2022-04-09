@@ -27,11 +27,11 @@ private protocol WKWebView_macOS_11_3 {
 @available(macOS 12, *)
 extension WKWebView: WKWebView_macOS_11_3 {
     func startDownload(using request: URLRequest, completionHandler: @escaping (WebKitDownload) -> Void) {
-        self.startDownload(using: request) { (download: WKDownload) in completionHandler(download) }
+        startDownload(using: request) { (download: WKDownload) in completionHandler(download) }
     }
 
     func resumeDownload(from data: Data, completionHandler: @escaping (WebKitDownload) -> Void) {
-        return resumeDownload(fromResumeData: data) { (download: WKDownload) in completionHandler(download) }
+        resumeDownload(fromResumeData: data) { (download: WKDownload) in completionHandler(download) }
     }
 }
 
@@ -42,9 +42,10 @@ extension WKWebView {
             (self as WKWebView_macOS_11_3).startDownload(using: request, completionHandler: completionHandler)
         } else if configuration.processPool.responds(to: #selector(WKProcessPool._downloadURLRequest(_:websiteDataStore:originatingWebView:))) {
             configuration.processPool.setDownloadDelegateIfNeeded(using: LegacyWebKitDownloadDelegate.init)
-            let download = configuration.processPool._downloadURLRequest(request,
-                                                                         websiteDataStore: self.configuration.websiteDataStore,
-                                                                         originatingWebView: self)
+            let download = configuration.processPool._downloadURLRequest(
+                request,
+                websiteDataStore: self.configuration.websiteDataStore,
+                originatingWebView: self)
             completionHandler(download)
         } else {
             assertionFailure("WKProcessPool does not respond to _downloadURLRequest:websiteDataStore:originatingWebView:")
@@ -55,12 +56,15 @@ extension WKWebView {
         try NSException.catch {
             if #available(macOS 11.3, *) {
                 (self as WKWebView_macOS_11_3).resumeDownload(from: resumeData, completionHandler: completionHandler)
-            } else if configuration.processPool.responds(to:
-              #selector(WKProcessPool._resumeDownload(from:websiteDataStore:path:originatingWebView:))) {
-                let download = configuration.processPool._resumeDownload(from: resumeData,
-                                                                         websiteDataStore: self.configuration.websiteDataStore,
-                                                                         path: localURL.path,
-                                                                         originatingWebView: self)
+            } else if
+                configuration.processPool.responds(
+                    to:
+                    #selector(WKProcessPool._resumeDownload(from:websiteDataStore:path:originatingWebView:))) {
+                let download = configuration.processPool._resumeDownload(
+                    from: resumeData,
+                    websiteDataStore: self.configuration.websiteDataStore,
+                    path: localURL.path,
+                    originatingWebView: self)
                 completionHandler(download)
             } else {
                 assertionFailure("WKProcessPool does not respond to _resumeDownloadFromData:websiteDataStore:path:originatingWebView:")
@@ -69,10 +73,12 @@ extension WKWebView {
     }
 
     var suggestedFilename: String? {
-        guard let title = self.title?.replacingOccurrences(of: "[~#@*+%{}<>\\[\\]|\"\\_^\\/:\\\\]",
-                                                           with: "_",
-                                                           options: .regularExpression),
-              !title.isEmpty
+        guard
+            let title = title?.replacingOccurrences(
+                of: "[~#@*+%{}<>\\[\\]|\"\\_^\\/:\\\\]",
+                with: "_",
+                options: .regularExpression),
+            !title.isEmpty
         else {
             return url?.suggestedFilename
         }
@@ -98,26 +104,28 @@ extension WKWebView {
         }
     }
 
-    func exportWebContent(to url: URL,
-                          as exportType: ContentExportType,
-                          completionHandler: ((Result<URL, Error>) -> Void)? = nil) {
+    func exportWebContent(
+        to url: URL,
+        as exportType: ContentExportType,
+        completionHandler: ((Result<URL, Error>) -> Void)? = nil) {
         let create: (@escaping (Data?, Error?) -> Void) -> Void
-        var transform: (Data) throws -> Data = { return $0 }
+        var transform: (Data) throws -> Data = { $0 }
 
         switch exportType {
         case .webArchive:
-            create = self.createWebArchiveData
+            create = createWebArchiveData
 
         case .pdf:
             create = { self.createPDF(withConfiguration: nil, completionHandler: $0) }
 
         case .html:
-            create = self.createWebArchiveData
+            create = createWebArchiveData
             transform = { data in
                 // extract HTML from WebArchive bplist
-                guard let dict = try PropertyListSerialization.propertyList(from: data, options: [], format: nil) as? [String: Any],
-                      let mainResource = dict["WebMainResource"] as? [String: Any],
-                      let resourceData = mainResource["WebResourceData"] as? NSData
+                guard
+                    let dict = try PropertyListSerialization.propertyList(from: data, options: [], format: nil) as? [String: Any],
+                    let mainResource = dict["WebMainResource"] as? [String: Any],
+                    let resourceData = mainResource["WebResourceData"] as? NSData
                 else {
                     struct GetWebResourceDataFromWebArchiveData: Error { let data: Data }
                     throw GetWebResourceDataFromWebArchiveData(data: data)
@@ -127,15 +135,16 @@ extension WKWebView {
             }
         }
 
-        let progress = Progress(totalUnitCount: 1,
-                                fileOperationKind: .downloading,
-                                kind: .file,
-                                isPausable: false,
-                                isCancellable: false,
-                                fileURL: url)
+        let progress = Progress(
+            totalUnitCount: 1,
+            fileOperationKind: .downloading,
+            kind: .file,
+            isPausable: false,
+            isCancellable: false,
+            fileURL: url)
         progress.publish()
 
-        create { (data, error) in
+        create { data, error in
             defer {
                 progress.completedUnitCount = progress.totalUnitCount
                 progress.unpublish()
@@ -159,8 +168,10 @@ extension WKNavigationActionPolicy {
     // https://github.com/WebKit/WebKit/blob/9a6f03d46238213231cf27641ed1a55e1949d074/Source/WebKit/UIProcess/API/Cocoa/WKNavigationDelegate.h#L49
     private static let download = WKNavigationActionPolicy(rawValue: Self.allow.rawValue + 1) ?? .cancel
 
-    static func download(_ navigationAction: WKNavigationAction,
-                         using webView: WKWebView) -> WKNavigationActionPolicy {
+    static func download(
+        _ navigationAction: WKNavigationAction,
+        using webView: WKWebView)
+        -> WKNavigationActionPolicy {
         webView.configuration.processPool
             .setDownloadDelegateIfNeeded(using: LegacyWebKitDownloadDelegate.init)?
             .registerDownloadNavigationAction(navigationAction)
@@ -172,8 +183,10 @@ extension WKNavigationActionPolicy {
 extension WKNavigationResponsePolicy {
     private static let download = WKNavigationResponsePolicy(rawValue: Self.allow.rawValue + 1) ?? .cancel
 
-    static func download(_ navigationResponse: WKNavigationResponse,
-                         using webView: WKWebView) -> WKNavigationResponsePolicy {
+    static func download(
+        _ navigationResponse: WKNavigationResponse,
+        using webView: WKWebView)
+        -> WKNavigationResponsePolicy {
         webView.configuration.processPool
             .setDownloadDelegateIfNeeded(using: LegacyWebKitDownloadDelegate.init)?
             .registerDownloadNavigationResponse(navigationResponse)

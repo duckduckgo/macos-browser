@@ -43,8 +43,9 @@ final class PrivacyPreferencesModel: ObservableObject {
     func presentManageFireproofSitesDialog() {
         let fireproofDomainsWindowController = FireproofDomainsViewController.create().wrappedInWindowController()
 
-        guard let fireproofDomainsWindow = fireproofDomainsWindowController.window,
-              let parentWindowController = WindowControllersManager.shared.lastKeyMainWindowController
+        guard
+            let fireproofDomainsWindow = fireproofDomainsWindowController.window,
+            let parentWindowController = WindowControllersManager.shared.lastKeyMainWindowController
         else {
             assertionFailure("Privacy Preferences: Failed to present FireproofDomainsViewController")
             return

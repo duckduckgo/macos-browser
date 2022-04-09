@@ -18,26 +18,31 @@
 
 import Foundation
 
-@objc enum WebKitDownloadRedirectPolicy: Int {
+@objc
+enum WebKitDownloadRedirectPolicy: Int {
     case cancel
     case allow
 }
 
-@objc protocol WebKitDownloadDelegate: AnyObject {
+@objc
+protocol WebKitDownloadDelegate: AnyObject {
 
-    func download(_ download: WebKitDownload,
-                  decideDestinationUsing response: URLResponse?,
-                  suggestedFilename: String,
-                  completionHandler: @escaping (URL?) -> Void)
+    func download(
+        _ download: WebKitDownload,
+        decideDestinationUsing response: URLResponse?,
+        suggestedFilename: String,
+        completionHandler: @escaping (URL?) -> Void)
 
-    func download(_ download: WebKitDownload,
-                  willPerformHTTPRedirection response: HTTPURLResponse,
-                  newRequest request: URLRequest,
-                  decisionHandler: @escaping (WebKitDownloadRedirectPolicy) -> Void)
+    func download(
+        _ download: WebKitDownload,
+        willPerformHTTPRedirection response: HTTPURLResponse,
+        newRequest request: URLRequest,
+        decisionHandler: @escaping (WebKitDownloadRedirectPolicy) -> Void)
 
-    func download(_ download: WebKitDownload,
-                  didReceive challenge: URLAuthenticationChallenge,
-                  completionHandler: @escaping (URLSession.AuthChallengeDisposition, URLCredential?) -> Void)
+    func download(
+        _ download: WebKitDownload,
+        didReceive challenge: URLAuthenticationChallenge,
+        completionHandler: @escaping (URLSession.AuthChallengeDisposition, URLCredential?) -> Void)
 
     func downloadDidFinish(_ download: WebKitDownload)
 

@@ -86,9 +86,9 @@ extension RunLoop {
         }
 
         while !condition.isResolved {
-            self.run(mode: mode, before: Date(timeIntervalSinceNow: 1.0))
+            run(mode: mode, before: Date(timeIntervalSinceNow: 1.0))
         }
-        self.remove(port, forMode: mode)
+        remove(port, forMode: mode)
     }
 
 }

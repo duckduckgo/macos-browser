@@ -16,17 +16,17 @@
 //  limitations under the License.
 //
 
-import Foundation
 import BrowserServicesKit
+import Foundation
 
 final class SecureVaultErrorReporter: SecureVaultErrorReporting {
     static let shared = SecureVaultErrorReporter()
     private init() {}
 
     func secureVaultInitFailed(_ error: SecureVaultError) {
-#if DEBUG
+        #if DEBUG
         guard !AppDelegate.isRunningTests else { return }
-#endif
+        #endif
         switch error {
         case .initFailed, .failedToOpenDatabase:
             Pixel.fire(.debug(event: .secureVaultInitError, error: error))

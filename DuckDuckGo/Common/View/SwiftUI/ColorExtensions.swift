@@ -27,14 +27,13 @@ extension Color {
         self.init(
             red: CGFloat((rgbValue & 0xFF0000) >> 16) / 255.0,
             green: CGFloat((rgbValue & 0x00FF00) >> 8) / 255.0,
-            blue: CGFloat(rgbValue & 0x0000FF) / 255.0
-        )
+            blue: CGFloat(rgbValue & 0x0000FF) / 255.0)
     }
 
     static func forDomain(_ domain: String) -> Color {
         var consistentHash: Int {
-            return domain.utf8
-                .map { return $0 }
+            domain.utf8
+                .map { $0 }
                 .reduce(5381) { ($0 << 5) &+ $0 &+ Int($1) }
         }
 

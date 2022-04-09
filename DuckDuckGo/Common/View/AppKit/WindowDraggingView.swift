@@ -20,8 +20,8 @@ import Cocoa
 
 final class WindowDraggingView: NSView {
 
-    override func acceptsFirstMouse(for event: NSEvent?) -> Bool {
-        return true
+    override func acceptsFirstMouse(for _: NSEvent?) -> Bool {
+        true
     }
 
     override var mouseDownCanMoveWindow: Bool {
@@ -43,5 +43,5 @@ final class WindowDraggingView: NSView {
     private func drag(with event: NSEvent) {
         window?.performDrag(with: event)
     }
-    
+
 }

@@ -21,7 +21,7 @@ import Foundation
 final class CrashReportSender {
 
     static let reportServiceUrl = URL(string: "https://duckduckgo.com/crash.js")!
-    
+
     private let session = URLSession(configuration: .ephemeral)
 
     func send(_ crashReport: CrashReport) {
@@ -35,7 +35,7 @@ final class CrashReportSender {
         request.httpMethod = "POST"
         request.httpBody = contentData
 
-        session.dataTask(with: request) { (_, _, error) in
+        session.dataTask(with: request) { _, _, error in
             if error != nil {
                 assertionFailure("CrashReportSender: Failed to send the crash reprot")
             }

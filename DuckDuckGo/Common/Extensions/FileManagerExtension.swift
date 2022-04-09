@@ -22,18 +22,20 @@ import os
 extension FileManager {
 
     func moveItem(at srcURL: URL, to destURL: URL, incrementingIndexIfExists flag: Bool, pathExtension: String? = nil) throws -> URL {
-        return try self.perform(self.moveItem, from: srcURL, to: destURL, incrementingIndexIfExists: flag, pathExtension: pathExtension)
+        try perform(moveItem, from: srcURL, to: destURL, incrementingIndexIfExists: flag, pathExtension: pathExtension)
     }
 
     func copyItem(at srcURL: URL, to destURL: URL, incrementingIndexIfExists flag: Bool, pathExtension: String? = nil) throws -> URL {
-        return try self.perform(self.copyItem, from: srcURL, to: destURL, incrementingIndexIfExists: flag, pathExtension: pathExtension)
+        try perform(copyItem, from: srcURL, to: destURL, incrementingIndexIfExists: flag, pathExtension: pathExtension)
     }
 
-    private func perform(_ operation: (URL, URL) throws -> Void,
-                         from srcURL: URL,
-                         to destURL: URL,
-                         incrementingIndexIfExists: Bool,
-                         pathExtension: String?) throws -> URL {
+    private func perform(
+        _ operation: (URL, URL) throws -> Void,
+        from srcURL: URL,
+        to destURL: URL,
+        incrementingIndexIfExists: Bool,
+        pathExtension: String?) throws
+        -> URL {
 
         guard incrementingIndexIfExists else {
             try operation(srcURL, destURL)
@@ -93,24 +95,26 @@ extension FileManager {
             // and this starts to fail after reaching 1000 folders
             // so we'll create a temp directory, then delete it and
             // return its parent (actual temp dir)
-            var tempURL = try self.url(for: .itemReplacementDirectory,
-                                       in: .userDomainMask,
-                                       appropriateFor: url,
-                                       create: true)
-            try self.removeItem(at: tempURL)
+            var tempURL = try self.url(
+                for: .itemReplacementDirectory,
+                in: .userDomainMask,
+                appropriateFor: url,
+                create: true)
+            try removeItem(at: tempURL)
 
             tempURL = tempURL.deletingLastPathComponent()
             var isDir: ObjCBool = false
-            guard self.fileExists(atPath: tempURL.path, isDirectory: &isDir),
-                  isDir.boolValue,
-                  try tempURL.resourceValues(forKeys: [.isWritableKey]).isWritable == true
+            guard
+                fileExists(atPath: tempURL.path, isDirectory: &isDir),
+                isDir.boolValue,
+                try tempURL.resourceValues(forKeys: [.isWritableKey]).isWritable == true
             else { throw ThrowableError() }
 
             return tempURL
 
         } catch {
-            return self.temporaryDirectory
+            return temporaryDirectory
         }
     }
-    
+
 }

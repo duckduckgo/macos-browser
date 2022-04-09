@@ -16,8 +16,8 @@
 //  limitations under the License.
 //
 
-import Foundation
 import CoreData
+import Foundation
 
 typealias FireproofDomainsStore = CoreDataStore<FireproofDomainManagedObject>
 extension FireproofDomainsStore {
@@ -33,11 +33,11 @@ extension FireproofDomainsStore {
 extension FireproofDomainManagedObject: ValueRepresentableManagedObject {
 
     func update(with domain: String) {
-        self.domainEncrypted = domain as NSString
+        domainEncrypted = domain as NSString
     }
 
     func valueRepresentation() -> String? {
-        self.domainEncrypted as? String
+        domainEncrypted as? String
     }
 
 }

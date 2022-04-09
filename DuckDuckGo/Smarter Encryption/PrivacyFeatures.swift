@@ -20,9 +20,9 @@ import Foundation
 
 import BrowserServicesKit
 
-public final class PrivacyFeatures {
-    
+public enum PrivacyFeatures {
+
     public static let httpsUpgradeStore = AppHTTPSUpgradeStore()
     public static let httpsUpgrade = HTTPSUpgrade(store: httpsUpgradeStore, privacyManager: ContentBlocking.shared.privacyConfigurationManager)
-    
+
 }

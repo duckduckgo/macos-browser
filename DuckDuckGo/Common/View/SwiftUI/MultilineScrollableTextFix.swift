@@ -19,13 +19,11 @@
 import SwiftUI
 
 extension View {
-    /**
-     * Ensures that multiline text is properly broken into lines
-     * when put in scroll views.
-     *
-     * As seen on [Stack Overflow](https://stackoverflow.com/a/70512685).
-     * Radar: FB6859124.
-     */
+    /// Ensures that multiline text is properly broken into lines
+    /// when put in scroll views.
+    ///
+    /// As seen on [Stack Overflow](https://stackoverflow.com/a/70512685).
+    /// Radar: FB6859124.
     func fixMultilineScrollableText() -> some View {
         lineLimit(nil).modifier(MultilineScrollableTextFix())
     }
@@ -34,6 +32,6 @@ extension View {
 private struct MultilineScrollableTextFix: ViewModifier {
 
     func body(content: Content) -> some View {
-        return AnyView(content.fixedSize(horizontal: false, vertical: true))
+        AnyView(content.fixedSize(horizontal: false, vertical: true))
     }
 }

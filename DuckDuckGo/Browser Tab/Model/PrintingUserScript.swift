@@ -16,8 +16,8 @@
 //  limitations under the License.
 //
 
-import Foundation
 import BrowserServicesKit
+import Foundation
 import WebKit
 
 public protocol PrintingUserScriptDelegate: AnyObject {
@@ -28,24 +28,24 @@ public protocol PrintingUserScriptDelegate: AnyObject {
 
 public class PrintingUserScript: NSObject, UserScript {
     public var requiresRunInPageContentWorld: Bool {
-        return true
+        true
     }
 
     public weak var delegate: PrintingUserScriptDelegate?
 
-    public var source: String = """
-(function() {
-    window.print = function() {
-        webkit.messageHandlers.printHandler.postMessage({});
-    };
-}) ();
-"""
+    public var source = """
+        (function() {
+            window.print = function() {
+                webkit.messageHandlers.printHandler.postMessage({});
+            };
+        }) ();
+        """
 
     public var injectionTime: WKUserScriptInjectionTime = .atDocumentStart
-    public var forMainFrameOnly: Bool = false
-    public var messageNames: [String] = ["printHandler"]
+    public var forMainFrameOnly = false
+    public var messageNames = ["printHandler"]
 
-    public func userContentController(_ userContentController: WKUserContentController, didReceive message: WKScriptMessage) {
+    public func userContentController(_: WKUserContentController, didReceive _: WKScriptMessage) {
         delegate?.printingUserScriptDidRequestPrintController(self)
     }
 

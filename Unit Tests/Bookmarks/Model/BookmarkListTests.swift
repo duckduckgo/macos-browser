@@ -76,10 +76,11 @@ final class BookmarkListTests: XCTestCase {
         let bookmark = Bookmark.aBookmark
         bookmarkList.insert(bookmark)
 
-        let unknownBookmark = Bookmark(id: UUID(),
-                                       url: URL.duckDuckGoAutocomplete,
-                                       title: "Unknown title",
-                                       isFavorite: true)
+        let unknownBookmark = Bookmark(
+            id: UUID(),
+            url: URL.duckDuckGoAutocomplete,
+            title: "Unknown title",
+            isFavorite: true)
 
         bookmarkList.update(with: unknownBookmark)
         let updateUrlResult = bookmarkList.updateUrl(of: unknownBookmark, to: URL.duckDuckGo)
@@ -133,12 +134,13 @@ final class BookmarkListTests: XCTestCase {
 
 }
 
-fileprivate extension Bookmark {
+extension Bookmark {
 
-    static var aBookmark: Bookmark = Bookmark(id: UUID(),
-                                              url: URL.duckDuckGo,
-                                              title: "Title",
-                                              isFavorite: false,
-                                              faviconManagement: FaviconManagerMock())
+    fileprivate static var aBookmark = Bookmark(
+        id: UUID(),
+        url: URL.duckDuckGo,
+        title: "Title",
+        isFavorite: false,
+        faviconManagement: FaviconManagerMock())
 
 }

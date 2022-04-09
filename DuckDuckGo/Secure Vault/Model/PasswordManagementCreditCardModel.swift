@@ -16,8 +16,8 @@
 //  limitations under the License.
 //
 
-import Foundation
 import BrowserServicesKit
+import Foundation
 
 final class PasswordManagementCreditCardModel: ObservableObject, PasswordManagementItemModel {
 
@@ -35,7 +35,7 @@ final class PasswordManagementCreditCardModel: ObservableObject, PasswordManagem
     var onCancelled: () -> Void
 
     var isEditingPublisher: Published<Bool>.Publisher {
-        return $isEditing
+        $isEditing
     }
 
     var card: SecureVaultModels.CreditCard? {
@@ -45,7 +45,7 @@ final class PasswordManagementCreditCardModel: ObservableObject, PasswordManagem
     }
 
     var isInEditMode: Bool {
-        return isEditing || isNew
+        isEditing || isNew
     }
 
     @Published var isEditing = false {
@@ -59,25 +59,25 @@ final class PasswordManagementCreditCardModel: ObservableObject, PasswordManagem
 
     @Published var isNew = false
 
-    @Published var title: String = "" {
+    @Published var title = "" {
         didSet {
             isDirty = true
         }
     }
 
-    @Published var cardNumber: String = "" {
+    @Published var cardNumber = "" {
         didSet {
             isDirty = true
         }
     }
 
-    @Published var cardholderName: String = "" {
+    @Published var cardholderName = "" {
         didSet {
             isDirty = true
         }
     }
 
-    @Published var cardSecurityCode: String = "" {
+    @Published var cardSecurityCode = "" {
         didSet {
             isDirty = true
         }
@@ -97,17 +97,18 @@ final class PasswordManagementCreditCardModel: ObservableObject, PasswordManagem
 
     var isDirty = false {
         didSet {
-            self.onDirtyChanged(isDirty)
+            onDirtyChanged(isDirty)
         }
     }
 
-    var lastUpdatedDate: String = ""
-    var createdDate: String = ""
+    var lastUpdatedDate = ""
+    var createdDate = ""
 
-    init(onDirtyChanged: @escaping (Bool) -> Void,
-         onSaveRequested: @escaping (SecureVaultModels.CreditCard) -> Void,
-         onDeleteRequested: @escaping (SecureVaultModels.CreditCard) -> Void,
-         onCancelled: @escaping () -> Void) {
+    init(
+        onDirtyChanged: @escaping (Bool) -> Void,
+        onSaveRequested: @escaping (SecureVaultModels.CreditCard) -> Void,
+        onDeleteRequested: @escaping (SecureVaultModels.CreditCard) -> Void,
+        onCancelled: @escaping () -> Void) {
         self.onDirtyChanged = onDirtyChanged
         self.onSaveRequested = onSaveRequested
         self.onDeleteRequested = onDeleteRequested
@@ -119,12 +120,13 @@ final class PasswordManagementCreditCardModel: ObservableObject, PasswordManagem
     }
 
     func createNew() {
-        card = .init(title: "",
-                     cardNumber: "",
-                     cardholderName: nil,
-                     cardSecurityCode: nil,
-                     expirationMonth: nil,
-                     expirationYear: nil)
+        card = .init(
+            title: "",
+            cardNumber: "",
+            cardholderName: nil,
+            cardSecurityCode: nil,
+            expirationMonth: nil,
+            expirationYear: nil)
 
         isEditing = true
     }

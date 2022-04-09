@@ -16,8 +16,8 @@
 //  limitations under the License.
 //
 
-import XCTest
 import Combine
+import XCTest
 @testable import DuckDuckGo_Privacy_Browser
 
 final class TabViewModelTests: XCTestCase {
@@ -159,7 +159,8 @@ final class TabViewModelTests: XCTestCase {
 
         tabViewModel.$favicon.debounce(for: 0.1, scheduler: RunLoop.main).sink { favicon in
             guard favicon != nil else { return }
-            if favicon == TabViewModel.Favicon.home,
+            if
+                favicon == TabViewModel.Favicon.home,
                 !fulfilled {
                 faviconExpectation.fulfill()
                 fulfilled = true

@@ -55,12 +55,13 @@ final class CSVImporter: DataImporter {
                 }
             }
 
-            if let url = urlPosition, let  username = usernamePosition, let password = passwordPosition {
-                self.init(titleIndex: titlePosition,
-                          urlIndex: url,
-                          usernameIndex: username,
-                          passwordIndex: password,
-                          maximumIndex: csvValues.count - 1)
+            if let url = urlPosition, let username = usernamePosition, let password = passwordPosition {
+                self.init(
+                    titleIndex: titlePosition,
+                    urlIndex: url,
+                    usernameIndex: username,
+                    passwordIndex: password,
+                    maximumIndex: csvValues.count - 1)
             } else {
                 return nil
             }
@@ -94,14 +95,15 @@ final class CSVImporter: DataImporter {
 
         var seen: [String: Bool] = [:]
 
-        let logins = Self.extractLogins(from: fileContents, defaultColumnPositions: self.defaultColumnPositions)
+        let logins = Self.extractLogins(from: fileContents, defaultColumnPositions: defaultColumnPositions)
         let uniqueLogins = logins.filter { seen.updateValue(true, forKey: "\($0.url)-\($0.username)") == nil }
 
         return uniqueLogins.count
     }
 
-    static func extractLogins(from fileContents: String,
-                              defaultColumnPositions: ColumnPositions? = nil) -> [ImportedLoginCredential] {
+    static func extractLogins(
+        from fileContents: String,
+        defaultColumnPositions: ColumnPositions? = nil) -> [ImportedLoginCredential] {
         let parsed = CSVParser.parse(string: fileContents)
 
         if let possibleHeaderRow = parsed.first, let inferredColumnPositions = ColumnPositions(csvValues: possibleHeaderRow) {
@@ -124,14 +126,15 @@ final class CSVImporter: DataImporter {
     }
 
     // This will change to return an array of DataImport.Summary objects, indicating the status of each import type that was requested.
-    func importData(types: [DataImport.DataType],
-                    from profile: DataImport.BrowserProfile?,
-                    completion: @escaping (Result<DataImport.Summary, DataImportError>) -> Void) {
+    func importData(
+        types _: [DataImport.DataType],
+        from _: DataImport.BrowserProfile?,
+        completion: @escaping (Result<DataImport.Summary, DataImportError>) -> Void) {
         guard let fileContents = try? String(contentsOf: fileURL, encoding: .utf8) else {
             completion(.failure(.cannotReadFile))
             return
         }
-        guard let loginImporter = self.loginImporter else {
+        guard let loginImporter = loginImporter else {
             completion(.failure(.cannotAccessSecureVault))
             return
         }
@@ -141,8 +144,9 @@ final class CSVImporter: DataImporter {
 
             do {
                 let result = try loginImporter.importLogins(loginCredentials)
-                DispatchQueue.main.async { completion(.success(.init(bookmarksResult: nil,
-                                                                     loginsResult: .completed(result)))) }
+                DispatchQueue.main.async { completion(.success(.init(
+                    bookmarksResult: nil,
+                    loginsResult: .completed(result)))) }
             } catch {
                 DispatchQueue.main.async { completion(.failure(.cannotAccessSecureVault)) }
             }
@@ -155,16 +159,18 @@ extension ImportedLoginCredential {
 
     // Some browsers will export credentials with a header row. To detect this, the URL field on the first parsed row is checked whether it passes
     // the data detector test. If it doesn't, it's assumed to be a header row.
-    fileprivate var isHeaderRow: Bool {
+    private var isHeaderRow: Bool {
         let types: NSTextCheckingResult.CheckingType = [.link]
 
         guard let detector = try? NSDataDetector(types: types.rawValue), self.url.count > 0 else {
             return false
         }
 
-        if detector.numberOfMatches(in: self.url,
-                                    options: NSRegularExpression.MatchingOptions(rawValue: 0),
-                                    range: NSRange(location: 0, length: self.url.count)) > 0 {
+        if
+            detector.numberOfMatches(
+                in: url,
+                options: NSRegularExpression.MatchingOptions(rawValue: 0),
+                range: NSRange(location: 0, length: url.count)) > 0 {
             return false
         }
 

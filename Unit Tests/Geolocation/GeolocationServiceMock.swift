@@ -16,9 +16,9 @@
 //  limitations under the License.
 //
 
-import Foundation
 import Combine
 import CoreLocation
+import Foundation
 @testable import DuckDuckGo_Privacy_Browser
 
 final class GeolocationServiceMock: GeolocationServiceProtocol {
@@ -30,6 +30,7 @@ final class GeolocationServiceMock: GeolocationServiceProtocol {
         case highAccuracyRequested
         case highAccuracyCancelled
     }
+
     var history = [CallHistoryItem]()
 
     @PublishedAfter var authorizationStatus: CLAuthorizationStatus = .notDetermined
@@ -38,6 +39,7 @@ final class GeolocationServiceMock: GeolocationServiceProtocol {
             history.append(.locationPublished)
         }
     }
+
     private var locationPublisherEventsHandler: AnyPublisher<Result<CLLocation, Error>?, Never>!
     private var highAccuracyEventsHandler: AnyPublisher<Void, Never>!
 
@@ -49,11 +51,12 @@ final class GeolocationServiceMock: GeolocationServiceProtocol {
 
     init() {
         locationPublisherEventsHandler = $currentLocationPublished
-            .handleEvents(receiveSubscription: self.didReceiveSubscription, receiveCancel: self.didReceiveCancel)
+            .handleEvents(receiveSubscription: didReceiveSubscription, receiveCancel: didReceiveCancel)
             .eraseToAnyPublisher()
         highAccuracyEventsHandler = $currentLocationPublished.map { _ in }
-            .handleEvents(receiveSubscription: self.didReceiveHighAccuracySubscription,
-                          receiveCancel: self.didReceiveHighAccuracyCancel)
+            .handleEvents(
+                receiveSubscription: didReceiveHighAccuracySubscription,
+                receiveCancel: didReceiveHighAccuracyCancel)
             .eraseToAnyPublisher()
     }
 
@@ -64,6 +67,7 @@ final class GeolocationServiceMock: GeolocationServiceProtocol {
     var locationPublisher: AnyPublisher<Result<CLLocation, Error>?, Never> {
         locationPublisherEventsHandler
     }
+
     var authorizationStatusPublisher: AnyPublisher<CLAuthorizationStatus, Never> {
         $authorizationStatus.eraseToAnyPublisher()
     }
@@ -74,9 +78,10 @@ final class GeolocationServiceMock: GeolocationServiceProtocol {
 
     var locationServicesEnabledValue = true {
         didSet {
-            authorizationStatus = (authorizationStatus)
+            authorizationStatus = authorizationStatus
         }
     }
+
     var locationServicesEnabled: () -> Bool {
         { self.locationServicesEnabledValue }
     }
@@ -95,6 +100,7 @@ final class GeolocationServiceMock: GeolocationServiceProtocol {
         history.append(.highAccuracyRequested)
         onHighAccuracyRequested?(s)
     }
+
     private func didReceiveHighAccuracyCancel() {
         history.append(.highAccuracyCancelled)
         onHighAccuracyCancelled?()

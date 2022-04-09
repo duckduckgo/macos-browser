@@ -16,13 +16,14 @@
 //  limitations under the License.
 //
 
-import Foundation
 import Combine
+import Foundation
 
 protocol BookmarkManagementSidebarViewControllerDelegate: AnyObject {
 
-    func bookmarkManagementSidebarViewController(_ sidebarViewController: BookmarkManagementSidebarViewController,
-                                                 enteredState state: BookmarkManagementSidebarViewController.SelectionState)
+    func bookmarkManagementSidebarViewController(
+        _ sidebarViewController: BookmarkManagementSidebarViewController,
+        enteredState state: BookmarkManagementSidebarViewController.SelectionState)
 
 }
 
@@ -42,13 +43,9 @@ final class BookmarkManagementSidebarViewController: NSViewController {
 
     private let treeControllerDataSource = BookmarkSidebarTreeController()
 
-    private lazy var treeController: BookmarkTreeController = {
-        return BookmarkTreeController(dataSource: treeControllerDataSource)
-    }()
+    private lazy var treeController = BookmarkTreeController(dataSource: treeControllerDataSource)
 
-    private lazy var dataSource: BookmarkOutlineViewDataSource = {
-        BookmarkOutlineViewDataSource(contentMode: .foldersOnly, treeController: treeController)
-    }()
+    private lazy var dataSource = BookmarkOutlineViewDataSource(contentMode: .foldersOnly, treeController: treeController)
 
     private var cancellables = Set<AnyCancellable>()
 
@@ -59,7 +56,8 @@ final class BookmarkManagementSidebarViewController: NSViewController {
         return [BookmarkNode]()
     }
 
-    @IBAction func onDoubleClick(_ sender: NSOutlineView) {
+    @IBAction
+    func onDoubleClick(_ sender: NSOutlineView) {
         guard let item = sender.item(atRow: sender.clickedRow) else { return }
         if sender.isItemExpanded(item) {
             sender.animator().collapseItem(item)
@@ -75,8 +73,10 @@ final class BookmarkManagementSidebarViewController: NSViewController {
         outlineView.dataSource = dataSource
         outlineView.delegate = dataSource
         outlineView.setDraggingSourceOperationMask([.move], forLocal: true)
-        outlineView.registerForDraggedTypes([BookmarkPasteboardWriter.bookmarkUTIInternalType,
-                                             FolderPasteboardWriter.folderUTIInternalType])
+        outlineView.registerForDraggedTypes([
+            BookmarkPasteboardWriter.bookmarkUTIInternalType,
+            FolderPasteboardWriter.folderUTIInternalType
+        ])
 
         dataSource.$selectedFolders.sink { [weak self] selectedFolders in
             guard let self = self else { return }
@@ -118,7 +118,7 @@ final class BookmarkManagementSidebarViewController: NSViewController {
     }
 
     private func reloadData() {
-        let selectedNodes = self.selectedNodes
+        let selectedNodes = selectedNodes
         dataSource.reloadData()
         outlineView.reloadData()
 
@@ -208,7 +208,7 @@ extension BookmarkManagementSidebarViewController: NSMenuDelegate {
 
 extension BookmarkManagementSidebarViewController: FolderMenuItemSelectors {
 
-    func newFolder(_ sender: NSMenuItem) {
+    func newFolder(_: NSMenuItem) {
         let addFolderViewController = AddFolderModalViewController.create()
         addFolderViewController.delegate = self
         beginSheet(addFolderViewController)
@@ -219,7 +219,7 @@ extension BookmarkManagementSidebarViewController: FolderMenuItemSelectors {
             assertionFailure("Failed to retrieve Bookmark from Rename Folder context menu item")
             return
         }
-        
+
         let addFolderViewController = AddFolderModalViewController.create()
         addFolderViewController.delegate = self
         addFolderViewController.edit(folder: folder)
@@ -241,11 +241,11 @@ extension BookmarkManagementSidebarViewController: FolderMenuItemSelectors {
 
 extension BookmarkManagementSidebarViewController: AddFolderModalViewControllerDelegate {
 
-    func addFolderViewController(_ viewController: AddFolderModalViewController, addedFolderWith name: String) {
+    func addFolderViewController(_: AddFolderModalViewController, addedFolderWith name: String) {
         LocalBookmarkManager.shared.makeFolder(for: name, parent: nil)
     }
 
-    func addFolderViewController(_ viewController: AddFolderModalViewController, saved folder: BookmarkFolder) {
+    func addFolderViewController(_: AddFolderModalViewController, saved folder: BookmarkFolder) {
         LocalBookmarkManager.shared.update(folder: folder)
     }
 

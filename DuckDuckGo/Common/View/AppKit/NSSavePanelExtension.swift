@@ -23,11 +23,11 @@ extension NSSavePanel {
     static private let fileTypesPopupTag = 100
 
     private var fileTypesPopup: NSPopUpButton? {
-        self.accessoryView?.viewWithTag(Self.fileTypesPopupTag) as? NSPopUpButton
+        accessoryView?.viewWithTag(Self.fileTypesPopupTag) as? NSPopUpButton
     }
 
     var selectedFileType: UTType? {
-        self.fileTypesPopup?.selectedItem?.representedObject as? UTType
+        fileTypesPopup?.selectedItem?.representedObject as? UTType
     }
 
     @UserDefaultsWrapper(key: .saveAsPreferredFileType, defaultValue: nil)
@@ -73,16 +73,18 @@ extension NSSavePanel {
         return savePanel
     }
 
-    @objc private func fileTypePopUpSelectionDidChange(_ popup: NSPopUpButton) {
+    @objc
+    private func fileTypePopUpSelectionDidChange(_ popup: NSPopUpButton) {
         guard let fileType = popup.selectedItem?.representedObject as? UTType else {
-            self.allowedFileTypes = nil
+            allowedFileTypes = nil
             return
         }
-        if fileType.fileExtension?.isEmpty == false,
-           let mimeType = fileType.mimeType {
+        if
+            fileType.fileExtension?.isEmpty == false,
+            let mimeType = fileType.mimeType {
             Self.preferredFileType = mimeType
         }
-        self.allowedFileTypes = [fileType.rawValue as String]
+        allowedFileTypes = [fileType.rawValue as String]
     }
 
 }

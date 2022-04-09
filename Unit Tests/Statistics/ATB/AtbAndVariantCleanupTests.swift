@@ -23,7 +23,7 @@ import XCTest
 
 class AtbAndVariantCleanupTests: XCTestCase {
 
-    struct Constants {
+    enum Constants {
 
         static let atb = "atb"
         static let variant = "variant"
@@ -68,5 +68,5 @@ class AtbAndVariantCleanupTests: XCTestCase {
         XCTAssertEqual(Constants.variant, mockStorage.variant)
 
     }
-    
+
 }

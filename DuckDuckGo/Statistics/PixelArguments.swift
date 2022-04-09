@@ -23,7 +23,7 @@ extension Pixel.Event {
     enum AppLaunch: String, CustomStringConvertible {
         var description: String { rawValue }
 
-        case initial = "initial"
+        case initial
         case dailyFirst = "first-in-a-day"
         case regular = "app-launch"
         case openURL = "open-url"
@@ -44,14 +44,18 @@ extension Pixel.Event {
             }
         }
 
-        static func repetition(store: PixelDataStore = LocalPixelDataStore.shared,
-                               now: @autoclosure @escaping () -> Date = Date()) -> AppLaunchRepetition {
-            return AppLaunchRepetition(store: store, now: now)
+        static func repetition(
+            store: PixelDataStore = LocalPixelDataStore.shared,
+            now: @autoclosure @escaping () -> Date = Date())
+            -> AppLaunchRepetition {
+            AppLaunchRepetition(store: store, now: now)
         }
 
-        static func autoInitialOrRegular(store: PixelDataStore = LocalPixelDataStore.shared,
-                                         now: @autoclosure @escaping () -> Date = Date()) -> AppLaunch {
-            let repetition = self.repetition(store: store, now: now())
+        static func autoInitialOrRegular(
+            store: PixelDataStore = LocalPixelDataStore.shared,
+            now: @autoclosure @escaping () -> Date = Date())
+            -> AppLaunch {
+            let repetition = repetition(store: store, now: now())
             switch repetition.value {
             case .initial:
                 return .initial
@@ -82,9 +86,9 @@ extension Pixel.Event {
     enum Repetition: String, CustomStringConvertible {
         var description: String { rawValue }
 
-        case initial = "initial"
+        case initial
         case dailyFirst = "first-in-a-day"
-        case repetitive = "repetitive"
+        case repetitive
 
         init(key: String, store: PixelDataStore = LocalPixelDataStore.shared, now: Date = Date(), update: Bool = true) {
             defer {
@@ -172,8 +176,9 @@ extension Pixel.Event {
         case pwm
 
         init(url: URL?, bookmarkManager: BookmarkManager = LocalBookmarkManager.shared) {
-            guard let url = url,
-                  let bookmark = bookmarkManager.getBookmark(for: url) else {
+            guard
+                let url = url,
+                let bookmark = bookmarkManager.getBookmark(for: url) else {
                 self = .website
                 return
             }
@@ -197,12 +202,13 @@ extension Pixel.Event {
     enum IsBookmarkFireproofed: String, CustomStringConvertible {
         var description: String { rawValue }
 
-        case fireproofed = "fireproofed"
+        case fireproofed
         case nonFireproofed = "non-fireproofed"
 
         init(url: URL?, fireproofDomains: FireproofDomains = FireproofDomains.shared) {
-            if let host = url?.host,
-               fireproofDomains.isFireproof(fireproofDomain: host) {
+            if
+                let host = url?.host,
+                fireproofDomains.isFireproof(fireproofDomain: host) {
                 self = .fireproofed
             } else {
                 self = .nonFireproofed
@@ -225,9 +231,10 @@ extension Pixel.Event {
             switch sender {
             case let menuItem as NSMenuItem:
                 if mainMenuCheck(menuItem.topMenu) {
-                    if let event = NSApp.currentEvent,
-                       case .keyDown = event.type,
-                       event.characters == menuItem.keyEquivalent {
+                    if
+                        let event = NSApp.currentEvent,
+                        case .keyDown = event.type,
+                        event.characters == menuItem.keyEquivalent {
 
                         self = .hotKey
                     } else {
@@ -264,8 +271,9 @@ extension Pixel.Event {
         }
 
         init(url: URL?, bookmarkManager: BookmarkManager = LocalBookmarkManager.shared) {
-            guard let url = url,
-                  !url.isDuckDuckGoSearch else {
+            guard
+                let url = url,
+                !url.isDuckDuckGoSearch else {
                 self = .search
                 return
             }
@@ -330,9 +338,9 @@ extension Pixel.Event {
         var description: String { rawValue }
 
         case newTab = "new-tab"
-        case cancelled = "cancelled"
+        case cancelled
         case newWindow = "new-window"
-        case feedback = "feedback"
+        case feedback
         case bookmarksList = "bookmarks-list"
         case loginsMenu = "logins-menu"
         case loginsMenuAllItems = "logins-menu-all-items"
@@ -343,11 +351,11 @@ extension Pixel.Event {
         case emailProtection = "email-protection"
         case emailProtectionCreateAddress = "email-protection-create"
         case emailProtectionOff = "email-protection-off"
-        case fireproof = "fireproof"
-        case preferences = "preferences"
-        case downloads = "downloads"
+        case fireproof
+        case preferences
+        case downloads
         case findInPage = "find-in-page"
-        case print = "print"
+        case print
     }
 
     enum RefreshAccessPoint: String, CustomStringConvertible {
@@ -362,9 +370,10 @@ extension Pixel.Event {
             switch sender {
             case let menuItem as NSMenuItem:
                 if mainMenuCheck(menuItem.topMenu) {
-                    if let event = NSApp.currentEvent,
-                       case .keyDown = event.type,
-                       event.characters == menuItem.keyEquivalent {
+                    if
+                        let event = NSApp.currentEvent,
+                        case .keyDown = event.type,
+                        event.characters == menuItem.keyEquivalent {
 
                         self = .hotKey
                     } else {

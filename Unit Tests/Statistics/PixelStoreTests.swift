@@ -16,9 +16,9 @@
 //  limitations under the License.
 //
 
+import Combine
 import XCTest
 @testable import DuckDuckGo_Privacy_Browser
-import Combine
 
 final class PixelStoreTests: XCTestCase {
 
@@ -36,7 +36,7 @@ final class PixelStoreTests: XCTestCase {
     override func setUp() {
         clearTemp()
 
-        self.tempURL = fm.temporaryDirectory
+        tempURL = fm.temporaryDirectory
 
         let keyStore = EncryptionKeyStoreMock()
         try? EncryptedValueTransformer<NSNumber>.registerTransformer(keyStore: keyStore)
@@ -49,9 +49,10 @@ final class PixelStoreTests: XCTestCase {
 
     func testPixelStoreMigration() throws {
         let url = tempURL.appendingPathComponent(testFile)
-        var oldContainer: NSPersistentContainer! = NSPersistentContainer.createPersistentContainer(at: url,
-                                                                                                   modelName: "OldPixelDataModel",
-                                                                                                   bundle: Bundle(for: type(of: self)))
+        var oldContainer: NSPersistentContainer! = NSPersistentContainer.createPersistentContainer(
+            at: url,
+            modelName: "OldPixelDataModel",
+            bundle: Bundle(for: type(of: self)))
         var oldContext: NSManagedObjectContext! = oldContainer.viewContext
         func updateModelOld(_ managedObject: NSManagedObject) -> (PixelDataRecord) throws -> Void {
             { record in
@@ -77,9 +78,10 @@ final class PixelStoreTests: XCTestCase {
         oldStore = nil
         oldContainer = nil
 
-        let newContainer = NSPersistentContainer.createPersistentContainer(at: url,
-                                                                           modelName: "PixelDataModel",
-                                                                           bundle: Bundle(for: DuckDuckGo_Privacy_Browser.PixelData.self))
+        let newContainer = NSPersistentContainer.createPersistentContainer(
+            at: url,
+            modelName: "PixelDataModel",
+            bundle: Bundle(for: DuckDuckGo_Privacy_Browser.PixelData.self))
         let newContext = newContainer.viewContext
         let newStore = LocalPixelDataStore(context: newContext, updateModel: DuckDuckGo_Privacy_Browser.PixelData.update)
 

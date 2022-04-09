@@ -17,14 +17,14 @@
 //  limitations under the License.
 //
 
-import XCTest
 import WebKit
+import XCTest
 @testable import DuckDuckGo_Privacy_Browser
 
 final class WKWebViewPrivateMethodsAvailabilityTests: XCTestCase {
 
     func testWebViewRespondsTo_sessionStateData() {
-        let webView = WebView.init(frame: CGRect(), configuration: .init())
+        let webView = WebView(frame: CGRect(), configuration: .init())
 
         XCTAssertNoThrow(try XCTAssertNotNil(webView.sessionStateData()))
     }

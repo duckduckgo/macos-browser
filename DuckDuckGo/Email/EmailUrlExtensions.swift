@@ -16,19 +16,19 @@
 //  limitations under the License.
 //
 
-import Foundation
 import BrowserServicesKit
+import Foundation
 
 extension EmailUrls {
 
-    private struct Url {
+    private enum Url {
         static let emailLandingPage = "https://duckduckgo.com/email/enable-autofill"
         static let emailGenerateTokenPage = "https://duckduckgo.com/email/new-address"
         static let emailAuthenticationHosts = ["quack.duckduckgo.com", "quackdev.duckduckgo.com"]
     }
 
     var emailLandingPage: URL {
-        return URL(string: Url.emailLandingPage)!
+        URL(string: Url.emailLandingPage)!
     }
 
     func shouldAuthenticateWithEmailCredentials(url: URL) -> Bool {

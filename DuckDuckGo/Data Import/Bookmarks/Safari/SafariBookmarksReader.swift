@@ -114,9 +114,10 @@ final class SafariBookmarksReader {
 
         do {
             let serializedData = try Data(contentsOf: safariBookmarksFileURL)
-            plistData = try PropertyListSerialization.propertyList(from: serializedData,
-                                                                   options: [],
-                                                                   format: &propertyListFormat) as? [String: AnyObject] ?? [:]
+            plistData = try PropertyListSerialization.propertyList(
+                from: serializedData,
+                options: [],
+                format: &propertyListFormat) as? [String: AnyObject] ?? [:]
         } catch {
             os_log("Failed to read Safari Bookmarks Plist at path: %s", log: .dataImportExport, type: .error, safariBookmarksFileURL.absoluteString)
             return nil

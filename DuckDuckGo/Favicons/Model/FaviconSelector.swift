@@ -23,7 +23,7 @@ final class FaviconSelector {
     static func getMostSuitableFavicon(for sizeCategory: Favicon.SizeCategory, favicons: [Favicon]) -> Favicon? {
         // Create groups according to the relation. // Prioritise favicon, then icon, and others
         let faviconGroups = favicons
-        // Categorize into 4 categories according to the quality
+            // Categorize into 4 categories according to the quality
             .reduce(into: [[Favicon](), [Favicon](), [Favicon](), [Favicon](), [Favicon]()], { partialResult, favicon in
                 if favicon.sizeCategory == sizeCategory {
                     switch favicon.relation {

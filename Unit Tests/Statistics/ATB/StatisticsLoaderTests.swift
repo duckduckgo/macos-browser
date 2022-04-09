@@ -17,9 +17,9 @@
 //  limitations under the License.
 //
 
-import XCTest
 import OHHTTPStubs
 import OHHTTPStubsSwift
+import XCTest
 @testable import DuckDuckGo_Privacy_Browser
 
 class StatisticsLoaderTests: XCTestCase {
@@ -129,20 +129,20 @@ class StatisticsLoaderTests: XCTestCase {
 
         waitForExpectations(timeout: 1, handler: nil)
     }
-    
+
     func testWhenAppRefreshHasSuccessfulAtbRequestThenAppRetentionAtbUpdated() {
-        
+
         mockStatisticsStore.atb = "atb"
         mockStatisticsStore.appRetentionAtb = "retentionatb"
         loadSuccessfulAtbStub()
-        
+
         let expect = expectation(description: "Successful atb updates retention store")
         testee.refreshAppRetentionAtb {
             XCTAssertEqual(self.mockStatisticsStore.atb, "atb")
             XCTAssertEqual(self.mockStatisticsStore.appRetentionAtb, "v77-5")
             expect.fulfill()
         }
-        
+
         waitForExpectations(timeout: 1, handler: nil)
     }
 
@@ -160,19 +160,19 @@ class StatisticsLoaderTests: XCTestCase {
 
         waitForExpectations(timeout: 1, handler: nil)
     }
-    
+
     func testWhenAppRefreshHasUnsuccessfulAtbRequestThenSearchRetentionAtbNotUpdated() {
         mockStatisticsStore.atb = "atb"
         mockStatisticsStore.appRetentionAtb = "retentionAtb"
         loadUnsuccessfulAtbStub()
-        
+
         let expect = expectation(description: "Unsuccessful atb does not update store")
         testee.refreshAppRetentionAtb {
             XCTAssertEqual(self.mockStatisticsStore.atb, "atb")
             XCTAssertEqual(self.mockStatisticsStore.appRetentionAtb, "retentionAtb")
             expect.fulfill()
         }
-        
+
         waitForExpectations(timeout: 1, handler: nil)
     }
 
@@ -181,7 +181,7 @@ class StatisticsLoaderTests: XCTestCase {
         mockStatisticsStore.appRetentionAtb = "retentionAtb"
         mockStatisticsStore.searchRetentionAtb = "retentionAtb"
         loadSuccessfulAtbStub()
-        XCTAssertFalse(self.mockStatisticsStore.isAppRetentionFiredToday)
+        XCTAssertFalse(mockStatisticsStore.isAppRetentionFiredToday)
 
         let expect = expectation(description: "Search retention atb does not update lastAppRetentionRequestDate")
         testee.refreshSearchRetentionAtb {
@@ -198,7 +198,7 @@ class StatisticsLoaderTests: XCTestCase {
         mockStatisticsStore.appRetentionAtb = "retentionAtb"
         mockStatisticsStore.searchRetentionAtb = "retentionAtb"
         loadSuccessfulAtbStub()
-        XCTAssertFalse(self.mockStatisticsStore.isAppRetentionFiredToday)
+        XCTAssertFalse(mockStatisticsStore.isAppRetentionFiredToday)
 
         let expect = expectation(description: "App retention atb updates lastAppRetentionRequestDate")
         testee.refreshAppRetentionAtb {
@@ -215,7 +215,7 @@ class StatisticsLoaderTests: XCTestCase {
         mockStatisticsStore.appRetentionAtb = "retentionAtb"
         mockStatisticsStore.searchRetentionAtb = "retentionAtb"
         loadUnsuccessfulAtbStub()
-        XCTAssertFalse(self.mockStatisticsStore.isAppRetentionFiredToday)
+        XCTAssertFalse(mockStatisticsStore.isAppRetentionFiredToday)
 
         let expect = expectation(description: "Unsuccessful App retention atb does not update lastAppRetentionRequestDate")
         testee.refreshAppRetentionAtb {

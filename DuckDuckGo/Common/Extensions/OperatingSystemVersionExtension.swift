@@ -19,7 +19,7 @@
 import Foundation
 
 extension OperatingSystemVersion: CustomStringConvertible {
-     public var description: String {
-         return "\(majorVersion).\(minorVersion).\(patchVersion)"
-     }
- }
+    public var description: String {
+        "\(majorVersion).\(minorVersion).\(patchVersion)"
+    }
+}

@@ -27,8 +27,9 @@ extension TabCollectionViewModel: NSSecureCoding {
     static var supportsSecureCoding: Bool { true }
 
     convenience init?(coder: NSCoder) {
-        guard let tabCollection = coder.decodeObject(of: TabCollection.self, forKey: NSSecureCodingKeys.tabCollection),
-              !tabCollection.tabs.isEmpty
+        guard
+            let tabCollection = coder.decodeObject(of: TabCollection.self, forKey: NSSecureCodingKeys.tabCollection),
+            !tabCollection.tabs.isEmpty
         else {
             return nil
         }

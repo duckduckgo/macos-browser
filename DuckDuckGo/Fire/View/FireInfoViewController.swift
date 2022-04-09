@@ -28,9 +28,10 @@ final class FireInfoViewController: NSViewController {
 
     weak var delegate: FireInfoViewControllerDelegate?
 
-    override func mouseDown(with event: NSEvent) {}
+    override func mouseDown(with _: NSEvent) {}
 
-    @IBAction func gotItAction(_ sender: Any) {
+    @IBAction
+    func gotItAction(_: Any) {
         delegate?.fireInfoViewControllerDidConfirm(self)
     }
 

@@ -16,9 +16,9 @@
 //  limitations under the License.
 //
 
-import Foundation
 import Combine
 import CoreLocation
+import Foundation
 @testable import DuckDuckGo_Privacy_Browser
 
 final class GeolocationProviderMock: GeolocationProviderProtocol {
@@ -31,7 +31,7 @@ final class GeolocationProviderMock: GeolocationProviderProtocol {
         self.geolocationService = geolocationService
     }
 
-    @PublishedAfter private var publishedIsActive: Bool = false
+    @PublishedAfter private var publishedIsActive = false
     var isActive: Bool {
         get {
             publishedIsActive
@@ -40,11 +40,12 @@ final class GeolocationProviderMock: GeolocationProviderProtocol {
             publishedIsActive = newValue
         }
     }
+
     var isActivePublisher: AnyPublisher<Bool, Never> {
         $publishedIsActive.eraseToAnyPublisher()
     }
 
-    @PublishedAfter private var publishedIsPaused: Bool = false
+    @PublishedAfter private var publishedIsPaused = false
     var isPaused: Bool {
         get {
             publishedIsPaused
@@ -53,17 +54,19 @@ final class GeolocationProviderMock: GeolocationProviderProtocol {
             publishedIsPaused = newValue
         }
     }
+
     var isPausedPublisher: AnyPublisher<Bool, Never> {
         $publishedIsPaused.eraseToAnyPublisher()
     }
 
-    var isRevoked: Bool = false
+    var isRevoked = false
 
     var authorizationStatusPublisher: AnyPublisher<CLAuthorizationStatus, Never> {
-        self.geolocationService.authorizationStatusPublisher
+        geolocationService.authorizationStatusPublisher
     }
+
     var authorizationStatus: CLAuthorizationStatus {
-        self.geolocationService.authorizationStatus
+        geolocationService.authorizationStatus
     }
 
     func revoke() {
@@ -73,9 +76,9 @@ final class GeolocationProviderMock: GeolocationProviderProtocol {
     }
 
     func reset() {
-        self.isActive = false
-        self.isRevoked = false
-        self.isPaused = false
+        isActive = false
+        isRevoked = false
+        isPaused = false
         onReset?()
     }
 

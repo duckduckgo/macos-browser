@@ -16,9 +16,9 @@
 //  limitations under the License.
 //
 
+import Carbon
 import Foundation
 import XCTest
-import Carbon
 @testable import DuckDuckGo_Privacy_Browser
 
 class AppUsageActivityMonitorTests: XCTestCase {
@@ -48,18 +48,30 @@ class AppUsageActivityMonitorTests: XCTestCase {
     }
 
     func sendKeyEvent() {
-        let event = NSEvent.keyEvent(with: .keyDown, location: .zero, modifierFlags: .command,
-                                     timestamp: Date().timeIntervalSinceReferenceDate, windowNumber: 0,
-                                     context: nil, characters: "x", charactersIgnoringModifiers: "",
-                                     isARepeat: false, keyCode: UInt16(kVK_ANSI_X))!
+        let event = NSEvent.keyEvent(
+            with: .keyDown,
+            location: .zero,
+            modifierFlags: .command,
+            timestamp: Date().timeIntervalSinceReferenceDate,
+            windowNumber: 0,
+            context: nil,
+            characters: "x",
+            charactersIgnoringModifiers: "",
+            isARepeat: false,
+            keyCode: UInt16(kVK_ANSI_X))!
         NSApp.sendEvent(event)
     }
 
     // MARK: - Tests
 
     func testActivityMonitorEventsAreThrottled() {
-        let mon = AppUsageActivityMonitor(delegate: self, dateProvider: self.now, storage: pixelDataStore,
-                                          throttle: 0.2, maxIdleTime: 10.0, threshold: 5.0)
+        let mon = AppUsageActivityMonitor(
+            delegate: self,
+            dateProvider: now,
+            storage: pixelDataStore,
+            throttle: 0.2,
+            maxIdleTime: 10.0,
+            threshold: 5.0)
 
         let e = expectation(description: "activity received")
 
@@ -83,8 +95,13 @@ class AppUsageActivityMonitorTests: XCTestCase {
     }
 
     func testWhenActivityMonitorReachesThresholdThenActivityCallbackIsFired() {
-        let mon = AppUsageActivityMonitor(delegate: self, dateProvider: self.now, storage: pixelDataStore,
-                                          throttle: 0.0, maxIdleTime: 10.0, threshold: 5.0)
+        let mon = AppUsageActivityMonitor(
+            delegate: self,
+            dateProvider: now,
+            storage: pixelDataStore,
+            throttle: 0.0,
+            maxIdleTime: 10.0,
+            threshold: 5.0)
 
         let e = expectation(description: "activity received")
 
@@ -106,8 +123,13 @@ class AppUsageActivityMonitorTests: XCTestCase {
     }
 
     func testWhenAppIsInactiveActivityIsNotTracked() {
-        let mon = AppUsageActivityMonitor(delegate: self, dateProvider: self.now, storage: pixelDataStore,
-                                          throttle: 0.0, maxIdleTime: 10.0, threshold: 5.0)
+        let mon = AppUsageActivityMonitor(
+            delegate: self,
+            dateProvider: now,
+            storage: pixelDataStore,
+            throttle: 0.0,
+            maxIdleTime: 10.0,
+            threshold: 5.0)
 
         callback = { _ in
             XCTFail("Should not fire when App is not active")
@@ -124,8 +146,13 @@ class AppUsageActivityMonitorTests: XCTestCase {
     }
 
     func testWhenAppIsRestartedThenActivityMonitorUsageTimeIsSaved() {
-        var mon = AppUsageActivityMonitor(delegate: self, dateProvider: self.now, storage: pixelDataStore,
-                                          throttle: 0.0, maxIdleTime: 10.0, threshold: 5.0)
+        var mon = AppUsageActivityMonitor(
+            delegate: self,
+            dateProvider: now,
+            storage: pixelDataStore,
+            throttle: 0.0,
+            maxIdleTime: 10.0,
+            threshold: 5.0)
 
         let e = expectation(description: "activity received")
 
@@ -138,8 +165,13 @@ class AppUsageActivityMonitorTests: XCTestCase {
         openWindowsAndTabs = [2, 3, 1]
         sendKeyEvent()
 
-        mon = AppUsageActivityMonitor(delegate: self, dateProvider: self.now, storage: pixelDataStore,
-                                      throttle: 0.0, maxIdleTime: 10.0, threshold: 5.0)
+        mon = AppUsageActivityMonitor(
+            delegate: self,
+            dateProvider: now,
+            storage: pixelDataStore,
+            throttle: 0.0,
+            maxIdleTime: 10.0,
+            threshold: 5.0)
 
         now += 5.0
         openWindowsAndTabs = [1, 1]
@@ -151,8 +183,13 @@ class AppUsageActivityMonitorTests: XCTestCase {
     }
 
     func testWhenAppIsIdleForIdleTimeThenActivityIsNotRegistered() {
-        let mon = AppUsageActivityMonitor(delegate: self, dateProvider: self.now, storage: pixelDataStore,
-                                          throttle: 0.0, maxIdleTime: 10.0, threshold: 5.0)
+        let mon = AppUsageActivityMonitor(
+            delegate: self,
+            dateProvider: now,
+            storage: pixelDataStore,
+            throttle: 0.0,
+            maxIdleTime: 10.0,
+            threshold: 5.0)
 
         callback = { _ in
             XCTFail("Activity should not be registered for idle time")
@@ -181,8 +218,13 @@ class AppUsageActivityMonitorTests: XCTestCase {
     }
 
     func testWhenActiveUsageIsRegisteredNextEventsDoNotFireCallback() {
-        let mon = AppUsageActivityMonitor(delegate: self, dateProvider: self.now, storage: pixelDataStore,
-                                          throttle: 0.0, maxIdleTime: 10.0, threshold: 5.0)
+        let mon = AppUsageActivityMonitor(
+            delegate: self,
+            dateProvider: now,
+            storage: pixelDataStore,
+            throttle: 0.0,
+            maxIdleTime: 10.0,
+            threshold: 5.0)
 
         var e = expectation(description: "activity received")
         callback = { _ in
@@ -221,8 +263,13 @@ class AppUsageActivityMonitorTests: XCTestCase {
     }
 
     func testWhenAppIsUsedNextDayThenMetricsAreReset() {
-        let mon = AppUsageActivityMonitor(delegate: self, dateProvider: self.now, storage: pixelDataStore,
-                                          throttle: 0.0, maxIdleTime: 10.0, threshold: 5.0)
+        let mon = AppUsageActivityMonitor(
+            delegate: self,
+            dateProvider: now,
+            storage: pixelDataStore,
+            throttle: 0.0,
+            maxIdleTime: 10.0,
+            threshold: 5.0)
 
         callback = { _ in
             XCTFail("Activity should not be registered before reaching threshold")
@@ -258,11 +305,11 @@ class AppUsageActivityMonitorTests: XCTestCase {
 extension AppUsageActivityMonitorTests: AppUsageActivityMonitorDelegate {
 
     func countOpenWindowsAndTabs() -> [Int] {
-        return self.openWindowsAndTabs
+        openWindowsAndTabs
     }
 
     func activeUsageTimeHasReachedThreshold(avgTabCount: Double) {
-        self.callback(avgTabCount)
+        callback(avgTabCount)
     }
 
 }

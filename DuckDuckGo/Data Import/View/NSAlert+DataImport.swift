@@ -21,7 +21,7 @@ import AppKit
 extension NSAlert {
 
     var stringValue: String? {
-        return (accessoryView as? NSTextField)?.stringValue
+        (accessoryView as? NSTextField)?.stringValue
     }
 
     static func closeRunningBrowserAlert(source: DataImport.Source) -> NSAlert {

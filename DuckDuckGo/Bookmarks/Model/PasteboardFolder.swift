@@ -20,7 +20,7 @@ import Foundation
 
 struct PasteboardFolder: Hashable {
 
-    private struct Key {
+    private enum Key {
         static let id = "id"
         static let name = "name"
     }
@@ -46,8 +46,9 @@ struct PasteboardFolder: Hashable {
     init?(pasteboardItem: NSPasteboardItem) {
         let type = FolderPasteboardWriter.folderUTIInternalType
 
-        guard pasteboardItem.types.contains(type),
-              let dictionary = pasteboardItem.propertyList(forType: type) as? PasteboardAttributes else { return nil }
+        guard
+            pasteboardItem.types.contains(type),
+            let dictionary = pasteboardItem.propertyList(forType: type) as? PasteboardAttributes else { return nil }
 
         self.init(dictionary: dictionary)
     }
@@ -64,38 +65,39 @@ struct PasteboardFolder: Hashable {
     // MARK: - Dictionary Representations
 
     var internalDictionaryRepresentation: PasteboardAttributes {
-        return [
+        [
             Key.id: id,
             Key.name: name
         ]
     }
 }
 
-@objc final class FolderPasteboardWriter: NSObject, NSPasteboardWriting {
+@objc
+final class FolderPasteboardWriter: NSObject, NSPasteboardWriting {
 
     static let folderUTIInternal = "com.duckduckgo.folder.internal"
     static let folderUTIInternalType = NSPasteboard.PasteboardType(rawValue: folderUTIInternal)
 
     var pasteboardFolder: PasteboardFolder {
-        return PasteboardFolder(id: folderID, name: folderName)
+        PasteboardFolder(id: folderID, name: folderName)
     }
 
     var internalDictionary: PasteboardAttributes {
-        return pasteboardFolder.internalDictionaryRepresentation
+        pasteboardFolder.internalDictionaryRepresentation
     }
 
     private let folderID: String
     private let folderName: String
 
     init(folder: BookmarkFolder) {
-        self.folderID = folder.id.uuidString
-        self.folderName = folder.title
+        folderID = folder.id.uuidString
+        folderName = folder.title
     }
 
     // MARK: - NSPasteboardWriting
 
-    func writableTypes(for pasteboard: NSPasteboard) -> [NSPasteboard.PasteboardType] {
-        return [FolderPasteboardWriter.folderUTIInternalType]
+    func writableTypes(for _: NSPasteboard) -> [NSPasteboard.PasteboardType] {
+        [FolderPasteboardWriter.folderUTIInternalType]
     }
 
     func pasteboardPropertyList(forType type: NSPasteboard.PasteboardType) -> Any? {

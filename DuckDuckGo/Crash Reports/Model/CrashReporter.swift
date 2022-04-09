@@ -31,7 +31,7 @@ final class CrashReporter {
 
     func checkForNewReports() {
 
-#if !DEBUG
+        #if !DEBUG
 
         guard let lastCheckDate = lastCheckDate else {
             // Initial run
@@ -52,7 +52,7 @@ final class CrashReporter {
         latestCrashReport = latest
         promptPresenter.showPrompt(self, for: latest)
 
-#endif
+        #endif
 
     }
 
@@ -60,8 +60,9 @@ final class CrashReporter {
 
 extension CrashReporter: CrashReportPromptViewControllerDelegate {
 
-    func crashReportPromptViewController(_ crashReportPromptViewController: CrashReportPromptViewController,
-                                         userDidAllowToReport: Bool) {
+    func crashReportPromptViewController(
+        _: CrashReportPromptViewController,
+        userDidAllowToReport: Bool) {
         guard userDidAllowToReport else {
             return
         }

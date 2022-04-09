@@ -27,16 +27,16 @@ class VariantManagerTests: XCTestCase {
         Variant(name: "mc", weight: 25, isIncluded: Variant.When.always, features: []),
         Variant(name: "mt", weight: Variant.doNotAllocate, isIncluded: Variant.When.always, features: []),
         Variant(name: "md", weight: 25, isIncluded: Variant.When.always, features: []),
-        Variant(name: "excluded", weight: 1000, isIncluded: { return false }, features: [.dummy])
+        Variant(name: "excluded", weight: 1000, isIncluded: { false }, features: [.dummy])
     ]
 
     func testWhenVariantIsExcludedThenItIsNotInVariantList() {
-        
+
         let subject = DefaultVariantManager(variants: testVariants, storage: MockStatisticsStore(), rng: MockVariantRNG(returnValue: 500))
         XCTAssertTrue(!subject.isSupported(feature: .dummy))
-        
+
     }
-    
+
     func testWhenCurrentVariantSupportsFeatureThenIsSupportedReturnsTrue() {
 
         let testVariants = [
@@ -58,24 +58,24 @@ class VariantManagerTests: XCTestCase {
         mockStore.atb = "atb"
         mockStore.appRetentionAtb = "aatb"
         mockStore.searchRetentionAtb = "satb"
-        
+
         for i in 0 ..< 100 {
-            
+
             let subject = DefaultVariantManager(variants: testVariants, storage: mockStore, rng: MockVariantRNG(returnValue: i))
-            subject.assignVariantIfNeeded { _ in  }
+            subject.assignVariantIfNeeded { _ in }
             XCTAssertNotEqual("mt", subject.currentVariant?.name)
 
         }
-        
+
     }
-    
+
     func testWhenExistingUserThenAssignIfNeededDoesNothing() {
 
         let mockStore = MockStatisticsStore()
         mockStore.atb = "atb"
 
         let subject = DefaultVariantManager(variants: testVariants, storage: mockStore, rng: MockVariantRNG(returnValue: 0))
-        subject.assignVariantIfNeeded {  _ in  }
+        subject.assignVariantIfNeeded { _ in }
         XCTAssertNil(subject.currentVariant)
 
     }
@@ -84,7 +84,7 @@ class VariantManagerTests: XCTestCase {
 
         let variant = Variant(name: "anything", weight: 100, isIncluded: Variant.When.always, features: [])
         let subject = DefaultVariantManager(variants: [variant], storage: MockStatisticsStore())
-        subject.assignVariantIfNeeded {  _ in }
+        subject.assignVariantIfNeeded { _ in }
         XCTAssertEqual(variant.name, subject.currentVariant?.name)
 
     }
@@ -143,8 +143,8 @@ struct MockVariantRNG: VariantRNG {
 
     let returnValue: Int
 
-    func nextInt(upperBound: Int) -> Int {
-        return returnValue
+    func nextInt(upperBound _: Int) -> Int {
+        returnValue
     }
-    
+
 }

@@ -16,21 +16,21 @@
 //  limitations under the License.
 //
 
-import XCTest
 import Combine
+import XCTest
 @testable import DuckDuckGo_Privacy_Browser
 
 final class AutofillPreferencesPersistorMock: AutofillPreferencesPersistor {
-    var isAutoLockEnabled: Bool = true
+    var isAutoLockEnabled = true
     var autoLockThreshold: AutofillAutoLockThreshold = .fifteenMinutes
-    var askToSaveUsernamesAndPasswords: Bool = true
-    var askToSaveAddresses: Bool = true
-    var askToSavePaymentMethods: Bool = true
+    var askToSaveUsernamesAndPasswords = true
+    var askToSaveAddresses = true
+    var askToSavePaymentMethods = true
 }
 
 final class UserAuthenticatorMock: UserAuthenticating {
     // swiftlint:disable:next identifier_name
-    var _authenticateUser: (DeviceAuthenticator.AuthenticationReason) -> DeviceAuthenticationResult = { _ in return .success }
+    var _authenticateUser: (DeviceAuthenticator.AuthenticationReason) -> DeviceAuthenticationResult = { _ in .success }
 
     func authenticateUser(reason: DeviceAuthenticator.AuthenticationReason, result: @escaping (DeviceAuthenticationResult) -> Void) {
         let authenticationResult = _authenticateUser(reason)
@@ -60,7 +60,7 @@ final class AutofillPreferencesModelTests: XCTestCase {
         let userAuthenticator = UserAuthenticatorMock()
         let model = AutofillPreferencesModel(persistor: persistor, userAuthenticator: userAuthenticator)
 
-        userAuthenticator._authenticateUser = { _ in return .success}
+        userAuthenticator._authenticateUser = { _ in .success }
 
         model.authorizeAutoLockSettingsChange(isEnabled: false)
         XCTAssertEqual(model.isAutoLockEnabled, false)
@@ -72,7 +72,7 @@ final class AutofillPreferencesModelTests: XCTestCase {
         let userAuthenticator = UserAuthenticatorMock()
         let model = AutofillPreferencesModel(persistor: persistor, userAuthenticator: userAuthenticator)
 
-        userAuthenticator._authenticateUser = { _ in return .failure}
+        userAuthenticator._authenticateUser = { _ in .failure }
 
         model.authorizeAutoLockSettingsChange(isEnabled: false)
         XCTAssertEqual(model.isAutoLockEnabled, true)
@@ -84,7 +84,7 @@ final class AutofillPreferencesModelTests: XCTestCase {
         let userAuthenticator = UserAuthenticatorMock()
         let model = AutofillPreferencesModel(persistor: persistor, userAuthenticator: userAuthenticator)
 
-        userAuthenticator._authenticateUser = { _ in return .success}
+        userAuthenticator._authenticateUser = { _ in .success }
 
         model.authorizeAutoLockSettingsChange(threshold: .oneHour)
         XCTAssertEqual(model.isAutoLockEnabled, true)
@@ -97,7 +97,7 @@ final class AutofillPreferencesModelTests: XCTestCase {
         let userAuthenticator = UserAuthenticatorMock()
         let model = AutofillPreferencesModel(persistor: persistor, userAuthenticator: userAuthenticator)
 
-        userAuthenticator._authenticateUser = { _ in return .failure}
+        userAuthenticator._authenticateUser = { _ in .failure }
 
         model.authorizeAutoLockSettingsChange(threshold: .oneHour)
         XCTAssertNotEqual(model.autoLockThreshold, .oneHour)

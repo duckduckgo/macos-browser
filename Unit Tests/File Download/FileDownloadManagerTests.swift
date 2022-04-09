@@ -39,8 +39,8 @@ final class FileDownloadManagerTests: XCTestCase {
         defaults.removePersistentDomain(forName: testGroupName)
         preferences = DownloadsPreferences(persistor: DownloadsPreferencesPersistorMock())
         preferences.alwaysRequestDownloadLocation = false
-        self.workspace = TestWorkspace()
-        self.dm = FileDownloadManager(workspace: workspace, preferences: preferences)
+        workspace = TestWorkspace()
+        dm = FileDownloadManager(workspace: workspace, preferences: preferences)
         let tempDir = fm.temporaryDirectory
         for file in (try? fm.contentsOfDirectory(atPath: tempDir.path)) ?? [] where file.hasPrefix(testFile) {
             try? fm.removeItem(at: tempDir.appendingPathComponent(file))
@@ -49,8 +49,8 @@ final class FileDownloadManagerTests: XCTestCase {
 
     override func tearDown() {
         FileManager.restoreUrlsForIn()
-        self.chooseDestination = nil
-        self.fileIconFlyAnimationOriginalRect = nil
+        chooseDestination = nil
+        fileIconFlyAnimationOriginalRect = nil
     }
 
     func testWhenDownloadIsAddedThenItsPublished() {
@@ -107,7 +107,7 @@ final class FileDownloadManagerTests: XCTestCase {
         preferences.selectedDownloadLocation = downloadsURL
 
         let e1 = expectation(description: "chooseDestinationCallback called")
-        self.chooseDestination = { suggestedFilename, directoryURL, fileTypes, callback in
+        chooseDestination = { suggestedFilename, directoryURL, fileTypes, callback in
             dispatchPrecondition(condition: .onQueue(.main))
             XCTAssertEqual(suggestedFilename, "suggested.filename")
             XCTAssertEqual(directoryURL, downloadsURL)
@@ -123,12 +123,13 @@ final class FileDownloadManagerTests: XCTestCase {
         let url = URL(string: "https://duckduckgo.com/somefile.html")!
         let response = URLResponse(url: url, mimeType: UTType.pdf.mimeType, expectedContentLength: 1, textEncodingName: "utf-8")
         let e2 = expectation(description: "WKDownload callback called")
-        download.downloadDelegate?.download(download,
-                                            decideDestinationUsing: response,
-                                            suggestedFilename: "suggested.filename") { url in
-            XCTAssertNil(url)
-            e2.fulfill()
-        }
+        download.downloadDelegate?.download(
+            download,
+            decideDestinationUsing: response,
+            suggestedFilename: "suggested.filename") { url in
+                XCTAssertNil(url)
+                e2.fulfill()
+            }
 
         waitForExpectations(timeout: 0.3)
     }
@@ -140,7 +141,7 @@ final class FileDownloadManagerTests: XCTestCase {
 
         let localURL = downloadsURL.appendingPathComponent(testFile)
         let e1 = expectation(description: "chooseDestinationCallback called")
-        self.chooseDestination = { suggestedFilename, directoryURL, fileTypes, callback in
+        chooseDestination = { suggestedFilename, directoryURL, fileTypes, callback in
             dispatchPrecondition(condition: .onQueue(.main))
             XCTAssertEqual(suggestedFilename, "suggested.filename")
             XCTAssertEqual(directoryURL, downloadsURL)
@@ -156,13 +157,14 @@ final class FileDownloadManagerTests: XCTestCase {
         let url = URL(string: "https://duckduckgo.com/somefile.html")!
         let response = URLResponse(url: url, mimeType: UTType.html.mimeType, expectedContentLength: 1, textEncodingName: "utf-8")
         let e2 = expectation(description: "WKDownload callback called")
-        download.downloadDelegate?.download(download,
-                                            decideDestinationUsing: response,
-                                            suggestedFilename: "suggested.filename") { url in
-            dispatchPrecondition(condition: .onQueue(.main))
-            XCTAssertEqual(url, localURL.appendingPathExtension(WebKitDownloadTask.downloadExtension))
-            e2.fulfill()
-        }
+        download.downloadDelegate?.download(
+            download,
+            decideDestinationUsing: response,
+            suggestedFilename: "suggested.filename") { url in
+                dispatchPrecondition(condition: .onQueue(.main))
+                XCTAssertEqual(url, localURL.appendingPathExtension(WebKitDownloadTask.downloadExtension))
+                e2.fulfill()
+            }
 
         waitForExpectations(timeout: 0.3)
     }
@@ -174,7 +176,7 @@ final class FileDownloadManagerTests: XCTestCase {
 
         let download = WKDownloadMock()
         dm.add(download, delegate: self, location: .prompt, postflight: .none)
-        self.chooseDestination = { _, _, _, callback in
+        chooseDestination = { _, _, _, callback in
             callback(localURL, nil)
         }
 
@@ -195,7 +197,7 @@ final class FileDownloadManagerTests: XCTestCase {
 
         let download = WKDownloadMock()
         dm.add(download, delegate: self, location: .auto, postflight: .none)
-        self.chooseDestination = { _, _, _, _ in
+        chooseDestination = { _, _, _, _ in
             XCTFail("Unpected chooseDestination call")
         }
 
@@ -214,7 +216,7 @@ final class FileDownloadManagerTests: XCTestCase {
 
         let download = WKDownloadMock()
         dm.add(download, delegate: self, location: .auto, postflight: .none)
-        self.chooseDestination = { _, _, _, _ in
+        chooseDestination = { _, _, _, _ in
             XCTFail("Unpected chooseDestination call")
         }
 
@@ -253,7 +255,7 @@ final class FileDownloadManagerTests: XCTestCase {
         chooseDestination = { _, _, _, callback in
             callback(url, nil)
         }
-        self.workspace.callback = { sel, urls in
+        workspace.callback = { sel, urls in
             completion(sel, urls)
         }
 
@@ -288,7 +290,7 @@ final class FileDownloadManagerTests: XCTestCase {
     func testWhenPostflightIsOpenThenFileIsOpened() {
         let localURL = fm.temporaryDirectory.appendingPathComponent(testFile)
         let e = expectation(description: "Open File postflight called")
-        performPostflightTest(at: localURL, with: .open) { (sel, urls) in
+        performPostflightTest(at: localURL, with: .open) { sel, urls in
             XCTAssertEqual(sel, #selector(NSWorkspace.open(_:)))
             XCTAssertEqual(urls, [localURL])
             e.fulfill()
@@ -298,7 +300,7 @@ final class FileDownloadManagerTests: XCTestCase {
     func testWhenPostflightIsRevealThenFileIsRevealed() {
         let localURL = fm.temporaryDirectory.appendingPathComponent(testFile)
         let e = expectation(description: "Open File postflight called")
-        performPostflightTest(at: localURL, with: .reveal) { (sel, urls) in
+        performPostflightTest(at: localURL, with: .reveal) { sel, urls in
             XCTAssertEqual(sel, #selector(NSWorkspace.activateFileViewerSelecting(_:)))
             XCTAssertEqual(urls, [localURL])
             e.fulfill()
@@ -310,11 +312,11 @@ final class FileDownloadManagerTests: XCTestCase {
 @available(macOS 11.3, *)
 extension FileDownloadManagerTests: FileDownloadManagerDelegate {
     func chooseDestination(suggestedFilename: String?, directoryURL: URL?, fileTypes: [UTType], callback: @escaping (URL?, UTType?) -> Void) {
-        self.chooseDestination?(suggestedFilename, directoryURL, fileTypes, callback)
+        chooseDestination?(suggestedFilename, directoryURL, fileTypes, callback)
     }
 
     func fileIconFlyAnimationOriginalRect(for downloadTask: WebKitDownloadTask) -> NSRect? {
-        self.fileIconFlyAnimationOriginalRect?(downloadTask)
+        fileIconFlyAnimationOriginalRect?(downloadTask)
     }
 }
 
@@ -332,42 +334,39 @@ final class TestWorkspace: NSWorkspace {
 
 }
 
-private extension FileManager {
+extension FileManager {
     private static var urlsForIn: ((SearchPathDirectory, SearchPathDomainMask) -> [URL])?
     private static let lock = NSLock()
     private static var isSwizzled = false
-    private static let originalUrlsForIn = {
-        class_getInstanceMethod(FileManager.self, #selector(FileManager.urls(for:in:)))!
-    }()
-    private static let swizzledUrlsForIn = {
-        class_getInstanceMethod(FileManager.self, #selector(FileManager.swizzled_urls(for:in:)))!
-    }()
+    private static let originalUrlsForIn = class_getInstanceMethod(FileManager.self, #selector(FileManager.urls(for:in:)))!
 
-    static func swizzleUrlsForIn(with urlsForIn: @escaping ((SearchPathDirectory, SearchPathDomainMask) -> [URL])) {
+    private static let swizzledUrlsForIn = class_getInstanceMethod(FileManager.self, #selector(FileManager.swizzled_urls(for:in:)))!
+
+    fileprivate static func swizzleUrlsForIn(with urlsForIn: @escaping ((SearchPathDirectory, SearchPathDomainMask) -> [URL])) {
         lock.lock()
         defer { lock.unlock() }
-        if !self.isSwizzled {
-            self.isSwizzled = true
+        if !isSwizzled {
+            isSwizzled = true
             method_exchangeImplementations(originalUrlsForIn, swizzledUrlsForIn)
         }
         self.urlsForIn = urlsForIn
     }
 
-    static func restoreUrlsForIn() {
+    fileprivate static func restoreUrlsForIn() {
         lock.lock()
         defer { lock.unlock() }
-        if self.isSwizzled {
-            self.isSwizzled = false
+        if isSwizzled {
+            isSwizzled = false
             method_exchangeImplementations(originalUrlsForIn, swizzledUrlsForIn)
         }
-        self.urlsForIn = nil
+        urlsForIn = nil
     }
 
     @objc
-    func swizzled_urls(for directory: FileManager.SearchPathDirectory, in domainMask: FileManager.SearchPathDomainMask) -> [URL] {
+    private func swizzled_urls(for directory: FileManager.SearchPathDirectory, in domainMask: FileManager.SearchPathDomainMask) -> [URL] {
         Self.lock.lock()
         defer { Self.lock.unlock() }
-        guard let urlsForIn = Self.urlsForIn else { return self.urls(for: directory, in: domainMask) }
+        guard let urlsForIn = Self.urlsForIn else { return urls(for: directory, in: domainMask) }
 
         return urlsForIn(directory, domainMask)
     }

@@ -16,9 +16,9 @@
 //  limitations under the License.
 //
 
+import Combine
 import XCTest
 @testable import DuckDuckGo_Privacy_Browser
-import Combine
 
 final class HistoryStoreTests: XCTestCase {
 
@@ -44,15 +44,15 @@ final class HistoryStoreTests: XCTestCase {
         let historyStore = HistoryStore(context: context)
 
         var historyEntry = HistoryEntry(identifier: UUID(), url: URL.duckDuckGo, title: "Test", numberOfVisits: 1, lastVisit: Date())
-        let firstSavingExpectation = self.expectation(description: "Saving")
+        let firstSavingExpectation = expectation(description: "Saving")
         save(entry: historyEntry, historyStore: historyStore, expectation: firstSavingExpectation)
 
         let newTitle = "New Title"
         historyEntry.title = newTitle
-        let secondSavingExpectation = self.expectation(description: "Saving")
+        let secondSavingExpectation = expectation(description: "Saving")
         save(entry: historyEntry, historyStore: historyStore, expectation: secondSavingExpectation)
 
-        let loadingExpectation = self.expectation(description: "Loading")
+        let loadingExpectation = expectation(description: "Loading")
         historyStore.cleanOld(until: Date(timeIntervalSince1970: 0))
             .receive(on: DispatchQueue.main)
             .sink { completion in
@@ -76,24 +76,26 @@ final class HistoryStoreTests: XCTestCase {
         let context = container.viewContext
         let historyStore = HistoryStore(context: context)
 
-        let oldHistoryEntry = HistoryEntry(identifier: UUID(),
-                                      url: URL.duckDuckGo,
-                                      title: nil,
-                                      numberOfVisits: 1,
-                                      lastVisit: Date.init(timeIntervalSince1970: 0))
-        let firstSavingExpectation = self.expectation(description: "Saving")
+        let oldHistoryEntry = HistoryEntry(
+            identifier: UUID(),
+            url: URL.duckDuckGo,
+            title: nil,
+            numberOfVisits: 1,
+            lastVisit: Date(timeIntervalSince1970: 0))
+        let firstSavingExpectation = expectation(description: "Saving")
         save(entry: oldHistoryEntry, historyStore: historyStore, expectation: firstSavingExpectation)
 
         let newHistoryEntryIdentifier = UUID()
-        let newHistoryEntry = HistoryEntry(identifier: newHistoryEntryIdentifier,
-                                           url: URL(string: "wikipedia.org")!,
-                                           title: nil,
-                                           numberOfVisits: 1,
-                                           lastVisit: Date())
-        let secondSavingExpectation = self.expectation(description: "Saving")
+        let newHistoryEntry = HistoryEntry(
+            identifier: newHistoryEntryIdentifier,
+            url: URL(string: "wikipedia.org")!,
+            title: nil,
+            numberOfVisits: 1,
+            lastVisit: Date())
+        let secondSavingExpectation = expectation(description: "Saving")
         save(entry: newHistoryEntry, historyStore: historyStore, expectation: secondSavingExpectation)
 
-        let loadingExpectation = self.expectation(description: "Loading")
+        let loadingExpectation = expectation(description: "Loading")
         historyStore.cleanOld(until: Date(timeIntervalSince1970: 1))
             .receive(on: DispatchQueue.main)
             .sink { completion in
@@ -118,23 +120,25 @@ final class HistoryStoreTests: XCTestCase {
         let historyStore = HistoryStore(context: context)
 
         let notToRemoveIdentifier = UUID()
-        let historyEntry = HistoryEntry(identifier: notToRemoveIdentifier,
-                                      url: URL.duckDuckGo,
-                                      title: nil,
-                                      numberOfVisits: 1,
-                                      lastVisit: Date())
-        let firstSavingExpectation = self.expectation(description: "Saving")
+        let historyEntry = HistoryEntry(
+            identifier: notToRemoveIdentifier,
+            url: URL.duckDuckGo,
+            title: nil,
+            numberOfVisits: 1,
+            lastVisit: Date())
+        let firstSavingExpectation = expectation(description: "Saving")
         save(entry: historyEntry, historyStore: historyStore, expectation: firstSavingExpectation)
 
-        let toRemoveHistoryEntry = HistoryEntry(identifier: UUID(),
-                                           url: URL(string: "wikipedia.org")!,
-                                           title: nil,
-                                           numberOfVisits: 1,
-                                           lastVisit: Date())
-        let secondSavingExpectation = self.expectation(description: "Saving")
+        let toRemoveHistoryEntry = HistoryEntry(
+            identifier: UUID(),
+            url: URL(string: "wikipedia.org")!,
+            title: nil,
+            numberOfVisits: 1,
+            lastVisit: Date())
+        let secondSavingExpectation = expectation(description: "Saving")
         save(entry: toRemoveHistoryEntry, historyStore: historyStore, expectation: secondSavingExpectation)
 
-        let loadingExpectation = self.expectation(description: "Loading")
+        let loadingExpectation = expectation(description: "Loading")
         historyStore.removeEntries([toRemoveHistoryEntry])
             .receive(on: DispatchQueue.main)
             .sink { completion in
@@ -155,18 +159,19 @@ final class HistoryStoreTests: XCTestCase {
 
 }
 
-fileprivate extension HistoryEntry {
+extension HistoryEntry {
 
-    init(identifier: UUID, url: URL, title: String?, numberOfVisits: Int, lastVisit: Date) {
-        self.init(identifier: identifier,
-                  url: url,
-                  title: title,
-                  numberOfVisits: numberOfVisits,
-                  lastVisit: lastVisit,
-                  failedToLoad: false,
-                  numberOfTrackersBlocked: 0,
-                  blockedTrackingEntities: .init(),
-                  trackersFound: false)
+    fileprivate init(identifier: UUID, url: URL, title: String?, numberOfVisits: Int, lastVisit: Date) {
+        self.init(
+            identifier: identifier,
+            url: url,
+            title: title,
+            numberOfVisits: numberOfVisits,
+            lastVisit: lastVisit,
+            failedToLoad: false,
+            numberOfTrackersBlocked: 0,
+            blockedTrackingEntities: .init(),
+            trackersFound: false)
     }
 
 }

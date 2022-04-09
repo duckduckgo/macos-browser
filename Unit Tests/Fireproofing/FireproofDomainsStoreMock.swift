@@ -37,10 +37,12 @@ final class FireproofDomainsStoreMock: FireproofDomainsStore {
         super.init(context: nil, tableName: "")
     }
 
-    override func load<Result>(objectsWithPredicate predicate: NSPredicate? = nil,
-                               sortDescriptors: [NSSortDescriptor]? = nil,
-                               into initialResult: Result,
-                               _ accumulate: (inout Result, IDValueTuple) throws -> Void) throws -> Result {
+    override func load<Result>(
+        objectsWithPredicate _: NSPredicate? = nil,
+        sortDescriptors _: [NSSortDescriptor]? = nil,
+        into initialResult: Result,
+        _ accumulate: (inout Result, IDValueTuple) throws -> Void) throws
+        -> Result {
 
         history.append(.load)
         if let error = error {

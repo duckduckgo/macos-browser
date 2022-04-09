@@ -16,8 +16,8 @@
 //  limitations under the License.
 //
 
-import Foundation
 import BrowserServicesKit
+import Foundation
 
 struct HistoryEntry {
 
@@ -48,15 +48,16 @@ struct HistoryEntry {
 extension HistoryEntry {
 
     init(url: URL) {
-        self.init(identifier: UUID(),
-                  url: url,
-                  title: nil,
-                  numberOfVisits: 0,
-                  lastVisit: Date.startOfMinuteNow,
-                  failedToLoad: false,
-                  numberOfTrackersBlocked: 0,
-                  blockedTrackingEntities: Set<String>(),
-                  trackersFound: false)
+        self.init(
+            identifier: UUID(),
+            url: url,
+            title: nil,
+            numberOfVisits: 0,
+            lastVisit: Date.startOfMinuteNow,
+            failedToLoad: false,
+            numberOfTrackersBlocked: 0,
+            blockedTrackingEntities: Set<String>(),
+            trackersFound: false)
     }
 
 }

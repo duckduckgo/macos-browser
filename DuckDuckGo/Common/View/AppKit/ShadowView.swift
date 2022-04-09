@@ -23,12 +23,12 @@ final class ShadowView: NSView {
     struct ShadowSide: OptionSet {
         let rawValue: UInt8
 
-        static let left   = ShadowSide(rawValue: 1 << 0)
-        static let top    = ShadowSide(rawValue: 1 << 1)
-        static let right  = ShadowSide(rawValue: 1 << 2)
+        static let left = ShadowSide(rawValue: 1 << 0)
+        static let top = ShadowSide(rawValue: 1 << 1)
+        static let right = ShadowSide(rawValue: 1 << 2)
         static let bottom = ShadowSide(rawValue: 1 << 3)
 
-        static let all    = ShadowSide(rawValue: 0xF)
+        static let all = ShadowSide(rawValue: 0xF)
 
         init(rawValue: UInt8) {
             self.rawValue = rawValue
@@ -37,32 +37,37 @@ final class ShadowView: NSView {
 
     @IBInspectable var shadowColor: NSColor? {
         didSet {
-            self.needsDisplay = true
+            needsDisplay = true
         }
     }
+
     @IBInspectable var shadowRadius: CGFloat = 0 {
         didSet {
-            self.needsDisplay = true
-            self.needsLayout = true
+            needsDisplay = true
+            needsLayout = true
         }
     }
+
     @IBInspectable var shadowOffset: CGSize = .zero {
         didSet {
-            self.needsDisplay = true
-            self.needsLayout = true
+            needsDisplay = true
+            needsLayout = true
         }
     }
+
     @IBInspectable var shadowOpacity: CGFloat = 0 {
         didSet {
-            self.needsDisplay = true
+            needsDisplay = true
         }
     }
+
     @IBInspectable var cornerRadius: CGFloat = 0 {
         didSet {
-            self.needsDisplay = true
-            self.needsLayout = true
+            needsDisplay = true
+            needsLayout = true
         }
     }
+
     var shadowSides: ShadowSide = .all {
         didSet {
             self.needsLayout = true
@@ -77,7 +82,7 @@ final class ShadowView: NSView {
     }()
 
     private func shadowPath() -> CGPath {
-        let cornerRadius: CGFloat = min(min(bounds.width, bounds.height) / 2, self.cornerRadius)
+        let cornerRadius: CGFloat = min(min(bounds.width, bounds.height) / 2, cornerRadius)
         let shadowPath = CGMutablePath()
 
         func corner(_ tangent1: CGPoint, _ tangent2: CGPoint, for sides: ShadowSide) {
@@ -96,24 +101,28 @@ final class ShadowView: NSView {
 
         shadowPath.move(to: CGPoint(x: bounds.minX + cornerRadius, y: bounds.minY))
 
-        corner(CGPoint(x: bounds.minX, y: bounds.minY),
-               CGPoint(x: bounds.minX, y: bounds.minY + cornerRadius),
-               for: [.left, .bottom])
+        corner(
+            CGPoint(x: bounds.minX, y: bounds.minY),
+            CGPoint(x: bounds.minX, y: bounds.minY + cornerRadius),
+            for: [.left, .bottom])
         shadowPath.addLine(to: CGPoint(x: bounds.minX, y: bounds.maxY - cornerRadius))
 
-        corner(CGPoint(x: bounds.minX, y: bounds.maxY),
-               CGPoint(x: bounds.minX + cornerRadius, y: bounds.maxY),
-               for: [.left, .top])
+        corner(
+            CGPoint(x: bounds.minX, y: bounds.maxY),
+            CGPoint(x: bounds.minX + cornerRadius, y: bounds.maxY),
+            for: [.left, .top])
         shadowPath.addLine(to: CGPoint(x: bounds.maxX - cornerRadius, y: bounds.maxY))
 
-        corner(CGPoint(x: bounds.maxX, y: bounds.maxY),
-               CGPoint(x: bounds.maxX, y: bounds.maxY - cornerRadius),
-               for: [.right, .top])
+        corner(
+            CGPoint(x: bounds.maxX, y: bounds.maxY),
+            CGPoint(x: bounds.maxX, y: bounds.maxY - cornerRadius),
+            for: [.right, .top])
         shadowPath.addLine(to: CGPoint(x: bounds.maxX, y: bounds.minY + cornerRadius))
 
-        corner(CGPoint(x: bounds.maxX, y: bounds.minY),
-               CGPoint(x: bounds.maxX - cornerRadius, y: bounds.minY),
-               for: [.right, .bottom])
+        corner(
+            CGPoint(x: bounds.maxX, y: bounds.minY),
+            CGPoint(x: bounds.maxX - cornerRadius, y: bounds.minY),
+            for: [.right, .bottom])
         shadowPath.addLine(to: CGPoint(x: bounds.minX + cornerRadius, y: bounds.minY))
 
         return shadowPath
@@ -148,10 +157,10 @@ final class ShadowView: NSView {
     override func layout() {
         super.layout()
 
-        let shadowPath = self.shadowPath()
+        let shadowPath = shadowPath()
         layer!.shadowPath = shadowPath
 
-        mask.path = self.maskPath(shadowPath: shadowPath)
+        mask.path = maskPath(shadowPath: shadowPath)
     }
 
     override func updateLayer() {
@@ -168,7 +177,7 @@ final class ShadowView: NSView {
     }
 
     private func updateProperties() {
-        self.wantsLayer = true
+        wantsLayer = true
 
         layer!.masksToBounds = false
         layer!.backgroundColor = NSColor.clear.cgColor

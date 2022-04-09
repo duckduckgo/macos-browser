@@ -22,7 +22,7 @@ import XCTest
 
 class BookmarksExporterTests: XCTestCase {
 
-    struct TestData {
+    enum TestData {
         static let exampleUrl = URL(string: "https://example.com")!
         static let exampleTitle = "Example"
 
@@ -57,13 +57,13 @@ class BookmarksExporterTests: XCTestCase {
         assertExportedFileEquals([
             BookmarksExporter.Template.header,
             BookmarksExporter.Template.openFolder(level: 1, named: TestData.folderName1),
-                BookmarksExporter.Template.openFolder(level: 2, named: TestData.folderName2),
-                    BookmarksExporter.Template.openFolder(level: 3, named: TestData.folderName3),
-                        BookmarksExporter.Template.openFolder(level: 4, named: TestData.folderName4),
-                            BookmarksExporter.Template.bookmark(level: 5, title: TestData.exampleTitle, url: TestData.exampleUrl),
-                        BookmarksExporter.Template.closeFolder(level: 4),
-                    BookmarksExporter.Template.closeFolder(level: 3),
-                BookmarksExporter.Template.closeFolder(level: 2),
+            BookmarksExporter.Template.openFolder(level: 2, named: TestData.folderName2),
+            BookmarksExporter.Template.openFolder(level: 3, named: TestData.folderName3),
+            BookmarksExporter.Template.openFolder(level: 4, named: TestData.folderName4),
+            BookmarksExporter.Template.bookmark(level: 5, title: TestData.exampleTitle, url: TestData.exampleUrl),
+            BookmarksExporter.Template.closeFolder(level: 4),
+            BookmarksExporter.Template.closeFolder(level: 3),
+            BookmarksExporter.Template.closeFolder(level: 2),
             BookmarksExporter.Template.closeFolder(level: 1),
             BookmarksExporter.Template.footer
         ].joined())
@@ -84,9 +84,9 @@ class BookmarksExporterTests: XCTestCase {
         assertExportedFileEquals([
             BookmarksExporter.Template.header,
             BookmarksExporter.Template.openFolder(level: 1, named: TestData.folderName1),
-                BookmarksExporter.Template.bookmark(level: 2, title: TestData.exampleTitle, url: TestData.exampleUrl),
-                BookmarksExporter.Template.openFolder(level: 2, named: TestData.folderName2),
-                BookmarksExporter.Template.closeFolder(level: 2),
+            BookmarksExporter.Template.bookmark(level: 2, title: TestData.exampleTitle, url: TestData.exampleUrl),
+            BookmarksExporter.Template.openFolder(level: 2, named: TestData.folderName2),
+            BookmarksExporter.Template.closeFolder(level: 2),
             BookmarksExporter.Template.closeFolder(level: 1),
             BookmarksExporter.Template.footer
         ].joined())
@@ -193,7 +193,7 @@ class BookmarksExporterTests: XCTestCase {
         try exporter.exportBookmarksTo(url: tmpFile)
         assertExportedFileEquals([
             BookmarksExporter.Template.header,
-            BookmarksExporter.Template.bookmark(level: 1, title: TestData.exampleTitle, url: TestData.exampleUrl  ),
+            BookmarksExporter.Template.bookmark(level: 1, title: TestData.exampleTitle, url: TestData.exampleUrl ),
             BookmarksExporter.Template.bookmark(level: 1, title: TestData.otherTitle, url: TestData.otherUrl),
             BookmarksExporter.Template.footer
         ].joined())

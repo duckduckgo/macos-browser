@@ -16,10 +16,10 @@
 //  limitations under the License.
 //
 
+import BrowserServicesKit
 import Cocoa
 import Combine
 import os.log
-import BrowserServicesKit
 
 @NSApplicationMain
 final class AppDelegate: NSObject, NSApplicationDelegate {
@@ -37,11 +37,12 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
     #if DEBUG
     let disableCVDisplayLinkLogs: Void = {
         // Disable CVDisplayLink logs
-        CFPreferencesSetValue("cv_note" as CFString,
-                              0 as CFPropertyList,
-                              "com.apple.corevideo" as CFString,
-                              kCFPreferencesCurrentUser,
-                              kCFPreferencesAnyHost)
+        CFPreferencesSetValue(
+            "cv_note" as CFString,
+            0 as CFPropertyList,
+            "com.apple.corevideo" as CFString,
+            kCFPreferencesCurrentUser,
+            kCFPreferencesAnyHost)
         CFPreferencesSynchronize("com.apple.corevideo" as CFString, kCFPreferencesCurrentUser, kCFPreferencesAnyHost)
     }()
     #endif
@@ -57,7 +58,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
 
     var appUsageActivityMonitor: AppUsageActivityMonitor?
 
-    func applicationWillFinishLaunching(_ notification: Notification) {
+    func applicationWillFinishLaunching(_: Notification) {
         if !Self.isRunningTests {
             #if DEBUG
             Pixel.setUp(dryRun: true)
@@ -121,7 +122,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         UserDefaultsWrapper<Any>.clearRemovedKeys()
     }
 
-    func applicationShouldTerminate(_ sender: NSApplication) -> NSApplication.TerminateReply {
+    func applicationShouldTerminate(_: NSApplication) -> NSApplication.TerminateReply {
         if !FileDownloadManager.shared.downloads.isEmpty {
             let alert = NSAlert.activeDownloadsTerminationAlert(for: FileDownloadManager.shared.downloads)
             if alert.runModal() == .cancel {
@@ -135,7 +136,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         return .terminateNow
     }
 
-    func applicationShouldHandleReopen(_ sender: NSApplication, hasVisibleWindows flag: Bool) -> Bool {
+    func applicationShouldHandleReopen(_: NSApplication, hasVisibleWindows _: Bool) -> Bool {
         if WindowControllersManager.shared.mainWindowControllers.isEmpty {
             WindowsManager.openNewWindow()
             return true
@@ -143,14 +144,14 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         return true
     }
 
-    func applicationDockMenu(_ sender: NSApplication) -> NSMenu? {
+    func applicationDockMenu(_: NSApplication) -> NSMenu? {
         let applicationDockMenu = ApplicationDockMenu()
         applicationDockMenu.dataSource = WindowControllersManager.shared
         applicationDockMenu.applicationDockMenuDelegate = WindowControllersManager.shared
         return applicationDockMenu
     }
 
-    func application(_ sender: NSApplication, openFiles files: [String]) {
+    func application(_: NSApplication, openFiles files: [String]) {
         urlEventHandler.handleFiles(files)
     }
 
@@ -183,7 +184,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
 extension AppDelegate: AppUsageActivityMonitorDelegate {
 
     func countOpenWindowsAndTabs() -> [Int] {
-        return WindowControllersManager.shared.mainWindowControllers
+        WindowControllersManager.shared.mainWindowControllers
             .map { $0.mainViewController.tabCollectionViewModel.tabCollection.tabs.count }
     }
 

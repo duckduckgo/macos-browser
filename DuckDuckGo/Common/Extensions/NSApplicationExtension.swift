@@ -23,8 +23,9 @@ extension NSApplication {
 
     // swiftlint:disable force_cast
     var mainMenuTyped: MainMenu {
-        return mainMenu as! MainMenu
+        mainMenu as! MainMenu
     }
+
     // swiftlint:enable force_cast
 
     var isCommandPressed: Bool {
@@ -40,8 +41,9 @@ extension NSApplication {
     }
 
     var isReturnOrEnterPressed: Bool {
-        guard let event = currentEvent,
-              case .keyDown = event.type
+        guard
+            let event = currentEvent,
+            case .keyDown = event.type
         else { return false }
         return event.keyCode == 36 || event.keyCode == 76
     }
@@ -52,7 +54,7 @@ extension NSApplication {
         let deactivated = NotificationCenter.default
             .publisher(for: NSApplication.didResignActiveNotification).map { _ in false }
 
-        return Just(self.isActive)
+        return Just(isActive)
             .merge(with: activated.merge(with: deactivated))
             .eraseToAnyPublisher()
     }

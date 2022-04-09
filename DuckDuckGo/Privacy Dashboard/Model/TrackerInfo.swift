@@ -16,8 +16,8 @@
 //  limitations under the License.
 //
 
-import Foundation
 import BrowserServicesKit
+import Foundation
 
 struct TrackerInfo: Encodable {
 
@@ -38,7 +38,7 @@ struct TrackerInfo: Encodable {
     }
 
     var isEmpty: Bool {
-        return trackersDetected.count == 0 &&
+        trackersDetected.count == 0 &&
             trackersBlocked.count == 0 &&
             installedSurrogates.count == 0
     }

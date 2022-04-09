@@ -91,27 +91,27 @@ private class MockHTTPSUpgradeStore: HTTPSUpgradeStore {
     private let httpsBloomFilter: BloomFilterWrapper?
 
     init(bloomFilter: BloomFilterWrapper?) {
-        self.httpsBloomFilter = bloomFilter
+        httpsBloomFilter = bloomFilter
     }
 
     func bloomFilter() -> BloomFilterWrapper? {
-        return httpsBloomFilter
+        httpsBloomFilter
     }
 
     func bloomFilterSpecification() -> HTTPSBloomFilterSpecification? {
-        return nil
+        nil
     }
 
-    func persistBloomFilter(specification: HTTPSBloomFilterSpecification, data: Data) -> Bool {
-        return true
+    func persistBloomFilter(specification _: HTTPSBloomFilterSpecification, data _: Data) -> Bool {
+        true
     }
 
     func shouldExcludeDomain(_ domain: String) -> Bool {
-        return domain == "excluded.url"
+        domain == "excluded.url"
     }
 
-    func persistExcludedDomains(_ domains: [String]) -> Bool {
-        return true
+    func persistExcludedDomains(_: [String]) -> Bool {
+        true
     }
 
 }

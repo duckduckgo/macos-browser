@@ -16,9 +16,9 @@
 //  limitations under the License.
 //
 
+import Combine
 import XCTest
 @testable import DuckDuckGo_Privacy_Browser
-import Combine
 
 final class HistoryStoringMock: HistoryStoring {
 
@@ -28,7 +28,7 @@ final class HistoryStoringMock: HistoryStoring {
 
     var cleanOldCalled = false
     var cleanOldResult: Result<History, Error>?
-    func cleanOld(until date: Date) -> Future<History, Error> {
+    func cleanOld(until _: Date) -> Future<History, Error> {
         cleanOldCalled = true
         return Future { [weak self] promise in
             guard let cleanOldResult = self?.cleanOldResult else {

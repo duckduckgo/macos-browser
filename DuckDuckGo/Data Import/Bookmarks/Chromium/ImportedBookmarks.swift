@@ -28,7 +28,7 @@ struct ImportedBookmarks: Decodable {
         let children: [BookmarkOrFolder]?
 
         var url: URL? {
-            if let url = self.urlString {
+            if let url = urlString {
                 return URL(string: url)
             }
 
@@ -36,12 +36,12 @@ struct ImportedBookmarks: Decodable {
         }
 
         var isFolder: Bool {
-            return type == "folder"
+            type == "folder"
         }
 
         // There's no guarantee that imported bookmarks will have a URL, this is used to filter them out during import
         var isInvalidBookmark: Bool {
-            return !isFolder && url == nil
+            !isFolder && url == nil
         }
 
         enum CodingKeys: String, CodingKey {

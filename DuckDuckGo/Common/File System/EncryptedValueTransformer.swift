@@ -16,8 +16,8 @@
 //  limitations under the License.
 //
 
-import Foundation
 import CryptoKit
+import Foundation
 
 final class EncryptedValueTransformer<T: NSSecureCoding & NSObject>: ValueTransformer {
 
@@ -57,8 +57,9 @@ final class EncryptedValueTransformer<T: NSSecureCoding & NSObject>: ValueTransf
     }
 
     override func reverseTransformedValue(_ value: Any?) -> Any? {
-        guard let data = value as? Data,
-              let decryptedData = try? DataEncryption.decrypt(data: data, key: encryptionKey) else { return nil }
+        guard
+            let data = value as? Data,
+            let decryptedData = try? DataEncryption.decrypt(data: data, key: encryptionKey) else { return nil }
 
         // if T is Data
         if let data = decryptedData as? T {

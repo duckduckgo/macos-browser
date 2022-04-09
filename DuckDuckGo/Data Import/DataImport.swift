@@ -54,11 +54,11 @@ enum DataImport {
         }
 
         var importSourceImage: NSImage? {
-            return ThirdPartyBrowser.browser(for: self)?.applicationIcon
+            ThirdPartyBrowser.browser(for: self)?.applicationIcon
         }
 
         var canImportData: Bool {
-            return (ThirdPartyBrowser.browser(for: self)?.isInstalled ?? false) || [.csv, .onePassword, .lastPass].contains(self)
+            (ThirdPartyBrowser.browser(for: self)?.isInstalled ?? false) || [.csv, .onePassword, .lastPass].contains(self)
         }
     }
 
@@ -92,7 +92,7 @@ enum DataImport {
         let profiles: [BrowserProfile]
 
         var validImportableProfiles: [BrowserProfile] {
-            return profiles.filter(\.hasLoginData)
+            profiles.filter(\.hasLoginData)
         }
 
         init(browser: ThirdPartyBrowser, profileURLs: [URL]) {
@@ -102,7 +102,7 @@ enum DataImport {
             case .brave, .chrome, .edge:
                 // Chromium profiles are either named "Default", or a series of incrementing profile names, i.e. "Profile 1", "Profile 2", etc.
                 let potentialProfiles = profileURLs.map(BrowserProfile.from(profileURL:))
-                let filteredProfiles =  potentialProfiles.filter {
+                let filteredProfiles = potentialProfiles.filter {
                     $0.hasNonDefaultProfileName ||
                         $0.profileName == "Default" ||
                         $0.profileName.hasPrefix("Profile ")
@@ -110,18 +110,18 @@ enum DataImport {
 
                 let sortedProfiles = filteredProfiles.sorted()
 
-                self.profiles = sortedProfiles
+                profiles = sortedProfiles
             case .firefox:
-                self.profiles = profileURLs.map(BrowserProfile.from(profileURL:)).sorted()
+                profiles = profileURLs.map(BrowserProfile.from(profileURL:)).sorted()
             case .safari:
-                self.profiles = profileURLs.map(BrowserProfile.from(profileURL:)).sorted()
+                profiles = profileURLs.map(BrowserProfile.from(profileURL:)).sorted()
             case .lastPass, .onePassword:
-                self.profiles = []
+                profiles = []
             }
         }
 
         var showProfilePicker: Bool {
-            return validImportableProfiles.count > 1
+            validImportableProfiles.count > 1
         }
 
         var defaultProfile: BrowserProfile? {
@@ -145,11 +145,11 @@ enum DataImport {
 
         let profileURL: URL
         var profileName: String {
-            return detectedChromePreferencesProfileName ?? fallbackProfileName
+            detectedChromePreferencesProfileName ?? fallbackProfileName
         }
 
         var hasNonDefaultProfileName: Bool {
-            return detectedChromePreferencesProfileName != nil
+            detectedChromePreferencesProfileName != nil
         }
 
         private let fileStore: FileStore
@@ -157,15 +157,15 @@ enum DataImport {
         private let detectedChromePreferencesProfileName: String?
 
         static func from(profileURL: URL) -> BrowserProfile {
-            return BrowserProfile(profileURL: profileURL)
+            BrowserProfile(profileURL: profileURL)
         }
 
         init(profileURL: URL, fileStore: FileStore = FileManager.default) {
             self.fileStore = fileStore
             self.profileURL = profileURL
 
-            self.fallbackProfileName = Self.getDefaultProfileName(at: profileURL)
-            self.detectedChromePreferencesProfileName = Self.getChromeProfileName(at: profileURL, fileStore: fileStore)
+            fallbackProfileName = Self.getDefaultProfileName(at: profileURL)
+            detectedChromePreferencesProfileName = Self.getChromeProfileName(at: profileURL, fileStore: fileStore)
         }
 
         var hasLoginData: Bool {
@@ -180,7 +180,7 @@ enum DataImport {
         }
 
         private static func getDefaultProfileName(at profileURL: URL) -> String {
-            return profileURL.lastPathComponent.components(separatedBy: ".").last ?? profileURL.lastPathComponent
+            profileURL.lastPathComponent.components(separatedBy: ".").last ?? profileURL.lastPathComponent
         }
 
         private static func getChromeProfileName(at profileURL: URL, fileStore: FileStore) -> String? {
@@ -192,9 +192,10 @@ enum DataImport {
                 return nil
             }
 
-            if profileDirectoryContents.contains(Constants.chromiumPreferencesFileName),
-               let chromePreferenceData = fileStore.loadData(at: profileURL.appendingPathComponent(Constants.chromiumPreferencesFileName)),
-               let chromePreferences = try? JSONDecoder().decode(ChromePreferences.self, from: chromePreferenceData) {
+            if
+                profileDirectoryContents.contains(Constants.chromiumPreferencesFileName),
+                let chromePreferenceData = fileStore.loadData(at: profileURL.appendingPathComponent(Constants.chromiumPreferencesFileName)),
+                let chromePreferences = try? JSONDecoder().decode(ChromePreferences.self, from: chromePreferenceData) {
                 return chromePreferences.profile.name
             }
 
@@ -202,11 +203,11 @@ enum DataImport {
         }
 
         static func < (lhs: DataImport.BrowserProfile, rhs: DataImport.BrowserProfile) -> Bool {
-            return lhs.profileName.localizedCompare(rhs.profileName) == .orderedAscending
+            lhs.profileName.localizedCompare(rhs.profileName) == .orderedAscending
         }
 
         static func == (lhs: DataImport.BrowserProfile, rhs: DataImport.BrowserProfile) -> Bool {
-            return lhs.profileURL == rhs.profileURL
+            lhs.profileURL == rhs.profileURL
         }
     }
 
@@ -250,8 +251,9 @@ protocol DataImporter {
     /// For example, a CSV importer will return true if the URL it has been created with is a CSV file, but does not check whether the CSV data matches the expected format.
     func importableTypes() -> [DataImport.DataType]
 
-    func importData(types: [DataImport.DataType],
-                    from profile: DataImport.BrowserProfile?,
-                    completion: @escaping (Result<DataImport.Summary, DataImportError>) -> Void)
+    func importData(
+        types: [DataImport.DataType],
+        from profile: DataImport.BrowserProfile?,
+        completion: @escaping (Result<DataImport.Summary, DataImportError>) -> Void)
 
 }

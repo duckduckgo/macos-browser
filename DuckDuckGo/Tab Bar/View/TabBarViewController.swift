@@ -17,9 +17,9 @@
 //
 
 import Cocoa
-import os.log
 import Combine
 import Lottie
+import os.log
 
 // swiftlint:disable file_length
 // swiftlint:disable type_body_length
@@ -51,7 +51,7 @@ final class TabBarViewController: NSViewController {
     private var selectionIndexCancellable: AnyCancellable?
     private var cancellables = Set<AnyCancellable>()
 
-    required init?(coder: NSCoder) {
+    required init?(coder _: NSCoder) {
         fatalError("TabBarViewController: Bad initializer")
     }
 
@@ -91,14 +91,18 @@ final class TabBarViewController: NSViewController {
         NotificationCenter.default.removeObserver(self)
     }
 
-    @IBAction func addButtonAction(_ sender: NSButton) {
+    @IBAction
+    func addButtonAction(_: NSButton) {
         tabCollectionViewModel.appendNewTab(with: .homePage)
     }
-    @IBAction func rightScrollButtonAction(_ sender: NSButton) {
+
+    @IBAction
+    func rightScrollButtonAction(_: NSButton) {
         collectionView.scrollToEnd()
     }
 
-    @IBAction func leftScrollButtonAction(_ sender: NSButton) {
+    @IBAction
+    func leftScrollButtonAction(_: NSButton) {
         collectionView.scrollToBeginning()
     }
 
@@ -144,7 +148,7 @@ final class TabBarViewController: NSViewController {
     }
 
     private func updateEmptyTabArea() {
-        let totalTabWidth = self.totalTabWidth
+        let totalTabWidth = totalTabWidth
         let emptySpace = scrollView.frame.size.width - totalTabWidth
         let plusButtonWidth = HorizontalSpace.buttonPadding.rawValue + HorizontalSpace.button.rawValue
 
@@ -206,19 +210,19 @@ final class TabBarViewController: NSViewController {
     private var tabMode = TabMode.divided
 
     private func updateTabMode(for numberOfItems: Int? = nil, updateLayout: Bool? = nil) {
-        let items = CGFloat(numberOfItems ?? self.layoutNumberOfItems())
+        let items = CGFloat(numberOfItems ?? layoutNumberOfItems())
         let tabsWidth = scrollView.bounds.width
 
         let newMode: TabMode
-        if max(0, (items - 1)) * TabBarViewItem.Width.minimum.rawValue + TabBarViewItem.Width.minimumSelected.rawValue < tabsWidth {
+        if max(0, items - 1) * TabBarViewItem.Width.minimum.rawValue + TabBarViewItem.Width.minimumSelected.rawValue < tabsWidth {
             newMode = .divided
         } else {
             newMode = .overflow
         }
 
-        guard self.tabMode != newMode else { return }
-        self.tabMode = newMode
-        if updateLayout ?? !self.frozenLayout {
+        guard tabMode != newMode else { return }
+        tabMode = newMode
+        if updateLayout ?? !frozenLayout {
             self.updateLayout()
         }
     }
@@ -236,17 +240,18 @@ final class TabBarViewController: NSViewController {
         let actualNumber = collectionView.numberOfItems(inSection: 0)
         // don't cache number of items before removal when closing the last Tab
         guard removedIndex ?? 0 < (actualNumber - 1) else {
-            self.cachedLayoutNumberOfItems = nil
+            cachedLayoutNumberOfItems = nil
             return actualNumber
         }
 
-        guard let numberOfItems = self.cachedLayoutNumberOfItems,
-              // skip updating number of items when closing not last Tab
-              numberOfItems > actualNumber,
-              tabMode == .divided,
-              self.view.isMouseLocationInsideBounds()
+        guard
+            let numberOfItems = cachedLayoutNumberOfItems,
+            // skip updating number of items when closing not last Tab
+            numberOfItems > actualNumber,
+            tabMode == .divided,
+            self.view.isMouseLocationInsideBounds()
         else {
-            self.cachedLayoutNumberOfItems = actualNumber
+            cachedLayoutNumberOfItems = actualNumber
             return actualNumber
         }
 
@@ -254,7 +259,7 @@ final class TabBarViewController: NSViewController {
     }
 
     private func currentTabWidth(selected: Bool = false, removedIndex: Int? = nil) -> CGFloat {
-        let numberOfItems = CGFloat(self.layoutNumberOfItems(removedIndex: removedIndex))
+        let numberOfItems = CGFloat(layoutNumberOfItems(removedIndex: removedIndex))
         let tabsWidth = scrollView.bounds.width
         let minimumWidth = selected ? TabBarViewItem.Width.minimumSelected.rawValue : TabBarViewItem.Width.minimum.rawValue
 
@@ -294,13 +299,15 @@ final class TabBarViewController: NSViewController {
     private func observeToScrollNotifications() {
         scrollView.contentView.postsBoundsChangedNotifications = true
 
-        NotificationCenter.default.addObserver(self,
-                                               selector: #selector(scrollViewBoundsDidChange(_:)),
-                                               name: NSView.boundsDidChangeNotification,
-                                               object: scrollView.contentView)
+        NotificationCenter.default.addObserver(
+            self,
+            selector: #selector(scrollViewBoundsDidChange(_:)),
+            name: NSView.boundsDidChangeNotification,
+            object: scrollView.contentView)
     }
 
-    @objc private func scrollViewBoundsDidChange(_ sender: Any) {
+    @objc
+    private func scrollViewBoundsDidChange(_: Any) {
         enableScrollButtons()
         hideTabPreview()
     }
@@ -325,11 +332,13 @@ final class TabBarViewController: NSViewController {
         let storyboard = NSStoryboard(name: "TabPreview", bundle: nil)
         return storyboard.instantiateController(withIdentifier: "TabPreviewWindowController") as! TabPreviewWindowController
     }()
+
     // swiftlint:enable force_cast
 
     func showTabPreview(for tabBarViewItem: TabBarViewItem) {
-        guard let indexPath = collectionView.indexPath(for: tabBarViewItem),
-              let tabViewModel = tabCollectionViewModel.tabViewModel(at: indexPath.item) else {
+        guard
+            let indexPath = collectionView.indexPath(for: tabBarViewItem),
+            let tabViewModel = tabCollectionViewModel.tabViewModel(at: indexPath.item) else {
             return
         }
 
@@ -356,13 +365,14 @@ final class TabBarViewController: NSViewController {
 
 extension TabBarViewController: TabCollectionViewModelDelegate {
 
-    func tabCollectionViewModelDidAppend(_ tabCollectionViewModel: TabCollectionViewModel, selected: Bool) {
+    func tabCollectionViewModelDidAppend(_: TabCollectionViewModel, selected: Bool) {
         appendToCollectionView(selected: selected)
     }
 
-    func tabCollectionViewModelDidInsert(_ tabCollectionViewModel: TabCollectionViewModel,
-                                         at index: Int,
-                                         selected: Bool) {
+    func tabCollectionViewModelDidInsert(
+        _: TabCollectionViewModel,
+        at index: Int,
+        selected: Bool) {
         let indexPathSet = Set(arrayLiteral: IndexPath(item: index))
         if selected {
             collectionView.clearSelection(animated: true)
@@ -377,9 +387,10 @@ extension TabBarViewController: TabCollectionViewModelDelegate {
         hideTabPreview()
     }
 
-    func tabCollectionViewModel(_ tabCollectionViewModel: TabCollectionViewModel,
-                                didRemoveTabAt removedIndex: Int,
-                                andSelectTabAt selectionIndex: Int?) {
+    func tabCollectionViewModel(
+        _: TabCollectionViewModel,
+        didRemoveTabAt removedIndex: Int,
+        andSelectTabAt selectionIndex: Int?) {
         let removedIndexPathSet = Set(arrayLiteral: IndexPath(item: removedIndex))
         guard let selectionIndex = selectionIndex else {
             collectionView.animator().deleteItems(at: removedIndexPathSet)
@@ -387,11 +398,11 @@ extension TabBarViewController: TabCollectionViewModelDelegate {
         }
         let selectionIndexPathSet = Set(arrayLiteral: IndexPath(item: selectionIndex))
 
-        self.updateTabMode(for: collectionView.numberOfItems(inSection: 0) - 1, updateLayout: false)
+        updateTabMode(for: collectionView.numberOfItems(inSection: 0) - 1, updateLayout: false)
 
         // don't scroll when mouse over and removing non-last Tab
         let shouldScroll = collectionView.isAtEndScrollPosition
-            && (!self.view.isMouseLocationInsideBounds() || removedIndex == self.collectionView.numberOfItems(inSection: 0) - 1)
+            && (!view.isMouseLocationInsideBounds() || removedIndex == collectionView.numberOfItems(inSection: 0) - 1)
         let visiRect = collectionView.enclosingScrollView!.contentView.documentVisibleRect
         NSAnimationContext.runAnimationGroup { context in
             context.duration = 0.15
@@ -425,7 +436,7 @@ extension TabBarViewController: TabCollectionViewModelDelegate {
         }
     }
 
-    func tabCollectionViewModel(_ tabCollectionViewModel: TabCollectionViewModel, didMoveTabAt index: Int, to newIndex: Int) {
+    func tabCollectionViewModel(_: TabCollectionViewModel, didMoveTabAt index: Int, to newIndex: Int) {
         let indexPath = IndexPath(item: index)
         let newIndexPath = IndexPath(item: newIndex)
         collectionView.animator().moveItem(at: indexPath, to: newIndexPath)
@@ -434,7 +445,7 @@ extension TabBarViewController: TabCollectionViewModelDelegate {
         hideTabPreview()
     }
 
-    func tabCollectionViewModel(_ tabCollectionViewModel: TabCollectionViewModel, didSelectAt selectionIndex: Int?) {
+    func tabCollectionViewModel(_: TabCollectionViewModel, didSelectAt selectionIndex: Int?) {
         if let selectionIndex = selectionIndex {
             let selectionIndexPathSet = Set(arrayLiteral: IndexPath(item: selectionIndex))
             collectionView.clearSelection(animated: true)
@@ -445,7 +456,7 @@ extension TabBarViewController: TabCollectionViewModelDelegate {
         }
     }
 
-    func tabCollectionViewModelDidMultipleChanges(_ tabCollectionViewModel: TabCollectionViewModel) {
+    func tabCollectionViewModelDidMultipleChanges(_: TabCollectionViewModel) {
         collectionView.reloadData()
         reloadSelection()
 
@@ -494,9 +505,11 @@ extension TabBarViewController: TabCollectionViewModelDelegate {
 
 extension TabBarViewController: NSCollectionViewDelegateFlowLayout {
 
-    func collectionView(_ collectionView: NSCollectionView,
-                        layout collectionViewLayout: NSCollectionViewLayout,
-                        sizeForItemAt indexPath: IndexPath) -> NSSize {
+    func collectionView(
+        _: NSCollectionView,
+        layout _: NSCollectionViewLayout,
+        sizeForItemAt indexPath: IndexPath)
+        -> NSSize {
         var isItemSelected = tabCollectionViewModel.selectionIndex == indexPath.item
 
         if let draggingOverIndexPath = currentDraggingIndexPath {
@@ -504,19 +517,19 @@ extension TabBarViewController: NSCollectionViewDelegateFlowLayout {
             isItemSelected = draggingOverIndexPath == indexPath
         }
 
-        return NSSize(width: self.currentTabWidth(selected: isItemSelected), height: TabBarViewItem.Height.standard.rawValue)
+        return NSSize(width: currentTabWidth(selected: isItemSelected), height: TabBarViewItem.Height.standard.rawValue)
     }
 
 }
 
 extension TabBarViewController: NSCollectionViewDataSource {
 
-    func numberOfSections(in collectionView: NSCollectionView) -> Int {
-        return 1
+    func numberOfSections(in _: NSCollectionView) -> Int {
+        1
     }
 
-    func collectionView(_ collectionView: NSCollectionView, numberOfItemsInSection section: Int) -> Int {
-        return tabCollectionViewModel.tabCollection.tabs.count
+    func collectionView(_: NSCollectionView, numberOfItemsInSection _: Int) -> Int {
+        tabCollectionViewModel.tabCollection.tabs.count
     }
 
     func collectionView(_ collectionView: NSCollectionView, itemForRepresentedObjectAt indexPath: IndexPath) -> NSCollectionViewItem {
@@ -537,12 +550,16 @@ extension TabBarViewController: NSCollectionViewDataSource {
         return tabBarViewItem
     }
 
-    func collectionView(_ collectionView: NSCollectionView,
-                        viewForSupplementaryElementOfKind kind: NSCollectionView.SupplementaryElementKind,
-                        at indexPath: IndexPath) -> NSView {
+    func collectionView(
+        _ collectionView: NSCollectionView,
+        viewForSupplementaryElementOfKind kind: NSCollectionView.SupplementaryElementKind,
+        at indexPath: IndexPath)
+        -> NSView {
 
-        let view = collectionView.makeSupplementaryView(ofKind: kind,
-                                                        withIdentifier: TabBarFooter.identifier, for: indexPath)
+        let view = collectionView.makeSupplementaryView(
+            ofKind: kind,
+            withIdentifier: TabBarFooter.identifier,
+            for: indexPath)
         if let footer = view as? TabBarFooter {
             footer.addButton?.target = self
             footer.addButton?.action = #selector(addButtonAction(_:))
@@ -551,9 +568,9 @@ extension TabBarViewController: NSCollectionViewDataSource {
     }
 
     func collectionView(
-        _ collectionView: NSCollectionView,
+        _: NSCollectionView,
         didEndDisplaying item: NSCollectionViewItem,
-        forRepresentedObjectAt indexPath: IndexPath) {
+        forRepresentedObjectAt _: IndexPath) {
 
         (item as? TabBarViewItem)?.clear()
     }
@@ -561,16 +578,17 @@ extension TabBarViewController: NSCollectionViewDataSource {
 
 extension TabBarViewController: NSCollectionViewDelegate {
 
-    func collectionView(_ collectionView: NSCollectionView,
-                        didChangeItemsAt indexPaths: Set<IndexPath>,
-                        to highlightState: NSCollectionViewItem.HighlightState) {
+    func collectionView(
+        _: NSCollectionView,
+        didChangeItemsAt indexPaths: Set<IndexPath>,
+        to highlightState: NSCollectionViewItem.HighlightState) {
         guard indexPaths.count == 1, let indexPath = indexPaths.first else {
             os_log("TabBarViewController: More than 1 item highlighted", type: .error)
             return
         }
 
         if highlightState == .forSelection {
-            self.collectionView.clearSelection()
+            collectionView.clearSelection()
             tabCollectionViewModel.select(at: indexPath.item)
 
             // Poor old NSCollectionView
@@ -582,14 +600,18 @@ extension TabBarViewController: NSCollectionViewDelegate {
         hideTabPreview()
     }
 
-    func collectionView(_ collectionView: NSCollectionView,
-                        canDragItemsAt indexPaths: Set<IndexPath>,
-                        with event: NSEvent) -> Bool {
-        return true
+    func collectionView(
+        _: NSCollectionView,
+        canDragItemsAt _: Set<IndexPath>,
+        with _: NSEvent)
+        -> Bool {
+        true
     }
 
-    func collectionView(_ collectionView: NSCollectionView,
-                        pasteboardWriterForItemAt indexPath: IndexPath) -> NSPasteboardWriting? {
+    func collectionView(
+        _: NSCollectionView,
+        pasteboardWriterForItemAt indexPath: IndexPath)
+        -> NSPasteboardWriting? {
         if let url = tabCollectionViewModel.tabCollection.tabs[indexPath.item].content.url {
             return url as NSURL
         } else {
@@ -597,10 +619,11 @@ extension TabBarViewController: NSCollectionViewDelegate {
         }
     }
 
-    func collectionView(_ collectionView: NSCollectionView,
-                        draggingSession session: NSDraggingSession,
-                        willBeginAt screenPoint: NSPoint,
-                        forItemsAt indexPaths: Set<IndexPath>) {
+    func collectionView(
+        _: NSCollectionView,
+        draggingSession session: NSDraggingSession,
+        willBeginAt _: NSPoint,
+        forItemsAt indexPaths: Set<IndexPath>) {
         session.animatesToStartingPositionsOnCancelOrFail = false
         initialDraggingIndexPaths = indexPaths
 
@@ -615,12 +638,13 @@ extension TabBarViewController: NSCollectionViewDelegate {
 
     static let dropToOpenDistance: CGFloat = 100
 
-    func collectionView(_ collectionView: NSCollectionView,
-                        draggingSession session: NSDraggingSession,
-                        endedAt screenPoint: NSPoint,
-                        dragOperation operation: NSDragOperation) {
-        let draggingIndexPath = self.currentDraggingIndexPath
-        self.initialDraggingIndexPaths = nil
+    func collectionView(
+        _: NSCollectionView,
+        draggingSession _: NSDraggingSession,
+        endedAt screenPoint: NSPoint,
+        dragOperation operation: NSDragOperation) {
+        let draggingIndexPath = currentDraggingIndexPath
+        initialDraggingIndexPaths = nil
         currentDraggingIndexPath = nil
 
         // Perform the drag and drop between multiple windows
@@ -644,13 +668,16 @@ extension TabBarViewController: NSCollectionViewDelegate {
         }
     }
 
-    func collectionView(_ collectionView: NSCollectionView,
-                        validateDrop draggingInfo: NSDraggingInfo,
-                        proposedIndexPath proposedDropIndexPath: AutoreleasingUnsafeMutablePointer<NSIndexPath>,
-                        dropOperation proposedDropOperation: UnsafeMutablePointer<NSCollectionView.DropOperation>) -> NSDragOperation {
+    func collectionView(
+        _: NSCollectionView,
+        validateDrop _: NSDraggingInfo,
+        proposedIndexPath proposedDropIndexPath: AutoreleasingUnsafeMutablePointer<NSIndexPath>,
+        dropOperation proposedDropOperation: UnsafeMutablePointer<NSCollectionView.DropOperation>)
+        -> NSDragOperation {
         guard let currentDraggingIndexPath = currentDraggingIndexPath else {
-            TabDragAndDropManager.shared.setDestination(tabCollectionViewModel: tabCollectionViewModel,
-                                                        indexPath: proposedDropIndexPath.pointee as IndexPath)
+            TabDragAndDropManager.shared.setDestination(
+                tabCollectionViewModel: tabCollectionViewModel,
+                indexPath: proposedDropIndexPath.pointee as IndexPath)
 
             proposedDropOperation.pointee = .on
             return .private
@@ -663,10 +690,12 @@ extension TabBarViewController: NSCollectionViewDelegate {
         return .private
     }
 
-    func collectionView(_ collectionView: NSCollectionView,
-                        acceptDrop draggingInfo: NSDraggingInfo,
-                        indexPath: IndexPath,
-                        dropOperation: NSCollectionView.DropOperation) -> Bool {
+    func collectionView(
+        _: NSCollectionView,
+        acceptDrop _: NSDraggingInfo,
+        indexPath _: IndexPath,
+        dropOperation _: NSCollectionView.DropOperation)
+        -> Bool {
         guard let draggingIndexPaths = initialDraggingIndexPaths else {
             // Droping from another TabBarViewController
             return true
@@ -680,9 +709,11 @@ extension TabBarViewController: NSCollectionViewDelegate {
         return true
     }
 
-    func collectionView(_ collectionView: NSCollectionView,
-                        layout collectionViewLayout: NSCollectionViewLayout,
-                        referenceSizeForFooterInSection section: Int) -> NSSize {
+    func collectionView(
+        _ collectionView: NSCollectionView,
+        layout _: NSCollectionViewLayout,
+        referenceSizeForFooterInSection _: Int)
+        -> NSSize {
         let width = isAddButtonFloating ? HorizontalSpace.button.rawValue + HorizontalSpace.buttonPadding.rawValue : 0
         return NSSize(width: width, height: collectionView.frame.size.height)
     }
@@ -713,9 +744,10 @@ extension TabBarViewController: TabBarViewItemDelegate {
     }
 
     func tabBarViewItemBookmarkThisPageAction(_ tabBarViewItem: TabBarViewItem) {
-        guard let indexPath = collectionView.indexPath(for: tabBarViewItem),
-              let tabViewModel = tabCollectionViewModel.tabViewModel(at: indexPath.item),
-              let url = tabViewModel.tab.content.url else {
+        guard
+            let indexPath = collectionView.indexPath(for: tabBarViewItem),
+            let tabViewModel = tabCollectionViewModel.tabViewModel(at: indexPath.item),
+            let url = tabViewModel.tab.content.url else {
             os_log("TabBarViewController: Failed to get index path of tab bar view item", type: .error)
             return
         }
@@ -736,8 +768,9 @@ extension TabBarViewController: TabBarViewItemDelegate {
     }
 
     func tabBarViewItemTogglePermissionAction(_ tabBarViewItem: TabBarViewItem) {
-        guard let indexPath = collectionView.indexPath(for: tabBarViewItem),
-              let permissions = tabCollectionViewModel.tabViewModel(at: indexPath.item)?.tab.permissions
+        guard
+            let indexPath = collectionView.indexPath(for: tabBarViewItem),
+            let permissions = tabCollectionViewModel.tabViewModel(at: indexPath.item)?.tab.permissions
         else {
             os_log("TabBarViewController: Failed to get index path of tab bar view item or its permissions", type: .error)
             return
@@ -780,10 +813,11 @@ extension TabBarViewController: TabBarViewItemDelegate {
     }
 
     func tabBarViewItemFireproofSite(_ tabBarViewItem: TabBarViewItem) {
-        guard let indexPath = collectionView.indexPath(for: tabBarViewItem),
-              let tabViewModel = tabCollectionViewModel.tabViewModel(at: indexPath.item),
-              let url = tabViewModel.tab.content.url,
-              let host = url.host
+        guard
+            let indexPath = collectionView.indexPath(for: tabBarViewItem),
+            let tabViewModel = tabCollectionViewModel.tabViewModel(at: indexPath.item),
+            let url = tabViewModel.tab.content.url,
+            let host = url.host
         else {
             os_log("TabBarViewController: Failed to get url of tab bar view item", type: .error)
             return
@@ -794,10 +828,11 @@ extension TabBarViewController: TabBarViewItemDelegate {
     }
 
     func tabBarViewItemRemoveFireproofing(_ tabBarViewItem: TabBarViewItem) {
-        guard let indexPath = collectionView.indexPath(for: tabBarViewItem),
-              let tabViewModel = tabCollectionViewModel.tabViewModel(at: indexPath.item),
-              let url = tabViewModel.tab.content.url,
-              let host = url.host
+        guard
+            let indexPath = collectionView.indexPath(for: tabBarViewItem),
+            let tabViewModel = tabCollectionViewModel.tabViewModel(at: indexPath.item),
+            let url = tabViewModel.tab.content.url,
+            let host = url.host
         else {
             os_log("TabBarViewController: Failed to get url of tab bar view item", type: .error)
             return
@@ -811,8 +846,9 @@ extension TabBarViewController: TabBarViewItemDelegate {
             os_log("TabBarViewController: Failed to get index path of tab bar view item", type: .error)
             return .init(hasItemsToTheLeft: false, hasItemsToTheRight: false)
         }
-        return .init(hasItemsToTheLeft: indexPath.item > 0,
-                     hasItemsToTheRight: indexPath.item + 1 < tabCollectionViewModel.tabCollection.tabs.count)
+        return .init(
+            hasItemsToTheLeft: indexPath.item > 0,
+            hasItemsToTheRight: indexPath.item + 1 < tabCollectionViewModel.tabCollection.tabs.count)
     }
 
 }

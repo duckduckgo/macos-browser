@@ -25,15 +25,15 @@ final class PasswordManagementPopover: NSPopover {
     override init() {
         super.init()
 
-        self.animates = false
+        animates = false
         // Prevent Popover detaching on Alert appearance
-        self.behavior = .semitransient
-        self.delegate = self
+        behavior = .semitransient
+        delegate = self
 
         setupContentController()
     }
 
-    required init?(coder: NSCoder) {
+    required init?(coder _: NSCoder) {
         fatalError("\(Self.self): Bad initializer")
     }
 
@@ -46,7 +46,7 @@ final class PasswordManagementPopover: NSPopover {
     func select(category: SecureVaultSorting.Category?) {
         viewController.select(category: category)
     }
-    
+
     private func setupContentController() {
         let controller = PasswordManagementViewController.create()
         contentViewController = controller
@@ -56,23 +56,24 @@ final class PasswordManagementPopover: NSPopover {
 
 extension PasswordManagementPopover: NSPopoverDelegate {
 
-    func popoverDidShow(_ notification: Notification) {
-        parentWindowDidResignKeyObserver = NotificationCenter.default.addObserver(forName: NSWindow.didResignMainNotification,
-                                                                                  object: nil,
-                                                                                  queue: OperationQueue.main) { [weak self] _ in
-            guard let self = self, self.isShown else { return }
-            
-            if !DeviceAuthenticator.shared.isAuthenticating {
-                self.close()
+    func popoverDidShow(_: Notification) {
+        parentWindowDidResignKeyObserver = NotificationCenter.default.addObserver(
+            forName: NSWindow.didResignMainNotification,
+            object: nil,
+            queue: OperationQueue.main) { [weak self] _ in
+                guard let self = self, self.isShown else { return }
+
+                if !DeviceAuthenticator.shared.isAuthenticating {
+                    self.close()
+                }
             }
-        }
     }
 
-    func popoverShouldClose(_ popover: NSPopover) -> Bool {
-        return !DeviceAuthenticator.shared.isAuthenticating
+    func popoverShouldClose(_: NSPopover) -> Bool {
+        !DeviceAuthenticator.shared.isAuthenticating
     }
 
-    func popoverDidClose(_ notification: Notification) {
+    func popoverDidClose(_: Notification) {
         if let window = viewController.view.window {
             for sheet in window.sheets {
                 window.endSheet(sheet, returnCode: .cancel)

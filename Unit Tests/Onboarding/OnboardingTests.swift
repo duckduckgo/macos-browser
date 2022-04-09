@@ -101,12 +101,13 @@ class OnboardingTests: XCTestCase {
         XCTAssertEqual(model.state, .startFlow)
     }
 
-    private func assertStateChange(_ model: OnboardingViewModel,
-                                   _ expectedCurrentState: OnboardingViewModel.OnboardingPhase,
-                                   _ expectedFinalState: OnboardingViewModel.OnboardingPhase,
-                                   _ mutator: () -> Void,
-                                   file: StaticString = #file,
-                                   line: UInt = #line) {
+    private func assertStateChange(
+        _ model: OnboardingViewModel,
+        _ expectedCurrentState: OnboardingViewModel.OnboardingPhase,
+        _ expectedFinalState: OnboardingViewModel.OnboardingPhase,
+        _ mutator: () -> Void,
+        file: StaticString = #file,
+        line: UInt = #line) {
 
         XCTAssertEqual(model.state, expectedCurrentState, file: file, line: line)
         mutator()

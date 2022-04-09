@@ -28,7 +28,7 @@ final class PseudoFolder: Equatable {
     let icon: NSImage
 
     /// Represents the total bookmarks or favorites, used when displaying in an NSOutlineView.
-    var count: Int = 0
+    var count = 0
 
     // PseudoFolder instances aren't created directly, they are provided via the static values above.
     private init(id: UUID, name: String, icon: NSImage) {
@@ -38,7 +38,7 @@ final class PseudoFolder: Equatable {
     }
 
     static func == (lhs: PseudoFolder, rhs: PseudoFolder) -> Bool {
-        return lhs.name == rhs.name
+        lhs.name == rhs.name
     }
 
 }

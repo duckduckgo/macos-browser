@@ -28,7 +28,7 @@ protocol FirePopoverViewControllerDelegate: AnyObject {
 
 final class FirePopoverViewController: NSViewController {
 
-    struct Constants {
+    enum Constants {
         static let maximumContentHeight: CGFloat = 42 + 230 + 32
         static let minimumContentHeight: CGFloat = 42
         static let headerHeight: CGFloat = 28
@@ -59,24 +59,26 @@ final class FirePopoverViewController: NSViewController {
     private var selectedCancellable: AnyCancellable?
     private var areOtherTabsInfluencedCancellable: AnyCancellable?
 
-    required init?(coder: NSCoder) {
+    required init?(coder _: NSCoder) {
         fatalError("FirePopoverViewController: Bad initializer")
     }
 
-    init?(coder: NSCoder,
-          fireViewModel: FireViewModel,
-          tabCollectionViewModel: TabCollectionViewModel,
-          historyCoordinating: HistoryCoordinating = HistoryCoordinator.shared,
-          fireproofDomains: FireproofDomains = FireproofDomains.shared,
-          faviconManagement: FaviconManagement = FaviconManager.shared) {
+    init?(
+        coder: NSCoder,
+        fireViewModel: FireViewModel,
+        tabCollectionViewModel: TabCollectionViewModel,
+        historyCoordinating: HistoryCoordinating = HistoryCoordinator.shared,
+        fireproofDomains: FireproofDomains = FireproofDomains.shared,
+        faviconManagement: FaviconManagement = FaviconManager.shared) {
         self.fireViewModel = fireViewModel
         self.tabCollectionViewModel = tabCollectionViewModel
         self.historyCoordinating = historyCoordinating
-        self.firePopoverViewModel = FirePopoverViewModel(fireViewModel: fireViewModel,
-                                                         tabCollectionViewModel: tabCollectionViewModel,
-                                                         historyCoordinating: historyCoordinating,
-                                                         fireproofDomains: fireproofDomains,
-                                                         faviconManagement: faviconManagement)
+        firePopoverViewModel = FirePopoverViewModel(
+            fireViewModel: fireViewModel,
+            tabCollectionViewModel: tabCollectionViewModel,
+            historyCoordinating: historyCoordinating,
+            fireproofDomains: fireproofDomains,
+            faviconManagement: faviconManagement)
 
         super.init(coder: coder)
     }
@@ -97,7 +99,8 @@ final class FirePopoverViewController: NSViewController {
         subscribeToAreOtherTabsInfluenced()
     }
 
-    @IBAction func optionsButtonAction(_ sender: NSPopUpButton) {
+    @IBAction
+    func optionsButtonAction(_ sender: NSPopUpButton) {
         guard let tag = sender.selectedItem?.tag else {
             assertionFailure("No tag in the selected menu item")
             return
@@ -108,11 +111,13 @@ final class FirePopoverViewController: NSViewController {
         updateWarningWrapperView()
     }
 
-    @IBAction func openDetailsButtonAction(_ sender: Any) {
+    @IBAction
+    func openDetailsButtonAction(_: Any) {
         toggleDetails()
     }
 
-    @IBAction func closeDetailsButtonAction(_ sender: Any) {
+    @IBAction
+    func closeDetailsButtonAction(_: Any) {
         toggleDetails()
     }
 
@@ -127,26 +132,27 @@ final class FirePopoverViewController: NSViewController {
 
     private func updateWarningWrapperView() {
         warningWrapperView.isHidden = firePopoverViewModel.clearingOption == .allData ||
-        !firePopoverViewModel.areOtherTabsInfluenced || detailsWrapperView.isHidden
+            !firePopoverViewModel.areOtherTabsInfluenced || detailsWrapperView.isHidden
 
         collectionViewBottomConstraint.constant = warningWrapperView.isHidden ? 0 : 32
     }
 
-    @IBAction func clearButtonAction(_ sender: Any) {
+    @IBAction
+    func clearButtonAction(_: Any) {
         delegate?.firePopoverViewControllerDidClear(self)
         firePopoverViewModel.burn()
 
     }
 
-    @IBAction func cancelButtonAction(_ sender: Any) {
+    @IBAction
+    func cancelButtonAction(_: Any) {
         delegate?.firePopoverViewControllerDidCancel(self)
     }
 
     private func subscribeToViewModel() {
         viewModelCancellable = Publishers.Zip(
             firePopoverViewModel.$fireproofed,
-            firePopoverViewModel.$selectable
-        ).receive(on: DispatchQueue.main)
+            firePopoverViewModel.$selectable).receive(on: DispatchQueue.main)
             .sink { [weak self] _ in
                 guard let self = self else { return }
                 self.collectionView.reloadData()
@@ -163,7 +169,7 @@ final class FirePopoverViewController: NSViewController {
             .receive(on: DispatchQueue.main)
             .sink { [weak self] selected in
                 guard let self = self else { return }
-                let selectionIndexPaths = Set(selected.map {IndexPath(item: $0, section: self.firePopoverViewModel.selectableSectionIndex)})
+                let selectionIndexPaths = Set(selected.map { IndexPath(item: $0, section: self.firePopoverViewModel.selectableSectionIndex) })
                 self.collectionView.selectionIndexPaths = selectionIndexPaths
                 self.updateCloseDetailsButton()
                 self.updateClearButton()
@@ -215,7 +221,7 @@ final class FirePopoverViewController: NSViewController {
     }
 
     private func setupOptionsButton() {
-        FirePopoverViewModel.ClearingOption.allCases.enumerated().forEach { (index, option) in
+        FirePopoverViewModel.ClearingOption.allCases.enumerated().forEach { index, option in
             optionsButton.menu?.item(withTag: index)?.title = option.string
         }
     }
@@ -233,12 +239,12 @@ final class FirePopoverViewController: NSViewController {
 
 extension FirePopoverViewController: NSCollectionViewDataSource {
 
-    func numberOfSections(in collectionView: NSCollectionView) -> Int {
-        return 2
+    func numberOfSections(in _: NSCollectionView) -> Int {
+        2
     }
 
-    func collectionView(_ collectionView: NSCollectionView, numberOfItemsInSection section: Int) -> Int {
-        return section == firePopoverViewModel.selectableSectionIndex ? firePopoverViewModel.selectable.count: firePopoverViewModel.fireproofed.count
+    func collectionView(_: NSCollectionView, numberOfItemsInSection section: Int) -> Int {
+        section == firePopoverViewModel.selectableSectionIndex ? firePopoverViewModel.selectable.count: firePopoverViewModel.fireproofed.count
     }
 
     func collectionView(_ collectionView: NSCollectionView, itemForRepresentedObjectAt indexPath: IndexPath) -> NSCollectionViewItem {
@@ -253,13 +259,16 @@ extension FirePopoverViewController: NSCollectionViewDataSource {
         return firePopoverItem
     }
 
-    func collectionView(_ collectionView: NSCollectionView,
-                        viewForSupplementaryElementOfKind kind: NSCollectionView.SupplementaryElementKind,
-                        at indexPath: IndexPath) -> NSView {
+    func collectionView(
+        _ collectionView: NSCollectionView,
+        viewForSupplementaryElementOfKind _: NSCollectionView.SupplementaryElementKind,
+        at indexPath: IndexPath)
+        -> NSView {
         // swiftlint:disable force_cast
-        let view = collectionView.makeSupplementaryView(ofKind: NSCollectionView.elementKindSectionHeader,
-                                                        withIdentifier: FirePopoverCollectionViewHeader.identifier,
-                                                        for: indexPath) as! FirePopoverCollectionViewHeader
+        let view = collectionView.makeSupplementaryView(
+            ofKind: NSCollectionView.elementKindSectionHeader,
+            withIdentifier: FirePopoverCollectionViewHeader.identifier,
+            for: indexPath) as! FirePopoverCollectionViewHeader
         // swiftlint:enable force_cast
 
         if indexPath.section == firePopoverViewModel.selectableSectionIndex {
@@ -279,9 +288,11 @@ extension FirePopoverViewController: NSCollectionViewDelegate {
 
 extension FirePopoverViewController: NSCollectionViewDelegateFlowLayout {
 
-    func collectionView(_ collectionView: NSCollectionView,
-                        layout collectionViewLayout: NSCollectionViewLayout,
-                        referenceSizeForHeaderInSection section: Int) -> NSSize {
+    func collectionView(
+        _ collectionView: NSCollectionView,
+        layout _: NSCollectionViewLayout,
+        referenceSizeForHeaderInSection section: Int)
+        -> NSSize {
         let count: Int
         switch section {
         case firePopoverViewModel.selectableSectionIndex: count = firePopoverViewModel.selectable.count
@@ -291,9 +302,11 @@ extension FirePopoverViewController: NSCollectionViewDelegateFlowLayout {
         return NSSize(width: collectionView.bounds.width, height: count == 0 ? 0 : Constants.headerHeight)
     }
 
-    func collectionView(_ collectionView: NSCollectionView,
-                        layout collectionViewLayout: NSCollectionViewLayout,
-                        referenceSizeForFooterInSection section: Int) -> NSSize {
+    func collectionView(
+        _ collectionView: NSCollectionView,
+        layout _: NSCollectionViewLayout,
+        referenceSizeForFooterInSection section: Int)
+        -> NSSize {
         let count: Int
         switch section {
         case firePopoverViewModel.selectableSectionIndex: count = firePopoverViewModel.selectable.count

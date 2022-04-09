@@ -33,11 +33,11 @@ private class Scanner {
     }
 
     let data: Data
-    var index: Int = 0
+    var index = 0
 
     /// Returns whether there is no more data to consume
     var isComplete: Bool {
-        return index >= data.count
+        index >= data.count
     }
 
     /// Creates a scanner with provided data
@@ -117,7 +117,7 @@ extension Data {
         }
 
         var int: UInt32 = 0
-        var offset: Int32 = Int32(count - 1)
+        var offset = Int32(count - 1)
         forEach { byte in
             let byte32 = UInt32(byte)
             let shifted = byte32 << (UInt32(offset) * 8)

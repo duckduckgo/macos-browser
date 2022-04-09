@@ -16,8 +16,8 @@
 //  limitations under the License.
 //
 
-import XCTest
 import Combine
+import XCTest
 @testable import DuckDuckGo_Privacy_Browser
 
 final class StateRestorationManagerTests: XCTestCase {
@@ -90,7 +90,7 @@ final class StateRestorationManagerTests: XCTestCase {
     func testStatePersistenceThrottlesWrites() {
         fileStore.delay = 0.1 // write operations will sleep for 100ms
         var counter = 0
-        let observer = fileStore.observe(\.storage) { (_, _) in
+        let observer = fileStore.observe(\.storage) { _, _ in
             counter += 1
         }
 
@@ -110,7 +110,7 @@ final class StateRestorationManagerTests: XCTestCase {
         fileStore.delay = 0.01 // write operations will sleep for 100ms
 
         var counter = 0
-        let observer = fileStore.observe(\.storage) { (_, _) in
+        let observer = fileStore.observe(\.storage) { _, _ in
             counter += 1
         }
 
@@ -154,6 +154,7 @@ private class SavedStateMock: NSObject {
         static let key1 = "key1"
         static let key2 = "key2"
     }
+
     static var supportsSecureCoding = true
 
     var val1: String?

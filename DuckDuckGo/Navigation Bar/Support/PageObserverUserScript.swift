@@ -16,8 +16,8 @@
 //  limitations under the License.
 //
 
-import Foundation
 import BrowserServicesKit
+import Foundation
 
 protocol PageObserverUserScriptDelegate: AnyObject {
 
@@ -35,10 +35,10 @@ final class PageObserverUserScript: NSObject, StaticUserScript {
 
     static let source = """
 
-        // assuming we're inserted at document end, we can message up to the native layer immediately
-        webkit.messageHandlers.pageDOMLoaded.postMessage({});
+            // assuming we're inserted at document end, we can message up to the native layer immediately
+            webkit.messageHandlers.pageDOMLoaded.postMessage({});
 
-    """
+        """
 
     static var script: WKUserScript = PageObserverUserScript.makeWKUserScript()
 
@@ -46,7 +46,7 @@ final class PageObserverUserScript: NSObject, StaticUserScript {
         ["pageDOMLoaded"]
     }
 
-    func userContentController(_ userContentController: WKUserContentController, didReceive message: WKScriptMessage) {
+    func userContentController(_: WKUserContentController, didReceive message: WKScriptMessage) {
         if message.frameInfo.isMainFrame {
             delegate?.pageDOMLoaded()
         }

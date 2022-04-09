@@ -18,8 +18,8 @@
 
 import Foundation
 
-import XCTest
 import Combine
+import XCTest
 @testable import DuckDuckGo_Privacy_Browser
 
 final class FireTests: XCTestCase {
@@ -32,10 +32,11 @@ final class FireTests: XCTestCase {
         let permissionManager = PermissionManagerMock()
         let faviconManager = FaviconManagerMock()
 
-        let fire = Fire(cacheManager: manager,
-                        historyCoordinating: historyCoordinator,
-                        permissionManager: permissionManager,
-                        faviconManagement: faviconManager)
+        let fire = Fire(
+            cacheManager: manager,
+            historyCoordinating: historyCoordinator,
+            permissionManager: permissionManager,
+            faviconManagement: faviconManager)
         let tabCollectionViewModel = TabCollectionViewModel.aTabCollectionViewModel
 
         let burningExpectation = expectation(description: "Burning")
@@ -55,10 +56,11 @@ final class FireTests: XCTestCase {
         let permissionManager = PermissionManagerMock()
         let faviconManager = FaviconManagerMock()
 
-        let fire = Fire(cacheManager: manager,
-                        historyCoordinating: historyCoordinator,
-                        permissionManager: permissionManager,
-                        faviconManagement: faviconManager)
+        let fire = Fire(
+            cacheManager: manager,
+            historyCoordinating: historyCoordinator,
+            permissionManager: permissionManager,
+            faviconManagement: faviconManager)
         let tabCollectionViewModel = TabCollectionViewModel.aTabCollectionViewModel
 
         let finishedBurningExpectation = expectation(description: "Finished burning")
@@ -79,10 +81,11 @@ final class FireTests: XCTestCase {
         let permissionManager = PermissionManagerMock()
         let faviconManager = FaviconManagerMock()
 
-        let fire = Fire(cacheManager: manager,
-                        historyCoordinating: historyCoordinator,
-                        permissionManager: permissionManager,
-                        faviconManagement: faviconManager)
+        let fire = Fire(
+            cacheManager: manager,
+            historyCoordinating: historyCoordinator,
+            permissionManager: permissionManager,
+            faviconManagement: faviconManager)
 
         let tabCollectionViewModel = TabCollectionViewModel.aTabCollectionViewModel
 
@@ -104,9 +107,9 @@ final class FireTests: XCTestCase {
 
 }
 
-fileprivate extension TabCollectionViewModel {
+extension TabCollectionViewModel {
 
-    static var aTabCollectionViewModel: TabCollectionViewModel {
+    fileprivate static var aTabCollectionViewModel: TabCollectionViewModel {
         let tabCollectionViewModel = TabCollectionViewModel()
         tabCollectionViewModel.appendNewTab()
         tabCollectionViewModel.appendNewTab()

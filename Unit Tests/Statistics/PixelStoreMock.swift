@@ -24,7 +24,7 @@ final class PixelStoreMock: PixelDataStore {
     var data = [String: Any]()
 
     func value(forKey key: String) -> Int? {
-        return (data[key] as? NSNumber)?.intValue
+        (data[key] as? NSNumber)?.intValue
     }
 
     func set(_ value: Int, forKey key: String, completionHandler: ((Error?) -> Void)?) {
@@ -33,7 +33,7 @@ final class PixelStoreMock: PixelDataStore {
     }
 
     func value(forKey key: String) -> Double? {
-        return (data[key] as? NSNumber)?.doubleValue
+        (data[key] as? NSNumber)?.doubleValue
     }
 
     func set(_ value: Double, forKey key: String, completionHandler: ((Error?) -> Void)?) {
@@ -42,7 +42,7 @@ final class PixelStoreMock: PixelDataStore {
     }
 
     func value(forKey key: String) -> String? {
-        return data[key] as? String
+        data[key] as? String
     }
 
     func set(_ value: String, forKey key: String, completionHandler: ((Error?) -> Void)?) {

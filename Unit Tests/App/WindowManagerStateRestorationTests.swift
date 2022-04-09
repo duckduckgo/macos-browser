@@ -34,10 +34,12 @@ final class WindowManagerStateRestorationTests: XCTestCase {
             && a.sessionStateData == b.sessionStateData
             && a.webView.configuration.websiteDataStore.isPersistent == b.webView.configuration.websiteDataStore.isPersistent
     }
+
     func areTabsEqual(_ a: [Tab], _ b: [Tab]) -> Bool {
         a.count == b.count &&
             !a.enumerated().contains { !isTab($0.1, equalTo: b[$0.0]) }
     }
+
     func areTabCollectionViewModelsEqual(_ a: TabCollectionViewModel, _ b: TabCollectionViewModel) -> Bool {
         a.selectionIndex == b.selectionIndex && areTabsEqual(a.tabCollection.tabs, b.tabCollection.tabs)
     }
@@ -46,12 +48,14 @@ final class WindowManagerStateRestorationTests: XCTestCase {
 
     func testWindowManagerStateRestoration() throws {
         let tabs1 = [
-            Tab(content: .url(URL(string: "https://duckduckgo.com")!),
+            Tab(
+                content: .url(URL(string: "https://duckduckgo.com")!),
                 title: "DDG",
                 error: nil,
                 sessionStateData: "data".data(using: .utf8)!),
             Tab(),
-            Tab(content: .url(URL(string: "https://duckduckgo.com/?q=search&t=osx&ia=web")!),
+            Tab(
+                content: .url(URL(string: "https://duckduckgo.com/?q=search&t=osx&ia=web")!),
                 title: "DDG search",
                 error: nil,
                 sessionStateData: "data 2".data(using: .utf8)!)
@@ -59,7 +63,8 @@ final class WindowManagerStateRestorationTests: XCTestCase {
         let tabs2 = [
             Tab(),
             Tab(),
-            Tab(content: .url(URL(string: "https://duckduckgo.com/?q=another_search&t=osx&ia=web")!),
+            Tab(
+                content: .url(URL(string: "https://duckduckgo.com/?q=another_search&t=osx&ia=web")!),
                 title: "DDG search",
                 error: nil,
                 sessionStateData: "data 3".data(using: .utf8)!)
@@ -84,8 +89,9 @@ final class WindowManagerStateRestorationTests: XCTestCase {
         XCTAssertEqual(restored.windows.count, 2)
         XCTAssertEqual(restored.keyWindowIndex, 1)
         for (idx, window) in state.windows.enumerated() {
-            XCTAssertTrue(areTabCollectionViewModelsEqual(window.model,
-                                                          state.windows[idx].model))
+            XCTAssertTrue(areTabCollectionViewModelsEqual(
+                window.model,
+                state.windows[idx].model))
             XCTAssertEqual(window.frame, state.windows[idx].frame)
         }
     }

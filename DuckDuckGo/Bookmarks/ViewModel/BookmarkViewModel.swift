@@ -74,7 +74,7 @@ struct BookmarkViewModel {
         guard let bookmark = entity as? Bookmark else {
             preconditionFailure("\(#file): Attempted to provide representing color for non-Bookmark")
         }
-        
+
         let index = bookmark.url.absoluteString.count % Self.representingColors.count
         return Self.representingColors[index]
     }
@@ -90,11 +90,11 @@ struct BookmarkViewModel {
 
 }
 
-fileprivate extension NSImage {
+extension NSImage {
 
-    static let favoriteFaviconImage = NSImage(named: "FavoriteFavicon")!
+    fileprivate static let favoriteFaviconImage = NSImage(named: "FavoriteFavicon")!
 
-    func makeFavoriteOverlay() -> NSImage {
+    private func makeFavoriteOverlay() -> NSImage {
         let overlayImage = Self.favoriteFaviconImage
 
         let newImage = NSImage(size: size)

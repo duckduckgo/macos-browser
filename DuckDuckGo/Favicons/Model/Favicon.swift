@@ -55,7 +55,7 @@ struct Favicon {
             let longestSide = max(imageSize.width, imageSize.height)
             switch longestSide {
             case 0: self = .noImage
-            case 1..<Self.small.rawValue:  self = .tiny
+            case 1..<Self.small.rawValue: self = .tiny
             case Self.small.rawValue..<Self.medium.rawValue: self = .small
             case Self.medium.rawValue..<Self.large.rawValue: self = .medium
             case Self.large.rawValue..<Self.huge.rawValue: self = .large
@@ -65,11 +65,13 @@ struct Favicon {
     }
 
     init(identifier: UUID, url: URL, image: NSImage?, relationString: String, documentUrl: URL, dateCreated: Date) {
-        self.init(identifier: identifier,
-                  url: url, image: image,
-                  relation: Relation(relationString: relationString),
-                  documentUrl: documentUrl,
-                  dateCreated: dateCreated)
+        self.init(
+            identifier: identifier,
+            url: url,
+            image: image,
+            relation: Relation(relationString: relationString),
+            documentUrl: documentUrl,
+            dateCreated: dateCreated)
     }
 
     init(identifier: UUID, url: URL, image: NSImage?, relation: Relation, documentUrl: URL, dateCreated: Date) {
@@ -89,7 +91,7 @@ struct Favicon {
         self.identifier = identifier
         self.url = url
         self.relation = relation
-        self.sizeCategory = SizeCategory(imageSize: self.image?.size)
+        sizeCategory = SizeCategory(imageSize: self.image?.size)
         self.documentUrl = documentUrl
         self.dateCreated = dateCreated
     }

@@ -16,8 +16,8 @@
 //  limitations under the License.
 //
 
-import XCTest
 import Combine
+import XCTest
 @testable import DuckDuckGo_Privacy_Browser
 
 final class ConfigurationDownloaderTests: XCTestCase {
@@ -290,12 +290,12 @@ final class ConfigurationDownloaderTests: XCTestCase {
         var etag: String?
         var etagConfig: ConfigurationLocation?
 
-        func loadData(for: ConfigurationLocation) -> Data? {
-            return data
+        func loadData(for _: ConfigurationLocation) -> Data? {
+            data
         }
 
-        func loadEtag(for: ConfigurationLocation) -> String? {
-            return etag
+        func loadEtag(for _: ConfigurationLocation) -> String? {
+            etag
         }
 
         func saveData(_ data: Data, for config: ConfigurationLocation) throws {
@@ -304,7 +304,7 @@ final class ConfigurationDownloaderTests: XCTestCase {
             }
 
             self.data = data
-            self.dataConfig = config
+            dataConfig = config
         }
 
         func saveEtag(_ etag: String, for config: ConfigurationLocation) throws {
@@ -313,7 +313,7 @@ final class ConfigurationDownloaderTests: XCTestCase {
             }
 
             self.etag = etag
-            self.etagConfig = config
+            etagConfig = config
         }
 
         func log() { }
@@ -322,30 +322,34 @@ final class ConfigurationDownloaderTests: XCTestCase {
 
 }
 
-fileprivate extension HTTPURLResponse {
+extension HTTPURLResponse {
 
-    static let etagHeader = "Etag"
-    static let ifNoneMatchHeader = "If-None-Match"
-    static let etagValue = "test-etag"
+    fileprivate static let etagHeader = "Etag"
+    fileprivate static let ifNoneMatchHeader = "If-None-Match"
+    fileprivate static let etagValue = "test-etag"
 
-    static let success = HTTPURLResponse(url: URL.blankPage,
-                                         statusCode: 200,
-                                         httpVersion: nil,
-                                         headerFields: [HTTPURLResponse.etagHeader: HTTPURLResponse.etagValue])!
+    fileprivate static let success = HTTPURLResponse(
+        url: URL.blankPage,
+        statusCode: 200,
+        httpVersion: nil,
+        headerFields: [HTTPURLResponse.etagHeader: HTTPURLResponse.etagValue])!
 
-    static let notModified = HTTPURLResponse(url: URL.blankPage,
-                                             statusCode: 304,
-                                             httpVersion: nil,
-                                             headerFields: [HTTPURLResponse.etagHeader: HTTPURLResponse.etagValue])!
+    fileprivate static let notModified = HTTPURLResponse(
+        url: URL.blankPage,
+        statusCode: 304,
+        httpVersion: nil,
+        headerFields: [HTTPURLResponse.etagHeader: HTTPURLResponse.etagValue])!
 
-    static let internalServerError = HTTPURLResponse(url: URL.blankPage,
-                                                     statusCode: 500,
-                                                     httpVersion: nil,
-                                                     headerFields: [:])!
+    fileprivate static let internalServerError = HTTPURLResponse(
+        url: URL.blankPage,
+        statusCode: 500,
+        httpVersion: nil,
+        headerFields: [:])!
 
-    static let successNoEtag = HTTPURLResponse(url: URL.blankPage,
-                                               statusCode: 200,
-                                               httpVersion: nil,
-                                               headerFields: [:])!
+    fileprivate static let successNoEtag = HTTPURLResponse(
+        url: URL.blankPage,
+        statusCode: 200,
+        httpVersion: nil,
+        headerFields: [:])!
 
 }

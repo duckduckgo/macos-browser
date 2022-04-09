@@ -59,7 +59,7 @@ final class OnboardingViewModel: ObservableObject {
 
     init(delegate: OnboardingDelegate? = nil) {
         self.delegate = delegate
-        self.state = onboardingFinished ? .startBrowsing : .startFlow
+        state = onboardingFinished ? .startBrowsing : .startFlow
     }
 
     func onSplashFinished() {
@@ -105,7 +105,7 @@ final class OnboardingViewModel: ObservableObject {
     func typingSkipped() {
         Pixel.fire(.onboardingTypingSkipped)
     }
-    
+
     func onboardingReshown() {
         if onboardingFinished {
             typingDisabled = true

@@ -115,17 +115,18 @@ class BookmarkSidebarTreeControllerTests: XCTestCase {
 
 }
 
-fileprivate extension Bookmark {
+extension Bookmark {
 
-    static var mock: Bookmark = Bookmark(id: UUID(),
-                                         url: URL.duckDuckGo,
-                                         title: "Title",
-                                         isFavorite: false)
+    fileprivate static var mock = Bookmark(
+        id: UUID(),
+        url: URL.duckDuckGo,
+        title: "Title",
+        isFavorite: false)
 
 }
 
-fileprivate extension BookmarkFolder {
+extension BookmarkFolder {
 
-    static var mock = BookmarkFolder(id: UUID(), title: "Title")
+    fileprivate static var mock = BookmarkFolder(id: UUID(), title: "Title")
 
 }

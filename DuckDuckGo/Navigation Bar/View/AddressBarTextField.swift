@@ -16,10 +16,10 @@
 //  limitations under the License.
 //
 
+import BrowserServicesKit
 import Cocoa
 import Combine
 import os.log
-import BrowserServicesKit
 
 // swiftlint:disable file_length
 // swiftlint:disable type_body_length
@@ -50,7 +50,7 @@ final class AddressBarTextField: NSTextField {
     }
 
     var suggestionWindowVisible: AnyPublisher<Bool, Never> {
-        self.publisher(for: \.suggestionWindowController?.window?.isVisible)
+        publisher(for: \.suggestionWindowController?.window?.isVisible)
             .map { $0 ?? false }
             .eraseToAnyPublisher()
     }
@@ -107,7 +107,7 @@ final class AddressBarTextField: NSTextField {
         selectedSuggestionViewModelCancellable =
             suggestionContainerViewModel?.$selectedSuggestionViewModel.receive(on: DispatchQueue.main).sink { [weak self] _ in
                 self?.displaySelectedSuggestionViewModel()
-        }
+            }
     }
 
     private func subscribeToSelectedTabViewModel() {
@@ -121,8 +121,8 @@ final class AddressBarTextField: NSTextField {
     private func subscribeToContentType() {
         contentTypeCancellable = tabCollectionViewModel.selectedTabViewModel?
             .tab.$content .receive(on: DispatchQueue.main).sink { [weak self] contentType in
-            self?.font = .systemFont(ofSize: contentType == .homePage ? 15 : 13)
-        }
+                self?.font = .systemFont(ofSize: contentType == .homePage ? 15 : 13)
+            }
     }
 
     private func subscribeToAddressBarString() {
@@ -220,8 +220,9 @@ final class AddressBarTextField: NSTextField {
         }
 
         value = Value.suggestion(selectedSuggestionViewModel)
-        if let originalStringValue = originalStringValue,
-           value.string.lowercased().hasPrefix(originalStringValue.lowercased()) {
+        if
+            let originalStringValue = originalStringValue,
+            value.string.lowercased().hasPrefix(originalStringValue.lowercased()) {
 
             selectToTheEnd(from: originalStringValue.count)
         } else {
@@ -259,15 +260,18 @@ final class AddressBarTextField: NSTextField {
         var url = providedUrl
 
         // keep current search mode
-        if url.isDuckDuckGoSearch,
-           let oldURL = selectedTabViewModel.tab.content.url,
+        if
+            url.isDuckDuckGoSearch,
+            let oldURL = selectedTabViewModel.tab.content.url,
             oldURL.isDuckDuckGoSearch {
-            if let ia = try? oldURL.getParameter(name: URL.DuckDuckGoParameters.ia.rawValue),
-               let newURL = try? url.addParameter(name: URL.DuckDuckGoParameters.ia.rawValue, value: ia) {
+            if
+                let ia = try? oldURL.getParameter(name: URL.DuckDuckGoParameters.ia.rawValue),
+                let newURL = try? url.addParameter(name: URL.DuckDuckGoParameters.ia.rawValue, value: ia) {
                 url = newURL
             }
-            if let iax = try? oldURL.getParameter(name: URL.DuckDuckGoParameters.iax.rawValue),
-               let newURL = try? url.addParameter(name: URL.DuckDuckGoParameters.iax.rawValue, value: iax) {
+            if
+                let iax = try? oldURL.getParameter(name: URL.DuckDuckGoParameters.iax.rawValue),
+                let newURL = try? url.addParameter(name: URL.DuckDuckGoParameters.iax.rawValue, value: iax) {
                 url = newURL
             }
         }
@@ -281,18 +285,19 @@ final class AddressBarTextField: NSTextField {
             selectedTabViewModel.tab.update(url: url)
         }
 
-        self.window?.makeFirstResponder(nil)
+        window?.makeFirstResponder(nil)
     }
 
     private func updateTabUrl(suggestion: Suggestion?) {
-        makeUrl(suggestion: suggestion,
-                stringValueWithoutSuffix: stringValueWithoutSuffix,
-                completion: { [weak self] url, isUpgraded in
-            guard let url = url else { return }
+        makeUrl(
+            suggestion: suggestion,
+            stringValueWithoutSuffix: stringValueWithoutSuffix,
+            completion: { [weak self] url, isUpgraded in
+                guard let url = url else { return }
 
-            if isUpgraded { self?.updateTabUpgradedToUrl(url) }
-            self?.updateTabUrlWithUrl(url, suggestion: suggestion)
-        })
+                if isUpgraded { self?.updateTabUpgradedToUrl(url) }
+                self?.updateTabUrlWithUrl(url, suggestion: suggestion)
+            })
     }
 
     private func updateTabUpgradedToUrl(_ url: URL?) {
@@ -313,12 +318,13 @@ final class AddressBarTextField: NSTextField {
     }
 
     private func openNewTab(selected: Bool, suggestion: Suggestion?) {
-        makeUrl(suggestion: suggestion,
-                stringValueWithoutSuffix: stringValueWithoutSuffix,
-                completion: { [weak self] url, isUpgraded in
-                    if isUpgraded { self?.updateTabUpgradedToUrl(url) }
-                    self?.openNewTabWithUrl(url, selected: selected, suggestion: suggestion)
-                })
+        makeUrl(
+            suggestion: suggestion,
+            stringValueWithoutSuffix: stringValueWithoutSuffix,
+            completion: { [weak self] url, isUpgraded in
+                if isUpgraded { self?.updateTabUpgradedToUrl(url) }
+                self?.openNewTabWithUrl(url, selected: selected, suggestion: suggestion)
+            })
     }
 
     private func makeUrl(suggestion: Suggestion?, stringValueWithoutSuffix: String, completion: @escaping (URL?, Bool) -> Void) {
@@ -342,12 +348,12 @@ final class AddressBarTextField: NSTextField {
 
         upgradeToHttps(url: url, completion: completion)
     }
-    
+
     private func upgradeToHttps(url: URL, completion: @escaping (URL?, Bool) -> Void) {
         Task {
             let result = await PrivacyFeatures.httpsUpgrade.upgrade(url: url)
             switch result {
-            case let .success(upgradedUrl):
+            case .success(let upgradedUrl):
                 completion(upgradedUrl, true)
             case .failure:
                 completion(url, false)
@@ -362,12 +368,13 @@ final class AddressBarTextField: NSTextField {
         case url(urlString: String, url: URL, userTyped: Bool)
         case suggestion(_ suggestionViewModel: SuggestionViewModel)
 
-        init(stringValue: String, userTyped: Bool, isSearch: Bool = false) {
+        init(stringValue: String, userTyped: Bool, isSearch _: Bool = false) {
             if let url = stringValue.punycodedUrl, url.isValid {
                 var stringValue = stringValue
                 // display punycoded url in readable form when editing
-                if !userTyped,
-                   let punycodeDecoded = url.punycodeDecodedString {
+                if
+                    !userTyped,
+                    let punycodeDecoded = url.punycodeDecodedString {
                     stringValue = punycodeDecoded
                 }
                 self = .url(urlString: stringValue, url: url, userTyped: userTyped)
@@ -384,8 +391,9 @@ final class AddressBarTextField: NSTextField {
                 return urlString
             case .suggestion(let suggestionViewModel):
                 let autocompletionString = suggestionViewModel.autocompletionString
-                if autocompletionString.lowercased()
-                    .hasPrefix(suggestionViewModel.userStringValue.lowercased()) {
+                if
+                    autocompletionString.lowercased()
+                        .hasPrefix(suggestionViewModel.userStringValue.lowercased()) {
                     // keep user input capitalization
                     let suffixLength = autocompletionString.count - suggestionViewModel.userStringValue.count
                     return suggestionViewModel.userStringValue + autocompletionString.suffix(suffixLength)
@@ -424,7 +432,7 @@ final class AddressBarTextField: NSTextField {
                 attributedString.append(suffix.toAttributedString(size: isHomePage ? 15 : 13))
                 attributedStringValue = attributedString
             } else {
-                self.stringValue = value.string
+                stringValue = value.string
             }
 
             addressBarTextFieldDelegate?.adressBarTextField(self, didChangeValue: value)
@@ -440,10 +448,10 @@ final class AddressBarTextField: NSTextField {
     func makeTextAttributes() -> [NSAttributedString.Key: Any] {
         let size: CGFloat = isHomePage ? 15 : 13
         return [
-           .font: NSFont.systemFont(ofSize: size, weight: .regular),
-           .foregroundColor: NSColor.textColor,
-           .kern: -0.16
-       ]
+            .font: NSFont.systemFont(ofSize: size, weight: .regular),
+            .foregroundColor: NSColor.textColor,
+            .kern: -0.16
+        ]
     }
 
     enum Suffix {
@@ -455,8 +463,9 @@ final class AddressBarTextField: NSTextField {
             switch value {
             case .text: self = Suffix.search
             case .url(urlString: _, url: let url, userTyped: let userTyped):
-                guard userTyped,
-                      let host = url.host
+                guard
+                    userTyped,
+                    let host = url.host
                 else { return nil }
                 self = Suffix.visit(host: host)
             case .suggestion(let suggestionViewModel):
@@ -474,15 +483,18 @@ final class AddressBarTextField: NSTextField {
 
             case .bookmark(title: _, url: let url, isFavorite: _, allowedInTopHits: _),
                  .historyEntry(title: _, url: let url, allowedInTopHits: _):
-                if let title = suggestionViewModel.title,
-                   !title.isEmpty,
-                   suggestionViewModel.autocompletionString != title {
+                if
+                    let title = suggestionViewModel.title,
+                    !title.isEmpty,
+                    suggestionViewModel.autocompletionString != title {
                     self = .title(title)
-                } else if let host = url.host?.dropWWW(),
-                          host == url.toString(decodePunycode: false,
-                                               dropScheme: true,
-                                               needsWWW: false,
-                                               dropTrailingSlash: true) {
+                } else if
+                    let host = url.host?.dropWWW(),
+                    host == url.toString(
+                        decodePunycode: false,
+                        dropScheme: true,
+                        needsWWW: false,
+                        dropTrailingSlash: true) {
                     self = .visit(host: host)
                 } else {
                     self = .url(url)
@@ -499,8 +511,10 @@ final class AddressBarTextField: NSTextField {
         case title(String)
 
         func toAttributedString(size: CGFloat) -> NSAttributedString {
-            let attrs = [NSAttributedString.Key.font: NSFont.systemFont(ofSize: size, weight: .light),
-                         .foregroundColor: NSColor.addressBarSuffixColor]
+            let attrs = [
+                NSAttributedString.Key.font: NSFont.systemFont(ofSize: size, weight: .light),
+                .foregroundColor: NSColor.addressBarSuffixColor
+            ]
             return NSAttributedString(string: string, attributes: attrs)
         }
 
@@ -517,10 +531,11 @@ final class AddressBarTextField: NSTextField {
                 if url.isDuckDuckGoSearch {
                     return Self.searchSuffix
                 } else {
-                    return " – " + url.toString(decodePunycode: false,
-                                                dropScheme: true,
-                                                needsWWW: false,
-                                                dropTrailingSlash: false)
+                    return " – " + url.toString(
+                        decodePunycode: false,
+                        dropScheme: true,
+                        needsWWW: false,
+                        dropTrailingSlash: false)
                 }
             case .title(let title):
                 return " – " + title
@@ -555,8 +570,9 @@ final class AddressBarTextField: NSTextField {
     func filterSuffix(fromSelectionRange range: NSRange, for stringValue: String) -> NSRange {
         let suffixStart = stringValue.utf16.count - (suffix?.string.utf16.count ?? 0)
         let currentSelectionEnd = range.location + range.length
-        guard suffixStart >= 0,
-              currentSelectionEnd > suffixStart
+        guard
+            suffixStart >= 0,
+            currentSelectionEnd > suffixStart
         else { return range }
 
         let newLocation = min(range.location, suffixStart)
@@ -573,26 +589,26 @@ final class AddressBarTextField: NSTextField {
     }
 
     @objc dynamic private var suggestionWindowController: NSWindowController?
-    private lazy var suggestionViewController: SuggestionViewController = {
-        NSStoryboard.suggestion.instantiateController(identifier: "SuggestionViewController") { coder in
-            let suggestionViewController = SuggestionViewController(coder: coder,
-                                                                    suggestionContainerViewModel: self.suggestionContainerViewModel!)
+    private lazy var suggestionViewController: SuggestionViewController = NSStoryboard.suggestion
+        .instantiateController(identifier: "SuggestionViewController") { coder in
+            let suggestionViewController = SuggestionViewController(
+                coder: coder,
+                suggestionContainerViewModel: self.suggestionContainerViewModel!)
             suggestionViewController?.delegate = self
             return suggestionViewController
         }
-    }()
 
     private func initSuggestionWindow() {
         let windowController = NSStoryboard.suggestion
             .instantiateController(withIdentifier: "SuggestionWindowController") as? NSWindowController
 
         windowController?.contentViewController = suggestionViewController
-        self.suggestionWindowController = windowController
+        suggestionWindowController = windowController
     }
 
     private func suggestionsContainLocalItems() -> SuggestionListChacteristics {
         var characteristics = SuggestionListChacteristics(hasBookmark: false, hasFavorite: false, hasHistoryEntry: false)
-        for suggestion in self.suggestionContainerViewModel?.suggestionContainer.result?.all ?? [] {
+        for suggestion in suggestionContainerViewModel?.suggestionContainer.result?.all ?? [] {
             if case .bookmark(title: _, url: _, isFavorite: let isFavorite, allowedInTopHits: _) = suggestion {
                 if isFavorite {
                     characteristics.hasFavorite = true
@@ -677,49 +693,53 @@ extension Notification.Name {
 
 extension AddressBarTextField: NSTextFieldDelegate {
 
-    func controlTextDidEndEditing(_ obj: Notification) {
+    func controlTextDidEndEditing(_: Notification) {
         suggestionContainerViewModel?.clearUserStringValue()
         hideSuggestionWindow()
     }
 
-    func controlTextDidChange(_ obj: Notification) {
-        let stringValueWithoutSuffix = self.stringValueWithoutSuffix
+    func controlTextDidChange(_: Notification) {
+        let stringValueWithoutSuffix = stringValueWithoutSuffix
 
         // if user continues typing letters from displayed Suggestion
         // don't blink and keep the Suggestion displayed
-        if isHandlingUserAppendingText,
-           case .suggestion(let suggestion) = self.value,
-           // disable autocompletion when user entered Space
-           !stringValueWithoutSuffix.contains(" "),
-           stringValueWithoutSuffix.hasPrefix(suggestion.userStringValue),
-           suggestion.autocompletionString.hasPrefix(stringValueWithoutSuffix),
-           let editor = currentEditor(),
-           editor.selectedRange.location == stringValueWithoutSuffix.utf16.count {
+        if
+            isHandlingUserAppendingText,
+            case .suggestion(let suggestion) = value,
+            // disable autocompletion when user entered Space
+            !stringValueWithoutSuffix.contains(" "),
+            stringValueWithoutSuffix.hasPrefix(suggestion.userStringValue),
+            suggestion.autocompletionString.hasPrefix(stringValueWithoutSuffix),
+            let editor = currentEditor(),
+            editor.selectedRange.location == stringValueWithoutSuffix.utf16.count {
 
-            self.value = .suggestion(SuggestionViewModel(isHomePage: isHomePage, suggestion: suggestion.suggestion,
-                                                         userStringValue: stringValueWithoutSuffix))
+            self.value = .suggestion(SuggestionViewModel(
+                isHomePage: isHomePage,
+                suggestion: suggestion.suggestion,
+                userStringValue: stringValueWithoutSuffix))
             self.selectToTheEnd(from: stringValueWithoutSuffix.count)
 
         } else {
             suggestionContainerViewModel?.clearSelection()
-            self.value = Value(stringValue: stringValueWithoutSuffix, userTyped: true)
+            value = Value(stringValue: stringValueWithoutSuffix, userTyped: true)
         }
 
         if stringValue.isEmpty {
             suggestionContainerViewModel?.clearUserStringValue()
             hideSuggestionWindow()
         } else {
-            suggestionContainerViewModel?.setUserStringValue(stringValueWithoutSuffix,
-                                                            userAppendedStringToTheEnd: isHandlingUserAppendingText)
+            suggestionContainerViewModel?.setUserStringValue(
+                stringValueWithoutSuffix,
+                userAppendedStringToTheEnd: isHandlingUserAppendingText)
         }
 
         // reset user typed flag for the next didChange event
         isHandlingUserAppendingText = false
     }
 
-    func textView(_ textView: NSTextView, userTypedString typedString: String, at range: NSRange) {
+    func textView(_: NSTextView, userTypedString _: String, at range: NSRange) {
         let userTypedLength = suggestionContainerViewModel?.userStringValue?.utf16.count ?? 0
-        let currentValueLength = self.stringValueWithoutSuffix.utf16.count
+        let currentValueLength = stringValueWithoutSuffix.utf16.count
         let selectedSuggestionRange = NSRange(location: userTypedLength, length: currentValueLength - userTypedLength)
         assert(selectedSuggestionRange.upperBound <= currentValueLength)
 
@@ -731,9 +751,9 @@ extension AddressBarTextField: NSTextFieldDelegate {
         }
     }
 
-    func control(_ control: NSControl, textView: NSTextView, doCommandBy commandSelector: Selector) -> Bool {
+    func control(_: NSControl, textView _: NSTextView, doCommandBy commandSelector: Selector) -> Bool {
         if NSApp.isReturnOrEnterPressed {
-            self.addressBarEnterPressed()
+            addressBarEnterPressed()
             return true
         }
 
@@ -744,9 +764,10 @@ extension AddressBarTextField: NSTextFieldDelegate {
 
         // Collision of suffix and forward deleting
         if [#selector(NSResponder.deleteForward(_:)), #selector(NSResponder.deleteWordForward(_:))].contains(commandSelector) {
-            if let currentEditor = currentEditor(),
-               currentEditor.selectedRange.location == value.string.utf16.count,
-               currentEditor.selectedRange.length == 0 {
+            if
+                let currentEditor = currentEditor(),
+                currentEditor.selectedRange.location == value.string.utf16.count,
+                currentEditor.selectedRange.length == 0 {
                 // Don't do delete when cursor is in the end
                 return true
             }
@@ -759,14 +780,14 @@ extension AddressBarTextField: NSTextFieldDelegate {
             case #selector(NSResponder.moveUp(_:)):
                 suggestionContainerViewModel?.selectPreviousIfPossible(); return true
             case #selector(NSResponder.deleteBackward(_:)),
-                #selector(NSResponder.deleteForward(_:)),
-                #selector(NSResponder.deleteToMark(_:)),
-                #selector(NSResponder.deleteWordForward(_:)),
-                #selector(NSResponder.deleteWordBackward(_:)),
-                #selector(NSResponder.deleteToEndOfLine(_:)),
-                #selector(NSResponder.deleteToEndOfParagraph(_:)),
-                #selector(NSResponder.deleteToBeginningOfLine(_:)),
-                #selector(NSResponder.deleteBackwardByDecomposingPreviousCharacter(_:)):
+                 #selector(NSResponder.deleteForward(_:)),
+                 #selector(NSResponder.deleteToMark(_:)),
+                 #selector(NSResponder.deleteWordForward(_:)),
+                 #selector(NSResponder.deleteWordBackward(_:)),
+                 #selector(NSResponder.deleteToEndOfLine(_:)),
+                 #selector(NSResponder.deleteToEndOfParagraph(_:)),
+                 #selector(NSResponder.deleteToBeginningOfLine(_:)),
+                 #selector(NSResponder.deleteBackwardByDecomposingPreviousCharacter(_:)):
                 suggestionContainerViewModel?.clearSelection(); return false
             default:
                 return false
@@ -780,7 +801,7 @@ extension AddressBarTextField: NSTextFieldDelegate {
 
 extension AddressBarTextField: SuggestionViewControllerDelegate {
 
-    func suggestionViewControllerDidConfirmSelection(_ suggestionViewController: SuggestionViewController) {
+    func suggestionViewControllerDidConfirmSelection(_: SuggestionViewController) {
         let suggestion = suggestionContainerViewModel?.selectedSuggestionViewModel?.suggestion
         if NSApp.isCommandPressed {
             openNewTab(selected: NSApp.isShiftPressed, suggestion: suggestion)
@@ -791,7 +812,7 @@ extension AddressBarTextField: SuggestionViewControllerDelegate {
 
     func shouldCloseSuggestionWindow(forMouseEvent event: NSEvent) -> Bool {
         // don't hide suggestions if clicking somewhere inside the Address Bar view
-        return superview?.isMouseLocationInsideBounds(event.locationInWindow) != true
+        superview?.isMouseLocationInsideBounds(event.locationInWindow) != true
     }
 }
 
@@ -802,11 +823,11 @@ extension AddressBarTextField: NSTextViewDelegate {
             // artifacts can appear when the selection changes, especially if the size of the field has changed, this clears them
             textView.needsDisplay = true
         }
-        return self.filterSuffix(fromSelectionRange: range, for: textView.string)
+        return filterSuffix(fromSelectionRange: range, for: textView.string)
     }
 
-    func textView(_ view: NSTextView, menu: NSMenu, for event: NSEvent, at charIndex: Int) -> NSMenu? {
-        return removingAttributeChangingMenuItems(from: menu)
+    func textView(_: NSTextView, menu: NSMenu, for _: NSEvent, at _: Int) -> NSMenu? {
+        removingAttributeChangingMenuItems(from: menu)
     }
 
     private static var selectorsToRemove: Set<Selector> = Set([
@@ -825,13 +846,14 @@ extension AddressBarTextField: NSTextViewDelegate {
             if let action = menuItem.action, Self.selectorsToRemove.contains(action) {
                 menu.removeItem(menuItem)
             } else {
-                if let submenu = menuItem.submenu, submenu.items.first(where: { submenuItem in
-                    if let submenuAction = submenuItem.action, Self.selectorsToRemove.contains(submenuAction) {
-                        return true
-                    } else {
-                        return false
-                    }
-                }) != nil {
+                if
+                    let submenu = menuItem.submenu, submenu.items.first(where: { submenuItem in
+                        if let submenuAction = submenuItem.action, Self.selectorsToRemove.contains(submenuAction) {
+                            return true
+                        } else {
+                            return false
+                        }
+                    }) != nil {
                     menu.removeItem(menuItem)
                 }
             }
@@ -862,7 +884,7 @@ final class AddressBarTextEditor: NSTextView {
             return super.selectionRange(forProposedRange: proposedCharRange, granularity: granularity)
         }
 
-        let string = self.string
+        let string = string
         var range: NSRange
         switch granularity {
         case .selectByParagraph:
@@ -872,8 +894,9 @@ final class AddressBarTextEditor: NSTextView {
         case .selectByWord:
             range = delegate.filterSuffix(fromSelectionRange: proposedCharRange, for: self.string)
             // if selection for word included suffix, move one character before adjusted to select last word w/o suffix
-            if range != proposedCharRange,
-               range.location > 0 {
+            if
+                range != proposedCharRange,
+                range.location > 0 {
                 range.location -= 1
             }
             // select word and then adjust by removing suffix
@@ -889,8 +912,9 @@ final class AddressBarTextEditor: NSTextView {
 
     override func characterIndexForInsertion(at point: NSPoint) -> Int {
         let index = super.characterIndexForInsertion(at: point)
-        let adjustedRange = selectionRange(forProposedRange: NSRange(location: index, length: 0),
-                                           granularity: .selectByCharacter)
+        let adjustedRange = selectionRange(
+            forProposedRange: NSRange(location: index, length: 0),
+            granularity: .selectByCharacter)
         return adjustedRange.location
     }
 
@@ -905,20 +929,20 @@ final class AddressBarTextEditor: NSTextView {
         }
         guard let string = string as? String else { return }
 
-        delegate.textView(self, userTypedString: string, at: replacementRange.location == NSNotFound ? self.selectedRange() : replacementRange)
+        delegate.textView(self, userTypedString: string, at: replacementRange.location == NSNotFound ? selectedRange() : replacementRange)
     }
 }
 
 final class AddressBarTextFieldCell: NSTextFieldCell {
     lazy var customEditor = AddressBarTextEditor()
 
-    override func fieldEditor(for controlView: NSView) -> NSTextView? {
-        return customEditor
+    override func fieldEditor(for _: NSView) -> NSTextView? {
+        customEditor
     }
 }
 
-fileprivate extension NSStoryboard {
-    static let suggestion = NSStoryboard(name: "Suggestion", bundle: .main)
+extension NSStoryboard {
+    fileprivate static let suggestion = NSStoryboard(name: "Suggestion", bundle: .main)
 }
 
 // swiftlint:enable type_body_length

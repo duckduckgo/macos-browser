@@ -31,7 +31,7 @@ final class SpacerNode: Equatable {
     }
 
     static func == (lhs: SpacerNode, rhs: SpacerNode) -> Bool {
-        return lhs.name == rhs.name
+        lhs.name == rhs.name
     }
 
 }

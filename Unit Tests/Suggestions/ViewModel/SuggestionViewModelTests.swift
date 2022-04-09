@@ -16,8 +16,8 @@
 //  limitations under the License.
 //
 
-import XCTest
 import BrowserServicesKit
+import XCTest
 @testable import DuckDuckGo_Privacy_Browser
 
 final class SuggestionViewModelTests: XCTestCase {
@@ -26,10 +26,10 @@ final class SuggestionViewModelTests: XCTestCase {
         let phrase = "phrase"
         let suggestion = Suggestion.phrase(phrase: phrase)
         let suggestionViewModel = SuggestionViewModel(suggestion: suggestion, userStringValue: "")
-        
+
         XCTAssertEqual(phrase, suggestionViewModel.string)
     }
-    
+
     func testWhenSuggestionIsWebsite_ThenStringIsUrlStringWithoutSchemeAndWWW() {
         let urlString = "https://spreadprivacy.com"
         let url = URL(string: urlString)!

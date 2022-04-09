@@ -52,14 +52,13 @@ final class AutofillPreferencesModel: ObservableObject {
 
     func authorizeAutoLockSettingsChange(
         isEnabled isAutoLockEnabledNewValue: Bool? = nil,
-        threshold autoLockThresholdNewValue: AutofillAutoLockThreshold? = nil
-    ) {
+        threshold autoLockThresholdNewValue: AutofillAutoLockThreshold? = nil) {
         guard isAutoLockEnabledNewValue != nil || autoLockThresholdNewValue != nil else {
             return
         }
 
-        let isAutoLockEnabled = isAutoLockEnabledNewValue ?? self.isAutoLockEnabled
-        let autoLockThreshold = autoLockThresholdNewValue ?? self.autoLockThreshold
+        let isAutoLockEnabled = isAutoLockEnabledNewValue ?? isAutoLockEnabled
+        let autoLockThreshold = autoLockThresholdNewValue ?? autoLockThreshold
 
         userAuthenticator.authenticateUser(reason: .changeLoginsSettings) { [weak self] authenticationResult in
             guard let self = self else {
@@ -94,8 +93,7 @@ final class AutofillPreferencesModel: ObservableObject {
 
     init(
         persistor: AutofillPreferencesPersistor = AutofillPreferences(),
-        userAuthenticator: UserAuthenticating = DeviceAuthenticator.shared
-    ) {
+        userAuthenticator: UserAuthenticating = DeviceAuthenticator.shared) {
         self.persistor = persistor
         self.userAuthenticator = userAuthenticator
 

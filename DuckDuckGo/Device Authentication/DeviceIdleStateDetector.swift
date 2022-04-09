@@ -19,7 +19,7 @@
 import Foundation
 
 protocol DeviceIdleStateProvider {
-    
+
     func secondsSinceLastEvent() -> TimeInterval
-    
+
 }

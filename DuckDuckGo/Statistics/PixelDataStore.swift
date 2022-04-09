@@ -16,8 +16,8 @@
 //  limitations under the License.
 //
 
-import Foundation
 import CoreData
+import Foundation
 
 protocol PixelDataStore {
 
@@ -31,7 +31,7 @@ protocol PixelDataStore {
     func set(_ value: String, forKey: String, completionHandler: ((Error?) -> Void)?)
 
     func removeValue(forKey key: String, completionHandler: ((Error?) -> Void)?)
-    
+
 }
 
 extension PixelDataStore {
@@ -55,13 +55,16 @@ extension PixelDataStore {
 extension PixelData {
     fileprivate static let sharedPixelDataStore = LocalPixelDataStore<PixelData>()
 }
-private extension LocalPixelDataStore where T == PixelData {
-    convenience init() {
-        self.init(context: Database.shared.makeContext(concurrencyType: .mainQueueConcurrencyType, name: "PixelData"),
-                  updateModel: PixelData.update,
-                  entityName: PixelData.className())
+
+extension LocalPixelDataStore where T == PixelData {
+    fileprivate convenience init() {
+        self.init(
+            context: Database.shared.makeContext(concurrencyType: .mainQueueConcurrencyType, name: "PixelData"),
+            updateModel: PixelData.update,
+            entityName: PixelData.className())
     }
 }
+
 enum PixelDataStoreError: Error {
     case objectNotFound
 }
@@ -99,12 +102,12 @@ final class LocalPixelDataStore<T: NSManagedObject>: PixelDataStore {
     }
 
     private func predicate(forKey key: String) -> NSPredicate {
-        return NSPredicate(format: "key = %@", key)
+        NSPredicate(format: "key = %@", key)
     }
 
     private func update(record: PixelDataRecord, completionHandler: ((Error?) -> Void)?) {
         cache[record.key] = record.value
-        let predicate = self.predicate(forKey: record.key)
+        let predicate = predicate(forKey: record.key)
 
         func mainQueueCompletion(_ error: Error?) {
             guard completionHandler != nil else { return }
@@ -140,15 +143,15 @@ final class LocalPixelDataStore<T: NSManagedObject>: PixelDataStore {
     }
 
     func value(forKey key: String) -> Double? {
-        return (cache[key] as? NSNumber)?.doubleValue
+        (cache[key] as? NSNumber)?.doubleValue
     }
 
     func value(forKey key: String) -> Int? {
-        return (cache[key] as? NSNumber)?.intValue
+        (cache[key] as? NSNumber)?.intValue
     }
 
     func value(forKey key: String) -> String? {
-        return cache[key] as? String
+        cache[key] as? String
     }
 
     func set(_ value: Double, forKey key: String, completionHandler: ((Error?) -> Void)?) {
@@ -164,8 +167,8 @@ final class LocalPixelDataStore<T: NSManagedObject>: PixelDataStore {
     }
 
     func removeValue(forKey key: String, completionHandler: ((Error?) -> Void)?) {
-        self.cache.removeValue(forKey: key)
-        let predicate = self.predicate(forKey: key)
+        cache.removeValue(forKey: key)
+        let predicate = predicate(forKey: key)
 
         func mainQueueCompletion(_ error: Error?) {
             guard completionHandler != nil else { return }
@@ -185,7 +188,7 @@ final class LocalPixelDataStore<T: NSManagedObject>: PixelDataStore {
                 let deletedObjects = result?.result as? [NSManagedObjectID] ?? []
                 let changes: [AnyHashable: Any] = [NSDeletedObjectsKey: deletedObjects]
                 NSManagedObjectContext.mergeChanges(fromRemoteContextSave: changes, into: [context])
-                
+
                 mainQueueCompletion(nil)
             } catch {
                 mainQueueCompletion(error)

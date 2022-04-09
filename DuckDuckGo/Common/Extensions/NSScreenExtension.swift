@@ -25,12 +25,13 @@ extension NSScreen {
     }
 
     func convert(_ point: NSPoint) -> NSPoint {
-        return NSPoint(x: point.x - self.frame.origin.x,
-                       y: point.y - self.frame.origin.y)
+        NSPoint(
+            x: point.x - frame.origin.x,
+            y: point.y - frame.origin.y)
     }
 
     func convert(_ rect: NSRect) -> NSRect {
-        return NSRect(origin: self.convert(rect.origin), size: rect.size)
+        NSRect(origin: convert(rect.origin), size: rect.size)
     }
 
 }

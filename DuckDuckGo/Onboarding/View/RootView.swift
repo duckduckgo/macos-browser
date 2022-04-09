@@ -20,46 +20,46 @@ import SwiftUI
 
 extension Onboarding {
 
-struct RootView: View {
+    struct RootView: View {
 
-    @EnvironmentObject var model: OnboardingViewModel
-    @State var showOnboardingFlow = false
-    @State var showBackgroundImage = false
+        @EnvironmentObject var model: OnboardingViewModel
+        @State var showOnboardingFlow = false
+        @State var showBackgroundImage = false
 
-    var body: some View {
+        var body: some View {
 
-        ZStack(alignment: .bottom) {
+            ZStack(alignment: .bottom) {
 
-            Rectangle()
-                .frame(maxWidth: .infinity, maxHeight: .infinity)
-                .foregroundColor(.white)
-                .visibility(showBackgroundImage ? .invisible : .visible)
+                Rectangle()
+                    .frame(maxWidth: .infinity, maxHeight: .infinity)
+                    .foregroundColor(.white)
+                    .visibility(showBackgroundImage ? .invisible : .visible)
 
-            OnboardingFlow()
-                .visibility(showOnboardingFlow ? .visible : .gone)
-                .frame(maxWidth: .infinity, maxHeight: .infinity)
+                OnboardingFlow()
+                    .visibility(showOnboardingFlow ? .visible : .gone)
+                    .frame(maxWidth: .infinity, maxHeight: .infinity)
 
-        }
-        .frame(maxWidth: .infinity, maxHeight: .infinity)
-        .onAppear {
+            }
+            .frame(maxWidth: .infinity, maxHeight: .infinity)
+            .onAppear {
 
-            if model.state == .startBrowsing {
-                showOnboardingFlow = true
-                showBackgroundImage = true
-                return
+                if model.state == .startBrowsing {
+                    showOnboardingFlow = true
+                    showBackgroundImage = true
+                    return
+                }
+
+                withAnimation {
+                    showOnboardingFlow = true
+                }
+
+                withAnimation(.easeIn.delay(0.3)) {
+                    showBackgroundImage = true
+                }
             }
 
-            withAnimation {
-                showOnboardingFlow = true
-            }
-
-            withAnimation(.easeIn.delay(0.3)) {
-                showBackgroundImage = true
-            }
         }
 
     }
-
-}
 
 }

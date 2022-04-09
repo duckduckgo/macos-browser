@@ -21,14 +21,15 @@ import BrowserServicesKit
 extension EmailManagerRequestDelegate {
 
     // swiftlint:disable function_parameter_count
-    func emailManager(_ emailManager: EmailManager,
-                      requested url: URL,
-                      method: String,
-                      headers: [String: String],
-                      parameters: [String: String]?,
-                      httpBody: Data?,
-                      timeoutInterval: TimeInterval,
-                      completion: @escaping (Data?, Error?) -> Void) {
+    func emailManager(
+        _: EmailManager,
+        requested url: URL,
+        method: String,
+        headers: [String: String],
+        parameters: [String: String]?,
+        httpBody: Data?,
+        timeoutInterval: TimeInterval,
+        completion: @escaping (Data?, Error?) -> Void) {
         let currentQueue = OperationQueue.current
 
         let finalURL: URL
@@ -43,7 +44,7 @@ extension EmailManagerRequestDelegate {
         request.allHTTPHeaderFields = headers
         request.httpMethod = method
         request.httpBody = httpBody
-        URLSession.default.dataTask(with: request) { (data, _, error) in
+        URLSession.default.dataTask(with: request) { data, _, error in
             currentQueue?.addOperation {
                 completion(data, error)
             }

@@ -166,22 +166,22 @@ final class WebCacheManagerTests: XCTestCase {
         var records = [WKWebsiteDataRecord]()
         var removeDataCalledCount = 0
 
-        func dataRecords(ofTypes dataTypes: Set<String>) async -> [WKWebsiteDataRecord] {
-            return records
+        func dataRecords(ofTypes _: Set<String>) async -> [WKWebsiteDataRecord] {
+            records
         }
 
-        func removeData(ofTypes dataTypes: Set<String>, modifiedSince date: Date) async {
+        func removeData(ofTypes dataTypes: Set<String>, modifiedSince _: Date) async {
             removeDataCalledCount += 1
 
             // In the real implementation, records will be selectively removed or edited based on their Fireproof status. For simplicity in this test,
             // only remove records if all data types are removed, so that we can tell whether records for given domains still exist in some form.
             if dataTypes == WKWebsiteDataStore.allWebsiteDataTypes() {
-                self.records = records.filter {
+                records = records.filter {
                     dataTypes == $0.dataTypes
                 }
             }
         }
-        
+
         func removeData(ofTypes dataTypes: Set<String>, for records: [WKWebsiteDataRecord]) async {
             removeDataCalledCount += 1
 
@@ -194,7 +194,7 @@ final class WebCacheManagerTests: XCTestCase {
             }
         }
 
-        func removeData(ofTypes dataTypes: Set<String>, modifiedSince date: Date, completionHandler: @escaping () -> Void) {
+        func removeData(ofTypes _: Set<String>, modifiedSince _: Date, completionHandler: @escaping () -> Void) {
             removeDataCalledCount += 1
 
             completionHandler()
@@ -221,7 +221,7 @@ final class WebCacheManagerTests: XCTestCase {
 
         init(recordName: String, types: Set<String> = WKWebsiteDataStore.allWebsiteDataTypes()) {
             self.recordName = recordName
-            self.recordTypes = types
+            recordTypes = types
         }
 
         override var displayName: String {
@@ -243,7 +243,7 @@ final class WebCacheManagerTests: XCTestCase {
         }
 
         func allCookies() async -> [HTTPCookie] {
-            return cookies
+            cookies
         }
 
         func setCookie(_ cookie: HTTPCookie) async {
