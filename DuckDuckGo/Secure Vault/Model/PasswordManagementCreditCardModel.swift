@@ -32,7 +32,6 @@ final class PasswordManagementCreditCardModel: ObservableObject, PasswordManagem
     var onDirtyChanged: (Bool) -> Void
     var onSaveRequested: (Model) -> Void
     var onDeleteRequested: (Model) -> Void
-    var onCancelled: () -> Void
 
     var isEditingPublisher: Published<Bool>.Publisher {
         return $isEditing
@@ -106,12 +105,10 @@ final class PasswordManagementCreditCardModel: ObservableObject, PasswordManagem
 
     init(onDirtyChanged: @escaping (Bool) -> Void,
          onSaveRequested: @escaping (SecureVaultModels.CreditCard) -> Void,
-         onDeleteRequested: @escaping (SecureVaultModels.CreditCard) -> Void,
-         onCancelled: @escaping () -> Void) {
+         onDeleteRequested: @escaping (SecureVaultModels.CreditCard) -> Void) {
         self.onDirtyChanged = onDirtyChanged
         self.onSaveRequested = onSaveRequested
         self.onDeleteRequested = onDeleteRequested
-        self.onCancelled = onCancelled
     }
 
     func copy(_ value: String) {
@@ -137,8 +134,6 @@ final class PasswordManagementCreditCardModel: ObservableObject, PasswordManagem
             card = nil
             isNew = false
         }
-
-        onCancelled()
     }
 
     func save() {
