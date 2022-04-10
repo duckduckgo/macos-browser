@@ -12,7 +12,7 @@ print_usage_and_exit() {
 }
 
 clean_keychain() {
-    while security delete-generic-password -s ddg-macos-app-archive-script >/dev/null 2>&1; do
+    while security delete-generic-password -s "${KEYCHAIN_SERVICE_NAME}" >/dev/null 2>&1; do
         true
     done
     echo "Removed keychain entries used by the script."
@@ -20,19 +20,16 @@ clean_keychain() {
 }
 
 set_up_environment() {
-    CWD="$(dirname "$0")"
-    XCPRETTY="xcpretty"
+    KEYCHAIN_SERVICE_NAME="ddg-macos-app-archive-script"
     WORKDIR="${PWD}/release"
     ARCHIVE="${WORKDIR}/DuckDuckGo.xcarchive"
-    NOTARIZATION_ZIP_PATH="${WORKDIR}/DuckDuckGo-for-notarization.zip"
     NOTARIZATION_INFO_PLIST="${WORKDIR}/notarization-info.plist"
-    NOTARIZATION_STATUS_INFO_PLIST="${WORKDIR}/notarization-status-info.plist"
 
-    if [ $# -lt 1 ]; then
+    if (( $# < 1 )); then
         print_usage_and_exit
     fi
 
-    case $1 in
+    case "$1" in
         review)
             APP_NAME="DuckDuckGo Review"
             SCHEME="Product Review Release"
@@ -52,36 +49,46 @@ set_up_environment() {
             ;;
     esac
 
+    local cwd
+    cwd="$(dirname "$0")"
     if [[ -z $CI ]]; then
-        EXPORT_OPTIONS_PLIST="${CWD}/ExportOptions.plist"
+        EXPORT_OPTIONS_PLIST="${cwd}/ExportOptions.plist"
     else
-        EXPORT_OPTIONS_PLIST="${CWD}/ExportOptions_CI.plist"
+        EXPORT_OPTIONS_PLIST="${cwd}/ExportOptions_CI.plist"
         CONFIGURATION="CI_${CONFIGURATION}"
     fi
 
     APP_PATH="${WORKDIR}/${APP_NAME}.app"
+    DSYM_PATH="${ARCHIVE}/dSYMs/${APP_NAME}.app.dSYM"
+
+    OUTPUT_APP_ZIP_PATH="${WORKDIR}/DuckDuckGo.zip"
+    OUTPUT_DSYM_ZIP_PATH="${WORKDIR}/${APP_NAME}.app.dSYM.zip"
 }
 
 user_has_password_in_keychain() {
+    local account="$1"
     security find-generic-password \
-        -s ddg-macos-app-archive-script \
-        -a "$1" \
+        -s "${KEYCHAIN_SERVICE_NAME}" \
+        -a "${account}" \
         >/dev/null 2>&1
 }
 
 retrieve_password_from_keychain() {
+    local account="$1"
     security find-generic-password \
-        -s ddg-macos-app-archive-script \
-        -a "$1" \
+        -s "${KEYCHAIN_SERVICE_NAME}" \
+        -a "${account}" \
         -w \
         2>&1
 }
 
 store_password_in_keychain() {
+    local account="$1"
+    local password="$2"
     security add-generic-password \
-        -s ddg-macos-app-archive-script \
-        -a "$1" \
-        -w "$2"
+        -s "${KEYCHAIN_SERVICE_NAME}" \
+        -a "${account}" \
+        -w "${password}"
 }
 
 get_developer_credentials() {
@@ -126,28 +133,34 @@ clean_working_directory() {
     mkdir -p "${WORKDIR}"
 }
 
+prepare_export_options_in_ci() {
+    if [[ -n $CI ]]; then
+        local signing_certificate
+        local team_id
+        
+        signing_certificate=$(security find-certificate -Z -c "Developer ID Application:" | grep "SHA-1" | awk 'NF { print $NF }')
+        team_id=$(security find-certificate -c "Developer ID Application:" | grep "alis" | awk 'NF { print $NF }' | tr -d \(\)\")
+
+        plutil -replace signingCertificate -string "${signing_certificate}" "${EXPORT_OPTIONS_PLIST}"
+        plutil -replace teamID -string "${team_id}" "${EXPORT_OPTIONS_PLIST}"
+    fi
+}
+
 check_xcpretty() {
     if ! command -v xcpretty &> /dev/null; then
         echo
         echo "xcpretty not found - not prettifying Xcode logs. You can install it using 'gem install xcpretty'."
         echo
-        XCPRETTY='tee'
-    fi
-}
-
-prepare_export_options() {
-    if [[ -z $CI ]]; then
-        :
+        xcpretty='tee'
     else
-        SIGNING_CERTIFICATE=$(security find-certificate -Z -c "Developer ID Application:" | grep "SHA-1" | awk 'NF { print $NF }')
-        TEAM_ID=$(security find-certificate -c "Developer ID Application:" | grep "alis" | awk 'NF { print $NF }' | tr -d \(\)\")
-
-        plutil -replace signingCertificate -string "${SIGNING_CERTIFICATE}" "${EXPORT_OPTIONS_PLIST}"
-        plutil -replace teamID -string "${TEAM_ID}" "${EXPORT_OPTIONS_PLIST}"
+        xcpretty='xcpretty'
     fi
 }
 
 archive_and_export() {
+    local xcpretty
+    check_xcpretty
+
     echo
     echo "Building and archiving the app ..."
     echo
@@ -155,21 +168,21 @@ archive_and_export() {
     xcrun xcodebuild archive \
         -scheme "${SCHEME}" \
         -configuration "${CONFIGURATION}" \
-        -archivePath "${WORKDIR}/DuckDuckGo" \
-        | ${XCPRETTY}
+        -archivePath "${ARCHIVE}" \
+        | ${xcpretty}
 
     echo
     echo "Exporting archive ..."
     echo
 
-    prepare_export_options
+    prepare_export_options_in_ci
 
     xcrun xcodebuild -exportArchive \
         -archivePath "${ARCHIVE}" \
         -exportPath "${WORKDIR}" \
         -exportOptionsPlist "${EXPORT_OPTIONS_PLIST}" \
         -configuration "${CONFIGURATION}" \
-        | ${XCPRETTY}
+        | ${xcpretty}
 }
 
 altool_upload() {
@@ -177,16 +190,18 @@ altool_upload() {
         --primary-bundle-id "com.duckduckgo.macos.browser" \
         -u "${DEVELOPER_APPLE_ID}" \
         -p "${DEVELOPER_PASSWORD}" \
-        -f "${NOTARIZATION_ZIP_PATH}" \
+        -f "${notarization_zip_path}" \
         --output-format xml \
         2>/dev/null \
         > "${NOTARIZATION_INFO_PLIST}"
 }
 
 upload_for_notarization() {
-    ditto -c -k --keepParent "${APP_PATH}" "${NOTARIZATION_ZIP_PATH}"
+    local notarization_zip_path="${WORKDIR}/DuckDuckGo-for-notarization.zip"
 
-    retries=3
+    ditto -c -k --keepParent "${APP_PATH}" "${notarization_zip_path}"
+
+    local retries=3
     while true; do
         echo
         printf '%s' "Uploading app for notarization ... "
@@ -196,10 +211,10 @@ upload_for_notarization() {
             break
         else
             echo "Failed to upload, retrying ..."
-            retries=$((retries-1))
+            retries=$(( retries - 1 ))
         fi
 
-        if [[ $retries -eq 0 ]]; then
+        if (( retries == 0 )); then
             echo "Maximum number of retries reached."
             exit 1
         fi
@@ -212,7 +227,7 @@ get_notarization_info() {
 }
 
 get_notarization_status() {
-    /usr/libexec/PlistBuddy -c "Print :notarization-info:Status" "${NOTARIZATION_STATUS_INFO_PLIST}"
+    /usr/libexec/PlistBuddy -c "Print :notarization-info:Status" "${notarization_status_info_plist}"
 }
 
 altool_check_notarization_status () {
@@ -221,10 +236,12 @@ altool_check_notarization_status () {
         -p "${DEVELOPER_PASSWORD}" \
         --output-format xml \
         2>/dev/null \
-        > "${NOTARIZATION_STATUS_INFO_PLIST}"
+        > "${notarization_status_info_plist}"
 }
 
 wait_for_notarization() {
+    local notarization_status_info_plist="${WORKDIR}/notarization-status-info.plist"
+
     echo "Checking notarization status ..."
     while true; do
         if altool_check_notarization_status; then
@@ -250,15 +267,14 @@ compress_app_and_dsym() {
     echo
     echo "Compressing app and dSYMs ..."
     echo
-    ditto -c -k --keepParent "${APP_PATH}" "${WORKDIR}/DuckDuckGo.zip"
-    ditto -c -k --keepParent "${ARCHIVE}/dSYMs/${APP_NAME}.app.dSYM" "${WORKDIR}/${APP_NAME}.app.dSYM.zip"
+    ditto -c -k --keepParent "${APP_PATH}" "${OUTPUT_APP_ZIP_PATH}"
+    ditto -c -k --keepParent "${DSYM_PATH}" "${OUTPUT_DSYM_ZIP_PATH}"
 }
 
 main() {
     set_up_environment "$@"
     get_developer_credentials
     clean_working_directory
-    check_xcpretty
     archive_and_export
     upload_for_notarization
     wait_for_notarization
@@ -267,8 +283,8 @@ main() {
 
     echo
     echo "Notarized app ready at ${APP_PATH}"
-    echo "Compressed app ready at ${WORKDIR}/DuckDuckGo.zip"
-    echo "Compressed debug symbols ready at ${WORKDIR}/${APP_NAME}.app.dSYM.zip"
+    echo "Compressed app ready at ${OUTPUT_APP_ZIP_PATH}"
+    echo "Compressed debug symbols ready at ${OUTPUT_DSYM_ZIP_PATH}"
 
     if [[ -z $CI ]]; then
         open "${WORKDIR}"
