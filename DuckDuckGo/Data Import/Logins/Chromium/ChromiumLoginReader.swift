@@ -27,12 +27,18 @@ final class ChromiumLoginReader {
         case decryptionFailed
     }
 
-    private let chromiumLoginDirectoryPath: String
+    private let chromiumLocalLoginDirectoryPath: String
+    private let chromiumGoogleAccountLoginDirectoryPath: String
     private let processName: String
     private let decryptionKey: String?
 
+    private static let sqlSelectWithPasswordTimestamp = "SELECT signon_realm, username_value, password_value, date_password_modified FROM logins;"
+    private static let sqlSelectWithCreatedTimestamp = "SELECT signon_realm, username_value, password_value, date_created FROM logins;"
+    private static let sqlSelectWithoutTimestamp = "SELECT signon_realm, username_value, password_value FROM logins;"
+
     init(chromiumDataDirectoryPath: String, processName: String, decryptionKey: String? = nil) {
-        self.chromiumLoginDirectoryPath = chromiumDataDirectoryPath + "/Login Data"
+        self.chromiumLocalLoginDirectoryPath = chromiumDataDirectoryPath + "/Login Data"
+        self.chromiumGoogleAccountLoginDirectoryPath = chromiumDataDirectoryPath + "/Login Data For Account"
         self.processName = processName
         self.decryptionKey = decryptionKey
     }
@@ -42,33 +48,78 @@ final class ChromiumLoginReader {
             return .failure(.decryptionFailed)
         }
 
-        var importedLogins = [ImportedLoginCredential]()
+        let loginFilePaths = [chromiumLocalLoginDirectoryPath, chromiumGoogleAccountLoginDirectoryPath]
+            .filter { FileManager.default.fileExists(atPath: $0) }
 
-        do {
-            let queue = try DatabaseQueue(path: chromiumLoginDirectoryPath)
-
-            try queue.read { database in
-                let loginRows = try ChromiumCredential.fetchAll(database, sql: "SELECT signon_realm, username_value, password_value FROM logins;")
-
-                for row in loginRows {
-                    guard let decryptedPassword = decrypt(passwordData: row.encryptedPassword, with: derivedKey) else {
-                        continue
-                    }
-
-                    let credential = ImportedLoginCredential(
-                        url: row.url,
-                        username: row.username,
-                        password: decryptedPassword
-                    )
-
-                    importedLogins.append(credential)
-                }
-            }
-        } catch {
+        guard !loginFilePaths.isEmpty else {
             return .failure(.databaseAccessFailed)
         }
 
+        var loginRows = [ChromiumCredential.ID: ChromiumCredential]()
+
+        for path in loginFilePaths {
+            do {
+                let queue = try DatabaseQueue(path: path)
+
+                var rows = [ChromiumCredential]()
+
+                try queue.read { database in
+                    rows = try fetchCredentials(from: database)
+                }
+
+                for row in rows {
+                    let existingRowTimestamp = loginRows[row.id]?.passwordModifiedAt
+                    let newRowTimestamp = row.passwordModifiedAt
+
+                    switch (newRowTimestamp, existingRowTimestamp) {
+                    case let (.some(new), .some(existing)) where new > existing:
+                        loginRows[row.id] = row
+                    case (_, .none):
+                        loginRows[row.id] = row
+                    default:
+                        break
+                    }
+                }
+
+            } catch {
+                return .failure(.databaseAccessFailed)
+            }
+        }
+
+        let importedLogins = loginRows.values
+            .compactMap { row -> ImportedLoginCredential? in
+                guard let decryptedPassword = decrypt(passwordData: row.encryptedPassword, with: derivedKey) else {
+                    return nil
+                }
+
+                return ImportedLoginCredential(
+                    url: row.url,
+                    username: row.username,
+                    password: decryptedPassword
+                )
+            }
+
         return .success(importedLogins)
+    }
+
+    private func fetchCredentials(from database: GRDB.Database) throws -> [ChromiumCredential] {
+        do {
+            return try ChromiumCredential.fetchAll(database, sql: Self.sqlSelectWithPasswordTimestamp)
+        } catch let databaseError as DatabaseError {
+            guard databaseError.isMissingColumnError else {
+                throw databaseError
+            }
+
+            do {
+                return try ChromiumCredential.fetchAll(database, sql: Self.sqlSelectWithCreatedTimestamp)
+            } catch let databaseError as DatabaseError {
+                guard databaseError.isMissingColumnError else {
+                    throw databaseError
+                }
+
+                return try ChromiumCredential.fetchAll(database, sql: Self.sqlSelectWithoutTimestamp)
+            }
+        }
     }
 
     // Step 1: Prompt for permission to access the user's Chromium Safe Storage key.
@@ -123,12 +174,16 @@ final class ChromiumLoginReader {
 
 // MARK: - GRDB Fetchable Records
 
-private struct ChromiumCredential {
+private struct ChromiumCredential: Identifiable {
+
+    var id: String {
+        url + username
+    }
 
     let url: String
-    var username: String
-    var encryptedPassword: Data
-
+    let username: String
+    let encryptedPassword: Data
+    let passwordModifiedAt: Int64?
 }
 
 extension ChromiumCredential: FetchableRecord {
@@ -137,6 +192,16 @@ extension ChromiumCredential: FetchableRecord {
         url = row["signon_realm"]
         username = row["username_value"]
         encryptedPassword = row["password_value"]
+        passwordModifiedAt = row["date_password_modified"]
     }
 
+}
+
+fileprivate extension DatabaseError {
+    var isMissingColumnError: Bool {
+        guard let message = message else {
+            return false
+        }
+        return message.hasPrefix("no such column")
+    }
 }

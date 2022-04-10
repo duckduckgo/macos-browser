@@ -30,6 +30,8 @@ enum DataImport {
         case lastPass
         case csv
 
+        static let preferredSources: [Self] = [.chrome, .safari]
+
         var importSourceName: String {
             switch self {
             case .brave:

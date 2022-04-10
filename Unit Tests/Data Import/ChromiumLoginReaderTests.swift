@@ -20,30 +20,67 @@ import Foundation
 import XCTest
 @testable import DuckDuckGo_Privacy_Browser
 
+private struct ChromiumLoginStore {
+    static let legacy: Self = .init(directory: "Legacy", decryptionKey: "0geUdf5dTuZmIrtd8Omf/Q==")
+    static let v32: Self = .init(directory: "v32", decryptionKey: "IcBAbGhvYp70AP+5W5ojcw==")
+
+    let directory: String
+    let decryptionKey: String
+
+    var databaseDirectoryPath: String {
+        let bundle = Bundle(for: ChromiumLoginReaderTests.self)
+        return bundle.resourceURL!
+            .appendingPathComponent("Data Import Resources/Test Chrome Data")
+            .appendingPathComponent(directory)
+            .path
+    }
+}
+
 class ChromiumLoginReaderTests: XCTestCase {
 
-    private let decryptionKey = "0geUdf5dTuZmIrtd8Omf/Q=="
+    func testImportFromVersion32() throws {
+        let reader = ChromiumLoginReader(
+            chromiumDataDirectoryPath: ChromiumLoginStore.v32.databaseDirectoryPath,
+            processName: "Chrome",
+            decryptionKey: ChromiumLoginStore.v32.decryptionKey
+        )
 
-    func testImport() {
-        XCTAssert(true)
+        let loginsResult = reader.readLogins()
 
-        let reader = ChromiumLoginReader(chromiumDataDirectoryPath: databasePath(), processName: "Chrome", decryptionKey: decryptionKey)
-        let logins = reader.readLogins()
+        let logins = try XCTUnwrap(loginsResult.get())
+            .sorted(by: { $0.username < $1.username })
 
-        if case let .success(logins) = logins, let firstLogin = logins.first {
-            XCTAssertEqual(logins.count, 1)
+        XCTAssertEqual(logins.count, 3)
 
-            XCTAssertEqual(firstLogin.url, "news.ycombinator.com")
-            XCTAssertEqual(firstLogin.username, "username")
-            XCTAssertEqual(firstLogin.password, "password")
-        } else {
-            XCTFail("Did not get expected number of logins")
-        }
+        XCTAssertEqual(logins[0].url, "news.ycombinator.com")
+        XCTAssertEqual(logins[0].username, "username32")
+        XCTAssertEqual(logins[0].password, "newerpassword")
+
+        XCTAssertEqual(logins[1].url, "news.ycombinator.com")
+        XCTAssertEqual(logins[1].username, "username32cloud")
+        XCTAssertEqual(logins[1].password, "password")
+
+        XCTAssertEqual(logins[2].url, "news.ycombinator.com")
+        XCTAssertEqual(logins[2].username, "username32local")
+        XCTAssertEqual(logins[2].password, "password")
     }
 
-    private func databasePath() -> String {
-        let bundle = Bundle(for: ChromiumLoginReaderTests.self)
-        return bundle.resourcePath!
-    }
+    func testImportFromLegacyVersion() throws {
 
+        let reader = ChromiumLoginReader(
+            chromiumDataDirectoryPath: ChromiumLoginStore.legacy.databaseDirectoryPath,
+            processName: "Chrome",
+            decryptionKey: ChromiumLoginStore.legacy.decryptionKey
+        )
+
+        let loginsResult = reader.readLogins()
+
+        let logins = try XCTUnwrap(loginsResult.get())
+
+        XCTAssertEqual(logins.count, 1)
+
+        XCTAssertEqual(logins[0].url, "news.ycombinator.com")
+        XCTAssertEqual(logins[0].username, "username")
+        XCTAssertEqual(logins[0].password, "password")
+    }
 }
