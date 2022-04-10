@@ -33,15 +33,12 @@ struct PasswordManagementItemListView: View {
 
     private enum Constants {
         static let dividerFadeInDistance: CGFloat = 100
-        static let coordinateSpace = "frameLayer"
     }
  
     @EnvironmentObject var model: PasswordManagementItemListModel
     
-    @State private var opacity = CGFloat.zero
-
     var body: some View {
-
+        
         VStack(spacing: 0) {
             PasswordManagementItemListCategoryView()
                 .padding(.top, 15)
@@ -51,7 +48,6 @@ struct PasswordManagementItemListView: View {
                 .opacity(model.canChangeCategory ? 1.0 : 0.5)
             
             Divider()
-                .opacity(opacity)
             
             if #available(macOS 11.0, *) {
                 ScrollView {
@@ -65,31 +61,15 @@ struct PasswordManagementItemListView: View {
                                     }
                                 }
                             }
-                            .background(GeometryReader { proxy in
-                                Color.clear.preference(key: ScrollOffsetKey.self, value: -proxy.frame(in: .named(Constants.coordinateSpace)).minY)
-                            })
-                            .onPreferenceChange(ScrollOffsetKey.self) { offset in
-                                if offset <= 0 {
-                                    self.opacity = 0
-                                } else {
-                                    self.opacity = offset / Constants.dividerFadeInDistance
-                                }
-                            }
                     }
                 }
-                .coordinateSpace(name: Constants.coordinateSpace)
             } else {
                 ScrollView {
                     PasswordManagementItemListStackView()
                 }
             }
         }
-        
     }
-    
-//    private func calculateContentOffset(from outsideProxy: GeometryProxy, to insideProxy: GeometryProxy) -> CGFloat {
-//        return outsideProxy.frame(in: .global).minY - insideProxy.frame(in: .global).minY
-//    }
 
 }
 
