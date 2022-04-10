@@ -33,6 +33,7 @@ struct PasswordManagementItemListView: View {
 
     private enum Constants {
         static let dividerFadeInDistance: CGFloat = 100
+        static let coordinateSpace = "frameLayer"
     }
  
     @EnvironmentObject var model: PasswordManagementItemListModel
@@ -53,32 +54,30 @@ struct PasswordManagementItemListView: View {
                 .opacity(opacity)
             
             if #available(macOS 11.0, *) {
-                GeometryReader { outsideProxy in
-                    ScrollView {
-                        ScrollViewReader { proxy in
-                            PasswordManagementItemListStackView()
-                                .onAppear {
-                                    // Scrolling to the selected item doesn't work consistently without a very slight delay.
-                                    DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
-                                        if let selectionID = model.selected?.id {
-                                            proxy.scrollTo(selectionID, anchor: .center)
-                                        }
+                ScrollView {
+                    ScrollViewReader { proxy in
+                        PasswordManagementItemListStackView()
+                            .onAppear {
+                                // Scrolling to the selected item doesn't work consistently without a very slight delay.
+                                DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
+                                    if let selectionID = model.selected?.id {
+                                        proxy.scrollTo(selectionID, anchor: .center)
                                     }
                                 }
-                                .background(GeometryReader { insideProxy in
-                                    Color.clear.preference(key: ScrollOffsetKey.self,
-                                                           value: self.calculateContentOffset(from: outsideProxy, to: insideProxy))
-                                })
-                                .onPreferenceChange(ScrollOffsetKey.self) { offset in
-                                    if offset <= 0 {
-                                        self.opacity = 0
-                                    } else {
-                                        self.opacity = offset / Constants.dividerFadeInDistance
-                                    }
+                            }
+                            .background(GeometryReader { proxy in
+                                Color.clear.preference(key: ScrollOffsetKey.self, value: -proxy.frame(in: .named(Constants.coordinateSpace)).minY)
+                            })
+                            .onPreferenceChange(ScrollOffsetKey.self) { offset in
+                                if offset <= 0 {
+                                    self.opacity = 0
+                                } else {
+                                    self.opacity = offset / Constants.dividerFadeInDistance
                                 }
-                        }
+                            }
                     }
                 }
+                .coordinateSpace(name: Constants.coordinateSpace)
             } else {
                 ScrollView {
                     PasswordManagementItemListStackView()
@@ -88,9 +87,9 @@ struct PasswordManagementItemListView: View {
         
     }
     
-    private func calculateContentOffset(from outsideProxy: GeometryProxy, to insideProxy: GeometryProxy) -> CGFloat {
-        return outsideProxy.frame(in: .global).minY - insideProxy.frame(in: .global).minY
-    }
+//    private func calculateContentOffset(from outsideProxy: GeometryProxy, to insideProxy: GeometryProxy) -> CGFloat {
+//        return outsideProxy.frame(in: .global).minY - insideProxy.frame(in: .global).minY
+//    }
 
 }
 
