@@ -18,6 +18,7 @@
 
 import Foundation
 
+// sourcery: AutoMockable
 protocol DownloadsPreferencesPersistor {
     var selectedDownloadLocation: String? { get set }
     var alwaysRequestDownloadLocation: Bool { get set }

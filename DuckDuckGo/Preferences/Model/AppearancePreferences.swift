@@ -18,6 +18,7 @@
 
 import Foundation
 
+// sourcery: AutoMockable
 protocol AppearancePreferencesPersistor {
     var showFullURL: Bool { get set }
     var currentThemeName: String { get set }

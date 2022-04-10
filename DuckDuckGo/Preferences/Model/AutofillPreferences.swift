@@ -18,6 +18,7 @@
 
 import Foundation
 
+// sourcery: AutoMockable
 protocol AutofillPreferencesPersistor {
     var isAutoLockEnabled: Bool { get set }
     var autoLockThreshold: AutofillAutoLockThreshold { get set }

@@ -37,8 +37,11 @@ final class FileDownloadManagerTests: XCTestCase {
     override func setUp() {
         defaults = UserDefaults(suiteName: testGroupName)!
         defaults.removePersistentDomain(forName: testGroupName)
-        preferences = DownloadsPreferences(persistor: DownloadsPreferencesPersistorMock())
-        preferences.alwaysRequestDownloadLocation = false
+
+        let persistor = DownloadsPreferencesPersistorMock()
+        persistor.alwaysRequestDownloadLocation = false
+        preferences = DownloadsPreferences(persistor: persistor)
+
         self.workspace = TestWorkspace()
         self.dm = FileDownloadManager(workspace: workspace, preferences: preferences)
         let tempDir = fm.temporaryDirectory

@@ -1,0 +1,9 @@
+sources:
+  - DuckDuckGo
+templates:
+  - Sourcery/AutoMockable.stencil
+output:
+  'Unit Tests/Mocks'
+args:
+  autoMockableTestableImports:
+    - DuckDuckGo_Privacy_Browser

@@ -19,47 +19,41 @@
 import XCTest
 @testable import DuckDuckGo_Privacy_Browser
 
-struct AppearancePreferencesPersistorMock: AppearancePreferencesPersistor {
-    var showFullURL: Bool
-    var currentThemeName: String
-
-    init(showFullURL: Bool = false, currentThemeName: String = ThemeName.systemDefault.rawValue) {
-        self.showFullURL = showFullURL
-        self.currentThemeName = currentThemeName
-    }
-}
-
 final class AppearancePreferencesTests: XCTestCase {
+    
+    // swiftlint:disable:next implicitly_unwrapped_optional
+    var persistor: AppearancePreferencesPersistorMock!
+    
+    override func setUpWithError() throws {
+        try super.setUpWithError()
+        
+        persistor = AppearancePreferencesPersistorMock()
+        persistor.showFullURL = false
+        persistor.currentThemeName = ThemeName.systemDefault.rawValue
+    }
 
     func testWhenInitializedThenItLoadsPersistedValues() throws {
-        var model = AppearancePreferences(
-            persistor: AppearancePreferencesPersistorMock(
-                showFullURL: false,
-                currentThemeName: ThemeName.systemDefault.rawValue
-            )
-        )
+        persistor.showFullURL = false
+        persistor.currentThemeName = ThemeName.systemDefault.rawValue
+
+        var model = AppearancePreferences(persistor: persistor)
 
         XCTAssertEqual(model.showFullURL, false)
         XCTAssertEqual(model.currentThemeName, ThemeName.systemDefault)
 
-        model = AppearancePreferences(
-            persistor: AppearancePreferencesPersistorMock(
-                showFullURL: true,
-                currentThemeName: ThemeName.light.rawValue
-            )
-        )
+        persistor.showFullURL = true
+        persistor.currentThemeName = ThemeName.light.rawValue
+        model = AppearancePreferences(persistor: persistor)
 
         XCTAssertEqual(model.showFullURL, true)
         XCTAssertEqual(model.currentThemeName, ThemeName.light)
     }
 
     func testWhenInitializedWithGarbageThenThemeIsSetToSystemDefault() throws {
-        let model = AppearancePreferences(
-            persistor: AppearancePreferencesPersistorMock(
-                showFullURL: false,
-                currentThemeName: "garbage"
-            )
-        )
+        persistor.showFullURL = false
+        persistor.currentThemeName = "garbage"
+
+        let model = AppearancePreferences(persistor: persistor)
 
         XCTAssertEqual(model.currentThemeName, ThemeName.systemDefault)
     }
@@ -71,7 +65,7 @@ final class AppearancePreferencesTests: XCTestCase {
     }
 
     func testWhenThemeNameIsUpdatedThenApplicationAppearanceIsUpdated() throws {
-        let model = AppearancePreferences(persistor: AppearancePreferencesPersistorMock())
+        let model = AppearancePreferences(persistor: persistor)
 
         model.currentThemeName = ThemeName.systemDefault
         XCTAssertEqual(NSApp.appearance?.name, ThemeName.systemDefault.appearance?.name)

@@ -26,6 +26,7 @@ extension NSNotification.Name {
 
 }
 
+// sourcery: AutoMockable
 protocol UserAuthenticating {
     func authenticateUser(reason: DeviceAuthenticator.AuthenticationReason, result: @escaping (DeviceAuthenticationResult) -> Void)
 }

@@ -19,43 +19,26 @@
 import XCTest
 @testable import DuckDuckGo_Privacy_Browser
 
-struct DownloadsPreferencesPersistorMock: DownloadsPreferencesPersistor {
-    var selectedDownloadLocation: String?
-    var alwaysRequestDownloadLocation: Bool
-    var defaultDownloadLocation: URL?
-    // swiftlint:disable:next identifier_name
-    var _isDownloadLocationValid: (URL) -> Bool
-
-    func isDownloadLocationValid(_ location: URL) -> Bool {
-        _isDownloadLocationValid(location)
-    }
-
-    init(
-        selectedDownloadLocation: String? = nil,
-        alwaysRequestDownloadLocation: Bool = false,
-        defaultDownloadLocation: URL? = FileManager.default.temporaryDirectory,
-        isDownloadLocationValid: @escaping (URL) -> Bool = { _ in true }
-    ) {
-        self.selectedDownloadLocation = selectedDownloadLocation
-        self.alwaysRequestDownloadLocation = alwaysRequestDownloadLocation
-        self.defaultDownloadLocation = defaultDownloadLocation
-        self._isDownloadLocationValid = isDownloadLocationValid
-    }
-}
-
 class DownloadsPreferencesTests: XCTestCase {
 
     static let defaultTestDirectoryName = "DownloadsPreferencesTests"
+    
+    // swiftlint:disable:next implicitly_unwrapped_optional
+    var persistor: DownloadsPreferencesPersistorMock!
 
     override func setUpWithError() throws {
         try super.setUpWithError()
+
+        persistor = DownloadsPreferencesPersistorMock()
+        persistor.alwaysRequestDownloadLocation = false
+        persistor.defaultDownloadLocation = FileManager.default.temporaryDirectory
+        persistor.isDownloadLocationValidClosure = { _ in true }
 
         deleteTemporaryTestDirectory()
     }
 
     func testWhenSettingNilDownloadLocationThenDefaultDownloadLocationIsReturned() {
         let testDirectory = createTemporaryTestDirectory()
-        let persistor = DownloadsPreferencesPersistorMock(selectedDownloadLocation: nil)
         let preferences = DownloadsPreferences(persistor: persistor)
 
         preferences.selectedDownloadLocation = testDirectory
@@ -66,7 +49,6 @@ class DownloadsPreferencesTests: XCTestCase {
     }
 
     func testWhenDownloadLocationIsNotPersistedThenDefaultDownloadLocationIsReturned() {
-        let persistor = DownloadsPreferencesPersistorMock(selectedDownloadLocation: nil)
         let preferences = DownloadsPreferences(persistor: persistor)
 
         XCTAssertEqual(preferences.effectiveDownloadLocation, DownloadsPreferences.defaultDownloadLocation())
@@ -74,7 +56,7 @@ class DownloadsPreferencesTests: XCTestCase {
 
     func testWhenDownloadLocationIsNotWritableThenDefaultDownloadLocationIsReturned() {
         let testDirectory = createTemporaryTestDirectory()
-        let persistor = DownloadsPreferencesPersistorMock(selectedDownloadLocation: testDirectory.absoluteString)
+        persistor.selectedDownloadLocation = testDirectory.absoluteString
         let preferences = DownloadsPreferences(persistor: persistor)
 
         let invalidDownloadLocationURL = FileManager.default.temporaryDirectory.appendingPathComponent("InvalidDownloadLocation")
@@ -86,7 +68,7 @@ class DownloadsPreferencesTests: XCTestCase {
 
     func testWhenGettingSelectedDownloadLocationAndSelectedLocationIsInaccessibleThenDefaultDownloadLocationIsReturned() {
         let testDirectory = createTemporaryTestDirectory()
-        let persistor = DownloadsPreferencesPersistorMock(selectedDownloadLocation: testDirectory.absoluteString)
+        persistor.selectedDownloadLocation = testDirectory.absoluteString
         let preferences = DownloadsPreferences(persistor: persistor)
 
         deleteTemporaryTestDirectory()
