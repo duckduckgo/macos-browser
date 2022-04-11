@@ -56,7 +56,7 @@ final class DownloadsViewController: NSViewController {
                 guard let self = self else { return }
                 let diff = value.new.difference(from: value.old) { $0.id == $1.id }
                 guard !diff.isEmpty else { return }
-                
+
                 self.tableView.beginUpdates()
                 for change in diff {
                     switch change {
@@ -69,7 +69,7 @@ final class DownloadsViewController: NSViewController {
                 self.tableView.reloadData(forRowIndexes: IndexSet(integer: value.new.count), columnIndexes: IndexSet(integer: 0))
                 self.tableView.endUpdates()
                 self.updateHeight()
-        }
+            }
         tableView.reloadData()
         updateHeight()
     }
@@ -104,7 +104,7 @@ final class DownloadsViewController: NSViewController {
     // MARK: User Actions
 
     @IBAction func openDownloadsFolderAction(_ sender: Any) {
-        guard let url = DownloadPreferences().selectedDownloadLocation
+        guard let url = DownloadsPreferences().effectiveDownloadLocation
                 ?? FileManager.default.urls(for: .downloadsDirectory, in: .userDomainMask).first
         else {
             return

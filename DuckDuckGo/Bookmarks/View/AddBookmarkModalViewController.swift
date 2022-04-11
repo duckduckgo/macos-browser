@@ -27,6 +27,19 @@ protocol AddBookmarkModalViewControllerDelegate: AnyObject {
 
 final class AddBookmarkModalViewController: NSViewController {
 
+    struct WebsiteInfo {
+        let url: URL
+        let title: String?
+
+        init?(_ tab: Tab) {
+            guard case let .url(url) = tab.content else {
+                return nil
+            }
+            self.url = url
+            self.title = tab.title
+        }
+    }
+
     enum Constants {
         static let storyboardName = "Bookmarks"
         static let identifier = "AddBookmarkModalViewController"
@@ -35,6 +48,14 @@ final class AddBookmarkModalViewController: NSViewController {
     static func create() -> AddBookmarkModalViewController {
         let storyboard = NSStoryboard(name: Constants.storyboardName, bundle: nil)
         return storyboard.instantiateController(identifier: Constants.identifier)
+    }
+
+    var currentTabWebsite: WebsiteInfo? {
+        didSet {
+            if isViewLoaded {
+                updateWithCurrentTabWebsite()
+            }
+        }
     }
 
     @IBOutlet var titleTextField: NSTextField!
@@ -54,7 +75,7 @@ final class AddBookmarkModalViewController: NSViewController {
 
     override func viewDidLoad() {
         super.viewDidLoad()
-        updateAddButton()
+        updateWithCurrentTabWebsite()
     }
 
     override func viewWillAppear() {
@@ -77,6 +98,14 @@ final class AddBookmarkModalViewController: NSViewController {
 
     private func updateAddButton() {
         addButton.isEnabled = hasValidInput
+    }
+
+    private func updateWithCurrentTabWebsite() {
+        if let website = currentTabWebsite, !LocalBookmarkManager.shared.isUrlBookmarked(url: website.url) {
+            titleTextField.stringValue = website.title ?? ""
+            urlTextField.stringValue = website.url.absoluteString
+        }
+        updateAddButton()
     }
 
 }

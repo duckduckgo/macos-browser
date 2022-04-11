@@ -26,6 +26,6 @@ enum BookmarkImportSource {
 
 protocol BookmarkImporter {
 
-    func importBookmarks(_ bookmarks: ImportedBookmarks, source: BookmarkImportSource) throws -> DataImport.Summary
+    func importBookmarks(_ bookmarks: ImportedBookmarks, source: BookmarkImportSource) throws -> BookmarkImportResult
 
 }

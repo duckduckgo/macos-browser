@@ -220,7 +220,8 @@ fileprivate extension HistoryEntry {
                   lastVisit: lastVisit,
                   failedToLoad: historyMO.failedToLoad,
                   numberOfTrackersBlocked: Int(numberOfTrackersBlocked),
-                  blockedTrackingEntities: Set<String>(blockedTrackingEntities.components(separatedBy: "|")))
+                  blockedTrackingEntities: Set<String>(blockedTrackingEntities.components(separatedBy: "|")),
+                  trackersFound: historyMO.trackersFound)
     }
 
 }
@@ -245,6 +246,7 @@ fileprivate extension HistoryEntryManagedObject {
         failedToLoad = entry.failedToLoad
         numberOfTrackersBlocked = Int64(entry.numberOfTrackersBlocked)
         blockedTrackingEntities = entry.blockedTrackingEntities.isEmpty ? "" : entry.blockedTrackingEntities.joined(separator: "|")
+        trackersFound = entry.trackersFound
     }
 
 }

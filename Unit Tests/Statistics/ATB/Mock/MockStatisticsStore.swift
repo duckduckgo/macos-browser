@@ -30,10 +30,10 @@ final class MockStatisticsStore: StatisticsStore {
 
     var variant: String?
     var lastAppRetentionRequestDate: Date?
-    
+
     var waitlistUnlocked: Bool = false
-    
+
     var autoLockEnabled: Bool = true
-    var autoLockThreshold: String? = LoginsPreferences.AutoLockThreshold.fifteenMinutes.rawValue
+    var autoLockThreshold: String? = AutofillAutoLockThreshold.fifteenMinutes.rawValue
 
 }

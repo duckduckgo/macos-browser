@@ -275,13 +275,9 @@ private struct WebsiteView: View {
 
         } else {
             if let domainURL = model.domain.url {
-                Button {
+                TextButton(model.domain) {
                     model.openURL(domainURL)
-                } label: {
-                    Text(model.domain)
-                        .foregroundColor(Color("LinkBlueColor"))
                 }
-                .buttonStyle(.plain)
                 .padding(.bottom, interItemSpacing)
             } else {
                 Text(model.domain)

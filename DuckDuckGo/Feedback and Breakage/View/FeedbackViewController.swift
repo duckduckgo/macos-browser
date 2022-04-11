@@ -276,13 +276,18 @@ final class FeedbackViewController: NSViewController {
         case .websiteBreakage:
             let blockedTrackerDomains = currentTab?.trackerInfo?.trackersBlocked.compactMap { $0.domain } ?? []
             let installedSurrogates = currentTab?.trackerInfo?.installedSurrogates.map {$0} ?? []
+            let ampURL = currentTab?.linkProtection.lastAMPURLString ?? ""
+            let urlParametersRemoved = currentTab?.linkProtection.urlParametersRemoved ?? false
             let websiteBreakage = WebsiteBreakage(category: selectedWebsiteBreakageCategory,
                                                   siteUrlString: urlTextField.stringValue,
                                                   osVersion: "\(ProcessInfo.processInfo.operatingSystemVersion)",
                                                   upgradedHttps: currentTab?.connectionUpgradedTo != nil,
                                                   tdsETag: ContentBlocking.shared.contentBlockingManager.currentRules.first?.etag,
                                                   blockedTrackerDomains: blockedTrackerDomains,
-                                                  installedSurrogates: installedSurrogates)
+                                                  installedSurrogates: installedSurrogates,
+                                                  isGPCEnabled: PrivacySecurityPreferences.shared.gpcEnabled,
+                                                  ampURL: ampURL,
+                                                  urlParametersRemoved: urlParametersRemoved)
             websiteBreakageSender.sendWebsiteBreakage(websiteBreakage)
         }
     }

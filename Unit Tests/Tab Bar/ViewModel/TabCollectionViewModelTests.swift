@@ -19,6 +19,7 @@
 import XCTest
 @testable import DuckDuckGo_Privacy_Browser
 
+// swiftlint:disable:next type_body_length
 final class TabCollectionViewModelTests: XCTestCase {
 
     // MARK: - TabViewModel
@@ -49,22 +50,22 @@ final class TabCollectionViewModelTests: XCTestCase {
 
         XCTAssert(tabCollectionViewModel.selectedTabViewModel === tabCollectionViewModel.tabViewModel(at: 0))
     }
-    
+
     func testWhenSelectionIndexIsOutOfBoundsThenSelectedTabViewModelIsNil() {
         let tabCollectionViewModel = TabCollectionViewModel.aTabCollectionViewModel()
-        
+
         tabCollectionViewModel.select(at: 1)
-        
+
         XCTAssertNil(tabCollectionViewModel.selectedTabViewModel)
     }
-    
+
     func testWhenSelectionIndexPointsToTabThenSelectedTabViewModelReturnsTheTab() {
         let tabCollectionViewModel = TabCollectionViewModel.aTabCollectionViewModel()
 
         tabCollectionViewModel.appendNewTab()
         tabCollectionViewModel.appendNewTab()
         tabCollectionViewModel.select(at: 0)
-        
+
         XCTAssert(tabCollectionViewModel.selectedTabViewModel === tabCollectionViewModel.tabViewModel(at: 0))
     }
 
@@ -106,6 +107,46 @@ final class TabCollectionViewModelTests: XCTestCase {
         tabCollectionViewModel.selectPrevious()
 
         XCTAssert(tabCollectionViewModel.selectedTabViewModel === tabCollectionViewModel.tabViewModel(at: 1))
+    }
+
+    func testWhenPreferencesTabIsPresentThenSelectDisplayableTabIfPresentSelectsPreferencesTab() {
+        let tabCollectionViewModel = TabCollectionViewModel.aTabCollectionViewModel()
+        tabCollectionViewModel.tabCollection.append(tab: .init(content: .preferences))
+        tabCollectionViewModel.tabCollection.append(tab: .init(content: .homePage))
+        tabCollectionViewModel.select(at: 0)
+
+        XCTAssertTrue(tabCollectionViewModel.selectDisplayableTabIfPresent(.preferences))
+        XCTAssert(tabCollectionViewModel.selectedTabViewModel === tabCollectionViewModel.tabViewModel(at: 1))
+    }
+
+    func testWhenBookmarksTabIsPresentThenSelectDisplayableTabIfPresentSelectsBookmarksTab() {
+        let tabCollectionViewModel = TabCollectionViewModel.aTabCollectionViewModel()
+        tabCollectionViewModel.tabCollection.append(tab: .init(content: .bookmarks))
+        tabCollectionViewModel.tabCollection.append(tab: .init(content: .homePage))
+        tabCollectionViewModel.select(at: 0)
+
+        XCTAssertTrue(tabCollectionViewModel.selectDisplayableTabIfPresent(.bookmarks))
+        XCTAssert(tabCollectionViewModel.selectedTabViewModel === tabCollectionViewModel.tabViewModel(at: 1))
+    }
+
+    func testSelectDisplayableTabDoesNotChangeSelectionIfDisplayableTabIsNotPresent() {
+        let tabCollectionViewModel = TabCollectionViewModel.aTabCollectionViewModel()
+        tabCollectionViewModel.tabCollection.append(tab: .init(content: .homePage))
+        tabCollectionViewModel.tabCollection.append(tab: .init(content: .homePage))
+        tabCollectionViewModel.select(at: 2)
+
+        XCTAssertFalse(tabCollectionViewModel.selectDisplayableTabIfPresent(.bookmarks))
+        XCTAssert(tabCollectionViewModel.selectedTabViewModel === tabCollectionViewModel.tabViewModel(at: 2))
+    }
+
+    func testSelectDisplayableTabDoesNotChangeSelectionIfDisplayableTabTypeDoesNotMatch() {
+        let tabCollectionViewModel = TabCollectionViewModel.aTabCollectionViewModel()
+        tabCollectionViewModel.tabCollection.append(tab: .init(content: .bookmarks))
+        tabCollectionViewModel.tabCollection.append(tab: .init(content: .homePage))
+        tabCollectionViewModel.select(at: 2)
+
+        XCTAssertFalse(tabCollectionViewModel.selectDisplayableTabIfPresent(.preferences))
+        XCTAssert(tabCollectionViewModel.selectedTabViewModel === tabCollectionViewModel.tabViewModel(at: 2))
     }
 
     // MARK: - Append

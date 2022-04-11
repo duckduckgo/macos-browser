@@ -43,15 +43,3 @@ final class PrivacySecurityPreferences {
     public var autoconsentEnabled: Bool?
 
 }
-
-extension PrivacySecurityPreferences: PreferenceSection {
-    
-    var displayName: String {
-        return UserText.privacyAndSecurity
-    }
-
-    var preferenceIcon: NSImage {
-        return NSImage(named: "Privacy")!
-    }
-
-}

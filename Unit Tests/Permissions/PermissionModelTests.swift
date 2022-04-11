@@ -75,7 +75,7 @@ final class PermissionModelTests: XCTestCase {
         }
         XCTAssertEqual(model.permissions, [.microphone: .active])
     }
-    
+
     func testWhenCameraAndMicIsActivatedThenCameraAndMicPermissionChangesToActive() {
         if #available(macOS 12, *) {
             webView.cameraCaptureState = .active
@@ -297,6 +297,25 @@ final class PermissionModelTests: XCTestCase {
 
         withExtendedLifetime(c) {
             waitForExpectations(timeout: 1)
+        }
+        XCTAssertEqual(model.permissions, [:])
+    }
+
+    func testWhenExternalSchemePermissionQueryIsResetThenItDoesNotTriggerDecisionHandler() {
+        let c = model.$authorizationQuery.sink {
+            if $0 != nil {
+                self.model!.tabDidStartNavigation()
+            }
+        }
+
+        let e = expectation(description: "Permission granted")
+        e.isInverted = true
+        model.permissions([.externalScheme(scheme: "mailto")], requestedForDomain: "test@example.com") { _ in
+            e.fulfill()
+        }
+
+        withExtendedLifetime(c) {
+            waitForExpectations(timeout: 0.1)
         }
         XCTAssertEqual(model.permissions, [:])
     }

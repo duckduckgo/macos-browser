@@ -20,17 +20,13 @@ import Foundation
 
 final class WebsiteBreakageSender {
 
+    static let allowedQueryReservedCharacters =  CharacterSet(charactersIn: ",")
+
     func sendWebsiteBreakage(_ websiteBreakage: WebsiteBreakage) {
-        let parameters: [String: String] = ["category": websiteBreakage.category?.rawValue ?? "",
-                                            "siteUrl": websiteBreakage.siteUrlString,
-                                            "upgradedHttps": websiteBreakage.upgradedHttps ? "true" : "false",
-                                            "tds": websiteBreakage.tdsETag?.trimmingCharacters(in: CharacterSet(charactersIn: "\"")) ?? "",
-                                            "blockedTrackers": websiteBreakage.blockedTrackerDomains.joined(separator: ","),
-                                            "surrogates": websiteBreakage.installedSurrogates.joined(separator: ","),
-                                            "os": websiteBreakage.osVersion,
-                                            "manufacturer": "Apple"]
-
-        Pixel.fire(.brokenSiteReport, withAdditionalParameters: parameters)
+        Pixel.fire(
+            .brokenSiteReport,
+            withAdditionalParameters: websiteBreakage.requestParameters,
+            allowedQueryReservedCharacters: Self.allowedQueryReservedCharacters
+        )
     }
-
 }

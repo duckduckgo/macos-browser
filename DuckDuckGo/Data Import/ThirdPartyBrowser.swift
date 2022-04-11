@@ -35,7 +35,9 @@ enum ThirdPartyBrowser: CaseIterable {
     case edge
     case firefox
     case safari
-    
+    case lastPass
+    case onePassword
+
     static var installedBrowsers: [ThirdPartyBrowser] {
         return allCases.filter(\.isInstalled)
     }
@@ -47,21 +49,32 @@ enum ThirdPartyBrowser: CaseIterable {
         case .edge: return .edge
         case .firefox: return .firefox
         case .safari: return .safari
+        case .lastPass: return .lastPass
+        case .onePassword: return .onePassword
         case .csv: return nil
         }
     }
 
     var isInstalled: Bool {
         let detectedApplicationPath = applicationPath != nil
-        let detectedBrowserProfiles = !(browserProfiles?.profiles.isEmpty ?? true)
-        
+        let detectedBrowserProfiles = !(browserProfiles?.profiles.isEmpty ?? false)
+
         return detectedApplicationPath && detectedBrowserProfiles
     }
 
     var isRunning: Bool {
         return !findRunningApplications().isEmpty
     }
-    
+
+    var shouldQuitBeforeImport: Bool {
+        switch self {
+        case .brave, .chrome, .edge, .firefox:
+            return true
+        case .safari, .lastPass, .onePassword:
+            return false
+        }
+    }
+
     var importSource: DataImport.Source {
         switch self {
         case .brave: return .brave
@@ -69,26 +82,38 @@ enum ThirdPartyBrowser: CaseIterable {
         case .edge: return .edge
         case .firefox: return .firefox
         case .safari: return .safari
+        case .onePassword: return .onePassword
+        case .lastPass: return .lastPass
         }
     }
 
     var applicationIcon: NSImage? {
         guard let applicationPath = applicationPath else {
-            return nil
+            return fallbackApplicationIcon
         }
 
         return NSWorkspace.shared.icon(forFile: applicationPath)
     }
+    
+    /// Used when specific apps are not installed, but still need to be displayed in the list.
+    /// Browsers are hidden when not installed, so this only applies to password managers.
+    var fallbackApplicationIcon: NSImage? {
+        switch self {
+        case .lastPass: return NSImage(named: "LastPassIcon")
+        case .onePassword: return NSImage(named: "1PasswordIcon")
+        default: return nil
+        }
+    }
 
     var browserProfiles: DataImport.BrowserProfileList? {
-        let profilePath = profilesDirectory()
-
-        guard let potentialProfileURLs = try? FileManager.default.contentsOfDirectory(at: profilePath,
+        guard let profilePath = profilesDirectory(),
+              let potentialProfileURLs = try? FileManager.default.contentsOfDirectory(at: profilePath,
                                                                                       includingPropertiesForKeys: nil,
                                                                                       options: [.skipsHiddenFiles]).filter(\.hasDirectoryPath) else {
             // Safari is an exception, as it may need permissions granted before being able to read the contents of the profile path. To be safe,
             // return the profile anyway and check the file system permissions when preparing to import.
-            if self == .safari {
+            if self == .safari,
+               let profilePath = profilesDirectory() {
                 return DataImport.BrowserProfileList(browser: self, profileURLs: [profilePath])
             } else {
                 return nil
@@ -120,6 +145,13 @@ enum ThirdPartyBrowser: CaseIterable {
             "org.mozilla.firefoxdeveloperedition"
         ])
         case .safari: return BundleIdentifiers(productionBundleID: "com.apple.safari", relatedBundleIDs: [])
+        case .onePassword: return BundleIdentifiers(productionBundleID: "com.agilebits.onepassword7", relatedBundleIDs: [
+            "com.agilebits.onepassword",
+            "com.agilebits.onepassword4"
+        ])
+        case .lastPass: return BundleIdentifiers(productionBundleID: "com.lastpass.lastpassmacdesktop", relatedBundleIDs: [
+            "com.lastpass.lastpass"
+        ])
         }
     }
 
@@ -143,7 +175,7 @@ enum ThirdPartyBrowser: CaseIterable {
     }
 
     // Returns the URL to the profiles for a given browser. This directory will contain a list of directories, each representing a profile.
-    private func profilesDirectory() -> URL {
+    private func profilesDirectory() -> URL? {
         let applicationSupportURL = FileManager.default.urls(for: .applicationSupportDirectory, in: .userDomainMask)[0]
 
         switch self {
@@ -154,6 +186,7 @@ enum ThirdPartyBrowser: CaseIterable {
         case .safari:
             let safariDataDirectory = FileManager.default.urls(for: .libraryDirectory, in: .userDomainMask)[0]
             return safariDataDirectory.appendingPathComponent("Safari")
+        case .lastPass, .onePassword: return nil
         }
     }
 

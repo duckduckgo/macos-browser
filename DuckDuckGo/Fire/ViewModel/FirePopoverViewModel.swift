@@ -69,9 +69,16 @@ final class FirePopoverViewModel {
     private let fireproofDomains: FireproofDomains
     private let faviconManagement: FaviconManagement
 
-    @Published private(set) var fireproofed: [Item] = []
     @Published private(set) var selectable: [Item] = []
-    @Published private(set) var selected: Set<Int> = Set()
+    @Published private(set) var fireproofed: [Item] = []
+    @Published private(set) var selected: Set<Int> = Set() {
+        didSet {
+            updateAreOtherTabsInfluenced()
+        }
+    }
+
+    let selectableSectionIndex = 0
+    let fireproofedSectionIndex = 1
 
     // MARK: - Options
 
@@ -85,27 +92,15 @@ final class FirePopoverViewModel {
                     return Set<String>()
                 }
 
-                return tab.visitedDomains
+                return tab.localHistory
             case .currentWindow:
-                return tabCollectionViewModel.tabCollection.tabs.reduce(Set<String>()) { result, tab in
-                    return result.union(tab.visitedDomains)
-                }
+                return tabCollectionViewModel.tabCollection.localHistory
             case .allData:
-                return historyCoordinating.history?.reduce(Set<String>(), { result, historyEntry in
-                    if let host = historyEntry.url.host {
-                        return result.union([host])
-                    } else {
-                        return result
-                    }
-                }) ?? Set<String>()
+                return historyCoordinating.history?.visitedDomains ?? Set<String>()
             }
         }
 
-        func dropWWW(domains: Set<String>) -> Set<String> {
-            return Set(domains.map { $0.dropWWW() })
-        }
-
-        let visitedDomains = dropWWW(domains: visitedDomains(basedOn: clearingOption))
+        let visitedDomains = visitedDomains(basedOn: clearingOption)
 
         let fireproofed = visitedDomains
             .filter { domain in
@@ -114,12 +109,13 @@ final class FirePopoverViewModel {
         let selectable = visitedDomains
             .subtracting(fireproofed)
 
-        self.fireproofed = fireproofed
-            .map { Item(domain: $0, favicon: faviconManagement.getCachedFavicon(for: $0, sizeCategory: .small)?.image) }
-            .sorted { $0.domain < $1.domain }
         self.selectable = selectable
             .map { Item(domain: $0, favicon: faviconManagement.getCachedFavicon(for: $0, sizeCategory: .small)?.image) }
             .sorted { $0.domain < $1.domain }
+        self.fireproofed = fireproofed
+            .map { Item(domain: $0, favicon: faviconManagement.getCachedFavicon(for: $0, sizeCategory: .small)?.image) }
+            .sorted { $0.domain < $1.domain }
+
         selectAll()
     }
 
@@ -149,6 +145,34 @@ final class FirePopoverViewModel {
         selected.remove(index)
     }
 
+    private var selectedDomains: Set<String> {
+        return Set<String>(selected.compactMap {
+            guard let selectedDomain = selectable[safe: $0]?.domain else {
+                assertionFailure("Wrong index")
+                return nil
+            }
+            return selectedDomain
+        })
+    }
+
+    // MARK: - Warning
+
+    @Published private(set) var areOtherTabsInfluenced = false
+
+    private func updateAreOtherTabsInfluenced() {
+        let selectedTab = tabCollectionViewModel.selectedTabViewModel?.tab
+        let allTabs = WindowControllersManager.shared.mainWindowControllers.flatMap {
+            $0.mainViewController.tabCollectionViewModel.tabCollection.tabs
+        }
+        let otherTabs = allTabs.filter({ $0 != selectedTab })
+
+        let otherTabsLocalHistory = otherTabs.reduce(Set<String>()) { result, tab in
+            return result.union(tab.localHistory)
+        }
+
+        areOtherTabsInfluenced = !otherTabsLocalHistory.isDisjoint(with: selectedDomains)
+    }
+
     // MARK: - Burning
 
     func burn() {
@@ -158,14 +182,6 @@ final class FirePopoverViewModel {
             fireViewModel.fire.burnAll(tabCollectionViewModel: tabCollectionViewModel) { timedPixel.fire() }
         } else {
             // Burn selected domains
-            let selectedDomains = Set<String>(selected.compactMap {
-                guard let selectedDomain = selectable[safe: $0]?.domain else {
-                    assertionFailure("Wrong index")
-                    return nil
-                }
-                return selectedDomain
-            })
-
             fireViewModel.fire.burnDomains(selectedDomains) { timedPixel.fire() }
         }
     }

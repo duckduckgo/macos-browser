@@ -52,13 +52,13 @@ extension AppDelegate {
 
     // MARK: - Help
 
-#if FEEDBACK
+    #if FEEDBACK
 
     @IBAction func openFeedback(_ sender: Any?) {
         FeedbackPresenter.presentFeedbackForm()
     }
 
-#endif
+    #endif
 
     @IBAction func navigateToBookmark(_ sender: Any?) {
         guard let menuItem = sender as? NSMenuItem else {
@@ -97,21 +97,37 @@ extension AppDelegate {
         guard let windowController = WindowControllersManager.shared.lastKeyMainWindowController,
               let window = windowController.window else { return }
 
-        let savePanel = NSSavePanel()
-        savePanel.nameFieldStringValue = "DuckDuckGo \(UserText.exportLoginsFileNameSuffix)"
-        savePanel.allowedFileTypes = ["csv"]
+        DeviceAuthenticator.shared.authenticateUser(reason: .exportLogins) { authenticationResult in
+            guard authenticationResult.authenticated else {
+                return
+            }
 
-        savePanel.beginSheetModal(for: window) { response in
-            guard response == .OK, let selectedURL = savePanel.url else { return }
+            let savePanel = NSSavePanel()
+            savePanel.nameFieldStringValue = "DuckDuckGo \(UserText.exportLoginsFileNameSuffix)"
 
-            let vault = try? SecureVaultFactory.default.makeVault(errorReporter: SecureVaultErrorReporter.shared)
-            let exporter = CSVLoginExporter(secureVault: vault!)
-            do {
-                try exporter.exportVaultLogins(to: selectedURL)
-                Pixel.fire(.exportedLogins())
-            } catch {
-                NSAlert.exportLoginsFailed()
-                    .beginSheetModal(for: window, completionHandler: nil)
+            let accessory = NSTextField.label(titled: UserText.exportLoginsWarning)
+            accessory.textColor = .red
+            accessory.alignment = .center
+            accessory.sizeToFit()
+
+            let accessoryContainer = accessory.wrappedInContainer(padding: 10)
+            accessoryContainer.frame.size = accessoryContainer.fittingSize
+
+            savePanel.accessoryView = accessoryContainer
+            savePanel.allowedFileTypes = ["csv"]
+
+            savePanel.beginSheetModal(for: window) { response in
+                guard response == .OK, let selectedURL = savePanel.url else { return }
+
+                let vault = try? SecureVaultFactory.default.makeVault(errorReporter: SecureVaultErrorReporter.shared)
+                let exporter = CSVLoginExporter(secureVault: vault!)
+                do {
+                    try exporter.exportVaultLogins(to: selectedURL)
+                    Pixel.fire(.exportedLogins())
+                } catch {
+                    NSAlert.exportLoginsFailed()
+                        .beginSheetModal(for: window, completionHandler: nil)
+                }
             }
         }
     }
@@ -281,14 +297,14 @@ extension MainViewController {
             .addressBarButtonsViewController?
             .openBookmarkPopover(setFavorite: false, accessPoint: .init(sender: sender, default: .moreMenu))
     }
-    
+
     @IBAction func favoriteThisPage(_ sender: Any) {
         navigationBarViewController?
             .addressBarViewController?
             .addressBarButtonsViewController?
             .openBookmarkPopover(setFavorite: true, accessPoint: .init(sender: sender, default: .moreMenu))
     }
-    
+
     @IBAction func openBookmark(_ sender: Any?) {
         guard let menuItem = sender as? NSMenuItem else {
             os_log("MainViewController: Casting to menu item failed", type: .error)
@@ -379,10 +395,12 @@ extension MainViewController {
         let otherMainViewControllers = otherWindowControllers.compactMap { $0.mainViewController }
         let otherTabCollectionViewModels = otherMainViewControllers.map { $0.tabCollectionViewModel }
         let otherTabs = otherTabCollectionViewModels.flatMap { $0.tabCollection.tabs }
+        let otherLocalHistoryOfRemovedTabs = Set(otherTabCollectionViewModels.flatMap { $0.tabCollection.localHistoryOfRemovedTabs })
 
         WindowsManager.closeWindows(except: view.window)
 
         tabCollectionViewModel.append(tabs: otherTabs)
+        tabCollectionViewModel.tabCollection.localHistoryOfRemovedTabs.formUnion(otherLocalHistoryOfRemovedTabs)
     }
 
     // MARK: - Edit
@@ -418,8 +436,8 @@ extension MainViewController {
         guard let webView = tabCollectionViewModel.selectedTabViewModel?.tab.webView,
               let window = webView.window,
               let printOperation = webView.printOperation()
-              else { return }
-        
+        else { return }
+
         if printOperation.view?.frame.isEmpty == true {
             printOperation.view?.frame = webView.bounds
         }
@@ -454,12 +472,12 @@ extension MainViewController {
 
     @IBAction func resetSecureVaultData(_ sender: Any?) {
         let vault = try? SecureVaultFactory.default.makeVault(errorReporter: SecureVaultErrorReporter.shared)
-        
+
         let accounts = (try? vault?.accounts()) ?? []
         for accountID in accounts.compactMap(\.id) {
             try? vault?.deleteWebsiteCredentialsFor(accountId: accountID)
         }
-        
+
         let cards = (try? vault?.creditCards()) ?? []
         for cardID in cards.compactMap(\.id) {
             try? vault?.deleteCreditCardFor(cardId: cardID)
@@ -469,18 +487,18 @@ extension MainViewController {
         for identityID in identities.compactMap(\.id) {
             try? vault?.deleteIdentityFor(identityId: identityID)
         }
-        
+
         let notes = (try? vault?.notes()) ?? []
         for noteID in notes.compactMap(\.id) {
             try? vault?.deleteNoteFor(noteId: noteID)
         }
     }
-    
+
     @IBAction func resetBookmarks(_ sender: Any?) {
         guard let topLevelEntities = LocalBookmarkManager.shared.list?.topLevelEntities else {
             return
         }
-        
+
         for entity in topLevelEntities {
             if let folder = entity as? BookmarkFolder {
                 LocalBookmarkManager.shared.remove(folder: folder)
@@ -489,13 +507,13 @@ extension MainViewController {
             }
         }
     }
-    
+
     @IBAction func resetMacWaitlistUnlockState(_ sender: Any?) {
         OnboardingViewModel().restart()
         let store = MacWaitlistEncryptedFileStorage()
         store.deleteExistingMetadata()
     }
-    
+
     // Used to test the lock screen upgrade process. Users with the legacy ATB format need to be unlocked.
     @IBAction func setFakeUserDefaultsATBValues(_ sender: Any?) {
         var legacyStore = LocalStatisticsStore.LegacyStatisticsStore()
@@ -528,7 +546,7 @@ extension MainViewController {
 }
 
 extension MainViewController: NSMenuItemValidation {
-    
+
     // swiftlint:disable cyclomatic_complexity
     // swiftlint:disable function_body_length
     func validateMenuItem(_ menuItem: NSMenuItem) -> Bool {
