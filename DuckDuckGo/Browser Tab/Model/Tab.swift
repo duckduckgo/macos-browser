@@ -877,7 +877,7 @@ extension Tab: WKNavigationDelegate {
 
                 return .cancel
 
-            } else if navigationAction.navigationType != .backForward,
+            } else if navigationAction.navigationType != .backForward, !isRequestingNewTab,
                       let request = GPCRequestFactory.shared.requestForGPC(basedOn: navigationAction.request) {
                 self.invalidateBackItemIfNeeded(for: navigationAction)
                 defer {
