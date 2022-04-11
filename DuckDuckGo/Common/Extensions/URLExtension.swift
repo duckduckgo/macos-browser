@@ -300,7 +300,7 @@ extension URL {
     }
 
     var isExternalSchemeLink: Bool {
-        return !["https", "http", "about", "file", "blob", "data"].contains(scheme)
+        return !["https", "http", "about", "file", "blob", "data", "ftp"].contains(scheme)
     }
 
     // MARK: - DuckDuckGo
