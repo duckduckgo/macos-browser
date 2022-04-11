@@ -71,6 +71,49 @@ final class AutofillPreferencesPersistorMock: AutofillPreferencesPersistor {
     var underlyingAskToSavePaymentMethods: Bool!
 
 }
+final class DefaultBrowserProviderMock: DefaultBrowserProvider {
+    var bundleIdentifier: String {
+        get { return underlyingBundleIdentifier }
+        set(value) { underlyingBundleIdentifier = value }
+    }
+    var underlyingBundleIdentifier: String!
+    var isDefault: Bool {
+        get { return underlyingIsDefault }
+        set(value) { underlyingIsDefault = value }
+    }
+    var underlyingIsDefault: Bool!
+
+    // MARK: - presentDefaultBrowserPrompt
+
+    var presentDefaultBrowserPromptThrowableError: Error?
+    var presentDefaultBrowserPromptCallsCount = 0
+    var presentDefaultBrowserPromptCalled: Bool {
+        return presentDefaultBrowserPromptCallsCount > 0
+    }
+    var presentDefaultBrowserPromptClosure: (() throws -> Void)?
+
+    func presentDefaultBrowserPrompt() throws {
+        presentDefaultBrowserPromptCallsCount += 1
+        if let error = presentDefaultBrowserPromptThrowableError {
+            throw error
+        }
+        try presentDefaultBrowserPromptClosure?()
+    }
+
+    // MARK: - openSystemPreferences
+
+    var openSystemPreferencesCallsCount = 0
+    var openSystemPreferencesCalled: Bool {
+        return openSystemPreferencesCallsCount > 0
+    }
+    var openSystemPreferencesClosure: (() -> Void)?
+
+    func openSystemPreferences() {
+        openSystemPreferencesCallsCount += 1
+        openSystemPreferencesClosure?()
+    }
+
+}
 final class DownloadsPreferencesPersistorMock: DownloadsPreferencesPersistor {
     var selectedDownloadLocation: String?
     var alwaysRequestDownloadLocation: Bool {

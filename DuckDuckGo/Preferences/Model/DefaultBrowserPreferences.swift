@@ -20,6 +20,7 @@ import Foundation
 import SwiftUI
 import Combine
 
+// sourcery: AutoMockable
 protocol DefaultBrowserProvider {
     var bundleIdentifier: String { get }
     var isDefault: Bool { get }

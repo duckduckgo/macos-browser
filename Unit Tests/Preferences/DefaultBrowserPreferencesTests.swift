@@ -19,26 +19,7 @@
 import XCTest
 @testable import DuckDuckGo_Privacy_Browser
 
-final class DefaultBrowserProviderMock: DefaultBrowserProvider {
-    enum MockError: Error {
-        case generic
-    }
-
-    var bundleIdentifier: String = "com.duckduckgo.DefaultBrowserPreferencesTests"
-    var isDefault: Bool = false
-    // swiftlint:disable identifier_name
-    var _presentDefaultBrowserPrompt: () throws -> Void = {}
-    var _openSystemPreferences: () -> Void = {}
-    // swiftlint:enable identifier_name
-
-    func presentDefaultBrowserPrompt() throws {
-        try _presentDefaultBrowserPrompt()
-    }
-
-    func openSystemPreferences() {
-        _openSystemPreferences()
-    }
-}
+private struct MockError: Error {}
 
 final class DefaultBrowserPreferencesTests: XCTestCase {
 
@@ -47,6 +28,8 @@ final class DefaultBrowserPreferencesTests: XCTestCase {
 
     override func setUpWithError() throws {
         provider = DefaultBrowserProviderMock()
+        provider.isDefault = true
+        provider.bundleIdentifier = "com.duckduckgo.macos.browser.DefaultBrowserPreferencesTests"
     }
 
     func testWhenInitializedThenIsDefaultIsTakenFromProvider() throws {
@@ -71,34 +54,19 @@ final class DefaultBrowserPreferencesTests: XCTestCase {
     func testWhenBecomeDefaultIsCalledThenDefaultBrowserPromptIsRequested() throws {
         let model = DefaultBrowserPreferences(defaultBrowserProvider: provider)
 
-        let browserPromptExpectation = self.expectation(description: "presentDefaultBrowserPrompt")
-
-        provider._presentDefaultBrowserPrompt = {
-            browserPromptExpectation.fulfill()
-        }
-
         model.becomeDefault()
-
-        waitForExpectations(timeout: 0.1, handler: nil)
+        XCTAssertEqual(provider.presentDefaultBrowserPromptCallsCount, 1)
+        XCTAssertFalse(provider.openSystemPreferencesCalled)
     }
 
     func testWhenDefaultBrowserPromptFailsThenPreferencesAreOpened() throws {
         let model = DefaultBrowserPreferences(defaultBrowserProvider: provider)
 
-        let browserPromptExpectation = self.expectation(description: "presentDefaultBrowserPrompt")
-        let openPreferencesExpectation = self.expectation(description: "openSystemPreferences")
-
-        provider._presentDefaultBrowserPrompt = {
-            browserPromptExpectation.fulfill()
-            throw DefaultBrowserProviderMock.MockError.generic
-        }
-
-        provider._openSystemPreferences = {
-            openPreferencesExpectation.fulfill()
-        }
+        provider.presentDefaultBrowserPromptThrowableError = MockError()
 
         model.becomeDefault()
 
-        waitForExpectations(timeout: 0.1, handler: nil)
+        XCTAssertEqual(provider.presentDefaultBrowserPromptCallsCount, 1)
+        XCTAssertEqual(provider.openSystemPreferencesCallsCount, 1)
     }
 }
