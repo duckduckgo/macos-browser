@@ -33,7 +33,6 @@ final class PasswordManagementIdentityModel: ObservableObject, PasswordManagemen
     var onDirtyChanged: (Bool) -> Void
     var onSaveRequested: (SecureVaultModels.Identity) -> Void
     var onDeleteRequested: (SecureVaultModels.Identity) -> Void
-    var onCancelled: () -> Void
 
     var isEditingPublisher: Published<Bool>.Publisher {
         return $isEditing
@@ -167,12 +166,10 @@ final class PasswordManagementIdentityModel: ObservableObject, PasswordManagemen
 
     init(onDirtyChanged: @escaping (Bool) -> Void,
          onSaveRequested: @escaping (SecureVaultModels.Identity) -> Void,
-         onDeleteRequested: @escaping (SecureVaultModels.Identity) -> Void,
-         onCancelled: @escaping () -> Void) {
+         onDeleteRequested: @escaping (SecureVaultModels.Identity) -> Void) {
         self.onDirtyChanged = onDirtyChanged
         self.onSaveRequested = onSaveRequested
         self.onDeleteRequested = onDeleteRequested
-        self.onCancelled = onCancelled
     }
 
     func copy(_ value: String) {
@@ -192,8 +189,6 @@ final class PasswordManagementIdentityModel: ObservableObject, PasswordManagemen
             identity = nil
             isNew = false
         }
-
-        onCancelled()
     }
 
     func save() {
