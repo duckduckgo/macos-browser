@@ -29,6 +29,7 @@ final class MainViewController: NSViewController {
     @IBOutlet weak var findInPageContainerView: NSView!
     @IBOutlet var navigationBarTopConstraint: NSLayoutConstraint!
     @IBOutlet var addressBarHeightConstraint: NSLayoutConstraint!
+    @IBOutlet var webViewTopConstraint: NSLayoutConstraint!
 
     @IBOutlet var divider: NSView!
 
@@ -72,6 +73,7 @@ final class MainViewController: NSViewController {
             tabBarViewController.view.isHidden = true
             tabBarContainerView.isHidden = true
             navigationBarTopConstraint.constant = 0.0
+            webViewTopConstraint.constant = navigationBarViewController.view.frame.height
             addressBarHeightConstraint.constant = tabBarContainerView.frame.height
         } else {
             navigationBarContainerView.wantsLayer = true
