@@ -24,6 +24,7 @@ class WebsiteBreakageReportTests: XCTestCase {
     func testCommonSetOfFields() throws {
         let breakage = WebsiteBreakage(
             category: .contentIsMissing,
+            description: nil,
             siteUrlString: "https://example.test/",
             osVersion: "12.3.0",
             upgradedHttps: true,
@@ -47,7 +48,7 @@ class WebsiteBreakageReportTests: XCTestCase {
         let queryItems = try XCTUnwrap(components.percentEncodedQueryItems)
 
         XCTAssertEqual(url.host, "improving.duckduckgo.com")
-        XCTAssertEqual(url.path, "/t/epbf")
+        XCTAssertEqual(url.path, "/t/epbf_macos_desktop")
 
         XCTAssertEqual(queryItems[valueFor: "category"], "content")
         XCTAssertEqual(queryItems[valueFor: "siteUrl"], "https%3A%2F%2Fexample.test%2F")
@@ -60,6 +61,7 @@ class WebsiteBreakageReportTests: XCTestCase {
     func testThatNativeAppSpecificFieldsAreReported() throws {
         let breakage = WebsiteBreakage(
             category: .videoOrImagesDidntLoad,
+            description: nil,
             siteUrlString: "http://unsafe.example.test/path/to/thing.html",
             osVersion: "12",
             upgradedHttps: false,
@@ -84,7 +86,7 @@ class WebsiteBreakageReportTests: XCTestCase {
         let queryItems = try XCTUnwrap(components.percentEncodedQueryItems)
 
         XCTAssertEqual(url.host, "improving.duckduckgo.com")
-        XCTAssertEqual(url.path, "/t/epbf")
+        XCTAssertEqual(url.path, "/t/epbf_macos_desktop")
 
         XCTAssertEqual(queryItems[valueFor: "category"], "images")
         XCTAssertEqual(queryItems[valueFor: "siteUrl"], "http%3A%2F%2Funsafe.example.test%2Fpath%2Fto%2Fthing.html")
