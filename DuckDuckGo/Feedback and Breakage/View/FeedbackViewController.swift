@@ -55,7 +55,7 @@ final class FeedbackViewController: NSViewController {
     @IBOutlet weak var browserFeedbackView: NSView!
     @IBOutlet weak var browserFeedbackDescriptionLabel: NSTextField!
     @IBOutlet weak var browserFeedbackTextView: NSTextView!
-    @IBOutlet weak var browserFeedbackDisclaimerTextVIew: NSTextField!
+    @IBOutlet weak var browserFeedbackDisclaimerTextView: NSTextField!
 
     @IBOutlet weak var websiteBreakageView: NSView!
     @IBOutlet weak var urlTextField: NSTextField!
@@ -264,9 +264,9 @@ final class FeedbackViewController: NSViewController {
     private func updateBrowserFeedbackDisclaimerLabel(for formOption: FormOption) {
         switch formOption {
         case .websiteBreakage:
-            browserFeedbackDisclaimerTextVIew.stringValue = UserText.feedbackBreakageDisclaimer
+            browserFeedbackDisclaimerTextView.stringValue = UserText.feedbackBreakageDisclaimer
         case .feedback:
-            browserFeedbackDisclaimerTextVIew.stringValue = UserText.feedbackDisclaimer
+            browserFeedbackDisclaimerTextView.stringValue = UserText.feedbackDisclaimer
         }
     }
 
