@@ -48,7 +48,7 @@ class WebsiteBreakageReportTests: XCTestCase {
         let queryItems = try XCTUnwrap(components.percentEncodedQueryItems)
 
         XCTAssertEqual(url.host, "improving.duckduckgo.com")
-        XCTAssertEqual(url.path, "/t/epbf")
+        XCTAssertEqual(url.path, "/t/epbf_macos_desktop")
 
         XCTAssertEqual(queryItems[valueFor: "category"], "content")
         XCTAssertEqual(queryItems[valueFor: "siteUrl"], "https%3A%2F%2Fexample.test%2F")
@@ -86,7 +86,7 @@ class WebsiteBreakageReportTests: XCTestCase {
         let queryItems = try XCTUnwrap(components.percentEncodedQueryItems)
 
         XCTAssertEqual(url.host, "improving.duckduckgo.com")
-        XCTAssertEqual(url.path, "/t/epbf")
+        XCTAssertEqual(url.path, "/t/epbf_macos_desktop")
 
         XCTAssertEqual(queryItems[valueFor: "category"], "images")
         XCTAssertEqual(queryItems[valueFor: "siteUrl"], "http%3A%2F%2Funsafe.example.test%2Fpath%2Fto%2Fthing.html")
