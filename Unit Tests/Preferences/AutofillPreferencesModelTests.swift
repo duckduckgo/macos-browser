@@ -100,7 +100,7 @@ final class AutofillPreferencesModelTests: XCTestCase {
         userAuthenticator._authenticateUser = { _ in return .failure}
 
         model.authorizeAutoLockSettingsChange(threshold: .oneHour)
-        XCTAssertEqual(model.autoLockThreshold, .oneHour)
+        XCTAssertNotEqual(model.autoLockThreshold, .oneHour)
         XCTAssertEqual(persistor.autoLockThreshold, model.autoLockThreshold)
     }
 }

@@ -51,7 +51,7 @@ final class DefaultBrowserPreferencesTests: XCTestCase {
 
     func testWhenInitializedThenIsDefaultIsTakenFromProvider() throws {
         provider.isDefault = true
-        XCTAssertFalse(DefaultBrowserPreferences(defaultBrowserProvider: provider).isDefault)
+        XCTAssertTrue(DefaultBrowserPreferences(defaultBrowserProvider: provider).isDefault)
 
         provider.isDefault = false
         XCTAssertFalse(DefaultBrowserPreferences(defaultBrowserProvider: provider).isDefault)
@@ -62,7 +62,7 @@ final class DefaultBrowserPreferencesTests: XCTestCase {
         let model = DefaultBrowserPreferences(defaultBrowserProvider: provider)
         provider.isDefault = true
 
-        XCTAssertEqual(model.isDefault, provider.isDefault)
+        XCTAssertNotEqual(model.isDefault, provider.isDefault)
 
         model.checkIfDefault()
         XCTAssertEqual(model.isDefault, provider.isDefault)
