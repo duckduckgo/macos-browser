@@ -1,0 +1,41 @@
+name: Run unit tests
+
+on: 
+  push:
+    branches: [ develop ]
+  pull_request:
+    branches: [ develop ]
+
+
+jobs:
+  unit-tests:
+
+    runs-on: macos-latest
+
+    steps:
+    - name: Register SSH keys for submodules access
+      uses: webfactory/ssh-agent@v0.5.4
+      with:
+        ssh-private-key: |
+          ${{ secrets.SSH_PRIVATE_KEY_FIND_IN_PAGE }}
+          ${{ secrets.SSH_PRIVATE_KEY_PRIVACY_DASHBOARD }}
+
+    - name: Check out the code
+      uses: actions/checkout@v3
+      with:
+        submodules: recursive
+
+    - name: Run unit tests
+      run: |
+        xcodebuild test \
+          -scheme "DuckDuckGo Privacy Browser" \
+          -configuration "CI" \
+          ENABLE_TESTABILITY=true \
+          | xcpretty -r junit -o unittests.xml
+
+    - name: Publish unit tests results
+      uses: EnricoMi/publish-unit-test-result-action/composite@v1
+      if: always()
+      with:
+        files: unittests.xml
+
