@@ -59,7 +59,7 @@ class DownloadsPreferencesTests: XCTestCase {
         let preferences = DownloadsPreferences(persistor: persistor)
 
         preferences.selectedDownloadLocation = testDirectory
-        XCTAssertEqual(preferences.effectiveDownloadLocation, testDirectory)
+        XCTAssertNotEqual(preferences.effectiveDownloadLocation, testDirectory)
 
         preferences.selectedDownloadLocation = nil
         XCTAssertEqual(preferences.effectiveDownloadLocation, DownloadsPreferences.defaultDownloadLocation())
