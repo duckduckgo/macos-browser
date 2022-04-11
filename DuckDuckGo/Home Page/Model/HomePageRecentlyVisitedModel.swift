@@ -152,6 +152,10 @@ final class RecentlyVisitedSiteModel: ObservableObject {
     @Published var numberOfTrackersBlocked = 0
     @Published var trackersFound = false
 
+    // These are used by the burning animation
+    @Published var isBurning = false
+    @Published var isHidden = false
+
     init(domain: String, bookmarkManager: BookmarkManager = LocalBookmarkManager.shared) {
         self.domain = domain
         if let url = domain.url {
