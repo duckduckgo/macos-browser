@@ -33,9 +33,9 @@ jobs:
           ENABLE_TESTABILITY=true \
           | xcpretty -r junit -o unittests.xml
 
-    - name: Publish unit tests results
-      uses: EnricoMi/publish-unit-test-result-action/composite@v1
-      if: always()
+    - name: Publish Unit Tests Report
+      uses: mikepenz/action-junit-report@v3
+      if: always() # always run even if the previous step fails
       with:
-        files: unittests.xml
+        report_paths: unittests.xml
 
