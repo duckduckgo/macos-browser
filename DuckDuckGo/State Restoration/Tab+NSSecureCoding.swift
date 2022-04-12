@@ -29,6 +29,7 @@ extension Tab: NSSecureCoding {
         static let tabType = "tabType"
         static let preferencePane = "preferencePane"
         static let visitedDomains = "visitedDomains"
+        static let lastSelectedAt = "lastSelectedAt"
     }
 
     static var supportsSecureCoding: Bool { true }
@@ -49,7 +50,8 @@ extension Tab: NSSecureCoding {
                   localHistory: Set(visitedDomains),
                   title: decoder.decodeIfPresent(at: NSSecureCodingKeys.title),
                   favicon: decoder.decodeIfPresent(at: NSSecureCodingKeys.favicon),
-                  sessionStateData: decoder.decodeIfPresent(at: NSSecureCodingKeys.sessionStateData))
+                  sessionStateData: decoder.decodeIfPresent(at: NSSecureCodingKeys.sessionStateData),
+                  lastSelectedAt: decoder.decodeIfPresent(at: NSSecureCodingKeys.lastSelectedAt))
     }
 
     func encode(with coder: NSCoder) {
@@ -61,6 +63,8 @@ extension Tab: NSSecureCoding {
         favicon.map(coder.encode(forKey: NSSecureCodingKeys.favicon))
         getActualSessionStateData().map(coder.encode(forKey: NSSecureCodingKeys.sessionStateData))
         coder.encode(content.type.rawValue, forKey: NSSecureCodingKeys.tabType)
+        lastSelectedAt.map(coder.encode(forKey: NSSecureCodingKeys.lastSelectedAt))
+
         if let pane = content.preferencePane {
             coder.encode(pane.rawValue, forKey: NSSecureCodingKeys.preferencePane)
         }

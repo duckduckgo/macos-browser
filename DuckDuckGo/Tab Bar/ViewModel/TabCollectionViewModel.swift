@@ -75,6 +75,12 @@ final class TabCollectionViewModel: NSObject {
         if self.selectionIndex != selectionIndex {
             self.selectionIndex = selectionIndex
         }
+        let tabsToReload = tabCollection.tabs
+            .filter { $0.lastSelectedAt != nil && $0.content.isUrl }
+            .sorted { $0.lastSelectedAt! < $1.lastSelectedAt! }
+            .dropFirst()
+            .prefix(3)
+        tabsToReload.forEach { $0.reload() }
     }
 
     convenience override init() {
@@ -444,6 +450,7 @@ final class TabCollectionViewModel: NSObject {
             return
         }
         let selectedTabViewModel = tabViewModel(at: selectionIndex)
+        selectedTabViewModel?.tab.lastSelectedAt = Date()
         self.selectedTabViewModel = selectedTabViewModel
     }
 

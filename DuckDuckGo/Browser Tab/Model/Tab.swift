@@ -142,7 +142,9 @@ final class Tab: NSObject {
          sessionStateData: Data? = nil,
          parentTab: Tab? = nil,
          shouldLoadInBackground: Bool = false,
-         canBeClosedWithBack: Bool = false) {
+         canBeClosedWithBack: Bool = false,
+         lastSelectedAt: Date? = nil
+    ) {
 
         self.content = content
         self.faviconManagement = faviconManagement
@@ -155,6 +157,7 @@ final class Tab: NSObject {
         self.parentTab = parentTab
         self._canBeClosedWithBack = canBeClosedWithBack
         self.sessionStateData = sessionStateData
+        self.lastSelectedAt = lastSelectedAt
 
         let configuration = webViewConfiguration ?? WKWebViewConfiguration()
         configuration.applyStandardConfiguration()
@@ -226,6 +229,8 @@ final class Tab: NSObject {
             self.content = content
         }
     }
+    
+    var lastSelectedAt: Date?
 
     @Published var title: String?
     @Published var error: Error?
