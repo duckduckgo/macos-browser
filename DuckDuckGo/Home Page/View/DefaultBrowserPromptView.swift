@@ -24,11 +24,6 @@ struct DefaultBrowserPrompt: View {
 
     var body: some View {
 
-        ZStack {
-
-            RoundedRectangle(cornerRadius: 8)
-                .fill(Color("HomeDefaultBrowserPromptBackgroundColor"))
-
             HStack {
                 Spacer()
 
@@ -51,11 +46,12 @@ struct DefaultBrowserPrompt: View {
                     self.model.close()
                 }.padding()
 
-            }
-
-        }
-        .visibility(model.shouldShow ? .visible : .gone)
-        .padding(.top, 24)
+            }.background(
+                RoundedRectangle(cornerRadius: 8)
+                    .fill(Color("HomeDefaultBrowserPromptBackgroundColor"))
+            )
+            .visibility(model.shouldShow ? .visible : .gone)
+            .padding(.top, 24)
 
     }
 
