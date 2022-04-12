@@ -364,6 +364,19 @@ final class BrowserTabViewController: NSViewController {
         }
         return overlay
     }
+
+    @objc(_webView:printFrame:)
+    func webView(_ webView: WKWebView, printFrame handle: Any) {
+        webView.tab?.print(frame: handle)
+    }
+
+    @available(macOS 12, *)
+    @objc(_webView:printFrame:pdfFirstPageSize:completionHandler:)
+    func webView(_ webView: WKWebView, printFrame handle: Any, pdfFirstPageSize size: CGSize, completionHandler: () -> Void) {
+        self.webView(webView, printFrame: handle)
+        completionHandler()
+    }
+
 }
 
 extension BrowserTabViewController: ContentOverlayUserScriptDelegate {
