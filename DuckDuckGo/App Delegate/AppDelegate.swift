@@ -113,9 +113,8 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
 
         appUsageActivityMonitor = AppUsageActivityMonitor(delegate: self)
 
-        #if OUT_OF_APPSTORE
         crashReporter.checkForNewReports()
-        #endif
+
         urlEventHandler.applicationDidFinishLaunching()
 
         UserDefaultsWrapper<Any>.clearRemovedKeys()
