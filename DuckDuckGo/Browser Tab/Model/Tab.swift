@@ -633,11 +633,11 @@ extension Tab: BrowserTabViewControllerClickDelegate {
 
 extension Tab: PrintingUserScriptDelegate {
 
-    func printingUserScriptDidRequestPrintController(_ script: PrintingUserScript) {
+    func print(frame: Any? = nil) {
         guard activePrintOperation == nil else { return }
 
         guard let window = webView.window,
-              let printOperation = webView.printOperation()
+              let printOperation = webView.printOperation(for: frame)
         else { return }
 
         self.activePrintOperation = printOperation
@@ -646,14 +646,22 @@ extension Tab: PrintingUserScriptDelegate {
             printOperation.view?.frame = webView.bounds
         }
 
-        let selector = #selector(printOperationDidRun(printOperation: success: contextInfo:))
+        let selector = #selector(printOperationDidRun(printOperation:success:contextInfo:))
         printOperation.runModal(for: window, delegate: self, didRun: selector, contextInfo: nil)
+        NSApp.runModal(for: window)
+    }
+
+    func printingUserScriptDidRequestPrintController(_ script: PrintingUserScript) {
+        self.print()
     }
 
     @objc func printOperationDidRun(printOperation: NSPrintOperation,
                                     success: Bool,
                                     contextInfo: UnsafeMutableRawPointer?) {
         activePrintOperation = nil
+        if NSApp.modalWindow != nil {
+            NSApp.stopModal()
+        }
     }
 
 }

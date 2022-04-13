@@ -363,7 +363,7 @@ final class AddressBarTextField: NSTextField {
         case suggestion(_ suggestionViewModel: SuggestionViewModel)
 
         init(stringValue: String, userTyped: Bool, isSearch: Bool = false) {
-            if let url = stringValue.punycodedUrl, url.isValid {
+            if let url = URL(trimmedAddressBarString: stringValue), url.isValid {
                 var stringValue = stringValue
                 // display punycoded url in readable form when editing
                 if !userTyped,
