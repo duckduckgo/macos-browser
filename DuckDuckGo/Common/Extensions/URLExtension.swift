@@ -57,11 +57,7 @@ extension URL {
     static func makeURL(from addressBarString: String) -> URL? {
         let trimmed = addressBarString.trimmingWhitespaces()
 
-        if let addressBarUrl = trimmed.punycodedUrl, addressBarUrl.isValid {
-            return addressBarUrl
-        }
-
-        if let addressBarUrl = makeURLIfMissingSlash(trimmed) {
+        if let addressBarUrl = URL(trimmedAddressBarString: trimmed), addressBarUrl.isValid {
             return addressBarUrl
         }
 
@@ -73,33 +69,107 @@ extension URL {
         return nil
     }
 
-    // Creates URL even if user enters one slash "/" instead of two slashes "//" after the hypertext scheme component
-    private static func makeURLIfMissingSlash(_ trimmedAddressBarString: String) -> URL? {
-        for scheme in URL.NavigationalScheme.hypertextSchemes {
-            guard trimmedAddressBarString.hasPrefix(scheme.rawValue) else {
-                continue
-            }
+    /// URL and URLComponents can't cope with emojis and international characters so this routine does some manual processing while trying to
+    /// retain the input as much as possible.
+    init?(trimmedAddressBarString: String) {
+        var s = trimmedAddressBarString
 
-            let droppedSchemeString = trimmedAddressBarString.drop(prefix: scheme.rawValue)
-            guard droppedSchemeString.hasPrefix(":/") && !droppedSchemeString.hasPrefix("://") else {
-                continue
-            }
-
-            let droppedSeparatorString = droppedSchemeString.drop(prefix: ":/")
-            let correctedString = scheme.separated() + droppedSeparatorString
-
-            guard let url = correctedString.punycodedUrl, url.isValid else {
-                break
-            }
-
-            return url
+        // Creates URL even if user enters one slash "/" instead of two slashes "//" after the hypertext scheme component
+        if let scheme = NavigationalScheme.hypertextSchemes.first(where: { s.hasPrefix($0.rawValue + ":/") }),
+           !s.hasPrefix(scheme.separated()) {
+            s = scheme.separated() + s.dropFirst(scheme.separated().count - 1)
         }
 
-        return nil
+        if let url = URL(string: s) {
+            // if URL has domain:port or user:password@domain mistakengly interpreted as a scheme
+            if let urlWithScheme = URL(string: NavigationalScheme.http.separated() + s),
+               urlWithScheme.port != nil || urlWithScheme.user != nil {
+                // could be a local domain but user needs to use the protocol to specify that
+                // make exception for "localhost"
+                guard urlWithScheme.host?.contains(".") == true || urlWithScheme.host == .localhost else { return nil }
+                self = urlWithScheme
+                return
+
+            } else if url.scheme != nil {
+                self = url
+                return
+
+            } else if let hostname = s.split(separator: "/").first {
+                guard hostname.contains(".") || String(hostname) == .localhost else {
+                    // could be a local domain but user needs to use the protocol to specify that
+                    return nil
+                }
+            } else {
+                return nil
+            }
+
+            s = NavigationalScheme.http.separated() + s
+        }
+
+        self.init(punycodeEncodedString: s)
+    }
+
+    private init?(punycodeEncodedString: String) {
+        var s = punycodeEncodedString
+        let scheme: String
+
+        if s.hasPrefix(URL.NavigationalScheme.http.separated()) {
+            scheme = URL.NavigationalScheme.http.separated()
+        } else if s.hasPrefix(URL.NavigationalScheme.https.separated()) {
+            scheme = URL.NavigationalScheme.https.separated()
+        } else if !s.contains(".") {
+            return nil
+        } else {
+            scheme = URL.NavigationalScheme.http.separated()
+            s = scheme + s
+        }
+
+        let urlAndQuery = s.split(separator: "?")
+        guard !urlAndQuery.isEmpty, !urlAndQuery[0].contains(" ") else {
+            return nil
+        }
+
+        var query = ""
+        if urlAndQuery.count > 1 {
+            // replace spaces with %20 in query values
+            do {
+                struct Throwable: Error {}
+                query = try "?" + urlAndQuery[1].components(separatedBy: "&").map { component in
+                    try component.components(separatedBy: "=").enumerated().map { (idx, component) -> String in
+                        if idx == 0 { // name
+                            // don't allow spaces in query names
+                            guard !component.contains(" ") else { throw Throwable() }
+                            return component
+                        } else { // value
+                            return component.replacingOccurrences(of: " ", with: "%20")
+                        }
+                    }.joined(separator: "=")
+                }.joined(separator: "&")
+            } catch {
+                return nil
+            }
+        }
+
+        let componentsWithoutQuery = urlAndQuery[0].split(separator: "/").dropFirst().map(String.init)
+        guard !componentsWithoutQuery.isEmpty else {
+            return nil
+        }
+
+        let host = componentsWithoutQuery[0].punycodeEncodedHostname
+
+        let encodedPath = componentsWithoutQuery
+            .dropFirst()
+            .map { $0.addingPercentEncoding(withAllowedCharacters: NSCharacterSet.urlPathAllowed) ?? $0 }
+            .joined(separator: "/")
+
+        let hostPathSeparator = !encodedPath.isEmpty || urlAndQuery[0].hasSuffix("/") ? "/" : ""
+        let url = scheme + host + hostPathSeparator + encodedPath + query
+
+        self.init(string: url)
     }
 
     static func makeURL(fromSuggestionPhrase phrase: String) -> URL? {
-        guard let url = phrase.punycodedUrl, url.isValid else { return nil }
+        guard let url = URL(trimmedAddressBarString: phrase), url.isValid else { return nil }
         return url
     }
 
@@ -168,12 +238,14 @@ extension URL {
 
     // MARK: - Components
 
-    enum NavigationalScheme: String, CaseIterable {
+    struct NavigationalScheme: RawRepresentable, Hashable {
+        let rawValue: String
+
         static let separator = "://"
 
-        case http
-        case https
-        case file
+        static let http = NavigationalScheme(rawValue: "http")
+        static let https = NavigationalScheme(rawValue: "https")
+        static let file = NavigationalScheme(rawValue: "ftp")
 
         func separated() -> String {
             self.rawValue + Self.separator
@@ -181,6 +253,10 @@ extension URL {
 
         static var hypertextSchemes: [NavigationalScheme] {
             return [.http, .https]
+        }
+
+        static var validSchemes: [NavigationalScheme] {
+            return [.http, .https, .file]
         }
     }
 
@@ -282,17 +358,15 @@ extension URL {
     // MARK: - Validity
 
     var isValid: Bool {
-        guard let scheme = scheme else { return false }
+        guard let scheme = scheme.map(NavigationalScheme.init) else { return false }
 
-        if URL.NavigationalScheme(rawValue: scheme) != nil,
-           let host = host, host.isValidHost,
-           user == nil { return true }
+        if NavigationalScheme.hypertextSchemes.contains(scheme) {
+           return host?.isValidHost == true && user == nil
+        }
 
-        if scheme == URL.NavigationalScheme.file.rawValue { return true }
-
-        // This effectively allows external URLs to be entered by the user.
-        // Without this check single word entries get treated like domains.
-        return URL.NavigationalScheme(rawValue: scheme) == nil
+        // This effectively allows file:// and External App Scheme URLs to be entered by user
+        // Without this check single word entries get treated like domains
+        return true
     }
 
     var isDataURL: Bool {
