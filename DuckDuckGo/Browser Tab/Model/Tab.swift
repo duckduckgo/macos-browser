@@ -58,11 +58,29 @@ final class Tab: NSObject {
             } else if url == .welcome {
                 return .onboarding
             } else if url == .preferences {
-                return .preferences(pane: nil)
+                return .anyPreferencePane
+            } else if let preferencePane = url.flatMap(PreferencePaneIdentifier.init(url:)) {
+                return .preferences(pane: preferencePane)
             } else {
                 return .url(url ?? .blankPage)
             }
         }
+
+        static var displayableTabTypes: [TabContent] {
+            // Add new displayable types here
+            let displayableTypes = [TabContent.anyPreferencePane, .bookmarks]
+
+            return displayableTypes.sorted { first, second in
+                guard let firstTitle = first.title, let secondTitle = second.title else {
+                    return true // Arbitrary sort order, only non-standard tabs are displayable.
+                }
+                return firstTitle.localizedStandardCompare(secondTitle) == .orderedAscending
+            }
+        }
+
+        /// Convenience accessor for a Preferences Tab Content with no particular pane selected,
+        /// i.e. the currently selected pane is decided internally by `PreferencesViewController`.
+        static let anyPreferencePane: Self = .preferences(pane: nil)
 
         var isDisplayable: Bool {
             switch self {
@@ -81,16 +99,6 @@ final class Tab: NSObject {
                 return true
             default:
                 return false
-            }
-        }
-
-        static var displayableTabTypes: [TabContent] {
-            // !! Replace [TabContent.preferences, .bookmarks] below with new displayable Tab Types if added
-            return [TabContent.preferences(pane: nil), .bookmarks].sorted { first, second in
-                guard let firstTitle = first.title, let secondTitle = second.title else {
-                    return true // Arbitrary sort order, only non-standard tabs are displayable.
-                }
-                return firstTitle.localizedStandardCompare(secondTitle) == .orderedAscending
             }
         }
 

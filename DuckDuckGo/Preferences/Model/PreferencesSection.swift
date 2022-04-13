@@ -40,7 +40,7 @@ enum PreferencesSectionIdentifier: Hashable, CaseIterable {
     case about
 }
 
-enum PreferencePaneIdentifier: String, Hashable, Identifiable {
+enum PreferencePaneIdentifier: String, Equatable, Hashable, Identifiable {
     case defaultBrowser
     case appearance
     case privacy

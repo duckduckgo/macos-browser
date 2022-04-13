@@ -77,7 +77,7 @@ extension Preferences {
                         ForEach(model.sections) { section in
                             ForEach(section.panes) { pane in
                                 SidebarItem(pane: pane, isSelected: model.selectedPane == pane) {
-                                    model.selectedPane = pane
+                                    model.selectPane(pane)
                                 }
                             }
                             if section != model.sections.last {

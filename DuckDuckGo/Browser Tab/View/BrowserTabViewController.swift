@@ -306,7 +306,7 @@ final class BrowserTabViewController: NSViewController {
         case let .preferences(pane):
             removeAllTabContent()
             if let pane = pane, preferencesViewController.model.selectedPane != pane {
-                preferencesViewController.model.selectedPane = pane
+                preferencesViewController.model.selectPane(pane)
             }
             showTabContentController(preferencesViewController)
 
