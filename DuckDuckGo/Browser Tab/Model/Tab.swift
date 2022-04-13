@@ -78,7 +78,7 @@ final class Tab: NSObject {
             }
         }
 
-        /// Convenience accessor for a Preferences Tab Content with no particular pane selected,
+        /// Convenience accessor for `.preferences` Tab Content with no particular pane selected,
         /// i.e. the currently selected pane is decided internally by `PreferencesViewController`.
         static let anyPreferencePane: Self = .preferences(pane: nil)
 
@@ -217,7 +217,14 @@ final class Tab: NSObject {
             return
         }
         lastUpgradedURL = nil
-        self.content = content
+
+        switch (self.content, content) {
+        case (.preferences(pane: .some), .preferences(pane: nil)):
+            // prevent clearing currently selected pane (for state persistence purposes)
+            break
+        default:
+            self.content = content
+        }
     }
 
     @Published var title: String?

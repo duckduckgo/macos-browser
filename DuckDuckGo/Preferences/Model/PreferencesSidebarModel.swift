@@ -40,7 +40,7 @@ final class PreferencesSidebarModel: ObservableObject {
     }
 
     func selectPane(_ identifier: PreferencePaneIdentifier) {
-        if sections.flatMap(\.panes).contains(identifier) {
+        if sections.flatMap(\.panes).contains(identifier), identifier != selectedPane {
             selectedPane = identifier
         }
     }
