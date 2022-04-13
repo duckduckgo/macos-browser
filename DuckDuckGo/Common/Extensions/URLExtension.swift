@@ -119,6 +119,10 @@ extension URL {
         return URL(string: "about:preferences")!
     }
 
+    static func preferencePane(_ pane: PreferencePaneIdentifier) -> URL {
+        return Self.preferences.appendingPathComponent(pane.rawValue)
+    }
+
     // MARK: Pixel
 
     static let pixelBase = ProcessInfo.processInfo.environment["PIXEL_BASE_URL", default: "https://improving.duckduckgo.com"]

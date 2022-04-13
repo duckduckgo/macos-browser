@@ -47,7 +47,7 @@ final class Tab: NSObject {
     enum TabContent: Equatable {
         case homePage
         case url(URL)
-        case preferences
+        case preferences(pane: PreferencePaneIdentifier?)
         case bookmarks
         case onboarding
         case none
@@ -58,18 +58,35 @@ final class Tab: NSObject {
             } else if url == .welcome {
                 return .onboarding
             } else if url == .preferences {
-                return .preferences
+                return .preferences(pane: nil)
             } else {
                 return .url(url ?? .blankPage)
             }
         }
 
+        var isDisplayable: Bool {
+            switch self {
+            case .preferences, .bookmarks:
+                return true
+            default:
+                return false
+            }
+        }
+
+        func matchesDisplayableTab(_ other: TabContent) -> Bool {
+            switch (self, other) {
+            case (.preferences, .preferences):
+                return true
+            case (.bookmarks, .bookmarks):
+                return true
+            default:
+                return false
+            }
+        }
+
         static var displayableTabTypes: [TabContent] {
-            return [TabContent.preferences, .bookmarks].sorted { first, second in
-                switch first {
-                case .homePage, .url, .preferences, .bookmarks, .onboarding, .none: break
-                // !! Replace [TabContent.preferences, .bookmarks] above with new displayable Tab Types if added
-                }
+            // !! Replace [TabContent.preferences, .bookmarks] below with new displayable Tab Types if added
+            return [TabContent.preferences(pane: nil), .bookmarks].sorted { first, second in
                 guard let firstTitle = first.title, let secondTitle = second.title else {
                     return true // Arbitrary sort order, only non-standard tabs are displayable.
                 }

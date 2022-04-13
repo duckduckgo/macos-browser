@@ -40,7 +40,7 @@ final class PreferencesSidebarModel: ObservableObject {
     }
 
     func resetTabSelectionIfNeeded() {
-        if let preferencesTabIndex = tabSwitcherTabs.firstIndex(of: .preferences) {
+        if let preferencesTabIndex = tabSwitcherTabs.firstIndex(of: .preferences(pane: nil)) {
             if preferencesTabIndex != selectedTabIndex {
                 selectedTabIndex = preferencesTabIndex
             }

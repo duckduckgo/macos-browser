@@ -109,13 +109,13 @@ final class TabCollectionViewModel: NSObject {
 
     @discardableResult func selectDisplayableTabIfPresent(_ content: Tab.TabContent) -> Bool {
         guard changesEnabled else { return false }
-        guard Tab.TabContent.displayableTabTypes.contains(content),
-              let index = tabCollection.tabs.firstIndex(where: { $0.content == content })
+        guard content.isDisplayable, let index = tabCollection.tabs.firstIndex(where: { $0.content.matchesDisplayableTab(content) })
         else {
             return false
         }
 
         if select(at: index) {
+            tabCollection.tabs[index].setContent(content)
             delegate?.tabCollectionViewModel(self, didSelectAt: index)
             return true
         }
@@ -159,6 +159,9 @@ final class TabCollectionViewModel: NSObject {
     // MARK: - Addition
 
     func appendNewTab(with content: Tab.TabContent = .homePage, selected: Bool = true, forceChange: Bool = false) {
+        if selectDisplayableTabIfPresent(content) {
+            return
+        }
         append(tab: Tab(content: content), selected: selected, forceChange: forceChange)
     }
 

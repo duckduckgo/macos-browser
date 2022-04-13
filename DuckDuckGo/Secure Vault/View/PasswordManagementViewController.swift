@@ -81,7 +81,7 @@ final class PasswordManagementViewController: NSViewController {
 
             let string = NSMutableAttributedString(string: UserText.pmLockScreenPreferencesLabel + " ")
             let linkString = NSMutableAttributedString(string: UserText.pmLockScreenPreferencesLink, attributes: [
-                .link: URL.preferences
+                .link: URL.preferencePane(.autofill)
             ])
 
             let paragraphStyle = NSMutableParagraphStyle()
@@ -242,9 +242,9 @@ final class PasswordManagementViewController: NSViewController {
         sender.menu?.popUp(positioning: nil, at: location, in: sender.superview)
     }
 
-    @IBAction func openPreferences(_ sender: Any) {
+    @IBAction func openAutofillPreferences(_ sender: Any) {
+        WindowControllersManager.shared.showPreferencesTab(withSelectedPane: .autofill)
         self.dismiss()
-        NSApp.sendAction(#selector(openPreferences(_:)), to: nil, from: sender)
     }
 
     @IBAction func openImportBrowserDataWindow(_ sender: Any?) {
@@ -906,8 +906,8 @@ extension PasswordManagementViewController: NSTextFieldDelegate {
 extension PasswordManagementViewController: NSTextViewDelegate {
 
     func textView(_ textView: NSTextView, clickedOnLink link: Any, at charIndex: Int) -> Bool {
-        if let link = link as? URL, link == URL.preferences {
-            WindowControllersManager.shared.showPreferencesTab()
+        if let link = link as? URL, let pane = PreferencePaneIdentifier(url: link) {
+            WindowControllersManager.shared.showPreferencesTab(withSelectedPane: pane)
             self.dismiss()
 
             Pixel.fire(.passwordManagerLockScreenPreferencesButtonPressed)
