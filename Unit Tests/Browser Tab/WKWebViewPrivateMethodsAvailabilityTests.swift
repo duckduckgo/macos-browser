@@ -42,4 +42,9 @@ final class WKWebViewPrivateMethodsAvailabilityTests: XCTestCase {
         XCTAssertTrue(WKWebView.instancesRespond(to: #selector(WKWebView.createPDF(withConfiguration:completionHandler:))))
     }
 
+    func testWebViewRespondsTo_printOperationWithPrintInfo() {
+        XCTAssertTrue(WKWebView.instancesRespond(to: #selector(WKWebView._printOperation(with:))))
+        XCTAssertTrue(WKWebView.instancesRespond(to: #selector(WKWebView._printOperation(with:forFrame:))))
+    }
+
 }
