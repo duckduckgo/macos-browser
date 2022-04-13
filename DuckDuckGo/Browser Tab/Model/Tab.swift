@@ -1060,6 +1060,7 @@ extension Tab: WKNavigationDelegate {
     }
 
     func webView(_ webView: WKWebView, didFailProvisionalNavigation navigation: WKNavigation!, withError error: Error) {
+        webView.stopLoading()
         if currentDownload != nil && (error as NSError).code == ErrorCodes.frameLoadInterrupted {
             currentDownload = nil
             return
