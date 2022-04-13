@@ -105,7 +105,7 @@ final class AutoconsentUserScript: NSObject, UserScriptWithAutoconsent {
             return
         }
 
-        guard String(describing: url) != "about:home" else {
+        guard url.absoluteString != "about:home" else {
             return
         }
         
