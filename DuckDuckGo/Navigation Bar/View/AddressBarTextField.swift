@@ -600,10 +600,7 @@ final class AddressBarTextField: NSTextField {
         AppearancePreferences.shared.showFullURL.toggle()
 
         let shouldShowFullURL = AppearancePreferences.shared.showFullURL
-
         menuItem.state = shouldShowFullURL ? .on : .off
-
-        // Change setting
     }
 
     private func initSuggestionWindow() {
