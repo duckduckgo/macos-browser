@@ -21,10 +21,16 @@ import XCTest
 
 struct AppearancePreferencesPersistorMock: AppearancePreferencesPersistor {
     var showFullURL: Bool
+    var showAutocompleteSuggestions: Bool
     var currentThemeName: String
 
-    init(showFullURL: Bool = false, currentThemeName: String = ThemeName.systemDefault.rawValue) {
+    init(
+        showFullURL: Bool = false,
+        showAutocompleteSuggestions: Bool = true,
+        currentThemeName: String = ThemeName.systemDefault.rawValue
+    ) {
         self.showFullURL = showFullURL
+        self.showAutocompleteSuggestions = showAutocompleteSuggestions
         self.currentThemeName = currentThemeName
     }
 }
@@ -35,28 +41,31 @@ final class AppearancePreferencesTests: XCTestCase {
         var model = AppearancePreferences(
             persistor: AppearancePreferencesPersistorMock(
                 showFullURL: false,
+                showAutocompleteSuggestions: true,
                 currentThemeName: ThemeName.systemDefault.rawValue
             )
         )
 
         XCTAssertEqual(model.showFullURL, false)
+        XCTAssertEqual(model.showAutocompleteSuggestions, true)
         XCTAssertEqual(model.currentThemeName, ThemeName.systemDefault)
 
         model = AppearancePreferences(
             persistor: AppearancePreferencesPersistorMock(
                 showFullURL: true,
+                showAutocompleteSuggestions: false,
                 currentThemeName: ThemeName.light.rawValue
             )
         )
 
         XCTAssertEqual(model.showFullURL, true)
+        XCTAssertEqual(model.showAutocompleteSuggestions, false)
         XCTAssertEqual(model.currentThemeName, ThemeName.light)
     }
 
     func testWhenInitializedWithGarbageThenThemeIsSetToSystemDefault() throws {
         let model = AppearancePreferences(
             persistor: AppearancePreferencesPersistorMock(
-                showFullURL: false,
                 currentThemeName: "garbage"
             )
         )

@@ -582,6 +582,20 @@ final class AddressBarTextField: NSTextField {
         }
     }()
 
+    @objc private func toggleAutocomplete(_ menuItem: NSMenuItem) {
+        AppearancePreferences.shared.showAutocompleteSuggestions.toggle()
+
+        let shouldShowAutocomplete = AppearancePreferences.shared.showAutocompleteSuggestions
+
+        menuItem.state = shouldShowAutocomplete ? .on : .off
+
+        if shouldShowAutocomplete {
+            handleTextDidChange()
+        } else {
+            hideSuggestionWindow()
+        }
+    }
+
     private func initSuggestionWindow() {
         let windowController = NSStoryboard.suggestion
             .instantiateController(withIdentifier: "SuggestionWindowController") as? NSWindowController
@@ -683,6 +697,10 @@ extension AddressBarTextField: NSTextFieldDelegate {
     }
 
     func controlTextDidChange(_ obj: Notification) {
+        handleTextDidChange()
+    }
+
+    private func handleTextDidChange() {
         let stringValueWithoutSuffix = self.stringValueWithoutSuffix
 
         // if user continues typing letters from displayed Suggestion
@@ -806,7 +824,9 @@ extension AddressBarTextField: NSTextViewDelegate {
     }
 
     func textView(_ view: NSTextView, menu: NSMenu, for event: NSEvent, at charIndex: Int) -> NSMenu? {
-        return removingAttributeChangingMenuItems(from: menu)
+        let textViewMenu = removingAttributeChangingMenuItems(from: menu)
+        textViewMenu.addItem(makeAutocompleteSuggestionsMenuItem())
+        return textViewMenu
     }
 
     private static var selectorsToRemove: Set<Selector> = Set([
@@ -839,6 +859,16 @@ extension AddressBarTextField: NSTextViewDelegate {
         return menu
     }
 
+    private func makeAutocompleteSuggestionsMenuItem() -> NSMenuItem {
+        let menuItem = NSMenuItem(
+            title: UserText.showAutocompleteSuggestions,
+            action: #selector(toggleAutocomplete(_:)),
+            keyEquivalent: ""
+        )
+        menuItem.state = AppearancePreferences.shared.showAutocompleteSuggestions ? .on : .off
+
+        return menuItem
+    }
 }
 
 final class AddressBarTextEditor: NSTextView {
