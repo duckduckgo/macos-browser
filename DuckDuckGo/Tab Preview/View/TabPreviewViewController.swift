@@ -44,7 +44,7 @@ extension TabPreviewViewController {
 
         // Search queries can match valid URL formats, so prevent creating a URL object from the address bar string if on a search page.
         if !(tabViewModel.tab.content.url?.isDuckDuckGoSearch ?? false),
-           let url = tabViewModel.addressBarString.punycodedUrl,
+           let url = URL(trimmedAddressBarString: tabViewModel.addressBarString),
            let punycodeDecoded = url.punycodeDecodedString {
             urlTextField.stringValue = punycodeDecoded
         } else {

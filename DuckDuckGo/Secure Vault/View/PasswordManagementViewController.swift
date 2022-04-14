@@ -359,8 +359,6 @@ final class PasswordManagementViewController: NSViewController {
             self?.doSaveCredentials(credentials)
         }, onDeleteRequested: { [weak self] credentials in
             self?.promptToDelete(credentials: credentials)
-        }, onCancelled: { [weak self] in
-            self?.refetchWithText(self!.searchField.stringValue)
         })
 
         self.itemModel = itemModel
@@ -377,8 +375,6 @@ final class PasswordManagementViewController: NSViewController {
             self?.doSaveIdentity(note)
         }, onDeleteRequested: { [weak self] identity in
             self?.promptToDelete(identity: identity)
-        }, onCancelled: { [weak self] in
-            self?.refetchWithText(self!.searchField.stringValue)
         })
 
         self.itemModel = itemModel
@@ -395,8 +391,6 @@ final class PasswordManagementViewController: NSViewController {
             self?.doSaveNote(note)
         }, onDeleteRequested: { [weak self] note in
             self?.promptToDelete(note: note)
-        }, onCancelled: { [weak self] in
-            self?.refetchWithText(self!.searchField.stringValue)
         })
 
         self.itemModel = itemModel
@@ -413,8 +407,6 @@ final class PasswordManagementViewController: NSViewController {
             self?.doSaveCreditCard(card)
         }, onDeleteRequested: { [weak self] card in
             self?.promptToDelete(card: card)
-        }, onCancelled: { [weak self] in
-            self?.refetchWithText(self!.searchField.stringValue)
         })
 
         self.itemModel = itemModel

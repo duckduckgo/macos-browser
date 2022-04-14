@@ -364,6 +364,19 @@ final class BrowserTabViewController: NSViewController {
         }
         return overlay
     }
+
+    @objc(_webView:printFrame:)
+    func webView(_ webView: WKWebView, printFrame handle: Any) {
+        webView.tab?.print(frame: handle)
+    }
+
+    @available(macOS 12, *)
+    @objc(_webView:printFrame:pdfFirstPageSize:completionHandler:)
+    func webView(_ webView: WKWebView, printFrame handle: Any, pdfFirstPageSize size: CGSize, completionHandler: () -> Void) {
+        self.webView(webView, printFrame: handle)
+        completionHandler()
+    }
+
 }
 
 extension BrowserTabViewController: ContentOverlayUserScriptDelegate {
@@ -396,7 +409,10 @@ extension BrowserTabViewController: TabDelegate {
     func tab(_ tab: Tab, requestedOpenExternalURL url: URL, forUserEnteredURL userEntered: Bool) {
 
         let searchForExternalUrl = { [weak tab] in
-            tab?.update(url: URL.makeSearchUrl(from: url.absoluteString), userEntered: false)
+            // Redirect after handing WebView.url update after cancelling the request
+            DispatchQueue.main.async {
+                tab?.update(url: URL.makeSearchUrl(from: url.absoluteString), userEntered: false)
+            }
         }
 
         // Another way of detecting whether an app is installed to handle a protocol is described in Asana:
@@ -412,7 +428,7 @@ extension BrowserTabViewController: TabDelegate {
         let permissionType = PermissionType.externalScheme(scheme: url.scheme ?? "")
 
         tab.permissions.permissions([permissionType],
-                                    requestedForDomain: webView?.url?.host ?? "localhost",
+                                    requestedForDomain: webView?.url?.host,
                                     url: url) { [weak self, weak tab] granted in
             guard granted, let tab = tab else {
                 if userEntered {
