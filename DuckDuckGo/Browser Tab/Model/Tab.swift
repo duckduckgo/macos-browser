@@ -143,11 +143,12 @@ final class Tab: NSObject {
     }
 
     deinit {
-        self.userContentController.removeAllUserScripts()
+        webView.stopLoading()
+        webView.stopMediaCapture()
+        webView.fullscreenWindowController?.close()
+        userContentController.removeAllUserScripts()
 
-        #if DEBUG
-        assert(self.isClosing || !content.isUrl, "tabWillClose() was not called for this Tab")
-        #endif
+        cbaTimeReporter?.tabWillClose(self)
     }
 
     private var userContentController: UserContentController {
@@ -464,20 +465,6 @@ final class Tab: NSObject {
                 await addHomePageToWebViewIfNeeded()
             }
         }
-    }
-
-    #if DEBUG
-    private var isClosing = false
-    #endif
-
-    func tabWillClose() {
-        webView.stopLoading()
-        webView.stopMediaCapture()
-        cbaTimeReporter?.tabWillClose(self)
-
-        #if DEBUG
-        self.isClosing = true
-        #endif
     }
 
     // MARK: - Favicon

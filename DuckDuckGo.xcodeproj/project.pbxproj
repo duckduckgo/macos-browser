@@ -668,6 +668,7 @@
 		B6B1E88226D5DAC30062C350 /* Downloads.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = B6B1E88126D5DAC30062C350 /* Downloads.storyboard */; };
 		B6B1E88426D5EB570062C350 /* DownloadsCellView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B6B1E88326D5EB570062C350 /* DownloadsCellView.swift */; };
 		B6B1E88B26D774090062C350 /* LinkButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = B6B1E88A26D774090062C350 /* LinkButton.swift */; };
+		B6B2400E28083B49001B8F3A /* WebViewContainerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B6B2400D28083B49001B8F3A /* WebViewContainerView.swift */; };
 		B6B3E0962654DACD0040E0A2 /* UTTypeTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = B6B3E0952654DACD0040E0A2 /* UTTypeTests.swift */; };
 		B6B3E0E12657EA7A0040E0A2 /* NSScreenExtension.swift in Sources */ = {isa = PBXBuildFile; fileRef = B6B3E0DC2657E9CF0040E0A2 /* NSScreenExtension.swift */; };
 		B6BBF1702744CDE1004F850E /* CoreDataStoreTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = B6BBF16F2744CDE1004F850E /* CoreDataStoreTests.swift */; };
@@ -1421,6 +1422,7 @@
 		B6B1E88126D5DAC30062C350 /* Downloads.storyboard */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; path = Downloads.storyboard; sourceTree = "<group>"; };
 		B6B1E88326D5EB570062C350 /* DownloadsCellView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DownloadsCellView.swift; sourceTree = "<group>"; };
 		B6B1E88A26D774090062C350 /* LinkButton.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LinkButton.swift; sourceTree = "<group>"; };
+		B6B2400D28083B49001B8F3A /* WebViewContainerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WebViewContainerView.swift; sourceTree = "<group>"; };
 		B6B3E0952654DACD0040E0A2 /* UTTypeTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UTTypeTests.swift; sourceTree = "<group>"; };
 		B6B3E0DC2657E9CF0040E0A2 /* NSScreenExtension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NSScreenExtension.swift; sourceTree = "<group>"; };
 		B6BBF16F2744CDE1004F850E /* CoreDataStoreTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CoreDataStoreTests.swift; sourceTree = "<group>"; };
@@ -2861,6 +2863,7 @@
 				AA585D83248FD31100E9A3E2 /* BrowserTabViewController.swift */,
 				856C98A5256EB59600A22F1F /* MenuItemSelectors.swift */,
 				AA6FFB4524DC3B5A0028F4D0 /* WebView.swift */,
+				B6B2400D28083B49001B8F3A /* WebViewContainerView.swift */,
 				B637273A26CBC8AF00C8CB02 /* AuthenticationAlert.swift */,
 			);
 			path = View;
@@ -4510,6 +4513,7 @@
 				B61F015525EDD5A700ABB5A3 /* UserContentController.swift in Sources */,
 				4BF01C00272AE74C00884A61 /* CountryList.swift in Sources */,
 				37CD54CC27F2FDD100F1F7B9 /* PreferencesSection.swift in Sources */,
+				B6B2400E28083B49001B8F3A /* WebViewContainerView.swift in Sources */,
 				AAC5E4D925D6A711007F5990 /* BookmarkStore.swift in Sources */,
 				B6FA893F269C424500588ECD /* PrivacyDashboardViewController.swift in Sources */,
 				37D2771527E870D4003365FD /* PreferencesAppearanceView.swift in Sources */,

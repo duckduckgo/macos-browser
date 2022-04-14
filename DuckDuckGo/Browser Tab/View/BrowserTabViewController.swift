@@ -127,37 +127,22 @@ final class BrowserTabViewController: NSViewController {
               let container = container ?? self.webViewContainer
         else { return }
 
-        // close fullscreenWindowController when closing tab in FullScreen mode
-        webView.fullscreenWindowController?.close()
-
-        webView.removeFromSuperview()
-        if self.webView == webView {
+        if self.webView === webView {
             self.webView = nil
         }
 
         container.removeFromSuperview()
-        if self.webViewContainer == container {
+        if self.webViewContainer === container {
             self.webViewContainer = nil
         }
     }
 
     private func addWebViewToViewHierarchy(_ webView: WebView) {
-        // This code should ideally use Auto Layout, but in order to enable the web inspector, it needs to use springs & structs.
-        // The line at the bottom of this comment is the "correct" method of doing this, but breaks the inspector.
-        // Context: https://stackoverflow.com/questions/60727065/wkwebview-web-inspector-in-macos-app-fails-to-render-and-flickers-flashes
-        //
-        // view.addAndLayout(newWebView)
-
-        webView.frame = view.bounds
-        webView.autoresizingMask = [.width, .height]
-
-        let container = NSView(frame: view.bounds)
-        container.autoresizingMask = [.width, .height]
-        view.addSubview(container)
-        container.addSubview(webView)
+        let container = WebViewContainerView(webView: webView, frame: view.bounds)
         self.webViewContainer = container
+        view.addSubview(container)
 
-        // Make sure this is on top
+        // Make sure link preview (tooltip shown in the bottom-left) is on top
         view.addSubview(hoverLabelContainer)
     }
 
@@ -316,7 +301,7 @@ final class BrowserTabViewController: NSViewController {
 
         case .url:
             // Adjust webviews if there was a tab switch or content type switch
-            if webView != tabViewModel?.tab.webView || tabViewModel?.tab.webView.superview == nil {
+            if webView != tabViewModel?.tab.webView || tabViewModel?.tab.webView.tabContentView.superview == nil {
                 removeAllTabContent(includingWebView: false)
                 changeWebView(tabViewModel: tabViewModel)
             }

@@ -28,7 +28,7 @@ final class AbstractContentBlockingAssetsCompilationTimeReporter<Caller: AnyObje
     var currentTime: () -> TimeInterval = CACurrentMediaTime
 
     private var waitStart: TimeInterval?
-    private var waiters = NSMapTable<Caller, NSNumber>.init(keyOptions: .weakMemory, valueOptions: .strongMemory)
+    private var waiters = Set<NSValue>()
     private var isFinished = false
 
     @UserDefaultsWrapper(key: .onboardingFinished, defaultValue: false)
@@ -48,7 +48,7 @@ final class AbstractContentBlockingAssetsCompilationTimeReporter<Caller: AnyObje
     func tabWillWaitForRulesCompilation(_ tab: Caller) {
         guard !isFinished else { return }
 
-        waiters.setObject(NSNumber(value: true), forKey: tab)
+        waiters.insert(NSValue(nonretainedObject: tab))
         if waitStart == nil {
             waitStart = currentTime()
         }
@@ -65,8 +65,8 @@ final class AbstractContentBlockingAssetsCompilationTimeReporter<Caller: AnyObje
 
     /// Called when Rules compilation finishes
     func reportWaitTimeForTabFinishedWaitingForRules(_ tab: Caller) {
-        defer { waiters.removeObject(forKey: tab) }
-        guard waiters.object(forKey: tab) != nil,
+        defer { waiters.remove(NSValue(nonretainedObject: tab)) }
+        guard waiters.contains(NSValue(nonretainedObject: tab)),
               !isFinished,
               let waitStart = waitStart
         else { return }
@@ -76,8 +76,8 @@ final class AbstractContentBlockingAssetsCompilationTimeReporter<Caller: AnyObje
 
     /// If Tab is going to close while the rules are still being compiled: report wait time with Tab .closed argument
     func tabWillClose(_ tab: Caller) {
-        defer { waiters.removeObject(forKey: tab) }
-        guard waiters.object(forKey: tab) != nil,
+        defer { waiters.remove(NSValue(nonretainedObject: tab)) }
+        guard waiters.contains(NSValue(nonretainedObject: tab)),
               !isFinished,
               let waitStart = self.waitStart
         else { return }

@@ -26,10 +26,8 @@ final class WindowsManager {
     }
 
     class func closeWindows(except window: NSWindow? = nil) {
-        NSApplication.shared.windows.forEach {
-            if $0 != window {
-                $0.close()
-            }
+        for controler in WindowControllersManager.shared.mainWindowControllers where controler.window !== window {
+            controler.close()
         }
     }
 
