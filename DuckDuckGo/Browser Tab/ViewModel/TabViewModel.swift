@@ -200,7 +200,7 @@ final class TabViewModel {
     
     private func updatePassiveAddressBarString(showURL: Bool, url: URL, host: String) {
         if showURL {
-            passiveAddressBarString = url.toString(decodePunycode: false, dropScheme: false, needsWWW: true, dropTrailingSlash: true)
+            passiveAddressBarString = url.toString(decodePunycode: false, dropScheme: false, dropTrailingSlash: true)
         } else {
             passiveAddressBarString = host.drop(prefix: URL.HostPrefix.www.separated())
         }
