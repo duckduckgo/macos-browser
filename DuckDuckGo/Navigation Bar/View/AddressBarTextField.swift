@@ -862,7 +862,7 @@ extension AddressBarTextField: NSTextViewDelegate {
         for (index, item) in menu.items.enumerated() {
             if foundPreferredSelector && item.isSeparatorItem {
                 let indexAfterSeparator = index + 1
-                return (indexAfterSeparator < menu.items.count) ? indexAfterSeparator : index
+                return menu.items.indices.contains(indexAfterSeparator) ? indexAfterSeparator : index
             }
             
             if let action = item.action, preferredSelectorNames.contains(action.description) {
