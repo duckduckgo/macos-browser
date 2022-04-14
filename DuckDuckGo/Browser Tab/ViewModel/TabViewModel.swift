@@ -186,7 +186,7 @@ final class TabViewModel {
             return
         }
 
-        guard let host = url.host ?? tab.parentTab?.content.url?.host else {
+        guard let host = tabHost else {
             // also lands here for about:blank and about:home
             addressBarString = ""
             passiveAddressBarString = ""
