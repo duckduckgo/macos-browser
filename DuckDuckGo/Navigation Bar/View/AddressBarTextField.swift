@@ -595,6 +595,16 @@ final class AddressBarTextField: NSTextField {
             hideSuggestionWindow()
         }
     }
+    
+    @objc private func toggleShowFullWebsiteAddress(_ menuItem: NSMenuItem) {
+        AppearancePreferences.shared.showFullURL.toggle()
+
+        let shouldShowFullURL = AppearancePreferences.shared.showFullURL
+
+        menuItem.state = shouldShowFullURL ? .on : .off
+
+        // Change setting
+    }
 
     private func initSuggestionWindow() {
         let windowController = NSStoryboard.suggestion
@@ -825,8 +835,42 @@ extension AddressBarTextField: NSTextViewDelegate {
 
     func textView(_ view: NSTextView, menu: NSMenu, for event: NSEvent, at charIndex: Int) -> NSMenu? {
         let textViewMenu = removingAttributeChangingMenuItems(from: menu)
-        textViewMenu.addItem(makeAutocompleteSuggestionsMenuItem())
+        let additionalMenuItems = [
+            makeAutocompleteSuggestionsMenuItem(),
+            makeFullWebsiteAddressMenuItem(),
+            NSMenuItem.separator()
+        ]
+        
+        if let insertionPoint = menuItemInsertionPoint(within: menu) {
+            additionalMenuItems.reversed().forEach { item in
+                textViewMenu.insertItem(item, at: insertionPoint + 1)
+            }
+        } else {
+            additionalMenuItems.forEach { item in
+                textViewMenu.addItem(item)
+            }
+        }
+        
         return textViewMenu
+    }
+    
+    /// Returns the menu item after which new items should be added.
+    /// - Returns: The preferred menu item, detected by checking a static list of selectors. If none are found, nil is returned.
+    private func menuItemInsertionPoint(within menu: NSMenu) -> Int? {
+        let preferredSelectorNames = ["cut:", "copy:", "paste:"]
+        var foundPreferredSelector = false
+        
+        for (index, item) in menu.items.enumerated() {
+            if foundPreferredSelector && item.isSeparatorItem {
+                return index
+            }
+            
+            if let action = item.action, preferredSelectorNames.contains(action.description) {
+                foundPreferredSelector = true
+            }
+        }
+
+        return nil
     }
 
     private static var selectorsToRemove: Set<Selector> = Set([
@@ -861,11 +905,22 @@ extension AddressBarTextField: NSTextViewDelegate {
 
     private func makeAutocompleteSuggestionsMenuItem() -> NSMenuItem {
         let menuItem = NSMenuItem(
-            title: UserText.showAutocompleteSuggestions,
+            title: UserText.showAutocompleteSuggestions.localizedCapitalized,
             action: #selector(toggleAutocomplete(_:)),
             keyEquivalent: ""
         )
         menuItem.state = AppearancePreferences.shared.showAutocompleteSuggestions ? .on : .off
+
+        return menuItem
+    }
+    
+    private func makeFullWebsiteAddressMenuItem() -> NSMenuItem {
+        let menuItem = NSMenuItem(
+            title: UserText.showFullWebsiteAddress.localizedCapitalized,
+            action: #selector(toggleShowFullWebsiteAddress(_:)),
+            keyEquivalent: ""
+        )
+        menuItem.state = AppearancePreferences.shared.showFullURL ? .on : .off
 
         return menuItem
     }
