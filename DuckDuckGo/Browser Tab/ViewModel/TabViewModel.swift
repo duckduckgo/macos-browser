@@ -114,6 +114,7 @@ final class TabViewModel {
             guard let self = self else { return }
             self.errorViewState.isVisible = self.tab.error != nil
             self.errorViewState.message = self.tab.error?.localizedDescription
+            self.updateCanGoBack()
         } .store(in: &cancellables)
     }
 
@@ -135,7 +136,7 @@ final class TabViewModel {
     }
 
     func updateCanGoBack() {
-        canGoBack = tab.canGoBack || tab.canBeClosedWithBack
+        canGoBack = tab.canGoBack || tab.canBeClosedWithBack || tab.error != nil
     }
 
     private func updateCanBeBookmarked() {

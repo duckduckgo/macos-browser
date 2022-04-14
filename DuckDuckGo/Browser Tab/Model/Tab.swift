@@ -284,20 +284,25 @@ final class Tab: NSObject {
     }
 
     func goForward() {
-        guard self.canGoForward else { return }
+        guard canGoForward else { return }
         shouldStoreNextVisit = false
         webView.goForward()
     }
 
     var canGoBack: Bool {
-        webView.canGoBack
+        webView.canGoBack || error != nil
     }
 
     func goBack() {
-        guard self.canGoBack else {
+        guard canGoBack else {
             if canBeClosedWithBack {
                 delegate?.closeTab(self)
             }
+            return
+        }
+
+        guard error == nil else {
+            webView.reload()
             return
         }
 
