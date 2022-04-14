@@ -148,7 +148,7 @@ final class Tab: NSObject {
         webView.fullscreenWindowController?.close()
         userContentController.removeAllUserScripts()
 
-        cbaTimeReporter?.tabWillClose(self)
+        cbaTimeReporter?.tabWillClose(self.instrumentation.currentTabIdentifier)
     }
 
     private var userContentController: UserContentController {
@@ -967,9 +967,9 @@ extension Tab: WKNavigationDelegate {
     private func prepareForContentBlocking() async {
         // Ensure Content Blocking Assets (WKContentRuleList&UserScripts) are installed
         if !userContentController.contentBlockingAssetsInstalled {
-            cbaTimeReporter?.tabWillWaitForRulesCompilation(self)
+            cbaTimeReporter?.tabWillWaitForRulesCompilation(self.instrumentation.currentTabIdentifier)
             await userContentController.awaitContentBlockingAssetsInstalled()
-            cbaTimeReporter?.reportWaitTimeForTabFinishedWaitingForRules(self)
+            cbaTimeReporter?.reportWaitTimeForTabFinishedWaitingForRules(self.instrumentation.currentTabIdentifier)
         } else {
             cbaTimeReporter?.reportNavigationDidNotWaitForRules()
         }
