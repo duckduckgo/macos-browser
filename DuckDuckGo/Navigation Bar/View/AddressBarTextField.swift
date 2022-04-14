@@ -843,7 +843,7 @@ extension AddressBarTextField: NSTextViewDelegate {
         
         if let insertionPoint = menuItemInsertionPoint(within: menu) {
             additionalMenuItems.reversed().forEach { item in
-                textViewMenu.insertItem(item, at: insertionPoint + 1)
+                textViewMenu.insertItem(item, at: insertionPoint)
             }
         } else {
             additionalMenuItems.forEach { item in
@@ -855,14 +855,17 @@ extension AddressBarTextField: NSTextViewDelegate {
     }
     
     /// Returns the menu item after which new items should be added.
-    /// - Returns: The preferred menu item, detected by checking a static list of selectors. If none are found, nil is returned.
+    /// This will be the first separator that comes after a predefined list of items: Cut, Copy, or Paste.
+    ///
+    /// - Returns: The preferred menu item. If none are found, nil is returned.
     private func menuItemInsertionPoint(within menu: NSMenu) -> Int? {
         let preferredSelectorNames = ["cut:", "copy:", "paste:"]
         var foundPreferredSelector = false
         
         for (index, item) in menu.items.enumerated() {
             if foundPreferredSelector && item.isSeparatorItem {
-                return index
+                let indexAfterSeparator = index + 1
+                return (indexAfterSeparator < menu.items.count) ? indexAfterSeparator : index
             }
             
             if let action = item.action, preferredSelectorNames.contains(action.description) {
