@@ -49,16 +49,57 @@ final class TabLazyLoader {
 
         subscribeToTabDidFinishNavigation(currentTab)
 
+        Publishers.Merge(currentTab.webViewDidFinishNavigationPublisher, currentTab.webViewDidFailNavigationPublisher)
+            .prefix(1)
+            .sink { [weak self] in
+                self?.reloadRecentlySelectedTabs()
+            }
+            .store(in: &cancellables)
+    }
+
+    private func reloadRecentlySelectedTabs() {
+        let tabs = findRecentlySelectedTabs()
+        guard !tabs.isEmpty else {
+            tabDidFinishLoadingPublisher.send(completion: .finished)
+            return
+        }
+
         tabDidFinishLoadingPublisher
-            .prefix(Const.numberOfLazyLoadedTabs + 1)
+            .prefix(tabs.count + 1)
             .sink(receiveCompletion: { _ in
                 print("Lazy tab loading finished")
-            }, receiveValue: { [weak self] tab in
+            }, receiveValue: { tab in
                 print("Tab did finish loading", String(reflecting: tab.content.url))
-                self?.tabsSelectedOrReloadedInThisSession.insert(tab)
-                self?.reloadRecentlySelectedTab()
             })
             .store(in: &cancellables)
+
+        tabs.forEach { tab in
+            subscribeToTabDidFinishNavigation(tab)
+            print("Reloading", String(reflecting: tab.content.url))
+            tab.reload()
+//            Task {
+//                let didRequestReload = await tab.reloadIfNeeded()
+//                if !didRequestReload {
+//                    print("Tab cached, skipping reload", String(reflecting: tab.content.url))
+//                    tabDidFinishLoadingPublisher.send(tab)
+//                } else {
+//                    print("Reloading tab", String(reflecting: tab.content.url))
+//                }
+//            }
+        }
+    }
+
+    private func findRecentlySelectedTabs() -> [Tab] {
+        guard let viewModel = tabCollectionViewModel else {
+            return []
+        }
+
+        return Array(
+            viewModel.tabCollection.tabs
+                .filter { $0.lastSelectedAt != nil && $0.content.isUrl && !tabsSelectedOrReloadedInThisSession.contains($0) }
+                .sorted { $0.lastSelectedAt! > $1.lastSelectedAt! }
+                .prefix(Const.numberOfLazyLoadedTabs)
+        )
     }
 
     private func reloadRecentlySelectedTab() {
