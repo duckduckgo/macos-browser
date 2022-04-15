@@ -185,6 +185,7 @@ final class Tab: NSObject {
     // MARK: - Event Publishers
 
     let webViewDidFinishNavigationPublisher = PassthroughSubject<Void, Never>()
+    let webViewDidFailNavigationPublisher = PassthroughSubject<Void, Never>()
 
     @MainActor
     @Published var isAMPProtectionExtracting: Bool = false
@@ -406,7 +407,7 @@ final class Tab: NSObject {
     }()
 
     @MainActor
-    private func reloadIfNeeded(shouldLoadInBackground: Bool = false) async {
+    @discardableResult func reloadIfNeeded(shouldLoadInBackground: Bool = false) async -> Bool {
         let url = await linkProtection.getCleanURL(from: contentURL, onStartExtracting: {
             isAMPProtectionExtracting = true
         }, onFinishExtracting: { [weak self]
@@ -417,8 +418,11 @@ final class Tab: NSObject {
             let didRestore = restoreSessionStateDataIfNeeded()
             if !didRestore {
                 webView.load(url)
+                return true
             }
+            return false
         }
+        return false
     }
 
     @MainActor
@@ -1096,6 +1100,7 @@ extension Tab: WKNavigationDelegate {
         // https://app.asana.com/0/1199230911884351/1200381133504356/f
         //        hasError = true
 
+        webViewDidFailNavigationPublisher.send()
         invalidateSessionStateData()
     }
 
