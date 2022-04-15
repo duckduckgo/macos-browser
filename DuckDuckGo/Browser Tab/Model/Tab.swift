@@ -403,7 +403,8 @@ final class Tab: NSObject {
     @MainActor
     private func shouldLoadURL(_ url: URL, shouldLoadInBackground: Bool = false) -> Bool {
         // don‘t reload in background unless shouldLoadInBackground
-        guard (webView.superview != nil || shouldLoadInBackground),
+        guard url.isValid,
+              (webView.superview != nil || shouldLoadInBackground),
               // don‘t reload when already loaded
               webView.url != url,
               webView.url != content.url
@@ -1125,8 +1126,11 @@ extension Tab: WKNavigationDelegate {
         }
     }
 
-    @objc(_webView:didFinishLoadWithRequest:inFrame:withError:)
-    func webView(_ webView: WKWebView, didFailLoadWithRequest request: URLRequest, inFrame frame: WKFrameInfo, withError error: Error) {
+    @objc(_webView:didFailProvisionalLoadWithRequest:inFrame:withError:)
+    func webView(_ webView: WKWebView,
+                 didFailProvisionalLoadWithRequest request: URLRequest,
+                 inFrame frame: WKFrameInfo,
+                 withError error: Error) {
         guard frame.isMainFrame else { return }
         self.mainFrameLoadState = .finished
     }
