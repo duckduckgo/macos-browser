@@ -1115,6 +1115,7 @@ extension Tab: WKNavigationDelegate {
         if (error as NSError).code != ErrorCodes.internetConnectionOffline, let failingUrl = error.failingUrl {
             historyCoordinating.markFailedToLoadUrl(failingUrl)
         }
+        webViewDidFailNavigationPublisher.send()
     }
 
     @available(macOS 11.3, *)

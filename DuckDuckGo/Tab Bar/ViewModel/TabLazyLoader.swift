@@ -21,53 +21,70 @@ import Combine
 
 final class TabLazyLoader {
 
-    private enum Const {
-        static let numberOfLazyLoadedTabs = 3
-    }
-
-    private var tabsSelectedOrReloadedInThisSession = Set<Tab>()
-    private var cancellables = Set<AnyCancellable>()
-
-    private var tabDidFinishLoadingPublisher = PassthroughSubject<Tab, Never>()
-
-    private weak var tabCollectionViewModel: TabCollectionViewModel?
+    @Published private(set) var isInProgress: Bool = true
 
     init?(tabCollectionViewModel: TabCollectionViewModel) {
-        guard let currentTab = tabCollectionViewModel.selectedTabViewModel?.tab else {
+        guard tabCollectionViewModel.qualifiesForLazyLoading,
+              let currentTab = tabCollectionViewModel.selectedTabViewModel?.tab
+        else {
+            print("Lazy loading not applicable")
             return nil
         }
 
         self.tabCollectionViewModel = tabCollectionViewModel
 
-        tabCollectionViewModel.$selectedTabViewModel
-            .compactMap { $0 }
-            .map(\.tab)
+        trackUserSwitchingTabs()
+        delayLazyLoadingUntilCurrentTabFinishesLoading(currentTab)
+    }
+
+    // MARK: - Private
+
+    private enum Const {
+        static let maxNumberOfLazyLoadedTabs = 3
+    }
+
+    private var tabDidFinishLazyLoadingPublisher = PassthroughSubject<Tab, Never>()
+    private var tabsSelectedOrReloadedInThisSession = Set<Tab>()
+    private var cancellables = Set<AnyCancellable>()
+
+    private weak var tabCollectionViewModel: TabCollectionViewModel?
+
+    private func trackUserSwitchingTabs() {
+
+        tabCollectionViewModel?.$selectedTabViewModel
+            .compactMap { $0?.tab }
             .sink { [weak self] tab in
                 self?.tabsSelectedOrReloadedInThisSession.insert(tab)
             }
             .store(in: &cancellables)
+    }
 
-        subscribeToTabDidFinishNavigation(currentTab)
+    private func delayLazyLoadingUntilCurrentTabFinishesLoading(_ tab: Tab) {
+        guard tab.content.isUrl else {
+            lazyLoadRecentlySelectedTabs()
+            return
+        }
 
-        Publishers.Merge(currentTab.webViewDidFinishNavigationPublisher, currentTab.webViewDidFailNavigationPublisher)
-            .prefix(1)
-            .sink { [weak self] in
-                self?.reloadRecentlySelectedTabs()
+        tab.loadingFinishedPublisher
+            .sink { [weak self] _ in
+                self?.lazyLoadRecentlySelectedTabs()
             }
             .store(in: &cancellables)
     }
 
-    private func reloadRecentlySelectedTabs() {
+    private func lazyLoadRecentlySelectedTabs() {
         let tabs = findRecentlySelectedTabs()
         guard !tabs.isEmpty else {
-            tabDidFinishLoadingPublisher.send(completion: .finished)
+            print("No tabs for lazy loading")
+            isInProgress = false
             return
         }
 
-        tabDidFinishLoadingPublisher
-            .prefix(tabs.count + 1)
-            .sink(receiveCompletion: { _ in
+        tabDidFinishLazyLoadingPublisher
+            .prefix(tabs.count)
+            .sink(receiveCompletion: { [weak self] _ in
                 print("Lazy tab loading finished")
+                self?.isInProgress = false
             }, receiveValue: { tab in
                 print("Tab did finish loading", String(reflecting: tab.content.url))
             })
@@ -76,16 +93,16 @@ final class TabLazyLoader {
         tabs.forEach { tab in
             subscribeToTabDidFinishNavigation(tab)
             print("Reloading", String(reflecting: tab.content.url))
-            tab.reload()
-//            Task {
-//                let didRequestReload = await tab.reloadIfNeeded()
-//                if !didRequestReload {
-//                    print("Tab cached, skipping reload", String(reflecting: tab.content.url))
-//                    tabDidFinishLoadingPublisher.send(tab)
-//                } else {
-//                    print("Reloading tab", String(reflecting: tab.content.url))
-//                }
-//            }
+
+            Task {
+                let didRequestReload = await tab.reloadIfNeeded(shouldLoadInBackground: true)
+                if !didRequestReload {
+                    print("Tab cached, loading from cache", String(reflecting: tab.content.url))
+                    tabDidFinishLazyLoadingPublisher.send(tab)
+                } else {
+                    print("Tab not found in cache", String(reflecting: tab.content.url))
+                }
+            }
         }
     }
 
@@ -98,49 +115,28 @@ final class TabLazyLoader {
             viewModel.tabCollection.tabs
                 .filter { $0.lastSelectedAt != nil && $0.content.isUrl && !tabsSelectedOrReloadedInThisSession.contains($0) }
                 .sorted { $0.lastSelectedAt! > $1.lastSelectedAt! }
-                .prefix(Const.numberOfLazyLoadedTabs)
+                .prefix(Const.maxNumberOfLazyLoadedTabs)
         )
     }
 
-    private func reloadRecentlySelectedTab() {
-        guard let tab = findRecentlySelectedTab() else {
-            tabDidFinishLoadingPublisher.send(completion: .finished)
-            return
-        }
-        subscribeToTabDidFinishNavigation(tab)
-        print("Reloading", String(reflecting: tab.content.url))
-        tab.reload()
-//        Task {
-//            let didRequestReload = await tab.reloadIfNeeded()
-//            if !didRequestReload {
-//                print("Tab cached, skipping reload", String(reflecting: tab.content.url))
-//                tabDidFinishLoadingPublisher.send(tab)
-//            } else {
-//                print("Reloading tab", String(reflecting: tab.content.url))
-//            }
-//        }
-    }
-
-    private func findRecentlySelectedTab() -> Tab? {
-        let tabs = tabCollectionViewModel?.tabCollection.tabs
-            .filter { $0.lastSelectedAt != nil && $0.content.isUrl && !tabsSelectedOrReloadedInThisSession.contains($0) }
-            .sorted { $0.lastSelectedAt! > $1.lastSelectedAt! }
-
-        guard let tabs = tabs else {
-            return nil
-        }
-
-//        print(tabs.prefix(3).map(\.content.url!))
-
-        return tabs.first
-    }
-
     private func subscribeToTabDidFinishNavigation(_ tab: Tab) {
-        Publishers.Merge(tab.webViewDidFinishNavigationPublisher, tab.webViewDidFailNavigationPublisher)
-            .prefix(1)
-            .sink { [weak self] in
-                self?.tabDidFinishLoadingPublisher.send(tab)
-            }
+        tab.loadingFinishedPublisher
+            .subscribe(tabDidFinishLazyLoadingPublisher)
             .store(in: &cancellables)
+    }
+}
+
+private extension TabCollectionViewModel {
+    var qualifiesForLazyLoading: Bool {
+        tabCollection.tabs.filter({ $0.content.isUrl }).count > 1
+    }
+}
+
+private extension Tab {
+    var loadingFinishedPublisher: AnyPublisher<Tab, Never> {
+        Publishers.Merge(webViewDidFinishNavigationPublisher, webViewDidFailNavigationPublisher)
+            .prefix(1)
+            .map { self }
+            .eraseToAnyPublisher()
     }
 }

@@ -78,6 +78,12 @@ final class TabCollectionViewModel: NSObject {
         }
 
         tabLazyLoader = TabLazyLoader(tabCollectionViewModel: self)
+        tabLazyLoader?.$isInProgress
+            .filter { !$0 }
+            .prefix(1)
+            .map { _ in TabLazyLoader?.none }
+            .assign(to: \.tabLazyLoader, onWeaklyHeld: self)
+            .store(in: &cancellables)
     }
 
     convenience override init() {
