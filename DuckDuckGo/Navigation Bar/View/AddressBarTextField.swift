@@ -582,6 +582,27 @@ final class AddressBarTextField: NSTextField {
         }
     }()
 
+    @objc private func toggleAutocomplete(_ menuItem: NSMenuItem) {
+        AppearancePreferences.shared.showAutocompleteSuggestions.toggle()
+
+        let shouldShowAutocomplete = AppearancePreferences.shared.showAutocompleteSuggestions
+
+        menuItem.state = shouldShowAutocomplete ? .on : .off
+
+        if shouldShowAutocomplete {
+            handleTextDidChange()
+        } else {
+            hideSuggestionWindow()
+        }
+    }
+    
+    @objc private func toggleShowFullWebsiteAddress(_ menuItem: NSMenuItem) {
+        AppearancePreferences.shared.showFullURL.toggle()
+
+        let shouldShowFullURL = AppearancePreferences.shared.showFullURL
+        menuItem.state = shouldShowFullURL ? .on : .off
+    }
+
     private func initSuggestionWindow() {
         let windowController = NSStoryboard.suggestion
             .instantiateController(withIdentifier: "SuggestionWindowController") as? NSWindowController
@@ -683,6 +704,10 @@ extension AddressBarTextField: NSTextFieldDelegate {
     }
 
     func controlTextDidChange(_ obj: Notification) {
+        handleTextDidChange()
+    }
+
+    private func handleTextDidChange() {
         let stringValueWithoutSuffix = self.stringValueWithoutSuffix
 
         // if user continues typing letters from displayed Suggestion
@@ -806,7 +831,46 @@ extension AddressBarTextField: NSTextViewDelegate {
     }
 
     func textView(_ view: NSTextView, menu: NSMenu, for event: NSEvent, at charIndex: Int) -> NSMenu? {
-        return removingAttributeChangingMenuItems(from: menu)
+        let textViewMenu = removingAttributeChangingMenuItems(from: menu)
+        let additionalMenuItems = [
+            makeAutocompleteSuggestionsMenuItem(),
+            makeFullWebsiteAddressMenuItem(),
+            NSMenuItem.separator()
+        ]
+        
+        if let insertionPoint = menuItemInsertionPoint(within: menu) {
+            additionalMenuItems.reversed().forEach { item in
+                textViewMenu.insertItem(item, at: insertionPoint)
+            }
+        } else {
+            additionalMenuItems.forEach { item in
+                textViewMenu.addItem(item)
+            }
+        }
+        
+        return textViewMenu
+    }
+    
+    /// Returns the menu item after which new items should be added.
+    /// This will be the first separator that comes after a predefined list of items: Cut, Copy, or Paste.
+    ///
+    /// - Returns: The preferred menu item. If none are found, nil is returned.
+    private func menuItemInsertionPoint(within menu: NSMenu) -> Int? {
+        let preferredSelectorNames = ["cut:", "copy:", "paste:"]
+        var foundPreferredSelector = false
+        
+        for (index, item) in menu.items.enumerated() {
+            if foundPreferredSelector && item.isSeparatorItem {
+                let indexAfterSeparator = index + 1
+                return menu.items.indices.contains(indexAfterSeparator) ? indexAfterSeparator : index
+            }
+            
+            if let action = item.action, preferredSelectorNames.contains(action.description) {
+                foundPreferredSelector = true
+            }
+        }
+
+        return nil
     }
 
     private static var selectorsToRemove: Set<Selector> = Set([
@@ -839,6 +903,27 @@ extension AddressBarTextField: NSTextViewDelegate {
         return menu
     }
 
+    private func makeAutocompleteSuggestionsMenuItem() -> NSMenuItem {
+        let menuItem = NSMenuItem(
+            title: UserText.showAutocompleteSuggestions.localizedCapitalized,
+            action: #selector(toggleAutocomplete(_:)),
+            keyEquivalent: ""
+        )
+        menuItem.state = AppearancePreferences.shared.showAutocompleteSuggestions ? .on : .off
+
+        return menuItem
+    }
+    
+    private func makeFullWebsiteAddressMenuItem() -> NSMenuItem {
+        let menuItem = NSMenuItem(
+            title: UserText.showFullWebsiteAddress.localizedCapitalized,
+            action: #selector(toggleShowFullWebsiteAddress(_:)),
+            keyEquivalent: ""
+        )
+        menuItem.state = AppearancePreferences.shared.showFullURL ? .on : .off
+
+        return menuItem
+    }
 }
 
 final class AddressBarTextEditor: NSTextView {

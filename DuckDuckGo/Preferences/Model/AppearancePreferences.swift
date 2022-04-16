@@ -20,12 +20,16 @@ import Foundation
 
 protocol AppearancePreferencesPersistor {
     var showFullURL: Bool { get set }
+    var showAutocompleteSuggestions: Bool { get set }
     var currentThemeName: String { get set }
 }
 
 struct AppearancePreferencesUserDefaultsPersistor: AppearancePreferencesPersistor {
     @UserDefaultsWrapper(key: .showFullURL, defaultValue: false)
     var showFullURL: Bool
+
+    @UserDefaultsWrapper(key: .showAutocompleteSuggestions, defaultValue: true)
+    var showAutocompleteSuggestions: Bool
 
     @UserDefaultsWrapper(key: .currentThemeName, defaultValue: ThemeName.systemDefault.rawValue)
     var currentThemeName: String
@@ -87,6 +91,12 @@ final class AppearancePreferences: ObservableObject {
         }
     }
 
+    @Published var showAutocompleteSuggestions: Bool {
+        didSet {
+            persistor.showAutocompleteSuggestions = showAutocompleteSuggestions
+        }
+    }
+
     func updateUserInterfaceStyle() {
         NSApp.appearance = currentThemeName.appearance
     }
@@ -95,6 +105,7 @@ final class AppearancePreferences: ObservableObject {
         self.persistor = persistor
         currentThemeName = .init(rawValue: persistor.currentThemeName) ?? .systemDefault
         showFullURL = persistor.showFullURL
+        showAutocompleteSuggestions = persistor.showAutocompleteSuggestions
     }
 
     private var persistor: AppearancePreferencesPersistor
