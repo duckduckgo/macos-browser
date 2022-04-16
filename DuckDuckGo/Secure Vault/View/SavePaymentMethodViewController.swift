@@ -18,6 +18,7 @@
 
 import Foundation
 import BrowserServicesKit
+import Combine
 import os.log
 
 protocol SavePaymentMethodDelegate: AnyObject {
@@ -47,7 +48,8 @@ final class SavePaymentMethodViewController: NSViewController {
     weak var delegate: SavePaymentMethodDelegate?
     
     private var paymentMethod: SecureVaultModels.CreditCard?
-    
+    private var appearanceCancellable: AnyCancellable?
+
     // MARK: - Public
     
     func savePaymentMethod(_ paymentMethod: SecureVaultModels.CreditCard) {
@@ -92,5 +94,13 @@ final class SavePaymentMethodViewController: NSViewController {
         WindowControllersManager.shared.showPreferencesTab()
         self.delegate?.shouldCloseSavePaymentMethodViewController(self)
     }
-    
+
+    // MARK: -
+
+    override func viewDidLoad() {
+        super.viewDidLoad()
+
+        appearanceCancellable = view.subscribeForAppApperanceUpdates()
+    }
+
 }
