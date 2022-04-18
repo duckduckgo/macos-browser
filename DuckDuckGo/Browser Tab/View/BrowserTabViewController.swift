@@ -963,9 +963,13 @@ extension BrowserTabViewController: BrowserTabSelectionDelegate {
     }
 
     func selectedPreferencePane(_ identifier: PreferencePaneIdentifier) {
-        let newContent = Tab.TabContent.preferences(pane: identifier)
-        let tab = tabCollectionViewModel.tabCollection.tabs.first(where: { $0.content.matchesDisplayableTab(newContent) })
-        tab?.setContent(newContent)
+        guard let selectedTab = tabCollectionViewModel.selectedTabViewModel?.tab else {
+            return
+        }
+
+        if case .preferences = selectedTab.content {
+            selectedTab.setContent(.preferences(pane: identifier))
+        }
     }
 
 }

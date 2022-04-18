@@ -58,5 +58,7 @@ final class PreferencesViewController: NSViewController {
         super.viewWillDisappear()
         selectedTabIndexCancellable?.cancel()
         selectedTabIndexCancellable = nil
+        selectedPreferencePaneCancellable?.cancel()
+        selectedPreferencePaneCancellable = nil
     }
 }

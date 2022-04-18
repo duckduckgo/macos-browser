@@ -109,7 +109,14 @@ final class TabCollectionViewModel: NSObject {
 
     @discardableResult func selectDisplayableTabIfPresent(_ content: Tab.TabContent) -> Bool {
         guard changesEnabled else { return false }
-        guard content.isDisplayable, let index = tabCollection.tabs.firstIndex(where: { $0.content.matchesDisplayableTab(content) })
+        guard content.isDisplayable else { return false }
+
+        let isTabCurrentlySelected = selectedTabViewModel?.tab.content.matchesDisplayableTab(content) ?? false
+        if isTabCurrentlySelected {
+            return true
+        }
+
+        guard let index = tabCollection.tabs.firstIndex(where: { $0.content.matchesDisplayableTab(content) })
         else {
             return false
         }
