@@ -17,6 +17,7 @@
 //
 
 import Cocoa
+import Combine
 
 protocol BookmarkPopoverViewControllerDelegate: AnyObject {
 
@@ -43,9 +44,12 @@ final class BookmarkPopoverViewController: NSViewController {
         }
     }
 
+    private var appearanceCancellable: AnyCancellable?
+
     override func viewDidLoad() {
         super.viewDidLoad()
 
+        appearanceCancellable = view.subscribeForAppApperanceUpdates()
         textField.delegate = self
     }
 

@@ -198,14 +198,19 @@ extension WKWebView {
         }
     }
     
-    func printOperation() -> NSPrintOperation? {
+    func printOperation(with printInfo: NSPrintInfo = .shared, for frame: Any?) -> NSPrintOperation? {
+        if let frame = frame,
+           self.responds(to: #selector(WKWebView._printOperation(with:forFrame:))) {
+            return self._printOperation(with: printInfo, forFrame: frame)
+        }
+
         if #available(macOS 11.0, *) {
-            return self.printOperation(with: .shared)
+            return self.printOperation(with: printInfo)
         }
 
         guard self.responds(to: #selector(WKWebView._printOperation(with:))) else { return nil }
 
-        return self._printOperation(with: .shared)
+        return self._printOperation(with: printInfo)
     }
 
 }

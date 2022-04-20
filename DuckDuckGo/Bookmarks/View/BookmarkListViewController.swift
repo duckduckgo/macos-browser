@@ -38,6 +38,7 @@ final class BookmarkListViewController: NSViewController {
     }
 
     weak var delegate: BookmarkListViewControllerDelegate?
+    var currentTabWebsite: AddBookmarkModalViewController.WebsiteInfo?
 
     @IBOutlet var outlineView: NSOutlineView!
     @IBOutlet var contextMenu: NSMenu!
@@ -70,7 +71,8 @@ final class BookmarkListViewController: NSViewController {
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        
+
+        view.subscribeForAppApperanceUpdates()?.store(in: &cancellables)
         preferredContentSize = CGSize(width: 420, height: 500)
         
         outlineView.register(BookmarkOutlineViewCell.nib, forIdentifier: BookmarkOutlineViewCell.identifier)
@@ -100,7 +102,7 @@ final class BookmarkListViewController: NSViewController {
     private func reloadData() {
         let selectedNodes = self.selectedNodes
         
-        treeController.rebuild()
+        dataSource.reloadData()
         outlineView.reloadData()
         
         expandAndRestore(selectedNodes: selectedNodes)
@@ -108,6 +110,7 @@ final class BookmarkListViewController: NSViewController {
     
     @IBAction func newBookmarkButtonClicked(_ sender: AnyObject) {
         let newBookmarkViewController = AddBookmarkModalViewController.create()
+        newBookmarkViewController.currentTabWebsite = currentTabWebsite
         newBookmarkViewController.delegate = self
         presentAsModalWindow(newBookmarkViewController)
     }
@@ -360,9 +363,9 @@ final class BookmarkListPopover: NSPopover {
         fatalError("BookmarkListPopover: Bad initializer")
     }
 
-    // swiftlint:disable force_cast
+    // swiftlint:disable:next force_cast
     var viewController: BookmarkListViewController { contentViewController as! BookmarkListViewController }
-    // swiftlint:enable force_cast
+
     private func setupContentController() {
         let controller = BookmarkListViewController.create()
         controller.delegate = self

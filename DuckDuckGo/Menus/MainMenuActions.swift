@@ -433,15 +433,7 @@ extension MainViewController {
     // MARK: - Printing
 
     @IBAction func printWebView(_ sender: Any?) {
-        guard let webView = tabCollectionViewModel.selectedTabViewModel?.tab.webView,
-              let window = webView.window,
-              let printOperation = webView.printOperation()
-        else { return }
-
-        if printOperation.view?.frame.isEmpty == true {
-            printOperation.view?.frame = webView.bounds
-        }
-        printOperation.runModal(for: window, delegate: nil, didRun: nil, contextInfo: nil)
+        tabCollectionViewModel.selectedTabViewModel?.tab.print()
     }
 
     // MARK: - Saving

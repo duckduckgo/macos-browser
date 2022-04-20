@@ -19,12 +19,13 @@
 import Cocoa
 import Combine
 
+// swiftlint:disable type_body_length
 final class FeedbackViewController: NSViewController {
 
     enum Constants {
         static let defaultContentHeight: CGFloat = 160
         static let feedbackContentHeight: CGFloat = 338
-        static let websiteBreakageContentHeight: CGFloat = 307
+        static let websiteBreakageContentHeight: CGFloat = 472
         static let thankYouContentHeight: CGFloat = 262
 
     }
@@ -54,6 +55,7 @@ final class FeedbackViewController: NSViewController {
     @IBOutlet weak var browserFeedbackView: NSView!
     @IBOutlet weak var browserFeedbackDescriptionLabel: NSTextField!
     @IBOutlet weak var browserFeedbackTextView: NSTextView!
+    @IBOutlet weak var browserFeedbackDisclaimerTextView: NSTextField!
 
     @IBOutlet weak var websiteBreakageView: NSView!
     @IBOutlet weak var urlTextField: NSTextField!
@@ -63,6 +65,9 @@ final class FeedbackViewController: NSViewController {
 
     @IBOutlet weak var thankYouView: NSView!
     private var cancellables = Set<AnyCancellable>()
+    
+    private var browserFeedbackConstraint: NSLayoutConstraint?
+    private var browserFeedbackBreakageConstraint: NSLayoutConstraint?
 
     var currentTab: Tab?
     var currentTabUrl: URL? {
@@ -81,6 +86,11 @@ final class FeedbackViewController: NSViewController {
         super.viewDidLoad()
         setContentViewHeight(Constants.defaultContentHeight, animated: false)
         setupTextViews()
+        
+        browserFeedbackConstraint = browserFeedbackView.topAnchor.constraint(equalTo: optionPopUpButton.bottomAnchor, constant: 8)
+        browserFeedbackBreakageConstraint = browserFeedbackView.topAnchor.constraint(equalTo: websiteBreakageView.bottomAnchor)
+        
+        browserFeedbackConstraint?.isActive = true
     }
 
     override func viewDidAppear() {
@@ -184,20 +194,27 @@ final class FeedbackViewController: NSViewController {
             pickOptionMenuItem.isEnabled = true
             return
         }
+        
+        browserFeedbackView.isHidden = false
 
         let contentHeight: CGFloat
         switch selectedFormOption {
         case .feedback(let feedbackCategory):
-            browserFeedbackView.isHidden = false
             contentHeight = Constants.feedbackContentHeight
             updateBrowserFeedbackDescriptionLabel(for: feedbackCategory)
-            browserFeedbackTextView.makeMeFirstResponder()
+            browserFeedbackBreakageConstraint?.isActive = false
+            browserFeedbackConstraint?.isActive = true
+            websiteBreakageView.isHidden = true
         case .websiteBreakage:
-            browserFeedbackView.isHidden = true
             contentHeight = Constants.websiteBreakageContentHeight
             urlTextField.stringValue = currentTabUrl?.absoluteString ?? ""
+            updateBrowserFeedbackDescriptionLabel(for: .bug)
+            browserFeedbackConstraint?.isActive = false
+            browserFeedbackBreakageConstraint?.isActive = true
+            websiteBreakageView.isHidden = false
         }
-        websiteBreakageView.isHidden = !browserFeedbackView.isHidden
+        updateBrowserFeedbackDisclaimerLabel(for: selectedFormOption)
+        browserFeedbackTextView.makeMeFirstResponder()
         setContentViewHeight(contentHeight, animated: true)
     }
 
@@ -243,6 +260,15 @@ final class FeedbackViewController: NSViewController {
             browserFeedbackDescriptionLabel.stringValue = UserText.feedbackOtherDescription
         }
     }
+    
+    private func updateBrowserFeedbackDisclaimerLabel(for formOption: FormOption) {
+        switch formOption {
+        case .websiteBreakage:
+            browserFeedbackDisclaimerTextView.stringValue = UserText.feedbackBreakageDisclaimer
+        case .feedback:
+            browserFeedbackDisclaimerTextView.stringValue = UserText.feedbackDisclaimer
+        }
+    }
 
     private func updateBrokenWebsiteMenuItem() {
         websiteIsBrokenMenuItem.isEnabled = currentTab?.content.isUrl ?? false
@@ -279,6 +305,7 @@ final class FeedbackViewController: NSViewController {
             let ampURL = currentTab?.linkProtection.lastAMPURLString ?? ""
             let urlParametersRemoved = currentTab?.linkProtection.urlParametersRemoved ?? false
             let websiteBreakage = WebsiteBreakage(category: selectedWebsiteBreakageCategory,
+                                                  description: browserFeedbackTextView.string,
                                                   siteUrlString: urlTextField.stringValue,
                                                   osVersion: "\(ProcessInfo.processInfo.operatingSystemVersion)",
                                                   upgradedHttps: currentTab?.connectionUpgradedTo != nil,
@@ -298,6 +325,7 @@ final class FeedbackViewController: NSViewController {
         thankYouView.isHidden = false
     }
 }
+// swiftlint:enable type_body_length
 
 fileprivate extension WebsiteBreakage.Category {
 

@@ -101,7 +101,11 @@ final class Tab: NSObject {
     }
 
     weak var autofillScript: WebsiteAutofillUserScript?
-    weak var delegate: TabDelegate?
+    weak var delegate: TabDelegate? {
+        didSet {
+            autofillScript?.currentOverlayTab = delegate
+        }
+    }
     private let cbaTimeReporter: ContentBlockingAssetsCompilationTimeReporter?
 
     init(content: TabContent,
@@ -644,20 +648,21 @@ extension Tab: UserContentControllerDelegate {
 }
 
 extension Tab: BrowserTabViewControllerClickDelegate {
+
     func browserTabViewController(_ browserTabViewController: BrowserTabViewController, didClickAtPoint: NSPoint) {
         guard let autofillScript = autofillScript else { return }
         autofillScript.clickPoint = didClickAtPoint
-        autofillScript.currentOverlayTab = self.delegate
     }
+
 }
 
 extension Tab: PrintingUserScriptDelegate {
 
-    func printingUserScriptDidRequestPrintController(_ script: PrintingUserScript) {
+    func print(frame: Any? = nil) {
         guard activePrintOperation == nil else { return }
 
         guard let window = webView.window,
-              let printOperation = webView.printOperation()
+              let printOperation = webView.printOperation(for: frame)
         else { return }
 
         self.activePrintOperation = printOperation
@@ -666,14 +671,22 @@ extension Tab: PrintingUserScriptDelegate {
             printOperation.view?.frame = webView.bounds
         }
 
-        let selector = #selector(printOperationDidRun(printOperation: success: contextInfo:))
+        let selector = #selector(printOperationDidRun(printOperation:success:contextInfo:))
         printOperation.runModal(for: window, delegate: self, didRun: selector, contextInfo: nil)
+        NSApp.runModal(for: window)
+    }
+
+    func printingUserScriptDidRequestPrintController(_ script: PrintingUserScript) {
+        self.print()
     }
 
     @objc func printOperationDidRun(printOperation: NSPrintOperation,
                                     success: Bool,
                                     contextInfo: UnsafeMutableRawPointer?) {
         activePrintOperation = nil
+        if NSApp.modalWindow != nil {
+            NSApp.stopModal()
+        }
     }
 
 }
@@ -892,7 +905,7 @@ extension Tab: WKNavigationDelegate {
 
                 return .cancel
 
-            } else if navigationAction.navigationType != .backForward,
+            } else if navigationAction.navigationType != .backForward, !isRequestingNewTab,
                       let request = GPCRequestFactory.shared.requestForGPC(basedOn: navigationAction.request) {
                 self.invalidateBackItemIfNeeded(for: navigationAction)
                 defer {

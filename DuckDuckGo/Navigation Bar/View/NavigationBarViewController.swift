@@ -329,6 +329,9 @@ final class NavigationBarViewController: NSViewController {
     func showBookmarkListPopover() {
         guard closeTransientPopovers() else { return }
         bookmarkListButton.isHidden = false
+        if let tab = tabCollectionViewModel.selectedTabViewModel?.tab {
+            bookmarkListPopover.viewController.currentTabWebsite = .init(tab)
+        }
         bookmarkListPopover.show(relativeTo: bookmarkListButton.bounds.insetFromLineOfDeath(), of: bookmarkListButton, preferredEdge: .maxY)
         Pixel.fire(.bookmarksList(source: .button))
     }

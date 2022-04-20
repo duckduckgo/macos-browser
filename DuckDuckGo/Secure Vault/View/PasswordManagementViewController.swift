@@ -101,6 +101,7 @@ final class PasswordManagementViewController: NSViewController {
 
     var emptyStateCancellable: AnyCancellable?
     var editingCancellable: AnyCancellable?
+    var appearanceCancellable: AnyCancellable?
 
     var domain: String?
     var isEditing = false
@@ -148,6 +149,8 @@ final class PasswordManagementViewController: NSViewController {
         super.viewDidLoad()
         createListView()
         createLoginItemView()
+
+        appearanceCancellable = view.subscribeForAppApperanceUpdates()
 
         emptyStateTitle.attributedStringValue = NSAttributedString.make(emptyStateTitle.stringValue, lineHeight: 1.14, kern: -0.23)
         emptyStateMessage.attributedStringValue = NSAttributedString.make(emptyStateMessage.stringValue, lineHeight: 1.05, kern: -0.08)
@@ -359,8 +362,6 @@ final class PasswordManagementViewController: NSViewController {
             self?.doSaveCredentials(credentials)
         }, onDeleteRequested: { [weak self] credentials in
             self?.promptToDelete(credentials: credentials)
-        }, onCancelled: { [weak self] in
-            self?.refetchWithText(self!.searchField.stringValue)
         })
 
         self.itemModel = itemModel
@@ -377,8 +378,6 @@ final class PasswordManagementViewController: NSViewController {
             self?.doSaveIdentity(note)
         }, onDeleteRequested: { [weak self] identity in
             self?.promptToDelete(identity: identity)
-        }, onCancelled: { [weak self] in
-            self?.refetchWithText(self!.searchField.stringValue)
         })
 
         self.itemModel = itemModel
@@ -395,8 +394,6 @@ final class PasswordManagementViewController: NSViewController {
             self?.doSaveNote(note)
         }, onDeleteRequested: { [weak self] note in
             self?.promptToDelete(note: note)
-        }, onCancelled: { [weak self] in
-            self?.refetchWithText(self!.searchField.stringValue)
         })
 
         self.itemModel = itemModel
@@ -413,8 +410,6 @@ final class PasswordManagementViewController: NSViewController {
             self?.doSaveCreditCard(card)
         }, onDeleteRequested: { [weak self] card in
             self?.promptToDelete(card: card)
-        }, onCancelled: { [weak self] in
-            self?.refetchWithText(self!.searchField.stringValue)
         })
 
         self.itemModel = itemModel

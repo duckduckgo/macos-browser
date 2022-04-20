@@ -242,7 +242,7 @@ extension Pixel.Event {
             return "m_mac_crash"
 
         case .brokenSiteReport:
-            return "epbf"
+            return "epbf_macos_desktop"
 
         case .compileRulesWait(onboardingShown: let onboardingShown, waitTime: let waitTime, result: let result):
             return "m_mac_cbr-wait_\(onboardingShown)_\(waitTime)_\(result)"
