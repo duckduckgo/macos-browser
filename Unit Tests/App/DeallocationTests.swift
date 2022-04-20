@@ -53,7 +53,11 @@ final class DeallocationTests: XCTestCase {
     // MARK: -
 
     func testWindowsDeallocation() {
+        var startTime: DispatchTime?
+        
         autoreleasepool {
+            startTime = DispatchTime.now()
+            
             weak var window1: NSWindow! = WindowsManager.openNewWindow()
             weak var window2: NSWindow! = WindowsManager.openNewWindow()
 
@@ -80,7 +84,12 @@ final class DeallocationTests: XCTestCase {
             window1.close()
             window2.close()
         }
-        waitForExpectations(timeout: 1, handler: nil)
+
+        waitForExpectations(timeout: 3)
+        
+        let endTime = DispatchTime.now()
+        let elapsedDuration = startTime!.distance(to: endTime)
+        print("DEBUG: Deallocation test completed in: \(elapsedDuration)")
     }
 
 }
