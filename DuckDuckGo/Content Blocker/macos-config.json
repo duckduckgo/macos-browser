@@ -242,10 +242,6 @@
             "state": "enabled",
             "exceptions": []
         },
-        "navigatorCredentials": {
-            "exceptions": [],
-            "state": "enabled"
-        },
         "navigatorInterface": {
             "exceptions": [],
             "state": "enabled"
@@ -253,6 +249,10 @@
         "referrer": {
             "exceptions": [],
             "state": "disabled"
+        },
+        "webCompat": {
+            "state": "enabled",
+            "exceptions": []
         },
         "trackerAllowlist": {
             "state": "enabled",
