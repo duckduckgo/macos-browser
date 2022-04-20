@@ -20,6 +20,12 @@ import Foundation
 import Combine
 import os
 
+protocol TabLazyLoaderDataSource: AnyObject {
+    var tabs: [Tab] { get }
+    var selectedTab: Tab? { get }
+    var selectedTabPublisher: AnyPublisher<Tab, Never> { get }
+}
+
 final class TabLazyLoader {
 
     /**
@@ -31,15 +37,15 @@ final class TabLazyLoader {
         lazyLoadingDidFinishSubject.prefix(1).eraseToAnyPublisher()
     }()
 
-    init?(tabCollectionViewModel: TabCollectionViewModel) {
-        guard tabCollectionViewModel.qualifiesForLazyLoading,
-              let currentTab = tabCollectionViewModel.selectedTabViewModel?.tab
+    init?(dataSource: TabLazyLoaderDataSource) {
+        guard dataSource.qualifiesForLazyLoading,
+              let currentTab = dataSource.selectedTab
         else {
             os_log("Lazy loading not applicable", log: .tabLazyLoading, type: .debug)
             return nil
         }
 
-        self.tabCollectionViewModel = tabCollectionViewModel
+        self.dataSource = dataSource
 
         trackUserSwitchingTabs()
         delayLazyLoadingUntilCurrentTabFinishesLoading(currentTab)
@@ -56,12 +62,11 @@ final class TabLazyLoader {
     private var tabsSelectedOrReloadedInThisSession = Set<Tab>()
     private var cancellables = Set<AnyCancellable>()
 
-    private weak var tabCollectionViewModel: TabCollectionViewModel?
+    private weak var dataSource: TabLazyLoaderDataSource?
 
     private func trackUserSwitchingTabs() {
 
-        tabCollectionViewModel?.$selectedTabViewModel
-            .compactMap { $0?.tab }
+        dataSource?.selectedTabPublisher
             .sink { [weak self] tab in
                 self?.tabsSelectedOrReloadedInThisSession.insert(tab)
             }
@@ -116,12 +121,12 @@ final class TabLazyLoader {
     }
 
     private func findRecentlySelectedTabs() -> [Tab] {
-        guard let viewModel = tabCollectionViewModel else {
+        guard let dataSource = dataSource else {
             return []
         }
 
         return Array(
-            viewModel.tabCollection.tabs
+            dataSource.tabs
                 .filter { $0.lastSelectedAt != nil && $0.content.isUrl && !tabsSelectedOrReloadedInThisSession.contains($0) }
                 .sorted { $0.lastSelectedAt! > $1.lastSelectedAt! }
                 .prefix(Const.maxNumberOfLazyLoadedTabs)
@@ -135,16 +140,30 @@ final class TabLazyLoader {
     }
 }
 
-private extension TabCollectionViewModel {
+extension TabLazyLoaderDataSource {
     var qualifiesForLazyLoading: Bool {
 
         let notSelectedURLTabsCount: Int = {
-            let count = tabCollection.tabs.filter({ $0.content.isUrl }).count
-            let isURLTabSelected = selectedTabViewModel?.tab.content.isUrl ?? false
+            let count = tabs.filter({ $0.content.isUrl }).count
+            let isURLTabSelected = selectedTab?.content.isUrl ?? false
             return isURLTabSelected ? count-1 : count
         }()
 
         return notSelectedURLTabsCount > 0
+    }
+}
+
+extension TabCollectionViewModel: TabLazyLoaderDataSource {
+    var tabs: [Tab] {
+        tabCollection.tabs
+    }
+
+    var selectedTab: Tab? {
+        selectedTabViewModel?.tab
+    }
+
+    var selectedTabPublisher: AnyPublisher<Tab, Never> {
+        $selectedTabViewModel.compactMap(\.?.tab).eraseToAnyPublisher()
     }
 }
 

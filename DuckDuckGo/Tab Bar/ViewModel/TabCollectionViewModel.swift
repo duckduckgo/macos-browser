@@ -413,7 +413,7 @@ final class TabCollectionViewModel: NSObject {
 
     private func setUpLazyLoading() {
 
-        tabLazyLoader = TabLazyLoader(tabCollectionViewModel: self)
+        tabLazyLoader = TabLazyLoader(dataSource: self)
 
         tabLazyLoader?.lazyLoadingDidFinish
             .sink { [weak self] _ in
