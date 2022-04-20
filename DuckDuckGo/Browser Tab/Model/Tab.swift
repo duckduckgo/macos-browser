@@ -135,6 +135,8 @@ final class Tab: NSObject {
         configuration.applyStandardConfiguration()
 
         webView = WebView(frame: CGRect.zero, configuration: configuration)
+        webView.setValue(false, forKey: "drawsBackground")
+
         permissions = PermissionModel(webView: webView)
 
         super.init()
@@ -627,6 +629,9 @@ extension Tab: BrowserTabViewControllerClickDelegate {
     func browserTabViewController(_ browserTabViewController: BrowserTabViewController, didClickAtPoint: NSPoint) {
         guard let autofillScript = autofillScript else { return }
         autofillScript.clickPoint = didClickAtPoint
+    }
+    func browserTabViewControllerUpdateDelegate(_ browserTabViewController: BrowserTabViewController) {
+        guard let autofillScript = autofillScript else { return }
         autofillScript.currentOverlayTab = self.delegate
     }
 }

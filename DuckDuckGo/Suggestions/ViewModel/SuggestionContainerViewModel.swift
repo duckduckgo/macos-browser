@@ -73,6 +73,10 @@ final class SuggestionContainerViewModel {
     }
 
     func setUserStringValue(_ userStringValue: String, userAppendedStringToTheEnd: Bool) {
+        guard AppearancePreferences.shared.showAutocompleteSuggestions else {
+            return
+        }
+
         let oldValue = self.userStringValue
         self.userStringValue = userStringValue
 

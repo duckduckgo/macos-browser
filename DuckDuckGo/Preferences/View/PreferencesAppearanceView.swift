@@ -98,6 +98,7 @@ extension Preferences {
                     Text(UserText.addressBar)
                         .font(Const.Fonts.preferencePaneSectionHeader)
                     Toggle(UserText.showFullWebsiteAddress, isOn: $model.showFullURL)
+                    Toggle(UserText.showAutocompleteSuggestions, isOn: $model.showAutocompleteSuggestions)
                 }
             }
         }

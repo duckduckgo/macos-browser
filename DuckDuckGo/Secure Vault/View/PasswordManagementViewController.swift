@@ -101,6 +101,7 @@ final class PasswordManagementViewController: NSViewController {
 
     var emptyStateCancellable: AnyCancellable?
     var editingCancellable: AnyCancellable?
+    var appearanceCancellable: AnyCancellable?
 
     var domain: String?
     var isEditing = false
@@ -148,6 +149,8 @@ final class PasswordManagementViewController: NSViewController {
         super.viewDidLoad()
         createListView()
         createLoginItemView()
+
+        appearanceCancellable = view.subscribeForAppApperanceUpdates()
 
         emptyStateTitle.attributedStringValue = NSAttributedString.make(emptyStateTitle.stringValue, lineHeight: 1.14, kern: -0.23)
         emptyStateMessage.attributedStringValue = NSAttributedString.make(emptyStateMessage.stringValue, lineHeight: 1.05, kern: -0.08)

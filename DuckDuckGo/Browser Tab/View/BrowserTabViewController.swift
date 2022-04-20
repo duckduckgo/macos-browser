@@ -165,6 +165,7 @@ final class BrowserTabViewController: NSViewController {
 
         func displayWebView(of tabViewModel: TabViewModel) {
             tabViewModel.tab.delegate = self
+            tabViewModel.tab.browserTabViewControllerUpdateDelegate(self)
 
             let newWebView = tabViewModel.tab.webView
             newWebView.uiDelegate = self
@@ -384,7 +385,7 @@ extension BrowserTabViewController: ContentOverlayUserScriptDelegate {
         contentOverlayPopover.websiteAutofillUserScriptCloseOverlay(websiteAutofillUserScript)
     }
     public func websiteAutofillUserScript(_ websiteAutofillUserScript: WebsiteAutofillUserScript,
-                                          willDisplayOverlayAtClick: NSPoint,
+                                          willDisplayOverlayAtClick: NSPoint?,
                                           serializedInputContext: String,
                                           inputPosition: CGRect) {
         contentOverlayPopover.websiteAutofillUserScript(websiteAutofillUserScript,
