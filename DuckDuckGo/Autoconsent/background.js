@@ -65,7 +65,8 @@ window.callAction = (messageId, tabId, action) => {
         const successResponse = (result) => respond({ ruleName: cmp.getCMPName(), result })
         switch (action) {
         case 'detectPopup':
-            cmp.isPopupOpen(20, 100).then(successResponse, errorResponse)
+            // give up after (20 * 200) ms
+            cmp.isPopupOpen(20, 200).then(successResponse, errorResponse)
             break
         case 'doOptOut':
             cmp.doOptOut().then(successResponse, errorResponse)
