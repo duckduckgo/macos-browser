@@ -77,13 +77,7 @@ final class TabCollectionViewModel: NSObject {
             self.selectionIndex = selectionIndex
         }
 
-        tabLazyLoader = TabLazyLoader(tabCollectionViewModel: self)
-        tabLazyLoader?.$isInProgress
-            .filter { !$0 }
-            .prefix(1)
-            .map { _ in TabLazyLoader?.none }
-            .assign(to: \.tabLazyLoader, onWeaklyHeld: self)
-            .store(in: &cancellables)
+        setUpLazyLoading()
     }
 
     convenience override init() {
@@ -415,6 +409,18 @@ final class TabCollectionViewModel: NSObject {
             return
         }
         select(at: selectionIndex, forceChange: forceChange)
+    }
+
+    private func setUpLazyLoading() {
+
+        tabLazyLoader = TabLazyLoader(tabCollectionViewModel: self)
+
+        tabLazyLoader?.lazyLoadingDidFinish
+            .sink { [weak self] _ in
+                self?.tabLazyLoader = nil
+                os_log("Disposed of Tab Lazy Loader", log: .tabLazyLoading, type: .debug)
+            }
+            .store(in: &cancellables)
     }
 
     private func subscribeToTabs() {

@@ -22,7 +22,14 @@ import os
 
 final class TabLazyLoader {
 
-    @Published private(set) var isInProgress: Bool = true
+    /**
+     * Emits output when lazy loader finishes.
+     *
+     * The output is `true` if lazy loading was performed and `false` if no tabs were lazy loaded.
+     */
+    private(set) lazy var lazyLoadingDidFinish: AnyPublisher<Bool, Never> = {
+        lazyLoadingDidFinishSubject.prefix(1).eraseToAnyPublisher()
+    }()
 
     init?(tabCollectionViewModel: TabCollectionViewModel) {
         guard tabCollectionViewModel.qualifiesForLazyLoading,
@@ -44,7 +51,8 @@ final class TabLazyLoader {
         static let maxNumberOfLazyLoadedTabs = 3
     }
 
-    private var tabDidFinishLazyLoadingPublisher = PassthroughSubject<Tab, Never>()
+    private let lazyLoadingDidFinishSubject = PassthroughSubject<Bool, Never>()
+    private let tabDidFinishLazyLoadingSubject = PassthroughSubject<Tab, Never>()
     private var tabsSelectedOrReloadedInThisSession = Set<Tab>()
     private var cancellables = Set<AnyCancellable>()
 
@@ -77,15 +85,15 @@ final class TabLazyLoader {
         let tabs = findRecentlySelectedTabs()
         guard !tabs.isEmpty else {
             os_log("No tabs for lazy loading", log: .tabLazyLoading, type: .debug)
-            isInProgress = false
+            lazyLoadingDidFinishSubject.send(false)
             return
         }
 
-        tabDidFinishLazyLoadingPublisher
+        tabDidFinishLazyLoadingSubject
             .prefix(tabs.count)
             .sink(receiveCompletion: { [weak self] _ in
                 os_log("Lazy tab loading finished", log: .tabLazyLoading, type: .debug)
-                self?.isInProgress = false
+                self?.lazyLoadingDidFinishSubject.send(true)
             }, receiveValue: { tab in
                 os_log("Tab did finish loading %s", log: .tabLazyLoading, type: .debug, String(reflecting: tab.content.url))
             })
@@ -99,7 +107,7 @@ final class TabLazyLoader {
                 let didRequestReload = await tab.reloadIfNeeded(shouldLoadInBackground: true)
                 if !didRequestReload {
                     os_log("Tab cached, loading from cache %s", log: .tabLazyLoading, type: .debug, String(reflecting: tab.content.url))
-                    tabDidFinishLazyLoadingPublisher.send(tab)
+                    tabDidFinishLazyLoadingSubject.send(tab)
                 } else {
                     os_log("Tab not found in cache %s", log: .tabLazyLoading, type: .debug, String(reflecting: tab.content.url))
                 }
@@ -122,7 +130,7 @@ final class TabLazyLoader {
 
     private func subscribeToTabDidFinishNavigation(_ tab: Tab) {
         tab.loadingFinishedPublisher
-            .subscribe(tabDidFinishLazyLoadingPublisher)
+            .subscribe(tabDidFinishLazyLoadingSubject)
             .store(in: &cancellables)
     }
 }
