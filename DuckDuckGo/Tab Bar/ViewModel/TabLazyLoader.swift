@@ -38,14 +38,19 @@ final class TabLazyLoader {
     }()
 
     init?(dataSource: TabLazyLoaderDataSource) {
-        guard dataSource.qualifiesForLazyLoading,
-              let currentTab = dataSource.selectedTab
-        else {
+        guard dataSource.qualifiesForLazyLoading else {
             os_log("Lazy loading not applicable", log: .tabLazyLoading, type: .debug)
             return nil
         }
 
         self.dataSource = dataSource
+    }
+
+    func scheduleLazyLoading() {
+        guard let currentTab = dataSource?.selectedTab else {
+            os_log("Lazy loading not applicable", log: .tabLazyLoading, type: .debug)
+            return
+        }
 
         trackUserSwitchingTabs()
         delayLazyLoadingUntilCurrentTabFinishesLoading(currentTab)

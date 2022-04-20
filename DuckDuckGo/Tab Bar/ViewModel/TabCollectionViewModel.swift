@@ -421,6 +421,8 @@ final class TabCollectionViewModel: NSObject {
                 os_log("Disposed of Tab Lazy Loader", log: .tabLazyLoading, type: .debug)
             }
             .store(in: &cancellables)
+
+        tabLazyLoader?.scheduleLazyLoading()
     }
 
     private func subscribeToTabs() {
