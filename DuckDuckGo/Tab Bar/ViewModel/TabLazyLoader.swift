@@ -18,6 +18,7 @@
 
 import Foundation
 import Combine
+import os
 
 final class TabLazyLoader {
 
@@ -27,7 +28,7 @@ final class TabLazyLoader {
         guard tabCollectionViewModel.qualifiesForLazyLoading,
               let currentTab = tabCollectionViewModel.selectedTabViewModel?.tab
         else {
-            print("Lazy loading not applicable")
+            os_log("Lazy loading not applicable", log: .tabLazyLoading, type: .debug)
             return nil
         }
 
@@ -75,7 +76,7 @@ final class TabLazyLoader {
     private func lazyLoadRecentlySelectedTabs() {
         let tabs = findRecentlySelectedTabs()
         guard !tabs.isEmpty else {
-            print("No tabs for lazy loading")
+            os_log("No tabs for lazy loading", log: .tabLazyLoading, type: .debug)
             isInProgress = false
             return
         }
@@ -83,24 +84,24 @@ final class TabLazyLoader {
         tabDidFinishLazyLoadingPublisher
             .prefix(tabs.count)
             .sink(receiveCompletion: { [weak self] _ in
-                print("Lazy tab loading finished")
+                os_log("Lazy tab loading finished", log: .tabLazyLoading, type: .debug)
                 self?.isInProgress = false
             }, receiveValue: { tab in
-                print("Tab did finish loading", String(reflecting: tab.content.url))
+                os_log("Tab did finish loading %s", log: .tabLazyLoading, type: .debug, String(reflecting: tab.content.url))
             })
             .store(in: &cancellables)
 
         tabs.forEach { tab in
             subscribeToTabDidFinishNavigation(tab)
-            print("Reloading", String(reflecting: tab.content.url))
+            os_log("Reloading %s", log: .tabLazyLoading, type: .debug, String(reflecting: tab.content.url))
 
             Task {
                 let didRequestReload = await tab.reloadIfNeeded(shouldLoadInBackground: true)
                 if !didRequestReload {
-                    print("Tab cached, loading from cache", String(reflecting: tab.content.url))
+                    os_log("Tab cached, loading from cache %s", log: .tabLazyLoading, type: .debug, String(reflecting: tab.content.url))
                     tabDidFinishLazyLoadingPublisher.send(tab)
                 } else {
-                    print("Tab not found in cache", String(reflecting: tab.content.url))
+                    os_log("Tab not found in cache %s", log: .tabLazyLoading, type: .debug, String(reflecting: tab.content.url))
                 }
             }
         }
