@@ -40,7 +40,7 @@ enum PreferencesSectionIdentifier: Hashable, CaseIterable {
     case about
 }
 
-enum PreferencePaneIdentifier: Hashable, Identifiable {
+enum PreferencePaneIdentifier: String, Equatable, Hashable, Identifiable {
     case defaultBrowser
     case appearance
     case privacy
@@ -50,6 +50,12 @@ enum PreferencePaneIdentifier: Hashable, Identifiable {
 
     var id: Self {
         self
+    }
+
+    init?(url: URL) {
+        // manually extract path because URLs such as "about:preferences" can't figure out their host or path
+        let path = url.absoluteString.drop(prefix: URL.preferences.absoluteString + "/")
+        self.init(rawValue: path)
     }
 
     var displayName: String {
