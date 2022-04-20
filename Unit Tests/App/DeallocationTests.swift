@@ -85,7 +85,7 @@ final class DeallocationTests: XCTestCase {
             window2.close()
         }
 
-        waitForExpectations(timeout: 3)
+        waitForExpectations(timeout: 10)
         
         let endTime = DispatchTime.now()
         let elapsedDuration = startTime!.distance(to: endTime)
