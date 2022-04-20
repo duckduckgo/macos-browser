@@ -154,7 +154,9 @@ final class TabLazyLoader {
 
     private func subscribeToTabDidFinishNavigation(_ tab: Tab) {
         tab.loadingFinishedPublisher
-            .subscribe(tabDidFinishLazyLoadingSubject)
+            .sink(receiveValue: { [weak self] tab in
+                self?.tabDidFinishLazyLoadingSubject.send(tab)
+            })
             .store(in: &cancellables)
     }
 }
