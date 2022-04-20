@@ -26,6 +26,21 @@ protocol TabLazyLoaderDataSource: AnyObject {
     var selectedTabPublisher: AnyPublisher<Tab, Never> { get }
 }
 
+extension TabLazyLoaderDataSource {
+    var qualifiesForLazyLoading: Bool {
+
+        let notSelectedURLTabsCount: Int = {
+            let count = tabs.filter({ $0.content.isUrl }).count
+            let isURLTabSelected = selectedTab?.content.isUrl ?? false
+            return isURLTabSelected ? count-1 : count
+        }()
+
+        return notSelectedURLTabsCount > 0
+    }
+}
+
+// MARK: - TabLazyLoader
+
 final class TabLazyLoader {
 
     /**
@@ -49,6 +64,7 @@ final class TabLazyLoader {
     func scheduleLazyLoading() {
         guard let currentTab = dataSource?.selectedTab else {
             os_log("Lazy loading not applicable", log: .tabLazyLoading, type: .debug)
+            lazyLoadingDidFinishSubject.send(false)
             return
         }
 
@@ -109,19 +125,17 @@ final class TabLazyLoader {
             })
             .store(in: &cancellables)
 
+        let selectedTabWebViewFrame = dataSource?.selectedTab?.webView.frame
+
         tabs.forEach { tab in
             subscribeToTabDidFinishNavigation(tab)
             os_log("Reloading %s", log: .tabLazyLoading, type: .debug, String(reflecting: tab.content.url))
 
-            Task {
-                let didRequestReload = await tab.reloadIfNeeded(shouldLoadInBackground: true)
-                if !didRequestReload {
-                    os_log("Tab cached, loading from cache %s", log: .tabLazyLoading, type: .debug, String(reflecting: tab.content.url))
-                    tabDidFinishLazyLoadingSubject.send(tab)
-                } else {
-                    os_log("Tab not found in cache %s", log: .tabLazyLoading, type: .debug, String(reflecting: tab.content.url))
-                }
+            if let currentWebViewFrame = selectedTabWebViewFrame {
+                tab.webView.frame = currentWebViewFrame
             }
+
+            tab.reload()
         }
     }
 
@@ -142,19 +156,6 @@ final class TabLazyLoader {
         tab.loadingFinishedPublisher
             .subscribe(tabDidFinishLazyLoadingSubject)
             .store(in: &cancellables)
-    }
-}
-
-extension TabLazyLoaderDataSource {
-    var qualifiesForLazyLoading: Bool {
-
-        let notSelectedURLTabsCount: Int = {
-            let count = tabs.filter({ $0.content.isUrl }).count
-            let isURLTabSelected = selectedTab?.content.isUrl ?? false
-            return isURLTabSelected ? count-1 : count
-        }()
-
-        return notSelectedURLTabsCount > 0
     }
 }
 

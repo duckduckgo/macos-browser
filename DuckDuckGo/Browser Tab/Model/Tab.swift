@@ -407,7 +407,7 @@ final class Tab: NSObject {
     }()
 
     @MainActor
-    @discardableResult func reloadIfNeeded(shouldLoadInBackground: Bool = false) async -> Bool {
+    private func reloadIfNeeded(shouldLoadInBackground: Bool = false) async {
         let url = await linkProtection.getCleanURL(from: contentURL, onStartExtracting: {
             isAMPProtectionExtracting = true
         }, onFinishExtracting: { [weak self]
@@ -418,11 +418,8 @@ final class Tab: NSObject {
             let didRestore = restoreSessionStateDataIfNeeded()
             if !didRestore {
                 webView.load(url)
-                return true
             }
-            return false
         }
-        return false
     }
 
     @MainActor
