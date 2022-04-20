@@ -129,7 +129,14 @@ final class TabLazyLoader {
 
 private extension TabCollectionViewModel {
     var qualifiesForLazyLoading: Bool {
-        tabCollection.tabs.filter({ $0.content.isUrl }).count > 1
+
+        let notSelectedURLTabsCount: Int = {
+            let count = tabCollection.tabs.filter({ $0.content.isUrl }).count
+            let isURLTabSelected = selectedTabViewModel?.tab.content.isUrl ?? false
+            return isURLTabSelected ? count-1 : count
+        }()
+
+        return notSelectedURLTabsCount > 0
     }
 }
 
