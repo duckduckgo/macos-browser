@@ -135,8 +135,6 @@ final class Tab: NSObject {
         configuration.applyStandardConfiguration()
 
         webView = WebView(frame: CGRect.zero, configuration: configuration)
-        webView.setValue(false, forKey: "drawsBackground")
-
         permissions = PermissionModel(webView: webView)
 
         super.init()
