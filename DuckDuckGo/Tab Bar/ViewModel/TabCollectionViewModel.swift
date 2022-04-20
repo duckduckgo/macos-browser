@@ -415,7 +415,7 @@ final class TabCollectionViewModel: NSObject {
 
         tabLazyLoader = TabLazyLoader(dataSource: self)
 
-        tabLazyLoader?.lazyLoadingDidFinish
+        tabLazyLoader?.lazyLoadingDidFinishPublisher
             .sink { [weak self] _ in
                 self?.tabLazyLoader = nil
                 os_log("Disposed of Tab Lazy Loader", log: .tabLazyLoading, type: .debug)

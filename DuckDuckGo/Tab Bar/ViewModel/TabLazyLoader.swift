@@ -48,7 +48,7 @@ final class TabLazyLoader {
      *
      * The output is `true` if lazy loading was performed and `false` if no tabs were lazy loaded.
      */
-    private(set) lazy var lazyLoadingDidFinish: AnyPublisher<Bool, Never> = {
+    private(set) lazy var lazyLoadingDidFinishPublisher: AnyPublisher<Bool, Never> = {
         lazyLoadingDidFinishSubject.prefix(1).eraseToAnyPublisher()
     }()
 
@@ -80,15 +80,17 @@ final class TabLazyLoader {
     }
 
     private let lazyLoadingDidFinishSubject = PassthroughSubject<Bool, Never>()
-    private let tabDidFinishLazyLoadingSubject = PassthroughSubject<Tab, Never>()
+    private let tabDidLoadSubject = PassthroughSubject<Tab, Never>()
+
     private let numberOfTabsInProgress = CurrentValueSubject<Int, Never>(0)
+    private var numberOfTabsRemaining = Const.maxNumberOfLazyLoadedTabs
+
     private var tabsSelectedOrReloadedInThisSession = Set<Tab>()
     private var cancellables = Set<AnyCancellable>()
 
     private weak var dataSource: TabLazyLoaderDataSource?
 
     private func trackUserSwitchingTabs() {
-
         dataSource?.selectedTabPublisher
             .sink { [weak self] tab in
                 self?.tabsSelectedOrReloadedInThisSession.insert(tab)
@@ -110,74 +112,82 @@ final class TabLazyLoader {
     }
 
     private func startLazyLoadingRecentlySelectedTabs() {
-        guard findRecentlySelectedTab() != nil else {
-            os_log("No tabs for lazy loading", log: .tabLazyLoading, type: .debug)
+        guard findTabToLoad() != nil else {
+            os_log("No tabs to load", log: .tabLazyLoading, type: .debug)
             lazyLoadingDidFinishSubject.send(false)
             return
         }
 
-        tabDidFinishLazyLoadingSubject
-            .prefix(Const.maxNumberOfLazyLoadedTabs + 1)
+        tabDidLoadSubject
+            .prefix(Const.maxNumberOfLazyLoadedTabs)
             .sink(receiveCompletion: { [weak self] _ in
-                os_log("Lazy tab loading finished", log: .tabLazyLoading, type: .debug)
-                self?.lazyLoadingDidFinishSubject.send(true)
-            }, receiveValue: { [weak self] tab in
-                os_log("Tab did finish loading %s", log: .tabLazyLoading, type: .debug, String(reflecting: tab.content.url))
 
-                os_log("Number of tabs being lazy loaded: %d", log: .tabLazyLoading, type: .debug, self!.numberOfTabsInProgress.value - 1)
+                os_log("Lazy tab loading finished, preloaded %d tabs", log: .tabLazyLoading, type: .debug, Const.maxNumberOfLazyLoadedTabs)
+                self?.lazyLoadingDidFinishSubject.send(true)
+
+            }, receiveValue: { [weak self] tab in
+
+                os_log("Tab did finish loading %s", log: .tabLazyLoading, type: .debug, String(reflecting: tab.content.url))
                 self?.numberOfTabsInProgress.value -= 1
+
             })
             .store(in: &cancellables)
 
         numberOfTabsInProgress
             .filter { $0 < Const.maxNumberOfConcurrentlyLoadedTabs }
-            .sink { [weak self] value in
-                let tabToLoad = self?.findRecentlySelectedTab()
-
-                switch (tabToLoad, value) {
-                case (.none, 0):
-                    os_log("No more tabs for lazy loading", log: .tabLazyLoading, type: .debug)
-                    self?.lazyLoadingDidFinishSubject.send(true)
-                case (.none, _):
-                    break
-                case (let .some(tab), _):
-                    self?.lazyLoadRecentlySelectedTab(tab)
-                    os_log("Number of tabs being lazy loaded: %d", log: .tabLazyLoading, type: .debug, value + 1)
-                }
+            .sink { [weak self] _ in
+                self?.findAndReloadRecentlySelectedTab()
             }
             .store(in: &cancellables)
     }
 
-    private func lazyLoadRecentlySelectedTab(_ tab: Tab) {
+    private func findAndReloadRecentlySelectedTab() {
+        guard numberOfTabsRemaining > 0 else {
+            os_log("Maximum allowed tabs loaded (%d), skipping", log: .tabLazyLoading, type: .debug, Const.maxNumberOfLazyLoadedTabs)
+            return
+        }
+
+        let tabToLoad = findTabToLoad()
+
+        switch (tabToLoad, numberOfTabsInProgress.value) {
+        case (.none, 0):
+            os_log("No more tabs suitable for lazy loading", log: .tabLazyLoading, type: .debug)
+            lazyLoadingDidFinishSubject.send(true)
+        case (.none, _):
+            break
+        case (let .some(tab), _):
+            lazyLoadTab(tab)
+        }
+    }
+
+    private func findTabToLoad() -> Tab? {
+        dataSource?.tabs
+            .filter { $0.content.isUrl && !tabsSelectedOrReloadedInThisSession.contains($0) }
+            .sorted { $0.isNewer(than: $1) }
+            .first
+    }
+
+    private func lazyLoadTab(_ tab: Tab) {
+        os_log("Reloading %s", log: .tabLazyLoading, type: .debug, String(reflecting: tab.content.url))
+
+        subscribeToTabLoadingFinished(tab)
+        tabsSelectedOrReloadedInThisSession.insert(tab)
+
         if let selectedTabWebViewFrame = dataSource?.selectedTab?.webView.frame {
             tab.webView.frame = selectedTabWebViewFrame
         }
-
-        subscribeToTabDidFinishNavigation(tab)
-        os_log("Reloading %s", log: .tabLazyLoading, type: .debug, String(reflecting: tab.content.url))
-        tabsSelectedOrReloadedInThisSession.insert(tab)
         tab.reload()
 
+        numberOfTabsRemaining -= 1
         DispatchQueue.main.async {
             self.numberOfTabsInProgress.value += 1
         }
     }
 
-    private func findRecentlySelectedTab() -> Tab? {
-        guard let dataSource = dataSource else {
-            return nil
-        }
-
-        return dataSource.tabs
-                .filter { $0.lastSelectedAt != nil && $0.content.isUrl && !tabsSelectedOrReloadedInThisSession.contains($0) }
-                .sorted { $0.lastSelectedAt! > $1.lastSelectedAt! }
-                .first
-    }
-
-    private func subscribeToTabDidFinishNavigation(_ tab: Tab) {
+    private func subscribeToTabLoadingFinished(_ tab: Tab) {
         tab.loadingFinishedPublisher
             .sink(receiveValue: { [weak self] tab in
-                self?.tabDidFinishLazyLoadingSubject.send(tab)
+                self?.tabDidLoadSubject.send(tab)
             })
             .store(in: &cancellables)
     }
@@ -203,5 +213,16 @@ private extension Tab {
             .prefix(1)
             .map { self }
             .eraseToAnyPublisher()
+    }
+
+    func isNewer(than other: Tab) -> Bool {
+        switch (lastSelectedAt, other.lastSelectedAt) {
+        case (.none, .none), (.some, .none):
+            return true
+        case (.none, .some):
+            return false
+        case (.some(let timestamp), .some(let otherTimestamp)):
+            return timestamp > otherTimestamp
+        }
     }
 }
