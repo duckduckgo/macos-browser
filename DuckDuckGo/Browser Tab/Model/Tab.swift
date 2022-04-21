@@ -126,7 +126,11 @@ final class Tab: NSObject {
     }
 
     weak var autofillScript: WebsiteAutofillUserScript?
-    weak var delegate: TabDelegate?
+    weak var delegate: TabDelegate? {
+        didSet {
+            autofillScript?.currentOverlayTab = delegate
+        }
+    }
     private let cbaTimeReporter: ContentBlockingAssetsCompilationTimeReporter?
 
     init(content: TabContent,
@@ -142,7 +146,8 @@ final class Tab: NSObject {
          sessionStateData: Data? = nil,
          parentTab: Tab? = nil,
          shouldLoadInBackground: Bool = false,
-         canBeClosedWithBack: Bool = false) {
+         canBeClosedWithBack: Bool = false,
+         currentDownload: URL? = nil) {
 
         self.content = content
         self.faviconManagement = faviconManagement
@@ -155,6 +160,7 @@ final class Tab: NSObject {
         self.parentTab = parentTab
         self._canBeClosedWithBack = canBeClosedWithBack
         self.sessionStateData = sessionStateData
+        self.currentDownload = currentDownload
 
         let configuration = webViewConfiguration ?? WKWebViewConfiguration()
         configuration.applyStandardConfiguration()
@@ -202,6 +208,7 @@ final class Tab: NSObject {
         didSet {
             handleFavicon(oldContent: oldValue)
             invalidateSessionStateData()
+            self.error = nil
             Task {
                 await reloadIfNeeded()
             }
@@ -272,7 +279,7 @@ final class Tab: NSObject {
     }
 
     // Used to track if an error was caused by a download navigation.
-    private var currentDownload: URL?
+    private(set) var currentDownload: URL?
 
     func download(from url: URL, promptForLocation: Bool = true) {
         webView.startDownload(URLRequest(url: url, cachePolicy: .returnCacheDataElseLoad)) { download in
@@ -351,6 +358,7 @@ final class Tab: NSObject {
     }
 
     func reload() {
+        currentDownload = nil
         if let error = error, let failingUrl = error.failingUrl {
             webView.load(failingUrl)
             return
@@ -430,9 +438,25 @@ final class Tab: NSObject {
 
     @MainActor
     private func shouldLoadURL(_ url: URL, shouldLoadInBackground: Bool = false) -> Bool {
-        return (webView.superview != nil || shouldLoadInBackground)
-            && webView.url != url
-            && webView.url != content.url // Initial Home Page shouldn't show Back Button
+        // don‘t reload in background unless shouldLoadInBackground
+        guard url.isValid,
+              (webView.superview != nil || shouldLoadInBackground),
+              // don‘t reload when already loaded
+              webView.url != url,
+              webView.url != content.url
+        else { return false }
+
+        // if content not loaded inspect error
+        switch error {
+        case .none, // no error
+            // error due to connection failure
+             .some(URLError.notConnectedToInternet),
+             .some(URLError.networkConnectionLost):
+            return true
+        case .some:
+            // don‘t autoreload on other kinds of errors
+            return false
+        }
     }
 
     @MainActor
@@ -656,14 +680,12 @@ extension Tab: UserContentControllerDelegate {
 }
 
 extension Tab: BrowserTabViewControllerClickDelegate {
+
     func browserTabViewController(_ browserTabViewController: BrowserTabViewController, didClickAtPoint: NSPoint) {
         guard let autofillScript = autofillScript else { return }
         autofillScript.clickPoint = didClickAtPoint
     }
-    func browserTabViewControllerUpdateDelegate(_ browserTabViewController: BrowserTabViewController) {
-        guard let autofillScript = autofillScript else { return }
-        autofillScript.currentOverlayTab = self.delegate
-    }
+
 }
 
 extension Tab: PrintingUserScriptDelegate {
@@ -848,11 +870,6 @@ extension AutofillType {
 
 extension Tab: WKNavigationDelegate {
 
-    struct ErrorCodes {
-        static let frameLoadInterrupted = 102
-        static let internetConnectionOffline = -1009
-    }
-
     func webView(_ webView: WKWebView,
                  didReceive challenge: URLAuthenticationChallenge,
                  completionHandler: @escaping (URLSession.AuthChallengeDisposition, URLCredential?) -> Void) {
@@ -931,7 +948,9 @@ extension Tab: WKNavigationDelegate {
         }
 
         if navigationAction.isTargetingMainFrame {
-            currentDownload = nil
+            if navigationAction.request.url != currentDownload || navigationAction.isUserInitiated {
+                currentDownload = nil
+            }
             if navigationAction.request.url != self.clientRedirectedDuringNavigationURL {
                 self.clientRedirectedDuringNavigationURL = nil
             }
@@ -1050,22 +1069,25 @@ extension Tab: WKNavigationDelegate {
         self.webView.frozenCanGoForward = false
     }
 
+    @MainActor
     func webView(_ webView: WKWebView,
-                 decidePolicyFor navigationResponse: WKNavigationResponse,
-                 decisionHandler: @escaping (WKNavigationResponsePolicy) -> Void) {
+                 decidePolicyFor navigationResponse: WKNavigationResponse) async -> WKNavigationResponsePolicy {
         userEnteredUrl = false // subsequent requests will be navigations
 
         if !navigationResponse.canShowMIMEType || navigationResponse.shouldDownload {
             if navigationResponse.isForMainFrame {
+                guard currentDownload != navigationResponse.response.url else {
+                    // prevent download twice
+                    return .cancel
+                }
                 currentDownload = navigationResponse.response.url
             }
             // register the navigationResponse for legacy _WKDownload to be called back on the Tab
             // further download will be passed to webView:navigationResponse:didBecomeDownload:
-            decisionHandler(.download(navigationResponse, using: webView))
-
-        } else {
-            decisionHandler(.allow)
+            return .download(navigationResponse, using: webView)
         }
+
+        return .allow
     }
 
     func webView(_ webView: WKWebView, didStartProvisionalNavigation navigation: WKNavigation!) {
@@ -1095,16 +1117,15 @@ extension Tab: WKNavigationDelegate {
     }
 
     func webView(_ webView: WKWebView, didFailProvisionalNavigation navigation: WKNavigation!, withError error: Error) {
-        if currentDownload != nil && (error as NSError).code == ErrorCodes.frameLoadInterrupted {
-            currentDownload = nil
-            return
+        switch error {
+        case URLError.notConnectedToInternet,
+             URLError.networkConnectionLost:
+            guard let failingUrl = error.failingUrl else { break }
+            historyCoordinating.markFailedToLoadUrl(failingUrl)
+        default: break
         }
 
         self.error = error
-
-        if (error as NSError).code != ErrorCodes.internetConnectionOffline, let failingUrl = error.failingUrl {
-            historyCoordinating.markFailedToLoadUrl(failingUrl)
-        }
     }
 
     @available(macOS 11.3, *)
@@ -1150,8 +1171,11 @@ extension Tab: WKNavigationDelegate {
         }
     }
 
-    @objc(_webView:didFinishLoadWithRequest:inFrame:withError:)
-    func webView(_ webView: WKWebView, didFailLoadWithRequest request: URLRequest, inFrame frame: WKFrameInfo, withError error: Error) {
+    @objc(_webView:didFailProvisionalLoadWithRequest:inFrame:withError:)
+    func webView(_ webView: WKWebView,
+                 didFailProvisionalLoadWithRequest request: URLRequest,
+                 inFrame frame: WKFrameInfo,
+                 withError error: Error) {
         guard frame.isMainFrame else { return }
         self.mainFrameLoadState = .finished
     }
@@ -1170,10 +1194,9 @@ extension Tab: WKWebViewDownloadDelegate {
         // https://en.wikipedia.org/wiki/Guitar#/media/File:GuitareClassique5.png
         // Safari closes new tabs that were opened and then create a download instantly.
         if self.webView.backForwardList.currentItem == nil,
-           self.parentTab != nil,
-           let delegate = delegate {
-            DispatchQueue.main.async {
-                delegate.closeTab(self)
+           self.parentTab != nil {
+            DispatchQueue.main.async { [weak delegate=self.delegate] in
+                delegate?.closeTab(self)
             }
         }
     }
