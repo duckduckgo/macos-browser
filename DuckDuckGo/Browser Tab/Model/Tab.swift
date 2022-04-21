@@ -47,7 +47,7 @@ final class Tab: NSObject {
     enum TabContent: Equatable {
         case homePage
         case url(URL)
-        case preferences
+        case preferences(pane: PreferencePaneIdentifier?)
         case bookmarks
         case onboarding
         case none
@@ -58,22 +58,47 @@ final class Tab: NSObject {
             } else if url == .welcome {
                 return .onboarding
             } else if url == .preferences {
-                return .preferences
+                return .anyPreferencePane
+            } else if let preferencePane = url.flatMap(PreferencePaneIdentifier.init(url:)) {
+                return .preferences(pane: preferencePane)
             } else {
                 return .url(url ?? .blankPage)
             }
         }
 
         static var displayableTabTypes: [TabContent] {
-            return [TabContent.preferences, .bookmarks].sorted { first, second in
-                switch first {
-                case .homePage, .url, .preferences, .bookmarks, .onboarding, .none: break
-                // !! Replace [TabContent.preferences, .bookmarks] above with new displayable Tab Types if added
-                }
+            // Add new displayable types here
+            let displayableTypes = [TabContent.anyPreferencePane, .bookmarks]
+
+            return displayableTypes.sorted { first, second in
                 guard let firstTitle = first.title, let secondTitle = second.title else {
                     return true // Arbitrary sort order, only non-standard tabs are displayable.
                 }
                 return firstTitle.localizedStandardCompare(secondTitle) == .orderedAscending
+            }
+        }
+
+        /// Convenience accessor for `.preferences` Tab Content with no particular pane selected,
+        /// i.e. the currently selected pane is decided internally by `PreferencesViewController`.
+        static let anyPreferencePane: Self = .preferences(pane: nil)
+
+        var isDisplayable: Bool {
+            switch self {
+            case .preferences, .bookmarks:
+                return true
+            default:
+                return false
+            }
+        }
+
+        func matchesDisplayableTab(_ other: TabContent) -> Bool {
+            switch (self, other) {
+            case (.preferences, .preferences):
+                return true
+            case (.bookmarks, .bookmarks):
+                return true
+            default:
+                return false
             }
         }
 
@@ -199,7 +224,14 @@ final class Tab: NSObject {
             return
         }
         lastUpgradedURL = nil
-        self.content = content
+
+        switch (self.content, content) {
+        case (.preferences(pane: .some), .preferences(pane: nil)):
+            // prevent clearing currently selected pane (for state persistence purposes)
+            break
+        default:
+            self.content = content
+        }
     }
 
     @Published var title: String?

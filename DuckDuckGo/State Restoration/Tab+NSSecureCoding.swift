@@ -27,6 +27,7 @@ extension Tab: NSSecureCoding {
         static let sessionStateData = "ssdata"
         static let favicon = "icon"
         static let tabType = "tabType"
+        static let preferencePane = "preferencePane"
         static let visitedDomains = "visitedDomains"
         static let currentDownload = "currentDownload"
     }
@@ -34,9 +35,13 @@ extension Tab: NSSecureCoding {
     static var supportsSecureCoding: Bool { true }
 
     convenience init?(coder decoder: NSCoder) {
+        let url: URL? = decoder.decodeIfPresent(at: NSSecureCodingKeys.url)
+        let preferencePane = decoder.decodeIfPresent(at: NSSecureCodingKeys.preferencePane)
+            .flatMap(PreferencePaneIdentifier.init(rawValue:))
+
         guard let tabTypeRawValue: Int = decoder.decodeIfPresent(at: NSSecureCodingKeys.tabType),
               let tabType = TabContent.ContentType(rawValue: tabTypeRawValue),
-              let content = TabContent(type: tabType, url: decoder.decodeIfPresent(at: NSSecureCodingKeys.url))
+              let content = TabContent(type: tabType, url: url, preferencePane: preferencePane)
         else { return nil }
 
         let visitedDomains = decoder.decodeObject(of: [NSArray.self, NSString.self], forKey: NSSecureCodingKeys.visitedDomains) as? [String] ?? []
@@ -60,6 +65,10 @@ extension Tab: NSSecureCoding {
         getActualSessionStateData().map(coder.encode(forKey: NSSecureCodingKeys.sessionStateData))
         coder.encode(content.type.rawValue, forKey: NSSecureCodingKeys.tabType)
         coder.encode(currentDownload, forKey: NSSecureCodingKeys.currentDownload)
+
+        if let pane = content.preferencePane {
+            coder.encode(pane.rawValue, forKey: NSSecureCodingKeys.preferencePane)
+        }
     }
 
 }
@@ -74,7 +83,7 @@ private extension Tab.TabContent {
         case onboarding = 4
     }
 
-    init?(type: ContentType, url: URL?) {
+    init?(type: ContentType, url: URL?, preferencePane: PreferencePaneIdentifier?) {
         switch type {
         case .homePage:
             self = .homePage
@@ -84,7 +93,7 @@ private extension Tab.TabContent {
         case .bookmarks:
             self = .bookmarks
         case .preferences:
-            self = .preferences
+            self = .preferences(pane: preferencePane)
         case .onboarding:
             self = .onboarding
         }
@@ -101,4 +110,12 @@ private extension Tab.TabContent {
         }
     }
 
+    var preferencePane: PreferencePaneIdentifier? {
+        switch self {
+        case let .preferences(pane: pane):
+            return pane
+        default:
+            return nil
+        }
+    }
 }

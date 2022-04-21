@@ -26,7 +26,8 @@ final class PreferencesViewController: NSViewController {
     
     let model = PreferencesSidebarModel()
     private var selectedTabIndexCancellable: AnyCancellable?
-    
+    private var selectedPreferencePaneCancellable: AnyCancellable?
+
     override func loadView() {
         view = NSView()
     }
@@ -45,11 +46,19 @@ final class PreferencesViewController: NSViewController {
             .sink { [weak self] index in
                 self?.delegate?.selectedTab(at: index)
             }
+
+        selectedPreferencePaneCancellable = model.$selectedPane
+            .dropFirst()
+            .sink { [weak self] identifier in
+                self?.delegate?.selectedPreferencePane(identifier)
+            }
     }
 
     override func viewWillDisappear() {
         super.viewWillDisappear()
         selectedTabIndexCancellable?.cancel()
         selectedTabIndexCancellable = nil
+        selectedPreferencePaneCancellable?.cancel()
+        selectedPreferencePaneCancellable = nil
     }
 }

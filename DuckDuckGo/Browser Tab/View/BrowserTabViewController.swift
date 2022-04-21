@@ -313,8 +313,11 @@ final class BrowserTabViewController: NSViewController {
             removeAllTabContent()
             showTabContentController(bookmarksViewController)
 
-        case .preferences:
+        case let .preferences(pane):
             removeAllTabContent()
+            if let pane = pane, preferencesViewController.model.selectedPane != pane {
+                preferencesViewController.model.selectPane(pane)
+            }
             showTabContentController(preferencesViewController)
 
         case .onboarding:
@@ -968,6 +971,16 @@ extension BrowserTabViewController: BrowserTabSelectionDelegate {
 
     func selectedTab(at index: Int) {
         show(displayableTabAtIndex: index)
+    }
+
+    func selectedPreferencePane(_ identifier: PreferencePaneIdentifier) {
+        guard let selectedTab = tabCollectionViewModel.selectedTabViewModel?.tab else {
+            return
+        }
+
+        if case .preferences = selectedTab.content {
+            selectedTab.setContent(.preferences(pane: identifier))
+        }
     }
 
 }
