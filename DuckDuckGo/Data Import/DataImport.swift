@@ -226,22 +226,65 @@ enum DataImport {
 
 }
 
-enum DataImportError: Error {
+struct DataImportError: Error {
 
-    case noFileFound
-    case cannotReadFile
-    case browserNeedsToBeClosed
-    case needsLoginPrimaryPassword
-    case cannotAccessSecureVault
-    case cannotAccessCoreData
-    case unknownError(Error)
+    enum ImportErrorAction {
+        case bookmarks
+        case logins
+        case generic
+        
+        var pixelEventAction: Pixel.Event.DataImportAction {
+            switch self {
+            case .bookmarks: return .importBookmarks
+            case .logins: return .importLogins
+            case .generic: return .generic
+            }
+        }
+    }
+    
+    enum ImportErrorType {
+        case noFileFound
+        case cannotReadFile
+        case browserNeedsToBeClosed
+        case needsLoginPrimaryPassword
+        case cannotAccessSecureVault
+        case cannotAccessCoreData
+        case unknownError(Error)
+        
+        var description: String {
+            switch self {
+            case .noFileFound: return "noFileFound"
+            case .cannotReadFile: return "cannotReadFile"
+            case .browserNeedsToBeClosed: return "browserNeedsToBeClosed"
+            case .needsLoginPrimaryPassword: return "needsLoginPrimaryPassword"
+            case .cannotAccessSecureVault: return "cannotAccessSecureVault"
+            case .cannotAccessCoreData: return "cannotAccessCoreData"
+            case .unknownError(let error): return "unknownError"
+            }
+        }
+    }
+    
+    static func generic(_ errorType: ImportErrorType) -> DataImportError {
+        return DataImportError(actionType: .generic, errorType: errorType)
+    }
+
+    static func bookmarks(_ errorType: ImportErrorType) -> DataImportError {
+        return DataImportError(actionType: .bookmarks, errorType: errorType)
+    }
+    
+    static func logins(_ errorType: ImportErrorType) -> DataImportError {
+        return DataImportError(actionType: .logins, errorType: errorType)
+    }
+    
+    let actionType: ImportErrorAction
+    let errorType: ImportErrorType
 
 }
 
 extension DataImportError: LocalizedError {
 
     public var errorDescription: String? {
-        switch self {
+        switch self.errorType {
         case .noFileFound:
             return "Could not find file"
         case .cannotReadFile:

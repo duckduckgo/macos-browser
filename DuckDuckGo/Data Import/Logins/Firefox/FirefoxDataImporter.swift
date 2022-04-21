@@ -39,7 +39,7 @@ final class FirefoxDataImporter: DataImporter {
                     from profile: DataImport.BrowserProfile?,
                     completion: @escaping (Result<DataImport.Summary, DataImportError>) -> Void) {
         guard let firefoxProfileURL = profile?.profileURL ?? defaultFirefoxProfilePath() else {
-            completion(.failure(.cannotReadFile))
+            completion(.failure(.generic(.cannotReadFile)))
             return
         }
 
@@ -54,16 +54,16 @@ final class FirefoxDataImporter: DataImporter {
                 do {
                     summary.loginsResult = .completed(try loginImporter.importLogins(logins))
                 } catch {
-                    completion(.failure(.cannotAccessSecureVault))
+                    completion(.failure(.logins(.cannotAccessSecureVault)))
                 }
             case .failure(let error):
                 switch error {
                 case .requiresPrimaryPassword:
-                    completion(.failure(.needsLoginPrimaryPassword))
+                    completion(.failure(.logins(.needsLoginPrimaryPassword)))
                 case .databaseAccessFailed:
-                    completion(.failure(.browserNeedsToBeClosed))
+                    completion(.failure(.logins(.browserNeedsToBeClosed)))
                 default:
-                    completion(.failure(.unknownError(error)))
+                    completion(.failure(.logins(.unknownError(error))))
                 }
             }
         }
@@ -77,11 +77,11 @@ final class FirefoxDataImporter: DataImporter {
                 do {
                     summary.bookmarksResult = try bookmarkImporter.importBookmarks(bookmarks, source: .firefox)
                 } catch {
-                    completion(.failure(.cannotAccessSecureVault))
+                    completion(.failure(.bookmarks(.cannotAccessSecureVault)))
                     return
                 }
             case .failure:
-                completion(.failure(.browserNeedsToBeClosed))
+                completion(.failure(.bookmarks(.browserNeedsToBeClosed)))
                 return
             }
         }
