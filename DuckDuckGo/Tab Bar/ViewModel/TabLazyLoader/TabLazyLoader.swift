@@ -24,6 +24,7 @@ final class TabLazyLoader<DataSource: TabLazyLoaderDataSource> {
 
     enum Const {
         static var maxNumberOfLazyLoadedTabs: Int { 20 }
+        static var maxNumberOfLazyLoadedAdjacentTabs: Int { 10 }
         static var maxNumberOfConcurrentlyLoadedTabs: Int { 3 }
     }
 
@@ -43,10 +44,18 @@ final class TabLazyLoader<DataSource: TabLazyLoaderDataSource> {
         }
 
         self.dataSource = dataSource
+
+        if let selectedTabIndex = dataSource.selectedTabIndex, dataSource.tabs.count > Const.maxNumberOfLazyLoadedTabs {
+            os_log("%d open tabs, will load adjacent tabs first", log: .tabLazyLoading, type: .debug, dataSource.tabs.count)
+            shouldLoadAdjacentTabs = true
+            adjacentItemEnumerator = .init(itemIndex: selectedTabIndex)
+        } else {
+            shouldLoadAdjacentTabs = false
+        }
     }
 
     func scheduleLazyLoading() {
-        guard let currentTab = dataSource?.selectedTab else {
+        guard let dataSource = dataSource, let currentTab = dataSource.selectedTab else {
             os_log("Lazy loading not applicable", log: .tabLazyLoading, type: .debug)
             lazyLoadingDidFinishSubject.send(false)
             return
@@ -63,6 +72,10 @@ final class TabLazyLoader<DataSource: TabLazyLoaderDataSource> {
 
     private let numberOfTabsInProgress = CurrentValueSubject<Int, Never>(0)
     private var numberOfTabsRemaining = Const.maxNumberOfLazyLoadedTabs
+
+    private let shouldLoadAdjacentTabs: Bool
+    private var adjacentItemEnumerator: AdjacentItemEnumerator?
+    private var numberOfLazyLoadedAdjacentTabs = 0
 
     private var idsOfTabsSelectedOrReloadedInThisSession = Set<DataSource.Tab.ID>()
     private var cancellables = Set<AnyCancellable>()
@@ -91,7 +104,7 @@ final class TabLazyLoader<DataSource: TabLazyLoaderDataSource> {
     }
 
     private func startLazyLoadingRecentlySelectedTabs() {
-        guard findTabToLoad() != nil else {
+        guard hasAnyTabsToLoad() else {
             os_log("No tabs to load", log: .tabLazyLoading, type: .debug)
             let loadedAnyTab = numberOfTabsRemaining < Const.maxNumberOfLazyLoadedTabs
             lazyLoadingDidFinishSubject.send(loadedAnyTab)
@@ -116,12 +129,12 @@ final class TabLazyLoader<DataSource: TabLazyLoaderDataSource> {
         numberOfTabsInProgress
             .filter { $0 < Const.maxNumberOfConcurrentlyLoadedTabs }
             .sink { [weak self] _ in
-                self?.findAndReloadRecentlySelectedTab()
+                self?.findAndReloadNextTab()
             }
             .store(in: &cancellables)
     }
 
-    private func findAndReloadRecentlySelectedTab() {
+    private func findAndReloadNextTab() {
         guard numberOfTabsRemaining > 0 else {
             os_log("Maximum allowed tabs loaded (%d), skipping", log: .tabLazyLoading, type: .debug, Const.maxNumberOfLazyLoadedTabs)
             return
@@ -140,7 +153,52 @@ final class TabLazyLoader<DataSource: TabLazyLoaderDataSource> {
         }
     }
 
-    private func findTabToLoad() -> DataSource.Tab? {
+    private func hasAnyTabsToLoad() -> Bool {
+        return findTabToLoad(dryRun: true) != nil
+    }
+
+    /**
+     * `dryRun` parameter, when set to `true`, reverts any changes it makes to lazy loader's state.
+     *
+     * This is to allow this function to be called to check whether there is any tab,
+     * either adjacent to current or recently selected, that can be loaded.
+     */
+    private func findTabToLoad(dryRun: Bool = false) -> DataSource.Tab? {
+        var tab: DataSource.Tab?
+
+        if shouldLoadAdjacentTabs, numberOfLazyLoadedAdjacentTabs < Const.maxNumberOfLazyLoadedAdjacentTabs {
+            tab = findAdjacentTabToLoad()
+            if dryRun {
+                adjacentItemEnumerator?.reset()
+            } else if tab != nil {
+                numberOfLazyLoadedAdjacentTabs += 1
+                os_log("Will reload adjacent tab #%d of %d", log: .tabLazyLoading, type: .debug,
+                       numberOfLazyLoadedAdjacentTabs,
+                       Const.maxNumberOfLazyLoadedAdjacentTabs)
+            }
+        }
+
+        if tab == nil {
+            tab = findRecentlySelectedTabToLoad()
+            if !dryRun, tab != nil {
+                os_log("Will reload recently selected tab", log: .tabLazyLoading, type: .debug)
+            }
+        }
+
+        return tab
+    }
+
+    private func findAdjacentTabToLoad() -> DataSource.Tab? {
+        guard let dataSource = dataSource,
+              let nextIndex = adjacentItemEnumerator?.nextIndex(arraySize: dataSource.tabs.count)
+        else {
+            return nil
+        }
+
+        return dataSource.tabs[nextIndex]
+    }
+
+    private func findRecentlySelectedTabToLoad() -> DataSource.Tab? {
         dataSource?.tabs
             .filter { $0.isUrl && !idsOfTabsSelectedOrReloadedInThisSession.contains($0.id) }
             .sorted { $0.isNewer(than: $1) }

@@ -40,10 +40,20 @@ struct AdjacentItemEnumerator {
         return newIndex
     }
 
-    let itemIndex: Int
+    var itemIndex: Int
 
-    init(itemIndex: Int) {
+    var currentAdjacentIndex: Int {
+        itemIndex + currentDiff
+    }
+
+    init(itemIndex: Int = 0) {
         self.itemIndex = itemIndex
+    }
+
+    mutating func reset() {
+        currentDiff = 0
+        previousDiff = 0
+        operation = .toggleSignAndAdvance
     }
 
     // MARK: - Private

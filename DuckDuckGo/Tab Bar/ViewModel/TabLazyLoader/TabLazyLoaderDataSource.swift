@@ -24,6 +24,8 @@ protocol TabLazyLoaderDataSource: AnyObject {
 
     var tabs: [Tab] { get }
     var selectedTab: Tab? { get }
+    var selectedTabIndex: Int? { get }
+
     var selectedTabPublisher: AnyPublisher<Tab, Never> { get }
 }
 
@@ -48,6 +50,10 @@ extension TabCollectionViewModel: TabLazyLoaderDataSource {
 
     var selectedTab: Tab? {
         selectedTabViewModel?.tab
+    }
+
+    var selectedTabIndex: Int? {
+        selectionIndex
     }
 
     var selectedTabPublisher: AnyPublisher<Tab, Never> {
