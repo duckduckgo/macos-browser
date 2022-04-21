@@ -21,6 +21,7 @@ import AppKit
 enum DataImport {
 
     enum Source: CaseIterable {
+
         case brave
         case chrome
         case edge
@@ -59,6 +60,19 @@ enum DataImport {
 
         var canImportData: Bool {
             return (ThirdPartyBrowser.browser(for: self)?.isInstalled ?? false) || [.csv, .onePassword, .lastPass].contains(self)
+        }
+
+        var pixelEventSource: Pixel.Event.DataImportSource {
+            switch self {
+            case .brave: return .brave
+            case .chrome: return .chrome
+            case .edge: return .edge
+            case .firefox: return .firefox
+            case .safari: return .safari
+            case .onePassword: return .onePassword
+            case .lastPass: return .lastPass
+            case .csv: return .csv
+            }
         }
     }
 
@@ -219,11 +233,13 @@ enum DataImportError: Error {
     case browserNeedsToBeClosed
     case needsLoginPrimaryPassword
     case cannotAccessSecureVault
+    case cannotAccessCoreData
     case unknownError(Error)
 
 }
 
 extension DataImportError: LocalizedError {
+
     public var errorDescription: String? {
         switch self {
         case .noFileFound:
@@ -236,10 +252,13 @@ extension DataImportError: LocalizedError {
             return "Failed to get primary password"
         case .cannotAccessSecureVault:
             return "Failed to read Secure Vault data"
+        case .cannotAccessCoreData:
+            return "Failed to access Bookmarks database"
         case .unknownError(let error):
             return error.localizedDescription
         }
     }
+
 }
 
 /// Represents an object able to import data from an outside source. The outside source may be capable of importing multiple types of data.

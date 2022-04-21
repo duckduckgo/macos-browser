@@ -427,6 +427,8 @@ final class DataImportViewController: NSViewController {
                 completeImport()
             }
         default:
+            Pixel.fire(.dataImportFailed(source: viewState.selectedImportSource.pixelEventSource))
+
             let alert = NSAlert.importFailedAlert(source: viewState.selectedImportSource, errorMessage: error.localizedDescription)
             alert.beginSheetModal(for: window, completionHandler: nil)
         }
@@ -449,7 +451,7 @@ final class DataImportViewController: NSViewController {
         switch self.viewState.selectedImportSource {
         case .brave: Pixel.fire(.importedBookmarks(source: .brave))
         case .chrome: Pixel.fire(.importedBookmarks(source: .chrome))
-        case .csv, .lastPass, .onePassword: assertionFailure("Attempted to fire CSV bookmark import pixel")
+        case .csv, .lastPass, .onePassword: assertionFailure("Attempted to fire invalid bookmark import pixel")
         case .edge: Pixel.fire(.importedBookmarks(source: .edge))
         case .firefox: Pixel.fire(.importedBookmarks(source: .firefox))
         case .safari: Pixel.fire(.importedBookmarks(source: .safari))

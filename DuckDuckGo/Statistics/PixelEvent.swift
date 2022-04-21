@@ -135,6 +135,8 @@ extension Pixel {
         case exportedLogins(repetition: Repetition = .init(key: "exported-logins"))
         case importedBookmarks(repetition: Repetition = .init(key: "imported-bookmarks"), source: DataImportSource)
         case exportedBookmarks(repetition: Repetition = .init(key: "exported-bookmarks"))
+        
+        case dataImportFailed(source: DataImportSource)
 
         case formAutofilled(kind: FormAutofillKind)
         case autofillItemSaved(kind: FormAutofillKind)
@@ -300,6 +302,9 @@ extension Pixel.Event {
 
         case .exportedBookmarks(repetition: let repetition):
             return "m_mac_exported-bookmarks_\(repetition)"
+            
+        case .dataImportFailed(source: let source):
+            return "m_mac_data-import-failed_\(source)"
 
         case .formAutofilled(kind: let kind):
             return "m_mac_autofill_\(kind)"

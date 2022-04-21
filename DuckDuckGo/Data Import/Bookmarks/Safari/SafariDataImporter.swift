@@ -73,7 +73,7 @@ internal class SafariDataImporter: DataImporter {
                 do {
                     summary.bookmarksResult = try bookmarkImporter.importBookmarks(bookmarks, source: .safari)
                 } catch {
-                    completion(.failure(.cannotAccessSecureVault))
+                    completion(.failure(.cannotAccessCoreData))
                     return
                 }
             case .failure:
