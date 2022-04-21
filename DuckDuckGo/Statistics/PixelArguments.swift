@@ -387,9 +387,9 @@ extension Pixel.Event {
     enum DataImportAction: String, CustomStringConvertible {
         var description: String { rawValue }
 
-        case importBookmarks = "import-bookmarks"
-        case importLogins = "import-logins"
-        case generic = "generic-error"
+        case importBookmarks = "bookmarks"
+        case importLogins = "logins"
+        case generic = "generic"
     }
     
     enum DataImportSource: String, CustomStringConvertible {

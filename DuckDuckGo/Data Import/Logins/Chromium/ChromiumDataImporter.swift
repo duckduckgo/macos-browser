@@ -42,9 +42,6 @@ internal class ChromiumDataImporter: DataImporter {
                     from profile: DataImport.BrowserProfile?,
                     completion: @escaping (Result<DataImport.Summary, DataImportError>) -> Void) {
         
-        completion(.failure(.bookmarks(.browserNeedsToBeClosed)))
-        return
-        
         var summary = DataImport.Summary()
         let dataDirectoryPath = profile?.profileURL.path ?? applicationDataDirectoryPath
 
