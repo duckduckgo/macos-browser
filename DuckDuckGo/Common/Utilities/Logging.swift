@@ -95,7 +95,7 @@ struct Logging {
     fileprivate static let autoLockLoggingEnabled = false
     fileprivate static let autoLockLog: OSLog = OSLog(subsystem: Bundle.main.bundleIdentifier ?? "DuckDuckGo", category: "Auto-Lock")
 
-    fileprivate static let tabLazyLoaderLoggingEnabled = true
+    fileprivate static let tabLazyLoaderLoggingEnabled = false
     fileprivate static let tabLazyLoaderLog: OSLog = OSLog(subsystem: Bundle.main.bundleIdentifier ?? "DuckDuckGo", category: "Lazy Loading")
 
     fileprivate static let autoconsentLoggingEnabled = false

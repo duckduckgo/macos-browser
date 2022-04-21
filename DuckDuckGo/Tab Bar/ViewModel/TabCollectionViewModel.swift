@@ -59,7 +59,7 @@ final class TabCollectionViewModel: NSObject {
 
     // In a special occasion, we want to select the "parent" tab after closing the currently selected tab
     private var selectParentOnRemoval = false
-    private var tabLazyLoader: TabLazyLoader?
+    private var tabLazyLoader: TabLazyLoader<TabCollectionViewModel>?
 
     private var cancellables = Set<AnyCancellable>()
 
