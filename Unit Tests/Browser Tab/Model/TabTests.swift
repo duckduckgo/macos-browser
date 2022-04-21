@@ -22,8 +22,8 @@ import XCTest
 final class TabTests: XCTestCase {
 
     func testWhenSettingURLThenTabTypeChangesToStandard() {
-        let tab = Tab(content: .preferences)
-        XCTAssertEqual(tab.content, .preferences)
+        let tab = Tab(content: .preferences(pane: .autofill))
+        XCTAssertEqual(tab.content, .preferences(pane: .autofill))
 
         tab.url = URL.duckDuckGo
         XCTAssertEqual(tab.content, .url(.duckDuckGo))

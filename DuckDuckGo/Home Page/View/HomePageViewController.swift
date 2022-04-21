@@ -94,6 +94,7 @@ final class HomePageViewController: NSViewController {
         guard !AppDelegate.isRunningTests else { return }
         refreshFavoritesModel()
         refreshRecentlyVisitedModel()
+        refreshDefaultBrowserModel()
     }
 
     func createRecentlyVisitedModel() -> HomePage.Models.RecentlyVisitedModel {
@@ -133,6 +134,10 @@ final class HomePageViewController: NSViewController {
 
     func refreshRecentlyVisitedModel() {
         recentlyVisitedModel.refreshWithHistory(historyCoordinating.history ?? [])
+    }
+
+    func refreshDefaultBrowserModel() {
+        defaultBrowserModel.isDefault = DefaultBrowserPreferences().isDefault
     }
 
     func subscribeToBookmarks() {
