@@ -85,7 +85,7 @@ final class TabLazyLoader {
     private let numberOfTabsInProgress = CurrentValueSubject<Int, Never>(0)
     private var numberOfTabsRemaining = Const.maxNumberOfLazyLoadedTabs
 
-    private var tabsSelectedOrReloadedInThisSession = Set<Tab>()
+    private var idsOfTabsSelectedOrReloadedInThisSession = Set<Tab.ID>()
     private var cancellables = Set<AnyCancellable>()
 
     private weak var dataSource: TabLazyLoaderDataSource?
@@ -93,7 +93,7 @@ final class TabLazyLoader {
     private func trackUserSwitchingTabs() {
         dataSource?.selectedTabPublisher
             .sink { [weak self] tab in
-                self?.tabsSelectedOrReloadedInThisSession.insert(tab)
+                self?.idsOfTabsSelectedOrReloadedInThisSession.insert(tab.id)
             }
             .store(in: &cancellables)
     }
@@ -162,7 +162,7 @@ final class TabLazyLoader {
 
     private func findTabToLoad() -> Tab? {
         dataSource?.tabs
-            .filter { $0.content.isUrl && !tabsSelectedOrReloadedInThisSession.contains($0) }
+            .filter { $0.content.isUrl && !idsOfTabsSelectedOrReloadedInThisSession.contains($0.id) }
             .sorted { $0.isNewer(than: $1) }
             .first
     }
@@ -171,7 +171,7 @@ final class TabLazyLoader {
         os_log("Reloading %s", log: .tabLazyLoading, type: .debug, String(reflecting: tab.content.url))
 
         subscribeToTabLoadingFinished(tab)
-        tabsSelectedOrReloadedInThisSession.insert(tab)
+        idsOfTabsSelectedOrReloadedInThisSession.insert(tab.id)
 
         if let selectedTabWebViewFrame = dataSource?.selectedTab?.webView.frame {
             tab.webView.frame = selectedTabWebViewFrame
