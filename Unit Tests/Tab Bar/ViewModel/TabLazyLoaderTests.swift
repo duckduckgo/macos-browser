@@ -34,20 +34,30 @@ private final class TabMock: LazyLoadable {
     var isNewerClosure: (TabMock) -> Bool = { _ in true }
     var reloadClosure: () -> Void = {}
 
+    var selectedTimestamp: Date
+
     init(
         isUrl: Bool = true,
         url: URL? = "https://example.com".url,
         webViewFrame: CGRect = .zero,
-        reloadExpectation: XCTestExpectation? = nil
+        reloadExpectation: XCTestExpectation? = nil,
+        selectedTimestamp: Date = Date(timeIntervalSince1970: 0)
     ) {
         self.isUrl = isUrl
         self.url = url
         self.webViewFrame = webViewFrame
+        self.selectedTimestamp = selectedTimestamp
+
+        isNewerClosure = { [unowned self] other in
+            self.selectedTimestamp > other.selectedTimestamp
+        }
 
         reloadClosure = { [unowned self] in
             // instantly notify that loading has finished (or failed)
-            reloadExpectation?.fulfill()
-            self.loadingFinishedSubject.send(self)
+            DispatchQueue.main.async {
+                reloadExpectation?.fulfill()
+                self.loadingFinishedSubject.send(self)
+            }
         }
     }
 
@@ -56,10 +66,12 @@ private final class TabMock: LazyLoadable {
 }
 
 private final class TabLazyLoaderDataSourceMock: TabLazyLoaderDataSource {
+
     typealias Tab = TabMock
 
     var tabs: [Tab] = []
     var selectedTab: Tab?
+    var selectedTabIndex: Int?
     var selectedTabPublisher: AnyPublisher<Tab, Never> {
         selectedTabSubject.eraseToAnyPublisher()
     }
@@ -142,9 +154,9 @@ class TabLazyLoaderTests: XCTestCase {
         lazyLoader?.scheduleLazyLoading()
 
         // Then
+        waitForExpectations(timeout: 0.3)
         XCTAssertEqual(didFinishEvents.count, 1)
         XCTAssertEqual(try XCTUnwrap(didFinishEvents.first), true)
-        waitForExpectations(timeout: 0.3)
     }
 
     func testThatLazyLoadingStartsAfterCurrentUrlTabFinishesLoading() throws {
@@ -170,9 +182,9 @@ class TabLazyLoaderTests: XCTestCase {
         selectedUrlTab.reload()
 
         // Then
+        waitForExpectations(timeout: 0.3)
         XCTAssertEqual(didFinishEvents.count, 1)
         XCTAssertEqual(try XCTUnwrap(didFinishEvents.first), true)
-        waitForExpectations(timeout: 0.3)
     }
 
     func testThatLazyLoadingDoesNotStartIfCurrentUrlTabDoesNotFinishLoading() throws {
@@ -195,8 +207,8 @@ class TabLazyLoaderTests: XCTestCase {
         lazyLoader?.scheduleLazyLoading()
 
         // Then
-        XCTAssertEqual(didFinishEvents.count, 0)
         waitForExpectations(timeout: 0.3)
+        XCTAssertEqual(didFinishEvents.count, 0)
     }
 
     func testThatLazyLoadingStopsAfterLoadingMaximumNumberOfTabs() throws {
@@ -219,9 +231,9 @@ class TabLazyLoaderTests: XCTestCase {
         lazyLoader?.scheduleLazyLoading()
 
         // Then
+        waitForExpectations(timeout: 0.3)
         XCTAssertEqual(didFinishEvents.count, 1)
         XCTAssertEqual(try XCTUnwrap(didFinishEvents.first), true)
-        waitForExpectations(timeout: 0.3)
     }
 
     func testThatLazyLoadingSkipsTabsSelectedInCurrentSession() throws {
@@ -255,8 +267,47 @@ class TabLazyLoaderTests: XCTestCase {
         selectedUrlTab.reload()
 
         // Then
+        waitForExpectations(timeout: 0.3)
         XCTAssertEqual(didFinishEvents.count, 1)
         XCTAssertEqual(try XCTUnwrap(didFinishEvents.first), true)
+    }
+
+    func testWhenTabNumberExceedsMaximumForLazyLoadingThenAdjacentTabsAreLoadedFirst() throws {
+        let maxNumberOfLazyLoadedTabs = TabLazyLoader<TabLazyLoaderDataSourceMock>.Const.maxNumberOfLazyLoadedTabs
+        let reloadExpectation = expectation(description: "TabMock.reload() called")
+        reloadExpectation.expectedFulfillmentCount = maxNumberOfLazyLoadedTabs + 1
+
+        var reloadedTabsIndices = [Int]()
+
+        // add 2 * max number tabs, ordered by selected timestamp ascending
+        for i in 0..<(2 * maxNumberOfLazyLoadedTabs) {
+            let tab = TabMock(isUrl: true, url: "http://\(i).com".url!, selectedTimestamp: Date(timeIntervalSince1970: .init(i)))
+            tab.reloadClosure = { [unowned tab] in
+                DispatchQueue.main.async {
+                    reloadedTabsIndices.append(i)
+                    tab.loadingFinishedSubject.send(tab)
+                    reloadExpectation.fulfill()
+                }
+            }
+            dataSource.tabs.append(tab)
+        }
+
+        // select tab #3, this will cause loading tabs adjacent to #3, and then from the end of the array (based on timestamp)
+        dataSource.selectedTab = dataSource.tabs[3]
+        dataSource.selectedTabIndex = 3
+
+        let lazyLoader = TabLazyLoader(dataSource: dataSource)
+
+        var didFinishEvents: [Bool] = []
+        lazyLoader?.lazyLoadingDidFinishPublisher.sink(receiveValue: { didFinishEvents.append($0) }).store(in: &cancellables)
+
+        // When
+        lazyLoader?.scheduleLazyLoading()
+        dataSource.selectedTab?.reload()
+
+        // Then
         waitForExpectations(timeout: 0.3)
+        XCTAssertEqual(didFinishEvents.count, 1)
+        XCTAssertEqual(reloadedTabsIndices, [3, 4, 2, 5, 1, 6, 0, 7, 8, 9, 10, 39, 38, 37, 36, 35, 34, 33, 32, 31, 30])
     }
 }
