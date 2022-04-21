@@ -432,7 +432,7 @@ final class DataImportViewController: NSViewController {
                 source: viewState.selectedImportSource.pixelEventSource
             )
 
-            let parameters = ["error": error.errorType.description]
+            let parameters = ["error": error.errorType.rawValue]
             Pixel.fire(pixel, withAdditionalParameters: parameters)
 
             let alert = NSAlert.importFailedAlert(source: viewState.selectedImportSource, errorMessage: error.localizedDescription)

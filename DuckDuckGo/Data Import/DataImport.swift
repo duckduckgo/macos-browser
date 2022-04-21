@@ -242,26 +242,16 @@ struct DataImportError: Error {
         }
     }
     
-    enum ImportErrorType {
+    enum ImportErrorType: String {
         case noFileFound
         case cannotReadFile
+        case couldNotFindProfile
         case browserNeedsToBeClosed
         case needsLoginPrimaryPassword
         case cannotAccessSecureVault
         case cannotAccessCoreData
-        case unknownError(Error)
-        
-        var description: String {
-            switch self {
-            case .noFileFound: return "noFileFound"
-            case .cannotReadFile: return "cannotReadFile"
-            case .browserNeedsToBeClosed: return "browserNeedsToBeClosed"
-            case .needsLoginPrimaryPassword: return "needsLoginPrimaryPassword"
-            case .cannotAccessSecureVault: return "cannotAccessSecureVault"
-            case .cannotAccessCoreData: return "cannotAccessCoreData"
-            case .unknownError(let error): return "unknownError"
-            }
-        }
+        case couldNotGetDecryptionKey
+        case cannotDecryptFile
     }
     
     static func generic(_ errorType: ImportErrorType) -> DataImportError {
@@ -297,8 +287,12 @@ extension DataImportError: LocalizedError {
             return "Failed to read Secure Vault data"
         case .cannotAccessCoreData:
             return "Failed to access Bookmarks database"
-        case .unknownError(let error):
-            return error.localizedDescription
+        case .couldNotFindProfile:
+            return "Could not find browser profile"
+        case .couldNotGetDecryptionKey:
+            return "Could not read file"
+        case .cannotDecryptFile:
+            return "Could not read file"
         }
     }
 
