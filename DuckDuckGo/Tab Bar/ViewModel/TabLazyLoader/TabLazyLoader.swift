@@ -22,6 +22,11 @@ import os
 
 final class TabLazyLoader<DataSource: TabLazyLoaderDataSource> {
 
+    enum Const {
+        static var maxNumberOfLazyLoadedTabs: Int { 20 }
+        static var maxNumberOfConcurrentlyLoadedTabs: Int { 3 }
+    }
+
     /**
      * Emits output when lazy loader finishes.
      *
@@ -52,11 +57,6 @@ final class TabLazyLoader<DataSource: TabLazyLoaderDataSource> {
     }
 
     // MARK: - Private
-
-    enum Const {
-        static var maxNumberOfLazyLoadedTabs: Int { 20 }
-        static var maxNumberOfConcurrentlyLoadedTabs: Int { 3 }
-    }
 
     private let lazyLoadingDidFinishSubject = PassthroughSubject<Bool, Never>()
     private let tabDidLoadSubject = PassthroughSubject<DataSource.Tab, Never>()
