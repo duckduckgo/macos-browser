@@ -21,6 +21,9 @@ import Combine
 @testable import DuckDuckGo_Privacy_Browser
 
 private final class TabMock: LazyLoadable {
+
+    var isLazyLoadingInProgress: Bool = false
+
     var isUrl: Bool = true
     var url: URL? = "https://example.com".url
     var webViewFrame: CGRect = .zero

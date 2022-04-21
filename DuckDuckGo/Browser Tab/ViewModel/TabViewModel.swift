@@ -105,7 +105,15 @@ final class TabViewModel {
     }
 
     private func subscribeToTitle() {
-        tab.$title.receive(on: DispatchQueue.main).sink { [weak self] _ in self?.updateTitle() } .store(in: &cancellables)
+        tab.$title
+            .filter { [weak self] _ in
+                self?.tab.isLazyLoadingInProgress == false
+            }
+            .receive(on: DispatchQueue.main)
+            .sink { [weak self] _ in
+                self?.updateTitle()
+            }
+            .store(in: &cancellables)
     }
 
     private func subscribeToFavicon() {

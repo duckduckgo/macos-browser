@@ -21,6 +21,8 @@ import Combine
 
 protocol LazyLoadable: AnyObject, Identifiable {
 
+    var isLazyLoadingInProgress: Bool { get set }
+
     var isUrl: Bool { get }
     var url: URL? { get }
 

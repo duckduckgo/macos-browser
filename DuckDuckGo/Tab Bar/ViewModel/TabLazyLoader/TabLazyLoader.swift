@@ -223,6 +223,7 @@ final class TabLazyLoader<DataSource: TabLazyLoaderDataSource> {
             tab.webViewFrame = selectedTabWebViewFrame
         }
 
+        tab.isLazyLoadingInProgress = true
         tab.reload()
         numberOfTabsRemaining -= 1
         numberOfTabsInProgress.value += 1
@@ -231,6 +232,7 @@ final class TabLazyLoader<DataSource: TabLazyLoaderDataSource> {
     private func subscribeToTabLoadingFinished(_ tab: DataSource.Tab) {
         tab.loadingFinishedPublisher
             .sink(receiveValue: { [weak self] tab in
+                tab.isLazyLoadingInProgress = false
                 self?.tabDidLoadSubject.send(tab)
             })
             .store(in: &cancellables)

@@ -208,6 +208,8 @@ final class Tab: NSObject, Identifiable {
 
     var fbBlockingEnabled = true
 
+    var isLazyLoadingInProgress = false
+
     @Published private(set) var content: TabContent {
         didSet {
             handleFavicon(oldContent: oldValue)
