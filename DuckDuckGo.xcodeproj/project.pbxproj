@@ -540,8 +540,8 @@
 		B630794226731F5400DCEE41 /* WKDownloadMock.swift in Sources */ = {isa = PBXBuildFile; fileRef = B630794126731F5400DCEE41 /* WKDownloadMock.swift */; };
 		B637273B26CBC8AF00C8CB02 /* AuthenticationAlert.swift in Sources */ = {isa = PBXBuildFile; fileRef = B637273A26CBC8AF00C8CB02 /* AuthenticationAlert.swift */; };
 		B637273D26CCF0C200C8CB02 /* OptionalExtension.swift in Sources */ = {isa = PBXBuildFile; fileRef = B637273C26CCF0C200C8CB02 /* OptionalExtension.swift */; };
-		B63BDF80280003570072D75B /* WebKitError.swift in Sources */ = {isa = PBXBuildFile; fileRef = B63BDF7F280003570072D75B /* WebKitError.swift */; };
 		B63BDF7E27FDAA640072D75B /* PrivacyDashboardWebView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B63BDF7D27FDAA640072D75B /* PrivacyDashboardWebView.swift */; };
+		B63BDF80280003570072D75B /* WebKitError.swift in Sources */ = {isa = PBXBuildFile; fileRef = B63BDF7F280003570072D75B /* WebKitError.swift */; };
 		B63D466925BEB6C200874977 /* WKWebView+SessionState.swift in Sources */ = {isa = PBXBuildFile; fileRef = B63D466825BEB6C200874977 /* WKWebView+SessionState.swift */; };
 		B63D467125BFA6C100874977 /* DispatchQueueExtensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = B63D467025BFA6C100874977 /* DispatchQueueExtensions.swift */; };
 		B63D467A25BFC3E100874977 /* NSCoderExtensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = B63D467925BFC3E100874977 /* NSCoderExtensions.swift */; };
@@ -1292,8 +1292,8 @@
 		B637273C26CCF0C200C8CB02 /* OptionalExtension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OptionalExtension.swift; sourceTree = "<group>"; };
 		B63B9C502670B2B200C45B91 /* _WKDownload.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = _WKDownload.h; sourceTree = "<group>"; };
 		B63B9C542670B32000C45B91 /* WKProcessPool+Private.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "WKProcessPool+Private.h"; sourceTree = "<group>"; };
-		B63BDF7F280003570072D75B /* WebKitError.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WebKitError.swift; sourceTree = "<group>"; };
 		B63BDF7D27FDAA640072D75B /* PrivacyDashboardWebView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PrivacyDashboardWebView.swift; sourceTree = "<group>"; };
+		B63BDF7F280003570072D75B /* WebKitError.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WebKitError.swift; sourceTree = "<group>"; };
 		B63D466725BEB6C200874977 /* WKWebView+Private.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "WKWebView+Private.h"; sourceTree = "<group>"; };
 		B63D466825BEB6C200874977 /* WKWebView+SessionState.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "WKWebView+SessionState.swift"; sourceTree = "<group>"; };
 		B63D467025BFA6C100874977 /* DispatchQueueExtensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DispatchQueueExtensions.swift; sourceTree = "<group>"; };
@@ -5749,7 +5749,7 @@
 			repositoryURL = "https://github.com/duckduckgo/BrowserServicesKit";
 			requirement = {
 				kind = upToNextMajorVersion;
-				minimumVersion = 12.2.6;
+				minimumVersion = 12.2.7;
 			};
 		};
 		AA06B6B52672AF8100F541C5 /* XCRemoteSwiftPackageReference "Sparkle" */ = {
