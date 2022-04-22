@@ -34,12 +34,12 @@ final class FirefoxDataImporter: DataImporter {
         return [.logins, .bookmarks]
     }
 
-    // swiftlint:disable cyclomatic_complexity
+    // swiftlint:disable:next cyclomatic_complexity function_body_length
     func importData(types: [DataImport.DataType],
                     from profile: DataImport.BrowserProfile?,
                     completion: @escaping (Result<DataImport.Summary, DataImportError>) -> Void) {
         guard let firefoxProfileURL = profile?.profileURL ?? defaultFirefoxProfilePath() else {
-            completion(.failure(.cannotReadFile))
+            completion(.failure(.generic(.cannotReadFile)))
             return
         }
 
@@ -54,16 +54,22 @@ final class FirefoxDataImporter: DataImporter {
                 do {
                     summary.loginsResult = .completed(try loginImporter.importLogins(logins))
                 } catch {
-                    completion(.failure(.cannotAccessSecureVault))
+                    completion(.failure(.logins(.cannotAccessSecureVault)))
                 }
             case .failure(let error):
                 switch error {
                 case .requiresPrimaryPassword:
-                    completion(.failure(.needsLoginPrimaryPassword))
+                    completion(.failure(.logins(.needsLoginPrimaryPassword)))
                 case .databaseAccessFailed:
-                    completion(.failure(.browserNeedsToBeClosed))
-                default:
-                    completion(.failure(.unknownError(error)))
+                    completion(.failure(.logins(.browserNeedsToBeClosed)))
+                case .couldNotFindProfile:
+                    completion(.failure(.logins(.couldNotFindProfile)))
+                case .couldNotGetDecryptionKey:
+                    completion(.failure(.logins(.couldNotGetDecryptionKey)))
+                case .couldNotReadLoginsFile:
+                    completion(.failure(.logins(.cannotReadFile)))
+                case .decryptionFailed:
+                    completion(.failure(.logins(.cannotDecryptFile)))
                 }
             }
         }
@@ -77,18 +83,17 @@ final class FirefoxDataImporter: DataImporter {
                 do {
                     summary.bookmarksResult = try bookmarkImporter.importBookmarks(bookmarks, source: .firefox)
                 } catch {
-                    completion(.failure(.cannotAccessSecureVault))
+                    completion(.failure(.bookmarks(.cannotAccessSecureVault)))
                     return
                 }
             case .failure:
-                completion(.failure(.browserNeedsToBeClosed))
+                completion(.failure(.bookmarks(.browserNeedsToBeClosed)))
                 return
             }
         }
 
         completion(.success(summary))
     }
-    // swiftlint:enable cyclomatic_complexity
 
     private func defaultFirefoxProfilePath() -> URL? {
         guard let potentialProfiles = try? FileManager.default.contentsOfDirectory(atPath: profilesDirectoryURL().path) else {

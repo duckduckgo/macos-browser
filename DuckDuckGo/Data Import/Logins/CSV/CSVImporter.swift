@@ -128,11 +128,11 @@ final class CSVImporter: DataImporter {
                     from profile: DataImport.BrowserProfile?,
                     completion: @escaping (Result<DataImport.Summary, DataImportError>) -> Void) {
         guard let fileContents = try? String(contentsOf: fileURL, encoding: .utf8) else {
-            completion(.failure(.cannotReadFile))
+            completion(.failure(.logins(.cannotReadFile)))
             return
         }
         guard let loginImporter = self.loginImporter else {
-            completion(.failure(.cannotAccessSecureVault))
+            completion(.failure(.logins(.cannotAccessSecureVault)))
             return
         }
 
@@ -144,7 +144,7 @@ final class CSVImporter: DataImporter {
                 DispatchQueue.main.async { completion(.success(.init(bookmarksResult: nil,
                                                                      loginsResult: .completed(result)))) }
             } catch {
-                DispatchQueue.main.async { completion(.failure(.cannotAccessSecureVault)) }
+                DispatchQueue.main.async { completion(.failure(.bookmarks(.cannotAccessSecureVault))) }
             }
         }
     }

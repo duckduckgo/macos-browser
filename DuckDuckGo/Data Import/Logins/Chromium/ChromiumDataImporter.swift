@@ -41,6 +41,7 @@ internal class ChromiumDataImporter: DataImporter {
     func importData(types: [DataImport.DataType],
                     from profile: DataImport.BrowserProfile?,
                     completion: @escaping (Result<DataImport.Summary, DataImportError>) -> Void) {
+        
         var summary = DataImport.Summary()
         let dataDirectoryPath = profile?.profileURL.path ?? applicationDataDirectoryPath
 
@@ -53,11 +54,11 @@ internal class ChromiumDataImporter: DataImporter {
                 do {
                     summary.loginsResult = .completed(try loginImporter.importLogins(logins))
                 } catch {
-                    completion(.failure(.cannotAccessSecureVault))
+                    completion(.failure(.logins(.cannotAccessSecureVault)))
                     return
                 }
             case .failure:
-                completion(.failure(.browserNeedsToBeClosed))
+                completion(.failure(.logins(.browserNeedsToBeClosed)))
                 return
             }
         }
@@ -71,7 +72,7 @@ internal class ChromiumDataImporter: DataImporter {
                 do {
                     summary.bookmarksResult = try bookmarkImporter.importBookmarks(bookmarks, source: .chromium)
                 } catch {
-                    completion(.failure(.cannotAccessSecureVault))
+                    completion(.failure(.bookmarks(.cannotAccessSecureVault)))
                     return
                 }
             case .failure(let error):
@@ -82,7 +83,7 @@ internal class ChromiumDataImporter: DataImporter {
                     summary.bookmarksResult = result
 
                 case .bookmarksFileDecodingFailed:
-                    completion(.failure(.cannotReadFile))
+                    completion(.failure(.bookmarks(.cannotReadFile)))
                     return
                 }
             }
