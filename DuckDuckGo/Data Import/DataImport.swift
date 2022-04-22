@@ -290,9 +290,9 @@ extension DataImportError: LocalizedError {
         case .couldNotFindProfile:
             return "Could not find browser profile"
         case .couldNotGetDecryptionKey:
-            return "Could not read file"
+            return "Could not read decryption key"
         case .cannotDecryptFile:
-            return "Could not read file"
+            return "Could not decrypt file"
         }
     }
 
