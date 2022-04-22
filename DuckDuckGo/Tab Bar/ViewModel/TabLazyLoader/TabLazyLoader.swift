@@ -82,7 +82,7 @@ final class TabLazyLoader<DataSource: TabLazyLoaderDataSource> {
 
     private let shouldLoadAdjacentTabs: Bool
     private var adjacentItemEnumerator: AdjacentItemEnumerator?
-    private var numberOfLazyLoadedAdjacentTabs = 0
+    private var numberOfAdjacentTabsRemaining = Const.maxNumberOfLazyLoadedAdjacentTabs
 
     private var idsOfTabsSelectedOrReloadedInThisSession = Set<DataSource.Tab.ID>()
     private var cancellables = Set<AnyCancellable>()
@@ -196,14 +196,14 @@ final class TabLazyLoader<DataSource: TabLazyLoaderDataSource> {
     private func findTabToLoad(dryRun: Bool = false) -> DataSource.Tab? {
         var tab: DataSource.Tab?
 
-        if shouldLoadAdjacentTabs, numberOfLazyLoadedAdjacentTabs < Const.maxNumberOfLazyLoadedAdjacentTabs {
+        if shouldLoadAdjacentTabs, numberOfAdjacentTabsRemaining > 0 {
             tab = findAdjacentTabToLoad()
             if dryRun {
                 adjacentItemEnumerator?.reset()
             } else if tab != nil {
-                numberOfLazyLoadedAdjacentTabs += 1
+                numberOfAdjacentTabsRemaining -= 1
                 os_log("Will reload adjacent tab #%d of %d", log: .tabLazyLoading, type: .debug,
-                       numberOfLazyLoadedAdjacentTabs,
+                       Const.maxNumberOfLazyLoadedAdjacentTabs - numberOfAdjacentTabsRemaining,
                        Const.maxNumberOfLazyLoadedAdjacentTabs)
             }
         }
