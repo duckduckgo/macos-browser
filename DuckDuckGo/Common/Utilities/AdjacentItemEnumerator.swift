@@ -18,8 +18,35 @@
 
 import Foundation
 
+/**
+ * This struct generates array indices adjacent to a given index.
+ *
+ * The _adjacent_ indices are generated as diffs against given index
+ * with the following pattern:
+ *
+ *     1, -1, 2, -2, 3, -3, 4, -4, ...
+ *
+ */
 struct AdjacentItemEnumerator {
 
+    /**
+     * The index of an item for which adjacent items indices are computed.
+     */
+    var itemIndex: Int
+
+    /**
+     * Last valid adjacent item index returned by `nextIndex(arraySize:)`.
+     */
+    var currentAdjacentIndex: Int {
+        itemIndex + currentDiff
+    }
+
+    /**
+     * Computes next adjacent index, constrained by `arraySize`.
+     *
+     * Returns the next available and valid index, between by `0` and `arraySize-1`,
+     * or `nil` if the index falls outside array bounds.
+     */
     mutating func nextIndex(arraySize: Int) -> Int? {
         if currentDiff != 0 {
             operation = operation.next
@@ -40,20 +67,19 @@ struct AdjacentItemEnumerator {
         return newIndex
     }
 
-    var itemIndex: Int
-
-    var currentAdjacentIndex: Int {
-        itemIndex + currentDiff
-    }
-
-    init(itemIndex: Int = 0) {
-        self.itemIndex = itemIndex
-    }
-
+    /**
+     * Resets the enumerator internal state
+     *
+     * Calling this function is equivalent to reinstantiating the enumerator.
+     */
     mutating func reset() {
         currentDiff = 0
         previousDiff = 0
         operation = .toggleSignAndAdvance
+    }
+
+    init(itemIndex: Int = 0) {
+        self.itemIndex = itemIndex
     }
 
     // MARK: - Private

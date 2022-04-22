@@ -1564,7 +1564,6 @@
 				37534C9F28113101002621E7 /* LazyLoadable.swift */,
 				37534CA2281132CB002621E7 /* TabLazyLoaderDataSource.swift */,
 				37B11B3828095E6600CBB621 /* TabLazyLoader.swift */,
-				37534CA62811988E002621E7 /* AdjacentItemEnumerator.swift */,
 			);
 			path = TabLazyLoader;
 			sourceTree = "<group>";
@@ -1990,6 +1989,7 @@
 				85C6A29525CC1FFD00EEB5F1 /* UserDefaultsWrapper.swift */,
 				B6AAAC2C260330580029438D /* PublishedAfter.swift */,
 				4BB6CE5E26B77ED000EC5860 /* Cryptography.swift */,
+				37534CA62811988E002621E7 /* AdjacentItemEnumerator.swift */,
 			);
 			path = Utilities;
 			sourceTree = "<group>";
