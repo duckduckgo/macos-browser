@@ -174,11 +174,12 @@ final class Tab: NSObject {
     }
 
     deinit {
-        self.userContentController.removeAllUserScripts()
+        webView.stopLoading()
+        webView.stopMediaCapture()
+        webView.fullscreenWindowController?.close()
+        userContentController.removeAllUserScripts()
 
-        #if DEBUG
-        assert(self.isClosing || !content.isUrl, "tabWillClose() was not called for this Tab")
-        #endif
+        cbaTimeReporter?.tabWillClose(self.instrumentation.currentTabIdentifier)
     }
 
     private var userContentController: UserContentController {
@@ -520,20 +521,6 @@ final class Tab: NSObject {
                 await addHomePageToWebViewIfNeeded()
             }
         }
-    }
-
-    #if DEBUG
-    private var isClosing = false
-    #endif
-
-    func tabWillClose() {
-        webView.stopLoading()
-        webView.stopMediaCapture()
-        cbaTimeReporter?.tabWillClose(self)
-
-        #if DEBUG
-        self.isClosing = true
-        #endif
     }
 
     // MARK: - Favicon
@@ -1034,9 +1021,9 @@ extension Tab: WKNavigationDelegate {
     private func prepareForContentBlocking() async {
         // Ensure Content Blocking Assets (WKContentRuleList&UserScripts) are installed
         if !userContentController.contentBlockingAssetsInstalled {
-            cbaTimeReporter?.tabWillWaitForRulesCompilation(self)
+            cbaTimeReporter?.tabWillWaitForRulesCompilation(self.instrumentation.currentTabIdentifier)
             await userContentController.awaitContentBlockingAssetsInstalled()
-            cbaTimeReporter?.reportWaitTimeForTabFinishedWaitingForRules(self)
+            cbaTimeReporter?.reportWaitTimeForTabFinishedWaitingForRules(self.instrumentation.currentTabIdentifier)
         } else {
             cbaTimeReporter?.reportNavigationDidNotWaitForRules()
         }

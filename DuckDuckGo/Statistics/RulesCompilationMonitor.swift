@@ -18,17 +18,17 @@
 
 import Foundation
 
-typealias ContentBlockingAssetsCompilationTimeReporter = AbstractContentBlockingAssetsCompilationTimeReporter<Tab>
+typealias ContentBlockingAssetsCompilationTimeReporter = AbstractContentBlockingAssetsCompilationTimeReporter<UInt64>
 extension ContentBlockingAssetsCompilationTimeReporter {
     static let shared = ContentBlockingAssetsCompilationTimeReporter()
 }
 
-final class AbstractContentBlockingAssetsCompilationTimeReporter<Caller: AnyObject & Hashable>: NSObject {
+final class AbstractContentBlockingAssetsCompilationTimeReporter<Caller: Hashable>: NSObject {
 
     var currentTime: () -> TimeInterval = CACurrentMediaTime
 
     private var waitStart: TimeInterval?
-    private var waiters = NSMapTable<Caller, NSNumber>.init(keyOptions: .weakMemory, valueOptions: .strongMemory)
+    private var waiters = Set<Caller>()
     private var isFinished = false
 
     @UserDefaultsWrapper(key: .onboardingFinished, defaultValue: false)
@@ -48,7 +48,7 @@ final class AbstractContentBlockingAssetsCompilationTimeReporter<Caller: AnyObje
     func tabWillWaitForRulesCompilation(_ tab: Caller) {
         guard !isFinished else { return }
 
-        waiters.setObject(NSNumber(value: true), forKey: tab)
+        waiters.insert(tab)
         if waitStart == nil {
             waitStart = currentTime()
         }
@@ -65,8 +65,8 @@ final class AbstractContentBlockingAssetsCompilationTimeReporter<Caller: AnyObje
 
     /// Called when Rules compilation finishes
     func reportWaitTimeForTabFinishedWaitingForRules(_ tab: Caller) {
-        defer { waiters.removeObject(forKey: tab) }
-        guard waiters.object(forKey: tab) != nil,
+        defer { waiters.remove(tab) }
+        guard waiters.contains(tab),
               !isFinished,
               let waitStart = waitStart
         else { return }
@@ -76,8 +76,8 @@ final class AbstractContentBlockingAssetsCompilationTimeReporter<Caller: AnyObje
 
     /// If Tab is going to close while the rules are still being compiled: report wait time with Tab .closed argument
     func tabWillClose(_ tab: Caller) {
-        defer { waiters.removeObject(forKey: tab) }
-        guard waiters.object(forKey: tab) != nil,
+        defer { waiters.remove(tab) }
+        guard waiters.contains(tab),
               !isFinished,
               let waitStart = self.waitStart
         else { return }

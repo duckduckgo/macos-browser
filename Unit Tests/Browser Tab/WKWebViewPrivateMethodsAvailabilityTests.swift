@@ -47,4 +47,8 @@ final class WKWebViewPrivateMethodsAvailabilityTests: XCTestCase {
         XCTAssertTrue(WKWebView.instancesRespond(to: #selector(WKWebView._printOperation(with:forFrame:))))
     }
 
+    func testWebViewRespondsTo_fullScreenPlaceholderView() {
+        XCTAssertTrue(WKWebView.instancesRespond(to: #selector(WKWebView._fullScreenPlaceholderView)))
+    }
+
 }

@@ -237,9 +237,16 @@ final class TabCollectionViewModel: NSObject {
         let parentTab = tabCollection.tabs[safe: index]?.parentTab
         guard tabCollection.remove(at: index) else { return }
 
+        self.didRemoveTab(withParent: parentTab, at: index)
+    }
+
+    private func didRemoveTab(withParent parentTab: Tab?, at index: Int) {
+        defer {
+            delegate?.tabCollectionViewModel(self, didRemoveTabAt: index, andSelectTabAt: self.selectionIndex)
+        }
+
         guard tabCollection.tabs.count > 0 else {
             selectionIndex = nil
-            delegate?.tabCollectionViewModel(self, didRemoveTabAt: index, andSelectTabAt: nil)
             return
         }
 
@@ -268,8 +275,20 @@ final class TabCollectionViewModel: NSObject {
             newSelectionIndex = max(min(selectionIndex, tabCollection.tabs.count - 1), 0)
         }
         select(at: newSelectionIndex)
+    }
 
-        delegate?.tabCollectionViewModel(self, didRemoveTabAt: index, andSelectTabAt: newSelectionIndex)
+    func moveTab(at fromIndex: Int, to otherViewModel: TabCollectionViewModel, at toIndex: Int) {
+        guard changesEnabled else { return }
+
+        let parentTab = tabCollection.tabs[safe: fromIndex]?.parentTab
+
+        guard tabCollection.moveTab(at: fromIndex, to: otherViewModel.tabCollection, at: toIndex) else { return }
+
+        didRemoveTab(withParent: parentTab, at: fromIndex)
+
+        otherViewModel.select(at: toIndex)
+        otherViewModel.delegate?.tabCollectionViewModelDidInsert(otherViewModel, at: toIndex, selected: true)
+        otherViewModel.selectParentOnRemoval = true
     }
 
     func removeAllTabs(except exceptionIndex: Int? = nil) {

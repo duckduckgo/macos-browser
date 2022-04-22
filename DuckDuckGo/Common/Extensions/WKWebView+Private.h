@@ -61,6 +61,8 @@ typedef NS_OPTIONS(NSUInteger, _WKCaptureDevices) {
 - (NSPrintOperation *)_printOperationWithPrintInfo:(NSPrintInfo *)printInfo;
 - (NSPrintOperation * _Nullable)_printOperationWithPrintInfo:(NSPrintInfo *)printInfo forFrame:(id)frame;
 
+- (NSView *)_fullScreenPlaceholderView;
+
 @end
 
 NS_ASSUME_NONNULL_END
