@@ -45,6 +45,7 @@ final class BrowserTabViewController: NSViewController {
     private let tabCollectionViewModel: TabCollectionViewModel
     private var tabContentCancellable: AnyCancellable?
     private var errorViewStateCancellable: AnyCancellable?
+    private var titleCancellable: AnyCancellable?
     private var cancellables = Set<AnyCancellable>()
 
     private var contextMenuExpected = false

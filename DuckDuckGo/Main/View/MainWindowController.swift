@@ -54,6 +54,7 @@ final class MainWindowController: NSWindowController {
         setupToolbar()
         subscribeToTrafficLightsAlpha()
         subscribeToShouldPreventUserInteraction()
+        subscribeToTitle()
     }
 
     required init?(coder: NSCoder) {
@@ -63,7 +64,6 @@ final class MainWindowController: NSWindowController {
     private func setupWindow() {
         window?.delegate = self
         window?.setFrameAutosaveName(Self.windowFrameSaveName)
-        
         NotificationCenter.default.addObserver(self, selector: #selector(dismissLockScreen), name: .macWaitlistLockScreenDidUnlock, object: nil)
     }
     
@@ -122,6 +122,13 @@ final class MainWindowController: NSWindowController {
             window?.styleMask.update(with: .closable)
             mainViewController.adjustFirstResponder()
         }
+    }
+
+    private var titleCancellable: AnyCancellable?
+    private func subscribeToTitle() {
+        titleCancellable = mainViewController.publisher(for: \.title)
+            .map { $0 ?? Bundle.main.displayName! }
+            .assign(to: \.title, onWeaklyHeld: window!)
     }
 
     private func moveTabBarView(toTitlebarView: Bool) {

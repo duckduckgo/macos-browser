@@ -87,6 +87,19 @@ final class MainWindow: NSWindow {
         NotificationCenter.default.post(name: .firstResponder, object: firstResponder)
     }
 
+    var newTabButton: NSButton? {
+        (self.contentViewController as? MainViewController)?.tabBarViewController.plusButton
+    }
+
+    override func accessibilityChildren() -> [Any]? {
+        var children = super.accessibilityChildren() as? [NSObject] ?? []
+        let newTabButton = self.newTabButton
+        if let newTabIdx = children.firstIndex(where: { $0 === newTabButton?.cell }) {
+            children.remove(at: newTabIdx)
+        }
+        return children
+    }
+
 }
 
 extension Notification.Name {

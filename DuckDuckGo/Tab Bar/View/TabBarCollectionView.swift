@@ -37,6 +37,39 @@ final class TabBarCollectionView: NSCollectionView {
         setDraggingSourceOperationMask([.private], forLocal: true)
     }
 
+    override func accessibilityRole() -> NSAccessibility.Role? {
+        .tabGroup
+    }
+
+    override func accessibilityChildren() -> [Any]? {
+        let originalChildren = super.accessibilityChildren()
+        guard let section = originalChildren?.first as? NSAccessibilityElement else {
+            assertionFailure("Unexpected element")
+            return originalChildren
+        }
+        var children = section.accessibilityChildren() ?? []
+        if let newTab = children.last as? NSAccessibilityElement,
+           case .some(.group) = newTab.accessibilityRole(),
+           let buttonCell = newTab.accessibilityChildren()?.first as? NSButtonCell,
+           let newTabButton = buttonCell.controlView,
+           let fixedNewTabButton = ((self.window as? MainWindow)?.contentViewController as? MainViewController)?.tabBarViewController.plusButton {
+            children.removeLast()
+            if newTabButton.window == nil {
+                children.append(fixedNewTabButton)
+            } else {
+                children.append(newTabButton)
+            }
+
+            newTabButton.setAccessibilityParent(self)
+            fixedNewTabButton.setAccessibilityParent(self)
+        }
+        return children
+    }
+
+    override func accessibilityVisibleChildren() -> [Any]? {
+        accessibilityChildren()
+    }
+
     override func selectItems(at indexPaths: Set<IndexPath>, scrollPosition: NSCollectionView.ScrollPosition) {
         super.selectItems(at: indexPaths, scrollPosition: scrollPosition)
 

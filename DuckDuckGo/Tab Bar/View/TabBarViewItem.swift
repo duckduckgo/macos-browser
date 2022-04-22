@@ -31,6 +31,7 @@ protocol TabBarViewItemDelegate: AnyObject {
 
     func tabBarViewItem(_ tabBarViewItem: TabBarViewItem, isMouseOver: Bool)
 
+    func tabBarViewItemSelectAction(_ tabBarViewItem: TabBarViewItem)
     func tabBarViewItemCloseAction(_ tabBarViewItem: TabBarViewItem)
     func tabBarViewItemTogglePermissionAction(_ tabBarViewItem: TabBarViewItem)
     func tabBarViewItemCloseOtherAction(_ tabBarViewItem: TabBarViewItem)
@@ -44,8 +45,65 @@ protocol TabBarViewItemDelegate: AnyObject {
     func otherTabBarViewItemsState(for tabBarViewItem: TabBarViewItem) -> OtherTabBarViewItemsState
 
 }
+final class TabBarView: NSView {
+
+//    override func accessibilityRole() -> NSAccessibility.Role? {
+//        super.accessibilityRole()
+//    }
+//    override func accessibilityLabel() -> String? {
+//        super.accessibilityLabel()
+//    }
+    override func accessibilityRole() -> NSAccessibility.Role? {
+      return .radioButton
+    }
+
+    override func accessibilityHelp() -> String? {
+      "help"
+    }
+
+    override func accessibilityLabel() -> String? {
+      "l;abel"
+    }
+
+    override func accessibilityTitle() -> String? {
+      "Title"
+    }
+
+    override func isAccessibilityElement() -> Bool {
+      true
+    }
+
+    override var accessibilityFocusedUIElement: Any? {
+      self
+    }
+    override func accessibilityParent() -> Any? {
+        let parent = super.accessibilityParent()
+        if let list = parent as? NSAccessibilityElement,
+           case .some(.list) = list.accessibilityRole() {
+            return list.accessibilityParent()
+        }
+        return parent
+    }
+
+    override func accessibilityPerformPress() -> Bool {
+        guard let item = self.nextResponder as? TabBarViewItem,
+              let delegate = item.delegate
+        else {
+            return false
+        }
+        delegate.tabBarViewItemSelectAction(item)
+        return true
+    }
+
+    @objc public override func accessibilityValue() -> Any? {
+      NSNumber(value: true)
+    }
+}
 
 final class TabBarViewItem: NSCollectionViewItem {
+    @objc func isAccessibilityElement() -> Bool {
+        false
+    }
 
     enum Constants {
         static let textFieldPadding: CGFloat = 32

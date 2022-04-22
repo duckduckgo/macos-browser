@@ -164,12 +164,14 @@ final class MainViewController: NSViewController {
     }
 
     private func subscribeToSelectedTabViewModel() {
-        selectedTabViewModelCancellable = tabCollectionViewModel.$selectedTabViewModel.receive(on: DispatchQueue.main).sink { [weak self] _ in
-            self?.navigationalCancellables = []
-            self?.subscribeToCanGoBackForward()
-            self?.subscribeToFindInPage()
-            self?.subscribeToTabContent()
-            self?.adjustFirstResponder()
+        selectedTabViewModelCancellable = tabCollectionViewModel.$selectedTabViewModel.receive(on: DispatchQueue.main)
+            .sink { [weak self] selectedTabViewModel in
+                self?.navigationalCancellables = []
+                self?.subscribeToCanGoBackForward()
+                self?.subscribeToFindInPage()
+                self?.subscribeToTabContent()
+                self?.subscribeToTitle(of: selectedTabViewModel)
+                self?.adjustFirstResponder()
         }
     }
 
@@ -195,6 +197,13 @@ final class MainViewController: NSViewController {
             self?.resizeNavigationBarForHomePage(content == .homePage, animated: content == .homePage && self?.lastTabContent != .homePage)
             self?.lastTabContent = content
         }).store(in: &self.navigationalCancellables)
+    }
+
+    private var titleCancellable: AnyCancellable?
+    private func subscribeToTitle(of selectedTabViewModel: TabViewModel?) {
+        titleCancellable = selectedTabViewModel?.$title
+            .map { $0 }
+            .assign(to: \.title, onWeaklyHeld: self)
     }
 
     private func subscribeToFindInPage() {

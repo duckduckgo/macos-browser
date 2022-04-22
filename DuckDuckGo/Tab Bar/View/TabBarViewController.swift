@@ -691,6 +691,15 @@ extension TabBarViewController: NSCollectionViewDelegate {
 
 extension TabBarViewController: TabBarViewItemDelegate {
 
+    func tabBarViewItemSelectAction(_ tabBarViewItem: TabBarViewItem) {
+        guard let indexPath = collectionView.indexPath(for: tabBarViewItem) else {
+            os_log("TabBarViewController: Failed to get index path of tab bar view item", type: .error)
+            return
+        }
+        tabCollectionViewModel.select(at: indexPath.item)
+        // TODO: Scroll?
+    }
+
     func tabBarViewItem(_ tabBarViewItem: TabBarViewItem, isMouseOver: Bool) {
         if isMouseOver {
             // Show tab preview for visible tab bar items
