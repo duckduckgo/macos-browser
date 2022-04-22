@@ -1,13 +1,15 @@
 {
     "readme": "https://github.com/duckduckgo/privacy-configuration",
-    "version": 1649708375853,
+    "version": 1650460275005,
     "features": {
         "ampLinks": {
             "exceptions": [],
             "settings": {
+                "deepExtractionEnabled": true,
+                "deepExtractionTimeout": 1500,
                 "linkFormats": [
                     "^https?:\\/\\/(?:w{3}\\.)?google\\.\\S{2,}\\/amp\\/s\\/(\\S+)$",
-                    "^https?:\\/\\/\\S+ampproject\\.org\\/v\\/s\\/(\\S+)$"
+                    "^https?:\\/\\/\\S+ampproject\\.org\\/\\S\\/s\\/(\\S+)$"
                 ],
                 "keywords": [
                     "=amp",
@@ -84,6 +86,10 @@
                 {
                     "domain": "fastmail.com",
                     "reason": "site breakage"
+                },
+                {
+                    "domain": "containerstore.com",
+                    "reason": "Poor UX"
                 }
             ],
             "state": "enabled"
@@ -95,6 +101,10 @@
         "contentBlocking": {
             "state": "enabled",
             "exceptions": [
+                {
+                    "domain": "video.corriere.it",
+                    "reason": "Video not playing"
+                },
                 {
                     "domain": "wp.pl",
                     "reason": "Adblocker wall"
@@ -151,6 +161,9 @@
             "state": "disabled"
         },
         "fingerprintingCanvas": {
+            "settings": {
+                "webGl": "enabled"
+            },
             "exceptions": [
                 {
                     "domain": "adidas.com",
@@ -189,6 +202,10 @@
         },
         "fingerprintingHardware": {
             "exceptions": [
+                {
+                    "domain": "accounts.nintendo.com",
+                    "reason": "broken login"
+                },
                 {
                     "domain": "gamestop.com",
                     "reason": "broken add to cart"
@@ -249,7 +266,7 @@
             "exceptions": [],
             "state": "disabled"
         },
-        "floc": {
+        "googleRejected": {
             "exceptions": [],
             "state": "disabled"
         },
@@ -284,12 +301,13 @@
             "state": "enabled"
         },
         "referrer": {
-            "exceptions": [],
+            "exceptions": [
+                {
+                    "domain": "apple.com",
+                    "reason": "Login issues"
+                }
+            ],
             "state": "disabled"
-        },
-        "webCompat": {
-            "state": "enabled",
-            "exceptions": []
         },
         "trackerAllowlist": {
             "state": "enabled",
@@ -517,9 +535,10 @@
                             {
                                 "rule": "mpsnare.iesnare.com/snare.js",
                                 "domains": [
-                                    "rei.com"
+                                    "rei.com",
+                                    "ups.com"
                                 ],
-                                "reason": "adwall"
+                                "reason": "adwall, login issues"
                             }
                         ]
                     },
@@ -535,6 +554,7 @@
                             {
                                 "rule": "www.instagram.com/embed.js",
                                 "domains": [
+                                    "buzzfeed.com",
                                     "livejournal.com"
                                 ],
                                 "reason": "embeds"
@@ -573,6 +593,17 @@
                                     "emol.com"
                                 ],
                                 "reason": "widget blocked"
+                            }
+                        ]
+                    },
+                    "segment.io": {
+                        "rules": [
+                            {
+                                "rule": "cdn.segment.com/analytics.js/v1/4I2fAtE5IxTlczNT3F91OckHtI5wfR7g/analytics.min.js",
+                                "domains": [
+                                    "foxnews.com"
+                                ],
+                                "reason": "user cannot access create account page from sign up page"
                             }
                         ]
                     },
@@ -812,7 +843,8 @@
                     "hmb_medium"
                 ]
             },
-            "state": "disabled"
+            "state": "enabled",
+            "minSupportedVersion": "0.22.3"
         },
         "userAgentRotation": {
             "settings": {
@@ -862,6 +894,10 @@
                 }
             ],
             "state": "disabled"
+        },
+        "webCompat": {
+            "exceptions": [],
+            "state": "enabled"
         }
     },
     "unprotectedTemporary": []
