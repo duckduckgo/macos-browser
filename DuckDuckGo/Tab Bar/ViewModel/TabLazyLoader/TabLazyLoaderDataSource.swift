@@ -27,6 +27,9 @@ protocol TabLazyLoaderDataSource: AnyObject {
     var selectedTabIndex: Int? { get }
 
     var selectedTabPublisher: AnyPublisher<Tab, Never> { get }
+
+    var isSelectedTabLoading: Bool { get }
+    var isSelectedTabLoadingPublisher: AnyPublisher<Bool, Never> { get }
 }
 
 extension TabLazyLoaderDataSource {
@@ -58,5 +61,16 @@ extension TabCollectionViewModel: TabLazyLoaderDataSource {
 
     var selectedTabPublisher: AnyPublisher<Tab, Never> {
         $selectedTabViewModel.compactMap(\.?.tab).eraseToAnyPublisher()
+    }
+
+    var isSelectedTabLoading: Bool {
+        selectedTabViewModel?.isLoading ?? false
+    }
+
+    var isSelectedTabLoadingPublisher: AnyPublisher<Bool, Never> {
+        $selectedTabViewModel
+            .compactMap { $0 }
+            .flatMap(\.$isLoading)
+            .eraseToAnyPublisher()
     }
 }

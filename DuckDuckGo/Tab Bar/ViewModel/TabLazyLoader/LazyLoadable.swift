@@ -21,16 +21,15 @@ import Combine
 
 protocol LazyLoadable: AnyObject, Identifiable {
 
-    var isLazyLoadingInProgress: Bool { get set }
-
     var isUrl: Bool { get }
     var url: URL? { get }
 
-    func isNewer(than other: Self) -> Bool
-
     var webViewFrame: CGRect { get set }
-    func reload()
+    var isLazyLoadingInProgress: Bool { get set }
     var loadingFinishedPublisher: AnyPublisher<Self, Never> { get }
+
+    func reload()
+    func isNewer(than other: Self) -> Bool
 }
 
 extension Tab: LazyLoadable {

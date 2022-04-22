@@ -32,10 +32,10 @@ private final class TabMock: LazyLoadable {
     lazy var loadingFinishedPublisher: AnyPublisher<TabMock, Never> = loadingFinishedSubject.eraseToAnyPublisher()
 
     func isNewer(than other: TabMock) -> Bool { isNewerClosure(other) }
-    func reload() { reloadClosure() }
+    func reload() { reloadClosure(self) }
 
     var isNewerClosure: (TabMock) -> Bool = { _ in true }
-    var reloadClosure: () -> Void = {}
+    var reloadClosure: (TabMock) -> Void = { _ in }
 
     var selectedTimestamp: Date
 
@@ -55,11 +55,11 @@ private final class TabMock: LazyLoadable {
             self.selectedTimestamp > other.selectedTimestamp
         }
 
-        reloadClosure = { [unowned self] in
+        reloadClosure = { tab in
             // instantly notify that loading has finished (or failed)
             DispatchQueue.main.async {
                 reloadExpectation?.fulfill()
-                self.loadingFinishedSubject.send(self)
+                tab.loadingFinishedSubject.send(tab)
             }
         }
     }
@@ -80,6 +80,13 @@ private final class TabLazyLoaderDataSourceMock: TabLazyLoaderDataSource {
     }
 
     var selectedTabSubject = PassthroughSubject<Tab, Never>()
+
+    var isSelectedTabLoading: Bool = false
+    var isSelectedTabLoadingPublisher: AnyPublisher<Bool, Never> {
+        isSelectedTabLoadingSubject.eraseToAnyPublisher()
+    }
+
+    var isSelectedTabLoadingSubject = PassthroughSubject<Bool, Never>()
 }
 
 class TabLazyLoaderTests: XCTestCase {
@@ -285,7 +292,7 @@ class TabLazyLoaderTests: XCTestCase {
         // add 2 * max number tabs, ordered by selected timestamp ascending
         for i in 0..<(2 * maxNumberOfLazyLoadedTabs) {
             let tab = TabMock(isUrl: true, url: "http://\(i).com".url!, selectedTimestamp: Date(timeIntervalSince1970: .init(i)))
-            tab.reloadClosure = { [unowned tab] in
+            tab.reloadClosure = { tab in
                 DispatchQueue.main.async {
                     reloadedTabsIndices.append(i)
                     tab.loadingFinishedSubject.send(tab)
@@ -313,4 +320,57 @@ class TabLazyLoaderTests: XCTestCase {
         XCTAssertEqual(didFinishEvents.count, 1)
         XCTAssertEqual(reloadedTabsIndices, [3, 4, 2, 5, 1, 6, 0, 7, 8, 9, 10, 39, 38, 37, 36, 35, 34, 33, 32, 31, 30])
     }
+
+    /**
+     * This test sets up 2 tabs suitable for lazy loading.
+     * When the first one is reloaded, it artificially triggers currently selected tab reload.
+     * This effectively pauses lazy loading and prevents the other tab from being reloaded
+     * until currently selected tab is marked as done loading.
+     */
+    func testWhenSelectedTabIsLoadingThenLazyLoadingIsPaused() throws {
+        var reloadedTabsUrls = [URL?]()
+
+        let tabReloadClosure: (TabMock) -> Void = { tab in
+            reloadedTabsUrls.append(tab.url)
+            tab.loadingFinishedSubject.send(tab)
+        }
+
+        let oldTab = TabMock(isUrl: true, url: "http://old.com".url, selectedTimestamp: .init(timeIntervalSince1970: 0))
+        let newTab = TabMock(isUrl: true, url: "http://new.com".url, selectedTimestamp: .init(timeIntervalSince1970: 1))
+
+        oldTab.reloadClosure = tabReloadClosure
+        newTab.reloadClosure = { [unowned self] tab in
+            // mark currently selected tab as reloading, causing lazy loading to pause
+            self.dataSource.isSelectedTabLoading = true
+            self.dataSource.isSelectedTabLoadingSubject.send(true)
+            tabReloadClosure(tab)
+        }
+
+        dataSource.tabs = [.mockNotUrl, newTab, oldTab]
+        dataSource.selectedTab = dataSource.tabs.first
+
+        let lazyLoader = TabLazyLoader(dataSource: dataSource)
+
+        var didFinishEvents: [Bool] = []
+        var isLazyLoadingPausedEvents: [Bool] = []
+
+        lazyLoader?.lazyLoadingDidFinishPublisher.sink(receiveValue: { didFinishEvents.append($0) }).store(in: &cancellables)
+        lazyLoader?.isLazyLoadingPausedPublisher.sink(receiveValue: { isLazyLoadingPausedEvents.append($0) }).store(in: &cancellables)
+
+        // When
+        lazyLoader?.scheduleLazyLoading()
+
+        XCTAssertEqual(reloadedTabsUrls, [newTab.url])
+
+        // unpause lazy loading here
+        dataSource.isSelectedTabLoading = false
+        dataSource.isSelectedTabLoadingSubject.send(false)
+
+        // Then
+        XCTAssertEqual(reloadedTabsUrls, [newTab.url, oldTab.url])
+        XCTAssertEqual(didFinishEvents.count, 1)
+        XCTAssertEqual(isLazyLoadingPausedEvents, [false, true, false])
+        XCTAssertEqual(try XCTUnwrap(didFinishEvents.first), true)
+    }
+
 }

@@ -37,6 +37,10 @@ final class TabLazyLoader<DataSource: TabLazyLoaderDataSource> {
         lazyLoadingDidFinishSubject.prefix(1).eraseToAnyPublisher()
     }()
 
+    private(set) lazy var isLazyLoadingPausedPublisher: AnyPublisher<Bool, Never> = {
+        isLazyLoadingPausedSubject.removeDuplicates().eraseToAnyPublisher()
+    }()
+
     init?(dataSource: DataSource) {
         guard dataSource.qualifiesForLazyLoading else {
             os_log("Lazy loading not applicable", log: .tabLazyLoading, type: .debug)
@@ -57,7 +61,7 @@ final class TabLazyLoader<DataSource: TabLazyLoaderDataSource> {
     }
 
     func scheduleLazyLoading() {
-        guard let dataSource = dataSource, let currentTab = dataSource.selectedTab else {
+        guard let currentTab = dataSource.selectedTab else {
             os_log("Lazy loading not applicable", log: .tabLazyLoading, type: .debug)
             lazyLoadingDidFinishSubject.send(false)
             return
@@ -70,6 +74,7 @@ final class TabLazyLoader<DataSource: TabLazyLoaderDataSource> {
     // MARK: - Private
 
     private let lazyLoadingDidFinishSubject = PassthroughSubject<Bool, Never>()
+    private let isLazyLoadingPausedSubject = CurrentValueSubject<Bool, Never>(false)
     private let tabDidLoadSubject = PassthroughSubject<DataSource.Tab, Never>()
 
     private let numberOfTabsInProgress = CurrentValueSubject<Int, Never>(0)
@@ -82,10 +87,10 @@ final class TabLazyLoader<DataSource: TabLazyLoaderDataSource> {
     private var idsOfTabsSelectedOrReloadedInThisSession = Set<DataSource.Tab.ID>()
     private var cancellables = Set<AnyCancellable>()
 
-    private weak var dataSource: DataSource?
+    private unowned var dataSource: DataSource
 
     private func trackUserSwitchingTabs() {
-        dataSource?.selectedTabPublisher
+        dataSource.selectedTabPublisher
             .sink { [weak self] tab in
                 self?.idsOfTabsSelectedOrReloadedInThisSession.insert(tab.id)
             }
@@ -128,12 +133,35 @@ final class TabLazyLoader<DataSource: TabLazyLoaderDataSource> {
             })
             .store(in: &cancellables)
 
-        numberOfTabsInProgress
-            .filter { $0 < Const.maxNumberOfConcurrentlyLoadedTabs }
-            .sink { [weak self] _ in
+        willReloadNextTab
+            .sink { [weak self] in
                 self?.findAndReloadNextTab()
             }
             .store(in: &cancellables)
+    }
+
+    private var willReloadNextTab: AnyPublisher<Void, Never> {
+        let readyToLoadNextTab = numberOfTabsInProgress
+            .filter { [weak self] _ in
+                guard let self = self else { return false }
+
+                if self.dataSource.isSelectedTabLoading {
+                    os_log("Selected tab is currently loading, pausing lazy loading until it finishes", log: .tabLazyLoading, type: .debug)
+                    self.isLazyLoadingPausedSubject.send(true)
+                    return false
+                }
+                self.isLazyLoadingPausedSubject.send(false)
+                return true
+            }
+            .asVoid()
+
+        let selectedTabDidFinishLoading = dataSource.isSelectedTabLoadingPublisher.filter({ !$0 }).asVoid()
+
+        return Publishers.Merge(readyToLoadNextTab, selectedTabDidFinishLoading)
+            .filter { [weak self] in
+                (self?.numberOfTabsInProgress.value ?? 0) < Const.maxNumberOfConcurrentlyLoadedTabs
+            }
+            .eraseToAnyPublisher()
     }
 
     private func findAndReloadNextTab() {
@@ -191,10 +219,6 @@ final class TabLazyLoader<DataSource: TabLazyLoaderDataSource> {
     }
 
     private func findAdjacentTabToLoad() -> DataSource.Tab? {
-        guard let dataSource = dataSource else {
-            return nil
-        }
-
         while true {
             guard let nextIndex = adjacentItemEnumerator?.nextIndex(arraySize: dataSource.tabs.count) else {
                 return nil
@@ -207,7 +231,7 @@ final class TabLazyLoader<DataSource: TabLazyLoaderDataSource> {
     }
 
     private func findRecentlySelectedTabToLoad() -> DataSource.Tab? {
-        dataSource?.tabs
+        dataSource.tabs
             .filter { $0.isUrl && !idsOfTabsSelectedOrReloadedInThisSession.contains($0.id) }
             .sorted { $0.isNewer(than: $1) }
             .first
@@ -219,7 +243,7 @@ final class TabLazyLoader<DataSource: TabLazyLoaderDataSource> {
         subscribeToTabLoadingFinished(tab)
         idsOfTabsSelectedOrReloadedInThisSession.insert(tab.id)
 
-        if let selectedTabWebViewFrame = dataSource?.selectedTab?.webViewFrame {
+        if let selectedTabWebViewFrame = dataSource.selectedTab?.webViewFrame {
             tab.webViewFrame = selectedTabWebViewFrame
         }
 
