@@ -16,4 +16,6 @@
 //  limitations under the License.
 //
 
+#import "Bridging.h"
+
 #import "DownloadsWebViewMock.h"

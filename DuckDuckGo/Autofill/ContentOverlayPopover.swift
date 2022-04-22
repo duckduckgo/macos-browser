@@ -69,12 +69,23 @@ extension ContentOverlayPopover: ContentOverlayUserScriptDelegate {
     }
 
     public func websiteAutofillUserScript(_ websiteAutofillUserScript: WebsiteAutofillUserScript,
-                                          willDisplayOverlayAtClick: NSPoint,
+                                          willDisplayOverlayAtClick: NSPoint?,
                                           serializedInputContext: String,
                                           inputPosition: CGRect) {
+        guard let overlayWindow = windowController.window,
+              let currentTabView = currentTabView,
+              let currentTabViewWindow = currentTabView.window else {
+                  return
+              }
+        var y = inputPosition.maxY
+        var x = inputPosition.minX
         // Combines native click with offset of JS click.
-        let y = (willDisplayOverlayAtClick.y - (inputPosition.height - inputPosition.minY))
-        let x = (willDisplayOverlayAtClick.x - inputPosition.minX)
+        if let willDisplayOverlayAtClick = willDisplayOverlayAtClick {
+            y = willDisplayOverlayAtClick.y - y
+            x += willDisplayOverlayAtClick.x
+        } else {
+            y = currentTabView.frame.maxY - inputPosition.maxY
+        }
         var rectWidth = inputPosition.width
         // If the field is wider we want to left assign the rectangle anchoring
         if inputPosition.width > 315 {
@@ -86,11 +97,10 @@ extension ContentOverlayPopover: ContentOverlayUserScriptDelegate {
         viewController.requestResizeToSize(CGSize(width: 0, height: 0))
         viewController.autofillInterfaceToChild = websiteAutofillUserScript
         viewController.setType(serializedInputContext: serializedInputContext, zoomFactor: zoomFactor)
-        if let overlayWindow = windowController.window, let currentTabViewWindow = currentTabView?.window {
-            currentTabViewWindow.addChildWindow(overlayWindow, ordered: .above)
-            let outRect = currentTabViewWindow.convertToScreen(rect)
-            overlayWindow.setFrameTopLeftPoint(NSPoint(x: outRect.minX, y: outRect.minY))
-        }
+
+        currentTabViewWindow.addChildWindow(overlayWindow, ordered: .above)
+        let outRect = currentTabViewWindow.convertToScreen(rect)
+        overlayWindow.setFrameTopLeftPoint(NSPoint(x: outRect.minX, y: outRect.minY))
     }
 
 }

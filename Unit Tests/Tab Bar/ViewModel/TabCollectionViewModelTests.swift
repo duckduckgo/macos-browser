@@ -111,12 +111,32 @@ final class TabCollectionViewModelTests: XCTestCase {
 
     func testWhenPreferencesTabIsPresentThenSelectDisplayableTabIfPresentSelectsPreferencesTab() {
         let tabCollectionViewModel = TabCollectionViewModel.aTabCollectionViewModel()
-        tabCollectionViewModel.tabCollection.append(tab: .init(content: .preferences))
+        tabCollectionViewModel.tabCollection.append(tab: .init(content: .anyPreferencePane))
         tabCollectionViewModel.tabCollection.append(tab: .init(content: .homePage))
         tabCollectionViewModel.select(at: 0)
 
-        XCTAssertTrue(tabCollectionViewModel.selectDisplayableTabIfPresent(.preferences))
+        XCTAssertTrue(tabCollectionViewModel.selectDisplayableTabIfPresent(.anyPreferencePane))
         XCTAssert(tabCollectionViewModel.selectedTabViewModel === tabCollectionViewModel.tabViewModel(at: 1))
+    }
+
+    func testWhenPreferencesTabIsPresentThenOpeningPreferencesWithDifferentPaneUpdatesPaneOnExistingTab() {
+        let tabCollectionViewModel = TabCollectionViewModel.aTabCollectionViewModel()
+        tabCollectionViewModel.tabCollection.append(tab: .init(content: .preferences(pane: .appearance)))
+        tabCollectionViewModel.tabCollection.append(tab: .init(content: .homePage))
+
+        XCTAssertTrue(tabCollectionViewModel.selectDisplayableTabIfPresent(.preferences(pane: .privacy)))
+        XCTAssert(tabCollectionViewModel.selectedTabViewModel === tabCollectionViewModel.tabViewModel(at: 1))
+        XCTAssertEqual(tabCollectionViewModel.selectedTabViewModel?.tab.content, .preferences(pane: .privacy))
+    }
+
+    func testWhenPreferencesTabIsPresentThenOpeningPreferencesWithAnyPaneDoesNotUpdatePaneOnExistingTab() {
+        let tabCollectionViewModel = TabCollectionViewModel.aTabCollectionViewModel()
+        tabCollectionViewModel.tabCollection.append(tab: .init(content: .preferences(pane: .appearance)))
+        tabCollectionViewModel.tabCollection.append(tab: .init(content: .homePage))
+
+        XCTAssertTrue(tabCollectionViewModel.selectDisplayableTabIfPresent(.anyPreferencePane))
+        XCTAssert(tabCollectionViewModel.selectedTabViewModel === tabCollectionViewModel.tabViewModel(at: 1))
+        XCTAssertEqual(tabCollectionViewModel.selectedTabViewModel?.tab.content, .preferences(pane: .appearance))
     }
 
     func testWhenBookmarksTabIsPresentThenSelectDisplayableTabIfPresentSelectsBookmarksTab() {
@@ -145,7 +165,7 @@ final class TabCollectionViewModelTests: XCTestCase {
         tabCollectionViewModel.tabCollection.append(tab: .init(content: .homePage))
         tabCollectionViewModel.select(at: 2)
 
-        XCTAssertFalse(tabCollectionViewModel.selectDisplayableTabIfPresent(.preferences))
+        XCTAssertFalse(tabCollectionViewModel.selectDisplayableTabIfPresent(.anyPreferencePane))
         XCTAssert(tabCollectionViewModel.selectedTabViewModel === tabCollectionViewModel.tabViewModel(at: 2))
     }
 

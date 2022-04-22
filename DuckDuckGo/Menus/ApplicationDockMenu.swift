@@ -59,6 +59,15 @@ final class ApplicationDockMenu: NSMenu {
             addItem(windowItem)
         }
 
+        if numberOfWindowMenuItems > 0 {
+            addItem(.separator())
+        }
+
+        let newWindowItem = NSMenuItem(title: UserText.newWindowMenuItem,
+                                       action: #selector(AppDelegate.newWindow(_:)),
+                                       target: nil,
+                                       keyEquivalent: "")
+        addItem(newWindowItem)
     }
 
     @objc func menuItemAction(_ sender: Any?) {

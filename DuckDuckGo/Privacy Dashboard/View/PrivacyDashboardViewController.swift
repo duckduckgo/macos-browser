@@ -22,7 +22,7 @@ import Combine
 import BrowserServicesKit
 
 final class PrivacyDashboardViewController: NSViewController {
-    
+
     struct Constants {
         static let initialContentHeight: CGFloat = 550
     }
@@ -91,16 +91,16 @@ final class PrivacyDashboardViewController: NSViewController {
 
     private func initWebView() {
         let configuration = WKWebViewConfiguration()
-        
+
 #if DEBUG
         configuration.preferences.setValue(true, forKey: "developerExtrasEnabled")
 #endif
-        
-        let webView = WKWebView(frame: .zero, configuration: configuration)
+
+        let webView = PrivacyDashboardWebView(frame: .zero, configuration: configuration)
         webView.navigationDelegate = self
         self.webView = webView
         view.addAndLayout(webView)
-        
+
         contentHeightConstraint = view.heightAnchor.constraint(equalToConstant: Constants.initialContentHeight)
         contentHeightConstraint.isActive = true
     }

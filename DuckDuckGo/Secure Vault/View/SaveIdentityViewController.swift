@@ -18,6 +18,7 @@
 
 import AppKit
 import BrowserServicesKit
+import Combine
 import os.log
 
 protocol SaveIdentityDelegate: AnyObject {
@@ -46,7 +47,8 @@ final class SaveIdentityViewController: NSViewController {
     weak var delegate: SaveIdentityDelegate?
     
     private var identity: SecureVaultModels.Identity?
-    
+    private var appearanceCancellable: AnyCancellable?
+
     // MARK: - Actions
     
     @IBAction func onNotNowClicked(sender: NSButton) {
@@ -83,6 +85,14 @@ final class SaveIdentityViewController: NSViewController {
         self.identity = identity
         
         buildStackView(from: identity)
+    }
+
+    // MARK: -
+
+    override func viewDidLoad() {
+        super.viewDidLoad()
+
+        appearanceCancellable = view.subscribeForAppApperanceUpdates()
     }
     
     // MARK: - Private

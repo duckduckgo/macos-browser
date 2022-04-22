@@ -84,7 +84,7 @@ extension AppDelegate {
     }
 
     @IBAction func openPreferences(_ sender: Any?) {
-        let tabCollection = TabCollection(tabs: [Tab(content: .preferences)])
+        let tabCollection = TabCollection(tabs: [Tab(content: .anyPreferencePane)])
         let tabCollectionViewModel = TabCollectionViewModel(tabCollection: tabCollection)
         WindowsManager.openNewWindow(with: tabCollectionViewModel)
     }
@@ -166,7 +166,7 @@ extension MainViewController {
     // MARK: - Main Menu
 
     @IBAction func openPreferences(_ sender: Any?) {
-        browserTabViewController.openNewTab(with: .preferences, selected: true)
+        browserTabViewController.openNewTab(with: .anyPreferencePane, selected: true)
     }
 
     // MARK: - File
@@ -433,15 +433,7 @@ extension MainViewController {
     // MARK: - Printing
 
     @IBAction func printWebView(_ sender: Any?) {
-        guard let webView = tabCollectionViewModel.selectedTabViewModel?.tab.webView,
-              let window = webView.window,
-              let printOperation = webView.printOperation()
-        else { return }
-
-        if printOperation.view?.frame.isEmpty == true {
-            printOperation.view?.frame = webView.bounds
-        }
-        printOperation.runModal(for: window, delegate: nil, didRun: nil, contextInfo: nil)
+        tabCollectionViewModel.selectedTabViewModel?.tab.print()
     }
 
     // MARK: - Saving

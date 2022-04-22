@@ -69,3 +69,6 @@ fastlane/test_output
 
 .DS_Store
 node_modules/
+
+# Release build script
+release/

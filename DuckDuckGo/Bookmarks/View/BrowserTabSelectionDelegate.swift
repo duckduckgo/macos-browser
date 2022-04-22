@@ -22,4 +22,6 @@ protocol BrowserTabSelectionDelegate: AnyObject {
 
     func selectedTab(at index: Int)
 
+    func selectedPreferencePane(_ identifier: PreferencePaneIdentifier)
+
 }

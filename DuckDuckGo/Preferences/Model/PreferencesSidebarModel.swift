@@ -25,7 +25,7 @@ final class PreferencesSidebarModel: ObservableObject {
 
     @Published var selectedTabIndex: Int = 0
 
-    @Published var selectedPane: PreferencePaneIdentifier = .defaultBrowser
+    @Published private(set) var selectedPane: PreferencePaneIdentifier = .defaultBrowser
 
     init(
         sections: [PreferencesSection] = PreferencesSection.defaultSections,
@@ -39,8 +39,14 @@ final class PreferencesSidebarModel: ObservableObject {
         }
     }
 
+    func selectPane(_ identifier: PreferencePaneIdentifier) {
+        if sections.flatMap(\.panes).contains(identifier), identifier != selectedPane {
+            selectedPane = identifier
+        }
+    }
+
     func resetTabSelectionIfNeeded() {
-        if let preferencesTabIndex = tabSwitcherTabs.firstIndex(of: .preferences) {
+        if let preferencesTabIndex = tabSwitcherTabs.firstIndex(of: .anyPreferencePane) {
             if preferencesTabIndex != selectedTabIndex {
                 selectedTabIndex = preferencesTabIndex
             }
