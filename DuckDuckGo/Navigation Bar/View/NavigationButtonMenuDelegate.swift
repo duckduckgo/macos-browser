@@ -109,7 +109,9 @@ extension NavigationButtonMenuDelegate: NSMenuDelegate {
         var currentIndex: Int?
 
         // Add closing with back button to the list
-        if list.count == 0, let parentTab = selectedTabViewModel.tab.parentTab {
+        if list.count == 0,
+            let parentTab = selectedTabViewModel.tab.parentTab,
+            buttonType == .back {
             list.insert(.goBackToCloseItem(parentTab: parentTab), at: 0)
         }
 
@@ -121,8 +123,13 @@ extension NavigationButtonMenuDelegate: NSMenuDelegate {
 
         // Add error to the list
         if selectedTabViewModel.tab.error != nil {
-            list.insert(.error, at: 0)
-            currentIndex = 0
+            if buttonType == .back {
+                list.insert(.error, at: 0)
+                currentIndex = 0
+            } else {
+                list = []
+                currentIndex = nil
+            }
         }
 
         return (list, currentIndex)

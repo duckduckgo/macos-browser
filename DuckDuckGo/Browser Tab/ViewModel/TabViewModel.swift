@@ -34,7 +34,7 @@ final class TabViewModel {
 
     private var webViewStateObserver: WebViewStateObserver?
 
-    @Published var canGoForward: Bool = false
+    @Published private(set) var canGoForward: Bool = false
     @Published private(set) var canGoBack: Bool = false
     @Published private(set) var canReload: Bool = false
     @Published var canBeBookmarked: Bool = false
@@ -115,6 +115,7 @@ final class TabViewModel {
             self.errorViewState.isVisible = self.tab.error != nil
             self.errorViewState.message = self.tab.error?.localizedDescription
             self.updateCanGoBack()
+            self.updateCanGoForward()
         } .store(in: &cancellables)
     }
 
@@ -137,6 +138,10 @@ final class TabViewModel {
 
     func updateCanGoBack() {
         canGoBack = tab.canGoBack || tab.canBeClosedWithBack || tab.error != nil
+    }
+
+    func updateCanGoForward() {
+        canGoForward = tab.canGoForward && tab.error == nil
     }
 
     private func updateCanBeBookmarked() {
