@@ -681,7 +681,20 @@ CQ
                                                 <action selector="setFakeUserDefaultsATBValues:" target="Ady-hI-5gd" id="Bn7-nE-crD"/>
                                             </connections>
                                         </menuItem>
-                                        <menuItem title="Fatal Error" id="FeS-hb-rvM" userLabel="Reset Default Browser Prompt">
+                                        <menuItem title="UI Triggers" id="1Ui-X0-1ov">
+                                            <modifierMask key="keyEquivalentModifierMask"/>
+                                            <menu key="submenu" title="UI Triggers" id="nRp-WO-6Fb">
+                                                <items>
+                                                    <menuItem title="Show Save Credentials Popover" id="yvr-ao-7Bb">
+                                                        <modifierMask key="keyEquivalentModifierMask"/>
+                                                        <connections>
+                                                            <action selector="showSaveCredentialsPopover:" target="Ady-hI-5gd" id="zgU-tH-zHa"/>
+                                                        </connections>
+                                                    </menuItem>
+                                                </items>
+                                            </menu>
+                                        </menuItem>
+                                        <menuItem title="Trigger Fatal Error" id="FeS-hb-rvM" userLabel="Reset Default Browser Prompt">
                                             <modifierMask key="keyEquivalentModifierMask"/>
                                             <connections>
                                                 <action selector="triggerFatalError:" target="Ady-hI-5gd" id="pS0-iQ-TPe"/>

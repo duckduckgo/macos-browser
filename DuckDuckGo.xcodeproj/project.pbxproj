@@ -176,6 +176,7 @@
 		4B9292D72667124000AD2C21 /* NSPopUpButtonExtension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B9292D62667124000AD2C21 /* NSPopUpButtonExtension.swift */; };
 		4B9292D92667124B00AD2C21 /* BookmarkListTreeControllerDataSource.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B9292D82667124B00AD2C21 /* BookmarkListTreeControllerDataSource.swift */; };
 		4B9292DB2667125D00AD2C21 /* ContextualMenu.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B9292DA2667125D00AD2C21 /* ContextualMenu.swift */; };
+		4B980E212817604000282EE1 /* NSNotificationName+Debug.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B980E202817604000282EE1 /* NSNotificationName+Debug.swift */; };
 		4BA1A69B258B076900F6F690 /* FileStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4BA1A69A258B076900F6F690 /* FileStore.swift */; };
 		4BA1A6A0258B079600F6F690 /* DataEncryption.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4BA1A69F258B079600F6F690 /* DataEncryption.swift */; };
 		4BA1A6A5258B07DF00F6F690 /* EncryptedValueTransformer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4BA1A6A4258B07DF00F6F690 /* EncryptedValueTransformer.swift */; };
@@ -917,6 +918,7 @@
 		4B9292D62667124000AD2C21 /* NSPopUpButtonExtension.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = NSPopUpButtonExtension.swift; sourceTree = "<group>"; };
 		4B9292D82667124B00AD2C21 /* BookmarkListTreeControllerDataSource.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = BookmarkListTreeControllerDataSource.swift; sourceTree = "<group>"; };
 		4B9292DA2667125D00AD2C21 /* ContextualMenu.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ContextualMenu.swift; sourceTree = "<group>"; };
+		4B980E202817604000282EE1 /* NSNotificationName+Debug.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "NSNotificationName+Debug.swift"; sourceTree = "<group>"; };
 		4BA1A69A258B076900F6F690 /* FileStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FileStore.swift; sourceTree = "<group>"; };
 		4BA1A69F258B079600F6F690 /* DataEncryption.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DataEncryption.swift; sourceTree = "<group>"; };
 		4BA1A6A4258B07DF00F6F690 /* EncryptedValueTransformer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EncryptedValueTransformer.swift; sourceTree = "<group>"; };
@@ -3260,6 +3262,7 @@
 				B6CF78DD267B099C00CD4F13 /* WKNavigationActionExtension.swift */,
 				4B7A60A0273E0BE400BBDFEB /* WKWebsiteDataStoreExtension.swift */,
 				4B39AAF527D9B2C700A73FD5 /* NSStackViewExtension.swift */,
+				4B980E202817604000282EE1 /* NSNotificationName+Debug.swift */,
 			);
 			path = Extensions;
 			sourceTree = "<group>";
@@ -4245,6 +4248,7 @@
 				B63BDF7E27FDAA640072D75B /* PrivacyDashboardWebView.swift in Sources */,
 				37CD54CF27F2FDD100F1F7B9 /* AppearancePreferences.swift in Sources */,
 				B6B1E87B26D381710062C350 /* DownloadListCoordinator.swift in Sources */,
+				4B980E212817604000282EE1 /* NSNotificationName+Debug.swift in Sources */,
 				AAC5E4F125D6BF10007F5990 /* AddressBarButton.swift in Sources */,
 				AAE7527E263B05C600B973F8 /* HistoryEntry.swift in Sources */,
 				AA5FA69D275F945C00DCE9C9 /* FaviconStore.swift in Sources */,

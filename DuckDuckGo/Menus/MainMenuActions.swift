@@ -512,6 +512,12 @@ extension MainViewController {
         legacyStore.atb = "fake-atb-value"
         legacyStore.installDate = Date()
     }
+    
+    @IBAction func showSaveCredentialsPopover(_ sender: Any?) {
+        #if DEBUG
+        NotificationCenter.default.post(name: .ShowSaveCredentialsPopover, object: nil)
+        #endif
+    }
 
     // MARK: - Developer Tools
 
