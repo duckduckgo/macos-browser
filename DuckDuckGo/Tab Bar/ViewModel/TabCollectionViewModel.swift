@@ -60,6 +60,7 @@ final class TabCollectionViewModel: NSObject {
     // In a special occasion, we want to select the "parent" tab after closing the currently selected tab
     private var selectParentOnRemoval = false
     private var tabLazyLoader: TabLazyLoader<TabCollectionViewModel>?
+    private var isTabLazyLoadingRequested: Bool = false
 
     private var cancellables = Set<AnyCancellable>()
 
@@ -76,13 +77,30 @@ final class TabCollectionViewModel: NSObject {
         if self.selectionIndex != selectionIndex {
             self.selectionIndex = selectionIndex
         }
-
-        setUpLazyLoading()
     }
 
     convenience override init() {
         let tabCollection = TabCollection()
         self.init(tabCollection: tabCollection)
+    }
+
+    func setUpLazyLoadingIfNeeded() {
+        guard !isTabLazyLoadingRequested else {
+            os_log("Lazy loading already requested in this session, skipping.", log: .tabLazyLoading, type: .debug)
+            return
+        }
+
+        tabLazyLoader = TabLazyLoader(dataSource: self)
+        isTabLazyLoadingRequested = true
+
+        tabLazyLoader?.lazyLoadingDidFinishPublisher
+            .sink { [weak self] _ in
+                self?.tabLazyLoader = nil
+                os_log("Disposed of Tab Lazy Loader", log: .tabLazyLoading, type: .debug)
+            }
+            .store(in: &cancellables)
+
+        tabLazyLoader?.scheduleLazyLoading()
     }
 
     func tabViewModel(at index: Int) -> TabViewModel? {
@@ -409,20 +427,6 @@ final class TabCollectionViewModel: NSObject {
             return
         }
         select(at: selectionIndex, forceChange: forceChange)
-    }
-
-    private func setUpLazyLoading() {
-
-        tabLazyLoader = TabLazyLoader(dataSource: self)
-
-        tabLazyLoader?.lazyLoadingDidFinishPublisher
-            .sink { [weak self] _ in
-                self?.tabLazyLoader = nil
-                os_log("Disposed of Tab Lazy Loader", log: .tabLazyLoading, type: .debug)
-            }
-            .store(in: &cancellables)
-
-        tabLazyLoader?.scheduleLazyLoading()
     }
 
     private func subscribeToTabs() {
