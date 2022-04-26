@@ -18,7 +18,7 @@
 
 import Foundation
 
-#if DEBUG
+#if DEBUG || REVIEW
 extension NSNotification.Name {
 
     static let ShowSaveCredentialsPopover = NSNotification.Name("ShowSaveCredentialsPopover")

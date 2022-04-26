@@ -143,7 +143,7 @@ final class NavigationBarViewController: NSViewController {
         bookmarkListButton.sendAction(on: .leftMouseDown)
         downloadsButton.sendAction(on: .leftMouseDown)
         
-        #if DEBUG
+        #if DEBUG || REVIEW
         addDebugNotificationListeners()
         #endif
     }
@@ -671,7 +671,7 @@ extension NavigationBarViewController: DownloadsViewControllerDelegate {
 
 }
 
-#if DEBUG
+#if DEBUG || REVIEW
 extension NavigationBarViewController {
     
     fileprivate func addDebugNotificationListeners() {

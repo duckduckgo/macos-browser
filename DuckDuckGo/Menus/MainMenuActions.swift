@@ -507,7 +507,7 @@ extension MainViewController {
     }
 
     @IBAction func showSaveCredentialsPopover(_ sender: Any?) {
-        #if DEBUG
+        #if DEBUG || REVIEW
         NotificationCenter.default.post(name: .ShowSaveCredentialsPopover, object: nil)
         #endif
     }
