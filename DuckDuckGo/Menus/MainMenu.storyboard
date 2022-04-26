@@ -645,43 +645,57 @@ CQ
                                 <modifierMask key="keyEquivalentModifierMask"/>
                                 <menu key="submenu" title="Debug" systemMenu="help" autoenablesItems="NO" id="y0w-AM-Bho">
                                     <items>
-                                        <menuItem title="Reset Default Browser Prompt" id="3Ve-bg-l5b" userLabel="Reset Default Browser Prompt">
+                                        <menuItem title="Reset Data" id="Yxs-rU-Pbe">
                                             <modifierMask key="keyEquivalentModifierMask"/>
-                                            <connections>
-                                                <action selector="resetDefaultBrowserPrompt:" target="Ady-hI-5gd" id="Esm-iy-0kW"/>
-                                            </connections>
+                                            <menu key="submenu" title="Reset Data" id="DVQ-kv-udm">
+                                                <items>
+                                                    <menuItem title="Reset Default Browser Prompt" id="3Ve-bg-l5b" userLabel="Reset Default Browser Prompt">
+                                                        <modifierMask key="keyEquivalentModifierMask"/>
+                                                        <connections>
+                                                            <action selector="resetDefaultBrowserPrompt:" target="Ady-hI-5gd" id="Esm-iy-0kW"/>
+                                                        </connections>
+                                                    </menuItem>
+                                                    <menuItem title="Reset Default Grammar Checks" id="xUM-bO-mMw" userLabel="Reset Default Browser Prompt">
+                                                        <modifierMask key="keyEquivalentModifierMask"/>
+                                                        <connections>
+                                                            <action selector="resetDefaultGrammarChecks:" target="Ady-hI-5gd" id="Ces-GX-TM5"/>
+                                                        </connections>
+                                                    </menuItem>
+                                                    <menuItem title="Reset Secure Vault Data" id="opO-fm-tW5">
+                                                        <modifierMask key="keyEquivalentModifierMask"/>
+                                                        <connections>
+                                                            <action selector="resetSecureVaultData:" target="Ady-hI-5gd" id="5uS-MI-2BN"/>
+                                                        </connections>
+                                                    </menuItem>
+                                                    <menuItem title="Reset Bookmarks" id="xqA-t4-jNd">
+                                                        <modifierMask key="keyEquivalentModifierMask"/>
+                                                        <connections>
+                                                            <action selector="resetBookmarks:" target="Ady-hI-5gd" id="3Q0-wb-PaD"/>
+                                                        </connections>
+                                                    </menuItem>
+                                                    <menuItem title="Reset Mac Waitlist Lock Screen" id="jXH-IC-kHl">
+                                                        <modifierMask key="keyEquivalentModifierMask"/>
+                                                        <connections>
+                                                            <action selector="resetMacWaitlistUnlockState:" target="Ady-hI-5gd" id="1Bd-q4-0F9"/>
+                                                        </connections>
+                                                    </menuItem>
+                                                </items>
+                                            </menu>
                                         </menuItem>
-                                        <menuItem title="Reset Default Grammar Checks" id="xUM-bO-mMw" userLabel="Reset Default Browser Prompt">
+                                        <menuItem title="UI Triggers" id="1Ui-X0-1ov">
                                             <modifierMask key="keyEquivalentModifierMask"/>
-                                            <connections>
-                                                <action selector="resetDefaultGrammarChecks:" target="Ady-hI-5gd" id="Ces-GX-TM5"/>
-                                            </connections>
+                                            <menu key="submenu" title="UI Triggers" id="nRp-WO-6Fb">
+                                                <items>
+                                                    <menuItem title="Show Save Credentials Popover" id="yvr-ao-7Bb">
+                                                        <modifierMask key="keyEquivalentModifierMask"/>
+                                                        <connections>
+                                                            <action selector="showSaveCredentialsPopover:" target="Ady-hI-5gd" id="zgU-tH-zHa"/>
+                                                        </connections>
+                                                    </menuItem>
+                                                </items>
+                                            </menu>
                                         </menuItem>
-                                        <menuItem title="Reset Secure Vault Data" id="opO-fm-tW5">
-                                            <modifierMask key="keyEquivalentModifierMask"/>
-                                            <connections>
-                                                <action selector="resetSecureVaultData:" target="Ady-hI-5gd" id="5uS-MI-2BN"/>
-                                            </connections>
-                                        </menuItem>
-                                        <menuItem title="Reset Bookmarks" id="xqA-t4-jNd">
-                                            <modifierMask key="keyEquivalentModifierMask"/>
-                                            <connections>
-                                                <action selector="resetBookmarks:" target="Ady-hI-5gd" id="3Q0-wb-PaD"/>
-                                            </connections>
-                                        </menuItem>
-                                        <menuItem title="Reset Mac Waitlist Lock Screen" id="jXH-IC-kHl">
-                                            <modifierMask key="keyEquivalentModifierMask"/>
-                                            <connections>
-                                                <action selector="resetMacWaitlistUnlockState:" target="Ady-hI-5gd" id="1Bd-q4-0F9"/>
-                                            </connections>
-                                        </menuItem>
-                                        <menuItem title="Set Fake User Defaults ATB Values" id="tjI-pj-o1j">
-                                            <modifierMask key="keyEquivalentModifierMask"/>
-                                            <connections>
-                                                <action selector="setFakeUserDefaultsATBValues:" target="Ady-hI-5gd" id="Bn7-nE-crD"/>
-                                            </connections>
-                                        </menuItem>
-                                        <menuItem title="Fatal Error" id="FeS-hb-rvM" userLabel="Reset Default Browser Prompt">
+                                        <menuItem title="Trigger Fatal Error" id="FeS-hb-rvM" userLabel="Reset Default Browser Prompt">
                                             <modifierMask key="keyEquivalentModifierMask"/>
                                             <connections>
                                                 <action selector="triggerFatalError:" target="Ady-hI-5gd" id="pS0-iQ-TPe"/>

@@ -506,11 +506,10 @@ extension MainViewController {
         store.deleteExistingMetadata()
     }
 
-    // Used to test the lock screen upgrade process. Users with the legacy ATB format need to be unlocked.
-    @IBAction func setFakeUserDefaultsATBValues(_ sender: Any?) {
-        var legacyStore = LocalStatisticsStore.LegacyStatisticsStore()
-        legacyStore.atb = "fake-atb-value"
-        legacyStore.installDate = Date()
+    @IBAction func showSaveCredentialsPopover(_ sender: Any?) {
+        #if DEBUG || REVIEW
+        NotificationCenter.default.post(name: .ShowSaveCredentialsPopover, object: nil)
+        #endif
     }
 
     // MARK: - Developer Tools

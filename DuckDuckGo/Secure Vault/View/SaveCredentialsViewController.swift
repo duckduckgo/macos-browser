@@ -78,6 +78,8 @@ final class SaveCredentialsViewController: NSViewController {
 
         updateButton.isHidden = credentials.account.id == nil
         dontUpdateButton.isHidden = credentials.account.id == nil
+        
+        fireproofCheck.state = FireproofDomains.shared.isFireproof(fireproofDomain: credentials.account.domain) ? .on : .off
     }
 
     @IBAction func onSaveClicked(sender: Any?) {
@@ -100,6 +102,8 @@ final class SaveCredentialsViewController: NSViewController {
         if self.fireproofCheck.state == .on {
             Pixel.fire(.fireproof(kind: .pwm, suggested: .pwm))
             FireproofDomains.shared.add(domain: account.domain)
+        } else {
+            FireproofDomains.shared.remove(domain: account.domain)
         }
     }
 
