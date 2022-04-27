@@ -38,6 +38,7 @@ final class SaveCredentialsViewController: NSViewController {
         return controller
     }
 
+    @IBOutlet var titleLabel: NSTextField!
     @IBOutlet var faviconImage: NSImageView!
     @IBOutlet var domainLabel: NSTextField!
     @IBOutlet var usernameField: NSTextField!
@@ -63,9 +64,9 @@ final class SaveCredentialsViewController: NSViewController {
         let string = hiddenPasswordField.isHidden ? visiblePasswordField.stringValue : hiddenPasswordField.stringValue
         return string.data(using: .utf8)!
     }
-
+    
     /// Note that if the credentials.account.id is not nil, then we consider this an update rather than a save.
-    func saveCredentials(_ credentials: SecureVaultModels.WebsiteCredentials) {
+    func update(credentials: SecureVaultModels.WebsiteCredentials, editable: Bool) {
         self.credentials = credentials
         self.domainLabel.stringValue = credentials.account.domain
         self.usernameField.stringValue = credentials.account.username
@@ -80,6 +81,22 @@ final class SaveCredentialsViewController: NSViewController {
         dontUpdateButton.isHidden = credentials.account.id == nil
         
         fireproofCheck.state = FireproofDomains.shared.isFireproof(fireproofDomain: credentials.account.domain) ? .on : .off
+        
+        updateViewState(editable: editable)
+    }
+    
+    private func updateViewState(editable: Bool) {
+        if editable {
+            titleLabel.stringValue = UserText.pmSaveCredentialsEditableTitle
+            view.window?.makeFirstResponder(usernameField)
+        } else {
+            titleLabel.stringValue = UserText.pmSaveCredentialsNonEditableTitle
+            view.window?.makeFirstResponder(nil)
+        }
+        
+        usernameField.setEditable(editable)
+        hiddenPasswordField.setEditable(editable)
+        visiblePasswordField.setEditable(editable)
     }
 
     @IBAction func onSaveClicked(sender: Any?) {

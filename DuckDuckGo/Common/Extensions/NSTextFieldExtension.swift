@@ -33,6 +33,14 @@ extension NSTextField {
         return label
     }
     
+    func setEditable(_ editable: Bool) {
+        self.isEditable = editable
+        self.isBordered = editable
+        self.isSelectable = editable
+        self.isBezeled = editable
+        // self.backgroundColor = .clear
+    }
+    
     static func optionalLabel(titled title: String?) -> NSTextField? {
         guard let title = title else {
             return nil
