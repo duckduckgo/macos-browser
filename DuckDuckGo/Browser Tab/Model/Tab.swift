@@ -908,7 +908,7 @@ extension Tab: WKNavigationDelegate {
                                                 if isRequestingNewTab || !navigationAction.isTargetingMainFrame {
                                                     self.delegate?.tab(self,
                                                                        requestedNewTabWith: .url(url),
-                                                                       selected: NSApp.isCommandPressed || !navigationAction.isTargetingMainFrame)
+                                                                       selected: NSApp.isShiftPressed || !navigationAction.isTargetingMainFrame)
                                                 } else {
                                                     webView.load(url)
                                                 }
