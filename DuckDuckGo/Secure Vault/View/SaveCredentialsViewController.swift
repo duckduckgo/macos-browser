@@ -44,10 +44,14 @@ final class SaveCredentialsViewController: NSViewController {
     @IBOutlet var usernameField: NSTextField!
     @IBOutlet var hiddenPasswordField: NSSecureTextField!
     @IBOutlet var visiblePasswordField: NSTextField!
+    
     @IBOutlet var notNowButton: NSButton!
     @IBOutlet var saveButton: NSButton!
     @IBOutlet var updateButton: NSButton!
     @IBOutlet var dontUpdateButton: NSButton!
+    @IBOutlet var doneButton: NSButton!
+    @IBOutlet var editButton: NSButton!
+    
     @IBOutlet var fireproofCheck: NSButton!
 
     weak var delegate: SaveCredentialsDelegate?
@@ -73,30 +77,39 @@ final class SaveCredentialsViewController: NSViewController {
         self.hiddenPasswordField.stringValue = String(data: credentials.password, encoding: .utf8) ?? ""
         self.visiblePasswordField.stringValue = self.hiddenPasswordField.stringValue
         self.loadFaviconForDomain(credentials.account.domain)
-
-        notNowButton.isHidden = credentials.account.id != nil
-        saveButton.isHidden = credentials.account.id != nil
-
-        updateButton.isHidden = credentials.account.id == nil
-        dontUpdateButton.isHidden = credentials.account.id == nil
         
         fireproofCheck.state = FireproofDomains.shared.isFireproof(fireproofDomain: credentials.account.domain) ? .on : .off
-        
         updateViewState(editable: editable)
     }
     
     private func updateViewState(editable: Bool) {
-        if editable {
-            titleLabel.stringValue = UserText.pmSaveCredentialsEditableTitle
-            view.window?.makeFirstResponder(usernameField)
-        } else {
-            titleLabel.stringValue = UserText.pmSaveCredentialsNonEditableTitle
-            view.window?.makeFirstResponder(nil)
-        }
-        
         usernameField.setEditable(editable)
         hiddenPasswordField.setEditable(editable)
         visiblePasswordField.setEditable(editable)
+
+        if editable {
+            notNowButton.isHidden = credentials?.account.id != nil
+            saveButton.isHidden = credentials?.account.id != nil
+            updateButton.isHidden = credentials?.account.id == nil
+            dontUpdateButton.isHidden = credentials?.account.id == nil
+            
+            editButton.isHidden = true
+            doneButton.isHidden = true
+            
+            titleLabel.stringValue = UserText.pmSaveCredentialsEditableTitle
+            usernameField.makeMeFirstResponder()
+        } else {
+            notNowButton.isHidden = true
+            saveButton.isHidden = true
+            updateButton.isHidden = true
+            dontUpdateButton.isHidden = true
+
+            editButton.isHidden = false
+            doneButton.isHidden = false
+            
+            titleLabel.stringValue = UserText.pmSaveCredentialsNonEditableTitle
+            view.window?.makeFirstResponder(nil)
+        }
     }
 
     @IBAction func onSaveClicked(sender: Any?) {
@@ -120,6 +133,8 @@ final class SaveCredentialsViewController: NSViewController {
             Pixel.fire(.fireproof(kind: .pwm, suggested: .pwm))
             FireproofDomains.shared.add(domain: account.domain)
         } else {
+            // If the Fireproof checkbox has been unchecked, and the domain is Fireproof, then un-Fireproof it.
+            guard FireproofDomains.shared.isFireproof(fireproofDomain: account.domain) else { return }
             FireproofDomains.shared.remove(domain: account.domain)
         }
     }
@@ -151,6 +166,14 @@ final class SaveCredentialsViewController: NSViewController {
         }
 
         Pixel.fire(.fireproofSuggested())
+    }
+    
+    @IBAction func onEditClicked(sender: Any?) {
+        updateViewState(editable: true)
+    }
+    
+    @IBAction func onDoneClicked(sender: Any?) {
+        delegate?.shouldCloseSaveCredentialsViewController(self)
     }
 
     @IBAction func onTogglePasswordVisibility(sender: Any?) {

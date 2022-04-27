@@ -38,7 +38,6 @@ extension NSTextField {
         self.isBordered = editable
         self.isSelectable = editable
         self.isBezeled = editable
-        // self.backgroundColor = .clear
     }
     
     static func optionalLabel(titled title: String?) -> NSTextField? {

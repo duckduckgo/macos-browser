@@ -557,7 +557,7 @@ final class NavigationBarViewController: NSViewController {
         if autofillPreferences.askToSaveUsernamesAndPasswords, let credentials = data.credentials {
             os_log("Presenting Save Credentials popover", log: .passwordManager)
             showSaveCredentialsPopover()
-            saveCredentialsPopover.viewController.update(credentials: credentials, editable: true)
+            saveCredentialsPopover.viewController.update(credentials: credentials, editable: !data.automaticallySavedCredentials)
         } else if autofillPreferences.askToSavePaymentMethods, let card = data.creditCard {
             os_log("Presenting Save Payment Method popover", log: .passwordManager)
             showSavePaymentMethodPopover()
