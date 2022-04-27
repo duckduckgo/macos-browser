@@ -105,19 +105,43 @@ final class TabViewModel {
     }
 
     private func subscribeToTitle() {
-        tab.$title.receive(on: DispatchQueue.main).sink { [weak self] _ in self?.updateTitle() } .store(in: &cancellables)
+        tab.$title
+            .filter { [weak self] _ in
+                self?.tab.isLazyLoadingInProgress == false
+            }
+            .receive(on: DispatchQueue.main)
+            .sink { [weak self] _ in
+                self?.updateTitle()
+            }
+            .store(in: &cancellables)
     }
 
     private func subscribeToFavicon() {
-        tab.$favicon.receive(on: DispatchQueue.main).sink { [weak self] _ in self?.updateFavicon() } .store(in: &cancellables)
+        tab.$favicon
+            .filter { [weak self] _ in
+                self?.tab.isLazyLoadingInProgress == false
+            }
+            .receive(on: DispatchQueue.main)
+            .sink { [weak self] _ in
+                self?.updateFavicon()
+            }
+            .store(in: &cancellables)
     }
 
     private func subscribeToTabError() {
-        tab.$error.receive(on: DispatchQueue.main).sink { [weak self] _ in
-            guard let self = self else { return }
-            self.errorViewState.isVisible = self.tab.error != nil
-            self.errorViewState.message = self.tab.error?.localizedDescription
-        } .store(in: &cancellables)
+        tab.$error
+            .map { error -> ErrorViewState in
+                switch error {
+                case .none, // no error
+                    // don‘t show error for interrupted load like downloads
+                    .some(WebKitError.frameLoadInterrupted):
+                    return .init(isVisible: false, message: nil)
+                case .some(let error):
+                    return .init(isVisible: true, message: error.localizedDescription)
+                }
+            }
+            .assign(to: \.errorViewState, onWeaklyHeld: self)
+            .store(in: &cancellables)
     }
 
     private func subscribeToPermissions() {
