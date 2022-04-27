@@ -11,6 +11,6 @@
     "rollup": "^2.61.0"
   },
   "dependencies": {
-    "@duckduckgo/autoconsent": "1.0.2"
+    "@duckduckgo/autoconsent": "1.0.4"
   }
 }
