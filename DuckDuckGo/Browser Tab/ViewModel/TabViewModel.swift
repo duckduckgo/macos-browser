@@ -105,11 +105,27 @@ final class TabViewModel {
     }
 
     private func subscribeToTitle() {
-        tab.$title.receive(on: DispatchQueue.main).sink { [weak self] _ in self?.updateTitle() } .store(in: &cancellables)
+        tab.$title
+            .filter { [weak self] _ in
+                self?.tab.isLazyLoadingInProgress == false
+            }
+            .receive(on: DispatchQueue.main)
+            .sink { [weak self] _ in
+                self?.updateTitle()
+            }
+            .store(in: &cancellables)
     }
 
     private func subscribeToFavicon() {
-        tab.$favicon.receive(on: DispatchQueue.main).sink { [weak self] _ in self?.updateFavicon() } .store(in: &cancellables)
+        tab.$favicon
+            .filter { [weak self] _ in
+                self?.tab.isLazyLoadingInProgress == false
+            }
+            .receive(on: DispatchQueue.main)
+            .sink { [weak self] _ in
+                self?.updateFavicon()
+            }
+            .store(in: &cancellables)
     }
 
     private func subscribeToTabError() {

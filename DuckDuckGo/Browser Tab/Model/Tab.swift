@@ -42,7 +42,7 @@ protocol TabDelegate: FileDownloadManagerDelegate, ContentOverlayUserScriptDeleg
 
 // swiftlint:disable type_body_length
 // swiftlint:disable file_length
-final class Tab: NSObject {
+final class Tab: NSObject, Identifiable {
 
     enum TabContent: Equatable {
         case homePage
@@ -147,7 +147,9 @@ final class Tab: NSObject {
          parentTab: Tab? = nil,
          shouldLoadInBackground: Bool = false,
          canBeClosedWithBack: Bool = false,
-         currentDownload: URL? = nil) {
+         lastSelectedAt: Date? = nil,
+         currentDownload: URL? = nil
+    ) {
 
         self.content = content
         self.faviconManagement = faviconManagement
@@ -160,6 +162,7 @@ final class Tab: NSObject {
         self.parentTab = parentTab
         self._canBeClosedWithBack = canBeClosedWithBack
         self.sessionStateData = sessionStateData
+        self.lastSelectedAt = lastSelectedAt
         self.currentDownload = currentDownload
 
         let configuration = webViewConfiguration ?? WKWebViewConfiguration()
@@ -174,11 +177,12 @@ final class Tab: NSObject {
     }
 
     deinit {
-        self.userContentController.removeAllUserScripts()
+        webView.stopLoading()
+        webView.stopMediaCapture()
+        webView.fullscreenWindowController?.close()
+        userContentController.removeAllUserScripts()
 
-        #if DEBUG
-        assert(self.isClosing || !content.isUrl, "tabWillClose() was not called for this Tab")
-        #endif
+        cbaTimeReporter?.tabWillClose(self.instrumentation.currentTabIdentifier)
     }
 
     private var userContentController: UserContentController {
@@ -188,6 +192,7 @@ final class Tab: NSObject {
     // MARK: - Event Publishers
 
     let webViewDidFinishNavigationPublisher = PassthroughSubject<Void, Never>()
+    let webViewDidFailNavigationPublisher = PassthroughSubject<Void, Never>()
 
     @MainActor
     @Published var isAMPProtectionExtracting: Bool = false
@@ -203,6 +208,8 @@ final class Tab: NSObject {
     var contentChangeEnabled = true
 
     var fbBlockingEnabled = true
+
+    var isLazyLoadingInProgress = false
 
     @Published private(set) var content: TabContent {
         didSet {
@@ -233,6 +240,8 @@ final class Tab: NSObject {
             self.content = content
         }
     }
+    
+    var lastSelectedAt: Date?
 
     @Published var title: String?
     @Published var error: Error?
@@ -520,20 +529,6 @@ final class Tab: NSObject {
                 await addHomePageToWebViewIfNeeded()
             }
         }
-    }
-
-    #if DEBUG
-    private var isClosing = false
-    #endif
-
-    func tabWillClose() {
-        webView.stopLoading()
-        webView.stopMediaCapture()
-        cbaTimeReporter?.tabWillClose(self)
-
-        #if DEBUG
-        self.isClosing = true
-        #endif
     }
 
     // MARK: - Favicon
@@ -1034,9 +1029,9 @@ extension Tab: WKNavigationDelegate {
     private func prepareForContentBlocking() async {
         // Ensure Content Blocking Assets (WKContentRuleList&UserScripts) are installed
         if !userContentController.contentBlockingAssetsInstalled {
-            cbaTimeReporter?.tabWillWaitForRulesCompilation(self)
+            cbaTimeReporter?.tabWillWaitForRulesCompilation(self.instrumentation.currentTabIdentifier)
             await userContentController.awaitContentBlockingAssetsInstalled()
-            cbaTimeReporter?.reportWaitTimeForTabFinishedWaitingForRules(self)
+            cbaTimeReporter?.reportWaitTimeForTabFinishedWaitingForRules(self.instrumentation.currentTabIdentifier)
         } else {
             cbaTimeReporter?.reportNavigationDidNotWaitForRules()
         }
@@ -1113,6 +1108,7 @@ extension Tab: WKNavigationDelegate {
         // https://app.asana.com/0/1199230911884351/1200381133504356/f
         //        hasError = true
 
+        webViewDidFailNavigationPublisher.send()
         invalidateSessionStateData()
     }
 
@@ -1126,6 +1122,7 @@ extension Tab: WKNavigationDelegate {
         }
 
         self.error = error
+        webViewDidFailNavigationPublisher.send()
     }
 
     @available(macOS 11.3, *)

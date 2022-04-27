@@ -21,6 +21,7 @@ import AppKit
 enum DataImport {
 
     enum Source: CaseIterable {
+
         case brave
         case chrome
         case edge
@@ -59,6 +60,19 @@ enum DataImport {
 
         var canImportData: Bool {
             return (ThirdPartyBrowser.browser(for: self)?.isInstalled ?? false) || [.csv, .onePassword, .lastPass].contains(self)
+        }
+
+        var pixelEventSource: Pixel.Event.DataImportSource {
+            switch self {
+            case .brave: return .brave
+            case .chrome: return .chrome
+            case .edge: return .edge
+            case .firefox: return .firefox
+            case .safari: return .safari
+            case .onePassword: return .onePassword
+            case .lastPass: return .lastPass
+            case .csv: return .csv
+            }
         }
     }
 
@@ -212,20 +226,55 @@ enum DataImport {
 
 }
 
-enum DataImportError: Error {
+struct DataImportError: Error {
 
-    case noFileFound
-    case cannotReadFile
-    case browserNeedsToBeClosed
-    case needsLoginPrimaryPassword
-    case cannotAccessSecureVault
-    case unknownError(Error)
+    enum ImportErrorAction {
+        case bookmarks
+        case logins
+        case generic
+        
+        var pixelEventAction: Pixel.Event.DataImportAction {
+            switch self {
+            case .bookmarks: return .importBookmarks
+            case .logins: return .importLogins
+            case .generic: return .generic
+            }
+        }
+    }
+    
+    enum ImportErrorType: String {
+        case noFileFound
+        case cannotReadFile
+        case couldNotFindProfile
+        case browserNeedsToBeClosed
+        case needsLoginPrimaryPassword
+        case cannotAccessSecureVault
+        case cannotAccessCoreData
+        case couldNotGetDecryptionKey
+        case cannotDecryptFile
+    }
+    
+    static func generic(_ errorType: ImportErrorType) -> DataImportError {
+        return DataImportError(actionType: .generic, errorType: errorType)
+    }
+
+    static func bookmarks(_ errorType: ImportErrorType) -> DataImportError {
+        return DataImportError(actionType: .bookmarks, errorType: errorType)
+    }
+    
+    static func logins(_ errorType: ImportErrorType) -> DataImportError {
+        return DataImportError(actionType: .logins, errorType: errorType)
+    }
+    
+    let actionType: ImportErrorAction
+    let errorType: ImportErrorType
 
 }
 
 extension DataImportError: LocalizedError {
+
     public var errorDescription: String? {
-        switch self {
+        switch self.errorType {
         case .noFileFound:
             return "Could not find file"
         case .cannotReadFile:
@@ -236,10 +285,17 @@ extension DataImportError: LocalizedError {
             return "Failed to get primary password"
         case .cannotAccessSecureVault:
             return "Failed to read Secure Vault data"
-        case .unknownError(let error):
-            return error.localizedDescription
+        case .cannotAccessCoreData:
+            return "Failed to access Bookmarks database"
+        case .couldNotFindProfile:
+            return "Could not find browser profile"
+        case .couldNotGetDecryptionKey:
+            return "Could not read decryption key"
+        case .cannotDecryptFile:
+            return "Could not decrypt file"
         }
     }
+
 }
 
 /// Represents an object able to import data from an outside source. The outside source may be capable of importing multiple types of data.

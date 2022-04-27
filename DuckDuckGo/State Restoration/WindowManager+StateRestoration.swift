@@ -34,6 +34,7 @@ extension WindowsManager {
         let isOriginalKeyWindowPresent = Self.windows.contains(where: {$0.isKeyWindow})
 
         var newKeyWindow: NSWindow?
+        var newKeyWindowModel: TabCollectionViewModel?
         for (idx, item) in state.windows.enumerated() {
             guard let window = self.openNewWindow(with: item.model, showWindow: false) else { continue }
             window.setContentSize(item.frame.size)
@@ -41,10 +42,12 @@ extension WindowsManager {
 
             if idx == state.keyWindowIndex {
                 newKeyWindow = window
+                newKeyWindowModel = item.model
             }
         }
         if !isOriginalKeyWindowPresent {
             newKeyWindow?.makeKeyAndOrderFront(self)
+            newKeyWindowModel?.setUpLazyLoadingIfNeeded()
         }
 
         if !state.windows.isEmpty {
