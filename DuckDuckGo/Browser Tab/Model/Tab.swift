@@ -905,8 +905,10 @@ extension Tab: WKNavigationDelegate {
                                             onFinishExtracting: { [weak self] in self?.isAMPProtectionExtracting = false },
                                             onLinkRewrite: { [weak self] url, _ in
                                                 guard let self = self else { return }
-                                                if isRequestingNewTab {
-                                                    self.delegate?.tab(self, requestedNewTabWith: .url(url), selected: NSApp.isShiftPressed)
+                                                if isRequestingNewTab || !navigationAction.isTargetingMainFrame {
+                                                    self.delegate?.tab(self,
+                                                                       requestedNewTabWith: .url(url),
+                                                                       selected: NSApp.isCommandPressed || !navigationAction.isTargetingMainFrame)
                                                 } else {
                                                     webView.load(url)
                                                 }
