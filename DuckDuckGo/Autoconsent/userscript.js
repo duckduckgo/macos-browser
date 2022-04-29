@@ -10,13 +10,8 @@ window.webkit.messageHandlers.autoconsentBackgroundMessage.postMessage(JSON.stri
 }))
 
 const isMainDocument = window === window.top
-if (isMainDocument) {
-    setTimeout(() => {
-        window.webkit.messageHandlers.autoconsentPageReady.postMessage(window.location.href)
-    }, 100)
-}
 
-window.onload = () => {
+function onLoad() {
     window.webkit.messageHandlers.autoconsentBackgroundMessage.postMessage(JSON.stringify({
         type: 'webNavigation.onCompleted',
         url: window.location.href
@@ -24,4 +19,10 @@ window.onload = () => {
     if (isMainDocument) {
         window.webkit.messageHandlers.autoconsentPageReady.postMessage(window.location.href)
     }
+}
+
+if (document.readyState === 'loading') {
+    window.addEventListener('DOMContentLoaded', onLoad);
+} else {
+    onLoad();
 }
