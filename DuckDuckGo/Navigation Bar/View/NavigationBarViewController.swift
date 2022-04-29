@@ -557,7 +557,7 @@ final class NavigationBarViewController: NSViewController {
         if autofillPreferences.askToSaveUsernamesAndPasswords, let credentials = data.credentials {
             os_log("Presenting Save Credentials popover", log: .passwordManager)
             showSaveCredentialsPopover()
-            saveCredentialsPopover.viewController.update(credentials: credentials, editable: !data.automaticallySavedCredentials)
+            saveCredentialsPopover.viewController.update(credentials: credentials, automaticallySaved: data.automaticallySavedCredentials)
         } else if autofillPreferences.askToSavePaymentMethods, let card = data.creditCard {
             os_log("Presenting Save Payment Method popover", log: .passwordManager)
             showSavePaymentMethodPopover()
@@ -689,7 +689,7 @@ extension NavigationBarViewController {
         let mockCredentials = SecureVaultModels.WebsiteCredentials(account: account, password: "password".data(using: .utf8)!)
         
         showSaveCredentialsPopover()
-        saveCredentialsPopover.viewController.update(credentials: mockCredentials, editable: true)
+        saveCredentialsPopover.viewController.update(credentials: mockCredentials, automaticallySaved: false)
     }
     
     fileprivate func showMockCredentialsSavedPopover() {
@@ -697,7 +697,7 @@ extension NavigationBarViewController {
         let mockCredentials = SecureVaultModels.WebsiteCredentials(account: account, password: "password".data(using: .utf8)!)
         
         showSaveCredentialsPopover()
-        saveCredentialsPopover.viewController.update(credentials: mockCredentials, editable: false)
+        saveCredentialsPopover.viewController.update(credentials: mockCredentials, automaticallySaved: true)
     }
     
 }

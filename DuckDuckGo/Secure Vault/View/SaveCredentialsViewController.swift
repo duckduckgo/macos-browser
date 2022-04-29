@@ -70,7 +70,7 @@ final class SaveCredentialsViewController: NSViewController {
     }
     
     /// Note that if the credentials.account.id is not nil, then we consider this an update rather than a save.
-    func update(credentials: SecureVaultModels.WebsiteCredentials, editable: Bool) {
+    func update(credentials: SecureVaultModels.WebsiteCredentials, automaticallySaved: Bool) {
         self.credentials = credentials
         self.domainLabel.stringValue = credentials.account.domain
         self.usernameField.stringValue = credentials.account.username
@@ -79,7 +79,17 @@ final class SaveCredentialsViewController: NSViewController {
         self.loadFaviconForDomain(credentials.account.domain)
         
         fireproofCheck.state = FireproofDomains.shared.isFireproof(fireproofDomain: credentials.account.domain) ? .on : .off
-        updateViewState(editable: editable)
+        
+        // Only use the non-editable state if a username exists and the state is not editable.
+//        if let existingID = credentials.account.id, (credentials.account.username.isEmpty || automaticallySaved) {
+//            updateViewState(editable: true)
+//        } else {
+//            updateViewState(editable: false)
+//        }
+        
+        // Only use the non-editable state if a credential was automatically saved and it didn't already exist.
+        let condition = credentials.account.id != nil && !credentials.account.username.isEmpty && automaticallySaved 
+        updateViewState(editable: !condition)
     }
     
     private func updateViewState(editable: Bool) {
