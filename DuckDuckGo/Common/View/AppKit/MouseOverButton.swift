@@ -75,6 +75,10 @@ internal class MouseOverButton: NSButton {
 
     required init?(coder: NSCoder) {
         super.init(coder: coder)
+        self.setButtonType(.momentaryPushIn)
+        self.isBordered = false
+        self.bezelStyle = .shadowlessSquare
+
 
         configureLayers()
     }

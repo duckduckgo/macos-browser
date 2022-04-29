@@ -51,12 +51,21 @@ extension NSView {
     }
 
     func makeMeFirstResponder() {
+        // TODO: Check that no popovers is displayed and address is not being edited
+        // also don‘t update address field when edited!
         guard let window = window else {
             os_log("%s: Window not available", type: .error, className)
             return
         }
 
         window.makeFirstResponder(self)
+    }
+
+    func setDefaultKeyViewLoop() {
+        guard self.responds(to: #selector(_setDefaultKeyViewLoop)) else {
+            return
+        }
+        self._setDefaultKeyViewLoop()
     }
 
     func applyDropShadow() {

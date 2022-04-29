@@ -31,6 +31,7 @@ struct NSPathControlView: NSViewRepresentable {
         
         newPathControl.wantsLayer = true
         newPathControl.isEditable = false
+        // TODO: refuses?
         newPathControl.refusesFirstResponder = true
         newPathControl.layer?.cornerRadius = 3.0
         newPathControl.layer?.borderWidth = 1.0

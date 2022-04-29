@@ -229,7 +229,6 @@ final class MainViewController: NSViewController {
     }
 
     private func updateFindInPage() {
-
         guard let model = tabCollectionViewModel.selectedTabViewModel?.findInPage else {
             findInPageViewController?.makeMeFirstResponder()
             os_log("MainViewController: Failed to get find in page model", type: .error)
@@ -241,6 +240,14 @@ final class MainViewController: NSViewController {
         if model.visible {
             findInPageViewController?.makeMeFirstResponder()
         }
+    }
+
+    private weak var nonToolbarFirstResponder: NSResponder?
+    func toggleToolbarFocus() {
+//        if let nonToolbarFirstResponder = nonToolbarFirstResponder {
+//            <#body#>
+//        }
+        self.navigationBarViewController.view.nextValidKeyView?.makeMeFirstResponder()
     }
 
     private func updateBackMenuItem() {
@@ -314,7 +321,6 @@ final class MainViewController: NSViewController {
         case .preferences: browserTabViewController.preferencesViewController.view.makeMeFirstResponder()
         case .bookmarks: browserTabViewController.bookmarksViewController.view.makeMeFirstResponder()
         }
-
     }
 
 }

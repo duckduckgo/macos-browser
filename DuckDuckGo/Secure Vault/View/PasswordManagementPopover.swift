@@ -66,6 +66,7 @@ extension PasswordManagementPopover: NSPopoverDelegate {
                 self.close()
             }
         }
+        viewController.view.makeMeFirstResponder()
     }
 
     func popoverShouldClose(_ popover: NSPopover) -> Bool {

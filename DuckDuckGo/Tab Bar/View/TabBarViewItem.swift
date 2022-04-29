@@ -46,7 +46,12 @@ protocol TabBarViewItemDelegate: AnyObject {
 
 }
 final class TabBarView: NSView {
-
+//    override var acceptsFirstResponder: Bool {
+//        true
+//    }
+//    override var canBecomeKeyView: Bool {
+//        true
+//    }
 //    override func accessibilityRole() -> NSAccessibility.Role? {
 //        super.accessibilityRole()
 //    }

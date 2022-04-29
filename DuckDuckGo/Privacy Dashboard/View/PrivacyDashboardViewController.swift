@@ -77,10 +77,14 @@ final class PrivacyDashboardViewController: NSViewController {
         let url = Bundle.main.url(forResource: "popup", withExtension: "html", subdirectory: "duckduckgo-privacy-dashboard/build/macos/html")!
         webView.loadFileURL(url, allowingReadAccessTo: url.deletingLastPathComponent())
         prepareContentBlockingCancellable(publisher: tabViewModel.tab.cbrCompletionTokensPublisher)
+    }       
+
+    override func viewDidAppear() {
+        webView.makeMeFirstResponder()
     }
 
     override func viewWillDisappear() {
-        contentHeightConstraint.constant = Constants.initialContentHeight
+        contentHeightConstraint?.constant = Constants.initialContentHeight
         cancellables.removeAll()
         skipLayoutAnimation = true
     }
@@ -117,10 +121,11 @@ final class PrivacyDashboardViewController: NSViewController {
             assertionFailure("PrivacyDashboardViewController: tabViewModel not set")
             return
         }
-        guard let domain = tabViewModel?.tab.content.url?.host else {
-            privacyDashboardScript.setPermissions(Permissions(), authorizationState: [], domain: "", in: webView)
-            return
-        }
+        let domain = "permission.site"
+//        guard let domain = tabViewModel?.tab.content.url?.host else {
+//            privacyDashboardScript.setPermissions(Permissions(), authorizationState: [], domain: "", in: webView)
+//            return
+//        }
 
         let authState: PrivacyDashboardUserScript.AuthorizationState
         authState = PermissionManager.shared.persistedPermissionTypes.union(usedPermissions.keys).compactMap { permissionType in
@@ -158,10 +163,11 @@ final class PrivacyDashboardViewController: NSViewController {
     }
 
     private func sendProtectionStatus() {
-        guard let domain = tabViewModel?.tab.content.url?.host else {
-            assertionFailure("PrivacyDashboardViewController: no domain available")
-            return
-        }
+        let domain = "permission.site"
+//        guard let domain = tabViewModel?.tab.content.url?.host else {
+//            assertionFailure("PrivacyDashboardViewController: no domain available")
+//            return
+//        }
 
         let configuration = ContentBlocking.shared.privacyConfigurationManager.privacyConfig
         let isProtected = !configuration.isUserUnprotected(domain: domain)
@@ -169,19 +175,21 @@ final class PrivacyDashboardViewController: NSViewController {
     }
 
     private func sendPendingUpdates() {
-        guard let domain = tabViewModel?.tab.content.url?.host else {
-            assertionFailure("PrivacyDashboardViewController: no domain available")
-            return
-        }
+        let domain = "permission.site"
+//        guard let domain = tabViewModel?.tab.content.url?.host else {
+//            assertionFailure("PrivacyDashboardViewController: no domain available")
+//            return
+//        }
 
         self.privacyDashboardScript.setIsPendingUpdates(pendingUpdates.values.contains(domain), webView: self.webView)
     }
 
     private func sendParentEntity() {
-        guard let domain = tabViewModel?.tab.content.url?.host else {
-            assertionFailure("PrivacyDashboardViewController: no domain available")
-            return
-        }
+        let domain = "permission.site"
+//        guard let domain = tabViewModel?.tab.content.url?.host else {
+//            assertionFailure("PrivacyDashboardViewController: no domain available")
+//            return
+//        }
 
         let pageEntity = ContentBlocking.shared.trackerDataManager.trackerData.findEntity(forHost: domain)
         self.privacyDashboardScript.setParentEntity(pageEntity, webView: self.webView)
@@ -216,10 +224,11 @@ final class PrivacyDashboardViewController: NSViewController {
 extension PrivacyDashboardViewController: PrivacyDashboardUserScriptDelegate {
 
     func userScript(_ userScript: PrivacyDashboardUserScript, didChangeProtectionStateTo isProtected: Bool) {
-        guard let domain = tabViewModel?.tab.content.url?.host else {
-            assertionFailure("PrivacyDashboardViewController: no domain available")
-            return
-        }
+        let domain = "permission.site"
+//        guard let domain = tabViewModel?.tab.content.url?.host else {
+//            assertionFailure("PrivacyDashboardViewController: no domain available")
+//            return
+//        }
 
         let configuration = ContentBlocking.shared.privacyConfigurationManager.privacyConfig
         if isProtected {
@@ -234,10 +243,11 @@ extension PrivacyDashboardViewController: PrivacyDashboardUserScriptDelegate {
     }
 
     func userScript(_ userScript: PrivacyDashboardUserScript, didSetPermission permission: PermissionType, to state: PermissionAuthorizationState) {
-        guard let domain = tabViewModel?.tab.content.url?.host else {
-            assertionFailure("PrivacyDashboardViewController: no domain available")
-            return
-        }
+        let domain = "permission.site"
+//        guard let domain = tabViewModel?.tab.content.url?.host else {
+//            assertionFailure("PrivacyDashboardViewController: no domain available")
+//            return
+//        }
 
         PermissionManager.shared.setPermission(state.persistedPermissionDecision, forDomain: domain, permissionType: permission)
     }
@@ -248,13 +258,13 @@ extension PrivacyDashboardViewController: PrivacyDashboardUserScriptDelegate {
 
     func userScript(_ userScript: PrivacyDashboardUserScript, setHeight height: Int) {
         if skipLayoutAnimation {
-            contentHeightConstraint.constant = CGFloat(height)
+            contentHeightConstraint?.constant = CGFloat(height)
             skipLayoutAnimation = false
         } else {
             NSAnimationContext.runAnimationGroup { [weak self] context in
                 context.duration = 1/3
                 context.timingFunction = CAMediaTimingFunction(name: .easeInEaseOut)
-                self?.contentHeightConstraint.animator().constant = CGFloat(height)
+                self?.contentHeightConstraint?.animator().constant = CGFloat(height)
             }
         }
     }

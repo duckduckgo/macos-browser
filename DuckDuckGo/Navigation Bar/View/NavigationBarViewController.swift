@@ -21,6 +21,25 @@ import Combine
 import os.log
 import BrowserServicesKit
 
+final class NavigationView: ColorView {
+    override func viewDidMoveToWindow() {
+        super.viewDidMoveToWindow()
+//        window!.initialFirstResponder = self.subviews[1].subviews[0]
+    }
+    override func accessibilityRole() -> NSAccessibility.Role? {
+        .toolbar
+    }
+    override func isAccessibilityElement() -> Bool {
+        true
+    }
+    override func accessibilitySelectedChildren() -> [Any]? {
+        super.accessibilitySelectedChildren()
+    }
+    override func setAccessibilitySelectedChildren(_ accessibilitySelectedChildren: [Any]?) {
+        super.setAccessibilitySelectedChildren(accessibilitySelectedChildren)
+    }
+}
+
 // swiftlint:disable type_body_length
 final class NavigationBarViewController: NSViewController {
 
@@ -237,7 +256,7 @@ final class NavigationBarViewController: NSViewController {
         showBookmarkListPopover()
     }
 
-    @IBAction func passwordManagementButtonAction(_ sender: NSButton) {
+    @IBAction func passwordManagementButtonAction(_ sender: Any?) {
         // Use the category that is already selected
 
         if passwordManagementPopover.isShown {
@@ -340,7 +359,7 @@ final class NavigationBarViewController: NSViewController {
         Pixel.fire(.bookmarksList(source: .button))
     }
 
-    func showPasswordManagementPopover(sender: Any, selectedCategory: SecureVaultSorting.Category?) {
+    func showPasswordManagementPopover(sender: Any?, selectedCategory: SecureVaultSorting.Category?) {
         guard closeTransientPopovers() else { return }
         passwordManagementButton.isHidden = false
         passwordManagementPopover.select(category: selectedCategory)

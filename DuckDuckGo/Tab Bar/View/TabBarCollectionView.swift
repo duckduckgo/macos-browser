@@ -22,7 +22,7 @@ import os.log
 final class TabBarCollectionView: NSCollectionView {
 
     override var acceptsFirstResponder: Bool {
-        return false
+        return true
     }
     
     override func awakeFromNib() {
@@ -50,6 +50,7 @@ final class TabBarCollectionView: NSCollectionView {
         var children = section.accessibilityChildren() ?? []
         if let newTab = children.last as? NSAccessibilityElement,
            case .some(.group) = newTab.accessibilityRole(),
+           // TODO: it creates a viewForSupplementaryElementOfKind
            let buttonCell = newTab.accessibilityChildren()?.first as? NSButtonCell,
            let newTabButton = buttonCell.controlView,
            let fixedNewTabButton = ((self.window as? MainWindow)?.contentViewController as? MainViewController)?.tabBarViewController.plusButton {

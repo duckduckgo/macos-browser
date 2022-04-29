@@ -40,7 +40,7 @@ struct PasswordManagementLoginItemView: View {
                 if editMode {
 
                     RoundedRectangle(cornerRadius: 8)
-                        .foregroundColor(Color(NSColor.editingPanelColor))
+                        .foregroundColor(Color(.editingPanelColor))
                         .shadow(radius: 6)
 
                 }
@@ -116,11 +116,13 @@ private struct Buttons: View {
                     model.requestDelete()
                 }
                 .buttonStyle(StandardButtonStyle())
+                .focusable()
 
                 Button(UserText.pmEdit) {
                     model.edit()
                 }
                 .buttonStyle(StandardButtonStyle())
+                .focusable()
 
             }
 
@@ -154,6 +156,7 @@ private struct UsernameView: View {
 
                 HStack(spacing: 6) {
                     Text(model.username)
+                        .focusable(true)
 
                     if isHovering {
                         Button {
@@ -223,8 +226,10 @@ private struct PasswordView: View {
 
                     if isPasswordVisible {
                         Text(model.password)
+                            .focusable()
                     } else {
                         Text(model.password.isEmpty ? "" : "••••••••••••")
+                            .focusable()
                     }
 
                     if isHovering || isPasswordVisible {
@@ -278,9 +283,11 @@ private struct WebsiteView: View {
                 TextButton(model.domain) {
                     model.openURL(domainURL)
                 }
+                .focusable()
                 .padding(.bottom, interItemSpacing)
             } else {
                 Text(model.domain)
+                    .focusable()
                     .padding(.bottom, interItemSpacing)
             }
         }

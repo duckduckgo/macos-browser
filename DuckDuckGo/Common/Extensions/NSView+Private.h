@@ -1,7 +1,7 @@
 //
-//  NSWindowExtension.swift
+//  NSView+Private.h
 //
-//  Copyright © 2021 DuckDuckGo. All rights reserved.
+//  Copyright © 2022 DuckDuckGo. All rights reserved.
 //
 //  Licensed under the Apache License, Version 2.0 (the "License");
 //  you may not use this file except in compliance with the License.
@@ -16,21 +16,10 @@
 //  limitations under the License.
 //
 
-import Cocoa
+#import <AppKit/AppKit.h>
 
-extension NSWindow {
+@interface NSView (Private)
 
-    var titlebarView: NSView? {
-        return self.standardWindowButton(.closeButton)?.superview
-    }
+- (void)_setDefaultKeyViewLoop;
 
-    var isPopUpWindow: Bool {
-        return self is PopUpWindow
-    }
-
-    func setFrameOrigin(droppingPoint: NSPoint) {
-        let frameOrigin = NSPoint(x: droppingPoint.x - frame.size.width/2, y: droppingPoint.y - frame.size.height)
-        setFrameOrigin(frameOrigin)
-    }
-
-}
+@end

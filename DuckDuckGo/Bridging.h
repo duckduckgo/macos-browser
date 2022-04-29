@@ -4,6 +4,7 @@
 
 #import "BloomFilterWrapper.h"
 
+#import "NSView+Private.h"
 #import "WKWebView+Private.h"
 #import "NSException+Catch.h"
 #import "_WKDownload.h"

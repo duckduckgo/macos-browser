@@ -23,6 +23,10 @@ import WebKit
 
 final class WKWebViewPrivateMethodsAvailabilityTests: XCTestCase {
 
+    func testNSViewRespondsTo_setDefaultKeyViewLoop() {
+        XCTAssertTrue(NSView.instancesRespond(to: #selector(NSView._setDefaultKeyViewLoop)))
+    }
+
     func testWebViewRespondsTo_sessionStateData() {
         let webView = WebView.init(frame: CGRect(), configuration: .init())
 

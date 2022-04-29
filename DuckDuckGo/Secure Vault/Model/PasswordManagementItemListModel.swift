@@ -257,7 +257,16 @@ final class PasswordManagementItemListModel: ObservableObject {
         }
     }
 
-    @Published private(set) var selected: SecureVaultItem?
+    @Published var isFirstResponder: Bool = false
+    private var selectionIndex: Int?
+    @Published private(set) var selected: SecureVaultItem? {
+        didSet {
+            if let selectionIndex = selectionIndex,
+               selected == nil || items[safe: selectionIndex] != selected {
+                self.selectionIndex = nil
+            }
+        }
+    }
     @Published private(set) var emptyState: EmptyState = .none
     @Published var canChangeCategory: Bool = true
 
@@ -354,10 +363,50 @@ final class PasswordManagementItemListModel: ObservableObject {
         selected = nil
 
         if let firstSection = displayedItems.first, let selectedItem = firstSection.items.first {
+            selectionIndex = 0
             selected(item: selectedItem)
         } else {
             selected(item: nil)
         }
+    }
+
+    func selectLast() {
+        selected = nil
+
+        if let selectedItem = self.items.last {
+            selectionIndex = self.items.count - 1
+            selected(item: selectedItem)
+        } else {
+            selected(item: nil)
+        }
+    }
+
+    func selectNext() {
+        guard let selectedItem = selected else {
+            selectFirst()
+            return
+        }
+        guard let selectionIndex = self.selectionIndex ?? items.firstIndex(of: selectedItem),
+              let item = items[safe: selectionIndex + 1]
+        else { return }
+
+        self.selected = nil
+        self.selectionIndex = selectionIndex
+        self.selected(item: item)
+    }
+
+    func selectPrevious() {
+        guard let selectedItem = selected else {
+            selectLast()
+            return
+        }
+        guard let selectionIndex = self.selectionIndex ?? items.firstIndex(of: selectedItem),
+              let item = items[safe: selectionIndex - 1]
+        else { return }
+
+        self.selected = nil
+        self.selectionIndex = selectionIndex
+        self.selected(item: item)
     }
     
     func clear() {

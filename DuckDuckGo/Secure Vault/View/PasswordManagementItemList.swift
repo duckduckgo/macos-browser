@@ -63,6 +63,7 @@ struct PasswordManagementItemListView: View {
                             }
                     }
                 }
+
             } else {
                 ScrollView {
                     PasswordManagementItemListStackView()
@@ -187,8 +188,17 @@ private struct ItemView: View {
     var body: some View {
  
         let selected = model.selected == item
-        let textColor = selected ? .white : Color(NSColor.controlTextColor)
+        let isFirstResponder = model.isFirstResponder
+        let textColor = selected
+            ? (isFirstResponder ? Color(.selectedMenuItemTextColor) : Color(.unemphasizedSelectedTextColor))
+            : Color(.controlTextColor)
         let font = Font.custom("SFProText-Regular", size: 13)
+        let bgStyle = selected
+            ? PasswordManagerItemButtonStyle(bgColor: isFirstResponder
+                                                          ? Color.accentColor
+                                                          : Color(.unemphasizedSelectedContentBackgroundColor))
+            // Almost clear, so that whole view is clickable
+            : PasswordManagerItemButtonStyle(bgColor: Color(.windowBackgroundColor.withAlphaComponent(0.001)))
 
         Button(action: action, label: {
             HStack(spacing: 0) {
@@ -233,10 +243,7 @@ private struct ItemView: View {
             }
         })
             .frame(maxHeight: 48)
-            .buttonStyle(selected ?
-                         PasswordManagerItemButtonStyle(bgColor: Color.accentColor) :
-                            // Almost clear, so that whole view is clickable
-                         PasswordManagerItemButtonStyle(bgColor: Color(NSColor.windowBackgroundColor.withAlphaComponent(0.001))))
+            .buttonStyle(bgStyle)
     }
 
 }
@@ -256,51 +263,95 @@ private struct PasswordManagerItemButtonStyle: ButtonStyle {
     }
 }
 
-struct PasswordManagementSortButton: View {
+struct PasswordManagementSortButton: NSViewRepresentable {
     
     @EnvironmentObject var model: PasswordManagementItemListModel
 
     @State var sortHover: Bool = false
     
     let imageName: String
-    
-    var body: some View {
-        
-        ZStack {
-            Image(imageName)
-            
-            // The image is added elsewhere, because MenuButton has a bug with using Images as labels.
-            MenuButton(label: Image(nsImage: NSImage())) {
-                Picker("", selection: $model.sortDescriptor.parameter) {
-                    ForEach(SecureVaultSorting.SortParameter.allCases, id: \.self) { parameter in
-                        Text(menuTitle(for: parameter.title, checked: parameter == model.sortDescriptor.parameter))
-                    }
-                }
-                .labelsHidden()
-                .pickerStyle(.radioGroup)
-                
-                Divider()
-                
-                Picker("", selection: $model.sortDescriptor.order) {
-                    ForEach(SecureVaultSorting.SortOrder.allCases, id: \.self) { order in
-                        let orderTitle = order.title(for: model.sortDescriptor.parameter.type)
-                        let labelTitle = menuTitle(for: orderTitle, checked: order == model.sortDescriptor.order)
-                        Text(labelTitle)
-                    }
-                }
-                .labelsHidden()
-                .pickerStyle(.radioGroup)
+
+    func makeNSView(context: Context) -> some NSView {
+        let view = NSView(frame: CGRect(x: 0, y: 0, width: 24, height: 24))
+
+        var objects: NSArray?
+        NSNib(nibNamed: "PasswordSortButton", bundle: .main)?.instantiate(withOwner: nil, topLevelObjects: &objects)
+        let btn = ((objects as? [Any]?)!!.first(where: { $0 is NSButton }) as? NSButton)!
+        btn.image = NSImage(named: imageName)!
+
+//        let btn = MouseOverButton(frame: CGRect(x: 0, y: 0, width: 24, height: 24))
+//
+//        btn.mouseOverColor = .buttonMouseOverColor
+//        btn.mouseDownColor = .buttonMouseDownColor
+//        btn.cornerRadius = 4
+//
+////        btn.addConstraint(.init(item: btn, attribute: .height, relatedBy: .equal, toItem: nil, attribute: .notAnAttribute, multiplier: 1.0, constant: 24))
+//        view.addSubview(btn)
+//        view.addConstraint(.init(item: view, attribute: .height, relatedBy: .equal, toItem: nil, attribute: .notAnAttribute, multiplier: 1.0, constant: 24))
+
+        final class ButtonDelegate: NSObject {
+            @objc func action(_ sender: NSButton) {
+                let location = NSPoint(x: sender.frame.origin.x, y: sender.frame.origin.y - (sender.frame.height / 2) + 6)
+                sender.menu?.popUp(positioning: nil, at: location, in: sender.superview)
             }
-            .menuButtonStyle(BorderlessButtonMenuButtonStyle())
-            .padding(5)
-            .background(RoundedRectangle(cornerRadius: 5).foregroundColor(sortHover ? Color("SecureVaultCategoryDefaultColor") : Color.clear))
-            .onHover { isOver in
-                sortHover = isOver
-            }
-            .foregroundColor(.red)
         }
-        
+        let delegate = ButtonDelegate()
+
+        let menu = NSMenu()
+        menu.addItem(.init(title: "test", action: nil, target: nil, keyEquivalent: ""))
+        menu.addItem(.separator())
+        menu.addItem(.init(title: "test 2", action: nil, target: nil, keyEquivalent: ""))
+        btn.menu = menu
+        btn.sendAction(on: .leftMouseDown)
+        btn.target = delegate
+        btn.action = #selector(ButtonDelegate.action(_:))
+        btn.cell?.representedObject = delegate
+
+        return btn
     }
+
+    func updateNSView(_ nsView: NSViewType, context: Context) {
+        guard let btn = nsView as? NSButton else { return }
+
+        btn.image = NSImage(named: imageName)!
+    }
+//    var body: some View {
+//
+//        ZStack {
+//            Image(imageName)
+//
+//            // The image is added elsewhere, because MenuButton has a bug with using Images as labels.
+//            MenuButton(label: Image(nsImage: NSImage())) {
+//                Picker("", selection: $model.sortDescriptor.parameter) {
+//                    ForEach(SecureVaultSorting.SortParameter.allCases, id: \.self) { parameter in
+//                        Text(menuTitle(for: parameter.title, checked: parameter == model.sortDescriptor.parameter))
+//                    }
+//                }
+//                .labelsHidden()
+//                .pickerStyle(.radioGroup)
+//
+//                Divider()
+//
+//                Picker("", selection: $model.sortDescriptor.order) {
+//                    ForEach(SecureVaultSorting.SortOrder.allCases, id: \.self) { order in
+//                        let orderTitle = order.title(for: model.sortDescriptor.parameter.type)
+//                        let labelTitle = menuTitle(for: orderTitle, checked: order == model.sortDescriptor.order)
+//                        Text(labelTitle)
+//                    }
+//                }
+//                .labelsHidden()
+//                .pickerStyle(.radioGroup)
+//            }
+//            .menuButtonStyle(BorderlessButtonMenuButtonStyle())
+//            .padding(5)
+//            .background(RoundedRectangle(cornerRadius: 5).foregroundColor(sortHover ? Color("SecureVaultCategoryDefaultColor") : Color.clear))
+//            .onHover { isOver in
+//                sortHover = isOver
+//            }
+//            .foregroundColor(.red)
+//        }
+//
+//    }
     
     // The SwiftUI MenuButton view doesn't allow pickers which have checkmarks at the top level; they get put into a submenu.
     // This title is used in place of a nested picker.

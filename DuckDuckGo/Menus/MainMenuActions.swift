@@ -350,6 +350,10 @@ extension MainViewController {
         Pixel.fire(.manageBookmarks(source: .mainMenu))
     }
 
+    @IBAction func openLoginsPopover(_ sender: NSMenuItem) {
+        navigationBarViewController.passwordManagementButtonAction(NSApp.menu)
+    }
+
     // MARK: - Window
 
     @IBAction func showPreviousTab(_ sender: Any?) {
@@ -573,6 +577,10 @@ extension MainViewController: NSMenuItemValidation {
             return tabCollectionViewModel.selectedTabViewModel?.canBeBookmarked == true
         case #selector(MainViewController.openBookmark(_:)),
              #selector(MainViewController.showManageBookmarks(_:)):
+            return true
+
+        // Logins
+        case #selector(MainViewController.openLoginsPopover(_:)):
             return true
 
         // Reopen Last Removed Tab

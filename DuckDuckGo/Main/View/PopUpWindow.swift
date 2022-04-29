@@ -18,12 +18,6 @@
 
 import Cocoa
 
-extension NSWindow {
-    var isPopUpWindow: Bool {
-        return self is PopUpWindow
-    }
-}
-
 final class PopUpWindow: NSPanel {
 
     override var canBecomeKey: Bool {
@@ -41,12 +35,6 @@ final class PopUpWindow: NSPanel {
                    defer: true)
 
         setupWindow()
-    }
-
-    // To avoid beep sounds, this keyDown method catches events that go through the
-    // responder chain when no other responders process it
-    override func keyDown(with event: NSEvent) {
-        return
     }
 
     private func setupWindow() {
@@ -96,7 +84,7 @@ final class PopUpWindow: NSPanel {
 
     override func doCommand(by selector: Selector) {
         // don't close Popup Window on Esc press
-        guard selector != #selector(NSSavePanel.cancel(_:)) else { return }
+        guard selector != #selector(NSWindowSelectors.cancel) else { return }
         super.doCommand(by: selector)
     }
 

@@ -31,10 +31,6 @@ final class MainWindowController: NSWindowController {
         // swiftlint:enable force_cast
     }
 
-    var titlebarView: NSView? {
-        return window?.standardWindowButton(.closeButton)?.superview
-    }
-
     init(mainViewController: MainViewController, popUp: Bool, fireViewModel: FireViewModel = FireCoordinator.fireViewModel) {
         let makeWindow: (NSRect) -> NSWindow = popUp ? PopUpWindow.init(frame:) : MainWindow.init(frame:)
 
@@ -77,7 +73,8 @@ final class MainWindowController: NSWindowController {
         // Empty toolbar ensures that window buttons are centered vertically
         window?.toolbar = NSToolbar()
         window?.toolbar?.showsBaselineSeparator = true
-
+        // disable fake toolbar to receive accessibility focus
+        window?.titlebarView?.subviews.first(where: { $0.accessibilityRole() == .toolbar })?.setAccessibilityElement(false)
         moveTabBarView(toTitlebarView: true)
     }
 
@@ -132,7 +129,7 @@ final class MainWindowController: NSWindowController {
     }
 
     private func moveTabBarView(toTitlebarView: Bool) {
-        guard let newParentView = toTitlebarView ? titlebarView : mainViewController.view,
+        guard let newParentView = toTitlebarView ? window?.titlebarView : mainViewController.view,
               let tabBarViewController = mainViewController.tabBarViewController else {
             assertionFailure("Failed to move tab bar view")
             return
@@ -141,6 +138,8 @@ final class MainWindowController: NSWindowController {
         tabBarViewController.view.removeFromSuperview()
         if toTitlebarView {
             newParentView.addSubview(tabBarViewController.view)
+            // Allow Tab key iteration
+            newParentView.setDefaultKeyViewLoop()
         } else {
             newParentView.addSubview(tabBarViewController.view, positioned: .below, relativeTo: mainViewController.fireViewController.view)
         }
@@ -168,6 +167,19 @@ final class MainWindowController: NSWindowController {
 
     private func register() {
         WindowControllersManager.shared.register(self)
+    }
+
+    // Overriding these methods allows to avoid beep sounds as the Window
+    // Controller gets these methods through the responder chain called for
+    // unsupported keyDown events and command selectors (such as cancel:)
+    override func keyDown(with event: NSEvent) {
+    }
+    override func doCommand(by selector: Selector) {
+        switch selector {
+        case #selector(NSWindowSelectors.noop):
+            super.doCommand(by: selector)
+        default: break
+        }
     }
 
 }

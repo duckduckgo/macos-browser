@@ -763,7 +763,7 @@ extension AddressBarTextField: NSTextFieldDelegate {
         }
 
         if commandSelector == #selector(NSResponder.insertTab(_:)) {
-            window?.makeFirstResponder(nextKeyView)
+            window?.makeFirstResponder(nextValidKeyView)
             return false
         }
 

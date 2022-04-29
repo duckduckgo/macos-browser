@@ -23,6 +23,7 @@ protocol PasswordManagementItemModel: AnyObject {
     func createNew()
     func cancel()
     func save()
+    func requestDelete()
     func clearSecureVaultModel()
     func setSecureVaultModel<Model>(_ modelObject: Model)
 

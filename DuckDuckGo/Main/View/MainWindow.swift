@@ -28,6 +28,14 @@ final class MainWindow: NSWindow {
         return true
     }
 
+    var mainViewController: MainViewController? {
+        guard let mainViewController = contentViewController as? MainViewController else {
+            assertionFailure("Unexpected View Controller type")
+            return nil
+        }
+        return mainViewController
+    }
+
     init(frame: NSRect) {
         super.init(contentRect: frame,
                    styleMask: [.titled, .closable, .miniaturizable, .resizable, .fullSizeContentView],
@@ -37,15 +45,9 @@ final class MainWindow: NSWindow {
         setupWindow()
     }
 
-    // To avoid beep sounds, this keyDown method catches events that go through the
-    // responder chain when no other responders process it
-    override func keyDown(with event: NSEvent) {
-        return
-    }
-
     private func setupWindow() {
         allowsToolTipsWhenApplicationIsInactive = false
-        autorecalculatesKeyViewLoop = false
+        autorecalculatesKeyViewLoop = true
         isReleasedWhenClosed = false
         animationBehavior = .documentWindow
         hasShadow = true
@@ -88,7 +90,7 @@ final class MainWindow: NSWindow {
     }
 
     var newTabButton: NSButton? {
-        (self.contentViewController as? MainViewController)?.tabBarViewController.plusButton
+        mainViewController?.tabBarViewController.plusButton
     }
 
     override func accessibilityChildren() -> [Any]? {
@@ -98,6 +100,23 @@ final class MainWindow: NSWindow {
             children.remove(at: newTabIdx)
         }
         return children
+    }
+    
+    // Handle Keyboard toggle Toolbar focus (Ctrl+F5)
+    @objc(_handleFocusToolbarHotKey:)
+    func handleFocusToolbarHotKey(_ event: Any?) {
+        guard mainViewController?.children.isEmpty != false else {
+            return
+        }
+        mainViewController?.toggleToolbarFocus()
+    }
+
+    override func recalculateKeyViewLoop() {
+        mainViewController?.tabBarViewController.view.superview?.setDefaultKeyViewLoop()
+        super.recalculateKeyViewLoop()
+
+        mainViewController?.webContainerView.nextKeyView = mainViewController?.tabBarViewController.view
+        mainViewController?.tabBarViewController.view.nextKeyView = mainViewController?.navigationBarViewController.view.nextKeyView
     }
 
 }

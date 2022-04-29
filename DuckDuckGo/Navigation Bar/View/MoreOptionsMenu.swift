@@ -178,10 +178,11 @@ final class MoreOptionsMenu: NSMenu {
     }
 
     private func addUtilityItems() {
-        addItem(withTitle: UserText.bookmarks, action: #selector(openBookmarks), keyEquivalent: "")
+        addItem(withTitle: UserText.bookmarks, action: #selector(openBookmarks), keyEquivalent: "b")
             .targetting(self)
             .withImage(NSImage(named: "Bookmarks"))
             .firingPixel(Pixel.Event.MoreResult.bookmarksList)
+            .keyEquivalentModifierMask = [.command, .option]
 
         addItem(withTitle: UserText.downloads, action: #selector(openDownloads), keyEquivalent: "j")
             .targetting(self)
@@ -360,7 +361,7 @@ final class LoginsSubMenu: NSMenu {
     }
 
     private func updateMenuItems(with target: AnyObject) {
-        addItem(withTitle: UserText.passwordManagementAllItems, action: #selector(MoreOptionsMenu.openAutofillWithAllItems), keyEquivalent: "")
+        addItem(withTitle: UserText.passwordManagementAllItems, action: #selector(MoreOptionsMenu.openAutofillWithAllItems), keyEquivalent: "l")
             .targetting(target)
             .firingPixel(Pixel.Event.MoreResult.loginsMenuAllItems)
 

@@ -20,6 +20,7 @@ import Foundation
 import Combine
 import SwiftUI
 import BrowserServicesKit
+import Carbon.HIToolbox
 
 // swiftlint:disable file_length
 
@@ -27,6 +28,98 @@ protocol PasswordManagementDelegate: AnyObject {
 
     /// May not be called on main thread.
     func shouldClosePasswordManagementViewController(_: PasswordManagementViewController)
+
+}
+
+extension NSView {
+    open override var acceptsFirstResponder: Bool {
+//        if self.className.contains("SwiftUI") /*&& (self.className.contains("DocumentView") || self is NSScrollView)*/ {
+//            self.canBecomeKeyView = true
+//            return true
+//        }
+        return super.acceptsFirstResponder
+    }
+
+}
+
+//final class SwiftUIListContainer: NSView {
+//
+//    override var acceptsFirstResponder: Bool {
+//        true
+//    }
+//    override var canBecomeKeyView: Bool {
+//        true
+//    }
+//
+//    @Published var isFirstResponder: Bool = false
+//    private var keyDownSubject = PassthroughSubject<Int, Never>()
+//    var keyDownPublisher: AnyPublisher<Int, Never> {
+//        keyDownSubject.eraseToAnyPublisher()
+//    }
+//
+//    override func becomeFirstResponder() -> Bool {
+//        let became = super.becomeFirstResponder()
+//        if self.window?.firstResponder === self, !self.isFirstResponder {
+//            self.isFirstResponder = true
+//        }
+//        return became
+//    }
+//
+//    override func resignFirstResponder() -> Bool {
+//        let resigned = super.resignFirstResponder()
+//        if self.isFirstResponder {
+//            self.isFirstResponder = false
+//        }
+//        return resigned
+//    }
+//
+//    override func keyDown(with event: NSEvent) {
+//        keyDownSubject.send(Int(event.keyCode))
+//        super.keyDown(with: event)
+//    }
+//
+//}
+
+final class FocusView: NSView {
+
+    override var acceptsFirstResponder: Bool {
+        true
+    }
+    override var canBecomeKeyView: Bool {
+        true
+    }
+
+    @Published var isFirstResponder: Bool = false
+    private var keyDownSubject = PassthroughSubject<Int, Never>()
+    var keyDownPublisher: AnyPublisher<Int, Never> {
+        keyDownSubject.eraseToAnyPublisher()
+    }
+
+    override func becomeFirstResponder() -> Bool {
+        if super.becomeFirstResponder() {
+            self.isFirstResponder = true
+            return true
+        }
+        return false
+    }
+
+    override func resignFirstResponder() -> Bool {
+        let resigned = super.resignFirstResponder()
+        if self.isFirstResponder {
+            self.isFirstResponder = false
+        }
+        return resigned
+    }
+
+    override func keyDown(with event: NSEvent) {
+        keyDownSubject.send(Int(event.keyCode))
+        super.keyDown(with: event)
+    }
+
+    override func mouseDown(with event: NSEvent) {
+        self.makeMeFirstResponder()
+        super.mouseDown(with: event)
+    }
 
 }
 
@@ -45,6 +138,7 @@ final class PasswordManagementViewController: NSViewController {
     weak var delegate: PasswordManagementDelegate?
 
     @IBOutlet var listContainer: NSView!
+    @IBOutlet var listFocusView: FocusView!
     @IBOutlet var itemContainer: NSView!
     @IBOutlet var addVaultItemButton: NSButton!
     @IBOutlet var moreButton: NSButton!
@@ -55,6 +149,7 @@ final class PasswordManagementViewController: NSViewController {
     @IBOutlet var emptyStateTitle: NSTextField!
     @IBOutlet var emptyStateMessage: NSTextField!
     @IBOutlet var emptyStateButton: NSButton!
+    @IBOutlet var unlockButton: NSButton!
 
     @IBOutlet var lockScreen: NSView!
     @IBOutlet var lockScreenIconImageView: NSImageView! {
@@ -68,36 +163,6 @@ final class PasswordManagementViewController: NSViewController {
     }
 
     @IBOutlet var lockScreenDurationLabel: NSTextField!
-    @IBOutlet var lockScreenOpenInPreferencesTextView: NSTextView! {
-        didSet {
-            lockScreenOpenInPreferencesTextView.delegate = self
-
-            let linkAttributes: [NSAttributedString.Key: Any] = [
-                .foregroundColor: NSColor(named: "LinkBlueColor")!,
-                .cursor: NSCursor.pointingHand
-            ]
-
-            lockScreenOpenInPreferencesTextView.linkTextAttributes = linkAttributes
-
-            let string = NSMutableAttributedString(string: UserText.pmLockScreenPreferencesLabel + " ")
-            let linkString = NSMutableAttributedString(string: UserText.pmLockScreenPreferencesLink, attributes: [
-                .link: URL.preferencePane(.autofill)
-            ])
-
-            let paragraphStyle = NSMutableParagraphStyle()
-            paragraphStyle.alignment = .center
-
-            string.append(linkString)
-            string.addAttributes([
-                .cursor: NSCursor.arrow,
-                .paragraphStyle: paragraphStyle,
-                .font: NSFont.systemFont(ofSize: 13, weight: .regular),
-                .foregroundColor: NSColor(named: "BlackWhite60")!
-            ], range: NSRange(location: 0, length: string.length))
-
-            lockScreenOpenInPreferencesTextView.textStorage?.setAttributedString(string)
-        }
-    }
 
     var emptyStateCancellable: AnyCancellable?
     var editingCancellable: AnyCancellable?
@@ -123,6 +188,15 @@ final class PasswordManagementViewController: NSViewController {
     }
 
     var listView: NSView?
+//    override func keyDown(with event: NSEvent) {
+//        switch Int(event.keyCode) {
+//        case kVK_DownArrow:
+//
+//        case kVK_UpArrow:
+//            listModel?.selectFirst()
+//        }
+//        super.keyDown(with: event)
+//    }
 
     var itemModel: PasswordManagementItemModel? {
         didSet {
@@ -166,6 +240,7 @@ final class PasswordManagementViewController: NSViewController {
             self?.refreshData()
         }
     }
+    private var obs: AnyCancellable?
 
     private func toggleLockScreen(hidden: Bool) {
         if hidden {
@@ -179,14 +254,20 @@ final class PasswordManagementViewController: NSViewController {
         lockScreen.isHidden = false
         searchField.isEnabled = false
         addVaultItemButton.isEnabled = false
+        listContainer.isHidden = true
+        itemContainer.isHidden = true
 
-        view.window?.makeFirstResponder(nil)
+        view.window?.makeFirstResponder(NSApp.isFullKeyboardAccessEnabled ? unlockButton : nil)
     }
 
     private func hideLockScreen() {
+//        _=Self.swizzleCanBecomeKeyView
+
         lockScreen.isHidden = true
         searchField.isEnabled = true
         addVaultItemButton.isEnabled = true
+        listContainer.isHidden = false
+        itemContainer.isHidden = false
     }
 
     override func viewWillAppear() {
@@ -199,9 +280,43 @@ final class PasswordManagementViewController: NSViewController {
             listContainer.addSubview(listView)
         }
     }
-
+    @IBOutlet var settingsButton: NSButton!
+    var obs2: AnyCancellable!
     override func viewDidAppear() {
         super.viewDidAppear()
+
+        // obs = view.window?.publisher(for: \.firstResponder).sink { [weak self] responder in
+        obs = listFocusView.$isFirstResponder.sink { [weak self] isFirstResponder in
+            self?.listModel?.isFirstResponder = isFirstResponder // self?.listView!.subviews[4] === responder
+//            print("first responder:", responder)
+        }
+        obs2 = listFocusView.keyDownPublisher.sink { [weak self] key in
+            guard let self = self else { return }
+            print("keyDown", key)
+            switch key {
+            case kVK_DownArrow:
+                if NSApp.isCommandPressed {
+                    fallthrough
+                }
+                self.listModel?.selectNext()
+            case kVK_End:
+                self.listModel?.selectLast()
+
+            case kVK_UpArrow:
+                if NSApp.isCommandPressed {
+                    fallthrough
+                }
+                self.listModel?.selectPrevious()
+            case kVK_Home:
+                self.listModel?.selectFirst()
+
+            case kVK_Delete, kVK_ForwardDelete:
+                self.itemModel?.requestDelete()
+
+            default:
+                break
+            }
+        }
 
         if !isDirty {
             itemModel?.clearSecureVaultModel()
@@ -216,6 +331,13 @@ final class PasswordManagementViewController: NSViewController {
         }
 
         promptForAuthenticationIfNecessary()
+
+        settingsButton.nextKeyView = moreButton
+
+//        self.listView!.subviews[2].subviews[0].nextKeyView = self.listView!.subviews[4]
+//        view.window?.makeFirstResponder(self.listView!.subviews[4])
+
+        view.window?.autorecalculatesKeyViewLoop = true
     }
 
     override func viewDidDisappear() {
@@ -270,6 +392,13 @@ final class PasswordManagementViewController: NSViewController {
         } else {
             DeviceAuthenticator.shared.lock()
         }
+    }
+
+    @IBAction func openInSettingsAction(_ sender: NSButton) {
+        WindowControllersManager.shared.showPreferencesTab(withSelectedPane: .autofill)
+        self.dismiss()
+
+        Pixel.fire(.passwordManagerLockScreenPreferencesButtonPressed)
     }
 
     private func refetchWithText(_ text: String,
@@ -902,27 +1031,6 @@ extension PasswordManagementViewController: NSTextFieldDelegate {
 
     func controlTextDidChange(_ obj: Notification) {
         updateFilter()
-    }
-
-}
-
-extension PasswordManagementViewController: NSTextViewDelegate {
-
-    func textView(_ textView: NSTextView, clickedOnLink link: Any, at charIndex: Int) -> Bool {
-        if let link = link as? URL, let pane = PreferencePaneIdentifier(url: link) {
-            WindowControllersManager.shared.showPreferencesTab(withSelectedPane: pane)
-            self.dismiss()
-
-            Pixel.fire(.passwordManagerLockScreenPreferencesButtonPressed)
-        }
-
-        return true
-    }
-
-    func textView(_ textView: NSTextView,
-                  willChangeSelectionFromCharacterRange oldSelectedCharRange: NSRange,
-                  toCharacterRange newSelectedCharRange: NSRange) -> NSRange {
-        return NSRange(location: 0, length: 0)
     }
 
 }
