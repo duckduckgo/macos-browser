@@ -103,6 +103,8 @@ final class SaveCredentialsViewController: NSViewController {
             Pixel.fire(.fireproof(kind: .pwm, suggested: .pwm))
             FireproofDomains.shared.add(domain: account.domain)
         } else {
+            // If the Fireproof checkbox has been unchecked, and the domain is Fireproof, then un-Fireproof it.
+            guard FireproofDomains.shared.isFireproof(fireproofDomain: account.domain) else { return }
             FireproofDomains.shared.remove(domain: account.domain)
         }
     }
