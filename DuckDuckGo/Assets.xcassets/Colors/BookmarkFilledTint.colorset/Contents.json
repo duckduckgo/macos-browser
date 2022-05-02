@@ -6,6 +6,19 @@
         "reference" : "controlAccentColor"
       },
       "idiom" : "universal"
+    },
+    {
+      "appearances" : [
+        {
+          "appearance" : "contrast",
+          "value" : "high"
+        }
+      ],
+      "color" : {
+        "platform" : "osx",
+        "reference" : "controlAccentColor"
+      },
+      "idiom" : "universal"
     }
   ],
   "info" : {

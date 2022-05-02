@@ -22,13 +22,11 @@ import XCTest
 final class TabTests: XCTestCase {
 
     func testWhenSettingURLThenTabTypeChangesToStandard() {
-        let tab = Tab(content: .preferences)
-        XCTAssertEqual(tab.content, .preferences)
+        let tab = Tab(content: .preferences(pane: .autofill))
+        XCTAssertEqual(tab.content, .preferences(pane: .autofill))
 
         tab.url = URL.duckDuckGo
         XCTAssertEqual(tab.content, .url(.duckDuckGo))
-
-        tab.tabWillClose()
     }
 
     // MARK: - Equality
@@ -38,8 +36,6 @@ final class TabTests: XCTestCase {
         let tab2 = tab
 
         XCTAssert(tab == tab2)
-
-        tab.tabWillClose()
     }
 
     func testWhenTabsArentIdenticalThenTheyArentEqual() {
@@ -49,9 +45,6 @@ final class TabTests: XCTestCase {
         tab2.url = URL.duckDuckGo
 
         XCTAssert(tab != tab2)
-
-        tab.tabWillClose()
-        tab2.tabWillClose()
     }
     
 }

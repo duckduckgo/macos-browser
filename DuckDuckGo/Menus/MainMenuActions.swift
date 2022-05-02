@@ -84,7 +84,7 @@ extension AppDelegate {
     }
 
     @IBAction func openPreferences(_ sender: Any?) {
-        let tabCollection = TabCollection(tabs: [Tab(content: .preferences)])
+        let tabCollection = TabCollection(tabs: [Tab(content: .anyPreferencePane)])
         let tabCollectionViewModel = TabCollectionViewModel(tabCollection: tabCollection)
         WindowsManager.openNewWindow(with: tabCollectionViewModel)
     }
@@ -166,7 +166,7 @@ extension MainViewController {
     // MARK: - Main Menu
 
     @IBAction func openPreferences(_ sender: Any?) {
-        browserTabViewController.openNewTab(with: .preferences, selected: true)
+        browserTabViewController.openNewTab(with: .anyPreferencePane, selected: true)
     }
 
     // MARK: - File
@@ -506,11 +506,10 @@ extension MainViewController {
         store.deleteExistingMetadata()
     }
 
-    // Used to test the lock screen upgrade process. Users with the legacy ATB format need to be unlocked.
-    @IBAction func setFakeUserDefaultsATBValues(_ sender: Any?) {
-        var legacyStore = LocalStatisticsStore.LegacyStatisticsStore()
-        legacyStore.atb = "fake-atb-value"
-        legacyStore.installDate = Date()
+    @IBAction func showSaveCredentialsPopover(_ sender: Any?) {
+        #if DEBUG || REVIEW
+        NotificationCenter.default.post(name: .ShowSaveCredentialsPopover, object: nil)
+        #endif
     }
 
     // MARK: - Developer Tools

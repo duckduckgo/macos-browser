@@ -10,7 +10,7 @@ on:
 jobs:
   unit-tests:
 
-    runs-on: macos-latest
+    runs-on: macos-12
 
     steps:
     - name: Register SSH keys for submodules access

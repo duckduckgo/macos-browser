@@ -54,8 +54,8 @@ extension WindowControllersManager {
         showTab(with: .bookmarks)
     }
 
-    func showPreferencesTab() {
-        showTab(with: .preferences)
+    func showPreferencesTab(withSelectedPane pane: PreferencePaneIdentifier? = nil) {
+        showTab(with: .preferences(pane: pane))
     }
 
     /// Opens a bookmark in a tab, respecting the current modifier keys when deciding where to open the bookmark's URL.

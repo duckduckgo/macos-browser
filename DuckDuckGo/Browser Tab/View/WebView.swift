@@ -197,6 +197,12 @@ final class WebView: WKWebView {
 
     // MARK: - Fullscreen
 
+    /// actual view to be displayed as a Tab content
+    /// may be the WebView itself or FullScreen Placeholder view
+    var tabContentView: NSView {
+        return fullScreenPlaceholderView ?? self
+    }
+
     var fullscreenWindowController: NSWindowController? {
         guard let fullscreenWindowController = self.window?.windowController,
               fullscreenWindowController.className.contains("FullScreen")

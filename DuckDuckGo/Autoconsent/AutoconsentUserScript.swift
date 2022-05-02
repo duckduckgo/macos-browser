@@ -105,6 +105,10 @@ final class AutoconsentUserScript: NSObject, UserScriptWithAutoconsent {
             return
         }
 
+        guard url.absoluteString != "about:home" else {
+            return
+        }
+        
         self.actionInProgress = true
 
         Self.background.ready {

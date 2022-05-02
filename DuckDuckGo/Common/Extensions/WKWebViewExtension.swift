@@ -213,4 +213,9 @@ extension WKWebView {
         return self._printOperation(with: printInfo)
     }
 
+    var fullScreenPlaceholderView: NSView? {
+        guard self.responds(to: #selector(WKWebView._fullScreenPlaceholderView)) else { return nil }
+        return self._fullScreenPlaceholderView()
+    }
+
 }

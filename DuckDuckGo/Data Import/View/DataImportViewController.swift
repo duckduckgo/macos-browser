@@ -100,7 +100,7 @@ final class DataImportViewController: NSViewController {
                 }
             } catch {
                 os_log("dataImporter initialization failed: %{public}s", type: .error, error.localizedDescription)
-                self.presentAlert(for: .cannotAccessSecureVault)
+                self.presentAlert(for: .generic(.cannotAccessSecureVault))
             }
         }
     }
@@ -400,7 +400,7 @@ final class DataImportViewController: NSViewController {
 
                 NotificationCenter.default.post(name: .dataImportComplete, object: nil)
             case .failure(let error):
-                switch error {
+                switch error.errorType {
                 case .needsLoginPrimaryPassword:
                     self.presentAlert(for: error)
                 default:
@@ -414,7 +414,7 @@ final class DataImportViewController: NSViewController {
     private func presentAlert(for error: DataImportError) {
         guard let window = view.window else { return }
 
-        switch error {
+        switch error.errorType {
         case .needsLoginPrimaryPassword:
             let alert = NSAlert.passwordRequiredAlert(source: viewState.selectedImportSource)
             let response = alert.runModal()
@@ -427,6 +427,14 @@ final class DataImportViewController: NSViewController {
                 completeImport()
             }
         default:
+            let pixel = Pixel.Event.dataImportFailed(
+                action: error.actionType.pixelEventAction,
+                source: viewState.selectedImportSource.pixelEventSource
+            )
+
+            let parameters = ["error": error.errorType.rawValue]
+            Pixel.fire(pixel, withAdditionalParameters: parameters)
+
             let alert = NSAlert.importFailedAlert(source: viewState.selectedImportSource, errorMessage: error.localizedDescription)
             alert.beginSheetModal(for: window, completionHandler: nil)
         }
@@ -449,7 +457,7 @@ final class DataImportViewController: NSViewController {
         switch self.viewState.selectedImportSource {
         case .brave: Pixel.fire(.importedBookmarks(source: .brave))
         case .chrome: Pixel.fire(.importedBookmarks(source: .chrome))
-        case .csv, .lastPass, .onePassword: assertionFailure("Attempted to fire CSV bookmark import pixel")
+        case .csv, .lastPass, .onePassword: assertionFailure("Attempted to fire invalid bookmark import pixel")
         case .edge: Pixel.fire(.importedBookmarks(source: .edge))
         case .firefox: Pixel.fire(.importedBookmarks(source: .firefox))
         case .safari: Pixel.fire(.importedBookmarks(source: .safari))
@@ -476,7 +484,7 @@ extension DataImportViewController: CSVImportViewControllerDelegate {
             self.viewState.interactionState = .ableToImport
         } catch {
             self.viewState.interactionState = .unableToImport
-            self.presentAlert(for: .cannotAccessSecureVault)
+            self.presentAlert(for: .logins(.cannotAccessSecureVault))
         }
     }
 

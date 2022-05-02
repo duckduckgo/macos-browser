@@ -28,7 +28,7 @@ final class TabInstrumentation: TabInstrumentationProtocol {
 
     private var siteLoadingSPID: Any?
     private var currentURL: String?
-    private var currentTabIdentifier: UInt64
+    private(set) var currentTabIdentifier: UInt64
 
     init() {
         type(of: self).tabMaxIdentifier += 1
