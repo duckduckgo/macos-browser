@@ -437,13 +437,7 @@ final class Tab: NSObject, Identifiable {
         if shouldLoadURL(url, shouldLoadInBackground: shouldLoadInBackground) {
             let didRestore = restoreSessionStateDataIfNeeded()
             if url.isFileURL {
-                if url != webView.url {
-                    webView.loadFileURL(url, allowingReadAccessTo: URL(fileURLWithPath: "/"))
-                } else {
-                    DispatchQueue.main.asyncAfter(deadline: .now() + 3) {
-                        self.webView.reload()
-                    }
-                }
+                webView.loadFileURL(url, allowingReadAccessTo: URL(fileURLWithPath: "/"))
             } else {
                 if !didRestore {
                     webView.load(url)
