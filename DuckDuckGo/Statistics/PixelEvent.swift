@@ -135,6 +135,8 @@ extension Pixel {
         case exportedLogins(repetition: Repetition = .init(key: "exported-logins"))
         case importedBookmarks(repetition: Repetition = .init(key: "imported-bookmarks"), source: DataImportSource)
         case exportedBookmarks(repetition: Repetition = .init(key: "exported-bookmarks"))
+        
+        case dataImportFailed(action: DataImportAction, source: DataImportSource)
 
         case formAutofilled(kind: FormAutofillKind)
         case autofillItemSaved(kind: FormAutofillKind)
@@ -242,7 +244,7 @@ extension Pixel.Event {
             return "m_mac_crash"
 
         case .brokenSiteReport:
-            return "epbf"
+            return "epbf_macos_desktop"
 
         case .compileRulesWait(onboardingShown: let onboardingShown, waitTime: let waitTime, result: let result):
             return "m_mac_cbr-wait_\(onboardingShown)_\(waitTime)_\(result)"
@@ -300,6 +302,9 @@ extension Pixel.Event {
 
         case .exportedBookmarks(repetition: let repetition):
             return "m_mac_exported-bookmarks_\(repetition)"
+            
+        case .dataImportFailed(action: let action, source: let source):
+            return "m_mac_data-import-failed_\(action)_\(source)"
 
         case .formAutofilled(kind: let kind):
             return "m_mac_autofill_\(kind)"

@@ -142,6 +142,10 @@ final class NavigationBarViewController: NSViewController {
         optionsButton.sendAction(on: .leftMouseDown)
         bookmarkListButton.sendAction(on: .leftMouseDown)
         downloadsButton.sendAction(on: .leftMouseDown)
+        
+        #if DEBUG || REVIEW
+        addDebugNotificationListeners()
+        #endif
     }
 
     override func viewWillAppear() {
@@ -329,6 +333,9 @@ final class NavigationBarViewController: NSViewController {
     func showBookmarkListPopover() {
         guard closeTransientPopovers() else { return }
         bookmarkListButton.isHidden = false
+        if let tab = tabCollectionViewModel.selectedTabViewModel?.tab {
+            bookmarkListPopover.viewController.currentTabWebsite = .init(tab)
+        }
         bookmarkListPopover.show(relativeTo: bookmarkListButton.bounds.insetFromLineOfDeath(), of: bookmarkListButton, preferredEdge: .maxY)
         Pixel.fire(.bookmarksList(source: .button))
     }
@@ -663,3 +670,23 @@ extension NavigationBarViewController: DownloadsViewControllerDelegate {
     }
 
 }
+
+#if DEBUG || REVIEW
+extension NavigationBarViewController {
+    
+    fileprivate func addDebugNotificationListeners() {
+        NotificationCenter.default.addObserver(forName: .ShowSaveCredentialsPopover, object: nil, queue: .main) { [weak self] _ in
+            self?.showMockSaveCredentialsPopover()
+        }
+    }
+
+    fileprivate func showMockSaveCredentialsPopover() {
+        let account = SecureVaultModels.WebsiteAccount(title: nil, username: "example-username", domain: "example.com")
+        let mockCredentials = SecureVaultModels.WebsiteCredentials(account: account, password: "password".data(using: .utf8)!)
+        
+        showSaveCredentialsPopover()
+        saveCredentialsPopover.viewController.saveCredentials(mockCredentials)
+    }
+    
+}
+#endif

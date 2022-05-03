@@ -58,16 +58,14 @@ final class TabDragAndDropManager {
     private func performDragAndDrop() {
         guard let sourceUnit = sourceUnit, let destinationUnit = destinationUnit,
               let sourceTabCollectionViewModel = sourceUnit.tabCollectionViewModel,
-              let destinationTabCollectionViewModel = destinationUnit.tabCollectionViewModel,
-              let tab = sourceTabCollectionViewModel.tabViewModel(at: sourceUnit.indexPath.item)?.tab
+              let destinationTabCollectionViewModel = destinationUnit.tabCollectionViewModel
         else {
             os_log("TabDragAndDropManager: Missing data to perform drag and drop", type: .error)
             return
         }
-        let newIndexPath = min(destinationUnit.indexPath.item + 1, destinationTabCollectionViewModel.tabCollection.tabs.count)
+        let newIndex = min(destinationUnit.indexPath.item + 1, destinationTabCollectionViewModel.tabCollection.tabs.count)
 
-        sourceTabCollectionViewModel.remove(at: sourceUnit.indexPath.item)
-        destinationTabCollectionViewModel.insert(tab: tab, at: newIndexPath)
+        sourceTabCollectionViewModel.moveTab(at: sourceUnit.indexPath.item, to: destinationTabCollectionViewModel, at: newIndex)
     }
 
     func clear() {

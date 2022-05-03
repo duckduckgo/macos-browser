@@ -30,11 +30,12 @@ final class TabViewModel {
     }
 
     private(set) var tab: Tab
+    private let appearancePreferences: AppearancePreferences
     private var cancellables = Set<AnyCancellable>()
 
     private var webViewStateObserver: WebViewStateObserver?
 
-    @Published var canGoForward: Bool = false
+    @Published private(set) var canGoForward: Bool = false
     @Published private(set) var canGoBack: Bool = false
     @Published private(set) var canReload: Bool = false
     @Published var canBeBookmarked: Bool = false
@@ -57,6 +58,8 @@ final class TabViewModel {
             updateAddressBarStrings()
             updateTitle()
             updateFavicon()
+            updateCanGoBack()
+            updateCanGoForward()
         }
     }
 
@@ -76,8 +79,9 @@ final class TabViewModel {
     @Published private(set) var usedPermissions = Permissions()
     @Published private(set) var permissionAuthorizationQuery: PermissionAuthorizationQuery?
 
-    init(tab: Tab) {
+    init(tab: Tab, appearancePreferences: AppearancePreferences = .shared) {
         self.tab = tab
+        self.appearancePreferences = appearancePreferences
 
         webViewStateObserver = WebViewStateObserver(webView: tab.webView, tabViewModel: self)
 
@@ -86,6 +90,7 @@ final class TabViewModel {
         subscribeToFavicon()
         subscribeToTabError()
         subscribeToPermissions()
+        subscribeToAppearancePreferences()
         subscribeToWebViewDidFinishNavigation()
         $isWebViewLoading.combineLatest(tab.$isAMPProtectionExtracting) { $0 || $1 }
             .assign(to: \.isLoading, onWeaklyHeld: self)
@@ -102,19 +107,43 @@ final class TabViewModel {
     }
 
     private func subscribeToTitle() {
-        tab.$title.receive(on: DispatchQueue.main).sink { [weak self] _ in self?.updateTitle() } .store(in: &cancellables)
+        tab.$title
+            .filter { [weak self] _ in
+                self?.tab.isLazyLoadingInProgress == false
+            }
+            .receive(on: DispatchQueue.main)
+            .sink { [weak self] _ in
+                self?.updateTitle()
+            }
+            .store(in: &cancellables)
     }
 
     private func subscribeToFavicon() {
-        tab.$favicon.receive(on: DispatchQueue.main).sink { [weak self] _ in self?.updateFavicon() } .store(in: &cancellables)
+        tab.$favicon
+            .filter { [weak self] _ in
+                self?.tab.isLazyLoadingInProgress == false
+            }
+            .receive(on: DispatchQueue.main)
+            .sink { [weak self] _ in
+                self?.updateFavicon()
+            }
+            .store(in: &cancellables)
     }
 
     private func subscribeToTabError() {
-        tab.$error.receive(on: DispatchQueue.main).sink { [weak self] _ in
-            guard let self = self else { return }
-            self.errorViewState.isVisible = self.tab.error != nil
-            self.errorViewState.message = self.tab.error?.localizedDescription
-        } .store(in: &cancellables)
+        tab.$error
+            .map { error -> ErrorViewState in
+                switch error {
+                case .none, // no error
+                    // don‘t show error for interrupted load like downloads
+                        .some(WebKitError.frameLoadInterrupted):
+                    return .init(isVisible: false, message: nil)
+                case .some(let error):
+                    return .init(isVisible: true, message: error.localizedDescription)
+                }
+            }
+            .assign(to: \.errorViewState, onWeaklyHeld: self)
+            .store(in: &cancellables)
     }
 
     private func subscribeToPermissions() {
@@ -122,6 +151,13 @@ final class TabViewModel {
             .store(in: &cancellables)
         tab.permissions.$authorizationQuery.assign(to: \.permissionAuthorizationQuery, onWeaklyHeld: self)
             .store(in: &cancellables)
+    }
+    
+    private func subscribeToAppearancePreferences() {
+        appearancePreferences.$showFullURL.dropFirst().sink { [weak self] newValue in
+            guard let self = self, let url = self.tabURL, let host = self.tabHost else { return }
+            self.updatePassiveAddressBarString(showURL: newValue, url: url, host: host)
+        }.store(in: &cancellables)
     }
 
     private func subscribeToWebViewDidFinishNavigation() {
@@ -135,11 +171,23 @@ final class TabViewModel {
     }
 
     func updateCanGoBack() {
-        canGoBack = tab.canGoBack || tab.canBeClosedWithBack
+        canGoBack = tab.canGoBack || tab.canBeClosedWithBack || tab.error != nil
+    }
+
+    func updateCanGoForward() {
+        canGoForward = tab.canGoForward && tab.error == nil
     }
 
     private func updateCanBeBookmarked() {
         canBeBookmarked = tab.content.url ?? .blankPage != .blankPage
+    }
+    
+    private var tabURL: URL? {
+        return tab.content.url ?? tab.parentTab?.content.url
+    }
+    
+    private var tabHost: String? {
+        return tabURL?.host ?? tab.parentTab?.content.url?.host
     }
 
     func updateAddressBarStrings() {
@@ -150,7 +198,7 @@ final class TabViewModel {
             return
         }
 
-        guard let url = tab.content.url ?? tab.parentTab?.content.url else {
+        guard let url = tabURL else {
             addressBarString = ""
             passiveAddressBarString = ""
             return
@@ -168,7 +216,7 @@ final class TabViewModel {
             return
         }
 
-        guard let host = url.host ?? tab.parentTab?.content.url?.host else {
+        guard let host = tabHost else {
             // also lands here for about:blank and about:home
             addressBarString = ""
             passiveAddressBarString = ""
@@ -177,8 +225,12 @@ final class TabViewModel {
 
         addressBarString = url.absoluteString
 
-        if AppearancePreferences.shared.showFullURL {
-            passiveAddressBarString = url.toString(decodePunycode: false, dropScheme: false, needsWWW: true, dropTrailingSlash: true)
+        updatePassiveAddressBarString(showURL: appearancePreferences.showFullURL, url: url, host: host)
+    }
+    
+    private func updatePassiveAddressBarString(showURL: Bool, url: URL, host: String) {
+        if showURL {
+            passiveAddressBarString = url.toString(decodePunycode: false, dropScheme: false, dropTrailingSlash: true)
         } else {
             passiveAddressBarString = host.drop(prefix: URL.HostPrefix.www.separated())
         }

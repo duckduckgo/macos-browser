@@ -22,7 +22,7 @@ import Combine
 import BrowserServicesKit
 
 final class PrivacyDashboardViewController: NSViewController {
-    
+
     struct Constants {
         static let initialContentHeight: CGFloat = 550
     }
@@ -37,6 +37,11 @@ final class PrivacyDashboardViewController: NSViewController {
     var serverTrustViewModel: ServerTrustViewModel?
 
     private var contentBlockinRulesUpdatedCancellable: AnyCancellable?
+    
+    /// Running the resize animation block during the popover animation causes frame hitching.
+    /// The animation only needs to run when transitioning between views in the popover, so this is used to track when to run the animation.
+    /// This should be set to true any time the popover is displayed (i.e., reset to true when dismissing the popover), and false after the initial resize pass is complete.
+    private var skipLayoutAnimation = true
 
     override func viewDidLoad() {
         privacyDashboardScript.delegate = self
@@ -77,6 +82,7 @@ final class PrivacyDashboardViewController: NSViewController {
     override func viewWillDisappear() {
         contentHeightConstraint.constant = Constants.initialContentHeight
         cancellables.removeAll()
+        skipLayoutAnimation = true
     }
 
     public func isPendingUpdates() -> Bool {
@@ -85,16 +91,16 @@ final class PrivacyDashboardViewController: NSViewController {
 
     private func initWebView() {
         let configuration = WKWebViewConfiguration()
-        
+
 #if DEBUG
         configuration.preferences.setValue(true, forKey: "developerExtrasEnabled")
 #endif
-        
-        let webView = WKWebView(frame: .zero, configuration: configuration)
+
+        let webView = PrivacyDashboardWebView(frame: .zero, configuration: configuration)
         webView.navigationDelegate = self
         self.webView = webView
         view.addAndLayout(webView)
-        
+
         contentHeightConstraint = view.heightAnchor.constraint(equalToConstant: Constants.initialContentHeight)
         contentHeightConstraint.isActive = true
     }
@@ -241,10 +247,15 @@ extension PrivacyDashboardViewController: PrivacyDashboardUserScriptDelegate {
     }
 
     func userScript(_ userScript: PrivacyDashboardUserScript, setHeight height: Int) {
-        NSAnimationContext.runAnimationGroup { [weak self] context in
-            context.duration = 1/3
-            context.timingFunction = CAMediaTimingFunction(name: .easeInEaseOut)
-            self?.contentHeightConstraint.animator().constant = CGFloat(height)
+        if skipLayoutAnimation {
+            contentHeightConstraint.constant = CGFloat(height)
+            skipLayoutAnimation = false
+        } else {
+            NSAnimationContext.runAnimationGroup { [weak self] context in
+                context.duration = 1/3
+                context.timingFunction = CAMediaTimingFunction(name: .easeInEaseOut)
+                self?.contentHeightConstraint.animator().constant = CGFloat(height)
+            }
         }
     }
 

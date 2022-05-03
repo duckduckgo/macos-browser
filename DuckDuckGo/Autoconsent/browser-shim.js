@@ -51,6 +51,7 @@ window._nativeMessageHandler = (tabId, frameId, message) => {
     // console.log(tabId, frameId, message)
     switch (message.type) {
     case 'webNavigation.onCommitted':
+        console.log('received onCommitted from', message.url);
         return window.browser.webNavigation.onCommitted._trigger({
             tabId,
             frameId,
@@ -58,6 +59,7 @@ window._nativeMessageHandler = (tabId, frameId, message) => {
             timeStamp: Date.now()
         })
     case 'webNavigation.onCompleted':
+        console.log('received onCompleted from', message.url);
         return window.browser.webNavigation.onCompleted._trigger({
             tabId,
             frameId,

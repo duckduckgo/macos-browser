@@ -28,25 +28,23 @@ final class TabCollection: NSObject {
         self.tabs = tabs
     }
 
-    deinit {
-        tabs.forEach { $0.tabWillClose() }
-    }
-
     func append(tab: Tab) {
         tabs.append(tab)
     }
 
-    func insert(tab: Tab, at index: Int) {
+    @discardableResult
+    func insert(tab: Tab, at index: Int) -> Bool {
         guard index >= 0, index <= tabs.endIndex else {
             os_log("TabCollection: Index out of bounds", type: .error)
-            return
+            return false
         }
 
         tabs.insert(tab, at: index)
+        return true
     }
 
     func remove(at index: Int) -> Bool {
-        guard index >= 0, index < tabs.count else {
+        guard tabs.indices.contains(index) else {
             os_log("TabCollection: Index out of bounds", type: .error)
             return false
         }
@@ -55,6 +53,18 @@ final class TabCollection: NSObject {
         tabWillClose(at: index)
         tabs.remove(at: index)
 
+        return true
+    }
+
+    func moveTab(at fromIndex: Int, to otherCollection: TabCollection, at toIndex: Int) -> Bool {
+        guard let tab = tabs[safe: fromIndex],
+              otherCollection.insert(tab: tab, at: toIndex)
+        else {
+            os_log("TabCollection: Index out of bounds", type: .error)
+            return false
+        }
+
+        tabs.remove(at: fromIndex)
         return true
     }
 
@@ -84,13 +94,11 @@ final class TabCollection: NSObject {
 
     private func tabWillClose(at index: Int) {
         keepLocalHistory(of: tabs[index])
-        tabs[index].tabWillClose()
     }
 
     private func tabsWillClose(range: Range<Int>) {
         for i in range {
             keepLocalHistory(of: tabs[i])
-            tabs[i].tabWillClose()
         }
     }
 
@@ -117,7 +125,6 @@ final class TabCollection: NSObject {
             return
         }
 
-        tabs[index].tabWillClose()
         keepLocalHistory(of: tabs[index])
         tabs[index] = tab
     }

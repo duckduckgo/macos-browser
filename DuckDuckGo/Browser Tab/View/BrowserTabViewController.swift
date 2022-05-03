@@ -44,8 +44,8 @@ final class BrowserTabViewController: NSViewController {
 
     private let tabCollectionViewModel: TabCollectionViewModel
     private var tabContentCancellable: AnyCancellable?
-    private var selectedTabViewModelCancellable: AnyCancellable?
     private var errorViewStateCancellable: AnyCancellable?
+    private var cancellables = Set<AnyCancellable>()
 
     private var contextMenuExpected = false
     private var contextMenuLink: URL?
@@ -81,6 +81,7 @@ final class BrowserTabViewController: NSViewController {
         super.viewDidLoad()
 
         hoverLabelContainer.alphaValue = 0
+        subscribeToTabs()
         subscribeToSelectedTabViewModel()
         subscribeToErrorViewState()
     }
@@ -112,13 +113,24 @@ final class BrowserTabViewController: NSViewController {
     }
 
     private func subscribeToSelectedTabViewModel() {
-        selectedTabViewModelCancellable = tabCollectionViewModel.$selectedTabViewModel
+        tabCollectionViewModel.$selectedTabViewModel
             .sink { [weak self] selectedTabViewModel in
                 self?.tabViewModel = selectedTabViewModel
                 self?.showTabContent(of: selectedTabViewModel)
                 self?.subscribeToErrorViewState()
                 self?.subscribeToTabContent(of: selectedTabViewModel)
             }
+            .store(in: &cancellables)
+    }
+
+    private func subscribeToTabs() {
+        tabCollectionViewModel.tabCollection.$tabs
+            .sink { [weak self] tabs in
+                for tab in tabs where tab.delegate !== self {
+                    tab.delegate = self
+                }
+            }
+            .store(in: &cancellables)
     }
 
     private func removeWebViewFromHierarchy(webView: WebView? = nil,
@@ -127,45 +139,28 @@ final class BrowserTabViewController: NSViewController {
               let container = container ?? self.webViewContainer
         else { return }
 
-        // close fullscreenWindowController when closing tab in FullScreen mode
-        webView.fullscreenWindowController?.close()
-
-        webView.removeFromSuperview()
-        if self.webView == webView {
+        if self.webView === webView {
             self.webView = nil
         }
 
         container.removeFromSuperview()
-        if self.webViewContainer == container {
+        if self.webViewContainer === container {
             self.webViewContainer = nil
         }
     }
 
     private func addWebViewToViewHierarchy(_ webView: WebView) {
-        // This code should ideally use Auto Layout, but in order to enable the web inspector, it needs to use springs & structs.
-        // The line at the bottom of this comment is the "correct" method of doing this, but breaks the inspector.
-        // Context: https://stackoverflow.com/questions/60727065/wkwebview-web-inspector-in-macos-app-fails-to-render-and-flickers-flashes
-        //
-        // view.addAndLayout(newWebView)
-
-        webView.frame = view.bounds
-        webView.autoresizingMask = [.width, .height]
-
-        let container = NSView(frame: view.bounds)
-        container.autoresizingMask = [.width, .height]
-        view.addSubview(container)
-        container.addSubview(webView)
+        let container = WebViewContainerView(webView: webView, frame: view.bounds)
         self.webViewContainer = container
+        view.addSubview(container)
 
-        // Make sure this is on top
+        // Make sure link preview (tooltip shown in the bottom-left) is on top
         view.addSubview(hoverLabelContainer)
     }
 
     private func changeWebView(tabViewModel: TabViewModel?) {
 
         func displayWebView(of tabViewModel: TabViewModel) {
-            tabViewModel.tab.delegate = self
-
             let newWebView = tabViewModel.tab.webView
             newWebView.uiDelegate = self
             webView = newWebView
@@ -303,8 +298,11 @@ final class BrowserTabViewController: NSViewController {
             removeAllTabContent()
             showTabContentController(bookmarksViewController)
 
-        case .preferences:
+        case let .preferences(pane):
             removeAllTabContent()
+            if let pane = pane, preferencesViewController.model.selectedPane != pane {
+                preferencesViewController.model.selectPane(pane)
+            }
             showTabContentController(preferencesViewController)
 
         case .onboarding:
@@ -316,7 +314,7 @@ final class BrowserTabViewController: NSViewController {
 
         case .url:
             // Adjust webviews if there was a tab switch or content type switch
-            if webView != tabViewModel?.tab.webView || tabViewModel?.tab.webView.superview == nil {
+            if webView != tabViewModel?.tab.webView || tabViewModel?.tab.webView.tabContentView.superview == nil {
                 removeAllTabContent(includingWebView: false)
                 changeWebView(tabViewModel: tabViewModel)
             }
@@ -349,8 +347,6 @@ final class BrowserTabViewController: NSViewController {
         return viewController
     }()
 
-    private var cancellables = Set<AnyCancellable>()
-
     private var _contentOverlayPopover: ContentOverlayPopover?
     public var contentOverlayPopover: ContentOverlayPopover {
         guard let overlay = _contentOverlayPopover else {
@@ -364,6 +360,19 @@ final class BrowserTabViewController: NSViewController {
         }
         return overlay
     }
+
+    @objc(_webView:printFrame:)
+    func webView(_ webView: WKWebView, printFrame handle: Any) {
+        webView.tab?.print(frame: handle)
+    }
+
+    @available(macOS 12, *)
+    @objc(_webView:printFrame:pdfFirstPageSize:completionHandler:)
+    func webView(_ webView: WKWebView, printFrame handle: Any, pdfFirstPageSize size: CGSize, completionHandler: () -> Void) {
+        self.webView(webView, printFrame: handle)
+        completionHandler()
+    }
+
 }
 
 extension BrowserTabViewController: ContentOverlayUserScriptDelegate {
@@ -371,7 +380,7 @@ extension BrowserTabViewController: ContentOverlayUserScriptDelegate {
         contentOverlayPopover.websiteAutofillUserScriptCloseOverlay(websiteAutofillUserScript)
     }
     public func websiteAutofillUserScript(_ websiteAutofillUserScript: WebsiteAutofillUserScript,
-                                          willDisplayOverlayAtClick: NSPoint,
+                                          willDisplayOverlayAtClick: NSPoint?,
                                           serializedInputContext: String,
                                           inputPosition: CGRect) {
         contentOverlayPopover.websiteAutofillUserScript(websiteAutofillUserScript,
@@ -396,7 +405,10 @@ extension BrowserTabViewController: TabDelegate {
     func tab(_ tab: Tab, requestedOpenExternalURL url: URL, forUserEnteredURL userEntered: Bool) {
 
         let searchForExternalUrl = { [weak tab] in
-            tab?.update(url: URL.makeSearchUrl(from: url.absoluteString), userEntered: false)
+            // Redirect after handing WebView.url update after cancelling the request
+            DispatchQueue.main.async {
+                tab?.update(url: URL.makeSearchUrl(from: url.absoluteString), userEntered: false)
+            }
         }
 
         // Another way of detecting whether an app is installed to handle a protocol is described in Asana:
@@ -412,7 +424,7 @@ extension BrowserTabViewController: TabDelegate {
         let permissionType = PermissionType.externalScheme(scheme: url.scheme ?? "")
 
         tab.permissions.permissions([permissionType],
-                                    requestedForDomain: webView?.url?.host ?? "localhost",
+                                    requestedForDomain: webView?.url?.host,
                                     url: url) { [weak self, weak tab] granted in
             guard granted, let tab = tab else {
                 if userEntered {
@@ -944,6 +956,16 @@ extension BrowserTabViewController: BrowserTabSelectionDelegate {
 
     func selectedTab(at index: Int) {
         show(displayableTabAtIndex: index)
+    }
+
+    func selectedPreferencePane(_ identifier: PreferencePaneIdentifier) {
+        guard let selectedTab = tabCollectionViewModel.selectedTabViewModel?.tab else {
+            return
+        }
+
+        if case .preferences = selectedTab.content {
+            selectedTab.setContent(.preferences(pane: identifier))
+        }
     }
 
 }

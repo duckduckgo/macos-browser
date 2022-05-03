@@ -42,12 +42,12 @@ protocol TabDelegate: FileDownloadManagerDelegate, ContentOverlayUserScriptDeleg
 
 // swiftlint:disable type_body_length
 // swiftlint:disable file_length
-final class Tab: NSObject {
+final class Tab: NSObject, Identifiable {
 
     enum TabContent: Equatable {
         case homePage
         case url(URL)
-        case preferences
+        case preferences(pane: PreferencePaneIdentifier?)
         case bookmarks
         case onboarding
         case none
@@ -58,22 +58,47 @@ final class Tab: NSObject {
             } else if url == .welcome {
                 return .onboarding
             } else if url == .preferences {
-                return .preferences
+                return .anyPreferencePane
+            } else if let preferencePane = url.flatMap(PreferencePaneIdentifier.init(url:)) {
+                return .preferences(pane: preferencePane)
             } else {
                 return .url(url ?? .blankPage)
             }
         }
 
         static var displayableTabTypes: [TabContent] {
-            return [TabContent.preferences, .bookmarks].sorted { first, second in
-                switch first {
-                case .homePage, .url, .preferences, .bookmarks, .onboarding, .none: break
-                // !! Replace [TabContent.preferences, .bookmarks] above with new displayable Tab Types if added
-                }
+            // Add new displayable types here
+            let displayableTypes = [TabContent.anyPreferencePane, .bookmarks]
+
+            return displayableTypes.sorted { first, second in
                 guard let firstTitle = first.title, let secondTitle = second.title else {
                     return true // Arbitrary sort order, only non-standard tabs are displayable.
                 }
                 return firstTitle.localizedStandardCompare(secondTitle) == .orderedAscending
+            }
+        }
+
+        /// Convenience accessor for `.preferences` Tab Content with no particular pane selected,
+        /// i.e. the currently selected pane is decided internally by `PreferencesViewController`.
+        static let anyPreferencePane: Self = .preferences(pane: nil)
+
+        var isDisplayable: Bool {
+            switch self {
+            case .preferences, .bookmarks:
+                return true
+            default:
+                return false
+            }
+        }
+
+        func matchesDisplayableTab(_ other: TabContent) -> Bool {
+            switch (self, other) {
+            case (.preferences, .preferences):
+                return true
+            case (.bookmarks, .bookmarks):
+                return true
+            default:
+                return false
             }
         }
 
@@ -101,7 +126,11 @@ final class Tab: NSObject {
     }
 
     weak var autofillScript: WebsiteAutofillUserScript?
-    weak var delegate: TabDelegate?
+    weak var delegate: TabDelegate? {
+        didSet {
+            autofillScript?.currentOverlayTab = delegate
+        }
+    }
     private let cbaTimeReporter: ContentBlockingAssetsCompilationTimeReporter?
 
     init(content: TabContent,
@@ -117,7 +146,10 @@ final class Tab: NSObject {
          sessionStateData: Data? = nil,
          parentTab: Tab? = nil,
          shouldLoadInBackground: Bool = false,
-         canBeClosedWithBack: Bool = false) {
+         canBeClosedWithBack: Bool = false,
+         lastSelectedAt: Date? = nil,
+         currentDownload: URL? = nil
+    ) {
 
         self.content = content
         self.faviconManagement = faviconManagement
@@ -130,6 +162,8 @@ final class Tab: NSObject {
         self.parentTab = parentTab
         self._canBeClosedWithBack = canBeClosedWithBack
         self.sessionStateData = sessionStateData
+        self.lastSelectedAt = lastSelectedAt
+        self.currentDownload = currentDownload
 
         let configuration = webViewConfiguration ?? WKWebViewConfiguration()
         configuration.applyStandardConfiguration()
@@ -143,11 +177,12 @@ final class Tab: NSObject {
     }
 
     deinit {
-        self.userContentController.removeAllUserScripts()
+        webView.stopLoading()
+        webView.stopMediaCapture()
+        webView.fullscreenWindowController?.close()
+        userContentController.removeAllUserScripts()
 
-        #if DEBUG
-        assert(self.isClosing || !content.isUrl, "tabWillClose() was not called for this Tab")
-        #endif
+        cbaTimeReporter?.tabWillClose(self.instrumentation.currentTabIdentifier)
     }
 
     private var userContentController: UserContentController {
@@ -157,6 +192,7 @@ final class Tab: NSObject {
     // MARK: - Event Publishers
 
     let webViewDidFinishNavigationPublisher = PassthroughSubject<Void, Never>()
+    let webViewDidFailNavigationPublisher = PassthroughSubject<Void, Never>()
 
     @MainActor
     @Published var isAMPProtectionExtracting: Bool = false
@@ -173,10 +209,13 @@ final class Tab: NSObject {
 
     var fbBlockingEnabled = true
 
+    var isLazyLoadingInProgress = false
+
     @Published private(set) var content: TabContent {
         didSet {
             handleFavicon(oldContent: oldValue)
             invalidateSessionStateData()
+            self.error = nil
             Task {
                 await reloadIfNeeded()
             }
@@ -192,8 +231,17 @@ final class Tab: NSObject {
             return
         }
         lastUpgradedURL = nil
-        self.content = content
+
+        switch (self.content, content) {
+        case (.preferences(pane: .some), .preferences(pane: nil)):
+            // prevent clearing currently selected pane (for state persistence purposes)
+            break
+        default:
+            self.content = content
+        }
     }
+    
+    var lastSelectedAt: Date?
 
     @Published var title: String?
     @Published var error: Error?
@@ -240,7 +288,7 @@ final class Tab: NSObject {
     }
 
     // Used to track if an error was caused by a download navigation.
-    private var currentDownload: URL?
+    private(set) var currentDownload: URL?
 
     func download(from url: URL, promptForLocation: Bool = true) {
         webView.startDownload(URLRequest(url: url, cachePolicy: .returnCacheDataElseLoad)) { download in
@@ -284,20 +332,25 @@ final class Tab: NSObject {
     }
 
     func goForward() {
-        guard self.canGoForward else { return }
+        guard canGoForward else { return }
         shouldStoreNextVisit = false
         webView.goForward()
     }
 
     var canGoBack: Bool {
-        webView.canGoBack
+        webView.canGoBack || error != nil
     }
 
     func goBack() {
-        guard self.canGoBack else {
+        guard canGoBack else {
             if canBeClosedWithBack {
                 delegate?.closeTab(self)
             }
+            return
+        }
+
+        guard error == nil else {
+            webView.reload()
             return
         }
 
@@ -319,6 +372,7 @@ final class Tab: NSObject {
     }
 
     func reload() {
+        currentDownload = nil
         if let error = error, let failingUrl = error.failingUrl {
             webView.load(failingUrl)
             return
@@ -412,9 +466,25 @@ final class Tab: NSObject {
 
     @MainActor
     private func shouldLoadURL(_ url: URL, shouldLoadInBackground: Bool = false) -> Bool {
-        return (webView.superview != nil || shouldLoadInBackground)
-            && webView.url != url
-            && webView.url != content.url // Initial Home Page shouldn't show Back Button
+        // don‘t reload in background unless shouldLoadInBackground
+        guard url.isValid,
+              (webView.superview != nil || shouldLoadInBackground),
+              // don‘t reload when already loaded
+              webView.url != url,
+              webView.url != content.url
+        else { return false }
+
+        // if content not loaded inspect error
+        switch error {
+        case .none, // no error
+            // error due to connection failure
+             .some(URLError.notConnectedToInternet),
+             .some(URLError.networkConnectionLost):
+            return true
+        case .some:
+            // don‘t autoreload on other kinds of errors
+            return false
+        }
     }
 
     @MainActor
@@ -478,20 +548,6 @@ final class Tab: NSObject {
                 await addHomePageToWebViewIfNeeded()
             }
         }
-    }
-
-    #if DEBUG
-    private var isClosing = false
-    #endif
-
-    func tabWillClose() {
-        webView.stopLoading()
-        webView.stopMediaCapture()
-        cbaTimeReporter?.tabWillClose(self)
-
-        #if DEBUG
-        self.isClosing = true
-        #endif
     }
 
     // MARK: - Favicon
@@ -638,20 +694,21 @@ extension Tab: UserContentControllerDelegate {
 }
 
 extension Tab: BrowserTabViewControllerClickDelegate {
+
     func browserTabViewController(_ browserTabViewController: BrowserTabViewController, didClickAtPoint: NSPoint) {
         guard let autofillScript = autofillScript else { return }
         autofillScript.clickPoint = didClickAtPoint
-        autofillScript.currentOverlayTab = self.delegate
     }
+
 }
 
 extension Tab: PrintingUserScriptDelegate {
 
-    func printingUserScriptDidRequestPrintController(_ script: PrintingUserScript) {
+    func print(frame: Any? = nil) {
         guard activePrintOperation == nil else { return }
 
         guard let window = webView.window,
-              let printOperation = webView.printOperation()
+              let printOperation = webView.printOperation(for: frame)
         else { return }
 
         self.activePrintOperation = printOperation
@@ -660,14 +717,22 @@ extension Tab: PrintingUserScriptDelegate {
             printOperation.view?.frame = webView.bounds
         }
 
-        let selector = #selector(printOperationDidRun(printOperation: success: contextInfo:))
+        let selector = #selector(printOperationDidRun(printOperation:success:contextInfo:))
         printOperation.runModal(for: window, delegate: self, didRun: selector, contextInfo: nil)
+        NSApp.runModal(for: window)
+    }
+
+    func printingUserScriptDidRequestPrintController(_ script: PrintingUserScript) {
+        self.print()
     }
 
     @objc func printOperationDidRun(printOperation: NSPrintOperation,
                                     success: Bool,
                                     contextInfo: UnsafeMutableRawPointer?) {
         activePrintOperation = nil
+        if NSApp.modalWindow != nil {
+            NSApp.stopModal()
+        }
     }
 
 }
@@ -819,11 +884,6 @@ extension AutofillType {
 
 extension Tab: WKNavigationDelegate {
 
-    struct ErrorCodes {
-        static let frameLoadInterrupted = 102
-        static let internetConnectionOffline = -1009
-    }
-
     func webView(_ webView: WKWebView,
                  didReceive challenge: URLAuthenticationChallenge,
                  completionHandler: @escaping (URLSession.AuthChallengeDisposition, URLCredential?) -> Void) {
@@ -862,20 +922,20 @@ extension Tab: WKNavigationDelegate {
         // which would skip link rewrites.
         if navigationAction.navigationType == .linkActivated {
             let navigationActionPolicy = await linkProtection
-                .requestTrackingLinkRewrite(
-                    initiatingURL: webView.url,
-                    navigationAction: navigationAction,
-                    onStartExtracting: { if !isRequestingNewTab { isAMPProtectionExtracting = true }},
-                    onFinishExtracting: { [weak self] in self?.isAMPProtectionExtracting = false },
-                    onLinkRewrite: { [weak self] url, _ in
-                        guard let self = self else { return }
-                        if isRequestingNewTab {
-                            self.delegate?.tab(self, requestedNewTabWith: .url(url), selected: NSApp.isShiftPressed)
-                        } else {
-                            webView.load(url)
-                        }
-                    }
-                )
+                .requestTrackingLinkRewrite(initiatingURL: webView.url,
+                                            navigationAction: navigationAction,
+                                            onStartExtracting: { if !isRequestingNewTab { isAMPProtectionExtracting = true }},
+                                            onFinishExtracting: { [weak self] in self?.isAMPProtectionExtracting = false },
+                                            onLinkRewrite: { [weak self] url, _ in
+                                                guard let self = self else { return }
+                                                if isRequestingNewTab || !navigationAction.isTargetingMainFrame {
+                                                    self.delegate?.tab(self,
+                                                                       requestedNewTabWith: .url(url),
+                                                                       selected: NSApp.isShiftPressed || !navigationAction.isTargetingMainFrame)
+                                                } else {
+                                                    webView.load(url)
+                                                }
+                                            })
             if let navigationActionPolicy = navigationActionPolicy, navigationActionPolicy == .cancel {
                 return navigationActionPolicy
             }
@@ -897,7 +957,7 @@ extension Tab: WKNavigationDelegate {
 
                 return .cancel
 
-            } else if navigationAction.navigationType != .backForward,
+            } else if navigationAction.navigationType != .backForward, !isRequestingNewTab,
                       let request = GPCRequestFactory.shared.requestForGPC(basedOn: navigationAction.request) {
                 self.invalidateBackItemIfNeeded(for: navigationAction)
                 defer {
@@ -908,7 +968,9 @@ extension Tab: WKNavigationDelegate {
         }
 
         if navigationAction.isTargetingMainFrame {
-            currentDownload = nil
+            if navigationAction.request.url != currentDownload || navigationAction.isUserInitiated {
+                currentDownload = nil
+            }
             if navigationAction.request.url != self.clientRedirectedDuringNavigationURL {
                 self.clientRedirectedDuringNavigationURL = nil
             }
@@ -992,9 +1054,9 @@ extension Tab: WKNavigationDelegate {
     private func prepareForContentBlocking() async {
         // Ensure Content Blocking Assets (WKContentRuleList&UserScripts) are installed
         if !userContentController.contentBlockingAssetsInstalled {
-            cbaTimeReporter?.tabWillWaitForRulesCompilation(self)
+            cbaTimeReporter?.tabWillWaitForRulesCompilation(self.instrumentation.currentTabIdentifier)
             await userContentController.awaitContentBlockingAssetsInstalled()
-            cbaTimeReporter?.reportWaitTimeForTabFinishedWaitingForRules(self)
+            cbaTimeReporter?.reportWaitTimeForTabFinishedWaitingForRules(self.instrumentation.currentTabIdentifier)
         } else {
             cbaTimeReporter?.reportNavigationDidNotWaitForRules()
         }
@@ -1027,22 +1089,25 @@ extension Tab: WKNavigationDelegate {
         self.webView.frozenCanGoForward = false
     }
 
+    @MainActor
     func webView(_ webView: WKWebView,
-                 decidePolicyFor navigationResponse: WKNavigationResponse,
-                 decisionHandler: @escaping (WKNavigationResponsePolicy) -> Void) {
+                 decidePolicyFor navigationResponse: WKNavigationResponse) async -> WKNavigationResponsePolicy {
         userEnteredUrl = false // subsequent requests will be navigations
 
         if !navigationResponse.canShowMIMEType || navigationResponse.shouldDownload {
             if navigationResponse.isForMainFrame {
+                guard currentDownload != navigationResponse.response.url else {
+                    // prevent download twice
+                    return .cancel
+                }
                 currentDownload = navigationResponse.response.url
             }
             // register the navigationResponse for legacy _WKDownload to be called back on the Tab
             // further download will be passed to webView:navigationResponse:didBecomeDownload:
-            decisionHandler(.download(navigationResponse, using: webView))
-
-        } else {
-            decisionHandler(.allow)
+            return .download(navigationResponse, using: webView)
         }
+
+        return .allow
     }
 
     func webView(_ webView: WKWebView, didStartProvisionalNavigation navigation: WKNavigation!) {
@@ -1068,20 +1133,21 @@ extension Tab: WKNavigationDelegate {
         // https://app.asana.com/0/1199230911884351/1200381133504356/f
         //        hasError = true
 
+        webViewDidFailNavigationPublisher.send()
         invalidateSessionStateData()
     }
 
     func webView(_ webView: WKWebView, didFailProvisionalNavigation navigation: WKNavigation!, withError error: Error) {
-        if currentDownload != nil && (error as NSError).code == ErrorCodes.frameLoadInterrupted {
-            currentDownload = nil
-            return
+        switch error {
+        case URLError.notConnectedToInternet,
+             URLError.networkConnectionLost:
+            guard let failingUrl = error.failingUrl else { break }
+            historyCoordinating.markFailedToLoadUrl(failingUrl)
+        default: break
         }
 
         self.error = error
-
-        if (error as NSError).code != ErrorCodes.internetConnectionOffline, let failingUrl = error.failingUrl {
-            historyCoordinating.markFailedToLoadUrl(failingUrl)
-        }
+        webViewDidFailNavigationPublisher.send()
     }
 
     @available(macOS 11.3, *)
@@ -1127,8 +1193,11 @@ extension Tab: WKNavigationDelegate {
         }
     }
 
-    @objc(_webView:didFinishLoadWithRequest:inFrame:withError:)
-    func webView(_ webView: WKWebView, didFailLoadWithRequest request: URLRequest, inFrame frame: WKFrameInfo, withError error: Error) {
+    @objc(_webView:didFailProvisionalLoadWithRequest:inFrame:withError:)
+    func webView(_ webView: WKWebView,
+                 didFailProvisionalLoadWithRequest request: URLRequest,
+                 inFrame frame: WKFrameInfo,
+                 withError error: Error) {
         guard frame.isMainFrame else { return }
         self.mainFrameLoadState = .finished
     }
@@ -1147,10 +1216,9 @@ extension Tab: WKWebViewDownloadDelegate {
         // https://en.wikipedia.org/wiki/Guitar#/media/File:GuitareClassique5.png
         // Safari closes new tabs that were opened and then create a download instantly.
         if self.webView.backForwardList.currentItem == nil,
-           self.parentTab != nil,
-           let delegate = delegate {
-            DispatchQueue.main.async {
-                delegate.closeTab(self)
+           self.parentTab != nil {
+            DispatchQueue.main.async { [weak delegate=self.delegate] in
+                delegate?.closeTab(self)
             }
         }
     }

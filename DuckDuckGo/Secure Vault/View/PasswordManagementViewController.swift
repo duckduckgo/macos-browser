@@ -81,7 +81,7 @@ final class PasswordManagementViewController: NSViewController {
 
             let string = NSMutableAttributedString(string: UserText.pmLockScreenPreferencesLabel + " ")
             let linkString = NSMutableAttributedString(string: UserText.pmLockScreenPreferencesLink, attributes: [
-                .link: URL.preferences
+                .link: URL.preferencePane(.autofill)
             ])
 
             let paragraphStyle = NSMutableParagraphStyle()
@@ -101,6 +101,7 @@ final class PasswordManagementViewController: NSViewController {
 
     var emptyStateCancellable: AnyCancellable?
     var editingCancellable: AnyCancellable?
+    var appearanceCancellable: AnyCancellable?
 
     var domain: String?
     var isEditing = false
@@ -148,6 +149,8 @@ final class PasswordManagementViewController: NSViewController {
         super.viewDidLoad()
         createListView()
         createLoginItemView()
+
+        appearanceCancellable = view.subscribeForAppApperanceUpdates()
 
         emptyStateTitle.attributedStringValue = NSAttributedString.make(emptyStateTitle.stringValue, lineHeight: 1.14, kern: -0.23)
         emptyStateMessage.attributedStringValue = NSAttributedString.make(emptyStateMessage.stringValue, lineHeight: 1.05, kern: -0.08)
@@ -242,9 +245,9 @@ final class PasswordManagementViewController: NSViewController {
         sender.menu?.popUp(positioning: nil, at: location, in: sender.superview)
     }
 
-    @IBAction func openPreferences(_ sender: Any) {
+    @IBAction func openAutofillPreferences(_ sender: Any) {
+        WindowControllersManager.shared.showPreferencesTab(withSelectedPane: .autofill)
         self.dismiss()
-        NSApp.sendAction(#selector(openPreferences(_:)), to: nil, from: sender)
     }
 
     @IBAction func openImportBrowserDataWindow(_ sender: Any?) {
@@ -359,8 +362,6 @@ final class PasswordManagementViewController: NSViewController {
             self?.doSaveCredentials(credentials)
         }, onDeleteRequested: { [weak self] credentials in
             self?.promptToDelete(credentials: credentials)
-        }, onCancelled: { [weak self] in
-            self?.refetchWithText(self!.searchField.stringValue)
         })
 
         self.itemModel = itemModel
@@ -377,8 +378,6 @@ final class PasswordManagementViewController: NSViewController {
             self?.doSaveIdentity(note)
         }, onDeleteRequested: { [weak self] identity in
             self?.promptToDelete(identity: identity)
-        }, onCancelled: { [weak self] in
-            self?.refetchWithText(self!.searchField.stringValue)
         })
 
         self.itemModel = itemModel
@@ -395,8 +394,6 @@ final class PasswordManagementViewController: NSViewController {
             self?.doSaveNote(note)
         }, onDeleteRequested: { [weak self] note in
             self?.promptToDelete(note: note)
-        }, onCancelled: { [weak self] in
-            self?.refetchWithText(self!.searchField.stringValue)
         })
 
         self.itemModel = itemModel
@@ -413,8 +410,6 @@ final class PasswordManagementViewController: NSViewController {
             self?.doSaveCreditCard(card)
         }, onDeleteRequested: { [weak self] card in
             self?.promptToDelete(card: card)
-        }, onCancelled: { [weak self] in
-            self?.refetchWithText(self!.searchField.stringValue)
         })
 
         self.itemModel = itemModel
@@ -914,8 +909,8 @@ extension PasswordManagementViewController: NSTextFieldDelegate {
 extension PasswordManagementViewController: NSTextViewDelegate {
 
     func textView(_ textView: NSTextView, clickedOnLink link: Any, at charIndex: Int) -> Bool {
-        if let link = link as? URL, link == URL.preferences {
-            WindowControllersManager.shared.showPreferencesTab()
+        if let link = link as? URL, let pane = PreferencePaneIdentifier(url: link) {
+            WindowControllersManager.shared.showPreferencesTab(withSelectedPane: pane)
             self.dismiss()
 
             Pixel.fire(.passwordManagerLockScreenPreferencesButtonPressed)

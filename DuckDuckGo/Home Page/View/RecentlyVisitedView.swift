@@ -104,8 +104,6 @@ struct RecentlyVisitedSite: View {
     @ObservedObject var site: HomePage.Models.RecentlyVisitedSiteModel
 
     @State var isHovering = false
-    @State var isBurning = false
-    @State var isHidden = false
 
     var body: some View {
         ZStack(alignment: .top) {
@@ -141,7 +139,7 @@ struct RecentlyVisitedSite: View {
 
             }
             .padding([.leading, .trailing, .top], 12)
-            .visibility(isHidden ? .invisible : .visible)
+            .visibility(site.isHidden ? .invisible : .visible)
 
             HStack(spacing: 2) {
 
@@ -155,9 +153,9 @@ struct RecentlyVisitedSite: View {
 
                 HoverButton(size: 24, imageName: "Burn", imageSize: 16, cornerRadius: 4) {
                     isHovering = false
-                    isBurning = true
+                    site.isBurning = true
                     withAnimation(.default.delay(0.4)) {
-                        isHidden = true
+                        site.isHidden = true
                     }
                 }
                 .foregroundColor(Color("HomeFeedItemButtonTintColor"))
@@ -166,15 +164,15 @@ struct RecentlyVisitedSite: View {
             }
             .padding(.trailing, 12)
             .padding(.top, 13)
-            .visibility(isHidden ? .invisible : .visible)
+            .visibility(site.isHidden ? .invisible : .visible)
 
             FireAnimation()
                 .cornerRadius(8)
-                .visibility(isBurning ? .visible : .gone)
+                .visibility(site.isBurning ? .visible : .gone)
                 .zIndex(100)
                 .onAppear {
                     withAnimation(.default.delay(1.0)) {
-                        isBurning = false
+                        site.isBurning = false
                     }
                 }
                 .onDisappear {

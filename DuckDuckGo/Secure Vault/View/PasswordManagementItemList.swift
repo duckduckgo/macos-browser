@@ -37,10 +37,8 @@ struct PasswordManagementItemListView: View {
  
     @EnvironmentObject var model: PasswordManagementItemListModel
     
-    @State private var opacity = CGFloat.zero
-
     var body: some View {
-
+        
         VStack(spacing: 0) {
             PasswordManagementItemListCategoryView()
                 .padding(.top, 15)
@@ -50,33 +48,19 @@ struct PasswordManagementItemListView: View {
                 .opacity(model.canChangeCategory ? 1.0 : 0.5)
             
             Divider()
-                .opacity(opacity)
             
             if #available(macOS 11.0, *) {
-                GeometryReader { outsideProxy in
-                    ScrollView {
-                        ScrollViewReader { proxy in
-                            PasswordManagementItemListStackView()
-                                .onAppear {
-                                    // Scrolling to the selected item doesn't work consistently without a very slight delay.
-                                    DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
-                                        if let selectionID = model.selected?.id {
-                                            proxy.scrollTo(selectionID, anchor: .center)
-                                        }
+                ScrollView {
+                    ScrollViewReader { proxy in
+                        PasswordManagementItemListStackView()
+                            .onAppear {
+                                // Scrolling to the selected item doesn't work consistently without a very slight delay.
+                                DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
+                                    if let selectionID = model.selected?.id {
+                                        proxy.scrollTo(selectionID, anchor: .center)
                                     }
                                 }
-                                .background(GeometryReader { insideProxy in
-                                    Color.clear.preference(key: ScrollOffsetKey.self,
-                                                           value: self.calculateContentOffset(from: outsideProxy, to: insideProxy))
-                                })
-                                .onPreferenceChange(ScrollOffsetKey.self) { offset in
-                                    if offset <= 0 {
-                                        self.opacity = 0
-                                    } else {
-                                        self.opacity = offset / Constants.dividerFadeInDistance
-                                    }
-                                }
-                        }
+                            }
                     }
                 }
             } else {
@@ -85,11 +69,6 @@ struct PasswordManagementItemListView: View {
                 }
             }
         }
-        
-    }
-    
-    private func calculateContentOffset(from outsideProxy: GeometryProxy, to insideProxy: GeometryProxy) -> CGFloat {
-        return outsideProxy.frame(in: .global).minY - insideProxy.frame(in: .global).minY
     }
 
 }

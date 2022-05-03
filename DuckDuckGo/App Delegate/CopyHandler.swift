@@ -23,33 +23,19 @@ final class CopyHandler: NSObject {
     static let copySelector = #selector(Self.copy(_:))
 
     @IBAction func copy(_ sender: Any?) {
-
-        guard let responder = NSApp.keyWindow?.firstResponder,
-              let editor = responder as? AddressBarTextEditor else {
-            NSApp.keyWindow?.firstResponder?.perform(Self.copySelector)
+        guard let responder = NSApp.keyWindow?.firstResponder else { return }
+        guard let editor = responder as? AddressBarTextEditor else {
+            NSApp.sendAction(Self.copySelector, to: responder, from: self)
             return
         }
 
-        func copyRange() {
-            let selectedString = editor.selectedText
-            NSPasteboard.general.clearContents()
-            NSPasteboard.general.setString(selectedString, forType: .string)
-        }
+        let selectedText = editor.selectedText
+        NSPasteboard.general.clearContents()
+        NSPasteboard.general.setString(selectedText, forType: .string)
 
-        func copyUrl(_ url: URL) {
-            NSPasteboard.general.clearContents()
-            NSPasteboard.general.setString(url.absoluteString, forType: .string)
-            NSPasteboard.general.setString(url.absoluteString, forType: .URL)
-        }
-
-        if let controller = NSApp.keyWindow?.contentViewController as? MainViewController,
-           let url = controller.tabCollectionViewModel.selectedTabViewModel?.tab.content.url {
-            let targetCopy = url.isDuckDuckGoSearch ? url.searchQuery : url.absoluteString
-            if editor.selectedText != targetCopy {
-                copyRange()
-            } else {
-                copyUrl(url)
-            }
+        if let urlString = URL(trimmedAddressBarString: selectedText.trimmingWhitespaces())?.absoluteString,
+            urlString == selectedText {
+            NSPasteboard.general.setString(urlString, forType: .URL)
         }
     }
 }

@@ -57,6 +57,8 @@ final class SaveCredentialsViewController: NSViewController {
 
     private var saveButtonAction: (() -> Void)?
 
+    private var appearanceCancellable: AnyCancellable?
+
     var passwordData: Data {
         let string = hiddenPasswordField.isHidden ? visiblePasswordField.stringValue : hiddenPasswordField.stringValue
         return string.data(using: .utf8)!
@@ -76,6 +78,8 @@ final class SaveCredentialsViewController: NSViewController {
 
         updateButton.isHidden = credentials.account.id == nil
         dontUpdateButton.isHidden = credentials.account.id == nil
+        
+        fireproofCheck.state = FireproofDomains.shared.isFireproof(fireproofDomain: credentials.account.domain) ? .on : .off
     }
 
     @IBAction func onSaveClicked(sender: Any?) {
@@ -98,6 +102,10 @@ final class SaveCredentialsViewController: NSViewController {
         if self.fireproofCheck.state == .on {
             Pixel.fire(.fireproof(kind: .pwm, suggested: .pwm))
             FireproofDomains.shared.add(domain: account.domain)
+        } else {
+            // If the Fireproof checkbox has been unchecked, and the domain is Fireproof, then un-Fireproof it.
+            guard FireproofDomains.shared.isFireproof(fireproofDomain: account.domain) else { return }
+            FireproofDomains.shared.remove(domain: account.domain)
         }
     }
 
@@ -136,6 +144,8 @@ final class SaveCredentialsViewController: NSViewController {
 
     override func viewDidLoad() {
         super.viewDidLoad()
+
+        appearanceCancellable = view.subscribeForAppApperanceUpdates()
         visiblePasswordField.isHidden = true
         saveButton.becomeFirstResponder()
     }
