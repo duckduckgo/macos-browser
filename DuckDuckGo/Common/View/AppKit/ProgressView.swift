@@ -179,7 +179,9 @@ final class ProgressView: NSView, CAAnimationDelegate {
         if (animationDuration ?? 0) > 0 {
             CATransaction.commit()
         } else {
-            self.progressAnimationDidStop(finished: true)
+            DispatchQueue.main.async {
+                self.progressAnimationDidStop(finished: true)
+            }
         }
     }
 

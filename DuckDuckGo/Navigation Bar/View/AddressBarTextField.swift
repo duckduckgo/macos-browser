@@ -276,7 +276,6 @@ final class AddressBarTextField: NSTextField {
             Pixel.fire(.refresh(source: .reloadURL))
             selectedTabViewModel.reload()
         } else {
-
             Pixel.fire(.navigation(kind: .init(url: url), source: suggestion != nil ? .suggestion : .addressBar))
             selectedTabViewModel.tab.update(url: url)
         }

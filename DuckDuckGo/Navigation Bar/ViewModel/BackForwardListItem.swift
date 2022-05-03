@@ -18,9 +18,10 @@
 
 import WebKit
 
-enum BackForwardListItem {
+enum BackForwardListItem: Equatable {
     case backForwardListItem(WKBackForwardListItem)
     case goBackToCloseItem(parentTab: Tab)
+    case error
 
     var url: URL? {
         switch self {
@@ -28,6 +29,8 @@ enum BackForwardListItem {
             return item.url
         case .goBackToCloseItem(parentTab: let tab):
             return tab.content.url
+        case .error:
+            return nil
         }
     }
 

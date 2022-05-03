@@ -35,7 +35,7 @@ final class TabViewModel {
 
     private var webViewStateObserver: WebViewStateObserver?
 
-    @Published var canGoForward: Bool = false
+    @Published private(set) var canGoForward: Bool = false
     @Published private(set) var canGoBack: Bool = false
     @Published private(set) var canReload: Bool = false
     @Published var canBeBookmarked: Bool = false
@@ -58,6 +58,8 @@ final class TabViewModel {
             updateAddressBarStrings()
             updateTitle()
             updateFavicon()
+            updateCanGoBack()
+            updateCanGoForward()
         }
     }
 
@@ -134,7 +136,7 @@ final class TabViewModel {
                 switch error {
                 case .none, // no error
                     // don‘t show error for interrupted load like downloads
-                    .some(WebKitError.frameLoadInterrupted):
+                        .some(WebKitError.frameLoadInterrupted):
                     return .init(isVisible: false, message: nil)
                 case .some(let error):
                     return .init(isVisible: true, message: error.localizedDescription)
@@ -169,7 +171,11 @@ final class TabViewModel {
     }
 
     func updateCanGoBack() {
-        canGoBack = tab.canGoBack || tab.canBeClosedWithBack
+        canGoBack = tab.canGoBack || tab.canBeClosedWithBack || tab.error != nil
+    }
+
+    func updateCanGoForward() {
+        canGoForward = tab.canGoForward && tab.error == nil
     }
 
     private func updateCanBeBookmarked() {

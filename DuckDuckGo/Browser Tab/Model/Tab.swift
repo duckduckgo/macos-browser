@@ -332,20 +332,25 @@ final class Tab: NSObject, Identifiable {
     }
 
     func goForward() {
-        guard self.canGoForward else { return }
+        guard canGoForward else { return }
         shouldStoreNextVisit = false
         webView.goForward()
     }
 
     var canGoBack: Bool {
-        webView.canGoBack
+        webView.canGoBack || error != nil
     }
 
     func goBack() {
-        guard self.canGoBack else {
+        guard canGoBack else {
             if canBeClosedWithBack {
                 delegate?.closeTab(self)
             }
+            return
+        }
+
+        guard error == nil else {
+            webView.reload()
             return
         }
 
@@ -905,8 +910,10 @@ extension Tab: WKNavigationDelegate {
                                             onFinishExtracting: { [weak self] in self?.isAMPProtectionExtracting = false },
                                             onLinkRewrite: { [weak self] url, _ in
                                                 guard let self = self else { return }
-                                                if isRequestingNewTab {
-                                                    self.delegate?.tab(self, requestedNewTabWith: .url(url), selected: NSApp.isShiftPressed)
+                                                if isRequestingNewTab || !navigationAction.isTargetingMainFrame {
+                                                    self.delegate?.tab(self,
+                                                                       requestedNewTabWith: .url(url),
+                                                                       selected: NSApp.isShiftPressed || !navigationAction.isTargetingMainFrame)
                                                 } else {
                                                     webView.load(url)
                                                 }

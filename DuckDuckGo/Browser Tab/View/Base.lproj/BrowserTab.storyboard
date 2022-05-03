@@ -12,29 +12,29 @@
             <objects>
                 <viewController id="D9y-55-iLO" customClass="BrowserTabViewController" customModule="DuckDuckGo_Privacy_Browser" customModuleProvider="target" sceneMemberID="viewController">
                     <view key="view" id="aev-t9-Epw" customClass="ColorView" customModule="DuckDuckGo_Privacy_Browser" customModuleProvider="target">
-                        <rect key="frame" x="0.0" y="0.0" width="512" height="492"/>
+                        <rect key="frame" x="0.0" y="0.0" width="513" height="492"/>
                         <autoresizingMask key="autoresizingMask"/>
                         <subviews>
                             <containerView translatesAutoresizingMaskIntoConstraints="NO" id="aUo-25-0iW">
-                                <rect key="frame" x="0.0" y="0.0" width="512" height="492"/>
+                                <rect key="frame" x="0.0" y="0.0" width="513" height="492"/>
                                 <connections>
                                     <segue destination="fQy-ie-1zy" kind="embed" destinationCreationSelector="createHomePageViewController:" id="XdA-0x-M1n"/>
                                 </connections>
                             </containerView>
                             <customView hidden="YES" translatesAutoresizingMaskIntoConstraints="NO" id="bol-qn-wuI" customClass="ColorView" customModule="DuckDuckGo_Privacy_Browser" customModuleProvider="target">
-                                <rect key="frame" x="0.0" y="0.0" width="512" height="492"/>
+                                <rect key="frame" x="0.0" y="0.0" width="513" height="492"/>
                                 <subviews>
                                     <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="RNn-86-Wkx">
-                                        <rect key="frame" x="140" y="253" width="232" height="17"/>
+                                        <rect key="frame" x="141" y="253" width="232" height="17"/>
                                         <textFieldCell key="cell" lineBreakMode="clipping" title="DuckDuckGo can’t load this page." id="W60-yd-bv3">
                                             <font key="font" metaFont="systemSemibold" size="14"/>
                                             <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
                                             <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
                                         </textFieldCell>
                                     </textField>
-                                    <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="iH5-FT-P9e">
-                                        <rect key="frame" x="157" y="228" width="199" height="16"/>
-                                        <textFieldCell key="cell" lineBreakMode="clipping" title="An unknown error has occurred." id="rLZ-IC-OXf">
+                                    <textField horizontalHuggingPriority="351" verticalHuggingPriority="750" horizontalCompressionResistancePriority="250" translatesAutoresizingMaskIntoConstraints="NO" id="iH5-FT-P9e">
+                                        <rect key="frame" x="157" y="229" width="199" height="16"/>
+                                        <textFieldCell key="cell" title="An unknown error has occurred." id="rLZ-IC-OXf">
                                             <font key="font" metaFont="system"/>
                                             <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
                                             <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
@@ -42,9 +42,11 @@
                                     </textField>
                                 </subviews>
                                 <constraints>
-                                    <constraint firstItem="iH5-FT-P9e" firstAttribute="centerY" secondItem="bol-qn-wuI" secondAttribute="centerY" constant="10" id="F05-mw-7Re"/>
+                                    <constraint firstItem="iH5-FT-P9e" firstAttribute="top" secondItem="RNn-86-Wkx" secondAttribute="bottom" constant="8" id="TGu-KU-L1y"/>
                                     <constraint firstItem="RNn-86-Wkx" firstAttribute="centerY" secondItem="bol-qn-wuI" secondAttribute="centerY" constant="-15" id="m7c-MA-Rcm"/>
+                                    <constraint firstItem="iH5-FT-P9e" firstAttribute="leading" relation="greaterThanOrEqual" secondItem="bol-qn-wuI" secondAttribute="leading" constant="20" id="mJQ-P7-aBb"/>
                                     <constraint firstItem="RNn-86-Wkx" firstAttribute="centerX" secondItem="bol-qn-wuI" secondAttribute="centerX" id="nuD-3G-hI8"/>
+                                    <constraint firstAttribute="trailing" relation="greaterThanOrEqual" secondItem="iH5-FT-P9e" secondAttribute="trailing" constant="20" id="qCW-WQ-F8g"/>
                                     <constraint firstItem="iH5-FT-P9e" firstAttribute="centerX" secondItem="bol-qn-wuI" secondAttribute="centerX" id="tff-7d-2X3"/>
                                 </constraints>
                                 <userDefinedRuntimeAttributes>
