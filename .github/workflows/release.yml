@@ -16,7 +16,7 @@ on:
 jobs:
   export-notarized-app:
 
-    runs-on: macos-latest
+    runs-on: macos-12
 
     steps:
     - name: Install Apple Developer ID Application certificate

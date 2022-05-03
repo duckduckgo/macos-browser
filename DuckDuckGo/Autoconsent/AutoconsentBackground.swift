@@ -142,7 +142,7 @@ final class AutoconsentBackground: NSObject, WKScriptMessageHandlerWithReply, Au
     }
     
     func testOptOutWorked(in tabId: Int) async throws -> ActionResponse {
-        return try await callActionAsync(in: tabId, action: .doOptOut)
+        return try await callActionAsync(in: tabId, action: .selfTest)
     }
     
     /// Process a message sent from the autoconsent userscript.

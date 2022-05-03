@@ -60,10 +60,16 @@ final class WKBackForwardListItemViewModel {
             } else {
                 return UserText.closeAndReturnToParent
             }
+        case .error:
+            return UserText.tabErrorTitle
         }
     }
 
     var image: NSImage? {
+        if case .error = backForwardListItem {
+            return nil
+        }
+
         if backForwardListItem.url == .homePage {
             return NSImage(named: "HomeFavicon")
         }
@@ -78,16 +84,18 @@ final class WKBackForwardListItemViewModel {
     }
 
     var state: NSControl.StateValue {
-        if case .backForwardListItem = backForwardListItem {
-            return isCurrentItem ? .on : .off
+        if case .goBackToCloseItem = backForwardListItem {
+            return .off
         }
-        return .off
+
+        return isCurrentItem ? .on : .off
     }
 
     var isGoBackToCloseItem: Bool {
         if case .goBackToCloseItem = backForwardListItem {
             return true
         }
+
         return false
     }
 

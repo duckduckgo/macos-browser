@@ -72,10 +72,11 @@ class AutoconsentBackgroundTests: XCTestCase {
         let url = Bundle(for: type(of: self)).url(forResource: "autoconsent-test-page", withExtension: "html")!
         webview.loadFileURL(url, allowingReadAccessTo: url.deletingLastPathComponent())
         DispatchQueue.main.asyncAfter(deadline: .now() + 2) {
-            webview.evaluateJavaScript("results.results[0] === 'button_clicked'", in: nil, in: .page, completionHandler: { result in
+            webview.evaluateJavaScript("results.results.length === 1 && results.results[0] === 'button_clicked'", in: nil, in: .page,
+                                       completionHandler: { result in
                 switch result {
                 case .success(let value as Bool):
-                    XCTAssertTrue(value, "Button should have been clicked")
+                    XCTAssertTrue(value, "Button should have been clicked once")
                 case .success:
                     XCTFail("Failed to read test result")
                 case .failure:
