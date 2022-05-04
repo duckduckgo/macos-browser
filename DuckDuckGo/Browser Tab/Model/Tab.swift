@@ -1084,9 +1084,13 @@ extension Tab: WKNavigationDelegate {
                 }
                 currentDownload = navigationResponse.response.url
             }
-            // register the navigationResponse for legacy _WKDownload to be called back on the Tab
-            // further download will be passed to webView:navigationResponse:didBecomeDownload:
-            return .download(navigationResponse, using: webView)
+
+            let isSuccessfulResponse = (navigationResponse.response as? HTTPURLResponse)?.validateStatusCode(statusCode: 200..<300) == nil
+            if isSuccessfulResponse {
+                // register the navigationResponse for legacy _WKDownload to be called back on the Tab
+                // further download will be passed to webView:navigationResponse:didBecomeDownload:
+                return .download(navigationResponse, using: webView)
+            }
         }
 
         return .allow
