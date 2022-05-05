@@ -230,6 +230,11 @@ final class AddressBarTextField: NSTextField {
         }
     }
 
+    fileprivate func handlePastedURL() {
+        handleTextDidChange()
+        selectToTheEnd(from: stringValueWithoutSuffix.count)
+    }
+
     private func addressBarEnterPressed() {
         suggestionContainerViewModel?.clearUserStringValue()
 
@@ -928,9 +933,16 @@ extension AddressBarTextField: NSTextViewDelegate {
 final class AddressBarTextEditor: NSTextView {
 
     override func paste(_ sender: Any?) {
+        guard let delegate = delegate as? AddressBarTextField else {
+            os_log("AddressBarTextEditor: unexpected kind of delegate")
+            super.paste(sender)
+            return
+        }
+
         // Fixes an issue when url-name instead of url is pasted
         if let urlString = NSPasteboard.general.string(forType: .URL) {
             string = urlString
+            delegate.handlePastedURL()
         } else {
             super.paste(sender)
         }
