@@ -46,6 +46,12 @@ final class DownloadsViewController: NSViewController {
     var viewModel = DownloadListViewModel()
     var downloadsCancellable: AnyCancellable?
 
+    override func viewDidLoad() {
+        super.viewDidLoad()
+
+        setupDragAndDrop()
+    }
+
     override func viewWillAppear() {
         viewModel.filterRemovedDownloads()
 
@@ -185,6 +191,12 @@ final class DownloadsViewController: NSViewController {
         }
     }
 
+    private func setupDragAndDrop() {
+        tableView.registerForDraggedTypes([.fileURL])
+        tableView.setDraggingSourceOperationMask(NSDragOperation.none, forLocal: true)
+        tableView.setDraggingSourceOperationMask(NSDragOperation.move, forLocal: false)
+    }
+
 }
 
 extension DownloadsViewController: NSMenuDelegate {
@@ -283,6 +295,21 @@ extension DownloadsViewController: NSTableViewDataSource, NSTableViewDelegate {
             cellIndexToUnselect = tableView.selectedRow
         }
     }
+
+    // MARK: - Drag & Drop
+    // Draging from the table view and dropping to Desktop or Finder
+
+    func tableView(_ tableView: NSTableView, pasteboardWriterForRow row: Int) -> NSPasteboardWriting? {
+        let item = viewModel.items[safe: row]
+        guard let url = item?.localURL?.absoluteURL else { return nil }
+
+        return url as NSPasteboardWriting
+    }
+
+    func tableView(_ tableView: NSTableView, acceptDrop info: NSDraggingInfo, row: Int, dropOperation: NSTableView.DropOperation) -> Bool {
+        return false
+    }
+
 }
 
 private extension NSUserInterfaceItemIdentifier {
