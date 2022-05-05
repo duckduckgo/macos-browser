@@ -59,7 +59,7 @@ set_up_environment() {
     fi
 
     APP_PATH="${WORKDIR}/${APP_NAME}.app"
-    DSYM_PATH="${ARCHIVE}/dSYMs/${APP_NAME}.app.dSYM"
+    DSYM_PATH="${ARCHIVE}/dSYMs"
 
     OUTPUT_APP_ZIP_PATH="${WORKDIR}/DuckDuckGo.zip"
     OUTPUT_DSYM_ZIP_PATH="${WORKDIR}/${APP_NAME}.app.dSYM.zip"
