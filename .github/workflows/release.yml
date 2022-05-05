@@ -1,4 +1,4 @@
-name: Make release build
+name: Make Release Build
 
 on: 
   workflow_dispatch:
@@ -15,6 +15,8 @@ on:
 
 jobs:
   export-notarized-app:
+
+    name: Export Notarized App
 
     runs-on: macos-12
 
@@ -73,10 +75,10 @@ jobs:
       uses: actions/upload-artifact@v3
       with:
         name: DuckDuckGo-macos-${{ github.event.inputs.release-type }}
-        path: ${{ github.workspace }}/release/DuckDuckGo.zip
+        path: ${{ github.workspace }}/release/DuckDuckGo*.app
 
     - name: Upload dSYMs artifact
       uses: actions/upload-artifact@v3
       with:
         name: DuckDuckGo-macos-${{ github.event.inputs.release-type }}-dSYM
-        path: ${{ github.workspace }}/release/DuckDuckGo*.app.dSYM.zip
+        path: ${{ github.workspace }}/release/DuckDuckGo*.xcarchive/dSYMs
