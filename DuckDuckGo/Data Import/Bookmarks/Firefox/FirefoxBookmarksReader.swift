@@ -21,6 +21,10 @@ import GRDB
 
 final class FirefoxBookmarksReader {
 
+    enum Constants {
+        static let placesDatabaseName = "places.sqlite"
+    }
+
     enum ImportError: Error {
         case noBookmarksFileFound
         case unexpectedBookmarksDatabaseFormat
@@ -29,7 +33,7 @@ final class FirefoxBookmarksReader {
     private let firefoxDataDirectoryPath: String
 
     init(firefoxDataDirectoryPath: String) {
-        self.firefoxDataDirectoryPath = firefoxDataDirectoryPath + "/places.sqlite"
+        self.firefoxDataDirectoryPath = firefoxDataDirectoryPath + "\(Constants.placesDatabaseName)"
     }
 
     func readBookmarks() -> Result<ImportedBookmarks, FirefoxBookmarksReader.ImportError> {

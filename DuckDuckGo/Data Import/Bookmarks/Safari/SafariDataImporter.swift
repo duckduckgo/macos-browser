@@ -81,6 +81,7 @@ internal class SafariDataImporter: DataImporter {
                 return
             }
         }
+
         if types.contains(.logins) {
             summary.loginsResult = .awaited
         }

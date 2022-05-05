@@ -262,6 +262,13 @@ struct DataImportError: Error {
         return DataImportError(actionType: .bookmarks, errorType: errorType)
     }
     
+    static func bookmarks(_ errorType: FirefoxBookmarksReader.ImportError) -> DataImportError {
+        switch errorType {
+        case .noBookmarksFileFound: return DataImportError(actionType: .bookmarks, errorType: .noFileFound)
+        case .unexpectedBookmarksDatabaseFormat: return DataImportError(actionType: .bookmarks, errorType: .cannotReadFile)
+        }
+    }
+    
     static func logins(_ errorType: ImportErrorType) -> DataImportError {
         return DataImportError(actionType: .logins, errorType: errorType)
     }

@@ -83,11 +83,16 @@ final class FirefoxDataImporter: DataImporter {
                 do {
                     summary.bookmarksResult = try bookmarkImporter.importBookmarks(bookmarks, source: .firefox)
                 } catch {
-                    completion(.failure(.bookmarks(.cannotAccessSecureVault)))
+                    guard let error = error as? FirefoxBookmarksReader.ImportError else {
+                        completion(.failure(.bookmarks(.unexpectedBookmarksDatabaseFormat)))
+                        return
+                    }
+                    
+                    completion(.failure(.bookmarks(error)))
                     return
                 }
-            case .failure:
-                completion(.failure(.bookmarks(.browserNeedsToBeClosed)))
+            case .failure(let error):
+                completion(.failure(.bookmarks(error)))
                 return
             }
         }
