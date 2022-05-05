@@ -340,8 +340,15 @@ extension MainViewController {
 
         switch Int(event.keyCode) {
         case kVK_Escape:
-            findInPageViewController?.findInPageDone(self)
-            return navigationBarViewController.addressBarViewController?.escapeKeyDown() ?? false
+            var isHandled = false
+            if !findInPageContainerView.isHidden {
+                findInPageViewController?.findInPageDone(self)
+                isHandled = true
+            }
+            if let addressBarVC = navigationBarViewController.addressBarViewController {
+                isHandled = isHandled || addressBarVC.escapeKeyDown()
+            }
+            return isHandled
 
         // Handle critical Main Menu actions before WebView
         case kVK_ANSI_1, kVK_ANSI_2, kVK_ANSI_3, kVK_ANSI_4, kVK_ANSI_5, kVK_ANSI_6,
