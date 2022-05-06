@@ -586,27 +586,6 @@ final class AddressBarTextField: NSTextField {
         }
     }()
 
-    @objc private func toggleAutocomplete(_ menuItem: NSMenuItem) {
-        AppearancePreferences.shared.showAutocompleteSuggestions.toggle()
-
-        let shouldShowAutocomplete = AppearancePreferences.shared.showAutocompleteSuggestions
-
-        menuItem.state = shouldShowAutocomplete ? .on : .off
-
-        if shouldShowAutocomplete {
-            handleTextDidChange()
-        } else {
-            hideSuggestionWindow()
-        }
-    }
-    
-    @objc private func toggleShowFullWebsiteAddress(_ menuItem: NSMenuItem) {
-        AppearancePreferences.shared.showFullURL.toggle()
-
-        let shouldShowFullURL = AppearancePreferences.shared.showFullURL
-        menuItem.state = shouldShowFullURL ? .on : .off
-    }
-
     private func initSuggestionWindow() {
         let windowController = NSStoryboard.suggestion
             .instantiateController(withIdentifier: "SuggestionWindowController") as? NSWindowController
@@ -690,6 +669,49 @@ final class AddressBarTextField: NSTextField {
 
         // pixel-perfect window adjustment for fractional points
         suggestionViewController.pixelPerfectConstraint.constant = converted.x - rounded.x
+    }
+
+    // MARK: - Menu Actions
+
+    @objc private func pasteAndGo(_ menuItem: NSMenuItem) {
+        guard let pasteboardString = NSPasteboard.general.string(forType: .string),
+              let url = URL(trimmedAddressBarString: pasteboardString.trimmingWhitespaces()) else {
+                  assertionFailure("Pasteboard doesn't contain URL")
+                  return
+              }
+
+        tabCollectionViewModel.selectedTabViewModel?.tab.update(url: url)
+    }
+
+    @objc private func pasteAndSearch(_ menuItem: NSMenuItem) {
+        guard let pasteboardString = NSPasteboard.general.string(forType: .string),
+              let searchURL = URL.makeSearchUrl(from: pasteboardString) else {
+                  assertionFailure("Can't create search URL from pasteboard string")
+                  return
+              }
+
+        tabCollectionViewModel.selectedTabViewModel?.tab.update(url: searchURL)
+    }
+
+    @objc private func toggleAutocomplete(_ menuItem: NSMenuItem) {
+        AppearancePreferences.shared.showAutocompleteSuggestions.toggle()
+
+        let shouldShowAutocomplete = AppearancePreferences.shared.showAutocompleteSuggestions
+
+        menuItem.state = shouldShowAutocomplete ? .on : .off
+
+        if shouldShowAutocomplete {
+            handleTextDidChange()
+        } else {
+            hideSuggestionWindow()
+        }
+    }
+
+    @objc private func toggleShowFullWebsiteAddress(_ menuItem: NSMenuItem) {
+        AppearancePreferences.shared.showFullURL.toggle()
+
+        let shouldShowFullURL = AppearancePreferences.shared.showFullURL
+        menuItem.state = shouldShowFullURL ? .on : .off
     }
 
 }
@@ -841,6 +863,11 @@ extension AddressBarTextField: NSTextViewDelegate {
             makeFullWebsiteAddressMenuItem(),
             NSMenuItem.separator()
         ]
+
+        if let pasteMenuItemIndex = pasteMenuItemIndex(within: menu),
+           let pasteAndDoMenuItem = makePasteAndDoMenuItem() {
+            textViewMenu.insertItem(pasteAndDoMenuItem, at: pasteMenuItemIndex + 1)
+        }
         
         if let insertionPoint = menuItemInsertionPoint(within: menu) {
             additionalMenuItems.reversed().forEach { item in
@@ -875,6 +902,15 @@ extension AddressBarTextField: NSTextViewDelegate {
         }
 
         return nil
+    }
+
+    private func pasteMenuItemIndex(within menu: NSMenu) -> Int? {
+        let pasteSelector = "paste:"
+        let index = menu.items.firstIndex { menuItem in
+            guard let action = menuItem.action else { return false }
+            return pasteSelector == action.description
+        }
+        return index
     }
 
     private static var selectorsToRemove: Set<Selector> = Set([
@@ -927,6 +963,35 @@ extension AddressBarTextField: NSTextViewDelegate {
         menuItem.state = AppearancePreferences.shared.showFullURL ? .on : .off
 
         return menuItem
+    }
+
+    private static var pasteAndGoMenuItem: NSMenuItem {
+        NSMenuItem(
+            title: UserText.pasteAndGo,
+            action: #selector(pasteAndGo(_:)),
+            keyEquivalent: ""
+        )
+    }
+
+    private static var pasteAndSearchMenuItem: NSMenuItem {
+        NSMenuItem(
+            title: UserText.pasteAndSearch,
+            action: #selector(pasteAndSearch(_:)),
+            keyEquivalent: ""
+        )
+    }
+
+    private func makePasteAndDoMenuItem() -> NSMenuItem? {
+        if let trimmedPasteboardString = NSPasteboard.general.string(forType: .string)?.trimmingWhitespaces(),
+           trimmedPasteboardString.count > 0 {
+            if URL(trimmedAddressBarString: trimmedPasteboardString) != nil {
+                return Self.pasteAndGoMenuItem
+            } else {
+                return Self.pasteAndSearchMenuItem
+            }
+        }
+
+        return nil
     }
 }
 
