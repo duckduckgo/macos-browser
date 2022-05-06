@@ -681,7 +681,7 @@ final class AddressBarTextField: NSTextField {
     @objc private func pasteAndSearch(_ menuItem: NSMenuItem) {
         guard let pasteboardString = NSPasteboard.general.string(forType: .string),
               let searchURL = URL.makeSearchUrl(from: pasteboardString) else {
-                  assertionFailure("Pasteboard doesn't contain URL")
+                  assertionFailure("Can't create search URL from pasteboard string")
                   return
               }
 
@@ -903,7 +903,7 @@ extension AddressBarTextField: NSTextViewDelegate {
         let pasteSelector = "paste:"
         let index = menu.items.firstIndex { menuItem in
             guard let action = menuItem.action else { return false }
-            return pasteSelector.contains(action.description)
+            return pasteSelector == action.description
         }
         return index
     }
@@ -977,8 +977,9 @@ extension AddressBarTextField: NSTextViewDelegate {
     }
 
     private func makePasteAndDoMenuItem() -> NSMenuItem? {
-        if let pasteboardString = NSPasteboard.general.string(forType: .string), pasteboardString.count > 0 {
-            if URL(trimmedAddressBarString: pasteboardString.trimmingWhitespaces()) != nil {
+        if let trimmedPasteboardString = NSPasteboard.general.string(forType: .string)?.trimmingWhitespaces(),
+           trimmedPasteboardString.count > 0 {
+            if URL(trimmedAddressBarString: trimmedPasteboardString) != nil {
                 return Self.pasteAndGoMenuItem
             } else {
                 return Self.pasteAndSearchMenuItem
