@@ -80,13 +80,6 @@ final class SaveCredentialsViewController: NSViewController {
         
         fireproofCheck.state = FireproofDomains.shared.isFireproof(fireproofDomain: credentials.account.domain) ? .on : .off
         
-        // Only use the non-editable state if a username exists and the state is not editable.
-//        if let existingID = credentials.account.id, (credentials.account.username.isEmpty || automaticallySaved) {
-//            updateViewState(editable: true)
-//        } else {
-//            updateViewState(editable: false)
-//        }
-        
         // Only use the non-editable state if a credential was automatically saved and it didn't already exist.
         let condition = credentials.account.id != nil && !credentials.account.username.isEmpty && automaticallySaved 
         updateViewState(editable: !condition)
