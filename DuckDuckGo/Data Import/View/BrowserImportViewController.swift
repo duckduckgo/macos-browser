@@ -124,7 +124,13 @@ final class BrowserImportViewController: NSViewController {
         switch browser {
         case .safari:
             bookmarksCheckbox.title = UserText.bookmarkImportBookmarksAndFavorites
-            passwordsWarningLabel.isHidden = false
+            guard let safariMajorVersion = SafariVersionReader.getMajorVersion() else {
+                assertionFailure("Failed to get version of Safari")
+                passwordsWarningLabel.isHidden = false
+                return
+            }
+
+            passwordsWarningLabel.isHidden = safariMajorVersion >= 15
         default:
             bookmarksCheckbox.title = UserText.bookmarkImportBookmarks
             passwordsWarningLabel.isHidden = true
