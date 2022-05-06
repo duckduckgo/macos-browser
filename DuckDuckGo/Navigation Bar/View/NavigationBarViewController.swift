@@ -21,7 +21,7 @@ import Combine
 import os.log
 import BrowserServicesKit
 
-// swiftlint:disable type_body_length
+// swiftlint:disable type_body_length file_length
 final class NavigationBarViewController: NSViewController {
 
     enum Constants {
@@ -557,7 +557,7 @@ final class NavigationBarViewController: NSViewController {
         if autofillPreferences.askToSaveUsernamesAndPasswords, let credentials = data.credentials {
             os_log("Presenting Save Credentials popover", log: .passwordManager)
             showSaveCredentialsPopover()
-            saveCredentialsPopover.viewController.saveCredentials(credentials)
+            saveCredentialsPopover.viewController.update(credentials: credentials, automaticallySaved: data.automaticallySavedCredentials)
         } else if autofillPreferences.askToSavePaymentMethods, let card = data.creditCard {
             os_log("Presenting Save Payment Method popover", log: .passwordManager)
             showSavePaymentMethodPopover()
@@ -678,6 +678,10 @@ extension NavigationBarViewController {
         NotificationCenter.default.addObserver(forName: .ShowSaveCredentialsPopover, object: nil, queue: .main) { [weak self] _ in
             self?.showMockSaveCredentialsPopover()
         }
+        
+        NotificationCenter.default.addObserver(forName: .ShowCredentialsSavedPopover, object: nil, queue: .main) { [weak self] _ in
+            self?.showMockCredentialsSavedPopover()
+        }
     }
 
     fileprivate func showMockSaveCredentialsPopover() {
@@ -685,7 +689,15 @@ extension NavigationBarViewController {
         let mockCredentials = SecureVaultModels.WebsiteCredentials(account: account, password: "password".data(using: .utf8)!)
         
         showSaveCredentialsPopover()
-        saveCredentialsPopover.viewController.saveCredentials(mockCredentials)
+        saveCredentialsPopover.viewController.update(credentials: mockCredentials, automaticallySaved: false)
+    }
+    
+    fileprivate func showMockCredentialsSavedPopover() {
+        let account = SecureVaultModels.WebsiteAccount(title: nil, username: "example-username", domain: "example.com")
+        let mockCredentials = SecureVaultModels.WebsiteCredentials(account: account, password: "password".data(using: .utf8)!)
+        
+        showSaveCredentialsPopover()
+        saveCredentialsPopover.viewController.update(credentials: mockCredentials, automaticallySaved: true)
     }
     
 }
