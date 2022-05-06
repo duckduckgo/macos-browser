@@ -21,7 +21,7 @@ import Combine
 import os.log
 import BrowserServicesKit
 
-// swiftlint:disable type_body_length
+// swiftlint:disable type_body_length file_length
 final class NavigationBarViewController: NSViewController {
 
     enum Constants {
