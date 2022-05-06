@@ -104,8 +104,7 @@ final class MainMenu: NSMenu {
             return
         }
 
-        helpMenuItemSubmenu.removeItem(helpSeparatorMenuItem)
-        helpMenuItemSubmenu.removeItem(sendFeedbackMenuItem)
+        sendFeedbackMenuItem.isHidden = true
 
         #endif
 
