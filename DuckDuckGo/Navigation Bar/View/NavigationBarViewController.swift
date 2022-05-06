@@ -307,6 +307,7 @@ final class NavigationBarViewController: NSViewController {
             DispatchQueue.main.async { [weak self] in
                 guard let self = self,
                       self.tabCollectionViewModel.selectedTabViewModel?.tab.url == url else {
+                          // if the tab is not active, don't show the popup
                           return
                       }
 
