@@ -12,17 +12,9 @@ print_usage_and_exit() {
     echo " -a <asana_task_url>  Update Asana task after building the app (implies -d)"
     echo " -d                   Create DMG image alongside the zipped app and dSYMs"
     echo
-    echo "To clean keychain entries:"
-    echo "  $ $0 clean-keychain"
+    echo "To clear keychain entries:"
+    echo "  $ $0 clear-keychain"
     exit 1
-}
-
-clean_keychain() {
-    while security delete-generic-password -s "${KEYCHAIN_SERVICE_NAME}" >/dev/null 2>&1; do
-        true
-    done
-    echo "Removed keychain entries used by the script."
-    exit 0
 }
 
 create_dmg_preflight() {
@@ -53,8 +45,8 @@ read_command_line_arguments() {
             SCHEME="DuckDuckGo Privacy Browser"
             CONFIGURATION="Release"
             ;;
-        clean-keychain)
-            clean_keychain
+        clear-keychain)
+            clear_keychain
             ;;
         *)
             echo "Unknown build type '$1'"
@@ -83,15 +75,14 @@ read_command_line_arguments() {
 }
 
 set_up_environment() {
-    KEYCHAIN_SERVICE_NAME="ddg-macos-app-archive-script"
     WORKDIR="${PWD}/release"
     ARCHIVE="${WORKDIR}/DuckDuckGo.xcarchive"
     NOTARIZATION_INFO_PLIST="${WORKDIR}/notarization-info.plist"
 
     if [[ -z $CI ]]; then
-        EXPORT_OPTIONS_PLIST="${cwd}/ExportOptions.plist"
+        EXPORT_OPTIONS_PLIST="${cwd}/assets/ExportOptions.plist"
     else
-        EXPORT_OPTIONS_PLIST="${cwd}/ExportOptions_CI.plist"
+        EXPORT_OPTIONS_PLIST="${cwd}/assets/ExportOptions_CI.plist"
         CONFIGURATION="CI_${CONFIGURATION}"
     fi
 
@@ -100,32 +91,6 @@ set_up_environment() {
 
     OUTPUT_APP_ZIP_PATH="${WORKDIR}/DuckDuckGo.zip"
     OUTPUT_DSYM_ZIP_PATH="${WORKDIR}/${APP_NAME}.app.dSYM.zip"
-}
-
-user_has_password_in_keychain() {
-    local account="$1"
-    security find-generic-password \
-        -s "${KEYCHAIN_SERVICE_NAME}" \
-        -a "${account}" \
-        >/dev/null 2>&1
-}
-
-retrieve_password_from_keychain() {
-    local account="$1"
-    security find-generic-password \
-        -s "${KEYCHAIN_SERVICE_NAME}" \
-        -a "${account}" \
-        -w \
-        2>&1
-}
-
-store_password_in_keychain() {
-    local account="$1"
-    local password="$2"
-    security add-generic-password \
-        -s "${KEYCHAIN_SERVICE_NAME}" \
-        -a "${account}" \
-        -w "${password}"
 }
 
 get_developer_credentials() {
@@ -165,7 +130,7 @@ get_developer_credentials() {
     fi
 }
 
-clean_working_directory() {
+clear_working_directory() {
     rm -rf "${WORKDIR}"
     mkdir -p "${WORKDIR}"
 }
@@ -314,7 +279,8 @@ create_dmg() {
     echo
     local dmg_dir="${WORKDIR}/dmg"
     local dmg_background="${cwd}/assets/dmg-background.png"
-    local dmg_output_path="${WORKDIR}/${APP_NAME}.dmg"
+    dmg_output_path="${WORKDIR}/${APP_NAME}.dmg"
+
     rm -rf "${dmg_dir}"
     mkdir -p "${dmg_dir}"
     cp -R "${APP_PATH}" "${dmg_dir}"
@@ -328,11 +294,12 @@ create_dmg() {
 }
 
 main() {
+    source "${cwd}/keychain.sh"
     read_command_line_arguments "$@"
     source "${cwd}/asana.sh"
     set_up_environment "$@"
     get_developer_credentials
-    clean_working_directory
+    clear_working_directory
     archive_and_export
     upload_for_notarization
     wait_for_notarization
@@ -341,6 +308,10 @@ main() {
 
     if [[ $create_dmg ]]; then
         create_dmg
+
+        if [[ $asana_task_id ]]; then
+            asana_update_task "${dmg_output_path}" "${OUTPUT_DSYM_ZIP_PATH}"
+        fi
     fi
 
     echo
