@@ -71,4 +71,5 @@ class FirefoxLoginReaderTests: XCTestCase {
         let bundle = Bundle(for: FirefoxLoginReaderTests.self)
         return bundle.resourceURL!.appendingPathComponent("Data Import Resources/Test Firefox Data/No Primary Password")
     }
+
 }

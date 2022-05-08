@@ -33,7 +33,7 @@ final class FirefoxBookmarksReader {
     private let firefoxDataDirectoryPath: String
 
     init(firefoxDataDirectoryPath: String) {
-        self.firefoxDataDirectoryPath = firefoxDataDirectoryPath + "\(Constants.placesDatabaseName)"
+        self.firefoxDataDirectoryPath = firefoxDataDirectoryPath + "/\(Constants.placesDatabaseName)"
     }
 
     func readBookmarks() -> Result<ImportedBookmarks, FirefoxBookmarksReader.ImportError> {
