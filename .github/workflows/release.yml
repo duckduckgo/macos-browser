@@ -67,7 +67,7 @@ jobs:
       env:
         XCODE_DEVELOPER_APPLE_ID: ${{ secrets.XCODE_DEVELOPER_APPLE_ID }}
         XCODE_DEVELOPER_PASSWORD: ${{ secrets.XCODE_DEVELOPER_PASSWORD }}
-      run: ./scripts/archive.sh ${{ github.event.inputs.release-type }}
+      run: ./scripts/archive.sh ${{ github.event.inputs.release-type }} -d
 
     - name: Upload app artifact
       uses: actions/upload-artifact@v3
