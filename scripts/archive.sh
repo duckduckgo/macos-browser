@@ -25,6 +25,18 @@ clean_keychain() {
     exit 0
 }
 
+create_dmg_preflight() {
+    if ! command -v create-dmg &> /dev/null; then
+        echo "create-dmg is required to create DMG images. Install it with:"
+        echo "    $ brew install create-dmg"
+        echo
+        exit 1
+    fi
+
+    create_dmg=1
+    echo "Will create DMG image after building the app."
+}
+
 read_command_line_arguments() {
     if (( $# < 1 )); then
         print_usage_and_exit
@@ -52,10 +64,14 @@ read_command_line_arguments() {
 
     shift 1
 
-    while getopts a: OPTION; do
+    while getopts 'a:d' OPTION; do
         case "${OPTION}" in
             a)
                 asana_task_url="${OPTARG}"
+                create_dmg_preflight
+                ;;
+            d)
+                create_dmg_preflight
                 ;;
             *)
                 print_usage_and_exit
@@ -292,6 +308,25 @@ compress_app_and_dsym() {
     ditto -c -k --keepParent "${DSYM_PATH}" "${OUTPUT_DSYM_ZIP_PATH}"
 }
 
+create_dmg() {
+    echo
+    echo "Creating DMG image ..."
+    echo
+    local dmg_dir="${WORKDIR}/dmg"
+    local dmg_background="${cwd}/assets/dmg-background.png"
+    local dmg_output_path="${WORKDIR}/${APP_NAME}.dmg"
+    rm -rf "${dmg_dir}"
+    mkdir -p "${dmg_dir}"
+    cp -R "${APP_PATH}" "${dmg_dir}"
+    create-dmg --volname "${APP_NAME}" \
+        --icon "${APP_NAME}.app" 140 160 \
+        --background "${dmg_background}" \
+        --window-size 600 400 \
+        --icon-size 120 \
+        --app-drop-link 430 160 "${dmg_output_path}" \
+        "${dmg_dir}"
+}
+
 main() {
     read_command_line_arguments "$@"
     source "${cwd}/asana.sh"
@@ -303,6 +338,10 @@ main() {
     wait_for_notarization
     staple_notarized_app
     compress_app_and_dsym
+
+    if [[ $create_dmg ]]; then
+        create_dmg
+    fi
 
     echo
     echo "Notarized app ready at ${APP_PATH}"
