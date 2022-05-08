@@ -11,6 +11,11 @@ on:
         options:
         - review
         - release
+      create-dmg:
+        description: "Create DMG image"
+        required: true
+        default: false
+        type: boolean
 
 
 jobs:
@@ -64,18 +69,21 @@ jobs:
         submodules: recursive
 
     - name: Install create-dmg
-      run: brew install create-dmg
+      if: ${{ github.event.inputs.create-dmg }}
+      run: |
+        brew install create-dmg
+        echo "create_dmg_arg=-d" >> $GITHUB_ENV
 
     - name: Archive and notarize the app
       env:
         XCODE_DEVELOPER_APPLE_ID: ${{ secrets.XCODE_DEVELOPER_APPLE_ID }}
         XCODE_DEVELOPER_PASSWORD: ${{ secrets.XCODE_DEVELOPER_PASSWORD }}
-      run: ./scripts/archive.sh ${{ github.event.inputs.release-type }} -d
+      run: ./scripts/archive.sh ${{ github.event.inputs.release-type }} ${{ env.create_dmg_arg }}
 
     - name: Upload app artifact
       uses: actions/upload-artifact@v3
       with:
-        name: DuckDuckGo-macos-${{ github.event.inputs.release-type }}
+        name: DuckDuckGo-macos-${{ github.event.inputs.release-type }}.app
         path: ${{ github.workspace }}/release/DuckDuckGo.zip
 
     - name: Upload dSYMs artifact
@@ -83,3 +91,10 @@ jobs:
       with:
         name: DuckDuckGo-macos-${{ github.event.inputs.release-type }}-dSYM
         path: ${{ github.workspace }}/release/DuckDuckGo*.app.dSYM.zip
+
+    - name: Upload DMG artifact
+      if: ${{ github.event.inputs.create-dmg }}
+      uses: actions/upload-artifact@v3
+      with:
+        name: DuckDuckGo-macos-${{ github.event.inputs.release-type }}.dmg
+        path: ${{ github.workspace }}/release/DuckDuckGo*.dmg
