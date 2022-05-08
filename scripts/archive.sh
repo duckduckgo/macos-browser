@@ -2,9 +2,15 @@
 
 set -eo pipefail
 
+cwd="$(dirname "$0")"
+
 print_usage_and_exit() {
     echo "Usage:"
-    echo "  $ $0 <review|release>"
+    echo "  $ $0 <review|release> [-a <asana_task_url>] [-d]"
+    echo
+    echo "Options:"
+    echo " -a <asana_task_url>  Update Asana task after building the app (implies -d)"
+    echo " -d                   Create DMG image alongside the zipped app and dSYMs"
     echo
     echo "To clean keychain entries:"
     echo "  $ $0 clean-keychain"
@@ -19,12 +25,7 @@ clean_keychain() {
     exit 0
 }
 
-set_up_environment() {
-    KEYCHAIN_SERVICE_NAME="ddg-macos-app-archive-script"
-    WORKDIR="${PWD}/release"
-    ARCHIVE="${WORKDIR}/DuckDuckGo.xcarchive"
-    NOTARIZATION_INFO_PLIST="${WORKDIR}/notarization-info.plist"
-
+read_command_line_arguments() {
     if (( $# < 1 )); then
         print_usage_and_exit
     fi
@@ -49,8 +50,28 @@ set_up_environment() {
             ;;
     esac
 
-    local cwd
-    cwd="$(dirname "$0")"
+    shift 1
+
+    while getopts a: OPTION; do
+        case "${OPTION}" in
+            a)
+                asana_task_url="${OPTARG}"
+                ;;
+            *)
+                print_usage_and_exit
+                ;;
+        esac
+    done
+
+    shift $((OPTIND-1))
+}
+
+set_up_environment() {
+    KEYCHAIN_SERVICE_NAME="ddg-macos-app-archive-script"
+    WORKDIR="${PWD}/release"
+    ARCHIVE="${WORKDIR}/DuckDuckGo.xcarchive"
+    NOTARIZATION_INFO_PLIST="${WORKDIR}/notarization-info.plist"
+
     if [[ -z $CI ]]; then
         EXPORT_OPTIONS_PLIST="${cwd}/ExportOptions.plist"
     else
@@ -272,6 +293,8 @@ compress_app_and_dsym() {
 }
 
 main() {
+    read_command_line_arguments "$@"
+    source "${cwd}/asana.sh"
     set_up_environment "$@"
     get_developer_credentials
     clean_working_directory
