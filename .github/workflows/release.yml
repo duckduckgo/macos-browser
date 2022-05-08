@@ -63,6 +63,9 @@ jobs:
       with:
         submodules: recursive
 
+    - name: Install create-dmg
+      run: brew install create-dmg
+
     - name: Archive and notarize the app
       env:
         XCODE_DEVELOPER_APPLE_ID: ${{ secrets.XCODE_DEVELOPER_APPLE_ID }}
