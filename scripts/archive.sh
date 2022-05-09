@@ -4,33 +4,6 @@ set -eo pipefail
 
 cwd="$(dirname "$0")"
 
-print_usage_and_exit() {
-    echo "Usage:"
-    echo "  $ $0 <review|release> [-a <asana_task_url>] [-d]"
-    echo
-    echo "Options:"
-    echo " -a <asana_task_url>  Update Asana task after building the app (implies -d)"
-    echo " -d                   Create DMG image alongside the zipped app and dSYMs"
-    echo
-    echo "To clear keychain entries:"
-    echo "  $ $0 clear-keychain"
-    exit 1
-}
-
-create_dmg_preflight() {
-    if [[ ${create_dmg} -ne 1 ]]; then
-        if ! command -v create-dmg &> /dev/null; then
-            echo "create-dmg is required to create DMG images. Install it with:"
-            echo "    $ brew install create-dmg"
-            echo
-            exit 1
-        fi
-
-        create_dmg=1
-        echo "Will create DMG image after building the app."
-    fi
-}
-
 read_command_line_arguments() {
     if (( $# < 1 )); then
         print_usage_and_exit
@@ -74,6 +47,33 @@ read_command_line_arguments() {
     done
 
     shift $((OPTIND-1))
+}
+
+print_usage_and_exit() {
+    echo "Usage:"
+    echo "  $ $0 <review|release> [-a <asana_task_url>] [-d]"
+    echo
+    echo "Options:"
+    echo " -a <asana_task_url>  Update Asana task after building the app (implies -d)"
+    echo " -d                   Create DMG image alongside the zipped app and dSYMs"
+    echo
+    echo "To clear keychain entries:"
+    echo "  $ $0 clear-keychain"
+    exit 1
+}
+
+create_dmg_preflight() {
+    if [[ ${create_dmg} -ne 1 ]]; then
+        if ! command -v create-dmg &> /dev/null; then
+            echo "create-dmg is required to create DMG images. Install it with:"
+            echo "    $ brew install create-dmg"
+            echo
+            exit 1
+        fi
+
+        create_dmg=1
+        echo "Will create DMG image after building the app."
+    fi
 }
 
 set_up_environment() {
