@@ -155,8 +155,8 @@ final class TabViewModel {
     
     private func subscribeToAppearancePreferences() {
         appearancePreferences.$showFullURL.dropFirst().sink { [weak self] newValue in
-            guard let self = self, let url = self.tabURL, let host = self.tabHost else { return }
-            self.updatePassiveAddressBarString(showURL: newValue, url: url, host: host)
+            guard let self = self, let url = self.tabURL, let host = self.tabHostURL else { return }
+            self.updatePassiveAddressBarString(showURL: newValue, url: url, hostURL: host)
         }.store(in: &cancellables)
     }
 
@@ -186,8 +186,8 @@ final class TabViewModel {
         return tab.content.url ?? tab.parentTab?.content.url
     }
     
-    private var tabHost: String? {
-        return tabURL?.host ?? tab.parentTab?.content.url?.host
+    private var tabHostURL: URL? {
+        return tabURL?.root
     }
 
     func updateAddressBarStrings() {
@@ -216,7 +216,7 @@ final class TabViewModel {
             return
         }
 
-        guard let host = tabHost else {
+        guard let hostURL = tabHostURL else {
             // also lands here for about:blank and about:home
             addressBarString = ""
             passiveAddressBarString = ""
@@ -225,14 +225,14 @@ final class TabViewModel {
 
         addressBarString = url.absoluteString
 
-        updatePassiveAddressBarString(showURL: appearancePreferences.showFullURL, url: url, host: host)
+        updatePassiveAddressBarString(showURL: appearancePreferences.showFullURL, url: url, hostURL: hostURL)
     }
     
-    private func updatePassiveAddressBarString(showURL: Bool, url: URL, host: String) {
+    private func updatePassiveAddressBarString(showURL: Bool, url: URL, hostURL: URL) {
         if showURL {
-            passiveAddressBarString = url.toString(decodePunycode: false, dropScheme: false, dropTrailingSlash: true)
+            passiveAddressBarString = url.toString(decodePunycode: true, dropScheme: false, dropTrailingSlash: true)
         } else {
-            passiveAddressBarString = host.drop(prefix: URL.HostPrefix.www.separated())
+            passiveAddressBarString = hostURL.toString(decodePunycode: true, dropScheme: true, needsWWW: false, dropTrailingSlash: true)
         }
     }
 
