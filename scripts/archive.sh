@@ -18,15 +18,17 @@ print_usage_and_exit() {
 }
 
 create_dmg_preflight() {
-    if ! command -v create-dmg &> /dev/null; then
-        echo "create-dmg is required to create DMG images. Install it with:"
-        echo "    $ brew install create-dmg"
-        echo
-        exit 1
-    fi
+    if [[ ${create_dmg} -ne 1 ]]; then
+        if ! command -v create-dmg &> /dev/null; then
+            echo "create-dmg is required to create DMG images. Install it with:"
+            echo "    $ brew install create-dmg"
+            echo
+            exit 1
+        fi
 
-    create_dmg=1
-    echo "Will create DMG image after building the app."
+        create_dmg=1
+        echo "Will create DMG image after building the app."
+    fi
 }
 
 read_command_line_arguments() {

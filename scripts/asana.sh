@@ -130,30 +130,31 @@ asana_update_task() {
         exit 1
     fi
 
-    local tasks_to_update=(
-        "Create Release Build using GitHub Action"
-        "Upload symbols"
-        "Create DMG with background"
-        "Upload DMG to this release task"
-    )
+    asana_close_subtasks
+}
 
-    local tasks
-    tasks="$(asana_get_subtasks)"
+asana_close_subtasks() {
+    local subtasks_to_close
+    IFS=',' read -ra subtasks_to_close <<< "${ASANA_COMMA_SEPARATED_TASK_NAMES_TO_BE_CLOSED}"
+
+    if [[ -n "${subtasks_to_close[*]}" ]]; then
+        local tasks
+        tasks="$(asana_get_subtasks)"
+
+        printf '%s' "Marking ${#subtasks_to_close[@]} relevant Asana task(s) as complete ... "
     
-    for task in "${tasks_to_update[@]}"; do
+        for task in "${subtasks_to_close[@]}"; do
+            task_id="$(asana_get_subtask_id "${task}")"
+            if ! asana_complete_task "${task_id}"; then
+                echo "Failed"
+                echo
+                exit 1
+            fi
+        done
 
-        printf '%s' "Marking task '${task}' as complete ... "
-        task_id="$(asana_get_subtask_id "${task}")"
-        if asana_complete_task "${task_id}"; then
-            echo "Done"
-        else
-            echo "Failed"
-            echo
-            exit 1
-        fi
-
-    done
-
+        echo "Done"
+        echo
+    fi
 }
 
 asana_preflight
