@@ -40,7 +40,7 @@ final class AutoconsentUserScript: NSObject, UserScriptWithAutoconsent {
     
     enum Constants {
         static let newSitePopupHidden = Notification.Name("newSitePopupHidden")
-        static let popupHiddenHostKey = "popupHiddenHostKey"
+        static let popupHiddenUrlKey = "popupHiddenUrlKey"
     }
     
     private enum MessageName: String, CaseIterable {
@@ -190,7 +190,7 @@ final class AutoconsentUserScript: NSObject, UserScriptWithAutoconsent {
         // post popover notification on main thread
         DispatchQueue.main.async {
             NotificationCenter.default.post(name: Constants.newSitePopupHidden, object: self, userInfo: [
-                Constants.popupHiddenHostKey: url.host ?? ""
+                Constants.popupHiddenUrlKey: url
             ])
         }
 
