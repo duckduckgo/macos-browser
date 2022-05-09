@@ -85,6 +85,7 @@
 		4B1E6EF227AB5E5D00F51793 /* PasswordManagementItemList.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B1E6EF027AB5E5D00F51793 /* PasswordManagementItemList.swift */; };
 		4B29759728281F0900187C4E /* FirefoxEncryptionKeyReader.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B29759628281F0900187C4E /* FirefoxEncryptionKeyReader.swift */; };
 		4B2975992828285900187C4E /* FirefoxKeyReaderTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B2975982828285900187C4E /* FirefoxKeyReaderTests.swift */; };
+		4B29759C28284DBC00187C4E /* FirefoxBerkeleyDatabaseReader.m in Sources */ = {isa = PBXBuildFile; fileRef = 4B29759B28284DBC00187C4E /* FirefoxBerkeleyDatabaseReader.m */; };
 		4B2CBF412767EEC1001DF04B /* MacWaitlistStoreTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B2CBF402767EEC1001DF04B /* MacWaitlistStoreTests.swift */; };
 		4B2E7D6326FF9D6500D2DB17 /* PrintingUserScript.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B2E7D6226FF9D6500D2DB17 /* PrintingUserScript.swift */; };
 		4B379C1527BD91E3008A968E /* QuartzIdleStateProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B379C1427BD91E3008A968E /* QuartzIdleStateProvider.swift */; };
@@ -833,6 +834,8 @@
 		4B1E6EF027AB5E5D00F51793 /* PasswordManagementItemList.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PasswordManagementItemList.swift; sourceTree = "<group>"; };
 		4B29759628281F0900187C4E /* FirefoxEncryptionKeyReader.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FirefoxEncryptionKeyReader.swift; sourceTree = "<group>"; };
 		4B2975982828285900187C4E /* FirefoxKeyReaderTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FirefoxKeyReaderTests.swift; sourceTree = "<group>"; };
+		4B29759A28284DBC00187C4E /* FirefoxBerkeleyDatabaseReader.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = FirefoxBerkeleyDatabaseReader.h; sourceTree = "<group>"; };
+		4B29759B28284DBC00187C4E /* FirefoxBerkeleyDatabaseReader.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = FirefoxBerkeleyDatabaseReader.m; sourceTree = "<group>"; };
 		4B2CBF402767EEC1001DF04B /* MacWaitlistStoreTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MacWaitlistStoreTests.swift; sourceTree = "<group>"; };
 		4B2E7D6226FF9D6500D2DB17 /* PrintingUserScript.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PrintingUserScript.swift; sourceTree = "<group>"; };
 		4B379C1427BD91E3008A968E /* QuartzIdleStateProvider.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = QuartzIdleStateProvider.swift; sourceTree = "<group>"; };
@@ -1937,6 +1940,8 @@
 				4B29759628281F0900187C4E /* FirefoxEncryptionKeyReader.swift */,
 				4B5FF67726B602B100D42879 /* FirefoxDataImporter.swift */,
 				4B8AC93A26B48ADF00879451 /* ASN1Parser.swift */,
+				4B29759A28284DBC00187C4E /* FirefoxBerkeleyDatabaseReader.h */,
+				4B29759B28284DBC00187C4E /* FirefoxBerkeleyDatabaseReader.m */,
 			);
 			path = Firefox;
 			sourceTree = "<group>";
@@ -4203,6 +4208,7 @@
 				AAC30A2A268E239100D2D9CD /* CrashReport.swift in Sources */,
 				37CC53F427E8D4620028713D /* NSPathControlView.swift in Sources */,
 				85589E9E27BFE4500038AD11 /* DefaultBrowserPromptView.swift in Sources */,
+				4B29759C28284DBC00187C4E /* FirefoxBerkeleyDatabaseReader.m in Sources */,
 				4B78A86B26BB3ADD0071BB16 /* BrowserImportSummaryViewController.swift in Sources */,
 				AA512D1424D99D9800230283 /* FaviconManager.swift in Sources */,
 				AABEE6AB24ACA0F90043105B /* SuggestionTableRowView.swift in Sources */,
