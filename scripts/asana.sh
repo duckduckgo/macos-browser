@@ -4,6 +4,22 @@ set -eo pipefail
 
 asana_token_keychain_identifier="asana-personal-token"
 
+asana_preflight() {
+    if [[ -n "${asana_task_url}" ]]; then
+        if ! command -v jq &> /dev/null; then
+            echo "jq is required to update Asana tasks. Install it with:"
+            echo "    $ brew install jq"
+            echo
+            exit 1
+        fi
+
+        asana_task_id=$(asana_extract_task_id)
+        asana_get_token
+
+        echo "Will update Asana task ${asana_task_id} after making a build."
+    fi
+}
+
 asana_extract_task_id() {
     local task_url_regex='^https://app.asana.com/[0-9]/[0-9]/([0-9]*)/f$'
     if [[ "${asana_task_url}" =~ ${task_url_regex} ]]; then
@@ -16,7 +32,7 @@ asana_extract_task_id() {
 }
 
 asana_get_token() {
-    asana_personal_access_token="${ASANA_PERSONAL_ACCESS_TOKEN}"
+    asana_personal_access_token="${ASANA_ACCESS_TOKEN}"
 
     if [[ -z "${asana_personal_access_token}" ]]; then
 
@@ -33,22 +49,6 @@ asana_get_token() {
 
             store_password_in_keychain "${asana_token_keychain_identifier}" "${asana_personal_access_token}"
         fi
-    fi
-}
-
-asana_preflight() {
-    if [[ -n "${asana_task_url}" ]]; then
-        if ! command -v jq &> /dev/null; then
-            echo "jq is required to update Asana tasks. Install it with:"
-            echo "    $ brew install jq"
-            echo
-            exit 1
-        fi
-            
-        asana_task_id=$(asana_extract_task_id)
-        asana_get_token
-        
-        echo "Will update Asana task ${asana_task_id} after making a build."
     fi
 }
 
@@ -80,11 +80,6 @@ asana_upload_dsyms_zip() {
     [[ $return_code -eq 200 ]]
 }
 
-asana_get_subtasks() {
-    curl -s "${asana_api_url}/tasks/${asana_task_id}/subtasks" \
-        -H "Authorization: Bearer ${asana_personal_access_token}"
-}
-
 asana_complete_task() {
     local task_id=$1
     
@@ -97,6 +92,11 @@ asana_complete_task() {
         -d '{"data":{"completed":true}}')"
     
     [[ ${return_code} -eq 200 ]]
+}
+
+asana_get_subtasks() {
+    curl -s "${asana_api_url}/tasks/${asana_task_id}/subtasks" \
+        -H "Authorization: Bearer ${asana_personal_access_token}"
 }
 
 asana_get_subtask_id() {

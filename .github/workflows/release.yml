@@ -6,7 +6,7 @@ on:
       release-type:
         description: "Build type (product review or public release)"
         required: true
-        default: 'review'
+        default: review
         type: choice
         options:
         - review
@@ -16,7 +16,10 @@ on:
         required: true
         default: false
         type: boolean
-
+      asana-task-url:
+        description: "Asana release task URL"
+        required: false
+        type: string
 
 jobs:
   export-notarized-app:
@@ -69,16 +72,24 @@ jobs:
         submodules: recursive
 
     - name: Install create-dmg
-      if: ${{ github.event.inputs.create-dmg }}
+      if: github.event.inputs.create-dmg || github.event.inputs.asana-task-url
       run: |
         brew install create-dmg
         echo "create_dmg_arg=-d" >> $GITHUB_ENV
+
+    - name: Set Asana task URL
+      if: github.event.inputs.asana-task-url
+      run: echo "asana_task_url_arg=-a ${{ github.event.inputs.asana-task-url }}" >> $GITHUB_ENV
 
     - name: Archive and notarize the app
       env:
         XCODE_DEVELOPER_APPLE_ID: ${{ secrets.XCODE_DEVELOPER_APPLE_ID }}
         XCODE_DEVELOPER_PASSWORD: ${{ secrets.XCODE_DEVELOPER_PASSWORD }}
-      run: ./scripts/archive.sh ${{ github.event.inputs.release-type }} ${{ env.create_dmg_arg }}
+        ASANA_ACCESS_TOKEN: ${{ secrets.ASANA_ACCESS_TOKEN }}
+      run: |
+        ./scripts/archive.sh ${{ github.event.inputs.release-type }} \
+            ${{ env.create_dmg_arg }} \
+            ${{ env.asana_task_url_arg }}
 
     - name: Upload app artifact
       uses: actions/upload-artifact@v3
@@ -93,7 +104,7 @@ jobs:
         path: ${{ github.workspace }}/release/DuckDuckGo*.app.dSYM.zip
 
     - name: Upload DMG artifact
-      if: ${{ github.event.inputs.create-dmg }}
+      if: github.event.inputs.create-dmg
       uses: actions/upload-artifact@v3
       with:
         name: DuckDuckGo-macos-${{ github.event.inputs.release-type }}.dmg
