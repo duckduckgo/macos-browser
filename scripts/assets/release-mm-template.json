@@ -1,0 +1,1 @@
+{"username":"GitHub Actions","text":"**Release build ready** :goose_honk_tada: | [:github: Workflow run summary](${WORKFLOW_URL}) | [:asana: Asana task](${ASANA_TASK_URL})\ncc ${MM_USER_HANDLE}"}

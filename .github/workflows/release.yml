@@ -27,6 +27,7 @@ jobs:
     runs-on: macos-12
 
     steps:
+
     - name: Install Apple Developer ID Application certificate
       env:
         BUILD_CERTIFICATE_BASE64: ${{ secrets.BUILD_CERTIFICATE_BASE64 }}
@@ -105,8 +106,19 @@ jobs:
         path: ${{ github.workspace }}/release/DuckDuckGo*.app.dSYM.zip
 
     - name: Upload DMG artifact
-      if: github.event.inputs.create-dmg
+      if: github.event.inputs.create-dmg || github.event.inputs.asana-task-url
       uses: actions/upload-artifact@v3
       with:
         name: DuckDuckGo-macos-${{ github.event.inputs.release-type }}.dmg
         path: ${{ github.workspace }}/release/DuckDuckGo*.dmg
+
+    - name: Send Mattermost message
+      if: github.event.inputs.asana-task-url
+      env:
+        WORKFLOW_URL: https://github.com/more-duckduckgo-org/macos-browser/actions/runs/${{ github.run_id }}
+        ASANA_TASK_URL: ${{ github.event.inputs.asana-task-url }}
+      run: |
+        export MM_USER_HANDLE=$(base64 -d <<< ${{ secrets.MM_HANDLES_BASE64 }} | jq ".${{ github.actor }}" | tr -d '"')
+        curl -H 'Content-type: application/json' \
+            -d "$(envsubst < ./scripts/assets/release-mm-template.json)" \
+            ${{ secrets.MM_WEBHOOK_URL }}
