@@ -21,7 +21,7 @@ asana_preflight() {
 }
 
 asana_extract_task_id() {
-    local task_url_regex='^https://app.asana.com/[0-9]/[0-9]/([0-9]*)/f$'
+    local task_url_regex='^https://app.asana.com/[0-9]/[0-9]*/([0-9]*)/f$'
     if [[ "${asana_task_url}" =~ ${task_url_regex} ]]; then
         echo "${BASH_REMATCH[1]}"
     else
@@ -94,14 +94,12 @@ asana_complete_task() {
     [[ ${return_code} -eq 200 ]]
 }
 
-asana_get_subtasks() {
-    curl -s "${asana_api_url}/tasks/${asana_task_id}/subtasks" \
-        -H "Authorization: Bearer ${asana_personal_access_token}"
-}
-
-asana_get_subtask_id() {
-    local task_name=$1
-    jq ".data[] | select(.name | test(\"${task_name}\")) | .gid" <<< "${tasks}" | tr -d '"'
+asana_get_subtasks_to_close() {
+    local tag_id="1202251744337353"
+    curl -s "${asana_api_url}/tasks/${asana_task_id}/subtasks?opt_fields=tags,name" \
+        -H "Authorization: Bearer ${asana_personal_access_token}" \
+        | jq "[.data[] | select(.tags[0].gid == \"${tag_id}\") | .gid] | join(\" \")" \
+        | tr -d '"'
 }
 
 asana_update_task() {
@@ -135,16 +133,13 @@ asana_update_task() {
 
 asana_close_subtasks() {
     local subtasks_to_close
-    IFS=',' read -ra subtasks_to_close <<< "${ASANA_COMMA_SEPARATED_TASK_NAMES_TO_BE_CLOSED}"
+    read -ra subtasks_to_close <<< "$(asana_get_subtasks_to_close)"
 
     if [[ -n "${subtasks_to_close[*]}" ]]; then
-        local tasks
-        tasks="$(asana_get_subtasks)"
 
         printf '%s' "Marking ${#subtasks_to_close[@]} relevant Asana task(s) as complete ... "
     
-        for task in "${subtasks_to_close[@]}"; do
-            task_id="$(asana_get_subtask_id "${task}")"
+        for task_id in "${subtasks_to_close[@]}"; do
             if ! asana_complete_task "${task_id}"; then
                 echo "Failed"
                 echo
