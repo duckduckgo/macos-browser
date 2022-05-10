@@ -39,6 +39,15 @@ final class DownloadsViewController: NSViewController {
     @IBOutlet var contextMenu: NSMenu!
     @IBOutlet var tableView: NSTableView!
     @IBOutlet var tableViewHeightConstraint: NSLayoutConstraint?
+    @IBOutlet var openDownloadsButton: NSButton!
+    @IBOutlet var clearButton: NSButton!
+
+    private static let openDownloadsLinkTag = 67
+    var openDownloadsLink: NSButton? {
+        didSet {
+            clearButton.nextKeyView = openDownloadsLink
+        }
+    }
     private var cellIndexToUnselect: Int?
 
     weak var delegate: DownloadsViewControllerDelegate?
@@ -72,6 +81,10 @@ final class DownloadsViewController: NSViewController {
             }
         tableView.reloadData()
         updateHeight()
+    }
+
+    override func viewDidAppear() {
+        clearButton.nextKeyView = openDownloadsLink
     }
 
     override func viewWillDisappear() {
@@ -252,8 +265,12 @@ extension DownloadsViewController: NSTableViewDataSource, NSTableViewDelegate {
             identifier = .openDownloadsCell
         }
         let cell = tableView.makeView(withIdentifier: identifier, owner: nil)
-        if identifier == .downloadCell {
+        switch identifier {
+        case .downloadCell:
             cell?.menu = contextMenu
+        case .openDownloadsCell, .noDownloadsCell:
+            self.openDownloadsLink = cell?.viewWithTag(Self.openDownloadsLinkTag) as? NSButton
+        default: break
         }
         return cell
     }

@@ -18,13 +18,16 @@
 
 import Cocoa
 
-final class FireCoordinator {
+final class FireCoordinator: NSObject {
+    static let shared = FireCoordinator()
+    private override init() {}
 
-    static var fireViewModel = FireViewModel()
+    var fireViewModel = FireViewModel()
+    var firePopover: FirePopover?
 
-    static var firePopover: FirePopover?
+    private weak var fireButton: NSButton?
 
-    static func fireButtonAction() {
+    func fireButtonAction() {
         let burningWindow: NSWindow
         let waitForOpening: Bool
 
@@ -45,7 +48,7 @@ final class FireCoordinator {
 
         if waitForOpening {
             DispatchQueue.main.asyncAfter(deadline: .now() + 1/3) {
-                showFirePopover(relativeTo: mainViewController.tabBarViewController.fireButton,
+                self.showFirePopover(relativeTo: mainViewController.tabBarViewController.fireButton,
                                 tabCollectionViewModel: mainViewController.tabCollectionViewModel)
             }
         } else {
@@ -54,13 +57,25 @@ final class FireCoordinator {
         }
     }
 
-    static func showFirePopover(relativeTo positioningView: NSView, tabCollectionViewModel: TabCollectionViewModel) {
+    func showFirePopover(relativeTo positioningView: NSButton, tabCollectionViewModel: TabCollectionViewModel) {
         if !(firePopover?.isShown ?? false) {
+            self.fireButton = positioningView
+            positioningView.state = .on
+
             firePopover = FirePopover(fireViewModel: fireViewModel, tabCollectionViewModel: tabCollectionViewModel)
+            firePopover?.delegate = self
             firePopover?.show(relativeTo: positioningView.bounds.insetFromLineOfDeath(),
                              of: positioningView,
                              preferredEdge: .maxY)
         }
+    }
+
+}
+
+extension FireCoordinator: NSPopoverDelegate {
+
+    func popoverDidClose(_ notification: Notification) {
+        self.fireButton?.state = .off
     }
 
 }

@@ -352,6 +352,8 @@ final class TabBarViewController: NSViewController {
         tabPreviewWindowController.hide()
     }
 
+    private weak var floatingAddButton: NSButton?
+
 }
 
 extension TabBarViewController: TabCollectionViewModelDelegate {
@@ -439,7 +441,7 @@ extension TabBarViewController: TabCollectionViewModelDelegate {
             let selectionIndexPathSet = Set(arrayLiteral: IndexPath(item: selectionIndex))
             collectionView.clearSelection(animated: true)
             collectionView.animator().selectItems(at: selectionIndexPathSet, scrollPosition: .centeredHorizontally)
-            collectionView.scrollToSelected()
+            collectionView.scroll(to: selectionIndex)
         } else {
             collectionView.clearSelection(animated: true)
         }
@@ -546,8 +548,13 @@ extension TabBarViewController: NSCollectionViewDataSource {
         if let footer = view as? TabBarFooter {
             footer.addButton?.target = self
             footer.addButton?.action = #selector(addButtonAction(_:))
+            self.floatingAddButton  = footer.addButton
         }
         return view
+    }
+
+    var addButton: NSButton? {
+        isAddButtonFloating ? floatingAddButton : nil
     }
 
     func collectionView(
@@ -575,7 +582,7 @@ extension TabBarViewController: NSCollectionViewDelegate {
 
             // Poor old NSCollectionView
             DispatchQueue.main.async {
-                self.collectionView.scrollToSelected()
+                self.collectionView.scroll(to: indexPath.item)
             }
         }
 
@@ -697,7 +704,7 @@ extension TabBarViewController: TabBarViewItemDelegate {
             return
         }
         tabCollectionViewModel.select(at: indexPath.item)
-        // TODO: Scroll?
+        // TODO: Scroll? // swiftlint:disable:this todo
     }
 
     func tabBarViewItem(_ tabBarViewItem: TabBarViewItem, isMouseOver: Bool) {

@@ -23,3 +23,9 @@
 - (void)_setDefaultKeyViewLoop;
 
 @end
+
+@interface NSControl (Private)
+
+- (NSEventMask)sendActionOnMask;
+
+@end

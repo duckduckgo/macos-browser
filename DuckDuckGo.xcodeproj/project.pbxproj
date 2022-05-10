@@ -526,6 +526,7 @@
 		B6085D062743905F00A9C456 /* CoreDataStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = B6085D052743905F00A9C456 /* CoreDataStore.swift */; };
 		B6085D092743AAB600A9C456 /* FireproofDomains.xcdatamodeld in Sources */ = {isa = PBXBuildFile; fileRef = B6085D072743993C00A9C456 /* FireproofDomains.xcdatamodeld */; };
 		B60D19B4281BC92900EBAB97 /* PasswordSortButton.xib in Resources */ = {isa = PBXBuildFile; fileRef = B60D19B3281BC92900EBAB97 /* PasswordSortButton.xib */; };
+		B60D19B9282A4FBB00EBAB97 /* FocusView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B60D19B8282A4FBB00EBAB97 /* FocusView.swift */; };
 		B6106BA026A7BE0B0013B453 /* PermissionManagerTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = B6106B9F26A7BE0B0013B453 /* PermissionManagerTests.swift */; };
 		B6106BA426A7BEA40013B453 /* PermissionAuthorizationState.swift in Sources */ = {isa = PBXBuildFile; fileRef = B6106BA226A7BEA00013B453 /* PermissionAuthorizationState.swift */; };
 		B6106BA726A7BECC0013B453 /* PermissionAuthorizationQuery.swift in Sources */ = {isa = PBXBuildFile; fileRef = B6106BA526A7BEC80013B453 /* PermissionAuthorizationQuery.swift */; };
@@ -1284,6 +1285,7 @@
 		B6085D052743905F00A9C456 /* CoreDataStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CoreDataStore.swift; sourceTree = "<group>"; };
 		B6085D082743993D00A9C456 /* Permissions.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = Permissions.xcdatamodel; sourceTree = "<group>"; };
 		B60D19B3281BC92900EBAB97 /* PasswordSortButton.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = PasswordSortButton.xib; sourceTree = "<group>"; };
+		B60D19B8282A4FBB00EBAB97 /* FocusView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FocusView.swift; sourceTree = "<group>"; };
 		B6106B9D26A565DA0013B453 /* BundleExtension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BundleExtension.swift; sourceTree = "<group>"; };
 		B6106B9F26A7BE0B0013B453 /* PermissionManagerTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PermissionManagerTests.swift; sourceTree = "<group>"; };
 		B6106BA226A7BEA00013B453 /* PermissionAuthorizationState.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PermissionAuthorizationState.swift; sourceTree = "<group>"; };
@@ -2182,6 +2184,7 @@
 				85589E9527BFE25D0038AD11 /* FailedAssertionView.swift */,
 				85589E9927BFE3C30038AD11 /* FaviconView.swift */,
 				85C5991A27D10CF000E605B2 /* FireAnimationView.swift */,
+				B60D19B8282A4FBB00EBAB97 /* FocusView.swift */,
 				85589E9727BFE2DA0038AD11 /* HoverButton.swift */,
 				4BE65484271FCD7B008D1D63 /* LoginFaviconView.swift */,
 				85707F2D276A394C00DC0649 /* ViewExtensions.swift */,
@@ -4465,6 +4468,7 @@
 				4B92929D26670D2A00AD2C21 /* BookmarkNode.swift in Sources */,
 				B693955226F04BEB0015B914 /* LongPressButton.swift in Sources */,
 				B6085D062743905F00A9C456 /* CoreDataStore.swift in Sources */,
+				B60D19B9282A4FBB00EBAB97 /* FocusView.swift in Sources */,
 				B6DB3AF6278EA0130024C5C4 /* BundleExtension.swift in Sources */,
 				4B677438255DBEB800025BD8 /* HTTPSUpgrade.xcdatamodeld in Sources */,
 				4B0511E1262CAA8600F6079C /* NSOpenPanelExtensions.swift in Sources */,

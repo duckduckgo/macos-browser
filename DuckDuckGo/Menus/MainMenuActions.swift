@@ -156,7 +156,7 @@ extension AppDelegate {
     }
 
     @IBAction func fireButtonAction(_ sender: NSButton) {
-        FireCoordinator.fireButtonAction()
+        FireCoordinator.shared.fireButtonAction()
     }
 
 }

@@ -304,20 +304,6 @@ final class AddressBarButtonsViewController: NSViewController {
     func openPrivacyDashboard() {
         guard let selectedTabViewModel = tabCollectionViewModel.selectedTabViewModel else { return }
 
-//        let webView = selectedTabViewModel.tab.webView
-
-////        let url = Bundle.main.url(forResource: "popup", withExtension: "html", subdirectory: "duckduckgo-privacy-dashboard/build/macos/html")!
-////        webView.loadFileURL(url, allowingReadAccessTo: url.deletingLastPathComponent())
-//        webView.navigationDelegate = privacyDashboardPopover.viewController
-//        webView.uiDelegate = nil
-//        privacyDashboardPopover.viewController.webView = webView
-//
-//        privacyDashboardPopover.viewController.tabViewModel = selectedTabViewModel
-//        privacyDashboardPopover.viewController.viewDidLoad()
-//        privacyDashboardPopover.viewController.viewWillAppear()
-//        webView.makeMeFirstResponder()
-//        return
-
         // Prevent popover from being closed with Privacy Entry Point Button, while pending updates
         if privacyDashboardPopover.viewController.isPendingUpdates() { return }
 

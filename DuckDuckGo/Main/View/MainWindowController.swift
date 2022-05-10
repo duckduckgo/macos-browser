@@ -31,7 +31,7 @@ final class MainWindowController: NSWindowController {
         // swiftlint:enable force_cast
     }
 
-    init(mainViewController: MainViewController, popUp: Bool, fireViewModel: FireViewModel = FireCoordinator.fireViewModel) {
+    init(mainViewController: MainViewController, popUp: Bool, fireViewModel: FireViewModel = FireCoordinator.shared.fireViewModel) {
         let makeWindow: (NSRect) -> NSWindow = popUp ? PopUpWindow.init(frame:) : MainWindow.init(frame:)
 
         let size = mainViewController.view.frame.size

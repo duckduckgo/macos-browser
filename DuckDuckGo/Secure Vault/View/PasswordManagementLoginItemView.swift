@@ -92,38 +92,34 @@ private struct Buttons: View {
         HStack {
 
             if model.isEditing && !model.isNew {
-                Button(UserText.pmDelete) {
-                    model.requestDelete()
-                }
-                .buttonStyle(StandardButtonStyle())
+                Button(UserText.pmDelete) { model.requestDelete() }
+                    .buttonStyle(StandardButtonStyle())
+                    .focusable(action: { model.requestDelete() })
             }
 
             Spacer()
 
             if model.isEditing || model.isNew {
-                Button(UserText.pmCancel) {
-                    model.cancel()
-                }
-                .buttonStyle(StandardButtonStyle())
-                Button(UserText.pmSave) {
-                    model.save()
-                }
-                .disabled(!model.isDirty)
-                .buttonStyle(DefaultActionButtonStyle(enabled: model.isDirty))
+                Button(UserText.pmCancel) { model.cancel() }
+                    .buttonStyle(StandardButtonStyle())
+                    .focusable(action: { model.cancel() })
+                    .keyboardShortcutIfAvailable(.escape)
+
+                Button(UserText.pmSave) { model.save() }
+                    .buttonStyle(DefaultActionButtonStyle(enabled: model.isDirty))
+                    .focusable(action: { model.save() })
+                    .keyboardShortcutIfAvailable(.return, modifiers: .command)
+                // TODO: Does kb access get disabled when disabled?
+                    .disabled(!model.isDirty)
 
             } else {
-                Button(UserText.pmDelete) {
-                    model.requestDelete()
-                }
-                .buttonStyle(StandardButtonStyle())
-                .focusable()
+                Button(UserText.pmDelete) { model.requestDelete()}
+                    .buttonStyle(StandardButtonStyle())
+                    .focusable(action: { model.requestDelete() })
 
-                Button(UserText.pmEdit) {
-                    model.edit()
-                }
-                .buttonStyle(StandardButtonStyle())
-                .focusable()
-
+                Button(UserText.pmEdit) { model.edit() }
+                    .buttonStyle(StandardButtonStyle())
+                    .focusable(action: { model.edit() })
             }
 
         }
@@ -146,6 +142,10 @@ private struct UsernameView: View {
                 .bold()
                 .padding(.bottom, itemSpacing)
 
+            let menuProvider = MenuProvider([
+                .item(title: UserText.loginCopy) { model.copy(model.username) }
+            ])
+
             if model.isEditing || model.isNew {
 
                 TextField("", text: $model.username)
@@ -156,7 +156,8 @@ private struct UsernameView: View {
 
                 HStack(spacing: 6) {
                     Text(model.username)
-                        .focusable(true)
+                        .textSelectableIfAvailable()
+                        .focusable(menu: menuProvider.createMenu, onCopy: { model.copy(model.username) })
 
                     if isHovering {
                         Button {
@@ -175,6 +176,71 @@ private struct UsernameView: View {
         .onHover {
             isHovering = $0
         }
+    }
+
+}
+
+enum MenuItem: Identifiable {
+    var id: ObjectIdentifier {
+        switch self {
+        case .item(title: let title, checked: _, action: _):
+            return .init(title as NSString)
+        case .divider:
+            return .init("-" as NSString)
+        }
+    }
+
+    case item(title: String, checked: Bool = false, action: () -> Void)
+    case divider
+}
+final class MenuResponder: NSObject {
+    @objc func menuItemSelected(_ menuItem: NSMenuItem) {
+        guard let action = menuItem.representedObject as? () -> Void else {
+            assertionFailure("Closure expected")
+            return
+        }
+        action()
+    }
+}
+struct MenuProvider {
+    var menuItems: [MenuItem]
+    init(_ menuItems: [MenuItem]) {
+        self.menuItems = menuItems
+    }
+}
+final class ActionMenu: NSMenu {
+    let responder = MenuResponder()
+    convenience init() {
+        self.init(title: "")
+    }
+}
+extension MenuProvider {
+
+    func createContextMenu() -> some View {
+        ForEach(menuItems) { item in
+            switch item {
+            case .item(title: let title, checked: _, action: let action):
+                Button(title, action: action)
+            case .divider:
+                Divider()
+            }
+        }
+    }
+
+    func createMenu() -> NSMenu {
+        let menu = ActionMenu()
+        for item in menuItems {
+            switch item {
+            case .item(title: let title, checked: let checked, action: let action):
+                let menuItem = NSMenuItem(title: title, action: #selector(MenuResponder.menuItemSelected), target: menu.responder, keyEquivalent: "")
+                menuItem.state = checked ? .on : .off
+                menuItem.representedObject = action
+                menu.addItem(menuItem)
+            case .divider:
+                menu.addItem(.separator())
+            }
+        }
+        return menu
     }
 
 }
@@ -201,6 +267,7 @@ private struct PasswordView: View {
 
                         TextField("", text: $model.password)
                             .textFieldStyle(RoundedBorderTextFieldStyle())
+                            .textSelectableIfAvailable()
 
                     } else {
 
@@ -215,6 +282,7 @@ private struct PasswordView: View {
                         Image("SecureEyeToggle")
                     }
                     .buttonStyle(PlainButtonStyle())
+                    .focusable(action: { isPasswordVisible = !isPasswordVisible })
                     .padding(.trailing, 10)
 
                 }
@@ -223,21 +291,28 @@ private struct PasswordView: View {
             } else {
 
                 HStack(alignment: .center, spacing: 6) {
+                    let menuProvider = MenuProvider([
+                        .item(title: isPasswordVisible ? UserText.passwordHide : UserText.passwordShow) {
+                            isPasswordVisible.toggle()
+                        },
+                        .item(title: UserText.passwordCopy) { model.copy(model.password) }
+                    ])
 
-                    if isPasswordVisible {
-                        Text(model.password)
-                            .focusable()
-                    } else {
-                        Text(model.password.isEmpty ? "" : "••••••••••••")
-                            .focusable()
-                    }
+                    Text(isPasswordVisible || model.password.isEmpty ? model.password : "••••••••••••")
+                        .focusable(menu: menuProvider.createMenu, onCopy: { model.copy(model.password) })
+//                        // TODO: AX actions // swiftlint:disable:this todo
+//                            .accessibilityAction {
+//                                print("Act")
+//                            }
 
                     if isHovering || isPasswordVisible {
                         Button {
                             isPasswordVisible = !isPasswordVisible
                         } label: {
                             Image("SecureEyeToggle")
-                        }.buttonStyle(PlainButtonStyle())
+                        }
+                        .buttonStyle(PlainButtonStyle())
+                        .tooltip(isPasswordVisible ? UserText.passwordHide : UserText.passwordShow)
                     }
 
                     if isHovering {
@@ -245,7 +320,9 @@ private struct PasswordView: View {
                             model.copy(model.password)
                         } label: {
                             Image("Copy")
-                        }.buttonStyle(PlainButtonStyle())
+                        }
+                        .buttonStyle(PlainButtonStyle())
+                        .tooltip(UserText.passwordCopy)
                     }
 
                     Spacer()
@@ -259,6 +336,72 @@ private struct PasswordView: View {
             isHovering = $0
         }
     }
+
+}
+
+extension View {
+
+    @ViewBuilder
+    func focusable(_ focusable: Bool = true,
+                   onClick: Bool = false,
+                   focusRing: Bool = true,
+                   onFocus: ((Bool) -> Void)? = nil,
+                   action: (() -> Void)? = nil,
+                   menu: (() -> NSMenu)? = nil,
+                   onCopy: (() -> Void)? = nil,
+                   keyDown: ((NSEvent) -> NSEvent?)? = nil) -> some View {
+        if focusable {
+            self.overlay(FocusSwiftUIView(onClick: onClick,
+                                          focusRing: focusRing,
+                                          onFocus: onFocus,
+                                          action: action,
+                                          menu: menu,
+                                          onCopy: onCopy,
+                                          keyDown: keyDown),
+                         alignment: .leading)
+        } else {
+            self
+        }
+    }
+
+    @ViewBuilder
+    func onDefaultAction(_ action: (() -> Void)?) -> some View {
+        self.onCommand(#selector(NSCell.performClick(_:)), perform: action)
+    }
+
+    @ViewBuilder
+    func textSelectableIfAvailable() -> some View {
+        if #available(macOS 12.0, *) {
+            self.textSelection(.enabled)
+        } else {
+            self
+        }
+    }
+
+    @ViewBuilder
+    func keyboardShortcutIfAvailable(_ key: Character, modifiers: EventModifiers = []) -> some View {
+        if #available(macOS 11.0, *) {
+            keyboardShortcut(.init(key), modifiers: modifiers)
+        } else {
+            self
+        }
+    }
+
+}
+
+// swiftlint:disable:next identifier_name
+@ViewBuilder func If<V1: View, V2: View>(_ condition: Bool, then: () -> V1, else elseBlock: () -> V2) -> some View {
+    if condition {
+        then()
+    } else {
+        elseBlock()
+    }
+}
+
+extension Character {
+
+    static let escape = Character("\u{001B}")
+    static let `return` = Character("\u{000D}")
 
 }
 
@@ -280,14 +423,24 @@ private struct WebsiteView: View {
 
         } else {
             if let domainURL = model.domain.url {
-                TextButton(model.domain) {
-                    model.openURL(domainURL)
-                }
-                .focusable()
-                .padding(.bottom, interItemSpacing)
+                let menuProvider = MenuProvider([
+                    .item(title: UserText.open) { model.openURL(domainURL) },
+                    .item(title: UserText.copy) { model.copy(domainURL) }
+                ])
+
+                TextButton(model.domain) { model.openURL(domainURL) }
+                    .contextMenu(menuItems: menuProvider.createContextMenu)
+                    .focusable(menu: menuProvider.createMenu, onCopy: { model.copy(domainURL) })
+                    .padding(.bottom, interItemSpacing)
+
             } else {
+                let menuProvider = MenuProvider([
+                    .item(title: UserText.copy) { model.copy(model.domain) }
+                ])
+
                 Text(model.domain)
-                    .focusable()
+                    .contextMenu(menuItems: menuProvider.createContextMenu)
+                    .focusable(menu: menuProvider.createMenu, onCopy: { model.copy(model.domain) })
                     .padding(.bottom, interItemSpacing)
             }
         }
@@ -344,8 +497,15 @@ private struct HeaderView: View {
 
             } else {
 
-                Text(model.title.isEmpty ? model.domain.dropWWW() : model.title)
+                let textFieldValue = model.title.isEmpty ? model.domain.dropWWW() : model.title
+                let menuProvider = MenuProvider([
+                    .item(title: UserText.copy) { model.copy(textFieldValue) }
+                ])
+
+                Text(textFieldValue)
                     .font(.title)
+                    .textSelectableIfAvailable()
+                    .focusable(menu: menuProvider.createMenu, onCopy: { model.copy(textFieldValue) })
 
             }
 

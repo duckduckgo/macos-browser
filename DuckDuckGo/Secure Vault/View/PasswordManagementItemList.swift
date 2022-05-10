@@ -20,6 +20,7 @@ import Foundation
 import SwiftUI
 import BrowserServicesKit
 import Combine
+import Carbon.HIToolbox
 
 struct ScrollOffsetKey: PreferenceKey {
     typealias Value = CGFloat
@@ -48,25 +49,26 @@ struct PasswordManagementItemListView: View {
                 .opacity(model.canChangeCategory ? 1.0 : 0.5)
             
             Divider()
-            
+
             if #available(macOS 11.0, *) {
                 ScrollView {
                     ScrollViewReader { proxy in
-                        PasswordManagementItemListStackView()
-                            .onAppear {
-                                // Scrolling to the selected item doesn't work consistently without a very slight delay.
-                                DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
-                                    if let selectionID = model.selected?.id {
-                                        proxy.scrollTo(selectionID, anchor: .center)
-                                    }
+                        PasswordManagementItemListStackView(onSelected: { item in
+                            proxy.scrollTo(item.id, anchor: nil)
+                        }).onAppear {
+                            // Scrolling to the selected item doesn't work consistently without a very slight delay.
+                            DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
+                                if let selectionID = model.selected?.id {
+                                    proxy.scrollTo(selectionID, anchor: .center)
                                 }
                             }
+                        }
                     }
                 }
 
             } else {
                 ScrollView {
-                    PasswordManagementItemListStackView()
+                    PasswordManagementItemListStackView(onSelected: { _ in })
                 }
             }
         }
@@ -133,27 +135,60 @@ struct PasswordManagementItemListCategoryView: View {
 }
 
 struct PasswordManagementItemListStackView: View {
-    
+
+    let onSelected: (SecureVaultItem) -> Void
     @EnvironmentObject var model: PasswordManagementItemListModel
     
     var body: some View {
-        
+        makeVStack()
+            .focusable(model.canBecomeFirstResponder, onClick: true, focusRing: false, onFocus: { isFirstResponder in
+                if model.isFirstResponder != isFirstResponder {
+                    model.isFirstResponder = isFirstResponder
+                }
+            }, keyDown: { event in
+                switch Int(event.keyCode) {
+                case kVK_DownArrow:
+                    if NSApp.isCommandPressed {
+                        fallthrough
+                    }
+                    model.selectNext().map(onSelected)
+                    return nil
+                case kVK_End:
+                    model.selectLast().map(onSelected)
+                    return nil
+                case kVK_UpArrow:
+                    if NSApp.isCommandPressed {
+                        fallthrough
+                    }
+                    model.selectPrevious().map(onSelected)
+                    return nil
+                case kVK_Home:
+                    model.selectFirst().map(onSelected)
+                    return nil
+                default: break
+                }
+                return event
+            })
+    }
+
+    @ViewBuilder
+    func makeVStack() -> some View {
         if #available(macOS 11.0, *) {
             LazyVStack(alignment: .leading) {
-                PasswordManagementItemStackContentsView()
+                PasswordManagementItemStackContentsView(onSelected: onSelected)
             }
         } else {
             VStack(alignment: .leading) {
-                PasswordManagementItemStackContentsView()
+                PasswordManagementItemStackContentsView(onSelected: onSelected)
             }
         }
-        
     }
     
 }
 
 private struct PasswordManagementItemStackContentsView: View {
-    
+
+    let onSelected: (SecureVaultItem) -> Void
     @EnvironmentObject var model: PasswordManagementItemListModel
 
     var body: some View {
@@ -166,6 +201,7 @@ private struct PasswordManagementItemStackContentsView: View {
                 ForEach(section.items, id: \.id) { item in
                     ItemView(item: item) {
                         model.selected(item: item)
+                        onSelected(item)
                     }
                     .padding(.horizontal, 10)
                 }
@@ -200,7 +236,7 @@ private struct ItemView: View {
             // Almost clear, so that whole view is clickable
             : PasswordManagerItemButtonStyle(bgColor: Color(.windowBackgroundColor.withAlphaComponent(0.001)))
 
-        Button(action: action, label: {
+        Button(action: {}, label: {
             HStack(spacing: 0) {
 
                 switch item {
@@ -244,6 +280,8 @@ private struct ItemView: View {
         })
             .frame(maxHeight: 48)
             .buttonStyle(bgStyle)
+            // Send action on mouse down
+            .highPriorityGesture(LongPressGesture(minimumDuration: 0).onEnded { _ in action() })
     }
 
 }
@@ -267,14 +305,11 @@ struct PasswordManagementSortButton: NSViewRepresentable {
     
     @EnvironmentObject var model: PasswordManagementItemListModel
 
-    @State var sortHover: Bool = false
-    
     let imageName: String
 
     func makeNSView(context: Context) -> some NSView {
-        let view = NSView(frame: CGRect(x: 0, y: 0, width: 24, height: 24))
-
         var objects: NSArray?
+        // TODO: Create button programmatically
         NSNib(nibNamed: "PasswordSortButton", bundle: .main)?.instantiate(withOwner: nil, topLevelObjects: &objects)
         let btn = ((objects as? [Any]?)!!.first(where: { $0 is NSButton }) as? NSButton)!
         btn.image = NSImage(named: imageName)!
@@ -285,23 +320,12 @@ struct PasswordManagementSortButton: NSViewRepresentable {
 //        btn.mouseDownColor = .buttonMouseDownColor
 //        btn.cornerRadius = 4
 //
-////        btn.addConstraint(.init(item: btn, attribute: .height, relatedBy: .equal, toItem: nil, attribute: .notAnAttribute, multiplier: 1.0, constant: 24))
+
 //        view.addSubview(btn)
 //        view.addConstraint(.init(item: view, attribute: .height, relatedBy: .equal, toItem: nil, attribute: .notAnAttribute, multiplier: 1.0, constant: 24))
 
-        final class ButtonDelegate: NSObject {
-            @objc func action(_ sender: NSButton) {
-                let location = NSPoint(x: sender.frame.origin.x, y: sender.frame.origin.y - (sender.frame.height / 2) + 6)
-                sender.menu?.popUp(positioning: nil, at: location, in: sender.superview)
-            }
-        }
-        let delegate = ButtonDelegate()
+        let delegate = ButtonDelegate(menuProvider: menuProvider())
 
-        let menu = NSMenu()
-        menu.addItem(.init(title: "test", action: nil, target: nil, keyEquivalent: ""))
-        menu.addItem(.separator())
-        menu.addItem(.init(title: "test 2", action: nil, target: nil, keyEquivalent: ""))
-        btn.menu = menu
         btn.sendAction(on: .leftMouseDown)
         btn.target = delegate
         btn.action = #selector(ButtonDelegate.action(_:))
@@ -314,53 +338,29 @@ struct PasswordManagementSortButton: NSViewRepresentable {
         guard let btn = nsView as? NSButton else { return }
 
         btn.image = NSImage(named: imageName)!
+        (btn.target as? ButtonDelegate)?.menuProvider = menuProvider()
     }
-//    var body: some View {
-//
-//        ZStack {
-//            Image(imageName)
-//
-//            // The image is added elsewhere, because MenuButton has a bug with using Images as labels.
-//            MenuButton(label: Image(nsImage: NSImage())) {
-//                Picker("", selection: $model.sortDescriptor.parameter) {
-//                    ForEach(SecureVaultSorting.SortParameter.allCases, id: \.self) { parameter in
-//                        Text(menuTitle(for: parameter.title, checked: parameter == model.sortDescriptor.parameter))
-//                    }
-//                }
-//                .labelsHidden()
-//                .pickerStyle(.radioGroup)
-//
-//                Divider()
-//
-//                Picker("", selection: $model.sortDescriptor.order) {
-//                    ForEach(SecureVaultSorting.SortOrder.allCases, id: \.self) { order in
-//                        let orderTitle = order.title(for: model.sortDescriptor.parameter.type)
-//                        let labelTitle = menuTitle(for: orderTitle, checked: order == model.sortDescriptor.order)
-//                        Text(labelTitle)
-//                    }
-//                }
-//                .labelsHidden()
-//                .pickerStyle(.radioGroup)
-//            }
-//            .menuButtonStyle(BorderlessButtonMenuButtonStyle())
-//            .padding(5)
-//            .background(RoundedRectangle(cornerRadius: 5).foregroundColor(sortHover ? Color("SecureVaultCategoryDefaultColor") : Color.clear))
-//            .onHover { isOver in
-//                sortHover = isOver
-//            }
-//            .foregroundColor(.red)
-//        }
-//
-//    }
-    
-    // The SwiftUI MenuButton view doesn't allow pickers which have checkmarks at the top level; they get put into a submenu.
-    // This title is used in place of a nested picker.
-    private func menuTitle(for string: String, checked: Bool) -> String {
-        if checked {
-            return "✓ \(string)"
-        } else {
-            return "    \(string)"
+
+    final private class ButtonDelegate: NSObject {
+        var menuProvider: MenuProvider
+        init(menuProvider: MenuProvider) {
+            self.menuProvider = menuProvider
+        }
+        @objc func action(_ sender: NSButton) {
+            menuProvider.createMenu().popUp(positioning: nil, at: NSPoint(x: 0, y: sender.bounds.maxY - 4), in: sender)
         }
     }
-    
+
+    private func menuProvider() -> MenuProvider {
+        MenuProvider(SecureVaultSorting.SortParameter.allCases.map { parameter in
+                .item(title: parameter.title, checked: parameter == model.sortDescriptor.parameter) {
+                    model.sortDescriptor.parameter = parameter
+                }
+        } + [.divider] + SecureVaultSorting.SortOrder.allCases.map { order in
+                .item(title: order.title(for: model.sortDescriptor.parameter.type), checked: order == model.sortDescriptor.order) {
+                    model.sortDescriptor.order = order
+                }
+        })
+    }
+
 }

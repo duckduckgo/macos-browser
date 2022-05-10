@@ -78,6 +78,9 @@ final class AddressBarTextField: NSTextField {
         currentEditor()?.selectAll(self)
     }
 
+    override var canBecomeKeyView: Bool { true }
+    override var acceptsFirstResponder: Bool { true }
+
     func viewDidLayout() {
         layoutSuggestionWindow()
     }
@@ -755,25 +758,30 @@ extension AddressBarTextField: NSTextFieldDelegate {
         }
     }
 
+    // swiftlint:disable:next cyclomatic_complexity
     func control(_ control: NSControl, textView: NSTextView, doCommandBy commandSelector: Selector) -> Bool {
         if NSApp.isReturnOrEnterPressed {
             self.addressBarEnterPressed()
             return true
         }
 
-        if commandSelector == #selector(NSResponder.insertTab(_:)) {
-            window?.makeFirstResponder(nextValidKeyView)
-            return false
-        }
-
+        switch commandSelector {
+        case #selector(insertTab(_:)):
+            window?.selectKeyView(following: control)
+            return true
+        case #selector(insertBacktab(_:)):
+            window?.selectKeyView(preceding: control)
+            return true
         // Collision of suffix and forward deleting
-        if [#selector(NSResponder.deleteForward(_:)), #selector(NSResponder.deleteWordForward(_:))].contains(commandSelector) {
-            if let currentEditor = currentEditor(),
-               currentEditor.selectedRange.location == value.string.utf16.count,
-               currentEditor.selectedRange.length == 0 {
-                // Don't do delete when cursor is in the end
-                return true
-            }
+        case #selector(NSResponder.deleteForward(_:)),
+             #selector(NSResponder.deleteWordForward(_:)):
+            guard let currentEditor = currentEditor(),
+                  currentEditor.selectedRange.location == value.string.utf16.count,
+                  currentEditor.selectedRange.length == 0 else { break }
+            // Don't do delete when cursor is in the end
+            return true
+        default:
+            break
         }
 
         if suggestionWindowController?.window?.isVisible ?? false {

@@ -159,6 +159,14 @@ struct UserText {
     static let passwordManagementLock = NSLocalizedString("passsword.management.lock", value: "Lock", comment: "Lock Logins Vault menu")
     static let passwordManagementUnlock = NSLocalizedString("passsword.management.unlock", value: "Unlock", comment: "Unlock Logins Vault menu")
 
+    static let copy = NSLocalizedString("copy", value: "Copy", comment: "Copy text or url")
+
+    static let loginCopy = NSLocalizedString("passsword.management.copy.login", value: "Copy login", comment: "Copies login into clipboard")
+
+    static let passwordShow = NSLocalizedString("passsword.management.show.password", value: "Show password", comment: "Displays password instead of ••••")
+    static let passwordHide = NSLocalizedString("passsword.management.hide.password", value: "Hide password", comment: "Displays •••• instead of password")
+    static let passwordCopy = NSLocalizedString("passsword.management.copy.password", value: "Copy password", comment: "Copies passwords into clipboard")
+
     static let importBrowserData = NSLocalizedString("import.browser.data", value: "Import Bookmarks and Passwords…", comment: "Opens Import Browser Data dialog")
 
     static let bookmarks = NSLocalizedString("bookmarks", value: "Bookmarks", comment: "Button for bookmarks")

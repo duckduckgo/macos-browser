@@ -36,6 +36,8 @@ final class TabBarScrollView: NSScrollView {
         set { super.horizontalScroller = newValue }
     }
 
+    override var canBecomeKeyView: Bool { false }
+
 }
 
 extension TabBarScrollView {

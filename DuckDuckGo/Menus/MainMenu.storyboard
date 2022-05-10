@@ -84,7 +84,7 @@
                                                 <action selector="newTab:" target="Ady-hI-5gd" id="Gnb-ML-joG"/>
                                             </connections>
                                         </menuItem>
-                                        <menuItem title="Open Location..." keyEquivalent="o" id="xnU-dQ-JR1">
+                                        <menuItem title="Open Location..." keyEquivalent="l" id="xnU-dQ-JR1">
                                             <connections>
                                                 <action selector="openLocation:" target="Ady-hI-5gd" id="ggi-sX-Mec"/>
                                             </connections>
@@ -410,7 +410,7 @@ CA
                                                 <action selector="toggleDownloads:" target="Ady-hI-5gd" id="UAV-kU-Drp"/>
                                             </connections>
                                         </menuItem>
-                                        <menuItem title="Autofill" image="LoginGlyph" keyEquivalent="l" id="JJF-Le-1yO">
+                                        <menuItem title="Autofill" keyEquivalent="A" id="JJF-Le-1yO">
                                             <connections>
                                                 <action selector="openLoginsPopover:" target="Ady-hI-5gd" id="tIQ-QM-M3Z"/>
                                             </connections>
@@ -778,6 +778,5 @@ CQ
     </scenes>
     <resources>
         <image name="Favorite" width="16" height="16"/>
-        <image name="LoginGlyph" width="16" height="16"/>
     </resources>
 </document>

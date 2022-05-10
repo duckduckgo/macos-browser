@@ -50,8 +50,22 @@ extension NSView {
         return containerView
     }
 
+    var isFirstResponder: Bool {
+        self.window?.firstResponder === self
+    }
+
+    func isFirstResponderPublisher() -> AnyPublisher<Bool, Never> {
+        self.publisher(for: \.window?.firstResponder).map { [weak self] firstResponder -> Bool in
+            firstResponder === self
+        }.eraseToAnyPublisher()
+    }
+
+    var isVisible: Bool {
+        return !isHidden && window != nil && alphaValue > 0.0
+    }
+
     func makeMeFirstResponder() {
-        // TODO: Check that no popovers is displayed and address is not being edited
+        // TODO: Check that no popovers is displayed and address is not being edited // swiftlint:disable:this todo
         // also don‘t update address field when edited!
         guard let window = window else {
             os_log("%s: Window not available", type: .error, className)
@@ -169,6 +183,15 @@ extension NSView {
             .publisher(for: \.effectiveAppearance)
             .map { $0 as NSAppearance? }
             .assign(to: \.appearance, onWeaklyHeld: self)
+    }
+
+}
+
+extension NSControl {
+
+    var sendActionOn: NSEvent.EventTypeMask {
+        guard self.responds(to: #selector(sendActionOnMask)) else { return .leftMouseUp }
+        return self.sendActionOnMask()
     }
 
 }

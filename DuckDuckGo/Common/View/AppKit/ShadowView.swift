@@ -17,6 +17,7 @@
 //
 
 import Cocoa
+import Combine
 
 final class ShadowView: NSView {
 
@@ -69,6 +70,16 @@ final class ShadowView: NSView {
         }
     }
 
+    @IBInspectable var stroke: CGFloat = 0 {
+        didSet {
+            self.needsDisplay = true
+            self.needsLayout = true
+        }
+    }
+
+    @IBInspectable var shouldHideOnLostFocus: Bool = false
+    private var keyWindowCancellable: AnyCancellable?
+
     lazy private var mask: CAShapeLayer = {
         let mask = CAShapeLayer()
         mask.fillRule = CAShapeLayerFillRule.evenOdd
@@ -77,6 +88,7 @@ final class ShadowView: NSView {
     }()
 
     private func shadowPath() -> CGPath {
+        let bounds = bounds.insetBy(dx: -stroke, dy: -stroke)
         let cornerRadius: CGFloat = min(min(bounds.width, bounds.height) / 2, self.cornerRadius)
         let shadowPath = CGMutablePath()
 
@@ -139,7 +151,7 @@ final class ShadowView: NSView {
             outerRect.size.height += dy
         }
 
-        let maskPath = CGMutablePath(rect: outerRect, transform: nil)
+        let maskPath = NSBezierPath(roundedRect: outerRect, xRadius: cornerRadius, yRadius: cornerRadius).cgMutablePath
         maskPath.addPath(shadowPath)
 
         return maskPath
@@ -163,12 +175,30 @@ final class ShadowView: NSView {
     override func viewDidMoveToWindow() {
         super.viewDidMoveToWindow()
 
-        guard case .some = window else { return }
+        guard let window = window else {
+            keyWindowCancellable = nil
+            return
+        }
         updateProperties()
+
+        if shouldHideOnLostFocus {
+            keyWindowCancellable = window.publisher(for: \.isKeyWindow)
+                .combineLatest(NSApp.isActivePublisher())
+                .sink { [weak self] _ in
+                    self?.updateProperties()
+            }
+        }
     }
 
     private func updateProperties() {
         self.wantsLayer = true
+
+        guard !shouldHideOnLostFocus
+                || (NSApp.isActive && (window?.isKeyWindow ?? false))
+        else {
+            layer!.shadowOpacity = 0.0
+            return
+        }
 
         layer!.masksToBounds = false
         layer!.backgroundColor = NSColor.clear.cgColor

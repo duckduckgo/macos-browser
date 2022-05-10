@@ -52,13 +52,13 @@
                         <constraint firstItem="Kky-kZ-lU9" firstAttribute="centerX" secondItem="A6g-eG-dOW" secondAttribute="centerX" id="sh1-7s-uE8"/>
                     </constraints>
                 </customView>
-                <button translatesAutoresizingMaskIntoConstraints="NO" id="XdB-Qn-iD9" userLabel="Active Permission" customClass="MouseOverButton" customModule="DuckDuckGo_Privacy_Browser" customModuleProvider="target">
+                <button focusRingType="exterior" translatesAutoresizingMaskIntoConstraints="NO" id="XdB-Qn-iD9" userLabel="Active Permission" customClass="MouseOverButton" customModule="DuckDuckGo_Privacy_Browser" customModuleProvider="target">
                     <rect key="frame" x="255" y="9" width="16" height="16"/>
                     <constraints>
                         <constraint firstAttribute="height" constant="16" id="a1w-Dc-Tkz"/>
                         <constraint firstAttribute="width" constant="16" id="nLR-Qf-xCM"/>
                     </constraints>
-                    <buttonCell key="cell" type="square" bezelStyle="shadowlessSquare" image="Camera-Tab-Active" imagePosition="only" alignment="center" imageScaling="proportionallyDown" inset="2" id="8II-A1-ote">
+                    <buttonCell key="cell" type="square" bezelStyle="shadowlessSquare" image="Camera-Tab-Active" imagePosition="only" alignment="center" focusRingType="exterior" imageScaling="proportionallyDown" inset="2" id="8II-A1-ote">
                         <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
                         <font key="font" metaFont="system"/>
                     </buttonCell>
@@ -78,13 +78,13 @@
                         <action selector="permissionButtonAction:" target="4MN-w4-aCk" id="r4o-aQ-Cdp"/>
                     </connections>
                 </button>
-                <button translatesAutoresizingMaskIntoConstraints="NO" id="vuD-rY-Vzl" userLabel="Close Button" customClass="MouseOverButton" customModule="DuckDuckGo_Privacy_Browser" customModuleProvider="target">
+                <button focusRingType="exterior" translatesAutoresizingMaskIntoConstraints="NO" id="vuD-rY-Vzl" userLabel="Close Button" customClass="MouseOverButton" customModule="DuckDuckGo_Privacy_Browser" customModuleProvider="target">
                     <rect key="frame" x="275" y="8" width="16" height="16"/>
                     <constraints>
                         <constraint firstAttribute="width" constant="16" id="Jud-dv-fco"/>
                         <constraint firstAttribute="height" constant="16" id="hNW-Ia-KQk"/>
                     </constraints>
-                    <buttonCell key="cell" type="square" bezelStyle="shadowlessSquare" image="Close" imagePosition="only" alignment="center" imageScaling="proportionallyDown" inset="2" id="ykX-aF-551">
+                    <buttonCell key="cell" type="square" bezelStyle="shadowlessSquare" image="Close" imagePosition="only" alignment="center" focusRingType="exterior" imageScaling="proportionallyDown" inset="2" id="ykX-aF-551">
                         <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
                         <font key="font" metaFont="system"/>
                     </buttonCell>
@@ -99,6 +99,7 @@
                         <userDefinedRuntimeAttribute type="color" keyPath="mouseDownColor">
                             <color key="value" name="ButtonMouseDownColor"/>
                         </userDefinedRuntimeAttribute>
+                        <userDefinedRuntimeAttribute type="boolean" keyPath="shouldAppearOnFocus" value="YES"/>
                     </userDefinedRuntimeAttributes>
                     <connections>
                         <action selector="closeButtonAction:" target="4MN-w4-aCk" id="ezW-I1-5yy"/>

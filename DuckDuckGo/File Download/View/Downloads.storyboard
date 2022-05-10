@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<document type="com.apple.InterfaceBuilder3.Cocoa.Storyboard.XIB" version="3.0" toolsVersion="19162" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES" initialViewController="luO-ux-o3b">
+<document type="com.apple.InterfaceBuilder3.Cocoa.Storyboard.XIB" version="3.0" toolsVersion="20037" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES" initialViewController="luO-ux-o3b">
     <dependencies>
         <deployment identifier="macosx"/>
-        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="19162"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="20037"/>
         <capability name="Named colors" minToolsVersion="9.0"/>
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
     </dependencies>
@@ -282,7 +282,7 @@
                                                                                 <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
                                                                             </textFieldCell>
                                                                         </textField>
-                                                                        <button verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="l4f-0C-oRY" customClass="LinkButton" customModule="DuckDuckGo_Privacy_Browser" customModuleProvider="target">
+                                                                        <button verticalHuggingPriority="750" tag="67" translatesAutoresizingMaskIntoConstraints="NO" id="l4f-0C-oRY" customClass="LinkButton" customModule="DuckDuckGo_Privacy_Browser" customModuleProvider="target">
                                                                             <rect key="frame" x="108" y="12" width="149" height="16"/>
                                                                             <buttonCell key="cell" type="square" title="Open Downloads Folder" bezelStyle="shadowlessSquare" alignment="center" imageScaling="proportionallyDown" inset="2" id="JMw-qp-avv">
                                                                                 <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
@@ -305,7 +305,7 @@
                                                                     <rect key="frame" x="0.0" y="120" width="365" height="60"/>
                                                                     <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                                                     <subviews>
-                                                                        <button verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="Jbc-kS-JbC" customClass="LinkButton" customModule="DuckDuckGo_Privacy_Browser" customModuleProvider="target">
+                                                                        <button verticalHuggingPriority="750" tag="67" translatesAutoresizingMaskIntoConstraints="NO" id="Jbc-kS-JbC" customClass="LinkButton" customModule="DuckDuckGo_Privacy_Browser" customModuleProvider="target">
                                                                             <rect key="frame" x="108" y="22" width="149" height="16"/>
                                                                             <buttonCell key="cell" type="square" title="Open Downloads Folder" bezelStyle="shadowlessSquare" alignment="center" imageScaling="proportionallyDown" inset="2" id="31c-Jt-x7J">
                                                                                 <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
@@ -378,7 +378,9 @@
                         </constraints>
                     </view>
                     <connections>
+                        <outlet property="clearButton" destination="cev-k6-wFH" id="K5b-vv-ol8"/>
                         <outlet property="contextMenu" destination="SCZ-TM-duL" id="Moa-bC-2Tb"/>
+                        <outlet property="openDownloadsButton" destination="aKx-1h-4hp" id="qkh-Ec-6ku"/>
                         <outlet property="tableView" destination="zWp-mP-b3k" id="uqE-oO-u61"/>
                         <outlet property="tableViewHeightConstraint" destination="pa7-BQ-jMF" id="i8E-WJ-esr"/>
                     </connections>
@@ -455,10 +457,10 @@
             <color red="0.28627450980392155" green="0.28627450980392155" blue="0.28627450980392155" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
         </namedColor>
         <namedColor name="ButtonMouseDownColor">
-            <color red="0.0" green="0.0" blue="0.0" alpha="0.20000000298023224" colorSpace="custom" customColorSpace="sRGB"/>
+            <color red="0.0" green="0.0" blue="0.0" alpha="0.18000000715255737" colorSpace="custom" customColorSpace="sRGB"/>
         </namedColor>
         <namedColor name="ButtonMouseOverColor">
-            <color red="0.0" green="0.0" blue="0.0" alpha="0.10000000149011612" colorSpace="custom" customColorSpace="sRGB"/>
+            <color red="0.0" green="0.0" blue="0.0" alpha="0.05000000074505806" colorSpace="custom" customColorSpace="sRGB"/>
         </namedColor>
         <namedColor name="ClearColor">
             <color red="1" green="1" blue="1" alpha="0.0" colorSpace="custom" customColorSpace="sRGB"/>

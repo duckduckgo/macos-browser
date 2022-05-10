@@ -19,6 +19,7 @@
 import Foundation
 import Lottie
 import Combine
+import AppKit
 
 final class MouseOverAnimationButton: AddressBarButton {
 
@@ -32,6 +33,7 @@ final class MouseOverAnimationButton: AddressBarButton {
     }
 
     private var isMouseOverCancellable: AnyCancellable?
+    private var keyWindowCancellable: AnyCancellable?
 
     private func subscribeToIsMouseOver() {
         isMouseOverCancellable = $isMouseOver
@@ -40,9 +42,51 @@ final class MouseOverAnimationButton: AddressBarButton {
                 if isMouseOver {
                     self?.animate()
                 } else {
-                    self?.stopAnimation()
+                    DispatchQueue.main.async {
+                        self?.stopAnimationIfNeeded()
+                    }
                 }
             }
+    }
+
+    override func becomeFirstResponder() -> Bool {
+        guard super.becomeFirstResponder() else { return false }
+
+        keyWindowCancellable = window?.publisher(for: \.isKeyWindow)
+            .combineLatest(NSApp.isActivePublisher())
+            .receive(on: DispatchQueue.main)
+            .sink { [weak self] _ in
+                if NSApp.isActive
+                    && self?.window?.isKeyWindow == true
+                    && self?.isFirstResponder == true {
+
+                    self?.animate()
+                } else {
+                    self?.stopAnimationIfNeeded()
+                }
+        }
+
+        return true
+    }
+
+    override func resignFirstResponder() -> Bool {
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) { [weak self] in
+            self?.stopAnimationIfNeeded()
+        }
+
+        self.keyWindowCancellable = nil
+        return super.resignFirstResponder()
+    }
+
+    override var state: NSControl.StateValue {
+        didSet {
+            switch state {
+            case .on:
+                self.animate()
+            default:
+                self.stopAnimationIfNeeded()
+            }
+        }
     }
 
     private var effectiveAppearanceCancellable: AnyCancellable?
@@ -128,9 +172,9 @@ final class MouseOverAnimationButton: AddressBarButton {
         get {
             return super.image
         }
-
         set {
             if isAnimationViewVisible {
+                guard let newValue = newValue else { return }
                 imageCache = newValue
             } else {
                 super.image = newValue
@@ -138,9 +182,11 @@ final class MouseOverAnimationButton: AddressBarButton {
         }
     }
 
-    var imageCache: NSImage?
+    private var imageCache: NSImage?
 
     private func hideImage() {
+        guard let image = image else { return }
+
         imageCache = image
         super.image = nil
     }
@@ -173,6 +219,17 @@ final class MouseOverAnimationButton: AddressBarButton {
         hideAnimation()
         showImage()
         currentAnimationView?.stop()
+    }
+
+    private func stopAnimationIfNeeded() {
+        guard !isMouseOver,
+              !(NSApp.isActive && self.window?.isKeyWindow == true && self.isFirstResponder),
+              case .off = self.state
+        else {
+            return
+        }
+
+        self.stopAnimation()
     }
 
 }

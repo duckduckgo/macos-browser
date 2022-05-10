@@ -43,7 +43,7 @@ final class FireViewController: NSViewController {
 
     init?(coder: NSCoder,
           tabCollectionViewModel: TabCollectionViewModel,
-          fireViewModel: FireViewModel = FireCoordinator.fireViewModel) {
+          fireViewModel: FireViewModel = FireCoordinator.shared.fireViewModel) {
         self.tabCollectionViewModel = tabCollectionViewModel
         self.fireViewModel = fireViewModel
 

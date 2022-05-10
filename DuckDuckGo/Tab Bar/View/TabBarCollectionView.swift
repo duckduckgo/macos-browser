@@ -18,11 +18,24 @@
 
 import Cocoa
 import os.log
+import Carbon.HIToolbox
 
 final class TabBarCollectionView: NSCollectionView {
 
-    override var acceptsFirstResponder: Bool {
-        return true
+    override func doCommand(by selector: Selector) {
+        if let window = window {
+            switch selector {
+            case #selector(insertTab(_:)):
+                window.selectKeyView(following: window.firstResponder as? NSView ?? self)
+                return
+            case #selector(insertBacktab(_:)):
+                window.selectKeyView(preceding: window.firstResponder as? NSView ?? self)
+                return
+            default:
+                break
+            }
+        }
+        super.doCommand(by: selector)
     }
     
     override func awakeFromNib() {
@@ -50,7 +63,7 @@ final class TabBarCollectionView: NSCollectionView {
         var children = section.accessibilityChildren() ?? []
         if let newTab = children.last as? NSAccessibilityElement,
            case .some(.group) = newTab.accessibilityRole(),
-           // TODO: it creates a viewForSupplementaryElementOfKind
+           // TODO: it creates a viewForSupplementaryElementOfKind // swiftlint:disable:this todo
            let buttonCell = newTab.accessibilityChildren()?.first as? NSButtonCell,
            let newTabButton = buttonCell.controlView,
            let fixedNewTabButton = ((self.window as? MainWindow)?.contentViewController as? MainViewController)?.tabBarViewController.plusButton {
@@ -84,17 +97,21 @@ final class TabBarCollectionView: NSCollectionView {
             deselectItems(at: selectionIndexPaths)
         }
     }
-    
+
     func scrollToSelected() {
         guard selectionIndexPaths.count == 1, let indexPath = selectionIndexPaths.first else {
             os_log("TabBarCollectionView: More than 1 item or no item highlighted", type: .error)
             return
         }
+        scroll(to: indexPath.item)
+    }
 
+    func scroll(to index: Int, completionHandler: ((Bool) -> Void)? = nil) {
+        let indexPath = IndexPath(item: index, section: 0)
         let rect = frameForItem(at: indexPath.item)
         animator().performBatchUpdates({
             animator().scrollToVisible(rect)
-        }, completionHandler: nil)
+        }, completionHandler: completionHandler)
     }
     
     func scrollToEnd(completionHandler: ((Bool) -> Void)? = nil) {
@@ -124,6 +141,8 @@ final class TabBarCollectionView: NSCollectionView {
             let leftToSelectionIndexPath = IndexPath(item: indexPath.item - 1)
             (item(at: leftToSelectionIndexPath) as? TabBarViewItem)?.isLeftToSelected = true
         }
+// TODO: Use other flag
+        (item(at: self.numberOfItems(inSection: 0) - 1) as? TabBarViewItem)?.isLeftToSelected = true
     }
 }
 

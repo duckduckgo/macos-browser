@@ -123,6 +123,10 @@ final class PasswordManagementLoginModel: ObservableObject, PasswordManagementIt
         NSPasteboard.copy(value)
     }
 
+    func copy(_ value: URL) {
+        NSPasteboard.copy(value)
+    }
+
     func save() {
         guard var credentials = credentials else { return }
         credentials.account.title = title

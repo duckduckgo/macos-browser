@@ -62,6 +62,8 @@ final class FeedbackViewController: NSViewController {
     @IBOutlet weak var websiteBreakageCategoryPopUpButton: NSPopUpButton!
 
     @IBOutlet weak var submitButton: NSButton!
+    @IBOutlet weak var cancelButton: NSButton!
+    @IBOutlet weak var finishButton: NSButton!
 
     @IBOutlet weak var thankYouView: NSView!
     private var cancellables = Set<AnyCancellable>()
@@ -101,6 +103,18 @@ final class FeedbackViewController: NSViewController {
                                                name: NSPopUpButton.willPopUpNotification,
                                                object: nil)
         updateBrokenWebsiteMenuItem()
+    }
+
+    override func viewDidLayout() {
+        super.viewDidLayout()
+
+        self.optionPopUpButton.nextKeyView = self.urlTextField
+        self.urlTextField.nextKeyView = self.websiteBreakageCategoryPopUpButton
+        self.websiteBreakageCategoryPopUpButton.nextKeyView = self.browserFeedbackTextView
+        self.browserFeedbackTextView.nextKeyView = self.submitButton
+        self.submitButton.nextKeyView = self.cancelButton
+        self.cancelButton.nextKeyView = self.finishButton
+        self.finishButton.nextKeyView = self.optionPopUpButton
     }
 
     override func viewDidDisappear() {
@@ -214,8 +228,9 @@ final class FeedbackViewController: NSViewController {
             websiteBreakageView.isHidden = false
         }
         updateBrowserFeedbackDisclaimerLabel(for: selectedFormOption)
-        browserFeedbackTextView.makeMeFirstResponder()
         setContentViewHeight(contentHeight, animated: true)
+
+        self.optionPopUpButton.nextValidKeyView?.makeMeFirstResponder()
     }
 
     private func setContentViewHeight(_ height: CGFloat, animated: Bool) {
@@ -359,6 +374,19 @@ extension FeedbackViewController: NSTextFieldDelegate {
 }
 
 extension FeedbackViewController: NSTextViewDelegate {
+
+    func textView(_ textView: NSTextView, doCommandBy selector: Selector) -> Bool {
+        switch selector {
+        case #selector(insertTab(_:)):
+            view.window?.selectNextKeyView(textView)
+            return true
+        case #selector(insertBacktab(_:)):
+            view.window?.selectPreviousKeyView(textView)
+            return true
+        default:
+            return false
+        }
+    }
 
     func textDidChange(_ notification: Notification) {
         updateSubmitButton()

@@ -193,7 +193,14 @@ private struct IdentificationView: View {
                 let components = DateComponents(calendar: Calendar.current, year: year, month: month, day: day)
 
                 if let date = components.date {
-                    Text(PasswordManagementIdentityModel.dateFormatter.string(from: date))
+                    let textFieldValue = PasswordManagementIdentityModel.dateFormatter.string(from: date)
+                    let menuProvider = MenuProvider([
+                        .item(title: UserText.copy) { model.copy(textFieldValue) }
+                    ])
+
+                    Text(textFieldValue)
+                        .textSelectableIfAvailable()
+                        .focusable(menu: menuProvider.createMenu, onCopy: { model.copy(textFieldValue) })
                         .padding(.bottom, interItemSpacing)
                 }
             }
@@ -253,7 +260,14 @@ private struct AddressView: View {
                     .bold()
                     .padding(.bottom, 5)
 
-                Text(CountryList.name(forCountryCode: model.addressCountryCode) ?? "")
+                let textFieldValue = CountryList.name(forCountryCode: model.addressCountryCode) ?? ""
+                let menuProvider = MenuProvider([
+                    .item(title: UserText.copy) { model.copy(textFieldValue) }
+                ])
+
+                Text(textFieldValue)
+                    .textSelectableIfAvailable()
+                    .focusable(menu: menuProvider.createMenu, onCopy: { model.copy(textFieldValue) })
                     .padding(.bottom, interItemSpacing)
             }
         }
@@ -303,9 +317,14 @@ private struct HeaderView: View {
                     .font(.title)
 
             } else {
+                let menuProvider = MenuProvider([
+                    .item(title: UserText.copy) { model.copy(model.title) }
+                ])
 
                 Text(model.title)
                     .font(.title)
+                    .textSelectableIfAvailable()
+                    .focusable(menu: menuProvider.createMenu, onCopy: { model.copy(model.title) })
 
             }
 
@@ -323,36 +342,33 @@ private struct Buttons: View {
         HStack {
 
             if model.isEditing && !model.isNew {
-                Button(UserText.pmDelete) {
-                    model.requestDelete()
-                }
-                .buttonStyle(StandardButtonStyle())
+                Button(UserText.pmDelete) { model.requestDelete() }
+                    .buttonStyle(StandardButtonStyle())
+                    .focusable(action: { model.requestDelete() })
             }
 
             Spacer()
 
             if model.isEditing || model.isNew {
-                Button(UserText.pmCancel) {
-                    model.cancel()
-                }
-                .buttonStyle(StandardButtonStyle())
+                Button(UserText.pmCancel) { model.cancel() }
+                    .buttonStyle(StandardButtonStyle())
+                    .focusable(action: { model.cancel() })
+                    .keyboardShortcutIfAvailable(.escape)
 
-                Button(UserText.pmSave) {
-                    model.save()
-                }
-                .disabled(!model.isDirty)
-                .buttonStyle(DefaultActionButtonStyle(enabled: model.isDirty))
+                Button(UserText.pmSave) { model.save() }
+                    .buttonStyle(DefaultActionButtonStyle(enabled: model.isDirty))
+                    .focusable(action: { model.save() })
+                    .keyboardShortcutIfAvailable(.return, modifiers: .command)
+                    .disabled(!model.isDirty)
 
             } else {
-                Button(UserText.pmDelete) {
-                    model.requestDelete()
-                }
-                .buttonStyle(StandardButtonStyle())
+                Button(UserText.pmDelete) { model.requestDelete() }
+                    .buttonStyle(StandardButtonStyle())
+                    .focusable(action: { model.requestDelete() })
 
-                Button(UserText.pmEdit) {
-                    model.edit()
-                }
-                .buttonStyle(StandardButtonStyle())
+                Button(UserText.pmEdit) { model.edit() }
+                    .buttonStyle(StandardButtonStyle())
+                    .focusable(action: { model.edit() })
 
             }
 
@@ -388,8 +404,14 @@ private struct EditableIdentityField: View {
 
                 } else {
 
+                    let menuProvider = MenuProvider([
+                        .item(title: UserText.copy) { model.copy(textFieldValue) }
+                    ])
+
                     HStack(spacing: 6) {
                         Text(textFieldValue)
+                            .textSelectableIfAvailable()
+                            .focusable(menu: menuProvider.createMenu, onCopy: { model.copy(textFieldValue) })
 
                         if isHovering {
                             Button {

@@ -38,13 +38,6 @@ final class MouseClickView: NSView {
 
     weak var delegate: MouseClickViewDelegate?
 
-    override var acceptsFirstResponder: Bool {
-        true
-    }
-    override var canBecomeKeyView: Bool {
-        true
-    }
-
     private func repostMultiClickEventIfNeeded(_ event: NSEvent) -> Bool {
         // don't let more-than-doubleclicks get in
         guard event.clickCount > 2,

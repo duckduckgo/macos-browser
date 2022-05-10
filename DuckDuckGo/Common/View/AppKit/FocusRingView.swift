@@ -17,13 +17,14 @@
 //
 
 import Cocoa
+import Combine
 
 final class FocusRingView: NSView {
 
-    enum Size: CGFloat {
-        case shadow = 2.5
-        case stroke = 0.5
-        case backgroundRadius = 8
+    enum Size {
+        static let shadow = 2.5
+        static let stroke = 0.5
+        static let backgroundRadius = 8.0
     }
 
     var strokedBackgroundColor = NSColor.addressBarFocusedBackgroundColor
@@ -35,19 +36,27 @@ final class FocusRingView: NSView {
 
     private var stroke = false
 
-    override func awakeFromNib() {
-        super.awakeFromNib()
+    private var keyWindowCancellable: AnyCancellable?
 
+    override func viewDidMoveToWindow() {
+        guard let window = window else {
+            keyWindowCancellable = nil
+            return
+        }
         wantsLayer = true
 
         addSublayers()
-        layoutSublayers()
+        keyWindowCancellable = window.publisher(for: \.isKeyWindow)
+            .combineLatest(NSApp.isActivePublisher())
+            .sink { [weak self] _ in
+                self?.updateLayer()
+        }
     }
 
     override func layout() {
         super.layout()
 
-        layoutSublayers()
+        updateLayer()
     }
 
     func updateView(stroke: Bool) {
@@ -56,6 +65,8 @@ final class FocusRingView: NSView {
     }
 
     private func addSublayers() {
+        guard shadowLayer.superlayer == nil else { return }
+
         shadowLayer.opacity = 0
         layer?.addSublayer(shadowLayer)
 
@@ -65,14 +76,12 @@ final class FocusRingView: NSView {
         layer?.addSublayer(backgroundLayer)
     }
 
-    private func layoutSublayers() {
-        guard let layer = layer else {
-            return
-        }
+    override func updateLayer() {
+        guard let layer = layer else { return }
 
         CATransaction.begin()
-        CATransaction.setAnimationDuration(0)
 
+        let stroke = self.stroke && NSApp.isActive && (window?.isKeyWindow ?? false)
         shadowLayer.opacity = stroke ? 0.4 : 0
         strokeLayer.opacity = stroke ? 1.0 : 0
 
@@ -83,17 +92,17 @@ final class FocusRingView: NSView {
         strokeLayer.backgroundColor = NSColor.controlAccentColor.cgColor
 
         shadowLayer.frame = layer.bounds
-        shadowLayer.cornerRadius = Size.backgroundRadius.rawValue + Size.shadow.rawValue + Size.stroke.rawValue
-        strokeLayer.frame = NSRect(x: layer.bounds.origin.x + Size.shadow.rawValue,
-                                   y: layer.bounds.origin.y + Size.shadow.rawValue,
-                                   width: layer.bounds.size.width - 2 * Size.shadow.rawValue,
-                                   height: layer.bounds.size.height - 2 * Size.shadow.rawValue)
-        strokeLayer.cornerRadius = Size.backgroundRadius.rawValue + Size.stroke.rawValue
-        backgroundLayer.frame = NSRect(x: layer.bounds.origin.x + Size.shadow.rawValue + Size.stroke.rawValue,
-                                       y: layer.bounds.origin.y + Size.shadow.rawValue + Size.stroke.rawValue,
-                                       width: layer.bounds.size.width - 2 * (Size.shadow.rawValue + Size.stroke.rawValue),
-                                       height: layer.bounds.size.height - 2 * (Size.shadow.rawValue + Size.stroke.rawValue))
-        backgroundLayer.cornerRadius = Size.backgroundRadius.rawValue
+        shadowLayer.cornerRadius = Size.backgroundRadius + Size.shadow + Size.stroke
+        strokeLayer.frame = NSRect(x: layer.bounds.origin.x + Size.shadow,
+                                   y: layer.bounds.origin.y + Size.shadow,
+                                   width: layer.bounds.size.width - 2 * Size.shadow,
+                                   height: layer.bounds.size.height - 2 * Size.shadow)
+        strokeLayer.cornerRadius = Size.backgroundRadius + Size.stroke
+        backgroundLayer.frame = NSRect(x: layer.bounds.origin.x + Size.shadow + Size.stroke,
+                                       y: layer.bounds.origin.y + Size.shadow + Size.stroke,
+                                       width: layer.bounds.size.width - 2 * (Size.shadow + Size.stroke),
+                                       height: layer.bounds.size.height - 2 * (Size.shadow + Size.stroke))
+        backgroundLayer.cornerRadius = Size.backgroundRadius
 
         CATransaction.commit()
     }

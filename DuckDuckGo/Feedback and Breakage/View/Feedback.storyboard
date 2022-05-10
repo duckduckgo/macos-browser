@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<document type="com.apple.InterfaceBuilder3.Cocoa.Storyboard.XIB" version="3.0" toolsVersion="19529" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES">
+<document type="com.apple.InterfaceBuilder3.Cocoa.Storyboard.XIB" version="3.0" toolsVersion="20037" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES">
     <dependencies>
         <deployment identifier="macosx"/>
-        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="19529"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="20037"/>
         <capability name="Named colors" minToolsVersion="9.0"/>
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
     </dependencies>
@@ -125,17 +125,20 @@
                                             <scrollView focusRingType="exterior" borderType="none" horizontalLineScroll="10" horizontalPageScroll="10" verticalLineScroll="10" verticalPageScroll="10" hasHorizontalScroller="NO" translatesAutoresizingMaskIntoConstraints="NO" id="heN-iP-EsM">
                                                 <rect key="frame" x="20" y="108" width="320" height="97"/>
                                                 <clipView key="contentView" drawsBackground="NO" id="PTf-L1-DK2">
-                                                    <rect key="frame" x="0.0" y="0.0" width="305" height="97"/>
+                                                    <rect key="frame" x="0.0" y="0.0" width="320" height="97"/>
                                                     <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                                     <subviews>
-                                                        <textView importsGraphics="NO" richText="NO" verticallyResizable="YES" smartInsertDelete="YES" id="F3N-ft-DgV">
-                                                            <rect key="frame" x="0.0" y="0.0" width="305" height="97"/>
+                                                        <textView importsGraphics="NO" richText="NO" verticallyResizable="YES" allowsUndo="YES" smartInsertDelete="YES" id="F3N-ft-DgV">
+                                                            <rect key="frame" x="0.0" y="0.0" width="320" height="97"/>
                                                             <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                                             <color key="textColor" name="textColor" catalog="System" colorSpace="catalog"/>
                                                             <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
-                                                            <size key="minSize" width="305" height="97"/>
+                                                            <size key="minSize" width="320" height="97"/>
                                                             <size key="maxSize" width="320" height="10000000"/>
                                                             <color key="insertionPointColor" name="textColor" catalog="System" colorSpace="catalog"/>
+                                                            <connections>
+                                                                <outlet property="delegate" destination="TOa-sP-KHa" id="2nk-2B-yZW"/>
+                                                            </connections>
                                                         </textView>
                                                     </subviews>
                                                 </clipView>
@@ -148,7 +151,7 @@
                                                     <autoresizingMask key="autoresizingMask"/>
                                                 </scroller>
                                                 <scroller key="verticalScroller" wantsLayer="YES" verticalHuggingPriority="750" horizontal="NO" id="MIn-YA-XiI">
-                                                    <rect key="frame" x="305" y="0.0" width="15" height="97"/>
+                                                    <rect key="frame" x="304" y="0.0" width="16" height="97"/>
                                                     <autoresizingMask key="autoresizingMask"/>
                                                 </scroller>
                                             </scrollView>
@@ -251,6 +254,10 @@
                                         <buttonCell key="cell" type="push" title="Submit" bezelStyle="rounded" alignment="center" controlSize="large" enabled="NO" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="ng8-Xz-jPD">
                                             <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
                                             <font key="font" metaFont="system"/>
+                                            <string key="keyEquivalent" base64-UTF8="YES">
+DQ
+</string>
+                                            <modifierMask key="keyEquivalentModifierMask" command="YES"/>
                                         </buttonCell>
                                         <connections>
                                             <action selector="submitButtonAction:" target="TOa-sP-KHa" id="5ag-9f-dye"/>
@@ -384,8 +391,10 @@ DQ
                         <outlet property="browserFeedbackDisclaimerTextView" destination="nm3-pj-w2B" id="gil-t1-jv0"/>
                         <outlet property="browserFeedbackTextView" destination="F3N-ft-DgV" id="amf-uR-AYI"/>
                         <outlet property="browserFeedbackView" destination="8Xi-CY-jyt" id="5IL-yu-IWc"/>
+                        <outlet property="cancelButton" destination="G99-8X-64H" id="bIA-kn-yGw"/>
                         <outlet property="contentView" destination="wYB-07-s0m" id="XXQ-Fh-tQF"/>
                         <outlet property="contentViewHeightContraint" destination="0W2-HI-Vs8" id="vY1-me-1T6"/>
+                        <outlet property="finishButton" destination="3nf-Bg-7k2" id="ewZ-Rk-HZC"/>
                         <outlet property="optionPopUpButton" destination="7Z6-Ji-PH7" id="4aZ-ZE-ym6"/>
                         <outlet property="pickOptionMenuItem" destination="z2T-3Y-jPK" id="6dO-Or-fk2"/>
                         <outlet property="submitButton" destination="Gy6-KF-A15" id="aBn-VX-sGY"/>

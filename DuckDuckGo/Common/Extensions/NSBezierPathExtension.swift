@@ -22,7 +22,7 @@ import AppKit
 
 extension NSBezierPath {
 
-    var cgPath: CGPath {
+    var cgMutablePath: CGMutablePath {
         let path = CGMutablePath()
         var points = [CGPoint](repeating: .zero, count: 3)
         for i in 0 ..< self.elementCount {
@@ -41,6 +41,10 @@ extension NSBezierPath {
             }
         }
         return path
+    }
+
+    var cgPath: CGPath {
+        cgMutablePath.copy()!
     }
 
 }

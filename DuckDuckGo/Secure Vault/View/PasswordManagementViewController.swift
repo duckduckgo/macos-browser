@@ -23,106 +23,6 @@ import BrowserServicesKit
 import Carbon.HIToolbox
 
 // swiftlint:disable file_length
-
-protocol PasswordManagementDelegate: AnyObject {
-
-    /// May not be called on main thread.
-    func shouldClosePasswordManagementViewController(_: PasswordManagementViewController)
-
-}
-
-extension NSView {
-    open override var acceptsFirstResponder: Bool {
-//        if self.className.contains("SwiftUI") /*&& (self.className.contains("DocumentView") || self is NSScrollView)*/ {
-//            self.canBecomeKeyView = true
-//            return true
-//        }
-        return super.acceptsFirstResponder
-    }
-
-}
-
-//final class SwiftUIListContainer: NSView {
-//
-//    override var acceptsFirstResponder: Bool {
-//        true
-//    }
-//    override var canBecomeKeyView: Bool {
-//        true
-//    }
-//
-//    @Published var isFirstResponder: Bool = false
-//    private var keyDownSubject = PassthroughSubject<Int, Never>()
-//    var keyDownPublisher: AnyPublisher<Int, Never> {
-//        keyDownSubject.eraseToAnyPublisher()
-//    }
-//
-//    override func becomeFirstResponder() -> Bool {
-//        let became = super.becomeFirstResponder()
-//        if self.window?.firstResponder === self, !self.isFirstResponder {
-//            self.isFirstResponder = true
-//        }
-//        return became
-//    }
-//
-//    override func resignFirstResponder() -> Bool {
-//        let resigned = super.resignFirstResponder()
-//        if self.isFirstResponder {
-//            self.isFirstResponder = false
-//        }
-//        return resigned
-//    }
-//
-//    override func keyDown(with event: NSEvent) {
-//        keyDownSubject.send(Int(event.keyCode))
-//        super.keyDown(with: event)
-//    }
-//
-//}
-
-final class FocusView: NSView {
-
-    override var acceptsFirstResponder: Bool {
-        true
-    }
-    override var canBecomeKeyView: Bool {
-        true
-    }
-
-    @Published var isFirstResponder: Bool = false
-    private var keyDownSubject = PassthroughSubject<Int, Never>()
-    var keyDownPublisher: AnyPublisher<Int, Never> {
-        keyDownSubject.eraseToAnyPublisher()
-    }
-
-    override func becomeFirstResponder() -> Bool {
-        if super.becomeFirstResponder() {
-            self.isFirstResponder = true
-            return true
-        }
-        return false
-    }
-
-    override func resignFirstResponder() -> Bool {
-        let resigned = super.resignFirstResponder()
-        if self.isFirstResponder {
-            self.isFirstResponder = false
-        }
-        return resigned
-    }
-
-    override func keyDown(with event: NSEvent) {
-        keyDownSubject.send(Int(event.keyCode))
-        super.keyDown(with: event)
-    }
-
-    override func mouseDown(with event: NSEvent) {
-        self.makeMeFirstResponder()
-        super.mouseDown(with: event)
-    }
-
-}
-
 // swiftlint:disable type_body_length
 final class PasswordManagementViewController: NSViewController {
 
@@ -135,10 +35,7 @@ final class PasswordManagementViewController: NSViewController {
         return controller
     }
 
-    weak var delegate: PasswordManagementDelegate?
-
     @IBOutlet var listContainer: NSView!
-    @IBOutlet var listFocusView: FocusView!
     @IBOutlet var itemContainer: NSView!
     @IBOutlet var addVaultItemButton: NSButton!
     @IBOutlet var moreButton: NSButton!
@@ -169,7 +66,16 @@ final class PasswordManagementViewController: NSViewController {
     var appearanceCancellable: AnyCancellable?
 
     var domain: String?
-    var isEditing = false
+    private(set) var isEditing = false {
+        didSet {
+            listModel?.canBecomeFirstResponder = !isEditing
+        }
+    }
+    func stopEditing() {
+        assert(isEditing)
+        itemModel?.cancel()
+    }
+    
     var isDirty = false {
         didSet {
             listModel?.canChangeCategory = !isDirty
@@ -188,15 +94,6 @@ final class PasswordManagementViewController: NSViewController {
     }
 
     var listView: NSView?
-//    override func keyDown(with event: NSEvent) {
-//        switch Int(event.keyCode) {
-//        case kVK_DownArrow:
-//
-//        case kVK_UpArrow:
-//            listModel?.selectFirst()
-//        }
-//        super.keyDown(with: event)
-//    }
 
     var itemModel: PasswordManagementItemModel? {
         didSet {
@@ -240,7 +137,6 @@ final class PasswordManagementViewController: NSViewController {
             self?.refreshData()
         }
     }
-    private var obs: AnyCancellable?
 
     private func toggleLockScreen(hidden: Bool) {
         if hidden {
@@ -261,8 +157,6 @@ final class PasswordManagementViewController: NSViewController {
     }
 
     private func hideLockScreen() {
-//        _=Self.swizzleCanBecomeKeyView
-
         lockScreen.isHidden = true
         searchField.isEnabled = true
         addVaultItemButton.isEnabled = true
@@ -281,42 +175,10 @@ final class PasswordManagementViewController: NSViewController {
         }
     }
     @IBOutlet var settingsButton: NSButton!
-    var obs2: AnyCancellable!
+
+    private var responderCancellable: AnyCancellable?
     override func viewDidAppear() {
         super.viewDidAppear()
-
-        // obs = view.window?.publisher(for: \.firstResponder).sink { [weak self] responder in
-        obs = listFocusView.$isFirstResponder.sink { [weak self] isFirstResponder in
-            self?.listModel?.isFirstResponder = isFirstResponder // self?.listView!.subviews[4] === responder
-//            print("first responder:", responder)
-        }
-        obs2 = listFocusView.keyDownPublisher.sink { [weak self] key in
-            guard let self = self else { return }
-            print("keyDown", key)
-            switch key {
-            case kVK_DownArrow:
-                if NSApp.isCommandPressed {
-                    fallthrough
-                }
-                self.listModel?.selectNext()
-            case kVK_End:
-                self.listModel?.selectLast()
-
-            case kVK_UpArrow:
-                if NSApp.isCommandPressed {
-                    fallthrough
-                }
-                self.listModel?.selectPrevious()
-            case kVK_Home:
-                self.listModel?.selectFirst()
-
-            case kVK_Delete, kVK_ForwardDelete:
-                self.itemModel?.requestDelete()
-
-            default:
-                break
-            }
-        }
 
         if !isDirty {
             itemModel?.clearSecureVaultModel()
@@ -334,10 +196,35 @@ final class PasswordManagementViewController: NSViewController {
 
         settingsButton.nextKeyView = moreButton
 
-//        self.listView!.subviews[2].subviews[0].nextKeyView = self.listView!.subviews[4]
-//        view.window?.makeFirstResponder(self.listView!.subviews[4])
-
         view.window?.autorecalculatesKeyViewLoop = true
+        view.window?.recalculateKeyViewLoop()
+
+        setupFirstResponderObserverForScrolling()
+    }
+
+    func setupFirstResponderObserverForScrolling() {
+        responderCancellable = view.window?.publisher(for: \.firstResponder).sink { responder in
+            guard let responder = responder as? NSView,
+               let scrollView = responder.enclosingScrollView,
+               !scrollView.contentView.documentVisibleRect.contains(responder.convert(responder.bounds, to: scrollView.contentView))
+            else {
+                return
+            }
+
+            let rect = responder.convert(responder.bounds, to: scrollView.contentView).insetBy(dx: 0, dy: -60)
+            scrollView.contentView.animator().scrollToVisible(rect)
+        }
+    }
+
+    override func keyDown(with event: NSEvent) {
+        switch Int(event.keyCode) {
+        case kVK_Delete where self.itemModel != nil,
+            kVK_ForwardDelete where self.itemModel != nil:
+            self.itemModel?.requestDelete()
+
+        default:
+            super.keyDown(with: event)
+        }
     }
 
     override func viewDidDisappear() {
@@ -789,6 +676,8 @@ final class PasswordManagementViewController: NSViewController {
                     default: // Cancel
                         if let previousValue = previousValue {
                             self?.listModel?.select(item: previousValue, notify: false)
+                        } else {
+                            self?.listModel?.clearSelection()
                         }
                     }
 

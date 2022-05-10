@@ -21,13 +21,13 @@
                             <stackView distribution="fill" orientation="horizontal" alignment="top" spacing="4" horizontalStackHuggingPriority="249.99998474121094" verticalStackHuggingPriority="249.99998474121094" detachesHiddenViews="YES" translatesAutoresizingMaskIntoConstraints="NO" id="eEh-kf-smR">
                                 <rect key="frame" x="12" y="24" width="92" height="28"/>
                                 <subviews>
-                                    <button translatesAutoresizingMaskIntoConstraints="NO" id="kky-0N-Cfd" customClass="LongPressButton" customModule="DuckDuckGo_Privacy_Browser" customModuleProvider="target">
+                                    <button focusRingType="exterior" translatesAutoresizingMaskIntoConstraints="NO" id="kky-0N-Cfd" customClass="LongPressButton" customModule="DuckDuckGo_Privacy_Browser" customModuleProvider="target">
                                         <rect key="frame" x="0.0" y="0.0" width="28" height="28"/>
                                         <constraints>
                                             <constraint firstAttribute="height" constant="28" id="0zh-Jn-l2h"/>
                                             <constraint firstAttribute="width" constant="28" id="8sl-Tr-gSd"/>
                                         </constraints>
-                                        <buttonCell key="cell" type="square" bezelStyle="shadowlessSquare" image="Back" imagePosition="only" alignment="center" imageScaling="proportionallyDown" inset="2" id="EhR-jn-0hY">
+                                        <buttonCell key="cell" type="square" bezelStyle="shadowlessSquare" image="Back" imagePosition="only" alignment="center" focusRingType="exterior" imageScaling="proportionallyDown" inset="2" id="EhR-jn-0hY">
                                             <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
                                             <font key="font" metaFont="system"/>
                                         </buttonCell>
@@ -47,13 +47,13 @@
                                             <action selector="goBackAction:" target="o2v-eH-jTI" id="gEk-2Z-80d"/>
                                         </connections>
                                     </button>
-                                    <button translatesAutoresizingMaskIntoConstraints="NO" id="mdE-u0-Ei5" customClass="LongPressButton" customModule="DuckDuckGo_Privacy_Browser" customModuleProvider="target">
+                                    <button focusRingType="exterior" translatesAutoresizingMaskIntoConstraints="NO" id="mdE-u0-Ei5" customClass="LongPressButton" customModule="DuckDuckGo_Privacy_Browser" customModuleProvider="target">
                                         <rect key="frame" x="32" y="0.0" width="28" height="28"/>
                                         <constraints>
                                             <constraint firstAttribute="height" constant="28" id="VXS-B2-jFA"/>
                                             <constraint firstAttribute="width" constant="28" id="jYM-So-c8l"/>
                                         </constraints>
-                                        <buttonCell key="cell" type="square" bezelStyle="shadowlessSquare" image="Forward" imagePosition="only" alignment="center" imageScaling="proportionallyDown" inset="2" id="ePU-hF-DNf">
+                                        <buttonCell key="cell" type="square" bezelStyle="shadowlessSquare" image="Forward" imagePosition="only" alignment="center" focusRingType="exterior" imageScaling="proportionallyDown" inset="2" id="ePU-hF-DNf">
                                             <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
                                             <font key="font" metaFont="system"/>
                                         </buttonCell>
@@ -73,13 +73,13 @@
                                             <action selector="goForwardAction:" target="o2v-eH-jTI" id="aht-fm-Fhd"/>
                                         </connections>
                                     </button>
-                                    <button translatesAutoresizingMaskIntoConstraints="NO" id="B2U-XM-Vo0" customClass="MouseOverButton" customModule="DuckDuckGo_Privacy_Browser" customModuleProvider="target">
+                                    <button focusRingType="exterior" translatesAutoresizingMaskIntoConstraints="NO" id="B2U-XM-Vo0" customClass="MouseOverButton" customModule="DuckDuckGo_Privacy_Browser" customModuleProvider="target">
                                         <rect key="frame" x="64" y="0.0" width="28" height="28"/>
                                         <constraints>
                                             <constraint firstAttribute="height" constant="28" id="Jkc-qJ-YzZ"/>
                                             <constraint firstAttribute="width" constant="28" id="Rf0-Vt-PDX"/>
                                         </constraints>
-                                        <buttonCell key="cell" type="square" bezelStyle="shadowlessSquare" image="Refresh" imagePosition="only" alignment="center" imageScaling="proportionallyDown" inset="2" id="T7v-4A-Zm2">
+                                        <buttonCell key="cell" type="square" bezelStyle="shadowlessSquare" image="Refresh" imagePosition="only" alignment="center" focusRingType="exterior" imageScaling="proportionallyDown" inset="2" id="T7v-4A-Zm2">
                                             <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
                                             <font key="font" metaFont="system"/>
                                         </buttonCell>
@@ -169,13 +169,13 @@
                                             <action selector="passwordManagementButtonAction:" target="o2v-eH-jTI" id="CkE-56-a4p"/>
                                         </connections>
                                     </button>
-                                    <button hidden="YES" translatesAutoresizingMaskIntoConstraints="NO" id="G8p-di-fq4" userLabel="Downloads Button" customClass="MouseOverButton" customModule="DuckDuckGo_Privacy_Browser" customModuleProvider="target">
+                                    <button hidden="YES" focusRingType="exterior" translatesAutoresizingMaskIntoConstraints="NO" id="G8p-di-fq4" userLabel="Downloads Button" customClass="MouseOverButton" customModule="DuckDuckGo_Privacy_Browser" customModuleProvider="target">
                                         <rect key="frame" x="0.0" y="0.0" width="28" height="28"/>
                                         <constraints>
                                             <constraint firstAttribute="width" constant="28" id="e8q-LQ-wRv"/>
                                             <constraint firstAttribute="height" constant="28" id="fxJ-mh-eCf"/>
                                         </constraints>
-                                        <buttonCell key="cell" type="square" bezelStyle="shadowlessSquare" image="Downloads" imagePosition="only" alignment="center" imageScaling="proportionallyDown" inset="2" id="GwE-DM-8UC">
+                                        <buttonCell key="cell" type="square" bezelStyle="shadowlessSquare" image="Downloads" imagePosition="only" alignment="center" focusRingType="exterior" imageScaling="proportionallyDown" inset="2" id="GwE-DM-8UC">
                                             <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
                                             <font key="font" metaFont="system"/>
                                         </buttonCell>
@@ -195,13 +195,13 @@
                                             <action selector="downloadsButtonAction:" target="o2v-eH-jTI" id="UIu-gq-V20"/>
                                         </connections>
                                     </button>
-                                    <button translatesAutoresizingMaskIntoConstraints="NO" id="4sj-qN-UUY" userLabel="Bookmarks Button" customClass="MouseOverButton" customModule="DuckDuckGo_Privacy_Browser" customModuleProvider="target">
+                                    <button focusRingType="exterior" translatesAutoresizingMaskIntoConstraints="NO" id="4sj-qN-UUY" userLabel="Bookmarks Button" customClass="MouseOverButton" customModule="DuckDuckGo_Privacy_Browser" customModuleProvider="target">
                                         <rect key="frame" x="32" y="0.0" width="28" height="28"/>
                                         <constraints>
                                             <constraint firstAttribute="height" constant="28" id="Qzm-SN-RXg"/>
                                             <constraint firstAttribute="width" constant="28" id="q0c-3z-K6Y"/>
                                         </constraints>
-                                        <buttonCell key="cell" type="square" bezelStyle="shadowlessSquare" image="Bookmarks" imagePosition="only" alignment="center" imageScaling="proportionallyDown" inset="2" id="ybv-cj-wPr">
+                                        <buttonCell key="cell" type="square" bezelStyle="shadowlessSquare" image="Bookmarks" imagePosition="only" alignment="center" focusRingType="exterior" imageScaling="proportionallyDown" inset="2" id="ybv-cj-wPr">
                                             <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
                                             <font key="font" metaFont="system"/>
                                         </buttonCell>
@@ -221,15 +221,17 @@
                                             <action selector="bookmarksButtonAction:" target="o2v-eH-jTI" id="feR-3s-kbn"/>
                                         </connections>
                                     </button>
-                                    <button translatesAutoresizingMaskIntoConstraints="NO" id="iIF-Ky-unr" customClass="MouseOverButton" customModule="DuckDuckGo_Privacy_Browser" customModuleProvider="target">
+                                    <button focusRingType="exterior" translatesAutoresizingMaskIntoConstraints="NO" id="iIF-Ky-unr" customClass="MouseOverButton" customModule="DuckDuckGo_Privacy_Browser" customModuleProvider="target">
                                         <rect key="frame" x="64" y="0.0" width="28" height="28"/>
                                         <constraints>
                                             <constraint firstAttribute="width" constant="28" id="2ry-8Q-yfk"/>
                                             <constraint firstAttribute="height" constant="28" id="s7E-4e-eTj"/>
                                         </constraints>
-                                        <buttonCell key="cell" type="square" bezelStyle="shadowlessSquare" image="Settings" imagePosition="only" alignment="center" imageScaling="proportionallyDown" inset="2" id="N7m-mn-k3W">
+                                        <buttonCell key="cell" type="square" bezelStyle="shadowlessSquare" image="Settings" imagePosition="only" alignment="center" focusRingType="exterior" imageScaling="proportionallyDown" inset="2" id="N7m-mn-k3W">
                                             <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
                                             <font key="font" metaFont="system"/>
+                                            <string key="keyEquivalent">.</string>
+                                            <modifierMask key="keyEquivalentModifierMask" command="YES"/>
                                         </buttonCell>
                                         <color key="contentTintColor" name="ButtonColor"/>
                                         <userDefinedRuntimeAttributes>
@@ -543,6 +545,7 @@
                                     <userDefinedRuntimeAttribute type="number" keyPath="cornerRadius">
                                         <integer key="value" value="7"/>
                                     </userDefinedRuntimeAttribute>
+                                    <userDefinedRuntimeAttribute type="boolean" keyPath="focusable" value="NO"/>
                                 </userDefinedRuntimeAttributes>
                                 <connections>
                                     <action selector="bookmarkButtonAction:" target="mcr-nj-GmC" id="zSj-zA-HAq"/>
@@ -569,6 +572,7 @@
                                     <userDefinedRuntimeAttribute type="number" keyPath="cornerRadius">
                                         <real key="value" value="4"/>
                                     </userDefinedRuntimeAttribute>
+                                    <userDefinedRuntimeAttribute type="boolean" keyPath="focusable" value="NO"/>
                                 </userDefinedRuntimeAttributes>
                                 <connections>
                                     <action selector="clearButtonAction:" target="mcr-nj-GmC" id="m9h-NY-Ujx"/>
@@ -577,13 +581,13 @@
                             <stackView distribution="equalSpacing" orientation="horizontal" alignment="centerY" spacing="0.0" horizontalStackHuggingPriority="249.99998474121094" verticalStackHuggingPriority="249.99998474121094" detachesHiddenViews="YES" translatesAutoresizingMaskIntoConstraints="NO" id="HEu-ro-RSA">
                                 <rect key="frame" x="0.0" y="0.0" width="194" height="32"/>
                                 <subviews>
-                                    <button hidden="YES" translatesAutoresizingMaskIntoConstraints="NO" id="nOW-iY-XmO" customClass="MouseOverAnimationButton" customModule="DuckDuckGo_Privacy_Browser" customModuleProvider="target">
+                                    <button hidden="YES" focusRingType="exterior" translatesAutoresizingMaskIntoConstraints="NO" id="nOW-iY-XmO" customClass="MouseOverAnimationButton" customModule="DuckDuckGo_Privacy_Browser" customModuleProvider="target">
                                         <rect key="frame" x="0.0" y="0.0" width="32" height="32"/>
                                         <constraints>
                                             <constraint firstAttribute="width" constant="32" id="Hf1-nK-Kb4"/>
                                             <constraint firstAttribute="height" constant="32" id="NcD-Mf-Vae"/>
                                         </constraints>
-                                        <buttonCell key="cell" type="square" bezelStyle="shadowlessSquare" imagePosition="only" alignment="center" imageScaling="proportionallyDown" inset="2" id="ZJj-fb-53u">
+                                        <buttonCell key="cell" type="square" bezelStyle="shadowlessSquare" imagePosition="only" alignment="center" focusRingType="exterior" imageScaling="proportionallyDown" inset="2" id="ZJj-fb-53u">
                                             <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
                                             <font key="font" metaFont="system"/>
                                         </buttonCell>
@@ -598,6 +602,7 @@
                                             <userDefinedRuntimeAttribute type="number" keyPath="cornerRadius">
                                                 <integer key="value" value="7"/>
                                             </userDefinedRuntimeAttribute>
+                                            <userDefinedRuntimeAttribute type="boolean" keyPath="shouldAppearOnFocus" value="YES"/>
                                         </userDefinedRuntimeAttributes>
                                         <connections>
                                             <action selector="privacyEntryPointButtonAction:" target="mcr-nj-GmC" id="YFW-MB-o9A"/>
@@ -606,17 +611,14 @@
                                     <customView translatesAutoresizingMaskIntoConstraints="NO" id="3Iv-YW-zn2">
                                         <rect key="frame" x="0.0" y="0.0" width="34" height="32"/>
                                         <subviews>
-                                            <button translatesAutoresizingMaskIntoConstraints="NO" id="psi-hX-Kh9">
+                                            <imageView translatesAutoresizingMaskIntoConstraints="NO" id="psi-hX-Kh9">
                                                 <rect key="frame" x="15" y="8" width="16" height="16"/>
                                                 <constraints>
                                                     <constraint firstAttribute="width" secondItem="psi-hX-Kh9" secondAttribute="height" multiplier="1:1" id="6fs-gf-saq"/>
                                                     <constraint firstAttribute="height" constant="16" id="OCF-kY-RT8"/>
                                                 </constraints>
-                                                <buttonCell key="cell" type="square" bezelStyle="shadowlessSquare" image="Search" imagePosition="only" alignment="center" imageScaling="proportionallyDown" inset="2" id="NBl-r8-f28">
-                                                    <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
-                                                    <font key="font" metaFont="system"/>
-                                                </buttonCell>
-                                            </button>
+                                                <imageCell key="cell" refusesFirstResponder="YES" alignment="center" imageScaling="proportionallyDown" image="Search" id="NBl-r8-f28"/>
+                                            </imageView>
                                         </subviews>
                                         <constraints>
                                             <constraint firstItem="psi-hX-Kh9" firstAttribute="centerY" secondItem="3Iv-YW-zn2" secondAttribute="centerY" id="0Ul-G5-HXF"/>

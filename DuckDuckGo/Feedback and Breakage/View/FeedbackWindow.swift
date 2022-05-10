@@ -32,6 +32,10 @@ final class FeedbackWindow: NSWindow {
 
     override var canBecomeMain: Bool { false }
 
+    override func awakeFromNib() {
+        autorecalculatesKeyViewLoop = false
+    }
+
     var feedbackViewController: FeedbackViewController {
         // swiftlint:disable:next force_cast
         contentViewController as! FeedbackViewController

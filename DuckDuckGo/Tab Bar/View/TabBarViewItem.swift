@@ -19,6 +19,7 @@
 import Cocoa
 import os.log
 import Combine
+import Carbon.HIToolbox
 
 struct OtherTabBarViewItemsState {
 
@@ -45,19 +46,14 @@ protocol TabBarViewItemDelegate: AnyObject {
     func otherTabBarViewItemsState(for tabBarViewItem: TabBarViewItem) -> OtherTabBarViewItemsState
 
 }
+
 final class TabBarView: NSView {
-//    override var acceptsFirstResponder: Bool {
-//        true
-//    }
-//    override var canBecomeKeyView: Bool {
-//        true
-//    }
-//    override func accessibilityRole() -> NSAccessibility.Role? {
-//        super.accessibilityRole()
-//    }
-//    override func accessibilityLabel() -> String? {
-//        super.accessibilityLabel()
-//    }
+
+    required init?(coder: NSCoder) {
+        super.init(coder: coder)
+        self.focusRingType = .exterior
+    }
+
     override func accessibilityRole() -> NSAccessibility.Role? {
       return .radioButton
     }
@@ -103,6 +99,47 @@ final class TabBarView: NSView {
     @objc public override func accessibilityValue() -> Any? {
       NSNumber(value: true)
     }
+
+    override var canBecomeKeyView: Bool {
+        NSApp.isFullKeyboardAccessEnabled
+    }
+
+    override var acceptsFirstResponder: Bool {
+        NSApp.isFullKeyboardAccessEnabled
+    }
+
+    override func becomeFirstResponder() -> Bool {
+        // TODO: Also observe my buttons.isFirstResponder and scroll into view // swiftlint:disable:this todo
+        (nextResponder as? TabBarViewItem)?.scrollIntoView { _ in
+            super.becomeFirstResponder()
+        }
+
+        return true
+    }
+
+    override func resignFirstResponder() -> Bool {
+        guard super.resignFirstResponder() else { return false }
+//        self.updateView(stroke: false)
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) { [weak self] in
+            if !(self?.window?.firstResponder is TabBarView || (self?.window?.firstResponder as? NSButton)?.superview is TabBarView) {
+                ((self?.nextResponder as? TabBarViewItem)?.collectionView as? TabBarCollectionView)?.scrollToSelected()
+            }
+        }
+        return true
+    }
+
+    override func doCommand(by selector: Selector) {
+        super.doCommand(by: selector)
+    }
+
+    override func keyDown(with event: NSEvent) {
+        if Int(event.keyCode) == kVK_Space {
+            _=accessibilityPerformPress()
+            return
+        }
+        super.keyDown(with: event)
+    }
+
 }
 
 final class TabBarViewItem: NSCollectionViewItem {
@@ -229,6 +266,11 @@ final class TabBarViewItem: NSCollectionViewItem {
     }
 
     private var lastKnownIndexPath: IndexPath?
+
+    func scrollIntoView(completionHandler: ((Bool) -> Void)? = nil) {
+        guard let indexPath = self.collectionView?.indexPath(for: self) else { return }
+        (self.collectionView as? TabBarCollectionView)?.scroll(to: indexPath.item, completionHandler: completionHandler)
+    }
 
     @IBAction func closeButtonAction(_ sender: NSButton) {
         guard let indexPath = self.collectionView?.indexPath(for: self) else {
