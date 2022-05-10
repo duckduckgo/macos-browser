@@ -283,7 +283,7 @@ create_dmg() {
     local dmg_background="${cwd}/assets/dmg-background.png"
     dmg_output_path="${WORKDIR}/${APP_NAME}.dmg"
 
-    rm -rf "${dmg_dir}"
+    rm -rf "${dmg_dir}" "${dmg_output_path}"
     mkdir -p "${dmg_dir}"
     cp -R "${APP_PATH}" "${dmg_dir}"
     create-dmg --volname "${APP_NAME}" \
