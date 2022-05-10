@@ -897,6 +897,9 @@ extension Tab: WKNavigationDelegate {
 
     func webView(_ webView: WKWebView, didCommit navigation: WKNavigation!) {
         isBeingRedirected = false
+        if let url = webView.url {
+            addVisit(of: url)
+        }
     }
 
     struct Constants {
@@ -1119,10 +1122,6 @@ extension Tab: WKNavigationDelegate {
 
     @MainActor
     func webView(_ webView: WKWebView, didFinish navigation: WKNavigation!) {
-        if !isBeingRedirected, let url = webView.url {
-            addVisit(of: url)
-        }
-
         isBeingRedirected = false
         invalidateSessionStateData()
         webViewDidFinishNavigationPublisher.send()
