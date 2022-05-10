@@ -90,7 +90,13 @@ final class WebViewStateObserver: NSObject {
         }
 
         switch keyPath {
-        case #keyPath(WKWebView.url): handleURLChange(in: webView, tabViewModel: tabViewModel)
+        case #keyPath(WKWebView.url):
+            if let url = webView.url {
+                tabViewModel.tab.setContent(.contentFromURL(url))
+                tabViewModel.tab.addVisit(of: url)
+            }
+            updateTitle() // The title might not change if webView doesn't think anything is different so update title here as well
+
         case #keyPath(WKWebView.canGoBack): tabViewModel.updateCanGoBack()
         case #keyPath(WKWebView.canGoForward): tabViewModel.updateCanGoForward()
         case #keyPath(WKWebView.isLoading): tabViewModel.isWebViewLoading = webView.isLoading
@@ -104,16 +110,6 @@ final class WebViewStateObserver: NSObject {
             os_log("%s: keyPath %s not handled", type: .error, className, keyPath)
             super.observeValue(forKeyPath: keyPath, of: object, change: change, context: context)
         }
-    }
-
-    private func handleURLChange(in webView: WKWebView, tabViewModel: TabViewModel) {
-        if let url = webView.url {
-            tabViewModel.tab.setContent(.contentFromURL(url))
-            if !webView.isLoading {
-                tabViewModel.tab.addVisit(of: url)
-            }
-        }
-        updateTitle() // The title might not change if webView doesn't think anything is different so update title here as well
     }
 
     private func updateTitle() {
