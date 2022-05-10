@@ -2471,7 +2471,7 @@
 			path = Model;
 			sourceTree = "<group>";
 		};
-		AA4D700525545EDE00C3411E /* App Delegate */ = {
+		AA4D700525545EDE00C3411E /* AppDelegate */ = {
 			isa = PBXGroup;
 			children = (
 				AA585D81248FD31100E9A3E2 /* AppDelegate.swift */,
@@ -2480,7 +2480,7 @@
 				AAD86E51267A0DFF005C11BE /* UpdateController.swift */,
 				858A798226A8B75F00A75A42 /* CopyHandler.swift */,
 			);
-			path = "App Delegate";
+			path = AppDelegate;
 			sourceTree = "<group>";
 		};
 		AA512D1224D99D4900230283 /* Services */ = {
@@ -2520,7 +2520,7 @@
 			children = (
 				B31055BB27A1BA0E001AC618 /* Autoconsent */,
 				B6A9E47526146A440067D1B9 /* API */,
-				AA4D700525545EDE00C3411E /* App Delegate */,
+				AA4D700525545EDE00C3411E /* AppDelegate */,
 				AAC5E4C025D6A6A9007F5990 /* Bookmarks */,
 				AA86491B24D837DE001BABEE /* Browser Tab */,
 				AA86491324D831B9001BABEE /* Common */,
