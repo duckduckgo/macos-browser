@@ -841,6 +841,13 @@ extension Tab: SecureVaultManagerDelegate {
     func secureVaultManager(_: SecureVaultManager, promptUserToStoreAutofillData data: AutofillData) {
         delegate?.tab(self, requestedSaveAutofillData: data)
     }
+    
+    public func secureVaultManager(_: SecureVaultManager,
+                                   promptUserToAutofillCredentialsForDomain
+                                   domain: String, withAccounts accounts: [SecureVaultModels.WebsiteAccount],
+                                   completionHandler: @escaping (SecureVaultModels.WebsiteAccount?) -> Void) {
+        // No-op, not needed on macOS
+    }
 
     func secureVaultManager(_: SecureVaultManager, didAutofill type: AutofillType, withObjectId objectId: Int64) {
         Pixel.fire(.formAutofilled(kind: type.formAutofillKind))
