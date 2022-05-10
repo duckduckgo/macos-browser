@@ -1,7 +1,5 @@
 #!/bin/bash
 
-set -eo pipefail
-
 KEYCHAIN_SERVICE_NAME="ddg-macos-app-archive-script"
 
 clear_keychain() {

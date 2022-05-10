@@ -3,6 +3,7 @@
 set -eo pipefail
 
 cwd="$(dirname "$0")"
+source "${cwd}/common.sh"
 
 read_command_line_arguments() {
 	if (( $# < 1 )); then
@@ -50,25 +51,31 @@ read_command_line_arguments() {
 }
 
 print_usage_and_exit() {
-	echo "Usage:"
-	echo "  $ $0 <review|release> [-a <asana_task_url>] [-d]"
-	echo
-	echo "Options:"
-	echo " -a <asana_task_url>  Update Asana task after building the app (implies -d)"
-	echo " -d                   Create DMG image alongside the zipped app and dSYMs"
-	echo
-	echo "To clear keychain entries:"
-	echo "  $ $0 clear-keychain"
-	exit 1
+	cat <<- EOF
+	Usage:
+	  $ $(basename "$0") <review|release> [-a <asana_task_url>] [-d]
+	
+	Options:
+	 -a <asana_task_url>  Update Asana task after building the app (implies -d)
+	 -d                   Create DMG image alongside the zipped app and dSYMs
+	
+	To clear keychain entries:
+	  $ $(basename "$0") clear-keychain
+
+	EOF
+
+	die "Build type not specified"
 }
 
 create_dmg_preflight() {
 	if [[ ${create_dmg} -ne 1 ]]; then
 		if ! command -v create-dmg &> /dev/null; then
-			echo "create-dmg is required to create DMG images. Install it with:"
-			echo "    $ brew install create-dmg"
-			echo
-			exit 1
+			cat <<- EOF
+			create-dmg is required to create DMG images. Install it with:
+			  $ brew install create-dmg
+			
+			EOF
+			die
 		fi
 
 		create_dmg=1
@@ -219,8 +226,7 @@ upload_for_notarization() {
 		fi
 
 		if (( retries == 0 )); then
-			echo "Maximum number of retries reached."
-			exit 1
+			die "Maximum number of retries reached."
 		fi
 	done
 	echo

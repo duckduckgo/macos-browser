@@ -1,16 +1,16 @@
 #!/bin/bash
 
-set -eo pipefail
-
 asana_token_keychain_identifier="asana-personal-token"
 
 asana_preflight() {
 	if [[ -n "${asana_task_url}" ]]; then
 		if ! command -v jq &> /dev/null; then
-			echo "jq is required to update Asana tasks. Install it with:"
-			echo "    $ brew install jq"
-			echo
-			exit 1
+			cat <<- EOF
+			jq is required to update Asana tasks. Install it with:
+			  $ brew install jq
+			
+			EOF
+			die
 		fi
 
 		asana_task_id=$(asana_extract_task_id)
@@ -25,9 +25,7 @@ asana_extract_task_id() {
 	if [[ "${asana_task_url}" =~ ${task_url_regex} ]]; then
 		echo "${BASH_REMATCH[1]}"
 	else
-		echo "Asana Task URL has incorrect format (attempted to match ${task_url_regex})."
-		echo
-		exit 1
+		die "Asana Task URL has incorrect format (attempted to match ${task_url_regex})."
 	fi
 }
 
@@ -113,9 +111,7 @@ asana_update_task() {
 	if asana_upload_dmg "${dmg_path}"; then
 		echo "Done"
 	else
-		echo "Failed to upload DMG to Asana"
-		echo
-		exit 1
+		die "Failed to upload DMG to Asana"
 	fi
 
 	printf '%s' "Uploading dSYMs zip to Asana task ... "
@@ -123,9 +119,7 @@ asana_update_task() {
 	if asana_upload_dsyms_zip "${dsym_zip_path}"; then
 		echo "Done"
 	else
-		echo "Failed to upload dSYMs zip to Asana"
-		echo
-		exit 1
+		die "Failed to upload dSYMs zip to Asana"
 	fi
 
 	asana_close_subtasks
@@ -141,9 +135,7 @@ asana_close_subtasks() {
 	
 		for task_id in "${subtasks_to_close[@]}"; do
 			if ! asana_complete_task "${task_id}"; then
-				echo "Failed"
-				echo
-				exit 1
+				die "Failed"
 			fi
 		done
 
