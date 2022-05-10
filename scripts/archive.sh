@@ -12,14 +12,14 @@ read_command_line_arguments() {
 
 	case "$1" in
 		review)
-			APP_NAME="DuckDuckGo Review"
-			SCHEME="Product Review Release"
-			CONFIGURATION="Review"
+			app_name="DuckDuckGo Review"
+			scheme="Product Review Release"
+			configuration="Review"
 			;;
 		release)
-			APP_NAME="DuckDuckGo"
-			SCHEME="DuckDuckGo Privacy Browser"
-			CONFIGURATION="Release"
+			app_name="DuckDuckGo"
+			scheme="DuckDuckGo Privacy Browser"
+			configuration="Release"
 			;;
 		clear-keychain)
 			clear_keychain
@@ -84,64 +84,64 @@ create_dmg_preflight() {
 }
 
 set_up_environment() {
-	WORKDIR="${PWD}/release"
-	ARCHIVE="${WORKDIR}/DuckDuckGo.xcarchive"
-	NOTARIZATION_INFO_PLIST="${WORKDIR}/notarization-info.plist"
+	workdir="${PWD}/release"
+	archive="${workdir}/DuckDuckGo.xcarchive"
+	notarization_info_plist="${workdir}/notarization-info.plist"
 
 	if [[ -z $CI ]]; then
-		EXPORT_OPTIONS_PLIST="${cwd}/assets/ExportOptions.plist"
+		export_options_plist="${cwd}/assets/ExportOptions.plist"
 	else
-		EXPORT_OPTIONS_PLIST="${cwd}/assets/ExportOptions_CI.plist"
-		CONFIGURATION="CI_${CONFIGURATION}"
+		export_options_plist="${cwd}/assets/ExportOptions_CI.plist"
+		configuration="CI_${configuration}"
 	fi
 
-	APP_PATH="${WORKDIR}/${APP_NAME}.app"
-	DSYM_PATH="${ARCHIVE}/dSYMs/${APP_NAME}.app.dSYM"
+	app_path="${workdir}/${app_name}.app"
+	dsym_path="${archive}/dSYMs/${app_name}.app.dSYM"
 
-	OUTPUT_APP_ZIP_PATH="${WORKDIR}/DuckDuckGo.zip"
-	OUTPUT_DSYM_ZIP_PATH="${WORKDIR}/${APP_NAME}.app.dSYM.zip"
+	output_app_zip_path="${workdir}/DuckDuckGo.zip"
+	output_dsym_zip_path="${workdir}/${app_name}.app.dSYM.zip"
 }
 
 get_developer_credentials() {
-	DEVELOPER_APPLE_ID="${XCODE_DEVELOPER_APPLE_ID}"
-	DEVELOPER_PASSWORD="${XCODE_DEVELOPER_PASSWORD}"
+	developer_apple_id="${XCODE_DEVELOPER_APPLE_ID}"
+	developer_password="${XCODE_DEVELOPER_PASSWORD}"
 
-	if [[ -z "${DEVELOPER_APPLE_ID}" ]]; then
+	if [[ -z "${developer_apple_id}" ]]; then
 
-		while [[ -z "${DEVELOPER_APPLE_ID}" ]]; do
+		while [[ -z "${developer_apple_id}" ]]; do
 			echo "Please enter Apple ID that will be used for requesting notarization"
 			echo "Set it in XCODE_DEVELOPER_APPLE_ID environment variable to not be asked again."
 			echo
-			read -rp "Apple ID: " DEVELOPER_APPLE_ID
+			read -rp "Apple ID: " developer_apple_id
 			echo
 		done
 
 	else
-		echo "Using ${DEVELOPER_APPLE_ID} Apple ID"
+		echo "Using ${developer_apple_id} Apple ID"
 	fi
 
-	if [[ -z "${DEVELOPER_PASSWORD}" ]]; then
+	if [[ -z "${developer_password}" ]]; then
 
-		if user_has_password_in_keychain "${DEVELOPER_APPLE_ID}"; then
+		if user_has_password_in_keychain "${developer_apple_id}"; then
 			echo "Found Apple ID password in the keychain"
-			DEVELOPER_PASSWORD=$(retrieve_password_from_keychain "${DEVELOPER_APPLE_ID}")
+			developer_password=$(retrieve_password_from_keychain "${developer_apple_id}")
 		else
-			while [[ -z "${DEVELOPER_PASSWORD}" ]]; do
+			while [[ -z "${developer_password}" ]]; do
 				echo "Set password in XCODE_DEVELOPER_PASSWORD environment variable to not be asked for password."
 				echo "Currently only application-specific password is supported (create one at https://appleid.apple.com)."
 				echo
-				read -srp "Password for ${DEVELOPER_APPLE_ID}: " DEVELOPER_PASSWORD
+				read -srp "Password for ${developer_apple_id}: " developer_password
 				echo
 			done
 
-			store_password_in_keychain "${DEVELOPER_APPLE_ID}" "${DEVELOPER_PASSWORD}"
+			store_password_in_keychain "${developer_apple_id}" "${developer_password}"
 		fi
 	fi
 }
 
 clear_working_directory() {
-	rm -rf "${WORKDIR}"
-	mkdir -p "${WORKDIR}"
+	rm -rf "${workdir}"
+	mkdir -p "${workdir}"
 }
 
 prepare_export_options_in_ci() {
@@ -152,8 +152,8 @@ prepare_export_options_in_ci() {
 		signing_certificate=$(security find-certificate -Z -c "Developer ID Application:" | grep "SHA-1" | awk 'NF { print $NF }')
 		team_id=$(security find-certificate -c "Developer ID Application:" | grep "alis" | awk 'NF { print $NF }' | tr -d \(\)\")
 
-		plutil -replace signingCertificate -string "${signing_certificate}" "${EXPORT_OPTIONS_PLIST}"
-		plutil -replace teamID -string "${team_id}" "${EXPORT_OPTIONS_PLIST}"
+		plutil -replace signingCertificate -string "${signing_certificate}" "${export_options_plist}"
+		plutil -replace teamID -string "${team_id}" "${export_options_plist}"
 	fi
 }
 
@@ -177,9 +177,9 @@ archive_and_export() {
 	echo
 	
 	xcrun xcodebuild archive \
-		-scheme "${SCHEME}" \
-		-configuration "${CONFIGURATION}" \
-		-archivePath "${ARCHIVE}" \
+		-scheme "${scheme}" \
+		-configuration "${configuration}" \
+		-archivePath "${archive}" \
 		| ${xcpretty}
 
 	echo
@@ -189,28 +189,28 @@ archive_and_export() {
 	prepare_export_options_in_ci
 
 	xcrun xcodebuild -exportArchive \
-		-archivePath "${ARCHIVE}" \
-		-exportPath "${WORKDIR}" \
-		-exportOptionsPlist "${EXPORT_OPTIONS_PLIST}" \
-		-configuration "${CONFIGURATION}" \
+		-archivePath "${archive}" \
+		-exportPath "${workdir}" \
+		-exportOptionsPlist "${export_options_plist}" \
+		-configuration "${configuration}" \
 		| ${xcpretty}
 }
 
 altool_upload() {
 	xcrun altool --notarize-app \
 		--primary-bundle-id "com.duckduckgo.macos.browser" \
-		-u "${DEVELOPER_APPLE_ID}" \
-		-p "${DEVELOPER_PASSWORD}" \
+		-u "${developer_apple_id}" \
+		-p "${developer_password}" \
 		-f "${notarization_zip_path}" \
 		--output-format xml \
 		2>/dev/null \
-		> "${NOTARIZATION_INFO_PLIST}"
+		> "${notarization_info_plist}"
 }
 
 upload_for_notarization() {
-	local notarization_zip_path="${WORKDIR}/DuckDuckGo-for-notarization.zip"
+	local notarization_zip_path="${workdir}/DuckDuckGo-for-notarization.zip"
 
-	ditto -c -k --keepParent "${APP_PATH}" "${notarization_zip_path}"
+	ditto -c -k --keepParent "${app_path}" "${notarization_zip_path}"
 
 	local retries=3
 	while true; do
@@ -233,7 +233,7 @@ upload_for_notarization() {
 }
 
 get_notarization_info() {
-	/usr/libexec/PlistBuddy -c "Print :notarization-upload:RequestUUID" "${NOTARIZATION_INFO_PLIST}"
+	/usr/libexec/PlistBuddy -c "Print :notarization-upload:RequestUUID" "${notarization_info_plist}"
 }
 
 get_notarization_status() {
@@ -242,15 +242,15 @@ get_notarization_status() {
 
 altool_check_notarization_status () {
 	xcrun altool --notarization-info "$(get_notarization_info)" \
-		-u "${DEVELOPER_APPLE_ID}" \
-		-p "${DEVELOPER_PASSWORD}" \
+		-u "${developer_apple_id}" \
+		-p "${developer_password}" \
 		--output-format xml \
 		2>/dev/null \
 		> "${notarization_status_info_plist}"
 }
 
 wait_for_notarization() {
-	local notarization_status_info_plist="${WORKDIR}/notarization-status-info.plist"
+	local notarization_status_info_plist="${workdir}/notarization-status-info.plist"
 
 	echo "Checking notarization status ..."
 	while true; do
@@ -270,30 +270,30 @@ wait_for_notarization() {
 }
 
 staple_notarized_app() {
-	xcrun stapler staple "${APP_PATH}"
+	xcrun stapler staple "${app_path}"
 }
 
 compress_app_and_dsym() {
 	echo
 	echo "Compressing app and dSYMs ..."
 	echo
-	ditto -c -k --keepParent "${APP_PATH}" "${OUTPUT_APP_ZIP_PATH}"
-	ditto -c -k --keepParent "${DSYM_PATH}" "${OUTPUT_DSYM_ZIP_PATH}"
+	ditto -c -k --keepParent "${app_path}" "${output_app_zip_path}"
+	ditto -c -k --keepParent "${dsym_path}" "${output_dsym_zip_path}"
 }
 
 create_dmg() {
 	echo
 	echo "Creating DMG image ..."
 	echo
-	local dmg_dir="${WORKDIR}/dmg"
+	local dmg_dir="${workdir}/dmg"
 	local dmg_background="${cwd}/assets/dmg-background.png"
-	dmg_output_path="${WORKDIR}/${APP_NAME}.dmg"
+	dmg_output_path="${workdir}/${app_name}.dmg"
 
 	rm -rf "${dmg_dir}" "${dmg_output_path}"
 	mkdir -p "${dmg_dir}"
-	cp -R "${APP_PATH}" "${dmg_dir}"
-	create-dmg --volname "${APP_NAME}" \
-		--icon "${APP_NAME}.app" 140 160 \
+	cp -R "${app_path}" "${dmg_dir}"
+	create-dmg --volname "${app_name}" \
+		--icon "${app_name}.app" 140 160 \
 		--background "${dmg_background}" \
 		--window-size 600 400 \
 		--icon-size 120 \
@@ -318,17 +318,17 @@ main() {
 		create_dmg
 
 		if [[ $asana_task_id ]]; then
-			asana_update_task "${dmg_output_path}" "${OUTPUT_DSYM_ZIP_PATH}"
+			asana_update_task "${dmg_output_path}" "${output_dsym_zip_path}"
 		fi
 	fi
 
 	echo
-	echo "Notarized app ready at ${APP_PATH}"
-	echo "Compressed app ready at ${OUTPUT_APP_ZIP_PATH}"
-	echo "Compressed debug symbols ready at ${OUTPUT_DSYM_ZIP_PATH}"
+	echo "Notarized app ready at ${app_path}"
+	echo "Compressed app ready at ${output_app_zip_path}"
+	echo "Compressed debug symbols ready at ${output_dsym_zip_path}"
 
 	if [[ -z $CI ]]; then
-		open "${WORKDIR}"
+		open "${workdir}"
 	fi
 }
 
