@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<document type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="3.0" toolsVersion="19162" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES" customObjectInstantitationMethod="direct">
+<document type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="3.0" toolsVersion="20037" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES" customObjectInstantitationMethod="direct">
     <dependencies>
         <deployment identifier="macosx"/>
-        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="19162"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="20037"/>
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
     </dependencies>
     <objects>
@@ -17,6 +17,13 @@
             <rect key="frame" x="0.0" y="0.0" width="265" height="24"/>
             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
             <subviews>
+                <box boxType="custom" borderWidth="0.0" translatesAutoresizingMaskIntoConstraints="NO" id="tn9-9X-Jgv">
+                    <rect key="frame" x="0.0" y="0.0" width="265" height="24"/>
+                    <view key="contentView" id="a9M-d4-y4y">
+                        <rect key="frame" x="0.0" y="0.0" width="265" height="24"/>
+                        <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                    </view>
+                </box>
                 <stackView distribution="fill" orientation="horizontal" alignment="centerY" horizontalStackHuggingPriority="249.99998474121094" verticalStackHuggingPriority="249.99998474121094" detachesHiddenViews="YES" translatesAutoresizingMaskIntoConstraints="NO" id="jlM-kU-ddU">
                     <rect key="frame" x="16" y="0.0" width="249" height="24"/>
                     <subviews>
@@ -26,7 +33,7 @@
                                 <constraint firstAttribute="height" constant="14" id="HC1-u3-Aru"/>
                                 <constraint firstAttribute="width" constant="14" id="SCP-dg-MvG"/>
                             </constraints>
-                            <buttonCell key="cell" type="check" bezelStyle="regularSquare" imagePosition="left" inset="2" id="sWG-wi-C6G">
+                            <buttonCell key="cell" type="check" bezelStyle="regularSquare" imagePosition="left" refusesFirstResponder="YES" inset="2" id="sWG-wi-C6G">
                                 <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
                                 <font key="font" metaFont="system"/>
                             </buttonCell>
@@ -66,13 +73,18 @@
             <constraints>
                 <constraint firstAttribute="trailing" secondItem="jlM-kU-ddU" secondAttribute="trailing" id="0XP-Lb-9sF"/>
                 <constraint firstItem="jlM-kU-ddU" firstAttribute="leading" secondItem="Hz6-mo-xeY" secondAttribute="leading" constant="16" id="71C-vl-Bng"/>
+                <constraint firstItem="tn9-9X-Jgv" firstAttribute="leading" secondItem="Hz6-mo-xeY" secondAttribute="leading" id="75c-SY-nW2"/>
                 <constraint firstItem="jlM-kU-ddU" firstAttribute="top" secondItem="Hz6-mo-xeY" secondAttribute="top" id="I6A-HC-lI9"/>
                 <constraint firstAttribute="bottom" secondItem="jlM-kU-ddU" secondAttribute="bottom" id="OVv-Qx-3Xz"/>
+                <constraint firstAttribute="trailing" secondItem="tn9-9X-Jgv" secondAttribute="trailing" id="UXn-CV-EVd"/>
+                <constraint firstItem="tn9-9X-Jgv" firstAttribute="top" secondItem="Hz6-mo-xeY" secondAttribute="top" id="rZI-vY-d9V"/>
+                <constraint firstAttribute="bottom" secondItem="tn9-9X-Jgv" secondAttribute="bottom" id="wRx-NA-V1a"/>
             </constraints>
             <point key="canvasLocation" x="-101.5" y="22"/>
         </customView>
         <collectionViewItem id="4Bn-0D-Hjp" customClass="FirePopoverCollectionViewItem" customModule="DuckDuckGo_Privacy_Browser" customModuleProvider="target">
             <connections>
+                <outlet property="backgroundView" destination="tn9-9X-Jgv" id="AIR-qO-6bJ"/>
                 <outlet property="checkButton" destination="X8J-Aj-0ZV" id="iWO-wc-EW4"/>
                 <outlet property="domainTextField" destination="p6Z-nn-uzt" id="odN-eO-glZ"/>
                 <outlet property="faviconImageView" destination="7mH-u3-zX1" id="9f6-79-DQW"/>

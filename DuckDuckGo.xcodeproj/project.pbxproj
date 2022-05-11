@@ -527,6 +527,7 @@
 		B6085D092743AAB600A9C456 /* FireproofDomains.xcdatamodeld in Sources */ = {isa = PBXBuildFile; fileRef = B6085D072743993C00A9C456 /* FireproofDomains.xcdatamodeld */; };
 		B60D19B4281BC92900EBAB97 /* PasswordSortButton.xib in Resources */ = {isa = PBXBuildFile; fileRef = B60D19B3281BC92900EBAB97 /* PasswordSortButton.xib */; };
 		B60D19B9282A4FBB00EBAB97 /* FocusView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B60D19B8282A4FBB00EBAB97 /* FocusView.swift */; };
+		B60D19BB282BAD0A00EBAB97 /* KeyboardControllableCollectionView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B60D19BA282BAD0A00EBAB97 /* KeyboardControllableCollectionView.swift */; };
 		B6106BA026A7BE0B0013B453 /* PermissionManagerTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = B6106B9F26A7BE0B0013B453 /* PermissionManagerTests.swift */; };
 		B6106BA426A7BEA40013B453 /* PermissionAuthorizationState.swift in Sources */ = {isa = PBXBuildFile; fileRef = B6106BA226A7BEA00013B453 /* PermissionAuthorizationState.swift */; };
 		B6106BA726A7BECC0013B453 /* PermissionAuthorizationQuery.swift in Sources */ = {isa = PBXBuildFile; fileRef = B6106BA526A7BEC80013B453 /* PermissionAuthorizationQuery.swift */; };
@@ -1286,6 +1287,7 @@
 		B6085D082743993D00A9C456 /* Permissions.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = Permissions.xcdatamodel; sourceTree = "<group>"; };
 		B60D19B3281BC92900EBAB97 /* PasswordSortButton.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = PasswordSortButton.xib; sourceTree = "<group>"; };
 		B60D19B8282A4FBB00EBAB97 /* FocusView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FocusView.swift; sourceTree = "<group>"; };
+		B60D19BA282BAD0A00EBAB97 /* KeyboardControllableCollectionView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KeyboardControllableCollectionView.swift; sourceTree = "<group>"; };
 		B6106B9D26A565DA0013B453 /* BundleExtension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BundleExtension.swift; sourceTree = "<group>"; };
 		B6106B9F26A7BE0B0013B453 /* PermissionManagerTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PermissionManagerTests.swift; sourceTree = "<group>"; };
 		B6106BA226A7BEA00013B453 /* PermissionAuthorizationState.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PermissionAuthorizationState.swift; sourceTree = "<group>"; };
@@ -2219,6 +2221,7 @@
 				B693954226F04BE90015B914 /* ShadowView.swift */,
 				B693954526F04BEA0015B914 /* WindowDraggingView.swift */,
 				4BDFA4AD27BF19E500648192 /* ToggleableScrollView.swift */,
+				B60D19BA282BAD0A00EBAB97 /* KeyboardControllableCollectionView.swift */,
 			);
 			path = AppKit;
 			sourceTree = "<group>";
@@ -4262,6 +4265,7 @@
 				B657841F25FA497600D8DB33 /* NSException+Catch.swift in Sources */,
 				4BE65481271FCD4D008D1D63 /* PasswordManagementNoteModel.swift in Sources */,
 				B63ED0E526BB8FB900A9DAD1 /* SharingMenu.swift in Sources */,
+				B60D19BB282BAD0A00EBAB97 /* KeyboardControllableCollectionView.swift in Sources */,
 				AA4FF40C2624751A004E2377 /* GrammarFeaturesManager.swift in Sources */,
 				B693955B26F0CE300015B914 /* WebKitDownloadDelegate.swift in Sources */,
 				B6B3E0E12657EA7A0040E0A2 /* NSScreenExtension.swift in Sources */,

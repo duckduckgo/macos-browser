@@ -17,6 +17,7 @@
 //
 
 import Cocoa
+import Combine
 
 protocol FirePopoverCollectionViewItemDelegate: AnyObject {
 
@@ -33,11 +34,19 @@ final class FirePopoverCollectionViewItem: NSCollectionViewItem {
 
     @IBOutlet weak var domainTextField: NSTextField!
     @IBOutlet weak var checkButton: NSButton!
+    @IBOutlet weak var backgroundView: NSBox!
     @IBOutlet weak var faviconImageView: NSImageView! {
        didSet {
            faviconImageView.applyFaviconStyle()
        }
-   }
+    }
+
+    private var responderCancellable: AnyCancellable?
+    override func viewDidAppear() {
+        responderCancellable = self.publisher(for: \.collectionView?.isFirstResponder).sink { [weak self] _ in
+            self?.updateSelection()
+        }
+    }
 
     func setItem(_ item: FirePopoverViewModel.Item, isFireproofed: Bool) {
         domainTextField.stringValue = item.domain
@@ -49,13 +58,30 @@ final class FirePopoverCollectionViewItem: NSCollectionViewItem {
         delegate?.firePopoverCollectionViewItemDidToggle(self)
     }
 
-    override func mouseDown(with event: NSEvent) {
-        delegate?.firePopoverCollectionViewItemDidToggle(self)
-    }
-
     override var isSelected: Bool {
         didSet {
-            checkButton.state = isSelected ? .on : .off
+            updateSelection()
+        }
+    }
+
+    private func updateSelection() {
+        if isSelected {
+            if self.collectionView?.isFirstResponder == true {
+                backgroundView.fillColor = .selectedContentBackgroundColor
+                domainTextField.textColor = .selectedMenuItemTextColor
+            } else {
+                backgroundView.fillColor = .unemphasizedSelectedContentBackgroundColor
+                domainTextField.textColor = .unemphasizedSelectedTextColor
+            }
+        } else {
+            backgroundView.fillColor = .clear
+            domainTextField.textColor = .labelColor
+        }
+    }
+
+    var isChecked: Bool = false {
+        didSet {
+            checkButton.state = isChecked ? .on : .off
         }
     }
 

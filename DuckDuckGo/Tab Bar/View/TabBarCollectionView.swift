@@ -141,7 +141,7 @@ final class TabBarCollectionView: NSCollectionView {
             let leftToSelectionIndexPath = IndexPath(item: indexPath.item - 1)
             (item(at: leftToSelectionIndexPath) as? TabBarViewItem)?.isLeftToSelected = true
         }
-// TODO: Use other flag
+// TODO: Use other flag // swiftlint:disable:this todo
         (item(at: self.numberOfItems(inSection: 0) - 1) as? TabBarViewItem)?.isLeftToSelected = true
     }
 }

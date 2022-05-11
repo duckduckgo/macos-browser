@@ -41,6 +41,10 @@ final class FocusView: NSView {
         }
     }
 
+    var isFirstResponder: Bool {
+        self.window?.firstResponder === self
+    }
+
     override var acceptsFirstResponder: Bool {
         NSApp.isFullKeyboardAccessEnabled && self.isVisible
     }

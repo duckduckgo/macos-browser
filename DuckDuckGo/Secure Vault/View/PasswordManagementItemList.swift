@@ -231,7 +231,7 @@ private struct ItemView: View {
         let font = Font.custom("SFProText-Regular", size: 13)
         let bgStyle = selected
             ? PasswordManagerItemButtonStyle(bgColor: isFirstResponder
-                                                          ? Color.accentColor
+                                                          ? Color(.selectedContentBackgroundColor)
                                                           : Color(.unemphasizedSelectedContentBackgroundColor))
             // Almost clear, so that whole view is clickable
             : PasswordManagerItemButtonStyle(bgColor: Color(.windowBackgroundColor.withAlphaComponent(0.001)))
@@ -309,7 +309,7 @@ struct PasswordManagementSortButton: NSViewRepresentable {
 
     func makeNSView(context: Context) -> some NSView {
         var objects: NSArray?
-        // TODO: Create button programmatically
+        // TODO: Create button programmatically // swiftlint:disable:this todo
         NSNib(nibNamed: "PasswordSortButton", bundle: .main)?.instantiate(withOwner: nil, topLevelObjects: &objects)
         let btn = ((objects as? [Any]?)!!.first(where: { $0 is NSButton }) as? NSButton)!
         btn.image = NSImage(named: imageName)!

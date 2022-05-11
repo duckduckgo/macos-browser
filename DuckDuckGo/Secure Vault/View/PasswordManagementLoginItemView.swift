@@ -109,7 +109,7 @@ private struct Buttons: View {
                     .buttonStyle(DefaultActionButtonStyle(enabled: model.isDirty))
                     .focusable(action: { model.save() })
                     .keyboardShortcutIfAvailable(.return, modifiers: .command)
-                // TODO: Does kb access get disabled when disabled?
+                // TODO: Does kb access get disabled when disabled? // swiftlint:disable:this todo
                     .disabled(!model.isDirty)
 
             } else {
@@ -298,12 +298,19 @@ private struct PasswordView: View {
                         .item(title: UserText.passwordCopy) { model.copy(model.password) }
                     ])
 
-                    Text(isPasswordVisible || model.password.isEmpty ? model.password : "••••••••••••")
-                        .focusable(menu: menuProvider.createMenu, onCopy: { model.copy(model.password) })
+                    if isPasswordVisible {
+                        Text(model.password)
+                            .textSelectableIfAvailable()
+                            .focusable(menu: menuProvider.createMenu, onCopy: { model.copy(model.password) })
+                    } else {
+                        Text(model.password.isEmpty ? "" : "••••••••••••")
+                            .contextMenu(menuItems: menuProvider.createContextMenu)
+                            .focusable(menu: menuProvider.createMenu, onCopy: { model.copy(model.password) })
 //                        // TODO: AX actions // swiftlint:disable:this todo
 //                            .accessibilityAction {
 //                                print("Act")
 //                            }
+                    }
 
                     if isHovering || isPasswordVisible {
                         Button {

@@ -50,7 +50,7 @@ final class FirePopoverViewController: NSViewController {
     @IBOutlet weak var detailsWrapperViewHeightContraint: NSLayoutConstraint!
     @IBOutlet weak var openWrapperView: NSView!
     @IBOutlet weak var closeWrapperView: NSView!
-    @IBOutlet weak var collectionView: NSCollectionView!
+    @IBOutlet weak var collectionView: KeyboardControllableCollectionView!
     @IBOutlet weak var collectionViewBottomConstraint: NSLayoutConstraint!
     @IBOutlet weak var warningWrapperView: NSView!
     @IBOutlet weak var clearButton: NSButton!
@@ -88,8 +88,18 @@ final class FirePopoverViewController: NSViewController {
         collectionView.register(nib, forItemWithIdentifier: FirePopoverCollectionViewItem.identifier)
         collectionView.delegate = self
         collectionView.dataSource = self
+        collectionView.menu = MenuProvider([
+            .item(title: UserText.fireDialogSelectAll, action: { [weak self] in
+                self?.firePopoverViewModel.selectAll()
+            }),
+            .item(title: UserText.fireDialogUnselectAll, action: { [weak self] in
+                self?.firePopoverViewModel.deselectAll()
+            })
+        ]).createMenu()
+        
         setupOptionsButton()
         updateCloseDetailsButton()
+        closeDetailsButton.isHidden = true
         updateWarningWrapperView()
 
         subscribeToViewModel()
@@ -108,12 +118,21 @@ final class FirePopoverViewController: NSViewController {
         updateWarningWrapperView()
     }
 
-    @IBAction func openDetailsButtonAction(_ sender: Any) {
+    @IBAction func openDetailsButtonAction(_ sender: NSButton) {
+        let isButtonFirstResponder = sender.isFirstResponder
         toggleDetails()
+        if isButtonFirstResponder {
+            closeDetailsButton.makeMeFirstResponder()
+        }
     }
 
-    @IBAction func closeDetailsButtonAction(_ sender: Any) {
+    @IBAction func closeDetailsButtonAction(_ sender: NSButton) {
+        let isButtonFirstResponder = sender.isFirstResponder
         toggleDetails()
+        collectionView.selectionIndexPaths = []
+        if isButtonFirstResponder {
+            openDetailsButton.makeMeFirstResponder()
+        }
     }
 
     private func updateCloseDetailsButton() {
@@ -135,7 +154,6 @@ final class FirePopoverViewController: NSViewController {
     @IBAction func clearButtonAction(_ sender: Any) {
         delegate?.firePopoverViewControllerDidClear(self)
         firePopoverViewModel.burn()
-
     }
 
     @IBAction func cancelButtonAction(_ sender: Any) {
@@ -163,8 +181,13 @@ final class FirePopoverViewController: NSViewController {
             .receive(on: DispatchQueue.main)
             .sink { [weak self] selected in
                 guard let self = self else { return }
-                let selectionIndexPaths = Set(selected.map {IndexPath(item: $0, section: self.firePopoverViewModel.selectableSectionIndex)})
-                self.collectionView.selectionIndexPaths = selectionIndexPaths
+
+                let section = self.firePopoverViewModel.selectableSectionIndex
+                for indexPath in self.collectionView.indexPathsForVisibleItems() where indexPath.section == section {
+                    guard let item = self.collectionView.item(at: indexPath) as? FirePopoverCollectionViewItem else { continue }
+                    item.isChecked = selected.contains(indexPath.item)
+                }
+
                 self.updateCloseDetailsButton()
                 self.updateClearButton()
             }
@@ -229,6 +252,23 @@ final class FirePopoverViewController: NSViewController {
         openDetailsButton.isEnabled = !firePopoverViewModel.selectable.isEmpty
     }
 
+    // Space Key cell toggle
+    @objc func performClick(_ sender: Any) {
+        let section = firePopoverViewModel.selectableSectionIndex
+        let selectedIndexes = collectionView.selectionIndexPaths.reduce(into: Set<Int>()) { result, indexPath in
+            guard indexPath.section == section else { return }
+            result.insert(indexPath.item)
+        }
+        let checkedIndexesToToggle = firePopoverViewModel.selected.intersection(selectedIndexes)
+        if checkedIndexesToToggle.isEmpty {
+            // None of selected are checked
+            firePopoverViewModel.select(selectedIndexes)
+        } else {
+            // All are checked or mixed state: uncheck
+            firePopoverViewModel.deselect(selectedIndexes)
+        }
+    }
+
 }
 
 extension FirePopoverViewController: NSCollectionViewDataSource {
@@ -241,15 +281,22 @@ extension FirePopoverViewController: NSCollectionViewDataSource {
         return section == firePopoverViewModel.selectableSectionIndex ? firePopoverViewModel.selectable.count: firePopoverViewModel.fireproofed.count
     }
 
+    private func modelItem(at indexPath: IndexPath) -> FirePopoverViewModel.Item {
+        let isSelectableSection = indexPath.section == firePopoverViewModel.selectableSectionIndex
+        let sectionList = isSelectableSection ? firePopoverViewModel.selectable : firePopoverViewModel.fireproofed
+        return sectionList[indexPath.item]
+    }
+
     func collectionView(_ collectionView: NSCollectionView, itemForRepresentedObjectAt indexPath: IndexPath) -> NSCollectionViewItem {
         let item = collectionView.makeItem(withIdentifier: FirePopoverCollectionViewItem.identifier, for: indexPath)
         guard let firePopoverItem = item as? FirePopoverCollectionViewItem else { return item }
 
         firePopoverItem.delegate = self
-        let isSelectableSection = indexPath.section == firePopoverViewModel.selectableSectionIndex
-        let sectionList = isSelectableSection ? firePopoverViewModel.selectable: firePopoverViewModel.fireproofed
-        let listItem = sectionList[indexPath.item]
+        let listItem = self.modelItem(at: indexPath)
         firePopoverItem.setItem(listItem, isFireproofed: indexPath.section == firePopoverViewModel.fireproofedSectionIndex)
+        firePopoverItem.isChecked = indexPath.section == firePopoverViewModel.selectableSectionIndex
+            && firePopoverViewModel.selected.contains(indexPath.item)
+
         return firePopoverItem
     }
 
@@ -274,6 +321,11 @@ extension FirePopoverViewController: NSCollectionViewDataSource {
 }
 
 extension FirePopoverViewController: NSCollectionViewDelegate {
+
+    func collectionView(_ collectionView: NSCollectionView, shouldSelectItemsAt indexPaths: Set<IndexPath>) -> Set<IndexPath> {
+        let selectableSectionIndex = firePopoverViewModel.selectableSectionIndex
+        return indexPaths.filter { $0.section == selectableSectionIndex }
+    }
 
 }
 
@@ -313,7 +365,7 @@ extension FirePopoverViewController: FirePopoverCollectionViewItemDelegate {
             return
         }
 
-        if firePopoverCollectionViewItem.isSelected {
+        if firePopoverCollectionViewItem.isChecked {
             firePopoverViewModel.deselect(index: indexPath.item)
         } else {
             firePopoverViewModel.select(index: indexPath.item)

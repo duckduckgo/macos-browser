@@ -107,6 +107,11 @@ struct UserText {
     static let selectedDomainsDescription = NSLocalizedString("fire.selected-domains.description", value: "Clear selected domains and related site data", comment: "Description of the 'Current Window' configuration option for the fire button")
     static let fireDialogNothingToBurn = NSLocalizedString("fire.dialog.nothing-to-burn", value: "No data to clear", comment: "Information label to inform there is no domain for burning")
     static let fireDialogDetails = NSLocalizedString("fire.dialog.details", value: "Details", comment: "Button to show more details")
+
+    static let fireDialogSelectAll = NSLocalizedString("fire.dialog.select.all", value: "Select All", comment: "Context Menu item to select all domains to burn")
+    static let fireDialogUnselectAll = NSLocalizedString("fire.dialog.unselect.all", value: "Unselect All", comment: "Context Menu item to unselect all domains to burn")
+
+
     static let fireproofSite = NSLocalizedString("options.menu.fireproof-site", value: "Fireproof This Site", comment: "Context menu item")
     static let removeFireproofing = NSLocalizedString("options.menu.remove-fireproofing", value: "Remove Fireproofing", comment: "Context menu item")
     static let fireproof = NSLocalizedString("fireproof", value: "Fireproof", comment: "Fireproof button")

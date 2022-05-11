@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<document type="com.apple.InterfaceBuilder3.Cocoa.Storyboard.XIB" version="3.0" toolsVersion="19529" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES" initialViewController="bU7-R8-ocO">
+<document type="com.apple.InterfaceBuilder3.Cocoa.Storyboard.XIB" version="3.0" toolsVersion="20037" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES" initialViewController="bU7-R8-ocO">
     <dependencies>
         <deployment identifier="macosx"/>
-        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="19529"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="20037"/>
         <capability name="Named colors" minToolsVersion="9.0"/>
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
     </dependencies>
@@ -204,12 +204,12 @@
                                         <imageCell key="cell" refusesFirstResponder="YES" alignment="left" imageScaling="proportionallyDown" image="ExpandDownPadding" id="GO4-t8-rcv"/>
                                         <color key="contentTintColor" name="GreyTextColor"/>
                                     </imageView>
-                                    <button translatesAutoresizingMaskIntoConstraints="NO" id="ACx-m8-z0K" customClass="MouseOverButton" customModule="DuckDuckGo_Privacy_Browser" customModuleProvider="target">
+                                    <button focusRingType="exterior" translatesAutoresizingMaskIntoConstraints="NO" id="ACx-m8-z0K" customClass="MouseOverButton" customModule="DuckDuckGo_Privacy_Browser" customModuleProvider="target">
                                         <rect key="frame" x="0.0" y="0.0" width="320" height="42"/>
                                         <constraints>
                                             <constraint firstAttribute="height" constant="42" id="lCs-Fg-DUS"/>
                                         </constraints>
-                                        <buttonCell key="cell" type="square" title="        Details" bezelStyle="shadowlessSquare" imagePosition="trailing" alignment="center" inset="2" id="mkO-Cm-jWy">
+                                        <buttonCell key="cell" type="square" title="        Details" bezelStyle="shadowlessSquare" imagePosition="trailing" alignment="center" focusRingType="exterior" inset="2" id="mkO-Cm-jWy">
                                             <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
                                             <font key="font" metaFont="smallSystem"/>
                                         </buttonCell>
@@ -259,9 +259,9 @@
                                                 <rect key="frame" x="0.0" y="-2" width="320" height="5"/>
                                                 <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                             </box>
-                                            <button translatesAutoresizingMaskIntoConstraints="NO" id="cgG-hF-FAP" customClass="MouseOverButton" customModule="DuckDuckGo_Privacy_Browser" customModuleProvider="target">
+                                            <button focusRingType="exterior" translatesAutoresizingMaskIntoConstraints="NO" id="cgG-hF-FAP" customClass="MouseOverButton" customModule="DuckDuckGo_Privacy_Browser" customModuleProvider="target">
                                                 <rect key="frame" x="0.0" y="0.0" width="320" height="42"/>
-                                                <buttonCell key="cell" type="square" title="     Close all tabs and clear site data" bezelStyle="shadowlessSquare" image="CondenseUpPadding" imagePosition="trailing" alignment="left" inset="2" id="5VP-Yt-jB8">
+                                                <buttonCell key="cell" type="square" title="     Close all tabs and clear site data" bezelStyle="shadowlessSquare" image="CondenseUpPadding" imagePosition="trailing" alignment="left" focusRingType="exterior" inset="2" id="5VP-Yt-jB8">
                                                     <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
                                                     <font key="font" metaFont="smallSystem"/>
                                                 </buttonCell>
@@ -297,13 +297,17 @@
                                             <rect key="frame" x="0.0" y="0.0" width="320" height="221"/>
                                             <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                             <subviews>
-                                                <collectionView selectable="YES" allowsMultipleSelection="YES" id="u7v-Gt-FjR">
+                                                <collectionView selectable="YES" allowsMultipleSelection="YES" id="u7v-Gt-FjR" customClass="KeyboardControllableCollectionView" customModule="DuckDuckGo_Privacy_Browser" customModuleProvider="target">
                                                     <rect key="frame" x="0.0" y="0.0" width="320" height="221"/>
                                                     <autoresizingMask key="autoresizingMask" widthSizable="YES"/>
                                                     <collectionViewFlowLayout key="collectionViewLayout" id="VZx-7u-HhL">
                                                         <size key="itemSize" width="318" height="24"/>
                                                     </collectionViewFlowLayout>
                                                     <color key="primaryBackgroundColor" name="FirePopoverListBackground"/>
+                                                    <userDefinedRuntimeAttributes>
+                                                        <userDefinedRuntimeAttribute type="boolean" keyPath="shouldSelectOnFocus" value="YES"/>
+                                                        <userDefinedRuntimeAttribute type="boolean" keyPath="shouldSelectOnMouseDown" value="YES"/>
+                                                    </userDefinedRuntimeAttributes>
                                                 </collectionView>
                                             </subviews>
                                             <color key="backgroundColor" name="InterfaceBackgroundColor"/>
@@ -586,6 +590,9 @@ DQ
             <point key="canvasLocation" x="622" y="512"/>
         </scene>
     </scenes>
+    <designables>
+        <designable name="Irb-Li-anx"/>
+    </designables>
     <resources>
         <image name="Burn" width="18" height="18"/>
         <image name="BurnAlert" width="64" height="64"/>
@@ -612,7 +619,7 @@ DQ
             <color red="0.98000001907348633" green="0.98000001907348633" blue="0.98000001907348633" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
         </namedColor>
         <namedColor name="GreyTextColor">
-            <color red="0.20000000000000001" green="0.20000000000000001" blue="0.20000000000000001" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+            <color red="0.0" green="0.0" blue="0.0" alpha="0.60000002384185791" colorSpace="custom" customColorSpace="sRGB"/>
         </namedColor>
         <namedColor name="HomePageBackgroundColor">
             <color red="0.97600001096725464" green="0.98000001907348633" blue="0.98000001907348633" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>

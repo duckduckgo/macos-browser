@@ -50,10 +50,6 @@ extension NSView {
         return containerView
     }
 
-    var isFirstResponder: Bool {
-        self.window?.firstResponder === self
-    }
-
     func isFirstResponderPublisher() -> AnyPublisher<Bool, Never> {
         self.publisher(for: \.window?.firstResponder).map { [weak self] firstResponder -> Bool in
             firstResponder === self
@@ -192,6 +188,10 @@ extension NSControl {
     var sendActionOn: NSEvent.EventTypeMask {
         guard self.responds(to: #selector(sendActionOnMask)) else { return .leftMouseUp }
         return self.sendActionOnMask()
+    }
+
+    var isFirstResponder: Bool {
+        self.window?.firstResponder === self
     }
 
 }

@@ -31,10 +31,12 @@ final class FireCoordinator: NSObject {
         let burningWindow: NSWindow
         let waitForOpening: Bool
 
-        if let lastKeyWindow = WindowControllersManager.shared.lastKeyMainWindowController?.window,
+        if let lastKeyMainWindowController = WindowControllersManager.shared.lastKeyMainWindowController,
+           let lastKeyWindow = lastKeyMainWindowController.window,
            lastKeyWindow.isVisible {
             burningWindow = lastKeyWindow
             burningWindow.makeKeyAndOrderFront(nil)
+            lastKeyMainWindowController.mainViewController.navigationBarViewController.closeTransientPopovers()
             waitForOpening = false
         } else {
             burningWindow = WindowsManager.openNewWindow()!

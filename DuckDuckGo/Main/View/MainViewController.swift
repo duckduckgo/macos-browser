@@ -242,11 +242,7 @@ final class MainViewController: NSViewController {
         }
     }
 
-    private weak var nonToolbarFirstResponder: NSResponder?
     func toggleToolbarFocus() {
-//        if let nonToolbarFirstResponder = nonToolbarFirstResponder {
-//            <#body#>
-//        }
         self.navigationBarViewController.view.nextValidKeyView?.makeMeFirstResponder()
     }
 

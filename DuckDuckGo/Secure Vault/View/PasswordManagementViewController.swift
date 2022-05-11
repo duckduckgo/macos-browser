@@ -230,6 +230,7 @@ final class PasswordManagementViewController: NSViewController {
     override func viewDidDisappear() {
         super.viewDidDisappear()
         listView?.removeFromSuperview()
+        responderCancellable = nil
     }
 
     private func promptForAuthenticationIfNecessary() {

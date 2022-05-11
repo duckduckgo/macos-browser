@@ -329,6 +329,7 @@ final class NavigationBarViewController: NSViewController {
         }
     }
 
+    @discardableResult
     func closeTransientPopovers() -> Bool {
         guard popovers.allSatisfy({ !$0.isShown }) else {
             return false
