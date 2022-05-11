@@ -130,7 +130,7 @@ final class SuggestionViewModel {
         switch suggestion {
         // for punycoded urls display real url as a suffix
         case .website(url: let url) where url.toString(forUserInput: userStringValue, decodePunycode: false) != self.string:
-            return " – " + url.toString(decodePunycode: false, dropScheme: true, needsWWW: false, dropTrailingSlash: true)
+            return " – " + url.toString(decodePunycode: true, dropScheme: true, needsWWW: false, dropTrailingSlash: true)
 
         case .phrase, .unknown, .website:
             return ""
@@ -139,10 +139,7 @@ final class SuggestionViewModel {
             if url.isDuckDuckGoSearch {
                 return " – \(UserText.searchDuckDuckGoSuffix)"
             } else {
-                return " – " + url.toString(decodePunycode: true,
-                                              dropScheme: true,
-                                              needsWWW: false,
-                                              dropTrailingSlash: true)
+                return " – " + url.toString(decodePunycode: true, dropScheme: true, needsWWW: false, dropTrailingSlash: true)
             }
         }
     }
