@@ -211,6 +211,8 @@ final class Tab: NSObject, Identifiable {
 
     var isLazyLoadingInProgress = false
 
+    private var isBeingRedirected: Bool = false
+
     @Published private(set) var content: TabContent {
         didSet {
             handleFavicon(oldContent: oldValue)
@@ -889,6 +891,17 @@ extension Tab: WKNavigationDelegate {
         }
     }
 
+    func webView(_ webView: WKWebView, didReceiveServerRedirectForProvisionalNavigation navigation: WKNavigation!) {
+        isBeingRedirected = true
+    }
+
+    func webView(_ webView: WKWebView, didCommit navigation: WKNavigation!) {
+        isBeingRedirected = false
+        if let url = webView.url {
+            addVisit(of: url)
+        }
+    }
+
     struct Constants {
         static let webkitMiddleClick = 4
     }
@@ -1109,6 +1122,7 @@ extension Tab: WKNavigationDelegate {
 
     @MainActor
     func webView(_ webView: WKWebView, didFinish navigation: WKNavigation!) {
+        isBeingRedirected = false
         invalidateSessionStateData()
         webViewDidFinishNavigationPublisher.send()
         if isAMPProtectionExtracting { isAMPProtectionExtracting = false }
@@ -1119,6 +1133,7 @@ extension Tab: WKNavigationDelegate {
         // https://app.asana.com/0/1199230911884351/1200381133504356/f
         //        hasError = true
 
+        isBeingRedirected = false
         webViewDidFailNavigationPublisher.send()
         invalidateSessionStateData()
     }
@@ -1133,6 +1148,7 @@ extension Tab: WKNavigationDelegate {
         }
 
         self.error = error
+        isBeingRedirected = false
         webViewDidFailNavigationPublisher.send()
     }
 
