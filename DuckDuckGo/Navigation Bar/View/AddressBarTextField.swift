@@ -460,7 +460,7 @@ final class AddressBarTextField: NSTextField {
             case .text: self = Suffix.search
             case .url(urlString: _, url: let url, userTyped: let userTyped):
                 guard userTyped,
-                      let host = url.host
+                      let host = url.root?.toString(decodePunycode: true, dropScheme: true, dropTrailingSlash: true)
                 else { return nil }
                 self = Suffix.visit(host: host)
             case .suggestion(let suggestionViewModel):
@@ -473,7 +473,9 @@ final class AddressBarTextField: NSTextField {
             case .phrase(phrase: _):
                 self = Suffix.search
             case .website(url: let url):
-                guard let host = url.host else { return nil }
+                guard let host = url.root?.toString(decodePunycode: true, dropScheme: true, dropTrailingSlash: true) else {
+                    return nil
+                }
                 self = Suffix.visit(host: host)
 
             case .bookmark(title: _, url: let url, isFavorite: _, allowedInTopHits: _),
@@ -482,11 +484,7 @@ final class AddressBarTextField: NSTextField {
                    !title.isEmpty,
                    suggestionViewModel.autocompletionString != title {
                     self = .title(title)
-                } else if let host = url.host?.dropWWW(),
-                          host == url.toString(decodePunycode: false,
-                                               dropScheme: true,
-                                               needsWWW: false,
-                                               dropTrailingSlash: true) {
+                } else if let host = url.root?.toString(decodePunycode: true, dropScheme: true, needsWWW: false, dropTrailingSlash: true) {
                     self = .visit(host: host)
                 } else {
                     self = .url(url)
