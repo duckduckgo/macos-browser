@@ -21,7 +21,6 @@ import Combine
 import os.log
 import BrowserServicesKit
 
-
 @NSApplicationMain
 final class AppDelegate: NSObject, NSApplicationDelegate {
 
