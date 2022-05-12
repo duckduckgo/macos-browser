@@ -2,8 +2,8 @@
 
 set -eo pipefail
 
-cwd="$(dirname "$0")"
-source "${cwd}/common.sh"
+cwd="$(dirname "${BASH_SOURCE[0]}")"
+source "${cwd}/helpers/common.sh"
 
 read_command_line_arguments() {
 	if (( $# < 1 )); then
@@ -57,7 +57,7 @@ print_usage_and_exit() {
 	
 	Options:
 	 -a <asana_task_url>  Update Asana task after building the app (implies -d)
-	 -d                   Create DMG image alongside the zipped app and dSYMs
+	 -d                   Create a DMG image alongside the zipped app and dSYMs
 	
 	To clear keychain entries:
 	  $ $(basename "$0") clear-keychain
@@ -109,9 +109,11 @@ get_developer_credentials() {
 	if [[ -z "${developer_apple_id}" ]]; then
 
 		while [[ -z "${developer_apple_id}" ]]; do
-			echo "Please enter Apple ID that will be used for requesting notarization"
-			echo "Set it in XCODE_DEVELOPER_APPLE_ID environment variable to not be asked again."
-			echo
+			cat <<- EOF
+			Please enter Apple ID that will be used for requesting notarization
+			Set it in XCODE_DEVELOPER_APPLE_ID environment variable to not be asked again.
+			
+			EOF
 			read -rp "Apple ID: " developer_apple_id
 			echo
 		done
@@ -127,9 +129,11 @@ get_developer_credentials() {
 			developer_password=$(retrieve_password_from_keychain "${developer_apple_id}")
 		else
 			while [[ -z "${developer_password}" ]]; do
-				echo "Set password in XCODE_DEVELOPER_PASSWORD environment variable to not be asked for password."
-				echo "Currently only application-specific password is supported (create one at https://appleid.apple.com)."
-				echo
+				cat <<- EOF
+				Set password in XCODE_DEVELOPER_PASSWORD environment variable to not be asked for password.
+				Currently only application-specific password is supported (create one at https://appleid.apple.com).
+				
+				EOF
 				read -srp "Password for ${developer_apple_id}: " developer_password
 				echo
 			done
@@ -302,9 +306,15 @@ create_dmg() {
 }
 
 main() {
-	source "${cwd}/keychain.sh"
+	# Load keychain-related functions first, because `clear-keychain`
+	# is required when parsing command-line arguments.
+	source "${cwd}/helpers/keychain.sh"
 	read_command_line_arguments "$@"
-	source "${cwd}/asana.sh"
+	
+	# Load Asana-related functions. This calls `_asana_preflight` which
+	# will check for Asana access token if needed (if asana task was passed to the script).
+	source "${cwd}/helpers/asana.sh"
+
 	set_up_environment "$@"
 	get_developer_credentials
 	clear_working_directory
@@ -314,16 +324,19 @@ main() {
 	staple_notarized_app
 	compress_app_and_dsym
 
-	if [[ $create_dmg ]]; then
+	if [[ ${create_dmg} ]]; then
 		create_dmg
 
-		if [[ $asana_task_id ]]; then
+		if [[ ${asana_task_id} ]]; then
 			asana_update_task "${dmg_output_path}" "${output_dsym_zip_path}"
 		fi
 	fi
 
 	echo
 	echo "Notarized app ready at ${app_path}"
+	if [[ ${create_dmg} ]]; then
+		echo "App DMG image ready at ${dmg_output_path}"
+	fi
 	echo "Compressed app ready at ${output_app_zip_path}"
 	echo "Compressed debug symbols ready at ${output_dsym_zip_path}"
 

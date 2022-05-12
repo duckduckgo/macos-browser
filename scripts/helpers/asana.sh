@@ -1,8 +1,39 @@
 #!/bin/bash
 
+source "$(dirname "${BASH_SOURCE[0]}")/common.sh"
 asana_token_keychain_identifier="asana-personal-token"
 
-asana_preflight() {
+asana_update_task() {
+	local dmg_path=$1
+	local dsym_zip_path=$2
+	local asana_api_url="https://app.asana.com/api/1.0"
+	
+	echo
+	printf '%s' "Uploading DMG to Asana task ... "
+
+	if _asana_upload_dmg "${dmg_path}"; then
+		echo "Done"
+	else
+		die "Failed to upload DMG to Asana"
+	fi
+
+	printf '%s' "Uploading dSYMs zip to Asana task ... "
+
+	if _asana_upload_dsyms_zip "${dsym_zip_path}"; then
+		echo "Done"
+	else
+		die "Failed to upload dSYMs zip to Asana"
+	fi
+
+	_asana_close_subtasks
+}
+
+# Private
+
+#
+# Verify that required software is installed and fetch Asana access token
+#
+_asana_preflight() {
 	if [[ -n "${asana_task_url}" ]]; then
 		if ! command -v jq &> /dev/null; then
 			cat <<- EOF
@@ -13,14 +44,14 @@ asana_preflight() {
 			die
 		fi
 
-		asana_task_id=$(asana_extract_task_id)
-		asana_get_token
+		asana_task_id=$(_asana_extract_task_id)
+		_asana_get_token
 
 		echo "Will update Asana task ${asana_task_id} after making a build."
 	fi
 }
 
-asana_extract_task_id() {
+_asana_extract_task_id() {
 	local task_url_regex='^https://app.asana.com/[0-9]/[0-9]*/([0-9]*)/f$'
 	if [[ "${asana_task_url}" =~ ${task_url_regex} ]]; then
 		echo "${BASH_REMATCH[1]}"
@@ -29,7 +60,11 @@ asana_extract_task_id() {
 	fi
 }
 
-asana_get_token() {
+#
+# If ASANA_ACCESS_TOKEN environment variable is defined, use it,
+# otherwise check keychain or ask user if not found in keychain.
+#
+_asana_get_token() {
 	asana_personal_access_token="${ASANA_ACCESS_TOKEN}"
 
 	if [[ -z "${asana_personal_access_token}" ]]; then
@@ -50,7 +85,7 @@ asana_get_token() {
 	fi
 }
 
-asana_upload_dmg() {
+_asana_upload_dmg() {
 	local dmg_path=$1
 	local dmg_name
 	dmg_name="$(basename "${dmg_path}")"
@@ -64,7 +99,7 @@ asana_upload_dmg() {
 	[[ $return_code -eq 200 ]]
 }
 
-asana_upload_dsyms_zip() {
+_asana_upload_dsyms_zip() {
 	local dsyms_path=$1
 	local dsyms_name
 	dsyms_name="$(basename "${dsyms_path}")"
@@ -78,7 +113,7 @@ asana_upload_dsyms_zip() {
 	[[ $return_code -eq 200 ]]
 }
 
-asana_complete_task() {
+_asana_complete_task() {
 	local task_id=$1
 	
 	return_code="$(curl -s "${asana_api_url}/tasks/${task_id}" \
@@ -92,7 +127,11 @@ asana_complete_task() {
 	[[ ${return_code} -eq 200 ]]
 }
 
-asana_get_subtasks_to_close() {
+#
+# Use hardcoded tag ID (for `apple-gha-automate` tag) to find relevant subtasks.
+# Use jq to format the output into space-separated task IDs.
+#
+_asana_get_subtasks_to_close() {
 	local tag_id="1202251744337353"
 	curl -s "${asana_api_url}/tasks/${asana_task_id}/subtasks?opt_fields=tags,name" \
 		-H "Authorization: Bearer ${asana_personal_access_token}" \
@@ -100,41 +139,19 @@ asana_get_subtasks_to_close() {
 		| tr -d '"'
 }
 
-asana_update_task() {
-	local dmg_path=$1
-	local dsym_zip_path=$2
-	local asana_api_url="https://app.asana.com/api/1.0"
-	
-	echo
-	printf '%s' "Uploading DMG to Asana task ... "
-
-	if asana_upload_dmg "${dmg_path}"; then
-		echo "Done"
-	else
-		die "Failed to upload DMG to Asana"
-	fi
-
-	printf '%s' "Uploading dSYMs zip to Asana task ... "
-
-	if asana_upload_dsyms_zip "${dsym_zip_path}"; then
-		echo "Done"
-	else
-		die "Failed to upload dSYMs zip to Asana"
-	fi
-
-	asana_close_subtasks
-}
-
-asana_close_subtasks() {
+#
+# For simplicity, die if any of the tasks fails to close.
+#
+_asana_close_subtasks() {
 	local subtasks_to_close
-	read -ra subtasks_to_close <<< "$(asana_get_subtasks_to_close)"
+	read -ra subtasks_to_close <<< "$(_asana_get_subtasks_to_close)"
 
 	if [[ -n "${subtasks_to_close[*]}" ]]; then
 
 		printf '%s' "Marking ${#subtasks_to_close[@]} relevant Asana task(s) as complete ... "
 	
 		for task_id in "${subtasks_to_close[@]}"; do
-			if ! asana_complete_task "${task_id}"; then
+			if ! _asana_complete_task "${task_id}"; then
 				die "Failed"
 			fi
 		done
@@ -144,4 +161,6 @@ asana_close_subtasks() {
 	fi
 }
 
-asana_preflight
+# Script
+
+_asana_preflight
