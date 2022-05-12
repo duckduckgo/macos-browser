@@ -47,11 +47,25 @@ extension NSAlert {
         return alert
     }
 
-    static func importFailedAlert(source: DataImport.Source, errorMessage: String) -> NSAlert {
+    static func importFailedAlert(source: DataImport.Source, linkDelegate: NSTextViewDelegate) -> NSAlert {
         let alert = NSAlert()
 
+        let linkText = UserText.dataImportSubmitFeedback
+        let informativeText = UserText.dataImportFailedBody(submitFeedbackText: linkText)
+        
+        let textView = NSTextView(frame: NSRect(x: 0, y: 0, width: 250, height: 0))
+        textView.applyLabelStyle()
+        
+        let attributedString = NSMutableAttributedString(string: informativeText)
+        attributedString.addLink("http://duck.com", toText: linkText)
+
+        textView.textStorage?.setAttributedString(attributedString)
+        
+        textView.sizeToFit()
+        textView.delegate = linkDelegate
+        
         alert.messageText = UserText.dataImportFailedTitle
-        alert.informativeText = UserText.dataImportFailedBody(source, errorMessage: errorMessage)
+        alert.accessoryView = textView
         alert.alertStyle = .warning
         alert.addButton(withTitle: UserText.dataImportAlertAccept)
 

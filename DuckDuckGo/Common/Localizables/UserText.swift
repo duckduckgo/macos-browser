@@ -299,13 +299,14 @@ struct UserText {
     static let initiateImport = NSLocalizedString("import.data.initiate", value: "Import", comment: "Button text for importing data")
     static let doneImporting = NSLocalizedString("import.data.done", value: "Done", comment: "Button text for finishing the data import")
 
-    static let dataImportFailedTitle = NSLocalizedString("import.data.import-failed.title", value: "Import Failed", comment: "Alert title when the data import fails")
+    static let dataImportFailedTitle = NSLocalizedString("import.data.import-failed.title", value: "Sorry, we weren't able to import your data.", comment: "Alert title when the data import fails")
 
-    static func dataImportFailedBody(_ source: DataImport.Source, errorMessage: String) -> String {
+    static let dataImportSubmitFeedback = NSLocalizedString("import.data.submit-feedback", value: "submit feedback", comment: "Link text used in the data import failure alert")
+    static func dataImportFailedBody(submitFeedbackText: String = dataImportSubmitFeedback) -> String {
         let localized = NSLocalizedString("import.data.import-failed.body",
-                                          value: "Failed to import data from %@.\n\nError message: %@",
-                                          comment: "Alert body text when the data import fails")
-        return String(format: localized, source.importSourceName, errorMessage)
+                                          value: "Please %@ so we can address this issue.",
+                                          comment: "Alert body text used in the data import failure alert")
+        return String(format: localized, submitFeedbackText)
     }
 
     static let dataImportAlertImport = NSLocalizedString("import.data.alert.import", value: "Import", comment: "Import button for data import alerts")

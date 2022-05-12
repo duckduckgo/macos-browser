@@ -32,3 +32,19 @@ extension NSAttributedString {
     }
 
 }
+
+extension NSMutableAttributedString {
+
+    @discardableResult
+    public func addLink(_ linkURL: String, toText text: String) -> Bool {
+        let foundRange = self.mutableString.range(of: text)
+
+        if foundRange.location != NSNotFound {
+            self.addAttribute(.link, value: linkURL, range: foundRange)
+            return true
+        }
+
+        return false
+    }
+
+}

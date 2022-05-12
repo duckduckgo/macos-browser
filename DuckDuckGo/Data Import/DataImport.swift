@@ -278,33 +278,6 @@ struct DataImportError: Error {
 
 }
 
-extension DataImportError: LocalizedError {
-
-    public var errorDescription: String? {
-        switch self.errorType {
-        case .noFileFound:
-            return "Could not find file"
-        case .cannotReadFile:
-            return "Could not read file"
-        case .browserNeedsToBeClosed:
-            return "Browser needs to be closed"
-        case .needsLoginPrimaryPassword:
-            return "Failed to get primary password"
-        case .cannotAccessSecureVault:
-            return "Failed to read Secure Vault data"
-        case .cannotAccessCoreData:
-            return "Failed to access Bookmarks database"
-        case .couldNotFindProfile:
-            return "Could not find browser profile"
-        case .couldNotGetDecryptionKey:
-            return "Could not read decryption key"
-        case .cannotDecryptFile:
-            return "Could not decrypt file"
-        }
-    }
-
-}
-
 /// Represents an object able to import data from an outside source. The outside source may be capable of importing multiple types of data.
 /// For instance, a browser data importer may be able to import logins and bookmarks.
 protocol DataImporter {
