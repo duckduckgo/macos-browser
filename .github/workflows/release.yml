@@ -114,7 +114,7 @@ jobs:
 
     - name: Send Mattermost message
       env:
-        WORKFLOW_URL: https://github.com/more-duckduckgo-org/macos-browser/actions/runs/${{ github.run_id }}
+        WORKFLOW_URL: https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}
         ASANA_TASK_URL: ${{ github.event.inputs.asana-task-url }}
         RELEASE_TYPE: ${{ github.event.inputs.release-type }}
       run: |
