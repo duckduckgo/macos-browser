@@ -1046,6 +1046,7 @@ extension Tab: WKNavigationDelegate {
         setConnectionUpgradedTo(upgradedURL, navigationAction: navigationAction)
     }
 
+    @MainActor
     private func prepareForContentBlocking() async {
         // Ensure Content Blocking Assets (WKContentRuleList&UserScripts) are installed
         if !userContentController.contentBlockingAssetsInstalled {
