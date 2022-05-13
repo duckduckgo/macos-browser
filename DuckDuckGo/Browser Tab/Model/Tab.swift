@@ -436,10 +436,10 @@ final class Tab: NSObject, Identifiable {
         }()
         if shouldLoadURL(url, shouldLoadInBackground: shouldLoadInBackground) {
             let didRestore = restoreSessionStateDataIfNeeded()
-            if url.isFileURL {
-                webView.loadFileURL(url, allowingReadAccessTo: URL(fileURLWithPath: "/"))
-            } else {
-                if !didRestore {
+            if !didRestore {
+                if url.isFileURL {
+                    webView.loadFileURL(url, allowingReadAccessTo: URL(fileURLWithPath: "/"))
+                } else {
                     webView.load(url)
                 }
             }
@@ -485,6 +485,9 @@ final class Tab: NSObject, Identifiable {
     private func restoreSessionStateDataIfNeeded() -> Bool {
         var didRestore: Bool = false
         if let sessionStateData = self.sessionStateData {
+            if contentURL.isFileURL {
+                webView.loadFileURL(contentURL, allowingReadAccessTo: URL(fileURLWithPath: "/"))
+            }
             do {
                 try webView.restoreSessionState(from: sessionStateData)
                 didRestore = true
