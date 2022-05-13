@@ -24,29 +24,6 @@ extension NSAlert {
         return (accessoryView as? NSTextField)?.stringValue
     }
 
-    static func closeRunningBrowserAlert(source: DataImport.Source) -> NSAlert {
-        let alert = NSAlert()
-
-        alert.messageText = UserText.dataImportQuitBrowserTitle(source)
-        alert.informativeText = UserText.dataImportQuitBrowserBody(source)
-        alert.alertStyle = .warning
-        alert.addButton(withTitle: UserText.dataImportQuitBrowserButton(source))
-        alert.addButton(withTitle: UserText.dataImportAlertCancel)
-
-        return alert
-    }
-
-    static func browserNeedsToBeClosedAlert(source: DataImport.Source) -> NSAlert {
-        let alert = NSAlert()
-
-        alert.messageText = UserText.dataImportFailedTitle
-        alert.informativeText = UserText.dataImportBrowserMustBeClosed(source)
-        alert.alertStyle = .warning
-        alert.addButton(withTitle: UserText.dataImportAlertAccept)
-
-        return alert
-    }
-
     static func importFailedAlert(source: DataImport.Source, linkDelegate: NSTextViewDelegate) -> NSAlert {
         let alert = NSAlert()
 

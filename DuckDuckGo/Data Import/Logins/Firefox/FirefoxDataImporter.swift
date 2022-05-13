@@ -70,6 +70,8 @@ final class FirefoxDataImporter: DataImporter {
                     completion(.failure(.logins(.cannotReadFile)))
                 case .decryptionFailed:
                     completion(.failure(.logins(.cannotDecryptFile)))
+                case .failedToTemporarilyCopyFile:
+                    completion(.failure(.logins(.failedToTemporarilyCopyFile)))
                 }
             }
         }

@@ -27,8 +27,8 @@ final class ChromiumLoginReader {
         case decryptionFailed
     }
 
-    private let chromiumLocalLoginDirectoryPath: String
-    private let chromiumGoogleAccountLoginDirectoryPath: String
+    private let chromiumLocalLoginDirectoryURL: URL
+    private let chromiumGoogleAccountLoginDirectoryURL: URL
     private let processName: String
     private let decryptionKey: String?
 
@@ -36,9 +36,9 @@ final class ChromiumLoginReader {
     private static let sqlSelectWithCreatedTimestamp = "SELECT signon_realm, username_value, password_value, date_created FROM logins;"
     private static let sqlSelectWithoutTimestamp = "SELECT signon_realm, username_value, password_value FROM logins;"
 
-    init(chromiumDataDirectoryPath: String, processName: String, decryptionKey: String? = nil) {
-        self.chromiumLocalLoginDirectoryPath = chromiumDataDirectoryPath + "/Login Data"
-        self.chromiumGoogleAccountLoginDirectoryPath = chromiumDataDirectoryPath + "/Login Data For Account"
+    init(chromiumDataDirectoryURL: URL, processName: String, decryptionKey: String? = nil) {
+        self.chromiumLocalLoginDirectoryURL = chromiumDataDirectoryURL.appendingPathComponent("/Login Data")
+        self.chromiumGoogleAccountLoginDirectoryURL = chromiumDataDirectoryURL.appendingPathComponent("/Login Data For Account")
         self.processName = processName
         self.decryptionKey = decryptionKey
     }
@@ -48,18 +48,25 @@ final class ChromiumLoginReader {
             return .failure(.decryptionFailed)
         }
 
-        let loginFilePaths = [chromiumLocalLoginDirectoryPath, chromiumGoogleAccountLoginDirectoryPath]
-            .filter { FileManager.default.fileExists(atPath: $0) }
+        let loginFileURLs = [chromiumLocalLoginDirectoryURL, chromiumGoogleAccountLoginDirectoryURL]
+            .filter { FileManager.default.fileExists(atPath: $0.path) }
 
-        guard !loginFilePaths.isEmpty else {
+        guard !loginFileURLs.isEmpty else {
             return .failure(.databaseAccessFailed)
         }
 
         var loginRows = [ChromiumCredential.ID: ChromiumCredential]()
 
-        for path in loginFilePaths {
+        for loginFileURL in loginFileURLs {
+            let temporaryFileHandler = TemporaryFileHandler(fileURL: loginFileURL)
+            defer { temporaryFileHandler.deleteTemporarilyCopiedFile() }
+            
+            guard case let .success(temporaryDatabaseURL) = temporaryFileHandler.copyFileToTemporaryDirectory() else {
+                return .failure(.databaseAccessFailed)
+            }
+            
             do {
-                let queue = try DatabaseQueue(path: path)
+                let queue = try DatabaseQueue(path: temporaryDatabaseURL.path)
 
                 var rows = [ChromiumCredential]()
 

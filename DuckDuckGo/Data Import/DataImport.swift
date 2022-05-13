@@ -246,13 +246,14 @@ struct DataImportError: Error {
         case noFileFound
         case cannotReadFile
         case couldNotFindProfile
-        case browserNeedsToBeClosed
+        case browserNeedsToBeClosed // TODO: Remove this
         case needsLoginPrimaryPassword
         case cannotAccessSecureVault
         case cannotAccessCoreData
         case couldNotGetDecryptionKey
         case cannotDecryptFile
         case failedToTemporarilyCopyFile
+        case failedToMapBookmarks
     }
     
     static func generic(_ errorType: ImportErrorType) -> DataImportError {
@@ -267,7 +268,8 @@ struct DataImportError: Error {
         switch errorType {
         case .noBookmarksFileFound: return DataImportError(actionType: .bookmarks, errorType: .noFileFound)
         case .unexpectedBookmarksDatabaseFormat: return DataImportError(actionType: .bookmarks, errorType: .cannotReadFile)
-        case .failedToTemporarilyCopyBookmarksFile: return DataImportError(actionType: .bookmarks, errorType: .failedToTemporarilyCopyFile)
+        case .failedToTemporarilyCopyFile: return DataImportError(actionType: .bookmarks, errorType: .failedToTemporarilyCopyFile)
+        case .failedToMapBookmarks: return DataImportError(actionType: .bookmarks, errorType: .failedToMapBookmarks)
         }
     }
     

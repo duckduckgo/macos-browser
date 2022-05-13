@@ -24,12 +24,12 @@ internal class ChromiumDataImporter: DataImporter {
         fatalError("Subclasses must provide their own process name")
     }
 
-    private let applicationDataDirectoryPath: String
+    private let applicationDataDirectoryURL: URL
     private let bookmarkImporter: BookmarkImporter
     private let loginImporter: LoginImporter
 
-    init(applicationDataDirectoryPath: String, loginImporter: LoginImporter, bookmarkImporter: BookmarkImporter) {
-        self.applicationDataDirectoryPath = applicationDataDirectoryPath
+    init(applicationDataDirectoryURL: URL, loginImporter: LoginImporter, bookmarkImporter: BookmarkImporter) {
+        self.applicationDataDirectoryURL = applicationDataDirectoryURL
         self.loginImporter = loginImporter
         self.bookmarkImporter = bookmarkImporter
     }
@@ -43,10 +43,10 @@ internal class ChromiumDataImporter: DataImporter {
                     completion: @escaping (Result<DataImport.Summary, DataImportError>) -> Void) {
         
         var summary = DataImport.Summary()
-        let dataDirectoryPath = profile?.profileURL.path ?? applicationDataDirectoryPath
+        let dataDirectoryURL = profile?.profileURL ?? applicationDataDirectoryURL
 
         if types.contains(.logins) {
-            let loginReader = ChromiumLoginReader(chromiumDataDirectoryPath: dataDirectoryPath, processName: processName)
+            let loginReader = ChromiumLoginReader(chromiumDataDirectoryURL: dataDirectoryURL, processName: processName)
             let loginResult = loginReader.readLogins()
 
             switch loginResult {
@@ -64,7 +64,7 @@ internal class ChromiumDataImporter: DataImporter {
         }
 
         if types.contains(.bookmarks) {
-            let bookmarkReader = ChromiumBookmarksReader(chromiumDataDirectoryPath: dataDirectoryPath)
+            let bookmarkReader = ChromiumBookmarksReader(chromiumDataDirectoryURL: dataDirectoryURL)
             let bookmarkResult = bookmarkReader.readBookmarks()
 
             switch bookmarkResult {

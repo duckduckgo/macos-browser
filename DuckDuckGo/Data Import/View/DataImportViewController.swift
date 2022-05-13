@@ -336,29 +336,7 @@ final class DataImportViewController: NSViewController {
     }
 
     private func beginImport() {
-        if let browser = ThirdPartyBrowser.browser(for: viewState.selectedImportSource),
-           browser.isRunning,
-           browser.shouldQuitBeforeImport {
-
-            let alert = NSAlert.closeRunningBrowserAlert(source: viewState.selectedImportSource)
-            let result = alert.runModal()
-
-            if result == NSApplication.ModalResponse.alertFirstButtonReturn {
-                browser.forceTerminate()
-
-                // Add a delay before completing the import. Completing the import immediately after a successful `forceTerminate` call does not
-                // always leave enough time for the browser's SQLite data to become unlocked.
-                DispatchQueue.main.asyncAfter(deadline: DispatchTime.now() + 1) {
-                    self.completeImport()
-                }
-            } else {
-                // If the cancel button was selected, abandon the import.
-                return
-            }
-        } else {
-            completeImport()
-        }
-
+        completeImport()
     }
 
     var selectedProfile: DataImport.BrowserProfile? {

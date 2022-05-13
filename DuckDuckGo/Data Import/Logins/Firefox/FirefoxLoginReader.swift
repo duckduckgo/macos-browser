@@ -19,7 +19,6 @@
 import Foundation
 import CommonCrypto
 import CryptoKit
-import GRDB
 
 final class FirefoxLoginReader {
 
@@ -30,11 +29,11 @@ final class FirefoxLoginReader {
         case couldNotGetDecryptionKey
         case couldNotReadLoginsFile
         case decryptionFailed
+        case failedToTemporarilyCopyFile
     }
 
-    private enum Constants {
-        static let defaultKeyDatabaseName = "key4.db"
-        static let defaultLoginsFileName = "logins.json"
+    private enum SupportedDatabaseLoginFileNamePairs {
+        static let version3 = (database: "key4.db", loginFile: "logins.json")
     }
 
     private let keyReader: FirefoxEncryptionKeyReading
@@ -51,8 +50,8 @@ final class FirefoxLoginReader {
     init(firefoxProfileURL: URL,
          keyReader: FirefoxEncryptionKeyReading = FirefoxEncryptionKeyReader(),
          primaryPassword: String? = nil,
-         databaseFileName: String = Constants.defaultKeyDatabaseName,
-         loginsFileName: String = Constants.defaultLoginsFileName) {
+         databaseFileName: String = SupportedDatabaseLoginFileNamePairs.version3.database,
+         loginsFileName: String = SupportedDatabaseLoginFileNamePairs.version3.loginFile) {
 
         self.keyReader = keyReader
         self.primaryPassword = primaryPassword
@@ -62,21 +61,20 @@ final class FirefoxLoginReader {
     }
 
     func readLogins() -> Result<[ImportedLoginCredential], FirefoxLoginReader.ImportError> {
-        let databasePath = firefoxProfileURL.appendingPathComponent(keyDatabaseName).path
-
-        let loginsPath = firefoxProfileURL.appendingPathComponent(loginsFileName).path
+        let databaseURL = firefoxProfileURL.appendingPathComponent(keyDatabaseName)
+        let loginsFileURL = firefoxProfileURL.appendingPathComponent(loginsFileName)
         
         // If there isn't a file where logins are expected, consider it a successful import of 0 logins
         // to avoid showing an error state.
-        guard FileManager.default.fileExists(atPath: loginsPath) else {
+        guard FileManager.default.fileExists(atPath: loginsFileURL.path) else {
             return .success([])
         }
         
-        guard let logins = readLoginsFile(from: loginsPath) else {
+        guard let logins = readLoginsFile(from: loginsFileURL.path) else {
             return .failure(.couldNotReadLoginsFile)
         }
 
-        let encryptionKeyResult = keyReader.getEncryptionKey(withDatabaseAt: databasePath, primaryPassword: primaryPassword ?? "")
+        let encryptionKeyResult = keyReader.getEncryptionKey(databaseURL: databaseURL, primaryPassword: primaryPassword ?? "")
 
         switch encryptionKeyResult {
         case .success(let keyData):

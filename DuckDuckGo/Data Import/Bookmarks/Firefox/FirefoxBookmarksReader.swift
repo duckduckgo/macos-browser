@@ -27,8 +27,9 @@ final class FirefoxBookmarksReader {
 
     enum ImportError: Error {
         case noBookmarksFileFound
-        case failedToTemporarilyCopyBookmarksFile
+        case failedToTemporarilyCopyFile
         case unexpectedBookmarksDatabaseFormat
+        case failedToMapBookmarks
     }
 
     private let firefoxDataDirectoryURL: URL
@@ -45,7 +46,7 @@ final class FirefoxBookmarksReader {
         }
         
         guard case let .success(temporaryDatabaseURL) = temporaryFileHandler.copyFileToTemporaryDirectory() else {
-            return .failure(.failedToTemporarilyCopyBookmarksFile)
+            return .failure(.failedToTemporarilyCopyFile)
         }
         
         do {
@@ -84,7 +85,7 @@ final class FirefoxBookmarksReader {
             if let importedBookmarks = mapDatabaseBookmarksToImportedBookmarks(bookmarks) {
                 return .success(importedBookmarks)
             } else {
-                return .failure(.unexpectedBookmarksDatabaseFormat)
+                return .failure(.failedToMapBookmarks)
             }
         } catch {
             return .failure(.unexpectedBookmarksDatabaseFormat)

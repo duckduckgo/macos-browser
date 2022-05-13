@@ -23,18 +23,28 @@ import GRDB
 
 protocol FirefoxEncryptionKeyReading {
     
-    func getEncryptionKey(withDatabaseAt databasePath: String, primaryPassword: String) -> Result<Data, FirefoxLoginReader.ImportError>
+    func getEncryptionKey(databaseURL: URL, primaryPassword: String) -> Result<Data, FirefoxLoginReader.ImportError>
 
 }
 
 final class FirefoxEncryptionKeyReader: FirefoxEncryptionKeyReading {
     
-    func getEncryptionKey(withDatabaseAt databasePath: String, primaryPassword: String) -> Result<Data, FirefoxLoginReader.ImportError> {
+    func getEncryptionKey(databaseURL: URL, primaryPassword: String) -> Result<Data, FirefoxLoginReader.ImportError> {
+        let temporaryFileHandler = TemporaryFileHandler(fileURL: databaseURL)
+        
+        defer {
+            temporaryFileHandler.deleteTemporarilyCopiedFile()
+        }
+        
+        guard case let .success(temporaryDatabaseURL) = temporaryFileHandler.copyFileToTemporaryDirectory() else {
+            return .failure(.failedToTemporarilyCopyFile)
+        }
+        
         var key: Data?
         var error: FirefoxLoginReader.ImportError?
 
         do {
-            let queue = try DatabaseQueue(path: databasePath)
+            let queue = try DatabaseQueue(path: temporaryDatabaseURL.path)
 
             try queue.read { database in
                 guard let metadataRow = try? Row.fetchOne(database, sql: "SELECT item1, item2 FROM metadata WHERE id = 'password'") else {
