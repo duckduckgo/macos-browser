@@ -47,6 +47,7 @@ final class MainMenu: NSMenu {
     @IBOutlet weak var stopMenuItem: NSMenuItem?
     @IBOutlet weak var homeMenuItem: NSMenuItem?
     @IBOutlet weak var reopenLastClosedTabMenuItem: NSMenuItem?
+    @IBOutlet weak var reopenAllWindowsFromLastSessionMenuItem: NSMenuItem?
 
     @IBOutlet weak var manageBookmarksMenuItem: NSMenuItem!
     @IBOutlet weak var importBookmarksMenuItem: NSMenuItem!

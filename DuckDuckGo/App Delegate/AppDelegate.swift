@@ -50,12 +50,16 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
 
     private let keyStore = EncryptionKeyStore()
     private var fileStore: FileStore!
-    private var stateRestorationManager: AppStateRestorationManager!
+    private(set) var stateRestorationManager: AppStateRestorationManager!
     private var grammarFeaturesManager = GrammarFeaturesManager()
     private let crashReporter = CrashReporter()
     let updateController = UpdateController()
 
     var appUsageActivityMonitor: AppUsageActivityMonitor?
+
+    var canRestoreState: Bool {
+        stateRestorationManager.canRestoreState
+    }
 
     func applicationWillFinishLaunching(_ notification: Notification) {
         if !Self.isRunningTests {

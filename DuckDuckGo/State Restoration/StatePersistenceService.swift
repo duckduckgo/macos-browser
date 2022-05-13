@@ -32,6 +32,10 @@ final class StatePersistenceService {
         self.fileName = fileName
     }
 
+    var canRestoreState: Bool {
+        fileStore.hasData(at: URL.persistenceLocation(for: self.fileName))
+    }
+
     private func archive(using encoder: @escaping (NSCoder) -> Void) -> Data {
         let archiver = NSKeyedArchiver(requiringSecureCoding: true)
         encoder(archiver)

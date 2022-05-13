@@ -30,9 +30,15 @@ final class AppStateRestorationManager {
         self.service = StatePersistenceService(fileStore: fileStore, fileName: AppStateRestorationManager.fileName)
     }
 
-    func applicationDidFinishLaunching() {
+    var canRestoreState: Bool {
+        service.canRestoreState
+    }
+
+    func restoreState(activateWindows: Bool = false) {
         do {
-            if StartupPreferences().restorePreviousSession {
+            if activateWindows {
+                try service.restoreState(using: WindowsManager.restoreStateAndActivateWindows(from:))
+            } else {
                 try service.restoreState(using: WindowsManager.restoreState(from:))
             }
         } catch CocoaError.fileReadNoSuchFile {
@@ -40,6 +46,12 @@ final class AppStateRestorationManager {
         } catch {
             os_log("App state could not be decoded: %s", "\(error)")
             Pixel.fire(.debug(event: .appStateRestorationFailed, error: error))
+        }
+    }
+
+    func applicationDidFinishLaunching() {
+        if StartupPreferences().restorePreviousSession {
+            restoreState()
         }
 
         cancellable = WindowControllersManager.shared.stateChanged

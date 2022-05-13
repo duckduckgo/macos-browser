@@ -30,28 +30,47 @@ extension WindowsManager {
         self.restoreWindows(from: state)
     }
 
-    private class func restoreWindows(from state: WindowManagerStateRestoration) {
+    class func restoreStateAndActivateWindows(from coder: NSCoder) throws {
+        guard let state = coder.decodeObject(of: WindowManagerStateRestoration.self,
+                                             forKey: NSKeyedArchiveRootObjectKey) else {
+            throw coder.error ?? NSError(domain: "WindowsManagerStateRestoration", code: -1, userInfo: nil)
+        }
+
+        self.restoreWindows(from: state, activate: true)
+    }
+
+    private class func restoreWindows(from state: WindowManagerStateRestoration, activate: Bool = false) {
         let isOriginalKeyWindowPresent = Self.windows.contains(where: {$0.isKeyWindow})
 
-        var newKeyWindow: NSWindow?
-        var newKeyWindowModel: TabCollectionViewModel?
-        for (idx, item) in state.windows.enumerated() {
-            guard let window = self.openNewWindow(with: item.model, showWindow: false) else { continue }
-            window.setContentSize(item.frame.size)
-            window.setFrameOrigin(item.frame.origin)
-
-            if idx == state.keyWindowIndex {
-                newKeyWindow = window
-                newKeyWindowModel = item.model
-            }
+        var windows = state.windows
+        var keyWindowRestorationItem: WindowRestorationItem?
+        if let idx = state.keyWindowIndex {
+            keyWindowRestorationItem = windows.remove(at: idx)
         }
-        if !isOriginalKeyWindowPresent {
-            newKeyWindow?.makeKeyAndOrderFront(self)
-            newKeyWindowModel?.setUpLazyLoadingIfNeeded()
+
+        for item in windows.reversed() {
+            self.setUpWindow(from: item)
+        }
+
+        if let keyWindowItem = keyWindowRestorationItem {
+            let shouldActivateWindow = !isOriginalKeyWindowPresent || activate
+            self.setUpWindow(from: keyWindowItem, activate: shouldActivateWindow)
         }
 
         if !state.windows.isEmpty {
             NSApp.activate(ignoringOtherApps: true)
+        }
+    }
+
+    private class func setUpWindow(from item: WindowRestorationItem, activate: Bool = false) {
+        guard let window = self.openNewWindow(with: item.model, showWindow: false) else { return }
+        window.setContentSize(item.frame.size)
+        window.setFrameOrigin(item.frame.origin)
+        window.makeKeyAndOrderFront(self)
+
+        if activate {
+            window.makeKeyAndOrderFront(self)
+            item.model.setUpLazyLoadingIfNeeded()
         }
     }
 
