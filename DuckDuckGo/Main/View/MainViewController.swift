@@ -243,7 +243,11 @@ final class MainViewController: NSViewController {
     }
 
     func toggleToolbarFocus() {
-        self.navigationBarViewController.view.nextValidKeyView?.makeMeFirstResponder()
+        if (view.window?.firstResponder as? NSView)?.isInViewHierarchy(of: browserTabViewController.view) ?? true {
+            self.navigationBarViewController.view.nextValidKeyView?.makeMeFirstResponder()
+            return
+        }
+        self.adjustFirstResponder()
     }
 
     private func updateBackMenuItem() {

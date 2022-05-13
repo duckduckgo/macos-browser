@@ -67,16 +67,20 @@ final class MainWindow: NSWindow {
         self.removedChildWindow = nil
     }
 
-    override func makeFirstResponder(_ responder: NSResponder?) -> Bool {
-        for window in childWindows ?? [] {
-            if let responder = responder as? NSView,
-               let popover = window.contentViewController?.nextResponder as? NSPopover,
-               window !== removedChildWindow,
-               responder.window !== window,
-               popover.delegate?.popoverShouldClose?(popover) == true || [.transient, .semitransient].contains(popover.behavior) {
+    var displayedPopovers: [NSPopover] {
+        self.childWindows?.compactMap { window in
+            guard window !== removedChildWindow else { return nil }
+            return window.contentViewController?.nextResponder as? NSPopover
+        } ?? []
+    }
 
-                popover.close()
-            }
+    override func makeFirstResponder(_ responder: NSResponder?) -> Bool {
+        func popoverShouldClose(_ popover: NSPopover) -> Bool {
+            popover.delegate?.popoverShouldClose?(popover) == true
+                || [.transient, .semitransient].contains(popover.behavior)
+        }
+        for popover in displayedPopovers where popoverShouldClose(popover) {
+            popover.close()
         }
 
         guard self.firstResponder !== responder else { return true }
@@ -190,10 +194,17 @@ print(event)
     // Handle Keyboard toggle Toolbar focus (Ctrl+F5)
     @objc(_handleFocusToolbarHotKey:)
     func handleFocusToolbarHotKey(_ event: Any?) {
-        guard mainViewController?.children.isEmpty != false else {
+        guard displayedPopovers.isEmpty else { return }
+        mainViewController?.toggleToolbarFocus()
+    }
+
+    // Esc
+    override func cancelOperation(_ sender: Any?) {
+        guard !(firstResponder is WebView) else {
+            super.cancelOperation(sender)
             return
         }
-        mainViewController?.toggleToolbarFocus()
+        self.mainViewController?.adjustFirstResponder()
     }
 
     final class TabBarViewItemProxy: NSView {

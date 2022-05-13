@@ -22,22 +22,6 @@ import Carbon.HIToolbox
 
 final class TabBarCollectionView: NSCollectionView {
 
-    override func doCommand(by selector: Selector) {
-        if let window = window {
-            switch selector {
-            case #selector(insertTab(_:)):
-                window.selectKeyView(following: window.firstResponder as? NSView ?? self)
-                return
-            case #selector(insertBacktab(_:)):
-                window.selectKeyView(preceding: window.firstResponder as? NSView ?? self)
-                return
-            default:
-                break
-            }
-        }
-        super.doCommand(by: selector)
-    }
-    
     override func awakeFromNib() {
         super.awakeFromNib()
         
@@ -81,8 +65,8 @@ final class TabBarCollectionView: NSCollectionView {
         return itemsCache[identifier]?[indexPath] ?? super.makeItem(withIdentifier: identifier, for: indexPath)
     }
 
-    override func accessibilityChildren() -> [Any]? {
-        return self.allIndexPaths().compactMap { indexPath in
+    private func getAccessibilityTabs() -> [NSAccessibilityElementProtocol] {
+        self.allIndexPaths().compactMap { indexPath in
             self.item(at: indexPath)?.view ?? {
                 guard let item = self.dataSource?.collectionView(self, itemForRepresentedObjectAt: indexPath) else { return nil }
                 if let identifier = item.identifier {
@@ -92,19 +76,148 @@ final class TabBarCollectionView: NSCollectionView {
                 return item.view
             }()
 
-        } + [newTabButton].compactMap { $0 }
+        }
+    }
+
+    private func getAccessibilityChildren() -> [NSAccessibilityElementProtocol] {
+        var children = getAccessibilityTabs()
+        if let newTabButton = newTabButton {
+            children.append(newTabButton)
+        }
+        return children
+    }
+
+    override func accessibilityChildren() -> [Any]? {
+        getAccessibilityChildren()
     }
 
     override func accessibilityVisibleChildren() -> [Any]? {
-        accessibilityChildren()
-    }
-
-    override func accessibilityTabs() -> [Any]? {
-        nil
+        getAccessibilityChildren()
     }
 
     override func accessibilityChildrenInNavigationOrder() -> [NSAccessibilityElementProtocol]? {
-        accessibilityChildren()
+        getAccessibilityChildren()
+    }
+
+    override func accessibilityTabs() -> [Any]? {
+        getAccessibilityChildren()
+    }
+
+    override func doCommand(by selector: Selector) {
+        guard let window = window else { return }
+        switch selector {
+        case #selector(insertTab(_:)):
+            window.selectKeyView(following: window.firstResponder as? NSView ?? self)
+
+        case #selector(moveRight(_:)):
+            focusNextItem()
+
+        case #selector(moveWordRight(_:)):
+            focusTabsPage(+1)
+
+        case #selector(moveDown(_:)),
+             #selector(moveToRightEndOfLine(_:)),
+             #selector(moveToEndOfDocument(_:)),
+             #selector(moveToEndOfParagraph(_:)):
+            focusLastItem()
+
+        case #selector(insertBacktab(_:)):
+            window.selectKeyView(preceding: window.firstResponder as? NSView ?? self)
+
+        case #selector(moveLeft(_:)):
+            focusPreviousItem()
+
+        case #selector(moveWordLeft(_:)):
+            focusTabsPage(-1)
+
+        case #selector(moveUp(_:)),
+             #selector(moveToLeftEndOfLine(_:)),
+             #selector(moveToBeginningOfDocument(_:)),
+             #selector(moveToBeginningOfParagraph(_:)):
+            focusFirstItem()
+
+        default:
+            super.doCommand(by: selector)
+        }
+    }
+
+    private func indexPathForItemWithFocusedView() -> IndexPath? {
+        guard let focusedView = window?.firstResponder as? NSView else { return nil }
+
+        if let item = window?.firstResponder?.nextResponder as? TabBarViewItem {
+            return self.indexPath(for: item)
+        }
+
+        let point = self.convert(focusedView.bounds.center, from: focusedView)
+        return self.indexPathForItem(at: point)
+    }
+
+    func focusNextItem() {
+        guard let indexPath = indexPathForItemWithFocusedView(),
+              self.numberOfItems(inSection: 0) > indexPath.item + 1
+        else {
+            __NSBeep()
+            return
+        }
+
+        focusItem(at: IndexPath(item: indexPath.item + 1, section: 0))
+    }
+
+    func focusPreviousItem() {
+        guard let indexPath = indexPathForItemWithFocusedView(),
+              indexPath.item > 0
+        else {
+            __NSBeep()
+            return
+        }
+
+        focusItem(at: IndexPath(item: indexPath.item - 1, section: 0))
+    }
+
+    func focusTabsPage(_ n: Int) {
+        guard let indexPath = indexPathForItemWithFocusedView(),
+              let clipView = enclosingScrollView?.contentView
+        else {
+            __NSBeep()
+            return
+        }
+
+        let leftmostPoint = self.convert(NSPoint(x: clipView.visibleRect.minX,
+                                                 y: clipView.visibleRect.midY),
+                                         from: clipView)
+        let rightmostPoint = self.convert(NSPoint(x: clipView.visibleRect.maxX,
+                                                  y: clipView.visibleRect.midY),
+                                          from: clipView)
+
+        let lastItem = self.numberOfItems(inSection: 0) - 1
+        let firstVisibleIndexPath = self.indexPathForItem(at: leftmostPoint) ?? IndexPath(item: 0, section: 0)
+        let lastVisibleIndexPath = self.indexPathForItem(at: rightmostPoint) ?? IndexPath(item: lastItem, section: 0)
+
+        let distance = lastVisibleIndexPath.item - firstVisibleIndexPath.item
+        let indexPathToFocus  = n > 0 ? lastVisibleIndexPath : firstVisibleIndexPath
+        let scrollTo = min(max(0, indexPath.item + distance * n * 2), lastItem)
+
+        scroll(to: scrollTo) { [weak self] _ in
+            self?.focusItem(at: indexPathToFocus)
+        }
+    }
+
+    func focusFirstItem() {
+        focusItem(at: IndexPath(item: 0, section: 0))
+    }
+
+    func focusLastItem() {
+        focusItem(at: IndexPath(item: self.numberOfItems(inSection: 0) - 1, section: 0))
+    }
+
+    func focusItem(at indexPath: IndexPath) {
+        if self.indexPathsForVisibleItems().contains(indexPath) {
+            self.item(at: indexPath)?.view.makeMeFirstResponder()
+        } else {
+            self.scroll(to: indexPath.item) { [weak self] _ in
+                self?.item(at: indexPath)?.view.makeMeFirstResponder()
+            }
+        }
     }
 
     override func selectItems(at indexPaths: Set<IndexPath>, scrollPosition: NSCollectionView.ScrollPosition) {

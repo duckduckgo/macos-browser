@@ -25,4 +25,8 @@ extension NSRect {
         return insetBy(dx: 0, dy: -5)
     }
 
+    var center: NSPoint {
+        NSPoint(x: midX, y: midY)
+    }
+
 }
