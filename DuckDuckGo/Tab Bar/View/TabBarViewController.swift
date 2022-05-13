@@ -328,7 +328,7 @@ final class TabBarViewController: NSViewController {
     // swiftlint:enable force_cast
 
     func showTabPreview(for tabBarViewItem: TabBarViewItem) {
-        guard let indexPath = collectionView.indexPath(for: tabBarViewItem),
+        guard let indexPath = tabBarViewItem.indexPath,
               let tabViewModel = tabCollectionViewModel.tabViewModel(at: indexPath.item) else {
             return
         }
@@ -353,7 +353,6 @@ final class TabBarViewController: NSViewController {
     }
 
     private weak var floatingAddButton: NSButton?
-
 }
 
 extension TabBarViewController: TabCollectionViewModelDelegate {
@@ -534,7 +533,7 @@ extension TabBarViewController: NSCollectionViewDataSource {
         }
 
         tabBarViewItem.delegate = self
-        tabBarViewItem.subscribe(to: tabViewModel)
+        tabBarViewItem.subscribe(to: tabViewModel, at: indexPath)
 
         return tabBarViewItem
     }
@@ -699,7 +698,7 @@ extension TabBarViewController: NSCollectionViewDelegate {
 extension TabBarViewController: TabBarViewItemDelegate {
 
     func tabBarViewItemSelectAction(_ tabBarViewItem: TabBarViewItem) {
-        guard let indexPath = collectionView.indexPath(for: tabBarViewItem) else {
+        guard let indexPath = tabBarViewItem.indexPath else {
             os_log("TabBarViewController: Failed to get index path of tab bar view item", type: .error)
             return
         }
@@ -719,7 +718,7 @@ extension TabBarViewController: TabBarViewItemDelegate {
     }
 
     func tabBarViewItemDuplicateAction(_ tabBarViewItem: TabBarViewItem) {
-        guard let indexPath = collectionView.indexPath(for: tabBarViewItem) else {
+        guard let indexPath = tabBarViewItem.indexPath else {
             os_log("TabBarViewController: Failed to get index path of tab bar view item", type: .error)
             return
         }
@@ -729,7 +728,7 @@ extension TabBarViewController: TabBarViewItemDelegate {
     }
 
     func tabBarViewItemBookmarkThisPageAction(_ tabBarViewItem: TabBarViewItem) {
-        guard let indexPath = collectionView.indexPath(for: tabBarViewItem),
+        guard let indexPath = tabBarViewItem.indexPath,
               let tabViewModel = tabCollectionViewModel.tabViewModel(at: indexPath.item),
               let url = tabViewModel.tab.content.url else {
             os_log("TabBarViewController: Failed to get index path of tab bar view item", type: .error)
@@ -743,7 +742,7 @@ extension TabBarViewController: TabBarViewItemDelegate {
     }
 
     func tabBarViewItemCloseAction(_ tabBarViewItem: TabBarViewItem) {
-        guard let indexPath = collectionView.indexPath(for: tabBarViewItem) else {
+        guard let indexPath = tabBarViewItem.indexPath else {
             os_log("TabBarViewController: Failed to get index path of tab bar view item", type: .error)
             return
         }
@@ -752,7 +751,7 @@ extension TabBarViewController: TabBarViewItemDelegate {
     }
 
     func tabBarViewItemTogglePermissionAction(_ tabBarViewItem: TabBarViewItem) {
-        guard let indexPath = collectionView.indexPath(for: tabBarViewItem),
+        guard let indexPath = tabBarViewItem.indexPath,
               let permissions = tabCollectionViewModel.tabViewModel(at: indexPath.item)?.tab.permissions
         else {
             os_log("TabBarViewController: Failed to get index path of tab bar view item or its permissions", type: .error)
@@ -769,7 +768,7 @@ extension TabBarViewController: TabBarViewItemDelegate {
     }
 
     func tabBarViewItemCloseOtherAction(_ tabBarViewItem: TabBarViewItem) {
-        guard let indexPath = collectionView.indexPath(for: tabBarViewItem) else {
+        guard let indexPath = tabBarViewItem.indexPath else {
             os_log("TabBarViewController: Failed to get index path of tab bar view item", type: .error)
             return
         }
@@ -778,7 +777,7 @@ extension TabBarViewController: TabBarViewItemDelegate {
     }
 
     func tabBarViewItemCloseToTheRightAction(_ tabBarViewItem: TabBarViewItem) {
-        guard let indexPath = collectionView.indexPath(for: tabBarViewItem) else {
+        guard let indexPath = tabBarViewItem.indexPath else {
             os_log("TabBarViewController: Failed to get index path of tab bar view item", type: .error)
             return
         }
@@ -787,7 +786,7 @@ extension TabBarViewController: TabBarViewItemDelegate {
     }
 
     func tabBarViewItemMoveToNewWindowAction(_ tabBarViewItem: TabBarViewItem) {
-        guard let indexPath = collectionView.indexPath(for: tabBarViewItem) else {
+        guard let indexPath = tabBarViewItem.indexPath else {
             os_log("TabBarViewController: Failed to get index path of tab bar view item", type: .error)
             return
         }
@@ -796,7 +795,7 @@ extension TabBarViewController: TabBarViewItemDelegate {
     }
 
     func tabBarViewItemFireproofSite(_ tabBarViewItem: TabBarViewItem) {
-        guard let indexPath = collectionView.indexPath(for: tabBarViewItem),
+        guard let indexPath = tabBarViewItem.indexPath,
               let tabViewModel = tabCollectionViewModel.tabViewModel(at: indexPath.item),
               let url = tabViewModel.tab.content.url,
               let host = url.host
@@ -810,7 +809,7 @@ extension TabBarViewController: TabBarViewItemDelegate {
     }
 
     func tabBarViewItemRemoveFireproofing(_ tabBarViewItem: TabBarViewItem) {
-        guard let indexPath = collectionView.indexPath(for: tabBarViewItem),
+        guard let indexPath = tabBarViewItem.indexPath,
               let tabViewModel = tabCollectionViewModel.tabViewModel(at: indexPath.item),
               let url = tabViewModel.tab.content.url,
               let host = url.host
@@ -823,7 +822,7 @@ extension TabBarViewController: TabBarViewItemDelegate {
     }
 
     func otherTabBarViewItemsState(for tabBarViewItem: TabBarViewItem) -> OtherTabBarViewItemsState {
-        guard let indexPath = collectionView.indexPath(for: tabBarViewItem) else {
+        guard let indexPath = tabBarViewItem.indexPath else {
             os_log("TabBarViewController: Failed to get index path of tab bar view item", type: .error)
             return .init(hasItemsToTheLeft: false, hasItemsToTheRight: false)
         }

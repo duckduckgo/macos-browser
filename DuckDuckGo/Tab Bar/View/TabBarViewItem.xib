@@ -31,7 +31,13 @@
                         <font key="font" metaFont="system"/>
                         <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
                         <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
+                        <userDefinedRuntimeAttributes>
+                            <userDefinedRuntimeAttribute type="boolean" keyPath="accessibilityElement" value="NO"/>
+                        </userDefinedRuntimeAttributes>
                     </textFieldCell>
+                    <userDefinedRuntimeAttributes>
+                        <userDefinedRuntimeAttribute type="boolean" keyPath="accessibilityElement" value="NO"/>
+                    </userDefinedRuntimeAttributes>
                 </textField>
                 <customView translatesAutoresizingMaskIntoConstraints="NO" id="A6g-eG-dOW">
                     <rect key="frame" x="8" y="5" width="24" height="24"/>
@@ -42,7 +48,14 @@
                                 <constraint firstAttribute="width" constant="16" id="UYc-rf-9hh"/>
                                 <constraint firstAttribute="height" constant="16" id="ey5-m5-Uxp"/>
                             </constraints>
-                            <imageCell key="cell" refusesFirstResponder="YES" alignment="left" imageScaling="proportionallyDown" id="xPB-Hd-eTl"/>
+                            <imageCell key="cell" refusesFirstResponder="YES" alignment="left" imageScaling="proportionallyDown" id="xPB-Hd-eTl">
+                                <userDefinedRuntimeAttributes>
+                                    <userDefinedRuntimeAttribute type="boolean" keyPath="accessibilityElement" value="NO"/>
+                                </userDefinedRuntimeAttributes>
+                            </imageCell>
+                            <userDefinedRuntimeAttributes>
+                                <userDefinedRuntimeAttribute type="boolean" keyPath="accessibilityElement" value="NO"/>
+                            </userDefinedRuntimeAttributes>
                         </imageView>
                     </subviews>
                     <constraints>
@@ -51,6 +64,9 @@
                         <constraint firstItem="Kky-kZ-lU9" firstAttribute="centerY" secondItem="A6g-eG-dOW" secondAttribute="centerY" id="q7W-XH-qud"/>
                         <constraint firstItem="Kky-kZ-lU9" firstAttribute="centerX" secondItem="A6g-eG-dOW" secondAttribute="centerX" id="sh1-7s-uE8"/>
                     </constraints>
+                </customView>
+                <customView translatesAutoresizingMaskIntoConstraints="NO" id="890-3t-v5O" customClass="MouseClickView" customModule="DuckDuckGo_Privacy_Browser" customModuleProvider="target">
+                    <rect key="frame" x="0.0" y="0.0" width="300" height="33"/>
                 </customView>
                 <button focusRingType="exterior" translatesAutoresizingMaskIntoConstraints="NO" id="XdB-Qn-iD9" userLabel="Active Permission" customClass="MouseOverButton" customModule="DuckDuckGo_Privacy_Browser" customModuleProvider="target">
                     <rect key="frame" x="255" y="9" width="16" height="16"/>
@@ -100,9 +116,11 @@
                             <color key="value" name="ButtonMouseDownColor"/>
                         </userDefinedRuntimeAttribute>
                         <userDefinedRuntimeAttribute type="boolean" keyPath="shouldAppearOnFocus" value="YES"/>
+                        <userDefinedRuntimeAttribute type="string" keyPath="accessibilityTitle" value="close tab"/>
                     </userDefinedRuntimeAttributes>
+                    <accessibility identifier="CloseTabButton"/>
                     <connections>
-                        <action selector="closeButtonAction:" target="4MN-w4-aCk" id="ezW-I1-5yy"/>
+                        <action selector="close:" target="4MN-w4-aCk" id="ezW-I1-5yy"/>
                     </connections>
                 </button>
                 <customView translatesAutoresizingMaskIntoConstraints="NO" id="opQ-Od-dCO" userLabel="Right Separator View" customClass="ColorView" customModule="DuckDuckGo_Privacy_Browser" customModuleProvider="target">
@@ -116,9 +134,6 @@
                             <color key="value" name="SeparatorColor"/>
                         </userDefinedRuntimeAttribute>
                     </userDefinedRuntimeAttributes>
-                </customView>
-                <customView translatesAutoresizingMaskIntoConstraints="NO" id="890-3t-v5O" customClass="MouseClickView" customModule="DuckDuckGo_Privacy_Browser" customModuleProvider="target">
-                    <rect key="frame" x="0.0" y="0.0" width="300" height="33"/>
                 </customView>
             </subviews>
             <constraints>
@@ -146,6 +161,9 @@
                 <constraint firstAttribute="bottom" secondItem="jlg-2n-tzm" secondAttribute="bottom" id="vcb-oV-uSI"/>
                 <constraint firstAttribute="trailing" secondItem="vuD-rY-Vzl" secondAttribute="trailing" constant="9" id="web-9k-BYT"/>
             </constraints>
+            <userDefinedRuntimeAttributes>
+                <userDefinedRuntimeAttribute type="boolean" keyPath="accessibilityElement" value="YES"/>
+            </userDefinedRuntimeAttributes>
             <point key="canvasLocation" x="-61" y="120.5"/>
         </customView>
         <collectionViewItem id="4MN-w4-aCk" customClass="TabBarViewItem" customModule="DuckDuckGo_Privacy_Browser" customModuleProvider="target">

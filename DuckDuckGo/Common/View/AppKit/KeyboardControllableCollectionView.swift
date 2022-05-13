@@ -20,6 +20,17 @@ import AppKit
 import Carbon.HIToolbox
 import Combine
 
+extension NSCollectionView {
+    
+    func allIndexPaths() -> [IndexPath] {
+        (0..<numberOfSections).reduce(into: [IndexPath]()) { result, section in
+            result.append(contentsOf: (0..<numberOfItems(inSection: section))
+                .map { IndexPath(item: $0, section: section) })
+        }
+    }
+
+}
+
 final class KeyboardControllableCollectionView: NSCollectionView {
 
     @IBInspectable var shouldSelectOnFocus: Bool = false
@@ -52,13 +63,6 @@ final class KeyboardControllableCollectionView: NSCollectionView {
             self.selectionIndexPaths = []
         }
         return super.resignFirstResponder()
-    }
-
-    func allIndexPaths() -> [IndexPath] {
-        (0..<numberOfSections).reduce(into: [IndexPath]()) { result, section in
-            result.append(contentsOf: (0..<numberOfItems(inSection: section))
-                .map { IndexPath(item: $0, section: section) })
-        }
     }
 
     @discardableResult

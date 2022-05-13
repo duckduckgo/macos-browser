@@ -87,6 +87,11 @@ final class MainWindow: NSWindow {
         super.endEditing(for: object)
     }
 
+    final class ClipView: NSView {
+        override func hitTest(_ point: NSPoint) -> NSView? {
+            nil
+        }
+    }
     var cont: NSView!
     var frv: NSView?
     var c: Any?
@@ -98,18 +103,18 @@ final class MainWindow: NSWindow {
         frv?.removeFromSuperview()
         c = nil
         if let firstResponder = firstResponder as? TabBarView {
-//            firstResponder.highli
 
             let cframe = firstResponder.enclosingScrollView?.superview?
                 .convert(firstResponder.enclosingScrollView!.frame, to: self.contentView!.superview!)
                 .insetBy(dx: -2, dy: -6)
             if let cframe = cframe {
                 if cont == nil {
-                    let c = NSView(frame: cframe)
-                    c.autoresizingMask = [.width]
+                    let c = ClipView(frame: cframe)
+                    c.autoresizingMask = [.width, .minYMargin]
                     c.wantsLayer = true
                     c.layer!.cornerRadius = 12.0
                     cont = c
+
                     self.contentView!.superview!.addSubview(c)
                 }
                 cont.frame = cframe
@@ -173,6 +178,64 @@ print(event)
         mainViewController?.toggleToolbarFocus()
     }
 
+    final class TabBarViewItemProxy: NSView {
+        weak var collectionView: TabBarCollectionView?
+        let index: Int
+        let position: Position
+
+        enum Position {
+            case first
+            case second
+            case beforeLast
+            case last
+        }
+
+        init(collectionView: TabBarCollectionView, index: Int, position: Position) {
+            self.collectionView = collectionView
+            self.index = index
+            self.position = position
+            let frame = [.first, .second].contains(position)
+                ? NSRect(x: 0, y: 0, width: 1, height: collectionView.frame.height)
+                : NSRect(x: collectionView.enclosingScrollView!.frame.width - 1, y: 0, width: 1, height: collectionView.frame.height)
+            super.init(frame: frame)
+
+            collectionView.enclosingScrollView?.addSubview(self)
+        }
+
+        required init?(coder: NSCoder) {
+            fatalError("init(coder:) has not been implemented")
+        }
+
+        override var acceptsFirstResponder: Bool {
+            NSApp.isFullKeyboardAccessEnabled && self.isVisible
+        }
+
+        override var canBecomeKeyView: Bool {
+            NSApp.isFullKeyboardAccessEnabled && self.isVisible
+        }
+
+        override func becomeFirstResponder() -> Bool {
+            guard let collectionView = collectionView else { return false }
+            self.removeFromSuperview()
+
+            collectionView.scroll(to: index) { [index, position] _ in
+                guard let item = collectionView.item(at: IndexPath(item: index, section: 0))
+                else { return }
+
+                switch position {
+                // Navigating backward to a Tab's button
+                case .second, .last:
+                    guard let btn = item.view.subviews.filter({ ($0 as? NSButton)?.canBecomeKeyView == true }).last else { fallthrough }
+                    btn.makeMeFirstResponder()
+                // Navigating forward to the Tab
+                case .first, .beforeLast:
+                    item.view.makeMeFirstResponder()
+                }
+            }
+            return false
+        }
+    }
+
     override func recalculateKeyViewLoop() {
         mainViewController?.tabBarViewController.view.superview?.setDefaultKeyViewLoop()
         super.recalculateKeyViewLoop()
@@ -181,25 +244,31 @@ print(event)
 //            mainViewController?.tabBarViewController.collectionView.subviews.first
         // TODO: Need to iterate through collectionView.itemAtIndexPath because not all views are created // swiftlint:disable:this todo
         let cv = mainViewController!.tabBarViewController.collectionView!
-        for idx in 0..<cv.numberOfItems(inSection: 0) {
-            guard let item = (cv.item(at: idx) as? TabBarViewItem) else { continue }
-            let subview = item.view
+        let visibleIndexPaths = cv.indexPathsForVisibleItems().sorted()
+        var views = [NSView]()
+        if let min = visibleIndexPaths.first,
+           min.item > 0 {
+            views.append(TabBarViewItemProxy(collectionView: cv, index: 0, position: .first))
+            views.append(TabBarViewItemProxy(collectionView: cv, index: min.item - 1, position: .second))
+        }
+        views.append(contentsOf: visibleIndexPaths.compactMap { cv.item(at: $0)?.view })    
+        if let max = visibleIndexPaths.last,
+           max.item < cv.numberOfItems(inSection: 0) - 1 {
+            views.append(TabBarViewItemProxy(collectionView: cv, index: max.item + 1, position: .beforeLast))
+            views.append(TabBarViewItemProxy(collectionView: cv, index: cv.numberOfItems(inSection: 0) - 1, position: .last))
+        }
+
+        for (idx, view) in views.enumerated() {
             if idx == 0 {
-                mainViewController?.navigationBarViewController.optionsButton.nextKeyView = subview
+                mainViewController?.navigationBarViewController.optionsButton.nextKeyView = view
             }
-            let btns = subview.subviews.filter { $0 is NSButton }
-            for (btnI, btn) in btns.enumerated() {
-                if btnI == 0 {
-                    subview.nextKeyView = btn
-                } else {
-                    btns[btnI - 1].nextKeyView = btn
-                    if btns.count == btnI + 1 {
-                        if let nextTab = (cv.item(at: idx + 1) as? TabBarViewItem)?.view as? TabBarView {
-                            btn.nextKeyView = nextTab
-                        } else {
-                            btn.nextKeyView = self.newTabButton
-                        }
-                    }
+            let btns = view.subviews.filter { $0 is NSButton }
+            if btns.isEmpty {
+                view.nextKeyView = views[safe: idx + 1] ?? self.newTabButton
+            } else {
+                view.nextKeyView = btns[0]
+                for btnIdx in btns.indices {
+                    btns[btnIdx].nextKeyView = btns[safe: btnIdx + 1] ?? views[safe: idx + 1] ?? self.newTabButton
                 }
             }
 

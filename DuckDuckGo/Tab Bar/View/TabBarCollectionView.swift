@@ -54,37 +54,64 @@ final class TabBarCollectionView: NSCollectionView {
         .tabGroup
     }
 
-    override func accessibilityChildren() -> [Any]? {
-        let originalChildren = super.accessibilityChildren()
-        guard let section = originalChildren?.first as? NSAccessibilityElement else {
-            assertionFailure("Unexpected element")
-            return originalChildren
+    override func accessibilityFrame() -> NSRect {
+        if let enclosingScrollView = self.enclosingScrollView,
+           let newTabButton = newTabButton {
+            return enclosingScrollView.accessibilityFrame().union(newTabButton.accessibilityFrame())
+                .union(leftScrollButton?.accessibilityFrame() ?? newTabButton.accessibilityFrame())
         }
-        var children = section.accessibilityChildren() ?? []
-        if let newTab = children.last as? NSAccessibilityElement,
-           case .some(.group) = newTab.accessibilityRole(),
-           // TODO: it creates a viewForSupplementaryElementOfKind // swiftlint:disable:this todo
-           let buttonCell = newTab.accessibilityChildren()?.first as? NSButtonCell,
-           let newTabButton = buttonCell.controlView,
-           let fixedNewTabButton = ((self.window as? MainWindow)?.contentViewController as? MainViewController)?.tabBarViewController.plusButton {
-            children.removeLast()
-            if newTabButton.window == nil {
-                children.append(fixedNewTabButton)
-            } else {
-                children.append(newTabButton)
-            }
 
-            newTabButton.setAccessibilityParent(self)
-            fixedNewTabButton.setAccessibilityParent(self)
+        return super.accessibilityFrame()
+    }
+
+    var leftScrollButton: NSButton? {
+        ((self.window as? MainWindow)?.contentViewController as? MainViewController)?.tabBarViewController.leftScrollButton
+    }
+
+    var newTabButton: NSButton? {
+        (self.window as? MainWindow)?.newTabButton
+    }
+
+    private var itemsCache = [NSUserInterfaceItemIdentifier: [IndexPath: NSCollectionViewItem]]()
+
+    override func makeItem(withIdentifier identifier: NSUserInterfaceItemIdentifier, for indexPath: IndexPath) -> NSCollectionViewItem {
+        defer {
+            itemsCache[identifier]?[indexPath] = nil
         }
-        return children
+        return itemsCache[identifier]?[indexPath] ?? super.makeItem(withIdentifier: identifier, for: indexPath)
+    }
+
+    override func accessibilityChildren() -> [Any]? {
+        return self.allIndexPaths().compactMap { indexPath in
+            self.item(at: indexPath)?.view ?? {
+                guard let item = self.dataSource?.collectionView(self, itemForRepresentedObjectAt: indexPath) else { return nil }
+                if let identifier = item.identifier {
+                    itemsCache[identifier, default: [:]][indexPath] = item
+                }
+                item.view.setAccessibilityParent(self)
+                return item.view
+            }()
+
+        } + [newTabButton].compactMap { $0 }
     }
 
     override func accessibilityVisibleChildren() -> [Any]? {
         accessibilityChildren()
     }
 
+    override func accessibilityTabs() -> [Any]? {
+        nil
+    }
+
+    override func accessibilityChildrenInNavigationOrder() -> [NSAccessibilityElementProtocol]? {
+        accessibilityChildren()
+    }
+
     override func selectItems(at indexPaths: Set<IndexPath>, scrollPosition: NSCollectionView.ScrollPosition) {
+        if self.indexPathsForVisibleItems().isDisjoint(with: indexPaths),
+           let indexPath = indexPaths.first {
+            self.scroll(to: indexPath)
+        }
         super.selectItems(at: indexPaths, scrollPosition: scrollPosition)
 
         updateItemsLeftToSelectedItems(indexPaths)
@@ -108,6 +135,10 @@ final class TabBarCollectionView: NSCollectionView {
 
     func scroll(to index: Int, completionHandler: ((Bool) -> Void)? = nil) {
         let indexPath = IndexPath(item: index, section: 0)
+        scroll(to: indexPath, completionHandler: completionHandler)
+    }
+
+    func scroll(to indexPath: IndexPath, completionHandler: ((Bool) -> Void)? = nil) {
         let rect = frameForItem(at: indexPath.item)
         animator().performBatchUpdates({
             animator().scrollToVisible(rect)
@@ -144,6 +175,7 @@ final class TabBarCollectionView: NSCollectionView {
 // TODO: Use other flag // swiftlint:disable:this todo
         (item(at: self.numberOfItems(inSection: 0) - 1) as? TabBarViewItem)?.isLeftToSelected = true
     }
+
 }
 
 extension NSCollectionView {

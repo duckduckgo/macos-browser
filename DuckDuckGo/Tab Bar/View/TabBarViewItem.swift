@@ -49,57 +49,6 @@ protocol TabBarViewItemDelegate: AnyObject {
 
 final class TabBarView: NSView {
 
-    required init?(coder: NSCoder) {
-        super.init(coder: coder)
-        self.focusRingType = .exterior
-    }
-
-    override func accessibilityRole() -> NSAccessibility.Role? {
-      return .radioButton
-    }
-
-    override func accessibilityHelp() -> String? {
-      "help"
-    }
-
-    override func accessibilityLabel() -> String? {
-      "l;abel"
-    }
-
-    override func accessibilityTitle() -> String? {
-      "Title"
-    }
-
-    override func isAccessibilityElement() -> Bool {
-      true
-    }
-
-    override var accessibilityFocusedUIElement: Any? {
-      self
-    }
-    override func accessibilityParent() -> Any? {
-        let parent = super.accessibilityParent()
-        if let list = parent as? NSAccessibilityElement,
-           case .some(.list) = list.accessibilityRole() {
-            return list.accessibilityParent()
-        }
-        return parent
-    }
-
-    override func accessibilityPerformPress() -> Bool {
-        guard let item = self.nextResponder as? TabBarViewItem,
-              let delegate = item.delegate
-        else {
-            return false
-        }
-        delegate.tabBarViewItemSelectAction(item)
-        return true
-    }
-
-    @objc public override func accessibilityValue() -> Any? {
-      NSNumber(value: true)
-    }
-
     override var canBecomeKeyView: Bool {
         NSApp.isFullKeyboardAccessEnabled
     }
@@ -110,42 +59,57 @@ final class TabBarView: NSView {
 
     override func becomeFirstResponder() -> Bool {
         // TODO: Also observe my buttons.isFirstResponder and scroll into view // swiftlint:disable:this todo
+        // TODO: enclosingScrollView.scrollIntoView
         (nextResponder as? TabBarViewItem)?.scrollIntoView { _ in
             super.becomeFirstResponder()
         }
 
+        setAccessibilityFocused(true)
         return true
     }
 
     override func resignFirstResponder() -> Bool {
         guard super.resignFirstResponder() else { return false }
-//        self.updateView(stroke: false)
+
         DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) { [weak self] in
             if !(self?.window?.firstResponder is TabBarView || (self?.window?.firstResponder as? NSButton)?.superview is TabBarView) {
                 ((self?.nextResponder as? TabBarViewItem)?.collectionView as? TabBarCollectionView)?.scrollToSelected()
             }
         }
+
+        setAccessibilityFocused(false)
         return true
     }
 
-    override func doCommand(by selector: Selector) {
-        super.doCommand(by: selector)
+    override func accessibilityFrame() -> NSRect {
+        let frame = self.window != nil ? super.accessibilityFrame() : self.frame
+        guard let parent = self.accessibilityParent() as? NSAccessibilityProtocol else { return frame }
+
+        var parentFrame = parent.accessibilityFrame()
+        parentFrame = parentFrame.insetBy(dx: 0, dy: (parentFrame.height - frame.height) / 2)
+        let intersection = parentFrame.intersection(frame)
+
+        if intersection.isEmpty || self.window == nil {
+            let isOnLeft = self.window != nil ? (frame.minX < parentFrame.minX) : frame.origin.x <= 0
+            return NSRect(x: isOnLeft ? parentFrame.minX : parentFrame.maxX - 2,
+                          y: parentFrame.origin.y,
+                          width: 2,
+                          height: parentFrame.height)
+        }
+        return intersection
     }
 
-    override func keyDown(with event: NSEvent) {
-        if Int(event.keyCode) == kVK_Space {
-            _=accessibilityPerformPress()
-            return
-        }
-        super.keyDown(with: event)
+    override func accessibilityPerformPress() -> Bool {
+        NSApp.sendAction(#selector(TabBarViewItem.performClick(_:)), to: nextResponder, from: self)
+    }
+
+    override func accessibilityPerformDelete() -> Bool {
+        NSApp.sendAction(#selector(TabBarViewItem.close(_:)), to: nextResponder, from: self)
     }
 
 }
 
 final class TabBarViewItem: NSCollectionViewItem {
-    @objc func isAccessibilityElement() -> Bool {
-        false
-    }
 
     enum Constants {
         static let textFieldPadding: CGFloat = 32
@@ -241,6 +205,8 @@ final class TabBarViewItem: NSCollectionViewItem {
             updateSubviews()
             updateUsedPermissions()
             updateTitleTextFieldMask()
+
+            self.view.setAccessibilityValue(isSelected)
         }
     }
 
@@ -267,15 +233,25 @@ final class TabBarViewItem: NSCollectionViewItem {
 
     private var lastKnownIndexPath: IndexPath?
 
+    var indexPath: IndexPath? {
+        collectionView?.indexPath(for: self) ?? lastKnownIndexPath
+    }
+
+    override func viewDidAppear() {
+        super.viewDidAppear()
+        self.lastKnownIndexPath = self.collectionView?.indexPath(for: self)
+    }
+
     func scrollIntoView(completionHandler: ((Bool) -> Void)? = nil) {
-        guard let indexPath = self.collectionView?.indexPath(for: self) else { return }
+        guard let indexPath = self.indexPath else { return }
         (self.collectionView as? TabBarCollectionView)?.scroll(to: indexPath.item, completionHandler: completionHandler)
     }
 
-    @IBAction func closeButtonAction(_ sender: NSButton) {
-        guard let indexPath = self.collectionView?.indexPath(for: self) else {
+    @IBAction func close(_ sender: Any) {
+        guard let indexPath = indexPath else {
             // doubleclick event arrived at point when we're already removed
             // pass the closeButton action to the next TabBarViewItem
+            // TODO: Validate it still works
             if let indexPath = self.lastKnownIndexPath,
                let nextItem = self.collectionView?.item(at: indexPath) as? Self {
                 // and set its lastKnownIndexPath in case clicks continue to arrive
@@ -287,6 +263,18 @@ final class TabBarViewItem: NSCollectionViewItem {
 
         self.lastKnownIndexPath = indexPath
         delegate?.tabBarViewItemCloseAction(self)
+    }
+
+    @objc func performClick(_ sender: Any) {
+        delegate?.tabBarViewItemSelectAction(self)
+    }
+
+    override func keyDown(with event: NSEvent) {
+        if Int(event.keyCode) == kVK_Space {
+            performClick(self)
+            return
+        }
+        super.keyDown(with: event)
     }
 
     @IBAction func permissionButtonAction(_ sender: NSButton) {
@@ -305,12 +293,19 @@ final class TabBarViewItem: NSCollectionViewItem {
         delegate?.tabBarViewItemMoveToNewWindowAction(self)
     }
 
-    func subscribe(to tabViewModel: TabViewModel) {
+    override var title: String? {
+        didSet {
+            titleTextField.stringValue = title ?? ""
+            view.setAccessibilityTitle(title)
+            view.setAccessibilityLabel(title)
+        }
+    }
+
+    func subscribe(to tabViewModel: TabViewModel, at indexPath: IndexPath) {
+        self.lastKnownIndexPath = indexPath
         clearSubscriptions()
 
-        tabViewModel.$title.sink { [weak self] title in
-            self?.titleTextField.stringValue = title
-        }.store(in: &cancellables)
+        tabViewModel.$title.map { $0 }.assign(to: \.title, onWeaklyHeld: self).store(in: &cancellables)
 
         tabViewModel.$favicon.sink { [weak self] favicon in
             self?.updateFavicon(favicon)
@@ -319,7 +314,7 @@ final class TabBarViewItem: NSCollectionViewItem {
         tabViewModel.tab.$content.sink { [weak self] content in
             self?.currentURL = content.url
         }.store(in: &cancellables)
-
+        // TODO: Used permissions/url? accessibility
         tabViewModel.$usedPermissions.assign(to: \.usedPermissions, onWeaklyHeld: self).store(in: &cancellables)
     }
 
@@ -336,6 +331,7 @@ final class TabBarViewItem: NSCollectionViewItem {
         }
     }
 
+    private var collectionViewCancellable: AnyCancellable?
     private func setupView() {
         mouseOverView.delegate = self
         mouseClickView.delegate = self
@@ -344,6 +340,17 @@ final class TabBarViewItem: NSCollectionViewItem {
         view.layer?.cornerRadius = 7
         view.layer?.maskedCorners = [.layerMinXMaxYCorner, .layerMaxXMaxYCorner]
         view.layer?.masksToBounds = true
+
+        view.setAccessibilityRole(.radioButton)
+        view.setAccessibilityRoleDescription("tab")
+        view.setAccessibilitySubrole(.tabButtonSubrole)
+        view.setAccessibilityValue(false)
+
+        collectionViewCancellable = self.publisher(for: \.collectionView).sink { [weak self] collectionView in
+            if let collectionView = collectionView {
+                self?.view.setAccessibilityParent(collectionView)
+            }
+        }
     }
 
     private func clearSubscriptions() {
@@ -454,7 +461,7 @@ extension TabBarViewItem: NSMenuDelegate {
             menu.addItem(NSMenuItem.separator())
         }
 
-        let closeMenuItem = NSMenuItem(title: UserText.closeTab, action: #selector(closeButtonAction(_:)), keyEquivalent: "")
+        let closeMenuItem = NSMenuItem(title: UserText.closeTab, action: #selector(close(_:)), keyEquivalent: "")
         closeMenuItem.target = self
         menu.addItem(closeMenuItem)
 
@@ -503,7 +510,7 @@ extension TabBarViewItem: MouseClickViewDelegate {
         // close on middle-click
         guard otherMouseDownEvent.buttonNumber == 2 else { return }
 
-        guard let indexPath = self.collectionView?.indexPath(for: self) else {
+        guard let indexPath = self.indexPath else {
             // doubleclick event arrived at point when we're already removed
             // pass the closeButton action to the next TabBarViewItem
             if let indexPath = self.lastKnownIndexPath,
