@@ -57,8 +57,8 @@ internal class ChromiumDataImporter: DataImporter {
                     completion(.failure(.logins(.cannotAccessSecureVault)))
                     return
                 }
-            case .failure:
-                completion(.failure(.logins(.browserNeedsToBeClosed)))
+            case .failure(let error):
+                completion(.failure(.logins(error)))
                 return
             }
         }

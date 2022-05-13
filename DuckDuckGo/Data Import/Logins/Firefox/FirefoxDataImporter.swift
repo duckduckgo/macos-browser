@@ -61,7 +61,7 @@ final class FirefoxDataImporter: DataImporter {
                 case .requiresPrimaryPassword:
                     completion(.failure(.logins(.needsLoginPrimaryPassword)))
                 case .databaseAccessFailed:
-                    completion(.failure(.logins(.browserNeedsToBeClosed)))
+                    completion(.failure(.logins(.databaseAccessFailed)))
                 case .couldNotFindProfile:
                     completion(.failure(.logins(.couldNotFindProfile)))
                 case .couldNotGetDecryptionKey:

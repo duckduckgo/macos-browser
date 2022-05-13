@@ -23,7 +23,9 @@ import GRDB
 final class ChromiumLoginReader {
 
     enum ImportError: Error {
-        case databaseAccessFailed
+        case databaseAccessFailed(String)
+        case couldNotFindLoginData
+        case failedToTemporarilyCopyDatabase
         case decryptionFailed
     }
 
@@ -35,6 +37,7 @@ final class ChromiumLoginReader {
     private static let sqlSelectWithPasswordTimestamp = "SELECT signon_realm, username_value, password_value, date_password_modified FROM logins;"
     private static let sqlSelectWithCreatedTimestamp = "SELECT signon_realm, username_value, password_value, date_created FROM logins;"
     private static let sqlSelectWithoutTimestamp = "SELECT signon_realm, username_value, password_value FROM logins;"
+    private static let sqlSelectMetadataVersion = "SELECT value FROM meta WHERE key='version'"
 
     init(chromiumDataDirectoryURL: URL, processName: String, decryptionKey: String? = nil) {
         self.chromiumLocalLoginDirectoryURL = chromiumDataDirectoryURL.appendingPathComponent("/Login Data")
@@ -43,6 +46,7 @@ final class ChromiumLoginReader {
         self.decryptionKey = decryptionKey
     }
 
+    // swiftlint:disable:next function_body_length
     func readLogins() -> Result<[ImportedLoginCredential], ChromiumLoginReader.ImportError> {
         guard let key = self.decryptionKey ?? promptForChromiumPasswordKeychainAccess(), let derivedKey = deriveKey(from: key) else {
             return .failure(.decryptionFailed)
@@ -52,21 +56,29 @@ final class ChromiumLoginReader {
             .filter { FileManager.default.fileExists(atPath: $0.path) }
 
         guard !loginFileURLs.isEmpty else {
-            return .failure(.databaseAccessFailed)
+            return .failure(.couldNotFindLoginData)
         }
 
         var loginRows = [ChromiumCredential.ID: ChromiumCredential]()
+        var version = "unknown"
 
         for loginFileURL in loginFileURLs {
             let temporaryFileHandler = TemporaryFileHandler(fileURL: loginFileURL)
             defer { temporaryFileHandler.deleteTemporarilyCopiedFile() }
             
             guard case let .success(temporaryDatabaseURL) = temporaryFileHandler.copyFileToTemporaryDirectory() else {
-                return .failure(.databaseAccessFailed)
+                return .failure(.failedToTemporarilyCopyDatabase)
             }
             
             do {
                 let queue = try DatabaseQueue(path: temporaryDatabaseURL.path)
+                
+                try queue.read { database in
+                    // Extract the version first, in case an error occurs later on in the function.
+                    if let fetchedVersion = try? String.fetchOne(database, sql: Self.sqlSelectMetadataVersion) {
+                        version = fetchedVersion
+                    }
+                }
 
                 var rows = [ChromiumCredential]()
 
@@ -89,7 +101,7 @@ final class ChromiumLoginReader {
                 }
 
             } catch {
-                return .failure(.databaseAccessFailed)
+                return .failure(.databaseAccessFailed(version))
             }
         }
 

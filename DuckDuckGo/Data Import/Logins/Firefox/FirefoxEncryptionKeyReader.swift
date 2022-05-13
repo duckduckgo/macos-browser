@@ -29,6 +29,7 @@ protocol FirefoxEncryptionKeyReading {
 
 final class FirefoxEncryptionKeyReader: FirefoxEncryptionKeyReading {
     
+    // swiftlint:disable:next function_body_length
     func getEncryptionKey(databaseURL: URL, primaryPassword: String) -> Result<Data, FirefoxLoginReader.ImportError> {
         let temporaryFileHandler = TemporaryFileHandler(fileURL: databaseURL)
         
