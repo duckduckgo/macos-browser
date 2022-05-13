@@ -32,7 +32,9 @@ final class AppStateRestorationManager {
 
     func applicationDidFinishLaunching() {
         do {
-            try service.restoreState(using: WindowsManager.restoreState(from:))
+            if StartupPreferences().restorePreviousSession {
+                try service.restoreState(using: WindowsManager.restoreState(from:))
+            }
         } catch CocoaError.fileReadNoSuchFile {
             // ignore
         } catch {

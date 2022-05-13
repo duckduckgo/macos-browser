@@ -24,6 +24,7 @@ extension Preferences {
 
     struct DefaultBrowserView: View {
         @ObservedObject var model: DefaultBrowserPreferences
+        @ObservedObject var startupModel: StartupPreferences
 
         var body: some View {
             VStack(alignment: .leading, spacing: 0) {
@@ -44,6 +45,13 @@ extension Preferences {
                         }
                     }
                 }
+
+                Section {
+                    Text(UserText.startup)
+                        .font(Const.Fonts.preferencePaneSectionHeader)
+                    Toggle(UserText.restorePreviousSession, isOn: $startupModel.restorePreviousSession)
+                }
+
             }
         }
     }
