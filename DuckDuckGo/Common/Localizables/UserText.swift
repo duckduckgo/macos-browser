@@ -273,11 +273,6 @@ struct UserText {
 
     // MARK: - Login Import & Export
 
-    static func closeBrowserWarningFor(browser: String) -> String {
-        let localized = NSLocalizedString("import.close.browser.warning", value: "You must quit %@ before importing data.", comment: "Quit browser warning when importing data")
-        return String(format: localized, browser)
-    }
-
     static let importLoginsCSV = NSLocalizedString("import.logins.csv.title", value: "CSV Logins File", comment: "Title text for the CSV importer")
 
     static let csvImportDescription = NSLocalizedString("import.logins.csv.description", value: "The CSV importer will try to match column headers to their position.\nIf there is no header, it supports two formats:\n\n1. URL, Username, Password\n2. Title, URL, Username, Password", comment: "Description text for the CSV importer")
