@@ -21,6 +21,7 @@ import Carbon.HIToolbox
 import Combine
 import os.log
 
+// swiftlint:disable:next type_body_length
 final class MainViewController: NSViewController {
 
     @IBOutlet weak var tabBarContainerView: NSView!

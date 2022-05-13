@@ -146,15 +146,15 @@ final class MainWindow: NSWindow {
             shadow.stroke = 2
             frv = shadow
 
-            let frame = (firstResponder as? NSView)!.bounds
+            let frame = firstResponder.bounds
             firstResponder.enclosingScrollView?.postsBoundsChangedNotifications = true
             c = NotificationCenter.default.addObserver(forName: NSView.boundsDidChangeNotification,
                                                        object: firstResponder.enclosingScrollView?.contentView,
                                                        queue: nil) { [weak shadow, cont] _ in
 
-                shadow?.frame = (firstResponder as? NSView)!.convert(frame, to: cont) // self.contentView!.superview!)
+                shadow?.frame = firstResponder.convert(frame, to: cont) // self.contentView!.superview!)
             }
-            shadow.frame = (firstResponder as? NSView)!.convert(frame, to: cont) // self.contentView!.superview!)
+            shadow.frame = firstResponder.convert(frame, to: cont) // self.contentView!.superview!)
 
             shadow.shadowColor = NSColor.controlAccentColor
             shadow.shadowRadius = 0

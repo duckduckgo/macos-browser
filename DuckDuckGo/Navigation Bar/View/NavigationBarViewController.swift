@@ -20,7 +20,7 @@ import Cocoa
 import Combine
 import os.log
 import BrowserServicesKit
-// swiftlint:disable file_length
+
 final class NavigationView: ColorView {
     override func viewDidMoveToWindow() {
         super.viewDidMoveToWindow()
