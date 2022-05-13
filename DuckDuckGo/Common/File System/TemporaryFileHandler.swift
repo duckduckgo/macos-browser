@@ -25,35 +25,42 @@ final class TemporaryFileHandler {
         case failedToCopyFile
     }
     
-    func copyFileToTemporaryDirectory(fileURL: URL, handler: @escaping (Result<URL, FileHandlerError>) -> Void) {
+    let fileURL: URL
+    let temporaryFileURL: URL
+    
+    init(fileURL: URL) {
+        self.fileURL = fileURL
+        
         let temporaryDirectoryURL = URL(fileURLWithPath: NSTemporaryDirectory(), isDirectory: true)
-        let fileManager = FileManager.default
-        
-        guard fileManager.fileExists(atPath: fileURL.path) else {
-            handler(.failure(.noFileFound))
-            return
-        }
-        
         let fileExtension = fileURL.pathExtension
         let newFileName = UUID().uuidString
         let finalTemporaryFileURL = temporaryDirectoryURL.appendingPathComponent(newFileName).appendingPathExtension(fileExtension)
         
-        do {
-            try fileManager.copyItem(at: fileURL, to: finalTemporaryFileURL)
-        } catch {
-            handler(.failure(.failedToCopyFile))
-            return
+        self.temporaryFileURL = finalTemporaryFileURL
+    }
+    
+    deinit {
+        deleteTemporarilyCopiedFile()
+    }
+    
+    func copyFileToTemporaryDirectory() -> Result<URL, FileHandlerError> {
+        let fileManager = FileManager.default
+        
+        guard fileManager.fileExists(atPath: fileURL.path) else {
+            return .failure(.noFileFound)
         }
         
-        // Pass the newly copied file URL to the handler.
-        handler(.success(finalTemporaryFileURL))
-        
-        // With the handler complete, delete the file.
         do {
-            try fileManager.removeItem(at: finalTemporaryFileURL)
+            try fileManager.copyItem(at: fileURL, to: temporaryFileURL)
         } catch {
-            assertionFailure("Failed to remove temporarily copied file")
+            return .failure(.failedToCopyFile)
         }
+        
+        return .success(temporaryFileURL)
+    }
+    
+    func deleteTemporarilyCopiedFile() {
+        try? FileManager.default.removeItem(at: temporaryFileURL)
     }
     
 }

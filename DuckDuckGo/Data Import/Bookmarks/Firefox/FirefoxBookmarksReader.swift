@@ -27,18 +27,29 @@ final class FirefoxBookmarksReader {
 
     enum ImportError: Error {
         case noBookmarksFileFound
+        case failedToTemporarilyCopyBookmarksFile
         case unexpectedBookmarksDatabaseFormat
     }
 
-    private let firefoxDataDirectoryPath: String
+    private let firefoxDataDirectoryURL: URL
 
-    init(firefoxDataDirectoryPath: String) {
-        self.firefoxDataDirectoryPath = firefoxDataDirectoryPath + "/\(Constants.placesDatabaseName)"
+    init(firefoxDataDirectoryURL: URL) {
+        self.firefoxDataDirectoryURL = firefoxDataDirectoryURL.appendingPathComponent(Constants.placesDatabaseName)
     }
 
     func readBookmarks() -> Result<ImportedBookmarks, FirefoxBookmarksReader.ImportError> {
+        let temporaryFileHandler = TemporaryFileHandler(fileURL: firefoxDataDirectoryURL)
+        
+        defer {
+            temporaryFileHandler.deleteTemporarilyCopiedFile()
+        }
+        
+        guard case let .success(temporaryDatabaseURL) = temporaryFileHandler.copyFileToTemporaryDirectory() else {
+            return .failure(.failedToTemporarilyCopyBookmarksFile)
+        }
+        
         do {
-            let queue = try DatabaseQueue(path: firefoxDataDirectoryPath)
+            let queue = try DatabaseQueue(path: temporaryDatabaseURL.path)
 
             let bookmarks: DatabaseBookmarks = try queue.read { database in
                 guard let rootEntries = try? FolderRow.fetchAll(database, sql: rootEntryQuery()), let rootEntry = rootEntries.first else {

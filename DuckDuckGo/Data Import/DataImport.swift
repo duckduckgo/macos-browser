@@ -252,6 +252,7 @@ struct DataImportError: Error {
         case cannotAccessCoreData
         case couldNotGetDecryptionKey
         case cannotDecryptFile
+        case failedToTemporarilyCopyFile
     }
     
     static func generic(_ errorType: ImportErrorType) -> DataImportError {
@@ -266,6 +267,7 @@ struct DataImportError: Error {
         switch errorType {
         case .noBookmarksFileFound: return DataImportError(actionType: .bookmarks, errorType: .noFileFound)
         case .unexpectedBookmarksDatabaseFormat: return DataImportError(actionType: .bookmarks, errorType: .cannotReadFile)
+        case .failedToTemporarilyCopyBookmarksFile: return DataImportError(actionType: .bookmarks, errorType: .failedToTemporarilyCopyFile)
         }
     }
     

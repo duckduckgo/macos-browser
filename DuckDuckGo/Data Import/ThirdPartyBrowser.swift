@@ -68,9 +68,9 @@ enum ThirdPartyBrowser: CaseIterable {
 
     var shouldQuitBeforeImport: Bool {
         switch self {
-        case .brave, .chrome, .edge, .firefox:
+        case .brave, .chrome, .edge:
             return true
-        case .safari, .lastPass, .onePassword:
+        case .safari, .lastPass, .onePassword, .firefox:
             return false
         }
     }

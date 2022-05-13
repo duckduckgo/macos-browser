@@ -75,7 +75,7 @@ final class FirefoxDataImporter: DataImporter {
         }
 
         if types.contains(.bookmarks) {
-            let bookmarkReader = FirefoxBookmarksReader(firefoxDataDirectoryPath: firefoxProfileURL.absoluteString)
+            let bookmarkReader = FirefoxBookmarksReader(firefoxDataDirectoryURL: firefoxProfileURL)
             let bookmarkResult = bookmarkReader.readBookmarks()
 
             switch bookmarkResult {
