@@ -38,15 +38,20 @@ final class SaveCredentialsViewController: NSViewController {
         return controller
     }
 
+    @IBOutlet var titleLabel: NSTextField!
     @IBOutlet var faviconImage: NSImageView!
     @IBOutlet var domainLabel: NSTextField!
     @IBOutlet var usernameField: NSTextField!
     @IBOutlet var hiddenPasswordField: NSSecureTextField!
     @IBOutlet var visiblePasswordField: NSTextField!
+    
     @IBOutlet var notNowButton: NSButton!
     @IBOutlet var saveButton: NSButton!
     @IBOutlet var updateButton: NSButton!
     @IBOutlet var dontUpdateButton: NSButton!
+    @IBOutlet var doneButton: NSButton!
+    @IBOutlet var editButton: NSButton!
+    
     @IBOutlet var fireproofCheck: NSButton!
 
     weak var delegate: SaveCredentialsDelegate?
@@ -63,23 +68,51 @@ final class SaveCredentialsViewController: NSViewController {
         let string = hiddenPasswordField.isHidden ? visiblePasswordField.stringValue : hiddenPasswordField.stringValue
         return string.data(using: .utf8)!
     }
-
+    
     /// Note that if the credentials.account.id is not nil, then we consider this an update rather than a save.
-    func saveCredentials(_ credentials: SecureVaultModels.WebsiteCredentials) {
+    func update(credentials: SecureVaultModels.WebsiteCredentials, automaticallySaved: Bool) {
         self.credentials = credentials
         self.domainLabel.stringValue = credentials.account.domain
         self.usernameField.stringValue = credentials.account.username
         self.hiddenPasswordField.stringValue = String(data: credentials.password, encoding: .utf8) ?? ""
         self.visiblePasswordField.stringValue = self.hiddenPasswordField.stringValue
         self.loadFaviconForDomain(credentials.account.domain)
-
-        notNowButton.isHidden = credentials.account.id != nil
-        saveButton.isHidden = credentials.account.id != nil
-
-        updateButton.isHidden = credentials.account.id == nil
-        dontUpdateButton.isHidden = credentials.account.id == nil
         
         fireproofCheck.state = FireproofDomains.shared.isFireproof(fireproofDomain: credentials.account.domain) ? .on : .off
+        
+        // Only use the non-editable state if a credential was automatically saved and it didn't already exist.
+        let condition = credentials.account.id != nil && !credentials.account.username.isEmpty && automaticallySaved 
+        updateViewState(editable: !condition)
+    }
+    
+    private func updateViewState(editable: Bool) {
+        usernameField.setEditable(editable)
+        hiddenPasswordField.setEditable(editable)
+        visiblePasswordField.setEditable(editable)
+
+        if editable {
+            notNowButton.isHidden = credentials?.account.id != nil
+            saveButton.isHidden = credentials?.account.id != nil
+            updateButton.isHidden = credentials?.account.id == nil
+            dontUpdateButton.isHidden = credentials?.account.id == nil
+            
+            editButton.isHidden = true
+            doneButton.isHidden = true
+            
+            titleLabel.stringValue = UserText.pmSaveCredentialsEditableTitle
+            usernameField.makeMeFirstResponder()
+        } else {
+            notNowButton.isHidden = true
+            saveButton.isHidden = true
+            updateButton.isHidden = true
+            dontUpdateButton.isHidden = true
+
+            editButton.isHidden = false
+            doneButton.isHidden = false
+            
+            titleLabel.stringValue = UserText.pmSaveCredentialsNonEditableTitle
+            view.window?.makeFirstResponder(nil)
+        }
     }
 
     @IBAction func onSaveClicked(sender: Any?) {
@@ -136,6 +169,14 @@ final class SaveCredentialsViewController: NSViewController {
         }
 
         Pixel.fire(.fireproofSuggested())
+    }
+    
+    @IBAction func onEditClicked(sender: Any?) {
+        updateViewState(editable: true)
+    }
+    
+    @IBAction func onDoneClicked(sender: Any?) {
+        delegate?.shouldCloseSaveCredentialsViewController(self)
     }
 
     @IBAction func onTogglePasswordVisibility(sender: Any?) {

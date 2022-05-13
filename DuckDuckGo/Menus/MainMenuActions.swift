@@ -515,6 +515,12 @@ extension MainViewController {
         NotificationCenter.default.post(name: .ShowSaveCredentialsPopover, object: nil)
         #endif
     }
+    
+    @IBAction func showCredentialsSavedPopover(_ sender: Any?) {
+        #if DEBUG || REVIEW
+        NotificationCenter.default.post(name: .ShowCredentialsSavedPopover, object: nil)
+        #endif
+    }
 
     // MARK: - Developer Tools
 

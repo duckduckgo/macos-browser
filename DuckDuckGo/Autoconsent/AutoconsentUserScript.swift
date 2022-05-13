@@ -40,7 +40,7 @@ final class AutoconsentUserScript: NSObject, UserScriptWithAutoconsent {
     
     enum Constants {
         static let newSitePopupHidden = Notification.Name("newSitePopupHidden")
-        static let popupHiddenHostKey = "popupHiddenHostKey"
+        static let popupHiddenUrlKey = "popupHiddenUrlKey"
     }
     
     private enum MessageName: String, CaseIterable {
@@ -120,7 +120,15 @@ final class AutoconsentUserScript: NSObject, UserScriptWithAutoconsent {
                 self.actionInProgress = false
                 return
             }
-            os_log("popup found from %s", log: .autoconsent, type: .info, String(describing: cmp.ruleName))
+            os_log("CMP found: %s", log: .autoconsent, type: .info, String(describing: cmp.ruleName))
+
+            guard await Self.background.isPopupOpen(in: self.tabId) else {
+                os_log("popup not open", log: .autoconsent, type: .debug)
+                self.actionInProgress = false
+                return
+            }
+            os_log("Open popup found: %s", log: .autoconsent, type: .info, String(describing: cmp.ruleName))
+
             // check if the user has explicitly enabled the feature
             self.checkUserWasPrompted { enabled in
                 guard enabled else {
@@ -170,12 +178,6 @@ final class AutoconsentUserScript: NSObject, UserScriptWithAutoconsent {
 
     @MainActor
     func runOptOut(for cmp: AutoconsentBackground.ActionResponse, on url: URL) async {
-        guard await Self.background.isPopupOpen(in: self.tabId) else {
-            os_log("popup not open", log: .autoconsent, type: .debug)
-            self.actionInProgress = false
-            return
-        }
-        
         let optOutSuccessful = await Self.background.doOptOut(in: self.tabId)
         guard optOutSuccessful else {
             os_log("opt out failed: %s", log: .autoconsent, type: .error, String(describing: cmp.ruleName))
@@ -188,7 +190,7 @@ final class AutoconsentUserScript: NSObject, UserScriptWithAutoconsent {
         // post popover notification on main thread
         DispatchQueue.main.async {
             NotificationCenter.default.post(name: Constants.newSitePopupHidden, object: self, userInfo: [
-                Constants.popupHiddenHostKey: url.host ?? ""
+                Constants.popupHiddenUrlKey: url
             ])
         }
 

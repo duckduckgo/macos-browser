@@ -32,4 +32,13 @@ struct SafariVersionReader {
         return versionNumber
     }
 
+    static func getMajorVersion() -> Int? {
+        if let safariVersionString = SafariVersionReader.getVersion(),
+           let majorVersion = safariVersionString.components(separatedBy: ".")[safe: 0] {
+            return Int(majorVersion)
+        } else {
+            return nil
+        }
+    }
+
 }

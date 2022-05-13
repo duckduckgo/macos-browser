@@ -697,6 +697,12 @@ CQ
                                                             <action selector="showSaveCredentialsPopover:" target="Ady-hI-5gd" id="zgU-tH-zHa"/>
                                                         </connections>
                                                     </menuItem>
+                                                    <menuItem title="Show Credentials Saved Popover" id="Odn-Rg-Mjy">
+                                                        <modifierMask key="keyEquivalentModifierMask"/>
+                                                        <connections>
+                                                            <action selector="showCredentialsSavedPopover:" target="Ady-hI-5gd" id="f2c-5P-iB5"/>
+                                                        </connections>
+                                                    </menuItem>
                                                 </items>
                                             </menu>
                                         </menuItem>

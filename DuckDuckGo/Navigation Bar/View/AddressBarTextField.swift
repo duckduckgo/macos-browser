@@ -233,6 +233,11 @@ final class AddressBarTextField: NSTextField {
         }
     }
 
+    fileprivate func handlePastedURL() {
+        handleTextDidChange()
+        selectToTheEnd(from: stringValueWithoutSuffix.count)
+    }
+
     private func addressBarEnterPressed() {
         suggestionContainerViewModel?.clearUserStringValue()
 
@@ -458,7 +463,7 @@ final class AddressBarTextField: NSTextField {
             case .text: self = Suffix.search
             case .url(urlString: _, url: let url, userTyped: let userTyped):
                 guard userTyped,
-                      let host = url.host
+                      let host = url.root?.toString(decodePunycode: true, dropScheme: true, dropTrailingSlash: true)
                 else { return nil }
                 self = Suffix.visit(host: host)
             case .suggestion(let suggestionViewModel):
@@ -471,7 +476,9 @@ final class AddressBarTextField: NSTextField {
             case .phrase(phrase: _):
                 self = Suffix.search
             case .website(url: let url):
-                guard let host = url.host else { return nil }
+                guard let host = url.root?.toString(decodePunycode: true, dropScheme: true, dropTrailingSlash: true) else {
+                    return nil
+                }
                 self = Suffix.visit(host: host)
 
             case .bookmark(title: _, url: let url, isFavorite: _, allowedInTopHits: _),
@@ -480,11 +487,7 @@ final class AddressBarTextField: NSTextField {
                    !title.isEmpty,
                    suggestionViewModel.autocompletionString != title {
                     self = .title(title)
-                } else if let host = url.host?.dropWWW(),
-                          host == url.toString(decodePunycode: false,
-                                               dropScheme: true,
-                                               needsWWW: false,
-                                               dropTrailingSlash: true) {
+                } else if let host = url.root?.toString(decodePunycode: true, dropScheme: true, needsWWW: false, dropTrailingSlash: true) {
                     self = .visit(host: host)
                 } else {
                     self = .url(url)
@@ -584,27 +587,6 @@ final class AddressBarTextField: NSTextField {
         }
     }()
 
-    @objc private func toggleAutocomplete(_ menuItem: NSMenuItem) {
-        AppearancePreferences.shared.showAutocompleteSuggestions.toggle()
-
-        let shouldShowAutocomplete = AppearancePreferences.shared.showAutocompleteSuggestions
-
-        menuItem.state = shouldShowAutocomplete ? .on : .off
-
-        if shouldShowAutocomplete {
-            handleTextDidChange()
-        } else {
-            hideSuggestionWindow()
-        }
-    }
-    
-    @objc private func toggleShowFullWebsiteAddress(_ menuItem: NSMenuItem) {
-        AppearancePreferences.shared.showFullURL.toggle()
-
-        let shouldShowFullURL = AppearancePreferences.shared.showFullURL
-        menuItem.state = shouldShowFullURL ? .on : .off
-    }
-
     private func initSuggestionWindow() {
         let windowController = NSStoryboard.suggestion
             .instantiateController(withIdentifier: "SuggestionWindowController") as? NSWindowController
@@ -688,6 +670,49 @@ final class AddressBarTextField: NSTextField {
 
         // pixel-perfect window adjustment for fractional points
         suggestionViewController.pixelPerfectConstraint.constant = converted.x - rounded.x
+    }
+
+    // MARK: - Menu Actions
+
+    @objc private func pasteAndGo(_ menuItem: NSMenuItem) {
+        guard let pasteboardString = NSPasteboard.general.string(forType: .string),
+              let url = URL(trimmedAddressBarString: pasteboardString.trimmingWhitespaces()) else {
+                  assertionFailure("Pasteboard doesn't contain URL")
+                  return
+              }
+
+        tabCollectionViewModel.selectedTabViewModel?.tab.update(url: url)
+    }
+
+    @objc private func pasteAndSearch(_ menuItem: NSMenuItem) {
+        guard let pasteboardString = NSPasteboard.general.string(forType: .string),
+              let searchURL = URL.makeSearchUrl(from: pasteboardString) else {
+                  assertionFailure("Can't create search URL from pasteboard string")
+                  return
+              }
+
+        tabCollectionViewModel.selectedTabViewModel?.tab.update(url: searchURL)
+    }
+
+    @objc private func toggleAutocomplete(_ menuItem: NSMenuItem) {
+        AppearancePreferences.shared.showAutocompleteSuggestions.toggle()
+
+        let shouldShowAutocomplete = AppearancePreferences.shared.showAutocompleteSuggestions
+
+        menuItem.state = shouldShowAutocomplete ? .on : .off
+
+        if shouldShowAutocomplete {
+            handleTextDidChange()
+        } else {
+            hideSuggestionWindow()
+        }
+    }
+
+    @objc private func toggleShowFullWebsiteAddress(_ menuItem: NSMenuItem) {
+        AppearancePreferences.shared.showFullURL.toggle()
+
+        let shouldShowFullURL = AppearancePreferences.shared.showFullURL
+        menuItem.state = shouldShowFullURL ? .on : .off
     }
 
 }
@@ -844,6 +869,11 @@ extension AddressBarTextField: NSTextViewDelegate {
             makeFullWebsiteAddressMenuItem(),
             NSMenuItem.separator()
         ]
+
+        if let pasteMenuItemIndex = pasteMenuItemIndex(within: menu),
+           let pasteAndDoMenuItem = makePasteAndDoMenuItem() {
+            textViewMenu.insertItem(pasteAndDoMenuItem, at: pasteMenuItemIndex + 1)
+        }
         
         if let insertionPoint = menuItemInsertionPoint(within: menu) {
             additionalMenuItems.reversed().forEach { item in
@@ -878,6 +908,15 @@ extension AddressBarTextField: NSTextViewDelegate {
         }
 
         return nil
+    }
+
+    private func pasteMenuItemIndex(within menu: NSMenu) -> Int? {
+        let pasteSelector = "paste:"
+        let index = menu.items.firstIndex { menuItem in
+            guard let action = menuItem.action else { return false }
+            return pasteSelector == action.description
+        }
+        return index
     }
 
     private static var selectorsToRemove: Set<Selector> = Set([
@@ -931,14 +970,50 @@ extension AddressBarTextField: NSTextViewDelegate {
 
         return menuItem
     }
+
+    private static var pasteAndGoMenuItem: NSMenuItem {
+        NSMenuItem(
+            title: UserText.pasteAndGo,
+            action: #selector(pasteAndGo(_:)),
+            keyEquivalent: ""
+        )
+    }
+
+    private static var pasteAndSearchMenuItem: NSMenuItem {
+        NSMenuItem(
+            title: UserText.pasteAndSearch,
+            action: #selector(pasteAndSearch(_:)),
+            keyEquivalent: ""
+        )
+    }
+
+    private func makePasteAndDoMenuItem() -> NSMenuItem? {
+        if let trimmedPasteboardString = NSPasteboard.general.string(forType: .string)?.trimmingWhitespaces(),
+           trimmedPasteboardString.count > 0 {
+            if URL(trimmedAddressBarString: trimmedPasteboardString) != nil {
+                return Self.pasteAndGoMenuItem
+            } else {
+                return Self.pasteAndSearchMenuItem
+            }
+        }
+
+        return nil
+    }
 }
 
 final class AddressBarTextEditor: NSTextView {
 
     override func paste(_ sender: Any?) {
+        guard let delegate = delegate as? AddressBarTextField else {
+            os_log("AddressBarTextEditor: unexpected kind of delegate")
+            super.paste(sender)
+            return
+        }
+
         // Fixes an issue when url-name instead of url is pasted
         if let urlString = NSPasteboard.general.string(forType: .URL) {
             string = urlString
+            delegate.handlePastedURL()
         } else {
             super.paste(sender)
         }
