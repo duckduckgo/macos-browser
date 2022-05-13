@@ -148,17 +148,6 @@ extension NSView {
         }
     }
 
-    func isInViewHierarchy(of rootView: NSView) -> Bool {
-        var superview: NSView? = self
-        while superview != nil {
-            if superview === rootView {
-                return true
-            }
-            superview = superview?.superview
-        }
-        return false
-    }
-
     // MARK: - Favicon
 
     func applyFaviconStyle() {

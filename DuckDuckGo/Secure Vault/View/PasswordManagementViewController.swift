@@ -153,7 +153,7 @@ final class PasswordManagementViewController: NSViewController {
         listContainer.isHidden = true
         itemContainer.isHidden = true
 
-        view.window?.makeFirstResponder(NSApp.isFullKeyboardAccessEnabled ? unlockButton : nil)
+        unlockButton.makeMeFirstResponder()
     }
 
     private func hideLockScreen() {
@@ -162,6 +162,8 @@ final class PasswordManagementViewController: NSViewController {
         addVaultItemButton.isEnabled = true
         listContainer.isHidden = false
         itemContainer.isHidden = false
+
+        searchField.makeMeFirstResponder()
     }
 
     override func viewWillAppear() {

@@ -205,6 +205,7 @@ final class FirePopoverViewController: NSViewController {
     private func toggleDetails() {
         let showDetails = detailsWrapperView.isHidden
         openWrapperView.isHidden = showDetails
+        closeDetailsButton.isHidden = !showDetails
         detailsWrapperView.isHidden = !showDetails
 
         updateWarningWrapperView()

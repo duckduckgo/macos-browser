@@ -244,7 +244,7 @@ final class MainViewController: NSViewController {
     }
 
     func toggleToolbarFocus() {
-        if (view.window?.firstResponder as? NSView)?.isInViewHierarchy(of: browserTabViewController.view) ?? true {
+        if (view.window?.firstResponder as? NSView)?.isDescendant(of: browserTabViewController.view) ?? true {
             self.navigationBarViewController.view.nextValidKeyView?.makeMeFirstResponder()
             return
         }

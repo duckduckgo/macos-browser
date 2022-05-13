@@ -211,8 +211,9 @@ final class BrowserTabViewController: NSViewController {
         DispatchQueue.main.async { [weak self] in
             guard let self = self,
                   self.webView?.url != nil,
-                  self.webView?.window?.firstResponder is WebView
-                    || self.webView?.window?.firstResponder?.acceptsFirstResponder != true
+                  (self.view.window as? MainWindow)?.displayedPopovers.isEmpty == true,
+                  self.view.window?.firstResponder is WebView
+                    || self.view.window?.firstResponder?.acceptsFirstResponder != true
             else {
                 return
             }

@@ -60,23 +60,40 @@ final class MainWindow: NSWindow {
 
     // MARK: - First Responder Notification
 
-    private var removedChildWindow: NSWindow?
+    private var addedOrRemovedChildWindow: NSWindow?
+
     override func removeChildWindow(_ childWin: NSWindow) {
-        self.removedChildWindow = childWin
+        self.addedOrRemovedChildWindow = childWin
         super.removeChildWindow(childWin)
-        self.removedChildWindow = nil
+        self.addedOrRemovedChildWindow = nil
+    }
+
+    override func addChildWindow(_ childWin: NSWindow, ordered place: NSWindow.OrderingMode) {
+        self.addedOrRemovedChildWindow = childWin
+        super.addChildWindow(childWin, ordered: place)
+        self.addedOrRemovedChildWindow = nil
     }
 
     var displayedPopovers: [NSPopover] {
         self.childWindows?.compactMap { window in
-            guard window !== removedChildWindow else { return nil }
+            guard window !== addedOrRemovedChildWindow else { return nil }
             return window.contentViewController?.nextResponder as? NSPopover
         } ?? []
     }
 
     override func makeFirstResponder(_ responder: NSResponder?) -> Bool {
         func popoverShouldClose(_ popover: NSPopover) -> Bool {
-            popover.delegate?.popoverShouldClose?(popover) == true
+            if responder == nil {
+                return false
+            } else if let responder = responder as? NSView,
+               let popoverView = popover.contentViewController?.view,
+               responder.isDescendant(of: popoverView) {
+                return false
+            } else if popover.contentViewController?.view.window === responder {
+                return false
+            }
+
+            return popover.delegate?.popoverShouldClose?(popover) == true
                 || [.transient, .semitransient].contains(popover.behavior)
         }
         for popover in displayedPopovers where popoverShouldClose(popover) {
