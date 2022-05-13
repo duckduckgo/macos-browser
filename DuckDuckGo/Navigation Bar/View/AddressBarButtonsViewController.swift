@@ -679,6 +679,9 @@ final class AddressBarButtonsViewController: NSViewController {
             !isHypertextUrl ||
             selectedTabViewModel.errorViewState.isVisible ||
             isTextFieldValueText
+        privacyEntryPointButton.shouldAppearOnFocus = !(isDuckDuckGoUrl ||
+                                                        !isHypertextUrl ||
+                                                        selectedTabViewModel.errorViewState.isVisible)
         imageButtonWrapper.isHidden = view.window?.isPopUpWindow == true
             || !privacyEntryPointButton.isHidden
             || isAnyTrackerAnimationPlaying
