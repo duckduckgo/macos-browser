@@ -60,7 +60,25 @@ final class MainWindow: NSWindow {
 
     // MARK: - First Responder Notification
 
+    private var removedChildWindow: NSWindow?
+    override func removeChildWindow(_ childWin: NSWindow) {
+        self.removedChildWindow = childWin
+        super.removeChildWindow(childWin)
+        self.removedChildWindow = nil
+    }
+
     override func makeFirstResponder(_ responder: NSResponder?) -> Bool {
+        for window in childWindows ?? [] {
+            if let responder = responder as? NSView,
+               let popover = window.contentViewController?.nextResponder as? NSPopover,
+               window !== removedChildWindow,
+               responder.window !== window,
+               popover.delegate?.popoverShouldClose?(popover) == true || [.transient, .semitransient].contains(popover.behavior) {
+
+                popover.close()
+            }
+        }
+
         guard self.firstResponder !== responder else { return true }
         // The only reliable way to detect NSTextField is the first responder
         defer {
