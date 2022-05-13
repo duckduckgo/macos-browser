@@ -29,9 +29,9 @@ class FirefoxKeyReaderTests: XCTestCase {
     }
 
     func testWhenReadingValidKey4Database_AndNoPrimaryPasswordIsSet_ThenKeyIsRead() {
-        let path = resourcesURLWithoutPassword().appendingPathComponent("key4.db").path
+        let databaseURL = resourcesURLWithoutPassword().appendingPathComponent("key4.db")
         let reader = FirefoxEncryptionKeyReader()
-        let result = reader.getEncryptionKey(withDatabaseAt: path, primaryPassword: "")
+        let result = reader.getEncryptionKey(databaseURL: databaseURL, primaryPassword: "")
         
         if case let .success(data) = result {
             XCTAssertEqual(data.count, 24)
@@ -41,9 +41,9 @@ class FirefoxKeyReaderTests: XCTestCase {
     }
     
     func testFirefox59_WhenReadingValidKey4Database_AndNoPrimaryPasswordIsSet_ThenKeyIsRead() {
-        let path = resourcesURLWithoutPassword().appendingPathComponent("key4-firefox59.db").path
+        let databaseURL = resourcesURLWithoutPassword().appendingPathComponent("key4-firefox59.db")
         let reader = FirefoxEncryptionKeyReader()
-        let result = reader.getEncryptionKey(withDatabaseAt: path, primaryPassword: "")
+        let result = reader.getEncryptionKey(databaseURL: databaseURL, primaryPassword: "")
         
         if case let .success(data) = result {
             XCTAssertEqual(data.count, 24)
@@ -53,9 +53,9 @@ class FirefoxKeyReaderTests: XCTestCase {
     }
     
     func testWhenReadingValidKey4Database_AndPrimaryPasswordIsProvided_ThenKeyIsRead() {
-        let path = resourcesURLWithPassword().appendingPathComponent("key4-encrypted.db").path
+        let databaseURL = resourcesURLWithPassword().appendingPathComponent("key4-encrypted.db")
         let reader = FirefoxEncryptionKeyReader()
-        let result = reader.getEncryptionKey(withDatabaseAt: path, primaryPassword: "testpassword")
+        let result = reader.getEncryptionKey(databaseURL: databaseURL, primaryPassword: "testpassword")
         
         if case let .success(data) = result {
             XCTAssertEqual(data.count, 24)
@@ -65,9 +65,9 @@ class FirefoxKeyReaderTests: XCTestCase {
     }
     
     func testWhenReadingValidKey4Database_AndPrimaryPasswordIsNotProvided_ThenKeyIsNotRead() {
-        let path = resourcesURLWithPassword().appendingPathComponent("key4-encrypted.db").path
+        let databaseURL = resourcesURLWithPassword().appendingPathComponent("key4-encrypted.db")
         let reader = FirefoxEncryptionKeyReader()
-        let result = reader.getEncryptionKey(withDatabaseAt: path, primaryPassword: "")
+        let result = reader.getEncryptionKey(databaseURL: databaseURL, primaryPassword: "")
         
         if case let .failure(error) = result {
             XCTAssertEqual(error, .requiresPrimaryPassword)

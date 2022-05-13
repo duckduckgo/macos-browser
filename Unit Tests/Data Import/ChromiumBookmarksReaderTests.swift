@@ -23,7 +23,7 @@ import XCTest
 class ChromiumBookmarksReaderTests: XCTestCase {
 
     func testImportingBookmarks() {
-        let bookmarksReader = ChromiumBookmarksReader(chromiumDataDirectoryPath: resourcePath())
+        let bookmarksReader = ChromiumBookmarksReader(chromiumDataDirectoryURL: resourceURL())
         let bookmarks = bookmarksReader.readBookmarks()
 
         guard case let .success(bookmarks) = bookmarks else {
@@ -35,9 +35,9 @@ class ChromiumBookmarksReaderTests: XCTestCase {
         XCTAssertEqual(bookmarks.topLevelFolders.otherBookmarks.type, "folder")
     }
 
-    private func resourcePath() -> String {
+    private func resourceURL() -> URL {
         let bundle = Bundle(for: ChromiumBookmarksReaderTests.self)
-        return bundle.resourceURL!.appendingPathComponent("Data Import Resources/Test Chrome Data").path
+        return bundle.resourceURL!.appendingPathComponent("Data Import Resources/Test Chrome Data")
     }
 
 }
