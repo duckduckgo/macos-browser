@@ -208,12 +208,16 @@ final class BrowserTabViewController: NSViewController {
     }
 
     private func setFirstResponderIfNeeded() {
-        guard webView?.url != nil else {
-            return
-        }
-
         DispatchQueue.main.async { [weak self] in
-            self?.makeWebViewFirstResponder()
+            guard let self = self,
+                  self.webView?.url != nil,
+                  self.webView?.window?.firstResponder is WebView
+                    || self.webView?.window?.firstResponder?.acceptsFirstResponder != true
+            else {
+                return
+            }
+
+            self.makeWebViewFirstResponder()
         }
     }
 
