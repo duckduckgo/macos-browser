@@ -252,6 +252,10 @@ extension MainViewController {
         navigationBarViewController?.toggleDownloadsPopover(keepButtonVisible: false)
     }
 
+    @IBAction func toggleBookmarksBar(_ sender: Any) {
+        print("Toggling")
+    }
+
     // MARK: - History
 
     @IBAction func back(_ sender: Any?) {

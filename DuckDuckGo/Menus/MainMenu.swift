@@ -54,6 +54,8 @@ final class MainMenu: NSMenu {
     @IBOutlet weak var bookmarkThisPageMenuItem: NSMenuItem?
     @IBOutlet weak var favoritesMenuItem: NSMenuItem?
     @IBOutlet weak var favoriteThisPageMenuItem: NSMenuItem?
+    
+    @IBOutlet weak var toggleBookmarksBarMenuItem: NSMenuItem?
 
     @IBOutlet weak var debugMenuItem: NSMenuItem? {
         didSet {
