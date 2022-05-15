@@ -17,6 +17,7 @@
 //
 
 import CommonCrypto
+import CryptoKit
 
 struct Cryptography {
 
@@ -126,6 +127,17 @@ struct Cryptography {
         }
 
         return Data(bytes: &outBytes, count: outLength)
+    }
+
+}
+
+struct HMAC {
+    
+    static func digestSHA1(key: Data, message: Data) -> Data {
+        let symmetricKey = SymmetricKey(data: key)
+        let authentication = CryptoKit.HMAC<Insecure.SHA1>.authenticationCode(for: message, using: symmetricKey)
+        
+        return Data(authentication)
     }
 
 }

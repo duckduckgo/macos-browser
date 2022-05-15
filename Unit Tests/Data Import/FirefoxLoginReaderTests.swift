@@ -22,11 +22,24 @@ import XCTest
 
 class FirefoxLoginReaderTests: XCTestCase {
 
+    func testWhenImportingFirefox46LoginsWithNoPrimaryPassword_ThenImportSucceeds() {
+        let firefoxLoginReader = FirefoxLoginReader(firefoxProfileURL: resourcesURLWithoutPassword(),
+                                                    databaseFileName: "key3-firefox46.db",
+                                                    loginsFileName: "logins-firefox46.json")
+        let result = firefoxLoginReader.readLogins(dataFormat: .version2)
+
+        if case let .success(logins) = result {
+            XCTAssertEqual(logins, [ImportedLoginCredential(url: "example.com", username: "testusername", password: "testpassword")])
+        } else {
+            XCTFail("Failed to decrypt Firefox logins")
+        }
+    }
+    
     func testWhenImportingLoginsWithNoPrimaryPassword_ThenImportSucceeds() {
         let firefoxLoginReader = FirefoxLoginReader(firefoxProfileURL: resourcesURLWithoutPassword(),
                                                     databaseFileName: "key4.db",
                                                     loginsFileName: "logins.json")
-        let result = firefoxLoginReader.readLogins()
+        let result = firefoxLoginReader.readLogins(dataFormat: .version3)
 
         if case let .success(logins) = result {
             XCTAssertEqual(logins, [ImportedLoginCredential(url: "example.com", username: "testusername", password: "testpassword")])
@@ -39,7 +52,7 @@ class FirefoxLoginReaderTests: XCTestCase {
         let firefoxLoginReader = FirefoxLoginReader(firefoxProfileURL: resourcesURLWithPassword(),
                                                     databaseFileName: "key4-encrypted.db",
                                                     loginsFileName: "logins-encrypted.json")
-        let result = firefoxLoginReader.readLogins()
+        let result = firefoxLoginReader.readLogins(dataFormat: .version3)
 
         if case let .failure(error) = result {
             XCTAssertEqual(error, .requiresPrimaryPassword)
@@ -53,7 +66,7 @@ class FirefoxLoginReaderTests: XCTestCase {
                                                     primaryPassword: "testpassword",
                                                     databaseFileName: "key4-encrypted.db",
                                                     loginsFileName: "logins-encrypted.json")
-        let result = firefoxLoginReader.readLogins()
+        let result = firefoxLoginReader.readLogins(dataFormat: .version3)
 
         if case let .success(logins) = result {
             XCTAssertEqual(logins, [ImportedLoginCredential(url: "example.com", username: "testusername", password: "testpassword")])

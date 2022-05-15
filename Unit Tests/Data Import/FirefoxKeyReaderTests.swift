@@ -23,7 +23,7 @@ import CryptoKit
 
 class FirefoxKeyReaderTests: XCTestCase {
     
-    func testDBOpen() {
+    func testWhenReadingValidKey3Database_AndNoPrimaryPasswordIsSet_ThenKeyIsRead() {
         let databaseURL = resourcesURLWithoutPassword().appendingPathComponent("key3-firefox46.db")
         let reader = FirefoxEncryptionKeyReader()
         let result = reader.getEncryptionKey(key3DatabaseURL: databaseURL, primaryPassword: "")

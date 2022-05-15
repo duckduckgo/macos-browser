@@ -37,23 +37,44 @@ final class FirefoxEncryptionKeyReader: FirefoxEncryptionKeyReading {
         
         guard let globalSalt = result["global-salt"],
               let passwordCheck = result["password-check"],
-              let asnData = result["data"] else {
+              let asnData = result["data"]?[4...] else { // Drop the first 4 bytes, they aren't required for decryption and can be ignored
             return .failure(.decryptionFailed)
         }
         
-        guard let decodedASNData = try? ASN1Parser.parse(data: asnData) else {
+        // Part 1: Take the data from the database and decrypt it.
+        
+        guard let decodedASNData = try? ASN1Parser.parse(data: asnData),
+              let entrySalt = extractKey3EntrySalt(from: decodedASNData),
+              let ciphertext = extractCiphertext(from: decodedASNData)else {
             return .failure(.decryptionFailed)
         }
         
-        guard let iv = extractInitializationVector(from: decodedASNData) else {
+        guard let decryptedData = tripleDesDecrypt(ciphertext: ciphertext,
+                                                   globalSalt: globalSalt,
+                                                   entrySalt: entrySalt,
+                                                   primaryPassword: primaryPassword) else {
             return .failure(.decryptionFailed)
         }
         
-        guard let decryptedItem2 = aesDecrypt(tlv: decodedASNData, iv: iv, globalSalt: globalSalt, primaryPassword: primaryPassword) else {
+        // Part 2: Take the decrypted ASN1 data, parse it, and extract the key.
+        
+        guard let decryptedASNData = try? ASN1Parser.parse(data: decryptedData) else {
             return .failure(.decryptionFailed)
         }
         
-        return .failure(.databaseAccessFailed)
+        guard let deeperDecryptedData = extractKey3DecryptedASNData(from: decryptedASNData) else {
+            return .failure(.decryptionFailed)
+        }
+        
+        guard let deeperStillDecryptedData = try? ASN1Parser.parse(data: deeperDecryptedData) else {
+            return .failure(.decryptionFailed)
+        }
+        
+        guard let key = extractKey3Key(from: deeperStillDecryptedData) else {
+            return .failure(.decryptionFailed)
+        }
+        
+        return .success(key)
     }
     
     // swiftlint:disable:next function_body_length
@@ -126,66 +147,94 @@ final class FirefoxEncryptionKeyReader: FirefoxEncryptionKeyReading {
             return .failure(.databaseAccessFailed)
         }
     }
+
+    // MARK: - Key3 Database Parsing
     
-//    private func extractKey(from data: Data, globalSalt: Data, primaryPassword: String) -> Result<Data, FirefoxLoginReader.ImportError> {
-//        guard let decodedItem2 = try? ASN1Parser.parse(data: data),
-//              let iv = extractInitializationVector(from: decodedItem2),
-//              let decryptedItem2 = aesDecrypt(tlv: decodedItem2, iv: iv, globalSalt: globalSalt, primaryPassword: primaryPassword) else {
-//            return .failure(.decryptionFailed)
-//        }
-//
-//        let string = String(data: decryptedItem2, encoding: .utf8)
-//
-//        // The password check is technically "password-check\x02\x02", it's converted to UTF-8 and checked here for simplicity
-//        if string != "password-check" {
-//            return .failure(.requiresPrimaryPassword)
-//        }
-//
-//        guard let nssPrivateRow = try? Row.fetchOne(database, sql: "SELECT a11, a102 FROM nssPrivate;") else {
-//            return .failure(.decryptionFailed)
-//        }
-//
-//        let a11: Data = nssPrivateRow["a11"]
-//        let a102: Data = nssPrivateRow["a102"]
-//
-//        assert(a102 == Data([248, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1]))
-//
-//        guard let decodedA11 = try? ASN1Parser.parse(data: a11), let finalIV = extractInitializationVector(from: decodedA11) else {
-//            return .failure(.decryptionFailed)
-//        }
-//
-//        return aesDecrypt(tlv: decodedA11, iv: finalIV, globalSalt: globalSalt, primaryPassword: primaryPassword)
-//    }
-    
-    private func aesDecrypt(tlv: ASN1Parser.Node,
-                            iv: Data,
-                            globalSalt: Data,
-                            primaryPassword: String) -> Data? {
-        guard let data = extractCiphertext(from: tlv),
-              let entrySalt = extractEntrySalt(from: tlv),
-              let iterationCount = extractIterationCount(from: tlv),
-              let keyLength = extractKeyLength(from: tlv) else { return nil }
-
-        assert(keyLength == 32)
-
-        let passwordData = globalSalt + primaryPassword.data(using: .utf8)!
-        let hashData = SHA.from(data: passwordData)
-
-        guard let commonCryptoKey = Cryptography.decryptPBKDF2(password: .base64(hashData.base64EncodedString()),
-                                                               salt: entrySalt,
-                                                               keyByteCount: keyLength,
-                                                               rounds: iterationCount,
-                                                               kdf: .sha256) else { return nil }
-
-        let iv = Data([4, 14]) + iv
-        guard let decryptedData = Cryptography.decryptAESCBC(data: data, key: commonCryptoKey.dataRepresentation, iv: iv) else {
+    private func extractKey3EntrySalt(from tlv: ASN1Parser.Node) -> Data? {
+        guard case let .sequence(outerSequence) = tlv else {
             return nil
         }
 
-        return Data(decryptedData)
+        let firstSequence = outerSequence[0]
+        
+        guard case let .sequence(secondSequence) = firstSequence else {
+            return nil
+        }
+        
+        let penultimateSequence = secondSequence[1]
+        
+        guard case let .sequence(finalSequence) = penultimateSequence else {
+            return nil
+        }
+        
+        let octetString = finalSequence[0]
+        
+        guard case let .octetString(data: data) = octetString else {
+            return nil
+        }
+        
+        return data
     }
     
-    private func extractEntrySalt(from tlv: ASN1Parser.Node) -> Data? {
+    private func extractKey3DecryptedASNData(from node: ASN1Parser.Node) -> Data? {
+        guard case let .sequence(outerSequence) = node else {
+            return nil
+        }
+        
+        let octetString = outerSequence[2]
+        
+        guard case let .octetString(data: data) = octetString else {
+            return nil
+        }
+        
+        return data
+    }
+    
+    private func extractKey3Key(from node: ASN1Parser.Node) -> Data? {
+        guard case let .sequence(outerSequence) = node else {
+            return nil
+        }
+        
+        let integer = outerSequence[3]
+        
+        guard case let .integer(data: data) = integer else {
+            return nil
+        }
+        
+        return data
+    }
+    
+    /// HP = SHA1( global-salt | PrimaryPassword )
+    /// CHP = SHA1( HP | ES )
+    /// k1 = HMAC-SHA1( key=CHP, msg= (PES | ES) )
+    /// tk = HMAC-SHA1( CHP, PES )
+    /// k2 = HMAC-SHA1( CHP, tk | ES )
+    /// k = k1 | k2
+    /// key = k[:24] # first 24 bytes (EDE keying, also called 3TDEA)
+    /// iv = k[-8:]  # last 8 bytes
+    /// clearText = DES3.new(key, DES3.CBC, iv).decrypt(cipherText)
+    private func tripleDesDecrypt(ciphertext: Data, globalSalt: Data, entrySalt: Data, primaryPassword: String) -> Data? {
+        guard let primaryPasswordData = primaryPassword.data(using: .utf8) else {
+            return nil
+        }
+
+        let hp = SHA.from(data: globalSalt + primaryPasswordData)
+        let chp = SHA.from(data: hp + entrySalt)
+        let pes = entrySalt // TODO: Pad this to 20 bytes
+        let k1 = HMAC.digestSHA1(key: chp, message: (pes + entrySalt))
+        let tk = HMAC.digestSHA1(key: chp, message: pes)
+        let k2 = HMAC.digestSHA1(key: chp, message: (tk + entrySalt))
+        let k = k1 + k2
+
+        let key = k.prefix(24)
+        let iv = k.suffix(8)
+        
+        return Cryptography.decrypt3DES(data: ciphertext, key: key, iv: iv)
+    }
+
+    // MARK: - Key4 Database Parsing
+    
+    private func extractKey4EntrySalt(from tlv: ASN1Parser.Node) -> Data? {
         guard case let .sequence(values1) = tlv else {
             return nil
         }
@@ -343,6 +392,34 @@ final class FirefoxEncryptionKeyReader: FirefoxEncryptionKeyReading {
         return data
     }
     
+    private func aesDecrypt(tlv: ASN1Parser.Node,
+                            iv: Data,
+                            globalSalt: Data,
+                            primaryPassword: String) -> Data? {
+        guard let data = extractCiphertext(from: tlv),
+              let entrySalt = extractKey4EntrySalt(from: tlv),
+              let iterationCount = extractIterationCount(from: tlv),
+              let keyLength = extractKeyLength(from: tlv) else { return nil }
+
+        assert(keyLength == 32)
+
+        let passwordData = globalSalt + primaryPassword.data(using: .utf8)!
+        let hashData = SHA.from(data: passwordData)
+
+        guard let commonCryptoKey = Cryptography.decryptPBKDF2(password: .base64(hashData.base64EncodedString()),
+                                                               salt: entrySalt,
+                                                               keyByteCount: keyLength,
+                                                               rounds: iterationCount,
+                                                               kdf: .sha256) else { return nil }
+
+        let iv = Data([4, 14]) + iv
+        guard let decryptedData = Cryptography.decryptAESCBC(data: data, key: commonCryptoKey.dataRepresentation, iv: iv) else {
+            return nil
+        }
+
+        return Data(decryptedData)
+    }
+
 }
 
 private struct SHA {

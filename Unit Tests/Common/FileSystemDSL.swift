@@ -25,8 +25,8 @@ enum FileSystemEntity {
     
     var name: String {
         switch self {
-        case .file(let name, let contents): return name
-        case .directory(let name, let children): return name
+        case .file(let name, _): return name
+        case .directory(let name, _): return name
         }
     }
 

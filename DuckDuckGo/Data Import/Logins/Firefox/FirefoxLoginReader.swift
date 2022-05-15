@@ -32,9 +32,16 @@ final class FirefoxLoginReader {
         case failedToTemporarilyCopyFile
     }
 
-    private enum SupportedDatabaseLoginFileNamePairs {
-        static let version2 = (database: "key3.db", loginFile: "logins.json")
-        static let version3 = (database: "key4.db", loginFile: "logins.json")
+    enum DataFormat {
+        case version2
+        case version3
+        
+        var formatFileNames: (databaseName: String, loginFileName: String) {
+            switch self {
+            case .version2: return (databaseName: "key3.db", loginFileName: "logins.json")
+            case .version3: return (databaseName: "key4.db", loginFileName: "logins.json")
+            }
+        }
     }
 
     private let keyReader: FirefoxEncryptionKeyReading
@@ -46,13 +53,13 @@ final class FirefoxLoginReader {
 
     /// Initialize a FirefoxLoginReader with a profile path and optional primary password.
     ///
-    /// - Parameter firefoxProfileURL: The path to the profile being imported from. This should be the base path of the profile, containing the `key4.db` and `logins.json` files.
+    /// - Parameter firefoxProfileURL: The path to the profile being imported from. This should be the base path of the profile, containing the database and JSON files.
     /// - Parameter primaryPassword: The password used to decrypt the login data. This is optional, as Firefox's primary password feature is optional.
     init(firefoxProfileURL: URL,
          keyReader: FirefoxEncryptionKeyReading = FirefoxEncryptionKeyReader(),
          primaryPassword: String? = nil,
-         databaseFileName: String = SupportedDatabaseLoginFileNamePairs.version3.database,
-         loginsFileName: String = SupportedDatabaseLoginFileNamePairs.version3.loginFile) {
+         databaseFileName: String = DataFormat.version3.formatFileNames.databaseName,
+         loginsFileName: String = DataFormat.version3.formatFileNames.loginFileName) {
 
         self.keyReader = keyReader
         self.primaryPassword = primaryPassword
@@ -61,7 +68,7 @@ final class FirefoxLoginReader {
         self.firefoxProfileURL = firefoxProfileURL
     }
 
-    func readLogins() -> Result<[ImportedLoginCredential], FirefoxLoginReader.ImportError> {
+    func readLogins(dataFormat: DataFormat) -> Result<[ImportedLoginCredential], FirefoxLoginReader.ImportError> {
         let databaseURL = firefoxProfileURL.appendingPathComponent(keyDatabaseName)
         let loginsFileURL = firefoxProfileURL.appendingPathComponent(loginsFileName)
         
@@ -75,8 +82,13 @@ final class FirefoxLoginReader {
             return .failure(.couldNotReadLoginsFile)
         }
 
-        let encryptionKeyResult = keyReader.getEncryptionKey(key4DatabaseURL: databaseURL, primaryPassword: primaryPassword ?? "")
+        let encryptionKeyResult: Result<Data, FirefoxLoginReader.ImportError>
 
+        switch dataFormat {
+        case .version2: encryptionKeyResult = keyReader.getEncryptionKey(key3DatabaseURL: databaseURL, primaryPassword: primaryPassword ?? "")
+        case .version3: encryptionKeyResult = keyReader.getEncryptionKey(key4DatabaseURL: databaseURL, primaryPassword: primaryPassword ?? "")
+        }
+        
         switch encryptionKeyResult {
         case .success(let keyData):
             let decryptedLogins = decrypt(logins: logins, with: keyData)
@@ -96,6 +108,8 @@ final class FirefoxLoginReader {
 
     private func decrypt(logins: EncryptedFirefoxLogins, with key: Data) -> [ImportedLoginCredential] {
         var credentials = [ImportedLoginCredential]()
+        
+        print("KEY COUNT: \(key.count)")
 
         // Filter out rows that are used by the Firefox sync service.
         let loginsToImport = logins.logins.filter { $0.hostname != "chrome://FirefoxAccounts" }
@@ -130,6 +144,7 @@ final class FirefoxLoginReader {
             return nil
         }
 
+        print("Credential: \(credential)")
         return String(data: decryptedData, encoding: .utf8)
     }
 
