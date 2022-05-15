@@ -22,16 +22,43 @@ import CryptoKit
 import GRDB
 
 protocol FirefoxEncryptionKeyReading {
-    
-    func getEncryptionKey(databaseURL: URL, primaryPassword: String) -> Result<Data, FirefoxLoginReader.ImportError>
+
+    func getEncryptionKey(key3DatabaseURL: URL, primaryPassword: String) -> Result<Data, FirefoxLoginReader.ImportError>
+    func getEncryptionKey(key4DatabaseURL: URL, primaryPassword: String) -> Result<Data, FirefoxLoginReader.ImportError>
 
 }
 
 final class FirefoxEncryptionKeyReader: FirefoxEncryptionKeyReading {
     
+    func getEncryptionKey(key3DatabaseURL: URL, primaryPassword: String) -> Result<Data, FirefoxLoginReader.ImportError> {
+        guard let result = FirefoxBerkeleyDatabaseReader.readDatabase(key3DatabaseURL.path) else {
+            return .failure(.databaseAccessFailed)
+        }
+        
+        guard let globalSalt = result["global-salt"],
+              let passwordCheck = result["password-check"],
+              let asnData = result["data"] else {
+            return .failure(.decryptionFailed)
+        }
+        
+        guard let decodedASNData = try? ASN1Parser.parse(data: asnData) else {
+            return .failure(.decryptionFailed)
+        }
+        
+        guard let iv = extractInitializationVector(from: decodedASNData) else {
+            return .failure(.decryptionFailed)
+        }
+        
+        guard let decryptedItem2 = aesDecrypt(tlv: decodedASNData, iv: iv, globalSalt: globalSalt, primaryPassword: primaryPassword) else {
+            return .failure(.decryptionFailed)
+        }
+        
+        return .failure(.databaseAccessFailed)
+    }
+    
     // swiftlint:disable:next function_body_length
-    func getEncryptionKey(databaseURL: URL, primaryPassword: String) -> Result<Data, FirefoxLoginReader.ImportError> {
-        let temporaryFileHandler = TemporaryFileHandler(fileURL: databaseURL)
+    func getEncryptionKey(key4DatabaseURL: URL, primaryPassword: String) -> Result<Data, FirefoxLoginReader.ImportError> {
+        let temporaryFileHandler = TemporaryFileHandler(fileURL: key4DatabaseURL)
         
         defer {
             temporaryFileHandler.deleteTemporarilyCopiedFile()
@@ -99,6 +126,36 @@ final class FirefoxEncryptionKeyReader: FirefoxEncryptionKeyReading {
             return .failure(.databaseAccessFailed)
         }
     }
+    
+//    private func extractKey(from data: Data, globalSalt: Data, primaryPassword: String) -> Result<Data, FirefoxLoginReader.ImportError> {
+//        guard let decodedItem2 = try? ASN1Parser.parse(data: data),
+//              let iv = extractInitializationVector(from: decodedItem2),
+//              let decryptedItem2 = aesDecrypt(tlv: decodedItem2, iv: iv, globalSalt: globalSalt, primaryPassword: primaryPassword) else {
+//            return .failure(.decryptionFailed)
+//        }
+//
+//        let string = String(data: decryptedItem2, encoding: .utf8)
+//
+//        // The password check is technically "password-check\x02\x02", it's converted to UTF-8 and checked here for simplicity
+//        if string != "password-check" {
+//            return .failure(.requiresPrimaryPassword)
+//        }
+//
+//        guard let nssPrivateRow = try? Row.fetchOne(database, sql: "SELECT a11, a102 FROM nssPrivate;") else {
+//            return .failure(.decryptionFailed)
+//        }
+//
+//        let a11: Data = nssPrivateRow["a11"]
+//        let a102: Data = nssPrivateRow["a102"]
+//
+//        assert(a102 == Data([248, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1]))
+//
+//        guard let decodedA11 = try? ASN1Parser.parse(data: a11), let finalIV = extractInitializationVector(from: decodedA11) else {
+//            return .failure(.decryptionFailed)
+//        }
+//
+//        return aesDecrypt(tlv: decodedA11, iv: finalIV, globalSalt: globalSalt, primaryPassword: primaryPassword)
+//    }
     
     private func aesDecrypt(tlv: ASN1Parser.Node,
                             iv: Data,

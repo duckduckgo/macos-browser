@@ -33,6 +33,7 @@ final class FirefoxLoginReader {
     }
 
     private enum SupportedDatabaseLoginFileNamePairs {
+        static let version2 = (database: "key3.db", loginFile: "logins.json")
         static let version3 = (database: "key4.db", loginFile: "logins.json")
     }
 
@@ -74,7 +75,7 @@ final class FirefoxLoginReader {
             return .failure(.couldNotReadLoginsFile)
         }
 
-        let encryptionKeyResult = keyReader.getEncryptionKey(databaseURL: databaseURL, primaryPassword: primaryPassword ?? "")
+        let encryptionKeyResult = keyReader.getEncryptionKey(key4DatabaseURL: databaseURL, primaryPassword: primaryPassword ?? "")
 
         switch encryptionKeyResult {
         case .success(let keyData):

@@ -22,7 +22,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 @interface FirefoxBerkeleyDatabaseReader : NSObject
 
-+ (void)readDatabase:(NSString *)databasePath;
++ (NSDictionary<NSString *, NSData *> * _Nullable)readDatabase:(NSString *)databasePath;
 
 @end
 

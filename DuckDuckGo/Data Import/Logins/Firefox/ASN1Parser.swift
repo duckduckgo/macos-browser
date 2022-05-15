@@ -62,7 +62,8 @@ private class Scanner {
             throw ScannerError.outOfBounds
         }
 
-        let subdata = data.subdata(in: index..<index + length)
+        let adjustedIndex = data.startIndex + index
+        let subdata = data.subdata(in: adjustedIndex..<adjustedIndex + length)
         index += length
         return subdata
     }
@@ -126,6 +127,18 @@ extension Data {
         }
 
         return Int(int)
+    }
+}
+
+extension Data {
+    struct HexEncodingOptions: OptionSet {
+        let rawValue: Int
+        static let upperCase = HexEncodingOptions(rawValue: 1 << 0)
+    }
+
+    func hexEncodedString(options: HexEncodingOptions = []) -> String {
+        let format = options.contains(.upperCase) ? "%02hhX" : "%02hhx"
+        return self.map { String(format: format, $0) }.joined()
     }
 }
 

@@ -23,28 +23,65 @@
 #include <fcntl.h>
 #include <limits.h>
 
+// MARK: - NSData to Hexadecimal
+
+@interface NSData (NSDataConversion)
+
+- (NSString *)hexadecimalString;
+
+@end
+
+@implementation NSData (NSDataConversion)
+
+- (NSString *)hexadecimalString {
+    const unsigned char *dataBuffer = (const unsigned char *)[self bytes];
+
+    if (!dataBuffer) {
+        return [NSString string];
+    }
+
+    NSUInteger          dataLength  = [self length];
+    NSMutableString     *hexString  = [NSMutableString stringWithCapacity:(dataLength * 2)];
+
+    for (int i = 0; i < dataLength; ++i) {
+        [hexString appendString:[NSString stringWithFormat:@"%02lx", (unsigned long)dataBuffer[i]]];
+    }
+
+    return [NSString stringWithString:hexString];
+}
+
+@end
+
+// MARK: - FirefoxBerkeleyDatabaseReader
+
+NSString * const FirefoxBerkeleyDatabaseReaderASN1Key = @"f8000000000000000000000000000001";
+
 @implementation FirefoxBerkeleyDatabaseReader
 
-+ (void)readDatabase:(NSString *)databasePath {
++ (NSDictionary<NSString *, NSData *> *)readDatabase:(NSString *)databasePath {
     const char *path = [databasePath cStringUsingEncoding:NSUTF8StringEncoding];
-    NSLog(@"Opening database at path: %s", path);
+
     DB *db = dbopen(path, O_RDONLY, O_RDONLY, DB_HASH, NULL);
-    NSLog(@"Opened database at path: %s", path);
+    NSMutableDictionary<NSString *, NSData *> *resultDictionary = [NSMutableDictionary dictionary];
+    DBT currentKeyDBT, currentDataDBT;
     
-    DBT key, data;
-    
-    while (db->seq(db, &key, &data, R_NEXT) == 0) {
-        // NSString *keyString = [NSString stringWithCharacters:key.data length:key.size];
-        NSData *objcKeyData = [NSData dataWithBytes:key.data length:key.size];
-        NSData *objcDataData = [NSData dataWithBytes:data.data length:data.size];
-        NSString *keyString = [[NSString alloc] initWithData:objcKeyData encoding:NSUTF8StringEncoding];
-        NSLog(@"Got key length %d, data length %d", key.size, data.size);
-        NSLog(@"Got key %@", keyString);
+    while (db->seq(db, &currentKeyDBT, &currentDataDBT, R_NEXT) == 0) {
+        NSData *currentKeyData = [NSData dataWithBytes:currentKeyDBT.data length:currentKeyDBT.size];
+        NSData *currentData = [NSData dataWithBytes:currentDataDBT.data length:currentDataDBT.size];
+        
+        NSString *currentKeyHexadecimalString = [currentKeyData hexadecimalString];
+        NSString *currentKeyString = [[NSString alloc] initWithData:currentKeyData encoding:NSUTF8StringEncoding];
+        
+        if ([currentKeyHexadecimalString isEqualToString:FirefoxBerkeleyDatabaseReaderASN1Key]) {
+            [resultDictionary setValue:currentData forKey:@"data"];
+        } else {
+            [resultDictionary setValue:currentData forKey:currentKeyString];
+        }
     }
     
     db->close(db);
     
-    NSLog(@"Reading database");
+    return resultDictionary;
 }
 
 @end
