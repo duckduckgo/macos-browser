@@ -69,7 +69,6 @@ extension WindowsManager {
         window.makeKeyAndOrderFront(self)
 
         if activate {
-            window.makeKeyAndOrderFront(self)
             item.model.setUpLazyLoadingIfNeeded()
         }
     }
