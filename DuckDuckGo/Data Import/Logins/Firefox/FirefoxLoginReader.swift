@@ -32,23 +32,20 @@ final class FirefoxLoginReader {
         case failedToTemporarilyCopyFile
     }
 
-    enum DataFormat {
-        case version2
+    enum DataFormat: CaseIterable {
         case version3
+        case version2
         
         var formatFileNames: (databaseName: String, loginFileName: String) {
             switch self {
-            case .version2: return (databaseName: "key3.db", loginFileName: "logins.json")
             case .version3: return (databaseName: "key4.db", loginFileName: "logins.json")
+            case .version2: return (databaseName: "key3.db", loginFileName: "logins.json")
             }
         }
     }
 
     private let keyReader: FirefoxEncryptionKeyReading
     private let primaryPassword: String?
-    private let keyDatabaseName: String
-    private let loginsFileName: String
-
     private let firefoxProfileURL: URL
 
     /// Initialize a FirefoxLoginReader with a profile path and optional primary password.
@@ -57,20 +54,41 @@ final class FirefoxLoginReader {
     /// - Parameter primaryPassword: The password used to decrypt the login data. This is optional, as Firefox's primary password feature is optional.
     init(firefoxProfileURL: URL,
          keyReader: FirefoxEncryptionKeyReading = FirefoxEncryptionKeyReader(),
-         primaryPassword: String? = nil,
-         databaseFileName: String = DataFormat.version3.formatFileNames.databaseName,
-         loginsFileName: String = DataFormat.version3.formatFileNames.loginFileName) {
+         primaryPassword: String? = nil) {
 
         self.keyReader = keyReader
         self.primaryPassword = primaryPassword
-        self.keyDatabaseName = databaseFileName
-        self.loginsFileName = loginsFileName
         self.firefoxProfileURL = firefoxProfileURL
     }
 
-    func readLogins(dataFormat: DataFormat) -> Result<[ImportedLoginCredential], FirefoxLoginReader.ImportError> {
-        let databaseURL = firefoxProfileURL.appendingPathComponent(keyDatabaseName)
-        let loginsFileURL = firefoxProfileURL.appendingPathComponent(loginsFileName)
+    /// Looks up and reads login files located within a Firefox user profile.
+    ///
+    /// - Parameter dataFormat: Optionally forces a specific Firefox data format to read from. If nil is passed, the names of the login files will be used to infer the format.
+    func readLogins(dataFormat: DataFormat?) -> Result<[ImportedLoginCredential], FirefoxLoginReader.ImportError> {
+        var detectedFormat: DataFormat?
+        
+        if let dataFormat = dataFormat {
+            detectedFormat = dataFormat
+        } else {
+            // Check whether a particular data format can be inferred from the existence of files on disk:
+            for potentialFormat in DataFormat.allCases {
+                let potentialDatabaseURL = firefoxProfileURL.appendingPathComponent(potentialFormat.formatFileNames.databaseName)
+                let potentialLoginsFileURL = firefoxProfileURL.appendingPathComponent(potentialFormat.formatFileNames.loginFileName)
+                
+                if FileManager.default.fileExists(atPath: potentialDatabaseURL.path),
+                   FileManager.default.fileExists(atPath: potentialLoginsFileURL.path) {
+                    detectedFormat = potentialFormat
+                    break
+                }
+            }
+        }
+        
+        guard let detectedFormat = detectedFormat else {
+            return .failure(.couldNotReadLoginsFile)
+        }
+        
+        let databaseURL = firefoxProfileURL.appendingPathComponent(detectedFormat.formatFileNames.databaseName)
+        let loginsFileURL = firefoxProfileURL.appendingPathComponent(detectedFormat.formatFileNames.loginFileName)
         
         // If there isn't a file where logins are expected, consider it a successful import of 0 logins
         // to avoid showing an error state.
@@ -84,7 +102,7 @@ final class FirefoxLoginReader {
 
         let encryptionKeyResult: Result<Data, FirefoxLoginReader.ImportError>
 
-        switch dataFormat {
+        switch detectedFormat {
         case .version2: encryptionKeyResult = keyReader.getEncryptionKey(key3DatabaseURL: databaseURL, primaryPassword: primaryPassword ?? "")
         case .version3: encryptionKeyResult = keyReader.getEncryptionKey(key4DatabaseURL: databaseURL, primaryPassword: primaryPassword ?? "")
         }

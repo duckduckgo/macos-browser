@@ -47,7 +47,7 @@ final class FirefoxDataImporter: DataImporter {
 
         if types.contains(.logins) {
             let loginReader = FirefoxLoginReader(firefoxProfileURL: firefoxProfileURL, primaryPassword: self.primaryPassword)
-            let loginResult = loginReader.readLogins(dataFormat: .version3)
+            let loginResult = loginReader.readLogins(dataFormat: nil)
 
             switch loginResult {
             case .success(let logins):

@@ -130,18 +130,6 @@ extension Data {
     }
 }
 
-extension Data {
-    struct HexEncodingOptions: OptionSet {
-        let rawValue: Int
-        static let upperCase = HexEncodingOptions(rawValue: 1 << 0)
-    }
-
-    func hexEncodedString(options: HexEncodingOptions = []) -> String {
-        let format = options.contains(.upperCase) ? "%02hhX" : "%02hhx"
-        return self.map { String(format: format, $0) }.joined()
-    }
-}
-
 /// A simple ASN1 parser that will recursively iterate over a root node and return a Node tree.
 /// The root node can be any of the supported nodes described in `Node`. If the parser encounters a sequence
 /// it will recursively parse its children.
