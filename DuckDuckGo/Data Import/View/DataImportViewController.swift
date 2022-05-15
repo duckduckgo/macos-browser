@@ -315,7 +315,7 @@ final class DataImportViewController: NSViewController {
         // Prevent transitioning to the same view controller.
         if let viewController = currentChildViewController as? BrowserImportViewController, viewController.browser == source { return nil }
 
-        guard let browser = ThirdPartyBrowser.browser(for: viewState.selectedImportSource), let profileList = browser.browserProfiles else {
+        guard let browser = ThirdPartyBrowser.browser(for: viewState.selectedImportSource), let profileList = browser.browserProfiles() else {
             assertionFailure("Attempted to create BrowserImportViewController without a valid browser selected")
             return nil
         }
