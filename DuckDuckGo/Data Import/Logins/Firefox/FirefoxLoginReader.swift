@@ -108,8 +108,6 @@ final class FirefoxLoginReader {
 
     private func decrypt(logins: EncryptedFirefoxLogins, with key: Data) -> [ImportedLoginCredential] {
         var credentials = [ImportedLoginCredential]()
-        
-        print("KEY COUNT: \(key.count)")
 
         // Filter out rows that are used by the Firefox sync service.
         let loginsToImport = logins.logins.filter { $0.hostname != "chrome://FirefoxAccounts" }
@@ -144,7 +142,6 @@ final class FirefoxLoginReader {
             return nil
         }
 
-        print("Credential: \(credential)")
         return String(data: decryptedData, encoding: .utf8)
     }
 

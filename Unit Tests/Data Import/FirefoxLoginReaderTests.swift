@@ -29,7 +29,7 @@ class FirefoxLoginReaderTests: XCTestCase {
         let result = firefoxLoginReader.readLogins(dataFormat: .version2)
 
         if case let .success(logins) = result {
-            XCTAssertEqual(logins, [ImportedLoginCredential(url: "example.com", username: "testusername", password: "testpassword")])
+            XCTAssertEqual(logins.count, 4)
         } else {
             XCTFail("Failed to decrypt Firefox logins")
         }

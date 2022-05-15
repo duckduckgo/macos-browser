@@ -34,6 +34,30 @@ class FirefoxKeyReaderTests: XCTestCase {
             XCTFail("Failed to read decryption key")
         }
     }
+    
+    func testWhenReadingValidKey3Database_AndPrimaryPasswordIsSet_AndPrimaryPasswordIsValid_ThenKeyIsRead() {
+        let databaseURL = resourcesURLWithPassword().appendingPathComponent("key3-firefox46.db")
+        let reader = FirefoxEncryptionKeyReader()
+        let result = reader.getEncryptionKey(key3DatabaseURL: databaseURL, primaryPassword: "сЮЛОажс$4vz*VçàhxpfCbmwo")
+        
+        if case let .success(data) = result {
+            XCTAssertEqual(data.count, 24)
+        } else {
+            XCTFail("Failed to read decryption key")
+        }
+    }
+    
+    func testWhenReadingValidKey3Database_AndPrimaryPasswordIsSet_AndPrimaryPasswordIsInvalid_ThenKeyIsNotRead() {
+        let databaseURL = resourcesURLWithPassword().appendingPathComponent("key3-firefox46.db")
+        let reader = FirefoxEncryptionKeyReader()
+        let result = reader.getEncryptionKey(key3DatabaseURL: databaseURL, primaryPassword: "invalid-password")
+        
+        if case let .failure(error) = result {
+            XCTAssertEqual(error, .decryptionFailed)
+        } else {
+            XCTFail("Did not expect to get valid decryption key")
+        }
+    }
 
     func testWhenReadingValidKey4Database_AndNoPrimaryPasswordIsSet_ThenKeyIsRead() {
         let databaseURL = resourcesURLWithoutPassword().appendingPathComponent("key4.db")
