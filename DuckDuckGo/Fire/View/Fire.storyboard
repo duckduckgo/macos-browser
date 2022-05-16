@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<document type="com.apple.InterfaceBuilder3.Cocoa.Storyboard.XIB" version="3.0" toolsVersion="19529" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES" initialViewController="bU7-R8-ocO">
+<document type="com.apple.InterfaceBuilder3.Cocoa.Storyboard.XIB" version="3.0" toolsVersion="20037" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES" initialViewController="bU7-R8-ocO">
     <dependencies>
         <deployment identifier="macosx"/>
-        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="19529"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="20037"/>
         <capability name="Named colors" minToolsVersion="9.0"/>
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
     </dependencies>
@@ -23,11 +23,8 @@
                                     </userDefinedRuntimeAttribute>
                                 </userDefinedRuntimeAttributes>
                             </customView>
-                            <customView translatesAutoresizingMaskIntoConstraints="NO" id="Irb-Li-anx" customClass="AnimationView" customModule="Lottie">
+                            <customView translatesAutoresizingMaskIntoConstraints="NO" id="Irb-Li-anx">
                                 <rect key="frame" x="0.0" y="0.0" width="721" height="479"/>
-                                <userDefinedRuntimeAttributes>
-                                    <userDefinedRuntimeAttribute type="string" keyPath="animationName" value="01_Fire_really_small"/>
-                                </userDefinedRuntimeAttributes>
                             </customView>
                             <customView translatesAutoresizingMaskIntoConstraints="NO" id="uFV-kr-0rY">
                                 <rect key="frame" x="201" y="130" width="320" height="220"/>
@@ -122,7 +119,7 @@
                     </view>
                     <connections>
                         <outlet property="fakeFireButton" destination="l2o-no-SFP" id="xqv-ch-iAF"/>
-                        <outlet property="fireAnimationView" destination="Irb-Li-anx" id="JfE-XU-lio"/>
+                        <outlet property="fireAnimationViewContainer" destination="Irb-Li-anx" id="r1a-Xi-Yj3"/>
                         <outlet property="progressIndicator" destination="Nf3-CP-318" id="nq9-vZ-Fzk"/>
                         <outlet property="progressIndicatorWrapper" destination="uFV-kr-0rY" id="RTJ-f8-iuU"/>
                         <outlet property="progressIndicatorWrapperBG" destination="Yly-fF-tnL" id="zNP-2N-cC6"/>
@@ -612,7 +609,7 @@ DQ
             <color red="0.98000001907348633" green="0.98000001907348633" blue="0.98000001907348633" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
         </namedColor>
         <namedColor name="GreyTextColor">
-            <color red="0.20000000000000001" green="0.20000000000000001" blue="0.20000000000000001" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+            <color red="0.0" green="0.0" blue="0.0" alpha="0.60000002384185791" colorSpace="custom" customColorSpace="sRGB"/>
         </namedColor>
         <namedColor name="HomePageBackgroundColor">
             <color red="0.97600001096725464" green="0.98000001907348633" blue="0.98000001907348633" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>

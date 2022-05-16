@@ -22,6 +22,10 @@ import Combine
 
 final class FireViewController: NSViewController {
 
+    enum Const {
+        static let animationName = "01_Fire_really_small"
+    }
+
     private var fireViewModel: FireViewModel
     private let tabCollectionViewModel: TabCollectionViewModel
     private var cancellables = Set<AnyCancellable>()
@@ -32,10 +36,12 @@ final class FireViewController: NSViewController {
     }()
 
     @IBOutlet weak var fakeFireButton: NSButton!
-    @IBOutlet weak var fireAnimationView: AnimationView!
+    @IBOutlet weak var fireAnimationViewContainer: NSView!
     @IBOutlet weak var progressIndicatorWrapper: NSView!
     @IBOutlet weak var progressIndicator: NSProgressIndicator!
     @IBOutlet weak var progressIndicatorWrapperBG: NSView!
+    private var fireAnimationView: AnimationView?
+    private var fireAnimationViewLoadingTask: Task<(), Never>?
 
     required init?(coder: NSCoder) {
         fatalError("TabBarViewController: Bad initializer")
@@ -50,12 +56,16 @@ final class FireViewController: NSViewController {
         super.init(coder: coder)
     }
 
+    deinit {
+        fireAnimationViewLoadingTask?.cancel()
+    }
+
     override func viewDidLoad() {
         super.viewDidLoad()
 
-        setupView()
-        setupFireAnimation()
-        subscribeToIsBurning()
+        fireAnimationViewLoadingTask = Task.detached(priority: .userInitiated) {
+            await self.setupFireAnimationView()
+        }
     }
 
     override func viewWillAppear() {
@@ -80,13 +90,27 @@ final class FireViewController: NSViewController {
             }
     }
 
-    private func setupView() {
+    @MainActor
+    private func setupFireAnimationView() async {
+        guard let animationView = await FireAnimationViewLoader.shared.createAnimationView() else {
+            return
+        }
+
+        animationView.contentMode = .scaleToFill
+        animationView.translatesAutoresizingMaskIntoConstraints = false
+        fireAnimationViewContainer.addSubview(animationView)
+        NSLayoutConstraint.activate([
+            animationView.leadingAnchor.constraint(equalTo: fireAnimationViewContainer.leadingAnchor),
+            animationView.trailingAnchor.constraint(equalTo: fireAnimationViewContainer.trailingAnchor),
+            animationView.topAnchor.constraint(equalTo: fireAnimationViewContainer.topAnchor),
+            animationView.bottomAnchor.constraint(equalTo: fireAnimationViewContainer.bottomAnchor)
+        ])
+        fireAnimationView = animationView
+
         fakeFireButton.wantsLayer = true
         fakeFireButton.layer?.backgroundColor = NSColor.buttonMouseDownColor.cgColor
-    }
 
-    private func setupFireAnimation() {
-        fireAnimationView.contentMode = .scaleToFill
+        subscribeToIsBurning()
     }
 
     private func subscribeToIsBurning() {
@@ -119,7 +143,12 @@ final class FireViewController: NSViewController {
         progressIndicatorWrapper.isHidden = true
 
         fireViewModel.isAnimationPlaying = true
-        fireAnimationView.play { [weak self] _ in
+
+        Task {
+            await fireAnimationViewLoadingTask?.value
+        }
+
+        fireAnimationView?.play { [weak self] _ in
             guard let self = self else { return }
 
             self.fireViewModel.isAnimationPlaying = false
@@ -129,5 +158,29 @@ final class FireViewController: NSViewController {
             }
         }
     }
+}
 
+private actor FireAnimationViewLoader {
+
+    static let shared: FireAnimationViewLoader = .init(animationName: FireViewController.Const.animationName)
+
+    @MainActor
+    func createAnimationView() async -> AnimationView? {
+        guard let animation = await animation else {
+            return nil
+        }
+        let view = AnimationView(animation: animation)
+        view.identifier = .init(rawValue: animationName)
+        return view
+    }
+
+    private init(animationName: String) {
+        self.animationName = animationName
+    }
+
+    private let animationName: String
+
+    private var animation: Animation? {
+        Animation.named(animationName, animationCache: LottieAnimationCache.shared)
+    }
 }
