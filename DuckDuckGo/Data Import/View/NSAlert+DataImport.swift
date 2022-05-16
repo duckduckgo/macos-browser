@@ -35,6 +35,10 @@ extension NSAlert {
         
         let attributedString = NSMutableAttributedString(string: informativeText)
         attributedString.addLink("http://duck.com", toText: linkText)
+        attributedString.addAttributes([
+            .font: NSFont.systemFont(ofSize: 13, weight: .regular),
+            .foregroundColor: NSColor(named: "BlackWhite60")!
+        ], range: NSRange(location: 0, length: attributedString.length))
 
         textView.textStorage?.setAttributedString(attributedString)
         
