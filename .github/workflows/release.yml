@@ -1,4 +1,4 @@
-name: Make release build
+name: Make Release Build
 
 on: 
   workflow_dispatch:
@@ -15,6 +15,8 @@ on:
 
 jobs:
   export-notarized-app:
+
+    name: Export Notarized App
 
     runs-on: macos-12
 
