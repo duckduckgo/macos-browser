@@ -34,7 +34,7 @@ extension NSAlert {
         textView.applyLabelStyle()
         
         let attributedString = NSMutableAttributedString(string: informativeText)
-        attributedString.addLink("http://duck.com", toText: linkText)
+        attributedString.addLink("", toText: linkText) // The actual value of the link isn't important, we're reacting to the click via the delegate
         attributedString.addAttributes([
             .font: NSFont.systemFont(ofSize: 13, weight: .regular),
             .foregroundColor: NSColor(named: "BlackWhite60")!
