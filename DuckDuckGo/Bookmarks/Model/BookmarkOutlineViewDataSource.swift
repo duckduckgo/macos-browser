@@ -281,7 +281,7 @@ final class BookmarkOutlineViewDataSource: NSObject, NSOutlineViewDataSource, NS
             return false
         }
 
-        return contentMode == .foldersOnly
+        return contentMode == .foldersOnly || outlineView.isFirstResponder
     }
 
 }

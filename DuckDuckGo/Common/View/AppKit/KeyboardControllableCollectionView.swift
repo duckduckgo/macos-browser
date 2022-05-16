@@ -51,7 +51,7 @@ final class KeyboardControllableCollectionView: NSCollectionView {
     }
 
     override func becomeFirstResponder() -> Bool {
-        if shouldSelectOnFocus && selectionIndexPaths.isEmpty && NSApp.currentEvent?.type == .keyDown {
+        if shouldSelectOnFocus && selectionIndexPaths.isEmpty && [.keyDown, .systemDefined].contains(NSApp.currentEvent?.type) {
             self.selectFirst()
             isSelectionImplicit = true
         }

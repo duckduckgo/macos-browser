@@ -50,7 +50,11 @@ final class RoundedSelectionRowView: NSTableRowView {
         selectionRect.size.height -= (insets.top + insets.bottom)
 
         let path = NSBezierPath(roundedRect: selectionRect, xRadius: 6, yRadius: 6)
-        NSColor.rowHoverColor.setFill()
+        if (self.nextResponder as? NSTableView)?.isFirstResponder == true {
+            NSColor.selectedContentBackgroundColor.setFill()
+        } else {
+            NSColor.unemphasizedSelectedContentBackgroundColor.setFill()
+        }
         path.fill()
     }
 

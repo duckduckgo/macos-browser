@@ -69,4 +69,34 @@ final class BookmarksOutlineView: NSOutlineView {
         rowView.highlight = !(item?.representedObject is SpacerNode)
         lastRow = rowView
     }
+
+    private var isSelectionImplicit = false
+
+    override func becomeFirstResponder() -> Bool {
+        if selectedRowIndexes.isEmpty,
+           self.numberOfRows > 0,
+           [.keyDown, .systemDefined].contains(NSApp.currentEvent?.type),
+           // don‘t select row when previous responder‘s window is another window
+           // i.e. the control becomes first responder on window appear
+           (self.window?.firstResponder as? NSView)?.window === self.window {
+            self.selectRowIndexes(IndexSet(integer: 0), byExtendingSelection: false)
+            self.isSelectionImplicit = true
+        }
+        return super.becomeFirstResponder()
+    }
+
+    override func resignFirstResponder() -> Bool {
+        if isSelectionImplicit,
+            !self.selectedRowIndexes.isEmpty {
+            self.deselectAll(nil)
+        }
+        self.isSelectionImplicit = false
+        return super.resignFirstResponder()
+    }
+
+    override func selectRowIndexes(_ indexes: IndexSet, byExtendingSelection extend: Bool) {
+        super.selectRowIndexes(indexes, byExtendingSelection: extend)
+        self.isSelectionImplicit = false
+    }
+
 }

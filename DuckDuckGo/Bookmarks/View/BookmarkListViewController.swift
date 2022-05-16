@@ -18,6 +18,7 @@
 
 import AppKit
 import Combine
+import Carbon.HIToolbox
 
 protocol BookmarkListViewControllerDelegate: AnyObject {
 
@@ -40,6 +41,7 @@ final class BookmarkListViewController: NSViewController {
     weak var delegate: BookmarkListViewControllerDelegate?
     var currentTabWebsite: AddBookmarkModalViewController.WebsiteInfo?
 
+    @IBOutlet var newBookmarkButton: NSButton!
     @IBOutlet var outlineView: NSOutlineView!
     @IBOutlet var contextMenu: NSMenu!
     @IBOutlet var emptyState: NSView!
@@ -49,11 +51,7 @@ final class BookmarkListViewController: NSViewController {
     private var cancellables = Set<AnyCancellable>()
     private var bookmarkManager: BookmarkManager = LocalBookmarkManager.shared
     private let treeControllerDataSource = BookmarkListTreeControllerDataSource()
-    
-    private var mouseUpEventsMonitor: Any?
-    private var mouseDownEventsMonitor: Any?
-    private var appObserver: Any?
-    
+
     private lazy var treeController: BookmarkTreeController = {
         return BookmarkTreeController(dataSource: treeControllerDataSource)
     }()
@@ -96,7 +94,13 @@ final class BookmarkListViewController: NSViewController {
     override func viewWillAppear() {
         super.viewWillAppear()
 
+        outlineView.deselectAll(nil)
         reloadData()
+    }
+
+    override func viewDidLayout() {
+        super.viewDidLayout()
+        outlineView.nextKeyView = self.newBookmarkButton
     }
 
     private func reloadData() {
@@ -128,9 +132,14 @@ final class BookmarkListViewController: NSViewController {
     }
     
     @IBAction func handleClick(_ sender: NSOutlineView) {
-        guard sender.clickedRow != -1 else { return }
+        guard sender.clickedRow != -1,
+              let item = sender.item(atRow: sender.clickedRow)
+        else { return }
 
-        let item = sender.item(atRow: sender.clickedRow)
+        performDefaultAction(for: item)
+    }
+
+    func performDefaultAction(for item: Any) {
         if let node = item as? BookmarkNode,
            let bookmark = node.representedObject as? Bookmark {
             WindowControllersManager.shared.open(bookmark: bookmark)
@@ -147,6 +156,47 @@ final class BookmarkListViewController: NSViewController {
 
     @IBAction func onImportClicked(_ sender: NSButton) {
         DataImportViewController.show()
+    }
+
+    override func keyDown(with event: NSEvent) {
+        switch Int(event.keyCode) {
+        case kVK_DownArrow:
+            guard outlineView.numberOfRows > 0 else { break }
+            outlineView.makeMeFirstResponder()
+            outlineView.selectRowIndexes(IndexSet(integer: 0), byExtendingSelection: false)
+            outlineView.scrollRowToVisible(0)
+            return
+
+        case kVK_UpArrow:
+            guard outlineView.numberOfRows > 0 else { break }
+            outlineView.makeMeFirstResponder()
+            let row = outlineView.numberOfRows - 1
+            outlineView.selectRowIndexes(IndexSet(integer: row), byExtendingSelection: false)
+            outlineView.scrollRowToVisible(row)
+            return
+
+        case kVK_Space:
+            let selectedRow = outlineView.selectedRow
+            guard (0..<outlineView.numberOfRows).contains(selectedRow),
+                  let menu = self.contextualMenu(forRow: selectedRow)
+            else {
+                break
+            }
+            let frame = outlineView.frameOfCell(atColumn: 0, row: selectedRow)
+            menu.popUp(positioning: nil, at: NSPoint(x: frame.minX, y: frame.maxY), in: outlineView)
+            return
+
+        case kVK_Return, kVK_ANSI_KeypadEnter:
+            guard outlineView.selectedRow >= 0,
+                  let item = outlineView.item(atRow: outlineView.selectedRow)
+            else { break }
+            self.performDefaultAction(for: item)
+            return
+
+        default:
+            break
+        }
+        super.keyDown(with: event)
     }
 
     // MARK: NSOutlineView Configuration
@@ -228,7 +278,10 @@ extension BookmarkListViewController: NSMenuDelegate {
     
     func contextualMenuForClickedRows() -> NSMenu? {
         let row = outlineView.clickedRow
-        
+        return contextualMenu(forRow: row)
+    }
+
+    func contextualMenu(forRow row: Int) -> NSMenu? {
         guard row != -1 else {
             return ContextualMenu.menu(for: nil)
         }
