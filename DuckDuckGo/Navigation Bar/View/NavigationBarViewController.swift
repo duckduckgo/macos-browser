@@ -246,10 +246,10 @@ final class NavigationBarViewController: NSViewController {
         selectedTabViewModel.reload()
     }
 
-    @IBAction func optionsButtonAction(_ sender: NSButton) {
+    @IBAction func optionsButtonAction(_ sender: Any?) {
         let menu = MoreOptionsMenu(tabCollectionViewModel: tabCollectionViewModel)
         menu.actionDelegate = self
-        menu.popUp(positioning: nil, at: NSPoint(x: 0, y: sender.bounds.height + 4), in: sender)
+        menu.popUp(positioning: nil, at: NSPoint(x: 0, y: optionsButton.bounds.height + 4), in: optionsButton)
     }
 
     @IBAction func bookmarksButtonAction(_ sender: NSButton) {

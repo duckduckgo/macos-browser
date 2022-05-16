@@ -366,6 +366,10 @@ extension MainViewController {
             }
             return isHandled
 
+        case kVK_ANSI_Period where flags == .command:
+            navigationBarViewController.optionsButtonAction(nil)
+            return true
+            
         // Handle critical Main Menu actions before WebView
         case kVK_ANSI_1, kVK_ANSI_2, kVK_ANSI_3, kVK_ANSI_4, kVK_ANSI_5, kVK_ANSI_6,
              kVK_ANSI_7, kVK_ANSI_8, kVK_ANSI_9,
@@ -379,7 +383,10 @@ extension MainViewController {
              kVK_ANSI_W where flags.contains(.command),
              kVK_ANSI_T where [[.command], [.command, .shift]].contains(flags),
              kVK_ANSI_Q where flags == .command,
-             kVK_ANSI_R where flags == .command:
+             kVK_ANSI_R where flags == .command,
+             kVK_ANSI_J where flags == .command,
+             kVK_ANSI_A where flags == [.command, .shift],
+             kVK_ANSI_B where flags == [.command, .option]:
             guard view.window?.firstResponder is WebView else { return false }
             NSApp.menu?.performKeyEquivalent(with: event)
             return true
