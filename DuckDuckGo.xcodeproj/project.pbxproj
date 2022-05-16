@@ -528,6 +528,7 @@
 		B60D19B4281BC92900EBAB97 /* PasswordSortButton.xib in Resources */ = {isa = PBXBuildFile; fileRef = B60D19B3281BC92900EBAB97 /* PasswordSortButton.xib */; };
 		B60D19B9282A4FBB00EBAB97 /* FocusView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B60D19B8282A4FBB00EBAB97 /* FocusView.swift */; };
 		B60D19BB282BAD0A00EBAB97 /* KeyboardControllableCollectionView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B60D19BA282BAD0A00EBAB97 /* KeyboardControllableCollectionView.swift */; };
+		B60D19BD28322B3900EBAB97 /* DownloadsTableView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B60D19BC28322B3900EBAB97 /* DownloadsTableView.swift */; };
 		B6106BA026A7BE0B0013B453 /* PermissionManagerTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = B6106B9F26A7BE0B0013B453 /* PermissionManagerTests.swift */; };
 		B6106BA426A7BEA40013B453 /* PermissionAuthorizationState.swift in Sources */ = {isa = PBXBuildFile; fileRef = B6106BA226A7BEA00013B453 /* PermissionAuthorizationState.swift */; };
 		B6106BA726A7BECC0013B453 /* PermissionAuthorizationQuery.swift in Sources */ = {isa = PBXBuildFile; fileRef = B6106BA526A7BEC80013B453 /* PermissionAuthorizationQuery.swift */; };
@@ -1288,6 +1289,7 @@
 		B60D19B3281BC92900EBAB97 /* PasswordSortButton.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = PasswordSortButton.xib; sourceTree = "<group>"; };
 		B60D19B8282A4FBB00EBAB97 /* FocusView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FocusView.swift; sourceTree = "<group>"; };
 		B60D19BA282BAD0A00EBAB97 /* KeyboardControllableCollectionView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KeyboardControllableCollectionView.swift; sourceTree = "<group>"; };
+		B60D19BC28322B3900EBAB97 /* DownloadsTableView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DownloadsTableView.swift; sourceTree = "<group>"; };
 		B6106B9D26A565DA0013B453 /* BundleExtension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BundleExtension.swift; sourceTree = "<group>"; };
 		B6106B9F26A7BE0B0013B453 /* PermissionManagerTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PermissionManagerTests.swift; sourceTree = "<group>"; };
 		B6106BA226A7BEA00013B453 /* PermissionAuthorizationState.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PermissionAuthorizationState.swift; sourceTree = "<group>"; };
@@ -3697,6 +3699,7 @@
 			children = (
 				B6B1E87D26D5DA0E0062C350 /* DownloadsPopover.swift */,
 				B6B1E87F26D5DA9B0062C350 /* DownloadsViewController.swift */,
+				B60D19BC28322B3900EBAB97 /* DownloadsTableView.swift */,
 				B6B1E88126D5DAC30062C350 /* Downloads.storyboard */,
 				B6B1E88326D5EB570062C350 /* DownloadsCellView.swift */,
 				B6C0B23B26E87D900031CB7F /* NSAlert+ActiveDownloadsTermination.swift */,
@@ -4382,6 +4385,7 @@
 				B63D467A25BFC3E100874977 /* NSCoderExtensions.swift in Sources */,
 				B31055C927A1BA1D001AC618 /* AutoconsentBackground.swift in Sources */,
 				B3FB199327BD0AD400513DC1 /* CookieConsentInfo.swift in Sources */,
+				B60D19BD28322B3900EBAB97 /* DownloadsTableView.swift in Sources */,
 				B6A5A27125B9377300AA7ADA /* StatePersistenceService.swift in Sources */,
 				B68458B025C7E76A00DC17B6 /* WindowManager+StateRestoration.swift in Sources */,
 				B68458C525C7EA0C00DC17B6 /* TabCollection+NSSecureCoding.swift in Sources */,

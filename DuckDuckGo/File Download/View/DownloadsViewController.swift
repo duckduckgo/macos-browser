@@ -18,11 +18,10 @@
 
 import Cocoa
 import Combine
+import Carbon.HIToolbox
 
 protocol DownloadsViewControllerDelegate: AnyObject {
-
     func clearDownloadsActionTriggered()
-
 }
 
 final class DownloadsViewController: NSViewController {
@@ -45,7 +44,7 @@ final class DownloadsViewController: NSViewController {
     private static let openDownloadsLinkTag = 67
     var openDownloadsLink: NSButton? {
         didSet {
-            clearButton.nextKeyView = openDownloadsLink
+            setUpKeyViewCycle()
         }
     }
     private var cellIndexToUnselect: Int?
@@ -90,21 +89,32 @@ final class DownloadsViewController: NSViewController {
     }
 
     override func viewDidAppear() {
-        clearButton.nextKeyView = openDownloadsLink
+        setUpKeyViewCycle()
     }
 
     override func viewWillDisappear() {
         downloadsCancellable = nil
     }
 
+    private func setUpKeyViewCycle() {
+        self.clearButton.nextKeyView = self.viewModel.items.isEmpty ? self.openDownloadsLink : self.tableView
+        if !self.viewModel.items.isEmpty {
+            self.tableView.nextKeyView = self.openDownloadsLink
+        }
+        self.openDownloadsLink?.nextKeyView = self.openDownloadsButton
+    }
+
     private func index(for sender: Any) -> Int? {
-        let row: Int
+        var row: Int
         switch sender {
-        case let button as NSButton:
-            let converted = tableView.convert(button.bounds.origin, from: button)
+        case let view as NSView:
+            let converted = tableView.convert(view.bounds.center, from: view)
             row = tableView.row(at: converted)
         case is NSMenuItem, is NSMenu, is NSTableView:
             row = tableView.clickedRow
+            if row == -1 {
+                row = tableView.selectedRow
+            }
         default:
             assertionFailure("Unexpected sender")
             return nil
@@ -202,6 +212,63 @@ final class DownloadsViewController: NSViewController {
         } else {
             openDownloadsFolderAction(sender)
         }
+    }
+
+    override func keyDown(with event: NSEvent) {
+        switch Int(event.keyCode) {
+        case kVK_DownArrow:
+            guard !viewModel.items.isEmpty else { break }
+            tableView.makeMeFirstResponder()
+            tableView.selectRowIndexes(IndexSet(integer: 0), byExtendingSelection: false)
+            tableView.scrollRowToVisible(0)
+            return
+
+        case kVK_UpArrow:
+            guard !viewModel.items.isEmpty else { break }
+            tableView.makeMeFirstResponder()
+            let row = tableView.numberOfRows - 1
+            tableView.selectRowIndexes(IndexSet(integer: viewModel.items.count - 1), byExtendingSelection: false)
+            tableView.scrollRowToVisible(row)
+            return
+
+        case kVK_Space:
+            let selectedRow = tableView.selectedRow
+            guard (0..<tableView.numberOfRows).contains(selectedRow),
+                  let menu = tableView.view(atColumn: 0, row: selectedRow, makeIfNecessary: false)?.menu
+            else {
+                break
+            }
+            let frame = tableView.frameOfCell(atColumn: 0, row: selectedRow)
+            menu.popUp(positioning: nil, at: NSPoint(x: frame.minX, y: frame.maxY), in: tableView)
+            return
+
+        case kVK_Return, kVK_ANSI_KeypadEnter:
+            guard tableView.selectedRow >= 0,
+                  performDefaultAction(forItemAt: tableView.selectedRow)
+            else { break }
+
+            return
+
+        default:
+            break
+        }
+        super.keyDown(with: event)
+    }
+
+    private func performDefaultAction(forItemAt row: Int) -> Bool {
+        guard let cell = tableView.view(atColumn: 0, row: tableView.selectedRow, makeIfNecessary: false) as? DownloadsCellView else {
+            return false
+        }
+        if !cell.cancelButton.isHidden {
+            cell.cancelButton.performClick(nil)
+        } else if !cell.revealButton.isHidden {
+            cell.revealButton.performClick(nil)
+        } else if !cell.restartButton.isHidden {
+            cell.restartButton.performClick(nil)
+        } else {
+            return false
+        }
+        return true
     }
 
     private func setupDragAndDrop() {
