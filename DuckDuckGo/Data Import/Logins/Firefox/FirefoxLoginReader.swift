@@ -38,13 +38,11 @@ final class FirefoxLoginReader {
     enum DataFormat: CaseIterable {
         case version3
         case version2
-        case version1
         
         var formatFileNames: (databaseName: String, loginFileName: String) {
             switch self {
             case .version3: return (databaseName: "key4.db", loginFileName: "logins.json")
             case .version2: return (databaseName: "key3.db", loginFileName: "logins.json")
-            case .version1: return (databaseName: "key3.db", loginFileName: "signons.sqlite")
             }
         }
     }
@@ -66,9 +64,6 @@ final class FirefoxLoginReader {
         self.firefoxProfileURL = firefoxProfileURL
     }
 
-    /// Looks up and reads login files located within a Firefox user profile.
-    ///
-    /// - Parameter dataFormat: Optionally forces a specific Firefox data format to read from. If nil is passed, the names of the login files will be used to infer the format.
     func readLogins(dataFormat: DataFormat?) -> Result<[ImportedLoginCredential], FirefoxLoginReader.ImportError> {
         var detectedFormat: DataFormat?
         
@@ -108,7 +103,6 @@ final class FirefoxLoginReader {
         let encryptionKeyResult: Result<Data, FirefoxLoginReader.ImportError>
 
         switch detectedFormat {
-        case .version1: encryptionKeyResult = keyReader.getEncryptionKey(key3DatabaseURL: databaseURL, primaryPassword: primaryPassword ?? "")
         case .version2: encryptionKeyResult = keyReader.getEncryptionKey(key3DatabaseURL: databaseURL, primaryPassword: primaryPassword ?? "")
         case .version3: encryptionKeyResult = keyReader.getEncryptionKey(key4DatabaseURL: databaseURL, primaryPassword: primaryPassword ?? "")
         }

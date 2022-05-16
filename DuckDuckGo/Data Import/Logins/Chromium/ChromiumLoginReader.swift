@@ -46,7 +46,7 @@ final class ChromiumLoginReader {
         self.decryptionKey = decryptionKey
     }
 
-    // swiftlint:disable:next function_body_length
+    // swiftlint:disable:next function_body_length cyclomatic_complexity
     func readLogins() -> Result<[ImportedLoginCredential], ChromiumLoginReader.ImportError> {
         guard let key = self.decryptionKey ?? promptForChromiumPasswordKeychainAccess(), let derivedKey = deriveKey(from: key) else {
             return .failure(.decryptionFailed)

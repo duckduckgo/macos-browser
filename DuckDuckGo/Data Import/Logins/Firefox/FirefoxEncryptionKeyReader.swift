@@ -28,6 +28,7 @@ protocol FirefoxEncryptionKeyReading {
 
 }
 
+// swiftlint:disable:next type_body_length
 final class FirefoxEncryptionKeyReader: FirefoxEncryptionKeyReading {
     
     func getEncryptionKey(key3DatabaseURL: URL, primaryPassword: String) -> Result<Data, FirefoxLoginReader.ImportError> {
@@ -36,7 +37,6 @@ final class FirefoxEncryptionKeyReader: FirefoxEncryptionKeyReading {
         }
         
         guard let globalSalt = result["global-salt"],
-              let passwordCheck = result["password-check"],
               let asnData = result["data"]?[4...] else { // Drop the first 4 bytes, they aren't required for decryption and can be ignored
             return .failure(.decryptionFailed)
         }
@@ -214,15 +214,19 @@ final class FirefoxEncryptionKeyReader: FirefoxEncryptionKeyReading {
     /// iv = k[-8:]  # last 8 bytes
     /// clearText = DES3.new(key, DES3.CBC, iv).decrypt(cipherText)
     private func tripleDesDecrypt(ciphertext: Data, globalSalt: Data, entrySalt: Data, primaryPassword: String) -> Data? {
-        guard let primaryPasswordData = primaryPassword.data(using: .utf8) else {
+        guard let primaryPasswordData = primaryPassword.data(using: .utf8), let pes = NSMutableData(length: 20) else {
             return nil
         }
 
+        entrySalt.withUnsafeBytes { rawBufferPointer in
+            let pointer = rawBufferPointer.baseAddress!
+            pes.replaceBytes(in: NSRange(location: 0, length: entrySalt.count), withBytes: pointer)
+        }
+        
         let hp = SHA.from(data: globalSalt + primaryPasswordData)
         let chp = SHA.from(data: hp + entrySalt)
-        let pes = entrySalt // TODO: Pad this to 20 bytes
         let k1 = HMAC.digestSHA1(key: chp, message: (pes + entrySalt))
-        let tk = HMAC.digestSHA1(key: chp, message: pes)
+        let tk = HMAC.digestSHA1(key: chp, message: pes as Data)
         let k2 = HMAC.digestSHA1(key: chp, message: (tk + entrySalt))
         let k = k1 + k2
 
