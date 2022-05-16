@@ -147,7 +147,11 @@ final class AddressBarTextField: NSTextField {
 
         let addressBarString = selectedTabViewModel.addressBarString
         let isSearch = selectedTabViewModel.tab.content.url?.isDuckDuckGoSearch ?? false
-        value = Value(stringValue: addressBarString, userTyped: false, isSearch: isSearch)
+
+        // Don‘t overwrite user-entered text while editing
+        if !(value.isUserTyped && self.currentEditor() != nil) {
+            value = Value(stringValue: addressBarString, userTyped: false, isSearch: isSearch)
+        }
     }
 
     private func saveValue() {
@@ -417,6 +421,15 @@ final class AddressBarTextField: NSTextField {
                 return true
             }
             return false
+        }
+
+        var isUserTyped: Bool {
+            switch self {
+            case .url(urlString: _, url: _, userTyped: let userTyped):
+                return userTyped
+            case .text, .suggestion:
+                return true
+            }
         }
     }
 
