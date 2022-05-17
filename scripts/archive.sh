@@ -95,11 +95,13 @@ set_up_environment() {
 		configuration="CI_${configuration}"
 	fi
 
+	app_version=$(get_app_version)
+
 	app_path="${workdir}/${app_name}.app"
 	dsym_path="${archive}/dSYMs"
 
-	output_app_zip_path="${workdir}/DuckDuckGo.zip"
-	output_dsym_zip_path="${workdir}/${app_name}.app.dSYM.zip"
+	output_app_zip_path="${workdir}/DuckDuckGo-${app_version}.zip"
+	output_dsym_zip_path="${workdir}/DuckDuckGo-${app_version}-dSYM.zip"
 }
 
 get_developer_credentials() {
@@ -172,12 +174,20 @@ check_xcpretty() {
 	fi
 }
 
+get_app_version() {
+	xcrun xcodebuild \
+		-scheme "${scheme}" \
+		-showBuildSettings 2>/dev/null \
+		| grep MARKETING_VERSION \
+		| awk '{print $3;}'
+}
+
 archive_and_export() {
 	local xcpretty
 	check_xcpretty
 
 	echo
-	echo "Building and archiving the app ..."
+	echo "Building and archiving the app (version ${app_version}) ..."
 	echo
 	
 	xcrun xcodebuild archive \
@@ -234,6 +244,8 @@ upload_for_notarization() {
 		fi
 	done
 	echo
+
+	rm -rf "${notarization_zip_path}"
 }
 
 get_notarization_info() {
@@ -291,7 +303,7 @@ create_dmg() {
 	echo
 	local dmg_dir="${workdir}/dmg"
 	local dmg_background="${cwd}/assets/dmg-background.png"
-	dmg_output_path="${workdir}/${app_name}.dmg"
+	dmg_output_path="${workdir}/${app_name}-${app_version}.dmg"
 
 	rm -rf "${dmg_dir}" "${dmg_output_path}"
 	mkdir -p "${dmg_dir}"
@@ -340,7 +352,11 @@ main() {
 	echo "Compressed app ready at ${output_app_zip_path}"
 	echo "Compressed debug symbols ready at ${output_dsym_zip_path}"
 
-	if [[ -z $CI ]]; then
+	if [[ -n $CI ]]; then
+		if [[ -z "${GITHUB_ENV}" ]]; then
+			echo "app_version=${app_version}" >> "${GITHUB_ENV}"
+		fi
+	else
 		open "${workdir}"
 	fi
 }

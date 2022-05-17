@@ -99,20 +99,20 @@ jobs:
       uses: actions/upload-artifact@v3
       with:
         name: DuckDuckGo-macos-${{ github.event.inputs.release-type }}.app
-        path: ${{ github.workspace }}/release/DuckDuckGo.zip
+        path: ${{ github.workspace }}/release/DuckDuckGo-${{ env.app_version }}.zip
 
     - name: Upload dSYMs artifact
       uses: actions/upload-artifact@v3
       with:
         name: DuckDuckGo-macos-${{ github.event.inputs.release-type }}-dSYM
-        path: ${{ github.workspace }}/release/DuckDuckGo*.app.dSYM.zip
+        path: ${{ github.workspace }}/release/DuckDuckGo-${{ env.app_version }}-dSYM.zip
 
     - name: Upload DMG artifact
       if: github.event.inputs.create-dmg || github.event.inputs.asana-task-url
       uses: actions/upload-artifact@v3
       with:
         name: DuckDuckGo-macos-${{ github.event.inputs.release-type }}.dmg
-        path: ${{ github.workspace }}/release/DuckDuckGo*.dmg
+        path: ${{ github.workspace }}/release/DuckDuckGo*-${{ env.app_version }}.dmg
 
     - name: Send Mattermost message
       env:
