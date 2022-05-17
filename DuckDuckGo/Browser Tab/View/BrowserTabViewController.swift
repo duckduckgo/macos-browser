@@ -203,8 +203,32 @@ final class BrowserTabViewController: NSViewController {
         }
     }
 
-    func makeWebViewFirstResponder() {
-        self.webView?.makeMeFirstResponder()
+    func adjustFirstResponder() {
+        switch tabViewModel?.tab.content ?? .none {
+        case .homePage, .onboarding, .none:
+            break
+        case .url:
+            self.webView?.makeMeFirstResponder()
+        case .preferences:
+            preferencesViewController.adjustFirstResponder()
+        case .bookmarks:
+            bookmarksViewController.adjustFirstResponder()
+        }
+    }
+
+    func recalculatePartialKeyViewLoop(after firstKeyView: NSView) -> NSView {
+        switch tabViewModel?.tab.content ?? .none {
+        case .homePage, .onboarding, .none:
+            // TODO: setup homepage/onboarding key view loop
+            return firstKeyView
+        case .url:
+            firstKeyView.nextKeyView = webView
+            return webView ?? firstKeyView
+        case .preferences:
+            return preferencesViewController.recalculatePartialKeyViewLoop(after: firstKeyView)
+        case .bookmarks:
+            return bookmarksViewController.recalculatePartialKeyViewLoop(after: firstKeyView)
+        }
     }
 
     private func setFirstResponderIfNeeded() {
@@ -218,7 +242,7 @@ final class BrowserTabViewController: NSViewController {
                 return
             }
 
-            self.makeWebViewFirstResponder()
+            self.adjustFirstResponder()
         }
     }
 
@@ -288,6 +312,16 @@ final class BrowserTabViewController: NSViewController {
         transientTabContentViewController = vc
     }
 
+    private func showPreferencePane(_ pane: PreferencePaneIdentifier?) {
+        if let pane = pane, preferencesViewController.model.selectedPane != pane {
+            preferencesViewController.model.selectPane(pane)
+        }
+        if preferencesViewController.parent !== self {
+            removeAllTabContent()
+            showTabContentController(preferencesViewController)
+        }
+    }
+
     private func requestDisableUI() {
         (view.window?.windowController as? MainWindowController)?.userInteraction(prevented: true)
     }
@@ -305,11 +339,7 @@ final class BrowserTabViewController: NSViewController {
             showTabContentController(bookmarksViewController)
 
         case let .preferences(pane):
-            removeAllTabContent()
-            if let pane = pane, preferencesViewController.model.selectedPane != pane {
-                preferencesViewController.model.selectPane(pane)
-            }
-            showTabContentController(preferencesViewController)
+            self.showPreferencePane(pane)
 
         case .onboarding:
             removeAllTabContent()

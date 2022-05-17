@@ -44,7 +44,7 @@ final class DownloadsViewController: NSViewController {
     private static let openDownloadsLinkTag = 67
     var openDownloadsLink: NSButton? {
         didSet {
-            setUpKeyViewCycle()
+            recalculateKeyViewLoop()
         }
     }
     private var cellIndexToUnselect: Int?
@@ -89,14 +89,14 @@ final class DownloadsViewController: NSViewController {
     }
 
     override func viewDidAppear() {
-        setUpKeyViewCycle()
+        recalculateKeyViewLoop()
     }
 
     override func viewWillDisappear() {
         downloadsCancellable = nil
     }
 
-    private func setUpKeyViewCycle() {
+    private func recalculateKeyViewLoop() {
         self.clearButton.nextKeyView = self.viewModel.items.isEmpty ? self.openDownloadsLink : self.tableView
         if !self.viewModel.items.isEmpty {
             self.tableView.nextKeyView = self.openDownloadsLink
@@ -227,7 +227,7 @@ final class DownloadsViewController: NSViewController {
             guard !viewModel.items.isEmpty else { break }
             tableView.makeMeFirstResponder()
             let row = tableView.numberOfRows - 1
-            tableView.selectRowIndexes(IndexSet(integer: viewModel.items.count - 1), byExtendingSelection: false)
+            tableView.selectRowIndexes(IndexSet(integer: row), byExtendingSelection: false)
             tableView.scrollRowToVisible(row)
             return
 

@@ -46,7 +46,7 @@
                                             <constraint firstAttribute="height" constant="28" id="bi3-CJ-RZk"/>
                                             <constraint firstAttribute="width" constant="28" id="hQ5-kp-q6K"/>
                                         </constraints>
-                                        <buttonCell key="cell" type="square" bezelStyle="shadowlessSquare" image="Back" imagePosition="only" alignment="center" imageScaling="proportionallyDown" inset="2" id="ZaC-5g-rMK">
+                                        <buttonCell key="cell" type="square" bezelStyle="shadowlessSquare" image="Back" imagePosition="only" alignment="center" refusesFirstResponder="YES" imageScaling="proportionallyDown" inset="2" id="ZaC-5g-rMK">
                                             <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
                                             <font key="font" metaFont="system"/>
                                         </buttonCell>
@@ -120,7 +120,7 @@
                                             <constraint firstAttribute="width" constant="28" id="avH-Y7-ipU"/>
                                             <constraint firstAttribute="height" constant="28" id="loq-Q2-JPM"/>
                                         </constraints>
-                                        <buttonCell key="cell" type="square" bezelStyle="shadowlessSquare" image="Forward" imagePosition="only" alignment="center" imageScaling="proportionallyDown" inset="2" id="R1x-TD-SO5">
+                                        <buttonCell key="cell" type="square" bezelStyle="shadowlessSquare" image="Forward" imagePosition="only" alignment="center" refusesFirstResponder="YES" imageScaling="proportionallyDown" inset="2" id="R1x-TD-SO5">
                                             <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
                                             <font key="font" metaFont="system"/>
                                         </buttonCell>
@@ -265,10 +265,10 @@
                         <outlet property="collectionView" destination="OEu-5P-cRF" id="b95-c4-JM0"/>
                         <outlet property="draggingSpace" destination="Ako-KX-AM9" id="yya-hb-te7"/>
                         <outlet property="fireButton" destination="XV4-Ze-5j7" id="ZCC-wX-7hC"/>
+                        <outlet property="fixedAddNewTabButton" destination="qXs-b0-tWI" id="cI1-G5-Plf"/>
                         <outlet property="leadingStackViewLeadingConstraint" destination="8CU-j8-UY3" id="qi2-Cw-RTu"/>
                         <outlet property="leftScrollButton" destination="7XG-Qm-Ksx" id="yre-8P-vb9"/>
                         <outlet property="leftShadowImageView" destination="zsA-or-9Xo" id="wVp-jj-2UD"/>
-                        <outlet property="plusButton" destination="qXs-b0-tWI" id="cI1-G5-Plf"/>
                         <outlet property="rightScrollButton" destination="2da-G7-xcP" id="4ka-kI-E1j"/>
                         <outlet property="rightShadowImageView" destination="u4N-Qc-LMf" id="QX4-lD-gfb"/>
                         <outlet property="scrollView" destination="O0X-yp-zLn" id="g9v-fn-qxC"/>

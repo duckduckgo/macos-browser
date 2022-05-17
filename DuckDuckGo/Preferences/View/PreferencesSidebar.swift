@@ -17,19 +17,28 @@
 //
 
 import SwiftUI
+import Carbon.HIToolbox
 
 extension Preferences {
 
     struct SidebarItem: View {
+        @EnvironmentObject var model: PreferencesSidebarModel
+
         let pane: PreferencePaneIdentifier
         let isSelected: Bool
         let action: () -> Void
 
         var body: some View {
+            let textColor = isSelected
+                ? (model.isFirstResponder ? Color(.selectedMenuItemTextColor) : Color(.unemphasizedSelectedTextColor))
+                : Color(.controlTextColor)
+
             Button(action: action) {
                 HStack(spacing: 6) {
                     Image(pane.preferenceIconName).frame(width: 16, height: 16)
-                    Text(pane.displayName).font(Const.Fonts.sideBarItem)
+                    Text(pane.displayName)
+                        .font(Const.Fonts.sideBarItem)
+                        .foregroundColor(textColor)
                 }
             }
             .buttonStyle(SidebarItemButtonStyle(isSelected: isSelected))
@@ -67,6 +76,8 @@ extension Preferences {
     struct Sidebar: View {
         @EnvironmentObject var model: PreferencesSidebarModel
 
+        static let tableViewTag = 157
+
         var body: some View {
             VStack(spacing: 12) {
                 TabSwitcher()
@@ -87,6 +98,34 @@ extension Preferences {
                             }
                         }
                     }
+                    .focusable(onClick: true, focusRing: false, tag: Self.tableViewTag, onFocus: { isFirstResponder in
+                        if model.isFirstResponder != isFirstResponder {
+                            model.isFirstResponder = isFirstResponder
+                        }
+                    }, keyDown: { event in
+                        switch Int(event.keyCode) {
+                        case kVK_DownArrow:
+                            if NSApp.isCommandPressed || NSApp.isOptionPressed {
+                                fallthrough
+                            }
+                            model.selectNextPane()
+                            return nil
+                        case kVK_End:
+                            model.selectLastPane()
+                            return nil
+                        case kVK_UpArrow:
+                            if NSApp.isCommandPressed || NSApp.isOptionPressed {
+                                fallthrough
+                            }
+                            model.selectPreviousPane()
+                            return nil
+                        case kVK_Home:
+                            model.selectFirstPane()
+                            return nil
+                        default: break
+                        }
+                        return event
+                    })
                 }
 
             }
@@ -100,15 +139,16 @@ extension Preferences {
         let isSelected: Bool
 
         @State private var isHovered: Bool = false
+        @EnvironmentObject var model: PreferencesSidebarModel
 
         func makeBody(configuration: Self.Configuration) -> some View {
 
             let bgColor: Color = {
                 if isSelected {
-                    return Color("RowHoverColor")
+                    return model.isFirstResponder ? Color(.selectedContentBackgroundColor) : Color(.unemphasizedSelectedContentBackgroundColor)
                 }
                 if isHovered {
-                    return Color("ButtonMouseOverColor")
+                    return Color(.rowHoverColor)
                 }
                 return Color(NSColor.clear.withAlphaComponent(0.001))
             }()

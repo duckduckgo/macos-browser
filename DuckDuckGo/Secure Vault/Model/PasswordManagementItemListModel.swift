@@ -396,54 +396,6 @@ final class PasswordManagementItemListModel: ObservableObject {
     private func item(at indexPath: IndexPath) -> SecureVaultItem? {
         return displayedItems[safe: indexPath.section]?.items[indexPath.item]
     }
-
-    @discardableResult
-    func selectNext() -> SecureVaultItem? {
-        guard let selectedItem = selected,
-              let selectionIndexPath = indexPath(of: selectedItem)
-        else {
-            return selectLast()
-        }
-
-        let nextIndexPath: IndexPath
-        if displayedItems[selectionIndexPath.section].items.count > selectionIndexPath.item + 1 {
-            nextIndexPath = IndexPath(item: selectionIndexPath.item + 1, section: selectionIndexPath.section)
-        } else if let nextSection = ((selectionIndexPath.section + 1)..<displayedItems.count).first(where: { !displayedItems[$0].items.isEmpty }) {
-            nextIndexPath = IndexPath(item: 0, section: nextSection)
-        } else {
-            return nil
-        }
-
-        self.selected = nil
-        self.selectionIndexPath = nextIndexPath
-        let item = self.item(at: nextIndexPath)
-        self.selected(item: item)
-        return item
-    }
-
-    @discardableResult
-    func selectPrevious() -> SecureVaultItem? {
-        guard let selectedItem = selected,
-              let selectionIndexPath = indexPath(of: selectedItem)
-        else {
-            return selectFirst()
-        }
-
-        let prevIndexPath: IndexPath
-        if selectionIndexPath.item > 0 {
-            prevIndexPath = IndexPath(item: selectionIndexPath.item - 1, section: selectionIndexPath.section)
-        } else if let prevSection = (0..<selectionIndexPath.section).last(where: { !displayedItems[$0].items.isEmpty }) {
-            prevIndexPath = IndexPath(item: displayedItems[prevSection].items.count - 1, section: prevSection)
-        } else {
-            return nil
-        }
-
-        self.selected = nil
-        self.selectionIndexPath = prevIndexPath
-        let item = self.item(at: prevIndexPath)
-        self.selected(item: item)
-        return item
-    }
     
     func clear() {
         update(items: [])
@@ -453,10 +405,6 @@ final class PasswordManagementItemListModel: ObservableObject {
         // Setting items to an empty array will typically show the No Data empty state, but this call is used when
         // the popover is closed so instead there should be no empty state.
         emptyState = .none
-    }
-
-    func clearSelection() {
-        selected = nil
     }
 
     private func sortIntoSectionsByItemType(_ items: [SecureVaultItem]) -> [PasswordManagementListSection] {
@@ -505,6 +453,106 @@ final class PasswordManagementItemListModel: ObservableObject {
         case .logins: emptyState = .logins
         case .identities: emptyState = .identities
         }
+    }
+
+}
+
+extension PasswordManagementItemListModel {
+
+    @discardableResult
+    func selectNext() -> SecureVaultItem? {
+        guard let selectedItem = selected,
+              let selectionIndexPath = indexPath(of: selectedItem)
+        else {
+            return selectLast()
+        }
+
+        let nextIndexPath: IndexPath
+        if displayedItems[selectionIndexPath.section].items.count > selectionIndexPath.item + 1 {
+            nextIndexPath = IndexPath(item: selectionIndexPath.item + 1, section: selectionIndexPath.section)
+        } else if let nextSection = ((selectionIndexPath.section + 1)..<displayedItems.count).first(where: { !displayedItems[$0].items.isEmpty }) {
+            nextIndexPath = IndexPath(item: 0, section: nextSection)
+        } else {
+            return nil
+        }
+
+        self.selected = nil
+        self.selectionIndexPath = nextIndexPath
+        let item = self.item(at: nextIndexPath)
+        self.selected(item: item)
+        return item
+    }
+
+    @discardableResult
+    func selectNextSection() -> SecureVaultItem? {
+        guard let selectedItem = selected,
+              let selectionIndexPath = indexPath(of: selectedItem)
+        else {
+            return selectLast()
+        }
+
+        let nextIndexPath: IndexPath
+        if let nextSection = ((selectionIndexPath.section + 1)..<displayedItems.count).first(where: { !displayedItems[$0].items.isEmpty }) {
+            nextIndexPath = IndexPath(item: 0, section: nextSection)
+        } else {
+            return selectLast()
+        }
+
+        self.selected = nil
+        self.selectionIndexPath = nextIndexPath
+        let item = self.item(at: nextIndexPath)
+        self.selected(item: item)
+        return item
+    }
+
+    @discardableResult
+    func selectPrevious() -> SecureVaultItem? {
+        guard let selectedItem = selected,
+              let selectionIndexPath = indexPath(of: selectedItem)
+        else {
+            return selectFirst()
+        }
+
+        let prevIndexPath: IndexPath
+        if selectionIndexPath.item > 0 {
+            prevIndexPath = IndexPath(item: selectionIndexPath.item - 1, section: selectionIndexPath.section)
+        } else if let prevSection = (0..<selectionIndexPath.section).last(where: { !displayedItems[$0].items.isEmpty }) {
+            prevIndexPath = IndexPath(item: displayedItems[prevSection].items.count - 1, section: prevSection)
+        } else {
+            return nil
+        }
+
+        self.selected = nil
+        self.selectionIndexPath = prevIndexPath
+        let item = self.item(at: prevIndexPath)
+        self.selected(item: item)
+        return item
+    }
+
+    @discardableResult
+    func selectPreviousSection() -> SecureVaultItem? {
+        guard let selectedItem = selected,
+              let selectionIndexPath = indexPath(of: selectedItem)
+        else {
+            return selectFirst()
+        }
+
+        let prevIndexPath: IndexPath
+        if let prevSection = (0..<selectionIndexPath.section).last(where: { !displayedItems[$0].items.isEmpty }) {
+            prevIndexPath = IndexPath(item: displayedItems[prevSection].items.count - 1, section: prevSection)
+        } else {
+            return selectFirst()
+        }
+
+        self.selected = nil
+        self.selectionIndexPath = prevIndexPath
+        let item = self.item(at: prevIndexPath)
+        self.selected(item: item)
+        return item
+    }
+
+    func clearSelection() {
+        selected = nil
     }
 
 }

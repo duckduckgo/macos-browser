@@ -203,6 +203,20 @@ final class NavigationBarViewController: NSViewController {
         return addressBarViewController
     }
 
+    var lastKeyView: NSView {
+        return self.optionsButton
+    }
+
+    func recalculatePartialKeyViewLoop(after firstKeyView: NSView) -> NSView {
+        if NSApp.isFullKeyboardAccessEnabled {
+            firstKeyView.nextKeyView = self.goBackButton
+            return self.lastKeyView
+        } else {
+            firstKeyView.nextKeyView = self.addressBarViewController?.addressBarTextField
+            return self.addressBarViewController?.addressBarTextField ?? firstKeyView
+        }
+    }
+
     @IBAction func goBackAction(_ sender: NSButton) {
         guard let selectedTabViewModel = tabCollectionViewModel.selectedTabViewModel else {
             os_log("%s: Selected tab view model is nil", type: .error, className)

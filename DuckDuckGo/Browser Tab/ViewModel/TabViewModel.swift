@@ -311,7 +311,7 @@ extension TabViewModel {
         tab.findInPage = findInPage
         findInPage.show()
     }
-
+// TODO: this is closed multiple times when site finishes loading (e.g. thingiverse)
     func closeFindInPage() {
         guard findInPage.visible else { return }
         tab.findDone()

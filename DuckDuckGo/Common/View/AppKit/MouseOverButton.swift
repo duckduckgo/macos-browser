@@ -73,12 +73,15 @@ internal class MouseOverButton: NSButton {
 
     override init(frame: CGRect) {
         super.init(frame: frame)
-
-        configureLayers()
+        initialize()
     }
 
     required init?(coder: NSCoder) {
         super.init(coder: coder)
+        initialize()
+    }
+
+    private func initialize() {
         self.setButtonType(.momentaryPushIn)
         self.isBordered = false
         self.bezelStyle = .shadowlessSquare
@@ -94,14 +97,14 @@ internal class MouseOverButton: NSButton {
         self.layer?.addSublayer(backgroundLayer)
     }
 
-    override func awakeFromNib() {
-        normalTintColor = self.contentTintColor
-        addTrackingArea()
-    }
-
     override func viewWillMove(toWindow newWindow: NSWindow?) {
         isMouseDown = false
         isMouseOver = false
+
+        if newWindow != nil {
+            normalTintColor = self.contentTintColor
+            addTrackingArea()
+        }
     }
 
     override func mouseEntered(with event: NSEvent) {

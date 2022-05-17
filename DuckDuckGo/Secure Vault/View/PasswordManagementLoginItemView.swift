@@ -352,6 +352,7 @@ extension View {
     func focusable(_ focusable: Bool = true,
                    onClick: Bool = false,
                    focusRing: Bool = true,
+                   tag: Int = 0,
                    onFocus: ((Bool) -> Void)? = nil,
                    action: (() -> Void)? = nil,
                    menu: (() -> NSMenu)? = nil,
@@ -360,6 +361,7 @@ extension View {
         if focusable {
             self.overlay(FocusSwiftUIView(onClick: onClick,
                                           focusRing: focusRing,
+                                          tag: tag,
                                           onFocus: onFocus,
                                           action: action,
                                           menu: menu,

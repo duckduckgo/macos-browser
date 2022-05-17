@@ -1,5 +1,5 @@
 //
-//  DownloadsTableView.swift
+//  KeyboardControllableTableView.swift
 //
 //  Copyright © 2022 DuckDuckGo. All rights reserved.
 //
@@ -20,7 +20,10 @@ import AppKit
 import Carbon.HIToolbox
 import Combine
 
-final class DownloadsTableView: NSTableView {
+final class KeyboardControllableTableView: NSTableView {
+
+    @IBInspectable var levelUpAction: String?
+    @IBInspectable var shouldDeselectOnFirstResponderInsideView: Bool = false
 
     private var isSelectionImplicit = false
     private var lastSelectedRow: Int?
@@ -61,7 +64,9 @@ final class DownloadsTableView: NSTableView {
         if !self.selectedRowIndexes.isEmpty,
            // Deselect implicit selection
            // Or deselect when first responder is a link inside the table
-           isSelectionImplicit || (newResponder as? NSView)?.isDescendant(of: self) == true {
+           isSelectionImplicit
+            || (shouldDeselectOnFirstResponderInsideView
+                && (newResponder as? NSView)?.isDescendant(of: self) == true) {
             self.lastSelectedRow = self.selectedRow
             self.deselectAll(nil)
         }
@@ -75,17 +80,24 @@ final class DownloadsTableView: NSTableView {
 
     override func keyDown(with event: NSEvent) {
         switch Int(event.keyCode) {
+        case kVK_UpArrow where NSApp.isCommandPressed:
+            guard let levelUpAction = levelUpAction else { break }
+            NSApp.sendAction(NSSelectorFromString(levelUpAction), to: self.target, from: send)
+            return
+
         case kVK_DownArrow where NSApp.isCommandPressed:
             guard let doubleAction = self.doubleAction,
                   self.selectedRow >= 0,
                   let selectedCell = self.view(atColumn: 0, row: selectedRow, makeIfNecessary: false)
-            else { fallthrough }
+            else { break }
 
             NSApp.sendAction(doubleAction, to: self.target, from: selectedCell)
-
+            return
+            
         default:
-            super.keyDown(with: event)
+            break
         }
+        super.keyDown(with: event)
     }
 
 }

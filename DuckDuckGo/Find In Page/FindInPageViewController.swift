@@ -63,6 +63,11 @@ final class FindInPageViewController: NSViewController {
         delegate?.findInPageDone(self)
     }
 
+    func recalculatePartialKeyViewLoop(after firstKeyView: NSView) -> NSView {
+        firstKeyView.nextKeyView = textField
+        return textField
+    }
+
     func control(_ control: NSControl, textView: NSTextView, doCommandBy commandSelector: Selector) -> Bool {
         // Handle pressing enter here rather than didEndEditing otherwise it moving to the next match doesn't work.
         guard NSApp.isReturnOrEnterPressed,

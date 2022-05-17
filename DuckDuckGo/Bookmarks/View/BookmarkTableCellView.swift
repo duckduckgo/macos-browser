@@ -20,8 +20,10 @@ import Foundation
 
 @objc protocol BookmarkTableCellViewDelegate: AnyObject {
 
-    func bookmarkTableCellViewRequestedMenu(_ sender: NSButton, cell: BookmarkTableCellView)
+    func bookmarkTableCellViewRequestedMenu(_ cell: BookmarkTableCellView)
     func bookmarkTableCellViewToggledFavorite(cell: BookmarkTableCellView)
+    func bookmarkTableCellViewCancelEditing(cell: BookmarkTableCellView)
+    func bookmarkTableCellViewEndEditing(cell: BookmarkTableCellView)
     func bookmarkTableCellView(_ cellView: BookmarkTableCellView, updatedBookmarkWithUUID uuid: UUID, newTitle: String, newUrl: String)
 
 }
@@ -78,7 +80,7 @@ final class BookmarkTableCellView: NSTableCellView, NibLoadable {
     @IBOutlet var titleLabelBottomConstraint: NSLayoutConstraint!
 
     @IBAction func cellMenuButtonClicked(_ sender: NSButton) {
-        delegate?.bookmarkTableCellViewRequestedMenu(sender, cell: self)
+        delegate?.bookmarkTableCellViewRequestedMenu(self)
     }
 
     @IBAction func favoriteButtonClicked(_ sender: NSButton) {
@@ -164,6 +166,8 @@ final class BookmarkTableCellView: NSTableCellView, NibLoadable {
     override func awakeFromNib() {
         super.awakeFromNib()
         resetCellState()
+        titleLabel.delegate = self
+        bookmarkURLLabel.delegate = self
     }
 
     func update(from bookmark: Bookmark) {
@@ -207,6 +211,7 @@ final class BookmarkTableCellView: NSTableCellView, NibLoadable {
 
         bookmarkURLLabel.isHidden = false
         favoriteButton.isHidden = false
+        favoriteButton.nextKeyView = titleLabel
         titleLabelBottomConstraint.priority = .defaultLow
 
         hideTertiaryValueInTitleLabel()
@@ -217,9 +222,15 @@ final class BookmarkTableCellView: NSTableCellView, NibLoadable {
         }
     }
 
-    private func exitEditingMode() {
-        window?.makeFirstResponder(nil)
+    func reset() {
+        if let editedBookmark = self.entity as? Bookmark {
+            titleLabel.stringValue = editedBookmark.title
+            bookmarkURLLabel.stringValue = editedBookmark.url.absoluteString
 
+        }
+    }
+
+    private func exitEditingMode() {
         titleLabel.isEditable = false
         bookmarkURLLabel.isEditable = false
 
@@ -315,6 +326,23 @@ final class BookmarkTableCellView: NSTableCellView, NibLoadable {
         titleString.append(urlString)
 
         return titleString
+    }
+
+}
+
+extension BookmarkTableCellView: NSTextFieldDelegate {
+
+    func control(_ control: NSControl, textView: NSTextView, doCommandBy selector: Selector) -> Bool {
+        switch selector {
+        case #selector(cancelOperation(_:)):
+            delegate?.bookmarkTableCellViewCancelEditing(cell: self)
+            return true
+        case #selector(insertNewline(_:)):
+            delegate?.bookmarkTableCellViewEndEditing(cell: self)
+            return true
+        default:
+            return false
+        }
     }
 
 }

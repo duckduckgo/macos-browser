@@ -168,7 +168,7 @@
                                     <rect key="frame" x="0.0" y="0.0" width="580" height="548"/>
                                     <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                     <subviews>
-                                        <tableView verticalHuggingPriority="750" allowsExpansionToolTips="YES" tableStyle="plain" columnReordering="NO" columnResizing="NO" autosaveColumns="NO" rowSizeStyle="automatic" usesAutomaticRowHeights="YES" viewBased="YES" id="b59-XH-JSp">
+                                        <tableView verticalHuggingPriority="750" allowsExpansionToolTips="YES" tableStyle="plain" columnReordering="NO" columnResizing="NO" autosaveColumns="NO" rowSizeStyle="automatic" usesAutomaticRowHeights="YES" viewBased="YES" id="b59-XH-JSp" customClass="KeyboardControllableTableView" customModule="DuckDuckGo_Privacy_Browser" customModuleProvider="target">
                                             <rect key="frame" x="0.0" y="0.0" width="580" height="504"/>
                                             <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                             <color key="backgroundColor" name="ClearColor"/>
@@ -187,6 +187,9 @@
                                                     <tableColumnResizingMask key="resizingMask" resizeWithTable="YES"/>
                                                 </tableColumn>
                                             </tableColumns>
+                                            <userDefinedRuntimeAttributes>
+                                                <userDefinedRuntimeAttribute type="string" keyPath="levelUpAction" value="goToParentFolder:"/>
+                                            </userDefinedRuntimeAttributes>
                                             <connections>
                                                 <action selector="handleClick:" target="nlv-9S-Ioa" id="qSg-4S-bnN"/>
                                                 <action trigger="doubleAction" selector="handleDoubleClick:" target="nlv-9S-Ioa" id="aRZ-xN-juR"/>
@@ -267,13 +270,13 @@
                                     <constraint firstItem="LTY-g7-MLc" firstAttribute="top" secondItem="mrh-3F-46f" secondAttribute="bottom" constant="8" id="xB2-zS-Uxz"/>
                                 </constraints>
                             </customView>
-                            <button verticalHuggingPriority="750" imageHugsTitle="YES" translatesAutoresizingMaskIntoConstraints="NO" id="nQu-I8-OqK" customClass="MouseOverButton" customModule="DuckDuckGo_Privacy_Browser" customModuleProvider="target">
+                            <button focusRingType="exterior" verticalHuggingPriority="750" imageHugsTitle="YES" translatesAutoresizingMaskIntoConstraints="NO" id="nQu-I8-OqK" customClass="MouseOverButton" customModule="DuckDuckGo_Privacy_Browser" customModuleProvider="target">
                                 <rect key="frame" x="194" y="573" width="110" height="24"/>
                                 <constraints>
                                     <constraint firstAttribute="width" constant="110" id="fCv-XV-yrO"/>
                                     <constraint firstAttribute="height" constant="24" id="ys9-mF-qNi"/>
                                 </constraints>
-                                <buttonCell key="cell" type="square" title="  New Folder" bezelStyle="shadowlessSquare" image="AddFolder" imagePosition="leading" alignment="center" inset="2" id="luj-VO-HpO">
+                                <buttonCell key="cell" type="square" title="  New Folder" bezelStyle="shadowlessSquare" image="AddFolder" imagePosition="leading" alignment="center" focusRingType="exterior" inset="2" id="luj-VO-HpO">
                                     <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
                                     <font key="font" metaFont="system"/>
                                 </buttonCell>
@@ -293,13 +296,13 @@
                                     <action selector="presentAddFolderModal:" target="nlv-9S-Ioa" id="Dv0-j9-4ha"/>
                                 </connections>
                             </button>
-                            <button verticalHuggingPriority="750" imageHugsTitle="YES" translatesAutoresizingMaskIntoConstraints="NO" id="96h-Ck-yux" customClass="MouseOverButton" customModule="DuckDuckGo_Privacy_Browser" customModuleProvider="target">
+                            <button focusRingType="exterior" verticalHuggingPriority="750" imageHugsTitle="YES" translatesAutoresizingMaskIntoConstraints="NO" id="96h-Ck-yux" customClass="MouseOverButton" customModule="DuckDuckGo_Privacy_Browser" customModuleProvider="target">
                                 <rect key="frame" x="48" y="573" width="130" height="24"/>
                                 <constraints>
                                     <constraint firstAttribute="height" constant="24" id="CKf-3f-aSt"/>
                                     <constraint firstAttribute="width" constant="130" id="hTU-md-bGM"/>
                                 </constraints>
-                                <buttonCell key="cell" type="square" title="  New Bookmark" bezelStyle="shadowlessSquare" image="AddBookmark" imagePosition="leading" alignment="center" inset="2" id="hNH-Va-fKg">
+                                <buttonCell key="cell" type="square" title="  New Bookmark" bezelStyle="shadowlessSquare" image="AddBookmark" imagePosition="leading" alignment="center" focusRingType="exterior" inset="2" id="hNH-Va-fKg">
                                     <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
                                     <font key="font" metaFont="system"/>
                                 </buttonCell>
@@ -349,6 +352,8 @@
                         <outlet property="emptyState" destination="I9P-t9-o4Y" id="pJ2-CO-qfr"/>
                         <outlet property="emptyStateMessage" destination="NwF-DN-Ena" id="a33-QA-OZc"/>
                         <outlet property="emptyStateTitle" destination="LTY-g7-MLc" id="3cM-x5-wox"/>
+                        <outlet property="newBookmarkButton" destination="96h-Ck-yux" id="bHg-qZ-vGZ"/>
+                        <outlet property="newFolderButton" destination="nQu-I8-OqK" id="eNr-s5-h8D"/>
                         <outlet property="tableView" destination="b59-XH-JSp" id="PpV-fJ-Dcg"/>
                     </connections>
                 </viewController>

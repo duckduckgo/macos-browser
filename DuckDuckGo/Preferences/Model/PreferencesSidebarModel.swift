@@ -23,6 +23,7 @@ final class PreferencesSidebarModel: ObservableObject {
     let sections: [PreferencesSection]
     let tabSwitcherTabs: [Tab.TabContent]
 
+    @Published var isFirstResponder: Bool = false
     @Published var selectedTabIndex: Int = 0
 
     @Published private(set) var selectedPane: PreferencePaneIdentifier = .defaultBrowser
@@ -39,10 +40,47 @@ final class PreferencesSidebarModel: ObservableObject {
         }
     }
 
-    func selectPane(_ identifier: PreferencePaneIdentifier) {
-        if sections.flatMap(\.panes).contains(identifier), identifier != selectedPane {
-            selectedPane = identifier
+    private func allPanes() -> [PreferencePaneIdentifier] {
+        return sections.flatMap(\.panes)
+    }
+
+    @discardableResult
+    func selectPane(_ identifier: PreferencePaneIdentifier) -> Bool {
+        guard allPanes().contains(identifier), identifier != selectedPane else { return false }
+        selectedPane = identifier
+        return true
+    }
+
+    @discardableResult
+    func selectNextPane() -> Bool {
+        let panes = allPanes()
+        guard let currentIdx = panes.firstIndex(of: selectedPane),
+              let nextPane = panes[safe: currentIdx + 1]
+        else {
+            return false
         }
+        return selectPane(nextPane)
+    }
+
+    @discardableResult
+    func selectPreviousPane() -> Bool {
+        let panes = allPanes()
+        guard let currentIdx = panes.firstIndex(of: selectedPane),
+              let prevPane = panes[safe: currentIdx - 1]
+        else {
+            return false
+        }
+        return selectPane(prevPane)
+    }
+
+    @discardableResult
+    func selectLastPane() -> Bool {
+        return selectPane(sections.last!.panes.last!)
+    }
+
+    @discardableResult
+    func selectFirstPane() -> Bool {
+        return selectPane(sections[0].panes[0])
     }
 
     func resetTabSelectionIfNeeded() {

@@ -317,11 +317,16 @@ final class MainViewController: NSViewController {
 
         switch selectedTabViewModel.tab.content {
         case .homePage, .onboarding, .none: navigationBarViewController.addressBarViewController?.addressBarTextField.makeMeFirstResponder()
-        case .url:
-            browserTabViewController.makeWebViewFirstResponder()
-        case .preferences: browserTabViewController.preferencesViewController.view.makeMeFirstResponder()
-        case .bookmarks: browserTabViewController.bookmarksViewController.view.makeMeFirstResponder()
+        case .url, .preferences, .bookmarks:
+            browserTabViewController.adjustFirstResponder()
         }
+    }
+
+    func recalculateKeyViewLoop() {
+        tabBarViewController.recalculatePartialKeyViewLoop(after: navigationBarViewController.lastKeyView)
+            .followedBy(findInPageViewController.recalculatePartialKeyViewLoop(after:))
+            .followedBy(browserTabViewController.recalculatePartialKeyViewLoop(after:))
+            .followedBy(navigationBarViewController.recalculatePartialKeyViewLoop(after:))
     }
 
 }

@@ -61,14 +61,7 @@ extension NSView {
     }
 
     func makeMeFirstResponder() {
-        // TODO: Check that no popovers is displayed and address is not being edited // swiftlint:disable:this todo
-        // also don‘t update address field when edited!
-        guard let window = window else {
-            os_log("%s: Window not available", type: .error, className)
-            return
-        }
-
-        window.makeFirstResponder(self)
+        window?.makeFirstResponder(self)
     }
 
     func setDefaultKeyViewLoop() {
@@ -76,6 +69,20 @@ extension NSView {
             return
         }
         self._setDefaultKeyViewLoop()
+    }
+
+    @discardableResult
+    func followedBy(_ recalculateKeyViewLoop: (NSView) -> NSView) -> NSView {
+        return recalculateKeyViewLoop(self)
+    }
+
+    var lastKeyView: NSView? {
+        var view = self
+        while let nextKeyView = view.nextKeyView,
+              nextKeyView.isDescendant(of: self) {
+            view = nextKeyView
+        }
+        return view
     }
 
     func applyDropShadow() {
@@ -106,7 +113,7 @@ extension NSView {
             NSLayoutConstraintToAttribute(attribute: .width, multiplier: multiplier, constant: const)
         }
         static func height(multiplier: CGFloat = 1.0, const: CGFloat = 0.0) -> NSLayoutConstraintToAttribute {
-            NSLayoutConstraintToAttribute(attribute: .width, multiplier: multiplier, constant: const)
+            NSLayoutConstraintToAttribute(attribute: .height, multiplier: multiplier, constant: const)
         }
 
         static func const(multiplier: CGFloat = 1.0, _ const: CGFloat) -> NSLayoutConstraintToAttribute {

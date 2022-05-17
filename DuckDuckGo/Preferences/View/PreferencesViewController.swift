@@ -52,6 +52,8 @@ final class PreferencesViewController: NSViewController {
             .sink { [weak self] identifier in
                 self?.delegate?.selectedPreferencePane(identifier)
             }
+
+        adjustFirstResponder()
     }
 
     override func viewWillDisappear() {
@@ -61,4 +63,27 @@ final class PreferencesViewController: NSViewController {
         selectedPreferencePaneCancellable?.cancel()
         selectedPreferencePaneCancellable = nil
     }
+
+    var firstKeyView: NSView {
+        self.view.nextKeyView ?? self.view
+    }
+
+    var lastKeyView: NSView {
+        self.view.lastKeyView ?? self.view
+    }
+
+    var sectionChooserFocusView: NSView? {
+        view.viewWithTag(Preferences.Sidebar.tableViewTag)
+    }
+
+    func adjustFirstResponder() {
+        self.sectionChooserFocusView?.makeMeFirstResponder()
+    }
+
+    func recalculatePartialKeyViewLoop(after firstKeyView: NSView) -> NSView {
+        firstKeyView.nextKeyView = self.firstKeyView
+        // let the engine adjust everything in between
+        return self.lastKeyView
+    }
+    
 }

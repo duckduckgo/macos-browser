@@ -19,20 +19,9 @@
 import SwiftUI
 
 fileprivate extension Preferences.Const {
-    static let autoLockPickerHorizontalOffset: CGFloat = {
-        if #available(macOS 12.0, *) {
-            return -8
-        } else {
-            return 0
-        }
-    }()
 
     static let autoLockWarningOffset: CGFloat = {
-        if #available(macOS 12.0, *) {
-            return 18
-        } else {
-            return 20
-        }
+        return 20
     }()
 
 }
@@ -76,11 +65,8 @@ extension Preferences {
 
                     VStack(alignment: .leading, spacing: 6) {
                         Toggle(UserText.autofillUsernamesAndPasswords, isOn: $model.askToSaveUsernamesAndPasswords)
-                            .fixMultilineScrollableText()
                         Toggle(UserText.autofillAddresses, isOn: $model.askToSaveAddresses)
-                            .fixMultilineScrollableText()
                         Toggle(UserText.autofillPaymentMethods, isOn: $model.askToSavePaymentMethods)
-                            .fixMultilineScrollableText()
                     }
                 }
 
@@ -89,9 +75,24 @@ extension Preferences {
                         .font(Const.Fonts.preferencePaneSectionHeader)
                         .padding(.bottom, 12)
 
-                    Picker(selection: isAutoLockEnabledBinding, content: {
+                    VStack(alignment: .leading) {
+                        let group = RadioButtonGroup(selection: model.isAutoLockEnabled ? 0 : 1) { selection in
+                            // Lock app until authenticated
+                            var condition: RunLoop.ResumeCondition?
+                            if selection == 1 {
+                                condition = RunLoop.ResumeCondition()
+                            }
+                            model.authorizeAutoLockSettingsChange(isEnabled: selection == 0) { _ in
+                                if let condition = condition {
+                                    condition.resolve()
+                                }
+                            }
+                            if let condition = condition {
+                                RunLoop.main.run(until: condition)
+                            }
+                        }
                         HStack {
-                            Text(UserText.autofillLockWhenIdle)
+                            RadioButton(title: UserText.autofillLockWhenIdle, group: group)
                             NSPopUpButtonView(selection: autoLockThresholdBinding) {
                                 let button = NSPopUpButton()
                                 button.setContentHuggingPriority(.defaultHigh, for: .horizontal)
@@ -103,11 +104,9 @@ extension Preferences {
                                 return button
                             }
                             .disabled(!model.isAutoLockEnabled)
-                        }.tag(true)
-                        Text(UserText.autofillNeverLock).tag(false)
-                    }, label: {})
-                    .pickerStyle(.radioGroup)
-                    .offset(x: Const.autoLockPickerHorizontalOffset)
+                        }
+                        RadioButton(title: UserText.autofillNeverLock, group: group)
+                    }
                     .padding(.bottom, 6)
 
                     Text(UserText.autofillNeverLockWarning)

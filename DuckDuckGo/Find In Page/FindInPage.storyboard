@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<document type="com.apple.InterfaceBuilder3.Cocoa.Storyboard.XIB" version="3.0" toolsVersion="19455" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES" initialViewController="9LP-fh-BRf">
+<document type="com.apple.InterfaceBuilder3.Cocoa.Storyboard.XIB" version="3.0" toolsVersion="20037" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES" initialViewController="9LP-fh-BRf">
     <dependencies>
         <deployment identifier="macosx"/>
-        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="19455"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="20037"/>
         <capability name="Named colors" minToolsVersion="9.0"/>
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
     </dependencies>
@@ -21,7 +21,7 @@
                                     <constraint firstAttribute="width" constant="32" id="YEe-St-HMj"/>
                                     <constraint firstAttribute="height" constant="24" id="k0z-Fd-kbt"/>
                                 </constraints>
-                                <buttonCell key="cell" type="square" bezelStyle="shadowlessSquare" image="Close-Large" imagePosition="only" alignment="center" imageScaling="proportionallyDown" inset="2" id="Gs5-tF-RjC">
+                                <buttonCell key="cell" type="square" bezelStyle="shadowlessSquare" image="Close-Large" imagePosition="only" alignment="center" refusesFirstResponder="YES" imageScaling="proportionallyDown" inset="2" id="Gs5-tF-RjC">
                                     <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
                                     <font key="font" metaFont="system"/>
                                 </buttonCell>
@@ -47,7 +47,7 @@
                                     <constraint firstAttribute="width" constant="32" id="6Ze-Oq-voa"/>
                                     <constraint firstAttribute="height" constant="24" id="VBe-gx-zVv"/>
                                 </constraints>
-                                <buttonCell key="cell" type="square" bezelStyle="shadowlessSquare" image="Find-Previous" imagePosition="only" alignment="center" imageScaling="proportionallyDown" inset="2" id="AOy-SC-evd">
+                                <buttonCell key="cell" type="square" bezelStyle="shadowlessSquare" image="Find-Previous" imagePosition="only" alignment="center" refusesFirstResponder="YES" imageScaling="proportionallyDown" inset="2" id="AOy-SC-evd">
                                     <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
                                     <font key="font" metaFont="system"/>
                                 </buttonCell>
@@ -73,7 +73,7 @@
                                     <constraint firstAttribute="height" constant="24" id="U1y-O1-eRL"/>
                                     <constraint firstAttribute="width" constant="32" id="nmQ-ju-a8J"/>
                                 </constraints>
-                                <buttonCell key="cell" type="square" bezelStyle="shadowlessSquare" image="Find-Next" imagePosition="only" alignment="center" imageScaling="proportionallyDown" inset="2" id="Adc-BN-gUM">
+                                <buttonCell key="cell" type="square" bezelStyle="shadowlessSquare" image="Find-Next" imagePosition="only" alignment="center" refusesFirstResponder="YES" imageScaling="proportionallyDown" inset="2" id="Adc-BN-gUM">
                                     <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
                                     <font key="font" metaFont="system"/>
                                 </buttonCell>
@@ -104,18 +104,17 @@
                                             <color key="backgroundColor" name="ClearColor"/>
                                         </textFieldCell>
                                     </textField>
-                                    <button translatesAutoresizingMaskIntoConstraints="NO" id="jgj-T1-zyO" userLabel="Search Image">
+                                    <imageView translatesAutoresizingMaskIntoConstraints="NO" id="jgj-T1-zyO" userLabel="Search Image">
                                         <rect key="frame" x="12" y="10" width="14" height="14"/>
                                         <constraints>
                                             <constraint firstAttribute="height" constant="14" id="KXB-7a-62O"/>
                                             <constraint firstAttribute="width" constant="14" id="LpJ-Ae-T4i"/>
                                         </constraints>
-                                        <buttonCell key="cell" type="square" bezelStyle="shadowlessSquare" image="Find-Search" imagePosition="only" alignment="center" imageScaling="proportionallyUpOrDown" inset="2" id="vwK-jg-8Gw">
-                                            <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
+                                        <imageCell key="cell" alignment="center" imageScaling="proportionallyUpOrDown" image="Find-Search" id="vwK-jg-8Gw">
                                             <font key="font" metaFont="system"/>
-                                        </buttonCell>
+                                        </imageCell>
                                         <color key="contentTintColor" name="ButtonColor"/>
-                                    </button>
+                                    </imageView>
                                     <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="gfp-ph-eKn" userLabel="Status Label">
                                         <rect key="frame" x="234" y="9" width="40" height="16"/>
                                         <textFieldCell key="cell" lineBreakMode="clipping" title="0 of 0" id="Pst-71-jYN">
@@ -179,10 +178,10 @@
             <color red="0.28627450980392155" green="0.28627450980392155" blue="0.28627450980392155" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
         </namedColor>
         <namedColor name="ButtonMouseDownColor">
-            <color red="1" green="1" blue="1" alpha="0.20000000298023224" colorSpace="custom" customColorSpace="sRGB"/>
+            <color red="0.0" green="0.0" blue="0.0" alpha="0.18000000715255737" colorSpace="custom" customColorSpace="sRGB"/>
         </namedColor>
         <namedColor name="ButtonMouseOverColor">
-            <color red="0.0" green="0.0" blue="0.0" alpha="0.10000000149011612" colorSpace="custom" customColorSpace="sRGB"/>
+            <color red="0.0" green="0.0" blue="0.0" alpha="0.05000000074505806" colorSpace="custom" customColorSpace="sRGB"/>
         </namedColor>
         <namedColor name="ClearColor">
             <color red="1" green="1" blue="1" alpha="0.0" colorSpace="custom" customColorSpace="sRGB"/>

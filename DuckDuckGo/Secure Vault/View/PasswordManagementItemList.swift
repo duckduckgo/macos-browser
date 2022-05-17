@@ -148,6 +148,10 @@ struct PasswordManagementItemListStackView: View {
             }, keyDown: { event in
                 switch Int(event.keyCode) {
                 case kVK_DownArrow:
+                    if NSApp.isOptionPressed {
+                        model.selectNextSection().map(onSelected)
+                        return nil
+                    }
                     if NSApp.isCommandPressed {
                         fallthrough
                     }
@@ -157,6 +161,10 @@ struct PasswordManagementItemListStackView: View {
                     model.selectLast().map(onSelected)
                     return nil
                 case kVK_UpArrow:
+                    if NSApp.isOptionPressed {
+                        model.selectPreviousSection().map(onSelected)
+                        return nil
+                    }
                     if NSApp.isCommandPressed {
                         fallthrough
                     }
@@ -308,27 +316,22 @@ struct PasswordManagementSortButton: NSViewRepresentable {
     let imageName: String
 
     func makeNSView(context: Context) -> some NSView {
-        var objects: NSArray?
-        // TODO: Create button programmatically // swiftlint:disable:this todo
-        NSNib(nibNamed: "PasswordSortButton", bundle: .main)?.instantiate(withOwner: nil, topLevelObjects: &objects)
-        let btn = ((objects as? [Any]?)!!.first(where: { $0 is NSButton }) as? NSButton)!
+        let btn = MouseOverButton(frame: CGRect(x: 0, y: 0, width: 28, height: 28))
         btn.image = NSImage(named: imageName)!
+        btn.focusRingType = .exterior
+        btn.mouseOverColor = .buttonMouseOverColor
+        btn.mouseDownColor = .buttonMouseDownColor
+        btn.cornerRadius = 4.0
+        NSLayoutConstraint.activate(btn.addConstraints(to: btn, [
+            .width: .const(28),
+            .height: .const(28)
+        ]))
 
-//        let btn = MouseOverButton(frame: CGRect(x: 0, y: 0, width: 24, height: 24))
-//
-//        btn.mouseOverColor = .buttonMouseOverColor
-//        btn.mouseDownColor = .buttonMouseDownColor
-//        btn.cornerRadius = 4
-//
-
-//        view.addSubview(btn)
-//        view.addConstraint(.init(item: view, attribute: .height, relatedBy: .equal, toItem: nil, attribute: .notAnAttribute, multiplier: 1.0, constant: 24))
-
-        let delegate = ButtonDelegate(menuProvider: menuProvider())
+        let delegate = MenuButtonDelegate(menuProvider: menuProvider())
 
         btn.sendAction(on: .leftMouseDown)
         btn.target = delegate
-        btn.action = #selector(ButtonDelegate.action(_:))
+        btn.action = #selector(MenuButtonDelegate.action(_:))
         btn.cell?.representedObject = delegate
 
         return btn
@@ -338,17 +341,7 @@ struct PasswordManagementSortButton: NSViewRepresentable {
         guard let btn = nsView as? NSButton else { return }
 
         btn.image = NSImage(named: imageName)!
-        (btn.target as? ButtonDelegate)?.menuProvider = menuProvider()
-    }
-
-    final private class ButtonDelegate: NSObject {
-        var menuProvider: MenuProvider
-        init(menuProvider: MenuProvider) {
-            self.menuProvider = menuProvider
-        }
-        @objc func action(_ sender: NSButton) {
-            menuProvider.createMenu().popUp(positioning: nil, at: NSPoint(x: 0, y: sender.bounds.maxY - 4), in: sender)
-        }
+        (btn.target as? MenuButtonDelegate)?.menuProvider = menuProvider()
     }
 
     private func menuProvider() -> MenuProvider {

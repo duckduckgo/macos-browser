@@ -50,13 +50,11 @@ extension Preferences {
                     }
                     .padding(.bottom, 8)
 
-                    TextButton(UserText.moreAt(url: model.displayableAboutURL)) {
-                        model.openURL(.aboutDuckDuckGo)
-                    }
+                    TextButton(UserText.moreAt(url: model.displayableAboutURL)) { model.openURL(.aboutDuckDuckGo) }
+                        .focusable(action: { model.openURL(.aboutDuckDuckGo) })
 
-                    TextButton(UserText.privacyPolicy) {
-                        model.openURL(.privacyPolicy)
-                    }
+                    TextButton(UserText.privacyPolicy) { model.openURL(.privacyPolicy) }
+                        .focusable(action: { model.openURL(.privacyPolicy) })
 
                     #if FEEDBACK
                     Button(UserText.sendFeedback) {

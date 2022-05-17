@@ -39,7 +39,13 @@ final class TabBarViewController: NSViewController {
     @IBOutlet weak var leftScrollButton: MouseOverButton!
     @IBOutlet weak var rightShadowImageView: NSImageView!
     @IBOutlet weak var leftShadowImageView: NSImageView!
-    @IBOutlet weak var plusButton: LongPressButton!
+    @IBOutlet weak var fixedAddNewTabButton: LongPressButton!
+    private weak   var floatingAddNewTabButton: NSButton?
+    private var isAddButtonFloating = false
+    var addNewTabButton: NSButton? {
+        isAddButtonFloating ? floatingAddNewTabButton : fixedAddNewTabButton
+    }
+
     @IBOutlet weak var fireButton: MouseOverAnimationButton!
     @IBOutlet weak var draggingSpace: NSView!
     @IBOutlet weak var windowDraggingViewLeadingConstraint: NSLayoutConstraint!
@@ -153,16 +159,14 @@ final class TabBarViewController: NSViewController {
         windowDraggingViewLeadingConstraint.constant = leadingSpace
 
         // Add button
-        if emptySpace > plusButton.frame.size.width {
+        if emptySpace > fixedAddNewTabButton.frame.size.width {
             isAddButtonFloating = true
         } else {
             isAddButtonFloating = false
         }
-        plusButton.alphaValue = isAddButtonFloating ? 0.0 : 1.0
-        plusButton.isEnabled = !isAddButtonFloating
+        fixedAddNewTabButton.alphaValue = isAddButtonFloating ? 0.0 : 1.0
+        fixedAddNewTabButton.isEnabled = !isAddButtonFloating
     }
-
-    private var isAddButtonFloating = false
 
     // MARK: - Drag and Drop
 
@@ -352,7 +356,44 @@ final class TabBarViewController: NSViewController {
         tabPreviewWindowController.hide()
     }
 
-    private weak var floatingAddButton: NSButton?
+    // MARK: - Key View Loop
+
+    func recalculatePartialKeyViewLoop(after firstKeyView: NSView) -> NSView {
+        guard NSApp.isFullKeyboardAccessEnabled else { return firstKeyView }
+
+        let visibleIndexPaths = collectionView.indexPathsForVisibleItems().sorted()
+        var views = [NSView]()
+        if let min = visibleIndexPaths.first,
+           min.item > 0 {
+            views.append(TabBarViewItemProxy(collectionView: collectionView, index: 0, position: .first))
+            views.append(TabBarViewItemProxy(collectionView: collectionView, index: min.item - 1, position: .second))
+        }
+        views.append(contentsOf: visibleIndexPaths.compactMap { collectionView.item(at: $0)?.view })
+        if let max = visibleIndexPaths.last,
+           max.item < collectionView.numberOfItems(inSection: 0) - 1 {
+            views.append(TabBarViewItemProxy(collectionView: collectionView, index: max.item + 1, position: .beforeLast))
+            views.append(TabBarViewItemProxy(collectionView: collectionView, index: collectionView.numberOfItems(inSection: 0) - 1, position: .last))
+        }
+
+        firstKeyView.nextKeyView = views.first
+
+        for (idx, view) in views.enumerated() {
+            let btns = view.subviews.filter { $0 is NSButton }
+            if btns.isEmpty {
+                view.nextKeyView = views[safe: idx + 1] ?? addNewTabButton
+            } else {
+                view.nextKeyView = btns[0]
+                for btnIdx in btns.indices {
+                    btns[btnIdx].nextKeyView = btns[safe: btnIdx + 1] ?? views[safe: idx + 1] ?? addNewTabButton
+                }
+            }
+
+        }
+        addNewTabButton?.nextKeyView = fireButton
+
+        return fireButton
+    }
+
 }
 
 extension TabBarViewController: TabCollectionViewModelDelegate {
@@ -547,13 +588,9 @@ extension TabBarViewController: NSCollectionViewDataSource {
         if let footer = view as? TabBarFooter {
             footer.addButton?.target = self
             footer.addButton?.action = #selector(addButtonAction(_:))
-            self.floatingAddButton  = footer.addButton
+            self.floatingAddNewTabButton  = footer.addButton
         }
         return view
-    }
-
-    var addButton: NSButton? {
-        isAddButtonFloating ? floatingAddButton : nil
     }
 
     func collectionView(

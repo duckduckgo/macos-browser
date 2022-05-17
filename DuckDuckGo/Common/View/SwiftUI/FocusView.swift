@@ -31,6 +31,25 @@ final class FocusView: NSView {
 
     private var focusCancellable: AnyCancellable?
 
+    private var _tag: Int
+    override var tag: Int {
+        get {
+            return _tag
+        }
+        set {
+            _tag = newValue
+        }
+    }
+
+    init(tag: Int) {
+        self._tag = tag
+        super.init(frame: .zero)
+    }
+
+    required init?(coder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }
+    
     var onFocus: ((Bool) -> Void)? {
         didSet {
             if let onFocus = onFocus {
@@ -97,6 +116,7 @@ struct FocusSwiftUIView: NSViewRepresentable {
 
     var onClick: Bool
     var focusRing: Bool
+    var tag: Int
     var onFocus: ((Bool) -> Void)?
     var action: (() -> Void)?
     var menu: (() -> NSMenu)?
@@ -104,7 +124,7 @@ struct FocusSwiftUIView: NSViewRepresentable {
     var keyDown: ((NSEvent) -> NSEvent?)?
 
     func makeNSView(context: Context) -> FocusView {
-        let view = FocusView()
+        let view = FocusView(tag: tag)
         view.shouldDrawFocusRing = focusRing
         view.shouldActivateOnMouseDown = onClick
         if let action = action {
@@ -134,6 +154,7 @@ struct FocusSwiftUIView: NSViewRepresentable {
         view.copyHandler = onCopy
         view.onKeyDown = keyDown
         view.onFocus = onFocus
+        view.tag = tag
     }
 
 }

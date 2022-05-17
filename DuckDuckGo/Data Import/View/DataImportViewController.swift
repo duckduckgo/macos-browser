@@ -102,6 +102,8 @@ final class DataImportViewController: NSViewController {
                 os_log("dataImporter initialization failed: %{public}s", type: .error, error.localizedDescription)
                 self.presentAlert(for: .generic(.cannotAccessSecureVault))
             }
+
+            self.view.window?.recalculateKeyViewLoop()
         }
     }
 

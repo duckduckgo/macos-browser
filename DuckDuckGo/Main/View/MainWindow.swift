@@ -136,7 +136,7 @@ final class MainWindow: NSWindow {
     var c: Any?
     private func postFirstResponderNotification(with firstResponder: NSResponder?) {
         NotificationCenter.default.post(name: .firstResponder, object: firstResponder)
-        // TODO: Endless loop if right-click Username field and then Tab // swiftlint:disable:this todo
+
         print("firstResponder", firstResponder)
 
         frv?.removeFromSuperview()
@@ -195,8 +195,7 @@ print(event)
     }
 
     var newTabButton: NSButton? {
-        self.mainViewController?.tabBarViewController.addButton ??
-            mainViewController?.tabBarViewController.plusButton
+        self.mainViewController?.tabBarViewController.addNewTabButton
     }
 
     override func accessibilityChildren() -> [Any]? {
@@ -224,131 +223,15 @@ print(event)
         self.mainViewController?.adjustFirstResponder()
     }
 
-    final class TabBarViewItemProxy: NSView {
-        weak var collectionView: TabBarCollectionView?
-        let index: Int
-        let position: Position
-
-        enum Position {
-            case first
-            case second
-            case beforeLast
-            case last
-        }
-
-        init(collectionView: TabBarCollectionView, index: Int, position: Position) {
-            self.collectionView = collectionView
-            self.index = index
-            self.position = position
-            let frame = [.first, .second].contains(position)
-                ? NSRect(x: 0, y: 0, width: 1, height: collectionView.frame.height)
-                : NSRect(x: collectionView.enclosingScrollView!.frame.width - 1, y: 0, width: 1, height: collectionView.frame.height)
-            super.init(frame: frame)
-
-            collectionView.enclosingScrollView?.addSubview(self)
-        }
-
-        required init?(coder: NSCoder) {
-            fatalError("init(coder:) has not been implemented")
-        }
-
-        override var acceptsFirstResponder: Bool {
-            NSApp.isFullKeyboardAccessEnabled && self.isVisible
-        }
-
-        override var canBecomeKeyView: Bool {
-            NSApp.isFullKeyboardAccessEnabled && self.isVisible
-        }
-
-        override func becomeFirstResponder() -> Bool {
-            guard let collectionView = collectionView else { return false }
-            self.removeFromSuperview()
-
-            collectionView.scroll(to: index) { [index, position] _ in
-                guard let item = collectionView.item(at: IndexPath(item: index, section: 0))
-                else { return }
-
-                switch position {
-                // Navigating backward to a Tab's button
-                case .second, .last:
-                    guard let btn = item.view.subviews.filter({ ($0 as? NSButton)?.canBecomeKeyView == true }).last else { fallthrough }
-                    btn.makeMeFirstResponder()
-                // Navigating forward to the Tab
-                case .first, .beforeLast:
-                    item.view.makeMeFirstResponder()
-                }
-            }
-            return false
-        }
-    }
-
     override func recalculateKeyViewLoop() {
+        // allow Tab through the NSToolbar-owned controls
         mainViewController?.tabBarViewController.view.superview?.setDefaultKeyViewLoop()
         super.recalculateKeyViewLoop()
 
-//        mainViewController?.navigationBarViewController.optionsButton.nextKeyView =
-//            mainViewController?.tabBarViewController.collectionView.subviews.first
-        // TODO: Need to iterate through collectionView.itemAtIndexPath because not all views are created // swiftlint:disable:this todo
-        let cv = mainViewController!.tabBarViewController.collectionView!
-        let visibleIndexPaths = cv.indexPathsForVisibleItems().sorted()
-        var views = [NSView]()
-        if let min = visibleIndexPaths.first,
-           min.item > 0 {
-            views.append(TabBarViewItemProxy(collectionView: cv, index: 0, position: .first))
-            views.append(TabBarViewItemProxy(collectionView: cv, index: min.item - 1, position: .second))
-        }
-        views.append(contentsOf: visibleIndexPaths.compactMap { cv.item(at: $0)?.view })    
-        if let max = visibleIndexPaths.last,
-           max.item < cv.numberOfItems(inSection: 0) - 1 {
-            views.append(TabBarViewItemProxy(collectionView: cv, index: max.item + 1, position: .beforeLast))
-            views.append(TabBarViewItemProxy(collectionView: cv, index: cv.numberOfItems(inSection: 0) - 1, position: .last))
-        }
-
-        for (idx, view) in views.enumerated() {
-            if idx == 0 {
-                mainViewController?.navigationBarViewController.optionsButton.nextKeyView = view
-            }
-            let btns = view.subviews.filter { $0 is NSButton }
-            if btns.isEmpty {
-                view.nextKeyView = views[safe: idx + 1] ?? self.newTabButton
-            } else {
-                view.nextKeyView = btns[0]
-                for btnIdx in btns.indices {
-                    btns[btnIdx].nextKeyView = btns[safe: btnIdx + 1] ?? views[safe: idx + 1] ?? self.newTabButton
-                }
-            }
-
-        }
-        self.newTabButton?.nextKeyView = mainViewController?.tabBarViewController.fireButton
-
-//        let btns: [NSView] = [
-//            self.mainViewController!.tabBarViewController.fireButton,
-//            self.mainViewController!.navigationBarViewController.goBackButton,
-//            self.mainViewController!.navigationBarViewController.goForwardButton,
-//            self.mainViewController!.navigationBarViewController.refreshButton,
-//            self.mainViewController!.navigationBarViewController.addressBarViewController!.addressBarButtonsViewController!.imageButton,
-//            self.mainViewController!.navigationBarViewController.addressBarViewController!.addressBarTextField
-//        ]
-//
-//        for (idx, btn) in btns.enumerated() {
-//            if idx == btns.count - 1 {
-//                btn.nextKeyView = self.mainViewController!.navigationBarViewController.optionsButton
-//            } else {
-
-//                btn.nextKeyView = btns[idx + 1]
-//            }
-//        }
-
-        mainViewController?.tabBarViewController.fireButton.nextKeyView = self.mainViewController?.navigationBarViewController.goBackButton
-//
-//        self.mainViewController?.navigationBarViewController.goBackButton.nextKeyView = self.mainViewController?.navigationBarViewController.goForwardButton
-//        self.mainViewController?.navigationBarViewController.goForwardButton.nextKeyView = self.mainViewController?.navigationBarViewController.refreshButton
-//        self.mainViewController?.navigationBarViewController.refreshButton.nextKeyView = self.mainViewController?.navigationBarViewController.addressBarViewController?.addressBarTextField
-
-//        mainViewController?.webContainerView.nextKeyView = mainViewController?.tabBarViewController.view
-//        mainViewController?.tabBarViewController.view.nextKeyView = mainViewController?.navigationBarViewController.view.nextKeyView
+        mainViewController?.recalculateKeyViewLoop()
     }
 
+    // Disable Key View redirection during nextValidKeyView() search
     @objc(_keyViewRedirectionDisabled)
     func keyViewRedirectionDisabled() -> Bool {
         true

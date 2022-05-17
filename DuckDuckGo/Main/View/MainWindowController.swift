@@ -138,8 +138,6 @@ final class MainWindowController: NSWindowController {
         tabBarViewController.view.removeFromSuperview()
         if toTitlebarView {
             newParentView.addSubview(tabBarViewController.view)
-            // Allow Tab key iteration
-            newParentView.setDefaultKeyViewLoop()
         } else {
             newParentView.addSubview(tabBarViewController.view, positioned: .below, relativeTo: mainViewController.fireViewController.view)
         }

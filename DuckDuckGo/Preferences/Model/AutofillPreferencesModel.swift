@@ -52,7 +52,8 @@ final class AutofillPreferencesModel: ObservableObject {
 
     func authorizeAutoLockSettingsChange(
         isEnabled isAutoLockEnabledNewValue: Bool? = nil,
-        threshold autoLockThresholdNewValue: AutofillAutoLockThreshold? = nil
+        threshold autoLockThresholdNewValue: AutofillAutoLockThreshold? = nil,
+        completionHandler: ((Bool) -> Void)? = nil
     ) {
         guard isAutoLockEnabledNewValue != nil || autoLockThresholdNewValue != nil else {
             return
@@ -84,7 +85,10 @@ final class AutofillPreferencesModel: ObservableObject {
                 if autoLockThreshold != self.autoLockThreshold {
                     self.autoLockThreshold = autoLockThreshold
                 }
+            } else {
+                self.isAutoLockEnabled = true
             }
+            completionHandler?(self.isAutoLockEnabled)
         }
     }
 

@@ -93,7 +93,7 @@
                                             <rect key="frame" x="0.0" y="0.0" width="366" height="440"/>
                                             <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                             <subviews>
-                                                <tableView verticalHuggingPriority="750" allowsExpansionToolTips="YES" columnAutoresizingStyle="lastColumnOnly" tableStyle="fullWidth" columnReordering="NO" columnResizing="NO" multipleSelection="NO" autosaveColumns="NO" typeSelect="NO" rowHeight="60" viewBased="YES" id="zWp-mP-b3k" customClass="DownloadsTableView" customModule="DuckDuckGo_Privacy_Browser" customModuleProvider="target">
+                                                <tableView verticalHuggingPriority="750" allowsExpansionToolTips="YES" columnAutoresizingStyle="lastColumnOnly" tableStyle="fullWidth" columnReordering="NO" columnResizing="NO" multipleSelection="NO" autosaveColumns="NO" typeSelect="NO" rowHeight="60" viewBased="YES" id="zWp-mP-b3k" customClass="KeyboardControllableTableView" customModule="DuckDuckGo_Privacy_Browser" customModuleProvider="target">
                                                     <rect key="frame" x="0.0" y="0.0" width="366" height="440"/>
                                                     <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                                     <color key="backgroundColor" name="ClearColor"/>
@@ -226,8 +226,8 @@
                                                                                 <action selector="restartDownloadAction:" target="luO-ux-o3b" id="g4e-M0-Abr"/>
                                                                             </connections>
                                                                         </button>
-                                                                        <customView misplaced="YES" translatesAutoresizingMaskIntoConstraints="NO" id="BUB-Ea-xr5" customClass="CircularProgressView" customModule="DuckDuckGo_Privacy_Browser" customModuleProvider="target">
-                                                                            <rect key="frame" x="332" y="19" width="27" height="27"/>
+                                                                        <customView translatesAutoresizingMaskIntoConstraints="NO" id="BUB-Ea-xr5" customClass="CircularProgressView" customModule="DuckDuckGo_Privacy_Browser" customModuleProvider="target">
+                                                                            <rect key="frame" x="332" y="17" width="27" height="27"/>
                                                                             <constraints>
                                                                                 <constraint firstAttribute="height" constant="27" id="eYj-jc-HTB"/>
                                                                                 <constraint firstAttribute="width" constant="27" id="vVc-1u-0F0"/>
@@ -325,6 +325,9 @@
                                                             </prototypeCellViews>
                                                         </tableColumn>
                                                     </tableColumns>
+                                                    <userDefinedRuntimeAttributes>
+                                                        <userDefinedRuntimeAttribute type="boolean" keyPath="shouldDeselectOnFirstResponderInsideView" value="YES"/>
+                                                    </userDefinedRuntimeAttributes>
                                                     <connections>
                                                         <action trigger="doubleAction" selector="doubleClickAction:" target="luO-ux-o3b" id="JjW-pA-gxL"/>
                                                         <outlet property="dataSource" destination="luO-ux-o3b" id="jKn-YV-l8R"/>

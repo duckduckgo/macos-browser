@@ -17,6 +17,7 @@
 //
 
 import Foundation
+import Combine
 
 final class BookmarkTableRowView: NSTableRowView {
 
@@ -51,6 +52,14 @@ final class BookmarkTableRowView: NSTableRowView {
     }
 
     private var trackingArea: NSTrackingArea?
+    private var firstResponderCancellable: AnyCancellable?
+
+    override func viewDidMoveToWindow() {
+        super.viewDidMoveToWindow()
+        firstResponderCancellable = self.window?.publisher(for: \.firstResponder).sink { [weak self] _ in
+            self?.needsDisplay = true
+        }
+    }
 
     override func drawBackground(in dirtyRect: NSRect) {
         backgroundColor.setFill()
@@ -83,7 +92,11 @@ final class BookmarkTableRowView: NSTableRowView {
         }
 
         let path = NSBezierPath(roundedRect: dirtyRect, forCorners: roundedCorners, cornerRadius: 6)
-        NSColor.selectedContentBackgroundColor.setFill()
+        if (self.nextResponder as? NSTableView)?.isFirstResponder == true {
+            NSColor.selectedContentBackgroundColor.setFill()
+        } else {
+            NSColor.unemphasizedSelectedContentBackgroundColor.setFill()
+        }
         path.fill()
     }
 

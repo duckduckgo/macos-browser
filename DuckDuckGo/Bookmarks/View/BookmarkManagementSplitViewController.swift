@@ -58,6 +58,28 @@ final class BookmarkManagementSplitViewController: NSSplitViewController {
         }
     }
 
+    override func viewDidAppear() {
+        super.viewDidAppear()
+        adjustFirstResponder()
+    }
+
+    func adjustFirstResponder() {
+        sidebarViewController.adjustFirstResponder()
+    }
+
+    func recalculatePartialKeyViewLoop(after firstKeyView: NSView) -> NSView {
+        guard NSApp.isFullKeyboardAccessEnabled else { return firstKeyView }
+
+        firstKeyView.nextKeyView = sidebarViewController.tabSwitcherButton
+
+        sidebarViewController.tabSwitcherButton.nextKeyView = sidebarViewController.outlineView
+        sidebarViewController.outlineView.nextKeyView = detailViewController.newBookmarkButton
+        detailViewController.newBookmarkButton.nextKeyView = detailViewController.newFolderButton
+        detailViewController.newFolderButton.nextKeyView = detailViewController.tableView
+
+        return detailViewController.tableView
+    }
+
 }
 
 extension BookmarkManagementSplitViewController: BookmarkManagementSidebarViewControllerDelegate {
@@ -72,7 +94,12 @@ extension BookmarkManagementSplitViewController: BookmarkManagementSidebarViewCo
 extension BookmarkManagementSplitViewController: BookmarkManagementDetailViewControllerDelegate {
 
     func bookmarkManagementDetailViewControllerDidSelectFolder(_ folder: BookmarkFolder) {
-        sidebarViewController.select(folder: folder)
+        sidebarViewController.select(folder)
+    }
+
+    func bookmarkManagementDetailViewControllerSelectParentFolder(of folder: BookmarkFolder) {
+        sidebarViewController.selectParent(of: folder)
+        detailViewController.select(folder)
     }
 
 }

@@ -28,6 +28,12 @@ final class RoundedSelectionRowView: NSTableRowView {
 
     var insets = NSEdgeInsets()
 
+    override func layout() {
+        super.layout()
+        // disable making Expand button Key View
+        (self.subviews.first(where: { $0 is NSButton }) as? NSButton)?.refusesFirstResponder = true
+    }
+
     override func drawDraggingDestinationFeedback(in dirtyRect: NSRect) {
         var selectionRect = self.bounds
 

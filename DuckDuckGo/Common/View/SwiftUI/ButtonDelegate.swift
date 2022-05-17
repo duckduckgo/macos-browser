@@ -1,5 +1,5 @@
 //
-//  MultilineScrollableTextFix.swift
+//  ButtonDelegate.swift
 //
 //  Copyright © 2022 DuckDuckGo. All rights reserved.
 //
@@ -16,24 +16,31 @@
 //  limitations under the License.
 //
 
-import SwiftUI
+import AppKit
 
-extension View {
-    /**
-     * Ensures that multiline text is properly broken into lines
-     * when put in scroll views.
-     *
-     * As seen on [Stack Overflow] https://stackoverflow.com/a/70512685
-     * Radar: FB6859124.
-     */
-    func fixMultilineScrollableText() -> some View {
-        lineLimit(nil).modifier(MultilineScrollableTextFix())
+final class ButtonDelegate: NSObject {
+    var onClick: (NSButton) -> Void
+
+    init(onClick: @escaping (NSButton) -> Void) {
+        self.onClick = onClick
+        super.init()
     }
+
+    @objc func action(_ sender: NSButton) {
+        onClick(sender)
+    }
+
 }
 
-private struct MultilineScrollableTextFix: ViewModifier {
+final class MenuButtonDelegate: NSObject {
+    var menuProvider: MenuProvider
 
-    func body(content: Content) -> some View {
-        return AnyView(content.fixedSize(horizontal: false, vertical: true))
+    init(menuProvider: MenuProvider) {
+        self.menuProvider = menuProvider
     }
+
+    @objc func action(_ sender: NSButton) {
+        menuProvider.createMenu().popUp(positioning: nil, at: NSPoint(x: 0, y: sender.bounds.maxY - 4), in: sender)
+    }
+
 }

@@ -110,11 +110,24 @@ final class BookmarkManagementSidebarViewController: NSViewController {
         tabSwitcherButton.select(tabType: .bookmarks)
     }
 
-    func select(folder: BookmarkFolder) {
-        if let node = treeController.node(representing: folder) {
-            let path = BookmarkNode.Path(node: node)
-            outlineView.revealAndSelect(nodePath: path)
-        }
+    func adjustFirstResponder() {
+        self.outlineView.makeMeFirstResponder()
+    }
+
+    func select(_ folder: BookmarkFolder) {
+        guard let node = treeController.node(representing: folder) else { return }
+
+        let path = BookmarkNode.Path(node: node)
+        outlineView.revealAndSelect(nodePath: path)
+    }
+
+    func selectParent(of folder: BookmarkFolder) {
+        guard let node = treeController.node(representing: folder),
+              let parent = node.parent
+        else { return }
+
+        let path = BookmarkNode.Path(node: parent)
+        outlineView.revealAndSelect(nodePath: path)
     }
 
     private func reloadData() {

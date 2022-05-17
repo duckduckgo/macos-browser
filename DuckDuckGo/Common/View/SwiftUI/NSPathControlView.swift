@@ -31,7 +31,6 @@ struct NSPathControlView: NSViewRepresentable {
         
         newPathControl.wantsLayer = true
         newPathControl.isEditable = false
-        // TODO: refuses? // swiftlint:disable:this todo
         newPathControl.refusesFirstResponder = true
         newPathControl.layer?.cornerRadius = 3.0
         newPathControl.layer?.borderWidth = 1.0

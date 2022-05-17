@@ -62,9 +62,8 @@ extension Preferences {
                         Text(UserText.gpcExplanation)
                             .fixMultilineScrollableText()
 
-                        TextButton(UserText.gpcLearnMore) {
-                            model.openURL(.gpcLearnMore)
-                        }
+                        TextButton(UserText.gpcLearnMore) { model.openURL(.gpcLearnMore) }
+                            .focusable(action: { model.openURL(.gpcLearnMore) })
                     }
                 }
             }
