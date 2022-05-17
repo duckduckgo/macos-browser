@@ -47,7 +47,7 @@ jobs:
         ignore_paths: scripts/helpers
         scandir: scripts
       env:
-        SHELLCHECK_OPTS: -x -P ./scripts
+        SHELLCHECK_OPTS: -x -P scripts -P scripts/helpers
 
   unit-tests:
 
