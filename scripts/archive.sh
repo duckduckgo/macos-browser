@@ -317,9 +317,9 @@ create_dmg() {
 		"${dmg_dir}"
 }
 
-export_app_version_to_env() {
+export_app_version_to_environment() {
 	if [[ -n "${GITHUB_ENV}" ]]; then
-		echo "app_version=${app_version}" >> ${GITHUB_ENV}
+		echo "app_version=${app_version}" >> "${GITHUB_ENV}"
 	fi
 }
 
