@@ -317,6 +317,12 @@ create_dmg() {
 		"${dmg_dir}"
 }
 
+export_app_version_to_environment() {
+	if [[ -n "${GITHUB_ENV}" ]]; then
+		echo "app_version=${app_version}" >> "${GITHUB_ENV}"
+	fi
+}
+
 main() {
 	# Load keychain-related functions first, because `clear-keychain`
 	# is required when parsing command-line arguments.
@@ -353,9 +359,7 @@ main() {
 	echo "Compressed debug symbols ready at ${output_dsym_zip_path}"
 
 	if [[ -n $CI ]]; then
-		if [[ -z "${GITHUB_ENV}" ]]; then
-			echo "app_version=${app_version}" >> "${GITHUB_ENV}"
-		fi
+		export_app_version_to_environment
 	else
 		open "${workdir}"
 	fi
