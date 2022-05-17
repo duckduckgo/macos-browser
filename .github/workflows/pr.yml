@@ -42,11 +42,12 @@ jobs:
 
     - name: Run ShellCheck
       uses: ludeeus/action-shellcheck@master
-      env:
-        SHELLCHECK_OPTS: -P scripts -x
       with:
         format: gcc
+        ignore_paths: scripts/helpers
         scandir: scripts
+      env:
+        SHELLCHECK_OPTS: -P scripts -x
 
   unit-tests:
 
