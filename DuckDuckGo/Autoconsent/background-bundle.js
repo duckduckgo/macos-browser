@@ -1,6 +1,8 @@
 (function () {
     'use strict';
 
+    const enableLogs = false; // change this to enable debug logs
+
     /* eslint-disable no-restricted-syntax,no-await-in-loop,no-underscore-dangle */
     async function waitFor(predicate, maxTimes, interval) {
         let result = await predicate();
@@ -16,7 +18,7 @@
     async function success(action) {
         const result = await action;
         if (!result) {
-            throw new Error(`Action failed: ${action}`);
+            throw new Error(`Action failed: ${action} ${result}`);
         }
         return result;
     }
@@ -180,7 +182,6 @@
             this.id = tabId;
         }
         async elementExists(selector, frameId = 0) {
-            console.log(`check for  ${selector} in tab ${this.id}, frame ${frameId}`);
             return this.sendContentMessage(this.id, {
                 type: "elemExists",
                 selector
@@ -189,7 +190,6 @@
             });
         }
         async clickElement(selector, frameId = 0) {
-            console.log(`click element ${selector} in tab ${this.id}`);
             return this.sendContentMessage(this.id, {
                 type: "click",
                 selector
@@ -198,7 +198,6 @@
             });
         }
         async clickElements(selector, frameId = 0) {
-            console.log(`click elements ${selector} in tab ${this.id}`);
             return this.sendContentMessage(this.id, {
                 type: "click",
                 all: true,
@@ -241,10 +240,11 @@
             }
             return false;
         }
-        async hideElements(selectors, frameId = 0) {
+        async hideElements(selectors, frameId = 0, method = 'display') {
             return this.sendContentMessage(this.id, {
                 type: "hide",
-                selectors
+                selectors,
+                method,
             }, { frameId });
         }
         async undoHideElements(frameId = 0) {
@@ -260,7 +260,9 @@
         }
         wait(ms) {
             return new Promise(resolve => {
-                setTimeout(() => resolve(true), ms);
+                setTimeout(() => {
+                    resolve(true);
+                }, ms);
             });
         }
         matches(matcherConfig) {
@@ -302,10 +304,12 @@
         }
         async doOptOut() {
             try {
+                enableLogs && console.log(`doing opt out ${this.getCMPName()} in tab ${this.tab.id}`);
                 this.optOutStatus = await this.rule.optOut(this.tab);
                 return this.optOutStatus;
             }
             catch (e) {
+                console.error('error during opt out', e);
                 this.optOutStatus = e;
                 throw e;
             }
@@ -350,6 +354,7 @@
                 try {
                     if (await r.detectCmp(tab)) {
                         earlyReturn = true;
+                        enableLogs && console.log(`Found CMP in [${tab.id}]: ${r.name}`);
                         resolve(index);
                     }
                 }
@@ -690,12 +695,47 @@
         }
     }
 
+    class Onetrust extends AutoConsentBase {
+        constructor() {
+            super("Onetrust");
+            this.prehideSelectors = ["#onetrust-banner-sdk,#onetrust-consent-sdk,.optanon-alert-box-wrapper,.onetrust-pc-dark-filter,.js-consent-banner"];
+        }
+        detectCmp(tab) {
+            return tab.elementExists("#onetrust-banner-sdk,.optanon-alert-box-wrapper");
+        }
+        detectPopup(tab) {
+            return tab.elementsAreVisible("#onetrust-banner-sdk,.optanon-alert-box-wrapper");
+        }
+        async optOut(tab) {
+            if (await tab.elementExists("#onetrust-pc-btn-handler")) { // "show purposes" button inside a popup
+                await success(tab.clickElement("#onetrust-pc-btn-handler"));
+            }
+            else { // otherwise look for a generic "show settings" button
+                await success(tab.clickElement(".ot-sdk-show-settings,button.js-cookie-settings"));
+            }
+            await success(tab.waitForElement("#onetrust-consent-sdk", 2000));
+            await success(tab.wait(1000));
+            await tab.clickElements("#onetrust-consent-sdk input.category-switch-handler:checked,.js-editor-toggle-state:checked"); // optional step
+            await success(tab.waitForThenClick(".save-preference-btn-handler,.js-consent-save", 1000));
+            // popup doesn't disappear immediately
+            await waitFor(async () => !(await tab.elementsAreVisible("#onetrust-banner-sdk")), 10, 500);
+            return true;
+        }
+        async optIn(tab) {
+            return tab.clickElement("onetrust-accept-btn-handler,js-accept-cookies");
+        }
+        async test(tab) {
+            return tab.eval("window.OnetrustActiveGroups.split(',').filter(s => s.length > 0).length <= 1");
+        }
+    }
+
     const rules$3 = [
         new TrustArc(),
         new Cookiebot(),
         new SourcePoint(),
         new ConsentManager(),
         new Evidon(),
+        new Onetrust(),
     ];
     function createAutoCMP(config) {
         return new AutoConsent$1(config);
@@ -767,7 +807,7 @@
             }
             return selectorList;
         }, globalHidden);
-        await tab.hideElements(selectors);
+        await tab.hideElements(selectors, undefined, 'opacity');
     }
 
     class AutoConsent {
@@ -909,6 +949,8 @@
     		name: "aws.amazon.com",
     		prehideSelectors: [
     			"#awsccc-cb-content",
+    			"#awsccc-cs-container",
+    			"#awsccc-cs-modalOverlay",
     			"#awsccc-cs-container-inner"
     		],
     		detectCmp: [
@@ -1000,7 +1042,7 @@
     		],
     		detectPopup: [
     			{
-    				visible: ".bpa-module-full-hero"
+    				visible: ".bpa-cookie-banner .bpa-module-full-hero"
     			}
     		],
     		optIn: [
@@ -1243,6 +1285,44 @@
     		optIn: [
     			{
     				click: ".yes"
+    			}
+    		]
+    	},
+    	{
+    		name: "etsy",
+    		detectCmp: [
+    			{
+    				exists: "#gdpr-single-choice-overlay"
+    			}
+    		],
+    		detectPopup: [
+    			{
+    				visible: "#gdpr-single-choice-overlay"
+    			}
+    		],
+    		optOut: [
+    			{
+    				hide: [
+    					"#gdpr-single-choice-overlay",
+    					"#gdpr-privacy-settings"
+    				]
+    			},
+    			{
+    				click: "button[data-gdpr-open-full-settings]"
+    			},
+    			{
+    				wait: 500
+    			},
+    			{
+    				"eval": "document.querySelectorAll('.gdpr-overlay-body input').forEach(toggle => { toggle.checked = false; }) || true"
+    			},
+    			{
+    				"eval": "document.querySelector('.gdpr-overlay-view button[data-wt-overlay-close]').click() || true"
+    			}
+    		],
+    		optIn: [
+    			{
+    				click: "button[data-gdpr-single-choice-accept]"
     			}
     		]
     	},
@@ -1760,54 +1840,6 @@
     		optOut: [
     			{
     				click: ".js-disc-cp-deny-all"
-    			}
-    		]
-    	},
-    	{
-    		name: "Onetrust",
-    		prehideSelectors: [
-    			"#onetrust-banner-sdk,#onetrust-consent-sdk,.optanon-alert-box-wrapper,.onetrust-pc-dark-filter,.js-consent-banner"
-    		],
-    		isHidingRule: true,
-    		detectCmp: [
-    			{
-    				exists: "#onetrust-banner-sdk,.optanon-alert-box-wrapper"
-    			}
-    		],
-    		detectPopup: [
-    			{
-    				visible: "#onetrust-banner-sdk,.optanon-alert-box-wrapper"
-    			}
-    		],
-    		optOut: [
-    			{
-    				click: "#onetrust-pc-btn-handler,.ot-sdk-show-settings,button.js-cookie-settings"
-    			},
-    			{
-    				waitFor: "#onetrust-consent-sdk",
-    				timeout: 2000
-    			},
-    			{
-    				wait: 1000
-    			},
-    			{
-    				click: "#onetrust-consent-sdk input.category-switch-handler:checked,.js-editor-toggle-state:checked",
-    				all: true,
-    				optional: true
-    			},
-    			{
-    				waitForThenClick: ".save-preference-btn-handler,.js-consent-save",
-    				timeout: 1000
-    			}
-    		],
-    		optIn: [
-    			{
-    				click: "onetrust-accept-btn-handler,js-accept-cookies"
-    			}
-    		],
-    		test: [
-    			{
-    				"eval": "window.OnetrustActiveGroups.split(',').filter(s => s.length > 0).length <= 1"
     			}
     		]
     	},

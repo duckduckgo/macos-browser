@@ -114,6 +114,7 @@ extension UserContentController {
         contentBlockingAssets != nil
     }
 
+    @MainActor
     func awaitContentBlockingAssetsInstalled() async {
         guard !contentBlockingAssetsInstalled else { return }
 

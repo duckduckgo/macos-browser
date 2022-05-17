@@ -426,16 +426,24 @@ final class Tab: NSObject, Identifiable {
 
     @MainActor
     private func reloadIfNeeded(shouldLoadInBackground: Bool = false) async {
-        let url = await linkProtection.getCleanURL(from: contentURL, onStartExtracting: {
-            isAMPProtectionExtracting = true
-        }, onFinishExtracting: { [weak self]
-            in self?.isAMPProtectionExtracting = false
-
-        })
+        let url: URL = await {
+            if contentURL.isFileURL {
+                return contentURL
+            }
+            return await linkProtection.getCleanURL(from: contentURL, onStartExtracting: {
+                isAMPProtectionExtracting = true
+            }, onFinishExtracting: { [weak self]
+                in self?.isAMPProtectionExtracting = false
+            })
+        }()
         if shouldLoadURL(url, shouldLoadInBackground: shouldLoadInBackground) {
             let didRestore = restoreSessionStateDataIfNeeded()
             if !didRestore {
-                webView.load(url)
+                if url.isFileURL {
+                    webView.loadFileURL(url, allowingReadAccessTo: URL(fileURLWithPath: "/"))
+                } else {
+                    webView.load(url)
+                }
             }
         }
     }
@@ -479,6 +487,9 @@ final class Tab: NSObject, Identifiable {
     private func restoreSessionStateDataIfNeeded() -> Bool {
         var didRestore: Bool = false
         if let sessionStateData = self.sessionStateData {
+            if contentURL.isFileURL {
+                webView.loadFileURL(contentURL, allowingReadAccessTo: URL(fileURLWithPath: "/"))
+            }
             do {
                 try webView.restoreSessionState(from: sessionStateData)
                 didRestore = true
@@ -912,6 +923,10 @@ extension Tab: WKNavigationDelegate {
     func webView(_ webView: WKWebView,
                  decidePolicyFor navigationAction: WKNavigationAction) async -> WKNavigationActionPolicy {
 
+        if navigationAction.request.url?.isFileURL ?? false {
+            return .allow
+        }
+
         let isRequestingNewTab = isRequestingNewTab(navigationAction: navigationAction)
         // This check needs to happen before GPC checks. Otherwise the navigation type may be rewritten to `.other`
         // which would skip link rewrites.
@@ -1046,6 +1061,7 @@ extension Tab: WKNavigationDelegate {
         setConnectionUpgradedTo(upgradedURL, navigationAction: navigationAction)
     }
 
+    @MainActor
     private func prepareForContentBlocking() async {
         // Ensure Content Blocking Assets (WKContentRuleList&UserScripts) are installed
         if !userContentController.contentBlockingAssetsInstalled {

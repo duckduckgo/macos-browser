@@ -49,7 +49,9 @@ internal class WebCacheManager {
 
     func clear(domains: Set<String>? = nil) async {
         // first cleanup ~/Library/Caches
-        await self.clearFileCache()
+        await clearFileCache()
+        
+        await clearDeviceHashSalts()
 
         await removeAllSafelyRemovableDataTypes()
 
@@ -80,6 +82,31 @@ internal class WebCacheManager {
         }
 
         try? fm.createDirectory(at: cachesDir.appendingPathComponent("WebKit"),
+                                withIntermediateDirectories: false,
+                                attributes: nil)
+
+        Process("/bin/rm", "-rf", tmpDir.path).launch()
+    }
+    
+    private func clearDeviceHashSalts() async {
+        guard let bundleID = Bundle.main.bundleIdentifier,
+              var libraryURL = FileManager.default.urls(for: .libraryDirectory, in: .userDomainMask).first else {
+            return
+        }
+        libraryURL.appendPathComponent("WebKit/\(bundleID)/WebsiteData/DeviceIdHashSalts/1")
+        
+        let fm = FileManager.default
+        let tmpDir = fm.temporaryDirectory(appropriateFor: libraryURL).appendingPathComponent(UUID().uuidString)
+
+        do {
+            try fm.createDirectory(at: tmpDir, withIntermediateDirectories: false, attributes: nil)
+        } catch {
+            os_log("Could not create temporary directory: %s", type: .error, "\(error)")
+            return
+        }
+        
+        try? fm.moveItem(at: libraryURL, to: tmpDir.appendingPathComponent("1"))
+        try? fm.createDirectory(at: libraryURL,
                                 withIntermediateDirectories: false,
                                 attributes: nil)
 
