@@ -62,15 +62,15 @@ final class FirefoxEncryptionKeyReader: FirefoxEncryptionKeyReading {
             return .failure(.decryptionFailed)
         }
         
-        guard let deeperDecryptedData = extractKey3DecryptedASNData(from: decryptedASNData) else {
+        guard let extractedASNData = extractKey3DecryptedASNData(from: decryptedASNData) else {
             return .failure(.decryptionFailed)
         }
         
-        guard let deeperStillDecryptedData = try? ASN1Parser.parse(data: deeperDecryptedData) else {
+        guard let keyContainerASNData = try? ASN1Parser.parse(data: extractedASNData) else {
             return .failure(.decryptionFailed)
         }
         
-        guard let key = extractKey3Key(from: deeperStillDecryptedData) else {
+        guard let key = extractKey3Key(from: keyContainerASNData) else {
             return .failure(.decryptionFailed)
         }
         

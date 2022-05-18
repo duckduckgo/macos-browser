@@ -289,7 +289,7 @@ struct DataImportError: Error {
     
     static func logins(_ errorType: ChromiumLoginReader.ImportError) -> DataImportError {
         switch errorType {
-        case .databaseAccessFailed(let version): return DataImportError(actionType: .logins, errorType: .databaseAccessFailed)
+        case .databaseAccessFailed: return DataImportError(actionType: .logins, errorType: .databaseAccessFailed)
         case .couldNotFindLoginData: return DataImportError(actionType: .logins, errorType: .noFileFound)
         case .failedToTemporarilyCopyDatabase: return DataImportError(actionType: .logins, errorType: .failedToTemporarilyCopyFile)
         case .decryptionFailed: return DataImportError(actionType: .logins, errorType: .cannotReadFile)
