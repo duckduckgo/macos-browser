@@ -31,19 +31,12 @@ extension WindowsManager {
     }
 
     private class func restoreWindows(from state: WindowManagerStateRestoration) {
-        var windows = state.windows
-        var keyWindowRestorationItem: WindowRestorationItem?
-        if let idx = state.keyWindowIndex {
-            keyWindowRestorationItem = windows.remove(at: idx)
-        }
-
-        for item in windows.reversed() {
+        for item in state.windows.reversed() {
             setUpWindow(from: item)
         }
 
-        if let keyWindowItem = keyWindowRestorationItem {
-            setUpWindow(from: keyWindowItem)
-            keyWindowItem.model.setUpLazyLoadingIfNeeded()
+        if let idx = state.keyWindowIndex {
+            state.windows[safe: idx]?.model.setUpLazyLoadingIfNeeded()
         }
 
         if !state.windows.isEmpty {
@@ -52,10 +45,9 @@ extension WindowsManager {
     }
 
     private class func setUpWindow(from item: WindowRestorationItem) {
-        guard let window = self.openNewWindow(with: item.model, showWindow: false) else { return }
+        guard let window = openNewWindow(with: item.model, showWindow: true) else { return }
         window.setContentSize(item.frame.size)
         window.setFrameOrigin(item.frame.origin)
-        window.makeKeyAndOrderFront(self)
     }
 
 }
@@ -99,6 +91,11 @@ final class WindowManagerStateRestoration: NSObject, NSSecureCoding {
     init(windowControllersManager: WindowControllersManager) {
         self.windows = windowControllersManager.mainWindowControllers
             .filter { $0.window?.isPopUpWindow == false }
+            .sorted { (lhs, rhs) in
+                let leftIndex = lhs.window?.orderedIndex ?? Int.min
+                let rightIndex = rhs.window?.orderedIndex ?? Int.min
+                return leftIndex < rightIndex
+            }
             .map(WindowRestorationItem.init(windowController:))
         self.keyWindowIndex = windowControllersManager.lastKeyMainWindowController.flatMap {
             windowControllersManager.mainWindowControllers.firstIndex(of: $0)
