@@ -33,7 +33,7 @@ final class StatePersistenceService {
         self.fileName = fileName
     }
 
-    var canRestoreState: Bool {
+    var canRestoreLastSessionState: Bool {
         lastSessionStateArchive != nil
     }
 

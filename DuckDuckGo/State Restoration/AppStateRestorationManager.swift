@@ -30,15 +30,8 @@ final class AppStateRestorationManager {
         self.service = StatePersistenceService(fileStore: fileStore, fileName: AppStateRestorationManager.fileName)
     }
 
-    var canRestoreState: Bool {
-        service.canRestoreState
-    }
-
-    func readLastSessionState(restore: Bool) {
-        service.loadLastSessionState()
-        if restore {
-            restoreLastSessionState(automatic: true)
-        }
+    var canRestoreLastSessionState: Bool {
+        service.canRestoreLastSessionState
     }
 
     func restoreLastSessionState(automatic: Bool = false) {
@@ -65,17 +58,23 @@ final class AppStateRestorationManager {
             // saving of the state
             .dropFirst()
             .sink { [weak self] _ in
-                self?.stateDidChange()
+                self?.persistAppState()
             }
-    }
-
-    private func stateDidChange() {
-        service.persistState(using: WindowControllersManager.shared.encodeState(with:))
     }
 
     func applicationWillTerminate() {
         cancellable.cancel()
-        service.persistState(using: WindowControllersManager.shared.encodeState(with:), sync: true)
+        persistAppState(sync: true)
     }
 
+    private func readLastSessionState(restore: Bool) {
+        service.loadLastSessionState()
+        if restore {
+            restoreLastSessionState(automatic: true)
+        }
+    }
+
+    private func persistAppState(sync: Bool = false) {
+        service.persistState(using: WindowControllersManager.shared.encodeState(with:), sync: sync)
+    }
 }

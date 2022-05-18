@@ -57,10 +57,6 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
 
     var appUsageActivityMonitor: AppUsageActivityMonitor?
 
-    var canRestoreState: Bool {
-        stateRestorationManager.canRestoreState
-    }
-
     func applicationWillFinishLaunching(_ notification: Notification) {
         if !Self.isRunningTests {
             #if DEBUG

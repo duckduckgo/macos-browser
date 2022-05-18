@@ -640,7 +640,7 @@ extension AppDelegate: NSMenuItemValidation {
 
         // Reopen All Windows from Last Session
         case #selector(AppDelegate.reopenAllWindowsFromLastSession(_:)):
-            return stateRestorationManager.canRestoreState
+            return stateRestorationManager.canRestoreLastSessionState
 
         default:
             return true
