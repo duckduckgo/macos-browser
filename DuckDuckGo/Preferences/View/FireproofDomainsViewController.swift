@@ -50,8 +50,16 @@ final class FireproofDomainsViewController: NSViewController {
         reloadData()
     }
 
+    override func viewDidAppear() {
+        view.window?.recalculateKeyViewLoop()
+    }
+
     private func updateRemoveButtonState() {
-        removeDomainButton.isEnabled = tableView.selectedRow > -1
+        let isFirstResponder = removeDomainButton.isFirstResponder
+        removeDomainButton.isEnabled = !tableView.selectedRowIndexes.isEmpty
+        if isFirstResponder {
+            tableView.makeMeFirstResponder()
+        }
     }
 
     fileprivate func reloadData() {
@@ -63,18 +71,30 @@ final class FireproofDomainsViewController: NSViewController {
         updateRemoveButtonState()
     }
 
+    override func doCommand(by selector: Selector) {
+        switch selector {
+        case #selector(cancelOperation(_:)),
+             #selector(NSWindowSelectors.cancel(_:)):
+            dismiss()
+        default:
+            break
+        }
+    }
+
     @IBAction func doneButtonClicked(_ sender: NSButton) {
         dismiss()
     }
 
-    @IBAction func removeSelectedDomain(_ sender: NSButton) {
-        guard tableView.selectedRow > -1 else {
+    @IBAction func removeSelectedDomains(_ sender: NSButton) {
+        guard !tableView.selectedRowIndexes.isEmpty else {
             updateRemoveButtonState()
             return
         }
 
-        let selectedDomain = fireproofDomains[tableView.selectedRow]
-        FireproofDomains.shared.remove(domain: selectedDomain)
+        for row in tableView.selectedRowIndexes {
+            let selectedDomain = fireproofDomains[row]
+            FireproofDomains.shared.remove(domain: selectedDomain)
+        }
         reloadData()
     }
 
