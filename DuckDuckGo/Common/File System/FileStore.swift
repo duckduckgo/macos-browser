@@ -22,9 +22,16 @@ import CryptoKit
 protocol FileStore {
     func persist(_ data: Data, url: URL) -> Bool
     func loadData(at url: URL) -> Data?
+    func decrypt(_ data: Data) -> Data?
     func hasData(at url: URL) -> Bool
     func directoryContents(at path: String) throws -> [String]
     func remove(fileAtURL url: URL)
+}
+
+extension FileStore {
+    func loadData(at url: URL) -> Data? {
+        try? Data(contentsOf: url)
+    }
 }
 
 final class EncryptedFileStore: FileStore {
@@ -55,16 +62,11 @@ final class EncryptedFileStore: FileStore {
         }
     }
 
-    func loadData(at url: URL) -> Data? {
-        guard let data = try? Data(contentsOf: url) else {
-            return nil
-        }
-
+    func decrypt(_ data: Data) -> Data? {
         if let key = self.encryptionKey {
             return try? DataEncryption.decrypt(data: data, key: key)
-        } else {
-            return data
         }
+        return data
     }
 
     func hasData(at url: URL) -> Bool {
@@ -95,8 +97,8 @@ extension FileManager: FileStore {
         }
     }
 
-    func loadData(at url: URL) -> Data? {
-        try? Data(contentsOf: url)
+    func decrypt(_ data: Data) -> Data? {
+        data
     }
 
     func hasData(at url: URL) -> Bool {

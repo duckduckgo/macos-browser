@@ -34,25 +34,26 @@ final class AppStateRestorationManager {
         service.canRestoreState
     }
 
-    func restoreState(activateWindows: Bool = false) {
+    func readLastSessionState(restore: Bool) {
+        service.loadLastSessionState()
+        if restore {
+            restoreLastSessionState(automatic: true)
+        }
+    }
+
+    func restoreLastSessionState(automatic: Bool = false) {
         do {
-            if activateWindows {
-                try service.restoreState(using: WindowsManager.restoreStateAndActivateWindows(from:))
-            } else {
-                try service.restoreState(using: WindowsManager.restoreState(from:))
-            }
+            try service.restoreState(using: WindowsManager.restoreState(from:))
         } catch CocoaError.fileReadNoSuchFile {
             // ignore
         } catch {
             os_log("App state could not be decoded: %s", "\(error)")
-            Pixel.fire(.debug(event: .appStateRestorationFailed, error: error))
+            Pixel.fire(.debug(event: .appStateRestorationFailed, error: error), withAdditionalParameters: ["interactive": String(!automatic)])
         }
     }
 
     func applicationDidFinishLaunching() {
-        if StartupPreferences().restorePreviousSession {
-            restoreState()
-        }
+        readLastSessionState(restore: StartupPreferences().restorePreviousSession)
 
         cancellable = WindowControllersManager.shared.stateChanged
             .debounce(for: .seconds(1), scheduler: RunLoop.main)

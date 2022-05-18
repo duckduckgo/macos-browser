@@ -22,6 +22,7 @@ import os.log
 final class StatePersistenceService {
     private let fileStore: FileStore
     private let fileName: String
+    private var lastSessionStateArchive: Data?
     private let queue = DispatchQueue(label: "StateRestorationManager.queue", qos: .background)
     private var job: DispatchWorkItem?
 
@@ -33,7 +34,7 @@ final class StatePersistenceService {
     }
 
     var canRestoreState: Bool {
-        fileStore.hasData(at: URL.persistenceLocation(for: self.fileName))
+        lastSessionStateArchive != nil
     }
 
     private func archive(using encoder: @escaping (NSCoder) -> Void) -> Data {
@@ -76,8 +77,20 @@ final class StatePersistenceService {
         queue.sync {}
     }
 
+    func loadLastSessionState() {
+        lastSessionStateArchive = fileStore.loadData(at: URL.persistenceLocation(for: self.fileName))
+    }
+
     func restoreState(using restore: @escaping (NSCoder) throws -> Void) throws {
-        guard let data = fileStore.loadData(at: URL.persistenceLocation(for: self.fileName)) else {
+        guard let encryptedData = lastSessionStateArchive else {
+            throw CocoaError(.fileReadNoSuchFile)
+        }
+        lastSessionStateArchive = nil
+        try restoreState(from: encryptedData, using: restore)
+    }
+
+    private func restoreState(from archive: Data, using restore: @escaping (NSCoder) throws -> Void) throws {
+        guard let data = fileStore.decrypt(archive) else {
             throw CocoaError(.fileReadNoSuchFile)
         }
         let unarchiver = try NSKeyedUnarchiver.init(forReadingFrom: data)

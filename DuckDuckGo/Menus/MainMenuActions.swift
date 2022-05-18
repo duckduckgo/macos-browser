@@ -53,7 +53,7 @@ extension AppDelegate {
     // MARK: - Window
 
     @IBAction func reopenAllWindowsFromLastSession(_ sender: Any?) {
-        stateRestorationManager.restoreState(activateWindows: true)
+        stateRestorationManager.restoreLastSessionState()
     }
 
     // MARK: - Help

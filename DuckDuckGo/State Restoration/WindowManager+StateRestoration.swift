@@ -30,18 +30,7 @@ extension WindowsManager {
         self.restoreWindows(from: state)
     }
 
-    class func restoreStateAndActivateWindows(from coder: NSCoder) throws {
-        guard let state = coder.decodeObject(of: WindowManagerStateRestoration.self,
-                                             forKey: NSKeyedArchiveRootObjectKey) else {
-            throw coder.error ?? NSError(domain: "WindowsManagerStateRestoration", code: -1, userInfo: nil)
-        }
-
-        self.restoreWindows(from: state, activate: true)
-    }
-
-    private class func restoreWindows(from state: WindowManagerStateRestoration, activate: Bool = false) {
-        let isOriginalKeyWindowPresent = Self.windows.contains(where: {$0.isKeyWindow})
-
+    private class func restoreWindows(from state: WindowManagerStateRestoration) {
         var windows = state.windows
         var keyWindowRestorationItem: WindowRestorationItem?
         if let idx = state.keyWindowIndex {
@@ -49,12 +38,12 @@ extension WindowsManager {
         }
 
         for item in windows.reversed() {
-            self.setUpWindow(from: item)
+            setUpWindow(from: item)
         }
 
         if let keyWindowItem = keyWindowRestorationItem {
-            let shouldActivateWindow = !isOriginalKeyWindowPresent || activate
-            self.setUpWindow(from: keyWindowItem, activate: shouldActivateWindow)
+            setUpWindow(from: keyWindowItem)
+            keyWindowItem.model.setUpLazyLoadingIfNeeded()
         }
 
         if !state.windows.isEmpty {
@@ -62,15 +51,11 @@ extension WindowsManager {
         }
     }
 
-    private class func setUpWindow(from item: WindowRestorationItem, activate: Bool = false) {
+    private class func setUpWindow(from item: WindowRestorationItem) {
         guard let window = self.openNewWindow(with: item.model, showWindow: false) else { return }
         window.setContentSize(item.frame.size)
         window.setFrameOrigin(item.frame.origin)
         window.makeKeyAndOrderFront(self)
-
-        if activate {
-            item.model.setUpLazyLoadingIfNeeded()
-        }
     }
 
 }
