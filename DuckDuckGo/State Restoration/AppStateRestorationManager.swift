@@ -52,6 +52,10 @@ final class AppStateRestorationManager {
         }
     }
 
+    func clearLastSessionState() {
+        service.removeLastSessionState()
+    }
+
     func applicationDidFinishLaunching() {
         readLastSessionState(restore: StartupPreferences().restorePreviousSession)
 
