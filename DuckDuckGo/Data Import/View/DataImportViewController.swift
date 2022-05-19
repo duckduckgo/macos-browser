@@ -144,7 +144,7 @@ final class DataImportViewController: NSViewController {
             self.viewState = .init(selectedImportSource: viewState.selectedImportSource, interactionState: .permissionsRequired([.logins]))
 
         case .ableToImport, .failedToImport:
-            beginImport()
+            completeImport()
         case .completedImport(let summary) where summary.loginsResult == .awaited:
             // Safari bookmarks import finished, switch to CSV select
             self.viewState = .init(selectedImportSource: viewState.selectedImportSource, interactionState: .permissionsRequired([.logins]))
@@ -335,10 +335,6 @@ final class DataImportViewController: NSViewController {
         cancelButton.title = UserText.navigateBack
     }
 
-    private func beginImport() {
-        completeImport()
-    }
-
     var selectedProfile: DataImport.BrowserProfile? {
         return browserImportViewController?.selectedProfile
     }
@@ -494,7 +490,7 @@ extension DataImportViewController: RequestFilePermissionViewControllerDelegate 
         if viewState.selectedImportSource == .safari
             && selectedImportOptions.contains(.bookmarks) {
 
-            self.beginImport()
+            self.completeImport()
             return
         }
 
