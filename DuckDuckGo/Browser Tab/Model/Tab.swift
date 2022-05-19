@@ -1134,6 +1134,7 @@ extension Tab: WKNavigationDelegate {
         invalidateSessionStateData()
         resetDashboardInfo()
         linkProtection.cancelOngoingExtraction()
+        linkProtection.setMainFrameUrl(webView.url)
     }
 
     @MainActor
@@ -1142,6 +1143,7 @@ extension Tab: WKNavigationDelegate {
         invalidateSessionStateData()
         webViewDidFinishNavigationPublisher.send()
         if isAMPProtectionExtracting { isAMPProtectionExtracting = false }
+        linkProtection.setMainFrameUrl(nil)
     }
 
     func webView(_ webView: WKWebView, didFail navigation: WKNavigation!, withError error: Error) {
@@ -1152,6 +1154,7 @@ extension Tab: WKNavigationDelegate {
         isBeingRedirected = false
         webViewDidFailNavigationPublisher.send()
         invalidateSessionStateData()
+        linkProtection.setMainFrameUrl(nil)
     }
 
     func webView(_ webView: WKWebView, didFailProvisionalNavigation navigation: WKNavigation!, withError error: Error) {
@@ -1165,6 +1168,7 @@ extension Tab: WKNavigationDelegate {
 
         self.error = error
         isBeingRedirected = false
+        linkProtection.setMainFrameUrl(nil)
         webViewDidFailNavigationPublisher.send()
     }
 
