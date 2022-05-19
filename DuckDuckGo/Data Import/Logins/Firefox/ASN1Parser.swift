@@ -57,12 +57,13 @@ private class Scanner {
         guard length > 0 else {
             return Data()
         }
+        
+        let adjustedIndex = data.startIndex + index
 
-        guard index + length <= data.count else {
+        guard adjustedIndex + length <= data.count else {
             throw ScannerError.outOfBounds
         }
 
-        let adjustedIndex = data.startIndex + index
         let subdata = data.subdata(in: adjustedIndex..<adjustedIndex + length)
         index += length
         return subdata
