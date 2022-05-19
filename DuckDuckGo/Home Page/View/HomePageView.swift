@@ -28,29 +28,51 @@ struct RootView: View {
 
     var body: some View {
         ZStack(alignment: .top) {
+            if #available(macOS 11.0, *) {
+                ScrollViewReader { proxy in
+                    ScrollView {
+                        VStack(spacing: 0) {
+                            Group {
+                                DefaultBrowserPrompt()
 
-            ScrollView {
-                VStack(spacing: 0) {
-                    Group {
-                        DefaultBrowserPrompt()
+                                Favorites()
+                                    .padding(.top, 72)
 
-                        Favorites()
-                            .padding(.top, 72)
+                                RecentlyVisited(scrollTo: { id in
+                                    proxy.scrollTo(id)
+                                })
+                                    .padding(.top, 66)
+                                    .padding(.bottom, 16)
 
-                        RecentlyVisited()
-                            .padding(.top, 66)
-                            .padding(.bottom, 16)
-
+                            }
+                            .frame(width: 508)
+                        }
+                        .frame(maxWidth: .infinity)
                     }
-                    .frame(width: 508)
                 }
-                .frame(maxWidth: .infinity)
-            }
+            } else {
+                ScrollView {
+                    VStack(spacing: 0) {
+                        Group {
+                            DefaultBrowserPrompt()
 
+                            Favorites()
+                                .padding(.top, 72)
+
+                            RecentlyVisited { _ in }
+                                .padding(.top, 66)
+                                .padding(.bottom, 16)
+
+                        }
+                        .frame(width: 508)
+                    }
+                    .frame(maxWidth: .infinity)
+                }
+            }
         }
         .frame(maxWidth: .infinity)
         .background(backgroundColor)
-     }
+    }
 
 }
 

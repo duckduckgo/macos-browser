@@ -28,6 +28,13 @@ final class FocusView: NSView {
     var defaultAction: (() -> Void)?
     var copyHandler: (() -> Void)?
     var onKeyDown: ((NSEvent) -> NSEvent?)?
+    var onAppear: ((FocusView) -> Void)? {
+        didSet {
+            if let onAppear = onAppear, window != nil {
+                onAppear(self)
+            }
+        }
+    }
 
     private var focusCancellable: AnyCancellable?
 
@@ -41,19 +48,22 @@ final class FocusView: NSView {
         }
     }
 
-    init(tag: Int) {
+    init(tag: Int, frame: NSRect = .zero) {
         self._tag = tag
-        super.init(frame: .zero)
+        super.init(frame: frame)
     }
 
     required init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
     
-    var onFocus: ((Bool) -> Void)? {
+    var onFocus: ((FocusView, Bool) -> Void)? {
         didSet {
             if let onFocus = onFocus {
-                focusCancellable = self.isFirstResponderPublisher().sink(receiveValue: onFocus)
+                focusCancellable = self.isFirstResponderPublisher().sink { [weak self] isFirstResponder in
+                    guard let self = self else { return }
+                    onFocus(self, isFirstResponder)
+                }
             } else {
                 focusCancellable = nil
             }
@@ -110,6 +120,13 @@ final class FocusView: NSView {
         super.keyDown(with: event)
     }
 
+    override func viewDidMoveToWindow() {
+        super.viewDidMoveToWindow()
+        if let onAppear = onAppear, window != nil {
+            onAppear(self)
+        }
+    }
+
 }
 
 struct FocusSwiftUIView: NSViewRepresentable {
@@ -118,6 +135,8 @@ struct FocusSwiftUIView: NSViewRepresentable {
     var focusRing: Bool
     var tag: Int
     var onFocus: ((Bool) -> Void)?
+    var onViewFocused: ((FocusView) -> Void)?
+    var onAppear: ((FocusView) -> Void)?
     var action: (() -> Void)?
     var menu: (() -> NSMenu)?
     var onCopy: (() -> Void)?
@@ -137,7 +156,16 @@ struct FocusSwiftUIView: NSViewRepresentable {
         }
         view.copyHandler = onCopy
         view.onKeyDown = keyDown
-        view.onFocus = onFocus
+        if onFocus != nil || onViewFocused != nil {
+            view.onFocus = { view, isFirstResponder in
+                onFocus?(isFirstResponder)
+                if isFirstResponder {
+                    onViewFocused?(view)
+                }
+            }
+        }
+        view.onAppear = onAppear
+        view.tag = tag
 
         return view
     }
@@ -153,7 +181,15 @@ struct FocusSwiftUIView: NSViewRepresentable {
         }
         view.copyHandler = onCopy
         view.onKeyDown = keyDown
-        view.onFocus = onFocus
+        if onFocus != nil || onViewFocused != nil {
+            view.onFocus = { view, isFirstResponder in
+                onFocus?(isFirstResponder)
+                if isFirstResponder {
+                    onViewFocused?(view)
+                }
+            }
+        }
+        view.onAppear = onAppear
         view.tag = tag
     }
 

@@ -32,6 +32,7 @@ protocol BrowserTabViewControllerClickDelegate: AnyObject {
 final class BrowserTabViewController: NSViewController {
 
     @IBOutlet weak var errorView: NSView!
+    private var homePageViewController: HomePageViewController!
     @IBOutlet weak var homePageView: NSView!
     @IBOutlet weak var errorMessageLabel: NSTextField!
     @IBOutlet weak var hoverLabel: NSTextField!
@@ -75,6 +76,8 @@ final class BrowserTabViewController: NSViewController {
                                                       bookmarkManager: LocalBookmarkManager.shared) else {
             fatalError("BrowserTabViewController: Failed to init HomePageViewController")
         }
+        self.homePageViewController = controller
+
         return controller
     }
 
@@ -205,7 +208,9 @@ final class BrowserTabViewController: NSViewController {
 
     func adjustFirstResponder() {
         switch tabViewModel?.tab.content ?? .none {
-        case .homePage, .onboarding, .none:
+        case .homePage:
+            homePageView.nextValidKeyView?.makeMeFirstResponder()
+        case .onboarding, .none:
             break
         case .url:
             self.webView?.makeMeFirstResponder()
@@ -218,9 +223,11 @@ final class BrowserTabViewController: NSViewController {
 
     func recalculatePartialKeyViewLoop(after firstKeyView: NSView) -> NSView {
         switch tabViewModel?.tab.content ?? .none {
-        case .homePage, .onboarding, .none:
-            // TODO: setup homepage/onboarding key view loop
+        case .onboarding:
+            // TODO: setup onboarding key view loop
             return firstKeyView
+        case .homePage:
+            return homePageViewController.recalculatePartialKeyViewLoop(after: firstKeyView)
         case .url:
             firstKeyView.nextKeyView = webView
             return webView ?? firstKeyView
@@ -228,6 +235,8 @@ final class BrowserTabViewController: NSViewController {
             return preferencesViewController.recalculatePartialKeyViewLoop(after: firstKeyView)
         case .bookmarks:
             return bookmarksViewController.recalculatePartialKeyViewLoop(after: firstKeyView)
+        case .none:
+            return firstKeyView
         }
     }
 
@@ -356,8 +365,10 @@ final class BrowserTabViewController: NSViewController {
             }
 
         case .homePage:
-            removeAllTabContent()
-            view.addAndLayout(homePageView)
+            if homePageViewController?.parent !== self {
+                removeAllTabContent()
+                view.addAndLayout(homePageView)
+            }
 
         case nil, .some(.none):
             removeAllTabContent()

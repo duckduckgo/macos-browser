@@ -33,7 +33,8 @@ final class HomePageViewController: NSViewController {
     var favoritesModel: HomePage.Models.FavoritesModel!
     var defaultBrowserModel: HomePage.Models.DefaultBrowserModel!
     var recentlyVisitedModel: HomePage.Models.RecentlyVisitedModel!
-    var cancellables = Set<AnyCancellable>()
+    private var cancellables = Set<AnyCancellable>()
+    private var responderCancellable: AnyCancellable?
 
     @UserDefaultsWrapper(key: .defaultBrowserDismissed, defaultValue: false)
     var defaultBrowserDismissed: Bool
@@ -83,6 +84,8 @@ final class HomePageViewController: NSViewController {
     override func viewDidAppear() {
         super.viewDidAppear()
         refreshModels()
+
+        setupFirstResponderObserverForScrolling()
     }
 
     override func viewDidLayout() {
@@ -194,6 +197,46 @@ final class HomePageViewController: NSViewController {
         view.window?.addChildWindow(window, ordered: .above)
         window.setFrame(windowFrame, display: true)
         window.makeKey()
+    }
+
+    func setupFirstResponderObserverForScrolling() {
+        responderCancellable = view.window?.publisher(for: \.firstResponder).sink { [weak self] responder in
+            guard let self = self,
+                  let responder = responder as? NSView,
+                  let scrollView = responder.enclosingScrollView,
+                  scrollView.isDescendant(of: self.view)
+            else {
+                self?.favoritesModel.setHomeViewFirstResponder(false)
+                return
+            }
+            self.favoritesModel.setHomeViewFirstResponder(true)
+
+            if !scrollView.contentView.documentVisibleRect.contains(responder.convert(responder.bounds, to: scrollView.contentView)) {
+                let rect = responder.convert(responder.bounds, to: scrollView.contentView).insetBy(dx: 0, dy: -60)
+                scrollView.contentView.animator().scrollToVisible(rect)
+            }
+        }
+    }
+
+    var firstKeyView: NSView {
+        self.view.nextKeyView ?? self.view
+    }
+
+    var lastKeyView: NSView {
+        // if there‘s a Fake Focus View added hosted directly in Scroll View
+        // it should be our last Key View (see RecentlyVisitedView.swift:646)
+        if let firstResponder = self.view.window?.firstResponder as? NSView,
+           firstResponder.isDescendant(of: self.view),
+           firstResponder.superview is NSClipView {
+            return firstResponder
+        }
+        return self.view.lastKeyView ?? self.view
+    }
+
+    func recalculatePartialKeyViewLoop(after firstKeyView: NSView) -> NSView {
+        firstKeyView.nextKeyView = self.firstKeyView
+        // let the engine adjust everything in between
+        return self.lastKeyView
     }
 
 }

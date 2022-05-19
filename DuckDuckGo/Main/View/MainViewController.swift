@@ -243,14 +243,6 @@ final class MainViewController: NSViewController {
         }
     }
 
-    func toggleToolbarFocus() {
-        if (view.window?.firstResponder as? NSView)?.isDescendant(of: browserTabViewController.view) ?? true {
-            self.navigationBarViewController.view.nextValidKeyView?.makeMeFirstResponder()
-            return
-        }
-        self.adjustFirstResponder()
-    }
-
     private func updateBackMenuItem() {
         guard self.view.window?.isMainWindow == true else { return }
         guard let selectedTabViewModel = tabCollectionViewModel.selectedTabViewModel else {
@@ -309,15 +301,18 @@ final class MainViewController: NSViewController {
 
     // MARK: - First responder
 
-    func adjustFirstResponder() {
+    func adjustFirstResponder(movingFocusFromToolbar: Bool = false) {
         guard let selectedTabViewModel = tabCollectionViewModel.selectedTabViewModel else {
             os_log("MainViewController: No tab view model selected", type: .error)
             return
         }
 
         switch selectedTabViewModel.tab.content {
-        case .homePage, .onboarding, .none: navigationBarViewController.addressBarViewController?.addressBarTextField.makeMeFirstResponder()
-        case .url, .preferences, .bookmarks:
+            // TODO: Onboarding focus move
+        case .onboarding, .none,
+             .homePage where !movingFocusFromToolbar:
+            navigationBarViewController.addressBarViewController?.addressBarTextField.makeMeFirstResponder()
+        case .url, .preferences, .bookmarks, .homePage:
             browserTabViewController.adjustFirstResponder()
         }
     }
@@ -327,6 +322,23 @@ final class MainViewController: NSViewController {
             .followedBy(findInPageViewController.recalculatePartialKeyViewLoop(after:))
             .followedBy(browserTabViewController.recalculatePartialKeyViewLoop(after:))
             .followedBy(navigationBarViewController.recalculatePartialKeyViewLoop(after:))
+    }
+
+    func toggleToolbarFocus() {
+        if NSApp.isFullKeyboardAccessEnabled {
+            if (view.window?.firstResponder as? NSView)?.isDescendant(of: browserTabViewController.view) ?? true {
+                self.navigationBarViewController.view.nextValidKeyView?.makeMeFirstResponder()
+                return
+            } else {
+                self.adjustFirstResponder(movingFocusFromToolbar: true)
+            }
+        } else {
+            if navigationBarViewController.addressBarViewController?.isFirstResponder ?? false {
+                navigationBarViewController.addressBarViewController?.addressBarTextField.makeMeFirstResponder()
+            } else {
+                self.adjustFirstResponder(movingFocusFromToolbar: true)
+            }
+        }
     }
 
 }

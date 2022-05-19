@@ -56,6 +56,11 @@ struct MoreOrLess: View {
                 isExpanded = !isExpanded
             }
         }
+        .focusable(action: {
+            withAnimation {
+                isExpanded = !isExpanded
+            }
+        })
 
     }
 

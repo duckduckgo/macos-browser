@@ -42,9 +42,8 @@ struct DefaultBrowserPrompt: View {
 
                 Spacer()
 
-                HoverButton(imageName: "Close", imageSize: 22, cornerRadius: 4) {
-                    self.model.close()
-                }.padding()
+                HoverButton(imageName: "Close", imageSize: 22, cornerRadius: 4) { self.model.close() }
+                    .padding()
 
             }.background(
                 RoundedRectangle(cornerRadius: 8)

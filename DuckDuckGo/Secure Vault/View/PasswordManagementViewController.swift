@@ -207,8 +207,9 @@ final class PasswordManagementViewController: NSViewController {
     func setupFirstResponderObserverForScrolling() {
         responderCancellable = view.window?.publisher(for: \.firstResponder).sink { responder in
             guard let responder = responder as? NSView,
-               let scrollView = responder.enclosingScrollView,
-               !scrollView.contentView.documentVisibleRect.contains(responder.convert(responder.bounds, to: scrollView.contentView))
+                  let scrollView = responder.enclosingScrollView,
+                  scrollView.isDescendant(of: self.view),
+                  !scrollView.contentView.documentVisibleRect.contains(responder.convert(responder.bounds, to: scrollView.contentView))
             else {
                 return
             }

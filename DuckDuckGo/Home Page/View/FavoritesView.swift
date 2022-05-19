@@ -17,6 +17,7 @@
 //
 
 import SwiftUI
+import Carbon.HIToolbox
 
 extension HomePage.Views {
 
@@ -32,49 +33,44 @@ struct Favorites: View {
 
     var body: some View {
 
-        let addButton = ZStack(alignment: .top) {
-            FavoriteTemplate(title: UserText.addFavorite, domain: nil)
-            ZStack {
-                Image("Add")
-                    .resizable()
-                    .frame(width: 22, height: 22)
-            }.frame(width: 64, height: 64)
-        }
-        .link {
-            model.addNew()
-        }
-
-        let ghostButton = VStack {
-            RoundedRectangle(cornerRadius: 12)
-                .stroke(Color("HomeFavoritesGhostColor"), style: StrokeStyle(lineWidth: 1.5, dash: [4.0, 2.0]))
-                .frame(width: 64, height: 64)
-        }.frame(width: 64)
-
         VStack(spacing: 4) {
 
-            ForEach(rowIndices, id: \.self) { index in
+            ForEach(rowIndices, id: \.self) { row in
 
                 HStack(alignment: .top, spacing: 20) {
-                    ForEach(model.rows[index], id: \.id) { favorite in
-
-                        switch favorite.favoriteType {
+                    ForEach(Array(zip(model.rows[row].indices, model.rows[row])), id: \.0) { index, favorite in
+                        let tag = FavoriteTemplate.tagBase + row * HomePage.favoritesPerRow + index
+                        switch favorite {
                         case .bookmark(let bookmark):
-                            Favorite(bookmark: bookmark)
+                            Favorite(bookmark: bookmark, tag: tag) { model.open(bookmark) }
 
                         case .addButton:
-                            addButton
+                            ZStack(alignment: .top) {
+                                FavoriteTemplate(title: UserText.addFavorite, domain: nil, tag: tag) { model.addNew() }
+                                ZStack {
+                                    Image("Add")
+                                        .resizable()
+                                        .frame(width: 22, height: 22)
+                                }.frame(width: 64, height: 64)
+                            }
 
                         case .ghostButton:
-                            ghostButton
+                            VStack {
+                                RoundedRectangle(cornerRadius: 12)
+                                    .stroke(Color("HomeFavoritesGhostColor"), style: StrokeStyle(lineWidth: 1.5, dash: [4.0, 2.0]))
+                                    .frame(width: 64, height: 64)
+                            }.frame(width: 64)
+
                         }
                     }
                 }
                 
             }
 
+            canShowMore = model.rows.count > HomePage.favoritesRowCountWhenCollapsed
             MoreOrLess(isExpanded: $model.showAllFavorites)
                 .padding(.top, 2)
-                .visibility(model.rows.count > HomePage.favoritesRowCountWhenCollapsed && isHovering ? .visible : .invisible)
+                .visibility(canShowMore && (isHovering || model.isHomeViewFirstResponder) ? .visible : .invisible)
 
         }
         .frame(maxWidth: .infinity)
@@ -88,9 +84,25 @@ struct Favorites: View {
 
 struct FavoriteTemplate: View {
 
+    static let tagBase = HomePage.favoritesPerRow * 10000
+
+    private enum KeyViewDirection {
+        case left
+        case leftMost
+        case right
+        case rightMost
+        case up
+        case topMost
+        case down
+        case bottomMost
+    }
+
     let title: String
     let domain: String?
+    let tag: Int
+    let action: () -> Void
 
+    @EnvironmentObject var model: HomePage.Models.FavoritesModel
     @State var isHovering = false
 
     var body: some View {
@@ -109,6 +121,22 @@ struct FavoriteTemplate: View {
             }
             .frame(width: 64, height: 64)
             .clipped()
+            .focusable(tag: tag, action: action, keyDown: { event in
+                let hasModifier = NSApp.isCommandPressed || NSApp.isOptionPressed
+                switch Int(event.keyCode) {
+                case kVK_LeftArrow:
+                    selectView(withTag: tagForView(at: hasModifier ? .leftMost : .left, against: tag))
+                case kVK_RightArrow:
+                    selectView(withTag: tagForView(at: hasModifier ? .rightMost : .right, against: tag))
+                case kVK_UpArrow:
+                    selectView(withTag: tagForView(at: hasModifier ? .topMost : .up, against: tag))
+                case kVK_DownArrow:
+                    selectView(withTag: tagForView(at: hasModifier ? .bottomMost : .down, against: tag))
+                default:
+                    return event
+                }
+                return nil
+            })
 
             Text(title)
                 .multilineTextAlignment(.center)
@@ -119,16 +147,80 @@ struct FavoriteTemplate: View {
         }
         .frame(width: 64)
         .frame(maxWidth: 64)
-        .onHover { isHovering in
+        .link(onHoverChanged: { isHovering in
             self.isHovering = isHovering
-            
+
             if isHovering {
                 NSCursor.pointingHand.push()
             } else {
                 NSCursor.pointingHand.pop()
             }
+        }, clicked: action)
+    }
 
+    // swiftlint:disable:next cyclomatic_complexity
+    private func tagForView(at direction: KeyViewDirection, against tag: Int) -> Int {
+        var index: Int { tag % HomePage.favoritesPerRow }
+        var row: Int { (tag - FavoriteTemplate.tagBase) / HomePage.favoritesPerRow }
+        var count: Int { model.favorites.count + 1 /* new fav */ }
+
+        switch direction {
+        case .left:
+            if tag > FavoriteTemplate.tagBase {
+                return tag - 1
+            } else {
+                return count - 1 + FavoriteTemplate.tagBase
+            }
+
+        case .leftMost:
+            return tag - index
+
+        case .right:
+            if (tag - FavoriteTemplate.tagBase) + 1 < count {
+                return tag + 1
+            } else {
+                return FavoriteTemplate.tagBase
+            }
+
+        case .rightMost:
+            return tag + (HomePage.favoritesPerRow - index - 1)
+
+        case .up:
+            if row > 0 {
+                return tag - HomePage.favoritesPerRow
+            } else {
+                return tagForView(at: .bottomMost, against: tag)
+            }
+
+        case .topMost:
+            return FavoriteTemplate.tagBase + index
+
+        case .down:
+            if (tag - FavoriteTemplate.tagBase) + HomePage.favoritesPerRow < count {
+                return tag + HomePage.favoritesPerRow
+            } else {
+                return tagForView(at: .topMost, against: tag)
+            }
+
+        case .bottomMost:
+            if index <= (count - 1) % HomePage.favoritesPerRow {
+                return FavoriteTemplate.tagBase + count - (count % HomePage.favoritesPerRow) + index
+            } else {
+                return FavoriteTemplate.tagBase + count - (count % HomePage.favoritesPerRow) - HomePage.favoritesPerRow + index
+            }
         }
+    }
+
+    private func selectView(withTag tag: Int) {
+        guard let window = NSApp.keyWindow,
+              let firstResponder = window.firstResponder as? NSView,
+              let scrollView = firstResponder.enclosingScrollView,
+              let view = scrollView.contentView.viewWithTag(tag)
+        else {
+            return
+        }
+
+        view.makeMeFirstResponder()
     }
 
 }
@@ -138,19 +230,21 @@ struct Favorite: View {
     @EnvironmentObject var model: HomePage.Models.FavoritesModel
 
     let bookmark: Bookmark
+    let tag: Int
+    let action: () -> Void
 
     var body: some View {
 
-        FavoriteTemplate(title: bookmark.title, domain: bookmark.url.host)
-            .link {
-                model.open(bookmark)
-            }.contextMenu(ContextMenu(menuItems: {
-                Button(UserText.openInNewTab, action: { model.openInNewTab(bookmark) })
-                Button(UserText.openInNewWindow, action: { model.openInNewWindow(bookmark) })
-                Divider()
-                Button(UserText.edit, action: { model.edit(bookmark) })
-                Button(UserText.remove, action: { model.remove(bookmark) })
-            }))
+        let menuProvider = MenuProvider([
+            .item(title: UserText.openInNewTab, action: { model.openInNewTab(bookmark) }),
+            .item(title: UserText.openInNewWindow, action: { model.openInNewWindow(bookmark) }),
+            .divider,
+            .item(title: UserText.edit, action: { model.edit(bookmark) }),
+            .item(title: UserText.remove, action: { model.remove(bookmark) })
+        ])
+
+        FavoriteTemplate(title: bookmark.title, domain: bookmark.url.host, tag: tag, action: action)
+            .contextMenu(menuItems: menuProvider.createContextMenu)
 
     }
 

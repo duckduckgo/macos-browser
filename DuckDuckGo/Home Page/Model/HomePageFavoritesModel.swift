@@ -28,13 +28,6 @@ extension HomePage.Models {
 
     }
 
-    struct FavoriteModel {
-
-        let id: UUID
-        let favoriteType: FavoriteType
-
-    }
-
     final class FavoritesModel: ObservableObject {
 
         enum OpenTarget {
@@ -54,22 +47,26 @@ extension HomePage.Models {
 
         @Published var favorites: [Bookmark] = [] {
             didSet {
-                var favorites = self.favorites.map { FavoriteModel(id: $0.id, favoriteType: .bookmark($0)) }
-                favorites.append(.init(id: UUID(), favoriteType: .addButton))
+                var favorites = self.favorites.map(FavoriteType.bookmark)
+                favorites.append(.addButton)
 
                 let lastRowCount = favorites.count % HomePage.favoritesPerRow
                 let missing = lastRowCount > 0 ? HomePage.favoritesPerRow - lastRowCount : 0
 
-                (0 ..< missing).forEach { _ in 
-                    favorites.append(FavoriteModel(id: UUID(), favoriteType: .ghostButton))
-                }
+                favorites.append(contentsOf: Array(repeating: .ghostButton, count: missing))
 
                 self.rows = favorites.chunked(into: HomePage.favoritesPerRow)
             }
         }
 
-        @Published private(set) var rows: [[FavoriteModel]] = []
-
+        @Published private(set) var rows: [[FavoriteType]] = []
+        @Published private(set) var isHomeViewFirstResponder = false
+        func setHomeViewFirstResponder(_ value: Bool) {
+            if value != isHomeViewFirstResponder {
+                isHomeViewFirstResponder = value
+            }
+        }
+        
         let open: (Bookmark, OpenTarget) -> Void
         let remove: (Bookmark) -> Void
         let addEdit: (Bookmark?) -> Void

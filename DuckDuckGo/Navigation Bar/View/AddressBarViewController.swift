@@ -53,7 +53,7 @@ final class AddressBarViewController: NSViewController {
         }
     }
 
-    private var isFirstResponder = false {
+    var isFirstResponder = false {
         didSet {
             updateView()
             self.addressBarButtonsViewController?.isTextFieldEditorFirstResponder = isFirstResponder

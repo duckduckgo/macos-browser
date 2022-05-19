@@ -36,6 +36,31 @@ final class RecentlyVisitedModel: ObservableObject {
 
     @Published var numberOfTrackersBlocked = 0
     @Published var recentSites = [RecentlyVisitedSiteModel]()
+
+    private static let tagBase = 600
+    enum FocusPosition: Int, CaseIterable {
+        case link
+        case favorite
+        case burn
+    }
+    struct FocusItem: Equatable {
+        let index: Int
+        let position: FocusPosition
+
+        var tag: Int {
+            tagBase + index * FocusPosition.allCases.count + position.rawValue
+        }
+    }
+    @Published var focusItem: FocusItem?
+
+    func focusChaged(to isFocused: Bool, for focusItem: FocusItem) {
+        if isFocused, self.focusItem != focusItem {
+            self.focusItem = focusItem
+        } else if !isFocused, self.focusItem == focusItem {
+            self.focusItem = nil
+        }
+    }
+
     @Published var showPagesOnHover: Bool {
         didSet {
             Self.showPagesOnHoverSetting = showPagesOnHover

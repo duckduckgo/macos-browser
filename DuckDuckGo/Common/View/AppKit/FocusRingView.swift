@@ -39,6 +39,8 @@ final class FocusRingView: NSView {
     private var keyWindowCancellable: AnyCancellable?
 
     override func viewDidMoveToWindow() {
+        super.viewDidMoveToWindow()
+
         guard let window = window else {
             keyWindowCancellable = nil
             return

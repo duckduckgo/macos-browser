@@ -98,6 +98,8 @@ internal class MouseOverButton: NSButton {
     }
 
     override func viewWillMove(toWindow newWindow: NSWindow?) {
+        super.viewWillMove(toWindow: newWindow)
+
         isMouseDown = false
         isMouseOver = false
 

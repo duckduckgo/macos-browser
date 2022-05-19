@@ -53,7 +53,7 @@ extension NSView {
     func isFirstResponderPublisher() -> AnyPublisher<Bool, Never> {
         self.publisher(for: \.window?.firstResponder).map { [weak self] firstResponder -> Bool in
             firstResponder === self
-        }.eraseToAnyPublisher()
+        }.removeDuplicates().eraseToAnyPublisher()
     }
 
     var isVisible: Bool {
