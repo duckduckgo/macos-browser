@@ -151,25 +151,13 @@ final class FirefoxEncryptionKeyReader: FirefoxEncryptionKeyReading {
     // MARK: - Key3 Database Parsing
     
     private func extractKey3EntrySalt(from tlv: ASN1Parser.Node) -> Data? {
-        guard case let .sequence(outerSequence) = tlv else {
-            return nil
-        }
-
-        let firstSequence = outerSequence[0]
-        
-        guard case let .sequence(secondSequence) = firstSequence else {
-            return nil
-        }
-        
-        let penultimateSequence = secondSequence[1]
-        
-        guard case let .sequence(finalSequence) = penultimateSequence else {
-            return nil
-        }
-        
-        let octetString = finalSequence[0]
-        
-        guard case let .octetString(data: data) = octetString else {
+        guard case let .sequence(outerSequence) = tlv,
+              let firstSequence = outerSequence[safe: 0],
+              case let .sequence(secondSequence) = firstSequence,
+              let penultimateSequence = secondSequence[safe: 1],
+              case let .sequence(finalSequence) = penultimateSequence,
+              let octetString = finalSequence[safe: 0],
+              case let .octetString(data: data) = octetString else {
             return nil
         }
         
@@ -177,13 +165,9 @@ final class FirefoxEncryptionKeyReader: FirefoxEncryptionKeyReading {
     }
     
     private func extractKey3DecryptedASNData(from node: ASN1Parser.Node) -> Data? {
-        guard case let .sequence(outerSequence) = node else {
-            return nil
-        }
-        
-        let octetString = outerSequence[2]
-        
-        guard case let .octetString(data: data) = octetString else {
+        guard case let .sequence(outerSequence) = node,
+              let octetString = outerSequence[safe: 2],
+              case let .octetString(data: data) = octetString else {
             return nil
         }
         
@@ -191,13 +175,9 @@ final class FirefoxEncryptionKeyReader: FirefoxEncryptionKeyReading {
     }
     
     private func extractKey3Key(from node: ASN1Parser.Node) -> Data? {
-        guard case let .sequence(outerSequence) = node else {
-            return nil
-        }
-        
-        let integer = outerSequence[3]
-        
-        guard case let .integer(data: data) = integer else {
+        guard case let .sequence(outerSequence) = node,
+              let integer = outerSequence[safe: 3],
+              case let .integer(data: data) = integer else {
             return nil
         }
         
@@ -239,37 +219,17 @@ final class FirefoxEncryptionKeyReader: FirefoxEncryptionKeyReading {
     // MARK: - Key4 Database Parsing
     
     private func extractKey4EntrySalt(from tlv: ASN1Parser.Node) -> Data? {
-        guard case let .sequence(values1) = tlv else {
-            return nil
-        }
-
-        let firstValue = values1[0]
-
-        guard case let .sequence(values2) = firstValue else {
-            return nil
-        }
-
-        let secondValue = values2[1]
-
-        guard case let .sequence(values3) = secondValue else {
-            return nil
-        }
-
-        let thirdValue = values3[0]
-
-        guard case let .sequence(values4) = thirdValue else {
-            return nil
-        }
-
-        let fourthValue = values4[1]
-
-        guard case let .sequence(values5) = fourthValue else {
-            return nil
-        }
-
-        let fifthValue = values5[0]
-
-        guard case let .octetString(data: data) = fifthValue else {
+        guard case let .sequence(values1) = tlv,
+              let firstValue = values1[safe: 0],
+              case let .sequence(values2) = firstValue,
+              let secondValue = values2[safe: 1],
+              case let .sequence(values3) = secondValue,
+              let thirdValue = values3[safe: 0],
+              case let .sequence(values4) = thirdValue,
+              let fourthValue = values4[safe: 1],
+              case let .sequence(values5) = fourthValue,
+              let fifthValue = values5[safe: 0],
+              case let .octetString(data: data) = fifthValue else {
             return nil
         }
 
@@ -277,37 +237,17 @@ final class FirefoxEncryptionKeyReader: FirefoxEncryptionKeyReading {
     }
 
     private func extractIterationCount(from tlv: ASN1Parser.Node) -> Int? {
-        guard case let .sequence(values1) = tlv else {
-            return nil
-        }
-
-        let firstValue = values1[0]
-
-        guard case let .sequence(values2) = firstValue else {
-            return nil
-        }
-
-        let secondValue = values2[1]
-
-        guard case let .sequence(values3) = secondValue else {
-            return nil
-        }
-
-        let thirdValue = values3[0]
-
-        guard case let .sequence(values4) = thirdValue else {
-            return nil
-        }
-
-        let fourthValue = values4[1]
-
-        guard case let .sequence(values5) = fourthValue else {
-            return nil
-        }
-
-        let fifthValue = values5[1]
-
-        guard case let .integer(data: data) = fifthValue else {
+        guard case let .sequence(values1) = tlv,
+              let firstValue = values1[safe: 0],
+              case let .sequence(values2) = firstValue,
+              let secondValue = values2[safe: 1],
+              case let .sequence(values3) = secondValue,
+              let thirdValue = values3[safe: 0],
+              case let .sequence(values4) = thirdValue,
+              let fourthValue = values4[safe: 1],
+              case let .sequence(values5) = fourthValue,
+              let fifthValue = values5[safe: 1],
+              case let .integer(data: data) = fifthValue else {
             return nil
         }
 
@@ -315,37 +255,17 @@ final class FirefoxEncryptionKeyReader: FirefoxEncryptionKeyReading {
     }
 
     private func extractKeyLength(from tlv: ASN1Parser.Node) -> Int? {
-        guard case let .sequence(values1) = tlv else {
-            return nil
-        }
-
-        let firstValue = values1[0]
-
-        guard case let .sequence(values2) = firstValue else {
-            return nil
-        }
-
-        let secondValue = values2[1]
-
-        guard case let .sequence(values3) = secondValue else {
-            return nil
-        }
-
-        let thirdValue = values3[0]
-
-        guard case let .sequence(values4) = thirdValue else {
-            return nil
-        }
-
-        let fourthValue = values4[1]
-
-        guard case let .sequence(values5) = fourthValue else {
-            return nil
-        }
-
-        let fifthValue = values5[2]
-
-        guard case let .integer(data: data) = fifthValue else {
+        guard case let .sequence(values1) = tlv,
+              let firstValue = values1[safe: 0],
+              case let .sequence(values2) = firstValue,
+              let secondValue = values2[safe: 1],
+              case let .sequence(values3) = secondValue,
+              let thirdValue = values3[safe: 0],
+              case let .sequence(values4) = thirdValue,
+              let fourthValue = values4[safe: 1],
+              case let .sequence(values5) = fourthValue,
+              let fifthValue = values5[safe: 2],
+              case let .integer(data: data) = fifthValue else {
             return nil
         }
 
@@ -353,31 +273,15 @@ final class FirefoxEncryptionKeyReader: FirefoxEncryptionKeyReading {
     }
 
     private func extractInitializationVector(from tlv: ASN1Parser.Node) -> Data? {
-        guard case let .sequence(values1) = tlv else {
-            return nil
-        }
-
-        let firstValue = values1[0]
-
-        guard case let .sequence(values2) = firstValue else {
-            return nil
-        }
-
-        let secondValue = values2[1]
-
-        guard case let .sequence(values3) = secondValue else {
-            return nil
-        }
-
-        let thirdValue = values3[1]
-
-        guard case let .sequence(values4) = thirdValue else {
-            return nil
-        }
-
-        let fourthValue = values4[1]
-
-        guard case let .octetString(data: data) = fourthValue else {
+        guard case let .sequence(values1) = tlv,
+              let firstValue = values1[safe: 0],
+              case let .sequence(values2) = firstValue,
+              let secondValue = values2[safe: 1],
+              case let .sequence(values3) = secondValue,
+              let thirdValue = values3[safe: 1],
+              case let .sequence(values4) = thirdValue,
+              let fourthValue = values4[safe: 1],
+              case let .octetString(data: data) = fourthValue else {
             return nil
         }
 
@@ -385,11 +289,8 @@ final class FirefoxEncryptionKeyReader: FirefoxEncryptionKeyReading {
     }
 
     private func extractCiphertext(from tlv: ASN1Parser.Node) -> Data? {
-        guard case let .sequence(values) = tlv else {
-            return nil
-        }
-
-        guard case let .octetString(data: data) = values[1] else {
+        guard case let .sequence(values) = tlv,
+              case let .octetString(data: data) = values[safe: 1] else {
             return nil
         }
 
@@ -403,11 +304,12 @@ final class FirefoxEncryptionKeyReader: FirefoxEncryptionKeyReading {
         guard let data = extractCiphertext(from: tlv),
               let entrySalt = extractKey4EntrySalt(from: tlv),
               let iterationCount = extractIterationCount(from: tlv),
-              let keyLength = extractKeyLength(from: tlv) else { return nil }
+              let keyLength = extractKeyLength(from: tlv),
+              let primaryPasswordData = primaryPassword.data(using: .utf8) else { return nil }
 
         assert(keyLength == 32)
 
-        let passwordData = globalSalt + primaryPassword.data(using: .utf8)!
+        let passwordData = globalSalt + primaryPasswordData
         let hashData = SHA.from(data: passwordData)
 
         guard let commonCryptoKey = Cryptography.decryptPBKDF2(password: .base64(hashData.base64EncodedString()),
