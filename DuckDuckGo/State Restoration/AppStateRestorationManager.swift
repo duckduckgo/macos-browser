@@ -19,12 +19,16 @@
 import Foundation
 import Combine
 import os.log
+import Sparkle
 
-final class AppStateRestorationManager {
+final class AppStateRestorationManager: NSObject {
     static let fileName = "persistentState"
 
     private let service: StatePersistenceService
     private var cancellable: AnyCancellable!
+
+    @UserDefaultsWrapper(key: .appIsRelaunchingAutomatically, defaultValue: false)
+    private var appIsRelaunchingAutomatically: Bool
 
     init(fileStore: FileStore) {
         self.service = StatePersistenceService(fileStore: fileStore, fileName: AppStateRestorationManager.fileName)
@@ -50,7 +54,8 @@ final class AppStateRestorationManager {
     }
 
     func applicationDidFinishLaunching() {
-        readLastSessionState(restore: StartupPreferences().restorePreviousSession)
+        readLastSessionState(restore: StartupPreferences().restorePreviousSession || appIsRelaunchingAutomatically)
+        appIsRelaunchingAutomatically = false
 
         cancellable = WindowControllersManager.shared.stateChanged
             .debounce(for: .seconds(1), scheduler: RunLoop.main)
@@ -76,5 +81,11 @@ final class AppStateRestorationManager {
 
     private func persistAppState(sync: Bool = false) {
         service.persistState(using: WindowControllersManager.shared.encodeState(with:), sync: sync)
+    }
+}
+
+extension AppStateRestorationManager: SUUpdaterDelegate {
+    func updaterWillRelaunchApplication(_ updater: SUUpdater) {
+        appIsRelaunchingAutomatically = true
     }
 }

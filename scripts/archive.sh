@@ -303,7 +303,7 @@ create_dmg() {
 	echo
 	local dmg_dir="${workdir}/dmg"
 	local dmg_background="${cwd}/assets/dmg-background.png"
-	dmg_output_path="${workdir}/${app_name}-${app_version}.dmg"
+	dmg_output_path="${workdir}/duckduckgo-${app_version}.dmg"
 
 	rm -rf "${dmg_dir}" "${dmg_output_path}"
 	mkdir -p "${dmg_dir}"

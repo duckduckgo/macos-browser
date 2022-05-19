@@ -76,6 +76,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
             fileStore = EncryptedFileStore()
         }
         stateRestorationManager = AppStateRestorationManager(fileStore: fileStore)
+        updateController.updater.delegate = stateRestorationManager
     }
 
     func applicationDidFinishLaunching(_ notification: Notification) {

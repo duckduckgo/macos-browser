@@ -21,7 +21,7 @@ import Sparkle
 
 final class UpdateController: NSObject {
 
-    private let updater = SUUpdater()
+    let updater = SUUpdater()
 
     override init() {
         super.init()
