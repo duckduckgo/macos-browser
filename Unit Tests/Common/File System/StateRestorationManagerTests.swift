@@ -199,28 +199,3 @@ final class StateRestorationManagerTests: XCTestCase {
         }
     }
 }
-
-@objc(SavedStateMock)
-private class SavedStateMock: NSObject {
-    private enum NSSecureCodingKeys {
-        static let key1 = "key1"
-        static let key2 = "key2"
-    }
-    static var supportsSecureCoding = true
-
-    var val1: String?
-    var val2: Int?
-
-    override init() {
-    }
-
-    func encode(with coder: NSCoder) {
-        val1.map(coder.encode(forKey: NSSecureCodingKeys.key1))
-        val2.map(coder.encode(forKey: NSSecureCodingKeys.key2))
-    }
-
-    func restoreState(from coder: NSCoder) throws {
-        val1 = coder.decodeIfPresent(at: NSSecureCodingKeys.key1)
-        val2 = coder.decodeIfPresent(at: NSSecureCodingKeys.key2)
-    }
-}

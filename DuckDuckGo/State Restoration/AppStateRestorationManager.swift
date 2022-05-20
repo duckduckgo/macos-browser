@@ -29,9 +29,19 @@ final class AppStateRestorationManager: NSObject {
 
     @UserDefaultsWrapper(key: .appIsRelaunchingAutomatically, defaultValue: false)
     private var appIsRelaunchingAutomatically: Bool
+    private let shouldRestorePreviousSession: Bool
 
-    init(fileStore: FileStore) {
-        self.service = StatePersistenceService(fileStore: fileStore, fileName: AppStateRestorationManager.fileName)
+    convenience init(fileStore: FileStore) {
+        let service = StatePersistenceService(fileStore: fileStore, fileName: AppStateRestorationManager.fileName)
+        self.init(service: service)
+    }
+
+    init(
+        service: StatePersistenceService,
+        shouldRestorePreviousSession: Bool = StartupPreferences().restorePreviousSession
+    ) {
+        self.service = service
+        self.shouldRestorePreviousSession = shouldRestorePreviousSession
     }
 
     var canRestoreLastSessionState: Bool {
@@ -57,7 +67,7 @@ final class AppStateRestorationManager: NSObject {
     }
 
     func applicationDidFinishLaunching() {
-        readLastSessionState(restore: StartupPreferences().restorePreviousSession || appIsRelaunchingAutomatically)
+        readLastSessionState(restore: shouldRestorePreviousSession || appIsRelaunchingAutomatically)
         appIsRelaunchingAutomatically = false
 
         cancellable = WindowControllersManager.shared.stateChanged
