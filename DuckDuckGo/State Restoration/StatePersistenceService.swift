@@ -78,7 +78,7 @@ final class StatePersistenceService {
     }
 
     func loadLastSessionState() {
-        lastSessionStateArchive = fileStore.loadData(at: URL.persistenceLocation(for: self.fileName))
+        lastSessionStateArchive = loadStateFromFile()
     }
 
     func removeLastSessionState() {
@@ -86,11 +86,15 @@ final class StatePersistenceService {
     }
 
     func restoreState(using restore: @escaping (NSCoder) throws -> Void) throws {
-        guard let encryptedData = lastSessionStateArchive else {
+        guard let encryptedData = lastSessionStateArchive ?? loadStateFromFile() else {
             throw CocoaError(.fileReadNoSuchFile)
         }
         removeLastSessionState()
         try restoreState(from: encryptedData, using: restore)
+    }
+
+    private func loadStateFromFile() -> Data? {
+        fileStore.loadData(at: URL.persistenceLocation(for: self.fileName), decryptIfNeeded: false)
     }
 
     private func restoreState(from archive: Data, using restore: @escaping (NSCoder) throws -> Void) throws {

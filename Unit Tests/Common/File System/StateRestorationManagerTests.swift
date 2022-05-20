@@ -87,6 +87,58 @@ final class StateRestorationManagerTests: XCTestCase {
         XCTAssertEqual(state.val2, 3)
     }
 
+    func testWhenLastSessionStateIsLoadedThenServiceCanRestoreLastSession() {
+        changeState("val1", 1, sync: true)
+
+        srm = StatePersistenceService(fileStore: fileStore, fileName: testFileName)
+        XCTAssertFalse(srm.canRestoreLastSessionState)
+
+        srm.loadLastSessionState()
+        XCTAssertTrue(srm.canRestoreLastSessionState)
+    }
+
+    func testWhenLastSessionStateIsRemovedManuallyThenLastSessionCannotBeRestored() {
+        changeState("val1", 1, sync: true)
+
+        srm = StatePersistenceService(fileStore: fileStore, fileName: testFileName)
+        srm.loadLastSessionState()
+        XCTAssertTrue(srm.canRestoreLastSessionState)
+
+        srm.removeLastSessionState()
+        XCTAssertFalse(srm.canRestoreLastSessionState)
+    }
+
+    func testWhenLastSessionStateIsLoadedThenChangesToStatePreserveLoadedLastSessionState() {
+        changeState("lastSessionValue", 42, sync: true)
+
+        srm = StatePersistenceService(fileStore: fileStore, fileName: testFileName)
+        srm.loadLastSessionState()
+
+        changeState("currentSessionValue", 7, sync: true)
+        XCTAssertNoThrow(try srm.restoreState(using: state.restoreState(from:)))
+
+        XCTAssertEqual(state.val1, "lastSessionValue")
+        XCTAssertEqual(state.val2, 42)
+        XCTAssertFalse(srm.canRestoreLastSessionState)
+    }
+
+    func testWhenLastSessionStateIsLoadedThenItIsNotDecrypted() {
+        let decryptExpectation = expectation(description: "decrypt")
+        decryptExpectation.isInverted = true
+
+        fileStore.decryptImpl = { data in
+            decryptExpectation.fulfill()
+            return data
+        }
+
+        changeState("val1", 1, sync: true)
+        srm = StatePersistenceService(fileStore: fileStore, fileName: testFileName)
+        srm.loadLastSessionState()
+
+        XCTAssertTrue(srm.canRestoreLastSessionState)
+        waitForExpectations(timeout: 0.1)
+    }
+
     func testStatePersistenceThrottlesWrites() {
         fileStore.delay = 0.1 // write operations will sleep for 100ms
         var counter = 0

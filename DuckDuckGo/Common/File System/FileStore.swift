@@ -22,6 +22,7 @@ import CryptoKit
 protocol FileStore {
     func persist(_ data: Data, url: URL) -> Bool
     func loadData(at url: URL) -> Data?
+    func loadData(at url: URL, decryptIfNeeded: Bool) -> Data?
     func decrypt(_ data: Data) -> Data?
     func hasData(at url: URL) -> Bool
     func directoryContents(at path: String) throws -> [String]
@@ -30,7 +31,7 @@ protocol FileStore {
 
 extension FileStore {
     func loadData(at url: URL) -> Data? {
-        try? Data(contentsOf: url)
+        loadData(at: url, decryptIfNeeded: false)
     }
 }
 
@@ -60,6 +61,11 @@ final class EncryptedFileStore: FileStore {
                        withAdditionalParameters: ["config": url.lastPathComponent])
             return false
         }
+    }
+
+    func loadData(at url: URL, decryptIfNeeded: Bool) -> Data? {
+        let data = try? Data(contentsOf: url)
+        return decryptIfNeeded ? data.flatMap(decrypt(_:)) : data
     }
 
     func decrypt(_ data: Data) -> Data? {
@@ -95,6 +101,11 @@ extension FileManager: FileStore {
         } catch {
             return false
         }
+    }
+
+    func loadData(at url: URL, decryptIfNeeded: Bool) -> Data? {
+        let data = try? Data(contentsOf: url)
+        return decryptIfNeeded ? data.flatMap(decrypt(_:)) : data
     }
 
     func decrypt(_ data: Data) -> Data? {
