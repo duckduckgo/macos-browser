@@ -297,12 +297,9 @@ struct UserText {
     static let dataImportFailedTitle = NSLocalizedString("import.data.import-failed.title", value: "Sorry, we weren't able to import your data.", comment: "Alert title when the data import fails")
 
     static let dataImportSubmitFeedback = NSLocalizedString("import.data.submit-feedback", value: "submit feedback", comment: "Link text used in the data import failure alert")
-    static func dataImportFailedBody(submitFeedbackText: String = dataImportSubmitFeedback) -> String {
-        let localized = NSLocalizedString("import.data.import-failed.body",
-                                          value: "Please %@ so we can address this issue.",
-                                          comment: "Alert body text used in the data import failure alert")
-        return String(format: localized, submitFeedbackText)
-    }
+    static let dataImportFailedBody = NSLocalizedString("import.data.import-failed.body",
+                                                        value: "Please submit feedback so we can address this issue.",
+                                                        comment: "Alert body text used in the data import failure alert")
 
     static let dataImportAlertImport = NSLocalizedString("import.data.alert.import", value: "Import", comment: "Import button for data import alerts")
     static let dataImportAlertAccept = NSLocalizedString("import.data.alert.accept", value: "Okay", comment: "Accept button for data import alerts")

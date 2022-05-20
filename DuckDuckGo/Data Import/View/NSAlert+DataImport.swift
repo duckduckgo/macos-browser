@@ -28,7 +28,7 @@ extension NSAlert {
         let alert = NSAlert()
 
         let linkText = UserText.dataImportSubmitFeedback
-        let informativeText = UserText.dataImportFailedBody(submitFeedbackText: linkText)
+        let informativeText = UserText.dataImportFailedBody
         
         let textView = NSTextView(frame: NSRect(x: 0, y: 0, width: 250, height: 0))
         textView.applyLabelStyle()
