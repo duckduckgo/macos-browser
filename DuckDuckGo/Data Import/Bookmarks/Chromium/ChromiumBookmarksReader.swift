@@ -25,14 +25,14 @@ final class ChromiumBookmarksReader {
         case bookmarksFileDecodingFailed
     }
 
-    private let chromiumLoginDirectoryURL: URL
+    private let chromiumBookmarksFileURL: URL
 
     init(chromiumDataDirectoryURL: URL, bookmarksFileName: String = "Bookmarks") {
-        self.chromiumLoginDirectoryURL = chromiumDataDirectoryURL.appendingPathComponent(bookmarksFileName)
+        self.chromiumBookmarksFileURL = chromiumDataDirectoryURL.appendingPathComponent(bookmarksFileName)
     }
 
     func readBookmarks() -> Result<ImportedBookmarks, ChromiumBookmarksReader.ImportError> {
-        guard let bookmarksFileData = try? Data(contentsOf: chromiumLoginDirectoryURL) else {
+        guard let bookmarksFileData = try? Data(contentsOf: chromiumBookmarksFileURL) else {
             return .failure(.noBookmarksFileFound)
         }
 
