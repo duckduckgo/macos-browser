@@ -23,7 +23,7 @@ import GRDB
 final class ChromiumLoginReader {
 
     enum ImportError: Error {
-        case databaseAccessFailed(String)
+        case databaseAccessFailed
         case couldNotFindLoginData
         case failedToTemporarilyCopyDatabase
         case decryptionFailed
@@ -37,7 +37,6 @@ final class ChromiumLoginReader {
     private static let sqlSelectWithPasswordTimestamp = "SELECT signon_realm, username_value, password_value, date_password_modified FROM logins;"
     private static let sqlSelectWithCreatedTimestamp = "SELECT signon_realm, username_value, password_value, date_created FROM logins;"
     private static let sqlSelectWithoutTimestamp = "SELECT signon_realm, username_value, password_value FROM logins;"
-    private static let sqlSelectMetadataVersion = "SELECT value FROM meta WHERE key='version'"
 
     init(chromiumDataDirectoryURL: URL, processName: String, decryptionKey: String? = nil) {
         self.chromiumLocalLoginDirectoryURL = chromiumDataDirectoryURL.appendingPathComponent("/Login Data")
@@ -59,7 +58,6 @@ final class ChromiumLoginReader {
         }
 
         var loginRows = [ChromiumCredential.ID: ChromiumCredential]()
-        var version = "unknown"
 
         for loginFileURL in loginFileURLs {
             let temporaryFileHandler = TemporaryFileHandler(fileURL: loginFileURL)
@@ -72,8 +70,6 @@ final class ChromiumLoginReader {
             do {
                 let queue = try DatabaseQueue(path: temporaryDatabaseURL.path)
                 var rows = [ChromiumCredential]()
-                
-                version = try fetchLoginFileVersion(queue: queue) ?? "unknown"
 
                 try queue.read { database in
                     rows = try fetchCredentials(from: database)
@@ -94,18 +90,12 @@ final class ChromiumLoginReader {
                 }
 
             } catch {
-                return .failure(.databaseAccessFailed(version))
+                return .failure(.databaseAccessFailed)
             }
         }
 
         let importedLogins = createImportedLoginCredentials(from: loginRows.values, decryptionKey: derivedKey)
         return .success(importedLogins)
-    }
-    
-    private func fetchLoginFileVersion(queue: DatabaseQueue) throws -> String? {
-        return try queue.read { database in
-            return try? String.fetchOne(database, sql: Self.sqlSelectMetadataVersion)
-        }
     }
     
     private func createImportedLoginCredentials(from credentials: Dictionary<ChromiumCredential.ID, ChromiumCredential>.Values,
