@@ -98,8 +98,20 @@ final class ChromiumLoginReader {
             }
         }
 
-        let importedLogins = loginRows.values.compactMap { row -> ImportedLoginCredential? in
-            guard let decryptedPassword = decrypt(passwordData: row.encryptedPassword, with: derivedKey) else {
+        let importedLogins = createImportedLoginCredentials(from: loginRows.values, decryptionKey: derivedKey)
+        return .success(importedLogins)
+    }
+    
+    private func fetchLoginFileVersion(queue: DatabaseQueue) throws -> String? {
+        return try queue.read { database in
+            return try? String.fetchOne(database, sql: Self.sqlSelectMetadataVersion)
+        }
+    }
+    
+    private func createImportedLoginCredentials(from credentials: Dictionary<ChromiumCredential.ID, ChromiumCredential>.Values,
+                                                decryptionKey: Data) -> [ImportedLoginCredential] {
+        return credentials.compactMap { row -> ImportedLoginCredential? in
+            guard let decryptedPassword = decrypt(passwordData: row.encryptedPassword, with: decryptionKey) else {
                 return nil
             }
             
@@ -108,14 +120,6 @@ final class ChromiumLoginReader {
                 username: row.username,
                 password: decryptedPassword
             )
-        }
-
-        return .success(importedLogins)
-    }
-    
-    private func fetchLoginFileVersion(queue: DatabaseQueue) throws -> String? {
-        return try queue.read { database in
-            return try? String.fetchOne(database, sql: Self.sqlSelectMetadataVersion)
         }
     }
     
