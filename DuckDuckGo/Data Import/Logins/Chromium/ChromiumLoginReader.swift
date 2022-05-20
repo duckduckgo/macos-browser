@@ -65,7 +65,7 @@ final class ChromiumLoginReader {
             let temporaryFileHandler = TemporaryFileHandler(fileURL: loginFileURL)
             defer { temporaryFileHandler.deleteTemporarilyCopiedFile() }
             
-            guard case let .success(temporaryDatabaseURL) = temporaryFileHandler.copyFileToTemporaryDirectory() else {
+            guard let temporaryDatabaseURL = try? temporaryFileHandler.copyFileToTemporaryDirectory() else {
                 return .failure(.failedToTemporarilyCopyDatabase)
             }
             

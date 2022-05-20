@@ -39,18 +39,20 @@ final class FirefoxBookmarksReader {
     }
 
     func readBookmarks() -> Result<ImportedBookmarks, FirefoxBookmarksReader.ImportError> {
-        let temporaryFileHandler = TemporaryFileHandler(fileURL: firefoxPlacesDatabaseURL)
-        
-        defer {
-            temporaryFileHandler.deleteTemporarilyCopiedFile()
-        }
-        
-        guard case let .success(temporaryDatabaseURL) = temporaryFileHandler.copyFileToTemporaryDirectory() else {
+        do {
+            return try firefoxPlacesDatabaseURL.withTemporaryFile { temporaryDatabaseURL in
+                return readBookmarks(fromDatabaseURL: temporaryDatabaseURL)
+            }
+        } catch {
             return .failure(.failedToTemporarilyCopyFile)
         }
-        
+    }
+
+    // MARK: - Private
+
+    private func readBookmarks(fromDatabaseURL databaseURL: URL) -> Result<ImportedBookmarks, FirefoxBookmarksReader.ImportError> {
         do {
-            let queue = try DatabaseQueue(path: temporaryDatabaseURL.path)
+            let queue = try DatabaseQueue(path: databaseURL.path)
 
             let bookmarks: DatabaseBookmarks = try queue.read { database in
                 guard let rootEntries = try? FolderRow.fetchAll(database, sql: rootEntryQuery()), let rootEntry = rootEntries.first else {
@@ -91,9 +93,7 @@ final class FirefoxBookmarksReader {
             return .failure(.unexpectedBookmarksDatabaseFormat)
         }
     }
-
-    // MARK: - Private
-
+    
     fileprivate class DatabaseBookmarks {
         let topLevelFolders: [FolderRow]
         let foldersByParent: [Int: [FolderRow]]

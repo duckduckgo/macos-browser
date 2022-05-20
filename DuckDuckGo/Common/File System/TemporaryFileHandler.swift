@@ -43,24 +43,42 @@ final class TemporaryFileHandler {
         deleteTemporarilyCopiedFile()
     }
     
-    func copyFileToTemporaryDirectory() -> Result<URL, FileHandlerError> {
+    func withTemporaryFile<T>(_ closure: (URL) -> T) throws -> T {
+        let temporaryFileURL = try copyFileToTemporaryDirectory()
+        let closureResult =  closure(temporaryFileURL)
+
+        deleteTemporarilyCopiedFile()
+        
+        return closureResult
+    }
+    
+    func copyFileToTemporaryDirectory() throws -> URL {
         let fileManager = FileManager.default
         
         guard fileManager.fileExists(atPath: fileURL.path) else {
-            return .failure(.noFileFound)
+            throw FileHandlerError.noFileFound
         }
         
         do {
             try fileManager.copyItem(at: fileURL, to: temporaryFileURL)
         } catch {
-            return .failure(.failedToCopyFile)
+            throw FileHandlerError.failedToCopyFile
         }
         
-        return .success(temporaryFileURL)
+        return temporaryFileURL
     }
     
     func deleteTemporarilyCopiedFile() {
         try? FileManager.default.removeItem(at: temporaryFileURL)
     }
     
+}
+
+extension URL {
+        
+    func withTemporaryFile<T>(_ closure: (URL) -> T) throws -> T {
+        let handler = TemporaryFileHandler(fileURL: self)
+        return try handler.withTemporaryFile(closure)
+    }
+
 }

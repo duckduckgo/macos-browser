@@ -22,30 +22,17 @@ import Combine
 
 final class TemporaryFileHandlerTests: XCTestCase {
     
-    func testWhenPassingAValidPathToTheTemporaryFileHandler_ThenTheFileIsCopied_AndDeletedAfterTheHandlerIsComplete() {
+    func testWhenPassingAValidPathToTheTemporaryFileHandler_ThenTheFileIsCopied_AndDeletedAfterTheHandlerIsComplete() throws {
         let handler = TemporaryFileHandler(fileURL: loginDatabaseURL())
-        let result = handler.copyFileToTemporaryDirectory()
+        let copiedFileURL = try handler.copyFileToTemporaryDirectory()
         
-        var copiedFileURL: URL?
-        
-        switch result {
-        case .success(let url):
-            XCTAssertTrue(url.path.contains(NSTemporaryDirectory()))
-            XCTAssertTrue(FileManager.default.fileExists(atPath: url.path))
-            XCTAssertEqual(url.pathExtension, "db")
-            copiedFileURL = url
-        case .failure(let error):
-            XCTFail("Failed to copy file to temporary directory, with error: \(error.localizedDescription)")
-        }
+        XCTAssertTrue(copiedFileURL.path.contains(NSTemporaryDirectory()))
+        XCTAssertTrue(FileManager.default.fileExists(atPath: copiedFileURL.path))
+        XCTAssertEqual(copiedFileURL.pathExtension, "db")
 
         handler.deleteTemporarilyCopiedFile()
         
-        // Verify that the file has since been deleted.
-        if let copiedFileURL = copiedFileURL {
-            XCTAssertFalse(FileManager.default.fileExists(atPath: copiedFileURL.path))
-        } else {
-            XCTFail("Didn't get copied file URL")
-        }
+        XCTAssertFalse(FileManager.default.fileExists(atPath: copiedFileURL.path))
     }
     
     private func loginDatabaseURL() -> URL {
