@@ -59,8 +59,8 @@ private class Scanner {
         }
         
         let adjustedIndex = data.startIndex + index
-
-        guard adjustedIndex + length <= data.count else {
+        
+        guard adjustedIndex + length <= data.endIndex else {
             throw ScannerError.outOfBounds
         }
 
