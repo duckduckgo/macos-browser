@@ -46,7 +46,6 @@ final class ChromiumLoginReader {
         self.decryptionKey = decryptionKey
     }
 
-    // swiftlint:disable:next function_body_length cyclomatic_complexity
     func readLogins() -> Result<[ImportedLoginCredential], ChromiumLoginReader.ImportError> {
         guard let key = self.decryptionKey ?? promptForChromiumPasswordKeychainAccess(), let derivedKey = deriveKey(from: key) else {
             return .failure(.decryptionFailed)
@@ -72,15 +71,9 @@ final class ChromiumLoginReader {
             
             do {
                 let queue = try DatabaseQueue(path: temporaryDatabaseURL.path)
-                
-                try queue.read { database in
-                    // Extract the version first, in case an error occurs later on in the function.
-                    if let fetchedVersion = try? String.fetchOne(database, sql: Self.sqlSelectMetadataVersion) {
-                        version = fetchedVersion
-                    }
-                }
-
                 var rows = [ChromiumCredential]()
+                
+                version = try fetchLoginFileVersion(queue: queue) ?? "unknown"
 
                 try queue.read { database in
                     rows = try fetchCredentials(from: database)
@@ -105,22 +98,27 @@ final class ChromiumLoginReader {
             }
         }
 
-        let importedLogins = loginRows.values
-            .compactMap { row -> ImportedLoginCredential? in
-                guard let decryptedPassword = decrypt(passwordData: row.encryptedPassword, with: derivedKey) else {
-                    return nil
-                }
-
-                return ImportedLoginCredential(
-                    url: row.url,
-                    username: row.username,
-                    password: decryptedPassword
-                )
+        let importedLogins = loginRows.values.compactMap { row -> ImportedLoginCredential? in
+            guard let decryptedPassword = decrypt(passwordData: row.encryptedPassword, with: derivedKey) else {
+                return nil
             }
+            
+            return ImportedLoginCredential(
+                url: row.url,
+                username: row.username,
+                password: decryptedPassword
+            )
+        }
 
         return .success(importedLogins)
     }
-
+    
+    private func fetchLoginFileVersion(queue: DatabaseQueue) throws -> String? {
+        return try queue.read { database in
+            return try? String.fetchOne(database, sql: Self.sqlSelectMetadataVersion)
+        }
+    }
+    
     private func fetchCredentials(from database: GRDB.Database) throws -> [ChromiumCredential] {
         do {
             return try ChromiumCredential.fetchAll(database, sql: Self.sqlSelectWithPasswordTimestamp)
