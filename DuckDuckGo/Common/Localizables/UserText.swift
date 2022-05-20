@@ -273,11 +273,6 @@ struct UserText {
 
     // MARK: - Login Import & Export
 
-    static func closeBrowserWarningFor(browser: String) -> String {
-        let localized = NSLocalizedString("import.close.browser.warning", value: "You must quit %@ before importing data.", comment: "Quit browser warning when importing data")
-        return String(format: localized, browser)
-    }
-
     static let importLoginsCSV = NSLocalizedString("import.logins.csv.title", value: "CSV Logins File", comment: "Title text for the CSV importer")
 
     static let csvImportDescription = NSLocalizedString("import.logins.csv.description", value: "The CSV importer will try to match column headers to their position.\nIf there is no header, it supports two formats:\n\n1. URL, Username, Password\n2. Title, URL, Username, Password", comment: "Description text for the CSV importer")
@@ -299,14 +294,12 @@ struct UserText {
     static let initiateImport = NSLocalizedString("import.data.initiate", value: "Import", comment: "Button text for importing data")
     static let doneImporting = NSLocalizedString("import.data.done", value: "Done", comment: "Button text for finishing the data import")
 
-    static let dataImportFailedTitle = NSLocalizedString("import.data.import-failed.title", value: "Import Failed", comment: "Alert title when the data import fails")
+    static let dataImportFailedTitle = NSLocalizedString("import.data.import-failed.title", value: "Sorry, we weren't able to import your data.", comment: "Alert title when the data import fails")
 
-    static func dataImportFailedBody(_ source: DataImport.Source, errorMessage: String) -> String {
-        let localized = NSLocalizedString("import.data.import-failed.body",
-                                          value: "Failed to import data from %@.\n\nError message: %@",
-                                          comment: "Alert body text when the data import fails")
-        return String(format: localized, source.importSourceName, errorMessage)
-    }
+    static let dataImportSubmitFeedback = NSLocalizedString("import.data.submit-feedback", value: "submit feedback", comment: "Link text used in the data import failure alert")
+    static let dataImportFailedBody = NSLocalizedString("import.data.import-failed.body",
+                                                        value: "Please submit feedback so we can address this issue.",
+                                                        comment: "Alert body text used in the data import failure alert")
 
     static let dataImportAlertImport = NSLocalizedString("import.data.alert.import", value: "Import", comment: "Import button for data import alerts")
     static let dataImportAlertAccept = NSLocalizedString("import.data.alert.accept", value: "Okay", comment: "Accept button for data import alerts")

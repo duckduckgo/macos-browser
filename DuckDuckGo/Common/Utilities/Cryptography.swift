@@ -17,6 +17,7 @@
 //
 
 import CommonCrypto
+import CryptoKit
 
 struct Cryptography {
 

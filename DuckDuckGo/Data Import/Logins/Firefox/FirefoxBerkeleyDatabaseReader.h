@@ -1,7 +1,7 @@
 //
-//  NSTextViewExtension.swift
+//  FirefoxBerkeleyDatabaseReader.h
 //
-//  Copyright © 2021 DuckDuckGo. All rights reserved.
+//  Copyright © 2022 DuckDuckGo. All rights reserved.
 //
 //  Licensed under the Apache License, Version 2.0 (the "License");
 //  you may not use this file except in compliance with the License.
@@ -16,23 +16,14 @@
 //  limitations under the License.
 //
 
-import Foundation
+#import <Foundation/Foundation.h>
 
-extension NSTextView {
+NS_ASSUME_NONNULL_BEGIN
 
-    var selectedText: String {
-        selectedRanges.compactMap {
-            if case let range as NSRange = $0 {
-                return string[range]
-            }
-            return nil
-        }.joined(separator: "\n")
-    }
-    
-    func applyLabelStyle() {
-        self.isEditable = false
-        self.backgroundColor = .clear
-        self.textContainer?.textView?.alignment = .center
-    }
-    
-}
+@interface FirefoxBerkeleyDatabaseReader : NSObject
+
++ (NSDictionary<NSString *, NSData *> * _Nullable)readDatabase:(NSString *)databasePath;
+
+@end
+
+NS_ASSUME_NONNULL_END

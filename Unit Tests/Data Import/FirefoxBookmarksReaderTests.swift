@@ -23,7 +23,7 @@ import XCTest
 class FirefoxBookmarksReaderTests: XCTestCase {
 
     func testImportingBookmarks() {
-        let bookmarksReader = FirefoxBookmarksReader(firefoxDataDirectoryPath: resourcePath())
+        let bookmarksReader = FirefoxBookmarksReader(firefoxDataDirectoryURL: resourceURL())
         let bookmarks = bookmarksReader.readBookmarks()
 
         guard case let .success(bookmarks) = bookmarks else {
@@ -35,9 +35,9 @@ class FirefoxBookmarksReaderTests: XCTestCase {
         XCTAssertEqual(bookmarks.topLevelFolders.otherBookmarks.type, "folder")
     }
 
-    private func resourcePath() -> String {
+    private func resourceURL() -> URL {
         let bundle = Bundle(for: FirefoxBookmarksReaderTests.self)
-        return bundle.resourceURL!.appendingPathComponent("Data Import Resources/Test Firefox Data").path
+        return bundle.resourceURL!.appendingPathComponent("Data Import Resources/Test Firefox Data")
     }
 
 }
