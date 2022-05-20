@@ -31,7 +31,7 @@ protocol FileStore {
 
 extension FileStore {
     func loadData(at url: URL) -> Data? {
-        loadData(at: url, decryptIfNeeded: false)
+        loadData(at: url, decryptIfNeeded: true)
     }
 }
 

@@ -38,14 +38,17 @@ final class AppStateRestorationManager: NSObject {
         service.canRestoreLastSessionState
     }
 
-    func restoreLastSessionState(automatic: Bool = false) {
+    func restoreLastSessionState(interactive: Bool) {
         do {
             try service.restoreState(using: WindowsManager.restoreState(from:))
         } catch CocoaError.fileReadNoSuchFile {
             // ignore
         } catch {
             os_log("App state could not be decoded: %s", "\(error)")
-            Pixel.fire(.debug(event: .appStateRestorationFailed, error: error), withAdditionalParameters: ["interactive": String(!automatic)])
+            Pixel.fire(
+                .debug(event: .appStateRestorationFailed, error: error),
+                withAdditionalParameters: ["interactive": String(interactive)]
+            )
         }
     }
 
@@ -75,7 +78,7 @@ final class AppStateRestorationManager: NSObject {
     private func readLastSessionState(restore: Bool) {
         service.loadLastSessionState()
         if restore {
-            restoreLastSessionState(automatic: true)
+            restoreLastSessionState(interactive: false)
         }
     }
 

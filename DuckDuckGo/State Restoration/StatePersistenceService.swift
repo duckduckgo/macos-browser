@@ -37,24 +37,6 @@ final class StatePersistenceService {
         lastSessionStateArchive != nil
     }
 
-    private func archive(using encoder: @escaping (NSCoder) -> Void) -> Data {
-        let archiver = NSKeyedArchiver(requiringSecureCoding: true)
-        encoder(archiver)
-        return archiver.encodedData
-    }
-
-    private func write(_ data: Data, sync: Bool) {
-        job?.cancel()
-        job = DispatchWorkItem {
-            self.error = nil
-            let location = URL.persistenceLocation(for: self.fileName)
-            if !self.fileStore.persist(data, url: location) {
-                self.error = CocoaError(.fileWriteNoPermission)
-            }
-        }
-        queue.dispatch(job!, sync: sync)
-    }
-
     func persistState(using encoder: @escaping (NSCoder) -> Void, sync: Bool = false) {
         dispatchPrecondition(condition: .onQueue(.main))
 
@@ -91,6 +73,26 @@ final class StatePersistenceService {
         }
         removeLastSessionState()
         try restoreState(from: encryptedData, using: restore)
+    }
+
+    // MARK: - Private
+
+    private func archive(using encoder: @escaping (NSCoder) -> Void) -> Data {
+        let archiver = NSKeyedArchiver(requiringSecureCoding: true)
+        encoder(archiver)
+        return archiver.encodedData
+    }
+
+    private func write(_ data: Data, sync: Bool) {
+        job?.cancel()
+        job = DispatchWorkItem {
+            self.error = nil
+            let location = URL.persistenceLocation(for: self.fileName)
+            if !self.fileStore.persist(data, url: location) {
+                self.error = CocoaError(.fileWriteNoPermission)
+            }
+        }
+        queue.dispatch(job!, sync: sync)
     }
 
     private func loadStateFromFile() -> Data? {
