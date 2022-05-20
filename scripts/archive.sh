@@ -3,6 +3,7 @@
 set -eo pipefail
 
 cwd="$(dirname "${BASH_SOURCE[0]}")"
+developer_apple_id_keychain_identifier="developer-apple-id"
 source "${cwd}/helpers/common.sh"
 
 read_command_line_arguments() {
@@ -32,14 +33,23 @@ read_command_line_arguments() {
 
 	shift 1
 
-	while getopts 'a:d' OPTION; do
+	while getopts 'a:dsv:' OPTION; do
 		case "${OPTION}" in
 			a)
 				asana_task_url="${OPTARG}"
-				create_dmg_preflight
+				if [[ ${create_dmg} -ne 1 ]]; then
+					create_dmg_preflight
+				fi
 				;;
 			d)
 				create_dmg_preflight
+				;;
+			s)
+				# Use silent_output function to redirect all output to /dev/null
+				filter_output='silent_output'
+				;;
+			v)
+				override_version="${OPTARG}"
 				;;
 			*)
 				print_usage_and_exit
@@ -53,12 +63,14 @@ read_command_line_arguments() {
 print_usage_and_exit() {
 	cat <<- EOF
 	Usage:
-	  $ $(basename "$0") <review|release> [-a <asana_task_url>] [-d]
-	
+	  $ $(basename "$0") <review|release> [-a <asana_task_url>] [-d] [-s] [-v <version>]
+
 	Options:
 	 -a <asana_task_url>  Update Asana task after building the app (implies -d)
 	 -d                   Create a DMG image alongside the zipped app and dSYMs
-	
+	 -s                   Skip xcodebuild output in logs
+	 -v <version>         Override app version with <version> (does not update Xcode project)
+
 	To clear keychain entries:
 	  $ $(basename "$0") clear-keychain
 
@@ -68,19 +80,17 @@ print_usage_and_exit() {
 }
 
 create_dmg_preflight() {
-	if [[ ${create_dmg} -ne 1 ]]; then
-		if ! command -v create-dmg &> /dev/null; then
-			cat <<- EOF
-			create-dmg is required to create DMG images. Install it with:
-			  $ brew install create-dmg
-			
-			EOF
-			die
-		fi
+	if ! command -v create-dmg &> /dev/null; then
+		cat <<- EOF
+		create-dmg is required to create DMG images. Install it with:
+		  $ brew install create-dmg
 
-		create_dmg=1
-		echo "Will create DMG image after building the app."
+		EOF
+		die
 	fi
+
+	echo "Will create DMG image after building the app."
+	create_dmg=1
 }
 
 set_up_environment() {
@@ -95,7 +105,12 @@ set_up_environment() {
 		configuration="CI_${configuration}"
 	fi
 
-	app_version=$(get_app_version)
+	if [[ -n "${override_version}" ]]; then
+		app_version="${override_version}"
+	else
+		source "${cwd}/helpers/version.sh"
+		app_version=$(get_app_version "${scheme}")
+	fi
 
 	app_path="${workdir}/${app_name}.app"
 	dsym_path="${archive}/dSYMs"
@@ -110,37 +125,47 @@ get_developer_credentials() {
 
 	if [[ -z "${developer_apple_id}" ]]; then
 
-		while [[ -z "${developer_apple_id}" ]]; do
-			cat <<- EOF
-			Please enter Apple ID that will be used for requesting notarization
-			Set it in XCODE_DEVELOPER_APPLE_ID environment variable to not be asked again.
-			
-			EOF
-			read -rp "Apple ID: " developer_apple_id
-			echo
-		done
+		if is_item_in_keychain "${developer_apple_id_keychain_identifier}"; then
+			developer_apple_id=$(retrieve_item_from_keychain "${developer_apple_id_keychain_identifier}")
+			echo "Using Apple ID found in the keychain: ${developer_apple_id}"
+		else
+			while [[ -z "${developer_apple_id}" ]]; do
+				cat <<- EOF
+				Please enter Apple ID that will be used for requesting notarization.
+				It will be stored in keychain and you won't be asked for it the next time.
+				Alternatively set the Apple ID in XCODE_DEVELOPER_APPLE_ID environment variable
+				to skip storing in keychain.
 
+				EOF
+				read -rp "Apple ID: " developer_apple_id
+				echo
+			done
+
+			store_item_in_keychain "${developer_apple_id_keychain_identifier}" "${developer_apple_id}"
+		fi
 	else
 		echo "Using ${developer_apple_id} Apple ID"
 	fi
 
 	if [[ -z "${developer_password}" ]]; then
 
-		if user_has_password_in_keychain "${developer_apple_id}"; then
+		if is_item_in_keychain "${developer_apple_id}"; then
+			developer_password=$(retrieve_item_from_keychain "${developer_apple_id}")
 			echo "Found Apple ID password in the keychain"
-			developer_password=$(retrieve_password_from_keychain "${developer_apple_id}")
 		else
 			while [[ -z "${developer_password}" ]]; do
 				cat <<- EOF
-				Set password in XCODE_DEVELOPER_PASSWORD environment variable to not be asked for password.
-				Currently only application-specific password is supported (create one at https://appleid.apple.com).
+				Enter your Apple ID application-specific password (create one at https://appleid.apple.com).
+				It will be stored in keychain and you won't be asked for it the next time.
+				Alternatively set the password in XCODE_DEVELOPER_PASSWORD environment variable 
+				to skip storing in keychain.
 				
 				EOF
 				read -srp "Password for ${developer_apple_id}: " developer_password
 				echo
 			done
 
-			store_password_in_keychain "${developer_apple_id}" "${developer_password}"
+			store_item_in_keychain "${developer_apple_id}" "${developer_password}"
 		fi
 	fi
 }
@@ -174,14 +199,6 @@ check_xcpretty() {
 	fi
 }
 
-get_app_version() {
-	xcrun xcodebuild \
-		-scheme "${scheme}" \
-		-showBuildSettings 2>/dev/null \
-		| grep MARKETING_VERSION \
-		| awk '{print $3;}'
-}
-
 archive_and_export() {
 	local xcpretty
 	check_xcpretty
@@ -190,10 +207,13 @@ archive_and_export() {
 	echo "Building and archiving the app (version ${app_version}) ..."
 	echo
 	
-	xcrun xcodebuild archive \
+	${filter_output} xcrun xcodebuild archive \
 		-scheme "${scheme}" \
 		-configuration "${configuration}" \
 		-archivePath "${archive}" \
+		CURRENT_PROJECT_VERSION="${app_version}" \
+		MARKETING_VERSION="${app_version}" \
+		2>&1 \
 		| ${xcpretty}
 
 	echo
@@ -202,11 +222,12 @@ archive_and_export() {
 
 	prepare_export_options_in_ci
 
-	xcrun xcodebuild -exportArchive \
+	${filter_output} xcrun xcodebuild -exportArchive \
 		-archivePath "${archive}" \
 		-exportPath "${workdir}" \
 		-exportOptionsPlist "${export_options_plist}" \
 		-configuration "${configuration}" \
+		2>&1 \
 		| ${xcpretty}
 }
 
@@ -286,7 +307,7 @@ wait_for_notarization() {
 }
 
 staple_notarized_app() {
-	xcrun stapler staple "${app_path}"
+	${filter_output} xcrun stapler staple "${app_path}"
 }
 
 compress_app_and_dsym() {
@@ -308,7 +329,7 @@ create_dmg() {
 	rm -rf "${dmg_dir}" "${dmg_output_path}"
 	mkdir -p "${dmg_dir}"
 	cp -R "${app_path}" "${dmg_dir}"
-	create-dmg --volname "${app_name}" \
+	${filter_output} create-dmg --volname "${app_name}" \
 		--icon "${app_name}.app" 140 160 \
 		--background "${dmg_background}" \
 		--window-size 600 400 \
