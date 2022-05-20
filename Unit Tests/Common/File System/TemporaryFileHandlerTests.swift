@@ -24,15 +24,20 @@ final class TemporaryFileHandlerTests: XCTestCase {
     
     func testWhenPassingAValidPathToTheTemporaryFileHandler_ThenTheFileIsCopied_AndDeletedAfterTheHandlerIsComplete() throws {
         let handler = TemporaryFileHandler(fileURL: loginDatabaseURL())
-        let copiedFileURL = try handler.copyFileToTemporaryDirectory()
+        var temporaryFileURL: URL?
         
-        XCTAssertTrue(copiedFileURL.path.contains(NSTemporaryDirectory()))
-        XCTAssertTrue(FileManager.default.fileExists(atPath: copiedFileURL.path))
-        XCTAssertEqual(copiedFileURL.pathExtension, "db")
-
-        handler.deleteTemporarilyCopiedFile()
+        try handler.withTemporaryFile { url in
+            temporaryFileURL = url
+            XCTAssertTrue(url.path.contains(NSTemporaryDirectory()))
+            XCTAssertTrue(FileManager.default.fileExists(atPath: url.path))
+            XCTAssertEqual(url.pathExtension, "db")
+        }
         
-        XCTAssertFalse(FileManager.default.fileExists(atPath: copiedFileURL.path))
+        if let temporaryFileURL = temporaryFileURL {
+            XCTAssertFalse(FileManager.default.fileExists(atPath: temporaryFileURL.path))
+        } else {
+            XCTFail("Did not get temporary file URL")
+        }
     }
     
     private func loginDatabaseURL() -> URL {

@@ -76,74 +76,66 @@ final class FirefoxEncryptionKeyReader: FirefoxEncryptionKeyReading {
         return .success(key)
     }
     
-    // swiftlint:disable:next function_body_length
     func getEncryptionKey(key4DatabaseURL: URL, primaryPassword: String) -> Result<Data, FirefoxLoginReader.ImportError> {
-        let temporaryFileHandler = TemporaryFileHandler(fileURL: key4DatabaseURL)
-        
-        defer {
-            temporaryFileHandler.deleteTemporarilyCopiedFile()
-        }
-        
-        guard let temporaryDatabaseURL = try? temporaryFileHandler.copyFileToTemporaryDirectory() else {
-            return .failure(.failedToTemporarilyCopyFile)
-        }
-        
-        var key: Data?
-        var error: FirefoxLoginReader.ImportError?
-
         do {
-            let queue = try DatabaseQueue(path: temporaryDatabaseURL.path)
-
-            try queue.read { database in
-                guard let metadataRow = try? Row.fetchOne(database, sql: "SELECT item1, item2 FROM metadata WHERE id = 'password'") else {
-                    error = .databaseAccessFailed
-                    return
+            return try key4DatabaseURL.withTemporaryFile { temporaryDatabaseURL in
+                do {
+                    if let data = try getKey(key4DatabaseURL: temporaryDatabaseURL, primaryPassword: primaryPassword) {
+                        return .success(data)
+                    } else {
+                        return .failure(.databaseAccessFailed)
+                    }
+                } catch {
+                    if let importError = error as? FirefoxLoginReader.ImportError {
+                        return .failure(importError)
+                    } else {
+                        return .failure(.couldNotGetDecryptionKey)
+                    }
                 }
-
-                let globalSalt: Data = metadataRow["item1"]
-                let item2: Data = metadataRow["item2"]
-
-                guard let decodedItem2 = try? ASN1Parser.parse(data: item2),
-                      let iv = extractInitializationVector(from: decodedItem2),
-                      let decryptedItem2 = aesDecrypt(tlv: decodedItem2, iv: iv, globalSalt: globalSalt, primaryPassword: primaryPassword) else {
-                    error = .decryptionFailed
-                    return
-                }
-
-                let string = String(data: decryptedItem2, encoding: .utf8)
-
-                // The password check is technically "password-check\x02\x02", it's converted to UTF-8 and checked here for simplicity
-                if string != "password-check" {
-                    error = .requiresPrimaryPassword
-                }
-
-                guard let nssPrivateRow = try? Row.fetchOne(database, sql: "SELECT a11, a102 FROM nssPrivate;") else {
-                    error = .decryptionFailed
-                    return
-                }
-
-                let a11: Data = nssPrivateRow["a11"]
-                let a102: Data = nssPrivateRow["a102"]
-
-                assert(a102 == Data([248, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1]))
-
-                guard let decodedA11 = try? ASN1Parser.parse(data: a11), let finalIV = extractInitializationVector(from: decodedA11) else {
-                    error = .decryptionFailed
-                    return
-                }
-
-                key = aesDecrypt(tlv: decodedA11, iv: finalIV, globalSalt: globalSalt, primaryPassword: primaryPassword)
             }
         } catch {
-            return .failure(.databaseAccessFailed)
+            return .failure(.failedToTemporarilyCopyFile)
         }
+    }
+    
+    private func getKey(key4DatabaseURL databaseURL: URL, primaryPassword: String) throws -> Data? {
+        let queue = try DatabaseQueue(path: databaseURL.path)
 
-        if let error = error {
-            return .failure(error)
-        } else if let key = key {
-            return .success(key)
-        } else {
-            return .failure(.databaseAccessFailed)
+        return try queue.read { database in
+            guard let metadataRow = try? Row.fetchOne(database, sql: "SELECT item1, item2 FROM metadata WHERE id = 'password'") else {
+                throw FirefoxLoginReader.ImportError.databaseAccessFailed
+            }
+
+            let globalSalt: Data = metadataRow["item1"]
+            let item2: Data = metadataRow["item2"]
+
+            guard let decodedItem2 = try? ASN1Parser.parse(data: item2),
+                  let iv = extractInitializationVector(from: decodedItem2),
+                  let decryptedItem2 = aesDecrypt(tlv: decodedItem2, iv: iv, globalSalt: globalSalt, primaryPassword: primaryPassword) else {
+                throw FirefoxLoginReader.ImportError.decryptionFailed
+            }
+
+            let string = String(data: decryptedItem2, encoding: .utf8)
+
+            // The password check is technically "password-check\x02\x02", it's converted to UTF-8 and checked here for simplicity
+            if string != "password-check" {
+                throw FirefoxLoginReader.ImportError.requiresPrimaryPassword
+            }
+
+            guard let nssPrivateRow = try? Row.fetchOne(database, sql: "SELECT a11, a102 FROM nssPrivate;") else {
+                throw FirefoxLoginReader.ImportError.decryptionFailed
+            }
+
+            let a11: Data = nssPrivateRow["a11"]
+            let a102: Data = nssPrivateRow["a102"]
+
+            assert(a102 == Data([248, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1]))
+
+            guard let decodedA11 = try? ASN1Parser.parse(data: a11), let finalIV = extractInitializationVector(from: decodedA11) else {
+                throw FirefoxLoginReader.ImportError.decryptionFailed
+            }
+
+            return aesDecrypt(tlv: decodedA11, iv: finalIV, globalSalt: globalSalt, primaryPassword: primaryPassword)
         }
     }
 

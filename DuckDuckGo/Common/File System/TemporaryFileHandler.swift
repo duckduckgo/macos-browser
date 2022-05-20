@@ -45,11 +45,8 @@ final class TemporaryFileHandler {
     
     func withTemporaryFile<T>(_ closure: (URL) -> T) throws -> T {
         let temporaryFileURL = try copyFileToTemporaryDirectory()
-        let closureResult =  closure(temporaryFileURL)
-
-        deleteTemporarilyCopiedFile()
-        
-        return closureResult
+        defer { deleteTemporarilyCopiedFile() }
+        return closure(temporaryFileURL)
     }
     
     func copyFileToTemporaryDirectory() throws -> URL {
