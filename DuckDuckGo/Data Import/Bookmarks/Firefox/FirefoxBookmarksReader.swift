@@ -32,14 +32,14 @@ final class FirefoxBookmarksReader {
         case failedToMapBookmarks
     }
 
-    private let firefoxDataDirectoryURL: URL
+    private let firefoxPlacesDatabaseURL: URL
 
     init(firefoxDataDirectoryURL: URL) {
-        self.firefoxDataDirectoryURL = firefoxDataDirectoryURL.appendingPathComponent(Constants.placesDatabaseName)
+        self.firefoxPlacesDatabaseURL = firefoxDataDirectoryURL.appendingPathComponent(Constants.placesDatabaseName)
     }
 
     func readBookmarks() -> Result<ImportedBookmarks, FirefoxBookmarksReader.ImportError> {
-        let temporaryFileHandler = TemporaryFileHandler(fileURL: firefoxDataDirectoryURL)
+        let temporaryFileHandler = TemporaryFileHandler(fileURL: firefoxPlacesDatabaseURL)
         
         defer {
             temporaryFileHandler.deleteTemporarilyCopiedFile()
