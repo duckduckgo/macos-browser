@@ -130,14 +130,3 @@ struct Cryptography {
     }
 
 }
-
-struct HMAC {
-    
-    static func digestSHA1(key: Data, message: Data) -> Data {
-        let symmetricKey = SymmetricKey(data: key)
-        let authentication = CryptoKit.HMAC<Insecure.SHA1>.authenticationCode(for: message, using: symmetricKey)
-        
-        return Data(authentication)
-    }
-
-}

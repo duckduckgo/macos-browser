@@ -205,15 +205,22 @@ final class FirefoxEncryptionKeyReader: FirefoxEncryptionKeyReading {
         
         let hp = SHA.from(data: globalSalt + primaryPasswordData)
         let chp = SHA.from(data: hp + entrySalt)
-        let k1 = HMAC.digestSHA1(key: chp, message: (pes + entrySalt))
-        let tk = HMAC.digestSHA1(key: chp, message: pes as Data)
-        let k2 = HMAC.digestSHA1(key: chp, message: (tk + entrySalt))
+        let k1 = calculateHMAC(key: chp, message: (pes + entrySalt))
+        let tk = calculateHMAC(key: chp, message: pes as Data)
+        let k2 = calculateHMAC(key: chp, message: (tk + entrySalt))
         let k = k1 + k2
 
         let key = k.prefix(24)
         let iv = k.suffix(8)
         
         return Cryptography.decrypt3DES(data: ciphertext, key: key, iv: iv)
+    }
+    
+    private func calculateHMAC(key: Data, message: Data) -> Data {
+        let symmetricKey = SymmetricKey(data: key)
+        let authentication = CryptoKit.HMAC<Insecure.SHA1>.authenticationCode(for: message, using: symmetricKey)
+        
+        return Data(authentication)
     }
 
     // MARK: - Key4 Database Parsing
