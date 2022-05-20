@@ -24,6 +24,10 @@ final class WindowControllersManager {
 
     static let shared = WindowControllersManager()
 
+    /**
+     * _Initial_ meaning a single window with a single home page tab.
+     */
+    @Published private(set) var isInInitialState: Bool = true
     @Published private(set) var mainWindowControllers = [MainWindowController]()
     weak var lastKeyMainWindowController: MainWindowController?
 
@@ -42,6 +46,18 @@ final class WindowControllersManager {
             return
         }
         mainWindowControllers.remove(at: idx)
+    }
+
+    func updateIsInInitialState() {
+        if isInInitialState {
+            let firstWindowTabs = mainWindowControllers.first?
+                .mainViewController
+                .tabCollectionViewModel
+                .tabs
+                .map(\.content)
+
+            isInInitialState = mainWindowControllers.isEmpty || (mainWindowControllers.count == 1 && firstWindowTabs == [.homePage])
+        }
     }
 
 }

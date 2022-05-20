@@ -625,7 +625,8 @@ CQ
                                             </connections>
                                         </menuItem>
                                         <menuItem isSeparatorItem="YES" id="BiH-Kk-Mam"/>
-                                        <menuItem title="Reopen Last Closed Tab" enabled="NO" keyEquivalent="T" id="c3l-v1-kxk">
+                                        <menuItem title="Reopen Last Closed Tab" enabled="NO" id="c3l-v1-kxk">
+                                            <modifierMask key="keyEquivalentModifierMask"/>
                                             <connections>
                                                 <action selector="reopenLastClosedTab:" target="Ady-hI-5gd" id="jzQ-2q-HGB"/>
                                             </connections>
