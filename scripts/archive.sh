@@ -2,13 +2,17 @@
 
 set -eo pipefail
 
-cwd="$(dirname "${BASH_SOURCE[0]}")"
+if ! [[ $common_sh ]]; then
+	cwd="$(dirname "${BASH_SOURCE[0]}")"
+	source "${cwd}/helpers/common.sh"
+	execute_from_tmp "${BASH_SOURCE[0]}" "$@"
+fi
+
 developer_apple_id_keychain_identifier="developer-apple-id"
-source "${cwd}/helpers/common.sh"
 
 read_command_line_arguments() {
 	if (( $# < 1 )); then
-		print_usage_and_exit
+		print_usage_and_exit "Build type not specified"
 	fi
 
 	case "$1" in
@@ -26,8 +30,7 @@ read_command_line_arguments() {
 			clear_keychain
 			;;
 		*)
-			echo "Unknown build type '$1'"
-			print_usage_and_exit
+			print_usage_and_exit "Unknown build type '$1'"
 			;;
 	esac
 
@@ -52,7 +55,7 @@ read_command_line_arguments() {
 				override_version="${OPTARG}"
 				;;
 			*)
-				print_usage_and_exit
+				print_usage_and_exit "Unknown option '${OPTION}'"
 				;;
 		esac
 	done
@@ -61,6 +64,8 @@ read_command_line_arguments() {
 }
 
 print_usage_and_exit() {
+	local reason=$1
+
 	cat <<- EOF
 	Usage:
 	  $ $(basename "$0") <review|release> [-a <asana_task_url>] [-d] [-s] [-v <version>]
@@ -76,7 +81,7 @@ print_usage_and_exit() {
 
 	EOF
 
-	die "Build type not specified"
+	die "${reason}"
 }
 
 create_dmg_preflight() {

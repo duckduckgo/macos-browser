@@ -2,8 +2,12 @@
 
 set -eo pipefail
 
-cwd="$(dirname "${BASH_SOURCE[0]}")"
-source "${cwd}/helpers/common.sh"
+if ! [[ $common_sh ]]; then
+	cwd="$(dirname "${BASH_SOURCE[0]}")"
+	source "${cwd}/helpers/common.sh"
+	execute_from_tmp "${BASH_SOURCE[0]}" "$@"
+fi
+
 cdn_dir="${PWD}/cdn"
 
 check_ngrok() {
