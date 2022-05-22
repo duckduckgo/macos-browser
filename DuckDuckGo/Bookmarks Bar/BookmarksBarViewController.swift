@@ -32,6 +32,7 @@ final class BookmarksBarViewController: NSViewController {
     private var cancellables = Set<AnyCancellable>()
     
     private var buttons: [NSButton] = []
+    private var midpoints: [CGFloat] = []
     private var clippedButtons: [NSButton] = [] {
         didSet {
             clippedItemsIndicator.isHidden = clippedButtons.isEmpty
@@ -67,9 +68,15 @@ final class BookmarksBarViewController: NSViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         
+        if let bookmarksBarView = self.view as? BookmarksBarView {
+            bookmarksBarView.delegate = self
+        } else {
+            assertionFailure()
+        }
+
         self.view.postsFrameChangedNotifications = true
         NotificationCenter.default.addObserver(self,
-                                               selector: #selector(frameChanged),
+                                               selector: #selector(bookmarksBarViewFrameChanged),
                                                name: NSView.frameDidChangeNotification,
                                                object: self.view)
         
@@ -77,21 +84,22 @@ final class BookmarksBarViewController: NSViewController {
         subscribeToBookmarks()
 
         self.buttons = createButtons(for: bookmarkManager.list?.topLevelEntities ?? [])
-        positionButtonsForInitialLayout()
+        addAndPositionButtonsForInitialLayout()
         layoutButtons()
+        bookmarksBarViewFrameChanged()
     }
     
     func subscribeToBookmarks() {
         bookmarkManager.listPublisher.receive(on: RunLoop.main).sink { [weak self] list in
             guard let self = self else { return }
             self.buttons = self.createButtons(for: list?.topLevelEntities ?? [])
-            self.positionButtonsForInitialLayout()
+            self.addAndPositionButtonsForInitialLayout()
             self.layoutButtons()
         }.store(in: &cancellables)
     }
     
     @objc
-    private func frameChanged() {
+    private func bookmarksBarViewFrameChanged() {
         if view.frame.size.width <= (totalButtonListWidth + (Constants.buttonSpacing * 2) + clippedItemsIndicator.frame.size.width) {
             removeLastButton()
         } else {
@@ -108,14 +116,13 @@ final class BookmarksBarViewController: NSViewController {
         super.viewDidLayout()
     }
     
-    private func positionButtonsForInitialLayout() {
+    private func addAndPositionButtonsForInitialLayout() {
         for view in view.subviews where view is NSButton {
             view.removeFromSuperview()
         }
 
-        for button in buttons {
-            view.addSubview(button)
-        }
+        buttons.forEach(view.addSubview)
+
         
         addClippedItemsIndicator()
         calculateFixedButtonSizingValues()
@@ -168,6 +175,28 @@ final class BookmarksBarViewController: NSViewController {
     }
 
     private func layoutButtons() {
+        self.midpoints = updateFrames(for: buttons, containerWidth: view.frame.width, hasClippedButtons: hasClippedButtons, draggedItemMetadata: nil)
+        
+        var clippedItemsIndicatorFrame = clippedItemsIndicator.frame
+        clippedItemsIndicatorFrame.origin.y = view.frame.midY - (clippedItemsIndicatorFrame.height / 2)
+        clippedItemsIndicatorFrame.origin.x = view.bounds.width - clippedItemsIndicatorFrame.width - Constants.buttonSpacing
+        clippedItemsIndicator.frame = clippedItemsIndicatorFrame
+    }
+    
+    private struct DraggedItemMetadata {
+        let dropIndex: Int
+        let itemWidth: CGFloat
+    }
+
+    /// Sets frames on the button array passed in. This function modifies their origins to flow from leading to trailing, with spacing values separating them.
+    /// If `draggedItemMetadata` is provided, a space will be created between the buttons on either side of the drop index.
+    ///
+    /// This function assumes that the buttons have already been sized, and will only update their origin.
+    private func updateFrames(for buttons: [NSButton],
+                              containerWidth: CGFloat,
+                              hasClippedButtons: Bool,
+                              draggedItemMetadata: DraggedItemMetadata?) -> [CGFloat] {
+        var midpoints: [CGFloat] = [0]
         var previousMaximumXValue: CGFloat
         
         // If there are any clipped buttons, the button list should always be leading-aligned.
@@ -183,12 +212,11 @@ final class BookmarksBarViewController: NSViewController {
             button.frame = updatedButtonFrame
             
             previousMaximumXValue = updatedButtonFrame.maxX + Constants.buttonSpacing
+            
+            midpoints.append(updatedButtonFrame.maxX + (Constants.buttonSpacing / 2))
         }
         
-        var clippedItemsIndicatorFrame = clippedItemsIndicator.frame
-        clippedItemsIndicatorFrame.origin.y = view.frame.midY - (clippedItemsIndicatorFrame.height / 2)
-        clippedItemsIndicatorFrame.origin.x = view.bounds.width - clippedItemsIndicatorFrame.width - Constants.buttonSpacing
-        clippedItemsIndicator.frame = clippedItemsIndicatorFrame
+        return midpoints
     }
     
     private func createButtons(for entities: [BaseBookmarkEntity]) -> [NSButton] {
@@ -211,9 +239,6 @@ final class BookmarksBarViewController: NSViewController {
         button.target = self
         button.sendAction(on: [.leftMouseDown, .leftMouseDragged, .leftMouseUp, .rightMouseUp])
         button.action = #selector(bookmarkButtonClicked(_:))
-        // button.image = FaviconManager.shared.getCachedFavicon(for: url, sizeCategory: .small)?.image
-        // button.imageScaling = .scaleProportionallyDown
-        // button.imagePosition = .imageLeading
         button.sizeToFit()
         
         var buttonFrame = button.frame
@@ -229,11 +254,11 @@ final class BookmarksBarViewController: NSViewController {
         let button = BookmarksBarButton(frame: .zero)
         button.isBordered = false
         button.title = title
-        button.sendAction(on: [.leftMouseDown, .rightMouseDown])
+        button.sendAction(on: [.leftMouseDown, .rightMouseDown, .leftMouseUp, .leftMouseDragged])
         button.target = self
         button.action = #selector(bookmarkButtonClicked(_:))
-//        button.image = NSImage(named: "Folder")
-//        button.imagePosition = .imageLeading
+        button.image = NSImage(named: "Folder")
+        button.imagePosition = .imageLeading
         button.sizeToFit()
         
         var buttonFrame = button.frame
@@ -258,16 +283,13 @@ final class BookmarksBarViewController: NSViewController {
             print("Mouse down")
         case .leftMouseDragged:
             let pasteboardItem = NSPasteboardItem()
-            pasteboardItem.setDataProvider(self, forTypes: [.URL])
+            pasteboardItem.setDataProvider(sender, forTypes: [.URL])
             
-            // 2.
             let draggingItem = NSDraggingItem(pasteboardWriter: pasteboardItem)
             var draggingFrame = sender.frame
             draggingFrame.origin = .zero
             draggingItem.setDraggingFrame(draggingFrame, contents: sender.imageRepresentation()!)
             
-            // 3.
-            print("Beginning dragging session, frame: \(draggingFrame)")
             sender.isHidden = true
             sender.beginDraggingSession(with: [draggingItem], event: event, source: sender)
         case .leftMouseUp:
@@ -282,8 +304,6 @@ final class BookmarksBarViewController: NSViewController {
             if let bookmark = entity as? Bookmark {
                 WindowControllersManager.shared.show(url: bookmark.url, newTab: false)
             } else if let folder = entity as? BookmarkFolder {
-                let viewModel = BookmarkViewModel(entity: entity)
-                
                 let menu = NSMenu(title: folder.title)
                 let childViewModels = folder.children.map(BookmarkViewModel.init)
                 let childMenuItems = bookmarkMenuItems(from: childViewModels, topLevel: false)
@@ -347,35 +367,53 @@ final class BookmarksBarViewController: NSViewController {
         return menuItems
     }
     
+    private var dropIndex: Int?
+    func updateNearestDragIndex(_ newDragIndex: Int?, additionalWidth: CGFloat) {
+        if let newDragIndex = newDragIndex {
+            // Index was provided, check if it differs from the existing one and if so update frames
+            
+            if let currentNearest = dropIndex, newDragIndex != dropIndex {
+                let button = self.buttons[newDragIndex]
+                print("Changing existing drop index to shift button out of the way: \(button.title)")
+                
+                let buttonsToRestore = buttons[currentNearest...]
+                for button in buttonsToRestore {
+                    var buttonFrame = button.frame
+                    buttonFrame.origin.x -= additionalWidth
+                    button.frame = buttonFrame
+                }
+                
+                let buttonsToShift = buttons[newDragIndex...]
+                for button in buttonsToShift {
+                    var buttonFrame = button.frame
+                    buttonFrame.origin.x += additionalWidth
+                    button.frame = buttonFrame
+                }
+                
+                dropIndex = newDragIndex
+            } else if dropIndex == nil {
+                dropIndex = newDragIndex
+                let button = self.buttons[newDragIndex]
+                print("Setting initial drop index: \(button.title)")
+                
+                let buttonsToShift = buttons[newDragIndex...]
+                for button in buttonsToShift {
+                    var buttonFrame = button.frame
+                    buttonFrame.origin.x += additionalWidth
+                    button.frame = buttonFrame
+                }
+            }
+        } else {
+            // No index was provided, so remove any additional width that has been added
+        }
+    }
+    
 }
 
-extension BookmarksBarViewController: NSDraggingDestination {
+extension BookmarksBarViewController {
     
     func configureDragAndDrop() {
-        view.registerForDraggedTypes([.fileURL])
-    }
-    
-    func draggingEntered(_ sender: NSDraggingInfo) -> NSDragOperation {
-        print(#function)
-        return sender.draggingSourceOperationMask
-    }
-    
-    func draggingExited(_ sender: NSDraggingInfo?) {
-        print(#function)
-    }
-    
-    func draggingUpdated(_ sender: NSDraggingInfo) -> NSDragOperation {
-        print(#function)
-        return sender.draggingSourceOperationMask
-    }
-    
-    func draggingEnded(_ sender: NSDraggingInfo) {
-        print("Dragging ended")
-    }
-    
-    func performDragOperation(_ sender: NSDraggingInfo) -> Bool {
-        print("Perform drag operation")
-        return true
+        view.registerForDraggedTypes([.fileURL, .URL])
     }
     
 }
@@ -390,16 +428,41 @@ extension NSEvent {
     
 }
 
-extension BookmarksBarViewController: NSPasteboardItemDataProvider {
-
-    func pasteboard(_ pasteboard: NSPasteboard?, item: NSPasteboardItem, provideDataForType type: NSPasteboard.PasteboardType) {
-        
+extension BookmarksBarViewController: BookmarksBarViewDelegate {
+    
+    func draggingEntered(draggingInfo: NSDraggingInfo) {
+        print("enter")
     }
+    
+    func draggingExited(draggingInfo: NSDraggingInfo?) {
+        print("exit")
+    }
+    
+    func draggingUpdated(draggingInfo: NSDraggingInfo) {
+        let convertedDraggingLocation = view.convert(draggingInfo.draggingLocation, from: nil)
+        let horizontalOffset = convertedDraggingLocation.x
+        
+        // Fake the additional width for now
+        let result = midpoints.nearest(to: horizontalOffset)
+        let additionalWidth = draggingInfo.width
+        
+        updateNearestDragIndex(result?.offset, additionalWidth: additionalWidth)
+    }
+    
+    func draggingEnded(draggingInfo: NSDraggingInfo) {
+        print("delegate dragging ended, check changes and update bookmarks")
+        dropIndex = nil
+        layoutButtons()
+    }
+    
+}
 
-    func pasteboard(_ pasteboard: NSPasteboard?, item: NSPasteboardItem, provideDataForType type: String) {
-        if let pasteboard = pasteboard, type == String(kUTTypeURL) {
-            // pasteboard.setData("", forType: type)
-        }
+extension Array where Element: (Comparable & SignedNumeric) {
+
+    func nearest(to value: Element) -> (offset: Int, element: Element)? {
+        self.enumerated().min(by: {
+            abs($0.element - value) < abs($1.element - value)
+        })
     }
 
 }

@@ -164,35 +164,24 @@
         <scene sceneID="XHU-g9-NQy">
             <objects>
                 <viewController id="FcM-Q5-3Cs" customClass="BookmarksBarViewController" customModule="DuckDuckGo_Privacy_Browser" customModuleProvider="target" sceneMemberID="viewController">
-                    <view key="view" id="kiq-tW-vPp">
+                    <view key="view" id="kiq-tW-vPp" customClass="BookmarksBarView" customModule="DuckDuckGo_Privacy_Browser" customModuleProvider="target">
                         <rect key="frame" x="0.0" y="0.0" width="676" height="56"/>
                         <autoresizingMask key="autoresizingMask"/>
                         <subviews>
-                            <customView translatesAutoresizingMaskIntoConstraints="NO" id="9M7-4d-Twc" customClass="ColorView" customModule="DuckDuckGo_Privacy_Browser" customModuleProvider="target">
-                                <rect key="frame" x="0.0" y="0.0" width="676" height="56"/>
-                                <subviews>
-                                    <box verticalHuggingPriority="750" boxType="separator" translatesAutoresizingMaskIntoConstraints="NO" id="lyZ-nJ-8lK">
-                                        <rect key="frame" x="0.0" y="-2" width="676" height="5"/>
-                                    </box>
-                                </subviews>
-                                <constraints>
-                                    <constraint firstAttribute="bottom" secondItem="lyZ-nJ-8lK" secondAttribute="bottom" id="FSd-cB-Gor"/>
-                                    <constraint firstAttribute="trailing" secondItem="lyZ-nJ-8lK" secondAttribute="trailing" id="Ij2-Sw-GTK"/>
-                                    <constraint firstItem="lyZ-nJ-8lK" firstAttribute="leading" secondItem="9M7-4d-Twc" secondAttribute="leading" id="MIc-jf-aLy"/>
-                                </constraints>
-                                <userDefinedRuntimeAttributes>
-                                    <userDefinedRuntimeAttribute type="color" keyPath="backgroundColor">
-                                        <color key="value" name="AddressBarBackgroundColor"/>
-                                    </userDefinedRuntimeAttribute>
-                                </userDefinedRuntimeAttributes>
-                            </customView>
+                            <box verticalHuggingPriority="750" boxType="separator" translatesAutoresizingMaskIntoConstraints="NO" id="lyZ-nJ-8lK">
+                                <rect key="frame" x="0.0" y="-2" width="676" height="5"/>
+                            </box>
                         </subviews>
                         <constraints>
-                            <constraint firstAttribute="trailing" secondItem="9M7-4d-Twc" secondAttribute="trailing" id="LZe-5X-F9c"/>
-                            <constraint firstAttribute="bottom" secondItem="9M7-4d-Twc" secondAttribute="bottom" id="MeY-5c-G2X"/>
-                            <constraint firstItem="9M7-4d-Twc" firstAttribute="leading" secondItem="kiq-tW-vPp" secondAttribute="leading" id="nQy-jB-bUY"/>
-                            <constraint firstItem="9M7-4d-Twc" firstAttribute="top" secondItem="kiq-tW-vPp" secondAttribute="top" id="xwF-Sd-HKU"/>
+                            <constraint firstAttribute="bottom" secondItem="lyZ-nJ-8lK" secondAttribute="bottom" id="KR3-nl-Ol1"/>
+                            <constraint firstItem="lyZ-nJ-8lK" firstAttribute="leading" secondItem="kiq-tW-vPp" secondAttribute="leading" id="Nr9-ic-Sg3"/>
+                            <constraint firstAttribute="trailing" secondItem="lyZ-nJ-8lK" secondAttribute="trailing" id="Zt2-jf-mSV"/>
                         </constraints>
+                        <userDefinedRuntimeAttributes>
+                            <userDefinedRuntimeAttribute type="color" keyPath="backgroundColor">
+                                <color key="value" name="AddressBarBackgroundColor"/>
+                            </userDefinedRuntimeAttribute>
+                        </userDefinedRuntimeAttributes>
                     </view>
                 </viewController>
                 <customObject id="wTP-Tm-ivr" userLabel="First Responder" customClass="NSResponder" sceneMemberID="firstResponder"/>

@@ -247,6 +247,8 @@
 		4BF01C00272AE74C00884A61 /* CountryList.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4BE65482271FCD53008D1D63 /* CountryList.swift */; };
 		4BF4951826C08395000547B8 /* ThirdPartyBrowserTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4BF4951726C08395000547B8 /* ThirdPartyBrowserTests.swift */; };
 		4BF4EA5027C71F26004E57C4 /* PasswordManagementListSectionTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4BF4EA4F27C71F26004E57C4 /* PasswordManagementListSectionTests.swift */; };
+		4BFD356B283AA07700CE9234 /* BookmarksBarDragController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4BFD356A283AA07700CE9234 /* BookmarksBarDragController.swift */; };
+		4BFD356D283AA2FD00CE9234 /* BookmarksBarView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4BFD356C283AA2FD00CE9234 /* BookmarksBarView.swift */; };
 		7B1E819E27C8874900FF0E60 /* ContentOverlayPopover.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7B1E819B27C8874900FF0E60 /* ContentOverlayPopover.swift */; };
 		7B1E819F27C8874900FF0E60 /* ContentOverlay.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 7B1E819C27C8874900FF0E60 /* ContentOverlay.storyboard */; };
 		7B1E81A027C8874900FF0E60 /* ContentOverlayViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7B1E819D27C8874900FF0E60 /* ContentOverlayViewController.swift */; };
@@ -1004,6 +1006,8 @@
 		4BEF0E712766B11200AF7C58 /* MacWaitlistLockScreenViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MacWaitlistLockScreenViewModel.swift; sourceTree = "<group>"; };
 		4BF4951726C08395000547B8 /* ThirdPartyBrowserTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ThirdPartyBrowserTests.swift; sourceTree = "<group>"; };
 		4BF4EA4F27C71F26004E57C4 /* PasswordManagementListSectionTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PasswordManagementListSectionTests.swift; sourceTree = "<group>"; };
+		4BFD356A283AA07700CE9234 /* BookmarksBarDragController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BookmarksBarDragController.swift; sourceTree = "<group>"; };
+		4BFD356C283AA2FD00CE9234 /* BookmarksBarView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BookmarksBarView.swift; sourceTree = "<group>"; };
 		7B1E819B27C8874900FF0E60 /* ContentOverlayPopover.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ContentOverlayPopover.swift; sourceTree = "<group>"; };
 		7B1E819C27C8874900FF0E60 /* ContentOverlay.storyboard */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.storyboard; path = ContentOverlay.storyboard; sourceTree = "<group>"; };
 		7B1E819D27C8874900FF0E60 /* ContentOverlayViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ContentOverlayViewController.swift; sourceTree = "<group>"; };
@@ -2094,6 +2098,17 @@
 			path = Model;
 			sourceTree = "<group>";
 		};
+		4BFD356E283ADE8B00CE9234 /* Bookmarks Bar */ = {
+			isa = PBXGroup;
+			children = (
+				4BBF0918282F5D2D00EE1418 /* BookmarksBarViewController.swift */,
+				4BFD356C283AA2FD00CE9234 /* BookmarksBarView.swift */,
+				4BFD356A283AA07700CE9234 /* BookmarksBarDragController.swift */,
+				4B5E72412835B88400E449C4 /* BookmarksBarButton.swift */,
+			);
+			path = "Bookmarks Bar";
+			sourceTree = "<group>";
+		};
 		7B1E819A27C8874900FF0E60 /* Autofill */ = {
 			isa = PBXGroup;
 			children = (
@@ -2569,6 +2584,7 @@
 				AAE71DB225F66A0900D74437 /* Home Page */,
 				AA97BF4425135CB60014931A /* Menus */,
 				85378D9A274E618C007C5CBF /* Message Views */,
+				4BFD356E283ADE8B00CE9234 /* Bookmarks Bar */,
 				AA86491524D83384001BABEE /* Navigation Bar */,
 				85B7184727677A7D00B4277F /* Onboarding */,
 				B64C84DB2692D6E80048FEBE /* Permissions */,
@@ -4183,6 +4199,7 @@
 				858A798326A8B75F00A75A42 /* CopyHandler.swift in Sources */,
 				4B8AC93926B48A5100879451 /* FirefoxLoginReader.swift in Sources */,
 				B69B503E2726A12500758A2B /* AtbParser.swift in Sources */,
+				4BFD356D283AA2FD00CE9234 /* BookmarksBarView.swift in Sources */,
 				4B9292D22667123700AD2C21 /* AddFolderModalViewController.swift in Sources */,
 				4B92929E26670D2A00AD2C21 /* BookmarkSidebarTreeController.swift in Sources */,
 				85589E8727BBB8F20038AD11 /* HomePageFavoritesModel.swift in Sources */,
@@ -4271,6 +4288,7 @@
 				4B9292DB2667125D00AD2C21 /* ContextualMenu.swift in Sources */,
 				AA68C3D32490ED62001B8783 /* NavigationBarViewController.swift in Sources */,
 				AA585DAF2490E6E600E9A3E2 /* MainViewController.swift in Sources */,
+				4BFD356B283AA07700CE9234 /* BookmarksBarDragController.swift in Sources */,
 				AA5FA69A275F91C700DCE9C9 /* Favicon.swift in Sources */,
 				AABEE69A24A902A90043105B /* SuggestionContainerViewModel.swift in Sources */,
 				AA840A9827319D1600E63CDD /* FirePopoverWrapperViewController.swift in Sources */,

@@ -98,33 +98,29 @@ final class BookmarksBarButton: NSButton {
 
 extension BookmarksBarButton: NSDraggingSource {
     
-//    override func mouseDown(with event: NSEvent) {
-//        super.mouseDown(with: event)
-//        print(#function)
-//    }
-//    override func mouseMoved(with event: NSEvent) {
-//        super.mouseMoved(with: event)
-//        print(#function)
+//    func draggingSession(_ session: NSDraggingSession, movedTo screenPoint: NSPoint) {
+//        // print(#function)
 //    }
 //    
-//    override func mouseDragged(with event: NSEvent) {
-//        super.mouseDragged(with: event)
+//    func draggingSession(_ session: NSDraggingSession, endedAt screenPoint: NSPoint, operation: NSDragOperation) {
+//        print("BookmarksBarButton: \(#function)")
 //        print(#function)
 //    }
-    
-    func draggingSession(_ session: NSDraggingSession, movedTo screenPoint: NSPoint) {
-        // print(#function)
-    }
-    
-    func draggingSession(_ session: NSDraggingSession, endedAt screenPoint: NSPoint, operation: NSDragOperation) {
-        print(#function)
-    }
 
     func draggingSession(_ session: NSDraggingSession, sourceOperationMaskFor context: NSDraggingContext) -> NSDragOperation {
-        print(#function)
+        print("BookmarksBarButton: \(#function)")
         return .generic
     }
     
+}
+
+extension BookmarksBarButton: NSPasteboardItemDataProvider {
+
+    func pasteboard(_ pasteboard: NSPasteboard?, item: NSPasteboardItem, provideDataForType type: NSPasteboard.PasteboardType) {
+        print(#function)
+        pasteboard?.setString("https://duck.com", forType: .URL)
+    }
+
 }
 
 extension NSView {
