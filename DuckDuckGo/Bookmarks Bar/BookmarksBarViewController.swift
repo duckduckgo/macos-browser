@@ -85,7 +85,13 @@ final class BookmarksBarViewController: NSViewController {
 
         self.buttons = createButtons(for: bookmarkManager.list?.topLevelEntities ?? [])
         addAndPositionButtonsForInitialLayout()
+    }
+    
+    override func viewWillAppear() {
+        super.viewWillAppear()
+        
         layoutButtons()
+        calculateFixedButtonSizingValues()
         bookmarksBarViewFrameChanged()
     }
     
@@ -122,7 +128,6 @@ final class BookmarksBarViewController: NSViewController {
         }
 
         buttons.forEach(view.addSubview)
-
         
         addClippedItemsIndicator()
         calculateFixedButtonSizingValues()
@@ -172,10 +177,12 @@ final class BookmarksBarViewController: NSViewController {
         self.cumulativeButtonWidth = buttons.map(\.bounds.size.width).reduce(0, +)
         self.cumulativeSpacingWidth = Constants.buttonSpacing * CGFloat(max(0, buttons.count - 1))
         self.totalButtonListWidth = cumulativeButtonWidth + cumulativeSpacingWidth
+        
+        bookmarksBarViewFrameChanged()
     }
 
     private func layoutButtons() {
-        self.midpoints = updateFrames(for: buttons, containerWidth: view.frame.width, hasClippedButtons: hasClippedButtons, draggedItemMetadata: nil)
+        self.midpoints = updateFrames(for: buttons, containerFrame: view.frame, hasClippedButtons: hasClippedButtons, draggedItemMetadata: nil)
         
         var clippedItemsIndicatorFrame = clippedItemsIndicator.frame
         clippedItemsIndicatorFrame.origin.y = view.frame.midY - (clippedItemsIndicatorFrame.height / 2)
@@ -193,7 +200,7 @@ final class BookmarksBarViewController: NSViewController {
     ///
     /// This function assumes that the buttons have already been sized, and will only update their origin.
     private func updateFrames(for buttons: [NSButton],
-                              containerWidth: CGFloat,
+                              containerFrame: CGRect,
                               hasClippedButtons: Bool,
                               draggedItemMetadata: DraggedItemMetadata?) -> [CGFloat] {
         var midpoints: [CGFloat] = [0]
@@ -203,12 +210,23 @@ final class BookmarksBarViewController: NSViewController {
         if hasClippedButtons {
             previousMaximumXValue = Constants.buttonSpacing
         } else {
-            previousMaximumXValue = max(Constants.buttonSpacing, (view.bounds.midX) - (self.totalButtonListWidth / 2))
+            previousMaximumXValue = max(Constants.buttonSpacing, (containerFrame.midX) - (self.totalButtonListWidth / 2))
         }
 
-        for button in buttons {
+        for (index, button) in buttons.enumerated() {
+            if button.isHidden, index != draggedItemMetadata?.dropIndex {
+                print("Skipping button: \(index), \(draggedItemMetadata?.dropIndex)")
+                continue
+            }
+
             var updatedButtonFrame = button.frame
-            updatedButtonFrame.origin = CGPoint(x: previousMaximumXValue, y: view.frame.midY - (button.frame.height / 2))
+            
+            if let metadata = draggedItemMetadata, metadata.dropIndex == index {
+                updatedButtonFrame.origin = CGPoint(x: previousMaximumXValue + metadata.itemWidth, y: containerFrame.midY - (button.frame.height / 2))
+            } else {
+                updatedButtonFrame.origin = CGPoint(x: previousMaximumXValue, y: containerFrame.midY - (button.frame.height / 2))
+            }
+            
             button.frame = updatedButtonFrame
             
             previousMaximumXValue = updatedButtonFrame.maxX + Constants.buttonSpacing
@@ -369,42 +387,24 @@ final class BookmarksBarViewController: NSViewController {
     
     private var dropIndex: Int?
     func updateNearestDragIndex(_ newDragIndex: Int?, additionalWidth: CGFloat) {
-        if let newDragIndex = newDragIndex {
-            // Index was provided, check if it differs from the existing one and if so update frames
-            
-            if let currentNearest = dropIndex, newDragIndex != dropIndex {
-                let button = self.buttons[newDragIndex]
-                print("Changing existing drop index to shift button out of the way: \(button.title)")
-                
-                let buttonsToRestore = buttons[currentNearest...]
-                for button in buttonsToRestore {
-                    var buttonFrame = button.frame
-                    buttonFrame.origin.x -= additionalWidth
-                    button.frame = buttonFrame
-                }
-                
-                let buttonsToShift = buttons[newDragIndex...]
-                for button in buttonsToShift {
-                    var buttonFrame = button.frame
-                    buttonFrame.origin.x += additionalWidth
-                    button.frame = buttonFrame
-                }
-                
-                dropIndex = newDragIndex
-            } else if dropIndex == nil {
-                dropIndex = newDragIndex
-                let button = self.buttons[newDragIndex]
-                print("Setting initial drop index: \(button.title)")
-                
-                let buttonsToShift = buttons[newDragIndex...]
-                for button in buttonsToShift {
-                    var buttonFrame = button.frame
-                    buttonFrame.origin.x += additionalWidth
-                    button.frame = buttonFrame
-                }
-            }
-        } else {
-            // No index was provided, so remove any additional width that has been added
+        guard let newDragIndex = newDragIndex else {
+            return
+        }
+        
+        if let currentNearest = dropIndex, newDragIndex != dropIndex {
+            dropIndex = newDragIndex
+            let metadata = DraggedItemMetadata(dropIndex: newDragIndex, itemWidth: additionalWidth)
+            self.midpoints = updateFrames(for: self.buttons,
+                                          containerFrame: view.frame,
+                                          hasClippedButtons: hasClippedButtons,
+                                          draggedItemMetadata: metadata)
+        } else if dropIndex == nil {
+            dropIndex = newDragIndex
+            let metadata = DraggedItemMetadata(dropIndex: newDragIndex, itemWidth: additionalWidth)
+            self.midpoints = updateFrames(for: self.buttons,
+                                          containerFrame: view.frame,
+                                          hasClippedButtons: hasClippedButtons,
+                                          draggedItemMetadata: metadata)
         }
     }
     
@@ -444,7 +444,7 @@ extension BookmarksBarViewController: BookmarksBarViewDelegate {
         
         // Fake the additional width for now
         let result = midpoints.nearest(to: horizontalOffset)
-        let additionalWidth = draggingInfo.width
+        let additionalWidth = draggingInfo.width + Constants.buttonSpacing
         
         updateNearestDragIndex(result?.offset, additionalWidth: additionalWidth)
     }
