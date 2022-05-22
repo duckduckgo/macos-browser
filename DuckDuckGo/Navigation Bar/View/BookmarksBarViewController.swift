@@ -73,6 +73,7 @@ final class BookmarksBarViewController: NSViewController {
                                                name: NSView.frameDidChangeNotification,
                                                object: self.view)
         
+        configureDragAndDrop()
         subscribeToBookmarks()
 
         self.buttons = createButtons(for: bookmarkManager.list?.topLevelEntities ?? [])
@@ -207,8 +208,8 @@ final class BookmarksBarViewController: NSViewController {
         let button = BookmarksBarButton(frame: .zero)
         button.isBordered = false
         button.title = title
-        button.sendAction(on: [.leftMouseDown, .rightMouseDown])
         button.target = self
+        button.sendAction(on: [.leftMouseDown, .leftMouseDragged, .leftMouseUp, .rightMouseUp])
         button.action = #selector(bookmarkButtonClicked(_:))
         // button.image = FaviconManager.shared.getCachedFavicon(for: url, sizeCategory: .small)?.image
         // button.imageScaling = .scaleProportionallyDown
@@ -248,9 +249,28 @@ final class BookmarksBarViewController: NSViewController {
     
     @objc
     private func bookmarkButtonClicked(_ sender: NSButton) {
-        if let event = NSApp.currentEvent, event.isRightClick {
-            print("Right click")
-        } else {
+        guard let event = NSApp.currentEvent, let sender = sender as? BookmarksBarButton else {
+            return
+        }
+        
+        switch event.type {
+        case .leftMouseDown:
+            print("Mouse down")
+        case .leftMouseDragged:
+            let pasteboardItem = NSPasteboardItem()
+            pasteboardItem.setDataProvider(self, forTypes: [.URL])
+            
+            // 2.
+            let draggingItem = NSDraggingItem(pasteboardWriter: pasteboardItem)
+            var draggingFrame = sender.frame
+            draggingFrame.origin = .zero
+            draggingItem.setDraggingFrame(draggingFrame, contents: sender.imageRepresentation()!)
+            
+            // 3.
+            print("Beginning dragging session, frame: \(draggingFrame)")
+            sender.isHidden = true
+            sender.beginDraggingSession(with: [draggingItem], event: event, source: sender)
+        case .leftMouseUp:
             guard let index = buttons.firstIndex(of: sender) else {
                 return
             }
@@ -272,12 +292,17 @@ final class BookmarksBarViewController: NSViewController {
                 let location = NSPoint(x: 0, y: sender.frame.height + 5) // Magic number to adjust the height.
                 menu.popUp(positioning: nil, at: location, in: sender)
             }
+        default: break
         }
     }
     
     @objc
     private func bookmarkMenuItemClicked(_ sender: NSButton) {
-        print("Left click")
+        if let event = NSApp.currentEvent, event.type == .leftMouseDown {
+            print("Left click down")
+        } else {
+            print("Left click other")
+        }
     }
     
     @objc
@@ -324,10 +349,57 @@ final class BookmarksBarViewController: NSViewController {
     
 }
 
+extension BookmarksBarViewController: NSDraggingDestination {
+    
+    func configureDragAndDrop() {
+        view.registerForDraggedTypes([.fileURL])
+    }
+    
+    func draggingEntered(_ sender: NSDraggingInfo) -> NSDragOperation {
+        print(#function)
+        return sender.draggingSourceOperationMask
+    }
+    
+    func draggingExited(_ sender: NSDraggingInfo?) {
+        print(#function)
+    }
+    
+    func draggingUpdated(_ sender: NSDraggingInfo) -> NSDragOperation {
+        print(#function)
+        return sender.draggingSourceOperationMask
+    }
+    
+    func draggingEnded(_ sender: NSDraggingInfo) {
+        print("Dragging ended")
+    }
+    
+    func performDragOperation(_ sender: NSDraggingInfo) -> Bool {
+        print("Perform drag operation")
+        return true
+    }
+    
+}
+
 extension NSEvent {
+    
     var isRightClick: Bool {
-        let rightClick = (self.type == .rightMouseDown)
+        let rightClick = (self.type == .rightMouseUp)
         let controlClick = self.modifierFlags.contains(.control)
         return rightClick || controlClick
     }
+    
+}
+
+extension BookmarksBarViewController: NSPasteboardItemDataProvider {
+
+    func pasteboard(_ pasteboard: NSPasteboard?, item: NSPasteboardItem, provideDataForType type: NSPasteboard.PasteboardType) {
+        
+    }
+
+    func pasteboard(_ pasteboard: NSPasteboard?, item: NSPasteboardItem, provideDataForType type: String) {
+        if let pasteboard = pasteboard, type == String(kUTTypeURL) {
+            // pasteboard.setData("", forType: type)
+        }
+    }
+
 }

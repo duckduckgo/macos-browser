@@ -95,3 +95,52 @@ final class BookmarksBarButton: NSButton {
     }
     
 }
+
+extension BookmarksBarButton: NSDraggingSource {
+    
+//    override func mouseDown(with event: NSEvent) {
+//        super.mouseDown(with: event)
+//        print(#function)
+//    }
+//    override func mouseMoved(with event: NSEvent) {
+//        super.mouseMoved(with: event)
+//        print(#function)
+//    }
+//    
+//    override func mouseDragged(with event: NSEvent) {
+//        super.mouseDragged(with: event)
+//        print(#function)
+//    }
+    
+    func draggingSession(_ session: NSDraggingSession, movedTo screenPoint: NSPoint) {
+        // print(#function)
+    }
+    
+    func draggingSession(_ session: NSDraggingSession, endedAt screenPoint: NSPoint, operation: NSDragOperation) {
+        print(#function)
+    }
+
+    func draggingSession(_ session: NSDraggingSession, sourceOperationMaskFor context: NSDraggingContext) -> NSDragOperation {
+        print(#function)
+        return .generic
+    }
+    
+}
+
+extension NSView {
+    
+    func imageRepresentation() -> NSImage? {
+        guard let bitmap = self.bitmapImageRepForCachingDisplay(in: bounds) else {
+            return nil
+        }
+        
+        bitmap.size = bounds.size
+        cacheDisplay(in: bounds, to: bitmap)
+        
+        let image = NSImage(size: bounds.size)
+        image.addRepresentation(bitmap)
+        
+        return image
+    }
+    
+}
