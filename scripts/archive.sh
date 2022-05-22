@@ -10,6 +10,28 @@ fi
 
 developer_apple_id_keychain_identifier="developer-apple-id"
 
+print_usage_and_exit() {
+	local reason=$1
+
+	cat <<- EOF
+	Usage:
+	  $ $(basename "$0") <review|release> [-a <asana_task_url>] [-d] [-s] [-v <version>]
+
+	Options:
+	 -a <asana_task_url>  Update Asana task after building the app (implies -d)
+	 -d                   Create a DMG image alongside the zipped app and dSYMs
+	 -h                   Print this message
+	 -s                   Skip xcodebuild output in logs
+	 -v <version>         Override app version with <version> (does not update Xcode project)
+
+	To clear keychain entries:
+	  $ $(basename "$0") clear-keychain
+
+	EOF
+
+	die "${reason}"
+}
+
 read_command_line_arguments() {
 	if (( $# < 1 )); then
 		print_usage_and_exit "Build type not specified"
@@ -36,7 +58,7 @@ read_command_line_arguments() {
 
 	shift 1
 
-	while getopts 'a:dsv:' OPTION; do
+	while getopts 'a:dhsv:' OPTION; do
 		case "${OPTION}" in
 			a)
 				asana_task_url="${OPTARG}"
@@ -46,6 +68,9 @@ read_command_line_arguments() {
 				;;
 			d)
 				create_dmg_preflight
+				;;
+			h)
+				print_usage_and_exit
 				;;
 			s)
 				# Use silent_output function to redirect all output to /dev/null
@@ -61,27 +86,6 @@ read_command_line_arguments() {
 	done
 
 	shift $((OPTIND-1))
-}
-
-print_usage_and_exit() {
-	local reason=$1
-
-	cat <<- EOF
-	Usage:
-	  $ $(basename "$0") <review|release> [-a <asana_task_url>] [-d] [-s] [-v <version>]
-
-	Options:
-	 -a <asana_task_url>  Update Asana task after building the app (implies -d)
-	 -d                   Create a DMG image alongside the zipped app and dSYMs
-	 -s                   Skip xcodebuild output in logs
-	 -v <version>         Override app version with <version> (does not update Xcode project)
-
-	To clear keychain entries:
-	  $ $(basename "$0") clear-keychain
-
-	EOF
-
-	die "${reason}"
 }
 
 create_dmg_preflight() {
@@ -208,9 +212,7 @@ archive_and_export() {
 	local xcpretty
 	check_xcpretty
 
-	echo
 	echo "Building and archiving the app (version ${app_version}) ..."
-	echo
 	
 	${filter_output} xcrun xcodebuild archive \
 		-scheme "${scheme}" \
@@ -221,9 +223,7 @@ archive_and_export() {
 		2>&1 \
 		| ${xcpretty}
 
-	echo
 	echo "Exporting archive ..."
-	echo
 
 	prepare_export_options_in_ci
 
@@ -316,17 +316,15 @@ staple_notarized_app() {
 }
 
 compress_app_and_dsym() {
-	echo
 	echo "Compressing app and dSYMs ..."
-	echo
+
 	ditto -c -k --keepParent "${app_path}" "${output_app_zip_path}"
 	ditto -c -k --keepParent "${dsym_path}" "${output_dsym_zip_path}"
 }
 
 create_dmg() {
-	echo
 	echo "Creating DMG image ..."
-	echo
+
 	local dmg_dir="${workdir}/dmg"
 	local dmg_background="${cwd}/assets/dmg-background.png"
 	dmg_output_path="${workdir}/duckduckgo-${app_version}.dmg"

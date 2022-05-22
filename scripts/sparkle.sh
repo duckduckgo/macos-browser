@@ -15,7 +15,7 @@ print_usage_and_exit() {
 
 	cat <<- EOF
 	Usage:
-	  $ $(basename "$0") [-h] [-i]
+	  $ $(basename "$0") [-i]
 
 	Options:
 	 -h  Print this message
