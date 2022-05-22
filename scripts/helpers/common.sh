@@ -11,7 +11,8 @@ die() {
 }
 
 random_string() {
-	uuidgen | tr -d '-' | tr '[:upper:]' '[:lower:]'
+	local length="${1:-8}"
+	uuidgen | tr -d '-' | tr '[:upper:]' '[:lower:]' | cut -c "1-${length}"
 }
 
 silent_output() {
@@ -24,7 +25,9 @@ silent_output() {
 # 2. copies `scripts` directory over there
 # 3. runs the script passed as first parameter, passing other parameters to it
 #
-# This allows to modify original script(s) during execution.
+# This allows to modify (or delete) original script(s) during execution
+# (e.g. as a result of branch switching).
+# It sets `cwd` variable to point to temporary directory.
 #
 execute_from_tmp() {
 	local source_script_path="${PWD}/$1"
@@ -36,7 +39,9 @@ execute_from_tmp() {
 		source_script_name="$(basename "${source_script_path}")"
 		source_script_dir="$(dirname "${source_script_path}")"
 		source_script_dir_name="$(basename "${source_script_dir}")"
-		temp_script_path="${tempdir}/${source_script_dir_name}/${source_script_name}"
+
+		export cwd="${tempdir}/${source_script_dir_name}"
+		temp_script_path="${cwd}/${source_script_name}"
 
 		cp -R "${source_script_dir}" "${tempdir}"
 
