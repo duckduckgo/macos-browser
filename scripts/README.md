@@ -126,6 +126,10 @@ The script calls `archive.sh` to create notarized builds, so all the
 requirements related to Apple account and app-specific password apply here too.
 Asana access token is not required, but `create-dmg` and `jq` are required.
 
+### Sparkle
+
+To generate `appcast.xml` files the `generate_appcast` binary from Sparkle release is required. It should be present in `$PATH`.
+
 ### Usage
 
 Run the script with 2 builds off the current branch:
