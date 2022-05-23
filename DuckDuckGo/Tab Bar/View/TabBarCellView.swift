@@ -32,6 +32,7 @@ final class TabBarCellView: NSView {
         guard super.becomeFirstResponder() else { return false }
 
         setAccessibilityFocused(true)
+        showFocusRing()
         return true
     }
 
@@ -39,7 +40,86 @@ final class TabBarCellView: NSView {
         guard super.resignFirstResponder() else { return false }
 
         setAccessibilityFocused(false)
+        removeFocusRing()
         return true
+    }
+
+    private func focusRingClipView(createIfNeeded: Bool) -> FocusRingClipView? {
+        let scrollView = enclosingScrollView
+        let themeFrameView = window?.themeFrameView
+        if let focusRingClipView = themeFrameView?.subviews.first(where: { $0 is FocusRingClipView }) as? FocusRingClipView {
+            return focusRingClipView
+        }
+        guard createIfNeeded else { return nil }
+
+        let frame = scrollView?.superview?.convert(scrollView!.frame, to: themeFrameView).insetBy(dx: -2, dy: -6) ?? .zero
+        let focusRingClipView = FocusRingClipView(frame: frame)
+        themeFrameView?.addSubview(focusRingClipView)
+
+        return focusRingClipView
+    }
+
+    private func focusRingView(createIfNeeded: Bool) -> ShadowView? {
+        let focusRingClipView = self.focusRingClipView(createIfNeeded: createIfNeeded)
+
+        if let focusRingView = focusRingClipView?.subviews.first(where: { $0 is ShadowView }) as? ShadowView {
+            return focusRingView
+        }
+        guard createIfNeeded else { return nil }
+
+        let focusRingView = ShadowView()
+        focusRingView.stroke = 2
+        focusRingView.shadowColor = NSColor.controlAccentColor
+        focusRingView.shadowRadius = 0
+        focusRingView.cornerRadius = 6
+        focusRingView.shadowOpacity = 1.0
+        focusRingView.shouldHideOnLostFocus = true
+        focusRingView.isHidden = true
+
+        focusRingClipView?.addSubview(focusRingView)
+        return focusRingView
+    }
+
+    private func showFocusRing() {
+        guard let scrollView = enclosingScrollView,
+              let focusRing = self.focusRingView(createIfNeeded: true)
+        else {
+            return
+        }
+
+        self.updateFocusRingFrame()
+        self.observeScrollPosition(in: scrollView)
+        focusRing.isHidden = false
+    }
+
+    private func updateFocusRingFrame() {
+        if self.window?.firstResponder === self,
+           let focusRingView = self.focusRingView(createIfNeeded: false) {
+            focusRingView.frame = self.convert(self.bounds, to: focusRingView.superview)
+
+        } else if let scrollPositionObserver = scrollPositionObserver {
+            NotificationCenter.default.removeObserver(scrollPositionObserver)
+            self.scrollPositionObserver = nil
+        }
+    }
+
+    private var scrollPositionObserver: Any?
+    private func observeScrollPosition(in scrollView: NSScrollView) {
+        scrollView.postsBoundsChangedNotifications = true
+        scrollPositionObserver = NotificationCenter.default.addObserver(forName: NSView.boundsDidChangeNotification,
+                                                                        object: scrollView.contentView,
+                                                                        queue: nil) { [weak self] _ in
+            self?.updateFocusRingFrame()
+        }
+    }
+
+    override func layout() {
+        super.layout()
+        updateFocusRingFrame()
+    }
+
+    private func removeFocusRing() {
+        focusRingView(createIfNeeded: false)?.isHidden = true
     }
 
     override func accessibilityFrame() -> NSRect {
@@ -67,6 +147,26 @@ final class TabBarCellView: NSView {
 
     override func accessibilityPerformDelete() -> Bool {
         NSApp.sendAction(#selector(TabBarViewItem.close(_:)), to: nextResponder, from: self)
+    }
+
+}
+
+private final class FocusRingClipView: NSView {
+
+    override init(frame: NSRect) {
+        super.init(frame: frame)
+
+        self.wantsLayer = true
+        self.layer!.cornerRadius = 12.0
+        self.autoresizingMask = [.width, .minYMargin]
+    }
+
+    required init?(coder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }
+
+    override func hitTest(_ point: NSPoint) -> NSView? {
+        nil
     }
 
 }

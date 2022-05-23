@@ -24,6 +24,10 @@ extension NSWindow {
         return self.standardWindowButton(.closeButton)?.superview
     }
 
+    var themeFrameView: NSView? {
+        return self.contentView?.superview
+    }
+
     var isPopUpWindow: Bool {
         return self is PopUpWindow
     }
