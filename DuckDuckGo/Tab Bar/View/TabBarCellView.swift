@@ -56,6 +56,9 @@ final class TabBarCellView: NSView {
 
     private func didResignFirstResponder() {
         setAccessibilityFocused(false)
+        guard (window?.firstResponder is TabBarCellView) != true else {
+            return
+        }
         removeFocusRing()
     }
 
