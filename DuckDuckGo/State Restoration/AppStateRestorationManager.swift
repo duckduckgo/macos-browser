@@ -82,7 +82,11 @@ final class AppStateRestorationManager: NSObject {
 
     func applicationWillTerminate() {
         cancellable.cancel()
-        persistAppState(sync: true)
+        if WindowControllersManager.shared.isInInitialState {
+            service.clearState(sync: true)
+        } else {
+            persistAppState(sync: true)
+        }
     }
 
     private func readLastSessionState(restore: Bool) {
