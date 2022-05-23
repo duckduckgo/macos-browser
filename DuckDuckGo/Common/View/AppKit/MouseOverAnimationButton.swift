@@ -52,7 +52,7 @@ final class MouseOverAnimationButton: AddressBarButton {
     override func becomeFirstResponder() -> Bool {
         guard super.becomeFirstResponder() else { return false }
 
-        keyWindowCancellable = window?.publisher(for: \.isKeyWindow)
+        keyWindowCancellable = NSApp.publisher(for: \.keyWindow)
             .combineLatest(NSApp.isActivePublisher())
             .receive(on: DispatchQueue.main)
             .sink { [weak self] _ in

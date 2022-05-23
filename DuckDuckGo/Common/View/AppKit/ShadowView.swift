@@ -175,15 +175,16 @@ final class ShadowView: NSView {
     override func viewDidMoveToWindow() {
         super.viewDidMoveToWindow()
 
-        guard let window = window else {
+        guard window != nil else {
             keyWindowCancellable = nil
             return
         }
         updateProperties()
 
         if shouldHideOnLostFocus {
-            keyWindowCancellable = window.publisher(for: \.isKeyWindow)
+            keyWindowCancellable = NSApp.publisher(for: \.keyWindow)
                 .combineLatest(NSApp.isActivePublisher())
+                .receive(on: DispatchQueue.main)
                 .sink { [weak self] _ in
                     self?.updateProperties()
             }

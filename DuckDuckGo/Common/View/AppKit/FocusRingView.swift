@@ -41,15 +41,16 @@ final class FocusRingView: NSView {
     override func viewDidMoveToWindow() {
         super.viewDidMoveToWindow()
 
-        guard let window = window else {
+        guard window != nil else {
             keyWindowCancellable = nil
             return
         }
         wantsLayer = true
 
         addSublayers()
-        keyWindowCancellable = window.publisher(for: \.isKeyWindow)
+        keyWindowCancellable = NSApp.publisher(for: \.keyWindow)
             .combineLatest(NSApp.isActivePublisher())
+            .receive(on: DispatchQueue.main)
             .sink { [weak self] _ in
                 self?.updateLayer()
         }
