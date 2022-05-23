@@ -246,55 +246,58 @@ struct DataImportError: Error {
         case noFileFound
         case cannotReadFile
         case couldNotFindProfile
-        case browserNeedsToBeClosed
         case needsLoginPrimaryPassword
         case cannotAccessSecureVault
         case cannotAccessCoreData
         case couldNotGetDecryptionKey
         case cannotDecryptFile
+        case failedToTemporarilyCopyFile
+        case failedToMapBookmarks
+        case databaseAccessFailed
     }
     
     static func generic(_ errorType: ImportErrorType) -> DataImportError {
         return DataImportError(actionType: .generic, errorType: errorType)
     }
 
+    // MARK: Bookmark Error Types
+
     static func bookmarks(_ errorType: ImportErrorType) -> DataImportError {
         return DataImportError(actionType: .bookmarks, errorType: errorType)
     }
+
+    static func bookmarks(_ errorType: FirefoxBookmarksReader.ImportError) -> DataImportError {
+        switch errorType {
+        case .noBookmarksFileFound: return DataImportError(actionType: .bookmarks, errorType: .noFileFound)
+        case .unexpectedBookmarksDatabaseFormat: return DataImportError(actionType: .bookmarks, errorType: .cannotReadFile)
+        case .failedToTemporarilyCopyFile: return DataImportError(actionType: .bookmarks, errorType: .failedToTemporarilyCopyFile)
+        case .failedToMapBookmarks: return DataImportError(actionType: .bookmarks, errorType: .failedToMapBookmarks)
+        }
+    }
+    
+    static func bookmarks(_ errorType: SafariBookmarksReader.ImportError) -> DataImportError {
+        switch errorType {
+        case .unexpectedBookmarksFileFormat: return DataImportError(actionType: .bookmarks, errorType: .cannotReadFile)
+        }
+    }
+    
+    // MARK: Login Error Types
     
     static func logins(_ errorType: ImportErrorType) -> DataImportError {
         return DataImportError(actionType: .logins, errorType: errorType)
     }
     
-    let actionType: ImportErrorAction
-    let errorType: ImportErrorType
-
-}
-
-extension DataImportError: LocalizedError {
-
-    public var errorDescription: String? {
-        switch self.errorType {
-        case .noFileFound:
-            return "Could not find file"
-        case .cannotReadFile:
-            return "Could not read file"
-        case .browserNeedsToBeClosed:
-            return "Browser needs to be closed"
-        case .needsLoginPrimaryPassword:
-            return "Failed to get primary password"
-        case .cannotAccessSecureVault:
-            return "Failed to read Secure Vault data"
-        case .cannotAccessCoreData:
-            return "Failed to access Bookmarks database"
-        case .couldNotFindProfile:
-            return "Could not find browser profile"
-        case .couldNotGetDecryptionKey:
-            return "Could not read decryption key"
-        case .cannotDecryptFile:
-            return "Could not decrypt file"
+    static func logins(_ errorType: ChromiumLoginReader.ImportError) -> DataImportError {
+        switch errorType {
+        case .databaseAccessFailed: return DataImportError(actionType: .logins, errorType: .databaseAccessFailed)
+        case .couldNotFindLoginData: return DataImportError(actionType: .logins, errorType: .noFileFound)
+        case .failedToTemporarilyCopyDatabase: return DataImportError(actionType: .logins, errorType: .failedToTemporarilyCopyFile)
+        case .decryptionFailed: return DataImportError(actionType: .logins, errorType: .cannotReadFile)
         }
     }
+    
+    let actionType: ImportErrorAction
+    let errorType: ImportErrorType
 
 }
 

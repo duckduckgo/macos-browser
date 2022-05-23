@@ -21,20 +21,38 @@ import GRDB
 
 final class FirefoxBookmarksReader {
 
-    enum ImportError: Error {
-        case noBookmarksFileFound
-        case unexpectedBookmarksDatabaseFormat
+    enum Constants {
+        static let placesDatabaseName = "places.sqlite"
     }
 
-    private let firefoxDataDirectoryPath: String
+    enum ImportError: Error {
+        case noBookmarksFileFound
+        case failedToTemporarilyCopyFile
+        case unexpectedBookmarksDatabaseFormat
+        case failedToMapBookmarks
+    }
 
-    init(firefoxDataDirectoryPath: String) {
-        self.firefoxDataDirectoryPath = firefoxDataDirectoryPath + "/places.sqlite"
+    private let firefoxPlacesDatabaseURL: URL
+
+    init(firefoxDataDirectoryURL: URL) {
+        self.firefoxPlacesDatabaseURL = firefoxDataDirectoryURL.appendingPathComponent(Constants.placesDatabaseName)
     }
 
     func readBookmarks() -> Result<ImportedBookmarks, FirefoxBookmarksReader.ImportError> {
         do {
-            let queue = try DatabaseQueue(path: firefoxDataDirectoryPath)
+            return try firefoxPlacesDatabaseURL.withTemporaryFile { temporaryDatabaseURL in
+                return readBookmarks(fromDatabaseURL: temporaryDatabaseURL)
+            }
+        } catch {
+            return .failure(.failedToTemporarilyCopyFile)
+        }
+    }
+
+    // MARK: - Private
+
+    private func readBookmarks(fromDatabaseURL databaseURL: URL) -> Result<ImportedBookmarks, FirefoxBookmarksReader.ImportError> {
+        do {
+            let queue = try DatabaseQueue(path: databaseURL.path)
 
             let bookmarks: DatabaseBookmarks = try queue.read { database in
                 guard let rootEntries = try? FolderRow.fetchAll(database, sql: rootEntryQuery()), let rootEntry = rootEntries.first else {
@@ -69,15 +87,13 @@ final class FirefoxBookmarksReader {
             if let importedBookmarks = mapDatabaseBookmarksToImportedBookmarks(bookmarks) {
                 return .success(importedBookmarks)
             } else {
-                return .failure(.unexpectedBookmarksDatabaseFormat)
+                return .failure(.failedToMapBookmarks)
             }
         } catch {
             return .failure(.unexpectedBookmarksDatabaseFormat)
         }
     }
-
-    // MARK: - Private
-
+    
     fileprivate class DatabaseBookmarks {
         let topLevelFolders: [FolderRow]
         let foldersByParent: [Int: [FolderRow]]

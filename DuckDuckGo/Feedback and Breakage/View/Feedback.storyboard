@@ -387,7 +387,6 @@ DQ
                     </view>
                     <connections>
                         <outlet property="browserFeedbackDescriptionLabel" destination="Obm-Wr-qrD" id="Tx7-Va-Sh9"/>
-                        <outlet property="browserFeedbackDisclaimerTextVIew" destination="nm3-pj-w2B" id="82M-Nk-Jk9"/>
                         <outlet property="browserFeedbackDisclaimerTextView" destination="nm3-pj-w2B" id="gil-t1-jv0"/>
                         <outlet property="browserFeedbackTextView" destination="F3N-ft-DgV" id="amf-uR-AYI"/>
                         <outlet property="browserFeedbackView" destination="8Xi-CY-jyt" id="5IL-yu-IWc"/>

@@ -49,14 +49,6 @@ final class BrowserImportViewController: NSViewController {
     @IBOutlet var passwordsCheckbox: NSButton!
     @IBOutlet var passwordsWarningLabel: NSTextField!
 
-    @IBOutlet var closeBrowserWarningLabel: NSTextField!
-    @IBOutlet var closeBrowserWarningViewHeightConstraint: NSLayoutConstraint!
-    @IBOutlet var closeBrowserWarningView: ColorView! {
-        didSet {
-            closeBrowserWarningView.backgroundColor = NSColor.black.withAlphaComponent(0.05)
-        }
-    }
-
     weak var delegate: BrowserImportViewControllerDelegate?
 
     var selectedImportOptions: [DataImport.DataType] {
@@ -99,11 +91,6 @@ final class BrowserImportViewController: NSViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
 
-        NotificationCenter.default.addObserver(self,
-                                               selector: #selector(hideOpenBrowserWarningIfNecessary),
-                                               name: NSApplication.didBecomeActiveNotification,
-                                               object: nil)
-
         // Update the profile picker:
 
         importOptionsStackView.setCustomSpacing(18, after: profileSelectionPopUpButton)
@@ -116,10 +103,6 @@ final class BrowserImportViewController: NSViewController {
             profileSelectionPopUpButton.isHidden = true
             profileSelectionPopUpButton.removeAllItems()
         }
-
-        // Toggle the browser warning bar:
-        self.closeBrowserWarningLabel.stringValue = UserText.closeBrowserWarningFor(browser: browser.importSourceName)
-        hideOpenBrowserWarningIfNecessary()
 
         switch browser {
         case .safari:
@@ -139,16 +122,6 @@ final class BrowserImportViewController: NSViewController {
 
     @IBAction func selectedImportOptionsChanged(_ sender: NSButton) {
         delegate?.browserImportViewController(self, didChangeSelectedImportOptions: selectedImportOptions)
-    }
-
-    @objc
-    private func hideOpenBrowserWarningIfNecessary() {
-        let browserIsRunning = ThirdPartyBrowser.browser(for: browser)?.isRunning ?? false
-        if browserIsRunning {
-            closeBrowserWarningViewHeightConstraint.constant = Constants.browserWarningBarHeight
-        } else {
-            closeBrowserWarningViewHeightConstraint.constant = 0
-        }
     }
 
 }

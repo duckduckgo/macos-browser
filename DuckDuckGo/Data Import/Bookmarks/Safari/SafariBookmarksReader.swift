@@ -22,7 +22,6 @@ import os.log
 final class SafariBookmarksReader {
 
     enum ImportError: Error {
-        case noBookmarksFileFound
         case unexpectedBookmarksFileFormat
     }
 

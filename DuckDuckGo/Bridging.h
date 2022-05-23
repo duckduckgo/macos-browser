@@ -3,6 +3,7 @@
 //
 
 #import "BloomFilterWrapper.h"
+#import "FirefoxBerkeleyDatabaseReader.h"
 
 #import "NSView+Private.h"
 #import "WKWebView+Private.h"

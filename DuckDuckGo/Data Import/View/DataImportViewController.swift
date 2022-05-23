@@ -146,7 +146,7 @@ final class DataImportViewController: NSViewController {
             self.viewState = .init(selectedImportSource: viewState.selectedImportSource, interactionState: .permissionsRequired([.logins]))
 
         case .ableToImport, .failedToImport:
-            beginImport()
+            completeImport()
         case .completedImport(let summary) where summary.loginsResult == .awaited:
             // Safari bookmarks import finished, switch to CSV select
             self.viewState = .init(selectedImportSource: viewState.selectedImportSource, interactionState: .permissionsRequired([.logins]))
@@ -317,7 +317,7 @@ final class DataImportViewController: NSViewController {
         // Prevent transitioning to the same view controller.
         if let viewController = currentChildViewController as? BrowserImportViewController, viewController.browser == source { return nil }
 
-        guard let browser = ThirdPartyBrowser.browser(for: viewState.selectedImportSource), let profileList = browser.browserProfiles else {
+        guard let browser = ThirdPartyBrowser.browser(for: viewState.selectedImportSource), let profileList = browser.browserProfiles() else {
             assertionFailure("Attempted to create BrowserImportViewController without a valid browser selected")
             return nil
         }
@@ -335,32 +335,6 @@ final class DataImportViewController: NSViewController {
         importSourcePopUpButton.isEnabled = false
         embed(viewController: BrowserImportMoreInfoViewController.create(source: viewState.selectedImportSource))
         cancelButton.title = UserText.navigateBack
-    }
-
-    private func beginImport() {
-        if let browser = ThirdPartyBrowser.browser(for: viewState.selectedImportSource),
-           browser.isRunning,
-           browser.shouldQuitBeforeImport {
-
-            let alert = NSAlert.closeRunningBrowserAlert(source: viewState.selectedImportSource)
-            let result = alert.runModal()
-
-            if result == NSApplication.ModalResponse.alertFirstButtonReturn {
-                browser.forceTerminate()
-
-                // Add a delay before completing the import. Completing the import immediately after a successful `forceTerminate` call does not
-                // always leave enough time for the browser's SQLite data to become unlocked.
-                DispatchQueue.main.asyncAfter(deadline: DispatchTime.now() + 1) {
-                    self.completeImport()
-                }
-            } else {
-                // If the cancel button was selected, abandon the import.
-                return
-            }
-        } else {
-            completeImport()
-        }
-
     }
 
     var selectedProfile: DataImport.BrowserProfile? {
@@ -437,7 +411,7 @@ final class DataImportViewController: NSViewController {
             let parameters = ["error": error.errorType.rawValue]
             Pixel.fire(pixel, withAdditionalParameters: parameters)
 
-            let alert = NSAlert.importFailedAlert(source: viewState.selectedImportSource, errorMessage: error.localizedDescription)
+            let alert = NSAlert.importFailedAlert(source: viewState.selectedImportSource, linkDelegate: self)
             alert.beginSheetModal(for: window, completionHandler: nil)
         }
     }
@@ -518,13 +492,30 @@ extension DataImportViewController: RequestFilePermissionViewControllerDelegate 
         if viewState.selectedImportSource == .safari
             && selectedImportOptions.contains(.bookmarks) {
 
-            self.beginImport()
+            self.completeImport()
             return
         }
 
         self.viewState.interactionState = .ableToImport
     }
 
+}
+
+extension DataImportViewController: NSTextViewDelegate {
+    
+    func textView(_ textView: NSTextView, clickedOnLink link: Any, at charIndex: Int) -> Bool {
+        guard let sheet = view.window?.attachedSheet else {
+            return false
+        }
+        
+        view.window?.endSheet(sheet)
+        dismiss()
+        
+        FeedbackPresenter.presentFeedbackForm()
+        
+        return true
+    }
+    
 }
 
 extension NSPopUpButton {

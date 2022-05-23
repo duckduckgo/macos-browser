@@ -76,11 +76,12 @@ internal class SafariDataImporter: DataImporter {
                     completion(.failure(.bookmarks(.cannotAccessCoreData)))
                     return
                 }
-            case .failure:
-                completion(.failure(.bookmarks(.browserNeedsToBeClosed)))
+            case .failure(let error):
+                completion(.failure(.bookmarks(error)))
                 return
             }
         }
+
         if types.contains(.logins) {
             summary.loginsResult = .awaited
         }
