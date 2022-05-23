@@ -38,7 +38,7 @@
 		37AFCE8527DA2D3900471A10 /* PreferencesSidebar.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37AFCE8427DA2D3900471A10 /* PreferencesSidebar.swift */; };
 		37AFCE8727DA334800471A10 /* PreferencesRootView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37AFCE8627DA334800471A10 /* PreferencesRootView.swift */; };
 		37AFCE8927DA33BA00471A10 /* Preferences.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37AFCE8827DA33BA00471A10 /* Preferences.swift */; };
-		37AFCE8B27DB69BC00471A10 /* PreferencesDefaultBrowserView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37AFCE8A27DB69BC00471A10 /* PreferencesDefaultBrowserView.swift */; };
+		37AFCE8B27DB69BC00471A10 /* PreferencesStartupView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37AFCE8A27DB69BC00471A10 /* PreferencesStartupView.swift */; };
 		37AFCE9227DB8CAD00471A10 /* PreferencesAboutView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37AFCE9127DB8CAD00471A10 /* PreferencesAboutView.swift */; };
 		37B11B3928095E6600CBB621 /* TabLazyLoader.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37B11B3828095E6600CBB621 /* TabLazyLoader.swift */; };
 		37CC53EC27E8A4D10028713D /* PreferencesPrivacyView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37CC53EB27E8A4D10028713D /* PreferencesPrivacyView.swift */; };
@@ -793,7 +793,7 @@
 		37AFCE8427DA2D3900471A10 /* PreferencesSidebar.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PreferencesSidebar.swift; sourceTree = "<group>"; };
 		37AFCE8627DA334800471A10 /* PreferencesRootView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PreferencesRootView.swift; sourceTree = "<group>"; };
 		37AFCE8827DA33BA00471A10 /* Preferences.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Preferences.swift; sourceTree = "<group>"; };
-		37AFCE8A27DB69BC00471A10 /* PreferencesDefaultBrowserView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PreferencesDefaultBrowserView.swift; sourceTree = "<group>"; };
+		37AFCE8A27DB69BC00471A10 /* PreferencesStartupView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PreferencesStartupView.swift; sourceTree = "<group>"; };
 		37AFCE9127DB8CAD00471A10 /* PreferencesAboutView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PreferencesAboutView.swift; sourceTree = "<group>"; };
 		37B11B3828095E6600CBB621 /* TabLazyLoader.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TabLazyLoader.swift; sourceTree = "<group>"; };
 		37CC53EB27E8A4D10028713D /* PreferencesPrivacyView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PreferencesPrivacyView.swift; sourceTree = "<group>"; };
@@ -1681,7 +1681,7 @@
 				37AFCE8827DA33BA00471A10 /* Preferences.swift */,
 				37AFCE8627DA334800471A10 /* PreferencesRootView.swift */,
 				37AFCE8427DA2D3900471A10 /* PreferencesSidebar.swift */,
-				37AFCE8A27DB69BC00471A10 /* PreferencesDefaultBrowserView.swift */,
+				37AFCE8A27DB69BC00471A10 /* PreferencesStartupView.swift */,
 				37D2771427E870D4003365FD /* PreferencesAppearanceView.swift */,
 				37CC53EB27E8A4D10028713D /* PreferencesPrivacyView.swift */,
 				379DE4BC27EA31AC002CC3DE /* PreferencesAutofillView.swift */,
@@ -4568,7 +4568,7 @@
 				B31055C427A1BA1D001AC618 /* AutoconsentUserScript.swift in Sources */,
 				859E7D6B27453BF3009C2B69 /* BookmarksExporter.swift in Sources */,
 				4B5FF67826B602B100D42879 /* FirefoxDataImporter.swift in Sources */,
-				37AFCE8B27DB69BC00471A10 /* PreferencesDefaultBrowserView.swift in Sources */,
+				37AFCE8B27DB69BC00471A10 /* PreferencesStartupView.swift in Sources */,
 				4B02198B25E05FAC00ED7DEA /* FireproofInfoViewController.swift in Sources */,
 				AA8EDF2424923E980071C2E8 /* URLExtension.swift in Sources */,
 				4BE0DF06267819A1006337B7 /* NSStoryboardExtension.swift in Sources */,

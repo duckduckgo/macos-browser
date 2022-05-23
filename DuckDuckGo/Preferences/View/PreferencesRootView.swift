@@ -42,8 +42,8 @@ extension Preferences {
                         VStack(alignment: .leading) {
 
                             switch model.selectedPane {
-                            case .defaultBrowser:
-                                DefaultBrowserView(model: DefaultBrowserPreferences(), startupModel: StartupPreferences())
+                            case .startup:
+                                StartupView(model: DefaultBrowserPreferences(), startupModel: StartupPreferences())
                             case .appearance:
                                 AppearanceView(model: .shared)
                             case .privacy:

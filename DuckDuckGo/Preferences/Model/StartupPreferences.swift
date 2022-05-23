@@ -23,7 +23,7 @@ protocol StartupPreferencesPersistor {
 }
 
 struct StartupPreferencesUserDefaultsPersistor: StartupPreferencesPersistor {
-    @UserDefaultsWrapper(key: .restorePreviousSession, defaultValue: true)
+    @UserDefaultsWrapper(key: .restorePreviousSession, defaultValue: false)
     var restorePreviousSession: Bool
 }
 

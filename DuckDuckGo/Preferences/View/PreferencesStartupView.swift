@@ -22,16 +22,19 @@ import Combine
 
 extension Preferences {
 
-    struct DefaultBrowserView: View {
+    struct StartupView: View {
         @ObservedObject var model: DefaultBrowserPreferences
         @ObservedObject var startupModel: StartupPreferences
 
         var body: some View {
             VStack(alignment: .leading, spacing: 0) {
-                Text(UserText.defaultBrowser)
+                Text(UserText.startup)
                     .font(Const.Fonts.preferencePaneTitle)
 
                 Section {
+                    Text(UserText.defaultBrowser)
+                        .font(Const.Fonts.preferencePaneSectionHeader)
+
                     HStack {
                         if model.isDefault {
                             Image("SolidCheckmark")
@@ -47,9 +50,9 @@ extension Preferences {
                 }
 
                 Section {
-                    Text(UserText.startup)
+                    Text(UserText.onStartup)
                         .font(Const.Fonts.preferencePaneSectionHeader)
-                    Toggle(UserText.restorePreviousSession, isOn: $startupModel.restorePreviousSession)
+                    Toggle(UserText.restoreWindowsAndTabs, isOn: $startupModel.restorePreviousSession)
                 }
 
             }

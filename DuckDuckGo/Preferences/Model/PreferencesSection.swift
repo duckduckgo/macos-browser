@@ -26,7 +26,7 @@ struct PreferencesSection: Hashable, Identifiable {
     static let defaultSections: [PreferencesSection] = [
         .init(
             id: .regularPreferencePanes,
-            panes: [.defaultBrowser, .appearance, .privacy, .autofill, .downloads]
+            panes: [.startup, .appearance, .privacy, .autofill, .downloads]
         ),
         .init(
             id: .about,
@@ -41,7 +41,7 @@ enum PreferencesSectionIdentifier: Hashable, CaseIterable {
 }
 
 enum PreferencePaneIdentifier: String, Equatable, Hashable, Identifiable {
-    case defaultBrowser
+    case startup
     case appearance
     case privacy
     case autofill
@@ -60,8 +60,8 @@ enum PreferencePaneIdentifier: String, Equatable, Hashable, Identifiable {
 
     var displayName: String {
         switch self {
-        case .defaultBrowser:
-            return UserText.defaultBrowser
+        case .startup:
+            return UserText.startup
         case .appearance:
             return UserText.appearance
         case .privacy:
@@ -77,7 +77,7 @@ enum PreferencePaneIdentifier: String, Equatable, Hashable, Identifiable {
 
     var preferenceIconName: String {
         switch self {
-        case .defaultBrowser:
+        case .startup:
             return "DefaultBrowser"
         case .appearance:
             return "Appearance"
