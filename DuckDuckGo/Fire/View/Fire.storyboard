@@ -454,6 +454,7 @@ Gw
                         </userDefinedRuntimeAttributes>
                     </view>
                     <connections>
+                        <outlet property="cancelButton" destination="wam-tC-iBG" id="Pfc-7z-Lj3"/>
                         <outlet property="clearButton" destination="Sam-GO-uzw" id="zbv-kv-WkC"/>
                         <outlet property="closeDetailsButton" destination="cgG-hF-FAP" id="PDY-tj-zma"/>
                         <outlet property="closeWrapperView" destination="553-P8-fEM" id="vUO-wA-3ME"/>

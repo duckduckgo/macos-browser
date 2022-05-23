@@ -54,6 +54,7 @@ final class FirePopoverViewController: NSViewController {
     @IBOutlet weak var collectionViewBottomConstraint: NSLayoutConstraint!
     @IBOutlet weak var warningWrapperView: NSView!
     @IBOutlet weak var clearButton: NSButton!
+    @IBOutlet weak var cancelButton: NSButton!
 
     private var viewModelCancellable: AnyCancellable?
     private var selectedCancellable: AnyCancellable?
@@ -105,6 +106,12 @@ final class FirePopoverViewController: NSViewController {
         subscribeToViewModel()
         subscribeToSelected()
         subscribeToAreOtherTabsInfluenced()
+    }
+
+    override func viewDidLayout() {
+        super.viewDidLayout()
+
+        collectionView.nextKeyView = cancelButton
     }
 
     @IBAction func optionsButtonAction(_ sender: NSPopUpButton) {
