@@ -249,6 +249,7 @@
 		4BF4EA5027C71F26004E57C4 /* PasswordManagementListSectionTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4BF4EA4F27C71F26004E57C4 /* PasswordManagementListSectionTests.swift */; };
 		4BFD356B283AA07700CE9234 /* BookmarksBarDragController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4BFD356A283AA07700CE9234 /* BookmarksBarDragController.swift */; };
 		4BFD356D283AA2FD00CE9234 /* BookmarksBarView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4BFD356C283AA2FD00CE9234 /* BookmarksBarView.swift */; };
+		4BFD3570283B109C00CE9234 /* BookmarksBarButtonCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4BFD356F283B109C00CE9234 /* BookmarksBarButtonCell.swift */; };
 		7B1E819E27C8874900FF0E60 /* ContentOverlayPopover.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7B1E819B27C8874900FF0E60 /* ContentOverlayPopover.swift */; };
 		7B1E819F27C8874900FF0E60 /* ContentOverlay.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 7B1E819C27C8874900FF0E60 /* ContentOverlay.storyboard */; };
 		7B1E81A027C8874900FF0E60 /* ContentOverlayViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7B1E819D27C8874900FF0E60 /* ContentOverlayViewController.swift */; };
@@ -1008,6 +1009,7 @@
 		4BF4EA4F27C71F26004E57C4 /* PasswordManagementListSectionTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PasswordManagementListSectionTests.swift; sourceTree = "<group>"; };
 		4BFD356A283AA07700CE9234 /* BookmarksBarDragController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BookmarksBarDragController.swift; sourceTree = "<group>"; };
 		4BFD356C283AA2FD00CE9234 /* BookmarksBarView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BookmarksBarView.swift; sourceTree = "<group>"; };
+		4BFD356F283B109C00CE9234 /* BookmarksBarButtonCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BookmarksBarButtonCell.swift; sourceTree = "<group>"; };
 		7B1E819B27C8874900FF0E60 /* ContentOverlayPopover.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ContentOverlayPopover.swift; sourceTree = "<group>"; };
 		7B1E819C27C8874900FF0E60 /* ContentOverlay.storyboard */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.storyboard; path = ContentOverlay.storyboard; sourceTree = "<group>"; };
 		7B1E819D27C8874900FF0E60 /* ContentOverlayViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ContentOverlayViewController.swift; sourceTree = "<group>"; };
@@ -2105,6 +2107,7 @@
 				4BFD356C283AA2FD00CE9234 /* BookmarksBarView.swift */,
 				4BFD356A283AA07700CE9234 /* BookmarksBarDragController.swift */,
 				4B5E72412835B88400E449C4 /* BookmarksBarButton.swift */,
+				4BFD356F283B109C00CE9234 /* BookmarksBarButtonCell.swift */,
 			);
 			path = "Bookmarks Bar";
 			sourceTree = "<group>";
@@ -4178,6 +4181,7 @@
 				AA3D531727A1EEED00074EC1 /* FeedbackViewController.swift in Sources */,
 				AAEF6BC8276A081C0024DCF4 /* FaviconSelector.swift in Sources */,
 				85589E7F27BBB8630038AD11 /* AddEditFavoriteViewController.swift in Sources */,
+				4BFD3570283B109C00CE9234 /* BookmarksBarButtonCell.swift in Sources */,
 				4B2E7D6326FF9D6500D2DB17 /* PrintingUserScript.swift in Sources */,
 				0230C0A52721F3750018F728 /* GPCRequestFactory.swift in Sources */,
 				9833912F27AAA3CE00DAF119 /* AppTrackerDataSetProvider.swift in Sources */,

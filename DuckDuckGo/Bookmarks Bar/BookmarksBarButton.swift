@@ -22,27 +22,27 @@ final class BookmarksBarButton: NSButton {
     
     let backgroundLayer = CALayer()
     
-    private let imageView = NSImageView(frame: .zero)
-    
-    override var image: NSImage? {
-        get {
-            return imageView.image
-        }
-        set {
-            imageView.image = newValue
-        }
-    }
+    private let faviconImageView = NSImageView(frame: CGRect(x: 3, y: 3, width: 16, height: 16))
     
     private var isMouseOver = false {
         didSet {
             updateLayer()
         }
     }
+     
+    override func sizeToFit() {
+        super.sizeToFit()
+        
+        let updatedFrame = self.frame.insetBy(dx: -5, dy: -3)
+        self.frame = updatedFrame
+    }
 
     override init(frame frameRect: NSRect) {
         super.init(frame: frameRect)
 
-        // self.cell = BookmarksBarButtonCell()
+        self.cell = BookmarksBarButtonCell()
+        
+        addSubview(faviconImageView)
         configureLayers()
         addTrackingArea()
     }
@@ -51,9 +51,24 @@ final class BookmarksBarButton: NSButton {
         fatalError("init(coder:) has not been implemented")
     }
     
+    // MARK: - Interface Updates
+    
+    func update(with bookmarkEntity: BaseBookmarkEntity) {
+        faviconImageView.layer?.cornerRadius = 3
+        faviconImageView.layer?.masksToBounds = true
+
+        if let bookmark = bookmarkEntity as? Bookmark {
+            let favicon = FaviconManager.shared.getCachedFavicon(for: bookmark.url, sizeCategory: .small)?.image ?? NSImage(named: "Bookmark")
+            faviconImageView.image = favicon
+        } else if let folder = bookmarkEntity as? BookmarkFolder {
+            faviconImageView.image = NSImage(named: "Folder")
+        } else {
+            assertionFailure("Tried to update bookmarks bar button with unsupported type: \(bookmarkEntity)")
+        }
+    }
+
     private func configureLayers() {
         self.wantsLayer = true
-        // self.layerUsesCoreImageFilters = true
         self.layer?.backgroundColor = NSColor.clear.cgColor
         self.backgroundLayer.masksToBounds = true
         self.layer?.addSublayer(backgroundLayer)
