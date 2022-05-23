@@ -43,7 +43,7 @@ extension Preferences {
 
                             switch model.selectedPane {
                             case .startup:
-                                StartupView(model: DefaultBrowserPreferences(), startupModel: StartupPreferences())
+                                StartupView(defaultBrowserModel: DefaultBrowserPreferences(), startupModel: StartupPreferences())
                             case .appearance:
                                 AppearanceView(model: .shared)
                             case .privacy:

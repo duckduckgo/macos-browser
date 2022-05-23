@@ -23,7 +23,7 @@ import Combine
 extension Preferences {
 
     struct StartupView: View {
-        @ObservedObject var model: DefaultBrowserPreferences
+        @ObservedObject var defaultBrowserModel: DefaultBrowserPreferences
         @ObservedObject var startupModel: StartupPreferences
 
         var body: some View {
@@ -36,14 +36,14 @@ extension Preferences {
                         .font(Const.Fonts.preferencePaneSectionHeader)
 
                     HStack {
-                        if model.isDefault {
+                        if defaultBrowserModel.isDefault {
                             Image("SolidCheckmark")
                             Text(UserText.isDefaultBrowser)
                         } else {
-                            Image("Warning")
+                            Image("Warning").foregroundColor(Color("LinkBlueColor"))
                             Text(UserText.isNotDefaultBrowser)
                             Button(UserText.makeDefaultBrowser) {
-                                model.becomeDefault()
+                                defaultBrowserModel.becomeDefault()
                             }
                         }
                     }
