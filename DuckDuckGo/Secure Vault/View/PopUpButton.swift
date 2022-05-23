@@ -51,6 +51,10 @@ final class PopUpButton: NSPopUpButton {
         let itemColor = NSMenuItemColor(foregroundColor: foregroundColor, backgroundColor: backgroundColor)
         backgroundColorCell?.colors[title] = itemColor
     }
+
+    override func drawFocusRingMask() {
+        NSBezierPath(roundedRect: self.bounds, xRadius: 4, yRadius: 4).fill()
+    }
     
 }
 

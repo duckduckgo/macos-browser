@@ -427,6 +427,8 @@ final class AddressBarTextField: NSTextField {
             switch self {
             case .url(urlString: _, url: _, userTyped: let userTyped):
                 return userTyped
+            case .text where isEmpty:
+                return false
             case .text, .suggestion:
                 return true
             }

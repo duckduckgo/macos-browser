@@ -230,7 +230,7 @@
                                         <buttonCell key="cell" type="square" bezelStyle="shadowlessSquare" image="Settings" imagePosition="only" alignment="center" focusRingType="exterior" imageScaling="proportionallyDown" inset="2" id="N7m-mn-k3W">
                                             <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
                                             <font key="font" metaFont="system"/>
-                                            <string key="keyEquivalent">.</string>
+                                            <string key="keyEquivalent">/</string>
                                             <modifierMask key="keyEquivalentModifierMask" command="YES"/>
                                         </buttonCell>
                                         <color key="contentTintColor" name="ButtonColor"/>

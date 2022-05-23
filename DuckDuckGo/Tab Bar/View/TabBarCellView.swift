@@ -67,8 +67,7 @@ final class TabBarCellView: NSView {
         }
         guard createIfNeeded else { return nil }
 
-        let frame = scrollView?.superview?.convert(scrollView!.frame, to: themeFrameView).insetBy(dx: -2, dy: -6) ?? .zero
-        let focusRingClipView = FocusRingClipView(frame: frame)
+        let focusRingClipView = FocusRingClipView(overlaidView: scrollView)
         themeFrameView?.addSubview(focusRingClipView)
 
         return focusRingClipView
@@ -168,12 +167,32 @@ final class TabBarCellView: NSView {
 
 private final class FocusRingClipView: NSView {
 
-    override init(frame: NSRect) {
-        super.init(frame: frame)
+    private weak var overlaidView: NSView?
+    private var frameCancellable: AnyCancellable?
+    init(overlaidView: NSView?) {
+        self.overlaidView = overlaidView
+        super.init(frame: overlaidView?.bounds ?? .zero)
 
         self.wantsLayer = true
         self.layer!.cornerRadius = 12.0
         self.autoresizingMask = [.width, .minYMargin]
+    }
+
+    override func viewDidMoveToWindow() {
+        super.viewDidMoveToWindow()
+        guard window != nil else {
+            frameCancellable = nil
+            return
+        }
+
+        frameCancellable = overlaidView?.publisher(for: \.frame).sink { [weak overlaidView, weak self] frame in
+            guard let self = self,
+                  let overlaidViewSuperview = overlaidView?.superview,
+                  let frame = overlaidView?.frame,
+                  let superview = self.superview
+            else { return }
+            self.frame = overlaidViewSuperview.convert(frame, to: superview).insetBy(dx: -2, dy: -6)
+        }
     }
 
     required init?(coder: NSCoder) {

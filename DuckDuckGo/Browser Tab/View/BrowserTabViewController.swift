@@ -224,7 +224,7 @@ final class BrowserTabViewController: NSViewController {
     func recalculatePartialKeyViewLoop(after firstKeyView: NSView) -> NSView {
         switch tabViewModel?.tab.content ?? .none {
         case .onboarding:
-            // TODO: setup onboarding key view loop
+            // TODO: setup onboarding key view loop // swiftlint:disable:this todo
             return firstKeyView
         case .homePage:
             return homePageViewController.recalculatePartialKeyViewLoop(after: firstKeyView)

@@ -308,7 +308,7 @@ final class MainViewController: NSViewController {
         }
 
         switch selectedTabViewModel.tab.content {
-            // TODO: Onboarding focus move
+            // TODO: Onboarding focus move //swiftlint:disable:this todo
         case .onboarding, .none,
              .homePage where !movingFocusFromToolbar:
             navigationBarViewController.addressBarViewController?.addressBarTextField.makeMeFirstResponder()
@@ -383,7 +383,7 @@ extension MainViewController {
             }
             return isHandled
 
-        case kVK_ANSI_Period where flags == .command:
+        case kVK_ANSI_Slash where flags == .command:
             navigationBarViewController.optionsButtonAction(nil)
             return true
             

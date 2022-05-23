@@ -47,6 +47,7 @@ protocol TabBarViewItemDelegate: AnyObject {
 
 }
 
+// swiftlint:disable type_body_length
 final class TabBarViewItem: NSCollectionViewItem {
 
     enum Constants {
@@ -119,7 +120,7 @@ final class TabBarViewItem: NSCollectionViewItem {
     override func viewDidLayout() {
         super.viewDidLayout()
 
-        updateTitleTextFieldMask()
+        updateSubviews()
     }
 
     override func viewWillDisappear() {
