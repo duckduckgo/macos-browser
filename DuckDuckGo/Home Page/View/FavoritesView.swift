@@ -67,7 +67,7 @@ struct Favorites: View {
                 
             }
 
-            canShowMore = model.rows.count > HomePage.favoritesRowCountWhenCollapsed
+            let canShowMore = model.rows.count > HomePage.favoritesRowCountWhenCollapsed
             MoreOrLess(isExpanded: $model.showAllFavorites)
                 .padding(.top, 2)
                 .visibility(canShowMore && (isHovering || model.isHomeViewFirstResponder) ? .visible : .invisible)

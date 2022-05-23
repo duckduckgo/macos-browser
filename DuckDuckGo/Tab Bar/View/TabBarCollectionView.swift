@@ -17,6 +17,7 @@
 //
 
 import Cocoa
+import Combine
 import os.log
 import Carbon.HIToolbox
 
@@ -34,6 +35,15 @@ final class TabBarCollectionView: NSCollectionView {
         setDraggingSourceOperationMask([.private], forLocal: true)
     }
 
+    private var firstResponderCancellable: AnyCancellable?
+
+    override func viewDidMoveToWindow() {
+        super.viewDidMoveToWindow()
+        firstResponderCancellable = window?.publisher(for: \.firstResponder).sink { [weak self] firstResponder in
+            self?.firstResponderDidChange(firstResponder)
+        }
+    }
+
     override func accessibilityRole() -> NSAccessibility.Role? {
         .tabGroup
     }
@@ -48,12 +58,16 @@ final class TabBarCollectionView: NSCollectionView {
         return super.accessibilityFrame()
     }
 
-    var leftScrollButton: NSButton? {
-        ((self.window as? MainWindow)?.contentViewController as? MainViewController)?.tabBarViewController.leftScrollButton
+    private var tabBarViewController: TabBarViewController? {
+        delegate as? TabBarViewController
     }
 
-    var newTabButton: NSButton? {
-        (self.window as? MainWindow)?.newTabButton
+    private var leftScrollButton: NSButton? {
+        tabBarViewController?.leftScrollButton
+    }
+
+    private var newTabButton: NSButton? {
+        tabBarViewController?.addNewTabButton
     }
 
     private var itemsCache = [NSUserInterfaceItemIdentifier: [IndexPath: NSCollectionViewItem]]()
@@ -141,8 +155,43 @@ final class TabBarCollectionView: NSCollectionView {
         }
     }
 
+    private enum TabBarFocusState {
+        case scrollingTo
+        case focusInside
+    }
+    private var focusState: TabBarFocusState?
+
+    private func firstResponderDidChange(_ firstResponder: Any?) {
+        let firstResponder = firstResponder as? NSView
+        let isFocusInside = self.enclosingScrollView.map { scrollView in firstResponder?.isDescendant(of: scrollView) ?? false } ?? false
+        switch (focusState, isFocusInside) {
+        case (.scrollingTo, true):
+            self.focusState = .focusInside
+        case (.scrollingTo, false), (.none, false):
+            break
+        case (.focusInside, true), (.none, true):
+            defer {
+                self.focusState = .focusInside
+            }
+            guard let indexPath = indexPathForItemWithFocusedView(),
+                  !self.isItemVisible(at: indexPath.item)
+            else {
+                break
+            }
+
+            self.scroll(to: indexPath.item)
+
+        case (.focusInside, false):
+            scrollToSelected()
+            self.focusState = .none
+        }
+    }
+
     private func indexPathForItemWithFocusedView() -> IndexPath? {
-        guard let focusedView = window?.firstResponder as? NSView else { return nil }
+        guard let focusedView = window?.firstResponder as? NSView,
+              let scrollView = self.enclosingScrollView,
+              focusedView.isDescendant(of: scrollView)
+        else { return nil }
 
         if let item = window?.firstResponder?.nextResponder as? TabBarViewItem {
             return self.indexPath(for: item)
@@ -189,6 +238,7 @@ final class TabBarCollectionView: NSCollectionView {
                                                   y: clipView.visibleRect.midY),
                                           from: clipView)
 
+        // calculate next/previous scroll "page" frame
         let lastItem = self.numberOfItems(inSection: 0) - 1
         let firstVisibleIndexPath = self.indexPathForItem(at: leftmostPoint) ?? IndexPath(item: 0, section: 0)
         let lastVisibleIndexPath = self.indexPathForItem(at: rightmostPoint) ?? IndexPath(item: lastItem, section: 0)
@@ -197,6 +247,7 @@ final class TabBarCollectionView: NSCollectionView {
         let indexPathToFocus  = n > 0 ? lastVisibleIndexPath : firstVisibleIndexPath
         let scrollTo = min(max(0, indexPath.item + distance * n * 2), lastItem)
 
+        self.focusState = .scrollingTo
         scroll(to: scrollTo) { [weak self] _ in
             self?.focusItem(at: indexPathToFocus)
         }
@@ -211,19 +262,26 @@ final class TabBarCollectionView: NSCollectionView {
     }
 
     func focusItem(at indexPath: IndexPath) {
-        if self.indexPathsForVisibleItems().contains(indexPath) {
+        if self.isItemVisible(at: indexPath.item) {
             self.item(at: indexPath)?.view.makeMeFirstResponder()
         } else {
+            self.focusState = .scrollingTo
             self.scroll(to: indexPath.item) { [weak self] _ in
                 self?.item(at: indexPath)?.view.makeMeFirstResponder()
             }
         }
     }
 
+    func isItemVisible(at index: Int) -> Bool {
+        guard let clipView = enclosingScrollView?.contentView else { return false }
+        let frame = frameForItem(at: index)
+        return clipView.documentVisibleRect.contains(frame)
+    }
+
     override func selectItems(at indexPaths: Set<IndexPath>, scrollPosition: NSCollectionView.ScrollPosition) {
-        if self.indexPathsForVisibleItems().isDisjoint(with: indexPaths),
-           let indexPath = indexPaths.first {
-            self.scroll(to: indexPath)
+        guard let indexPath = indexPaths.first else { return }
+        if !self.isItemVisible(at: indexPath.item) {
+            self.scroll(to: indexPath.item)
         }
         super.selectItems(at: indexPaths, scrollPosition: scrollPosition)
 
@@ -247,17 +305,12 @@ final class TabBarCollectionView: NSCollectionView {
     }
 
     func scroll(to index: Int, completionHandler: ((Bool) -> Void)? = nil) {
-        let indexPath = IndexPath(item: index, section: 0)
-        scroll(to: indexPath, completionHandler: completionHandler)
-    }
-
-    func scroll(to indexPath: IndexPath, completionHandler: ((Bool) -> Void)? = nil) {
-        let rect = frameForItem(at: indexPath.item)
+        let rect = frameForItem(at: index)
         animator().performBatchUpdates({
             animator().scrollToVisible(rect)
         }, completionHandler: completionHandler)
     }
-    
+
     func scrollToEnd(completionHandler: ((Bool) -> Void)? = nil) {
         animator().performBatchUpdates({
             animator().scroll(CGPoint(x: self.bounds.size.width, y: 0))
@@ -276,17 +329,14 @@ final class TabBarCollectionView: NSCollectionView {
     }
 
     func updateItemsLeftToSelectedItems(_ selectionIndexPaths: Set<IndexPath>? = nil) {
-        let indexPaths = selectionIndexPaths ?? self.selectionIndexPaths
-        visibleItems().forEach {
-            ($0 as? TabBarViewItem)?.isLeftToSelected = false
-        }
+        let selectedIndex = (selectionIndexPaths ?? self.selectionIndexPaths)?.first?.item
+        let lastIndexPath = IndexPath(item: self.numberOfItems(inSection: 0) - 1, section: 0)
+        for indexPath in indexPathsForVisibleItems() {
+            guard let item = item(at: indexPath) as? TabBarViewItem else { continue }
 
-        for indexPath in indexPaths where indexPath.item > 0 {
-            let leftToSelectionIndexPath = IndexPath(item: indexPath.item - 1)
-            (item(at: leftToSelectionIndexPath) as? TabBarViewItem)?.isLeftToSelected = true
+            item.isSeparatorHidden = indexPath.item + 1 == selectedIndex // left to selected
+                || (tabBarViewController?.tabMode == .overflow && indexPath == lastIndexPath)
         }
-// TODO: Use other flag // swiftlint:disable:this todo
-        (item(at: self.numberOfItems(inSection: 0) - 1) as? TabBarViewItem)?.isLeftToSelected = true
     }
 
 }

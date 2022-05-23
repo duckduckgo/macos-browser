@@ -45,7 +45,7 @@ final class MainWindow: NSWindow {
 
         setupWindow()
     }
-
+    var firstResponderCancellable: AnyCancellable!
     private func setupWindow() {
         allowsToolTipsWhenApplicationIsInactive = false
         autorecalculatesKeyViewLoop = true
@@ -56,7 +56,13 @@ final class MainWindow: NSWindow {
         titlebarAppearsTransparent = true
         // the window will be draggable using custom drag areas defined by WindowDraggingView
         isMovable = false
+
+        firstResponderCancellable = self.publisher(for: \.firstResponder).sink { [weak self] in
+            self?.firstResponderDidChange($0)
+        }
     }
+
+
 
     // MARK: - First Responder Notification
 
@@ -101,13 +107,12 @@ final class MainWindow: NSWindow {
         }
 
         guard self.firstResponder !== responder else { return true }
+        guard super.makeFirstResponder(responder) else { return false }
+
         // The only reliable way to detect NSTextField is the first responder
-        defer {
-            // Send it after the first responder has been set on the super class so that window.firstResponder matches correctly
-            postFirstResponderNotification(with: responder)
-        }
-        
-        return super.makeFirstResponder(responder)
+        // Send it after the first responder has been set on the super class so that window.firstResponder matches correctly
+        postFirstResponderNotification(with: responder)
+        return true
     }
 
     override func becomeMain() {
@@ -136,12 +141,14 @@ final class MainWindow: NSWindow {
     var c: Any?
     private func postFirstResponderNotification(with firstResponder: NSResponder?) {
         NotificationCenter.default.post(name: .firstResponder, object: firstResponder)
+    }
 
+    func firstResponderDidChange(_ firstResponder: NSResponder?) {
         print("firstResponder", firstResponder)
 
         frv?.removeFromSuperview()
         c = nil
-        if let firstResponder = firstResponder as? TabBarView {
+        if let firstResponder = firstResponder as? TabBarCellView {
 
             let cframe = firstResponder.enclosingScrollView?.superview?
                 .convert(firstResponder.enclosingScrollView!.frame, to: self.contentView!.superview!)
@@ -189,6 +196,7 @@ final class MainWindow: NSWindow {
 
         }
     }
+
     @objc func handleEvent(_ event: NSEvent) -> Bool {
 print(event)
         return true

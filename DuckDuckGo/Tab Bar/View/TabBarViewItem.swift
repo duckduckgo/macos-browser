@@ -47,68 +47,6 @@ protocol TabBarViewItemDelegate: AnyObject {
 
 }
 
-final class TabBarView: NSView {
-
-    override var canBecomeKeyView: Bool {
-        NSApp.isFullKeyboardAccessEnabled
-    }
-
-    override var acceptsFirstResponder: Bool {
-        NSApp.isFullKeyboardAccessEnabled
-    }
-
-    override func becomeFirstResponder() -> Bool {
-        // TODO: Also observe my buttons.isFirstResponder and scroll into view // swiftlint:disable:this todo
-        // TODO: enclosingScrollView.scrollIntoView // swiftlint:disable:this todo
-        (nextResponder as? TabBarViewItem)?.scrollIntoView { _ in
-            super.becomeFirstResponder()
-        }
-
-        setAccessibilityFocused(true)
-        return true
-    }
-
-    override func resignFirstResponder() -> Bool {
-        guard super.resignFirstResponder() else { return false }
-
-        DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) { [weak self] in
-            if !(self?.window?.firstResponder is TabBarView || (self?.window?.firstResponder as? NSButton)?.superview is TabBarView) {
-                ((self?.nextResponder as? TabBarViewItem)?.collectionView as? TabBarCollectionView)?.scrollToSelected()
-            }
-        }
-
-        setAccessibilityFocused(false)
-        return true
-    }
-
-    override func accessibilityFrame() -> NSRect {
-        let frame = self.window != nil ? super.accessibilityFrame() : self.frame
-        guard let parent = self.accessibilityParent() as? NSAccessibilityProtocol else { return frame }
-
-        var parentFrame = parent.accessibilityFrame()
-        parentFrame = parentFrame.insetBy(dx: 0, dy: (parentFrame.height - frame.height) / 2)
-        let intersection = parentFrame.intersection(frame)
-
-        if intersection.isEmpty || self.window == nil {
-            let isOnLeft = self.window != nil ? (frame.minX < parentFrame.minX) : frame.origin.x <= 0
-            return NSRect(x: isOnLeft ? parentFrame.minX : parentFrame.maxX - 2,
-                          y: parentFrame.origin.y,
-                          width: 2,
-                          height: parentFrame.height)
-        }
-        return intersection
-    }
-
-    override func accessibilityPerformPress() -> Bool {
-        NSApp.sendAction(#selector(TabBarViewItem.performClick(_:)), to: nextResponder, from: self)
-    }
-
-    override func accessibilityPerformDelete() -> Bool {
-        NSApp.sendAction(#selector(TabBarViewItem.close(_:)), to: nextResponder, from: self)
-    }
-
-}
-
 final class TabBarViewItem: NSCollectionViewItem {
 
     enum Constants {
@@ -134,7 +72,7 @@ final class TabBarViewItem: NSCollectionViewItem {
         }
     }
 
-    var isLeftToSelected: Bool = false {
+    var isSeparatorHidden: Bool = false {
         didSet {
             updateSeparatorView()
         }
@@ -399,10 +337,7 @@ final class TabBarViewItem: NSCollectionViewItem {
     }
 
     private func updateSeparatorView() {
-        let newIsHidden = isSelected || isDragged || isLeftToSelected
-        if rightSeparatorView.isHidden != newIsHidden {
-            rightSeparatorView.isHidden = newIsHidden
-        }
+        rightSeparatorView.isHidden = isSelected || isDragged || isSeparatorHidden
     }
 
     private func setupMenu() {

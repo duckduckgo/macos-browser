@@ -84,6 +84,14 @@ final class TabBarViewController: NSViewController {
         reloadSelection()
     }
 
+    override func viewDidAppear() {
+        super.viewDidAppear()
+
+        DispatchQueue.main.async {
+            self.collectionView.scrollToSelected()
+        }
+    }
+
     override func viewDidLayout() {
         super.viewDidLayout()
 
@@ -207,7 +215,7 @@ final class TabBarViewController: NSViewController {
     }
 
     private var frozenLayout = false
-    private var tabMode = TabMode.divided
+    private(set) var tabMode = TabMode.divided
 
     private func updateTabMode(for numberOfItems: Int? = nil, updateLayout: Bool? = nil) {
         let items = CGFloat(numberOfItems ?? self.layoutNumberOfItems())
@@ -233,6 +241,7 @@ final class TabBarViewController: NSViewController {
         updateEmptyTabArea()
         collectionView.invalidateLayout()
         frozenLayout = false
+        collectionView.updateItemsLeftToSelectedItems()
     }
 
     private var cachedLayoutNumberOfItems: Int?
