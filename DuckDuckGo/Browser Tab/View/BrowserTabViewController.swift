@@ -365,7 +365,7 @@ final class BrowserTabViewController: NSViewController {
             }
 
         case .homePage:
-            if homePageViewController?.parent !== self {
+            if homePageView.superview == nil {
                 removeAllTabContent()
                 view.addAndLayout(homePageView)
             }
