@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <document type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="3.0" toolsVersion="20037" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES" customObjectInstantitationMethod="direct">
     <dependencies>
+        <deployment identifier="macosx"/>
         <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="20037"/>
         <capability name="Named colors" minToolsVersion="9.0"/>
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
@@ -68,7 +69,7 @@
                     <rect key="frame" x="0.0" y="0.0" width="300" height="33"/>
                 </customView>
                 <button focusRingType="exterior" translatesAutoresizingMaskIntoConstraints="NO" id="XdB-Qn-iD9" userLabel="Active Permission" customClass="MouseOverButton" customModule="DuckDuckGo_Privacy_Browser" customModuleProvider="target">
-                    <rect key="frame" x="255" y="9" width="16" height="16"/>
+                    <rect key="frame" x="255" y="8" width="16" height="16"/>
                     <constraints>
                         <constraint firstAttribute="height" constant="16" id="a1w-Dc-Tkz"/>
                         <constraint firstAttribute="width" constant="16" id="nLR-Qf-xCM"/>
@@ -138,10 +139,9 @@
             <constraints>
                 <constraint firstAttribute="trailing" secondItem="jlg-2n-tzm" secondAttribute="trailing" id="0eL-gX-odc"/>
                 <constraint firstItem="DFD-8r-YGx" firstAttribute="leading" secondItem="Hz6-mo-xeY" secondAttribute="leading" constant="32" id="4P8-mH-XGb"/>
-                <constraint firstItem="XdB-Qn-iD9" firstAttribute="centerY" secondItem="Hz6-mo-xeY" secondAttribute="centerY" id="6wl-2B-Woa"/>
+                <constraint firstItem="XdB-Qn-iD9" firstAttribute="centerY" secondItem="Hz6-mo-xeY" secondAttribute="centerY" constant="1" id="6wl-2B-Woa"/>
                 <constraint firstAttribute="trailing" secondItem="XdB-Qn-iD9" secondAttribute="trailing" priority="900" constant="8" id="BAO-r4-OkC"/>
                 <constraint firstItem="jlg-2n-tzm" firstAttribute="leading" secondItem="Hz6-mo-xeY" secondAttribute="leading" id="DOd-Y3-APh"/>
-                <constraint firstItem="vuD-rY-Vzl" firstAttribute="centerX" secondItem="A6g-eG-dOW" secondAttribute="centerX" priority="300" id="Eoq-S2-Ah7"/>
                 <constraint firstItem="jlg-2n-tzm" firstAttribute="top" secondItem="Hz6-mo-xeY" secondAttribute="top" id="IAM-jm-SbM"/>
                 <constraint firstItem="opQ-Od-dCO" firstAttribute="centerY" secondItem="Hz6-mo-xeY" secondAttribute="centerY" id="J32-aM-9m2"/>
                 <constraint firstAttribute="trailing" secondItem="DFD-8r-YGx" secondAttribute="trailing" constant="8" id="L7J-mr-jLh"/>
@@ -158,6 +158,7 @@
                 <constraint firstItem="890-3t-v5O" firstAttribute="leading" secondItem="Hz6-mo-xeY" secondAttribute="leading" id="qFE-7M-fWu"/>
                 <constraint firstItem="XdB-Qn-iD9" firstAttribute="leading" relation="greaterThanOrEqual" secondItem="A6g-eG-dOW" secondAttribute="trailing" constant="4" id="uNR-JN-6RT"/>
                 <constraint firstAttribute="bottom" secondItem="jlg-2n-tzm" secondAttribute="bottom" id="vcb-oV-uSI"/>
+                <constraint firstItem="vuD-rY-Vzl" firstAttribute="centerX" secondItem="Hz6-mo-xeY" secondAttribute="centerX" priority="300" id="wBX-0a-HgF"/>
                 <constraint firstAttribute="trailing" secondItem="vuD-rY-Vzl" secondAttribute="trailing" constant="9" id="web-9k-BYT"/>
             </constraints>
             <userDefinedRuntimeAttributes>
@@ -176,9 +177,9 @@
                 <outlet property="mouseClickView" destination="890-3t-v5O" id="rcf-rO-cap"/>
                 <outlet property="mouseOverView" destination="jlg-2n-tzm" id="mX4-Hq-XHD"/>
                 <outlet property="permissionButton" destination="XdB-Qn-iD9" id="Cav-HW-zvK"/>
-                <outlet property="permissionCloseButtonTrailingConstraint" destination="lqC-R5-KOi" id="G6L-Zh-eBV"/>
+                <outlet property="permissionLeadingConstraint" destination="uNR-JN-6RT" id="qy2-j0-gPR"/>
+                <outlet property="permissionTrailingConstraint" destination="lqC-R5-KOi" id="sJI-Sd-Hl5"/>
                 <outlet property="rightSeparatorView" destination="opQ-Od-dCO" id="k6U-n5-y4S"/>
-                <outlet property="tabLoadingPermissionLeadingConstraint" destination="uNR-JN-6RT" id="r7F-38-4Nx"/>
                 <outlet property="titleTextField" destination="DFD-8r-YGx" id="6mj-b0-Oq3"/>
                 <outlet property="titleTextFieldLeadingConstraint" destination="4P8-mH-XGb" id="mKz-Wl-mQJ"/>
                 <outlet property="view" destination="Hz6-mo-xeY" id="DwG-v1-cn3"/>

@@ -17,6 +17,7 @@
 //
 
 import AppKit
+import Combine
 
 final class TabBarCellView: NSView {
 
@@ -28,20 +29,34 @@ final class TabBarCellView: NSView {
         NSApp.isFullKeyboardAccessEnabled
     }
 
-    override func becomeFirstResponder() -> Bool {
-        guard super.becomeFirstResponder() else { return false }
+    private var isFirstResponderCancellable: AnyCancellable?
+    override func viewWillMove(toWindow newWindow: NSWindow?) {
+        super.viewDidMoveToWindow()
 
-        setAccessibilityFocused(true)
-        showFocusRing()
-        return true
+        isFirstResponderCancellable = newWindow?.publisher(for: \.firstResponder).map { [weak self] firstResponder in
+            return firstResponder === self
+        }.assign(to: \.isFirstResponder, onWeaklyHeld: self)
     }
 
-    override func resignFirstResponder() -> Bool {
-        guard super.resignFirstResponder() else { return false }
+    var isFirstResponder: Bool = false {
+        didSet {
+            guard isFirstResponder != oldValue else { return }
+            if isFirstResponder {
+                didBecomeFirstResponder()
+            } else {
+                didResignFirstResponder()
+            }
+        }
+    }
 
+    private func didBecomeFirstResponder() {
+        setAccessibilityFocused(true)
+        showFocusRing()
+    }
+
+    private func didResignFirstResponder() {
         setAccessibilityFocused(false)
         removeFocusRing()
-        return true
     }
 
     private func focusRingClipView(createIfNeeded: Bool) -> FocusRingClipView? {

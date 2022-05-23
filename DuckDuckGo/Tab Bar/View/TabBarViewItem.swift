@@ -64,7 +64,7 @@ final class TabBarViewItem: NSCollectionViewItem {
 
     static let identifier = NSUserInterfaceItemIdentifier(rawValue: "TabBarViewItem")
 
-    private var eventMonitor: Any? {
+    private var commandPressedMonitor: Any? {
         didSet {
             if let oldValue = oldValue {
                 NSEvent.removeMonitor(oldValue)
@@ -94,8 +94,8 @@ final class TabBarViewItem: NSCollectionViewItem {
     @IBOutlet weak var faviconWrapperView: NSView!
     @IBOutlet weak var faviconWrapperViewCenterConstraint: NSLayoutConstraint!
     @IBOutlet weak var faviconWrapperViewLeadingConstraint: NSLayoutConstraint!
-    @IBOutlet var permissionCloseButtonTrailingConstraint: NSLayoutConstraint!
-    @IBOutlet var tabLoadingPermissionLeadingConstraint: NSLayoutConstraint!
+    @IBOutlet var permissionLeadingConstraint: NSLayoutConstraint!
+    @IBOutlet var permissionTrailingConstraint: NSLayoutConstraint!
     @IBOutlet var closeButtonTrailingConstraint: NSLayoutConstraint!
 
     private let titleTextFieldMaskLayer = CAGradientLayer()
@@ -105,7 +105,7 @@ final class TabBarViewItem: NSCollectionViewItem {
 
     weak var delegate: TabBarViewItemDelegate?
 
-    var isMouseOver = false
+    private var isMouseOver = false
 
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -113,25 +113,23 @@ final class TabBarViewItem: NSCollectionViewItem {
         setupView()
         updateSubviews()
         setupMenu()
-        updateTitleTextFieldMask()
         closeButton.isHidden = true
     }
 
     override func viewDidLayout() {
         super.viewDidLayout()
 
-        updateSubviews()
         updateTitleTextFieldMask()
     }
 
     override func viewWillDisappear() {
         super.viewWillDisappear()
-        eventMonitor = nil
+        commandPressedMonitor = nil
     }
 
     deinit {
-        if let eventMonitor = eventMonitor {
-            NSEvent.removeMonitor(eventMonitor)
+        if let commandPressedMonitor = commandPressedMonitor {
+            NSEvent.removeMonitor(commandPressedMonitor)
         }
     }
 
@@ -140,9 +138,8 @@ final class TabBarViewItem: NSCollectionViewItem {
             if isSelected {
                 isDragged = false
             }
-            updateSubviews()
             updateUsedPermissions()
-            updateTitleTextFieldMask()
+            updateSubviews()
 
             self.view.setAccessibilityValue(isSelected)
         }
@@ -254,6 +251,10 @@ final class TabBarViewItem: NSCollectionViewItem {
         }.store(in: &cancellables)
         // TODO: Used permissions/url? accessibility // swiftlint:disable:this todo
         tabViewModel.$usedPermissions.assign(to: \.usedPermissions, onWeaklyHeld: self).store(in: &cancellables)
+
+        closeButton.isFirstResponderPublisher().sink { [weak self] _ in
+            self?.updateSubviews()
+        }.store(in: &cancellables)
     }
 
     func clear() {
@@ -302,14 +303,21 @@ final class TabBarViewItem: NSCollectionViewItem {
             mouseOverView.mouseOverColor = isSelected || isDragged ? NSColor.clear : NSColor.tabMouseOverColor
         }
 
-        let showCloseButton = (isMouseOver && !widthStage.isCloseButtonHidden) || isSelected
+        let showCloseButton = isSelected || closeButton.isFirstResponder
+            || (isMouseOver && (!widthStage.isCloseButtonHidden || NSApp.isCommandPressed))
         closeButton.isHidden = !showCloseButton
-        updateSeparatorView()
-        permissionCloseButtonTrailingConstraint.isActive = !closeButton.isHidden
         titleTextField.isHidden = widthStage.isTitleHidden && faviconImageView.image != nil
+        faviconImageView.isHidden = widthStage.isTitleHidden && !closeButton.isHidden
+        updateSeparatorView()
+
+        permissionLeadingConstraint.isActive = !(faviconImageView.isHidden || permissionButton.isHidden)
+        permissionTrailingConstraint.isActive = !(closeButton.isHidden || permissionButton.isHidden)
+        closeButtonTrailingConstraint.isActive = widthStage.isFaviconCentered || (showCloseButton && !permissionButton.isHidden)
 
         faviconWrapperViewCenterConstraint.priority = titleTextField.isHidden ? .defaultHigh : .defaultLow
         faviconWrapperViewLeadingConstraint.priority = titleTextField.isHidden ? .defaultLow : .defaultHigh
+
+        updateTitleTextFieldMask()
     }
 
     private var usedPermissions = Permissions() {
@@ -328,12 +336,14 @@ final class TabBarViewItem: NSCollectionViewItem {
         } else if usedPermissions.microphone.isPaused {
             permissionButton.image = .micBlockedImage
         } else {
+            permissionButton.image = nil
             permissionButton.isHidden = true
-            tabLoadingPermissionLeadingConstraint.isActive = false
+            permissionLeadingConstraint.isActive = false
             return
         }
         permissionButton.isHidden = false
-        tabLoadingPermissionLeadingConstraint.isActive = true
+        permissionLeadingConstraint.isActive = true
+        permissionTrailingConstraint.isActive = true
     }
 
     private func updateSeparatorView() {
@@ -434,6 +444,12 @@ extension TabBarViewItem: MouseOverViewDelegate {
     func mouseOverView(_ mouseOverView: MouseOverView, isMouseOver: Bool) {
         delegate?.tabBarViewItem(self, isMouseOver: isMouseOver)
         self.isMouseOver = isMouseOver
+        if isMouseOver {
+            commandPressedMonitor = NSEvent.addLocalMonitorForEvents(matching: .flagsChanged) { [weak self] event in
+                self?.updateSubviews()
+                return event
+            }
+        }
         view.needsLayout = true
     }
 
