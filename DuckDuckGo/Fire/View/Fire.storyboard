@@ -23,9 +23,6 @@
                                     </userDefinedRuntimeAttribute>
                                 </userDefinedRuntimeAttributes>
                             </customView>
-                            <customView translatesAutoresizingMaskIntoConstraints="NO" id="Irb-Li-anx">
-                                <rect key="frame" x="0.0" y="0.0" width="721" height="479"/>
-                            </customView>
                             <customView translatesAutoresizingMaskIntoConstraints="NO" id="uFV-kr-0rY">
                                 <rect key="frame" x="201" y="130" width="320" height="220"/>
                                 <subviews>
@@ -105,11 +102,7 @@
                         <constraints>
                             <constraint firstAttribute="trailing" secondItem="cmz-06-1Ay" secondAttribute="trailing" id="0K9-Ki-pRH"/>
                             <constraint firstAttribute="bottom" secondItem="cmz-06-1Ay" secondAttribute="bottom" id="B02-aa-Nm3"/>
-                            <constraint firstItem="Irb-Li-anx" firstAttribute="top" secondItem="tOy-S4-hL0" secondAttribute="top" id="B21-W6-jl6"/>
-                            <constraint firstAttribute="trailing" secondItem="Irb-Li-anx" secondAttribute="trailing" id="DRg-RM-bVO"/>
-                            <constraint firstItem="Irb-Li-anx" firstAttribute="leading" secondItem="tOy-S4-hL0" secondAttribute="leading" id="H3t-Ax-ZO9"/>
                             <constraint firstItem="cmz-06-1Ay" firstAttribute="leading" secondItem="tOy-S4-hL0" secondAttribute="leading" id="IPL-C4-zho"/>
-                            <constraint firstAttribute="bottom" secondItem="Irb-Li-anx" secondAttribute="bottom" id="LRY-yM-EOZ"/>
                             <constraint firstItem="l2o-no-SFP" firstAttribute="top" secondItem="tOy-S4-hL0" secondAttribute="top" constant="8" id="VhL-VV-TZc"/>
                             <constraint firstItem="uFV-kr-0rY" firstAttribute="centerY" secondItem="tOy-S4-hL0" secondAttribute="centerY" id="aFg-Dk-hZE"/>
                             <constraint firstItem="uFV-kr-0rY" firstAttribute="centerX" secondItem="tOy-S4-hL0" secondAttribute="centerX" id="hHN-Ge-Wm8"/>
@@ -119,7 +112,6 @@
                     </view>
                     <connections>
                         <outlet property="fakeFireButton" destination="l2o-no-SFP" id="xqv-ch-iAF"/>
-                        <outlet property="fireAnimationViewContainer" destination="Irb-Li-anx" id="r1a-Xi-Yj3"/>
                         <outlet property="progressIndicator" destination="Nf3-CP-318" id="nq9-vZ-Fzk"/>
                         <outlet property="progressIndicatorWrapper" destination="uFV-kr-0rY" id="RTJ-f8-iuU"/>
                         <outlet property="progressIndicatorWrapperBG" destination="Yly-fF-tnL" id="zNP-2N-cC6"/>

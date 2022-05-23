@@ -36,7 +36,6 @@ final class FireViewController: NSViewController {
     }()
 
     @IBOutlet weak var fakeFireButton: NSButton!
-    @IBOutlet weak var fireAnimationViewContainer: NSView!
     @IBOutlet weak var progressIndicatorWrapper: NSView!
     @IBOutlet weak var progressIndicator: NSProgressIndicator!
     @IBOutlet weak var progressIndicatorWrapperBG: NSView!
@@ -98,12 +97,12 @@ final class FireViewController: NSViewController {
 
         animationView.contentMode = .scaleToFill
         animationView.translatesAutoresizingMaskIntoConstraints = false
-        fireAnimationViewContainer.addSubview(animationView)
+        view.addSubview(animationView, positioned: .below, relativeTo: progressIndicatorWrapper)
         NSLayoutConstraint.activate([
-            animationView.leadingAnchor.constraint(equalTo: fireAnimationViewContainer.leadingAnchor),
-            animationView.trailingAnchor.constraint(equalTo: fireAnimationViewContainer.trailingAnchor),
-            animationView.topAnchor.constraint(equalTo: fireAnimationViewContainer.topAnchor),
-            animationView.bottomAnchor.constraint(equalTo: fireAnimationViewContainer.bottomAnchor)
+            animationView.leadingAnchor.constraint(equalTo: view.leadingAnchor),
+            animationView.trailingAnchor.constraint(equalTo: view.trailingAnchor),
+            animationView.topAnchor.constraint(equalTo: view.topAnchor),
+            animationView.bottomAnchor.constraint(equalTo: view.bottomAnchor)
         ])
         fireAnimationView = animationView
 
