@@ -88,6 +88,7 @@ prepare_fake_cdn_directory() {
 
 start_ngrok() {
 	local basic_auth
+	# shellcheck disable=2119
 	basic_auth="$(random_string):$(random_string)"
 	echo "Starting ngrok ..."
 	ngrok http --log stdout --basic-auth "${basic_auth}" "file://${cdn_dir}" >/dev/null &
