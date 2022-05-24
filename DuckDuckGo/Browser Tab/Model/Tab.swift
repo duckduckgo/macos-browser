@@ -1171,9 +1171,9 @@ extension Tab: WKNavigationDelegate {
         //        hasError = true
 
         isBeingRedirected = false
-        webViewDidFailNavigationPublisher.send()
         invalidateSessionStateData()
         linkProtection.setMainFrameUrl(nil)
+        webViewDidFailNavigationPublisher.send()
     }
 
     func webView(_ webView: WKWebView, didFailProvisionalNavigation navigation: WKNavigation!, withError error: Error) {
