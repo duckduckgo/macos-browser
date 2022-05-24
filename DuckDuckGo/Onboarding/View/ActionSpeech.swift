@@ -45,6 +45,7 @@ struct ActionSpeech: View {
                     }
                 }
                 .buttonStyle(SkipButtonStyle())
+                .focusable(cornerRadius: 8, action: skip)
 
                 Button(actionName) {
                     withAnimation {
@@ -52,6 +53,8 @@ struct ActionSpeech: View {
                     }
                 }
                 .buttonStyle(ActionButtonStyle())
+                .keyboardShortcutIfAvailable(.return, modifiers: [])
+                .focusable(cornerRadius: 8, action: action)
 
             }
             .visibility(typingFinished ? .visible : .gone)

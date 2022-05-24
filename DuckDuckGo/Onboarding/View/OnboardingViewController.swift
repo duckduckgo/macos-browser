@@ -62,6 +62,27 @@ final class OnboardingViewController: NSViewController {
         }
     }
 
+    func adjustFirstResponder() {
+        self.firstKeyView.makeMeFirstResponder()
+    }
+
+    var firstKeyView: NSView {
+        if model.onboardingFinished {
+            return self.view.lastKeyView?.nextValidKeyView ?? self.view
+        }
+        return self.view.nextValidKeyView ?? self.view
+    }
+
+    var lastKeyView: NSView {
+        self.view.lastKeyView ?? self.view
+    }
+
+    func recalculatePartialKeyViewLoop(after firstKeyView: NSView) -> NSView {
+        firstKeyView.nextKeyView = self.firstKeyView
+        // let the engine adjust everything in between
+        return self.lastKeyView
+    }
+
     deinit {
         NSEvent.removeMonitor(mouseDownMonitor as Any)
     }

@@ -57,6 +57,9 @@ final class BrowserTabViewController: NSViewController {
     private var hoverLabelWorkItem: DispatchWorkItem?
 
     private var transientTabContentViewController: NSViewController?
+    private var onboardingViewController: OnboardingViewController? {
+        transientTabContentViewController as? OnboardingViewController
+    }
 
     private var mouseDownMonitor: Any?
 
@@ -210,22 +213,23 @@ final class BrowserTabViewController: NSViewController {
         switch tabViewModel?.tab.content ?? .none {
         case .homePage:
             homePageView.nextValidKeyView?.makeMeFirstResponder()
-        case .onboarding, .none:
-            break
+        case .onboarding:
+            onboardingViewController?.adjustFirstResponder()
         case .url:
             self.webView?.makeMeFirstResponder()
         case .preferences:
             preferencesViewController.adjustFirstResponder()
         case .bookmarks:
             bookmarksViewController.adjustFirstResponder()
+        case .none:
+            break
         }
     }
 
     func recalculatePartialKeyViewLoop(after firstKeyView: NSView) -> NSView {
         switch tabViewModel?.tab.content ?? .none {
         case .onboarding:
-            // TODO: setup onboarding key view loop // swiftlint:disable:this todo
-            return firstKeyView
+            return onboardingViewController?.recalculatePartialKeyViewLoop(after: firstKeyView) ?? firstKeyView
         case .homePage:
             return homePageViewController.recalculatePartialKeyViewLoop(after: firstKeyView)
         case .url:

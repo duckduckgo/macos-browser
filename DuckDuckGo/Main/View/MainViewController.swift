@@ -308,16 +308,23 @@ final class MainViewController: NSViewController {
         }
 
         switch selectedTabViewModel.tab.content {
-            // TODO: Onboarding focus move //swiftlint:disable:this todo
-        case .onboarding, .none,
+        case .none,
              .homePage where !movingFocusFromToolbar:
             navigationBarViewController.addressBarViewController?.addressBarTextField.makeMeFirstResponder()
-        case .url, .preferences, .bookmarks, .homePage:
+        case .url, .preferences, .bookmarks, .homePage, .onboarding:
             browserTabViewController.adjustFirstResponder()
         }
     }
 
     func recalculateKeyViewLoop() {
+        navigationBarViewController.addressBarViewController?.addressBarTextField
+            .acceptsFirstResponder = tabCollectionViewModel.changesEnabled
+        guard tabCollectionViewModel.changesEnabled else {
+            view.window?.initialFirstResponder =
+                browserTabViewController.recalculatePartialKeyViewLoop(after: browserTabViewController.view)
+            return
+        }
+
         tabBarViewController.recalculatePartialKeyViewLoop(after: navigationBarViewController.lastKeyView)
             .followedBy(findInPageViewController.recalculatePartialKeyViewLoop(after:))
             .followedBy(browserTabViewController.recalculatePartialKeyViewLoop(after:))
@@ -325,6 +332,12 @@ final class MainViewController: NSViewController {
     }
 
     func toggleToolbarFocus() {
+        guard tabCollectionViewModel.changesEnabled else {
+            browserTabViewController.adjustFirstResponder()
+            __NSBeep()
+            return
+        }
+
         if NSApp.isFullKeyboardAccessEnabled {
             if (view.window?.firstResponder as? NSView)?.isDescendant(of: browserTabViewController.view) ?? true {
                 self.navigationBarViewController.view.nextValidKeyView?.makeMeFirstResponder()

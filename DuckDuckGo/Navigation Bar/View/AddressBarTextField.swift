@@ -78,8 +78,16 @@ final class AddressBarTextField: NSTextField {
         currentEditor()?.selectAll(self)
     }
 
-    override var canBecomeKeyView: Bool { true }
-    override var acceptsFirstResponder: Bool { true }
+    private var _acceptsFirstResponder: Bool = true
+    override var canBecomeKeyView: Bool { _acceptsFirstResponder }
+    override var acceptsFirstResponder: Bool {
+        get {
+            _acceptsFirstResponder
+        }
+        set {
+            _acceptsFirstResponder = newValue
+        }
+    }
 
     func viewDidLayout() {
         layoutSuggestionWindow()

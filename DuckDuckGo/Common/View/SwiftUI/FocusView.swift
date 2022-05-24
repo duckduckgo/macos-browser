@@ -48,6 +48,8 @@ final class FocusView: NSView {
         }
     }
 
+    var cornerRadius: CGFloat = 4
+
     init(tag: Int, frame: NSRect = .zero) {
         self._tag = tag
         super.init(frame: frame)
@@ -98,7 +100,8 @@ final class FocusView: NSView {
 
     override func drawFocusRingMask() {
         guard shouldDrawFocusRing else { return }
-        NSBezierPath(roundedRect: self.bounds, xRadius: 4, yRadius: 4).fill()
+        NSBezierPath(roundedRect: self.bounds, xRadius: cornerRadius, yRadius: cornerRadius)
+            .fill()
     }
 
     @objc
@@ -134,6 +137,7 @@ struct FocusSwiftUIView: NSViewRepresentable {
     var onClick: Bool
     var focusRing: Bool
     var tag: Int
+    var cornerRadius: CGFloat?
     var onFocus: ((Bool) -> Void)?
     var onViewFocused: ((FocusView) -> Void)?
     var onAppear: ((FocusView) -> Void)?
@@ -166,6 +170,7 @@ struct FocusSwiftUIView: NSViewRepresentable {
         }
         view.onAppear = onAppear
         view.tag = tag
+        view.cornerRadius = cornerRadius ?? 4
 
         return view
     }
@@ -191,6 +196,7 @@ struct FocusSwiftUIView: NSViewRepresentable {
         }
         view.onAppear = onAppear
         view.tag = tag
+        view.cornerRadius = cornerRadius ?? 4
     }
 
 }

@@ -46,6 +46,7 @@ struct CallToAction: View {
             }
             .frame(width: speechWidth)
             .buttonStyle(ActionButtonStyle())
+            .keyboardShortcutIfAvailable(.return, modifiers: [])
             .visibility(typingFinished ? .visible : .gone)
         }
     }

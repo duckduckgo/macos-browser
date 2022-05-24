@@ -653,7 +653,7 @@ final class NavigationBarViewController: NSViewController {
         } .store(in: &navigationButtonsCancellables)
     }
 
-    private func updateNavigationButtons() {
+    func updateNavigationButtons() {
         guard let selectedTabViewModel = tabCollectionViewModel.selectedTabViewModel else {
             os_log("%s: Selected tab view model is nil", type: .error, className)
             return

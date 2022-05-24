@@ -108,6 +108,9 @@ final class MainWindowController: NSWindowController {
 
         mainViewController.tabBarViewController.fireButton.isEnabled = !prevented
         mainViewController.navigationBarViewController.controlsForUserPrevention.forEach { $0?.isEnabled = !prevented }
+        if !prevented {
+            mainViewController.navigationBarViewController.updateNavigationButtons()
+        }
         
         NSApplication.shared.mainMenuTyped.autoupdatingMenusForUserPrevention.forEach { $0.autoenablesItems = !prevented }
         NSApplication.shared.mainMenuTyped.menuItemsForUserPrevention.forEach { $0.isEnabled = !prevented }
@@ -117,6 +120,7 @@ final class MainWindowController: NSWindowController {
             mainViewController.view.makeMeFirstResponder()
         } else {
             window?.styleMask.update(with: .closable)
+            window?.recalculateKeyViewLoop()
             mainViewController.adjustFirstResponder()
         }
     }
