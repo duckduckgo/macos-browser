@@ -158,16 +158,14 @@ final class BrowserTabViewController: NSViewController {
         view.addSubview(hoverLabelContainer)
     }
 
-    private func changeWebView(tabViewModel: TabViewModel?, provisional: Bool = false) {
+    private func changeWebView(tabViewModel: TabViewModel?) {
 
-        func registerWebView(of tabViewModel: TabViewModel, display: Bool) {
+        func displayWebView(of tabViewModel: TabViewModel) {
             let newWebView = tabViewModel.tab.webView
             newWebView.uiDelegate = self
             webView = newWebView
 
-            if display {
-                addWebViewToViewHierarchy(newWebView)
-            }
+            addWebViewToViewHierarchy(newWebView)
         }
 
         guard let tabViewModel = tabViewModel else {
@@ -177,14 +175,10 @@ final class BrowserTabViewController: NSViewController {
 
         let oldWebView = webView
         let webViewContainer = webViewContainer
-
-        registerWebView(of: tabViewModel, display: !provisional)
+        displayWebView(of: tabViewModel)
         tabViewModel.updateAddressBarStrings()
-
-        if !provisional {
-            if let oldWebView = oldWebView, let webViewContainer = webViewContainer {
-                removeWebViewFromHierarchy(webView: oldWebView, container: webViewContainer)
-            }
+        if let oldWebView = oldWebView, let webViewContainer = webViewContainer {
+            removeWebViewFromHierarchy(webView: oldWebView, container: webViewContainer)
         }
     }
 
@@ -338,7 +332,7 @@ final class BrowserTabViewController: NSViewController {
             // Adjust webviews if there was a tab switch or content type switch
             if webView != tabViewModel?.tab.webView || tabViewModel?.tab.webView.tabContentView.superview == nil {
                 removeAllTabContent(includingWebView: false)
-                changeWebView(tabViewModel: tabViewModel, provisional: false)
+                changeWebView(tabViewModel: tabViewModel)
             }
 
         case .homePage:
