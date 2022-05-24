@@ -1,11 +1,5 @@
 /**
- *  
- * Put DuckDuckGo.app and its corresponding dSYM in the same folder.
- * 
- * cd to that folder and execute `node path/to/symbolicate.js file.ips` where file.ips is an IPS file for this version of the app.
- * 
- * Script could be adapted to read the meta data section of the IPS and use the correct app/dSYM dynamically. 
- *
+ * See README.md for instructions.
  */
 
 let fs = require('fs');
