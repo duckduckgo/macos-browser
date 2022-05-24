@@ -44,6 +44,7 @@ final class BrowserTabViewController: NSViewController {
 
     private let tabCollectionViewModel: TabCollectionViewModel
     private var tabContentCancellable: AnyCancellable?
+    private var tabWebViewDidCommitNavigationCancellable: AnyCancellable?
     private var errorViewStateCancellable: AnyCancellable?
     private var cancellables = Set<AnyCancellable>()
 
@@ -158,14 +159,16 @@ final class BrowserTabViewController: NSViewController {
         view.addSubview(hoverLabelContainer)
     }
 
-    private func changeWebView(tabViewModel: TabViewModel?) {
+    private func changeWebView(tabViewModel: TabViewModel?, provisional: Bool = false) {
 
-        func displayWebView(of tabViewModel: TabViewModel) {
+        func displayWebView(of tabViewModel: TabViewModel, provisional: Bool) {
             let newWebView = tabViewModel.tab.webView
             newWebView.uiDelegate = self
             webView = newWebView
 
-            addWebViewToViewHierarchy(newWebView)
+            if !provisional {
+                addWebViewToViewHierarchy(newWebView)
+            }
         }
 
         guard let tabViewModel = tabViewModel else {
@@ -175,10 +178,14 @@ final class BrowserTabViewController: NSViewController {
 
         let oldWebView = webView
         let webViewContainer = webViewContainer
-        displayWebView(of: tabViewModel)
+
+        displayWebView(of: tabViewModel, provisional: provisional)
         tabViewModel.updateAddressBarStrings()
-        if let oldWebView = oldWebView, let webViewContainer = webViewContainer {
-            removeWebViewFromHierarchy(webView: oldWebView, container: webViewContainer)
+
+        if !provisional {
+            if let oldWebView = oldWebView, let webViewContainer = webViewContainer {
+                removeWebViewFromHierarchy(webView: oldWebView, container: webViewContainer)
+            }
         }
     }
 
@@ -188,8 +195,20 @@ final class BrowserTabViewController: NSViewController {
             .dropFirst()
             .removeDuplicates()
             .receive(on: DispatchQueue.main)
-            .sink { [weak self] _ in
-                self?.showTabContent(of: tabViewModel)
+            .sink { [weak self] tabContent in
+                switch tabContent {
+                case .url:
+                    self?.showTabContent(of: tabViewModel, provisional: true)
+                default:
+                    self?.showTabContent(of: tabViewModel)
+                }
+            }
+
+        tabWebViewDidCommitNavigationCancellable = tabViewModel?.tab.webViewDidCommitNavigationPublisher
+            .sink { [weak self] in
+                if case .url = tabViewModel?.tab.content {
+                    self?.showTabContent(of: tabViewModel)
+                }
             }
     }
 
@@ -286,7 +305,7 @@ final class BrowserTabViewController: NSViewController {
         (view.window?.windowController as? MainWindowController)?.userInteraction(prevented: true)
     }
 
-    private func showTabContent(of tabViewModel: TabViewModel?) {
+    private func showTabContent(of tabViewModel: TabViewModel?, provisional: Bool = false) {
         guard !tabCollectionViewModel.tabCollection.tabs.isEmpty else {
             view.window?.close()
             return
@@ -313,10 +332,14 @@ final class BrowserTabViewController: NSViewController {
             showTransientTabContentController(OnboardingViewController.create(withDelegate: self))
 
         case .url:
-            // Adjust webviews if there was a tab switch or content type switch
-            if webView != tabViewModel?.tab.webView || tabViewModel?.tab.webView.tabContentView.superview == nil {
-                removeAllTabContent(includingWebView: false)
-                changeWebView(tabViewModel: tabViewModel)
+            if !provisional {
+                // Adjust webviews if there was a tab switch or content type switch
+                if webView != tabViewModel?.tab.webView || tabViewModel?.tab.webView.tabContentView.superview == nil {
+                    removeAllTabContent(includingWebView: false)
+                    changeWebView(tabViewModel: tabViewModel)
+                }
+            } else {
+                changeWebView(tabViewModel: tabViewModel, provisional: true)
             }
 
         case .homePage:

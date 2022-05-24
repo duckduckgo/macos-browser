@@ -203,6 +203,7 @@ final class Tab: NSObject, Identifiable {
 
     // MARK: - Event Publishers
 
+    let webViewDidCommitNavigationPublisher = PassthroughSubject<Void, Never>()
     let webViewDidFinishNavigationPublisher = PassthroughSubject<Void, Never>()
     let webViewDidFailNavigationPublisher = PassthroughSubject<Void, Never>()
 
@@ -231,7 +232,8 @@ final class Tab: NSObject, Identifiable {
             invalidateSessionStateData()
             self.error = nil
             Task {
-                await reloadIfNeeded()
+                let shouldLoadInBackground = oldValue != .none
+                await reloadIfNeeded(shouldLoadInBackground: shouldLoadInBackground)
             }
 
             if let title = content.title {
@@ -919,6 +921,7 @@ extension Tab: WKNavigationDelegate {
     }
 
     func webView(_ webView: WKWebView, didCommit navigation: WKNavigation!) {
+        webViewDidCommitNavigationPublisher.send()
         isBeingRedirected = false
         if let url = webView.url {
             addVisit(of: url)
