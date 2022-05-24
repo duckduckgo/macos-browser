@@ -191,24 +191,37 @@ final class BrowserTabViewController: NSViewController {
 
     func subscribeToTabContent(of tabViewModel: TabViewModel?) {
         tabContentCancellable?.cancel()
-        tabContentCancellable = tabViewModel?.tab.$content
+        tabWebViewDidCommitNavigationCancellable?.cancel()
+
+        guard let tabViewModel = tabViewModel else {
+            return
+        }
+
+        let tabContentPublisher = tabViewModel.tab.$content
             .dropFirst()
             .removeDuplicates()
             .receive(on: DispatchQueue.main)
-            .sink { [weak self] tabContent in
-                switch tabContent {
-                case .url:
-                    self?.showTabContent(of: tabViewModel, provisional: true)
-                default:
-                    self?.showTabContent(of: tabViewModel)
-                }
+
+
+        tabContentCancellable = tabContentPublisher
+            .filter { !$0.isUrl }
+            .sink { [weak self] _ in
+                self?.showTabContent(of: tabViewModel)
             }
 
-        tabWebViewDidCommitNavigationCancellable = tabViewModel?.tab.webViewDidCommitNavigationPublisher
+        tabWebViewDidCommitNavigationCancellable = tabContentPublisher
+            .filter { $0.isUrl }
+            .handleEvents(receiveOutput: { [weak self] _ in
+                self?.showTabContent(of: tabViewModel, provisional: true)
+            })
+            .flatMap { _ in
+                Publishers.Merge(
+                    tabViewModel.tab.webViewDidCommitNavigationPublisher,
+                    tabViewModel.tab.webViewDidFailNavigationPublisher
+                )
+            }
             .sink { [weak self] in
-                if case .url = tabViewModel?.tab.content {
-                    self?.showTabContent(of: tabViewModel)
-                }
+                self?.showTabContent(of: tabViewModel)
             }
     }
 
@@ -332,14 +345,10 @@ final class BrowserTabViewController: NSViewController {
             showTransientTabContentController(OnboardingViewController.create(withDelegate: self))
 
         case .url:
-            if !provisional {
-                // Adjust webviews if there was a tab switch or content type switch
-                if webView != tabViewModel?.tab.webView || tabViewModel?.tab.webView.tabContentView.superview == nil {
-                    removeAllTabContent(includingWebView: false)
-                    changeWebView(tabViewModel: tabViewModel)
-                }
-            } else {
-                changeWebView(tabViewModel: tabViewModel, provisional: true)
+            // Adjust webviews if there was a tab switch or content type switch
+            if webView != tabViewModel?.tab.webView || tabViewModel?.tab.webView.tabContentView.superview == nil {
+                removeAllTabContent(includingWebView: false)
+                changeWebView(tabViewModel: tabViewModel, provisional: provisional)
             }
 
         case .homePage:

@@ -232,8 +232,7 @@ final class Tab: NSObject, Identifiable {
             invalidateSessionStateData()
             self.error = nil
             Task {
-                let shouldLoadInBackground = oldValue != .none
-                await reloadIfNeeded(shouldLoadInBackground: shouldLoadInBackground)
+                await reloadIfNeeded(shouldLoadInBackground: true)
             }
 
             if let title = content.title {
@@ -253,7 +252,9 @@ final class Tab: NSObject, Identifiable {
             // prevent clearing currently selected pane (for state persistence purposes)
             break
         default:
-            self.content = content
+            if self.content != content {
+                self.content = content
+            }
         }
     }
     
