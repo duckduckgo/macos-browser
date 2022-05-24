@@ -44,6 +44,7 @@ final class BrowserTabViewController: NSViewController {
 
     private let tabCollectionViewModel: TabCollectionViewModel
     private var tabContentCancellable: AnyCancellable?
+    private var webViewFrameCancellable: AnyCancellable?
     private var errorViewStateCancellable: AnyCancellable?
     private var cancellables = Set<AnyCancellable>()
 
@@ -119,8 +120,10 @@ final class BrowserTabViewController: NSViewController {
                 self?.showTabContent(of: selectedTabViewModel)
                 self?.subscribeToErrorViewState()
                 self?.subscribeToTabContent(of: selectedTabViewModel)
+                self?.subscribeForOffScreenWebViewFrameUpdates(with: selectedTabViewModel)
             }
             .store(in: &cancellables)
+
     }
 
     private func subscribeToTabs() {
@@ -156,6 +159,7 @@ final class BrowserTabViewController: NSViewController {
 
         // Make sure link preview (tooltip shown in the bottom-left) is on top
         view.addSubview(hoverLabelContainer)
+        webViewFrameCancellable?.cancel()
     }
 
     private func changeWebView(tabViewModel: TabViewModel?) {
@@ -210,6 +214,21 @@ final class BrowserTabViewController: NSViewController {
             .sink { [weak self] in
                 self?.showTabContent(of: tabViewModel)
             }
+    }
+
+    private func subscribeForOffScreenWebViewFrameUpdates(with tabViewModel: TabViewModel?) {
+        webViewFrameCancellable?.cancel()
+
+        guard let tabViewModel = tabViewModel else {
+            return
+        }
+
+        webViewFrameCancellable = view.publisher(for: \.frame)
+            .map { NSRect(origin: .zero, size: $0.size) }
+            .prefix(while: { _ in
+                tabViewModel.tab.webView.superview == nil
+            })
+            .assign(to: \.tab.webView.frame, on: tabViewModel)
     }
 
     private func subscribeToErrorViewState() {
