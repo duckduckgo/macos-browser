@@ -243,6 +243,7 @@ final class AddressBarButtonsViewController: NSViewController {
         let showBookmarkButton = clearButton.isHidden && !hasEmptyAddressBar && (isMouseOver || bookmarkPopover.isShown)
 
         bookmarkButton.isHidden = !showBookmarkButton
+        bookmarkButton.shouldAppearOnFocus = !hasEmptyAddressBar
     }
 
     func openBookmarkPopover(setFavorite: Bool, accessPoint: Pixel.Event.AccessPoint) {
@@ -330,6 +331,7 @@ final class AddressBarButtonsViewController: NSViewController {
         updatePrivacyEntryPoint()
         updateImageButton()
         updatePermissionButtons()
+        updateBookmarkButtonVisibility()
     }
 
     @IBAction func cameraButtonAction(_ sender: NSButton) {
@@ -445,6 +447,7 @@ final class AddressBarButtonsViewController: NSViewController {
             microphoneButton.position = .free
             externalSchemeButton.position = .free
             bookmarkButton.isHidden = true
+            bookmarkButton.shouldAppearOnFocus = false
         } else {
             bookmarkButton.position = .right
             privacyEntryPointButton.position = .left

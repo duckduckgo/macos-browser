@@ -209,7 +209,18 @@ final class NavigationBarViewController: NSViewController {
 
     func recalculatePartialKeyViewLoop(after firstKeyView: NSView) -> NSView {
         if NSApp.isFullKeyboardAccessEnabled {
-            firstKeyView.nextKeyView = self.goBackButton
+            firstKeyView.nextKeyView = goBackButton
+
+            // fix Bookmarks button getting focused before Address Bar
+            if addressBarViewController?.addressBarButtonsViewController?.bookmarkButton
+                .previousKeyView != addressBarViewController?.addressBarTextField {
+
+                addressBarViewController?.addressBarButtonsViewController?.bookmarkButton
+                    .previousKeyView?.nextKeyView = addressBarViewController?.addressBarTextField
+                addressBarViewController?.addressBarTextField.nextKeyView = addressBarViewController?.addressBarButtonsViewController?.bookmarkButton
+                addressBarViewController?.addressBarButtonsViewController?.bookmarkButton.nextKeyView = optionsButton
+            }
+
             return self.lastKeyView
         } else {
             firstKeyView.nextKeyView = self.addressBarViewController?.addressBarTextField
