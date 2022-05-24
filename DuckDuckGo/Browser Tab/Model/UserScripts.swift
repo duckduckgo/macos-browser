@@ -43,7 +43,9 @@ final class UserScripts {
         surrogatesScript = SurrogatesUserScript(configuration: sourceProvider.surrogatesConfig!)
         let privacySettings = PrivacySecurityPreferences.shared
         let sessionKey = sourceProvider.sessionKey ?? ""
-        let prefs = ContentScopeProperties.init(gpcEnabled: privacySettings.gpcEnabled, sessionKey: sessionKey)
+        let prefs = ContentScopeProperties.init(gpcEnabled: privacySettings.gpcEnabled,
+                                                sessionKey: sessionKey,
+                                                featureToggles: ContentScopeFeatureToggles.supportedFeaturesOnMacOS)
         contentScopeUserScript = ContentScopeUserScript(sourceProvider.privacyConfigurationManager, properties: prefs)
         autofillScript = WebsiteAutofillUserScript(scriptSourceProvider: sourceProvider.autofillSourceProvider!)
         if #available(macOS 11, *) {
