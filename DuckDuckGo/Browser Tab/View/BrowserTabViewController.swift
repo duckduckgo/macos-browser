@@ -200,9 +200,12 @@ final class BrowserTabViewController: NSViewController {
                     return Just(()).eraseToAnyPublisher()
                 }
 
-                return tabViewModel.tab.webViewDidCommitNavigationPublisher
-                    .merge(with: tabViewModel.tab.webViewDidFailNavigationPublisher)
-                    .eraseToAnyPublisher()
+                return Publishers.Merge3(
+                    tabViewModel.tab.webViewDidCommitNavigationPublisher,
+                    tabViewModel.tab.webViewDidFailNavigationPublisher,
+                    tabViewModel.tab.webViewDidReceiveChallengePublisher
+                )
+                .eraseToAnyPublisher()
             }
             .sink { [weak self] in
                 self?.showTabContent(of: tabViewModel)

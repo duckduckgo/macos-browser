@@ -203,6 +203,7 @@ final class Tab: NSObject, Identifiable {
 
     // MARK: - Event Publishers
 
+    let webViewDidReceiveChallengePublisher = PassthroughSubject<Void, Never>()
     let webViewDidCommitNavigationPublisher = PassthroughSubject<Void, Never>()
     let webViewDidFinishNavigationPublisher = PassthroughSubject<Void, Never>()
     let webViewDidFailNavigationPublisher = PassthroughSubject<Void, Never>()
@@ -901,6 +902,8 @@ extension Tab: WKNavigationDelegate {
     func webView(_ webView: WKWebView,
                  didReceive challenge: URLAuthenticationChallenge,
                  completionHandler: @escaping (URLSession.AuthChallengeDisposition, URLCredential?) -> Void) {
+        webViewDidReceiveChallengePublisher.send()
+
         if let url = webView.url, EmailUrls().shouldAuthenticateWithEmailCredentials(url: url) {
             completionHandler(.useCredential, URLCredential(user: "dax", password: "qu4ckqu4ck!", persistence: .none))
             return
