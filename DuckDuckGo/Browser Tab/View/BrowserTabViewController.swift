@@ -44,7 +44,6 @@ final class BrowserTabViewController: NSViewController {
 
     private let tabCollectionViewModel: TabCollectionViewModel
     private var tabContentCancellable: AnyCancellable?
-    private var tabWebViewDidCommitNavigationCancellable: AnyCancellable?
     private var errorViewStateCancellable: AnyCancellable?
     private var cancellables = Set<AnyCancellable>()
 
@@ -161,12 +160,12 @@ final class BrowserTabViewController: NSViewController {
 
     private func changeWebView(tabViewModel: TabViewModel?, provisional: Bool = false) {
 
-        func displayWebView(of tabViewModel: TabViewModel, provisional: Bool) {
+        func registerWebView(of tabViewModel: TabViewModel, display: Bool) {
             let newWebView = tabViewModel.tab.webView
             newWebView.uiDelegate = self
             webView = newWebView
 
-            if !provisional {
+            if display {
                 addWebViewToViewHierarchy(newWebView)
             }
         }
@@ -179,7 +178,7 @@ final class BrowserTabViewController: NSViewController {
         let oldWebView = webView
         let webViewContainer = webViewContainer
 
-        displayWebView(of: tabViewModel, provisional: provisional)
+        registerWebView(of: tabViewModel, display: !provisional)
         tabViewModel.updateAddressBarStrings()
 
         if !provisional {
@@ -191,7 +190,6 @@ final class BrowserTabViewController: NSViewController {
 
     func subscribeToTabContent(of tabViewModel: TabViewModel?) {
         tabContentCancellable?.cancel()
-        tabWebViewDidCommitNavigationCancellable?.cancel()
 
         guard let tabViewModel = tabViewModel else {
             return
@@ -202,23 +200,15 @@ final class BrowserTabViewController: NSViewController {
             .removeDuplicates()
             .receive(on: DispatchQueue.main)
 
-
         tabContentCancellable = tabContentPublisher
-            .filter { !$0.isUrl }
-            .sink { [weak self] _ in
-                self?.showTabContent(of: tabViewModel)
-            }
+            .flatMap { tabContent -> AnyPublisher<Void, Never> in
+                guard tabContent.isUrl else {
+                    return Just(()).eraseToAnyPublisher()
+                }
 
-        tabWebViewDidCommitNavigationCancellable = tabContentPublisher
-            .filter { $0.isUrl }
-            .handleEvents(receiveOutput: { [weak self] _ in
-                self?.showTabContent(of: tabViewModel, provisional: true)
-            })
-            .flatMap { _ in
-                Publishers.Merge(
-                    tabViewModel.tab.webViewDidCommitNavigationPublisher,
-                    tabViewModel.tab.webViewDidFailNavigationPublisher
-                )
+                return tabViewModel.tab.webViewDidCommitNavigationPublisher
+                    .merge(with: tabViewModel.tab.webViewDidFailNavigationPublisher)
+                    .eraseToAnyPublisher()
             }
             .sink { [weak self] in
                 self?.showTabContent(of: tabViewModel)
@@ -318,7 +308,7 @@ final class BrowserTabViewController: NSViewController {
         (view.window?.windowController as? MainWindowController)?.userInteraction(prevented: true)
     }
 
-    private func showTabContent(of tabViewModel: TabViewModel?, provisional: Bool = false) {
+    private func showTabContent(of tabViewModel: TabViewModel?) {
         guard !tabCollectionViewModel.tabCollection.tabs.isEmpty else {
             view.window?.close()
             return
@@ -348,7 +338,7 @@ final class BrowserTabViewController: NSViewController {
             // Adjust webviews if there was a tab switch or content type switch
             if webView != tabViewModel?.tab.webView || tabViewModel?.tab.webView.tabContentView.superview == nil {
                 removeAllTabContent(includingWebView: false)
-                changeWebView(tabViewModel: tabViewModel, provisional: provisional)
+                changeWebView(tabViewModel: tabViewModel, provisional: false)
             }
 
         case .homePage:

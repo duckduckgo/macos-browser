@@ -922,11 +922,11 @@ extension Tab: WKNavigationDelegate {
     }
 
     func webView(_ webView: WKWebView, didCommit navigation: WKNavigation!) {
-        webViewDidCommitNavigationPublisher.send()
         isBeingRedirected = false
         if let url = webView.url {
             addVisit(of: url)
         }
+        webViewDidCommitNavigationPublisher.send()
     }
 
     struct Constants {
