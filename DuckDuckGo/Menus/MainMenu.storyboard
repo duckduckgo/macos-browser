@@ -72,7 +72,7 @@
                             </menuItem>
                             <menuItem title="File" id="dMs-cI-mzQ">
                                 <modifierMask key="keyEquivalentModifierMask"/>
-                                <menu key="submenu" title="File" autoenablesItems="NO" id="bib-Uj-vzu">
+                                <menu key="submenu" title="File" id="bib-Uj-vzu">
                                     <items>
                                         <menuItem title="New Window" keyEquivalent="n" id="Was-JA-tGl">
                                             <connections>
@@ -749,6 +749,7 @@ CQ
                             <outlet property="closeTabMenuItem" destination="DVo-aG-piG" id="Hr0-hn-2p1"/>
                             <outlet property="closeWindowMenuItem" destination="CzI-4o-2re" id="32H-X4-8Ub"/>
                             <outlet property="debugMenuItem" destination="ilv-5f-YpZ" id="4F7-9b-Mve"/>
+                            <outlet property="editMenu" destination="W48-6f-4Dl" id="g3L-YU-eJX"/>
                             <outlet property="favoriteThisPageMenuItem" destination="cHZ-Fb-aKU" id="uPM-LY-AmL"/>
                             <outlet property="favoritesMenuItem" destination="Y9I-ZC-gGg" id="zk1-XL-x3e"/>
                             <outlet property="forwardMenuItem" destination="Gbj-sV-aI3" id="54P-Ym-Ic2"/>

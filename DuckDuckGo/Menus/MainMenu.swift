@@ -22,6 +22,8 @@ import Combine
 
 final class MainMenu: NSMenu {
 
+    @IBOutlet weak var editMenu: NSMenu!
+
     @IBOutlet weak var checkForUpdatesMenuItem: NSMenuItem?
     @IBOutlet weak var checkForUpdatesSeparatorItem: NSMenuItem?
 

@@ -24,6 +24,7 @@ struct NSPopUpButtonView<ItemType>: NSViewRepresentable where ItemType: Equatabl
     typealias NSViewType = NSPopUpButton
 
     @Binding var selection: ItemType
+    var canBecomeFirstResponder = true
 
     var viewCreator: () -> NSPopUpButton
     
@@ -48,6 +49,8 @@ struct NSPopUpButtonView<ItemType>: NSViewRepresentable where ItemType: Equatabl
         if matchedMenuItem != nil {
             button.select(matchedMenuItem)
         }
+
+        button.refusesFirstResponder = !canBecomeFirstResponder
     }
     
     func makeCoordinator() -> Coordinator {

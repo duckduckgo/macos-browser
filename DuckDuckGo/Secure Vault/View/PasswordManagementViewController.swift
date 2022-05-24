@@ -48,6 +48,9 @@ final class PasswordManagementViewController: NSViewController {
     @IBOutlet var emptyStateButton: NSButton!
     @IBOutlet var unlockButton: NSButton!
 
+    @IBOutlet var editMenu: NSMenu!
+    private var editMenuItems = [NSMenuItem]()
+
     @IBOutlet var lockScreen: NSView!
     @IBOutlet var lockScreenIconImageView: NSImageView! {
         didSet {
@@ -66,16 +69,23 @@ final class PasswordManagementViewController: NSViewController {
     var appearanceCancellable: AnyCancellable?
 
     var domain: String?
+
     private(set) var isEditing = false {
         didSet {
             listModel?.canBecomeFirstResponder = !isEditing
+            moreButton.refusesFirstResponder = isEditing
+            addVaultItemButton.refusesFirstResponder = isEditing
+            divider.isHidden = isEditing
+            searchField.isEditable = !isEditing
+
+            if oldValue != isEditing {
+                DispatchQueue.main.async {
+                    self.adjustFirstResponder()
+                }
+            }
         }
     }
-    func stopEditing() {
-        assert(isEditing)
-        itemModel?.cancel()
-    }
-    
+
     var isDirty = false {
         didSet {
             listModel?.canChangeCategory = !isDirty
@@ -104,10 +114,7 @@ final class PasswordManagementViewController: NSViewController {
                 guard let self = self else { return }
 
                 self.isEditing = isEditing
-                self.divider.isHidden = isEditing
                 self.updateEmptyState(state: self.listModel?.emptyState)
-
-                self.searchField.isEditable = !isEditing
             })
         }
     }
@@ -153,7 +160,12 @@ final class PasswordManagementViewController: NSViewController {
         listContainer.isHidden = true
         itemContainer.isHidden = true
 
-        unlockButton.makeMeFirstResponder()
+        itemModel = nil
+        clearSelectedItem()
+
+        DispatchQueue.main.async {
+            self.adjustFirstResponder()
+        }
     }
 
     private func hideLockScreen() {
@@ -163,7 +175,7 @@ final class PasswordManagementViewController: NSViewController {
         listContainer.isHidden = false
         itemContainer.isHidden = false
 
-        searchField.makeMeFirstResponder()
+        adjustFirstResponder()
     }
 
     override func viewWillAppear() {
@@ -179,6 +191,7 @@ final class PasswordManagementViewController: NSViewController {
     @IBOutlet var settingsButton: NSButton!
 
     private var responderCancellable: AnyCancellable?
+
     override func viewDidAppear() {
         super.viewDidAppear()
 
@@ -198,13 +211,54 @@ final class PasswordManagementViewController: NSViewController {
 
         settingsButton.nextKeyView = moreButton
 
+        setupFirstResponderObserverForScrolling()
+        addMenuItems()
+        adjustFirstResponder()
+    }
+
+    override func viewDidDisappear() {
+        super.viewDidDisappear()
+
+        listView?.removeFromSuperview()
+        responderCancellable = nil
+
+        removeMenuItems()
+    }
+
+    private func addMenuItems() {
+        if editMenuItems.isEmpty {
+            editMenuItems = editMenu.items
+            editMenu.removeAllItems()
+        }
+        for item in editMenuItems {
+            NSApp.mainMenuTyped.editMenu.addItem(item)
+        }
+    }
+
+    private func removeMenuItems() {
+        for item in editMenuItems {
+            let idx = NSApp.mainMenuTyped.editMenu.index(of: item)
+            guard idx >= 0 else { continue }
+            NSApp.mainMenuTyped.editMenu.removeItem(at: idx)
+        }
+    }
+
+    private func adjustFirstResponder() {
+        guard view.window?.isVisible == true else { return }
+        
         view.window?.autorecalculatesKeyViewLoop = true
         view.window?.recalculateKeyViewLoop()
 
-        setupFirstResponderObserverForScrolling()
+        if DeviceAuthenticator.shared.requiresAuthentication {
+            unlockButton.makeMeFirstResponder()
+        } else if isEditing {
+            self.view.nextValidKeyView?.makeMeFirstResponder()
+        } else {
+            searchField.makeMeFirstResponder()
+        }
     }
 
-    func setupFirstResponderObserverForScrolling() {
+    private func setupFirstResponderObserverForScrolling() {
         responderCancellable = view.window?.publisher(for: \.firstResponder).sink { responder in
             guard let responder = responder as? NSView,
                   let scrollView = responder.enclosingScrollView,
@@ -217,23 +271,6 @@ final class PasswordManagementViewController: NSViewController {
             let rect = responder.convert(responder.bounds, to: scrollView.contentView).insetBy(dx: 0, dy: -60)
             scrollView.contentView.animator().scrollToVisible(rect)
         }
-    }
-
-    override func keyDown(with event: NSEvent) {
-        switch Int(event.keyCode) {
-        case kVK_Delete where self.itemModel != nil,
-            kVK_ForwardDelete where self.itemModel != nil:
-            self.itemModel?.requestDelete()
-
-        default:
-            super.keyDown(with: event)
-        }
-    }
-
-    override func viewDidDisappear() {
-        super.viewDidDisappear()
-        listView?.removeFromSuperview()
-        responderCancellable = nil
     }
 
     private func promptForAuthenticationIfNecessary() {
@@ -290,6 +327,25 @@ final class PasswordManagementViewController: NSViewController {
         self.dismiss()
 
         Pixel.fire(.passwordManagerLockScreenPreferencesButtonPressed)
+    }
+
+    @IBAction func edit(_ sender: Any?) {
+        itemModel?.edit()
+    }
+
+    @IBAction func save(_ sender: Any?) {
+        assert(isEditing)
+        itemModel?.save()
+    }
+
+    @IBAction func cancelEditing(_ sender: Any?) {
+        assert(isEditing)
+        itemModel?.cancel()
+    }
+
+    // Cmd+Backspace
+    @IBAction override func deleteToBeginningOfLine(_ sender: Any?) {
+        itemModel?.requestDelete()
     }
 
     private func refetchWithText(_ text: String,
@@ -924,6 +980,25 @@ extension PasswordManagementViewController: NSTextFieldDelegate {
 
     func controlTextDidChange(_ obj: Notification) {
         updateFilter()
+    }
+
+}
+
+extension PasswordManagementViewController: NSMenuItemValidation {
+
+    func validateMenuItem(_ menuItem: NSMenuItem) -> Bool {
+        switch menuItem.action {
+        case #selector(edit(_:)):
+            return itemModel != nil && !isEditing
+        case #selector(save(_:)):
+            return isEditing && itemModel?.isDirty == true
+        case #selector(cancelEditing(_:)):
+            return isEditing
+        case #selector(deleteToBeginningOfLine(_:)):
+            return itemModel != nil
+        default:
+            return true
+        }
     }
 
 }

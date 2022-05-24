@@ -107,10 +107,9 @@ private struct Buttons: View {
 
                 Button(UserText.pmSave) { model.save() }
                     .buttonStyle(DefaultActionButtonStyle(enabled: model.isDirty))
-                    .focusable(action: { model.save() })
-                    .keyboardShortcutIfAvailable(.return, modifiers: .command)
-                // TODO: Does kb access get disabled when disabled? // swiftlint:disable:this todo
                     .disabled(!model.isDirty)
+                    .focusable(model.isDirty, action: { model.save() })
+                    .keyboardShortcutIfAvailable(.return, modifiers: .command)
 
             } else {
                 Button(UserText.pmDelete) { model.requestDelete()}

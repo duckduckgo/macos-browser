@@ -72,7 +72,7 @@ extension PasswordManagementPopover: NSPopoverDelegate {
     func popoverShouldClose(_ popover: NSPopover) -> Bool {
         if viewController.isEditing && NSApp.currentEvent?.type == .keyDown && Int(NSApp.currentEvent?.keyCode ?? 0) == kVK_Escape {
             // When a Title field is focused Esc will close popover instead of exiting Edit Mode
-            viewController.stopEditing()
+            viewController.cancelEditing(nil)
             return false
         }
         return !DeviceAuthenticator.shared.isAuthenticating

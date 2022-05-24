@@ -84,7 +84,9 @@ struct PasswordManagementItemListCategoryView: View {
         
         HStack(alignment: .center) {
             
-            NSPopUpButtonView<SecureVaultSorting.Category>(selection: $model.sortDescriptor.category, viewCreator: {
+            NSPopUpButtonView<SecureVaultSorting.Category>(selection: $model.sortDescriptor.category,
+                                                           canBecomeFirstResponder: model.canBecomeFirstResponder,
+                                                           viewCreator: {
                 let button = PopUpButton()
                 
                 for category in SecureVaultSorting.Category.allCases {
@@ -125,9 +127,9 @@ struct PasswordManagementItemListCategoryView: View {
             // Reference: https://stackoverflow.com/questions/65602163/swiftui-menu-button-displayed-as-disabled-initially
             
             if model.sortDescriptor.order == .ascending {
-                PasswordManagementSortButton(imageName: "SortAscending")
+                PasswordManagementSortButton(imageName: "SortAscending", canBecomeFirstResponder: model.canBecomeFirstResponder)
             } else {
-                PasswordManagementSortButton(imageName: "SortDescending")
+                PasswordManagementSortButton(imageName: "SortDescending", canBecomeFirstResponder: model.canBecomeFirstResponder)
             }
         }
         
@@ -314,6 +316,7 @@ struct PasswordManagementSortButton: NSViewRepresentable {
     @EnvironmentObject var model: PasswordManagementItemListModel
 
     let imageName: String
+    var canBecomeFirstResponder = true
 
     func makeNSView(context: Context) -> some NSView {
         let btn = MouseOverButton(frame: CGRect(x: 0, y: 0, width: 28, height: 28))
@@ -333,6 +336,7 @@ struct PasswordManagementSortButton: NSViewRepresentable {
         btn.target = delegate
         btn.action = #selector(MenuButtonDelegate.action(_:))
         btn.cell?.representedObject = delegate
+        btn.refusesFirstResponder = !canBecomeFirstResponder
 
         return btn
     }
@@ -342,6 +346,7 @@ struct PasswordManagementSortButton: NSViewRepresentable {
 
         btn.image = NSImage(named: imageName)!
         (btn.target as? MenuButtonDelegate)?.menuProvider = menuProvider()
+        btn.refusesFirstResponder = !canBecomeFirstResponder
     }
 
     private func menuProvider() -> MenuProvider {

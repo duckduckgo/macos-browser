@@ -21,12 +21,15 @@ import Foundation
 protocol PasswordManagementItemModel: AnyObject {
 
     func createNew()
+    func edit()
     func cancel()
     func save()
     func requestDelete()
     func clearSecureVaultModel()
     func setSecureVaultModel<Model>(_ modelObject: Model)
 
+    var isEditing: Bool { get }
+    var isDirty: Bool { get }
     var isEditingPublisher: Published<Bool>.Publisher { get }
 
 }

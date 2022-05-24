@@ -217,10 +217,6 @@ final class BookmarkManagementDetailViewController: NSViewController {
         super.keyDown(with: event)
     }
 
-    override func doCommand(by selector: Selector) {
-        super.doCommand(by: selector)
-    }
-
     @objc func goToParentFolder(_ sender: Any?) {
         guard case .folder(let folder) = selectionState else {
             __NSBeep()
