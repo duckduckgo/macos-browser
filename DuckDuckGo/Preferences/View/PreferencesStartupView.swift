@@ -52,7 +52,7 @@ extension Preferences {
                 Section {
                     Text(UserText.onStartup)
                         .font(Const.Fonts.preferencePaneSectionHeader)
-                    Toggle(UserText.restoreWindowsAndTabs, isOn: $startupModel.restorePreviousSession)
+                    Toggle(UserText.reopenAllWindowsFromLastSession, isOn: $startupModel.restorePreviousSession)
                 }
 
             }

@@ -241,7 +241,7 @@ struct UserText {
     static let isNotDefaultBrowser = NSLocalizedString("preferences.default-browser.inactive", value: "DuckDuckGo is not your default browser.", comment: "Indicate that the browser is not the default")
     static let makeDefaultBrowser = NSLocalizedString("preferences.default-browser.button.make-default", value: "Make DuckDuckGo Default...", comment: "")
     static let onStartup = NSLocalizedString("preferences.on-startup", value: "On Startup", comment: "Name of the preferences section related to app startup")
-    static let restoreWindowsAndTabs = NSLocalizedString("preferences.open-windows-and-tabs", value: "Restore windows and tabs from previous session", comment: "Option to control session restoration")
+    static let reopenAllWindowsFromLastSession = NSLocalizedString("preferences.reopen-windows", value: "Reopen all windows from last session", comment: "Option to control session restoration")
     static let theme = NSLocalizedString("preferences.appearance.theme", value: "Theme", comment: "Theme preferences")
     static let addressBar = NSLocalizedString("preferences.appearance.address-bar", value: "Address Bar", comment: "Theme preferences")
     static let showFullWebsiteAddress = NSLocalizedString("preferences.appearance.show-full-url", value: "Show full website address", comment: "Option to show full URL in the address bar")
