@@ -81,9 +81,9 @@ final class FireViewController: NSViewController {
         progressIndicator.stopAnimation(self)
     }
 
-    private var shouldPreventUserInteractioCancellable: AnyCancellable?
+    private var shouldPreventUserInteractionCancellable: AnyCancellable?
     private func subscribeToShouldPreventUserInteraction() {
-        shouldPreventUserInteractioCancellable = fireViewModel.shouldPreventUserInteraction
+        shouldPreventUserInteractionCancellable = fireViewModel.shouldPreventUserInteraction
             .sink { [weak self] shouldPreventUserInteraction in
                 self?.view.superview?.isHidden = !shouldPreventUserInteraction
             }
@@ -112,14 +112,6 @@ final class FireViewController: NSViewController {
         subscribeToIsBurning()
     }
 
-    private func waitForFireAnimationViewIfNeeded() {
-        if fireAnimationView == nil {
-            Task {
-                await fireAnimationViewLoadingTask?.value
-            }
-        }
-    }
-
     private func subscribeToIsBurning() {
         fireViewModel.fire.$burningData
             .sink(receiveValue: { [weak self] burningData in
@@ -128,7 +120,9 @@ final class FireViewController: NSViewController {
                         return
                     }
 
-                self.animateFire(burningData: burningData)
+                Task {
+                    await self.animateFire(burningData: burningData)
+                }
             })
             .store(in: &cancellables)
     }
@@ -137,7 +131,8 @@ final class FireViewController: NSViewController {
         presentAsModalWindow(fireDialogViewController)
     }
 
-    func animateFire(burningData: Fire.BurningData) {
+    @MainActor
+    private func animateFire(burningData: Fire.BurningData) async {
         switch burningData {
         case .all: break
         case .specificDomains(let burningDomains):
@@ -148,7 +143,7 @@ final class FireViewController: NSViewController {
             }
         }
 
-        waitForFireAnimationViewIfNeeded()
+        await waitForFireAnimationViewIfNeeded()
 
         progressIndicatorWrapper.isHidden = true
         fireViewModel.isAnimationPlaying = true
@@ -161,6 +156,12 @@ final class FireViewController: NSViewController {
                 self.progressIndicatorWrapper.isHidden = false
                 self.progressIndicatorWrapperBG.applyDropShadow()
             }
+        }
+    }
+
+    private func waitForFireAnimationViewIfNeeded() async {
+        if fireAnimationView == nil {
+            await fireAnimationViewLoadingTask?.value
         }
     }
 }
