@@ -98,12 +98,13 @@ final class FireViewController: NSViewController {
         animationView.contentMode = .scaleToFill
         animationView.translatesAutoresizingMaskIntoConstraints = false
         view.addSubview(animationView, positioned: .below, relativeTo: progressIndicatorWrapper)
-        NSLayoutConstraint.activate([
-            animationView.leadingAnchor.constraint(equalTo: view.leadingAnchor),
-            animationView.trailingAnchor.constraint(equalTo: view.trailingAnchor),
-            animationView.topAnchor.constraint(equalTo: view.topAnchor),
-            animationView.bottomAnchor.constraint(equalTo: view.bottomAnchor)
+        let constraints = animationView.addConstraints(to: view, [
+            .top: .top(),
+            .bottom: .bottom(),
+            .leading: .leading(),
+            .trailing: .trailing()
         ])
+        NSLayoutConstraint.activate(constraints)
         fireAnimationView = animationView
 
         fakeFireButton.wantsLayer = true
