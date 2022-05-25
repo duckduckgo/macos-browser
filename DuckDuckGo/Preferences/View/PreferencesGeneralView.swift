@@ -1,5 +1,5 @@
 //
-//  PreferencesStartupView.swift
+//  PreferencesGeneralView.swift
 //
 //  Copyright © 2022 DuckDuckGo. All rights reserved.
 //
@@ -22,13 +22,13 @@ import Combine
 
 extension Preferences {
 
-    struct StartupView: View {
+    struct GeneralView: View {
         @ObservedObject var defaultBrowserModel: DefaultBrowserPreferences
         @ObservedObject var startupModel: StartupPreferences
 
         var body: some View {
             VStack(alignment: .leading, spacing: 0) {
-                Text(UserText.startup)
+                Text(UserText.general)
                     .font(Const.Fonts.preferencePaneTitle)
 
                 Section {

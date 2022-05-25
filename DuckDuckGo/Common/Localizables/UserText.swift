@@ -230,7 +230,7 @@ struct UserText {
 
     static let settings = NSLocalizedString("settings", value: "Settings", comment: "Menu item for opening settings")
 
-    static let startup = NSLocalizedString("preferences.startup", value: "Startup", comment: "Show startup preferences")
+    static let general = NSLocalizedString("preferences.general", value: "General", comment: "Show general preferences")
     static let defaultBrowser = NSLocalizedString("preferences.default-browser", value: "Default Browser", comment: "Show default browser preferences")
     static let appearance = NSLocalizedString("preferences.appearance", value: "Appearance", comment: "Show appearance preferences")
     static let privacy = NSLocalizedString("preferences.privacy", value: "Privacy", comment: "Show privacy browser preferences")
