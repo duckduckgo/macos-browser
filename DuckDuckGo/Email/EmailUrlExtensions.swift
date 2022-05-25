@@ -22,6 +22,7 @@ import BrowserServicesKit
 extension EmailUrls {
 
     private struct Url {
+        static let emailProtectionLink = "https://duckduckgo.com/email"
         static let emailLandingPage = "https://duckduckgo.com/email/enable-autofill"
         static let emailGenerateTokenPage = "https://duckduckgo.com/email/new-address"
         static let emailAuthenticationHosts = ["quack.duckduckgo.com", "quackdev.duckduckgo.com"]
@@ -36,4 +37,7 @@ extension EmailUrls {
         return Url.emailAuthenticationHosts.contains(host)
     }
 
+    func isDuckDuckGoEmailProtection(url: URL) -> Bool {
+        return url.absoluteString.starts(with: Url.emailProtectionLink)
+    }
 }

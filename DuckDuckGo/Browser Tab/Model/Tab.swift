@@ -174,6 +174,18 @@ final class Tab: NSObject, Identifiable {
         super.init()
 
         setupWebView(shouldLoadInBackground: shouldLoadInBackground)
+
+        NotificationCenter.default.addObserver(self,
+                                               selector: #selector(onDuckDuckGoEmailSignOut),
+                                               name: .emailDidSignOut,
+                                               object: nil)
+    }
+
+    @objc func onDuckDuckGoEmailSignOut(_ notification: Notification) {
+        guard let url = webView.url else { return }
+        if EmailUrls().isDuckDuckGoEmailProtection(url: url) {
+            webView.evaluateJavaScript("window.postMessage({ emailProtectionSignedOut: true }, window.origin);")
+        }
     }
 
     deinit {
