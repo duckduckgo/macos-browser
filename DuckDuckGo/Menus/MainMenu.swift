@@ -120,10 +120,6 @@ final class MainMenu: NSMenu {
         subscribeToBookmarkList()
     }
 
-    // MARK: - Reopen Last Closed Tab / All Windows from Last Session
-
-    private let reopenMenuItemKeyEquivalentManager = ReopenMenuItemKeyEquivalentManager()
-
     // MARK: - Bookmarks
 
     var bookmarkListCancellable: AnyCancellable?
@@ -208,6 +204,7 @@ final class MainMenu: NSMenu {
     }
     // swiftlint:enable function_body_length
 
+    private let reopenMenuItemKeyEquivalentManager = ReopenMenuItemKeyEquivalentManager()
 }
 
 extension MainMenu: NSMenuDelegate {

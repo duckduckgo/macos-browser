@@ -50,13 +50,13 @@ final class WindowControllersManager {
 
     func updateIsInInitialState() {
         if isInInitialState {
-            let firstWindowTabs = mainWindowControllers.first?
-                .mainViewController
-                .tabCollectionViewModel
-                .tabs
-                .map(\.content)
 
-            isInInitialState = mainWindowControllers.isEmpty || (mainWindowControllers.count == 1 && firstWindowTabs == [.homePage])
+            isInInitialState = mainWindowControllers.isEmpty ||
+            (
+                mainWindowControllers.count == 1 &&
+                mainWindowControllers.first?.mainViewController.tabCollectionViewModel.tabs.count == 1 &&
+                mainWindowControllers.first?.mainViewController.tabCollectionViewModel.tabs.first?.content == .homePage
+            )
         }
     }
 
