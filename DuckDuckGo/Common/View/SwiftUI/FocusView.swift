@@ -28,15 +28,15 @@ final class FocusView: NSView {
     var defaultAction: (() -> Void)?
     var copyHandler: (() -> Void)?
     var onKeyDown: ((NSEvent) -> NSEvent?)?
-    var onAppear: ((FocusView) -> Void)? {
+    var onAppear: ((FocusView) -> Void)?
+    var onDisappear: ((FocusView) -> Void)?
+    var onFocus: ((FocusView, Bool) -> Void)? {
         didSet {
-            if let onAppear = onAppear, window != nil {
-                onAppear(self)
-            }
+            setupFirstResponderObserver()
         }
     }
 
-    private var focusCancellable: AnyCancellable?
+    private var firstResponderObserver: NSKeyValueObservation?
 
     private var _tag: Int
     override var tag: Int {
@@ -57,19 +57,6 @@ final class FocusView: NSView {
 
     required init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
-    }
-    
-    var onFocus: ((FocusView, Bool) -> Void)? {
-        didSet {
-            if let onFocus = onFocus {
-                focusCancellable = self.isFirstResponderPublisher().sink { [weak self] isFirstResponder in
-                    guard let self = self else { return }
-                    onFocus(self, isFirstResponder)
-                }
-            } else {
-                focusCancellable = nil
-            }
-        }
     }
 
     var isFirstResponder: Bool {
@@ -104,13 +91,11 @@ final class FocusView: NSView {
             .fill()
     }
 
-    @objc
-    func performClick(_ sender: Any) {
+    @objc func performClick(_ sender: Any) {
         defaultAction?()
     }
 
-    @objc
-    func copy(_ sender: Any) {
+    @objc func copy(_ sender: Any) {
         copyHandler?()
     }
 
@@ -123,10 +108,40 @@ final class FocusView: NSView {
         super.keyDown(with: event)
     }
 
+    override func viewWillMove(toWindow newWindow: NSWindow?) {
+        super.viewWillMove(toWindow: newWindow)
+        firstResponderObserver = nil
+        // if removed from view hierarchy while first responder: notify
+        if isFirstResponder, let onFocus = onFocus {
+            onFocus(self, false)
+        }
+    }
+
     override func viewDidMoveToWindow() {
         super.viewDidMoveToWindow()
-        if let onAppear = onAppear, window != nil {
-            onAppear(self)
+
+        if window != nil {
+            setupFirstResponderObserver()
+            onAppear?(self)
+        } else {
+            onDisappear?(self)
+        }
+    }
+
+    private func setupFirstResponderObserver() {
+        guard let onFocus = onFocus,
+              self.window != nil
+        else {
+            firstResponderObserver = nil
+            return
+        }
+        firstResponderObserver = self.window?.observe(\.firstResponder, options: [.initial, .new, .old]) { [weak self] _, change in
+            guard let self = self else { return }
+            if change.oldValue ?? nil !== self && change.newValue ?? nil === self {
+                onFocus(self, true)
+            } else if change.oldValue ?? nil === self && change.newValue ?? nil !== self {
+                onFocus(self, false)
+            }
         }
     }
 
@@ -148,29 +163,7 @@ struct FocusSwiftUIView: NSViewRepresentable {
 
     func makeNSView(context: Context) -> FocusView {
         let view = FocusView(tag: tag)
-        view.shouldDrawFocusRing = focusRing
-        view.shouldActivateOnMouseDown = onClick
-        if let action = action {
-            view.defaultAction = action
-        } else if let menu = menu {
-            view.menu = menu()
-            view.defaultAction = { [weak view] in
-                view?.menu?.popUp(positioning: nil, at: .zero, in: view)
-            }
-        }
-        view.copyHandler = onCopy
-        view.onKeyDown = keyDown
-        if onFocus != nil || onViewFocused != nil {
-            view.onFocus = { view, isFirstResponder in
-                onFocus?(isFirstResponder)
-                if isFirstResponder {
-                    onViewFocused?(view)
-                }
-            }
-        }
-        view.onAppear = onAppear
-        view.tag = tag
-        view.cornerRadius = cornerRadius ?? 4
+        updateNSView(view, context: context)
 
         return view
     }
@@ -184,19 +177,35 @@ struct FocusSwiftUIView: NSViewRepresentable {
                 view?.menu?.popUp(positioning: nil, at: NSPoint(x: 0, y: -4), in: view)
             }
         }
+        view.shouldDrawFocusRing = focusRing
+        view.shouldActivateOnMouseDown = onClick
         view.copyHandler = onCopy
         view.onKeyDown = keyDown
-        if onFocus != nil || onViewFocused != nil {
-            view.onFocus = { view, isFirstResponder in
-                onFocus?(isFirstResponder)
-                if isFirstResponder {
-                    onViewFocused?(view)
-                }
-            }
-        }
-        view.onAppear = onAppear
+        view.onFocus = onFocusHandler()
         view.tag = tag
         view.cornerRadius = cornerRadius ?? 4
+        view.onAppear = onAppear
+        view.onDisappear = { view in
+            view.defaultAction = nil
+            view.copyHandler = nil
+            view.onKeyDown = nil
+            view.onAppear = nil
+        }
+
+        if let onAppear = onAppear,
+           view.window != nil {
+            onAppear(view)
+        }
+    }
+
+    private func onFocusHandler() -> ((FocusView, Bool) -> Void)? {
+        guard onFocus != nil || onViewFocused != nil else { return nil }
+        return { [onFocus, onViewFocused] view, isFirstResponder in
+            onFocus?(isFirstResponder)
+            if isFirstResponder {
+                onViewFocused?(view)
+            }
+        }
     }
 
 }

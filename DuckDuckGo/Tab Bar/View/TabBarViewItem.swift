@@ -103,6 +103,7 @@ final class TabBarViewItem: NSCollectionViewItem {
 
     private var currentURL: URL?
     private var cancellables = Set<AnyCancellable>()
+    private var closeButtonFirstResponderObserver: NSKeyValueObservation?
 
     weak var delegate: TabBarViewItemDelegate?
 
@@ -123,9 +124,16 @@ final class TabBarViewItem: NSCollectionViewItem {
         updateSubviews()
     }
 
+    override func viewDidAppear() {
+        super.viewDidAppear()
+        self.lastKnownIndexPath = self.collectionView?.indexPath(for: self)
+        setupCloseButtonFirstResponderObserver()
+    }
+
     override func viewWillDisappear() {
         super.viewWillDisappear()
         commandPressedMonitor = nil
+        closeButtonFirstResponderObserver = nil
     }
 
     deinit {
@@ -171,11 +179,6 @@ final class TabBarViewItem: NSCollectionViewItem {
 
     var indexPath: IndexPath? {
         collectionView?.indexPath(for: self) ?? lastKnownIndexPath
-    }
-
-    override func viewDidAppear() {
-        super.viewDidAppear()
-        self.lastKnownIndexPath = self.collectionView?.indexPath(for: self)
     }
 
     func scrollIntoView(completionHandler: ((Bool) -> Void)? = nil) {
@@ -252,10 +255,17 @@ final class TabBarViewItem: NSCollectionViewItem {
         }.store(in: &cancellables)
         // TODO: Used permissions/url? accessibility // swiftlint:disable:this todo
         tabViewModel.$usedPermissions.assign(to: \.usedPermissions, onWeaklyHeld: self).store(in: &cancellables)
+    }
 
-        closeButton.isFirstResponderPublisher().sink { [weak self] _ in
-            self?.updateSubviews()
-        }.store(in: &cancellables)
+    private func setupCloseButtonFirstResponderObserver() {
+        closeButtonFirstResponderObserver = self.closeButton.window?
+            .observe(\.firstResponder, options: [.initial, .new, .old]) { [weak self] _, change in
+                guard let self = self,
+                      change.oldValue ?? nil === self.closeButton || change.newValue ?? nil === self.closeButton
+                else { return }
+
+                self.updateSubviews()
+        }
     }
 
     func clear() {

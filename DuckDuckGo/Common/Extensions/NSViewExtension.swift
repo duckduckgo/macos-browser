@@ -50,12 +50,6 @@ extension NSView {
         return containerView
     }
 
-    func isFirstResponderPublisher() -> AnyPublisher<Bool, Never> {
-        self.publisher(for: \.window?.firstResponder).map { [weak self] firstResponder -> Bool in
-            firstResponder === self
-        }.removeDuplicates().eraseToAnyPublisher()
-    }
-
     var isVisible: Bool {
         return !isHidden && window != nil && alphaValue > 0.0
     }

@@ -107,7 +107,6 @@ struct FavoriteTemplate: View {
 
     var body: some View {
         VStack(spacing: 5) {
-
             ZStack(alignment: .center) {
 
                 RoundedRectangle(cornerRadius: 12)
@@ -121,7 +120,7 @@ struct FavoriteTemplate: View {
             }
             .frame(width: 64, height: 64)
             .clipped()
-            .focusable(tag: tag, action: action, keyDown: { event in
+            .focusable(tag: tag, cornerRadius: 12, action: action, keyDown: { event in
                 let hasModifier = NSApp.isCommandPressed || NSApp.isOptionPressed
                 switch Int(event.keyCode) {
                 case kVK_LeftArrow:
@@ -173,7 +172,7 @@ struct FavoriteTemplate: View {
             }
 
         case .leftMost:
-            return tag - index
+            return max(tag - index, FavoriteTemplate.tagBase)
 
         case .right:
             if (tag - FavoriteTemplate.tagBase) + 1 < count {
@@ -183,7 +182,7 @@ struct FavoriteTemplate: View {
             }
 
         case .rightMost:
-            return tag + (HomePage.favoritesPerRow - index - 1)
+            return min(tag + (HomePage.favoritesPerRow - index - 1), FavoriteTemplate.tagBase + count - 1)
 
         case .up:
             if row > 0 {

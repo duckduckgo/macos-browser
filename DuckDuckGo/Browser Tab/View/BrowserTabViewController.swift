@@ -212,6 +212,7 @@ final class BrowserTabViewController: NSViewController {
     func adjustFirstResponder() {
         switch tabViewModel?.tab.content ?? .none {
         case .homePage:
+            view.window?.recalculateKeyViewLoop()
             homePageView.nextValidKeyView?.makeMeFirstResponder()
         case .onboarding:
             onboardingViewController?.adjustFirstResponder()

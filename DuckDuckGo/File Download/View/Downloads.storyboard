@@ -29,13 +29,13 @@
                                             <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
                                         </textFieldCell>
                                     </textField>
-                                    <button translatesAutoresizingMaskIntoConstraints="NO" id="aKx-1h-4hp" userLabel="Downloads Button" customClass="MouseOverButton" customModule="DuckDuckGo_Privacy_Browser" customModuleProvider="target">
+                                    <button focusRingType="exterior" translatesAutoresizingMaskIntoConstraints="NO" id="aKx-1h-4hp" userLabel="Downloads Button" customClass="MouseOverButton" customModule="DuckDuckGo_Privacy_Browser" customModuleProvider="target">
                                         <rect key="frame" x="291" y="447" width="32" height="32"/>
                                         <constraints>
                                             <constraint firstAttribute="width" constant="32" id="qmK-lZ-dXW"/>
                                             <constraint firstAttribute="height" constant="32" id="x7g-Vs-qTK"/>
                                         </constraints>
-                                        <buttonCell key="cell" type="square" bezelStyle="shadowlessSquare" image="OpenDownloadsFolder" imagePosition="only" alignment="center" imageScaling="proportionallyDown" inset="2" id="zPp-Ue-FE8">
+                                        <buttonCell key="cell" type="square" bezelStyle="shadowlessSquare" image="OpenDownloadsFolder" imagePosition="only" alignment="center" focusRingType="exterior" imageScaling="proportionallyDown" inset="2" id="zPp-Ue-FE8">
                                             <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
                                             <font key="font" metaFont="system"/>
                                         </buttonCell>
@@ -58,13 +58,13 @@
                                             <action selector="openDownloadsFolderAction:" target="luO-ux-o3b" id="8Eo-z4-5r2"/>
                                         </connections>
                                     </button>
-                                    <button translatesAutoresizingMaskIntoConstraints="NO" id="cev-k6-wFH" userLabel="Downloads Button" customClass="MouseOverButton" customModule="DuckDuckGo_Privacy_Browser" customModuleProvider="target">
+                                    <button focusRingType="exterior" translatesAutoresizingMaskIntoConstraints="NO" id="cev-k6-wFH" userLabel="Downloads Button" customClass="MouseOverButton" customModule="DuckDuckGo_Privacy_Browser" customModuleProvider="target">
                                         <rect key="frame" x="323" y="447" width="32" height="32"/>
                                         <constraints>
                                             <constraint firstAttribute="width" constant="32" id="3WQ-PO-rHo"/>
                                             <constraint firstAttribute="height" constant="32" id="mKF-nC-42R"/>
                                         </constraints>
-                                        <buttonCell key="cell" type="square" bezelStyle="shadowlessSquare" image="ClearDownloads" imagePosition="only" alignment="center" imageScaling="proportionallyDown" inset="2" id="rtz-Fb-5yl">
+                                        <buttonCell key="cell" type="square" bezelStyle="shadowlessSquare" image="ClearDownloads" imagePosition="only" alignment="center" focusRingType="exterior" imageScaling="proportionallyDown" inset="2" id="rtz-Fb-5yl">
                                             <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
                                             <font key="font" metaFont="system"/>
                                         </buttonCell>

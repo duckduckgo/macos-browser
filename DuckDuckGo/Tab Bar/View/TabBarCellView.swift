@@ -56,10 +56,12 @@ final class TabBarCellView: NSView {
 
     private func didResignFirstResponder() {
         setAccessibilityFocused(false)
-        guard (window?.firstResponder is TabBarCellView) != true else {
-            return
+        DispatchQueue.main.async { [weak self] in
+            guard (self?.window?.firstResponder is TabBarCellView) != true else {
+                return
+            }
+            self?.removeFocusRing()
         }
-        removeFocusRing()
     }
 
     private func focusRingClipView(createIfNeeded: Bool) -> FocusRingClipView? {
