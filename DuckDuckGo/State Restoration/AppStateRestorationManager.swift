@@ -19,13 +19,13 @@
 import Foundation
 import Combine
 import os.log
-import Sparkle
 
 final class AppStateRestorationManager: NSObject {
     static let fileName = "persistentState"
 
     private let service: StatePersistenceService
-    private var cancellable: AnyCancellable!
+    private var appWillRelaunchCancellable: AnyCancellable?
+    private var stateChangedCancellable: AnyCancellable?
 
     @UserDefaultsWrapper(key: .appIsRelaunchingAutomatically, defaultValue: false)
     private var appIsRelaunchingAutomatically: Bool
@@ -42,6 +42,12 @@ final class AppStateRestorationManager: NSObject {
     ) {
         self.service = service
         self.shouldRestorePreviousSession = shouldRestorePreviousSession
+    }
+
+    func subscribeToAutomaticAppRelaunching(using relaunchPublisher: AnyPublisher<Void, Never>) {
+        appWillRelaunchCancellable = relaunchPublisher
+            .map { true }
+            .assign(to: \.appIsRelaunchingAutomatically, onWeaklyHeld: self)
     }
 
     var canRestoreLastSessionState: Bool {
@@ -67,10 +73,11 @@ final class AppStateRestorationManager: NSObject {
     }
 
     func applicationDidFinishLaunching() {
-        readLastSessionState(restore: shouldRestorePreviousSession || appIsRelaunchingAutomatically)
+        let isRelaunchingAutomatically = appIsRelaunchingAutomatically
         appIsRelaunchingAutomatically = false
+        readLastSessionState(restore: shouldRestorePreviousSession || isRelaunchingAutomatically)
 
-        cancellable = WindowControllersManager.shared.stateChanged
+        stateChangedCancellable = WindowControllersManager.shared.stateChanged
             .debounce(for: .seconds(1), scheduler: RunLoop.main)
             // There is a favicon assignment after a restored tab loads that triggered unnecessary
             // saving of the state
@@ -81,7 +88,7 @@ final class AppStateRestorationManager: NSObject {
     }
 
     func applicationWillTerminate() {
-        cancellable.cancel()
+        stateChangedCancellable?.cancel()
         if WindowControllersManager.shared.isInInitialState {
             service.clearState(sync: true)
         } else {
@@ -98,11 +105,5 @@ final class AppStateRestorationManager: NSObject {
 
     private func persistAppState(sync: Bool = false) {
         service.persistState(using: WindowControllersManager.shared.encodeState(with:), sync: sync)
-    }
-}
-
-extension AppStateRestorationManager: SUUpdaterDelegate {
-    func updaterWillRelaunchApplication(_ updater: SUUpdater) {
-        appIsRelaunchingAutomatically = true
     }
 }
