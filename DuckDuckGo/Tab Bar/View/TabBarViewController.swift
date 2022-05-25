@@ -749,7 +749,6 @@ extension TabBarViewController: TabBarViewItemDelegate {
             return
         }
         tabCollectionViewModel.select(at: indexPath.item)
-        // TODO: Scroll? // swiftlint:disable:this todo
     }
 
     func tabBarViewItem(_ tabBarViewItem: TabBarViewItem, isMouseOver: Bool) {

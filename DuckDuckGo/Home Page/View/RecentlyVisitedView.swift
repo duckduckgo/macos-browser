@@ -54,14 +54,14 @@ struct RecentlyVisited: View {
                     }
 
                     if !model.recentSites.isEmpty {
-                        // Switch focus to the last RecentlyVisited item when Shift+Tabbing into the Home Page
+                        // Fake focusable item to switch focus to the last RecentlyVisited item when Shift+Tabbing into the Home Page
                         Text("").focusable(focusRing: false, onViewFocused: { _ in
                             guard !model.recentSites.isEmpty,
                                   model.focusItem == nil
                             else { return }
                             let index = model.recentSites.count - 1
                             scrollTo(.init(rawValue: index))
-                            model.focusChaged(to: true, for: .init(index: index, position: .burn))
+                            model.focusChaged(to: true, for: .init(index: index, position: .burn)) // TODO: last link not burn
                         })
                     }
 
@@ -262,7 +262,7 @@ struct RecentlyVisitedSite: View {
     private func moveFocus(to position: FocusPosition, at index: Int) {
         let focusItem = FocusItem(index: index, position: position)
 
-        if #available(macOS 12, *) {
+        if #available(macOS 11, *) {
             scrollTo(index)
             model.focusChaged(to: true, for: focusItem)
             return
