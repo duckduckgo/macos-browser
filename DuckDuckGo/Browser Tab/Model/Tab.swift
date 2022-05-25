@@ -174,6 +174,18 @@ final class Tab: NSObject, Identifiable {
         super.init()
 
         setupWebView(shouldLoadInBackground: shouldLoadInBackground)
+
+        NotificationCenter.default.addObserver(self,
+                                               selector: #selector(onDuckDuckGoEmailSignOut),
+                                               name: .emailDidSignOut,
+                                               object: nil)
+    }
+
+    @objc func onDuckDuckGoEmailSignOut(_ notification: Notification) {
+        guard let url = webView.url else { return }
+        if EmailUrls().isDuckDuckGoEmailProtection(url: url) {
+            webView.evaluateJavaScript("window.postMessage({ emailProtectionSignedOut: true }, window.origin);")
+        }
     }
 
     deinit {
@@ -210,6 +222,8 @@ final class Tab: NSObject, Identifiable {
     var fbBlockingEnabled = true
 
     var isLazyLoadingInProgress = false
+
+    private var isBeingRedirected: Bool = false
 
     @Published private(set) var content: TabContent {
         didSet {
@@ -424,16 +438,24 @@ final class Tab: NSObject, Identifiable {
 
     @MainActor
     private func reloadIfNeeded(shouldLoadInBackground: Bool = false) async {
-        let url = await linkProtection.getCleanURL(from: contentURL, onStartExtracting: {
-            isAMPProtectionExtracting = true
-        }, onFinishExtracting: { [weak self]
-            in self?.isAMPProtectionExtracting = false
-
-        })
+        let url: URL = await {
+            if contentURL.isFileURL {
+                return contentURL
+            }
+            return await linkProtection.getCleanURL(from: contentURL, onStartExtracting: {
+                isAMPProtectionExtracting = true
+            }, onFinishExtracting: { [weak self]
+                in self?.isAMPProtectionExtracting = false
+            })
+        }()
         if shouldLoadURL(url, shouldLoadInBackground: shouldLoadInBackground) {
             let didRestore = restoreSessionStateDataIfNeeded()
             if !didRestore {
-                webView.load(url)
+                if url.isFileURL {
+                    webView.loadFileURL(url, allowingReadAccessTo: URL(fileURLWithPath: "/"))
+                } else {
+                    webView.load(url)
+                }
             }
         }
     }
@@ -477,6 +499,9 @@ final class Tab: NSObject, Identifiable {
     private func restoreSessionStateDataIfNeeded() -> Bool {
         var didRestore: Bool = false
         if let sessionStateData = self.sessionStateData {
+            if contentURL.isFileURL {
+                webView.loadFileURL(contentURL, allowingReadAccessTo: URL(fileURLWithPath: "/"))
+            }
             do {
                 try webView.restoreSessionState(from: sessionStateData)
                 didRestore = true
@@ -889,6 +914,17 @@ extension Tab: WKNavigationDelegate {
         }
     }
 
+    func webView(_ webView: WKWebView, didReceiveServerRedirectForProvisionalNavigation navigation: WKNavigation!) {
+        isBeingRedirected = true
+    }
+
+    func webView(_ webView: WKWebView, didCommit navigation: WKNavigation!) {
+        isBeingRedirected = false
+        if let url = webView.url {
+            addVisit(of: url)
+        }
+    }
+
     struct Constants {
         static let webkitMiddleClick = 4
     }
@@ -898,6 +934,10 @@ extension Tab: WKNavigationDelegate {
     @MainActor
     func webView(_ webView: WKWebView,
                  decidePolicyFor navigationAction: WKNavigationAction) async -> WKNavigationActionPolicy {
+
+        if navigationAction.request.url?.isFileURL ?? false {
+            return .allow
+        }
 
         let isRequestingNewTab = isRequestingNewTab(navigationAction: navigationAction)
         // This check needs to happen before GPC checks. Otherwise the navigation type may be rewritten to `.other`
@@ -1033,6 +1073,7 @@ extension Tab: WKNavigationDelegate {
         setConnectionUpgradedTo(upgradedURL, navigationAction: navigationAction)
     }
 
+    @MainActor
     private func prepareForContentBlocking() async {
         // Ensure Content Blocking Assets (WKContentRuleList&UserScripts) are installed
         if !userContentController.contentBlockingAssetsInstalled {
@@ -1084,9 +1125,13 @@ extension Tab: WKNavigationDelegate {
                 }
                 currentDownload = navigationResponse.response.url
             }
-            // register the navigationResponse for legacy _WKDownload to be called back on the Tab
-            // further download will be passed to webView:navigationResponse:didBecomeDownload:
-            return .download(navigationResponse, using: webView)
+
+            let isSuccessfulResponse = (navigationResponse.response as? HTTPURLResponse)?.validateStatusCode(statusCode: 200..<300) == nil
+            if isSuccessfulResponse {
+                // register the navigationResponse for legacy _WKDownload to be called back on the Tab
+                // further download will be passed to webView:navigationResponse:didBecomeDownload:
+                return .download(navigationResponse, using: webView)
+            }
         }
 
         return .allow
@@ -1101,13 +1146,16 @@ extension Tab: WKNavigationDelegate {
         invalidateSessionStateData()
         resetDashboardInfo()
         linkProtection.cancelOngoingExtraction()
+        linkProtection.setMainFrameUrl(webView.url)
     }
 
     @MainActor
     func webView(_ webView: WKWebView, didFinish navigation: WKNavigation!) {
+        isBeingRedirected = false
         invalidateSessionStateData()
         webViewDidFinishNavigationPublisher.send()
         if isAMPProtectionExtracting { isAMPProtectionExtracting = false }
+        linkProtection.setMainFrameUrl(nil)
     }
 
     func webView(_ webView: WKWebView, didFail navigation: WKNavigation!, withError error: Error) {
@@ -1115,8 +1163,10 @@ extension Tab: WKNavigationDelegate {
         // https://app.asana.com/0/1199230911884351/1200381133504356/f
         //        hasError = true
 
+        isBeingRedirected = false
         webViewDidFailNavigationPublisher.send()
         invalidateSessionStateData()
+        linkProtection.setMainFrameUrl(nil)
     }
 
     func webView(_ webView: WKWebView, didFailProvisionalNavigation navigation: WKNavigation!, withError error: Error) {
@@ -1129,6 +1179,8 @@ extension Tab: WKNavigationDelegate {
         }
 
         self.error = error
+        isBeingRedirected = false
+        linkProtection.setMainFrameUrl(nil)
         webViewDidFailNavigationPublisher.send()
     }
 

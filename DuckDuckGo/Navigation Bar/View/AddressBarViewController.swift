@@ -69,8 +69,6 @@ final class AddressBarViewController: NSViewController {
 
     private var cancellables = Set<AnyCancellable>()
     private var passiveAddressBarStringCancellable: AnyCancellable?
-    private var suggestionsVisibleCancellable: AnyCancellable?
-    private var frameCancellable: AnyCancellable?
 
     private var progressCancellable: AnyCancellable?
     private var loadingCancellable: AnyCancellable?
@@ -140,6 +138,7 @@ final class AddressBarViewController: NSViewController {
             addMouseMonitors()
         }
         subscribeToButtonsWidth()
+        subscribeForShadowViewUpdates()
     }
 
     // swiftlint:disable notification_center_detachment
@@ -250,18 +249,32 @@ final class AddressBarViewController: NSViewController {
         }
     }
 
-    func subscribeToButtonsWidth() {
-        addressBarButtonsViewController!.$buttonsWidth.assign(to: \.constant, onWeaklyHeld: passiveTextFieldMinXConstraint)
+    private func subscribeToButtonsWidth() {
+        addressBarButtonsViewController!.$buttonsWidth
+            .assign(to: \.constant, onWeaklyHeld: passiveTextFieldMinXConstraint)
+            .store(in: &cancellables)
+    }
+
+    private func subscribeForShadowViewUpdates() {
+        addressBarTextField.suggestionWindowVisible
+            .sink { [weak self] isSuggestionsWindowVisible in
+                self?.updateShadowView(isSuggestionsWindowVisible)
+            }
+            .store(in: &cancellables)
+
+        view.superview?.publisher(for: \.frame)
+            .sink { [weak self] _ in
+                self?.layoutShadowView()
+            }
             .store(in: &cancellables)
     }
 
     private func updateView() {
-
         let isPassiveTextFieldHidden = isFirstResponder || mode.isEditing
         addressBarTextField.alphaValue = isPassiveTextFieldHidden ? 1 : 0
         passiveTextField.alphaValue = isPassiveTextFieldHidden ? 0 : 1
 
-        updateShadowView(firstResponder: isFirstResponder)
+        updateShadowViewPresence(isFirstResponder)
         inactiveBackgroundView.alphaValue = isFirstResponder ? 0 : 1
         activeBackgroundView.alphaValue = isFirstResponder ? 1 : 0
 
@@ -272,29 +285,26 @@ final class AddressBarViewController: NSViewController {
         activeBackgroundView.layer?.borderColor = NSColor.controlAccentColor.withAlphaComponent(0.8).cgColor
     }
 
-    private func updateShadowView(firstResponder: Bool) {
-        guard firstResponder,
-            view.window?.isPopUpWindow == false
-        else {
-            suggestionsVisibleCancellable = nil
-            frameCancellable = nil
+    private func updateShadowViewPresence(_ isFirstResponder: Bool) {
+        guard isFirstResponder, view.window?.isPopUpWindow == false else {
             shadowView.removeFromSuperview()
             return
         }
-
-        suggestionsVisibleCancellable = addressBarTextField.suggestionWindowVisible.sink { [weak self] visible in
-            self?.shadowView.shadowSides = visible ? [.left, .top, .right] : []
-            self?.shadowView.shadowColor = visible ? .suggestionsShadowColor : .clear
-            self?.shadowView.shadowRadius = visible ? 8.0 : 0.0
-
-            self?.activeOuterBorderView.isHidden = visible
-            self?.activeBackgroundView.isHidden = visible
-            self?.activeBackgroundViewWithSuggestions.isHidden = !visible
+        if shadowView.superview == nil {
+            updateShadowView(addressBarTextField.isSuggestionWindowVisible)
+            view.window?.contentView?.addSubview(shadowView)
+            layoutShadowView()
         }
-        frameCancellable = self.view.superview?.publisher(for: \.frame).sink { [weak self] _ in
-            self?.layoutShadowView()
-        }
-        view.window?.contentView?.addSubview(shadowView)
+    }
+
+    private func updateShadowView(_ isSuggestionsWindowVisible: Bool) {
+        shadowView.shadowSides = isSuggestionsWindowVisible ? [.left, .top, .right] : []
+        shadowView.shadowColor = isSuggestionsWindowVisible ? .suggestionsShadowColor : .clear
+        shadowView.shadowRadius = isSuggestionsWindowVisible ? 8.0 : 0.0
+
+        activeOuterBorderView.isHidden = isSuggestionsWindowVisible
+        activeBackgroundView.isHidden = isSuggestionsWindowVisible
+        activeBackgroundViewWithSuggestions.isHidden = !isSuggestionsWindowVisible
     }
 
     private func layoutShadowView() {

@@ -57,22 +57,13 @@ enum ThirdPartyBrowser: CaseIterable {
 
     var isInstalled: Bool {
         let detectedApplicationPath = applicationPath != nil
-        let detectedBrowserProfiles = !(browserProfiles?.profiles.isEmpty ?? false)
+        let detectedBrowserProfiles = !(browserProfiles()?.profiles.isEmpty ?? false)
 
         return detectedApplicationPath && detectedBrowserProfiles
     }
 
     var isRunning: Bool {
         return !findRunningApplications().isEmpty
-    }
-
-    var shouldQuitBeforeImport: Bool {
-        switch self {
-        case .brave, .chrome, .edge, .firefox:
-            return true
-        case .safari, .lastPass, .onePassword:
-            return false
-        }
     }
 
     var importSource: DataImport.Source {
@@ -105,24 +96,6 @@ enum ThirdPartyBrowser: CaseIterable {
         }
     }
 
-    var browserProfiles: DataImport.BrowserProfileList? {
-        guard let profilePath = profilesDirectory(),
-              let potentialProfileURLs = try? FileManager.default.contentsOfDirectory(at: profilePath,
-                                                                                      includingPropertiesForKeys: nil,
-                                                                                      options: [.skipsHiddenFiles]).filter(\.hasDirectoryPath) else {
-            // Safari is an exception, as it may need permissions granted before being able to read the contents of the profile path. To be safe,
-            // return the profile anyway and check the file system permissions when preparing to import.
-            if self == .safari,
-               let profilePath = profilesDirectory() {
-                return DataImport.BrowserProfileList(browser: self, profileURLs: [profilePath])
-            } else {
-                return nil
-            }
-        }
-
-        return DataImport.BrowserProfileList(browser: self, profileURLs: potentialProfileURLs)
-    }
-
     // Returns the first available path to the application. This will test the production bundle ID, and any known pre-release versions, such as the
     // Firefox Nightly build.
     private var applicationPath: String? {
@@ -147,7 +120,8 @@ enum ThirdPartyBrowser: CaseIterable {
         case .safari: return BundleIdentifiers(productionBundleID: "com.apple.safari", relatedBundleIDs: [])
         case .onePassword: return BundleIdentifiers(productionBundleID: "com.agilebits.onepassword7", relatedBundleIDs: [
             "com.agilebits.onepassword",
-            "com.agilebits.onepassword4"
+            "com.agilebits.onepassword4",
+            "com.1password.1password"
         ])
         case .lastPass: return BundleIdentifiers(productionBundleID: "com.lastpass.lastpassmacdesktop", relatedBundleIDs: [
             "com.lastpass.lastpass"
@@ -162,6 +136,26 @@ enum ThirdPartyBrowser: CaseIterable {
             $0.forceTerminate()
         }
     }
+    
+    func browserProfiles(supportDirectoryURL: URL? = nil) -> DataImport.BrowserProfileList? {
+        let applicationSupportURL = supportDirectoryURL ?? FileManager.default.urls(for: .applicationSupportDirectory, in: .userDomainMask)[0]
+        
+        guard let profilePath = profilesDirectory(applicationSupportURL: applicationSupportURL),
+              let potentialProfileURLs = try? FileManager.default.contentsOfDirectory(at: profilePath,
+                                                                                      includingPropertiesForKeys: nil,
+                                                                                      options: [.skipsHiddenFiles]).filter(\.hasDirectoryPath) else {
+            // Safari is an exception, as it may need permissions granted before being able to read the contents of the profile path. To be safe,
+            // return the profile anyway and check the file system permissions when preparing to import.
+            if self == .safari,
+               let profilePath = profilesDirectory(applicationSupportURL: applicationSupportURL) {
+                return DataImport.BrowserProfileList(browser: self, profileURLs: [profilePath])
+            } else {
+                return nil
+            }
+        }
+
+        return DataImport.BrowserProfileList(browser: self, profileURLs: potentialProfileURLs)
+    }
 
     private func findRunningApplications() -> [NSRunningApplication] {
         var applications = [NSRunningApplication]()
@@ -175,9 +169,7 @@ enum ThirdPartyBrowser: CaseIterable {
     }
 
     // Returns the URL to the profiles for a given browser. This directory will contain a list of directories, each representing a profile.
-    private func profilesDirectory() -> URL? {
-        let applicationSupportURL = FileManager.default.urls(for: .applicationSupportDirectory, in: .userDomainMask)[0]
-
+    private func profilesDirectory(applicationSupportURL: URL) -> URL? {
         switch self {
         case .brave: return applicationSupportURL.appendingPathComponent("BraveSoftware/Brave-Browser/")
         case .chrome: return applicationSupportURL.appendingPathComponent("Google/Chrome/")

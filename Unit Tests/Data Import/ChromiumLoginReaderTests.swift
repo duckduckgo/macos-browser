@@ -27,12 +27,11 @@ private struct ChromiumLoginStore {
     let directory: String
     let decryptionKey: String
 
-    var databaseDirectoryPath: String {
+    var databaseDirectoryURL: URL {
         let bundle = Bundle(for: ChromiumLoginReaderTests.self)
         return bundle.resourceURL!
             .appendingPathComponent("Data Import Resources/Test Chrome Data")
             .appendingPathComponent(directory)
-            .path
     }
 }
 
@@ -40,7 +39,7 @@ class ChromiumLoginReaderTests: XCTestCase {
 
     func testImportFromVersion32() throws {
         let reader = ChromiumLoginReader(
-            chromiumDataDirectoryPath: ChromiumLoginStore.v32.databaseDirectoryPath,
+            chromiumDataDirectoryURL: ChromiumLoginStore.v32.databaseDirectoryURL,
             processName: "Chrome",
             decryptionKey: ChromiumLoginStore.v32.decryptionKey
         )
@@ -68,7 +67,7 @@ class ChromiumLoginReaderTests: XCTestCase {
     func testImportFromLegacyVersion() throws {
 
         let reader = ChromiumLoginReader(
-            chromiumDataDirectoryPath: ChromiumLoginStore.legacy.databaseDirectoryPath,
+            chromiumDataDirectoryURL: ChromiumLoginStore.legacy.databaseDirectoryURL,
             processName: "Chrome",
             decryptionKey: ChromiumLoginStore.legacy.decryptionKey
         )
