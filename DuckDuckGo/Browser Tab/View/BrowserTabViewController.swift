@@ -121,7 +121,6 @@ final class BrowserTabViewController: NSViewController {
                 self?.subscribeToTabContent(of: selectedTabViewModel)
             }
             .store(in: &cancellables)
-
     }
 
     private func subscribeToTabs() {
