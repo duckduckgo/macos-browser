@@ -94,8 +94,10 @@ final class LocalBookmarkStore: BookmarkStore {
             fetchRequest.returnsObjectsAsFaults = false
 
             do {
-                let results = try self.context.fetch(fetchRequest)
-                let entities = results.compactMap { BaseBookmarkEntity.from(managedObject: $0) }
+                let results: [BookmarkManagedObject] = try self.context.fetch(fetchRequest)
+                let entities: [BaseBookmarkEntity] = results.compactMap { entity in
+                    BaseBookmarkEntity.from(managedObject: entity, parentFolderUUID: entity.parentFolder?.id)
+                }
 
                 mainQueueCompletion(bookmarks: entities, error: nil)
             } catch let error {
@@ -283,7 +285,7 @@ final class LocalBookmarkStore: BookmarkStore {
             }
 
             bookmarkManagedObjects.forEach { managedObject in
-                if let entity = BaseBookmarkEntity.from(managedObject: managedObject) {
+                if let entity = BaseBookmarkEntity.from(managedObject: managedObject, parentFolderUUID: nil) {
                     update(entity)
                     managedObject.update(with: entity)
                 }

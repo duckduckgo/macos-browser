@@ -33,6 +33,7 @@ protocol BookmarkManager: AnyObject {
     func update(bookmark: Bookmark)
     func update(folder: BookmarkFolder)
     @discardableResult func updateUrl(of bookmark: Bookmark, to newUrl: URL) -> Bookmark?
+    func add(bookmark: Bookmark, to parent: BookmarkFolder?, completion: @escaping (Error?) -> Void)
     func add(objectsWithUUIDs uuids: [UUID], to parent: BookmarkFolder?, completion: @escaping (Error?) -> Void)
     func update(objectsWithUUIDs uuids: [UUID], update: @escaping (BaseBookmarkEntity) -> Void, completion: @escaping (Error?) -> Void)
     func importBookmarks(_ bookmarks: ImportedBookmarks, source: BookmarkImportSource) -> BookmarkImportResult
@@ -107,7 +108,7 @@ final class LocalBookmarkManager: BookmarkManager {
         }
 
         let id = UUID()
-        let bookmark = Bookmark(id: id, url: url, title: title, isFavorite: isFavorite)
+        let bookmark = Bookmark(id: id, url: url, title: title, isFavorite: isFavorite, parentFolderUUID: nil)
 
         list?.insert(bookmark)
         bookmarkStore.save(bookmark: bookmark, parent: nil) { [weak self] success, _  in
@@ -193,6 +194,10 @@ final class LocalBookmarkManager: BookmarkManager {
         return folder
     }
 
+    func add(bookmark: Bookmark, to parent: BookmarkFolder?, completion: @escaping (Error?) -> Void) {
+        add(objectsWithUUIDs: [bookmark.id], to: parent, completion: completion)
+    }
+    
     func add(objectsWithUUIDs uuids: [UUID], to parent: BookmarkFolder?, completion: @escaping (Error?) -> Void) {
         bookmarkStore.add(objectsWithUUIDs: uuids, to: parent) { [weak self] error in
             self?.loadBookmarks()

@@ -55,7 +55,7 @@ internal class BaseBookmarkEntity {
         self.isFolder = isFolder
     }
 
-    static func from(managedObject: BookmarkManagedObject, parentFolderUUID: UUID? = nil) -> BaseBookmarkEntity? {
+    static func from(managedObject: BookmarkManagedObject, parentFolderUUID: UUID?) -> BaseBookmarkEntity? {
         guard let id = managedObject.id,
               let title = managedObject.titleEncrypted as? String else {
             assertionFailure("\(#file): Failed to create BaseBookmarkEntity from BookmarkManagedObject")
@@ -135,7 +135,7 @@ final class Bookmark: BaseBookmarkEntity {
 
     let url: URL
     var isFavorite: Bool
-    var parentFolderUUID: UUID?
+    private(set) var parentFolderUUID: UUID?
 
     // Property oldFavicon can be removed in future updates when favicon cache is built
     var oldFavicon: NSImage?
@@ -149,9 +149,8 @@ final class Bookmark: BaseBookmarkEntity {
          title: String,
          oldFavicon: NSImage? = nil,
          isFavorite: Bool,
-         parentFolderUUID: UUID? = nil,
+         parentFolderUUID: UUID?,
          faviconManagement: FaviconManagement = FaviconManager.shared) {
-
         self.url = url
         self.oldFavicon = oldFavicon
         self.isFavorite = isFavorite
@@ -166,7 +165,8 @@ final class Bookmark: BaseBookmarkEntity {
                   url: newUrl,
                   title: bookmark.title,
                   oldFavicon: nil,
-                  isFavorite: bookmark.isFavorite)
+                  isFavorite: bookmark.isFavorite,
+                  parentFolderUUID: bookmark.parentFolderUUID)
     }
 
 }
