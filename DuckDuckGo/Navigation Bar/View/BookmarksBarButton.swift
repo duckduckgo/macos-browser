@@ -22,6 +22,17 @@ final class BookmarksBarButton: NSButton {
     
     let backgroundLayer = CALayer()
     
+    private let imageView = NSImageView(frame: .zero)
+    
+    override var image: NSImage? {
+        get {
+            return imageView.image
+        }
+        set {
+            imageView.image = newValue
+        }
+    }
+    
     private var isMouseOver = false {
         didSet {
             updateLayer()
@@ -31,6 +42,7 @@ final class BookmarksBarButton: NSButton {
     override init(frame frameRect: NSRect) {
         super.init(frame: frameRect)
 
+        // self.cell = BookmarksBarButtonCell()
         configureLayers()
         addTrackingArea()
     }

@@ -25,7 +25,7 @@ final class BookmarksBarViewController: NSViewController {
     private enum Constants {
         static let buttonSpacing: CGFloat = 12
         static let buttonHeight: CGFloat = 28
-        static let maximumButtonWidth: CGFloat = 120
+        static let maximumButtonWidth: CGFloat = 150
     }
     
     private let bookmarkManager = LocalBookmarkManager.shared
@@ -191,20 +191,49 @@ final class BookmarksBarViewController: NSViewController {
     }
     
     private func createButtons(for entities: [BaseBookmarkEntity]) -> [NSButton] {
-        return entities.map { entity in
-            bookmarkButton(titled: entity.title)
+        return entities.compactMap { entity in
+            if let bookmark = entity as? Bookmark {
+                return bookmarkButton(titled: entity.title, url: bookmark.url)
+            } else if let folder = entity as? BookmarkFolder {
+                return folderButton(titled: folder.title)
+            } else {
+                assertionFailure("Tried to display bookmarks bar button for unsupported type: \(entity)")
+                return nil
+            }
         }
     }
     
-    private func bookmarkButton(titled title: String) -> NSButton {
+    private func bookmarkButton(titled title: String, url: URL) -> NSButton {
         let button = BookmarksBarButton(frame: .zero)
         button.isBordered = false
         button.title = title
         button.sendAction(on: [.leftMouseDown, .rightMouseDown])
         button.target = self
         button.action = #selector(bookmarkButtonClicked(_:))
+        // button.image = FaviconManager.shared.getCachedFavicon(for: url, sizeCategory: .small)?.image
+        // button.imageScaling = .scaleProportionallyDown
+        // button.imagePosition = .imageLeading
         button.sizeToFit()
-        button.image = FaviconManager.shared.getCachedFavicon(for: "https://nytimes.com/", sizeCategory: .small)?.image
+        
+        var buttonFrame = button.frame
+        buttonFrame.size.width = min(Constants.maximumButtonWidth, buttonFrame.size.width)
+        button.frame = buttonFrame
+        
+        button.lineBreakMode = .byTruncatingMiddle
+
+        return button
+    }
+    
+    private func folderButton(titled title: String) -> NSButton {
+        let button = BookmarksBarButton(frame: .zero)
+        button.isBordered = false
+        button.title = title
+        button.sendAction(on: [.leftMouseDown, .rightMouseDown])
+        button.target = self
+        button.action = #selector(bookmarkButtonClicked(_:))
+//        button.image = NSImage(named: "Folder")
+//        button.imagePosition = .imageLeading
+        button.sizeToFit()
         
         var buttonFrame = button.frame
         buttonFrame.size.width = min(Constants.maximumButtonWidth, buttonFrame.size.width)
@@ -222,7 +251,27 @@ final class BookmarksBarViewController: NSViewController {
         if let event = NSApp.currentEvent, event.isRightClick {
             print("Right click")
         } else {
-            print("Left click")
+            guard let index = buttons.firstIndex(of: sender) else {
+                return
+            }
+            
+            guard let entity = bookmarkManager.list?.topLevelEntities[index] else {
+                return
+            }
+            
+            if let bookmark = entity as? Bookmark {
+                WindowControllersManager.shared.show(url: bookmark.url, newTab: false)
+            } else if let folder = entity as? BookmarkFolder {
+                let viewModel = BookmarkViewModel(entity: entity)
+                
+                let menu = NSMenu(title: folder.title)
+                let childViewModels = folder.children.map(BookmarkViewModel.init)
+                let childMenuItems = bookmarkMenuItems(from: childViewModels, topLevel: false)
+                menu.items = childMenuItems
+                
+                let location = NSPoint(x: 0, y: sender.frame.height + 5) // Magic number to adjust the height.
+                menu.popUp(positioning: nil, at: location, in: sender)
+            }
         }
     }
     
@@ -240,6 +289,37 @@ final class BookmarksBarViewController: NSViewController {
         
         let location = NSPoint(x: 0, y: sender.frame.height + 5) // Magic number to adjust the height.
         menu.popUp(positioning: nil, at: location, in: sender)
+    }
+    
+    private func bookmarkMenuItems(from bookmarkViewModels: [BookmarkViewModel], topLevel: Bool = true) -> [NSMenuItem] {
+        var menuItems = [NSMenuItem]()
+
+        for viewModel in bookmarkViewModels {
+            let menuItem = NSMenuItem(bookmarkViewModel: viewModel)
+
+            if let folder = viewModel.entity as? BookmarkFolder {
+                let subMenu = NSMenu(title: folder.title)
+                let childViewModels = folder.children.map(BookmarkViewModel.init)
+                let childMenuItems = bookmarkMenuItems(from: childViewModels, topLevel: false)
+                subMenu.items = childMenuItems
+
+                if !subMenu.items.isEmpty {
+                    menuItem.submenu = subMenu
+                }
+            }
+
+            menuItems.append(menuItem)
+        }
+
+        if !topLevel {
+            let showOpenInTabsItem = bookmarkViewModels.compactMap { $0.entity as? Bookmark }.count > 1
+            if showOpenInTabsItem {
+                menuItems.append(.separator())
+                menuItems.append(NSMenuItem(bookmarkViewModels: bookmarkViewModels))
+            }
+        }
+        
+        return menuItems
     }
     
 }

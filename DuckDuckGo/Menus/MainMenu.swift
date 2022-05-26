@@ -211,28 +211,3 @@ extension MainMenu: NSMenuDelegate {
     }
 
 }
-
-fileprivate extension NSMenuItem {
-
-    convenience init(bookmarkViewModel: BookmarkViewModel) {
-        self.init()
-
-        title = bookmarkViewModel.menuTitle
-        image = bookmarkViewModel.menuFavicon
-        representedObject = bookmarkViewModel.entity
-        action = #selector(MainViewController.openBookmark(_:))
-    }
-
-    convenience init(bookmarkViewModels: [BookmarkViewModel]) {
-        self.init()
-
-        title = UserText.bookmarksOpenInNewTabs
-        representedObject = bookmarkViewModels
-        action = #selector(MainViewController.openAllInTabs(_:))
-    }
-
-    func removeFromParent() {
-        parent?.submenu?.removeItem(self)
-    }
-
-}
