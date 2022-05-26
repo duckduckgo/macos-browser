@@ -45,7 +45,11 @@ final class BookmarksBarViewController: NSViewController {
     private let clippedItemsIndicator: NSButton = {
         let indicator = NSButton(frame: .zero)
     
-        indicator.image = NSImage(systemSymbolName: "chevron.forward.2", accessibilityDescription: nil)
+        // TODO: Get proper asset
+        if #available(macOS 11.0, *) {
+            indicator.image = NSImage(systemSymbolName: "chevron.forward.2", accessibilityDescription: nil)
+        }
+        
         indicator.isBordered = false
         indicator.isHidden = true
         indicator.sizeToFit()

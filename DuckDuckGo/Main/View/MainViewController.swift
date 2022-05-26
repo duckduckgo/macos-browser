@@ -38,6 +38,7 @@ final class MainViewController: NSViewController {
     private(set) var browserTabViewController: BrowserTabViewController!
     private(set) var findInPageViewController: FindInPageViewController!
     private(set) var fireViewController: FireViewController!
+    private(set) var bookmarksBarViewController: BookmarksBarViewController!
 
     let tabCollectionViewModel: TabCollectionViewModel
 
@@ -161,6 +162,13 @@ final class MainViewController: NSViewController {
                                                     tabCollectionViewModel: tabCollectionViewModel)
         self.fireViewController = fireViewController
         return fireViewController
+    }
+    
+    @IBSegueAction
+    func createBookmarksBar(coder: NSCoder, sender: Any?, segueIdentifier: String?) -> BookmarksBarViewController? {
+        let bookmarksBarViewController = BookmarksBarViewController(coder: coder)
+        self.bookmarksBarViewController = bookmarksBarViewController
+        return bookmarksBarViewController
     }
 
     private func subscribeToSelectedTabViewModel() {

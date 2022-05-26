@@ -226,6 +226,9 @@
 		4BBF0925283083EC00EE1418 /* FileSystemDSLTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4BBF0924283083EC00EE1418 /* FileSystemDSLTests.swift */; };
 		4BC68A702759AE490029A586 /* Waitlist.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 4BC68A6F2759AE490029A586 /* Waitlist.storyboard */; };
 		4BC68A722759B2140029A586 /* Waitlist.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4BC68A712759B2140029A586 /* Waitlist.swift */; };
+		4BD18F00283F0BC500058124 /* BookmarksBarButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4BD18EFE283F0BC500058124 /* BookmarksBarButton.swift */; };
+		4BD18F01283F0BC500058124 /* BookmarksBarViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4BD18EFF283F0BC500058124 /* BookmarksBarViewController.swift */; };
+		4BD18F05283F151F00058124 /* BookmarksBar.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 4BD18F04283F151F00058124 /* BookmarksBar.storyboard */; };
 		4BDFA4AE27BF19E500648192 /* ToggleableScrollView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4BDFA4AD27BF19E500648192 /* ToggleableScrollView.swift */; };
 		4BE0DF06267819A1006337B7 /* NSStoryboardExtension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4BE0DF0426781961006337B7 /* NSStoryboardExtension.swift */; };
 		4BE4005327CF3DC3007D3161 /* SavePaymentMethodPopover.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4BE4005227CF3DC3007D3161 /* SavePaymentMethodPopover.swift */; };
@@ -986,6 +989,9 @@
 		4BBF0924283083EC00EE1418 /* FileSystemDSLTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FileSystemDSLTests.swift; sourceTree = "<group>"; };
 		4BC68A6F2759AE490029A586 /* Waitlist.storyboard */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; path = Waitlist.storyboard; sourceTree = "<group>"; };
 		4BC68A712759B2140029A586 /* Waitlist.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Waitlist.swift; sourceTree = "<group>"; };
+		4BD18EFE283F0BC500058124 /* BookmarksBarButton.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = BookmarksBarButton.swift; sourceTree = "<group>"; };
+		4BD18EFF283F0BC500058124 /* BookmarksBarViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = BookmarksBarViewController.swift; sourceTree = "<group>"; };
+		4BD18F04283F151F00058124 /* BookmarksBar.storyboard */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; path = BookmarksBar.storyboard; sourceTree = "<group>"; };
 		4BDFA4AD27BF19E500648192 /* ToggleableScrollView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ToggleableScrollView.swift; sourceTree = "<group>"; };
 		4BE0DF0426781961006337B7 /* NSStoryboardExtension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NSStoryboardExtension.swift; sourceTree = "<group>"; };
 		4BE4005227CF3DC3007D3161 /* SavePaymentMethodPopover.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SavePaymentMethodPopover.swift; sourceTree = "<group>"; };
@@ -2081,6 +2087,26 @@
 			path = Waitlist;
 			sourceTree = "<group>";
 		};
+		4BD18F02283F0F1000058124 /* View */ = {
+			isa = PBXGroup;
+			children = (
+				4BD18EFE283F0BC500058124 /* BookmarksBarButton.swift */,
+				4BFD356F283B109C00CE9234 /* BookmarksBarButtonCell.swift */,
+				4BFD356C283AA2FD00CE9234 /* BookmarksBarView.swift */,
+				4BD18EFF283F0BC500058124 /* BookmarksBarViewController.swift */,
+				4BD18F04283F151F00058124 /* BookmarksBar.storyboard */,
+			);
+			path = View;
+			sourceTree = "<group>";
+		};
+		4BD18F03283F0F2F00058124 /* Controllers */ = {
+			isa = PBXGroup;
+			children = (
+				4BFD356A283AA07700CE9234 /* BookmarksBarDragController.swift */,
+			);
+			path = Controllers;
+			sourceTree = "<group>";
+		};
 		4BEF0E6D27667F6300AF7C58 /* View */ = {
 			isa = PBXGroup;
 			children = (
@@ -2103,11 +2129,8 @@
 		4BFD356E283ADE8B00CE9234 /* Bookmarks Bar */ = {
 			isa = PBXGroup;
 			children = (
-				4BBF0918282F5D2D00EE1418 /* BookmarksBarViewController.swift */,
-				4BFD356C283AA2FD00CE9234 /* BookmarksBarView.swift */,
-				4BFD356A283AA07700CE9234 /* BookmarksBarDragController.swift */,
-				4B5E72412835B88400E449C4 /* BookmarksBarButton.swift */,
-				4BFD356F283B109C00CE9234 /* BookmarksBarButtonCell.swift */,
+				4BD18F03283F0F2F00058124 /* Controllers */,
+				4BD18F02283F0F1000058124 /* View */,
 			);
 			path = "Bookmarks Bar";
 			sourceTree = "<group>";
@@ -2565,6 +2588,7 @@
 				B6A9E47526146A440067D1B9 /* API */,
 				AA4D700525545EDE00C3411E /* App Delegate */,
 				AAC5E4C025D6A6A9007F5990 /* Bookmarks */,
+				4BFD356E283ADE8B00CE9234 /* Bookmarks Bar */,
 				AA86491B24D837DE001BABEE /* Browser Tab */,
 				AA86491324D831B9001BABEE /* Common */,
 				85D33F1025C82E93002B91A6 /* Configuration */,
@@ -2587,7 +2611,6 @@
 				AAE71DB225F66A0900D74437 /* Home Page */,
 				AA97BF4425135CB60014931A /* Menus */,
 				85378D9A274E618C007C5CBF /* Message Views */,
-				4BFD356E283ADE8B00CE9234 /* Bookmarks Bar */,
 				AA86491524D83384001BABEE /* Navigation Bar */,
 				85B7184727677A7D00B4277F /* Onboarding */,
 				B64C84DB2692D6E80048FEBE /* Permissions */,
@@ -3999,6 +4022,7 @@
 				AA7412B324D0B3AC00D22FE0 /* TabBarViewItem.xib in Resources */,
 				85480F8A25CDC360009424E3 /* MainMenu.storyboard in Resources */,
 				4B677435255DBEB800025BD8 /* httpsMobileV2FalsePositives.json in Resources */,
+				4BD18F05283F151F00058124 /* BookmarksBar.storyboard in Resources */,
 				AA3439792754D55100B241FA /* trackers-1.json in Resources */,
 				AA34397C2754D55100B241FA /* dark-trackers-1.json in Resources */,
 				AA3863C527A1E28F00749AB5 /* Feedback.storyboard in Resources */,
@@ -4311,6 +4335,7 @@
 				9826B0A22747DFEB0092F683 /* AppPrivacyConfigurationDataProvider.swift in Sources */,
 				B63BDF80280003570072D75B /* WebKitError.swift in Sources */,
 				B6B1E88B26D774090062C350 /* LinkButton.swift in Sources */,
+				4BD18F00283F0BC500058124 /* BookmarksBarButton.swift in Sources */,
 				4BBF0915282DD40100EE1418 /* TemporaryFileHandler.swift in Sources */,
 				CB6BCDF927C6BEFF00CC76DC /* PrivacyFeatures.swift in Sources */,
 				B693954D26F04BEB0015B914 /* MouseClickView.swift in Sources */,
@@ -4488,6 +4513,7 @@
 				AA8EDF2724923EC70071C2E8 /* StringExtension.swift in Sources */,
 				85378DA2274E7F25007C5CBF /* EmailManagerRequestDelegate.swift in Sources */,
 				B68172A9269C487D006D1092 /* PrivacyDashboardUserScript.swift in Sources */,
+				4BD18F01283F0BC500058124 /* BookmarksBarViewController.swift in Sources */,
 				379DE4BD27EA31AC002CC3DE /* PreferencesAutofillView.swift in Sources */,
 				858A797F26A79EAA00A75A42 /* UserText+PasswordManager.swift in Sources */,
 				B693954E26F04BEB0015B914 /* ProgressView.swift in Sources */,

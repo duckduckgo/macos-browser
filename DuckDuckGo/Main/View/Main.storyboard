@@ -60,7 +60,7 @@
                                     <constraint firstAttribute="height" constant="32" id="D6Z-21-RpW"/>
                                 </constraints>
                                 <connections>
-                                    <segue destination="FcM-Q5-3Cs" kind="embed" id="SUE-TU-ulm"/>
+                                    <segue destination="aql-HV-xza" kind="embed" id="TuO-tg-e0N"/>
                                 </connections>
                             </containerView>
                             <containerView hidden="YES" translatesAutoresizingMaskIntoConstraints="NO" id="Jbn-9T-FNt" userLabel="Find in Page Container View">
@@ -120,13 +120,21 @@
             </objects>
             <point key="canvasLocation" x="75" y="1178.5"/>
         </scene>
+        <!--BookmarksBar-->
+        <scene sceneID="Oyo-re-WAl">
+            <objects>
+                <controllerPlaceholder storyboardName="BookmarksBar" id="aql-HV-xza" sceneMemberID="viewController"/>
+                <customObject id="Rg1-ug-XrN" userLabel="First Responder" customClass="NSResponder" sceneMemberID="firstResponder"/>
+            </objects>
+            <point key="canvasLocation" x="870" y="1152"/>
+        </scene>
         <!--TabBar-->
         <scene sceneID="XSA-KE-InJ">
             <objects>
                 <customObject id="NXm-I5-OhA" userLabel="First Responder" customClass="NSResponder" sceneMemberID="firstResponder"/>
                 <controllerPlaceholder storyboardName="TabBar" id="Nfk-V8-FAE" sceneMemberID="viewController"/>
             </objects>
-            <point key="canvasLocation" x="849" y="1066"/>
+            <point key="canvasLocation" x="848" y="1052"/>
         </scene>
         <!--NavigationBar-->
         <scene sceneID="Sc0-ir-Na8">
@@ -134,7 +142,7 @@
                 <customObject id="Pfq-lf-Cxf" userLabel="First Responder" customClass="NSResponder" sceneMemberID="firstResponder"/>
                 <controllerPlaceholder storyboardName="NavigationBar" id="R9l-dg-lKa" sceneMemberID="viewController"/>
             </objects>
-            <point key="canvasLocation" x="869" y="1112"/>
+            <point key="canvasLocation" x="869" y="1103"/>
         </scene>
         <!--FindInPage-->
         <scene sceneID="PQx-g7-OSP">
@@ -142,7 +150,7 @@
                 <customObject id="AN6-a3-PL9" userLabel="First Responder" customClass="NSResponder" sceneMemberID="firstResponder"/>
                 <controllerPlaceholder storyboardName="FindInPage" id="0cy-cn-sdp" sceneMemberID="viewController"/>
             </objects>
-            <point key="canvasLocation" x="860" y="1170"/>
+            <point key="canvasLocation" x="860" y="1202"/>
         </scene>
         <!--Fire-->
         <scene sceneID="1LJ-1c-OxA">
@@ -150,7 +158,7 @@
                 <controllerPlaceholder storyboardName="Fire" id="cnP-Wp-dck" sceneMemberID="viewController"/>
                 <customObject id="uyP-DE-lLX" userLabel="First Responder" customClass="NSResponder" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="838" y="1228"/>
+            <point key="canvasLocation" x="838" y="1252"/>
         </scene>
         <!--BrowserTab-->
         <scene sceneID="O3n-py-FOu">
@@ -158,41 +166,10 @@
                 <customObject id="ECq-3v-dmj" userLabel="First Responder" customClass="NSResponder" sceneMemberID="firstResponder"/>
                 <controllerPlaceholder storyboardName="BrowserTab" id="wo6-dV-Q3Q" sceneMemberID="viewController"/>
             </objects>
-            <point key="canvasLocation" x="862" y="1280"/>
-        </scene>
-        <!--Bookmarks Bar View Controller-->
-        <scene sceneID="XHU-g9-NQy">
-            <objects>
-                <viewController id="FcM-Q5-3Cs" customClass="BookmarksBarViewController" customModule="DuckDuckGo_Privacy_Browser" customModuleProvider="target" sceneMemberID="viewController">
-                    <view key="view" id="kiq-tW-vPp" customClass="BookmarksBarView" customModule="DuckDuckGo_Privacy_Browser" customModuleProvider="target">
-                        <rect key="frame" x="0.0" y="0.0" width="676" height="56"/>
-                        <autoresizingMask key="autoresizingMask"/>
-                        <subviews>
-                            <box verticalHuggingPriority="750" boxType="separator" translatesAutoresizingMaskIntoConstraints="NO" id="lyZ-nJ-8lK">
-                                <rect key="frame" x="0.0" y="-2" width="676" height="5"/>
-                            </box>
-                        </subviews>
-                        <constraints>
-                            <constraint firstAttribute="bottom" secondItem="lyZ-nJ-8lK" secondAttribute="bottom" id="KR3-nl-Ol1"/>
-                            <constraint firstItem="lyZ-nJ-8lK" firstAttribute="leading" secondItem="kiq-tW-vPp" secondAttribute="leading" id="Nr9-ic-Sg3"/>
-                            <constraint firstAttribute="trailing" secondItem="lyZ-nJ-8lK" secondAttribute="trailing" id="Zt2-jf-mSV"/>
-                        </constraints>
-                        <userDefinedRuntimeAttributes>
-                            <userDefinedRuntimeAttribute type="color" keyPath="backgroundColor">
-                                <color key="value" name="AddressBarBackgroundColor"/>
-                            </userDefinedRuntimeAttribute>
-                        </userDefinedRuntimeAttributes>
-                    </view>
-                </viewController>
-                <customObject id="wTP-Tm-ivr" userLabel="First Responder" customClass="NSResponder" sceneMemberID="firstResponder"/>
-            </objects>
-            <point key="canvasLocation" x="1054" y="708"/>
+            <point key="canvasLocation" x="862" y="1302"/>
         </scene>
     </scenes>
     <resources>
-        <namedColor name="AddressBarBackgroundColor">
-            <color red="1" green="1" blue="1" alpha="1" colorSpace="custom" customColorSpace="displayP3"/>
-        </namedColor>
         <namedColor name="SeparatorColor">
             <color red="0.0" green="0.0" blue="0.0" alpha="0.10000000149011612" colorSpace="custom" customColorSpace="sRGB"/>
         </namedColor>
