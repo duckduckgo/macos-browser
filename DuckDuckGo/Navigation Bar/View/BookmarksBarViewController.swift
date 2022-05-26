@@ -23,13 +23,45 @@ final class BookmarksBarViewController: NSViewController {
  
     @IBOutlet var bookmarksCollectionView: NSCollectionView!
     
+    let totalDataSourceCount: Int = 10
+    var currentMaximumCells: Int = 10 {
+        didSet {
+            bookmarksCollectionView.reloadData()
+        }
+    }
+    
     override func viewDidLoad() {
         super.viewDidLoad()
         
+        self.view.postsFrameChangedNotifications = true
+        NotificationCenter.default.addObserver(self, selector: #selector(frameChanged), name: NSView.frameDidChangeNotification, object: self.view)
+
         let nib = NSNib(nibNamed: BookmarksBarCollectionViewItem.identifier.rawValue, bundle: nil)
         bookmarksCollectionView.register(nib, forItemWithIdentifier: BookmarksBarCollectionViewItem.identifier)
         bookmarksCollectionView.delegate = self
         bookmarksCollectionView.dataSource = self
+        
+        (bookmarksCollectionView.collectionViewLayout as? NSCollectionViewGridLayout)?.minimumInteritemSpacing = 10.0
+        (bookmarksCollectionView.collectionViewLayout as? NSCollectionViewGridLayout)?.margins = NSEdgeInsets(top: 0, left: 0, bottom: 0, right: 10.0)
+    }
+    
+    @objc
+    private func frameChanged() {
+        print("Frame changed \(self.bookmarksCollectionView.visibleItems().count)")
+        
+        calculateMaximumVisibleItems(viewWidth: view.bounds.width)
+    }
+    
+    private func calculateMaximumVisibleItems(viewWidth: CGFloat) {
+        let cellWidth = 100
+        let spacing = 10
+        let totalCellWidth = CGFloat(cellWidth + spacing)
+        
+        let maximumVisibleCells = floor(viewWidth / totalCellWidth)
+        
+        print(maximumVisibleCells)
+        
+        currentMaximumCells = Int(maximumVisibleCells)
     }
     
 }
@@ -37,7 +69,7 @@ final class BookmarksBarViewController: NSViewController {
 extension BookmarksBarViewController: NSCollectionViewDataSource {
     
     func collectionView(_ collectionView: NSCollectionView, numberOfItemsInSection section: Int) -> Int {
-        return 50
+        return min(currentMaximumCells, totalDataSourceCount)
     }
     
     func collectionView(_ collectionView: NSCollectionView, itemForRepresentedObjectAt indexPath: IndexPath) -> NSCollectionViewItem {
@@ -52,5 +84,13 @@ extension BookmarksBarViewController: NSCollectionViewDataSource {
 }
 
 extension BookmarksBarViewController: NSCollectionViewDelegate {
+    
+}
+
+extension BookmarksBarViewController: NSCollectionViewDelegateFlowLayout {
+    
+    func collectionView(_ collectionView: NSCollectionView, layout collectionViewLayout: NSCollectionViewLayout, sizeForItemAt indexPath: IndexPath) -> NSSize {
+        return NSSize(width: 100, height: 20)
+    }
     
 }

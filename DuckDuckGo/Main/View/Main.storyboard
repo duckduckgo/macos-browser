@@ -180,9 +180,7 @@
                                                 <collectionView id="ys4-wS-wDB">
                                                     <rect key="frame" x="0.0" y="0.0" width="674" height="158"/>
                                                     <autoresizingMask key="autoresizingMask" widthSizable="YES"/>
-                                                    <collectionViewFlowLayout key="collectionViewLayout" minimumInteritemSpacing="10" minimumLineSpacing="10" scrollDirection="horizontal" id="eGJ-Zi-XHx">
-                                                        <size key="itemSize" width="100" height="32"/>
-                                                    </collectionViewFlowLayout>
+                                                    <collectionViewLayout key="collectionViewLayout" id="M8y-Ki-9e7" customClass="BookmarksBarCollectionViewLayout" customModule="DuckDuckGo_Privacy_Browser" customModuleProvider="target"/>
                                                     <color key="primaryBackgroundColor" name="controlBackgroundColor" catalog="System" colorSpace="catalog"/>
                                                     <connections>
                                                         <outlet property="dataSource" destination="FcM-Q5-3Cs" id="ZOe-bx-TzW"/>
