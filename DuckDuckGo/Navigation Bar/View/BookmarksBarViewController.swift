@@ -20,5 +20,37 @@ import Foundation
 import AppKit
 
 final class BookmarksBarViewController: NSViewController {
+ 
+    @IBOutlet var bookmarksCollectionView: NSCollectionView!
+    
+    override func viewDidLoad() {
+        super.viewDidLoad()
+        
+        let nib = NSNib(nibNamed: BookmarksBarCollectionViewItem.identifier.rawValue, bundle: nil)
+        bookmarksCollectionView.register(nib, forItemWithIdentifier: BookmarksBarCollectionViewItem.identifier)
+        bookmarksCollectionView.delegate = self
+        bookmarksCollectionView.dataSource = self
+    }
+    
+}
+
+extension BookmarksBarViewController: NSCollectionViewDataSource {
+    
+    func collectionView(_ collectionView: NSCollectionView, numberOfItemsInSection section: Int) -> Int {
+        return 50
+    }
+    
+    func collectionView(_ collectionView: NSCollectionView, itemForRepresentedObjectAt indexPath: IndexPath) -> NSCollectionViewItem {
+        let item = collectionView.makeItem(withIdentifier: BookmarksBarCollectionViewItem.identifier, for: indexPath)
+        guard let firePopoverItem = item as? BookmarksBarCollectionViewItem else { return item }
+        
+        print("Made item at \(indexPath.item)")
+        
+        return firePopoverItem
+    }
+    
+}
+
+extension BookmarksBarViewController: NSCollectionViewDelegate {
     
 }

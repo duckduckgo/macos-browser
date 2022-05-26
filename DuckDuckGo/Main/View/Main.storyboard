@@ -170,6 +170,43 @@
                         <subviews>
                             <customView translatesAutoresizingMaskIntoConstraints="NO" id="9M7-4d-Twc" customClass="ColorView" customModule="DuckDuckGo_Privacy_Browser" customModuleProvider="target">
                                 <rect key="frame" x="0.0" y="0.0" width="676" height="56"/>
+                                <subviews>
+                                    <scrollView wantsLayer="YES" autohidesScrollers="YES" horizontalLineScroll="10" horizontalPageScroll="10" verticalLineScroll="10" verticalPageScroll="10" usesPredominantAxisScrolling="NO" translatesAutoresizingMaskIntoConstraints="NO" id="wsQ-D5-8Oq">
+                                        <rect key="frame" x="0.0" y="0.0" width="676" height="56"/>
+                                        <clipView key="contentView" id="UJg-Dc-EgL">
+                                            <rect key="frame" x="1" y="1" width="674" height="54"/>
+                                            <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                                            <subviews>
+                                                <collectionView id="ys4-wS-wDB">
+                                                    <rect key="frame" x="0.0" y="0.0" width="674" height="158"/>
+                                                    <autoresizingMask key="autoresizingMask" widthSizable="YES"/>
+                                                    <collectionViewFlowLayout key="collectionViewLayout" minimumInteritemSpacing="10" minimumLineSpacing="10" scrollDirection="horizontal" id="eGJ-Zi-XHx">
+                                                        <size key="itemSize" width="50" height="50"/>
+                                                    </collectionViewFlowLayout>
+                                                    <color key="primaryBackgroundColor" name="controlBackgroundColor" catalog="System" colorSpace="catalog"/>
+                                                    <connections>
+                                                        <outlet property="dataSource" destination="FcM-Q5-3Cs" id="ZOe-bx-TzW"/>
+                                                        <outlet property="delegate" destination="FcM-Q5-3Cs" id="O0f-X0-Bb6"/>
+                                                    </connections>
+                                                </collectionView>
+                                            </subviews>
+                                        </clipView>
+                                        <scroller key="horizontalScroller" hidden="YES" wantsLayer="YES" verticalHuggingPriority="750" horizontal="YES" id="NZi-Ay-udg">
+                                            <rect key="frame" x="1" y="144" width="233" height="15"/>
+                                            <autoresizingMask key="autoresizingMask"/>
+                                        </scroller>
+                                        <scroller key="verticalScroller" wantsLayer="YES" verticalHuggingPriority="750" horizontal="NO" id="AHk-bm-24F">
+                                            <rect key="frame" x="659" y="1" width="16" height="54"/>
+                                            <autoresizingMask key="autoresizingMask"/>
+                                        </scroller>
+                                    </scrollView>
+                                </subviews>
+                                <constraints>
+                                    <constraint firstAttribute="trailing" secondItem="wsQ-D5-8Oq" secondAttribute="trailing" id="JMf-EK-fGu"/>
+                                    <constraint firstItem="wsQ-D5-8Oq" firstAttribute="top" secondItem="9M7-4d-Twc" secondAttribute="top" id="Y3W-Bn-88R"/>
+                                    <constraint firstAttribute="bottom" secondItem="wsQ-D5-8Oq" secondAttribute="bottom" id="Y5I-gM-Uc6"/>
+                                    <constraint firstItem="wsQ-D5-8Oq" firstAttribute="leading" secondItem="9M7-4d-Twc" secondAttribute="leading" id="ez4-nJ-qYU"/>
+                                </constraints>
                                 <userDefinedRuntimeAttributes>
                                     <userDefinedRuntimeAttribute type="color" keyPath="backgroundColor">
                                         <color key="value" name="AccentColor"/>
@@ -184,6 +221,9 @@
                             <constraint firstItem="9M7-4d-Twc" firstAttribute="top" secondItem="kiq-tW-vPp" secondAttribute="top" id="xwF-Sd-HKU"/>
                         </constraints>
                     </view>
+                    <connections>
+                        <outlet property="bookmarksCollectionView" destination="ys4-wS-wDB" id="O35-au-k45"/>
+                    </connections>
                 </viewController>
                 <customObject id="wTP-Tm-ivr" userLabel="First Responder" customClass="NSResponder" sceneMemberID="firstResponder"/>
             </objects>
