@@ -44,6 +44,7 @@ final class FirePopoverWrapperViewController: NSViewController {
 
     @IBSegueAction func createFirePopoverViewController(_ coder: NSCoder) -> FirePopoverViewController? {
         guard let tabCollectionViewModel = tabCollectionViewModel else {
+            assertionFailure("Attempted to display Fire Popover without an associated TabCollectionViewModel")
             return nil
         }
 
