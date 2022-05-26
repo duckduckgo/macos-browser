@@ -507,8 +507,8 @@ Gw
         <scene sceneID="e65-WV-kqF">
             <objects>
                 <viewController storyboardIdentifier="CSVImportViewController" id="Meg-M8-8oL" userLabel="CSV Import View Controller" customClass="CSVImportViewController" customModule="DuckDuckGo_Privacy_Browser" customModuleProvider="target" sceneMemberID="viewController">
-                    <view key="view" translatesAutoresizingMaskIntoConstraints="NO" id="n2z-bE-Ka8">
-                        <rect key="frame" x="0.0" y="0.0" width="512" height="815"/>
+                    <view key="view" misplaced="YES" translatesAutoresizingMaskIntoConstraints="NO" id="n2z-bE-Ka8">
+                        <rect key="frame" x="0.0" y="0.0" width="512" height="817"/>
                         <subviews>
                             <stackView distribution="fill" orientation="vertical" alignment="leading" spacing="20" horizontalStackHuggingPriority="249.99998474121094" verticalStackHuggingPriority="249.99998474121094" horizontalHuggingPriority="249" detachesHiddenViews="YES" translatesAutoresizingMaskIntoConstraints="NO" id="HLb-Dw-Y0O">
                                 <rect key="frame" x="20" y="3" width="472" height="809"/>
