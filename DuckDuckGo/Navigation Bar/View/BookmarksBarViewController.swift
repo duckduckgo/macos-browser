@@ -18,7 +18,7 @@
 
 import Foundation
 import AppKit
-import CryptoKit
+import Combine
 
 final class BookmarksBarViewController: NSViewController {
     
@@ -28,10 +28,32 @@ final class BookmarksBarViewController: NSViewController {
         static let maximumButtonWidth: CGFloat = 120
     }
     
+    private let bookmarkManager = LocalBookmarkManager.shared
+    private var cancellables = Set<AnyCancellable>()
+    
     private var buttons: [NSButton] = []
-    private var clippedButtons: [NSButton] = []
+    private var clippedButtons: [NSButton] = [] {
+        didSet {
+            clippedItemsIndicator.isHidden = clippedButtons.isEmpty
+        }
+    }
     private var hasClippedButtons: Bool {
         !clippedButtons.isEmpty
+    }
+    
+    private let clippedItemsIndicator: NSButton = {
+        let indicator = NSButton(frame: .zero)
+    
+        indicator.image = NSImage(systemSymbolName: "chevron.forward.2", accessibilityDescription: nil)
+        indicator.isBordered = false
+        indicator.isHidden = true
+        indicator.sizeToFit()
+    
+        return indicator
+    }()
+    
+    private var clipThreshold: CGFloat {
+        return view.frame.width - (clippedItemsIndicator.frame.midX - Constants.buttonSpacing)
     }
     
     // MARK: - Layout Calculation
@@ -51,14 +73,25 @@ final class BookmarksBarViewController: NSViewController {
                                                name: NSView.frameDidChangeNotification,
                                                object: self.view)
         
-        self.buttons = generateFakeButtons()
+        subscribeToBookmarks()
+
+        self.buttons = createButtons(for: bookmarkManager.list?.topLevelEntities ?? [])
         positionButtonsForInitialLayout()
         layoutButtons()
     }
     
+    func subscribeToBookmarks() {
+        bookmarkManager.listPublisher.receive(on: RunLoop.main).sink { [weak self] list in
+            guard let self = self else { return }
+            self.buttons = self.createButtons(for: list?.topLevelEntities ?? [])
+            self.positionButtonsForInitialLayout()
+            self.layoutButtons()
+        }.store(in: &cancellables)
+    }
+    
     @objc
     private func frameChanged() {
-        if view.frame.size.width <= (totalButtonListWidth + (Constants.buttonSpacing * 2)) {
+        if view.frame.size.width <= (totalButtonListWidth + (Constants.buttonSpacing * 2) + clippedItemsIndicator.frame.size.width) {
             removeLastButton()
         } else {
             tryToRestoreClippedButton()
@@ -75,11 +108,23 @@ final class BookmarksBarViewController: NSViewController {
     }
     
     private func positionButtonsForInitialLayout() {
+        for view in view.subviews where view is NSButton {
+            view.removeFromSuperview()
+        }
+
         for button in buttons {
             view.addSubview(button)
         }
         
+        addClippedItemsIndicator()
         calculateFixedButtonSizingValues()
+    }
+    
+    private func addClippedItemsIndicator() {
+        clippedItemsIndicator.target = self
+        clippedItemsIndicator.action = #selector(clippedItemsIndicatorClicked(_:))
+        
+        view.addSubview(clippedItemsIndicator)
     }
     
     private func tryToRestoreClippedButton() {
@@ -93,7 +138,7 @@ final class BookmarksBarViewController: NSViewController {
         
         // Button spacing * 3: Once for the padding between the last button and the new one,
         // and two to account for the spacing at the beginning and end of the list.
-        if totalButtonListWidth + (Constants.buttonSpacing * 3) + clippedButtonWidth < view.bounds.width {
+        if totalButtonListWidth + (Constants.buttonSpacing * 3) + clippedButtonWidth + clippedItemsIndicator.frame.width < view.bounds.width {
             let buttonToRestore = clippedButtons.removeFirst()
             buttons.append(buttonToRestore)
             view.addSubview(buttonToRestore)
@@ -133,35 +178,33 @@ final class BookmarksBarViewController: NSViewController {
 
         for button in buttons {
             var updatedButtonFrame = button.frame
-            updatedButtonFrame.origin = CGPoint(x: previousMaximumXValue, y: view.frame.midY - (button.frame.height / 2) + 3)
+            updatedButtonFrame.origin = CGPoint(x: previousMaximumXValue, y: view.frame.midY - (button.frame.height / 2))
             button.frame = updatedButtonFrame
             
             previousMaximumXValue = updatedButtonFrame.maxX + Constants.buttonSpacing
         }
+        
+        var clippedItemsIndicatorFrame = clippedItemsIndicator.frame
+        clippedItemsIndicatorFrame.origin.y = view.frame.midY - (clippedItemsIndicatorFrame.height / 2)
+        clippedItemsIndicatorFrame.origin.x = view.bounds.width - clippedItemsIndicatorFrame.width - Constants.buttonSpacing
+        clippedItemsIndicator.frame = clippedItemsIndicatorFrame
     }
     
-    private func generateFakeButtons() -> [NSButton] {
-        return [
-            bookmarkButton(titled: "Testing Testing Testing 1"),
-            bookmarkButton(titled: "Test 2"),
-            bookmarkButton(titled: "Test 3"),
-            bookmarkButton(titled: "Test 4?!"),
-            bookmarkButton(titled: "Test 5"),
-            bookmarkButton(titled: "Test Test 6"),
-            bookmarkButton(titled: "Testing 7: Still Testing"),
-            bookmarkButton(titled: "Test Test 8"),
-            bookmarkButton(titled: "Test Test 9"),
-            bookmarkButton(titled: "Test Test 10"),
-            bookmarkButton(titled: "Test Test 11"),
-            bookmarkButton(titled: "Test Test 12")
-        ]
+    private func createButtons(for entities: [BaseBookmarkEntity]) -> [NSButton] {
+        return entities.map { entity in
+            bookmarkButton(titled: entity.title)
+        }
     }
     
     private func bookmarkButton(titled title: String) -> NSButton {
-        let button = NSButton(frame: .zero)
+        let button = BookmarksBarButton(frame: .zero)
         button.isBordered = false
         button.title = title
+        button.sendAction(on: [.leftMouseDown, .rightMouseDown])
+        button.target = self
+        button.action = #selector(bookmarkButtonClicked(_:))
         button.sizeToFit()
+        button.image = FaviconManager.shared.getCachedFavicon(for: "https://nytimes.com/", sizeCategory: .small)?.image
         
         var buttonFrame = button.frame
         buttonFrame.size.width = min(Constants.maximumButtonWidth, buttonFrame.size.width)
@@ -172,4 +215,39 @@ final class BookmarksBarViewController: NSViewController {
         return button
     }
     
+    // MARK: - Button Click Handlers
+    
+    @objc
+    private func bookmarkButtonClicked(_ sender: NSButton) {
+        if let event = NSApp.currentEvent, event.isRightClick {
+            print("Right click")
+        } else {
+            print("Left click")
+        }
+    }
+    
+    @objc
+    private func bookmarkMenuItemClicked(_ sender: NSButton) {
+        print("Left click")
+    }
+    
+    @objc
+    private func clippedItemsIndicatorClicked(_ sender: NSButton) {
+        let menu = NSMenu()
+        menu.items = clippedButtons.map {
+            NSMenuItem(title: $0.title, action: #selector(bookmarkMenuItemClicked(_:)), target: self, keyEquivalent: "")
+        }
+        
+        let location = NSPoint(x: 0, y: sender.frame.height + 5) // Magic number to adjust the height.
+        menu.popUp(positioning: nil, at: location, in: sender)
+    }
+    
+}
+
+extension NSEvent {
+    var isRightClick: Bool {
+        let rightClick = (self.type == .rightMouseDown)
+        let controlClick = self.modifierFlags.contains(.control)
+        return rightClick || controlClick
+    }
 }
