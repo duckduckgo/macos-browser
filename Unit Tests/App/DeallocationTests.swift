@@ -80,7 +80,7 @@ final class DeallocationTests: XCTestCase {
             window1.close()
             window2.close()
         }
-        waitForExpectations(timeout: 1, handler: nil)
+        waitForExpectations(timeout: 3, handler: nil)
     }
 
 }
