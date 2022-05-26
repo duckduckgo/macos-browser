@@ -24,16 +24,6 @@
                                     <segue destination="Nfk-V8-FAE" kind="embed" destinationCreationSelector="createTabBarViewControllerWithCoder:sender:segueIdentifier:" id="dL6-gI-9Hl"/>
                                 </connections>
                             </containerView>
-                            <containerView translatesAutoresizingMaskIntoConstraints="NO" id="SYo-8W-jl3">
-                                <rect key="frame" x="0.0" y="0.0" width="1024" height="671"/>
-                                <constraints>
-                                    <constraint firstAttribute="width" relation="greaterThanOrEqual" constant="512" id="FeK-TC-TkT"/>
-                                    <constraint firstAttribute="height" relation="greaterThanOrEqual" constant="178" id="OOl-4a-Y8I"/>
-                                </constraints>
-                                <connections>
-                                    <segue destination="wo6-dV-Q3Q" kind="embed" destinationCreationSelector="createWebViewControllerWithCoder:sender:segueIdentifier:" id="A2b-sp-a54"/>
-                                </connections>
-                            </containerView>
                             <customView translatesAutoresizingMaskIntoConstraints="NO" id="af1-Eb-VaG" userLabel="Separator" customClass="ColorView" customModule="DuckDuckGo_Privacy_Browser" customModuleProvider="target">
                                 <rect key="frame" x="0.0" y="708" width="1024" height="1"/>
                                 <constraints>
@@ -55,12 +45,22 @@
                                 </connections>
                             </containerView>
                             <containerView translatesAutoresizingMaskIntoConstraints="NO" id="kfs-1U-pfm" userLabel="Bookmarks Bar Container View">
-                                <rect key="frame" x="0.0" y="677" width="1024" height="32"/>
+                                <rect key="frame" x="0.0" y="676" width="1024" height="32"/>
                                 <constraints>
                                     <constraint firstAttribute="height" constant="32" id="D6Z-21-RpW"/>
                                 </constraints>
                                 <connections>
-                                    <segue destination="aql-HV-xza" kind="embed" id="TuO-tg-e0N"/>
+                                    <segue destination="aql-HV-xza" kind="embed" destinationCreationSelector="createBookmarksBarWithCoder:sender:segueIdentifier:" id="TuO-tg-e0N"/>
+                                </connections>
+                            </containerView>
+                            <containerView translatesAutoresizingMaskIntoConstraints="NO" id="SYo-8W-jl3">
+                                <rect key="frame" x="0.0" y="0.0" width="1024" height="676"/>
+                                <constraints>
+                                    <constraint firstAttribute="width" relation="greaterThanOrEqual" constant="512" id="FeK-TC-TkT"/>
+                                    <constraint firstAttribute="height" relation="greaterThanOrEqual" constant="178" id="OOl-4a-Y8I"/>
+                                </constraints>
+                                <connections>
+                                    <segue destination="wo6-dV-Q3Q" kind="embed" destinationCreationSelector="createWebViewControllerWithCoder:sender:segueIdentifier:" id="A2b-sp-a54"/>
                                 </connections>
                             </containerView>
                             <containerView hidden="YES" translatesAutoresizingMaskIntoConstraints="NO" id="Jbn-9T-FNt" userLabel="Find in Page Container View">
@@ -86,15 +86,15 @@
                             <constraint firstAttribute="trailing" secondItem="UE1-Pg-JIe" secondAttribute="trailing" id="DIS-8Z-gS4"/>
                             <constraint firstAttribute="trailing" secondItem="SYo-8W-jl3" secondAttribute="trailing" id="EJ8-cX-El9"/>
                             <constraint firstAttribute="trailing" secondItem="lYg-bX-QrJ" secondAttribute="trailing" id="HkZ-fV-qYb"/>
+                            <constraint firstItem="SYo-8W-jl3" firstAttribute="top" secondItem="kfs-1U-pfm" secondAttribute="bottom" id="JX7-Ev-c3Y"/>
                             <constraint firstItem="kfs-1U-pfm" firstAttribute="leading" secondItem="m2S-Jp-Qdl" secondAttribute="leading" id="Npp-De-0qc"/>
                             <constraint firstItem="lYg-bX-QrJ" firstAttribute="top" secondItem="m2S-Jp-Qdl" secondAttribute="top" id="PNG-fr-pcs"/>
                             <constraint firstItem="Jbn-9T-FNt" firstAttribute="centerX" secondItem="wFH-xq-50o" secondAttribute="centerX" id="PQa-4m-EpD"/>
                             <constraint firstItem="wFH-xq-50o" firstAttribute="top" secondItem="m2S-Jp-Qdl" secondAttribute="top" constant="38" id="TRm-AX-VcL"/>
                             <constraint firstAttribute="trailing" secondItem="kfs-1U-pfm" secondAttribute="trailing" id="WtE-KK-sPb"/>
                             <constraint firstItem="wFH-xq-50o" firstAttribute="leading" secondItem="m2S-Jp-Qdl" secondAttribute="leading" id="XQv-BZ-2ci"/>
-                            <constraint firstItem="kfs-1U-pfm" firstAttribute="top" secondItem="wFH-xq-50o" secondAttribute="bottom" id="Xfr-6f-7N4"/>
+                            <constraint firstItem="kfs-1U-pfm" firstAttribute="top" secondItem="wFH-xq-50o" secondAttribute="bottom" constant="1" id="Xfr-6f-7N4"/>
                             <constraint firstItem="af1-Eb-VaG" firstAttribute="top" secondItem="wFH-xq-50o" secondAttribute="bottom" id="ajK-M4-7Qf"/>
-                            <constraint firstItem="SYo-8W-jl3" firstAttribute="top" secondItem="m2S-Jp-Qdl" secondAttribute="top" constant="118" id="js0-Db-kRi"/>
                             <constraint firstItem="lYg-bX-QrJ" firstAttribute="leading" secondItem="m2S-Jp-Qdl" secondAttribute="leading" id="kVB-Sz-8Sv"/>
                             <constraint firstItem="af1-Eb-VaG" firstAttribute="leading" secondItem="m2S-Jp-Qdl" secondAttribute="leading" id="oLA-yb-nB8"/>
                             <constraint firstItem="UE1-Pg-JIe" firstAttribute="leading" secondItem="m2S-Jp-Qdl" secondAttribute="leading" id="qA7-89-XxQ"/>
@@ -107,13 +107,13 @@
                     </view>
                     <connections>
                         <outlet property="addressBarHeightConstraint" destination="vZS-tl-wOP" id="cCS-Fd-zJd"/>
+                        <outlet property="bookmarksBarHeightConstraint" destination="D6Z-21-RpW" id="AMj-Ll-fEc"/>
                         <outlet property="divider" destination="af1-Eb-VaG" id="Nws-XY-cPD"/>
                         <outlet property="findInPageContainerView" destination="Jbn-9T-FNt" id="5Sl-UV-Fa9"/>
                         <outlet property="navigationBarContainerView" destination="wFH-xq-50o" id="hbq-xV-McI"/>
                         <outlet property="navigationBarTopConstraint" destination="TRm-AX-VcL" id="cCS-Fd-hJd"/>
                         <outlet property="tabBarContainerView" destination="lYg-bX-QrJ" id="nor-E0-cFP"/>
                         <outlet property="webContainerView" destination="SYo-8W-jl3" id="DoZ-Ih-dHA"/>
-                        <outlet property="webViewTopConstraint" destination="js0-Db-kRi" id="puD-Cr-Val"/>
                     </connections>
                 </viewController>
                 <customObject id="rPt-NT-nkU" userLabel="First Responder" customClass="NSResponder" sceneMemberID="firstResponder"/>

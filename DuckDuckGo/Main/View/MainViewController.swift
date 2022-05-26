@@ -29,6 +29,7 @@ final class MainViewController: NSViewController {
     @IBOutlet weak var findInPageContainerView: NSView!
     @IBOutlet var navigationBarTopConstraint: NSLayoutConstraint!
     @IBOutlet var addressBarHeightConstraint: NSLayoutConstraint!
+    @IBOutlet var bookmarksBarHeightConstraint: NSLayoutConstraint!
     @IBOutlet var webViewTopConstraint: NSLayoutConstraint!
 
     @IBOutlet var divider: NSView!
@@ -169,6 +170,11 @@ final class MainViewController: NSViewController {
         let bookmarksBarViewController = BookmarksBarViewController(coder: coder)
         self.bookmarksBarViewController = bookmarksBarViewController
         return bookmarksBarViewController
+    }
+    
+    func toggleBookmarksBar() {
+        bookmarksBarViewController.view.isHidden.toggle()
+        bookmarksBarHeightConstraint.constant = bookmarksBarViewController.view.isHidden ? 0 : 32
     }
 
     private func subscribeToSelectedTabViewModel() {
