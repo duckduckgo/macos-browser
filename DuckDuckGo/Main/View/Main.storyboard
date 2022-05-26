@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<document type="com.apple.InterfaceBuilder3.Cocoa.Storyboard.XIB" version="3.0" toolsVersion="19529" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES">
+<document type="com.apple.InterfaceBuilder3.Cocoa.Storyboard.XIB" version="3.0" toolsVersion="20037" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES">
     <dependencies>
         <deployment identifier="macosx"/>
-        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="19529"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="20037"/>
         <capability name="Named colors" minToolsVersion="9.0"/>
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
     </dependencies>
@@ -54,6 +54,15 @@
                                     <segue destination="R9l-dg-lKa" kind="embed" destinationCreationSelector="createNavigationBarViewControllerWithCoder:sender:segueIdentifier:" id="Br9-o3-sQ8"/>
                                 </connections>
                             </containerView>
+                            <containerView translatesAutoresizingMaskIntoConstraints="NO" id="kfs-1U-pfm" userLabel="Bookmarks Bar Container View">
+                                <rect key="frame" x="0.0" y="677" width="1024" height="32"/>
+                                <constraints>
+                                    <constraint firstAttribute="height" constant="32" id="D6Z-21-RpW"/>
+                                </constraints>
+                                <connections>
+                                    <segue destination="FcM-Q5-3Cs" kind="embed" id="SUE-TU-ulm"/>
+                                </connections>
+                            </containerView>
                             <containerView hidden="YES" translatesAutoresizingMaskIntoConstraints="NO" id="Jbn-9T-FNt" userLabel="Find in Page Container View">
                                 <rect key="frame" x="312" y="673" width="400" height="40"/>
                                 <constraints>
@@ -77,10 +86,13 @@
                             <constraint firstAttribute="trailing" secondItem="UE1-Pg-JIe" secondAttribute="trailing" id="DIS-8Z-gS4"/>
                             <constraint firstAttribute="trailing" secondItem="SYo-8W-jl3" secondAttribute="trailing" id="EJ8-cX-El9"/>
                             <constraint firstAttribute="trailing" secondItem="lYg-bX-QrJ" secondAttribute="trailing" id="HkZ-fV-qYb"/>
+                            <constraint firstItem="kfs-1U-pfm" firstAttribute="leading" secondItem="m2S-Jp-Qdl" secondAttribute="leading" id="Npp-De-0qc"/>
                             <constraint firstItem="lYg-bX-QrJ" firstAttribute="top" secondItem="m2S-Jp-Qdl" secondAttribute="top" id="PNG-fr-pcs"/>
                             <constraint firstItem="Jbn-9T-FNt" firstAttribute="centerX" secondItem="wFH-xq-50o" secondAttribute="centerX" id="PQa-4m-EpD"/>
                             <constraint firstItem="wFH-xq-50o" firstAttribute="top" secondItem="m2S-Jp-Qdl" secondAttribute="top" constant="38" id="TRm-AX-VcL"/>
+                            <constraint firstAttribute="trailing" secondItem="kfs-1U-pfm" secondAttribute="trailing" id="WtE-KK-sPb"/>
                             <constraint firstItem="wFH-xq-50o" firstAttribute="leading" secondItem="m2S-Jp-Qdl" secondAttribute="leading" id="XQv-BZ-2ci"/>
+                            <constraint firstItem="kfs-1U-pfm" firstAttribute="top" secondItem="wFH-xq-50o" secondAttribute="bottom" id="Xfr-6f-7N4"/>
                             <constraint firstItem="af1-Eb-VaG" firstAttribute="top" secondItem="wFH-xq-50o" secondAttribute="bottom" id="ajK-M4-7Qf"/>
                             <constraint firstItem="SYo-8W-jl3" firstAttribute="top" secondItem="m2S-Jp-Qdl" secondAttribute="top" constant="86" id="js0-Db-kRi"/>
                             <constraint firstItem="lYg-bX-QrJ" firstAttribute="leading" secondItem="m2S-Jp-Qdl" secondAttribute="leading" id="kVB-Sz-8Sv"/>
@@ -148,8 +160,40 @@
             </objects>
             <point key="canvasLocation" x="862" y="1280"/>
         </scene>
+        <!--Bookmarks Bar View Controller-->
+        <scene sceneID="XHU-g9-NQy">
+            <objects>
+                <viewController id="FcM-Q5-3Cs" customClass="BookmarksBarViewController" customModule="DuckDuckGo_Privacy_Browser" customModuleProvider="target" sceneMemberID="viewController">
+                    <view key="view" id="kiq-tW-vPp">
+                        <rect key="frame" x="0.0" y="0.0" width="676" height="56"/>
+                        <autoresizingMask key="autoresizingMask"/>
+                        <subviews>
+                            <customView translatesAutoresizingMaskIntoConstraints="NO" id="9M7-4d-Twc" customClass="ColorView" customModule="DuckDuckGo_Privacy_Browser" customModuleProvider="target">
+                                <rect key="frame" x="0.0" y="0.0" width="676" height="56"/>
+                                <userDefinedRuntimeAttributes>
+                                    <userDefinedRuntimeAttribute type="color" keyPath="backgroundColor">
+                                        <color key="value" name="AccentColor"/>
+                                    </userDefinedRuntimeAttribute>
+                                </userDefinedRuntimeAttributes>
+                            </customView>
+                        </subviews>
+                        <constraints>
+                            <constraint firstAttribute="trailing" secondItem="9M7-4d-Twc" secondAttribute="trailing" id="LZe-5X-F9c"/>
+                            <constraint firstAttribute="bottom" secondItem="9M7-4d-Twc" secondAttribute="bottom" id="MeY-5c-G2X"/>
+                            <constraint firstItem="9M7-4d-Twc" firstAttribute="leading" secondItem="kiq-tW-vPp" secondAttribute="leading" id="nQy-jB-bUY"/>
+                            <constraint firstItem="9M7-4d-Twc" firstAttribute="top" secondItem="kiq-tW-vPp" secondAttribute="top" id="xwF-Sd-HKU"/>
+                        </constraints>
+                    </view>
+                </viewController>
+                <customObject id="wTP-Tm-ivr" userLabel="First Responder" customClass="NSResponder" sceneMemberID="firstResponder"/>
+            </objects>
+            <point key="canvasLocation" x="1054" y="708"/>
+        </scene>
     </scenes>
     <resources>
+        <namedColor name="AccentColor">
+            <color red="0.0" green="0.46000000000000002" blue="0.89000000000000001" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+        </namedColor>
         <namedColor name="SeparatorColor">
             <color red="0.0" green="0.0" blue="0.0" alpha="0.10000000149011612" colorSpace="custom" customColorSpace="sRGB"/>
         </namedColor>
