@@ -880,7 +880,10 @@ extension Tab: SecureVaultManagerDelegate {
     func secureVaultInitFailed(_ error: SecureVaultError) {
         SecureVaultErrorReporter.shared.secureVaultInitFailed(error)
     }
-
+    
+    func secureVaultManagerShouldAutomaticallyUpdateCredentialsWithoutUsername(_: SecureVaultManager) -> Bool {
+        return true
+    }
 }
 
 extension AutofillType {

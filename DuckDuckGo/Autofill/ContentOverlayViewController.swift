@@ -200,6 +200,10 @@ extension ContentOverlayViewController: SecureVaultManagerDelegate {
         // No-op, Tab.swift handles this functionality
     }
     
+    public func secureVaultManagerShouldAutomaticallyUpdateCredentialsWithoutUsername(_: SecureVaultManager) -> Bool {
+        return true
+    }
+    
     public func secureVaultManager(_: SecureVaultManager, didRequestAuthenticationWithCompletionHandler handler: @escaping (Bool) -> Void) {
         DeviceAuthenticator.shared.authenticateUser(reason: .autofill) { authenticationResult in
             handler(authenticationResult.authenticated)
