@@ -112,7 +112,7 @@ jobs:
       uses: actions/upload-artifact@v3
       with:
         name: DuckDuckGo-${{ github.event.inputs.release-type }}-${{ env.app_version }}.dmg
-        path: ${{ github.workspace }}/release/DuckDuckGo*-${{ env.app_version }}.dmg
+        path: ${{ github.workspace }}/release/duckduckgo*-${{ env.app_version }}.dmg
 
     - name: Send Mattermost message
       env:

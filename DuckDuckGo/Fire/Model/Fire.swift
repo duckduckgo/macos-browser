@@ -85,6 +85,7 @@ final class Fire {
     let windowControllerManager: WindowControllersManager
     let faviconManagement: FaviconManagement
     let autoconsentManagement: AutoconsentManagement?
+    let stateRestorationManager: AppStateRestorationManager?
     
     let tabsCleaner = TabDataCleaner()
 
@@ -100,7 +101,8 @@ final class Fire {
          downloadListCoordinator: DownloadListCoordinator = DownloadListCoordinator.shared,
          windowControllerManager: WindowControllersManager = WindowControllersManager.shared,
          faviconManagement: FaviconManagement = FaviconManager.shared,
-         autoconsentManagement: AutoconsentManagement? = nil) {
+         autoconsentManagement: AutoconsentManagement? = nil,
+         stateRestorationManager: AppStateRestorationManager? = nil) {
         self.webCacheManager = cacheManager
         self.historyCoordinating = historyCoordinating
         self.permissionManager = permissionManager
@@ -113,10 +115,20 @@ final class Fire {
         } else {
             self.autoconsentManagement = autoconsentManagement
         }
+
+        if let stateRestorationManager = stateRestorationManager {
+            self.stateRestorationManager = stateRestorationManager
+        } else if let appDelegate = NSApp.delegate as? AppDelegate {
+            self.stateRestorationManager = appDelegate.stateRestorationManager
+        } else {
+            self.stateRestorationManager = nil
+        }
     }
 
     func burnDomains(_ domains: Set<String>, completion: (() -> Void)? = nil) {
         os_log("Fire started", log: .fire)
+
+        burnLastSessionState()
 
         burningData = .specificDomains(domains)
 
@@ -176,6 +188,8 @@ final class Fire {
         os_log("Fire started", log: .fire)
         burningData = .all
         
+        burnLastSessionState()
+
         tabsCleaner.prepareModelsForCleanup(allTabViewModels()) {
             let group = DispatchGroup()
             group.enter()
@@ -334,6 +348,11 @@ final class Fire {
         if #available(macOS 11, *), self.autoconsentManagement != nil {
             self.autoconsentManagement!.clearCache()
         }
+    }
+
+    // MARK: - Last Session State
+    private func burnLastSessionState() {
+        stateRestorationManager?.clearLastSessionState()
     }
 
 }
