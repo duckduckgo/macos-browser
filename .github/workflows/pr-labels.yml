@@ -1,4 +1,4 @@
-name: Enforce PR Labels
+name: PR Labels
 
 on:
   pull_request:
@@ -7,7 +7,7 @@ on:
 jobs:
   enforce-label:
 
-    name: Block merging when draft or before Product Review
+    name: Prevent merging with banned labels
 
     runs-on: ubuntu-latest
 
