@@ -54,8 +54,8 @@ final class DeallocationTests: XCTestCase {
 
     func testWindowsDeallocation() {
         autoreleasepool {
-            weak var window1: NSWindow! = WindowsManager.openNewWindow()
-            weak var window2: NSWindow! = WindowsManager.openNewWindow()
+            weak var window1: NSWindow! = WindowsManager.openNewWindow(showWindow: false)
+            weak var window2: NSWindow! = WindowsManager.openNewWindow(showWindow: false)
 
             for i in 0...1 {
                 WindowControllersManager.shared.mainWindowControllers[i].mainViewController.tabCollectionViewModel
