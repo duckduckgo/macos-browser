@@ -54,6 +54,8 @@ final class DeallocationTests: XCTestCase {
 
     func testWindowsDeallocation() {
         autoreleasepool {
+
+            // `showWindow: false` would still open a window, but not activate it, which seems to upset CI
             weak var window1: NSWindow! = WindowsManager.openNewWindow(showWindow: false)
             weak var window2: NSWindow! = WindowsManager.openNewWindow(showWindow: false)
 
