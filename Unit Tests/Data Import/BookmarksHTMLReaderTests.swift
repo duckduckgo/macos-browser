@@ -47,4 +47,20 @@ class BookmarksHTMLReaderTests: XCTestCase {
         }
     }
 
+    func testMoreBookmarkFiles() throws {
+        let otherBookmarkFiles = [
+            "bookmarks_brave.html",
+            "bookmarks_chrome.html",
+            "bookmarks_ddg_android.html",
+            "bookmarks_ddg_macos.html",
+            "bookmarks_firefox.html",
+            "bookmarks_safari.html"
+        ]
+
+        for file in otherBookmarkFiles {
+            reader = BookmarkHTMLReader(bookmarksFileURL: bookmarksFileURL(file))
+            let result = reader.readBookmarks()
+            XCTAssertNoThrow(try result.get(), file)
+        }
+    }
 }

@@ -66,39 +66,26 @@ final class BookmarkHTMLReader {
             }
 
             var isSafariFormat: Bool = false
-            var bookmarksBarTitle: String?
 
             // 3.
             cursor = cursor?.nextSibling
             switch cursor?.htmlTag {
             case .dl:
                 try proceedToH3(&cursor)
-                bookmarksBarTitle = cursor?.text
             case .h3:
                 isSafariFormat = true
-                bookmarksBarTitle = cursor?.text
             default:
                 throw ImportError.unexpectedBookmarksFileFormat
             }
 
-            guard let bookmarksBarTitle = bookmarksBarTitle else {
-                throw ImportError.unexpectedBookmarksFileFormat
-            }
-
-            // 4.
-            cursor = cursor?.nextSibling
-            guard cursor?.htmlTag == .dl else {
-                throw ImportError.unexpectedBookmarksFileFormat
-            }
-
             // 5.
-            let bookmarkBar = try readFolder(cursor, title: bookmarksBarTitle)
+            let bookmarkBar = try readFolder(cursor)
 
             // 6.
             var other = [ImportedBookmarks.BookmarkOrFolder]()
             while cursor != nil {
-                if let folder = try findNextFolder(&cursor, isSafariFormat: isSafariFormat) {
-                    other.append(folder)
+                if let item = try findNextItem(&cursor, isSafariFormat: isSafariFormat) {
+                    other.append(item)
                 }
             }
 
@@ -127,36 +114,27 @@ final class BookmarkHTMLReader {
         }
     }
 
-    private func readFolder(_ node: XMLNode?, title: String) throws -> ImportedBookmarks.BookmarkOrFolder {
-        var cursor = node?.child(at: 0)
+    private func readFolder(_ node: XMLNode?) throws -> ImportedBookmarks.BookmarkOrFolder {
+        var cursor = node
+
+        let title = cursor?.text ?? ""
+        cursor = cursor?.nextSibling
+        guard cursor?.htmlTag == .dl else {
+            throw ImportError.unexpectedBookmarksFileFormat
+        }
+
+        cursor = cursor?.child(at: 0)
 
         var children = [ImportedBookmarks.BookmarkOrFolder]()
 
         while cursor != nil {
-            switch cursor?.htmlTag {
-            case .dd:
+            let firstChild = cursor?.child(at: 0)
+            switch (cursor?.htmlTag, firstChild?.htmlTag) {
+            case (.dd, .h3):
                 // 5.1.
-                let child = cursor?.child(at: 0)
-                if child?.htmlTag == .h3, let title = child?.text {
-                    let subFolderNode = child?.nextSibling
-                    guard subFolderNode?.htmlTag == .dl else {
-                        throw ImportError.unexpectedBookmarksFileFormat
-                    }
-                    children.append(try readFolder(subFolderNode, title: title))
-                }
-            case .dt:
-                let child = cursor?.child(at: 0)
-                guard child?.htmlTag == .a, let name = child?.text else {
-                    throw ImportError.unexpectedBookmarksFileFormat
-                }
-                let childElement = child as? XMLElement
-                children.append(.init(
-                    name: name,
-                    type: "bookmark",
-                    urlString: childElement?.attribute(forName: "href")?.stringValue,
-                    children: nil
-                ))
-
+                children.append(try readFolder(firstChild))
+            case (.dt, .a):
+                children.append(try readItem(firstChild))
             default:
                 break
             }
@@ -166,42 +144,62 @@ final class BookmarkHTMLReader {
         return .init(name: title, type: "folder", urlString: nil, children: children)
     }
 
-    private func findNextFolder(_ cursor: inout XMLNode?, isSafariFormat: Bool) throws -> ImportedBookmarks.BookmarkOrFolder? {
+    private func readItem(_ node: XMLNode?) throws -> ImportedBookmarks.BookmarkOrFolder {
+        guard node?.htmlTag == .a, let name = node?.text else {
+            throw ImportError.unexpectedBookmarksFileFormat
+        }
+        let xmlElement = node as? XMLElement
+
+        return .init(
+            name: name,
+            type: "bookmark",
+            urlString: xmlElement?.attribute(forName: "href")?.stringValue,
+            children: nil
+        )
+    }
+
+    private func findNextItem(_ cursor: inout XMLNode?, isSafariFormat: Bool) throws -> ImportedBookmarks.BookmarkOrFolder? {
+
+        var isFolder: Bool?
+
         if isSafariFormat {
-            while cursor != nil {
+            while cursor != nil && isFolder == nil {
                 cursor = cursor?.nextSibling
-                if cursor?.htmlTag == .h3 {
+                switch cursor?.htmlTag {
+                case .h3:
+                    isFolder = true
+                case .dt:
+                    isFolder = false
+                default:
                     break
                 }
             }
         } else {
             cursor = cursor?.parent?.nextSibling
-            while cursor != nil {
-                guard cursor?.htmlTag == .dd else {
-                    throw ImportError.unexpectedBookmarksFileFormat
-                }
+            while cursor != nil && isFolder == nil {
                 let firstChild = cursor?.child(at: 0)
-                if firstChild?.htmlTag == .h3 {
+                switch (cursor?.htmlTag, firstChild?.htmlTag) {
+                case (.dd, .h3):
                     cursor = firstChild
-                    break
+                    isFolder = true
+                case (.dt, .a):
+                    cursor = firstChild
+                    isFolder = false
+                default:
+                    cursor = cursor?.nextSibling
                 }
-                cursor = cursor?.nextSibling
             }
         }
 
-        guard cursor != nil else {
+        switch isFolder {
+        case true:
+            return try readFolder(cursor)
+        case false:
+            return try readItem(cursor)
+        default:
             return nil
         }
-
-        let title = cursor?.text ?? ""
-        cursor = cursor?.nextSibling
-        guard cursor?.htmlTag == .dl else {
-            throw ImportError.unexpectedBookmarksFileFormat
-        }
-
-        return try readFolder(cursor, title: title)
     }
-
 }
 
 private extension XMLNode {
