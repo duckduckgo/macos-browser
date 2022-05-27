@@ -55,10 +55,13 @@ protocol BookmarkStore {
 // swiftlint:disable type_body_length
 final class LocalBookmarkStore: BookmarkStore {
 
-    init() {}
+    init() {
+        migrateTopLevelStorageToImplicitBookmarksFolder()
+    }
 
     init(context: NSManagedObjectContext) {
         self.context = context
+        migrateTopLevelStorageToImplicitBookmarksFolder()
     }
 
     enum BookmarkStoreError: Error {
@@ -90,11 +93,11 @@ final class LocalBookmarkStore: BookmarkStore {
                 fetchRequest = Bookmark.topLevelEntitiesFetchRequest()
             }
 
-            fetchRequest.sortDescriptors = [NSSortDescriptor(key: #keyPath(BookmarkManagedObject.dateAdded), ascending: true)]
             fetchRequest.returnsObjectsAsFaults = false
 
             do {
                 let results: [BookmarkManagedObject] = try self.context.fetch(fetchRequest)
+                
                 let entities: [BaseBookmarkEntity] = results.compactMap { entity in
                     BaseBookmarkEntity.from(managedObject: entity, parentFolderUUID: entity.parentFolder?.id)
                 }
@@ -530,6 +533,63 @@ final class LocalBookmarkStore: BookmarkStore {
         }
 
         return total
+    }
+    
+    // MARK: - Migration
+    
+    @UserDefaultsWrapper(key: .hasMigratedTopLevelStorageToImplicitBookmarksFolder, defaultValue: false)
+    private var hasMigratedTopLevelStorageToImplicitBookmarksFolder: Bool
+    
+    private let topLevelBookmarksFolderName = "BookmarksRootFolder"
+    
+    private func migrateTopLevelStorageToImplicitBookmarksFolder() {
+        guard !hasMigratedTopLevelStorageToImplicitBookmarksFolder else {
+            return
+        }
+        
+        print("Migrating")
+        
+        context.performAndWait {
+            // 1. Fetch all top-level entities and check that there isn't an existing root folder
+            // 2. If the root folder does not exist, create it
+            // 3. Add all other top-level entities as children of the root folder
+            
+            let topLevelEntitiesFetchRequest = Bookmark.topLevelEntitiesFetchRequest()
+            topLevelEntitiesFetchRequest.sortDescriptors = [NSSortDescriptor(key: #keyPath(BookmarkManagedObject.dateAdded), ascending: true)]
+            topLevelEntitiesFetchRequest.returnsObjectsAsFaults = true
+            
+            do {
+                // 1. Get the existing top level entities:
+                
+                let existingTopLevelEntities = try self.context.fetch(topLevelEntitiesFetchRequest)
+                
+                // 2. Create the new top level bookmarks folder:
+                
+                let managedObject = NSEntityDescription.insertNewObject(forEntityName: BookmarkManagedObject.className(), into: self.context)
+
+                guard let topLevelFolder = managedObject as? BookmarkManagedObject else {
+                    assertionFailure("LocalBookmarkStore: Failed to migrate top level entities")
+                    return
+                }
+
+                topLevelFolder.id = UUID()
+                topLevelFolder.titleEncrypted = topLevelBookmarksFolderName as NSString
+                topLevelFolder.isFolder = true
+                topLevelFolder.dateAdded = NSDate.now
+                
+                // 3. Add existing top level entities as children of the new top level folder:
+                
+                topLevelFolder.children = NSOrderedSet(array: existingTopLevelEntities)
+                
+                // 4. Save the migration:
+                
+                try context.save()
+            } catch {
+                // TODO: Handle error
+            }
+        }
+        
+        hasMigratedTopLevelStorageToImplicitBookmarksFolder = true
     }
 
 }
