@@ -113,6 +113,12 @@ final class CSVImportViewController: NSViewController {
             lastPassInfoView.isHidden = true
             onePasswordInfoView.isHidden = true
             selectFileButton.title = UserText.importLoginsSelectCSVFile
+        case .bookmarksHTML:
+            descriptionLabel.isHidden = false
+            safariInfoView.isHidden = true
+            lastPassInfoView.isHidden = true
+            onePasswordInfoView.isHidden = true
+            selectFileButton.title = UserText.importBookmarksSelectHTMLFile
         }
     }
 
@@ -137,7 +143,15 @@ final class CSVImportViewController: NSViewController {
     }
 
     @IBAction func selectFileButtonClicked(_ sender: Any) {
-        let panel = NSOpenPanel.filePanel(allowedExtension: "csv")
+        let fileExtension: String = {
+            switch importSource {
+            case .bookmarksHTML:
+                return "html"
+            default:
+                return "csv"
+            }
+        }()
+        let panel = NSOpenPanel.filePanel(allowedExtension: fileExtension)
         let result = panel.runModal()
 
         if result == .OK {

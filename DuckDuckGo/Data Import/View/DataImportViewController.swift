@@ -93,7 +93,7 @@ final class DataImportViewController: NSViewController {
                     self.dataImporter = try FirefoxDataImporter(loginImporter: secureVaultImporter(), bookmarkImporter: bookmarkImporter)
                 case .safari where !(currentChildViewController is CSVImportViewController):
                     self.dataImporter = SafariDataImporter(bookmarkImporter: bookmarkImporter)
-                case .csv, .onePassword, .lastPass, .safari /* csv only */:
+                case .csv, .onePassword, .lastPass, .safari, .bookmarksHTML /* csv only */:
                     if !(self.dataImporter is CSVImporter) {
                         self.dataImporter = nil
                     }
@@ -176,7 +176,7 @@ final class DataImportViewController: NSViewController {
         let source = validSources.first(where: { $0.importSourceName == item.title })!
 
         switch source {
-        case .csv, .lastPass, .onePassword:
+        case .csv, .lastPass, .onePassword, .bookmarksHTML:
             self.viewState = ViewState(selectedImportSource: source, interactionState: .unableToImport)
 
         case .chrome, .firefox, .brave, .edge, .safari:
@@ -278,7 +278,7 @@ final class DataImportViewController: NSViewController {
                 return browserImportViewController
             }
 
-        case .csv, .onePassword, .lastPass:
+        case .csv, .onePassword, .lastPass, .bookmarksHTML:
             if case let .completedImport(summary) = interactionState {
                 return BrowserImportSummaryViewController.create(importSummary: summary)
             } else {
@@ -424,6 +424,7 @@ final class DataImportViewController: NSViewController {
         case .edge: Pixel.fire(.importedLogins(source: .edge))
         case .firefox: Pixel.fire(.importedLogins(source: .firefox))
         case .safari: Pixel.fire(.importedLogins(source: .safari))
+        case .bookmarksHTML: assertionFailure("Attempted to fire invalid logins import pixel")
         }
     }
 
@@ -435,6 +436,7 @@ final class DataImportViewController: NSViewController {
         case .edge: Pixel.fire(.importedBookmarks(source: .edge))
         case .firefox: Pixel.fire(.importedBookmarks(source: .firefox))
         case .safari: Pixel.fire(.importedBookmarks(source: .safari))
+        case .bookmarksHTML: Pixel.fire(.importedBookmarks(source: .bookmarksHTML))
         }
     }
 
