@@ -39,6 +39,7 @@ final class BookmarkHTMLReader {
         static let leafType = "WebBookmarkTypeLeaf"
 
         static let title = "Bookmarks"
+        static let readingListID = "com.apple.ReadingList"
     }
 
     private let bookmarksFileURL: URL
@@ -84,9 +85,8 @@ final class BookmarkHTMLReader {
             // 6.
             var other = [ImportedBookmarks.BookmarkOrFolder]()
             while cursor != nil {
-                if let item = try findNextItem(&cursor) {
-                    other.append(item)
-                }
+                let items = try findNextItem(&cursor)
+                other.append(contentsOf: items)
             }
 
             let otherBookmarks = ImportedBookmarks.BookmarkOrFolder(name: "other", type: "folder", urlString: nil, children: other)
@@ -123,6 +123,12 @@ final class BookmarkHTMLReader {
             throw ImportError.unexpectedBookmarksFileFormat
         }
 
+        let children = try readFolderContents(cursor)
+        return .init(name: title, type: "folder", urlString: nil, children: children)
+    }
+
+    private func readFolderContents(_ node: XMLNode?) throws -> [ImportedBookmarks.BookmarkOrFolder] {
+        var cursor = node
         cursor = cursor?.child(at: 0)
 
         var children = [ImportedBookmarks.BookmarkOrFolder]()
@@ -141,7 +147,8 @@ final class BookmarkHTMLReader {
 
             cursor = cursor?.nextSibling
         }
-        return .init(name: title, type: "folder", urlString: nil, children: children)
+
+        return children
     }
 
     private func readItem(_ node: XMLNode?) throws -> ImportedBookmarks.BookmarkOrFolder {
@@ -160,18 +167,28 @@ final class BookmarkHTMLReader {
         )
     }
 
-    private func findNextItem(_ cursor: inout XMLNode?) throws -> ImportedBookmarks.BookmarkOrFolder? {
+    private func findNextItem(_ cursor: inout XMLNode?) throws -> [ImportedBookmarks.BookmarkOrFolder] {
 
         var isFolder: Bool?
+        var isUntitledFolder: Bool?
 
         if isSafariFormat {
-            while cursor != nil && isFolder == nil {
+            while cursor != nil && isFolder == nil && isUntitledFolder == nil {
                 cursor = cursor?.nextSibling
                 switch cursor?.htmlTag {
                 case .h3:
+                    let xmlElement = cursor as? XMLElement
+                    if xmlElement?.attribute(forName: "id")?.stringValue == Constants.readingListID {
+                        break
+                    }
                     isFolder = true
                 case .dt:
                     isFolder = false
+                case .dl:
+                    let firstGrandchild = cursor?.child(at: 0)?.child(at: 0)
+                    if firstGrandchild?.htmlTag == .a {
+                        isUntitledFolder = true
+                    }
                 default:
                     break
                 }
@@ -193,13 +210,15 @@ final class BookmarkHTMLReader {
             }
         }
 
-        switch isFolder {
-        case true:
-            return try readFolder(cursor)
-        case false:
-            return try readItem(cursor)
+        switch (isFolder, isUntitledFolder) {
+        case (true, _):
+            return [try readFolder(cursor)]
+        case (_, true):
+            return try readFolderContents(cursor)
+        case (false, _):
+            return [try readItem(cursor)]
         default:
-            return nil
+            return []
         }
     }
 }

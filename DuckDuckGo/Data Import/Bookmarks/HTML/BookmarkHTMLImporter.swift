@@ -30,8 +30,13 @@ final class BookmarkHTMLImporter: DataImporter {
 
     var totalBookmarks: Int {
         let bookmarkReader = BookmarkHTMLReader(bookmarksFileURL: fileURL)
-        _ = bookmarkReader.readBookmarks()
-        return bookmarkReader.bookmarksCount
+        let result = bookmarkReader.readBookmarks()
+        switch result {
+        case .success:
+            return bookmarkReader.bookmarksCount
+        case .failure:
+            return 0
+        }
     }
 
     func importableTypes() -> [DataImport.DataType] {
