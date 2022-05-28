@@ -284,7 +284,13 @@ struct DataImportError: Error {
         case .unexpectedBookmarksFileFormat: return DataImportError(actionType: .bookmarks, errorType: .cannotReadFile)
         }
     }
-    
+
+    static func bookmarks(_ errorType: BookmarkHTMLReader.ImportError) -> DataImportError {
+        switch errorType {
+        case .unexpectedBookmarksFileFormat: return DataImportError(actionType: .bookmarks, errorType: .cannotReadFile)
+        }
+    }
+
     // MARK: Login Error Types
     
     static func logins(_ errorType: ImportErrorType) -> DataImportError {

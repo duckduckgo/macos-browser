@@ -93,7 +93,11 @@ final class DataImportViewController: NSViewController {
                     self.dataImporter = try FirefoxDataImporter(loginImporter: secureVaultImporter(), bookmarkImporter: bookmarkImporter)
                 case .safari where !(currentChildViewController is CSVImportViewController):
                     self.dataImporter = SafariDataImporter(bookmarkImporter: bookmarkImporter)
-                case .csv, .onePassword, .lastPass, .safari, .bookmarksHTML /* csv only */:
+                case .bookmarksHTML:
+                    if !(self.dataImporter is BookmarkHTMLImporter) {
+                        self.dataImporter = nil
+                    }
+                case .csv, .onePassword, .lastPass, .safari /* csv only */:
                     if !(self.dataImporter is CSVImporter) {
                         self.dataImporter = nil
                     }
@@ -445,6 +449,18 @@ final class DataImportViewController: NSViewController {
 
 extension DataImportViewController: CSVImportViewControllerDelegate {
 
+    func csvImportViewController(_ viewController: CSVImportViewController, didSelectBookmarksFileWithURL url: URL?) {
+        guard let url = url else {
+            self.viewState.interactionState = .unableToImport
+            return
+        }
+
+        let bookmarkImporter = CoreDataBookmarkImporter(bookmarkManager: LocalBookmarkManager.shared)
+
+        self.dataImporter = BookmarkHTMLImporter(fileURL: url, bookmarkImporter: bookmarkImporter)
+        self.viewState.interactionState = .ableToImport
+    }
+
     func csvImportViewController(_ viewController: CSVImportViewController, didSelectCSVFileWithURL url: URL?) {
         guard let url = url else {
             self.viewState.interactionState = .unableToImport
@@ -470,6 +486,14 @@ extension DataImportViewController: CSVImportViewControllerDelegate {
                                    loginImporter: nil,
                                    defaultColumnPositions: .init(source: self.viewState.selectedImportSource))
         return importer.totalValidLogins()
+    }
+
+    func totalValidBookmarks(in fileURL: URL) -> Int? {
+        let importer = BookmarkHTMLImporter(
+            fileURL: fileURL,
+            bookmarkImporter: CoreDataBookmarkImporter(bookmarkManager: LocalBookmarkManager.shared)
+        )
+        return importer.totalBookmarks
     }
 
 }

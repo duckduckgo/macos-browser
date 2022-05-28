@@ -42,6 +42,8 @@ final class BookmarkHTMLReader {
     }
 
     private let bookmarksFileURL: URL
+    private(set) var isSafariFormat: Bool = false
+    private(set) var bookmarksCount: Int = 0
 
     init(bookmarksFileURL: URL) {
         self.bookmarksFileURL = bookmarksFileURL
@@ -65,8 +67,6 @@ final class BookmarkHTMLReader {
                 throw ImportError.unexpectedBookmarksFileFormat
             }
 
-            var isSafariFormat: Bool = false
-
             // 3.
             cursor = cursor?.nextSibling
             switch cursor?.htmlTag {
@@ -84,7 +84,7 @@ final class BookmarkHTMLReader {
             // 6.
             var other = [ImportedBookmarks.BookmarkOrFolder]()
             while cursor != nil {
-                if let item = try findNextItem(&cursor, isSafariFormat: isSafariFormat) {
+                if let item = try findNextItem(&cursor) {
                     other.append(item)
                 }
             }
@@ -150,6 +150,8 @@ final class BookmarkHTMLReader {
         }
         let xmlElement = node as? XMLElement
 
+        bookmarksCount += 1
+
         return .init(
             name: name,
             type: "bookmark",
@@ -158,7 +160,7 @@ final class BookmarkHTMLReader {
         )
     }
 
-    private func findNextItem(_ cursor: inout XMLNode?, isSafariFormat: Bool) throws -> ImportedBookmarks.BookmarkOrFolder? {
+    private func findNextItem(_ cursor: inout XMLNode?) throws -> ImportedBookmarks.BookmarkOrFolder? {
 
         var isFolder: Bool?
 
