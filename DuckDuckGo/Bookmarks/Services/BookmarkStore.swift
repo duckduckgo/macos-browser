@@ -48,6 +48,7 @@ protocol BookmarkStore {
     func update(folder: BookmarkFolder)
     func add(objectsWithUUIDs: [UUID], to parent: BookmarkFolder?, completion: @escaping (Error?) -> Void)
     func update(objectsWithUUIDs uuids: [UUID], update: @escaping (BaseBookmarkEntity) -> Void, completion: @escaping (Error?) -> Void)
+    func move(objectUUID: UUID, toIndexWithinParentFolder: Int, completion: @escaping (Error?) -> Void)
     func importBookmarks(_ bookmarks: ImportedBookmarks, source: BookmarkImportSource) -> BookmarkImportResult
 
 }
@@ -349,6 +350,39 @@ final class LocalBookmarkStore: BookmarkStore {
             DispatchQueue.main.async { completion(true, nil) }
         }
     }
+    
+    func move(objectUUID: UUID, toIndexWithinParentFolder index: Int, completion: @escaping (Error?) -> Void) {
+        context.perform { [weak self] in
+            guard let self = self else {
+                assertionFailure("Couldn't get strong self")
+                completion(nil)
+                return
+            }
+
+            let bookmarksFetchRequest = BaseBookmarkEntity.singleEntity(with: objectUUID)
+            let bookmarksResults = try? self.context.fetch(bookmarksFetchRequest)
+
+            guard let bookmarkManagedObject = bookmarksResults?.first,
+                  let parentFolder = bookmarkManagedObject.parentFolder else {
+                assertionFailure("\(#file): Failed to get BookmarkManagedObject from the context")
+                completion(nil)
+                return
+            }
+
+            parentFolder.mutableChildren.remove(bookmarkManagedObject)
+            parentFolder.mutableChildren.insert(bookmarkManagedObject, at: index)
+
+            do {
+                try self.context.save()
+            } catch {
+                assertionFailure("\(#file): Saving of context failed")
+                DispatchQueue.main.async { completion(error) }
+                return
+            }
+
+            DispatchQueue.main.async { completion(nil) }
+        }
+    }
 
     // MARK: - Import
     
@@ -547,8 +581,6 @@ final class LocalBookmarkStore: BookmarkStore {
             return
         }
         
-        print("Migrating")
-        
         context.performAndWait {
             // 1. Fetch all top-level entities and check that there isn't an existing root folder
             // 2. If the root folder does not exist, create it
@@ -590,6 +622,64 @@ final class LocalBookmarkStore: BookmarkStore {
         }
         
         hasMigratedTopLevelStorageToImplicitBookmarksFolder = true
+    }
+    
+    // MARK: - Concurrency
+    
+    func loadAll(type: BookmarkStoreFetchPredicateType) async -> Result<[BaseBookmarkEntity], Error> {
+        return await withCheckedContinuation { continuation in
+            loadAll(type: type) { result, error in
+                if let error = error {
+                    continuation.resume(returning: .failure(error))
+                    return
+                }
+
+                guard let result = result else {
+                    fatalError("Expected non-nil result 'result' for nil error")
+                }
+
+                continuation.resume(returning: .success(result))
+            }
+        }
+    }
+    
+    func save(folder: BookmarkFolder, parent: BookmarkFolder?) async -> Result<Bool, Error> {
+        return await withCheckedContinuation { continuation in
+            save(folder: folder, parent: parent) { result, error in
+                if let error = error {
+                    continuation.resume(returning: .failure(error))
+                    return
+                }
+
+                continuation.resume(returning: .success(result))
+            }
+        }
+    }
+    
+    func save(bookmark: Bookmark, parent: BookmarkFolder?) async -> Result<Bool, Error> {
+        return await withCheckedContinuation { continuation in
+            save(bookmark: bookmark, parent: parent) { result, error in
+                if let error = error {
+                    continuation.resume(returning: .failure(error))
+                    return
+                }
+
+                continuation.resume(returning: .success(result))
+            }
+        }
+    }
+    
+    func move(objectUUID: UUID, toIndexWithinParentFolder index: Int) async -> Error? {
+        return await withCheckedContinuation { continuation in
+            move(objectUUID: objectUUID, toIndexWithinParentFolder: index) { error in
+                if let error = error {
+                    continuation.resume(returning: error)
+                    return
+                }
+
+                continuation.resume(returning: nil)
+            }
+        }
     }
 
 }

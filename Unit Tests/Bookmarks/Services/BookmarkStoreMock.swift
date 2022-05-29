@@ -87,5 +87,10 @@ final class BookmarkStoreMock: BookmarkStore {
         importBookmarksCalled = true
         return BookmarkImportResult(successful: 0, duplicates: 0, failed: 0)
     }
+    
+    var moveObjectUUIDCalled = false
+    func move(objectUUID: UUID, toIndexWithinParentFolder: Int, completion: @escaping (Error?) -> Void) {
+        moveObjectUUIDCalled = true
+    }
 
 }

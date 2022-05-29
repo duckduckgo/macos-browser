@@ -27,6 +27,10 @@ extension BookmarkManagedObject {
         case bookmarkRequiresURL
     }
 
+    public var mutableChildren: NSMutableOrderedSet {
+        return mutableOrderedSetValue(forKey: "children")
+    }
+
     public override func validateForInsert() throws {
         try super.validateForInsert()
         try validate()
