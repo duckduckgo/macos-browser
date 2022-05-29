@@ -57,12 +57,17 @@ protocol BookmarkStore {
 final class LocalBookmarkStore: BookmarkStore {
 
     init() {
-        migrateTopLevelStorageToImplicitBookmarksFolder()
+        sharedInitialization()
     }
 
     init(context: NSManagedObjectContext) {
         self.context = context
+        sharedInitialization()
+    }
+    
+    private func sharedInitialization() {
         migrateTopLevelStorageToImplicitBookmarksFolder()
+        cacheReadOnlyTopLevelBookmarksFolder()
     }
 
     enum BookmarkStoreError: Error {
@@ -74,6 +79,28 @@ final class LocalBookmarkStore: BookmarkStore {
     }
 
     private lazy var context = Database.shared.makeContext(concurrencyType: .privateQueueConcurrencyType, name: "Bookmark")
+    private var cachedReadOnlyTopLevelFolder: BookmarkManagedObject?
+    
+    private func cacheReadOnlyTopLevelBookmarksFolder() {
+        context.performAndWait {
+            let fetchRequest = NSFetchRequest<BookmarkManagedObject>(entityName: BookmarkManagedObject.className())
+            fetchRequest.predicate = NSPredicate(format: "%K == nil AND %K == true",
+                                                 #keyPath(BookmarkManagedObject.parentFolder),
+                                                 #keyPath(BookmarkManagedObject.isFolder))
+            
+            let results = try? context.fetch(fetchRequest)
+
+            guard (results?.count ?? 0) <= 1 else {
+                fatalError("There shouldn't be an orphaned folder")
+            }
+            
+            guard let folder = results?.first else {
+                fatalError("Top level folder missing")
+            }
+            
+            self.cachedReadOnlyTopLevelFolder = folder
+        }
+    }
 
     // MARK: - Bookmarks
 
@@ -137,6 +164,8 @@ final class LocalBookmarkStore: BookmarkStore {
                 let parentFetchRequestResults = try? self.context.fetch(parentFetchRequest)
 
                 bookmarkMO.parentFolder = parentFetchRequestResults?.first
+            } else {
+                bookmarkMO.parentFolder = self.cachedReadOnlyTopLevelFolder
             }
 
             do {
@@ -256,7 +285,7 @@ final class LocalBookmarkStore: BookmarkStore {
                 parentManagedObject.addToChildren(NSOrderedSet(array: bookmarkManagedObjects))
             } else {
                 for bookmarkManagedObject in bookmarkManagedObjects {
-                    bookmarkManagedObject.parentFolder = nil
+                    bookmarkManagedObject.parentFolder = self.cachedReadOnlyTopLevelFolder
                 }
             }
 
@@ -333,6 +362,8 @@ final class LocalBookmarkStore: BookmarkStore {
                 let parentFetchRequest = BaseBookmarkEntity.singleEntity(with: parent.id)
                 let parentFetchRequestResults = try? self.context.fetch(parentFetchRequest)
                 bookmarkMO.parentFolder = parentFetchRequestResults?.first
+            } else {
+                bookmarkMO.parentFolder = self.cachedReadOnlyTopLevelFolder
             }
 
             do {
@@ -382,6 +413,10 @@ final class LocalBookmarkStore: BookmarkStore {
 
             DispatchQueue.main.async { completion(nil) }
         }
+    }
+    
+    func getTopLevelFolder(completion: Result<BookmarkManagedObject, Error>) {
+        
     }
 
     // MARK: - Import
@@ -537,7 +572,7 @@ final class LocalBookmarkStore: BookmarkStore {
             bookmarkManagedObject.isFolder = bookmarkOrFolder.isFolder
             bookmarkManagedObject.urlEncrypted = bookmarkOrFolder.url as NSURL?
             bookmarkManagedObject.dateAdded = NSDate.now
-            bookmarkManagedObject.parentFolder = parent
+            bookmarkManagedObject.parentFolder = parent ?? self.cachedReadOnlyTopLevelFolder
             
             // Bookmarks from the bookmarks bar are imported as favorites
             bookmarkManagedObject.isFavorite = (!bookmarkOrFolder.isFolder && markBookmarksAsFavorite)
