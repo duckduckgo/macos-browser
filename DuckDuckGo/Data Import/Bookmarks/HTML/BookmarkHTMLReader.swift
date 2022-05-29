@@ -114,6 +114,40 @@ final class BookmarkHTMLReader {
         }
     }
 
+    private func findNextItem(_ cursor: inout XMLNode?) throws -> [ImportedBookmarks.BookmarkOrFolder] {
+
+        var itemType: XMLNode.BookmarkItemType?
+
+        if isSafariFormat {
+            while cursor != nil && itemType == nil {
+                cursor = cursor?.nextSibling
+                itemType = cursor?.itemType(inSafariFormat: true)
+            }
+        } else {
+            cursor = cursor?.parent?.nextSibling
+            while cursor != nil && itemType == nil {
+                itemType = cursor?.itemType(inSafariFormat: false)
+                switch itemType {
+                case .some:
+                    cursor = cursor?.child(at: 0)
+                case .none:
+                    cursor = cursor?.nextSibling
+                }
+            }
+        }
+
+        switch itemType {
+        case .bookmark:
+            return [try readItem(cursor)]
+        case .folder:
+            return [try readFolder(cursor)]
+        case .untitledFolder:
+            return try readFolderContents(cursor)
+        default:
+            return []
+        }
+    }
+
     private func readFolder(_ node: XMLNode?) throws -> ImportedBookmarks.BookmarkOrFolder {
         var cursor = node
 
@@ -166,64 +200,14 @@ final class BookmarkHTMLReader {
             children: nil
         )
     }
-
-    private func findNextItem(_ cursor: inout XMLNode?) throws -> [ImportedBookmarks.BookmarkOrFolder] {
-
-        var isFolder: Bool?
-        var isUntitledFolder: Bool?
-
-        if isSafariFormat {
-            while cursor != nil && isFolder == nil && isUntitledFolder == nil {
-                cursor = cursor?.nextSibling
-                switch cursor?.htmlTag {
-                case .h3:
-                    let xmlElement = cursor as? XMLElement
-                    if xmlElement?.attribute(forName: "id")?.stringValue == Constants.readingListID {
-                        break
-                    }
-                    isFolder = true
-                case .dt:
-                    isFolder = false
-                case .dl:
-                    let firstGrandchild = cursor?.child(at: 0)?.child(at: 0)
-                    if firstGrandchild?.htmlTag == .a {
-                        isUntitledFolder = true
-                    }
-                default:
-                    break
-                }
-            }
-        } else {
-            cursor = cursor?.parent?.nextSibling
-            while cursor != nil && isFolder == nil {
-                let firstChild = cursor?.child(at: 0)
-                switch (cursor?.htmlTag, firstChild?.htmlTag) {
-                case (.dd, .h3):
-                    cursor = firstChild
-                    isFolder = true
-                case (.dt, .a):
-                    cursor = firstChild
-                    isFolder = false
-                default:
-                    cursor = cursor?.nextSibling
-                }
-            }
-        }
-
-        switch (isFolder, isUntitledFolder) {
-        case (true, _):
-            return [try readFolder(cursor)]
-        case (_, true):
-            return try readFolderContents(cursor)
-        case (false, _):
-            return [try readItem(cursor)]
-        default:
-            return []
-        }
-    }
 }
 
 private extension XMLNode {
+
+    enum Const {
+        static let idAttributeName = "id"
+        static let readingListID = "com.apple.ReadingList"
+    }
 
     enum HTMLTag: String, CaseIterable {
         case h1
@@ -239,6 +223,42 @@ private extension XMLNode {
             return nil
         }
         return .init(rawValue: name)
+    }
+
+    enum BookmarkItemType {
+        case bookmark, folder, untitledFolder
+    }
+
+    func itemType(inSafariFormat isInSafariFormat: Bool) -> BookmarkItemType? {
+        if isInSafariFormat {
+            switch htmlTag {
+            case .h3:
+                let xmlElement = self as? XMLElement
+                if xmlElement?.attribute(forName: Const.idAttributeName)?.stringValue == Const.readingListID {
+                    break
+                }
+                return .folder
+            case .dt:
+                return .bookmark
+            case .dl:
+                let firstGrandchild = child(at: 0)?.child(at: 0)
+                if firstGrandchild?.htmlTag == .a {
+                    return .untitledFolder
+                }
+            default:
+                return nil
+            }
+        } else {
+            switch (htmlTag, child(at: 0)?.htmlTag) {
+            case (.dd, .h3):
+                return .folder
+            case (.dt, .a):
+                return .bookmark
+            default:
+                return nil
+            }
+        }
+        return nil
     }
 
     var text: String? {
