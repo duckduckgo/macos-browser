@@ -32,8 +32,8 @@ final class BookmarkHTMLImporter: DataImporter {
         let bookmarkReader = BookmarkHTMLReader(bookmarksFileURL: fileURL)
         let result = bookmarkReader.readBookmarks()
         switch result {
-        case .success:
-            return bookmarkReader.bookmarksCount
+        case let .success(importedData):
+            return importedData.bookmarkCount
         case .failure:
             return 0
         }
@@ -55,15 +55,15 @@ final class BookmarkHTMLImporter: DataImporter {
             let bookmarkResult = bookmarkReader.readBookmarks()
 
             switch bookmarkResult {
-            case .success(let bookmarks):
+            case let .success(importedData):
                 do {
-                    let source: BookmarkImportSource = bookmarkReader.isSafariFormat ? .safari : .chromium
-                    summary.bookmarksResult = try bookmarkImporter.importBookmarks(bookmarks, source: source)
+                    let source: BookmarkImportSource = importedData.isInSafariFormat ? .safari : .chromium
+                    summary.bookmarksResult = try bookmarkImporter.importBookmarks(importedData.bookmarks, source: source)
                 } catch {
                     completion(.failure(.bookmarks(.cannotAccessCoreData)))
                     return
                 }
-            case .failure(let error):
+            case let .failure(error):
                 completion(.failure(.bookmarks(error)))
                 return
             }
