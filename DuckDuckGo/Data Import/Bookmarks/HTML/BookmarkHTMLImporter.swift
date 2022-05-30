@@ -29,14 +29,7 @@ final class BookmarkHTMLImporter: DataImporter {
     }
 
     var totalBookmarks: Int {
-        let bookmarkReader = BookmarkHTMLReader(bookmarksFileURL: fileURL)
-        let result = bookmarkReader.readBookmarks()
-        switch result {
-        case let .success(importedData):
-            return importedData.bookmarkCount
-        case .failure:
-            return 0
-        }
+        (try? bookmarkReaderResult.get().bookmarkCount) ?? 0
     }
 
     func importableTypes() -> [DataImport.DataType] {
@@ -55,10 +48,8 @@ final class BookmarkHTMLImporter: DataImporter {
         }
 
         DispatchQueue.global(qos: .userInitiated).async {
-            let bookmarkReader = BookmarkHTMLReader(bookmarksFileURL: self.fileURL)
-            let bookmarkResult = bookmarkReader.readBookmarks()
 
-            switch bookmarkResult {
+            switch self.bookmarkReaderResult {
             case let .success(importedData):
                 do {
                     let source: BookmarkImportSource = importedData.isInSafariFormat ? .safari : .chromium
@@ -79,4 +70,8 @@ final class BookmarkHTMLImporter: DataImporter {
         }
     }
 
+    private lazy var bookmarkReaderResult: Result<HTMLImportedBookmarks, BookmarkHTMLReader.ImportError> = {
+        let bookmarkReader = BookmarkHTMLReader(bookmarksFileURL: self.fileURL)
+        return bookmarkReader.readBookmarks()
+    }()
 }
