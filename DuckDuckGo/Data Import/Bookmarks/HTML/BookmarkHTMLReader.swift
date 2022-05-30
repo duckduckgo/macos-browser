@@ -20,7 +20,6 @@ import Foundation
 
 struct HTMLImportedBookmarks {
     let isInSafariFormat: Bool
-    let bookmarkCount: Int
     let bookmarks: ImportedBookmarks
 }
 
@@ -36,8 +35,6 @@ final class BookmarkHTMLReader {
 
     func readBookmarks() -> Result<HTMLImportedBookmarks, ImportError> {
         do {
-            bookmarksCount = 0
-
             guard let document = try? XMLDocument(contentsOf: bookmarksFileURL, options: .documentTidyHTML) else {
                 throw ImportError.unexpectedBookmarksFileFormat
             }
@@ -66,7 +63,7 @@ final class BookmarkHTMLReader {
 
             let otherBookmarks = ImportedBookmarks.BookmarkOrFolder(name: "other", type: "folder", urlString: nil, children: other)
             let allBookmarks = ImportedBookmarks(topLevelFolders: .init(bookmarkBar: bookmarkBar, otherBookmarks: otherBookmarks))
-            let result = HTMLImportedBookmarks(isInSafariFormat: isInSafariFormat, bookmarkCount: bookmarksCount, bookmarks: allBookmarks)
+            let result = HTMLImportedBookmarks(isInSafariFormat: isInSafariFormat, bookmarks: allBookmarks)
 
             return .success(result)
 
@@ -183,7 +180,6 @@ final class BookmarkHTMLReader {
             let firstChild = cursor?.child(at: 0)
             switch (cursor?.htmlTag, firstChild?.htmlTag) {
             case (.dd, .h3):
-                // 5.1.
                 children.append(try readFolder(firstChild))
             case (.dt, .a):
                 children.append(try readBookmark(firstChild))
@@ -202,13 +198,10 @@ final class BookmarkHTMLReader {
             throw ImportError.unexpectedBookmarksFileFormat
         }
 
-        bookmarksCount += 1
-
         return bookmark
     }
 
     private let bookmarksFileURL: URL
-    private var bookmarksCount: Int = 0
 }
 
 private extension XMLNode {

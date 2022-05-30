@@ -44,6 +44,13 @@ struct ImportedBookmarks: Decodable {
             return !isFolder && url == nil
         }
 
+        fileprivate var numberOfBookmarks: Int {
+            if isFolder {
+                return (children ?? []).reduce(0, { $0 + $1.numberOfBookmarks })
+            }
+            return 1
+        }
+
         enum CodingKeys: String, CodingKey {
             case name
             case type
@@ -63,6 +70,10 @@ struct ImportedBookmarks: Decodable {
     }
 
     let topLevelFolders: TopLevelFolders
+
+    var numberOfBookmarks: Int {
+        topLevelFolders.bookmarkBar.numberOfBookmarks + topLevelFolders.otherBookmarks.numberOfBookmarks
+    }
 
     enum CodingKeys: String, CodingKey {
         case topLevelFolders = "roots"

@@ -29,7 +29,7 @@ final class BookmarkHTMLImporter: DataImporter {
     }
 
     var totalBookmarks: Int {
-        (try? bookmarkReaderResult.get().bookmarkCount) ?? 0
+        (try? bookmarkReaderResult.get().bookmarks.numberOfBookmarks) ?? 0
     }
 
     func importableTypes() -> [DataImport.DataType] {

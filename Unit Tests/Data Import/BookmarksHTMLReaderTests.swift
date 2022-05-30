@@ -35,7 +35,7 @@ class BookmarksHTMLReaderTests: XCTestCase {
         let result = reader.readBookmarks()
 
         let importedBookmarks = try XCTUnwrap(try? result.get())
-        XCTAssertEqual(importedBookmarks.bookmarkCount, 12)
+        XCTAssertEqual(importedBookmarks.bookmarks.numberOfBookmarks, 12)
     }
 
     func test_WhenParseSafariHtml_ThenImportSuccess() throws {
@@ -43,7 +43,7 @@ class BookmarksHTMLReaderTests: XCTestCase {
         let result = reader.readBookmarks()
 
         let importedBookmarks = try XCTUnwrap(try? result.get())
-        XCTAssertEqual(importedBookmarks.bookmarkCount, 13)
+        XCTAssertEqual(importedBookmarks.bookmarks.numberOfBookmarks, 13)
     }
 
     func test_WhenParseSafariHtml_ThenReadingListExcluded() throws {
@@ -60,7 +60,7 @@ class BookmarksHTMLReaderTests: XCTestCase {
         let result = reader.readBookmarks()
 
         let importedBookmarks = try XCTUnwrap(try? result.get())
-        XCTAssertEqual(importedBookmarks.bookmarkCount, 17)
+        XCTAssertEqual(importedBookmarks.bookmarks.numberOfBookmarks, 17)
     }
 
     func test_WhenParseBraveHtml_ThenImportSuccess() throws {
@@ -68,7 +68,7 @@ class BookmarksHTMLReaderTests: XCTestCase {
         let result = reader.readBookmarks()
 
         let importedBookmarks = try XCTUnwrap(try? result.get())
-        XCTAssertEqual(importedBookmarks.bookmarkCount, 12)
+        XCTAssertEqual(importedBookmarks.bookmarks.numberOfBookmarks, 12)
     }
 
     func test_WhenParseDDGAndroidHtml_ThenImportSuccess() throws {
@@ -76,7 +76,7 @@ class BookmarksHTMLReaderTests: XCTestCase {
         let result = reader.readBookmarks()
 
         let importedBookmarks = try XCTUnwrap(try? result.get())
-        XCTAssertEqual(importedBookmarks.bookmarkCount, 13)
+        XCTAssertEqual(importedBookmarks.bookmarks.numberOfBookmarks, 13)
     }
 
     func test_WhenParseDDGMacOSHtml_ThenImportSuccess() throws {
@@ -84,7 +84,7 @@ class BookmarksHTMLReaderTests: XCTestCase {
         let result = reader.readBookmarks()
 
         let importedBookmarks = try XCTUnwrap(try? result.get())
-        XCTAssertEqual(importedBookmarks.bookmarkCount, 13)
+        XCTAssertEqual(importedBookmarks.bookmarks.numberOfBookmarks, 13)
     }
 
     func test_WhenParseInvalidHtml_ThenImportFail() throws {
