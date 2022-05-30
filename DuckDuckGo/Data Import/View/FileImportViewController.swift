@@ -1,5 +1,5 @@
 //
-//  CSVImportViewController.swift
+//  FileImportViewController.swift
 //
 //  Copyright © 2021 DuckDuckGo. All rights reserved.
 //
@@ -18,27 +18,27 @@
 
 import AppKit
 
-protocol CSVImportViewControllerDelegate: AnyObject {
+protocol FileImportViewControllerDelegate: AnyObject {
 
-    func csvImportViewController(_ viewController: CSVImportViewController, didSelectCSVFileWithURL: URL?)
+    func fileImportViewController(_ viewController: FileImportViewController, didSelectCSVFileWithURL: URL?)
     func totalValidLogins(in fileURL: URL) -> Int?
 
-    func csvImportViewController(_ viewController: CSVImportViewController, didSelectBookmarksFileWithURL: URL?)
+    func fileImportViewController(_ viewController: FileImportViewController, didSelectBookmarksFileWithURL: URL?)
     func totalValidBookmarks(in fileURL: URL) -> Int?
 }
 
-final class CSVImportViewController: NSViewController {
+final class FileImportViewController: NSViewController {
 
     enum Constants {
         static let storyboardName = "DataImport"
-        static let identifier = "CSVImportViewController"
+        static let identifier = "FileImportViewController"
         static let wideStackViewSpacing: CGFloat = 20
         static let narrowStackViewSpacing: CGFloat = 12
     }
 
-    static func create(importSource: DataImport.Source) -> CSVImportViewController {
+    static func create(importSource: DataImport.Source) -> FileImportViewController {
         let storyboard = NSStoryboard(name: Constants.storyboardName, bundle: nil)
-        let controller: CSVImportViewController = storyboard.instantiateController(identifier: Constants.identifier)
+        let controller: FileImportViewController = storyboard.instantiateController(identifier: Constants.identifier)
         controller.importSource = importSource
         return controller
     }
@@ -61,7 +61,7 @@ final class CSVImportViewController: NSViewController {
             renderCurrentState()
         }
     }
-    weak var delegate: CSVImportViewControllerDelegate?
+    weak var delegate: FileImportViewControllerDelegate?
 
     // MARK: - View State
 
@@ -174,13 +174,13 @@ final class CSVImportViewController: NSViewController {
             if let selectedURL = panel.url {
                 currentImportState = .selectedValidFile(fileURL: selectedURL)
                 if importSource == .bookmarksHTML {
-                    delegate?.csvImportViewController(self, didSelectBookmarksFileWithURL: selectedURL)
+                    delegate?.fileImportViewController(self, didSelectBookmarksFileWithURL: selectedURL)
                 } else {
-                    delegate?.csvImportViewController(self, didSelectCSVFileWithURL: selectedURL)
+                    delegate?.fileImportViewController(self, didSelectCSVFileWithURL: selectedURL)
                 }
             } else {
                 currentImportState = .selectedInvalidFile
-                delegate?.csvImportViewController(self, didSelectCSVFileWithURL: nil)
+                delegate?.fileImportViewController(self, didSelectCSVFileWithURL: nil)
             }
         }
 

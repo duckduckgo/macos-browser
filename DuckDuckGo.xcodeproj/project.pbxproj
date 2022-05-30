@@ -127,8 +127,8 @@
 		4B723E0826B0003E00E14D75 /* MockSecureVault.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B723E0326B0003E00E14D75 /* MockSecureVault.swift */; };
 		4B723E0926B0003E00E14D75 /* CSVLoginExporterTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B723E0426B0003E00E14D75 /* CSVLoginExporterTests.swift */; };
 		4B723E0A26B0005900E14D75 /* DataImportViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B723DEE26B0002B00E14D75 /* DataImportViewController.swift */; };
-		4B723E0B26B0005B00E14D75 /* CSVImportViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B723DEF26B0002B00E14D75 /* CSVImportViewController.swift */; };
-		4B723E0C26B0005D00E14D75 /* CSVImportSummaryViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B723DF026B0002B00E14D75 /* CSVImportSummaryViewController.swift */; };
+		4B723E0B26B0005B00E14D75 /* FileImportViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B723DEF26B0002B00E14D75 /* FileImportViewController.swift */; };
+		4B723E0C26B0005D00E14D75 /* FileImportSummaryViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B723DF026B0002B00E14D75 /* FileImportSummaryViewController.swift */; };
 		4B723E0D26B0006100E14D75 /* SecureVaultLoginImporter.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B723DF326B0002B00E14D75 /* SecureVaultLoginImporter.swift */; };
 		4B723E0E26B0006300E14D75 /* LoginImport.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B723DF426B0002B00E14D75 /* LoginImport.swift */; };
 		4B723E0F26B0006500E14D75 /* CSVParser.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B723DF626B0002B00E14D75 /* CSVParser.swift */; };
@@ -887,8 +887,8 @@
 		4B723DEB26B0002B00E14D75 /* DataImport.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DataImport.swift; sourceTree = "<group>"; };
 		4B723DED26B0002B00E14D75 /* DataImport.storyboard */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; path = DataImport.storyboard; sourceTree = "<group>"; };
 		4B723DEE26B0002B00E14D75 /* DataImportViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DataImportViewController.swift; sourceTree = "<group>"; };
-		4B723DEF26B0002B00E14D75 /* CSVImportViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CSVImportViewController.swift; sourceTree = "<group>"; };
-		4B723DF026B0002B00E14D75 /* CSVImportSummaryViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CSVImportSummaryViewController.swift; sourceTree = "<group>"; };
+		4B723DEF26B0002B00E14D75 /* FileImportViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FileImportViewController.swift; sourceTree = "<group>"; };
+		4B723DF026B0002B00E14D75 /* FileImportSummaryViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FileImportSummaryViewController.swift; sourceTree = "<group>"; };
 		4B723DF326B0002B00E14D75 /* SecureVaultLoginImporter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SecureVaultLoginImporter.swift; sourceTree = "<group>"; };
 		4B723DF426B0002B00E14D75 /* LoginImport.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LoginImport.swift; sourceTree = "<group>"; };
 		4B723DF626B0002B00E14D75 /* CSVParser.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CSVParser.swift; sourceTree = "<group>"; };
@@ -1886,8 +1886,8 @@
 				85C48CD027908C1000D3263E /* BrowserImportMoreInfoViewController.swift */,
 				4B78A86A26BB3ADD0071BB16 /* BrowserImportSummaryViewController.swift */,
 				4B59024226B35F7C00489384 /* BrowserImportViewController.swift */,
-				4B723DF026B0002B00E14D75 /* CSVImportSummaryViewController.swift */,
-				4B723DEF26B0002B00E14D75 /* CSVImportViewController.swift */,
+				4B723DF026B0002B00E14D75 /* FileImportSummaryViewController.swift */,
+				4B723DEF26B0002B00E14D75 /* FileImportViewController.swift */,
 				4B723DED26B0002B00E14D75 /* DataImport.storyboard */,
 				4B723DEE26B0002B00E14D75 /* DataImportViewController.swift */,
 				4B8AC93426B3B2FD00879451 /* NSAlert+DataImport.swift */,
@@ -4204,7 +4204,7 @@
 				9833912F27AAA3CE00DAF119 /* AppTrackerDataSetProvider.swift in Sources */,
 				4BA1A6B3258B080A00F6F690 /* EncryptionKeyGeneration.swift in Sources */,
 				37B11B3928095E6600CBB621 /* TabLazyLoader.swift in Sources */,
-				4B723E0B26B0005B00E14D75 /* CSVImportViewController.swift in Sources */,
+				4B723E0B26B0005B00E14D75 /* FileImportViewController.swift in Sources */,
 				8589063C267BCDC000D23B0D /* SaveCredentialsViewController.swift in Sources */,
 				4BBE0AA727B9B027003B37A8 /* PopUpButton.swift in Sources */,
 				AABEE6A524AA0A7F0043105B /* SuggestionViewController.swift in Sources */,
@@ -4284,7 +4284,7 @@
 				B6F1C80B2761C45400334924 /* LocalUnprotectedDomains.swift in Sources */,
 				858A798526A8BB5D00A75A42 /* NSTextViewExtension.swift in Sources */,
 				B6B1E88426D5EB570062C350 /* DownloadsCellView.swift in Sources */,
-				4B723E0C26B0005D00E14D75 /* CSVImportSummaryViewController.swift in Sources */,
+				4B723E0C26B0005D00E14D75 /* FileImportSummaryViewController.swift in Sources */,
 				B6AAAC2D260330580029438D /* PublishedAfter.swift in Sources */,
 				4BBC16A027C4859400E00A38 /* DeviceAuthenticationService.swift in Sources */,
 				3776582F27F82E62009A6B35 /* AutofillPreferences.swift in Sources */,

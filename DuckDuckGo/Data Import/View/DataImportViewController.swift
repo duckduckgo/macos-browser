@@ -91,7 +91,7 @@ final class DataImportViewController: NSViewController {
                     self.dataImporter = try EdgeDataImporter(loginImporter: secureVaultImporter(), bookmarkImporter: bookmarkImporter)
                 case .firefox:
                     self.dataImporter = try FirefoxDataImporter(loginImporter: secureVaultImporter(), bookmarkImporter: bookmarkImporter)
-                case .safari where !(currentChildViewController is CSVImportViewController):
+                case .safari where !(currentChildViewController is FileImportViewController):
                     self.dataImporter = SafariDataImporter(bookmarkImporter: bookmarkImporter)
                 case .bookmarksHTML:
                     if !(self.dataImporter is BookmarkHTMLImporter) {
@@ -143,7 +143,7 @@ final class DataImportViewController: NSViewController {
         case .ableToImport where viewState.selectedImportSource == .safari
                 && selectedImportOptions.contains(.logins)
                 && (dataImporter is CSVImporter || selectedImportOptions == [.logins])
-                && !(currentChildViewController is CSVImportViewController):
+                && !(currentChildViewController is FileImportViewController):
             // Only Safari Passwords selected, switch to CSV select
             self.viewState = .init(selectedImportSource: viewState.selectedImportSource, interactionState: .permissionsRequired([.logins]))
 
@@ -258,13 +258,13 @@ final class DataImportViewController: NSViewController {
         switch importSource {
         case .safari:
             if case .permissionsRequired([.logins]) = interactionState {
-                let viewController = CSVImportViewController.create(importSource: .safari)
+                let viewController = FileImportViewController.create(importSource: .safari)
                 viewController.delegate = self
                 return viewController
 
             } else if case .ableToImport = interactionState,
-                      let csvImportViewController = currentChildViewController as? CSVImportViewController {
-                csvImportViewController.importSource = importSource
+                      let fileImportViewController = currentChildViewController as? FileImportViewController {
+                fileImportViewController.importSource = importSource
                 return nil
             }
             fallthrough
@@ -286,11 +286,11 @@ final class DataImportViewController: NSViewController {
             if case let .completedImport(summary) = interactionState {
                 return BrowserImportSummaryViewController.create(importSummary: summary)
             } else {
-                if let csvImportViewController = currentChildViewController as? CSVImportViewController {
-                    csvImportViewController.importSource = importSource
+                if let fileImportViewController = currentChildViewController as? FileImportViewController {
+                    fileImportViewController.importSource = importSource
                     return nil
                 }
-                let viewController = CSVImportViewController.create(importSource: importSource)
+                let viewController = FileImportViewController.create(importSource: importSource)
                 viewController.delegate = self
                 return viewController
             }
@@ -447,9 +447,9 @@ final class DataImportViewController: NSViewController {
 }
 // swiftlint:enable type_body_length
 
-extension DataImportViewController: CSVImportViewControllerDelegate {
+extension DataImportViewController: FileImportViewControllerDelegate {
 
-    func csvImportViewController(_ viewController: CSVImportViewController, didSelectBookmarksFileWithURL url: URL?) {
+    func fileImportViewController(_ viewController: FileImportViewController, didSelectBookmarksFileWithURL url: URL?) {
         guard let url = url else {
             self.viewState.interactionState = .unableToImport
             return
@@ -461,7 +461,7 @@ extension DataImportViewController: CSVImportViewControllerDelegate {
         self.viewState.interactionState = .ableToImport
     }
 
-    func csvImportViewController(_ viewController: CSVImportViewController, didSelectCSVFileWithURL url: URL?) {
+    func fileImportViewController(_ viewController: FileImportViewController, didSelectCSVFileWithURL url: URL?) {
         guard let url = url else {
             self.viewState.interactionState = .unableToImport
             return
