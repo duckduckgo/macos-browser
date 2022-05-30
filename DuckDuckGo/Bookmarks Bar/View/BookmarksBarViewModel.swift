@@ -18,6 +18,21 @@
 
 import Foundation
 
-final class BookmarksBarViewModel {
+final class BookmarksBarViewModel: NSObject, NSPasteboardItemDataProvider {
     
+    func pasteboard(_ pasteboard: NSPasteboard?, item: NSPasteboardItem, provideDataForType type: NSPasteboard.PasteboardType) {
+        print(#function)
+        
+        // TODO: Read data about actual dragged item
+        let string = "https://duckduckgo.com/".data(using: .utf8)!
+    
+        switch type {
+        case .URL:
+            item.setData(string, forType: type)
+        case .string:
+            item.setData(string, forType: type)
+        default: break
+        }
+    }
+ 
 }

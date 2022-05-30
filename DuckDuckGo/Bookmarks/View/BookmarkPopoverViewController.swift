@@ -36,7 +36,7 @@ final class BookmarkPopoverViewController: NSViewController {
     @IBOutlet weak var favoriteButton: NSButton!
     @IBOutlet weak var folderPickerPopUpButton: NSPopUpButton!
     
-    private var folderPickerPopUpButtonSelectionCancellable: AnyCancellable?
+    private var folderPickerSelectionCancellable: AnyCancellable?
 
     let bookmarkManager: BookmarkManager = LocalBookmarkManager.shared
     var bookmark: Bookmark? {
@@ -55,7 +55,7 @@ final class BookmarkPopoverViewController: NSViewController {
         appearanceCancellable = view.subscribeForAppApperanceUpdates()
         textField.delegate = self
         
-        folderPickerPopUpButtonSelectionCancellable = folderPickerPopUpButton.selectionPublisher.dropFirst().sink { [weak self] index in
+        folderPickerSelectionCancellable = folderPickerPopUpButton.selectionPublisher.dropFirst().sink { [weak self] index in
             guard let self = self,
                   let bookmark = self.bookmark,
                   let menuItem = self.folderPickerPopUpButton.item(at: index),

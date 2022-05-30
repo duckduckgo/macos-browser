@@ -1028,6 +1028,7 @@ extension BrowserTabViewController {
     }
 
     func mouseDown(with event: NSEvent) -> NSEvent? {
+        print("TAB MOUSE DOWN")
         self.clickPoint = event.locationInWindow
         guard event.window === self.view.window, let clickPoint = self.clickPoint else { return event }
         tabViewModel?.tab.browserTabViewController(self, didClickAtPoint: clickPoint)

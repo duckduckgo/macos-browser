@@ -32,11 +32,21 @@ final class BookmarksBarView: ColorView {
     weak var delegate: BookmarksBarViewDelegate?
     
     override func draggingEntered(_ sender: NSDraggingInfo) -> NSDragOperation {
+        print(#function)
+        
         delegate?.draggingEntered(draggingInfo: sender)
+        
+        let canReadPasteboardObjects = sender.draggingPasteboard.canReadObject(forClasses: [NSString.self, NSURL.self], options: nil)
+     
+        if canReadPasteboardObjects {
+            return .copy
+        }
+     
         return sender.draggingSourceOperationMask
     }
     
     override func draggingExited(_ sender: NSDraggingInfo?) {
+        print(#function)
         delegate?.draggingExited(draggingInfo: sender)
     }
     
@@ -56,7 +66,14 @@ final class BookmarksBarView: ColorView {
     }
     
     override func performDragOperation(_ sender: NSDraggingInfo) -> Bool {
-        print("Perform drag operation")
+        let classes = [NSString.self, NSURL.self]
+
+        guard let pasteboardObjects = sender.draggingPasteboard.readObjects(forClasses: classes, options: nil), pasteboardObjects.count > 0 else {
+            print("\(#function): Couldn't read objects")
+            return false
+        }
+        
+        print("\(#function): Did read objects")
         return true
     }
     

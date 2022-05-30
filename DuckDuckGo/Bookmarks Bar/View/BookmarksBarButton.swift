@@ -60,7 +60,7 @@ final class BookmarksBarButton: NSButton {
         if let bookmark = bookmarkEntity as? Bookmark {
             let favicon = FaviconManager.shared.getCachedFavicon(for: bookmark.url, sizeCategory: .small)?.image ?? NSImage(named: "Bookmark")
             faviconImageView.image = favicon
-        } else if let folder = bookmarkEntity as? BookmarkFolder {
+        } else if bookmarkEntity is BookmarkFolder {
             faviconImageView.image = NSImage(named: "Folder")
         } else {
             assertionFailure("Tried to update bookmarks bar button with unsupported type: \(bookmarkEntity)")
@@ -112,46 +112,10 @@ final class BookmarksBarButton: NSButton {
 }
 
 extension BookmarksBarButton: NSDraggingSource {
-    
-//    func draggingSession(_ session: NSDraggingSession, movedTo screenPoint: NSPoint) {
-//        // print(#function)
-//    }
-//    
-//    func draggingSession(_ session: NSDraggingSession, endedAt screenPoint: NSPoint, operation: NSDragOperation) {
-//        print("BookmarksBarButton: \(#function)")
-//        print(#function)
-//    }
 
     func draggingSession(_ session: NSDraggingSession, sourceOperationMaskFor context: NSDraggingContext) -> NSDragOperation {
         print("BookmarksBarButton: \(#function)")
-        return .generic
-    }
-    
-}
-
-extension BookmarksBarButton: NSPasteboardItemDataProvider {
-
-    func pasteboard(_ pasteboard: NSPasteboard?, item: NSPasteboardItem, provideDataForType type: NSPasteboard.PasteboardType) {
-        print(#function)
-        pasteboard?.setString("https://duck.com", forType: .URL)
-    }
-
-}
-
-extension NSView {
-    
-    func imageRepresentation() -> NSImage? {
-        guard let bitmap = self.bitmapImageRepForCachingDisplay(in: bounds) else {
-            return nil
-        }
-        
-        bitmap.size = bounds.size
-        cacheDisplay(in: bounds, to: bitmap)
-        
-        let image = NSImage(size: bounds.size)
-        image.addRepresentation(bitmap)
-        
-        return image
+        return .move
     }
     
 }
