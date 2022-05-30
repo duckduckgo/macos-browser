@@ -27,7 +27,6 @@ class EmbeddedTrackerDataTests: XCTestCase {
     func testWhenEmbeddedDataIsUpdatedThenUpdateSHAAndEtag() throws {
         
         let hash = try Data(contentsOf: AppTrackerDataSetProvider.embeddedUrl).sha256
-    print(hash)
         XCTAssertEqual(hash, AppTrackerDataSetProvider.Constants.embeddedDataSHA, "Error: please update SHA and ETag when changing embedded TDS")
     }
     

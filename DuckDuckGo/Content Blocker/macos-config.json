@@ -1,6 +1,6 @@
 {
     "readme": "https://github.com/duckduckgo/privacy-configuration",
-    "version": 1653502015972,
+    "version": 1653680846662,
     "features": {
         "ampLinks": {
             "exceptions": [
@@ -151,6 +151,10 @@
                     "reason": "Site not loading"
                 }
             ]
+        },
+        "cookie": {
+            "exceptions": [],
+            "state": "disabled"
         },
         "customUserAgent": {
             "settings": {
