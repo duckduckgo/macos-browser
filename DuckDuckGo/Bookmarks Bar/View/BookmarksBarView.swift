@@ -38,7 +38,6 @@ final class BookmarksBarView: ColorView {
     
     override func draggingExited(_ sender: NSDraggingInfo?) {
         delegate?.draggingExited(draggingInfo: sender)
-        print(#function)
     }
     
     override func draggingUpdated(_ sender: NSDraggingInfo) -> NSDragOperation {
