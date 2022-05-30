@@ -348,7 +348,7 @@ final class DataImportViewController: NSViewController {
             assertionFailure("\(#file): No data importer or profile found")
             return []
         }
-        return browserImportViewController?.selectedImportOptions ?? importer.importableTypes()
+        return importer.importableTypes()
     }
 
     private func completeImport() {
