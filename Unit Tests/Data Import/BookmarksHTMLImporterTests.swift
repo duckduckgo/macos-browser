@@ -23,16 +23,14 @@ struct BookmarkImportErrorMock: Error {}
 
 struct BookmarkImporterMock: BookmarkImporter {
     func importBookmarks(_ bookmarks: ImportedBookmarks, source: BookmarkImportSource) throws -> BookmarkImportResult {
-        if let error = _throwableError {
+        if let error = throwableError {
             throw error
         }
-        return _importBookmarks(bookmarks, source)
+        return importBookmarks(bookmarks, source)
     }
 
-    // swiftlint:disable identifier_name
-    var _throwableError: Error?
-    var _importBookmarks: (ImportedBookmarks, BookmarkImportSource) -> BookmarkImportResult
-    // swiftlint:enable identifier_name
+    var throwableError: Error?
+    var importBookmarks: (ImportedBookmarks, BookmarkImportSource) -> BookmarkImportResult
 }
 
 final class BookmarksHTMLImporterTests: XCTestCase {
@@ -41,7 +39,7 @@ final class BookmarksHTMLImporterTests: XCTestCase {
     var underlyingBookmarkImporter: BookmarkImporterMock!
 
     override func setUpWithError() throws {
-        underlyingBookmarkImporter = BookmarkImporterMock(_importBookmarks: { _, _ in
+        underlyingBookmarkImporter = BookmarkImporterMock(importBookmarks: { _, _ in
                 .init(successful: 0, duplicates: 0, failed: 0)
         })
     }
@@ -68,7 +66,7 @@ final class BookmarksHTMLImporterTests: XCTestCase {
         let completionExpectation = expectation(description: "Import Bookmarks Completion")
         let expectedImportResult = BookmarkImportResult(successful: 0, duplicates: 0, failed: 0)
 
-        underlyingBookmarkImporter._importBookmarks = { (_, _) in
+        underlyingBookmarkImporter.importBookmarks = { (_, _) in
             importExpectation.fulfill()
             return expectedImportResult
         }
@@ -88,4 +86,49 @@ final class BookmarksHTMLImporterTests: XCTestCase {
         waitForExpectations(timeout: 1)
     }
 
+    func testWhenValidBookmarksFileIsLoadedButImporterThrowsAnErrorThenBookmarksImportReturnsFailure() {
+        let completionExpectation = expectation(description: "Import Bookmarks Completion")
+
+        underlyingBookmarkImporter.throwableError = BookmarkImportErrorMock()
+
+        dataImporter = .init(fileURL: bookmarksFileURL("bookmarks_safari.html"), bookmarkImporter: underlyingBookmarkImporter)
+
+        dataImporter.importData(types: [.bookmarks], from: nil) { result in
+            switch result {
+            case .success:
+                XCTFail("unexpected import success")
+            case let .failure(error):
+                XCTAssertEqual(error.errorType, .cannotAccessCoreData)
+            }
+            completionExpectation.fulfill()
+        }
+
+        waitForExpectations(timeout: 1)
+    }
+
+    func testWhenInvalidBookmarksFileIsLoadedThenBookmarksImportReturnsFailure() {
+        let importExpectation = expectation(description: "Import Bookmarks")
+        importExpectation.isInverted = true
+        let completionExpectation = expectation(description: "Import Bookmarks Completion")
+        let expectedImportResult = BookmarkImportResult(successful: 0, duplicates: 0, failed: 0)
+
+        underlyingBookmarkImporter.importBookmarks = { (_, _) in
+            importExpectation.fulfill()
+            return expectedImportResult
+        }
+
+        dataImporter = .init(fileURL: bookmarksFileURL("bookmarks_invalid.html"), bookmarkImporter: underlyingBookmarkImporter)
+
+        dataImporter.importData(types: [.bookmarks], from: nil) { result in
+            switch result {
+            case .success:
+                XCTFail("unexpected import success")
+            case let .failure(error):
+                XCTAssertEqual(error.errorType, .cannotReadFile)
+            }
+            completionExpectation.fulfill()
+        }
+
+        waitForExpectations(timeout: 1)
+    }
 }
