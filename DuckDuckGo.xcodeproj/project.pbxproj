@@ -1942,6 +1942,7 @@
 				4B59024B26B38BB800489384 /* ChromiumLoginReaderTests.swift */,
 				4B723E0126B0003E00E14D75 /* CSVImporterTests.swift */,
 				4B723E0026B0003E00E14D75 /* CSVParserTests.swift */,
+				373A1AA9283ED86C00586521 /* BookmarksHTMLReaderTests.swift */,
 				4B723DFF26B0003E00E14D75 /* DataImportMocks.swift */,
 				4BB99D0D26FE1A83001E4761 /* FirefoxBookmarksReaderTests.swift */,
 				4B8AC93C26B49BE600879451 /* FirefoxLoginReaderTests.swift */,
@@ -1949,7 +1950,6 @@
 				4BB99D0E26FE1A84001E4761 /* SafariBookmarksReaderTests.swift */,
 				4BF4951726C08395000547B8 /* ThirdPartyBrowserTests.swift */,
 				37A803DA27FD69D300052F4C /* Data Import Resources */,
-				373A1AA9283ED86C00586521 /* BookmarksHTMLReaderTests.swift */,
 			);
 			path = "Data Import";
 			sourceTree = "<group>";

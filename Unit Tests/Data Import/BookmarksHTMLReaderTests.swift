@@ -23,14 +23,6 @@ class BookmarksHTMLReaderTests: XCTestCase {
 
     var reader: BookmarkHTMLReader!
 
-    var testBookmarkFiles: [URL] {
-        let bundle = Bundle(for: ChromiumLoginReaderTests.self)
-        let directory = bundle.resourceURL!
-            .appendingPathComponent("Data Import Resources/Test Bookmarks Data")
-        // swiftlint:disable:next force_try
-        return try! FileManager.default.contentsOfDirectory(at: directory, includingPropertiesForKeys: nil)
-    }
-
     func bookmarksFileURL(_ name: String) -> URL {
         let bundle = Bundle(for: ChromiumLoginReaderTests.self)
         return bundle.resourceURL!
@@ -38,29 +30,72 @@ class BookmarksHTMLReaderTests: XCTestCase {
             .appendingPathComponent(name)
     }
 
-    func testExample() throws {
+    func test_WhenParseChromeHtml_ThenImportSuccess() throws {
+        reader = BookmarkHTMLReader(bookmarksFileURL: bookmarksFileURL("bookmarks_chrome.html"))
+        let result = reader.readBookmarks()
 
-        for bookmarkFile in testBookmarkFiles {
-            reader = BookmarkHTMLReader(bookmarksFileURL: bookmarkFile)
-            let result = reader.readBookmarks()
-            XCTAssertNoThrow(try result.get(), bookmarkFile.absoluteString)
-        }
+        let importedBookmarks = try XCTUnwrap(try? result.get())
+        XCTAssertEqual(importedBookmarks.bookmarkCount, 12)
     }
 
-    func testMoreBookmarkFiles() throws {
-        let otherBookmarkFiles = [
-            "bookmarks_brave.html",
-            "bookmarks_chrome.html",
-            "bookmarks_ddg_android.html",
-            "bookmarks_ddg_macos.html",
-            "bookmarks_firefox.html",
-            "bookmarks_safari.html"
-        ]
+    func test_WhenParseSafariHtml_ThenImportSuccess() throws {
+        reader = BookmarkHTMLReader(bookmarksFileURL: bookmarksFileURL("bookmarks_safari.html"))
+        let result = reader.readBookmarks()
 
-        for file in otherBookmarkFiles {
-            reader = BookmarkHTMLReader(bookmarksFileURL: bookmarksFileURL(file))
-            let result = reader.readBookmarks()
-            XCTAssertNoThrow(try result.get(), file)
-        }
+        let importedBookmarks = try XCTUnwrap(try? result.get())
+        XCTAssertEqual(importedBookmarks.bookmarkCount, 13)
+    }
+
+    func test_WhenParseSafariHtml_ThenReadingListExcluded() throws {
+        reader = BookmarkHTMLReader(bookmarksFileURL: bookmarksFileURL("bookmarks_safari.html"))
+        let result = reader.readBookmarks()
+
+        let importedBookmarks = try XCTUnwrap(try? result.get())
+        let otherBookmarksFolders = try XCTUnwrap(importedBookmarks.bookmarks.topLevelFolders.otherBookmarks.children)
+        XCTAssertFalse(otherBookmarksFolders.contains(where: { $0.isFolder && $0.name == "Reading List" }))
+    }
+
+    func test_WhenParseFirefoxHtml_ThenImportSuccess() throws {
+        reader = BookmarkHTMLReader(bookmarksFileURL: bookmarksFileURL("bookmarks_firefox.html"))
+        let result = reader.readBookmarks()
+
+        let importedBookmarks = try XCTUnwrap(try? result.get())
+        XCTAssertEqual(importedBookmarks.bookmarkCount, 17)
+    }
+
+    func test_WhenParseBraveHtml_ThenImportSuccess() throws {
+        reader = BookmarkHTMLReader(bookmarksFileURL: bookmarksFileURL("bookmarks_brave.html"))
+        let result = reader.readBookmarks()
+
+        let importedBookmarks = try XCTUnwrap(try? result.get())
+        XCTAssertEqual(importedBookmarks.bookmarkCount, 12)
+    }
+
+    func test_WhenParseDDGAndroidHtml_ThenImportSuccess() throws {
+        reader = BookmarkHTMLReader(bookmarksFileURL: bookmarksFileURL("bookmarks_ddg_android.html"))
+        let result = reader.readBookmarks()
+
+        let importedBookmarks = try XCTUnwrap(try? result.get())
+        XCTAssertEqual(importedBookmarks.bookmarkCount, 13)
+    }
+
+    func test_WhenParseDDGMacOSHtml_ThenImportSuccess() throws {
+        reader = BookmarkHTMLReader(bookmarksFileURL: bookmarksFileURL("bookmarks_ddg_macos.html"))
+        let result = reader.readBookmarks()
+
+        let importedBookmarks = try XCTUnwrap(try? result.get())
+        XCTAssertEqual(importedBookmarks.bookmarkCount, 13)
+    }
+
+    func test_WhenParseInvalidHtml_ThenImportFail() throws {
+        reader = BookmarkHTMLReader(bookmarksFileURL: bookmarksFileURL("bookmarks_invalid.html"))
+        let result = reader.readBookmarks()
+
+        XCTAssertThrowsError(try result.get(), "", { error in
+            guard case BookmarkHTMLReader.ImportError.unexpectedBookmarksFileFormat = error else {
+                XCTFail("Unexpected error type: \(String(reflecting: error))")
+                return
+            }
+        })
     }
 }

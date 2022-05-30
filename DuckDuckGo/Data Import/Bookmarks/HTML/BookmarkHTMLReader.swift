@@ -145,7 +145,6 @@ final class BookmarkHTMLReader {
 
     private func findNextItemInSafariFormat(_ cursor: inout XMLNode?) -> XMLNode.BookmarkItemType? {
         var itemType: XMLNode.BookmarkItemType?
-        cursor = cursor?.parent?.nextSibling
 
         while cursor != nil && itemType == nil {
             cursor = cursor?.nextSibling
