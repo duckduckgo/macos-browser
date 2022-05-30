@@ -44,10 +44,8 @@ final class BookmarkHTMLReader {
 
             var cursor = try validateHTMLBookmarksDocument(document)
             let isInSafariFormat = try findTopLevelFolderNameNode(&cursor)
-            // 5.
             let bookmarkBar = try readFolder(cursor)
 
-            // 6.
             var other = [ImportedBookmarks.BookmarkOrFolder]()
 
             while cursor != nil {
@@ -80,13 +78,11 @@ final class BookmarkHTMLReader {
     // MARK: - Private
 
     private func validateHTMLBookmarksDocument(_ document: XMLDocument) throws -> XMLNode? {
-        // 1.
         let root = document.rootElement()
         guard let body = root?.child(at: 1) else {
             throw ImportError.unexpectedBookmarksFileFormat
         }
 
-        // 2.
         let cursor = body.child(at: 0)
         guard cursor?.htmlTag == .h1 else {
             throw ImportError.unexpectedBookmarksFileFormat
@@ -96,7 +92,6 @@ final class BookmarkHTMLReader {
     }
 
     private func findTopLevelFolderNameNode(_ cursor: inout XMLNode?) throws -> Bool {
-        // 3.
         var isInSafariFormat = false
         cursor = cursor?.nextSibling
 

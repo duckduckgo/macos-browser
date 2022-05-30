@@ -48,28 +48,35 @@ final class BookmarkHTMLImporter: DataImporter {
         from profile: DataImport.BrowserProfile?,
         completion: @escaping (Result<DataImport.Summary, DataImportError>) -> Void
     ) {
-        var summary = DataImport.Summary()
+        guard types == importableTypes() else {
+            assertionFailure("Unexpected data types for HTML bookmark import: \(types)")
+            completion(.failure(.bookmarks(BookmarkHTMLReader.ImportError.unexpectedBookmarksFileFormat)))
+            return
+        }
 
-        if types.contains(.bookmarks) {
-            let bookmarkReader = BookmarkHTMLReader(bookmarksFileURL: fileURL)
+        DispatchQueue.global(qos: .userInitiated).async {
+            let bookmarkReader = BookmarkHTMLReader(bookmarksFileURL: self.fileURL)
             let bookmarkResult = bookmarkReader.readBookmarks()
 
             switch bookmarkResult {
             case let .success(importedData):
                 do {
                     let source: BookmarkImportSource = importedData.isInSafariFormat ? .safari : .chromium
-                    summary.bookmarksResult = try bookmarkImporter.importBookmarks(importedData.bookmarks, source: source)
+                    let bookmarksResult = try self.bookmarkImporter.importBookmarks(importedData.bookmarks, source: source)
+                    DispatchQueue.main.async {
+                        completion(.success(.init(bookmarksResult: bookmarksResult)))
+                    }
                 } catch {
-                    completion(.failure(.bookmarks(.cannotAccessCoreData)))
-                    return
+                    DispatchQueue.main.async {
+                        completion(.failure(.bookmarks(.cannotAccessCoreData)))
+                    }
                 }
             case let .failure(error):
-                completion(.failure(.bookmarks(error)))
-                return
+                DispatchQueue.main.async {
+                    completion(.failure(.bookmarks(error)))
+                }
             }
         }
-
-        completion(.success(summary))
     }
 
 }
