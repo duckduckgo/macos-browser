@@ -67,7 +67,7 @@ final class MainViewController: NSViewController {
         listenToKeyDownEvents()
         subscribeToSelectedTabViewModel()
         findInPageContainerView.applyDropShadow()
-
+        // updateBookmarksBar(visible: true)
     }
 
     override func viewWillAppear() {
@@ -172,9 +172,11 @@ final class MainViewController: NSViewController {
         return bookmarksBarViewController
     }
     
-    func toggleBookmarksBar() {
-        bookmarksBarViewController.view.isHidden.toggle()
-        bookmarksBarHeightConstraint.constant = bookmarksBarViewController.view.isHidden ? 0 : 32
+    func updateBookmarksBar(visible: Bool) {
+        bookmarksBarViewController.view.isHidden = !visible
+        bookmarksBarHeightConstraint.constant = visible ? 32 : 0
+        // (divider as? ColorView)?.backgroundColor = visible ? .addressBarBackgroundColor : .separatorColor
+        (divider as? ColorView)?.backgroundColor = visible ? .red : .separatorColor
     }
 
     private func subscribeToSelectedTabViewModel() {

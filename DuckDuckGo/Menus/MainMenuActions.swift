@@ -254,7 +254,7 @@ extension MainViewController {
 
     @IBAction func toggleBookmarksBar(_ sender: Any) {
         guard let mainWindowController = WindowControllersManager.shared.lastKeyMainWindowController else { return }
-        mainWindowController.mainViewController.toggleBookmarksBar()
+        mainWindowController.mainViewController.updateBookmarksBar(visible: bookmarksBarViewController.view.isHidden)
     }
 
     // MARK: - History
