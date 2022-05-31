@@ -132,27 +132,24 @@ final class FileImportViewController: NSViewController {
             selectedFileContainer.isHidden = true
             renderAwaitingFileSelectionState()
         case .selectedValidFile(let fileURL):
+            selectedFileContainer.isHidden = false
+            selectedFileLabel.stringValue = fileURL.path
             if importSource == .bookmarksHTML {
                 let totalBookmarksToImport = self.delegate?.totalValidBookmarks(in: fileURL) ?? 0
-                selectedFileContainer.isHidden = false
-                selectedFileLabel.stringValue = fileURL.path
                 selectFileButton.title = UserText.importBookmarksSelectAnotherFile
                 totalValidLoginsLabel.stringValue = UserText.importingFile(validBookmarks: totalBookmarksToImport)
             } else {
                 let totalLoginsToImport = self.delegate?.totalValidLogins(in: fileURL) ?? 0
-                selectedFileContainer.isHidden = false
-                selectedFileLabel.stringValue = fileURL.path
                 selectFileButton.title = UserText.importLoginsSelectAnotherFile
                 totalValidLoginsLabel.stringValue = UserText.importingFile(validLogins: totalLoginsToImport)
             }
         case .selectedInvalidFile:
+            selectedFileLabel.isHidden = false
             if importSource == .bookmarksHTML {
                 selectedFileLabel.stringValue = UserText.importBookmarksFailedToReadHTMLFile
-                selectedFileLabel.isHidden = false
                 selectFileButton.title = UserText.importBookmarksSelectHTMLFile
             } else {
                 selectedFileLabel.stringValue = UserText.importLoginsFailedToReadCSVFile
-                selectedFileLabel.isHidden = false
                 selectFileButton.title = UserText.importLoginsSelectCSVFile
             }
         }
@@ -173,10 +170,13 @@ final class FileImportViewController: NSViewController {
         if result == .OK {
             if let selectedURL = panel.url {
                 currentImportState = .selectedValidFile(fileURL: selectedURL)
-                if importSource == .bookmarksHTML {
+                switch importSource {
+                case .bookmarksHTML:
                     delegate?.fileImportViewController(self, didSelectBookmarksFileWithURL: selectedURL)
-                } else {
+                case .csv:
                     delegate?.fileImportViewController(self, didSelectCSVFileWithURL: selectedURL)
+                default:
+                    break
                 }
             } else {
                 currentImportState = .selectedInvalidFile
