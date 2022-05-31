@@ -35,9 +35,15 @@ final class BookmarkHTMLReader {
 
     func readBookmarks() -> Result<HTMLImportedBookmarks, ImportError> {
         do {
-            guard let document = try? XMLDocument(contentsOf: bookmarksFileURL, options: .documentTidyHTML) else {
-                throw ImportError.unexpectedBookmarksFileFormat
-            }
+            //
+            // Bookmarks HTML is not a valid HTML and needs to be fixed, hence `.documentTidyHTML`.
+            // This, however, has a side effect of wrapping any `<p></p>` tags (otherwise irrelevant to
+            // the bookmarks structure) in `<dd></dd>` tags, that need to be handled while parsing.
+            // More info:
+            //  * https://social.msdn.microsoft.com/Forums/en-US/42547a38-7f65-432e-a40b-821b99aebdbb/intelligent-xmlhtml-parsing-firefoxnetscape-bookmarkshtml-format
+            //  * https://www.w3schools.com/TAgs/tag_dd.asp
+            //
+            let document = try XMLDocument(contentsOf: bookmarksFileURL, options: [.documentTidyHTML])
 
             var cursor = try validateHTMLBookmarksDocument(document)
             let isInSafariFormat = try findTopLevelFolderNameNode(&cursor)
@@ -61,7 +67,7 @@ final class BookmarkHTMLReader {
                 other.append(contentsOf: items)
             }
 
-            let otherBookmarks = ImportedBookmarks.BookmarkOrFolder(name: "other", type: "folder", urlString: nil, children: other)
+            let otherBookmarks = ImportedBookmarks.BookmarkOrFolder.folder(name: "other", children: other)
             let allBookmarks = ImportedBookmarks(topLevelFolders: .init(bookmarkBar: bookmarkBar, otherBookmarks: otherBookmarks))
             let result = HTMLImportedBookmarks(isInSafariFormat: isInSafariFormat, bookmarks: allBookmarks)
 
@@ -167,7 +173,7 @@ final class BookmarkHTMLReader {
         }
 
         let children = try readFolderContents(cursor)
-        return .init(name: title, type: "folder", urlString: nil, children: children)
+        return .folder(name: title, children: children)
     }
 
     private func readFolderContents(_ node: XMLNode?) throws -> [ImportedBookmarks.BookmarkOrFolder] {
@@ -197,7 +203,6 @@ final class BookmarkHTMLReader {
         guard let bookmark = node?.bookmark else {
             throw ImportError.unexpectedBookmarksFileFormat
         }
-
         return bookmark
     }
 
@@ -212,11 +217,17 @@ private extension XMLNode {
     }
 
     enum HTMLTag: String {
+        /// Bookmarks document title
         case h1
+        /// Bookmark folder name
         case h3
+        /// Bookmark folder contents
         case dl
+        /// Individual bookmark
         case dt
+        /// Tag added by XMLDocument while tidying up bookmarks HTML
         case dd
+        /// Contains bookmark URL and name
         case a
     }
 
@@ -269,11 +280,9 @@ private extension XMLNode {
             return nil
         }
 
-        return .init(
+        return .bookmark(
             name: name,
-            type: "bookmark",
-            urlString: (self as? XMLElement)?.attribute(forName: "href")?.stringValue,
-            children: nil
+            urlString: (self as? XMLElement)?.attribute(forName: "href")?.stringValue
         )
     }
 }

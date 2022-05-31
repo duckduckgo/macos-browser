@@ -27,6 +27,14 @@ struct ImportedBookmarks: Decodable {
 
         let children: [BookmarkOrFolder]?
 
+        static func bookmark(name: String, urlString: String?) -> BookmarkOrFolder {
+            .init(name: name, type: "bookmark", urlString: urlString, children: nil)
+        }
+
+        static func folder(name: String, children: [BookmarkOrFolder]) -> BookmarkOrFolder {
+            .init(name: name, type: "folder", urlString: nil, children: children)
+        }
+
         var url: URL? {
             if let url = self.urlString {
                 return URL(string: url)
