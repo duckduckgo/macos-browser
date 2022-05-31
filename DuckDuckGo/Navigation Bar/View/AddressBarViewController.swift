@@ -69,7 +69,7 @@ final class AddressBarViewController: NSViewController {
 
     private var cancellables = Set<AnyCancellable>()
     private var passiveAddressBarStringCancellable: AnyCancellable?
-
+    private var tabContentCancellable: AnyCancellable?
     private var progressCancellable: AnyCancellable?
     private var loadingCancellable: AnyCancellable?
 
@@ -193,9 +193,12 @@ final class AddressBarViewController: NSViewController {
     }
 
     private func subscribeToTabContent() {
-        tabCollectionViewModel.selectedTabViewModel?.tab.$content.receive(on: DispatchQueue.main).sink { [weak self] content in
-            self?.isHomePage = content == .homePage
-        }.store(in: &cancellables)
+        tabContentCancellable?.cancel()
+
+        tabContentCancellable = tabCollectionViewModel.selectedTabViewModel?.tab.$content
+            .receive(on: DispatchQueue.main)
+            .map { $0 == .homePage }
+            .assign(to: \.isHomePage, onWeaklyHeld: self)
     }
 
     private func subscribeToPassiveAddressBarString() {
