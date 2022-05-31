@@ -212,7 +212,7 @@ final class BookmarkHTMLReader {
         var cursor = node
 
         var folderName: String = ""
-        if cursor?.htmlTag == .h3, let name = cursor?.name {
+        if cursor?.htmlTag == .h3, let name = cursor?.stringValue {
             folderName = name
             cursor = cursor?.nextSibling
         }
