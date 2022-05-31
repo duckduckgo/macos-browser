@@ -32,14 +32,20 @@ final class URLExtensionTests: XCTestCase {
         XCTAssertTrue("http://example.com".url!.isValid)
         XCTAssertTrue("https://example.com".url!.isValid)
         XCTAssertTrue("http://localhost".url!.isValid)
-        XCTAssertTrue("http://localdomain".url!.isValid)
+        XCTAssertTrue("http://localhost.local".url!.isValid)
+        XCTAssertTrue("http://localhost.localdomain".url!.isValid)
+        XCTAssertTrue("http://host.docker.internal".url!.isValid)
+        XCTAssertTrue("http://random.hostname.with.scheme".url!.isValid)
     }
 
     func test_when_no_scheme_in_string_url_has_scheme() {
         XCTAssertEqual("duckduckgo.com".url!.absoluteString, "http://duckduckgo.com")
         XCTAssertEqual("example.com".url!.absoluteString, "http://example.com")
         XCTAssertEqual("localhost".url!.absoluteString, "http://localhost")
+        XCTAssertEqual("localhost.local".url!.absoluteString, "http://localhost.local")
+        XCTAssertNil("host.docker.internal".url)
         XCTAssertNil("localdomain".url)
+        XCTAssertNil("random.hostname.without.scheme".url)
     }
 
     func test_makeURL_from_addressBarString() {

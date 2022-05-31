@@ -84,9 +84,9 @@ extension URL {
             // if URL has domain:port or user:password@domain mistakengly interpreted as a scheme
             if let urlWithScheme = URL(string: NavigationalScheme.http.separated() + s),
                urlWithScheme.port != nil || urlWithScheme.user != nil {
-                // could be a local domain but user needs to use the protocol to specify that
-                // make exception for "localhost"
-                guard urlWithScheme.host?.contains(".") == true || urlWithScheme.host == .localhost else { return nil }
+                // validate host against known domain names (including 'localhost')
+                // if an custom local domain then user needs to add the protocol to specify that
+                guard urlWithScheme.host?.isValidHost(validateDomain: true) == true else { return nil }
                 self = urlWithScheme
                 return
 
@@ -95,8 +95,9 @@ extension URL {
                 return
 
             } else if let hostname = s.split(separator: "/").first {
-                guard hostname.contains(".") || String(hostname) == .localhost else {
-                    // could be a local domain but user needs to use the protocol to specify that
+                guard String(hostname).isValidHost(validateDomain: true) else {
+                    // validate hostname against known domain names (including 'localhost')
+                    // if an custom local domain then user needs to add the protocol to specify that
                     return nil
                 }
             } else {
@@ -365,7 +366,7 @@ extension URL {
         guard let scheme = scheme.map(NavigationalScheme.init) else { return false }
 
         if NavigationalScheme.hypertextSchemes.contains(scheme) {
-           return host?.isValidHost == true && user == nil
+           return host?.isValidHost(validateDomain: false) == true && user == nil
         }
 
         // This effectively allows file:// and External App Scheme URLs to be entered by user
