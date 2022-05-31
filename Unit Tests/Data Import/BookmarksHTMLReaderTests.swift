@@ -79,6 +79,14 @@ class BookmarksHTMLReaderTests: XCTestCase {
         XCTAssertEqual(importedBookmarks.bookmarks.numberOfBookmarks, 13)
     }
 
+    func test_WhenParseDDGiOSHtml_ThenImportSuccess() throws {
+        reader = BookmarkHTMLReader(bookmarksFileURL: bookmarksFileURL("bookmarks_ddg_ios.html"))
+        let result = reader.readBookmarks()
+
+        let importedBookmarks = try XCTUnwrap(try? result.get())
+        XCTAssertEqual(importedBookmarks.bookmarks.numberOfBookmarks, 8)
+    }
+
     func test_WhenParseDDGMacOSHtml_ThenImportSuccess() throws {
         reader = BookmarkHTMLReader(bookmarksFileURL: bookmarksFileURL("bookmarks_ddg_macos.html"))
         let result = reader.readBookmarks()

@@ -19,7 +19,7 @@
 import Foundation
 
 struct HTMLImportedBookmarks {
-    let isInSafariFormat: Bool
+    let source: BookmarkImportSource?
     let bookmarks: ImportedBookmarks
 }
 
@@ -36,7 +36,7 @@ final class BookmarkHTMLReader {
     func readBookmarks() -> Result<HTMLImportedBookmarks, ImportError> {
         do {
             //
-            // Bookmarks HTML is not a valid HTML and needs to be fixed, hence `.documentTidyHTML`.
+            // Bookmarks HTML is not a valid HTML and needs to be fixed before parsing, hence `.documentTidyHTML`.
             // This, however, has a side effect of wrapping any `<p></p>` tags (otherwise irrelevant to
             // the bookmarks structure) in `<dd></dd>` tags, that need to be handled while parsing.
             // More info:
@@ -46,14 +46,22 @@ final class BookmarkHTMLReader {
             let document = try XMLDocument(contentsOf: bookmarksFileURL, options: [.documentTidyHTML])
 
             var cursor = try validateHTMLBookmarksDocument(document)
-            let isInSafariFormat = try findTopLevelFolderNameNode(&cursor)
-            let bookmarkBar = try readFolder(cursor)
+            let importSource = try determineImportSource(&cursor)
+
+            let firstFolder = try readFolder(cursor)
 
             var other = [ImportedBookmarks.BookmarkOrFolder]()
+            if importSource == .duckduckgoWebKit {
+                if firstFolder.name.isEmpty {
+                    other.append(contentsOf: firstFolder.children ?? [])
+                } else {
+                    other.append(firstFolder)
+                }
+            }
 
             while cursor != nil {
                 let itemType: XMLNode.BookmarkItemType?
-                if isInSafariFormat {
+                if importSource?.supportsSafariBookmarksHTMLFormat == true {
                     itemType = findNextItemInSafariFormat(&cursor)
                 } else {
                     itemType = findNextItem(&cursor)
@@ -67,9 +75,17 @@ final class BookmarkHTMLReader {
                 other.append(contentsOf: items)
             }
 
+            let bookmarkBar: ImportedBookmarks.BookmarkOrFolder
+            if importSource == .duckduckgoWebKit {
+                // DDG does not have a "Bookmarks Bar" so let's fake it with an empty folder that will not be imported
+                bookmarkBar = .folder(name: "", children: [])
+            } else {
+                bookmarkBar = firstFolder
+            }
+
             let otherBookmarks = ImportedBookmarks.BookmarkOrFolder.folder(name: "other", children: other)
             let allBookmarks = ImportedBookmarks(topLevelFolders: .init(bookmarkBar: bookmarkBar, otherBookmarks: otherBookmarks))
-            let result = HTMLImportedBookmarks(isInSafariFormat: isInSafariFormat, bookmarks: allBookmarks)
+            let result = HTMLImportedBookmarks(source: importSource, bookmarks: allBookmarks)
 
             return .success(result)
 
@@ -79,6 +95,22 @@ final class BookmarkHTMLReader {
     }
 
     // MARK: - Private
+
+    private enum ReaderError: Error {
+        case noTopLevelFolder
+    }
+
+    private func determineImportSource(_ cursor: inout XMLNode?) throws -> BookmarkImportSource? {
+        let isInSafariFormat = try findTopLevelFolderNameNode(&cursor)
+
+        if cursor?.rootDocument?.isDDGBookmarksDocument == true {
+            return .duckduckgoWebKit
+        }
+        if isInSafariFormat {
+            return .safari
+        }
+        return nil
+    }
 
     private func validateHTMLBookmarksDocument(_ document: XMLDocument) throws -> XMLNode? {
         let root = document.rootElement()
@@ -100,7 +132,11 @@ final class BookmarkHTMLReader {
 
         switch cursor?.htmlTag {
         case .dl:
-            try proceedToTopLevelFolderNameNode(&cursor)
+            do {
+                try proceedToTopLevelFolderNameNode(&cursor)
+            } catch ReaderError.noTopLevelFolder {
+                isInSafariFormat = true
+            }
         case .h3:
             isInSafariFormat = true
         default:
@@ -111,10 +147,19 @@ final class BookmarkHTMLReader {
     }
 
     private func proceedToTopLevelFolderNameNode(_ cursor: inout XMLNode?) throws {
+        let originalCursorValue = cursor
         cursor = cursor?.child(at: 0)
         while cursor != nil {
             guard cursor?.htmlTag == .dd else {
-                throw ImportError.unexpectedBookmarksFileFormat
+                if cursor?.htmlTag == .dt {
+                    // There is no "top-level" folder, and the first item
+                    // in the bookmarks file is a regular bookmark, not a folder.
+                    // This is specific to iOS and MacOS DuckDuckGo apps.
+                    cursor = originalCursorValue
+                    throw ReaderError.noTopLevelFolder
+                } else {
+                    throw ImportError.unexpectedBookmarksFileFormat
+                }
             }
             if cursor?.child(at: 0)?.htmlTag == .h3 {
                 cursor = cursor?.child(at: 0)
@@ -166,14 +211,18 @@ final class BookmarkHTMLReader {
     private func readFolder(_ node: XMLNode?) throws -> ImportedBookmarks.BookmarkOrFolder {
         var cursor = node
 
-        let title = cursor?.text ?? ""
-        cursor = cursor?.nextSibling
+        var folderName: String = ""
+        if cursor?.htmlTag == .h3, let name = cursor?.name {
+            folderName = name
+            cursor = cursor?.nextSibling
+        }
+
         guard cursor?.htmlTag == .dl else {
             throw ImportError.unexpectedBookmarksFileFormat
         }
 
         let children = try readFolderContents(cursor)
-        return .folder(name: title, children: children)
+        return .folder(name: folderName, children: children)
     }
 
     private func readFolderContents(_ node: XMLNode?) throws -> [ImportedBookmarks.BookmarkOrFolder] {
@@ -207,6 +256,28 @@ final class BookmarkHTMLReader {
     }
 
     private let bookmarksFileURL: URL
+}
+
+private extension BookmarkImportSource {
+    var supportsSafariBookmarksHTMLFormat: Bool {
+        switch self {
+        case .duckduckgoWebKit, .safari:
+            return true
+        default:
+            return false
+        }
+    }
+}
+
+private extension XMLDocument {
+    enum Const {
+        static let ddgNamespacePrefix = "duckduckgo"
+        static let ddgNamespaceValue = "https://duckduckgo.com/bookmarks"
+    }
+
+    var isDDGBookmarksDocument: Bool {
+        rootElement()?.namespace(forPrefix: Const.ddgNamespacePrefix)?.stringValue == Const.ddgNamespaceValue
+    }
 }
 
 private extension XMLNode {
@@ -282,7 +353,8 @@ private extension XMLNode {
 
         return .bookmark(
             name: name,
-            urlString: (self as? XMLElement)?.attribute(forName: "href")?.stringValue
+            urlString: (self as? XMLElement)?.attribute(forName: "href")?.stringValue,
+            isDDGFavorite: (self as? XMLElement)?.attribute(forName: "duckduckgo:favorite")?.stringValue == "true"
         )
     }
 }

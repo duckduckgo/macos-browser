@@ -24,11 +24,12 @@ struct ImportedBookmarks: Decodable {
         let name: String
         let type: String
         let urlString: String?
+        let isDDGFavorite: Bool
 
         let children: [BookmarkOrFolder]?
 
-        static func bookmark(name: String, urlString: String?) -> BookmarkOrFolder {
-            .init(name: name, type: "bookmark", urlString: urlString, children: nil)
+        static func bookmark(name: String, urlString: String?, isDDGFavorite: Bool) -> BookmarkOrFolder {
+            .init(name: name, type: "bookmark", urlString: urlString, children: nil, isDDGFavorite: isDDGFavorite)
         }
 
         static func folder(name: String, children: [BookmarkOrFolder]) -> BookmarkOrFolder {
@@ -64,6 +65,23 @@ struct ImportedBookmarks: Decodable {
             case type
             case urlString = "url"
             case children
+        }
+
+        init(from decoder: Decoder) throws {
+            let container = try decoder.container(keyedBy: CodingKeys.self)
+            name = try container.decode(String.self, forKey: .name)
+            type = try container.decode(String.self, forKey: .type)
+            urlString = try container.decodeIfPresent(String.self, forKey: .urlString)
+            children = try container.decodeIfPresent([BookmarkOrFolder].self, forKey: .children)
+            isDDGFavorite = false
+        }
+
+        init(name: String, type: String, urlString: String?, children: [BookmarkOrFolder]?, isDDGFavorite: Bool = false) {
+            self.name = name
+            self.type = type
+            self.urlString = urlString
+            self.children = children
+            self.isDDGFavorite = isDDGFavorite
         }
     }
 
