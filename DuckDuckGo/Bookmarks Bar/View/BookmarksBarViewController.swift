@@ -323,9 +323,7 @@ final class BookmarksBarViewController: NSViewController {
             pasteboardItem.setDataProvider(viewModel, forTypes: [.URL, .string])
             
             let draggingItem = NSDraggingItem(pasteboardWriter: pasteboardItem)
-            var draggingFrame = sender.frame
-            // draggingFrame.origin = .zero
-            draggingItem.setDraggingFrame(draggingFrame, contents: sender.imageRepresentation()!)
+            draggingItem.setDraggingFrame(sender.frame, contents: sender.imageRepresentation()!)
             
             draggedItemOriginalIndex = index
             sender.isHidden = true
@@ -418,6 +416,7 @@ final class BookmarksBarViewController: NSViewController {
 
     func updateNearestDragIndex(_ newDragIndex: Int?, additionalWidth: CGFloat) {
         guard let newDragIndex = newDragIndex else {
+            print("DEBUG: Updating drag index with nil index, width \(additionalWidth)")
             self.midpoints = updateFrames(for: self.buttons,
                                           containerFrame: view.frame,
                                           hasClippedButtons: hasClippedButtons,
@@ -426,6 +425,7 @@ final class BookmarksBarViewController: NSViewController {
         }
         
         if let currentNearest = dropIndex, newDragIndex != dropIndex {
+            print("DEBUG: Setting new drag index \(newDragIndex), width \(additionalWidth)")
             dropIndex = newDragIndex
             let metadata = DraggedItemMetadata(dropIndex: newDragIndex, proposedItemWidth: additionalWidth)
             self.midpoints = updateFrames(for: self.buttons,
@@ -433,6 +433,7 @@ final class BookmarksBarViewController: NSViewController {
                                           hasClippedButtons: hasClippedButtons,
                                           draggedItemMetadata: metadata)
         } else if dropIndex == nil {
+            print("DEBUG: Setting initial drag index \(newDragIndex), width \(additionalWidth)")
             dropIndex = newDragIndex
             let metadata = DraggedItemMetadata(dropIndex: newDragIndex, proposedItemWidth: additionalWidth)
             self.midpoints = updateFrames(for: self.buttons,
@@ -468,10 +469,12 @@ extension BookmarksBarViewController: BookmarksBarViewDelegate {
         let convertedDraggingLocation = view.convert(draggingInfo.draggingLocation, from: nil)
         let horizontalOffset = convertedDraggingLocation.x
         
-        let nearest = midpoints.nearest(to: horizontalOffset)
-        let additionalWidth = draggingInfo.width + Constants.buttonSpacing
+        let result = midpoints.nearest(to: horizontalOffset)
         
-        updateNearestDragIndex(nearest?.offset, additionalWidth: additionalWidth)
+        if let width = draggingInfo.width {
+            let additionalWidth = width + Constants.buttonSpacing
+            updateNearestDragIndex(result?.offset, additionalWidth: additionalWidth)
+        }
     }
     
     func draggingExited(draggingInfo: NSDraggingInfo?) {
@@ -483,9 +486,11 @@ extension BookmarksBarViewController: BookmarksBarViewDelegate {
         let horizontalOffset = convertedDraggingLocation.x
         
         let result = midpoints.nearest(to: horizontalOffset)
-        let additionalWidth = draggingInfo.width + Constants.buttonSpacing
         
-        updateNearestDragIndex(result?.offset, additionalWidth: additionalWidth)
+        if let width = draggingInfo.width {
+            let additionalWidth = width + Constants.buttonSpacing
+            updateNearestDragIndex(result?.offset, additionalWidth: additionalWidth)
+        }
     }
     
     func draggingEnded(draggingInfo: NSDraggingInfo) {
@@ -514,20 +519,7 @@ extension BookmarksBarViewController: BookmarksBarViewDelegate {
     
 }
 
-extension Array where Element: (Comparable & SignedNumeric) {
-
-    func nearest(to value: Element) -> (offset: Int, element: Element)? {
-        self.enumerated().min(by: {
-            abs($0.element - value) < abs($1.element - value)
-        })
-    }
-
-}
-
-func CGPointDistanceSquared(from: CGPoint, to: CGPoint) -> CGFloat {
-    return (from.x - to.x) * (from.x - to.x) + (from.y - to.y) * (from.y - to.y)
-}
-
 func CGPointDistance(from: CGPoint, to: CGPoint) -> CGFloat {
-    return sqrt(CGPointDistanceSquared(from: from, to: to))
+    let distanceSquared = (from.x - to.x) * (from.x - to.x) + (from.y - to.y) * (from.y - to.y)
+    return sqrt(distanceSquared)
 }

@@ -58,9 +58,9 @@ final class BookmarkPopoverViewController: NSViewController {
         folderPickerSelectionCancellable = folderPickerPopUpButton.selectionPublisher.dropFirst().sink { [weak self] index in
             guard let self = self,
                   let bookmark = self.bookmark,
-                  let menuItem = self.folderPickerPopUpButton.item(at: index),
-                  let folder = menuItem.representedObject as? BookmarkFolder else { return }
+                  let menuItem = self.folderPickerPopUpButton.item(at: index) else { return }
             
+            let folder = menuItem.representedObject as? BookmarkFolder
             self.bookmarkManager.add(bookmark: bookmark, to: folder, completion: { _ in })
         }
     }

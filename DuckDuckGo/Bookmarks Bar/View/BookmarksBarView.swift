@@ -73,7 +73,7 @@ final class BookmarksBarView: ColorView {
             return false
         }
         
-        print("\(#function): Did read objects")
+        print("\(#function): Did read objects \(pasteboardObjects)")
         return true
     }
     
@@ -81,8 +81,8 @@ final class BookmarksBarView: ColorView {
 
 extension NSDraggingInfo {
     
-    var width: CGFloat {
-        return draggedImage?.size.width ?? 0
+    var width: CGFloat? {
+        return draggedImage?.size.width
     }
     
 }

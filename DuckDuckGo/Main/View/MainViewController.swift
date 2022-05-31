@@ -175,8 +175,9 @@ final class MainViewController: NSViewController {
     func updateBookmarksBar(visible: Bool) {
         bookmarksBarViewController.view.isHidden = !visible
         bookmarksBarHeightConstraint.constant = visible ? 32 : 0
+        
         // (divider as? ColorView)?.backgroundColor = visible ? .addressBarBackgroundColor : .separatorColor
-        (divider as? ColorView)?.backgroundColor = visible ? .red : .separatorColor
+        (divider as? ColorView)?.backgroundColor = visible ? .white : .separatorColor
     }
 
     private func subscribeToSelectedTabViewModel() {
@@ -196,7 +197,7 @@ final class MainViewController: NSViewController {
             let nonHomePageHeight: CGFloat = view.window?.isPopUpWindow == true ? 42 : 48
 
             let height = animated ? addressBarHeightConstraint.animator() : addressBarHeightConstraint
-            height?.constant = homePage ? 56 : nonHomePageHeight
+            height?.constant = homePage ? 52 : nonHomePageHeight
 
             let divider = animated ? self.divider.animator() : self.divider
             divider?.alphaValue = homePage ? 0 : 1.0

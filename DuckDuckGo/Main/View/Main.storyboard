@@ -35,15 +35,6 @@
                                     </userDefinedRuntimeAttribute>
                                 </userDefinedRuntimeAttributes>
                             </customView>
-                            <containerView translatesAutoresizingMaskIntoConstraints="NO" id="wFH-xq-50o">
-                                <rect key="frame" x="0.0" y="709" width="1024" height="42"/>
-                                <constraints>
-                                    <constraint firstAttribute="height" constant="42" id="vZS-tl-wOP"/>
-                                </constraints>
-                                <connections>
-                                    <segue destination="R9l-dg-lKa" kind="embed" destinationCreationSelector="createNavigationBarViewControllerWithCoder:sender:segueIdentifier:" id="Br9-o3-sQ8"/>
-                                </connections>
-                            </containerView>
                             <containerView translatesAutoresizingMaskIntoConstraints="NO" id="kfs-1U-pfm" userLabel="Bookmarks Bar Container View">
                                 <rect key="frame" x="0.0" y="676" width="1024" height="32"/>
                                 <constraints>
@@ -51,6 +42,15 @@
                                 </constraints>
                                 <connections>
                                     <segue destination="aql-HV-xza" kind="embed" destinationCreationSelector="createBookmarksBarWithCoder:sender:segueIdentifier:" id="TuO-tg-e0N"/>
+                                </connections>
+                            </containerView>
+                            <containerView translatesAutoresizingMaskIntoConstraints="NO" id="wFH-xq-50o">
+                                <rect key="frame" x="0.0" y="709" width="1024" height="42"/>
+                                <constraints>
+                                    <constraint firstAttribute="height" constant="42" id="vZS-tl-wOP"/>
+                                </constraints>
+                                <connections>
+                                    <segue destination="R9l-dg-lKa" kind="embed" destinationCreationSelector="createNavigationBarViewControllerWithCoder:sender:segueIdentifier:" id="Br9-o3-sQ8"/>
                                 </connections>
                             </containerView>
                             <containerView translatesAutoresizingMaskIntoConstraints="NO" id="SYo-8W-jl3">
