@@ -235,7 +235,6 @@ class BookmarksExporterTests: XCTestCase {
     }
 
     private func assertExportedFileEquals(_ expected: String, _ file: StaticString = #file, _ line: UInt = #line) {
-        print(tmpFile.absoluteString)
         let actual = try? String(contentsOf: tmpFile)
         XCTAssertEqual(expected, actual, file: file, line: line)
     }

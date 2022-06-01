@@ -102,6 +102,46 @@ final class FireTests: XCTestCase {
         waitForExpectations(timeout: 5, handler: nil)
     }
 
+    func testWhenBurnAllIsCalledThenLastSessionStateIsCleared() {
+        let fileName = "testStateFileForBurningAllData"
+        let fileStore = preparePersistedState(withFileName: fileName)
+        let service = StatePersistenceService(fileStore: fileStore, fileName: fileName)
+        let appStateRestorationManager = AppStateRestorationManager(service: service, shouldRestorePreviousSession: false)
+        appStateRestorationManager.applicationDidFinishLaunching()
+
+        let fire = Fire(stateRestorationManager: appStateRestorationManager)
+
+        XCTAssertTrue(appStateRestorationManager.canRestoreLastSessionState)
+        fire.burnAll(tabCollectionViewModel: .aTabCollectionViewModel)
+        XCTAssertFalse(appStateRestorationManager.canRestoreLastSessionState)
+    }
+
+    func testWhenBurnDomainsIsCalledThenLastSessionStateIsCleared() {
+        let fileName = "testStateFileForBurningAllData"
+        let fileStore = preparePersistedState(withFileName: fileName)
+        let service = StatePersistenceService(fileStore: fileStore, fileName: fileName)
+        let appStateRestorationManager = AppStateRestorationManager(service: service, shouldRestorePreviousSession: false)
+        appStateRestorationManager.applicationDidFinishLaunching()
+
+        let fire = Fire(stateRestorationManager: appStateRestorationManager)
+
+        XCTAssertTrue(appStateRestorationManager.canRestoreLastSessionState)
+        fire.burnDomains(["https://example.com"])
+        XCTAssertFalse(appStateRestorationManager.canRestoreLastSessionState)
+    }
+
+    func preparePersistedState(withFileName fileName: String) -> FileStore {
+        let fileStore = FileStoreMock()
+        let state = SavedStateMock()
+        state.val1 = "String"
+        state.val2 = 0x8badf00d
+
+        let serviceToPersistStateFile = StatePersistenceService(fileStore: fileStore, fileName: fileName)
+        serviceToPersistStateFile.persistState(using: state.encode(with:), sync: true)
+
+        return fileStore
+    }
+
 }
 
 fileprivate extension TabCollectionViewModel {

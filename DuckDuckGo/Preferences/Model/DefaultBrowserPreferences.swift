@@ -71,6 +71,7 @@ struct SystemDefaultBrowserProvider: DefaultBrowserProvider {
 final class DefaultBrowserPreferences: ObservableObject {
 
     @Published private(set) var isDefault: Bool = false
+    @Published private(set) var restorePreviousSession: Bool = false
 
     init(defaultBrowserProvider: DefaultBrowserProvider = SystemDefaultBrowserProvider()) {
         self.defaultBrowserProvider = defaultBrowserProvider

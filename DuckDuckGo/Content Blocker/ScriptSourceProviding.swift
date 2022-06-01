@@ -70,7 +70,8 @@ struct DefaultScriptSourceProvider: ScriptSourceProviding {
 
         return DefaultAutofillSourceProvider(privacyConfigurationManager: self.privacyConfigurationManager,
                                              properties: ContentScopeProperties(gpcEnabled: privacySettings.gpcEnabled,
-                                                                                sessionKey: self.sessionKey ?? ""))
+                                                                                sessionKey: self.sessionKey ?? "",
+                                                                                featureToggles: ContentScopeFeatureToggles.supportedFeaturesOnMacOS))
     }
 
     private func buildContentBlockerRulesConfig() -> ContentBlockerUserScriptConfig {

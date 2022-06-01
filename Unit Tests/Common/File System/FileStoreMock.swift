@@ -75,10 +75,15 @@ final class FileStoreMock: NSObject, FileStore {
         return true
     }
 
-    func loadData(at url: URL) -> Data? {
+    var decryptImpl: (Data) -> Data? = { $0 }
+    func decrypt(_ data: Data) -> Data? {
+        decryptImpl(data)
+    }
+
+    func loadData(at url: URL, decryptIfNeeded: Bool) -> Data? {
         guard failWithError == nil else { return nil }
         guard let data = storage[url.lastPathComponent] else { return nil }
-        return data
+        return decryptIfNeeded ? decrypt(data) : data
     }
 
     func hasData(at url: URL) -> Bool {

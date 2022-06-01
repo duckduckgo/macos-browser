@@ -27,7 +27,7 @@ final class FirePopoverWrapperViewController: NSViewController {
     var infoPresentedOnce: Bool
 
     private let fireViewModel: FireViewModel
-    private let tabCollectionViewModel: TabCollectionViewModel
+    private weak var tabCollectionViewModel: TabCollectionViewModel?
 
     required init?(coder: NSCoder) {
         fatalError("FirePopoverWrapperViewController: Bad initializer")
@@ -41,7 +41,13 @@ final class FirePopoverWrapperViewController: NSViewController {
 
         super.init(coder: coder)
     }
+
     @IBSegueAction func createFirePopoverViewController(_ coder: NSCoder) -> FirePopoverViewController? {
+        guard let tabCollectionViewModel = tabCollectionViewModel else {
+            assertionFailure("Attempted to display Fire Popover without an associated TabCollectionViewModel")
+            return nil
+        }
+
         let firePopoverViewController = FirePopoverViewController(coder: coder,
                                                                   fireViewModel: fireViewModel,
                                                                   tabCollectionViewModel: tabCollectionViewModel)

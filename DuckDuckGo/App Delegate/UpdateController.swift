@@ -17,13 +17,15 @@
 //
 
 import Foundation
+import Combine
 import Sparkle
 
 final class UpdateController: NSObject {
 
-    private let updater = SUUpdater()
+    let willRelaunchAppPublisher: AnyPublisher<Void, Never>
 
     override init() {
+        willRelaunchAppPublisher = willRelaunchAppSubject.eraseToAnyPublisher()
         super.init()
 
         configureUpdater()
@@ -33,15 +35,23 @@ final class UpdateController: NSObject {
         updater.checkForUpdates(sender)
     }
 
+    // MARK: - Private
+
     private func configureUpdater() {
+        updater.delegate = self
     // The default configuration of Sparkle updates is in Info.plist
-
 #if DEBUG
-
         updater.automaticallyChecksForUpdates = false
         updater.updateCheckInterval = 0
-
 #endif
     }
 
+    private let updater = SUUpdater()
+    private let willRelaunchAppSubject = PassthroughSubject<Void, Never>()
+}
+
+extension UpdateController: SUUpdaterDelegate {
+    func updaterWillRelaunchApplication(_ updater: SUUpdater) {
+        willRelaunchAppSubject.send()
+    }
 }

@@ -34,7 +34,7 @@ final class FirefoxDataImporter: DataImporter {
         return [.logins, .bookmarks]
     }
 
-    // swiftlint:disable:next cyclomatic_complexity function_body_length
+    // swiftlint:disable:next cyclomatic_complexity
     func importData(types: [DataImport.DataType],
                     from profile: DataImport.BrowserProfile?,
                     completion: @escaping (Result<DataImport.Summary, DataImportError>) -> Void) {
@@ -47,7 +47,7 @@ final class FirefoxDataImporter: DataImporter {
 
         if types.contains(.logins) {
             let loginReader = FirefoxLoginReader(firefoxProfileURL: firefoxProfileURL, primaryPassword: self.primaryPassword)
-            let loginResult = loginReader.readLogins()
+            let loginResult = loginReader.readLogins(dataFormat: nil)
 
             switch loginResult {
             case .success(let logins):
@@ -58,24 +58,19 @@ final class FirefoxDataImporter: DataImporter {
                 }
             case .failure(let error):
                 switch error {
-                case .requiresPrimaryPassword:
-                    completion(.failure(.logins(.needsLoginPrimaryPassword)))
-                case .databaseAccessFailed:
-                    completion(.failure(.logins(.browserNeedsToBeClosed)))
-                case .couldNotFindProfile:
-                    completion(.failure(.logins(.couldNotFindProfile)))
-                case .couldNotGetDecryptionKey:
-                    completion(.failure(.logins(.couldNotGetDecryptionKey)))
-                case .couldNotReadLoginsFile:
-                    completion(.failure(.logins(.cannotReadFile)))
-                case .decryptionFailed:
-                    completion(.failure(.logins(.cannotDecryptFile)))
+                case .requiresPrimaryPassword: completion(.failure(.logins(.needsLoginPrimaryPassword)))
+                case .databaseAccessFailed: completion(.failure(.logins(DataImportError.ImportErrorType.databaseAccessFailed)))
+                case .couldNotFindProfile: completion(.failure(.logins(.couldNotFindProfile)))
+                case .couldNotGetDecryptionKey: completion(.failure(.logins(.couldNotGetDecryptionKey)))
+                case .couldNotReadLoginsFile: completion(.failure(.logins(.cannotReadFile)))
+                case .decryptionFailed: completion(.failure(.logins(.cannotDecryptFile)))
+                case .failedToTemporarilyCopyFile: completion(.failure(.logins(.failedToTemporarilyCopyFile)))
                 }
             }
         }
 
         if types.contains(.bookmarks) {
-            let bookmarkReader = FirefoxBookmarksReader(firefoxDataDirectoryPath: firefoxProfileURL.absoluteString)
+            let bookmarkReader = FirefoxBookmarksReader(firefoxDataDirectoryURL: firefoxProfileURL)
             let bookmarkResult = bookmarkReader.readBookmarks()
 
             switch bookmarkResult {
@@ -83,11 +78,16 @@ final class FirefoxDataImporter: DataImporter {
                 do {
                     summary.bookmarksResult = try bookmarkImporter.importBookmarks(bookmarks, source: .firefox)
                 } catch {
-                    completion(.failure(.bookmarks(.cannotAccessSecureVault)))
+                    guard let error = error as? FirefoxBookmarksReader.ImportError else {
+                        completion(.failure(.bookmarks(.unexpectedBookmarksDatabaseFormat)))
+                        return
+                    }
+                    
+                    completion(.failure(.bookmarks(error)))
                     return
                 }
-            case .failure:
-                completion(.failure(.bookmarks(.browserNeedsToBeClosed)))
+            case .failure(let error):
+                completion(.failure(.bookmarks(error)))
                 return
             }
         }

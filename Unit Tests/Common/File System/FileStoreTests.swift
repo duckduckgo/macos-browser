@@ -76,6 +76,29 @@ final class FileStoreTests: XCTestCase {
         XCTAssertEqual(data, testData)
     }
 
+    func testThatLoadDataFromEncryptedStoreDecryptsByDefault() throws {
+        let keyStore = MockEncryptionKeyStore(generator: EncryptionKeyGenerator(), account: "mock-account")
+        let key = try? keyStore.readKey()
+        let encryptedStore = EncryptedFileStore(encryptionKey: key!)
+
+        _ = encryptedStore.persist(testData, url: testFileLocation)
+        let readData = try XCTUnwrap(encryptedStore.loadData(at: testFileLocation))
+
+        XCTAssertEqual(testData, readData)
+    }
+
+    func testWhenLoadDataIsCalledWithoutDecryptionThenDataIsNotDecrypted() throws {
+        let keyStore = MockEncryptionKeyStore(generator: EncryptionKeyGenerator(), account: "mock-account")
+        let key = try? keyStore.readKey()
+        let encryptedStore = EncryptedFileStore(encryptionKey: key!)
+
+        _ = encryptedStore.persist(testData, url: testFileLocation)
+        let readData = try XCTUnwrap(encryptedStore.loadData(at: testFileLocation, decryptIfNeeded: false))
+
+        XCTAssertNotEqual(testData, readData)
+        XCTAssertEqual(encryptedStore.decrypt(readData), testData)
+    }
+
     func testOverwritingStoredFiles() {
         let keyStore = MockEncryptionKeyStore(generator: EncryptionKeyGenerator(), account: "mock-account")
         let key = try? keyStore.readKey()

@@ -1,5 +1,5 @@
 //
-//  PreferencesDefaultBrowserView.swift
+//  PreferencesGeneralView.swift
 //
 //  Copyright © 2022 DuckDuckGo. All rights reserved.
 //
@@ -22,28 +22,39 @@ import Combine
 
 extension Preferences {
 
-    struct DefaultBrowserView: View {
-        @ObservedObject var model: DefaultBrowserPreferences
+    struct GeneralView: View {
+        @ObservedObject var defaultBrowserModel: DefaultBrowserPreferences
+        @ObservedObject var startupModel: StartupPreferences
 
         var body: some View {
             VStack(alignment: .leading, spacing: 0) {
-                Text(UserText.defaultBrowser)
+                Text(UserText.general)
                     .font(Const.Fonts.preferencePaneTitle)
 
                 Section {
+                    Text(UserText.defaultBrowser)
+                        .font(Const.Fonts.preferencePaneSectionHeader)
+
                     HStack {
-                        if model.isDefault {
+                        if defaultBrowserModel.isDefault {
                             Image("SolidCheckmark")
                             Text(UserText.isDefaultBrowser)
                         } else {
-                            Image("Warning")
+                            Image("Warning").foregroundColor(Color("LinkBlueColor"))
                             Text(UserText.isNotDefaultBrowser)
                             Button(UserText.makeDefaultBrowser) {
-                                model.becomeDefault()
+                                defaultBrowserModel.becomeDefault()
                             }
                         }
                     }
                 }
+
+                Section {
+                    Text(UserText.onStartup)
+                        .font(Const.Fonts.preferencePaneSectionHeader)
+                    Toggle(UserText.reopenAllWindowsFromLastSession, isOn: $startupModel.restorePreviousSession)
+                }
+
             }
         }
     }
