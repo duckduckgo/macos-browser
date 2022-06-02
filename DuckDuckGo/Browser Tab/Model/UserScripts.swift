@@ -30,6 +30,7 @@ final class UserScripts {
     let hoverUserScript = HoverUserScript()
     let debugScript = DebugUserScript()
     let clickToLoadScript: ClickToLoadUserScript
+    let youtubeScript = YoutubeAdBlockingUserScript()
 
     let contentBlockerRulesScript: ContentBlockerRulesUserScript
     let surrogatesScript: SurrogatesUserScript
@@ -69,7 +70,8 @@ final class UserScripts {
         hoverUserScript,
         clickToLoadScript,
         contentScopeUserScript,
-        autofillScript
+        autofillScript,
+        youtubeScript
     ]
 
     lazy var scripts = userScripts.map { $0.makeWKUserScript() }

@@ -491,6 +491,7 @@
 		AAC9C01C24CB594C00AD1325 /* TabViewModelTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = AAC9C01B24CB594C00AD1325 /* TabViewModelTests.swift */; };
 		AAC9C01E24CB6BEB00AD1325 /* TabCollectionViewModelTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = AAC9C01D24CB6BEB00AD1325 /* TabCollectionViewModelTests.swift */; };
 		AACF6FD626BC366D00CF09F9 /* SafariVersionReader.swift in Sources */ = {isa = PBXBuildFile; fileRef = AACF6FD526BC366D00CF09F9 /* SafariVersionReader.swift */; };
+		AAD5D9FB28489C9000ABAE2A /* YoutubeAdBlockingUserScript.swift in Sources */ = {isa = PBXBuildFile; fileRef = AAD5D9FA28489C9000ABAE2A /* YoutubeAdBlockingUserScript.swift */; };
 		AAD6D8882696DF6D002393B3 /* CrashReportPromptViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = AAD6D8862696DF6D002393B3 /* CrashReportPromptViewController.swift */; };
 		AAD8078527B3F3BE00CF7703 /* WebsiteBreakageSender.swift in Sources */ = {isa = PBXBuildFile; fileRef = AAD8078427B3F3BE00CF7703 /* WebsiteBreakageSender.swift */; };
 		AAD8078727B3F45600CF7703 /* WebsiteBreakage.swift in Sources */ = {isa = PBXBuildFile; fileRef = AAD8078627B3F45600CF7703 /* WebsiteBreakage.swift */; };
@@ -1260,6 +1261,7 @@
 		AAC9C01B24CB594C00AD1325 /* TabViewModelTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TabViewModelTests.swift; sourceTree = "<group>"; };
 		AAC9C01D24CB6BEB00AD1325 /* TabCollectionViewModelTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TabCollectionViewModelTests.swift; sourceTree = "<group>"; };
 		AACF6FD526BC366D00CF09F9 /* SafariVersionReader.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SafariVersionReader.swift; sourceTree = "<group>"; };
+		AAD5D9FA28489C9000ABAE2A /* YoutubeAdBlockingUserScript.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = YoutubeAdBlockingUserScript.swift; sourceTree = "<group>"; };
 		AAD6D8862696DF6D002393B3 /* CrashReportPromptViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CrashReportPromptViewController.swift; sourceTree = "<group>"; };
 		AAD8078427B3F3BE00CF7703 /* WebsiteBreakageSender.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WebsiteBreakageSender.swift; sourceTree = "<group>"; };
 		AAD8078627B3F45600CF7703 /* WebsiteBreakage.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WebsiteBreakage.swift; sourceTree = "<group>"; };
@@ -2956,6 +2958,7 @@
 				4B2E7D6226FF9D6500D2DB17 /* PrintingUserScript.swift */,
 				85D438B5256E7C9E00F3BAF8 /* ContextMenuUserScript.swift */,
 				4BB88B4425B7B55C006F6B06 /* DebugUserScript.swift */,
+				AAD5D9FA28489C9000ABAE2A /* YoutubeAdBlockingUserScript.swift */,
 				AA9FF95824A1ECF20039E328 /* Tab.swift */,
 				85AC3AEE25D5CE9800C7D2AA /* UserScripts.swift */,
 				F4A6198B283CFFBB007F2080 /* ContentScopeFeatureFlagging.swift */,
@@ -4323,6 +4326,7 @@
 				37CD54CF27F2FDD100F1F7B9 /* AppearancePreferences.swift in Sources */,
 				B6B1E87B26D381710062C350 /* DownloadListCoordinator.swift in Sources */,
 				4B980E212817604000282EE1 /* NSNotificationName+Debug.swift in Sources */,
+				AAD5D9FB28489C9000ABAE2A /* YoutubeAdBlockingUserScript.swift in Sources */,
 				AAC5E4F125D6BF10007F5990 /* AddressBarButton.swift in Sources */,
 				AAE7527E263B05C600B973F8 /* HistoryEntry.swift in Sources */,
 				AA5FA69D275F945C00DCE9C9 /* FaviconStore.swift in Sources */,
