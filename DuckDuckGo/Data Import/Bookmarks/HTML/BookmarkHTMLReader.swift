@@ -316,7 +316,7 @@ private extension XMLNode {
     func itemType(inSafariFormat isInSafariFormat: Bool) -> BookmarkItemType? {
         if isInSafariFormat {
             switch htmlTag {
-            case .h3 where !representsSafariReadingList:
+            case .h3:
                 return .folder
             case .dt:
                 return .bookmark
@@ -335,11 +335,6 @@ private extension XMLNode {
                 return nil
             }
         }
-    }
-
-    var representsSafariReadingList: Bool {
-        let xmlElement = self as? XMLElement
-        return xmlElement?.attribute(forName: Const.idAttributeName)?.stringValue == Const.readingListID
     }
 
     var text: String? {

@@ -53,7 +53,7 @@ final class BookmarksHTMLImporterTests: XCTestCase {
 
     func testWhenValidBookmarksFileIsLoadedThenCorrectBookmarksCountIsReturned() {
         dataImporter = .init(fileURL: bookmarksFileURL("bookmarks_safari.html"), bookmarkImporter: underlyingBookmarkImporter)
-        XCTAssertEqual(dataImporter.totalBookmarks, 13)
+        XCTAssertEqual(dataImporter.totalBookmarks, 14)
     }
 
     func testWhenInvalidBookmarksFileIsLoadedThenBookmarksCountIsZero() {

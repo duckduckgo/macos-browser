@@ -43,16 +43,7 @@ class BookmarksHTMLReaderTests: XCTestCase {
         let result = reader.readBookmarks()
 
         let importedBookmarks = try XCTUnwrap(try? result.get())
-        XCTAssertEqual(importedBookmarks.bookmarks.numberOfBookmarks, 13)
-    }
-
-    func test_WhenParseSafariHtml_ThenReadingListExcluded() throws {
-        reader = BookmarkHTMLReader(bookmarksFileURL: bookmarksFileURL("bookmarks_safari.html"))
-        let result = reader.readBookmarks()
-
-        let importedBookmarks = try XCTUnwrap(try? result.get())
-        let otherBookmarksFolders = try XCTUnwrap(importedBookmarks.bookmarks.topLevelFolders.otherBookmarks.children)
-        XCTAssertFalse(otherBookmarksFolders.contains(where: { $0.isFolder && $0.name == "Reading List" }))
+        XCTAssertEqual(importedBookmarks.bookmarks.numberOfBookmarks, 14)
     }
 
     func test_WhenParseFirefoxHtml_ThenImportSuccess() throws {
