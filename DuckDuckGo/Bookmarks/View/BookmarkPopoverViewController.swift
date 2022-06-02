@@ -118,6 +118,8 @@ final class BookmarkPopoverViewController: NSViewController {
         }
 
         let bookmarksMenuItem = NSMenuItem(title: "Bookmarks", action: nil, target: nil, keyEquivalent: "")
+        bookmarksMenuItem.image = NSImage(named: "Folder")
+
         let topLevelFolders = list.topLevelEntities.compactMap { $0 as? BookmarkFolder }
         var folderMenuItems = [NSMenuItem]()
         
