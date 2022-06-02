@@ -145,8 +145,7 @@ final class TabBarCellView: NSView {
         let frame = self.window != nil ? super.accessibilityFrame() : self.frame
         guard let parent = self.accessibilityParent() as? NSAccessibilityProtocol else { return frame }
 
-        var parentFrame = parent.accessibilityFrame()
-        parentFrame = parentFrame.insetBy(dx: 0, dy: (parentFrame.height - frame.height) / 2)
+        let parentFrame = parent.accessibilityFrame()
         let intersection = parentFrame.intersection(frame)
 
         // display thin line at the TabBar edge instead of real frame if out of scroll view
@@ -158,6 +157,15 @@ final class TabBarCellView: NSView {
                           height: parentFrame.height)
         }
         return intersection
+    }
+
+    override func accessibilityChildren() -> [Any]? {
+        self.subviews.compactMap { subview in
+            guard let button = subview as? NSButton,
+                  !button.isHidden || button.action == #selector(TabBarViewItem.close(_:))
+            else { return nil }
+            return button.cell
+        }
     }
 
     override func accessibilityPerformPress() -> Bool {

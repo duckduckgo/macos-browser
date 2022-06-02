@@ -539,6 +539,7 @@
 		B60D19C728336D5200EBAB97 /* RadioButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = B60D19C628336D5200EBAB97 /* RadioButton.swift */; };
 		B60D19C92833846300EBAB97 /* RadioButtonGroup.swift in Sources */ = {isa = PBXBuildFile; fileRef = B60D19C82833846300EBAB97 /* RadioButtonGroup.swift */; };
 		B60D19CB283B70F700EBAB97 /* TabBarCellView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B60D19CA283B70F700EBAB97 /* TabBarCellView.swift */; };
+		B60D19CD2845F8E200EBAB97 /* PassiveAddressBarTextField.swift in Sources */ = {isa = PBXBuildFile; fileRef = B60D19CC2845F8E200EBAB97 /* PassiveAddressBarTextField.swift */; };
 		B6106BA026A7BE0B0013B453 /* PermissionManagerTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = B6106B9F26A7BE0B0013B453 /* PermissionManagerTests.swift */; };
 		B6106BA426A7BEA40013B453 /* PermissionAuthorizationState.swift in Sources */ = {isa = PBXBuildFile; fileRef = B6106BA226A7BEA00013B453 /* PermissionAuthorizationState.swift */; };
 		B6106BA726A7BECC0013B453 /* PermissionAuthorizationQuery.swift in Sources */ = {isa = PBXBuildFile; fileRef = B6106BA526A7BEC80013B453 /* PermissionAuthorizationQuery.swift */; };
@@ -1311,6 +1312,7 @@
 		B60D19C628336D5200EBAB97 /* RadioButton.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RadioButton.swift; sourceTree = "<group>"; };
 		B60D19C82833846300EBAB97 /* RadioButtonGroup.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RadioButtonGroup.swift; sourceTree = "<group>"; };
 		B60D19CA283B70F700EBAB97 /* TabBarCellView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TabBarCellView.swift; sourceTree = "<group>"; };
+		B60D19CC2845F8E200EBAB97 /* PassiveAddressBarTextField.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PassiveAddressBarTextField.swift; sourceTree = "<group>"; };
 		B6106B9D26A565DA0013B453 /* BundleExtension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BundleExtension.swift; sourceTree = "<group>"; };
 		B6106B9F26A7BE0B0013B453 /* PermissionManagerTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PermissionManagerTests.swift; sourceTree = "<group>"; };
 		B6106BA226A7BEA00013B453 /* PermissionAuthorizationState.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PermissionAuthorizationState.swift; sourceTree = "<group>"; };
@@ -2906,6 +2908,7 @@
 				AAC5E4F025D6BF10007F5990 /* AddressBarButton.swift */,
 				AAA0CC32252F181A0079BC96 /* NavigationButtonMenuDelegate.swift */,
 				AAA0CC462533833C0079BC96 /* MoreOptionsMenu.swift */,
+				B60D19CC2845F8E200EBAB97 /* PassiveAddressBarTextField.swift */,
 			);
 			path = View;
 			sourceTree = "<group>";
@@ -4192,6 +4195,7 @@
 				B6B1E88026D5DA9B0062C350 /* DownloadsViewController.swift in Sources */,
 				85AC3AF725D5DBFD00C7D2AA /* DataExtension.swift in Sources */,
 				B6A924D42664BBBB001A28CA /* WKWebViewDownloadDelegate.swift in Sources */,
+				B60D19CD2845F8E200EBAB97 /* PassiveAddressBarTextField.swift in Sources */,
 				AA9B7C8526A199B60008D425 /* ServerTrustViewModel.swift in Sources */,
 				85480FCF25D1AA22009424E3 /* ConfigurationStoring.swift in Sources */,
 				AA3D531B27A2F57E00074EC1 /* Feedback.swift in Sources */,

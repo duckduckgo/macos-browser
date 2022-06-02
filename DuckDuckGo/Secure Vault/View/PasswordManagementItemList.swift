@@ -88,7 +88,9 @@ struct PasswordManagementItemListCategoryView: View {
                                                            canBecomeFirstResponder: model.canBecomeFirstResponder,
                                                            viewCreator: {
                 let button = PopUpButton()
-                
+                button.setAccessibilityIdentifier("AutofillItemTypeButton")
+                button.setAccessibilityTitle(UserText.pmCategoryButtonTooltip)
+
                 for category in SecureVaultSorting.Category.allCases {
                     button.addItem(withTitle: category.title,
                                    foregroundColor: category.foregroundColor,
@@ -325,6 +327,12 @@ struct PasswordManagementSortButton: NSViewRepresentable {
         btn.mouseOverColor = .buttonMouseOverColor
         btn.mouseDownColor = .buttonMouseDownColor
         btn.cornerRadius = 4.0
+        btn.toolTip = UserText.pmSortButtonTooltip
+        btn.setAccessibilityTitle(UserText.pmSortButtonTooltip)
+        btn.setAccessibilityIdentifier("AutofillSortButton")
+        btn.setAccessibilityRole(.popUpButton)
+        btn.setAccessibilityRoleDescription("pop-up button")
+
         NSLayoutConstraint.activate(btn.addConstraints(to: btn, [
             .width: .const(28),
             .height: .const(28)
@@ -347,6 +355,10 @@ struct PasswordManagementSortButton: NSViewRepresentable {
         btn.image = NSImage(named: imageName)!
         (btn.target as? MenuButtonDelegate)?.menuProvider = menuProvider()
         btn.refusesFirstResponder = !canBecomeFirstResponder
+
+        btn.setAccessibilityValue(model.sortDescriptor.parameter.title
+                                  + ", "
+                                  + model.sortDescriptor.order.title(for: model.sortDescriptor.parameter.type))
     }
 
     private func menuProvider() -> MenuProvider {

@@ -35,9 +35,6 @@
                             <userDefinedRuntimeAttribute type="boolean" keyPath="accessibilityElement" value="NO"/>
                         </userDefinedRuntimeAttributes>
                     </textFieldCell>
-                    <userDefinedRuntimeAttributes>
-                        <userDefinedRuntimeAttribute type="boolean" keyPath="accessibilityElement" value="NO"/>
-                    </userDefinedRuntimeAttributes>
                 </textField>
                 <customView translatesAutoresizingMaskIntoConstraints="NO" id="A6g-eG-dOW">
                     <rect key="frame" x="8" y="5" width="24" height="24"/>
@@ -53,9 +50,6 @@
                                     <userDefinedRuntimeAttribute type="boolean" keyPath="accessibilityElement" value="NO"/>
                                 </userDefinedRuntimeAttributes>
                             </imageCell>
-                            <userDefinedRuntimeAttributes>
-                                <userDefinedRuntimeAttribute type="boolean" keyPath="accessibilityElement" value="NO"/>
-                            </userDefinedRuntimeAttributes>
                         </imageView>
                     </subviews>
                     <constraints>
@@ -90,6 +84,7 @@
                             <color key="value" name="ButtonMouseDownColor"/>
                         </userDefinedRuntimeAttribute>
                     </userDefinedRuntimeAttributes>
+                    <accessibility identifier="PermissionMuteButton"/>
                     <connections>
                         <action selector="permissionButtonAction:" target="4MN-w4-aCk" id="r4o-aQ-Cdp"/>
                     </connections>
@@ -118,7 +113,7 @@
                         <userDefinedRuntimeAttribute type="boolean" keyPath="shouldAppearOnFocus" value="YES"/>
                         <userDefinedRuntimeAttribute type="string" keyPath="accessibilityTitle" value="close tab"/>
                     </userDefinedRuntimeAttributes>
-                    <accessibility identifier="CloseTabButton"/>
+                    <accessibility description="close tab" identifier="CloseTabButton"/>
                     <connections>
                         <action selector="close:" target="4MN-w4-aCk" id="ezW-I1-5yy"/>
                     </connections>

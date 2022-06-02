@@ -122,7 +122,7 @@ internal class MouseOverButton: NSButton {
         super.mouseDown(with: event)
         isMouseDown = false
         if isMouseOver,
-           window?.isKeyWindow != true || isMouseLocationInsideBounds(window?.mouseLocationOutsideOfEventStream) != true {
+           NSApp.keyWindow !== window || isMouseLocationInsideBounds(window?.mouseLocationOutsideOfEventStream) != true {
 
             mouseExited(with: event)
         }

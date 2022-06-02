@@ -222,6 +222,9 @@ struct UserText {
     static let permissionUnmuteFormat = NSLocalizedString("permission.unmute", value: "Resume %@ use on “%@”", comment: "Resume input media device %@ access for %@ website")
     static let permissionReloadToEnable = NSLocalizedString("permission.reloadPage", value: "Reload to ask permission again", comment: "Reload webpage to ask for input media device access permission again")
 
+    static let permissionMuteAXTitleFormat = NSLocalizedString("permission.mute.axtitle", value: "Pause %@", comment: "Temporarily pause input media device %@ access - accessibility button title")
+    static let permissionUnmuteAXTitleFormat = NSLocalizedString("permission.unmute.axtitle", value: "Pause %@", comment: "Resume input media device %@ access - accessibility button title")
+
     static let permissionAllowExternalSchemeFormat = NSLocalizedString("permission.allow.externalScheme", value: "Allow “%@“ to open %@", comment: "Allow to open External Link (%@ 2) to open on current domain (%@ 1)")
     static let permissionMenuHeaderExternalSchemeFormat = NSLocalizedString("permission.allow.externalScheme", value: "Allow the %@ to open “%@” links", comment: "Allow the App Name(%@ 1) to open “URL Scheme”(%@ 2) links")
 

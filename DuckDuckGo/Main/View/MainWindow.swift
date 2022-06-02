@@ -134,14 +134,11 @@ final class MainWindow: NSWindow {
     }
 
     override func accessibilityChildren() -> [Any]? {
-        var children = super.accessibilityChildren() as? [NSObject] ?? []
-        let newTabButton = self.newTabButton
-        if let newTabIdx = children.firstIndex(where: { $0 === newTabButton?.cell }) {
-            children.remove(at: newTabIdx)
+        return super.accessibilityChildren()?.filter {
+            ($0 as? NSAccessibilityElementProtocol)?.accessibilityParent() as? NSObject === self
         }
-        return children
     }
-    
+
     // Handle Keyboard toggle Toolbar focus (Ctrl+F5)
     @objc(_handleFocusToolbarHotKey:)
     func handleFocusToolbarHotKey(_ event: Any?) {

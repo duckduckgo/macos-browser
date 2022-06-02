@@ -84,7 +84,7 @@ final class FocusRingView: NSView {
 
         CATransaction.begin()
 
-        let stroke = self.stroke && NSApp.isActive && (window?.isKeyWindow ?? false)
+        let stroke = self.stroke && NSApp.isActive && NSApp.keyWindow === window
         shadowLayer.opacity = stroke ? 0.4 : 0
         strokeLayer.opacity = stroke ? 1.0 : 0
 

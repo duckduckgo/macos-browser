@@ -40,7 +40,7 @@
                             <stackView distribution="fillEqually" orientation="horizontal" alignment="top" spacing="0.0" horizontalStackHuggingPriority="249.99998474121094" verticalStackHuggingPriority="249.99998474121094" detachesHiddenViews="YES" translatesAutoresizingMaskIntoConstraints="NO" id="kOb-4q-pAe">
                                 <rect key="frame" x="76" y="18" width="0.0" height="0.0"/>
                                 <subviews>
-                                    <button hidden="YES" translatesAutoresizingMaskIntoConstraints="NO" id="7XG-Qm-Ksx" userLabel="Left Scroll Button" customClass="MouseOverButton" customModule="DuckDuckGo_Privacy_Browser" customModuleProvider="target">
+                                    <button hidden="YES" toolTip="Scroll left" translatesAutoresizingMaskIntoConstraints="NO" id="7XG-Qm-Ksx" userLabel="Left Scroll Button" customClass="MouseOverButton" customModule="DuckDuckGo_Privacy_Browser" customModuleProvider="target">
                                         <rect key="frame" x="0.0" y="-28" width="28" height="28"/>
                                         <constraints>
                                             <constraint firstAttribute="height" constant="28" id="bi3-CJ-RZk"/>
@@ -60,7 +60,9 @@
                                             <userDefinedRuntimeAttribute type="number" keyPath="cornerRadius">
                                                 <real key="value" value="4"/>
                                             </userDefinedRuntimeAttribute>
+                                            <userDefinedRuntimeAttribute type="string" keyPath="accessibilityTitle" value="&lt;"/>
                                         </userDefinedRuntimeAttributes>
+                                        <accessibility description="scroll tab bar left" identifier="LeftScrollButton"/>
                                         <connections>
                                             <action selector="leftScrollButtonAction:" target="uSf-9n-QMw" id="hBs-JI-5HW"/>
                                         </connections>
@@ -102,10 +104,16 @@
                                 <scroller key="horizontalScroller" wantsLayer="YES" verticalHuggingPriority="750" horizontal="YES" id="f6A-N1-Ed1">
                                     <rect key="frame" x="0.0" y="18" width="661" height="16"/>
                                     <autoresizingMask key="autoresizingMask"/>
+                                    <userDefinedRuntimeAttributes>
+                                        <userDefinedRuntimeAttribute type="boolean" keyPath="accessibilityElement" value="NO"/>
+                                    </userDefinedRuntimeAttributes>
                                 </scroller>
                                 <scroller key="verticalScroller" hidden="YES" wantsLayer="YES" verticalHuggingPriority="750" horizontal="NO" id="tXZ-5R-7cy">
                                     <rect key="frame" x="-100" y="-100" width="16" height="39"/>
                                     <autoresizingMask key="autoresizingMask"/>
+                                    <userDefinedRuntimeAttributes>
+                                        <userDefinedRuntimeAttribute type="boolean" keyPath="accessibilityElement" value="NO"/>
+                                    </userDefinedRuntimeAttributes>
                                 </scroller>
                                 <userDefinedRuntimeAttributes>
                                     <userDefinedRuntimeAttribute type="boolean" keyPath="accessibilityElement" value="NO"/>
@@ -114,7 +122,7 @@
                             <stackView distribution="fillEqually" orientation="horizontal" alignment="top" spacing="4" horizontalStackHuggingPriority="249.99998474121094" verticalStackHuggingPriority="249.99998474121094" detachesHiddenViews="YES" translatesAutoresizingMaskIntoConstraints="NO" id="dN1-y1-5Xe">
                                 <rect key="frame" x="741" y="4" width="92" height="28"/>
                                 <subviews>
-                                    <button hidden="YES" translatesAutoresizingMaskIntoConstraints="NO" id="2da-G7-xcP" userLabel="Right Scroll Button" customClass="MouseOverButton" customModule="DuckDuckGo_Privacy_Browser" customModuleProvider="target">
+                                    <button hidden="YES" toolTip="Scroll right" translatesAutoresizingMaskIntoConstraints="NO" id="2da-G7-xcP" userLabel="Right Scroll Button" customClass="MouseOverButton" customModule="DuckDuckGo_Privacy_Browser" customModuleProvider="target">
                                         <rect key="frame" x="0.0" y="0.0" width="28" height="28"/>
                                         <constraints>
                                             <constraint firstAttribute="width" constant="28" id="avH-Y7-ipU"/>
@@ -134,12 +142,14 @@
                                             <userDefinedRuntimeAttribute type="number" keyPath="cornerRadius">
                                                 <real key="value" value="4"/>
                                             </userDefinedRuntimeAttribute>
+                                            <userDefinedRuntimeAttribute type="string" keyPath="accessibilityTitle" value="&gt;"/>
                                         </userDefinedRuntimeAttributes>
+                                        <accessibility description="scroll tab bar right" identifier="RightScrollButton"/>
                                         <connections>
                                             <action selector="rightScrollButtonAction:" target="uSf-9n-QMw" id="j7F-Ke-3i3"/>
                                         </connections>
                                     </button>
-                                    <button focusRingType="exterior" translatesAutoresizingMaskIntoConstraints="NO" id="qXs-b0-tWI" userLabel="Add Button" customClass="LongPressButton" customModule="DuckDuckGo_Privacy_Browser" customModuleProvider="target">
+                                    <button toolTip="New Tab" focusRingType="exterior" translatesAutoresizingMaskIntoConstraints="NO" id="qXs-b0-tWI" userLabel="Add Button" customClass="LongPressButton" customModule="DuckDuckGo_Privacy_Browser" customModuleProvider="target">
                                         <rect key="frame" x="0.0" y="0.0" width="28" height="28"/>
                                         <constraints>
                                             <constraint firstAttribute="width" constant="28" id="Lmr-Cv-caT"/>
@@ -160,7 +170,9 @@
                                             <userDefinedRuntimeAttribute type="color" keyPath="mouseDownColor">
                                                 <color key="value" name="ButtonMouseDownColor"/>
                                             </userDefinedRuntimeAttribute>
+                                            <userDefinedRuntimeAttribute type="string" keyPath="accessibilityTitle" value="new tab"/>
                                         </userDefinedRuntimeAttributes>
+                                        <accessibility description="open new tab" identifier="NewTabButton"/>
                                         <connections>
                                             <action selector="addButtonAction:" target="uSf-9n-QMw" id="Nx9-xc-NzJ"/>
                                         </connections>
@@ -172,7 +184,7 @@
                                             <constraint firstAttribute="height" constant="28" id="zmV-VF-tQ1"/>
                                         </constraints>
                                     </customView>
-                                    <button focusRingType="exterior" translatesAutoresizingMaskIntoConstraints="NO" id="XV4-Ze-5j7" userLabel="Burn Button" customClass="MouseOverAnimationButton" customModule="DuckDuckGo_Privacy_Browser" customModuleProvider="target">
+                                    <button toolTip="Clear Browsing Data..." focusRingType="exterior" translatesAutoresizingMaskIntoConstraints="NO" id="XV4-Ze-5j7" userLabel="Burn Button" customClass="MouseOverAnimationButton" customModule="DuckDuckGo_Privacy_Browser" customModuleProvider="target">
                                         <rect key="frame" x="64" y="0.0" width="28" height="28"/>
                                         <constraints>
                                             <constraint firstAttribute="width" constant="28" id="9Ii-rC-Eca"/>
@@ -193,7 +205,9 @@
                                             <userDefinedRuntimeAttribute type="color" keyPath="mouseDownColor">
                                                 <color key="value" name="ButtonMouseDownColor"/>
                                             </userDefinedRuntimeAttribute>
+                                            <userDefinedRuntimeAttribute type="string" keyPath="accessibilityTitle" value="Burn"/>
                                         </userDefinedRuntimeAttributes>
+                                        <accessibility description="clear browsing data" identifier="BurnButton"/>
                                         <connections>
                                             <action selector="fireButtonAction:" target="7J5-0H-rHB" id="4O7-R9-MHU"/>
                                         </connections>
@@ -217,14 +231,22 @@
                                 <constraints>
                                     <constraint firstAttribute="width" constant="5" id="tqI-pU-ZWB"/>
                                 </constraints>
-                                <imageCell key="cell" refusesFirstResponder="YES" alignment="left" imageScaling="axesIndependently" image="TabBarShadowRight" id="qd0-z2-M5R"/>
+                                <imageCell key="cell" refusesFirstResponder="YES" alignment="left" imageScaling="axesIndependently" image="TabBarShadowRight" id="qd0-z2-M5R">
+                                    <userDefinedRuntimeAttributes>
+                                        <userDefinedRuntimeAttribute type="boolean" keyPath="accessibilityElement" value="NO"/>
+                                    </userDefinedRuntimeAttributes>
+                                </imageCell>
                             </imageView>
                             <imageView hidden="YES" horizontalHuggingPriority="251" verticalHuggingPriority="251" translatesAutoresizingMaskIntoConstraints="NO" id="zsA-or-9Xo" userLabel="Left Shadow Image">
                                 <rect key="frame" x="76" y="0.0" width="5" height="40"/>
                                 <constraints>
                                     <constraint firstAttribute="width" constant="5" id="Zrh-wT-hvv"/>
                                 </constraints>
-                                <imageCell key="cell" refusesFirstResponder="YES" alignment="left" imageScaling="axesIndependently" image="TabBarShadowLeft" id="crE-9i-66r"/>
+                                <imageCell key="cell" refusesFirstResponder="YES" alignment="left" imageScaling="axesIndependently" image="TabBarShadowLeft" id="crE-9i-66r">
+                                    <userDefinedRuntimeAttributes>
+                                        <userDefinedRuntimeAttribute type="boolean" keyPath="accessibilityElement" value="NO"/>
+                                    </userDefinedRuntimeAttributes>
+                                </imageCell>
                             </imageView>
                             <customView translatesAutoresizingMaskIntoConstraints="NO" id="efe-Pc-ueT" userLabel="Window Dragging View" customClass="WindowDraggingView" customModule="DuckDuckGo_Privacy_Browser" customModuleProvider="target">
                                 <rect key="frame" x="76" y="0.0" width="665" height="40"/>

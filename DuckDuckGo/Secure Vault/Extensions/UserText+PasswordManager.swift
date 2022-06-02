@@ -53,14 +53,21 @@ extension UserText {
     static let pmCardholderName = NSLocalizedString("pm.card.cardholder-name", value: "Cardholder Name", comment: "Label for cardholder name title")
     static let pmCardVerificationValue = NSLocalizedString("pm.card.cvv", value: "CVV", comment: "Label for CVV title")
     static let pmCardExpiration = NSLocalizedString("pm.card.expiration-date", value: "Expiration Date", comment: "Label for expiration date title")
+    static let pmCardExpirationYear = NSLocalizedString("pm.card.expiration-year", value: "Expiration Year", comment: "Label for expiration Year title")
+    static let pmCardExpirationMonth = NSLocalizedString("pm.card.expiration-month", value: "Expiration Month", comment: "Label for expiration Month title")
 
     static let pmIdentification = NSLocalizedString("pm.identification", value: "Identification", comment: "Label for identification title")
     static let pmFirstName = NSLocalizedString("pm.name.first", value: "First Name", comment: "Label for first name title")
     static let pmMiddleName = NSLocalizedString("pm.name.middle", value: "Middle Name", comment: "Label for middle name title")
     static let pmLastName = NSLocalizedString("pm.name.last", value: "Last Name", comment: "Label for last name title")
+    static let pmBirthday = NSLocalizedString("pm.name.birthday", value: "Birthday", comment: "Label for Birthday field")
     static let pmDay = NSLocalizedString("pm.day", value: "Day", comment: "Label for Day title")
     static let pmMonth = NSLocalizedString("pm.month", value: "Month", comment: "Label for Month title")
     static let pmYear = NSLocalizedString("pm.year", value: "Year", comment: "Label for Year title")
+
+    static let pmAddress = NSLocalizedString("pm.address.address", value: "Address", comment: "Label for Address field")
+    static let pmCountry = NSLocalizedString("pm.address.country", value: "Country", comment: "Label for Country field")
+    static let pmContactInfo = NSLocalizedString("pm.address.contact.info", value: "Contact Info", comment: "Label for Contact Info field")
 
     static let pmAddress1 = NSLocalizedString("pm.address.address1", value: "Address 1", comment: "Label for address 1 title")
     static let pmAddress2 = NSLocalizedString("pm.address.address2", value: "Address 2", comment: "Label for address 2 title")
@@ -74,6 +81,9 @@ extension UserText {
     static let pmEmptyNote = NSLocalizedString("pm.note.empty", value: "Empty note", comment: "Label for empty note title")
 
     static let pmDefaultIdentityAutofillTitle = NSLocalizedString("pm.identity.autofill.title.default", value: "Address", comment: "Default title for Addresses/Identities")
+
+    static let pmCategoryButtonTooltip = NSLocalizedString("pm.category.button.tooltip", value: "Category", comment: "Tooltip for Item Category Button")
+    static let pmSortButtonTooltip = NSLocalizedString("pm.sort.button.tooltip", value: "Sort order", comment: "Tooltip for Sort Button")
 
     static let pmSortStringAscending = NSLocalizedString("pm.sort.string.ascending", value: "Alphabetically", comment: "Label for Ascending string sort order")
     static let pmSortStringDescending = NSLocalizedString("pm.sort.string.descending", value: "Reverse Alphabetically", comment: "Label for Descending string sort order")

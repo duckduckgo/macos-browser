@@ -195,7 +195,7 @@ final class ShadowView: NSView {
         self.wantsLayer = true
 
         guard !shouldHideOnLostFocus
-                || (NSApp.isActive && (window?.isKeyWindow ?? false))
+                || (NSApp.isActive && NSApp.keyWindow === window)
         else {
             layer!.shadowOpacity = 0.0
             return

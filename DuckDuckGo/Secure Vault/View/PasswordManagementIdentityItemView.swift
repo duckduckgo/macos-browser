@@ -103,7 +103,7 @@ private struct IdentificationView: View {
             EditableIdentityField(textFieldValue: $model.lastName, title: UserText.pmLastName)
 
             if model.isInEditMode {
-                Text("Birthday")
+                Text(UserText.pmBirthday)
                     .bold()
                     .padding(.bottom, 5)
 
@@ -114,7 +114,8 @@ private struct IdentificationView: View {
                     if Locale.current.dateComponentOrder == .dayMonthYear {
                         NSPopUpButtonView<Int?>(selection: $model.birthdayDay, viewCreator: {
                             let button = NSPopUpButton()
-                            
+                            button.setAccessibilityLabel(UserText.pmDay)
+
                             let item = button.menu?.addItem(withTitle: UserText.pmDay, action: nil, keyEquivalent: "")
                             item?.representedObject = nil
                             
@@ -128,7 +129,8 @@ private struct IdentificationView: View {
 
                         NSPopUpButtonView<Int?>(selection: $model.birthdayMonth, viewCreator: {
                             let button = NSPopUpButton()
-                            
+                            button.setAccessibilityLabel(UserText.pmMonth)
+
                             let item = button.menu?.addItem(withTitle: UserText.pmMonth, action: nil, keyEquivalent: "")
                             item?.representedObject = nil
                             
@@ -142,6 +144,7 @@ private struct IdentificationView: View {
                     } else {
                         NSPopUpButtonView<Int?>(selection: $model.birthdayMonth, viewCreator: {
                             let button = NSPopUpButton()
+                            button.setAccessibilityLabel(UserText.pmMonth)
                             
                             let item = button.menu?.addItem(withTitle: UserText.pmMonth, action: nil, keyEquivalent: "")
                             item?.representedObject = nil
@@ -156,7 +159,8 @@ private struct IdentificationView: View {
 
                         NSPopUpButtonView<Int?>(selection: $model.birthdayDay, viewCreator: {
                             let button = NSPopUpButton()
-                            
+                            button.setAccessibilityLabel(UserText.pmDay)
+
                             let item = button.menu?.addItem(withTitle: UserText.pmDay, action: nil, keyEquivalent: "")
                             item?.representedObject = nil
                             
@@ -171,6 +175,7 @@ private struct IdentificationView: View {
                     
                     NSPopUpButtonView<Int?>(selection: $model.birthdayYear, viewCreator: {
                         let button = NSPopUpButton()
+                        button.setAccessibilityLabel(UserText.pmYear)
                         
                         let item = button.menu?.addItem(withTitle: UserText.pmYear, action: nil, keyEquivalent: "")
                         item?.representedObject = nil
@@ -186,7 +191,7 @@ private struct IdentificationView: View {
                 }
                 .padding(.bottom, interItemSpacing)
             } else if let day = model.birthdayDay, let month = model.birthdayMonth, let year = model.birthdayYear {
-                Text("Birthday")
+                Text(UserText.pmBirthday)
                     .bold()
                     .padding(.bottom, 5)
 
@@ -199,6 +204,7 @@ private struct IdentificationView: View {
                     ])
 
                     Text(textFieldValue)
+                        .accessibility(hint: .init(UserText.pmBirthday))
                         .textSelectableIfAvailable()
                         .focusable(menu: menuProvider.createMenu, onCopy: { model.copy(textFieldValue) })
                         .padding(.bottom, interItemSpacing)
@@ -223,7 +229,7 @@ private struct AddressView: View {
                 !model.addressPostalCode.isEmpty ||
                 !model.addressCountryCode.isEmpty ||
                 model.isInEditMode {
-                Text("Address")
+                Text(UserText.pmAddress)
                     .bold()
                     .foregroundColor(.gray)
                     .padding(.bottom, 20)
@@ -236,13 +242,14 @@ private struct AddressView: View {
             EditableIdentityField(textFieldValue: $model.addressPostalCode, title: UserText.pmAddressPostalCode)
 
             if model.isInEditMode {
-                Text("Country")
+                Text(UserText.pmCountry)
                     .bold()
                     .padding(.bottom, 5)
 
                 NSPopUpButtonView<String>(selection: $model.addressCountryCode, viewCreator: {
                     let button = NSPopUpButton()
-                    
+                    button.setAccessibilityLabel(UserText.pmCountry)
+
                     let item = button.menu?.addItem(withTitle: "-", action: nil, keyEquivalent: "")
                     item?.representedObject = ""
                     
@@ -256,7 +263,7 @@ private struct AddressView: View {
                 .padding(.bottom, 5)
                 
             } else if !model.addressCountryCode.isEmpty {
-                Text("Country")
+                Text(UserText.pmCountry)
                     .bold()
                     .padding(.bottom, 5)
 
@@ -266,6 +273,7 @@ private struct AddressView: View {
                 ])
 
                 Text(textFieldValue)
+                    .accessibility(hint: .init(UserText.pmCountry))
                     .textSelectableIfAvailable()
                     .focusable(menu: menuProvider.createMenu, onCopy: { model.copy(textFieldValue) })
                     .padding(.bottom, interItemSpacing)
@@ -284,7 +292,7 @@ private struct ContactInfoView: View {
 
         VStack(alignment: .leading, spacing: 0) {
             if !model.homePhone.isEmpty || !model.mobilePhone.isEmpty || !model.emailAddress.isEmpty || model.isInEditMode {
-                Text("Contact Info")
+                Text(UserText.pmContactInfo)
                     .bold()
                     .foregroundColor(.gray)
                     .padding(.bottom, 20)
@@ -399,6 +407,7 @@ private struct EditableIdentityField: View {
                 if model.isEditing || model.isNew {
 
                     TextField("", text: $textFieldValue)
+                        .accessibility(label: .init(title))
                         .textFieldStyle(RoundedBorderTextFieldStyle())
                         .padding(.bottom, interItemSpacing)
 
@@ -410,6 +419,7 @@ private struct EditableIdentityField: View {
 
                     HStack(spacing: 6) {
                         Text(textFieldValue)
+                            .accessibility(hint: .init(title))
                             .textSelectableIfAvailable()
                             .focusable(menu: menuProvider.createMenu, onCopy: { model.copy(textFieldValue) })
 

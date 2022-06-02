@@ -21,25 +21,6 @@ import Combine
 import os.log
 import BrowserServicesKit
 
-final class NavigationView: ColorView {
-    override func viewDidMoveToWindow() {
-        super.viewDidMoveToWindow()
-//        window!.initialFirstResponder = self.subviews[1].subviews[0]
-    }
-    override func accessibilityRole() -> NSAccessibility.Role? {
-        .toolbar
-    }
-    override func isAccessibilityElement() -> Bool {
-        true
-    }
-    override func accessibilitySelectedChildren() -> [Any]? {
-        super.accessibilitySelectedChildren()
-    }
-    override func setAccessibilitySelectedChildren(_ accessibilitySelectedChildren: [Any]?) {
-        super.setAccessibilitySelectedChildren(accessibilitySelectedChildren)
-    }
-}
-
 // swiftlint:disable type_body_length file_length
 final class NavigationBarViewController: NSViewController {
 

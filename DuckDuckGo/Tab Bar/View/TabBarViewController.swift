@@ -35,12 +35,28 @@ final class TabBarViewController: NSViewController {
     @IBOutlet weak var collectionView: TabBarCollectionView!
     @IBOutlet weak var scrollView: TabBarScrollView!
     @IBOutlet weak var leadingStackViewLeadingConstraint: NSLayoutConstraint!
-    @IBOutlet weak var rightScrollButton: MouseOverButton!
-    @IBOutlet weak var leftScrollButton: MouseOverButton!
+    @IBOutlet weak var rightScrollButton: MouseOverButton! {
+        didSet {
+            rightScrollButton.setAccessibilityParent(collectionView)
+        }
+    }
+    @IBOutlet weak var leftScrollButton: MouseOverButton! {
+        didSet {
+            leftScrollButton.setAccessibilityParent(collectionView)
+        }
+    }
     @IBOutlet weak var rightShadowImageView: NSImageView!
     @IBOutlet weak var leftShadowImageView: NSImageView!
-    @IBOutlet weak var fixedAddNewTabButton: LongPressButton!
-    private weak   var floatingAddNewTabButton: NSButton?
+    @IBOutlet weak var fixedAddNewTabButton: LongPressButton! {
+        didSet {
+            fixedAddNewTabButton.setAccessibilityParent(collectionView)
+        }
+    }
+    private weak var floatingAddNewTabButton: NSButton? {
+        didSet {
+            floatingAddNewTabButton?.setAccessibilityParent(collectionView)
+        }
+    }
     private var isAddButtonFloating = false
     var addNewTabButton: NSButton? {
         isAddButtonFloating ? floatingAddNewTabButton : fixedAddNewTabButton

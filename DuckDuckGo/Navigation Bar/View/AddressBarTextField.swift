@@ -263,6 +263,11 @@ final class AddressBarTextField: NSTextField {
         hideSuggestionWindow()
     }
 
+    override func accessibilityPerformConfirm() -> Bool {
+        addressBarEnterPressed()
+        return true
+    }
+
     private func navigate(suggestion: Suggestion?) {
         hideSuggestionWindow()
         updateTabUrl(suggestion: suggestion)

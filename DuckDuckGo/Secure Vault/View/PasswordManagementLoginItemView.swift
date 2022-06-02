@@ -148,6 +148,7 @@ private struct UsernameView: View {
             if model.isEditing || model.isNew {
 
                 TextField("", text: $model.username)
+                    .accessibility(label: .init(UserText.pmUsername))
                     .textFieldStyle(RoundedBorderTextFieldStyle())
                     .padding(.bottom, interItemSpacing)
 
@@ -155,6 +156,7 @@ private struct UsernameView: View {
 
                 HStack(spacing: 6) {
                     Text(model.username)
+                        .accessibility(hint: .init(UserText.pmUsername))
                         .textSelectableIfAvailable()
                         .focusable(menu: menuProvider.createMenu, onCopy: { model.copy(model.username) })
 
@@ -265,12 +267,14 @@ private struct PasswordView: View {
                     if isPasswordVisible {
 
                         TextField("", text: $model.password)
+                            .accessibility(label: .init(UserText.pmPassword))
                             .textFieldStyle(RoundedBorderTextFieldStyle())
                             .textSelectableIfAvailable()
 
                     } else {
 
                         SecureField("", text: $model.password)
+                            .accessibility(hint: .init(UserText.pmPassword))
                             .textFieldStyle(RoundedBorderTextFieldStyle())
 
                     }
@@ -299,16 +303,14 @@ private struct PasswordView: View {
 
                     if isPasswordVisible {
                         Text(model.password)
+                            .accessibility(hint: .init(UserText.pmPassword))
                             .textSelectableIfAvailable()
                             .focusable(menu: menuProvider.createMenu, onCopy: { model.copy(model.password) })
                     } else {
                         Text(model.password.isEmpty ? "" : "••••••••••••")
+                            .accessibility(hint: .init(UserText.pmPassword))
                             .contextMenu(menuItems: menuProvider.createContextMenu)
                             .focusable(menu: menuProvider.createMenu, onCopy: { model.copy(model.password) })
-//                        // TODO: AX actions // swiftlint:disable:this todo
-//                            .accessibilityAction {
-//                                print("Act")
-//                            }
                     }
 
                     if isHovering || isPasswordVisible {
@@ -358,6 +360,7 @@ private struct WebsiteView: View {
         if model.isEditing || model.isNew {
 
             TextField("", text: $model.domain)
+                .accessibility(label: .init(UserText.pmWebsite))
                 .textFieldStyle(RoundedBorderTextFieldStyle())
                 .padding(.bottom, interItemSpacing)
 
@@ -369,6 +372,7 @@ private struct WebsiteView: View {
                 ])
 
                 TextButton(model.domain) { model.openURL(domainURL) }
+                    .accessibility(hint: .init(UserText.pmWebsite))
                     .contextMenu(menuItems: menuProvider.createContextMenu)
                     .focusable(menu: menuProvider.createMenu, onCopy: { model.copy(domainURL) })
                     .padding(.bottom, interItemSpacing)
@@ -379,6 +383,7 @@ private struct WebsiteView: View {
                 ])
 
                 Text(model.domain)
+                    .accessibility(hint: .init(UserText.pmWebsite))
                     .contextMenu(menuItems: menuProvider.createContextMenu)
                     .focusable(menu: menuProvider.createMenu, onCopy: { model.copy(model.domain) })
                     .padding(.bottom, interItemSpacing)
@@ -402,6 +407,7 @@ private struct DatesView: View {
                     .bold()
                     .opacity(0.6)
                 Text(model.createdDate)
+                    .accessibility(hint: .init(UserText.pmLoginAdded))
                     .opacity(0.6)
             }
 
@@ -410,6 +416,7 @@ private struct DatesView: View {
                     .bold()
                     .opacity(0.6)
                 Text(model.lastUpdatedDate)
+                    .accessibility(hint: .init(UserText.pmLoginLastUpdated))
                     .opacity(0.6)
             }
 

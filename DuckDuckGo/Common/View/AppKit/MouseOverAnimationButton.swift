@@ -57,7 +57,7 @@ final class MouseOverAnimationButton: AddressBarButton {
             .receive(on: DispatchQueue.main)
             .sink { [weak self] _ in
                 if NSApp.isActive
-                    && self?.window?.isKeyWindow == true
+                    && NSApp.keyWindow === self?.window
                     && self?.isFirstResponder == true {
 
                     self?.animate()
@@ -223,7 +223,7 @@ final class MouseOverAnimationButton: AddressBarButton {
 
     private func stopAnimationIfNeeded() {
         guard !isMouseOver,
-              !(NSApp.isActive && self.window?.isKeyWindow == true && self.isFirstResponder),
+              !(NSApp.isActive && NSApp.keyWindow === self.window && self.isFirstResponder),
               case .off = self.state
         else {
             return

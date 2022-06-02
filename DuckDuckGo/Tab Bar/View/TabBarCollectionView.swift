@@ -44,8 +44,34 @@ final class TabBarCollectionView: NSCollectionView {
         }
     }
 
+    override func accessibilityIdentifier() -> String {
+        "TabBar"
+    }
+
+    override func accessibilityLabel() -> String? {
+        "tab bar"
+    }
+
     override func accessibilityRole() -> NSAccessibility.Role? {
-        .tabGroup
+        .group
+    }
+
+    override func accessibilityRoleDescription() -> String? {
+        "group"
+    }
+
+    override func isAccessibilitySelectorAllowed(_ selector: Selector) -> Bool {
+        switch selector {
+        case #selector(accessibilitySubrole),
+             #selector(accessibilityOrientation),
+             #selector(accessibilityColumnCount),
+             #selector(accessibilityRowCount),
+             #selector(accessibilitySelectedChildren),
+             #selector(isAccessibilityEnabled):
+            return false
+        default:
+            return super.isAccessibilitySelectorAllowed(selector)
+        }
     }
 
     override func accessibilityFrame() -> NSRect {
@@ -64,6 +90,10 @@ final class TabBarCollectionView: NSCollectionView {
 
     private var leftScrollButton: NSButton? {
         tabBarViewController?.leftScrollButton
+    }
+
+    private var rightScrollButton: NSButton? {
+        tabBarViewController?.rightScrollButton
     }
 
     private var newTabButton: NSButton? {
@@ -94,9 +124,18 @@ final class TabBarCollectionView: NSCollectionView {
     }
 
     private func getAccessibilityChildren() -> [NSAccessibilityElementProtocol] {
-        var children = getAccessibilityTabs()
-        if let newTabButton = newTabButton {
-            children.append(newTabButton)
+        var children = [NSAccessibilityElementProtocol]()
+        if leftScrollButton?.isHidden == false,
+           let leftScrollButtonCell = leftScrollButton?.cell {
+            children.append(leftScrollButtonCell)
+        }
+        children.append(contentsOf: getAccessibilityTabs())
+        if rightScrollButton?.isHidden == false,
+           let rightScrollButtonCell = rightScrollButton?.cell {
+            children.append(rightScrollButtonCell)
+        }
+        if let newTabButtonCell = newTabButton?.cell {
+            children.append(newTabButtonCell)
         }
         return children
     }
@@ -114,7 +153,11 @@ final class TabBarCollectionView: NSCollectionView {
     }
 
     override func accessibilityTabs() -> [Any]? {
-        getAccessibilityChildren()
+        getAccessibilityTabs()
+    }
+
+    override func accessibilityContents() -> [Any]? {
+        getAccessibilityTabs()
     }
 
     override func doCommand(by selector: Selector) {

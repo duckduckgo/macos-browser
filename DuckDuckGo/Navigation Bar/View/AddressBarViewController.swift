@@ -95,6 +95,8 @@ final class AddressBarViewController: NSViewController {
 
         view.wantsLayer = true
         view.layer?.masksToBounds = false
+        // TODO: clearButton.cell?
+        addressBarButtonsViewController?.clearButton.setAccessibilityParent(addressBarTextField)
 
         updateView()
         addressBarTextField.addressBarTextFieldDelegate = self

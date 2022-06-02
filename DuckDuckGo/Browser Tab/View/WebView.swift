@@ -42,6 +42,10 @@ final class WebView: WKWebView {
         "WKMenuItemIdentifierDownloadLinkedFile": UserText.downloadLinkedFileAs,
         "WKMenuItemIdentifierSearchWeb": UserText.searchWithDuckDuckGo
     ]
+
+    override func accessibilityIdentifier() -> String {
+        "WebView"
+    }
   
     deinit {
         self.configuration.userContentController.removeAllUserScripts()

@@ -101,7 +101,11 @@ final class TabBarViewItem: NSCollectionViewItem {
 
     private let titleTextFieldMaskLayer = CAGradientLayer()
 
-    private var currentURL: URL?
+    private var currentURL: URL? {
+        didSet {
+            view.setAccessibilityURL(currentURL)
+        }
+    }
     private var cancellables = Set<AnyCancellable>()
     private var closeButtonFirstResponderObserver: NSKeyValueObservation?
 
@@ -253,8 +257,9 @@ final class TabBarViewItem: NSCollectionViewItem {
         tabViewModel.tab.$content.sink { [weak self] content in
             self?.currentURL = content.url
         }.store(in: &cancellables)
-        // TODO: Used permissions/url? accessibility // swiftlint:disable:this todo
         tabViewModel.$usedPermissions.assign(to: \.usedPermissions, onWeaklyHeld: self).store(in: &cancellables)
+
+        view.setAccessibilityIdentifier("Tab-\(tabViewModel.tab.identifier)")
     }
 
     private func setupCloseButtonFirstResponderObserver() {
@@ -338,14 +343,35 @@ final class TabBarViewItem: NSCollectionViewItem {
         }
     }
     private func updateUsedPermissions() {
+        let domain = currentURL?.host ?? ""
         if usedPermissions.camera.isActive {
             permissionButton.image = .cameraActiveImage
+            permissionButton.setAccessibilityTitle(String(format: UserText.permissionMuteAXTitleFormat,
+                                                          PermissionType.camera.localizedDescription.lowercased()))
+            permissionButton.setAccessibilityLabel(String(format: UserText.permissionMuteFormat,
+                                                          PermissionType.camera.localizedDescription.lowercased(),
+                                                          domain))
         } else if usedPermissions.microphone.isActive {
             permissionButton.image = .micActiveImage
+            permissionButton.setAccessibilityTitle(String(format: UserText.permissionMuteAXTitleFormat,
+                                                          PermissionType.microphone.localizedDescription.lowercased()))
+            permissionButton.setAccessibilityLabel(String(format: UserText.permissionMuteFormat,
+                                                          PermissionType.microphone.localizedDescription.lowercased(),
+                                                          domain))
         } else if usedPermissions.camera.isPaused {
             permissionButton.image = .cameraBlockedImage
+            permissionButton.setAccessibilityTitle(String(format: UserText.permissionUnmuteAXTitleFormat,
+                                                          PermissionType.camera.localizedDescription.lowercased()))
+            permissionButton.setAccessibilityLabel(String(format: UserText.permissionUnmuteFormat,
+                                                          PermissionType.camera.localizedDescription.lowercased(),
+                                                          domain))
         } else if usedPermissions.microphone.isPaused {
             permissionButton.image = .micBlockedImage
+            permissionButton.setAccessibilityTitle(String(format: UserText.permissionUnmuteAXTitleFormat,
+                                                          PermissionType.microphone.localizedDescription.lowercased()))
+            permissionButton.setAccessibilityLabel(String(format: UserText.permissionUnmuteFormat,
+                                                          PermissionType.microphone.localizedDescription.lowercased(),
+                                                          domain))
         } else {
             permissionButton.image = nil
             permissionButton.isHidden = true

@@ -69,6 +69,7 @@ struct PasswordManagementCreditCardItemView: View {
                                         .tag(month.index as Int?)
                                 }
                             }
+                            .accessibility(label: .init(UserText.pmCardExpirationMonth))
                             .labelsHidden()
 
                             Picker("", selection: $model.expirationYear) {
@@ -77,6 +78,7 @@ struct PasswordManagementCreditCardItemView: View {
                                         .tag(year as Int?)
                                 }
                             }
+                            .accessibility(label: .init(UserText.pmCardExpirationYear))
                             .labelsHidden()
 
                         }
@@ -91,6 +93,7 @@ struct PasswordManagementCreditCardItemView: View {
                             ])
 
                             Text(textFieldValue)
+                                .accessibility(hint: .init(UserText.pmCardExpiration))
                                 .textSelectableIfAvailable()
                                 .focusable(menu: menuProvider.createMenu, onCopy: { model.copy(textFieldValue) })
                                 .padding(.bottom, interItemSpacing)
@@ -216,6 +219,7 @@ private struct EditableCreditCardField: View {
                 if model.isEditing || model.isNew {
 
                     TextField("", text: $textFieldValue)
+                        .accessibility(label: .init(title))
                         .textFieldStyle(RoundedBorderTextFieldStyle())
                         .padding(.bottom, interItemSpacing)
 
@@ -227,6 +231,7 @@ private struct EditableCreditCardField: View {
                         ])
 
                         Text(textFieldValue)
+                            .accessibility(hint: .init(title))
                             .textSelectableIfAvailable()
                             .focusable(menu: menuProvider.createMenu, onCopy: { model.copy(textFieldValue) })
 

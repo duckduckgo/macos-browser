@@ -329,6 +329,10 @@ final class Tab: NSObject, Identifiable {
     private var clientRedirectedDuringNavigationURL: URL?
     private var externalSchemeOpenedPerPageLoad = false
 
+    var identifier: UInt64 {
+        instrumentation.currentTabIdentifier
+    }
+
     var canGoForward: Bool {
         webView.canGoForward
     }
