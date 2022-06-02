@@ -77,7 +77,7 @@ struct ImportedBookmarks: Decodable {
         }
 
         init(name: String, type: String, urlString: String?, children: [BookmarkOrFolder]?, isDDGFavorite: Bool = false) {
-            self.name = name
+            self.name = name.trimmingWhitespaces()
             self.type = type
             self.urlString = urlString
             self.children = children
