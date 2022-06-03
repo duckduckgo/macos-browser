@@ -403,6 +403,7 @@ extension Pixel.Event {
         case edge = "source-edge"
         case firefox = "source-firefox"
         case safari = "source-safari"
+        case bookmarksHTML = "source-bookmarks-html"
     }
 
 }

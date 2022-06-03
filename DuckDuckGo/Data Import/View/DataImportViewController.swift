@@ -91,8 +91,12 @@ final class DataImportViewController: NSViewController {
                     self.dataImporter = try EdgeDataImporter(loginImporter: secureVaultImporter(), bookmarkImporter: bookmarkImporter)
                 case .firefox:
                     self.dataImporter = try FirefoxDataImporter(loginImporter: secureVaultImporter(), bookmarkImporter: bookmarkImporter)
-                case .safari where !(currentChildViewController is CSVImportViewController):
+                case .safari where !(currentChildViewController is FileImportViewController):
                     self.dataImporter = SafariDataImporter(bookmarkImporter: bookmarkImporter)
+                case .bookmarksHTML:
+                    if !(self.dataImporter is BookmarkHTMLImporter) {
+                        self.dataImporter = nil
+                    }
                 case .csv, .onePassword, .lastPass, .safari /* csv only */:
                     if !(self.dataImporter is CSVImporter) {
                         self.dataImporter = nil
@@ -139,7 +143,7 @@ final class DataImportViewController: NSViewController {
         case .ableToImport where viewState.selectedImportSource == .safari
                 && selectedImportOptions.contains(.logins)
                 && (dataImporter is CSVImporter || selectedImportOptions == [.logins])
-                && !(currentChildViewController is CSVImportViewController):
+                && !(currentChildViewController is FileImportViewController):
             // Only Safari Passwords selected, switch to CSV select
             self.viewState = .init(selectedImportSource: viewState.selectedImportSource, interactionState: .permissionsRequired([.logins]))
 
@@ -176,7 +180,7 @@ final class DataImportViewController: NSViewController {
         let source = validSources.first(where: { $0.importSourceName == item.title })!
 
         switch source {
-        case .csv, .lastPass, .onePassword:
+        case .csv, .lastPass, .onePassword, .bookmarksHTML:
             self.viewState = ViewState(selectedImportSource: source, interactionState: .unableToImport)
 
         case .chrome, .firefox, .brave, .edge, .safari:
@@ -254,13 +258,13 @@ final class DataImportViewController: NSViewController {
         switch importSource {
         case .safari:
             if case .permissionsRequired([.logins]) = interactionState {
-                let viewController = CSVImportViewController.create(importSource: .safari)
+                let viewController = FileImportViewController.create(importSource: .safari)
                 viewController.delegate = self
                 return viewController
 
             } else if case .ableToImport = interactionState,
-                      let csvImportViewController = currentChildViewController as? CSVImportViewController {
-                csvImportViewController.importSource = importSource
+                      let fileImportViewController = currentChildViewController as? FileImportViewController {
+                fileImportViewController.importSource = importSource
                 return nil
             }
             fallthrough
@@ -278,15 +282,15 @@ final class DataImportViewController: NSViewController {
                 return browserImportViewController
             }
 
-        case .csv, .onePassword, .lastPass:
+        case .csv, .onePassword, .lastPass, .bookmarksHTML:
             if case let .completedImport(summary) = interactionState {
                 return BrowserImportSummaryViewController.create(importSummary: summary)
             } else {
-                if let csvImportViewController = currentChildViewController as? CSVImportViewController {
-                    csvImportViewController.importSource = importSource
+                if let fileImportViewController = currentChildViewController as? FileImportViewController {
+                    fileImportViewController.importSource = importSource
                     return nil
                 }
-                let viewController = CSVImportViewController.create(importSource: importSource)
+                let viewController = FileImportViewController.create(importSource: importSource)
                 viewController.delegate = self
                 return viewController
             }
@@ -344,7 +348,8 @@ final class DataImportViewController: NSViewController {
             assertionFailure("\(#file): No data importer or profile found")
             return []
         }
-        return browserImportViewController?.selectedImportOptions ?? importer.importableTypes()
+        let selectedOptions = browserImportViewController?.selectedImportOptions ?? []
+        return selectedOptions.isEmpty ? importer.importableTypes() : selectedOptions
     }
 
     private func completeImport() {
@@ -424,6 +429,7 @@ final class DataImportViewController: NSViewController {
         case .edge: Pixel.fire(.importedLogins(source: .edge))
         case .firefox: Pixel.fire(.importedLogins(source: .firefox))
         case .safari: Pixel.fire(.importedLogins(source: .safari))
+        case .bookmarksHTML: assertionFailure("Attempted to fire invalid logins import pixel")
         }
     }
 
@@ -435,15 +441,28 @@ final class DataImportViewController: NSViewController {
         case .edge: Pixel.fire(.importedBookmarks(source: .edge))
         case .firefox: Pixel.fire(.importedBookmarks(source: .firefox))
         case .safari: Pixel.fire(.importedBookmarks(source: .safari))
+        case .bookmarksHTML: Pixel.fire(.importedBookmarks(source: .bookmarksHTML))
         }
     }
 
 }
 // swiftlint:enable type_body_length
 
-extension DataImportViewController: CSVImportViewControllerDelegate {
+extension DataImportViewController: FileImportViewControllerDelegate {
 
-    func csvImportViewController(_ viewController: CSVImportViewController, didSelectCSVFileWithURL url: URL?) {
+    func fileImportViewController(_ viewController: FileImportViewController, didSelectBookmarksFileWithURL url: URL?) {
+        guard let url = url else {
+            self.viewState.interactionState = .unableToImport
+            return
+        }
+
+        let bookmarkImporter = CoreDataBookmarkImporter(bookmarkManager: LocalBookmarkManager.shared)
+
+        self.dataImporter = BookmarkHTMLImporter(fileURL: url, bookmarkImporter: bookmarkImporter)
+        self.viewState.interactionState = .ableToImport
+    }
+
+    func fileImportViewController(_ viewController: FileImportViewController, didSelectCSVFileWithURL url: URL?) {
         guard let url = url else {
             self.viewState.interactionState = .unableToImport
             return
@@ -468,6 +487,14 @@ extension DataImportViewController: CSVImportViewControllerDelegate {
                                    loginImporter: nil,
                                    defaultColumnPositions: .init(source: self.viewState.selectedImportSource))
         return importer.totalValidLogins()
+    }
+
+    func totalValidBookmarks(in fileURL: URL) -> Int? {
+        let importer = BookmarkHTMLImporter(
+            fileURL: fileURL,
+            bookmarkImporter: CoreDataBookmarkImporter(bookmarkManager: LocalBookmarkManager.shared)
+        )
+        return importer.totalBookmarks
     }
 
 }

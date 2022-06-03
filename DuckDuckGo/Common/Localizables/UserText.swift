@@ -277,6 +277,17 @@ struct UserText {
     // MARK: - Login Import & Export
 
     static let importLoginsCSV = NSLocalizedString("import.logins.csv.title", value: "CSV Logins File", comment: "Title text for the CSV importer")
+    static let importBookmarksHTML = NSLocalizedString("import.bookmarks.html.title", value: "HTML Bookmarks File", comment: "Title text for the HTML Bookmarks importer")
+    static let importBookmarksSelectHTMLFile = NSLocalizedString("import.bookmarks.select-html-file", value: "Select HTML Bookmarks File…", comment: "Button text for selecting HTML Bookmarks file")
+    static let importBookmarksSelectAnotherFile = NSLocalizedString("import.bookmarks.select-another-file", value: "Select Another HTML File…", comment: "Button text for selecting another file")
+    static let importBookmarksFailedToReadHTMLFile = NSLocalizedString("import.bookmarks.failed-to-read-file", value: "Failed to read HTML file", comment: "Error text when importing a HTML file")
+
+    static func importingFile(validBookmarks: Int) -> String {
+        let localized = NSLocalizedString("import.bookmarks.html.valid-bookmarks",
+                                          value: "Contains %@ bookmarks",
+                                          comment: "Displays the number of the bookmarks being imported")
+        return String(format: localized, String(validBookmarks))
+    }
 
     static let csvImportDescription = NSLocalizedString("import.logins.csv.description", value: "The CSV importer will try to match column headers to their position.\nIf there is no header, it supports two formats:\n\n1. URL, Username, Password\n2. Title, URL, Username, Password", comment: "Description text for the CSV importer")
     static let importLoginsSelectCSVFile = NSLocalizedString("import.logins.select-csv-file", value: "Select CSV File…", comment: "Button text for selecting a CSV file")
