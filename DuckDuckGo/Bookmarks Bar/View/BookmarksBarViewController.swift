@@ -262,13 +262,13 @@ final class BookmarksBarViewController: NSViewController {
             let viewModel = BookmarkViewModel(entity: entity)
 
             if let bookmark = entity as? Bookmark {
-                let button = bookmarkButton(titled: entity.title, url: bookmark.url)
-                button.update(with: bookmark)
+                let button = BookmarksBarButton(bookmark: bookmark)
+                configureBookmarkButton(button: button, withTitle: bookmark.title)
                 
                 return BookmarkButtonData(button: button, bookmarkViewModel: viewModel)
             } else if let folder = entity as? BookmarkFolder {
-                let button = folderButton(titled: folder.title)
-                button.update(with: folder)
+                let button = BookmarksBarButton(folder: folder)
+                configureBookmarkButton(button: button, withTitle: folder.title)
                 
                 return BookmarkButtonData(button: button, bookmarkViewModel: viewModel)
             } else {
@@ -278,16 +278,7 @@ final class BookmarksBarViewController: NSViewController {
         }
     }
     
-    private func bookmarkButton(titled title: String, url: URL) -> BookmarksBarButton {
-        return createButton(titled: title)
-    }
-    
-    private func folderButton(titled title: String) -> BookmarksBarButton {
-        return createButton(titled: title)
-    }
-    
-    private func createButton(titled title: String) -> BookmarksBarButton {
-        let button = BookmarksBarButton(frame: .zero)
+    private func configureBookmarkButton(button: BookmarksBarButton, withTitle title: String) {
         button.layerContentsRedrawPolicy = .onSetNeedsDisplay
         button.isBordered = false
         button.title = title
@@ -301,8 +292,6 @@ final class BookmarksBarViewController: NSViewController {
         button.frame = buttonFrame
         
         button.lineBreakMode = .byTruncatingMiddle
-
-        return button
     }
     
     private func buttonIndex(for button: BookmarksBarButton) -> Int? {
@@ -371,28 +360,15 @@ final class BookmarksBarViewController: NSViewController {
             }
         default:
             break
-            // print("Other event: \(event)")
-        }
-    }
-    
-    @objc
-    private func bookmarkMenuItemClicked(_ sender: NSButton) {
-        if let event = NSApp.currentEvent, event.type == .leftMouseDown {
-            print("Left click down")
-        } else {
-            print("Left click other")
         }
     }
     
     @objc
     private func clippedItemsIndicatorClicked(_ sender: NSButton) {
         let menu = NSMenu()
-
-        menu.items = clippedButtons.map {
-            NSMenuItem(bookmarkViewModel: $0.bookmarkViewModel)
-        }
-        
         let location = NSPoint(x: 0, y: sender.frame.height + 5) // Magic number to adjust the height.
+
+        menu.items = clippedButtons.map { NSMenuItem(bookmarkViewModel: $0.bookmarkViewModel) }
         menu.popUp(positioning: nil, at: location, in: sender)
     }
     

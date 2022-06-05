@@ -29,20 +29,26 @@ final class BookmarksBarButton: NSButton {
             updateLayer()
         }
     }
-     
-    override func sizeToFit() {
-        super.sizeToFit()
-        
-        let updatedFrame = self.frame.insetBy(dx: -5, dy: -3)
-        self.frame = updatedFrame
-    }
 
+    convenience init(bookmark: Bookmark) {
+        self.init(frame: .zero)
+        update(from: bookmark)
+    }
+    
+    convenience init(folder: BookmarkFolder) {
+        self.init(frame: .zero)
+        update(from: folder)
+    }
+    
     override init(frame frameRect: NSRect) {
         super.init(frame: frameRect)
 
         self.cell = BookmarksBarButtonCell()
         
         addSubview(faviconImageView)
+        faviconImageView.layer?.cornerRadius = 3
+        faviconImageView.layer?.masksToBounds = true
+
         configureLayers()
         addTrackingArea()
     }
@@ -51,20 +57,22 @@ final class BookmarksBarButton: NSButton {
         fatalError("init(coder:) has not been implemented")
     }
     
+    override func sizeToFit() {
+        super.sizeToFit()
+        
+        let updatedFrame = self.frame.insetBy(dx: -5, dy: -3)
+        self.frame = updatedFrame
+    }
+    
     // MARK: - Interface Updates
     
-    func update(with bookmarkEntity: BaseBookmarkEntity) {
-        faviconImageView.layer?.cornerRadius = 3
-        faviconImageView.layer?.masksToBounds = true
-
-        if let bookmark = bookmarkEntity as? Bookmark {
-            let favicon = FaviconManager.shared.getCachedFavicon(for: bookmark.url, sizeCategory: .small)?.image ?? NSImage(named: "Bookmark")
-            faviconImageView.image = favicon
-        } else if bookmarkEntity is BookmarkFolder {
-            faviconImageView.image = NSImage(named: "Folder")
-        } else {
-            assertionFailure("Tried to update bookmarks bar button with unsupported type: \(bookmarkEntity)")
-        }
+    private func update(from bookmark: Bookmark) {
+        let favicon = FaviconManager.shared.getCachedFavicon(for: bookmark.url, sizeCategory: .small)?.image ?? NSImage(named: "Bookmark")
+        faviconImageView.image = favicon
+    }
+    
+    private func update(from folder: BookmarkFolder) {
+        faviconImageView.image = NSImage(named: "Folder-16")
     }
 
     private func configureLayers() {
