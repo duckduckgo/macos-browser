@@ -612,9 +612,9 @@ final class LocalBookmarkStore: BookmarkStore {
     private let topLevelBookmarksFolderName = "BookmarksRootFolder"
     
     private func migrateTopLevelStorageToImplicitBookmarksFolder() {
-        guard !hasMigratedTopLevelStorageToImplicitBookmarksFolder else {
-            return
-        }
+//        guard !hasMigratedTopLevelStorageToImplicitBookmarksFolder else {
+//            return
+//        }
         
         context.performAndWait {
             // 1. Fetch all top-level entities and check that there isn't an existing root folder
@@ -626,27 +626,46 @@ final class LocalBookmarkStore: BookmarkStore {
             topLevelEntitiesFetchRequest.returnsObjectsAsFaults = true
             
             do {
-                // 1. Get the existing top level entities:
+                // 1. Get the existing top level entities and check for a root folder:
                 
-                let existingTopLevelEntities = try self.context.fetch(topLevelEntitiesFetchRequest)
+                var existingTopLevelEntities = try self.context.fetch(topLevelEntitiesFetchRequest)
                 
-                // 2. Create the new top level bookmarks folder:
+                let existingTopLevelFolderIndex = existingTopLevelEntities.firstIndex { entity in
+                    (entity.titleEncrypted as? String) == topLevelBookmarksFolderName
+                }
                 
-                let managedObject = NSEntityDescription.insertNewObject(forEntityName: BookmarkManagedObject.className(), into: self.context)
-
-                guard let topLevelFolder = managedObject as? BookmarkManagedObject else {
-                    assertionFailure("LocalBookmarkStore: Failed to migrate top level entities")
+                // Check if there's only one top level folder, and it's the root folder:
+                if existingTopLevelFolderIndex != nil, existingTopLevelEntities.count == 1 {
+                    print("Didn't need to migrate")
                     return
                 }
 
-                topLevelFolder.id = UUID()
-                topLevelFolder.titleEncrypted = topLevelBookmarksFolderName as NSString
-                topLevelFolder.isFolder = true
-                topLevelFolder.dateAdded = NSDate.now
+                // 2. Get or create the top level folder:
+                
+                let topLevelFolder: BookmarkManagedObject
+                
+                if let existingTopLevelFolderIndex = existingTopLevelFolderIndex {
+                    topLevelFolder = existingTopLevelEntities[existingTopLevelFolderIndex]
+                    existingTopLevelEntities.remove(at: existingTopLevelFolderIndex)
+                } else {
+                    let managedObject = NSEntityDescription.insertNewObject(forEntityName: BookmarkManagedObject.className(), into: self.context)
+                    
+                    guard let newTopLevelFolder = managedObject as? BookmarkManagedObject else {
+                        assertionFailure("LocalBookmarkStore: Failed to migrate top level entities")
+                        return
+                    }
+                    
+                    newTopLevelFolder.id = UUID()
+                    newTopLevelFolder.titleEncrypted = topLevelBookmarksFolderName as NSString
+                    newTopLevelFolder.isFolder = true
+                    newTopLevelFolder.dateAdded = NSDate.now
+                    
+                    topLevelFolder = newTopLevelFolder
+                }
                 
                 // 3. Add existing top level entities as children of the new top level folder:
                 
-                topLevelFolder.children = NSOrderedSet(array: existingTopLevelEntities)
+                topLevelFolder.mutableChildren.addObjects(from: existingTopLevelEntities)
                 
                 // 4. Save the migration:
                 
