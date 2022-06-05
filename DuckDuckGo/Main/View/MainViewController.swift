@@ -50,6 +50,10 @@ final class MainViewController: NSViewController {
     private var findInPageCancellable: AnyCancellable?
     private var keyDownMonitor: Any?
     private var mouseNavButtonsMonitor: Any?
+    
+    private var bookmarksBarIsVisible: Bool {
+        return !bookmarksBarViewController.view.isHidden
+    }
 
     required init?(coder: NSCoder) {
         self.tabCollectionViewModel = TabCollectionViewModel()
@@ -67,7 +71,6 @@ final class MainViewController: NSViewController {
         listenToKeyDownEvents()
         subscribeToSelectedTabViewModel()
         findInPageContainerView.applyDropShadow()
-        // updateBookmarksBar(visible: true)
     }
 
     override func viewWillAppear() {
@@ -77,12 +80,15 @@ final class MainViewController: NSViewController {
             navigationBarTopConstraint.constant = 0.0
             webViewTopConstraint.constant = navigationBarViewController.view.frame.height
             addressBarHeightConstraint.constant = tabBarContainerView.frame.height
+            updateBookmarksBar(visible: false)
         } else {
             navigationBarContainerView.wantsLayer = true
             navigationBarContainerView.layer?.masksToBounds = false
 
             resizeNavigationBarForHomePage(tabCollectionViewModel.selectedTabViewModel?.tab.content == .homePage, animated: false)
         }
+        
+        updateDividerColor()
     }
 
     override func viewDidLayout() {
@@ -175,9 +181,14 @@ final class MainViewController: NSViewController {
     func updateBookmarksBar(visible: Bool) {
         bookmarksBarViewController.view.isHidden = !visible
         bookmarksBarHeightConstraint.constant = visible ? 32 : 0
-        
-        // (divider as? ColorView)?.backgroundColor = visible ? .addressBarBackgroundColor : .separatorColor
-        (divider as? ColorView)?.backgroundColor = visible ? .white : .separatorColor
+        updateDividerColor()
+    }
+    
+    private func updateDividerColor() {
+        NSAppearance.withAppAppearance {
+            let isHomePage = tabCollectionViewModel.selectedTabViewModel?.tab.content == .homePage
+            (divider as? ColorView)?.backgroundColor = (bookmarksBarIsVisible || isHomePage) ? .addressBarFocusedBackgroundColor : .separatorColor
+        }
     }
 
     private func subscribeToSelectedTabViewModel() {
@@ -199,9 +210,7 @@ final class MainViewController: NSViewController {
             let height = animated ? addressBarHeightConstraint.animator() : addressBarHeightConstraint
             height?.constant = homePage ? 52 : nonHomePageHeight
 
-            let divider = animated ? self.divider.animator() : self.divider
-            divider?.alphaValue = homePage ? 0 : 1.0
-
+            updateDividerColor()
             navigationBarViewController.resizeAddressBarForHomePage(homePage, animated: animated)
         }
     }

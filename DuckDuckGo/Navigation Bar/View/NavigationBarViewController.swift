@@ -432,7 +432,7 @@ final class NavigationBarViewController: NSViewController {
         barTop?.constant = homePage ? 16 : verticalPadding
 
         let bottom = animated ? addressBarBottomConstraint.animator() : addressBarBottomConstraint
-        bottom?.constant = homePage ? 0 : verticalPadding
+        bottom?.constant = homePage ? 2 : verticalPadding
 
         let logoWidth = animated ? logoWidthConstraint.animator() : logoWidthConstraint
         logoWidth?.constant = homePage ? 44 : 0
