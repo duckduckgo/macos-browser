@@ -124,8 +124,8 @@ keychain_account() {
 delete_keychain_entries() {
 	local account="$1"
 
-	if is_item_in_keychain_by_label "${account}" "${keychain_label}"; then
-		delete_item_from_keychain_with_label "${account}" "${keychain_label}"
+	if is_item_in_keychain "${account}" "${keychain_label}"; then
+		delete_item_from_keychain "${account}" "${keychain_label}"
 	fi
 }
 
@@ -134,10 +134,10 @@ copy_keychain_entries() {
 	local target_account="$2"
 	local keychain_label="DuckDuckGo WebCrypto Master Key"
 
-	if is_item_in_keychain_by_label "${source_account}" "${keychain_label}"; then
+	if is_item_in_keychain "${source_account}" "${keychain_label}"; then
 		local password
-		password="$(retrieve_item_from_keychain_by_label "${source_account}" "${keychain_label}")"
-		store_item_in_keychain_with_label "${target_account}" "${password}" "${keychain_label}"
+		password="$(retrieve_item_from_keychain "${source_account}" "${keychain_label}")"
+		store_item_in_keychain "${target_account}" "${password}" "${keychain_label}"
 	fi
 }
 
