@@ -82,7 +82,7 @@ final class BookmarkListViewController: NSViewController {
         outlineView.registerForDraggedTypes([BookmarkPasteboardWriter.bookmarkUTIInternalType,
                                              FolderPasteboardWriter.folderUTIInternalType])
         
-        LocalBookmarkManager.shared.listPublisher.receive(on: RunLoop.main).sink { [weak self] list in
+        LocalBookmarkManager.shared.listPublisher.receive(on: DispatchQueue.main).sink { [weak self] list in
             self?.reloadData()
             let isEmpty = list?.topLevelEntities.isEmpty ?? true
             self?.emptyState.isHidden = !isEmpty
