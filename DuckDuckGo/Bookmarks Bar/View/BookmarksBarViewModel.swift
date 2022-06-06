@@ -17,8 +17,120 @@
 //
 
 import Foundation
+import Combine
 
-final class BookmarksBarViewModel: NSObject, NSPasteboardItemDataProvider {
+final class BookmarksBarViewModel: NSObject {
+    
+    // MARK: Enums
+    
+    enum Constants {
+        static let distanceRequiredForDragging: CGFloat = 10
+        static let buttonSpacing: CGFloat = 8
+        static let buttonHeight: CGFloat = 28
+        static let maximumButtonWidth: CGFloat = 150
+    }
+    
+    enum ViewState {
+        case idle
+        case beginningDrag(originalLocation: CGPoint)
+        case draggingExistingItem(draggedItemData: DraggedItemData)
+        case draggingNewItem(draggedItemData: DraggedItemData)
+        
+        var isDragging: Bool {
+            switch self {
+            case .draggingExistingItem, .draggingNewItem: return true
+            case .idle, .beginningDrag: return false
+            }
+        }
+    }
+    
+    enum ViewEvent {
+        case mouseDown(CGPoint)
+        case mouseDragged(buttonIndex: Int, location: CGPoint)
+        case mouseUp
+        case beganDraggingSession
+    }
+    
+    // MARK: State
+    
+    struct ButtonLayoutData {
+        let cumulativeButtonWidth: CGFloat = 0
+        let cumulativeSpacingWidth: CGFloat = 0
+        let totalButtonListWidth: CGFloat = 0
+    }
+    
+    struct DraggedItemData {
+        let proposedDropIndex: Int
+        let proposedItemWidth: CGFloat
+    }
+
+    @Published private(set) var state: ViewState = .idle
+    private(set) var buttonLayoutData: ButtonLayoutData = ButtonLayoutData()
+    
+    private let bookmarkManager: BookmarkManager
+    private var cancellables = Set<AnyCancellable>()
+    
+    // MARK: Functions
+
+    init(bookmarkManager: BookmarkManager = LocalBookmarkManager.shared) {
+        self.bookmarkManager = bookmarkManager
+    }
+    
+    func handle(event: ViewEvent) {
+        switch event {
+        case .mouseDown(let location):
+            print("VM Mouse down")
+        case .mouseDragged(let draggedButtonIndex, let currentLocation):
+            if case let .beginningDrag(originalLocation) = self.state {
+                let distance = CGPointDistance(from: originalLocation, to: currentLocation)
+                if distance > Constants.distanceRequiredForDragging {
+                    self.state = .draggingExistingItem(draggedItemData: DraggedItemData(proposedDropIndex: 0, proposedItemWidth: 0))
+                }
+            } else {
+                self.state = .beginningDrag(originalLocation: currentLocation)
+            }
+        case .mouseUp:
+            self.state = .idle
+        case .beganDraggingSession:
+            print("Dragging session began")
+        }
+    }
+ 
+}
+
+// MARK: - Dragging Destination
+
+extension BookmarksBarViewModel {
+    
+}
+
+// MARK: - Dragging Source
+
+extension BookmarksBarViewModel: NSDraggingSource {
+    
+//    func draggingSession(_ session: NSDraggingSession, movedTo screenPoint: NSPoint) {
+//        print("BookmarksBarViewModel: \(#function)")
+//    }
+    
+//    func draggingSession(_ session: NSDraggingSession, endedAt screenPoint: NSPoint, operation: NSDragOperation) {
+//        print("BookmarksBarViewModel: \(#function)")
+//    }
+
+    func draggingSession(_ session: NSDraggingSession, sourceOperationMaskFor context: NSDraggingContext) -> NSDragOperation {
+        print("BookmarksBarViewModel: \(#function)")
+        
+        switch context {
+        case .withinApplication: return .generic
+        case .outsideApplication: return []
+        @unknown default: fatalError()
+        }
+    }
+
+}
+
+// MARK: - Dragging Pasteboard Data
+
+extension BookmarksBarViewModel: NSPasteboardItemDataProvider {
     
     func pasteboard(_ pasteboard: NSPasteboard?, item: NSPasteboardItem, provideDataForType type: NSPasteboard.PasteboardType) {
         print(#function)
@@ -27,12 +139,10 @@ final class BookmarksBarViewModel: NSObject, NSPasteboardItemDataProvider {
         let string = "https://duckduckgo.com/".data(using: .utf8)!
     
         switch type {
-        case .URL:
-            item.setData(string, forType: type)
-        case .string:
-            item.setData(string, forType: type)
+        case .URL: item.setData(string, forType: type)
+        case .string: item.setData(string, forType: type)
         default: break
         }
     }
- 
+
 }

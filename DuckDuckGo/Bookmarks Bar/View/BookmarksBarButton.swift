@@ -60,7 +60,7 @@ final class BookmarksBarButton: NSButton {
     override func sizeToFit() {
         super.sizeToFit()
         
-        let updatedFrame = self.frame.insetBy(dx: -5, dy: -3)
+        let updatedFrame = self.frame.insetBy(dx: -3, dy: -3)
         self.frame = updatedFrame
     }
     
@@ -115,15 +115,6 @@ final class BookmarksBarButton: NSButton {
                 backgroundLayer.backgroundColor = NSColor.clear.cgColor
             }
         }
-    }
-    
-}
-
-extension BookmarksBarButton: NSDraggingSource {
-
-    func draggingSession(_ session: NSDraggingSession, sourceOperationMaskFor context: NSDraggingContext) -> NSDragOperation {
-        print("BookmarksBarButton: \(#function)")
-        return .move
     }
     
 }

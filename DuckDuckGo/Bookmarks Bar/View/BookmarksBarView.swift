@@ -36,17 +36,16 @@ final class BookmarksBarView: ColorView {
         
         delegate?.draggingEntered(draggingInfo: sender)
         
-        let canReadPasteboardObjects = sender.draggingPasteboard.canReadObject(forClasses: [NSString.self, NSURL.self], options: nil)
-     
-        if canReadPasteboardObjects {
-            return .copy
-        }
+//        let canReadPasteboardObjects = sender.draggingPasteboard.canReadObject(forClasses: [NSString.self, NSURL.self], options: nil)
+//
+//        if canReadPasteboardObjects {
+//            return .copy
+//        }
      
         return sender.draggingSourceOperationMask
     }
     
     override func draggingExited(_ sender: NSDraggingInfo?) {
-        print(#function)
         delegate?.draggingExited(draggingInfo: sender)
     }
     
