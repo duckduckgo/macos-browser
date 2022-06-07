@@ -79,7 +79,11 @@ struct RecentlyVisited: View {
             }
             .visibility(isExpanded ? .visible : .gone)
 
-        }.padding(.bottom, 24)
+        }
+        .accessibilityElement(children: .contain)
+        .accessibility(identifier: "RecentlyVisitedList")
+        .accessibility(label: .init(UserText.homePageProtectionSummaryTitle))
+        .padding(.bottom, 24)
 
     }
 
@@ -226,6 +230,8 @@ struct RecentlyVisitedSite: View {
             self.isHovering = isHovering
         }
         .frame(maxWidth: .infinity, minHeight: model.showPagesOnHover ? 126 : 0)
+        .accessibilityElement(children: .contain)
+        .accessibility(addTraits: .isSummaryElement)
         .padding(.bottom, model.showPagesOnHover ? 0 : 12)
 
     }
@@ -385,37 +391,33 @@ struct RecentlyVisitedPage: View {
 
     var body: some View {
         HStack {
-            HStack {
-                Text(page.displayTitle)
-                    .optionalUnderline(isHovering)
-                    .font(.system(size: 12))
-                    .lineLimit(1)
-                    .truncationMode(.middle)
-                    .foregroundColor(isHovering ? linkColor : pageTextColor)
+            Button(action: { model.open(page.url) }) {
+                HStack {
+                    Text(page.displayTitle)
+                        .optionalUnderline(isHovering)
+                        .font(.system(size: 12))
+                        .lineLimit(1)
+                        .truncationMode(.middle)
+                        .foregroundColor(isHovering ? linkColor : pageTextColor)
 
-                Text(model.relativeTime(page.visited))
-                    .font(.system(size: 12))
-                    .foregroundColor(timeTextColor)
-            }
-            .frame(height: 21)
-            .link { isHovering in
-                self.isHovering = isHovering
-
-                if isHovering {
-                    NSCursor.pointingHand.push()
-                } else {
-                    NSCursor.pointingHand.pop()
+                    Text(model.relativeTime(page.visited))
+                        .font(.system(size: 12))
+                        .foregroundColor(timeTextColor)
                 }
-
-            } clicked: {
-                model.open(page.url)
+                .frame(height: 21)
             }
+            .accessibility(label: .init(page.accessibilityLabel + "; " + model.relativeTime(page.visited)))
+            .buttonStyle(.plain)
+            .onHover(update: $isHovering)
+            .cursor(.pointingHand)
 
             HoverButton(size: 16, imageName: "HomeArrowDown", imageSize: 8, cornerRadius: 4) {
                 withAnimation {
                     isExpanded.toggle()
                 }
             }
+            .accessibility(label: .init(isExpanded ? UserText.homePageProtectionSummaryCollapse : UserText.homePageProtectionSummaryExpand))
+            .cursor(.pointingHand)
             .rotationEffect(.degrees(isExpanded ? 180 : 0))
             .visibility(
                 showExpandButton ? .visible : .invisible
@@ -472,6 +474,7 @@ struct RecentlyVisitedTitle: View {
                 }
             }
             HoverButton(size: 24, imageName: "HomeArrowUp", imageSize: 16, cornerRadius: 4, action: toggleSection)
+                .accessibility(label: .init(isExpanded ? UserText.homePageProtectionSummaryCollapse : UserText.homePageProtectionSummaryExpand))
                 .rotationEffect(.degrees(isExpanded ? 0 : 180))
                 .focusable(tag: Self.buttonTag, action: toggleSection)
 
@@ -493,25 +496,20 @@ struct SiteIconAndConnector: View {
 
     var body: some View {
         VStack(spacing: 0) {
-            ZStack {
-                RoundedRectangle(cornerRadius: 6)
-                    .fill(isHovering ? mouseOverColor : backgroundColor)
+            Button(action: { model.open(site) }) {
+                ZStack {
+                    RoundedRectangle(cornerRadius: 6)
+                        .fill(isHovering ? mouseOverColor : backgroundColor)
 
-                FaviconView(domain: site.domain, size: 22)
-            }
-            .link {
-                self.isHovering = $0
-
-                if isHovering {
-                    NSCursor.pointingHand.push()
-                } else {
-                    NSCursor.pointingHand.pop()
+                    FaviconView(domain: site.domain, size: 22)
                 }
-                
-            } clicked: {
-                model.open(site)
+                .frame(width: 32, height: 32)
             }
-            .frame(width: 32, height: 32)
+            .buttonStyle(.plain)
+            .accessibilityElement(children: .ignore)
+            .accessibility(addTraits: .isImage)
+            .onHover(update: $isHovering)
+            .cursor(.pointingHand)
 
             Rectangle()
                 .fill(backgroundColor)

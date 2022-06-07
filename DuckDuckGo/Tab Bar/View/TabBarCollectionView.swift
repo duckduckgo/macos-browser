@@ -44,46 +44,6 @@ final class TabBarCollectionView: NSCollectionView {
         }
     }
 
-    override func accessibilityIdentifier() -> String {
-        "TabBar"
-    }
-
-    override func accessibilityLabel() -> String? {
-        "tab bar"
-    }
-
-    override func accessibilityRole() -> NSAccessibility.Role? {
-        .group
-    }
-
-    override func accessibilityRoleDescription() -> String? {
-        "group"
-    }
-
-    override func isAccessibilitySelectorAllowed(_ selector: Selector) -> Bool {
-        switch selector {
-        case #selector(accessibilitySubrole),
-             #selector(accessibilityOrientation),
-             #selector(accessibilityColumnCount),
-             #selector(accessibilityRowCount),
-             #selector(accessibilitySelectedChildren),
-             #selector(isAccessibilityEnabled):
-            return false
-        default:
-            return super.isAccessibilitySelectorAllowed(selector)
-        }
-    }
-
-    override func accessibilityFrame() -> NSRect {
-        if let enclosingScrollView = self.enclosingScrollView,
-           let newTabButton = newTabButton {
-            return enclosingScrollView.accessibilityFrame().union(newTabButton.accessibilityFrame())
-                .union(leftScrollButton?.accessibilityFrame() ?? newTabButton.accessibilityFrame())
-        }
-
-        return super.accessibilityFrame()
-    }
-
     private var tabBarViewController: TabBarViewController? {
         delegate as? TabBarViewController
     }
@@ -107,57 +67,6 @@ final class TabBarCollectionView: NSCollectionView {
             itemsCache[identifier]?[indexPath] = nil
         }
         return itemsCache[identifier]?[indexPath] ?? super.makeItem(withIdentifier: identifier, for: indexPath)
-    }
-
-    private func getAccessibilityTabs() -> [NSAccessibilityElementProtocol] {
-        self.allIndexPaths().compactMap { indexPath in
-            self.item(at: indexPath)?.view ?? {
-                guard let item = self.dataSource?.collectionView(self, itemForRepresentedObjectAt: indexPath) else { return nil }
-                if let identifier = item.identifier {
-                    itemsCache[identifier, default: [:]][indexPath] = item
-                }
-                item.view.setAccessibilityParent(self)
-                return item.view
-            }()
-
-        }
-    }
-
-    private func getAccessibilityChildren() -> [NSAccessibilityElementProtocol] {
-        var children = [NSAccessibilityElementProtocol]()
-        if leftScrollButton?.isHidden == false,
-           let leftScrollButtonCell = leftScrollButton?.cell {
-            children.append(leftScrollButtonCell)
-        }
-        children.append(contentsOf: getAccessibilityTabs())
-        if rightScrollButton?.isHidden == false,
-           let rightScrollButtonCell = rightScrollButton?.cell {
-            children.append(rightScrollButtonCell)
-        }
-        if let newTabButtonCell = newTabButton?.cell {
-            children.append(newTabButtonCell)
-        }
-        return children
-    }
-
-    override func accessibilityChildren() -> [Any]? {
-        getAccessibilityChildren()
-    }
-
-    override func accessibilityVisibleChildren() -> [Any]? {
-        getAccessibilityChildren()
-    }
-
-    override func accessibilityChildrenInNavigationOrder() -> [NSAccessibilityElementProtocol]? {
-        getAccessibilityChildren()
-    }
-
-    override func accessibilityTabs() -> [Any]? {
-        getAccessibilityTabs()
-    }
-
-    override func accessibilityContents() -> [Any]? {
-        getAccessibilityTabs()
     }
 
     override func doCommand(by selector: Selector) {
@@ -384,28 +293,99 @@ final class TabBarCollectionView: NSCollectionView {
 
 }
 
-extension NSCollectionView {
+// MARK: - Accessibility
 
-    var clipView: NSClipView? {
-        return enclosingScrollView?.contentView
+extension TabBarCollectionView {
+
+    override func accessibilityIdentifier() -> String {
+        "TabBar"
     }
 
-    var isAtEndScrollPosition: Bool {
-        guard let clipView = clipView else {
-            os_log("TabBarCollectionView: Clip view is nil", type: .error)
-            return false
-        }
-
-        return clipView.bounds.origin.x + clipView.bounds.size.width >= bounds.size.width
+    override func accessibilityLabel() -> String? {
+        "tab bar"
     }
 
-    var isAtStartScrollPosition: Bool {
-        guard let clipView = clipView else {
-            os_log("TabBarCollectionView: Clip view is nil", type: .error)
+    override func accessibilityRole() -> NSAccessibility.Role? {
+        .group
+    }
+
+    override func accessibilityRoleDescription() -> String? {
+        "group"
+    }
+
+    override func isAccessibilitySelectorAllowed(_ selector: Selector) -> Bool {
+        switch selector {
+        case #selector(accessibilitySubrole),
+             #selector(accessibilityOrientation),
+             #selector(accessibilityColumnCount),
+             #selector(accessibilityRowCount),
+             #selector(accessibilitySelectedChildren),
+             #selector(isAccessibilityEnabled):
             return false
+        default:
+            return super.isAccessibilitySelectorAllowed(selector)
+        }
+    }
+
+    override func accessibilityFrame() -> NSRect {
+        if let enclosingScrollView = self.enclosingScrollView,
+           let newTabButton = newTabButton {
+            return enclosingScrollView.accessibilityFrame().union(newTabButton.accessibilityFrame())
+                .union(leftScrollButton?.accessibilityFrame() ?? newTabButton.accessibilityFrame())
         }
 
-        return clipView.bounds.origin.x <= 0
+        return super.accessibilityFrame()
+    }
+
+    private func getAccessibilityTabs() -> [NSAccessibilityElementProtocol] {
+        self.allIndexPaths().compactMap { indexPath in
+            self.item(at: indexPath)?.view ?? {
+                guard let item = self.dataSource?.collectionView(self, itemForRepresentedObjectAt: indexPath) else { return nil }
+                if let identifier = item.identifier {
+                    itemsCache[identifier, default: [:]][indexPath] = item
+                }
+                item.view.setAccessibilityParent(self)
+                return item.view
+            }()
+
+        }
+    }
+
+    private func getAccessibilityChildren() -> [NSAccessibilityElementProtocol] {
+        var children = [NSAccessibilityElementProtocol]()
+        if leftScrollButton?.isHidden == false,
+           let leftScrollButtonCell = leftScrollButton?.cell {
+            children.append(leftScrollButtonCell)
+        }
+        children.append(contentsOf: getAccessibilityTabs())
+        if rightScrollButton?.isHidden == false,
+           let rightScrollButtonCell = rightScrollButton?.cell {
+            children.append(rightScrollButtonCell)
+        }
+        if let newTabButtonCell = newTabButton?.cell {
+            children.append(newTabButtonCell)
+        }
+        return children
+    }
+
+    override func accessibilityChildren() -> [Any]? {
+        getAccessibilityChildren()
+    }
+
+    override func accessibilityVisibleChildren() -> [Any]? {
+        getAccessibilityChildren()
+    }
+
+    override func accessibilityChildrenInNavigationOrder() -> [NSAccessibilityElementProtocol]? {
+        getAccessibilityChildren()
+    }
+
+    override func accessibilityTabs() -> [Any]? {
+        getAccessibilityTabs()
+    }
+
+    override func accessibilityContents() -> [Any]? {
+        getAccessibilityTabs()
     }
 
 }

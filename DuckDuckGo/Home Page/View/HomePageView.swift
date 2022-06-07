@@ -45,6 +45,8 @@ struct RootView: View {
                                     .padding(.bottom, 16)
 
                             }
+                            .accessibilityElement(children: .contain)
+                            .accessibilityIdentifier("NewTabPage")
                             .frame(width: 508)
                         }
                         .frame(maxWidth: .infinity)
@@ -64,6 +66,8 @@ struct RootView: View {
                                 .padding(.bottom, 16)
 
                         }
+                        .accessibilityElement(children: .contain)
+                        .accessibility(identifier: "NewTabPage")
                         .frame(width: 508)
                     }
                     .frame(maxWidth: .infinity)

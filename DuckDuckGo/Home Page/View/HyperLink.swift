@@ -18,35 +18,7 @@
 
 import SwiftUI
 
-struct HyperLink: View {
-
-    let text: String
-    let textColor: Color
-    let action: () -> Void
-
-    @State var isHovering = false
-
-    init(_ text: String, textColor: Color, _ action: @escaping () -> Void) {
-        self.text = text
-        self.textColor = textColor
-        self.action = action
-    }
-
-    var body: some View {
-        Text(text)
-            .foregroundColor(isHovering ? Color("LinkBlueColor") : textColor)
-            .optionalUnderline(isHovering)
-            .link {
-                isHovering = $0
-
-                if isHovering {
-                    NSCursor.pointingHand.push()
-                } else {
-                    NSCursor.pointingHand.pop()
-                }
-            } clicked: {
-                action()
-            }
-    }
-
+// swiftlint:disable:next identifier_name
+func HyperLink(_ text: String, textColor: Color, _ action: @escaping () -> Void) -> some View {
+    TextButton(text, color: textColor, hoverColor: Color("LinkBlueColor"), underlineOnHover: true, action: action)
 }

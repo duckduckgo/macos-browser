@@ -43,6 +43,7 @@ struct DefaultBrowserPrompt: View {
                 Spacer()
 
                 HoverButton(imageName: "Close", imageSize: 22, cornerRadius: 4) { self.model.close() }
+                    .accessibility(label: .init(UserText.dismissDefaultBrowserPromptButton))
                     .padding()
 
             }.background(
@@ -50,6 +51,8 @@ struct DefaultBrowserPrompt: View {
                     .fill(Color("HomeDefaultBrowserPromptBackgroundColor"))
             )
             .visibility(model.shouldShow ? .visible : .gone)
+            .accessibilityElement(children: .contain)
+            .accessibility(identifier: "MakeDefaultBrowserPrompt")
             .padding(.top, 24)
 
     }

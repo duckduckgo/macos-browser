@@ -48,32 +48,29 @@ struct HoverButton: View {
     }
 
     var body: some View {
-        ZStack {
+        Button(action: action) {
+            ZStack {
+                RoundedRectangle(cornerRadius: cornerRadius)
+                    .fill(isHovering ? mouseOverColor : backgroundColor)
 
-            RoundedRectangle(cornerRadius: cornerRadius)
-                .fill(isHovering ? mouseOverColor : backgroundColor)
-
-            Group {
-                if NSImage(named: imageName) != nil {
-                    Image(imageName)
-                        .resizable()
-                } else if #available(macOS 11, *) {
-                    Image(systemName: imageName)
-                        .resizable()
-                } else {
-                    FailedAssertionView("Unable to find image \(imageName)")
+                Group {
+                    if NSImage(named: imageName) != nil {
+                        Image(imageName)
+                            .resizable()
+                    } else if #available(macOS 11, *) {
+                        Image(systemName: imageName)
+                            .resizable()
+                    } else {
+                        FailedAssertionView("Unable to find image \(imageName)")
+                    }
                 }
+                .frame(width: imageSize ?? size, height: imageSize ?? size)
+
             }
-            .frame(width: imageSize ?? size, height: imageSize ?? size)
-
+            .frame(width: size, height: size)
         }
-        .frame(width: size, height: size)
-        .link(onHoverChanged: {
-            self.isHovering = $0
-        }) {
-            action()
-        }
-
+        .buttonStyle(.plain)
+        .onHover(update: $isHovering)
     }
 
 }

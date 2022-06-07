@@ -49,11 +49,9 @@ extension View {
         })
     }
 
-    func link(onHoverChanged: ((Bool) -> Void)? = nil, clicked: @escaping () -> Void) -> some View {
-        self.onHover { over in
-            onHoverChanged?(over)
-        }.onTapGesture {
-            clicked()
+    func onHover(update binding: Binding<Bool>) -> some View {
+        self.onHover { isMouseOver in
+            binding.wrappedValue = isMouseOver
         }
     }
 

@@ -151,12 +151,16 @@ final class RecentlyVisitedPageModel: ObservableObject {
 
     @Published var displayTitle: String
 
+    var accessibilityLabel: String {
+        actualTitle ?? url.absoluteString
+    }
+
     init(actualTitle: String?, url: URL, visited: Date) {
         self.actualTitle = actualTitle
         self.url = url
         self.visited = visited
 
-        // This gets fixed in the parent model, when iterating over history items
+        // This gets fixed in the parent (RecentlyVisitedSiteModel) model, when iterating over history items
         self.displayTitle = actualTitle ?? ""
     }
 

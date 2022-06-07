@@ -21,19 +21,35 @@ import SwiftUI
 struct TextButton: View {
     
     let title: String
+    let color: Color
+    let hoverColor: Color?
+    let underlineOnHover: Bool
     let action: () -> Void
+
+    @State var isHovering = false
     
-    init(_ title: String, action: @escaping () -> Void) {
+    init(_ title: String,
+         color: Color = Color("LinkBlueColor"),
+         hoverColor: Color? = nil,
+         underlineOnHover: Bool = false,
+         action: @escaping () -> Void) {
+
         self.title = title
+        self.color = color
+        self.hoverColor = hoverColor
+        self.underlineOnHover = underlineOnHover
         self.action = action
     }
     
     var body: some View {
         Button(action: action) {
             Text(title)
-                .foregroundColor(Color("LinkBlueColor"))
+                .foregroundColor(isHovering && hoverColor != nil ? hoverColor! : color)
+                .optionalUnderline(underlineOnHover && isHovering)
         }
         .buttonStyle(.plain)
         .cursor(.pointingHand)
+        .onHover(update: $isHovering)
     }
+
 }

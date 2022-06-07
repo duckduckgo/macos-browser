@@ -45,13 +45,8 @@ struct Favorites: View {
                             Favorite(bookmark: bookmark, tag: tag) { model.open(bookmark) }
 
                         case .addButton:
-                            ZStack(alignment: .top) {
-                                FavoriteTemplate(title: UserText.addFavorite, domain: nil, tag: tag) { model.addNew() }
-                                ZStack {
-                                    Image("Add")
-                                        .resizable()
-                                        .frame(width: 22, height: 22)
-                                }.frame(width: 64, height: 64)
+                            FavoriteTemplate(title: UserText.addFavorite, domain: nil, image: Image("Add"), size: 22, tag: tag) {
+                                model.addNew()
                             }
 
                         case .ghostButton:
@@ -64,19 +59,21 @@ struct Favorites: View {
                         }
                     }
                 }
-                
+
             }
 
             let canShowMore = model.rows.count > HomePage.favoritesRowCountWhenCollapsed
-            MoreOrLess(isExpanded: $model.showAllFavorites)
+            MoreOrLess(isExpanded: $model.showAllFavorites, isVisible: isHovering || model.isHomeViewFirstResponder)
                 .padding(.top, 2)
-                .visibility(canShowMore && (isHovering || model.isHomeViewFirstResponder) ? .visible : .invisible)
+                // keep an empty button visible for VoiceOver
+                .visibility(canShowMore ? .visible : .invisible)
 
         }
+        .accessibilityElement(children: .contain)
+        .accessibility(identifier: "FavoritesList")
+        .accessibility(label: .init(UserText.favorites))
         .frame(maxWidth: .infinity)
-        .onHover { isHovering in
-            self.isHovering = isHovering
-        }
+        .onHover(update: $isHovering)
 
     }
 
@@ -99,6 +96,8 @@ struct FavoriteTemplate: View {
 
     let title: String
     let domain: String?
+    var image: Image?
+    var size: CGFloat = 32
     let tag: Int
     let action: () -> Void
 
@@ -106,55 +105,54 @@ struct FavoriteTemplate: View {
     @State var isHovering = false
 
     var body: some View {
-        VStack(spacing: 5) {
-            ZStack(alignment: .center) {
+        Button(action: action) {
+            VStack(spacing: 5) {
+                ZStack(alignment: .center) {
 
-                RoundedRectangle(cornerRadius: 12)
-                    .foregroundColor(isHovering ? Color("HomeFavoritesHoverColor") : Color("HomeFavoritesBackgroundColor"))
+                    RoundedRectangle(cornerRadius: 12)
+                        .foregroundColor(isHovering ? Color("HomeFavoritesHoverColor") : Color("HomeFavoritesBackgroundColor"))
 
-                if let domain = domain {
-                    FaviconView(domain: domain)
-                        .frame(width: 32, height: 32)
+                    FaviconView(domain: domain, image: image, size: size)
+                        .frame(width: size, height: size)
                         .padding(9)
                 }
+                .frame(width: 64, height: 64)
+                .clipped()
+                .focusable(tag: tag, cornerRadius: 12, action: action, keyDown: { event in
+                    let hasModifier = NSApp.isCommandPressed || NSApp.isOptionPressed
+                    switch Int(event.keyCode) {
+                    case kVK_LeftArrow:
+                        selectView(withTag: tagForView(at: hasModifier ? .leftMost : .left, against: tag))
+                    case kVK_RightArrow:
+                        selectView(withTag: tagForView(at: hasModifier ? .rightMost : .right, against: tag))
+                    case kVK_UpArrow:
+                        selectView(withTag: tagForView(at: hasModifier ? .topMost : .up, against: tag))
+                    case kVK_DownArrow:
+                        selectView(withTag: tagForView(at: hasModifier ? .bottomMost : .down, against: tag))
+                    default:
+                        return event
+                    }
+                    return nil
+                })
+
+                Text(title)
+                    .multilineTextAlignment(.center)
+                    .lineLimit(2)
+                    .font(.system(size: 11))
+                    .frame(height: 32, alignment: .top)
+
             }
-            .frame(width: 64, height: 64)
-            .clipped()
-            .focusable(tag: tag, cornerRadius: 12, action: action, keyDown: { event in
-                let hasModifier = NSApp.isCommandPressed || NSApp.isOptionPressed
-                switch Int(event.keyCode) {
-                case kVK_LeftArrow:
-                    selectView(withTag: tagForView(at: hasModifier ? .leftMost : .left, against: tag))
-                case kVK_RightArrow:
-                    selectView(withTag: tagForView(at: hasModifier ? .rightMost : .right, against: tag))
-                case kVK_UpArrow:
-                    selectView(withTag: tagForView(at: hasModifier ? .topMost : .up, against: tag))
-                case kVK_DownArrow:
-                    selectView(withTag: tagForView(at: hasModifier ? .bottomMost : .down, against: tag))
-                default:
-                    return event
-                }
-                return nil
-            })
-
-            Text(title)
-                .multilineTextAlignment(.center)
-                .lineLimit(2)
-                .font(.system(size: 11))
-                .frame(height: 32, alignment: .top)
-
+            .frame(width: 64)
+            .frame(maxWidth: 64)
         }
-        .frame(width: 64)
-        .frame(maxWidth: 64)
-        .link(onHoverChanged: { isHovering in
-            self.isHovering = isHovering
+        .buttonStyle(.plain)
+        .accessibilityElement(children: .ignore)
+        .accessibility(addTraits: .isButton)
+        .accessibility(label: .init(title))
+        .accessibilityAction { action() }
+        .onHover(update: $isHovering)
+        .cursor(.pointingHand)
 
-            if isHovering {
-                NSCursor.pointingHand.push()
-            } else {
-                NSCursor.pointingHand.pop()
-            }
-        }, clicked: action)
     }
 
     // swiftlint:disable:next cyclomatic_complexity

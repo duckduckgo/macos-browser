@@ -65,4 +65,5 @@ private struct CursorModifier: ViewModifier {
             NSCursor.pop()
         }
     }
+
 }

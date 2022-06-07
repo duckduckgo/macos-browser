@@ -177,6 +177,7 @@ struct UserText {
     static let importBrowserData = NSLocalizedString("import.browser.data", value: "Import Bookmarks and Passwords…", comment: "Opens Import Browser Data dialog")
 
     static let bookmarks = NSLocalizedString("bookmarks", value: "Bookmarks", comment: "Button for bookmarks")
+    static let favorites = NSLocalizedString("favorites", value: "Favorites", comment: "List of favorites")
     static let bookmarksOpenInNewTabs = NSLocalizedString("bookmarks.open.in.new.tabs", value: "Open in New Tabs", comment: "Open all bookmarks in folder in new tabs")
     static let addToFavorites = NSLocalizedString("add.to.favorites", value: "Add to Favorites", comment: "Button for adding bookmarks to favorites")
     static let addFavorite = NSLocalizedString("add.favorite", value: "Add Favorite", comment: "Button for adding a favorite bookmark")
@@ -468,6 +469,11 @@ struct UserText {
 
     static let defaultBrowserPromptMessage = NSLocalizedString("default.browser.prompt.message", value: "Make DuckDuckGo your default browser", comment: "")
     static let defaultBrowserPromptButton = NSLocalizedString("default.browser.prompt.button", value: "Set Default...", comment: "")
+    static let dismissDefaultBrowserPromptButton = NSLocalizedString("default.browser.prompt.dismiss", value: "Dismiss", comment: "Dismiss Make Default Browser prompt hint")
+
+    static let homePageProtectionSummaryTitle = NSLocalizedString("home.page.protection.summary.title", value: "Recently visited", comment: "Home page Recently Visited section Accessibility Title")
+    static let homePageProtectionSummaryCollapse = NSLocalizedString("home.page.protection.summary.collapse", value: "Collapse", comment: "Collapse Home page Recently Visited section Accessibility Title")
+    static let homePageProtectionSummaryExpand = NSLocalizedString("home.page.protection.summary.expand", value: "Expand", comment: "Expand Home page Recently Visited section Accessibility Title")
 
     static let homePageProtectionSummaryInfo = NSLocalizedString("home.page.protection.summary.info", value: "No recent activity", comment: "")
     static func homePageProtectionSummaryMessage(numberOfTrackersBlocked: Int) -> String {

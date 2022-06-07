@@ -22,21 +22,27 @@ struct FaviconView: View {
 
     let faviconManagement: FaviconManagement = FaviconManager.shared
 
-    let domain: String
+    let domain: String?
     let size: CGFloat
+    let staticImage: Image?
 
-    @State var image: NSImage?
+    @State private var image: Image?
     @State private var timer = Timer.publish(every: 0.1, tolerance: 0, on: .main, in: .default, options: nil).autoconnect()
 
-    init(domain: String, size: CGFloat = 32) {
+    init(domain: String?, image: Image? = nil, size: CGFloat = 32) {
         self.domain = domain
+        self.staticImage = image
         self.size = size
     }
 
     func refreshImage() {
-        let image = faviconManagement.getCachedFavicon(for: domain, sizeCategory: .medium)?.image
-        if image?.size.isSmaller(than: CGSize(width: 16, height: 16)) == false {
-            self.image = image
+        guard let domain = domain else {
+            self.image = self.staticImage
+            return
+        }
+        if let image = faviconManagement.getCachedFavicon(for: domain, sizeCategory: .medium)?.image,
+            image.size.isSmaller(than: CGSize(width: 16, height: 16)) == false {
+            self.image = Image(nsImage: image)
         }
     }
 
@@ -44,7 +50,7 @@ struct FaviconView: View {
 
         Group {
             if let image = image {
-                Image(nsImage: image)
+                image
                     .resizable()
                     .aspectRatio(contentMode: .fit)
                     .frame(width: size, height: size)
@@ -53,8 +59,8 @@ struct FaviconView: View {
                         refreshImage()
                         timer.upstream.connect().cancel()
                     }
-            } else {
 
+            } else if let domain = domain {
                 ZStack {
                     Rectangle()
                         .foregroundColor(Color.forDomain(domain.dropWWW()))
