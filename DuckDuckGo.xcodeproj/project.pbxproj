@@ -1297,14 +1297,14 @@
 		AAEF6BC7276A081C0024DCF4 /* FaviconSelector.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FaviconSelector.swift; sourceTree = "<group>"; };
 		AAFCB37E25E545D400859DD4 /* PublisherExtension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PublisherExtension.swift; sourceTree = "<group>"; };
 		AAFE068226C7082D005434CC /* WebKitVersionProvider.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WebKitVersionProvider.swift; sourceTree = "<group>"; };
-		B31055BC27A1BA1D001AC618 /* AutoconsentUserScript.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = AutoconsentUserScript.swift; path = Autoconsent/AutoconsentUserScript.swift; sourceTree = "<group>"; };
-		B31055BD27A1BA1D001AC618 /* autoconsent.html */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.html; name = autoconsent.html; path = Autoconsent/autoconsent.html; sourceTree = "<group>"; };
-		B31055BE27A1BA1D001AC618 /* userscript.js */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.javascript; name = userscript.js; path = Autoconsent/userscript.js; sourceTree = "<group>"; };
-		B31055BF27A1BA1D001AC618 /* browser-shim.js */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.javascript; name = "browser-shim.js"; path = "Autoconsent/browser-shim.js"; sourceTree = "<group>"; };
-		B31055C027A1BA1D001AC618 /* background-bundle.js */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.javascript; name = "background-bundle.js"; path = "Autoconsent/background-bundle.js"; sourceTree = "<group>"; };
-		B31055C127A1BA1D001AC618 /* AutoconsentBackground.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = AutoconsentBackground.swift; path = Autoconsent/AutoconsentBackground.swift; sourceTree = "<group>"; };
-		B31055C227A1BA1D001AC618 /* background.js */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.javascript; name = background.js; path = Autoconsent/background.js; sourceTree = "<group>"; };
-		B31055C327A1BA1D001AC618 /* autoconsent-bundle.js */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.javascript; name = "autoconsent-bundle.js"; path = "Autoconsent/autoconsent-bundle.js"; sourceTree = "<group>"; };
+		B31055BC27A1BA1D001AC618 /* AutoconsentUserScript.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AutoconsentUserScript.swift; sourceTree = "<group>"; };
+		B31055BD27A1BA1D001AC618 /* autoconsent.html */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.html; path = autoconsent.html; sourceTree = "<group>"; };
+		B31055BE27A1BA1D001AC618 /* userscript.js */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.javascript; path = userscript.js; sourceTree = "<group>"; };
+		B31055BF27A1BA1D001AC618 /* browser-shim.js */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.javascript; path = "browser-shim.js"; sourceTree = "<group>"; };
+		B31055C027A1BA1D001AC618 /* background-bundle.js */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.javascript; path = "background-bundle.js"; sourceTree = "<group>"; };
+		B31055C127A1BA1D001AC618 /* AutoconsentBackground.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AutoconsentBackground.swift; sourceTree = "<group>"; };
+		B31055C227A1BA1D001AC618 /* background.js */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.javascript; path = background.js; sourceTree = "<group>"; };
+		B31055C327A1BA1D001AC618 /* autoconsent-bundle.js */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.javascript; path = "autoconsent-bundle.js"; sourceTree = "<group>"; };
 		B31055CD27A1BA44001AC618 /* AutoconsentBackgroundTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = AutoconsentBackgroundTests.swift; path = Autoconsent/AutoconsentBackgroundTests.swift; sourceTree = "<group>"; };
 		B3FB198D27BC013C00513DC1 /* autoconsent-test-page.html */ = {isa = PBXFileReference; lastKnownFileType = text.html; path = "autoconsent-test-page.html"; sourceTree = "<group>"; };
 		B3FB198F27BC015600513DC1 /* autoconsent-test.js */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.javascript; path = "autoconsent-test.js"; sourceTree = "<group>"; };
@@ -2583,6 +2583,7 @@
 			isa = PBXGroup;
 			children = (
 				B31055BB27A1BA0E001AC618 /* Autoconsent */,
+				7B1E819A27C8874900FF0E60 /* Autofill */,
 				B6A9E47526146A440067D1B9 /* API */,
 				AA4D700525545EDE00C3411E /* App Delegate */,
 				AAC5E4C025D6A6A9007F5990 /* Bookmarks */,
@@ -3501,7 +3502,6 @@
 		B31055BB27A1BA0E001AC618 /* Autoconsent */ = {
 			isa = PBXGroup;
 			children = (
-				7B1E819A27C8874900FF0E60 /* Autofill */,
 				B31055C327A1BA1D001AC618 /* autoconsent-bundle.js */,
 				B31055BD27A1BA1D001AC618 /* autoconsent.html */,
 				B31055C127A1BA1D001AC618 /* AutoconsentBackground.swift */,
@@ -3511,7 +3511,7 @@
 				B31055BF27A1BA1D001AC618 /* browser-shim.js */,
 				B31055BE27A1BA1D001AC618 /* userscript.js */,
 			);
-			name = Autoconsent;
+			path = Autoconsent;
 			sourceTree = "<group>";
 		};
 		B31055CC27A1BA39001AC618 /* Autoconsent */ = {
