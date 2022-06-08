@@ -92,7 +92,7 @@ final class BookmarksBarViewController: NSViewController {
                                                name: NSView.frameDidChangeNotification,
                                                object: view)
         
-        subscribeToViewModelState()
+        // subscribeToViewModelState()
         subscribeToBookmarks()
 
         self.buttons = createButtons(for: bookmarkManager.list?.topLevelEntities ?? [])
@@ -107,22 +107,22 @@ final class BookmarksBarViewController: NSViewController {
         bookmarksBarViewFrameChanged()
     }
     
-    private func subscribeToViewModelState() {
-        viewModel.$state.sink { [weak self] state in
-            guard let self = self else { return }
-
-            switch state {
-            case .idle:
-                print("Idle")
-            case .beginningDrag(originalLocation: let originalLocation):
-                print("Beginning drag")
-            case .draggingExistingItem(draggedItemData: let draggedItemData):
-                print("Dragging existing")
-            case .draggingNewItem(draggedItemData: let draggedItemData):
-                print("Dragging new")
-            }
-        }.store(in: &cancellables)
-    }
+//    private func subscribeToViewModelState() {
+//        viewModel.$state.sink { [weak self] state in
+//            guard let self = self else { return }
+//
+//            switch state {
+//            case .idle:
+//                print("Idle")
+//            case .beginningDrag(originalLocation: let originalLocation):
+//                print("Beginning drag")
+//            case .draggingExistingItem(draggedItemData: let draggedItemData):
+//                print("Dragging existing")
+//            case .draggingNewItem(draggedItemData: let draggedItemData):
+//                print("Dragging new")
+//            }
+//        }.store(in: &cancellables)
+//    }
 
     private func subscribeToBookmarks() {
         bookmarkManager.listPublisher.sink { [weak self] list in
@@ -471,11 +471,15 @@ extension BookmarksBarViewController: BookmarksBarViewDelegate {
         let horizontalOffset = convertedDraggingLocation.x
         
         let result = midpoints.nearest(to: horizontalOffset)
+        let additionalWidth: CGFloat
         
-        if let width = draggingInfo.width {
-            let additionalWidth = width + BookmarksBarViewModel.Constants.buttonSpacing
-            updateNearestDragIndex(result?.offset, additionalWidth: additionalWidth)
+        if draggingInfo.draggingSource is BookmarksBarViewModel, let width = draggingInfo.width {
+            additionalWidth = width + BookmarksBarViewModel.Constants.buttonSpacing
+        } else {
+            additionalWidth = 100.0
         }
+        
+        updateNearestDragIndex(result?.offset, additionalWidth: additionalWidth)
     }
     
     func draggingExited(draggingInfo: NSDraggingInfo?) {
@@ -487,11 +491,15 @@ extension BookmarksBarViewController: BookmarksBarViewDelegate {
         let horizontalOffset = convertedDraggingLocation.x
         
         let result = midpoints.nearest(to: horizontalOffset)
+        let additionalWidth: CGFloat
         
-        if let width = draggingInfo.width {
-            let additionalWidth = width + BookmarksBarViewModel.Constants.buttonSpacing
-            updateNearestDragIndex(result?.offset, additionalWidth: additionalWidth)
+        if draggingInfo.draggingSource is BookmarksBarViewModel, let width = draggingInfo.width {
+            additionalWidth = width + BookmarksBarViewModel.Constants.buttonSpacing
+        } else {
+            additionalWidth = 100.0
         }
+        
+        updateNearestDragIndex(result?.offset, additionalWidth: additionalWidth)
     }
     
     func draggingEnded(draggingInfo: NSDraggingInfo) {

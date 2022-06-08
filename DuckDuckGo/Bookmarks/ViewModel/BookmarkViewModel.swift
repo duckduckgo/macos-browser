@@ -20,9 +20,10 @@ import AppKit
 
 struct BookmarkViewModel {
 
+    static let maxMenuTitleLength = 55
+ 
     let entity: BaseBookmarkEntity
 
-    static let maxMenuTitleLength = 55
     var menuTitle: String {
         let title: String
 
@@ -43,9 +44,6 @@ struct BookmarkViewModel {
     }
 
     var menuFavicon: NSImage? {
-        // Once we have bookmark folders
-        // bookmark.isFavorite ? bookmark.favicon?.makeFavoriteOverlay() : bookmark.favicon
-
         if let bookmark = entity as? Bookmark {
             let favicon = bookmark.favicon(.small)?.copy() as? NSImage
             favicon?.size = NSSize.faviconSize
@@ -55,7 +53,6 @@ struct BookmarkViewModel {
         } else {
             return nil
         }
-
     }
 
     // MARK: - Representing Color and Character

@@ -45,6 +45,7 @@ final class BookmarksBarViewModel: NSObject {
     }
     
     enum ViewEvent {
+        case containerFrameChanged(CGRect)
         case mouseDown(CGPoint)
         case mouseDragged(buttonIndex: Int, location: CGPoint)
         case mouseUp
@@ -93,6 +94,8 @@ final class BookmarksBarViewModel: NSObject {
             self.state = .idle
         case .beganDraggingSession:
             print("Dragging session began")
+        case .containerFrameChanged(_):
+            print("Frame changed")
         }
     }
  
