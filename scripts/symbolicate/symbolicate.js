@@ -2,7 +2,8 @@
  * See README.md for instructions.
  */
 
-let fs = require('fs');
+const fs = require('fs');
+const path = require('path');
 const execSync = require('child_process').execSync;
 
 if (process.argv.length < 3) {
@@ -21,23 +22,34 @@ function fileExistsSync(filepath){
   return flag;
 }
 
-function symbolicateFile(crashFile) {
+function symbolicateFile(filePath) {
 
-    console.log(`symbolicating ${crashFile}`);
+    console.log(`symbolicating ${filePath}`);
 
-    let ips = fs.readFileSync(crashFile);
-    let lines = ips.toString().split("\n");
+    let fileData = fs.readFileSync(filePath);
+    let lines = fileData.toString().split("\n");
 
-    let metaJSON
+    let ipsMetadata = extractIPSMetadata(lines);
+
+    if (ipsMetadata) {
+        symbolicateIPSFile(filePath, ipsMetadata, lines);
+    }
+}
+
+function extractIPSMetadata(fileLines) {
     try {
-        metaJSON = JSON.parse(lines.shift());
+        let metadata = JSON.parse(fileLines[0]);
+        fileLines.shift();
+        return metadata;
     } catch (err) {
         console.log(`WARN ${crashFile} does not appear to be IPS format`);
         console.log();
-        return;
     }
+}
 
-    let version = metaJSON["app_version"];
+function symbolicateIPSFile(crashFile, metaJSON, lines) {
+
+    let version = metaJSON.app_version;
     let crashJSON = JSON.parse(lines.join("\n"));
     let ddgBaseAddress;
     let ddgImageIndex;
@@ -76,10 +88,17 @@ function symbolicateFile(crashFile) {
         return;
     }
 
-
     let updatedJSON = JSON.stringify(metaJSON) + "\n" + JSON.stringify(crashJSON, null, '\t');
 
-    fs.writeFileSync(crashFile, updatedJSON);
+    let fileInfo = path.parse(crashFile);
+    if (fileInfo.ext === ".ips") {
+        fs.writeFileSync(crashFile, updatedJSON);
+    } else {
+        fileInfo.base = undefined;
+        fileInfo.ext = ".ips";
+        fs.writeFileSync(path.format(fileInfo), updatedJSON);
+        fs.unlinkSync(crashFile);
+    }
 
     if (changes > 0) {
         console.log(`SUCCESS updated ${crashFile}`);
@@ -92,18 +111,18 @@ function symbolicateFile(crashFile) {
 function symbolicateFolder(folderName) {
     const files = fs.readdirSync(folderName);
 
-    files.forEach(file => {
-        if (file.endsWith(".ips")) {
-            let ipsFile = `${folderName}${file}`;
+    files
+        .filter(f => f.endsWith(".ips") || f.endsWith(".crash"))
+        .forEach(file => {
+            let filePath = path.resolve(folderName, file);
             try {
-                symbolicateFile(ipsFile);
+                symbolicateFile(filePath);
             } catch (err) {
-                console.log(`FAILED to symbolicate ${ipsFile}`);
+                console.log(`FAILED to symbolicate ${filePath}`);
                 console.log(err);
                 console.log();
             }
-        }
-    });
+        });
 }
 
 function symbolicateAsiBacktraces(crashJSON, dwarf, ddgBaseAddress) {
@@ -138,31 +157,43 @@ function symbolicateAsiBacktraces(crashJSON, dwarf, ddgBaseAddress) {
 function symbolicateThreads(crashJSON, dwarf, ddgBaseAddress, ddgImageIndex) {
     let threads = crashJSON.threads;
 
-    let changes = 0;
+    let changes = [];
 
-    for (let thread of threads) {
-        for (let i in thread.frames) {
-            let frame = thread.frames[i];
+    for (let threadIndex in threads) {
+        let thread = threads[threadIndex];
+        for (let frameIndex in thread.frames) {
+            let frame = thread.frames[frameIndex];
+
             if (frame.imageIndex == ddgImageIndex) {
+
                 let offset = frame.imageOffset;
                 let symbolOffset = parseInt(ddgBaseAddress, 16) + offset;
                 let symbolAddress = symbolOffset.toString(16);
 
-                let command = `atos -o ${dwarf} -l 0x${ddgBaseAddress} 0x${symbolAddress}`
-                console.log(command);
-                let symbol = execSync(command);
-                frame.symbol = symbol.toString().trim();
-                changes += 1;
+                changes.push({
+                    threadIndex,
+                    frameIndex,
+                    symbolAddress: `0x${symbolAddress}`
+                });
             }
         }
     }
 
-    return changes;
+    let command = `atos -o ${dwarf} -l 0x${ddgBaseAddress} ${changes.map((c) => c.symbolAddress).join(" ")}`
+    console.log(command);
+    let symbols = execSync(command).toString().trim().split('\n');
+
+    for (let i in changes) {
+        const change = changes[i];
+        threads[change.threadIndex].frames[change.frameIndex].symbol = symbols[i];
+    }
+
+    return changes.length;
 }
 
 let location = process.argv[2];
 if (fs.lstatSync(location).isDirectory()) {
-    symbolicateFolder(location.endsWith("/") ? location : `${location}/`);
+    symbolicateFolder(location);
 } else {
-    symbolicateFile(location);
+    symbolicateIPSFile(location);
 }
