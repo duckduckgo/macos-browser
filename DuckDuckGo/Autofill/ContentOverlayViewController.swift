@@ -197,7 +197,7 @@ extension ContentOverlayViewController: SecureVaultManagerDelegate {
     }
 
     public func secureVaultManager(_: SecureVaultManager, didAutofill type: AutofillType, withObjectId objectId: Int64) {
-        // No-op, Tab.swift handles this functionality
+        Pixel.fire(.formAutofilled(kind: type.formAutofillKind))
     }
     
     public func secureVaultManagerShouldAutomaticallyUpdateCredentialsWithoutUsername(_: SecureVaultManager) -> Bool {
