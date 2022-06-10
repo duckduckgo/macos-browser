@@ -64,9 +64,16 @@ final class DownloadsPreferences: ObservableObject {
         return Self.defaultDownloadLocation()
     }
 
-    @Published var selectedDownloadLocation: URL? {
-        didSet {
-            guard let newDownloadLocation = selectedDownloadLocation else {
+    var selectedDownloadLocation: URL? {
+        get {
+            persistor.selectedDownloadLocation?.url
+        }
+        
+        set {
+            defer {
+                objectWillChange.send()
+            }
+            guard let newDownloadLocation = newValue else {
                 persistor.selectedDownloadLocation = nil
                 return
             }
@@ -77,9 +84,14 @@ final class DownloadsPreferences: ObservableObject {
         }
     }
 
-    @Published var alwaysRequestDownloadLocation: Bool = false {
-        didSet {
-            persistor.alwaysRequestDownloadLocation = alwaysRequestDownloadLocation
+    var alwaysRequestDownloadLocation: Bool {
+        get {
+            persistor.alwaysRequestDownloadLocation
+        }
+        
+        set {
+            persistor.alwaysRequestDownloadLocation = newValue
+            objectWillChange.send()
         }
     }
 
@@ -94,17 +106,11 @@ final class DownloadsPreferences: ObservableObject {
 
     init(persistor: DownloadsPreferencesPersistor = DownloadsPreferencesUserDefaultsPersistor()) {
         self.persistor = persistor
-        alwaysRequestDownloadLocation = persistor.alwaysRequestDownloadLocation
-        selectedDownloadLocation = {
-            if let selectedLocation = persistor.selectedDownloadLocation,
-               let selectedLocationURL = URL(string: selectedLocation),
-               Self.isDownloadLocationValid(selectedLocationURL) {
-
-                return selectedLocationURL
-            }
-
-            return Self.defaultDownloadLocation()
-        }()
+        
+        // Fix the selected download location if it needs it
+        if selectedDownloadLocation == nil || !Self.isDownloadLocationValid(selectedDownloadLocation!) {
+            selectedDownloadLocation = Self.defaultDownloadLocation()
+        }
     }
 
     private var persistor: DownloadsPreferencesPersistor
