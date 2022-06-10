@@ -790,7 +790,7 @@ extension BrowserTabViewController: WKUIDelegate {
 
         let tab = makeTab(parentTab: parentTab, content: .none)
         if windowFeatures.toolbarsVisibility?.boolValue == true {
-            tabCollectionViewModel.insertChild(tab: tab, selected: true)
+            tabCollectionViewModel.insertChild(tab: tab, selected: !NSApp.isCommandPressed)
         } else {
             WindowsManager.openPopUpWindow(with: tab, contentSize: contentSize)
         }
