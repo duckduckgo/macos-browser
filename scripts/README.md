@@ -2,6 +2,7 @@
 
 * [archive.sh](#archivesh-create-notarized-application-build)
 * [sparkle-sandbox.sh](#sparkle-sandboxsh-test-automatic-updates-via-sparkle-locally)
+* [update-embedded.sh](#update-embeddedsh-update-embedded-tracker-data-set-and-privacy-config)
 
 ## `archive.sh`: Create notarized application build
 
@@ -143,3 +144,33 @@ Run in interactive mode:
 Display all available parameters:
 
     $ ./scripts/sparkle-sandbox.sh -h
+
+
+## `update-embedded.sh`: Update embedded Tracker Data Set and Privacy Config
+
+This script checks app's source code for ETag values of Tracker Data Set
+and Privacy Config files embedded in the app, downloads new versions of the
+files if they appear outdated and updates relevant entries in the source code
+to reflect the metadata (ETag and SHA256 sum) of downloaded files.
+
+It may update the following files:
+* DuckDuckGo/Content Blocker/AppPrivacyConfigurationDataProvider.swift
+* DuckDuckGo/Content Blocker/AppTrackerDataSetProvider.swift
+* DuckDuckGo/Content Blocker/macos-config.json
+* DuckDuckGo/Content Blocker/trackerData.json
+
+### Requirements
+
+No 3rd party software is required to run the script. It uses built-in
+command line utilities and curl.
+
+### Usage
+
+To update embedded files if needed:
+
+    $ ./scripts/update_embedded.sh
+
+Make sure that unit tests pass after updating files. These test cases verify
+embedded data correctness:
+* `EmbeddedTrackerDataTests.testWhenEmbeddedDataIsUpdatedThenUpdateSHAAndEtag`
+* `AppPrivacyConfigurationTests.testWhenEmbeddedDataIsUpdatedThenUpdateSHAAndEtag`

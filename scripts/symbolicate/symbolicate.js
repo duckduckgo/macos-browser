@@ -39,15 +39,17 @@ function symbolicateFile(crashFile) {
 
     let version = metaJSON["app_version"];
     let crashJSON = JSON.parse(lines.join("\n"));
-    let ddgBaseAddress = Number(crashJSON.usedImages.filter((e) => { return e.name == "DuckDuckGo" })[0].base).toString(16);
+    let ddgBaseAddress;
+    let ddgImageIndex;
 
-    if (!crashJSON.asiBacktraces) {
-        console.log(`WARN no asiBacktraces found in ${crashFile}`);
-        console.log();
-        return;
+    for (const i in crashJSON.usedImages) {
+        let image = crashJSON.usedImages[i];
+        if (image.name === "DuckDuckGo") {
+            ddgBaseAddress = image.base.toString(16);
+            ddgImageIndex = i;
+            break;
+        }
     }
-
-    let backtrace = crashJSON.asiBacktraces[0].split("\n");
 
     let dwarf = `binaries/${version}/DuckDuckGo.app.dSYM/Contents/Resources/DWARF/DuckDuckGo`;
     if (!fileExistsSync(dwarf)) {
@@ -63,30 +65,17 @@ function symbolicateFile(crashFile) {
         return;
     }
 
-    let regex = /0x([0-9a-f]*) DuckDuckGo \+ (\d*)/
+    let changes;
+    if (crashJSON.asiBacktraces) {
+        changes = symbolicateAsiBacktraces(crashJSON, dwarf, ddgBaseAddress, ddgImageIndex);
+    } else if (crashJSON.threads) {
+        changes = symbolicateThreads(crashJSON, dwarf, ddgBaseAddress, ddgImageIndex);
+    } else {
+        console.log(`WARN no 'asiBacktraces' or 'threads' found in ${crashFile}`);
+        console.log();
+        return;
+    }
 
-    var changes = 0;
-    let symbolicatedCrash = backtrace.map((e) => { 
-        let matches = e.match(regex);
-
-        if (matches) {
-            changes += 1;
-            let rawLoadAddress = "0x" + matches[1];
-            let binaryLoadAddress = parseInt(matches[1], 16);
-            let offset = Number(matches[2]);
-            let symbolOffset = binaryLoadAddress + offset;
-            let symbolAddress = symbolOffset.toString(16)
-
-            let command = `atos -o ${dwarf} -l 0x${ddgBaseAddress} 0x${symbolAddress}`
-            console.log(command);
-            let symbol = execSync(command);
-            return e.replace(rawLoadAddress, `${rawLoadAddress} ${symbol}`).replace("DuckDuckGo + ", "").replace("\n", "");
-        }
-
-        return e;
-    }).join('\n');
-
-    crashJSON.asiBacktraces[0] = symbolicatedCrash;
 
     let updatedJSON = JSON.stringify(metaJSON) + "\n" + JSON.stringify(crashJSON, null, '\t');
 
@@ -115,6 +104,60 @@ function symbolicateFolder(folderName) {
             }
         }
     });
+}
+
+function symbolicateAsiBacktraces(crashJSON, dwarf, ddgBaseAddress) {
+    let backtrace = crashJSON.asiBacktraces[0].split("\n");
+
+    let regex = /0x([0-9a-f]*) DuckDuckGo \+ (\d*)/
+
+    let changes = 0;
+    let symbolicatedCrash = backtrace.map((e) => { 
+        let matches = e.match(regex);
+
+        if (matches) {
+            changes += 1;
+            let rawLoadAddress = "0x" + matches[1];
+            let binaryLoadAddress = parseInt(matches[1], 16);
+            let offset = Number(matches[2]);
+            let symbolOffset = binaryLoadAddress + offset;
+            let symbolAddress = symbolOffset.toString(16)
+
+            let command = `atos -o ${dwarf} -l 0x${ddgBaseAddress} 0x${symbolAddress}`
+            console.log(command);
+            let symbol = execSync(command);
+            return e.replace(rawLoadAddress, `${rawLoadAddress} ${symbol}`).replace("DuckDuckGo + ", "").replace("\n", "");
+        }
+
+        return e;
+    }).join('\n');
+
+    crashJSON.asiBacktraces[0] = symbolicatedCrash;
+}
+
+function symbolicateThreads(crashJSON, dwarf, ddgBaseAddress, ddgImageIndex) {
+    let threads = crashJSON.threads;
+
+    let changes = 0;
+
+    for (let thread of threads) {
+        for (let i in thread.frames) {
+            let frame = thread.frames[i];
+            if (frame.imageIndex == ddgImageIndex) {
+                let offset = frame.imageOffset;
+                let symbolOffset = parseInt(ddgBaseAddress, 16) + offset;
+                let symbolAddress = symbolOffset.toString(16);
+
+                let command = `atos -o ${dwarf} -l 0x${ddgBaseAddress} 0x${symbolAddress}`
+                console.log(command);
+                let symbol = execSync(command);
+                frame.symbol = symbol.toString().trim();
+                changes += 1;
+            }
+        }
+    }
+
+    return changes;
 }
 
 let location = process.argv[2];
