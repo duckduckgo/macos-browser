@@ -30,21 +30,117 @@ function symbolicateFile(filePath) {
     let fileData = fs.readFileSync(filePath);
     let lines = fileData.toString().split("\n");
 
-    let ipsMetadata = extractIPSMetadata(lines);
+    let ipsMetadata = extractIPSMetadata(filePath, lines);
 
     if (ipsMetadata) {
         symbolicateIPSFile(filePath, ipsMetadata, lines);
+    } else {
+        symbolicateCrashFile(filePath, lines);
     }
 }
 
-function extractIPSMetadata(fileLines) {
+function checkAppAndDWARFFiles(version) {
+    let dwarf = `binaries/${version}/DuckDuckGo.app.dSYM/Contents/Resources/DWARF/DuckDuckGo`;
+    if (!fileExistsSync(dwarf)) {
+        console.log(`WARN missing dwarf binary for ${version}`);
+        console.log();
+        return;
+    }
+
+    let app = `binaries/${version}/DuckDuckGo.app`;
+    if (!fileExistsSync(app)) {
+        console.log(`WARN missing app binary for ${version}`);
+        console.log();
+        return;
+    }
+
+    return { dwarf, app };
+}
+
+function symbolicateCrashFile(crashFile, lines) {
+    let versionLine = lines.find((l) => l.startsWith("Version:"));
+    if (!versionLine) {
+        console.log(`WARN incorrect crash file format`);
+        console.log();
+        return;
+    }
+    const version = versionLine.match(/Version:\s+([\d\.]+) .*/)[1]
+
+    let codeTypeLine = lines.find((l) => l.startsWith("Code Type:"));
+    if (!codeTypeLine) {
+        console.log(`WARN incorrect crash file format`);
+        console.log();
+        return;
+    }
+    const codeType = codeTypeLine.match(/Code Type:\s+(X86-64|ARM-64).*/)[1]
+    const arch = {
+        "X86-64": "x86_64",
+        "ARM-64": "arm64"
+    }[codeType];
+
+    let { dwarf, app } = checkAppAndDWARFFiles(version);
+
+    let binaryImagesLineIndex = lines.findIndex((l) => l.startsWith("Binary Images:"));
+    let lineIndex = binaryImagesLineIndex + 1;
+    const binaryImageRegex = /\s+0x([0-9a-fA-F]+) - \s+0x[0-9a-fA-F]+.*com\.duckduckgo\.macos\.browser/;
+
+    let ddgBaseAddress;
+    while (lineIndex < lines.length) {
+        const match = lines[lineIndex].match(binaryImageRegex);
+        if (match && match.length > 1) {
+            ddgBaseAddress = match[1];
+            break;
+        }
+        lineIndex += 1;
+    }
+
+    lineIndex = 0;
+    const stackFrameRegex = /\d+\s+com.duckduckgo.macos.browser\s+(0x[0-9a-fA-F]+) (0x[0-9a-fA-F]+ \+ \d+)/;
+    let changes = [];
+
+    while (lineIndex < binaryImagesLineIndex) {
+        const match = lines[lineIndex].match(stackFrameRegex);
+        if (match && match.length > 2) {
+            const change = {
+                lineIndex,
+                symbolAddress: match[1],
+                symbolPlaceholder: match[2]
+            };
+
+            changes.push(change);
+        }
+        lineIndex += 1;
+    }
+
+    if (changes.length > 0) {
+
+        let command = `atos -a ${arch} -o ${dwarf} -l 0x${ddgBaseAddress} ${changes.map((c) => c.symbolAddress).join(" ")}`
+        console.log(command);
+        let symbols = execSync(command).toString().trim().split('\n');
+        // console.log(symbols);
+
+        for (let i in changes) {
+            const change = changes[i];
+            lines[change.lineIndex] = lines[change.lineIndex].replace(change.symbolPlaceholder, symbols[i]);
+        }
+
+        const updatedBacktrace = lines.join('\n');
+        fs.writeFileSync(crashFile, updatedBacktrace);
+
+        console.log(`SUCCESS updated ${crashFile}`);
+    } else {
+        console.log(`WARN no changes made to ${crashFile}`);
+    }
+    console.log();
+}
+
+function extractIPSMetadata(crashFile, fileLines) {
     try {
         let metadata = JSON.parse(fileLines[0]);
         fileLines.shift();
         return metadata;
     } catch (err) {
-        console.log(`WARN ${crashFile} does not appear to be IPS format`);
-        console.log();
+        console.log(`INFO ${crashFile} does not appear to be IPS format`);
     }
 }
 
@@ -66,19 +162,7 @@ function symbolicateIPSFile(crashFile, metaJSON, lines) {
         }
     }
 
-    let dwarf = `binaries/${version}/DuckDuckGo.app.dSYM/Contents/Resources/DWARF/DuckDuckGo`;
-    if (!fileExistsSync(dwarf)) {
-        console.log(`WARN missing dwarf binary for ${version}`);
-        console.log();
-        return;
-    }
-
-    let app = `binaries/${version}/DuckDuckGo.app`;
-    if (!fileExistsSync(app)) {
-        console.log(`WARN missing app binary for ${version}`);
-        console.log();
-        return;
-    }
+    let { dwarf, app } = checkAppAndDWARFFiles(version);
 
     let changes;
     if (crashJSON.asiBacktraces) {
