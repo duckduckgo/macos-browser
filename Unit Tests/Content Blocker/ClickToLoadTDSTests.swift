@@ -1,6 +1,5 @@
 //
 //  ClickToLoadTDSTests.swift
-//  Core
 //
 //  Copyright © 2019 DuckDuckGo. All rights reserved.
 //

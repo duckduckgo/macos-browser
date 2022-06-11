@@ -1,6 +1,5 @@
 //
 //  Pixel.swift
-//  DuckDuckGo
 //
 //  Copyright © 2018 DuckDuckGo. All rights reserved.
 //
