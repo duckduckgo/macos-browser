@@ -1,3 +1,4 @@
+#!/usr/bin/env node
 /**
  * See README.md for instructions.
  */
@@ -51,12 +52,14 @@ function symbolicateIPSFile(crashFile, metaJSON, lines) {
 
     let version = metaJSON.app_version;
     let crashJSON = JSON.parse(lines.join("\n"));
+    let arch;
     let ddgBaseAddress;
     let ddgImageIndex;
 
     for (const i in crashJSON.usedImages) {
         let image = crashJSON.usedImages[i];
         if (image.name === "DuckDuckGo") {
+            arch = image.arch;
             ddgBaseAddress = image.base.toString(16);
             ddgImageIndex = i;
             break;
@@ -79,9 +82,9 @@ function symbolicateIPSFile(crashFile, metaJSON, lines) {
 
     let changes;
     if (crashJSON.asiBacktraces) {
-        changes = symbolicateAsiBacktraces(crashJSON, dwarf, ddgBaseAddress, ddgImageIndex);
+        changes = symbolicateAsiBacktraces(crashJSON, dwarf, arch, ddgBaseAddress);
     } else if (crashJSON.threads) {
-        changes = symbolicateThreads(crashJSON, dwarf, ddgBaseAddress, ddgImageIndex);
+        changes = symbolicateThreads(crashJSON, dwarf, arch, ddgBaseAddress, ddgImageIndex);
     } else {
         console.log(`WARN no 'asiBacktraces' or 'threads' found in ${crashFile}`);
         console.log();
@@ -125,7 +128,7 @@ function symbolicateFolder(folderName) {
         });
 }
 
-function symbolicateAsiBacktraces(crashJSON, dwarf, ddgBaseAddress) {
+function symbolicateAsiBacktraces(crashJSON, dwarf, arch, ddgBaseAddress) {
     let backtrace = crashJSON.asiBacktraces[0].split("\n");
 
     let regex = /0x([0-9a-f]*) DuckDuckGo \+ (\d*)/
@@ -142,7 +145,7 @@ function symbolicateAsiBacktraces(crashJSON, dwarf, ddgBaseAddress) {
             let symbolOffset = binaryLoadAddress + offset;
             let symbolAddress = symbolOffset.toString(16)
 
-            let command = `atos -o ${dwarf} -l 0x${ddgBaseAddress} 0x${symbolAddress}`
+            let command = `atos -a ${arch} -o ${dwarf} -l 0x${ddgBaseAddress} 0x${symbolAddress}`
             console.log(command);
             let symbol = execSync(command);
             return e.replace(rawLoadAddress, `${rawLoadAddress} ${symbol}`).replace("DuckDuckGo + ", "").replace("\n", "");
@@ -154,7 +157,7 @@ function symbolicateAsiBacktraces(crashJSON, dwarf, ddgBaseAddress) {
     crashJSON.asiBacktraces[0] = symbolicatedCrash;
 }
 
-function symbolicateThreads(crashJSON, dwarf, ddgBaseAddress, ddgImageIndex) {
+function symbolicateThreads(crashJSON, dwarf, arch, ddgBaseAddress, ddgImageIndex) {
     let threads = crashJSON.threads;
 
     let changes = [];
@@ -179,7 +182,7 @@ function symbolicateThreads(crashJSON, dwarf, ddgBaseAddress, ddgImageIndex) {
         }
     }
 
-    let command = `atos -o ${dwarf} -l 0x${ddgBaseAddress} ${changes.map((c) => c.symbolAddress).join(" ")}`
+    let command = `atos -a ${arch} -o ${dwarf} -l 0x${ddgBaseAddress} ${changes.map((c) => c.symbolAddress).join(" ")}`
     console.log(command);
     let symbols = execSync(command).toString().trim().split('\n');
 
@@ -195,5 +198,5 @@ let location = process.argv[2];
 if (fs.lstatSync(location).isDirectory()) {
     symbolicateFolder(location);
 } else {
-    symbolicateIPSFile(location);
+    symbolicateFile(location);
 }
