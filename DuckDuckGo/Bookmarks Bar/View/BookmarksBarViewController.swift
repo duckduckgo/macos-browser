@@ -20,12 +20,13 @@ import Foundation
 import AppKit
 import Combine
 
+// swiftlint:disable:next type_body_length
 final class BookmarksBarViewController: NSViewController {
     
     private struct ButtonLayoutMetadata {
         var cumulativeButtonWidth: CGFloat = 0
         var cumulativeSpacingWidth: CGFloat = 0
-        var totalButtonListWidth: CGFloat = 0
+        var bookmarksBarWidth: CGFloat = 0
     }
     
     private struct DraggedItemMetadata {
@@ -137,7 +138,8 @@ final class BookmarksBarViewController: NSViewController {
     private func bookmarksBarViewFrameChanged() {
         layoutButtons()
 
-        if view.frame.size.width <= (layoutMetadata.totalButtonListWidth + (BookmarksBarViewModel.Constants.buttonSpacing * 2) + clippedItemsIndicator.frame.size.width) {
+        let maximumWidth = layoutMetadata.bookmarksBarWidth + (BookmarksBarViewModel.Constants.buttonSpacing * 2) + clippedItemsIndicator.frame.width
+        if view.frame.size.width <= maximumWidth {
             removeLastButton()
         } else {
             tryToRestoreClippedButton()
@@ -173,7 +175,7 @@ final class BookmarksBarViewController: NSViewController {
         
         // Button spacing * 3: Once for the padding between the last button and the new one,
         // and two to account for the spacing at the beginning and end of the list.
-        if layoutMetadata.totalButtonListWidth +
+        if layoutMetadata.bookmarksBarWidth +
             (BookmarksBarViewModel.Constants.buttonSpacing * 3) +
             clippedButtonWidth +
             clippedItemsIndicator.frame.width < view.bounds.width {
@@ -201,7 +203,7 @@ final class BookmarksBarViewController: NSViewController {
     private func calculateFixedButtonSizingValues() {
         layoutMetadata.cumulativeButtonWidth = buttons.map(\.button.bounds.size.width).reduce(0, +)
         layoutMetadata.cumulativeSpacingWidth = BookmarksBarViewModel.Constants.buttonSpacing * CGFloat(max(0, buttons.count - 1))
-        layoutMetadata.totalButtonListWidth = layoutMetadata.cumulativeButtonWidth + layoutMetadata.cumulativeSpacingWidth
+        layoutMetadata.bookmarksBarWidth = layoutMetadata.cumulativeButtonWidth + layoutMetadata.cumulativeSpacingWidth
         
         bookmarksBarViewFrameChanged()
     }
@@ -233,7 +235,7 @@ final class BookmarksBarViewController: NSViewController {
         if hasClippedButtons {
             previousMaximumXValue = BookmarksBarViewModel.Constants.buttonSpacing
         } else {
-            previousMaximumXValue = max(BookmarksBarViewModel.Constants.buttonSpacing, (containerFrame.midX) - (layoutMetadata.totalButtonListWidth / 2))
+            previousMaximumXValue = max(BookmarksBarViewModel.Constants.buttonSpacing, (containerFrame.midX) - (layoutMetadata.bookmarksBarWidth / 2))
         }
         
         let visibleButtons = buttons.filter { button in
@@ -326,7 +328,7 @@ final class BookmarksBarViewController: NSViewController {
             viewModel.handle(event: .mouseDragged(buttonIndex: index, location: event.locationInWindow))
             
             if let initialDraggingLocation = initialDraggingLocation {
-                let distance = CGPointDistance(from: initialDraggingLocation, to: event.locationInWindow)
+                let distance = initialDraggingLocation.distance(to: event.locationInWindow)
                 if distance <= BookmarksBarViewModel.Constants.distanceRequiredForDragging {
                     return
                 }
@@ -528,9 +530,4 @@ extension BookmarksBarViewController: BookmarksBarViewDelegate {
         }
     }
     
-}
-
-func CGPointDistance(from: CGPoint, to: CGPoint) -> CGFloat {
-    let distanceSquared = (from.x - to.x) * (from.x - to.x) + (from.y - to.y) * (from.y - to.y)
-    return sqrt(distanceSquared)
 }

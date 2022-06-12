@@ -21,6 +21,7 @@ import Foundation
 import XCTest
 @testable import DuckDuckGo_Privacy_Browser
 
+// swiftlint:disable:next type_body_length
 final class LocalBookmarkStoreTests: XCTestCase {
 
     func testWhenBookmarkIsSaved_ThenItMustBeLoadedFromStore() {
