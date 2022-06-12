@@ -55,6 +55,10 @@ protocol BookmarkStore {
 
 // swiftlint:disable type_body_length
 final class LocalBookmarkStore: BookmarkStore {
+    
+    enum Constants {
+        static let rootFolderUUID = "87E09C05-17CB-4185-9EDF-8D1AF4312BAF"
+    }
 
     init() {
         sharedInitialization()
@@ -474,7 +478,7 @@ final class LocalBookmarkStore: BookmarkStore {
 
                 // Only throw this assertion when running in debug and when unit tests are not running.
                 if !AppDelegate.isRunningTests {
-                    assertionFailure("LocalBookmarkStore: Saving of context failed")
+                    assertionFailure("LocalBookmarkStore: Saving of context failed, error: \(error.localizedDescription)")
                 }
             }
         }
@@ -570,6 +574,7 @@ final class LocalBookmarkStore: BookmarkStore {
     private func createFolder(titled title: String, in context: NSManagedObjectContext) -> BookmarkManagedObject {
         let folder = BookmarkManagedObject(context: self.context)
         folder.id = UUID()
+        folder.parentFolder = self.cachedReadOnlyTopLevelFolder
         folder.titleEncrypted = title as NSString
         folder.isFolder = true
         folder.dateAdded = NSDate.now
@@ -638,16 +643,7 @@ final class LocalBookmarkStore: BookmarkStore {
     
     // MARK: - Migration
     
-    @UserDefaultsWrapper(key: .hasMigratedTopLevelStorageToImplicitBookmarksFolder, defaultValue: false)
-    private var hasMigratedTopLevelStorageToImplicitBookmarksFolder: Bool
-    
-    private let topLevelBookmarksFolderName = "BookmarksRootFolder"
-    
     private func migrateTopLevelStorageToImplicitBookmarksFolder() {
-//        guard !hasMigratedTopLevelStorageToImplicitBookmarksFolder else {
-//            return
-//        }
-        
         context.performAndWait {
             // 1. Fetch all top-level entities and check that there isn't an existing root folder
             // 2. If the root folder does not exist, create it
@@ -663,12 +659,11 @@ final class LocalBookmarkStore: BookmarkStore {
                 var existingTopLevelEntities = try self.context.fetch(topLevelEntitiesFetchRequest)
                 
                 let existingTopLevelFolderIndex = existingTopLevelEntities.firstIndex { entity in
-                    (entity.titleEncrypted as? String) == topLevelBookmarksFolderName
+                    entity.id == .rootBookmarkFolderUUID
                 }
                 
                 // Check if there's only one top level folder, and it's the root folder:
                 if existingTopLevelFolderIndex != nil, existingTopLevelEntities.count == 1 {
-                    print("Didn't need to migrate")
                     return
                 }
 
@@ -687,8 +682,8 @@ final class LocalBookmarkStore: BookmarkStore {
                         return
                     }
                     
-                    newTopLevelFolder.id = UUID()
-                    newTopLevelFolder.titleEncrypted = topLevelBookmarksFolderName as NSString
+                    newTopLevelFolder.id = .rootBookmarkFolderUUID
+                    newTopLevelFolder.titleEncrypted = "Root Bookmarks Folder" as NSString
                     newTopLevelFolder.isFolder = true
                     newTopLevelFolder.dateAdded = NSDate.now
                     
@@ -706,8 +701,6 @@ final class LocalBookmarkStore: BookmarkStore {
                 // TODO: Handle error
             }
         }
-        
-        hasMigratedTopLevelStorageToImplicitBookmarksFolder = true
     }
     
     // MARK: - Concurrency
@@ -798,4 +791,13 @@ fileprivate extension BookmarkManagedObject {
     }
 
 }
+
+extension UUID {
+    
+    static var rootBookmarkFolderUUID: UUID {
+        return UUID(uuidString: LocalBookmarkStore.Constants.rootFolderUUID)!
+    }
+    
+}
+
 // swiftlint:enable type_body_length
