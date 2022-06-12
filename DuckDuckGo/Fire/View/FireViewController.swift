@@ -22,6 +22,10 @@ import Combine
 
 final class FireViewController: NSViewController {
 
+    enum Const {
+        static let animationName = "01_Fire_really_small"
+    }
+
     private var fireViewModel: FireViewModel
     private let tabCollectionViewModel: TabCollectionViewModel
     private var cancellables = Set<AnyCancellable>()
@@ -32,10 +36,11 @@ final class FireViewController: NSViewController {
     }()
 
     @IBOutlet weak var fakeFireButton: NSButton!
-    @IBOutlet weak var fireAnimationView: AnimationView!
     @IBOutlet weak var progressIndicatorWrapper: NSView!
     @IBOutlet weak var progressIndicator: NSProgressIndicator!
     @IBOutlet weak var progressIndicatorWrapperBG: NSView!
+    private var fireAnimationView: AnimationView?
+    private var fireAnimationViewLoadingTask: Task<(), Never>?
 
     required init?(coder: NSCoder) {
         fatalError("TabBarViewController: Bad initializer")
@@ -50,12 +55,16 @@ final class FireViewController: NSViewController {
         super.init(coder: coder)
     }
 
+    deinit {
+        fireAnimationViewLoadingTask?.cancel()
+    }
+
     override func viewDidLoad() {
         super.viewDidLoad()
 
-        setupView()
-        setupFireAnimation()
-        subscribeToIsBurning()
+        fireAnimationViewLoadingTask = Task.detached(priority: .userInitiated) {
+            await self.setupFireAnimationView()
+        }
     }
 
     override func viewWillAppear() {
@@ -72,21 +81,36 @@ final class FireViewController: NSViewController {
         progressIndicator.stopAnimation(self)
     }
 
-    private var shouldPreventUserInteractioCancellable: AnyCancellable?
+    private var shouldPreventUserInteractionCancellable: AnyCancellable?
     private func subscribeToShouldPreventUserInteraction() {
-        shouldPreventUserInteractioCancellable = fireViewModel.shouldPreventUserInteraction
+        shouldPreventUserInteractionCancellable = fireViewModel.shouldPreventUserInteraction
             .sink { [weak self] shouldPreventUserInteraction in
                 self?.view.superview?.isHidden = !shouldPreventUserInteraction
             }
     }
 
-    private func setupView() {
+    @MainActor
+    private func setupFireAnimationView() async {
+        guard let animationView = await FireAnimationViewLoader.shared.createAnimationView() else {
+            return
+        }
+
+        animationView.contentMode = .scaleToFill
+        animationView.translatesAutoresizingMaskIntoConstraints = false
+        view.addSubview(animationView, positioned: .below, relativeTo: progressIndicatorWrapper)
+        let constraints = animationView.addConstraints(to: view, [
+            .top: .top(),
+            .bottom: .bottom(),
+            .leading: .leading(),
+            .trailing: .trailing()
+        ])
+        NSLayoutConstraint.activate(constraints)
+        fireAnimationView = animationView
+
         fakeFireButton.wantsLayer = true
         fakeFireButton.layer?.backgroundColor = NSColor.buttonMouseDownColor.cgColor
-    }
 
-    private func setupFireAnimation() {
-        fireAnimationView.contentMode = .scaleToFill
+        subscribeToIsBurning()
     }
 
     private func subscribeToIsBurning() {
@@ -97,7 +121,9 @@ final class FireViewController: NSViewController {
                         return
                     }
 
-                self.animateFire(burningData: burningData)
+                Task {
+                    await self.animateFire(burningData: burningData)
+                }
             })
             .store(in: &cancellables)
     }
@@ -106,7 +132,8 @@ final class FireViewController: NSViewController {
         presentAsModalWindow(fireDialogViewController)
     }
 
-    func animateFire(burningData: Fire.BurningData) {
+    @MainActor
+    private func animateFire(burningData: Fire.BurningData) async {
         switch burningData {
         case .all: break
         case .specificDomains(let burningDomains):
@@ -116,10 +143,13 @@ final class FireViewController: NSViewController {
                 return
             }
         }
-        progressIndicatorWrapper.isHidden = true
 
+        await waitForFireAnimationViewIfNeeded()
+
+        progressIndicatorWrapper.isHidden = true
         fireViewModel.isAnimationPlaying = true
-        fireAnimationView.play { [weak self] _ in
+
+        fireAnimationView?.play { [weak self] _ in
             guard let self = self else { return }
 
             self.fireViewModel.isAnimationPlaying = false
@@ -130,4 +160,41 @@ final class FireViewController: NSViewController {
         }
     }
 
+    private func waitForFireAnimationViewIfNeeded() async {
+        if fireAnimationView == nil {
+            await fireAnimationViewLoadingTask?.value
+        }
+    }
+}
+
+/**
+ * This actor creates Fire animation views by loading animation always on a background thread.
+ *
+ * We use animation cache for Lottie animations, so as soon as the first animation is loaded,
+ * subsequent views would use the cache. However, the first load takes between 0.5 and 3 seconds
+ * and would contribute to application start-up time (before any window is shown) if done synchronously.
+ */
+private actor FireAnimationViewLoader {
+
+    static let shared: FireAnimationViewLoader = .init(animationName: FireViewController.Const.animationName)
+
+    @MainActor
+    func createAnimationView() async -> AnimationView? {
+        guard let animation = await animation else {
+            return nil
+        }
+        let view = AnimationView(animation: animation)
+        view.identifier = .init(rawValue: animationName)
+        return view
+    }
+
+    private init(animationName: String) {
+        self.animationName = animationName
+    }
+
+    private let animationName: String
+
+    private var animation: Animation? {
+        Animation.named(animationName, animationCache: LottieAnimationCache.shared)
+    }
 }

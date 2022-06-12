@@ -630,9 +630,16 @@ CQ
                                             </connections>
                                         </menuItem>
                                         <menuItem isSeparatorItem="YES" id="BiH-Kk-Mam"/>
-                                        <menuItem title="Reopen Last Closed Tab" enabled="NO" keyEquivalent="T" id="c3l-v1-kxk">
+                                        <menuItem title="Reopen Last Closed Tab" enabled="NO" id="c3l-v1-kxk">
+                                            <modifierMask key="keyEquivalentModifierMask"/>
                                             <connections>
                                                 <action selector="reopenLastClosedTab:" target="Ady-hI-5gd" id="jzQ-2q-HGB"/>
+                                            </connections>
+                                        </menuItem>
+                                        <menuItem title="Reopen All Windows from Last Session" enabled="NO" id="C6V-uF-uX8">
+                                            <modifierMask key="keyEquivalentModifierMask"/>
+                                            <connections>
+                                                <action selector="reopenAllWindowsFromLastSession:" target="Ady-hI-5gd" id="Ppr-eX-00b"/>
                                             </connections>
                                         </menuItem>
                                         <menuItem isSeparatorItem="YES" id="pC4-EZ-Df8"/>
@@ -765,6 +772,7 @@ CQ
                             <outlet property="printMenuItem" destination="uFk-FD-FTB" id="mOP-Xp-myS"/>
                             <outlet property="printSeparatorItem" destination="anH-0y-7dE" id="E6b-rl-clQ"/>
                             <outlet property="reloadMenuItem" destination="aKZ-VG-MOp" id="J3D-X3-Xg3"/>
+                            <outlet property="reopenAllWindowsFromLastSessionMenuItem" destination="C6V-uF-uX8" id="WVJ-17-v1S"/>
                             <outlet property="reopenLastClosedTabMenuItem" destination="c3l-v1-kxk" id="eGw-Dg-del"/>
                             <outlet property="sendFeedbackMenuItem" destination="V8t-Ts-q0L" id="qwz-Oh-HGm"/>
                             <outlet property="shareMenuItem" destination="kUE-Qf-cwa" id="kEZ-Kc-Wf4"/>

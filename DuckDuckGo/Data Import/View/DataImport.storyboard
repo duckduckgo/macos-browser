@@ -104,10 +104,10 @@ Gw
             </objects>
             <point key="canvasLocation" x="75" y="145.5"/>
         </scene>
-        <!--CSV Import Summary View Controller-->
+        <!--File Import Summary View Controller-->
         <scene sceneID="lq1-B2-i1k">
             <objects>
-                <viewController storyboardIdentifier="CSVImportSummaryViewController" id="SBx-aI-Zdd" userLabel="CSV Import Summary View Controller" customClass="CSVImportSummaryViewController" customModule="DuckDuckGo_Privacy_Browser" customModuleProvider="target" sceneMemberID="viewController">
+                <viewController storyboardIdentifier="FileImportSummaryViewController" id="SBx-aI-Zdd" userLabel="File Import Summary View Controller" customClass="FileImportSummaryViewController" customModule="DuckDuckGo_Privacy_Browser" customModuleProvider="target" sceneMemberID="viewController">
                     <view key="view" id="VAn-Ub-6ym">
                         <rect key="frame" x="0.0" y="0.0" width="509" height="40"/>
                         <autoresizingMask key="autoresizingMask"/>
@@ -503,12 +503,12 @@ Gw
             </objects>
             <point key="canvasLocation" x="75" y="455"/>
         </scene>
-        <!--CSV Import View Controller-->
+        <!--File Import View Controller-->
         <scene sceneID="e65-WV-kqF">
             <objects>
-                <viewController storyboardIdentifier="CSVImportViewController" id="Meg-M8-8oL" userLabel="CSV Import View Controller" customClass="CSVImportViewController" customModule="DuckDuckGo_Privacy_Browser" customModuleProvider="target" sceneMemberID="viewController">
-                    <view key="view" misplaced="YES" translatesAutoresizingMaskIntoConstraints="NO" id="n2z-bE-Ka8">
-                        <rect key="frame" x="0.0" y="0.0" width="512" height="817"/>
+                <viewController storyboardIdentifier="FileImportViewController" id="Meg-M8-8oL" userLabel="File Import View Controller" customClass="FileImportViewController" customModule="DuckDuckGo_Privacy_Browser" customModuleProvider="target" sceneMemberID="viewController">
+                    <view key="view" translatesAutoresizingMaskIntoConstraints="NO" id="n2z-bE-Ka8">
+                        <rect key="frame" x="0.0" y="0.0" width="512" height="815"/>
                         <subviews>
                             <stackView distribution="fill" orientation="vertical" alignment="leading" spacing="20" horizontalStackHuggingPriority="249.99998474121094" verticalStackHuggingPriority="249.99998474121094" horizontalHuggingPriority="249" detachesHiddenViews="YES" translatesAutoresizingMaskIntoConstraints="NO" id="HLb-Dw-Y0O">
                                 <rect key="frame" x="20" y="3" width="472" height="809"/>

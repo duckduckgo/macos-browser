@@ -1,6 +1,5 @@
 //
 //  APIRequest.swift
-//  DuckDuckGo
 //
 //  Copyright © 2017 DuckDuckGo. All rights reserved.
 //

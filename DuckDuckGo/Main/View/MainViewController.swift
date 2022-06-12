@@ -21,6 +21,7 @@ import Carbon.HIToolbox
 import Combine
 import os.log
 
+// swiftlint:disable type_body_length
 final class MainViewController: NSViewController {
 
     @IBOutlet weak var tabBarContainerView: NSView!
@@ -218,8 +219,10 @@ final class MainViewController: NSViewController {
     var lastTabContent: Tab.TabContent?
     private func subscribeToTabContent() {
         tabCollectionViewModel.selectedTabViewModel?.tab.$content.receive(on: DispatchQueue.main).sink(receiveValue: { [weak self] content in
-            self?.resizeNavigationBarForHomePage(content == .homePage, animated: content == .homePage && self?.lastTabContent != .homePage)
-            self?.lastTabContent = content
+            guard let self = self else { return }
+            self.resizeNavigationBarForHomePage(content == .homePage, animated: content == .homePage && self.lastTabContent != .homePage)
+            self.lastTabContent = content
+            self.adjustFirstResponderOnContentChange(content: content)
         }).store(in: &self.navigationalCancellables)
     }
 
@@ -325,13 +328,30 @@ final class MainViewController: NSViewController {
         }
 
         switch selectedTabViewModel.tab.content {
-        case .homePage, .onboarding, .none: navigationBarViewController.addressBarViewController?.addressBarTextField.makeMeFirstResponder()
+        case .homePage, .onboarding:
+            navigationBarViewController.addressBarViewController?.addressBarTextField.makeMeFirstResponder()
         case .url:
             browserTabViewController.makeWebViewFirstResponder()
-        case .preferences: browserTabViewController.preferencesViewController.view.makeMeFirstResponder()
-        case .bookmarks: browserTabViewController.bookmarksViewController.view.makeMeFirstResponder()
+        case .preferences:
+            browserTabViewController.preferencesViewController.view.makeMeFirstResponder()
+        case .bookmarks:
+            browserTabViewController.bookmarksViewController.view.makeMeFirstResponder()
+        case .none:
+            shouldAdjustFirstResponderOnContentChange = true
+        }
+    }
+
+    // swiftlint:disable identifier_name
+    var shouldAdjustFirstResponderOnContentChange = false
+    // swiftlint:enable identifier_name
+
+    func adjustFirstResponderOnContentChange(content: Tab.TabContent) {
+        guard shouldAdjustFirstResponderOnContentChange, content != .none else {
+            return
         }
 
+        shouldAdjustFirstResponderOnContentChange = false
+        adjustFirstResponder()
     }
 
 }

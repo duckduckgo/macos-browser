@@ -33,8 +33,7 @@ final class TabViewModelTests: XCTestCase {
     }
 
     func testWhenURLIsNotNilThenCanReloadIsTrue() {
-        let tabViewModel = TabViewModel.aTabViewModel
-        tabViewModel.tab.url = URL.duckDuckGo
+        let tabViewModel = TabViewModel.forTabWithURL(.duckDuckGo)
 
         let canReloadExpectation = expectation(description: "Can reload")
         tabViewModel.$canReload.debounce(for: 0.1, scheduler: RunLoop.main).sink { _ in
@@ -53,10 +52,8 @@ final class TabViewModelTests: XCTestCase {
     }
 
     func testWhenURLIsSetThenAddressBarIsUpdated() {
-        let tabViewModel = TabViewModel.aTabViewModel
-
         let urlString = "http://spreadprivacy.com"
-        tabViewModel.tab.url = URL.makeURL(from: urlString)
+        let tabViewModel = TabViewModel.forTabWithURL(.makeURL(from: urlString)!)
 
         let addressBarStringExpectation = expectation(description: "Address bar string")
 
@@ -68,10 +65,8 @@ final class TabViewModelTests: XCTestCase {
     }
 
     func testWhenURLIsFileURLThenAddressBarIsFilePath() {
-        let tabViewModel = TabViewModel.aTabViewModel
-
         let urlString = "file:///Users/Dax/file.txt"
-        tabViewModel.tab.url = URL.makeURL(from: urlString)
+        let tabViewModel = TabViewModel.forTabWithURL(.makeURL(from: urlString)!)
 
         let addressBarStringExpectation = expectation(description: "Address bar string")
 
@@ -84,10 +79,8 @@ final class TabViewModelTests: XCTestCase {
     }
 
     func testWhenURLIsDataURLThenAddressBarIsDataURL() {
-        let tabViewModel = TabViewModel.aTabViewModel
-
         let urlString = "data:,Hello%2C%20World%21"
-        tabViewModel.tab.url = URL.makeURL(from: urlString)
+        let tabViewModel = TabViewModel.forTabWithURL(.makeURL(from: urlString)!)
 
         let addressBarStringExpectation = expectation(description: "Address bar string")
 
@@ -108,8 +101,7 @@ final class TabViewModelTests: XCTestCase {
     }
 
     func testWhenTabTitleIsNotNilThenTitleReflectsTabTitle() {
-        let tabViewModel = TabViewModel.aTabViewModel
-        tabViewModel.tab.url = URL.duckDuckGo
+        let tabViewModel = TabViewModel.forTabWithURL(.duckDuckGo)
         let testTitle = "Test title"
         tabViewModel.tab.title = testTitle
 
@@ -123,8 +115,7 @@ final class TabViewModelTests: XCTestCase {
     }
 
     func testWhenTabTitleIsNilThenTitleIsAddressBarString() {
-        let tabViewModel = TabViewModel.aTabViewModel
-        tabViewModel.tab.url = URL.duckDuckGo
+        let tabViewModel = TabViewModel.forTabWithURL(.duckDuckGo)
 
         let titleExpectation = expectation(description: "Title")
 
@@ -168,6 +159,11 @@ extension TabViewModel {
 
     static var aTabViewModel: TabViewModel {
         let tab = Tab()
+        return TabViewModel(tab: tab)
+    }
+
+    static func forTabWithURL(_ url: URL) -> TabViewModel {
+        let tab = Tab(content: .url(url))
         return TabViewModel(tab: tab)
     }
 

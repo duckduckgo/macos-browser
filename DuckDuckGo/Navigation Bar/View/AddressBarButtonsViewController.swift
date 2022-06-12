@@ -451,7 +451,9 @@ final class AddressBarButtonsViewController: NSViewController {
         }
 
         privacyEntryPointButton.contentTintColor = .privacyEnabledColor
+
         imageButton.applyFaviconStyle()
+        (imageButton.cell as? NSButtonCell)?.highlightsBy = NSCell.StyleMask(rawValue: 0)
 
         cameraButton.sendAction(on: .leftMouseDown)
         microphoneButton.sendAction(on: .leftMouseDown)

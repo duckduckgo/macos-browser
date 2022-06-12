@@ -50,6 +50,12 @@ extension AppDelegate {
         WindowsManager.closeWindows()
     }
 
+    // MARK: - Window
+
+    @IBAction func reopenAllWindowsFromLastSession(_ sender: Any?) {
+        stateRestorationManager.restoreLastSessionState(interactive: true)
+    }
+
     // MARK: - Help
 
     #if FEEDBACK
@@ -636,6 +642,10 @@ extension AppDelegate: NSMenuItemValidation {
         switch menuItem.action {
         case #selector(AppDelegate.closeAllWindows(_:)):
             return !WindowControllersManager.shared.mainWindowControllers.isEmpty
+
+        // Reopen All Windows from Last Session
+        case #selector(AppDelegate.reopenAllWindowsFromLastSession(_:)):
+            return stateRestorationManager.canRestoreLastSessionState
 
         default:
             return true

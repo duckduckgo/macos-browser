@@ -52,6 +52,7 @@ enum ThirdPartyBrowser: CaseIterable {
         case .lastPass: return .lastPass
         case .onePassword: return .onePassword
         case .csv: return nil
+        case .bookmarksHTML: return nil
         }
     }
 

@@ -50,7 +50,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
 
     private let keyStore = EncryptionKeyStore()
     private var fileStore: FileStore!
-    private var stateRestorationManager: AppStateRestorationManager!
+    private(set) var stateRestorationManager: AppStateRestorationManager!
     private var grammarFeaturesManager = GrammarFeaturesManager()
     private let crashReporter = CrashReporter()
     let updateController = UpdateController()
@@ -76,6 +76,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
             fileStore = EncryptedFileStore()
         }
         stateRestorationManager = AppStateRestorationManager(fileStore: fileStore)
+        stateRestorationManager.subscribeToAutomaticAppRelaunching(using: updateController.willRelaunchAppPublisher)
     }
 
     func applicationDidFinishLaunching(_ notification: Notification) {

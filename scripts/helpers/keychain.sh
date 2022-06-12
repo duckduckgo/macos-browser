@@ -10,7 +10,7 @@ clear_keychain() {
 	exit 0
 }
 
-user_has_password_in_keychain() {
+is_item_in_keychain() {
 	local account="$1"
 	security find-generic-password \
 		-s "${keychain_service_name}" \
@@ -18,7 +18,7 @@ user_has_password_in_keychain() {
 		>/dev/null 2>&1
 }
 
-retrieve_password_from_keychain() {
+retrieve_item_from_keychain() {
 	local account="$1"
 	security find-generic-password \
 		-s "${keychain_service_name}" \
@@ -27,11 +27,11 @@ retrieve_password_from_keychain() {
 		2>&1
 }
 
-store_password_in_keychain() {
+store_item_in_keychain() {
 	local account="$1"
-	local password="$2"
+	local item="$2"
 	security add-generic-password \
 		-s "${keychain_service_name}" \
 		-a "${account}" \
-		-w "${password}"
+		-w "${item}"
 }

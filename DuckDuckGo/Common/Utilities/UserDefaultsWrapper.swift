@@ -57,6 +57,7 @@ public struct UserDefaultsWrapper<T> {
 
         case fireInfoPresentedOnce = "fire.info.presented.once"
 
+        case restorePreviousSession = "preferences.startup.restore-previous-session"
         case currentThemeName = "com.duckduckgo.macos.currentThemeNameKey"
         case showFullURL = "preferences.appearance.show-full-url"
         case showAutocompleteSuggestions = "preferences.appearance.show-autocomplete-suggestions"
@@ -79,6 +80,8 @@ public struct UserDefaultsWrapper<T> {
         case homePageShowPageTitles = "home.page.show.page.titles"
         
         case hasMigratedTopLevelStorageToImplicitBookmarksFolder = "com.duckduckgo.bookmarks.hasMigratedTopLevelStorageToImplicitBookmarksFolder"
+
+        case appIsRelaunchingAutomatically = "app-relaunching-automatically"
     }
 
     enum RemovedKeys: String, CaseIterable {
