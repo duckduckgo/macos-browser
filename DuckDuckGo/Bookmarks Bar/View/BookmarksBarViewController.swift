@@ -350,25 +350,20 @@ final class BookmarksBarViewController: NSViewController {
             if initialDraggingLocation != nil {
                 // We just ended a drag operation, don't proceed with left click logic.
                 initialDraggingLocation = nil
-                print("DEBUG (\(Date()): Mouse up, but returning because we just ended dragging")
                 return
             }
 
             guard let index = buttonIndex(for: sender) else {
-                print("DEBUG (\(Date()): Mouse up, but returning because we have no button index")
                 return
             }
             
             guard let entity = bookmarkManager.list?.topLevelEntities[index] else {
-                print("DEBUG (\(Date()): Mouse up, but returning because we have no entity")
                 return
             }
             
             if let bookmark = entity as? Bookmark {
-                print("DEBUG (\(Date()): Mouse up, showing URL")
                 WindowControllersManager.shared.show(url: bookmark.url, newTab: false)
             } else if let folder = entity as? BookmarkFolder {
-                print("DEBUG (\(Date()): Mouse up, showing folder menu")
                 let menu = NSMenu(title: folder.title)
                 let childViewModels = folder.children.map(BookmarkViewModel.init)
                 let childMenuItems = bookmarkMenuItems(from: childViewModels, topLevel: false)
@@ -436,7 +431,6 @@ final class BookmarksBarViewController: NSViewController {
         }
         
         if let currentNearest = dropIndex, newDragIndex != dropIndex {
-            print("DEBUG: Setting new drag index \(newDragIndex), width \(additionalWidth)")
             dropIndex = newDragIndex
             let metadata = DraggedItemMetadata(dropIndex: newDragIndex, proposedItemWidth: additionalWidth)
             self.midpoints = updateFrames(for: self.buttons.map(\.button),
@@ -444,7 +438,6 @@ final class BookmarksBarViewController: NSViewController {
                                           hasClippedButtons: hasClippedButtons,
                                           draggedItemMetadata: metadata)
         } else if dropIndex == nil {
-            print("DEBUG: Setting initial drag index \(newDragIndex), width \(additionalWidth)")
             dropIndex = newDragIndex
             let metadata = DraggedItemMetadata(dropIndex: newDragIndex, proposedItemWidth: additionalWidth)
             self.midpoints = updateFrames(for: self.buttons.map(\.button),
@@ -475,10 +468,10 @@ extension BookmarksBarViewController: BookmarksBarViewDelegate {
         let result = midpoints.nearest(to: horizontalOffset)
         let additionalWidth: CGFloat
         
-        if draggingInfo.draggingSource is BookmarksBarViewModel, let width = draggingInfo.width {
-            additionalWidth = width + BookmarksBarViewModel.Constants.buttonSpacing
+        if let width = draggingInfo.width {
+            additionalWidth = min(width, BookmarksBarViewModel.Constants.maximumButtonWidth) + BookmarksBarViewModel.Constants.buttonSpacing
         } else {
-            additionalWidth = 100.0
+            additionalWidth = BookmarksBarViewModel.Constants.maximumButtonWidth + BookmarksBarViewModel.Constants.buttonSpacing
         }
         
         updateNearestDragIndex(result?.offset, additionalWidth: additionalWidth)
@@ -507,12 +500,11 @@ extension BookmarksBarViewController: BookmarksBarViewDelegate {
     func draggingEnded(draggingInfo: NSDraggingInfo) {
         initialDraggingLocation = nil
 
-        guard let index = draggedItemOriginalIndex,
-              let newIndex = dropIndex else {
+        guard let newIndex = dropIndex else {
             return
         }
         
-        if let draggedItemUUID = self.bookmarkManager.list?.topLevelEntities[index].id {
+        if let index = draggedItemOriginalIndex, let draggedItemUUID = self.bookmarkManager.list?.topLevelEntities[index].id {
             bookmarkManager.move(objectUUID: draggedItemUUID, toIndexWithinParentFolder: newIndex) { _ in
                 self.dropIndex = nil
                 self.draggedItemOriginalIndex = nil
@@ -520,8 +512,7 @@ extension BookmarksBarViewController: BookmarksBarViewDelegate {
             }
         } else if let draggedURLs = draggingInfo.draggingPasteboard.readObjects(forClasses: [NSURL.self]) as? [NSURL] {
             for draggedURL in draggedURLs {
-                let bookmark = Bookmark(id: UUID(), url: draggedURL as URL, title: (draggedURL as URL).absoluteString, isFavorite: false)
-                bookmarkManager.add(bookmark: bookmark, to: nil) { _ in }
+                bookmarkManager.makeBookmark(for: draggedURL as URL, title: draggedURL.description, isFavorite: false, index: newIndex)
             }
 
             self.dropIndex = nil

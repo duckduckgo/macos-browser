@@ -27,6 +27,7 @@ protocol BookmarkManager: AnyObject {
     func isHostInBookmarks(host: String) -> Bool
     func getBookmark(for url: URL) -> Bookmark?
     @discardableResult func makeBookmark(for url: URL, title: String, isFavorite: Bool) -> Bookmark?
+    @discardableResult func makeBookmark(for url: URL, title: String, isFavorite: Bool, index: Int?) -> Bookmark?
     @discardableResult func makeFolder(for title: String, parent: BookmarkFolder?) -> BookmarkFolder
     func remove(bookmark: Bookmark)
     func remove(folder: BookmarkFolder)
@@ -101,6 +102,10 @@ final class LocalBookmarkManager: BookmarkManager {
     }
 
     @discardableResult func makeBookmark(for url: URL, title: String, isFavorite: Bool) -> Bookmark? {
+        makeBookmark(for: url, title: title, isFavorite: isFavorite, index: nil)
+    }
+    
+    @discardableResult func makeBookmark(for url: URL, title: String, isFavorite: Bool, index: Int?) -> Bookmark? {
         guard list != nil else { return nil }
 
         guard !isUrlBookmarked(url: url) else {
@@ -112,7 +117,7 @@ final class LocalBookmarkManager: BookmarkManager {
         let bookmark = Bookmark(id: id, url: url, title: title, isFavorite: isFavorite, parentFolderUUID: nil)
 
         list?.insert(bookmark)
-        bookmarkStore.save(bookmark: bookmark, parent: nil) { [weak self] success, _  in
+        bookmarkStore.save(bookmark: bookmark, parent: nil, index: index) { [weak self] success, _  in
             guard success else {
                 self?.list?.remove(bookmark)
                 return
@@ -120,6 +125,7 @@ final class LocalBookmarkManager: BookmarkManager {
 
             self?.loadBookmarks()
         }
+
         return bookmark
     }
 

@@ -80,7 +80,7 @@ final class BookmarksBarViewModel: NSObject {
     func handle(event: ViewEvent) {
         switch event {
         case .mouseDown:
-            print("VM Mouse down")
+            break
         case .mouseDragged(let draggedButtonIndex, let currentLocation):
             if case let .beginningDrag(originalLocation) = self.state {
                 let distance = originalLocation.distance(to: currentLocation)
@@ -93,9 +93,9 @@ final class BookmarksBarViewModel: NSObject {
         case .mouseUp:
             self.state = .idle
         case .beganDraggingSession:
-            print("Dragging session began")
+            break
         case .containerFrameChanged:
-            print("Frame changed")
+            break
         }
     }
  
@@ -120,8 +120,6 @@ extension BookmarksBarViewModel: NSDraggingSource {
 //    }
 
     func draggingSession(_ session: NSDraggingSession, sourceOperationMaskFor context: NSDraggingContext) -> NSDragOperation {
-        print("BookmarksBarViewModel: \(#function)")
-        
         switch context {
         case .withinApplication: return .generic
         case .outsideApplication: return []

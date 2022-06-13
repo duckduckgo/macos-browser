@@ -41,7 +41,7 @@ struct BookmarkImportResult: Equatable {
 protocol BookmarkStore {
 
     func loadAll(type: BookmarkStoreFetchPredicateType, completion: @escaping ([BaseBookmarkEntity]?, Error?) -> Void)
-    func save(bookmark: Bookmark, parent: BookmarkFolder?, completion: @escaping (Bool, Error?) -> Void)
+    func save(bookmark: Bookmark, parent: BookmarkFolder?, index: Int?, completion: @escaping (Bool, Error?) -> Void)
     func save(folder: BookmarkFolder, parent: BookmarkFolder?, completion: @escaping (Bool, Error?) -> Void)
     func remove(objectsWithUUIDs: [UUID], completion: @escaping (Bool, Error?) -> Void)
     func update(bookmark: Bookmark)
@@ -152,7 +152,7 @@ final class LocalBookmarkStore: BookmarkStore {
         }
     }
 
-    func save(bookmark: Bookmark, parent: BookmarkFolder?, completion: @escaping (Bool, Error?) -> Void) {
+    func save(bookmark: Bookmark, parent: BookmarkFolder?, index: Int?, completion: @escaping (Bool, Error?) -> Void) {
         context.perform { [weak self] in
             guard let self = self else {
                 DispatchQueue.main.async { completion(false, BookmarkStoreError.storeDeallocated) }
@@ -177,10 +177,20 @@ final class LocalBookmarkStore: BookmarkStore {
             if let parent = parent {
                 let parentFetchRequest = BaseBookmarkEntity.singleEntity(with: parent.id)
                 let parentFetchRequestResults = try? self.context.fetch(parentFetchRequest)
-
-                bookmarkMO.parentFolder = parentFetchRequestResults?.first
+                let parentFolder = parentFetchRequestResults?.first
+                
+                if let index = index {
+                    parentFolder?.mutableChildren.insert(bookmarkMO, at: index)
+                } else {
+                    parentFolder?.mutableChildren.add(bookmarkMO)
+                }
             } else {
-                bookmarkMO.parentFolder = self.cachedReadOnlyTopLevelFolder
+                // TODO: Fetch the top level folder and mutate that, instead of the top level folder.
+                if let index = index {
+                    self.cachedReadOnlyTopLevelFolder?.mutableChildren.insert(bookmarkMO, at: index)
+                } else {
+                    self.cachedReadOnlyTopLevelFolder?.mutableChildren.add(bookmarkMO)
+                }
             }
 
             do {
@@ -736,9 +746,9 @@ final class LocalBookmarkStore: BookmarkStore {
         }
     }
     
-    func save(bookmark: Bookmark, parent: BookmarkFolder?) async -> Result<Bool, Error> {
+    func save(bookmark: Bookmark, parent: BookmarkFolder?, index: Int?) async -> Result<Bool, Error> {
         return await withCheckedContinuation { continuation in
-            save(bookmark: bookmark, parent: parent) { result, error in
+            save(bookmark: bookmark, parent: parent, index: index) { result, error in
                 if let error = error {
                     continuation.resume(returning: .failure(error))
                     return

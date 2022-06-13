@@ -64,18 +64,6 @@ final class BookmarksBarView: ColorView {
         delegate?.draggingEnded(draggingInfo: sender)
     }
     
-    override func performDragOperation(_ sender: NSDraggingInfo) -> Bool {
-        let classes = [NSString.self, NSURL.self]
-
-        guard let pasteboardObjects = sender.draggingPasteboard.readObjects(forClasses: classes, options: nil), pasteboardObjects.count > 0 else {
-            print("\(#function): Couldn't read objects")
-            return false
-        }
-        
-        print("\(#function): Did read objects \(pasteboardObjects)")
-        return true
-    }
-    
 }
 
 extension NSDraggingInfo {
