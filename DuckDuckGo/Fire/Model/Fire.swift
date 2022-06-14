@@ -324,7 +324,7 @@ final class Fire {
             } else {
                 tabCollectionViewModel.appendNewTab(forceChange: true)
             }
-            tabCollectionViewModel.tabCollection.cleanLastRemovedTab()
+            tabCollectionViewModel.tabCollection.cleanRecentlyClosedTabsCache()
 
             completion()
         }
@@ -405,11 +405,8 @@ fileprivate extension TabCollectionViewModel {
         // Clean local history of closed tabs
         tabCollection.localHistoryOfRemovedTabs.subtract(domains)
 
-        // Clean last removed tab if needed
-        if let lastRemovedTabHost = tabCollection.lastRemovedTabCache?.url?.host,
-           domains.contains(lastRemovedTabHost) {
-            tabCollection.cleanLastRemovedTab()
-        }
+        // Clean cache of recently closed tabs
+        tabCollection.cleanRecentlyClosedTabsCache(domains: domains)
     }
 }
 

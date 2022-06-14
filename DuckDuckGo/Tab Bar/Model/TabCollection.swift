@@ -22,7 +22,7 @@ import os.log
 final class TabCollection: NSObject {
 
     @Published private(set) var tabs: [Tab]
-    @Published private(set) var lastRemovedTabCache: (url: URL?, index: Int)?
+    @Published private(set) var recentlyClosedTabsCache = [(tabContent: Tab.TabContent, index: Int)]()
 
     init(tabs: [Tab] = []) {
         self.tabs = tabs
@@ -49,7 +49,7 @@ final class TabCollection: NSObject {
             return false
         }
 
-        saveLastRemovedTab(at: index)
+        cacheRecentlyClosedTab(at: index)
         tabWillClose(at: index)
         tabs.remove(at: index)
 
@@ -129,31 +129,44 @@ final class TabCollection: NSObject {
         tabs[index] = tab
     }
 
-    // MARK: - Last Removed Tab
+    // MARK: - Recently Closed Tabs
 
-    private func saveLastRemovedTab(at index: Int) {
-        guard index >= 0, index < tabs.count else {
+    private func cacheRecentlyClosedTab(at tabIndex: Int) {
+        guard tabIndex >= 0, tabIndex < tabs.count else {
             os_log("TabCollection: Index out of bounds", type: .error)
             return
         }
 
-        let tab = tabs[index]
-        lastRemovedTabCache = (tab.content.url, index)
+        let tab = tabs[tabIndex]
+        recentlyClosedTabsCache.append((tab.content, tabIndex))
     }
 
-    func putBackLastRemovedTab() {
-        guard let lastRemovedTabCache = lastRemovedTabCache else {
+    // Returns new tab index
+    @discardableResult func reopenRecentlyClosedTab(from cacheIndex: Int? = nil) -> Int? {
+        let cacheIndex = cacheIndex ?? (recentlyClosedTabsCache.count - 1)
+        guard let cacheItem = recentlyClosedTabsCache[safe: cacheIndex] else {
             os_log("TabCollection: No tab removed yet", type: .error)
-            return
+            return nil
         }
 
-        let tab = Tab(content: lastRemovedTabCache.url.map(Tab.TabContent.url) ?? .homePage)
-        insert(tab: tab, at: min(lastRemovedTabCache.index, tabs.count))
-        self.lastRemovedTabCache = nil
+        let tab = Tab(content: cacheItem.tabContent)
+        let tabIndex = min(cacheItem.index, tabs.count)
+        insert(tab: tab, at: tabIndex)
+        recentlyClosedTabsCache.remove(at: cacheIndex)
+        return tabIndex
     }
 
-    func cleanLastRemovedTab() {
-        lastRemovedTabCache = nil
+    func cleanRecentlyClosedTabsCache(domains: Set<String>? = nil) {
+        if let domains = domains {
+            recentlyClosedTabsCache.removeAll { (tabContent, _) in
+                if let host = tabContent.url?.host, domains.contains(host) {
+                    return true
+                }
+                return false
+            }
+        } else {
+            recentlyClosedTabsCache.removeAll()
+        }
     }
 
     // MARK: - Fire button

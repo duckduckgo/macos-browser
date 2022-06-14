@@ -161,17 +161,17 @@ final class TabCollectionTests: XCTestCase {
 
     // MARK: - Last Removed Tab
 
-    func testWhenNoTabWasRemovedThenPutBackLastRemovedTabDoesNothing() {
+    func testWhenNoTabWasRemoved_ThenReopenRecentlyClosedTabDoesNothing() {
         let tabCollection = TabCollection()
         let tabsCount = tabCollection.tabs.count
 
-        tabCollection.putBackLastRemovedTab()
+        tabCollection.reopenRecentlyClosedTab()
 
-        XCTAssertNil(tabCollection.lastRemovedTabCache)
+        XCTAssert(tabCollection.recentlyClosedTabsCache.isEmpty)
         XCTAssertEqual(tabsCount, tabCollection.tabs.count)
     }
 
-    func testPutBackLastRemovedTab() {
+    func testReopenLastClosedTab() {
         let tabCollection = TabCollection()
 
         let tab1 = Tab()
@@ -182,16 +182,20 @@ final class TabCollectionTests: XCTestCase {
         let tab3 = Tab()
         tabCollection.append(tab: tab3)
 
-        XCTAssert(tabCollection.remove(at: 1))
-        tabCollection.putBackLastRemovedTab()
+        XCTAssert(tabCollection.remove(at: 0))
+        XCTAssert(tabCollection.remove(at: 0))
+        XCTAssert(tabCollection.remove(at: 0))
+        tabCollection.reopenRecentlyClosedTab()
+        tabCollection.reopenRecentlyClosedTab()
+        tabCollection.reopenRecentlyClosedTab()
 
-        XCTAssertEqual(tabCollection.tabs[0], tab1)
-        XCTAssertEqual(tabCollection.tabs[1].url, tab2.url)
-        XCTAssertEqual(tabCollection.tabs[2], tab3)
-        XCTAssertNil(tabCollection.lastRemovedTabCache)
+        XCTAssertEqual(tabCollection.tabs[0].content, tab1.content)
+        XCTAssertEqual(tabCollection.tabs[1].content, tab2.content)
+        XCTAssertEqual(tabCollection.tabs[2].content, tab3.content)
+        XCTAssert(tabCollection.recentlyClosedTabsCache.isEmpty)
     }
 
-    func testWhenLastRemovedTabCacheWasCleaned_ThenPutBackLastRemovedTabDoesNothing() {
+    func testWhenRecentlyClosedCacheIsCleaned_ThenReopenLastClosedTabDoesNothing() {
         let tabCollection = TabCollection()
 
         let tab = Tab()
@@ -201,10 +205,10 @@ final class TabCollectionTests: XCTestCase {
 
         let tabsCount = tabCollection.tabs.count
 
-        tabCollection.cleanLastRemovedTab()
-        tabCollection.putBackLastRemovedTab()
+        tabCollection.cleanRecentlyClosedTabsCache()
+        tabCollection.reopenRecentlyClosedTab()
 
-        XCTAssertNil(tabCollection.lastRemovedTabCache)
+        XCTAssert(tabCollection.recentlyClosedTabsCache.isEmpty)
         XCTAssertEqual(tabsCount, tabCollection.tabs.count)
     }
 

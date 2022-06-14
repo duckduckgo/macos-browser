@@ -70,7 +70,7 @@ final class FireTests: XCTestCase {
         XCTAssert(manager.clearCalled)
         XCTAssert(historyCoordinator.burnCalled)
         XCTAssert(permissionManager.burnPermissionsCalled)
-        XCTAssertNil(tabCollectionViewModel.tabCollection.lastRemovedTabCache)
+        XCTAssert(tabCollectionViewModel.tabCollection.recentlyClosedTabsCache.isEmpty)
     }
 
     func testWhenBurnAllThenBurningFlagToggles() {
