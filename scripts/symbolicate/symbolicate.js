@@ -174,31 +174,30 @@ function symbolicateIPSFile(crashFile, metaJSON, lines) {
         return;
     }
 
-    let changes;
+    let changes = 0;
     if (crashJSON.asiBacktraces) {
-        changes = symbolicateAsiBacktraces(crashJSON, dwarf, arch, ddgBaseAddress);
-    } else if (crashJSON.threads) {
-        changes = symbolicateThreads(crashJSON, dwarf, arch, ddgBaseAddress, ddgImageIndex);
-    } else {
-        console.log(`WARN no 'asiBacktraces' or 'threads' found in ${crashFile}`);
-        console.log();
-        return;
+        changes += symbolicateAsiBacktraces(crashJSON, dwarf, arch, ddgBaseAddress);
     }
-
-    let updatedJSON = JSON.stringify(metaJSON) + "\n" + JSON.stringify(crashJSON, null, '\t');
-
-    let fileInfo = path.parse(crashFile);
-    if (fileInfo.ext === ".ips") {
-        fs.writeFileSync(crashFile, updatedJSON);
-    } else {
-        fileInfo.base = undefined;
-        fileInfo.ext = ".ips";
-        fs.writeFileSync(path.format(fileInfo), updatedJSON);
-        fs.unlinkSync(crashFile);
+    if (crashJSON.threads) {
+        changes += symbolicateThreads(crashJSON, dwarf, arch, ddgBaseAddress, ddgImageIndex);
     }
 
     if (changes > 0) {
-        console.log(`SUCCESS updated ${crashFile}`);
+        let updatedJSON = JSON.stringify(metaJSON) + "\n" + JSON.stringify(crashJSON, null, '\t');
+
+        let fileInfo = path.parse(crashFile);
+        if (fileInfo.ext === ".ips") {
+            fs.writeFileSync(crashFile, updatedJSON);
+            console.log(`SUCCESS updated ${crashFile}`);
+        } else {
+            fileInfo.base = undefined;
+            fileInfo.ext = ".ips";
+            const newCrashFile = path.format(fileInfo);
+            fs.writeFileSync(newCrashFile, updatedJSON);
+            fs.unlinkSync(crashFile);
+            console.log(`SUCCESS updated ${crashFile} (renamed as ${newCrashFile})`);
+        }
+
     } else {
         console.log(`WARN no changes made to ${crashFile}`);
     }
@@ -249,6 +248,8 @@ function symbolicateAsiBacktraces(crashJSON, dwarf, arch, ddgBaseAddress) {
     }).join('\n');
 
     crashJSON.asiBacktraces[0] = symbolicatedCrash;
+
+    return changes;
 }
 
 function symbolicateThreads(crashJSON, dwarf, arch, ddgBaseAddress, ddgImageIndex) {
