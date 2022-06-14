@@ -39,7 +39,7 @@ function symbolicateFile(filePath) {
     }
 }
 
-function checkAppAndDWARFFiles(version) {
+function checkDWARFFile(version) {
     let dwarf = `binaries/${version}/DuckDuckGo.app.dSYM/Contents/Resources/DWARF/DuckDuckGo`;
     if (!fileExistsSync(dwarf)) {
         console.log(`WARN missing dwarf binary for ${version}`);
@@ -47,18 +47,11 @@ function checkAppAndDWARFFiles(version) {
         return;
     }
 
-    let app = `binaries/${version}/DuckDuckGo.app`;
-    if (!fileExistsSync(app)) {
-        console.log(`WARN missing app binary for ${version}`);
-        console.log();
-        return;
-    }
-
-    return { dwarf, app };
+    return dwarf;
 }
 
 function symbolicateCrashFile(crashFile, lines) {
-    let versionLine = lines.find((l) => l.startsWith("Version:"));
+    const versionLine = lines.find((l) => l.startsWith("Version:"));
     if (!versionLine) {
         console.log(`WARN incorrect crash file format`);
         console.log();
@@ -66,7 +59,7 @@ function symbolicateCrashFile(crashFile, lines) {
     }
     const version = versionLine.match(/Version:\s+([\d\.]+) .*/)[1]
 
-    let codeTypeLine = lines.find((l) => l.startsWith("Code Type:"));
+    const codeTypeLine = lines.find((l) => l.startsWith("Code Type:"));
     if (!codeTypeLine) {
         console.log(`WARN incorrect crash file format`);
         console.log();
@@ -78,9 +71,12 @@ function symbolicateCrashFile(crashFile, lines) {
         "ARM-64": "arm64"
     }[codeType];
 
-    let { dwarf, app } = checkAppAndDWARFFiles(version);
+    const dwarf = checkDWARFFile(version);
+    if (!dwarf) {
+        return;
+    }
 
-    let binaryImagesLineIndex = lines.findIndex((l) => l.startsWith("Binary Images:"));
+    const binaryImagesLineIndex = lines.findIndex((l) => l.startsWith("Binary Images:"));
     let lineIndex = binaryImagesLineIndex + 1;
     const binaryImageRegex = /\s+0x([0-9a-fA-F]+) - \s+0x[0-9a-fA-F]+.*com\.duckduckgo\.macos\.browser/;
 
@@ -92,6 +88,12 @@ function symbolicateCrashFile(crashFile, lines) {
             break;
         }
         lineIndex += 1;
+    }
+
+    if (!ddgBaseAddress) {
+        console.log(`WARN DuckDuckGo image not found in ${crashFile}, skipping`);
+        console.log();
+        return;
     }
 
     lineIndex = 0;
@@ -114,12 +116,11 @@ function symbolicateCrashFile(crashFile, lines) {
 
     if (changes.length > 0) {
 
-        let command = `atos -a ${arch} -o ${dwarf} -l 0x${ddgBaseAddress} ${changes.map((c) => c.symbolAddress).join(" ")}`
+        const command = `atos -arch ${arch} -o ${dwarf} -l 0x${ddgBaseAddress} ${changes.map((c) => c.symbolAddress).join(" ")}`
         console.log(command);
         let symbols = execSync(command).toString().trim().split('\n');
-        // console.log(symbols);
 
-        for (let i in changes) {
+        for (const i in changes) {
             const change = changes[i];
             lines[change.lineIndex] = lines[change.lineIndex].replace(change.symbolPlaceholder, symbols[i]);
         }
@@ -162,7 +163,16 @@ function symbolicateIPSFile(crashFile, metaJSON, lines) {
         }
     }
 
-    let { dwarf, app } = checkAppAndDWARFFiles(version);
+    if (!arch) {
+        console.log(`WARN DuckDuckGo image not found in ${crashFile}, skipping`);
+        console.log();
+        return;
+    }
+
+    let dwarf = checkDWARFFile(version);
+    if (!dwarf) {
+        return;
+    }
 
     let changes;
     if (crashJSON.asiBacktraces) {
@@ -229,7 +239,7 @@ function symbolicateAsiBacktraces(crashJSON, dwarf, arch, ddgBaseAddress) {
             let symbolOffset = binaryLoadAddress + offset;
             let symbolAddress = symbolOffset.toString(16)
 
-            let command = `atos -a ${arch} -o ${dwarf} -l 0x${ddgBaseAddress} 0x${symbolAddress}`
+            let command = `atos -arch ${arch} -o ${dwarf} -l 0x${ddgBaseAddress} 0x${symbolAddress}`
             console.log(command);
             let symbol = execSync(command);
             return e.replace(rawLoadAddress, `${rawLoadAddress} ${symbol}`).replace("DuckDuckGo + ", "").replace("\n", "");
@@ -266,7 +276,7 @@ function symbolicateThreads(crashJSON, dwarf, arch, ddgBaseAddress, ddgImageInde
         }
     }
 
-    let command = `atos -a ${arch} -o ${dwarf} -l 0x${ddgBaseAddress} ${changes.map((c) => c.symbolAddress).join(" ")}`
+    let command = `atos -arch ${arch} -o ${dwarf} -l 0x${ddgBaseAddress} ${changes.map((c) => c.symbolAddress).join(" ")}`
     console.log(command);
     let symbols = execSync(command).toString().trim().split('\n');
 
