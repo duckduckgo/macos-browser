@@ -8,7 +8,11 @@
         <!--Application-->
         <scene sceneID="JPo-4y-FX3">
             <objects>
-                <customObject id="Voe-Tx-rLC" customClass="AppDelegate" customModule="DuckDuckGo_Privacy_Browser" customModuleProvider="target"/>
+                <customObject id="Voe-Tx-rLC" customClass="AppDelegate" customModule="DuckDuckGo_Privacy_Browser" customModuleProvider="target">
+                    <connections>
+                        <outlet property="recentlyClosedMenuItem" destination="pWT-lm-yTC" id="rdf-F2-HCf"/>
+                    </connections>
+                </customObject>
                 <customObject id="Ady-hI-5gd" userLabel="First Responder" customClass="NSResponder" sceneMemberID="firstResponder"/>
                 <customObject id="WIK-gq-Ncg" customClass="CopyHandler" customModule="DuckDuckGo_Privacy_Browser" customModuleProvider="target"/>
                 <customObject id="YLy-65-1bz" customClass="NSFontManager"/>
@@ -566,6 +570,10 @@ CQ
                                                 <action selector="reopenLastClosedTab:" target="Ady-hI-5gd" id="jzQ-2q-HGB"/>
                                             </connections>
                                         </menuItem>
+                                        <menuItem title="Recently Closed" id="pWT-lm-yTC">
+                                            <modifierMask key="keyEquivalentModifierMask"/>
+                                            <menu key="submenu" id="f0J-Yk-EaI"/>
+                                        </menuItem>
                                         <menuItem title="Reopen All Windows from Last Session" enabled="NO" id="C6V-uF-uX8">
                                             <modifierMask key="keyEquivalentModifierMask"/>
                                             <connections>
@@ -772,6 +780,7 @@ CQ
                             <outlet property="preferencesMenuItem" destination="yD7-Ol-cRF" id="f58-zA-Auu"/>
                             <outlet property="printMenuItem" destination="uFk-FD-FTB" id="mOP-Xp-myS"/>
                             <outlet property="printSeparatorItem" destination="anH-0y-7dE" id="E6b-rl-clQ"/>
+                            <outlet property="recentlyClosedMenuItem" destination="pWT-lm-yTC" id="xue-50-IzM"/>
                             <outlet property="reloadMenuItem" destination="aKZ-VG-MOp" id="J3D-X3-Xg3"/>
                             <outlet property="reopenAllWindowsFromLastSessionMenuItem" destination="C6V-uF-uX8" id="WVJ-17-v1S"/>
                             <outlet property="reopenLastClosedTabMenuItem" destination="c3l-v1-kxk" id="eGw-Dg-del"/>

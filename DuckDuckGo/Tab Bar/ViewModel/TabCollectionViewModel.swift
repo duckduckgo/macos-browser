@@ -396,14 +396,14 @@ final class TabCollectionViewModel: NSObject {
 
     // MARK: - Others
 
-    func reopenRecentlyClosedTab() {
+    func reopenRecentlyClosedTab(cacheIndex: Int? = nil) {
         guard changesEnabled else { return }
 
-        let index = tabCollection.reopenRecentlyClosedTab()
+        let tabIndex = tabCollection.reopenRecentlyClosedTab(cacheIndex: cacheIndex)
 
-        if let index = index {
-            select(at: index)
-            delegate?.tabCollectionViewModelDidInsert(self, at: index, selected: true)
+        if let tabIndex = tabIndex {
+            select(at: tabIndex)
+            delegate?.tabCollectionViewModelDidInsert(self, at: tabIndex, selected: true)
         }
     }
 

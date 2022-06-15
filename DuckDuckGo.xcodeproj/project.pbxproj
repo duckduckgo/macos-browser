@@ -387,6 +387,8 @@
 		AA585D84248FD31100E9A3E2 /* BrowserTabViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA585D83248FD31100E9A3E2 /* BrowserTabViewController.swift */; };
 		AA585D86248FD31400E9A3E2 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = AA585D85248FD31400E9A3E2 /* Assets.xcassets */; };
 		AA585DAF2490E6E600E9A3E2 /* MainViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA585DAE2490E6E600E9A3E2 /* MainViewController.swift */; };
+		AA5C1DD1285A154E0089850C /* RecentlyClosedMenu.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA5C1DD0285A154E0089850C /* RecentlyClosedMenu.swift */; };
+		AA5C1DD3285A217F0089850C /* RecentlyClosedTabsCacheItem.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA5C1DD2285A217F0089850C /* RecentlyClosedTabsCacheItem.swift */; };
 		AA5C8F59258FE21F00748EB7 /* NSTextFieldExtension.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA5C8F58258FE21F00748EB7 /* NSTextFieldExtension.swift */; };
 		AA5C8F5E2590EEE800748EB7 /* NSPointExtension.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA5C8F5D2590EEE800748EB7 /* NSPointExtension.swift */; };
 		AA5C8F632591021700748EB7 /* NSApplicationExtension.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA5C8F622591021700748EB7 /* NSApplicationExtension.swift */; };
@@ -1158,6 +1160,8 @@
 		AA585D90248FD31400E9A3E2 /* Unit Tests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = "Unit Tests.xctest"; sourceTree = BUILT_PRODUCTS_DIR; };
 		AA585D96248FD31400E9A3E2 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		AA585DAE2490E6E600E9A3E2 /* MainViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MainViewController.swift; sourceTree = "<group>"; };
+		AA5C1DD0285A154E0089850C /* RecentlyClosedMenu.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RecentlyClosedMenu.swift; sourceTree = "<group>"; };
+		AA5C1DD2285A217F0089850C /* RecentlyClosedTabsCacheItem.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RecentlyClosedTabsCacheItem.swift; sourceTree = "<group>"; };
 		AA5C8F58258FE21F00748EB7 /* NSTextFieldExtension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NSTextFieldExtension.swift; sourceTree = "<group>"; };
 		AA5C8F5D2590EEE800748EB7 /* NSPointExtension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NSPointExtension.swift; sourceTree = "<group>"; };
 		AA5C8F622591021700748EB7 /* NSApplicationExtension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NSApplicationExtension.swift; sourceTree = "<group>"; };
@@ -3047,6 +3051,7 @@
 				AA6EF9B425081B4C004754E6 /* MainMenuActions.swift */,
 				AA97BF4525135DD30014931A /* ApplicationDockMenu.swift */,
 				B63ED0E426BB8FB900A9DAD1 /* SharingMenu.swift */,
+				AA5C1DD0285A154E0089850C /* RecentlyClosedMenu.swift */,
 			);
 			path = Menus;
 			sourceTree = "<group>";
@@ -3089,6 +3094,7 @@
 			isa = PBXGroup;
 			children = (
 				AA9FF95C24A1FA1C0039E328 /* TabCollection.swift */,
+				AA5C1DD2285A217F0089850C /* RecentlyClosedTabsCacheItem.swift */,
 			);
 			path = Model;
 			sourceTree = "<group>";
@@ -4494,6 +4500,7 @@
 				B693954E26F04BEB0015B914 /* ProgressView.swift in Sources */,
 				B69B503C2726A12500758A2B /* StatisticsStore.swift in Sources */,
 				B693955426F04BEC0015B914 /* ColorView.swift in Sources */,
+				AA5C1DD3285A217F0089850C /* RecentlyClosedTabsCacheItem.swift in Sources */,
 				B6BBF17427475B15004F850E /* PopupBlockedPopover.swift in Sources */,
 				8589063A267BCD8E00D23B0D /* SaveCredentialsPopover.swift in Sources */,
 				4B379C1527BD91E3008A968E /* QuartzIdleStateProvider.swift in Sources */,
@@ -4609,6 +4616,7 @@
 				37534CA8281198CD002621E7 /* AdjacentItemEnumerator.swift in Sources */,
 				AA9B7C7E26A06E040008D425 /* TrackerInfo.swift in Sources */,
 				B6553692268440D700085A79 /* WKProcessPool+GeolocationProvider.swift in Sources */,
+				AA5C1DD1285A154E0089850C /* RecentlyClosedMenu.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

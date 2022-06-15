@@ -22,7 +22,7 @@ import os.log
 final class TabCollection: NSObject {
 
     @Published private(set) var tabs: [Tab]
-    @Published private(set) var recentlyClosedTabsCache = [(tabContent: Tab.TabContent, index: Int)]()
+    @Published private(set) var recentlyClosedTabsCache = [RecentlyClosedTabsCacheItem]()
 
     init(tabs: [Tab] = []) {
         self.tabs = tabs
@@ -138,11 +138,15 @@ final class TabCollection: NSObject {
         }
 
         let tab = tabs[tabIndex]
-        recentlyClosedTabsCache.append((tab.content, tabIndex))
+        let cacheItem = RecentlyClosedTabsCacheItem(tabContent: tab.content,
+                                                    favicon: tab.favicon,
+                                                    title: tab.title,
+                                                    index: tabIndex)
+        recentlyClosedTabsCache.append(cacheItem)
     }
 
     // Returns new tab index
-    @discardableResult func reopenRecentlyClosedTab(from cacheIndex: Int? = nil) -> Int? {
+    @discardableResult func reopenRecentlyClosedTab(cacheIndex: Int? = nil) -> Int? {
         let cacheIndex = cacheIndex ?? (recentlyClosedTabsCache.count - 1)
         guard let cacheItem = recentlyClosedTabsCache[safe: cacheIndex] else {
             os_log("TabCollection: No tab removed yet", type: .error)
@@ -158,8 +162,8 @@ final class TabCollection: NSObject {
 
     func cleanRecentlyClosedTabsCache(domains: Set<String>? = nil) {
         if let domains = domains {
-            recentlyClosedTabsCache.removeAll { (tabContent, _) in
-                if let host = tabContent.url?.host, domains.contains(host) {
+            recentlyClosedTabsCache.removeAll { (cacheItem) in
+                if let host = cacheItem.tabContent.url?.host, domains.contains(host) {
                     return true
                 }
                 return false

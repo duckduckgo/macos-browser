@@ -295,6 +295,17 @@ extension MainViewController {
         tabCollectionViewModel.reopenRecentlyClosedTab()
     }
 
+    @IBAction func recentlyClosedAction(_ sender: Any?) {
+
+        guard let menuItem = sender as? NSMenuItem,
+              let cacheIndex = menuItem.representedObject as? Int else {
+                  assertionFailure("Wrong sender for recentlyClosedAction()")
+                  return
+              }
+
+        tabCollectionViewModel.reopenRecentlyClosedTab(cacheIndex: cacheIndex)
+    }
+
     // MARK: - Bookmarks
 
     @IBAction func bookmarkThisPage(_ sender: Any) {

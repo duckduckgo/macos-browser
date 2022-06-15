@@ -22,6 +22,10 @@ import Combine
 
 final class MainMenu: NSMenu {
 
+    enum Constants {
+        static let maxTitleLength = 55
+    }
+
     @IBOutlet weak var checkForUpdatesMenuItem: NSMenuItem?
     @IBOutlet weak var checkForUpdatesSeparatorItem: NSMenuItem?
 
@@ -46,6 +50,7 @@ final class MainMenu: NSMenu {
     @IBOutlet weak var reloadMenuItem: NSMenuItem?
     @IBOutlet weak var stopMenuItem: NSMenuItem?
     @IBOutlet weak var homeMenuItem: NSMenuItem?
+    @IBOutlet weak var recentlyClosedMenuItem: NSMenuItem!
     @IBOutlet weak var reopenLastClosedTabMenuItem: NSMenuItem? {
         didSet {
             reopenMenuItemKeyEquivalentManager.lastTabMenuItem = reopenLastClosedTabMenuItem
@@ -84,6 +89,7 @@ final class MainMenu: NSMenu {
     @IBOutlet weak var actualSizeMenuItem: NSMenuItem?
 
     let sharingMenu = SharingMenu()
+    var recentlyClosedMenu: RecentlyClosedMenu?
 
     required init(coder: NSCoder) {
         super.init(coder: coder)
@@ -100,6 +106,8 @@ final class MainMenu: NSMenu {
         }
         sharingMenu.title = shareMenuItem.title
         shareMenuItem.submenu = sharingMenu
+
+        updateRecentlyClosedMenu()
     }
 
     private func setup() {
@@ -205,6 +213,20 @@ final class MainMenu: NSMenu {
     // swiftlint:enable function_body_length
 
     private let reopenMenuItemKeyEquivalentManager = ReopenMenuItemKeyEquivalentManager()
+
+    // MARK: - Recently Closed
+
+    private func updateRecentlyClosedMenu() {
+        guard let lastKeyMainWindowController = WindowControllersManager.shared.lastKeyMainWindowController else {
+            recentlyClosedMenuItem.isEnabled = false
+            return
+        }
+
+        recentlyClosedMenu = RecentlyClosedMenu(from: lastKeyMainWindowController)
+        recentlyClosedMenuItem.submenu = recentlyClosedMenu
+        recentlyClosedMenuItem.isEnabled = !(recentlyClosedMenu?.items ?? [] ).isEmpty
+    }
+
 }
 
 extension MainMenu: NSMenuDelegate {
