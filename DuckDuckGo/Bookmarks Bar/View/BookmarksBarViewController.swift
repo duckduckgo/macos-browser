@@ -19,6 +19,7 @@
 import Foundation
 import AppKit
 import Combine
+import os.log
 
 // swiftlint:disable:next type_body_length
 final class BookmarksBarViewController: NSViewController {
@@ -88,10 +89,17 @@ final class BookmarksBarViewController: NSViewController {
 
         view.registerForDraggedTypes([.string, .URL])
         view.postsFrameChangedNotifications = true
+        
         NotificationCenter.default.addObserver(self,
                                                selector: #selector(bookmarksBarViewFrameChanged),
                                                name: NSView.frameDidChangeNotification,
                                                object: view)
+        
+        NotificationCenter.default.addObserver(self,
+                                               selector: #selector(refreshFavicons),
+                                               name: .faviconCacheUpdated,
+                                               object: nil)
+        
         
         // subscribeToViewModelState()
         subscribeToBookmarks()
@@ -143,6 +151,13 @@ final class BookmarksBarViewController: NSViewController {
             removeLastButton()
         } else {
             tryToRestoreClippedButton()
+        }
+    }
+    
+    @objc
+    private func refreshFavicons() {        
+        for buttonData in buttons {
+            buttonData.button.refreshFaviconIfNeeded()
         }
     }
     
@@ -212,7 +227,8 @@ final class BookmarksBarViewController: NSViewController {
         self.midpoints = updateFrames(for: buttons.map(\.button),
                                       containerFrame: view.frame,
                                       hasClippedButtons: hasClippedButtons,
-                                      draggedItemMetadata: nil)
+                                      draggedItemMetadata: nil,
+                                      animated: false)
         
         var clippedItemsIndicatorFrame = clippedItemsIndicator.frame
         clippedItemsIndicatorFrame.origin.y = view.frame.midY - (clippedItemsIndicatorFrame.height / 2)
@@ -227,7 +243,8 @@ final class BookmarksBarViewController: NSViewController {
     private func updateFrames(for buttons: [NSButton],
                               containerFrame: CGRect,
                               hasClippedButtons: Bool,
-                              draggedItemMetadata: DraggedItemMetadata?) -> [CGFloat] {
+                              draggedItemMetadata: DraggedItemMetadata?,
+                              animated: Bool) -> [CGFloat] {
         var midpoints: [CGFloat] = []
         var previousMaximumXValue: CGFloat
         
@@ -241,9 +258,11 @@ final class BookmarksBarViewController: NSViewController {
         let visibleButtons = buttons.filter { button in
             return !button.isHidden
         }
+        
+        os_log("Updating button frames, animated = %s", log: .bookmarks, type: .info, animated ? "yes" : "no")
 
         NSAnimationContext.runAnimationGroup { context in
-            context.duration = (draggedItemMetadata == nil) ? 0.0 : 0.5
+            context.duration = animated ? 0.35 : 0.0
 
             for (index, button) in visibleButtons.enumerated() {
                 var updatedButtonFrame = button.frame
@@ -422,28 +441,37 @@ final class BookmarksBarViewController: NSViewController {
 
     func updateNearestDragIndex(_ newDragIndex: Int?, additionalWidth: CGFloat) {
         guard let newDragIndex = newDragIndex else {
-            print("DEBUG: Updating drag index with nil index, width \(additionalWidth)")
+            os_log("Updating drag index: index = nil, width = %f", log: .bookmarks, type: .info, additionalWidth)
+            
+            self.dropIndex = nil
             self.midpoints = updateFrames(for: self.buttons.map(\.button),
                                           containerFrame: view.frame,
                                           hasClippedButtons: hasClippedButtons,
-                                          draggedItemMetadata: nil)
+                                          draggedItemMetadata: nil,
+                                          animated: true)
             return
         }
         
         if let currentNearest = dropIndex, newDragIndex != dropIndex {
+            os_log("Updating drag index with new index: index = %d, width = %f", log: .bookmarks, type: .info, newDragIndex, additionalWidth)
+
             dropIndex = newDragIndex
             let metadata = DraggedItemMetadata(dropIndex: newDragIndex, proposedItemWidth: additionalWidth)
             self.midpoints = updateFrames(for: self.buttons.map(\.button),
                                           containerFrame: view.frame,
                                           hasClippedButtons: hasClippedButtons,
-                                          draggedItemMetadata: metadata)
+                                          draggedItemMetadata: metadata,
+                                          animated: true)
         } else if dropIndex == nil {
+            os_log("Updating drag index with initial index: index = %d, width = %f", log: .bookmarks, type: .info, newDragIndex, additionalWidth)
+            
             dropIndex = newDragIndex
             let metadata = DraggedItemMetadata(dropIndex: newDragIndex, proposedItemWidth: additionalWidth)
             self.midpoints = updateFrames(for: self.buttons.map(\.button),
                                           containerFrame: view.frame,
                                           hasClippedButtons: hasClippedButtons,
-                                          draggedItemMetadata: metadata)
+                                          draggedItemMetadata: metadata,
+                                          animated: true)
         }
     }
     
@@ -462,6 +490,8 @@ extension NSEvent {
 extension BookmarksBarViewController: BookmarksBarViewDelegate {
     
     func draggingEntered(draggingInfo: NSDraggingInfo) {
+        os_log("Dragging entered", log: .bookmarks, type: .info)
+        
         let convertedDraggingLocation = view.convert(draggingInfo.draggingLocation, from: nil)
         let horizontalOffset = convertedDraggingLocation.x
         
@@ -478,6 +508,7 @@ extension BookmarksBarViewController: BookmarksBarViewDelegate {
     }
     
     func draggingExited(draggingInfo: NSDraggingInfo?) {
+        os_log("Dragging exited", log: .bookmarks, type: .info)
         updateNearestDragIndex(nil, additionalWidth: 0)
     }
     
@@ -501,16 +532,23 @@ extension BookmarksBarViewController: BookmarksBarViewDelegate {
         initialDraggingLocation = nil
 
         guard let newIndex = dropIndex else {
+            os_log("Dragging ended without a drop index, returning", log: .bookmarks, type: .info)
             return
         }
         
         if let index = draggedItemOriginalIndex, let draggedItemUUID = self.bookmarkManager.list?.topLevelEntities[index].id {
+            os_log("Dragging ended with drop index = %d, moving existing bookmark", log: .bookmarks, type: .info, newIndex)
+            
+            self.buttons.move(fromOffsets: IndexSet(integer: index), toOffset: newIndex)
+            self.layoutButtons()
+            
             bookmarkManager.move(objectUUID: draggedItemUUID, toIndexWithinParentFolder: newIndex) { _ in
                 self.dropIndex = nil
                 self.draggedItemOriginalIndex = nil
-                self.layoutButtons()
             }
         } else if let draggedURLs = draggingInfo.draggingPasteboard.readObjects(forClasses: [NSURL.self]) as? [NSURL] {
+            os_log("Dragging ended with drop index = %d, saving new bookmark", log: .bookmarks, type: .info, newIndex)
+            
             for draggedURL in draggedURLs {
                 bookmarkManager.makeBookmark(for: draggedURL as URL, title: draggedURL.description, isFavorite: false, index: newIndex)
             }

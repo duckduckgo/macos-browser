@@ -72,6 +72,7 @@ final class FaviconImageCache {
                 switch completion {
                 case .finished:
                     os_log("Favicon saved successfully. URL: %s", log: .favicons, favicon.url.absoluteString)
+                    NotificationCenter.default.post(name: .faviconCacheUpdated, object: nil)
                 case .failure(let error):
                     os_log("Saving of favicon failed: %s", log: .favicons, type: .error, error.localizedDescription)
                 }

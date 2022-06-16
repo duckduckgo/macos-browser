@@ -23,6 +23,7 @@ final class BookmarksBarButton: NSButton {
     let backgroundLayer = CALayer()
     
     private let faviconImageView = NSImageView(frame: CGRect(x: 3, y: 3, width: 16, height: 16))
+    private var url: URL?
     
     private var isMouseOver = false {
         didSet {
@@ -66,9 +67,17 @@ final class BookmarksBarButton: NSButton {
     
     // MARK: - Interface Updates
     
+    func refreshFaviconIfNeeded() {
+        guard let url = url else {
+            return
+        }
+
+        refreshFavicon(url: url)
+    }
+    
     private func update(from bookmark: Bookmark) {
-        let favicon = FaviconManager.shared.getCachedFavicon(for: bookmark.url, sizeCategory: .small)?.image ?? NSImage(named: "Bookmark")
-        faviconImageView.image = favicon
+        self.url = bookmark.url
+        refreshFavicon(url: bookmark.url)
     }
     
     private func update(from folder: BookmarkFolder) {
@@ -80,6 +89,18 @@ final class BookmarksBarButton: NSButton {
         self.layer?.backgroundColor = NSColor.clear.cgColor
         self.backgroundLayer.masksToBounds = true
         self.layer?.addSublayer(backgroundLayer)
+    }
+    
+    private func refreshFavicon(url: URL) {
+        guard let host = url.host else {
+            faviconImageView.image = NSImage(named: "Bookmark")
+            return
+        }
+
+        // Replace this with the bookmark's favicon directly?
+        let cachedFavicon = FaviconManager.shared.getCachedFavicon(for: host, sizeCategory: .small)?.image
+        let favicon = cachedFavicon ?? NSImage(named: "Bookmark")
+        faviconImageView.image = favicon
     }
 
     // MARK: - Tracking

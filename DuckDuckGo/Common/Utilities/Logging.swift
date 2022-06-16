@@ -64,6 +64,10 @@ extension OSLog {
     static var tabLazyLoading: OSLog {
         Logging.tabLazyLoaderLoggingEnabled ? Logging.tabLazyLoaderLog : .disabled
     }
+    
+    static var bookmarks: OSLog {
+        Logging.bookmarksLoggingEnabled ? Logging.bookmarksLog : .disabled
+    }
 }
 
 struct Logging {
@@ -89,7 +93,7 @@ struct Logging {
     fileprivate static let contentBlockingLoggingEnabled = false
     fileprivate static let contentBlockingLog: OSLog = OSLog(subsystem: Bundle.main.bundleIdentifier ?? "DuckDuckGo", category: "Content Blocking")
 
-    fileprivate static let faviconLoggingEnabled = false
+    fileprivate static let faviconLoggingEnabled = true
     fileprivate static let faviconLog: OSLog = OSLog(subsystem: Bundle.main.bundleIdentifier ?? "DuckDuckGo", category: "Favicons")
     
     fileprivate static let autoLockLoggingEnabled = false
@@ -100,5 +104,8 @@ struct Logging {
 
     fileprivate static let autoconsentLoggingEnabled = false
     fileprivate static let autoconsentLog: OSLog = OSLog(subsystem: Bundle.main.bundleIdentifier ?? "DuckDuckGo", category: "Autoconsent")
+    
+    fileprivate static let bookmarksLoggingEnabled = true
+    fileprivate static let bookmarksLog: OSLog = OSLog(subsystem: Bundle.main.bundleIdentifier ?? "DuckDuckGo", category: "Bookmarks")
 
 }
