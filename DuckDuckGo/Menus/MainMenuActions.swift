@@ -292,7 +292,7 @@ extension MainViewController {
     }
 
     @IBAction func reopenLastClosedTab(_ sender: Any?) {
-        tabCollectionViewModel.reopenRecentlyClosedTab()
+        RecentlyClosedCoordinator.shared.reopenTab()
     }
 
     @IBAction func recentlyClosedAction(_ sender: Any?) {
@@ -303,7 +303,7 @@ extension MainViewController {
                   return
               }
 
-        tabCollectionViewModel.reopenRecentlyClosedTab(cacheIndex: cacheIndex)
+        RecentlyClosedCoordinator.shared.reopenTab(cacheIndex: cacheIndex)
     }
 
     // MARK: - Bookmarks
@@ -600,7 +600,7 @@ extension MainViewController: NSMenuItemValidation {
 
         // Reopen Last Removed Tab
         case #selector(MainViewController.reopenLastClosedTab(_:)):
-            return tabCollectionViewModel.canReopenRecentlyClosedTab == true
+            return RecentlyClosedCoordinator.shared.canReopenRecentlyClosedTab == true
 
         // Printing/saving
         case #selector(MainViewController.saveAs(_:)),

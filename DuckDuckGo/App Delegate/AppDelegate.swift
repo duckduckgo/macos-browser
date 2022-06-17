@@ -89,8 +89,9 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         PrivacyFeatures.httpsUpgrade.loadDataAsync()
         LocalBookmarkManager.shared.loadBookmarks()
         FaviconManager.shared.loadFavicons()
-        _=ConfigurationManager.shared
-        _=DownloadListCoordinator.shared
+        _ = ConfigurationManager.shared
+        _ = DownloadListCoordinator.shared
+        _ = RecentlyClosedCoordinator.shared
 
         AtbAndVariantCleanup.cleanup()
         DefaultVariantManager().assignVariantIfNeeded { _ in

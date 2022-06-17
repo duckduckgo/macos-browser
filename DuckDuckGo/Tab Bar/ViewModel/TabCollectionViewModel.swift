@@ -55,8 +55,6 @@ final class TabCollectionViewModel: NSObject {
     }
     private weak var previouslySelectedTabViewModel: TabViewModel?
 
-    @Published private(set) var canReopenRecentlyClosedTab: Bool = false
-
     // In a special occasion, we want to select the "parent" tab after closing the currently selected tab
     private var selectParentOnRemoval = false
     private var tabLazyLoader: TabLazyLoader<TabCollectionViewModel>?
@@ -69,7 +67,6 @@ final class TabCollectionViewModel: NSObject {
         super.init()
 
         subscribeToTabs()
-        subscribeToRecentlyClosedTabsCache()
 
         if tabCollection.tabs.isEmpty {
             appendNewTab(with: .homePage)
@@ -396,17 +393,6 @@ final class TabCollectionViewModel: NSObject {
 
     // MARK: - Others
 
-    func reopenRecentlyClosedTab(cacheIndex: Int? = nil) {
-        guard changesEnabled else { return }
-
-        let tabIndex = tabCollection.reopenRecentlyClosedTab(cacheIndex: cacheIndex)
-
-        if let tabIndex = tabIndex {
-            select(at: tabIndex)
-            delegate?.tabCollectionViewModelDidInsert(self, at: tabIndex, selected: true)
-        }
-    }
-
     func duplicateTab(at index: Int) {
         guard changesEnabled else { return }
 
@@ -456,14 +442,6 @@ final class TabCollectionViewModel: NSObject {
             self.removeTabViewModels(old.subtracting(new))
             self.addTabViewModels(new.subtracting(old))
         } .store(in: &cancellables)
-    }
-
-    private func subscribeToRecentlyClosedTabsCache() {
-        tabCollection.$recentlyClosedTabsCache
-            .receive(on: DispatchQueue.main)
-            .map { closedTabsCache in !closedTabsCache.isEmpty}
-            .assign(to: \.canReopenRecentlyClosedTab, onWeaklyHeld: self)
-            .store(in: &cancellables)
     }
 
     private func removeTabViewModels(_ removed: Set<Tab>) {

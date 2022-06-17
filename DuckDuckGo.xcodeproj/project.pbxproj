@@ -388,7 +388,8 @@
 		AA585D86248FD31400E9A3E2 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = AA585D85248FD31400E9A3E2 /* Assets.xcassets */; };
 		AA585DAF2490E6E600E9A3E2 /* MainViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA585DAE2490E6E600E9A3E2 /* MainViewController.swift */; };
 		AA5C1DD1285A154E0089850C /* RecentlyClosedMenu.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA5C1DD0285A154E0089850C /* RecentlyClosedMenu.swift */; };
-		AA5C1DD3285A217F0089850C /* RecentlyClosedTabsCacheItem.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA5C1DD2285A217F0089850C /* RecentlyClosedTabsCacheItem.swift */; };
+		AA5C1DD3285A217F0089850C /* RecentlyClosedCacheItem.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA5C1DD2285A217F0089850C /* RecentlyClosedCacheItem.swift */; };
+		AA5C1DD5285C780C0089850C /* RecentlyClosedCoordinator.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA5C1DD4285C780C0089850C /* RecentlyClosedCoordinator.swift */; };
 		AA5C8F59258FE21F00748EB7 /* NSTextFieldExtension.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA5C8F58258FE21F00748EB7 /* NSTextFieldExtension.swift */; };
 		AA5C8F5E2590EEE800748EB7 /* NSPointExtension.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA5C8F5D2590EEE800748EB7 /* NSPointExtension.swift */; };
 		AA5C8F632591021700748EB7 /* NSApplicationExtension.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA5C8F622591021700748EB7 /* NSApplicationExtension.swift */; };
@@ -1161,7 +1162,8 @@
 		AA585D96248FD31400E9A3E2 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		AA585DAE2490E6E600E9A3E2 /* MainViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MainViewController.swift; sourceTree = "<group>"; };
 		AA5C1DD0285A154E0089850C /* RecentlyClosedMenu.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RecentlyClosedMenu.swift; sourceTree = "<group>"; };
-		AA5C1DD2285A217F0089850C /* RecentlyClosedTabsCacheItem.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RecentlyClosedTabsCacheItem.swift; sourceTree = "<group>"; };
+		AA5C1DD2285A217F0089850C /* RecentlyClosedCacheItem.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RecentlyClosedCacheItem.swift; sourceTree = "<group>"; };
+		AA5C1DD4285C780C0089850C /* RecentlyClosedCoordinator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RecentlyClosedCoordinator.swift; sourceTree = "<group>"; };
 		AA5C8F58258FE21F00748EB7 /* NSTextFieldExtension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NSTextFieldExtension.swift; sourceTree = "<group>"; };
 		AA5C8F5D2590EEE800748EB7 /* NSPointExtension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NSPointExtension.swift; sourceTree = "<group>"; };
 		AA5C8F622591021700748EB7 /* NSApplicationExtension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NSApplicationExtension.swift; sourceTree = "<group>"; };
@@ -3094,7 +3096,6 @@
 			isa = PBXGroup;
 			children = (
 				AA9FF95C24A1FA1C0039E328 /* TabCollection.swift */,
-				AA5C1DD2285A217F0089850C /* RecentlyClosedTabsCacheItem.swift */,
 			);
 			path = Model;
 			sourceTree = "<group>";
@@ -3423,6 +3424,8 @@
 			children = (
 				AAE7527F263B0A4D00B973F8 /* HistoryCoordinator.swift */,
 				AAE7527D263B05C600B973F8 /* HistoryEntry.swift */,
+				AA5C1DD4285C780C0089850C /* RecentlyClosedCoordinator.swift */,
+				AA5C1DD2285A217F0089850C /* RecentlyClosedCacheItem.swift */,
 			);
 			path = Model;
 			sourceTree = "<group>";
@@ -4338,6 +4341,7 @@
 				4B9292D42667123700AD2C21 /* BookmarkListViewController.swift in Sources */,
 				4B723E0D26B0006100E14D75 /* SecureVaultLoginImporter.swift in Sources */,
 				4B9292D32667123700AD2C21 /* AddBookmarkModalViewController.swift in Sources */,
+				AA5C1DD5285C780C0089850C /* RecentlyClosedCoordinator.swift in Sources */,
 				AA88D14B252A557100980B4E /* URLRequestExtension.swift in Sources */,
 				AA6197C6276B3168008396F0 /* FaviconHostReference.swift in Sources */,
 				AAD8078527B3F3BE00CF7703 /* WebsiteBreakageSender.swift in Sources */,
@@ -4500,7 +4504,7 @@
 				B693954E26F04BEB0015B914 /* ProgressView.swift in Sources */,
 				B69B503C2726A12500758A2B /* StatisticsStore.swift in Sources */,
 				B693955426F04BEC0015B914 /* ColorView.swift in Sources */,
-				AA5C1DD3285A217F0089850C /* RecentlyClosedTabsCacheItem.swift in Sources */,
+				AA5C1DD3285A217F0089850C /* RecentlyClosedCacheItem.swift in Sources */,
 				B6BBF17427475B15004F850E /* PopupBlockedPopover.swift in Sources */,
 				8589063A267BCD8E00D23B0D /* SaveCredentialsPopover.swift in Sources */,
 				4B379C1527BD91E3008A968E /* QuartzIdleStateProvider.swift in Sources */,

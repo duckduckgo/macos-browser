@@ -86,6 +86,7 @@ final class Fire {
     let faviconManagement: FaviconManagement
     let autoconsentManagement: AutoconsentManagement?
     let stateRestorationManager: AppStateRestorationManager?
+    let recentlyClosedCoordinator: RecentlyClosedCoordinatorProtocol?
     
     let tabsCleaner = TabDataCleaner()
 
@@ -102,13 +103,15 @@ final class Fire {
          windowControllerManager: WindowControllersManager = WindowControllersManager.shared,
          faviconManagement: FaviconManagement = FaviconManager.shared,
          autoconsentManagement: AutoconsentManagement? = nil,
-         stateRestorationManager: AppStateRestorationManager? = nil) {
+         stateRestorationManager: AppStateRestorationManager? = nil,
+         recentlyClosedCoordinator: RecentlyClosedCoordinatorProtocol? = nil) {
         self.webCacheManager = cacheManager
         self.historyCoordinating = historyCoordinating
         self.permissionManager = permissionManager
         self.downloadListCoordinator = downloadListCoordinator
         self.windowControllerManager = windowControllerManager
         self.faviconManagement = faviconManagement
+        self.recentlyClosedCoordinator = recentlyClosedCoordinator
         
         if #available(macOS 11, *), autoconsentManagement == nil {
             self.autoconsentManagement = AutoconsentUserScript.background
@@ -174,6 +177,7 @@ final class Fire {
             })
 
             self.burnAutoconsentCache()
+            self.burnRecentlyClosed(domains: domains)
 
             group.notify(queue: .main) {
                 self.burningData = nil
@@ -214,7 +218,8 @@ final class Fire {
             }
             
             self.burnAutoconsentCache()
-            
+            self.burnRecentlyClosed()
+
             group.notify(queue: .main) {
                 self.burningData = nil
                 completion?()
@@ -324,7 +329,6 @@ final class Fire {
             } else {
                 tabCollectionViewModel.appendNewTab(forceChange: true)
             }
-            tabCollectionViewModel.tabCollection.cleanRecentlyClosedTabsCache()
 
             completion()
         }
@@ -344,6 +348,7 @@ final class Fire {
     }
     
     // MARK: - Autoconsent visit cache
+
     private func burnAutoconsentCache() {
         if #available(macOS 11, *), self.autoconsentManagement != nil {
             self.autoconsentManagement!.clearCache()
@@ -351,8 +356,15 @@ final class Fire {
     }
 
     // MARK: - Last Session State
+
     private func burnLastSessionState() {
         stateRestorationManager?.clearLastSessionState()
+    }
+
+    // MARK: - Burn Recently Closed
+
+    private func burnRecentlyClosed(domains: Set<String>? = nil) {
+        recentlyClosedCoordinator?.burnCache(domains: domains)
     }
 
 }
@@ -404,9 +416,6 @@ fileprivate extension TabCollectionViewModel {
 
         // Clean local history of closed tabs
         tabCollection.localHistoryOfRemovedTabs.subtract(domains)
-
-        // Clean cache of recently closed tabs
-        tabCollection.cleanRecentlyClosedTabsCache(domains: domains)
     }
 }
 

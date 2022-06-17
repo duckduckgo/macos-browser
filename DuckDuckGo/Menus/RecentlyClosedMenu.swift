@@ -35,7 +35,7 @@ final class RecentlyClosedMenu: NSMenu {
     }
 
     private func makeMenuItems(mainWindowController: MainWindowController) -> [NSMenuItem] {
-        Array(mainWindowController.mainViewController.tabCollectionViewModel.tabCollection.recentlyClosedTabsCache
+        Array(RecentlyClosedCoordinator.shared.cache
                 .enumerated()
                 .compactMap { NSMenuItem(from: $0.element, cacheIndex: $0.offset) }
                 .reversed()
@@ -46,10 +46,10 @@ final class RecentlyClosedMenu: NSMenu {
 
 private extension NSMenuItem {
 
-    convenience init?(from recentlyClosedTabsCacheItem: RecentlyClosedTabsCacheItem, cacheIndex: Int) {
+    convenience init?(from recentlyClosedCacheItem: RecentlyClosedCacheItem, cacheIndex: Int) {
         self.init()
 
-        switch recentlyClosedTabsCacheItem.tabContent {
+        switch recentlyClosedCacheItem.tabContent {
         case .homePage:
             image = TabViewModel.Favicon.home
             title = UserText.tabHomeTitle
@@ -60,9 +60,9 @@ private extension NSMenuItem {
             image = TabViewModel.Favicon.preferences
             title = UserText.tabPreferencesTitle
         case .url:
-            image = recentlyClosedTabsCacheItem.favicon
+            image = recentlyClosedCacheItem.favicon
             image?.size = NSSize.faviconSize
-            title = recentlyClosedTabsCacheItem.title ?? recentlyClosedTabsCacheItem.tabContent.url?.absoluteString ?? ""
+            title = recentlyClosedCacheItem.title ?? recentlyClosedCacheItem.tabContent.url?.absoluteString ?? ""
 
             if title.count > MainMenu.Constants.maxTitleLength {
                 title = String(title.truncated(length: MainMenu.Constants.maxTitleLength))

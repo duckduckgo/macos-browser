@@ -56,6 +56,7 @@ final class MainMenu: NSMenu {
             reopenMenuItemKeyEquivalentManager.lastTabMenuItem = reopenLastClosedTabMenuItem
         }
     }
+    @IBOutlet weak var reopenLastClosedWindowMenuItem: NSMenuItem!
     @IBOutlet weak var reopenAllWindowsFromLastSessionMenuItem: NSMenuItem? {
         didSet {
             reopenMenuItemKeyEquivalentManager.lastSessionMenuItem = reopenAllWindowsFromLastSessionMenuItem
@@ -275,6 +276,7 @@ extension MainMenu {
      */
     final class ReopenMenuItemKeyEquivalentManager {
         weak var lastTabMenuItem: NSMenuItem?
+        weak var lastWindowMenuItem: NSMenuItem?
         weak var lastSessionMenuItem: NSMenuItem?
 
         enum Const {
@@ -307,7 +309,7 @@ extension MainMenu {
             }
         }
 
-        private func assignKeyEquivalent(to menuItem: NSMenuItem?) {
+        func assignKeyEquivalent(to menuItem: NSMenuItem?) {
             currentlyAssignedMenuItem?.keyEquivalent = ""
             currentlyAssignedMenuItem?.keyEquivalentModifierMask = []
             menuItem?.keyEquivalent = Const.keyEquivalent

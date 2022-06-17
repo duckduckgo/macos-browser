@@ -51,10 +51,11 @@ final class WindowsManager {
         return mainWindowController.window
     }
 
-    class func openNewWindow(with tab: Tab, droppingPoint: NSPoint? = nil, contentSize: NSSize? = nil, popUp: Bool = false) {
+    @discardableResult
+    class func openNewWindow(with tab: Tab, droppingPoint: NSPoint? = nil, contentSize: NSSize? = nil, popUp: Bool = false) -> NSWindow? {
         let tabCollection = TabCollection()
         tabCollection.append(tab: tab)
-        openNewWindow(with: TabCollectionViewModel(tabCollection: tabCollection),
+        return openNewWindow(with: TabCollectionViewModel(tabCollection: tabCollection),
                       droppingPoint: droppingPoint,
                       contentSize: contentSize,
                       popUp: popUp)

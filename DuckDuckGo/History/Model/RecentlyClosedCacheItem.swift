@@ -18,12 +18,13 @@
 
 import Foundation
 
-struct RecentlyClosedTabsCacheItem {
+struct RecentlyClosedCacheItem {
 
     let tabContent: Tab.TabContent
     let favicon: NSImage?
     let title: String?
 
+    weak var originalTabCollection: TabCollection?
     let index: Int
 
 }
