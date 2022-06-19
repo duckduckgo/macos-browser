@@ -17,6 +17,7 @@
 //
 
 import Foundation
+import AppKit
 import os.log
 
 typealias RegEx = NSRegularExpression
@@ -54,6 +55,13 @@ extension String {
 
     func truncated(length: Int, trailing: String = "…") -> String {
       return (self.count > length) ? self.prefix(length) + trailing : self
+    }
+    
+    func renderingWidth(with font: NSFont) -> CGFloat {
+        let constraintRect = CGSize(width: .greatestFiniteMagnitude, height: font.pointSize)
+        let boundingBox = self.boundingRect(with: constraintRect, options: [.usesLineFragmentOrigin, .usesFontLeading], context: nil)
+        
+        return ceil(boundingBox.width)
     }
 
     subscript (_ range: NSRange) -> Self {

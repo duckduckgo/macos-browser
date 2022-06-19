@@ -25,33 +25,17 @@ import os.log
 final class BookmarksBarViewController: NSViewController {
     
     private struct ButtonLayoutMetadata {
-        var cumulativeButtonWidth: CGFloat = 0
-        var cumulativeSpacingWidth: CGFloat = 0
         var bookmarksBarWidth: CGFloat = 0
     }
     
-    private struct DraggedItemMetadata {
+    private struct DraggedItemLayoutData {
         let dropIndex: Int
         let proposedItemWidth: CGFloat
-    }
-    
-    private struct BookmarkButtonData {
-        let button: BookmarksBarButton
-        let bookmarkViewModel: BookmarkViewModel
     }
     
     private let bookmarkManager = LocalBookmarkManager.shared
     private let viewModel = BookmarksBarViewModel()
     private var cancellables = Set<AnyCancellable>()
-    
-    private var buttonData: [BookmarkButtonData] = []
-
-    private var midpoints: [CGFloat] = []
-    private var clippedButtons: [BookmarkButtonData] = [] {
-        didSet {
-            clippedItemsIndicator.isHidden = clippedButtons.isEmpty
-        }
-    }
     
     private var hasClippedButtons: Bool {
         !clippedButtons.isEmpty
@@ -74,7 +58,25 @@ final class BookmarksBarViewController: NSViewController {
     
     // MARK: - Layout Calculation
     
+    private var buttonData: [BookmarksBarViewModel.BookmarkButtonData] = []
+
+    private var midpoints: [CGFloat] = [] {
+        didSet {
+            print("CHANGED MIDPOINTS")
+        }
+    }
+    
+    private var clippedButtons: [BookmarksBarViewModel.BookmarkButtonData] = [] {
+        didSet {
+            clippedItemsIndicator.isHidden = clippedButtons.isEmpty
+        }
+    }
+    
     private var layoutMetadata = ButtonLayoutMetadata()
+    
+    private var draggedItemOriginalIndex: Int?
+    private var dropIndex: Int?
+    private var initialDraggingPoint: CGPoint?
     
     // MARK: - View Lifecycle
 
@@ -100,10 +102,16 @@ final class BookmarksBarViewController: NSViewController {
                                                name: .faviconCacheUpdated,
                                                object: nil)
         
-        // subscribeToViewModelState()
+        subscribeToViewModelState()
         subscribeToBookmarks()
 
-        self.buttonData = createButtons(for: bookmarkManager.list?.topLevelEntities ?? [])
+        self.buttonData = viewModel.createButtons(for: bookmarkManager.list?.topLevelEntities ?? [])
+        self.buttonData.forEach {
+            $0.button.target = self
+            $0.button.sendAction(on: [.leftMouseDown, .leftMouseDragged, .leftMouseUp, .rightMouseDown])
+            $0.button.action = #selector(bookmarkButtonClicked(_:))
+        }
+        
         addAndPositionButtonsForInitialLayout()
     }
     
@@ -115,27 +123,33 @@ final class BookmarksBarViewController: NSViewController {
         bookmarksBarViewFrameChanged()
     }
     
-//    private func subscribeToViewModelState() {
-//        viewModel.$state.sink { [weak self] state in
-//            guard let self = self else { return }
-//
-//            switch state {
-//            case .idle:
-//                print("Idle")
-//            case .beginningDrag(originalLocation: let originalLocation):
-//                print("Beginning drag")
-//            case .draggingExistingItem(draggedItemData: let draggedItemData):
-//                print("Dragging existing")
-//            case .draggingNewItem(draggedItemData: let draggedItemData):
-//                print("Dragging new")
-//            }
-//        }.store(in: &cancellables)
-//    }
+    private func subscribeToViewModelState() {
+        viewModel.$state.sink { [weak self] state in
+            guard let self = self else { return }
+
+            switch state {
+            case .idle:
+                print("Idle")
+            case .beginningDrag(originalLocation: let originalLocation):
+                print("Beginning drag")
+            case .draggingExistingItem(draggedItemData: let draggedItemData):
+                print("Dragging existing")
+            case .draggingNewItem(draggedItemData: let draggedItemData):
+                print("Dragging new")
+            }
+        }.store(in: &cancellables)
+    }
 
     private func subscribeToBookmarks() {
         bookmarkManager.listPublisher.sink { [weak self] list in
             guard let self = self else { return }
-            self.buttonData = self.createButtons(for: list?.topLevelEntities ?? [])
+            self.buttonData = self.viewModel.createButtons(for: list?.topLevelEntities ?? [])
+            self.buttonData.forEach {
+                $0.button.target = self
+                $0.button.sendAction(on: [.leftMouseDown, .leftMouseDragged, .leftMouseUp, .rightMouseDown])
+                $0.button.action = #selector(self.bookmarkButtonClicked(_:))
+            }
+
             self.addAndPositionButtonsForInitialLayout()
             self.layoutButtons()
         }.store(in: &cancellables)
@@ -143,6 +157,8 @@ final class BookmarksBarViewController: NSViewController {
     
     @objc
     private func bookmarksBarViewFrameChanged() {
+        viewModel.handle(event: .containerFrameChanged(view.frame))
+
         layoutButtons()
 
         let maximumWidth = layoutMetadata.bookmarksBarWidth + (BookmarksBarViewModel.Constants.buttonSpacing * 2) + clippedItemsIndicator.frame.width
@@ -167,6 +183,7 @@ final class BookmarksBarViewController: NSViewController {
 
         self.buttonData.map(\.button).forEach(view.addSubview)
         
+        clippedButtons = []
         addClippedItemsIndicator()
         calculateFixedButtonSizingValues()
     }
@@ -215,9 +232,9 @@ final class BookmarksBarViewController: NSViewController {
     }
     
     private func calculateFixedButtonSizingValues() {
-        layoutMetadata.cumulativeButtonWidth = buttonData.map(\.button.bounds.size.width).reduce(0, +)
-        layoutMetadata.cumulativeSpacingWidth = BookmarksBarViewModel.Constants.buttonSpacing * CGFloat(max(0, buttonData.count - 1))
-        layoutMetadata.bookmarksBarWidth = layoutMetadata.cumulativeButtonWidth + layoutMetadata.cumulativeSpacingWidth
+        let cumulativeButtonWidth = buttonData.map(\.button.bounds.size.width).reduce(0, +)
+        let cumulativeSpacingWidth = BookmarksBarViewModel.Constants.buttonSpacing * CGFloat(max(0, buttonData.count - 1))
+        layoutMetadata.bookmarksBarWidth = cumulativeButtonWidth + cumulativeSpacingWidth
         
         bookmarksBarViewFrameChanged()
     }
@@ -242,86 +259,64 @@ final class BookmarksBarViewController: NSViewController {
     private func updateFrames(for buttons: [NSButton],
                               containerFrame: CGRect,
                               hasClippedButtons: Bool,
-                              draggedItemMetadata: DraggedItemMetadata?,
+                              draggedItemMetadata: DraggedItemLayoutData?,
                               animated: Bool) -> [CGFloat] {
-        var midpoints: [CGFloat] = []
-        var previousMaximumXValue: CGFloat
-        
-        // If there are any clipped buttons, the button list should always be leading-aligned.
-        if hasClippedButtons {
-            previousMaximumXValue = BookmarksBarViewModel.Constants.buttonSpacing
-        } else {
-            previousMaximumXValue = max(BookmarksBarViewModel.Constants.buttonSpacing, (containerFrame.midX) - (layoutMetadata.bookmarksBarWidth / 2))
-        }
-        
         let visibleButtons = buttons.filter { button in
             return !button.isHidden
         }
         
-        os_log("Updating button frames, animated = %s", log: .bookmarks, type: .info, animated ? "yes" : "no")
+        let (frames, midpoints) = calculateUpdatedFrames(buttons: visibleButtons,
+                                                         within: containerFrame,
+                                                         forceLeftAlignedButtons: hasClippedButtons,
+                                                         draggedItemMetadata: draggedItemMetadata)
 
         NSAnimationContext.runAnimationGroup { context in
             context.duration = animated ? 0.35 : 0.0
 
             for (index, button) in visibleButtons.enumerated() {
-                var updatedButtonFrame = button.frame
-                
-                if let metadata = draggedItemMetadata, metadata.dropIndex == index {
-                    let newOffset = previousMaximumXValue + metadata.proposedItemWidth
-                    updatedButtonFrame.origin = CGPoint(x: newOffset, y: containerFrame.midY - (button.frame.height / 2))
-                } else {
-                    updatedButtonFrame.origin = CGPoint(x: previousMaximumXValue, y: containerFrame.midY - (button.frame.height / 2))
-                }
-                
-                button.animator().frame = updatedButtonFrame
-                
-                previousMaximumXValue = updatedButtonFrame.maxX + BookmarksBarViewModel.Constants.buttonSpacing
-                
-                if midpoints.isEmpty {
-                    midpoints.append(updatedButtonFrame.minX - (BookmarksBarViewModel.Constants.buttonSpacing / 2))
-                }
-                
-                midpoints.append(updatedButtonFrame.maxX + (BookmarksBarViewModel.Constants.buttonSpacing / 2))
+                button.animator().frame = frames[index]
             }
         }
         
         return midpoints
     }
     
-    private func createButtons(for entities: [BaseBookmarkEntity]) -> [BookmarkButtonData] {
-        return entities.compactMap { entity in
-            let viewModel = BookmarkViewModel(entity: entity)
-
-            if let bookmark = entity as? Bookmark {
-                let button = BookmarksBarButton(bookmark: bookmark)
-                configureBookmarkButton(button: button, withTitle: bookmark.title)
-                
-                return BookmarkButtonData(button: button, bookmarkViewModel: viewModel)
-            } else if let folder = entity as? BookmarkFolder {
-                let button = BookmarksBarButton(folder: folder)
-                configureBookmarkButton(button: button, withTitle: folder.title)
-                
-                return BookmarkButtonData(button: button, bookmarkViewModel: viewModel)
-            } else {
-                assertionFailure("Tried to display bookmarks bar button for unsupported type: \(entity)")
-                return nil
-            }
-        }
-    }
-    
-    private func configureBookmarkButton(button: BookmarksBarButton, withTitle title: String) {
-        // button.layerContentsRedrawPolicy = .onSetNeedsDisplay
-        button.isBordered = false
-        button.title = title
-        button.lineBreakMode = .byTruncatingMiddle
-        button.target = self
-        button.sendAction(on: [.leftMouseDown, .leftMouseDragged, .leftMouseUp, .rightMouseDown])
-        button.action = #selector(bookmarkButtonClicked(_:))
-        button.sizeToFit()
+    private func calculateUpdatedFrames(buttons: [NSButton],
+                                        within containerFrame: CGRect,
+                                        forceLeftAlignedButtons: Bool,
+                                        draggedItemMetadata: DraggedItemLayoutData?) -> (buttonFrames: [CGRect], midpoints: [CGFloat]) {
+        var updatedFrames: [CGRect] = []
+        var midpoints: [CGFloat] = []
+        var previousMaximumXValue: CGFloat
         
-        var buttonFrame = button.frame
-        buttonFrame.size.width = min(BookmarksBarViewModel.Constants.maximumButtonWidth, buttonFrame.size.width)
-        button.frame = buttonFrame
+        if forceLeftAlignedButtons {
+            previousMaximumXValue = BookmarksBarViewModel.Constants.buttonSpacing
+        } else {
+            previousMaximumXValue = max(BookmarksBarViewModel.Constants.buttonSpacing, (containerFrame.midX) - (layoutMetadata.bookmarksBarWidth / 2))
+        }
+
+        for (index, button) in buttons.enumerated() {
+            var updatedButtonFrame = button.frame
+            
+            if let metadata = draggedItemMetadata, metadata.dropIndex == index {
+                let newOffset = previousMaximumXValue + metadata.proposedItemWidth
+                updatedButtonFrame.origin = CGPoint(x: newOffset, y: containerFrame.midY - (button.frame.height / 2))
+            } else {
+                updatedButtonFrame.origin = CGPoint(x: previousMaximumXValue, y: containerFrame.midY - (button.frame.height / 2))
+            }
+            
+            updatedFrames.append(updatedButtonFrame)
+            
+            previousMaximumXValue = updatedButtonFrame.maxX + BookmarksBarViewModel.Constants.buttonSpacing
+            
+            if midpoints.isEmpty {
+                midpoints.append(updatedButtonFrame.minX - (BookmarksBarViewModel.Constants.buttonSpacing / 2))
+            }
+            
+            midpoints.append(updatedButtonFrame.maxX + (BookmarksBarViewModel.Constants.buttonSpacing / 2))
+        }
+        
+        return (buttonFrames: updatedFrames, midpoints: midpoints)
     }
     
     private func buttonIndex(for button: BookmarksBarButton) -> Int? {
@@ -331,8 +326,6 @@ final class BookmarksBarViewController: NSViewController {
     }
     
     // MARK: - Button Click Handlers
-    
-    private var draggedItemOriginalIndex: Int?
 
     @objc
     private func bookmarkButtonClicked(_ sender: NSButton) {
@@ -358,6 +351,9 @@ final class BookmarksBarViewController: NSViewController {
             }
             
             os_log("Received leftMouseDragged event, starting drag session", log: .bookmarks, type: .info)
+
+//            let draggedEntity = self.buttonData[index].bookmarkViewModel.entity
+//            let draggedItemData = BookmarksBarViewModel.ExistingDraggedItemData(originalIndex: index, title: draggedEntity.title)
 
             let pasteboardItem = NSPasteboardItem()
             pasteboardItem.setDataProvider(viewModel, forTypes: [.URL, .string])
@@ -439,9 +435,6 @@ final class BookmarksBarViewController: NSViewController {
         
         return menuItems
     }
-    
-    private var dropIndex: Int?
-    private var initialDraggingPoint: CGPoint?
 
     func updateNearestDragIndex(_ newDragIndex: Int?, additionalWidth: CGFloat) {
         guard let newDragIndex = newDragIndex else {
@@ -460,7 +453,7 @@ final class BookmarksBarViewController: NSViewController {
             os_log("Updating drag index with new index: index = %d, width = %f", log: .bookmarks, type: .info, newDragIndex, additionalWidth)
 
             dropIndex = newDragIndex
-            let metadata = DraggedItemMetadata(dropIndex: newDragIndex, proposedItemWidth: additionalWidth)
+            let metadata = DraggedItemLayoutData(dropIndex: newDragIndex, proposedItemWidth: additionalWidth)
             self.midpoints = updateFrames(for: self.buttonData.map(\.button),
                                           containerFrame: view.frame,
                                           hasClippedButtons: hasClippedButtons,
@@ -470,7 +463,7 @@ final class BookmarksBarViewController: NSViewController {
             os_log("Updating drag index with initial index: index = %d, width = %f", log: .bookmarks, type: .info, newDragIndex, additionalWidth)
             
             dropIndex = newDragIndex
-            let metadata = DraggedItemMetadata(dropIndex: newDragIndex, proposedItemWidth: additionalWidth)
+            let metadata = DraggedItemLayoutData(dropIndex: newDragIndex, proposedItemWidth: additionalWidth)
             self.midpoints = updateFrames(for: self.buttonData.map(\.button),
                                           containerFrame: view.frame,
                                           hasClippedButtons: hasClippedButtons,
@@ -481,35 +474,12 @@ final class BookmarksBarViewController: NSViewController {
     
 }
 
-extension NSEvent {
-    
-    var isRightClick: Bool {
-        let rightClick = (self.type == .rightMouseUp)
-        let controlClick = self.modifierFlags.contains(.control)
-        return rightClick || controlClick
-    }
-    
-}
-
 extension BookmarksBarViewController: BookmarksBarViewDelegate {
 
     func draggingEntered(draggingInfo: NSDraggingInfo) {
         os_log("Dragging entered", log: .bookmarks, type: .info)
-        
-        let convertedDraggingLocation = view.convert(draggingInfo.draggingLocation, from: nil)
-        let horizontalOffset = convertedDraggingLocation.x
-        
-        let result = midpoints.nearest(to: horizontalOffset)
-        let additionalWidth: CGFloat
-        
-        if let width = draggingInfo.width {
-            additionalWidth = min(width, BookmarksBarViewModel.Constants.maximumButtonWidth) + BookmarksBarViewModel.Constants.buttonSpacing
-        } else {
-            print("NO WIDTH!!!")
-            additionalWidth = BookmarksBarViewModel.Constants.maximumButtonWidth + BookmarksBarViewModel.Constants.buttonSpacing
-        }
-        
-        updateNearestDragIndex(result?.offset, additionalWidth: additionalWidth)
+        let (index, width) = calculateNearestDragIndex(draggingInfo: draggingInfo)
+        updateNearestDragIndex(index, additionalWidth: width)
     }
     
     func draggingExited(draggingInfo: NSDraggingInfo?) {
@@ -518,26 +488,42 @@ extension BookmarksBarViewController: BookmarksBarViewDelegate {
     }
     
     func draggingUpdated(draggingInfo: NSDraggingInfo) {
+        let (index, width) = calculateNearestDragIndex(draggingInfo: draggingInfo)
+        updateNearestDragIndex(index, additionalWidth: width)
+    }
+    
+    private func calculateNearestDragIndex(draggingInfo: NSDraggingInfo) -> (index: Int, draggedItemWidth: CGFloat) {
         let convertedDraggingLocation = view.convert(draggingInfo.draggingLocation, from: nil)
         let horizontalOffset = convertedDraggingLocation.x
         
         let result = midpoints.nearest(to: horizontalOffset)
         let additionalWidth: CGFloat
         
-        // TODO: Calculate width
         if draggingInfo.draggingSource is BookmarksBarViewModel, let width = draggingInfo.width {
             additionalWidth = width + BookmarksBarViewModel.Constants.buttonSpacing
+        } else if draggingInfo.draggingSource is BookmarksBarViewModel, let index = draggedItemOriginalIndex {
+            let entityTitle = self.buttonData[index].bookmarkViewModel.entity.title
+            let renderingWidth = entityTitle.renderingWidth(with: BookmarksBarViewModel.Constants.labelFont)
+            let titleWidth = min(BookmarksBarViewModel.Constants.maximumButtonWidth, renderingWidth + 16 + 10)
+            
+            additionalWidth = titleWidth + BookmarksBarViewModel.Constants.buttonSpacing
         } else {
-            print("NO WIDTH!!!")
-            additionalWidth = 100.0
+            if let item = draggingInfo.draggingPasteboard.pasteboardItems?.first, let title = titleAndURL(from: item) {
+                additionalWidth = min(
+                    BookmarksBarViewModel.Constants.maximumButtonWidth,
+                    title.0.renderingWidth(with: BookmarksBarViewModel.Constants.labelFont)
+                )
+            } else {
+                additionalWidth = draggingInfo.width ?? 0
+            }
         }
         
-        updateNearestDragIndex(result?.offset, additionalWidth: additionalWidth)
+        return (result?.offset ?? 0, additionalWidth)
     }
     
     func draggingEnded(draggingInfo: NSDraggingInfo) {
-        os_log("Dragging ended", log: .bookmarks, type: .info)
-        self.viewModel.isDragging = false
+        os_log("Dragging ended", log: .bookmarks, type: .info)        
+        viewModel.handle(event: .draggingEnded)
     }
     
     func performDragOperation(draggingInfo: NSDraggingInfo) -> Bool {

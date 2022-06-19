@@ -72,8 +72,6 @@ final class FaviconManager: FaviconManagement {
     func handleFaviconLinks(_ faviconLinks: [FaviconUserScript.FaviconLink],
                             documentUrl: URL,
                             completion: @escaping (Favicon?) -> Void) {
-        print("HANDLING FAVICON LINKS \(faviconLinks)")
-
         // Manually add favicon.ico into links
         let faviconLinks = addingFaviconIco(into: faviconLinks, documentUrl: documentUrl)
 
