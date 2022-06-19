@@ -35,7 +35,7 @@ final class LocalBookmarkStoreTests: XCTestCase {
 
         let bookmark = Bookmark(id: UUID(), url: URL.duckDuckGo, title: "DuckDuckGo", isFavorite: true)
 
-        bookmarkStore.save(bookmark: bookmark, parent: nil) { (success, error) in
+        bookmarkStore.save(bookmark: bookmark, parent: nil, index: nil) { (success, error) in
             XCTAssert(success)
             XCTAssertNil(error)
 
@@ -65,7 +65,7 @@ final class LocalBookmarkStoreTests: XCTestCase {
         let loadingExpectation = self.expectation(description: "Loading")
 
         let bookmark = Bookmark(id: UUID(), url: URL.duckDuckGo, title: "DuckDuckGo", isFavorite: true)
-        bookmarkStore.save(bookmark: bookmark, parent: nil) { (success, error) in
+        bookmarkStore.save(bookmark: bookmark, parent: nil, index: nil) { (success, error) in
             XCTAssert(success)
             XCTAssertNil(error)
 
@@ -101,7 +101,7 @@ final class LocalBookmarkStoreTests: XCTestCase {
 
         let bookmark = Bookmark(id: UUID(), url: URL.duckDuckGo, title: "DuckDuckGo", isFavorite: true)
 
-        bookmarkStore.save(bookmark: bookmark, parent: nil) { (success, error) in
+        bookmarkStore.save(bookmark: bookmark, parent: nil, index: nil) { (success, error) in
             XCTAssert(success)
             XCTAssertNil(error)
 
@@ -237,9 +237,9 @@ final class LocalBookmarkStoreTests: XCTestCase {
         // Save the initial bookmarks state:
         
         _ = await bookmarkStore.save(folder: folder, parent: nil)
-        _ = await bookmarkStore.save(bookmark: bookmark1, parent: folder)
-        _ = await bookmarkStore.save(bookmark: bookmark2, parent: folder)
-        _ = await bookmarkStore.save(bookmark: bookmark3, parent: folder)
+        _ = await bookmarkStore.save(bookmark: bookmark1, parent: folder, index: nil)
+        _ = await bookmarkStore.save(bookmark: bookmark2, parent: folder, index: nil)
+        _ = await bookmarkStore.save(bookmark: bookmark3, parent: folder, index: nil)
 
         // Fetch persisted bookmarks back from the store:
         
@@ -293,7 +293,7 @@ final class LocalBookmarkStoreTests: XCTestCase {
 
             saveFolderExpectation.fulfill()
 
-            bookmarkStore.save(bookmark: bookmark, parent: folder) { (success, error) in
+            bookmarkStore.save(bookmark: bookmark, parent: folder, index: nil) { (success, error) in
                 XCTAssert(success)
                 XCTAssertNil(error)
 

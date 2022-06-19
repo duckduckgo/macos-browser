@@ -34,7 +34,7 @@ final class BookmarkStoreMock: BookmarkStore {
     var saveBookmarkCalled = false
     var saveBookmarkSuccess = true
     var saveBookmarkError: Error?
-    func save(bookmark: Bookmark, parent: BookmarkFolder?, completion: @escaping (Bool, Error?) -> Void) {
+    func save(bookmark: Bookmark, parent: BookmarkFolder?, index: Int?, completion: @escaping (Bool, Error?) -> Void) {
         saveBookmarkCalled = true
         bookmarks?.append(bookmark)
         completion(saveBookmarkSuccess, saveBookmarkError)

@@ -31,7 +31,7 @@ final class BookmarksBarViewModel: NSObject {
         static let maximumButtonWidth: CGFloat = 150
     }
     
-    enum ViewState {
+    enum ViewState: Equatable {
         case idle
         case beginningDrag(originalLocation: CGPoint)
         case draggingExistingItem(draggedItemData: DraggedItemData)
@@ -61,7 +61,7 @@ final class BookmarksBarViewModel: NSObject {
         let totalButtonListWidth: CGFloat = 0
     }
     
-    struct DraggedItemData {
+    struct DraggedItemData: Equatable {
         let proposedDropIndex: Int
         let proposedItemWidth: CGFloat
     }
@@ -102,16 +102,11 @@ final class BookmarksBarViewModel: NSObject {
         case .beganDraggingSession:
             break
         case .containerFrameChanged:
+            // Calculate new frames
             break
         }
     }
  
-}
-
-// MARK: - Dragging Destination
-
-extension BookmarksBarViewModel {
-    
 }
 
 // MARK: - Dragging Source
