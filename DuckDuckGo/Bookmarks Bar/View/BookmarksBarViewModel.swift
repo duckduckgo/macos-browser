@@ -16,15 +16,16 @@
 //  limitations under the License.
 //
 
-import Foundation
+import AppKit
 import Combine
+import Foundation
 
 final class BookmarksBarViewModel: NSObject {
     
     // MARK: Enums
     
     enum Constants {
-        static let distanceRequiredForDragging: CGFloat = 10
+        static let distanceRequiredForDragging: CGFloat = 7
         static let buttonSpacing: CGFloat = 8
         static let buttonHeight: CGFloat = 28
         static let maximumButtonWidth: CGFloat = 150
@@ -65,6 +66,12 @@ final class BookmarksBarViewModel: NSObject {
         let proposedItemWidth: CGFloat
     }
 
+    @Published var isDragging = false {
+        didSet {
+            print("DID SET: isDragging = \(isDragging)")
+        }
+    }
+    
     @Published private(set) var state: ViewState = .idle
     private(set) var buttonLayoutData: ButtonLayoutData = ButtonLayoutData()
     
@@ -110,19 +117,15 @@ extension BookmarksBarViewModel {
 // MARK: - Dragging Source
 
 extension BookmarksBarViewModel: NSDraggingSource {
-    
-//    func draggingSession(_ session: NSDraggingSession, movedTo screenPoint: NSPoint) {
-//        print("BookmarksBarViewModel: \(#function)")
-//    }
-    
-//    func draggingSession(_ session: NSDraggingSession, endedAt screenPoint: NSPoint, operation: NSDragOperation) {
-//        print("BookmarksBarViewModel: \(#function)")
-//    }
 
     func draggingSession(_ session: NSDraggingSession, sourceOperationMaskFor context: NSDraggingContext) -> NSDragOperation {
         switch context {
-        case .withinApplication: return .generic
-        case .outsideApplication: return []
+        case .withinApplication:
+            print("RETURNING GENERIC")
+            return .generic
+        case .outsideApplication:
+            print("RETURNING EMPTY")
+            return []
         @unknown default: fatalError()
         }
     }

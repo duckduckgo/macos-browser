@@ -311,9 +311,10 @@ final class BookmarksBarViewController: NSViewController {
     }
     
     private func configureBookmarkButton(button: BookmarksBarButton, withTitle title: String) {
-        button.layerContentsRedrawPolicy = .onSetNeedsDisplay
+        // button.layerContentsRedrawPolicy = .onSetNeedsDisplay
         button.isBordered = false
         button.title = title
+        button.lineBreakMode = .byTruncatingMiddle
         button.target = self
         button.sendAction(on: [.leftMouseDown, .leftMouseDragged, .leftMouseUp, .rightMouseDown])
         button.action = #selector(bookmarkButtonClicked(_:))
@@ -322,8 +323,6 @@ final class BookmarksBarViewController: NSViewController {
         var buttonFrame = button.frame
         buttonFrame.size.width = min(BookmarksBarViewModel.Constants.maximumButtonWidth, buttonFrame.size.width)
         button.frame = buttonFrame
-        
-        button.lineBreakMode = .byTruncatingMiddle
     }
     
     private func buttonIndex(for button: BookmarksBarButton) -> Int? {
@@ -349,12 +348,17 @@ final class BookmarksBarViewController: NSViewController {
             if let initialDraggingLocation = initialDraggingLocation {
                 let distance = initialDraggingLocation.distance(to: event.locationInWindow)
                 if distance <= BookmarksBarViewModel.Constants.distanceRequiredForDragging {
+                    os_log("Received leftMouseDragged event, but haven't dragged far enough", log: .bookmarks, type: .info)
+                    
                     return
                 }
             } else {
                 initialDraggingLocation = event.locationInWindow
+                os_log("Received leftMouseDragged event, setting initial drag location", log: .bookmarks, type: .info)
                 return
             }
+            
+            os_log("Received leftMouseDragged event, starting drag session", log: .bookmarks, type: .info)
 
             let pasteboardItem = NSPasteboardItem()
             pasteboardItem.setDataProvider(viewModel, forTypes: [.URL, .string])
@@ -364,13 +368,11 @@ final class BookmarksBarViewController: NSViewController {
             
             draggedItemOriginalIndex = index
             sender.isHidden = true
+            
+            self.viewModel.isDragging = true
             self.view.beginDraggingSession(with: [draggingItem], event: event, source: viewModel)
         case .leftMouseUp:
-            if initialDraggingLocation != nil {
-                // We just ended a drag operation, don't proceed with left click logic.
-                initialDraggingLocation = nil
-                return
-            }
+            initialDraggingLocation = nil
 
             guard let index = buttonIndex(for: sender) else {
                 return
@@ -381,8 +383,11 @@ final class BookmarksBarViewController: NSViewController {
             }
             
             if let bookmark = entity as? Bookmark {
+                os_log("Received leftMouseUp event, loading bookmark", log: .bookmarks, type: .info)
+                print("isDragging = \(self.viewModel.isDragging)")
                 WindowControllersManager.shared.show(url: bookmark.url, newTab: false)
             } else if let folder = entity as? BookmarkFolder {
+                os_log("Received leftMouseUp event, showing folder contents", log: .bookmarks, type: .info)
                 let menu = NSMenu(title: folder.title)
                 let childViewModels = folder.children.map(BookmarkViewModel.init)
                 let childMenuItems = bookmarkMenuItems(from: childViewModels, topLevel: false)
@@ -488,7 +493,7 @@ extension NSEvent {
 }
 
 extension BookmarksBarViewController: BookmarksBarViewDelegate {
-    
+
     func draggingEntered(draggingInfo: NSDraggingInfo) {
         os_log("Dragging entered", log: .bookmarks, type: .info)
         
@@ -501,6 +506,7 @@ extension BookmarksBarViewController: BookmarksBarViewDelegate {
         if let width = draggingInfo.width {
             additionalWidth = min(width, BookmarksBarViewModel.Constants.maximumButtonWidth) + BookmarksBarViewModel.Constants.buttonSpacing
         } else {
+            print("NO WIDTH!!!")
             additionalWidth = BookmarksBarViewModel.Constants.maximumButtonWidth + BookmarksBarViewModel.Constants.buttonSpacing
         }
         
@@ -519,9 +525,11 @@ extension BookmarksBarViewController: BookmarksBarViewDelegate {
         let result = midpoints.nearest(to: horizontalOffset)
         let additionalWidth: CGFloat
         
+        // TODO: Calculate width
         if draggingInfo.draggingSource is BookmarksBarViewModel, let width = draggingInfo.width {
             additionalWidth = width + BookmarksBarViewModel.Constants.buttonSpacing
         } else {
+            print("NO WIDTH!!!")
             additionalWidth = 100.0
         }
         
@@ -529,11 +537,17 @@ extension BookmarksBarViewController: BookmarksBarViewDelegate {
     }
     
     func draggingEnded(draggingInfo: NSDraggingInfo) {
+        os_log("Dragging ended", log: .bookmarks, type: .info)
+        self.viewModel.isDragging = false
+    }
+    
+    func performDragOperation(draggingInfo: NSDraggingInfo) -> Bool {
+        os_log("Performing drag operation", log: .bookmarks, type: .info)
         initialDraggingLocation = nil
 
         guard let newIndex = dropIndex else {
             os_log("Dragging ended without a drop index, returning", log: .bookmarks, type: .info)
-            return
+            return false
         }
         
         if let index = draggedItemOriginalIndex, let draggedItemUUID = self.bookmarkManager.list?.topLevelEntities[index].id {
@@ -546,17 +560,31 @@ extension BookmarksBarViewController: BookmarksBarViewDelegate {
                 self.dropIndex = nil
                 self.draggedItemOriginalIndex = nil
             }
-        } else if let draggedURLs = draggingInfo.draggingPasteboard.readObjects(forClasses: [NSURL.self]) as? [NSURL] {
+        } else if let draggedItems = draggingInfo.draggingPasteboard.pasteboardItems {
             os_log("Dragging ended with drop index = %d, saving new bookmark", log: .bookmarks, type: .info, newIndex)
             
-            for draggedURL in draggedURLs {
-                bookmarkManager.makeBookmark(for: draggedURL as URL, title: draggedURL.description, isFavorite: false, index: newIndex)
+            for draggedItem in draggedItems {
+                if let (title, url) = titleAndURL(from: draggedItem) {
+                    bookmarkManager.makeBookmark(for: url, title: title, isFavorite: false, index: newIndex)
+                }
             }
 
             self.dropIndex = nil
             self.draggedItemOriginalIndex = nil
             self.layoutButtons()
         }
+        
+        return true
+    }
+    
+    private func titleAndURL(from pasteboardItem: NSPasteboardItem) -> (String, URL)? {
+        guard let urlString = pasteboardItem.string(forType: .URL), let url = URL(string: urlString) else {
+            return nil
+        }
+        
+        // WKWebView pasteboard items include the name of the link under the `public.url-name` type.
+        let name = pasteboardItem.string(forType: NSPasteboard.PasteboardType(rawValue: "public.url-name"))
+        return (name ?? urlString, url)
     }
     
 }

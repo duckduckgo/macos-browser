@@ -17,6 +17,7 @@
 //
 
 import Foundation
+import AppKit
 
 protocol BookmarksBarViewDelegate: AnyObject {
     
@@ -24,6 +25,7 @@ protocol BookmarksBarViewDelegate: AnyObject {
     func draggingExited(draggingInfo: NSDraggingInfo?)
     func draggingUpdated(draggingInfo: NSDraggingInfo)
     func draggingEnded(draggingInfo: NSDraggingInfo)
+    func performDragOperation(draggingInfo: NSDraggingInfo) -> Bool
     
 }
 
@@ -62,6 +64,14 @@ final class BookmarksBarView: ColorView {
         }
         
         delegate?.draggingEnded(draggingInfo: sender)
+    }
+    
+    override func performDragOperation(_ sender: NSDraggingInfo) -> Bool {
+        print(#function)
+        
+        // URL Name
+        // sender.draggingPasteboard.pasteboardItems?.first?.string(forType: NSPasteboard.PasteboardType.init(rawValue: "public.url-name"))
+        return delegate?.performDragOperation(draggingInfo: sender) ?? false
     }
     
 }
