@@ -176,7 +176,7 @@ final class Fire {
                 })
             })
 
-            self.burnRecentlyClosed(domains: domains)
+            self.burnRecentlyClosed(domains: burningDomains)
             self.burnAutoconsentCache()
 
             group.notify(queue: .main) {
