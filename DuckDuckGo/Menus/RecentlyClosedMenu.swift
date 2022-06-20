@@ -28,18 +28,14 @@ final class RecentlyClosedMenu: NSMenu {
         fatalError("RecentlyClosedMenu: Bad initializer")
     }
 
-    init(from mainWindowController: MainWindowController) {
+    init(recentlyClosedCoordinator: RecentlyClosedCoordinatorProtocol) {
         super.init(title: "Recently Closed")
 
-        items = makeMenuItems(mainWindowController: mainWindowController)
-    }
-
-    private func makeMenuItems(mainWindowController: MainWindowController) -> [NSMenuItem] {
-        Array(RecentlyClosedCoordinator.shared.cache
-                .enumerated()
-                .compactMap { NSMenuItem(from: $0.element, cacheIndex: $0.offset) }
-                .reversed()
-                .prefix(Constants.maxNumberOfItems))
+        items = Array(recentlyClosedCoordinator.cache
+                        .enumerated()
+                        .compactMap { NSMenuItem(from: $0.element, cacheIndex: $0.offset) }
+                        .reversed()
+                        .prefix(Constants.maxNumberOfItems))
     }
 
 }
@@ -71,7 +67,7 @@ private extension NSMenuItem {
             return nil
         }
 
-        action = #selector(MainViewController.recentlyClosedAction(_:))
+        action = #selector(AppDelegate.recentlyClosedAction(_:))
         representedObject = cacheIndex
     }
 

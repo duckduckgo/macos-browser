@@ -23,6 +23,7 @@ import os.log
 protocol RecentlyClosedCoordinatorProtocol: AnyObject {
 
     var recentlyClosedEntity: RecentlyClosedCoordinator.RecentlyClosedEntity? { get }
+    var cache: [RecentlyClosedCacheItem] { get }
 
     func reopenTab(cacheIndex: Int?)
     func burnCache(domains: Set<String>?)
@@ -82,7 +83,7 @@ final class RecentlyClosedCoordinator: RecentlyClosedCoordinatorProtocol {
 
     // MARK: - Cache
 
-    @Published private(set) var cache = [RecentlyClosedCacheItem]()
+    private(set) var cache = [RecentlyClosedCacheItem]()
 
     private func cacheTabContent(_ tab: Tab, at tabIndex: Int) {
         guard tab.content != .none, tab.content != .homePage else {

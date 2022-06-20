@@ -218,12 +218,7 @@ final class MainMenu: NSMenu {
     // MARK: - Recently Closed
 
     private func updateRecentlyClosedMenu() {
-        guard let lastKeyMainWindowController = WindowControllersManager.shared.lastKeyMainWindowController else {
-            recentlyClosedMenuItem.isEnabled = false
-            return
-        }
-
-        recentlyClosedMenu = RecentlyClosedMenu(from: lastKeyMainWindowController)
+        recentlyClosedMenu = RecentlyClosedMenu(recentlyClosedCoordinator: RecentlyClosedCoordinator.shared)
         recentlyClosedMenuItem.submenu = recentlyClosedMenu
         recentlyClosedMenuItem.isEnabled = !(recentlyClosedMenu?.items ?? [] ).isEmpty
     }

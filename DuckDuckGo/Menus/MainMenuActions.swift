@@ -50,6 +50,22 @@ extension AppDelegate {
         WindowsManager.closeWindows()
     }
 
+    // MARK: - History
+
+    @IBAction func reopenLastClosedTab(_ sender: Any?) {
+        RecentlyClosedCoordinator.shared.reopenTab()
+    }
+
+    @IBAction func recentlyClosedAction(_ sender: Any?) {
+        guard let menuItem = sender as? NSMenuItem,
+              let cacheIndex = menuItem.representedObject as? Int else {
+                  assertionFailure("Wrong sender for recentlyClosedAction()")
+                  return
+              }
+
+        RecentlyClosedCoordinator.shared.reopenTab(cacheIndex: cacheIndex)
+    }
+
     // MARK: - Window
 
     @IBAction func reopenAllWindowsFromLastSession(_ sender: Any?) {
@@ -289,21 +305,6 @@ extension MainViewController {
         }
 
         selectedTabViewModel.tab.openHomePage()
-    }
-
-    @IBAction func reopenLastClosedTab(_ sender: Any?) {
-        RecentlyClosedCoordinator.shared.reopenTab()
-    }
-
-    @IBAction func recentlyClosedAction(_ sender: Any?) {
-
-        guard let menuItem = sender as? NSMenuItem,
-              let cacheIndex = menuItem.representedObject as? Int else {
-                  assertionFailure("Wrong sender for recentlyClosedAction()")
-                  return
-              }
-
-        RecentlyClosedCoordinator.shared.reopenTab(cacheIndex: cacheIndex)
     }
 
     // MARK: - Bookmarks
@@ -598,10 +599,6 @@ extension MainViewController: NSMenuItemValidation {
              #selector(MainViewController.showManageBookmarks(_:)):
             return true
 
-        // Reopen Last Removed Tab
-        case #selector(MainViewController.reopenLastClosedTab(_:)):
-            return RecentlyClosedCoordinator.shared.canReopenRecentlyClosedTab == true
-
         // Printing/saving
         case #selector(MainViewController.saveAs(_:)),
              #selector(MainViewController.printWebView(_:)):
@@ -648,6 +645,10 @@ extension AppDelegate: NSMenuItemValidation {
         switch menuItem.action {
         case #selector(AppDelegate.closeAllWindows(_:)):
             return !WindowControllersManager.shared.mainWindowControllers.isEmpty
+
+        // Reopen Last Removed Tab
+        case #selector(AppDelegate.reopenLastClosedTab(_:)):
+            return RecentlyClosedCoordinator.shared.canReopenRecentlyClosedTab == true
 
         // Reopen All Windows from Last Session
         case #selector(AppDelegate.reopenAllWindowsFromLastSession(_:)):
