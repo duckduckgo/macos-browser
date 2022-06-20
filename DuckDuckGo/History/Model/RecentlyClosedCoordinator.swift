@@ -22,7 +22,6 @@ import os.log
 
 protocol RecentlyClosedCoordinatorProtocol: AnyObject {
 
-    var recentlyClosedEntity: RecentlyClosedCoordinator.RecentlyClosedEntity? { get }
     var cache: [RecentlyClosedCacheItem] { get }
 
     func reopenTab(cacheIndex: Int?)
@@ -46,28 +45,19 @@ final class RecentlyClosedCoordinator: RecentlyClosedCoordinatorProtocol {
         return !cache.isEmpty
     }
 
-    enum RecentlyClosedEntity: Equatable {
-        case tab
-        case window(numberOfTabs: Int)
-    }
-
-    var recentlyClosedEntity: RecentlyClosedEntity?
-
     // MARK: - Subscribtions to events
 
-    private var mainWCDidRegisterCancellable: AnyCancellable?
-    private var mainWCDidUnregisterCancellable: AnyCancellable?
+    private var mainVCDidRegisterCancellable: AnyCancellable?
+    private var mainVCDidUnregisterCancellable: AnyCancellable?
     private var cancellables = Set<AnyCancellable>()
 
     private func subscribeToWindowControllersManager() {
-        mainWCDidRegisterCancellable = WindowControllersManager.shared.didRegisterWindowController
+        mainVCDidRegisterCancellable = WindowControllersManager.shared.didRegisterWindowController
             .sink(receiveValue: { [weak self] mainWindowController in
                 self?.subscribeToTabCollection(of: mainWindowController)
             })
-        mainWCDidUnregisterCancellable = WindowControllersManager.shared.didUnregisterWindowController
+        mainVCDidUnregisterCancellable = WindowControllersManager.shared.didUnregisterWindowController
             .sink(receiveValue: { [weak self] mainWindowController in
-                let numberOfTabs = mainWindowController.mainViewController.tabCollectionViewModel.tabCollection.tabs.count
-                self?.recentlyClosedEntity = .window(numberOfTabs: numberOfTabs)
                 self?.cacheTabCollectionContent(mainWindowController.mainViewController.tabCollectionViewModel.tabCollection)
             })
     }
@@ -75,7 +65,6 @@ final class RecentlyClosedCoordinator: RecentlyClosedCoordinatorProtocol {
     private func subscribeToTabCollection(of mainWindowController: MainWindowController) {
         mainWindowController.mainViewController.tabCollectionViewModel.tabCollection.didRemoveTabPublisher
             .sink { [weak self] (tab, index) in
-                self?.recentlyClosedEntity = .tab
                 self?.cacheTabContent(tab, at: index)
             }
             .store(in: &cancellables)

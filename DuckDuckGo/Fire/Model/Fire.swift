@@ -104,7 +104,7 @@ final class Fire {
          faviconManagement: FaviconManagement = FaviconManager.shared,
          autoconsentManagement: AutoconsentManagement? = nil,
          stateRestorationManager: AppStateRestorationManager? = nil,
-         recentlyClosedCoordinator: RecentlyClosedCoordinatorProtocol? = nil) {
+         recentlyClosedCoordinator: RecentlyClosedCoordinatorProtocol? = RecentlyClosedCoordinator.shared) {
         self.webCacheManager = cacheManager
         self.historyCoordinating = historyCoordinating
         self.permissionManager = permissionManager
@@ -176,8 +176,8 @@ final class Fire {
                 })
             })
 
-            self.burnAutoconsentCache()
             self.burnRecentlyClosed(domains: domains)
+            self.burnAutoconsentCache()
 
             group.notify(queue: .main) {
                 self.burningData = nil
@@ -216,9 +216,9 @@ final class Fire {
             self.burnWindows(exceptOwnerOf: tabCollectionViewModel) {
                 group.leave()
             }
-            
-            self.burnAutoconsentCache()
+
             self.burnRecentlyClosed()
+            self.burnAutoconsentCache()
 
             group.notify(queue: .main) {
                 self.burningData = nil
