@@ -85,6 +85,11 @@ final class RecentlyClosedCoordinator: RecentlyClosedCoordinatorProtocol {
     @Published private(set) var cache = [RecentlyClosedCacheItem]()
 
     private func cacheTabContent(_ tab: Tab, at tabIndex: Int) {
+        guard tab.content != .none, tab.content != .homePage else {
+            // We don't cache empty tabs
+            return
+        }
+
         let cacheItem = RecentlyClosedCacheItem(tab: tab, tabIndex: tabIndex)
         cache.append(cacheItem)
     }
