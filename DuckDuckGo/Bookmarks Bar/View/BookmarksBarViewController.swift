@@ -24,10 +24,6 @@ import os.log
 // swiftlint:disable:next type_body_length
 final class BookmarksBarViewController: NSViewController {
     
-    private struct ButtonLayoutMetadata {
-        var bookmarksBarWidth: CGFloat = 0
-    }
-    
     private struct DraggedItemLayoutData {
         let dropIndex: Int
         let proposedItemWidth: CGFloat
@@ -59,12 +55,7 @@ final class BookmarksBarViewController: NSViewController {
     // MARK: - Layout Calculation
     
     private var buttonData: [BookmarksBarViewModel.BookmarkButtonData] = []
-
-    private var midpoints: [CGFloat] = [] {
-        didSet {
-            print("CHANGED MIDPOINTS")
-        }
-    }
+    private var midpoints: [CGFloat] = []
     
     private var clippedButtons: [BookmarksBarViewModel.BookmarkButtonData] = [] {
         didSet {
@@ -72,7 +63,7 @@ final class BookmarksBarViewController: NSViewController {
         }
     }
     
-    private var layoutMetadata = ButtonLayoutMetadata()
+    private var bookmarksBarWidth: CGFloat = 0
     
     private var draggedItemOriginalIndex: Int?
     private var dropIndex: Int?
@@ -93,7 +84,7 @@ final class BookmarksBarViewController: NSViewController {
         view.postsFrameChangedNotifications = true
         
         NotificationCenter.default.addObserver(self,
-                                               selector: #selector(bookmarksBarViewFrameChanged),
+                                               selector: #selector(frameChangeNotification),
                                                name: NSView.frameDidChangeNotification,
                                                object: view)
         
@@ -102,66 +93,48 @@ final class BookmarksBarViewController: NSViewController {
                                                name: .faviconCacheUpdated,
                                                object: nil)
         
-        subscribeToViewModelState()
         subscribeToBookmarks()
 
         self.buttonData = viewModel.createButtons(for: bookmarkManager.list?.topLevelEntities ?? [])
         self.buttonData.forEach {
             $0.button.target = self
-            $0.button.sendAction(on: [.leftMouseDown, .leftMouseDragged, .leftMouseUp, .rightMouseDown])
+            $0.button.sendAction(on: [.leftMouseDown, .leftMouseDragged, .leftMouseUp])
             $0.button.action = #selector(bookmarkButtonClicked(_:))
+            $0.button.menu = ContextualMenu.menu(for: [$0.bookmarkViewModel.entity], includeBookmarkEditMenu: false)
         }
         
         addAndPositionButtonsForInitialLayout()
-    }
-    
-    override func viewWillAppear() {
-        super.viewWillAppear()
-        
-        layoutButtons()
-        calculateFixedButtonSizingValues()
-        bookmarksBarViewFrameChanged()
-    }
-    
-    private func subscribeToViewModelState() {
-        viewModel.$state.sink { [weak self] state in
-            guard let self = self else { return }
-
-            switch state {
-            case .idle:
-                print("Idle")
-            case .beginningDrag(originalLocation: let originalLocation):
-                print("Beginning drag")
-            case .draggingExistingItem(draggedItemData: let draggedItemData):
-                print("Dragging existing")
-            case .draggingNewItem(draggedItemData: let draggedItemData):
-                print("Dragging new")
-            }
-        }.store(in: &cancellables)
     }
 
     private func subscribeToBookmarks() {
         bookmarkManager.listPublisher.sink { [weak self] list in
             guard let self = self else { return }
+            
+            print("Bookmarks Changed")
             self.buttonData = self.viewModel.createButtons(for: list?.topLevelEntities ?? [])
             self.buttonData.forEach {
                 $0.button.target = self
-                $0.button.sendAction(on: [.leftMouseDown, .leftMouseDragged, .leftMouseUp, .rightMouseDown])
+                $0.button.sendAction(on: [.leftMouseDown, .leftMouseDragged, .leftMouseUp])
                 $0.button.action = #selector(self.bookmarkButtonClicked(_:))
+                $0.button.menu = ContextualMenu.menu(for: [$0.bookmarkViewModel.entity], includeBookmarkEditMenu: false)
             }
 
             self.addAndPositionButtonsForInitialLayout()
-            self.layoutButtons()
         }.store(in: &cancellables)
     }
     
     @objc
+    private func frameChangeNotification() {
+        print(#function)
+        bookmarksBarViewFrameChanged()
+    }
+    
     private func bookmarksBarViewFrameChanged() {
-        viewModel.handle(event: .containerFrameChanged(view.frame))
-
+        print(#function)
         layoutButtons()
 
-        let maximumWidth = layoutMetadata.bookmarksBarWidth + (BookmarksBarViewModel.Constants.buttonSpacing * 2) + clippedItemsIndicator.frame.width
+        let maximumWidth = bookmarksBarWidth + (BookmarksBarViewModel.Constants.buttonSpacing * 2) + clippedItemsIndicator.frame.width
+        
         if view.frame.size.width <= maximumWidth {
             removeLastButton()
         } else {
@@ -177,6 +150,8 @@ final class BookmarksBarViewController: NSViewController {
     }
     
     private func addAndPositionButtonsForInitialLayout() {
+        print(#function)
+        
         for view in view.subviews where view is NSButton {
             view.removeFromSuperview()
         }
@@ -185,7 +160,11 @@ final class BookmarksBarViewController: NSViewController {
         
         clippedButtons = []
         addClippedItemsIndicator()
+
         calculateFixedButtonSizingValues()
+        
+        print("DEBUG \(Date()): LayoutButtons AddAndPosition")
+        layoutButtons()
     }
     
     private func addClippedItemsIndicator() {
@@ -196,6 +175,8 @@ final class BookmarksBarViewController: NSViewController {
     }
     
     private func tryToRestoreClippedButton() {
+        print(#function)
+
         guard let firstClippedButton = clippedButtons.first else {
             return
         }
@@ -206,7 +187,7 @@ final class BookmarksBarViewController: NSViewController {
         
         // Button spacing * 3: Once for the padding between the last button and the new one,
         // and two to account for the spacing at the beginning and end of the list.
-        if layoutMetadata.bookmarksBarWidth +
+        if bookmarksBarWidth +
             (BookmarksBarViewModel.Constants.buttonSpacing * 3) +
             clippedButtonWidth +
             clippedItemsIndicator.frame.width < view.bounds.width {
@@ -223,6 +204,8 @@ final class BookmarksBarViewController: NSViewController {
         guard let lastButton = buttonData.popLast() else {
             return
         }
+        
+        print("Popped button: \(lastButton.button.title)")
 
         lastButton.button.removeFromSuperview()
         clippedButtons.insert(lastButton, at: 0)
@@ -232,10 +215,10 @@ final class BookmarksBarViewController: NSViewController {
     }
     
     private func calculateFixedButtonSizingValues() {
+        print(#function)
         let cumulativeButtonWidth = buttonData.map(\.button.bounds.size.width).reduce(0, +)
         let cumulativeSpacingWidth = BookmarksBarViewModel.Constants.buttonSpacing * CGFloat(max(0, buttonData.count - 1))
-        layoutMetadata.bookmarksBarWidth = cumulativeButtonWidth + cumulativeSpacingWidth
-        
+        bookmarksBarWidth = cumulativeButtonWidth + cumulativeSpacingWidth
         bookmarksBarViewFrameChanged()
     }
 
@@ -292,7 +275,7 @@ final class BookmarksBarViewController: NSViewController {
         if forceLeftAlignedButtons {
             previousMaximumXValue = BookmarksBarViewModel.Constants.buttonSpacing
         } else {
-            previousMaximumXValue = max(BookmarksBarViewModel.Constants.buttonSpacing, (containerFrame.midX) - (layoutMetadata.bookmarksBarWidth / 2))
+            previousMaximumXValue = max(BookmarksBarViewModel.Constants.buttonSpacing, (containerFrame.midX - (bookmarksBarWidth / 2)))
         }
 
         for (index, button) in buttons.enumerated() {
@@ -474,6 +457,8 @@ final class BookmarksBarViewController: NSViewController {
     
 }
 
+// MARK: - BookmarksBarViewDelegate
+
 extension BookmarksBarViewController: BookmarksBarViewDelegate {
 
     func draggingEntered(draggingInfo: NSDraggingInfo) {
@@ -495,7 +480,6 @@ extension BookmarksBarViewController: BookmarksBarViewDelegate {
     private func calculateNearestDragIndex(draggingInfo: NSDraggingInfo) -> (index: Int, draggedItemWidth: CGFloat) {
         let convertedDraggingLocation = view.convert(draggingInfo.draggingLocation, from: nil)
         let horizontalOffset = convertedDraggingLocation.x
-        
         let result = midpoints.nearest(to: horizontalOffset)
         let additionalWidth: CGFloat
         
@@ -511,7 +495,7 @@ extension BookmarksBarViewController: BookmarksBarViewDelegate {
             if let item = draggingInfo.draggingPasteboard.pasteboardItems?.first, let title = titleAndURL(from: item) {
                 additionalWidth = min(
                     BookmarksBarViewModel.Constants.maximumButtonWidth,
-                    title.0.renderingWidth(with: BookmarksBarViewModel.Constants.labelFont)
+                    title.0.renderingWidth(with: BookmarksBarViewModel.Constants.labelFont) + 16 + 10
                 )
             } else {
                 additionalWidth = draggingInfo.width ?? 0
@@ -524,6 +508,13 @@ extension BookmarksBarViewController: BookmarksBarViewDelegate {
     func draggingEnded(draggingInfo: NSDraggingInfo) {
         os_log("Dragging ended", log: .bookmarks, type: .info)        
         viewModel.handle(event: .draggingEnded)
+        
+        for button in buttonData {
+            button.button.isHidden = false
+        }
+        
+        print("DEBUG \(Date()): LayoutButtons DraggingEnded")
+        layoutButtons()
     }
     
     func performDragOperation(draggingInfo: NSDraggingInfo) -> Bool {
@@ -539,6 +530,7 @@ extension BookmarksBarViewController: BookmarksBarViewDelegate {
             os_log("Dragging ended with drop index = %d, moving existing bookmark", log: .bookmarks, type: .info, newIndex)
             
             self.buttonData.move(fromOffsets: IndexSet(integer: index), toOffset: newIndex)
+            print("DEBUG \(Date()): PerformDragOperation")
             self.layoutButtons()
             
             bookmarkManager.move(objectUUID: draggedItemUUID, toIndexWithinParentFolder: newIndex) { _ in
@@ -556,20 +548,111 @@ extension BookmarksBarViewController: BookmarksBarViewDelegate {
 
             self.dropIndex = nil
             self.draggedItemOriginalIndex = nil
+            print("DEBUG \(Date()): PerformDragOperation")
             self.layoutButtons()
         }
         
         return true
     }
     
-    private func titleAndURL(from pasteboardItem: NSPasteboardItem) -> (String, URL)? {
+    private func titleAndURL(from pasteboardItem: NSPasteboardItem) -> (title: String, url: URL)? {
         guard let urlString = pasteboardItem.string(forType: .URL), let url = URL(string: urlString) else {
             return nil
         }
         
         // WKWebView pasteboard items include the name of the link under the `public.url-name` type.
         let name = pasteboardItem.string(forType: NSPasteboard.PasteboardType(rawValue: "public.url-name"))
-        return (name ?? urlString, url)
+        return (title: name ?? urlString, url: url)
+    }
+    
+}
+
+extension BookmarksBarViewController: BookmarkMenuItemSelectors {
+    
+    func openBookmarkInNewTab(_ sender: NSMenuItem) {
+        guard let bookmark = sender.representedObject as? Bookmark else {
+            assertionFailure("Failed to cast menu represented object to Bookmark")
+            return
+        }
+        
+        WindowControllersManager.shared.show(url: bookmark.url, newTab: true)
+    }
+    
+    func openBookmarkInNewWindow(_ sender: NSMenuItem) {
+        guard let bookmark = sender.representedObject as? Bookmark else {
+            assertionFailure("Failed to cast menu represented object to Bookmark")
+            return
+        }
+        
+        WindowsManager.openNewWindow(with: bookmark.url)
+    }
+    
+    func toggleBookmarkAsFavorite(_ sender: NSMenuItem) {
+        guard let bookmark = sender.representedObject as? Bookmark else {
+            assertionFailure("Failed to cast menu represented object to Bookmark")
+            return
+        }
+        
+        bookmark.isFavorite.toggle()
+        LocalBookmarkManager.shared.update(bookmark: bookmark)
+    }
+    
+    func editBookmark(_ sender: NSMenuItem) {
+        // Unsupported in the list view for the initial release.
+    }
+    
+    func copyBookmark(_ sender: NSMenuItem) {
+        guard let bookmark = sender.representedObject as? Bookmark, let bookmarkURL = bookmark.url as NSURL? else {
+            assertionFailure("Failed to cast menu represented object to Bookmark")
+            return
+        }
+        
+        let pasteboard = NSPasteboard.general
+        pasteboard.declareTypes([.URL], owner: nil)
+        bookmarkURL.write(to: pasteboard)
+        pasteboard.setString(bookmarkURL.absoluteString ?? "", forType: .string)
+    }
+    
+    func deleteBookmark(_ sender: NSMenuItem) {
+        guard let bookmark = sender.representedObject as? Bookmark else {
+            assertionFailure("Failed to cast menu represented object to Bookmark")
+            return
+        }
+        
+        LocalBookmarkManager.shared.remove(bookmark: bookmark)
+    }
+    
+}
+
+extension BookmarksBarViewController: FolderMenuItemSelectors {
+    
+    func newFolder(_ sender: NSMenuItem) {
+        let addFolderViewController = AddFolderModalViewController.create()
+        // TODO
+        // addFolderViewController.delegate = self
+        beginSheet(addFolderViewController)
+    }
+    
+    func renameFolder(_ sender: NSMenuItem) {
+        guard let folder = sender.representedObject as? BookmarkFolder else {
+            assertionFailure("Failed to retrieve Bookmark from Rename Folder context menu item")
+            return
+        }
+        
+        let addFolderViewController = AddFolderModalViewController.create()
+        // TODO
+        // addFolderViewController.delegate = self
+        addFolderViewController.edit(folder: folder)
+        presentAsModalWindow(addFolderViewController)
+    }
+    
+    func deleteFolder(_ sender: NSMenuItem) {
+        guard let folder = sender.representedObject as? BookmarkFolder else {
+            assertionFailure("Failed to retrieve Bookmark from Delete Folder context menu item")
+            return
+        }
+        
+        LocalBookmarkManager.shared.remove(folder: folder)
     }
     
 }

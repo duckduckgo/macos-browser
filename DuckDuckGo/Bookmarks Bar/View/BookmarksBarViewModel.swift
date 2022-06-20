@@ -25,7 +25,7 @@ final class BookmarksBarViewModel: NSObject {
     // MARK: Enums
     
     enum Constants {
-        static let distanceRequiredForDragging: CGFloat = 7
+        static let distanceRequiredForDragging: CGFloat = 10
         static let buttonSpacing: CGFloat = 8
         static let buttonHeight: CGFloat = 28
         static let maximumButtonWidth: CGFloat = 150
@@ -35,7 +35,7 @@ final class BookmarksBarViewModel: NSObject {
     enum ViewState: Equatable {
         case idle
         case beginningDrag(originalLocation: CGPoint)
-        case draggingExistingItem(draggedItemData: NewDraggedItemData)
+        case draggingExistingItem(draggedItemData: ExistingDraggedItemData)
         case draggingNewItem(draggedItemData: NewDraggedItemData)
         
         var isDragging: Bool {
@@ -47,7 +47,6 @@ final class BookmarksBarViewModel: NSObject {
     }
     
     enum ViewEvent {
-        case containerFrameChanged(CGRect)
         case mouseDown(CGPoint)
         case mouseDragged(buttonIndex: Int, location: CGPoint)
         case mouseUp
@@ -81,11 +80,7 @@ final class BookmarksBarViewModel: NSObject {
         let title: String
     }
 
-    @Published var isDragging = false {
-        didSet {
-            print("DID SET: isDragging = \(isDragging)")
-        }
-    }
+    @Published var isDragging = false
     
     @Published private(set) var state: ViewState = .idle
     private(set) var buttonLayoutData: ButtonRowLayoutData = ButtonRowLayoutData()
@@ -101,16 +96,13 @@ final class BookmarksBarViewModel: NSObject {
     
     func handle(event: ViewEvent) {
         switch event {
-        case .containerFrameChanged:
-            // Calculate new frames
-            break
         case .mouseDown:
             break
         case .mouseDragged(let draggedButtonIndex, let currentLocation):
             if case let .beginningDrag(originalLocation) = self.state {
                 let distance = originalLocation.distance(to: currentLocation)
                 if distance > Constants.distanceRequiredForDragging {
-                    self.state = .draggingExistingItem(draggedItemData: NewDraggedItemData(proposedDropIndex: 0, proposedItemWidth: 0))
+                    self.state = .draggingExistingItem(draggedItemData: ExistingDraggedItemData(originalIndex: 0, title: "Title"))
                 }
             } else {
                 self.state = .beginningDrag(originalLocation: currentLocation)
@@ -162,8 +154,6 @@ final class BookmarksBarViewModel: NSObject {
         buttonFrame.size.width = min(BookmarksBarViewModel.Constants.maximumButtonWidth, buttonFrame.size.width)
         button.frame = buttonFrame
     }
-    
-    // MARK: - Menu Item Creation
  
 }
 

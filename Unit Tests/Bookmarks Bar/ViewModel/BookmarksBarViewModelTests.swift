@@ -45,7 +45,7 @@ class BookmarksBarViewModelTests: XCTestCase {
     }
     
     func testWhenStateIsBeginningDrag_AndViewCrossesDragSessionThreshold_ThenStateEqualsDragging() throws {
-        let expectedItem = BookmarksBarViewModel.DraggedItemData(proposedDropIndex: 0, proposedItemWidth: 0)
+        let expectedItem = BookmarksBarViewModel.ExistingDraggedItemData(originalIndex: 0, title: "Title")
         
         let mockBookmarksManager = createMockBookmarksManager()
         let viewModel = BookmarksBarViewModel(bookmarkManager: mockBookmarksManager)
