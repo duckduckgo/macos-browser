@@ -300,10 +300,10 @@ final class NavigationBarViewController: NSViewController {
             guard view.window?.isKeyWindow == true,
                   let url = sender.userInfo?[AutoconsentUserScript.Constants.popupHiddenUrlKey] as? URL,
                   let host = url.host,
-                  !AutoconsentUserScript.background.sitesNotifiedCache.contains(host),
+                  !AutoconsentManagement.shared.sitesNotifiedCache.contains(host),
                   let relativeTarget = self.addressBarViewController?.addressBarButtonsViewController?.privacyEntryPointButton
             else { return }
-            AutoconsentUserScript.background.sitesNotifiedCache.insert(host)
+            AutoconsentManagement.shared.sitesNotifiedCache.insert(host)
             DispatchQueue.main.async { [weak self] in
                 guard let self = self,
                       self.tabCollectionViewModel.selectedTabViewModel?.tab.url == url else {

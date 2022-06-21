@@ -1,14 +1,11 @@
 import AutoConsent from '@duckduckgo/autoconsent';
-import jsonRules from '@duckduckgo/autoconsent/rules/rules.json';
 
 const autoconsent = new AutoConsent(
-    window.webkit.messageHandlers.contentMessageHandler.postMessage,
-    {
-        enabled: true,
-        autoAction: 'optOut',
-        disabledCmps: [],
-        enablePrehide: true,
+    (message) => {
+        console.log('sending', message);
+        window.webkit.messageHandlers[message.type].postMessage(message).then(resp => {
+            console.log('received', resp);
+            autoconsent.receiveMessageCallback(resp);
+        });
     },
-    jsonRules,
 );
-window.autoconsentMessageCallback = autoconsent.receiveMessageCallback;

@@ -111,7 +111,7 @@ final class Fire {
         self.faviconManagement = faviconManagement
         
         if #available(macOS 11, *), autoconsentManagement == nil {
-            self.autoconsentManagement = AutoconsentUserScript.background
+            self.autoconsentManagement = AutoconsentManagement.shared
         } else {
             self.autoconsentManagement = autoconsentManagement
         }

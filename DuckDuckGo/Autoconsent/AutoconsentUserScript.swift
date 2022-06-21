@@ -28,13 +28,19 @@ protocol UserScriptWithAutoconsent: UserScript {
     var delegate: AutoconsentUserScriptDelegate? { get set }
 }
 
-@available(macOS 11, *)
-final class AutoconsentUserScript: NSObject, UserScriptWithAutoconsent {
+final class AutoconsentManagement {
+    static let shared = AutoconsentManagement()
+    var sitesNotifiedCache = Set<String>()
+    func clearCache() {
+        dispatchPrecondition(condition: .onQueue(.main))
+        sitesNotifiedCache.removeAll()
+    }
+}
 
-    private static var globalTabCounter = 0
+@available(macOS 11, *)
+final class AutoconsentUserScript: NSObject, WKScriptMessageHandlerWithReply, UserScriptWithAutoconsent {
     private static var promptLastShown: Date?
-    static let background = AutoconsentBackground()
-    
+
     var injectionTime: WKUserScriptInjectionTime { .atDocumentStart }
     var forMainFrameOnly: Bool { false }
     
@@ -44,42 +50,105 @@ final class AutoconsentUserScript: NSObject, UserScriptWithAutoconsent {
     }
     
     private enum MessageName: String, CaseIterable {
-        case autoconsentBackgroundMessage
-        case autoconsentPageReady
+        case `init`
+        case eval
+        case popupFound
+        case optOutResult
+        case optInResult
+        case selfTestResult
+        case autoconsentDone
+        case autoconsentError
     }
     public var messageNames: [String] { MessageName.allCases.map(\.rawValue) }
     let source: String
-    private let tabId: Int
     private let config: PrivacyConfiguration
-    private var actionInProgress = false
-    private weak var webview: WKWebView?
     weak var delegate: AutoconsentUserScriptDelegate?
 
     init(scriptSource: ScriptSourceProviding, config: PrivacyConfiguration) {
         source = Self.loadJS("autoconsent-bundle", from: .main, withReplacements: [:])
-        Self.globalTabCounter += 1
-        tabId = Self.globalTabCounter
         self.config = config
     }
 
+    func userContentController(_ userContentController: WKUserContentController,
+                               didReceive message: WKScriptMessage) {
+        // this is never used because macOS <11 is not supported by autoconsent
+    }
+
     @MainActor
-    func userContentController(_ userContentController: WKUserContentController, didReceive message: WKScriptMessage) {
-        guard let messageName = MessageName(rawValue: message.name) else { return }
-        if message.webView != nil {
-            webview = message.webView
+    func userContentController(_ userContentController: WKUserContentController,
+                               didReceive message: WKScriptMessage,
+                               replyHandler: @escaping (Any?, String?) -> Void) {
+        os_log("Message received: %s", log: .autoconsent, type: .debug, String(describing: message.body))
+        guard let messageName = MessageName(rawValue: message.name) else {
+            replyHandler(nil, "Unknown message type")
+            return
         }
 
         switch messageName {
-        case .autoconsentBackgroundMessage:
-            // forward messages from Userscript to the background
-            return Self.background.onUserScriptMessage(in: tabId, message)
-        case .autoconsentPageReady:
-            // Page ready event (main frame): trigger CMP detection and opt-out if popup is being shown.
-            os_log("page ready: %s", log: .autoconsent, type: .debug, String(describing: message.body))
-            guard let url = URL(string: message.body as? String ?? "") else {
-                return
+        case MessageName.`init`:
+            let remoteConfig = self.config.settings(for: .autoconsent)
+            let disabledCMPs = remoteConfig["disabledCMPs"] as? [String] ?? []
+            let rulesUrl = Bundle.main.url(forResource: "rules", withExtension: "json")!
+            let rulesData = (try? Data(contentsOf: rulesUrl))!
+            let rules = try? JSONSerialization.jsonObject(with: rulesData, options: [])
+
+            replyHandler([
+                "type": "initResp",
+                "rules": rules,
+                "config": [
+                    "enabled": true,
+                    "autoAction": "optOut",
+                    "disabledCmps": disabledCMPs,
+                    "enablePrehide": true
+                ]
+            ], nil)
+        case MessageName.eval:
+            let request = (message.body as? [String: Any])!
+            let payload = request["code"]!
+            let reqId = request["id"]!
+            let script = """
+            (() => {
+            try {
+                console.log("EXEC", `\(payload)`);
+                return !!(\(payload))
+            } catch (e) {
+              // ignore CSP errors
+              return;
             }
-            onPageReady(url: url)
+            })();
+            """
+            
+            if let webview = message.webView {
+                webview.evaluateJavaScript(script, in: message.frameInfo, in: WKContentWorld.page, completionHandler: { (result) in
+                    switch result {
+                    case.failure(let error):
+                        replyHandler(nil, "Error snippet: \(error)")
+                    case.success(let value):
+                        replyHandler(
+                            [
+                                "type": "evalResp",
+                                "id": reqId,
+                                "result": value
+                            ],
+                            nil
+                        )
+                    }
+                })
+            } else {
+                replyHandler(nil, "missing frame target")
+            }
+        case MessageName.popupFound:
+            os_log("OLOLO: %s", log: .autoconsent, type: .debug, String(describing: message.body))
+        case MessageName.optOutResult:
+            os_log("OLOLO: %s", log: .autoconsent, type: .debug, String(describing: message.body))
+        case MessageName.optInResult:
+            os_log("OLOLO: %s", log: .autoconsent, type: .debug, String(describing: message.body))
+        case MessageName.selfTestResult:
+            os_log("OLOLO: %s", log: .autoconsent, type: .debug, String(describing: message.body))
+        case MessageName.autoconsentDone:
+            os_log("OLOLO: %s", log: .autoconsent, type: .debug, String(describing: message.body))
+        case MessageName.autoconsentError:
+            os_log("OLOLO: %s", log: .autoconsent, type: .debug, String(describing: message.body))
         }
     }
 
@@ -93,118 +162,111 @@ final class AutoconsentUserScript: NSObject, UserScriptWithAutoconsent {
         }
         
         // reset dashboard state
-        self.delegate?.autoconsentUserScript(consentStatus: CookieConsentInfo(
-            consentManaged: Self.background.sitesNotifiedCache.contains(url.host ?? ""), optoutFailed: nil, selftestFailed: nil))
+//        self.delegate?.autoconsentUserScript(consentStatus: CookieConsentInfo(
+//            consentManaged: Self.sitesNotifiedCache.contains(url.host ?? ""), optoutFailed: nil, selftestFailed: nil))
 
         guard config.isFeature(.autoconsent, enabledForDomain: url.host) else {
             os_log("disabled for site: %s", log: .autoconsent, type: .info, String(describing: url.absoluteString))
-            return
-        }
-        
-        guard actionInProgress == false else {
             return
         }
 
         guard url.absoluteString != "about:home" else {
             return
         }
-        
-        self.actionInProgress = true
 
-        Self.background.ready {
-            // push current privacy config settings to the background page
-            Self.background.updateSettings(settings: self.config.settings(for: .autoconsent))
-            let cmp = await Self.background.detectCmp(in: self.tabId)
-            guard let cmp = cmp, cmp.result == true else {
-                os_log("no CMP detected", log: .autoconsent, type: .info)
-                self.actionInProgress = false
-                return
-            }
-            os_log("CMP found: %s", log: .autoconsent, type: .info, String(describing: cmp.ruleName))
-
-            guard await Self.background.isPopupOpen(in: self.tabId) else {
-                os_log("popup not open", log: .autoconsent, type: .debug)
-                self.actionInProgress = false
-                return
-            }
-            os_log("Open popup found: %s", log: .autoconsent, type: .info, String(describing: cmp.ruleName))
-
-            // check if the user has explicitly enabled the feature
-            self.checkUserWasPrompted { enabled in
-                guard enabled else {
-                    self.actionInProgress = false
-                    return
-                }
-                Task {
-                    await self.runOptOut(for: cmp, on: url)
-                }
-            }
-        }
+//        Self.background.ready {
+//            // push current privacy config settings to the background page
+//            Self.background.updateSettings(settings: self.config.settings(for: .autoconsent))
+//            let cmp = await Self.background.detectCmp(in: self.tabId)
+//            guard let cmp = cmp, cmp.result == true else {
+//                os_log("no CMP detected", log: .autoconsent, type: .info)
+//                self.actionInProgress = false
+//                return
+//            }
+//            os_log("CMP found: %s", log: .autoconsent, type: .info, String(describing: cmp.ruleName))
+//
+//            guard await Self.background.isPopupOpen(in: self.tabId) else {
+//                os_log("popup not open", log: .autoconsent, type: .debug)
+//                self.actionInProgress = false
+//                return
+//            }
+//            os_log("Open popup found: %s", log: .autoconsent, type: .info, String(describing: cmp.ruleName))
+//
+//            // check if the user has explicitly enabled the feature
+//            self.checkUserWasPrompted { enabled in
+//                guard enabled else {
+//                    self.actionInProgress = false
+//                    return
+//                }
+//                Task {
+//                    await self.runOptOut(for: cmp, on: url)
+//                }
+//            }
+//        }
     }
 
     @MainActor
     func checkUserWasPrompted(callback: @escaping (Bool) -> Void) {
-        let preferences = PrivacySecurityPreferences.shared
-        guard preferences.autoconsentEnabled == nil else {
-            callback(true)
-            return
-        }
-        let now = Date.init()
-        guard Self.promptLastShown == nil || now > Self.promptLastShown!.addingTimeInterval(30),
-              let window = self.webview?.window else {
-            callback(false)
-            return
-        }
-        Self.promptLastShown = now
-        let alert = NSAlert.cookiePopup()
-        alert.beginSheetModal(for: window, completionHandler: { response in
-            switch response {
-            case .alertFirstButtonReturn:
-                // User wants to turn on the feature
-                preferences.autoconsentEnabled = true
-                callback(true)
-            case .alertSecondButtonReturn:
-                // "Not now"
-                callback(false)
-            case .alertThirdButtonReturn:
-                // "Don't ask again"
-                preferences.autoconsentEnabled = false
-                callback(false)
-            case _:
-                callback(false)
-            }
-        })
+//        let preferences = PrivacySecurityPreferences.shared
+//        guard preferences.autoconsentEnabled == nil else {
+//            callback(true)
+//            return
+//        }
+//        let now = Date.init()
+//        guard Self.promptLastShown == nil || now > Self.promptLastShown!.addingTimeInterval(30),
+//              let window = self.webview?.window else {
+//            callback(false)
+//            return
+//        }
+//        Self.promptLastShown = now
+//        let alert = NSAlert.cookiePopup()
+//        alert.beginSheetModal(for: window, completionHandler: { response in
+//            switch response {
+//            case .alertFirstButtonReturn:
+//                // User wants to turn on the feature
+//                preferences.autoconsentEnabled = true
+//                callback(true)
+//            case .alertSecondButtonReturn:
+//                // "Not now"
+//                callback(false)
+//            case .alertThirdButtonReturn:
+//                // "Don't ask again"
+//                preferences.autoconsentEnabled = false
+//                callback(false)
+//            case _:
+//                callback(false)
+//            }
+//        })
     }
 
     @MainActor
     func runOptOut(for cmp: AutoconsentBackground.ActionResponse, on url: URL) async {
-        let optOutSuccessful = await Self.background.doOptOut(in: self.tabId)
-        guard optOutSuccessful else {
-            os_log("opt out failed: %s", log: .autoconsent, type: .error, String(describing: cmp.ruleName))
-            self.delegate?.autoconsentUserScript(consentStatus: CookieConsentInfo(
-                consentManaged: true, optoutFailed: true, selftestFailed: nil))
-            self.actionInProgress = false
-            return
-        }
-        os_log("opted out: %s", log: .autoconsent, type: .info, String(describing: cmp.ruleName))
-        // post popover notification on main thread
-        DispatchQueue.main.async {
-            NotificationCenter.default.post(name: Constants.newSitePopupHidden, object: self, userInfo: [
-                Constants.popupHiddenUrlKey: url
-            ])
-        }
-
-        do {
-            let response = try await Self.background.testOptOutWorked(in: self.tabId)
-            os_log("self test successful?: %s", log: .autoconsent, type: .debug, String(describing: response.result))
-            self.delegate?.autoconsentUserScript(consentStatus: CookieConsentInfo(
-                consentManaged: true, optoutFailed: false, selftestFailed: false))
-        } catch {
-            os_log("self test error: %s", log: .autoconsent, type: .error, error.localizedDescription)
-            self.delegate?.autoconsentUserScript(consentStatus: CookieConsentInfo(
-                consentManaged: true, optoutFailed: false, selftestFailed: true))
-        }
-        self.actionInProgress = false
+//        let optOutSuccessful = await Self.background.doOptOut(in: self.tabId)
+//        guard optOutSuccessful else {
+//            os_log("opt out failed: %s", log: .autoconsent, type: .error, String(describing: cmp.ruleName))
+//            self.delegate?.autoconsentUserScript(consentStatus: CookieConsentInfo(
+//                consentManaged: true, optoutFailed: true, selftestFailed: nil))
+//            self.actionInProgress = false
+//            return
+//        }
+//        os_log("opted out: %s", log: .autoconsent, type: .info, String(describing: cmp.ruleName))
+//        // post popover notification on main thread
+//        DispatchQueue.main.async {
+//            NotificationCenter.default.post(name: Constants.newSitePopupHidden, object: self, userInfo: [
+//                Constants.popupHiddenUrlKey: url
+//            ])
+//        }
+//
+//        do {
+//            let response = try await Self.background.testOptOutWorked(in: self.tabId)
+//            os_log("self test successful?: %s", log: .autoconsent, type: .debug, String(describing: response.result))
+//            self.delegate?.autoconsentUserScript(consentStatus: CookieConsentInfo(
+//                consentManaged: true, optoutFailed: false, selftestFailed: false))
+//        } catch {
+//            os_log("self test error: %s", log: .autoconsent, type: .error, error.localizedDescription)
+//            self.delegate?.autoconsentUserScript(consentStatus: CookieConsentInfo(
+//                consentManaged: true, optoutFailed: false, selftestFailed: true))
+//        }
+//        self.actionInProgress = false
     }
-
 }
