@@ -12,15 +12,21 @@ if (process.argv.length < 3) {
     return;
 }
 
-// https://stackoverflow.com/a/35008327/73479
-function fileExistsSync(filepath){
-  let flag = true;
-  try{
-    fs.accessSync(filepath, fs.constants.F_OK);
-  }catch(e){
-    flag = false;
-  }
-  return flag;
+function symbolicateFolder(folderName) {
+    const files = fs.readdirSync(folderName);
+
+    files
+        .filter(f => f.endsWith(".ips") || f.endsWith(".crash"))
+        .forEach(file => {
+            let filePath = path.resolve(folderName, file);
+            try {
+                symbolicateFile(filePath);
+            } catch (err) {
+                console.log(`FAILED to symbolicate ${filePath}`);
+                console.log(err);
+                console.log();
+            }
+        });
 }
 
 function symbolicateFile(filePath) {
@@ -37,6 +43,17 @@ function symbolicateFile(filePath) {
     } else {
         symbolicateCrashFile(filePath, lines);
     }
+}
+
+// https://stackoverflow.com/a/35008327/73479
+function fileExistsSync(filepath) {
+    let flag = true;
+    try {
+        fs.accessSync(filepath, fs.constants.F_OK);
+    } catch(e) {
+        flag = false;
+    }
+    return flag;
 }
 
 function checkDWARFFile(version) {
@@ -202,23 +219,6 @@ function symbolicateIPSFile(crashFile, metaJSON, lines) {
         console.log(`WARN no changes made to ${crashFile}`);
     }
     console.log();
-}
-
-function symbolicateFolder(folderName) {
-    const files = fs.readdirSync(folderName);
-
-    files
-        .filter(f => f.endsWith(".ips") || f.endsWith(".crash"))
-        .forEach(file => {
-            let filePath = path.resolve(folderName, file);
-            try {
-                symbolicateFile(filePath);
-            } catch (err) {
-                console.log(`FAILED to symbolicate ${filePath}`);
-                console.log(err);
-                console.log();
-            }
-        });
 }
 
 function symbolicateAsiBacktraces(crashJSON, dwarf, arch, ddgBaseAddress) {
