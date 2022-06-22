@@ -28,6 +28,7 @@ protocol FirefoxEncryptionKeyReading {
 
 }
 
+// swiftlint:disable:next type_body_length
 final class FirefoxEncryptionKeyReader: FirefoxEncryptionKeyReading {
     
     func getEncryptionKey(key3DatabaseURL: URL, primaryPassword: String) -> Result<Data, FirefoxLoginReader.ImportError> {
