@@ -70,10 +70,12 @@ final class WindowsManager {
     }
 
     class func openNewWindow(with tabCollection: TabCollection, droppingPoint: NSPoint? = nil, contentSize: NSSize? = nil, popUp: Bool = false) {
-        openNewWindow(with: TabCollectionViewModel(tabCollection: tabCollection),
+        let tabCollectionViewModel = TabCollectionViewModel(tabCollection: tabCollection)
+        openNewWindow(with: tabCollectionViewModel,
                       droppingPoint: droppingPoint,
                       contentSize: contentSize,
                       popUp: popUp)
+        tabCollectionViewModel.setUpLazyLoadingIfNeeded()
     }
 
     class func openPopUpWindow(with tab: Tab, contentSize: NSSize?) {

@@ -151,7 +151,7 @@ final class RecentlyClosedCoordinator: RecentlyClosedCoordinatorProtocol {
     private func reopenWindow(_ recentlyClosedWindow: RecentlyClosedWindow) {
         let tabCollection = TabCollection()
         recentlyClosedWindow.tabs.forEach { recentlyClosedTab in
-            let tab = Tab(content: recentlyClosedTab.tabContent)
+            let tab = Tab(content: recentlyClosedTab.tabContent, title: recentlyClosedTab.title, favicon: recentlyClosedTab.favicon)
             tabCollection.append(tab: tab)
         }
         WindowsManager.openNewWindow(with: tabCollection,
