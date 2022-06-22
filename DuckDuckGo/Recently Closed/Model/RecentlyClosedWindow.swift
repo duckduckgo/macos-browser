@@ -1,5 +1,5 @@
 //
-//  RecentlyClosedTabsCacheItem.swift
+//  RecentlyClosedWindow.swift
 //
 //  Copyright © 2022 DuckDuckGo. All rights reserved.
 //
@@ -18,13 +18,16 @@
 
 import Foundation
 
-struct RecentlyClosedCacheItem {
+final class RecentlyClosedWindow: RecentlyClosedCacheItem {
 
-    let tabContent: Tab.TabContent
-    let favicon: NSImage?
-    let title: String?
+    init(tabs: [RecentlyClosedTab], droppingPoint: NSPoint?, contentSize: NSSize?) {
+        self.tabs = tabs
+        self.droppingPoint = droppingPoint
+        self.contentSize = contentSize
+    }
 
-    weak var originalTabCollection: TabCollection?
-    let index: Int
+    let tabs: [RecentlyClosedTab]
+    let droppingPoint: NSPoint?
+    let contentSize: NSSize?
 
 }

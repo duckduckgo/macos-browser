@@ -779,7 +779,7 @@ CQ
                             <outlet property="recentlyClosedMenuItem" destination="pWT-lm-yTC" id="xue-50-IzM"/>
                             <outlet property="reloadMenuItem" destination="aKZ-VG-MOp" id="J3D-X3-Xg3"/>
                             <outlet property="reopenAllWindowsFromLastSessionMenuItem" destination="C6V-uF-uX8" id="WVJ-17-v1S"/>
-                            <outlet property="reopenLastClosedTabMenuItem" destination="c3l-v1-kxk" id="eGw-Dg-del"/>
+                            <outlet property="reopenLastClosedMenuItem" destination="c3l-v1-kxk" id="eGw-Dg-del"/>
                             <outlet property="sendFeedbackMenuItem" destination="V8t-Ts-q0L" id="qwz-Oh-HGm"/>
                             <outlet property="shareMenuItem" destination="kUE-Qf-cwa" id="kEZ-Kc-Wf4"/>
                             <outlet property="stopMenuItem" destination="FyY-q1-f0k" id="BFN-Kd-aAb"/>

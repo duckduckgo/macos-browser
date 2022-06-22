@@ -53,17 +53,17 @@ extension AppDelegate {
     // MARK: - History
 
     @IBAction func reopenLastClosedTab(_ sender: Any?) {
-        RecentlyClosedCoordinator.shared.reopenTab()
+        RecentlyClosedCoordinator.shared.reopenItem()
     }
 
     @IBAction func recentlyClosedAction(_ sender: Any?) {
         guard let menuItem = sender as? NSMenuItem,
-              let cacheIndex = menuItem.representedObject as? Int else {
-                  assertionFailure("Wrong sender for recentlyClosedAction()")
+              let cacheItem = menuItem.representedObject as? RecentlyClosedCacheItem else {
+                  assertionFailure("Wrong represented object for recentlyClosedAction()")
                   return
               }
 
-        RecentlyClosedCoordinator.shared.reopenTab(cacheIndex: cacheIndex)
+        RecentlyClosedCoordinator.shared.reopenItem(cacheItem)
     }
 
     // MARK: - Window

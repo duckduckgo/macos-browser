@@ -51,9 +51,9 @@ final class MainMenu: NSMenu {
     @IBOutlet weak var stopMenuItem: NSMenuItem?
     @IBOutlet weak var homeMenuItem: NSMenuItem?
     @IBOutlet weak var recentlyClosedMenuItem: NSMenuItem!
-    @IBOutlet weak var reopenLastClosedTabMenuItem: NSMenuItem? {
+    @IBOutlet weak var reopenLastClosedMenuItem: NSMenuItem? {
         didSet {
-            reopenMenuItemKeyEquivalentManager.lastTabMenuItem = reopenLastClosedTabMenuItem
+            reopenMenuItemKeyEquivalentManager.reopenLastClosedMenuItem = reopenLastClosedMenuItem
         }
     }
     @IBOutlet weak var reopenLastClosedWindowMenuItem: NSMenuItem!
@@ -109,6 +109,7 @@ final class MainMenu: NSMenu {
         shareMenuItem.submenu = sharingMenu
 
         updateRecentlyClosedMenu()
+        updateReopenLastClosedMenuItem()
     }
 
     private func setup() {
@@ -215,7 +216,17 @@ final class MainMenu: NSMenu {
 
     private let reopenMenuItemKeyEquivalentManager = ReopenMenuItemKeyEquivalentManager()
 
-    // MARK: - Recently Closed
+    // MARK: - Reopen Last Closed & Recently Closed
+
+    private func updateReopenLastClosedMenuItem() {
+        switch RecentlyClosedCoordinator.shared.cache.last {
+        case is RecentlyClosedWindow:
+            reopenLastClosedMenuItem?.title = UserText.reopenLastClosedWindow
+        default:
+            reopenLastClosedMenuItem?.title = UserText.reopenLastClosedTab
+        }
+
+    }
 
     private func updateRecentlyClosedMenu() {
         recentlyClosedMenu = RecentlyClosedMenu(recentlyClosedCoordinator: RecentlyClosedCoordinator.shared)
@@ -270,7 +281,7 @@ extension MainMenu {
      * menu items.
      */
     final class ReopenMenuItemKeyEquivalentManager {
-        weak var lastTabMenuItem: NSMenuItem?
+        weak var reopenLastClosedMenuItem: NSMenuItem?
         weak var lastWindowMenuItem: NSMenuItem?
         weak var lastSessionMenuItem: NSMenuItem?
 
@@ -300,7 +311,7 @@ extension MainMenu {
             if isInInitialState && canRestoreLastSessionState() {
                 assignKeyEquivalent(to: lastSessionMenuItem)
             } else {
-                assignKeyEquivalent(to: lastTabMenuItem)
+                assignKeyEquivalent(to: reopenLastClosedMenuItem)
             }
         }
 

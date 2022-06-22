@@ -45,7 +45,7 @@ final class TabCollection: NSObject {
         return true
     }
 
-    func remove(at index: Int) -> Bool {
+    func remove(at index: Int, published: Bool = true) -> Bool {
         guard tabs.indices.contains(index) else {
             os_log("TabCollection: Index out of bounds", type: .error)
             return false
@@ -54,7 +54,9 @@ final class TabCollection: NSObject {
         let tab = tabs[index]
         tabWillClose(at: index)
         tabs.remove(at: index)
-        didRemoveTabPublisher.send((tab, index))
+        if published {
+            didRemoveTabPublisher.send((tab, index))
+        }
 
         return true
     }

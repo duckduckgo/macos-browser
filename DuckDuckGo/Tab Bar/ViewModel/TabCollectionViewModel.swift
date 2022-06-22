@@ -249,11 +249,11 @@ final class TabCollectionViewModel: NSObject {
 
     // MARK: - Removal
 
-    func remove(at index: Int) {
+    func remove(at index: Int, published: Bool = true) {
         guard changesEnabled else { return }
 
         let parentTab = tabCollection.tabs[safe: index]?.parentTab
-        guard tabCollection.remove(at: index) else { return }
+        guard tabCollection.remove(at: index, published: published) else { return }
 
         self.didRemoveTab(withParent: parentTab, at: index)
     }
