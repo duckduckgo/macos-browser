@@ -29,7 +29,6 @@ final class FirefoxBookmarksReader {
         case noBookmarksFileFound
         case failedToTemporarilyCopyFile
         case unexpectedBookmarksDatabaseFormat
-        case failedToMapBookmarks
     }
 
     private let firefoxPlacesDatabaseURL: URL
@@ -84,11 +83,8 @@ final class FirefoxBookmarksReader {
                 return DatabaseBookmarks(topLevelFolders: topLevelFolders, foldersByParent: foldersByParent, bookmarksByFolder: bookmarksByFolder)
             }
 
-            if let importedBookmarks = mapDatabaseBookmarksToImportedBookmarks(bookmarks) {
-                return .success(importedBookmarks)
-            } else {
-                return .failure(.failedToMapBookmarks)
-            }
+            let importedBookmarks = mapDatabaseBookmarksToImportedBookmarks(bookmarks)
+            return .success(importedBookmarks)
         } catch {
             return .failure(.unexpectedBookmarksDatabaseFormat)
         }
@@ -134,27 +130,31 @@ final class FirefoxBookmarksReader {
         }
     }
 
-    private func mapDatabaseBookmarksToImportedBookmarks(_ databaseBookmarks: DatabaseBookmarks) -> ImportedBookmarks? {
-        guard let menu = databaseBookmarks.topLevelFolders.first(where: { $0.title == "menu" }),
-              let toolbar = databaseBookmarks.topLevelFolders.first(where: { $0.title == "toolbar" }),
-              let unfiled = databaseBookmarks.topLevelFolders.first(where: { $0.title == "unfiled" }) else {
-                return nil
-              }
+    private func mapDatabaseBookmarksToImportedBookmarks(_ databaseBookmarks: DatabaseBookmarks) -> ImportedBookmarks {
+        let menu = databaseBookmarks.topLevelFolders.first(where: { $0.title == "menu" })
+        let toolbar = databaseBookmarks.topLevelFolders.first(where: { $0.title == "toolbar" })
+        let unfiled = databaseBookmarks.topLevelFolders.first(where: { $0.title == "unfiled" })
 
-        let menuBookmarksAndFolders = children(parentID: menu.id, bookmarks: databaseBookmarks)
-        let toolbarBookmarksAndFolders = children(parentID: toolbar.id, bookmarks: databaseBookmarks)
-        let unfiledBookmarksAndFolders = children(parentID: unfiled.id, bookmarks: databaseBookmarks)
+        let menuBookmarksAndFolders = children(parentID: menu?.id, bookmarks: databaseBookmarks)
+        let toolbarBookmarksAndFolders = children(parentID: toolbar?.id, bookmarks: databaseBookmarks)
+        let unfiledBookmarksAndFolders = children(parentID: unfiled?.id, bookmarks: databaseBookmarks)
 
         let toolbarFolder = ImportedBookmarks.BookmarkOrFolder(name: "bar",
                                                                type: "folder",
                                                                urlString: nil,
                                                                children: toolbarBookmarksAndFolders + menuBookmarksAndFolders)
+
         let unfiledFolder = ImportedBookmarks.BookmarkOrFolder(name: "other", type: "folder", urlString: nil, children: unfiledBookmarksAndFolders)
         let folders = ImportedBookmarks.TopLevelFolders(bookmarkBar: toolbarFolder, otherBookmarks: unfiledFolder)
+        
         return ImportedBookmarks(topLevelFolders: folders)
     }
 
-    private func children(parentID: Int, bookmarks: DatabaseBookmarks) -> [ImportedBookmarks.BookmarkOrFolder] {
+    private func children(parentID: Int?, bookmarks: DatabaseBookmarks) -> [ImportedBookmarks.BookmarkOrFolder] {
+        guard let parentID = parentID else {
+            return []
+        }
+
         let childFolders = bookmarks.foldersByParent[parentID] ?? []
         let childBookmarks = bookmarks.bookmarksByFolder[parentID] ?? []
 
