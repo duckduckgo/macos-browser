@@ -173,10 +173,8 @@ final class FirefoxBookmarksReader {
 
     // MARK: - Database Queries
 
-    // It's expected that this will have an id of 1, but it's unclear if that is guaranteed. To be safe, we extract the root entry and use that to
-    // look up the root folders.
     func rootEntryQuery() -> String {
-        return "SELECT id,type,title,parent FROM moz_bookmarks WHERE parent = 0;"
+        return "SELECT id,type,title,parent FROM moz_bookmarks WHERE guid = 'root________';"
     }
 
     func foldersWithParentQuery() -> String {
