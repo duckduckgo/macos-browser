@@ -54,11 +54,11 @@ final class BrowserImportViewController: NSViewController {
     var selectedImportOptions: [DataImport.DataType] {
         var options = [DataImport.DataType]()
 
-        if bookmarksCheckbox.state == .on && !bookmarksCheckbox.isHidden && bookmarksCheckbox.window != nil {
+        if bookmarksCheckbox.state == .on && !bookmarksCheckbox.isHidden {
             options.append(.bookmarks)
         }
 
-        if passwordsCheckbox.state == .on && !passwordsCheckbox.isHidden && passwordsCheckbox.window != nil {
+        if passwordsCheckbox.state == .on && !passwordsCheckbox.isHidden {
             options.append(.logins)
         }
 
