@@ -224,7 +224,7 @@ function symbolicateIPSFile(crashFile, metaJSON, lines) {
 function symbolicateAsiBacktraces(crashJSON, dwarf, arch, ddgBaseAddress) {
     let backtrace = crashJSON.asiBacktraces[0].split("\n");
 
-    let regex = /0x([0-9a-f]*) DuckDuckGo \+ (\d*)/
+    let regex = /(0x[0-9a-f]*) DuckDuckGo \+ \d*/
 
     let changes = 0;
     let symbolicatedCrash = backtrace.map((e) => { 
@@ -232,16 +232,11 @@ function symbolicateAsiBacktraces(crashJSON, dwarf, arch, ddgBaseAddress) {
 
         if (matches) {
             changes += 1;
-            let rawLoadAddress = "0x" + matches[1];
-            let binaryLoadAddress = parseInt(matches[1], 16);
-            let offset = Number(matches[2]);
-            let symbolOffset = binaryLoadAddress + offset;
-            let symbolAddress = symbolOffset.toString(16)
-
-            let command = `atos -arch ${arch} -o ${dwarf} -l 0x${ddgBaseAddress} 0x${symbolAddress}`
+            let symbolAddress = matches[1];
+            let command = `atos -arch ${arch} -o ${dwarf} -l 0x${ddgBaseAddress} ${symbolAddress}`
             console.log(command);
             let symbol = execSync(command);
-            return e.replace(rawLoadAddress, `${rawLoadAddress} ${symbol}`).replace("DuckDuckGo + ", "").replace("\n", "");
+            return e.replace(symbolAddress, `${symbolAddress} ${symbol}`).replace("DuckDuckGo + ", "+ ").replace("\n", "");
         }
 
         return e;
