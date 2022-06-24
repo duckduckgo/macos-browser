@@ -96,6 +96,14 @@ final class FirefoxDataImporter: DataImporter {
 
         completion(.success(summary))
     }
+    
+    func importData(types: [DataImport.DataType], from profile: DataImport.BrowserProfile?) async -> Result<DataImport.Summary, DataImportError> {
+        return await withCheckedContinuation { continuation in
+            importData(types: types, from: profile) { result in
+                continuation.resume(returning: result)
+            }
+        }
+    }
 
     private func defaultFirefoxProfilePath() -> URL? {
         guard let potentialProfiles = try? FileManager.default.contentsOfDirectory(atPath: profilesDirectoryURL().path) else {

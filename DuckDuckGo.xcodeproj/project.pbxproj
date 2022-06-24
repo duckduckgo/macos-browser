@@ -102,6 +102,7 @@
 		4B379C2427BDE1B0008A968E /* FlatButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B379C2327BDE1B0008A968E /* FlatButton.swift */; };
 		4B39AAF627D9B2C700A73FD5 /* NSStackViewExtension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B39AAF527D9B2C700A73FD5 /* NSStackViewExtension.swift */; };
 		4B3F641E27A8D3BD00E0C118 /* BrowserProfileTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B3F641D27A8D3BD00E0C118 /* BrowserProfileTests.swift */; };
+		4B43469528655D1400177407 /* FirefoxDataImporterTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B43469428655D1400177407 /* FirefoxDataImporterTests.swift */; };
 		4B4F72EC266B2ED300814C60 /* CollectionExtension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B4F72EB266B2ED300814C60 /* CollectionExtension.swift */; };
 		4B59023D26B35F3600489384 /* ChromeDataImporter.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B59023826B35F3600489384 /* ChromeDataImporter.swift */; };
 		4B59023E26B35F3600489384 /* ChromiumLoginReader.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B59023926B35F3600489384 /* ChromiumLoginReader.swift */; };
@@ -865,6 +866,7 @@
 		4B379C2327BDE1B0008A968E /* FlatButton.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FlatButton.swift; sourceTree = "<group>"; };
 		4B39AAF527D9B2C700A73FD5 /* NSStackViewExtension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NSStackViewExtension.swift; sourceTree = "<group>"; };
 		4B3F641D27A8D3BD00E0C118 /* BrowserProfileTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BrowserProfileTests.swift; sourceTree = "<group>"; };
+		4B43469428655D1400177407 /* FirefoxDataImporterTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FirefoxDataImporterTests.swift; sourceTree = "<group>"; };
 		4B4F72EB266B2ED300814C60 /* CollectionExtension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CollectionExtension.swift; sourceTree = "<group>"; };
 		4B59023826B35F3600489384 /* ChromeDataImporter.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ChromeDataImporter.swift; sourceTree = "<group>"; };
 		4B59023926B35F3600489384 /* ChromiumLoginReader.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ChromiumLoginReader.swift; sourceTree = "<group>"; };
@@ -1939,17 +1941,18 @@
 		4B723DFE26B0003E00E14D75 /* Data Import */ = {
 			isa = PBXGroup;
 			children = (
+				373A1AB128451ED400586521 /* BookmarksHTMLImporterTests.swift */,
+				373A1AA9283ED86C00586521 /* BookmarksHTMLReaderTests.swift */,
 				4B3F641D27A8D3BD00E0C118 /* BrowserProfileTests.swift */,
 				4BB99D0C26FE1A83001E4761 /* ChromiumBookmarksReaderTests.swift */,
 				4B59024B26B38BB800489384 /* ChromiumLoginReaderTests.swift */,
 				4B723E0126B0003E00E14D75 /* CSVImporterTests.swift */,
 				4B723E0026B0003E00E14D75 /* CSVParserTests.swift */,
-				373A1AA9283ED86C00586521 /* BookmarksHTMLReaderTests.swift */,
-				373A1AB128451ED400586521 /* BookmarksHTMLImporterTests.swift */,
 				4B723DFF26B0003E00E14D75 /* DataImportMocks.swift */,
 				4BB99D0D26FE1A83001E4761 /* FirefoxBookmarksReaderTests.swift */,
-				4B8AC93C26B49BE600879451 /* FirefoxLoginReaderTests.swift */,
+				4B43469428655D1400177407 /* FirefoxDataImporterTests.swift */,
 				4B2975982828285900187C4E /* FirefoxKeyReaderTests.swift */,
+				4B8AC93C26B49BE600879451 /* FirefoxLoginReaderTests.swift */,
 				4BB99D0E26FE1A84001E4761 /* SafariBookmarksReaderTests.swift */,
 				4BF4951726C08395000547B8 /* ThirdPartyBrowserTests.swift */,
 				37A803DA27FD69D300052F4C /* Data Import Resources */,
@@ -4662,6 +4665,7 @@
 				B63ED0DE26AFD9A300A9DAD1 /* AVCaptureDeviceMock.swift in Sources */,
 				B63ED0E026AFE32F00A9DAD1 /* GeolocationProviderMock.swift in Sources */,
 				378205FB283C277800D1D4AA /* MainMenuTests.swift in Sources */,
+				4B43469528655D1400177407 /* FirefoxDataImporterTests.swift in Sources */,
 				4B723E0926B0003E00E14D75 /* CSVLoginExporterTests.swift in Sources */,
 				B630793526731BC400DCEE41 /* URLSuggestedFilenameTests.swift in Sources */,
 				AADE11C026D916D70032D8A7 /* StringExtensionTests.swift in Sources */,
