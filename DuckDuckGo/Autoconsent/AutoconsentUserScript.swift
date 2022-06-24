@@ -31,6 +31,7 @@ protocol UserScriptWithAutoconsent: UserScript {
 final class AutoconsentManagement {
     static let shared = AutoconsentManagement()
     var sitesNotifiedCache = Set<String>()
+    var promptLastShown: Date?
     func clearCache() {
         dispatchPrecondition(condition: .onQueue(.main))
         sitesNotifiedCache.removeAll()
@@ -39,14 +40,11 @@ final class AutoconsentManagement {
 
 @available(macOS 11, *)
 final class AutoconsentUserScript: NSObject, WKScriptMessageHandlerWithReply, UserScriptWithAutoconsent {
-    private static var promptLastShown: Date?
-
     var injectionTime: WKUserScriptInjectionTime { .atDocumentStart }
     var forMainFrameOnly: Bool { false }
     
     enum Constants {
         static let newSitePopupHidden = Notification.Name("newSitePopupHidden")
-        static let popupHiddenUrlKey = "popupHiddenUrlKey"
     }
     
     private enum MessageName: String, CaseIterable {
@@ -65,6 +63,7 @@ final class AutoconsentUserScript: NSObject, WKScriptMessageHandlerWithReply, Us
     weak var delegate: AutoconsentUserScriptDelegate?
 
     init(scriptSource: ScriptSourceProviding, config: PrivacyConfiguration) {
+        os_log("Initialising autoconsent userscript", log: .autoconsent, type: .debug)
         source = Self.loadJS("autoconsent-bundle", from: .main, withReplacements: [:])
         self.config = config
     }
@@ -118,9 +117,11 @@ final class AutoconsentUserScript: NSObject, WKScriptMessageHandlerWithReply, Us
                 "rules": rules,
                 "config": [
                     "enabled": true,
-                    "autoAction": "optOut",
+                    // if it's the first time, disable autoAction
+                    "autoAction": PrivacySecurityPreferences.shared.autoconsentEnabled == true ? "optOut" : nil,
                     "disabledCmps": disabledCMPs,
-                    "enablePrehide": true
+                    // the very first time, make sure the popup is visible
+                    "enablePrehide": PrivacySecurityPreferences.shared.autoconsentEnabled
                 ]
             ], nil)
         case MessageName.eval:
@@ -161,17 +162,63 @@ final class AutoconsentUserScript: NSObject, WKScriptMessageHandlerWithReply, Us
                 replyHandler(nil, "missing frame target")
             }
         case MessageName.popupFound:
-            os_log("OLOLO: %s", log: .autoconsent, type: .debug, String(describing: message.body))
+            guard PrivacySecurityPreferences.shared.autoconsentEnabled == nil else {
+                // if feature is already enabled, opt-out will happen automatically
+                replyHandler([ "type": "ok" ], nil) // this is just to prevent a Promise rejection
+                return
+            }
+            
+            os_log("Prompting user about autoconsent", log: .autoconsent, type: .debug)
+
+            // if it's the first time, prompt the user and trigger opt-out
+            if let window = message.webView?.window {
+                ensurePrompt(window: window, callback: { shouldProceed in
+                    if shouldProceed {
+                        Task {
+                            replyHandler([ "type": "optOut" ], nil)
+                        }
+                    }
+                })
+            } else {
+                replyHandler(nil, "missing frame target")
+            }
         case MessageName.optOutResult:
+            // TODO: save a reference to the webview and frame for self-test
             os_log("OLOLO: %s", log: .autoconsent, type: .debug, String(describing: message.body))
+            replyHandler([ "type": "ok" ], nil) // this is just to prevent a Promise rejection
         case MessageName.optInResult:
-            os_log("OLOLO: %s", log: .autoconsent, type: .debug, String(describing: message.body))
+            // this is not supported in browser
+            os_log("ignoring optInResult: %s", log: .autoconsent, type: .debug, String(describing: message.body))
+            replyHandler(nil, "opt-in is not supported")
         case MessageName.selfTestResult:
+            // TODO: store self-test result
             os_log("OLOLO: %s", log: .autoconsent, type: .debug, String(describing: message.body))
+            replyHandler([ "type": "ok" ], nil) // this is just to prevent a Promise rejection
         case MessageName.autoconsentDone:
-            os_log("OLOLO: %s", log: .autoconsent, type: .debug, String(describing: message.body))
+            // report a managed popup
+            os_log("opt-out successful: %s", log: .autoconsent, type: .debug, String(describing: message.body))
+            
+            guard let urlString = messageData["url"] as? String,
+                  let url = URL(string: urlString),
+                  let host = url.host else {
+                replyHandler(nil, "cannot decode message")
+                return
+            }
+            
+            // trigger popup once per domain
+            if !AutoconsentManagement.shared.sitesNotifiedCache.contains(host) {
+                AutoconsentManagement.shared.sitesNotifiedCache.insert(host)
+                // post popover notification on main thread
+                DispatchQueue.main.async {
+                    NotificationCenter.default.post(name: Constants.newSitePopupHidden, object: self, userInfo: [
+                        "url": url
+                    ])
+                }
+            }
+            replyHandler([ "type": "ok" ], nil) // this is just to prevent a Promise rejection
         case MessageName.autoconsentError:
-            os_log("OLOLO: %s", log: .autoconsent, type: .debug, String(describing: message.body))
+            os_log("Autoconsent error: %s", log: .autoconsent, String(describing: message.body))
+            replyHandler([ "type": "ok" ], nil) // this is just to prevent a Promise rejection
         }
     }
 
@@ -229,37 +276,35 @@ final class AutoconsentUserScript: NSObject, WKScriptMessageHandlerWithReply, Us
     }
 
     @MainActor
-    func checkUserWasPrompted(callback: @escaping (Bool) -> Void) {
-//        let preferences = PrivacySecurityPreferences.shared
-//        guard preferences.autoconsentEnabled == nil else {
-//            callback(true)
-//            return
-//        }
-//        let now = Date.init()
-//        guard Self.promptLastShown == nil || now > Self.promptLastShown!.addingTimeInterval(30),
-//              let window = self.webview?.window else {
-//            callback(false)
-//            return
-//        }
-//        Self.promptLastShown = now
-//        let alert = NSAlert.cookiePopup()
-//        alert.beginSheetModal(for: window, completionHandler: { response in
-//            switch response {
-//            case .alertFirstButtonReturn:
-//                // User wants to turn on the feature
-//                preferences.autoconsentEnabled = true
-//                callback(true)
-//            case .alertSecondButtonReturn:
-//                // "Not now"
-//                callback(false)
-//            case .alertThirdButtonReturn:
-//                // "Don't ask again"
-//                preferences.autoconsentEnabled = false
-//                callback(false)
-//            case _:
-//                callback(false)
-//            }
-//        })
+    func ensurePrompt(window: NSWindow, callback: @escaping (Bool) -> Void) {
+        let preferences = PrivacySecurityPreferences.shared
+        let now = Date.init()
+        guard AutoconsentManagement.shared.promptLastShown == nil || now > AutoconsentManagement.shared.promptLastShown!.addingTimeInterval(30) else {
+            // user said "not now" recently, don't bother asking
+            os_log("Have a recent user response, canceling prompt", log: .autoconsent, type: .debug)
+            callback(false)
+            return
+        }
+
+        AutoconsentManagement.shared.promptLastShown = now
+        let alert = NSAlert.cookiePopup()
+        alert.beginSheetModal(for: window, completionHandler: { response in
+            switch response {
+            case .alertFirstButtonReturn:
+                // User wants to turn on the feature
+                preferences.autoconsentEnabled = true
+                callback(true)
+            case .alertSecondButtonReturn:
+                // "Not now"
+                callback(false)
+            case .alertThirdButtonReturn:
+                // "Don't ask again"
+                preferences.autoconsentEnabled = false
+                callback(false)
+            case _:
+                callback(false)
+            }
+        })
     }
 
     @MainActor
