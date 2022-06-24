@@ -16,6 +16,7 @@
 //  limitations under the License.
 //
 
+import os
 import Foundation
 import BrowserServicesKit
 import TrackerRadarKit
@@ -49,9 +50,14 @@ final class UserScripts {
         contentScopeUserScript = ContentScopeUserScript(sourceProvider.privacyConfigurationManager, properties: prefs)
         autofillScript = WebsiteAutofillUserScript(scriptSourceProvider: sourceProvider.autofillSourceProvider!)
         if #available(macOS 11, *) {
-            autoconsentUserScript = AutoconsentUserScript(scriptSource: sourceProvider,
-                                                          config: sourceProvider.privacyConfigurationManager.privacyConfig)
-            userScripts.append(autoconsentUserScript!)
+            if PrivacySecurityPreferences.shared.autoconsentEnabled != false {
+                autoconsentUserScript = AutoconsentUserScript(scriptSource: sourceProvider,
+                                                              config: sourceProvider.privacyConfigurationManager.privacyConfig)
+                userScripts.append(autoconsentUserScript!)
+            } else {
+                os_log("Autoconsent is disabled", log: .autoconsent, type: .debug)
+                autoconsentUserScript = nil
+            }
         } else {
             autoconsentUserScript = nil
         }

@@ -83,9 +83,30 @@ final class AutoconsentUserScript: NSObject, WKScriptMessageHandlerWithReply, Us
             replyHandler(nil, "Unknown message type")
             return
         }
+        
+        guard let messageData = message.body as? [String: Any] else {
+            replyHandler(nil, "cannot decode message")
+            return
+        }
 
         switch messageName {
         case MessageName.`init`:
+            guard let urlString = messageData["url"] as? String,
+                  let url = URL(string: urlString) else {
+                replyHandler(nil, "cannot decode init request")
+                return
+            }
+            if !url.isHttp && !url.isHttps {
+                // ignore special schemes
+                os_log("Ignoring special URL scheme: %s", log: .autoconsent, type: .debug, urlString)
+                replyHandler([ "type": "ok" ], nil) // this is just to prevent a Promise rejection
+                return
+            }
+            if PrivacySecurityPreferences.shared.autoconsentEnabled == false {
+                // this will only happen if the user has just declined a prompt in this tab
+                replyHandler([ "type": "ok" ], nil) // this is just to prevent a Promise rejection
+                return
+            }
             let remoteConfig = self.config.settings(for: .autoconsent)
             let disabledCMPs = remoteConfig["disabledCMPs"] as? [String] ?? []
             let rulesUrl = Bundle.main.url(forResource: "rules", withExtension: "json")!
@@ -103,9 +124,11 @@ final class AutoconsentUserScript: NSObject, WKScriptMessageHandlerWithReply, Us
                 ]
             ], nil)
         case MessageName.eval:
-            let request = (message.body as? [String: Any])!
-            let payload = request["code"]!
-            let reqId = request["id"]!
+            guard let payload = messageData["code"],
+                  let reqId = messageData["id"] else {
+                replyHandler(nil, "cannot decode eval request")
+                return
+            }
             let script = """
             (() => {
             try {
