@@ -27,7 +27,7 @@ class FirefoxDataImporterTests: XCTestCase {
         let bookmarkImporter = MockBookmarkImporter(importBookmarks: { _, _ in .init(successful: 0, duplicates: 0, failed: 0) })
         let importer = FirefoxDataImporter(loginImporter: loginImporter, bookmarkImporter: bookmarkImporter)
         
-        let summary = await importer.importData(types: [], from: nil)
+        let summary = await importer.importData(types: [], from: .init(profileURL: resourceURL()))
         
         if case let .success(summary) = summary {
             XCTAssert(summary.isEmpty)
@@ -41,7 +41,7 @@ class FirefoxDataImporterTests: XCTestCase {
         let bookmarkImporter = MockBookmarkImporter(importBookmarks: { _, _ in .init(successful: 1, duplicates: 2, failed: 3) })
         let importer = FirefoxDataImporter(loginImporter: loginImporter, bookmarkImporter: bookmarkImporter)
         
-        let summary = await importer.importData(types: [.bookmarks], from: nil)
+        let summary = await importer.importData(types: [.bookmarks], from: .init(profileURL: resourceURL()))
         
         if case let .success(summary) = summary {
             XCTAssertEqual(summary.bookmarksResult?.successful, 1)
@@ -52,14 +52,14 @@ class FirefoxDataImporterTests: XCTestCase {
             XCTFail("Received populated summary unexpectedly")
         }
     }
-    
+
     func testWhenImportingBookmarks_AndBookmarkImportFails_ThenErrorIsReturned() async {
         let loginImporter = MockLoginImporter()
         let bookmarkImporter = MockBookmarkImporter(throwableError: DataImportError.bookmarks(.cannotAccessCoreData),
                                                     importBookmarks: { _, _ in .init(successful: 0, duplicates: 0, failed: 0) })
         let importer = FirefoxDataImporter(loginImporter: loginImporter, bookmarkImporter: bookmarkImporter)
         
-        let summary = await importer.importData(types: [.bookmarks], from: nil)
+        let summary = await importer.importData(types: [.bookmarks], from: .init(profileURL: resourceURL()))
         
         if case let .failure(error) = summary {
             XCTAssertEqual(error, .bookmarks(.cannotReadFile))
@@ -68,4 +68,8 @@ class FirefoxDataImporterTests: XCTestCase {
         }
     }
     
+    private func resourceURL() -> URL {
+        let bundle = Bundle(for: FirefoxBookmarksReaderTests.self)
+        return bundle.resourceURL!.appendingPathComponent("Data Import Resources/Test Firefox Data")
+    }
 }
