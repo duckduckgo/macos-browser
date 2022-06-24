@@ -239,12 +239,21 @@ notarize() {
 	echo "Uploading app for notarization ..."
 
 	ditto -c -k --keepParent "${app_path}" "${notarization_zip_path}"
-	${filter_output} xcrun notarytool submit \
-		--apple-id "${developer_apple_id}" \
-		--password "${developer_password}" \
-		--team-id "${team_id}" \
-		--wait \
-		"${notarization_zip_path}"
+	if [[ -n $CI ]]; then
+		${filter_output} xcrun notarytool submit \
+			--key "${APPLE_API_KEY_PATH}" \
+			--key-id "${APPLE_API_KEY_ID}" \
+			--issuer "${APPLE_API_KEY_ISSUER}" \
+			--wait \
+			"${notarization_zip_path}"
+	else
+		${filter_output} xcrun notarytool submit \
+			--apple-id "${developer_apple_id}" \
+			--password "${developer_password}" \
+			--team-id "${team_id}" \
+			--wait \
+			"${notarization_zip_path}"
+	fi
 }
 
 staple_notarized_app() {
@@ -294,7 +303,15 @@ main() {
 	source "${cwd}/helpers/asana.sh"
 
 	set_up_environment "$@"
-	get_developer_credentials
+
+	# CI uses Apple API Key to communicate with notarization service
+	# and expects relevant environment variables to be defined.
+	# For running script locally, we're currently relying on Apple ID
+	# and application-specific password.
+	if [[ -z $CI ]]; then
+		get_developer_credentials
+	fi
+
 	clear_working_directory
 	archive_and_export
 	notarize
