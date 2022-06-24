@@ -90,136 +90,166 @@ final class AutoconsentUserScript: NSObject, WKScriptMessageHandlerWithReply, Us
 
         switch messageName {
         case MessageName.`init`:
-            guard let urlString = messageData["url"] as? String,
-                  let url = URL(string: urlString) else {
-                replyHandler(nil, "cannot decode init request")
-                return
-            }
-            if !url.isHttp && !url.isHttps {
-                // ignore special schemes
-                os_log("Ignoring special URL scheme: %s", log: .autoconsent, type: .debug, urlString)
-                replyHandler([ "type": "ok" ], nil) // this is just to prevent a Promise rejection
-                return
-            }
-            if PrivacySecurityPreferences.shared.autoconsentEnabled == false {
-                // this will only happen if the user has just declined a prompt in this tab
-                replyHandler([ "type": "ok" ], nil) // this is just to prevent a Promise rejection
-                return
-            }
-            let remoteConfig = self.config.settings(for: .autoconsent)
-            let disabledCMPs = remoteConfig["disabledCMPs"] as? [String] ?? []
-            let rulesUrl = Bundle.main.url(forResource: "rules", withExtension: "json")!
-            let rulesData = (try? Data(contentsOf: rulesUrl))!
-            let rules = try? JSONSerialization.jsonObject(with: rulesData, options: [])
-
-            replyHandler([
-                "type": "initResp",
-                "rules": rules,
-                "config": [
-                    "enabled": true,
-                    // if it's the first time, disable autoAction
-                    "autoAction": PrivacySecurityPreferences.shared.autoconsentEnabled == true ? "optOut" : nil,
-                    "disabledCmps": disabledCMPs,
-                    // the very first time, make sure the popup is visible
-                    "enablePrehide": PrivacySecurityPreferences.shared.autoconsentEnabled
-                ]
-            ], nil)
+            handleInit(messageData: messageData, replyHandler: replyHandler)
         case MessageName.eval:
-            guard let payload = messageData["code"],
-                  let reqId = messageData["id"] else {
-                replyHandler(nil, "cannot decode eval request")
-                return
-            }
-            let script = """
-            (() => {
-            try {
-                console.log("EXEC", `\(payload)`);
-                return !!(\(payload))
-            } catch (e) {
-              // ignore CSP errors
-              return;
-            }
-            })();
-            """
-            
-            if let webview = message.webView {
-                webview.evaluateJavaScript(script, in: message.frameInfo, in: WKContentWorld.page, completionHandler: { (result) in
-                    switch result {
-                    case.failure(let error):
-                        replyHandler(nil, "Error snippet: \(error)")
-                    case.success(let value):
-                        replyHandler(
-                            [
-                                "type": "evalResp",
-                                "id": reqId,
-                                "result": value
-                            ],
-                            nil
-                        )
-                    }
-                })
-            } else {
-                replyHandler(nil, "missing frame target")
-            }
+            handleEval(messageData: messageData, replyHandler: replyHandler, message: message)
         case MessageName.popupFound:
-            guard PrivacySecurityPreferences.shared.autoconsentEnabled == nil else {
-                // if feature is already enabled, opt-out will happen automatically
-                replyHandler([ "type": "ok" ], nil) // this is just to prevent a Promise rejection
-                return
-            }
-            
-            os_log("Prompting user about autoconsent", log: .autoconsent, type: .debug)
-
-            // if it's the first time, prompt the user and trigger opt-out
-            if let window = message.webView?.window {
-                ensurePrompt(window: window, callback: { shouldProceed in
-                    if shouldProceed {
-                        Task {
-                            replyHandler([ "type": "optOut" ], nil)
-                        }
-                    }
-                })
-            } else {
-                replyHandler(nil, "missing frame target")
-            }
+            handlePopupFound(messageData: messageData, replyHandler: replyHandler, message: message)
         case MessageName.optOutResult:
-            // TODO: save a reference to the webview and frame for self-test
-            os_log("OLOLO: %s", log: .autoconsent, type: .debug, String(describing: message.body))
-            replyHandler([ "type": "ok" ], nil) // this is just to prevent a Promise rejection
+            handleOptOutResult(messageData: messageData, replyHandler: replyHandler, message: message)
         case MessageName.optInResult:
             // this is not supported in browser
             os_log("ignoring optInResult: %s", log: .autoconsent, type: .debug, String(describing: message.body))
             replyHandler(nil, "opt-in is not supported")
         case MessageName.selfTestResult:
-            // TODO: store self-test result
-            os_log("OLOLO: %s", log: .autoconsent, type: .debug, String(describing: message.body))
-            replyHandler([ "type": "ok" ], nil) // this is just to prevent a Promise rejection
+            handleSelfTestResult(messageData: messageData, replyHandler: replyHandler)
         case MessageName.autoconsentDone:
-            // report a managed popup
-            os_log("opt-out successful: %s", log: .autoconsent, type: .debug, String(describing: message.body))
-            
-            guard let urlString = messageData["url"] as? String,
-                  let url = URL(string: urlString),
-                  let host = url.host else {
-                replyHandler(nil, "cannot decode message")
-                return
-            }
-            
-            // trigger popup once per domain
-            if !AutoconsentManagement.shared.sitesNotifiedCache.contains(host) {
-                AutoconsentManagement.shared.sitesNotifiedCache.insert(host)
-                // post popover notification on main thread
-                DispatchQueue.main.async {
-                    NotificationCenter.default.post(name: Constants.newSitePopupHidden, object: self, userInfo: [
-                        "url": url
-                    ])
-                }
-            }
-            replyHandler([ "type": "ok" ], nil) // this is just to prevent a Promise rejection
+            handleAutoconsentDone(messageData: messageData, replyHandler: replyHandler)
         case MessageName.autoconsentError:
             os_log("Autoconsent error: %s", log: .autoconsent, String(describing: message.body))
             replyHandler([ "type": "ok" ], nil) // this is just to prevent a Promise rejection
         }
+    }
+    
+    @MainActor
+    func handleInit(messageData: [String: Any], replyHandler: @escaping (Any?, String?) -> Void) {
+        guard let urlString = messageData["url"] as? String,
+              let url = URL(string: urlString) else {
+            replyHandler(nil, "cannot decode init request")
+            return
+        }
+        if !url.isHttp && !url.isHttps {
+            // ignore special schemes
+            os_log("Ignoring special URL scheme: %s", log: .autoconsent, type: .debug, urlString)
+            replyHandler([ "type": "ok" ], nil) // this is just to prevent a Promise rejection
+            return
+        }
+        if PrivacySecurityPreferences.shared.autoconsentEnabled == false {
+            // this will only happen if the user has just declined a prompt in this tab
+            replyHandler([ "type": "ok" ], nil) // this is just to prevent a Promise rejection
+            return
+        }
+        let remoteConfig = self.config.settings(for: .autoconsent)
+        let disabledCMPs = remoteConfig["disabledCMPs"] as? [String] ?? []
+        let rulesUrl = Bundle.main.url(forResource: "rules", withExtension: "json")!
+        let rulesData = (try? Data(contentsOf: rulesUrl))!
+        let rules = try? JSONSerialization.jsonObject(with: rulesData, options: [])
+
+        replyHandler([
+            "type": "initResp",
+            "rules": rules,
+            "config": [
+                "enabled": true,
+                // if it's the first time, disable autoAction
+                "autoAction": PrivacySecurityPreferences.shared.autoconsentEnabled == true ? "optOut" : nil,
+                "disabledCmps": disabledCMPs,
+                // the very first time, make sure the popup is visible
+                "enablePrehide": PrivacySecurityPreferences.shared.autoconsentEnabled
+            ]
+        ], nil)
+    }
+    
+    @MainActor
+    func handleEval(messageData: [String: Any], replyHandler: @escaping (Any?, String?) -> Void, message: WKScriptMessage) {
+        guard let payload = messageData["code"],
+              let reqId = messageData["id"] else {
+            replyHandler(nil, "cannot decode eval request")
+            return
+        }
+        let script = """
+        (() => {
+        try {
+            console.log("EXEC", `\(payload)`);
+            return !!(\(payload))
+        } catch (e) {
+          // ignore CSP errors
+          return;
+        }
+        })();
+        """
+        
+        if let webview = message.webView {
+            webview.evaluateJavaScript(script, in: message.frameInfo, in: WKContentWorld.page, completionHandler: { (result) in
+                switch result {
+                case.failure(let error):
+                    replyHandler(nil, "Error snippet: \(error)")
+                case.success(let value):
+                    replyHandler(
+                        [
+                            "type": "evalResp",
+                            "id": reqId,
+                            "result": value
+                        ],
+                        nil
+                    )
+                }
+            })
+        } else {
+            replyHandler(nil, "missing frame target")
+        }
+    }
+    
+    @MainActor
+    func handlePopupFound(messageData: [String: Any], replyHandler: @escaping (Any?, String?) -> Void, message: WKScriptMessage) {
+        guard PrivacySecurityPreferences.shared.autoconsentEnabled == nil else {
+            // if feature is already enabled, opt-out will happen automatically
+            replyHandler([ "type": "ok" ], nil) // this is just to prevent a Promise rejection
+            return
+        }
+        
+        os_log("Prompting user about autoconsent", log: .autoconsent, type: .debug)
+
+        // if it's the first time, prompt the user and trigger opt-out
+        if let window = message.webView?.window {
+            ensurePrompt(window: window, callback: { shouldProceed in
+                if shouldProceed {
+                    Task {
+                        replyHandler([ "type": "optOut" ], nil)
+                    }
+                }
+            })
+        } else {
+            replyHandler(nil, "missing frame target")
+        }
+    }
+    
+    @MainActor
+    func handleOptOutResult(messageData: [String: Any], replyHandler: @escaping (Any?, String?) -> Void, message: WKScriptMessage) {
+        // TODO: save a reference to the webview and frame for self-test
+        os_log("OLOLO: %s", log: .autoconsent, type: .debug, String(describing: message.body))
+        replyHandler([ "type": "ok" ], nil) // this is just to prevent a Promise rejection
+    }
+    
+    @MainActor
+    func handleAutoconsentDone(messageData: [String: Any], replyHandler: @escaping (Any?, String?) -> Void) {
+        // report a managed popup
+        os_log("opt-out successful: %s", log: .autoconsent, type: .debug, String(describing: messageData))
+        
+        guard let urlString = messageData["url"] as? String,
+              let url = URL(string: urlString),
+              let host = url.host else {
+            replyHandler(nil, "cannot decode message")
+            return
+        }
+        
+        // trigger popup once per domain
+        if !AutoconsentManagement.shared.sitesNotifiedCache.contains(host) {
+            AutoconsentManagement.shared.sitesNotifiedCache.insert(host)
+            // post popover notification on main thread
+            DispatchQueue.main.async {
+                NotificationCenter.default.post(name: Constants.newSitePopupHidden, object: self, userInfo: [
+                    "url": url
+                ])
+            }
+        }
+        replyHandler([ "type": "ok" ], nil) // this is just to prevent a Promise rejection
+    }
+    
+    @MainActor
+    func handleSelfTestResult(messageData: [String: Any], replyHandler: @escaping (Any?, String?) -> Void) {
+        // TODO: store self-test result
+        os_log("OLOLO: %s", log: .autoconsent, type: .debug, String(describing: messageData))
+        replyHandler([ "type": "ok" ], nil) // this is just to prevent a Promise rejection
     }
 
     @MainActor
