@@ -75,7 +75,7 @@ jobs:
         submodules: recursive
 
     - name: Install create-dmg
-      if: github.event.inputs.create-dmg || github.event.inputs.asana-task-url
+      if: ${{ github.event.inputs.create-dmg == true || github.event.inputs.asana-task-url }}
       run: |
         brew install create-dmg
         echo "create_dmg_arg=-d" >> $GITHUB_ENV
