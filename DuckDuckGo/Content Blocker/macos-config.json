@@ -1,6 +1,6 @@
 {
     "readme": "https://github.com/duckduckgo/privacy-configuration",
-    "version": 1653680846662,
+    "version": 1655989238391,
     "features": {
         "ampLinks": {
             "exceptions": [
@@ -168,6 +168,10 @@
                         "reason": "Wordpress plugin reports our browser as a bot"
                     },
                     {
+                        "domain": "thingiverse.com",
+                        "reason": "Site loads blank"
+                    },
+                    {
                         "domain": "accounts.google.com",
                         "reason": "Site reports browser not supported"
                     },
@@ -205,6 +209,10 @@
             "exceptions": [
                 {
                     "domain": "adidas.com",
+                    "reason": "Broken add to cart"
+                },
+                {
+                    "domain": "hm.com",
                     "reason": "Broken add to cart"
                 },
                 {
@@ -409,6 +417,17 @@
                             }
                         ]
                     },
+                    "aldi-digital.co.uk": {
+                        "rules": [
+                            {
+                                "rule": "assets.aldi-digital.co.uk/assets/050b4966c22c430e5c9308903ebb87e1/dist/scripts/main.js",
+                                "domains": [
+                                    "aldi.co.uk"
+                                ],
+                                "reason": "product images missing"
+                            }
+                        ]
+                    },
                     "alicdn.com": {
                         "rules": [
                             {
@@ -555,6 +574,39 @@
                             }
                         ]
                     },
+                    "facebook.net": {
+                        "rules": [
+                            {
+                                "rule": "connect.facebook.net/en_US/sdk.js",
+                                "domains": [
+                                    "grubhub.com"
+                                ],
+                                "reason": "broken login"
+                            }
+                        ]
+                    },
+                    "fwmrm.net": {
+                        "rules": [
+                            {
+                                "rule": "2a7e9.v.fwmrm.net/ad/g/1",
+                                "domains": [
+                                    "channel4.com"
+                                ],
+                                "reason": "adwall"
+                            }
+                        ]
+                    },
+                    "gigya.com": {
+                        "rules": [
+                            {
+                                "rule": "gigya.com/js/gigya.services.plugins.base.min.js",
+                                "domains": [
+                                    "<all>"
+                                ],
+                                "reason": "login content not loading"
+                            }
+                        ]
+                    },
                     "google-analytics.com": {
                         "rules": [
                             {
@@ -597,10 +649,11 @@
                                 "rule": "googletagmanager.com/gtm.js",
                                 "domains": [
                                     "ah.nl",
+                                    "dailyherald.com",
                                     "iltalehti.fi",
                                     "rbcroyalbank.com"
                                 ],
-                                "reason": "page not loading, video not loading, internal ads blocked"
+                                "reason": "page/video/image not loading, internal ads blocked"
                             }
                         ]
                     },
@@ -727,6 +780,17 @@
                                     "eonline.com"
                                 ],
                                 "reason": "video not loading"
+                            }
+                        ]
+                    },
+                    "tiqcdn.com": {
+                        "rules": [
+                            {
+                                "rule": "tags.tiqcdn.com/utag/agl/community/prod/utag.sync.js",
+                                "domains": [
+                                    "agl.com.au"
+                                ],
+                                "reason": "site loading delayed"
                             }
                         ]
                     },
