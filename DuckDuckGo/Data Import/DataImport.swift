@@ -230,7 +230,7 @@ enum DataImport {
 
 }
 
-struct DataImportError: Error {
+struct DataImportError: Error, Equatable {
 
     enum ImportErrorAction {
         case bookmarks
@@ -256,7 +256,6 @@ struct DataImportError: Error {
         case couldNotGetDecryptionKey
         case cannotDecryptFile
         case failedToTemporarilyCopyFile
-        case failedToMapBookmarks
         case databaseAccessFailed
     }
     
@@ -275,7 +274,6 @@ struct DataImportError: Error {
         case .noBookmarksFileFound: return DataImportError(actionType: .bookmarks, errorType: .noFileFound)
         case .unexpectedBookmarksDatabaseFormat: return DataImportError(actionType: .bookmarks, errorType: .cannotReadFile)
         case .failedToTemporarilyCopyFile: return DataImportError(actionType: .bookmarks, errorType: .failedToTemporarilyCopyFile)
-        case .failedToMapBookmarks: return DataImportError(actionType: .bookmarks, errorType: .failedToMapBookmarks)
         }
     }
     
