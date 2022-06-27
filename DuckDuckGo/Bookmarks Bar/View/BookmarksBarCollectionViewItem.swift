@@ -21,7 +21,6 @@ import Cocoa
 protocol BookmarksBarCollectionViewItemDelegate: AnyObject {
 
     func bookmarksBarCollectionViewItemClicked(_ bookmarksBarCollectionViewItem: BookmarksBarCollectionViewItem)
-    func bookmarksBarCollectionViewItemShowContextMenu(_ bookmarksBarCollectionViewItem: BookmarksBarCollectionViewItem)
 
 }
 
@@ -49,15 +48,16 @@ final class BookmarksBarCollectionViewItem: NSCollectionViewItem {
         self.view.layer?.masksToBounds = true
     }
     
-    func updateItem(labelText: String, isFolder: Bool) {
+    func updateItem(labelText: String, bookmarkURL: URL?) {
         self.title = labelText
         self.titleLabel.stringValue = labelText
-        self.disclosureIndicatorImageView.isHidden = !isFolder
+        self.disclosureIndicatorImageView.isHidden = (bookmarkURL != nil)
         
-        if isFolder {
-            faviconView.image = NSImage(named: "Folder-16")
+        if let bookmarkHost = bookmarkURL?.host {
+            let favicon = FaviconManager.shared.getCachedFavicon(for: bookmarkHost, sizeCategory: .small)
+            faviconView.image = favicon?.image ?? NSImage(named: "Bookmark")
         } else {
-            faviconView.image = NSImage(named: "Bookmark")
+            faviconView.image = NSImage(named: "Folder-16")
         }
     }
     
@@ -67,10 +67,6 @@ extension BookmarksBarCollectionViewItem: MouseClickViewDelegate {
     
     func mouseClickView(_ mouseClickView: MouseClickView, mouseUpEvent: NSEvent) {
         delegate?.bookmarksBarCollectionViewItemClicked(self)
-    }
-    
-    func mouseClickView(_ mouseClickView: MouseClickView, rightMouseDownEvent: NSEvent) {
-        delegate?.bookmarksBarCollectionViewItemShowContextMenu(self)
     }
 
 }

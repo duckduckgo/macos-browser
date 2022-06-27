@@ -20,6 +20,12 @@ import AppKit
 import Combine
 import Foundation
 
+protocol BookmarksBarViewModelDelegate: AnyObject {
+    
+    func bookmarksBarViewModelReceivedLeftClick(for item: BookmarksBarCollectionViewItem)
+    
+}
+
 final class BookmarksBarViewModel: NSObject {
     
     // MARK: Enums
@@ -27,7 +33,7 @@ final class BookmarksBarViewModel: NSObject {
     enum Constants {
         static let buttonSpacing: CGFloat = 8
         static let buttonHeight: CGFloat = 28
-        static let maximumButtonWidth: CGFloat = 150
+        static let maximumButtonWidth: CGFloat = 200
         static let labelFont = NSFont.systemFont(ofSize: 13)
     }
     
@@ -38,6 +44,8 @@ final class BookmarksBarViewModel: NSObject {
         let cachedWidth: CGFloat
         let entity: BaseBookmarkEntity
     }
+    
+    weak var delegate: BookmarksBarViewModelDelegate?
 
     private var cancellables = Set<AnyCancellable>()
     
@@ -102,13 +110,13 @@ final class BookmarksBarViewModel: NSObject {
  
     func cachedWidth(buttonTitle: String, isFolder: Bool = false) -> CGFloat {
         if let cachedValue = collectionViewItemSizeCache[buttonTitle] {
-            return cachedValue + (isFolder ? 40 : 28)
+            return cachedValue + (isFolder ? 40 : 30)
         } else {            
             let calculationLabel = NSTextField.label(titled: buttonTitle)
             calculationLabel.sizeToFit()
             let cappedTitleWidth = min(Constants.maximumButtonWidth, calculationLabel.frame.width)
 
-            let calculatedWidth = min(Constants.maximumButtonWidth, calculationLabel.frame.width) + (isFolder ? 44 : 28)
+            let calculatedWidth = min(Constants.maximumButtonWidth, calculationLabel.frame.width) + (isFolder ? 44 : 30)
             collectionViewItemSizeCache[buttonTitle] = cappedTitleWidth
             
             return calculatedWidth
@@ -161,7 +169,11 @@ extension BookmarksBarViewModel: NSCollectionViewDelegate, NSCollectionViewDataS
         
         let bookmarksBarItem = bookmarksBarItems[indexPath.item]
         bookmarksCollectionViewItem.delegate = self
-        bookmarksCollectionViewItem.updateItem(labelText: bookmarksBarItem.title, isFolder: bookmarksBarItem.isFolder)
+        bookmarksCollectionViewItem.updateItem(labelText: bookmarksBarItem.title, bookmarkURL: (bookmarksBarItem.entity as? Bookmark)?.url)
+        
+        let menu = NSMenu()
+        menu.addItem(withTitle: "Test", action: nil, keyEquivalent: "")
+        bookmarksCollectionViewItem.view.menu = menu
         
         return bookmarksCollectionViewItem
     }
@@ -236,11 +248,7 @@ extension BookmarksBarViewModel: NSCollectionViewDelegate, NSCollectionViewDataS
 extension BookmarksBarViewModel: BookmarksBarCollectionViewItemDelegate {
     
     func bookmarksBarCollectionViewItemClicked(_ bookmarksBarCollectionViewItem: BookmarksBarCollectionViewItem) {
-        print("Clicked!!!")
-    }
-    
-    func bookmarksBarCollectionViewItemShowContextMenu(_ bookmarksBarCollectionViewItem: BookmarksBarCollectionViewItem) {
-        print("Right Clicked!!!")
+        delegate?.bookmarksBarViewModelReceivedLeftClick(for: bookmarksBarCollectionViewItem)
     }
     
 }

@@ -31,7 +31,7 @@ extension NSCollectionLayoutGroup {
                 if centered {
                     xPos = (environment.container.effectiveContentSize.width - totalWidth()) / 2 + environment.container.contentInsets.leading
                 } else {
-                    xPos = 0
+                    xPos = interItemSpacing
                 }
                 
                 let maxItemHeight = rowSizes.map(\.height).max() ?? 0
