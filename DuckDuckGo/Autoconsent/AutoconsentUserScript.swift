@@ -42,6 +42,9 @@ final class AutoconsentManagement {
 final class AutoconsentUserScript: NSObject, WKScriptMessageHandlerWithReply, UserScriptWithAutoconsent {
     var injectionTime: WKUserScriptInjectionTime { .atDocumentStart }
     var forMainFrameOnly: Bool { false }
+    var selfTestWebView: WKWebView?
+    var selfTestFrameInfo: WKFrameInfo?
+    var topUrl: URL?
     
     enum Constants {
         static let newSitePopupHidden = Notification.Name("newSitePopupHidden")
@@ -74,6 +77,13 @@ final class AutoconsentUserScript: NSObject, WKScriptMessageHandlerWithReply, Us
     }
 
     @MainActor
+    func refreshDashboardState(consentManaged: Bool, optoutFailed: Bool?, selftestFailed: Bool?) {
+        self.delegate?.autoconsentUserScript(consentStatus: CookieConsentInfo(
+            consentManaged: consentManaged, optoutFailed: optoutFailed, selftestFailed: selftestFailed)
+        )
+    }
+
+    @MainActor
     func userContentController(_ userContentController: WKUserContentController,
                                didReceive message: WKScriptMessage,
                                replyHandler: @escaping (Any?, String?) -> Void) {
@@ -90,7 +100,7 @@ final class AutoconsentUserScript: NSObject, WKScriptMessageHandlerWithReply, Us
 
         switch messageName {
         case MessageName.`init`:
-            handleInit(messageData: messageData, replyHandler: replyHandler)
+            handleInit(messageData: messageData, replyHandler: replyHandler, message: message)
         case MessageName.eval:
             handleEval(messageData: messageData, replyHandler: replyHandler, message: message)
         case MessageName.popupFound:
@@ -112,7 +122,7 @@ final class AutoconsentUserScript: NSObject, WKScriptMessageHandlerWithReply, Us
     }
     
     @MainActor
-    func handleInit(messageData: [String: Any], replyHandler: @escaping (Any?, String?) -> Void) {
+    func handleInit(messageData: [String: Any], replyHandler: @escaping (Any?, String?) -> Void, message: WKScriptMessage) {
         guard let urlString = messageData["url"] as? String,
               let url = URL(string: urlString) else {
             replyHandler(nil, "cannot decode init request")
@@ -128,6 +138,11 @@ final class AutoconsentUserScript: NSObject, WKScriptMessageHandlerWithReply, Us
             // this will only happen if the user has just declined a prompt in this tab
             replyHandler([ "type": "ok" ], nil) // this is just to prevent a Promise rejection
             return
+        }
+        if message.frameInfo.isMainFrame {
+            topUrl = url
+            // reset dashboard state
+            refreshDashboardState(consentManaged: AutoconsentManagement.shared.sitesNotifiedCache.contains(url.host ?? ""), optoutFailed: nil, selftestFailed: nil)
         }
         let remoteConfig = self.config.settings(for: .autoconsent)
         let disabledCMPs = remoteConfig["disabledCMPs"] as? [String] ?? []
@@ -215,8 +230,21 @@ final class AutoconsentUserScript: NSObject, WKScriptMessageHandlerWithReply, Us
     
     @MainActor
     func handleOptOutResult(messageData: [String: Any], replyHandler: @escaping (Any?, String?) -> Void, message: WKScriptMessage) {
-        // TODO: save a reference to the webview and frame for self-test
-        os_log("OLOLO: %s", log: .autoconsent, type: .debug, String(describing: message.body))
+        os_log("opt-out result: %s", log: .autoconsent, type: .debug, String(describing: messageData))
+        guard let scheduleSelfTest = messageData["scheduleSelfTest"] as? Bool,
+              let result = messageData["result"] as? Bool else {
+            replyHandler(nil, "cannot decode message")
+            return
+        }
+
+        if !result {
+            refreshDashboardState(consentManaged: true, optoutFailed: true, selftestFailed: nil)
+        } else if scheduleSelfTest {
+            // save a reference to the webview and frame for self-test
+            selfTestWebView = message.webView
+            selfTestFrameInfo = message.frameInfo
+        }
+
         replyHandler([ "type": "ok" ], nil) // this is just to prevent a Promise rejection
     }
     
@@ -232,23 +260,54 @@ final class AutoconsentUserScript: NSObject, WKScriptMessageHandlerWithReply, Us
             return
         }
         
+        refreshDashboardState(consentManaged: true, optoutFailed: false, selftestFailed: nil)
+        
         // trigger popup once per domain
         if !AutoconsentManagement.shared.sitesNotifiedCache.contains(host) {
+            os_log("bragging that we closed a popup", log: .autoconsent, type: .debug)
             AutoconsentManagement.shared.sitesNotifiedCache.insert(host)
             // post popover notification on main thread
             DispatchQueue.main.async {
                 NotificationCenter.default.post(name: Constants.newSitePopupHidden, object: self, userInfo: [
-                    "url": url
+                    "topUrl": self.topUrl ?? url
                 ])
             }
         }
+        
         replyHandler([ "type": "ok" ], nil) // this is just to prevent a Promise rejection
+
+        if let selfTestWebView = selfTestWebView,
+           let selfTestFrameInfo = selfTestFrameInfo {
+            os_log("requesting self-test in: %s", log: .autoconsent, type: .debug, urlString)
+            selfTestWebView.evaluateJavaScript(
+                "window.autoconsentMessageCallback({ type: 'selfTest' })",
+                in: selfTestFrameInfo,
+                in: WKContentWorld.defaultClient,
+                completionHandler: { (result) in
+                    switch result {
+                    case.failure(let error):
+                        os_log("Error running self-test: %s", log: .autoconsent, type: .debug, String(describing: error))
+                    case.success(let value):
+                        os_log("self-test requested", log: .autoconsent, type: .debug)
+                    }
+                }
+            )
+        } else {
+            os_log("no self-test scheduled in this tab", log: .autoconsent, type: .debug)
+        }
+        selfTestWebView = nil
+        selfTestFrameInfo = nil
     }
     
     @MainActor
     func handleSelfTestResult(messageData: [String: Any], replyHandler: @escaping (Any?, String?) -> Void) {
-        // TODO: store self-test result
-        os_log("OLOLO: %s", log: .autoconsent, type: .debug, String(describing: messageData))
+        // store self-test result
+        os_log("self-test result: %s", log: .autoconsent, type: .debug, String(describing: messageData))
+        guard let result = messageData["result"] as? Bool else {
+            replyHandler(nil, "cannot decode message")
+            return
+        }
+        refreshDashboardState(consentManaged: true, optoutFailed: false, selftestFailed: result)
         replyHandler([ "type": "ok" ], nil) // this is just to prevent a Promise rejection
     }
 
@@ -312,7 +371,7 @@ final class AutoconsentUserScript: NSObject, WKScriptMessageHandlerWithReply, Us
         guard AutoconsentManagement.shared.promptLastShown == nil || now > AutoconsentManagement.shared.promptLastShown!.addingTimeInterval(30) else {
             // user said "not now" recently, don't bother asking
             os_log("Have a recent user response, canceling prompt", log: .autoconsent, type: .debug)
-            callback(false)
+            callback(preferences.autoconsentEnabled ?? false) // if two prompts were scheduled from the same tab, result could be true
             return
         }
 

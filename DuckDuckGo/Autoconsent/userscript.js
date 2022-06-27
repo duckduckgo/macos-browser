@@ -9,3 +9,6 @@ const autoconsent = new AutoConsent(
         });
     },
 );
+window.autoconsentMessageCallback = (msg) => {
+    autoconsent.receiveMessageCallback(msg);
+}
