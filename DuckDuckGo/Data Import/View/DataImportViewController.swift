@@ -298,6 +298,10 @@ final class DataImportViewController: NSViewController {
     }
 
     private func embed(viewController newChildViewController: NSViewController) {
+        if newChildViewController === currentChildViewController {
+            return
+        }
+
         if let currentChildViewController = currentChildViewController {
             addChild(newChildViewController)
             transition(from: currentChildViewController, to: newChildViewController, options: [])

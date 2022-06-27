@@ -28,6 +28,7 @@ protocol FirefoxEncryptionKeyReading {
 
 }
 
+// swiftlint:disable:next type_body_length
 final class FirefoxEncryptionKeyReader: FirefoxEncryptionKeyReading {
     
     func getEncryptionKey(key3DatabaseURL: URL, primaryPassword: String) -> Result<Data, FirefoxLoginReader.ImportError> {
@@ -57,19 +58,10 @@ final class FirefoxEncryptionKeyReader: FirefoxEncryptionKeyReading {
         
         // Part 2: Take the decrypted ASN1 data, parse it, and extract the key.
         
-        guard let decryptedASNData = try? ASN1Parser.parse(data: decryptedData) else {
-            return .failure(.decryptionFailed)
-        }
-        
-        guard let extractedASNData = extractKey3DecryptedASNData(from: decryptedASNData) else {
-            return .failure(.decryptionFailed)
-        }
-        
-        guard let keyContainerASNData = try? ASN1Parser.parse(data: extractedASNData) else {
-            return .failure(.decryptionFailed)
-        }
-        
-        guard let key = extractKey3Key(from: keyContainerASNData) else {
+        guard let decryptedASNData = try? ASN1Parser.parse(data: decryptedData),
+              let extractedASNData = extractKey3DecryptedASNData(from: decryptedASNData),
+              let keyContainerASNData = try? ASN1Parser.parse(data: extractedASNData),
+              let key = extractKey3Key(from: keyContainerASNData) else {
             return .failure(.decryptionFailed)
         }
         
@@ -109,33 +101,21 @@ final class FirefoxEncryptionKeyReader: FirefoxEncryptionKeyReading {
             let globalSalt: Data = metadataRow["item1"]
             let item2: Data = metadataRow["item2"]
 
-            guard let decodedItem2 = try? ASN1Parser.parse(data: item2),
-                  let iv = extractInitializationVector(from: decodedItem2),
-                  let decryptedItem2 = aesDecrypt(tlv: decodedItem2, iv: iv, globalSalt: globalSalt, primaryPassword: primaryPassword) else {
+            guard let decodedASNData = try? ASN1Parser.parse(data: item2) else {
                 throw FirefoxLoginReader.ImportError.decryptionFailed
             }
-
-            let string = String(data: decryptedItem2, encoding: .utf8)
-
-            // The password check is technically "password-check\x02\x02", it's converted to UTF-8 and checked here for simplicity
-            if string != "password-check" {
-                throw FirefoxLoginReader.ImportError.requiresPrimaryPassword
+            
+            if let tripleDesData = try extractKeyUsing3DES(from: decodedASNData,
+                                                           globalSalt: globalSalt,
+                                                           primaryPassword: primaryPassword,
+                                                           database: database) {
+                return tripleDesData
+            } else {
+                return try extractKeyUsingAES(from: decodedASNData,
+                                              globalSalt: globalSalt,
+                                              primaryPassword: primaryPassword,
+                                              database: database)
             }
-
-            guard let nssPrivateRow = try? Row.fetchOne(database, sql: "SELECT a11, a102 FROM nssPrivate;") else {
-                throw FirefoxLoginReader.ImportError.decryptionFailed
-            }
-
-            let a11: Data = nssPrivateRow["a11"]
-            let a102: Data = nssPrivateRow["a102"]
-
-            assert(a102 == Data([248, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1]))
-
-            guard let decodedA11 = try? ASN1Parser.parse(data: a11), let finalIV = extractInitializationVector(from: decodedA11) else {
-                throw FirefoxLoginReader.ImportError.decryptionFailed
-            }
-
-            return aesDecrypt(tlv: decodedA11, iv: finalIV, globalSalt: globalSalt, primaryPassword: primaryPassword)
         }
     }
 
@@ -322,6 +302,73 @@ final class FirefoxEncryptionKeyReader: FirefoxEncryptionKeyReading {
         }
 
         return Data(decryptedData)
+    }
+    
+    // MARK: - ASN Key Extraction
+    
+    private func extractKeyUsing3DES(from node: ASN1Parser.Node, globalSalt: Data, primaryPassword: String, database: GRDB.Database) throws -> Data? {
+        guard let entrySalt = extractKey3EntrySalt(from: node), let passwordCheckCiphertext = extractCiphertext(from: node) else {
+            return nil
+        }
+        
+        guard let decryptedCiphertext = tripleDesDecrypt(ciphertext: passwordCheckCiphertext,
+                                                         globalSalt: globalSalt,
+                                                         entrySalt: entrySalt,
+                                                         primaryPassword: primaryPassword) else {
+            return nil
+        }
+        
+        let passwordCheckString = String(data: decryptedCiphertext, encoding: .utf8)
+        
+        if passwordCheckString != "password-check" {
+            throw FirefoxLoginReader.ImportError.requiresPrimaryPassword
+        }
+        
+        guard let nssPrivateRow = try? Row.fetchOne(database, sql: "SELECT a11, a102 FROM nssPrivate;") else {
+            throw FirefoxLoginReader.ImportError.decryptionFailed
+        }
+
+        let a11: Data = nssPrivateRow["a11"]
+        let a102: Data = nssPrivateRow["a102"]
+        
+        assert(a102 == Data([248, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1]))
+        
+        guard let decodedA11 = try? ASN1Parser.parse(data: a11),
+              let entrySalt = extractKey3EntrySalt(from: decodedA11),
+              let ciphertext = extractCiphertext(from: decodedA11) else {
+            throw FirefoxLoginReader.ImportError.decryptionFailed
+        }
+
+        return tripleDesDecrypt(ciphertext: ciphertext, globalSalt: globalSalt, entrySalt: entrySalt, primaryPassword: primaryPassword)
+    }
+    
+    private func extractKeyUsingAES(from node: ASN1Parser.Node, globalSalt: Data, primaryPassword: String, database: GRDB.Database) throws -> Data? {
+        guard let iv = extractInitializationVector(from: node),
+              let decryptedItem2 = aesDecrypt(tlv: node, iv: iv, globalSalt: globalSalt, primaryPassword: primaryPassword) else {
+            throw FirefoxLoginReader.ImportError.decryptionFailed
+        }
+
+        let passwordCheckString = String(data: decryptedItem2, encoding: .utf8)
+
+        // The password check is technically "password-check\x02\x02", it's converted to UTF-8 and checked here for simplicity
+        if passwordCheckString != "password-check" {
+            throw FirefoxLoginReader.ImportError.requiresPrimaryPassword
+        }
+
+        guard let nssPrivateRow = try? Row.fetchOne(database, sql: "SELECT a11, a102 FROM nssPrivate;") else {
+            throw FirefoxLoginReader.ImportError.decryptionFailed
+        }
+
+        let a11: Data = nssPrivateRow["a11"]
+        let a102: Data = nssPrivateRow["a102"]
+
+        assert(a102 == Data([248, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1]))
+
+        guard let decodedA11 = try? ASN1Parser.parse(data: a11), let finalIV = extractInitializationVector(from: decodedA11) else {
+            throw FirefoxLoginReader.ImportError.decryptionFailed
+        }
+
+        return aesDecrypt(tlv: decodedA11, iv: finalIV, globalSalt: globalSalt, primaryPassword: primaryPassword)
     }
 
 }
