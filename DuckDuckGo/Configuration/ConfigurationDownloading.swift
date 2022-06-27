@@ -142,8 +142,8 @@ final class DefaultConfigurationDownloader: ConfigurationDownloading {
 
     func embeddedEtag(for config: ConfigurationLocation) -> String? {
         switch config {
-        case .trackerRadar: return AppTrackerDataSetProvider.Constants.embeddedDataSetETag
-        case .privacyConfiguration: return AppPrivacyConfigurationDataProvider.Constants.embeddedConfigETag
+        case .trackerRadar: return AppTrackerDataSetProvider.Constants.embeddedDataETag
+        case .privacyConfiguration: return AppPrivacyConfigurationDataProvider.Constants.embeddedDataSHA
         default: return nil
         }
     }

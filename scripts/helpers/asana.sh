@@ -69,9 +69,9 @@ _asana_get_token() {
 
 	if [[ -z "${asana_personal_access_token}" ]]; then
 
-		if user_has_password_in_keychain "${asana_token_keychain_identifier}"; then
+		if is_item_in_keychain "${asana_token_keychain_identifier}"; then
 			echo "Found Asana Personal Access Token in the keychain"
-			asana_personal_access_token=$(retrieve_password_from_keychain "${asana_token_keychain_identifier}")
+			asana_personal_access_token=$(retrieve_item_from_keychain "${asana_token_keychain_identifier}")
 		else
 			while [[ -z "${asana_personal_access_token}" ]]; do
 				echo "Input your Asana Personal Access Token. It will be stored securely in the keychain."
@@ -80,7 +80,7 @@ _asana_get_token() {
 				echo
 			done
 
-			store_password_in_keychain "${asana_token_keychain_identifier}" "${asana_personal_access_token}"
+			store_item_in_keychain "${asana_token_keychain_identifier}" "${asana_personal_access_token}"
 		fi
 	fi
 }

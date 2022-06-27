@@ -1,5 +1,5 @@
 //
-//  CSVImportViewController.swift
+//  FileImportViewController.swift
 //
 //  Copyright © 2021 DuckDuckGo. All rights reserved.
 //
@@ -18,25 +18,27 @@
 
 import AppKit
 
-protocol CSVImportViewControllerDelegate: AnyObject {
+protocol FileImportViewControllerDelegate: AnyObject {
 
-    func csvImportViewController(_ viewController: CSVImportViewController, didSelectCSVFileWithURL: URL?)
+    func fileImportViewController(_ viewController: FileImportViewController, didSelectCSVFileWithURL: URL?)
     func totalValidLogins(in fileURL: URL) -> Int?
 
+    func fileImportViewController(_ viewController: FileImportViewController, didSelectBookmarksFileWithURL: URL?)
+    func totalValidBookmarks(in fileURL: URL) -> Int?
 }
 
-final class CSVImportViewController: NSViewController {
+final class FileImportViewController: NSViewController {
 
     enum Constants {
         static let storyboardName = "DataImport"
-        static let identifier = "CSVImportViewController"
+        static let identifier = "FileImportViewController"
         static let wideStackViewSpacing: CGFloat = 20
         static let narrowStackViewSpacing: CGFloat = 12
     }
 
-    static func create(importSource: DataImport.Source) -> CSVImportViewController {
+    static func create(importSource: DataImport.Source) -> FileImportViewController {
         let storyboard = NSStoryboard(name: Constants.storyboardName, bundle: nil)
-        let controller: CSVImportViewController = storyboard.instantiateController(identifier: Constants.identifier)
+        let controller: FileImportViewController = storyboard.instantiateController(identifier: Constants.identifier)
         controller.importSource = importSource
         return controller
     }
@@ -59,7 +61,7 @@ final class CSVImportViewController: NSViewController {
             renderCurrentState()
         }
     }
-    weak var delegate: CSVImportViewControllerDelegate?
+    weak var delegate: FileImportViewControllerDelegate?
 
     // MARK: - View State
 
@@ -113,6 +115,12 @@ final class CSVImportViewController: NSViewController {
             lastPassInfoView.isHidden = true
             onePasswordInfoView.isHidden = true
             selectFileButton.title = UserText.importLoginsSelectCSVFile
+        case .bookmarksHTML:
+            descriptionLabel.isHidden = true
+            safariInfoView.isHidden = true
+            lastPassInfoView.isHidden = true
+            onePasswordInfoView.isHidden = true
+            selectFileButton.title = UserText.importBookmarksSelectHTMLFile
         }
     }
 
@@ -124,29 +132,55 @@ final class CSVImportViewController: NSViewController {
             selectedFileContainer.isHidden = true
             renderAwaitingFileSelectionState()
         case .selectedValidFile(let fileURL):
-            let totalLoginsToImport = self.delegate?.totalValidLogins(in: fileURL) ?? 0
             selectedFileContainer.isHidden = false
             selectedFileLabel.stringValue = fileURL.path
-            selectFileButton.title = UserText.importLoginsSelectAnotherFile
-            totalValidLoginsLabel.stringValue = UserText.importingFile(validLogins: totalLoginsToImport)
+            if importSource == .bookmarksHTML {
+                let totalBookmarksToImport = self.delegate?.totalValidBookmarks(in: fileURL) ?? 0
+                selectFileButton.title = UserText.importBookmarksSelectAnotherFile
+                totalValidLoginsLabel.stringValue = UserText.importingFile(validBookmarks: totalBookmarksToImport)
+            } else {
+                let totalLoginsToImport = self.delegate?.totalValidLogins(in: fileURL) ?? 0
+                selectFileButton.title = UserText.importLoginsSelectAnotherFile
+                totalValidLoginsLabel.stringValue = UserText.importingFile(validLogins: totalLoginsToImport)
+            }
         case .selectedInvalidFile:
-            selectedFileLabel.stringValue = UserText.importLoginsFailedToReadCSVFile
             selectedFileLabel.isHidden = false
-            selectFileButton.title = UserText.importLoginsSelectCSVFile
+            if importSource == .bookmarksHTML {
+                selectedFileLabel.stringValue = UserText.importBookmarksFailedToReadHTMLFile
+                selectFileButton.title = UserText.importBookmarksSelectHTMLFile
+            } else {
+                selectedFileLabel.stringValue = UserText.importLoginsFailedToReadCSVFile
+                selectFileButton.title = UserText.importLoginsSelectCSVFile
+            }
         }
     }
 
     @IBAction func selectFileButtonClicked(_ sender: Any) {
-        let panel = NSOpenPanel.filePanel(allowedExtension: "csv")
+        let fileExtension: String = {
+            switch importSource {
+            case .bookmarksHTML:
+                return "html"
+            default:
+                return "csv"
+            }
+        }()
+        let panel = NSOpenPanel.filePanel(allowedExtension: fileExtension)
         let result = panel.runModal()
 
         if result == .OK {
             if let selectedURL = panel.url {
                 currentImportState = .selectedValidFile(fileURL: selectedURL)
-                delegate?.csvImportViewController(self, didSelectCSVFileWithURL: selectedURL)
+                switch importSource {
+                case .bookmarksHTML:
+                    delegate?.fileImportViewController(self, didSelectBookmarksFileWithURL: selectedURL)
+                case .csv:
+                    delegate?.fileImportViewController(self, didSelectCSVFileWithURL: selectedURL)
+                default:
+                    break
+                }
             } else {
                 currentImportState = .selectedInvalidFile
-                delegate?.csvImportViewController(self, didSelectCSVFileWithURL: nil)
+                delegate?.fileImportViewController(self, didSelectCSVFileWithURL: nil)
             }
         }
 

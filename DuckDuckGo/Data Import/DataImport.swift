@@ -30,6 +30,7 @@ enum DataImport {
         case onePassword
         case lastPass
         case csv
+        case bookmarksHTML
 
         static let preferredSources: [Self] = [.chrome, .safari]
 
@@ -51,6 +52,8 @@ enum DataImport {
                 return "1Password"
             case .csv:
                 return UserText.importLoginsCSV
+            case .bookmarksHTML:
+                return UserText.importBookmarksHTML
             }
         }
 
@@ -59,7 +62,7 @@ enum DataImport {
         }
 
         var canImportData: Bool {
-            return (ThirdPartyBrowser.browser(for: self)?.isInstalled ?? false) || [.csv, .onePassword, .lastPass].contains(self)
+            return (ThirdPartyBrowser.browser(for: self)?.isInstalled ?? false) || [.csv, .onePassword, .lastPass, .bookmarksHTML].contains(self)
         }
 
         var pixelEventSource: Pixel.Event.DataImportSource {
@@ -72,6 +75,7 @@ enum DataImport {
             case .onePassword: return .onePassword
             case .lastPass: return .lastPass
             case .csv: return .csv
+            case .bookmarksHTML: return .bookmarksHTML
             }
         }
     }
@@ -280,7 +284,13 @@ struct DataImportError: Error {
         case .unexpectedBookmarksFileFormat: return DataImportError(actionType: .bookmarks, errorType: .cannotReadFile)
         }
     }
-    
+
+    static func bookmarks(_ errorType: BookmarkHTMLReader.ImportError) -> DataImportError {
+        switch errorType {
+        case .unexpectedBookmarksFileFormat: return DataImportError(actionType: .bookmarks, errorType: .cannotReadFile)
+        }
+    }
+
     // MARK: Login Error Types
     
     static func logins(_ errorType: ImportErrorType) -> DataImportError {

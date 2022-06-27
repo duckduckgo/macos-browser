@@ -64,7 +64,7 @@ final class FirePopoverViewModel {
     }
 
     private let fireViewModel: FireViewModel
-    private let tabCollectionViewModel: TabCollectionViewModel
+    private weak var tabCollectionViewModel: TabCollectionViewModel?
     private let historyCoordinating: HistoryCoordinating
     private let fireproofDomains: FireproofDomains
     private let faviconManagement: FaviconManagement
@@ -87,14 +87,14 @@ final class FirePopoverViewModel {
         func visitedDomains(basedOn clearingOption: ClearingOption) -> Set<String> {
             switch clearingOption {
             case .currentTab:
-                guard let tab = tabCollectionViewModel.selectedTabViewModel?.tab else {
+                guard let tab = tabCollectionViewModel?.selectedTabViewModel?.tab else {
                     assertionFailure("No tab selected")
                     return Set<String>()
                 }
 
                 return tab.localHistory
             case .currentWindow:
-                return tabCollectionViewModel.tabCollection.localHistory
+                return tabCollectionViewModel?.tabCollection.localHistory ?? Set<String>()
             case .allData:
                 return historyCoordinating.history?.visitedDomains ?? Set<String>()
             }
@@ -172,7 +172,7 @@ final class FirePopoverViewModel {
     @Published private(set) var areOtherTabsInfluenced = false
 
     private func updateAreOtherTabsInfluenced() {
-        let selectedTab = tabCollectionViewModel.selectedTabViewModel?.tab
+        let selectedTab = tabCollectionViewModel?.selectedTabViewModel?.tab
         let allTabs = WindowControllersManager.shared.mainWindowControllers.flatMap {
             $0.mainViewController.tabCollectionViewModel.tabCollection.tabs
         }
@@ -190,8 +190,10 @@ final class FirePopoverViewModel {
     func burn() {
         let timedPixel = TimedPixel(.burn())
         if clearingOption == .allData && areAllSelected {
-            // Burn everything
-            fireViewModel.fire.burnAll(tabCollectionViewModel: tabCollectionViewModel) { timedPixel.fire() }
+            if let tabCollectionViewModel = tabCollectionViewModel {
+                // Burn everything
+                fireViewModel.fire.burnAll(tabCollectionViewModel: tabCollectionViewModel) { timedPixel.fire() }
+            }
         } else {
             // Burn selected domains
             fireViewModel.fire.burnDomains(selectedDomains) { timedPixel.fire() }

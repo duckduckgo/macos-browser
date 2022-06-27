@@ -24,8 +24,17 @@ struct ImportedBookmarks: Decodable {
         let name: String
         let type: String
         let urlString: String?
+        let isDDGFavorite: Bool
 
         let children: [BookmarkOrFolder]?
+
+        static func bookmark(name: String, urlString: String?, isDDGFavorite: Bool) -> BookmarkOrFolder {
+            .init(name: name, type: "bookmark", urlString: urlString, children: nil, isDDGFavorite: isDDGFavorite)
+        }
+
+        static func folder(name: String, children: [BookmarkOrFolder]) -> BookmarkOrFolder {
+            .init(name: name, type: "folder", urlString: nil, children: children)
+        }
 
         var url: URL? {
             if let url = self.urlString {
@@ -44,11 +53,35 @@ struct ImportedBookmarks: Decodable {
             return !isFolder && url == nil
         }
 
+        fileprivate var numberOfBookmarks: Int {
+            if isFolder {
+                return (children ?? []).reduce(0, { $0 + $1.numberOfBookmarks })
+            }
+            return 1
+        }
+
         enum CodingKeys: String, CodingKey {
             case name
             case type
             case urlString = "url"
             case children
+        }
+
+        init(from decoder: Decoder) throws {
+            let container = try decoder.container(keyedBy: CodingKeys.self)
+            name = try container.decode(String.self, forKey: .name)
+            type = try container.decode(String.self, forKey: .type)
+            urlString = try container.decodeIfPresent(String.self, forKey: .urlString)
+            children = try container.decodeIfPresent([BookmarkOrFolder].self, forKey: .children)
+            isDDGFavorite = false
+        }
+
+        init(name: String, type: String, urlString: String?, children: [BookmarkOrFolder]?, isDDGFavorite: Bool = false) {
+            self.name = name.trimmingWhitespaces()
+            self.type = type
+            self.urlString = urlString
+            self.children = children
+            self.isDDGFavorite = isDDGFavorite
         }
     }
 
@@ -63,6 +96,10 @@ struct ImportedBookmarks: Decodable {
     }
 
     let topLevelFolders: TopLevelFolders
+
+    var numberOfBookmarks: Int {
+        topLevelFolders.bookmarkBar.numberOfBookmarks + topLevelFolders.otherBookmarks.numberOfBookmarks
+    }
 
     enum CodingKeys: String, CodingKey {
         case topLevelFolders = "roots"

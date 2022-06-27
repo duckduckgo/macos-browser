@@ -87,6 +87,58 @@ final class StateRestorationManagerTests: XCTestCase {
         XCTAssertEqual(state.val2, 3)
     }
 
+    func testWhenLastSessionStateIsLoadedThenServiceCanRestoreLastSession() {
+        changeState("val1", 1, sync: true)
+
+        srm = StatePersistenceService(fileStore: fileStore, fileName: testFileName)
+        XCTAssertFalse(srm.canRestoreLastSessionState)
+
+        srm.loadLastSessionState()
+        XCTAssertTrue(srm.canRestoreLastSessionState)
+    }
+
+    func testWhenLastSessionStateIsRemovedManuallyThenLastSessionCannotBeRestored() {
+        changeState("val1", 1, sync: true)
+
+        srm = StatePersistenceService(fileStore: fileStore, fileName: testFileName)
+        srm.loadLastSessionState()
+        XCTAssertTrue(srm.canRestoreLastSessionState)
+
+        srm.removeLastSessionState()
+        XCTAssertFalse(srm.canRestoreLastSessionState)
+    }
+
+    func testWhenLastSessionStateIsLoadedThenChangesToStatePreserveLoadedLastSessionState() {
+        changeState("lastSessionValue", 42, sync: true)
+
+        srm = StatePersistenceService(fileStore: fileStore, fileName: testFileName)
+        srm.loadLastSessionState()
+
+        changeState("currentSessionValue", 7, sync: true)
+        XCTAssertNoThrow(try srm.restoreState(using: state.restoreState(from:)))
+
+        XCTAssertEqual(state.val1, "lastSessionValue")
+        XCTAssertEqual(state.val2, 42)
+        XCTAssertFalse(srm.canRestoreLastSessionState)
+    }
+
+    func testWhenLastSessionStateIsLoadedThenItIsNotDecrypted() {
+        let decryptExpectation = expectation(description: "decrypt")
+        decryptExpectation.isInverted = true
+
+        fileStore.decryptImpl = { data in
+            decryptExpectation.fulfill()
+            return data
+        }
+
+        changeState("val1", 1, sync: true)
+        srm = StatePersistenceService(fileStore: fileStore, fileName: testFileName)
+        srm.loadLastSessionState()
+
+        XCTAssertTrue(srm.canRestoreLastSessionState)
+        waitForExpectations(timeout: 0.1)
+    }
+
     func testStatePersistenceThrottlesWrites() {
         fileStore.delay = 0.1 // write operations will sleep for 100ms
         var counter = 0
@@ -145,30 +197,5 @@ final class StateRestorationManagerTests: XCTestCase {
                 return XCTFail("Unexpected \($0), expected \(CocoaError(.fileReadNoSuchFile))")
             }
         }
-    }
-}
-
-@objc(SavedStateMock)
-private class SavedStateMock: NSObject {
-    private enum NSSecureCodingKeys {
-        static let key1 = "key1"
-        static let key2 = "key2"
-    }
-    static var supportsSecureCoding = true
-
-    var val1: String?
-    var val2: Int?
-
-    override init() {
-    }
-
-    func encode(with coder: NSCoder) {
-        val1.map(coder.encode(forKey: NSSecureCodingKeys.key1))
-        val2.map(coder.encode(forKey: NSSecureCodingKeys.key2))
-    }
-
-    func restoreState(from coder: NSCoder) throws {
-        val1 = coder.decodeIfPresent(at: NSSecureCodingKeys.key1)
-        val2 = coder.decodeIfPresent(at: NSSecureCodingKeys.key2)
     }
 }

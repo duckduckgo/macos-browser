@@ -393,10 +393,10 @@
                 tab.frame.url.startsWith("https://consent-pref.trustarc.com/?")) {
                 return true;
             }
-            return tab.elementExists("#truste-show-consent");
+            return tab.elementExists("#truste-show-consent,#truste-consent-track");
         }
         async detectPopup(tab) {
-            return ((await tab.elementsAreVisible("#truste-consent-content,#trustarc-banner-overlay")) ||
+            return ((await tab.elementsAreVisible("#truste-consent-content,.truste-consent-content,#trustarc-banner-overlay")) ||
                 (tab.frame &&
                     (await tab.waitForElement("#defaultpreferencemanager", 5000, tab.frame.id))));
         }
@@ -486,7 +486,7 @@
     class Cookiebot extends AutoConsentBase {
         constructor() {
             super('Cybotcookiebot');
-            this.prehideSelectors = ["#CybotCookiebotDialog,#dtcookie-container,#cookiebanner"];
+            this.prehideSelectors = ["#CybotCookiebotDialog,#dtcookie-container,#cookiebanner,#cb-cookieoverlay"];
         }
         async detectCmp(tab) {
             try {
@@ -497,7 +497,7 @@
             }
         }
         detectPopup(tab) {
-            return tab.elementExists('#CybotCookiebotDialog,#dtcookie-container,#cookiebanner');
+            return tab.elementExists('#CybotCookiebotDialog,#dtcookie-container,#cookiebanner,#cb-cookiebanner');
         }
         async optOut(tab) {
             if (await tab.elementExists('.cookie-alert-extended-detail-link')) {
@@ -535,6 +535,10 @@
             if (await tab.eval('CookieConsent.hasResponse !== true')) {
                 await tab.eval('Cookiebot.dialog.submitConsent() || true');
                 await tab.wait(500);
+            }
+            // site with 3rd confirm settings modal
+            if (await tab.elementExists('#cb-confirmedSettings')) {
+                await tab.eval('endCookieProcess()');
             }
             return true;
         }
@@ -894,6 +898,37 @@
 
     var autoconsent = [
     	{
+    		name: "192.com",
+    		detectCmp: [
+    			{
+    				exists: ".ont-cookies"
+    			}
+    		],
+    		detectPopup: [
+    			{
+    				visible: ".ont-cookies"
+    			}
+    		],
+    		optIn: [
+    			{
+    				click: ".ont-btn-main.ont-cookies-btn.js-ont-btn-ok2"
+    			}
+    		],
+    		optOut: [
+    			{
+    				click: ".ont-cookes-btn-manage"
+    			},
+    			{
+    				click: ".ont-btn-main.ont-cookies-btn.js-ont-btn-choose"
+    			}
+    		],
+    		test: [
+    			{
+    				"eval": "document.cookie.includes('CC_ADVERTISING=NO') && document.cookie.includes('CC_ANALYTICS=NO')"
+    			}
+    		]
+    	},
+    	{
     		name: "arzt-auskunft.de",
     		prehideSelectors: [
     			"#cookiescript_injected"
@@ -942,6 +977,27 @@
     			},
     			{
     				click: ".btn-save"
+    			}
+    		]
+    	},
+    	{
+    		name: "ausopen.com",
+    		isHidingRule: true,
+    		detectCmp: [
+    			{
+    				exists: ".gdpr-popup__message"
+    			}
+    		],
+    		detectPopup: [
+    			{
+    				visible: ".gdpr-popup__message"
+    			}
+    		],
+    		optOut: [
+    			{
+    				hide: [
+    					".gdpr-popup__message"
+    				]
     			}
     		]
     	},
@@ -1002,6 +1058,40 @@
     			}
     		],
     		optOut: [
+    		]
+    	},
+    	{
+    		name: "bing.com",
+    		prehideSelectors: [
+    			"#bnp_container"
+    		],
+    		detectCmp: [
+    			{
+    				exists: "#bnp_cookie_banner"
+    			}
+    		],
+    		detectPopup: [
+    			{
+    				visible: "#bnp_cookie_banner"
+    			}
+    		],
+    		optIn: [
+    			{
+    				click: "#bnp_btn_accept"
+    			}
+    		],
+    		optOut: [
+    			{
+    				click: "#bnp_btn_preference"
+    			},
+    			{
+    				click: "#mcp_savesettings"
+    			}
+    		],
+    		test: [
+    			{
+    				"eval": "document.cookie.includes('AL=0') && document.cookie.includes('AD=0') && document.cookie.includes('SM=0')"
+    			}
     		]
     	},
     	{
@@ -1289,6 +1379,40 @@
     		]
     	},
     	{
+    		name: "dunelm.com",
+    		prehideSelectors: [
+    			"div[data-testid=cookie-consent-modal-backdrop]"
+    		],
+    		detectCmp: [
+    			{
+    				exists: "div[data-testid=cookie-consent-message-contents]"
+    			}
+    		],
+    		detectPopup: [
+    			{
+    				visible: "div[data-testid=cookie-consent-message-contents]"
+    			}
+    		],
+    		optIn: [
+    			{
+    				click: ""
+    			}
+    		],
+    		optOut: [
+    			{
+    				click: "button[data-testid=cookie-consent-adjust-settings]"
+    			},
+    			{
+    				click: "button[data-testid=cookie-consent-preferences-save]"
+    			}
+    		],
+    		test: [
+    			{
+    				"eval": "document.cookie.includes('cc_functional=0') && document.cookie.includes('cc_targeting=0')"
+    			}
+    		]
+    	},
+    	{
     		name: "etsy",
     		detectCmp: [
     			{
@@ -1394,6 +1518,32 @@
     		optIn: [
     			{
     				click: ".fc-cta-consent"
+    			}
+    		]
+    	},
+    	{
+    		name: "gov.uk",
+    		detectCmp: [
+    			{
+    				exists: "#global-cookie-message"
+    			}
+    		],
+    		detectPopup: [
+    			{
+    				exists: "#global-cookie-message"
+    			}
+    		],
+    		optIn: [
+    			{
+    				click: "button[data-accept-cookies=true]"
+    			}
+    		],
+    		optOut: [
+    			{
+    				click: "button[data-reject-cookies=true],#reject-cookies"
+    			},
+    			{
+    				click: "button[data-hide-cookie-banner=true],#hide-cookie-decision"
     			}
     		]
     	},
@@ -1564,6 +1714,27 @@
     		test: [
     			{
     				"eval": "Object.values(klaro.getManager().consents).every(c => !c)"
+    			}
+    		]
+    	},
+    	{
+    		name: "marksandspencer.com",
+    		isHidingRule: true,
+    		detectCmp: [
+    			{
+    				exists: ".navigation-cookiebbanner"
+    			}
+    		],
+    		detectPopup: [
+    			{
+    				visible: ".navigation-cookiebbanner"
+    			}
+    		],
+    		optOut: [
+    			{
+    				hide: [
+    					".navigation-cookiebbanner"
+    				]
     			}
     		]
     	},
@@ -1899,7 +2070,7 @@
     		]
     	},
     	{
-    		name: "paypal.de",
+    		name: "paypal.com",
     		prehideSelectors: [
     			"#gdprCookieBanner"
     		],
@@ -1920,7 +2091,15 @@
     		],
     		optOut: [
     			{
+    				wait: 200
+    			},
+    			{
     				click: ".gdprCookieBanner_decline-button"
+    			}
+    		],
+    		test: [
+    			{
+    				"eval": "document.cookie.includes('cookie_prefs') === true"
     			}
     		]
     	},
@@ -2197,6 +2376,32 @@
     		]
     	},
     	{
+    		name: "uswitch.com",
+    		prehideSelectors: [
+    			"#cookie-banner-wrapper"
+    		],
+    		detectCmp: [
+    			{
+    				exists: "#cookie-banner-wrapper"
+    			}
+    		],
+    		detectPopup: [
+    			{
+    				visible: "#cookie-banner-wrapper"
+    			}
+    		],
+    		optIn: [
+    			{
+    				click: "#cookie_banner_accept_mobile"
+    			}
+    		],
+    		optOut: [
+    			{
+    				click: "#cookie_banner_save"
+    			}
+    		]
+    	},
+    	{
     		name: "vodafone.de",
     		prehideSelectors: [
     			".dip-consent,.dip-consent-container"
@@ -2222,6 +2427,71 @@
     		optIn: [
     			{
     				click: ".dip-consent-btn.red-btn"
+    			}
+    		]
+    	},
+    	{
+    		name: "waitrose.com",
+    		prehideSelectors: [
+    			"div[aria-labelledby=CookieAlertModalHeading]",
+    			"section[data-test=initial-waitrose-cookie-consent-banner]",
+    			"section[data-test=cookie-consent-modal]"
+    		],
+    		detectCmp: [
+    			{
+    				exists: "section[data-test=initial-waitrose-cookie-consent-banner]"
+    			}
+    		],
+    		detectPopup: [
+    			{
+    				visible: "section[data-test=initial-waitrose-cookie-consent-banner]"
+    			}
+    		],
+    		optIn: [
+    			{
+    				click: "button[data-test=accept-all]"
+    			}
+    		],
+    		optOut: [
+    			{
+    				click: "button[data-test=manage-cookies]"
+    			},
+    			{
+    				wait: 200
+    			},
+    			{
+    				"eval": "Array.from(document.querySelectorAll('label[id$=cookies-deny-label]')).forEach(e => e.click()) || true"
+    			},
+    			{
+    				click: "button[data-test=submit]"
+    			}
+    		],
+    		test: [
+    			{
+    				"eval": "document.cookie.includes('wtr_cookies_advertising=0') && document.cookie.includes('wtr_cookies_analytics=0')"
+    			}
+    		]
+    	},
+    	{
+    		name: "wetransfer.com",
+    		detectCmp: [
+    			{
+    				exists: ".welcome__cookie-notice"
+    			}
+    		],
+    		detectPopup: [
+    			{
+    				visible: ".welcome__cookie-notice"
+    			}
+    		],
+    		optIn: [
+    			{
+    				click: ".welcome__button--accept"
+    			}
+    		],
+    		optOut: [
+    			{
+    				click: ".welcome__button--decline"
     			}
     		]
     	},

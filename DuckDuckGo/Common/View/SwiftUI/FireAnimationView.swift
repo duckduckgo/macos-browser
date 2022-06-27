@@ -21,7 +21,7 @@ import Lottie
 
 struct FireAnimation: NSViewRepresentable {
 
-    static let animation = Animation.named("01_Fire_really_small")
+    static let animation = Animation.named("01_Fire_really_small", animationCache: LottieAnimationCache.shared)
 
     func makeNSView(context: NSViewRepresentableContext<FireAnimation>) -> NSView {
         let view = NSView(frame: .zero)

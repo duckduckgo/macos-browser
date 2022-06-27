@@ -26,7 +26,7 @@ final class PreferencesSidebarModel: ObservableObject {
     @Published var isFirstResponder: Bool = false
     @Published var selectedTabIndex: Int = 0
 
-    @Published private(set) var selectedPane: PreferencePaneIdentifier = .defaultBrowser
+    @Published private(set) var selectedPane: PreferencePaneIdentifier = .general
 
     init(
         sections: [PreferencesSection] = PreferencesSection.defaultSections,

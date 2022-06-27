@@ -65,12 +65,12 @@ final class PreferencesSidebarModelTests: XCTestCase {
         let sections: [PreferencesSection] = [.init(id: .regularPreferencePanes, panes: [.appearance, .downloads])]
         let model = PreferencesSidebarModel(sections: sections)
 
-        model.selectPane(.defaultBrowser)
+        model.selectPane(.general)
         XCTAssertEqual(model.selectedPane, .appearance)
     }
 
     func testWhenSelectedTabIndexIsChangedThenSelectedPaneIsNotAffected() throws {
-        let sections: [PreferencesSection] = [.init(id: .regularPreferencePanes, panes: [.defaultBrowser, .appearance, .downloads, .autofill])]
+        let sections: [PreferencesSection] = [.init(id: .regularPreferencePanes, panes: [.general, .appearance, .downloads, .autofill])]
         let tabs: [Tab.TabContent] = [.anyPreferencePane, .bookmarks]
         let model = PreferencesSidebarModel(sections: sections, tabSwitcherTabs: tabs)
 

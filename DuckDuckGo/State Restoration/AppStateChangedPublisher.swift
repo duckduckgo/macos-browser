@@ -46,6 +46,10 @@ extension MainWindowController {
 extension WindowControllersManager {
     var stateChanged: AnyPublisher<Void, Never> {
         $mainWindowControllers.nestedObjectChanges(\.stateChanged)
+            .handleEvents(receiveOutput: { [unowned self] in
+                self.updateIsInInitialState()
+            })
+            .filter { [unowned self] in !self.isInInitialState }
             .eraseToAnyPublisher()
     }
 }

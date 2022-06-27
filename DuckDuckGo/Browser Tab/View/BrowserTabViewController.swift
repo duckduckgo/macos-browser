@@ -191,11 +191,30 @@ final class BrowserTabViewController: NSViewController {
 
     func subscribeToTabContent(of tabViewModel: TabViewModel?) {
         tabContentCancellable?.cancel()
-        tabContentCancellable = tabViewModel?.tab.$content
+
+        guard let tabViewModel = tabViewModel else {
+            return
+        }
+
+        let tabContentPublisher = tabViewModel.tab.$content
             .dropFirst()
             .removeDuplicates()
             .receive(on: DispatchQueue.main)
-            .sink { [weak self] _ in
+
+        tabContentCancellable = tabContentPublisher
+            .flatMap { tabContent -> AnyPublisher<Void, Never> in
+                guard tabContent.isUrl else {
+                    return Just(()).eraseToAnyPublisher()
+                }
+
+                return Publishers.Merge3(
+                    tabViewModel.tab.webViewDidCommitNavigationPublisher,
+                    tabViewModel.tab.webViewDidFailNavigationPublisher,
+                    tabViewModel.tab.webViewDidReceiveChallengePublisher
+                )
+                .eraseToAnyPublisher()
+            }
+            .sink { [weak self] in
                 self?.showTabContent(of: tabViewModel)
             }
     }
@@ -823,7 +842,7 @@ extension BrowserTabViewController: WKUIDelegate {
 
         let tab = makeTab(parentTab: parentTab, content: .none)
         if windowFeatures.toolbarsVisibility?.boolValue == true {
-            tabCollectionViewModel.insertChild(tab: tab, selected: true)
+            tabCollectionViewModel.insertChild(tab: tab, selected: !NSApp.isCommandPressed)
         } else {
             WindowsManager.openPopUpWindow(with: tab, contentSize: contentSize)
         }

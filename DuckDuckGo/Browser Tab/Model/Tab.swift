@@ -174,6 +174,18 @@ final class Tab: NSObject, Identifiable {
         super.init()
 
         setupWebView(shouldLoadInBackground: shouldLoadInBackground)
+
+        NotificationCenter.default.addObserver(self,
+                                               selector: #selector(onDuckDuckGoEmailSignOut),
+                                               name: .emailDidSignOut,
+                                               object: nil)
+    }
+
+    @objc func onDuckDuckGoEmailSignOut(_ notification: Notification) {
+        guard let url = webView.url else { return }
+        if EmailUrls().isDuckDuckGoEmailProtection(url: url) {
+            webView.evaluateJavaScript("window.postMessage({ emailProtectionSignedOut: true }, window.origin);")
+        }
     }
 
     deinit {
@@ -191,6 +203,8 @@ final class Tab: NSObject, Identifiable {
 
     // MARK: - Event Publishers
 
+    let webViewDidReceiveChallengePublisher = PassthroughSubject<Void, Never>()
+    let webViewDidCommitNavigationPublisher = PassthroughSubject<Void, Never>()
     let webViewDidFinishNavigationPublisher = PassthroughSubject<Void, Never>()
     let webViewDidFailNavigationPublisher = PassthroughSubject<Void, Never>()
 
@@ -219,7 +233,7 @@ final class Tab: NSObject, Identifiable {
             invalidateSessionStateData()
             self.error = nil
             Task {
-                await reloadIfNeeded()
+                await reloadIfNeeded(shouldLoadInBackground: true)
             }
 
             if let title = content.title {
@@ -239,7 +253,9 @@ final class Tab: NSObject, Identifiable {
             // prevent clearing currently selected pane (for state persistence purposes)
             break
         default:
-            self.content = content
+            if self.content != content {
+                self.content = content
+            }
         }
     }
     
@@ -854,6 +870,13 @@ extension Tab: SecureVaultManagerDelegate {
     func secureVaultManager(_: SecureVaultManager, promptUserToStoreAutofillData data: AutofillData) {
         delegate?.tab(self, requestedSaveAutofillData: data)
     }
+    
+    func secureVaultManager(_: SecureVaultManager,
+                            promptUserToAutofillCredentialsForDomain domain: String,
+                            withAccounts accounts: [SecureVaultModels.WebsiteAccount],
+                            completionHandler: @escaping (SecureVaultModels.WebsiteAccount?) -> Void) {
+        // no-op on macOS
+    }
 
     func secureVaultManager(_: SecureVaultManager, didAutofill type: AutofillType, withObjectId objectId: Int64) {
         Pixel.fire(.formAutofilled(kind: type.formAutofillKind))
@@ -868,7 +891,10 @@ extension Tab: SecureVaultManagerDelegate {
     func secureVaultInitFailed(_ error: SecureVaultError) {
         SecureVaultErrorReporter.shared.secureVaultInitFailed(error)
     }
-
+    
+    func secureVaultManagerShouldAutomaticallyUpdateCredentialsWithoutUsername(_: SecureVaultManager) -> Bool {
+        return true
+    }
 }
 
 extension AutofillType {
@@ -886,6 +912,8 @@ extension Tab: WKNavigationDelegate {
     func webView(_ webView: WKWebView,
                  didReceive challenge: URLAuthenticationChallenge,
                  completionHandler: @escaping (URLSession.AuthChallengeDisposition, URLCredential?) -> Void) {
+        webViewDidReceiveChallengePublisher.send()
+
         if let url = webView.url, EmailUrls().shouldAuthenticateWithEmailCredentials(url: url) {
             completionHandler(.useCredential, URLCredential(user: "dax", password: "qu4ckqu4ck!", persistence: .none))
             return
@@ -911,6 +939,7 @@ extension Tab: WKNavigationDelegate {
         if let url = webView.url {
             addVisit(of: url)
         }
+        webViewDidCommitNavigationPublisher.send()
     }
 
     struct Constants {
@@ -1152,9 +1181,9 @@ extension Tab: WKNavigationDelegate {
         //        hasError = true
 
         isBeingRedirected = false
-        webViewDidFailNavigationPublisher.send()
         invalidateSessionStateData()
         linkProtection.setMainFrameUrl(nil)
+        webViewDidFailNavigationPublisher.send()
     }
 
     func webView(_ webView: WKWebView, didFailProvisionalNavigation navigation: WKNavigation!, withError error: Error) {

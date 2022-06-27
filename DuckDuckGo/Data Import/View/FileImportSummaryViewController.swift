@@ -1,5 +1,5 @@
 //
-//  CSVImportSummaryViewController.swift
+//  FileImportSummaryViewController.swift
 //
 //  Copyright © 2021 DuckDuckGo. All rights reserved.
 //
@@ -18,18 +18,18 @@
 
 import AppKit
 
-final class CSVImportSummaryViewController: NSViewController {
+final class FileImportSummaryViewController: NSViewController {
 
     enum Constants {
         static let storyboardName = "DataImport"
-        static let identifier = "CSVImportSummaryViewController"
+        static let identifier = "FileImportSummaryViewController"
     }
 
-    static func create(summary: DataImport.Summary?) -> CSVImportSummaryViewController {
+    static func create(summary: DataImport.Summary?) -> FileImportSummaryViewController {
         let storyboard = NSStoryboard(name: Constants.storyboardName, bundle: nil)
 
-        return storyboard.instantiateController(identifier: Constants.identifier) { (coder) -> CSVImportSummaryViewController? in
-            return CSVImportSummaryViewController(coder: coder, summary: summary)
+        return storyboard.instantiateController(identifier: Constants.identifier) { (coder) -> FileImportSummaryViewController? in
+            return FileImportSummaryViewController(coder: coder, summary: summary)
         }
     }
 

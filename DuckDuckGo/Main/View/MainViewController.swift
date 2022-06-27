@@ -21,7 +21,7 @@ import Carbon.HIToolbox
 import Combine
 import os.log
 
-// swiftlint:disable:next type_body_length
+// swiftlint:disable type_body_length
 final class MainViewController: NSViewController {
 
     @IBOutlet weak var tabBarContainerView: NSView!
@@ -195,8 +195,9 @@ final class MainViewController: NSViewController {
     var lastTabContent: Tab.TabContent?
     private func subscribeToTabContent() {
         tabCollectionViewModel.selectedTabViewModel?.tab.$content.receive(on: DispatchQueue.main).sink(receiveValue: { [weak self] content in
-            self?.resizeNavigationBarForHomePage(content == .homePage, animated: content == .homePage && self?.lastTabContent != .homePage)
-            self?.lastTabContent = content
+            guard let self = self else { return }
+            self.resizeNavigationBarForHomePage(content == .homePage, animated: content == .homePage && self.lastTabContent != .homePage)
+            self.lastTabContent = content
         }).store(in: &self.navigationalCancellables)
     }
 
@@ -353,7 +354,6 @@ final class MainViewController: NSViewController {
             }
         }
     }
-
 }
 
 // MARK: - Mouse & Keyboard Events

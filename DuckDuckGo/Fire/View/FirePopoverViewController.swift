@@ -38,7 +38,6 @@ final class FirePopoverViewController: NSViewController {
     weak var delegate: FirePopoverViewControllerDelegate?
 
     private let fireViewModel: FireViewModel
-    private let tabCollectionViewModel: TabCollectionViewModel
     private var firePopoverViewModel: FirePopoverViewModel
     private let historyCoordinating: HistoryCoordinating
 
@@ -71,7 +70,6 @@ final class FirePopoverViewController: NSViewController {
           fireproofDomains: FireproofDomains = FireproofDomains.shared,
           faviconManagement: FaviconManagement = FaviconManager.shared) {
         self.fireViewModel = fireViewModel
-        self.tabCollectionViewModel = tabCollectionViewModel
         self.historyCoordinating = historyCoordinating
         self.firePopoverViewModel = FirePopoverViewModel(fireViewModel: fireViewModel,
                                                          tabCollectionViewModel: tabCollectionViewModel,
