@@ -139,6 +139,12 @@ final class AutoconsentUserScript: NSObject, WKScriptMessageHandlerWithReply, Us
             replyHandler([ "type": "ok" ], nil) // this is just to prevent a Promise rejection
             return
         }
+
+        guard config.isFeature(.autoconsent, enabledForDomain: url.host) else {
+            os_log("disabled for site: %s", log: .autoconsent, type: .info, String(describing: url.absoluteString))
+            return
+        }
+
         if message.frameInfo.isMainFrame {
             topUrl = url
             // reset dashboard state
