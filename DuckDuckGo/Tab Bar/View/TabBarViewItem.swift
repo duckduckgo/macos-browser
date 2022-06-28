@@ -190,7 +190,6 @@ final class TabBarViewItem: NSCollectionViewItem {
         guard let indexPath = indexPath else {
             // doubleclick event arrived at point when we're already removed
             // pass the closeButton action to the next TabBarViewItem
-            // TODO: Validate it still works // swiftlint:disable:this todo
             if let indexPath = self.lastKnownIndexPath,
                let nextItem = self.collectionView?.item(at: indexPath) as? Self {
                 // and set its lastKnownIndexPath in case clicks continue to arrive
@@ -253,7 +252,6 @@ final class TabBarViewItem: NSCollectionViewItem {
         tabViewModel.tab.$content.sink { [weak self] content in
             self?.currentURL = content.url
         }.store(in: &cancellables)
-        // TODO: Used permissions/url? accessibility // swiftlint:disable:this todo
         tabViewModel.$usedPermissions.assign(to: \.usedPermissions, onWeaklyHeld: self).store(in: &cancellables)
     }
 

@@ -61,7 +61,7 @@ struct RecentlyVisited: View {
                             else { return }
                             let index = model.recentSites.count - 1
                             scrollTo(.init(rawValue: index))
-                            model.focusChaged(to: true, for: .init(index: index, position: .burn)) // TODO: last link not burn
+                            model.focusChaged(to: true, for: .init(index: index, position: .burn))
                         })
                     }
 

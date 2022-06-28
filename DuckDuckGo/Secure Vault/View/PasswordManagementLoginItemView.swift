@@ -305,10 +305,6 @@ private struct PasswordView: View {
                         Text(model.password.isEmpty ? "" : "••••••••••••")
                             .contextMenu(menuItems: menuProvider.createContextMenu)
                             .focusable(menu: menuProvider.createMenu, onCopy: { model.copy(model.password) })
-//                        // TODO: AX actions // swiftlint:disable:this todo
-//                            .accessibilityAction {
-//                                print("Act")
-//                            }
                     }
 
                     if isHovering || isPasswordVisible {
