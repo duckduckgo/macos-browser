@@ -22,11 +22,10 @@ import SwiftUI
 
 final class HomePageViewController: NSViewController {
 
-    private let fire = Fire()
-
     private let tabCollectionViewModel: TabCollectionViewModel
     private var bookmarkManager: BookmarkManager
     private let historyCoordinating: HistoryCoordinating
+    private let fireViewModel: FireViewModel
 
     private weak var host: NSView?
 
@@ -46,11 +45,13 @@ final class HomePageViewController: NSViewController {
     init?(coder: NSCoder,
           tabCollectionViewModel: TabCollectionViewModel,
           bookmarkManager: BookmarkManager,
-          historyCoordinating: HistoryCoordinating = HistoryCoordinator.shared) {
+          historyCoordinating: HistoryCoordinating = HistoryCoordinator.shared,
+          fireViewModel: FireViewModel = FireCoordinator.shared.fireViewModel) {
 
         self.tabCollectionViewModel = tabCollectionViewModel
         self.bookmarkManager = bookmarkManager
         self.historyCoordinating = historyCoordinating
+        self.fireViewModel = fireViewModel
 
         super.init(coder: coder)
     }
@@ -79,6 +80,7 @@ final class HomePageViewController: NSViewController {
         self.host = host
 
         subscribeToBookmarks()
+        subscribeToBurningData()
     }
 
     override func viewDidAppear() {
@@ -237,6 +239,17 @@ final class HomePageViewController: NSViewController {
         firstKeyView.nextKeyView = self.firstKeyView
         // let the engine adjust everything in between
         return self.lastKeyView
+    }
+
+    private var burningDataCancellable: AnyCancellable?
+    private func subscribeToBurningData() {
+        burningDataCancellable = fireViewModel.fire.$burningData
+            .dropFirst()
+            .sink { [weak self] burningData in
+                if burningData == nil {
+                    self?.refreshModels()
+                }
+            }
     }
 
 }
