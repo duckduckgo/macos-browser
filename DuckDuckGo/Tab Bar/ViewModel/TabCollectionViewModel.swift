@@ -392,6 +392,7 @@ final class TabCollectionViewModel: NSObject {
         }
 
         self.remove(at: selectionIndex)
+        NotificationCenter.default.post(name: .selectedTabWasRemoved, object: nil)
     }
 
     // MARK: - Others
@@ -493,4 +494,9 @@ final class TabCollectionViewModel: NSObject {
     }
 
 }
+
+extension Notification.Name {
+    static let selectedTabWasRemoved = Notification.Name("selectedTabWasRemoved")
+}
+
 // swiftlint:enable type_body_length
