@@ -266,12 +266,16 @@ final class BrowserTabViewController: NSViewController {
 
     private func setFirstResponderIfNeeded() {
         DispatchQueue.main.async { [weak self] in
-            guard let self = self,
-                  self.webView?.url != nil,
-                  (self.view.window as? MainWindow)?.displayedPopovers.isEmpty == true,
-                  self.view.window?.firstResponder is WebView
-                    || self.view.window?.firstResponder?.acceptsFirstResponder != true
-            else {
+            guard let self = self else { return }
+
+            let urlIsNotNil = self.webView?.url != nil
+            let noPopoversAreDisplayed = (self.view.window as? MainWindow)?.displayedPopovers.isEmpty == true
+            let firstResponderIsWebview = self.view.window?.firstResponder is WebView
+            let firstResponderDoesNotAccept = self.view.window?.firstResponder?.acceptsFirstResponder != true
+
+            guard urlIsNotNil,
+                  noPopoversAreDisplayed,
+                  firstResponderIsWebview || firstResponderDoesNotAccept else {
                 return
             }
 

@@ -121,11 +121,10 @@ final class PrivacyDashboardViewController: NSViewController {
             assertionFailure("PrivacyDashboardViewController: tabViewModel not set")
             return
         }
-        let domain = "permission.site"
-//        guard let domain = tabViewModel?.tab.content.url?.host else {
-//            privacyDashboardScript.setPermissions(Permissions(), authorizationState: [], domain: "", in: webView)
-//            return
-//        }
+        guard let domain = tabViewModel?.tab.content.url?.host else {
+            privacyDashboardScript.setPermissions(Permissions(), authorizationState: [], domain: "", in: webView)
+            return
+        }
 
         let authState: PrivacyDashboardUserScript.AuthorizationState
         authState = PermissionManager.shared.persistedPermissionTypes.union(usedPermissions.keys).compactMap { permissionType in

@@ -446,6 +446,13 @@ extension TabBarViewItem: NSMenuDelegate {
 
     }
 
+    private func addCommandPressedMonitor() {
+        commandPressedMonitor = NSEvent.addLocalMonitorForEvents(matching: .flagsChanged) { [weak self] event in
+            self?.updateSubviews()
+            return event
+        }
+    }
+
 }
 
 extension TabBarViewItem: MouseOverViewDelegate {
@@ -454,10 +461,7 @@ extension TabBarViewItem: MouseOverViewDelegate {
         delegate?.tabBarViewItem(self, isMouseOver: isMouseOver)
         self.isMouseOver = isMouseOver
         if isMouseOver {
-            commandPressedMonitor = NSEvent.addLocalMonitorForEvents(matching: .flagsChanged) { [weak self] event in
-                self?.updateSubviews()
-                return event
-            }
+            addCommandPressedMonitor()
         }
         view.needsLayout = true
     }
