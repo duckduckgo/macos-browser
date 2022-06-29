@@ -75,7 +75,7 @@ jobs:
         submodules: recursive
 
     - name: Install create-dmg
-      if: github.event.inputs.create-dmg || github.event.inputs.asana-task-url
+      if: ${{ github.event.inputs.create-dmg == true || github.event.inputs.asana-task-url }}
       run: |
         brew install create-dmg
         echo "create_dmg_arg=-d" >> $GITHUB_ENV
@@ -89,11 +89,16 @@ jobs:
 
     - name: Archive and notarize the app
       env:
-        XCODE_DEVELOPER_APPLE_ID: ${{ secrets.XCODE_DEVELOPER_APPLE_ID }}
-        XCODE_DEVELOPER_PASSWORD: ${{ secrets.XCODE_DEVELOPER_PASSWORD }}
+        APPLE_API_KEY_BASE64: ${{ secrets.APPLE_API_KEY_BASE64 }}
+        APPLE_API_KEY_ID: ${{ secrets.APPLE_API_KEY_ID }}
+        APPLE_API_KEY_ISSUER: ${{ secrets.APPLE_API_KEY_ISSUER }}
         ASANA_ACCESS_TOKEN: ${{ secrets.ASANA_ACCESS_TOKEN }}
         ASANA_COMMA_SEPARATED_TASK_NAMES_TO_BE_CLOSED: ${{ secrets.ASANA_COMMA_SEPARATED_TASK_NAMES_TO_BE_CLOSED }}
       run: |
+        # import API Key from secrets
+        export APPLE_API_KEY_PATH="$RUNNER_TEMP/apple_api_key.pem"
+        echo -n "$APPLE_API_KEY_BASE64" | base64 --decode --output $APPLE_API_KEY_PATH
+
         ./scripts/archive.sh ${{ github.event.inputs.release-type }} \
             ${{ env.create_dmg_arg }} \
             ${{ env.asana_task_url_arg }}

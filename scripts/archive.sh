@@ -105,7 +105,7 @@ create_dmg_preflight() {
 set_up_environment() {
 	workdir="${PWD}/release"
 	archive="${workdir}/DuckDuckGo.xcarchive"
-	notarization_info_plist="${workdir}/notarization-info.plist"
+	team_id=$(security find-certificate -c "Developer ID Application:" | grep "alis" | awk 'NF { print $NF }' | tr -d \(\)\")
 
 	if [[ -z $CI ]]; then
 		export_options_plist="${cwd}/assets/ExportOptions.plist"
@@ -187,10 +187,7 @@ clear_working_directory() {
 prepare_export_options_in_ci() {
 	if [[ -n $CI ]]; then
 		local signing_certificate
-		local team_id
-		
 		signing_certificate=$(security find-certificate -Z -c "Developer ID Application:" | grep "SHA-1" | awk 'NF { print $NF }')
-		team_id=$(security find-certificate -c "Developer ID Application:" | grep "alis" | awk 'NF { print $NF }' | tr -d \(\)\")
 
 		plutil -replace signingCertificate -string "${signing_certificate}" "${export_options_plist}"
 		plutil -replace teamID -string "${team_id}" "${export_options_plist}"
@@ -236,79 +233,27 @@ archive_and_export() {
 		| ${xcpretty}
 }
 
-altool_upload() {
-	xcrun altool --notarize-app \
-		--primary-bundle-id "com.duckduckgo.macos.browser" \
-		-u "${developer_apple_id}" \
-		-p "${developer_password}" \
-		-f "${notarization_zip_path}" \
-		--output-format xml \
-		2>/dev/null \
-		> "${notarization_info_plist}"
-}
-
-upload_for_notarization() {
+notarize() {
 	local notarization_zip_path="${workdir}/DuckDuckGo-for-notarization.zip"
 
+	echo "Uploading app for notarization ..."
+
 	ditto -c -k --keepParent "${app_path}" "${notarization_zip_path}"
-
-	local retries=3
-	while true; do
-		echo
-		printf '%s' "Uploading app for notarization ... "
-
-		if altool_upload; then
-			echo "Done"
-			break
-		else
-			echo "Failed to upload, retrying ..."
-			retries=$(( retries - 1 ))
-		fi
-
-		if (( retries == 0 )); then
-			die "Maximum number of retries reached."
-		fi
-	done
-	echo
-
-	rm -rf "${notarization_zip_path}"
-}
-
-get_notarization_info() {
-	/usr/libexec/PlistBuddy -c "Print :notarization-upload:RequestUUID" "${notarization_info_plist}"
-}
-
-get_notarization_status() {
-	/usr/libexec/PlistBuddy -c "Print :notarization-info:Status" "${notarization_status_info_plist}"
-}
-
-altool_check_notarization_status () {
-	xcrun altool --notarization-info "$(get_notarization_info)" \
-		-u "${developer_apple_id}" \
-		-p "${developer_password}" \
-		--output-format xml \
-		2>/dev/null \
-		> "${notarization_status_info_plist}"
-}
-
-wait_for_notarization() {
-	local notarization_status_info_plist="${workdir}/notarization-status-info.plist"
-
-	echo "Checking notarization status ..."
-	while true; do
-		if altool_check_notarization_status; then
-			if [[ "$(get_notarization_status)" != "in progress" ]]; then
-				echo "Notarization complete"
-				break
-			else
-				echo "Still in progress, rechecking in 60 seconds ..."
-				sleep 60
-			fi
-		else
-			echo "Failed to fetch notarization info, rechecking in 10 seconds ..."
-			sleep 10
-		fi
-	done
+	if [[ -n $CI ]]; then
+		${filter_output} xcrun notarytool submit \
+			--key "${APPLE_API_KEY_PATH}" \
+			--key-id "${APPLE_API_KEY_ID}" \
+			--issuer "${APPLE_API_KEY_ISSUER}" \
+			--wait \
+			"${notarization_zip_path}"
+	else
+		${filter_output} xcrun notarytool submit \
+			--apple-id "${developer_apple_id}" \
+			--password "${developer_password}" \
+			--team-id "${team_id}" \
+			--wait \
+			"${notarization_zip_path}"
+	fi
 }
 
 staple_notarized_app() {
@@ -358,11 +303,18 @@ main() {
 	source "${cwd}/helpers/asana.sh"
 
 	set_up_environment "$@"
-	get_developer_credentials
+
+	# CI uses Apple API Key to communicate with notarization service
+	# and expects relevant environment variables to be defined.
+	# For running script locally, we're currently relying on Apple ID
+	# and application-specific password.
+	if [[ -z $CI ]]; then
+		get_developer_credentials
+	fi
+
 	clear_working_directory
 	archive_and_export
-	upload_for_notarization
-	wait_for_notarization
+	notarize
 	staple_notarized_app
 	compress_app_and_dsym
 

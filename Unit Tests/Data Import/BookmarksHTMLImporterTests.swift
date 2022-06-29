@@ -19,27 +19,13 @@
 import XCTest
 @testable import DuckDuckGo_Privacy_Browser
 
-struct BookmarkImportErrorMock: Error {}
-
-struct BookmarkImporterMock: BookmarkImporter {
-    func importBookmarks(_ bookmarks: ImportedBookmarks, source: BookmarkImportSource) throws -> BookmarkImportResult {
-        if let error = throwableError {
-            throw error
-        }
-        return importBookmarks(bookmarks, source)
-    }
-
-    var throwableError: Error?
-    var importBookmarks: (ImportedBookmarks, BookmarkImportSource) -> BookmarkImportResult
-}
-
 final class BookmarksHTMLImporterTests: XCTestCase {
 
     var dataImporter: BookmarkHTMLImporter!
-    var underlyingBookmarkImporter: BookmarkImporterMock!
+    var underlyingBookmarkImporter: MockBookmarkImporter!
 
     override func setUpWithError() throws {
-        underlyingBookmarkImporter = BookmarkImporterMock(importBookmarks: { _, _ in
+        underlyingBookmarkImporter = MockBookmarkImporter(importBookmarks: { _, _ in
                 .init(successful: 0, duplicates: 0, failed: 0)
         })
     }

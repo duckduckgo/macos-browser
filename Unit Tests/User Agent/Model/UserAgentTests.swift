@@ -30,7 +30,7 @@ final class UserAgentTests: XCTestCase {
         XCTAssertEqual(UserAgent.safari, UserAgent.for(URL(string: "https://google.com")))
         XCTAssertEqual(UserAgent.safari, UserAgent.for(URL(string: "https://accounts.google.com")))
         XCTAssertEqual(UserAgent.safari, UserAgent.for(URL(string: "https://docs.google.com")))
-        XCTAssertEqual(UserAgent.chrome, UserAgent.for(URL(string: "https://docs.google.com/spreadsheets/a/document")))
+        XCTAssertEqual(UserAgent.safari, UserAgent.for(URL(string: "https://docs.google.com/spreadsheets/a/document")))
         XCTAssertEqual(UserAgent.safari, UserAgent.for(URL(string: "https://a.docs.google.com")))
     }
 
