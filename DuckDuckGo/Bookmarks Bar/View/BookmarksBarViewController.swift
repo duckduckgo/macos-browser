@@ -27,12 +27,12 @@ final class BookmarksBarViewController: NSViewController {
     @IBOutlet private var clippedItemsIndicator: NSButton!
 
     private let bookmarkManager = LocalBookmarkManager.shared
-    private let viewModel = BookmarksBarViewModel()
+    private let viewModel = BookmarksBarViewModel(bookmarkManager: LocalBookmarkManager.shared)
     private var cancellables = Set<AnyCancellable>()
     
     private var clipThreshold: CGFloat {
         let viewWidthWithoutClipIndicator = view.frame.width - clippedItemsIndicator.frame.minX
-        return view.frame.width - viewWidthWithoutClipIndicator - 13
+        return view.frame.width - viewWidthWithoutClipIndicator - 3
     }
     
     // MARK: - View Lifecycle
@@ -43,7 +43,7 @@ final class BookmarksBarViewController: NSViewController {
         viewModel.delegate = self
 
         let nib = NSNib(nibNamed: "BookmarksBarCollectionViewItem", bundle: .main)
-        bookmarksBarCollectionView.register(nib, forItemWithIdentifier: NSUserInterfaceItemIdentifier(rawValue: "BookmarksBarCollectionViewItem"))
+        bookmarksBarCollectionView.register(nib, forItemWithIdentifier: BookmarksBarCollectionViewItem.identifier)
         
         bookmarksBarCollectionView.registerForDraggedTypes([.string, .URL])
         bookmarksBarCollectionView.setDraggingSourceOperationMask(.copy, forLocal: true)
@@ -115,8 +115,6 @@ final class BookmarksBarViewController: NSViewController {
         let lastIndexPath = IndexPath(item: viewModel.bookmarksBarItems.count - 1, section: 0)
 
         if viewModel.bookmarksBarItemsTotalWidth >= clipThreshold {
-            print("Removing last item")
-            
             if viewModel.clipLastBarItem() {
                 self.bookmarksBarCollectionView.deleteItems(at: Set([lastIndexPath]))
             }
@@ -127,7 +125,6 @@ final class BookmarksBarViewController: NSViewController {
 
             if newMaximumWidth < clipThreshold {
                 if viewModel.restoreLastClippedItem() {
-                    print("Restoring clipped item")
                     self.bookmarksBarCollectionView.reloadData()
                 }
             }

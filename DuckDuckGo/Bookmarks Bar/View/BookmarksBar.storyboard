@@ -17,7 +17,7 @@
                         <subviews>
                             <scrollView wantsLayer="YES" borderType="none" autohidesScrollers="YES" horizontalLineScroll="0.0" horizontalPageScroll="0.0" verticalLineScroll="0.0" verticalPageScroll="0.0" hasHorizontalScroller="NO" hasVerticalScroller="NO" usesPredominantAxisScrolling="NO" horizontalScrollElasticity="none" verticalScrollElasticity="none" translatesAutoresizingMaskIntoConstraints="NO" id="D39-Of-BIh">
                                 <rect key="frame" x="0.0" y="0.0" width="676" height="56"/>
-                                <clipView key="contentView" id="yvk-6W-sd0">
+                                <clipView key="contentView" drawsBackground="NO" id="yvk-6W-sd0">
                                     <rect key="frame" x="0.0" y="0.0" width="676" height="56"/>
                                     <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                     <subviews>
@@ -25,9 +25,10 @@
                                             <rect key="frame" x="0.0" y="0.0" width="676" height="158"/>
                                             <autoresizingMask key="autoresizingMask" widthSizable="YES"/>
                                             <collectionViewLayout key="collectionViewLayout" id="YNm-eM-CbC"/>
-                                            <color key="primaryBackgroundColor" name="controlBackgroundColor" catalog="System" colorSpace="catalog"/>
+                                            <color key="primaryBackgroundColor" name="AddressBarFocusedBackgroundColor"/>
                                         </collectionView>
                                     </subviews>
+                                    <color key="backgroundColor" name="AddressBarFocusedBackgroundColor"/>
                                 </clipView>
                                 <scroller key="horizontalScroller" hidden="YES" wantsLayer="YES" verticalHuggingPriority="750" horizontal="YES" id="78T-h6-lHw">
                                     <rect key="frame" x="-100" y="-100" width="644" height="16"/>

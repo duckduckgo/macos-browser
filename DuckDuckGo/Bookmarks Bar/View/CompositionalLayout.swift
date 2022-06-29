@@ -9,14 +9,13 @@ import AppKit
 
 extension NSCollectionLayoutGroup {
 
-    static func horizontallyCentered(cellSizes: [CGSize], interItemSpacing: CGFloat = 10, centered: Bool = true) -> NSCollectionLayoutGroup {
+    static func horizontallyCentered(cellSizes: [CGSize], interItemSpacing: CGFloat = 8, centered: Bool = true) -> NSCollectionLayoutGroup {
         let groupSize = NSCollectionLayoutSize(widthDimension: .fractionalWidth(1), heightDimension: .absolute(32))
         
         return custom(layoutSize: groupSize) { environment in
+            let verticalPosition: CGFloat = environment.container.contentInsets.top
+
             var items: [NSCollectionLayoutGroupCustomItem] = []
-            
-            var yPos: CGFloat = environment.container.contentInsets.top
-            
             var rowSizes: [CGSize] = []
             
             func totalWidth() -> CGFloat {
@@ -36,7 +35,7 @@ extension NSCollectionLayoutGroup {
                 
                 let maxItemHeight = rowSizes.map(\.height).max() ?? 0
                 let rowItems: [NSCollectionLayoutGroupCustomItem] = rowSizes.map {
-                    let rect = CGRect(origin: CGPoint(x: xPos, y: yPos + (maxItemHeight - $0.height) / 2), size: $0)
+                    let rect = CGRect(origin: CGPoint(x: xPos, y: verticalPosition + (maxItemHeight - $0.height) / 2), size: $0)
                     xPos += ($0.width + interItemSpacing)
                     return NSCollectionLayoutGroupCustomItem(frame: rect)
                 }
