@@ -56,25 +56,6 @@ final class MainWindowController: NSWindowController {
         subscribeToShouldPreventUserInteraction()
         subscribeToResolutionChange()
     }
-    
-    private func subscribeToResolutionChange() {
-        NotificationCenter.default.addObserver(forName: NSApplication.didChangeScreenParametersNotification,
-                                               object: NSApplication.shared,
-                                               queue: OperationQueue.main) { [weak self] _ in
-            self?.resizeWindowIfNeeded()
-        }
-    }
-    
-    private func resizeWindowIfNeeded() {
-        
-        if let visibleWindowFrame = window?.screen?.visibleFrame,
-           let windowFrame = window?.frame {
-            
-            if windowFrame.width > visibleWindowFrame.width || windowFrame.height > visibleWindowFrame.height {
-                window?.performZoom(nil)
-            }
-        }
-    }
 
     required init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
@@ -85,6 +66,24 @@ final class MainWindowController: NSWindowController {
         window?.setFrameAutosaveName(Self.windowFrameSaveName)
         
         NotificationCenter.default.addObserver(self, selector: #selector(dismissLockScreen), name: .macWaitlistLockScreenDidUnlock, object: nil)
+    }
+    
+    private func subscribeToResolutionChange() {
+        NotificationCenter.default.addObserver(forName: NSApplication.didChangeScreenParametersNotification,
+                                               object: NSApplication.shared,
+                                               queue: OperationQueue.main) { [weak self] _ in
+            self?.resizeWindowIfNeeded()
+        }
+    }
+    
+    private func resizeWindowIfNeeded() {
+        if let visibleWindowFrame = window?.screen?.visibleFrame,
+           let windowFrame = window?.frame {
+            
+            if windowFrame.width > visibleWindowFrame.width || windowFrame.height > visibleWindowFrame.height {
+                window?.performZoom(nil)
+            }
+        }
     }
     
     @objc
