@@ -262,18 +262,18 @@ struct DataImportError: Error, Equatable {
         
         var stringValue: String {
             switch self {
-            case .noFileFound: return "noFileFound"
-            case .cannotReadFile: return "cannotReadFile"
-            case .userDeniedPrompt: return "userDeniedPrompt"
-            case .couldNotFindProfile: return "couldNotFindProfile"
-            case .needsLoginPrimaryPassword: return "needsLoginPrimaryPassword"
-            case .cannotAccessSecureVault: return "cannotAccessSecureVault"
-            case .cannotAccessCoreData: return "cannotAccessCoreData"
-            case .couldNotGetDecryptionKey: return "couldNotGetDecryptionKey"
             case .couldNotAccessKeychain: return "couldNotAccessKeychain"
-            case .cannotDecryptFile: return "cannotDecryptFile"
-            case .failedToTemporarilyCopyFile: return "failedToTemporarilyCopyFile"
-            case .databaseAccessFailed: return "databaseAccessFailed"
+            case .noFileFound,
+                    .cannotReadFile,
+                    .userDeniedPrompt,
+                    .couldNotFindProfile,
+                    .needsLoginPrimaryPassword,
+                    .cannotAccessSecureVault,
+                    .cannotAccessCoreData,
+                    .couldNotGetDecryptionKey,
+                    .cannotDecryptFile,
+                    .failedToTemporarilyCopyFile,
+                    .databaseAccessFailed: return String(describing: self)
             }
         }
         
@@ -281,9 +281,7 @@ struct DataImportError: Error, Equatable {
             var parameters = ["error": stringValue]
             
             switch self {
-            case .couldNotAccessKeychain(let status):
-                parameters["keychainErrorCode"] = String(status)
-                
+            case .couldNotAccessKeychain(let status): parameters["keychainErrorCode"] = String(status)
             case .noFileFound,
                     .cannotReadFile,
                     .userDeniedPrompt,
