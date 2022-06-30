@@ -65,7 +65,8 @@ final class TabDragAndDropManager {
         }
         let newIndex = min(destinationUnit.indexPath.item + 1, destinationTabCollectionViewModel.tabCollection.tabs.count)
 
-        sourceTabCollectionViewModel.moveTab(at: sourceUnit.indexPath.item, to: destinationTabCollectionViewModel, at: newIndex)
+        // TODO
+        sourceTabCollectionViewModel.moveRegularTab(at: sourceUnit.indexPath.item, to: destinationTabCollectionViewModel, at: newIndex)
     }
 
     func clear() {

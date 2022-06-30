@@ -17,18 +17,17 @@
 //
 
 import Foundation
+import Combine
+import os
 
 protocol PinnedTabsManager {
     var tabCollection: TabCollection { get set }
     func pin(_ tab: Tab)
     func unpin(_ tab: Tab)
+    func tabViewModel(at index: Int) -> TabViewModel?
 }
 
 final class LocalPinnedTabsManager: PinnedTabsManager {
-
-    init(tabCollection: TabCollection = .init()) {
-        self.tabCollection = tabCollection
-    }
 
     var tabCollection: TabCollection
 
@@ -38,4 +37,48 @@ final class LocalPinnedTabsManager: PinnedTabsManager {
 
     func unpin(_ tab: Tab) {
     }
+
+    func tabViewModel(at index: Int) -> TabViewModel? {
+        guard index >= 0, tabCollection.tabs.count > index else {
+            os_log("LocalPinnedTabsManager: Index out of bounds", type: .error)
+            return nil
+        }
+
+        let tab = tabCollection.tabs[index]
+        return tabViewModels[tab]
+    }
+
+    init(tabCollection: TabCollection = .init()) {
+        self.tabCollection = tabCollection
+    }
+
+    // MARK: - Private
+
+    private(set) var tabViewModels = [Tab: TabViewModel]()
+    private var cancellables: Set<AnyCancellable> = []
+
+    private func subscribeToPinnedTabs() {
+        tabCollection.$tabs.sink { [weak self] newTabs in
+            guard let self = self else { return }
+
+            let new = Set(newTabs)
+            let old = Set(self.tabViewModels.keys)
+
+            self.removeTabViewModels(old.subtracting(new))
+            self.addTabViewModels(new.subtracting(old))
+        } .store(in: &cancellables)
+    }
+
+    private func removeTabViewModels(_ removed: Set<Tab>) {
+        for tab in removed {
+            tabViewModels[tab] = nil
+        }
+    }
+
+    private func addTabViewModels(_ added: Set<Tab>) {
+        for tab in added {
+            tabViewModels[tab] = TabViewModel(tab: tab)
+        }
+    }
+
 }

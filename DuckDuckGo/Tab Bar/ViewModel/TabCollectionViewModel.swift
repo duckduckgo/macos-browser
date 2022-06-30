@@ -39,6 +39,17 @@ final class TabCollectionViewModel: NSObject {
     weak var delegate: TabCollectionViewModelDelegate?
 
     private(set) var tabCollection: TabCollection
+    var pinnedTabsCollection: TabCollection {
+        WindowControllersManager.shared.pinnedTabsManager.tabCollection
+    }
+
+    var numberOfTabs: Int {
+        pinnedTabsCollection.tabs.count + tabCollection.tabs.count
+    }
+
+    var allTabs: [Tab] {
+        pinnedTabsCollection.tabs + tabCollection.tabs
+    }
 
     var changesEnabled = true
 
@@ -112,9 +123,14 @@ final class TabCollectionViewModel: NSObject {
 
     // MARK: - Selection
 
+    @discardableResult func selectRegularTab(at index: Int, forceChange: Bool = false) -> Bool {
+        let indexIncludingPinnedTabs = pinnedTabsCollection.tabs.count + index
+        return select(at: indexIncludingPinnedTabs)
+    }
+
     @discardableResult func select(at index: Int, forceChange: Bool = false) -> Bool {
         guard changesEnabled || forceChange else { return false }
-        guard index >= 0, index < tabCollection.tabs.count else {
+        guard index >= 0, index < numberOfTabs else {
             os_log("TabCollectionViewModel: Index out of bounds", type: .error)
             selectionIndex = nil
             return false
@@ -139,7 +155,7 @@ final class TabCollectionViewModel: NSObject {
             return false
         }
 
-        if select(at: index) {
+        if selectRegularTab(at: index) {
             tabCollection.tabs[index].setContent(content)
             delegate?.tabCollectionViewModel(self, didSelectAt: index)
             return true
@@ -155,12 +171,17 @@ final class TabCollectionViewModel: NSObject {
         }
 
         if let selectionIndex = selectionIndex {
-            let newSelectionIndex = (selectionIndex + 1) % tabCollection.tabs.count
+            let newSelectionIndex = (selectionIndex + 1) % numberOfTabs
             select(at: newSelectionIndex)
-            delegate?.tabCollectionViewModel(self, didSelectAt: newSelectionIndex)
+            if newSelectionIndex >= pinnedTabsCollection.tabs.count {
+                let indexInTabCollection = newSelectionIndex - pinnedTabsCollection.tabs.count
+                delegate?.tabCollectionViewModel(self, didSelectAt: indexInTabCollection)
+            }
         } else {
             select(at: 0)
-            delegate?.tabCollectionViewModel(self, didSelectAt: 0)
+            if pinnedTabsCollection.tabs.isEmpty {
+                delegate?.tabCollectionViewModel(self, didSelectAt: 0)
+            }
         }
     }
 
@@ -172,12 +193,17 @@ final class TabCollectionViewModel: NSObject {
         }
 
         if let selectionIndex = selectionIndex {
-            let newSelectionIndex = selectionIndex - 1 >= 0 ? selectionIndex - 1 : tabCollection.tabs.count - 1
+            let newSelectionIndex = selectionIndex - 1 >= 0 ? selectionIndex - 1 : numberOfTabs - 1
             select(at: newSelectionIndex)
-            delegate?.tabCollectionViewModel(self, didSelectAt: newSelectionIndex)
+            if newSelectionIndex >= pinnedTabsCollection.tabs.count {
+                let indexInTabCollection = newSelectionIndex - pinnedTabsCollection.tabs.count
+                delegate?.tabCollectionViewModel(self, didSelectAt: indexInTabCollection)
+            }
         } else {
-            select(at: tabCollection.tabs.count - 1)
-            delegate?.tabCollectionViewModel(self, didSelectAt: tabCollection.tabs.count - 1)
+            select(at: numberOfTabs - 1)
+            if !tabCollection.tabs.isEmpty {
+                delegate?.tabCollectionViewModel(self, didSelectAt: tabCollection.tabs.count - 1)
+            }
         }
     }
 
@@ -196,7 +222,7 @@ final class TabCollectionViewModel: NSObject {
         tabCollection.append(tab: tab)
 
         if selected {
-            select(at: tabCollection.tabs.count - 1, forceChange: forceChange)
+            select(at: numberOfTabs - 1, forceChange: forceChange)
             delegate?.tabCollectionViewModelDidAppend(self, selected: true)
         } else {
             delegate?.tabCollectionViewModelDidAppend(self, selected: false)
@@ -213,7 +239,7 @@ final class TabCollectionViewModel: NSObject {
         tabs.forEach {
             tabCollection.append(tab: $0)
         }
-        let newSelectionIndex = tabCollection.tabs.count - 1
+        let newSelectionIndex = numberOfTabs - 1
         select(at: newSelectionIndex)
 
         delegate?.tabCollectionViewModelDidMultipleChanges(self)
@@ -224,7 +250,8 @@ final class TabCollectionViewModel: NSObject {
 
         tabCollection.insert(tab: tab, at: index)
         if selected {
-            select(at: index)
+            let indexIncludingPinnedTabs = pinnedTabsCollection.tabs.count + index
+            select(at: indexIncludingPinnedTabs)
         }
         delegate?.tabCollectionViewModelDidInsert(self, at: index, selected: selected)
 
@@ -250,20 +277,33 @@ final class TabCollectionViewModel: NSObject {
     // MARK: - Removal
 
     func remove(at index: Int, published: Bool = true) {
-        guard changesEnabled else { return }
+        guard changesEnabled, let (tabCollection, indexInCollection) = tabCollection(for: index) else { return }
 
-        let parentTab = tabCollection.tabs[safe: index]?.parentTab
-        guard tabCollection.remove(at: index, published: published) else { return }
+        let parentTab = tabCollection.tabs[indexInCollection].parentTab
+        guard tabCollection.remove(at: indexInCollection, published: published) else { return }
 
-        self.didRemoveTab(withParent: parentTab, at: index)
+        didRemoveTab(at: index, withParent: parentTab, from: tabCollection, indexInCollection: indexInCollection)
     }
 
-    private func didRemoveTab(withParent parentTab: Tab?, at index: Int) {
+    private func tabCollection(for index: Int) -> (TabCollection, Int)? {
+        if pinnedTabsCollection.tabs.indices.contains(index) {
+            return (pinnedTabsCollection, index)
+        }
+        let indexWithoutPinnedTabs = index - pinnedTabsCollection.tabs.count
+        if tabCollection.tabs.indices.contains(indexWithoutPinnedTabs) {
+            return (tabCollection, indexWithoutPinnedTabs)
+        }
+        return nil
+    }
+
+    private func didRemoveTab(at index: Int, withParent parentTab: Tab?, from collection: TabCollection, indexInCollection: Int) {
         defer {
-            delegate?.tabCollectionViewModel(self, didRemoveTabAt: index, andSelectTabAt: self.selectionIndex)
+            if collection === tabCollection {
+                delegate?.tabCollectionViewModel(self, didRemoveTabAt: indexInCollection, andSelectTabAt: self.selectionIndex)
+            }
         }
 
-        guard tabCollection.tabs.count > 0 else {
+        guard numberOfTabs > 0 else {
             selectionIndex = nil
             return
         }
@@ -277,32 +317,32 @@ final class TabCollectionViewModel: NSObject {
         if selectionIndex == index,
            selectParentOnRemoval,
            let parentTab = parentTab,
-           let parentTabIndex = tabCollection.tabs.firstIndex(of: parentTab) {
+           let parentTabIndex = allTabs.firstIndex(of: parentTab) {
             // Select parent tab
             newSelectionIndex = parentTabIndex
         } else if selectionIndex == index,
                   let parentTab = parentTab,
-                  let leftTab = tabCollection.tabs[safe: index - 1],
-                  let rightTab = tabCollection.tabs[safe: index],
+                  let leftTab = allTabs[safe: index - 1],
+                  let rightTab = allTabs[safe: index],
                   rightTab.parentTab !== parentTab && (leftTab.parentTab === parentTab || leftTab === parentTab) {
             // Select parent tab on left or another child tab on left instead of the tab on right
             newSelectionIndex = max(selectionIndex - 1, 0)
         } else if selectionIndex > index {
             newSelectionIndex = max(selectionIndex - 1, 0)
         } else {
-            newSelectionIndex = max(min(selectionIndex, tabCollection.tabs.count - 1), 0)
+            newSelectionIndex = max(min(selectionIndex, numberOfTabs - 1), 0)
         }
         select(at: newSelectionIndex)
     }
 
-    func moveTab(at fromIndex: Int, to otherViewModel: TabCollectionViewModel, at toIndex: Int) {
+    func moveRegularTab(at fromIndex: Int, to otherViewModel: TabCollectionViewModel, at toIndex: Int) {
         guard changesEnabled else { return }
 
         let parentTab = tabCollection.tabs[safe: fromIndex]?.parentTab
 
         guard tabCollection.moveTab(at: fromIndex, to: otherViewModel.tabCollection, at: toIndex) else { return }
 
-        didRemoveTab(withParent: parentTab, at: fromIndex)
+        didRemoveTab(at: fromIndex, withParent: parentTab, from: tabCollection, indexInCollection: fromIndex)
 
         otherViewModel.select(at: toIndex)
         otherViewModel.delegate?.tabCollectionViewModelDidInsert(otherViewModel, at: toIndex, selected: true)
@@ -371,7 +411,7 @@ final class TabCollectionViewModel: NSObject {
     func remove(ownerOf webView: WebView) {
         guard changesEnabled else { return }
 
-        let webViews = tabCollection.tabs.map { $0.webView }
+        let webViews = allTabs.map { $0.webView }
         guard let index = webViews.firstIndex(of: webView) else {
             os_log("TabCollection: Failed to get index of the tab", type: .error)
             return
@@ -406,20 +446,22 @@ final class TabCollectionViewModel: NSObject {
         let newIndex = index + 1
 
         tabCollection.insert(tab: tabCopy, at: newIndex)
-        select(at: newIndex)
+        select(at: newIndex + pinnedTabsCollection.tabs.count)
 
         delegate?.tabCollectionViewModelDidInsert(self, at: newIndex, selected: true)
     }
 
+    // TODO
     func moveTab(at index: Int, to newIndex: Int) {
         guard changesEnabled else { return }
 
         tabCollection.moveTab(at: index, to: newIndex)
-        select(at: newIndex)
+        select(at: newIndex + pinnedTabsCollection.tabs.count)
 
         delegate?.tabCollectionViewModel(self, didMoveTabAt: index, to: newIndex)
     }
 
+    // TODO
     func replaceTab(at index: Int, with tab: Tab, forceChange: Bool = false) {
         guard changesEnabled || forceChange else { return }
 
@@ -429,7 +471,7 @@ final class TabCollectionViewModel: NSObject {
             os_log("TabCollectionViewModel: No tab selected", type: .error)
             return
         }
-        select(at: selectionIndex, forceChange: forceChange)
+        select(at: selectionIndex + pinnedTabsCollection.tabs.count, forceChange: forceChange)
     }
 
     private func subscribeToTabs() {
@@ -457,11 +499,22 @@ final class TabCollectionViewModel: NSObject {
     }
 
     private func updateSelectedTabViewModel() {
-        guard let selectionIndex = selectionIndex else {
+        guard let selectionIndex = selectionIndex, let (tabCollection, indexInCollection) = tabCollection(for: selectionIndex) else {
             selectedTabViewModel = nil
             return
         }
-        let selectedTabViewModel = tabViewModel(at: selectionIndex)
+
+        var selectedTabViewModel: TabViewModel?
+
+        switch tabCollection {
+        case self.tabCollection:
+            selectedTabViewModel = tabViewModel(at: indexInCollection)
+        case pinnedTabsCollection:
+            selectedTabViewModel = WindowControllersManager.shared.pinnedTabsManager.tabViewModel(at: selectionIndex)
+        default:
+            break
+        }
+
         selectedTabViewModel?.tab.lastSelectedAt = Date()
         self.selectedTabViewModel = selectedTabViewModel
     }

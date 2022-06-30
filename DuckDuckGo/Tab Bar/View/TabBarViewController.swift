@@ -618,7 +618,7 @@ extension TabBarViewController: NSCollectionViewDelegate {
 
         if highlightState == .forSelection {
             self.collectionView.clearSelection()
-            tabCollectionViewModel.select(at: indexPath.item)
+            tabCollectionViewModel.selectRegularTab(at: indexPath.item)
 
             // Poor old NSCollectionView
             DispatchQueue.main.async {
