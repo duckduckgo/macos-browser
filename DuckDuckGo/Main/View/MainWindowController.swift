@@ -71,18 +71,9 @@ final class MainWindowController: NSWindowController {
            let windowFrame = window?.frame {
             
             if windowFrame.width > visibleWindowFrame.width || windowFrame.height > visibleWindowFrame.height {
-                
-                let width = min(windowFrame.width, visibleWindowFrame.width)
-                let height = min(windowFrame.height, visibleWindowFrame.height)
-                
-                window?.setFrame(NSRect(x: windowFrame.origin.x,
-                                        y: windowFrame.origin.y,
-                                        width: width,
-                                        height: height),
-                                 display: true)
+                window?.performZoom(nil)
             }
         }
-        
     }
 
     required init?(coder: NSCoder) {
