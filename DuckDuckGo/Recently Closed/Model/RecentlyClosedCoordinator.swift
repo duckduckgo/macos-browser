@@ -167,9 +167,10 @@ final class RecentlyClosedCoordinator: RecentlyClosedCoordinatorProtocol {
                 case let tab as RecentlyClosedTab:
                     return tab.contentContainsDomains(domains)
                 case let window as RecentlyClosedWindow:
-                    return window.tabs.contains { tab in
+                    window.tabs.removeAll(where: { tab in
                         tab.contentContainsDomains(domains)
-                    }
+                    })
+                    if window.tabs.isEmpty { return true }
                 default:
                     assertionFailure("Unknown type")
                 }

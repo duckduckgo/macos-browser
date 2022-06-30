@@ -26,7 +26,7 @@ final class RecentlyClosedWindow: RecentlyClosedCacheItem {
         self.contentSize = contentSize
     }
 
-    let tabs: [RecentlyClosedTab]
+    var tabs: [RecentlyClosedTab]
     let droppingPoint: NSPoint?
     let contentSize: NSSize?
 
