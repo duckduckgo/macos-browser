@@ -159,59 +159,6 @@ final class TabCollectionTests: XCTestCase {
         XCTAssertEqual(tabCollection.tabs[2], tab2)
     }
 
-    // MARK: - Last Removed Tab
-
-    func testWhenNoTabWasRemoved_ThenReopenRecentlyClosedTabDoesNothing() {
-        let tabCollection = TabCollection()
-        let tabsCount = tabCollection.tabs.count
-
-        tabCollection.reopenRecentlyClosedTab()
-
-        XCTAssert(tabCollection.recentlyClosedTabsCache.isEmpty)
-        XCTAssertEqual(tabsCount, tabCollection.tabs.count)
-    }
-
-    func testReopenLastClosedTab() {
-        let tabCollection = TabCollection()
-
-        let tab1 = Tab()
-        tabCollection.append(tab: tab1)
-        let tab2 = Tab()
-        tab2.url = URL.duckDuckGo
-        tabCollection.append(tab: tab2)
-        let tab3 = Tab()
-        tabCollection.append(tab: tab3)
-
-        XCTAssert(tabCollection.remove(at: 0))
-        XCTAssert(tabCollection.remove(at: 0))
-        XCTAssert(tabCollection.remove(at: 0))
-        tabCollection.reopenRecentlyClosedTab()
-        tabCollection.reopenRecentlyClosedTab()
-        tabCollection.reopenRecentlyClosedTab()
-
-        XCTAssertEqual(tabCollection.tabs[0].content, tab1.content)
-        XCTAssertEqual(tabCollection.tabs[1].content, tab2.content)
-        XCTAssertEqual(tabCollection.tabs[2].content, tab3.content)
-        XCTAssert(tabCollection.recentlyClosedTabsCache.isEmpty)
-    }
-
-    func testWhenRecentlyClosedCacheIsCleaned_ThenReopenLastClosedTabDoesNothing() {
-        let tabCollection = TabCollection()
-
-        let tab = Tab()
-        tab.url = URL.duckDuckGo
-        tabCollection.append(tab: tab)
-        XCTAssert(tabCollection.remove(at: 0))
-
-        let tabsCount = tabCollection.tabs.count
-
-        tabCollection.cleanRecentlyClosedTabsCache()
-        tabCollection.reopenRecentlyClosedTab()
-
-        XCTAssert(tabCollection.recentlyClosedTabsCache.isEmpty)
-        XCTAssertEqual(tabsCount, tabCollection.tabs.count)
-    }
-
 }
 
 extension Tab {
