@@ -230,7 +230,7 @@ enum DataImport {
 
 }
 
-struct DataImportError: Error {
+struct DataImportError: Error, Equatable {
 
     enum ImportErrorAction {
         case bookmarks
@@ -246,7 +246,7 @@ struct DataImportError: Error {
         }
     }
     
-    enum ImportErrorType {
+    enum ImportErrorType: Equatable {
         case noFileFound
         case cannotReadFile
         case userDeniedPrompt

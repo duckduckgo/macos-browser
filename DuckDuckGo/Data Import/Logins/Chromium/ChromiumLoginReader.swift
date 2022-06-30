@@ -22,7 +22,7 @@ import GRDB
 
 final class ChromiumLoginReader {
 
-    enum ImportError: Error {
+    enum ImportError: Error, Equatable {
         case couldNotFindLoginData
         case databaseAccessFailed
         case decryptionFailed
@@ -62,14 +62,10 @@ final class ChromiumLoginReader {
             let keyPromptResult = decryptionKeyPrompt.promptForChromiumPasswordKeychainAccess(processName: processName)
             
             switch keyPromptResult {
-            case .password(let passwordString):
-                key = passwordString
-            case .failedToDecodePasswordData:
-                return .failure(.failedToDecodePasswordData)
-            case .userDeniedKeychainPrompt:
-                return .failure(.userDeniedKeychainPrompt)
-            case .keychainError(let status):
-                return .failure(.decryptionKeyAccessFailed(status))
+            case .password(let passwordString): key = passwordString
+            case .failedToDecodePasswordData: return .failure(.failedToDecodePasswordData)
+            case .userDeniedKeychainPrompt: return .failure(.userDeniedKeychainPrompt)
+            case .keychainError(let status): return .failure(.decryptionKeyAccessFailed(status))
             }
         }
         
@@ -87,42 +83,63 @@ final class ChromiumLoginReader {
         var loginRows = [ChromiumCredential.ID: ChromiumCredential]()
 
         for loginFileURL in loginFileURLs {
-            let temporaryFileHandler = TemporaryFileHandler(fileURL: loginFileURL)
-            defer { temporaryFileHandler.deleteTemporarilyCopiedFile() }
+            let result = readLoginRows(loginFileURL: loginFileURL)
             
-            guard let temporaryDatabaseURL = try? temporaryFileHandler.copyFileToTemporaryDirectory() else {
-                return .failure(.failedToTemporarilyCopyDatabase)
-            }
-            
-            do {
-                let queue = try DatabaseQueue(path: temporaryDatabaseURL.path)
-                var rows = [ChromiumCredential]()
-
-                try queue.read { database in
-                    rows = try fetchCredentials(from: database)
-                }
-
-                for row in rows {
-                    let existingRowTimestamp = loginRows[row.id]?.passwordModifiedAt
-                    let newRowTimestamp = row.passwordModifiedAt
-
-                    switch (newRowTimestamp, existingRowTimestamp) {
-                    case let (.some(new), .some(existing)) where new > existing:
-                        loginRows[row.id] = row
-                    case (_, .none):
-                        loginRows[row.id] = row
-                    default:
-                        break
+            switch result {
+            case .success(let newLoginRows):
+                loginRows.merge(newLoginRows) { existingRow, newRow in
+                    if let newDate = newRow.passwordModifiedAt, let existingDate = existingRow.passwordModifiedAt, newDate > existingDate {
+                        return newRow
+                    } else {
+                        return existingRow
                     }
                 }
-
-            } catch {
-                return .failure(.databaseAccessFailed)
+            case .failure(let error):
+                return .failure(error)
             }
         }
 
         let importedLogins = createImportedLoginCredentials(from: loginRows.values, decryptionKey: derivedKey)
         return .success(importedLogins)
+    }
+    
+    private func readLoginRows(loginFileURL: URL) -> Result<[ChromiumCredential.ID: ChromiumCredential], ChromiumLoginReader.ImportError> {
+        let temporaryFileHandler = TemporaryFileHandler(fileURL: loginFileURL)
+        defer { temporaryFileHandler.deleteTemporarilyCopiedFile() }
+        
+        guard let temporaryDatabaseURL = try? temporaryFileHandler.copyFileToTemporaryDirectory() else {
+            return .failure(.failedToTemporarilyCopyDatabase)
+        }
+        
+        var loginRows = [ChromiumCredential.ID: ChromiumCredential]()
+        
+        do {
+            let queue = try DatabaseQueue(path: temporaryDatabaseURL.path)
+            var rows = [ChromiumCredential]()
+
+            try queue.read { database in
+                rows = try fetchCredentials(from: database)
+            }
+
+            for row in rows {
+                let existingRowTimestamp = loginRows[row.id]?.passwordModifiedAt
+                let newRowTimestamp = row.passwordModifiedAt
+
+                switch (newRowTimestamp, existingRowTimestamp) {
+                case let (.some(new), .some(existing)) where new > existing:
+                    loginRows[row.id] = row
+                case (_, .none):
+                    loginRows[row.id] = row
+                default:
+                    break
+                }
+            }
+
+        } catch {
+            return .failure(.databaseAccessFailed)
+        }
+        
+        return .success(loginRows)
     }
     
     private func createImportedLoginCredentials(from credentials: Dictionary<ChromiumCredential.ID, ChromiumCredential>.Values,
