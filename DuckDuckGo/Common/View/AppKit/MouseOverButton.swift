@@ -97,6 +97,10 @@ internal class MouseOverButton: NSButton {
         self.layer?.addSublayer(backgroundLayer)
     }
 
+    override func awakeFromNib() {
+        normalTintColor = self.contentTintColor
+    }
+
     override func viewWillMove(toWindow newWindow: NSWindow?) {
         super.viewWillMove(toWindow: newWindow)
 
