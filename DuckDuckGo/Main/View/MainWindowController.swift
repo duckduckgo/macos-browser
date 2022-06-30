@@ -54,6 +54,35 @@ final class MainWindowController: NSWindowController {
         setupToolbar()
         subscribeToTrafficLightsAlpha()
         subscribeToShouldPreventUserInteraction()
+        subscribeToResolutionChange()
+    }
+    
+    private func subscribeToResolutionChange() {
+        NotificationCenter.default.addObserver(forName: NSApplication.didChangeScreenParametersNotification,
+                                               object: NSApplication.shared,
+                                               queue: OperationQueue.main) { [weak self] _ in
+            self?.resizeWindowIfNeeded()
+        }
+    }
+    
+    private func resizeWindowIfNeeded() {
+        
+        if let visibleWindowFrame = window?.screen?.visibleFrame,
+           let windowFrame = window?.frame {
+            
+            if windowFrame.width > visibleWindowFrame.width || windowFrame.height > visibleWindowFrame.height {
+                
+                let width = min(windowFrame.width, visibleWindowFrame.width)
+                let height = min(windowFrame.height, visibleWindowFrame.height)
+                
+                window?.setFrame(NSRect(x: windowFrame.origin.x,
+                                        y: windowFrame.origin.y,
+                                        width: width,
+                                        height: height),
+                                 display: true)
+            }
+        }
+        
     }
 
     required init?(coder: NSCoder) {
