@@ -66,6 +66,7 @@ extension WindowControllersManager {
 
     func restorePinnedTabs(_ collection: TabCollection) {
         pinnedTabsManager.tabCollection = collection
+        pinnedTabsManager.tabCollection = .init(tabs: [.init(content: .url("http://onet.pl".url!))])
     }
 
 }

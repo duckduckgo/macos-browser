@@ -389,9 +389,9 @@ extension MainViewController {
         }
         let index = keyEquivalent - 1
         if keyEquivalent == 9, !tabCollectionViewModel.tabCollection.tabs.isEmpty {
-            tabCollectionViewModel.select(at: tabCollectionViewModel.numberOfTabs - 1)
+            tabCollectionViewModel.selectRegularTab(at: tabCollectionViewModel.numberOfTabs - 1)
         } else if index < tabCollectionViewModel.numberOfTabs {
-            tabCollectionViewModel.select(at: index)
+            tabCollectionViewModel.selectRegularTab(at: index)
         }
     }
 

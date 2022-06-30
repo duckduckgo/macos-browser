@@ -56,7 +56,7 @@ extension TabCollectionViewModel: TabLazyLoaderDataSource {
     }
 
     var selectedTabIndex: Int? {
-        selectionIndex
+        selectionIndex?.index
     }
 
     var selectedTabPublisher: AnyPublisher<Tab, Never> {

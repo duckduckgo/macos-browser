@@ -122,7 +122,9 @@ final class TabBarViewController: NSViewController {
     }
 
     private func reloadSelection() {
-        guard collectionView.selectionIndexPaths.first?.item != tabCollectionViewModel.selectionIndex else {
+        guard (tabCollectionViewModel.selectionIndex?.isRegularTab ?? true) == true,
+              collectionView.selectionIndexPaths.first?.item != tabCollectionViewModel.selectionIndex?.index
+        else {
             collectionView.updateItemsLeftToSelectedItems()
             return
         }
@@ -136,7 +138,7 @@ final class TabBarViewController: NSViewController {
             collectionView.clearSelection()
         }
 
-        let newSelectionIndexPath = IndexPath(item: selectionIndex)
+        let newSelectionIndexPath = IndexPath(item: selectionIndex.index)
         if tabMode == .divided {
             collectionView.animator().selectItems(at: [newSelectionIndexPath], scrollPosition: .centeredHorizontally)
         } else {
@@ -544,7 +546,7 @@ extension TabBarViewController: NSCollectionViewDelegateFlowLayout {
     func collectionView(_ collectionView: NSCollectionView,
                         layout collectionViewLayout: NSCollectionViewLayout,
                         sizeForItemAt indexPath: IndexPath) -> NSSize {
-        var isItemSelected = tabCollectionViewModel.selectionIndex == indexPath.item
+        var isItemSelected = tabCollectionViewModel.selectionIndex == .regular(indexPath.item)
 
         if let draggingOverIndexPath = currentDraggingIndexPath {
             // Drag&drop in progress - the empty space is equal to the selected tab width

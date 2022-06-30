@@ -484,7 +484,7 @@ extension BrowserTabViewController: TabDelegate {
     }
 
     func closeTab(_ tab: Tab) {
-        guard let index = tabCollectionViewModel.allTabs.firstIndex(of: tab) else {
+        guard let index = tabCollectionViewModel.tabCollection.tabs.firstIndex(of: tab) else {
             return
         }
         tabCollectionViewModel.remove(at: index)
