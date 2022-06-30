@@ -76,8 +76,14 @@ final class TabBarViewController: NSViewController {
         updateEmptyTabArea()
         tabCollectionViewModel.delegate = self
         reloadSelection()
+        addMouseMonitors()
     }
 
+    override func viewWillDisappear() {
+        super.viewWillDisappear()
+        removeMouseMonitors()
+    }
+    
     override func viewDidLayout() {
         super.viewDidLayout()
 
@@ -132,6 +138,14 @@ final class TabBarViewController: NSViewController {
             collectionView.animator().selectItems(at: [newSelectionIndexPath], scrollPosition: .centeredHorizontally)
         } else {
             collectionView.selectItems(at: [newSelectionIndexPath], scrollPosition: .centeredHorizontally)
+        }
+    }
+    
+    private func selectTabWithPoint(_ point: NSPoint) {
+        let pointLocationOnCollectionView = collectionView.convert(point, from: view)
+        
+        if let indexPath = collectionView.indexPathForItem(at: pointLocationOnCollectionView) {
+            tabCollectionViewModel.select(at: indexPath.item)
         }
     }
 
@@ -193,6 +207,36 @@ final class TabBarViewController: NSViewController {
         let tab = tabViewModel.tab
         tabCollectionViewModel.remove(at: indexPath.item)
         WindowsManager.openNewWindow(with: tab, droppingPoint: droppingPoint)
+    }
+    
+    // MARK: - Mouse Monitor
+    
+    private var mouseDownMonitor: Any?
+
+    private func addMouseMonitors() {
+        guard mouseDownMonitor == nil else { return }
+        
+        mouseDownMonitor = NSEvent.addLocalMonitorForEvents(matching: .leftMouseDown) { [weak self] event in
+            self?.mouseDown(with: event)
+        }
+    }
+
+    private func removeMouseMonitors() {
+        if let monitor = mouseDownMonitor {
+            NSEvent.removeMonitor(monitor)
+        }
+        
+        mouseDownMonitor = nil
+    }
+    
+    func mouseDown(with event: NSEvent) -> NSEvent? {
+        if event.window === view.window,
+           view.window?.isMainWindow == false,
+           let point = view.mouseLocationInsideBounds(event.locationInWindow) {
+            selectTabWithPoint(point)
+        }
+        
+        return event
     }
 
     // MARK: - Tab Width
