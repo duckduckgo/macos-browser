@@ -177,7 +177,6 @@ final class AddressBarButtonsViewController: NSViewController {
         subscribeToEffectiveAppearance()
         subscribeToIsMouseOverAnimationVisible()
         updateBookmarkButtonVisibility()
-        subscribeToTabRemovedNotification()
     }
 
     override func viewWillAppear() {
@@ -861,14 +860,7 @@ final class AddressBarButtonsViewController: NSViewController {
                 }
             }
     }
-    
-    private func subscribeToTabRemovedNotification() {
-        NotificationCenter.default.addObserver(forName: .selectedTabWasRemoved,
-                                               object: nil,
-                                               queue: OperationQueue.main) { [weak self] _ in
-            self?.privacyDashboardPopover.close()
-        }
-    }
+
 }
 // swiftlint:enable type_body_length
 
