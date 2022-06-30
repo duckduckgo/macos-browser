@@ -47,6 +47,7 @@
 		37AFCE8B27DB69BC00471A10 /* PreferencesGeneralView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37AFCE8A27DB69BC00471A10 /* PreferencesGeneralView.swift */; };
 		37AFCE9227DB8CAD00471A10 /* PreferencesAboutView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37AFCE9127DB8CAD00471A10 /* PreferencesAboutView.swift */; };
 		37B11B3928095E6600CBB621 /* TabLazyLoader.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37B11B3828095E6600CBB621 /* TabLazyLoader.swift */; };
+		37BF3F14286D8A6500BD9014 /* PinnedTabsManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37BF3F13286D8A6500BD9014 /* PinnedTabsManager.swift */; };
 		37CC53EC27E8A4D10028713D /* PreferencesPrivacyView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37CC53EB27E8A4D10028713D /* PreferencesPrivacyView.swift */; };
 		37CC53F027E8D1440028713D /* PreferencesDownloadsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37CC53EF27E8D1440028713D /* PreferencesDownloadsView.swift */; };
 		37CC53F427E8D4620028713D /* NSPathControlView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37CC53F327E8D4620028713D /* NSPathControlView.swift */; };
@@ -817,6 +818,7 @@
 		37AFCE8A27DB69BC00471A10 /* PreferencesGeneralView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PreferencesGeneralView.swift; sourceTree = "<group>"; };
 		37AFCE9127DB8CAD00471A10 /* PreferencesAboutView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PreferencesAboutView.swift; sourceTree = "<group>"; };
 		37B11B3828095E6600CBB621 /* TabLazyLoader.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TabLazyLoader.swift; sourceTree = "<group>"; };
+		37BF3F13286D8A6500BD9014 /* PinnedTabsManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PinnedTabsManager.swift; sourceTree = "<group>"; };
 		37CC53EB27E8A4D10028713D /* PreferencesPrivacyView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PreferencesPrivacyView.swift; sourceTree = "<group>"; };
 		37CC53EF27E8D1440028713D /* PreferencesDownloadsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PreferencesDownloadsView.swift; sourceTree = "<group>"; };
 		37CC53F327E8D4620028713D /* NSPathControlView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NSPathControlView.swift; sourceTree = "<group>"; };
@@ -1642,6 +1644,14 @@
 				378205FA283C277800D1D4AA /* MainMenuTests.swift */,
 			);
 			path = Menus;
+			sourceTree = "<group>";
+		};
+		37BF3F12286D8A4B00BD9014 /* Pinned Tabs */ = {
+			isa = PBXGroup;
+			children = (
+				37BF3F13286D8A6500BD9014 /* PinnedTabsManager.swift */,
+			);
+			path = "Pinned Tabs";
 			sourceTree = "<group>";
 		};
 		37CD54C027F2FDD100F1F7B9 /* Model */ = {
@@ -2630,6 +2640,7 @@
 				AA86491524D83384001BABEE /* Navigation Bar */,
 				85B7184727677A7D00B4277F /* Onboarding */,
 				B64C84DB2692D6E80048FEBE /* Permissions */,
+				37BF3F12286D8A4B00BD9014 /* Pinned Tabs */,
 				4B0511A2262CAA5A00F6079C /* Preferences */,
 				B6FA893A269C414900588ECD /* Privacy Dashboard */,
 				AAC6881528626B6F00D54247 /* Recently Closed */,
@@ -4440,6 +4451,7 @@
 				7B1E819E27C8874900FF0E60 /* ContentOverlayPopover.swift in Sources */,
 				4BA1A6A5258B07DF00F6F690 /* EncryptedValueTransformer.swift in Sources */,
 				4B92929F26670D2A00AD2C21 /* PasteboardBookmark.swift in Sources */,
+				37BF3F14286D8A6500BD9014 /* PinnedTabsManager.swift in Sources */,
 				856CADF0271710F400E79BB0 /* HoverUserScript.swift in Sources */,
 				4B9292AC26670D3700AD2C21 /* Bookmark.xcdatamodeld in Sources */,
 				AA6EF9B525081B4C004754E6 /* MainMenuActions.swift in Sources */,
