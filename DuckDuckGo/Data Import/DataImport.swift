@@ -230,7 +230,7 @@ enum DataImport {
 
 }
 
-struct DataImportError: Error, Equatable {
+struct DataImportError: Error {
 
     enum ImportErrorAction {
         case bookmarks
@@ -246,17 +246,59 @@ struct DataImportError: Error, Equatable {
         }
     }
     
-    enum ImportErrorType: String {
+    enum ImportErrorType {
         case noFileFound
         case cannotReadFile
+        case userDeniedPrompt
         case couldNotFindProfile
         case needsLoginPrimaryPassword
         case cannotAccessSecureVault
         case cannotAccessCoreData
         case couldNotGetDecryptionKey
+        case couldNotAccessKeychain(OSStatus)
         case cannotDecryptFile
         case failedToTemporarilyCopyFile
         case databaseAccessFailed
+        
+        var stringValue: String {
+            switch self {
+            case .noFileFound: return "noFileFound"
+            case .cannotReadFile: return "cannotReadFile"
+            case .userDeniedPrompt: return "userDeniedPrompt"
+            case .couldNotFindProfile: return "couldNotFindProfile"
+            case .needsLoginPrimaryPassword: return "needsLoginPrimaryPassword"
+            case .cannotAccessSecureVault: return "cannotAccessSecureVault"
+            case .cannotAccessCoreData: return "cannotAccessCoreData"
+            case .couldNotGetDecryptionKey: return "couldNotGetDecryptionKey"
+            case .couldNotAccessKeychain: return "couldNotAccessKeychain"
+            case .cannotDecryptFile: return "cannotDecryptFile"
+            case .failedToTemporarilyCopyFile: return "failedToTemporarilyCopyFile"
+            case .databaseAccessFailed: return "databaseAccessFailed"
+            }
+        }
+        
+        var errorParameters: [String: String] {
+            var parameters = ["error": stringValue]
+            
+            switch self {
+            case .couldNotAccessKeychain(let status):
+                parameters["keychainErrorCode"] = String(status)
+                
+            case .noFileFound,
+                    .cannotReadFile,
+                    .userDeniedPrompt,
+                    .couldNotFindProfile,
+                    .needsLoginPrimaryPassword,
+                    .cannotAccessSecureVault,
+                    .cannotAccessCoreData,
+                    .couldNotGetDecryptionKey,
+                    .cannotDecryptFile,
+                    .failedToTemporarilyCopyFile,
+                    .databaseAccessFailed: break
+            }
+            
+            return parameters
+        }
     }
     
     static func generic(_ errorType: ImportErrorType) -> DataImportError {
@@ -297,10 +339,13 @@ struct DataImportError: Error, Equatable {
     
     static func logins(_ errorType: ChromiumLoginReader.ImportError) -> DataImportError {
         switch errorType {
+        case .decryptionKeyAccessFailed(let status): return DataImportError(actionType: .logins, errorType: .couldNotAccessKeychain(status))
         case .databaseAccessFailed: return DataImportError(actionType: .logins, errorType: .databaseAccessFailed)
         case .couldNotFindLoginData: return DataImportError(actionType: .logins, errorType: .noFileFound)
         case .failedToTemporarilyCopyDatabase: return DataImportError(actionType: .logins, errorType: .failedToTemporarilyCopyFile)
         case .decryptionFailed: return DataImportError(actionType: .logins, errorType: .cannotReadFile)
+        case .failedToDecodePasswordData: return DataImportError(actionType: .logins, errorType: .cannotReadFile)
+        case .userDeniedKeychainPrompt: return DataImportError(actionType: .logins, errorType: .userDeniedPrompt)
         }
     }
     

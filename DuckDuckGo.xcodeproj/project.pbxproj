@@ -239,6 +239,7 @@
 		4BE0DF06267819A1006337B7 /* NSStoryboardExtension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4BE0DF0426781961006337B7 /* NSStoryboardExtension.swift */; };
 		4BE4005327CF3DC3007D3161 /* SavePaymentMethodPopover.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4BE4005227CF3DC3007D3161 /* SavePaymentMethodPopover.swift */; };
 		4BE4005527CF3F19007D3161 /* SavePaymentMethodViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4BE4005427CF3F19007D3161 /* SavePaymentMethodViewController.swift */; };
+		4BE53374286E39F10019DBFD /* ChromiumKeychainPrompt.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4BE53373286E39F10019DBFD /* ChromiumKeychainPrompt.swift */; };
 		4BE65474271FCD40008D1D63 /* PasswordManagementIdentityItemView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4BE6546E271FCD40008D1D63 /* PasswordManagementIdentityItemView.swift */; };
 		4BE65476271FCD41008D1D63 /* PasswordManagementCreditCardItemView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4BE65470271FCD40008D1D63 /* PasswordManagementCreditCardItemView.swift */; };
 		4BE65477271FCD41008D1D63 /* PasswordManagementLoginItemView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4BE65471271FCD40008D1D63 /* PasswordManagementLoginItemView.swift */; };
@@ -1005,6 +1006,7 @@
 		4BE0DF0426781961006337B7 /* NSStoryboardExtension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NSStoryboardExtension.swift; sourceTree = "<group>"; };
 		4BE4005227CF3DC3007D3161 /* SavePaymentMethodPopover.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SavePaymentMethodPopover.swift; sourceTree = "<group>"; };
 		4BE4005427CF3F19007D3161 /* SavePaymentMethodViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SavePaymentMethodViewController.swift; sourceTree = "<group>"; };
+		4BE53373286E39F10019DBFD /* ChromiumKeychainPrompt.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChromiumKeychainPrompt.swift; sourceTree = "<group>"; };
 		4BE6546E271FCD40008D1D63 /* PasswordManagementIdentityItemView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PasswordManagementIdentityItemView.swift; sourceTree = "<group>"; };
 		4BE65470271FCD40008D1D63 /* PasswordManagementCreditCardItemView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PasswordManagementCreditCardItemView.swift; sourceTree = "<group>"; };
 		4BE65471271FCD40008D1D63 /* PasswordManagementLoginItemView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PasswordManagementLoginItemView.swift; sourceTree = "<group>"; };
@@ -1776,6 +1778,7 @@
 			children = (
 				4B59023826B35F3600489384 /* ChromeDataImporter.swift */,
 				4B59023926B35F3600489384 /* ChromiumLoginReader.swift */,
+				4BE53373286E39F10019DBFD /* ChromiumKeychainPrompt.swift */,
 				4B59023B26B35F3600489384 /* ChromiumDataImporter.swift */,
 				4B59023C26B35F3600489384 /* BraveDataImporter.swift */,
 				4B8AC93226B3B06300879451 /* EdgeDataImporter.swift */,
@@ -4611,6 +4614,7 @@
 				4BA1A6C2258B0A1300F6F690 /* ContiguousBytesExtension.swift in Sources */,
 				37534CA8281198CD002621E7 /* AdjacentItemEnumerator.swift in Sources */,
 				AA9B7C7E26A06E040008D425 /* TrackerInfo.swift in Sources */,
+				4BE53374286E39F10019DBFD /* ChromiumKeychainPrompt.swift in Sources */,
 				B6553692268440D700085A79 /* WKProcessPool+GeolocationProvider.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

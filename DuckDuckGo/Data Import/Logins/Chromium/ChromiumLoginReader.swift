@@ -23,30 +23,57 @@ import GRDB
 final class ChromiumLoginReader {
 
     enum ImportError: Error {
-        case databaseAccessFailed
         case couldNotFindLoginData
-        case failedToTemporarilyCopyDatabase
+        case databaseAccessFailed
         case decryptionFailed
+        case failedToDecodePasswordData
+        case userDeniedKeychainPrompt
+        case decryptionKeyAccessFailed(OSStatus)
+        case failedToTemporarilyCopyDatabase
     }
 
     private let chromiumLocalLoginDirectoryURL: URL
     private let chromiumGoogleAccountLoginDirectoryURL: URL
     private let processName: String
     private let decryptionKey: String?
+    private let decryptionKeyPrompt: ChromiumKeychainPrompting
 
     private static let sqlSelectWithPasswordTimestamp = "SELECT signon_realm, username_value, password_value, date_password_modified FROM logins;"
     private static let sqlSelectWithCreatedTimestamp = "SELECT signon_realm, username_value, password_value, date_created FROM logins;"
     private static let sqlSelectWithoutTimestamp = "SELECT signon_realm, username_value, password_value FROM logins;"
 
-    init(chromiumDataDirectoryURL: URL, processName: String, decryptionKey: String? = nil) {
+    init(chromiumDataDirectoryURL: URL,
+         processName: String,
+         decryptionKey: String? = nil,
+         decryptionKeyPrompt: ChromiumKeychainPrompting = ChromiumKeychainPrompt()) {
         self.chromiumLocalLoginDirectoryURL = chromiumDataDirectoryURL.appendingPathComponent("/Login Data")
         self.chromiumGoogleAccountLoginDirectoryURL = chromiumDataDirectoryURL.appendingPathComponent("/Login Data For Account")
         self.processName = processName
         self.decryptionKey = decryptionKey
+        self.decryptionKeyPrompt = decryptionKeyPrompt
     }
 
     func readLogins() -> Result<[ImportedLoginCredential], ChromiumLoginReader.ImportError> {
-        guard let key = self.decryptionKey ?? promptForChromiumPasswordKeychainAccess(), let derivedKey = deriveKey(from: key) else {
+        let key: String
+        
+        if let decryptionKey = decryptionKey {
+            key = decryptionKey
+        } else {
+            let keyPromptResult = decryptionKeyPrompt.promptForChromiumPasswordKeychainAccess(processName: processName)
+            
+            switch keyPromptResult {
+            case .password(let passwordString):
+                key = passwordString
+            case .failedToDecodePasswordData:
+                return .failure(.failedToDecodePasswordData)
+            case .userDeniedKeychainPrompt:
+                return .failure(.userDeniedKeychainPrompt)
+            case .keychainError(let status):
+                return .failure(.decryptionKeyAccessFailed(status))
+            }
+        }
+        
+        guard let derivedKey = deriveKey(from: key) else {
             return .failure(.decryptionFailed)
         }
 
@@ -133,29 +160,6 @@ final class ChromiumLoginReader {
         }
     }
 
-    // Step 1: Prompt for permission to access the user's Chromium Safe Storage key.
-    //         This value is stored in the keychain under "[BROWSER] Safe Storage", e.g. "Chrome Safe Storage".
-    private func promptForChromiumPasswordKeychainAccess() -> String? {
-        let key = "\(processName) Safe Storage"
-
-        let query = [
-            kSecClass as String: kSecClassGenericPassword,
-            kSecAttrLabel as String: key,
-            kSecReturnData as String: kCFBooleanTrue!,
-            kSecMatchLimit as String: kSecMatchLimitOne] as [String: Any]
-
-        var dataFromKeychain: AnyObject?
-        let status: OSStatus = SecItemCopyMatching(query as CFDictionary, &dataFromKeychain)
-
-        if status == noErr, let passwordData = dataFromKeychain as? Data, let password = String(data: passwordData, encoding: .utf8) {
-            return password
-        } else {
-            return nil
-        }
-    }
-
-    // Step 2: Derive the decryption key from the Chromium Safe Storage key.
-    //         This step uses fixed salt and iteration values that are hardcoded in Chromium.
     private func deriveKey(from password: String) -> Data? {
         return Cryptography.decryptPBKDF2(password: .utf8(password),
                                           salt: "saltysalt".data(using: .utf8)!,
@@ -164,7 +168,6 @@ final class ChromiumLoginReader {
                                           kdf: .sha1)
     }
 
-    // Step 3: Decrypt password values from the credential database.
     private func decrypt(passwordData: Data, with key: Data) -> String? {
         guard passwordData.count >= 4 else {
             return nil
