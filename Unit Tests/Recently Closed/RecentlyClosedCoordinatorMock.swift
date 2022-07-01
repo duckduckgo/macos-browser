@@ -20,7 +20,7 @@ import XCTest
 import BrowserServicesKit
 @testable import DuckDuckGo_Privacy_Browser
 
-final class RecentlyClosedCoordinatorMock: RecentlyClosedCoordinatorProtocol {
+final class RecentlyClosedCoordinatorMock: RecentlyClosedCoordinating {
 
     var cache: [RecentlyClosedCacheItem] = []
 

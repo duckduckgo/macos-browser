@@ -86,7 +86,7 @@ final class Fire {
     let faviconManagement: FaviconManagement
     let autoconsentManagement: AutoconsentManagement?
     let stateRestorationManager: AppStateRestorationManager?
-    let recentlyClosedCoordinator: RecentlyClosedCoordinatorProtocol?
+    let recentlyClosedCoordinator: RecentlyClosedCoordinating?
     
     let tabsCleaner = TabDataCleaner()
 
@@ -104,7 +104,7 @@ final class Fire {
          faviconManagement: FaviconManagement = FaviconManager.shared,
          autoconsentManagement: AutoconsentManagement? = nil,
          stateRestorationManager: AppStateRestorationManager? = nil,
-         recentlyClosedCoordinator: RecentlyClosedCoordinatorProtocol? = RecentlyClosedCoordinator.shared) {
+         recentlyClosedCoordinator: RecentlyClosedCoordinating? = RecentlyClosedCoordinator.shared) {
         self.webCacheManager = cacheManager
         self.historyCoordinating = historyCoordinating
         self.permissionManager = permissionManager

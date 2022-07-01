@@ -28,13 +28,13 @@ final class RecentlyClosedMenu: NSMenu {
         fatalError("RecentlyClosedMenu: Bad initializer")
     }
 
-    init(recentlyClosedCoordinator: RecentlyClosedCoordinatorProtocol) {
+    init(recentlyClosedCoordinator: RecentlyClosedCoordinating) {
         super.init(title: "Recently Closed")
 
         initMenuItems(recentlyClosedCoordinator: recentlyClosedCoordinator)
     }
 
-    private func initMenuItems(recentlyClosedCoordinator: RecentlyClosedCoordinatorProtocol) {
+    private func initMenuItems(recentlyClosedCoordinator: RecentlyClosedCoordinating) {
         var items = [NSMenuItem]()
 
         recentlyClosedCoordinator.cache.forEach({ cacheItem in
