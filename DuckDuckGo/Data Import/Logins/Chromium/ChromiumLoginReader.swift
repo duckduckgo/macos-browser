@@ -73,6 +73,10 @@ final class ChromiumLoginReader {
             return .failure(.decryptionFailed)
         }
 
+        return readLogins(using: derivedKey)
+    }
+    
+    private func readLogins(using key: Data) -> Result<[ImportedLoginCredential], ChromiumLoginReader.ImportError> {
         let loginFileURLs = [chromiumLocalLoginDirectoryURL, chromiumGoogleAccountLoginDirectoryURL]
             .filter { FileManager.default.fileExists(atPath: $0.path) }
 
@@ -99,7 +103,7 @@ final class ChromiumLoginReader {
             }
         }
 
-        let importedLogins = createImportedLoginCredentials(from: loginRows.values, decryptionKey: derivedKey)
+        let importedLogins = createImportedLoginCredentials(from: loginRows.values, decryptionKey: key)
         return .success(importedLogins)
     }
     
