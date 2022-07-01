@@ -33,7 +33,12 @@ extension TabCollectionViewModel: NSSecureCoding {
         else {
             return nil
         }
-        let isPinned = coder.decodeIfPresent(at: NSSecureCodingKeys.isPinned) ?? false
+        let isPinned: Bool = {
+            if coder.containsValue(forKey: NSSecureCodingKeys.isPinned) {
+                return coder.decodeBool(forKey: NSSecureCodingKeys.isPinned)
+            }
+            return false
+        }()
         let index = coder.decodeIfPresent(at: NSSecureCodingKeys.selectionIndex) ?? 0
         let selectionIndex: SelectedTabIndex = isPinned ? .pinned(index) : .regular(index)
         self.init(tabCollection: tabCollection, selectionIndex: selectionIndex)

@@ -78,11 +78,8 @@ extension NSBezierPath {
             }
         }
 
-        let adjustedWidth = rect.width - cornerRadius * 2
-        assert(adjustedWidth > 0)
-
-        let adjustedHeight = rect.height - cornerRadius * 2
-        assert(adjustedHeight > 0)
+        let adjustedWidth = max(0, rect.width - cornerRadius * 2)
+        let adjustedHeight = max(0, rect.height - cornerRadius * 2)
 
         let p1 = rect.origin.adjustingX(cornerRadius)
         let p2 = p1.adjustingX(adjustedWidth)

@@ -532,6 +532,10 @@ extension MainViewController {
         store.deleteExistingMetadata()
     }
 
+    @IBAction func resetPinnedTabs(_ sender: Any?) {
+        WindowControllersManager.shared.pinnedTabsManager.tabCollection.removeAll()
+    }
+
     @IBAction func showSaveCredentialsPopover(_ sender: Any?) {
         #if DEBUG || REVIEW
         NotificationCenter.default.post(name: .ShowSaveCredentialsPopover, object: nil)

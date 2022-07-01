@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<document type="com.apple.InterfaceBuilder3.Cocoa.Storyboard.XIB" version="3.0" toolsVersion="19529" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES" initialViewController="uSf-9n-QMw">
+<document type="com.apple.InterfaceBuilder3.Cocoa.Storyboard.XIB" version="3.0" toolsVersion="20037" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES" initialViewController="uSf-9n-QMw">
     <dependencies>
         <deployment identifier="macosx"/>
-        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="19529"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="20037"/>
         <capability name="Named colors" minToolsVersion="9.0"/>
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
     </dependencies>
@@ -36,6 +36,12 @@
                             </visualEffectView>
                             <customView translatesAutoresizingMaskIntoConstraints="NO" id="efe-Pc-ueP" userLabel="Window Dragging View" customClass="WindowDraggingView" customModule="DuckDuckGo_Privacy_Browser" customModuleProvider="target">
                                 <rect key="frame" x="0.0" y="0.0" width="845" height="40"/>
+                            </customView>
+                            <customView translatesAutoresizingMaskIntoConstraints="NO" id="G3c-kC-Gu9">
+                                <rect key="frame" x="76" y="1" width="0.0" height="34"/>
+                                <constraints>
+                                    <constraint firstAttribute="width" placeholder="YES" id="WbS-dd-RX8"/>
+                                </constraints>
                             </customView>
                             <stackView distribution="fillEqually" orientation="horizontal" alignment="top" spacing="0.0" horizontalStackHuggingPriority="249.99998474121094" verticalStackHuggingPriority="249.99998474121094" detachesHiddenViews="YES" translatesAutoresizingMaskIntoConstraints="NO" id="kOb-4q-pAe">
                                 <rect key="frame" x="76" y="18" width="0.0" height="0.0"/>
@@ -230,7 +236,6 @@
                         <constraints>
                             <constraint firstAttribute="trailing" secondItem="8Av-Au-VBq" secondAttribute="trailing" id="04T-2h-lX4"/>
                             <constraint firstItem="efe-Pc-ueT" firstAttribute="leading" secondItem="O0X-yp-zLn" secondAttribute="leading" priority="250" id="5k3-uY-xby"/>
-                            <constraint firstItem="kOb-4q-pAe" firstAttribute="leading" secondItem="JQD-ov-FCr" secondAttribute="leading" constant="76" id="8CU-j8-UY3"/>
                             <constraint firstAttribute="bottom" secondItem="O0X-yp-zLn" secondAttribute="bottom" constant="1" id="9nu-uZ-CjI"/>
                             <constraint firstItem="u4N-Qc-LMf" firstAttribute="trailing" secondItem="O0X-yp-zLn" secondAttribute="trailing" id="Bd1-0P-xDt"/>
                             <constraint firstItem="zsA-or-9Xo" firstAttribute="top" secondItem="JQD-ov-FCr" secondAttribute="top" id="CKr-JO-cA6"/>
@@ -245,13 +250,17 @@
                             <constraint firstAttribute="trailing" secondItem="dN1-y1-5Xe" secondAttribute="trailing" constant="12" id="SiM-7u-jTo"/>
                             <constraint firstItem="efe-Pc-ueP" firstAttribute="leading" secondItem="JQD-ov-FCr" secondAttribute="leading" id="UBO-rv-mb4"/>
                             <constraint firstItem="8Av-Au-VBq" firstAttribute="top" secondItem="JQD-ov-FCr" secondAttribute="top" id="UNA-xd-vb7"/>
+                            <constraint firstItem="G3c-kC-Gu9" firstAttribute="leading" secondItem="JQD-ov-FCr" secondAttribute="leading" constant="76" id="a7p-a2-dhE"/>
+                            <constraint firstItem="O0X-yp-zLn" firstAttribute="height" secondItem="G3c-kC-Gu9" secondAttribute="height" id="adx-La-J2Q"/>
                             <constraint firstItem="O0X-yp-zLn" firstAttribute="leading" secondItem="zsA-or-9Xo" secondAttribute="leading" id="bIL-4K-ggG"/>
                             <constraint firstItem="8Av-Au-VBq" firstAttribute="leading" secondItem="JQD-ov-FCr" secondAttribute="leading" id="djE-ZR-Zcb"/>
                             <constraint firstAttribute="trailing" secondItem="efe-Pc-ueP" secondAttribute="trailing" id="etm-VT-0k2"/>
                             <constraint firstItem="dN1-y1-5Xe" firstAttribute="leading" secondItem="efe-Pc-ueT" secondAttribute="trailing" id="hWs-AC-dwE"/>
                             <constraint firstAttribute="bottom" secondItem="efe-Pc-ueP" secondAttribute="bottom" id="iYT-Di-UlL"/>
                             <constraint firstItem="efe-Pc-ueT" firstAttribute="top" secondItem="JQD-ov-FCr" secondAttribute="top" priority="750" id="kNA-2I-L0U"/>
+                            <constraint firstAttribute="bottom" secondItem="G3c-kC-Gu9" secondAttribute="bottom" constant="1" id="lTF-M0-ybw"/>
                             <constraint firstAttribute="bottom" secondItem="8Av-Au-VBq" secondAttribute="bottom" id="pat-VC-dVb"/>
+                            <constraint firstItem="kOb-4q-pAe" firstAttribute="leading" secondItem="G3c-kC-Gu9" secondAttribute="trailing" id="qU6-dU-yJw"/>
                             <constraint firstItem="u4N-Qc-LMf" firstAttribute="top" secondItem="JQD-ov-FCr" secondAttribute="top" id="zB8-BE-pJR"/>
                         </constraints>
                     </view>
@@ -259,9 +268,10 @@
                         <outlet property="collectionView" destination="OEu-5P-cRF" id="b95-c4-JM0"/>
                         <outlet property="draggingSpace" destination="Ako-KX-AM9" id="yya-hb-te7"/>
                         <outlet property="fireButton" destination="XV4-Ze-5j7" id="ZCC-wX-7hC"/>
-                        <outlet property="leadingStackViewLeadingConstraint" destination="8CU-j8-UY3" id="qi2-Cw-RTu"/>
                         <outlet property="leftScrollButton" destination="7XG-Qm-Ksx" id="yre-8P-vb9"/>
                         <outlet property="leftShadowImageView" destination="zsA-or-9Xo" id="wVp-jj-2UD"/>
+                        <outlet property="pinnedTabsContainerView" destination="G3c-kC-Gu9" id="v78-CF-sIa"/>
+                        <outlet property="pinnedTabsViewLeadingConstraint" destination="a7p-a2-dhE" id="0hK-dY-o7E"/>
                         <outlet property="plusButton" destination="qXs-b0-tWI" id="cI1-G5-Plf"/>
                         <outlet property="rightScrollButton" destination="2da-G7-xcP" id="4ka-kI-E1j"/>
                         <outlet property="rightShadowImageView" destination="u4N-Qc-LMf" id="QX4-lD-gfb"/>

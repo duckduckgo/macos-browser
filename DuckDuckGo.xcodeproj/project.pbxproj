@@ -48,6 +48,9 @@
 		37AFCE9227DB8CAD00471A10 /* PreferencesAboutView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37AFCE9127DB8CAD00471A10 /* PreferencesAboutView.swift */; };
 		37B11B3928095E6600CBB621 /* TabLazyLoader.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37B11B3828095E6600CBB621 /* TabLazyLoader.swift */; };
 		37BF3F14286D8A6500BD9014 /* PinnedTabsManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37BF3F13286D8A6500BD9014 /* PinnedTabsManager.swift */; };
+		37BF3F21286F0A7A00BD9014 /* PinnedTabsModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37BF3F1E286F0A7A00BD9014 /* PinnedTabsModel.swift */; };
+		37BF3F22286F0A7A00BD9014 /* PinnedTabsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37BF3F1F286F0A7A00BD9014 /* PinnedTabsView.swift */; };
+		37BF3F24286F0AAE00BD9014 /* View+RoundedCorners.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37BF3F23286F0AAE00BD9014 /* View+RoundedCorners.swift */; };
 		37CC53EC27E8A4D10028713D /* PreferencesPrivacyView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37CC53EB27E8A4D10028713D /* PreferencesPrivacyView.swift */; };
 		37CC53F027E8D1440028713D /* PreferencesDownloadsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37CC53EF27E8D1440028713D /* PreferencesDownloadsView.swift */; };
 		37CC53F427E8D4620028713D /* NSPathControlView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37CC53F327E8D4620028713D /* NSPathControlView.swift */; };
@@ -819,6 +822,9 @@
 		37AFCE9127DB8CAD00471A10 /* PreferencesAboutView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PreferencesAboutView.swift; sourceTree = "<group>"; };
 		37B11B3828095E6600CBB621 /* TabLazyLoader.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TabLazyLoader.swift; sourceTree = "<group>"; };
 		37BF3F13286D8A6500BD9014 /* PinnedTabsManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PinnedTabsManager.swift; sourceTree = "<group>"; };
+		37BF3F1E286F0A7A00BD9014 /* PinnedTabsModel.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PinnedTabsModel.swift; sourceTree = "<group>"; };
+		37BF3F1F286F0A7A00BD9014 /* PinnedTabsView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PinnedTabsView.swift; sourceTree = "<group>"; };
+		37BF3F23286F0AAE00BD9014 /* View+RoundedCorners.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "View+RoundedCorners.swift"; sourceTree = "<group>"; };
 		37CC53EB27E8A4D10028713D /* PreferencesPrivacyView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PreferencesPrivacyView.swift; sourceTree = "<group>"; };
 		37CC53EF27E8D1440028713D /* PreferencesDownloadsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PreferencesDownloadsView.swift; sourceTree = "<group>"; };
 		37CC53F327E8D4620028713D /* NSPathControlView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NSPathControlView.swift; sourceTree = "<group>"; };
@@ -1649,9 +1655,19 @@
 		37BF3F12286D8A4B00BD9014 /* Pinned Tabs */ = {
 			isa = PBXGroup;
 			children = (
+				37BF3F1C286F0A6100BD9014 /* View */,
 				37BF3F13286D8A6500BD9014 /* PinnedTabsManager.swift */,
 			);
 			path = "Pinned Tabs";
+			sourceTree = "<group>";
+		};
+		37BF3F1C286F0A6100BD9014 /* View */ = {
+			isa = PBXGroup;
+			children = (
+				37BF3F1E286F0A7A00BD9014 /* PinnedTabsModel.swift */,
+				37BF3F1F286F0A7A00BD9014 /* PinnedTabsView.swift */,
+			);
+			path = View;
 			sourceTree = "<group>";
 		};
 		37CD54C027F2FDD100F1F7B9 /* Model */ = {
@@ -2272,6 +2288,7 @@
 				85707F2D276A394C00DC0649 /* ViewExtensions.swift */,
 				371E141827E92E42009E3B5B /* MultilineScrollableTextFix.swift */,
 				37CD54B227EE509700F1F7B9 /* View+Cursor.swift */,
+				37BF3F23286F0AAE00BD9014 /* View+RoundedCorners.swift */,
 				376705B227EC7D4F00DD8D76 /* TextButton.swift */,
 				37CC53F327E8D4620028713D /* NSPathControlView.swift */,
 				4B1E6EEF27AB5E5D00F51793 /* NSPopUpButtonView.swift */,
@@ -4577,6 +4594,7 @@
 				AA61C0D02722159B00E6B681 /* FireInfoViewController.swift in Sources */,
 				B64C85422694590B0048FEBE /* PermissionButton.swift in Sources */,
 				AAA0CC472533833C0079BC96 /* MoreOptionsMenu.swift in Sources */,
+				37BF3F24286F0AAE00BD9014 /* View+RoundedCorners.swift in Sources */,
 				B64C84E32692DC9F0048FEBE /* PermissionAuthorizationViewController.swift in Sources */,
 				4B92929D26670D2A00AD2C21 /* BookmarkNode.swift in Sources */,
 				B693955226F04BEB0015B914 /* LongPressButton.swift in Sources */,
@@ -4592,6 +4610,7 @@
 				4B8A4DFF27C83B29005F40E8 /* SaveIdentityViewController.swift in Sources */,
 				4BA1A69B258B076900F6F690 /* FileStore.swift in Sources */,
 				B6A9E47F26146A800067D1B9 /* PixelArguments.swift in Sources */,
+				37BF3F21286F0A7A00BD9014 /* PinnedTabsModel.swift in Sources */,
 				AAC5E4D225D6A709007F5990 /* BookmarkList.swift in Sources */,
 				4B9292D12667123700AD2C21 /* BookmarkTableRowView.swift in Sources */,
 				B66E9DD42670EB4A00E53BB5 /* WKDownload+WebKitDownload.swift in Sources */,
@@ -4662,6 +4681,7 @@
 				859E7D6B27453BF3009C2B69 /* BookmarksExporter.swift in Sources */,
 				4B5FF67826B602B100D42879 /* FirefoxDataImporter.swift in Sources */,
 				37AFCE8B27DB69BC00471A10 /* PreferencesGeneralView.swift in Sources */,
+				37BF3F22286F0A7A00BD9014 /* PinnedTabsView.swift in Sources */,
 				4B02198B25E05FAC00ED7DEA /* FireproofInfoViewController.swift in Sources */,
 				AA8EDF2424923E980071C2E8 /* URLExtension.swift in Sources */,
 				4BE0DF06267819A1006337B7 /* NSStoryboardExtension.swift in Sources */,

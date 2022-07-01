@@ -20,6 +20,7 @@ import Cocoa
 import os.log
 import Combine
 import Lottie
+import SwiftUI
 
 // swiftlint:disable file_length
 // swiftlint:disable type_body_length
@@ -27,14 +28,15 @@ import Lottie
 final class TabBarViewController: NSViewController {
 
     enum HorizontalSpace: CGFloat {
-        case leadingStackViewPadding = 76
+        case pinnedTabsScrollViewPadding = 76
         case button = 28
         case buttonPadding = 4
     }
 
+    @IBOutlet weak var pinnedTabsContainerView: NSView!
     @IBOutlet weak var collectionView: TabBarCollectionView!
     @IBOutlet weak var scrollView: TabBarScrollView!
-    @IBOutlet weak var leadingStackViewLeadingConstraint: NSLayoutConstraint!
+    @IBOutlet weak var pinnedTabsViewLeadingConstraint: NSLayoutConstraint!
     @IBOutlet weak var rightScrollButton: MouseOverButton!
     @IBOutlet weak var leftScrollButton: MouseOverButton!
     @IBOutlet weak var rightShadowImageView: NSImageView!
@@ -68,6 +70,33 @@ final class TabBarViewController: NSViewController {
         observeToScrollNotifications()
         subscribeToSelectionIndex()
         setupFireButton()
+        setupPinnedTabsView()
+    }
+
+    private func setupPinnedTabsView() {
+        var items: [PinnedTabModel] = []
+        for tab in WindowControllersManager.shared.pinnedTabsManager.tabCollection.tabs where tab.isUrl {
+            let model = PinnedTabModel()
+            model.url = tab.url
+            model.faviconImage = tab.favicon
+            items.append(model)
+        }
+        let pinnedTabsModel = PinnedTabsModel(items: items)
+        let pinnedTabsView = PinnedTabsView(model: pinnedTabsModel)
+        let host = NSHostingView(rootView: pinnedTabsView)
+        pinnedTabsContainerView.addAndLayout(host)
+
+        WindowControllersManager.shared.pinnedTabsManager.tabCollection.$tabs
+            .map { tabs -> [PinnedTabModel] in
+                tabs.map { tab in
+                    let model = PinnedTabModel()
+                    model.url = tab.url
+                    model.faviconImage = tab.favicon
+                    return model
+                }
+            }
+            .assign(to: \.items, on: pinnedTabsModel)
+            .store(in: &cancellables)
     }
 
     override func viewWillAppear() {
