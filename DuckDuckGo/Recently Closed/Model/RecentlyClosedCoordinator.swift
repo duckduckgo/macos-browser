@@ -38,6 +38,9 @@ final class RecentlyClosedCoordinator: RecentlyClosedCoordinating {
     init(windowControllerManager: WindowControllersManagerProtocol) {
         self.windowControllerManager = windowControllerManager
 
+        guard !AppDelegate.isRunningTests else {
+            return
+        }
         subscribeToWindowControllersManager()
     }
 
@@ -52,11 +55,11 @@ final class RecentlyClosedCoordinator: RecentlyClosedCoordinating {
     private var cancellables = Set<AnyCancellable>()
 
     private func subscribeToWindowControllersManager() {
-        mainVCDidRegisterCancellable = WindowControllersManager.shared.didRegisterWindowController
+        mainVCDidRegisterCancellable = windowControllerManager.didRegisterWindowController
             .sink(receiveValue: { [weak self] mainWindowController in
                 self?.subscribeToTabCollection(of: mainWindowController)
             })
-        mainVCDidUnregisterCancellable = WindowControllersManager.shared.didUnregisterWindowController
+        mainVCDidUnregisterCancellable = windowControllerManager.didUnregisterWindowController
             .sink(receiveValue: { [weak self] mainWindowController in
                 self?.cacheWindowContent(mainWindowController: mainWindowController)
             })
