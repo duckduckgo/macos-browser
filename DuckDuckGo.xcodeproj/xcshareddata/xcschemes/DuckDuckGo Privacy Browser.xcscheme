@@ -68,12 +68,6 @@
             </BuildableReference>
             <SkippedTests>
                <Test
-                  Identifier = "AppUsageActivityMonitorTests">
-               </Test>
-               <Test
-                  Identifier = "DeallocationTests">
-               </Test>
-               <Test
                   Identifier = "EncryptionKeyStoreTests">
                </Test>
                <Test
