@@ -22,7 +22,6 @@ struct BookmarkViewModel {
 
     let entity: BaseBookmarkEntity
 
-    static let maxMenuTitleLength = 55
     var menuTitle: String {
         let title: String
 
@@ -34,10 +33,10 @@ struct BookmarkViewModel {
             preconditionFailure("\(#file): Failed to case BaseBookmarkEntity to Bookmark or Folder")
         }
 
-        if title.count <= Self.maxMenuTitleLength {
+        if title.count <= MainMenu.Constants.maxTitleLength {
             return title
         } else {
-            return String(title.truncated(length: Self.maxMenuTitleLength))
+            return String(title.truncated(length: MainMenu.Constants.maxTitleLength))
         }
 
     }
