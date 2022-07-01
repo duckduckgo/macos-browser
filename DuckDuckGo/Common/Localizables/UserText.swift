@@ -34,6 +34,7 @@ struct UserText {
     static let pasteAndSearch = NSLocalizedString("paste.and.search", value: "Paste & Search", comment: "Paste & Search button")
 
     static let duplicateTab = NSLocalizedString("duplicate.tab", value: "Duplicate Tab", comment: "Menu item. Duplicate as a verb")
+    static let pinTab = NSLocalizedString("pin.tab", value: "Pin Tab", comment: "Menu item. Pin as a verb")
     static let closeTab = NSLocalizedString("close.tab", value: "Close Tab", comment: "Menu item")
     static let closeOtherTabs = NSLocalizedString("close.other.tabs", value: "Close Other Tabs", comment: "Menu item")
     static let closeTabsToTheRight = NSLocalizedString("close.tabs.to.the.right", value: "Close Tabs to the Right", comment: "Menu item")

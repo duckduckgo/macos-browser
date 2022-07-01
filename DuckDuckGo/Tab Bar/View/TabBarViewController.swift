@@ -761,6 +761,16 @@ extension TabBarViewController: TabBarViewItemDelegate {
         tabCollectionViewModel.duplicateTab(at: indexPath.item)
     }
 
+    func tabBarViewItemPinAction(_ tabBarViewItem: TabBarViewItem) {
+        guard let indexPath = collectionView.indexPath(for: tabBarViewItem) else {
+            os_log("TabBarViewController: Failed to get index path of tab bar view item", type: .error)
+            return
+        }
+
+        collectionView.clearSelection()
+        tabCollectionViewModel.pinTab(at: indexPath.item)
+    }
+
     func tabBarViewItemBookmarkThisPageAction(_ tabBarViewItem: TabBarViewItem) {
         guard let indexPath = collectionView.indexPath(for: tabBarViewItem),
               let tabViewModel = tabCollectionViewModel.tabViewModel(at: indexPath.item),
