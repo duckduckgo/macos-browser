@@ -191,7 +191,7 @@ final class TabBarViewController: NSViewController {
         }
 
         let tab = tabViewModel.tab
-        tabCollectionViewModel.remove(at: indexPath.item)
+        tabCollectionViewModel.remove(at: indexPath.item, published: false)
         WindowsManager.openNewWindow(with: tab, droppingPoint: droppingPoint)
     }
 
