@@ -38,30 +38,43 @@ struct PinnedTabView: View {
     }
 
     @ObservedObject var model: PinnedTabModel
+    @EnvironmentObject var collectionModel: PinnedTabsModel
     @State var isHovered: Bool = false
 
     var body: some View {
-        ZStack {
-            Rectangle()
-                .foregroundColor(isHovered ? Color("TabMouseOverColor") : Color.clear)
-            GeometryReader { proxy in
+        Button {
+            collectionModel.selectedItem = model
+        } label: {
+            ZStack {
                 Rectangle()
-                    .foregroundColor(Color("SeparatorColor"))
-                    .frame(width: 1, height: 20)
-                    .offset(x: proxy.size.width-1, y: 7)
-            }
-            if let image = model.faviconImage {
-                Image(nsImage: image)
-                    .resizable()
-                    .frame(maxWidth: 16, maxHeight: 16)
-                    .aspectRatio(contentMode: .fit)
+                    .foregroundColor(foregroundColor)
+                GeometryReader { proxy in
+                    Rectangle()
+                        .foregroundColor(Color("SeparatorColor"))
+                        .frame(width: 1, height: 20)
+                        .offset(x: proxy.size.width-1, y: 7)
+                }
+                if let image = model.faviconImage {
+                    Image(nsImage: image)
+                        .resizable()
+                        .frame(maxWidth: 16, maxHeight: 16)
+                        .aspectRatio(contentMode: .fit)
+                }
             }
         }
+        .buttonStyle(TouchDownButtonStyle())
         .frame(width: Const.dimension)
         .cornerRadius(6, corners: [.topLeft, .topRight])
         .onHover { isHovered in
             self.isHovered = isHovered
         }
+    }
+
+    var foregroundColor: Color {
+        if collectionModel.selectedItem == model {
+            return Color("InterfaceBackgroundColor")
+        }
+        return isHovered ? Color("TabMouseOverColor") : Color.clear
     }
 }
 
@@ -72,6 +85,7 @@ struct PinnedTabsView: View {
         HStack(alignment: .bottom, spacing: 0) {
             ForEach(model.items, id: \.self) { item in
                 PinnedTabView(model: item)
+                    .environmentObject(model)
             }
         }
         .frame(maxHeight: PinnedTabView.Const.dimension)

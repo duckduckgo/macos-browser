@@ -20,7 +20,7 @@ import Foundation
 
 final class PinnedTabsModel: ObservableObject {
     @Published var items: [PinnedTabModel]
-    @Published var selectedItemIndex: Int?
+    @Published var selectedItem: PinnedTabModel?
 
     init(items: [PinnedTabModel] = []) {
         self.items = items

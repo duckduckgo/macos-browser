@@ -74,14 +74,7 @@ final class TabBarViewController: NSViewController {
     }
 
     private func setupPinnedTabsView() {
-        var items: [PinnedTabModel] = []
-        for tab in WindowControllersManager.shared.pinnedTabsManager.tabCollection.tabs where tab.isUrl {
-            let model = PinnedTabModel()
-            model.url = tab.url
-            model.faviconImage = tab.favicon
-            items.append(model)
-        }
-        let pinnedTabsModel = PinnedTabsModel(items: items)
+        let pinnedTabsModel = PinnedTabsModel(items: [])
         let pinnedTabsView = PinnedTabsView(model: pinnedTabsModel)
         let host = NSHostingView(rootView: pinnedTabsView)
         pinnedTabsContainerView.addAndLayout(host)
@@ -96,6 +89,21 @@ final class TabBarViewController: NSViewController {
                 }
             }
             .assign(to: \.items, on: pinnedTabsModel)
+            .store(in: &cancellables)
+
+        tabCollectionViewModel.$selectionIndex
+            .filter { $0?.isRegularTab == true }
+            .map { _ in PinnedTabModel?.none }
+            .assign(to: \.selectedItem, on: pinnedTabsModel)
+            .store(in: &cancellables)
+
+        pinnedTabsModel.$selectedItem
+            .compactMap { $0.flatMap(pinnedTabsModel.items.firstIndex(of:)) }
+            .sink(receiveValue: { [weak self] index in
+                if self?.tabCollectionViewModel.selectPinnedTab(at: index) == true {
+                    self?.collectionView.clearSelection(animated: true)
+                }
+            })
             .store(in: &cancellables)
     }
 

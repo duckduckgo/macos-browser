@@ -29,7 +29,11 @@ protocol PinnedTabsManager {
 
 final class LocalPinnedTabsManager: PinnedTabsManager {
 
-    var tabCollection: TabCollection
+    var tabCollection: TabCollection {
+        didSet {
+            subscribeToPinnedTabs()
+        }
+    }
 
     func pin(_ tab: Tab) {
         tabCollection.append(tab: tab)
