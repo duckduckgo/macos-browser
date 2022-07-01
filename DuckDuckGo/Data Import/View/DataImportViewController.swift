@@ -414,9 +414,8 @@ final class DataImportViewController: NSViewController {
                 action: error.actionType.pixelEventAction,
                 source: viewState.selectedImportSource.pixelEventSource
             )
-
-            let parameters = ["error": error.errorType.rawValue]
-            Pixel.fire(pixel, withAdditionalParameters: parameters)
+            
+            Pixel.fire(pixel, withAdditionalParameters: error.errorType.errorParameters)
 
             let alert = NSAlert.importFailedAlert(source: viewState.selectedImportSource, linkDelegate: self)
             alert.beginSheetModal(for: window, completionHandler: nil)
