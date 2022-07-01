@@ -59,9 +59,6 @@ enum UserAgent {
     static let webViewDefault = ""
 
     static let domainUserAgents: KeyValuePairs<RegEx, String> = [
-        // fix broken spreadsheets
-        regex("https://docs\\.google\\.com/spreadsheets/.*"): UserAgent.chrome,
-
         // use safari when serving up PDFs from duckduckgo directly
         regex("https://duckduckgo\\.com/[^?]*\\.pdf"): UserAgent.safari,
 

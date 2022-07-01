@@ -111,6 +111,10 @@ would use this temporary storage for reading update info.
   to a temporary directory so that you could switch to an old branch that
   didn't have this script.
 
+**Important:** When testing a new feature, be sure to use interactive mode (`-i`)
+and create the first build from the main branch (to simulate upgrading from
+a previous release).
+
 ### Requirements
 
 #### ngrok

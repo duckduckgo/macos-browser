@@ -29,7 +29,7 @@ final class RecentlyVisitedModel: ObservableObject {
         return f
     } ()
 
-    private let fire = Fire()
+    private let fire: Fire
 
     @UserDefaultsWrapper(key: .homePageShowPagesOnHover, defaultValue: false)
     private static var showPagesOnHoverSetting: Bool
@@ -44,8 +44,10 @@ final class RecentlyVisitedModel: ObservableObject {
 
     let open: (URL) -> Void
 
-    init(open: @escaping (URL) -> Void) {
+    init(open: @escaping (URL) -> Void,
+         fire: Fire = FireCoordinator.fireViewModel.fire) {
         self.open = open
+        self.fire = fire
         showPagesOnHover = Self.showPagesOnHoverSetting
     }
 
