@@ -26,7 +26,9 @@ enum ChromiumKeychainPromptResult {
 }
 
 protocol ChromiumKeychainPrompting {
+
     func promptForChromiumPasswordKeychainAccess(processName: String) -> ChromiumKeychainPromptResult
+
 }
 
 final class ChromiumKeychainPrompt: ChromiumKeychainPrompting {

@@ -249,7 +249,7 @@ struct DataImportError: Error, Equatable {
     enum ImportErrorType: Equatable {
         case noFileFound
         case cannotReadFile
-        case userDeniedPrompt
+        case userDeniedKeychainPrompt
         case couldNotFindProfile
         case needsLoginPrimaryPassword
         case cannotAccessSecureVault
@@ -265,7 +265,7 @@ struct DataImportError: Error, Equatable {
             case .couldNotAccessKeychain: return "couldNotAccessKeychain"
             case .noFileFound,
                     .cannotReadFile,
-                    .userDeniedPrompt,
+                    .userDeniedKeychainPrompt,
                     .couldNotFindProfile,
                     .needsLoginPrimaryPassword,
                     .cannotAccessSecureVault,
@@ -284,7 +284,7 @@ struct DataImportError: Error, Equatable {
             case .couldNotAccessKeychain(let status): parameters["keychainErrorCode"] = String(status)
             case .noFileFound,
                     .cannotReadFile,
-                    .userDeniedPrompt,
+                    .userDeniedKeychainPrompt,
                     .couldNotFindProfile,
                     .needsLoginPrimaryPassword,
                     .cannotAccessSecureVault,
@@ -343,7 +343,7 @@ struct DataImportError: Error, Equatable {
         case .failedToTemporarilyCopyDatabase: return DataImportError(actionType: .logins, errorType: .failedToTemporarilyCopyFile)
         case .decryptionFailed: return DataImportError(actionType: .logins, errorType: .cannotReadFile)
         case .failedToDecodePasswordData: return DataImportError(actionType: .logins, errorType: .cannotReadFile)
-        case .userDeniedKeychainPrompt: return DataImportError(actionType: .logins, errorType: .userDeniedPrompt)
+        case .userDeniedKeychainPrompt: return DataImportError(actionType: .logins, errorType: .userDeniedKeychainPrompt)
         }
     }
     
