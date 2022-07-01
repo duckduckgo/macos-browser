@@ -709,7 +709,7 @@ final class LocalBookmarkStore: BookmarkStore {
                 
                 try context.save()
             } catch {
-                // TODO: Handle error
+                // Handle error
             }
         }
     }

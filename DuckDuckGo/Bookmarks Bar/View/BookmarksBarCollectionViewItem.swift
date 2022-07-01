@@ -135,7 +135,7 @@ extension BookmarksBarCollectionViewItem {
             openBookmarkInNewTabMenuItem(),
             openBookmarkInNewWindowMenuItem(),
             NSMenuItem.separator(),
-            toggleBookmarkAsFavoriteMenuItem(isFavorite: isFavorite),
+            toggleBookmarkAsFavoriteMenuItem(isFavorite: isFavorite)
         ]
         
 //

@@ -267,8 +267,7 @@ extension BookmarksBarViewController: FolderMenuItemSelectors {
     
     func newFolder(_ sender: NSMenuItem) {
         let addFolderViewController = AddFolderModalViewController.create()
-        // TODO
-        // addFolderViewController.delegate = self
+        // addFolderViewController.delegate = self TODO
         beginSheet(addFolderViewController)
     }
     
@@ -279,8 +278,7 @@ extension BookmarksBarViewController: FolderMenuItemSelectors {
         }
         
         let addFolderViewController = AddFolderModalViewController.create()
-        // TODO
-        // addFolderViewController.delegate = self
+        // addFolderViewController.delegate = self TODO
         addFolderViewController.edit(folder: folder)
         presentAsModalWindow(addFolderViewController)
     }

@@ -180,7 +180,10 @@ extension BookmarksBarViewModel: NSCollectionViewDelegate, NSCollectionViewDataS
         return imageView
     }
     
-    func collectionView(_ collectionView: NSCollectionView, draggingImageForItemsAt indexes: IndexSet, with event: NSEvent, offset dragImageOffset: NSPointPointer) -> NSImage {
+    func collectionView(_ collectionView: NSCollectionView,
+                        draggingImageForItemsAt indexes: IndexSet,
+                        with event: NSEvent,
+                        offset dragImageOffset: NSPointPointer) -> NSImage {
         return NSImage()
     }
     
@@ -264,22 +267,29 @@ extension BookmarksBarViewModel: NSCollectionViewDelegate, NSCollectionViewDataS
                 item = newIndexPath.item
             }
 
-            let existingItem = self.bookmarksBarItems[existingIndexPath.item].title
-            let itemAtCurrentSpot = self.bookmarksBarItems[item].title
+            // let existingItem = self.bookmarksBarItems[existingIndexPath.item].title
+            // let itemAtCurrentSpot = self.bookmarksBarItems[item].title
             
             self.bookmarksBarItems.rearrange(from: existingIndexPath.item, to: newIndexPath.item)
             collectionView.animator().moveItem(at: existingIndexPath, to: IndexPath(item: item, section: 0))
             existingItemDraggingIndexPath = nil
             
             self.bookmarkManager.move(objectUUID: entityUUID, toIndexWithinParentFolder: item) { _ in
-                // TODO: If error, reload the bar completely?
+                // If error, reload the bar completely?
             }
 
             return true
         } else {
             print("Adding new bookmark")
             
-            return false
+            guard let item = draggingInfo.draggingPasteboard.pasteboardItems?.first, let draggedItemData = titleAndURL(from: item) else {
+                print("No dragged items")
+                return false
+            }
+            
+            self.bookmarkManager.makeBookmark(for: draggedItemData.url, title: draggedItemData.title, isFavorite: false, index: newIndexPath.item)
+            
+            return true
         }
     }
     
