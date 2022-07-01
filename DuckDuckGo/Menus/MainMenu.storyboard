@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<document type="com.apple.InterfaceBuilder3.Cocoa.Storyboard.XIB" version="3.0" toolsVersion="20037" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES">
+<document type="com.apple.InterfaceBuilder3.Cocoa.Storyboard.XIB" version="3.0" toolsVersion="19529" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES">
     <dependencies>
         <deployment identifier="macosx"/>
-        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="20037"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="19529"/>
     </dependencies>
     <scenes>
         <!--Application-->
@@ -468,63 +468,10 @@ CA
                                     </items>
                                 </menu>
                             </menuItem>
-                            <menuItem title="Bookmarks" id="xf8-PW-TOA">
+                            <menuItem title="History" id="aVY-po-b3d">
                                 <modifierMask key="keyEquivalentModifierMask"/>
-                                <menu key="submenu" title="Bookmarks" id="AGQ-XC-31O">
+                                <menu key="submenu" title="History" id="SLT-Z6-mh7">
                                     <items>
-                                        <menuItem title="Bookmark This Page..." enabled="NO" keyEquivalent="d" id="Nkm-zy-JXD">
-                                            <connections>
-                                                <action selector="bookmarkThisPage:" target="Ady-hI-5gd" id="Mah-44-bE1"/>
-                                            </connections>
-                                        </menuItem>
-                                        <menuItem title="Manage Bookmarks" id="BaO-sP-wbQ">
-                                            <modifierMask key="keyEquivalentModifierMask"/>
-                                            <connections>
-                                                <action selector="showManageBookmarks:" target="Ady-hI-5gd" id="meV-V2-zJ2"/>
-                                            </connections>
-                                        </menuItem>
-                                        <menuItem isSeparatorItem="YES" id="aPG-H0-BrG"/>
-                                        <menuItem title="Import Bookmarks and Passwords..." id="tNX-Bv-yM3" userLabel="Import Bookmarks...">
-                                            <modifierMask key="keyEquivalentModifierMask"/>
-                                            <connections>
-                                                <action selector="openImportBrowserDataWindow:" target="Ady-hI-5gd" id="NdE-Lt-CL5"/>
-                                            </connections>
-                                        </menuItem>
-                                        <menuItem isSeparatorItem="YES" id="xsn-Ak-LSd"/>
-                                        <menuItem title="Favorites" image="Favorite" id="Y9I-ZC-gGg">
-                                            <modifierMask key="keyEquivalentModifierMask"/>
-                                            <menu key="submenu" id="Nxf-cs-uVD">
-                                                <items>
-                                                    <menuItem title="Favorite This Page..." image="Favorite" enabled="NO" id="cHZ-Fb-aKU">
-                                                        <modifierMask key="keyEquivalentModifierMask"/>
-                                                        <connections>
-                                                            <action selector="favoriteThisPage:" target="Ady-hI-5gd" id="wPO-TZ-mVB"/>
-                                                        </connections>
-                                                    </menuItem>
-                                                    <menuItem isSeparatorItem="YES" tag="521" id="eL9-aR-XDR"/>
-                                                </items>
-                                            </menu>
-                                        </menuItem>
-                                        <menuItem isSeparatorItem="YES" tag="53" id="s02-vH-KA3"/>
-                                    </items>
-                                </menu>
-                            </menuItem>
-                            <menuItem title="Window" id="aUF-d1-5bR">
-                                <modifierMask key="keyEquivalentModifierMask"/>
-                                <menu key="submenu" title="Window" systemMenu="window" id="Td7-aD-5lo">
-                                    <items>
-                                        <menuItem title="Minimize" keyEquivalent="m" id="OY7-WF-poV">
-                                            <connections>
-                                                <action selector="performMiniaturize:" target="Ady-hI-5gd" id="VwT-WD-YPe"/>
-                                            </connections>
-                                        </menuItem>
-                                        <menuItem title="Zoom" id="R4o-n2-Eq4">
-                                            <modifierMask key="keyEquivalentModifierMask"/>
-                                            <connections>
-                                                <action selector="performZoom:" target="Ady-hI-5gd" id="DIl-cC-cCs"/>
-                                            </connections>
-                                        </menuItem>
-                                        <menuItem isSeparatorItem="YES" id="eu3-7i-yIM"/>
                                         <menuItem title="Show Previous Tab" id="xkB-bY-Afr">
                                             <string key="keyEquivalent" base64-UTF8="YES">
 GQ
@@ -612,6 +559,83 @@ CQ
                                                 <action selector="showTab:" target="Ady-hI-5gd" id="JqA-RD-GZA"/>
                                             </connections>
                                         </menuItem>
+                                        <menuItem isSeparatorItem="YES" id="BiH-Kk-Mam"/>
+                                        <menuItem title="Reopen Last Closed Tab" enabled="NO" id="c3l-v1-kxk">
+                                            <modifierMask key="keyEquivalentModifierMask"/>
+                                            <connections>
+                                                <action selector="reopenLastClosedTab:" target="Ady-hI-5gd" id="jzQ-2q-HGB"/>
+                                            </connections>
+                                        </menuItem>
+                                        <menuItem title="Recently Closed" id="pWT-lm-yTC">
+                                            <modifierMask key="keyEquivalentModifierMask"/>
+                                            <menu key="submenu" id="f0J-Yk-EaI"/>
+                                        </menuItem>
+                                        <menuItem title="Reopen All Windows from Last Session" enabled="NO" id="C6V-uF-uX8">
+                                            <modifierMask key="keyEquivalentModifierMask"/>
+                                            <connections>
+                                                <action selector="reopenAllWindowsFromLastSession:" target="Ady-hI-5gd" id="Ppr-eX-00b"/>
+                                            </connections>
+                                        </menuItem>
+                                    </items>
+                                </menu>
+                            </menuItem>
+                            <menuItem title="Bookmarks" id="xf8-PW-TOA">
+                                <modifierMask key="keyEquivalentModifierMask"/>
+                                <menu key="submenu" title="Bookmarks" id="AGQ-XC-31O">
+                                    <items>
+                                        <menuItem title="Bookmark This Page..." enabled="NO" keyEquivalent="d" id="Nkm-zy-JXD">
+                                            <connections>
+                                                <action selector="bookmarkThisPage:" target="Ady-hI-5gd" id="Mah-44-bE1"/>
+                                            </connections>
+                                        </menuItem>
+                                        <menuItem title="Manage Bookmarks" id="BaO-sP-wbQ">
+                                            <modifierMask key="keyEquivalentModifierMask"/>
+                                            <connections>
+                                                <action selector="showManageBookmarks:" target="Ady-hI-5gd" id="meV-V2-zJ2"/>
+                                            </connections>
+                                        </menuItem>
+                                        <menuItem isSeparatorItem="YES" id="aPG-H0-BrG"/>
+                                        <menuItem title="Import Bookmarks and Passwords..." id="tNX-Bv-yM3" userLabel="Import Bookmarks...">
+                                            <modifierMask key="keyEquivalentModifierMask"/>
+                                            <connections>
+                                                <action selector="openImportBrowserDataWindow:" target="Ady-hI-5gd" id="NdE-Lt-CL5"/>
+                                            </connections>
+                                        </menuItem>
+                                        <menuItem isSeparatorItem="YES" id="xsn-Ak-LSd"/>
+                                        <menuItem title="Favorites" image="Favorite" id="Y9I-ZC-gGg">
+                                            <modifierMask key="keyEquivalentModifierMask"/>
+                                            <menu key="submenu" id="Nxf-cs-uVD">
+                                                <items>
+                                                    <menuItem title="Favorite This Page..." image="Favorite" enabled="NO" id="cHZ-Fb-aKU">
+                                                        <modifierMask key="keyEquivalentModifierMask"/>
+                                                        <connections>
+                                                            <action selector="favoriteThisPage:" target="Ady-hI-5gd" id="wPO-TZ-mVB"/>
+                                                        </connections>
+                                                    </menuItem>
+                                                    <menuItem isSeparatorItem="YES" tag="521" id="eL9-aR-XDR"/>
+                                                </items>
+                                            </menu>
+                                        </menuItem>
+                                        <menuItem isSeparatorItem="YES" tag="53" id="s02-vH-KA3"/>
+                                    </items>
+                                </menu>
+                            </menuItem>
+                            <menuItem title="Window" id="aUF-d1-5bR">
+                                <modifierMask key="keyEquivalentModifierMask"/>
+                                <menu key="submenu" title="Window" systemMenu="window" id="Td7-aD-5lo">
+                                    <items>
+                                        <menuItem title="Minimize" keyEquivalent="m" id="OY7-WF-poV">
+                                            <connections>
+                                                <action selector="performMiniaturize:" target="Ady-hI-5gd" id="VwT-WD-YPe"/>
+                                            </connections>
+                                        </menuItem>
+                                        <menuItem title="Zoom" id="R4o-n2-Eq4">
+                                            <modifierMask key="keyEquivalentModifierMask"/>
+                                            <connections>
+                                                <action selector="performZoom:" target="Ady-hI-5gd" id="DIl-cC-cCs"/>
+                                            </connections>
+                                        </menuItem>
+                                        <menuItem isSeparatorItem="YES" id="pC4-EZ-Df8"/>
                                         <menuItem title="Move Tab to New Window" id="8LN-7f-htp">
                                             <modifierMask key="keyEquivalentModifierMask"/>
                                             <connections>
@@ -624,27 +648,13 @@ CQ
                                                 <action selector="mergeAllWindows:" target="Ady-hI-5gd" id="Jz6-se-61Z"/>
                                             </connections>
                                         </menuItem>
-                                        <menuItem isSeparatorItem="YES" id="BiH-Kk-Mam"/>
-                                        <menuItem title="Reopen Last Closed Tab" enabled="NO" id="c3l-v1-kxk">
-                                            <modifierMask key="keyEquivalentModifierMask"/>
-                                            <connections>
-                                                <action selector="reopenLastClosedTab:" target="Ady-hI-5gd" id="jzQ-2q-HGB"/>
-                                            </connections>
-                                        </menuItem>
-                                        <menuItem title="Reopen All Windows from Last Session" enabled="NO" id="C6V-uF-uX8">
-                                            <modifierMask key="keyEquivalentModifierMask"/>
-                                            <connections>
-                                                <action selector="reopenAllWindowsFromLastSession:" target="Ady-hI-5gd" id="Ppr-eX-00b"/>
-                                            </connections>
-                                        </menuItem>
-                                        <menuItem isSeparatorItem="YES" id="pC4-EZ-Df8"/>
+                                        <menuItem isSeparatorItem="YES" id="xBA-Iw-nYf"/>
                                         <menuItem title="Bring All to Front" id="LE2-aR-0XJ">
                                             <modifierMask key="keyEquivalentModifierMask"/>
                                             <connections>
                                                 <action selector="arrangeInFront:" target="Ady-hI-5gd" id="DRN-fu-gQh"/>
                                             </connections>
                                         </menuItem>
-                                        <menuItem isSeparatorItem="YES" id="NnU-b2-poS"/>
                                     </items>
                                 </menu>
                             </menuItem>
@@ -766,9 +776,10 @@ CQ
                             <outlet property="preferencesMenuItem" destination="yD7-Ol-cRF" id="f58-zA-Auu"/>
                             <outlet property="printMenuItem" destination="uFk-FD-FTB" id="mOP-Xp-myS"/>
                             <outlet property="printSeparatorItem" destination="anH-0y-7dE" id="E6b-rl-clQ"/>
+                            <outlet property="recentlyClosedMenuItem" destination="pWT-lm-yTC" id="xue-50-IzM"/>
                             <outlet property="reloadMenuItem" destination="aKZ-VG-MOp" id="J3D-X3-Xg3"/>
                             <outlet property="reopenAllWindowsFromLastSessionMenuItem" destination="C6V-uF-uX8" id="WVJ-17-v1S"/>
-                            <outlet property="reopenLastClosedTabMenuItem" destination="c3l-v1-kxk" id="eGw-Dg-del"/>
+                            <outlet property="reopenLastClosedMenuItem" destination="c3l-v1-kxk" id="eGw-Dg-del"/>
                             <outlet property="sendFeedbackMenuItem" destination="V8t-Ts-q0L" id="qwz-Oh-HGm"/>
                             <outlet property="shareMenuItem" destination="kUE-Qf-cwa" id="kEZ-Kc-Wf4"/>
                             <outlet property="stopMenuItem" destination="FyY-q1-f0k" id="BFN-Kd-aAb"/>
@@ -781,6 +792,19 @@ CQ
                         <outlet property="delegate" destination="Voe-Tx-rLC" id="PrD-fu-P6m"/>
                     </connections>
                 </application>
+                <menu id="013-wG-YGZ">
+                    <items>
+                        <menuItem title="Item 1" id="m8E-kO-TwB">
+                            <modifierMask key="keyEquivalentModifierMask"/>
+                        </menuItem>
+                        <menuItem title="Item 2" id="gKX-rb-enP">
+                            <modifierMask key="keyEquivalentModifierMask"/>
+                        </menuItem>
+                        <menuItem title="Item 3" id="MNz-ve-jnh">
+                            <modifierMask key="keyEquivalentModifierMask"/>
+                        </menuItem>
+                    </items>
+                </menu>
             </objects>
             <point key="canvasLocation" x="-215" y="-265"/>
         </scene>
