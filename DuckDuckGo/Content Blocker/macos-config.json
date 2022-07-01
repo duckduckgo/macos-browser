@@ -1,6 +1,6 @@
 {
     "readme": "https://github.com/duckduckgo/privacy-configuration",
-    "version": 1655989238391,
+    "version": 1656516173849,
     "features": {
         "ampLinks": {
             "exceptions": [
@@ -209,7 +209,11 @@
             "exceptions": [
                 {
                     "domain": "adidas.com",
-                    "reason": "Broken add to cart"
+                    "reason": "When adding an item to the cart, there is an error 'An unexpected problem occurred' and the item is not added to the cart."
+                },
+                {
+                    "domain": "adidas.co.uk",
+                    "reason": "When adding an item to the cart, there is an error 'An unexpected problem occurred' and the item is not added to the cart."
                 },
                 {
                     "domain": "hm.com",
@@ -514,9 +518,10 @@
                             {
                                 "rule": "pubads.g.doubleclick.net/gampad/ads",
                                 "domains": [
-                                    "nhl.com"
+                                    "nhl.com",
+                                    "viki.com"
                                 ],
-                                "reason": "videos not loading"
+                                "reason": "nhl.com - videos not loading; viki.com - after a video has played for a few seconds an adwall pops up. Clicking 'I've turned off my adblocker' resets the video, then after a few seconds the adwall pops up again."
                             },
                             {
                                 "rule": "securepubads.g.doubleclick.net/tag/js/gpt.js",
@@ -866,10 +871,6 @@
                         "reason": "Site breakage"
                     },
                     {
-                        "domain": "accounts.google.com",
-                        "reason": "SSO which needs cookies for auth"
-                    },
-                    {
                         "domain": "googleapis.com",
                         "reason": "Site breakage"
                     },
@@ -879,10 +880,6 @@
                     },
                     {
                         "domain": "apis.google.com",
-                        "reason": "Site breakage"
-                    },
-                    {
-                        "domain": "pay.google.com",
                         "reason": "Site breakage"
                     },
                     {
