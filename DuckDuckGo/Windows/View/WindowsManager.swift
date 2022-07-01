@@ -42,6 +42,11 @@ final class WindowsManager {
         if let droppingPoint = droppingPoint {
             mainWindowController.window?.setFrameOrigin(droppingPoint: droppingPoint)
         }
+        if let contentSize = contentSize {
+            let frame = NSRect(origin: droppingPoint ?? CGPoint.zero,
+                               size: contentSize)
+            mainWindowController.window?.setFrame(frame, display: true)
+        }
         if showWindow {
             mainWindowController.showWindow(self)
         } else {
@@ -62,6 +67,15 @@ final class WindowsManager {
 
     class func openNewWindow(with initialUrl: URL) {
         openNewWindow(with: Tab(content: .contentFromURL(initialUrl)))
+    }
+
+    class func openNewWindow(with tabCollection: TabCollection, droppingPoint: NSPoint? = nil, contentSize: NSSize? = nil, popUp: Bool = false) {
+        let tabCollectionViewModel = TabCollectionViewModel(tabCollection: tabCollection)
+        openNewWindow(with: tabCollectionViewModel,
+                      droppingPoint: droppingPoint,
+                      contentSize: contentSize,
+                      popUp: popUp)
+        tabCollectionViewModel.setUpLazyLoadingIfNeeded()
     }
 
     class func openPopUpWindow(with tab: Tab, contentSize: NSSize?) {

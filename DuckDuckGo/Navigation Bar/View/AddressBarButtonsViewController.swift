@@ -518,6 +518,7 @@ final class AddressBarButtonsViewController: NSViewController {
             self?.subscribeToUrl()
             self?.subscribeToPermissions()
             self?.subscribeToTrackerAnimationTrigger()
+            self?.closePopover()
         }
     }
 
@@ -776,7 +777,11 @@ final class AddressBarButtonsViewController: NSViewController {
         updatePrivacyEntryPointIcon()
         updatePermissionButtons()
     }
-
+    
+    private func closePopover() {
+        privacyDashboardPopover.close()
+    }
+    
     private func stopAnimations(trackerAnimations: Bool = true, shieldAnimations: Bool = true) {
         func stopAnimation(_ animationView: AnimationView) {
             if animationView.isAnimationPlaying || !animationView.isHidden {

@@ -159,55 +159,6 @@ final class TabCollectionTests: XCTestCase {
         XCTAssertEqual(tabCollection.tabs[2], tab2)
     }
 
-    // MARK: - Last Removed Tab
-
-    func testWhenNoTabWasRemovedThenPutBackLastRemovedTabDoesNothing() {
-        let tabCollection = TabCollection()
-        let tabsCount = tabCollection.tabs.count
-
-        tabCollection.putBackLastRemovedTab()
-
-        XCTAssertNil(tabCollection.lastRemovedTabCache)
-        XCTAssertEqual(tabsCount, tabCollection.tabs.count)
-    }
-
-    func testPutBackLastRemovedTab() {
-        let tabCollection = TabCollection()
-
-        let tab1 = Tab()
-        tabCollection.append(tab: tab1)
-        let tab2 = Tab()
-        tab2.url = URL.duckDuckGo
-        tabCollection.append(tab: tab2)
-        let tab3 = Tab()
-        tabCollection.append(tab: tab3)
-
-        XCTAssert(tabCollection.remove(at: 1))
-        tabCollection.putBackLastRemovedTab()
-
-        XCTAssertEqual(tabCollection.tabs[0], tab1)
-        XCTAssertEqual(tabCollection.tabs[1].url, tab2.url)
-        XCTAssertEqual(tabCollection.tabs[2], tab3)
-        XCTAssertNil(tabCollection.lastRemovedTabCache)
-    }
-
-    func testWhenLastRemovedTabCacheWasCleaned_ThenPutBackLastRemovedTabDoesNothing() {
-        let tabCollection = TabCollection()
-
-        let tab = Tab()
-        tab.url = URL.duckDuckGo
-        tabCollection.append(tab: tab)
-        XCTAssert(tabCollection.remove(at: 0))
-
-        let tabsCount = tabCollection.tabs.count
-
-        tabCollection.cleanLastRemovedTab()
-        tabCollection.putBackLastRemovedTab()
-
-        XCTAssertNil(tabCollection.lastRemovedTabCache)
-        XCTAssertEqual(tabsCount, tabCollection.tabs.count)
-    }
-
 }
 
 extension Tab {
