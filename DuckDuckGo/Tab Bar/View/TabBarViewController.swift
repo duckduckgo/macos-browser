@@ -76,6 +76,9 @@ final class TabBarViewController: NSViewController {
         updateEmptyTabArea()
         tabCollectionViewModel.delegate = self
         reloadSelection()
+        
+        // Detect if tabs are clicked when the window is not in focus
+        // https://app.asana.com/0/1177771139624306/1202033879471339
         addMouseMonitors()
     }
 
