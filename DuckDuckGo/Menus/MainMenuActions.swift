@@ -406,6 +406,15 @@ extension MainViewController {
         WindowsManager.openNewWindow(with: tab)
     }
 
+    @IBAction func pinTab(_ sender: Any?) {
+        guard let selectedTabIndex = tabCollectionViewModel.selectionIndex, selectedTabIndex.isRegularTab else {
+            os_log("MainViewController: No tab view model selected", type: .error)
+            return
+        }
+
+        tabCollectionViewModel.pinTab(at: selectedTabIndex.index)
+    }
+
     @IBAction func mergeAllWindows(_ sender: Any?) {
         guard let mainWindowController = WindowControllersManager.shared.lastKeyMainWindowController else { return }
         let otherWindowControllers = WindowControllersManager.shared.mainWindowControllers.filter { $0 !== mainWindowController }
@@ -597,6 +606,10 @@ extension MainViewController: NSMenuItemValidation {
         case #selector(MainViewController.openBookmark(_:)),
              #selector(MainViewController.showManageBookmarks(_:)):
             return true
+
+        // Pin Tab
+        case #selector(MainViewController.pinTab(_:)):
+            return tabCollectionViewModel.selectionIndex?.isRegularTab == true
 
         // Printing/saving
         case #selector(MainViewController.saveAs(_:)),
