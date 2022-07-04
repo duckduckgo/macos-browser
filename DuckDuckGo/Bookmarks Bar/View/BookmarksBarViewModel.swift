@@ -62,7 +62,6 @@ final class BookmarksBarViewModel: NSObject {
     
     private(set) var bookmarksBarItems: [BookmarksBarItem] = [] {
         didSet {
-            print("Got new items: \(bookmarksBarItems.map(\.title))")
             let itemsWidth = bookmarksBarItems.reduce(CGFloat(0)) { total, item in
                 if total == 0 {
                     return total + item.cachedWidth
@@ -103,7 +102,6 @@ final class BookmarksBarViewModel: NSObject {
             }
 
             if currentTotalWidth > containerWidth {
-                print("Adding the new item would break the container width, stop creating items and put the remainder in the overflow menu")
                 clippedItemsStartingIndex = index
                 break
             }
@@ -215,7 +213,6 @@ extension BookmarksBarViewModel: NSCollectionViewDelegate, NSCollectionViewDataS
                         draggingSession session: NSDraggingSession,
                         endedAt screenPoint: NSPoint,
                         dragOperation operation: NSDragOperation) {
-        print("Dragging ended at point \(screenPoint)")
         self.existingItemDraggingIndexPath = nil
     }
  
@@ -257,10 +254,7 @@ extension BookmarksBarViewModel: NSCollectionViewDelegate, NSCollectionViewDataS
                 item = newIndexPath.item
             }
 
-            // let existingItem = self.bookmarksBarItems[existingIndexPath.item].title
-            // let itemAtCurrentSpot = self.bookmarksBarItems[item].title
-            
-            self.bookmarksBarItems.rearrange(from: existingIndexPath.item, to: newIndexPath.item)
+            self.bookmarksBarItems.move(fromOffsets: IndexSet(integer: existingIndexPath.item), toOffset: newIndexPath.item)
             collectionView.animator().moveItem(at: existingIndexPath, to: IndexPath(item: item, section: 0))
             existingItemDraggingIndexPath = nil
             
@@ -270,15 +264,11 @@ extension BookmarksBarViewModel: NSCollectionViewDelegate, NSCollectionViewDataS
 
             return true
         } else {
-            print("Adding new bookmark")
-            
             guard let item = draggingInfo.draggingPasteboard.pasteboardItems?.first, let draggedItemData = titleAndURL(from: item) else {
-                print("No dragged items")
                 return false
             }
             
             self.bookmarkManager.makeBookmark(for: draggedItemData.url, title: draggedItemData.title, isFavorite: false, index: newIndexPath.item)
-            
             return true
         }
     }
@@ -311,13 +301,4 @@ extension BookmarksBarViewModel: BookmarksBarCollectionViewItemDelegate {
         delegate?.bookmarksBarViewModelReceived(click: clickType, for: bookmarksBarCollectionViewItem)
     }
     
-}
-
-extension Array {
-
-    mutating func rearrange(from currentIndex: Int, to newIndex: Int) {
-        print("Moving from \(currentIndex) to \(newIndex)")
-        move(fromOffsets: IndexSet(integer: currentIndex), toOffset: newIndex)
-    }
-
 }
