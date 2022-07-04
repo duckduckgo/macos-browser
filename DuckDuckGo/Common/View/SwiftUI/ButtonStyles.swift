@@ -65,17 +65,9 @@ private struct OnTouchDownGestureModifier: ViewModifier {
     let callback: () -> Void
 
     func body(content: Content) -> some View {
-        content
-            .simultaneousGesture(DragGesture(minimumDistance: 0)
-                .onChanged { _ in
-                    if !self.tapped {
-                        self.tapped = true
-                        self.callback()
-                    }
-                }
-                .onEnded { _ in
-                    self.tapped = false
-                })
+        content.gesture(LongPressGesture().onChanged { _ in
+            callback()
+        })
     }
 }
 
