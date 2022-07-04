@@ -28,11 +28,21 @@ final class BookmarksBarViewController: NSViewController {
 
     private let bookmarkManager = LocalBookmarkManager.shared
     private let viewModel = BookmarksBarViewModel(bookmarkManager: LocalBookmarkManager.shared)
+    private let tabCollectionViewModel: TabCollectionViewModel
     private var cancellables = Set<AnyCancellable>()
     
     private var clipThreshold: CGFloat {
         let viewWidthWithoutClipIndicator = view.frame.width - clippedItemsIndicator.frame.minX
         return view.frame.width - viewWidthWithoutClipIndicator - 3
+    }
+    
+    init?(coder: NSCoder, tabCollectionViewModel: TabCollectionViewModel) {
+        self.tabCollectionViewModel = tabCollectionViewModel
+        super.init(coder: coder)
+    }
+    
+    required init?(coder: NSCoder) {
+        fatalError("TabBarViewController: Bad initializer")
     }
     
     // MARK: - View Lifecycle
@@ -67,6 +77,11 @@ final class BookmarksBarViewController: NSViewController {
         subscribeToBookmarks()
     }
     
+    override func viewWillAppear() {
+        super.viewWillAppear()
+        clipOrRestoreBookmarksBarItems()
+    }
+    
     private func createCenteredLayout(centered: Bool) -> NSCollectionLayoutSection {
         let widths = viewModel.bookmarksBarItems.map(\.cachedWidth)
         let cellSizes = widths.map { CGSize(width: $0, height: 28) }
@@ -99,7 +114,7 @@ final class BookmarksBarViewController: NSViewController {
     
     @objc
     private func frameChangeNotification() {
-        bookmarksBarViewFrameChanged()
+        clipOrRestoreBookmarksBarItems()
         refreshClippedIndicator()
     }
     
@@ -107,7 +122,7 @@ final class BookmarksBarViewController: NSViewController {
         self.clippedItemsIndicator.isHidden = viewModel.clippedItems.isEmpty
     }
     
-    private func bookmarksBarViewFrameChanged() {
+    private func clipOrRestoreBookmarksBarItems() {
         guard !viewModel.bookmarksBarItems.isEmpty else {
             return
         }
@@ -119,16 +134,26 @@ final class BookmarksBarViewController: NSViewController {
                 self.bookmarksBarCollectionView.deleteItems(at: Set([lastIndexPath]))
             }
         } else if let nextRestorableClippedItem = viewModel.clippedItems.first {
-            let widthOfRestorableItem = viewModel.cachedWidth(buttonTitle: nextRestorableClippedItem.entity.title,
-                                                              isFolder: nextRestorableClippedItem.entity.isFolder)
-            let newMaximumWidth = viewModel.bookmarksBarItemsTotalWidth + 10 + widthOfRestorableItem
-
-            if newMaximumWidth < clipThreshold {
-                if viewModel.restoreLastClippedItem() {
-                    self.bookmarksBarCollectionView.reloadData()
+            while true {
+                if !restoreNextClippedItemToBookmarksBarIfPossible(item: nextRestorableClippedItem) {
+                    break
                 }
             }
+            
+            self.bookmarksBarCollectionView.reloadData()
         }
+    }
+    
+    private func restoreNextClippedItemToBookmarksBarIfPossible(item: BookmarkViewModel) -> Bool {
+        let widthOfRestorableItem = viewModel.cachedWidth(buttonTitle: item.entity.title,
+                                                          isFolder: item.entity.isFolder)
+        let newMaximumWidth = viewModel.bookmarksBarItemsTotalWidth + 10 + widthOfRestorableItem
+
+        if newMaximumWidth < clipThreshold {
+            return viewModel.restoreLastClippedItem()
+        }
+        
+        return false
     }
     
     @objc
@@ -178,7 +203,7 @@ final class BookmarksBarViewController: NSViewController {
 
 extension BookmarksBarViewController: BookmarksBarViewModelDelegate {
     
-    func bookmarksBarViewModelReceivedLeftClick(for item: BookmarksBarCollectionViewItem) {
+    func bookmarksBarViewModelReceived(click: BookmarksBarViewModel.BookmarksBarClickType, for item: BookmarksBarCollectionViewItem) {
         guard let indexPath = bookmarksBarCollectionView.indexPath(for: item) else {
             assertionFailure("Failed to look up index path for clicked item")
             return
@@ -190,18 +215,37 @@ extension BookmarksBarViewController: BookmarksBarViewModelDelegate {
         }
         
         if let bookmark = entity as? Bookmark {
-            WindowControllersManager.shared.show(url: bookmark.url, newTab: false)
+            switch click {
+            case .shiftCommandClick:
+                tabCollectionViewModel.appendNewTab(with: .url(bookmark.url), selected: true)
+            case .commandClick:
+                tabCollectionViewModel.appendNewTab(with: .url(bookmark.url), selected: false)
+            case .standard:
+                WindowControllersManager.shared.show(url: bookmark.url)
+            }
         } else if let folder = entity as? BookmarkFolder {
             let childEntities = folder.children
             let viewModels = childEntities.map { BookmarkViewModel(entity: $0) }
             let menuItems = bookmarkMenuItems(from: viewModels, topLevel: true)
-            let menu = NSMenu()
-            
-            menu.items = menuItems
+            let menu = bookmarkFolderMenu(items: menuItems)
             menu.popUp(positioning: nil, at: CGPoint(x: 0, y: item.view.frame.minY - 7), in: item.view)
         } else {
             assertionFailure("Failed to cast entity for clicked item")
         }
+    }
+    
+    private func bookmarkFolderMenu(items: [NSMenuItem]) -> NSMenu {
+        let menu = NSMenu()
+        
+        if items.isEmpty {
+            menu.items = [
+                NSMenuItem(title: "Empty", action: nil, target: nil, keyEquivalent: "")
+            ]
+        } else {
+            menu.items = items
+        }
+        
+        return menu
     }
     
 }

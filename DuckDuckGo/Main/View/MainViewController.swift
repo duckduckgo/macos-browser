@@ -87,6 +87,9 @@ final class MainViewController: NSViewController {
             navigationBarContainerView.layer?.masksToBounds = false
 
             resizeNavigationBarForHomePage(tabCollectionViewModel.selectedTabViewModel?.tab.content == .homePage, animated: false)
+            
+            let bookmarksBarVisible = PersistentAppInterfaceSettings.shared.showBookmarksBar
+            toggleBookmarksBarVisibility(visible: bookmarksBarVisible)
         }
         
         updateDividerColor()
@@ -174,12 +177,17 @@ final class MainViewController: NSViewController {
     
     @IBSegueAction
     func createBookmarksBar(coder: NSCoder, sender: Any?, segueIdentifier: String?) -> BookmarksBarViewController? {
-        let bookmarksBarViewController = BookmarksBarViewController(coder: coder)
+        let bookmarksBarViewController = BookmarksBarViewController(coder: coder, tabCollectionViewModel: tabCollectionViewModel)
         self.bookmarksBarViewController = bookmarksBarViewController
         return bookmarksBarViewController
     }
     
     func updateBookmarksBar(visible: Bool) {
+        PersistentAppInterfaceSettings.shared.showBookmarksBar = visible
+        toggleBookmarksBarVisibility(visible: visible)
+    }
+    
+    private func toggleBookmarksBarVisibility(visible: Bool) {
         bookmarksBarViewController.view.isHidden = !visible
         bookmarksBarHeightConstraint.constant = visible ? 32 : 0
         updateDividerColor()

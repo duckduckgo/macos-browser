@@ -22,7 +22,7 @@ import Foundation
 
 protocol BookmarksBarViewModelDelegate: AnyObject {
     
-    func bookmarksBarViewModelReceivedLeftClick(for item: BookmarksBarCollectionViewItem)
+    func bookmarksBarViewModelReceived(click: BookmarksBarViewModel.BookmarksBarClickType, for item: BookmarksBarCollectionViewItem)
     
 }
 
@@ -35,6 +35,12 @@ final class BookmarksBarViewModel: NSObject {
         static let buttonHeight: CGFloat = 30
         static let maximumButtonWidth: CGFloat = 200
         static let labelFont = NSFont.systemFont(ofSize: 13)
+    }
+    
+    enum BookmarksBarClickType {
+        case standard
+        case commandClick
+        case shiftCommandClick
     }
     
     struct BookmarksBarItem {
@@ -175,25 +181,9 @@ extension BookmarksBarViewModel: NSCollectionViewDelegate, NSCollectionViewDataS
                         at indexPath: IndexPath) -> NSView {
         let image = NSImage(named: "Drop-Target-Indicator-16")!
         let imageView = NSImageView(image: image)
-        imageView.contentTintColor = NSColor.systemMint
+        imageView.contentTintColor = NSColor.controlAccentColor
         
         return imageView
-    }
-    
-    func collectionView(_ collectionView: NSCollectionView,
-                        draggingImageForItemsAt indexes: IndexSet,
-                        with event: NSEvent,
-                        offset dragImageOffset: NSPointPointer) -> NSImage {
-        return NSImage()
-    }
-    
-    func collectionView(
-        _ collectionView: NSCollectionView,
-        draggingImageForItemsAt indexPaths: Set<IndexPath>,
-        with event: NSEvent,
-        offset dragImageOffset: NSPointPointer
-    ) -> NSImage {
-        return NSImage(named: "Bookmark")!
     }
 
     func collectionView(_ collectionView: NSCollectionView, numberOfItemsInSection section: Int) -> Int {
@@ -308,8 +298,17 @@ extension BookmarksBarViewModel: NSCollectionViewDelegate, NSCollectionViewDataS
 extension BookmarksBarViewModel: BookmarksBarCollectionViewItemDelegate {
     
     func bookmarksBarCollectionViewItemClicked(_ bookmarksBarCollectionViewItem: BookmarksBarCollectionViewItem) {
-        print("Clicked item!")
-        delegate?.bookmarksBarViewModelReceivedLeftClick(for: bookmarksBarCollectionViewItem)
+        let clickType: BookmarksBarClickType
+        
+        if NSApplication.shared.isCommandPressed && NSApplication.shared.isShiftPressed {
+            clickType = .shiftCommandClick
+        } else if NSApplication.shared.isCommandPressed {
+            clickType = .commandClick
+        } else {
+            clickType = .standard
+        }
+        
+        delegate?.bookmarksBarViewModelReceived(click: clickType, for: bookmarksBarCollectionViewItem)
     }
     
 }

@@ -80,6 +80,8 @@ public struct UserDefaultsWrapper<T> {
         case homePageShowPageTitles = "home.page.show.page.titles"
 
         case appIsRelaunchingAutomatically = "app-relaunching-automatically"
+        
+        case showBookmarksBar = "bookmarks.bar.show"
     }
 
     enum RemovedKeys: String, CaseIterable {
