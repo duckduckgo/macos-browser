@@ -19,10 +19,11 @@
 import Foundation
 
 final class PinnedTabsModel: ObservableObject {
-    @Published var items: [PinnedTabModel]
-    @Published var selectedItem: PinnedTabModel?
+    @Published var items: [Tab]
+    @Published var selectedItem: Tab?
 
-    init(items: [PinnedTabModel] = []) {
-        self.items = items
+    init(collection: TabCollection) {
+        items = collection.tabs
     }
 }
+

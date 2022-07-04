@@ -74,27 +74,22 @@ final class TabBarViewController: NSViewController {
     }
 
     private func setupPinnedTabsView() {
-        let pinnedTabsModel = PinnedTabsModel(items: [])
+        let pinnedTabsModel = PinnedTabsModel(collection: WindowControllersManager.shared.pinnedTabsManager.tabCollection)
         let pinnedTabsView = PinnedTabsView(model: pinnedTabsModel)
         let host = NSHostingView(rootView: pinnedTabsView)
         pinnedTabsContainerView.addAndLayout(host)
 
-        WindowControllersManager.shared.pinnedTabsManager.tabCollection.$tabs
-            .map { tabs -> [PinnedTabModel] in
-                tabs.map { tab in
-                    let model = PinnedTabModel()
-                    model.url = tab.url
-                    model.faviconImage = tab.favicon
-                    return model
-                }
-            }
-            .assign(to: \.items, on: pinnedTabsModel)
-            .store(in: &cancellables)
-
         tabCollectionViewModel.$selectionIndex
             .filter { $0?.isRegularTab == true }
-            .map { _ in PinnedTabModel?.none }
+            .map { _ in Tab?.none }
             .assign(to: \.selectedItem, on: pinnedTabsModel)
+            .store(in: &cancellables)
+
+        pinnedTabsModel.$items
+            .removeDuplicates()
+            .sink { tabs in
+                WindowControllersManager.shared.pinnedTabsManager.tabCollection.reorderTabs(tabs)
+            }
             .store(in: &cancellables)
 
         pinnedTabsModel.$selectedItem

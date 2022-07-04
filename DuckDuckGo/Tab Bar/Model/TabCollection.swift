@@ -97,6 +97,11 @@ final class TabCollection: NSObject {
         tabs.remove(atOffsets: indexSet)
     }
 
+    func reorderTabs(_ newOrder: [Tab]) {
+        assert(Set(tabs) == Set(newOrder), "tabs cannot change when reordering")
+        tabs = newOrder
+    }
+
     private func tabWillClose(at index: Int) {
         keepLocalHistory(of: tabs[index])
     }

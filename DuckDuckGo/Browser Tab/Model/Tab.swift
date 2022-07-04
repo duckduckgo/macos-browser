@@ -42,7 +42,7 @@ protocol TabDelegate: FileDownloadManagerDelegate, ContentOverlayUserScriptDeleg
 
 // swiftlint:disable type_body_length
 // swiftlint:disable file_length
-final class Tab: NSObject, Identifiable {
+final class Tab: NSObject, Identifiable, ObservableObject {
 
     enum TabContent: Equatable {
         case homePage

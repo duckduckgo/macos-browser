@@ -23,11 +23,12 @@ import os
 protocol PinnedTabsManager {
     var tabCollection: TabCollection { get set }
     func pin(_ tab: Tab)
+    func pin(_ tab: Tab, at index: Int?)
     func unpin(_ tab: Tab)
     func tabViewModel(at index: Int) -> TabViewModel?
 }
 
-final class LocalPinnedTabsManager: PinnedTabsManager {
+final class LocalPinnedTabsManager: PinnedTabsManager, ObservableObject {
 
     var tabCollection: TabCollection {
         didSet {
@@ -36,7 +37,15 @@ final class LocalPinnedTabsManager: PinnedTabsManager {
     }
 
     func pin(_ tab: Tab) {
-        tabCollection.append(tab: tab)
+        pin(tab, at: nil)
+    }
+
+    func pin(_ tab: Tab, at index: Int?) {
+        if let index = index {
+            tabCollection.insert(tab: tab, at: index)
+        } else {
+            tabCollection.append(tab: tab)
+        }
     }
 
     func unpin(_ tab: Tab) {
