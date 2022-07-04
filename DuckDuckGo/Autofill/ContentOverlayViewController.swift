@@ -191,10 +191,6 @@ extension ContentOverlayViewController: OverlayAutofillUserScriptPresentationDel
 }
 
 extension ContentOverlayViewController: SecureVaultManagerDelegate {
-    
-    public func secureVaultManagerIsEnabledStatus(_: SecureVaultManager) -> Bool {
-        return true
-    }
 
     public func secureVaultManager(_: SecureVaultManager, promptUserToStoreAutofillData data: AutofillData) {
         // No-op, the content overlay view controller should not be prompting the user to store data
