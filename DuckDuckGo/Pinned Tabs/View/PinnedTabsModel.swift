@@ -17,13 +17,28 @@
 //
 
 import Foundation
+import Combine
 
 final class PinnedTabsModel: ObservableObject {
-    @Published var items: [Tab]
+    @Published var items: [Tab] = [] {
+        didSet {
+            if oldValue != items && Set(oldValue) == Set(items) {
+                tabsDidReorderSubject.send(items)
+            }
+        }
+    }
+
     @Published var selectedItem: Tab?
 
-    init(collection: TabCollection) {
-        items = collection.tabs
-    }
-}
+    let tabsDidReorderPublisher: AnyPublisher<[Tab], Never>
 
+    init(collection: TabCollection) {
+        tabsDidReorderPublisher = tabsDidReorderSubject.eraseToAnyPublisher()
+        collection.$tabs
+            .assign(to: \.items, onWeaklyHeld: self)
+            .store(in: &cancellables)
+    }
+
+    private let tabsDidReorderSubject = PassthroughSubject<[Tab], Never>()
+    private var cancellables = Set<AnyCancellable>()
+}

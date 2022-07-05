@@ -85,11 +85,8 @@ final class TabBarViewController: NSViewController {
             .assign(to: \.selectedItem, on: pinnedTabsModel)
             .store(in: &cancellables)
 
-        pinnedTabsModel.$items
-            .removeDuplicates()
-            .sink { tabs in
-                WindowControllersManager.shared.pinnedTabsManager.tabCollection.reorderTabs(tabs)
-            }
+        pinnedTabsModel.tabsDidReorderPublisher
+            .sink(receiveValue: WindowControllersManager.shared.pinnedTabsManager.tabCollection.reorderTabs)
             .store(in: &cancellables)
 
         pinnedTabsModel.$selectedItem

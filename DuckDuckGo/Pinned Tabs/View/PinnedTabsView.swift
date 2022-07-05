@@ -17,6 +17,7 @@
 //
 
 import SwiftUI
+import Combine
 
 struct PinnedTabsView: View {
     @ObservedObject var model: PinnedTabsModel
