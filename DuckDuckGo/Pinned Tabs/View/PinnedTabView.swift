@@ -37,7 +37,7 @@ struct PinnedTabView: View {
         }
         .buttonStyle(TouchDownButtonStyle())
         .cornerRadius(6, corners: [.topLeft, .topRight])
-        .contextMenu(contextMenu)
+        .contextMenu { contextMenu }
         .onHover { isHovered in
             self.isHovered = isHovered
         }
@@ -50,27 +50,23 @@ struct PinnedTabView: View {
         return isHovered ? Color("TabMouseOverColor") : Color.clear
     }
 
-    let contextMenu = ContextMenu {
-        Button {
-            print("unpin")
-        } label: {
-            Text(UserText.unpinTab)
-        }
-        Button {
-            print("duplicate")
-        } label: {
-            Text(UserText.duplicateTab)
-        }
+    @ViewBuilder
+    var contextMenu: some View {
+        Button(UserText.unpinTab, action: { collectionModel.unpin(model) })
+        Button(UserText.duplicateTab, action: { collectionModel.duplicate(model) })
         Divider()
-        Button {
-            print("bookmark")
-        } label: {
-            Text(UserText.bookmarkThisPage)
-        }
-        Button {
-            print("close")
-        } label: {
-            Text(UserText.closeTab)
+        Button(UserText.bookmarkThisPage, action: { collectionModel.bookmark(model) })
+        fireproofAction
+        Divider()
+        Button(UserText.closeTab, action: { collectionModel.close(model) })
+    }
+
+    @ViewBuilder
+    var fireproofAction: some View {
+        if collectionModel.isFireproof(model) {
+            Button(UserText.removeFireproofing, action: { collectionModel.removeFireproofing(model) })
+        } else {
+            Button(UserText.fireproofSite, action: { collectionModel.fireproof(model) })
         }
     }
 }

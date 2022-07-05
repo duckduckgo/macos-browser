@@ -112,6 +112,33 @@ final class TabBarViewController: NSViewController {
                 }
             })
             .store(in: &cancellables)
+
+        pinnedTabsModel.contextMenuActionPublisher
+            .sink { [weak self] action in
+                self?.handlePinnedTabContextMenuAction(action)
+            }
+            .store(in: &cancellables)
+    }
+
+    private func handlePinnedTabContextMenuAction(_ action: PinnedTabsModel.ContextMenuAction) {
+        switch action {
+        case let .unpin(index):
+            tabCollectionViewModel.unpinTab(at: index)
+        case let .duplicate(index):
+            duplicateTab(at: .pinned(index))
+        case let .bookmark(tab):
+            guard let url = tab.url, let tabViewModel = WindowControllersManager.shared.pinnedTabsManager.tabViewModels[tab] else {
+                os_log("TabBarViewController: Failed to get url from tab")
+                return
+            }
+            bookmarkTab(with: url, title: tabViewModel.title)
+        case let .fireproof(tab):
+            fireproof(tab)
+        case let .removeFireproofing(tab):
+            removeFireproofing(from: tab)
+        case let .close(index):
+            tabCollectionViewModel.remove(at: .pinned(index))
+        }
     }
 
     override func viewWillAppear() {
@@ -583,6 +610,40 @@ extension TabBarViewController: TabCollectionViewModelDelegate {
         hideTabPreview()
     }
 
+    // MARK: - Tab Actions
+
+    private func duplicateTab(at tabIndex: TabIndex) {
+        if tabIndex.isRegularTab {
+            collectionView.clearSelection()
+        }
+        tabCollectionViewModel.duplicateTab(at: tabIndex)
+    }
+
+    private func bookmarkTab(with url: URL, title: String) {
+        if !bookmarkManager.isUrlBookmarked(url: url) {
+            bookmarkManager.makeBookmark(for: url, title: title, isFavorite: false)
+            Pixel.fire(.bookmark(fireproofed: .init(url: url), source: .tabMenu))
+        }
+    }
+
+    private func fireproof(_ tab: Tab) {
+        guard let url = tab.url, let host = url.host else {
+            os_log("TabBarViewController: Failed to get url of tab bar view item", type: .error)
+            return
+        }
+
+        Pixel.fire(.fireproof(kind: .init(url: url), suggested: .manual))
+        FireproofDomains.shared.add(domain: host)
+    }
+
+    private func removeFireproofing(from tab: Tab) {
+        guard let host = tab.url?.host else {
+            os_log("TabBarViewController: Failed to get url of tab bar view item", type: .error)
+            return
+        }
+
+        FireproofDomains.shared.remove(domain: host)
+    }
 }
 
 extension TabBarViewController: NSCollectionViewDelegateFlowLayout {
@@ -801,8 +862,7 @@ extension TabBarViewController: TabBarViewItemDelegate {
             return
         }
 
-        collectionView.clearSelection()
-        tabCollectionViewModel.duplicateTab(at: indexPath.item)
+        duplicateTab(at: .regular(indexPath.item))
     }
 
     func tabBarViewItemCanBePinned(_ tabBarViewItem: TabBarViewItem) -> Bool {
@@ -832,10 +892,7 @@ extension TabBarViewController: TabBarViewItemDelegate {
             return
         }
 
-        if !bookmarkManager.isUrlBookmarked(url: url) {
-            bookmarkManager.makeBookmark(for: url, title: tabViewModel.title, isFavorite: false)
-            Pixel.fire(.bookmark(fireproofed: .init(url: url), source: .tabMenu))
-        }
+        bookmarkTab(with: url, title: tabViewModel.title)
     }
 
     func tabBarViewItemCloseAction(_ tabBarViewItem: TabBarViewItem) {
@@ -893,29 +950,24 @@ extension TabBarViewController: TabBarViewItemDelegate {
 
     func tabBarViewItemFireproofSite(_ tabBarViewItem: TabBarViewItem) {
         guard let indexPath = collectionView.indexPath(for: tabBarViewItem),
-              let tabViewModel = tabCollectionViewModel.tabViewModel(at: indexPath.item),
-              let url = tabViewModel.tab.content.url,
-              let host = url.host
+              let tab = tabCollectionViewModel.tabCollection.tabs[safe: indexPath.item]
         else {
-            os_log("TabBarViewController: Failed to get url of tab bar view item", type: .error)
+            os_log("TabBarViewController: Failed to get tab from tab bar view item", type: .error)
             return
         }
 
-        Pixel.fire(.fireproof(kind: .init(url: url), suggested: .manual))
-        FireproofDomains.shared.add(domain: host)
+        fireproof(tab)
     }
 
     func tabBarViewItemRemoveFireproofing(_ tabBarViewItem: TabBarViewItem) {
         guard let indexPath = collectionView.indexPath(for: tabBarViewItem),
-              let tabViewModel = tabCollectionViewModel.tabViewModel(at: indexPath.item),
-              let url = tabViewModel.tab.content.url,
-              let host = url.host
+              let tab = tabCollectionViewModel.tabCollection.tabs[safe: indexPath.item]
         else {
-            os_log("TabBarViewController: Failed to get url of tab bar view item", type: .error)
+            os_log("TabBarViewController: Failed to get tab from tab bar view item", type: .error)
             return
         }
 
-        FireproofDomains.shared.remove(domain: host)
+        removeFireproofing(from: tab)
     }
 
     func otherTabBarViewItemsState(for tabBarViewItem: TabBarViewItem) -> OtherTabBarViewItemsState {

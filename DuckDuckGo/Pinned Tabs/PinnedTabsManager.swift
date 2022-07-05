@@ -23,6 +23,8 @@ import os
 protocol PinnedTabsManager {
     var didSetUpPinnedTabsPublisher: AnyPublisher<Void, Never> { get }
     var tabCollection: TabCollection { get set }
+    var tabViewModels: [Tab: TabViewModel] { get }
+
     func pin(_ tab: Tab)
     func pin(_ tab: Tab, at index: Int?)
     func unpin(_ tab: Tab) -> Bool
@@ -39,6 +41,8 @@ final class LocalPinnedTabsManager: PinnedTabsManager, ObservableObject {
             subscribeToPinnedTabs()
         }
     }
+
+    private(set) var tabViewModels = [Tab: TabViewModel]()
 
     let didSetUpPinnedTabsPublisher: AnyPublisher<Void, Never>
 
@@ -63,7 +67,7 @@ final class LocalPinnedTabsManager: PinnedTabsManager, ObservableObject {
         guard let index = tabCollection.tabs.firstIndex(of: tab) else {
             return false
         }
-        return tabCollection.remove(at: index)
+        return tabCollection.remove(at: index, published: false)
     }
 
     func unpinTab(at index: Int) -> Tab? {
@@ -90,7 +94,6 @@ final class LocalPinnedTabsManager: PinnedTabsManager, ObservableObject {
 
     // MARK: - Private
 
-    private(set) var tabViewModels = [Tab: TabViewModel]()
     private let didSetUpPinnedTabsSubject = PassthroughSubject<Void, Never>()
     private var cancellables: Set<AnyCancellable> = []
 
