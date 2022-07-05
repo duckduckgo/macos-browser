@@ -639,7 +639,7 @@ CQ
                                         <menuItem title="Pin Tab" id="8LN-7f-htp">
                                             <modifierMask key="keyEquivalentModifierMask"/>
                                             <connections>
-                                                <action selector="pinTab:" target="Ady-hI-5gd" id="KuR-A3-MsW"/>
+                                                <action selector="pinOrUnpinTab:" target="Ady-hI-5gd" id="hfz-H3-RTg"/>
                                             </connections>
                                         </menuItem>
                                         <menuItem title="Move Tab to New Window" id="c3E-76-Now">

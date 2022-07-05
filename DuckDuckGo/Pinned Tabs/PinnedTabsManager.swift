@@ -25,7 +25,8 @@ protocol PinnedTabsManager {
     var tabCollection: TabCollection { get set }
     func pin(_ tab: Tab)
     func pin(_ tab: Tab, at index: Int?)
-    func unpin(_ tab: Tab)
+    func unpin(_ tab: Tab) -> Bool
+    func unpinTab(at index: Int) -> Tab?
     func tabViewModel(at index: Int) -> TabViewModel?
 
     func setUp(with collection: TabCollection)
@@ -58,7 +59,18 @@ final class LocalPinnedTabsManager: PinnedTabsManager, ObservableObject {
         }
     }
 
-    func unpin(_ tab: Tab) {
+    func unpin(_ tab: Tab) -> Bool {
+        guard let index = tabCollection.tabs.firstIndex(of: tab) else {
+            return false
+        }
+        return tabCollection.remove(at: index)
+    }
+
+    func unpinTab(at index: Int) -> Tab? {
+        guard let tab = tabCollection.tabs[safe: index], tabCollection.remove(at: index, published: false) else {
+            return nil
+        }
+        return tab
     }
 
     func tabViewModel(at index: Int) -> TabViewModel? {

@@ -505,6 +505,22 @@ final class TabCollectionViewModel: NSObject {
         selectPinnedTab(at: pinnedTabsCollection.tabs.count - 1)
     }
 
+    func unpinTab(at index: Int) {
+        guard changesEnabled else { return }
+
+        guard index >= 0, index < pinnedTabsCollection.tabs.count else {
+            os_log("TabCollectionViewModel: Index out of bounds", type: .error)
+            return
+        }
+
+        guard let tab = WindowControllersManager.shared.pinnedTabsManager.unpinTab(at: index) else {
+            os_log("Unable to unpin a tab", type: .error)
+            return
+        }
+
+        insert(tab: tab, at: 0, selected: true)
+    }
+
     // TODO
     func moveTab(at index: Int, to newIndex: Int) {
         guard changesEnabled else { return }

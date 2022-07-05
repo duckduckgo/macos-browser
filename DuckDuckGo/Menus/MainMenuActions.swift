@@ -406,13 +406,18 @@ extension MainViewController {
         WindowsManager.openNewWindow(with: tab)
     }
 
-    @IBAction func pinTab(_ sender: Any?) {
-        guard let selectedTabIndex = tabCollectionViewModel.selectionIndex, selectedTabIndex.isRegularTab else {
+    @IBAction func pinOrUnpinTab(_ sender: Any?) {
+        guard let selectedTabIndex = tabCollectionViewModel.selectionIndex else {
             os_log("MainViewController: No tab view model selected", type: .error)
             return
         }
 
-        tabCollectionViewModel.pinTab(at: selectedTabIndex.index)
+        switch selectedTabIndex {
+        case .pinned(let index):
+            tabCollectionViewModel.unpinTab(at: index)
+        case .regular(let index):
+            tabCollectionViewModel.pinTab(at: index)
+        }
     }
 
     @IBAction func mergeAllWindows(_ sender: Any?) {
@@ -612,9 +617,19 @@ extension MainViewController: NSMenuItemValidation {
             return true
 
         // Pin Tab
-        case #selector(MainViewController.pinTab(_:)):
-            return tabCollectionViewModel.selectionIndex?.isRegularTab == true
-            && tabCollectionViewModel.selectedTabViewModel?.tab.isUrl == true
+        case #selector(MainViewController.pinOrUnpinTab(_:)):
+            guard tabCollectionViewModel.selectedTabViewModel?.tab.isUrl == true else {
+                return false
+            }
+            if tabCollectionViewModel.selectionIndex?.isRegularTab == true {
+                menuItem.title = UserText.pinTab
+                return true
+            }
+            if tabCollectionViewModel.selectionIndex?.isPinnedTab == true {
+                menuItem.title = UserText.unpinTab
+                return true
+            }
+            return false
 
         // Printing/saving
         case #selector(MainViewController.saveAs(_:)),
