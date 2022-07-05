@@ -25,6 +25,8 @@ protocol PinnedTabsManager {
     var tabCollection: TabCollection { get set }
     var tabViewModels: [Tab: TabViewModel] { get }
 
+    func isTabPinned(_ tab: Tab) -> Bool
+
     func pin(_ tab: Tab)
     func pin(_ tab: Tab, at index: Int?)
     func unpin(_ tab: Tab) -> Bool
@@ -49,6 +51,10 @@ final class LocalPinnedTabsManager: PinnedTabsManager, ObservableObject {
     func setUp(with collection: TabCollection) {
         tabCollection = collection
         didSetUpPinnedTabsSubject.send()
+    }
+
+    func isTabPinned(_ tab: Tab) -> Bool {
+        tabCollection.tabs.contains(tab)
     }
 
     func pin(_ tab: Tab) {

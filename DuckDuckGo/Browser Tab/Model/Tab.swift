@@ -956,25 +956,29 @@ extension Tab: WKNavigationDelegate {
             return .allow
         }
 
-        let isRequestingNewTab = isRequestingNewTab(navigationAction: navigationAction)
+        let isNavigatingAwayFromPinnedTab = isNavigatingAwayFromPinnedTab(navigationAction)
+        let isRequestingNewTab = isRequestingNewTab(navigationAction) || isNavigatingAwayFromPinnedTab
         // This check needs to happen before GPC checks. Otherwise the navigation type may be rewritten to `.other`
         // which would skip link rewrites.
         if navigationAction.navigationType == .linkActivated {
             let navigationActionPolicy = await linkProtection
-                .requestTrackingLinkRewrite(initiatingURL: webView.url,
-                                            navigationAction: navigationAction,
-                                            onStartExtracting: { if !isRequestingNewTab { isAMPProtectionExtracting = true }},
-                                            onFinishExtracting: { [weak self] in self?.isAMPProtectionExtracting = false },
-                                            onLinkRewrite: { [weak self] url, _ in
-                                                guard let self = self else { return }
-                                                if isRequestingNewTab || !navigationAction.isTargetingMainFrame {
-                                                    self.delegate?.tab(self,
-                                                                       requestedNewTabWith: .url(url),
-                                                                       selected: NSApp.isShiftPressed || !navigationAction.isTargetingMainFrame)
-                                                } else {
-                                                    webView.load(url)
-                                                }
-                                            })
+                .requestTrackingLinkRewrite(
+                    initiatingURL: webView.url,
+                    navigationAction: navigationAction,
+                    onStartExtracting: { if !isRequestingNewTab { isAMPProtectionExtracting = true }},
+                    onFinishExtracting: { [weak self] in self?.isAMPProtectionExtracting = false },
+                    onLinkRewrite: { [weak self] url, _ in
+                        guard let self = self else { return }
+                        if isRequestingNewTab || !navigationAction.isTargetingMainFrame {
+                            self.delegate?.tab(
+                                self,
+                                requestedNewTabWith: .url(url),
+                                selected: NSApp.isShiftPressed || !navigationAction.isTargetingMainFrame || isNavigatingAwayFromPinnedTab
+                            )
+                        } else {
+                            webView.load(url)
+                        }
+                    })
             if let navigationActionPolicy = navigationActionPolicy, navigationActionPolicy == .cancel {
                 return navigationActionPolicy
             }
@@ -1020,7 +1024,10 @@ extension Tab: WKNavigationDelegate {
         let isLinkActivated = navigationAction.navigationType == .linkActivated
         if isRequestingNewTab {
             defer {
-                delegate?.tab(self, requestedNewTabWith: navigationAction.request.url.map { .url($0) } ?? .none, selected: NSApp.isShiftPressed)
+                delegate?.tab(
+                    self,
+                    requestedNewTabWith: navigationAction.request.url.map { .url($0) } ?? .none,
+                    selected: NSApp.isShiftPressed || isNavigatingAwayFromPinnedTab)
             }
             return .cancel
         } else if isLinkActivated && NSApp.isOptionPressed && !NSApp.isCommandPressed {
@@ -1073,10 +1080,20 @@ extension Tab: WKNavigationDelegate {
         return .allow
     }
 
-    private func isRequestingNewTab(navigationAction: WKNavigationAction) -> Bool {
+    private func isRequestingNewTab(_ navigationAction: WKNavigationAction) -> Bool {
         let isLinkActivated = navigationAction.navigationType == .linkActivated
+        let isPinnedTab = WindowControllersManager.shared.pinnedTabsManager.isTabPinned(self)
+        let isNavigatingToAnotherDomain = navigationAction.request.url?.host != url?.host
         let isMiddleClicked = navigationAction.buttonNumber == Constants.webkitMiddleClick
-        return isLinkActivated && NSApp.isCommandPressed || isMiddleClicked
+        return (isLinkActivated && (NSApp.isCommandPressed || (isPinnedTab && isNavigatingToAnotherDomain)))
+            || isMiddleClicked
+    }
+
+    private func isNavigatingAwayFromPinnedTab(_ navigationAction: WKNavigationAction) -> Bool {
+        let isLinkActivated = navigationAction.navigationType == .linkActivated
+        let isPinnedTab = WindowControllersManager.shared.pinnedTabsManager.isTabPinned(self)
+        let isNavigatingToAnotherDomain = navigationAction.request.url?.host != url?.host
+        return isLinkActivated && isPinnedTab && isNavigatingToAnotherDomain
     }
 
     // swiftlint:enable cyclomatic_complexity

@@ -319,13 +319,13 @@ final class TabCollectionViewModel: NSObject {
     func insertChild(tab: Tab, selected: Bool) {
         guard changesEnabled else { return }
         guard let parentTab = tab.parentTab,
-              let parentTabIndex = tabCollection.tabs.firstIndex(where: { $0 === parentTab }) else {
+              let parentTabIndex = indexInAllTabs(of: parentTab) else {
             os_log("TabCollection: No parent tab", type: .error)
             return
         }
 
         // Insert at the end of the child tabs
-        var newIndex = parentTabIndex + 1
+        var newIndex = parentTabIndex.isPinnedTab ? 0 : parentTabIndex.index + 1
         while tabCollection.tabs[safe: newIndex]?.parentTab === parentTab { newIndex += 1 }
         insert(tab: tab, at: newIndex, selected: selected)
     }
@@ -388,7 +388,8 @@ final class TabCollectionViewModel: NSObject {
     private func didRemoveTab(at index: TabIndex, withParent parentTab: Tab?) {
         defer {
             if index.isRegularTab {
-                delegate?.tabCollectionViewModel(self, didRemoveTabAt: index.index, andSelectTabAt: self.selectionIndex?.index)
+                let newSelectionIndex = self.selectionIndex?.isRegularTab == true ? self.selectionIndex?.index : nil
+                delegate?.tabCollectionViewModel(self, didRemoveTabAt: index.index, andSelectTabAt: newSelectionIndex)
             }
         }
 

@@ -124,6 +124,14 @@ final class BrowserTabViewController: NSViewController {
     }
 
     private func subscribeToTabs() {
+        tabCollectionViewModel.pinnedTabsCollection.$tabs
+            .sink { [weak self] tabs in
+                for tab in tabs where tab.delegate !== self {
+                    tab.delegate = self
+                }
+            }
+            .store(in: &cancellables)
+
         tabCollectionViewModel.tabCollection.$tabs
             .sink { [weak self] tabs in
                 for tab in tabs where tab.delegate !== self {
