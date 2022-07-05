@@ -333,14 +333,14 @@ extension TabBarViewItem: NSMenuDelegate {
     func menuNeedsUpdate(_ menu: NSMenu) {
         menu.removeAllItems()
 
-        let duplicateMenuItem = NSMenuItem(title: UserText.duplicateTab, action: #selector(duplicateAction(_:)), keyEquivalent: "")
-        duplicateMenuItem.target = self
-        menu.addItem(duplicateMenuItem)
-
         let pinMenuItem = NSMenuItem(title: UserText.pinTab, action: #selector(pinAction(_:)), keyEquivalent: "")
         pinMenuItem.target = self
         pinMenuItem.isEnabled = delegate?.tabBarViewItemCanBePinned(self) ?? false
         menu.addItem(pinMenuItem)
+
+        let duplicateMenuItem = NSMenuItem(title: UserText.duplicateTab, action: #selector(duplicateAction(_:)), keyEquivalent: "")
+        duplicateMenuItem.target = self
+        menu.addItem(duplicateMenuItem)
 
         menu.addItem(NSMenuItem.separator())
 

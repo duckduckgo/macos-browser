@@ -37,6 +37,7 @@ struct PinnedTabView: View {
         }
         .buttonStyle(TouchDownButtonStyle())
         .cornerRadius(6, corners: [.topLeft, .topRight])
+        .contextMenu(contextMenu)
         .onHover { isHovered in
             self.isHovered = isHovered
         }
@@ -47,6 +48,30 @@ struct PinnedTabView: View {
             return Color("InterfaceBackgroundColor")
         }
         return isHovered ? Color("TabMouseOverColor") : Color.clear
+    }
+
+    let contextMenu = ContextMenu {
+        Button {
+            print("unpin")
+        } label: {
+            Text(UserText.unpinTab)
+        }
+        Button {
+            print("duplicate")
+        } label: {
+            Text(UserText.duplicateTab)
+        }
+        Divider()
+        Button {
+            print("bookmark")
+        } label: {
+            Text(UserText.bookmarkThisPage)
+        }
+        Button {
+            print("close")
+        } label: {
+            Text(UserText.closeTab)
+        }
     }
 }
 
