@@ -78,7 +78,9 @@ final class TabCollectionViewModel: NSObject {
     private(set) var tabViewModels = [Tab: TabViewModel]()
     @Published private(set) var selectionIndex: SelectedTabIndex? {
         didSet {
-            updateSelectedTabViewModel()
+            if selectionIndex != oldValue {
+                updateSelectedTabViewModel()
+            }
         }
     }
     @Published private(set) var selectedTabViewModel: TabViewModel? {

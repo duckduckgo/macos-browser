@@ -105,8 +105,10 @@ final class TabBarViewController: NSViewController {
             .removeDuplicates()
             .compactMap { $0.flatMap(pinnedTabsModel.items.firstIndex(of:)) }
             .sink(receiveValue: { [weak self] index in
-                if self?.tabCollectionViewModel.selectPinnedTab(at: index) == true {
-                    self?.collectionView.clearSelection(animated: true)
+                if self?.tabCollectionViewModel.selectionIndex != .pinned(index) {
+                    if self?.tabCollectionViewModel.selectPinnedTab(at: index) == true {
+                        self?.collectionView.clearSelection(animated: true)
+                    }
                 }
             })
             .store(in: &cancellables)
