@@ -78,9 +78,7 @@ final class TabCollectionViewModel: NSObject {
     private(set) var tabViewModels = [Tab: TabViewModel]()
     @Published private(set) var selectionIndex: SelectedTabIndex? {
         didSet {
-            if selectionIndex != oldValue {
-                updateSelectedTabViewModel()
-            }
+            updateSelectedTabViewModel()
         }
     }
     @Published private(set) var selectedTabViewModel: TabViewModel? {
@@ -518,7 +516,7 @@ final class TabCollectionViewModel: NSObject {
             return
         }
 
-        insert(tab: tab, at: 0, selected: true)
+        insert(tab: tab)
     }
 
     // TODO
