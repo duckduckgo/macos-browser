@@ -72,7 +72,8 @@ final class WindowControllersManager: WindowControllersManagerProtocol {
             (
                 mainWindowControllers.count == 1 &&
                 mainWindowControllers.first?.mainViewController.tabCollectionViewModel.tabs.count == 1 &&
-                mainWindowControllers.first?.mainViewController.tabCollectionViewModel.tabs.first?.content == .homePage
+                mainWindowControllers.first?.mainViewController.tabCollectionViewModel.tabs.first?.content == .homePage &&
+                pinnedTabsManager.tabCollection.tabs.isEmpty
             )
         }
     }
