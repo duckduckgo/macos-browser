@@ -22,6 +22,12 @@ import os.log
 
 extension NSView {
 
+    func setCornerRadius(_ radius: CGFloat) {
+        wantsLayer = true
+        layer?.masksToBounds = true
+        layer?.cornerRadius = radius
+    }
+
     func addAndLayout(_ subView: NSView) {
         subView.translatesAutoresizingMaskIntoConstraints = false
         addSubview(subView)

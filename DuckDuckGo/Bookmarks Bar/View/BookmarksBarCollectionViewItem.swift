@@ -35,7 +35,13 @@ final class BookmarksBarCollectionViewItem: NSCollectionViewItem {
     static let identifier = NSUserInterfaceItemIdentifier(rawValue: "BookmarksBarCollectionViewItem")
 
     @IBOutlet var stackView: NSStackView!
-    @IBOutlet private var faviconView: NSImageView!
+    @IBOutlet private var mouseOverView: MouseOverView!
+    @IBOutlet private var faviconView: NSImageView! {
+        didSet {
+            faviconView.setCornerRadius(3.0)
+        }
+    }
+
     @IBOutlet private var titleLabel: NSTextField!
     @IBOutlet private var disclosureIndicatorImageView: NSImageView!
     @IBOutlet private var mouseClickView: MouseClickView! {
@@ -101,6 +107,11 @@ final class BookmarksBarCollectionViewItem: NSCollectionViewItem {
         let menu = NSMenu()
         menu.delegate = self
         view.menu = menu
+    }
+    
+    override func prepareForReuse() {
+        super.prepareForReuse()
+        mouseOverView.updateTrackingAreas()
     }
     
 }

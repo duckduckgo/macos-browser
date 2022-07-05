@@ -283,6 +283,8 @@ extension BookmarksBarViewModel: NSCollectionViewDelegate, NSCollectionViewDataS
                         indexPath newIndexPath: IndexPath,
                         dropOperation: NSCollectionView.DropOperation) -> Bool {
         if let existingIndexPath = existingItemDraggingIndexPath {
+            print("\(Date()): Accepting drop at index path \(newIndexPath)")
+            
             let entityUUID = self.bookmarksBarItems[existingIndexPath.item].entity.id
             
             let item: Int
@@ -327,6 +329,8 @@ extension BookmarksBarViewModel: NSCollectionViewDelegate, NSCollectionViewDataS
 extension BookmarksBarViewModel: BookmarksBarCollectionViewItemDelegate {
 
     func bookmarksBarCollectionViewItemClicked(_ item: BookmarksBarCollectionViewItem) {
+        print("\(Date()): Clicked item")
+        
         let action: BookmarksBarItemAction
         
         if NSApplication.shared.isCommandPressed && NSApplication.shared.isShiftPressed {

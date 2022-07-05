@@ -90,6 +90,7 @@
                 <outlet property="faviconView" destination="aEY-jN-qvL" id="vuC-Cm-ECU"/>
                 <outlet property="imageView" destination="aEY-jN-qvL" id="REc-8m-yVP"/>
                 <outlet property="mouseClickView" destination="IHK-ff-XkT" id="919-Qr-nRS"/>
+                <outlet property="mouseOverView" destination="Ff3-Xx-JTo" id="lDQ-IQ-fk1"/>
                 <outlet property="stackView" destination="KId-EQ-QP4" id="wtY-z4-O3g"/>
                 <outlet property="titleLabel" destination="fMp-kj-J3A" id="Sxw-1t-GqZ"/>
                 <outlet property="view" destination="Hz6-mo-xeY" id="Zhf-KI-eAw"/>
