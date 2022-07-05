@@ -614,6 +614,7 @@ extension MainViewController: NSMenuItemValidation {
         // Pin Tab
         case #selector(MainViewController.pinTab(_:)):
             return tabCollectionViewModel.selectionIndex?.isRegularTab == true
+            && tabCollectionViewModel.selectedTabViewModel?.tab.isUrl == true
 
         // Printing/saving
         case #selector(MainViewController.saveAs(_:)),

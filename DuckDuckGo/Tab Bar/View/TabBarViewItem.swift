@@ -31,6 +31,8 @@ protocol TabBarViewItemDelegate: AnyObject {
 
     func tabBarViewItem(_ tabBarViewItem: TabBarViewItem, isMouseOver: Bool)
 
+    func tabBarViewItemCanBePinned(_ tabBarViewItem: TabBarViewItem) -> Bool
+
     func tabBarViewItemCloseAction(_ tabBarViewItem: TabBarViewItem)
     func tabBarViewItemTogglePermissionAction(_ tabBarViewItem: TabBarViewItem)
     func tabBarViewItemCloseOtherAction(_ tabBarViewItem: TabBarViewItem)
@@ -301,6 +303,7 @@ final class TabBarViewItem: NSCollectionViewItem {
     private func setupMenu() {
         let menu = NSMenu()
         menu.delegate = self
+        menu.autoenablesItems = false
         view.menu = menu
     }
 
@@ -336,6 +339,7 @@ extension TabBarViewItem: NSMenuDelegate {
 
         let pinMenuItem = NSMenuItem(title: UserText.pinTab, action: #selector(pinAction(_:)), keyEquivalent: "")
         pinMenuItem.target = self
+        pinMenuItem.isEnabled = delegate?.tabBarViewItemCanBePinned(self) ?? false
         menu.addItem(pinMenuItem)
 
         menu.addItem(NSMenuItem.separator())
