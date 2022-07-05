@@ -22,8 +22,7 @@ import Foundation
 
 protocol BookmarksBarViewModelDelegate: AnyObject {
     
-    func bookmarksBarViewModelReceived(click: BookmarksBarViewModel.BookmarksBarClickType, for item: BookmarksBarCollectionViewItem)
-    
+    func bookmarksBarViewModelReceived(action: BookmarksBarViewModel.BookmarksBarItemAction, for item: BookmarksBarCollectionViewItem)
 }
 
 final class BookmarksBarViewModel: NSObject {
@@ -37,10 +36,14 @@ final class BookmarksBarViewModel: NSObject {
         static let labelFont = NSFont.systemFont(ofSize: 13)
     }
     
-    enum BookmarksBarClickType {
-        case standard
-        case commandClick
-        case shiftCommandClick
+    enum BookmarksBarItemAction {
+        case loadURL
+        case openInBackgroundTab
+        case openInNewTab
+        case openInNewWindow
+        case toggleFavorite
+        case copyURL
+        case deleteEntity
     }
     
     struct BookmarksBarItem {
@@ -170,6 +173,42 @@ final class BookmarksBarViewModel: NSObject {
         return true
     }
     
+    func buildClippedItemsMenu() -> NSMenu {
+        let menu = NSMenu()
+        menu.items = bookmarksTreeMenuItems(from: clippedItems)
+        
+        return menu
+    }
+    
+    func bookmarksTreeMenuItems(from bookmarkViewModels: [BookmarkViewModel], topLevel: Bool = true) -> [NSMenuItem] {
+        var menuItems = [NSMenuItem]()
+
+        for viewModel in bookmarkViewModels {
+            let menuItem = NSMenuItem(bookmarkViewModel: viewModel)
+
+            if let folder = viewModel.entity as? BookmarkFolder {
+                let subMenu = NSMenu(title: folder.title)
+                let childViewModels = folder.children.map(BookmarkViewModel.init)
+                let childMenuItems = bookmarksTreeMenuItems(from: childViewModels, topLevel: false)
+                subMenu.items = childMenuItems
+
+                if !subMenu.items.isEmpty {
+                    menuItem.submenu = subMenu
+                }
+            }
+
+            menuItems.append(menuItem)
+        }
+
+        let showOpenInTabsItem = bookmarkViewModels.compactMap { $0.entity as? Bookmark }.count > 1
+        if showOpenInTabsItem {
+            menuItems.append(.separator())
+            menuItems.append(NSMenuItem(bookmarkViewModels: bookmarkViewModels))
+        }
+        
+        return menuItems
+    }
+    
 }
 
 extension BookmarksBarViewModel: NSCollectionViewDelegate, NSCollectionViewDataSource {
@@ -221,7 +260,7 @@ extension BookmarksBarViewModel: NSCollectionViewDelegate, NSCollectionViewDataS
     }
     
     func collectionView(_ collectionView: NSCollectionView, pasteboardWriterForItemAt indexPath: IndexPath) -> NSPasteboardWriting? {
-        return NSURL(string: "https://example.com")
+        return bookmarksBarItems[indexPath.item].url as NSURL? ?? NSURL(string: "https://duck.com/")
     }
     
     func collectionView(_ collectionView: NSCollectionView,
@@ -286,19 +325,39 @@ extension BookmarksBarViewModel: NSCollectionViewDelegate, NSCollectionViewDataS
 }
 
 extension BookmarksBarViewModel: BookmarksBarCollectionViewItemDelegate {
-    
-    func bookmarksBarCollectionViewItemClicked(_ bookmarksBarCollectionViewItem: BookmarksBarCollectionViewItem) {
-        let clickType: BookmarksBarClickType
+
+    func bookmarksBarCollectionViewItemClicked(_ item: BookmarksBarCollectionViewItem) {
+        let action: BookmarksBarItemAction
         
         if NSApplication.shared.isCommandPressed && NSApplication.shared.isShiftPressed {
-            clickType = .shiftCommandClick
+            action = .openInNewTab
         } else if NSApplication.shared.isCommandPressed {
-            clickType = .commandClick
+            action = .openInBackgroundTab
         } else {
-            clickType = .standard
+            action = .loadURL
         }
         
-        delegate?.bookmarksBarViewModelReceived(click: clickType, for: bookmarksBarCollectionViewItem)
+        delegate?.bookmarksBarViewModelReceived(action: action, for: item)
+    }
+    
+    func bookmarksBarCollectionViewItemOpenInNewTabAction(_ item: BookmarksBarCollectionViewItem) {        
+        delegate?.bookmarksBarViewModelReceived(action: .openInNewTab, for: item)
+    }
+    
+    func bookmarksBarCollectionViewItemOpenInNewWindowAction(_ item: BookmarksBarCollectionViewItem) {
+        delegate?.bookmarksBarViewModelReceived(action: .openInNewWindow, for: item)
+    }
+    
+    func bookmarksBarCollectionViewItemToggleFavoriteBookmarkAction(_ item: BookmarksBarCollectionViewItem) {
+        delegate?.bookmarksBarViewModelReceived(action: .toggleFavorite, for: item)
+    }
+    
+    func bookmarksBarCollectionViewItemCopyBookmarkURLAction(_ item: BookmarksBarCollectionViewItem) {
+        delegate?.bookmarksBarViewModelReceived(action: .copyURL, for: item)
+    }
+    
+    func bookmarksBarCollectionViewItemDeleteEntityAction(_ item: BookmarksBarCollectionViewItem) {
+        delegate?.bookmarksBarViewModelReceived(action: .deleteEntity, for: item)
     }
     
 }

@@ -20,7 +20,13 @@ import Cocoa
 
 protocol BookmarksBarCollectionViewItemDelegate: AnyObject {
 
-    func bookmarksBarCollectionViewItemClicked(_ bookmarksBarCollectionViewItem: BookmarksBarCollectionViewItem)
+    func bookmarksBarCollectionViewItemClicked(_ item: BookmarksBarCollectionViewItem)
+    
+    func bookmarksBarCollectionViewItemOpenInNewTabAction(_ item: BookmarksBarCollectionViewItem)
+    func bookmarksBarCollectionViewItemOpenInNewWindowAction(_ item: BookmarksBarCollectionViewItem)
+    func bookmarksBarCollectionViewItemToggleFavoriteBookmarkAction(_ item: BookmarksBarCollectionViewItem)
+    func bookmarksBarCollectionViewItemCopyBookmarkURLAction(_ item: BookmarksBarCollectionViewItem)
+    func bookmarksBarCollectionViewItemDeleteEntityAction(_ item: BookmarksBarCollectionViewItem)
 
 }
 
@@ -130,26 +136,18 @@ extension BookmarksBarCollectionViewItem: NSMenuDelegate {
 
 extension BookmarksBarCollectionViewItem {
     
+    // MARK: Bookmark Menu Items
+    
     func createBookmarkMenuItems(isFavorite: Bool) -> [NSMenuItem] {
         return [
             openBookmarkInNewTabMenuItem(),
             openBookmarkInNewWindowMenuItem(),
             NSMenuItem.separator(),
-            toggleBookmarkAsFavoriteMenuItem(isFavorite: isFavorite)
+            toggleBookmarkAsFavoriteMenuItem(isFavorite: isFavorite),
+            NSMenuItem.separator(),
+            copyBookmarkURLMenuItem(),
+            deleteEntityMenuItem()
         ]
-        
-//
-//        if includeBookmarkEditMenu {
-//            menu.addItem(editBookmarkMenuItem(bookmark: bookmark))
-//        }
-//
-//        menu.addItem(NSMenuItem.separator())
-//
-//        menu.addItem(copyBookmarkMenuItem(bookmark: bookmark))
-//        menu.addItem(deleteBookmarkMenuItem(bookmark: bookmark))
-//        menu.addItem(NSMenuItem.separator())
-//
-//        menu.addItem(newFolderMenuItem())
     }
     
     func openBookmarkInNewTabMenuItem() -> NSMenuItem {
@@ -158,7 +156,7 @@ extension BookmarksBarCollectionViewItem {
     
     @objc
     func openBookmarkInNewTabMenuItemSelected(_ sender: NSMenuItem) {
-        print("Open in new tab")
+        delegate?.bookmarksBarCollectionViewItemOpenInNewTabAction(self)
     }
 
     func openBookmarkInNewWindowMenuItem() -> NSMenuItem {
@@ -167,7 +165,7 @@ extension BookmarksBarCollectionViewItem {
     
     @objc
     func openBookmarkInNewWindowMenuItemSelected(_ sender: NSMenuItem) {
-        print("Open in new window")
+        delegate?.bookmarksBarCollectionViewItemOpenInNewWindowAction(self)
     }
     
     func toggleBookmarkAsFavoriteMenuItem(isFavorite: Bool) -> NSMenuItem {
@@ -184,11 +182,33 @@ extension BookmarksBarCollectionViewItem {
     
     @objc
     func toggleBookmarkAsFavoriteMenuItemSelected(_ sender: NSMenuItem) {
-        print("Toggle favorite")
+        delegate?.bookmarksBarCollectionViewItemToggleFavoriteBookmarkAction(self)
     }
     
+    func copyBookmarkURLMenuItem() -> NSMenuItem {
+        return menuItem("Copy", #selector(copyBookmarkURLMenuItemSelected(_:)))
+    }
+    
+    @objc
+    func copyBookmarkURLMenuItemSelected(_ sender: NSMenuItem) {
+        delegate?.bookmarksBarCollectionViewItemCopyBookmarkURLAction(self)
+    }
+    
+    func deleteEntityMenuItem() -> NSMenuItem {
+        return menuItem("Delete", #selector(deleteMenuItemSelected(_:)))
+    }
+    
+    @objc
+    func deleteMenuItemSelected(_ sender: NSMenuItem) {
+        delegate?.bookmarksBarCollectionViewItemDeleteEntityAction(self)
+    }
+    
+    // MARK: Folder Menu Items
+    
     func createFolderMenuItems() -> [NSMenuItem] {
-        return []
+        return [
+            deleteEntityMenuItem()
+        ]
     }
     
     func menuItem(_ title: String, _ action: Selector) -> NSMenuItem {

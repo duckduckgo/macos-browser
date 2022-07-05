@@ -23,7 +23,13 @@ final class PersistentAppInterfaceSettings {
     
     static let shared = PersistentAppInterfaceSettings()
 
+    static let ShowBookmarksBarSettingChanged = NSNotification.Name("ShowBookmarksBarSettingChanged")
+    
     @UserDefaultsWrapper(key: .showBookmarksBar, defaultValue: false)
-    var showBookmarksBar: Bool
+    var showBookmarksBar: Bool {
+        didSet {
+            NotificationCenter.default.post(name: PersistentAppInterfaceSettings.ShowBookmarksBarSettingChanged, object: nil)
+        }
+    }
     
 }

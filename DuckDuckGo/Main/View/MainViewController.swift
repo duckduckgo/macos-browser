@@ -45,6 +45,7 @@ final class MainViewController: NSViewController {
     let tabCollectionViewModel: TabCollectionViewModel
 
     private var selectedTabViewModelCancellable: AnyCancellable?
+    private var bookmarksBarVisibilityChangedCancellable: AnyCancellable?
     private var navigationalCancellables = Set<AnyCancellable>()
     private var canBookmarkCancellable: AnyCancellable?
     private var canInsertLastRemovedTabCancellable: AnyCancellable?
@@ -71,6 +72,7 @@ final class MainViewController: NSViewController {
 
         listenToKeyDownEvents()
         subscribeToSelectedTabViewModel()
+        subscribeToAppSettingsNotifications()
         findInPageContainerView.applyDropShadow()
     }
 
@@ -208,6 +210,15 @@ final class MainViewController: NSViewController {
             self?.subscribeToTabContent()
             self?.adjustFirstResponder()
         }
+    }
+    
+    private func subscribeToAppSettingsNotifications() {
+        bookmarksBarVisibilityChangedCancellable = NotificationCenter.default
+            .publisher(for: PersistentAppInterfaceSettings.ShowBookmarksBarSettingChanged)
+            .sink { [weak self] _ in
+                let bookmarksBarVisible = PersistentAppInterfaceSettings.shared.showBookmarksBar
+                self?.toggleBookmarksBarVisibility(visible: bookmarksBarVisible)
+            }
     }
 
     private func resizeNavigationBarForHomePage(_ homePage: Bool, animated: Bool) {

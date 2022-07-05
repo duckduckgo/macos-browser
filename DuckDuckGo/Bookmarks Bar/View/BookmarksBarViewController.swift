@@ -163,47 +163,17 @@ final class BookmarksBarViewController: NSViewController {
 
     @IBAction
     private func clippedItemsIndicatorClicked(_ sender: NSButton) {
-        let menu = NSMenu()
+        let menu = viewModel.buildClippedItemsMenu()
         let location = NSPoint(x: 0, y: sender.frame.height + 5) // Magic number to adjust the height.
 
-        menu.items = viewModel.clippedItems.map { NSMenuItem(bookmarkViewModel: $0) }
         menu.popUp(positioning: nil, at: location, in: sender)
-    }
-    
-    private func bookmarkMenuItems(from bookmarkViewModels: [BookmarkViewModel], topLevel: Bool = true) -> [NSMenuItem] {
-        var menuItems = [NSMenuItem]()
-
-        for viewModel in bookmarkViewModels {
-            let menuItem = NSMenuItem(bookmarkViewModel: viewModel)
-
-            if let folder = viewModel.entity as? BookmarkFolder {
-                let subMenu = NSMenu(title: folder.title)
-                let childViewModels = folder.children.map(BookmarkViewModel.init)
-                let childMenuItems = bookmarkMenuItems(from: childViewModels, topLevel: false)
-                subMenu.items = childMenuItems
-
-                if !subMenu.items.isEmpty {
-                    menuItem.submenu = subMenu
-                }
-            }
-
-            menuItems.append(menuItem)
-        }
-
-        let showOpenInTabsItem = bookmarkViewModels.compactMap { $0.entity as? Bookmark }.count > 1
-        if showOpenInTabsItem {
-            menuItems.append(.separator())
-            menuItems.append(NSMenuItem(bookmarkViewModels: bookmarkViewModels))
-        }
-        
-        return menuItems
     }
     
 }
 
 extension BookmarksBarViewController: BookmarksBarViewModelDelegate {
     
-    func bookmarksBarViewModelReceived(click: BookmarksBarViewModel.BookmarksBarClickType, for item: BookmarksBarCollectionViewItem) {
+    func bookmarksBarViewModelReceived(action: BookmarksBarViewModel.BookmarksBarItemAction, for item: BookmarksBarCollectionViewItem) {
         guard let indexPath = bookmarksBarCollectionView.indexPath(for: item) else {
             assertionFailure("Failed to look up index path for clicked item")
             return
@@ -215,20 +185,36 @@ extension BookmarksBarViewController: BookmarksBarViewModelDelegate {
         }
         
         if let bookmark = entity as? Bookmark {
-            switch click {
-            case .shiftCommandClick:
+            switch action {
+            case .openInNewTab:
                 tabCollectionViewModel.appendNewTab(with: .url(bookmark.url), selected: true)
-            case .commandClick:
+            case .openInBackgroundTab:
                 tabCollectionViewModel.appendNewTab(with: .url(bookmark.url), selected: false)
-            case .standard:
+            case .openInNewWindow:
+                WindowsManager.openNewWindow(with: bookmark.url)
+            case .loadURL:
                 WindowControllersManager.shared.show(url: bookmark.url)
+            case .toggleFavorite:                
+                bookmark.isFavorite = !bookmark.isFavorite
+                bookmarkManager.update(bookmark: bookmark)
+            case .copyURL:
+                break
+            case .deleteEntity:
+                bookmarkManager.remove(bookmark: bookmark)
             }
         } else if let folder = entity as? BookmarkFolder {
-            let childEntities = folder.children
-            let viewModels = childEntities.map { BookmarkViewModel(entity: $0) }
-            let menuItems = bookmarkMenuItems(from: viewModels, topLevel: true)
-            let menu = bookmarkFolderMenu(items: menuItems)
-            menu.popUp(positioning: nil, at: CGPoint(x: 0, y: item.view.frame.minY - 7), in: item.view)
+            switch action {
+            case .loadURL:
+                let childEntities = folder.children
+                let viewModels = childEntities.map { BookmarkViewModel(entity: $0) }
+                let menuItems = viewModel.bookmarksTreeMenuItems(from: viewModels, topLevel: true)
+                let menu = bookmarkFolderMenu(items: menuItems)
+                menu.popUp(positioning: nil, at: CGPoint(x: 0, y: item.view.frame.minY - 7), in: item.view)
+            case .deleteEntity:
+                bookmarkManager.remove(folder: folder)
+            default:
+                assertionFailure("Received unexpected action for bookmark folder")
+            }
         } else {
             assertionFailure("Failed to cast entity for clicked item")
         }
