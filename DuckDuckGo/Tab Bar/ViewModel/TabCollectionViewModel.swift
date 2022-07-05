@@ -204,7 +204,7 @@ final class TabCollectionViewModel: NSObject {
 
     func selectNext() {
         guard changesEnabled else { return }
-        guard tabCollection.tabs.count > 0 else {
+        guard allTabs.count > 0 else {
             os_log("TabCollectionViewModel: No tabs for selection", type: .error)
             return
         }
@@ -226,7 +226,7 @@ final class TabCollectionViewModel: NSObject {
 
     func selectPrevious() {
         guard changesEnabled else { return }
-        guard tabCollection.tabs.count > 0 else {
+        guard allTabs.count > 0 else {
             os_log("TabCollectionViewModel: No tabs for selection", type: .error)
             return
         }
