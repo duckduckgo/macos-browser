@@ -78,7 +78,9 @@ final class TabCollectionViewModel: NSObject {
     private(set) var tabViewModels = [Tab: TabViewModel]()
     @Published private(set) var selectionIndex: SelectedTabIndex? {
         didSet {
-            updateSelectedTabViewModel()
+            if selectionIndex != oldValue {
+                updateSelectedTabViewModel()
+            }
         }
     }
     @Published private(set) var selectedTabViewModel: TabViewModel? {
@@ -493,7 +495,7 @@ final class TabCollectionViewModel: NSObject {
         }
 
         if tabCollection.tabs.count == 1 {
-            appendNewTab(with: .homePage)
+            appendNewTab(with: .homePage, selected: false)
         }
 
         let tab = tabCollection.tabs[index]
