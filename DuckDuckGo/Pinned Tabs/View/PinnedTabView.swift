@@ -29,7 +29,9 @@ struct PinnedTabView: View {
 
     var body: some View {
         Button {
-            collectionModel.selectedItem = model
+            if collectionModel.selectedItem != model {
+                collectionModel.selectedItem = model
+            }
         } label: {
             PinnedTabInnerView(foregroundColor: foregroundColor, faviconImage: model.favicon)
         }
