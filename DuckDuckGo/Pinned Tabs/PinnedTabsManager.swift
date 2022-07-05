@@ -21,11 +21,14 @@ import Combine
 import os
 
 protocol PinnedTabsManager {
+    var didSetUpPinnedTabsPublisher: AnyPublisher<Void, Never> { get }
     var tabCollection: TabCollection { get set }
     func pin(_ tab: Tab)
     func pin(_ tab: Tab, at index: Int?)
     func unpin(_ tab: Tab)
     func tabViewModel(at index: Int) -> TabViewModel?
+
+    func setUp(with collection: TabCollection)
 }
 
 final class LocalPinnedTabsManager: PinnedTabsManager, ObservableObject {
@@ -34,6 +37,13 @@ final class LocalPinnedTabsManager: PinnedTabsManager, ObservableObject {
         didSet {
             subscribeToPinnedTabs()
         }
+    }
+
+    let didSetUpPinnedTabsPublisher: AnyPublisher<Void, Never>
+
+    func setUp(with collection: TabCollection) {
+        tabCollection = collection
+        didSetUpPinnedTabsSubject.send()
     }
 
     func pin(_ tab: Tab) {
@@ -62,12 +72,14 @@ final class LocalPinnedTabsManager: PinnedTabsManager, ObservableObject {
     }
 
     init(tabCollection: TabCollection = .init()) {
+        didSetUpPinnedTabsPublisher = didSetUpPinnedTabsSubject.eraseToAnyPublisher()
         self.tabCollection = tabCollection
     }
 
     // MARK: - Private
 
     private(set) var tabViewModels = [Tab: TabViewModel]()
+    private let didSetUpPinnedTabsSubject = PassthroughSubject<Void, Never>()
     private var cancellables: Set<AnyCancellable> = []
 
     private func subscribeToPinnedTabs() {

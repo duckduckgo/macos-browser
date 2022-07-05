@@ -65,7 +65,7 @@ extension WindowControllersManager {
     }
 
     func restorePinnedTabs(_ collection: TabCollection) {
-        pinnedTabsManager.tabCollection = collection
+        pinnedTabsManager.setUp(with: collection)
     }
 
 }

@@ -80,8 +80,14 @@ final class TabBarViewController: NSViewController {
         pinnedTabsContainerView.addAndLayout(host)
 
         tabCollectionViewModel.$selectionIndex
-            .filter { $0?.isRegularTab == true }
-            .map { _ in Tab?.none }
+            .map { selectedTabIndex -> Tab? in
+                switch selectedTabIndex {
+                case .pinned(let index):
+                    return WindowControllersManager.shared.pinnedTabsManager.tabCollection.tabs[safe: index]
+                default:
+                    return nil
+                }
+            }
             .assign(to: \.selectedItem, on: pinnedTabsModel)
             .store(in: &cancellables)
 
@@ -90,6 +96,8 @@ final class TabBarViewController: NSViewController {
             .store(in: &cancellables)
 
         pinnedTabsModel.$selectedItem
+            .dropFirst()
+            .removeDuplicates()
             .compactMap { $0.flatMap(pinnedTabsModel.items.firstIndex(of:)) }
             .sink(receiveValue: { [weak self] index in
                 if self?.tabCollectionViewModel.selectPinnedTab(at: index) == true {

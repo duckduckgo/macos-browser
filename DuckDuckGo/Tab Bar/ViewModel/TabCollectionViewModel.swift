@@ -100,12 +100,10 @@ final class TabCollectionViewModel: NSObject {
         super.init()
 
         subscribeToTabs()
+        applySelectionWhenPinnedTabsAreReady(selectionIndex)
 
         if tabCollection.tabs.isEmpty {
             appendNewTab(with: .homePage)
-        }
-        if self.selectionIndex != selectionIndex {
-            self.selectionIndex = selectionIndex
         }
     }
 
@@ -200,41 +198,6 @@ final class TabCollectionViewModel: NSObject {
             return true
         }
         return false
-    }
-
-    private func nextIndex(from current: SelectedTabIndex) -> SelectedTabIndex {
-        switch current {
-        case .pinned(let index):
-            if index == pinnedTabsCollection.tabs.count - 1 {
-                return .regular(0)
-            }
-            return .pinned(index + 1)
-        case .regular(let index):
-            if index == tabCollection.tabs.count - 1 {
-                return pinnedTabsCollection.tabs.count > 0 ? .pinned(0) : .regular(0)
-            }
-            return .regular(index + 1)
-        }
-    }
-
-    private func previousIndex(from current: SelectedTabIndex) -> SelectedTabIndex {
-        switch current {
-        case .pinned(let index):
-            if index == 0 {
-                return .regular(tabCollection.tabs.count - 1)
-            }
-            return .pinned(index - 1)
-        case .regular(let index):
-            if index == 0 {
-                let pinnedTabsCount = pinnedTabsCollection.tabs.count
-                return pinnedTabsCount > 0 ? .pinned(pinnedTabsCount - 1) : .regular(tabCollection.tabs.count - 1)
-            }
-            return .regular(index - 1)
-        }
-    }
-
-    private func firstIndex() -> SelectedTabIndex {
-        return pinnedTabsCollection.tabs.count > 0 ? .pinned(0) : .regular(0)
     }
 
     func selectNext() {
@@ -356,7 +319,7 @@ final class TabCollectionViewModel: NSObject {
         didRemoveTab(at: index, withParent: parentTab, from: tabCollection)
     }
 
-    private func tabCollection(for selection: SelectedTabIndex) -> TabCollection {
+    private func tabCollection(for selection: SelectedTabIndex) -> TabCollection? {
         switch selection {
         case .regular:
             return tabCollection
@@ -557,6 +520,17 @@ final class TabCollectionViewModel: NSObject {
         selectRegularTab(at: selectionIndex.index, forceChange: forceChange)
     }
 
+    private func applySelectionWhenPinnedTabsAreReady(_ selection: SelectedTabIndex?) {
+        WindowControllersManager.shared.pinnedTabsManager.didSetUpPinnedTabsPublisher
+            .prefix(1)
+            .sink { [weak self] in
+                if self?.selectionIndex != selection {
+                    self?.selectionIndex = selection
+                }
+            }
+            .store(in: &cancellables)
+    }
+
     private func subscribeToTabs() {
         tabCollection.$tabs.sink { [weak self] newTabs in
             guard let self = self else { return }
@@ -603,5 +577,39 @@ final class TabCollectionViewModel: NSObject {
         self.selectedTabViewModel = selectedTabViewModel
     }
 
+    private func firstIndex() -> SelectedTabIndex {
+        return pinnedTabsCollection.tabs.count > 0 ? .pinned(0) : .regular(0)
+    }
+
+    private func nextIndex(from current: SelectedTabIndex) -> SelectedTabIndex {
+        switch current {
+        case .pinned(let index):
+            if index == pinnedTabsCollection.tabs.count - 1 {
+                return .regular(0)
+            }
+            return .pinned(index + 1)
+        case .regular(let index):
+            if index == tabCollection.tabs.count - 1 {
+                return firstIndex()
+            }
+            return .regular(index + 1)
+        }
+    }
+
+    private func previousIndex(from current: SelectedTabIndex) -> SelectedTabIndex {
+        switch current {
+        case .pinned(let index):
+            if index == 0 {
+                return .regular(tabCollection.tabs.count - 1)
+            }
+            return .pinned(index - 1)
+        case .regular(let index):
+            if index == 0 {
+                let pinnedTabsCount = pinnedTabsCollection.tabs.count
+                return pinnedTabsCount > 0 ? .pinned(pinnedTabsCount - 1) : .regular(tabCollection.tabs.count - 1)
+            }
+            return .regular(index - 1)
+        }
+    }
 }
 // swiftlint:enable type_body_length
