@@ -492,9 +492,15 @@ final class TabCollectionViewModel: NSObject {
             return
         }
 
+        if tabCollection.tabs.count == 1 {
+            appendNewTab(with: .homePage)
+        }
+
         let tab = tabCollection.tabs[index]
+
         WindowControllersManager.shared.pinnedTabsManager.pin(tab)
-        remove(at: index)
+        remove(at: index, published: false)
+        selectPinnedTab(at: pinnedTabsCollection.tabs.count - 1)
     }
 
     // TODO
