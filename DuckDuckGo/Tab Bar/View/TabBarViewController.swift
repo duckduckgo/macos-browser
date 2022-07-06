@@ -187,7 +187,7 @@ final class TabBarViewController: NSViewController {
     }
 
     private func reloadSelection() {
-        guard (tabCollectionViewModel.selectionIndex?.isRegularTab ?? true) == true,
+        guard tabCollectionViewModel.selectionIndex?.isRegularTab == true,
               collectionView.selectionIndexPaths.first?.item != tabCollectionViewModel.selectionIndex?.index
         else {
             collectionView.updateItemsLeftToSelectedItems()

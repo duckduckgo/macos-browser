@@ -114,7 +114,7 @@ final class TabCollectionViewModel: NSObject {
     private var isTabLazyLoadingRequested: Bool = false
 
     private let pinnedTabsManager: PinnedTabsManager
-    private var shouldBlockPinnedTabsManagerSubscriptions: Bool = false
+    private var shouldBlockPinnedTabsManagerUpdates: Bool = false
 
     private var cancellables = Set<AnyCancellable>()
 
@@ -361,9 +361,9 @@ final class TabCollectionViewModel: NSObject {
 
     func removePinnedTab(at index: Int, published: Bool = true) {
         guard changesEnabled else { return }
-        shouldBlockPinnedTabsManagerSubscriptions = true
+        shouldBlockPinnedTabsManagerUpdates = true
         defer {
-            shouldBlockPinnedTabsManagerSubscriptions = false
+            shouldBlockPinnedTabsManagerUpdates = false
         }
         guard pinnedTabsManager.unpinTab(at: index, published: published) != nil else { return }
 
@@ -577,9 +577,9 @@ final class TabCollectionViewModel: NSObject {
 
     func unpinTab(at index: Int) {
         guard changesEnabled else { return }
-        shouldBlockPinnedTabsManagerSubscriptions = true
+        shouldBlockPinnedTabsManagerUpdates = true
         defer {
-            shouldBlockPinnedTabsManagerSubscriptions = false
+            shouldBlockPinnedTabsManagerUpdates = false
         }
 
         guard let tab = pinnedTabsManager.unpinTab(at: index, published: false) else {
@@ -633,7 +633,7 @@ final class TabCollectionViewModel: NSObject {
 
     private func subscribeToPinnedTabsManager() {
         pinnedTabsManager.didUnpinTabPublisher
-            .filter { [weak self] _ in self?.shouldBlockPinnedTabsManagerSubscriptions == false }
+            .filter { [weak self] _ in self?.shouldBlockPinnedTabsManagerUpdates == false }
             .sink { [weak self] index in
                 self?.handleTabUnpinnedInAnotherTabCollectionViewModel(at: index)
             }

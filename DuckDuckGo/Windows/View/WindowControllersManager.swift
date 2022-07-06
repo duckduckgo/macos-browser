@@ -43,8 +43,15 @@ final class WindowControllersManager: WindowControllersManagerProtocol {
     @Published private(set) var mainWindowControllers = [MainWindowController]()
     var pinnedTabsManager: PinnedTabsManager = LocalPinnedTabsManager()
 
-    weak var lastKeyMainWindowController: MainWindowController?
+    weak var lastKeyMainWindowController: MainWindowController? {
+        didSet {
+            if lastKeyMainWindowController != oldValue {
+                didChangeKeyWindowController.send(())
+            }
+        }
+    }
 
+    let didChangeKeyWindowController = PassthroughSubject<Void, Never>()
     let didRegisterWindowController = PassthroughSubject<(MainWindowController), Never>()
     let didUnregisterWindowController = PassthroughSubject<(MainWindowController), Never>()
 
