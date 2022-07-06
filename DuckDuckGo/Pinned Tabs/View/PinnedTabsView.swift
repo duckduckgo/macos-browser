@@ -19,6 +19,11 @@
 import SwiftUI
 import Combine
 
+struct TabDragState {
+    var draggedTab: Tab
+    var offset: CGFloat
+}
+
 struct PinnedTabsView: View {
     @ObservedObject var model: PinnedTabsModel
     @State private var draggedTab: Tab?
@@ -27,23 +32,43 @@ struct PinnedTabsView: View {
         HStack(alignment: .bottom, spacing: 0) {
             ForEach(model.items) { item in
                 PinnedTabView(model: item)
-                    .opacity(draggedTab == item ? 0 : 1)
-                    .onDrag({
-                        draggedTab = item
-                        return NSItemProvider(object: DummyItemProvider())
-                    }, previewIfAvailable: {
-                        PinnedTabDraggingPreview(model: item)
-                    })
-                    .onDrop(of: ["public.data"], delegate: PinnedTabsViewRelocateDragDelegate(
-                        tab: item,
-                        tabs: $model.items,
-                        draggedTab: $draggedTab,
-                        selectedTab: $model.selectedItem
-                    ))
                     .environmentObject(model)
             }
         }
         .frame(maxHeight: PinnedTabView.Const.dimension)
+        .gesture(dragGesture)
+    }
+
+    var dragGesture: some Gesture {
+        DragGesture()
+            .onChanged(updateDrag)
+            .onEnded(endDrag)
+    }
+
+    private func updateDrag(_ value: DragGesture.Value) {
+        if draggedTab == nil {
+            let draggedTabIndex = itemIndex(for: value.startLocation.x)
+            draggedTab = model.items[draggedTabIndex]
+        }
+        guard let draggedTab = draggedTab, let from = model.items.firstIndex(of: draggedTab) else {
+            return
+        }
+        let to = itemIndex(for: value.location.x)
+
+        if to != from, model.items[to] != draggedTab {
+            withAnimation(.easeInOut(duration: 0.2)) {
+                model.items.move(fromOffsets: IndexSet(integer: from),
+                                 toOffset: to > from ? to + 1 : to)
+            }
+        }
+    }
+
+    private func endDrag(_ value: DragGesture.Value) {
+        draggedTab = nil
+    }
+
+    private func itemIndex(for x: CGFloat) -> Int {
+        max(0, min(Int(x / CGFloat(PinnedTabView.Const.dimension)), model.items.count - 1))
     }
 }
 
@@ -54,80 +79,5 @@ extension PinnedTabsView {
         }
         let possibleItemIndex = Int(point.x / PinnedTabView.Const.dimension)
         return model.items.index(model.items.startIndex, offsetBy: possibleItemIndex, limitedBy: model.items.endIndex)
-    }
-}
-
-private extension View {
-
-    @ViewBuilder
-    func onDrag<V: View>(_ data: @escaping () -> NSItemProvider, previewIfAvailable: () -> V) -> some View {
-        if #available(macOS 12.0, *) {
-            onDrag(data, preview: previewIfAvailable)
-        } else {
-            onDrag(data)
-        }
-    }
-}
-
-final class DummyItemProvider: NSObject, NSItemProviderWriting {
-    static var writableTypeIdentifiersForItemProvider: [String] {
-        ["public.data"]
-    }
-
-    func loadData(
-        withTypeIdentifier typeIdentifier: String,
-        forItemProviderCompletionHandler completionHandler: @escaping (Data?, Error?) -> Void
-    ) -> Progress? {
-        completionHandler(nil, nil)
-        return nil
-    }
-}
-
-struct PinnedTabsViewRelocateDragDelegate: DropDelegate {
-    let tab: Tab
-    @Binding var tabs: [Tab]
-    @Binding var draggedTab: Tab?
-    @Binding var selectedTab: Tab?
-
-    func dropEntered(info: DropInfo) {
-        guard let currentTab = draggedTab else {
-            return
-        }
-        if tab != currentTab,
-           let from = tabs.firstIndex(of: currentTab),
-           let to = tabs.firstIndex(of: tab),
-           tabs[to] != currentTab {
-
-            withAnimation(.easeInOut(duration: 0.2)) {
-                tabs.move(fromOffsets: IndexSet(integer: from),
-                          toOffset: to > from ? to + 1 : to)
-            }
-        }
-    }
-
-    func dropUpdated(info: DropInfo) -> DropProposal? {
-        .init(operation: .move)
-    }
-
-    func performDrop(info: DropInfo) -> Bool {
-        print(#function, "has url: \(info.hasItemsConforming(to: ["public.url"]))")
-
-//        if draggedTab == nil, let itemProvider = info.itemProviders(for: ["public.url"]).first {
-//            itemProvider.loadItem(forTypeIdentifier: "public.url") { data, _ in
-//                guard let data = data as? Data else {
-//                    return
-//                }
-//                guard let url = String(bytes: data, encoding: .utf8)?.url else {
-//                    return
-//                }
-//                DispatchQueue.main.async {
-//                    TabDragAndDropManager.shared.dropToPinTabIfNeeded()
-//                }
-//            }
-//        }
-
-        selectedTab = draggedTab
-        draggedTab = nil
-        return true
     }
 }
