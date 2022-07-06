@@ -27,6 +27,9 @@ struct PinnedTabView: View {
     @EnvironmentObject var collectionModel: PinnedTabsModel
     @State var isHovered: Bool = false
 
+    // Hover highlight is disabled while another tab is dragged
+    var showsHover: Bool
+
     var body: some View {
         Button {
             if collectionModel.selectedItem != model {
@@ -47,7 +50,7 @@ struct PinnedTabView: View {
         if collectionModel.selectedItem == model {
             return Color("InterfaceBackgroundColor")
         }
-        return isHovered ? Color("TabMouseOverColor") : Color.clear
+        return showsHover && isHovered ? Color("TabMouseOverColor") : Color.clear
     }
 
     @ViewBuilder
@@ -92,14 +95,5 @@ struct PinnedTabInnerView: View {
                 .foregroundColor(Color("GreyTextColor"))
         }
         .frame(width: PinnedTabView.Const.dimension)
-    }
-}
-
-struct PinnedTabDraggingPreview: View {
-    @ObservedObject var model: Tab
-
-    var body: some View {
-        PinnedTabInnerView(foregroundColor: Color("InterfaceBackgroundColor"), faviconImage: model.favicon)
-            .cornerRadius(6)
     }
 }

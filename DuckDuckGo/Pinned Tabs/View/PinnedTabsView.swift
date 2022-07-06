@@ -31,7 +31,7 @@ struct PinnedTabsView: View {
     var body: some View {
         HStack(alignment: .bottom, spacing: 0) {
             ForEach(model.items) { item in
-                PinnedTabView(model: item)
+                PinnedTabView(model: item, showsHover: draggedTab == nil)
                     .environmentObject(model)
             }
         }
