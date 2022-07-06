@@ -137,7 +137,7 @@ final class BookmarksBarViewModel: NSObject {
             let additionalWidth = isFolder ? Constants.additionalFolderWidth : Constants.additionalBookmarkWidth
             let width = cachedValue + additionalWidth
             
-            print("DEBUG: Returning cached width of \(width) for title '\(buttonTitle)', isFolder = \(isFolder)")
+            // print("DEBUG: Returning cached width of \(width) for title '\(buttonTitle)', isFolder = \(isFolder)")
             
             return width
         } else {            
@@ -149,7 +149,7 @@ final class BookmarksBarViewModel: NSObject {
             let calculatedWidth = min(Constants.maximumButtonWidth, calculationLabel.frame.width) + additionalWidth
             collectionViewItemSizeCache[buttonTitle] = cappedTitleWidth
 
-            print("DEBUG: Returning calculated width of \(calculatedWidth) for title '\(buttonTitle)', isFolder = \(isFolder)")
+            // print("DEBUG: Returning calculated width of \(calculatedWidth) for title '\(buttonTitle)', isFolder = \(isFolder)")
             
             return calculatedWidth
         }
@@ -186,7 +186,6 @@ final class BookmarksBarViewModel: NSObject {
     func buildClippedItemsMenu() -> NSMenu {
         let menu = NSMenu()
         menu.items = bookmarksTreeMenuItems(from: clippedItems)
-        
         return menu
     }
     
@@ -226,22 +225,11 @@ extension BookmarksBarViewModel: NSCollectionViewDelegate, NSCollectionViewDataS
     func collectionView(_ collectionView: NSCollectionView,
                         viewForSupplementaryElementOfKind kind: NSCollectionView.SupplementaryElementKind,
                         at indexPath: IndexPath) -> NSView {
-        print("Creating supplementary image with kind = \(kind)")
-
         let image = NSImage(named: "Drop-Target-Indicator-16")!
         let imageView = NSImageView(image: image)
         imageView.contentTintColor = NSColor.controlAccentColor
         
         return imageView
-    }
-    
-    func collectionView(_ collectionView: NSCollectionView,
-                        draggingImageForItemsAt indexPaths: Set<IndexPath>,
-                        with event: NSEvent,
-                        offset dragImageOffset: NSPointPointer) -> NSImage {
-        let image = collectionView.draggingImageForItems(at: indexPaths, with: event, offset: dragImageOffset)
-        
-        return image
     }
 
     func collectionView(_ collectionView: NSCollectionView, numberOfItemsInSection section: Int) -> Int {
@@ -281,6 +269,7 @@ extension BookmarksBarViewModel: NSCollectionViewDelegate, NSCollectionViewDataS
     }
     
     func collectionView(_ collectionView: NSCollectionView, pasteboardWriterForItemAt indexPath: IndexPath) -> NSPasteboardWriting? {
+        // TODO: Remove the hardcoded duck.com writer and replace it with a custom writer for folders.
         return bookmarksBarItems[indexPath.item].url as NSURL? ?? NSURL(string: "https://duck.com/")
     }
     
@@ -304,8 +293,6 @@ extension BookmarksBarViewModel: NSCollectionViewDelegate, NSCollectionViewDataS
                         indexPath newIndexPath: IndexPath,
                         dropOperation: NSCollectionView.DropOperation) -> Bool {
         if let existingIndexPath = existingItemDraggingIndexPath {
-            print("\(Date()): Accepting drop at index path \(newIndexPath)")
-            
             let entityUUID = self.bookmarksBarItems[existingIndexPath.item].entity.id
             
             let item: Int
@@ -350,8 +337,6 @@ extension BookmarksBarViewModel: NSCollectionViewDelegate, NSCollectionViewDataS
 extension BookmarksBarViewModel: BookmarksBarCollectionViewItemDelegate {
 
     func bookmarksBarCollectionViewItemClicked(_ item: BookmarksBarCollectionViewItem) {
-        print("\(Date()): Clicked item")
-        
         let action: BookmarksBarItemAction
         
         if NSApplication.shared.isCommandPressed && NSApplication.shared.isShiftPressed {

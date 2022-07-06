@@ -28,41 +28,30 @@ extension NSCollectionLayoutGroup {
             let verticalPosition: CGFloat = environment.container.contentInsets.top
 
             var items: [NSCollectionLayoutGroupCustomItem] = []
-            var rowSizes: [CGSize] = []
             
             func totalWidth() -> CGFloat {
-                rowSizes.map(\.width).reduce(0) {
+                cellSizes.map(\.width).reduce(0) {
                     $0 == 0 ? $1 : $0 + interItemSpacing + $1
                 }
             }
             
-            func addRowItems() {
-                var xPos: CGFloat
-                
-                if centered {
-                    xPos = (environment.container.effectiveContentSize.width - totalWidth()) / 2 + environment.container.contentInsets.leading
-                } else {
-                    xPos = interItemSpacing
-                }
-                
-                let maxItemHeight = rowSizes.map(\.height).max() ?? 0
-
-                let rowItems: [NSCollectionLayoutGroupCustomItem] = rowSizes.map {
-                    let rect = CGRect(origin: CGPoint(x: xPos, y: verticalPosition + (maxItemHeight - $0.height) / 2), size: $0)
-                    xPos += ($0.width + interItemSpacing)
-                    return NSCollectionLayoutGroupCustomItem(frame: rect)
-                }
-                
-                items.append(contentsOf: rowItems)
+            var xPos: CGFloat
+            
+            if centered {
+                xPos = (environment.container.effectiveContentSize.width - totalWidth()) / 2 + environment.container.contentInsets.leading
+            } else {
+                xPos = interItemSpacing
             }
             
-            for (index, cellSize) in cellSizes.enumerated() {
-                rowSizes.append(cellSize)
-                
-                if index == cellSizes.count - 1 {
-                    addRowItems()
-                }
+            let maxItemHeight = cellSizes.map(\.height).max() ?? 0
+
+            let rowItems: [NSCollectionLayoutGroupCustomItem] = cellSizes.map {
+                let rect = CGRect(origin: CGPoint(x: xPos, y: verticalPosition + (maxItemHeight - $0.height) / 2), size: $0)
+                xPos += ($0.width + interItemSpacing)
+                return NSCollectionLayoutGroupCustomItem(frame: rect)
             }
+            
+            items.append(contentsOf: rowItems)
             
             return items
         }

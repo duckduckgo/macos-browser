@@ -226,102 +226,12 @@ extension BookmarksBarViewController: BookmarksBarViewModelDelegate {
         let menu = NSMenu()
         
         if items.isEmpty {
-            menu.items = [
-                NSMenuItem(title: "Empty", action: nil, target: nil, keyEquivalent: "")
-            ]
+            menu.items = [NSMenuItem(title: "Empty", action: nil, target: nil, keyEquivalent: "")]
         } else {
             menu.items = items
         }
         
         return menu
-    }
-    
-}
-
-extension BookmarksBarViewController: BookmarkMenuItemSelectors {
-    
-    func openBookmarkInNewTab(_ sender: NSMenuItem) {
-        guard let bookmark = sender.representedObject as? Bookmark else {
-            assertionFailure("Failed to cast menu represented object to Bookmark")
-            return
-        }
-        
-        WindowControllersManager.shared.show(url: bookmark.url, newTab: true)
-    }
-    
-    func openBookmarkInNewWindow(_ sender: NSMenuItem) {
-        guard let bookmark = sender.representedObject as? Bookmark else {
-            assertionFailure("Failed to cast menu represented object to Bookmark")
-            return
-        }
-        
-        WindowsManager.openNewWindow(with: bookmark.url)
-    }
-    
-    func toggleBookmarkAsFavorite(_ sender: NSMenuItem) {
-        guard let bookmark = sender.representedObject as? Bookmark else {
-            assertionFailure("Failed to cast menu represented object to Bookmark")
-            return
-        }
-        
-        bookmark.isFavorite.toggle()
-        LocalBookmarkManager.shared.update(bookmark: bookmark)
-    }
-    
-    func editBookmark(_ sender: NSMenuItem) {
-        // Unsupported
-    }
-    
-    func copyBookmark(_ sender: NSMenuItem) {
-        guard let bookmark = sender.representedObject as? Bookmark, let bookmarkURL = bookmark.url as NSURL? else {
-            assertionFailure("Failed to cast menu represented object to Bookmark")
-            return
-        }
-        
-        let pasteboard = NSPasteboard.general
-        pasteboard.declareTypes([.URL], owner: nil)
-        bookmarkURL.write(to: pasteboard)
-        pasteboard.setString(bookmarkURL.absoluteString ?? "", forType: .string)
-    }
-    
-    func deleteBookmark(_ sender: NSMenuItem) {
-        guard let bookmark = sender.representedObject as? Bookmark else {
-            assertionFailure("Failed to cast menu represented object to Bookmark")
-            return
-        }
-        
-        LocalBookmarkManager.shared.remove(bookmark: bookmark)
-    }
-    
-}
-
-extension BookmarksBarViewController: FolderMenuItemSelectors {
-    
-    func newFolder(_ sender: NSMenuItem) {
-        let addFolderViewController = AddFolderModalViewController.create()
-        // addFolderViewController.delegate = self
-        beginSheet(addFolderViewController)
-    }
-    
-    func renameFolder(_ sender: NSMenuItem) {
-        guard let folder = sender.representedObject as? BookmarkFolder else {
-            assertionFailure("Failed to retrieve Bookmark from Rename Folder context menu item")
-            return
-        }
-        
-        let addFolderViewController = AddFolderModalViewController.create()
-        // addFolderViewController.delegate = self
-        addFolderViewController.edit(folder: folder)
-        presentAsModalWindow(addFolderViewController)
-    }
-    
-    func deleteFolder(_ sender: NSMenuItem) {
-        guard let folder = sender.representedObject as? BookmarkFolder else {
-            assertionFailure("Failed to retrieve Bookmark from Delete Folder context menu item")
-            return
-        }
-        
-        LocalBookmarkManager.shared.remove(folder: folder)
     }
     
 }
