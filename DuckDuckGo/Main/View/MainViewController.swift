@@ -93,6 +93,7 @@ final class MainViewController: NSViewController {
         updateForwardMenuItem()
         updateReloadMenuItem()
         updateStopMenuItem()
+        browserTabViewController.windowDidBecomeKey()
     }
 
     func windowDidResignKey() {

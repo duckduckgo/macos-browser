@@ -45,6 +45,7 @@ final class BrowserTabViewController: NSViewController {
     private let tabCollectionViewModel: TabCollectionViewModel
     private var tabContentCancellable: AnyCancellable?
     private var errorViewStateCancellable: AnyCancellable?
+    private var pinnedTabsDelegatesCancellable: AnyCancellable?
     private var cancellables = Set<AnyCancellable>()
 
     private var contextMenuExpected = false
@@ -124,13 +125,22 @@ final class BrowserTabViewController: NSViewController {
     }
 
     private func subscribeToTabs() {
-        Publishers.Merge(tabCollectionViewModel.pinnedTabsCollection.$tabs, tabCollectionViewModel.tabCollection.$tabs)
-        .sink { [weak self] tabs in
-            for tab in tabs where tab.delegate !== self {
-                tab.delegate = self
+        tabCollectionViewModel.tabCollection.$tabs
+            .sink { [weak self] tabs in
+                for tab in tabs where tab.delegate !== self {
+                    tab.delegate = self
+                }
             }
-        }
-        .store(in: &cancellables)
+            .store(in: &cancellables)
+    }
+
+    private func subscribeToPinnedTabs() {
+        pinnedTabsDelegatesCancellable = tabCollectionViewModel.pinnedTabsCollection.$tabs
+            .sink { [weak self] tabs in
+                for tab in tabs where tab.delegate !== self {
+                    tab.delegate = self
+                }
+            }
     }
 
     private func removeWebViewFromHierarchy(webView: WebView? = nil,
@@ -529,7 +539,12 @@ extension BrowserTabViewController: TabDelegate {
         scheduleHoverLabelUpdatesForUrl(url)
     }
 
+    func windowDidBecomeKey() {
+        subscribeToPinnedTabs()
+    }
+
     func windowDidResignKey() {
+        pinnedTabsDelegatesCancellable = nil
         scheduleHoverLabelUpdatesForUrl(nil)
     }
 
