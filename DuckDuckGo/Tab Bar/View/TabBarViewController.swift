@@ -96,8 +96,8 @@ final class TabBarViewController: NSViewController {
             .store(in: &cancellables)
 
         pinnedTabsModel.$selectedItemIndex.dropFirst()
-            .compactMap { $0 }
             .removeDuplicates()
+            .compactMap { $0 }
             .sink { [weak self] index in
                 if self?.tabCollectionViewModel.selectionIndex != .pinned(index) {
                     if self?.tabCollectionViewModel.selectPinnedTab(at: index) == true {
