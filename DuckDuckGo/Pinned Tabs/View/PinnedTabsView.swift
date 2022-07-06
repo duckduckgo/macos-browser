@@ -30,11 +30,11 @@ struct PinnedTabsView: View {
                     .opacity(draggedTab == item ? 0 : 1)
                     .onDrag({
                         draggedTab = item
-                        return NSItemProvider(object: NSString())
+                        return NSItemProvider(object: DummyItemProvider())
                     }, previewIfAvailable: {
                         PinnedTabDraggingPreview(model: item)
                     })
-                    .onDrop(of: ["public.utf8-plain-text"], delegate: PinnedTabsViewRelocateDragDelegate(
+                    .onDrop(of: ["public.data"], delegate: PinnedTabsViewRelocateDragDelegate(
                         tab: item,
                         tabs: $model.items,
                         draggedTab: $draggedTab,
@@ -66,6 +66,20 @@ private extension View {
         } else {
             onDrag(data)
         }
+    }
+}
+
+final class DummyItemProvider: NSObject, NSItemProviderWriting {
+    static var writableTypeIdentifiersForItemProvider: [String] {
+        ["public.data"]
+    }
+
+    func loadData(
+        withTypeIdentifier typeIdentifier: String,
+        forItemProviderCompletionHandler completionHandler: @escaping (Data?, Error?) -> Void
+    ) -> Progress? {
+        completionHandler(nil, nil)
+        return nil
     }
 }
 
