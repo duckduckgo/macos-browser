@@ -85,12 +85,11 @@ struct PinnedTabInnerView: View {
                     .frame(width: 1, height: 20)
                     .offset(x: proxy.size.width-1, y: 7)
             }
-            if let image = faviconImage {
-                Image(nsImage: image)
-                    .resizable()
-                    .frame(maxWidth: 16, maxHeight: 16)
-                    .aspectRatio(contentMode: .fit)
-            }
+            Image(nsImage: faviconImage ?? #imageLiteral(resourceName: "Web"))
+                .resizable()
+                .frame(maxWidth: 16, maxHeight: 16)
+                .aspectRatio(contentMode: .fit)
+                .foregroundColor(Color("GreyTextColor"))
         }
         .frame(width: PinnedTabView.Const.dimension)
     }
