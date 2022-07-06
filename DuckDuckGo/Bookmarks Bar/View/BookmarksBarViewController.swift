@@ -108,7 +108,10 @@ final class BookmarksBarViewController: NSViewController {
             
             self.viewModel.update(from: list?.topLevelEntities ?? [], containerWidth: self.clipThreshold)
             self.refreshClippedIndicator()
+            print("DEBUG: Reloading collection view data")
             self.bookmarksBarCollectionView.reloadData()
+            
+            self.bookmarksBarCollectionView.collectionViewLayout?.invalidateLayout()
         }.store(in: &cancellables)
     }
     
@@ -173,6 +176,7 @@ final class BookmarksBarViewController: NSViewController {
 
 extension BookmarksBarViewController: BookmarksBarViewModelDelegate {
     
+    // swiftlint:disable:next cyclomatic_complexity
     func bookmarksBarViewModelReceived(action: BookmarksBarViewModel.BookmarksBarItemAction, for item: BookmarksBarCollectionViewItem) {
         guard let indexPath = bookmarksBarCollectionView.indexPath(for: item) else {
             assertionFailure("Failed to look up index path for clicked item")
@@ -267,7 +271,7 @@ extension BookmarksBarViewController: BookmarkMenuItemSelectors {
     }
     
     func editBookmark(_ sender: NSMenuItem) {
-        // Unsupported in the list view for the initial release.
+        // Unsupported
     }
     
     func copyBookmark(_ sender: NSMenuItem) {
@@ -297,7 +301,7 @@ extension BookmarksBarViewController: FolderMenuItemSelectors {
     
     func newFolder(_ sender: NSMenuItem) {
         let addFolderViewController = AddFolderModalViewController.create()
-        // addFolderViewController.delegate = self TODO
+        // addFolderViewController.delegate = self
         beginSheet(addFolderViewController)
     }
     
@@ -308,7 +312,7 @@ extension BookmarksBarViewController: FolderMenuItemSelectors {
         }
         
         let addFolderViewController = AddFolderModalViewController.create()
-        // addFolderViewController.delegate = self TODO
+        // addFolderViewController.delegate = self
         addFolderViewController.edit(folder: folder)
         presentAsModalWindow(addFolderViewController)
     }

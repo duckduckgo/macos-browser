@@ -3,7 +3,6 @@
     <dependencies>
         <deployment identifier="macosx"/>
         <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="20037"/>
-        <capability name="Image references" minToolsVersion="12.0"/>
         <capability name="Named colors" minToolsVersion="9.0"/>
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
     </dependencies>
@@ -33,33 +32,22 @@
                                 <constraint firstAttribute="width" constant="16" id="s73-Is-qty"/>
                             </constraints>
                             <imageCell key="cell" refusesFirstResponder="YES" alignment="left" imageScaling="proportionallyDown" image="Bookmark" id="br4-aE-1QB"/>
+                            <color key="contentTintColor" name="BlackWhite80"/>
                         </imageView>
                         <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="fMp-kj-J3A">
-                            <rect key="frame" x="20" y="42" width="211" height="16"/>
-                            <textFieldCell key="cell" lineBreakMode="truncatingMiddle" title="Label" id="7mq-oj-2L8">
+                            <rect key="frame" x="20" y="42" width="229" height="16"/>
+                            <textFieldCell key="cell" lineBreakMode="truncatingMiddle" title="Bookmark" id="7mq-oj-2L8">
                                 <font key="font" metaFont="system"/>
                                 <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
                                 <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
                             </textFieldCell>
                         </textField>
-                        <imageView horizontalHuggingPriority="251" verticalHuggingPriority="251" translatesAutoresizingMaskIntoConstraints="NO" id="XQR-eo-OfN" userLabel="Disclosure Image View">
-                            <rect key="frame" x="235" y="46" width="12" height="7"/>
-                            <constraints>
-                                <constraint firstAttribute="height" constant="9" id="0LO-2L-M9D"/>
-                                <constraint firstAttribute="width" constant="12" id="YJE-4M-bvt"/>
-                            </constraints>
-                            <imageCell key="cell" refusesFirstResponder="YES" alignment="left" imageScaling="proportionallyDown" id="tyi-7G-6gt">
-                                <imageReference key="image" image="chevron.down" catalog="system" symbolScale="small"/>
-                            </imageCell>
-                        </imageView>
                     </subviews>
                     <visibilityPriorities>
                         <integer value="1000"/>
                         <integer value="1000"/>
-                        <integer value="1000"/>
                     </visibilityPriorities>
                     <customSpacing>
-                        <real value="3.4028234663852886e+38"/>
                         <real value="3.4028234663852886e+38"/>
                         <real value="3.4028234663852886e+38"/>
                     </customSpacing>
@@ -86,7 +74,6 @@
         </customView>
         <collectionViewItem id="mo5-Bi-OJI" customClass="BookmarksBarCollectionViewItem" customModule="DuckDuckGo_Privacy_Browser" customModuleProvider="target">
             <connections>
-                <outlet property="disclosureIndicatorImageView" destination="XQR-eo-OfN" id="oOJ-by-dfN"/>
                 <outlet property="faviconView" destination="aEY-jN-qvL" id="vuC-Cm-ECU"/>
                 <outlet property="imageView" destination="aEY-jN-qvL" id="REc-8m-yVP"/>
                 <outlet property="mouseClickView" destination="IHK-ff-XkT" id="919-Qr-nRS"/>
@@ -99,7 +86,9 @@
     </objects>
     <resources>
         <image name="Bookmark" width="16" height="16"/>
-        <image name="chevron.down" catalog="system" width="12" height="7"/>
+        <namedColor name="BlackWhite80">
+            <color red="0.0" green="0.0" blue="0.0" alpha="0.80000000000000004" colorSpace="custom" customColorSpace="sRGB"/>
+        </namedColor>
         <namedColor name="ButtonMouseOverColor">
             <color red="0.0" green="0.0" blue="0.0" alpha="0.05000000074505806" colorSpace="custom" customColorSpace="sRGB"/>
         </namedColor>

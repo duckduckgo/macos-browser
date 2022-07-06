@@ -34,6 +34,9 @@ final class BookmarksBarViewModel: NSObject {
         static let buttonHeight: CGFloat = 30
         static let maximumButtonWidth: CGFloat = 200
         static let labelFont = NSFont.systemFont(ofSize: 13)
+        
+        static let additionalBookmarkWidth = 30.0
+        static let additionalFolderWidth = 30.0
     }
     
     enum BookmarksBarItemAction {
@@ -131,16 +134,23 @@ final class BookmarksBarViewModel: NSObject {
  
     func cachedWidth(buttonTitle: String, isFolder: Bool = false) -> CGFloat {
         if let cachedValue = collectionViewItemSizeCache[buttonTitle] {
-            let width = cachedValue + (isFolder ? 46 : 30)
+            let additionalWidth = isFolder ? Constants.additionalFolderWidth : Constants.additionalBookmarkWidth
+            let width = cachedValue + additionalWidth
+            
+            print("DEBUG: Returning cached width of \(width) for title '\(buttonTitle)', isFolder = \(isFolder)")
+            
             return width
         } else {            
             let calculationLabel = NSTextField.label(titled: buttonTitle)
             calculationLabel.sizeToFit()
             let cappedTitleWidth = min(Constants.maximumButtonWidth, calculationLabel.frame.width)
 
-            let calculatedWidth = min(Constants.maximumButtonWidth, calculationLabel.frame.width) + (isFolder ? 46 : 30)
+            let additionalWidth = isFolder ? Constants.additionalFolderWidth : Constants.additionalBookmarkWidth
+            let calculatedWidth = min(Constants.maximumButtonWidth, calculationLabel.frame.width) + additionalWidth
             collectionViewItemSizeCache[buttonTitle] = cappedTitleWidth
 
+            print("DEBUG: Returning calculated width of \(calculatedWidth) for title '\(buttonTitle)', isFolder = \(isFolder)")
+            
             return calculatedWidth
         }
     }
@@ -216,11 +226,22 @@ extension BookmarksBarViewModel: NSCollectionViewDelegate, NSCollectionViewDataS
     func collectionView(_ collectionView: NSCollectionView,
                         viewForSupplementaryElementOfKind kind: NSCollectionView.SupplementaryElementKind,
                         at indexPath: IndexPath) -> NSView {
+        print("Creating supplementary image with kind = \(kind)")
+
         let image = NSImage(named: "Drop-Target-Indicator-16")!
         let imageView = NSImageView(image: image)
         imageView.contentTintColor = NSColor.controlAccentColor
         
         return imageView
+    }
+    
+    func collectionView(_ collectionView: NSCollectionView,
+                        draggingImageForItemsAt indexPaths: Set<IndexPath>,
+                        with event: NSEvent,
+                        offset dragImageOffset: NSPointPointer) -> NSImage {
+        let image = collectionView.draggingImageForItems(at: indexPaths, with: event, offset: dragImageOffset)
+        
+        return image
     }
 
     func collectionView(_ collectionView: NSCollectionView, numberOfItemsInSection section: Int) -> Int {

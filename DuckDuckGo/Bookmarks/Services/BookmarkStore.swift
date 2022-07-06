@@ -185,7 +185,7 @@ final class LocalBookmarkStore: BookmarkStore {
                     parentFolder?.mutableChildren.add(bookmarkMO)
                 }
             } else {
-                // TODO: Fetch the top level folder and mutate that, instead of the top level folder.
+                // Sam S: Update to fetch the top level folder and mutate that, instead of the top level folder.
                 if let index = index {
                     self.cachedReadOnlyTopLevelFolder?.mutableChildren.insert(bookmarkMO, at: index)
                 } else {

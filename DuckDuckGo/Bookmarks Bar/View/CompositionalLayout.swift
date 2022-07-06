@@ -20,9 +20,11 @@ import AppKit
 extension NSCollectionLayoutGroup {
 
     static func horizontallyCentered(cellSizes: [CGSize], interItemSpacing: CGFloat = 8, centered: Bool = true) -> NSCollectionLayoutGroup {
-        let groupSize = NSCollectionLayoutSize(widthDimension: .fractionalWidth(1), heightDimension: .absolute(32))
+        let groupSize = NSCollectionLayoutSize(widthDimension: .fractionalWidth(1), heightDimension: .absolute(28))
         
         return custom(layoutSize: groupSize) { environment in
+            print("DEBUG: Returning new layout values, for cell sizes: \(cellSizes.map(\.width))")
+            
             let verticalPosition: CGFloat = environment.container.contentInsets.top
 
             var items: [NSCollectionLayoutGroupCustomItem] = []
@@ -44,6 +46,7 @@ extension NSCollectionLayoutGroup {
                 }
                 
                 let maxItemHeight = rowSizes.map(\.height).max() ?? 0
+
                 let rowItems: [NSCollectionLayoutGroupCustomItem] = rowSizes.map {
                     let rect = CGRect(origin: CGPoint(x: xPos, y: verticalPosition + (maxItemHeight - $0.height) / 2), size: $0)
                     xPos += ($0.width + interItemSpacing)
@@ -55,13 +58,6 @@ extension NSCollectionLayoutGroup {
             
             for (index, cellSize) in cellSizes.enumerated() {
                 rowSizes.append(cellSize)
-                
-//                if totalWidth() > environment.container.effectiveContentSize.width {
-//                    rowSizes.removeLast()
-//                    addRowItems()
-//                    yPos += cellSize.height
-//                    rowSizes = [cellSize]
-//                }
                 
                 if index == cellSizes.count - 1 {
                     addRowItems()

@@ -43,7 +43,6 @@ final class BookmarksBarCollectionViewItem: NSCollectionViewItem {
     }
 
     @IBOutlet private var titleLabel: NSTextField!
-    @IBOutlet private var disclosureIndicatorImageView: NSImageView!
     @IBOutlet private var mouseClickView: MouseClickView! {
         didSet {
             mouseClickView.delegate = self
@@ -92,7 +91,6 @@ final class BookmarksBarCollectionViewItem: NSCollectionViewItem {
         }
         
         self.titleLabel.stringValue = entity.title
-        self.disclosureIndicatorImageView.isHidden = !entityType.isFolder
         
         switch entityType {
         case .bookmark(_, let url, _):
@@ -107,11 +105,6 @@ final class BookmarksBarCollectionViewItem: NSCollectionViewItem {
         let menu = NSMenu()
         menu.delegate = self
         view.menu = menu
-    }
-    
-    override func prepareForReuse() {
-        super.prepareForReuse()
-        mouseOverView.updateTrackingAreas()
     }
     
 }
