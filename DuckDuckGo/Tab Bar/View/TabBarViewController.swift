@@ -48,6 +48,9 @@ final class TabBarViewController: NSViewController {
 
     private let tabCollectionViewModel: TabCollectionViewModel
     private let bookmarkManager: BookmarkManager = LocalBookmarkManager.shared
+    private lazy var pinnedTabsModel: PinnedTabsModel = .init(collection: WindowControllersManager.shared.pinnedTabsManager.tabCollection)
+    private lazy var pinnedTabsView: PinnedTabsView = .init(model: pinnedTabsModel)
+    private lazy var pinnedTabsHostingView = NSHostingView(rootView: pinnedTabsView)
 
     private var tabsCancellable: AnyCancellable?
     private var selectionIndexCancellable: AnyCancellable?
@@ -74,10 +77,7 @@ final class TabBarViewController: NSViewController {
     }
 
     private func setupPinnedTabsView() {
-        let pinnedTabsModel = PinnedTabsModel(collection: WindowControllersManager.shared.pinnedTabsManager.tabCollection)
-        let pinnedTabsView = PinnedTabsView(model: pinnedTabsModel)
-        let host = NSHostingView(rootView: pinnedTabsView)
-        pinnedTabsContainerView.addAndLayout(host)
+        pinnedTabsContainerView.addAndLayout(pinnedTabsHostingView)
 
         tabCollectionViewModel.$selectionIndex
             .map { selectedTabIndex -> Tab? in
@@ -88,7 +88,7 @@ final class TabBarViewController: NSViewController {
                     return nil
                 }
             }
-            .assign(to: \.selectedItem, on: pinnedTabsModel)
+            .assign(to: \.selectedItem, onWeaklyHeld: pinnedTabsModel)
             .store(in: &cancellables)
 
         pinnedTabsModel.tabsDidReorderPublisher
@@ -96,14 +96,17 @@ final class TabBarViewController: NSViewController {
             .store(in: &cancellables)
 
         let selectedItemAfterReordering = pinnedTabsModel.tabsDidReorderPublisher
-            .map { _ in pinnedTabsModel.selectedItem }
+            .map { [weak self] _ in self?.pinnedTabsModel.selectedItem }
 
         // subscribe to selected item update and reordering (mapped to selected item)
-        pinnedTabsModel.$selectedItem
-            .dropFirst()
-            .merge(with: selectedItemAfterReordering)
+        Publishers.Merge(pinnedTabsModel.$selectedItem.dropFirst(), selectedItemAfterReordering)
             .removeDuplicates()
-            .compactMap { $0.flatMap(pinnedTabsModel.items.firstIndex(of:)) }
+            .compactMap { [weak self] tab -> Int? in
+                guard let tab = tab, let pinnedTabsModel = self?.pinnedTabsModel else {
+                    return nil
+                }
+                return pinnedTabsModel.items.firstIndex(of: tab)
+            }
             .sink(receiveValue: { [weak self] index in
                 if self?.tabCollectionViewModel.selectionIndex != .pinned(index) {
                     if self?.tabCollectionViewModel.selectPinnedTab(at: index) == true {
@@ -221,7 +224,12 @@ final class TabBarViewController: NSViewController {
         let pointLocationOnCollectionView = collectionView.convert(point, from: view)
         
         if let indexPath = collectionView.indexPathForItem(at: pointLocationOnCollectionView) {
-            tabCollectionViewModel.select(at: indexPath.item)
+            tabCollectionViewModel.select(at: .regular(indexPath.item))
+        } else {
+            let pointLocationOnPinnedTabsView = pinnedTabsHostingView.convert(point, from: view)
+            if let index = pinnedTabsView.itemIndex(for: pointLocationOnPinnedTabsView) {
+                tabCollectionViewModel.select(at: .pinned(index))
+            }
         }
     }
 

@@ -98,7 +98,7 @@ final class TabCollection: NSObject {
     }
 
     func reorderTabs(_ newOrder: [Tab]) {
-        assert(Set(tabs) == Set(newOrder), "tabs cannot change when reordering")
+        assert(tabs.count == newOrder.count && Set(tabs) == Set(newOrder), "tabs changed when reordering")
         tabs = newOrder
     }
 

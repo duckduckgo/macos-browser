@@ -124,21 +124,13 @@ final class BrowserTabViewController: NSViewController {
     }
 
     private func subscribeToTabs() {
-        tabCollectionViewModel.pinnedTabsCollection.$tabs
-            .sink { [weak self] tabs in
-                for tab in tabs where tab.delegate !== self {
-                    tab.delegate = self
-                }
+        Publishers.Merge(tabCollectionViewModel.pinnedTabsCollection.$tabs, tabCollectionViewModel.tabCollection.$tabs)
+        .sink { [weak self] tabs in
+            for tab in tabs where tab.delegate !== self {
+                tab.delegate = self
             }
-            .store(in: &cancellables)
-
-        tabCollectionViewModel.tabCollection.$tabs
-            .sink { [weak self] tabs in
-                for tab in tabs where tab.delegate !== self {
-                    tab.delegate = self
-                }
-            }
-            .store(in: &cancellables)
+        }
+        .store(in: &cancellables)
     }
 
     private func removeWebViewFromHierarchy(webView: WebView? = nil,
