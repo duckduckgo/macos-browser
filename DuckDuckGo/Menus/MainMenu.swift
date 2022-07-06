@@ -26,9 +26,12 @@ final class MainMenu: NSMenu {
         static let maxTitleLength = 55
     }
 
+    // DuckDuckGo
     @IBOutlet weak var checkForUpdatesMenuItem: NSMenuItem?
     @IBOutlet weak var checkForUpdatesSeparatorItem: NSMenuItem?
+    @IBOutlet weak var preferencesMenuItem: NSMenuItem!
 
+    // File
     @IBOutlet weak var newWindowMenuItem: NSMenuItem!
     @IBOutlet weak var newTabMenuItem: NSMenuItem!
     @IBOutlet weak var openLocationMenuItem: NSMenuItem!
@@ -40,29 +43,37 @@ final class MainMenu: NSMenu {
     @IBOutlet weak var printMenuItem: NSMenuItem?
     @IBOutlet weak var shareMenuItem: NSMenuItem!
     @IBOutlet weak var importBrowserDataMenuItem: NSMenuItem!
-    @IBOutlet weak var preferencesMenuItem: NSMenuItem!
 
+    // Edit
     @IBOutlet weak var checkSpellingWhileTypingMenuItem: NSMenuItem?
     @IBOutlet weak var checkGrammarWithSpellingMenuItem: NSMenuItem?
 
+    // View
     @IBOutlet weak var backMenuItem: NSMenuItem?
     @IBOutlet weak var forwardMenuItem: NSMenuItem?
     @IBOutlet weak var reloadMenuItem: NSMenuItem?
     @IBOutlet weak var stopMenuItem: NSMenuItem?
     @IBOutlet weak var homeMenuItem: NSMenuItem?
+    @IBOutlet weak var toggleFullscreenMenuItem: NSMenuItem?
+    @IBOutlet weak var zoomInMenuItem: NSMenuItem?
+    @IBOutlet weak var zoomOutMenuItem: NSMenuItem?
+    @IBOutlet weak var actualSizeMenuItem: NSMenuItem?
+
+    // History
+    @IBOutlet weak var historyMenuItem: NSMenuItem?
     @IBOutlet weak var recentlyClosedMenuItem: NSMenuItem!
     @IBOutlet weak var reopenLastClosedMenuItem: NSMenuItem? {
         didSet {
             reopenMenuItemKeyEquivalentManager.reopenLastClosedMenuItem = reopenLastClosedMenuItem
         }
     }
-    @IBOutlet weak var reopenLastClosedWindowMenuItem: NSMenuItem!
     @IBOutlet weak var reopenAllWindowsFromLastSessionMenuItem: NSMenuItem? {
         didSet {
             reopenMenuItemKeyEquivalentManager.lastSessionMenuItem = reopenAllWindowsFromLastSessionMenuItem
         }
     }
 
+    // Bookmarks
     @IBOutlet weak var manageBookmarksMenuItem: NSMenuItem!
     @IBOutlet weak var importBookmarksMenuItem: NSMenuItem!
     @IBOutlet weak var bookmarksMenuItem: NSMenuItem?
@@ -70,6 +81,7 @@ final class MainMenu: NSMenu {
     @IBOutlet weak var favoritesMenuItem: NSMenuItem?
     @IBOutlet weak var favoriteThisPageMenuItem: NSMenuItem?
 
+    // Debug
     @IBOutlet weak var debugMenuItem: NSMenuItem? {
         didSet {
             #if !DEBUG && !REVIEW
@@ -80,14 +92,10 @@ final class MainMenu: NSMenu {
         }
     }
 
+    // Help
     @IBOutlet weak var helpMenuItem: NSMenuItem?
     @IBOutlet weak var helpSeparatorMenuItem: NSMenuItem?
     @IBOutlet weak var sendFeedbackMenuItem: NSMenuItem?
-
-    @IBOutlet weak var toggleFullscreenMenuItem: NSMenuItem?
-    @IBOutlet weak var zoomInMenuItem: NSMenuItem?
-    @IBOutlet weak var zoomOutMenuItem: NSMenuItem?
-    @IBOutlet weak var actualSizeMenuItem: NSMenuItem?
 
     let sharingMenu = SharingMenu()
     var recentlyClosedMenu: RecentlyClosedMenu?
@@ -129,6 +137,26 @@ final class MainMenu: NSMenu {
 
         subscribeToBookmarkList()
     }
+
+    // MARK: - History
+
+    private func updateReopenLastClosedMenuItem() {
+        switch RecentlyClosedCoordinator.shared.cache.last {
+        case is RecentlyClosedWindow:
+            reopenLastClosedMenuItem?.title = UserText.reopenLastClosedWindow
+        default:
+            reopenLastClosedMenuItem?.title = UserText.reopenLastClosedTab
+        }
+
+    }
+
+    private func updateRecentlyClosedMenu() {
+        recentlyClosedMenu = RecentlyClosedMenu(recentlyClosedCoordinator: RecentlyClosedCoordinator.shared)
+        recentlyClosedMenuItem.submenu = recentlyClosedMenu
+        recentlyClosedMenuItem.isEnabled = !(recentlyClosedMenu?.items ?? [] ).isEmpty
+    }
+
+
 
     // MARK: - Bookmarks
 
@@ -215,24 +243,6 @@ final class MainMenu: NSMenu {
     // swiftlint:enable function_body_length
 
     private let reopenMenuItemKeyEquivalentManager = ReopenMenuItemKeyEquivalentManager()
-
-    // MARK: - Reopen Last Closed & Recently Closed
-
-    private func updateReopenLastClosedMenuItem() {
-        switch RecentlyClosedCoordinator.shared.cache.last {
-        case is RecentlyClosedWindow:
-            reopenLastClosedMenuItem?.title = UserText.reopenLastClosedWindow
-        default:
-            reopenLastClosedMenuItem?.title = UserText.reopenLastClosedTab
-        }
-
-    }
-
-    private func updateRecentlyClosedMenu() {
-        recentlyClosedMenu = RecentlyClosedMenu(recentlyClosedCoordinator: RecentlyClosedCoordinator.shared)
-        recentlyClosedMenuItem.submenu = recentlyClosedMenu
-        recentlyClosedMenuItem.isEnabled = !(recentlyClosedMenu?.items ?? [] ).isEmpty
-    }
 
 }
 

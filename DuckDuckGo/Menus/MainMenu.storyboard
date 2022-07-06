@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<document type="com.apple.InterfaceBuilder3.Cocoa.Storyboard.XIB" version="3.0" toolsVersion="19529" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES">
+<document type="com.apple.InterfaceBuilder3.Cocoa.Storyboard.XIB" version="3.0" toolsVersion="20037" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES">
     <dependencies>
         <deployment identifier="macosx"/>
-        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="19529"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="20037"/>
     </dependencies>
     <scenes>
         <!--Application-->
@@ -470,7 +470,7 @@ CA
                             </menuItem>
                             <menuItem title="History" id="aVY-po-b3d">
                                 <modifierMask key="keyEquivalentModifierMask"/>
-                                <menu key="submenu" title="History" id="SLT-Z6-mh7">
+                                <menu key="submenu" title="History" id="SLT-Z6-mh7" customClass="HistoryMenu" customModule="DuckDuckGo_Privacy_Browser" customModuleProvider="target">
                                     <items>
                                         <menuItem title="Show Previous Tab" id="xkB-bY-Afr">
                                             <string key="keyEquivalent" base64-UTF8="YES">

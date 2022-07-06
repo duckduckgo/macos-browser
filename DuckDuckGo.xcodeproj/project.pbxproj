@@ -429,6 +429,7 @@
 		AA7412BD24D2BEEE00D22FE0 /* MainWindow.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA7412BC24D2BEEE00D22FE0 /* MainWindow.swift */; };
 		AA75A0AE26F3500C0086B667 /* PrivacyIconViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA75A0AD26F3500C0086B667 /* PrivacyIconViewModel.swift */; };
 		AA7E9176286DB05D00AB6B62 /* RecentlyClosedCoordinatorMock.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA7E9175286DB05D00AB6B62 /* RecentlyClosedCoordinatorMock.swift */; };
+		AA7E919728746BCC00AB6B62 /* HistoryMenu.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA7E919628746BCC00AB6B62 /* HistoryMenu.swift */; };
 		AA7EB6DF27E7C57D00036718 /* MouseOverAnimationButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA7EB6DE27E7C57D00036718 /* MouseOverAnimationButton.swift */; };
 		AA7EB6E227E7D05500036718 /* flame-mouse-over.json in Resources */ = {isa = PBXBuildFile; fileRef = AA7EB6E027E7D05500036718 /* flame-mouse-over.json */; };
 		AA7EB6E327E7D05500036718 /* dark-flame-mouse-over.json in Resources */ = {isa = PBXBuildFile; fileRef = AA7EB6E127E7D05500036718 /* dark-flame-mouse-over.json */; };
@@ -1209,6 +1210,7 @@
 		AA75A0AD26F3500C0086B667 /* PrivacyIconViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PrivacyIconViewModel.swift; sourceTree = "<group>"; };
 		AA7DE8E026A9BD000012B490 /* History 2.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = "History 2.xcdatamodel"; sourceTree = "<group>"; };
 		AA7E9175286DB05D00AB6B62 /* RecentlyClosedCoordinatorMock.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RecentlyClosedCoordinatorMock.swift; sourceTree = "<group>"; };
+		AA7E919628746BCC00AB6B62 /* HistoryMenu.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HistoryMenu.swift; sourceTree = "<group>"; };
 		AA7EB6DE27E7C57D00036718 /* MouseOverAnimationButton.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MouseOverAnimationButton.swift; sourceTree = "<group>"; };
 		AA7EB6E027E7D05500036718 /* flame-mouse-over.json */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.json; path = "flame-mouse-over.json"; sourceTree = "<group>"; };
 		AA7EB6E127E7D05500036718 /* dark-flame-mouse-over.json */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.json; path = "dark-flame-mouse-over.json"; sourceTree = "<group>"; };
@@ -3075,6 +3077,7 @@
 				AA6EF9B425081B4C004754E6 /* MainMenuActions.swift */,
 				AA97BF4525135DD30014931A /* ApplicationDockMenu.swift */,
 				B63ED0E426BB8FB900A9DAD1 /* SharingMenu.swift */,
+				AA7E919628746BCC00AB6B62 /* HistoryMenu.swift */,
 			);
 			path = Menus;
 			sourceTree = "<group>";
@@ -4271,6 +4274,7 @@
 				AAC6881928626BF800D54247 /* RecentlyClosedTab.swift in Sources */,
 				B688B4DF27420D290087BEAF /* PDFSearchTextMenuItemHandler.swift in Sources */,
 				4B723E0A26B0005900E14D75 /* DataImportViewController.swift in Sources */,
+				AA7E919728746BCC00AB6B62 /* HistoryMenu.swift in Sources */,
 				F4A6198C283CFFBB007F2080 /* ContentScopeFeatureFlagging.swift in Sources */,
 				85707F24276A332A00DC0649 /* OnboardingButtonStyles.swift in Sources */,
 				4B8A4E0127C8447E005F40E8 /* SaveIdentityPopover.swift in Sources */,
