@@ -21,7 +21,9 @@ import Combine
 import os
 
 protocol PinnedTabsManager {
+    var didUnpinTabPublisher: AnyPublisher<Int, Never> { get }
     var didSetUpPinnedTabsPublisher: AnyPublisher<Void, Never> { get }
+
     var tabCollection: TabCollection { get }
     var tabViewModels: [Tab: TabViewModel] { get }
 
@@ -29,8 +31,8 @@ protocol PinnedTabsManager {
 
     func pin(_ tab: Tab)
     func pin(_ tab: Tab, at index: Int?)
-    func unpin(_ tab: Tab) -> Bool
-    func unpinTab(at index: Int) -> Tab?
+    func unpin(_ tab: Tab, published: Bool) -> Bool
+    func unpinTab(at index: Int, published: Bool) -> Tab?
     func tabViewModel(at index: Int) -> TabViewModel?
 
     func setUp(with collection: TabCollection)
@@ -41,6 +43,7 @@ final class LocalPinnedTabsManager: PinnedTabsManager, ObservableObject {
     private(set) var tabCollection: TabCollection
     private(set) var tabViewModels = [Tab: TabViewModel]()
 
+    let didUnpinTabPublisher: AnyPublisher<Int, Never>
     let didSetUpPinnedTabsPublisher: AnyPublisher<Void, Never>
 
     func setUp(with collection: TabCollection) {
@@ -68,15 +71,26 @@ final class LocalPinnedTabsManager: PinnedTabsManager, ObservableObject {
         }
     }
 
-    func unpin(_ tab: Tab) -> Bool {
+    func unpin(_ tab: Tab, published: Bool = false) -> Bool {
         guard let index = tabCollection.tabs.firstIndex(of: tab) else {
+            os_log("PinnedTabsManager: unable to unpin a tab")
             return false
         }
-        return tabCollection.remove(at: index, published: false)
+        guard tabCollection.remove(at: index, published: published) else {
+            os_log("PinnedTabsManager: unable to unpin a tab")
+            return false
+        }
+        didUnpinTabSubject.send(index)
+        return true
     }
 
-    func unpinTab(at index: Int) -> Tab? {
-        guard let tab = tabCollection.tabs[safe: index], tabCollection.remove(at: index, published: false) else {
+    func unpinTab(at index: Int, published: Bool = false) -> Tab? {
+        guard let tab = tabCollection.tabs[safe: index] else {
+            os_log("PinnedTabsManager: unable to unpin a tab")
+            return nil
+        }
+        guard unpin(tab, published: published) else {
+            os_log("PinnedTabsManager: unable to unpin a tab")
             return nil
         }
         return tab
@@ -93,12 +107,14 @@ final class LocalPinnedTabsManager: PinnedTabsManager, ObservableObject {
     }
 
     init(tabCollection: TabCollection = .init()) {
+        didUnpinTabPublisher = didUnpinTabSubject.eraseToAnyPublisher()
         didSetUpPinnedTabsPublisher = didSetUpPinnedTabsSubject.eraseToAnyPublisher()
         self.tabCollection = tabCollection
     }
 
     // MARK: - Private
 
+    private let didUnpinTabSubject = PassthroughSubject<Int, Never>()
     private let didSetUpPinnedTabsSubject = PassthroughSubject<Void, Never>()
     private var cancellables: Set<AnyCancellable> = []
 

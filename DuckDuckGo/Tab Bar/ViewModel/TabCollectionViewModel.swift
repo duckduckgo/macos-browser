@@ -82,7 +82,7 @@ final class TabCollectionViewModel: NSObject {
 
     private(set) var tabCollection: TabCollection
     var pinnedTabsCollection: TabCollection {
-        WindowControllersManager.shared.pinnedTabsManager.tabCollection
+        pinnedTabsManager.tabCollection
     }
 
     var numberOfTabs: Int {
@@ -113,10 +113,18 @@ final class TabCollectionViewModel: NSObject {
     private var tabLazyLoader: TabLazyLoader<TabCollectionViewModel>?
     private var isTabLazyLoadingRequested: Bool = false
 
+    private let pinnedTabsManager: PinnedTabsManager
+    private var shouldBlockPinnedTabsManagerSubscriptions: Bool = false
+
     private var cancellables = Set<AnyCancellable>()
 
-    init(tabCollection: TabCollection, selectionIndex: TabIndex = .regular(0)) {
+    init(
+        tabCollection: TabCollection,
+        selectionIndex: TabIndex = .regular(0),
+        pinnedTabsManager: PinnedTabsManager = WindowControllersManager.shared.pinnedTabsManager
+    ) {
         self.tabCollection = tabCollection
+        self.pinnedTabsManager = pinnedTabsManager
         super.init()
 
         subscribeToTabs()
@@ -353,7 +361,11 @@ final class TabCollectionViewModel: NSObject {
 
     func removePinnedTab(at index: Int, published: Bool = true) {
         guard changesEnabled else { return }
-        guard pinnedTabsCollection.remove(at: index, published: published) else { return }
+        shouldBlockPinnedTabsManagerSubscriptions = true
+        defer {
+            shouldBlockPinnedTabsManagerSubscriptions = false
+        }
+        guard pinnedTabsManager.unpinTab(at: index, published: published) != nil else { return }
 
         didRemoveTab(at: .pinned(index), withParent: nil)
     }
@@ -558,25 +570,30 @@ final class TabCollectionViewModel: NSObject {
 
         let tab = tabCollection.tabs[index]
 
-        WindowControllersManager.shared.pinnedTabsManager.pin(tab)
+        pinnedTabsManager.pin(tab)
         remove(at: index, published: false)
         selectPinnedTab(at: pinnedTabsCollection.tabs.count - 1)
     }
 
     func unpinTab(at index: Int) {
         guard changesEnabled else { return }
-
-        guard index >= 0, index < pinnedTabsCollection.tabs.count else {
-            os_log("TabCollectionViewModel: Index out of bounds", type: .error)
-            return
+        shouldBlockPinnedTabsManagerSubscriptions = true
+        defer {
+            shouldBlockPinnedTabsManagerSubscriptions = false
         }
 
-        guard let tab = WindowControllersManager.shared.pinnedTabsManager.unpinTab(at: index) else {
+        guard let tab = pinnedTabsManager.unpinTab(at: index, published: false) else {
             os_log("Unable to unpin a tab", type: .error)
             return
         }
 
         insert(tab: tab)
+    }
+
+    private func handleTabUnpinnedInAnotherTabCollectionViewModel(at index: Int) {
+        if selectionIndex == .pinned(index) {
+            didRemoveTab(at: .pinned(index), withParent: nil)
+        }
     }
 
     // TODO
@@ -603,12 +620,22 @@ final class TabCollectionViewModel: NSObject {
     }
 
     private func applySelectionWhenPinnedTabsAreReady(_ selection: TabIndex?) {
-        WindowControllersManager.shared.pinnedTabsManager.didSetUpPinnedTabsPublisher
+        pinnedTabsManager.didSetUpPinnedTabsPublisher
             .prefix(1)
             .sink { [weak self] in
                 if self?.selectionIndex != selection {
                     self?.selectionIndex = selection
                 }
+                self?.subscribeToPinnedTabsManager()
+            }
+            .store(in: &cancellables)
+    }
+
+    private func subscribeToPinnedTabsManager() {
+        pinnedTabsManager.didUnpinTabPublisher
+            .filter { [weak self] _ in self?.shouldBlockPinnedTabsManagerSubscriptions == false }
+            .sink { [weak self] index in
+                self?.handleTabUnpinnedInAnotherTabCollectionViewModel(at: index)
             }
             .store(in: &cancellables)
     }
@@ -650,7 +677,7 @@ final class TabCollectionViewModel: NSObject {
         case self.tabCollection:
             selectedTabViewModel = tabViewModel(at: selectionIndex.index)
         case pinnedTabsCollection:
-            selectedTabViewModel = WindowControllersManager.shared.pinnedTabsManager.tabViewModel(at: selectionIndex.index)
+            selectedTabViewModel = pinnedTabsManager.tabViewModel(at: selectionIndex.index)
         default:
             break
         }
