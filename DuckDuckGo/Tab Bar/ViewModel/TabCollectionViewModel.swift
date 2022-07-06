@@ -417,11 +417,11 @@ final class TabCollectionViewModel: NSObject {
                   let rightTab = tab(at: index),
                   rightTab.parentTab !== parentTab && (leftTab.parentTab === parentTab || leftTab === parentTab) {
             // Select parent tab on left or another child tab on left instead of the tab on right
-            newSelectionIndex = .regular(max(0, index.index - 1))
+            newSelectionIndex = .regular(max(0, selectionIndex.index - 1))
         } else if selectionIndex > index {
-            newSelectionIndex = .regular(max(0, index.index - 1))
+            newSelectionIndex = previousIndex(from: selectionIndex)
         } else {
-            newSelectionIndex = max(firstIndex(), min(index, .regular(tabCollection.tabs.count - 1)))
+            newSelectionIndex = sanitizeIndex(selectionIndex)
         }
 
         select(at: newSelectionIndex)
@@ -666,15 +666,27 @@ final class TabCollectionViewModel: NSObject {
     private func nextIndex(from current: TabIndex) -> TabIndex {
         switch current {
         case .pinned(let index):
-            if index == pinnedTabsCollection.tabs.count - 1 {
+            if index >= pinnedTabsCollection.tabs.count - 1 {
                 return .regular(0)
             }
             return .pinned(index + 1)
         case .regular(let index):
-            if index == tabCollection.tabs.count - 1 {
+            if index >= tabCollection.tabs.count - 1 {
                 return firstIndex()
             }
             return .regular(index + 1)
+        }
+    }
+
+    private func sanitizeIndex(_ idx: TabIndex) -> TabIndex {
+        switch idx {
+        case .pinned(let index):
+            if index >= pinnedTabsCollection.tabs.count {
+                return .regular(min(index - pinnedTabsCollection.tabs.count, tabCollection.tabs.count - 1))
+            }
+            return idx
+        case .regular(let index):
+            return .regular(max(0, min(index, tabCollection.tabs.count - 1)))
         }
     }
 
