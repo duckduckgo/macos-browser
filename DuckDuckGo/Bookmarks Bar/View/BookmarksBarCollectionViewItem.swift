@@ -74,6 +74,11 @@ final class BookmarksBarCollectionViewItem: NSCollectionViewItem {
         createMenu()
     }
     
+    override func viewDidLayout() {
+        super.viewDidLayout()
+        mouseOverView.updateTrackingAreas()
+    }
+    
     func updateItem(from entity: BaseBookmarkEntity) {
         self.title = entity.title
         
@@ -105,16 +110,6 @@ final class BookmarksBarCollectionViewItem: NSCollectionViewItem {
         let menu = NSMenu()
         menu.delegate = self
         view.menu = menu
-    }
-    
-    override func mouseEntered(with event: NSEvent) {
-        super.mouseEntered(with: event)
-        print("Mouse entered item with title '\(self.titleLabel.stringValue)', max X = \(self.view.frame.maxX), event location in window = \(event.locationInWindow)")
-    }
-    
-    override func mouseExited(with event: NSEvent) {
-        super.mouseExited(with: event)
-        print("Mouse exited item with title '\(self.titleLabel.stringValue)', max X = \(self.view.frame.maxX), event location in window = \(event.locationInWindow)")
     }
     
 }

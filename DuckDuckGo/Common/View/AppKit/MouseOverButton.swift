@@ -172,15 +172,5 @@ internal class MouseOverButton: NSButton {
         let area = NSTrackingArea(rect: bounds, options: [.mouseEnteredAndExited, .activeInKeyWindow, .inVisibleRect], owner: self, userInfo: nil)
         addTrackingArea(area)
     }
-    
-    override func updateTrackingAreas() {
-        super.updateTrackingAreas()
-        
-        trackingAreas.forEach { area in
-            removeTrackingArea(area)
-        }
-        
-        addTrackingArea()
-    }
 
 }

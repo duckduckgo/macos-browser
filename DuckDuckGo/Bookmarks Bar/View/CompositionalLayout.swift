@@ -23,22 +23,17 @@ extension NSCollectionLayoutGroup {
         let groupSize = NSCollectionLayoutSize(widthDimension: .fractionalWidth(1), heightDimension: .absolute(28))
         
         return custom(layoutSize: groupSize) { environment in
-            print("DEBUG: Returning new layout values, for cell sizes: \(cellSizes.map(\.width))")
-            
             let verticalPosition: CGFloat = environment.container.contentInsets.top
 
             var items: [NSCollectionLayoutGroupCustomItem] = []
-            
-            func totalWidth() -> CGFloat {
-                cellSizes.map(\.width).reduce(0) {
-                    $0 == 0 ? $1 : $0 + interItemSpacing + $1
-                }
+            let totalWidth = cellSizes.map(\.width).reduce(0) {
+                $0 == 0 ? $1 : $0 + interItemSpacing + $1
             }
             
             var xPos: CGFloat
             
             if centered {
-                xPos = (environment.container.effectiveContentSize.width - totalWidth()) / 2 + environment.container.contentInsets.leading
+                xPos = (environment.container.effectiveContentSize.width - totalWidth) / 2 + environment.container.contentInsets.leading
             } else {
                 xPos = interItemSpacing
             }

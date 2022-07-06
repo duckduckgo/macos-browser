@@ -53,7 +53,6 @@ final class BookmarksBarViewModel: NSObject {
         let title: String
         let url: URL?
         let isFolder: Bool
-        let cachedWidth: CGFloat
         let entity: BaseBookmarkEntity
     }
     
@@ -70,9 +69,9 @@ final class BookmarksBarViewModel: NSObject {
         didSet {
             let itemsWidth = bookmarksBarItems.reduce(CGFloat(0)) { total, item in
                 if total == 0 {
-                    return total + item.cachedWidth
+                    return total + self.cachedWidth(buttonTitle: item.title, isFolder: item.isFolder)
                 } else {
-                    return total + Constants.buttonSpacing + item.cachedWidth
+                    return total + Constants.buttonSpacing + self.cachedWidth(buttonTitle: item.title, isFolder: item.isFolder)
                 }
             }
             
@@ -115,7 +114,6 @@ final class BookmarksBarViewModel: NSObject {
             let item = BookmarksBarItem(title: entity.title,
                                         url: (entity as? Bookmark)?.url,
                                         isFolder: entity.isFolder,
-                                        cachedWidth: calculatedWidth,
                                         entity: entity)
 
             displayableItems.append(item)
@@ -135,11 +133,7 @@ final class BookmarksBarViewModel: NSObject {
     func cachedWidth(buttonTitle: String, isFolder: Bool = false) -> CGFloat {
         if let cachedValue = collectionViewItemSizeCache[buttonTitle] {
             let additionalWidth = isFolder ? Constants.additionalFolderWidth : Constants.additionalBookmarkWidth
-            let width = cachedValue + additionalWidth
-            
-            // print("DEBUG: Returning cached width of \(width) for title '\(buttonTitle)', isFolder = \(isFolder)")
-            
-            return width
+            return cachedValue + additionalWidth
         } else {            
             let calculationLabel = NSTextField.label(titled: buttonTitle)
             calculationLabel.sizeToFit()
@@ -148,8 +142,6 @@ final class BookmarksBarViewModel: NSObject {
             let additionalWidth = isFolder ? Constants.additionalFolderWidth : Constants.additionalBookmarkWidth
             let calculatedWidth = min(Constants.maximumButtonWidth, calculationLabel.frame.width) + additionalWidth
             collectionViewItemSizeCache[buttonTitle] = cappedTitleWidth
-
-            // print("DEBUG: Returning calculated width of \(calculatedWidth) for title '\(buttonTitle)', isFolder = \(isFolder)")
             
             return calculatedWidth
         }
@@ -175,7 +167,6 @@ final class BookmarksBarViewModel: NSObject {
         let bookmarksBarItem = BookmarksBarItem(title: item.entity.title,
                                                 url: (item.entity as? Bookmark)?.url,
                                                 isFolder: item.entity.isFolder,
-                                                cachedWidth: cachedWidth(buttonTitle: item.entity.title, isFolder: item.entity.isFolder),
                                                 entity: item.entity)
         
         bookmarksBarItems.append(bookmarksBarItem)
