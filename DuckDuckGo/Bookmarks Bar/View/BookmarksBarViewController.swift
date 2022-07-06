@@ -83,7 +83,10 @@ final class BookmarksBarViewController: NSViewController {
     }
     
     private func createCenteredLayout(centered: Bool) -> NSCollectionLayoutSection {
-        let widths = viewModel.bookmarksBarItems.map(\.cachedWidth)
+        let widths = viewModel.bookmarksBarItems.map { item in
+            return viewModel.cachedWidth(buttonTitle: item.title, isFolder: item.isFolder)
+        }
+
         let cellSizes = widths.map { CGSize(width: $0, height: 28) }
         
         let group = NSCollectionLayoutGroup.horizontallyCentered(cellSizes: cellSizes, centered: centered)
@@ -103,12 +106,11 @@ final class BookmarksBarViewController: NSViewController {
     }
 
     private func subscribeToBookmarks() {
-        bookmarkManager.listPublisher.sink { [weak self] list in
+        bookmarkManager.listPublisher.receive(on: RunLoop.main).sink { [weak self] list in
             guard let self = self else { return }
             
             self.viewModel.update(from: list?.topLevelEntities ?? [], containerWidth: self.clipThreshold)
             self.refreshClippedIndicator()
-            print("DEBUG: Reloading collection view data")
             self.bookmarksBarCollectionView.reloadData()
         }.store(in: &cancellables)
     }
