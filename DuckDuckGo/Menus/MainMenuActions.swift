@@ -208,7 +208,14 @@ extension MainViewController {
     }
 
     @IBAction func closeTab(_ sender: Any?) {
-        tabCollectionViewModel.removeSelected()
+        // when close is triggered by a keyboard shortcut,
+        // instead of closing a pinned tab we select the first regular tab
+        // (this is in line with Safari behavior)
+        if isHandlingKeyDownEvent, tabCollectionViewModel.selectionIndex?.isPinnedTab == true {
+            tabCollectionViewModel.select(at: .regular(0))
+        } else {
+            tabCollectionViewModel.removeSelected()
+        }
     }
 
     // MARK: - View
