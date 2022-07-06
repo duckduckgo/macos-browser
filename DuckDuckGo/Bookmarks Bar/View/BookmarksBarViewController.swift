@@ -110,8 +110,6 @@ final class BookmarksBarViewController: NSViewController {
             self.refreshClippedIndicator()
             print("DEBUG: Reloading collection view data")
             self.bookmarksBarCollectionView.reloadData()
-            
-            self.bookmarksBarCollectionView.collectionViewLayout?.invalidateLayout()
         }.store(in: &cancellables)
     }
     
