@@ -37,7 +37,8 @@ struct PinnedTabsView: View {
                     .onDrop(of: ["public.utf8-plain-text"], delegate: PinnedTabsViewRelocateDragDelegate(
                         tab: item,
                         tabs: $model.items,
-                        draggedTab: $draggedTab
+                        draggedTab: $draggedTab,
+                        selectedTab: $model.selectedItem
                     ))
                     .environmentObject(model)
             }
@@ -72,6 +73,7 @@ struct PinnedTabsViewRelocateDragDelegate: DropDelegate {
     let tab: Tab
     @Binding var tabs: [Tab]
     @Binding var draggedTab: Tab?
+    @Binding var selectedTab: Tab?
 
     func dropEntered(info: DropInfo) {
         guard let currentTab = draggedTab else {
@@ -110,6 +112,7 @@ struct PinnedTabsViewRelocateDragDelegate: DropDelegate {
 //            }
 //        }
 
+        selectedTab = draggedTab
         draggedTab = nil
         return true
     }

@@ -95,25 +95,16 @@ final class TabBarViewController: NSViewController {
             .sink(receiveValue: WindowControllersManager.shared.pinnedTabsManager.tabCollection.reorderTabs)
             .store(in: &cancellables)
 
-        let selectedItemAfterReordering = pinnedTabsModel.tabsDidReorderPublisher
-            .map { [weak self] _ in self?.pinnedTabsModel.selectedItem }
-
-        // subscribe to selected item update and reordering (mapped to selected item)
-        Publishers.Merge(pinnedTabsModel.$selectedItem.dropFirst(), selectedItemAfterReordering)
+        pinnedTabsModel.$selectedItemIndex.dropFirst()
+            .compactMap { $0 }
             .removeDuplicates()
-            .compactMap { [weak self] tab -> Int? in
-                guard let tab = tab, let pinnedTabsModel = self?.pinnedTabsModel else {
-                    return nil
-                }
-                return pinnedTabsModel.items.firstIndex(of: tab)
-            }
-            .sink(receiveValue: { [weak self] index in
+            .sink { [weak self] index in
                 if self?.tabCollectionViewModel.selectionIndex != .pinned(index) {
                     if self?.tabCollectionViewModel.selectPinnedTab(at: index) == true {
                         self?.collectionView.clearSelection(animated: true)
                     }
                 }
-            })
+            }
             .store(in: &cancellables)
 
         pinnedTabsModel.contextMenuActionPublisher
