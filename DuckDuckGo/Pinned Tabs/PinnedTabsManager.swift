@@ -22,7 +22,7 @@ import os
 
 protocol PinnedTabsManager {
     var didSetUpPinnedTabsPublisher: AnyPublisher<Void, Never> { get }
-    var tabCollection: TabCollection { get set }
+    var tabCollection: TabCollection { get }
     var tabViewModels: [Tab: TabViewModel] { get }
 
     func isTabPinned(_ tab: Tab) -> Bool
@@ -38,18 +38,17 @@ protocol PinnedTabsManager {
 
 final class LocalPinnedTabsManager: PinnedTabsManager, ObservableObject {
 
-    var tabCollection: TabCollection {
-        didSet {
-            subscribeToPinnedTabs()
-        }
-    }
-
+    private(set) var tabCollection: TabCollection
     private(set) var tabViewModels = [Tab: TabViewModel]()
 
     let didSetUpPinnedTabsPublisher: AnyPublisher<Void, Never>
 
     func setUp(with collection: TabCollection) {
-        tabCollection = collection
+        tabCollection.removeAll()
+        for tab in collection.tabs {
+            tabCollection.append(tab: tab)
+        }
+        subscribeToPinnedTabs()
         didSetUpPinnedTabsSubject.send()
     }
 

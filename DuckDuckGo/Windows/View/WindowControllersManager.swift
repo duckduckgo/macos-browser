@@ -22,6 +22,8 @@ import Combine
 
 protocol WindowControllersManagerProtocol {
 
+    var pinnedTabsManager: PinnedTabsManager { get }
+
     var didRegisterWindowController: PassthroughSubject<(MainWindowController), Never> { get }
     var didUnregisterWindowController: PassthroughSubject<(MainWindowController), Never> { get }
 

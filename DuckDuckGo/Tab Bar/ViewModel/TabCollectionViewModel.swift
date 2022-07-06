@@ -300,14 +300,17 @@ final class TabCollectionViewModel: NSObject {
         delegate?.tabCollectionViewModelDidMultipleChanges(self)
     }
 
-    func insert(tab: Tab, at index: Int = 0, selected: Bool = true) {
+    func insert(tab: Tab, at index: TabIndex = .regular(0), selected: Bool = true) {
         guard changesEnabled else { return }
 
-        tabCollection.insert(tab: tab, at: index)
+        let tabCollection = tabCollection(for: index)
+        tabCollection.insert(tab: tab, at: index.index)
         if selected {
-            selectRegularTab(at: index)
+            select(at: index)
         }
-        delegate?.tabCollectionViewModelDidInsert(self, at: index, selected: selected)
+        if index.isRegularTab {
+            delegate?.tabCollectionViewModelDidInsert(self, at: index.index, selected: selected)
+        }
 
         if selected {
             self.selectParentOnRemoval = true
@@ -325,7 +328,7 @@ final class TabCollectionViewModel: NSObject {
         // Insert at the end of the child tabs
         var newIndex = parentTabIndex.isPinnedTab ? 0 : parentTabIndex.index + 1
         while tabCollection.tabs[safe: newIndex]?.parentTab === parentTab { newIndex += 1 }
-        insert(tab: tab, at: newIndex, selected: selected)
+        insert(tab: tab, at: .regular(newIndex), selected: selected)
     }
 
     // MARK: - Removal
