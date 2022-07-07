@@ -55,7 +55,7 @@ final class HistoryCoordinator: HistoryCoordinating {
     }
 
     func commonInit() {
-        cleanOldHistory()
+        cleanOldAndLoad()
         scheduleRegularCleaning()
     }
 
@@ -67,9 +67,8 @@ final class HistoryCoordinator: HistoryCoordinating {
     private var historyDictionary: [URL: HistoryEntry]?
 
     // Output
-    private var _history: History?
     var history: History? {
-        queue.sync { self._history }
+        queue.sync { self.makeHistory(from: historyDictionary ?? [:]) }
     }
 
     private var cancellables = Set<AnyCancellable>()
@@ -81,10 +80,11 @@ final class HistoryCoordinator: HistoryCoordinating {
                 return
             }
 
-            var entry = historyDictionary[url] ?? HistoryEntry(url: url)
+            let entry = historyDictionary[url] ?? HistoryEntry(url: url)
             entry.addVisit()
             entry.failedToLoad = false
 
+            self?.historyDictionary?[url] = entry
             self?.save(entry: entry)
         }
     }
@@ -96,7 +96,7 @@ final class HistoryCoordinator: HistoryCoordinating {
                 return
             }
 
-            guard var entry = historyDictionary[url] else {
+            guard let entry = historyDictionary[url] else {
                 os_log("Add tracker to %s ignored, no entry", log: .history, url.absoluteString)
                 return
             }
@@ -113,7 +113,7 @@ final class HistoryCoordinator: HistoryCoordinating {
                 return
             }
 
-            guard var entry = historyDictionary[url] else {
+            guard let entry = historyDictionary[url] else {
                 os_log("Add tracker to %s ignored, no entry", log: .history, url.absoluteString)
                 return
             }
@@ -126,7 +126,7 @@ final class HistoryCoordinator: HistoryCoordinating {
     func updateTitleIfNeeded(title: String, url: URL) {
         queue.async(flags: .barrier) { [weak self] in
             guard let historyDictionary = self?.historyDictionary else { return }
-            guard var entry = historyDictionary[url] else {
+            guard let entry = historyDictionary[url] else {
                 os_log("Title update ignored - URL not part of history yet", type: .debug)
                 return
             }
@@ -153,12 +153,13 @@ final class HistoryCoordinator: HistoryCoordinating {
 
     func burn(except fireproofDomains: FireproofDomains, completion: @escaping () -> Void) {
         queue.async(flags: .barrier) { [weak self] in
-            guard let history = self?._history else { return }
-            let entries: [HistoryEntry] = history.filter { historyEntry in
+            guard let self = self, let historyDictionary = self.historyDictionary else { return }
+
+            let entries: [HistoryEntry] = historyDictionary.values.filter { historyEntry in
                 return !fireproofDomains.isURLFireproof(url: historyEntry.url)
             }
 
-            self?.removeEntries(entries, completionHandler: { _ in
+            self.removeEntries(entries, completionHandler: { _ in
                 DispatchQueue.main.async {
                     completion()
                 }
@@ -168,8 +169,9 @@ final class HistoryCoordinator: HistoryCoordinating {
 
     func burnDomains(_ domains: Set<String>, completion: @escaping () -> Void) {
         queue.async(flags: .barrier) { [weak self] in
-            guard let history = self?._history else { return }
-            let entries: [HistoryEntry] = history.filter { historyEntry in
+            guard let self = self, let historyDictionary = self.historyDictionary else { return }
+
+            let entries: [HistoryEntry] = historyDictionary.values.filter { historyEntry in
                 guard let host = historyEntry.url.host else {
                     return false
                 }
@@ -177,7 +179,7 @@ final class HistoryCoordinator: HistoryCoordinating {
                 return domains.contains(host)
             }
 
-            self?.removeEntries(entries, completionHandler: { _ in
+            self.removeEntries(entries, completionHandler: { _ in
                 DispatchQueue.main.async {
                     completion()
                 }
@@ -185,7 +187,7 @@ final class HistoryCoordinator: HistoryCoordinating {
         }
     }
 
-    @objc private func cleanOldHistory() {
+    @objc private func cleanOldAndLoad() {
         clean(until: .monthAgo)
     }
 
@@ -208,7 +210,6 @@ final class HistoryCoordinator: HistoryCoordinating {
                     }
                 }, receiveValue: { [weak self] history in
                     self?.historyDictionary = self?.makeHistoryDictionary(from: history)
-                    self?._history = history
                 })
                 .store(in: &self.cancellables)
         }
@@ -216,6 +217,12 @@ final class HistoryCoordinator: HistoryCoordinating {
 
     private func removeEntries(_ entries: [HistoryEntry],
                                completionHandler: ((Error?) -> Void)? = nil) {
+        // Remove from the local memory
+        entries.forEach { entry in
+            historyDictionary?.removeValue(forKey: entry.url)
+        }
+
+        // Remove from the storage
         queue.async(flags: .barrier) { [weak self] in
             guard let self = self else { return }
 
@@ -232,10 +239,7 @@ final class HistoryCoordinator: HistoryCoordinating {
                         os_log("Removal failed: %s", log: .history, type: .error, error.localizedDescription)
                         completionHandler?(error)
                     }
-                }, receiveValue: { [weak self] history in
-                    self?.historyDictionary = self?.makeHistoryDictionary(from: history)
-                    self?._history = history
-                })
+                }, receiveValue: {})
                 .store(in: &self.cancellables)
         }
     }
@@ -244,7 +248,7 @@ final class HistoryCoordinator: HistoryCoordinating {
         let timer = Timer(fireAt: .startOfDayTomorrow,
                           interval: .day,
                           target: self,
-                          selector: #selector(cleanOldHistory),
+                          selector: #selector(cleanOldAndLoad),
                           userInfo: nil,
                           repeats: true)
         RunLoop.main.add(timer, forMode: RunLoop.Mode.common)
@@ -260,11 +264,6 @@ final class HistoryCoordinator: HistoryCoordinating {
     }
 
     private func save(entry: HistoryEntry) {
-        var historyDictionary = self.historyDictionary ?? [:]
-        historyDictionary[entry.url] = entry
-        self.historyDictionary = historyDictionary
-        self._history = self.makeHistory(from: historyDictionary)
-
         self.historyStoring.save(entry: entry)
             .receive(on: self.queue, options: .init(flags: .barrier))
             .sink(receiveCompletion: { completion in
@@ -274,11 +273,12 @@ final class HistoryCoordinator: HistoryCoordinating {
                            log: .history,
                            entry.url.absoluteString,
                            entry.title ?? "",
-                           entry.numberOfVisits,
+                           entry.numberOfTotalVisits,
                            entry.failedToLoad ? "yes" : "no")
                 case .failure(let error):
                     os_log("Saving of history entry failed: %s", log: .history, type: .error, error.localizedDescription)
                 }
+                entry.savingState = .saved
             }, receiveValue: {})
             .store(in: &self.cancellables)
     }

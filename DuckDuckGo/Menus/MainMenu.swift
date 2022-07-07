@@ -156,8 +156,6 @@ final class MainMenu: NSMenu {
         recentlyClosedMenuItem.isEnabled = !(recentlyClosedMenu?.items ?? [] ).isEmpty
     }
 
-
-
     // MARK: - Bookmarks
 
     var bookmarkListCancellable: AnyCancellable?

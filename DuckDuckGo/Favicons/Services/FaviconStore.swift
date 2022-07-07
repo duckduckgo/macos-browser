@@ -232,7 +232,7 @@ final class FaviconStore: FaviconStoring {
                         let deletedObjects = result?.result as? [NSManagedObjectID] ?? []
                         let changes: [AnyHashable: Any] = [ NSDeletedObjectsKey: deletedObjects ]
                         NSManagedObjectContext.mergeChanges(fromRemoteContextSave: changes, into: [self.context])
-                        os_log("%d entries of %s removed", log: .history, entityName, deletedObjects.count)
+                        os_log("%d entries of %s removed", log: .favicons, deletedObjects.count, entityName)
                     } catch {
                         promise(.failure(error))
                     }

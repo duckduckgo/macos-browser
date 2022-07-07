@@ -24,7 +24,7 @@ import os.log
 protocol HistoryStoring {
 
     func cleanOld(until date: Date) -> Future<History, Error>
-    func removeEntries(_ entries: [HistoryEntry]) -> Future<History, Error>
+    func removeEntries(_ entries: [HistoryEntry]) -> Future<Void, Error>
     func save(entry: HistoryEntry) -> Future<Void, Error>
 
 }
@@ -44,7 +44,7 @@ final class HistoryStore: HistoryStoring {
 
     private lazy var context = Database.shared.makeContext(concurrencyType: .privateQueueConcurrencyType, name: "History")
 
-    func removeEntries(_ entries: [HistoryEntry]) -> Future<History, Error> {
+    func removeEntries(_ entries: [HistoryEntry]) -> Future<Void, Error> {
         return Future { [weak self] promise in
             self?.context.perform {
                 guard let self = self else {
@@ -57,8 +57,7 @@ final class HistoryStore: HistoryStoring {
                 case .failure(let error):
                     promise(.failure(error))
                 case .success:
-                    let reloadResult = self.reload(self.context)
-                    promise(reloadResult)
+                    promise(.success(()))
                 }
             }
         }
@@ -149,6 +148,7 @@ final class HistoryStore: HistoryStoring {
 
                 // Check for existence
                 let fetchRequest = HistoryEntryManagedObject.fetchRequest() as NSFetchRequest<HistoryEntryManagedObject>
+                fetchRequest.returnsObjectsAsFaults = false
                 fetchRequest.predicate = NSPredicate(format: "identifier == %@", entry.identifier as CVarArg)
                 let fetchedObjects: [HistoryEntryManagedObject]
                 do {
@@ -160,9 +160,11 @@ final class HistoryStore: HistoryStoring {
 
                 assert(fetchedObjects.count <= 1, "More than 1 history entry with the same identifier")
 
+                let historyEntryManagedObject: HistoryEntryManagedObject
                 if let fetchedObject = fetchedObjects.first {
                     // Update existing
                     fetchedObject.update(with: entry)
+                    historyEntryManagedObject = fetchedObject
                 } else {
                     // Add new
                     let insertedObject = NSEntityDescription.insertNewObject(forEntityName: HistoryEntryManagedObject.className(), into: self.context)
@@ -171,8 +173,11 @@ final class HistoryStore: HistoryStoring {
                         return
                     }
                     historyEntryMO.update(with: entry, afterInsertion: true)
+                    historyEntryManagedObject = historyEntryMO
                 }
-
+                let insertNewVisitsResult = self.insertNewVisits(of: entry,
+                                                                 into: historyEntryManagedObject,
+                                                                 context: self.context)
                 do {
                     try self.context.save()
                 } catch {
@@ -180,17 +185,47 @@ final class HistoryStore: HistoryStoring {
                     return
                 }
 
-                promise(.success(()))
+                promise(insertNewVisitsResult)
             }
         }
     }
+
+    private func insertNewVisits(of historyEntry: HistoryEntry,
+                                 into historyEntryManagedObject: HistoryEntryManagedObject,
+                                 context: NSManagedObjectContext) -> Result<Void, Error> {
+        var success = true
+        historyEntry.visits
+            .filter {
+                $0.savingState == .initialized
+            }
+            .forEach {
+                if case .failure = self.insert(visit: $0,
+                                               into: historyEntryManagedObject,
+                                               context: context) {
+                    success = false
+                }
+            }
+        return success ? .success(()) : .failure(HistoryStoreError.savingFailed)
+    }
+
+    private func insert(visit: Visit,
+                        into historyEntryManagedObject: HistoryEntryManagedObject,
+                        context: NSManagedObjectContext) -> Result<Void, Error> {
+        let insertedObject = NSEntityDescription.insertNewObject(forEntityName: VisitManagedObject.className(), into: context)
+        guard let visitMO = insertedObject as? VisitManagedObject else {
+            return .failure(HistoryStoreError.savingFailed)
+        }
+        visitMO.update(with: visit, historyEntryManagedObject: historyEntryManagedObject)
+        return .success(())
+    }
+
 }
 
 fileprivate extension History {
 
     init(historyEntries: [HistoryEntryManagedObject]) {
         self = historyEntries.reduce(into: History(), {
-            if let historyEntry = HistoryEntry(historyMO: $1) {
+            if let historyEntry = HistoryEntry(historyEntryMO: $1) {
                 $0.append(historyEntry)
             }
         })
@@ -200,28 +235,30 @@ fileprivate extension History {
 
 fileprivate extension HistoryEntry {
 
-    init?(historyMO: HistoryEntryManagedObject) {
-        guard let url = historyMO.urlEncrypted as? URL,
-              let identifier = historyMO.identifier,
-              let lastVisit = historyMO.lastVisit else {
+    convenience init?(historyEntryMO: HistoryEntryManagedObject) {
+        guard let url = historyEntryMO.urlEncrypted as? URL,
+              let identifier = historyEntryMO.identifier,
+              let lastVisit = historyEntryMO.lastVisit else {
             assertionFailure("HistoryEntry: Failed to init HistoryEntry from HistoryEntryManagedObject")
             return nil
         }
 
-        let title = historyMO.titleEncrypted as? String
-        let numberOfVisits = historyMO.numberOfVisits
-        let numberOfTrackersBlocked = historyMO.numberOfTrackersBlocked
-        let blockedTrackingEntities = historyMO.blockedTrackingEntities ?? ""
+        let title = historyEntryMO.titleEncrypted as? String
+        let numberOfTotalVisits = historyEntryMO.numberOfTotalVisits
+        let numberOfTrackersBlocked = historyEntryMO.numberOfTrackersBlocked
+        let blockedTrackingEntities = historyEntryMO.blockedTrackingEntities ?? ""
+        let visits = Set(historyEntryMO.visits?.compactMap { Visit(visitMO: $0 as? VisitManagedObject) } ?? [])
 
         self.init(identifier: identifier,
                   url: url,
                   title: title,
-                  numberOfVisits: Int(numberOfVisits),
+                  failedToLoad: historyEntryMO.failedToLoad,
+                  numberOfTotalVisits: Int(numberOfTotalVisits),
                   lastVisit: lastVisit,
-                  failedToLoad: historyMO.failedToLoad,
+                  visits: visits,
                   numberOfTrackersBlocked: Int(numberOfTrackersBlocked),
                   blockedTrackingEntities: Set<String>(blockedTrackingEntities.components(separatedBy: "|")),
-                  trackersFound: historyMO.trackersFound)
+                  trackersFound: historyEntryMO.trackersFound)
     }
 
 }
@@ -241,12 +278,34 @@ fileprivate extension HistoryEntryManagedObject {
         if let title = entry.title, !title.isEmpty {
             self.titleEncrypted = title as NSString
         }
-        numberOfVisits = Int64(entry.numberOfVisits)
+        numberOfTotalVisits = Int64(entry.numberOfTotalVisits)
         lastVisit = entry.lastVisit
         failedToLoad = entry.failedToLoad
         numberOfTrackersBlocked = Int64(entry.numberOfTrackersBlocked)
         blockedTrackingEntities = entry.blockedTrackingEntities.isEmpty ? "" : entry.blockedTrackingEntities.joined(separator: "|")
         trackersFound = entry.trackersFound
+    }
+
+}
+
+private extension VisitManagedObject {
+
+    func update(with visit: Visit, historyEntryManagedObject: HistoryEntryManagedObject) {
+        date = visit.date
+        historyEntry = historyEntryManagedObject
+    }
+
+}
+
+private extension Visit {
+
+    convenience init?(visitMO: VisitManagedObject?) {
+        guard let visitMO = visitMO, let date = visitMO.date else {
+            assertionFailure("Bad type or date is nil")
+            return nil
+        }
+        
+        self.init(date: date)
     }
 
 }
