@@ -27,7 +27,7 @@ struct ContextualMenu {
         }
 
         if objects.count > 1 {
-            return nil
+            return menuForEntities()
         }
 
         let node = objects.first as? BookmarkNode
@@ -41,6 +41,8 @@ struct ContextualMenu {
             return nil
         }
     }
+    
+    // MARK: - Single Item Menu Creation
 
     private static func menuForNoSelection() -> NSMenu {
         let menu = NSMenu(title: "")
@@ -78,6 +80,17 @@ struct ContextualMenu {
 
         menu.addItem(renameFolderMenuItem(folder: folder))
         menu.addItem(deleteFolderMenuItem(folder: folder))
+
+        return menu
+    }
+    
+    // MARK: - Multi-Item Menu Creation
+
+    private static func menuForEntities() -> NSMenu {
+        let menu = NSMenu(title: "")
+        
+        let deleteItem = NSMenuItem(title: "Delete", action: nil, keyEquivalent: "")
+        menu.items = [deleteItem]
 
         return menu
     }
