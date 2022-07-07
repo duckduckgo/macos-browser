@@ -907,8 +907,8 @@ extension BrowserTabViewController: WKUIDelegate {
                  initiatedByFrame frame: WKFrameInfo,
                  completionHandler: @escaping () -> Void) {
 
-        guard let window = view.window else {
-            os_log("%s: Window is nil", type: .error, className)
+        guard webView === self.webView, let window = view.window else {
+            os_log("%s: Could not display JS alert panel", type: .error, className)
             completionHandler()
             return
         }
@@ -924,8 +924,8 @@ extension BrowserTabViewController: WKUIDelegate {
                  initiatedByFrame frame: WKFrameInfo,
                  completionHandler: @escaping (Bool) -> Void) {
 
-        guard let window = view.window else {
-            os_log("%s: Window is nil", type: .error, className)
+        guard webView === self.webView, let window = view.window else {
+            os_log("%s: Could not display JS confirmation panel", type: .error, className)
             completionHandler(false)
             return
         }
@@ -942,8 +942,8 @@ extension BrowserTabViewController: WKUIDelegate {
                  initiatedByFrame frame: WKFrameInfo,
                  completionHandler: @escaping (String?) -> Void) {
 
-        guard let window = view.window else {
-            os_log("%s: Window is nil", type: .error, className)
+        guard webView === self.webView, let window = view.window else {
+            os_log("%s: Could not display JS text input panel", type: .error, className)
             completionHandler(nil)
             return
         }
