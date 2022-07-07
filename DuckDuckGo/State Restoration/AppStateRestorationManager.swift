@@ -107,6 +107,7 @@ final class AppStateRestorationManager: NSObject {
         } else {
             restorePinnedTabs()
         }
+        WindowControllersManager.shared.updateIsInInitialState()
     }
 
     private func restorePinnedTabs() {
