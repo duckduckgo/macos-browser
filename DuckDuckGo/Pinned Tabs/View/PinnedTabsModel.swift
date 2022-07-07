@@ -49,7 +49,18 @@ final class PinnedTabsModel: ObservableObject {
         }
     }
 
+    @Published var hoveredItem: Tab? {
+        didSet {
+            if let hoveredItem = hoveredItem {
+                hoveredItemIndex = items.firstIndex(of: hoveredItem)
+            } else {
+                hoveredItemIndex = nil
+            }
+        }
+    }
+
     @Published private(set) var selectedItemIndex: Int?
+    @Published private(set) var hoveredItemIndex: Int?
 
     let contextMenuActionPublisher: AnyPublisher<ContextMenuAction, Never>
     let tabsDidReorderPublisher: AnyPublisher<[Tab], Never>

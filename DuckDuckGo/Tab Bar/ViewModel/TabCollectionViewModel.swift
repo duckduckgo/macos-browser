@@ -95,6 +95,8 @@ final class TabCollectionViewModel: NSObject {
 
     var changesEnabled = true
 
+    private(set) var pinnedTabsManager: PinnedTabsManager
+
     private(set) var tabViewModels = [Tab: TabViewModel]()
     @Published private(set) var selectionIndex: TabIndex? {
         didSet {
@@ -113,7 +115,6 @@ final class TabCollectionViewModel: NSObject {
     private var tabLazyLoader: TabLazyLoader<TabCollectionViewModel>?
     private var isTabLazyLoadingRequested: Bool = false
 
-    private let pinnedTabsManager: PinnedTabsManager
     private var shouldBlockPinnedTabsManagerUpdates: Bool = false
 
     private var cancellables = Set<AnyCancellable>()

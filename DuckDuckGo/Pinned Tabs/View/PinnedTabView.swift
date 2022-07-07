@@ -27,6 +27,8 @@ struct PinnedTabView: View {
     @EnvironmentObject var collectionModel: PinnedTabsModel
     @State var isHovered: Bool = false
 
+    @Environment(\.controlActiveState) private var controlActiveState
+
     // Hover highlight is disabled while another tab is dragged
     var showsHover: Bool
 
@@ -42,7 +44,11 @@ struct PinnedTabView: View {
         .cornerRadius(6, corners: [.topLeft, .topRight])
         .contextMenu { contextMenu }
         .onHover { isHovered in
+            guard controlActiveState == .key else {
+                return
+            }
             self.isHovered = isHovered
+            collectionModel.hoveredItem = isHovered ? model : nil
         }
     }
 
@@ -78,6 +84,8 @@ struct PinnedTabInnerView: View {
     var foregroundColor: Color
     var faviconImage: NSImage?
 
+    @Environment(\.controlActiveState) private var controlActiveState
+
     var body: some View {
         ZStack {
             Rectangle()
@@ -90,6 +98,7 @@ struct PinnedTabInnerView: View {
             }
             Image(nsImage: faviconImage ?? #imageLiteral(resourceName: "Web"))
                 .resizable()
+                .grayscale(controlActiveState == .key ? 0.0 : 1.0)
                 .frame(maxWidth: 16, maxHeight: 16)
                 .aspectRatio(contentMode: .fit)
                 .foregroundColor(Color("GreyTextColor"))

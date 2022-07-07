@@ -46,7 +46,8 @@ final class TabBarViewController: NSViewController {
     @IBOutlet weak var draggingSpace: NSView!
     @IBOutlet weak var windowDraggingViewLeadingConstraint: NSLayoutConstraint!
 
-    private let tabCollectionViewModel: TabCollectionViewModel
+    let tabCollectionViewModel: TabCollectionViewModel
+
     private let bookmarkManager: BookmarkManager = LocalBookmarkManager.shared
     private lazy var pinnedTabsModel: PinnedTabsModel = .init(collection: WindowControllersManager.shared.pinnedTabsManager.tabCollection)
     private lazy var pinnedTabsView: PinnedTabsView = .init(model: pinnedTabsModel)
@@ -99,11 +100,20 @@ final class TabBarViewController: NSViewController {
             .removeDuplicates()
             .compactMap { $0 }
             .sink { [weak self] index in
+                self?.hideTabPreview()
                 if self?.tabCollectionViewModel.selectionIndex != .pinned(index) {
                     if self?.tabCollectionViewModel.selectPinnedTab(at: index) == true {
                         self?.collectionView.clearSelection(animated: true)
                     }
                 }
+            }
+            .store(in: &cancellables)
+
+        pinnedTabsModel.$hoveredItemIndex.dropFirst()
+            .removeDuplicates()
+            .compactMap { $0 }
+            .sink { [weak self] index in
+                self?.showPinnedTabPreview(at: index)
             }
             .store(in: &cancellables)
 
@@ -439,19 +449,37 @@ final class TabBarViewController: NSViewController {
 
     // MARK: - Tab Preview
 
-    // swiftlint:disable force_cast
     private var tabPreviewWindowController: TabPreviewWindowController = {
         let storyboard = NSStoryboard(name: "TabPreview", bundle: nil)
+        // swiftlint:disable:next force_cast
         return storyboard.instantiateController(withIdentifier: "TabPreviewWindowController") as! TabPreviewWindowController
     }()
-    // swiftlint:enable force_cast
 
-    func showTabPreview(for tabBarViewItem: TabBarViewItem) {
+    private func showTabPreview(for tabBarViewItem: TabBarViewItem) {
         guard let indexPath = collectionView.indexPath(for: tabBarViewItem),
-              let tabViewModel = tabCollectionViewModel.tabViewModel(at: indexPath.item) else {
+              let tabViewModel = tabCollectionViewModel.tabViewModel(at: indexPath.item)
+        else {
             return
         }
 
+        let position = scrollView.frame.minX + tabBarViewItem.view.frame.minX
+        showTabPreview(for: tabViewModel, from: position, after: .init(from: tabBarViewItem.widthStage))
+    }
+
+    private func showPinnedTabPreview(at index: Int) {
+        guard let tabViewModel = tabCollectionViewModel.pinnedTabsManager.tabViewModel(at: index) else {
+            return
+        }
+
+        let position = pinnedTabsContainerView.frame.minX + PinnedTabView.Const.dimension * CGFloat(index)
+        showTabPreview(for: tabViewModel, from: position, after: .init(from: .withoutTitle))
+    }
+
+    private func showTabPreview(
+        for tabViewModel: TabViewModel,
+        from xPosition: CGFloat,
+        after interval: TabPreviewWindowController.TimerInterval
+    ) {
         tabPreviewWindowController.tabPreviewViewController.display(tabViewModel: tabViewModel)
 
         guard let window = view.window, let clipView = collectionView.clipView else {
@@ -461,10 +489,9 @@ final class TabBarViewController: NSViewController {
 
         var point = view.bounds.origin
         point.y -= TabPreviewWindowController.VerticalSpace.padding.rawValue
-        point.x += scrollView.frame.origin.x + tabBarViewItem.view.frame.origin.x - clipView.bounds.origin.x
+        point.x += xPosition - clipView.bounds.origin.x
         let converted = window.convertPoint(toScreen: view.convert(point, to: nil))
-        let timerInterval = TabPreviewWindowController.TimerInterval(from: tabBarViewItem.widthStage)
-        tabPreviewWindowController.scheduleShowing(parentWindow: window, timerInterval: timerInterval, topLeftPoint: converted)
+        tabPreviewWindowController.scheduleShowing(parentWindow: window, timerInterval: interval, topLeftPoint: converted)
     }
 
     func hideTabPreview() {
