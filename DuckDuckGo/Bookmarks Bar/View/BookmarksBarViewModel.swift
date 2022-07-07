@@ -30,10 +30,10 @@ final class BookmarksBarViewModel: NSObject {
     // MARK: Enums
     
     enum Constants {
-        static let buttonSpacing: CGFloat = 8
+        static let buttonSpacing: CGFloat = 2
         static let buttonHeight: CGFloat = 30
-        static let maximumButtonWidth: CGFloat = 200
-        static let labelFont = NSFont.systemFont(ofSize: 13)
+        static let maximumButtonWidth: CGFloat = 120
+        static let labelFont = NSFont.systemFont(ofSize: 12)
         
         static let additionalBookmarkWidth = 30.0
         static let additionalFolderWidth = 30.0

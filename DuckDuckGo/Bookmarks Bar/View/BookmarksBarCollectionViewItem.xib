@@ -22,8 +22,8 @@
                         </userDefinedRuntimeAttribute>
                     </userDefinedRuntimeAttributes>
                 </customView>
-                <stackView distribution="fill" orientation="horizontal" alignment="centerY" spacing="6" horizontalStackHuggingPriority="249.99998474121094" verticalStackHuggingPriority="249.99998474121094" detachesHiddenViews="YES" translatesAutoresizingMaskIntoConstraints="NO" id="KId-EQ-QP4">
-                    <rect key="frame" x="4" y="0.0" width="247" height="99"/>
+                <stackView distribution="fill" orientation="horizontal" alignment="centerY" spacing="4" horizontalStackHuggingPriority="249.99998474121094" verticalStackHuggingPriority="249.99998474121094" detachesHiddenViews="YES" translatesAutoresizingMaskIntoConstraints="NO" id="KId-EQ-QP4">
+                    <rect key="frame" x="7" y="0.0" width="241" height="99"/>
                     <subviews>
                         <imageView horizontalHuggingPriority="251" verticalHuggingPriority="251" translatesAutoresizingMaskIntoConstraints="NO" id="aEY-jN-qvL" userLabel="Favicon Image View">
                             <rect key="frame" x="0.0" y="42" width="16" height="16"/>
@@ -35,9 +35,9 @@
                             <color key="contentTintColor" name="BlackWhite80"/>
                         </imageView>
                         <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="fMp-kj-J3A">
-                            <rect key="frame" x="20" y="42" width="229" height="16"/>
-                            <textFieldCell key="cell" lineBreakMode="truncatingMiddle" title="Bookmark" id="7mq-oj-2L8">
-                                <font key="font" metaFont="system"/>
+                            <rect key="frame" x="18" y="42" width="225" height="15"/>
+                            <textFieldCell key="cell" lineBreakMode="truncatingMiddle" alignment="left" title="Bookmark" id="7mq-oj-2L8">
+                                <font key="font" metaFont="system" size="12"/>
                                 <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
                                 <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
                             </textFieldCell>
@@ -64,9 +64,9 @@
                 <constraint firstItem="KId-EQ-QP4" firstAttribute="top" secondItem="Hz6-mo-xeY" secondAttribute="top" id="PQj-tC-3JU"/>
                 <constraint firstItem="Ff3-Xx-JTo" firstAttribute="top" secondItem="Hz6-mo-xeY" secondAttribute="top" id="Q1T-ZH-Ew3"/>
                 <constraint firstItem="IHK-ff-XkT" firstAttribute="leading" secondItem="Hz6-mo-xeY" secondAttribute="leading" id="RMp-c3-xiB"/>
-                <constraint firstItem="KId-EQ-QP4" firstAttribute="leading" secondItem="Hz6-mo-xeY" secondAttribute="leading" constant="4" id="a09-Tc-R1Q"/>
+                <constraint firstItem="KId-EQ-QP4" firstAttribute="leading" secondItem="Hz6-mo-xeY" secondAttribute="leading" constant="7" id="a09-Tc-R1Q"/>
                 <constraint firstAttribute="bottom" secondItem="IHK-ff-XkT" secondAttribute="bottom" id="qDr-an-58u"/>
-                <constraint firstAttribute="trailing" secondItem="KId-EQ-QP4" secondAttribute="trailing" constant="4" id="sdb-On-4qS"/>
+                <constraint firstAttribute="trailing" secondItem="KId-EQ-QP4" secondAttribute="trailing" constant="7" id="sdb-On-4qS"/>
                 <constraint firstAttribute="bottom" secondItem="KId-EQ-QP4" secondAttribute="bottom" id="u3L-fo-BK2"/>
                 <constraint firstItem="Ff3-Xx-JTo" firstAttribute="leading" secondItem="Hz6-mo-xeY" secondAttribute="leading" id="yst-tx-82t"/>
             </constraints>
