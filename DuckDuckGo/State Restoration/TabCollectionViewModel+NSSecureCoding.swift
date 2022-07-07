@@ -22,7 +22,6 @@ extension TabCollectionViewModel: NSSecureCoding {
     private enum NSSecureCodingKeys {
         static let tabCollection = "tabs"
         static let selectionIndex = "idx"
-        static let isPinned = "pinned"
     }
 
     static var supportsSecureCoding: Bool { true }
@@ -33,21 +32,14 @@ extension TabCollectionViewModel: NSSecureCoding {
         else {
             return nil
         }
-        let isPinned: Bool = {
-            if coder.containsValue(forKey: NSSecureCodingKeys.isPinned) {
-                return coder.decodeBool(forKey: NSSecureCodingKeys.isPinned)
-            }
-            return false
-        }()
         let index = coder.decodeIfPresent(at: NSSecureCodingKeys.selectionIndex) ?? 0
-        let selectionIndex: TabIndex = isPinned ? .pinned(index) : .regular(index)
+        let selectionIndex: TabIndex = .regular(index)
         self.init(tabCollection: tabCollection, selectionIndex: selectionIndex)
     }
 
     func encode(with coder: NSCoder) {
-        if let index = selectionIndex {
-            coder.encode(index.index, forKey: NSSecureCodingKeys.selectionIndex)
-            coder.encode(index.isPinnedTab, forKey: NSSecureCodingKeys.isPinned)
+        if case let .regular(index) = selectionIndex {
+            coder.encode(index, forKey: NSSecureCodingKeys.selectionIndex)
         }
         coder.encode(tabCollection, forKey: NSSecureCodingKeys.tabCollection)
     }
