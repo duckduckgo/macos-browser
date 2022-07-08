@@ -33,8 +33,7 @@ extension TabCollectionViewModel: NSSecureCoding {
             return nil
         }
         let index = coder.decodeIfPresent(at: NSSecureCodingKeys.selectionIndex) ?? 0
-        let selectionIndex: TabIndex = .regular(index)
-        self.init(tabCollection: tabCollection, selectionIndex: selectionIndex)
+        self.init(tabCollection: tabCollection, selectionIndex: index)
     }
 
     func encode(with coder: NSCoder) {

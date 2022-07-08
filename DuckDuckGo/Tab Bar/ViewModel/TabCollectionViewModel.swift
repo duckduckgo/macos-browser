@@ -121,7 +121,7 @@ final class TabCollectionViewModel: NSObject {
 
     init(
         tabCollection: TabCollection,
-        selectionIndex: TabIndex = .regular(0),
+        selectionIndex: Int = 0,
         pinnedTabsManager: PinnedTabsManager = WindowControllersManager.shared.pinnedTabsManager
     ) {
         self.tabCollection = tabCollection
@@ -129,7 +129,8 @@ final class TabCollectionViewModel: NSObject {
         super.init()
 
         subscribeToTabs()
-        applySelectionWhenPinnedTabsAreReady(selectionIndex)
+        subscribeToPinnedTabsManager()
+        self.selectionIndex = .regular(selectionIndex)
 
         if tabCollection.tabs.isEmpty {
             appendNewTab(with: .homePage)
@@ -618,18 +619,6 @@ final class TabCollectionViewModel: NSObject {
             return
         }
         selectRegularTab(at: selectionIndex.index, forceChange: forceChange)
-    }
-
-    private func applySelectionWhenPinnedTabsAreReady(_ selection: TabIndex?) {
-        pinnedTabsManager.didSetUpPinnedTabsPublisher
-            .prefix(1)
-            .sink { [weak self] in
-                if self?.selectionIndex != selection {
-                    self?.selectionIndex = selection
-                }
-                self?.subscribeToPinnedTabsManager()
-            }
-            .store(in: &cancellables)
     }
 
     private func subscribeToPinnedTabsManager() {
