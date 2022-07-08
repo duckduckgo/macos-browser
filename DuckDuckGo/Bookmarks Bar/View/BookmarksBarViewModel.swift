@@ -30,10 +30,10 @@ final class BookmarksBarViewModel: NSObject {
     // MARK: Enums
     
     enum Constants {
-        static let buttonSpacing: CGFloat = 2
-        static let buttonHeight: CGFloat = 30
+        static let buttonSpacing: CGFloat = 6
+        static let buttonHeight: CGFloat = 28
         static let maximumButtonWidth: CGFloat = 120
-        static let labelFont = NSFont.systemFont(ofSize: 12)
+        static let labelFont = NSFont.systemFont(ofSize: 11)
         
         static let additionalBookmarkWidth = 30.0
         static let additionalFolderWidth = 30.0
@@ -216,6 +216,11 @@ extension BookmarksBarViewModel: NSCollectionViewDelegate, NSCollectionViewDataS
     func collectionView(_ collectionView: NSCollectionView,
                         viewForSupplementaryElementOfKind kind: NSCollectionView.SupplementaryElementKind,
                         at indexPath: IndexPath) -> NSView {
+        guard kind == "NSCollectionElementKindInterItemGapIndicator" else {
+            assertionFailure("Received requested for unexpected supplementary element type")
+            return NSView()
+        }
+
         let image = NSImage(named: "Drop-Target-Indicator-16")!
         let imageView = NSImageView(image: image)
         imageView.contentTintColor = NSColor.controlAccentColor

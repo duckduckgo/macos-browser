@@ -191,7 +191,7 @@ final class MainViewController: NSViewController {
     
     private func toggleBookmarksBarVisibility(visible: Bool) {
         bookmarksBarViewController.view.isHidden = !visible
-        bookmarksBarHeightConstraint.constant = visible ? 32 : 0
+        bookmarksBarHeightConstraint.constant = visible ? 34 : 0
         updateDividerColor()
     }
     

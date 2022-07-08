@@ -36,9 +36,9 @@
                                 </userDefinedRuntimeAttributes>
                             </customView>
                             <containerView translatesAutoresizingMaskIntoConstraints="NO" id="kfs-1U-pfm" userLabel="Bookmarks Bar Container View">
-                                <rect key="frame" x="0.0" y="676" width="1024" height="32"/>
+                                <rect key="frame" x="0.0" y="674" width="1024" height="34"/>
                                 <constraints>
-                                    <constraint firstAttribute="height" constant="32" id="D6Z-21-RpW"/>
+                                    <constraint firstAttribute="height" constant="34" id="D6Z-21-RpW"/>
                                 </constraints>
                                 <connections>
                                     <segue destination="aql-HV-xza" kind="embed" destinationCreationSelector="createBookmarksBarWithCoder:sender:segueIdentifier:" id="TuO-tg-e0N"/>
@@ -54,7 +54,7 @@
                                 </connections>
                             </containerView>
                             <containerView translatesAutoresizingMaskIntoConstraints="NO" id="SYo-8W-jl3">
-                                <rect key="frame" x="0.0" y="0.0" width="1024" height="676"/>
+                                <rect key="frame" x="0.0" y="0.0" width="1024" height="674"/>
                                 <constraints>
                                     <constraint firstAttribute="width" relation="greaterThanOrEqual" constant="512" id="FeK-TC-TkT"/>
                                     <constraint firstAttribute="height" relation="greaterThanOrEqual" constant="178" id="OOl-4a-Y8I"/>

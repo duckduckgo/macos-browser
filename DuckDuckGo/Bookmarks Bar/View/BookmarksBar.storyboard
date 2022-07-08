@@ -15,14 +15,14 @@
                         <rect key="frame" x="0.0" y="0.0" width="676" height="56"/>
                         <autoresizingMask key="autoresizingMask"/>
                         <subviews>
-                            <scrollView wantsLayer="YES" borderType="none" autohidesScrollers="YES" horizontalLineScroll="0.0" horizontalPageScroll="0.0" verticalLineScroll="0.0" verticalPageScroll="0.0" hasHorizontalScroller="NO" hasVerticalScroller="NO" usesPredominantAxisScrolling="NO" horizontalScrollElasticity="none" verticalScrollElasticity="none" translatesAutoresizingMaskIntoConstraints="NO" id="D39-Of-BIh">
-                                <rect key="frame" x="0.0" y="0.0" width="676" height="56"/>
+                            <scrollView wantsLayer="YES" borderType="none" autohidesScrollers="YES" horizontalLineScroll="0.0" horizontalPageScroll="0.0" verticalLineScroll="0.0" verticalPageScroll="0.0" hasHorizontalScroller="NO" usesPredominantAxisScrolling="NO" horizontalScrollElasticity="none" verticalScrollElasticity="none" translatesAutoresizingMaskIntoConstraints="NO" id="D39-Of-BIh">
+                                <rect key="frame" x="0.0" y="2" width="676" height="52"/>
                                 <clipView key="contentView" drawsBackground="NO" id="yvk-6W-sd0">
-                                    <rect key="frame" x="0.0" y="0.0" width="676" height="56"/>
+                                    <rect key="frame" x="0.0" y="0.0" width="676" height="52"/>
                                     <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                     <subviews>
                                         <collectionView selectable="YES" id="vwg-NL-UPk">
-                                            <rect key="frame" x="0.0" y="0.0" width="676" height="158"/>
+                                            <rect key="frame" x="0.0" y="0.0" width="676" height="52"/>
                                             <autoresizingMask key="autoresizingMask" widthSizable="YES"/>
                                             <collectionViewLayout key="collectionViewLayout" id="YNm-eM-CbC"/>
                                             <color key="primaryBackgroundColor" name="AddressBarFocusedBackgroundColor"/>
@@ -35,7 +35,7 @@
                                     <autoresizingMask key="autoresizingMask"/>
                                 </scroller>
                                 <scroller key="verticalScroller" hidden="YES" wantsLayer="YES" verticalHuggingPriority="750" horizontal="NO" id="p2h-o7-49x">
-                                    <rect key="frame" x="-100" y="-100" width="16" height="55"/>
+                                    <rect key="frame" x="660" y="0.0" width="16" height="52"/>
                                     <autoresizingMask key="autoresizingMask"/>
                                 </scroller>
                             </scrollView>
@@ -55,8 +55,8 @@
                         </subviews>
                         <constraints>
                             <constraint firstItem="X6g-3K-JDi" firstAttribute="leading" secondItem="R54-3G-cms" secondAttribute="leading" id="0AB-Ps-M7N"/>
-                            <constraint firstItem="D39-Of-BIh" firstAttribute="top" secondItem="R54-3G-cms" secondAttribute="top" id="1I1-kg-gBo"/>
-                            <constraint firstAttribute="bottom" secondItem="D39-Of-BIh" secondAttribute="bottom" id="1fG-Jn-HEl"/>
+                            <constraint firstItem="D39-Of-BIh" firstAttribute="top" secondItem="R54-3G-cms" secondAttribute="top" constant="2" id="1I1-kg-gBo"/>
+                            <constraint firstAttribute="bottom" secondItem="D39-Of-BIh" secondAttribute="bottom" constant="2" id="1fG-Jn-HEl"/>
                             <constraint firstAttribute="trailing" secondItem="D39-Of-BIh" secondAttribute="trailing" id="Cvo-oT-HF2"/>
                             <constraint firstAttribute="trailing" secondItem="Mgr-xJ-Pl5" secondAttribute="trailing" constant="8" id="UCG-Ww-dsY"/>
                             <constraint firstAttribute="trailing" secondItem="X6g-3K-JDi" secondAttribute="trailing" id="ZaK-nU-eHk"/>
