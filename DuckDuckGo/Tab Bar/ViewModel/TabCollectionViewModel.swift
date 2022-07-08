@@ -16,6 +16,8 @@
 //  limitations under the License.
 //
 
+// swiftlint:disable file_length
+
 import Foundation
 import os.log
 import Combine
@@ -598,7 +600,6 @@ final class TabCollectionViewModel: NSObject {
         }
     }
 
-    // TODO
     func moveTab(at index: Int, to newIndex: Int) {
         guard changesEnabled else { return }
 
@@ -608,7 +609,6 @@ final class TabCollectionViewModel: NSObject {
         delegate?.tabCollectionViewModel(self, didMoveTabAt: index, to: newIndex)
     }
 
-    // TODO
     func replaceTab(at index: Int, with tab: Tab, forceChange: Bool = false) {
         guard changesEnabled || forceChange else { return }
 

@@ -111,9 +111,17 @@ final class TabBarViewController: NSViewController {
 
         pinnedTabsModel.$hoveredItemIndex.dropFirst()
             .removeDuplicates()
-            .compactMap { $0 }
+            .debounce(for: 0.05, scheduler: DispatchQueue.main)
             .sink { [weak self] index in
-                self?.showPinnedTabPreview(at: index)
+                if let index = index {
+                    self?.showPinnedTabPreview(at: index)
+                } else {
+                    DispatchQueue.main.asyncAfter(deadline: .now() + 0.2) {
+                        if self?.view.isMouseLocationInsideBounds() == false {
+                            self?.hideTabPreview()
+                        }
+                    }
+                }
             }
             .store(in: &cancellables)
 
