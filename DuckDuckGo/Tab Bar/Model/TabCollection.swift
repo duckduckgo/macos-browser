@@ -17,12 +17,14 @@
 //
 
 import Foundation
+import Combine
 import os.log
 
 final class TabCollection: NSObject {
 
     @Published private(set) var tabs: [Tab]
-    @Published private(set) var lastRemovedTabCache: (url: URL?, index: Int)?
+
+    let didRemoveTabPublisher = PassthroughSubject<(Tab, Int), Never>()
 
     init(tabs: [Tab] = []) {
         self.tabs = tabs
@@ -43,15 +45,18 @@ final class TabCollection: NSObject {
         return true
     }
 
-    func remove(at index: Int) -> Bool {
+    func remove(at index: Int, published: Bool = true) -> Bool {
         guard tabs.indices.contains(index) else {
             os_log("TabCollection: Index out of bounds", type: .error)
             return false
         }
 
-        saveLastRemovedTab(at: index)
+        let tab = tabs[index]
         tabWillClose(at: index)
         tabs.remove(at: index)
+        if published {
+            didRemoveTabPublisher.send((tab, index))
+        }
 
         return true
     }
@@ -127,33 +132,6 @@ final class TabCollection: NSObject {
 
         keepLocalHistory(of: tabs[index])
         tabs[index] = tab
-    }
-
-    // MARK: - Last Removed Tab
-
-    private func saveLastRemovedTab(at index: Int) {
-        guard index >= 0, index < tabs.count else {
-            os_log("TabCollection: Index out of bounds", type: .error)
-            return
-        }
-
-        let tab = tabs[index]
-        lastRemovedTabCache = (tab.content.url, index)
-    }
-
-    func putBackLastRemovedTab() {
-        guard let lastRemovedTabCache = lastRemovedTabCache else {
-            os_log("TabCollection: No tab removed yet", type: .error)
-            return
-        }
-
-        let tab = Tab(content: lastRemovedTabCache.url.map(Tab.TabContent.url) ?? .homePage)
-        insert(tab: tab, at: min(lastRemovedTabCache.index, tabs.count))
-        self.lastRemovedTabCache = nil
-    }
-
-    func cleanLastRemovedTab() {
-        lastRemovedTabCache = nil
     }
 
     // MARK: - Fire button

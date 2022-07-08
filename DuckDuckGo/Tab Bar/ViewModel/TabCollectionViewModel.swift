@@ -55,8 +55,6 @@ final class TabCollectionViewModel: NSObject {
     }
     private weak var previouslySelectedTabViewModel: TabViewModel?
 
-    @Published private(set) var canInsertLastRemovedTab: Bool = false
-
     // In a special occasion, we want to select the "parent" tab after closing the currently selected tab
     private var selectParentOnRemoval = false
     private var tabLazyLoader: TabLazyLoader<TabCollectionViewModel>?
@@ -69,7 +67,6 @@ final class TabCollectionViewModel: NSObject {
         super.init()
 
         subscribeToTabs()
-        subscribeToLastRemovedTab()
 
         if tabCollection.tabs.isEmpty {
             appendNewTab(with: .homePage)
@@ -252,11 +249,11 @@ final class TabCollectionViewModel: NSObject {
 
     // MARK: - Removal
 
-    func remove(at index: Int) {
+    func remove(at index: Int, published: Bool = true) {
         guard changesEnabled else { return }
 
         let parentTab = tabCollection.tabs[safe: index]?.parentTab
-        guard tabCollection.remove(at: index) else { return }
+        guard tabCollection.remove(at: index, published: published) else { return }
 
         self.didRemoveTab(withParent: parentTab, at: index)
     }
@@ -396,19 +393,6 @@ final class TabCollectionViewModel: NSObject {
 
     // MARK: - Others
 
-    func putBackLastRemovedTab() {
-        guard changesEnabled else { return }
-
-        let lastRemovedTabIndex = tabCollection.lastRemovedTabCache?.index
-        tabCollection.putBackLastRemovedTab()
-
-        if let lastRemovedTabIndex = lastRemovedTabIndex {
-            select(at: lastRemovedTabIndex)
-
-            delegate?.tabCollectionViewModelDidInsert(self, at: lastRemovedTabIndex, selected: true)
-        }
-    }
-
     func duplicateTab(at index: Int) {
         guard changesEnabled else { return }
 
@@ -460,12 +444,6 @@ final class TabCollectionViewModel: NSObject {
         } .store(in: &cancellables)
     }
 
-    private func subscribeToLastRemovedTab() {
-        tabCollection.$lastRemovedTabCache.receive(on: DispatchQueue.main).sink { [weak self] _ in
-            self?.updateCanInsertLastRemovedTab()
-        } .store(in: &cancellables)
-    }
-
     private func removeTabViewModels(_ removed: Set<Tab>) {
         for tab in removed {
             tabViewModels[tab] = nil
@@ -486,10 +464,6 @@ final class TabCollectionViewModel: NSObject {
         let selectedTabViewModel = tabViewModel(at: selectionIndex)
         selectedTabViewModel?.tab.lastSelectedAt = Date()
         self.selectedTabViewModel = selectedTabViewModel
-    }
-
-    private func updateCanInsertLastRemovedTab() {
-        canInsertLastRemovedTab = tabCollection.lastRemovedTabCache != nil
     }
 
 }

@@ -49,16 +49,18 @@ final class FireTests: XCTestCase {
         XCTAssertEqual(tabCollectionViewModel.tabCollection.tabs.first?.content, .homePage)
     }
 
-    func testWhenBurnAll_ThenAllWebsiteDataAreRemovedAndHistoryIsCleanedAndLastRemovedTabCacheIsNil() {
+    func testWhenBurnAll_ThenAllWebsiteDataAreRemoved() {
         let manager = WebCacheManagerMock()
         let historyCoordinator = HistoryCoordinatingMock()
         let permissionManager = PermissionManagerMock()
         let faviconManager = FaviconManagerMock()
+        let recentlyClosedCoordinator = RecentlyClosedCoordinatorMock()
 
         let fire = Fire(cacheManager: manager,
                         historyCoordinating: historyCoordinator,
                         permissionManager: permissionManager,
-                        faviconManagement: faviconManager)
+                        faviconManagement: faviconManager,
+                        recentlyClosedCoordinator: recentlyClosedCoordinator)
         let tabCollectionViewModel = TabCollectionViewModel.aTabCollectionViewModel
 
         let finishedBurningExpectation = expectation(description: "Finished burning")
@@ -70,7 +72,7 @@ final class FireTests: XCTestCase {
         XCTAssert(manager.clearCalled)
         XCTAssert(historyCoordinator.burnCalled)
         XCTAssert(permissionManager.burnPermissionsCalled)
-        XCTAssertNil(tabCollectionViewModel.tabCollection.lastRemovedTabCache)
+        XCTAssert(recentlyClosedCoordinator.burnCacheCalled)
     }
 
     func testWhenBurnAllThenBurningFlagToggles() {
