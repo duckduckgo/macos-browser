@@ -62,6 +62,8 @@ final class BookmarksBarViewModel: NSObject {
     private var cancellables = Set<AnyCancellable>()
     
     private var existingItemDraggingIndexPath: IndexPath?
+    private var preventClicks = false
+
     private var collectionViewItemSizeCache: [String: CGFloat] = [:]
     private(set) var bookmarksBarItemsTotalWidth: CGFloat = 0
     
@@ -288,6 +290,8 @@ extension BookmarksBarViewModel: NSCollectionViewDelegate, NSCollectionViewDataS
                         acceptDrop draggingInfo: NSDraggingInfo,
                         indexPath newIndexPath: IndexPath,
                         dropOperation: NSCollectionView.DropOperation) -> Bool {
+        beginClickPreventionTimer()
+
         if let existingIndexPath = existingItemDraggingIndexPath {
             let entityUUID = self.bookmarksBarItems[existingIndexPath.item].entity.id
             
@@ -318,6 +322,14 @@ extension BookmarksBarViewModel: NSCollectionViewDelegate, NSCollectionViewDataS
         }
     }
     
+    private func beginClickPreventionTimer() {
+        preventClicks = true
+        
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.25) {
+            self.preventClicks = false
+        }
+    }
+    
     private func titleAndURL(from pasteboardItem: NSPasteboardItem) -> (title: String, url: URL)? {
         guard let urlString = pasteboardItem.string(forType: .URL), let url = URL(string: urlString) else {
             return nil
@@ -333,6 +345,11 @@ extension BookmarksBarViewModel: NSCollectionViewDelegate, NSCollectionViewDataS
 extension BookmarksBarViewModel: BookmarksBarCollectionViewItemDelegate {
 
     func bookmarksBarCollectionViewItemClicked(_ item: BookmarksBarCollectionViewItem) {
+        guard !preventClicks else {
+            print("DEBUG: Prevented click")
+            return
+        }
+
         let action: BookmarksBarItemAction
         
         if NSApplication.shared.isCommandPressed && NSApplication.shared.isShiftPressed {
