@@ -132,12 +132,13 @@ final class NavigationBarViewController: NSViewController {
         view.layer?.masksToBounds = false
         addressBarContainer.wantsLayer = true
         addressBarContainer.layer?.masksToBounds = false
-
+        
         setupNavigationButtonMenus()
         subscribeToSelectedTabViewModel()
         listenToPasswordManagerNotifications()
         listenToMessageNotifications()
         subscribeToDownloads()
+        addContextMenu()
 
         optionsButton.sendAction(on: .leftMouseDown)
         bookmarkListButton.sendAction(on: .leftMouseDown)
@@ -481,6 +482,12 @@ final class NavigationBarViewController: NSViewController {
             .assign(to: \.progress, onWeaklyHeld: downloadsProgressView)
             .store(in: &downloadsCancellables)
     }
+    
+    private func addContextMenu() {
+        let menu = NSMenu()
+        menu.delegate = self
+        self.view.menu = menu
+    }
 
     private func updatePasswordManagementButton() {
         let url = tabCollectionViewModel.selectedTabViewModel?.tab.content.url
@@ -632,6 +639,25 @@ final class NavigationBarViewController: NSViewController {
 
 }
 // swiftlint:enable type_body_length
+
+extension NavigationBarViewController: NSMenuDelegate {
+    
+    public func menuNeedsUpdate(_ menu: NSMenu) {
+        menu.removeAllItems()
+        
+        if PersistentAppInterfaceSettings.shared.showBookmarksBar {
+            menu.addItem(withTitle: UserText.hideBookmarksBar, action: #selector(toggleBookmarksBar), keyEquivalent: "")
+        } else {
+            menu.addItem(withTitle: UserText.showBookmarksBar, action: #selector(toggleBookmarksBar), keyEquivalent: "")
+        }
+    }
+    
+    @objc
+    private func toggleBookmarksBar(_ sender: NSMenuItem) {
+        PersistentAppInterfaceSettings.shared.showBookmarksBar.toggle()
+    }
+
+}
 
 extension NavigationBarViewController: OptionsButtonMenuDelegate {
 
