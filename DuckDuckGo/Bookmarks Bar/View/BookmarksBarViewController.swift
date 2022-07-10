@@ -160,8 +160,8 @@ final class BookmarksBarViewController: NSViewController {
     }
     
     @objc
-    private func refreshFavicons() {        
-        // update each item
+    private func refreshFavicons() {
+        bookmarksBarCollectionView.reloadData()
     }
 
     @IBAction

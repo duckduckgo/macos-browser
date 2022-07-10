@@ -50,7 +50,7 @@ final class BookmarksBarCollectionViewItem: NSCollectionViewItem {
     }
     
     private enum EntityType {
-        case bookmark(title: String, url: URL, isFavorite: Bool)
+        case bookmark(title: String, url: URL, favicon: NSImage?, isFavorite: Bool)
         case folder(title: String)
         
         var isFolder: Bool {
@@ -83,7 +83,10 @@ final class BookmarksBarCollectionViewItem: NSCollectionViewItem {
         self.title = entity.title
         
         if let bookmark = entity as? Bookmark {
-            self.entityType = .bookmark(title: bookmark.title, url: bookmark.url, isFavorite: bookmark.isFavorite)
+            let favicon = bookmark.favicon(.small)?.copy() as? NSImage
+            favicon?.size = NSSize.faviconSize
+
+            self.entityType = .bookmark(title: bookmark.title, url: bookmark.url, favicon: favicon, isFavorite: bookmark.isFavorite)
         } else if let folder = entity as? BookmarkFolder {
             self.entityType = .folder(title: folder.title)
         } else {
@@ -98,9 +101,9 @@ final class BookmarksBarCollectionViewItem: NSCollectionViewItem {
         self.titleLabel.stringValue = entity.title
         
         switch entityType {
-        case .bookmark(_, let url, _):
-            let favicon = FaviconManager.shared.getCachedFavicon(for: url.host ?? "", sizeCategory: .small)
-            faviconView.image = favicon?.image ?? NSImage(named: "Bookmark")
+        case .bookmark(_, let url, let storedFavicon, _):
+            let favicon = storedFavicon ?? FaviconManager.shared.getCachedFavicon(for: url.host ?? "", sizeCategory: .small)?.image
+            faviconView.image = favicon ?? NSImage(named: "Bookmark")
         case .folder:
             faviconView.image = NSImage(named: "Folder-16")
         }
@@ -134,7 +137,7 @@ extension BookmarksBarCollectionViewItem: NSMenuDelegate {
         }
         
         switch entityType {
-        case .bookmark(_, _, let isFavorite):
+        case .bookmark(_, _, _, let isFavorite):
             menu.items = createBookmarkMenuItems(isFavorite: isFavorite)
         case .folder:
             menu.items = createFolderMenuItems()
