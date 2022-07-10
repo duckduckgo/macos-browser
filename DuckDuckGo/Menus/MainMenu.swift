@@ -112,6 +112,7 @@ final class MainMenu: NSMenu {
 
         updateRecentlyClosedMenu()
         updateReopenLastClosedMenuItem()
+        updateBookmarksBarMenuItem()
     }
 
     private func setup() {
@@ -216,9 +217,17 @@ final class MainMenu: NSMenu {
     }
     // swiftlint:enable function_body_length
 
-    private let reopenMenuItemKeyEquivalentManager = ReopenMenuItemKeyEquivalentManager()
+    private func updateBookmarksBarMenuItem() {
+        if PersistentAppInterfaceSettings.shared.showBookmarksBar {
+            toggleBookmarksBarMenuItem?.title = UserText.hideBookmarksBar
+        } else {
+            toggleBookmarksBarMenuItem?.title = UserText.showBookmarksBar
+        }
+    }
 
     // MARK: - Reopen Last Closed & Recently Closed
+    
+    private let reopenMenuItemKeyEquivalentManager = ReopenMenuItemKeyEquivalentManager()
 
     private func updateReopenLastClosedMenuItem() {
         switch RecentlyClosedCoordinator.shared.cache.last {
