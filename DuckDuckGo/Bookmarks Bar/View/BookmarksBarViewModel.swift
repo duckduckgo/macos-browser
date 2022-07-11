@@ -35,8 +35,7 @@ final class BookmarksBarViewModel: NSObject {
         static let maximumButtonWidth: CGFloat = 120
         static let labelFont = NSFont.systemFont(ofSize: 11)
         
-        static let additionalBookmarkWidth = 30.0
-        static let additionalFolderWidth = 30.0
+        static let additionalItemWidth = 30.0
     }
     
     enum BookmarksBarItemAction {
@@ -133,15 +132,13 @@ final class BookmarksBarViewModel: NSObject {
  
     func cachedWidth(buttonTitle: String, isFolder: Bool = false) -> CGFloat {
         if let cachedValue = collectionViewItemSizeCache[buttonTitle] {
-            let additionalWidth = isFolder ? Constants.additionalFolderWidth : Constants.additionalBookmarkWidth
-            return cachedValue + additionalWidth
+            return cachedValue + Constants.additionalItemWidth
         } else {            
             let calculationLabel = NSTextField.label(titled: buttonTitle)
             calculationLabel.sizeToFit()
             let cappedTitleWidth = min(Constants.maximumButtonWidth, calculationLabel.frame.width)
 
-            let additionalWidth = isFolder ? Constants.additionalFolderWidth : Constants.additionalBookmarkWidth
-            let calculatedWidth = min(Constants.maximumButtonWidth, calculationLabel.frame.width) + additionalWidth
+            let calculatedWidth = min(Constants.maximumButtonWidth, calculationLabel.frame.width) + Constants.additionalItemWidth
             collectionViewItemSizeCache[buttonTitle] = cappedTitleWidth
             
             return calculatedWidth
