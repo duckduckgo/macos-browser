@@ -64,6 +64,9 @@ final class BookmarksBarCollectionViewItem: NSCollectionViewItem {
     weak var delegate: BookmarksBarCollectionViewItemDelegate?
     private var entityType: EntityType?
     
+    /// MouseClickView is prone to sending mouseUp events without a preceding mouseDown. This tracks whether to consider a click as legitimate and use it to trigger navigation from the bookmarks bar.
+    private var receivedMouseDownEvent = false
+    
     override func viewDidLoad() {
         super.viewDidLoad()
         
@@ -119,7 +122,16 @@ final class BookmarksBarCollectionViewItem: NSCollectionViewItem {
 
 extension BookmarksBarCollectionViewItem: MouseClickViewDelegate {
     
+    func mouseClickView(_ mouseClickView: MouseClickView, mouseDownEvent: NSEvent) {
+        receivedMouseDownEvent = true
+    }
+
     func mouseClickView(_ mouseClickView: MouseClickView, mouseUpEvent: NSEvent) {
+        guard receivedMouseDownEvent else {
+            return
+        }
+
+        receivedMouseDownEvent = false
         delegate?.bookmarksBarCollectionViewItemClicked(self)
     }
 

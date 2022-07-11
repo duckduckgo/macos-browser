@@ -267,7 +267,7 @@ extension BookmarksBarViewModel: NSCollectionViewDelegate, NSCollectionViewDataS
     }
     
     func collectionView(_ collectionView: NSCollectionView, pasteboardWriterForItemAt indexPath: IndexPath) -> NSPasteboardWriting? {
-        // TODO: Remove the hardcoded duck.com writer and replace it with a custom writer for folders.
+        // Remove the hardcoded duck.com writer and replace it with a custom writer for folders.
         return bookmarksBarItems[indexPath.item].url as NSURL? ?? NSURL(string: "https://duck.com/")
     }
     

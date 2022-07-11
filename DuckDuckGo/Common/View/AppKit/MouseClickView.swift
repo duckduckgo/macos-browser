@@ -68,8 +68,6 @@ final class MouseClickView: NSView {
     }
 
     override func mouseUp(with event: NSEvent) {
-        guard !repostMultiClickEventIfNeeded(event) else { return }
-
         super.mouseUp(with: event)
         delegate?.mouseClickView(self, mouseUpEvent: event)
     }
