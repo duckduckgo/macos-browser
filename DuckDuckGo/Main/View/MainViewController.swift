@@ -31,7 +31,6 @@ final class MainViewController: NSViewController {
     @IBOutlet var navigationBarTopConstraint: NSLayoutConstraint!
     @IBOutlet var addressBarHeightConstraint: NSLayoutConstraint!
     @IBOutlet var bookmarksBarHeightConstraint: NSLayoutConstraint!
-    @IBOutlet var webViewTopConstraint: NSLayoutConstraint!
 
     @IBOutlet var divider: NSView!
 
@@ -56,6 +55,10 @@ final class MainViewController: NSViewController {
     private var bookmarksBarIsVisible: Bool {
         return !bookmarksBarViewController.view.isHidden
     }
+    
+    private var isInPopUpWindow: Bool {
+        view.window?.isPopUpWindow == true
+    }
 
     required init?(coder: NSCoder) {
         self.tabCollectionViewModel = TabCollectionViewModel()
@@ -77,13 +80,12 @@ final class MainViewController: NSViewController {
     }
 
     override func viewWillAppear() {
-        if view.window?.isPopUpWindow == true {
+        if isInPopUpWindow {
             tabBarViewController.view.isHidden = true
             tabBarContainerView.isHidden = true
             navigationBarTopConstraint.constant = 0.0
-            webViewTopConstraint.constant = navigationBarViewController.view.frame.height
             addressBarHeightConstraint.constant = tabBarContainerView.frame.height
-            updateBookmarksBar(visible: false)
+            updateBookmarksBarVisibility(visible: false)
         } else {
             navigationBarContainerView.wantsLayer = true
             navigationBarContainerView.layer?.masksToBounds = false
@@ -91,7 +93,7 @@ final class MainViewController: NSViewController {
             resizeNavigationBarForHomePage(tabCollectionViewModel.selectedTabViewModel?.tab.content == .homePage, animated: false)
             
             let bookmarksBarVisible = PersistentAppInterfaceSettings.shared.showBookmarksBar
-            toggleBookmarksBarVisibility(visible: bookmarksBarVisible)
+            updateBookmarksBarVisibility(visible: bookmarksBarVisible)
         }
         
         updateDividerColor()
@@ -186,12 +188,20 @@ final class MainViewController: NSViewController {
     
     func updateBookmarksBar(visible: Bool) {
         PersistentAppInterfaceSettings.shared.showBookmarksBar = visible
-        toggleBookmarksBarVisibility(visible: visible)
+        updateBookmarksBarVisibility(visible: visible)
     }
     
-    private func toggleBookmarksBarVisibility(visible: Bool) {
-        bookmarksBarViewController.view.isHidden = !visible
-        bookmarksBarHeightConstraint.constant = visible ? 34 : 0
+    private func updateBookmarksBarVisibility(visible: Bool) {
+        let showBookmarksBar: Bool
+
+        if isInPopUpWindow {
+            showBookmarksBar = false
+        } else {
+            showBookmarksBar = visible
+        }
+
+        bookmarksBarViewController.view.isHidden = !showBookmarksBar
+        bookmarksBarHeightConstraint.constant = showBookmarksBar ? 34 : 0
         updateDividerColor()
     }
     
@@ -217,7 +227,7 @@ final class MainViewController: NSViewController {
             .publisher(for: PersistentAppInterfaceSettings.ShowBookmarksBarSettingChanged)
             .sink { [weak self] _ in
                 let bookmarksBarVisible = PersistentAppInterfaceSettings.shared.showBookmarksBar
-                self?.toggleBookmarksBarVisibility(visible: bookmarksBarVisible)
+                self?.updateBookmarksBarVisibility(visible: bookmarksBarVisible)
             }
     }
 
@@ -225,7 +235,7 @@ final class MainViewController: NSViewController {
         NSAnimationContext.runAnimationGroup { context in
             context.duration = 0.1
 
-            let nonHomePageHeight: CGFloat = view.window?.isPopUpWindow == true ? 42 : 48
+            let nonHomePageHeight: CGFloat = isInPopUpWindow ? 42 : 48
 
             let height = animated ? addressBarHeightConstraint.animator() : addressBarHeightConstraint
             height?.constant = homePage ? 52 : nonHomePageHeight
