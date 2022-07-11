@@ -126,14 +126,14 @@
             <objects>
                 <viewController storyboardIdentifier="FirePopoverViewController" id="DMI-mh-xLJ" customClass="FirePopoverViewController" customModule="DuckDuckGo_Privacy_Browser" customModuleProvider="target" sceneMemberID="viewController">
                     <view key="view" id="dGd-Gc-P2e" customClass="ColorView" customModule="DuckDuckGo_Privacy_Browser" customModuleProvider="target">
-                        <rect key="frame" x="0.0" y="0.0" width="320" height="282"/>
+                        <rect key="frame" x="0.0" y="0.0" width="328" height="282"/>
                         <autoresizingMask key="autoresizingMask"/>
                         <subviews>
                             <customView translatesAutoresizingMaskIntoConstraints="NO" id="3Jn-h4-fXL" userLabel="Header Wrapper View">
-                                <rect key="frame" x="0.0" y="134" width="320" height="148"/>
+                                <rect key="frame" x="0.0" y="134" width="328" height="148"/>
                                 <subviews>
                                     <imageView horizontalHuggingPriority="251" verticalHuggingPriority="251" translatesAutoresizingMaskIntoConstraints="NO" id="acV-lE-jVh">
-                                        <rect key="frame" x="96" y="64" width="128" height="64"/>
+                                        <rect key="frame" x="100" y="64" width="128" height="64"/>
                                         <constraints>
                                             <constraint firstAttribute="width" constant="128" id="jv0-mb-KeT"/>
                                             <constraint firstAttribute="height" constant="64" id="zhN-YS-juD"/>
@@ -141,7 +141,7 @@
                                         <imageCell key="cell" refusesFirstResponder="YES" alignment="left" imageScaling="proportionallyDown" image="FireHeader" id="Dql-dm-pHB"/>
                                     </imageView>
                                     <popUpButton translatesAutoresizingMaskIntoConstraints="NO" id="ckJ-6G-38h">
-                                        <rect key="frame" x="114" y="22" width="133" height="37"/>
+                                        <rect key="frame" x="122" y="22" width="133" height="37"/>
                                         <constraints>
                                             <constraint firstAttribute="height" constant="30" id="AOr-Ku-GpD"/>
                                             <constraint firstAttribute="width" constant="127" id="f5G-AU-bU2"/>
@@ -163,7 +163,7 @@
                                         </connections>
                                     </popUpButton>
                                     <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="gVh-tG-Gue">
-                                        <rect key="frame" x="75" y="33" width="36" height="16"/>
+                                        <rect key="frame" x="83" y="33" width="36" height="16"/>
                                         <textFieldCell key="cell" lineBreakMode="clipping" title="Clear" id="98U-sP-UUR">
                                             <font key="font" metaFont="system"/>
                                             <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
@@ -177,15 +177,15 @@
                                     <constraint firstAttribute="height" constant="148" id="KFj-xA-het"/>
                                     <constraint firstItem="acV-lE-jVh" firstAttribute="top" secondItem="3Jn-h4-fXL" secondAttribute="top" constant="20" id="TNw-m8-oz1"/>
                                     <constraint firstItem="gVh-tG-Gue" firstAttribute="top" secondItem="acV-lE-jVh" secondAttribute="bottom" constant="15" id="dzE-fi-9Qb"/>
-                                    <constraint firstItem="ckJ-6G-38h" firstAttribute="centerX" secondItem="3Jn-h4-fXL" secondAttribute="centerX" constant="20" id="eVG-pj-q6k"/>
+                                    <constraint firstItem="ckJ-6G-38h" firstAttribute="centerX" secondItem="3Jn-h4-fXL" secondAttribute="centerX" constant="24" id="eVG-pj-q6k"/>
                                     <constraint firstItem="acV-lE-jVh" firstAttribute="centerX" secondItem="3Jn-h4-fXL" secondAttribute="centerX" id="jdZ-Ii-nMi"/>
                                 </constraints>
                             </customView>
                             <customView translatesAutoresizingMaskIntoConstraints="NO" id="sbc-pJ-bul" userLabel="Open Wrapper View">
-                                <rect key="frame" x="0.0" y="92" width="320" height="42"/>
+                                <rect key="frame" x="0.0" y="92" width="328" height="42"/>
                                 <subviews>
                                     <imageView horizontalHuggingPriority="251" verticalHuggingPriority="251" translatesAutoresizingMaskIntoConstraints="NO" id="8qK-6q-RQT">
-                                        <rect key="frame" x="288" y="13" width="32" height="16"/>
+                                        <rect key="frame" x="296" y="13" width="32" height="16"/>
                                         <constraints>
                                             <constraint firstAttribute="height" constant="16" id="CF5-0A-jcP"/>
                                             <constraint firstAttribute="width" constant="32" id="br4-Fc-8RE"/>
@@ -194,7 +194,7 @@
                                         <color key="contentTintColor" name="GreyTextColor"/>
                                     </imageView>
                                     <button translatesAutoresizingMaskIntoConstraints="NO" id="ACx-m8-z0K" customClass="MouseOverButton" customModule="DuckDuckGo_Privacy_Browser" customModuleProvider="target">
-                                        <rect key="frame" x="0.0" y="0.0" width="320" height="42"/>
+                                        <rect key="frame" x="0.0" y="0.0" width="328" height="42"/>
                                         <constraints>
                                             <constraint firstAttribute="height" constant="42" id="lCs-Fg-DUS"/>
                                         </constraints>
@@ -227,13 +227,13 @@
                                 </constraints>
                             </customView>
                             <customView hidden="YES" translatesAutoresizingMaskIntoConstraints="NO" id="6vZ-d2-qnR" userLabel="Details Wrapper View">
-                                <rect key="frame" x="0.0" y="-129" width="320" height="263"/>
+                                <rect key="frame" x="0.0" y="-129" width="328" height="263"/>
                                 <subviews>
                                     <customView translatesAutoresizingMaskIntoConstraints="NO" id="553-P8-fEM">
-                                        <rect key="frame" x="0.0" y="221" width="320" height="42"/>
+                                        <rect key="frame" x="0.0" y="221" width="328" height="42"/>
                                         <subviews>
                                             <customView translatesAutoresizingMaskIntoConstraints="NO" id="41J-2u-8fZ" customClass="ColorView" customModule="DuckDuckGo_Privacy_Browser" customModuleProvider="target">
-                                                <rect key="frame" x="0.0" y="0.0" width="320" height="42"/>
+                                                <rect key="frame" x="0.0" y="0.0" width="328" height="42"/>
                                                 <userDefinedRuntimeAttributes>
                                                     <userDefinedRuntimeAttribute type="color" keyPath="backgroundColor">
                                                         <color key="value" name="FirePopoverPanelBackground"/>
@@ -241,15 +241,15 @@
                                                 </userDefinedRuntimeAttributes>
                                             </customView>
                                             <box verticalHuggingPriority="750" fixedFrame="YES" boxType="separator" translatesAutoresizingMaskIntoConstraints="NO" id="zrk-pB-b5b">
-                                                <rect key="frame" x="0.0" y="39" width="320" height="5"/>
+                                                <rect key="frame" x="0.0" y="39" width="328" height="5"/>
                                                 <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                             </box>
                                             <box verticalHuggingPriority="750" fixedFrame="YES" boxType="separator" translatesAutoresizingMaskIntoConstraints="NO" id="L0W-XS-gts">
-                                                <rect key="frame" x="0.0" y="-2" width="320" height="5"/>
+                                                <rect key="frame" x="0.0" y="-2" width="328" height="5"/>
                                                 <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                             </box>
                                             <button translatesAutoresizingMaskIntoConstraints="NO" id="cgG-hF-FAP" customClass="MouseOverButton" customModule="DuckDuckGo_Privacy_Browser" customModuleProvider="target">
-                                                <rect key="frame" x="0.0" y="0.0" width="320" height="42"/>
+                                                <rect key="frame" x="0.0" y="0.0" width="328" height="42"/>
                                                 <buttonCell key="cell" type="square" title="     Close all tabs and clear site data" bezelStyle="shadowlessSquare" image="CondenseUpPadding" imagePosition="trailing" alignment="left" inset="2" id="5VP-Yt-jB8">
                                                     <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
                                                     <font key="font" metaFont="smallSystem"/>
@@ -281,13 +281,13 @@
                                         </constraints>
                                     </customView>
                                     <scrollView wantsLayer="YES" borderType="none" autohidesScrollers="YES" horizontalLineScroll="10" horizontalPageScroll="10" verticalLineScroll="10" verticalPageScroll="10" hasHorizontalScroller="NO" usesPredominantAxisScrolling="NO" translatesAutoresizingMaskIntoConstraints="NO" id="XmN-jm-YAB">
-                                        <rect key="frame" x="0.0" y="0.0" width="320" height="221"/>
+                                        <rect key="frame" x="0.0" y="0.0" width="328" height="221"/>
                                         <clipView key="contentView" drawsBackground="NO" id="TlT-bV-Znt">
-                                            <rect key="frame" x="0.0" y="0.0" width="320" height="221"/>
+                                            <rect key="frame" x="0.0" y="0.0" width="328" height="221"/>
                                             <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                             <subviews>
                                                 <collectionView selectable="YES" allowsMultipleSelection="YES" id="u7v-Gt-FjR">
-                                                    <rect key="frame" x="0.0" y="0.0" width="320" height="221"/>
+                                                    <rect key="frame" x="0.0" y="0.0" width="328" height="221"/>
                                                     <autoresizingMask key="autoresizingMask" widthSizable="YES"/>
                                                     <collectionViewFlowLayout key="collectionViewLayout" id="VZx-7u-HhL">
                                                         <size key="itemSize" width="318" height="24"/>
@@ -319,10 +319,10 @@
                                 </constraints>
                             </customView>
                             <customView translatesAutoresizingMaskIntoConstraints="NO" id="r7f-Ig-GcB">
-                                <rect key="frame" x="0.0" y="92" width="320" height="32"/>
+                                <rect key="frame" x="0.0" y="92" width="328" height="32"/>
                                 <subviews>
                                     <customView translatesAutoresizingMaskIntoConstraints="NO" id="R2h-Oh-HRn" customClass="ColorView" customModule="DuckDuckGo_Privacy_Browser" customModuleProvider="target">
-                                        <rect key="frame" x="0.0" y="0.0" width="320" height="32"/>
+                                        <rect key="frame" x="0.0" y="0.0" width="328" height="32"/>
                                         <userDefinedRuntimeAttributes>
                                             <userDefinedRuntimeAttribute type="color" keyPath="backgroundColor">
                                                 <color key="value" name="FirePopoverPanelBackground"/>
@@ -330,17 +330,17 @@
                                         </userDefinedRuntimeAttributes>
                                     </customView>
                                     <box verticalHuggingPriority="750" fixedFrame="YES" boxType="separator" translatesAutoresizingMaskIntoConstraints="NO" id="55B-tN-GCl">
-                                        <rect key="frame" x="0.0" y="29" width="320" height="5"/>
+                                        <rect key="frame" x="0.0" y="29" width="328" height="5"/>
                                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                     </box>
                                     <box verticalHuggingPriority="750" fixedFrame="YES" boxType="separator" translatesAutoresizingMaskIntoConstraints="NO" id="rMv-28-G5x">
-                                        <rect key="frame" x="0.0" y="-12" width="320" height="5"/>
+                                        <rect key="frame" x="0.0" y="-12" width="328" height="5"/>
                                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                     </box>
                                     <button fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="Bir-wk-iOW">
-                                        <rect key="frame" x="20" y="0.0" width="280" height="32"/>
+                                        <rect key="frame" x="20" y="0.0" width="288" height="32"/>
                                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
-                                        <buttonCell key="cell" type="square" title="   All tabs open to selected sites will close" bezelStyle="shadowlessSquare" image="WarningTriangle" imagePosition="leading" alignment="left" inset="2" id="6NW-yL-FoB">
+                                        <buttonCell key="cell" type="square" title="   All unpinned tabs open to selected sites will close" bezelStyle="shadowlessSquare" image="WarningTriangle" imagePosition="leading" alignment="left" inset="2" id="6NW-yL-FoB">
                                             <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
                                             <font key="font" metaFont="smallSystem"/>
                                         </buttonCell>
@@ -356,10 +356,10 @@
                                 </constraints>
                             </customView>
                             <customView translatesAutoresizingMaskIntoConstraints="NO" id="otO-as-2jX">
-                                <rect key="frame" x="0.0" y="60" width="320" height="32"/>
+                                <rect key="frame" x="0.0" y="60" width="328" height="32"/>
                                 <subviews>
                                     <customView translatesAutoresizingMaskIntoConstraints="NO" id="NdB-Mf-pfM" customClass="ColorView" customModule="DuckDuckGo_Privacy_Browser" customModuleProvider="target">
-                                        <rect key="frame" x="0.0" y="0.0" width="320" height="32"/>
+                                        <rect key="frame" x="0.0" y="0.0" width="328" height="32"/>
                                         <userDefinedRuntimeAttributes>
                                             <userDefinedRuntimeAttribute type="color" keyPath="backgroundColor">
                                                 <color key="value" name="FirePopoverPanelBackground"/>
@@ -367,15 +367,15 @@
                                         </userDefinedRuntimeAttributes>
                                     </customView>
                                     <box verticalHuggingPriority="750" fixedFrame="YES" boxType="separator" translatesAutoresizingMaskIntoConstraints="NO" id="34T-v7-FF8">
-                                        <rect key="frame" x="0.0" y="29" width="320" height="5"/>
+                                        <rect key="frame" x="0.0" y="29" width="328" height="5"/>
                                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                     </box>
                                     <box verticalHuggingPriority="750" fixedFrame="YES" boxType="separator" translatesAutoresizingMaskIntoConstraints="NO" id="2C1-OI-Sa7">
-                                        <rect key="frame" x="0.0" y="-12" width="320" height="5"/>
+                                        <rect key="frame" x="0.0" y="-12" width="328" height="5"/>
                                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                     </box>
                                     <button fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="M8a-pP-SrH">
-                                        <rect key="frame" x="20" y="0.0" width="280" height="32"/>
+                                        <rect key="frame" x="20" y="0.0" width="288" height="32"/>
                                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                         <buttonCell key="cell" type="square" title="   Pinned tabs won't be cleared" bezelStyle="shadowlessSquare" image="InfoLight" imagePosition="left" alignment="left" inset="2" id="PtE-9T-2YE">
                                             <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
@@ -393,10 +393,10 @@
                                 </constraints>
                             </customView>
                             <customView translatesAutoresizingMaskIntoConstraints="NO" id="nId-He-RIU" userLabel="Main Buttons Wrapper View">
-                                <rect key="frame" x="0.0" y="0.0" width="320" height="60"/>
+                                <rect key="frame" x="0.0" y="0.0" width="328" height="60"/>
                                 <subviews>
                                     <customView translatesAutoresizingMaskIntoConstraints="NO" id="fSV-XR-8Dh" customClass="ColorView" customModule="DuckDuckGo_Privacy_Browser" customModuleProvider="target">
-                                        <rect key="frame" x="0.0" y="0.0" width="320" height="60"/>
+                                        <rect key="frame" x="0.0" y="0.0" width="328" height="60"/>
                                         <userDefinedRuntimeAttributes>
                                             <userDefinedRuntimeAttribute type="color" keyPath="backgroundColor">
                                                 <color key="value" name="InterfaceBackgroundColor"/>
@@ -404,10 +404,10 @@
                                         </userDefinedRuntimeAttributes>
                                     </customView>
                                     <box verticalHuggingPriority="750" boxType="separator" translatesAutoresizingMaskIntoConstraints="NO" id="dqq-R5-UUp">
-                                        <rect key="frame" x="0.0" y="57" width="320" height="5"/>
+                                        <rect key="frame" x="0.0" y="57" width="328" height="5"/>
                                     </box>
                                     <button verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="Sam-GO-uzw">
-                                        <rect key="frame" x="158" y="10" width="148" height="40"/>
+                                        <rect key="frame" x="162" y="10" width="152" height="40"/>
                                         <buttonCell key="cell" type="push" title="Clear" bezelStyle="rounded" alignment="center" controlSize="large" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="tCs-Mx-t1s">
                                             <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
                                             <font key="font" metaFont="system"/>
@@ -420,7 +420,7 @@ DQ
                                         </connections>
                                     </button>
                                     <button verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="wam-tC-iBG">
-                                        <rect key="frame" x="14" y="10" width="148" height="40"/>
+                                        <rect key="frame" x="14" y="10" width="152" height="40"/>
                                         <buttonCell key="cell" type="push" title="Cancel" bezelStyle="rounded" alignment="center" controlSize="large" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="vN9-d2-hnK">
                                             <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
                                             <font key="font" metaFont="system"/>
@@ -504,17 +504,17 @@ Gw
             <objects>
                 <viewController storyboardIdentifier="FirePopoverWrapperViewController" id="tVa-jC-2sf" customClass="FirePopoverWrapperViewController" customModule="DuckDuckGo_Privacy_Browser" customModuleProvider="target" sceneMemberID="viewController">
                     <view key="view" id="MAm-om-86j">
-                        <rect key="frame" x="0.0" y="0.0" width="320" height="250"/>
+                        <rect key="frame" x="0.0" y="0.0" width="328" height="250"/>
                         <autoresizingMask key="autoresizingMask"/>
                         <subviews>
                             <containerView hidden="YES" translatesAutoresizingMaskIntoConstraints="NO" id="hQC-gC-rhn">
-                                <rect key="frame" x="0.0" y="0.0" width="320" height="250"/>
+                                <rect key="frame" x="0.0" y="0.0" width="328" height="250"/>
                                 <connections>
                                     <segue destination="hqb-gn-5gp" kind="embed" destinationCreationSelector="createFireInfoViewController:" id="Kqq-oK-w9X"/>
                                 </connections>
                             </containerView>
                             <containerView hidden="YES" translatesAutoresizingMaskIntoConstraints="NO" id="hnY-hP-VSW">
-                                <rect key="frame" x="0.0" y="0.0" width="320" height="250"/>
+                                <rect key="frame" x="0.0" y="0.0" width="328" height="250"/>
                                 <connections>
                                     <segue destination="DMI-mh-xLJ" kind="embed" destinationCreationSelector="createFirePopoverViewController:" id="dT4-mE-M8b"/>
                                 </connections>
@@ -546,11 +546,11 @@ Gw
                 <customObject id="2D4-gy-3jN" userLabel="First Responder" customClass="NSResponder" sceneMemberID="firstResponder"/>
                 <viewController id="hqb-gn-5gp" customClass="FireInfoViewController" customModule="DuckDuckGo_Privacy_Browser" customModuleProvider="target" sceneMemberID="viewController">
                     <view key="view" id="1se-D0-4zU" customClass="ColorView" customModule="DuckDuckGo_Privacy_Browser" customModuleProvider="target">
-                        <rect key="frame" x="0.0" y="0.0" width="320" height="250"/>
+                        <rect key="frame" x="0.0" y="0.0" width="328" height="250"/>
                         <autoresizingMask key="autoresizingMask"/>
                         <subviews>
                             <button verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="vOP-zm-6FL">
-                                <rect key="frame" x="14" y="10" width="292" height="40"/>
+                                <rect key="frame" x="18" y="10" width="292" height="40"/>
                                 <buttonCell key="cell" type="push" title="Got It!" bezelStyle="rounded" alignment="center" controlSize="large" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="K9v-mN-Am9">
                                     <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
                                     <font key="font" metaFont="system"/>
@@ -563,7 +563,7 @@ DQ
                                 </connections>
                             </button>
                             <imageView horizontalHuggingPriority="251" verticalHuggingPriority="251" translatesAutoresizingMaskIntoConstraints="NO" id="wWB-fA-JGV">
-                                <rect key="frame" x="96" y="166" width="128" height="64"/>
+                                <rect key="frame" x="100" y="166" width="128" height="64"/>
                                 <constraints>
                                     <constraint firstAttribute="height" constant="64" id="KbY-ZC-c5P"/>
                                     <constraint firstAttribute="width" constant="128" id="hUg-eV-t0D"/>
@@ -571,7 +571,7 @@ DQ
                                 <imageCell key="cell" refusesFirstResponder="YES" alignment="left" imageScaling="proportionallyDown" image="FireHeader" id="bCv-vD-xuT"/>
                             </imageView>
                             <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="AsC-eN-HNp">
-                                <rect key="frame" x="18" y="69" width="284" height="48"/>
+                                <rect key="frame" x="22" y="69" width="284" height="48"/>
                                 <constraints>
                                     <constraint firstAttribute="width" constant="280" id="YS3-eh-JOs"/>
                                 </constraints>
@@ -582,7 +582,7 @@ DQ
                                 </textFieldCell>
                             </textField>
                             <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="cPr-2R-bkx">
-                                <rect key="frame" x="18" y="123" width="284" height="19"/>
+                                <rect key="frame" x="22" y="123" width="284" height="19"/>
                                 <constraints>
                                     <constraint firstAttribute="width" constant="280" id="LLa-XW-6PH"/>
                                 </constraints>
@@ -594,17 +594,15 @@ DQ
                             </textField>
                         </subviews>
                         <constraints>
-                            <constraint firstAttribute="trailing" secondItem="AsC-eN-HNp" secondAttribute="trailing" constant="20" symbolic="YES" id="3wh-q4-K98"/>
                             <constraint firstItem="AsC-eN-HNp" firstAttribute="top" secondItem="cPr-2R-bkx" secondAttribute="bottom" constant="6" id="72P-p9-0Kb"/>
-                            <constraint firstAttribute="trailing" secondItem="cPr-2R-bkx" secondAttribute="trailing" constant="20" symbolic="YES" id="DPH-Ep-K26"/>
-                            <constraint firstAttribute="trailing" secondItem="vOP-zm-6FL" secondAttribute="trailing" constant="20" symbolic="YES" id="Li7-XG-l95"/>
+                            <constraint firstItem="cPr-2R-bkx" firstAttribute="centerX" secondItem="1se-D0-4zU" secondAttribute="centerX" id="R0e-hX-4Mu"/>
+                            <constraint firstItem="AsC-eN-HNp" firstAttribute="centerX" secondItem="1se-D0-4zU" secondAttribute="centerX" id="TXY-jC-5c2"/>
                             <constraint firstItem="wWB-fA-JGV" firstAttribute="centerX" secondItem="1se-D0-4zU" secondAttribute="centerX" id="V4f-UG-ojf"/>
                             <constraint firstItem="wWB-fA-JGV" firstAttribute="top" secondItem="1se-D0-4zU" secondAttribute="top" constant="20" symbolic="YES" id="Wiy-76-7IF"/>
-                            <constraint firstItem="cPr-2R-bkx" firstAttribute="leading" secondItem="1se-D0-4zU" secondAttribute="leading" constant="20" symbolic="YES" id="aDl-hn-tyD"/>
+                            <constraint firstItem="vOP-zm-6FL" firstAttribute="width" secondItem="AsC-eN-HNp" secondAttribute="width" id="YmO-IY-1qj"/>
                             <constraint firstAttribute="bottom" secondItem="vOP-zm-6FL" secondAttribute="bottom" constant="16" id="da0-dI-nQN"/>
-                            <constraint firstItem="AsC-eN-HNp" firstAttribute="leading" secondItem="1se-D0-4zU" secondAttribute="leading" constant="20" symbolic="YES" id="eAa-wx-a2p"/>
-                            <constraint firstItem="vOP-zm-6FL" firstAttribute="leading" secondItem="1se-D0-4zU" secondAttribute="leading" constant="20" symbolic="YES" id="nnD-Km-vGI"/>
                             <constraint firstItem="vOP-zm-6FL" firstAttribute="top" secondItem="AsC-eN-HNp" secondAttribute="bottom" constant="25" id="nqi-H2-ZOR"/>
+                            <constraint firstItem="vOP-zm-6FL" firstAttribute="centerX" secondItem="1se-D0-4zU" secondAttribute="centerX" id="vSX-vQ-6Ig"/>
                         </constraints>
                         <userDefinedRuntimeAttributes>
                             <userDefinedRuntimeAttribute type="color" keyPath="backgroundColor">
