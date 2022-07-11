@@ -54,6 +54,7 @@ final class FirePopoverViewModel {
         self.fireproofDomains = fireproofDomains
         self.faviconManagement = faviconManagement
         self.clearingOption = initialClearingOption
+        self.shouldShowPinnedTabsInfo = !tabCollectionViewModel.pinnedTabsCollection.tabs.isEmpty
         updateItems(for: initialClearingOption)
     }
 
@@ -62,6 +63,8 @@ final class FirePopoverViewModel {
             updateItems(for: clearingOption)
         }
     }
+
+    let shouldShowPinnedTabsInfo: Bool
 
     private let fireViewModel: FireViewModel
     private weak var tabCollectionViewModel: TabCollectionViewModel?

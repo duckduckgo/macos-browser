@@ -126,11 +126,11 @@
             <objects>
                 <viewController storyboardIdentifier="FirePopoverViewController" id="DMI-mh-xLJ" customClass="FirePopoverViewController" customModule="DuckDuckGo_Privacy_Browser" customModuleProvider="target" sceneMemberID="viewController">
                     <view key="view" id="dGd-Gc-P2e" customClass="ColorView" customModule="DuckDuckGo_Privacy_Browser" customModuleProvider="target">
-                        <rect key="frame" x="0.0" y="0.0" width="320" height="250"/>
+                        <rect key="frame" x="0.0" y="0.0" width="320" height="282"/>
                         <autoresizingMask key="autoresizingMask"/>
                         <subviews>
                             <customView translatesAutoresizingMaskIntoConstraints="NO" id="3Jn-h4-fXL" userLabel="Header Wrapper View">
-                                <rect key="frame" x="0.0" y="102" width="320" height="148"/>
+                                <rect key="frame" x="0.0" y="134" width="320" height="148"/>
                                 <subviews>
                                     <imageView horizontalHuggingPriority="251" verticalHuggingPriority="251" translatesAutoresizingMaskIntoConstraints="NO" id="acV-lE-jVh">
                                         <rect key="frame" x="96" y="64" width="128" height="64"/>
@@ -182,7 +182,7 @@
                                 </constraints>
                             </customView>
                             <customView translatesAutoresizingMaskIntoConstraints="NO" id="sbc-pJ-bul" userLabel="Open Wrapper View">
-                                <rect key="frame" x="0.0" y="60" width="320" height="42"/>
+                                <rect key="frame" x="0.0" y="92" width="320" height="42"/>
                                 <subviews>
                                     <imageView horizontalHuggingPriority="251" verticalHuggingPriority="251" translatesAutoresizingMaskIntoConstraints="NO" id="8qK-6q-RQT">
                                         <rect key="frame" x="288" y="13" width="32" height="16"/>
@@ -227,7 +227,7 @@
                                 </constraints>
                             </customView>
                             <customView hidden="YES" translatesAutoresizingMaskIntoConstraints="NO" id="6vZ-d2-qnR" userLabel="Details Wrapper View">
-                                <rect key="frame" x="0.0" y="-161" width="320" height="263"/>
+                                <rect key="frame" x="0.0" y="-129" width="320" height="263"/>
                                 <subviews>
                                     <customView translatesAutoresizingMaskIntoConstraints="NO" id="553-P8-fEM">
                                         <rect key="frame" x="0.0" y="221" width="320" height="42"/>
@@ -319,7 +319,7 @@
                                 </constraints>
                             </customView>
                             <customView translatesAutoresizingMaskIntoConstraints="NO" id="r7f-Ig-GcB">
-                                <rect key="frame" x="0.0" y="60" width="320" height="32"/>
+                                <rect key="frame" x="0.0" y="92" width="320" height="32"/>
                                 <subviews>
                                     <customView translatesAutoresizingMaskIntoConstraints="NO" id="R2h-Oh-HRn" customClass="ColorView" customModule="DuckDuckGo_Privacy_Browser" customModuleProvider="target">
                                         <rect key="frame" x="0.0" y="0.0" width="320" height="32"/>
@@ -353,6 +353,43 @@
                                     <constraint firstItem="R2h-Oh-HRn" firstAttribute="top" secondItem="r7f-Ig-GcB" secondAttribute="top" id="nOB-Rm-zOy"/>
                                     <constraint firstAttribute="trailing" secondItem="R2h-Oh-HRn" secondAttribute="trailing" id="tm1-hf-0JX"/>
                                     <constraint firstAttribute="bottom" secondItem="R2h-Oh-HRn" secondAttribute="bottom" id="uVV-mf-WiT"/>
+                                </constraints>
+                            </customView>
+                            <customView translatesAutoresizingMaskIntoConstraints="NO" id="otO-as-2jX">
+                                <rect key="frame" x="0.0" y="60" width="320" height="32"/>
+                                <subviews>
+                                    <customView translatesAutoresizingMaskIntoConstraints="NO" id="NdB-Mf-pfM" customClass="ColorView" customModule="DuckDuckGo_Privacy_Browser" customModuleProvider="target">
+                                        <rect key="frame" x="0.0" y="0.0" width="320" height="32"/>
+                                        <userDefinedRuntimeAttributes>
+                                            <userDefinedRuntimeAttribute type="color" keyPath="backgroundColor">
+                                                <color key="value" name="FirePopoverPanelBackground"/>
+                                            </userDefinedRuntimeAttribute>
+                                        </userDefinedRuntimeAttributes>
+                                    </customView>
+                                    <box verticalHuggingPriority="750" fixedFrame="YES" boxType="separator" translatesAutoresizingMaskIntoConstraints="NO" id="34T-v7-FF8">
+                                        <rect key="frame" x="0.0" y="29" width="320" height="5"/>
+                                        <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                                    </box>
+                                    <box verticalHuggingPriority="750" fixedFrame="YES" boxType="separator" translatesAutoresizingMaskIntoConstraints="NO" id="2C1-OI-Sa7">
+                                        <rect key="frame" x="0.0" y="-12" width="320" height="5"/>
+                                        <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                                    </box>
+                                    <button fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="M8a-pP-SrH">
+                                        <rect key="frame" x="20" y="0.0" width="280" height="32"/>
+                                        <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                                        <buttonCell key="cell" type="square" title="   Pinned tabs won't be cleared" bezelStyle="shadowlessSquare" image="InfoLight" imagePosition="left" alignment="left" inset="2" id="PtE-9T-2YE">
+                                            <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
+                                            <font key="font" metaFont="smallSystem"/>
+                                        </buttonCell>
+                                        <color key="contentTintColor" name="GreyTextColor"/>
+                                    </button>
+                                </subviews>
+                                <constraints>
+                                    <constraint firstAttribute="trailing" secondItem="NdB-Mf-pfM" secondAttribute="trailing" id="0tF-Dy-wEY"/>
+                                    <constraint firstAttribute="height" constant="32" id="9tC-lO-ZiR"/>
+                                    <constraint firstItem="NdB-Mf-pfM" firstAttribute="top" secondItem="otO-as-2jX" secondAttribute="top" id="C5O-nc-2o4"/>
+                                    <constraint firstItem="NdB-Mf-pfM" firstAttribute="leading" secondItem="otO-as-2jX" secondAttribute="leading" id="FgG-4w-ocS"/>
+                                    <constraint firstAttribute="bottom" secondItem="NdB-Mf-pfM" secondAttribute="bottom" id="onv-Ku-Lyc"/>
                                 </constraints>
                             </customView>
                             <customView translatesAutoresizingMaskIntoConstraints="NO" id="nId-He-RIU" userLabel="Main Buttons Wrapper View">
@@ -425,9 +462,12 @@ Gw
                             <constraint firstItem="3Jn-h4-fXL" firstAttribute="leading" secondItem="dGd-Gc-P2e" secondAttribute="leading" id="ZK2-xe-fKM"/>
                             <constraint firstItem="r7f-Ig-GcB" firstAttribute="leading" secondItem="dGd-Gc-P2e" secondAttribute="leading" id="ZOG-ov-blY"/>
                             <constraint firstItem="3Jn-h4-fXL" firstAttribute="top" secondItem="dGd-Gc-P2e" secondAttribute="top" id="bUr-Qo-pGT"/>
-                            <constraint firstItem="nId-He-RIU" firstAttribute="top" secondItem="r7f-Ig-GcB" secondAttribute="bottom" id="f1V-n7-jhp"/>
-                            <constraint firstItem="nId-He-RIU" firstAttribute="top" secondItem="3Jn-h4-fXL" secondAttribute="bottom" constant="42" id="hbg-4i-hjT"/>
+                            <constraint firstItem="otO-as-2jX" firstAttribute="leading" secondItem="dGd-Gc-P2e" secondAttribute="leading" id="eza-TF-Wxz"/>
+                            <constraint firstItem="otO-as-2jX" firstAttribute="top" secondItem="r7f-Ig-GcB" secondAttribute="bottom" id="f1V-n7-jhp"/>
+                            <constraint firstItem="nId-He-RIU" firstAttribute="top" secondItem="otO-as-2jX" secondAttribute="bottom" id="fZK-jn-eTA"/>
+                            <constraint firstItem="otO-as-2jX" firstAttribute="top" secondItem="3Jn-h4-fXL" secondAttribute="bottom" constant="42" id="hbg-4i-hjT"/>
                             <constraint firstAttribute="trailing" secondItem="r7f-Ig-GcB" secondAttribute="trailing" id="kNz-fP-3Iv"/>
+                            <constraint firstAttribute="trailing" secondItem="otO-as-2jX" secondAttribute="trailing" id="mk4-1w-gUg"/>
                             <constraint firstAttribute="trailing" secondItem="3Jn-h4-fXL" secondAttribute="trailing" id="nnI-mg-tvm"/>
                             <constraint firstAttribute="bottom" secondItem="nId-He-RIU" secondAttribute="bottom" id="oF4-VF-B5Y"/>
                             <constraint firstItem="sbc-pJ-bul" firstAttribute="leading" secondItem="dGd-Gc-P2e" secondAttribute="leading" id="pKH-pe-Sua"/>
@@ -447,6 +487,8 @@ Gw
                         <outlet property="contentHeightConstraint" destination="hbg-4i-hjT" id="mC2-Ot-onY"/>
                         <outlet property="detailsWrapperView" destination="6vZ-d2-qnR" id="TKb-Ux-TIk"/>
                         <outlet property="detailsWrapperViewHeightContraint" destination="sJt-dl-rlH" id="7pa-Kc-9xB"/>
+                        <outlet property="infoWrapperView" destination="otO-as-2jX" id="cWj-B0-jwh"/>
+                        <outlet property="infoWrapperViewHeightConstraint" destination="9tC-lO-ZiR" id="8u0-IG-PHE"/>
                         <outlet property="openDetailsButton" destination="ACx-m8-z0K" id="cu4-zz-MhA"/>
                         <outlet property="openWrapperView" destination="sbc-pJ-bul" id="dUO-6T-MLY"/>
                         <outlet property="optionsButton" destination="ckJ-6G-38h" id="xSK-KE-yMk"/>
@@ -581,6 +623,7 @@ DQ
         <image name="CondenseUpPadding" width="32" height="16"/>
         <image name="ExpandDownPadding" width="32" height="16"/>
         <image name="FireHeader" width="96" height="64"/>
+        <image name="InfoLight" width="16" height="16"/>
         <image name="WarningTriangle" width="16" height="15"/>
         <namedColor name="ButtonColor">
             <color red="0.28627450980392155" green="0.28627450980392155" blue="0.28627450980392155" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
