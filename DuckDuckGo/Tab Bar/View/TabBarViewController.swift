@@ -92,6 +92,16 @@ final class TabBarViewController: NSViewController {
             .assign(to: \.selectedItem, onWeaklyHeld: pinnedTabsModel)
             .store(in: &cancellables)
 
+        Publishers.CombineLatest(tabCollectionViewModel.$selectionIndex, $tabMode)
+            .map { selectedTabIndex, tabMode -> Bool in
+                if case .regular(0) = selectedTabIndex, tabMode == .divided {
+                    return false
+                }
+                return true
+            }
+            .assign(to: \.shouldDrawLastItemSeparator, onWeaklyHeld: pinnedTabsModel)
+            .store(in: &cancellables)
+
         pinnedTabsModel.tabsDidReorderPublisher
             .sink(receiveValue: WindowControllersManager.shared.pinnedTabsManager.tabCollection.reorderTabs)
             .store(in: &cancellables)
@@ -334,13 +344,13 @@ final class TabBarViewController: NSViewController {
 
     // MARK: - Tab Width
 
-    enum TabMode {
+    enum TabMode: Equatable {
         case divided
         case overflow
     }
 
     private var frozenLayout = false
-    private var tabMode = TabMode.divided
+    @Published private var tabMode = TabMode.divided
 
     private func updateTabMode(for numberOfItems: Int? = nil, updateLayout: Bool? = nil) {
         let items = CGFloat(numberOfItems ?? self.layoutNumberOfItems())

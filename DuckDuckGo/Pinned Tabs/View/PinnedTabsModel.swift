@@ -46,6 +46,7 @@ final class PinnedTabsModel: ObservableObject {
             } else {
                 selectedItemIndex = nil
             }
+            updateItemsWithoutSeparator()
         }
     }
 
@@ -59,8 +60,16 @@ final class PinnedTabsModel: ObservableObject {
         }
     }
 
+    @Published var shouldDrawLastItemSeparator: Bool = true {
+        didSet {
+            updateItemsWithoutSeparator()
+        }
+    }
+
     @Published private(set) var selectedItemIndex: Int?
     @Published private(set) var hoveredItemIndex: Int?
+
+    @Published private(set) var itemsWithoutSeparator: [Tab] = []
 
     let contextMenuActionPublisher: AnyPublisher<ContextMenuAction, Never>
     let tabsDidReorderPublisher: AnyPublisher<[Tab], Never>
@@ -122,4 +131,18 @@ final class PinnedTabsModel: ObservableObject {
     private let tabsDidReorderSubject = PassthroughSubject<[Tab], Never>()
     private let contextMenuActionSubject = PassthroughSubject<ContextMenuAction, Never>()
     private var cancellables = Set<AnyCancellable>()
+
+    private func updateItemsWithoutSeparator() {
+        var items = [Tab]()
+        if let selectedItem = selectedItem {
+            items.append(selectedItem)
+        }
+        if let selectedItemIndex = selectedItemIndex, selectedItemIndex > 0 {
+            items.append(self.items[selectedItemIndex - 1])
+        }
+        if !shouldDrawLastItemSeparator, let lastItem = self.items.last {
+            items.append(lastItem)
+        }
+        itemsWithoutSeparator = items
+    }
 }

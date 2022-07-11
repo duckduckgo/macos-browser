@@ -34,11 +34,15 @@ struct PinnedTabView: View {
 
     var body: some View {
         Button {
-            if collectionModel.selectedItem != model {
+            if !isSelected {
                 collectionModel.selectedItem = model
             }
         } label: {
-            PinnedTabInnerView(foregroundColor: foregroundColor, faviconImage: model.favicon)
+            PinnedTabInnerView(
+                foregroundColor: foregroundColor,
+                faviconImage: model.favicon,
+                drawSeparator: !collectionModel.itemsWithoutSeparator.contains(model)
+            )
         }
         .buttonStyle(TouchDownButtonStyle())
         .cornerRadius(6, corners: [.topLeft, .topRight])
@@ -52,15 +56,19 @@ struct PinnedTabView: View {
         }
     }
 
-    var foregroundColor: Color {
-        if collectionModel.selectedItem == model {
+    private var isSelected: Bool {
+        collectionModel.selectedItem == model
+    }
+
+    private var foregroundColor: Color {
+        if isSelected {
             return Color("InterfaceBackgroundColor")
         }
         return showsHover && isHovered ? Color("TabMouseOverColor") : Color.clear
     }
 
     @ViewBuilder
-    var contextMenu: some View {
+    private var contextMenu: some View {
         Button(UserText.unpinTab, action: { collectionModel.unpin(model) })
         Button(UserText.duplicateTab, action: { collectionModel.duplicate(model) })
         Divider()
@@ -71,7 +79,7 @@ struct PinnedTabView: View {
     }
 
     @ViewBuilder
-    var fireproofAction: some View {
+    private var fireproofAction: some View {
         if collectionModel.isFireproof(model) {
             Button(UserText.removeFireproofing, action: { collectionModel.removeFireproofing(model) })
         } else {
@@ -83,6 +91,7 @@ struct PinnedTabView: View {
 struct PinnedTabInnerView: View {
     var foregroundColor: Color
     var faviconImage: NSImage?
+    var drawSeparator: Bool = true
 
     @Environment(\.controlActiveState) private var controlActiveState
 
@@ -90,11 +99,13 @@ struct PinnedTabInnerView: View {
         ZStack {
             Rectangle()
                 .foregroundColor(foregroundColor)
-            GeometryReader { proxy in
-                Rectangle()
-                    .foregroundColor(Color("SeparatorColor"))
-                    .frame(width: 1, height: 20)
-                    .offset(x: proxy.size.width-1, y: 7)
+            if drawSeparator {
+                GeometryReader { proxy in
+                    Rectangle()
+                        .foregroundColor(Color("SeparatorColor"))
+                        .frame(width: 1, height: 20)
+                        .offset(x: proxy.size.width-1, y: 7)
+                }
             }
             Image(nsImage: faviconImage ?? #imageLiteral(resourceName: "Web"))
                 .resizable()
