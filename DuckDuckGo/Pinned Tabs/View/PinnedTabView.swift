@@ -99,9 +99,9 @@ struct PinnedTabInnerView: View {
             Image(nsImage: faviconImage ?? #imageLiteral(resourceName: "Web"))
                 .resizable()
                 .grayscale(controlActiveState == .key ? 0.0 : 1.0)
+                .opacity(controlActiveState == .key ? 1.0 : 0.60)
                 .frame(maxWidth: 16, maxHeight: 16)
                 .aspectRatio(contentMode: .fit)
-                .foregroundColor(Color("GreyTextColor"))
         }
         .frame(width: PinnedTabView.Const.dimension)
     }
