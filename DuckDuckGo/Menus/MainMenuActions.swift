@@ -650,8 +650,10 @@ extension MainViewController: NSMenuItemValidation {
             return WindowControllersManager.shared.mainWindowControllers.count > 1
 
         // Move Tab to New Window, Select Next/Prev Tab
-        case #selector(MainViewController.moveTabToNewWindow(_:)),
-             #selector(MainViewController.showNextTab(_:)),
+        case #selector(MainViewController.moveTabToNewWindow(_:)):
+            return tabCollectionViewModel.tabCollection.tabs.count > 1 && tabCollectionViewModel.selectionIndex?.isRegularTab == true
+
+        case #selector(MainViewController.showNextTab(_:)),
              #selector(MainViewController.showPreviousTab(_:)):
             return tabCollectionViewModel.allTabs.count > 1
 
