@@ -26,6 +26,9 @@ protocol PinnedTabsManager {
     var tabCollection: TabCollection { get }
     var tabViewModels: [Tab: TabViewModel] { get }
 
+    var pinnedDomains: Set<String> { get }
+    func isDomainPinned(_ domain: String) -> Bool
+
     func isTabPinned(_ tab: Tab) -> Bool
 
     func pin(_ tab: Tab)
@@ -35,6 +38,16 @@ protocol PinnedTabsManager {
     func tabViewModel(at index: Int) -> TabViewModel?
 
     func setUp(with collection: TabCollection)
+}
+
+extension PinnedTabsManager {
+    func isDomainPinned(_ domain: String) -> Bool {
+        pinnedDomains.contains(domain)
+    }
+
+    var pinnedDomains: Set<String> {
+        Set(tabCollection.tabs.compactMap { $0.url?.host?.dropWWW() })
+    }
 }
 
 final class LocalPinnedTabsManager: PinnedTabsManager, ObservableObject {
