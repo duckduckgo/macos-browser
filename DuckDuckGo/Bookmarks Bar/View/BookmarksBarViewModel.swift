@@ -76,7 +76,7 @@ final class BookmarksBarViewModel: NSObject {
                     return total + Constants.buttonSpacing + self.cachedWidth(buttonTitle: item.title, isFolder: item.isFolder)
                 }
             }
-            
+
             self.bookmarksBarItemsTotalWidth = itemsWidth
         }
     }
@@ -99,9 +99,8 @@ final class BookmarksBarViewModel: NSObject {
         var displayableItems: [BookmarksBarItem] = []
 
         for (index, entity) in bookmarkEntities.enumerated() {
-            let width = self.cachedWidth(buttonTitle: entity.title, isFolder: entity.isFolder)
-            let calculatedWidth = min(Constants.maximumButtonWidth, width)
-
+            let calculatedWidth = self.cachedWidth(buttonTitle: entity.title, isFolder: entity.isFolder)
+            
             if currentTotalWidth == 0 {
                 currentTotalWidth += calculatedWidth
             } else {
