@@ -54,7 +54,10 @@ final class FirePopoverViewModel {
         self.fireproofDomains = fireproofDomains
         self.faviconManagement = faviconManagement
         self.clearingOption = initialClearingOption
-        self.shouldShowPinnedTabsInfo = !tabCollectionViewModel.pinnedTabsCollection.tabs.isEmpty
+
+        self.pinnedDomains = Set(tabCollectionViewModel.pinnedTabsCollection.tabs.compactMap { $0.url?.host })
+        self.shouldShowPinnedTabsInfo = !pinnedDomains.isEmpty
+
         updateItems(for: initialClearingOption)
     }
 
@@ -71,6 +74,7 @@ final class FirePopoverViewModel {
     private let historyCoordinating: HistoryCoordinating
     private let fireproofDomains: FireproofDomains
     private let faviconManagement: FaviconManagement
+    private let pinnedDomains: Set<String>
 
     @Published private(set) var selectable: [Item] = []
     @Published private(set) var fireproofed: [Item] = []
@@ -111,6 +115,7 @@ final class FirePopoverViewModel {
             }
         let selectable = visitedDomains
             .subtracting(fireproofed)
+            .subtracting(pinnedDomains.map { $0.dropWWW() })
 
         self.selectable = selectable
             .map { Item(domain: $0, favicon: faviconManagement.getCachedFavicon(for: $0, sizeCategory: .small)?.image) }
@@ -180,14 +185,23 @@ final class FirePopoverViewModel {
 
     func burn() {
         let timedPixel = TimedPixel(.burn())
+
+        let implicitlyFireproofedDomains = pinnedDomains.filter({ !fireproofDomains.isFireproof(fireproofDomain: $0) })
+        let completion: () -> Void = { [weak self] in
+            implicitlyFireproofedDomains.forEach { self?.fireproofDomains.remove(domain: $0) }
+            timedPixel.fire()
+        }
+
+        implicitlyFireproofedDomains.forEach { fireproofDomains.add(domain: $0, notify: false) }
+
         if clearingOption == .allData && areAllSelected {
             if let tabCollectionViewModel = tabCollectionViewModel {
                 // Burn everything
-                fireViewModel.fire.burnAll(tabCollectionViewModel: tabCollectionViewModel) { timedPixel.fire() }
+                fireViewModel.fire.burnAll(tabCollectionViewModel: tabCollectionViewModel, completion: completion)
             }
         } else {
             // Burn selected domains
-            fireViewModel.fire.burnDomains(selectedDomains) { timedPixel.fire() }
+            fireViewModel.fire.burnDomains(selectedDomains, completion: completion)
         }
     }
 

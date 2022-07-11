@@ -87,6 +87,7 @@ final class Fire {
     let autoconsentManagement: AutoconsentManagement?
     let stateRestorationManager: AppStateRestorationManager?
     let recentlyClosedCoordinator: RecentlyClosedCoordinating?
+    let pinnedTabsManager: PinnedTabsManager
     
     let tabsCleaner = TabDataCleaner()
 
@@ -104,7 +105,9 @@ final class Fire {
          faviconManagement: FaviconManagement = FaviconManager.shared,
          autoconsentManagement: AutoconsentManagement? = nil,
          stateRestorationManager: AppStateRestorationManager? = nil,
-         recentlyClosedCoordinator: RecentlyClosedCoordinating? = RecentlyClosedCoordinator.shared) {
+         recentlyClosedCoordinator: RecentlyClosedCoordinating? = RecentlyClosedCoordinator.shared,
+         pinnedTabsManager: PinnedTabsManager = WindowControllersManager.shared.pinnedTabsManager
+    ) {
         self.webCacheManager = cacheManager
         self.historyCoordinating = historyCoordinating
         self.permissionManager = permissionManager
@@ -112,6 +115,7 @@ final class Fire {
         self.windowControllerManager = windowControllerManager
         self.faviconManagement = faviconManagement
         self.recentlyClosedCoordinator = recentlyClosedCoordinator
+        self.pinnedTabsManager = pinnedTabsManager
         
         if #available(macOS 11, *), autoconsentManagement == nil {
             self.autoconsentManagement = AutoconsentUserScript.background
@@ -149,6 +153,8 @@ final class Fire {
         let modelsToRemove = collectionsCleanupInfo.values.flatMap { tabViewModelsCleanupInfo in
             tabViewModelsCleanupInfo.filter({ $0.action == .burn }).compactMap { $0.tabViewModel }
         }
+
+        let pinnedTabsViewModels = pinnedTabViewModels()
         
         tabsCleaner.prepareModelsForCleanup(modelsToRemove) {
 
@@ -159,7 +165,12 @@ final class Fire {
                          relatedToDomains: burningDomains) {
                 group.leave()
             }
-            
+
+            group.enter()
+            self.burnPinnedTabs(pinnedTabsViewModels, relatedToDomains: domains) {
+                group.leave()
+            }
+
             group.enter()
             Task {
                 await self.burnWebCache(domains: burningDomains)
@@ -194,11 +205,18 @@ final class Fire {
         
         burnLastSessionState()
 
+        let pinnedTabsViewModels = pinnedTabViewModels()
+
         tabsCleaner.prepareModelsForCleanup(allTabViewModels()) {
             let group = DispatchGroup()
             group.enter()
             Task {
                 await self.burnWebCache()
+                group.leave()
+            }
+
+            group.enter()
+            self.burnPinnedTabs(pinnedTabsViewModels) {
                 group.leave()
             }
             
@@ -240,7 +258,11 @@ final class Fire {
         }
         return allTabViewModels
     }
-    
+
+    private func pinnedTabViewModels() -> [TabViewModel] {
+        return Array(windowControllerManager.pinnedTabsManager.tabViewModels.values)
+    }
+
     private func tabViewModelsFor(domains: Set<String>) -> TabCollectionsCleanupInfo {
         var collectionsCleanupInfo = TabCollectionsCleanupInfo()
         for window in windowControllerManager.mainWindowControllers {
@@ -248,7 +270,7 @@ final class Fire {
             
             collectionsCleanupInfo[tabCollectionViewModel] = tabCollectionViewModel.prepareCleanupInfoForTabs(relatedToDomains: domains)
         }
-        
+
         return collectionsCleanupInfo
     }
 
@@ -333,7 +355,19 @@ final class Fire {
             completion()
         }
     }
-    
+
+    private func burnPinnedTabs(_ tabViewModels: [TabViewModel],
+                                relatedToDomains domains: Set<String>? = nil,
+                                completion: @escaping () -> Void) {
+        // Close tabs where specified domains are currently loaded
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) { [weak self] in
+            let keyWindow = self?.windowControllerManager.lastKeyMainWindowController
+            keyWindow?.mainViewController.tabCollectionViewModel.clearPinnedTabsData(for: domains)
+
+            completion()
+        }
+    }
+
     private func burnTabsFrom(collectionViewModels: TabCollectionsCleanupInfo,
                               relatedToDomains domains: Set<String>,
                               completion: @escaping () -> Void) {
@@ -377,9 +411,9 @@ fileprivate extension TabCollectionViewModel {
     }
     
     func prepareCleanupInfoForTabs(relatedToDomains domains: Set<String>) -> [TabCleanupInfo] {
-        
+
         var result = [TabCleanupInfo]()
-    
+
         for (tab, tabViewModel) in tabViewModels {
             let action = tab.fireAction(for: domains)
             switch action {
@@ -389,7 +423,7 @@ fileprivate extension TabCollectionViewModel {
                                              action: action))
             }
         }
-        
+
         return result
     }
 
@@ -407,7 +441,7 @@ fileprivate extension TabCollectionViewModel {
             case .replace:
                 
                 let tab = Tab(content: tabCleanupInfo.tabViewModel.tab.content, shouldLoadInBackground: true)
-                replaceTab(at: tabIndex, with: tab, forceChange: true)
+                replaceTab(at: .regular(tabIndex), with: tab, forceChange: true)
             case .burn:
                 toRemove.insert(tabIndex)
             }
@@ -416,6 +450,19 @@ fileprivate extension TabCollectionViewModel {
 
         // Clean local history of closed tabs
         tabCollection.localHistoryOfRemovedTabs.subtract(domains)
+    }
+
+    func clearPinnedTabsData(for domains: Set<String>? = nil) {
+        // Go one by one and replace pinned tabs
+        for (i, tab) in pinnedTabsManager.tabCollection.tabs.enumerated() {
+            let tab = Tab(content: tab.content, shouldLoadInBackground: true)
+            replaceTab(at: .pinned(i), with: tab, forceChange: true)
+        }
+
+        if let domains = domains {
+            // Clean local history of closed tabs
+            pinnedTabsManager.tabCollection.localHistoryOfRemovedTabs.subtract(domains)
+        }
     }
 }
 

@@ -609,16 +609,17 @@ final class TabCollectionViewModel: NSObject {
         delegate?.tabCollectionViewModel(self, didMoveTabAt: index, to: newIndex)
     }
 
-    func replaceTab(at index: Int, with tab: Tab, forceChange: Bool = false) {
+    func replaceTab(at index: TabIndex, with tab: Tab, forceChange: Bool = false) {
         guard changesEnabled || forceChange else { return }
 
-        tabCollection.replaceTab(at: index, with: tab)
+        let tabCollection = tabCollection(for: index)
+        tabCollection.replaceTab(at: index.index, with: tab)
 
         guard let selectionIndex = selectionIndex else {
             os_log("TabCollectionViewModel: No tab selected", type: .error)
             return
         }
-        selectRegularTab(at: selectionIndex.index, forceChange: forceChange)
+        select(at: selectionIndex, forceChange: forceChange)
     }
 
     private func subscribeToPinnedTabsManager() {
