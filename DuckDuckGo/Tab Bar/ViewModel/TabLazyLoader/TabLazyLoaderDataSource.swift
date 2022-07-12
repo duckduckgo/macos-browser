@@ -22,9 +22,11 @@ import Combine
 protocol TabLazyLoaderDataSource: AnyObject {
     associatedtype Tab: LazyLoadable
 
+    var pinnedTabs: [Tab] { get }
+
     var tabs: [Tab] { get }
     var selectedTab: Tab? { get }
-    var selectedTabIndex: Int? { get }
+    var selectedTabIndex: TabIndex? { get }
 
     var selectedTabPublisher: AnyPublisher<Tab, Never> { get }
 
@@ -47,6 +49,10 @@ extension TabLazyLoaderDataSource {
 
 extension TabCollectionViewModel: TabLazyLoaderDataSource {
 
+    var pinnedTabs: [Tab] {
+        pinnedTabsCollection.tabs
+    }
+
     var tabs: [Tab] {
         tabCollection.tabs
     }
@@ -55,8 +61,8 @@ extension TabCollectionViewModel: TabLazyLoaderDataSource {
         selectedTabViewModel?.tab
     }
 
-    var selectedTabIndex: Int? {
-        selectionIndex?.index
+    var selectedTabIndex: TabIndex? {
+        selectionIndex
     }
 
     var selectedTabPublisher: AnyPublisher<Tab, Never> {
