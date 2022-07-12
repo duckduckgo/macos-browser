@@ -120,8 +120,6 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         urlEventHandler.applicationDidFinishLaunching()
 
         UserDefaultsWrapper<Any>.clearRemovedKeys()
-        
-        deliberateCompilationFailure()
     }
 
     func applicationShouldTerminate(_ sender: NSApplication) -> NSApplication.TerminateReply {
