@@ -21,32 +21,35 @@ import SwiftUI
 struct CookieConsentUserPermissionView: View {
     var body: some View {
         
-        VStack(spacing: 32) {
-            HStack(alignment: .top) {
-                
-                VStack {
-                    HStack {
-                    Image("OnboardingDax")
-                        .resizable()
-                        .frame(width: 64, height: 64)
-                        .shadow(color: .black.opacity(0.16), radius: 6, x: 0, y: 3)
-                        
-                        Spacer()
-                    }
+        Group {
+            VStack(spacing: 32) {
+                HStack(alignment: .top) {
+                    daxStackView
+                    
+                    contentView
+                        .frame(width: 406)
                 }
-                //.border(Color.purple, width: 1)
-
-                contentView
-                    .frame(width: 406)
-                  //  .border(Color.purple, width: 1)
-
+                .frame(height: 176)
+                
+                buttonStack
             }
-            .frame(width: 490, height: 176)
-
-            buttonStack
-                .frame(width: 490)
-        }.padding()
-            .background(Color("CookieConsentPanelBackground"))
+            .frame(width: 490)
+        }
+        .padding()
+        .background(Color("CookieConsentPanelBackground"))
+    }
+    
+    private var daxStackView: some View {
+        VStack {
+            HStack {
+                Image("OnboardingDax")
+                    .resizable()
+                    .frame(width: 64, height: 64)
+                    .shadow(color: .black.opacity(0.16), radius: 6, x: 0, y: 3)
+                
+                Spacer()
+            }
+        }
     }
     
     private var contentView: some View {
@@ -117,7 +120,7 @@ private struct PrimaryCTAStyle: ButtonStyle {
 
 private struct SecondaryCTAStyle: ButtonStyle {
     @Environment(\.colorScheme) var colorScheme
-
+    
     func makeBody(configuration: Self.Configuration) -> some View {
         
         let color = configuration.isPressed ? Color("OnboardingActionButtonPressedColor") : Color("CookieConsentSecondaryButton")
