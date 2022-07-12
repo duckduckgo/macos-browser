@@ -475,17 +475,20 @@ final class TabBarViewController: NSViewController {
 
     private func showTabPreview(for tabBarViewItem: TabBarViewItem) {
         guard let indexPath = collectionView.indexPath(for: tabBarViewItem),
-              let tabViewModel = tabCollectionViewModel.tabViewModel(at: indexPath.item)
+              let tabViewModel = tabCollectionViewModel.tabViewModel(at: indexPath.item),
+              let clipView = collectionView.clipView
         else {
+            os_log("TabBarViewController: Showing tab preview window failed", type: .error)
             return
         }
 
-        let position = scrollView.frame.minX + tabBarViewItem.view.frame.minX
+        let position = scrollView.frame.minX + tabBarViewItem.view.frame.minX - clipView.bounds.origin.x
         showTabPreview(for: tabViewModel, from: position, after: .init(from: tabBarViewItem.widthStage))
     }
 
     private func showPinnedTabPreview(at index: Int) {
         guard let tabViewModel = tabCollectionViewModel.pinnedTabsManager.tabViewModel(at: index) else {
+            os_log("TabBarViewController: Showing pinned tab preview window failed", type: .error)
             return
         }
 
@@ -500,14 +503,14 @@ final class TabBarViewController: NSViewController {
     ) {
         tabPreviewWindowController.tabPreviewViewController.display(tabViewModel: tabViewModel)
 
-        guard let window = view.window, let clipView = collectionView.clipView else {
-            os_log("TabBarViewController: Showing of tab preview window failed", type: .error)
+        guard let window = view.window else {
+            os_log("TabBarViewController: Showing tab preview window failed", type: .error)
             return
         }
 
         var point = view.bounds.origin
         point.y -= TabPreviewWindowController.VerticalSpace.padding.rawValue
-        point.x += xPosition - clipView.bounds.origin.x
+        point.x += xPosition
         let converted = window.convertPoint(toScreen: view.convert(point, to: nil))
         tabPreviewWindowController.scheduleShowing(parentWindow: window, timerInterval: interval, topLeftPoint: converted)
     }
