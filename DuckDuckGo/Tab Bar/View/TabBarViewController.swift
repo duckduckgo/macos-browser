@@ -106,32 +106,17 @@ final class TabBarViewController: NSViewController {
             .sink(receiveValue: WindowControllersManager.shared.pinnedTabsManager.tabCollection.reorderTabs)
             .store(in: &cancellables)
 
-        pinnedTabsModel.$selectedItemIndex.dropFirst()
-            .removeDuplicates()
+        pinnedTabsModel.$selectedItemIndex.dropFirst().removeDuplicates()
             .compactMap { $0 }
             .sink { [weak self] index in
-                self?.hideTabPreview()
-                if self?.tabCollectionViewModel.selectionIndex != .pinned(index) {
-                    if self?.tabCollectionViewModel.selectPinnedTab(at: index) == true {
-                        self?.collectionView.clearSelection(animated: true)
-                    }
-                }
+                self?.deselectTabAndSelectPinnedTab(at: index)
             }
             .store(in: &cancellables)
 
-        pinnedTabsModel.$hoveredItemIndex.dropFirst()
-            .removeDuplicates()
+        pinnedTabsModel.$hoveredItemIndex.dropFirst().removeDuplicates()
             .debounce(for: 0.05, scheduler: DispatchQueue.main)
             .sink { [weak self] index in
-                if let index = index {
-                    self?.showPinnedTabPreview(at: index)
-                } else {
-                    DispatchQueue.main.asyncAfter(deadline: .now() + 0.2) {
-                        if self?.view.isMouseLocationInsideBounds() == false {
-                            self?.hideTabPreview()
-                        }
-                    }
-                }
+                self?.pinnedTabsViewDidUpdateHoveredItem(to: index)
             }
             .store(in: &cancellables)
 
@@ -140,6 +125,27 @@ final class TabBarViewController: NSViewController {
                 self?.handlePinnedTabContextMenuAction(action)
             }
             .store(in: &cancellables)
+    }
+
+    private func pinnedTabsViewDidUpdateHoveredItem(to index: Int?) {
+        if let index = index {
+            showPinnedTabPreview(at: index)
+        } else {
+            DispatchQueue.main.asyncAfter(deadline: .now() + 0.2) {
+                if self.view.isMouseLocationInsideBounds() == false {
+                    self.hideTabPreview()
+                }
+            }
+        }
+    }
+
+    private func deselectTabAndSelectPinnedTab(at index: Int) {
+        hideTabPreview()
+        if tabCollectionViewModel.selectionIndex != .pinned(index), tabCollectionViewModel.selectPinnedTab(at: index) {
+            let previousSelection = collectionView.selectionIndexPaths
+            collectionView.clearSelection(animated: true)
+            collectionView.reloadItems(at: previousSelection)
+        }
     }
 
     private func handlePinnedTabContextMenuAction(_ action: PinnedTabsModel.ContextMenuAction) {
