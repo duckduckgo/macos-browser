@@ -35,6 +35,9 @@ final class PinnedTabsModel: ObservableObject {
         didSet {
             if oldValue != items && Set(oldValue) == Set(items) {
                 tabsDidReorderSubject.send(items)
+                if let selectedItem = selectedItem {
+                    selectedItemIndex = items.firstIndex(of: selectedItem)
+                }
             }
         }
     }
