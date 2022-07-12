@@ -135,8 +135,8 @@ final class FirePopoverViewController: NSViewController {
     }
 
     private func updateInfoWrapperView() {
-        infoWrapperView.isHidden = !firePopoverViewModel.shouldShowPinnedTabsInfo
-        infoWrapperViewHeightConstraint.constant = infoWrapperView.isHidden ? 0 : 32
+        infoWrapperView.animator().isHidden = !firePopoverViewModel.shouldShowPinnedTabsInfo
+        infoWrapperViewHeightConstraint.animator().constant = infoWrapperView.isHidden ? 0 : 32
     }
 
     @IBAction func clearButtonAction(_ sender: Any) {

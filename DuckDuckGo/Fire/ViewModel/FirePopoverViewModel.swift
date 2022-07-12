@@ -56,18 +56,18 @@ final class FirePopoverViewModel {
         self.clearingOption = initialClearingOption
 
         self.pinnedDomains = Set(tabCollectionViewModel.pinnedTabsCollection.tabs.compactMap { $0.url?.host })
-        self.shouldShowPinnedTabsInfo = !pinnedDomains.isEmpty
-
         updateItems(for: initialClearingOption)
+        updateShouldShowPinnedTabsInfo()
     }
 
     var clearingOption = ClearingOption.allData {
         didSet {
             updateItems(for: clearingOption)
+            updateShouldShowPinnedTabsInfo()
         }
     }
 
-    let shouldShowPinnedTabsInfo: Bool
+    private(set) var shouldShowPinnedTabsInfo: Bool = false
 
     private let fireViewModel: FireViewModel
     private weak var tabCollectionViewModel: TabCollectionViewModel?
@@ -125,6 +125,17 @@ final class FirePopoverViewModel {
             .sorted { $0.domain < $1.domain }
 
         selectAll()
+    }
+
+    private func updateShouldShowPinnedTabsInfo() {
+        let isPinnedTabSelected = tabCollectionViewModel?.selectionIndex?.isPinnedTab == true
+        let burnCurrentTab = clearingOption == .currentTab
+        let hasPinnedTabs = !pinnedDomains.isEmpty
+        if hasPinnedTabs && isPinnedTabSelected && burnCurrentTab {
+            shouldShowPinnedTabsInfo = false
+        } else {
+            shouldShowPinnedTabsInfo = true
+        }
     }
 
     // MARK: - Selection
