@@ -246,14 +246,13 @@ final class TabBarViewController: NSViewController {
     }
     
     private func selectTabWithPoint(_ point: NSPoint) {
-        let pointLocationOnCollectionView = collectionView.convert(point, from: view)
-        
-        if let indexPath = collectionView.indexPathForItem(at: pointLocationOnCollectionView) {
-            tabCollectionViewModel.select(at: .regular(indexPath.item))
+        let pointLocationOnPinnedTabsView = pinnedTabsHostingView.convert(point, from: view)
+        if let index = pinnedTabsView.itemIndex(for: pointLocationOnPinnedTabsView) {
+            tabCollectionViewModel.select(at: .pinned(index))
         } else {
-            let pointLocationOnPinnedTabsView = pinnedTabsHostingView.convert(point, from: view)
-            if let index = pinnedTabsView.itemIndex(for: pointLocationOnPinnedTabsView) {
-                tabCollectionViewModel.select(at: .pinned(index))
+            let pointLocationOnCollectionView = collectionView.convert(point, from: view)
+            if let indexPath = collectionView.indexPathForItem(at: pointLocationOnCollectionView) {
+                tabCollectionViewModel.select(at: .regular(indexPath.item))
             }
         }
     }
