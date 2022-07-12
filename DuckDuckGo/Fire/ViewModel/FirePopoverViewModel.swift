@@ -131,11 +131,11 @@ final class FirePopoverViewModel {
         let isPinnedTabSelected = tabCollectionViewModel?.selectionIndex?.isPinnedTab == true
         let burnCurrentTab = clearingOption == .currentTab
         let hasPinnedTabs = !pinnedDomains.isEmpty
-        if hasPinnedTabs && isPinnedTabSelected && burnCurrentTab {
+        guard hasPinnedTabs else {
             shouldShowPinnedTabsInfo = false
-        } else {
-            shouldShowPinnedTabsInfo = true
+            return
         }
+        shouldShowPinnedTabsInfo = !(isPinnedTabSelected && burnCurrentTab)
     }
 
     // MARK: - Selection
