@@ -63,33 +63,35 @@ final class PinnedTabsModel: ObservableObject {
     @Published private(set) var selectedItemIndex: Int?
     @Published private(set) var hoveredItemIndex: Int?
 
-    @Published private(set) var itemsWithoutSeparator: [Tab] = []
+    @Published private(set) var itemsWithoutSeparator: Set<Tab> = []
 
     let contextMenuActionPublisher: AnyPublisher<ContextMenuAction, Never>
     let tabsDidReorderPublisher: AnyPublisher<[Tab], Never>
 
     // MARK: -
 
-    init(collection: TabCollection) {
+    init(collection: TabCollection, fireproofDomains: FireproofDomains = .shared) {
         tabsDidReorderPublisher = tabsDidReorderSubject.eraseToAnyPublisher()
         contextMenuActionPublisher = contextMenuActionSubject.eraseToAnyPublisher()
+        self.fireproofDomains = fireproofDomains
         tabsCancellable = collection.$tabs.assign(to: \.items, onWeaklyHeld: self)
     }
 
     private let tabsDidReorderSubject = PassthroughSubject<[Tab], Never>()
     private let contextMenuActionSubject = PassthroughSubject<ContextMenuAction, Never>()
     private var tabsCancellable: AnyCancellable?
+    private var fireproofDomains: FireproofDomains
 
     private func updateItemsWithoutSeparator() {
-        var items = [Tab]()
+        var items = Set<Tab>()
         if let selectedItem = selectedItem {
-            items.append(selectedItem)
+            items.insert(selectedItem)
         }
         if let selectedItemIndex = selectedItemIndex, selectedItemIndex > 0 {
-            items.append(self.items[selectedItemIndex - 1])
+            items.insert(self.items[selectedItemIndex - 1])
         }
         if !shouldDrawLastItemSeparator, let lastItem = self.items.last {
-            items.append(lastItem)
+            items.insert(lastItem)
         }
         itemsWithoutSeparator = items
     }
@@ -113,7 +115,7 @@ extension PinnedTabsModel {
             os_log("PinnedTabsModel: Failed to get url of a tab", type: .error)
             return false
         }
-        return FireproofDomains.shared.isFireproof(fireproofDomain: host)
+        return fireproofDomains.isFireproof(fireproofDomain: host)
     }
 
     func unpin(_ tab: Tab) {
