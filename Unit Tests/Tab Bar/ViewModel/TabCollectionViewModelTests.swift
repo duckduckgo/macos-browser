@@ -276,7 +276,7 @@ final class TabCollectionViewModelTests: XCTestCase {
     func testWhenRemoveIsCalledWithIndexOutOfBoundsThenNoTabIsRemoved() {
         let tabCollectionViewModel = TabCollectionViewModel.aTabCollectionViewModel()
 
-        tabCollectionViewModel.remove(at: 1)
+        tabCollectionViewModel.remove(at: .unpinned(1))
 
         XCTAssertEqual(tabCollectionViewModel.tabCollection.tabs.count, 1)
     }
@@ -287,7 +287,7 @@ final class TabCollectionViewModelTests: XCTestCase {
         tabCollectionViewModel.appendNewTab()
         let selectedTab = tabCollectionViewModel.selectedTabViewModel?.tab
 
-        tabCollectionViewModel.remove(at: 0)
+        tabCollectionViewModel.remove(at: .unpinned(0))
 
         XCTAssertEqual(selectedTab, tabCollectionViewModel.selectedTabViewModel?.tab)
     }
@@ -297,7 +297,7 @@ final class TabCollectionViewModelTests: XCTestCase {
         let firstTab = tabCollectionViewModel.tabCollection.tabs[0]
 
         tabCollectionViewModel.appendNewTab()
-        tabCollectionViewModel.remove(at: 1)
+        tabCollectionViewModel.remove(at: .unpinned(1))
 
         XCTAssertEqual(firstTab, tabCollectionViewModel.selectedTabViewModel?.tab)
     }
@@ -317,7 +317,7 @@ final class TabCollectionViewModelTests: XCTestCase {
     func testWhenLastTabIsRemoved_ThenSelectionIsNil() {
         let tabCollectionViewModel = TabCollectionViewModel.aTabCollectionViewModel()
 
-        tabCollectionViewModel.remove(at: 0)
+        tabCollectionViewModel.remove(at: .unpinned(0))
 
         XCTAssertNil(tabCollectionViewModel.selectionIndex)
         XCTAssertEqual(tabCollectionViewModel.tabCollection.tabs.count, 0)

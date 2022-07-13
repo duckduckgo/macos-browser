@@ -72,6 +72,10 @@ extension TabIndex {
         return viewModel.pinnedTabsCount > 0 ? .pinned(0) : .unpinned(0)
     }
 
+    static func last(in viewModel: TabCollectionViewModel) -> TabIndex {
+        .unpinned(viewModel.tabsCount - 1)
+    }
+
     func next(in viewModel: TabCollectionViewModel) -> TabIndex {
         switch self {
         case .pinned(let index):

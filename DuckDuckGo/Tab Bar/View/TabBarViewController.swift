@@ -141,7 +141,7 @@ final class TabBarViewController: NSViewController {
 
     private func deselectTabAndSelectPinnedTab(at index: Int) {
         hideTabPreview()
-        if tabCollectionViewModel.selectionIndex != .pinned(index), tabCollectionViewModel.selectPinnedTab(at: index) {
+        if tabCollectionViewModel.selectionIndex != .pinned(index), tabCollectionViewModel.select(at: .pinned(index)) {
             let previousSelection = collectionView.selectionIndexPaths
             collectionView.clearSelection(animated: true)
             collectionView.reloadItems(at: previousSelection)
@@ -313,7 +313,7 @@ final class TabBarViewController: NSViewController {
         }
 
         let tab = tabViewModel.tab
-        tabCollectionViewModel.remove(at: indexPath.item, published: false)
+        tabCollectionViewModel.remove(at: .unpinned(indexPath.item), published: false)
         WindowsManager.openNewWindow(with: tab, droppingPoint: droppingPoint)
     }
     
@@ -777,7 +777,7 @@ extension TabBarViewController: NSCollectionViewDelegate {
 
         if highlightState == .forSelection {
             self.collectionView.clearSelection()
-            tabCollectionViewModel.selectRegularTab(at: indexPath.item)
+            tabCollectionViewModel.select(at: .unpinned(indexPath.item))
 
             // Poor old NSCollectionView
             DispatchQueue.main.async {
@@ -953,7 +953,7 @@ extension TabBarViewController: TabBarViewItemDelegate {
             return
         }
 
-        tabCollectionViewModel.remove(at: indexPath.item)
+        tabCollectionViewModel.remove(at: .unpinned(indexPath.item))
     }
 
     func tabBarViewItemTogglePermissionAction(_ tabBarViewItem: TabBarViewItem) {

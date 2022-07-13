@@ -516,7 +516,7 @@ extension BrowserTabViewController: TabDelegate {
         guard let index = tabCollectionViewModel.tabCollection.tabs.firstIndex(of: tab) else {
             return
         }
-        tabCollectionViewModel.remove(at: index)
+        tabCollectionViewModel.remove(at: .unpinned(index))
     }
 
     func tab(_ tab: Tab,

@@ -68,6 +68,15 @@ final class TabIndexTests: XCTestCase {
         XCTAssertEqual(TabIndex.first(in: tabCollectionViewModel), .pinned(0))
     }
 
+    func testLastTab() {
+        let tabCollectionViewModel = TabCollectionViewModel(
+            tabCollection: tabCollection(tabsCount: 10),
+            pinnedTabsManager: pinnedTabsManager(tabsCount: 0)
+        )
+
+        XCTAssertEqual(TabIndex.last(in: tabCollectionViewModel), .unpinned(9))
+    }
+
     func testThatNextInViewModelCyclesThroughPinnedAndUnpinnedTabs() {
         let viewModel = TabCollectionViewModel(
             tabCollection: tabCollection(tabsCount: 2),

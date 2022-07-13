@@ -260,7 +260,7 @@ final class Fire {
     }
 
     private func pinnedTabViewModels() -> [TabViewModel] {
-        return Array(windowControllerManager.pinnedTabsManager.tabViewModels.values)
+        return Array(pinnedTabsManager.tabViewModels.values)
     }
 
     private func tabViewModelsFor(domains: Set<String>) -> TabCollectionsCleanupInfo {
