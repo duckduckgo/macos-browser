@@ -105,7 +105,7 @@ private struct PrimaryCTAStyle: ButtonStyle {
     
     func makeBody(configuration: Self.Configuration) -> some View {
 
-        let color = configuration.isPressed ? Color("OnboardingActionButtonPressedColor") : Color("CookieConsentPrimaryButton")
+        let color = configuration.isPressed ? Color("CookieConsentPrimaryButtonPressed") : Color("CookieConsentPrimaryButton")
 
         configuration.label
             .padding(.vertical, 10)
@@ -114,7 +114,6 @@ private struct PrimaryCTAStyle: ButtonStyle {
             .background(RoundedRectangle(cornerRadius: 8, style: .continuous).fill(color))
             .foregroundColor(.white)
             .font(.system(size: 13, weight: .light, design: .default))
-
     }
 }
 
@@ -123,7 +122,7 @@ private struct SecondaryCTAStyle: ButtonStyle {
     
     func makeBody(configuration: Self.Configuration) -> some View {
         
-        let color = configuration.isPressed ? Color("OnboardingActionButtonPressedColor") : Color("CookieConsentSecondaryButton")
+        let color = configuration.isPressed ? Color("CookieConsentSecondaryButtonPressed") : Color("CookieConsentSecondaryButton")
         
         let outterShadowOpacity = colorScheme == .dark ? 0.8 : 0.0
         let cornerRadius: CGFloat = 8
