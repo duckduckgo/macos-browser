@@ -22,6 +22,7 @@ import BrowserServicesKit
 
 protocol AutoconsentUserScriptDelegate: AnyObject {
     func autoconsentUserScript(consentStatus: CookieConsentInfo)
+    func autoconsentUserScriptPromptUserForConsent(_ result: (Bool) -> Void)
 }
 
 protocol UserScriptWithAutoconsent: UserScript {
@@ -155,25 +156,31 @@ final class AutoconsentUserScript: NSObject, UserScriptWithAutoconsent {
             callback(false)
             return
         }
+       
         Self.promptLastShown = now
-        let alert = NSAlert.cookiePopup()
-        alert.beginSheetModal(for: window, completionHandler: { response in
-            switch response {
-            case .alertFirstButtonReturn:
-                // User wants to turn on the feature
-                preferences.autoconsentEnabled = true
-                callback(true)
-            case .alertSecondButtonReturn:
-                // "Not now"
-                callback(false)
-            case .alertThirdButtonReturn:
-                // "Don't ask again"
-                preferences.autoconsentEnabled = false
-                callback(false)
-            case _:
-                callback(false)
-            }
-        })
+        self.delegate?.autoconsentUserScriptPromptUserForConsent { result in
+            preferences.autoconsentEnabled = result
+        }
+  
+        #warning("Remove this")
+//        let alert = NSAlert.cookiePopup()
+//        alert.beginSheetModal(for: window, completionHandler: { response in
+//            switch response {
+//            case .alertFirstButtonReturn:
+//                // User wants to turn on the feature
+//                preferences.autoconsentEnabled = true
+//                callback(true)
+//            case .alertSecondButtonReturn:
+//                // "Not now"
+//                callback(false)
+//            case .alertThirdButtonReturn:
+//                // "Don't ask again"
+//                preferences.autoconsentEnabled = false
+//                callback(false)
+//            case _:
+//                callback(false)
+//            }
+//        })
     }
 
     @MainActor

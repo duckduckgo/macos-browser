@@ -37,6 +37,7 @@ struct CookieConsentUserPermissionView: View {
         }
         .padding()
         .background(Color("CookieConsentPanelBackground"))
+        .cornerRadius(8)
     }
     
     private var daxStackView: some View {
