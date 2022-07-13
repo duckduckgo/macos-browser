@@ -441,7 +441,7 @@ fileprivate extension TabCollectionViewModel {
             case .replace:
                 
                 let tab = Tab(content: tabCleanupInfo.tabViewModel.tab.content, shouldLoadInBackground: true)
-                replaceTab(at: .regular(tabIndex), with: tab, forceChange: true)
+                replaceTab(at: .unpinned(tabIndex), with: tab, forceChange: true)
             case .burn:
                 toRemove.insert(tabIndex)
             }

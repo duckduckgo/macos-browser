@@ -19,11 +19,11 @@
 import Foundation
 
 enum TabIndex: Equatable, Comparable {
-    case pinned(Int), regular(Int)
+    case pinned(Int), unpinned(Int)
 
     var index: Int {
         switch self {
-        case .pinned(let index), .regular(let index):
+        case .pinned(let index), .unpinned(let index):
             return index
         }
     }
@@ -35,7 +35,7 @@ enum TabIndex: Equatable, Comparable {
         return false
     }
 
-    var isRegularTab: Bool {
+    var isUnpinnedTab: Bool {
         !isPinnedTab
     }
 
@@ -48,16 +48,16 @@ enum TabIndex: Equatable, Comparable {
         switch self {
         case let .pinned(index):
             return .pinned(index + 1)
-        case let .regular(index):
-            return .regular(index + 1)
+        case let .unpinned(index):
+            return .unpinned(index + 1)
         }
     }
 
     static func < (_ lhs: TabIndex, _ rhs: TabIndex) -> Bool {
         switch (lhs, rhs) {
-        case (.pinned, .regular):
+        case (.pinned, .unpinned):
             return true
-        case (.regular, .pinned):
+        case (.unpinned, .pinned):
             return false
         default:
             return lhs.index < rhs.index
@@ -69,21 +69,21 @@ enum TabIndex: Equatable, Comparable {
 
 extension TabIndex {
     static func first(in viewModel: TabCollectionViewModel) -> TabIndex {
-        return viewModel.pinnedTabsCount > 0 ? .pinned(0) : .regular(0)
+        return viewModel.pinnedTabsCount > 0 ? .pinned(0) : .unpinned(0)
     }
 
     func next(in viewModel: TabCollectionViewModel) -> TabIndex {
         switch self {
         case .pinned(let index):
             if index >= viewModel.pinnedTabsCount - 1 {
-                return .regular(0)
+                return .unpinned(0)
             }
             return .pinned(index + 1)
-        case .regular(let index):
+        case .unpinned(let index):
             if index >= viewModel.tabCollection.tabs.count - 1 {
                 return .first(in: viewModel)
             }
-            return .regular(index + 1)
+            return .unpinned(index + 1)
         }
     }
 
@@ -91,14 +91,14 @@ extension TabIndex {
         switch self {
         case .pinned(let index):
             if index == 0 {
-                return .regular(viewModel.tabsCount - 1)
+                return .unpinned(viewModel.tabsCount - 1)
             }
             return .pinned(index - 1)
-        case .regular(let index):
+        case .unpinned(let index):
             if index == 0 {
-                return viewModel.pinnedTabsCount > 0 ? .pinned(viewModel.pinnedTabsCount - 1) : .regular(viewModel.tabsCount - 1)
+                return viewModel.pinnedTabsCount > 0 ? .pinned(viewModel.pinnedTabsCount - 1) : .unpinned(viewModel.tabsCount - 1)
             }
-            return .regular(index - 1)
+            return .unpinned(index - 1)
         }
     }
 
@@ -106,11 +106,11 @@ extension TabIndex {
         switch self {
         case .pinned(let index):
             if index >= viewModel.pinnedTabsCount {
-                return .regular(min(index - viewModel.pinnedTabsCount, viewModel.tabsCount - 1))
+                return .unpinned(min(index - viewModel.pinnedTabsCount, viewModel.tabsCount - 1))
             }
             return .pinned(max(0, index))
-        case .regular(let index):
-            return .regular(max(0, min(index, viewModel.tabsCount - 1)))
+        case .unpinned(let index):
+            return .unpinned(max(0, min(index, viewModel.tabsCount - 1)))
         }
     }
 }

@@ -22,31 +22,31 @@ import XCTest
 final class TabIndexTests: XCTestCase {
 
     func testComparison() {
-        XCTAssertLessThan(TabIndex.pinned(0), TabIndex.regular(0))
+        XCTAssertLessThan(TabIndex.pinned(0), TabIndex.unpinned(0))
         XCTAssertLessThan(TabIndex.pinned(0), TabIndex.pinned(1))
-        XCTAssertLessThan(TabIndex.pinned(100), TabIndex.regular(0))
-        XCTAssertLessThan(TabIndex.pinned(100), TabIndex.regular(200))
-        XCTAssertLessThan(TabIndex.regular(100), TabIndex.regular(200))
+        XCTAssertLessThan(TabIndex.pinned(100), TabIndex.unpinned(0))
+        XCTAssertLessThan(TabIndex.pinned(100), TabIndex.unpinned(200))
+        XCTAssertLessThan(TabIndex.unpinned(100), TabIndex.unpinned(200))
     }
 
     func testIndex() {
         XCTAssertEqual(TabIndex.pinned(4).index, 4)
-        XCTAssertEqual(TabIndex.regular(2).index, 2)
+        XCTAssertEqual(TabIndex.unpinned(2).index, 2)
     }
 
     func testIsPinned() {
         XCTAssertTrue(TabIndex.pinned(5).isPinnedTab)
-        XCTAssertFalse(TabIndex.regular(5).isPinnedTab)
+        XCTAssertFalse(TabIndex.unpinned(5).isPinnedTab)
     }
 
     func testIsUnpinned() {
-        XCTAssertTrue(TabIndex.regular(5).isRegularTab)
-        XCTAssertFalse(TabIndex.pinned(5).isRegularTab)
+        XCTAssertTrue(TabIndex.unpinned(5).isUnpinnedTab)
+        XCTAssertFalse(TabIndex.pinned(5).isUnpinnedTab)
     }
 
     func testMakeNext() {
-        XCTAssertEqual(TabIndex.regular(0).makeNext(), TabIndex.regular(1))
-        XCTAssertEqual(TabIndex.regular(41).makeNext(), TabIndex.regular(42))
+        XCTAssertEqual(TabIndex.unpinned(0).makeNext(), TabIndex.unpinned(1))
+        XCTAssertEqual(TabIndex.unpinned(41).makeNext(), TabIndex.unpinned(42))
         XCTAssertEqual(TabIndex.pinned(16).makeNext(), TabIndex.pinned(17))
     }
 
@@ -56,7 +56,7 @@ final class TabIndexTests: XCTestCase {
             pinnedTabsManager: pinnedTabsManager(tabsCount: 0)
         )
 
-        XCTAssertEqual(TabIndex.first(in: tabCollectionViewModel), .regular(0))
+        XCTAssertEqual(TabIndex.first(in: tabCollectionViewModel), .unpinned(0))
     }
 
     func testWhenViewModelHasPinnedTabsThenFirstTabIsPinned() {
@@ -76,9 +76,9 @@ final class TabIndexTests: XCTestCase {
 
         XCTAssertEqual(TabIndex.pinned(0).next(in: viewModel), .pinned(1))
         XCTAssertEqual(TabIndex.pinned(1).next(in: viewModel), .pinned(2))
-        XCTAssertEqual(TabIndex.pinned(2).next(in: viewModel), .regular(0))
-        XCTAssertEqual(TabIndex.regular(0).next(in: viewModel), .regular(1))
-        XCTAssertEqual(TabIndex.regular(1).next(in: viewModel), .pinned(0))
+        XCTAssertEqual(TabIndex.pinned(2).next(in: viewModel), .unpinned(0))
+        XCTAssertEqual(TabIndex.unpinned(0).next(in: viewModel), .unpinned(1))
+        XCTAssertEqual(TabIndex.unpinned(1).next(in: viewModel), .pinned(0))
     }
 
     func testWhenViewModelHasNoPinnedTabsThenNextInViewModelCyclesThroughUnpinnedTabs() {
@@ -87,8 +87,8 @@ final class TabIndexTests: XCTestCase {
             pinnedTabsManager: pinnedTabsManager(tabsCount: 0)
         )
 
-        XCTAssertEqual(TabIndex.regular(0).next(in: viewModel), .regular(1))
-        XCTAssertEqual(TabIndex.regular(1).next(in: viewModel), .regular(0))
+        XCTAssertEqual(TabIndex.unpinned(0).next(in: viewModel), .unpinned(1))
+        XCTAssertEqual(TabIndex.unpinned(1).next(in: viewModel), .unpinned(0))
     }
 
     func testThatPreviousInViewModelCyclesThroughPinnedAndUnpinnedTabs() {
@@ -97,11 +97,11 @@ final class TabIndexTests: XCTestCase {
             pinnedTabsManager: pinnedTabsManager(tabsCount: 3)
         )
 
-        XCTAssertEqual(TabIndex.regular(1).previous(in: viewModel), .regular(0))
-        XCTAssertEqual(TabIndex.regular(0).previous(in: viewModel), .pinned(2))
+        XCTAssertEqual(TabIndex.unpinned(1).previous(in: viewModel), .unpinned(0))
+        XCTAssertEqual(TabIndex.unpinned(0).previous(in: viewModel), .pinned(2))
         XCTAssertEqual(TabIndex.pinned(2).previous(in: viewModel), .pinned(1))
         XCTAssertEqual(TabIndex.pinned(1).previous(in: viewModel), .pinned(0))
-        XCTAssertEqual(TabIndex.pinned(0).previous(in: viewModel), .regular(1))
+        XCTAssertEqual(TabIndex.pinned(0).previous(in: viewModel), .unpinned(1))
     }
 
     func testWhenViewModelHasNoPinnedTabsThenPreviousInViewModelCyclesThroughUnpinnedTabs() {
@@ -110,9 +110,9 @@ final class TabIndexTests: XCTestCase {
             pinnedTabsManager: pinnedTabsManager(tabsCount: 0)
         )
 
-        XCTAssertEqual(TabIndex.regular(2).previous(in: viewModel), .regular(1))
-        XCTAssertEqual(TabIndex.regular(1).previous(in: viewModel), .regular(0))
-        XCTAssertEqual(TabIndex.regular(0).previous(in: viewModel), .regular(2))
+        XCTAssertEqual(TabIndex.unpinned(2).previous(in: viewModel), .unpinned(1))
+        XCTAssertEqual(TabIndex.unpinned(1).previous(in: viewModel), .unpinned(0))
+        XCTAssertEqual(TabIndex.unpinned(0).previous(in: viewModel), .unpinned(2))
     }
 
     func testThatSanitizedInViewModelReturnsIndexRepresentingExistingTab() {
@@ -121,13 +121,13 @@ final class TabIndexTests: XCTestCase {
             pinnedTabsManager: pinnedTabsManager(tabsCount: 5)
         )
 
-        XCTAssertEqual(TabIndex.regular(7).sanitized(for: viewModel), .regular(7))
-        XCTAssertEqual(TabIndex.regular(-1).sanitized(for: viewModel), .regular(0))
-        XCTAssertEqual(TabIndex.regular(400).sanitized(for: viewModel), .regular(9))
+        XCTAssertEqual(TabIndex.unpinned(7).sanitized(for: viewModel), .unpinned(7))
+        XCTAssertEqual(TabIndex.unpinned(-1).sanitized(for: viewModel), .unpinned(0))
+        XCTAssertEqual(TabIndex.unpinned(400).sanitized(for: viewModel), .unpinned(9))
         XCTAssertEqual(TabIndex.pinned(3).sanitized(for: viewModel), .pinned(3))
         XCTAssertEqual(TabIndex.pinned(-3).sanitized(for: viewModel), .pinned(0))
-        XCTAssertEqual(TabIndex.pinned(8).sanitized(for: viewModel), .regular(3))
-        XCTAssertEqual(TabIndex.pinned(800).sanitized(for: viewModel), .regular(9))
+        XCTAssertEqual(TabIndex.pinned(8).sanitized(for: viewModel), .unpinned(3))
+        XCTAssertEqual(TabIndex.pinned(800).sanitized(for: viewModel), .unpinned(9))
     }
 
     // MARK: -

@@ -212,7 +212,7 @@ extension MainViewController {
         // instead of closing a pinned tab we select the first regular tab
         // (this is in line with Safari behavior)
         if isHandlingKeyDownEvent, tabCollectionViewModel.selectionIndex?.isPinnedTab == true {
-            tabCollectionViewModel.select(at: .regular(0))
+            tabCollectionViewModel.select(at: .unpinned(0))
         } else {
             tabCollectionViewModel.removeSelected()
         }
@@ -424,7 +424,7 @@ extension MainViewController {
         switch selectedTabIndex {
         case .pinned(let index):
             tabCollectionViewModel.unpinTab(at: index)
-        case .regular(let index):
+        case .unpinned(let index):
             tabCollectionViewModel.pinTab(at: index)
         }
     }
@@ -630,7 +630,7 @@ extension MainViewController: NSMenuItemValidation {
             guard tabCollectionViewModel.selectedTabViewModel?.tab.isUrl == true else {
                 return false
             }
-            if tabCollectionViewModel.selectionIndex?.isRegularTab == true {
+            if tabCollectionViewModel.selectionIndex?.isUnpinnedTab == true {
                 menuItem.title = UserText.pinTab
                 return true
             }
@@ -651,7 +651,7 @@ extension MainViewController: NSMenuItemValidation {
 
         // Move Tab to New Window, Select Next/Prev Tab
         case #selector(MainViewController.moveTabToNewWindow(_:)):
-            return tabCollectionViewModel.tabCollection.tabs.count > 1 && tabCollectionViewModel.selectionIndex?.isRegularTab == true
+            return tabCollectionViewModel.tabCollection.tabs.count > 1 && tabCollectionViewModel.selectionIndex?.isUnpinnedTab == true
 
         case #selector(MainViewController.showNextTab(_:)),
              #selector(MainViewController.showPreviousTab(_:)):

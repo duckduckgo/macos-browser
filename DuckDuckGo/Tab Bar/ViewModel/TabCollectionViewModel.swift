@@ -88,7 +88,7 @@ final class TabCollectionViewModel: NSObject {
 
         subscribeToTabs()
         subscribeToPinnedTabsManager()
-        self.selectionIndex = .regular(selectionIndex)
+        self.selectionIndex = .unpinned(selectionIndex)
 
         if tabCollection.tabs.isEmpty {
             appendNewTab(with: .homePage)
@@ -139,7 +139,7 @@ final class TabCollectionViewModel: NSObject {
             return false
         }
 
-        selectionIndex = .regular(index)
+        selectionIndex = .unpinned(index)
         selectParentOnRemoval = selectedTabViewModel === previouslySelectedTabViewModel && selectParentOnRemoval
         return true
     }
@@ -159,7 +159,7 @@ final class TabCollectionViewModel: NSObject {
 
     @discardableResult func select(at index: TabIndex, forceChange: Bool = false) -> Bool {
         switch index {
-        case .regular(let i):
+        case .unpinned(let i):
             return selectRegularTab(at: i, forceChange: forceChange)
         case .pinned(let i):
             return selectPinnedTab(at: i, forceChange: forceChange)
@@ -198,13 +198,13 @@ final class TabCollectionViewModel: NSObject {
         if let selectionIndex = selectionIndex {
             let newSelectionIndex = selectionIndex.next(in: self)
             select(at: newSelectionIndex)
-            if newSelectionIndex.isRegularTab {
+            if newSelectionIndex.isUnpinnedTab {
                 delegate?.tabCollectionViewModel(self, didSelectAt: newSelectionIndex.index)
             }
         } else {
             let newSelectionIndex = TabIndex.first(in: self)
             select(at: newSelectionIndex)
-            if newSelectionIndex.isRegularTab {
+            if newSelectionIndex.isUnpinnedTab {
                 delegate?.tabCollectionViewModel(self, didSelectAt: newSelectionIndex.index)
             }
         }
@@ -220,11 +220,11 @@ final class TabCollectionViewModel: NSObject {
         if let selectionIndex = selectionIndex {
             let newSelectionIndex = selectionIndex.previous(in: self)
             select(at: newSelectionIndex)
-            if newSelectionIndex.isRegularTab {
+            if newSelectionIndex.isUnpinnedTab {
                 delegate?.tabCollectionViewModel(self, didSelectAt: newSelectionIndex.index)
             }
         } else {
-            let newSelectionIndex = TabIndex.regular(tabCollection.tabs.count - 1)
+            let newSelectionIndex = TabIndex.unpinned(tabCollection.tabs.count - 1)
             select(at: newSelectionIndex)
             delegate?.tabCollectionViewModel(self, didSelectAt: newSelectionIndex.index)
         }
@@ -268,7 +268,7 @@ final class TabCollectionViewModel: NSObject {
         delegate?.tabCollectionViewModelDidMultipleChanges(self)
     }
 
-    func insert(tab: Tab, at index: TabIndex = .regular(0), selected: Bool = true) {
+    func insert(tab: Tab, at index: TabIndex = .unpinned(0), selected: Bool = true) {
         guard changesEnabled else { return }
 
         let tabCollection = tabCollection(for: index)
@@ -276,7 +276,7 @@ final class TabCollectionViewModel: NSObject {
         if selected {
             select(at: index)
         }
-        if index.isRegularTab {
+        if index.isUnpinnedTab {
             delegate?.tabCollectionViewModelDidInsert(self, at: index.index, selected: selected)
         }
 
@@ -296,14 +296,14 @@ final class TabCollectionViewModel: NSObject {
         // Insert at the end of the child tabs
         var newIndex = parentTabIndex.isPinnedTab ? 0 : parentTabIndex.index + 1
         while tabCollection.tabs[safe: newIndex]?.parentTab === parentTab { newIndex += 1 }
-        insert(tab: tab, at: .regular(newIndex), selected: selected)
+        insert(tab: tab, at: .unpinned(newIndex), selected: selected)
     }
 
     // MARK: - Removal
 
     func remove(at index: TabIndex, published: Bool = true) {
         switch index {
-        case .regular(let i):
+        case .unpinned(let i):
             return remove(at: i, published: published)
         case .pinned(let i):
             return removePinnedTab(at: i, published: published)
@@ -316,7 +316,7 @@ final class TabCollectionViewModel: NSObject {
         let parentTab = tabCollection.tabs[safe: index]?.parentTab
         guard tabCollection.remove(at: index, published: published) else { return }
 
-        didRemoveTab(at: .regular(index), withParent: parentTab)
+        didRemoveTab(at: .unpinned(index), withParent: parentTab)
     }
 
     func removePinnedTab(at index: Int, published: Bool = true) {
@@ -332,7 +332,7 @@ final class TabCollectionViewModel: NSObject {
 
     private func tabCollection(for selection: TabIndex) -> TabCollection {
         switch selection {
-        case .regular:
+        case .unpinned:
             return tabCollection
         case .pinned:
             return pinnedTabsCollection
@@ -344,7 +344,7 @@ final class TabCollectionViewModel: NSObject {
             return .pinned(index)
         }
         if let index = tabCollection.tabs.firstIndex(of: tab) {
-            return .regular(index)
+            return .unpinned(index)
         }
         return nil
     }
@@ -353,15 +353,15 @@ final class TabCollectionViewModel: NSObject {
         switch tabIndex {
         case .pinned(let index):
             return pinnedTabsCollection.tabs[safe: index]
-        case .regular(let index):
+        case .unpinned(let index):
             return tabCollection.tabs[safe: index]
         }
     }
 
     private func didRemoveTab(at index: TabIndex, withParent parentTab: Tab?) {
         defer {
-            if index.isRegularTab {
-                let newSelectionIndex = self.selectionIndex?.isRegularTab == true ? self.selectionIndex?.index : nil
+            if index.isUnpinnedTab {
+                let newSelectionIndex = self.selectionIndex?.isUnpinnedTab == true ? self.selectionIndex?.index : nil
                 delegate?.tabCollectionViewModel(self, didRemoveTabAt: index.index, andSelectTabAt: newSelectionIndex)
             }
         }
@@ -389,7 +389,7 @@ final class TabCollectionViewModel: NSObject {
                   let rightTab = tab(at: index),
                   rightTab.parentTab !== parentTab && (leftTab.parentTab === parentTab || leftTab === parentTab) {
             // Select parent tab on left or another child tab on left instead of the tab on right
-            newSelectionIndex = .regular(max(0, selectionIndex.index - 1))
+            newSelectionIndex = .unpinned(max(0, selectionIndex.index - 1))
         } else if selectionIndex > index {
             newSelectionIndex = selectionIndex.previous(in: self)
         } else {
@@ -406,7 +406,7 @@ final class TabCollectionViewModel: NSObject {
 
         guard tabCollection.moveTab(at: fromIndex, to: otherViewModel.tabCollection, at: toIndex) else { return }
 
-        didRemoveTab(at: .regular(fromIndex), withParent: parentTab)
+        didRemoveTab(at: .unpinned(fromIndex), withParent: parentTab)
 
         otherViewModel.selectRegularTab(at: toIndex)
         otherViewModel.delegate?.tabCollectionViewModelDidInsert(otherViewModel, at: toIndex, selected: true)
@@ -431,8 +431,8 @@ final class TabCollectionViewModel: NSObject {
 
         tabCollection.removeTabs(after: index)
 
-        if let currentSelection = selectionIndex, currentSelection.isRegularTab, !tabCollection.tabs.indices.contains(currentSelection.index) {
-            selectionIndex = .regular(tabCollection.tabs.count - 1)
+        if let currentSelection = selectionIndex, currentSelection.isUnpinnedTab, !tabCollection.tabs.indices.contains(currentSelection.index) {
+            selectionIndex = .unpinned(tabCollection.tabs.count - 1)
         }
 
         delegate?.tabCollectionViewModelDidMultipleChanges(self)
@@ -511,7 +511,7 @@ final class TabCollectionViewModel: NSObject {
         tabCollection(for: tabIndex).insert(tab: tabCopy, at: newIndex.index)
         select(at: newIndex)
 
-        if newIndex.isRegularTab {
+        if newIndex.isUnpinnedTab {
             delegate?.tabCollectionViewModelDidInsert(self, at: newIndex.index, selected: true)
         }
     }

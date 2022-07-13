@@ -54,7 +54,7 @@ final class TabCollectionViewModelTests: XCTestCase {
     func testWhenSelectionIndexIsOutOfBoundsThenSelectedTabViewModelIsNil() {
         let tabCollectionViewModel = TabCollectionViewModel.aTabCollectionViewModel()
 
-        tabCollectionViewModel.select(at: .regular(1))
+        tabCollectionViewModel.select(at: .unpinned(1))
 
         XCTAssertNil(tabCollectionViewModel.selectedTabViewModel)
     }
@@ -64,7 +64,7 @@ final class TabCollectionViewModelTests: XCTestCase {
 
         tabCollectionViewModel.appendNewTab()
         tabCollectionViewModel.appendNewTab()
-        tabCollectionViewModel.select(at: .regular(0))
+        tabCollectionViewModel.select(at: .unpinned(0))
 
         XCTAssert(tabCollectionViewModel.selectedTabViewModel === tabCollectionViewModel.tabViewModel(at: 0))
     }
@@ -74,7 +74,7 @@ final class TabCollectionViewModelTests: XCTestCase {
 
         tabCollectionViewModel.appendNewTab()
         tabCollectionViewModel.appendNewTab()
-        tabCollectionViewModel.select(at: .regular(0))
+        tabCollectionViewModel.select(at: .unpinned(0))
         tabCollectionViewModel.selectNext()
 
         XCTAssert(tabCollectionViewModel.selectedTabViewModel === tabCollectionViewModel.tabViewModel(at: 1))
@@ -103,7 +103,7 @@ final class TabCollectionViewModelTests: XCTestCase {
         let tabCollectionViewModel = TabCollectionViewModel.aTabCollectionViewModel()
 
         tabCollectionViewModel.appendNewTab()
-        tabCollectionViewModel.select(at: .regular(0))
+        tabCollectionViewModel.select(at: .unpinned(0))
         tabCollectionViewModel.selectPrevious()
 
         XCTAssert(tabCollectionViewModel.selectedTabViewModel === tabCollectionViewModel.tabViewModel(at: 1))
@@ -113,7 +113,7 @@ final class TabCollectionViewModelTests: XCTestCase {
         let tabCollectionViewModel = TabCollectionViewModel.aTabCollectionViewModel()
         tabCollectionViewModel.tabCollection.append(tab: .init(content: .anyPreferencePane))
         tabCollectionViewModel.tabCollection.append(tab: .init(content: .homePage))
-        tabCollectionViewModel.select(at: .regular(0))
+        tabCollectionViewModel.select(at: .unpinned(0))
 
         XCTAssertTrue(tabCollectionViewModel.selectDisplayableTabIfPresent(.anyPreferencePane))
         XCTAssert(tabCollectionViewModel.selectedTabViewModel === tabCollectionViewModel.tabViewModel(at: 1))
@@ -143,7 +143,7 @@ final class TabCollectionViewModelTests: XCTestCase {
         let tabCollectionViewModel = TabCollectionViewModel.aTabCollectionViewModel()
         tabCollectionViewModel.tabCollection.append(tab: .init(content: .bookmarks))
         tabCollectionViewModel.tabCollection.append(tab: .init(content: .homePage))
-        tabCollectionViewModel.select(at: .regular(0))
+        tabCollectionViewModel.select(at: .unpinned(0))
 
         XCTAssertTrue(tabCollectionViewModel.selectDisplayableTabIfPresent(.bookmarks))
         XCTAssert(tabCollectionViewModel.selectedTabViewModel === tabCollectionViewModel.tabViewModel(at: 1))
@@ -153,7 +153,7 @@ final class TabCollectionViewModelTests: XCTestCase {
         let tabCollectionViewModel = TabCollectionViewModel.aTabCollectionViewModel()
         tabCollectionViewModel.tabCollection.append(tab: .init(content: .homePage))
         tabCollectionViewModel.tabCollection.append(tab: .init(content: .homePage))
-        tabCollectionViewModel.select(at: .regular(2))
+        tabCollectionViewModel.select(at: .unpinned(2))
 
         XCTAssertFalse(tabCollectionViewModel.selectDisplayableTabIfPresent(.bookmarks))
         XCTAssert(tabCollectionViewModel.selectedTabViewModel === tabCollectionViewModel.tabViewModel(at: 2))
@@ -163,7 +163,7 @@ final class TabCollectionViewModelTests: XCTestCase {
         let tabCollectionViewModel = TabCollectionViewModel.aTabCollectionViewModel()
         tabCollectionViewModel.tabCollection.append(tab: .init(content: .bookmarks))
         tabCollectionViewModel.tabCollection.append(tab: .init(content: .homePage))
-        tabCollectionViewModel.select(at: .regular(2))
+        tabCollectionViewModel.select(at: .unpinned(2))
 
         XCTAssertFalse(tabCollectionViewModel.selectDisplayableTabIfPresent(.anyPreferencePane))
         XCTAssert(tabCollectionViewModel.selectedTabViewModel === tabCollectionViewModel.tabViewModel(at: 2))
@@ -246,7 +246,7 @@ final class TabCollectionViewModelTests: XCTestCase {
         tabCollectionViewModel.appendNewTab()
 
         let parentTab = Tab()
-        tabCollectionViewModel.insert(tab: parentTab, at: .regular(1), selected: true)
+        tabCollectionViewModel.insert(tab: parentTab, at: .unpinned(1), selected: true)
 
         tabCollectionViewModel.insertChild(tab: Tab(parentTab: parentTab), selected: false)
         tabCollectionViewModel.insertChild(tab: Tab(parentTab: parentTab), selected: false)
@@ -263,7 +263,7 @@ final class TabCollectionViewModelTests: XCTestCase {
         tabCollectionViewModel.appendNewTab()
 
         let parentTab = Tab()
-        tabCollectionViewModel.insert(tab: parentTab, at: .regular(1), selected: true)
+        tabCollectionViewModel.insert(tab: parentTab, at: .unpinned(1), selected: true)
 
         let tab = Tab(parentTab: parentTab)
         tabCollectionViewModel.insertChild(tab: tab, selected: false)
@@ -329,9 +329,9 @@ final class TabCollectionViewModelTests: XCTestCase {
         tabCollectionViewModel.appendNewTab()
 
         // Clear selection
-        tabCollectionViewModel.select(at: .regular(-1))
+        tabCollectionViewModel.select(at: .unpinned(-1))
 
-        tabCollectionViewModel.remove(at: .regular(1))
+        tabCollectionViewModel.remove(at: .unpinned(1))
 
         XCTAssertNil(tabCollectionViewModel.selectionIndex)
     }
@@ -344,7 +344,7 @@ final class TabCollectionViewModelTests: XCTestCase {
         let childTab2 = Tab(parentTab: parentTab)
         tabCollectionViewModel.append(tab: childTab2, selected: true)
 
-        tabCollectionViewModel.remove(at: .regular(2))
+        tabCollectionViewModel.remove(at: .unpinned(2))
 
         XCTAssertEqual(tabCollectionViewModel.selectedTabViewModel?.tab, parentTab)
     }
@@ -406,7 +406,7 @@ final class TabCollectionViewModelTests: XCTestCase {
         let tabCollectionViewModel = TabCollectionViewModel.aTabCollectionViewModel()
         let firstTabViewModel = tabCollectionViewModel.tabViewModel(at: 0)
 
-        tabCollectionViewModel.duplicateTab(at: .regular(0))
+        tabCollectionViewModel.duplicateTab(at: .unpinned(0))
 
         XCTAssert(firstTabViewModel === tabCollectionViewModel.tabViewModel(at: 0))
     }
@@ -416,7 +416,7 @@ final class TabCollectionViewModelTests: XCTestCase {
         let firstTabViewModel = tabCollectionViewModel.tabViewModel(at: 0)
         firstTabViewModel?.tab.url = URL.duckDuckGo
 
-        tabCollectionViewModel.duplicateTab(at: .regular(0))
+        tabCollectionViewModel.duplicateTab(at: .unpinned(0))
 
         XCTAssertEqual(firstTabViewModel?.tab.url, tabCollectionViewModel.tabViewModel(at: 1)?.tab.url)
     }

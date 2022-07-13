@@ -94,7 +94,7 @@ final class TabBarViewController: NSViewController {
 
         Publishers.CombineLatest(tabCollectionViewModel.$selectionIndex, $tabMode)
             .map { selectedTabIndex, tabMode -> Bool in
-                if case .regular(0) = selectedTabIndex, tabMode == .divided {
+                if case .unpinned(0) = selectedTabIndex, tabMode == .divided {
                     return false
                 }
                 return true
@@ -221,7 +221,7 @@ final class TabBarViewController: NSViewController {
     }
 
     private func reloadSelection() {
-        guard tabCollectionViewModel.selectionIndex?.isRegularTab == true,
+        guard tabCollectionViewModel.selectionIndex?.isUnpinnedTab == true,
               collectionView.selectionIndexPaths.first?.item != tabCollectionViewModel.selectionIndex?.index
         else {
             collectionView.updateItemsLeftToSelectedItems()
@@ -252,7 +252,7 @@ final class TabBarViewController: NSViewController {
         } else {
             let pointLocationOnCollectionView = collectionView.convert(point, from: view)
             if let indexPath = collectionView.indexPathForItem(at: pointLocationOnCollectionView) {
-                tabCollectionViewModel.select(at: .regular(indexPath.item))
+                tabCollectionViewModel.select(at: .unpinned(indexPath.item))
             }
         }
     }
@@ -665,7 +665,7 @@ extension TabBarViewController: TabCollectionViewModelDelegate {
     // MARK: - Tab Actions
 
     private func duplicateTab(at tabIndex: TabIndex) {
-        if tabIndex.isRegularTab {
+        if tabIndex.isUnpinnedTab {
             collectionView.clearSelection()
         }
         tabCollectionViewModel.duplicateTab(at: tabIndex)
@@ -703,7 +703,7 @@ extension TabBarViewController: NSCollectionViewDelegateFlowLayout {
     func collectionView(_ collectionView: NSCollectionView,
                         layout collectionViewLayout: NSCollectionViewLayout,
                         sizeForItemAt indexPath: IndexPath) -> NSSize {
-        var isItemSelected = tabCollectionViewModel.selectionIndex == .regular(indexPath.item)
+        var isItemSelected = tabCollectionViewModel.selectionIndex == .unpinned(indexPath.item)
 
         if let draggingOverIndexPath = currentDraggingIndexPath {
             // Drag&drop in progress - the empty space is equal to the selected tab width
@@ -914,7 +914,7 @@ extension TabBarViewController: TabBarViewItemDelegate {
             return
         }
 
-        duplicateTab(at: .regular(indexPath.item))
+        duplicateTab(at: .unpinned(indexPath.item))
     }
 
     func tabBarViewItemCanBePinned(_ tabBarViewItem: TabBarViewItem) -> Bool {

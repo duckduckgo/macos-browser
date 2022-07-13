@@ -80,7 +80,7 @@ final class RecentlyClosedCoordinator: RecentlyClosedCoordinating {
         let tabCollection = mainWindowController.mainViewController.tabCollectionViewModel.tabCollection
         tabCollection.didRemoveTabPublisher
             .sink { [weak self] (tab, index) in
-                self?.cacheTabContent(tab, of: tabCollection, at: .regular(index))
+                self?.cacheTabContent(tab, of: tabCollection, at: .unpinned(index))
             }
             .store(in: &cancellables)
     }
@@ -108,7 +108,7 @@ final class RecentlyClosedCoordinator: RecentlyClosedCoordinating {
         }
 
         let tabCacheItems = tabCollection.tabs.enumerated().map {
-            RecentlyClosedTab(tab: $0.element, originalTabCollection: tabCollection, tabIndex: .regular($0.offset))
+            RecentlyClosedTab(tab: $0.element, originalTabCollection: tabCollection, tabIndex: .unpinned($0.offset))
         }
         let droppingPoint = mainWindowController.window?.frame.origin
         let contentSize = mainWindowController.window?.frame.size
@@ -137,7 +137,7 @@ final class RecentlyClosedCoordinator: RecentlyClosedCoordinating {
             cache.removeAll(where: { $0 === recentlyClosedTab })
         }
 
-        guard recentlyClosedTab.index.isRegularTab else {
+        guard recentlyClosedTab.index.isUnpinnedTab else {
             reopenPinnedTab(recentlyClosedTab)
             return
         }
@@ -164,7 +164,7 @@ final class RecentlyClosedCoordinator: RecentlyClosedCoordinating {
         }
 
         let tab = Tab(content: recentlyClosedTab.tabContent)
-        tabCollectionViewModel.insert(tab: tab, at: .regular(tabIndex), selected: true)
+        tabCollectionViewModel.insert(tab: tab, at: .unpinned(tabIndex), selected: true)
     }
 
     private func reopenPinnedTab(_ recentlyClosedTab: RecentlyClosedTab) {
