@@ -41,7 +41,7 @@ final class WindowControllersManager: WindowControllersManagerProtocol {
      */
     @Published private(set) var isInInitialState: Bool = true
     @Published private(set) var mainWindowControllers = [MainWindowController]()
-    var pinnedTabsManager: PinnedTabsManager = LocalPinnedTabsManager()
+    private(set) var pinnedTabsManager = PinnedTabsManager()
 
     weak var lastKeyMainWindowController: MainWindowController? {
         didSet {

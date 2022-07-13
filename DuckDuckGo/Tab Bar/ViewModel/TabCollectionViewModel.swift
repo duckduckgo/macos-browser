@@ -16,8 +16,6 @@
 //  limitations under the License.
 //
 
-// swiftlint:disable file_length
-
 import Foundation
 import os.log
 import Combine

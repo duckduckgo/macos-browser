@@ -20,53 +20,12 @@ import Foundation
 import Combine
 import os
 
-protocol PinnedTabsManager {
-    var didUnpinTabPublisher: AnyPublisher<Int, Never> { get }
-
-    var tabCollection: TabCollection { get }
-    var tabViewModels: [Tab: TabViewModel] { get }
-
-    var pinnedDomains: Set<String> { get }
-    func isDomainPinned(_ domain: String) -> Bool
-
-    func isTabPinned(_ tab: Tab) -> Bool
-
-    func pin(_ tab: Tab)
-    func pin(_ tab: Tab, at index: Int?)
-    func unpin(_ tab: Tab, published: Bool) -> Bool
-    func unpinTab(at index: Int, published: Bool) -> Tab?
-    func tabViewModel(at index: Int) -> TabViewModel?
-
-    func setUp(with collection: TabCollection)
-}
-
-extension PinnedTabsManager {
-    func isDomainPinned(_ domain: String) -> Bool {
-        pinnedDomains.contains(domain)
-    }
-
-    var pinnedDomains: Set<String> {
-        Set(tabCollection.tabs.compactMap { $0.url?.host?.dropWWW() })
-    }
-}
-
-final class LocalPinnedTabsManager: PinnedTabsManager, ObservableObject {
+final class PinnedTabsManager: ObservableObject {
 
     private(set) var tabCollection: TabCollection
     private(set) var tabViewModels = [Tab: TabViewModel]()
 
     let didUnpinTabPublisher: AnyPublisher<Int, Never>
-
-    func setUp(with collection: TabCollection) {
-        tabCollection.removeAll()
-        for tab in collection.tabs {
-            tabCollection.append(tab: tab)
-        }
-    }
-
-    func isTabPinned(_ tab: Tab) -> Bool {
-        tabCollection.tabs.contains(tab)
-    }
 
     func pin(_ tab: Tab) {
         pin(tab, at: nil)
@@ -80,39 +39,46 @@ final class LocalPinnedTabsManager: PinnedTabsManager, ObservableObject {
         }
     }
 
-    func unpin(_ tab: Tab, published: Bool = false) -> Bool {
-        guard let index = tabCollection.tabs.firstIndex(of: tab) else {
-            os_log("PinnedTabsManager: unable to unpin a tab")
-            return false
-        }
-        guard tabCollection.remove(at: index, published: published) else {
-            os_log("PinnedTabsManager: unable to unpin a tab")
-            return false
-        }
-        didUnpinTabSubject.send(index)
-        return true
-    }
-
     func unpinTab(at index: Int, published: Bool = false) -> Tab? {
         guard let tab = tabCollection.tabs[safe: index] else {
             os_log("PinnedTabsManager: unable to unpin a tab")
             return nil
         }
-        guard unpin(tab, published: published) else {
+        guard tabCollection.remove(at: index, published: published) else {
             os_log("PinnedTabsManager: unable to unpin a tab")
             return nil
         }
+        didUnpinTabSubject.send(index)
         return tab
+    }
+
+    func isTabPinned(_ tab: Tab) -> Bool {
+        tabCollection.tabs.contains(tab)
+    }
+
+    func setUp(with collection: TabCollection) {
+        tabCollection.removeAll()
+        for tab in collection.tabs {
+            tabCollection.append(tab: tab)
+        }
     }
 
     func tabViewModel(at index: Int) -> TabViewModel? {
         guard index >= 0, tabCollection.tabs.count > index else {
-            os_log("LocalPinnedTabsManager: Index out of bounds", type: .error)
+            os_log("PinnedTabsManager: Index out of bounds", type: .error)
             return nil
         }
 
         let tab = tabCollection.tabs[index]
         return tabViewModels[tab]
+    }
+
+    func isDomainPinned(_ domain: String) -> Bool {
+        pinnedDomains.contains(domain)
+    }
+
+    var pinnedDomains: Set<String> {
+        Set(tabCollection.tabs.compactMap { $0.url?.host?.dropWWW() })
     }
 
     init(tabCollection: TabCollection = .init()) {

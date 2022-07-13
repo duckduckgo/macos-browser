@@ -108,7 +108,7 @@ extension TabIndex {
             if index >= viewModel.pinnedTabsCount {
                 return .regular(min(index - viewModel.pinnedTabsCount, viewModel.tabsCount - 1))
             }
-            return self
+            return .pinned(max(0, index))
         case .regular(let index):
             return .regular(max(0, min(index, viewModel.tabsCount - 1)))
         }
