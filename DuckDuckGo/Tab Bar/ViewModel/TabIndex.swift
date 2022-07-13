@@ -53,6 +53,15 @@ enum TabIndex: Equatable, Comparable {
         }
     }
 
+    func isInSameSection(as other: TabIndex) -> Bool {
+        switch (self, other) {
+        case (.pinned, .unpinned), (.unpinned, .pinned):
+            return false
+        default:
+            return true
+        }
+    }
+
     static func < (_ lhs: TabIndex, _ rhs: TabIndex) -> Bool {
         switch (lhs, rhs) {
         case (.pinned, .unpinned):

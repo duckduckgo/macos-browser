@@ -348,7 +348,7 @@ final class TabCollectionViewModel: NSObject {
                   rightTab.parentTab !== parentTab && (leftTab.parentTab === parentTab || leftTab === parentTab) {
             // Select parent tab on left or another child tab on left instead of the tab on right
             newSelectionIndex = .unpinned(max(0, selectionIndex.index - 1))
-        } else if selectionIndex > index {
+        } else if selectionIndex > index, selectionIndex.isInSameSection(as: index) {
             newSelectionIndex = selectionIndex.previous(in: self)
         } else {
             newSelectionIndex = selectionIndex.sanitized(for: self)

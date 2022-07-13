@@ -22,15 +22,6 @@ import os
 
 final class PinnedTabsModel: ObservableObject {
 
-    enum ContextMenuAction {
-        case unpin(Int)
-        case duplicate(Int)
-        case bookmark(Tab)
-        case fireproof(Tab)
-        case removeFireproofing(Tab)
-        case close(Int)
-    }
-
     @Published var items: [Tab] = [] {
         didSet {
             if oldValue != items && Set(oldValue) == Set(items) {
@@ -77,6 +68,46 @@ final class PinnedTabsModel: ObservableObject {
     let contextMenuActionPublisher: AnyPublisher<ContextMenuAction, Never>
     let tabsDidReorderPublisher: AnyPublisher<[Tab], Never>
 
+    // MARK: -
+
+    init(collection: TabCollection) {
+        tabsDidReorderPublisher = tabsDidReorderSubject.eraseToAnyPublisher()
+        contextMenuActionPublisher = contextMenuActionSubject.eraseToAnyPublisher()
+        tabsCancellable = collection.$tabs.assign(to: \.items, onWeaklyHeld: self)
+    }
+
+    private let tabsDidReorderSubject = PassthroughSubject<[Tab], Never>()
+    private let contextMenuActionSubject = PassthroughSubject<ContextMenuAction, Never>()
+    private var tabsCancellable: AnyCancellable?
+
+    private func updateItemsWithoutSeparator() {
+        var items = [Tab]()
+        if let selectedItem = selectedItem {
+            items.append(selectedItem)
+        }
+        if let selectedItemIndex = selectedItemIndex, selectedItemIndex > 0 {
+            items.append(self.items[selectedItemIndex - 1])
+        }
+        if !shouldDrawLastItemSeparator, let lastItem = self.items.last {
+            items.append(lastItem)
+        }
+        itemsWithoutSeparator = items
+    }
+}
+
+// MARK: - Context Menu
+
+extension PinnedTabsModel {
+
+    enum ContextMenuAction {
+        case unpin(Int)
+        case duplicate(Int)
+        case bookmark(Tab)
+        case fireproof(Tab)
+        case removeFireproofing(Tab)
+        case close(Int)
+    }
+
     func isFireproof(_ tab: Tab) -> Bool {
         guard let host = tab.url?.host else {
             os_log("PinnedTabsModel: Failed to get url of a tab", type: .error)
@@ -119,33 +150,5 @@ final class PinnedTabsModel: ObservableObject {
 
     func removeFireproofing(_ tab: Tab) {
         contextMenuActionSubject.send(.removeFireproofing(tab))
-    }
-
-    // MARK: -
-
-    init(collection: TabCollection) {
-        tabsDidReorderPublisher = tabsDidReorderSubject.eraseToAnyPublisher()
-        contextMenuActionPublisher = contextMenuActionSubject.eraseToAnyPublisher()
-        collection.$tabs
-            .assign(to: \.items, onWeaklyHeld: self)
-            .store(in: &cancellables)
-    }
-
-    private let tabsDidReorderSubject = PassthroughSubject<[Tab], Never>()
-    private let contextMenuActionSubject = PassthroughSubject<ContextMenuAction, Never>()
-    private var cancellables = Set<AnyCancellable>()
-
-    private func updateItemsWithoutSeparator() {
-        var items = [Tab]()
-        if let selectedItem = selectedItem {
-            items.append(selectedItem)
-        }
-        if let selectedItemIndex = selectedItemIndex, selectedItemIndex > 0 {
-            items.append(self.items[selectedItemIndex - 1])
-        }
-        if !shouldDrawLastItemSeparator, let lastItem = self.items.last {
-            items.append(lastItem)
-        }
-        itemsWithoutSeparator = items
     }
 }

@@ -73,6 +73,7 @@
 		37D2377A287EB8CA00BCE03B /* TabIndex.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37D23779287EB8CA00BCE03B /* TabIndex.swift */; };
 		37D2377C287EBDA300BCE03B /* TabIndexTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37D2377B287EBDA300BCE03B /* TabIndexTests.swift */; };
 		37D23780287EFEE200BCE03B /* PinnedTabsManagerTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37D2377F287EFEE200BCE03B /* PinnedTabsManagerTests.swift */; };
+		37D23785287F4E6500BCE03B /* PinnedTabsHostingView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37D23783287F4D6A00BCE03B /* PinnedTabsHostingView.swift */; };
 		37D2771527E870D4003365FD /* PreferencesAppearanceView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37D2771427E870D4003365FD /* PreferencesAppearanceView.swift */; };
 		4B0135CE2729F1AA00D54834 /* NSPasteboardExtension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B0135CD2729F1AA00D54834 /* NSPasteboardExtension.swift */; };
 		4B02198925E05FAC00ED7DEA /* FireproofingURLExtensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B02197F25E05FAC00ED7DEA /* FireproofingURLExtensions.swift */; };
@@ -852,6 +853,7 @@
 		37D23779287EB8CA00BCE03B /* TabIndex.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TabIndex.swift; sourceTree = "<group>"; };
 		37D2377B287EBDA300BCE03B /* TabIndexTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TabIndexTests.swift; sourceTree = "<group>"; };
 		37D2377F287EFEE200BCE03B /* PinnedTabsManagerTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PinnedTabsManagerTests.swift; sourceTree = "<group>"; };
+		37D23783287F4D6A00BCE03B /* PinnedTabsHostingView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PinnedTabsHostingView.swift; sourceTree = "<group>"; };
 		37D2771427E870D4003365FD /* PreferencesAppearanceView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PreferencesAppearanceView.swift; sourceTree = "<group>"; };
 		4B0135CD2729F1AA00D54834 /* NSPasteboardExtension.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = NSPasteboardExtension.swift; sourceTree = "<group>"; };
 		4B02197F25E05FAC00ED7DEA /* FireproofingURLExtensions.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = FireproofingURLExtensions.swift; sourceTree = "<group>"; };
@@ -1674,6 +1676,7 @@
 		37BF3F1C286F0A6100BD9014 /* View */ = {
 			isa = PBXGroup;
 			children = (
+				37D23783287F4D6A00BCE03B /* PinnedTabsHostingView.swift */,
 				37BF3F1F286F0A7A00BD9014 /* PinnedTabsView.swift */,
 				37054FC82873301700033B6F /* PinnedTabView.swift */,
 			);
@@ -4395,6 +4398,7 @@
 				85C6A29625CC1FFD00EEB5F1 /* UserDefaultsWrapper.swift in Sources */,
 				85625998269C9C5F00EE44BC /* PasswordManagementPopover.swift in Sources */,
 				85589E9127BFB9810038AD11 /* HomePageRecentlyVisitedModel.swift in Sources */,
+				37D23785287F4E6500BCE03B /* PinnedTabsHostingView.swift in Sources */,
 				4BB99CFE26FE191E001E4761 /* FirefoxBookmarksReader.swift in Sources */,
 				4BBC16A227C485BC00E00A38 /* DeviceIdleStateDetector.swift in Sources */,
 				B6A9E4A3261475C70067D1B9 /* AppUsageActivityMonitor.swift in Sources */,

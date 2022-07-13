@@ -17,12 +17,6 @@
 //
 
 import SwiftUI
-import Combine
-
-struct TabDragState {
-    var draggedTab: Tab
-    var offset: CGFloat
-}
 
 struct PinnedTabsView: View {
     @ObservedObject var model: PinnedTabsModel

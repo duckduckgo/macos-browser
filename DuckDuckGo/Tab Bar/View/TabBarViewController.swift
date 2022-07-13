@@ -51,7 +51,7 @@ final class TabBarViewController: NSViewController {
     private let bookmarkManager: BookmarkManager = LocalBookmarkManager.shared
     private lazy var pinnedTabsModel: PinnedTabsModel = .init(collection: WindowControllersManager.shared.pinnedTabsManager.tabCollection)
     private lazy var pinnedTabsView: PinnedTabsView = .init(model: pinnedTabsModel)
-    private lazy var pinnedTabsHostingView = NSHostingView(rootView: pinnedTabsView)
+    private lazy var pinnedTabsHostingView = PinnedTabsHostingView(rootView: pinnedTabsView)
 
     private var tabsCancellable: AnyCancellable?
     private var selectionIndexCancellable: AnyCancellable?
@@ -123,6 +123,13 @@ final class TabBarViewController: NSViewController {
         pinnedTabsModel.contextMenuActionPublisher
             .sink { [weak self] action in
                 self?.handlePinnedTabContextMenuAction(action)
+            }
+            .store(in: &cancellables)
+
+        pinnedTabsHostingView.middleClickPublisher
+            .compactMap { [weak self] in self?.pinnedTabsView.itemIndex(for: $0) }
+            .sink { [weak self] index in
+                self?.tabCollectionViewModel.remove(at: .pinned(index))
             }
             .store(in: &cancellables)
     }
