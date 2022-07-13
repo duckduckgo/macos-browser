@@ -35,48 +35,6 @@ protocol TabCollectionViewModelDelegate: AnyObject {
 
 }
 
-enum TabIndex: Equatable, Comparable {
-    case pinned(Int), regular(Int)
-
-    var index: Int {
-        switch self {
-        case .pinned(let index), .regular(let index):
-            return index
-        }
-    }
-
-    var isPinnedTab: Bool {
-        if case .pinned = self {
-            return true
-        }
-        return false
-    }
-
-    var isRegularTab: Bool {
-        !isPinnedTab
-    }
-
-    var next: Self {
-        switch self {
-        case let .pinned(index):
-            return .pinned(index + 1)
-        case let .regular(index):
-            return .regular(index + 1)
-        }
-    }
-
-    static func < (_ lhs: TabIndex, _ rhs: TabIndex) -> Bool {
-        switch (lhs, rhs) {
-        case (.pinned, .regular):
-            return true
-        case (.regular, .pinned):
-            return false
-        default:
-            return lhs.index < rhs.index
-        }
-    }
-}
-
 // swiftlint:disable type_body_length
 final class TabCollectionViewModel: NSObject {
 
@@ -240,13 +198,13 @@ final class TabCollectionViewModel: NSObject {
         }
 
         if let selectionIndex = selectionIndex {
-            let newSelectionIndex = nextIndex(from: selectionIndex)
+            let newSelectionIndex = selectionIndex.next(in: self)
             select(at: newSelectionIndex)
             if newSelectionIndex.isRegularTab {
                 delegate?.tabCollectionViewModel(self, didSelectAt: newSelectionIndex.index)
             }
         } else {
-            let newSelectionIndex = firstIndex()
+            let newSelectionIndex = TabIndex.first(in: self)
             select(at: newSelectionIndex)
             if newSelectionIndex.isRegularTab {
                 delegate?.tabCollectionViewModel(self, didSelectAt: newSelectionIndex.index)
@@ -262,7 +220,7 @@ final class TabCollectionViewModel: NSObject {
         }
 
         if let selectionIndex = selectionIndex {
-            let newSelectionIndex = previousIndex(from: selectionIndex)
+            let newSelectionIndex = selectionIndex.previous(in: self)
             select(at: newSelectionIndex)
             if newSelectionIndex.isRegularTab {
                 delegate?.tabCollectionViewModel(self, didSelectAt: newSelectionIndex.index)
@@ -429,15 +387,15 @@ final class TabCollectionViewModel: NSObject {
             newSelectionIndex = parentTabIndex
         } else if selectionIndex == index,
                   let parentTab = parentTab,
-                  let leftTab = tab(at: previousIndex(from: index)),
+                  let leftTab = tab(at: index.previous(in: self)),
                   let rightTab = tab(at: index),
                   rightTab.parentTab !== parentTab && (leftTab.parentTab === parentTab || leftTab === parentTab) {
             // Select parent tab on left or another child tab on left instead of the tab on right
             newSelectionIndex = .regular(max(0, selectionIndex.index - 1))
         } else if selectionIndex > index {
-            newSelectionIndex = previousIndex(from: selectionIndex)
+            newSelectionIndex = selectionIndex.previous(in: self)
         } else {
-            newSelectionIndex = sanitizeIndex(selectionIndex)
+            newSelectionIndex = selectionIndex.sanitized(for: self)
         }
 
         select(at: newSelectionIndex)
@@ -550,7 +508,7 @@ final class TabCollectionViewModel: NSObject {
         }
 
         let tabCopy = Tab(content: tab.content, sessionStateData: tab.sessionStateData)
-        let newIndex = tabIndex.next
+        let newIndex = tabIndex.makeNext()
 
         tabCollection(for: tabIndex).insert(tab: tabCopy, at: newIndex.index)
         select(at: newIndex)
@@ -675,53 +633,6 @@ final class TabCollectionViewModel: NSObject {
 
         selectedTabViewModel?.tab.lastSelectedAt = Date()
         self.selectedTabViewModel = selectedTabViewModel
-    }
-
-    private func firstIndex() -> TabIndex {
-        return pinnedTabsCollection.tabs.count > 0 ? .pinned(0) : .regular(0)
-    }
-
-    private func nextIndex(from current: TabIndex) -> TabIndex {
-        switch current {
-        case .pinned(let index):
-            if index >= pinnedTabsCollection.tabs.count - 1 {
-                return .regular(0)
-            }
-            return .pinned(index + 1)
-        case .regular(let index):
-            if index >= tabCollection.tabs.count - 1 {
-                return firstIndex()
-            }
-            return .regular(index + 1)
-        }
-    }
-
-    private func sanitizeIndex(_ idx: TabIndex) -> TabIndex {
-        switch idx {
-        case .pinned(let index):
-            if index >= pinnedTabsCollection.tabs.count {
-                return .regular(min(index - pinnedTabsCollection.tabs.count, tabCollection.tabs.count - 1))
-            }
-            return idx
-        case .regular(let index):
-            return .regular(max(0, min(index, tabCollection.tabs.count - 1)))
-        }
-    }
-
-    private func previousIndex(from current: TabIndex) -> TabIndex {
-        switch current {
-        case .pinned(let index):
-            if index == 0 {
-                return .regular(tabCollection.tabs.count - 1)
-            }
-            return .pinned(index - 1)
-        case .regular(let index):
-            if index == 0 {
-                let pinnedTabsCount = pinnedTabsCollection.tabs.count
-                return pinnedTabsCount > 0 ? .pinned(pinnedTabsCount - 1) : .regular(tabCollection.tabs.count - 1)
-            }
-            return .regular(index - 1)
-        }
     }
 }
 // swiftlint:enable type_body_length
