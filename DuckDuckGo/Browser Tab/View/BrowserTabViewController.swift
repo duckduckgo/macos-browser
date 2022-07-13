@@ -38,7 +38,7 @@ final class BrowserTabViewController: NSViewController {
     @IBOutlet weak var hoverLabelContainer: NSView!
     private weak var webView: WebView?
     private weak var webViewContainer: NSView?
-    private weak var webViewSnapshot: WebViewSnapshotView?
+    private weak var webViewSnapshot: NSView?
 
     var tabViewModel: TabViewModel?
     var clickPoint: NSPoint?
@@ -363,7 +363,6 @@ final class BrowserTabViewController: NSViewController {
                 tabViewModel?.tab.webView.tabContentView.superview == nil ||
                 isPinnedTabAndKeyWindow {
 
-                print("WILL SHOW WEB VIEW", tabCollectionViewModel.tabs.map(\.content.url?.host))
                 removeAllTabContent(includingWebView: true)
                 changeWebView(tabViewModel: tabViewModel)
             }
@@ -560,73 +559,15 @@ extension BrowserTabViewController: TabDelegate {
     }
 
     func windowDidBecomeKey() {
-        print(#function, tabCollectionViewModel.tabs.map(\.content.url?.host))
         keyWindowSelectedTabCancellable = nil
         subscribeToPinnedTabs()
-
-        if webViewSnapshot != nil {
-            DispatchQueue.main.async {
-                self.showTabContent(of: self.tabCollectionViewModel.selectedTabViewModel)
-                self.webViewSnapshot?.removeFromSuperview()
-            }
-        }
+        hideWebViewSnapshotIfNeeded()
     }
 
     func windowDidResignKey() {
-        print(#function, tabCollectionViewModel.tabs.map(\.content.url?.host))
         pinnedTabsDelegatesCancellable = nil
         scheduleHoverLabelUpdatesForUrl(nil)
-        subscribeToSelectedPinnedTabInKeyWindow()
-    }
-
-    private func subscribeToSelectedPinnedTabInKeyWindow() {
-        let lastKeyWindowOtherThanCurrent = WindowControllersManager.shared.didChangeKeyWindowController
-            .map { WindowControllersManager.shared.lastKeyMainWindowController }
-            .prepend(WindowControllersManager.shared.lastKeyMainWindowController)
-            .compactMap { $0 }
-            .filter { [weak self] in $0.window !== self?.view.window }
-
-        keyWindowSelectedTabCancellable = lastKeyWindowOtherThanCurrent
-            .flatMap(\.mainViewController.tabCollectionViewModel.$selectionIndex)
-            .compactMap { $0 }
-            .removeDuplicates()
-            .print()
-            .sink { [weak self] index in
-                if index.isPinnedTab, index == self?.tabCollectionViewModel.selectionIndex, self?.webViewSnapshot == nil {
-                    print("same tab selected")
-                    self?.setWebViewSnapshot()
-                } else if self?.webViewSnapshot != nil {
-                    print("SELECTION CHANGED", self?.tabCollectionViewModel.tabs.map(\.content.url?.host))
-                    self?.showTabContent(of: self?.tabCollectionViewModel.selectedTabViewModel)
-                }
-            }
-    }
-
-    private func setWebViewSnapshot() {
-        guard let webView = webView else {
-            os_log("BrowserTabViewController: failed to create a snapshot of webView")
-            return
-        }
-
-        print("Snapshotting \(view.bounds.size)")
-
-        let config = WKSnapshotConfiguration()
-        config.afterScreenUpdates = false
-
-        webView.takeSnapshot(with: config) { [weak self] image, _ in
-            guard let self = self else { return }
-            guard let image = image else {
-                os_log("BrowserTabViewController: failed to create a snapshot of webView")
-                return
-            }
-            let snapshotView = WebViewSnapshotView(image: image, frame: self.view.bounds)
-            snapshotView.autoresizingMask = [.width, .height]
-            snapshotView.translatesAutoresizingMaskIntoConstraints = true
-
-            self.view.addSubview(snapshotView)
-            self.webViewSnapshot?.removeFromSuperview()
-            self.webViewSnapshot = snapshotView
-        }
+        subscribeToTabSelectedInCurrentKeyWindow()
     }
 
     private func scheduleHoverLabelUpdatesForUrl(_ url: URL?) {
@@ -658,7 +599,6 @@ extension BrowserTabViewController: TabDelegate {
             DispatchQueue.main.asyncAfter(deadline: .now() + delay, execute: item)
         }
     }
-
 }
 
 extension BrowserTabViewController: FileDownloadManagerDelegate {
@@ -1148,7 +1088,72 @@ extension BrowserTabViewController {
         tabViewModel?.tab.browserTabViewController(self, didClickAtPoint: clickPoint)
         return event
     }
+}
 
+// MARK: - Web View snapshot for Pinned Tab selected in more than 1 window
+
+extension BrowserTabViewController {
+
+    private func subscribeToTabSelectedInCurrentKeyWindow() {
+        let lastKeyWindowOtherThanOurs = WindowControllersManager.shared.didChangeKeyWindowController
+            .map { WindowControllersManager.shared.lastKeyMainWindowController }
+            .prepend(WindowControllersManager.shared.lastKeyMainWindowController)
+            .compactMap { $0 }
+            .filter { [weak self] in $0.window !== self?.view.window }
+
+        keyWindowSelectedTabCancellable = lastKeyWindowOtherThanOurs
+            .flatMap(\.mainViewController.tabCollectionViewModel.$selectionIndex)
+            .compactMap { $0 }
+            .removeDuplicates()
+            .sink { [weak self] index in
+                self?.handleTabSelectedInKeyWindow(index)
+            }
+    }
+
+    private func handleTabSelectedInKeyWindow(_ tabIndex: TabIndex) {
+        if tabIndex.isPinnedTab, tabIndex == tabCollectionViewModel.selectionIndex, webViewSnapshot == nil {
+            makeWebViewSnapshot()
+        } else {
+            hideWebViewSnapshotIfNeeded()
+        }
+    }
+
+    private func makeWebViewSnapshot() {
+        guard let webView = webView else {
+            os_log("BrowserTabViewController: failed to create a snapshot of webView", type: .error)
+            return
+        }
+
+        let config = WKSnapshotConfiguration()
+        config.afterScreenUpdates = false
+
+        webView.takeSnapshot(with: config) { [weak self] image, _ in
+            guard let image = image else {
+                os_log("BrowserTabViewController: failed to create a snapshot of webView", type: .error)
+                return
+            }
+            self?.showWebViewSnapshot(with: image)
+        }
+    }
+
+    private func showWebViewSnapshot(with image: NSImage) {
+        let snapshotView = WebViewSnapshotView(image: image, frame: view.bounds)
+        snapshotView.autoresizingMask = [.width, .height]
+        snapshotView.translatesAutoresizingMaskIntoConstraints = true
+
+        view.addSubview(snapshotView)
+        webViewSnapshot?.removeFromSuperview()
+        webViewSnapshot = snapshotView
+    }
+
+    private func hideWebViewSnapshotIfNeeded() {
+        if webViewSnapshot != nil {
+            DispatchQueue.main.async {
+                self.showTabContent(of: self.tabCollectionViewModel.selectedTabViewModel)
+                self.webViewSnapshot?.removeFromSuperview()
+            }
+        }
+    }
 }
 
 // swiftlint:enable file_length
