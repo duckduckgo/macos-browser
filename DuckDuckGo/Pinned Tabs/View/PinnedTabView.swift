@@ -69,8 +69,8 @@ struct PinnedTabView: View {
 
     @ViewBuilder
     private var contextMenu: some View {
-        Button(UserText.unpinTab, action: { collectionModel.unpin(model) })
         Button(UserText.duplicateTab, action: { collectionModel.duplicate(model) })
+        Button(UserText.unpinTab, action: { collectionModel.unpin(model) })
         Divider()
         Button(UserText.bookmarkThisPage, action: { collectionModel.bookmark(model) })
         fireproofAction
