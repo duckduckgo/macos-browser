@@ -20,18 +20,14 @@ import Foundation
 import Combine
 import os
 
-final class PinnedTabsManager: ObservableObject {
+final class PinnedTabsManager {
 
     private(set) var tabCollection: TabCollection
     private(set) var tabViewModels = [Tab: TabViewModel]()
 
     let didUnpinTabPublisher: AnyPublisher<Int, Never>
 
-    func pin(_ tab: Tab) {
-        pin(tab, at: nil)
-    }
-
-    func pin(_ tab: Tab, at index: Int?) {
+    func pin(_ tab: Tab, at index: Int? = nil) {
         if let index = index {
             tabCollection.insert(tab: tab, at: index)
         } else {
@@ -56,13 +52,6 @@ final class PinnedTabsManager: ObservableObject {
         tabCollection.tabs.contains(tab)
     }
 
-    func setUp(with collection: TabCollection) {
-        tabCollection.removeAll()
-        for tab in collection.tabs {
-            tabCollection.append(tab: tab)
-        }
-    }
-
     func tabViewModel(at index: Int) -> TabViewModel? {
         guard index >= 0, tabCollection.tabs.count > index else {
             os_log("PinnedTabsManager: Index out of bounds", type: .error)
@@ -81,6 +70,13 @@ final class PinnedTabsManager: ObservableObject {
         Set(tabCollection.tabs.compactMap { $0.url?.host?.dropWWW() })
     }
 
+    func setUp(with collection: TabCollection) {
+        tabCollection.removeAll()
+        for tab in collection.tabs {
+            tabCollection.append(tab: tab)
+        }
+    }
+
     init(tabCollection: TabCollection = .init()) {
         didUnpinTabPublisher = didUnpinTabSubject.eraseToAnyPublisher()
         self.tabCollection = tabCollection
@@ -90,10 +86,10 @@ final class PinnedTabsManager: ObservableObject {
     // MARK: - Private
 
     private let didUnpinTabSubject = PassthroughSubject<Int, Never>()
-    private var cancellables: Set<AnyCancellable> = []
+    private var tabsCancellable: AnyCancellable?
 
     private func subscribeToPinnedTabs() {
-        tabCollection.$tabs.sink { [weak self] newTabs in
+        tabsCancellable = tabCollection.$tabs.sink { [weak self] newTabs in
             guard let self = self else { return }
 
             let new = Set(newTabs)
@@ -101,7 +97,7 @@ final class PinnedTabsManager: ObservableObject {
 
             self.removeTabViewModels(old.subtracting(new))
             self.addTabViewModels(new.subtracting(old))
-        } .store(in: &cancellables)
+        }
     }
 
     private func removeTabViewModels(_ removed: Set<Tab>) {
@@ -115,5 +111,4 @@ final class PinnedTabsManager: ObservableObject {
             tabViewModels[tab] = TabViewModel(tab: tab)
         }
     }
-
 }

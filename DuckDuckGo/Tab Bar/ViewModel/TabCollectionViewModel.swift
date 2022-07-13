@@ -88,11 +88,11 @@ final class TabCollectionViewModel: NSObject {
 
         subscribeToTabs()
         subscribeToPinnedTabsManager()
-        self.selectionIndex = .unpinned(selectionIndex)
 
         if tabCollection.tabs.isEmpty {
             appendNewTab(with: .homePage)
         }
+        self.selectionIndex = .unpinned(selectionIndex)
     }
 
     convenience override init() {
