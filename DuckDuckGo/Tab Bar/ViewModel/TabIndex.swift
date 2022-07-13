@@ -18,10 +18,21 @@
 
 import Foundation
 
+/**
+ * Represents a tab position in one of the 2 sections
+ * of the tab bar view (pinned or unpinned tabs).
+ *
+ * The associated value represents the position in a respective tab bar section.
+ */
 enum TabIndex: Equatable, Comparable {
     case pinned(Int), unpinned(Int)
 
-    var index: Int {
+    /**
+     * Returns tab position within its respective section.
+     *
+     * - Note: the name follows `IndexPath.item` pattern.
+     */
+    var item: Int {
         switch self {
         case .pinned(let index), .unpinned(let index):
             return index
@@ -40,7 +51,7 @@ enum TabIndex: Equatable, Comparable {
     }
 
     /**
-     * Creates a new tab index by incrementing internal index by 1.
+     * Creates a new tab index by incrementing position by 1.
      *
      * No bounds checking is performed.
      */
@@ -69,7 +80,7 @@ enum TabIndex: Equatable, Comparable {
         case (.unpinned, .pinned):
             return false
         default:
-            return lhs.index < rhs.index
+            return lhs.item < rhs.item
         }
     }
 }

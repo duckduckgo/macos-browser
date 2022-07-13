@@ -149,7 +149,7 @@ final class RecentlyClosedCoordinator: RecentlyClosedCoordinating {
            originalTabCollection == lastKeyMainWindowController.mainViewController.tabCollectionViewModel.tabCollection {
             // Original window still exists and it is key
             tabCollectionViewModel = lastKeyMainWindowController.mainViewController.tabCollectionViewModel
-            tabIndex = min(recentlyClosedTab.index.index, tabCollectionViewModel.tabCollection.tabs.count)
+            tabIndex = min(recentlyClosedTab.index.item, tabCollectionViewModel.tabCollection.tabs.count)
 
         } else if let lastKeyMainWindowController = WindowControllersManager.shared.lastKeyMainWindowController {
             // Original window is closed, reopen the tab in the current window
@@ -180,7 +180,7 @@ final class RecentlyClosedCoordinator: RecentlyClosedCoordinating {
         }
 
         let tab = Tab(content: recentlyClosedTab.tabContent)
-        let tabIndex = min(recentlyClosedTab.index.index, windowControllerManager.pinnedTabsManager.tabCollection.tabs.count)
+        let tabIndex = min(recentlyClosedTab.index.item, windowControllerManager.pinnedTabsManager.tabCollection.tabs.count)
 
         tabCollectionViewModel.insert(tab: tab, at: .pinned(tabIndex), selected: true)
     }

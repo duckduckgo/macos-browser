@@ -229,7 +229,7 @@ final class TabBarViewController: NSViewController {
 
     private func reloadSelection() {
         guard tabCollectionViewModel.selectionIndex?.isUnpinnedTab == true,
-              collectionView.selectionIndexPaths.first?.item != tabCollectionViewModel.selectionIndex?.index
+              collectionView.selectionIndexPaths.first?.item != tabCollectionViewModel.selectionIndex?.item
         else {
             collectionView.updateItemsLeftToSelectedItems()
             return
@@ -244,7 +244,7 @@ final class TabBarViewController: NSViewController {
             collectionView.clearSelection()
         }
 
-        let newSelectionIndexPath = IndexPath(item: selectionIndex.index)
+        let newSelectionIndexPath = IndexPath(item: selectionIndex.item)
         if tabMode == .divided {
             collectionView.animator().selectItems(at: [newSelectionIndexPath], scrollPosition: .centeredHorizontally)
         } else {

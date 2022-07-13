@@ -57,7 +57,7 @@ final class TabLazyLoader<DataSource: TabLazyLoaderDataSource> {
 
             // Adjacent tab loading only applies to non-pinned tabs. If a pinned tab is selected,
             // start adjacent tab loading from the first tab (closest to pinned tabs section).
-            adjacentItemEnumerator = .init(itemIndex: selectedTabIndex.isUnpinnedTab ? selectedTabIndex.index : 0)
+            adjacentItemEnumerator = .init(itemIndex: selectedTabIndex.isUnpinnedTab ? selectedTabIndex.item : 0)
         } else {
             shouldLoadAdjacentTabs = false
         }

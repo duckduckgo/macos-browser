@@ -30,8 +30,8 @@ final class TabIndexTests: XCTestCase {
     }
 
     func testIndex() {
-        XCTAssertEqual(TabIndex.pinned(4).index, 4)
-        XCTAssertEqual(TabIndex.unpinned(2).index, 2)
+        XCTAssertEqual(TabIndex.pinned(4).item, 4)
+        XCTAssertEqual(TabIndex.unpinned(2).item, 2)
     }
 
     func testIsPinned() {
