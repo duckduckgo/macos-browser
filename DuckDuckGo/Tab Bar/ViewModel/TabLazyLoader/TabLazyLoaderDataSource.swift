@@ -36,6 +36,9 @@ protocol TabLazyLoaderDataSource: AnyObject {
 
 extension TabLazyLoaderDataSource {
     var qualifiesForLazyLoading: Bool {
+        if pinnedTabs.count > 0 {
+            return true
+        }
 
         let notSelectedURLTabsCount: Int = {
             let count = tabs.filter({ $0.isUrl }).count
