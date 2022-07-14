@@ -61,6 +61,13 @@ final class MouseClickView: NSView {
     }
 
     override func mouseDown(with event: NSEvent) {
+        let coordinateInWindow = event.locationInWindow
+        let coordinateInView = self.convert(coordinateInWindow, from: nil)
+        
+        if !self.bounds.contains(coordinateInView) {
+            return
+        }
+        
         guard !repostMultiClickEventIfNeeded(event) else { return }
 
         super.mouseDown(with: event)
