@@ -1110,6 +1110,7 @@ extension BrowserTabViewController {
             .flatMap(\.mainViewController.tabCollectionViewModel.$selectionIndex)
             .compactMap { $0 }
             .removeDuplicates()
+            .receive(on: DispatchQueue.main)
             .sink { [weak self] index in
                 self?.handleTabSelectedInKeyWindow(index)
             }
