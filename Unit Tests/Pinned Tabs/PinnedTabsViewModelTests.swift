@@ -1,5 +1,5 @@
 //
-//  PinnedTabsModelTests.swift
+//  PinnedTabsViewModelTests.swift
 //
 //  Copyright © 2022 DuckDuckGo. All rights reserved.
 //
@@ -19,9 +19,9 @@
 import XCTest
 @testable import DuckDuckGo_Privacy_Browser
 
-class PinnedTabsModelTests: XCTestCase {
+class PinnedTabsViewModelTests: XCTestCase {
 
-    var model: PinnedTabsModel!
+    var model: PinnedTabsViewModel!
     var collection: TabCollection!
 
     override func setUpWithError() throws {
@@ -33,7 +33,7 @@ class PinnedTabsModelTests: XCTestCase {
             Tab(content: .url("http://d.com".url!)),
             Tab(content: .url("http://e.com".url!))
         ])
-        model = PinnedTabsModel(collection: collection)
+        model = PinnedTabsViewModel(collection: collection)
     }
 
     func testInitialState() throws {
@@ -118,7 +118,7 @@ class PinnedTabsModelTests: XCTestCase {
         let tabA = Tab(content: .url("http://a.com".url!))
         let tabB = Tab(content: .url("http://b.com".url!))
 
-        var events: [PinnedTabsModel.ContextMenuAction] = []
+        var events: [PinnedTabsViewModel.ContextMenuAction] = []
 
         let cancellable = model.contextMenuActionPublisher.sink { events.append($0) }
 

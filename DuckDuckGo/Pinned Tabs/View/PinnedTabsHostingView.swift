@@ -19,7 +19,7 @@
 import SwiftUI
 import Combine
 
-final class PinnedTabsHostingView<Content>: NSHostingView<Content> where Content: View {
+final class PinnedTabsHostingView: NSHostingView<PinnedTabsView> {
 
     let middleClickPublisher: AnyPublisher<CGPoint, Never>
 
@@ -30,7 +30,7 @@ final class PinnedTabsHostingView<Content>: NSHostingView<Content> where Content
         middleClickSubject.send(locationInView)
     }
 
-    required init(rootView: Content) {
+    required init(rootView: PinnedTabsView) {
         middleClickPublisher = middleClickSubject.eraseToAnyPublisher()
         super.init(rootView: rootView)
     }

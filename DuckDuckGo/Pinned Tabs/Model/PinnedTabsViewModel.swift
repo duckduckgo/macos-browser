@@ -1,5 +1,5 @@
 //
-//  PinnedTabsModel.swift
+//  PinnedTabsViewModel.swift
 //
 //  Copyright © 2022 DuckDuckGo. All rights reserved.
 //
@@ -20,7 +20,7 @@ import Foundation
 import Combine
 import os
 
-final class PinnedTabsModel: ObservableObject {
+final class PinnedTabsViewModel: ObservableObject {
 
     @Published var items: [Tab] = [] {
         didSet {
@@ -99,7 +99,7 @@ final class PinnedTabsModel: ObservableObject {
 
 // MARK: - Context Menu
 
-extension PinnedTabsModel {
+extension PinnedTabsViewModel {
 
     enum ContextMenuAction {
         case unpin(Int)
@@ -112,7 +112,7 @@ extension PinnedTabsModel {
 
     func isFireproof(_ tab: Tab) -> Bool {
         guard let host = tab.url?.host else {
-            os_log("PinnedTabsModel: Failed to get url of a tab", type: .error)
+            os_log("PinnedTabsViewModel: Failed to get url of a tab", type: .error)
             return false
         }
         return fireproofDomains.isFireproof(fireproofDomain: host)
@@ -120,7 +120,7 @@ extension PinnedTabsModel {
 
     func unpin(_ tab: Tab) {
         guard let index = items.firstIndex(of: tab) else {
-            os_log("PinnedTabsModel: Failed to get index of a tab", type: .error)
+            os_log("PinnedTabsViewModel: Failed to get index of a tab", type: .error)
             return
         }
         contextMenuActionSubject.send(.unpin(index))
@@ -128,7 +128,7 @@ extension PinnedTabsModel {
 
     func duplicate(_ tab: Tab) {
         guard let index = items.firstIndex(of: tab) else {
-            os_log("PinnedTabsModel: Failed to get index of a tab", type: .error)
+            os_log("PinnedTabsViewModel: Failed to get index of a tab", type: .error)
             return
         }
         contextMenuActionSubject.send(.duplicate(index))
@@ -136,7 +136,7 @@ extension PinnedTabsModel {
 
     func close(_ tab: Tab) {
         guard let index = items.firstIndex(of: tab) else {
-            os_log("PinnedTabsModel: Failed to get index of a tab", type: .error)
+            os_log("PinnedTabsViewModel: Failed to get index of a tab", type: .error)
             return
         }
         contextMenuActionSubject.send(.close(index))

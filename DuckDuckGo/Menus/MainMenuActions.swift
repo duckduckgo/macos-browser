@@ -547,7 +547,7 @@ extension MainViewController {
     }
 
     @IBAction func resetPinnedTabs(_ sender: Any?) {
-        WindowControllersManager.shared.pinnedTabsManager.tabCollection.removeAll()
+        tabCollectionViewModel.pinnedTabsManager.tabCollection.removeAll()
     }
 
     @IBAction func showSaveCredentialsPopover(_ sender: Any?) {

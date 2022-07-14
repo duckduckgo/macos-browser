@@ -19,7 +19,7 @@
 import SwiftUI
 
 struct PinnedTabsView: View {
-    @ObservedObject var model: PinnedTabsModel
+    @ObservedObject var model: PinnedTabsViewModel
     @State private var draggedTab: Tab?
 
     var body: some View {

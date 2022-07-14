@@ -24,7 +24,7 @@ struct PinnedTabView: View {
     }
 
     @ObservedObject var model: Tab
-    @EnvironmentObject var collectionModel: PinnedTabsModel
+    @EnvironmentObject var collectionModel: PinnedTabsViewModel
     @State var isHovered: Bool = false
 
     @Environment(\.controlActiveState) private var controlActiveState

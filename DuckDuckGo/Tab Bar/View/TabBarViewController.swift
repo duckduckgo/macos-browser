@@ -49,9 +49,9 @@ final class TabBarViewController: NSViewController {
     let tabCollectionViewModel: TabCollectionViewModel
 
     private let bookmarkManager: BookmarkManager = LocalBookmarkManager.shared
-    private lazy var pinnedTabsModel: PinnedTabsModel = .init(collection: WindowControllersManager.shared.pinnedTabsManager.tabCollection)
-    private lazy var pinnedTabsView: PinnedTabsView = .init(model: pinnedTabsModel)
-    private lazy var pinnedTabsHostingView = PinnedTabsHostingView(rootView: pinnedTabsView)
+    private let pinnedTabsViewModel: PinnedTabsViewModel
+    private let pinnedTabsView: PinnedTabsView
+    private let pinnedTabsHostingView: PinnedTabsHostingView
 
     private var tabsCancellable: AnyCancellable?
     private var selectionIndexCancellable: AnyCancellable?
@@ -63,6 +63,9 @@ final class TabBarViewController: NSViewController {
 
     init?(coder: NSCoder, tabCollectionViewModel: TabCollectionViewModel) {
         self.tabCollectionViewModel = tabCollectionViewModel
+        pinnedTabsViewModel = .init(collection: tabCollectionViewModel.pinnedTabsManager.tabCollection)
+        pinnedTabsView = .init(model: pinnedTabsViewModel)
+        pinnedTabsHostingView = .init(rootView: pinnedTabsView)
 
         super.init(coder: coder)
     }
@@ -81,15 +84,15 @@ final class TabBarViewController: NSViewController {
         pinnedTabsContainerView.addAndLayout(pinnedTabsHostingView)
 
         tabCollectionViewModel.$selectionIndex
-            .map { selectedTabIndex -> Tab? in
+            .map { [weak self] selectedTabIndex -> Tab? in
                 switch selectedTabIndex {
                 case .pinned(let index):
-                    return WindowControllersManager.shared.pinnedTabsManager.tabCollection.tabs[safe: index]
+                    return self?.pinnedTabsViewModel.items[safe: index]
                 default:
                     return nil
                 }
             }
-            .assign(to: \.selectedItem, onWeaklyHeld: pinnedTabsModel)
+            .assign(to: \.selectedItem, onWeaklyHeld: pinnedTabsViewModel)
             .store(in: &cancellables)
 
         Publishers.CombineLatest(tabCollectionViewModel.$selectionIndex, $tabMode)
@@ -99,28 +102,30 @@ final class TabBarViewController: NSViewController {
                 }
                 return true
             }
-            .assign(to: \.shouldDrawLastItemSeparator, onWeaklyHeld: pinnedTabsModel)
+            .assign(to: \.shouldDrawLastItemSeparator, onWeaklyHeld: pinnedTabsViewModel)
             .store(in: &cancellables)
 
-        pinnedTabsModel.tabsDidReorderPublisher
-            .sink(receiveValue: WindowControllersManager.shared.pinnedTabsManager.tabCollection.reorderTabs)
+        pinnedTabsViewModel.tabsDidReorderPublisher
+            .sink { [weak self] tabs in
+                self?.tabCollectionViewModel.pinnedTabsManager.tabCollection.reorderTabs(tabs)
+            }
             .store(in: &cancellables)
 
-        pinnedTabsModel.$selectedItemIndex.dropFirst().removeDuplicates()
+        pinnedTabsViewModel.$selectedItemIndex.dropFirst().removeDuplicates()
             .compactMap { $0 }
             .sink { [weak self] index in
                 self?.deselectTabAndSelectPinnedTab(at: index)
             }
             .store(in: &cancellables)
 
-        pinnedTabsModel.$hoveredItemIndex.dropFirst().removeDuplicates()
+        pinnedTabsViewModel.$hoveredItemIndex.dropFirst().removeDuplicates()
             .debounce(for: 0.05, scheduler: DispatchQueue.main)
             .sink { [weak self] index in
                 self?.pinnedTabsViewDidUpdateHoveredItem(to: index)
             }
             .store(in: &cancellables)
 
-        pinnedTabsModel.contextMenuActionPublisher
+        pinnedTabsViewModel.contextMenuActionPublisher
             .sink { [weak self] action in
                 self?.handlePinnedTabContextMenuAction(action)
             }
@@ -155,14 +160,14 @@ final class TabBarViewController: NSViewController {
         }
     }
 
-    private func handlePinnedTabContextMenuAction(_ action: PinnedTabsModel.ContextMenuAction) {
+    private func handlePinnedTabContextMenuAction(_ action: PinnedTabsViewModel.ContextMenuAction) {
         switch action {
         case let .unpin(index):
             tabCollectionViewModel.unpinTab(at: index)
         case let .duplicate(index):
             duplicateTab(at: .pinned(index))
         case let .bookmark(tab):
-            guard let url = tab.url, let tabViewModel = WindowControllersManager.shared.pinnedTabsManager.tabViewModels[tab] else {
+            guard let url = tab.url, let tabViewModel = tabCollectionViewModel.pinnedTabsManager.tabViewModels[tab] else {
                 os_log("TabBarViewController: Failed to get url from tab")
                 return
             }

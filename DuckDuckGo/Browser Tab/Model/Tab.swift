@@ -132,12 +132,14 @@ final class Tab: NSObject, Identifiable, ObservableObject {
         }
     }
     private let cbaTimeReporter: ContentBlockingAssetsCompilationTimeReporter?
+    private let pinnedTabsManager: PinnedTabsManager
 
     init(content: TabContent,
          faviconManagement: FaviconManagement = FaviconManager.shared,
          webCacheManager: WebCacheManager = WebCacheManager.shared,
          webViewConfiguration: WKWebViewConfiguration? = nil,
          historyCoordinating: HistoryCoordinating = HistoryCoordinator.shared,
+         pinnedTabsManager: PinnedTabsManager = WindowControllersManager.shared.pinnedTabsManager,
          cbaTimeReporter: ContentBlockingAssetsCompilationTimeReporter? = ContentBlockingAssetsCompilationTimeReporter.shared,
          localHistory: Set<String> = Set<String>(),
          title: String? = nil,
@@ -154,6 +156,7 @@ final class Tab: NSObject, Identifiable, ObservableObject {
         self.content = content
         self.faviconManagement = faviconManagement
         self.historyCoordinating = historyCoordinating
+        self.pinnedTabsManager = pinnedTabsManager
         self.cbaTimeReporter = cbaTimeReporter
         self.localHistory = localHistory
         self.title = title
@@ -959,7 +962,7 @@ extension Tab: WKNavigationDelegate {
         let isLinkActivated = navigationAction.navigationType == .linkActivated
         let isNavigatingAwayFromPinnedTab: Bool = {
             let isNavigatingToAnotherDomain = navigationAction.request.url?.host != url?.host
-            let isPinned = WindowControllersManager.shared.pinnedTabsManager.isTabPinned(self)
+            let isPinned = pinnedTabsManager.isTabPinned(self)
             return isLinkActivated && isPinned && isNavigatingToAnotherDomain
         }()
 
