@@ -43,6 +43,16 @@ final class TabCollectionViewModelTests: XCTestCase {
         XCTAssert(tabCollectionViewModel.tabViewModel(at: 0) === tabCollectionViewModel.tabViewModel(at: 0))
     }
 
+    func testWhenTabViewModelIsInitializedWithoutTabsThenNewHomePageTabIsCreated() {
+        let tabCollection = TabCollection()
+        XCTAssertTrue(tabCollection.tabs.isEmpty)
+
+        let tabCollectionViewModel = TabCollectionViewModel(tabCollection: TabCollection())
+
+        XCTAssertEqual(tabCollectionViewModel.tabCollection.tabs.count, 1)
+        XCTAssertEqual(tabCollectionViewModel.tabCollection.tabs[0].content, .homePage)
+    }
+
     // MARK: - Select
 
     func testWhenTabCollectionViewModelIsInitializedThenSelectedTabViewModelIsFirst() {
@@ -55,7 +65,9 @@ final class TabCollectionViewModelTests: XCTestCase {
         let tabCollectionViewModel = TabCollectionViewModel.aTabCollectionViewModel()
 
         tabCollectionViewModel.select(at: .unpinned(1))
+        XCTAssertNil(tabCollectionViewModel.selectedTabViewModel)
 
+        tabCollectionViewModel.select(at: .pinned(0))
         XCTAssertNil(tabCollectionViewModel.selectedTabViewModel)
     }
 
@@ -427,9 +439,9 @@ fileprivate extension TabCollectionViewModel {
 
     static func aTabCollectionViewModel() -> TabCollectionViewModel {
         let tabCollection = TabCollection()
-        return TabCollectionViewModel(tabCollection: tabCollection)
+        let pinnedTabsManager = PinnedTabsManager()
+        return TabCollectionViewModel(tabCollection: tabCollection, pinnedTabsManager: pinnedTabsManager)
     }
-
 }
 
 extension Tab {
