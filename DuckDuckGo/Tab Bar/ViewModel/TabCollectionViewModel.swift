@@ -20,6 +20,9 @@ import Foundation
 import os.log
 import Combine
 
+/**
+ * The delegate callbacks are triggered for events related to unpinned tabs only.
+ */
 protocol TabCollectionViewModelDelegate: AnyObject {
 
     func tabCollectionViewModelDidAppend(_ tabCollectionViewModel: TabCollectionViewModel, selected: Bool)
@@ -38,7 +41,10 @@ final class TabCollectionViewModel: NSObject {
 
     weak var delegate: TabCollectionViewModelDelegate?
 
+    /// Local tabs collection
     private(set) var tabCollection: TabCollection
+
+    /// Pinned tabs collection (provided via `PinnedTabsManager` instance).
     var pinnedTabsCollection: TabCollection {
         pinnedTabsManager.tabCollection
     }
@@ -47,20 +53,25 @@ final class TabCollectionViewModel: NSObject {
         pinnedTabsCollection.tabs.count + tabCollection.tabs.count
     }
 
-    var allTabs: [Tab] {
-        pinnedTabsCollection.tabs + tabCollection.tabs
-    }
-
     var changesEnabled = true
 
     private(set) var pinnedTabsManager: PinnedTabsManager
 
+    /**
+     * Contains view models for local tabs
+     *
+     * Pinned tabs' view models are shared between windows
+     * and are available through `pinnedTabsManager`.
+     */
     private(set) var tabViewModels = [Tab: TabViewModel]()
+
     @Published private(set) var selectionIndex: TabIndex? {
         didSet {
             updateSelectedTabViewModel()
         }
     }
+
+    /// Can point to a local or pinned tab view model.
     @Published private(set) var selectedTabViewModel: TabViewModel? {
         didSet {
             previouslySelectedTabViewModel = oldValue

@@ -655,7 +655,7 @@ extension MainViewController: NSMenuItemValidation {
 
         case #selector(MainViewController.showNextTab(_:)),
              #selector(MainViewController.showPreviousTab(_:)):
-            return tabCollectionViewModel.allTabs.count > 1
+            return tabCollectionViewModel.allTabsCount > 1
 
         // Developer Tools
         case #selector(MainViewController.toggleDeveloperTools(_:)):
