@@ -19,7 +19,6 @@
 import Cocoa
 
 public final class CookieConsentPopover {
-    
     public var viewController: CookieConsentUserPermissionViewController
     public var windowController: NSWindowController
     public weak var currentTabView: NSView?
@@ -28,15 +27,37 @@ public final class CookieConsentPopover {
         let storyboard = NSStoryboard(name: "CookieConsent", bundle: Bundle.main)
         viewController = storyboard.instantiateController(identifier: "CookieConsentUserPermissionViewController")
         windowController = storyboard.instantiateController(identifier: "CookieConsentWindowController")
+        
         windowController.contentViewController = viewController
-      //  windowController.window?.hasShadow = true
         windowController.window?.acceptsMouseMovedEvents = true
         windowController.window?.ignoresMouseEvents = false
         
         viewController.view.window?.backgroundColor = .clear
         viewController.view.wantsLayer = true
         self.currentTabView = currentTabView
-
+    }
+    
+    public func close(animated: Bool) {
+        guard let overlayWindow = windowController.window else {
+            return
+        }
+        if !overlayWindow.isVisible { return }
+        
+        let removeWindow = {
+            overlayWindow.parent?.removeChildWindow(overlayWindow)
+            overlayWindow.orderOut(nil)
+        }
+        
+        if animated {
+            NSAnimationContext.runAnimationGroup({ context in
+                context.duration = 0.8
+                overlayWindow.animator().alphaValue = 0
+            }) {
+                removeWindow()
+            }
+        } else {
+            removeWindow()
+        }
     }
     
     public func show() {
@@ -63,6 +84,10 @@ public final class CookieConsentPopover {
             overlayWindow.animator().setFrame(NSRect(origin: newOrigin, size: size), display: true)
         }) {
             // no-op
+        }
+        
+        DispatchQueue.main.asyncAfter(deadline: .now() + 2.5) {
+            self.close(animated: true)
         }
     }
     

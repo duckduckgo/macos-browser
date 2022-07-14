@@ -35,11 +35,6 @@ public final class CookieConsentUserPermissionViewController: NSViewController {
         view.applyDropShadow()
     }
     
-    public override func viewDidAppear() {
-        super.viewDidAppear()
-        view.makeMeFirstResponder()
-    }
-    
     private func setupConstraints() {
         consentView.translatesAutoresizingMaskIntoConstraints = false
         
