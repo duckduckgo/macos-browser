@@ -354,15 +354,7 @@ final class BrowserTabViewController: NSViewController {
             showTransientTabContentController(OnboardingViewController.create(withDelegate: self))
 
         case .url:
-            assert(tabViewModel != nil)
-
-            let isPinnedTabAndKeyWindow = tabCollectionViewModel.pinnedTabsCollection.tabs.contains(tabViewModel!.tab)
-            && view.window?.isKeyWindow == true
-
-            if webView != tabViewModel?.tab.webView ||
-                tabViewModel?.tab.webView.tabContentView.superview == nil ||
-                isPinnedTabAndKeyWindow {
-
+            if shouldReplaceWebView(for: tabViewModel) {
                 removeAllTabContent(includingWebView: true)
                 changeWebView(tabViewModel: tabViewModel)
             }
@@ -371,10 +363,23 @@ final class BrowserTabViewController: NSViewController {
             removeAllTabContent()
             view.addAndLayout(homePageView)
 
-        case nil, .some(.none):
-            removeAllTabContent()
+        default:
+            break
+        }
+    }
+
+    private func shouldReplaceWebView(for tabViewModel: TabViewModel?) -> Bool {
+        guard let tabViewModel = tabViewModel else {
+            return false
         }
 
+        let isPinnedTab = tabCollectionViewModel.pinnedTabsCollection.tabs.contains(tabViewModel.tab)
+        let isKeyWindow = view.window?.isKeyWindow == true
+
+        let tabIsNotOnScreen = tabViewModel.tab.webView.tabContentView.superview == nil
+        let isDifferentTabDisplayed = webView != tabViewModel.tab.webView
+
+        return isDifferentTabDisplayed || tabIsNotOnScreen || (isPinnedTab && isKeyWindow)
     }
 
     // MARK: - Preferences
