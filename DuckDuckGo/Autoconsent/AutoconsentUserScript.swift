@@ -52,6 +52,7 @@ final class AutoconsentUserScript: NSObject, WKScriptMessageHandlerWithReply, Us
     
     private enum MessageName: String, CaseIterable {
         case `init`
+        case cmpDetected
         case eval
         case popupFound
         case optOutResult
@@ -111,6 +112,9 @@ final class AutoconsentUserScript: NSObject, WKScriptMessageHandlerWithReply, Us
             // this is not supported in browser
             os_log("ignoring optInResult: %s", log: .autoconsent, type: .debug, String(describing: message.body))
             replyHandler(nil, "opt-in is not supported")
+        case MessageName.cmpDetected:
+            // no need to do anything here
+            replyHandler([ "type": "ok" ], nil) // this is just to prevent a Promise rejection
         case MessageName.selfTestResult:
             handleSelfTestResult(messageData: messageData, replyHandler: replyHandler)
         case MessageName.autoconsentDone:
@@ -165,7 +169,8 @@ final class AutoconsentUserScript: NSObject, WKScriptMessageHandlerWithReply, Us
                 "autoAction": PrivacySecurityPreferences.shared.autoconsentEnabled == true ? "optOut" : nil,
                 "disabledCmps": disabledCMPs,
                 // the very first time, make sure the popup is visible
-                "enablePrehide": PrivacySecurityPreferences.shared.autoconsentEnabled
+                "enablePrehide": PrivacySecurityPreferences.shared.autoconsentEnabled,
+                "detectRetries": 20
             ]
         ], nil)
     }
