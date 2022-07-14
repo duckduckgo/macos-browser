@@ -413,13 +413,15 @@ extension BrowserTabViewController: TabDelegate {
 
     func tab(_ tab: Tab, promptUserForCookieConsent result: (Bool) -> Void) {
         Swift.print("CONSENT PANEL")
-        let consentCookieViewController = CookieConsentUserPermissionViewController()
-        addChild(consentCookieViewController)
+     //   let consentCookieViewController = CookieConsentUserPermissionViewController()
+       // addChild(consentCookieViewController)
         
-        let viewCenter = CGPoint(x: NSMidX(view.frame), y: NSMidY(view.frame))
-
-        consentCookieViewController.view.frame = NSRect(origin: viewCenter, size: consentCookieViewController.view.frame.size)
-        view.addSubview(consentCookieViewController.view)
+        let popover = CookieConsentPopover(currentTabView: self.view)
+        popover.show()
+//        let viewCenter = CGPoint(x: NSMidX(view.frame), y: NSMidY(view.frame))
+//
+//        consentCookieViewController.view.frame = NSRect(origin: viewCenter, size: consentCookieViewController.view.frame.size)
+//        view.addSubview(consentCookieViewController.view)
     }
     
     func tabWillStartNavigation(_ tab: Tab, isUserInitiated: Bool) {

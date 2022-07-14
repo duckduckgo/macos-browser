@@ -19,15 +19,15 @@
 import AppKit
 import SwiftUI
 
-final class CookieConsentUserPermissionViewController: NSViewController {
+public final class CookieConsentUserPermissionViewController: NSViewController {
     private let consentView = NSHostingView(rootView: CookieConsentUserPermissionView())
-    private let viewSize = CGSize(width: 530, height: 285)
+    private let viewSize = CGSize(width: 550, height: 300)
     
-    override func loadView() {
+    public override func loadView() {
         view = NSView(frame: NSRect(origin: CGPoint.zero, size: viewSize))
     }
     
-    override func viewDidLoad() {
+    public override func viewDidLoad() {
         super.viewDidLoad()
         
         view.addSubview(consentView)
@@ -35,7 +35,7 @@ final class CookieConsentUserPermissionViewController: NSViewController {
         view.applyDropShadow()
     }
     
-    override func viewDidAppear() {
+    public override func viewDidAppear() {
         super.viewDidAppear()
         view.makeMeFirstResponder()
     }

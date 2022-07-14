@@ -18,6 +18,8 @@
 		14D9B8FB24F7E089000D4D13 /* AddressBarViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 14D9B8F924F7E089000D4D13 /* AddressBarViewController.swift */; };
 		3106AD76287F000600159FE5 /* CookieConsentUserPermissionViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3106AD75287F000600159FE5 /* CookieConsentUserPermissionViewController.swift */; };
 		313AEDA1287CAD1D00E1E8F4 /* CookieConsentUserPermissionView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 313AEDA0287CAD1D00E1E8F4 /* CookieConsentUserPermissionView.swift */; };
+		31B7C84F288008E00049841F /* CookieConsent.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 31B7C84E288008E00049841F /* CookieConsent.storyboard */; };
+		31B7C85128800A5D0049841F /* CookieConsentPopover.swift in Sources */ = {isa = PBXBuildFile; fileRef = 31B7C85028800A5D0049841F /* CookieConsentPopover.swift */; };
 		336D5B18262D8D3C0052E0C9 /* findinpage.js in Resources */ = {isa = PBXBuildFile; fileRef = 336D5AEF262D8D3C0052E0C9 /* findinpage.js */; };
 		339A6B5826A044BA00E3DAE8 /* duckduckgo-privacy-dashboard in Resources */ = {isa = PBXBuildFile; fileRef = 339A6B5726A044BA00E3DAE8 /* duckduckgo-privacy-dashboard */; };
 		371C0A2927E33EDC0070591F /* FeedbackPresenter.swift in Sources */ = {isa = PBXBuildFile; fileRef = 371C0A2827E33EDC0070591F /* FeedbackPresenter.swift */; };
@@ -790,6 +792,8 @@
 		14D9B8F924F7E089000D4D13 /* AddressBarViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AddressBarViewController.swift; sourceTree = "<group>"; };
 		3106AD75287F000600159FE5 /* CookieConsentUserPermissionViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CookieConsentUserPermissionViewController.swift; sourceTree = "<group>"; };
 		313AEDA0287CAD1D00E1E8F4 /* CookieConsentUserPermissionView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CookieConsentUserPermissionView.swift; sourceTree = "<group>"; };
+		31B7C84E288008E00049841F /* CookieConsent.storyboard */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; path = CookieConsent.storyboard; sourceTree = "<group>"; };
+		31B7C85028800A5D0049841F /* CookieConsentPopover.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CookieConsentPopover.swift; sourceTree = "<group>"; };
 		336B39E22726B4B700C417D3 /* LocalUnprotectedDomains.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LocalUnprotectedDomains.swift; sourceTree = "<group>"; };
 		336D5AEF262D8D3C0052E0C9 /* findinpage.js */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.javascript; path = findinpage.js; sourceTree = "<group>"; };
 		339A6B5726A044BA00E3DAE8 /* duckduckgo-privacy-dashboard */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; name = "duckduckgo-privacy-dashboard"; path = "Submodules/duckduckgo-privacy-dashboard"; sourceTree = SOURCE_ROOT; };
@@ -1601,6 +1605,8 @@
 			children = (
 				313AEDA0287CAD1D00E1E8F4 /* CookieConsentUserPermissionView.swift */,
 				3106AD75287F000600159FE5 /* CookieConsentUserPermissionViewController.swift */,
+				31B7C84E288008E00049841F /* CookieConsent.storyboard */,
+				31B7C85028800A5D0049841F /* CookieConsentPopover.swift */,
 			);
 			path = UI;
 			sourceTree = "<group>";
@@ -4082,6 +4088,7 @@
 				85378D9C274E61B8007C5CBF /* MessageViews.storyboard in Resources */,
 				AA80EC79256C46AA007083E7 /* TabBar.storyboard in Resources */,
 				AA34396D2754D4E300B241FA /* shield-dot.json in Resources */,
+				31B7C84F288008E00049841F /* CookieConsent.storyboard in Resources */,
 				AAC5E4C925D6A6E8007F5990 /* Bookmarks.storyboard in Resources */,
 				B6FA893D269C423100588ECD /* PrivacyDashboard.storyboard in Resources */,
 				AA34396C2754D4E300B241FA /* shield.json in Resources */,
@@ -4246,6 +4253,7 @@
 				AA5FA697275F90C400DCE9C9 /* FaviconImageCache.swift in Sources */,
 				1430DFF524D0580F00B8978C /* TabBarViewController.swift in Sources */,
 				4B92929B26670D2A00AD2C21 /* BookmarkOutlineViewDataSource.swift in Sources */,
+				31B7C85128800A5D0049841F /* CookieConsentPopover.swift in Sources */,
 				85D885B026A590A90077C374 /* NSNotificationName+PasswordManager.swift in Sources */,
 				B610F2BB27A145C500FCEBE9 /* RulesCompilationMonitor.swift in Sources */,
 				AAC30A28268E045400D2D9CD /* CrashReportReader.swift in Sources */,
