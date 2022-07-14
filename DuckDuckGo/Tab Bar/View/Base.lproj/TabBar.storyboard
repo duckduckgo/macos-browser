@@ -37,12 +37,6 @@
                             <customView translatesAutoresizingMaskIntoConstraints="NO" id="efe-Pc-ueP" userLabel="Window Dragging View" customClass="WindowDraggingView" customModule="DuckDuckGo_Privacy_Browser" customModuleProvider="target">
                                 <rect key="frame" x="0.0" y="0.0" width="845" height="40"/>
                             </customView>
-                            <customView translatesAutoresizingMaskIntoConstraints="NO" id="G3c-kC-Gu9">
-                                <rect key="frame" x="76" y="1" width="0.0" height="34"/>
-                                <constraints>
-                                    <constraint firstAttribute="width" placeholder="YES" id="WbS-dd-RX8"/>
-                                </constraints>
-                            </customView>
                             <stackView distribution="fillEqually" orientation="horizontal" alignment="top" spacing="0.0" horizontalStackHuggingPriority="249.99998474121094" verticalStackHuggingPriority="249.99998474121094" detachesHiddenViews="YES" translatesAutoresizingMaskIntoConstraints="NO" id="kOb-4q-pAe">
                                 <rect key="frame" x="76" y="18" width="0.0" height="0.0"/>
                                 <subviews>
@@ -229,6 +223,12 @@
                                 </constraints>
                                 <imageCell key="cell" refusesFirstResponder="YES" alignment="left" imageScaling="axesIndependently" image="TabBarShadowLeft" id="crE-9i-66r"/>
                             </imageView>
+                            <customView horizontalHuggingPriority="251" horizontalCompressionResistancePriority="749" translatesAutoresizingMaskIntoConstraints="NO" id="G3c-kC-Gu9">
+                                <rect key="frame" x="76" y="1" width="0.0" height="34"/>
+                                <constraints>
+                                    <constraint firstAttribute="width" placeholder="YES" id="WbS-dd-RX8"/>
+                                </constraints>
+                            </customView>
                             <customView translatesAutoresizingMaskIntoConstraints="NO" id="efe-Pc-ueT" userLabel="Window Dragging View" customClass="WindowDraggingView" customModule="DuckDuckGo_Privacy_Browser" customModuleProvider="target">
                                 <rect key="frame" x="76" y="0.0" width="665" height="40"/>
                             </customView>
