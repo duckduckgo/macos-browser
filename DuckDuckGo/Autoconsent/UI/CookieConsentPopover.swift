@@ -21,9 +21,8 @@ import Cocoa
 public final class CookieConsentPopover {
     public var viewController: CookieConsentUserPermissionViewController
     public var windowController: NSWindowController
-    public weak var currentTabView: NSView?
 
-    public init(currentTabView: NSView) {
+    public init() {
         let storyboard = NSStoryboard(name: "CookieConsent", bundle: Bundle.main)
         viewController = storyboard.instantiateController(identifier: "CookieConsentUserPermissionViewController")
         windowController = storyboard.instantiateController(identifier: "CookieConsentWindowController")
@@ -34,7 +33,6 @@ public final class CookieConsentPopover {
         
         viewController.view.window?.backgroundColor = .clear
         viewController.view.wantsLayer = true
-        self.currentTabView = currentTabView
     }
     
     public func close(animated: Bool) {
@@ -49,10 +47,10 @@ public final class CookieConsentPopover {
         }
         
         if animated {
-            NSAnimationContext.runAnimationGroup({ context in
+            NSAnimationContext.runAnimationGroup { context in
                 context.duration = 0.8
                 overlayWindow.animator().alphaValue = 0
-            }) {
+            } completionHandler: {
                 removeWindow()
             }
         } else {
@@ -60,34 +58,30 @@ public final class CookieConsentPopover {
         }
     }
     
-    public func show() {
-        guard let currentTabView = currentTabView,
-        let currentTabViewWindow = currentTabView.window,
+    public func show(on currentTabView: NSView, animated: Bool) {
+        guard let currentTabViewWindow = currentTabView.window,
         let overlayWindow = windowController.window else {
             return
         }
         currentTabViewWindow.addChildWindow(overlayWindow, ordered: .above)
         
         let xPosition = (currentTabViewWindow.frame.width / 2) - (overlayWindow.frame.width / 2) + currentTabViewWindow.frame.origin.x
-        var yPosition = currentTabViewWindow.frame.origin.y + currentTabViewWindow.frame.height - overlayWindow.frame.height
-
-        overlayWindow.setFrameOrigin(NSPoint(x: xPosition, y: yPosition))
-        overlayWindow.alphaValue = 0
-
-        NSAnimationContext.runAnimationGroup({ context in
-            context.duration = 0.8
-            yPosition -= 65
-            
-            let newOrigin = NSPoint(x: xPosition, y: yPosition)
-            let size = overlayWindow.frame.size
-            overlayWindow.animator().alphaValue = 1
-            overlayWindow.animator().setFrame(NSRect(origin: newOrigin, size: size), display: true)
-        }) {
-            // no-op
-        }
+        let yPosition = currentTabViewWindow.frame.origin.y + currentTabViewWindow.frame.height - overlayWindow.frame.height
+        let yPositionOffset: CGFloat = 65
         
-        DispatchQueue.main.asyncAfter(deadline: .now() + 2.5) {
-            self.close(animated: true)
+        if animated {
+            overlayWindow.setFrameOrigin(NSPoint(x: xPosition, y: yPosition))
+            overlayWindow.alphaValue = 0
+            
+            NSAnimationContext.runAnimationGroup { context in
+                context.duration = 0.8
+                let newOrigin = NSPoint(x: xPosition, y: yPosition - yPositionOffset)
+                let size = overlayWindow.frame.size
+                overlayWindow.animator().alphaValue = 1
+                overlayWindow.animator().setFrame(NSRect(origin: newOrigin, size: size), display: true)
+            }
+        } else {
+            overlayWindow.setFrameOrigin(NSPoint(x: xPosition, y: yPosition - yPositionOffset))
         }
     }
     
