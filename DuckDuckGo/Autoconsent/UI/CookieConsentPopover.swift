@@ -18,7 +18,12 @@
 
 import Cocoa
 
+protocol CookieConsentPopoverDelegate: AnyObject {
+    func cookieConsentPopover(_ popOver: CookieConsentPopover, didFinishWithResult result: Bool)
+}
+
 public final class CookieConsentPopover {
+    weak var delegate: CookieConsentPopoverDelegate?
     public var viewController: CookieConsentUserPermissionViewController
     public var windowController: NSWindowController
 
@@ -33,6 +38,8 @@ public final class CookieConsentPopover {
         
         viewController.view.window?.backgroundColor = .clear
         viewController.view.wantsLayer = true
+        
+        viewController.delegate = self
     }
     
     public func close(animated: Bool) {
@@ -87,5 +94,11 @@ public final class CookieConsentPopover {
     
     public required init?(coder: NSCoder) {
         fatalError("CookieConsentPopover: Bad initializer")
+    }
+}
+
+extension CookieConsentPopover: CookieConsentUserPermissionViewControllerDelegate {
+    func cookieConsentUserPermissionViewController(_ controller: CookieConsentUserPermissionViewController, didFinishWithResult result: Bool) {
+        self.delegate?.cookieConsentPopover(self, didFinishWithResult: result)
     }
 }

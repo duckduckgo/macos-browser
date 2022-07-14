@@ -19,8 +19,20 @@
 import AppKit
 import SwiftUI
 
+protocol CookieConsentUserPermissionViewControllerDelegate: AnyObject {
+    func cookieConsentUserPermissionViewController(_ controller: CookieConsentUserPermissionViewController, didFinishWithResult result: Bool)
+}
+
 public final class CookieConsentUserPermissionViewController: NSViewController {
-    private let consentView = NSHostingView(rootView: CookieConsentUserPermissionView())
+    weak var delegate: CookieConsentUserPermissionViewControllerDelegate?
+    private lazy var consentView: NSHostingView<CookieConsentUserPermissionView> = {
+        
+        let permissionView = CookieConsentUserPermissionView { result in
+            self.delegate?.cookieConsentUserPermissionViewController(self, didFinishWithResult: result)
+        }
+        return NSHostingView(rootView: permissionView)
+    }()
+    
     private let viewSize = CGSize(width: 550, height: 300)
     
     public override func loadView() {

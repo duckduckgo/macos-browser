@@ -22,7 +22,7 @@ import BrowserServicesKit
 
 protocol AutoconsentUserScriptDelegate: AnyObject {
     func autoconsentUserScript(consentStatus: CookieConsentInfo)
-    func autoconsentUserScriptPromptUserForConsent(_ result: (Bool) -> Void)
+    func autoconsentUserScriptPromptUserForConsent(_ result: @escaping (Bool) -> Void)
 }
 
 protocol UserScriptWithAutoconsent: UserScript {
@@ -160,6 +160,7 @@ final class AutoconsentUserScript: NSObject, UserScriptWithAutoconsent {
         Self.promptLastShown = now
         self.delegate?.autoconsentUserScriptPromptUserForConsent { result in
             preferences.autoconsentEnabled = result
+            callback(result)
         }
   
         #warning("Remove this")

@@ -19,6 +19,8 @@
 import SwiftUI
 
 struct CookieConsentUserPermissionView: View {
+    let result: (Bool) -> Void
+    
     var body: some View {
         
         Group {
@@ -74,30 +76,31 @@ struct CookieConsentUserPermissionView: View {
     private var buttonStack: some View {
         HStack {
             Button {
-                print("Don't")
+                result(false)
             } label: {
                 Text("No Thanks")
             }
             .buttonStyle(SecondaryCTAStyle())
             
             Button {
-                print("Manage")
+                result(true)
             } label: {
                 Text("Manage Cookie Pop-ups")
             }
             .buttonStyle(PrimaryCTAStyle())
         }
-
     }
 }
 
 struct CookieConsentUserPermissionView_Previews: PreviewProvider {
     static var previews: some View {
+        let result: (Bool) -> Void = { _ in }
+        
         if #available(macOS 11.0, *) {
-            CookieConsentUserPermissionView().preferredColorScheme(.dark)
-            CookieConsentUserPermissionView().preferredColorScheme(.light)
+            CookieConsentUserPermissionView(result: result).preferredColorScheme(.dark)
+            CookieConsentUserPermissionView(result: result).preferredColorScheme(.light)
         } else {
-            CookieConsentUserPermissionView()
+            CookieConsentUserPermissionView(result: result)
         }
     }
 }

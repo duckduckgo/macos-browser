@@ -58,11 +58,6 @@ final class BrowserTabViewController: NSViewController {
 
     private var mouseDownMonitor: Any?
     
-    private class CookieConsentPopoverManager {
-        weak var currentTab: Tab?
-        lazy var popOver = CookieConsentPopover()
-    }
-    
     private var cookieConsentPopoverManager = CookieConsentPopoverManager()
 
     required init?(coder: NSCoder) {
@@ -128,7 +123,6 @@ final class BrowserTabViewController: NSViewController {
                 self.showTabContent(of: selectedTabViewModel)
                 self.subscribeToErrorViewState()
                 self.subscribeToTabContent(of: selectedTabViewModel)
-               
                 
                 if selectedTabViewModel?.tab == self.cookieConsentPopoverManager.currentTab {
                     self.cookieConsentPopoverManager.popOver.show(on: self.view, animated: false)
@@ -427,10 +421,9 @@ extension BrowserTabViewController: ContentOverlayUserScriptDelegate {
 
 extension BrowserTabViewController: TabDelegate {
 
-    func tab(_ tab: Tab, promptUserForCookieConsent result: (Bool) -> Void) {
-        self.cookieConsentPopoverManager.popOver.show(on: view, animated: true)
-        self.cookieConsentPopoverManager.currentTab = tabViewModel?.tab
-        print("SHOW CONSENT")
+    func tab(_ tab: Tab, promptUserForCookieConsent result: @escaping (Bool) -> Void) {
+       cookieConsentPopoverManager.show(on: view, animated: true, result: result)
+       cookieConsentPopoverManager.currentTab = tabViewModel?.tab
     }
     
     func tabWillStartNavigation(_ tab: Tab, isUserInitiated: Bool) {
