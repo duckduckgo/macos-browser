@@ -27,17 +27,17 @@ struct CookieConsentUserPermissionView: View {
                     daxStackView
                     
                     contentView
-                        .frame(width: 406)
+                        .frame(width: Consts.Layout.contentViewWidth)
                 }
-                .frame(height: 176)
+                .frame(height: Consts.Layout.innerContainerHeight)
                 
                 buttonStack
             }
-            .frame(width: 490)
+            .frame(width: Consts.Layout.outerContainerWidth)
         }
         .padding()
         .background(Color("CookieConsentPanelBackground"))
-        .cornerRadius(8)
+        .cornerRadius(Consts.Layout.containerCornerRadius)
     }
     
     private var daxStackView: some View {
@@ -45,7 +45,7 @@ struct CookieConsentUserPermissionView: View {
             HStack {
                 Image("OnboardingDax")
                     .resizable()
-                    .frame(width: 64, height: 64)
+                    .frame(width: Consts.Layout.daxImageSize, height: Consts.Layout.daxImageSize)
                     .shadow(color: .black.opacity(0.16), radius: 6, x: 0, y: 3)
                 
                 Spacer()
@@ -143,5 +143,15 @@ private struct SecondaryCTAStyle: ButtonStyle {
             .overlay(
                 RoundedRectangle(cornerRadius: cornerRadius)
                     .stroke(Color.black.opacity(0.1), lineWidth: 1))
+    }
+}
+
+private struct Consts {
+    struct Layout {
+        static let outerContainerWidth: CGFloat = 490
+        static let contentViewWidth: CGFloat = 406
+        static let innerContainerHeight: CGFloat = 176
+        static let daxImageSize: CGFloat = 64
+        static let containerCornerRadius: CGFloat = 8
     }
 }
