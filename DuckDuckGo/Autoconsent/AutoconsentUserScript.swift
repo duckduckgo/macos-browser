@@ -50,7 +50,7 @@ final class AutoconsentUserScript: NSObject, WKScriptMessageHandlerWithReply, Us
         static let newSitePopupHidden = Notification.Name("newSitePopupHidden")
     }
     
-    private enum MessageName: String, CaseIterable {
+    enum MessageName: String, CaseIterable {
         case `init`
         case cmpDetected
         case eval
@@ -99,6 +99,14 @@ final class AutoconsentUserScript: NSObject, WKScriptMessageHandlerWithReply, Us
             return
         }
 
+        return handleMessage(messageName: messageName, messageData: messageData, replyHandler: replyHandler, message: message)
+    }
+
+    @MainActor
+    func handleMessage(messageName: MessageName,
+                       messageData: [String: Any],
+                       replyHandler: @escaping (Any?, String?) -> Void,
+                       message: WKScriptMessage) {
         switch messageName {
         case MessageName.`init`:
             handleInit(messageData: messageData, replyHandler: replyHandler, message: message)
