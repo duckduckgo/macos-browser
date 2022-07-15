@@ -79,14 +79,18 @@ public final class CookieConsentPopover {
         if animated {
             overlayWindow.setFrameOrigin(NSPoint(x: xPosition, y: yPosition))
             overlayWindow.alphaValue = 0
-            
+        
             NSAnimationContext.runAnimationGroup { context in
                 context.duration = 0.8
                 let newOrigin = NSPoint(x: xPosition, y: yPosition - yPositionOffset)
                 let size = overlayWindow.frame.size
                 overlayWindow.animator().alphaValue = 1
                 overlayWindow.animator().setFrame(NSRect(origin: newOrigin, size: size), display: true)
+
+            } completionHandler: {
+                self.viewController.startAnimation()
             }
+
         } else {
             overlayWindow.setFrameOrigin(NSPoint(x: xPosition, y: yPosition - yPositionOffset))
         }

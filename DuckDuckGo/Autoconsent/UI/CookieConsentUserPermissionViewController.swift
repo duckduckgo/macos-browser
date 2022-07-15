@@ -25,15 +25,17 @@ protocol CookieConsentUserPermissionViewControllerDelegate: AnyObject {
 
 public final class CookieConsentUserPermissionViewController: NSViewController {
     weak var delegate: CookieConsentUserPermissionViewControllerDelegate?
-    private lazy var consentView: NSHostingView<CookieConsentUserPermissionView> = {
-        
-        let permissionView = CookieConsentUserPermissionView { result in
+    private var sketchAnimationModel = CookieConsentAnimationModel()
+    private typealias PermissionView = CookieConsentUserPermissionView<CookieConsentAnimationModel>
+    private let viewSize = CGSize(width: 550, height: 300)
+
+    private lazy var consentView: NSHostingView<PermissionView> = {
+        let permissionView = CookieConsentUserPermissionView(sketchAnimationModel: sketchAnimationModel) { result in
             self.delegate?.cookieConsentUserPermissionViewController(self, didFinishWithResult: result)
         }
         return NSHostingView(rootView: permissionView)
     }()
     
-    private let viewSize = CGSize(width: 550, height: 300)
     
     public override func loadView() {
         view = NSView(frame: NSRect(origin: CGPoint.zero, size: viewSize))
@@ -45,6 +47,10 @@ public final class CookieConsentUserPermissionViewController: NSViewController {
         view.addSubview(consentView)
         setupConstraints()
         view.applyDropShadow()
+    }
+    
+    public func startAnimation() {
+        sketchAnimationModel.startAnimation()
     }
     
     private func setupConstraints() {

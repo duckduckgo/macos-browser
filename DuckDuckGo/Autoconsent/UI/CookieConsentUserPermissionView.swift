@@ -18,11 +18,11 @@
 
 import SwiftUI
 
-struct CookieConsentUserPermissionView: View {
+struct CookieConsentUserPermissionView<AnimationModel>: View where AnimationModel: CookieConsentAnimation {
+    var sketchAnimationModel: AnimationModel
     let result: (Bool) -> Void
     
     var body: some View {
-        
         Group {
             VStack(spacing: 32) {
                 HStack(alignment: .top) {
@@ -58,21 +58,19 @@ struct CookieConsentUserPermissionView: View {
     private var contentView: some View {
         VStack(alignment: .leading, spacing: 24) {
             Text("Looks like this site has a cookie consent pop-up 👇")
-                .font(.system(size: 15))
+                .font(.system(size: Consts.Font.size))
                 .fontWeight(.light)
- 
-            HStack {
-                Spacer()
-                Image("CookieConsentSketch")
-                Spacer()
-            }            
-
+            
+            CookieConsentAnimationView(animationModel: sketchAnimationModel)
+                .padding(.leading, 40)
+            
             Text("Want me to handle these for you? I can try to minimize cookies, maximize privacy, and hide pop-ups like these.")
                 .fontWeight(.light)
-                .font(.system(size: 15))
+                .font(.system(size: Consts.Font.size))
             
         }.frame(maxHeight: .infinity)
     }
+    
     private var buttonStack: some View {
         HStack {
             Button {
@@ -90,6 +88,10 @@ struct CookieConsentUserPermissionView: View {
             .buttonStyle(PrimaryCTAStyle())
         }
     }
+    
+    func startAnimation() {
+        sketchAnimationModel.startAnimation()
+    }
 }
 
 struct CookieConsentUserPermissionView_Previews: PreviewProvider {
@@ -97,10 +99,10 @@ struct CookieConsentUserPermissionView_Previews: PreviewProvider {
         let result: (Bool) -> Void = { _ in }
         
         if #available(macOS 11.0, *) {
-            CookieConsentUserPermissionView(result: result).preferredColorScheme(.dark)
-            CookieConsentUserPermissionView(result: result).preferredColorScheme(.light)
+            CookieConsentUserPermissionView(sketchAnimationModel: CookieConsentAnimationMock(), result: result).preferredColorScheme(.dark)
+            CookieConsentUserPermissionView(sketchAnimationModel: CookieConsentAnimationMock(), result: result).preferredColorScheme(.light)
         } else {
-            CookieConsentUserPermissionView(result: result)
+            CookieConsentUserPermissionView(sketchAnimationModel: CookieConsentAnimationMock(), result: result)
         }
     }
 }
@@ -156,5 +158,9 @@ private struct Consts {
         static let innerContainerHeight: CGFloat = 176
         static let daxImageSize: CGFloat = 64
         static let containerCornerRadius: CGFloat = 8
+    }
+    
+    struct Font {
+        static let size: CGFloat = 15
     }
 }
