@@ -23,6 +23,9 @@ import Foundation
 protocol BookmarksBarViewModelDelegate: AnyObject {
     
     func bookmarksBarViewModelReceived(action: BookmarksBarViewModel.BookmarksBarItemAction, for item: BookmarksBarCollectionViewItem)
+    func bookmarksBarViewModelWidthForContainer() -> CGFloat
+    func bookmarksBarViewModelReloadedData()
+    
 }
 
 final class BookmarksBarViewModel: NSObject {
@@ -55,6 +58,13 @@ final class BookmarksBarViewModel: NSObject {
         let url: URL?
         let isFolder: Bool
         let entity: BaseBookmarkEntity
+        
+        init(entity: BaseBookmarkEntity) {
+            self.title = entity.title
+            self.url = (entity as? Bookmark)?.url
+            self.isFolder = entity.isFolder
+            self.entity = entity
+        }
     }
     
     weak var delegate: BookmarksBarViewModelDelegate?
@@ -82,12 +92,23 @@ final class BookmarksBarViewModel: NSObject {
         }
     }
 
+    @Published
     private(set) var clippedItems: [BookmarkViewModel] = []
     
     // MARK: - Initialization
     
     init(bookmarkManager: BookmarkManager) {
         self.bookmarkManager = bookmarkManager
+        super.init()
+        subscribeToBookmarks()
+    }
+    
+    private func subscribeToBookmarks() {
+        bookmarkManager.listPublisher.receive(on: RunLoop.main).sink { [weak self] list in
+            let containerWidth = self?.delegate?.bookmarksBarViewModelWidthForContainer() ?? 0
+            self?.update(from: list?.topLevelEntities ?? [], containerWidth: containerWidth)
+            self?.delegate?.bookmarksBarViewModelReloadedData()
+        }.store(in: &cancellables)
     }
     
     // MARK: - Functions
@@ -113,11 +134,7 @@ final class BookmarksBarViewModel: NSObject {
                 break
             }
             
-            let item = BookmarksBarItem(title: entity.title,
-                                        url: (entity as? Bookmark)?.url,
-                                        isFolder: entity.isFolder,
-                                        entity: entity)
-
+            let item = BookmarksBarItem(entity: entity)
             displayableItems.append(item)
         }
         
@@ -166,10 +183,7 @@ final class BookmarksBarViewModel: NSObject {
         }
         
         let item = clippedItems.removeFirst()
-        let bookmarksBarItem = BookmarksBarItem(title: item.entity.title,
-                                                url: (item.entity as? Bookmark)?.url,
-                                                isFolder: item.entity.isFolder,
-                                                entity: item.entity)
+        let bookmarksBarItem = BookmarksBarItem(entity: item.entity)
         
         bookmarksBarItems.append(bookmarksBarItem)
         

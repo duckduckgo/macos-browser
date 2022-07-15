@@ -31,7 +31,7 @@ final class BookmarksBarViewController: NSViewController {
     private let tabCollectionViewModel: TabCollectionViewModel
     private var cancellables = Set<AnyCancellable>()
     
-    private var clipThreshold: CGFloat {
+    fileprivate var clipThreshold: CGFloat {
         let viewWidthWithoutClipIndicator = view.frame.width - clippedItemsIndicator.frame.minX
         return view.frame.width - viewWidthWithoutClipIndicator - 3
     }
@@ -74,7 +74,7 @@ final class BookmarksBarViewController: NSViewController {
                                                name: .faviconCacheUpdated,
                                                object: nil)
         
-        subscribeToBookmarks()
+        subscribeToViewModel()
     }
     
     override func viewWillAppear() {
@@ -105,13 +105,10 @@ final class BookmarksBarViewController: NSViewController {
         }
     }
 
-    private func subscribeToBookmarks() {
-        bookmarkManager.listPublisher.receive(on: RunLoop.main).sink { [weak self] list in
+    private func subscribeToViewModel() {
+        viewModel.$clippedItems.receive(on: RunLoop.main).sink { [weak self] list in
             guard let self = self else { return }
-            
-            self.viewModel.update(from: list?.topLevelEntities ?? [], containerWidth: self.clipThreshold)
             self.refreshClippedIndicator()
-            self.bookmarksBarCollectionView.reloadData()
         }.store(in: &cancellables)
     }
     
@@ -221,6 +218,14 @@ extension BookmarksBarViewController: BookmarksBarViewModelDelegate {
         } else {
             assertionFailure("Failed to cast entity for clicked item")
         }
+    }
+    
+    func bookmarksBarViewModelWidthForContainer() -> CGFloat {
+        return clipThreshold
+    }
+    
+    func bookmarksBarViewModelReloadedData() {
+        bookmarksBarCollectionView.reloadData()
     }
     
     private func bookmarkFolderMenu(items: [NSMenuItem]) -> NSMenu {
