@@ -85,7 +85,7 @@ final class MainViewController: NSViewController {
             tabBarContainerView.isHidden = true
             navigationBarTopConstraint.constant = 0.0
             addressBarHeightConstraint.constant = tabBarContainerView.frame.height
-            updateBookmarksBarVisibility(visible: false)
+            updateBookmarksBarViewVisibility(visible: false)
         } else {
             navigationBarContainerView.wantsLayer = true
             navigationBarContainerView.layer?.masksToBounds = false
@@ -93,7 +93,7 @@ final class MainViewController: NSViewController {
             resizeNavigationBarForHomePage(tabCollectionViewModel.selectedTabViewModel?.tab.content == .homePage, animated: false)
             
             let bookmarksBarVisible = PersistentAppInterfaceSettings.shared.showBookmarksBar
-            updateBookmarksBarVisibility(visible: bookmarksBarVisible)
+            updateBookmarksBarViewVisibility(visible: bookmarksBarVisible)
         }
         
         updateDividerColor()
@@ -186,22 +186,12 @@ final class MainViewController: NSViewController {
         return bookmarksBarViewController
     }
     
-    func updateBookmarksBar(visible: Bool) {
-        PersistentAppInterfaceSettings.shared.showBookmarksBar = visible
-        updateBookmarksBarVisibility(visible: visible)
-    }
-    
-    private func updateBookmarksBarVisibility(visible: Bool) {
-        let showBookmarksBar: Bool
-
-        if isInPopUpWindow {
-            showBookmarksBar = false
-        } else {
-            showBookmarksBar = visible
-        }
+    private func updateBookmarksBarViewVisibility(visible: Bool) {
+        let showBookmarksBar = isInPopUpWindow ? false : visible
 
         bookmarksBarViewController.view.isHidden = !showBookmarksBar
         bookmarksBarHeightConstraint.constant = showBookmarksBar ? 34 : 0
+
         updateDividerColor()
     }
     
@@ -226,8 +216,7 @@ final class MainViewController: NSViewController {
         bookmarksBarVisibilityChangedCancellable = NotificationCenter.default
             .publisher(for: PersistentAppInterfaceSettings.ShowBookmarksBarSettingChanged)
             .sink { [weak self] _ in
-                let bookmarksBarVisible = PersistentAppInterfaceSettings.shared.showBookmarksBar
-                self?.updateBookmarksBarVisibility(visible: bookmarksBarVisible)
+                self?.updateBookmarksBarViewVisibility(visible: PersistentAppInterfaceSettings.shared.showBookmarksBar)
             }
     }
 
