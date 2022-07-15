@@ -20,45 +20,6 @@ import XCTest
 @testable import DuckDuckGo_Privacy_Browser
 
 class BookmarksBarViewModelTests: XCTestCase {
-
-    func testWhenMouseDraggedEventIsReceived_ThenViewModelEntersBeginningDragState() throws {
-        let mockBookmarksManager = createMockBookmarksManager()
-        let viewModel = BookmarksBarViewModel(bookmarkManager: mockBookmarksManager)
-        
-        XCTAssertEqual(viewModel.state, .idle)
-        viewModel.handle(event: .mouseDragged(buttonIndex: 0, location: .zero))
-        XCTAssertEqual(viewModel.state, .beginningDrag(originalLocation: .zero))
-    }
-    
-    func testWhenStateIsBeginningDrag_AndMouseUpEventIsReceivedBeforeCrossingDragSessionThreshold_ThenStateResetsToIdle() throws {
-        let mockBookmarksManager = createMockBookmarksManager()
-        let viewModel = BookmarksBarViewModel(bookmarkManager: mockBookmarksManager)
-        
-        viewModel.handle(event: .mouseDragged(buttonIndex: 0, location: .zero))
-        XCTAssertEqual(viewModel.state, .beginningDrag(originalLocation: .zero))
-        
-        viewModel.handle(event: .mouseDragged(buttonIndex: 0, location: CGPoint(x: 0, y: 1)))
-        XCTAssertEqual(viewModel.state, .beginningDrag(originalLocation: .zero))
-        
-        viewModel.handle(event: .mouseUp)
-        XCTAssertEqual(viewModel.state, .idle)
-    }
-    
-    func testWhenStateIsBeginningDrag_AndViewCrossesDragSessionThreshold_ThenStateEqualsDragging() throws {
-        let expectedItem = BookmarksBarViewModel.ExistingDraggedItemData(originalIndex: 0, title: "Title")
-        
-        let mockBookmarksManager = createMockBookmarksManager()
-        let viewModel = BookmarksBarViewModel(bookmarkManager: mockBookmarksManager)
-        
-        viewModel.handle(event: .mouseDragged(buttonIndex: 0, location: .zero))
-        XCTAssertEqual(viewModel.state, .beginningDrag(originalLocation: .zero))
-        
-        viewModel.handle(event: .mouseDragged(buttonIndex: 0, location: CGPoint(x: 10, y: 10)))
-        XCTAssertEqual(viewModel.state, .draggingExistingItem(draggedItemData: expectedItem))
-        
-        viewModel.handle(event: .mouseUp)
-        XCTAssertEqual(viewModel.state, .idle)
-    }
     
     private func createMockBookmarksManager() -> BookmarkManager {
         let mockBookmarkStore = BookmarkStoreMock()

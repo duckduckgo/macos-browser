@@ -106,9 +106,8 @@ final class BookmarksBarViewController: NSViewController {
     }
 
     private func subscribeToViewModel() {
-        viewModel.$clippedItems.receive(on: RunLoop.main).sink { [weak self] list in
-            guard let self = self else { return }
-            self.refreshClippedIndicator()
+        viewModel.$clippedItems.receive(on: RunLoop.main).sink { [weak self] _ in
+            self?.refreshClippedIndicator()
         }.store(in: &cancellables)
     }
     
