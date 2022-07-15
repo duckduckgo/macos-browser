@@ -151,7 +151,7 @@ private struct SecondaryCTAStyle: ButtonStyle {
     }
 }
 
-private struct Consts {
+private enum Consts {
     struct Layout {
         static let outerContainerWidth: CGFloat = 490
         static let contentViewWidth: CGFloat = 406
