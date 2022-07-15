@@ -101,7 +101,10 @@ final class AutoconsentUserScript: NSObject, WKScriptMessageHandlerWithReply, Us
 
         return handleMessage(messageName: messageName, messageData: messageData, replyHandler: replyHandler, message: message)
     }
+}
 
+@available(macOS 11, *)
+extension AutoconsentUserScript {
     @MainActor
     func handleMessage(messageName: MessageName,
                        messageData: [String: Any],
@@ -160,7 +163,11 @@ final class AutoconsentUserScript: NSObject, WKScriptMessageHandlerWithReply, Us
         if message.frameInfo.isMainFrame {
             topUrl = url
             // reset dashboard state
-            refreshDashboardState(consentManaged: AutoconsentManagement.shared.sitesNotifiedCache.contains(url.host ?? ""), optoutFailed: nil, selftestFailed: nil)
+            refreshDashboardState(
+                consentManaged: AutoconsentManagement.shared.sitesNotifiedCache.contains(url.host ?? ""),
+                optoutFailed: nil,
+                selftestFailed: nil
+            )
         }
         let remoteConfig = self.config.settings(for: .autoconsent)
         let disabledCMPs = remoteConfig["disabledCMPs"] as? [String] ?? []
