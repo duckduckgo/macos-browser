@@ -52,7 +52,7 @@ final class PrivacyDashboardViewController: NSViewController {
     private func prepareContentBlockingCancellable<Pub: Publisher>(publisher: Pub)
     where Pub.Output == [ContentBlockerRulesManager.CompletionToken], Pub.Failure == Never {
 
-        publisher.receive(on: DispatchQueue.main).sink { [weak self] completionTokens in
+        publisher.receive(on: RunLoop.main).sink { [weak self] completionTokens in
             dispatchPrecondition(condition: .onQueue(.main))
 
             guard let self = self, !self.pendingUpdates.isEmpty else { return }

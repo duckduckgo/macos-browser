@@ -218,11 +218,8 @@ final class MainMenu: NSMenu {
     // swiftlint:enable function_body_length
 
     private func updateBookmarksBarMenuItem() {
-        if PersistentAppInterfaceSettings.shared.showBookmarksBar {
-            toggleBookmarksBarMenuItem?.title = UserText.hideBookmarksBar
-        } else {
-            toggleBookmarksBarMenuItem?.title = UserText.showBookmarksBar
-        }
+        let title = PersistentAppInterfaceSettings.shared.showBookmarksBar ? UserText.hideBookmarksBar : UserText.showBookmarksBar
+        toggleBookmarksBarMenuItem?.title = title
     }
 
     // MARK: - Reopen Last Closed & Recently Closed

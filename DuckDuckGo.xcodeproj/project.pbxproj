@@ -249,7 +249,7 @@
 		4BE4E51C2856A960008A546D /* CGPointExtension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4BE4E51B2856A960008A546D /* CGPointExtension.swift */; };
 		4BE5336B286912D40019DBFD /* BookmarksBarCollectionViewItem.xib in Resources */ = {isa = PBXBuildFile; fileRef = 4BE53369286912D40019DBFD /* BookmarksBarCollectionViewItem.xib */; };
 		4BE5336C286912D40019DBFD /* BookmarksBarCollectionViewItem.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4BE5336A286912D40019DBFD /* BookmarksBarCollectionViewItem.swift */; };
-		4BE5336E286915A10019DBFD /* CompositionalLayout.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4BE5336D286915A10019DBFD /* CompositionalLayout.swift */; };
+		4BE5336E286915A10019DBFD /* HorizontallyCenteredLayout.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4BE5336D286915A10019DBFD /* HorizontallyCenteredLayout.swift */; };
 		4BE53374286E39F10019DBFD /* ChromiumKeychainPrompt.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4BE53373286E39F10019DBFD /* ChromiumKeychainPrompt.swift */; };
 		4BE65474271FCD40008D1D63 /* PasswordManagementIdentityItemView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4BE6546E271FCD40008D1D63 /* PasswordManagementIdentityItemView.swift */; };
 		4BE65476271FCD41008D1D63 /* PasswordManagementCreditCardItemView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4BE65470271FCD40008D1D63 /* PasswordManagementCreditCardItemView.swift */; };
@@ -1033,7 +1033,7 @@
 		4BE4E51B2856A960008A546D /* CGPointExtension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CGPointExtension.swift; sourceTree = "<group>"; };
 		4BE53369286912D40019DBFD /* BookmarksBarCollectionViewItem.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = BookmarksBarCollectionViewItem.xib; sourceTree = "<group>"; };
 		4BE5336A286912D40019DBFD /* BookmarksBarCollectionViewItem.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = BookmarksBarCollectionViewItem.swift; sourceTree = "<group>"; };
-		4BE5336D286915A10019DBFD /* CompositionalLayout.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CompositionalLayout.swift; sourceTree = "<group>"; };
+		4BE5336D286915A10019DBFD /* HorizontallyCenteredLayout.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = HorizontallyCenteredLayout.swift; sourceTree = "<group>"; };
 		4BE53373286E39F10019DBFD /* ChromiumKeychainPrompt.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChromiumKeychainPrompt.swift; sourceTree = "<group>"; };
 		4BE6546E271FCD40008D1D63 /* PasswordManagementIdentityItemView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PasswordManagementIdentityItemView.swift; sourceTree = "<group>"; };
 		4BE65470271FCD40008D1D63 /* PasswordManagementCreditCardItemView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PasswordManagementCreditCardItemView.swift; sourceTree = "<group>"; };
@@ -2178,7 +2178,7 @@
 				4BD18F04283F151F00058124 /* BookmarksBar.storyboard */,
 				4BE5336A286912D40019DBFD /* BookmarksBarCollectionViewItem.swift */,
 				4BE53369286912D40019DBFD /* BookmarksBarCollectionViewItem.xib */,
-				4BE5336D286915A10019DBFD /* CompositionalLayout.swift */,
+				4BE5336D286915A10019DBFD /* HorizontallyCenteredLayout.swift */,
 			);
 			path = View;
 			sourceTree = "<group>";
@@ -3133,10 +3133,10 @@
 		AA97BF4425135CB60014931A /* Menus */ = {
 			isa = PBXGroup;
 			children = (
+				AA97BF4525135DD30014931A /* ApplicationDockMenu.swift */,
 				85480F8925CDC360009424E3 /* MainMenu.storyboard */,
 				AA4BBA3A25C58FA200C4FB0F /* MainMenu.swift */,
 				AA6EF9B425081B4C004754E6 /* MainMenuActions.swift */,
-				AA97BF4525135DD30014931A /* ApplicationDockMenu.swift */,
 				B63ED0E426BB8FB900A9DAD1 /* SharingMenu.swift */,
 			);
 			path = Menus;
@@ -4730,7 +4730,7 @@
 				37AFCE8127DA2CA600471A10 /* PreferencesViewController.swift in Sources */,
 				4B02198A25E05FAC00ED7DEA /* FireproofDomains.swift in Sources */,
 				4B677442255DBEEA00025BD8 /* Database.swift in Sources */,
-				4BE5336E286915A10019DBFD /* CompositionalLayout.swift in Sources */,
+				4BE5336E286915A10019DBFD /* HorizontallyCenteredLayout.swift in Sources */,
 				4B92928B26670D1700AD2C21 /* BookmarksOutlineView.swift in Sources */,
 				B61F015525EDD5A700ABB5A3 /* UserContentController.swift in Sources */,
 				4BF01C00272AE74C00884A61 /* CountryList.swift in Sources */,

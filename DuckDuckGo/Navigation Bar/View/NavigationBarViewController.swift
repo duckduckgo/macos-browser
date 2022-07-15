@@ -132,7 +132,7 @@ final class NavigationBarViewController: NSViewController {
         view.layer?.masksToBounds = false
         addressBarContainer.wantsLayer = true
         addressBarContainer.layer?.masksToBounds = false
-        
+
         setupNavigationButtonMenus()
         subscribeToSelectedTabViewModel()
         listenToPasswordManagerNotifications()

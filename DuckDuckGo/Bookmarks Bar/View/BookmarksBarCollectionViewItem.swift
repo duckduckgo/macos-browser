@@ -64,16 +64,14 @@ final class BookmarksBarCollectionViewItem: NSCollectionViewItem {
     weak var delegate: BookmarksBarCollectionViewItemDelegate?
     private var entityType: EntityType?
     
-    /// MouseClickView is prone to sending mouseUp events without a preceding mouseDown. This tracks whether to consider a click as legitimate and use it to trigger navigation from the bookmarks bar.
+    /// MouseClickView is prone to sending mouseUp events without a preceding mouseDown.
+    /// This tracks whether to consider a click as legitimate and use it to trigger navigation from the bookmarks bar.
     private var receivedMouseDownEvent = false
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        
-        self.view.wantsLayer = true
-        self.view.layer?.cornerRadius = 4.0
-        self.view.layer?.masksToBounds = true
-        
+
+        configureLayer()
         createMenu()
     }
     
@@ -110,6 +108,12 @@ final class BookmarksBarCollectionViewItem: NSCollectionViewItem {
         case .folder:
             faviconView.image = NSImage(named: "Folder-16")
         }
+    }
+    
+    private func configureLayer() {
+        view.wantsLayer = true
+        view.layer?.cornerRadius = 4.0
+        view.layer?.masksToBounds = true
     }
     
     private func createMenu() {

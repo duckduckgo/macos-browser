@@ -70,9 +70,9 @@ final class BookmarksBarViewModel: NSObject {
         didSet {
             let itemsWidth = bookmarksBarItems.reduce(CGFloat(0)) { total, item in
                 if total == 0 {
-                    return total + self.cachedWidth(buttonTitle: item.title, isFolder: item.isFolder)
+                    return total + cachedWidth(buttonTitle: item.title)
                 } else {
-                    return total + Constants.buttonSpacing + self.cachedWidth(buttonTitle: item.title, isFolder: item.isFolder)
+                    return total + Constants.buttonSpacing + cachedWidth(buttonTitle: item.title)
                 }
             }
 
@@ -98,7 +98,7 @@ final class BookmarksBarViewModel: NSObject {
         var displayableItems: [BookmarksBarItem] = []
 
         for (index, entity) in bookmarkEntities.enumerated() {
-            let calculatedWidth = self.cachedWidth(buttonTitle: entity.title, isFolder: entity.isFolder)
+            let calculatedWidth = self.cachedWidth(buttonTitle: entity.title)
             
             if currentTotalWidth == 0 {
                 currentTotalWidth += calculatedWidth
@@ -130,7 +130,7 @@ final class BookmarksBarViewModel: NSObject {
         }
     }
  
-    func cachedWidth(buttonTitle: String, isFolder: Bool = false) -> CGFloat {
+    func cachedWidth(buttonTitle: String) -> CGFloat {
         if let cachedValue = collectionViewItemSizeCache[buttonTitle] {
             return cachedValue + Constants.additionalItemWidth
         } else {            

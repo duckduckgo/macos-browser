@@ -1,5 +1,5 @@
 //
-//  CompositionalLayout.swift
+//  HorizontallyCenteredLayout.swift
 //
 //  Copyright © 2022 DuckDuckGo. All rights reserved.
 //

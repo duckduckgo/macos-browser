@@ -84,7 +84,7 @@ final class BookmarksBarViewController: NSViewController {
     
     private func createCenteredLayout(centered: Bool) -> NSCollectionLayoutSection {
         let widths = viewModel.bookmarksBarItems.map { item in
-            return viewModel.cachedWidth(buttonTitle: item.title, isFolder: item.isFolder)
+            return viewModel.cachedWidth(buttonTitle: item.title)
         }
 
         let cellSizes = widths.map { CGSize(width: $0, height: 28) }
@@ -148,8 +148,7 @@ final class BookmarksBarViewController: NSViewController {
     }
     
     private func restoreNextClippedItemToBookmarksBarIfPossible(item: BookmarkViewModel) -> Bool {
-        let widthOfRestorableItem = viewModel.cachedWidth(buttonTitle: item.entity.title,
-                                                          isFolder: item.entity.isFolder)
+        let widthOfRestorableItem = viewModel.cachedWidth(buttonTitle: item.entity.title)
         let newMaximumWidth = viewModel.bookmarksBarItemsTotalWidth + 10 + widthOfRestorableItem
 
         if newMaximumWidth < clipThreshold {
@@ -167,7 +166,7 @@ final class BookmarksBarViewController: NSViewController {
     @IBAction
     private func clippedItemsIndicatorClicked(_ sender: NSButton) {
         let menu = viewModel.buildClippedItemsMenu()
-        let location = NSPoint(x: 0, y: sender.frame.height + 5) // Magic number to adjust the height.
+        let location = NSPoint(x: 0, y: sender.frame.height + 5)
 
         menu.popUp(positioning: nil, at: location, in: sender)
     }
