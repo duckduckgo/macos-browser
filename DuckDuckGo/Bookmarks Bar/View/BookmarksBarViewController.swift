@@ -195,7 +195,7 @@ extension BookmarksBarViewController: BookmarksBarViewModelDelegate {
                 tabCollectionViewModel.appendNewTab(with: .url(bookmark.url), selected: false)
             case .openInNewWindow:
                 WindowsManager.openNewWindow(with: bookmark.url)
-            case .loadURL:
+            case .clickItem:
                 WindowControllersManager.shared.show(url: bookmark.url)
             case .toggleFavorite:                
                 bookmark.isFavorite = !bookmark.isFavorite
@@ -207,7 +207,7 @@ extension BookmarksBarViewController: BookmarksBarViewModelDelegate {
             }
         } else if let folder = entity as? BookmarkFolder {
             switch action {
-            case .loadURL:
+            case .clickItem:
                 let childEntities = folder.children
                 let viewModels = childEntities.map { BookmarkViewModel(entity: $0) }
                 let menuItems = viewModel.bookmarksTreeMenuItems(from: viewModels, topLevel: true)

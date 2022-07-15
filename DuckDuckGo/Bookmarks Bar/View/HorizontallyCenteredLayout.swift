@@ -24,26 +24,28 @@ extension NSCollectionLayoutGroup {
         
         return custom(layoutSize: groupSize) { environment in
             let verticalPosition: CGFloat = environment.container.contentInsets.top
-
-            var items: [NSCollectionLayoutGroupCustomItem] = []
-            let totalWidth = cellSizes.map(\.width).reduce(0) {
-                $0 == 0 ? $1 : $0 + interItemSpacing + $1
-            }
-            
-            var xPos: CGFloat
-            
-            if centered {
-                xPos = (environment.container.effectiveContentSize.width - totalWidth) / 2 + environment.container.contentInsets.leading
-            } else {
-                xPos = interItemSpacing
-            }
-            
+            let totalWidth = cellSizes.map(\.width).reduce(0) { $0 == 0 ? $1 : $0 + interItemSpacing + $1 }
             let maxItemHeight = cellSizes.map(\.height).max() ?? 0
 
-            let rowItems: [NSCollectionLayoutGroupCustomItem] = cellSizes.map {
-                let rect = CGRect(origin: CGPoint(x: xPos, y: verticalPosition + (maxItemHeight - $0.height) / 2), size: $0)
-                xPos += ($0.width + interItemSpacing)
-                return NSCollectionLayoutGroupCustomItem(frame: rect)
+            var items: [NSCollectionLayoutGroupCustomItem] = []
+            var horizontalPosition: CGFloat
+            
+            // Derive initial horizontal position:
+            
+            if centered {
+                horizontalPosition = (environment.container.effectiveContentSize.width - totalWidth) / 2 + environment.container.contentInsets.leading
+            } else {
+                horizontalPosition = interItemSpacing
+            }
+
+            // Calculate frames for layout group items:
+            
+            let rowItems: [NSCollectionLayoutGroupCustomItem] = cellSizes.map { size in
+                let origin = CGPoint(x: horizontalPosition, y: verticalPosition + (maxItemHeight - size.height) / 2)
+                let itemFrame = CGRect(origin: origin, size: size)
+                horizontalPosition += (size.width + interItemSpacing)
+
+                return NSCollectionLayoutGroupCustomItem(frame: itemFrame)
             }
             
             items.append(contentsOf: rowItems)

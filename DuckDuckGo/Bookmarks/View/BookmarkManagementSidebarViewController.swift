@@ -98,7 +98,7 @@ final class BookmarkManagementSidebarViewController: NSViewController {
             }
         }.store(in: &cancellables)
 
-        LocalBookmarkManager.shared.listPublisher.receive(on: DispatchQueue.main).sink { [weak self] _ in
+        LocalBookmarkManager.shared.listPublisher.receive(on: RunLoop.main).sink { [weak self] _ in
             self?.reloadData()
         }.store(in: &cancellables)
     }

@@ -19,8 +19,6 @@
 import AppKit
 
 struct BookmarkViewModel {
-
-    static let maxMenuTitleLength = 55
  
     let entity: BaseBookmarkEntity
 

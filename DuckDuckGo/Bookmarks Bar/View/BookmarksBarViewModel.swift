@@ -36,10 +36,12 @@ final class BookmarksBarViewModel: NSObject {
         static let labelFont = NSFont.systemFont(ofSize: 12)
         
         static let additionalItemWidth = 34.0
+        
+        static let interItemGapIndicatorIdentifier = "NSCollectionElementKindInterItemGapIndicator"
     }
     
     enum BookmarksBarItemAction {
-        case loadURL
+        case clickItem
         case openInBackgroundTab
         case openInNewTab
         case openInNewWindow
@@ -216,7 +218,7 @@ extension BookmarksBarViewModel: NSCollectionViewDelegate, NSCollectionViewDataS
     func collectionView(_ collectionView: NSCollectionView,
                         viewForSupplementaryElementOfKind kind: NSCollectionView.SupplementaryElementKind,
                         at indexPath: IndexPath) -> NSView {
-        guard kind == "NSCollectionElementKindInterItemGapIndicator" else {
+        guard kind == Constants.interItemGapIndicatorIdentifier else {
             assertionFailure("Received requested for unexpected supplementary element type")
             return NSView()
         }
@@ -311,7 +313,7 @@ extension BookmarksBarViewModel: NSCollectionViewDelegate, NSCollectionViewDataS
 
             return true
         } else {
-            guard let item = draggingInfo.draggingPasteboard.pasteboardItems?.first, let draggedItemData = titleAndURL(from: item) else {
+            guard let item = draggingInfo.draggingPasteboard.pasteboardItems?.first, let draggedItemData = item.draggedWebViewValues() else {
                 return false
             }
             
@@ -320,6 +322,8 @@ extension BookmarksBarViewModel: NSCollectionViewDelegate, NSCollectionViewDataS
         }
     }
     
+    /// On rare occasions, a click event will be sent immediately after a drag and drop operation completes.
+    /// To prevent drag and drop from accidentally triggering a bookmark to load or folder to open, all click events are ignored for a short period after a drop has been accepted.
     private func beginClickPreventionTimer() {
         preventClicks = true
         
@@ -328,23 +332,12 @@ extension BookmarksBarViewModel: NSCollectionViewDelegate, NSCollectionViewDataS
         }
     }
     
-    private func titleAndURL(from pasteboardItem: NSPasteboardItem) -> (title: String, url: URL)? {
-        guard let urlString = pasteboardItem.string(forType: .URL), let url = URL(string: urlString) else {
-            return nil
-        }
-        
-        // WKWebView pasteboard items include the name of the link under the `public.url-name` type.
-        let name = pasteboardItem.string(forType: NSPasteboard.PasteboardType(rawValue: "public.url-name"))
-        return (title: name ?? urlString, url: url)
-    }
-    
 }
 
 extension BookmarksBarViewModel: BookmarksBarCollectionViewItemDelegate {
 
     func bookmarksBarCollectionViewItemClicked(_ item: BookmarksBarCollectionViewItem) {
         guard !preventClicks else {
-            print("DEBUG: Prevented click")
             return
         }
 
@@ -355,7 +348,7 @@ extension BookmarksBarViewModel: BookmarksBarCollectionViewItemDelegate {
         } else if NSApplication.shared.isCommandPressed {
             action = .openInBackgroundTab
         } else {
-            action = .loadURL
+            action = .clickItem
         }
         
         delegate?.bookmarksBarViewModelReceived(action: action, for: item)
