@@ -1110,7 +1110,6 @@ extension BrowserTabViewController {
             .flatMap(\.mainViewController.tabCollectionViewModel.$selectionIndex)
             .compactMap { $0 }
             .removeDuplicates()
-            .receive(on: DispatchQueue.main)
             .sink { [weak self] index in
                 self?.handleTabSelectedInKeyWindow(index)
             }
@@ -1125,6 +1124,8 @@ extension BrowserTabViewController {
     }
 
     private func makeWebViewSnapshot() {
+        dispatchPrecondition(condition: .onQueue(.main))
+
         guard let webView = webView else {
             os_log("BrowserTabViewController: failed to create a snapshot of webView", type: .error)
             return
