@@ -11,11 +11,11 @@
         <customObject id="-1" userLabel="First Responder" customClass="FirstResponder"/>
         <customObject id="-3" userLabel="Application" customClass="NSObject"/>
         <customView id="Hz6-mo-xeY">
-            <rect key="frame" x="0.0" y="0.0" width="255" height="99"/>
+            <rect key="frame" x="0.0" y="0.0" width="184" height="99"/>
             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
             <subviews>
                 <customView translatesAutoresizingMaskIntoConstraints="NO" id="Ff3-Xx-JTo" customClass="MouseOverView" customModule="DuckDuckGo_Privacy_Browser" customModuleProvider="target">
-                    <rect key="frame" x="0.0" y="0.0" width="255" height="99"/>
+                    <rect key="frame" x="0.0" y="0.0" width="184" height="99"/>
                     <userDefinedRuntimeAttributes>
                         <userDefinedRuntimeAttribute type="color" keyPath="mouseOverColor">
                             <color key="value" name="ButtonMouseOverColor"/>
@@ -23,7 +23,7 @@
                     </userDefinedRuntimeAttributes>
                 </customView>
                 <stackView distribution="fill" orientation="horizontal" alignment="centerY" spacing="4" horizontalStackHuggingPriority="249.99998474121094" verticalStackHuggingPriority="249.99998474121094" detachesHiddenViews="YES" translatesAutoresizingMaskIntoConstraints="NO" id="KId-EQ-QP4">
-                    <rect key="frame" x="7" y="0.0" width="241" height="99"/>
+                    <rect key="frame" x="7" y="0.0" width="170" height="99"/>
                     <subviews>
                         <imageView horizontalHuggingPriority="251" verticalHuggingPriority="251" translatesAutoresizingMaskIntoConstraints="NO" id="aEY-jN-qvL" userLabel="Favicon Image View">
                             <rect key="frame" x="0.0" y="42" width="16" height="16"/>
@@ -35,9 +35,9 @@
                             <color key="contentTintColor" name="BlackWhite80"/>
                         </imageView>
                         <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="fMp-kj-J3A">
-                            <rect key="frame" x="18" y="42" width="225" height="15"/>
+                            <rect key="frame" x="18" y="42" width="154" height="15"/>
                             <textFieldCell key="cell" lineBreakMode="truncatingMiddle" alignment="left" title="Bookmark" id="7mq-oj-2L8">
-                                <font key="font" metaFont="system" size="12"/>
+                                <font key="font" metaFont="cellTitle"/>
                                 <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
                                 <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
                             </textFieldCell>
@@ -53,7 +53,7 @@
                     </customSpacing>
                 </stackView>
                 <customView translatesAutoresizingMaskIntoConstraints="NO" id="IHK-ff-XkT" customClass="MouseClickView" customModule="DuckDuckGo_Privacy_Browser" customModuleProvider="target">
-                    <rect key="frame" x="0.0" y="0.0" width="255" height="99"/>
+                    <rect key="frame" x="0.0" y="0.0" width="184" height="99"/>
                 </customView>
             </subviews>
             <constraints>

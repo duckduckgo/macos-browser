@@ -33,9 +33,9 @@ final class BookmarksBarViewModel: NSObject {
         static let buttonSpacing: CGFloat = 6
         static let buttonHeight: CGFloat = 28
         static let maximumButtonWidth: CGFloat = 120
-        static let labelFont = NSFont.systemFont(ofSize: 11)
+        static let labelFont = NSFont.systemFont(ofSize: 12)
         
-        static let additionalItemWidth = 30.0
+        static let additionalItemWidth = 34.0
     }
     
     enum BookmarksBarItemAction {
@@ -135,6 +135,8 @@ final class BookmarksBarViewModel: NSObject {
             return cachedValue + Constants.additionalItemWidth
         } else {            
             let calculationLabel = NSTextField.label(titled: buttonTitle)
+            calculationLabel.font = Constants.labelFont
+            calculationLabel.lineBreakMode = .byTruncatingMiddle
             calculationLabel.sizeToFit()
             let cappedTitleWidth = min(Constants.maximumButtonWidth, calculationLabel.frame.width)
 
