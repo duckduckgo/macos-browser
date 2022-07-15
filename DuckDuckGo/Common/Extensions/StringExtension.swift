@@ -17,7 +17,6 @@
 //
 
 import Foundation
-import AppKit
 import os.log
 
 typealias RegEx = NSRegularExpression

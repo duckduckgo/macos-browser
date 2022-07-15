@@ -104,7 +104,6 @@
 		4B39AAF627D9B2C700A73FD5 /* NSStackViewExtension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B39AAF527D9B2C700A73FD5 /* NSStackViewExtension.swift */; };
 		4B3F641E27A8D3BD00E0C118 /* BrowserProfileTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B3F641D27A8D3BD00E0C118 /* BrowserProfileTests.swift */; };
 		4B434690285ED7A100177407 /* BookmarksBarViewModelTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B43468F285ED7A100177407 /* BookmarksBarViewModelTests.swift */; };
-		4B434692285F841F00177407 /* NSEventExtension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B434691285F841F00177407 /* NSEventExtension.swift */; };
 		4B43469528655D1400177407 /* FirefoxDataImporterTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B43469428655D1400177407 /* FirefoxDataImporterTests.swift */; };
 		4B4F72EC266B2ED300814C60 /* CollectionExtension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B4F72EB266B2ED300814C60 /* CollectionExtension.swift */; };
 		4B59023D26B35F3600489384 /* ChromeDataImporter.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B59023826B35F3600489384 /* ChromeDataImporter.swift */; };
@@ -246,7 +245,6 @@
 		4BE4005327CF3DC3007D3161 /* SavePaymentMethodPopover.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4BE4005227CF3DC3007D3161 /* SavePaymentMethodPopover.swift */; };
 		4BE4005527CF3F19007D3161 /* SavePaymentMethodViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4BE4005427CF3F19007D3161 /* SavePaymentMethodViewController.swift */; };
 		4BE41A5E28446EAD00760399 /* BookmarksBarViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4BE41A5D28446EAD00760399 /* BookmarksBarViewModel.swift */; };
-		4BE4E51C2856A960008A546D /* CGPointExtension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4BE4E51B2856A960008A546D /* CGPointExtension.swift */; };
 		4BE5336B286912D40019DBFD /* BookmarksBarCollectionViewItem.xib in Resources */ = {isa = PBXBuildFile; fileRef = 4BE53369286912D40019DBFD /* BookmarksBarCollectionViewItem.xib */; };
 		4BE5336C286912D40019DBFD /* BookmarksBarCollectionViewItem.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4BE5336A286912D40019DBFD /* BookmarksBarCollectionViewItem.swift */; };
 		4BE5336E286915A10019DBFD /* HorizontallyCenteredLayout.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4BE5336D286915A10019DBFD /* HorizontallyCenteredLayout.swift */; };
@@ -886,7 +884,6 @@
 		4B39AAF527D9B2C700A73FD5 /* NSStackViewExtension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NSStackViewExtension.swift; sourceTree = "<group>"; };
 		4B3F641D27A8D3BD00E0C118 /* BrowserProfileTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BrowserProfileTests.swift; sourceTree = "<group>"; };
 		4B43468F285ED7A100177407 /* BookmarksBarViewModelTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BookmarksBarViewModelTests.swift; sourceTree = "<group>"; };
-		4B434691285F841F00177407 /* NSEventExtension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NSEventExtension.swift; sourceTree = "<group>"; };
 		4B43469428655D1400177407 /* FirefoxDataImporterTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FirefoxDataImporterTests.swift; sourceTree = "<group>"; };
 		4B4F72EB266B2ED300814C60 /* CollectionExtension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CollectionExtension.swift; sourceTree = "<group>"; };
 		4B59023826B35F3600489384 /* ChromeDataImporter.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ChromeDataImporter.swift; sourceTree = "<group>"; };
@@ -1030,7 +1027,6 @@
 		4BE4005227CF3DC3007D3161 /* SavePaymentMethodPopover.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SavePaymentMethodPopover.swift; sourceTree = "<group>"; };
 		4BE4005427CF3F19007D3161 /* SavePaymentMethodViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SavePaymentMethodViewController.swift; sourceTree = "<group>"; };
 		4BE41A5D28446EAD00760399 /* BookmarksBarViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BookmarksBarViewModel.swift; sourceTree = "<group>"; };
-		4BE4E51B2856A960008A546D /* CGPointExtension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CGPointExtension.swift; sourceTree = "<group>"; };
 		4BE53369286912D40019DBFD /* BookmarksBarCollectionViewItem.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = BookmarksBarCollectionViewItem.xib; sourceTree = "<group>"; };
 		4BE5336A286912D40019DBFD /* BookmarksBarCollectionViewItem.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = BookmarksBarCollectionViewItem.swift; sourceTree = "<group>"; };
 		4BE5336D286915A10019DBFD /* HorizontallyCenteredLayout.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = HorizontallyCenteredLayout.swift; sourceTree = "<group>"; };
@@ -3413,7 +3409,6 @@
 				AA61C0D12727F59B00E6B681 /* ArrayExtension.swift */,
 				AA7EB6E427E7D6DC00036718 /* AnimationView.swift */,
 				B6106B9D26A565DA0013B453 /* BundleExtension.swift */,
-				4BE4E51B2856A960008A546D /* CGPointExtension.swift */,
 				4BA1A6C1258B0A1300F6F690 /* ContiguousBytesExtension.swift */,
 				85AC3AF625D5DBFD00C7D2AA /* DataExtension.swift */,
 				B6A9E46F26146A250067D1B9 /* DateExtension.swift */,
@@ -3474,7 +3469,6 @@
 				4B7A60A0273E0BE400BBDFEB /* WKWebsiteDataStoreExtension.swift */,
 				4B39AAF527D9B2C700A73FD5 /* NSStackViewExtension.swift */,
 				4B980E202817604000282EE1 /* NSNotificationName+Debug.swift */,
-				4B434691285F841F00177407 /* NSEventExtension.swift */,
 			);
 			path = Extensions;
 			sourceTree = "<group>";
@@ -4404,7 +4398,6 @@
 				85589E9127BFB9810038AD11 /* HomePageRecentlyVisitedModel.swift in Sources */,
 				4BB99CFE26FE191E001E4761 /* FirefoxBookmarksReader.swift in Sources */,
 				4BBC16A227C485BC00E00A38 /* DeviceIdleStateDetector.swift in Sources */,
-				4BE4E51C2856A960008A546D /* CGPointExtension.swift in Sources */,
 				B6A9E4A3261475C70067D1B9 /* AppUsageActivityMonitor.swift in Sources */,
 				4B379C2427BDE1B0008A968E /* FlatButton.swift in Sources */,
 				4BA1A6A0258B079600F6F690 /* DataEncryption.swift in Sources */,
@@ -4491,7 +4484,6 @@
 				4B29759728281F0900187C4E /* FirefoxEncryptionKeyReader.swift in Sources */,
 				4B9292D02667123700AD2C21 /* BookmarkManagementSplitViewController.swift in Sources */,
 				B6E61EE3263AC0C8004E11AB /* FileManagerExtension.swift in Sources */,
-				4B434692285F841F00177407 /* NSEventExtension.swift in Sources */,
 				B6DB3CFB26A17CB800D459B7 /* PermissionModel.swift in Sources */,
 				4B92929C26670D2A00AD2C21 /* PasteboardFolder.swift in Sources */,
 				B6106BAB26A7BF1D0013B453 /* PermissionType.swift in Sources */,
