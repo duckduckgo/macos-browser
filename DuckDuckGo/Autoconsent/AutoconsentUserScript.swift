@@ -156,13 +156,10 @@ final class AutoconsentUserScript: NSObject, WKScriptMessageHandlerWithReply, Us
         }
         let remoteConfig = self.config.settings(for: .autoconsent)
         let disabledCMPs = remoteConfig["disabledCMPs"] as? [String] ?? []
-        let rulesUrl = Bundle.main.url(forResource: "rules", withExtension: "json")!
-        let rulesData = (try? Data(contentsOf: rulesUrl))!
-        let rules = try? JSONSerialization.jsonObject(with: rulesData, options: [])
 
         replyHandler([
             "type": "initResp",
-            "rules": rules,
+            "rules": nil, // rules are bundled with the content script atm
             "config": [
                 "enabled": true,
                 // if it's the first time, disable autoAction
