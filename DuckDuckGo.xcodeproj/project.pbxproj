@@ -432,6 +432,7 @@
 		AA7E919728746BCC00AB6B62 /* HistoryMenu.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA7E919628746BCC00AB6B62 /* HistoryMenu.swift */; };
 		AA7E919A2875B39300AB6B62 /* Visit.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA7E91992875B39300AB6B62 /* Visit.swift */; };
 		AA7E919C2875C65000AB6B62 /* Stored.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA7E919B2875C65000AB6B62 /* Stored.swift */; };
+		AA7E919F287872EA00AB6B62 /* VisitViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA7E919E287872EA00AB6B62 /* VisitViewModel.swift */; };
 		AA7EB6DF27E7C57D00036718 /* MouseOverAnimationButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA7EB6DE27E7C57D00036718 /* MouseOverAnimationButton.swift */; };
 		AA7EB6E227E7D05500036718 /* flame-mouse-over.json in Resources */ = {isa = PBXBuildFile; fileRef = AA7EB6E027E7D05500036718 /* flame-mouse-over.json */; };
 		AA7EB6E327E7D05500036718 /* dark-flame-mouse-over.json in Resources */ = {isa = PBXBuildFile; fileRef = AA7EB6E127E7D05500036718 /* dark-flame-mouse-over.json */; };
@@ -1216,6 +1217,7 @@
 		AA7E91982875AB4700AB6B62 /* History 6.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = "History 6.xcdatamodel"; sourceTree = "<group>"; };
 		AA7E91992875B39300AB6B62 /* Visit.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Visit.swift; sourceTree = "<group>"; };
 		AA7E919B2875C65000AB6B62 /* Stored.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Stored.swift; sourceTree = "<group>"; };
+		AA7E919E287872EA00AB6B62 /* VisitViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VisitViewModel.swift; sourceTree = "<group>"; };
 		AA7EB6DE27E7C57D00036718 /* MouseOverAnimationButton.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MouseOverAnimationButton.swift; sourceTree = "<group>"; };
 		AA7EB6E027E7D05500036718 /* flame-mouse-over.json */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.json; path = "flame-mouse-over.json"; sourceTree = "<group>"; };
 		AA7EB6E127E7D05500036718 /* dark-flame-mouse-over.json */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.json; path = "dark-flame-mouse-over.json"; sourceTree = "<group>"; };
@@ -2863,6 +2865,14 @@
 			path = "Recently Closed";
 			sourceTree = "<group>";
 		};
+		AA7E919D287872DB00AB6B62 /* ViewModel */ = {
+			isa = PBXGroup;
+			children = (
+				AA7E919E287872EA00AB6B62 /* VisitViewModel.swift */,
+			);
+			path = ViewModel;
+			sourceTree = "<group>";
+		};
 		AA7EB6EE27E880EA00036718 /* Animations */ = {
 			isa = PBXGroup;
 			children = (
@@ -3462,6 +3472,7 @@
 		AAE75275263B036300B973F8 /* History */ = {
 			isa = PBXGroup;
 			children = (
+				AA7E919D287872DB00AB6B62 /* ViewModel */,
 				AAE75277263B038F00B973F8 /* Model */,
 				AAE75276263B038A00B973F8 /* Services */,
 			);
@@ -4259,6 +4270,7 @@
 				4BBE0AA727B9B027003B37A8 /* PopUpButton.swift in Sources */,
 				AABEE6A524AA0A7F0043105B /* SuggestionViewController.swift in Sources */,
 				85589E8027BBB8630038AD11 /* AddEditFavoriteWindow.swift in Sources */,
+				AA7E919F287872EA00AB6B62 /* VisitViewModel.swift in Sources */,
 				B69B503B2726A12500758A2B /* Atb.swift in Sources */,
 				B6B1E88026D5DA9B0062C350 /* DownloadsViewController.swift in Sources */,
 				85AC3AF725D5DBFD00C7D2AA /* DataExtension.swift in Sources */,

@@ -486,6 +486,7 @@ CA
                                         <menuItem title="Reopen All Windows from Last Session" enabled="NO" id="C6V-uF-uX8">
                                             <modifierMask key="keyEquivalentModifierMask"/>
                                         </menuItem>
+                                        <menuItem isSeparatorItem="YES" id="eoz-XM-HpQ"/>
                                     </items>
                                     <connections>
                                         <outlet property="recentlyClosedMenuItem" destination="pWT-lm-yTC" id="bhY-MN-oMZ"/>

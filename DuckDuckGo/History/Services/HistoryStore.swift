@@ -199,6 +199,7 @@ final class HistoryStore: HistoryStoring {
                 $0.savingState == .initialized
             }
             .forEach {
+                $0.savingState = .saved
                 if case .failure = self.insert(visit: $0,
                                                into: historyEntryManagedObject,
                                                context: context) {
@@ -247,7 +248,9 @@ fileprivate extension HistoryEntry {
         let numberOfTotalVisits = historyEntryMO.numberOfTotalVisits
         let numberOfTrackersBlocked = historyEntryMO.numberOfTrackersBlocked
         let blockedTrackingEntities = historyEntryMO.blockedTrackingEntities ?? ""
-        let visits = Set(historyEntryMO.visits?.compactMap { Visit(visitMO: $0 as? VisitManagedObject) } ?? [])
+        let visits = Set(historyEntryMO.visits?.allObjects.compactMap {
+            Visit(visitMO: $0 as? VisitManagedObject)
+        } ?? [])
 
         self.init(identifier: identifier,
                   url: url,
@@ -259,6 +262,10 @@ fileprivate extension HistoryEntry {
                   numberOfTrackersBlocked: Int(numberOfTrackersBlocked),
                   blockedTrackingEntities: Set<String>(blockedTrackingEntities.components(separatedBy: "|")),
                   trackersFound: historyEntryMO.trackersFound)
+
+        visits.forEach { visit in
+            visit.historyEntry = self
+        }
     }
 
 }

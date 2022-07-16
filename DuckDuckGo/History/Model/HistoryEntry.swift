@@ -58,7 +58,7 @@ final class HistoryEntry: Stored {
     var visits: Set<Visit>
 
     func addVisit() {
-        let visit = Visit(date: Date())
+        let visit = Visit(date: Date(), historyEntry: self)
         visits.insert(visit)
 
         numberOfTotalVisits += 1

@@ -20,13 +20,15 @@ import Foundation
 
 final class Visit: Stored {
 
-    init(date: Date, identifier: UUID? = nil) {
+    init(date: Date, identifier: UUID? = nil, historyEntry: HistoryEntry? = nil) {
         self.date = date
         self.identifier = identifier
+        self.historyEntry = historyEntry
     }
 
     let date: Date
     var identifier: UUID?
+    weak var historyEntry: HistoryEntry?
 
 }
 

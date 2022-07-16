@@ -18,6 +18,7 @@
 
 import Cocoa
 import Combine
+import os.log
 
 final class HistoryMenu: NSMenu {
 
@@ -33,6 +34,7 @@ final class HistoryMenu: NSMenu {
         }
     }
 
+    private let historyCoordinator: HistoryCoordinating = HistoryCoordinator.shared
     private var recentlyClosedMenu: RecentlyClosedMenu?
     private let reopenMenuItemKeyEquivalentManager = ReopenMenuItemKeyEquivalentManager()
 
@@ -64,29 +66,16 @@ final class HistoryMenu: NSMenu {
 
     // MARK: - Recently Visited
 
-    var recentlyVisitedHeaderMenuItem: NSMenuItem?
+    var recentlyVisitedHeaderMenuItem: NSMenuItem {
+        let item = NSMenuItem(title: "Recently Visited", action: nil, target: nil, keyEquivalent: "")
+        item.isEnabled = false
+        return item
+    }
+
     var recentlyVisitedMenuItems = [NSMenuItem]()
 
     private func updateRecentlyVisited() {
-        updateRecentlyVisitedHeader()
         updateRecentlyVisitedItems()
-    }
-
-    private func updateRecentlyVisitedHeader() {
-        if let recentlyVisitedHeaderMenuItem = recentlyVisitedHeaderMenuItem {
-            if !items.contains(recentlyVisitedHeaderMenuItem) {
-                self.recentlyVisitedHeaderMenuItem = nil
-            }
-        }
-
-        if recentlyVisitedHeaderMenuItem == nil {
-            addItem(NSMenuItem.separator())
-
-            let headerItem = NSMenuItem(title: "Recently Visited", action: nil, target: nil, keyEquivalent: "")
-            headerItem.isEnabled = false
-            addItem(headerItem)
-            recentlyVisitedHeaderMenuItem = headerItem
-        }
     }
 
     private func updateRecentlyVisitedItems() {
@@ -94,8 +83,19 @@ final class HistoryMenu: NSMenu {
             recentlyVisitedMenuItems.contains(menuItem)
         }
 
-        //HERE
-        recentlyVisitedMenuItems = []
+        recentlyVisitedMenuItems = [recentlyVisitedHeaderMenuItem]
+        recentlyVisitedMenuItems.append(contentsOf: historyCoordinator.getRecentVisits(maxCount: 14)
+            .map {
+                NSMenuItem(visitViewModel: VisitViewModel(visit: $0), target: self)
+            }
+        )
+        recentlyVisitedMenuItems.forEach {
+            addItem($0)
+        }
+    }
+
+    @objc func openRecentlyVisited(_ sender: NSMenuItem) {
+        //todo
     }
 
 }
@@ -155,4 +155,36 @@ private extension NSApplication {
     var canRestoreLastSessionState: Bool {
         (delegate as? AppDelegate)?.stateRestorationManager?.canRestoreLastSessionState ?? false
     }
+}
+
+private extension HistoryCoordinating {
+
+    func getRecentVisits(maxCount: Int) -> [Visit] {
+        guard let history = history else {
+            os_log("HistoryCoordinator: No history available", type: .error)
+            return []
+        }
+
+        return Array(history
+            .flatMap { entry in
+                Array(entry.visits)
+            }
+            .sorted(by: { (visit1, visit2) in
+                visit1.date > visit2.date
+            })
+            .prefix(maxCount))
+    }
+
+}
+
+private extension NSMenuItem {
+
+    convenience init(visitViewModel: VisitViewModel, target: AnyObject) {
+        self.init(title: visitViewModel.titleTruncated,
+                  action: #selector(HistoryMenu.openRecentlyVisited(_:)),
+                  target: target,
+                  keyEquivalent: "")
+        image = visitViewModel.smallFaviconImage?.resizedToFaviconSize()
+    }
+
 }
