@@ -52,8 +52,6 @@ final class FirePopoverViewController: NSViewController {
     @IBOutlet weak var collectionView: NSCollectionView!
     @IBOutlet weak var collectionViewBottomConstraint: NSLayoutConstraint!
     @IBOutlet weak var warningWrapperView: NSView!
-    @IBOutlet weak var infoWrapperView: NSView!
-    @IBOutlet weak var infoWrapperViewHeightConstraint: NSLayoutConstraint!
     @IBOutlet weak var clearButton: NSButton!
 
     private var viewModelCancellable: AnyCancellable?
@@ -91,7 +89,6 @@ final class FirePopoverViewController: NSViewController {
         setupOptionsButton()
         updateCloseDetailsButton()
         updateWarningWrapperView()
-        updateInfoWrapperView()
 
         subscribeToViewModel()
         subscribeToSelected()
@@ -107,7 +104,6 @@ final class FirePopoverViewController: NSViewController {
         firePopoverViewModel.clearingOption = clearingOption
         updateCloseDetailsButton()
         updateWarningWrapperView()
-        updateInfoWrapperView()
     }
 
     @IBAction func openDetailsButtonAction(_ sender: Any) {
@@ -132,16 +128,6 @@ final class FirePopoverViewController: NSViewController {
         !firePopoverViewModel.areOtherTabsInfluenced || detailsWrapperView.isHidden
 
         collectionViewBottomConstraint.constant = warningWrapperView.isHidden ? 0 : 32
-    }
-
-    private func updateInfoWrapperView() {
-        if view.window != nil {
-            infoWrapperView.animator().isHidden = !firePopoverViewModel.shouldShowPinnedTabsInfo
-            infoWrapperViewHeightConstraint.animator().constant = infoWrapperView.isHidden ? 0 : 32
-        } else {
-            infoWrapperView.isHidden = !firePopoverViewModel.shouldShowPinnedTabsInfo
-            infoWrapperViewHeightConstraint.constant = infoWrapperView.isHidden ? 0 : 32
-        }
     }
 
     @IBAction func clearButtonAction(_ sender: Any) {

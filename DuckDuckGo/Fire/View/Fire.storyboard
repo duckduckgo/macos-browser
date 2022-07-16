@@ -126,11 +126,11 @@
             <objects>
                 <viewController storyboardIdentifier="FirePopoverViewController" id="DMI-mh-xLJ" customClass="FirePopoverViewController" customModule="DuckDuckGo_Privacy_Browser" customModuleProvider="target" sceneMemberID="viewController">
                     <view key="view" id="dGd-Gc-P2e" customClass="ColorView" customModule="DuckDuckGo_Privacy_Browser" customModuleProvider="target">
-                        <rect key="frame" x="0.0" y="0.0" width="328" height="282"/>
+                        <rect key="frame" x="0.0" y="0.0" width="328" height="250"/>
                         <autoresizingMask key="autoresizingMask"/>
                         <subviews>
                             <customView translatesAutoresizingMaskIntoConstraints="NO" id="3Jn-h4-fXL" userLabel="Header Wrapper View">
-                                <rect key="frame" x="0.0" y="134" width="328" height="148"/>
+                                <rect key="frame" x="0.0" y="102" width="328" height="148"/>
                                 <subviews>
                                     <imageView horizontalHuggingPriority="251" verticalHuggingPriority="251" translatesAutoresizingMaskIntoConstraints="NO" id="acV-lE-jVh">
                                         <rect key="frame" x="100" y="64" width="128" height="64"/>
@@ -182,7 +182,7 @@
                                 </constraints>
                             </customView>
                             <customView translatesAutoresizingMaskIntoConstraints="NO" id="sbc-pJ-bul" userLabel="Open Wrapper View">
-                                <rect key="frame" x="0.0" y="92" width="328" height="42"/>
+                                <rect key="frame" x="0.0" y="60" width="328" height="42"/>
                                 <subviews>
                                     <imageView horizontalHuggingPriority="251" verticalHuggingPriority="251" translatesAutoresizingMaskIntoConstraints="NO" id="8qK-6q-RQT">
                                         <rect key="frame" x="296" y="13" width="32" height="16"/>
@@ -227,7 +227,7 @@
                                 </constraints>
                             </customView>
                             <customView hidden="YES" translatesAutoresizingMaskIntoConstraints="NO" id="6vZ-d2-qnR" userLabel="Details Wrapper View">
-                                <rect key="frame" x="0.0" y="-129" width="328" height="263"/>
+                                <rect key="frame" x="0.0" y="-161" width="328" height="263"/>
                                 <subviews>
                                     <customView translatesAutoresizingMaskIntoConstraints="NO" id="553-P8-fEM">
                                         <rect key="frame" x="0.0" y="221" width="328" height="42"/>
@@ -241,11 +241,11 @@
                                                 </userDefinedRuntimeAttributes>
                                             </customView>
                                             <box verticalHuggingPriority="750" fixedFrame="YES" boxType="separator" translatesAutoresizingMaskIntoConstraints="NO" id="zrk-pB-b5b">
-                                                <rect key="frame" x="0.0" y="39" width="328" height="5"/>
+                                                <rect key="frame" x="0.0" y="39" width="320" height="5"/>
                                                 <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                             </box>
                                             <box verticalHuggingPriority="750" fixedFrame="YES" boxType="separator" translatesAutoresizingMaskIntoConstraints="NO" id="L0W-XS-gts">
-                                                <rect key="frame" x="0.0" y="-2" width="328" height="5"/>
+                                                <rect key="frame" x="0.0" y="-2" width="320" height="5"/>
                                                 <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                             </box>
                                             <button translatesAutoresizingMaskIntoConstraints="NO" id="cgG-hF-FAP" customClass="MouseOverButton" customModule="DuckDuckGo_Privacy_Browser" customModuleProvider="target">
@@ -319,7 +319,7 @@
                                 </constraints>
                             </customView>
                             <customView translatesAutoresizingMaskIntoConstraints="NO" id="r7f-Ig-GcB">
-                                <rect key="frame" x="0.0" y="92" width="328" height="32"/>
+                                <rect key="frame" x="0.0" y="60" width="328" height="32"/>
                                 <subviews>
                                     <customView translatesAutoresizingMaskIntoConstraints="NO" id="R2h-Oh-HRn" customClass="ColorView" customModule="DuckDuckGo_Privacy_Browser" customModuleProvider="target">
                                         <rect key="frame" x="0.0" y="0.0" width="328" height="32"/>
@@ -330,11 +330,11 @@
                                         </userDefinedRuntimeAttributes>
                                     </customView>
                                     <box verticalHuggingPriority="750" fixedFrame="YES" boxType="separator" translatesAutoresizingMaskIntoConstraints="NO" id="55B-tN-GCl">
-                                        <rect key="frame" x="0.0" y="29" width="328" height="5"/>
+                                        <rect key="frame" x="0.0" y="29" width="320" height="5"/>
                                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                     </box>
                                     <box verticalHuggingPriority="750" fixedFrame="YES" boxType="separator" translatesAutoresizingMaskIntoConstraints="NO" id="rMv-28-G5x">
-                                        <rect key="frame" x="0.0" y="-12" width="328" height="5"/>
+                                        <rect key="frame" x="0.0" y="-12" width="320" height="5"/>
                                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                     </box>
                                     <button fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="Bir-wk-iOW">
@@ -353,43 +353,6 @@
                                     <constraint firstItem="R2h-Oh-HRn" firstAttribute="top" secondItem="r7f-Ig-GcB" secondAttribute="top" id="nOB-Rm-zOy"/>
                                     <constraint firstAttribute="trailing" secondItem="R2h-Oh-HRn" secondAttribute="trailing" id="tm1-hf-0JX"/>
                                     <constraint firstAttribute="bottom" secondItem="R2h-Oh-HRn" secondAttribute="bottom" id="uVV-mf-WiT"/>
-                                </constraints>
-                            </customView>
-                            <customView translatesAutoresizingMaskIntoConstraints="NO" id="otO-as-2jX">
-                                <rect key="frame" x="0.0" y="60" width="328" height="32"/>
-                                <subviews>
-                                    <customView translatesAutoresizingMaskIntoConstraints="NO" id="NdB-Mf-pfM" customClass="ColorView" customModule="DuckDuckGo_Privacy_Browser" customModuleProvider="target">
-                                        <rect key="frame" x="0.0" y="0.0" width="328" height="32"/>
-                                        <userDefinedRuntimeAttributes>
-                                            <userDefinedRuntimeAttribute type="color" keyPath="backgroundColor">
-                                                <color key="value" name="FirePopoverPanelBackground"/>
-                                            </userDefinedRuntimeAttribute>
-                                        </userDefinedRuntimeAttributes>
-                                    </customView>
-                                    <box verticalHuggingPriority="750" fixedFrame="YES" boxType="separator" translatesAutoresizingMaskIntoConstraints="NO" id="34T-v7-FF8">
-                                        <rect key="frame" x="0.0" y="29" width="328" height="5"/>
-                                        <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
-                                    </box>
-                                    <box verticalHuggingPriority="750" fixedFrame="YES" boxType="separator" translatesAutoresizingMaskIntoConstraints="NO" id="2C1-OI-Sa7">
-                                        <rect key="frame" x="0.0" y="-12" width="328" height="5"/>
-                                        <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
-                                    </box>
-                                    <button fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="M8a-pP-SrH">
-                                        <rect key="frame" x="20" y="0.0" width="288" height="32"/>
-                                        <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
-                                        <buttonCell key="cell" type="square" title="   Pinned tabs won't be cleared" bezelStyle="shadowlessSquare" image="InfoLight" imagePosition="left" alignment="left" inset="2" id="PtE-9T-2YE">
-                                            <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
-                                            <font key="font" metaFont="smallSystem"/>
-                                        </buttonCell>
-                                        <color key="contentTintColor" name="GreyTextColor"/>
-                                    </button>
-                                </subviews>
-                                <constraints>
-                                    <constraint firstAttribute="trailing" secondItem="NdB-Mf-pfM" secondAttribute="trailing" id="0tF-Dy-wEY"/>
-                                    <constraint firstAttribute="height" constant="32" id="9tC-lO-ZiR"/>
-                                    <constraint firstItem="NdB-Mf-pfM" firstAttribute="top" secondItem="otO-as-2jX" secondAttribute="top" id="C5O-nc-2o4"/>
-                                    <constraint firstItem="NdB-Mf-pfM" firstAttribute="leading" secondItem="otO-as-2jX" secondAttribute="leading" id="FgG-4w-ocS"/>
-                                    <constraint firstAttribute="bottom" secondItem="NdB-Mf-pfM" secondAttribute="bottom" id="onv-Ku-Lyc"/>
                                 </constraints>
                             </customView>
                             <customView translatesAutoresizingMaskIntoConstraints="NO" id="nId-He-RIU" userLabel="Main Buttons Wrapper View">
@@ -462,12 +425,9 @@ Gw
                             <constraint firstItem="3Jn-h4-fXL" firstAttribute="leading" secondItem="dGd-Gc-P2e" secondAttribute="leading" id="ZK2-xe-fKM"/>
                             <constraint firstItem="r7f-Ig-GcB" firstAttribute="leading" secondItem="dGd-Gc-P2e" secondAttribute="leading" id="ZOG-ov-blY"/>
                             <constraint firstItem="3Jn-h4-fXL" firstAttribute="top" secondItem="dGd-Gc-P2e" secondAttribute="top" id="bUr-Qo-pGT"/>
-                            <constraint firstItem="otO-as-2jX" firstAttribute="leading" secondItem="dGd-Gc-P2e" secondAttribute="leading" id="eza-TF-Wxz"/>
-                            <constraint firstItem="otO-as-2jX" firstAttribute="top" secondItem="r7f-Ig-GcB" secondAttribute="bottom" id="f1V-n7-jhp"/>
-                            <constraint firstItem="nId-He-RIU" firstAttribute="top" secondItem="otO-as-2jX" secondAttribute="bottom" id="fZK-jn-eTA"/>
-                            <constraint firstItem="otO-as-2jX" firstAttribute="top" secondItem="3Jn-h4-fXL" secondAttribute="bottom" constant="42" id="hbg-4i-hjT"/>
+                            <constraint firstItem="nId-He-RIU" firstAttribute="top" secondItem="r7f-Ig-GcB" secondAttribute="bottom" id="f1V-n7-jhp"/>
+                            <constraint firstItem="nId-He-RIU" firstAttribute="top" secondItem="3Jn-h4-fXL" secondAttribute="bottom" constant="42" id="hbg-4i-hjT"/>
                             <constraint firstAttribute="trailing" secondItem="r7f-Ig-GcB" secondAttribute="trailing" id="kNz-fP-3Iv"/>
-                            <constraint firstAttribute="trailing" secondItem="otO-as-2jX" secondAttribute="trailing" id="mk4-1w-gUg"/>
                             <constraint firstAttribute="trailing" secondItem="3Jn-h4-fXL" secondAttribute="trailing" id="nnI-mg-tvm"/>
                             <constraint firstAttribute="bottom" secondItem="nId-He-RIU" secondAttribute="bottom" id="oF4-VF-B5Y"/>
                             <constraint firstItem="sbc-pJ-bul" firstAttribute="leading" secondItem="dGd-Gc-P2e" secondAttribute="leading" id="pKH-pe-Sua"/>
@@ -487,8 +447,6 @@ Gw
                         <outlet property="contentHeightConstraint" destination="hbg-4i-hjT" id="mC2-Ot-onY"/>
                         <outlet property="detailsWrapperView" destination="6vZ-d2-qnR" id="TKb-Ux-TIk"/>
                         <outlet property="detailsWrapperViewHeightContraint" destination="sJt-dl-rlH" id="7pa-Kc-9xB"/>
-                        <outlet property="infoWrapperView" destination="otO-as-2jX" id="cWj-B0-jwh"/>
-                        <outlet property="infoWrapperViewHeightConstraint" destination="9tC-lO-ZiR" id="8u0-IG-PHE"/>
                         <outlet property="openDetailsButton" destination="ACx-m8-z0K" id="cu4-zz-MhA"/>
                         <outlet property="openWrapperView" destination="sbc-pJ-bul" id="dUO-6T-MLY"/>
                         <outlet property="optionsButton" destination="ckJ-6G-38h" id="xSK-KE-yMk"/>
@@ -504,17 +462,17 @@ Gw
             <objects>
                 <viewController storyboardIdentifier="FirePopoverWrapperViewController" id="tVa-jC-2sf" customClass="FirePopoverWrapperViewController" customModule="DuckDuckGo_Privacy_Browser" customModuleProvider="target" sceneMemberID="viewController">
                     <view key="view" id="MAm-om-86j">
-                        <rect key="frame" x="0.0" y="0.0" width="328" height="250"/>
+                        <rect key="frame" x="0.0" y="0.0" width="320" height="250"/>
                         <autoresizingMask key="autoresizingMask"/>
                         <subviews>
                             <containerView hidden="YES" translatesAutoresizingMaskIntoConstraints="NO" id="hQC-gC-rhn">
-                                <rect key="frame" x="0.0" y="0.0" width="328" height="250"/>
+                                <rect key="frame" x="0.0" y="0.0" width="320" height="250"/>
                                 <connections>
                                     <segue destination="hqb-gn-5gp" kind="embed" destinationCreationSelector="createFireInfoViewController:" id="Kqq-oK-w9X"/>
                                 </connections>
                             </containerView>
                             <containerView hidden="YES" translatesAutoresizingMaskIntoConstraints="NO" id="hnY-hP-VSW">
-                                <rect key="frame" x="0.0" y="0.0" width="328" height="250"/>
+                                <rect key="frame" x="0.0" y="0.0" width="320" height="250"/>
                                 <connections>
                                     <segue destination="DMI-mh-xLJ" kind="embed" destinationCreationSelector="createFirePopoverViewController:" id="dT4-mE-M8b"/>
                                 </connections>
@@ -546,11 +504,14 @@ Gw
                 <customObject id="2D4-gy-3jN" userLabel="First Responder" customClass="NSResponder" sceneMemberID="firstResponder"/>
                 <viewController id="hqb-gn-5gp" customClass="FireInfoViewController" customModule="DuckDuckGo_Privacy_Browser" customModuleProvider="target" sceneMemberID="viewController">
                     <view key="view" id="1se-D0-4zU" customClass="ColorView" customModule="DuckDuckGo_Privacy_Browser" customModuleProvider="target">
-                        <rect key="frame" x="0.0" y="0.0" width="328" height="250"/>
+                        <rect key="frame" x="0.0" y="0.0" width="320" height="250"/>
                         <autoresizingMask key="autoresizingMask"/>
                         <subviews>
                             <button verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="vOP-zm-6FL">
-                                <rect key="frame" x="18" y="10" width="292" height="40"/>
+                                <rect key="frame" x="14" y="10" width="292" height="40"/>
+                                <constraints>
+                                    <constraint firstAttribute="width" constant="280" id="B8y-tY-HvU"/>
+                                </constraints>
                                 <buttonCell key="cell" type="push" title="Got It!" bezelStyle="rounded" alignment="center" controlSize="large" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="K9v-mN-Am9">
                                     <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
                                     <font key="font" metaFont="system"/>
@@ -563,7 +524,7 @@ DQ
                                 </connections>
                             </button>
                             <imageView horizontalHuggingPriority="251" verticalHuggingPriority="251" translatesAutoresizingMaskIntoConstraints="NO" id="wWB-fA-JGV">
-                                <rect key="frame" x="100" y="166" width="128" height="64"/>
+                                <rect key="frame" x="96" y="166" width="128" height="64"/>
                                 <constraints>
                                     <constraint firstAttribute="height" constant="64" id="KbY-ZC-c5P"/>
                                     <constraint firstAttribute="width" constant="128" id="hUg-eV-t0D"/>
@@ -571,7 +532,7 @@ DQ
                                 <imageCell key="cell" refusesFirstResponder="YES" alignment="left" imageScaling="proportionallyDown" image="FireHeader" id="bCv-vD-xuT"/>
                             </imageView>
                             <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="AsC-eN-HNp">
-                                <rect key="frame" x="22" y="69" width="284" height="48"/>
+                                <rect key="frame" x="18" y="69" width="284" height="48"/>
                                 <constraints>
                                     <constraint firstAttribute="width" constant="280" id="YS3-eh-JOs"/>
                                 </constraints>
@@ -582,7 +543,7 @@ DQ
                                 </textFieldCell>
                             </textField>
                             <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="cPr-2R-bkx">
-                                <rect key="frame" x="22" y="123" width="284" height="19"/>
+                                <rect key="frame" x="18" y="123" width="284" height="19"/>
                                 <constraints>
                                     <constraint firstAttribute="width" constant="280" id="LLa-XW-6PH"/>
                                 </constraints>
@@ -595,14 +556,13 @@ DQ
                         </subviews>
                         <constraints>
                             <constraint firstItem="AsC-eN-HNp" firstAttribute="top" secondItem="cPr-2R-bkx" secondAttribute="bottom" constant="6" id="72P-p9-0Kb"/>
-                            <constraint firstItem="cPr-2R-bkx" firstAttribute="centerX" secondItem="1se-D0-4zU" secondAttribute="centerX" id="R0e-hX-4Mu"/>
-                            <constraint firstItem="AsC-eN-HNp" firstAttribute="centerX" secondItem="1se-D0-4zU" secondAttribute="centerX" id="TXY-jC-5c2"/>
+                            <constraint firstItem="AsC-eN-HNp" firstAttribute="centerX" secondItem="1se-D0-4zU" secondAttribute="centerX" id="9zn-kw-ecJ"/>
+                            <constraint firstItem="vOP-zm-6FL" firstAttribute="centerX" secondItem="1se-D0-4zU" secondAttribute="centerX" id="B9B-bo-9be"/>
                             <constraint firstItem="wWB-fA-JGV" firstAttribute="centerX" secondItem="1se-D0-4zU" secondAttribute="centerX" id="V4f-UG-ojf"/>
                             <constraint firstItem="wWB-fA-JGV" firstAttribute="top" secondItem="1se-D0-4zU" secondAttribute="top" constant="20" symbolic="YES" id="Wiy-76-7IF"/>
-                            <constraint firstItem="vOP-zm-6FL" firstAttribute="width" secondItem="AsC-eN-HNp" secondAttribute="width" id="YmO-IY-1qj"/>
                             <constraint firstAttribute="bottom" secondItem="vOP-zm-6FL" secondAttribute="bottom" constant="16" id="da0-dI-nQN"/>
                             <constraint firstItem="vOP-zm-6FL" firstAttribute="top" secondItem="AsC-eN-HNp" secondAttribute="bottom" constant="25" id="nqi-H2-ZOR"/>
-                            <constraint firstItem="vOP-zm-6FL" firstAttribute="centerX" secondItem="1se-D0-4zU" secondAttribute="centerX" id="vSX-vQ-6Ig"/>
+                            <constraint firstItem="cPr-2R-bkx" firstAttribute="centerX" secondItem="1se-D0-4zU" secondAttribute="centerX" id="r5H-V6-ZB0"/>
                         </constraints>
                         <userDefinedRuntimeAttributes>
                             <userDefinedRuntimeAttribute type="color" keyPath="backgroundColor">
@@ -621,7 +581,6 @@ DQ
         <image name="CondenseUpPadding" width="32" height="16"/>
         <image name="ExpandDownPadding" width="32" height="16"/>
         <image name="FireHeader" width="96" height="64"/>
-        <image name="InfoLight" width="16" height="16"/>
         <image name="WarningTriangle" width="16" height="15"/>
         <namedColor name="ButtonColor">
             <color red="0.28627450980392155" green="0.28627450980392155" blue="0.28627450980392155" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
