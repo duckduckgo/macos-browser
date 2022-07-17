@@ -44,6 +44,7 @@ final class HistoryMenu: NSMenu {
         updateRecentlyClosedMenu()
         updateReopenLastClosedMenuItem()
         updateRecentlyVisited()
+        updateHistoryGroupings()
     }
 
     // MARK: - Last Closed & Recently Closed
@@ -96,6 +97,64 @@ final class HistoryMenu: NSMenu {
 
     @objc func openRecentlyVisited(_ sender: NSMenuItem) {
         //todo
+    }
+
+    // MARK: - History Groupings
+
+    var historyGroupingsMenuItems = [NSMenuItem]()
+
+    let relativeDateFormatter: DateFormatter = {
+        //todo: month, day, year
+        let dateFormatter = DateFormatter()
+        dateFormatter.timeStyle = .none
+        dateFormatter.dateStyle = .medium
+        dateFormatter.doesRelativeDateFormatting = true
+        return dateFormatter
+    }()
+
+    let dateFormatter: DateFormatter = {
+        let dateFormatter = DateFormatter()
+        dateFormatter.dateFormat = "EEEE, MMMM dd, YYYY"
+        return dateFormatter
+    }()
+
+    private func updateHistoryGroupings() {
+        items.removeAll { menuItem in
+            historyGroupingsMenuItems.contains(menuItem)
+        }
+
+        let groupings = historyCoordinator.getVisitGroupings()
+        let firstWeek = groupings.filter { item in
+            item.key > Date.weekAgo.startOfDay
+        }
+        historyGroupingsMenuItems = [NSMenuItem.separator()]
+        let firstWeekItems: [NSMenuItem] = firstWeek.map { grouping in
+            let title: String
+            if grouping.key > Date.daysAgo(2).startOfDay {
+                title = relativeDateFormatter.string(from: grouping.key)
+            } else {
+                title = dateFormatter.string(from: grouping.key)
+            }
+
+            let menuItem = NSMenuItem(title: title, action: nil, target: nil, keyEquivalent: "")
+            let subMenuItems = grouping.value.sorted(by: { (visit1, visit2) in
+                visit1.date > visit2.date
+            }).map { visit in
+                NSMenuItem(visitViewModel: VisitViewModel(visit: visit), target: self)
+            }
+            let submenu = NSMenu()
+            subMenuItems.forEach { menuItem in
+                submenu.addItem(menuItem)
+            }
+            menuItem.submenu = submenu
+            return menuItem
+        }
+
+        historyGroupingsMenuItems.append(contentsOf: firstWeekItems)
+
+        historyGroupingsMenuItems.forEach {
+            addItem($0)
+        }
     }
 
 }
@@ -173,6 +232,21 @@ private extension HistoryCoordinating {
                 visit1.date > visit2.date
             })
             .prefix(maxCount))
+    }
+
+    func getVisitGroupings() -> [Date: [Visit]] {
+        guard let history = history else {
+            os_log("HistoryCoordinator: No history available", type: .error)
+            return [:]
+        }
+
+        let visits = Array(history
+            .flatMap { entry in
+                Array(entry.visits)
+            })
+        return Dictionary(grouping: visits) { visit in
+            return visit.date.startOfDay
+        }
     }
 
 }
