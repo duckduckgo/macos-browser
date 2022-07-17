@@ -174,7 +174,7 @@ class BookmarkOutlineViewDataSourceTests: XCTestCase {
 
 }
 
-fileprivate extension Bookmark {
+extension Bookmark {
 
     static var mock: Bookmark = Bookmark(id: UUID(),
                                          url: URL.duckDuckGo,
@@ -183,7 +183,7 @@ fileprivate extension Bookmark {
 
 }
 
-fileprivate extension BookmarkFolder {
+extension BookmarkFolder {
 
     static var mock = BookmarkFolder(id: UUID(), title: "Title")
 

@@ -197,6 +197,7 @@ extension BookmarksBarViewController: BookmarksBarViewModelDelegate {
                 bookmark.isFavorite = !bookmark.isFavorite
                 bookmarkManager.update(bookmark: bookmark)
             case .copyURL:
+                // TODO: Actually copy the URL
                 break
             case .deleteEntity:
                 bookmarkManager.remove(bookmark: bookmark)

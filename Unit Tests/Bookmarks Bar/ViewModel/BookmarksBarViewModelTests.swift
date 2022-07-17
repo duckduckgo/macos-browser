@@ -21,8 +21,79 @@ import XCTest
 
 class BookmarksBarViewModelTests: XCTestCase {
     
-    private func createMockBookmarksManager() -> BookmarkManager {
-        let mockBookmarkStore = BookmarkStoreMock()
+    func testWhenClippingTheLastBarItem_AndNoItemsCanBeClipped_ThenNoItemsAreClipped() {
+        let manager = createMockBookmarksManager()
+        let bookmarksBarViewModel = BookmarksBarViewModel(bookmarkManager: manager)
+        
+        let clipped = bookmarksBarViewModel.clipLastBarItem()
+        
+        XCTAssertFalse(clipped)
+        XCTAssert(bookmarksBarViewModel.clippedItems.isEmpty)
+    }
+    
+    func testWhenClippingTheLastBarItem_AndItemsCanBeClipped_ThenItemsAreClipped() {
+        let bookmarks = [Bookmark.mock]
+        let storeMock = BookmarkStoreMock()
+        storeMock.bookmarks = bookmarks
+
+        let manager = createMockBookmarksManager(mockBookmarkStore: storeMock)
+        let bookmarksBarViewModel = BookmarksBarViewModel(bookmarkManager: manager)
+        bookmarksBarViewModel.update(from: bookmarks, containerWidth: 200)
+        
+        let clipped = bookmarksBarViewModel.clipLastBarItem()
+        
+        XCTAssertTrue(clipped)
+        XCTAssertEqual(bookmarksBarViewModel.clippedItems.count, 1)
+    }
+    
+    func testWhenTheBarHasClippedItems_ThenClippedItemsCanBeRestored() {
+        let bookmarks = [Bookmark.mock]
+        let storeMock = BookmarkStoreMock()
+        storeMock.bookmarks = bookmarks
+
+        let manager = createMockBookmarksManager(mockBookmarkStore: storeMock)
+        let bookmarksBarViewModel = BookmarksBarViewModel(bookmarkManager: manager)
+        bookmarksBarViewModel.update(from: bookmarks, containerWidth: 200)
+        
+        let clipped = bookmarksBarViewModel.clipLastBarItem()
+        
+        XCTAssert(clipped)
+        XCTAssert(bookmarksBarViewModel.bookmarksBarItems.isEmpty)
+        XCTAssertEqual(bookmarksBarViewModel.clippedItems.count, 1)
+        
+        let restored = bookmarksBarViewModel.restoreLastClippedItem()
+        
+        XCTAssert(restored)
+        XCTAssert(bookmarksBarViewModel.clippedItems.isEmpty)
+        XCTAssertEqual(bookmarksBarViewModel.bookmarksBarItems.count, 1)
+    }
+    
+    func testWhenUpdatingFromBookmarkEntities_AndTheContainerCannotFitAnyBookmarks_ThenBookmarksAreImmediatelyClipped() {
+        let bookmarks = [Bookmark.mock]
+        let storeMock = BookmarkStoreMock()
+        storeMock.bookmarks = bookmarks
+
+        let manager = createMockBookmarksManager(mockBookmarkStore: storeMock)
+        let bookmarksBarViewModel = BookmarksBarViewModel(bookmarkManager: manager)
+        bookmarksBarViewModel.update(from: bookmarks, containerWidth: 0)
+        
+        XCTAssertEqual(bookmarksBarViewModel.clippedItems.count, 1)
+    }
+    
+    func testWhenUpdatingFromBookmarkEntities_AndTheContainerCanFitAllBookmarks_ThenNoBookmarksAreClipped() {
+        let bookmarks = [Bookmark.mock]
+        let storeMock = BookmarkStoreMock()
+        storeMock.bookmarks = bookmarks
+
+        let manager = createMockBookmarksManager(mockBookmarkStore: storeMock)
+        let bookmarksBarViewModel = BookmarksBarViewModel(bookmarkManager: manager)
+        bookmarksBarViewModel.update(from: bookmarks, containerWidth: 200)
+        
+        XCTAssertEqual(bookmarksBarViewModel.bookmarksBarItems.count, 1)
+        XCTAssert(bookmarksBarViewModel.clippedItems.isEmpty)
+    }
+    
+    private func createMockBookmarksManager(mockBookmarkStore: BookmarkStoreMock = BookmarkStoreMock()) -> BookmarkManager {
         let mockFaviconManager = FaviconManagerMock()
         return LocalBookmarkManager(bookmarkStore: mockBookmarkStore, faviconManagement: mockFaviconManager)
     }

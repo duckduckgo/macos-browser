@@ -281,8 +281,7 @@ extension BookmarksBarViewModel: NSCollectionViewDelegate, NSCollectionViewDataS
     }
     
     func collectionView(_ collectionView: NSCollectionView, pasteboardWriterForItemAt indexPath: IndexPath) -> NSPasteboardWriting? {
-        // Remove the hardcoded duck.com writer and replace it with a custom writer for folders.
-        return bookmarksBarItems[indexPath.item].url as NSURL? ?? NSURL(string: "https://duck.com/")
+        return bookmarksBarItems[indexPath.item].entity.pasteboardWriter
     }
     
     func collectionView(_ collectionView: NSCollectionView,
@@ -321,8 +320,10 @@ extension BookmarksBarViewModel: NSCollectionViewDelegate, NSCollectionViewDataS
             collectionView.animator().moveItem(at: existingIndexPath, to: IndexPath(item: item, section: 0))
             existingItemDraggingIndexPath = nil
             
-            self.bookmarkManager.move(objectUUID: entityUUID, toIndexWithinParentFolder: item) { _ in
-                // If error, reload the bar completely?
+            self.bookmarkManager.move(objectUUID: entityUUID, toIndexWithinParentFolder: item) { error in
+                if error != nil {
+                    self.delegate?.bookmarksBarViewModelReloadedData()
+                }
             }
 
             return true
