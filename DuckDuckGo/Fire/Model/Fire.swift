@@ -167,7 +167,7 @@ final class Fire {
             }
 
             group.enter()
-            self.burnPinnedTabs(pinnedTabsViewModels, relatedToDomains: domains) {
+            self.burnPinnedTabs(pinnedTabsViewModels, onlyRelatedToDomains: domains) {
                 group.leave()
             }
 
@@ -336,18 +336,19 @@ final class Fire {
             } else {
                 tabCollectionViewModel.appendNewTab(forceChange: true)
             }
+            tabCollectionViewModel.tabCollection.localHistoryOfRemovedTabs.removeAll()
 
             completion()
         }
     }
 
     private func burnPinnedTabs(_ cleanupInfo: [TabCollectionViewModel.TabCleanupInfo],
-                                relatedToDomains domains: Set<String>? = nil,
+                                onlyRelatedToDomains domains: Set<String>? = nil,
                                 completion: @escaping () -> Void) {
         // Close tabs where specified domains are currently loaded
         DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) { [weak self] in
             let keyWindow = self?.windowControllerManager.lastKeyMainWindowController
-            keyWindow?.mainViewController.tabCollectionViewModel.clearPinnedTabsData(cleanupInfo, forDomains: domains)
+            keyWindow?.mainViewController.tabCollectionViewModel.clearPinnedTabsData(cleanupInfo, onlyForDomains: domains)
 
             completion()
         }
@@ -467,8 +468,8 @@ fileprivate extension TabCollectionViewModel {
         tabCollection.localHistoryOfRemovedTabs.subtract(domains)
     }
 
-    // Burns data related to domains from the collection of pinned tabs
-    func clearPinnedTabsData(_ cleanupInfo: [TabCleanupInfo], forDomains domains: Set<String>? = nil) {
+    // Burns data from the collection of pinned tabs, optionally limited to the set of domains
+    func clearPinnedTabsData(_ cleanupInfo: [TabCleanupInfo], onlyForDomains domains: Set<String>? = nil) {
         // Go one by one and replace pinned tabs
         for tabCleanupInfo in cleanupInfo {
             guard let tabIndex = pinnedTabsManager.tabCollection.tabs.firstIndex(of: tabCleanupInfo.tabViewModel.tab) else {
@@ -484,9 +485,11 @@ fileprivate extension TabCollectionViewModel {
             }
         }
 
+        // Clean local history of closed tabs
         if let domains = domains {
-            // Clean local history of closed tabs
             pinnedTabsManager.tabCollection.localHistoryOfRemovedTabs.subtract(domains)
+        } else {
+            pinnedTabsManager.tabCollection.localHistoryOfRemovedTabs.removeAll()
         }
     }
 }
