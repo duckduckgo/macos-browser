@@ -43,8 +43,21 @@ final class HistoryMenu: NSMenu {
 
         updateRecentlyClosedMenu()
         updateReopenLastClosedMenuItem()
-        updateRecentlyVisited()
-        updateHistoryGroupings()
+
+        clearOldVariableMenuItems()
+        addRecentlyVisited()
+        addHistoryGroupings()
+        addSearchHistory()
+        addClearAllHistory()
+    }
+
+    private func clearOldVariableMenuItems() {
+        items.removeAll { menuItem in
+            recentlyVisitedMenuItems.contains(menuItem) ||
+            historyGroupingsMenuItems.contains(menuItem) ||
+            menuItem == searchHistoryMenuItem ||
+            menuItem == clearAllHistoryMenuItem
+        }
     }
 
     // MARK: - Last Closed & Recently Closed
@@ -68,22 +81,14 @@ final class HistoryMenu: NSMenu {
     // MARK: - Recently Visited
 
     var recentlyVisitedHeaderMenuItem: NSMenuItem {
-        let item = NSMenuItem(title: "Recently Visited", action: nil, target: nil, keyEquivalent: "")
+        let item = NSMenuItem(title: UserText.recentlyVisitedMenuSection)
         item.isEnabled = false
         return item
     }
 
     var recentlyVisitedMenuItems = [NSMenuItem]()
 
-    private func updateRecentlyVisited() {
-        updateRecentlyVisitedItems()
-    }
-
-    private func updateRecentlyVisitedItems() {
-        items.removeAll { menuItem in
-            recentlyVisitedMenuItems.contains(menuItem)
-        }
-
+    private func addRecentlyVisited() {
         recentlyVisitedMenuItems = [recentlyVisitedHeaderMenuItem]
         recentlyVisitedMenuItems.append(contentsOf: historyCoordinator.getRecentVisits(maxCount: 14)
             .map {
@@ -101,10 +106,94 @@ final class HistoryMenu: NSMenu {
 
     // MARK: - History Groupings
 
+    struct HistoryGrouping {
+        let date: Date
+        let visits: [Visit]
+    }
+
     var historyGroupingsMenuItems = [NSMenuItem]()
 
-    let relativeDateFormatter: DateFormatter = {
+    private func addHistoryGroupings() {
+        let groupings = historyCoordinator.getVisitGroupings()
+        var firstWeek = [HistoryGrouping](), older = [HistoryGrouping]()
+        groupings.forEach { grouping in
+            if grouping.date > Date.weekAgo.startOfDay {
+                firstWeek.append(grouping)
+            } else {
+                older.append(grouping)
+            }
+        }
+
+        // First week
+        historyGroupingsMenuItems = [NSMenuItem.separator()]
+        let firstWeekItems = makeFirstWeekMenuItems(from: firstWeek)
+        historyGroupingsMenuItems.append(contentsOf: firstWeekItems)
+
+        // Older
+        if let olderMenuItem = makeOlderRootMenuItem(from: older) {
+            historyGroupingsMenuItems.append(olderMenuItem)
+        }
+
+        historyGroupingsMenuItems.forEach {
+            addItem($0)
+        }
+    }
+
+    private func makeFirstWeekMenuItems(from groupings: [HistoryGrouping]) -> [NSMenuItem] {
+
+        func makeFirstWeekRootMenuItem(from grouping: HistoryGrouping) -> NSMenuItem {
+            let menuItem = NSMenuItem(title: makeTitle(for: grouping))
+            let subMenuItems = makeClearThisHistoryMenuItems() + makeMenuItems(from: grouping)
+            let submenu = NSMenu(items: subMenuItems)
+            menuItem.submenu = submenu
+            return menuItem
+        }
+
+        return groupings.map { grouping in
+            makeFirstWeekRootMenuItem(from: grouping)
+        }
+    }
+
+    private func makeOlderRootMenuItem(from groupings: [HistoryGrouping]) -> NSMenuItem? {
+
+        func makeOlderSubmenuItems(from groupings: [HistoryGrouping]) -> [NSMenuItem] {
+            var olderSubmenuItems = [NSMenuItem]()
+            olderSubmenuItems.append(contentsOf: makeClearThisHistoryMenuItems())
+            olderSubmenuItems.append(contentsOf: groupings.flatMap { grouping in
+                [NSMenuItem(title: makeTitle(for: grouping))] +
+                makeMenuItems(from: grouping) +
+                [NSMenuItem.separator()]
+            })
+            return olderSubmenuItems
+        }
+
+        guard groupings.count > 0 else {
+            return nil
+        }
+
+        let rootMenuItem = NSMenuItem(title: UserText.olderMenuItem)
+        let submenuItems = makeOlderSubmenuItems(from: groupings)
+        rootMenuItem.submenu = NSMenu(items: submenuItems)
+
+        return rootMenuItem
+    }
+
+    private func makeMenuItems(from grouping: HistoryGrouping) -> [NSMenuItem] {
+        return grouping.visits.map { visit in
+            NSMenuItem(visitViewModel: VisitViewModel(visit: visit), target: self)
+        }
+    }
+
+    private func makeTitle(for grouping: HistoryGrouping) -> String {
         //todo: month, day, year
+        if grouping.date > Date.daysAgo(2).startOfDay {
+            return relativeDateFormatter.string(from: grouping.date)
+        } else {
+            return dateFormatter.string(from: grouping.date)
+        }
+    }
+
+    let relativeDateFormatter: DateFormatter = {
         let dateFormatter = DateFormatter()
         dateFormatter.timeStyle = .none
         dateFormatter.dateStyle = .medium
@@ -118,48 +207,53 @@ final class HistoryMenu: NSMenu {
         return dateFormatter
     }()
 
-    private func updateHistoryGroupings() {
-        items.removeAll { menuItem in
-            historyGroupingsMenuItems.contains(menuItem)
-        }
+    private func makeClearThisHistoryMenuItems() -> [NSMenuItem] {
+        return [NSMenuItem(title: UserText.clearThisHistoryMenuItem,
+                           action: #selector(clearThisHistory(_:)),
+                           target: self,
+                           keyEquivalent: ""),
+                NSMenuItem.separator()]
+    }
 
-        let groupings = historyCoordinator.getVisitGroupings()
-        let firstWeek = groupings.filter { item in
-            item.key > Date.weekAgo.startOfDay
-        }
-        historyGroupingsMenuItems = [NSMenuItem.separator()]
-        let firstWeekItems: [NSMenuItem] = firstWeek.map { grouping in
-            let title: String
-            if grouping.key > Date.daysAgo(2).startOfDay {
-                title = relativeDateFormatter.string(from: grouping.key)
-            } else {
-                title = dateFormatter.string(from: grouping.key)
-            }
+    @objc func clearThisHistory(_ sender: NSMenuItem) {
+        //todo
+    }
 
-            let menuItem = NSMenuItem(title: title, action: nil, target: nil, keyEquivalent: "")
-            let subMenuItems = grouping.value.sorted(by: { (visit1, visit2) in
-                visit1.date > visit2.date
-            }).map { visit in
-                NSMenuItem(visitViewModel: VisitViewModel(visit: visit), target: self)
-            }
-            let submenu = NSMenu()
-            subMenuItems.forEach { menuItem in
-                submenu.addItem(menuItem)
-            }
-            menuItem.submenu = submenu
-            return menuItem
-        }
+    // MARK: - Search History
 
-        historyGroupingsMenuItems.append(contentsOf: firstWeekItems)
+    lazy var searchHistoryMenuItem = NSMenuItem(title: UserText.searchHistoryMenuItem,
+                                                action: #selector(searchHistory(_:)),
+                                                target: self,
+                                                keyEquivalent: "")
 
-        historyGroupingsMenuItems.forEach {
-            addItem($0)
-        }
+    private func addSearchHistory() {
+        addItem(searchHistoryMenuItem)
+    }
+
+    @objc func searchHistory(_ sender: NSMenuItem) {
+        //todo
+    }
+
+    // MARK: - Clear All History
+
+    lazy var clearAllHistoryMenuItem = NSMenuItem(title: UserText.clearAllHistoryMenuItem,
+                                                  action: #selector(clearAllHistory(_:)),
+                                                  target: self,
+                                                  keyEquivalent: "")
+
+    private func addClearAllHistory() {
+        addItem(NSMenuItem.separator())
+        addItem(clearAllHistoryMenuItem)
+    }
+
+    @objc func clearAllHistory(_ sender: NSMenuItem) {
+        //todo
     }
 
 }
 
 extension HistoryMenu {
+
     /**
      * This class manages the shortcut assignment to either of the
      * "Reopen Last Closed Tab" or "Reopen All Windows from Last Session"
@@ -208,12 +302,15 @@ extension HistoryMenu {
             currentlyAssignedMenuItem = menuItem
         }
     }
+
 }
 
 private extension NSApplication {
+
     var canRestoreLastSessionState: Bool {
         (delegate as? AppDelegate)?.stateRestorationManager?.canRestoreLastSessionState ?? false
     }
+
 }
 
 private extension HistoryCoordinating {
@@ -234,10 +331,11 @@ private extension HistoryCoordinating {
             .prefix(maxCount))
     }
 
-    func getVisitGroupings() -> [Date: [Visit]] {
+    //todo in the background?
+    func getVisitGroupings() -> [HistoryMenu.HistoryGrouping] {
         guard let history = history else {
             os_log("HistoryCoordinator: No history available", type: .error)
-            return [:]
+            return []
         }
 
         let visits = Array(history
@@ -246,7 +344,11 @@ private extension HistoryCoordinating {
             })
         return Dictionary(grouping: visits) { visit in
             return visit.date.startOfDay
-        }
+        } .map {
+            return HistoryMenu.HistoryGrouping(date: $0.key, visits: $0.value)
+        } .sorted(by: { (grouping1, grouping2) in
+            grouping1.date > grouping2.date
+        })
     }
 
 }

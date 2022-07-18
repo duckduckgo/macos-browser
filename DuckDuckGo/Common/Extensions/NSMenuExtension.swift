@@ -20,6 +20,14 @@ import Cocoa
 
 extension NSMenu {
 
+    convenience init(items: [NSMenuItem]) {
+        self.init()
+
+        items.forEach { item in
+            addItem(item)
+        }
+    }
+
     func indexOfItem(withIdentifier id: String) -> Int? {
         guard let item = items.first(where: { $0.identifier?.rawValue == id }) else { return nil }
         return index(of: item)
