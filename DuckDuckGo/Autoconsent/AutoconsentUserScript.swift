@@ -197,7 +197,6 @@ extension AutoconsentUserScript {
         let script = """
         (() => {
         try {
-            console.log("EXEC", `\(payload)`);
             return !!(\(payload))
         } catch (e) {
           // ignore CSP errors
