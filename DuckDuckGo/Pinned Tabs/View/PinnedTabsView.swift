@@ -30,7 +30,7 @@ struct PinnedTabsView: View {
             }
         }
         .frame(maxHeight: PinnedTabView.Const.dimension)
-        .gesture(dragGesture)
+        .simultaneousGesture(dragGesture)
     }
 
     var dragGesture: some Gesture {

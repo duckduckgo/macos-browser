@@ -65,7 +65,7 @@ private struct OnTouchDownGestureModifier: ViewModifier {
     let callback: () -> Void
 
     func body(content: Content) -> some View {
-        content.gesture(LongPressGesture().onChanged { _ in
+        content.simultaneousGesture(DragGesture(minimumDistance: 0).onChanged { _ in
             callback()
         })
     }
