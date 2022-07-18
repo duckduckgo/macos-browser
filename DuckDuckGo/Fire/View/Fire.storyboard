@@ -450,6 +450,7 @@ Gw
                         <outlet property="openDetailsButton" destination="ACx-m8-z0K" id="cu4-zz-MhA"/>
                         <outlet property="openWrapperView" destination="sbc-pJ-bul" id="dUO-6T-MLY"/>
                         <outlet property="optionsButton" destination="ckJ-6G-38h" id="xSK-KE-yMk"/>
+                        <outlet property="warningButton" destination="Bir-wk-iOW" id="kOP-t7-e5z"/>
                         <outlet property="warningWrapperView" destination="r7f-Ig-GcB" id="cSU-Xr-Bin"/>
                     </connections>
                 </viewController>

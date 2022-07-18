@@ -166,6 +166,13 @@ final class FirePopoverViewModel {
 
     @Published private(set) var areOtherTabsInfluenced = false
 
+    var hasPinnedTabs: Bool {
+        guard let tabCollectionViewModel = tabCollectionViewModel else {
+            return false
+        }
+        return !tabCollectionViewModel.pinnedTabsManager.tabCollection.tabs.isEmpty
+    }
+
     private func updateAreOtherTabsInfluenced() {
         let selectedTab = tabCollectionViewModel?.selectedTabViewModel?.tab
         let allTabs = WindowControllersManager.shared.mainWindowControllers.flatMap {
