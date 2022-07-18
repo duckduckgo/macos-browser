@@ -97,7 +97,11 @@ final class FirePopoverViewModel {
 
                 return tab.localHistory
             case .currentWindow:
-                return tabCollectionViewModel?.tabCollection.localHistory ?? Set<String>()
+                guard let tabCollectionViewModel = tabCollectionViewModel else {
+                    return []
+                }
+
+                return tabCollectionViewModel.tabCollection.localHistory.union(tabCollectionViewModel.pinnedTabsCollection.localHistory)
             case .allData:
                 return historyCoordinating.history?.visitedDomains ?? Set<String>()
             }
