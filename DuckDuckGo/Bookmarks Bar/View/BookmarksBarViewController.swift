@@ -53,7 +53,7 @@ final class BookmarksBarViewController: NSViewController {
         viewModel.delegate = self
 
         let nib = NSNib(nibNamed: "BookmarksBarCollectionViewItem", bundle: .main)
-        bookmarksBarCollectionView.setDraggingSourceOperationMask(.copy, forLocal: true)
+        bookmarksBarCollectionView.setDraggingSourceOperationMask([.copy, .move], forLocal: true)
         bookmarksBarCollectionView.register(nib, forItemWithIdentifier: BookmarksBarCollectionViewItem.identifier)
         bookmarksBarCollectionView.registerForDraggedTypes([
             .string,
