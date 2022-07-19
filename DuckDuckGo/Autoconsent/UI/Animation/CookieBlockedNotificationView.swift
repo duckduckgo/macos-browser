@@ -77,7 +77,7 @@ struct ExpandableRectangle: View {
     var body: some View {
         GeometryReader { geometry in
             Rectangle()
-                .fill(.brown)
+                .fill(.yellow)
                 .cornerRadius(8)
                 .frame(width: geometry.size.height + width, height: geometry.size.height)
                 .onAppear {
