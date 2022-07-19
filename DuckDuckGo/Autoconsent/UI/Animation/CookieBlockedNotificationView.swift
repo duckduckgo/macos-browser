@@ -53,6 +53,7 @@ struct ContentView: View {
 struct BadgeAnimationView: View {
     let iconView: AnyView
     let text: String
+    @State var textOffset: CGFloat = -100
     
     var body: some View {
         GeometryReader { geometry in
@@ -60,12 +61,36 @@ struct BadgeAnimationView: View {
                 ExpandableRectangle()
                     .frame(width: geometry.size.width, height: geometry.size.height)
                 
-                HStack{
-                    iconView
+                HStack {
+                    Text(text)
+                        .offset(x: textOffset)
+                        .onAppear {
+                            withAnimation(.easeInOut(duration: 3)) {
+                                textOffset = 0
+                            }
+                        }
+                        .padding(.leading, geometry.size.height)
+                    
+                    Spacer()
+                }.clipped()
+                
+                //opaque view
+                HStack {
+                    Rectangle()
+                        .foregroundColor(.red)
                         .frame(width: geometry.size.height, height: geometry.size.height)
                     Spacer()
                 }
-                .border(Color.red, width: 1)
+                
+                HStack{
+                    iconView
+                        .frame(width: geometry.size.height, height: geometry.size.height)
+                        .border(Color.white, width: 2)
+                    Spacer()
+                }
+                
+              
+                .border(Color.red, width: 2)
             }
         }
         .border(Color.white, width: 1)
