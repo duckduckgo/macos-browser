@@ -104,7 +104,7 @@ struct PinnedTabInnerView: View {
                     Rectangle()
                         .foregroundColor(Color("SeparatorColor"))
                         .frame(width: 1, height: 20)
-                        .offset(x: proxy.size.width-1, y: 7)
+                        .offset(x: proxy.size.width-1, y: 6)
                 }
             }
             Image(nsImage: faviconImage ?? #imageLiteral(resourceName: "Web"))

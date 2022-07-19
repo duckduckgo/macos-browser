@@ -118,6 +118,7 @@ final class MainWindowController: NSWindowController {
     private func subscribeToShouldPreventUserInteraction() {
         shouldPreventUserInteractionCancellable = fireViewModel.shouldPreventUserInteraction
             .dropFirst()
+            .removeDuplicates()
             .sink(receiveValue: { [weak self] shouldPreventUserInteraction in
                 self?.moveTabBarView(toTitlebarView: !shouldPreventUserInteraction)
                 self?.userInteraction(prevented: shouldPreventUserInteraction)

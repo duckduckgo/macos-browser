@@ -12,14 +12,14 @@
             <objects>
                 <viewController id="uSf-9n-QMw" customClass="TabBarViewController" customModule="DuckDuckGo_Privacy_Browser" customModuleProvider="target" sceneMemberID="viewController">
                     <view key="view" id="JQD-ov-FCr" customClass="MouseOverView" customModule="DuckDuckGo_Privacy_Browser" customModuleProvider="target">
-                        <rect key="frame" x="0.0" y="0.0" width="845" height="40"/>
+                        <rect key="frame" x="0.0" y="0.0" width="845" height="34"/>
                         <autoresizingMask key="autoresizingMask"/>
                         <subviews>
                             <visualEffectView blendingMode="behindWindow" material="sidebar" state="active" translatesAutoresizingMaskIntoConstraints="NO" id="8Av-Au-VBq">
-                                <rect key="frame" x="0.0" y="0.0" width="845" height="40"/>
+                                <rect key="frame" x="0.0" y="0.0" width="845" height="34"/>
                                 <subviews>
                                     <customView translatesAutoresizingMaskIntoConstraints="NO" id="T1A-KU-P4c" customClass="ColorView" customModule="DuckDuckGo_Privacy_Browser" customModuleProvider="target">
-                                        <rect key="frame" x="0.0" y="0.0" width="845" height="40"/>
+                                        <rect key="frame" x="0.0" y="0.0" width="845" height="34"/>
                                         <userDefinedRuntimeAttributes>
                                             <userDefinedRuntimeAttribute type="color" keyPath="backgroundColor">
                                                 <color key="value" name="WindowBackgroundColor"/>
@@ -35,7 +35,7 @@
                                 </constraints>
                             </visualEffectView>
                             <customView translatesAutoresizingMaskIntoConstraints="NO" id="efe-Pc-ueP" userLabel="Window Dragging View" customClass="WindowDraggingView" customModule="DuckDuckGo_Privacy_Browser" customModuleProvider="target">
-                                <rect key="frame" x="0.0" y="0.0" width="845" height="40"/>
+                                <rect key="frame" x="0.0" y="0.0" width="845" height="34"/>
                             </customView>
                             <stackView distribution="fillEqually" orientation="horizontal" alignment="top" spacing="0.0" horizontalStackHuggingPriority="249.99998474121094" verticalStackHuggingPriority="249.99998474121094" detachesHiddenViews="YES" translatesAutoresizingMaskIntoConstraints="NO" id="kOb-4q-pAe">
                                 <rect key="frame" x="76" y="18" width="0.0" height="0.0"/>
@@ -210,14 +210,14 @@
                                 </customSpacing>
                             </stackView>
                             <imageView hidden="YES" horizontalHuggingPriority="251" verticalHuggingPriority="251" translatesAutoresizingMaskIntoConstraints="NO" id="u4N-Qc-LMf" userLabel="Right Shadow Image">
-                                <rect key="frame" x="732" y="0.0" width="5" height="40"/>
+                                <rect key="frame" x="732" y="0.0" width="5" height="34"/>
                                 <constraints>
                                     <constraint firstAttribute="width" constant="5" id="tqI-pU-ZWB"/>
                                 </constraints>
                                 <imageCell key="cell" refusesFirstResponder="YES" alignment="left" imageScaling="axesIndependently" image="TabBarShadowRight" id="qd0-z2-M5R"/>
                             </imageView>
                             <imageView hidden="YES" horizontalHuggingPriority="251" verticalHuggingPriority="251" translatesAutoresizingMaskIntoConstraints="NO" id="zsA-or-9Xo" userLabel="Left Shadow Image">
-                                <rect key="frame" x="76" y="0.0" width="5" height="40"/>
+                                <rect key="frame" x="76" y="0.0" width="5" height="34"/>
                                 <constraints>
                                     <constraint firstAttribute="width" constant="5" id="Zrh-wT-hvv"/>
                                 </constraints>
@@ -230,7 +230,7 @@
                                 </constraints>
                             </customView>
                             <customView translatesAutoresizingMaskIntoConstraints="NO" id="efe-Pc-ueT" userLabel="Window Dragging View" customClass="WindowDraggingView" customModule="DuckDuckGo_Privacy_Browser" customModuleProvider="target">
-                                <rect key="frame" x="76" y="0.0" width="665" height="40"/>
+                                <rect key="frame" x="76" y="0.0" width="665" height="34"/>
                             </customView>
                         </subviews>
                         <constraints>
@@ -243,6 +243,7 @@
                             <constraint firstItem="efe-Pc-ueT" firstAttribute="trailing" secondItem="O0X-yp-zLn" secondAttribute="trailing" priority="250" constant="4" id="FJf-Su-MHu"/>
                             <constraint firstAttribute="bottom" secondItem="u4N-Qc-LMf" secondAttribute="bottom" id="Fc4-Wo-qz3"/>
                             <constraint firstItem="kOb-4q-pAe" firstAttribute="centerY" secondItem="O0X-yp-zLn" secondAttribute="centerY" id="GDB-h4-lrc"/>
+                            <constraint firstItem="O0X-yp-zLn" firstAttribute="bottom" secondItem="G3c-kC-Gu9" secondAttribute="bottom" id="I2a-Vb-s9P"/>
                             <constraint firstItem="efe-Pc-ueP" firstAttribute="top" secondItem="JQD-ov-FCr" secondAttribute="top" id="IfJ-U1-mpT"/>
                             <constraint firstItem="dN1-y1-5Xe" firstAttribute="centerY" secondItem="O0X-yp-zLn" secondAttribute="centerY" id="M6c-OC-8Nn"/>
                             <constraint firstItem="O0X-yp-zLn" firstAttribute="leading" secondItem="kOb-4q-pAe" secondAttribute="trailing" id="MVf-BL-bYZ"/>
@@ -251,14 +252,13 @@
                             <constraint firstItem="efe-Pc-ueP" firstAttribute="leading" secondItem="JQD-ov-FCr" secondAttribute="leading" id="UBO-rv-mb4"/>
                             <constraint firstItem="8Av-Au-VBq" firstAttribute="top" secondItem="JQD-ov-FCr" secondAttribute="top" id="UNA-xd-vb7"/>
                             <constraint firstItem="G3c-kC-Gu9" firstAttribute="leading" secondItem="JQD-ov-FCr" secondAttribute="leading" constant="76" id="a7p-a2-dhE"/>
-                            <constraint firstItem="O0X-yp-zLn" firstAttribute="height" secondItem="G3c-kC-Gu9" secondAttribute="height" id="adx-La-J2Q"/>
                             <constraint firstItem="O0X-yp-zLn" firstAttribute="leading" secondItem="zsA-or-9Xo" secondAttribute="leading" id="bIL-4K-ggG"/>
                             <constraint firstItem="8Av-Au-VBq" firstAttribute="leading" secondItem="JQD-ov-FCr" secondAttribute="leading" id="djE-ZR-Zcb"/>
                             <constraint firstAttribute="trailing" secondItem="efe-Pc-ueP" secondAttribute="trailing" id="etm-VT-0k2"/>
                             <constraint firstItem="dN1-y1-5Xe" firstAttribute="leading" secondItem="efe-Pc-ueT" secondAttribute="trailing" id="hWs-AC-dwE"/>
                             <constraint firstAttribute="bottom" secondItem="efe-Pc-ueP" secondAttribute="bottom" id="iYT-Di-UlL"/>
                             <constraint firstItem="efe-Pc-ueT" firstAttribute="top" secondItem="JQD-ov-FCr" secondAttribute="top" priority="750" id="kNA-2I-L0U"/>
-                            <constraint firstAttribute="bottom" secondItem="G3c-kC-Gu9" secondAttribute="bottom" constant="1" id="lTF-M0-ybw"/>
+                            <constraint firstItem="G3c-kC-Gu9" firstAttribute="height" secondItem="O0X-yp-zLn" secondAttribute="height" id="n4S-57-Odv"/>
                             <constraint firstAttribute="bottom" secondItem="8Av-Au-VBq" secondAttribute="bottom" id="pat-VC-dVb"/>
                             <constraint firstItem="kOb-4q-pAe" firstAttribute="leading" secondItem="G3c-kC-Gu9" secondAttribute="trailing" id="qU6-dU-yJw"/>
                             <constraint firstItem="u4N-Qc-LMf" firstAttribute="top" secondItem="JQD-ov-FCr" secondAttribute="top" id="zB8-BE-pJR"/>

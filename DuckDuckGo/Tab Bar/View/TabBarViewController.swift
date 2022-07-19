@@ -80,9 +80,75 @@ final class TabBarViewController: NSViewController {
         setupPinnedTabsView()
     }
 
-    private func setupPinnedTabsView() {
-        pinnedTabsContainerView.addAndLayout(pinnedTabsHostingView)
+    override func viewWillAppear() {
+        super.viewWillAppear()
 
+        updateEmptyTabArea()
+        tabCollectionViewModel.delegate = self
+        reloadSelection()
+
+        // Detect if tabs are clicked when the window is not in focus
+        // https://app.asana.com/0/1177771139624306/1202033879471339
+        addMouseMonitors()
+    }
+
+    override func viewWillDisappear() {
+        super.viewWillDisappear()
+        removeMouseMonitors()
+    }
+
+    override func viewDidLayout() {
+        super.viewDidLayout()
+
+        frozenLayout = view.isMouseLocationInsideBounds()
+        updateTabMode()
+        updateEmptyTabArea()
+        collectionView.invalidateLayout()
+    }
+
+    deinit {
+        NotificationCenter.default.removeObserver(self)
+    }
+
+    @IBAction func addButtonAction(_ sender: NSButton) {
+        tabCollectionViewModel.appendNewTab(with: .homePage)
+    }
+    @IBAction func rightScrollButtonAction(_ sender: NSButton) {
+        collectionView.scrollToEnd()
+    }
+
+    @IBAction func leftScrollButtonAction(_ sender: NSButton) {
+        collectionView.scrollToBeginning()
+    }
+
+    private func subscribeToSelectionIndex() {
+        selectionIndexCancellable = tabCollectionViewModel.$selectionIndex.receive(on: DispatchQueue.main).sink { [weak self] _ in
+            self?.reloadSelection()
+        }
+    }
+
+    private func setupFireButton() {
+        fireButton.animationNames = MouseOverAnimationButton.AnimationNames(aqua: "flame-mouse-over", dark: "dark-flame-mouse-over")
+    }
+
+    private func setupPinnedTabsView() {
+        layoutPinnedTabsView()
+        subscribeToPinnedTabsViewModel()
+    }
+
+    private func layoutPinnedTabsView() {
+        pinnedTabsHostingView.translatesAutoresizingMaskIntoConstraints = false
+        pinnedTabsContainerView.addSubview(pinnedTabsHostingView)
+
+        NSLayoutConstraint.activate([
+            pinnedTabsHostingView.leadingAnchor.constraint(equalTo: pinnedTabsContainerView.leadingAnchor),
+            pinnedTabsHostingView.topAnchor.constraint(lessThanOrEqualTo: pinnedTabsContainerView.topAnchor),
+            pinnedTabsHostingView.bottomAnchor.constraint(equalTo: pinnedTabsContainerView.bottomAnchor),
+            pinnedTabsHostingView.trailingAnchor.constraint(equalTo: pinnedTabsContainerView.trailingAnchor)
+        ])
+    }
+
+    private func subscribeToPinnedTabsViewModel() {
         tabCollectionViewModel.$selectionIndex
             .map { [weak self] selectedTabIndex -> Tab? in
                 switch selectedTabIndex {
@@ -179,57 +245,6 @@ final class TabBarViewController: NSViewController {
         case let .close(index):
             tabCollectionViewModel.remove(at: .pinned(index))
         }
-    }
-
-    override func viewWillAppear() {
-        super.viewWillAppear()
-
-        updateEmptyTabArea()
-        tabCollectionViewModel.delegate = self
-        reloadSelection()
-        
-        // Detect if tabs are clicked when the window is not in focus
-        // https://app.asana.com/0/1177771139624306/1202033879471339
-        addMouseMonitors()
-    }
-
-    override func viewWillDisappear() {
-        super.viewWillDisappear()
-        removeMouseMonitors()
-    }
-    
-    override func viewDidLayout() {
-        super.viewDidLayout()
-
-        frozenLayout = view.isMouseLocationInsideBounds()
-        updateTabMode()
-        updateEmptyTabArea()
-        collectionView.invalidateLayout()
-    }
-
-    deinit {
-        NotificationCenter.default.removeObserver(self)
-    }
-
-    @IBAction func addButtonAction(_ sender: NSButton) {
-        tabCollectionViewModel.appendNewTab(with: .homePage)
-    }
-    @IBAction func rightScrollButtonAction(_ sender: NSButton) {
-        collectionView.scrollToEnd()
-    }
-
-    @IBAction func leftScrollButtonAction(_ sender: NSButton) {
-        collectionView.scrollToBeginning()
-    }
-
-    private func subscribeToSelectionIndex() {
-        selectionIndexCancellable = tabCollectionViewModel.$selectionIndex.receive(on: DispatchQueue.main).sink { [weak self] _ in
-            self?.reloadSelection()
-        }
-    }
-
-    private func setupFireButton() {
-        fireButton.animationNames = MouseOverAnimationButton.AnimationNames(aqua: "flame-mouse-over", dark: "dark-flame-mouse-over")
     }
 
     private func reloadSelection() {
