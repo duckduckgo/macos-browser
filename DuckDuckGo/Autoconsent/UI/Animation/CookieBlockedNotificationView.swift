@@ -8,8 +8,13 @@
 import SwiftUI
 
 private enum Consts {
+    
+    enum Colors {
+        static let badgeBackgroundColor = Color("URLNotificationBadgeBackground")
+    }
+    
     enum CookieAnimation {
-        static let duration: CGFloat = 5.0 //1.5
+        static let duration: CGFloat = 1.5 //1.5
         static let halfDuration = duration / 2
         static let secondPhaseDelay = halfDuration
         
@@ -21,16 +26,16 @@ private enum Consts {
     }
     
     enum BadgeAnimation {
-        static let duration: CGFloat = 5.0
+        static let duration: CGFloat = 0.8
         static let halfDuration = duration / 2
         static let secondPhaseDelay = 3.0
     }
     
     enum Layout {
-        static let cookieSize: CGFloat = 24
-        static let dotsGroupSize: CGFloat = 35
+        static let cookieSize: CGFloat = 16
+        static let dotsGroupSize: CGFloat = 20
         static let randomDegreesOffset = 40
-        static let dotSize: CGFloat = 7
+        static let dotSize: CGFloat = 3
     }
     
     enum Count {
@@ -43,9 +48,10 @@ struct ContentView: View {
         HStack {
             BadgeAnimationView(iconView: AnyView(CookieAnimationView()),
                                text: "Cookies Managed")
+            .frame(width: 148, height: 32)
             Spacer()
         }.padding()
-            .frame(width: 250, height: 100)
+            .frame(width: 250, height: 80)
             .background(Color.yellow)
     }
 }
@@ -53,7 +59,7 @@ struct ContentView: View {
 struct BadgeAnimationView: View {
     let iconView: AnyView
     let text: String
-    @State var textOffset: CGFloat = -100
+    @State var textOffset: CGFloat = -120
     
     var body: some View {
         GeometryReader { geometry in
@@ -63,11 +69,16 @@ struct BadgeAnimationView: View {
                 
                 HStack {
                     Text(text)
+                        .font(.footnote)
                         .offset(x: textOffset)
                         .onAppear {
-                            withAnimation(.easeInOut(duration: 3)) {
+                            withAnimation(.easeInOut(duration: Consts.BadgeAnimation.duration)) {
                                 textOffset = 0
                             }
+                            withAnimation(.easeInOut(duration: Consts.BadgeAnimation.duration).delay(Consts.BadgeAnimation.secondPhaseDelay)) {
+                                    textOffset = -120
+                            }
+
                         }
                         .padding(.leading, geometry.size.height)
                     
@@ -77,7 +88,8 @@ struct BadgeAnimationView: View {
                 //opaque view
                 HStack {
                     Rectangle()
-                        .foregroundColor(.red)
+                        .foregroundColor(Consts.Colors.badgeBackgroundColor)
+                        .cornerRadius(8)
                         .frame(width: geometry.size.height, height: geometry.size.height)
                     Spacer()
                 }
@@ -85,15 +97,10 @@ struct BadgeAnimationView: View {
                 HStack{
                     iconView
                         .frame(width: geometry.size.height, height: geometry.size.height)
-                        .border(Color.white, width: 2)
                     Spacer()
                 }
-                
-              
-                .border(Color.red, width: 2)
             }
         }
-        .border(Color.white, width: 1)
     }
 }
 
@@ -102,12 +109,16 @@ struct ExpandableRectangle: View {
     var body: some View {
         GeometryReader { geometry in
             Rectangle()
-                .fill(.yellow)
+                .fill(Consts.Colors.badgeBackgroundColor)
                 .cornerRadius(8)
                 .frame(width: geometry.size.height + width, height: geometry.size.height)
                 .onAppear {
-                    withAnimation(.easeInOut(duration: 3)) {
+                    withAnimation(.easeInOut(duration: Consts.BadgeAnimation.duration)) {
                         width = geometry.size.width - geometry.size.height
+                    }
+                    
+                    withAnimation(.easeInOut(duration: Consts.BadgeAnimation.duration).delay(Consts.BadgeAnimation.secondPhaseDelay)) {
+                            width = 0
                     }
                 }
         }
@@ -225,7 +236,7 @@ struct InnerExpandingCircle: View {
     @State var scale: CGFloat = 1
     var body: some View {
         Circle()
-            .strokeBorder(.blue, lineWidth: 2)
+            .strokeBorder(.blue, lineWidth: 1)
             .opacity(opacity)
             .scaleEffect(scale)
             .onAppear {
@@ -271,7 +282,7 @@ struct DotView: View {
     @State var scale: CGFloat = 1
     @State var opacity: CGFloat = 0
     @State var isContracted = true
-    @State var expandedOffset: CGFloat = 0
+    @State var expandedOffset: CGFloat = -1
     
     var body: some View {
         Circle()
@@ -289,7 +300,7 @@ struct DotView: View {
                 withAnimation(.easeInOut(duration: Consts.CookieAnimation.halfDuration).delay(Consts.CookieAnimation.secondPhaseDelay)) {
                     scale = 0
                     opacity = 0
-                    expandedOffset = -6
+                    expandedOffset = -2
                 }
             }
     }
