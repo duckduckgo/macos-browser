@@ -92,16 +92,12 @@ final class HistoryMenu: NSMenu {
         recentlyVisitedMenuItems = [recentlyVisitedHeaderMenuItem]
         recentlyVisitedMenuItems.append(contentsOf: historyCoordinator.getRecentVisits(maxCount: 14)
             .map {
-                NSMenuItem(visitViewModel: VisitViewModel(visit: $0), target: self)
+                NSMenuItem(visitViewModel: VisitViewModel(visit: $0))
             }
         )
         recentlyVisitedMenuItems.forEach {
             addItem($0)
         }
-    }
-
-    @objc func openRecentlyVisited(_ sender: NSMenuItem) {
-        //todo
     }
 
     // MARK: - History Groupings
@@ -180,7 +176,7 @@ final class HistoryMenu: NSMenu {
 
     private func makeMenuItems(from grouping: HistoryGrouping) -> [NSMenuItem] {
         return grouping.visits.map { visit in
-            NSMenuItem(visitViewModel: VisitViewModel(visit: visit), target: self)
+            NSMenuItem(visitViewModel: VisitViewModel(visit: visit))
         }
     }
 
@@ -357,12 +353,12 @@ private extension HistoryCoordinating {
 
 private extension NSMenuItem {
 
-    convenience init(visitViewModel: VisitViewModel, target: AnyObject) {
+    convenience init(visitViewModel: VisitViewModel) {
         self.init(title: visitViewModel.titleTruncated,
-                  action: #selector(HistoryMenu.openRecentlyVisited(_:)),
-                  target: target,
+                  action: #selector(AppDelegate.openVisit(_:)),
                   keyEquivalent: "")
         image = visitViewModel.smallFaviconImage?.resizedToFaviconSize()
+        representedObject = visitViewModel.visit
     }
 
 }

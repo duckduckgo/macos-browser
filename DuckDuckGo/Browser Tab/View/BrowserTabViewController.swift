@@ -180,6 +180,11 @@ final class BrowserTabViewController: NSViewController {
         if let oldWebView = oldWebView, let webViewContainer = webViewContainer {
             removeWebViewFromHierarchy(webView: oldWebView, container: webViewContainer)
         }
+
+        if setFirstResponderAfterAdding {
+            setFirstResponderAfterAdding = false
+            makeWebViewFirstResponder()
+        }
     }
 
     func subscribeToTabContent(of tabViewModel: TabViewModel?) {
@@ -222,8 +227,15 @@ final class BrowserTabViewController: NSViewController {
     }
 
     func makeWebViewFirstResponder() {
-        self.webView?.makeMeFirstResponder()
+        if let webView = self.webView {
+            webView.makeMeFirstResponder()
+        } else {
+            setFirstResponderAfterAdding = true
+            view.window?.makeFirstResponder(nil)
+        }
     }
+
+    private var setFirstResponderAfterAdding = false
 
     private func setFirstResponderIfNeeded() {
         guard webView?.url != nil else {

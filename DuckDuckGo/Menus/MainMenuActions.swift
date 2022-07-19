@@ -67,22 +67,25 @@ extension AppDelegate {
     }
 
     @objc func searchHistory(_ sender: NSMenuItem) {
-        let mainViewController: MainViewController
-        if let existingViewController = WindowControllersManager.shared.lastKeyMainWindowController?.mainViewController {
-            mainViewController = existingViewController
-        } else {
-            let newWindow = WindowsManager.openNewWindow(with: Tab(content: .homePage))
-            let newWindowController = newWindow?.windowController as? MainWindowController
-            guard let newViewController = newWindowController?.mainViewController else {
-                assertionFailure("No reference to main view controller")
-                return
-            }
-
-            mainViewController = newViewController
+        let window = WindowsManager.openNewWindow(with: Tab(content: .homePage))
+        let windowController = window?.windowController as? MainWindowController
+        guard let viewController = windowController?.mainViewController else {
+            assertionFailure("No reference to main view controller")
+            return
         }
 
-        mainViewController.navigationBarViewController.addressBarViewController?.addressBarTextField.clearValue()
-        mainViewController.navigationBarViewController.addressBarViewController?.addressBarTextField.makeMeFirstResponder()
+        viewController.navigationBarViewController.addressBarViewController?.addressBarTextField.clearValue()
+        viewController.navigationBarViewController.addressBarViewController?.addressBarTextField.makeMeFirstResponder()
+    }
+
+    @objc func openVisit(_ sender: NSMenuItem) {
+        guard let visit = sender.representedObject as? Visit,
+              let url = visit.historyEntry?.url else {
+            assertionFailure("Wrong represented object")
+            return
+        }
+
+        WindowsManager.openNewWindow(with: Tab(content: .contentFromURL(url)))
     }
 
     // MARK: - Window
@@ -324,6 +327,32 @@ extension MainViewController {
         }
 
         selectedTabViewModel.tab.openHomePage()
+    }
+
+    @objc func searchHistory(_ sender: NSMenuItem) {
+        guard let viewController = WindowControllersManager.shared.lastKeyMainWindowController?.mainViewController else {
+            assertionFailure("No reference to main view controller")
+            return
+        }
+
+        viewController.navigationBarViewController.addressBarViewController?.addressBarTextField.clearValue()
+        viewController.navigationBarViewController.addressBarViewController?.addressBarTextField.makeMeFirstResponder()
+    }
+
+    @objc func openVisit(_ sender: NSMenuItem) {
+        guard let visit = sender.representedObject as? Visit,
+              let url = visit.historyEntry?.url else {
+            assertionFailure("Wrong represented object")
+            return
+        }
+
+        guard let selectedTabViewModel = tabCollectionViewModel.selectedTabViewModel else {
+            os_log("MainViewController: No tab view model selected", type: .error)
+            return
+        }
+
+        selectedTabViewModel.tab.setContent(.contentFromURL(url))
+        adjustFirstResponder()
     }
 
     // MARK: - Bookmarks
