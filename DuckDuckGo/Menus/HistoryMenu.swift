@@ -185,9 +185,10 @@ final class HistoryMenu: NSMenu {
     }
 
     private func makeTitle(for grouping: HistoryGrouping) -> String {
-        //todo: month, day, year
         if grouping.date > Date.daysAgo(2).startOfDay {
-            return relativeDateFormatter.string(from: grouping.date)
+            let prefix = relativeDateFormatter.string(from: grouping.date)
+            let suffix = relativeDateSuffixFormatter.string(from: grouping.date)
+            return "\(prefix)\(suffix)"
         } else {
             return dateFormatter.string(from: grouping.date)
         }
@@ -198,6 +199,12 @@ final class HistoryMenu: NSMenu {
         dateFormatter.timeStyle = .none
         dateFormatter.dateStyle = .medium
         dateFormatter.doesRelativeDateFormatting = true
+        return dateFormatter
+    }()
+
+    let relativeDateSuffixFormatter: DateFormatter = {
+        let dateFormatter = DateFormatter()
+        dateFormatter.dateFormat = ", MMMM dd, YYYY"
         return dateFormatter
     }()
 
