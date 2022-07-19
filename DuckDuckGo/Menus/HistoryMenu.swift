@@ -317,7 +317,7 @@ private extension NSApplication {
 
 private extension HistoryCoordinating {
 
-    func getRecentVisits(maxCount: Int) -> [Visit] {
+    func getSortedArrayOfVisits() -> [Visit] {
         guard let history = history else {
             os_log("HistoryCoordinator: No history available", type: .error)
             return []
@@ -329,22 +329,16 @@ private extension HistoryCoordinating {
             }
             .sorted(by: { (visit1, visit2) in
                 visit1.date > visit2.date
-            })
-            .prefix(maxCount))
+            }))
+    }
+
+    func getRecentVisits(maxCount: Int) -> [Visit] {
+        return Array(getSortedArrayOfVisits().prefix(maxCount))
     }
 
     //todo in the background?
     func getVisitGroupings() -> [HistoryMenu.HistoryGrouping] {
-        guard let history = history else {
-            os_log("HistoryCoordinator: No history available", type: .error)
-            return []
-        }
-
-        let visits = Array(history
-            .flatMap { entry in
-                Array(entry.visits)
-            })
-        return Dictionary(grouping: visits) { visit in
+        return Dictionary(grouping: getSortedArrayOfVisits()) { visit in
             return visit.date.startOfDay
         } .map {
             return HistoryMenu.HistoryGrouping(date: $0.key, visits: $0.value)
