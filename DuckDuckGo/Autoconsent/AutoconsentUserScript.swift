@@ -28,16 +28,6 @@ protocol UserScriptWithAutoconsent: UserScript {
     var delegate: AutoconsentUserScriptDelegate? { get set }
 }
 
-final class AutoconsentManagement {
-    static let shared = AutoconsentManagement()
-    var sitesNotifiedCache = Set<String>()
-    var promptLastShown: Date?
-    func clearCache() {
-        dispatchPrecondition(condition: .onQueue(.main))
-        sitesNotifiedCache.removeAll()
-    }
-}
-
 @available(macOS 11, *)
 final class AutoconsentUserScript: NSObject, WKScriptMessageHandlerWithReply, UserScriptWithAutoconsent {
     var injectionTime: WKUserScriptInjectionTime { .atDocumentStart }
@@ -45,6 +35,8 @@ final class AutoconsentUserScript: NSObject, WKScriptMessageHandlerWithReply, Us
     var selfTestWebView: WKWebView?
     var selfTestFrameInfo: WKFrameInfo?
     var topUrl: URL?
+    let preferences = PrivacySecurityPreferences.shared
+    let management = AutoconsentManagement.shared
 
     enum Constants {
         static let newSitePopupHidden = Notification.Name("newSitePopupHidden")
@@ -211,7 +203,7 @@ extension AutoconsentUserScript {
             replyHandler([ "type": "ok" ], nil) // this is just to prevent a Promise rejection
             return
         }
-        if PrivacySecurityPreferences.shared.autoconsentEnabled == false {
+        if preferences.autoconsentEnabled == false {
             // this will only happen if the user has just declined a prompt in this tab
             replyHandler([ "type": "ok" ], nil) // this is just to prevent a Promise rejection
             return
@@ -227,7 +219,7 @@ extension AutoconsentUserScript {
             topUrl = url
             // reset dashboard state
             refreshDashboardState(
-                consentManaged: AutoconsentManagement.shared.sitesNotifiedCache.contains(url.host ?? ""),
+                consentManaged: management.sitesNotifiedCache.contains(url.host ?? ""),
                 optoutFailed: nil,
                 selftestFailed: nil
             )
@@ -241,10 +233,10 @@ extension AutoconsentUserScript {
             "config": [
                 "enabled": true,
                 // if it's the first time, disable autoAction
-                "autoAction": PrivacySecurityPreferences.shared.autoconsentEnabled == true ? "optOut" : nil,
+                "autoAction": preferences.autoconsentEnabled == true ? "optOut" : nil,
                 "disabledCmps": disabledCMPs,
                 // the very first time, make sure the popup is visible
-                "enablePrehide": PrivacySecurityPreferences.shared.autoconsentEnabled,
+                "enablePrehide": preferences.autoconsentEnabled,
                 "detectRetries": 20
             ]
         ], nil)
@@ -290,7 +282,7 @@ extension AutoconsentUserScript {
     
     @MainActor
     func handlePopupFound(message: WKScriptMessage, replyHandler: @escaping (Any?, String?) -> Void) {
-        guard PrivacySecurityPreferences.shared.autoconsentEnabled == nil else {
+        guard preferences.autoconsentEnabled == nil else {
             // if feature is already enabled, opt-out will happen automatically
             replyHandler([ "type": "ok" ], nil) // this is just to prevent a Promise rejection
             return
@@ -349,9 +341,9 @@ extension AutoconsentUserScript {
         refreshDashboardState(consentManaged: true, optoutFailed: false, selftestFailed: nil)
         
         // trigger popup once per domain
-        if !AutoconsentManagement.shared.sitesNotifiedCache.contains(host) {
+        if !management.sitesNotifiedCache.contains(host) {
             os_log("bragging that we closed a popup", log: .autoconsent, type: .debug)
-            AutoconsentManagement.shared.sitesNotifiedCache.insert(host)
+            management.sitesNotifiedCache.insert(host)
             // post popover notification on main thread
             DispatchQueue.main.async {
                 NotificationCenter.default.post(name: Constants.newSitePopupHidden, object: self, userInfo: [
@@ -399,29 +391,28 @@ extension AutoconsentUserScript {
 
     @MainActor
     func ensurePrompt(window: NSWindow, callback: @escaping (Bool) -> Void) {
-        let preferences = PrivacySecurityPreferences.shared
         let now = Date.init()
-        guard AutoconsentManagement.shared.promptLastShown == nil || now > AutoconsentManagement.shared.promptLastShown!.addingTimeInterval(30) else {
+        guard management.promptLastShown == nil || now > management.promptLastShown!.addingTimeInterval(30) else {
             // user said "not now" recently, don't bother asking
             os_log("Have a recent user response, canceling prompt", log: .autoconsent, type: .debug)
             callback(preferences.autoconsentEnabled ?? false) // if two prompts were scheduled from the same tab, result could be true
             return
         }
 
-        AutoconsentManagement.shared.promptLastShown = now
+        management.promptLastShown = now
         let alert = NSAlert.cookiePopup()
         alert.beginSheetModal(for: window, completionHandler: { response in
             switch response {
             case .alertFirstButtonReturn:
                 // User wants to turn on the feature
-                preferences.autoconsentEnabled = true
+                self.preferences.autoconsentEnabled = true
                 callback(true)
             case .alertSecondButtonReturn:
                 // "Not now"
                 callback(false)
             case .alertThirdButtonReturn:
                 // "Don't ask again"
-                preferences.autoconsentEnabled = false
+                self.preferences.autoconsentEnabled = false
                 callback(false)
             case _:
                 callback(false)
