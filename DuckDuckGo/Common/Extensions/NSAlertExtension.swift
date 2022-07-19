@@ -64,13 +64,33 @@ extension NSAlert {
         return alert
     }
 
-    static func fireButtonAlert() -> NSAlert {
+    static func clearAllHistoryAndDataAlert() -> NSAlert {
         let alert = NSAlert()
-        alert.messageText = UserText.burnAlertMessageText
-        alert.informativeText = UserText.burnAlertInformativeText
+        alert.messageText = UserText.clearAllDataQuestion
+        alert.informativeText = UserText.clearAllDataDescription
         alert.alertStyle = .warning
-        alert.icon = NSImage(named: "BurnAlert")
-        alert.addButton(withTitle: UserText.burn)
+        alert.icon = NSImage(named: "FireHeader")
+        alert.addButton(withTitle: UserText.clear)
+        alert.addButton(withTitle: UserText.cancel)
+        return alert
+    }
+
+    static func clearHistoryAndDataAlert(date: Date?, includesFireproofed: Bool) -> NSAlert {
+        let alert = NSAlert()
+        if let date = date {
+            //todo date format
+            alert.messageText = String(format: UserText.clearDataHeader, "selected date")
+        } else {
+            alert.messageText = String(format: UserText.clearDataHeader, "selected dates")
+        }
+
+        alert.informativeText = UserText.clearDataDescription
+        if includesFireproofed {
+            alert.informativeText += "\( UserText.clearDataDescriptionFireproof)"
+        }
+        alert.alertStyle = .warning
+        alert.icon = NSImage(named: "FireHeader")
+        alert.addButton(withTitle: UserText.clear)
         alert.addButton(withTitle: UserText.cancel)
         return alert
     }

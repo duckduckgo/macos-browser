@@ -20,6 +20,8 @@ import Cocoa
 import os.log
 import BrowserServicesKit
 
+// swiftlint:disable file_length
+
 // Actions are sent to objects of responder chain
 
 // MARK: - Main Menu Actions
@@ -74,8 +76,7 @@ extension AppDelegate {
             return
         }
 
-        viewController.navigationBarViewController.addressBarViewController?.addressBarTextField.clearValue()
-        viewController.navigationBarViewController.addressBarViewController?.addressBarTextField.makeMeFirstResponder()
+        viewController.searchHistory(sender)
     }
 
     @objc func openVisit(_ sender: NSMenuItem) {
@@ -86,6 +87,26 @@ extension AppDelegate {
         }
 
         WindowsManager.openNewWindow(with: Tab(content: .contentFromURL(url)))
+    }
+
+    @objc func clearAllHistory(_ sender: NSMenuItem) {
+        guard let window = WindowsManager.openNewWindow(with: Tab(content: .homePage)),
+              let windowController = window.windowController as? MainWindowController else {
+            assertionFailure("No reference to main window controller")
+            return
+        }
+
+        windowController.mainViewController.clearAllHistory(sender)
+    }
+
+    @objc func clearThisHistory(_ sender: NSMenuItem) {
+        guard let window = WindowsManager.openNewWindow(with: Tab(content: .homePage)),
+              let windowController = window.windowController as? MainWindowController else {
+            assertionFailure("No reference to main window controller")
+            return
+        }
+
+        windowController.mainViewController.clearThisHistory(sender)
     }
 
     // MARK: - Window
@@ -353,6 +374,39 @@ extension MainViewController {
 
         selectedTabViewModel.tab.setContent(.contentFromURL(url))
         adjustFirstResponder()
+    }
+
+    @objc func clearAllHistory(_ sender: NSMenuItem) {
+        guard let window = view.window else {
+            assertionFailure("No window")
+            return
+        }
+
+        let alert = NSAlert.clearAllHistoryAndDataAlert()
+        alert.beginSheetModal(for: window, completionHandler: { [weak self] response in
+            guard case .alertFirstButtonReturn = response, let self = self else {
+                return
+            }
+            FireCoordinator.fireViewModel.fire.burnAll(tabCollectionViewModel: self.tabCollectionViewModel)
+        })
+    }
+
+    @objc func clearThisHistory(_ sender: NSMenuItem) {
+        guard let window = view.window else {
+            assertionFailure("No window")
+            return
+        }
+
+        let date = sender.representedObject as? Date
+        //todo burning domains + fireproof domains
+        //todo everything in fireproofed alert
+        let alert = NSAlert.clearHistoryAndDataAlert(date: date, includesFireproofed: false)
+        alert.beginSheetModal(for: window, completionHandler: { response in
+            guard case .alertFirstButtonReturn = response else {
+                return
+            }
+            FireCoordinator.fireViewModel.fire.burnDomains(Set())
+        })
     }
 
     // MARK: - Bookmarks

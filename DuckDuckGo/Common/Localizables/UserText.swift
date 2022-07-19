@@ -32,6 +32,7 @@ struct UserText {
     static let next = NSLocalizedString("next", value: "Next", comment: "Next button")
     static let pasteAndGo = NSLocalizedString("paste.and.go", value: "Paste & Go", comment: "Paste & Go button")
     static let pasteAndSearch = NSLocalizedString("paste.and.search", value: "Paste & Search", comment: "Paste & Search button")
+    static let clear = NSLocalizedString("clear", value: "Clear", comment: "Clear button")
 
     static let duplicateTab = NSLocalizedString("duplicate.tab", value: "Duplicate Tab", comment: "Menu item. Duplicate as a verb")
     static let closeTab = NSLocalizedString("close.tab", value: "Close Tab", comment: "Menu item")
@@ -58,14 +59,6 @@ struct UserText {
     static let addressBarVisitSuffix = NSLocalizedString("address.bar.visit.suffix",
                                                          value: "Visit",
                                                          comment: "Address bar suffix of possibly visited website. Example: spreadprivacy.com . Visit spreadprivacy.com")
-
-    static let burnAlertMessageText = NSLocalizedString("burn.alert.message.text",
-                                                        value: "Are you sure you want to burn everything?",
-                                                        comment: "")
-    static let burnAlertInformativeText = NSLocalizedString("burn.alert.informative.text",
-                                                            value: "This will close all tabs and clear website data.",
-                                                            comment: "")
-    static let burn = NSLocalizedString("burn", value: "Burn", comment: "Burn button")
 
     static let navigateBack = NSLocalizedString("navigate.back", value: "Back", comment: "Context menu item")
     static let closeAndReturnToParentFormat = NSLocalizedString("close.tab.on.back.format",
@@ -503,7 +496,14 @@ struct UserText {
     static let recentlyVisitedMenuSection = NSLocalizedString("history.menu.recently.visited", value: "Recently Visited", comment: "Section header of the history menu")
     static let olderMenuItem = NSLocalizedString("history.menu.older", value: "Older...", comment: "Menu item representing older history")
 
+    static let clearAllDataQuestion = NSLocalizedString("clear.all.data.question", value: "Clear all data?", comment: "Alert with the confirmation to clear all data")
+    static let clearAllDataDescription = NSLocalizedString("clear.all.data.description", value: "This will close all tabs and clear all website data.", comment: "Description in the alert with the confirmation to clear all data")
 
+    static let clearDataHeader = NSLocalizedString("clear.data.question", value: "Clear all data for %@?", comment: "Alert with the confirmation to clear all data")
+    static let clearDataDescription = NSLocalizedString("clear.data.description", value: "This will close all tabs and clear all website data.", comment: "Description in the alert with the confirmation to clear data and history")
+    static let clearDataDescriptionFireproof = NSLocalizedString("clear.data.description.fireproof", value: "Fireproof sites will not be cleared.", comment: "Description in the alert with the confirmation to clear data and history")
 
+    static let allSitesFireproofAlertHeader = NSLocalizedString("all.sites.fireproof.alert.header", value: "All of the sites in this list are Fireproof.", comment: "")
+    static let allSitesFireproofAlertDescription = NSLocalizedString("all.sites.fireproof.alert.description", value: "To remove Fireproofing from a site, go to Settings", comment: "")
 
 }

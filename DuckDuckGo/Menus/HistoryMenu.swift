@@ -212,14 +212,9 @@ final class HistoryMenu: NSMenu {
 
     private func makeClearThisHistoryMenuItems() -> [NSMenuItem] {
         return [NSMenuItem(title: UserText.clearThisHistoryMenuItem,
-                           action: #selector(clearThisHistory(_:)),
-                           target: self,
+                           action: #selector(AppDelegate.clearThisHistory(_:)),
                            keyEquivalent: ""),
                 NSMenuItem.separator()]
-    }
-
-    @objc func clearThisHistory(_ sender: NSMenuItem) {
-        //todo
     }
 
     // MARK: - Search History
@@ -236,8 +231,7 @@ final class HistoryMenu: NSMenu {
 
     lazy var clearAllHistoryMenuItem: NSMenuItem = {
         let menuItem = NSMenuItem(title: UserText.clearAllHistoryMenuItem,
-                                  action: #selector(clearAllHistory(_:)),
-                                  target: self,
+                                  action: #selector(AppDelegate.clearAllHistory(_:)),
                                   keyEquivalent: "\u{08}")
         menuItem.keyEquivalentModifierMask = NSEvent.ModifierFlags(rawValue: 1179648)
         return menuItem
@@ -246,10 +240,6 @@ final class HistoryMenu: NSMenu {
     private func addClearAllHistory() {
         addItem(NSMenuItem.separator())
         addItem(clearAllHistoryMenuItem)
-    }
-
-    @objc func clearAllHistory(_ sender: NSMenuItem) {
-        //todo
     }
 
 }
