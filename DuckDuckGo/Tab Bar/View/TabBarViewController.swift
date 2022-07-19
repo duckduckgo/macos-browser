@@ -417,6 +417,7 @@ extension TabBarViewController: TabCollectionViewModelDelegate {
         collectionView.animator().insertItems(at: indexPathSet)
         if selected {
             collectionView.selectItems(at: indexPathSet, scrollPosition: .centeredHorizontally)
+            collectionView.scrollToSelected()
         }
 
         updateTabMode()
