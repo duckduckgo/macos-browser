@@ -39,19 +39,18 @@ class AutoconsentMessageProtocolTests: XCTestCase {
     @MainActor
     func testInitIgnoresNonHttp() {
         let expect = expectation(description: "tt")
+        let message = MockWKScriptMessage(name: "init", body: [
+            "type": "init",
+            "url": "file://helicopter"
+        ])
         userScript.handleMessage(
-            messageName: .`init`,
-            messageData: [
-                "type": "init",
-                "url": "file://helicopter"
-            ],
             replyHandler: {(msg: Any?, _: String?) in
                 expect.fulfill()
                 XCTAssertEqual(self.replyToJson(msg: msg!), """
                 {"type":"ok"}
                 """)
             },
-            message: WKScriptMessage()
+            message: message
         )
         waitForExpectations(timeout: 1.0)
     }
@@ -59,12 +58,11 @@ class AutoconsentMessageProtocolTests: XCTestCase {
     @MainActor
     func testInitResponds() {
         let expect = expectation(description: "tt")
+        let message = MockWKScriptMessage(name: "init", body: [
+            "type": "init",
+            "url": "https://example.com"
+        ])
         userScript.handleMessage(
-            messageName: .`init`,
-            messageData: [
-                "type": "init",
-                "url": "https://example.com"
-            ],
             replyHandler: {(msg: Any?, _: String?) in
                 expect.fulfill()
                 // swiftlint:disable line_length
@@ -73,23 +71,20 @@ class AutoconsentMessageProtocolTests: XCTestCase {
                 """)
                 // swiftlint:enable line_length
             },
-            message: WKScriptMessage()
+            message: message
         )
         waitForExpectations(timeout: 1.0)
     }
     
     @MainActor
     func testEval() {
-        let msg = [
+        let message = MockWKScriptMessage(name: "eval", body: [
             "type": "eval",
             "id": "some id",
             "code": "1+1==2"
-        ]
-        let message = MockWKScriptMessage(name: "eval", body: msg, webView: WKWebView())
+        ], webView: WKWebView())
         let expect = expectation(description: "testEval")
         userScript.handleMessage(
-            messageName: .eval,
-            messageData: msg,
             replyHandler: {(msg: Any?, _: String?) in
                 expect.fulfill()
                 XCTAssertEqual(self.replyToJson(msg: msg!), """
@@ -103,22 +98,20 @@ class AutoconsentMessageProtocolTests: XCTestCase {
     
     @MainActor
     func testPopupFoundNoPromptIfEnabled() {
-        let msg = [
+        let expect = expectation(description: "tt")
+        let message = MockWKScriptMessage(name: "popupFound", body: [
             "type": "popupFound",
             "cmp": "some cmp",
             "url": "some url"
-        ]
-        let expect = expectation(description: "tt")
+        ])
         userScript.handleMessage(
-            messageName: .popupFound,
-            messageData: msg,
             replyHandler: {(msg: Any?, _: String?) in
                 expect.fulfill()
                 XCTAssertEqual(self.replyToJson(msg: msg!), """
                 {"type":"ok"}
                 """)
             },
-            message: WKScriptMessage()
+            message: message
         )
         waitForExpectations(timeout: 1.0)
     }

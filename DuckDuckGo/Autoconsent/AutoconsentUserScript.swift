@@ -49,18 +49,7 @@ final class AutoconsentUserScript: NSObject, WKScriptMessageHandlerWithReply, Us
     enum Constants {
         static let newSitePopupHidden = Notification.Name("newSitePopupHidden")
     }
-    
-    enum MessageName: String, CaseIterable {
-        case `init`
-        case cmpDetected
-        case eval
-        case popupFound
-        case optOutResult
-        case optInResult
-        case selfTestResult
-        case autoconsentDone
-        case autoconsentError
-    }
+
     public var messageNames: [String] { MessageName.allCases.map(\.rawValue) }
     let source: String
     private let config: PrivacyConfiguration
@@ -89,36 +78,106 @@ final class AutoconsentUserScript: NSObject, WKScriptMessageHandlerWithReply, Us
                                didReceive message: WKScriptMessage,
                                replyHandler: @escaping (Any?, String?) -> Void) {
         os_log("Message received: %s", log: .autoconsent, type: .debug, String(describing: message.body))
-        guard let messageName = MessageName(rawValue: message.name) else {
-            replyHandler(nil, "Unknown message type")
-            return
-        }
-        
-        guard let messageData = message.body as? [String: Any] else {
-            replyHandler(nil, "cannot decode message")
-            return
-        }
+        return handleMessage(replyHandler: replyHandler, message: message)
+    }
+}
 
-        return handleMessage(messageName: messageName, messageData: messageData, replyHandler: replyHandler, message: message)
+@available(macOS 11, *)
+extension AutoconsentUserScript {
+    enum MessageName: String, CaseIterable {
+        case `init`
+        case cmpDetected
+        case eval
+        case popupFound
+        case optOutResult
+        case optInResult
+        case selfTestResult
+        case autoconsentDone
+        case autoconsentError
+    }
+
+    struct InitMessage: Codable {
+        let type: String
+        let url: String
+    }
+
+    struct CmpDetectedMessage: Codable {
+        let type: String
+        let cmp: String
+        let url: String
+    }
+
+    struct EvalMessage: Codable {
+        let type: String
+        let id: String
+        let code: String
+    }
+    
+    struct PopupFoundMessage: Codable {
+        let type: String
+        let cmp: String
+        let url: String
+    }
+    
+    struct OptOutResultMessage: Codable {
+        let type: String
+        let cmp: String
+        let result: Bool
+        let scheduleSelfTest: Bool
+        let url: String
+    }
+    
+    struct OptInResultMessage: Codable {
+        let type: String
+        let cmp: String
+        let result: Bool
+        let scheduleSelfTest: Bool
+        let url: String
+    }
+    
+    struct SelfTestResultMessage: Codable {
+        let type: String
+        let cmp: String
+        let result: Bool
+        let url: String
+    }
+    
+    struct AutoconsentDoneMessage: Codable {
+        let type: String
+        let cmp: String
+        let url: String
+    }
+    
+    func decodeMessageBody<Input: Any, Target: Codable>(from message: Input) -> Target? {
+        do {
+            let json = try JSONSerialization.data(withJSONObject: message)
+            return try JSONDecoder().decode(Target.self, from: json)
+        } catch {
+            os_log(.error, "Error decoding message body: %{public}@", error.localizedDescription)
+            return nil
+        }
     }
 }
 
 @available(macOS 11, *)
 extension AutoconsentUserScript {
     @MainActor
-    func handleMessage(messageName: MessageName,
-                       messageData: [String: Any],
-                       replyHandler: @escaping (Any?, String?) -> Void,
+    func handleMessage(replyHandler: @escaping (Any?, String?) -> Void,
                        message: WKScriptMessage) {
+        guard let messageName = MessageName(rawValue: message.name) else {
+            replyHandler(nil, "Unknown message type")
+            return
+        }
+
         switch messageName {
         case MessageName.`init`:
-            handleInit(messageData: messageData, replyHandler: replyHandler, message: message)
+            handleInit(message: message, replyHandler: replyHandler)
         case MessageName.eval:
-            handleEval(messageData: messageData, replyHandler: replyHandler, message: message)
+            handleEval(message: message, replyHandler: replyHandler)
         case MessageName.popupFound:
-            handlePopupFound(messageData: messageData, replyHandler: replyHandler, message: message)
+            handlePopupFound(message: message, replyHandler: replyHandler)
         case MessageName.optOutResult:
-            handleOptOutResult(messageData: messageData, replyHandler: replyHandler, message: message)
+            handleOptOutResult(message: message, replyHandler: replyHandler)
         case MessageName.optInResult:
             // this is not supported in browser
             os_log("ignoring optInResult: %s", log: .autoconsent, type: .debug, String(describing: message.body))
@@ -127,25 +186,28 @@ extension AutoconsentUserScript {
             // no need to do anything here
             replyHandler([ "type": "ok" ], nil) // this is just to prevent a Promise rejection
         case MessageName.selfTestResult:
-            handleSelfTestResult(messageData: messageData, replyHandler: replyHandler)
+            handleSelfTestResult(message: message, replyHandler: replyHandler)
         case MessageName.autoconsentDone:
-            handleAutoconsentDone(messageData: messageData, replyHandler: replyHandler)
+            handleAutoconsentDone(message: message, replyHandler: replyHandler)
         case MessageName.autoconsentError:
             os_log("Autoconsent error: %s", log: .autoconsent, String(describing: message.body))
             replyHandler([ "type": "ok" ], nil) // this is just to prevent a Promise rejection
         }
     }
-    
+
     @MainActor
-    func handleInit(messageData: [String: Any], replyHandler: @escaping (Any?, String?) -> Void, message: WKScriptMessage) {
-        guard let urlString = messageData["url"] as? String,
-              let url = URL(string: urlString) else {
+    func handleInit(message: WKScriptMessage, replyHandler: @escaping (Any?, String?) -> Void) {
+        guard let messageData: InitMessage = decodeMessageBody(from: message.body) else {
+            replyHandler(nil, "cannot decode message")
+            return
+        }
+        guard let url = URL(string: messageData.url) else {
             replyHandler(nil, "cannot decode init request")
             return
         }
         if !url.isHttp && !url.isHttps {
             // ignore special schemes
-            os_log("Ignoring special URL scheme: %s", log: .autoconsent, type: .debug, urlString)
+            os_log("Ignoring special URL scheme: %s", log: .autoconsent, type: .debug, messageData.url)
             replyHandler([ "type": "ok" ], nil) // this is just to prevent a Promise rejection
             return
         }
@@ -157,6 +219,7 @@ extension AutoconsentUserScript {
 
         guard config.isFeature(.autoconsent, enabledForDomain: url.host) else {
             os_log("disabled for site: %s", log: .autoconsent, type: .info, String(describing: url.absoluteString))
+            replyHandler([ "type": "ok" ], nil) // this is just to prevent a Promise rejection
             return
         }
 
@@ -188,16 +251,15 @@ extension AutoconsentUserScript {
     }
     
     @MainActor
-    func handleEval(messageData: [String: Any], replyHandler: @escaping (Any?, String?) -> Void, message: WKScriptMessage) {
-        guard let payload = messageData["code"],
-              let reqId = messageData["id"] else {
-            replyHandler(nil, "cannot decode eval request")
+    func handleEval(message: WKScriptMessage, replyHandler: @escaping (Any?, String?) -> Void) {
+        guard let messageData: EvalMessage = decodeMessageBody(from: message.body) else {
+            replyHandler(nil, "cannot decode message")
             return
         }
         let script = """
         (() => {
         try {
-            return !!(\(payload))
+            return !!(\(messageData.code))
         } catch (e) {
           // ignore CSP errors
           return;
@@ -214,7 +276,7 @@ extension AutoconsentUserScript {
                     replyHandler(
                         [
                             "type": "evalResp",
-                            "id": reqId,
+                            "id": messageData.id,
                             "result": value
                         ],
                         nil
@@ -227,7 +289,7 @@ extension AutoconsentUserScript {
     }
     
     @MainActor
-    func handlePopupFound(messageData: [String: Any], replyHandler: @escaping (Any?, String?) -> Void, message: WKScriptMessage) {
+    func handlePopupFound(message: WKScriptMessage, replyHandler: @escaping (Any?, String?) -> Void) {
         guard PrivacySecurityPreferences.shared.autoconsentEnabled == nil else {
             // if feature is already enabled, opt-out will happen automatically
             replyHandler([ "type": "ok" ], nil) // this is just to prevent a Promise rejection
@@ -251,17 +313,16 @@ extension AutoconsentUserScript {
     }
     
     @MainActor
-    func handleOptOutResult(messageData: [String: Any], replyHandler: @escaping (Any?, String?) -> Void, message: WKScriptMessage) {
-        os_log("opt-out result: %s", log: .autoconsent, type: .debug, String(describing: messageData))
-        guard let scheduleSelfTest = messageData["scheduleSelfTest"] as? Bool,
-              let result = messageData["result"] as? Bool else {
+    func handleOptOutResult(message: WKScriptMessage, replyHandler: @escaping (Any?, String?) -> Void) {
+        guard let messageData: OptOutResultMessage = decodeMessageBody(from: message.body) else {
             replyHandler(nil, "cannot decode message")
             return
         }
+        os_log("opt-out result: %s", log: .autoconsent, type: .debug, String(describing: messageData))
 
-        if !result {
+        if !messageData.result {
             refreshDashboardState(consentManaged: true, optoutFailed: true, selftestFailed: nil)
-        } else if scheduleSelfTest {
+        } else if messageData.scheduleSelfTest {
             // save a reference to the webview and frame for self-test
             selfTestWebView = message.webView
             selfTestFrameInfo = message.frameInfo
@@ -271,12 +332,15 @@ extension AutoconsentUserScript {
     }
     
     @MainActor
-    func handleAutoconsentDone(messageData: [String: Any], replyHandler: @escaping (Any?, String?) -> Void) {
+    func handleAutoconsentDone(message: WKScriptMessage, replyHandler: @escaping (Any?, String?) -> Void) {
         // report a managed popup
+        guard let messageData: AutoconsentDoneMessage = decodeMessageBody(from: message.body) else {
+            replyHandler(nil, "cannot decode message")
+            return
+        }
         os_log("opt-out successful: %s", log: .autoconsent, type: .debug, String(describing: messageData))
         
-        guard let urlString = messageData["url"] as? String,
-              let url = URL(string: urlString),
+        guard let url = URL(string: messageData.url),
               let host = url.host else {
             replyHandler(nil, "cannot decode message")
             return
@@ -300,7 +364,7 @@ extension AutoconsentUserScript {
 
         if let selfTestWebView = selfTestWebView,
            let selfTestFrameInfo = selfTestFrameInfo {
-            os_log("requesting self-test in: %s", log: .autoconsent, type: .debug, urlString)
+            os_log("requesting self-test in: %s", log: .autoconsent, type: .debug, messageData.url)
             selfTestWebView.evaluateJavaScript(
                 "window.autoconsentMessageCallback({ type: 'selfTest' })",
                 in: selfTestFrameInfo,
@@ -322,14 +386,14 @@ extension AutoconsentUserScript {
     }
     
     @MainActor
-    func handleSelfTestResult(messageData: [String: Any], replyHandler: @escaping (Any?, String?) -> Void) {
-        // store self-test result
-        os_log("self-test result: %s", log: .autoconsent, type: .debug, String(describing: messageData))
-        guard let result = messageData["result"] as? Bool else {
+    func handleSelfTestResult(message: WKScriptMessage, replyHandler: @escaping (Any?, String?) -> Void) {
+        guard let messageData: SelfTestResultMessage = decodeMessageBody(from: message.body) else {
             replyHandler(nil, "cannot decode message")
             return
         }
-        refreshDashboardState(consentManaged: true, optoutFailed: false, selftestFailed: result)
+        // store self-test result
+        os_log("self-test result: %s", log: .autoconsent, type: .debug, String(describing: messageData))
+        refreshDashboardState(consentManaged: true, optoutFailed: false, selftestFailed: messageData.result)
         replyHandler([ "type": "ok" ], nil) // this is just to prevent a Promise rejection
     }
 
