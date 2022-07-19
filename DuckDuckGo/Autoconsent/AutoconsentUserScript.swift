@@ -32,8 +32,8 @@ protocol UserScriptWithAutoconsent: UserScript {
 final class AutoconsentUserScript: NSObject, WKScriptMessageHandlerWithReply, UserScriptWithAutoconsent {
     var injectionTime: WKUserScriptInjectionTime { .atDocumentStart }
     var forMainFrameOnly: Bool { false }
-    var selfTestWebView: WKWebView?
-    var selfTestFrameInfo: WKFrameInfo?
+    weak var selfTestWebView: WKWebView?
+    weak var selfTestFrameInfo: WKFrameInfo?
     var topUrl: URL?
     let preferences = PrivacySecurityPreferences.shared
     let management = AutoconsentManagement.shared
