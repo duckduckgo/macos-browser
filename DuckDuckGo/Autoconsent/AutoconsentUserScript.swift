@@ -235,8 +235,8 @@ extension AutoconsentUserScript {
                 // if it's the first time, disable autoAction
                 "autoAction": preferences.autoconsentEnabled == true ? "optOut" : nil,
                 "disabledCmps": disabledCMPs,
-                // the very first time, make sure the popup is visible
-                "enablePrehide": preferences.autoconsentEnabled,
+                // the very first time (autoconsentEnabled = nil), make sure the popup is visible
+                "enablePrehide": preferences.autoconsentEnabled ?? false,
                 "detectRetries": 20
             ]
         ], nil)
