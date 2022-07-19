@@ -497,10 +497,13 @@ struct UserText {
     static let reopenLastClosedTab = NSLocalizedString("reopen.last.closed.tab", value: "Reopen Last Closed Tab", comment: "")
     static let reopenLastClosedWindow = NSLocalizedString("reopen.last.closed.window", value: "Reopen Last Closed Window", comment: "")
 
-    static let clearAllHistoryMenuItem = NSLocalizedString("history.menu.clear.all.history", value: "Clear All History...", comment: "Menu item to clear all history")
-    static let clearThisHistoryMenuItem = NSLocalizedString("history.menu.clear.this.history", value: "Clear This History...", comment: "Menu item to clear parts of history")
+    static let clearAllHistoryMenuItem = NSLocalizedString("history.menu.clear.all.history", value: "Clear All History and Data...", comment: "Menu item to clear all history and data")
+    static let clearThisHistoryMenuItem = NSLocalizedString("history.menu.clear.this.history", value: "Clear History and Data from These Sites…", comment: "Menu item to clear parts of history and data")
     static let searchHistoryMenuItem = NSLocalizedString("history.menu.search.history", value: "Search History...", comment: "Menu item to search history")
     static let recentlyVisitedMenuSection = NSLocalizedString("history.menu.recently.visited", value: "Recently Visited", comment: "Section header of the history menu")
     static let olderMenuItem = NSLocalizedString("history.menu.older", value: "Older...", comment: "Menu item representing older history")
+
+
+
 
 }
