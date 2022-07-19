@@ -53,10 +53,14 @@ final class BookmarksBarViewController: NSViewController {
         viewModel.delegate = self
 
         let nib = NSNib(nibNamed: "BookmarksBarCollectionViewItem", bundle: .main)
-        bookmarksBarCollectionView.register(nib, forItemWithIdentifier: BookmarksBarCollectionViewItem.identifier)
-        
-        bookmarksBarCollectionView.registerForDraggedTypes([.string, .URL])
         bookmarksBarCollectionView.setDraggingSourceOperationMask(.copy, forLocal: true)
+        bookmarksBarCollectionView.register(nib, forItemWithIdentifier: BookmarksBarCollectionViewItem.identifier)
+        bookmarksBarCollectionView.registerForDraggedTypes([
+            .string,
+            .URL,
+            BookmarkPasteboardWriter.bookmarkUTIInternalType,
+            FolderPasteboardWriter.folderUTIInternalType
+        ])
         
         bookmarksBarCollectionView.delegate = viewModel
         bookmarksBarCollectionView.dataSource = viewModel
@@ -197,8 +201,7 @@ extension BookmarksBarViewController: BookmarksBarViewModelDelegate {
                 bookmark.isFavorite = !bookmark.isFavorite
                 bookmarkManager.update(bookmark: bookmark)
             case .copyURL:
-                // TODO: Actually copy the URL
-                break
+                NSPasteboard.general.copy(url: bookmark.url)
             case .deleteEntity:
                 bookmarkManager.remove(bookmark: bookmark)
             }
