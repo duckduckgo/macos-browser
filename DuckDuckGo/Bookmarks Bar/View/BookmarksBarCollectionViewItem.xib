@@ -22,36 +22,23 @@
                         </userDefinedRuntimeAttribute>
                     </userDefinedRuntimeAttributes>
                 </customView>
-                <stackView distribution="fill" orientation="horizontal" alignment="centerY" spacing="4" horizontalStackHuggingPriority="249.99998474121094" verticalStackHuggingPriority="249.99998474121094" detachesHiddenViews="YES" translatesAutoresizingMaskIntoConstraints="NO" id="KId-EQ-QP4">
-                    <rect key="frame" x="7" y="0.0" width="170" height="99"/>
-                    <subviews>
-                        <imageView horizontalHuggingPriority="251" verticalHuggingPriority="251" translatesAutoresizingMaskIntoConstraints="NO" id="aEY-jN-qvL" userLabel="Favicon Image View">
-                            <rect key="frame" x="0.0" y="42" width="16" height="16"/>
-                            <constraints>
-                                <constraint firstAttribute="height" constant="16" id="LbV-fW-nWP"/>
-                                <constraint firstAttribute="width" constant="16" id="s73-Is-qty"/>
-                            </constraints>
-                            <imageCell key="cell" refusesFirstResponder="YES" alignment="left" imageScaling="proportionallyDown" image="Bookmark" id="br4-aE-1QB"/>
-                            <color key="contentTintColor" name="BlackWhite80"/>
-                        </imageView>
-                        <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="fMp-kj-J3A">
-                            <rect key="frame" x="18" y="42" width="154" height="15"/>
-                            <textFieldCell key="cell" lineBreakMode="truncatingMiddle" alignment="left" title="Bookmark" id="7mq-oj-2L8">
-                                <font key="font" metaFont="cellTitle"/>
-                                <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
-                                <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
-                            </textFieldCell>
-                        </textField>
-                    </subviews>
-                    <visibilityPriorities>
-                        <integer value="1000"/>
-                        <integer value="1000"/>
-                    </visibilityPriorities>
-                    <customSpacing>
-                        <real value="3.4028234663852886e+38"/>
-                        <real value="3.4028234663852886e+38"/>
-                    </customSpacing>
-                </stackView>
+                <imageView horizontalHuggingPriority="251" verticalHuggingPriority="251" translatesAutoresizingMaskIntoConstraints="NO" id="aEY-jN-qvL" userLabel="Favicon Image View">
+                    <rect key="frame" x="7" y="42" width="16" height="16"/>
+                    <constraints>
+                        <constraint firstAttribute="height" constant="16" id="LbV-fW-nWP"/>
+                        <constraint firstAttribute="width" constant="16" id="s73-Is-qty"/>
+                    </constraints>
+                    <imageCell key="cell" refusesFirstResponder="YES" alignment="left" imageScaling="proportionallyDown" image="Bookmark" id="br4-aE-1QB"/>
+                    <color key="contentTintColor" name="BlackWhite80"/>
+                </imageView>
+                <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="fMp-kj-J3A">
+                    <rect key="frame" x="25" y="42" width="154" height="15"/>
+                    <textFieldCell key="cell" lineBreakMode="truncatingMiddle" alignment="left" title="Bookmark" id="7mq-oj-2L8">
+                        <font key="font" metaFont="cellTitle"/>
+                        <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
+                        <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
+                    </textFieldCell>
+                </textField>
                 <customView translatesAutoresizingMaskIntoConstraints="NO" id="IHK-ff-XkT" customClass="MouseClickView" customModule="DuckDuckGo_Privacy_Browser" customModuleProvider="target">
                     <rect key="frame" x="0.0" y="0.0" width="184" height="99"/>
                 </customView>
@@ -60,14 +47,15 @@
                 <constraint firstAttribute="trailing" secondItem="IHK-ff-XkT" secondAttribute="trailing" id="1OU-XC-cdf"/>
                 <constraint firstAttribute="trailing" secondItem="Ff3-Xx-JTo" secondAttribute="trailing" id="2VU-ec-cXW"/>
                 <constraint firstItem="IHK-ff-XkT" firstAttribute="top" secondItem="Hz6-mo-xeY" secondAttribute="top" id="7ph-Q0-R4I"/>
+                <constraint firstItem="aEY-jN-qvL" firstAttribute="centerY" secondItem="Hz6-mo-xeY" secondAttribute="centerY" id="FRD-J2-zMP"/>
+                <constraint firstItem="fMp-kj-J3A" firstAttribute="centerY" secondItem="Hz6-mo-xeY" secondAttribute="centerY" id="H0Q-is-CJW"/>
                 <constraint firstAttribute="bottom" secondItem="Ff3-Xx-JTo" secondAttribute="bottom" id="PC6-Xr-IM6"/>
-                <constraint firstItem="KId-EQ-QP4" firstAttribute="top" secondItem="Hz6-mo-xeY" secondAttribute="top" id="PQj-tC-3JU"/>
                 <constraint firstItem="Ff3-Xx-JTo" firstAttribute="top" secondItem="Hz6-mo-xeY" secondAttribute="top" id="Q1T-ZH-Ew3"/>
                 <constraint firstItem="IHK-ff-XkT" firstAttribute="leading" secondItem="Hz6-mo-xeY" secondAttribute="leading" id="RMp-c3-xiB"/>
-                <constraint firstItem="KId-EQ-QP4" firstAttribute="leading" secondItem="Hz6-mo-xeY" secondAttribute="leading" constant="7" id="a09-Tc-R1Q"/>
+                <constraint firstAttribute="trailing" secondItem="fMp-kj-J3A" secondAttribute="trailing" constant="7" id="lxn-aE-KVB"/>
                 <constraint firstAttribute="bottom" secondItem="IHK-ff-XkT" secondAttribute="bottom" id="qDr-an-58u"/>
-                <constraint firstAttribute="trailing" secondItem="KId-EQ-QP4" secondAttribute="trailing" constant="7" id="sdb-On-4qS"/>
-                <constraint firstAttribute="bottom" secondItem="KId-EQ-QP4" secondAttribute="bottom" id="u3L-fo-BK2"/>
+                <constraint firstItem="fMp-kj-J3A" firstAttribute="leading" secondItem="aEY-jN-qvL" secondAttribute="trailing" constant="4" id="svg-gd-cvC"/>
+                <constraint firstItem="aEY-jN-qvL" firstAttribute="leading" secondItem="Hz6-mo-xeY" secondAttribute="leading" constant="7" id="vtS-fU-Vm0"/>
                 <constraint firstItem="Ff3-Xx-JTo" firstAttribute="leading" secondItem="Hz6-mo-xeY" secondAttribute="leading" id="yst-tx-82t"/>
             </constraints>
             <point key="canvasLocation" x="255" y="121"/>
@@ -75,10 +63,8 @@
         <collectionViewItem id="mo5-Bi-OJI" customClass="BookmarksBarCollectionViewItem" customModule="DuckDuckGo_Privacy_Browser" customModuleProvider="target">
             <connections>
                 <outlet property="faviconView" destination="aEY-jN-qvL" id="vuC-Cm-ECU"/>
-                <outlet property="imageView" destination="aEY-jN-qvL" id="REc-8m-yVP"/>
                 <outlet property="mouseClickView" destination="IHK-ff-XkT" id="919-Qr-nRS"/>
                 <outlet property="mouseOverView" destination="Ff3-Xx-JTo" id="lDQ-IQ-fk1"/>
-                <outlet property="stackView" destination="KId-EQ-QP4" id="wtY-z4-O3g"/>
                 <outlet property="titleLabel" destination="fMp-kj-J3A" id="Sxw-1t-GqZ"/>
                 <outlet property="view" destination="Hz6-mo-xeY" id="Zhf-KI-eAw"/>
             </connections>
