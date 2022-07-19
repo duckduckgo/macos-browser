@@ -112,16 +112,6 @@
                                             </connections>
                                         </menuItem>
                                         <menuItem isSeparatorItem="YES" id="lUm-8h-5el"/>
-                                        <menuItem title="Clear Browsing Data..." id="b1E-Hc-xhP">
-                                            <string key="keyEquivalent" base64-UTF8="YES">
-CA
-</string>
-                                            <modifierMask key="keyEquivalentModifierMask" shift="YES" command="YES"/>
-                                            <connections>
-                                                <action selector="fireButtonAction:" target="Ady-hI-5gd" id="vT7-U8-BVg"/>
-                                            </connections>
-                                        </menuItem>
-                                        <menuItem isSeparatorItem="YES" id="u7E-4A-OQP"/>
                                         <menuItem title="Import Bookmarks and Passwords..." id="gTV-od-6G5">
                                             <modifierMask key="keyEquivalentModifierMask"/>
                                             <connections>
@@ -756,7 +746,6 @@ CQ
                             <outlet property="backMenuItem" destination="VWV-vB-Mtc" id="Keo-4E-dRW"/>
                             <outlet property="bookmarkThisPageMenuItem" destination="Nkm-zy-JXD" id="HVV-JT-gvV"/>
                             <outlet property="bookmarksMenuItem" destination="xf8-PW-TOA" id="Pfa-kN-nIj"/>
-                            <outlet property="burnWebsiteDataMenuItem" destination="b1E-Hc-xhP" id="8br-vM-1Pj"/>
                             <outlet property="checkForUpdatesMenuItem" destination="RbH-ua-rrN" id="pdB-jS-fc3"/>
                             <outlet property="checkForUpdatesSeparatorItem" destination="gNj-hj-EIc" id="EH1-yf-r5I"/>
                             <outlet property="checkGrammarWithSpellingMenuItem" destination="mK6-2p-4JG" id="hA4-qY-11q"/>
