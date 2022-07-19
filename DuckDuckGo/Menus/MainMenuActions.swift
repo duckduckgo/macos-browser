@@ -405,6 +405,7 @@ extension MainViewController {
             guard case .alertFirstButtonReturn = response else {
                 return
             }
+            //todo domains
             FireCoordinator.fireViewModel.fire.burnDomains(Set())
         })
     }
