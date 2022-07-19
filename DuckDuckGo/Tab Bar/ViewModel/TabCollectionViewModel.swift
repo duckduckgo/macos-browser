@@ -328,20 +328,23 @@ final class TabCollectionViewModel: NSObject {
     }
 
     private func didRemoveTab(at index: TabIndex, withParent parentTab: Tab?) {
-        defer {
+
+        func notifyDelegate() {
             if index.isUnpinnedTab {
                 let newSelectionIndex = self.selectionIndex?.isUnpinnedTab == true ? self.selectionIndex?.item : nil
                 delegate?.tabCollectionViewModel(self, didRemoveTabAt: index.item, andSelectTabAt: newSelectionIndex)
             }
         }
 
-        guard index.isPinnedTab || tabCollection.tabs.count > 0 else {
+        guard index.isPinnedTab || !pinnedTabsCollection.tabs.isEmpty || tabCollection.tabs.count > 0 else {
             selectionIndex = nil
+            notifyDelegate()
             return
         }
 
         guard let selectionIndex = selectionIndex else {
             os_log("TabCollection: No tab selected", type: .error)
+            notifyDelegate()
             return
         }
 
@@ -365,6 +368,7 @@ final class TabCollectionViewModel: NSObject {
             newSelectionIndex = selectionIndex.sanitized(for: self)
         }
 
+        notifyDelegate()
         select(at: newSelectionIndex)
     }
 
@@ -491,10 +495,6 @@ final class TabCollectionViewModel: NSObject {
         guard index >= 0, index < tabCollection.tabs.count else {
             os_log("TabCollectionViewModel: Index out of bounds", type: .error)
             return
-        }
-
-        if tabCollection.tabs.count == 1 {
-            appendNewTab(with: .homePage, selected: false)
         }
 
         let tab = tabCollection.tabs[index]

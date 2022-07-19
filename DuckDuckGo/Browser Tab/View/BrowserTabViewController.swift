@@ -328,7 +328,7 @@ final class BrowserTabViewController: NSViewController {
     }
 
     private func showTabContent(of tabViewModel: TabViewModel?) {
-        guard !tabCollectionViewModel.tabCollection.tabs.isEmpty else {
+        guard !tabCollectionViewModel.tabCollection.tabs.isEmpty || !tabCollectionViewModel.pinnedTabsCollection.tabs.isEmpty else {
             view.window?.close()
             return
         }

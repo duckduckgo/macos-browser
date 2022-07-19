@@ -185,13 +185,15 @@ extension TabCollectionViewModelTests {
         XCTAssertEqual(tabCollectionViewModel.selectionIndex, .unpinned(0))
     }
 
-    func test_WithPinnedTabs_WhenLastTabIsRemoved_ThenSelectionIsNil() {
+    func test_WithPinnedTabs_WhenLastTabIsRemoved_ThenLastPinnedTabIsSelected() {
         let tabCollectionViewModel = TabCollectionViewModel.aTabCollectionViewModelWithPinnedTab()
+        tabCollectionViewModel.appendPinnedTab()
+        let lastPinnedTab = tabCollectionViewModel.pinnedTabsCollection.tabs[1]
 
         tabCollectionViewModel.remove(at: .unpinned(0))
 
-        XCTAssertNil(tabCollectionViewModel.selectionIndex)
-        XCTAssertEqual(tabCollectionViewModel.tabCollection.tabs.count, 0)
+        XCTAssertIdentical(lastPinnedTab, tabCollectionViewModel.selectedTabViewModel?.tab)
+        XCTAssertEqual(tabCollectionViewModel.selectionIndex, .pinned(1))
     }
 
     func test_WithPinnedTabs_WhenNoTabIsSelectedAndTabIsRemoved_ThenSelectionStaysEmpty() {

@@ -212,7 +212,11 @@ extension MainViewController {
         // instead of closing a pinned tab we select the first regular tab
         // (this is in line with Safari behavior)
         if isHandlingKeyDownEvent, tabCollectionViewModel.selectionIndex?.isPinnedTab == true {
-            tabCollectionViewModel.select(at: .unpinned(0))
+            if tabCollectionViewModel.tabCollection.tabs.isEmpty {
+                tabCollectionViewModel.append(tab: .init(content: .homePage), selected: true)
+            } else {
+                tabCollectionViewModel.select(at: .unpinned(0))
+            }
         } else {
             tabCollectionViewModel.removeSelected()
         }

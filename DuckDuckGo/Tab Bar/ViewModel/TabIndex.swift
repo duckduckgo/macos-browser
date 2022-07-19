@@ -115,7 +115,7 @@ extension TabIndex {
         switch self {
         case .pinned(let index):
             if index == 0 {
-                return .unpinned(viewModel.tabsCount - 1)
+                return viewModel.tabsCount > 0 ? .unpinned(viewModel.tabsCount - 1) : .pinned(viewModel.pinnedTabsCount - 1)
             }
             return .pinned(index - 1)
         case .unpinned(let index):
@@ -134,6 +134,9 @@ extension TabIndex {
             }
             return .pinned(max(0, index))
         case .unpinned(let index):
+            if index >= 0 && viewModel.tabsCount == 0 {
+                return .pinned(viewModel.pinnedTabsCount - 1)
+            }
             return .unpinned(max(0, min(index, viewModel.tabsCount - 1)))
         }
     }

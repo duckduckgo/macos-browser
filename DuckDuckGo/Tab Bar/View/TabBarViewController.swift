@@ -413,15 +413,10 @@ final class TabBarViewController: NSViewController {
     private var cachedLayoutNumberOfItems: Int?
     private func layoutNumberOfItems(removedIndex: Int? = nil) -> Int {
         let actualNumber = collectionView.numberOfItems(inSection: 0)
-        // don't cache number of items before removal when closing the last Tab
-        guard removedIndex ?? 0 < (actualNumber - 1) else {
-            self.cachedLayoutNumberOfItems = nil
-            return actualNumber
-        }
 
         guard let numberOfItems = self.cachedLayoutNumberOfItems,
               // skip updating number of items when closing not last Tab
-              numberOfItems > actualNumber,
+              actualNumber > 0 && numberOfItems > actualNumber,
               tabMode == .divided,
               self.view.isMouseLocationInsideBounds()
         else {
@@ -434,6 +429,10 @@ final class TabBarViewController: NSViewController {
 
     private func currentTabWidth(selected: Bool = false, removedIndex: Int? = nil) -> CGFloat {
         let numberOfItems = CGFloat(self.layoutNumberOfItems(removedIndex: removedIndex))
+        guard numberOfItems > 0 else {
+            return 0
+        }
+
         let tabsWidth = scrollView.bounds.width
         let minimumWidth = selected ? TabBarViewItem.Width.minimumSelected.rawValue : TabBarViewItem.Width.minimum.rawValue
 
