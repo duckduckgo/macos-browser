@@ -25,9 +25,8 @@ class FirefoxLoginReaderTests: XCTestCase {
     private let rootDirectoryName = UUID().uuidString
     
     func testWhenImportingFirefox46LoginsWithNoPrimaryPassword_ThenImportSucceeds() throws {
-        let bundle = Bundle(for: FirefoxLoginReaderTests.self)
-        let database = bundle.resourceURL!.appendingPathComponent("Data Import Resources/Test Firefox Data/No Primary Password/key3-firefox46.db")
-        let logins = bundle.resourceURL!.appendingPathComponent("Data Import Resources/Test Firefox Data/No Primary Password/logins-firefox46.json")
+        let database = resourcesURLWithoutPassword().appendingPathComponent("key3-firefox46.db")
+        let logins = resourcesURLWithoutPassword().appendingPathComponent("logins-firefox46.json")
         
         let structure = FileSystem(rootDirectoryName: rootDirectoryName) {
             File("key3.db", contents: .copy(database))
@@ -50,9 +49,8 @@ class FirefoxLoginReaderTests: XCTestCase {
     }
     
     func testWhenImportingLoginsWithNoPrimaryPassword_ThenImportSucceeds() throws {
-        let bundle = Bundle(for: FirefoxLoginReaderTests.self)
-        let database = bundle.resourceURL!.appendingPathComponent("Data Import Resources/Test Firefox Data/No Primary Password/key4.db")
-        let logins = bundle.resourceURL!.appendingPathComponent("Data Import Resources/Test Firefox Data/No Primary Password/logins.json")
+        let database = resourcesURLWithoutPassword().appendingPathComponent("key4.db")
+        let logins = resourcesURLWithoutPassword().appendingPathComponent("logins.json")
         
         let structure = FileSystem(rootDirectoryName: rootDirectoryName) {
             File("key4.db", contents: .copy(database))
@@ -75,9 +73,8 @@ class FirefoxLoginReaderTests: XCTestCase {
     }
 
     func testWhenImportingLoginsWithPrimaryPassword_AndNoPrimaryPasswordIsProvided_ThenImportFails() throws {
-        let bundle = Bundle(for: FirefoxLoginReaderTests.self)
-        let database = bundle.resourceURL!.appendingPathComponent("Data Import Resources/Test Firefox Data/Primary Password/key4-encrypted.db")
-        let logins = bundle.resourceURL!.appendingPathComponent("Data Import Resources/Test Firefox Data/Primary Password/logins-encrypted.json")
+        let database = resourcesURLWithPassword().appendingPathComponent("key4-encrypted.db")
+        let logins = resourcesURLWithPassword().appendingPathComponent("logins-encrypted.json")
         
         let structure = FileSystem(rootDirectoryName: rootDirectoryName) {
             File("key4.db", contents: .copy(database))
@@ -100,9 +97,8 @@ class FirefoxLoginReaderTests: XCTestCase {
     }
 
     func testWhenImportingLoginsWithPrimaryPassword_AndPrimaryPasswordIsProvided_ThenImportSucceeds() throws {
-        let bundle = Bundle(for: FirefoxLoginReaderTests.self)
-        let database = bundle.resourceURL!.appendingPathComponent("Data Import Resources/Test Firefox Data/Primary Password/key4-encrypted.db")
-        let logins = bundle.resourceURL!.appendingPathComponent("Data Import Resources/Test Firefox Data/Primary Password/logins-encrypted.json")
+        let database = resourcesURLWithPassword().appendingPathComponent("key4-encrypted.db")
+        let logins = resourcesURLWithPassword().appendingPathComponent("logins-encrypted.json")
         
         let structure = FileSystem(rootDirectoryName: rootDirectoryName) {
             File("key4.db", contents: .copy(database))
@@ -140,6 +136,138 @@ class FirefoxLoginReaderTests: XCTestCase {
         }
         
         try structure.removeCreatedFileSystemStructure()
+    }
+    
+    func testWhenImportingFirefox70LoginsWithNoPrimaryPassword_ThenImportSucceeds() throws {
+        let database = resourcesURLWithoutPassword().appendingPathComponent("key4-firefox70.db")
+        let logins = resourcesURLWithoutPassword().appendingPathComponent("logins-firefox70.json")
+        
+        let structure = FileSystem(rootDirectoryName: rootDirectoryName) {
+            File("key4.db", contents: .copy(database))
+            File("logins.json", contents: .copy(logins))
+        }
+        
+        try structure.writeToTemporaryDirectory()
+        let profileDirectoryURL = FileManager.default.temporaryDirectory.appendingPathComponent(rootDirectoryName)
+        
+        let firefoxLoginReader = FirefoxLoginReader(firefoxProfileURL: profileDirectoryURL, primaryPassword: "")
+        let result = firefoxLoginReader.readLogins(dataFormat: nil)
+
+        if case let .success(logins) = result {
+            XCTAssertEqual(logins, [ImportedLoginCredential(url: "www.example.com", username: "test", password: "test")])
+        } else {
+            XCTFail("Failed to decrypt Firefox logins")
+        }
+    }
+    
+    func testWhenImportingFirefox70LoginsWithPrimaryPassword_AndPrimaryPasswordIsProvided_ThenImportSucceeds() throws {
+        let database = resourcesURLWithPassword().appendingPathComponent("key4-firefox70.db")
+        let logins = resourcesURLWithPassword().appendingPathComponent("logins-firefox70.json")
+        
+        let structure = FileSystem(rootDirectoryName: rootDirectoryName) {
+            File("key4.db", contents: .copy(database))
+            File("logins.json", contents: .copy(logins))
+        }
+        
+        try structure.writeToTemporaryDirectory()
+        let profileDirectoryURL = FileManager.default.temporaryDirectory.appendingPathComponent(rootDirectoryName)
+        
+        let firefoxLoginReader = FirefoxLoginReader(firefoxProfileURL: profileDirectoryURL, primaryPassword: "test")
+        let result = firefoxLoginReader.readLogins(dataFormat: nil)
+
+        if case let .success(logins) = result {
+            XCTAssertEqual(logins, [ImportedLoginCredential(url: "www.example.com", username: "test", password: "test")])
+        } else {
+            XCTFail("Failed to decrypt Firefox logins")
+        }
+    }
+    
+    func testWhenImportingFirefox70LoginsWithPrimaryPassword_AndNoPrimaryPasswordIsProvided_ThenImportFails() throws {
+        let database = resourcesURLWithPassword().appendingPathComponent("key4-firefox70.db")
+        let logins = resourcesURLWithPassword().appendingPathComponent("logins-firefox70.json")
+        
+        let structure = FileSystem(rootDirectoryName: rootDirectoryName) {
+            File("key4.db", contents: .copy(database))
+            File("logins.json", contents: .copy(logins))
+        }
+        
+        try structure.writeToTemporaryDirectory()
+        let profileDirectoryURL = FileManager.default.temporaryDirectory.appendingPathComponent(rootDirectoryName)
+        
+        let firefoxLoginReader = FirefoxLoginReader(firefoxProfileURL: profileDirectoryURL, primaryPassword: "")
+        let result = firefoxLoginReader.readLogins(dataFormat: nil)
+
+        if case let .failure(error) = result {
+            XCTAssertEqual(error, .requiresPrimaryPassword)
+        } else {
+            XCTFail("Did not expect decryption success")
+        }
+    }
+    
+    func testWhenImportingFirefox84LoginsWithNoPrimaryPassword_ThenImportSucceeds() throws {
+        let database = resourcesURLWithoutPassword().appendingPathComponent("key4-firefox84.db")
+        let logins = resourcesURLWithoutPassword().appendingPathComponent("logins-firefox84.json")
+        
+        let structure = FileSystem(rootDirectoryName: rootDirectoryName) {
+            File("key4.db", contents: .copy(database))
+            File("logins.json", contents: .copy(logins))
+        }
+        
+        try structure.writeToTemporaryDirectory()
+        let profileDirectoryURL = FileManager.default.temporaryDirectory.appendingPathComponent(rootDirectoryName)
+        
+        let firefoxLoginReader = FirefoxLoginReader(firefoxProfileURL: profileDirectoryURL, primaryPassword: "")
+        let result = firefoxLoginReader.readLogins(dataFormat: nil)
+
+        if case let .success(logins) = result {
+            XCTAssertEqual(logins, [ImportedLoginCredential(url: "www.example.com", username: "test", password: "test")])
+        } else {
+            XCTFail("Failed to decrypt Firefox logins")
+        }
+    }
+    
+    func testWhenImportingFirefox84LoginsWithPrimaryPassword_AndPrimaryPasswordIsProvided_ThenImportSucceeds() throws {
+        let database = resourcesURLWithPassword().appendingPathComponent("key4-firefox84.db")
+        let logins = resourcesURLWithPassword().appendingPathComponent("logins-firefox84.json")
+        
+        let structure = FileSystem(rootDirectoryName: rootDirectoryName) {
+            File("key4.db", contents: .copy(database))
+            File("logins.json", contents: .copy(logins))
+        }
+        
+        try structure.writeToTemporaryDirectory()
+        let profileDirectoryURL = FileManager.default.temporaryDirectory.appendingPathComponent(rootDirectoryName)
+        
+        let firefoxLoginReader = FirefoxLoginReader(firefoxProfileURL: profileDirectoryURL, primaryPassword: "test")
+        let result = firefoxLoginReader.readLogins(dataFormat: nil)
+
+        if case let .success(logins) = result {
+            XCTAssertEqual(logins, [ImportedLoginCredential(url: "www.example.com", username: "test", password: "test")])
+        } else {
+            XCTFail("Failed to decrypt Firefox logins")
+        }
+    }
+    
+    func testWhenImportingFirefox84LoginsWithPrimaryPassword_AndNoPrimaryPasswordIsProvided_ThenImportFails() throws {
+        let database = resourcesURLWithPassword().appendingPathComponent("key4-firefox84.db")
+        let logins = resourcesURLWithPassword().appendingPathComponent("logins-firefox84.json")
+        
+        let structure = FileSystem(rootDirectoryName: rootDirectoryName) {
+            File("key4.db", contents: .copy(database))
+            File("logins.json", contents: .copy(logins))
+        }
+        
+        try structure.writeToTemporaryDirectory()
+        let profileDirectoryURL = FileManager.default.temporaryDirectory.appendingPathComponent(rootDirectoryName)
+        
+        let firefoxLoginReader = FirefoxLoginReader(firefoxProfileURL: profileDirectoryURL, primaryPassword: "")
+        let result = firefoxLoginReader.readLogins(dataFormat: nil)
+
+        if case let .failure(error) = result {
+            XCTAssertEqual(error, .requiresPrimaryPassword)
+        } else {
+            XCTFail("Did not expect decryption success")
+        }
     }
 
     private func resourcesURLWithPassword() -> URL {

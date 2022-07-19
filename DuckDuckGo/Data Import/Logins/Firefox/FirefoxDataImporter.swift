@@ -66,6 +66,8 @@ final class FirefoxDataImporter: DataImporter {
                 case .decryptionFailed: completion(.failure(.logins(.cannotDecryptFile)))
                 case .failedToTemporarilyCopyFile: completion(.failure(.logins(.failedToTemporarilyCopyFile)))
                 }
+
+                return
             }
         }
 
@@ -93,6 +95,14 @@ final class FirefoxDataImporter: DataImporter {
         }
 
         completion(.success(summary))
+    }
+    
+    func importData(types: [DataImport.DataType], from profile: DataImport.BrowserProfile?) async -> Result<DataImport.Summary, DataImportError> {
+        return await withCheckedContinuation { continuation in
+            importData(types: types, from: profile) { result in
+                continuation.resume(returning: result)
+            }
+        }
     }
 
     private func defaultFirefoxProfilePath() -> URL? {

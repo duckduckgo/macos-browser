@@ -20,7 +20,17 @@ import Cocoa
 import os.log
 import Combine
 
-final class WindowControllersManager {
+protocol WindowControllersManagerProtocol {
+
+    var didRegisterWindowController: PassthroughSubject<(MainWindowController), Never> { get }
+    var didUnregisterWindowController: PassthroughSubject<(MainWindowController), Never> { get }
+
+    func register(_ windowController: MainWindowController)
+    func unregister(_ windowController: MainWindowController)
+
+}
+
+final class WindowControllersManager: WindowControllersManagerProtocol {
 
     static let shared = WindowControllersManager()
 
@@ -31,6 +41,9 @@ final class WindowControllersManager {
     @Published private(set) var mainWindowControllers = [MainWindowController]()
     weak var lastKeyMainWindowController: MainWindowController?
 
+    let didRegisterWindowController = PassthroughSubject<(MainWindowController), Never>()
+    let didUnregisterWindowController = PassthroughSubject<(MainWindowController), Never>()
+
     func register(_ windowController: MainWindowController) {
         guard !mainWindowControllers.contains(windowController) else {
             assertionFailure("Window controller already registered")
@@ -38,6 +51,7 @@ final class WindowControllersManager {
         }
 
         mainWindowControllers.append(windowController)
+        didRegisterWindowController.send(windowController)
     }
 
     func unregister(_ windowController: MainWindowController) {
@@ -46,6 +60,7 @@ final class WindowControllersManager {
             return
         }
         mainWindowControllers.remove(at: idx)
+        didUnregisterWindowController.send(windowController)
     }
 
     func updateIsInInitialState() {

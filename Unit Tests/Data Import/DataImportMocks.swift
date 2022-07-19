@@ -31,3 +31,19 @@ final class MockLoginImporter: LoginImporter {
     }
 
 }
+
+struct BookmarkImportErrorMock: Error {}
+
+struct MockBookmarkImporter: BookmarkImporter {
+
+    func importBookmarks(_ bookmarks: ImportedBookmarks, source: BookmarkImportSource) throws -> BookmarkImportResult {
+        if let error = throwableError {
+            throw error
+        }
+        return importBookmarks(bookmarks, source)
+    }
+
+    var throwableError: Error?
+    var importBookmarks: (ImportedBookmarks, BookmarkImportSource) -> BookmarkImportResult
+
+}

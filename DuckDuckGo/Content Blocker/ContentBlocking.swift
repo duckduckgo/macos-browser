@@ -47,7 +47,7 @@ final class ContentBlocking {
                                                 embeddedDataProvider: AppTrackerDataSetProvider(),
                                                 errorReporting: Self.debugEvents)
 
-        contentBlockerRulesSource = ContentBlockerRulesLists(trackerDataManger: trackerDataManager)
+        contentBlockerRulesSource = ContentBlockerRulesLists(trackerDataManager: trackerDataManager)
         exceptionsSource = DefaultContentBlockerRulesExceptionsSource(privacyConfigManager: privacyConfigurationManager)
 
         contentBlockingManager = ContentBlockerRulesManager(rulesSource: contentBlockerRulesSource,

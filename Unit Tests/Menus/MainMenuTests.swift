@@ -41,52 +41,52 @@ class MainMenuTests: XCTestCase {
     func testWhenIsInInitialState_AndCanRestoreState_ThenLastSessionMenuItemHasShortcut() {
         manager = .init(isInInitialStatePublisher: $isInInitialState, canRestoreLastSessionState: true)
         manager.lastSessionMenuItem = lastSessionMenuItem
-        manager.lastTabMenuItem = lastTabMenuItem
+        manager.reopenLastClosedMenuItem = lastTabMenuItem
 
         isInInitialState = true
 
         XCTAssertEqual(manager.lastSessionMenuItem?.keyEquivalent, ReopenMenuItemKeyEquivalentManager.Const.keyEquivalent)
         XCTAssertEqual(manager.lastSessionMenuItem?.keyEquivalentModifierMask, ReopenMenuItemKeyEquivalentManager.Const.modifierMask)
-        XCTAssertEqual(manager.lastTabMenuItem?.keyEquivalent, "")
-        XCTAssertEqual(manager.lastTabMenuItem?.keyEquivalentModifierMask, .command)
+        XCTAssertEqual(manager.reopenLastClosedMenuItem?.keyEquivalent, "")
+        XCTAssertEqual(manager.reopenLastClosedMenuItem?.keyEquivalentModifierMask, .command)
     }
 
     func testWhenIsInInitialState_AndCannotRestoreState_ThenLastTabMenuItemHasShortcut() {
         manager = .init(isInInitialStatePublisher: $isInInitialState, canRestoreLastSessionState: false)
         manager.lastSessionMenuItem = lastSessionMenuItem
-        manager.lastTabMenuItem = lastTabMenuItem
+        manager.reopenLastClosedMenuItem = lastTabMenuItem
 
         isInInitialState = true
 
         XCTAssertEqual(manager.lastSessionMenuItem?.keyEquivalent, "")
         XCTAssertEqual(manager.lastSessionMenuItem?.keyEquivalentModifierMask, .command)
-        XCTAssertEqual(manager.lastTabMenuItem?.keyEquivalent, ReopenMenuItemKeyEquivalentManager.Const.keyEquivalent)
-        XCTAssertEqual(manager.lastTabMenuItem?.keyEquivalentModifierMask, ReopenMenuItemKeyEquivalentManager.Const.modifierMask)
+        XCTAssertEqual(manager.reopenLastClosedMenuItem?.keyEquivalent, ReopenMenuItemKeyEquivalentManager.Const.keyEquivalent)
+        XCTAssertEqual(manager.reopenLastClosedMenuItem?.keyEquivalentModifierMask, ReopenMenuItemKeyEquivalentManager.Const.modifierMask)
     }
 
     func testWhenIsNotInInitialState_AndCanRestoreState_ThenLastTabMenuItemHasShortcut() {
         manager = .init(isInInitialStatePublisher: $isInInitialState, canRestoreLastSessionState: true)
         manager.lastSessionMenuItem = lastSessionMenuItem
-        manager.lastTabMenuItem = lastTabMenuItem
+        manager.reopenLastClosedMenuItem = lastTabMenuItem
 
         isInInitialState = false
 
         XCTAssertEqual(manager.lastSessionMenuItem?.keyEquivalent, "")
         XCTAssertEqual(manager.lastSessionMenuItem?.keyEquivalentModifierMask, .command)
-        XCTAssertEqual(manager.lastTabMenuItem?.keyEquivalent, ReopenMenuItemKeyEquivalentManager.Const.keyEquivalent)
-        XCTAssertEqual(manager.lastTabMenuItem?.keyEquivalentModifierMask, ReopenMenuItemKeyEquivalentManager.Const.modifierMask)
+        XCTAssertEqual(manager.reopenLastClosedMenuItem?.keyEquivalent, ReopenMenuItemKeyEquivalentManager.Const.keyEquivalent)
+        XCTAssertEqual(manager.reopenLastClosedMenuItem?.keyEquivalentModifierMask, ReopenMenuItemKeyEquivalentManager.Const.modifierMask)
     }
 
     func testWhenIsNotInInitialState_AndCannotRestoreState_ThenLastTabMenuItemHasShortcut() {
         manager = .init(isInInitialStatePublisher: $isInInitialState, canRestoreLastSessionState: false)
         manager.lastSessionMenuItem = lastSessionMenuItem
-        manager.lastTabMenuItem = lastTabMenuItem
+        manager.reopenLastClosedMenuItem = lastTabMenuItem
 
         isInInitialState = false
 
         XCTAssertEqual(manager.lastSessionMenuItem?.keyEquivalent, "")
         XCTAssertEqual(manager.lastSessionMenuItem?.keyEquivalentModifierMask, .command)
-        XCTAssertEqual(manager.lastTabMenuItem?.keyEquivalent, ReopenMenuItemKeyEquivalentManager.Const.keyEquivalent)
-        XCTAssertEqual(manager.lastTabMenuItem?.keyEquivalentModifierMask, ReopenMenuItemKeyEquivalentManager.Const.modifierMask)
+        XCTAssertEqual(manager.reopenLastClosedMenuItem?.keyEquivalent, ReopenMenuItemKeyEquivalentManager.Const.keyEquivalent)
+        XCTAssertEqual(manager.reopenLastClosedMenuItem?.keyEquivalentModifierMask, ReopenMenuItemKeyEquivalentManager.Const.modifierMask)
     }
 }

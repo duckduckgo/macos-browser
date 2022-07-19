@@ -164,7 +164,7 @@ final class PrivacyDashboardViewController: NSViewController {
         }
 
         let configuration = ContentBlocking.shared.privacyConfigurationManager.privacyConfig
-        let isProtected = !configuration.isUserUnprotected(domain: domain)
+        let isProtected = configuration.isProtected(domain: domain)
         self.privacyDashboardScript.setProtectionStatus(isProtected, webView: self.webView)
     }
 
@@ -222,7 +222,7 @@ extension PrivacyDashboardViewController: PrivacyDashboardUserScriptDelegate {
         }
 
         let configuration = ContentBlocking.shared.privacyConfigurationManager.privacyConfig
-        if isProtected {
+        if isProtected && configuration.isUserUnprotected(domain: domain) {
             configuration.userEnabledProtection(forDomain: domain)
         } else {
             configuration.userDisabledProtection(forDomain: domain)

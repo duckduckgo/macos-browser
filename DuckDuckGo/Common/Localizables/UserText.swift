@@ -491,4 +491,10 @@ struct UserText {
     static let autoconsentPopupLaterButton = NSLocalizedString("Not Now", comment: "")
     static let autoconsentPopupNeverButton = NSLocalizedString("Don't Ask Again", comment: "")
 
+    static let recentlyClosedMenuItemSuffixOne = NSLocalizedString("one.more.tab", value: " (and 1 more tab)", comment: "suffix of string in Recently Closed menu")
+    static let recentlyClosedMenuItemSuffixMultiple = NSLocalizedString("n.more.tabs", value: " (and %d more tabs)", comment: "suffix of string in Recently Closed menu")
+
+    static let reopenLastClosedTab = NSLocalizedString("reopen.last.closed.tab", value: "Reopen Last Closed Tab", comment: "")
+    static let reopenLastClosedWindow = NSLocalizedString("reopen.last.closed.window", value: "Reopen Last Closed Window", comment: "")
+
 }

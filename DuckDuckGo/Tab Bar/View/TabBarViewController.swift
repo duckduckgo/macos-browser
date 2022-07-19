@@ -76,8 +76,17 @@ final class TabBarViewController: NSViewController {
         updateEmptyTabArea()
         tabCollectionViewModel.delegate = self
         reloadSelection()
+        
+        // Detect if tabs are clicked when the window is not in focus
+        // https://app.asana.com/0/1177771139624306/1202033879471339
+        addMouseMonitors()
     }
 
+    override func viewWillDisappear() {
+        super.viewWillDisappear()
+        removeMouseMonitors()
+    }
+    
     override func viewDidLayout() {
         super.viewDidLayout()
 
@@ -132,6 +141,14 @@ final class TabBarViewController: NSViewController {
             collectionView.animator().selectItems(at: [newSelectionIndexPath], scrollPosition: .centeredHorizontally)
         } else {
             collectionView.selectItems(at: [newSelectionIndexPath], scrollPosition: .centeredHorizontally)
+        }
+    }
+    
+    private func selectTabWithPoint(_ point: NSPoint) {
+        let pointLocationOnCollectionView = collectionView.convert(point, from: view)
+        
+        if let indexPath = collectionView.indexPathForItem(at: pointLocationOnCollectionView) {
+            tabCollectionViewModel.select(at: indexPath.item)
         }
     }
 
@@ -191,8 +208,38 @@ final class TabBarViewController: NSViewController {
         }
 
         let tab = tabViewModel.tab
-        tabCollectionViewModel.remove(at: indexPath.item)
+        tabCollectionViewModel.remove(at: indexPath.item, published: false)
         WindowsManager.openNewWindow(with: tab, droppingPoint: droppingPoint)
+    }
+    
+    // MARK: - Mouse Monitor
+    
+    private var mouseDownMonitor: Any?
+
+    private func addMouseMonitors() {
+        guard mouseDownMonitor == nil else { return }
+        
+        mouseDownMonitor = NSEvent.addLocalMonitorForEvents(matching: .leftMouseDown) { [weak self] event in
+            self?.mouseDown(with: event)
+        }
+    }
+
+    private func removeMouseMonitors() {
+        if let monitor = mouseDownMonitor {
+            NSEvent.removeMonitor(monitor)
+        }
+        
+        mouseDownMonitor = nil
+    }
+    
+    func mouseDown(with event: NSEvent) -> NSEvent? {
+        if event.window === view.window,
+           view.window?.isMainWindow == false,
+           let point = view.mouseLocationInsideBounds(event.locationInWindow) {
+            selectTabWithPoint(point)
+        }
+        
+        return event
     }
 
     // MARK: - Tab Width
@@ -370,6 +417,7 @@ extension TabBarViewController: TabCollectionViewModelDelegate {
         collectionView.animator().insertItems(at: indexPathSet)
         if selected {
             collectionView.selectItems(at: indexPathSet, scrollPosition: .centeredHorizontally)
+            collectionView.scrollToSelected()
         }
 
         updateTabMode()

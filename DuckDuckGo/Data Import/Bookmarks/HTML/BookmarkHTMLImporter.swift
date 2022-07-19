@@ -41,12 +41,6 @@ final class BookmarkHTMLImporter: DataImporter {
         from profile: DataImport.BrowserProfile?,
         completion: @escaping (Result<DataImport.Summary, DataImportError>) -> Void
     ) {
-        guard types == importableTypes() else {
-            assertionFailure("Unexpected data types for HTML bookmark import: \(types)")
-            completion(.failure(.bookmarks(BookmarkHTMLReader.ImportError.unexpectedBookmarksFileFormat)))
-            return
-        }
-
         DispatchQueue.global(qos: .userInitiated).async {
 
             switch self.bookmarkReaderResult {
