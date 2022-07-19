@@ -37,7 +37,7 @@ protocol BookmarkManager: AnyObject {
     func add(bookmark: Bookmark, to parent: BookmarkFolder?, completion: @escaping (Error?) -> Void)
     func add(objectsWithUUIDs uuids: [UUID], to parent: BookmarkFolder?, completion: @escaping (Error?) -> Void)
     func update(objectsWithUUIDs uuids: [UUID], update: @escaping (BaseBookmarkEntity) -> Void, completion: @escaping (Error?) -> Void)
-    func move(objectUUID: UUID, toIndexWithinParentFolder: Int, completion: @escaping (Error?) -> Void)
+    func move(objectUUID: UUID, toIndex: Int, withinParentFolder: ParentFolderType, completion: @escaping (Error?) -> Void)
     func importBookmarks(_ bookmarks: ImportedBookmarks, source: BookmarkImportSource) -> BookmarkImportResult
 
     // Wrapper definition in a protocol is not supported yet
@@ -219,13 +219,13 @@ final class LocalBookmarkManager: BookmarkManager {
         }
     }
     
-    func move(objectUUID: UUID, toIndexWithinParentFolder index: Int, completion: @escaping (Error?) -> Void) {
-        bookmarkStore.move(objectUUID: objectUUID, toIndexWithinParentFolder: index) { [weak self] error in
+    func move(objectUUID: UUID, toIndex index: Int, withinParentFolder parent: ParentFolderType = .parent, completion: @escaping (Error?) -> Void) {
+        bookmarkStore.move(objectUUID: objectUUID, toIndex: index, withinParentFolder: parent) { [weak self] error in
             self?.loadBookmarks()
             completion(error)
         }
     }
-
+    
     // MARK: - Favicons
 
     private func favicon(for host: String?) -> NSImage? {

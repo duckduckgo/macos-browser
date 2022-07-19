@@ -89,7 +89,7 @@ final class BookmarkStoreMock: BookmarkStore {
     }
     
     var moveObjectUUIDCalled = false
-    func move(objectUUID: UUID, toIndexWithinParentFolder: Int, completion: @escaping (Error?) -> Void) {
+    func move(objectUUID: UUID, toIndex: Int, withinParentFolder: ParentFolderType, completion: @escaping (Error?) -> Void) {
         moveObjectUUIDCalled = true
     }
 

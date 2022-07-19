@@ -26,6 +26,11 @@ enum BookmarkStoreFetchPredicateType {
     case topLevelEntities
 }
 
+enum ParentFolderType {
+    case parent
+    case root
+}
+
 struct BookmarkImportResult: Equatable {
     var successful: Int
     var duplicates: Int
@@ -48,7 +53,7 @@ protocol BookmarkStore {
     func update(folder: BookmarkFolder)
     func add(objectsWithUUIDs: [UUID], to parent: BookmarkFolder?, completion: @escaping (Error?) -> Void)
     func update(objectsWithUUIDs uuids: [UUID], update: @escaping (BaseBookmarkEntity) -> Void, completion: @escaping (Error?) -> Void)
-    func move(objectUUID: UUID, toIndexWithinParentFolder: Int, completion: @escaping (Error?) -> Void)
+    func move(objectUUID: UUID, toIndex: Int, withinParentFolder: ParentFolderType, completion: @escaping (Error?) -> Void)
     func importBookmarks(_ bookmarks: ImportedBookmarks, source: BookmarkImportSource) -> BookmarkImportResult
 
 }
@@ -407,7 +412,7 @@ final class LocalBookmarkStore: BookmarkStore {
         }
     }
     
-    func move(objectUUID: UUID, toIndexWithinParentFolder index: Int, completion: @escaping (Error?) -> Void) {
+    func move(objectUUID: UUID, toIndex index: Int, withinParentFolder type: ParentFolderType = .parent, completion: @escaping (Error?) -> Void) {
         context.perform { [weak self] in
             guard let self = self else {
                 assertionFailure("Couldn't get strong self")
@@ -419,14 +424,22 @@ final class LocalBookmarkStore: BookmarkStore {
             let bookmarksResults = try? self.context.fetch(bookmarksFetchRequest)
 
             guard let bookmarkManagedObject = bookmarksResults?.first,
-                  let parentFolder = bookmarkManagedObject.parentFolder else {
+                  let currentParentFolder = bookmarkManagedObject.parentFolder,
+                  let rootFolder = self.cachedReadOnlyTopLevelFolder else {
                 assertionFailure("\(#file): Failed to get BookmarkManagedObject from the context")
                 completion(nil)
                 return
             }
+            
+            let newParentFolder: BookmarkManagedObject
+            
+            switch type {
+            case .parent: newParentFolder = currentParentFolder
+            case .root: newParentFolder = rootFolder
+            }
 
-            parentFolder.mutableChildren.remove(bookmarkManagedObject)
-            parentFolder.mutableChildren.insert(bookmarkManagedObject, at: index)
+            currentParentFolder.mutableChildren.remove(bookmarkManagedObject)
+            newParentFolder.mutableChildren.insert(bookmarkManagedObject, at: index)
 
             do {
                 try self.context.save()
@@ -759,9 +772,9 @@ final class LocalBookmarkStore: BookmarkStore {
         }
     }
     
-    func move(objectUUID: UUID, toIndexWithinParentFolder index: Int) async -> Error? {
+    func move(objectUUID: UUID, toIndex index: Int, withinParentFolder parent: ParentFolderType = .parent) async -> Error? {
         return await withCheckedContinuation { continuation in
-            move(objectUUID: objectUUID, toIndexWithinParentFolder: index) { error in
+            move(objectUUID: objectUUID, toIndex: index, withinParentFolder: parent) { error in
                 if let error = error {
                     continuation.resume(returning: error)
                     return

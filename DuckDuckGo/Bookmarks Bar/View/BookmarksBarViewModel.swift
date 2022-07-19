@@ -360,19 +360,37 @@ extension BookmarksBarViewModel: NSCollectionViewDelegate, NSCollectionViewDataS
         if let existingIndexPath = existingItemDraggingIndexPath {
             let entityUUID = self.bookmarksBarItems[existingIndexPath.item].entity.id
             
-            let item: Int
+            let index: Int
             
             if existingIndexPath.item <= newIndexPath.item {
-                item = newIndexPath.item - 1
+                index = newIndexPath.item - 1
             } else {
-                item = newIndexPath.item
+                index = newIndexPath.item
             }
 
             self.bookmarksBarItems.move(fromOffsets: IndexSet(integer: existingIndexPath.item), toOffset: newIndexPath.item)
-            collectionView.animator().moveItem(at: existingIndexPath, to: IndexPath(item: item, section: 0))
+            collectionView.animator().moveItem(at: existingIndexPath, to: IndexPath(item: index, section: 0))
             existingItemDraggingIndexPath = nil
             
-            self.bookmarkManager.move(objectUUID: entityUUID, toIndexWithinParentFolder: item) { error in
+            bookmarkManager.move(objectUUID: entityUUID, toIndex: index, withinParentFolder: .root) { error in
+                if error != nil {
+                    self.delegate?.bookmarksBarViewModelReloadedData()
+                }
+            }
+
+            return true
+        } else if let draggedBookmark = PasteboardBookmark.pasteboardBookmarks(with: draggingInfo.draggingPasteboard)?.first,
+                  let uuid = UUID(uuidString: draggedBookmark.id) {
+            bookmarkManager.move(objectUUID: uuid, toIndex: newIndexPath.item, withinParentFolder: .root) { error in
+                if error != nil {
+                    self.delegate?.bookmarksBarViewModelReloadedData()
+                }
+            }
+
+            return true
+        } else if let draggedFolder = PasteboardFolder.pasteboardFolders(with: draggingInfo.draggingPasteboard)?.first,
+                  let uuid = UUID(uuidString: draggedFolder.id) {
+            bookmarkManager.move(objectUUID: uuid, toIndex: newIndexPath.item, withinParentFolder: .root) { error in
                 if error != nil {
                     self.delegate?.bookmarksBarViewModelReloadedData()
                 }
