@@ -36,7 +36,7 @@ final class WindowsManager {
                              droppingPoint: NSPoint? = nil,
                              contentSize: NSSize? = nil,
                              showWindow: Bool = true,
-                             popUp: Bool = false) -> NSWindow? {
+                             popUp: Bool = false) -> MainWindow? {
         let mainWindowController = makeNewWindow(tabCollectionViewModel: tabCollectionViewModel, popUp: popUp)
 
         if let droppingPoint = droppingPoint {
@@ -53,16 +53,17 @@ final class WindowsManager {
             mainWindowController.orderWindowBack(self)
         }
 
-        return mainWindowController.window
+        return mainWindowController.window as? MainWindow
     }
 
-    class func openNewWindow(with tab: Tab, droppingPoint: NSPoint? = nil, contentSize: NSSize? = nil, popUp: Bool = false) {
+    @discardableResult
+    class func openNewWindow(with tab: Tab, droppingPoint: NSPoint? = nil, contentSize: NSSize? = nil, popUp: Bool = false) -> MainWindow? {
         let tabCollection = TabCollection()
         tabCollection.append(tab: tab)
-        openNewWindow(with: TabCollectionViewModel(tabCollection: tabCollection),
-                      droppingPoint: droppingPoint,
-                      contentSize: contentSize,
-                      popUp: popUp)
+        return openNewWindow(with: TabCollectionViewModel(tabCollection: tabCollection),
+                             droppingPoint: droppingPoint,
+                             contentSize: contentSize,
+                             popUp: popUp)
     }
 
     class func openNewWindow(with initialUrl: URL) {

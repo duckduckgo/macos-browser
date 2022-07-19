@@ -66,6 +66,25 @@ extension AppDelegate {
         RecentlyClosedCoordinator.shared.reopenItem(cacheItem)
     }
 
+    @objc func searchHistory(_ sender: NSMenuItem) {
+        let mainViewController: MainViewController
+        if let existingViewController = WindowControllersManager.shared.lastKeyMainWindowController?.mainViewController {
+            mainViewController = existingViewController
+        } else {
+            let newWindow = WindowsManager.openNewWindow(with: Tab(content: .homePage))
+            let newWindowController = newWindow?.windowController as? MainWindowController
+            guard let newViewController = newWindowController?.mainViewController else {
+                assertionFailure("No reference to main view controller")
+                return
+            }
+
+            mainViewController = newViewController
+        }
+
+        mainViewController.navigationBarViewController.addressBarViewController?.addressBarTextField.clearValue()
+        mainViewController.navigationBarViewController.addressBarViewController?.addressBarTextField.makeMeFirstResponder()
+    }
+
     // MARK: - Window
 
     @IBAction func reopenAllWindowsFromLastSession(_ sender: Any?) {

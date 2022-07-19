@@ -229,16 +229,11 @@ final class HistoryMenu: NSMenu {
     // MARK: - Search History
 
     lazy var searchHistoryMenuItem = NSMenuItem(title: UserText.searchHistoryMenuItem,
-                                                action: #selector(searchHistory(_:)),
-                                                target: self,
+                                                action: #selector(AppDelegate.searchHistory(_:)),
                                                 keyEquivalent: "")
 
     private func addSearchHistory() {
         addItem(searchHistoryMenuItem)
-    }
-
-    @objc func searchHistory(_ sender: NSMenuItem) {
-        //todo
     }
 
     // MARK: - Clear All History
