@@ -64,7 +64,7 @@ final class BookmarksBarViewController: NSViewController {
         
         bookmarksBarCollectionView.delegate = viewModel
         bookmarksBarCollectionView.dataSource = viewModel
-        bookmarksBarCollectionView.collectionViewLayout = createBookmarksBarCollectionViewLayout()
+        bookmarksBarCollectionView.collectionViewLayout = createCenteredCollectionViewLayout()
         
         view.postsFrameChangedNotifications = true
         
@@ -83,29 +83,17 @@ final class BookmarksBarViewController: NSViewController {
     
     override func viewWillAppear() {
         super.viewWillAppear()
-        clipOrRestoreBookmarksBarItems()
+        viewModel.clipOrRestoreBookmarksBarItems()
     }
     
     private func createCenteredLayout(centered: Bool) -> NSCollectionLayoutSection {
-        let widths = viewModel.bookmarksBarItems.map { item in
-            return viewModel.cachedWidth(buttonTitle: item.title)
-        }
-
-        let cellSizes = widths.map { CGSize(width: $0, height: 28) }
-        
-        let group = NSCollectionLayoutGroup.horizontallyCentered(cellSizes: cellSizes, centered: centered)
-        let section = NSCollectionLayoutSection(group: group)
-
-        return section
+        let group = NSCollectionLayoutGroup.horizontallyCentered(cellSizes: viewModel.cellSizes, centered: centered)
+        return NSCollectionLayoutSection(group: group)
     }
     
-    func createBookmarksBarCollectionViewLayout() -> NSCollectionViewLayout {
+    func createCenteredCollectionViewLayout() -> NSCollectionViewLayout {
         return NSCollectionViewCompositionalLayout { [unowned self] _, _ in
-            if viewModel.clippedItems.isEmpty {
-                return createCenteredLayout(centered: true)
-            } else {
-                return createCenteredLayout(centered: false)
-            }
+            return createCenteredLayout(centered: viewModel.clippedItems.isEmpty)
         }
     }
 
@@ -117,45 +105,12 @@ final class BookmarksBarViewController: NSViewController {
     
     @objc
     private func frameChangeNotification() {
-        clipOrRestoreBookmarksBarItems()
+        viewModel.clipOrRestoreBookmarksBarItems()
         refreshClippedIndicator()
     }
     
     private func refreshClippedIndicator() {
         self.clippedItemsIndicator.isHidden = viewModel.clippedItems.isEmpty
-    }
-    
-    private func clipOrRestoreBookmarksBarItems() {
-        guard !viewModel.bookmarksBarItems.isEmpty else {
-            return
-        }
-        
-        let lastIndexPath = IndexPath(item: viewModel.bookmarksBarItems.count - 1, section: 0)
-
-        if viewModel.bookmarksBarItemsTotalWidth >= clipThreshold {
-            if viewModel.clipLastBarItem() {
-                self.bookmarksBarCollectionView.deleteItems(at: Set([lastIndexPath]))
-            }
-        } else if let nextRestorableClippedItem = viewModel.clippedItems.first {
-            while true {
-                if !restoreNextClippedItemToBookmarksBarIfPossible(item: nextRestorableClippedItem) {
-                    break
-                }
-            }
-            
-            self.bookmarksBarCollectionView.reloadData()
-        }
-    }
-    
-    private func restoreNextClippedItemToBookmarksBarIfPossible(item: BookmarkViewModel) -> Bool {
-        let widthOfRestorableItem = viewModel.cachedWidth(buttonTitle: item.entity.title)
-        let newMaximumWidth = viewModel.bookmarksBarItemsTotalWidth + 10 + widthOfRestorableItem
-
-        if newMaximumWidth < clipThreshold {
-            return viewModel.restoreLastClippedItem()
-        }
-        
-        return false
     }
     
     @objc
@@ -174,8 +129,7 @@ final class BookmarksBarViewController: NSViewController {
 }
 
 extension BookmarksBarViewController: BookmarksBarViewModelDelegate {
-    
-    // swiftlint:disable:next cyclomatic_complexity
+
     func bookmarksBarViewModelReceived(action: BookmarksBarViewModel.BookmarksBarItemAction, for item: BookmarksBarCollectionViewItem) {
         guard let indexPath = bookmarksBarCollectionView.indexPath(for: item) else {
             assertionFailure("Failed to look up index path for clicked item")
@@ -188,36 +142,9 @@ extension BookmarksBarViewController: BookmarksBarViewModelDelegate {
         }
         
         if let bookmark = entity as? Bookmark {
-            switch action {
-            case .openInNewTab:
-                tabCollectionViewModel.appendNewTab(with: .url(bookmark.url), selected: true)
-            case .openInBackgroundTab:
-                tabCollectionViewModel.appendNewTab(with: .url(bookmark.url), selected: false)
-            case .openInNewWindow:
-                WindowsManager.openNewWindow(with: bookmark.url)
-            case .clickItem:
-                WindowControllersManager.shared.show(url: bookmark.url)
-            case .toggleFavorite:                
-                bookmark.isFavorite = !bookmark.isFavorite
-                bookmarkManager.update(bookmark: bookmark)
-            case .copyURL:
-                NSPasteboard.general.copy(url: bookmark.url)
-            case .deleteEntity:
-                bookmarkManager.remove(bookmark: bookmark)
-            }
+            handle(action, for: bookmark)
         } else if let folder = entity as? BookmarkFolder {
-            switch action {
-            case .clickItem:
-                let childEntities = folder.children
-                let viewModels = childEntities.map { BookmarkViewModel(entity: $0) }
-                let menuItems = viewModel.bookmarksTreeMenuItems(from: viewModels, topLevel: true)
-                let menu = bookmarkFolderMenu(items: menuItems)
-                menu.popUp(positioning: nil, at: CGPoint(x: 0, y: item.view.frame.minY - 7), in: item.view)
-            case .deleteEntity:
-                bookmarkManager.remove(folder: folder)
-            default:
-                assertionFailure("Received unexpected action for bookmark folder")
-            }
+            handle(action, for: folder, item: item)
         } else {
             assertionFailure("Failed to cast entity for clicked item")
         }
@@ -231,15 +158,49 @@ extension BookmarksBarViewController: BookmarksBarViewModelDelegate {
         bookmarksBarCollectionView.reloadData()
     }
     
+    func bookmarksBarViewModelDeletedItems(at indexPaths: Set<IndexPath>) {
+        bookmarksBarCollectionView.deleteItems(at: indexPaths)
+    }
+    
+    private func handle(_ action: BookmarksBarViewModel.BookmarksBarItemAction, for bookmark: Bookmark) {
+        switch action {
+        case .openInNewTab:
+            tabCollectionViewModel.appendNewTab(with: .url(bookmark.url), selected: true)
+        case .openInBackgroundTab:
+            tabCollectionViewModel.appendNewTab(with: .url(bookmark.url), selected: false)
+        case .openInNewWindow:
+            WindowsManager.openNewWindow(with: bookmark.url)
+        case .clickItem:
+            WindowControllersManager.shared.show(url: bookmark.url)
+        case .toggleFavorite:
+            bookmark.isFavorite = !bookmark.isFavorite
+            bookmarkManager.update(bookmark: bookmark)
+        case .copyURL:
+            NSPasteboard.general.copy(url: bookmark.url)
+        case .deleteEntity:
+            bookmarkManager.remove(bookmark: bookmark)
+        }
+    }
+    
+    private func handle(_ action: BookmarksBarViewModel.BookmarksBarItemAction, for folder: BookmarkFolder, item: BookmarksBarCollectionViewItem) {
+        switch action {
+        case .clickItem:
+            let childEntities = folder.children
+            let viewModels = childEntities.map { BookmarkViewModel(entity: $0) }
+            let menuItems = viewModel.bookmarksTreeMenuItems(from: viewModels, topLevel: true)
+            let menu = bookmarkFolderMenu(items: menuItems)
+
+            menu.popUp(positioning: nil, at: CGPoint(x: 0, y: item.view.frame.minY - 7), in: item.view)
+        case .deleteEntity:
+            bookmarkManager.remove(folder: folder)
+        default:
+            assertionFailure("Received unexpected action for bookmark folder")
+        }
+    }
+    
     private func bookmarkFolderMenu(items: [NSMenuItem]) -> NSMenu {
         let menu = NSMenu()
-        
-        if items.isEmpty {
-            menu.items = [NSMenuItem(title: "Empty", action: nil, target: nil, keyEquivalent: "")]
-        } else {
-            menu.items = items
-        }
-        
+        menu.items = items.isEmpty ? [NSMenuItem(title: UserText.bookmarksBarFolderEmpty, action: nil, target: nil, keyEquivalent: "")] : items
         return menu
     }
     

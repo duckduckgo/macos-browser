@@ -25,6 +25,7 @@ protocol BookmarksBarViewModelDelegate: AnyObject {
     func bookmarksBarViewModelReceived(action: BookmarksBarViewModel.BookmarksBarItemAction, for item: BookmarksBarCollectionViewItem)
     func bookmarksBarViewModelWidthForContainer() -> CGFloat
     func bookmarksBarViewModelReloadedData()
+    func bookmarksBarViewModelDeletedItems(at indexPaths: Set<IndexPath>)
     
 }
 
@@ -76,9 +77,9 @@ final class BookmarksBarViewModel: NSObject {
     private var preventClicks = false
 
     private var collectionViewItemSizeCache: [String: CGFloat] = [:]
-    private(set) var bookmarksBarItemsTotalWidth: CGFloat = 0
+    private var bookmarksBarItemsTotalWidth: CGFloat = 0
     
-    private(set) var bookmarksBarItems: [BookmarksBarItem] = [] {
+    private var bookmarksBarItems: [BookmarksBarItem] = [] {
         didSet {
             let itemsWidth = bookmarksBarItems.reduce(CGFloat(0)) { total, item in
                 if total == 0 {
@@ -94,6 +95,14 @@ final class BookmarksBarViewModel: NSObject {
 
     @Published
     private(set) var clippedItems: [BookmarkViewModel] = []
+    
+    var cellSizes: [CGSize] {
+        let widths = bookmarksBarItems.map { item in
+            return cachedWidth(buttonTitle: item.title)
+        }
+
+        return widths.map { CGSize(width: $0, height: Constants.buttonHeight) }
+    }
     
     // MARK: - Initialization
     
@@ -147,6 +156,49 @@ final class BookmarksBarViewModel: NSObject {
                 clippedItems.append(BookmarkViewModel(entity: clippedEntity))
             }
         }
+    }
+    
+    func clipOrRestoreBookmarksBarItems() {
+        guard let clipThreshold = delegate?.bookmarksBarViewModelWidthForContainer() else {
+            assertionFailure("Failed to get width of bookmarks bar container")
+            return
+        }
+        
+        guard !bookmarksBarItems.isEmpty else {
+            return
+        }
+        
+        let lastIndexPath = IndexPath(item: bookmarksBarItems.count - 1, section: 0)
+
+        if bookmarksBarItemsTotalWidth >= clipThreshold {
+            if clipLastBarItem() {
+                delegate?.bookmarksBarViewModelDeletedItems(at: Set([lastIndexPath]))
+            }
+        } else if let nextRestorableClippedItem = clippedItems.first {
+            while true {
+                if !restoreNextClippedItemToBookmarksBarIfPossible(item: nextRestorableClippedItem) {
+                    break
+                }
+            }
+            
+            delegate?.bookmarksBarViewModelReloadedData()
+        }
+    }
+    
+    private func restoreNextClippedItemToBookmarksBarIfPossible(item: BookmarkViewModel) -> Bool {
+        guard let clipThreshold = delegate?.bookmarksBarViewModelWidthForContainer() else {
+            assertionFailure("Failed to get width of bookmarks bar container")
+            return false
+        }
+
+        let widthOfRestorableItem = cachedWidth(buttonTitle: item.entity.title)
+        let newMaximumWidth = bookmarksBarItemsTotalWidth + Constants.buttonSpacing + widthOfRestorableItem
+
+        if newMaximumWidth < clipThreshold {
+            return restoreLastClippedItem()
+        }
+        
+        return false
     }
  
     func cachedWidth(buttonTitle: String) -> CGFloat {

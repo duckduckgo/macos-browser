@@ -58,14 +58,12 @@ class BookmarksBarViewModelTests: XCTestCase {
         let clipped = bookmarksBarViewModel.clipLastBarItem()
         
         XCTAssert(clipped)
-        XCTAssert(bookmarksBarViewModel.bookmarksBarItems.isEmpty)
         XCTAssertEqual(bookmarksBarViewModel.clippedItems.count, 1)
         
         let restored = bookmarksBarViewModel.restoreLastClippedItem()
         
         XCTAssert(restored)
         XCTAssert(bookmarksBarViewModel.clippedItems.isEmpty)
-        XCTAssertEqual(bookmarksBarViewModel.bookmarksBarItems.count, 1)
     }
     
     func testWhenUpdatingFromBookmarkEntities_AndTheContainerCannotFitAnyBookmarks_ThenBookmarksAreImmediatelyClipped() {
@@ -89,7 +87,6 @@ class BookmarksBarViewModelTests: XCTestCase {
         let bookmarksBarViewModel = BookmarksBarViewModel(bookmarkManager: manager)
         bookmarksBarViewModel.update(from: bookmarks, containerWidth: 200)
         
-        XCTAssertEqual(bookmarksBarViewModel.bookmarksBarItems.count, 1)
         XCTAssert(bookmarksBarViewModel.clippedItems.isEmpty)
     }
     
