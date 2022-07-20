@@ -163,13 +163,9 @@ final class BookmarksBarViewModel: NSObject {
             return
         }
         
-        print("Clipping/restoring with threshold \(clipThreshold)")
-        
         guard !bookmarksBarItems.isEmpty else {
             return
         }
-        
-        let lastIndexPath = IndexPath(item: bookmarksBarItems.count - 1, section: 0)
 
         if bookmarksBarItemsTotalWidth >= clipThreshold {
             if clipLastBarItem() {
