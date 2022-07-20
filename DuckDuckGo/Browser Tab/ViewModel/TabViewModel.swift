@@ -277,7 +277,7 @@ final class TabViewModel {
             favicon = Favicon.bookmarks
             return
         case .url (let url):
-            if url.host == DDGURL.domain {
+            if url.host == URL.duckDuckGo.host {
                 favicon = Favicon.home
                 return
             }
@@ -341,8 +341,4 @@ extension TabViewModel: TabDataClearing {
         tab.prepareForDataClearing(caller: caller)
     }
 
-}
-
-private enum DDGURL {
-    static let domain = "duckduckgo.com"
 }
