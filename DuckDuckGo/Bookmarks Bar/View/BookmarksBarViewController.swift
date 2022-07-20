@@ -187,10 +187,6 @@ extension BookmarksBarViewController: BookmarksBarViewModelDelegate {
         bookmarksBarCollectionView.reloadData()
     }
     
-    func bookmarksBarViewModelDeletedItems(at indexPaths: Set<IndexPath>) {
-        bookmarksBarCollectionView.deleteItems(at: indexPaths)
-    }
-    
     private func handle(_ action: BookmarksBarViewModel.BookmarksBarItemAction, for bookmark: Bookmark) {
         switch action {
         case .openInNewTab:

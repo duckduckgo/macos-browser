@@ -25,7 +25,6 @@ protocol BookmarksBarViewModelDelegate: AnyObject {
     func bookmarksBarViewModelReceived(action: BookmarksBarViewModel.BookmarksBarItemAction, for item: BookmarksBarCollectionViewItem)
     func bookmarksBarViewModelWidthForContainer() -> CGFloat
     func bookmarksBarViewModelReloadedData()
-    func bookmarksBarViewModelDeletedItems(at indexPaths: Set<IndexPath>)
     
 }
 
@@ -164,6 +163,8 @@ final class BookmarksBarViewModel: NSObject {
             return
         }
         
+        print("Clipping/restoring with threshold \(clipThreshold)")
+        
         guard !bookmarksBarItems.isEmpty else {
             return
         }
@@ -172,7 +173,7 @@ final class BookmarksBarViewModel: NSObject {
 
         if bookmarksBarItemsTotalWidth >= clipThreshold {
             if clipLastBarItem() {
-                delegate?.bookmarksBarViewModelDeletedItems(at: Set([lastIndexPath]))
+                delegate?.bookmarksBarViewModelReloadedData()
             }
         } else if let nextRestorableClippedItem = clippedItems.first {
             var restoredItem = false
