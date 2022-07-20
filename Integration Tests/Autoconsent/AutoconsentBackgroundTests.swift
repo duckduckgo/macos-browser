@@ -34,8 +34,8 @@ class AutoconsentBackgroundTests: XCTestCase {
         configuration.userContentController.addHandler(autoconsentUserScript)
         let webview = WKWebView(frame: .zero, configuration: configuration)
         let expectation = XCTestExpectation(description: "Async call")
-        let url = URL(string: "https://privacy-test-pages.glitch.me/features/autoconsent/")
-        webview.load(url!)
+        let url = Bundle(for: type(of: self)).url(forResource: "autoconsent-test-page", withExtension: "html")!
+        webview.loadFileURL(url, allowingReadAccessTo: url.deletingLastPathComponent())
         DispatchQueue.main.asyncAfter(deadline: .now() + 2) {
             webview.evaluateJavaScript("results.results.includes('button_clicked')", in: nil, in: .page,
                                        completionHandler: { result in
