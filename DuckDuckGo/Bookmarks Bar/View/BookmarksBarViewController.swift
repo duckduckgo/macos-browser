@@ -73,7 +73,12 @@ final class BookmarksBarViewController: NSViewController {
     override func viewWillAppear() {
         super.viewWillAppear()
         subscribeToEvents()
-        viewModel.clipOrRestoreBookmarksBarItems()
+        refreshFavicons()
+    }
+    
+    override func viewDidAppear() {
+        super.viewDidAppear()
+        frameChangeNotification()
     }
     
     private func subscribeToViewModel() {
