@@ -100,7 +100,6 @@ class BookmarkManagedObjectTests: XCTestCase {
     func testWhenSavingFolders_AndTheParentFolderIsTheSameAsTheFolder_ThenSavingFails() {
         let container = CoreData.bookmarkContainer()
         let context = container.viewContext
-        let parent = createTestRootFolderManagedObject(in: context)
         let id = UUID()
 
         let folder = BookmarkManagedObject(context: context)
@@ -137,6 +136,43 @@ class BookmarkManagedObjectTests: XCTestCase {
 
         bottomLevelFolder.addToChildren(topLevelFolder)
         XCTAssertThrowsError(try context.save())
+    }
+    
+    func testWhenSavingBookmark_AndBookmarkDoesNotHaveParentFolder_ThenSavingFails() {
+        let container = CoreData.bookmarkContainer()
+        let context = container.viewContext
+        let id = UUID()
+
+        let bookmark = BookmarkManagedObject(context: context)
+
+        bookmark.id = id
+        bookmark.urlEncrypted = URL(string: "https://example.com")! as NSObject
+        bookmark.titleEncrypted = "Bookmark" as NSObject
+        bookmark.isFolder = false
+        bookmark.isFavorite = false
+        bookmark.dateAdded = NSDate.now
+
+        XCTAssertThrowsError(try context.save()) { error in
+            XCTAssertEqual(error as? BookmarkManagedObject.BookmarkError, BookmarkManagedObject.BookmarkError.mustExistInsideRootFolder)
+        }
+    }
+    
+    func testWhenSavingFolder_AndFolderDoesNotHaveParentFolder_ThenSavingFails() {
+        let container = CoreData.bookmarkContainer()
+        let context = container.viewContext
+        let id = UUID()
+
+        let folder = BookmarkManagedObject(context: context)
+
+        folder.id = id
+        folder.titleEncrypted = "Folder" as NSObject
+        folder.isFolder = false
+        folder.isFavorite = false
+        folder.dateAdded = NSDate.now
+
+        XCTAssertThrowsError(try context.save()) { error in
+            XCTAssertEqual(error as? BookmarkManagedObject.BookmarkError, BookmarkManagedObject.BookmarkError.mustExistInsideRootFolder)
+        }
     }
 
     @discardableResult
