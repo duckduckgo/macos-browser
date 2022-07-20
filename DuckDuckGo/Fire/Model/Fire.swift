@@ -75,6 +75,11 @@ final class TabDataCleaner: NSObject, WKNavigationDelegate {
 }
 
 final class Fire {
+
+    // Drop www prefixes to produce list of burning domains
+    static func getBurningDomain(from url: URL) -> String? {
+        return url.host?.dropWWW()
+    }
     
     private typealias TabCollectionsCleanupInfo = [TabCollectionViewModel: [TabCollectionViewModel.TabCleanupInfo]]
 
@@ -143,6 +148,12 @@ final class Fire {
             return domain
         })
         let burningDomains = domains.union(wwwDomains)
+
+        // Fireproofed domains shouldn't be in the list of burning domains
+        assert(!burningDomains.contains(where: { domain in
+            FireproofDomains.shared.isFireproof(fireproofDomain: domain)
+        }), "Fireproof domain is burning")
+
         let collectionsCleanupInfo = tabViewModelsFor(domains: burningDomains)
         
         // Prepare all Tabs that are going to be burned
@@ -466,12 +477,42 @@ extension History {
 
     var visitedDomains: Set<String> {
         return reduce(Set<String>(), { result, historyEntry in
-            if let host = historyEntry.url.host {
-                return result.union([host.dropWWW()])
+            if let domain = Fire.getBurningDomain(from: historyEntry.url) {
+                return result.union([domain])
             } else {
                 return result
             }
         })
+    }
+
+}
+
+// Visits
+extension Fire {
+
+    func burnDomains(of visits: [Visit],
+                     except fireproofDomains: FireproofDomains,
+                     completion: (() -> Void)? = nil) {
+
+        // Get domains to burn
+        var domains = Set<String>()
+        visits.forEach { visit in
+            guard let histotyEntry = visit.historyEntry,
+                  let domain = Fire.getBurningDomain(from: histotyEntry.url) else {
+                assertionFailure("No history entry or url")
+                return
+            }
+
+            if !fireproofDomains.isFireproof(fireproofDomain: domain) {
+                domains.insert(domain)
+            }
+        }
+
+        burnDomains(domains, completion: completion)
+    }
+
+    func isFireproofed() {
+
     }
 
 }

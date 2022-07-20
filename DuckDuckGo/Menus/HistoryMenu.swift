@@ -138,8 +138,9 @@ final class HistoryMenu: NSMenu {
     private func makeFirstWeekMenuItems(from groupings: [HistoryGrouping]) -> [NSMenuItem] {
 
         func makeFirstWeekRootMenuItem(from grouping: HistoryGrouping) -> NSMenuItem {
-            let menuItem = NSMenuItem(title: makeTitle(for: grouping))
-            let subMenuItems = makeClearThisHistoryMenuItems() + makeMenuItems(from: grouping)
+            let title = makeTitle(for: grouping)
+            let menuItem = NSMenuItem(title: title)
+            let subMenuItems = makeClearThisHistoryMenuItems(with: title) + makeMenuItems(from: grouping)
             let submenu = NSMenu(items: subMenuItems)
             menuItem.submenu = submenu
             return menuItem
@@ -210,10 +211,13 @@ final class HistoryMenu: NSMenu {
         return dateFormatter
     }()
 
-    private func makeClearThisHistoryMenuItems() -> [NSMenuItem] {
-        return [NSMenuItem(title: UserText.clearThisHistoryMenuItem,
-                           action: #selector(AppDelegate.clearThisHistory(_:)),
-                           keyEquivalent: ""),
+    private func makeClearThisHistoryMenuItems(with dateString: String? = nil) -> [NSMenuItem] {
+        let headerItem = NSMenuItem(title: UserText.clearThisHistoryMenuItem,
+                                    action: #selector(AppDelegate.clearThisHistory(_:)),
+                                    keyEquivalent: "")
+        // Keep the dateString for alerts so we don't need to use the formatter again
+        headerItem.representedObject = dateString
+        return [headerItem,
                 NSMenuItem.separator()]
     }
 
@@ -339,14 +343,22 @@ private extension HistoryCoordinating {
 
 }
 
-private extension NSMenuItem {
+extension NSMenuItem {
 
     convenience init(visitViewModel: VisitViewModel) {
         self.init(title: visitViewModel.titleTruncated,
                   action: #selector(AppDelegate.openVisit(_:)),
                   keyEquivalent: "")
         image = visitViewModel.smallFaviconImage?.resizedToFaviconSize()
+        // Keep the reference to visit in order to use it for burning
         representedObject = visitViewModel.visit
+    }
+
+    // Getting visits for the whole menu section in order to perform burning
+    func getVisits() -> [Visit] {
+        return menu?.items.compactMap({ menuItem in
+            return menuItem.representedObject as? Visit
+        }) ?? []
     }
 
 }

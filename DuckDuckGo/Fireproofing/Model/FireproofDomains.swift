@@ -144,3 +144,32 @@ internal class FireproofDomains {
     }
 
 }
+
+extension FireproofDomains {
+
+    enum FireproofStatus {
+        case noFireproofedDomain
+        case containsFireproofedDomain
+        case allDomainsAreFireproofed
+    }
+
+    func getFireproofedStatus(for visits: [Visit]) -> FireproofStatus {
+        guard visits.count > 0 else {
+            return .noFireproofedDomain
+        }
+
+        let fireproofedVisits = visits.filter { visit in
+            if let domain = visit.historyEntry?.url.host, isFireproof(fireproofDomain: domain) {
+                return true
+            }
+
+            return false
+        }
+
+        switch fireproofedVisits.count {
+        case 0: return .noFireproofedDomain
+        case visits.count: return .allDomainsAreFireproofed
+        default: return .containsFireproofedDomain
+        }
+    }
+}

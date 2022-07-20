@@ -391,23 +391,37 @@ extension MainViewController {
         })
     }
 
+    //todo ClearThisHistoryMenuItem
     @objc func clearThisHistory(_ sender: NSMenuItem) {
         guard let window = view.window else {
             assertionFailure("No window")
             return
         }
 
-        let date = sender.representedObject as? Date
-        //todo burning domains + fireproof domains
-        //todo everything in fireproofed alert
-        let alert = NSAlert.clearHistoryAndDataAlert(date: date, includesFireproofed: false)
-        alert.beginSheetModal(for: window, completionHandler: { response in
-            guard case .alertFirstButtonReturn = response else {
-                return
-            }
-            //todo domains
-            FireCoordinator.fireViewModel.fire.burnDomains(Set())
-        })
+        let dateString = sender.representedObject as? String
+        let visits = sender.getVisits()
+        let fireproofStatus = FireproofDomains.shared.getFireproofedStatus(for: visits)
+
+        if fireproofStatus == .allDomainsAreFireproofed {
+            let alert = NSAlert.allFireproofAlert()
+            alert.beginSheetModal(for: window, completionHandler: { [weak self] response in
+                guard case .alertFirstButtonReturn = response else {
+                    return
+                }
+
+                self?.browserTabViewController.openNewTab(with: .preferences(pane: .privacy),
+                                                          selected: true)
+            })
+        } else {
+            let alert = NSAlert.clearHistoryAndDataAlert(dateString: dateString,
+                                                         includesFireproofed: fireproofStatus == .containsFireproofedDomain)
+            alert.beginSheetModal(for: window, completionHandler: { response in
+                guard case .alertFirstButtonReturn = response else {
+                    return
+                }
+                FireCoordinator.fireViewModel.fire.burnDomains(of: visits, except: FireproofDomains.shared)
+            })
+        }
     }
 
     // MARK: - Bookmarks

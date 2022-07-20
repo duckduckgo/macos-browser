@@ -244,7 +244,6 @@ fileprivate extension MainMenu {
             closeWindowMenuItem,
             closeAllWindowsMenuItem,
             closeTabMenuItem,
-            burnWebsiteDataMenuItem,
             importBrowserDataMenuItem,
             manageBookmarksMenuItem,
             importBookmarksMenuItem,

@@ -75,11 +75,10 @@ extension NSAlert {
         return alert
     }
 
-    static func clearHistoryAndDataAlert(date: Date?, includesFireproofed: Bool) -> NSAlert {
+    static func clearHistoryAndDataAlert(dateString: String?, includesFireproofed: Bool) -> NSAlert {
         let alert = NSAlert()
-        if let date = date {
-            //todo date format
-            alert.messageText = String(format: UserText.clearDataHeader, "selected date")
+        if let dateString = dateString {
+            alert.messageText = String(format: UserText.clearDataHeader, dateString)
         } else {
             alert.messageText = String(format: UserText.clearDataHeader, "selected dates")
         }
@@ -91,6 +90,17 @@ extension NSAlert {
         alert.alertStyle = .warning
         alert.icon = NSImage(named: "FireHeader")
         alert.addButton(withTitle: UserText.clear)
+        alert.addButton(withTitle: UserText.cancel)
+        return alert
+    }
+
+    static func allFireproofAlert() -> NSAlert {
+        let alert = NSAlert()
+        alert.messageText = UserText.allSitesFireproofAlertHeader
+        alert.informativeText = UserText.allSitesFireproofAlertDescription
+        alert.alertStyle = .warning
+        alert.icon = NSImage(named: "FireHeader")
+        alert.addButton(withTitle: UserText.settings)
         alert.addButton(withTitle: UserText.cancel)
         return alert
     }
