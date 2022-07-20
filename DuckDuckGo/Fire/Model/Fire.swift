@@ -329,6 +329,7 @@ final class Fire {
             } else {
                 tabCollectionViewModel.appendNewTab(forceChange: true)
             }
+            tabCollectionViewModel.tabCollection.localHistoryOfRemovedTabs.removeAll()
 
             completion()
         }
