@@ -29,7 +29,8 @@ final class BookmarksBarViewController: NSViewController {
     private let bookmarkManager = LocalBookmarkManager.shared
     private let viewModel = BookmarksBarViewModel(bookmarkManager: LocalBookmarkManager.shared)
     private let tabCollectionViewModel: TabCollectionViewModel
-    private var cancellables = Set<AnyCancellable>()
+    
+    private var viewModelCancellable: AnyCancellable?
     
     fileprivate var clipThreshold: CGFloat {
         let viewWidthWithoutClipIndicator = view.frame.width - clippedItemsIndicator.frame.minX
@@ -67,7 +68,37 @@ final class BookmarksBarViewController: NSViewController {
         bookmarksBarCollectionView.collectionViewLayout = createCenteredCollectionViewLayout()
         
         view.postsFrameChangedNotifications = true
-        
+    }
+    
+    override func viewWillAppear() {
+        super.viewWillAppear()
+        subscribeToEvents()
+        viewModel.clipOrRestoreBookmarksBarItems()
+    }
+    
+    private func subscribeToViewModel() {
+        guard viewModelCancellable.isNil else {
+            assertionFailure("Tried to subscribe to view model while it is already subscribed")
+            return
+        }
+
+        viewModelCancellable = viewModel.$clippedItems.receive(on: RunLoop.main).sink { [weak self] _ in
+            self?.refreshClippedIndicator()
+        }
+    }
+    
+    @objc
+    private func frameChangeNotification() {
+        viewModel.clipOrRestoreBookmarksBarItems()
+        refreshClippedIndicator()
+    }
+    
+    override func removeFromParent() {
+        super.removeFromParent()
+        unsubscribeFromEvents()
+    }
+    
+    private func subscribeToEvents() {
         NotificationCenter.default.addObserver(self,
                                                selector: #selector(frameChangeNotification),
                                                name: NSView.frameDidChangeNotification,
@@ -81,21 +112,12 @@ final class BookmarksBarViewController: NSViewController {
         subscribeToViewModel()
     }
     
-    override func viewWillAppear() {
-        super.viewWillAppear()
-        viewModel.clipOrRestoreBookmarksBarItems()
-    }
-    
-    private func subscribeToViewModel() {
-        viewModel.$clippedItems.receive(on: RunLoop.main).sink { [weak self] _ in
-            self?.refreshClippedIndicator()
-        }.store(in: &cancellables)
-    }
-    
-    @objc
-    private func frameChangeNotification() {
-        viewModel.clipOrRestoreBookmarksBarItems()
-        refreshClippedIndicator()
+    private func unsubscribeFromEvents() {
+        NotificationCenter.default.removeObserver(self, name: NSView.frameDidChangeNotification, object: nil)
+        NotificationCenter.default.removeObserver(self, name: .faviconCacheUpdated, object: nil)
+        
+        viewModelCancellable?.cancel()
+        viewModelCancellable = nil
     }
     
     // MARK: - Layout

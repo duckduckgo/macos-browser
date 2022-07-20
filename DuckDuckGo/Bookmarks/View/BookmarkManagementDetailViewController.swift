@@ -47,7 +47,6 @@ final class BookmarkManagementDetailViewController: NSViewController {
     weak var delegate: BookmarkManagementDetailViewControllerDelegate?
 
     private var bookmarkManager: BookmarkManager = LocalBookmarkManager.shared
-    private var bookmarkListCancellable: AnyCancellable?
     private var selectionState: BookmarkManagementSidebarViewController.SelectionState = .empty {
         didSet {
             editingBookmarkIndex = nil
