@@ -28,6 +28,7 @@ final class MainViewController: NSViewController {
     @IBOutlet weak var navigationBarContainerView: NSView!
     @IBOutlet weak var webContainerView: NSView!
     @IBOutlet weak var findInPageContainerView: NSView!
+    @IBOutlet weak var bookmarksBarContainerView: NSView!
     @IBOutlet var navigationBarTopConstraint: NSLayoutConstraint!
     @IBOutlet var addressBarHeightConstraint: NSLayoutConstraint!
     @IBOutlet var bookmarksBarHeightConstraint: NSLayoutConstraint!
@@ -189,7 +190,18 @@ final class MainViewController: NSViewController {
     private func updateBookmarksBarViewVisibility(visible: Bool) {
         let showBookmarksBar = isInPopUpWindow ? false : visible
 
-        bookmarksBarViewController.view.isHidden = !showBookmarksBar
+        if visible {
+            if bookmarksBarViewController.parent == nil {
+                addChild(bookmarksBarViewController)
+
+                bookmarksBarViewController.view.frame = bookmarksBarContainerView.bounds
+                bookmarksBarContainerView.addSubview(bookmarksBarViewController.view)
+            }
+        } else {
+            bookmarksBarViewController.removeFromParent()
+            bookmarksBarViewController.view.removeFromSuperview()
+        }
+        
         bookmarksBarHeightConstraint.constant = showBookmarksBar ? 34 : 0
 
         updateDividerColor()

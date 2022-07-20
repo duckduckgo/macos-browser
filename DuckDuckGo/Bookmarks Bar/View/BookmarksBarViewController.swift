@@ -86,17 +86,6 @@ final class BookmarksBarViewController: NSViewController {
         viewModel.clipOrRestoreBookmarksBarItems()
     }
     
-    private func createCenteredLayout(centered: Bool) -> NSCollectionLayoutSection {
-        let group = NSCollectionLayoutGroup.horizontallyCentered(cellSizes: viewModel.cellSizes, centered: centered)
-        return NSCollectionLayoutSection(group: group)
-    }
-    
-    func createCenteredCollectionViewLayout() -> NSCollectionViewLayout {
-        return NSCollectionViewCompositionalLayout { [unowned self] _, _ in
-            return createCenteredLayout(centered: viewModel.clippedItems.isEmpty)
-        }
-    }
-
     private func subscribeToViewModel() {
         viewModel.$clippedItems.receive(on: RunLoop.main).sink { [weak self] _ in
             self?.refreshClippedIndicator()
@@ -107,6 +96,19 @@ final class BookmarksBarViewController: NSViewController {
     private func frameChangeNotification() {
         viewModel.clipOrRestoreBookmarksBarItems()
         refreshClippedIndicator()
+    }
+    
+    // MARK: - Layout
+    
+    private func createCenteredLayout(centered: Bool) -> NSCollectionLayoutSection {
+        let group = NSCollectionLayoutGroup.horizontallyCentered(cellSizes: viewModel.cellSizes, centered: centered)
+        return NSCollectionLayoutSection(group: group)
+    }
+    
+    func createCenteredCollectionViewLayout() -> NSCollectionViewLayout {
+        return NSCollectionViewCompositionalLayout { [unowned self] _, _ in
+            return createCenteredLayout(centered: viewModel.clippedItems.isEmpty)
+        }
     }
     
     private func refreshClippedIndicator() {

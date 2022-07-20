@@ -107,6 +107,7 @@
                     </view>
                     <connections>
                         <outlet property="addressBarHeightConstraint" destination="vZS-tl-wOP" id="cCS-Fd-zJd"/>
+                        <outlet property="bookmarksBarContainerView" destination="kfs-1U-pfm" id="4FY-K8-M2a"/>
                         <outlet property="bookmarksBarHeightConstraint" destination="D6Z-21-RpW" id="AMj-Ll-fEc"/>
                         <outlet property="divider" destination="af1-Eb-VaG" id="Nws-XY-cPD"/>
                         <outlet property="findInPageContainerView" destination="Jbn-9T-FNt" id="5Sl-UV-Fa9"/>

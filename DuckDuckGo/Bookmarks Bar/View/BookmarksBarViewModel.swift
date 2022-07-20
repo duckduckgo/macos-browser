@@ -175,13 +175,19 @@ final class BookmarksBarViewModel: NSObject {
                 delegate?.bookmarksBarViewModelDeletedItems(at: Set([lastIndexPath]))
             }
         } else if let nextRestorableClippedItem = clippedItems.first {
+            var restoredItem = false
+
             while true {
                 if !restoreNextClippedItemToBookmarksBarIfPossible(item: nextRestorableClippedItem) {
                     break
                 }
+                
+                restoredItem = true
             }
             
-            delegate?.bookmarksBarViewModelReloadedData()
+            if restoredItem {
+                delegate?.bookmarksBarViewModelReloadedData()
+            }
         }
     }
     
