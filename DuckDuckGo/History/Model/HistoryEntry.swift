@@ -65,6 +65,12 @@ final class HistoryEntry: Stored {
         lastVisit = Date.startOfMinuteNow
     }
 
+    // Used for migration
+    func addOldVisit(date: Date) {
+        let visit = Visit(date: date, historyEntry: self)
+        visits.insert(visit)
+    }
+
     // MARK: - Tracker blocking info
 
     var numberOfTrackersBlocked: Int

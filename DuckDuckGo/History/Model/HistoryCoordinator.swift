@@ -55,7 +55,9 @@ final class HistoryCoordinator: HistoryCoordinating {
     }
 
     func commonInit() {
-        cleanOldAndLoad()
+        cleanOldAndLoad { [weak self] _ in
+            self?.migrateModelV5toV6IfNeeded()
+        }
         scheduleRegularCleaning()
     }
 
@@ -187,8 +189,8 @@ final class HistoryCoordinator: HistoryCoordinating {
         }
     }
 
-    @objc private func cleanOldAndLoad() {
-        clean(until: .monthAgo)
+    @objc private func cleanOldAndLoad(completionHandler: ((Error?) -> Void)? = nil) {
+        clean(until: .monthAgo, completionHandler: completionHandler)
     }
 
     private func clean(until date: Date,
@@ -296,6 +298,30 @@ final class HistoryCoordinator: HistoryCoordinating {
             entry[keyPath: keyPath] = value
             self?.save(entry: entry)
         }
+    }
+
+    // V5 to V6 custom migration
+
+    @UserDefaultsWrapper(key: .historyV5toV6Migration, defaultValue: false)
+    private var historyV5toV6Migration: Bool
+
+
+    private func migrateModelV5toV6IfNeeded() {
+
+        guard let historyDictionary = historyDictionary,
+              !historyV5toV6Migration else {
+            return
+        }
+
+        historyV5toV6Migration = true
+
+        for entry in historyDictionary.values {
+            if entry.visits.isEmpty {
+                entry.addOldVisit(date: entry.lastVisit)
+                save(entry: entry)
+            }
+        }
+
     }
 
 }
