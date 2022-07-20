@@ -179,7 +179,7 @@ class BookmarkManagedObjectTests: XCTestCase {
     private func createTestRootFolderManagedObject(in context: NSManagedObjectContext) -> BookmarkManagedObject {
         let folder = BookmarkManagedObject(context: context)
 
-        folder.id = UUID(uuidString: LocalBookmarkStore.Constants.rootFolderUUID)!
+        folder.id = UUID.rootBookmarkFolderUUID
         folder.titleEncrypted = "RootFolder" as NSObject
         folder.isFolder = true
         folder.isFavorite = false
