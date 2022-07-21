@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<document type="com.apple.InterfaceBuilder3.Cocoa.Storyboard.XIB" version="3.0" toolsVersion="19529" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES">
+<document type="com.apple.InterfaceBuilder3.Cocoa.Storyboard.XIB" version="3.0" toolsVersion="20037" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES">
     <dependencies>
         <deployment identifier="macosx"/>
-        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="19529"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="20037"/>
         <capability name="Named colors" minToolsVersion="9.0"/>
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
     </dependencies>
@@ -125,15 +125,15 @@
                                             <scrollView focusRingType="exterior" borderType="none" horizontalLineScroll="10" horizontalPageScroll="10" verticalLineScroll="10" verticalPageScroll="10" hasHorizontalScroller="NO" translatesAutoresizingMaskIntoConstraints="NO" id="heN-iP-EsM">
                                                 <rect key="frame" x="20" y="108" width="320" height="97"/>
                                                 <clipView key="contentView" drawsBackground="NO" id="PTf-L1-DK2">
-                                                    <rect key="frame" x="0.0" y="0.0" width="305" height="97"/>
+                                                    <rect key="frame" x="0.0" y="0.0" width="320" height="97"/>
                                                     <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                                     <subviews>
                                                         <textView importsGraphics="NO" richText="NO" verticallyResizable="YES" smartInsertDelete="YES" id="F3N-ft-DgV">
-                                                            <rect key="frame" x="0.0" y="0.0" width="305" height="97"/>
+                                                            <rect key="frame" x="0.0" y="0.0" width="320" height="97"/>
                                                             <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                                             <color key="textColor" name="textColor" catalog="System" colorSpace="catalog"/>
                                                             <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
-                                                            <size key="minSize" width="305" height="97"/>
+                                                            <size key="minSize" width="320" height="97"/>
                                                             <size key="maxSize" width="320" height="10000000"/>
                                                             <color key="insertionPointColor" name="textColor" catalog="System" colorSpace="catalog"/>
                                                         </textView>
@@ -148,7 +148,7 @@
                                                     <autoresizingMask key="autoresizingMask"/>
                                                 </scroller>
                                                 <scroller key="verticalScroller" wantsLayer="YES" verticalHuggingPriority="750" horizontal="NO" id="MIn-YA-XiI">
-                                                    <rect key="frame" x="305" y="0.0" width="15" height="97"/>
+                                                    <rect key="frame" x="304" y="0.0" width="16" height="97"/>
                                                     <autoresizingMask key="autoresizingMask"/>
                                                 </scroller>
                                             </scrollView>
@@ -213,7 +213,8 @@
                                                             <menuItem title="The site does not support this browser" tag="3" id="naz-Hr-IpO"/>
                                                             <menuItem title="The site asked me to disable" tag="4" id="0YV-Mw-KfP"/>
                                                             <menuItem title="Video or images didn't load" tag="5" id="ks1-6b-EFw"/>
-                                                            <menuItem title="Something else" tag="6" id="Fhy-jA-gGf"/>
+                                                            <menuItem title="Cookie pop-up wasn't managed" tag="6" id="6cG-Ng-AfP"/>
+                                                            <menuItem title="Something else" tag="7" id="Fhy-jA-gGf"/>
                                                         </items>
                                                     </menu>
                                                 </popUpButtonCell>

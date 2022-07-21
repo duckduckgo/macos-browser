@@ -337,7 +337,8 @@ fileprivate extension WebsiteBreakage.Category {
         case 3: self = .browserIsIncompatible
         case 4: self = .theSiteAskedToDisable
         case 5: self = .videoOrImagesDidntLoad
-        case 6: self = .somethingElse
+        case 6: self = .cookiePromptNotManaged
+        case 7: self = .somethingElse
 
         default:
             return nil
