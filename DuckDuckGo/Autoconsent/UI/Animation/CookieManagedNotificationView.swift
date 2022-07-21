@@ -1,106 +1,29 @@
 //
-//  ContentView.swift
-//  CookieAnimation
+//  CookieManagedNotificationView.swift
 //
-//  Created by Fernando Bunn on 18/07/2022.
+//  Copyright © 2022 DuckDuckGo. All rights reserved.
+//
+//  Licensed under the Apache License, Version 2.0 (the "License");
+//  you may not use this file except in compliance with the License.
+//  You may obtain a copy of the License at
+//
+//  http://www.apache.org/licenses/LICENSE-2.0
+//
+//  Unless required by applicable law or agreed to in writing, software
+//  distributed under the License is distributed on an "AS IS" BASIS,
+//  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+//  See the License for the specific language governing permissions and
+//  limitations under the License.
 //
 
 import SwiftUI
 
-private enum Consts {
-    
-    enum Colors {
-        static let badgeBackgroundColor = Color("URLNotificationBadgeBackground")
-    }
-    
-    enum CookieAnimation {
-        static let duration: CGFloat = 1.5 //1.5
-        static let halfDuration = duration / 2
-        static let secondPhaseDelay = halfDuration
-        
-        static let innerExpandingCircleScale1 = 1.2
-        static let innerExpandingCircleScale2 = 1.8
-        
-        static let outerExpandingCircleScale1 = 1.5
-        static let outerExpandingCircleScale2 = 2.2
-    }
-    
-    enum BadgeAnimation {
-        static let duration: CGFloat = 0.8
-        static let halfDuration = duration / 2
-        static let secondPhaseDelay = 3.0
-    }
-    
-    enum Layout {
-        static let cookieSize: CGFloat = 16
-        static let dotsGroupSize: CGFloat = 20
-        static let randomDegreesOffset = 40
-        static let dotSize: CGFloat = 3
-    }
-    
-    enum Count {
-        static let circle = 5
-    }
-}
-
-struct ContentView: View {
+struct CookieManagedNotificationView: View {
     var body: some View {
-        HStack {
-            BadgeAnimationView(iconView: AnyView(CookieAnimationView()),
-                               text: "Cookies Managed")
-            .frame(width: 148, height: 32)
-            Spacer()
-        }.padding()
-            .frame(width: 250, height: 80)
-            .background(Color.yellow)
-    }
-}
-
-struct BadgeAnimationView: View {
-    let iconView: AnyView
-    let text: String
-    @State var textOffset: CGFloat = -120
-    
-    var body: some View {
-        GeometryReader { geometry in
-            ZStack {
-                ExpandableRectangle()
-                    .frame(width: geometry.size.width, height: geometry.size.height)
-                
-                HStack {
-                    Text(text)
-                        .font(.footnote)
-                        .offset(x: textOffset)
-                        .onAppear {
-                            withAnimation(.easeInOut(duration: Consts.BadgeAnimation.duration)) {
-                                textOffset = 0
-                            }
-                            withAnimation(.easeInOut(duration: Consts.BadgeAnimation.duration).delay(Consts.BadgeAnimation.secondPhaseDelay)) {
-                                    textOffset = -120
-                            }
-
-                        }
-                        .padding(.leading, geometry.size.height)
-                    
-                    Spacer()
-                }.clipped()
-                
-                //opaque view
-                HStack {
-                    Rectangle()
-                        .foregroundColor(Consts.Colors.badgeBackgroundColor)
-                        .cornerRadius(8)
-                        .frame(width: geometry.size.height, height: geometry.size.height)
-                    Spacer()
-                }
-                
-                HStack{
-                    iconView
-                        .frame(width: geometry.size.height, height: geometry.size.height)
-                    Spacer()
-                }
-            }
-        }
+        BadgeAnimationView(iconView: AnyView(CookieAnimationView()),
+                           text: "Cookies Managed",
+                           animationDuration: Consts.BadgeAnimation.duration,
+                           animationSecondPhaseDelay: Consts.BadgeAnimation.secondPhaseDelay)
     }
 }
 
@@ -124,41 +47,6 @@ struct ExpandableRectangle: View {
         }
     }
 }
-
-
-struct CookieBadgeAnimationView: View {
-    @State var width: CGFloat = 70
-    @State var textOffset: CGFloat = -100
-    
-    var body: some View {
-        ZStack {
-            Rectangle()
-                .cornerRadius(8)
-                .foregroundColor(.red)
-            
-            Text("Cookies Managed")
-                .offset(x: textOffset)
-            
-            HStack {
-                CookieAnimationView()
-                    .background(Color.red)
-                    .border(Color.white, width: 2)
-                Spacer()
-            }
-        }
-        //   .frame(maxWidth: .infinity)
-        // .frame(height: 60)
-        //        .onAppear {
-        //            withAnimation(.easeInOut(duration: Consts.BadgeAnimation.duration)) {
-        //                textOffset = 0
-        //            }
-        //            withAnimation(.easeInOut(duration: Consts.BadgeAnimation.duration).delay(Consts.BadgeAnimation.secondPhaseDelay)) {
-        //                width = 70
-        //            }
-        //        }
-    }
-}
-
 
 struct CookieAnimationView: View {
     @State var cookieAlpha: CGFloat = 1
@@ -190,8 +78,6 @@ struct CookieAnimationView: View {
             }
         }.frame(width: Consts.Layout.dotsGroupSize * 1.6,
                 height: Consts.Layout.dotsGroupSize * 1.6)
-        
-        
         .onAppear {
             withAnimation(.easeInOut(duration: Consts.CookieAnimation.duration)) {
                 cookieAlpha = 0
@@ -229,7 +115,6 @@ struct DotGroupView: View {
         }
     }
 }
-
 
 struct InnerExpandingCircle: View {
     @State var opacity: CGFloat = 0
@@ -274,7 +159,6 @@ struct OuterExpandingCircle: View {
     }
 }
 
-
 struct DotView: View {
     let size = Consts.Layout.dotSize
     let geo: GeometryProxy
@@ -306,7 +190,6 @@ struct DotView: View {
     }
     
     private func xPositionWithGeometry(_ proxy: GeometryProxy, isContracted: Bool) -> CGFloat {
-        //let expandedXOffset: CGFloat = 0
         return isContracted ? proxy.size.width/2 : size/2 + expandedOffset
     }
     
@@ -319,10 +202,44 @@ extension Animation {
     static let expandDots = Animation.easeInOut(duration: 2.4)
 }
 
-
-struct ContentView_Previews: PreviewProvider {
+struct CookieManagedNotificationView_Previews: PreviewProvider {
     static var previews: some View {
-        ContentView()
+        CookieManagedNotificationView()
+            .frame(width: 148, height: 32)
+    }
+}
+
+private enum Consts {
+    
+    enum Colors {
+        static let badgeBackgroundColor = Color("URLNotificationBadgeBackground")
+    }
+    
+    enum CookieAnimation {
+        static let duration: CGFloat = 1.5
+        static let halfDuration = duration / 2
+        static let secondPhaseDelay = halfDuration
         
+        static let innerExpandingCircleScale1 = 1.2
+        static let innerExpandingCircleScale2 = 1.8
+        
+        static let outerExpandingCircleScale1 = 1.5
+        static let outerExpandingCircleScale2 = 2.2
+    }
+    
+    enum BadgeAnimation {
+        static let duration: CGFloat = 0.8
+        static let secondPhaseDelay = 3.0
+    }
+
+    enum Layout {
+        static let cookieSize: CGFloat = 16
+        static let dotsGroupSize: CGFloat = 20
+        static let randomDegreesOffset = 40
+        static let dotSize: CGFloat = 3
+    }
+    
+    enum Count {
+        static let circle = 5
     }
 }
