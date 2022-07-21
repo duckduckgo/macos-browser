@@ -56,7 +56,11 @@ final class AppStateRestorationManager: NSObject {
 
     func restoreLastSessionState(interactive: Bool) {
         do {
-            try service.restoreState(using: WindowsManager.restoreState(from:))
+            let isCalledAtStartup = !interactive
+            try service.restoreState(using: { coder in
+                try WindowsManager.restoreState(from: coder, includePinnedTabs: isCalledAtStartup)
+            })
+            clearLastSessionState()
         } catch CocoaError.fileReadNoSuchFile {
             // ignore
         } catch {
@@ -75,7 +79,7 @@ final class AppStateRestorationManager: NSObject {
     func applicationDidFinishLaunching() {
         let isRelaunchingAutomatically = appIsRelaunchingAutomatically
         appIsRelaunchingAutomatically = false
-        readLastSessionState(restore: shouldRestorePreviousSession || isRelaunchingAutomatically)
+        readLastSessionState(restoreWindows: shouldRestorePreviousSession || isRelaunchingAutomatically)
 
         stateChangedCancellable = WindowControllersManager.shared.stateChanged
             .debounce(for: .seconds(1), scheduler: RunLoop.main)
@@ -96,10 +100,26 @@ final class AppStateRestorationManager: NSObject {
         }
     }
 
-    private func readLastSessionState(restore: Bool) {
+    private func readLastSessionState(restoreWindows: Bool) {
         service.loadLastSessionState()
-        if restore {
+        if restoreWindows {
             restoreLastSessionState(interactive: false)
+        } else {
+            restorePinnedTabs()
+        }
+        WindowControllersManager.shared.updateIsInInitialState()
+    }
+
+    private func restorePinnedTabs() {
+        do {
+            try service.restoreState(using: { coder in
+                try WindowsManager.restoreState(from: coder, includeWindows: false)
+            })
+        } catch CocoaError.fileReadNoSuchFile {
+            // ignore
+        } catch {
+            os_log("Pinned tabs state could not be decoded: %s", "\(error)")
+            Pixel.fire(.debug(event: .appStateRestorationFailed, error: error))
         }
     }
 

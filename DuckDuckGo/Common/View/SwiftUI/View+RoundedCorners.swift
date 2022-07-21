@@ -1,5 +1,5 @@
 //
-//  RecentlyClosedTab.swift
+//  View+RoundedCorners.swift
 //
 //  Copyright © 2022 DuckDuckGo. All rights reserved.
 //
@@ -16,23 +16,25 @@
 //  limitations under the License.
 //
 
-import Foundation
+import SwiftUI
 
-final class RecentlyClosedTab: RecentlyClosedCacheItem {
+extension View {
 
-    init(tabContent: Tab.TabContent, favicon: NSImage?, title: String?, originalTabCollection: TabCollection? = nil, index: TabIndex) {
-        self.tabContent = tabContent
-        self.favicon = favicon
-        self.title = title
-        self.originalTabCollection = originalTabCollection
-        self.index = index
+    /**
+     * Rounds corners specified by `corners` using given `radius`.
+     */
+    func cornerRadius(_ radius: CGFloat, corners: [NSBezierPath.Corners]) -> some View {
+        clipShape(RoundedCorner(radius: radius, corners: corners))
     }
+}
 
-    let tabContent: Tab.TabContent
-    let favicon: NSImage?
-    let title: String?
+private struct RoundedCorner: Shape {
 
-    weak var originalTabCollection: TabCollection?
-    let index: TabIndex
+    var radius: CGFloat = 0
+    var corners: [NSBezierPath.Corners] = NSBezierPath.Corners.allCases
 
+    func path(in rect: CGRect) -> Path {
+        let path = NSBezierPath(roundedRect: rect, forCorners: corners, cornerRadius: radius)
+        return Path(path.cgPath)
+    }
 }
