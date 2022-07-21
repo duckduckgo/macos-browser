@@ -305,7 +305,6 @@ final class HistoryCoordinator: HistoryCoordinating {
     @UserDefaultsWrapper(key: .historyV5toV6Migration, defaultValue: false)
     private var historyV5toV6Migration: Bool
 
-
     private func migrateModelV5toV6IfNeeded() {
 
         guard let historyDictionary = historyDictionary,
@@ -315,11 +314,9 @@ final class HistoryCoordinator: HistoryCoordinating {
 
         historyV5toV6Migration = true
 
-        for entry in historyDictionary.values {
-            if entry.visits.isEmpty {
-                entry.addOldVisit(date: entry.lastVisit)
-                save(entry: entry)
-            }
+        for entry in historyDictionary.values where entry.visits.isEmpty {
+            entry.addOldVisit(date: entry.lastVisit)
+            save(entry: entry)
         }
 
     }
