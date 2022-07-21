@@ -78,6 +78,14 @@ final class BookmarksBarViewModel: NSObject {
     private var collectionViewItemSizeCache: [String: CGFloat] = [:]
     private var bookmarksBarItemsTotalWidth: CGFloat = 0
     
+    private let textSizeCalculationLabel: NSTextField = {
+        let calculationLabel = NSTextField.label(titled: "")
+        calculationLabel.font = Constants.labelFont
+        calculationLabel.lineBreakMode = .byTruncatingMiddle
+        
+        return calculationLabel
+    }()
+    
     private var bookmarksBarItems: [BookmarksBarItem] = [] {
         didSet {
             let itemsWidth = bookmarksBarItems.reduce(CGFloat(0)) { total, item in
@@ -208,13 +216,11 @@ final class BookmarksBarViewModel: NSObject {
         if let cachedValue = collectionViewItemSizeCache[buttonTitle] {
             return cachedValue + Constants.additionalItemWidth
         } else {            
-            let calculationLabel = NSTextField.label(titled: buttonTitle)
-            calculationLabel.font = Constants.labelFont
-            calculationLabel.lineBreakMode = .byTruncatingMiddle
-            calculationLabel.sizeToFit()
-            let cappedTitleWidth = min(Constants.maximumButtonWidth, calculationLabel.frame.width)
+            textSizeCalculationLabel.stringValue = buttonTitle
+            textSizeCalculationLabel.sizeToFit()
 
-            let calculatedWidth = min(Constants.maximumButtonWidth, calculationLabel.frame.width) + Constants.additionalItemWidth
+            let cappedTitleWidth = min(Constants.maximumButtonWidth, textSizeCalculationLabel.frame.width)
+            let calculatedWidth = min(Constants.maximumButtonWidth, textSizeCalculationLabel.frame.width) + Constants.additionalItemWidth
             collectionViewItemSizeCache[buttonTitle] = cappedTitleWidth
             
             return calculatedWidth
