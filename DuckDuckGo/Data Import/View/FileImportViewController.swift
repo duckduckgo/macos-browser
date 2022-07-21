@@ -132,6 +132,9 @@ final class FileImportViewController: NSViewController {
             selectedFileContainer.isHidden = true
             renderAwaitingFileSelectionState()
         case .selectedValidFile(let fileURL):
+            // In case the import source has changed, the file selection state's info view needs to be refreshed.
+            renderAwaitingFileSelectionState()
+            
             selectedFileContainer.isHidden = false
             selectedFileLabel.stringValue = fileURL.path
             if importSource == .bookmarksHTML {
@@ -173,7 +176,7 @@ final class FileImportViewController: NSViewController {
                 switch importSource {
                 case .bookmarksHTML:
                     delegate?.fileImportViewController(self, didSelectBookmarksFileWithURL: selectedURL)
-                case .csv:
+                case .csv, .onePassword, .lastPass:
                     delegate?.fileImportViewController(self, didSelectCSVFileWithURL: selectedURL)
                 default:
                     break

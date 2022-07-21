@@ -180,8 +180,13 @@ final class DataImportViewController: NSViewController {
         let source = validSources.first(where: { $0.importSourceName == item.title })!
 
         switch source {
-        case .csv, .lastPass, .onePassword, .bookmarksHTML:
-            self.viewState = ViewState(selectedImportSource: source, interactionState: .unableToImport)
+        case .csv, .lastPass, .onePassword:
+            let interactionState: InteractionState = (dataImporter is CSVImporter) ? .ableToImport : .unableToImport
+            self.viewState = ViewState(selectedImportSource: source, interactionState: interactionState)
+
+        case .bookmarksHTML:
+            let interactionState: InteractionState = (dataImporter is BookmarkHTMLImporter) ? .ableToImport : .unableToImport
+            self.viewState = ViewState(selectedImportSource: source, interactionState: interactionState)
 
         case .chrome, .firefox, .brave, .edge, .safari:
             let interactionState: InteractionState
