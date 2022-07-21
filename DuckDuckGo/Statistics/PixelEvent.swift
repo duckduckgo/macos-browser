@@ -213,6 +213,8 @@ extension Pixel {
             case feedbackReportingFailed = "feedback_reporting_failed"
             
             case blankNavigationOnBurnFailed = "blank_navigation_on_burn_failed"
+            
+            case bookmarksStoreRootFolderMigrationFailed = "bookmarks_store_root_folder_migration_failed"
         }
 
     }

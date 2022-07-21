@@ -723,7 +723,7 @@ final class LocalBookmarkStore: BookmarkStore {
                 
                 try context.save()
             } catch {
-                // Handle error
+                Pixel.fire(.debug(event: .bookmarksStoreRootFolderMigrationFailed, error: error))
             }
         }
     }
