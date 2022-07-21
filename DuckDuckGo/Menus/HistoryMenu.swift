@@ -120,14 +120,16 @@ final class HistoryMenu: NSMenu {
             }
         }
 
-        // First week
         historyGroupingsMenuItems = [NSMenuItem.separator()]
-        let firstWeekItems = makeFirstWeekMenuItems(from: firstWeek)
-        historyGroupingsMenuItems.append(contentsOf: firstWeekItems)
+
+        // First week
+        let firstWeekMenuItems = makeGroupingMenuItems(from: firstWeek)
+        historyGroupingsMenuItems.append(contentsOf: firstWeekMenuItems)
 
         // Older
-        if let olderMenuItem = makeOlderRootMenuItem(from: older) {
-            historyGroupingsMenuItems.append(olderMenuItem)
+        let olderMenuItems = makeGroupingMenuItems(from: older)
+        if let olderRootMenuItem = makeOlderRootMenuItem(from: olderMenuItems) {
+            historyGroupingsMenuItems.append(olderRootMenuItem)
         }
 
         historyGroupingsMenuItems.forEach {
@@ -135,9 +137,9 @@ final class HistoryMenu: NSMenu {
         }
     }
 
-    private func makeFirstWeekMenuItems(from groupings: [HistoryGrouping]) -> [NSMenuItem] {
+    private func makeGroupingMenuItems(from groupings: [HistoryGrouping]) -> [NSMenuItem] {
 
-        func makeFirstWeekRootMenuItem(from grouping: HistoryGrouping) -> NSMenuItem {
+        func makeGroupingRootMenuItem(from grouping: HistoryGrouping) -> NSMenuItem {
             let title = makeTitle(for: grouping)
             let menuItem = NSMenuItem(title: title)
             let subMenuItems = makeClearThisHistoryMenuItems(with: title) + makeMenuItems(from: grouping)
@@ -147,31 +149,17 @@ final class HistoryMenu: NSMenu {
         }
 
         return groupings.map { grouping in
-            makeFirstWeekRootMenuItem(from: grouping)
+            makeGroupingRootMenuItem(from: grouping)
         }
     }
 
-    private func makeOlderRootMenuItem(from groupings: [HistoryGrouping]) -> NSMenuItem? {
-
-        func makeOlderSubmenuItems(from groupings: [HistoryGrouping]) -> [NSMenuItem] {
-            var olderSubmenuItems = [NSMenuItem]()
-            olderSubmenuItems.append(contentsOf: makeClearThisHistoryMenuItems())
-            olderSubmenuItems.append(contentsOf: groupings.flatMap { grouping in
-                [NSMenuItem(title: makeTitle(for: grouping))] +
-                makeMenuItems(from: grouping) +
-                [NSMenuItem.separator()]
-            })
-            return olderSubmenuItems
-        }
-
-        guard groupings.count > 0 else {
+    private func makeOlderRootMenuItem(from submenuItems: [NSMenuItem]) -> NSMenuItem? {
+        guard submenuItems.count > 0 else {
             return nil
         }
 
         let rootMenuItem = NSMenuItem(title: UserText.olderMenuItem)
-        let submenuItems = makeOlderSubmenuItems(from: groupings)
         rootMenuItem.submenu = NSMenu(items: submenuItems)
-
         return rootMenuItem
     }
 
@@ -183,7 +171,7 @@ final class HistoryMenu: NSMenu {
 
     private func makeTitle(for grouping: HistoryGrouping) -> String {
         if grouping.date > Date.daysAgo(2).startOfDay {
-            let prefix = relativeDateFormatter.string(from: grouping.date)
+            let prefix = relativeDatePrefixFormatter.string(from: grouping.date)
             let suffix = relativeDateSuffixFormatter.string(from: grouping.date)
             return "\(prefix)\(suffix)"
         } else {
@@ -191,7 +179,7 @@ final class HistoryMenu: NSMenu {
         }
     }
 
-    let relativeDateFormatter: DateFormatter = {
+    let relativeDatePrefixFormatter: DateFormatter = {
         let dateFormatter = DateFormatter()
         dateFormatter.timeStyle = .none
         dateFormatter.dateStyle = .medium
