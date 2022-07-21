@@ -58,6 +58,10 @@ final class FileImportViewController: NSViewController {
 
     var importSource: DataImport.Source = .csv {
         didSet {
+            if oldValue != importSource {
+                currentImportState = .awaitingFileSelection
+            }
+
             renderCurrentState()
         }
     }
@@ -176,7 +180,7 @@ final class FileImportViewController: NSViewController {
                 switch importSource {
                 case .bookmarksHTML:
                     delegate?.fileImportViewController(self, didSelectBookmarksFileWithURL: selectedURL)
-                case .csv, .onePassword, .lastPass:
+                case .csv, .onePassword, .lastPass, .safari:
                     delegate?.fileImportViewController(self, didSelectCSVFileWithURL: selectedURL)
                 default:
                     break

@@ -180,13 +180,8 @@ final class DataImportViewController: NSViewController {
         let source = validSources.first(where: { $0.importSourceName == item.title })!
 
         switch source {
-        case .csv, .lastPass, .onePassword:
-            let interactionState: InteractionState = (dataImporter is CSVImporter) ? .ableToImport : .unableToImport
-            self.viewState = ViewState(selectedImportSource: source, interactionState: interactionState)
-
-        case .bookmarksHTML:
-            let interactionState: InteractionState = (dataImporter is BookmarkHTMLImporter) ? .ableToImport : .unableToImport
-            self.viewState = ViewState(selectedImportSource: source, interactionState: interactionState)
+        case .csv, .lastPass, .onePassword, .bookmarksHTML:
+            self.viewState = ViewState(selectedImportSource: source, interactionState: .unableToImport)
 
         case .chrome, .firefox, .brave, .edge, .safari:
             let interactionState: InteractionState
@@ -196,6 +191,7 @@ final class DataImportViewController: NSViewController {
             case (_, true):
                 interactionState = .moreInfoAvailable
             }
+
             self.viewState = ViewState(selectedImportSource: source, interactionState: interactionState)
         }
 
@@ -265,13 +261,16 @@ final class DataImportViewController: NSViewController {
             if case .permissionsRequired([.logins]) = interactionState {
                 let viewController = FileImportViewController.create(importSource: .safari)
                 viewController.delegate = self
-                return viewController
 
+                return viewController
             } else if case .ableToImport = interactionState,
-                      let fileImportViewController = currentChildViewController as? FileImportViewController {
+                      let fileImportViewController = currentChildViewController as? FileImportViewController,
+                      fileImportViewController.importSource == .safari {
                 fileImportViewController.importSource = importSource
+
                 return nil
             }
+
             fallthrough
         case .brave, .chrome, .edge, .firefox:
             if case let .completedImport(summary) = interactionState {
