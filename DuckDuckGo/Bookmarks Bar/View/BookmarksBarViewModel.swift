@@ -327,6 +327,7 @@ extension BookmarksBarViewModel: NSCollectionViewDelegate, NSCollectionViewDataS
                         draggingSession session: NSDraggingSession,
                         willBeginAt screenPoint: NSPoint,
                         forItemsAt indexPaths: Set<IndexPath>) {
+        assert(indexPaths.count == 1) // Only one item can be dragged from the bar at a time
         self.existingItemDraggingIndexPath = indexPaths.first
     }
     
@@ -406,14 +407,21 @@ extension BookmarksBarViewModel: NSCollectionViewDelegate, NSCollectionViewDataS
             }
 
             return true
-        } else {
-            guard let item = draggingInfo.draggingPasteboard.pasteboardItems?.first, let draggedItemData = item.draggedWebViewValues() else {
-                return false
+        } else if let item = draggingInfo.draggingPasteboard.pasteboardItems?.first {
+            if let draggedItemData = item.draggedWebViewValues() {
+                self.bookmarkManager.makeBookmark(for: draggedItemData.url, title: draggedItemData.title, isFavorite: false, index: newIndexPath.item)
+                return true
             }
             
-            self.bookmarkManager.makeBookmark(for: draggedItemData.url, title: draggedItemData.title, isFavorite: false, index: newIndexPath.item)
-            return true
+            if let draggedString = item.string(forType: .string), let draggedURL = URL(string: draggedString) {
+                self.bookmarkManager.makeBookmark(for: draggedURL, title: draggedURL.absoluteString, isFavorite: false, index: newIndexPath.item)
+                return true
+            }
+            
+            return false
         }
+        
+        return false
     }
     
     /// On rare occasions, a click event will be sent immediately after a drag and drop operation completes.
