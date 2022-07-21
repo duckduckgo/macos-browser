@@ -69,7 +69,7 @@ extension NSAlert {
         alert.messageText = UserText.clearAllDataQuestion
         alert.informativeText = UserText.clearAllDataDescription
         alert.alertStyle = .warning
-        alert.icon = NSImage(named: "FireHeader")
+        alert.icon = NSImage(named: "BurnAlert")
         alert.addButton(withTitle: UserText.clear)
         alert.addButton(withTitle: UserText.cancel)
         return alert
@@ -88,7 +88,7 @@ extension NSAlert {
             alert.informativeText += "\( UserText.clearDataDescriptionFireproof)"
         }
         alert.alertStyle = .warning
-        alert.icon = NSImage(named: "FireHeader")
+        alert.icon = NSImage(named: "BurnAlert")
         alert.addButton(withTitle: UserText.clear)
         alert.addButton(withTitle: UserText.cancel)
         return alert
@@ -99,7 +99,7 @@ extension NSAlert {
         alert.messageText = UserText.allSitesFireproofAlertHeader
         alert.informativeText = UserText.allSitesFireproofAlertDescription
         alert.alertStyle = .warning
-        alert.icon = NSImage(named: "FireHeader")
+        alert.icon = NSImage(named: "BurnAlert")
         alert.addButton(withTitle: UserText.settings)
         alert.addButton(withTitle: UserText.cancel)
         return alert
