@@ -226,7 +226,7 @@ final class MainViewController: NSViewController {
     
     private func subscribeToAppSettingsNotifications() {
         bookmarksBarVisibilityChangedCancellable = NotificationCenter.default
-            .publisher(for: PersistentAppInterfaceSettings.ShowBookmarksBarSettingChanged)
+            .publisher(for: PersistentAppInterfaceSettings.showBookmarksBarSettingChanged)
             .sink { [weak self] _ in
                 self?.updateBookmarksBarViewVisibility(visible: PersistentAppInterfaceSettings.shared.showBookmarksBar)
             }
