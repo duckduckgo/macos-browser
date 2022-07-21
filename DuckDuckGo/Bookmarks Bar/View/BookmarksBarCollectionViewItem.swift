@@ -214,7 +214,7 @@ extension BookmarksBarCollectionViewItem {
     }
     
     func copyBookmarkURLMenuItem() -> NSMenuItem {
-        return menuItem("Copy", #selector(copyBookmarkURLMenuItemSelected(_:)))
+        return menuItem(UserText.bookmarksBarContextMenuCopy, #selector(copyBookmarkURLMenuItemSelected(_:)))
     }
     
     @objc
@@ -223,7 +223,7 @@ extension BookmarksBarCollectionViewItem {
     }
     
     func deleteEntityMenuItem() -> NSMenuItem {
-        return menuItem("Delete", #selector(deleteMenuItemSelected(_:)))
+        return menuItem(UserText.bookmarksBarContextMenuDelete, #selector(deleteMenuItemSelected(_:)))
     }
     
     @objc
