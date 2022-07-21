@@ -496,10 +496,10 @@ struct UserText {
     static let recentlyVisitedMenuSection = NSLocalizedString("history.menu.recently.visited", value: "Recently Visited", comment: "Section header of the history menu")
     static let olderMenuItem = NSLocalizedString("history.menu.older", value: "Older...", comment: "Menu item representing older history")
 
-    static let clearAllDataQuestion = NSLocalizedString("clear.all.data.question", value: "Clear all data?", comment: "Alert with the confirmation to clear all data")
+    static let clearAllDataQuestion = NSLocalizedString("clear.all.data.question", value: "Clear All History and Data?", comment: "Alert with the confirmation to clear all history and data")
     static let clearAllDataDescription = NSLocalizedString("clear.all.data.description", value: "This will close all tabs and clear all website data.", comment: "Description in the alert with the confirmation to clear all data")
 
-    static let clearDataHeader = NSLocalizedString("clear.data.question", value: "Clear all data for \n %@?", comment: "Alert with the confirmation to clear all data")
+    static let clearDataHeader = NSLocalizedString("clear.data.question", value: "Clear All History and Data for \n %@?", comment: "Alert with the confirmation to clear all data")
     static let clearDataDescription = NSLocalizedString("clear.data.description", value: "This will close all tabs and clear all website data.", comment: "Description in the alert with the confirmation to clear data and history")
     static let clearDataDescriptionFireproof = NSLocalizedString("clear.data.description.fireproof", value: "Fireproof sites will not be cleared.", comment: "Description in the alert with the confirmation to clear data and history")
 

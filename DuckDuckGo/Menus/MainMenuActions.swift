@@ -391,14 +391,12 @@ extension MainViewController {
         })
     }
 
-    //todo ClearThisHistoryMenuItem
     @objc func clearThisHistory(_ sender: NSMenuItem) {
-        guard let window = view.window else {
-            assertionFailure("No window")
+        guard let window = view.window, let dateString = sender.representedObject as? String else {
+            assertionFailure("No window or wrong represented object")
             return
         }
 
-        let dateString = sender.representedObject as? String
         let visits = sender.getVisits()
         let fireproofStatus = FireproofDomains.shared.getFireproofedStatus(for: visits)
 

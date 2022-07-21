@@ -318,7 +318,6 @@ private extension HistoryCoordinating {
         return Array(getSortedArrayOfVisits().prefix(maxCount))
     }
 
-    //todo in the background?
     func getVisitGroupings() -> [HistoryMenu.HistoryGrouping] {
         return Dictionary(grouping: getSortedArrayOfVisits()) { visit in
             return visit.date.startOfDay
