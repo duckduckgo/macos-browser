@@ -75,27 +75,13 @@ extension NSAlert {
         return alert
     }
 
-    static func clearHistoryAndDataAlert(dateString: String, includesFireproofed: Bool) -> NSAlert {
+    static func clearHistoryAndDataAlert(dateString: String) -> NSAlert {
         let alert = NSAlert()
         alert.messageText = String(format: UserText.clearDataHeader, dateString)
         alert.informativeText = UserText.clearDataDescription
-        if includesFireproofed {
-            alert.informativeText += (" " + UserText.clearDataDescriptionFireproof)
-        }
         alert.alertStyle = .warning
         alert.icon = NSImage(named: "BurnAlert")
         alert.addButton(withTitle: UserText.clear)
-        alert.addButton(withTitle: UserText.cancel)
-        return alert
-    }
-
-    static func allFireproofAlert() -> NSAlert {
-        let alert = NSAlert()
-        alert.messageText = UserText.allSitesFireproofAlertHeader
-        alert.informativeText = UserText.allSitesFireproofAlertDescription
-        alert.alertStyle = .warning
-        alert.icon = NSImage(named: "BurnAlert")
-        alert.addButton(withTitle: UserText.settings)
         alert.addButton(withTitle: UserText.cancel)
         return alert
     }

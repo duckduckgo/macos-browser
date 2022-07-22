@@ -39,9 +39,9 @@ final class TabDataCleaner: NSObject, WKNavigationDelegate {
     
     private var completion: (() -> Void)?
     
-    func prepareModelsForCleanup(_ models: [TabViewModel],
-                                 completion: @escaping () -> Void) {
-        guard !models.isEmpty else {
+    func prepareTabsForCleanup(_ tabs: [TabViewModel],
+                               completion: @escaping () -> Void) {
+        guard !tabs.isEmpty else {
             completion()
             return
         }
@@ -49,8 +49,8 @@ final class TabDataCleaner: NSObject, WKNavigationDelegate {
         assert(self.completion == nil)
         self.completion = completion
         
-        numberOfTabs = models.count
-        models.forEach { $0.prepareForDataClearing(caller: self) }
+        numberOfTabs = tabs.count
+        tabs.forEach { $0.prepareForDataClearing(caller: self) }
     }
     
     private func notifyIfDone() {
@@ -133,7 +133,9 @@ final class Fire {
         }
     }
 
-    func burnDomains(_ domains: Set<String>, completion: (() -> Void)? = nil) {
+    func burnDomains(_ domains: Set<String>,
+                     includingHistory: Bool = true,
+                     completion: (() -> Void)? = nil) {
         os_log("Fire started", log: .fire)
 
         burnLastSessionState()
@@ -157,11 +159,11 @@ final class Fire {
         let collectionsCleanupInfo = tabViewModelsFor(domains: burningDomains)
         
         // Prepare all Tabs that are going to be burned
-        let modelsToRemove = collectionsCleanupInfo.values.flatMap { tabViewModelsCleanupInfo in
+        let tabsToRemove = collectionsCleanupInfo.values.flatMap { tabViewModelsCleanupInfo in
             tabViewModelsCleanupInfo.filter({ $0.action == .burn }).compactMap { $0.tabViewModel }
         }
         
-        tabsCleaner.prepareModelsForCleanup(modelsToRemove) {
+        tabsCleaner.prepareTabsForCleanup(tabsToRemove) {
 
             let group = DispatchGroup()
             
@@ -177,14 +179,19 @@ final class Fire {
                 group.leave()
             }
 
-            group.enter()
-            self.burnHistory(of: burningDomains, completion: {
-                self.burnPermissions(of: burningDomains, completion: {
-                    self.burnFavicons(for: burningDomains) {
-                        self.burnDownloads(of: burningDomains)
-                        group.leave()
-                    }
+            if includingHistory {
+                group.enter()
+                self.burnHistory(of: burningDomains, completion: {
+                    group.leave()
                 })
+            }
+
+            group.enter()
+            self.burnPermissions(of: burningDomains, completion: {
+                self.burnFavicons(for: burningDomains) {
+                    self.burnDownloads(of: burningDomains)
+                    group.leave()
+                }
             })
 
             self.burnRecentlyClosed(domains: burningDomains)
@@ -205,7 +212,7 @@ final class Fire {
         
         burnLastSessionState()
 
-        tabsCleaner.prepareModelsForCleanup(allTabViewModels()) {
+        tabsCleaner.prepareTabsForCleanup(allTabViewModels()) {
             let group = DispatchGroup()
             group.enter()
             Task {
@@ -239,8 +246,32 @@ final class Fire {
             }
         }
     }
+
+    // Burns visit passed to the method but preserves other visits of same domains
+    func burnVisits(of visits: [Visit],
+                    except fireproofDomains: FireproofDomains,
+                    completion: (() -> Void)? = nil) {
+
+        // Get domains to burn
+        var domains = Set<String>()
+        visits.forEach { visit in
+            guard let histotyEntry = visit.historyEntry,
+                  let domain = Fire.getBurningDomain(from: histotyEntry.url) else {
+                assertionFailure("No history entry or url")
+                return
+            }
+
+            if !fireproofDomains.isFireproof(fireproofDomain: domain) {
+                domains.insert(domain)
+            }
+        }
+
+        historyCoordinating.burnVisits(visits) {
+            self.burnDomains(domains, includingHistory: false, completion: completion)
+        }
+    }
     
-    // MARK: - Tab Models
+    // MARK: - Tabs
     
     private func allTabViewModels() -> [TabViewModel] {
         var allTabViewModels = [TabViewModel] ()
@@ -483,36 +514,6 @@ extension History {
                 return result
             }
         })
-    }
-
-}
-
-// Visits
-extension Fire {
-
-    func burnDomains(of visits: [Visit],
-                     except fireproofDomains: FireproofDomains,
-                     completion: (() -> Void)? = nil) {
-
-        // Get domains to burn
-        var domains = Set<String>()
-        visits.forEach { visit in
-            guard let histotyEntry = visit.historyEntry,
-                  let domain = Fire.getBurningDomain(from: histotyEntry.url) else {
-                assertionFailure("No history entry or url")
-                return
-            }
-
-            if !fireproofDomains.isFireproof(fireproofDomain: domain) {
-                domains.insert(domain)
-            }
-        }
-
-        burnDomains(domains, completion: completion)
-    }
-
-    func isFireproofed() {
-
     }
 
 }

@@ -24,8 +24,9 @@ import os.log
 protocol HistoryStoring {
 
     func cleanOld(until date: Date) -> Future<History, Error>
-    func removeEntries(_ entries: [HistoryEntry]) -> Future<Void, Error>
     func save(entry: HistoryEntry) -> Future<Void, Error>
+    func removeEntries(_ entries: [HistoryEntry]) -> Future<Void, Error>
+    func removeVisits(_ visits: [Visit]) -> Future<Void, Error>
 
 }
 
@@ -217,6 +218,56 @@ final class HistoryStore: HistoryStoring {
             return .failure(HistoryStoreError.savingFailed)
         }
         visitMO.update(with: visit, historyEntryManagedObject: historyEntryManagedObject)
+        return .success(())
+    }
+
+    func removeVisits(_ visits: [Visit]) -> Future<Void, Error> {
+        return Future { [weak self] promise in
+            self?.context.perform {
+                guard let self = self else {
+                    promise(.failure(HistoryStoreError.storeDeallocated))
+                    return
+                }
+
+                switch self.remove(visits, context: self.context) {
+                case .failure(let error):
+                    promise(.failure(error))
+                case .success:
+                    promise(.success(()))
+                }
+            }
+        }
+    }
+
+    private func remove(_ visits: [Visit], context: NSManagedObjectContext) -> Result<Void, Error> {
+        // To avoid long predicate, execute multiple times
+        let chunkedVisits = visits.chunked(into: 100)
+
+        for visits in chunkedVisits {
+            let deleteRequest = NSFetchRequest<NSFetchRequestResult>(entityName: VisitManagedObject.className())
+            let predicates = visits.compactMap({ (visit: Visit) -> NSPredicate? in
+                guard let historyEntry = visit.historyEntry else {
+                    assertionFailure("No history entry")
+                    return nil
+                }
+
+                return NSPredicate(format: "historyEntry.identifier == %@ && date == %@", argumentArray: [historyEntry.identifier, visit.date])
+            })
+            deleteRequest.predicate = NSCompoundPredicate(type: .or, subpredicates: predicates)
+            let batchDeleteRequest = NSBatchDeleteRequest(fetchRequest: deleteRequest)
+            batchDeleteRequest.resultType = .resultTypeObjectIDs
+            do {
+                let result = try self.context.execute(batchDeleteRequest) as? NSBatchDeleteResult
+                let deletedObjects = result?.result as? [NSManagedObjectID] ?? []
+                let changes: [AnyHashable: Any] = [ NSDeletedObjectsKey: deletedObjects ]
+                NSManagedObjectContext.mergeChanges(fromRemoteContextSave: changes, into: [context])
+                os_log("%d visits cleaned from history", log: .history, deletedObjects.count)
+                assert(deletedObjects.count == visits.count, "Not all visits removed")
+            } catch {
+                return .failure(error)
+            }
+        }
+
         return .success(())
     }
 

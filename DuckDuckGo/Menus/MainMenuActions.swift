@@ -398,28 +398,13 @@ extension MainViewController {
         }
 
         let visits = sender.getVisits()
-        let fireproofStatus = FireproofDomains.shared.getFireproofedStatus(for: visits)
-
-        if fireproofStatus == .allDomainsAreFireproofed {
-            let alert = NSAlert.allFireproofAlert()
-            alert.beginSheetModal(for: window, completionHandler: { [weak self] response in
-                guard case .alertFirstButtonReturn = response else {
-                    return
-                }
-
-                self?.browserTabViewController.openNewTab(with: .preferences(pane: .privacy),
-                                                          selected: true)
-            })
-        } else {
-            let alert = NSAlert.clearHistoryAndDataAlert(dateString: dateString,
-                                                         includesFireproofed: fireproofStatus == .containsFireproofedDomain)
-            alert.beginSheetModal(for: window, completionHandler: { response in
-                guard case .alertFirstButtonReturn = response else {
-                    return
-                }
-                FireCoordinator.fireViewModel.fire.burnDomains(of: visits, except: FireproofDomains.shared)
-            })
-        }
+        let alert = NSAlert.clearHistoryAndDataAlert(dateString: dateString)
+        alert.beginSheetModal(for: window, completionHandler: { response in
+            guard case .alertFirstButtonReturn = response else {
+                return
+            }
+            FireCoordinator.fireViewModel.fire.burnVisits(of: visits, except: FireproofDomains.shared)
+        })
     }
 
     // MARK: - Bookmarks

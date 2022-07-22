@@ -500,10 +500,6 @@ struct UserText {
     static let clearAllDataDescription = NSLocalizedString("clear.all.data.description", value: "This will close all tabs and clear all website data.", comment: "Description in the alert with the confirmation to clear all data")
 
     static let clearDataHeader = NSLocalizedString("clear.data.question", value: "Clear All History and Data for \n %@?", comment: "Alert with the confirmation to clear all data")
-    static let clearDataDescription = NSLocalizedString("clear.data.description", value: "This will close all tabs and clear all website data.", comment: "Description in the alert with the confirmation to clear data and history")
-    static let clearDataDescriptionFireproof = NSLocalizedString("clear.data.description.fireproof", value: "Fireproof sites will not be cleared.", comment: "Description in the alert with the confirmation to clear data and history")
-
-    static let allSitesFireproofAlertHeader = NSLocalizedString("all.sites.fireproof.alert.header", value: "All of the sites in this list are Fireproof.", comment: "")
-    static let allSitesFireproofAlertDescription = NSLocalizedString("all.sites.fireproof.alert.description", value: "To remove Fireproofing from a site, go to Settings", comment: "")
+    static let clearDataDescription = NSLocalizedString("clear.data.description", value: "Related cookies will also be removed unless Fireproof. Other history from these sites will remain.", comment: "Description in the alert with the confirmation to clear browsing data and history")
 
 }
