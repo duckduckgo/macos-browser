@@ -27,7 +27,7 @@ final class BookmarksBarViewController: NSViewController {
     @IBOutlet private var clippedItemsIndicator: NSButton!
 
     private let bookmarkManager = LocalBookmarkManager.shared
-    private let viewModel = BookmarksBarViewModel(bookmarkManager: LocalBookmarkManager.shared)
+    private let viewModel: BookmarksBarViewModel
     private let tabCollectionViewModel: TabCollectionViewModel
     
     private var viewModelCancellable: AnyCancellable?
@@ -39,6 +39,8 @@ final class BookmarksBarViewController: NSViewController {
     
     init?(coder: NSCoder, tabCollectionViewModel: TabCollectionViewModel) {
         self.tabCollectionViewModel = tabCollectionViewModel
+        self.viewModel = BookmarksBarViewModel(bookmarkManager: LocalBookmarkManager.shared, tabCollectionViewModel: tabCollectionViewModel)
+
         super.init(coder: coder)
     }
     

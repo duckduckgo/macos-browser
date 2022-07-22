@@ -70,6 +70,7 @@ final class BookmarksBarViewModel: NSObject {
     weak var delegate: BookmarksBarViewModelDelegate?
 
     private let bookmarkManager: BookmarkManager
+    private let tabCollectionViewModel: TabCollectionViewModel
     private var cancellables = Set<AnyCancellable>()
     
     private var existingItemDraggingIndexPath: IndexPath?
@@ -113,8 +114,9 @@ final class BookmarksBarViewModel: NSObject {
     
     // MARK: - Initialization
     
-    init(bookmarkManager: BookmarkManager) {
+    init(bookmarkManager: BookmarkManager, tabCollectionViewModel: TabCollectionViewModel) {
         self.bookmarkManager = bookmarkManager
+        self.tabCollectionViewModel = tabCollectionViewModel
         super.init()
         subscribeToBookmarks()
     }
@@ -412,9 +414,18 @@ extension BookmarksBarViewModel: NSCollectionViewDelegate, NSCollectionViewDataS
                 self.bookmarkManager.makeBookmark(for: draggedItemData.url, title: draggedItemData.title, isFavorite: false, index: newIndexPath.item)
                 return true
             }
-            
+
             if let draggedString = item.string(forType: .string), let draggedURL = URL(string: draggedString) {
-                self.bookmarkManager.makeBookmark(for: draggedURL, title: draggedURL.absoluteString, isFavorite: false, index: newIndexPath.item)
+                let title: String
+
+                if let selectedTab = tabCollectionViewModel.selectedTab, selectedTab.url == draggedURL, let tabTitle = selectedTab.title {
+                    title = tabTitle
+                } else {
+                    title = draggedURL.absoluteString
+                }
+
+                self.bookmarkManager.makeBookmark(for: draggedURL, title: title, isFavorite: false, index: newIndexPath.item)
+
                 return true
             }
             
