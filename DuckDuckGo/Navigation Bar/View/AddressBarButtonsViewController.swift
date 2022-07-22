@@ -189,9 +189,20 @@ final class AddressBarButtonsViewController: NSViewController {
     }
     
     func showNotification(_ type: NavigationBarBadgeAnimationView.AnimationType) {
-        buttonsContainer.alphaValue = 0.0
-        notificationAnimationView.startAnimation(type) { [weak self] in
-            self?.buttonsContainer.alphaValue = 1.0
+        let animationDuration: CGFloat = 0.5
+        
+        NSAnimationContext.runAnimationGroup { context in
+            context.duration = animationDuration
+            self.buttonsContainer.animator().alphaValue = 0
+            self.notificationAnimationView.animator().alphaValue = 1
+            
+            self.notificationAnimationView.startAnimation(type) { [weak self] in
+                NSAnimationContext.runAnimationGroup { context in
+                    context.duration = animationDuration
+                    self?.buttonsContainer.animator().alphaValue = 1
+                    self?.notificationAnimationView.animator().alphaValue = 0
+                }
+            }
         }
     }
 

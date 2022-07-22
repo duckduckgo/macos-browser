@@ -58,10 +58,12 @@ struct CookieAnimationView: View {
                 Group {
                     Image("Cookie")
                         .resizable()
+                        .foregroundColor(.primary)
                         .opacity(cookieAlpha)
                     
                     Image("CookieBite")
                         .resizable()
+                        .foregroundColor(.primary)
                         .opacity(bittenCookieAlpha)
                     
                     InnerExpandingCircle()
@@ -221,10 +223,10 @@ private enum Consts {
         static let secondPhaseDelay = halfDuration
         
         static let innerExpandingCircleScale1 = 1.2
-        static let innerExpandingCircleScale2 = 1.8
+        static let innerExpandingCircleScale2 = 1.6
         
         static let outerExpandingCircleScale1 = 1.5
-        static let outerExpandingCircleScale2 = 2.2
+        static let outerExpandingCircleScale2 = 2.0
     }
     
     enum BadgeAnimation {
@@ -234,7 +236,7 @@ private enum Consts {
 
     enum Layout {
         static let cookieSize: CGFloat = 16
-        static let dotsGroupSize: CGFloat = 20
+        static let dotsGroupSize: CGFloat = 18
         static let randomDegreesOffset = 40
         static let dotSize: CGFloat = 3
         static let cornerRadius: CGFloat = 5

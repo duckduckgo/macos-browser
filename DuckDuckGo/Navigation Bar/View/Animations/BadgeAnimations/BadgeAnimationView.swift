@@ -34,7 +34,8 @@ struct BadgeAnimationView: View {
                 
                 HStack {
                     Text(text)
-                        .font(.footnote)
+                        .foregroundColor(.primary)
+                        .font(.body)
                         .offset(x: textOffset)
                         .onAppear {
                             withAnimation(.easeInOut(duration: animationDuration)) {
@@ -85,7 +86,7 @@ struct BadgeAnimationView_Previews: PreviewProvider {
 private enum Consts {
     enum View {
         static let cornerRadius: CGFloat = 5
-        static let opaqueViewOffset: CGFloat = 10
+        static let opaqueViewOffset: CGFloat = 8
         static let textScrollerOffset: CGFloat = 120
     }
     
