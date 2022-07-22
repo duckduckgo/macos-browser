@@ -297,26 +297,20 @@ final class NavigationBarViewController: NSViewController {
 
     @objc private func showAutoconsentFeedback(_ sender: Notification) {
         if #available(macOS 11, *) {
-            self.addressBarViewController?.addressBarButtonsViewController?.showNotification(.cookieManaged)
-        
-            return
-            
             guard view.window?.isKeyWindow == true,
                   let url = sender.userInfo?[AutoconsentUserScript.Constants.popupHiddenUrlKey] as? URL,
                   let host = url.host,
-                  !AutoconsentUserScript.background.sitesNotifiedCache.contains(host),
-                  let relativeTarget = self.addressBarViewController?.addressBarButtonsViewController?.privacyEntryPointButton
+                  !AutoconsentUserScript.background.sitesNotifiedCache.contains(host)
             else { return }
             AutoconsentUserScript.background.sitesNotifiedCache.insert(host)
             DispatchQueue.main.async { [weak self] in
                 guard let self = self,
                       self.tabCollectionViewModel.selectedTabViewModel?.tab.url == url else {
-                          // if the tab is not active, don't show the popup
+                          // if the tab is not active, don't show the notification
                           return
                       }
 
-                let viewController = PopoverMessageViewController.createWithMessage(UserText.autoconsentPopoverMessage)
-                viewController.show(onParent: self, relativeTo: relativeTarget)
+                self.addressBarViewController?.addressBarButtonsViewController?.showNotification(.cookieManaged)
             }
         }
     }

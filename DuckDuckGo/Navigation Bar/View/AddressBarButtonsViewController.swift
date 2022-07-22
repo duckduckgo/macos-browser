@@ -811,6 +811,8 @@ final class AddressBarButtonsViewController: NSViewController {
             stopAnimation(shieldAnimationView)
             stopAnimation(shieldDotAnimationView)
         }
+        
+        notificationAnimationView.removeAnimation()
     }
 
     private var isAnyTrackerAnimationPlaying: Bool {

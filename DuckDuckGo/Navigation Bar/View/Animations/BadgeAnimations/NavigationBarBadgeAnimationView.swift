@@ -30,7 +30,7 @@ final class NavigationBarBadgeAnimationView: NSView {
     }
 
     func startAnimation(_ type: AnimationType, completion: @escaping () -> Void) {
-        animatedView?.removeFromSuperview()
+        removeAnimation()
         
         let viewToAnimate: NotificationBarViewAnimated
         switch type {
@@ -43,6 +43,10 @@ final class NavigationBarBadgeAnimationView: NSView {
         setupConstraints()
         
         animatedView?.startAnimation(completion)
+    }
+    
+    func removeAnimation() {
+        animatedView?.removeFromSuperview()
     }
     
     private func setupConstraints() {
