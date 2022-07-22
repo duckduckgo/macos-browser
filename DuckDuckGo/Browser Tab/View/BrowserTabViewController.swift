@@ -38,6 +38,7 @@ final class BrowserTabViewController: NSViewController {
     @IBOutlet weak var hoverLabelContainer: NSView!
     private weak var webView: WebView?
     private weak var webViewContainer: NSView?
+    private weak var webViewSnapshot: NSView?
 
     var tabViewModel: TabViewModel?
     var clickPoint: NSPoint?
@@ -45,6 +46,8 @@ final class BrowserTabViewController: NSViewController {
     private let tabCollectionViewModel: TabCollectionViewModel
     private var tabContentCancellable: AnyCancellable?
     private var errorViewStateCancellable: AnyCancellable?
+    private var pinnedTabsDelegatesCancellable: AnyCancellable?
+    private var keyWindowSelectedTabCancellable: AnyCancellable?
     private var cancellables = Set<AnyCancellable>()
 
     private var contextMenuExpected = false
@@ -133,6 +136,15 @@ final class BrowserTabViewController: NSViewController {
             .store(in: &cancellables)
     }
 
+    private func subscribeToPinnedTabs() {
+        pinnedTabsDelegatesCancellable = tabCollectionViewModel.pinnedTabsCollection.$tabs
+            .sink { [weak self] tabs in
+                for tab in tabs where tab.delegate !== self {
+                    tab.delegate = self
+                }
+            }
+    }
+
     private func removeWebViewFromHierarchy(webView: WebView? = nil,
                                             container: NSView? = nil) {
         guard let webView = webView ?? self.webView,
@@ -143,7 +155,9 @@ final class BrowserTabViewController: NSViewController {
             self.webView = nil
         }
 
-        container.removeFromSuperview()
+        if webView.window === view.window {
+            container.removeFromSuperview()
+        }
         if self.webViewContainer === container {
             self.webViewContainer = nil
         }
@@ -160,8 +174,15 @@ final class BrowserTabViewController: NSViewController {
 
     private func changeWebView(tabViewModel: TabViewModel?) {
 
+        func cleanUpRemoteWebViewIfNeeded(_ webView: WebView) {
+            if webView.containerView !== webViewContainer {
+                webView.containerView?.removeFromSuperview()
+            }
+        }
+
         func displayWebView(of tabViewModel: TabViewModel) {
             let newWebView = tabViewModel.tab.webView
+            cleanUpRemoteWebViewIfNeeded(newWebView)
             newWebView.uiDelegate = self
             webView = newWebView
 
@@ -175,9 +196,10 @@ final class BrowserTabViewController: NSViewController {
 
         let oldWebView = webView
         let webViewContainer = webViewContainer
+
         displayWebView(of: tabViewModel)
         tabViewModel.updateAddressBarStrings()
-        if let oldWebView = oldWebView, let webViewContainer = webViewContainer {
+        if let oldWebView = oldWebView, let webViewContainer = webViewContainer, oldWebView !== webView {
             removeWebViewFromHierarchy(webView: oldWebView, container: webViewContainer)
         }
     }
@@ -306,7 +328,7 @@ final class BrowserTabViewController: NSViewController {
     }
 
     private func showTabContent(of tabViewModel: TabViewModel?) {
-        guard !tabCollectionViewModel.tabCollection.tabs.isEmpty else {
+        guard !tabCollectionViewModel.tabCollection.tabs.isEmpty || !tabCollectionViewModel.pinnedTabsCollection.tabs.isEmpty else {
             view.window?.close()
             return
         }
@@ -332,9 +354,8 @@ final class BrowserTabViewController: NSViewController {
             showTransientTabContentController(OnboardingViewController.create(withDelegate: self))
 
         case .url:
-            // Adjust webviews if there was a tab switch or content type switch
-            if webView != tabViewModel?.tab.webView || tabViewModel?.tab.webView.tabContentView.superview == nil {
-                removeAllTabContent(includingWebView: false)
+            if shouldReplaceWebView(for: tabViewModel) {
+                removeAllTabContent(includingWebView: true)
                 changeWebView(tabViewModel: tabViewModel)
             }
 
@@ -342,10 +363,23 @@ final class BrowserTabViewController: NSViewController {
             removeAllTabContent()
             view.addAndLayout(homePageView)
 
-        case nil, .some(.none):
-            removeAllTabContent()
+        default:
+            break
+        }
+    }
+
+    private func shouldReplaceWebView(for tabViewModel: TabViewModel?) -> Bool {
+        guard let tabViewModel = tabViewModel else {
+            return false
         }
 
+        let isPinnedTab = tabCollectionViewModel.pinnedTabsCollection.tabs.contains(tabViewModel.tab)
+        let isKeyWindow = view.window?.isKeyWindow == true
+
+        let tabIsNotOnScreen = tabViewModel.tab.webView.tabContentView.superview == nil
+        let isDifferentTabDisplayed = webView != tabViewModel.tab.webView
+
+        return isDifferentTabDisplayed || tabIsNotOnScreen || (isPinnedTab && isKeyWindow)
     }
 
     // MARK: - Preferences
@@ -487,7 +521,7 @@ extension BrowserTabViewController: TabDelegate {
         guard let index = tabCollectionViewModel.tabCollection.tabs.firstIndex(of: tab) else {
             return
         }
-        tabCollectionViewModel.remove(at: index)
+        tabCollectionViewModel.remove(at: .unpinned(index))
     }
 
     func tab(_ tab: Tab,
@@ -529,8 +563,16 @@ extension BrowserTabViewController: TabDelegate {
         scheduleHoverLabelUpdatesForUrl(url)
     }
 
+    func windowDidBecomeKey() {
+        keyWindowSelectedTabCancellable = nil
+        subscribeToPinnedTabs()
+        hideWebViewSnapshotIfNeeded()
+    }
+
     func windowDidResignKey() {
+        pinnedTabsDelegatesCancellable = nil
         scheduleHoverLabelUpdatesForUrl(nil)
+        subscribeToTabSelectedInCurrentKeyWindow()
     }
 
     private func scheduleHoverLabelUpdatesForUrl(_ url: URL?) {
@@ -562,7 +604,6 @@ extension BrowserTabViewController: TabDelegate {
             DispatchQueue.main.asyncAfter(deadline: .now() + delay, execute: item)
         }
     }
-
 }
 
 extension BrowserTabViewController: FileDownloadManagerDelegate {
@@ -1052,7 +1093,74 @@ extension BrowserTabViewController {
         tabViewModel?.tab.browserTabViewController(self, didClickAtPoint: clickPoint)
         return event
     }
+}
 
+// MARK: - Web View snapshot for Pinned Tab selected in more than 1 window
+
+extension BrowserTabViewController {
+
+    private func subscribeToTabSelectedInCurrentKeyWindow() {
+        let lastKeyWindowOtherThanOurs = WindowControllersManager.shared.didChangeKeyWindowController
+            .map { WindowControllersManager.shared.lastKeyMainWindowController }
+            .prepend(WindowControllersManager.shared.lastKeyMainWindowController)
+            .compactMap { $0 }
+            .filter { [weak self] in $0.window !== self?.view.window }
+
+        keyWindowSelectedTabCancellable = lastKeyWindowOtherThanOurs
+            .flatMap(\.mainViewController.tabCollectionViewModel.$selectionIndex)
+            .compactMap { $0 }
+            .removeDuplicates()
+            .sink { [weak self] index in
+                self?.handleTabSelectedInKeyWindow(index)
+            }
+    }
+
+    private func handleTabSelectedInKeyWindow(_ tabIndex: TabIndex) {
+        if tabIndex.isPinnedTab, tabIndex == tabCollectionViewModel.selectionIndex, webViewSnapshot == nil {
+            makeWebViewSnapshot()
+        } else {
+            hideWebViewSnapshotIfNeeded()
+        }
+    }
+
+    private func makeWebViewSnapshot() {
+        dispatchPrecondition(condition: .onQueue(.main))
+
+        guard let webView = webView else {
+            os_log("BrowserTabViewController: failed to create a snapshot of webView", type: .error)
+            return
+        }
+
+        let config = WKSnapshotConfiguration()
+        config.afterScreenUpdates = false
+
+        webView.takeSnapshot(with: config) { [weak self] image, _ in
+            guard let image = image else {
+                os_log("BrowserTabViewController: failed to create a snapshot of webView", type: .error)
+                return
+            }
+            self?.showWebViewSnapshot(with: image)
+        }
+    }
+
+    private func showWebViewSnapshot(with image: NSImage) {
+        let snapshotView = WebViewSnapshotView(image: image, frame: view.bounds)
+        snapshotView.autoresizingMask = [.width, .height]
+        snapshotView.translatesAutoresizingMaskIntoConstraints = true
+
+        view.addSubview(snapshotView)
+        webViewSnapshot?.removeFromSuperview()
+        webViewSnapshot = snapshotView
+    }
+
+    private func hideWebViewSnapshotIfNeeded() {
+        if webViewSnapshot != nil {
+            DispatchQueue.main.async {
+                self.showTabContent(of: self.tabCollectionViewModel.selectedTabViewModel)
+                self.webViewSnapshot?.removeFromSuperview()
+            }
+        }
+    }
 }
 
 // swiftlint:enable file_length

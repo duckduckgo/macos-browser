@@ -110,14 +110,15 @@ final class MainWindowController: NSWindowController {
         // slide tabs to the left in full screen
         trafficLightsAlphaCancellable = window?.standardWindowButton(.closeButton)?
             .publisher(for: \.alphaValue)
-            .map { alphaValue in TabBarViewController.HorizontalSpace.leadingStackViewPadding.rawValue * alphaValue }
-            .assign(to: \.constant, onWeaklyHeld: tabBarViewController.leadingStackViewLeadingConstraint)
+            .map { alphaValue in TabBarViewController.HorizontalSpace.pinnedTabsScrollViewPadding.rawValue * alphaValue }
+            .assign(to: \.constant, onWeaklyHeld: tabBarViewController.pinnedTabsViewLeadingConstraint)
     }
 
     private var shouldPreventUserInteractionCancellable: AnyCancellable?
     private func subscribeToShouldPreventUserInteraction() {
         shouldPreventUserInteractionCancellable = fireViewModel.shouldPreventUserInteraction
             .dropFirst()
+            .removeDuplicates()
             .sink(receiveValue: { [weak self] shouldPreventUserInteraction in
                 self?.moveTabBarView(toTitlebarView: !shouldPreventUserInteraction)
                 self?.userInteraction(prevented: shouldPreventUserInteraction)

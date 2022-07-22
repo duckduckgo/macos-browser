@@ -16,6 +16,8 @@
 //  limitations under the License.
 //
 
+// swiftlint:disable file_length
+
 import Cocoa
 import os.log
 import BrowserServicesKit
@@ -206,7 +208,18 @@ extension MainViewController {
     }
 
     @IBAction func closeTab(_ sender: Any?) {
-        tabCollectionViewModel.removeSelected()
+        // when close is triggered by a keyboard shortcut,
+        // instead of closing a pinned tab we select the first regular tab
+        // (this is in line with Safari behavior)
+        if isHandlingKeyDownEvent, tabCollectionViewModel.selectionIndex?.isPinnedTab == true {
+            if tabCollectionViewModel.tabCollection.tabs.isEmpty {
+                tabCollectionViewModel.append(tab: .init(content: .homePage), selected: true)
+            } else {
+                tabCollectionViewModel.select(at: .unpinned(0))
+            }
+        } else {
+            tabCollectionViewModel.removeSelected()
+        }
     }
 
     // MARK: - View
@@ -392,11 +405,10 @@ extension MainViewController {
             return
         }
         let index = keyEquivalent - 1
-        if keyEquivalent == 9,
-           !tabCollectionViewModel.tabCollection.tabs.isEmpty {
-            tabCollectionViewModel.select(at: tabCollectionViewModel.tabCollection.tabs.count - 1)
-        } else if tabCollectionViewModel.tabCollection.tabs.indices.contains(index) {
-            tabCollectionViewModel.select(at: index)
+        if keyEquivalent == 9, !tabCollectionViewModel.tabCollection.tabs.isEmpty {
+            tabCollectionViewModel.select(at: .last(in: tabCollectionViewModel))
+        } else if index < tabCollectionViewModel.tabCollection.tabs.count {
+            tabCollectionViewModel.select(at: .unpinned(index))
         }
     }
 
@@ -409,6 +421,20 @@ extension MainViewController {
         let tab = selectedTabViewModel.tab
         tabCollectionViewModel.removeSelected()
         WindowsManager.openNewWindow(with: tab)
+    }
+
+    @IBAction func pinOrUnpinTab(_ sender: Any?) {
+        guard let selectedTabIndex = tabCollectionViewModel.selectionIndex else {
+            os_log("MainViewController: No tab view model selected", type: .error)
+            return
+        }
+
+        switch selectedTabIndex {
+        case .pinned(let index):
+            tabCollectionViewModel.unpinTab(at: index)
+        case .unpinned(let index):
+            tabCollectionViewModel.pinTab(at: index)
+        }
     }
 
     @IBAction func mergeAllWindows(_ sender: Any?) {
@@ -528,6 +554,10 @@ extension MainViewController {
         store.deleteExistingMetadata()
     }
 
+    @IBAction func resetPinnedTabs(_ sender: Any?) {
+        tabCollectionViewModel.pinnedTabsManager.tabCollection.removeAll()
+    }
+
     @IBAction func showSaveCredentialsPopover(_ sender: Any?) {
         #if DEBUG || REVIEW
         NotificationCenter.default.post(name: .ShowSaveCredentialsPopover, object: nil)
@@ -603,6 +633,21 @@ extension MainViewController: NSMenuItemValidation {
              #selector(MainViewController.showManageBookmarks(_:)):
             return true
 
+        // Pin Tab
+        case #selector(MainViewController.pinOrUnpinTab(_:)):
+            guard tabCollectionViewModel.selectedTabViewModel?.tab.isUrl == true else {
+                return false
+            }
+            if tabCollectionViewModel.selectionIndex?.isUnpinnedTab == true {
+                menuItem.title = UserText.pinTab
+                return true
+            }
+            if tabCollectionViewModel.selectionIndex?.isPinnedTab == true {
+                menuItem.title = UserText.unpinTab
+                return true
+            }
+            return false
+
         // Printing/saving
         case #selector(MainViewController.saveAs(_:)),
              #selector(MainViewController.printWebView(_:)):
@@ -613,10 +658,12 @@ extension MainViewController: NSMenuItemValidation {
             return WindowControllersManager.shared.mainWindowControllers.count > 1
 
         // Move Tab to New Window, Select Next/Prev Tab
-        case #selector(MainViewController.moveTabToNewWindow(_:)),
-             #selector(MainViewController.showNextTab(_:)),
+        case #selector(MainViewController.moveTabToNewWindow(_:)):
+            return tabCollectionViewModel.tabCollection.tabs.count > 1 && tabCollectionViewModel.selectionIndex?.isUnpinnedTab == true
+
+        case #selector(MainViewController.showNextTab(_:)),
              #selector(MainViewController.showPreviousTab(_:)):
-            return tabCollectionViewModel.tabCollection.tabs.count > 1
+            return tabCollectionViewModel.allTabsCount > 1
 
         // Developer Tools
         case #selector(MainViewController.toggleDeveloperTools(_:)):

@@ -21,13 +21,18 @@ import os.log
 
 extension WindowsManager {
 
-    class func restoreState(from coder: NSCoder) throws {
+    class func restoreState(from coder: NSCoder, includePinnedTabs: Bool = true, includeWindows: Bool = true) throws {
         guard let state = coder.decodeObject(of: WindowManagerStateRestoration.self,
                                              forKey: NSKeyedArchiveRootObjectKey) else {
             throw coder.error ?? NSError(domain: "WindowsManagerStateRestoration", code: -1, userInfo: nil)
         }
 
-        self.restoreWindows(from: state)
+        if let pinnedTabsCollection = state.pinnedTabs {
+            WindowControllersManager.shared.restorePinnedTabs(pinnedTabsCollection)
+        }
+        if includeWindows {
+            restoreWindows(from: state)
+        }
     }
 
     private class func restoreWindows(from state: WindowManagerStateRestoration) {
@@ -59,6 +64,10 @@ extension WindowControllersManager {
                      forKey: NSKeyedArchiveRootObjectKey)
     }
 
+    func restorePinnedTabs(_ collection: TabCollection) {
+        pinnedTabsManager.setUp(with: collection)
+    }
+
 }
 
 @objc(WMState)
@@ -66,12 +75,14 @@ final class WindowManagerStateRestoration: NSObject, NSSecureCoding {
     private enum NSSecureCodingKeys {
         static let controllers = "ctrls"
         static let keyWindowIndex = "key_idx"
+        static let pinnedTabs = "pinned_tabs"
     }
 
     static var supportsSecureCoding: Bool { true }
 
     let windows: [WindowRestorationItem]
     let keyWindowIndex: Int?
+    let pinnedTabs: TabCollection?
 
     init?(coder: NSCoder) {
         guard let restorationArray = coder.decodeObject(of: [NSArray.self, WindowRestorationItem.self],
@@ -83,6 +94,10 @@ final class WindowManagerStateRestoration: NSObject, NSSecureCoding {
         self.windows = restorationArray
         self.keyWindowIndex = coder.containsValue(forKey: NSSecureCodingKeys.keyWindowIndex)
             ? coder.decodeInteger(forKey: NSSecureCodingKeys.keyWindowIndex)
+            : nil
+
+        self.pinnedTabs = coder.containsValue(forKey: NSSecureCodingKeys.pinnedTabs)
+            ? coder.decodeObject(of: TabCollection.self, forKey: NSSecureCodingKeys.pinnedTabs)
             : nil
 
         super.init()
@@ -100,11 +115,14 @@ final class WindowManagerStateRestoration: NSObject, NSSecureCoding {
         self.keyWindowIndex = windowControllersManager.lastKeyMainWindowController.flatMap {
             windowControllersManager.mainWindowControllers.firstIndex(of: $0)
         }
+
+        self.pinnedTabs = windowControllersManager.pinnedTabsManager.tabCollection
     }
 
     func encode(with coder: NSCoder) {
         coder.encode(windows as NSArray, forKey: NSSecureCodingKeys.controllers)
         keyWindowIndex.map(coder.encode(forKey: NSSecureCodingKeys.keyWindowIndex))
+        coder.encode(pinnedTabs, forKey: NSSecureCodingKeys.pinnedTabs)
     }
 }
 
