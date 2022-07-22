@@ -156,7 +156,8 @@ final class AddressBarButtonsViewController: NSViewController {
     private var permissionsCancellables = Set<AnyCancellable>()
     private var trackerAnimationTriggerCancellable: AnyCancellable?
     private var isMouseOverAnimationVisibleCancellable: AnyCancellable?
-
+    private lazy var buttonsBadgeAnimator = AddressBarButtonsBadgeAnimator()
+    
     required init?(coder: NSCoder) {
         fatalError("AddressBarButtonsViewController: Bad initializer")
     }
@@ -189,21 +190,9 @@ final class AddressBarButtonsViewController: NSViewController {
     }
     
     func showNotification(_ type: NavigationBarBadgeAnimationView.AnimationType) {
-        let animationDuration: CGFloat = 0.5
-        
-        NSAnimationContext.runAnimationGroup { context in
-            context.duration = animationDuration
-            self.buttonsContainer.animator().alphaValue = 0
-            self.notificationAnimationView.animator().alphaValue = 1
-            
-            self.notificationAnimationView.startAnimation(type) { [weak self] in
-                NSAnimationContext.runAnimationGroup { context in
-                    context.duration = animationDuration
-                    self?.buttonsContainer.animator().alphaValue = 1
-                    self?.notificationAnimationView.animator().alphaValue = 0
-                }
-            }
-        }
+        buttonsBadgeAnimator.showNotification(withType: .cookieManaged,
+                                              buttonsContainer: buttonsContainer,
+                                              and: notificationAnimationView)
     }
 
     var mouseEnterExitTrackingArea: NSTrackingArea?
