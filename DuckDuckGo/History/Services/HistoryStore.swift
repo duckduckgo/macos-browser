@@ -262,7 +262,7 @@ final class HistoryStore: HistoryStoring {
                 let changes: [AnyHashable: Any] = [ NSDeletedObjectsKey: deletedObjects ]
                 NSManagedObjectContext.mergeChanges(fromRemoteContextSave: changes, into: [context])
                 os_log("%d visits cleaned from history", log: .history, deletedObjects.count)
-                assert(deletedObjects.count == visits.count, "Not all visits removed")
+                assert(deletedObjects.count >= visits.count, "Not all visits removed")
             } catch {
                 return .failure(error)
             }

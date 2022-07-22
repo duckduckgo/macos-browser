@@ -209,7 +209,6 @@ final class HistoryCoordinator: HistoryCoordinating {
         queue.async(flags: .barrier) { [weak self] in
             guard let self = self else { return }
 
-            self.cancellables = Set<AnyCancellable>()
             self.historyStoring.cleanOld(until: date)
                 .receive(on: self.queue, options: .init(flags: .barrier))
                 .sink(receiveCompletion: { completion in
@@ -239,7 +238,6 @@ final class HistoryCoordinator: HistoryCoordinating {
             }
 
             // Remove from the storage
-            self.cancellables = Set<AnyCancellable>()
             self.historyStoring.removeEntries(entries)
                 .receive(on: self.queue, options: .init(flags: .barrier))
                 .sink(receiveCompletion: { completion in
@@ -266,13 +264,23 @@ final class HistoryCoordinator: HistoryCoordinating {
             visits.forEach { visit in
                 if let historyEntry = visit.historyEntry {
                     historyEntry.visits.remove(visit)
+
+                    if historyEntry.visits.count > 0 {
+                        if let newLastVisit = historyEntry.visits.map({ $0.date }).max() {
+                            historyEntry.lastVisit = newLastVisit
+                            self.save(entry: historyEntry)
+                        } else {
+                            assertionFailure("No history entry")
+                        }
+                    } else {
+                        self.removeEntries([historyEntry])
+                    }
                 } else {
                     assertionFailure("No history entry")
                 }
             }
 
             // Remove from the storage
-            self.cancellables = Set<AnyCancellable>()
             self.historyStoring.removeVisits(visits)
                 .receive(on: self.queue, options: .init(flags: .barrier))
                 .sink(receiveCompletion: { completion in

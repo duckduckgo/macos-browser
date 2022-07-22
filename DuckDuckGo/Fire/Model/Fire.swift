@@ -182,16 +182,16 @@ final class Fire {
             if includingHistory {
                 group.enter()
                 self.burnHistory(of: burningDomains, completion: {
-                    group.leave()
+                    self.burnFavicons(for: burningDomains) {
+                        group.leave()
+                    }
                 })
             }
 
             group.enter()
             self.burnPermissions(of: burningDomains, completion: {
-                self.burnFavicons(for: burningDomains) {
-                    self.burnDownloads(of: burningDomains)
-                    group.leave()
-                }
+                self.burnDownloads(of: burningDomains)
+                group.leave()
             })
 
             self.burnRecentlyClosed(domains: burningDomains)
