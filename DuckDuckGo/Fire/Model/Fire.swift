@@ -118,7 +118,7 @@ final class Fire {
         self.pinnedTabsManager = pinnedTabsManager
         
         if #available(macOS 11, *), autoconsentManagement == nil {
-            self.autoconsentManagement = AutoconsentUserScript.background
+            self.autoconsentManagement = AutoconsentManagement.shared
         } else {
             self.autoconsentManagement = autoconsentManagement
         }
