@@ -84,7 +84,7 @@ struct BadgeAnimationView_Previews: PreviewProvider {
 
 private enum Consts {
     enum View {
-        static let cornerRadius: CGFloat = 8
+        static let cornerRadius: CGFloat = 5
         static let opaqueViewOffset: CGFloat = 10
         static let textScrollerOffset: CGFloat = 120
     }

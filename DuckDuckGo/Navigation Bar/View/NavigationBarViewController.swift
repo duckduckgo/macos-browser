@@ -297,6 +297,10 @@ final class NavigationBarViewController: NSViewController {
 
     @objc private func showAutoconsentFeedback(_ sender: Notification) {
         if #available(macOS 11, *) {
+            self.addressBarViewController?.addressBarButtonsViewController?.showNotification(.cookieManaged)
+        
+            return
+            
             guard view.window?.isKeyWindow == true,
                   let url = sender.userInfo?[AutoconsentUserScript.Constants.popupHiddenUrlKey] as? URL,
                   let host = url.host,

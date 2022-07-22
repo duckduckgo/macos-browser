@@ -131,7 +131,6 @@ private struct SecondaryCTAStyle: ButtonStyle {
         let color = configuration.isPressed ? Color("CookieConsentSecondaryButtonPressed") : Color("CookieConsentSecondaryButton")
         
         let outterShadowOpacity = colorScheme == .dark ? 0.8 : 0.0
-        let cornerRadius: CGFloat = 8
         
         configuration.label
             .font(.system(size: 13, weight: .light, design: .default))
@@ -139,14 +138,14 @@ private struct SecondaryCTAStyle: ButtonStyle {
             .padding(.vertical, 10)
             .frame(maxWidth: .infinity)
             .background(
-                RoundedRectangle(cornerRadius: cornerRadius,
+                RoundedRectangle(cornerRadius: Consts.Layout.containerCornerRadius,
                                  style: .continuous)
                 .fill(color)
                 .shadow(color: .black.opacity(0.1), radius: 0.1, x: 0, y: 1)
                 .shadow(color: .primary.opacity(outterShadowOpacity), radius: 0.1, x: 0, y: -0.6))
         
             .overlay(
-                RoundedRectangle(cornerRadius: cornerRadius)
+                RoundedRectangle(cornerRadius: Consts.Layout.containerCornerRadius)
                     .stroke(Color.black.opacity(0.1), lineWidth: 1))
     }
 }

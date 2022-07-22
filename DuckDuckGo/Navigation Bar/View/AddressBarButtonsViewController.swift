@@ -86,7 +86,8 @@ final class AddressBarButtonsViewController: NSViewController {
     var trackerAnimationView3: AnimationView!
     var shieldAnimationView: AnimationView!
     var shieldDotAnimationView: AnimationView!
-
+    @IBOutlet weak var notificationAnimationView: NavigationBarBadgeAnimationView!
+    
     @IBOutlet weak var permissionButtons: NSView!
     @IBOutlet weak var cameraButton: PermissionButton! {
         didSet {
@@ -181,6 +182,17 @@ final class AddressBarButtonsViewController: NSViewController {
 
     override func viewWillAppear() {
         setupButtons()
+    }
+    
+    override func viewDidAppear() {
+        super.viewDidAppear()
+    }
+    
+    func showNotification(_ type: NavigationBarBadgeAnimationView.AnimationType) {
+        buttonsContainer.alphaValue = 0.0
+        notificationAnimationView.startAnimation(type) { [weak self] in
+            self?.buttonsContainer.alphaValue = 1.0
+        }
     }
 
     var mouseEnterExitTrackingArea: NSTrackingArea?

@@ -33,7 +33,7 @@ struct ExpandableRectangle: View {
         GeometryReader { geometry in
             Rectangle()
                 .fill(Consts.Colors.badgeBackgroundColor)
-                .cornerRadius(8)
+                .cornerRadius(Consts.Layout.cornerRadius)
                 .frame(width: geometry.size.height + width, height: geometry.size.height)
                 .onAppear {
                     withAnimation(.easeInOut(duration: Consts.BadgeAnimation.duration)) {
@@ -61,7 +61,6 @@ struct CookieAnimationView: View {
                         .opacity(cookieAlpha)
                     
                     Image("CookieBite")
-                    
                         .resizable()
                         .opacity(bittenCookieAlpha)
                     
@@ -182,7 +181,8 @@ struct DotView: View {
                     opacity = 1
                 }
                 withAnimation(.easeInOut(duration: Consts.CookieAnimation.halfDuration).delay(Consts.CookieAnimation.secondPhaseDelay)) {
-                    scale = 0
+                    // Fix: ignoring singular matrix
+                    scale = 0.001
                     opacity = 0
                     expandedOffset = -2
                 }
@@ -237,6 +237,7 @@ private enum Consts {
         static let dotsGroupSize: CGFloat = 20
         static let randomDegreesOffset = 40
         static let dotSize: CGFloat = 3
+        static let cornerRadius: CGFloat = 5
     }
     
     enum Count {
