@@ -314,7 +314,6 @@ final class Tab: NSObject, Identifiable, ObservableObject {
         
         self.interactionStateData = (webView.interactionState as? Data)
         
-        Swift.print("Returning interaction state data of length \(self.interactionStateData?.count ?? 0)")
         return self.interactionStateData
     }
 
@@ -545,8 +544,6 @@ final class Tab: NSObject, Identifiable, ObservableObject {
             }
         }
         
-        Swift.print("Restored session state data: \(didRestore)")
-        
         return didRestore
     }
     
@@ -562,8 +559,6 @@ final class Tab: NSObject, Identifiable, ObservableObject {
             webView.interactionState = interactionStateData
             didRestore = true
         }
-        
-        Swift.print("Restored interaction state data: \(didRestore)")
         
         return didRestore
     }
