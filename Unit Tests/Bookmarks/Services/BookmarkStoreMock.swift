@@ -64,6 +64,10 @@ final class BookmarkStoreMock: BookmarkStore {
 
     var updateBookmarkCalled = false
     func update(bookmark: Bookmark) {
+        if let index = bookmarks?.firstIndex(where: { $0.id == bookmark.id}) {
+            bookmarks![index] = bookmark
+        }
+
         updateBookmarkCalled = true
     }
 

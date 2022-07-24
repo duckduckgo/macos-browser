@@ -21,41 +21,6 @@ import XCTest
 
 @available(macOS 11, *)
 class AutoconsentBackgroundTests: XCTestCase {
-
-    @MainActor
-    func testStartupPerformance() {
-        // This is an example of a performance test case.
-        self.measure {
-            // Put the code you want to measure the time of here.
-            let expectation = XCTestExpectation(description: "Startup")
-            let bg = AutoconsentBackground()
-            bg.ready {
-                expectation.fulfill()
-            }
-            wait(for: [expectation], timeout: 1)
-        }
-    }
-
-    @MainActor
-    func testAutoconsentIsCreated() {
-        let bg = AutoconsentBackground()
-        let expectation = XCTestExpectation(description: "Async call")
-        bg.ready {
-            bg.background.evaluateJavaScript("typeof window.autoconsent", in: nil, in: .page, completionHandler: { result in
-                switch result {
-                case .success(let value as String):
-                    XCTAssertEqual(value, "object", "window.autoconsent should be an object")
-                case .success:
-                    XCTFail("Failed to check for autoconsent global")
-                case .failure:
-                    XCTFail("Failed to check for autoconsent global")
-                }
-                expectation.fulfill()
-            })
-        }
-        wait(for: [expectation], timeout: 2)
-    }
-    
     func testUserscriptIntegration() {
         // enable the feature
         let prefs = PrivacySecurityPreferences.shared
@@ -72,7 +37,7 @@ class AutoconsentBackgroundTests: XCTestCase {
         let url = Bundle(for: type(of: self)).url(forResource: "autoconsent-test-page", withExtension: "html")!
         webview.loadFileURL(url, allowingReadAccessTo: url.deletingLastPathComponent())
         DispatchQueue.main.asyncAfter(deadline: .now() + 2) {
-            webview.evaluateJavaScript("results.results.length === 1 && results.results[0] === 'button_clicked'", in: nil, in: .page,
+            webview.evaluateJavaScript("results.results.includes('button_clicked')", in: nil, in: .page,
                                        completionHandler: { result in
                 switch result {
                 case .success(let value as Bool):
