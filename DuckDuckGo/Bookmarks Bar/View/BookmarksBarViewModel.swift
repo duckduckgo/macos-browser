@@ -391,50 +391,37 @@ extension BookmarksBarViewModel: NSCollectionViewDelegate, NSCollectionViewDataS
             }
 
             return true
-        } else if let draggedBookmark = PasteboardBookmark.pasteboardBookmarks(with: draggingInfo.draggingPasteboard)?.first,
-                  let uuid = UUID(uuidString: draggedBookmark.id) {
-            bookmarkManager.move(objectUUID: uuid, toIndex: newIndexPath.item, withinParentFolder: .root) { error in
-                if error != nil {
-                    self.delegate?.bookmarksBarViewModelReloadedData()
+        } else if let pasteboardItems = draggingInfo.draggingPasteboard.pasteboardItems {
+            for item in pasteboardItems {
+                if let bookmarkEntityUUID = item.bookmarkEntityUUID {
+                    bookmarkManager.move(objectUUID: bookmarkEntityUUID, toIndex: newIndexPath.item, withinParentFolder: .root) { error in
+                        if error != nil {
+                            self.delegate?.bookmarksBarViewModelReloadedData()
+                        }
+                    }
+                } else if let webViewItem = item.draggedWebViewValues() {
+                    self.bookmarkManager.makeBookmark(for: webViewItem.url, title: webViewItem.title, isFavorite: false, index: newIndexPath.item)
+                } else if let draggedString = item.string(forType: .string), let draggedURL = URL(string: draggedString) {
+                    let title: String
+
+                    if let selectedTab = tabCollectionViewModel.selectedTab, selectedTab.url == draggedURL, let tabTitle = selectedTab.title {
+                        title = tabTitle
+                    } else {
+                        title = draggedURL.absoluteString
+                    }
+
+                    self.bookmarkManager.makeBookmark(for: draggedURL, title: title, isFavorite: false, index: newIndexPath.item)
                 }
-            }
-
-            return true
-        } else if let draggedFolder = PasteboardFolder.pasteboardFolders(with: draggingInfo.draggingPasteboard)?.first,
-                  let uuid = UUID(uuidString: draggedFolder.id) {
-            bookmarkManager.move(objectUUID: uuid, toIndex: newIndexPath.item, withinParentFolder: .root) { error in
-                if error != nil {
-                    self.delegate?.bookmarksBarViewModelReloadedData()
-                }
-            }
-
-            return true
-        } else if let item = draggingInfo.draggingPasteboard.pasteboardItems?.first {
-            if let draggedItemData = item.draggedWebViewValues() {
-                self.bookmarkManager.makeBookmark(for: draggedItemData.url, title: draggedItemData.title, isFavorite: false, index: newIndexPath.item)
-                return true
-            }
-
-            if let draggedString = item.string(forType: .string), let draggedURL = URL(string: draggedString) {
-                let title: String
-
-                if let selectedTab = tabCollectionViewModel.selectedTab, selectedTab.url == draggedURL, let tabTitle = selectedTab.title {
-                    title = tabTitle
-                } else {
-                    title = draggedURL.absoluteString
-                }
-
-                self.bookmarkManager.makeBookmark(for: draggedURL, title: title, isFavorite: false, index: newIndexPath.item)
-
-                return true
             }
             
-            return false
+            return true
         }
         
         return false
     }
     
+    // MARK: - Drag & Drop
+
     /// On rare occasions, a click event will be sent immediately after a drag and drop operation completes.
     /// To prevent drag and drop from accidentally triggering a bookmark to load or folder to open, all click events are ignored for a short period after a drop has been accepted.
     private func beginClickPreventionTimer() {

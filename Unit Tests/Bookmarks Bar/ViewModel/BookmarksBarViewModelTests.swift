@@ -23,7 +23,7 @@ class BookmarksBarViewModelTests: XCTestCase {
     
     func testWhenClippingTheLastBarItem_AndNoItemsCanBeClipped_ThenNoItemsAreClipped() {
         let manager = createMockBookmarksManager()
-        let bookmarksBarViewModel = BookmarksBarViewModel(bookmarkManager: manager)
+        let bookmarksBarViewModel = BookmarksBarViewModel(bookmarkManager: manager, tabCollectionViewModel: .mock())
         
         let clipped = bookmarksBarViewModel.clipLastBarItem()
         
@@ -37,7 +37,7 @@ class BookmarksBarViewModelTests: XCTestCase {
         storeMock.bookmarks = bookmarks
 
         let manager = createMockBookmarksManager(mockBookmarkStore: storeMock)
-        let bookmarksBarViewModel = BookmarksBarViewModel(bookmarkManager: manager)
+        let bookmarksBarViewModel = BookmarksBarViewModel(bookmarkManager: manager, tabCollectionViewModel: .mock())
         bookmarksBarViewModel.update(from: bookmarks, containerWidth: 200)
         
         let clipped = bookmarksBarViewModel.clipLastBarItem()
@@ -52,7 +52,7 @@ class BookmarksBarViewModelTests: XCTestCase {
         storeMock.bookmarks = bookmarks
 
         let manager = createMockBookmarksManager(mockBookmarkStore: storeMock)
-        let bookmarksBarViewModel = BookmarksBarViewModel(bookmarkManager: manager)
+        let bookmarksBarViewModel = BookmarksBarViewModel(bookmarkManager: manager, tabCollectionViewModel: .mock())
         bookmarksBarViewModel.update(from: bookmarks, containerWidth: 200)
         
         let clipped = bookmarksBarViewModel.clipLastBarItem()
@@ -72,7 +72,7 @@ class BookmarksBarViewModelTests: XCTestCase {
         storeMock.bookmarks = bookmarks
 
         let manager = createMockBookmarksManager(mockBookmarkStore: storeMock)
-        let bookmarksBarViewModel = BookmarksBarViewModel(bookmarkManager: manager)
+        let bookmarksBarViewModel = BookmarksBarViewModel(bookmarkManager: manager, tabCollectionViewModel: .mock())
         bookmarksBarViewModel.update(from: bookmarks, containerWidth: 0)
         
         XCTAssertEqual(bookmarksBarViewModel.clippedItems.count, 1)
@@ -84,7 +84,7 @@ class BookmarksBarViewModelTests: XCTestCase {
         storeMock.bookmarks = bookmarks
 
         let manager = createMockBookmarksManager(mockBookmarkStore: storeMock)
-        let bookmarksBarViewModel = BookmarksBarViewModel(bookmarkManager: manager)
+        let bookmarksBarViewModel = BookmarksBarViewModel(bookmarkManager: manager, tabCollectionViewModel: .mock())
         bookmarksBarViewModel.update(from: bookmarks, containerWidth: 200)
         
         XCTAssert(bookmarksBarViewModel.clippedItems.isEmpty)
@@ -93,6 +93,16 @@ class BookmarksBarViewModelTests: XCTestCase {
     private func createMockBookmarksManager(mockBookmarkStore: BookmarkStoreMock = BookmarkStoreMock()) -> BookmarkManager {
         let mockFaviconManager = FaviconManagerMock()
         return LocalBookmarkManager(bookmarkStore: mockBookmarkStore, faviconManagement: mockFaviconManager)
+    }
+
+}
+
+fileprivate extension TabCollectionViewModel {
+
+    static func mock() -> TabCollectionViewModel {
+        let tabCollection = TabCollection()
+        let pinnedTabsManager = PinnedTabsManager()
+        return TabCollectionViewModel(tabCollection: tabCollection, pinnedTabsManager: pinnedTabsManager)
     }
 
 }
