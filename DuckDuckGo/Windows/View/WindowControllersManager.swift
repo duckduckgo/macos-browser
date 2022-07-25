@@ -22,6 +22,8 @@ import Combine
 
 protocol WindowControllersManagerProtocol {
 
+    var pinnedTabsManager: PinnedTabsManager { get }
+
     var didRegisterWindowController: PassthroughSubject<(MainWindowController), Never> { get }
     var didUnregisterWindowController: PassthroughSubject<(MainWindowController), Never> { get }
 
@@ -39,8 +41,17 @@ final class WindowControllersManager: WindowControllersManagerProtocol {
      */
     @Published private(set) var isInInitialState: Bool = true
     @Published private(set) var mainWindowControllers = [MainWindowController]()
-    weak var lastKeyMainWindowController: MainWindowController?
+    private(set) var pinnedTabsManager = PinnedTabsManager()
 
+    weak var lastKeyMainWindowController: MainWindowController? {
+        didSet {
+            if lastKeyMainWindowController != oldValue {
+                didChangeKeyWindowController.send(())
+            }
+        }
+    }
+
+    let didChangeKeyWindowController = PassthroughSubject<Void, Never>()
     let didRegisterWindowController = PassthroughSubject<(MainWindowController), Never>()
     let didUnregisterWindowController = PassthroughSubject<(MainWindowController), Never>()
 
@@ -70,7 +81,8 @@ final class WindowControllersManager: WindowControllersManagerProtocol {
             (
                 mainWindowControllers.count == 1 &&
                 mainWindowControllers.first?.mainViewController.tabCollectionViewModel.tabs.count == 1 &&
-                mainWindowControllers.first?.mainViewController.tabCollectionViewModel.tabs.first?.content == .homePage
+                mainWindowControllers.first?.mainViewController.tabCollectionViewModel.tabs.first?.content == .homePage &&
+                pinnedTabsManager.tabCollection.tabs.isEmpty
             )
         }
     }

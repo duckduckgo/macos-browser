@@ -20,7 +20,7 @@ import Foundation
 
 final class RecentlyClosedTab: RecentlyClosedCacheItem {
 
-    init(tabContent: Tab.TabContent, favicon: NSImage?, title: String?, originalTabCollection: TabCollection? = nil, index: Int) {
+    init(tabContent: Tab.TabContent, favicon: NSImage?, title: String?, originalTabCollection: TabCollection? = nil, index: TabIndex) {
         self.tabContent = tabContent
         self.favicon = favicon
         self.title = title
@@ -33,6 +33,6 @@ final class RecentlyClosedTab: RecentlyClosedCacheItem {
     let title: String?
 
     weak var originalTabCollection: TabCollection?
-    let index: Int
+    let index: TabIndex
 
 }

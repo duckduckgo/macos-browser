@@ -167,9 +167,9 @@ final class AppStateChangePublisherTests: XCTestCase {
             }.store(in: &cancellables)
 
         WindowControllersManager.shared.mainWindowControllers[0].mainViewController.tabCollectionViewModel
-            .remove(at: 0)
+            .remove(at: .unpinned(0))
         WindowControllersManager.shared.mainWindowControllers[1].mainViewController.tabCollectionViewModel
-            .remove(at: 1)
+            .remove(at: .unpinned(1))
 
         waitForExpectations(timeout: 0.3, handler: nil)
     }

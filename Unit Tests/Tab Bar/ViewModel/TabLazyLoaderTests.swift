@@ -72,9 +72,10 @@ private final class TabLazyLoaderDataSourceMock: TabLazyLoaderDataSource {
 
     typealias Tab = TabMock
 
+    var pinnedTabs: [Tab] = []
     var tabs: [Tab] = []
     var selectedTab: Tab?
-    var selectedTabIndex: Int?
+    var selectedTabIndex: TabIndex?
     var selectedTabPublisher: AnyPublisher<Tab, Never> {
         selectedTabSubject.eraseToAnyPublisher()
     }
@@ -304,7 +305,7 @@ class TabLazyLoaderTests: XCTestCase {
 
         // select tab #3, this will cause loading tabs adjacent to #3, and then from the end of the array (based on timestamp)
         dataSource.selectedTab = dataSource.tabs[3]
-        dataSource.selectedTabIndex = 3
+        dataSource.selectedTabIndex = .unpinned(3)
 
         let lazyLoader = TabLazyLoader(dataSource: dataSource)
 

@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<document type="com.apple.InterfaceBuilder3.Cocoa.Storyboard.XIB" version="3.0" toolsVersion="19529" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES">
+<document type="com.apple.InterfaceBuilder3.Cocoa.Storyboard.XIB" version="3.0" toolsVersion="20037" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES">
     <dependencies>
         <deployment identifier="macosx"/>
-        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="19529"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="20037"/>
     </dependencies>
     <scenes>
         <!--Application-->
@@ -636,10 +636,16 @@ CQ
                                             </connections>
                                         </menuItem>
                                         <menuItem isSeparatorItem="YES" id="pC4-EZ-Df8"/>
-                                        <menuItem title="Move Tab to New Window" id="8LN-7f-htp">
+                                        <menuItem title="Pin Tab" id="8LN-7f-htp">
                                             <modifierMask key="keyEquivalentModifierMask"/>
                                             <connections>
-                                                <action selector="moveTabToNewWindow:" target="Ady-hI-5gd" id="fCP-ze-pja"/>
+                                                <action selector="pinOrUnpinTab:" target="Ady-hI-5gd" id="hfz-H3-RTg"/>
+                                            </connections>
+                                        </menuItem>
+                                        <menuItem title="Move Tab to New Window" id="c3E-76-Now">
+                                            <modifierMask key="keyEquivalentModifierMask"/>
+                                            <connections>
+                                                <action selector="moveTabToNewWindow:" target="Ady-hI-5gd" id="gYI-WT-dJX"/>
                                             </connections>
                                         </menuItem>
                                         <menuItem title="Merge All Windows" enabled="NO" id="mSV-y2-3DW">
@@ -694,6 +700,12 @@ CQ
                                                         <modifierMask key="keyEquivalentModifierMask"/>
                                                         <connections>
                                                             <action selector="resetMacWaitlistUnlockState:" target="Ady-hI-5gd" id="1Bd-q4-0F9"/>
+                                                        </connections>
+                                                    </menuItem>
+                                                    <menuItem title="Reset Pinned Tabs" id="4sC-SF-6u1">
+                                                        <modifierMask key="keyEquivalentModifierMask"/>
+                                                        <connections>
+                                                            <action selector="resetPinnedTabs:" target="Ady-hI-5gd" id="4iv-wI-8wp"/>
                                                         </connections>
                                                     </menuItem>
                                                 </items>
