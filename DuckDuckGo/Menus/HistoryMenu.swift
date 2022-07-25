@@ -92,7 +92,7 @@ final class HistoryMenu: NSMenu {
         recentlyVisitedMenuItems = [recentlyVisitedHeaderMenuItem]
         recentlyVisitedMenuItems.append(contentsOf: historyCoordinator.getRecentVisits(maxCount: 14)
             .map {
-                NSMenuItem(visitViewModel: VisitViewModel(visit: $0))
+                VisitMenuItem(visitViewModel: VisitViewModel(visit: $0))
             }
         )
         recentlyVisitedMenuItems.forEach {
@@ -165,7 +165,7 @@ final class HistoryMenu: NSMenu {
 
     private func makeMenuItems(from grouping: HistoryGrouping) -> [NSMenuItem] {
         return grouping.visits.map { visit in
-            NSMenuItem(visitViewModel: VisitViewModel(visit: visit))
+            VisitMenuItem(visitViewModel: VisitViewModel(visit: visit))
         }
     }
 
@@ -199,12 +199,11 @@ final class HistoryMenu: NSMenu {
         return dateFormatter
     }()
 
-    private func makeClearThisHistoryMenuItems(with dateString: String? = nil) -> [NSMenuItem] {
-        let headerItem = NSMenuItem(title: UserText.clearThisHistoryMenuItem,
-                                    action: #selector(AppDelegate.clearThisHistory(_:)),
-                                    keyEquivalent: "")
-        // Keep the dateString for alerts so we don't need to use the formatter again
-        headerItem.representedObject = dateString
+    private func makeClearThisHistoryMenuItems(with dateString: String) -> [NSMenuItem] {
+        let headerItem = ClearThisHistoryMenuItem(title: UserText.clearThisHistoryMenuItem,
+                                                  action: #selector(AppDelegate.clearThisHistory(_:)),
+                                                  keyEquivalent: "")
+        headerItem.setDateString(dateString)
         return [headerItem,
                 NSMenuItem.separator()]
     }
@@ -326,26 +325,6 @@ private extension HistoryCoordinating {
         } .sorted(by: { (grouping1, grouping2) in
             grouping1.date > grouping2.date
         })
-    }
-
-}
-
-extension NSMenuItem {
-
-    convenience init(visitViewModel: VisitViewModel) {
-        self.init(title: visitViewModel.titleTruncated,
-                  action: #selector(AppDelegate.openVisit(_:)),
-                  keyEquivalent: "")
-        image = visitViewModel.smallFaviconImage?.resizedToFaviconSize()
-        // Keep the reference to visit in order to use it for burning
-        representedObject = visitViewModel.visit
-    }
-
-    // Getting visits for the whole menu section in order to perform burning
-    func getVisits() -> [Visit] {
-        return menu?.items.compactMap({ menuItem in
-            return menuItem.representedObject as? Visit
-        }) ?? []
     }
 
 }

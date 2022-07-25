@@ -472,6 +472,8 @@
 		AAA0CC572539EBC90079BC96 /* FaviconUserScript.swift in Sources */ = {isa = PBXBuildFile; fileRef = AAA0CC562539EBC90079BC96 /* FaviconUserScript.swift */; };
 		AAA0CC6A253CC43C0079BC96 /* WKUserContentControllerExtension.swift in Sources */ = {isa = PBXBuildFile; fileRef = AAA0CC69253CC43C0079BC96 /* WKUserContentControllerExtension.swift */; };
 		AAA892EA250A4CEF005B37B2 /* WindowControllersManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = AAA892E9250A4CEF005B37B2 /* WindowControllersManager.swift */; };
+		AAAB9114288EB1D600A057A9 /* CleanThisHistoryMenuItem.swift in Sources */ = {isa = PBXBuildFile; fileRef = AAAB9113288EB1D600A057A9 /* CleanThisHistoryMenuItem.swift */; };
+		AAAB9116288EB46B00A057A9 /* VisitMenuItem.swift in Sources */ = {isa = PBXBuildFile; fileRef = AAAB9115288EB46B00A057A9 /* VisitMenuItem.swift */; };
 		AAADFD06264AA282001555EA /* TimeIntervalExtension.swift in Sources */ = {isa = PBXBuildFile; fileRef = AAADFD05264AA282001555EA /* TimeIntervalExtension.swift */; };
 		AAB549DF25DAB8F80058460B /* BookmarkViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = AAB549DE25DAB8F80058460B /* BookmarkViewModel.swift */; };
 		AAB7320726DD0C37002FACF9 /* Fire.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = AAB7320626DD0C37002FACF9 /* Fire.storyboard */; };
@@ -1257,6 +1259,8 @@
 		AAA0CC562539EBC90079BC96 /* FaviconUserScript.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FaviconUserScript.swift; sourceTree = "<group>"; };
 		AAA0CC69253CC43C0079BC96 /* WKUserContentControllerExtension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WKUserContentControllerExtension.swift; sourceTree = "<group>"; };
 		AAA892E9250A4CEF005B37B2 /* WindowControllersManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WindowControllersManager.swift; sourceTree = "<group>"; };
+		AAAB9113288EB1D600A057A9 /* CleanThisHistoryMenuItem.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CleanThisHistoryMenuItem.swift; sourceTree = "<group>"; };
+		AAAB9115288EB46B00A057A9 /* VisitMenuItem.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VisitMenuItem.swift; sourceTree = "<group>"; };
 		AAADFD05264AA282001555EA /* TimeIntervalExtension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TimeIntervalExtension.swift; sourceTree = "<group>"; };
 		AAB549DE25DAB8F80058460B /* BookmarkViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BookmarkViewModel.swift; sourceTree = "<group>"; };
 		AAB7320626DD0C37002FACF9 /* Fire.storyboard */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; path = Fire.storyboard; sourceTree = "<group>"; };
@@ -3094,6 +3098,8 @@
 				AA97BF4525135DD30014931A /* ApplicationDockMenu.swift */,
 				B63ED0E426BB8FB900A9DAD1 /* SharingMenu.swift */,
 				AA7E919628746BCC00AB6B62 /* HistoryMenu.swift */,
+				AAAB9113288EB1D600A057A9 /* CleanThisHistoryMenuItem.swift */,
+				AAAB9115288EB46B00A057A9 /* VisitMenuItem.swift */,
 			);
 			path = Menus;
 			sourceTree = "<group>";
@@ -4307,6 +4313,7 @@
 				4B0511CA262CAA5A00F6079C /* FireproofDomainsViewController.swift in Sources */,
 				AA4D700725545EF800C3411E /* URLEventHandler.swift in Sources */,
 				AA92127725ADA07900600CD4 /* WKWebViewExtension.swift in Sources */,
+				AAAB9114288EB1D600A057A9 /* CleanThisHistoryMenuItem.swift in Sources */,
 				B6106BA426A7BEA40013B453 /* PermissionAuthorizationState.swift in Sources */,
 				B6A9E499261474120067D1B9 /* TimedPixel.swift in Sources */,
 				B6C0B23626E732000031CB7F /* DownloadListItem.swift in Sources */,
@@ -4394,6 +4401,7 @@
 				CB6BCDF927C6BEFF00CC76DC /* PrivacyFeatures.swift in Sources */,
 				B693954D26F04BEB0015B914 /* MouseClickView.swift in Sources */,
 				B6DB3CF926A00E2D00D459B7 /* AVCaptureDevice+SwizzledAuthState.swift in Sources */,
+				AAAB9116288EB46B00A057A9 /* VisitMenuItem.swift in Sources */,
 				4BA1A6BD258B082300F6F690 /* EncryptionKeyStore.swift in Sources */,
 				4BE65474271FCD40008D1D63 /* PasswordManagementIdentityItemView.swift in Sources */,
 				B6F41031264D2B23003DA42C /* ProgressExtension.swift in Sources */,

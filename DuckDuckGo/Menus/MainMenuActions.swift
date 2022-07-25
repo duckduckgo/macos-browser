@@ -99,7 +99,7 @@ extension AppDelegate {
         windowController.mainViewController.clearAllHistory(sender)
     }
 
-    @objc func clearThisHistory(_ sender: NSMenuItem) {
+    @objc func clearThisHistory(_ sender: ClearThisHistoryMenuItem) {
         guard let window = WindowsManager.openNewWindow(with: Tab(content: .homePage)),
               let windowController = window.windowController as? MainWindowController else {
             assertionFailure("No reference to main window controller")
@@ -391,8 +391,8 @@ extension MainViewController {
         })
     }
 
-    @objc func clearThisHistory(_ sender: NSMenuItem) {
-        guard let window = view.window, let dateString = sender.representedObject as? String else {
+    @objc func clearThisHistory(_ sender: ClearThisHistoryMenuItem) {
+        guard let window = view.window, let dateString = sender.dateString else {
             assertionFailure("No window or wrong represented object")
             return
         }
