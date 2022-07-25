@@ -57,14 +57,14 @@ struct CookieConsentUserPermissionView<AnimationModel>: View where AnimationMode
     
     private var contentView: some View {
         VStack(alignment: .leading, spacing: 24) {
-            Text("Looks like this site has a cookie consent pop-up 👇")
+            Text(UserText.autoconsentModalTitle)
                 .font(.system(size: Consts.Font.size))
                 .fontWeight(.light)
             
             CookieConsentAnimationView(animationModel: sketchAnimationModel)
                 .padding(.leading, 40)
             
-            Text("Want me to handle these for you? I can try to minimize cookies, maximize privacy, and hide pop-ups like these.")
+            Text(UserText.autoconsentModalBody)
                 .fontWeight(.light)
                 .font(.system(size: Consts.Font.size))
             
@@ -76,14 +76,14 @@ struct CookieConsentUserPermissionView<AnimationModel>: View where AnimationMode
             Button {
                 result(false)
             } label: {
-                Text("No Thanks")
+                Text(UserText.autoconsentModalDenyButton)
             }
             .buttonStyle(SecondaryCTAStyle())
             
             Button {
                 result(true)
             } label: {
-                Text("Manage Cookie Pop-ups")
+                Text(UserText.autoconsentModalConfirmButton)
             }
             .buttonStyle(PrimaryCTAStyle())
         }

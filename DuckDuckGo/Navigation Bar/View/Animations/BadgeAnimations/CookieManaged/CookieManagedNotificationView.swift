@@ -21,7 +21,7 @@ import SwiftUI
 struct CookieManagedNotificationView: View {
     var body: some View {
         BadgeAnimationView(iconView: AnyView(CookieAnimationView()),
-                           text: "Cookies Managed",
+                           text: UserText.cookiesManagedNotification,
                            animationDuration: Consts.BadgeAnimation.duration,
                            animationSecondPhaseDelay: Consts.BadgeAnimation.secondPhaseDelay)
     }

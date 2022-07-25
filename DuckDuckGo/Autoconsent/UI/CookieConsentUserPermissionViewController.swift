@@ -36,7 +36,6 @@ public final class CookieConsentUserPermissionViewController: NSViewController {
         return NSHostingView(rootView: permissionView)
     }()
     
-    
     public override func loadView() {
         view = NSView(frame: NSRect(origin: CGPoint.zero, size: viewSize))
     }
