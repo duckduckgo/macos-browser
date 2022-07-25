@@ -19,6 +19,7 @@
 import SwiftUI
 
 struct BadgeAnimationView: View {
+    var animationModel: BadgeNotificationAnimationModel
     let iconView: AnyView
     let text: String
     let animationDuration: CGFloat
@@ -29,23 +30,30 @@ struct BadgeAnimationView: View {
     var body: some View {
         GeometryReader { geometry in
             ZStack {
-                ExpandableRectangle(animationDuration: animationDuration,
+                ExpandableRectangle(animationModel: animationModel,
+                                    animationDuration: animationDuration,
                                     animationSecondPhaseDelay: animationSecondPhaseDelay)
-                    .frame(width: geometry.size.width, height: geometry.size.height)
+                .frame(width: geometry.size.width, height: geometry.size.height)
                 
                 HStack {
                     Text(text)
                         .foregroundColor(.primary)
                         .font(.body)
                         .offset(x: textOffset)
-                        .onAppear {
-                            withAnimation(.easeInOut(duration: animationDuration)) {
-                                textOffset = 0
+                        .onReceive(animationModel.$state, perform: { state in
+                            switch state {
+                            case .expanded:
+                                withAnimation(.easeInOut(duration: animationDuration)) {
+                                    textOffset = 0
+                                }
+                            case .retracted:
+                                withAnimation(.easeInOut(duration: animationDuration)) {
+                                    textOffset = -Consts.View.textScrollerOffset
+                                }
+                            default:
+                                break
                             }
-                            withAnimation(.easeInOut(duration: animationDuration).delay(animationSecondPhaseDelay)) {
-                                textOffset = -Consts.View.textScrollerOffset
-                            }
-                        }
+                        })
                         .padding(.leading, geometry.size.height)
                     
                     Spacer()
@@ -70,8 +78,8 @@ struct BadgeAnimationView: View {
     }
 }
 
-
 struct ExpandableRectangle: View {
+    @ObservedObject var animationModel: BadgeNotificationAnimationModel
     @State var width: CGFloat = 0
     let animationDuration: CGFloat
     let animationSecondPhaseDelay: CGFloat
@@ -82,32 +90,39 @@ struct ExpandableRectangle: View {
                 .fill(Consts.Colors.badgeBackgroundColor)
                 .cornerRadius(Consts.View.cornerRadius)
                 .frame(width: geometry.size.height + width, height: geometry.size.height)
-                .onAppear {
-                    withAnimation(.easeInOut(duration: animationDuration)) {
-                        width = geometry.size.width - geometry.size.height
+                .onReceive(animationModel.$state, perform: { state in
+                    switch state {
+                    case .expanded:
+                        withAnimation(.easeInOut(duration: animationDuration)) {
+                            width = geometry.size.width - geometry.size.height
+                        }
+                        
+                    case .retracted:
+                        withAnimation(.easeInOut(duration: animationDuration)) {
+                                width = 0
+                        }
+                    default:
+                        break
                     }
-                    
-                    withAnimation(.easeInOut(duration: animationDuration).delay(animationSecondPhaseDelay)) {
-                            width = 0
-                    }
-                }
+                })
         }
     }
 }
 
-struct BadgeAnimationView_Previews: PreviewProvider {
-    static var previews: some View {
-        if #available(macOS 11.0, *) {
-            BadgeAnimationView(iconView: AnyView(Image(systemName: "globle")),
-                               text: "Test",
-                               animationDuration: 3,
-                               animationSecondPhaseDelay: 1)
-            .frame(width: 100, height: 30)
-        } else {
-            Text("No Preview")
-        }
-    }
-}
+#warning("fix preview")
+//struct BadgeAnimationView_Previews: PreviewProvider {
+//    static var previews: some View {
+//        if #available(macOS 11.0, *) {
+//            BadgeAnimationView(iconView: AnyView(Image(systemName: "globle")),
+//                               text: "Test",
+//                               animationDuration: 3,
+//                               animationSecondPhaseDelay: 1)
+//            .frame(width: 100, height: 30)
+//        } else {
+//            Text("No Preview")
+//        }
+//    }
+//}
 
 private enum Consts {
     enum View {

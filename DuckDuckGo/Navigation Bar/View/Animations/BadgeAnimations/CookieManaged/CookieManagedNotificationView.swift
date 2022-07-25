@@ -19,8 +19,12 @@
 import SwiftUI
 
 struct CookieManagedNotificationView: View {
+    @ObservedObject var animationModel: CookieNotificationAnimationModel
+    var badgeAnimationModel: BadgeNotificationAnimationModel
+    
     var body: some View {
-        BadgeAnimationView(iconView: AnyView(CookieAnimationView()),
+        BadgeAnimationView(animationModel: badgeAnimationModel,
+                           iconView: AnyView(CookieAnimationView(animationModel: animationModel)),
                            text: UserText.cookiesManagedNotification,
                            animationDuration: Consts.BadgeAnimation.duration,
                            animationSecondPhaseDelay: Consts.BadgeAnimation.secondPhaseDelay)
@@ -28,6 +32,8 @@ struct CookieManagedNotificationView: View {
 }
 
 struct CookieAnimationView: View {
+    @ObservedObject var animationModel: CookieNotificationAnimationModel
+    
     @State var cookieAlpha: CGFloat = 1
     @State var bittenCookieAlpha: CGFloat = 0
     
@@ -45,29 +51,36 @@ struct CookieAnimationView: View {
                         .foregroundColor(.primary)
                         .opacity(bittenCookieAlpha)
                     
-                    InnerExpandingCircle()
-                    OuterExpandingCircle()
+                    InnerExpandingCircle(animationModel: animationModel)
+                    OuterExpandingCircle(animationModel: animationModel)
                 }
                 .frame(width: Consts.Layout.cookieSize,
                        height: Consts.Layout.cookieSize)
                 
-                DotGroupView(circleCount: Consts.Count.circle)
+                DotGroupView(animationModel: animationModel,
+                             circleCount: Consts.Count.circle)
                     .frame(width: Consts.Layout.dotsGroupSize,
                            height: Consts.Layout.dotsGroupSize)
                 
             }
         }.frame(width: Consts.Layout.dotsGroupSize * 1.6,
                 height: Consts.Layout.dotsGroupSize * 1.6)
-        .onAppear {
-            withAnimation(.easeInOut(duration: Consts.CookieAnimation.duration)) {
-                cookieAlpha = 0
-                bittenCookieAlpha = 1
+        .onReceive(animationModel.$state, perform: { state in
+            switch state {
+            case .firstPhase:
+                withAnimation(.easeInOut(duration: Consts.CookieAnimation.duration)) {
+                    cookieAlpha = 0
+                    bittenCookieAlpha = 1
+                }
+            default:
+                break
             }
-        }
+        })
     }
 }
 
 struct DotGroupView: View {
+    var animationModel: CookieNotificationAnimationModel
     let circleCount: Int
     
     private func degreesOffset(for index: Int) -> Double {
@@ -80,7 +93,9 @@ struct DotGroupView: View {
                 
                 ForEach(0..<self.circleCount, id: \.self) { i in
                     ZStack {
-                        DotView(geo: geo, index: i)
+                        DotView(animationModel: animationModel,
+                                geo: geo,
+                                index: i)
                     }
                     .rotationEffect(.degrees(degreesOffset(for: i)))
                 }
@@ -90,6 +105,7 @@ struct DotGroupView: View {
 }
 
 struct InnerExpandingCircle: View {
+    @ObservedObject var animationModel: CookieNotificationAnimationModel
     @State var opacity: CGFloat = 0
     @State var scale: CGFloat = 1
     var body: some View {
@@ -97,21 +113,27 @@ struct InnerExpandingCircle: View {
             .strokeBorder(.blue, lineWidth: 1)
             .opacity(opacity)
             .scaleEffect(scale)
-            .onAppear {
-                withAnimation(.easeInOut(duration: Consts.CookieAnimation.halfDuration)) {
-                    opacity = 1
-                    scale = Consts.CookieAnimation.innerExpandingCircleScale1
+            .onReceive(animationModel.$state, perform: { state in
+                switch state {
+                case .firstPhase:
+                    withAnimation(.easeInOut(duration: Consts.CookieAnimation.duration)) {
+                        opacity = 1
+                        scale = Consts.CookieAnimation.innerExpandingCircleScale1
+                    }
+                case .secondPhase:
+                    withAnimation(.easeInOut(duration: Consts.CookieAnimation.halfDuration)) {
+                        opacity = 0
+                        scale = Consts.CookieAnimation.innerExpandingCircleScale2
+                    }
+                default:
+                    break
                 }
-                
-                withAnimation(.easeInOut(duration: Consts.CookieAnimation.halfDuration).delay(Consts.CookieAnimation.secondPhaseDelay)) {
-                    opacity = 0
-                    scale = Consts.CookieAnimation.innerExpandingCircleScale2
-                }
-            }
+            })
     }
 }
 
 struct OuterExpandingCircle: View {
+    @ObservedObject var animationModel: CookieNotificationAnimationModel
     @State var opacity: CGFloat = 0
     @State var scale: CGFloat = Consts.CookieAnimation.outerExpandingCircleScale1
     var body: some View {
@@ -119,20 +141,26 @@ struct OuterExpandingCircle: View {
             .strokeBorder(.blue, lineWidth: 1)
             .opacity(opacity)
             .scaleEffect(scale)
-            .onAppear {
-                withAnimation(.easeInOut(duration: Consts.CookieAnimation.halfDuration)) {
-                    opacity = 1
+            .onReceive(animationModel.$state, perform: { state in
+                switch state {
+                case .firstPhase:
+                    withAnimation(.easeInOut(duration: Consts.CookieAnimation.duration)) {
+                        opacity = 1
+                    }
+                case .secondPhase:
+                    withAnimation(.easeInOut(duration: Consts.CookieAnimation.halfDuration)) {
+                        opacity = 0
+                        scale = Consts.CookieAnimation.outerExpandingCircleScale2
+                    }
+                default:
+                    break
                 }
-                
-                withAnimation(.easeInOut(duration: Consts.CookieAnimation.halfDuration).delay(Consts.CookieAnimation.secondPhaseDelay)) {
-                    opacity = 0
-                    scale = Consts.CookieAnimation.outerExpandingCircleScale2
-                }
-            }
+            })
     }
 }
 
 struct DotView: View {
+    @ObservedObject var animationModel: CookieNotificationAnimationModel
     let size = Consts.Layout.dotSize
     let geo: GeometryProxy
     let index: Int
@@ -149,18 +177,24 @@ struct DotView: View {
             .frame(width: size, height: size)
             .position(x: xPositionWithGeometry(geo, isContracted: isContracted),
                       y: yPositionWithGeometry(geo, isContracted: isContracted))
-            .onAppear {
-                withAnimation(.easeInOut(duration: Consts.CookieAnimation.halfDuration)) {
-                    self.isContracted.toggle()
-                    opacity = 1
+            .onReceive(animationModel.$state, perform: { state in
+                switch state {
+                case .firstPhase:
+                    withAnimation(.easeInOut(duration: Consts.CookieAnimation.halfDuration)) {
+                        self.isContracted.toggle()
+                        opacity = 1
+                    }
+                case .secondPhase:
+                    withAnimation(.easeInOut(duration: Consts.CookieAnimation.halfDuration)) {
+                        // Fix: ignoring singular matrix
+                        scale = 0.001
+                        opacity = 0
+                        expandedOffset = -3
+                    }
+                default:
+                    break
                 }
-                withAnimation(.easeInOut(duration: Consts.CookieAnimation.halfDuration).delay(Consts.CookieAnimation.secondPhaseDelay)) {
-                    // Fix: ignoring singular matrix
-                    scale = 0.001
-                    opacity = 0
-                    expandedOffset = -2
-                }
-            }
+            })
     }
     
     private func xPositionWithGeometry(_ proxy: GeometryProxy, isContracted: Bool) -> CGFloat {
@@ -175,13 +209,13 @@ struct DotView: View {
 extension Animation {
     static let expandDots = Animation.easeInOut(duration: 2.4)
 }
-
-struct CookieManagedNotificationView_Previews: PreviewProvider {
-    static var previews: some View {
-        CookieManagedNotificationView()
-            .frame(width: 148, height: 32)
-    }
-}
+#warning("Fix preview")
+//struct CookieManagedNotificationView_Previews: PreviewProvider {
+//    static var previews: some View {
+//        CookieManagedNotificationView()
+//            .frame(width: 148, height: 32)
+//    }
+//}
 
 private enum Consts {
     
