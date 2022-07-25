@@ -54,6 +54,7 @@ final class FirePopoverViewModel {
         self.fireproofDomains = fireproofDomains
         self.faviconManagement = faviconManagement
         self.clearingOption = initialClearingOption
+
         updateItems(for: initialClearingOption)
     }
 
@@ -62,6 +63,8 @@ final class FirePopoverViewModel {
             updateItems(for: clearingOption)
         }
     }
+
+    private(set) var shouldShowPinnedTabsInfo: Bool = false
 
     private let fireViewModel: FireViewModel
     private weak var tabCollectionViewModel: TabCollectionViewModel?
@@ -94,7 +97,11 @@ final class FirePopoverViewModel {
 
                 return tab.localHistory
             case .currentWindow:
-                return tabCollectionViewModel?.tabCollection.localHistory ?? Set<String>()
+                guard let tabCollectionViewModel = tabCollectionViewModel else {
+                    return []
+                }
+
+                return tabCollectionViewModel.tabCollection.localHistory.union(tabCollectionViewModel.pinnedTabsCollection.localHistory)
             case .allData:
                 return historyCoordinating.history?.visitedDomains ?? Set<String>()
             }
@@ -159,10 +166,20 @@ final class FirePopoverViewModel {
 
     @Published private(set) var areOtherTabsInfluenced = false
 
+    var hasPinnedTabs: Bool {
+        guard let tabCollectionViewModel = tabCollectionViewModel else {
+            return false
+        }
+        return !tabCollectionViewModel.pinnedTabsManager.tabCollection.tabs.isEmpty
+    }
+
     private func updateAreOtherTabsInfluenced() {
         let selectedTab = tabCollectionViewModel?.selectedTabViewModel?.tab
-        let allTabs = WindowControllersManager.shared.mainWindowControllers.flatMap {
+        var allTabs = WindowControllersManager.shared.mainWindowControllers.flatMap {
             $0.mainViewController.tabCollectionViewModel.tabCollection.tabs
+        }
+        if let pinnedTabs = tabCollectionViewModel?.pinnedTabsManager.tabCollection.tabs {
+            allTabs.append(contentsOf: pinnedTabs)
         }
         let otherTabs = allTabs.filter({ $0 != selectedTab })
 
@@ -180,11 +197,11 @@ final class FirePopoverViewModel {
         if clearingOption == .allData && areAllSelected {
             if let tabCollectionViewModel = tabCollectionViewModel {
                 // Burn everything
-                fireViewModel.fire.burnAll(tabCollectionViewModel: tabCollectionViewModel) { timedPixel.fire() }
+                fireViewModel.fire.burnAll(tabCollectionViewModel: tabCollectionViewModel, completion: { timedPixel.fire() })
             }
         } else {
             // Burn selected domains
-            fireViewModel.fire.burnDomains(selectedDomains) { timedPixel.fire() }
+            fireViewModel.fire.burnDomains(selectedDomains, completion: { timedPixel.fire() })
         }
     }
 

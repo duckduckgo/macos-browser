@@ -84,7 +84,7 @@ internal class FireproofDomains {
         return true
     }
 
-    func add(domain: String) {
+    func add(domain: String, notify: Bool = true) {
         dispatchPrecondition(condition: .onQueue(.main))
         guard !isFireproof(fireproofDomain: domain) else {
             // submodains also?
@@ -100,9 +100,11 @@ internal class FireproofDomains {
             return
         }
 
-        NotificationCenter.default.post(name: Constants.newFireproofDomainNotification, object: self, userInfo: [
-            Constants.newFireproofDomainKey: domainWithoutWWW
-        ])
+        if notify {
+            NotificationCenter.default.post(name: Constants.newFireproofDomainNotification, object: self, userInfo: [
+                Constants.newFireproofDomainKey: domainWithoutWWW
+            ])
+        }
     }
 
     func remove(domain: String) {

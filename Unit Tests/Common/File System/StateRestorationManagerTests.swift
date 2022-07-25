@@ -119,7 +119,6 @@ final class StateRestorationManagerTests: XCTestCase {
 
         XCTAssertEqual(state.val1, "lastSessionValue")
         XCTAssertEqual(state.val2, 42)
-        XCTAssertFalse(srm.canRestoreLastSessionState)
     }
 
     func testWhenLastSessionStateIsLoadedThenItIsNotDecrypted() {

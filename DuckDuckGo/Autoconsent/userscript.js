@@ -1,28 +1,17 @@
-import handleContentMessage from '@duckduckgo/autoconsent/lib/web/content'
+import AutoConsent from '@duckduckgo/autoconsent';
+import * as rules from '@duckduckgo/autoconsent/rules/rules.json';
 
-window.autoconsent = (payload) => {
-    return handleContentMessage(payload.message, false)
-}
-
-window.webkit.messageHandlers.autoconsentBackgroundMessage.postMessage(JSON.stringify({
-    type: 'webNavigation.onCommitted',
-    url: window.location.href
-}))
-
-const isMainDocument = window === window.top
-
-function onLoad() {
-    window.webkit.messageHandlers.autoconsentBackgroundMessage.postMessage(JSON.stringify({
-        type: 'webNavigation.onCompleted',
-        url: window.location.href
-    }))
-    if (isMainDocument) {
-        window.webkit.messageHandlers.autoconsentPageReady.postMessage(window.location.href)
-    }
-}
-
-if (document.readyState === 'loading') {
-    window.addEventListener('DOMContentLoaded', onLoad);
-} else {
-    onLoad();
+const autoconsent = new AutoConsent(
+    (message) => {
+        // console.log('sending', message);
+        window.webkit.messageHandlers[message.type].postMessage(message).then(resp => {
+            // console.log('received', resp);
+            autoconsent.receiveMessageCallback(resp);
+        });
+    },
+    null,
+    rules,
+);
+window.autoconsentMessageCallback = (msg) => {
+    autoconsent.receiveMessageCallback(msg);
 }

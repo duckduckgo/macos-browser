@@ -1,5 +1,6 @@
-import json from '@rollup/plugin-json'
-import { nodeResolve } from '@rollup/plugin-node-resolve'
+import json from '@rollup/plugin-json';
+import { terser } from "rollup-plugin-terser";
+import { nodeResolve } from '@rollup/plugin-node-resolve';
 
 export default [
     {
@@ -11,17 +12,9 @@ export default [
             }
         ],
         plugins: [
-            nodeResolve()
+            nodeResolve(),
+            json(),
+            terser(),
         ]
-    },
-    {
-        input: 'DuckDuckGo/Autoconsent/background.js',
-        output: [
-            {
-                file: 'DuckDuckGo/Autoconsent/background-bundle.js',
-                format: 'iife'
-            }
-        ],
-        plugins: [json(), nodeResolve()]
     }
 ]

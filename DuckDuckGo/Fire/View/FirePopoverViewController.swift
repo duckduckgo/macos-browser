@@ -52,6 +52,7 @@ final class FirePopoverViewController: NSViewController {
     @IBOutlet weak var collectionView: NSCollectionView!
     @IBOutlet weak var collectionViewBottomConstraint: NSLayoutConstraint!
     @IBOutlet weak var warningWrapperView: NSView!
+    @IBOutlet weak var warningButton: NSButton!
     @IBOutlet weak var clearButton: NSButton!
 
     private var viewModelCancellable: AnyCancellable?
@@ -126,6 +127,14 @@ final class FirePopoverViewController: NSViewController {
     private func updateWarningWrapperView() {
         warningWrapperView.isHidden = firePopoverViewModel.clearingOption == .allData ||
         !firePopoverViewModel.areOtherTabsInfluenced || detailsWrapperView.isHidden
+
+        if !warningWrapperView.isHidden {
+            if firePopoverViewModel.hasPinnedTabs {
+                warningButton.title = "   \(UserText.fireDialogAllUnpinnedTabsWillClose)"
+            } else {
+                warningButton.title = "   \(UserText.fireDialogAllTabsWillClose)"
+            }
+        }
 
         collectionViewBottomConstraint.constant = warningWrapperView.isHidden ? 0 : 32
     }
