@@ -19,41 +19,13 @@
 import Foundation
 import SwiftUI
 
-final class CookieNotificationAnimationModel: ObservableObject {
-    static let duration: CGFloat = 1.5
-    static let halfDuration = duration / 2
-    static let secondPhaseDelay = halfDuration
-    
-    enum AnimationState {
-        case unstarted
-        case firstPhase
-        case secondPhase
-    }
-    
-    @Published var state: AnimationState = .unstarted
-}
-
-final class BadgeNotificationAnimationModel: ObservableObject {
-    static let duration: CGFloat = 0.8
-    static let secondPhaseDelay = 3.0
-    
-    enum AnimationState {
-        case unstarted
-        case expanded
-        case retracted
-    }
-    
-    @Published var state: AnimationState = .unstarted
-}
-
 final class CookieManagedNotificationContainerView: NSView, NotificationBarViewAnimated {
     private let cookieAnimationModel = CookieNotificationAnimationModel()
     private let badgeAnimationModel = BadgeNotificationAnimationModel()
     
     private lazy var hostingView: NSHostingView<CookieManagedNotificationView> = {
-        let view = NSHostingView(rootView:
-                                    CookieManagedNotificationView(animationModel: cookieAnimationModel,
-                                                                  badgeAnimationModel: badgeAnimationModel))
+        let view = NSHostingView(rootView: CookieManagedNotificationView(animationModel: cookieAnimationModel,
+                                                                         badgeAnimationModel: badgeAnimationModel))
         view.frame = bounds
         return view
     }()
@@ -83,34 +55,28 @@ final class CookieManagedNotificationContainerView: NSView, NotificationBarViewA
         ])
     }
     
-    func startAnimation(_ completion: @escaping () -> Void) {
-        print("START!")
-        
-        DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
-            self.startCookieAnimation()
-            self.startBadgeAnimation()
-        }
-        
-        DispatchQueue.main.asyncAfter(deadline: .now() + 5.0) {
+    func startAnimation(_ completion: @escaping () -> Void) {        
+        let totalDuration = (badgeAnimationModel.duration * 2) + badgeAnimationModel.secondPhaseDelay
+
+        self.startCookieAnimation()
+        self.startBadgeAnimation()
+
+        DispatchQueue.main.asyncAfter(deadline: .now() + totalDuration) {
             completion()
         }
     }
     
     private func startBadgeAnimation() {
         badgeAnimationModel.state = .expanded
-        DispatchQueue.main.asyncAfter(deadline: .now() + BadgeNotificationAnimationModel.secondPhaseDelay) {
+        DispatchQueue.main.asyncAfter(deadline: .now() + badgeAnimationModel.secondPhaseDelay) {
             self.badgeAnimationModel.state = .retracted
         }
     }
     
     private func startCookieAnimation() {
         cookieAnimationModel.state = .firstPhase
-        DispatchQueue.main.asyncAfter(deadline: .now() + CookieNotificationAnimationModel.secondPhaseDelay) {
+        DispatchQueue.main.asyncAfter(deadline: .now() + cookieAnimationModel.secondPhaseDelay) {
             self.cookieAnimationModel.state = .secondPhase
         }
-    }
-    
-    deinit {
-        print("BUYE")
     }
 }

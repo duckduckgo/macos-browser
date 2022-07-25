@@ -42,7 +42,7 @@ final class NavigationBarBadgeAnimationView: NSView {
         animatedView = viewToAnimate
         setupConstraints()
         
-        animatedView?.startAnimation(completion)
+        self.animatedView?.startAnimation(completion)
     }
     
     func removeAnimation() {

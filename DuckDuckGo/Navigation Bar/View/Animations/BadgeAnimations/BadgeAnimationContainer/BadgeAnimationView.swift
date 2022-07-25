@@ -22,17 +22,12 @@ struct BadgeAnimationView: View {
     var animationModel: BadgeNotificationAnimationModel
     let iconView: AnyView
     let text: String
-    let animationDuration: CGFloat
-    let animationSecondPhaseDelay: CGFloat
-    
     @State var textOffset: CGFloat = -Consts.View.textScrollerOffset
     
     var body: some View {
         GeometryReader { geometry in
             ZStack {
-                ExpandableRectangle(animationModel: animationModel,
-                                    animationDuration: animationDuration,
-                                    animationSecondPhaseDelay: animationSecondPhaseDelay)
+                ExpandableRectangle(animationModel: animationModel)
                 .frame(width: geometry.size.width, height: geometry.size.height)
                 
                 HStack {
@@ -43,11 +38,11 @@ struct BadgeAnimationView: View {
                         .onReceive(animationModel.$state, perform: { state in
                             switch state {
                             case .expanded:
-                                withAnimation(.easeInOut(duration: animationDuration)) {
+                                withAnimation(.easeInOut(duration: animationModel.duration)) {
                                     textOffset = 0
                                 }
                             case .retracted:
-                                withAnimation(.easeInOut(duration: animationDuration)) {
+                                withAnimation(.easeInOut(duration: animationModel.duration)) {
                                     textOffset = -Consts.View.textScrollerOffset
                                 }
                             default:
@@ -81,8 +76,6 @@ struct BadgeAnimationView: View {
 struct ExpandableRectangle: View {
     @ObservedObject var animationModel: BadgeNotificationAnimationModel
     @State var width: CGFloat = 0
-    let animationDuration: CGFloat
-    let animationSecondPhaseDelay: CGFloat
 
     var body: some View {
         GeometryReader { geometry in
@@ -93,12 +86,12 @@ struct ExpandableRectangle: View {
                 .onReceive(animationModel.$state, perform: { state in
                     switch state {
                     case .expanded:
-                        withAnimation(.easeInOut(duration: animationDuration)) {
+                        withAnimation(.easeInOut(duration: animationModel.duration)) {
                             width = geometry.size.width - geometry.size.height
                         }
                         
                     case .retracted:
-                        withAnimation(.easeInOut(duration: animationDuration)) {
+                        withAnimation(.easeInOut(duration: animationModel.duration)) {
                                 width = 0
                         }
                     default:
@@ -109,20 +102,18 @@ struct ExpandableRectangle: View {
     }
 }
 
-#warning("fix preview")
-//struct BadgeAnimationView_Previews: PreviewProvider {
-//    static var previews: some View {
-//        if #available(macOS 11.0, *) {
-//            BadgeAnimationView(iconView: AnyView(Image(systemName: "globle")),
-//                               text: "Test",
-//                               animationDuration: 3,
-//                               animationSecondPhaseDelay: 1)
-//            .frame(width: 100, height: 30)
-//        } else {
-//            Text("No Preview")
-//        }
-//    }
-//}
+struct BadgeAnimationView_Previews: PreviewProvider {
+    static var previews: some View {
+        if #available(macOS 11.0, *) {
+            BadgeAnimationView(animationModel: BadgeNotificationAnimationModel(),
+                               iconView: AnyView(Image(systemName: "globle")),
+                                                 text: "Test")
+            .frame(width: 100, height: 30)
+        } else {
+            Text("No Preview")
+        }
+    }
+}
 
 private enum Consts {
     enum View {
