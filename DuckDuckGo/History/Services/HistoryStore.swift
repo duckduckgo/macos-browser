@@ -303,6 +303,8 @@ fileprivate extension HistoryEntry {
             Visit(visitMO: $0 as? VisitManagedObject)
         } ?? [])
 
+        assert(Dictionary(grouping: visits, by: \.date).filter({ $1.count > 1 }).isEmpty, "Duplicate of visit stored")
+
         self.init(identifier: identifier,
                   url: url,
                   title: title,
@@ -364,6 +366,7 @@ private extension Visit {
         }
         
         self.init(date: date)
+        savingState = .saved
     }
 
 }

@@ -19,7 +19,7 @@
 import Foundation
 import BrowserServicesKit
 
-final class HistoryEntry: Stored {
+final class HistoryEntry {
 
     init(identifier: UUID,
          url: URL,

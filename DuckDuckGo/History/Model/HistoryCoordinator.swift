@@ -332,7 +332,6 @@ final class HistoryCoordinator: HistoryCoordinating {
                 case .failure(let error):
                     os_log("Saving of history entry failed: %s", log: .history, type: .error, error.localizedDescription)
                 }
-                entry.savingState = .saved
             }, receiveValue: {})
             .store(in: &self.cancellables)
     }
