@@ -71,7 +71,13 @@ final class HistoryCoordinator: HistoryCoordinating {
 
     // Output
     var history: History? {
-        queue.sync { self.makeHistory(from: historyDictionary ?? [:]) }
+        queue.sync {
+            guard let historyDictionary = historyDictionary else {
+                return nil
+            }
+
+            return self.makeHistory(from: historyDictionary)
+        }
     }
 
     private var cancellables = Set<AnyCancellable>()
