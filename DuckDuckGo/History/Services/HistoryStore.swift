@@ -112,7 +112,7 @@ final class HistoryStore: HistoryStoring {
         fetchRequest.returnsObjectsAsFaults = false
         do {
             let historyEntries = try context.fetch(fetchRequest)
-            os_log("%d items loaded from history", log: .history, historyEntries.count)
+            os_log("%d entries loaded from history", log: .history, historyEntries.count)
             let history = History(historyEntries: historyEntries)
             return .success(history)
         } catch {
@@ -121,7 +121,7 @@ final class HistoryStore: HistoryStoring {
     }
 
     private func clean(_ context: NSManagedObjectContext, until date: Date) -> Result<Void, Error> {
-        // Clean using batch delete request
+        // Clean using batch delete requests
         let deleteRequest = NSFetchRequest<NSFetchRequestResult>(entityName: HistoryEntryManagedObject.className())
         deleteRequest.predicate = NSPredicate(format: "lastVisit < %@", date as NSDate)
         let batchDeleteRequest = NSBatchDeleteRequest(fetchRequest: deleteRequest)
@@ -132,7 +132,22 @@ final class HistoryStore: HistoryStoring {
             let deletedObjects = result?.result as? [NSManagedObjectID] ?? []
             let changes: [AnyHashable: Any] = [ NSDeletedObjectsKey: deletedObjects ]
             NSManagedObjectContext.mergeChanges(fromRemoteContextSave: changes, into: [context])
-            os_log("%d items cleaned from history", log: .history, deletedObjects.count)
+            os_log("%d entries cleaned from history", log: .history, deletedObjects.count)
+        } catch {
+            return .failure(error)
+        }
+
+        let visitDeleteRequest = NSFetchRequest<NSFetchRequestResult>(entityName: VisitManagedObject.className())
+        visitDeleteRequest.predicate = NSPredicate(format: "date < %@", date as NSDate)
+        let visitBatchDeleteRequest = NSBatchDeleteRequest(fetchRequest: visitDeleteRequest)
+        visitBatchDeleteRequest.resultType = .resultTypeObjectIDs
+
+        do {
+            let result = try context.execute(visitBatchDeleteRequest) as? NSBatchDeleteResult
+            let deletedObjects = result?.result as? [NSManagedObjectID] ?? []
+            let changes: [AnyHashable: Any] = [ NSDeletedObjectsKey: deletedObjects ]
+            NSManagedObjectContext.mergeChanges(fromRemoteContextSave: changes, into: [context])
+            os_log("%d visits cleaned from history", log: .history, deletedObjects.count)
             return .success(())
         } catch {
             return .failure(error)
