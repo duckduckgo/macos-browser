@@ -19,7 +19,6 @@
 import SwiftUI
 
 struct CookieConsentAnimationView<AnimationModel>: View where AnimationModel: CookieConsentAnimation {
-    
     @ObservedObject var animationModel: AnimationModel
     
     var body: some View {
@@ -30,17 +29,20 @@ struct CookieConsentAnimationView<AnimationModel>: View where AnimationModel: Co
                     .opacity(animationModel.pillsOpacity)
                     .scaleEffect(animationModel.pillsScale)
                     .offset(x: animationModel.pillLeftSideOffset)
-                
+                    .animation(.easeInOut(duration: animationModel.secondAnimationDuration))
+
                 Image("CookieConsentSketch")
                     .opacity(animationModel.imageOpacity)
                     .scaleEffect(animationModel.imageScale)
-                
+                    .animation(.easeInOut(duration: animationModel.firstAnimationDuration))
+
                 Image("CookieConsentSketchMarks")
                     .foregroundColor(Color("CookieConsentSketchMarksColor"))
                     .rotationEffect(.degrees(180))
                     .opacity(animationModel.pillsOpacity)
                     .scaleEffect(animationModel.pillsScale)
                     .offset(x: animationModel.pillRightSideOffset)
+                    .animation(.easeInOut(duration: animationModel.secondAnimationDuration))
             }
         }
     }
@@ -59,5 +61,7 @@ final class CookieConsentAnimationMock: CookieConsentAnimation {
     var pillsScale: CGFloat = 1
     var pillLeftSideOffset: CGFloat = 0
     var pillRightSideOffset: CGFloat = 0
+    var firstAnimationDuration: CGFloat = 0.7
+    var secondAnimationDuration: CGFloat = 0.5
     func startAnimation() { }
 }

@@ -26,7 +26,9 @@ protocol CookieConsentAnimation: ObservableObject {
     var pillsScale: CGFloat { get set}
     var pillLeftSideOffset: CGFloat { get set}
     var pillRightSideOffset: CGFloat { get set}
-    
+    var firstAnimationDuration: CGFloat { get }
+    var secondAnimationDuration: CGFloat { get }
+
     func startAnimation()
 }
 
@@ -74,12 +76,10 @@ final class CookieConsentAnimationModel: CookieConsentAnimation {
     }
     
     func startAnimation() {
-        withAnimation(.easeInOut(duration: firstAnimationDuration)) {
-            updateDataForFirstAnimation()
-        }
+        updateDataForFirstAnimation()
         
-        withAnimation(.easeInOut(duration: secondAnimationDuration).delay(firstAnimationDuration)) {
-            updateDataForSecondAnimation()
+        DispatchQueue.main.asyncAfter(deadline: .now() + firstAnimationDuration) {
+            self.updateDataForSecondAnimation()
         }
     }
 }
