@@ -100,6 +100,7 @@ final class HistoryStore: HistoryStoring {
                 NSManagedObjectContext.mergeChanges(fromRemoteContextSave: changes, into: [context])
                 os_log("%d items cleaned from history", log: .history, deletedObjects.count)
             } catch {
+                Pixel.fire(.debug(event: .historyRemoveFailed, error: error))
                 return .failure(error)
             }
         }
@@ -116,6 +117,7 @@ final class HistoryStore: HistoryStoring {
             let history = History(historyEntries: historyEntries)
             return .success(history)
         } catch {
+            Pixel.fire(.debug(event: .historyReloadFailed, error: error))
             return .failure(error)
         }
     }
@@ -134,6 +136,7 @@ final class HistoryStore: HistoryStoring {
             NSManagedObjectContext.mergeChanges(fromRemoteContextSave: changes, into: [context])
             os_log("%d entries cleaned from history", log: .history, deletedObjects.count)
         } catch {
+            Pixel.fire(.debug(event: .historyCleanEntriesFailed, error: error))
             return .failure(error)
         }
 
@@ -150,6 +153,7 @@ final class HistoryStore: HistoryStoring {
             os_log("%d visits cleaned from history", log: .history, deletedObjects.count)
             return .success(())
         } catch {
+            Pixel.fire(.debug(event: .historyCleanVisitsFailed, error: error))
             return .failure(error)
         }
     }
@@ -197,6 +201,7 @@ final class HistoryStore: HistoryStoring {
                 do {
                     try self.context.save()
                 } catch {
+                    Pixel.fire(.debug(event: .historyCleanEntriesFailed, error: error))
                     promise(.failure(HistoryStoreError.savingFailed))
                     return
                 }
@@ -230,6 +235,7 @@ final class HistoryStore: HistoryStoring {
                         context: NSManagedObjectContext) -> Result<Void, Error> {
         let insertedObject = NSEntityDescription.insertNewObject(forEntityName: VisitManagedObject.className(), into: context)
         guard let visitMO = insertedObject as? VisitManagedObject else {
+            Pixel.fire(.debug(event: .historyInsertVisitFailed))
             return .failure(HistoryStoreError.savingFailed)
         }
         visitMO.update(with: visit, historyEntryManagedObject: historyEntryManagedObject)
@@ -279,6 +285,7 @@ final class HistoryStore: HistoryStoring {
                 os_log("%d visits cleaned from history", log: .history, deletedObjects.count)
                 assert(deletedObjects.count >= visits.count, "Not all visits removed")
             } catch {
+                Pixel.fire(.debug(event: .historyRemoveVisitsFailed))
                 return .failure(error)
             }
         }
