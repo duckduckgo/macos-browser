@@ -54,6 +54,7 @@ final class MainWindowController: NSWindowController {
         setupToolbar()
         subscribeToTrafficLightsAlpha()
         subscribeToShouldPreventUserInteraction()
+        subscribeToResolutionChange()
     }
 
     required init?(coder: NSCoder) {
@@ -65,6 +66,24 @@ final class MainWindowController: NSWindowController {
         window?.setFrameAutosaveName(Self.windowFrameSaveName)
         
         NotificationCenter.default.addObserver(self, selector: #selector(dismissLockScreen), name: .macWaitlistLockScreenDidUnlock, object: nil)
+    }
+    
+    private func subscribeToResolutionChange() {
+        NotificationCenter.default.addObserver(forName: NSApplication.didChangeScreenParametersNotification,
+                                               object: NSApplication.shared,
+                                               queue: OperationQueue.main) { [weak self] _ in
+            self?.resizeWindowIfNeeded()
+        }
+    }
+    
+    private func resizeWindowIfNeeded() {
+        if let visibleWindowFrame = window?.screen?.visibleFrame,
+           let windowFrame = window?.frame {
+            
+            if windowFrame.width > visibleWindowFrame.width || windowFrame.height > visibleWindowFrame.height {
+                window?.performZoom(nil)
+            }
+        }
     }
     
     @objc
@@ -91,14 +110,15 @@ final class MainWindowController: NSWindowController {
         // slide tabs to the left in full screen
         trafficLightsAlphaCancellable = window?.standardWindowButton(.closeButton)?
             .publisher(for: \.alphaValue)
-            .map { alphaValue in TabBarViewController.HorizontalSpace.leadingStackViewPadding.rawValue * alphaValue }
-            .assign(to: \.constant, onWeaklyHeld: tabBarViewController.leadingStackViewLeadingConstraint)
+            .map { alphaValue in TabBarViewController.HorizontalSpace.pinnedTabsScrollViewPadding.rawValue * alphaValue }
+            .assign(to: \.constant, onWeaklyHeld: tabBarViewController.pinnedTabsViewLeadingConstraint)
     }
 
     private var shouldPreventUserInteractionCancellable: AnyCancellable?
     private func subscribeToShouldPreventUserInteraction() {
         shouldPreventUserInteractionCancellable = fireViewModel.shouldPreventUserInteraction
             .dropFirst()
+            .removeDuplicates()
             .sink(receiveValue: { [weak self] shouldPreventUserInteraction in
                 self?.moveTabBarView(toTitlebarView: !shouldPreventUserInteraction)
                 self?.userInteraction(prevented: shouldPreventUserInteraction)

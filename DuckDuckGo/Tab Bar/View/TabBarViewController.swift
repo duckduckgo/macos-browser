@@ -20,6 +20,7 @@ import Cocoa
 import os.log
 import Combine
 import Lottie
+import SwiftUI
 
 // swiftlint:disable file_length
 // swiftlint:disable type_body_length
@@ -27,14 +28,15 @@ import Lottie
 final class TabBarViewController: NSViewController {
 
     enum HorizontalSpace: CGFloat {
-        case leadingStackViewPadding = 76
+        case pinnedTabsScrollViewPadding = 76
         case button = 28
         case buttonPadding = 4
     }
 
+    @IBOutlet weak var pinnedTabsContainerView: NSView!
     @IBOutlet weak var collectionView: TabBarCollectionView!
     @IBOutlet weak var scrollView: TabBarScrollView!
-    @IBOutlet weak var leadingStackViewLeadingConstraint: NSLayoutConstraint!
+    @IBOutlet weak var pinnedTabsViewLeadingConstraint: NSLayoutConstraint!
     @IBOutlet weak var rightScrollButton: MouseOverButton!
     @IBOutlet weak var leftScrollButton: MouseOverButton!
     @IBOutlet weak var rightShadowImageView: NSImageView!
@@ -44,8 +46,12 @@ final class TabBarViewController: NSViewController {
     @IBOutlet weak var draggingSpace: NSView!
     @IBOutlet weak var windowDraggingViewLeadingConstraint: NSLayoutConstraint!
 
-    private let tabCollectionViewModel: TabCollectionViewModel
+    let tabCollectionViewModel: TabCollectionViewModel
+
     private let bookmarkManager: BookmarkManager = LocalBookmarkManager.shared
+    private let pinnedTabsViewModel: PinnedTabsViewModel
+    private let pinnedTabsView: PinnedTabsView
+    private let pinnedTabsHostingView: PinnedTabsHostingView
 
     private var tabsCancellable: AnyCancellable?
     private var selectionIndexCancellable: AnyCancellable?
@@ -57,6 +63,9 @@ final class TabBarViewController: NSViewController {
 
     init?(coder: NSCoder, tabCollectionViewModel: TabCollectionViewModel) {
         self.tabCollectionViewModel = tabCollectionViewModel
+        pinnedTabsViewModel = .init(collection: tabCollectionViewModel.pinnedTabsManager.tabCollection)
+        pinnedTabsView = .init(model: pinnedTabsViewModel)
+        pinnedTabsHostingView = .init(rootView: pinnedTabsView)
 
         super.init(coder: coder)
     }
@@ -68,6 +77,7 @@ final class TabBarViewController: NSViewController {
         observeToScrollNotifications()
         subscribeToSelectionIndex()
         setupFireButton()
+        setupPinnedTabsView()
     }
 
     override func viewWillAppear() {
@@ -76,6 +86,15 @@ final class TabBarViewController: NSViewController {
         updateEmptyTabArea()
         tabCollectionViewModel.delegate = self
         reloadSelection()
+
+        // Detect if tabs are clicked when the window is not in focus
+        // https://app.asana.com/0/1177771139624306/1202033879471339
+        addMouseMonitors()
+    }
+
+    override func viewWillDisappear() {
+        super.viewWillDisappear()
+        removeMouseMonitors()
     }
 
     override func viewDidLayout() {
@@ -112,8 +131,126 @@ final class TabBarViewController: NSViewController {
         fireButton.animationNames = MouseOverAnimationButton.AnimationNames(aqua: "flame-mouse-over", dark: "dark-flame-mouse-over")
     }
 
+    private func setupPinnedTabsView() {
+        layoutPinnedTabsView()
+        subscribeToPinnedTabsViewModel()
+    }
+
+    private func layoutPinnedTabsView() {
+        pinnedTabsHostingView.translatesAutoresizingMaskIntoConstraints = false
+        pinnedTabsContainerView.addSubview(pinnedTabsHostingView)
+
+        NSLayoutConstraint.activate([
+            pinnedTabsHostingView.leadingAnchor.constraint(equalTo: pinnedTabsContainerView.leadingAnchor),
+            pinnedTabsHostingView.topAnchor.constraint(lessThanOrEqualTo: pinnedTabsContainerView.topAnchor),
+            pinnedTabsHostingView.bottomAnchor.constraint(equalTo: pinnedTabsContainerView.bottomAnchor),
+            pinnedTabsHostingView.trailingAnchor.constraint(equalTo: pinnedTabsContainerView.trailingAnchor)
+        ])
+    }
+
+    private func subscribeToPinnedTabsViewModel() {
+        tabCollectionViewModel.$selectionIndex
+            .map { [weak self] selectedTabIndex -> Tab? in
+                switch selectedTabIndex {
+                case .pinned(let index):
+                    return self?.pinnedTabsViewModel.items[safe: index]
+                default:
+                    return nil
+                }
+            }
+            .assign(to: \.selectedItem, onWeaklyHeld: pinnedTabsViewModel)
+            .store(in: &cancellables)
+
+        Publishers.CombineLatest(tabCollectionViewModel.$selectionIndex, $tabMode)
+            .map { selectedTabIndex, tabMode -> Bool in
+                if case .unpinned(0) = selectedTabIndex, tabMode == .divided {
+                    return false
+                }
+                return true
+            }
+            .assign(to: \.shouldDrawLastItemSeparator, onWeaklyHeld: pinnedTabsViewModel)
+            .store(in: &cancellables)
+
+        pinnedTabsViewModel.tabsDidReorderPublisher
+            .sink { [weak self] tabs in
+                self?.tabCollectionViewModel.pinnedTabsManager.tabCollection.reorderTabs(tabs)
+            }
+            .store(in: &cancellables)
+
+        pinnedTabsViewModel.$selectedItemIndex.dropFirst().removeDuplicates()
+            .compactMap { $0 }
+            .sink { [weak self] index in
+                self?.deselectTabAndSelectPinnedTab(at: index)
+            }
+            .store(in: &cancellables)
+
+        pinnedTabsViewModel.$hoveredItemIndex.dropFirst().removeDuplicates()
+            .debounce(for: 0.05, scheduler: DispatchQueue.main)
+            .sink { [weak self] index in
+                self?.pinnedTabsViewDidUpdateHoveredItem(to: index)
+            }
+            .store(in: &cancellables)
+
+        pinnedTabsViewModel.contextMenuActionPublisher
+            .sink { [weak self] action in
+                self?.handlePinnedTabContextMenuAction(action)
+            }
+            .store(in: &cancellables)
+
+        pinnedTabsHostingView.middleClickPublisher
+            .compactMap { [weak self] in self?.pinnedTabsView.itemIndex(for: $0) }
+            .sink { [weak self] index in
+                self?.tabCollectionViewModel.remove(at: .pinned(index))
+            }
+            .store(in: &cancellables)
+    }
+
+    private func pinnedTabsViewDidUpdateHoveredItem(to index: Int?) {
+        if let index = index {
+            showPinnedTabPreview(at: index)
+        } else {
+            DispatchQueue.main.asyncAfter(deadline: .now() + 0.2) {
+                if self.view.isMouseLocationInsideBounds() == false {
+                    self.hideTabPreview()
+                }
+            }
+        }
+    }
+
+    private func deselectTabAndSelectPinnedTab(at index: Int) {
+        hideTabPreview()
+        if tabCollectionViewModel.selectionIndex != .pinned(index), tabCollectionViewModel.select(at: .pinned(index)) {
+            let previousSelection = collectionView.selectionIndexPaths
+            collectionView.clearSelection(animated: true)
+            collectionView.reloadItems(at: previousSelection)
+        }
+    }
+
+    private func handlePinnedTabContextMenuAction(_ action: PinnedTabsViewModel.ContextMenuAction) {
+        switch action {
+        case let .unpin(index):
+            tabCollectionViewModel.unpinTab(at: index)
+        case let .duplicate(index):
+            duplicateTab(at: .pinned(index))
+        case let .bookmark(tab):
+            guard let url = tab.url, let tabViewModel = tabCollectionViewModel.pinnedTabsManager.tabViewModels[tab] else {
+                os_log("TabBarViewController: Failed to get url from tab")
+                return
+            }
+            bookmarkTab(with: url, title: tabViewModel.title)
+        case let .fireproof(tab):
+            fireproof(tab)
+        case let .removeFireproofing(tab):
+            removeFireproofing(from: tab)
+        case let .close(index):
+            tabCollectionViewModel.remove(at: .pinned(index))
+        }
+    }
+
     private func reloadSelection() {
-        guard collectionView.selectionIndexPaths.first?.item != tabCollectionViewModel.selectionIndex else {
+        guard tabCollectionViewModel.selectionIndex?.isUnpinnedTab == true,
+              collectionView.selectionIndexPaths.first?.item != tabCollectionViewModel.selectionIndex?.item
+        else {
             collectionView.updateItemsLeftToSelectedItems()
             return
         }
@@ -127,11 +264,23 @@ final class TabBarViewController: NSViewController {
             collectionView.clearSelection()
         }
 
-        let newSelectionIndexPath = IndexPath(item: selectionIndex)
+        let newSelectionIndexPath = IndexPath(item: selectionIndex.item)
         if tabMode == .divided {
             collectionView.animator().selectItems(at: [newSelectionIndexPath], scrollPosition: .centeredHorizontally)
         } else {
             collectionView.selectItems(at: [newSelectionIndexPath], scrollPosition: .centeredHorizontally)
+        }
+    }
+    
+    private func selectTabWithPoint(_ point: NSPoint) {
+        let pointLocationOnPinnedTabsView = pinnedTabsHostingView.convert(point, from: view)
+        if let index = pinnedTabsView.itemIndex(for: pointLocationOnPinnedTabsView) {
+            tabCollectionViewModel.select(at: .pinned(index))
+        } else {
+            let pointLocationOnCollectionView = collectionView.convert(point, from: view)
+            if let indexPath = collectionView.indexPathForItem(at: pointLocationOnCollectionView) {
+                tabCollectionViewModel.select(at: .unpinned(indexPath.item))
+            }
         }
     }
 
@@ -191,19 +340,49 @@ final class TabBarViewController: NSViewController {
         }
 
         let tab = tabViewModel.tab
-        tabCollectionViewModel.remove(at: indexPath.item, published: false)
+        tabCollectionViewModel.remove(at: .unpinned(indexPath.item), published: false)
         WindowsManager.openNewWindow(with: tab, droppingPoint: droppingPoint)
+    }
+    
+    // MARK: - Mouse Monitor
+    
+    private var mouseDownMonitor: Any?
+
+    private func addMouseMonitors() {
+        guard mouseDownMonitor == nil else { return }
+        
+        mouseDownMonitor = NSEvent.addLocalMonitorForEvents(matching: .leftMouseDown) { [weak self] event in
+            self?.mouseDown(with: event)
+        }
+    }
+
+    private func removeMouseMonitors() {
+        if let monitor = mouseDownMonitor {
+            NSEvent.removeMonitor(monitor)
+        }
+        
+        mouseDownMonitor = nil
+    }
+    
+    func mouseDown(with event: NSEvent) -> NSEvent? {
+        if event.window === view.window,
+           view.window?.isMainWindow == false,
+           let point = view.mouseLocationInsideBounds(event.locationInWindow) {
+            selectTabWithPoint(point)
+        }
+        
+        return event
     }
 
     // MARK: - Tab Width
 
-    enum TabMode {
+    enum TabMode: Equatable {
         case divided
         case overflow
     }
 
     private var frozenLayout = false
-    private var tabMode = TabMode.divided
+    @Published private var tabMode = TabMode.divided
 
     private func updateTabMode(for numberOfItems: Int? = nil, updateLayout: Bool? = nil) {
         let items = CGFloat(numberOfItems ?? self.layoutNumberOfItems())
@@ -234,15 +413,10 @@ final class TabBarViewController: NSViewController {
     private var cachedLayoutNumberOfItems: Int?
     private func layoutNumberOfItems(removedIndex: Int? = nil) -> Int {
         let actualNumber = collectionView.numberOfItems(inSection: 0)
-        // don't cache number of items before removal when closing the last Tab
-        guard removedIndex ?? 0 < (actualNumber - 1) else {
-            self.cachedLayoutNumberOfItems = nil
-            return actualNumber
-        }
 
         guard let numberOfItems = self.cachedLayoutNumberOfItems,
               // skip updating number of items when closing not last Tab
-              numberOfItems > actualNumber,
+              actualNumber > 0 && numberOfItems > actualNumber,
               tabMode == .divided,
               self.view.isMouseLocationInsideBounds()
         else {
@@ -255,6 +429,10 @@ final class TabBarViewController: NSViewController {
 
     private func currentTabWidth(selected: Bool = false, removedIndex: Int? = nil) -> CGFloat {
         let numberOfItems = CGFloat(self.layoutNumberOfItems(removedIndex: removedIndex))
+        guard numberOfItems > 0 else {
+            return 0
+        }
+
         let tabsWidth = scrollView.bounds.width
         let minimumWidth = selected ? TabBarViewItem.Width.minimumSelected.rawValue : TabBarViewItem.Width.minimum.rawValue
 
@@ -320,32 +498,52 @@ final class TabBarViewController: NSViewController {
 
     // MARK: - Tab Preview
 
-    // swiftlint:disable force_cast
     private var tabPreviewWindowController: TabPreviewWindowController = {
         let storyboard = NSStoryboard(name: "TabPreview", bundle: nil)
+        // swiftlint:disable:next force_cast
         return storyboard.instantiateController(withIdentifier: "TabPreviewWindowController") as! TabPreviewWindowController
     }()
-    // swiftlint:enable force_cast
 
-    func showTabPreview(for tabBarViewItem: TabBarViewItem) {
+    private func showTabPreview(for tabBarViewItem: TabBarViewItem) {
         guard let indexPath = collectionView.indexPath(for: tabBarViewItem),
-              let tabViewModel = tabCollectionViewModel.tabViewModel(at: indexPath.item) else {
+              let tabViewModel = tabCollectionViewModel.tabViewModel(at: indexPath.item),
+              let clipView = collectionView.clipView
+        else {
+            os_log("TabBarViewController: Showing tab preview window failed", type: .error)
             return
         }
 
+        let position = scrollView.frame.minX + tabBarViewItem.view.frame.minX - clipView.bounds.origin.x
+        showTabPreview(for: tabViewModel, from: position, after: .init(from: tabBarViewItem.widthStage))
+    }
+
+    private func showPinnedTabPreview(at index: Int) {
+        guard let tabViewModel = tabCollectionViewModel.pinnedTabsManager.tabViewModel(at: index) else {
+            os_log("TabBarViewController: Showing pinned tab preview window failed", type: .error)
+            return
+        }
+
+        let position = pinnedTabsContainerView.frame.minX + PinnedTabView.Const.dimension * CGFloat(index)
+        showTabPreview(for: tabViewModel, from: position, after: .init(from: .withoutTitle))
+    }
+
+    private func showTabPreview(
+        for tabViewModel: TabViewModel,
+        from xPosition: CGFloat,
+        after interval: TabPreviewWindowController.TimerInterval
+    ) {
         tabPreviewWindowController.tabPreviewViewController.display(tabViewModel: tabViewModel)
 
-        guard let window = view.window, let clipView = collectionView.clipView else {
-            os_log("TabBarViewController: Showing of tab preview window failed", type: .error)
+        guard let window = view.window else {
+            os_log("TabBarViewController: Showing tab preview window failed", type: .error)
             return
         }
 
         var point = view.bounds.origin
         point.y -= TabPreviewWindowController.VerticalSpace.padding.rawValue
-        point.x += scrollView.frame.origin.x + tabBarViewItem.view.frame.origin.x - clipView.bounds.origin.x
+        point.x += xPosition
         let converted = window.convertPoint(toScreen: view.convert(point, to: nil))
-        let timerInterval = TabPreviewWindowController.TimerInterval(from: tabBarViewItem.widthStage)
-        tabPreviewWindowController.scheduleShowing(parentWindow: window, timerInterval: timerInterval, topLeftPoint: converted)
+        tabPreviewWindowController.scheduleShowing(parentWindow: window, timerInterval: interval, topLeftPoint: converted)
     }
 
     func hideTabPreview() {
@@ -370,6 +568,7 @@ extension TabBarViewController: TabCollectionViewModelDelegate {
         collectionView.animator().insertItems(at: indexPathSet)
         if selected {
             collectionView.selectItems(at: indexPathSet, scrollPosition: .centeredHorizontally)
+            collectionView.scrollToSelected()
         }
 
         updateTabMode()
@@ -490,6 +689,40 @@ extension TabBarViewController: TabCollectionViewModelDelegate {
         hideTabPreview()
     }
 
+    // MARK: - Tab Actions
+
+    private func duplicateTab(at tabIndex: TabIndex) {
+        if tabIndex.isUnpinnedTab {
+            collectionView.clearSelection()
+        }
+        tabCollectionViewModel.duplicateTab(at: tabIndex)
+    }
+
+    private func bookmarkTab(with url: URL, title: String) {
+        if !bookmarkManager.isUrlBookmarked(url: url) {
+            bookmarkManager.makeBookmark(for: url, title: title, isFavorite: false)
+            Pixel.fire(.bookmark(fireproofed: .init(url: url), source: .tabMenu))
+        }
+    }
+
+    private func fireproof(_ tab: Tab) {
+        guard let url = tab.url, let host = url.host else {
+            os_log("TabBarViewController: Failed to get url of tab bar view item", type: .error)
+            return
+        }
+
+        Pixel.fire(.fireproof(kind: .init(url: url), suggested: .manual))
+        FireproofDomains.shared.add(domain: host)
+    }
+
+    private func removeFireproofing(from tab: Tab) {
+        guard let host = tab.url?.host else {
+            os_log("TabBarViewController: Failed to get url of tab bar view item", type: .error)
+            return
+        }
+
+        FireproofDomains.shared.remove(domain: host)
+    }
 }
 
 extension TabBarViewController: NSCollectionViewDelegateFlowLayout {
@@ -497,7 +730,7 @@ extension TabBarViewController: NSCollectionViewDelegateFlowLayout {
     func collectionView(_ collectionView: NSCollectionView,
                         layout collectionViewLayout: NSCollectionViewLayout,
                         sizeForItemAt indexPath: IndexPath) -> NSSize {
-        var isItemSelected = tabCollectionViewModel.selectionIndex == indexPath.item
+        var isItemSelected = tabCollectionViewModel.selectionIndex == .unpinned(indexPath.item)
 
         if let draggingOverIndexPath = currentDraggingIndexPath {
             // Drag&drop in progress - the empty space is equal to the selected tab width
@@ -571,7 +804,7 @@ extension TabBarViewController: NSCollectionViewDelegate {
 
         if highlightState == .forSelection {
             self.collectionView.clearSelection()
-            tabCollectionViewModel.select(at: indexPath.item)
+            tabCollectionViewModel.select(at: .unpinned(indexPath.item))
 
             // Poor old NSCollectionView
             DispatchQueue.main.async {
@@ -708,8 +941,26 @@ extension TabBarViewController: TabBarViewItemDelegate {
             return
         }
 
+        duplicateTab(at: .unpinned(indexPath.item))
+    }
+
+    func tabBarViewItemCanBePinned(_ tabBarViewItem: TabBarViewItem) -> Bool {
+        guard let indexPath = collectionView.indexPath(for: tabBarViewItem) else {
+            os_log("TabBarViewController: Failed to get index path of tab bar view item", type: .error)
+            return false
+        }
+
+        return tabCollectionViewModel.tabViewModel(at: indexPath.item)?.tab.isUrl ?? false
+    }
+
+    func tabBarViewItemPinAction(_ tabBarViewItem: TabBarViewItem) {
+        guard let indexPath = collectionView.indexPath(for: tabBarViewItem) else {
+            os_log("TabBarViewController: Failed to get index path of tab bar view item", type: .error)
+            return
+        }
+
         collectionView.clearSelection()
-        tabCollectionViewModel.duplicateTab(at: indexPath.item)
+        tabCollectionViewModel.pinTab(at: indexPath.item)
     }
 
     func tabBarViewItemBookmarkThisPageAction(_ tabBarViewItem: TabBarViewItem) {
@@ -720,10 +971,7 @@ extension TabBarViewController: TabBarViewItemDelegate {
             return
         }
 
-        if !bookmarkManager.isUrlBookmarked(url: url) {
-            bookmarkManager.makeBookmark(for: url, title: tabViewModel.title, isFavorite: false)
-            Pixel.fire(.bookmark(fireproofed: .init(url: url), source: .tabMenu))
-        }
+        bookmarkTab(with: url, title: tabViewModel.title)
     }
 
     func tabBarViewItemCloseAction(_ tabBarViewItem: TabBarViewItem) {
@@ -732,7 +980,7 @@ extension TabBarViewController: TabBarViewItemDelegate {
             return
         }
 
-        tabCollectionViewModel.remove(at: indexPath.item)
+        tabCollectionViewModel.remove(at: .unpinned(indexPath.item))
     }
 
     func tabBarViewItemTogglePermissionAction(_ tabBarViewItem: TabBarViewItem) {
@@ -781,29 +1029,24 @@ extension TabBarViewController: TabBarViewItemDelegate {
 
     func tabBarViewItemFireproofSite(_ tabBarViewItem: TabBarViewItem) {
         guard let indexPath = collectionView.indexPath(for: tabBarViewItem),
-              let tabViewModel = tabCollectionViewModel.tabViewModel(at: indexPath.item),
-              let url = tabViewModel.tab.content.url,
-              let host = url.host
+              let tab = tabCollectionViewModel.tabCollection.tabs[safe: indexPath.item]
         else {
-            os_log("TabBarViewController: Failed to get url of tab bar view item", type: .error)
+            os_log("TabBarViewController: Failed to get tab from tab bar view item", type: .error)
             return
         }
 
-        Pixel.fire(.fireproof(kind: .init(url: url), suggested: .manual))
-        FireproofDomains.shared.add(domain: host)
+        fireproof(tab)
     }
 
     func tabBarViewItemRemoveFireproofing(_ tabBarViewItem: TabBarViewItem) {
         guard let indexPath = collectionView.indexPath(for: tabBarViewItem),
-              let tabViewModel = tabCollectionViewModel.tabViewModel(at: indexPath.item),
-              let url = tabViewModel.tab.content.url,
-              let host = url.host
+              let tab = tabCollectionViewModel.tabCollection.tabs[safe: indexPath.item]
         else {
-            os_log("TabBarViewController: Failed to get url of tab bar view item", type: .error)
+            os_log("TabBarViewController: Failed to get tab from tab bar view item", type: .error)
             return
         }
 
-        FireproofDomains.shared.remove(domain: host)
+        removeFireproofing(from: tab)
     }
 
     func otherTabBarViewItemsState(for tabBarViewItem: TabBarViewItem) -> OtherTabBarViewItemsState {

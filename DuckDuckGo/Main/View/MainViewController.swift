@@ -93,6 +93,7 @@ final class MainViewController: NSViewController {
         updateForwardMenuItem()
         updateReloadMenuItem()
         updateStopMenuItem()
+        browserTabViewController.windowDidBecomeKey()
     }
 
     func windowDidResignKey() {
@@ -328,6 +329,7 @@ final class MainViewController: NSViewController {
         adjustFirstResponder()
     }
 
+    private(set) var isHandlingKeyDownEvent: Bool = false
 }
 
 // MARK: - Mouse & Keyboard Events
@@ -352,6 +354,10 @@ extension MainViewController {
     }
 
     func customKeyDown(with event: NSEvent) -> Bool {
+        isHandlingKeyDownEvent = true
+        defer {
+            isHandlingKeyDownEvent = false
+        }
        guard let locWindow = self.view.window,
           NSApplication.shared.keyWindow === locWindow else { return false }
 

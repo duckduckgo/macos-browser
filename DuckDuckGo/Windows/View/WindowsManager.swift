@@ -36,7 +36,8 @@ final class WindowsManager {
                              droppingPoint: NSPoint? = nil,
                              contentSize: NSSize? = nil,
                              showWindow: Bool = true,
-                             popUp: Bool = false) -> MainWindow? {
+                             popUp: Bool = false,
+                             lazyLoadTabs: Bool = false) -> MainWindow? {
         let mainWindowController = makeNewWindow(tabCollectionViewModel: tabCollectionViewModel, popUp: popUp)
 
         if let droppingPoint = droppingPoint {
@@ -51,6 +52,10 @@ final class WindowsManager {
             mainWindowController.showWindow(self)
         } else {
             mainWindowController.orderWindowBack(self)
+        }
+
+        if lazyLoadTabs {
+            mainWindowController.mainViewController.tabCollectionViewModel.setUpLazyLoadingIfNeeded()
         }
 
         return mainWindowController.window as? MainWindow

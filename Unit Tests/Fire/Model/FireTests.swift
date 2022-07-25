@@ -36,7 +36,7 @@ final class FireTests: XCTestCase {
                         historyCoordinating: historyCoordinator,
                         permissionManager: permissionManager,
                         faviconManagement: faviconManager)
-        let tabCollectionViewModel = TabCollectionViewModel.aTabCollectionViewModel
+        let tabCollectionViewModel = TabCollectionViewModel.makeTabCollectionViewModel()
 
         let burningExpectation = expectation(description: "Burning")
         fire.burnAll(tabCollectionViewModel: tabCollectionViewModel) {
@@ -47,6 +47,38 @@ final class FireTests: XCTestCase {
 
         XCTAssertEqual(tabCollectionViewModel.tabCollection.tabs.count, 1)
         XCTAssertEqual(tabCollectionViewModel.tabCollection.tabs.first?.content, .homePage)
+    }
+
+    func testWhenBurnAllThenPinnedTabsArePersisted() {
+        let manager = WebCacheManagerMock()
+        let historyCoordinator = HistoryCoordinatingMock()
+        let permissionManager = PermissionManagerMock()
+        let faviconManager = FaviconManagerMock()
+
+        let pinnedTabs: [Tab] = [
+            .init(content: .url("https://duck.com".url!)),
+            .init(content: .url("https://spreadprivacy.com".url!)),
+            .init(content: .url("https://wikipedia.org".url!))
+        ]
+        let pinnedTabsManager = PinnedTabsManager(tabCollection: .init(tabs: pinnedTabs))
+
+        let fire = Fire(cacheManager: manager,
+                        historyCoordinating: historyCoordinator,
+                        permissionManager: permissionManager,
+                        faviconManagement: faviconManager,
+                        pinnedTabsManager: pinnedTabsManager)
+        let tabCollectionViewModel = TabCollectionViewModel.makeTabCollectionViewModel(with: pinnedTabsManager)
+
+        let burningExpectation = expectation(description: "Burning")
+        fire.burnAll(tabCollectionViewModel: tabCollectionViewModel) {
+            burningExpectation.fulfill()
+        }
+
+        waitForExpectations(timeout: 5, handler: nil)
+
+        XCTAssertEqual(tabCollectionViewModel.tabCollection.tabs.count, 1)
+        XCTAssertEqual(tabCollectionViewModel.tabCollection.tabs.first?.content, .homePage)
+        XCTAssertEqual(pinnedTabsManager.tabCollection.tabs.map(\.content.url), pinnedTabs.map(\.content.url))
     }
 
     func testWhenBurnAll_ThenAllWebsiteDataAreRemoved() {
@@ -61,7 +93,7 @@ final class FireTests: XCTestCase {
                         permissionManager: permissionManager,
                         faviconManagement: faviconManager,
                         recentlyClosedCoordinator: recentlyClosedCoordinator)
-        let tabCollectionViewModel = TabCollectionViewModel.aTabCollectionViewModel
+        let tabCollectionViewModel = TabCollectionViewModel.makeTabCollectionViewModel()
 
         let finishedBurningExpectation = expectation(description: "Finished burning")
         fire.burnAll(tabCollectionViewModel: tabCollectionViewModel) {
@@ -86,7 +118,7 @@ final class FireTests: XCTestCase {
                         permissionManager: permissionManager,
                         faviconManagement: faviconManager)
 
-        let tabCollectionViewModel = TabCollectionViewModel.aTabCollectionViewModel
+        let tabCollectionViewModel = TabCollectionViewModel.makeTabCollectionViewModel()
 
         let isBurningExpectation = expectation(description: "Burning")
         let finishedBurningExpectation = expectation(description: "Finished burning")
@@ -114,7 +146,7 @@ final class FireTests: XCTestCase {
         let fire = Fire(stateRestorationManager: appStateRestorationManager)
 
         XCTAssertTrue(appStateRestorationManager.canRestoreLastSessionState)
-        fire.burnAll(tabCollectionViewModel: .aTabCollectionViewModel)
+        fire.burnAll(tabCollectionViewModel: .makeTabCollectionViewModel())
         XCTAssertFalse(appStateRestorationManager.canRestoreLastSessionState)
     }
 
@@ -148,8 +180,11 @@ final class FireTests: XCTestCase {
 
 fileprivate extension TabCollectionViewModel {
 
-    static var aTabCollectionViewModel: TabCollectionViewModel {
-        let tabCollectionViewModel = TabCollectionViewModel()
+    static func makeTabCollectionViewModel(
+        with pinnedTabsManager: PinnedTabsManager = WindowControllersManager.shared.pinnedTabsManager
+    ) -> TabCollectionViewModel {
+
+        let tabCollectionViewModel = TabCollectionViewModel(tabCollection: .init(), pinnedTabsManager: pinnedTabsManager)
         tabCollectionViewModel.appendNewTab()
         tabCollectionViewModel.appendNewTab()
         return tabCollectionViewModel

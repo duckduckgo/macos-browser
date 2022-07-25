@@ -31,11 +31,14 @@ protocol TabBarViewItemDelegate: AnyObject {
 
     func tabBarViewItem(_ tabBarViewItem: TabBarViewItem, isMouseOver: Bool)
 
+    func tabBarViewItemCanBePinned(_ tabBarViewItem: TabBarViewItem) -> Bool
+
     func tabBarViewItemCloseAction(_ tabBarViewItem: TabBarViewItem)
     func tabBarViewItemTogglePermissionAction(_ tabBarViewItem: TabBarViewItem)
     func tabBarViewItemCloseOtherAction(_ tabBarViewItem: TabBarViewItem)
     func tabBarViewItemCloseToTheRightAction(_ tabBarViewItem: TabBarViewItem)
     func tabBarViewItemDuplicateAction(_ tabBarViewItem: TabBarViewItem)
+    func tabBarViewItemPinAction(_ tabBarViewItem: TabBarViewItem)
     func tabBarViewItemBookmarkThisPageAction(_ tabBarViewItem: TabBarViewItem)
     func tabBarViewItemMoveToNewWindowAction(_ tabBarViewItem: TabBarViewItem)
     func tabBarViewItemFireproofSite(_ tabBarViewItem: TabBarViewItem)
@@ -151,6 +154,10 @@ final class TabBarViewItem: NSCollectionViewItem {
 
     @objc func duplicateAction(_ sender: NSButton) {
         delegate?.tabBarViewItemDuplicateAction(self)
+    }
+
+    @objc func pinAction(_ sender: NSButton) {
+        delegate?.tabBarViewItemPinAction(self)
     }
 
     @objc func fireproofSiteAction(_ sender: NSButton) {
@@ -296,6 +303,7 @@ final class TabBarViewItem: NSCollectionViewItem {
     private func setupMenu() {
         let menu = NSMenu()
         menu.delegate = self
+        menu.autoenablesItems = false
         view.menu = menu
     }
 
@@ -328,6 +336,11 @@ extension TabBarViewItem: NSMenuDelegate {
         let duplicateMenuItem = NSMenuItem(title: UserText.duplicateTab, action: #selector(duplicateAction(_:)), keyEquivalent: "")
         duplicateMenuItem.target = self
         menu.addItem(duplicateMenuItem)
+
+        let pinMenuItem = NSMenuItem(title: UserText.pinTab, action: #selector(pinAction(_:)), keyEquivalent: "")
+        pinMenuItem.target = self
+        pinMenuItem.isEnabled = delegate?.tabBarViewItemCanBePinned(self) ?? false
+        menu.addItem(pinMenuItem)
 
         menu.addItem(NSMenuItem.separator())
 

@@ -44,6 +44,7 @@ final class WindowManagerStateRestorationTests: XCTestCase {
 
     // MARK: -
 
+    // swiftlint:disable:next function_body_length
     func testWindowManagerStateRestoration() throws {
         let tabs1 = [
             Tab(content: .url(URL(string: "https://duckduckgo.com")!),
@@ -64,7 +65,16 @@ final class WindowManagerStateRestorationTests: XCTestCase {
                 error: nil,
                 sessionStateData: "data 3".data(using: .utf8)!)
         ]
+        let pinnedTabs = [
+            Tab(content: .url(URL(string: "https://duck.com")!)),
+            Tab(content: .url(URL(string: "https://wikipedia.org")!)),
+            Tab(content: .url(URL(string: "https://duckduckgo.com/?q=search_in_pinned_tab&t=osx&ia=web")!),
+                title: "DDG search",
+                error: nil,
+                sessionStateData: "data 4".data(using: .utf8)!)
+        ]
 
+        WindowControllersManager.shared.pinnedTabsManager.setUp(with: .init(tabs: pinnedTabs))
         let model1 = TabCollectionViewModel(tabCollection: TabCollection(tabs: tabs1), selectionIndex: 0)
         let model2 = TabCollectionViewModel(tabCollection: TabCollection(tabs: tabs2), selectionIndex: 2)
         WindowsManager.openNewWindow(with: model1)
@@ -81,12 +91,14 @@ final class WindowManagerStateRestorationTests: XCTestCase {
             return XCTFail("Could not unarchive WindowManagerStateRestoration")
         }
 
+        XCTAssertTrue(areTabsEqual(restored.pinnedTabs!.tabs, pinnedTabs))
         XCTAssertEqual(restored.windows.count, 2)
         XCTAssertEqual(restored.keyWindowIndex, 1)
         for (idx, window) in state.windows.enumerated() {
             XCTAssertTrue(areTabCollectionViewModelsEqual(window.model,
                                                           state.windows[idx].model))
             XCTAssertEqual(window.frame, state.windows[idx].frame)
+            XCTAssertEqual(window.model.pinnedTabs, pinnedTabs)
         }
     }
 
