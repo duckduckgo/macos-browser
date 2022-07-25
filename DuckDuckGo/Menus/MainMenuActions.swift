@@ -16,8 +16,6 @@
 //  limitations under the License.
 //
 
-// swiftlint:disable file_length
-
 import Cocoa
 import os.log
 import BrowserServicesKit

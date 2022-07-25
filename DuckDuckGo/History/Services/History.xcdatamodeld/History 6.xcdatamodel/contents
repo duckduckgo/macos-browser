@@ -10,11 +10,11 @@
         <attribute name="titleEncrypted" optional="YES" attributeType="Transformable" valueTransformerName="NSStringTransformer"/>
         <attribute name="trackersFound" optional="YES" attributeType="Boolean" usesScalarValueType="YES"/>
         <attribute name="urlEncrypted" attributeType="Transformable" valueTransformerName="NSURLTransformer"/>
-        <relationship name="visits" toMany="YES" deletionRule="Cascade" destinationEntity="VisitManagedObject" inverseName="historyEntry" inverseEntity="VisitManagedObject"/>
+        <relationship name="visits" optional="YES" toMany="YES" deletionRule="Cascade" destinationEntity="VisitManagedObject" inverseName="historyEntry" inverseEntity="VisitManagedObject"/>
     </entity>
     <entity name="VisitManagedObject" representedClassName="VisitManagedObject" syncable="YES" codeGenerationType="class">
         <attribute name="date" attributeType="Date" usesScalarValueType="NO"/>
-        <relationship name="historyEntry" maxCount="1" deletionRule="No Action" destinationEntity="HistoryEntryManagedObject" inverseName="visits" inverseEntity="HistoryEntryManagedObject"/>
+        <relationship name="historyEntry" maxCount="1" deletionRule="Nullify" destinationEntity="HistoryEntryManagedObject" inverseName="visits" inverseEntity="HistoryEntryManagedObject"/>
     </entity>
     <elements>
         <element name="HistoryEntryManagedObject" positionX="-63" positionY="-18" width="128" height="179"/>

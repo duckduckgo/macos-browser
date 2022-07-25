@@ -40,6 +40,7 @@ protocol HistoryCoordinating: AnyObject {
 
 }
 
+// swiftlint:disable type_body_length
 /// Coordinates access to History. Uses its own queue with high qos for all operations.
 final class HistoryCoordinator: HistoryCoordinating {
 
@@ -165,7 +166,9 @@ final class HistoryCoordinator: HistoryCoordinating {
             guard let self = self, let historyDictionary = self.historyDictionary else { return }
 
             let entries: [HistoryEntry] = historyDictionary.values.filter { historyEntry in
-                return !fireproofDomains.isURLFireproof(url: historyEntry.url)
+                return DispatchQueue.main.sync {
+                    !fireproofDomains.isURLFireproof(url: historyEntry.url)
+                }
             }
 
             self.removeEntries(entries, completionHandler: { _ in

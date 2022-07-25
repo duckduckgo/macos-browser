@@ -74,6 +74,7 @@ final class TabDataCleaner: NSObject, WKNavigationDelegate {
     }
 }
 
+// swiftlint:disable type_body_length
 final class Fire {
 
     // Drop www prefixes to produce list of burning domains
@@ -137,6 +138,7 @@ final class Fire {
         }
     }
 
+    // swiftlint:disable function_body_length
     func burnDomains(_ domains: Set<String>,
                      includingHistory: Bool = true,
                      completion: (() -> Void)? = nil) {
@@ -216,6 +218,7 @@ final class Fire {
             }
         }
     }
+    // swiftlint:enable function_body_length
 
     func burnAll(tabCollectionViewModel: TabCollectionViewModel, completion: (() -> Void)? = nil) {
         os_log("Fire started", log: .fire)
