@@ -27,27 +27,6 @@ struct CookieManagedNotificationView: View {
     }
 }
 
-struct ExpandableRectangle: View {
-    @State var width: CGFloat = 0
-    var body: some View {
-        GeometryReader { geometry in
-            Rectangle()
-                .fill(Consts.Colors.badgeBackgroundColor)
-                .cornerRadius(Consts.Layout.cornerRadius)
-                .frame(width: geometry.size.height + width, height: geometry.size.height)
-                .onAppear {
-                    withAnimation(.easeInOut(duration: Consts.BadgeAnimation.duration)) {
-                        width = geometry.size.width - geometry.size.height
-                    }
-                    
-                    withAnimation(.easeInOut(duration: Consts.BadgeAnimation.duration).delay(Consts.BadgeAnimation.secondPhaseDelay)) {
-                            width = 0
-                    }
-                }
-        }
-    }
-}
-
 struct CookieAnimationView: View {
     @State var cookieAlpha: CGFloat = 1
     @State var bittenCookieAlpha: CGFloat = 0
@@ -84,13 +63,6 @@ struct CookieAnimationView: View {
                 cookieAlpha = 0
                 bittenCookieAlpha = 1
             }
-        }
-    }
-    
-    func startAnimation() {
-        withAnimation(.easeInOut(duration: Consts.CookieAnimation.duration)) {
-            cookieAlpha = 0
-            bittenCookieAlpha = 1
         }
     }
 }

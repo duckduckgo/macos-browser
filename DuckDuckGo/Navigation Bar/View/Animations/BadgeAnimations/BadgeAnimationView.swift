@@ -29,7 +29,8 @@ struct BadgeAnimationView: View {
     var body: some View {
         GeometryReader { geometry in
             ZStack {
-                ExpandableRectangle()
+                ExpandableRectangle(animationDuration: animationDuration,
+                                    animationSecondPhaseDelay: animationSecondPhaseDelay)
                     .frame(width: geometry.size.width, height: geometry.size.height)
                 
                 HStack {
@@ -69,6 +70,31 @@ struct BadgeAnimationView: View {
     }
 }
 
+
+struct ExpandableRectangle: View {
+    @State var width: CGFloat = 0
+    let animationDuration: CGFloat
+    let animationSecondPhaseDelay: CGFloat
+
+    var body: some View {
+        GeometryReader { geometry in
+            Rectangle()
+                .fill(Consts.Colors.badgeBackgroundColor)
+                .cornerRadius(Consts.View.cornerRadius)
+                .frame(width: geometry.size.height + width, height: geometry.size.height)
+                .onAppear {
+                    withAnimation(.easeInOut(duration: animationDuration)) {
+                        width = geometry.size.width - geometry.size.height
+                    }
+                    
+                    withAnimation(.easeInOut(duration: animationDuration).delay(animationSecondPhaseDelay)) {
+                            width = 0
+                    }
+                }
+        }
+    }
+}
+
 struct BadgeAnimationView_Previews: PreviewProvider {
     static var previews: some View {
         if #available(macOS 11.0, *) {
@@ -93,4 +119,5 @@ private enum Consts {
     enum Colors {
         static let badgeBackgroundColor = Color("URLNotificationBadgeBackground")
     }
+    
 }

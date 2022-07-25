@@ -190,9 +190,11 @@ final class AddressBarButtonsViewController: NSViewController {
     }
     
     func showNotification(_ type: NavigationBarBadgeAnimationView.AnimationType) {
-        buttonsBadgeAnimator.showNotification(withType: .cookieManaged,
-                                              buttonsContainer: buttonsContainer,
-                                              and: notificationAnimationView)
+        if !isAnyShieldAnimationPlaying {
+            buttonsBadgeAnimator.showNotification(withType: .cookieManaged,
+                                                  buttonsContainer: buttonsContainer,
+                                                  and: notificationAnimationView)
+        }
     }
 
     var mouseEnterExitTrackingArea: NSTrackingArea?
