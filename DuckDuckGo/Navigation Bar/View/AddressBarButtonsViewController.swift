@@ -156,7 +156,7 @@ final class AddressBarButtonsViewController: NSViewController {
     private var permissionsCancellables = Set<AnyCancellable>()
     private var trackerAnimationTriggerCancellable: AnyCancellable?
     private var isMouseOverAnimationVisibleCancellable: AnyCancellable?
-    private lazy var buttonsBadgeAnimator = AddressBarButtonsBadgeAnimator()
+    private lazy var buttonsBadgeAnimator = NavigationBarBadgeAnimator()
     
     required init?(coder: NSCoder) {
         fatalError("AddressBarButtonsViewController: Bad initializer")
@@ -194,6 +194,14 @@ final class AddressBarButtonsViewController: NSViewController {
             buttonsBadgeAnimator.showNotification(withType: .cookieManaged,
                                                   buttonsContainer: buttonsContainer,
                                                   and: notificationAnimationView)
+        } else {
+            buttonsBadgeAnimator.queuedAnimation = type
+        }
+    }
+    
+    private func playBadgeAnimationIfNecessary() {
+        if let queuedNotification = buttonsBadgeAnimator.queuedAnimation {
+            showNotification(queuedNotification)
         }
     }
 
@@ -785,13 +793,14 @@ final class AddressBarButtonsViewController: NSViewController {
                 trackerAnimationView?.isHidden = true
                 self?.updatePrivacyEntryPointIcon()
                 self?.updatePermissionButtons()
+                self?.playBadgeAnimationIfNecessary()
             }
         }
 
         updatePrivacyEntryPointIcon()
         updatePermissionButtons()
     }
-    
+
     private func closePopover() {
         privacyDashboardPopover.close()
     }
@@ -813,8 +822,12 @@ final class AddressBarButtonsViewController: NSViewController {
             stopAnimation(shieldAnimationView)
             stopAnimation(shieldDotAnimationView)
         }
-        
+        stopNotificationBadgeAnimations()
+    }
+    
+    private func stopNotificationBadgeAnimations() {
         notificationAnimationView.removeAnimation()
+        buttonsBadgeAnimator.queuedAnimation = nil
     }
 
     private var isAnyTrackerAnimationPlaying: Bool {

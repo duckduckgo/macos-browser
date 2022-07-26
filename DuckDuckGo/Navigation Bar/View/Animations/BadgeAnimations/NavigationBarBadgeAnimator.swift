@@ -18,12 +18,14 @@
 
 import Cocoa
 
-final class AddressBarButtonsBadgeAnimator: NSObject {
+final class NavigationBarBadgeAnimator: NSObject {
+    var queuedAnimation: NavigationBarBadgeAnimationView.AnimationType?
     private var animationID: UUID?
 
     func showNotification(withType type: NavigationBarBadgeAnimationView.AnimationType,
                           buttonsContainer: NSView,
                           and notificationBadgeContainer: NavigationBarBadgeAnimationView) {
+        queuedAnimation = nil
         
         let animationDuration: CGFloat = 0.5
         let newAnimationID = UUID()
