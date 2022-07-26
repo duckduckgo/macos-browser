@@ -63,6 +63,29 @@ final class DarkReaderScriptSettings {
         }
     }
     
+    private var defaultAppearanceSettings: String {
+        return """
+            {
+                brightness: 100,
+                contrast: 90,
+                sepia: 10
+            }
+        """
+    }
+    
+    func appearanceSettingsJSON() -> String {
+        let settings = DarkReaderAppearanceSettings(brightness: brightness, contrast: contrast, sepia: sepia)
+        return (try? JSONEncoder().encode(settings).utf8String()) ?? defaultAppearanceSettings
+    }
+    
+}
+
+private struct DarkReaderAppearanceSettings: Encodable {
+    
+    let brightness: Int
+    let contrast: Int
+    let sepia: Int
+    
 }
 
 extension NSNotification.Name {

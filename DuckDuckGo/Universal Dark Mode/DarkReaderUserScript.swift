@@ -47,21 +47,9 @@ final class DarkReaderUserScript: NSObject, StaticUserScript {
     private func generateDarkReaderCall(from settings: DarkReaderScriptSettings) -> String {
         switch settings.status {
         case .auto:
-            return """
-                DarkReader.auto({
-                    brightness: 100,
-                    contrast: 90,
-                    sepia: 10
-                });
-            """
+            return "DarkReader.auto(\(settings.appearanceSettingsJSON()));"
         case .enabled:
-            return """
-                DarkReader.enable({
-                    brightness: 100,
-                    contrast: 90,
-                    sepia: 10
-                });
-            """
+            return "DarkReader.enable(\(settings.appearanceSettingsJSON()));"
         case .disabled:
             return "DarkReader.disable()"
         }
