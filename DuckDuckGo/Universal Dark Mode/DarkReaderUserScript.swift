@@ -28,29 +28,13 @@ final class DarkReaderUserScript: NSObject, StaticUserScript {
     var messageNames: [String] { [""] }
 
     func userContentController(_ userContentController: WKUserContentController, didReceive message: WKScriptMessage) {
-        guard let dict = message.body as? [String: Any] else { return }
-
-        print("Got Dark Reader script message: \(dict)")
+        assertionFailure("Didn't expect to get a script message from Dark Reader")
     }
     
     func refreshDarkReaderScript(from settings: DarkReaderScriptSettings = .shared, webView: WKWebView) {
         let call = generateDarkReaderCall(from: settings)
         evaluate(js: call, inWebView: webView)
     }
-    
-//    func enableDarkReader(withWebView webView: WKWebView) {
-//        evaluate(js: """
-//        DarkReader.auto({
-//            brightness: 100,
-//            contrast: 90,
-//            sepia: 10
-//        });
-//        """, inWebView: webView)
-//    }
-//
-//    func disableDarkReader(withWebView webView: WKWebView) {
-//        evaluate(js: "DarkReader.disable()", inWebView: webView)
-//    }
     
     private func evaluate(js: String, inWebView webView: WKWebView) {
         if #available(macOS 11.0, *) {
