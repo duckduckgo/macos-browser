@@ -730,6 +730,31 @@ CQ
                                                 </items>
                                             </menu>
                                         </menuItem>
+                                        <menuItem title="Dark Reader" id="ZQm-AG-aXz">
+                                            <modifierMask key="keyEquivalentModifierMask"/>
+                                            <menu key="submenu" title="Dark Reader" id="TPS-WL-7Vn">
+                                                <items>
+                                                    <menuItem title="Auto" id="pxs-pO-HN7">
+                                                        <modifierMask key="keyEquivalentModifierMask"/>
+                                                        <connections>
+                                                            <action selector="darkReaderAuto:" target="Ady-hI-5gd" id="0qW-VG-Hdc"/>
+                                                        </connections>
+                                                    </menuItem>
+                                                    <menuItem title="Enabled" id="Kqa-JG-dTt">
+                                                        <modifierMask key="keyEquivalentModifierMask"/>
+                                                        <connections>
+                                                            <action selector="darkReaderEnabled:" target="Ady-hI-5gd" id="FDZ-z3-vNB"/>
+                                                        </connections>
+                                                    </menuItem>
+                                                    <menuItem title="Disabled" state="on" id="Cgw-Dz-xec">
+                                                        <modifierMask key="keyEquivalentModifierMask"/>
+                                                        <connections>
+                                                            <action selector="darkReaderDisabled:" target="Ady-hI-5gd" id="j1N-88-cKB"/>
+                                                        </connections>
+                                                    </menuItem>
+                                                </items>
+                                            </menu>
+                                        </menuItem>
                                         <menuItem title="Trigger Fatal Error" id="FeS-hb-rvM" userLabel="Reset Default Browser Prompt">
                                             <modifierMask key="keyEquivalentModifierMask"/>
                                             <connections>
@@ -772,6 +797,7 @@ CQ
                             <outlet property="closeAllWindowsMenuItem" destination="VeX-H4-NpP" id="NbQ-qo-OZe"/>
                             <outlet property="closeTabMenuItem" destination="DVo-aG-piG" id="Hr0-hn-2p1"/>
                             <outlet property="closeWindowMenuItem" destination="CzI-4o-2re" id="32H-X4-8Ub"/>
+                            <outlet property="darkReaderMenuItem" destination="ZQm-AG-aXz" id="1ll-BY-KOt"/>
                             <outlet property="debugMenuItem" destination="ilv-5f-YpZ" id="4F7-9b-Mve"/>
                             <outlet property="favoriteThisPageMenuItem" destination="cHZ-Fb-aKU" id="uPM-LY-AmL"/>
                             <outlet property="favoritesMenuItem" destination="Y9I-ZC-gGg" id="zk1-XL-x3e"/>
@@ -804,19 +830,6 @@ CQ
                         <outlet property="delegate" destination="Voe-Tx-rLC" id="PrD-fu-P6m"/>
                     </connections>
                 </application>
-                <menu id="013-wG-YGZ">
-                    <items>
-                        <menuItem title="Item 1" id="m8E-kO-TwB">
-                            <modifierMask key="keyEquivalentModifierMask"/>
-                        </menuItem>
-                        <menuItem title="Item 2" id="gKX-rb-enP">
-                            <modifierMask key="keyEquivalentModifierMask"/>
-                        </menuItem>
-                        <menuItem title="Item 3" id="MNz-ve-jnh">
-                            <modifierMask key="keyEquivalentModifierMask"/>
-                        </menuItem>
-                    </items>
-                </menu>
             </objects>
             <point key="canvasLocation" x="-215" y="-265"/>
         </scene>

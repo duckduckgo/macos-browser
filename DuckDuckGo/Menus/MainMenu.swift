@@ -79,6 +79,12 @@ final class MainMenu: NSMenu {
             #endif
         }
     }
+    
+    @IBOutlet weak var darkReaderMenuItem: NSMenuItem? {
+        didSet {
+            darkReaderMenuItem?.submenu?.delegate = self
+        }
+    }
 
     @IBOutlet weak var helpMenuItem: NSMenuItem?
     @IBOutlet weak var helpSeparatorMenuItem: NSMenuItem?
@@ -245,6 +251,17 @@ extension MainMenu: NSMenuDelegate {
         sharingMenu.update()
         shareMenuItem.submenu = sharingMenu
         return false
+    }
+    
+    func menuWillOpen(_ menu: NSMenu) {
+        guard menu == darkReaderMenuItem?.submenu else {
+            return
+        }
+        
+        // Hardcoded menu item order, should fix this:
+        menu.items[0].state = (DarkReaderScriptSettings.shared.status == .auto) ? .on : .off
+        menu.items[1].state = (DarkReaderScriptSettings.shared.status == .enabled) ? .on : .off
+        menu.items[2].state = (DarkReaderScriptSettings.shared.status == .disabled) ? .on : .off
     }
 
 }

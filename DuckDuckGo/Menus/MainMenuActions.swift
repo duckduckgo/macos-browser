@@ -587,7 +587,19 @@ extension MainViewController {
     @IBAction func showPageResources(_ sender: Any?) {
         tabCollectionViewModel.selectedTabViewModel?.tab.webView.showPageSource()
     }
+    
+    @IBAction func darkReaderAuto(_ sender: Any?) {
+        DarkReaderScriptSettings.shared.status = .auto
+    }
 
+    @IBAction func darkReaderEnabled(_ sender: Any?) {
+        DarkReaderScriptSettings.shared.status = .enabled
+    }
+    
+    @IBAction func darkReaderDisabled(_ sender: Any?) {
+        DarkReaderScriptSettings.shared.status = .disabled
+    }
+    
 }
 
 extension MainViewController: NSMenuItemValidation {

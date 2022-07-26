@@ -182,6 +182,12 @@ final class Tab: NSObject, Identifiable, ObservableObject {
                                                selector: #selector(onDuckDuckGoEmailSignOut),
                                                name: .emailDidSignOut,
                                                object: nil)
+        
+        NotificationCenter.default.addObserver(self,
+                                               selector: #selector(refreshDarkReader),
+                                               name: .darkReaderSettingsChanged,
+                                               object: nil)
+        
     }
 
     @objc func onDuckDuckGoEmailSignOut(_ notification: Notification) {
@@ -189,6 +195,10 @@ final class Tab: NSObject, Identifiable, ObservableObject {
         if EmailUrls().isDuckDuckGoEmailProtection(url: url) {
             webView.evaluateJavaScript("window.postMessage({ emailProtectionSignedOut: true }, window.origin);")
         }
+    }
+    
+    @objc func refreshDarkReader(_ notification: Notification) {
+        darkReaderScript?.refreshDarkReaderScript(webView: webView)
     }
 
     deinit {
@@ -606,6 +616,8 @@ final class Tab: NSObject, Identifiable, ObservableObject {
 
     // MARK: - Find in Page
 
+    weak var darkReaderScript: DarkReaderUserScript?
+
     weak var findInPageScript: FindInPageUserScript?
     var findInPageCancellable: AnyCancellable?
     private func subscribeToFindInPageTextChange() {
@@ -706,6 +718,7 @@ extension Tab: UserContentControllerDelegate {
         userScripts.autoconsentUserScript?.delegate = self
 
         findInPageScript = userScripts.findInPageScript
+        darkReaderScript = userScripts.darkReaderUserScript
         attachFindInPage()
     }
 
@@ -1185,6 +1198,8 @@ extension Tab: WKNavigationDelegate {
         webViewDidFinishNavigationPublisher.send()
         if isAMPProtectionExtracting { isAMPProtectionExtracting = false }
         linkProtection.setMainFrameUrl(nil)
+        
+        darkReaderScript?.refreshDarkReaderScript(webView: webView)
     }
 
     func webView(_ webView: WKWebView, didFail navigation: WKNavigation!, withError error: Error) {

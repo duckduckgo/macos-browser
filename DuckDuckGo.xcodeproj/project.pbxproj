@@ -151,6 +151,9 @@
 		4B723E1226B0006E00E14D75 /* DataImport.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B723DEB26B0002B00E14D75 /* DataImport.swift */; };
 		4B723E1326B0007A00E14D75 /* CSVLoginExporter.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B723DFD26B0002B00E14D75 /* CSVLoginExporter.swift */; };
 		4B723E1926B000DC00E14D75 /* TemporaryFileCreator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B723E1726B000DC00E14D75 /* TemporaryFileCreator.swift */; };
+		4B742C8B28907E230086A4DB /* darkreader.js in Resources */ = {isa = PBXBuildFile; fileRef = 4B742C8A28907E230086A4DB /* darkreader.js */; };
+		4B742C8D28907F7B0086A4DB /* DarkReaderUserScript.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B742C8C28907F7B0086A4DB /* DarkReaderUserScript.swift */; };
+		4B742C8F2890865F0086A4DB /* DarkReaderScriptSettings.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B742C8E2890865F0086A4DB /* DarkReaderScriptSettings.swift */; };
 		4B78A86B26BB3ADD0071BB16 /* BrowserImportSummaryViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B78A86A26BB3ADD0071BB16 /* BrowserImportSummaryViewController.swift */; };
 		4B7A57CF279A4EF300B1C70E /* ChromePreferences.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B7A57CE279A4EF300B1C70E /* ChromePreferences.swift */; };
 		4B7A60A1273E0BE400BBDFEB /* WKWebsiteDataStoreExtension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B7A60A0273E0BE400BBDFEB /* WKWebsiteDataStoreExtension.swift */; };
@@ -932,6 +935,9 @@
 		4B723E0326B0003E00E14D75 /* MockSecureVault.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MockSecureVault.swift; sourceTree = "<group>"; };
 		4B723E0426B0003E00E14D75 /* CSVLoginExporterTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CSVLoginExporterTests.swift; sourceTree = "<group>"; };
 		4B723E1726B000DC00E14D75 /* TemporaryFileCreator.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TemporaryFileCreator.swift; sourceTree = "<group>"; };
+		4B742C8A28907E230086A4DB /* darkreader.js */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.javascript; name = darkreader.js; path = node_modules/darkreader/darkreader.js; sourceTree = SOURCE_ROOT; };
+		4B742C8C28907F7B0086A4DB /* DarkReaderUserScript.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DarkReaderUserScript.swift; sourceTree = "<group>"; };
+		4B742C8E2890865F0086A4DB /* DarkReaderScriptSettings.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DarkReaderScriptSettings.swift; sourceTree = "<group>"; };
 		4B78A86A26BB3ADD0071BB16 /* BrowserImportSummaryViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BrowserImportSummaryViewController.swift; sourceTree = "<group>"; };
 		4B7A57CE279A4EF300B1C70E /* ChromePreferences.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChromePreferences.swift; sourceTree = "<group>"; };
 		4B7A60A0273E0BE400BBDFEB /* WKWebsiteDataStoreExtension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WKWebsiteDataStoreExtension.swift; sourceTree = "<group>"; };
@@ -2040,6 +2046,24 @@
 			path = "Data Export";
 			sourceTree = "<group>";
 		};
+		4B742C8828907DF30086A4DB /* Universal Dark Mode */ = {
+			isa = PBXGroup;
+			children = (
+				4B742C8928907DFE0086A4DB /* Resources */,
+				4B742C8C28907F7B0086A4DB /* DarkReaderUserScript.swift */,
+				4B742C8E2890865F0086A4DB /* DarkReaderScriptSettings.swift */,
+			);
+			path = "Universal Dark Mode";
+			sourceTree = "<group>";
+		};
+		4B742C8928907DFE0086A4DB /* Resources */ = {
+			isa = PBXGroup;
+			children = (
+				4B742C8A28907E230086A4DB /* darkreader.js */,
+			);
+			path = Resources;
+			sourceTree = "<group>";
+		};
 		4B82E9B725B6A04B00656FE7 /* Content Blocker */ = {
 			isa = PBXGroup;
 			children = (
@@ -2700,6 +2724,7 @@
 				AAE8B0FD258A416F00E81239 /* Tab Preview */,
 				B6040859274B8C5200680351 /* Unprotected Domains */,
 				AACF6FD426BC35C200CF09F9 /* User Agent */,
+				4B742C8828907DF30086A4DB /* Universal Dark Mode */,
 				4BC68A6C2759ADC20029A586 /* Waitlist */,
 				AA6EF9AE25066F99004754E6 /* Windows */,
 				AA585D85248FD31400E9A3E2 /* Assets.xcassets */,
@@ -4151,6 +4176,7 @@
 				4B92928E26670D1700AD2C21 /* BookmarkOutlineViewCell.xib in Resources */,
 				B64C84DE2692D7400048FEBE /* PermissionAuthorization.storyboard in Resources */,
 				4BC68A702759AE490029A586 /* Waitlist.storyboard in Resources */,
+				4B742C8B28907E230086A4DB /* darkreader.js in Resources */,
 				AA34397D2754D55100B241FA /* dark-trackers-3.json in Resources */,
 				AA3439782754D55100B241FA /* dark-trackers-2.json in Resources */,
 				AAB7320726DD0C37002FACF9 /* Fire.storyboard in Resources */,
@@ -4462,6 +4488,7 @@
 				AAD8078527B3F3BE00CF7703 /* WebsiteBreakageSender.swift in Sources */,
 				4B8AC93B26B48ADF00879451 /* ASN1Parser.swift in Sources */,
 				37CD54B327EE509700F1F7B9 /* View+Cursor.swift in Sources */,
+				4B742C8D28907F7B0086A4DB /* DarkReaderUserScript.swift in Sources */,
 				B66E9DD22670EB2A00E53BB5 /* _WKDownload+WebKitDownload.swift in Sources */,
 				B6A9E4612614608B0067D1B9 /* AppVersion.swift in Sources */,
 				856C98DF257014BD00A22F1F /* FileDownloadManager.swift in Sources */,
@@ -4683,6 +4710,7 @@
 				B65E6B9E26D9EC0800095F96 /* CircularProgressView.swift in Sources */,
 				AABEE69C24A902BB0043105B /* SuggestionContainer.swift in Sources */,
 				85589E8327BBB8630038AD11 /* HomePageViewController.swift in Sources */,
+				4B742C8F2890865F0086A4DB /* DarkReaderScriptSettings.swift in Sources */,
 				4B59024126B35F3600489384 /* BraveDataImporter.swift in Sources */,
 				B6A9E46B2614618A0067D1B9 /* OperatingSystemVersionExtension.swift in Sources */,
 				4BDFA4AE27BF19E500648192 /* ToggleableScrollView.swift in Sources */,

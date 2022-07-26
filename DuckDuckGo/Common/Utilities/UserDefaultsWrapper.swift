@@ -80,6 +80,12 @@ public struct UserDefaultsWrapper<T> {
         case homePageShowPageTitles = "home.page.show.page.titles"
 
         case appIsRelaunchingAutomatically = "app-relaunching-automatically"
+        
+        // Dark Reader
+        case darkReaderStatus = "dark-reader.status"
+        case darkReaderAppearanceBrightness = "dark-reader.appearance.brightness"
+        case darkReaderAppearanceContrast = "dark-reader.appearance.contrast"
+        case darkReaderAppearanceSepia = "dark-reader.appearance.sepia"
     }
 
     enum RemovedKeys: String, CaseIterable {

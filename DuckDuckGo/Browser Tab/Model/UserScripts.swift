@@ -31,6 +31,7 @@ final class UserScripts {
     let hoverUserScript = HoverUserScript()
     let debugScript = DebugUserScript()
     let clickToLoadScript: ClickToLoadUserScript
+    let darkReaderUserScript = DarkReaderUserScript()
 
     let contentBlockerRulesScript: ContentBlockerRulesUserScript
     let surrogatesScript: SurrogatesUserScript
@@ -74,6 +75,7 @@ final class UserScripts {
         printingUserScript,
         hoverUserScript,
         clickToLoadScript,
+        darkReaderUserScript,
         contentScopeUserScript,
         autofillScript
     ]
