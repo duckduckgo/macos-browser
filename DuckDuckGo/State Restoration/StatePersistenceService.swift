@@ -71,7 +71,6 @@ final class StatePersistenceService {
         guard let encryptedData = lastSessionStateArchive ?? loadStateFromFile() else {
             throw CocoaError(.fileReadNoSuchFile)
         }
-        removeLastSessionState()
         try restoreState(from: encryptedData, using: restore)
     }
 

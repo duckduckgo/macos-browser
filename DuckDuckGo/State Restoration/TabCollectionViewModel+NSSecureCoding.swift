@@ -27,17 +27,15 @@ extension TabCollectionViewModel: NSSecureCoding {
     static var supportsSecureCoding: Bool { true }
 
     convenience init?(coder: NSCoder) {
-        guard let tabCollection = coder.decodeObject(of: TabCollection.self, forKey: NSSecureCodingKeys.tabCollection),
-              !tabCollection.tabs.isEmpty
-        else {
+        guard let tabCollection = coder.decodeObject(of: TabCollection.self, forKey: NSSecureCodingKeys.tabCollection) else {
             return nil
         }
-        let selectionIndex = coder.decodeIfPresent(at: NSSecureCodingKeys.selectionIndex) ?? 0
-        self.init(tabCollection: tabCollection, selectionIndex: selectionIndex)
+        let index = coder.decodeIfPresent(at: NSSecureCodingKeys.selectionIndex) ?? 0
+        self.init(tabCollection: tabCollection, selectionIndex: index)
     }
 
     func encode(with coder: NSCoder) {
-        if let index = selectionIndex {
+        if case let .unpinned(index) = selectionIndex {
             coder.encode(index, forKey: NSSecureCodingKeys.selectionIndex)
         }
         coder.encode(tabCollection, forKey: NSSecureCodingKeys.tabCollection)
