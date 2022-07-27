@@ -1,6 +1,6 @@
 {
     "readme": "https://github.com/duckduckgo/privacy-configuration",
-    "version": 1658347711725,
+    "version": 1658418905212,
     "features": {
         "ampLinks": {
             "exceptions": [
@@ -162,10 +162,19 @@
                 "keyboard": {
                     "type": "undefined"
                 },
-                "hardwareConcurrency": {
-                    "type": "number",
-                    "value": 4
-                },
+                "hardwareConcurrency": [
+                    {
+                        "type": "number",
+                        "value": 4
+                    },
+                    {
+                        "type": "number",
+                        "value": 8,
+                        "criteria": {
+                            "arch": "AppleSilicon"
+                        }
+                    }
+                ],
                 "deviceMemory": {
                     "type": "undefined"
                 }
