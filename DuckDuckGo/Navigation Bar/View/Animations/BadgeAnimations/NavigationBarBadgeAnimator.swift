@@ -31,12 +31,15 @@ final class NavigationBarBadgeAnimator: NSObject {
         let newAnimationID = UUID()
         self.animationID = newAnimationID
         
+        notificationBadgeContainer.alphaValue = 0
+        notificationBadgeContainer.prepareAnimation(.cookieManaged)
+
         NSAnimationContext.runAnimationGroup { context in
             context.duration = animationDuration
             buttonsContainer.animator().alphaValue = 0
             notificationBadgeContainer.animator().alphaValue = 1
-            
-            notificationBadgeContainer.startAnimation(type) { [weak self] in
+        } completionHandler: {
+            notificationBadgeContainer.startAnimation { [weak self] in
                 if self?.animationID == newAnimationID {
                     NSAnimationContext.runAnimationGroup { context in
                         context.duration = animationDuration

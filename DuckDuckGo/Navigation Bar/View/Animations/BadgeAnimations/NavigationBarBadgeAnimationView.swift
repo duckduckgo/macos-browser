@@ -29,9 +29,8 @@ final class NavigationBarBadgeAnimationView: NSView {
         case cookieManaged
     }
 
-    func startAnimation(_ type: AnimationType, completion: @escaping () -> Void) {
+    func prepareAnimation(_ type: AnimationType) {
         removeAnimation()
-        
         let viewToAnimate: NotificationBarViewAnimated
         switch type {
         case .cookieManaged:
@@ -41,8 +40,10 @@ final class NavigationBarBadgeAnimationView: NSView {
         addSubview(viewToAnimate)
         animatedView = viewToAnimate
         setupConstraints()
-        
-        self.animatedView?.startAnimation(completion)
+    }
+    
+    func startAnimation(completion: @escaping () -> Void) {
+         self.animatedView?.startAnimation(completion)
     }
     
     func removeAnimation() {
