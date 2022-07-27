@@ -341,8 +341,6 @@ final class TabCollectionViewModel: NSObject {
             }
         }
 
-//        guard let pinnedTabsCollection = pinnedTabsCollection else { return false }
-
         let hasPinnedTabs = !(pinnedTabsCollection?.tabs.isEmpty ?? true)
         let hasUnpinnedTabs = !tabCollection.tabs.isEmpty
 
