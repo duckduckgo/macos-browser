@@ -61,6 +61,8 @@ final class Tab: NSObject, Identifiable, ObservableObject {
                 return .anyPreferencePane
             } else if let preferencePane = url.flatMap(PreferencePaneIdentifier.init(url:)) {
                 return .preferences(pane: preferencePane)
+            } else if let youtubeURL = url?.youtubeURL {
+                return .url(youtubeURL)
             } else {
                 return .url(url ?? .blankPage)
             }
@@ -418,11 +420,15 @@ final class Tab: NSObject, Identifiable, ObservableObject {
             return
         }
 
-        if webView.url == nil,
-           let url = self.content.url {
-            webView.load(url)
+        if let youtubeURL = webView.url?.youtubeURL {
+            webView.load(youtubeURL)
         } else {
-            webView.reload()
+            if webView.url == nil,
+               let url = self.content.url {
+                webView.load(url)
+            } else {
+                webView.reload()
+            }
         }
     }
 
@@ -514,6 +520,10 @@ final class Tab: NSObject, Identifiable, ObservableObject {
               webView.url != url,
               webView.url != content.url
         else { return false }
+
+        if webView.url?.youtubeURL == url {
+            return false
+        }
 
         // if content not loaded inspect error
         switch error {
@@ -1127,6 +1137,11 @@ extension Tab: WKNavigationDelegate {
                     await prepareForContentBlocking()
                 }
             }
+        }
+
+        if let youtubeVideoID = navigationAction.request.url?.youtubeVideoID, webView.url?.youtubeURL != navigationAction.request.url {
+            YoutubePlayer(videoID: youtubeVideoID).load(in: webView)
+            return .cancel
         }
 
         toggleFBProtection(for: url)

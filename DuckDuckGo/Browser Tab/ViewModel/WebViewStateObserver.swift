@@ -70,7 +70,7 @@ final class WebViewStateObserver: NSObject {
     }
 
     private func observe(webView: WKWebView) {
-        webView.addObserver(self, forKeyPath: #keyPath(WKWebView.url), options: .new, context: nil)
+        webView.addObserver(self, forKeyPath: #keyPath(WKWebView.url), options: [.old, .new], context: nil)
         webView.addObserver(self, forKeyPath: #keyPath(WKWebView.canGoBack), options: .new, context: nil)
         webView.addObserver(self, forKeyPath: #keyPath(WKWebView.canGoForward), options: .new, context: nil)
         webView.addObserver(self, forKeyPath: #keyPath(WKWebView.isLoading), options: .new, context: nil)
@@ -90,7 +90,14 @@ final class WebViewStateObserver: NSObject {
         }
 
         switch keyPath {
-        case #keyPath(WKWebView.url): handleURLChange(in: webView, tabViewModel: tabViewModel)
+        case #keyPath(WKWebView.url):
+            guard let change = change, let oldURL = change[.oldKey] as? URL, let newURL = change[.newKey] as? URL else {
+                return
+            }
+            if oldURL.youtubeURL == newURL {
+                return
+            }
+            handleURLChange(in: webView, tabViewModel: tabViewModel)
         case #keyPath(WKWebView.canGoBack): tabViewModel.updateCanGoBack()
         case #keyPath(WKWebView.canGoForward): tabViewModel.updateCanGoForward()
         case #keyPath(WKWebView.isLoading): tabViewModel.isWebViewLoading = webView.isLoading
@@ -108,9 +115,13 @@ final class WebViewStateObserver: NSObject {
 
     private func handleURLChange(in webView: WKWebView, tabViewModel: TabViewModel) {
         if let url = webView.url {
+
             tabViewModel.tab.setContent(.contentFromURL(url))
             if !webView.isLoading {
                 tabViewModel.tab.addVisit(of: url)
+            }
+            if let youtubeVideoID = url.youtubeVideoID {
+                YoutubePlayer(videoID: youtubeVideoID).load(in: webView)
             }
         }
         updateTitle() // The title might not change if webView doesn't think anything is different so update title here as well
