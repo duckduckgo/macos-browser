@@ -201,6 +201,7 @@ final class AddressBarButtonsViewController: NSViewController {
     
     private func playBadgeAnimationIfNecessary() {
         if let queuedNotification = buttonsBadgeAnimator.queuedAnimation {
+            // Add small time gap in between animations if badge animation was queued
             DispatchQueue.main.asyncAfter(deadline: .now() + 0.6) {
                 self.showNotification(queuedNotification)
             }
