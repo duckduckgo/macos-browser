@@ -48,13 +48,15 @@ final class RecentlyClosedCoordinator: RecentlyClosedCoordinating {
         return !cache.isEmpty
     }
 
-    // MARK: - Subscribtions
+    // MARK: - Subscriptions
 
     private var mainVCDidRegisterCancellable: AnyCancellable?
     private var mainVCDidUnregisterCancellable: AnyCancellable?
     private var cancellables = Set<AnyCancellable>()
 
     private func subscribeToWindowControllersManager() {
+        subscribeToPinnedTabCollection(of: windowControllerManager.pinnedTabsManager)
+
         mainVCDidRegisterCancellable = windowControllerManager.didRegisterWindowController
             .sink(receiveValue: { [weak self] mainWindowController in
                 self?.subscribeToTabCollection(of: mainWindowController)
@@ -65,11 +67,20 @@ final class RecentlyClosedCoordinator: RecentlyClosedCoordinating {
             })
     }
 
+    private func subscribeToPinnedTabCollection(of pinnedTabsManager: PinnedTabsManager) {
+        let tabCollection = pinnedTabsManager.tabCollection
+        tabCollection.didRemoveTabPublisher
+            .sink { [weak self] (tab, index) in
+                self?.cacheTabContent(tab, of: tabCollection, at: .pinned(index))
+            }
+            .store(in: &cancellables)
+    }
+
     private func subscribeToTabCollection(of mainWindowController: MainWindowController) {
         let tabCollection = mainWindowController.mainViewController.tabCollectionViewModel.tabCollection
         tabCollection.didRemoveTabPublisher
             .sink { [weak self] (tab, index) in
-                self?.cacheTabContent(tab, of: tabCollection, at: index)
+                self?.cacheTabContent(tab, of: tabCollection, at: .unpinned(index))
             }
             .store(in: &cancellables)
     }
@@ -78,7 +89,7 @@ final class RecentlyClosedCoordinator: RecentlyClosedCoordinating {
 
     private(set) var cache = [RecentlyClosedCacheItem]()
 
-    private func cacheTabContent(_ tab: Tab, of tabCollection: TabCollection, at tabIndex: Int) {
+    private func cacheTabContent(_ tab: Tab, of tabCollection: TabCollection, at tabIndex: TabIndex) {
         guard !tab.isContentEmpty else {
             // Don't cache empty tabs
             return
@@ -97,7 +108,7 @@ final class RecentlyClosedCoordinator: RecentlyClosedCoordinating {
         }
 
         let tabCacheItems = tabCollection.tabs.enumerated().map {
-            RecentlyClosedTab(tab: $0.element, originalTabCollection: tabCollection, tabIndex: $0.offset)
+            RecentlyClosedTab(tab: $0.element, originalTabCollection: tabCollection, tabIndex: .unpinned($0.offset))
         }
         let droppingPoint = mainWindowController.window?.frame.origin
         let contentSize = mainWindowController.window?.frame.size
@@ -126,6 +137,11 @@ final class RecentlyClosedCoordinator: RecentlyClosedCoordinating {
             cache.removeAll(where: { $0 === recentlyClosedTab })
         }
 
+        guard recentlyClosedTab.index.isUnpinnedTab else {
+            reopenPinnedTab(recentlyClosedTab)
+            return
+        }
+
         let tabCollectionViewModel: TabCollectionViewModel
         let tabIndex: Int
         if let originalTabCollection = recentlyClosedTab.originalTabCollection,
@@ -133,7 +149,7 @@ final class RecentlyClosedCoordinator: RecentlyClosedCoordinating {
            originalTabCollection == lastKeyMainWindowController.mainViewController.tabCollectionViewModel.tabCollection {
             // Original window still exists and it is key
             tabCollectionViewModel = lastKeyMainWindowController.mainViewController.tabCollectionViewModel
-            tabIndex = min(recentlyClosedTab.index, tabCollectionViewModel.tabCollection.tabs.count)
+            tabIndex = min(recentlyClosedTab.index.item, tabCollectionViewModel.tabCollection.tabs.count)
 
         } else if let lastKeyMainWindowController = WindowControllersManager.shared.lastKeyMainWindowController {
             // Original window is closed, reopen the tab in the current window
@@ -148,7 +164,25 @@ final class RecentlyClosedCoordinator: RecentlyClosedCoordinating {
         }
 
         let tab = Tab(content: recentlyClosedTab.tabContent)
-        tabCollectionViewModel.insert(tab: tab, at: tabIndex, selected: true)
+        tabCollectionViewModel.insert(tab: tab, at: .unpinned(tabIndex), selected: true)
+    }
+
+    private func reopenPinnedTab(_ recentlyClosedTab: RecentlyClosedTab) {
+        var lastKeyMainWindowController = WindowControllersManager.shared.lastKeyMainWindowController
+        if lastKeyMainWindowController == nil {
+            // Create a new window if none exists
+            WindowsManager.openNewWindow(with: .init(content: .homePage))
+            lastKeyMainWindowController = WindowControllersManager.shared.lastKeyMainWindowController
+        }
+
+        guard let tabCollectionViewModel = lastKeyMainWindowController?.mainViewController.tabCollectionViewModel else {
+            return
+        }
+
+        let tab = Tab(content: recentlyClosedTab.tabContent)
+        let tabIndex = min(recentlyClosedTab.index.item, windowControllerManager.pinnedTabsManager.tabCollection.tabs.count)
+
+        tabCollectionViewModel.insert(tab: tab, at: .pinned(tabIndex), selected: true)
     }
 
     private func reopenWindow(_ recentlyClosedWindow: RecentlyClosedWindow) {
@@ -189,7 +223,7 @@ final class RecentlyClosedCoordinator: RecentlyClosedCoordinating {
 
 private extension RecentlyClosedTab {
 
-    convenience init (tab: Tab, originalTabCollection: TabCollection, tabIndex: Int) {
+    convenience init (tab: Tab, originalTabCollection: TabCollection, tabIndex: TabIndex) {
         self.init(tabContent: tab.content,
                   favicon: tab.favicon,
                   title: tab.title,

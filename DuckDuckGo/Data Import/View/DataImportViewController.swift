@@ -191,6 +191,7 @@ final class DataImportViewController: NSViewController {
             case (_, true):
                 interactionState = .moreInfoAvailable
             }
+
             self.viewState = ViewState(selectedImportSource: source, interactionState: interactionState)
         }
 
@@ -260,13 +261,16 @@ final class DataImportViewController: NSViewController {
             if case .permissionsRequired([.logins]) = interactionState {
                 let viewController = FileImportViewController.create(importSource: .safari)
                 viewController.delegate = self
-                return viewController
 
+                return viewController
             } else if case .ableToImport = interactionState,
-                      let fileImportViewController = currentChildViewController as? FileImportViewController {
+                      let fileImportViewController = currentChildViewController as? FileImportViewController,
+                      fileImportViewController.importSource == .safari {
                 fileImportViewController.importSource = importSource
+
                 return nil
             }
+
             fallthrough
         case .brave, .chrome, .edge, .firefox:
             if case let .completedImport(summary) = interactionState {

@@ -87,6 +87,7 @@ final class Fire {
     let autoconsentManagement: AutoconsentManagement?
     let stateRestorationManager: AppStateRestorationManager?
     let recentlyClosedCoordinator: RecentlyClosedCoordinating?
+    let pinnedTabsManager: PinnedTabsManager
     
     let tabsCleaner = TabDataCleaner()
 
@@ -104,7 +105,9 @@ final class Fire {
          faviconManagement: FaviconManagement = FaviconManager.shared,
          autoconsentManagement: AutoconsentManagement? = nil,
          stateRestorationManager: AppStateRestorationManager? = nil,
-         recentlyClosedCoordinator: RecentlyClosedCoordinating? = RecentlyClosedCoordinator.shared) {
+         recentlyClosedCoordinator: RecentlyClosedCoordinating? = RecentlyClosedCoordinator.shared,
+         pinnedTabsManager: PinnedTabsManager = WindowControllersManager.shared.pinnedTabsManager
+    ) {
         self.webCacheManager = cacheManager
         self.historyCoordinating = historyCoordinating
         self.permissionManager = permissionManager
@@ -112,9 +115,10 @@ final class Fire {
         self.windowControllerManager = windowControllerManager
         self.faviconManagement = faviconManagement
         self.recentlyClosedCoordinator = recentlyClosedCoordinator
+        self.pinnedTabsManager = pinnedTabsManager
         
         if #available(macOS 11, *), autoconsentManagement == nil {
-            self.autoconsentManagement = AutoconsentUserScript.background
+            self.autoconsentManagement = AutoconsentManagement.shared
         } else {
             self.autoconsentManagement = autoconsentManagement
         }
@@ -149,6 +153,8 @@ final class Fire {
         let modelsToRemove = collectionsCleanupInfo.values.flatMap { tabViewModelsCleanupInfo in
             tabViewModelsCleanupInfo.filter({ $0.action == .burn }).compactMap { $0.tabViewModel }
         }
+
+        let pinnedTabsViewModels = pinnedTabViewModels(for: burningDomains)
         
         tabsCleaner.prepareModelsForCleanup(modelsToRemove) {
 
@@ -156,10 +162,15 @@ final class Fire {
             
             group.enter()
             self.burnTabsFrom(collectionViewModels: collectionsCleanupInfo,
-                         relatedToDomains: burningDomains) {
+                              relatedToDomains: burningDomains) {
                 group.leave()
             }
-            
+
+            group.enter()
+            self.burnPinnedTabs(pinnedTabsViewModels, onlyRelatedToDomains: domains) {
+                group.leave()
+            }
+
             group.enter()
             Task {
                 await self.burnWebCache(domains: burningDomains)
@@ -194,11 +205,18 @@ final class Fire {
         
         burnLastSessionState()
 
+        let pinnedTabsViewModels = pinnedTabViewModels()
+
         tabsCleaner.prepareModelsForCleanup(allTabViewModels()) {
             let group = DispatchGroup()
             group.enter()
             Task {
                 await self.burnWebCache()
+                group.leave()
+            }
+
+            group.enter()
+            self.burnPinnedTabs(pinnedTabsViewModels) {
                 group.leave()
             }
             
@@ -228,7 +246,7 @@ final class Fire {
             }
         }
     }
-    
+
     // MARK: - Tab Models
     
     private func allTabViewModels() -> [TabViewModel] {
@@ -239,17 +257,6 @@ final class Fire {
             allTabViewModels.append(contentsOf: tabCollectionViewModel.tabViewModels.values)
         }
         return allTabViewModels
-    }
-    
-    private func tabViewModelsFor(domains: Set<String>) -> TabCollectionsCleanupInfo {
-        var collectionsCleanupInfo = TabCollectionsCleanupInfo()
-        for window in windowControllerManager.mainWindowControllers {
-            let tabCollectionViewModel = window.mainViewController.tabCollectionViewModel
-            
-            collectionsCleanupInfo[tabCollectionViewModel] = tabCollectionViewModel.prepareCleanupInfoForTabs(relatedToDomains: domains)
-        }
-        
-        return collectionsCleanupInfo
     }
 
     // MARK: - Web cache
@@ -334,7 +341,19 @@ final class Fire {
             completion()
         }
     }
-    
+
+    private func burnPinnedTabs(_ cleanupInfo: [TabCollectionViewModel.TabCleanupInfo],
+                                onlyRelatedToDomains domains: Set<String>? = nil,
+                                completion: @escaping () -> Void) {
+        // Close tabs where specified domains are currently loaded
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) { [weak self] in
+            let keyWindow = self?.windowControllerManager.lastKeyMainWindowController
+            keyWindow?.mainViewController.tabCollectionViewModel.clearPinnedTabsData(cleanupInfo, onlyForDomains: domains)
+
+            completion()
+        }
+    }
+
     private func burnTabsFrom(collectionViewModels: TabCollectionsCleanupInfo,
                               relatedToDomains domains: Set<String>,
                               completion: @escaping () -> Void) {
@@ -367,7 +386,54 @@ final class Fire {
     private func burnRecentlyClosed(domains: Set<String>? = nil) {
         recentlyClosedCoordinator?.burnCache(domains: domains)
     }
+}
 
+// MARK: - Tab Cleanup Info
+
+extension Fire {
+
+    private func pinnedTabViewModels(for domains: Set<String>? = nil) -> [TabCollectionViewModel.TabCleanupInfo] {
+        guard let domains = domains else {
+            return pinnedTabsManager.tabViewModels.values.map { tabViewModel in
+                TabCollectionViewModel.TabCleanupInfo.init(tabViewModel: tabViewModel, action: .replace)
+            }
+        }
+
+        return prepareCleanupInfo(for: pinnedTabsManager.tabViewModels, relatedToDomains: domains)
+    }
+
+    private func tabViewModelsFor(domains: Set<String>) -> TabCollectionsCleanupInfo {
+        var collectionsCleanupInfo = TabCollectionsCleanupInfo()
+        for window in windowControllerManager.mainWindowControllers {
+            let tabCollectionViewModel = window.mainViewController.tabCollectionViewModel
+
+            collectionsCleanupInfo[tabCollectionViewModel] = prepareCleanupInfo(
+                for: tabCollectionViewModel.tabViewModels,
+                relatedToDomains: domains
+            )
+        }
+
+        return collectionsCleanupInfo
+    }
+
+    private func prepareCleanupInfo(
+        for tabViewModels: [Tab: TabViewModel],
+        relatedToDomains domains: Set<String>
+    ) -> [TabCollectionViewModel.TabCleanupInfo] {
+
+        var result = [TabCollectionViewModel.TabCleanupInfo]()
+
+        for (tab, tabViewModel) in tabViewModels {
+            let action = tab.fireAction(for: domains)
+            switch action {
+            case .none: continue
+            case .replace, .burn:
+                result.append(.init(tabViewModel: tabViewModel, action: action))
+            }
+        }
+
+        return result
+    }
 }
 
 fileprivate extension TabCollectionViewModel {
@@ -377,23 +443,6 @@ fileprivate extension TabCollectionViewModel {
         let action: Tab.FireAction
     }
     
-    func prepareCleanupInfoForTabs(relatedToDomains domains: Set<String>) -> [TabCleanupInfo] {
-        
-        var result = [TabCleanupInfo]()
-    
-        for (tab, tabViewModel) in tabViewModels {
-            let action = tab.fireAction(for: domains)
-            switch action {
-            case .none: continue
-            case .replace, .burn:
-                result.append(TabCleanupInfo(tabViewModel: tabViewModel,
-                                             action: action))
-            }
-        }
-        
-        return result
-    }
-
     // Burns data related to domains from the collection of tabs
     func clearData(_ cleanupInfo: [TabCleanupInfo], forDomains domains: Set<String>) {
         // Go one by one and execute the fire action
@@ -408,7 +457,7 @@ fileprivate extension TabCollectionViewModel {
             case .replace:
                 
                 let tab = Tab(content: tabCleanupInfo.tabViewModel.tab.content, shouldLoadInBackground: true)
-                replaceTab(at: tabIndex, with: tab, forceChange: true)
+                replaceTab(at: .unpinned(tabIndex), with: tab, forceChange: true)
             case .burn:
                 toRemove.insert(tabIndex)
             }
@@ -417,6 +466,31 @@ fileprivate extension TabCollectionViewModel {
 
         // Clean local history of closed tabs
         tabCollection.localHistoryOfRemovedTabs.subtract(domains)
+    }
+
+    // Burns data from the collection of pinned tabs, optionally limited to the set of domains
+    func clearPinnedTabsData(_ cleanupInfo: [TabCleanupInfo], onlyForDomains domains: Set<String>? = nil) {
+        // Go one by one and replace pinned tabs
+        for tabCleanupInfo in cleanupInfo {
+            guard let tabIndex = pinnedTabsManager.tabCollection.tabs.firstIndex(of: tabCleanupInfo.tabViewModel.tab) else {
+                assertionFailure("Tab index not found for a pinned TabViewModel")
+                continue
+            }
+            switch tabCleanupInfo.action {
+            case .none: continue
+            case .replace, .burn:
+                // Burning does not ever close pinned tabs, so treat burning as replacing
+                let tab = Tab(content: tabCleanupInfo.tabViewModel.tab.content, shouldLoadInBackground: true)
+                replaceTab(at: .pinned(tabIndex), with: tab, forceChange: true)
+            }
+        }
+
+        // Clean local history of closed tabs
+        if let domains = domains {
+            pinnedTabsManager.tabCollection.localHistoryOfRemovedTabs.subtract(domains)
+        } else {
+            pinnedTabsManager.tabCollection.localHistoryOfRemovedTabs.removeAll()
+        }
     }
 }
 

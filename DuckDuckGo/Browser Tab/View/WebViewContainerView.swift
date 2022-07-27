@@ -76,3 +76,9 @@ final class WebViewContainerView: NSView {
     }
 
 }
+
+extension WebView {
+    var containerView: WebViewContainerView? {
+        superview as? WebViewContainerView ?? tabContentView.superview as? WebViewContainerView
+    }
+}

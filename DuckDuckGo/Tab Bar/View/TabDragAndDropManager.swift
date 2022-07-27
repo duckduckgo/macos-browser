@@ -55,6 +55,17 @@ final class TabDragAndDropManager {
         }
     }
 
+    func dropToPinTabIfNeeded() -> Bool {
+        guard let sourceUnit = sourceUnit,
+              let sourceTabCollectionViewModel = sourceUnit.tabCollectionViewModel
+        else {
+            os_log("TabDragAndDropManager: Missing data to perform drop to pin", type: .error)
+            return false
+        }
+        sourceTabCollectionViewModel.pinTab(at: sourceUnit.indexPath.item)
+        return true
+    }
+
     private func performDragAndDrop() {
         guard let sourceUnit = sourceUnit, let destinationUnit = destinationUnit,
               let sourceTabCollectionViewModel = sourceUnit.tabCollectionViewModel,

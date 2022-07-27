@@ -174,6 +174,8 @@ final class LocalBookmarkManager: BookmarkManager {
         }
 
         bookmarkStore.update(bookmark: newBookmark)
+        loadBookmarks()
+
         return newBookmark
     }
 
