@@ -27,8 +27,6 @@ protocol BrowserTabViewControllerClickDelegate: AnyObject {
     func browserTabViewController(_ browserTabViewController: BrowserTabViewController, didClickAtPoint: CGPoint)
 }
 
-// swiftlint:disable file_length
-// swiftlint:disable:next type_body_length
 final class BrowserTabViewController: NSViewController {
 
     @IBOutlet weak var errorView: NSView!
@@ -1162,5 +1160,3 @@ extension BrowserTabViewController {
         }
     }
 }
-
-// swiftlint:enable file_length

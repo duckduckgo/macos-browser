@@ -19,7 +19,6 @@
 import Cocoa
 import Combine
 
-// swiftlint:disable type_body_length
 final class FeedbackViewController: NSViewController {
 
     enum Constants {
@@ -325,7 +324,6 @@ final class FeedbackViewController: NSViewController {
         thankYouView.isHidden = false
     }
 }
-// swiftlint:enable type_body_length
 
 fileprivate extension WebsiteBreakage.Category {
 

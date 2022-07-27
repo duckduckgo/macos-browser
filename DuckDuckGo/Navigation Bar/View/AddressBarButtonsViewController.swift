@@ -27,8 +27,7 @@ protocol AddressBarButtonsViewControllerDelegate: AnyObject {
 
 }
 
-// swiftlint:disable type_body_length
-// swiftlint:disable file_length
+// swiftlint:disable:next type_body_length
 final class AddressBarButtonsViewController: NSViewController {
 
     static let homeFaviconImage = NSImage(named: "Search")
@@ -867,7 +866,6 @@ final class AddressBarButtonsViewController: NSViewController {
     }
 
 }
-// swiftlint:enable type_body_length
 
 extension AddressBarButtonsViewController: PermissionContextMenuDelegate {
 
@@ -928,6 +926,3 @@ final class TrackerAnimationImageProvider: AnimationImageProvider {
     }
 
 }
-
-// swiftlint:enable type_body_length
-// swiftlint:enable file_length

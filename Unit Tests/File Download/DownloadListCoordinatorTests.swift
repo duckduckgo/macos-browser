@@ -20,7 +20,6 @@ import Foundation
 import XCTest
 @testable import DuckDuckGo_Privacy_Browser
 
-// swiftlint:disable type_body_length
 @available(macOS 11.3, *)
 final class DownloadListCoordinatorTests: XCTestCase {
     let store = DownloadListStoreMock()
@@ -437,7 +436,6 @@ final class DownloadListCoordinatorTests: XCTestCase {
     }
 
 }
-// swiftlint:enable type_body_length
 
 private struct TestError: Error, Equatable {}
 private extension Data {

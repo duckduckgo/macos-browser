@@ -23,8 +23,7 @@ import Combine
 import AVFoundation
 @testable import DuckDuckGo_Privacy_Browser
 
-// swiftlint:disable file_length
-// swiftlint:disable type_body_length
+// swiftlint:disable:next type_body_length
 final class PermissionModelTests: XCTestCase {
 
     let permissionManagerMock = PermissionManagerMock()
@@ -1151,6 +1150,3 @@ extension PermissionModelTests: WebViewPermissionsDelegate {
     }
 
 }
-
-// swiftlint:enable type_body_length
-// swiftlint:enable file_length

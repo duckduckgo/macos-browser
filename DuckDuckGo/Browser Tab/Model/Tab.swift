@@ -40,7 +40,6 @@ protocol TabDelegate: FileDownloadManagerDelegate, ContentOverlayUserScriptDeleg
     func closeTab(_ tab: Tab)
 }
 
-// swiftlint:disable type_body_length
 // swiftlint:disable file_length
 final class Tab: NSObject, Identifiable, ObservableObject {
 

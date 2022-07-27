@@ -36,7 +36,6 @@ protocol TabCollectionViewModelDelegate: AnyObject {
 
 }
 
-// swiftlint:disable type_body_length
 final class TabCollectionViewModel: NSObject {
 
     weak var delegate: TabCollectionViewModelDelegate?
@@ -634,4 +633,3 @@ extension TabCollectionViewModel {
     }
 
 }
-// swiftlint:enable type_body_length

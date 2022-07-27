@@ -52,7 +52,6 @@ protocol BookmarkStore {
 
 }
 
-// swiftlint:disable type_body_length
 final class LocalBookmarkStore: BookmarkStore {
 
     init() {}
@@ -582,4 +581,3 @@ fileprivate extension BookmarkManagedObject {
     }
 
 }
-// swiftlint:enable type_body_length
