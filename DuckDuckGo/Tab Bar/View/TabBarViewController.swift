@@ -49,9 +49,9 @@ final class TabBarViewController: NSViewController {
     let tabCollectionViewModel: TabCollectionViewModel
 
     private let bookmarkManager: BookmarkManager = LocalBookmarkManager.shared
-    private let pinnedTabsViewModel: PinnedTabsViewModel
-    private let pinnedTabsView: PinnedTabsView
-    private let pinnedTabsHostingView: PinnedTabsHostingView
+    private let pinnedTabsViewModel: PinnedTabsViewModel?
+    private let pinnedTabsView: PinnedTabsView?
+    private let pinnedTabsHostingView: PinnedTabsHostingView?
 
     private var tabsCancellable: AnyCancellable?
     private var selectionIndexCancellable: AnyCancellable?
@@ -63,9 +63,17 @@ final class TabBarViewController: NSViewController {
 
     init?(coder: NSCoder, tabCollectionViewModel: TabCollectionViewModel) {
         self.tabCollectionViewModel = tabCollectionViewModel
-        pinnedTabsViewModel = .init(collection: tabCollectionViewModel.pinnedTabsManager.tabCollection)
-        pinnedTabsView = .init(model: pinnedTabsViewModel)
-        pinnedTabsHostingView = .init(rootView: pinnedTabsView)
+        if let pinnedTabCollection = tabCollectionViewModel.pinnedTabsManager?.tabCollection {
+            let pinnedTabsViewModel = PinnedTabsViewModel(collection: pinnedTabCollection)
+            let pinnedTabsView = PinnedTabsView(model: pinnedTabsViewModel)
+            self.pinnedTabsViewModel = pinnedTabsViewModel
+            self.pinnedTabsView = pinnedTabsView
+            self.pinnedTabsHostingView = .init(rootView: pinnedTabsView)
+        } else {
+            self.pinnedTabsViewModel = nil
+            self.pinnedTabsView = nil
+            self.pinnedTabsHostingView = nil
+        }
 
         super.init(coder: coder)
     }
@@ -137,6 +145,10 @@ final class TabBarViewController: NSViewController {
     }
 
     private func layoutPinnedTabsView() {
+        guard let pinnedTabsHostingView = pinnedTabsHostingView else {
+            return
+        }
+
         pinnedTabsHostingView.translatesAutoresizingMaskIntoConstraints = false
         pinnedTabsContainerView.addSubview(pinnedTabsHostingView)
 
@@ -149,11 +161,15 @@ final class TabBarViewController: NSViewController {
     }
 
     private func subscribeToPinnedTabsViewModel() {
+        guard let pinnedTabsViewModel = pinnedTabsViewModel else {
+            return
+        }
+
         tabCollectionViewModel.$selectionIndex
             .map { [weak self] selectedTabIndex -> Tab? in
                 switch selectedTabIndex {
                 case .pinned(let index):
-                    return self?.pinnedTabsViewModel.items[safe: index]
+                    return self?.pinnedTabsViewModel?.items[safe: index]
                 default:
                     return nil
                 }
@@ -173,7 +189,7 @@ final class TabBarViewController: NSViewController {
 
         pinnedTabsViewModel.tabsDidReorderPublisher
             .sink { [weak self] tabs in
-                self?.tabCollectionViewModel.pinnedTabsManager.tabCollection.reorderTabs(tabs)
+                self?.tabCollectionViewModel.pinnedTabsManager?.tabCollection.reorderTabs(tabs)
             }
             .store(in: &cancellables)
 
@@ -197,8 +213,8 @@ final class TabBarViewController: NSViewController {
             }
             .store(in: &cancellables)
 
-        pinnedTabsHostingView.middleClickPublisher
-            .compactMap { [weak self] in self?.pinnedTabsView.itemIndex(for: $0) }
+        pinnedTabsHostingView?.middleClickPublisher
+            .compactMap { [weak self] in self?.pinnedTabsView?.itemIndex(for: $0) }
             .sink { [weak self] index in
                 self?.tabCollectionViewModel.remove(at: .pinned(index))
             }
@@ -233,7 +249,7 @@ final class TabBarViewController: NSViewController {
         case let .duplicate(index):
             duplicateTab(at: .pinned(index))
         case let .bookmark(tab):
-            guard let url = tab.url, let tabViewModel = tabCollectionViewModel.pinnedTabsManager.tabViewModels[tab] else {
+            guard let url = tab.url, let tabViewModel = tabCollectionViewModel.pinnedTabsManager?.tabViewModels[tab] else {
                 os_log("TabBarViewController: Failed to get url from tab")
                 return
             }
@@ -273,8 +289,11 @@ final class TabBarViewController: NSViewController {
     }
     
     private func selectTabWithPoint(_ point: NSPoint) {
-        let pointLocationOnPinnedTabsView = pinnedTabsHostingView.convert(point, from: view)
-        if let index = pinnedTabsView.itemIndex(for: pointLocationOnPinnedTabsView) {
+        guard let pointLocationOnPinnedTabsView = pinnedTabsHostingView?.convert(point, from: view) else {
+            return
+        }
+
+        if let index = pinnedTabsView?.itemIndex(for: pointLocationOnPinnedTabsView) {
             tabCollectionViewModel.select(at: .pinned(index))
         } else {
             let pointLocationOnCollectionView = collectionView.convert(point, from: view)
@@ -518,7 +537,7 @@ final class TabBarViewController: NSViewController {
     }
 
     private func showPinnedTabPreview(at index: Int) {
-        guard let tabViewModel = tabCollectionViewModel.pinnedTabsManager.tabViewModel(at: index) else {
+        guard let tabViewModel = tabCollectionViewModel.pinnedTabsManager?.tabViewModel(at: index) else {
             os_log("TabBarViewController: Showing pinned tab preview window failed", type: .error)
             return
         }
