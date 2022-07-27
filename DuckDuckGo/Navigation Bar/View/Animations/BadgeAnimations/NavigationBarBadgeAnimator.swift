@@ -21,12 +21,14 @@ import Cocoa
 final class NavigationBarBadgeAnimator: NSObject {
     var queuedAnimation: NavigationBarBadgeAnimationView.AnimationType?
     private var animationID: UUID?
+    private(set) var isAnimating = false
 
     func showNotification(withType type: NavigationBarBadgeAnimationView.AnimationType,
                           buttonsContainer: NSView,
                           and notificationBadgeContainer: NavigationBarBadgeAnimationView) {
         queuedAnimation = nil
         
+        isAnimating = true
         let animationDuration: CGFloat = 0.5
         let newAnimationID = UUID()
         self.animationID = newAnimationID
@@ -45,6 +47,8 @@ final class NavigationBarBadgeAnimator: NSObject {
                         context.duration = animationDuration
                         buttonsContainer.animator().alphaValue = 1
                         notificationBadgeContainer.animator().alphaValue = 0
+                    } completionHandler: {
+                        self?.isAnimating = false
                     }
                 }
             }

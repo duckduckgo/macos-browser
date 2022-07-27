@@ -201,7 +201,9 @@ final class AddressBarButtonsViewController: NSViewController {
     
     private func playBadgeAnimationIfNecessary() {
         if let queuedNotification = buttonsBadgeAnimator.queuedAnimation {
-            showNotification(queuedNotification)
+            DispatchQueue.main.asyncAfter(deadline: .now() + 0.6) {
+                self.showNotification(queuedNotification)
+            }
         }
     }
 
@@ -805,7 +807,9 @@ final class AddressBarButtonsViewController: NSViewController {
         privacyDashboardPopover.close()
     }
     
-    private func stopAnimations(trackerAnimations: Bool = true, shieldAnimations: Bool = true) {
+    private func stopAnimations(trackerAnimations: Bool = true,
+                                shieldAnimations: Bool = true,
+                                badgeAnimations: Bool = true) {
         func stopAnimation(_ animationView: AnimationView) {
             if animationView.isAnimationPlaying || !animationView.isHidden {
                 animationView.isHidden = true
@@ -822,7 +826,9 @@ final class AddressBarButtonsViewController: NSViewController {
             stopAnimation(shieldAnimationView)
             stopAnimation(shieldDotAnimationView)
         }
-        stopNotificationBadgeAnimations()
+        if badgeAnimations {
+            stopNotificationBadgeAnimations()
+        }
     }
     
     private func stopNotificationBadgeAnimations() {
@@ -887,8 +893,9 @@ final class AddressBarButtonsViewController: NSViewController {
         isMouseOverAnimationVisibleCancellable = privacyEntryPointButton.$isAnimationViewVisible
             .dropFirst()
             .sink { [weak self] isAnimationViewVisible in
+   
                 if isAnimationViewVisible {
-                    self?.stopAnimations(trackerAnimations: false, shieldAnimations: true)
+                    self?.stopAnimations(trackerAnimations: false, shieldAnimations: true, badgeAnimations: false)
                 } else {
                     self?.updatePrivacyEntryPointIcon()
                 }
