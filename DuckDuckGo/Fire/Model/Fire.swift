@@ -470,6 +470,10 @@ fileprivate extension TabCollectionViewModel {
 
     // Burns data from the collection of pinned tabs, optionally limited to the set of domains
     func clearPinnedTabsData(_ cleanupInfo: [TabCleanupInfo], onlyForDomains domains: Set<String>? = nil) {
+        guard let pinnedTabsManager = pinnedTabsManager else {
+            return
+        }
+
         // Go one by one and replace pinned tabs
         for tabCleanupInfo in cleanupInfo {
             guard let tabIndex = pinnedTabsManager.tabCollection.tabs.firstIndex(of: tabCleanupInfo.tabViewModel.tab) else {

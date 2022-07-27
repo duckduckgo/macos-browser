@@ -148,6 +148,6 @@ private extension TabCollectionViewModel {
     }
 
     var pinnedTabsCount: Int {
-        pinnedTabsCollection.tabs.count
+        pinnedTabsCollection?.tabs.count ?? 0
     }
 }
