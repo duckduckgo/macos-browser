@@ -161,9 +161,7 @@ final class TabBarViewController: NSViewController {
     }
 
     private func subscribeToPinnedTabsViewModel() {
-        guard let pinnedTabsViewModel = pinnedTabsViewModel else {
-            return
-        }
+        guard let pinnedTabsViewModel = pinnedTabsViewModel else { return }
 
         tabCollectionViewModel.$selectionIndex
             .map { [weak self] selectedTabIndex -> Tab? in
