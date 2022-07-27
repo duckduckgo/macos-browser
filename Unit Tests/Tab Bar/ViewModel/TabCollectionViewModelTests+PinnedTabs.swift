@@ -19,6 +19,8 @@
 import XCTest
 @testable import DuckDuckGo_Privacy_Browser
 
+// MARK: - Tests for TabCollectionViewModel with pinned tabs
+
 extension TabCollectionViewModelTests {
 
     // MARK: - Select
