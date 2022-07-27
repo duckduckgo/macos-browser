@@ -341,10 +341,7 @@ final class TabCollectionViewModel: NSObject {
             }
         }
 
-        let hasPinnedTabs = !(pinnedTabsCollection?.tabs.isEmpty ?? true)
-        let hasUnpinnedTabs = !tabCollection.tabs.isEmpty
-
-        guard hasPinnedTabs || hasUnpinnedTabs else {
+        guard allTabsCount > 0 else {
             selectionIndex = nil
             notifyDelegate()
             return
