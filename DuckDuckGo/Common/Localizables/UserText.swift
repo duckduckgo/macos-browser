@@ -500,12 +500,12 @@ struct UserText {
     static let recentlyVisitedMenuSection = NSLocalizedString("history.menu.recently.visited", value: "Recently Visited", comment: "Section header of the history menu")
     static let olderMenuItem = NSLocalizedString("history.menu.older", value: "Older…", comment: "Menu item representing older history")
 
-    static let clearAllDataQuestion = NSLocalizedString("history.menu.clear.all.history.question", value: "Clear all history and close all tabs?", comment: "Alert with the confirmation to clear all history and data")
+    static let clearAllDataQuestion = NSLocalizedString("history.menu.clear.all.history.question", value: "Clear all history and \nclose all tabs?", comment: "Alert with the confirmation to clear all history and data")
     static let clearAllDataDescription = NSLocalizedString("history.menu.clear.all.history.description", value: "Cookies and site data for all sites will also be cleared, unless the site is Fireproof.", comment: "Description in the alert with the confirmation to clear all data")
 
     static let clearDataHeader = NSLocalizedString("history.menu.clear.data.question", value: "Clear History for %@?", comment: "Alert with the confirmation to clear all data")
     static let clearDataDescription = NSLocalizedString("history.menu.clear.data.description", value: "Cookies and other data for sites visited on this day will also be cleared unless the site is Fireproof. History from other days will not be cleared.", comment: "Description in the alert with the confirmation to clear browsing history")
-    static let clearDataTodayHeader = NSLocalizedString("history.menu.clear.data.today.question", value: "Clear history for today and close all tabs?", comment: "Alert with the confirmation to clear all data")
+    static let clearDataTodayHeader = NSLocalizedString("history.menu.clear.data.today.question", value: "Clear history for today \nand close all tabs?", comment: "Alert with the confirmation to clear all data")
     static let clearDataTodayDescription = NSLocalizedString("history.menu.clear.data.today.description", value: "Cookies and other data for sites visited today will also be cleared unless the site is Fireproof. History from other days will not be cleared.", comment: "Description in the alert with the confirmation to clear browsing history")
 
 }
