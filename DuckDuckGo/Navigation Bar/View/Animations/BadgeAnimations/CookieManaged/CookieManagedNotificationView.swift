@@ -105,7 +105,7 @@ private struct DotGroupView: View {
 private struct InnerExpandingCircle: View {
     @ObservedObject var animationModel: CookieNotificationAnimationModel
     @State private var opacity: CGFloat = 0
-    @State private var scale: CGFloat = 1
+    @State private var scale: CGFloat = Consts.CookieAnimation.innerExpandingCircleScale1
     var body: some View {
         Circle()
             .strokeBorder(.blue, lineWidth: 1)
@@ -116,12 +116,11 @@ private struct InnerExpandingCircle: View {
                 case .firstPhase:
                     withAnimation(.easeInOut(duration: animationModel.duration)) {
                         opacity = 1
-                        scale = Consts.CookieAnimation.innerExpandingCircleScale1
+                        scale = Consts.CookieAnimation.innerExpandingCircleScale2
                     }
                 case .secondPhase:
                     withAnimation(.easeInOut(duration: animationModel.halfDuration)) {
                         opacity = 0
-                        scale = Consts.CookieAnimation.innerExpandingCircleScale2
                     }
                 default:
                     break
@@ -144,11 +143,11 @@ private struct OuterExpandingCircle: View {
                 case .firstPhase:
                     withAnimation(.easeInOut(duration: animationModel.duration)) {
                         opacity = 1
+                        scale = Consts.CookieAnimation.outerExpandingCircleScale2
                     }
                 case .secondPhase:
                     withAnimation(.easeInOut(duration: animationModel.halfDuration)) {
                         opacity = 0
-                        scale = Consts.CookieAnimation.outerExpandingCircleScale2
                     }
                 default:
                     break
@@ -219,11 +218,11 @@ private enum Consts {
     }
     
     enum CookieAnimation {
-        static let innerExpandingCircleScale1 = 1.2
-        static let innerExpandingCircleScale2 = 1.6
+        static let innerExpandingCircleScale1 = 1.0
+        static let innerExpandingCircleScale2 = 1.4
         
-        static let outerExpandingCircleScale1 = 1.5
-        static let outerExpandingCircleScale2 = 2.0
+        static let outerExpandingCircleScale1 = 1.2
+        static let outerExpandingCircleScale2 = 1.8
     }
     
     enum BadgeAnimation {

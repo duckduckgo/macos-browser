@@ -53,8 +53,8 @@ final class CookieConsentAnimationModel: CookieConsentAnimation {
         }
     }
     
-    let firstAnimationDuration: CGFloat = 0.7
-    let secondAnimationDuration: CGFloat = 0.5
+    let firstAnimationDuration: CGFloat = 0.35
+    let secondAnimationDuration: CGFloat = 0.3
     
     @Published var imageOpacity = Animation.Image.opacity.begin
     @Published var imageScale = Animation.Image.scale.begin
@@ -78,7 +78,7 @@ final class CookieConsentAnimationModel: CookieConsentAnimation {
     func startAnimation() {
         updateDataForFirstAnimation()
         
-        DispatchQueue.main.asyncAfter(deadline: .now() + firstAnimationDuration) {
+        DispatchQueue.main.asyncAfter(deadline: .now() + (firstAnimationDuration) / 2) {
             self.updateDataForSecondAnimation()
         }
     }

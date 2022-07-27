@@ -23,7 +23,7 @@ final class BadgeNotificationAnimationModel: ObservableObject {
     let secondPhaseDelay: CGFloat
     @Published var state: AnimationState = .unstarted
 
-    init(duration: CGFloat = 0.8, secondPhaseDelay: CGFloat = 3.0) {
+    init(duration: CGFloat = 0.3, secondPhaseDelay: CGFloat = 3.0) {
         self.duration = duration
         self.secondPhaseDelay = secondPhaseDelay
     }
