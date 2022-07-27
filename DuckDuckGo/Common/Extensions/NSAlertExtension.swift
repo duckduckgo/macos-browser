@@ -75,10 +75,15 @@ extension NSAlert {
         return alert
     }
 
-    static func clearHistoryAndDataAlert(dateString: String) -> NSAlert {
+    static func clearHistoryAndDataAlert(dateString: String?) -> NSAlert {
         let alert = NSAlert()
-        alert.messageText = String(format: UserText.clearDataHeader, dateString)
-        alert.informativeText = UserText.clearDataDescription
+        if let dateString = dateString {
+            alert.messageText = String(format: UserText.clearDataHeader, dateString)
+            alert.informativeText = UserText.clearDataDescription
+        } else {
+            alert.messageText = String(format: UserText.clearDataTodayHeader)
+            alert.informativeText = UserText.clearDataTodayDescription
+        }
         alert.alertStyle = .warning
         alert.icon = NSImage(named: "BurnAlert")
         alert.addButton(withTitle: UserText.clear)

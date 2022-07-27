@@ -141,8 +141,10 @@ final class HistoryMenu: NSMenu {
 
         func makeGroupingRootMenuItem(from grouping: HistoryGrouping) -> NSMenuItem {
             let title = makeTitle(for: grouping)
-            let menuItem = NSMenuItem(title: title)
-            let subMenuItems = makeClearThisHistoryMenuItems(with: title) + makeMenuItems(from: grouping)
+            let menuItem = NSMenuItem(title: "\(title.0), \(title.1)")
+            let isToday = NSCalendar.current.isDateInToday(grouping.date)
+            let dateString = isToday ? nil : title.1
+            let subMenuItems = makeClearThisHistoryMenuItems(with: dateString) + makeMenuItems(from: grouping)
             let submenu = NSMenu(items: subMenuItems)
             menuItem.submenu = submenu
             return menuItem
@@ -169,17 +171,18 @@ final class HistoryMenu: NSMenu {
         }
     }
 
-    private func makeTitle(for grouping: HistoryGrouping) -> String {
+    private func makeTitle(for grouping: HistoryGrouping) -> (String, String) {
+        let prefix: String
         if grouping.date > Date.daysAgo(2).startOfDay {
-            let prefix = relativeDatePrefixFormatter.string(from: grouping.date)
-            let suffix = relativeDateSuffixFormatter.string(from: grouping.date)
-            return "\(prefix)\(suffix)"
+            prefix = relativePrefixFormatter.string(from: grouping.date)
         } else {
-            return dateFormatter.string(from: grouping.date)
+            prefix = prefixFormatter.string(from: grouping.date)
         }
+        let suffix = suffixFormatter.string(from: grouping.date)
+        return (prefix, suffix)
     }
 
-    let relativeDatePrefixFormatter: DateFormatter = {
+    let relativePrefixFormatter: DateFormatter = {
         let dateFormatter = DateFormatter()
         dateFormatter.timeStyle = .none
         dateFormatter.dateStyle = .medium
@@ -187,19 +190,19 @@ final class HistoryMenu: NSMenu {
         return dateFormatter
     }()
 
-    let relativeDateSuffixFormatter: DateFormatter = {
+    let suffixFormatter: DateFormatter = {
         let dateFormatter = DateFormatter()
-        dateFormatter.dateFormat = ", MMMM dd, YYYY"
+        dateFormatter.dateFormat = "MMMM dd, YYYY"
         return dateFormatter
     }()
 
-    let dateFormatter: DateFormatter = {
+    let prefixFormatter: DateFormatter = {
         let dateFormatter = DateFormatter()
-        dateFormatter.dateFormat = "EEEE, MMMM dd, YYYY"
+        dateFormatter.dateFormat = "EEEE"
         return dateFormatter
     }()
 
-    private func makeClearThisHistoryMenuItems(with dateString: String) -> [NSMenuItem] {
+    private func makeClearThisHistoryMenuItems(with dateString: String?) -> [NSMenuItem] {
         let headerItem = ClearThisHistoryMenuItem(title: UserText.clearThisHistoryMenuItem,
                                                   action: #selector(AppDelegate.clearThisHistory(_:)),
                                                   keyEquivalent: "")

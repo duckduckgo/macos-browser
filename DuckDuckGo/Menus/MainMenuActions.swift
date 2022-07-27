@@ -403,11 +403,12 @@ extension MainViewController {
     }
 
     @objc func clearThisHistory(_ sender: ClearThisHistoryMenuItem) {
-        guard let window = view.window, let dateString = sender.dateString else {
-            assertionFailure("No window or wrong represented object")
+        guard let window = view.window else {
+            assertionFailure("No window")
             return
         }
 
+        let dateString = sender.dateString
         let visits = sender.getVisits()
         let alert = NSAlert.clearHistoryAndDataAlert(dateString: dateString)
         alert.beginSheetModal(for: window, completionHandler: { response in

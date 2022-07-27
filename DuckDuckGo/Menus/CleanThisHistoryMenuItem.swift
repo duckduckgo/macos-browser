@@ -21,7 +21,7 @@ import Foundation
 final class ClearThisHistoryMenuItem: NSMenuItem {
 
     // Keep the dateString for alerts so we don't need to use the formatter again
-    func setDateString(_ dateString: String) {
+    func setDateString(_ dateString: String?) {
         representedObject = dateString
     }
 
