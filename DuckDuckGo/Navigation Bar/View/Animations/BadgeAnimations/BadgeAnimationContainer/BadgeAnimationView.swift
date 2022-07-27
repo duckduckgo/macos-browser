@@ -125,5 +125,4 @@ private enum Consts {
     enum Colors {
         static let badgeBackgroundColor = Color("URLNotificationBadgeBackground")
     }
-    
 }

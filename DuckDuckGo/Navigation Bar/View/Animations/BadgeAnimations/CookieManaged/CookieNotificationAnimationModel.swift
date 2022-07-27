@@ -31,9 +31,13 @@ final class CookieNotificationAnimationModel: ObservableObject {
     let secondPhaseDelay: CGFloat
     let halfDuration: CGFloat
     
-    init(duration: CGFloat = 0.9) {
+    init(duration: CGFloat = AnimationDefaultConsts.totalDuration) {
         self.duration = duration
         self.halfDuration = duration / 2.0
         self.secondPhaseDelay = self.halfDuration
     }
+}
+
+private enum AnimationDefaultConsts {
+    static let totalDuration: CGFloat = 0.3
 }
