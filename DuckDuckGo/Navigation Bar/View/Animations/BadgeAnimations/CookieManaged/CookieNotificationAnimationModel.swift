@@ -39,5 +39,5 @@ final class CookieNotificationAnimationModel: ObservableObject {
 }
 
 private enum AnimationDefaultConsts {
-    static let totalDuration: CGFloat = 0.3
+    static let totalDuration: CGFloat = 0.9
 }
