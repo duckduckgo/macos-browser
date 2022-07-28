@@ -47,7 +47,6 @@ final class HistoryMenu: NSMenu {
         clearOldVariableMenuItems()
         addRecentlyVisited()
         addHistoryGroupings()
-        addSearchHistory()
         addClearAllHistory()
     }
 
@@ -55,7 +54,6 @@ final class HistoryMenu: NSMenu {
         items.removeAll { menuItem in
             recentlyVisitedMenuItems.contains(menuItem) ||
             historyGroupingsMenuItems.contains(menuItem) ||
-            menuItem == searchHistoryMenuItem ||
             menuItem == clearAllHistoryMenuItem
         }
     }
@@ -209,16 +207,6 @@ final class HistoryMenu: NSMenu {
         headerItem.setDateString(dateString)
         return [headerItem,
                 NSMenuItem.separator()]
-    }
-
-    // MARK: - Search History
-
-    lazy var searchHistoryMenuItem = NSMenuItem(title: UserText.searchHistoryMenuItem,
-                                                action: #selector(AppDelegate.searchHistory(_:)),
-                                                keyEquivalent: "")
-
-    private func addSearchHistory() {
-        addItem(searchHistoryMenuItem)
     }
 
     // MARK: - Clear All History
