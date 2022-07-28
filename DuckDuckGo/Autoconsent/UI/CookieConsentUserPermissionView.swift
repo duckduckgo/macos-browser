@@ -21,7 +21,8 @@ import SwiftUI
 struct CookieConsentUserPermissionView<AnimationModel>: View where AnimationModel: CookieConsentAnimation {
     var sketchAnimationModel: AnimationModel
     let result: (Bool) -> Void
-    
+    @Environment(\.colorScheme) var colorScheme
+
     var body: some View {
         Group {
             VStack(alignment: .leading, spacing: 32) {
@@ -38,15 +39,19 @@ struct CookieConsentUserPermissionView<AnimationModel>: View where AnimationMode
         .padding()
         .background(Color("CookieConsentPanelBackground"))
         .cornerRadius(Consts.Layout.containerCornerRadius)
+        .overlay(
+            RoundedRectangle(cornerRadius: Consts.Layout.containerCornerRadius)
+                .stroke(colorScheme == .dark ? Consts.Colors.darkModeBorderColor : Consts.Colors.whiteModeBorderColor, lineWidth: 1)
+        )
     }
-    
+  
     private var daxStackView: some View {
         VStack {
             HStack {
                 Image("OnboardingDax")
                     .resizable()
                     .frame(width: Consts.Layout.daxImageSize, height: Consts.Layout.daxImageSize)
-                    .shadow(color: .black.opacity(0.16), radius: 6, x: 0, y: 3)
+                    .shadow(color: Consts.Colors.daxShadow, radius: 6, x: 0, y: 3)
                 
                 Spacer()
             }
@@ -159,6 +164,11 @@ private enum Consts {
         static let CTACornerRadius: CGFloat = 8
     }
     
+    struct Colors {
+        static let darkModeBorderColor: Color = .white.opacity(0.2)
+        static let whiteModeBorderColor: Color = .black.opacity(0.1)
+        static let daxShadow: Color = .black.opacity(0.16)
+    }
     struct Font {
         static let size: CGFloat = 15
     }
