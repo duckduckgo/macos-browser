@@ -440,7 +440,12 @@ final class LocalBookmarkStore: BookmarkStore {
             }
 
             currentParentFolder.mutableChildren.remove(bookmarkManagedObject)
-            newParentFolder.mutableChildren.insert(bookmarkManagedObject, at: index)
+            
+            if index < newParentFolder.mutableChildren.count {
+                newParentFolder.mutableChildren.insert(bookmarkManagedObject, at: index)
+            } else {
+                newParentFolder.mutableChildren.addObjects(from: [bookmarkManagedObject])
+            }
 
             do {
                 try self.context.save()

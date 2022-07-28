@@ -392,15 +392,17 @@ extension BookmarksBarViewModel: NSCollectionViewDelegate, NSCollectionViewDataS
 
             return true
         } else if let pasteboardItems = draggingInfo.draggingPasteboard.pasteboardItems {
+            var currentIndexPathItem = newIndexPath.item
+
             for item in pasteboardItems {
                 if let bookmarkEntityUUID = item.bookmarkEntityUUID {
-                    bookmarkManager.move(objectUUID: bookmarkEntityUUID, toIndex: newIndexPath.item, withinParentFolder: .root) { error in
+                    bookmarkManager.move(objectUUID: bookmarkEntityUUID, toIndex: currentIndexPathItem, withinParentFolder: .root) { error in
                         if error != nil {
                             self.delegate?.bookmarksBarViewModelReloadedData()
                         }
                     }
                 } else if let webViewItem = item.draggedWebViewValues() {
-                    self.bookmarkManager.makeBookmark(for: webViewItem.url, title: webViewItem.title, isFavorite: false, index: newIndexPath.item)
+                    self.bookmarkManager.makeBookmark(for: webViewItem.url, title: webViewItem.title, isFavorite: false, index: currentIndexPathItem)
                 } else if let draggedString = item.string(forType: .string), let draggedURL = URL(string: draggedString) {
                     let title: String
 
@@ -410,8 +412,10 @@ extension BookmarksBarViewModel: NSCollectionViewDelegate, NSCollectionViewDataS
                         title = draggedURL.absoluteString
                     }
 
-                    self.bookmarkManager.makeBookmark(for: draggedURL, title: title, isFavorite: false, index: newIndexPath.item)
+                    self.bookmarkManager.makeBookmark(for: draggedURL, title: title, isFavorite: false, index: currentIndexPathItem)
                 }
+                
+                currentIndexPathItem += 1
             }
             
             return true

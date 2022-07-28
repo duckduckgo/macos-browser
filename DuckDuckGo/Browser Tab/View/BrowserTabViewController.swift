@@ -137,7 +137,7 @@ final class BrowserTabViewController: NSViewController {
     }
 
     private func subscribeToPinnedTabs() {
-        pinnedTabsDelegatesCancellable = tabCollectionViewModel.pinnedTabsCollection.$tabs
+        pinnedTabsDelegatesCancellable = tabCollectionViewModel.pinnedTabsCollection?.$tabs
             .sink { [weak self] tabs in
                 for tab in tabs where tab.delegate !== self {
                     tab.delegate = self
@@ -328,7 +328,7 @@ final class BrowserTabViewController: NSViewController {
     }
 
     private func showTabContent(of tabViewModel: TabViewModel?) {
-        guard !tabCollectionViewModel.tabCollection.tabs.isEmpty || !tabCollectionViewModel.pinnedTabsCollection.tabs.isEmpty else {
+        guard tabCollectionViewModel.allTabsCount > 0 else {
             view.window?.close()
             return
         }
@@ -373,7 +373,7 @@ final class BrowserTabViewController: NSViewController {
             return false
         }
 
-        let isPinnedTab = tabCollectionViewModel.pinnedTabsCollection.tabs.contains(tabViewModel.tab)
+        let isPinnedTab = tabCollectionViewModel.pinnedTabsCollection?.tabs.contains(tabViewModel.tab) == true
         let isKeyWindow = view.window?.isKeyWindow == true
 
         let tabIsNotOnScreen = tabViewModel.tab.webView.tabContentView.superview == nil

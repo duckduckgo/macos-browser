@@ -555,7 +555,10 @@ extension MainViewController {
     }
 
     @IBAction func resetPinnedTabs(_ sender: Any?) {
-        tabCollectionViewModel.pinnedTabsManager.tabCollection.removeAll()
+        if tabCollectionViewModel.selectedTabIndex?.isPinnedTab == true, tabCollectionViewModel.tabCollection.tabs.count > 0 {
+            tabCollectionViewModel.select(at: .unpinned(0))
+        }
+        tabCollectionViewModel.pinnedTabsManager?.tabCollection.removeAll()
     }
 
     @IBAction func showSaveCredentialsPopover(_ sender: Any?) {
@@ -635,7 +638,9 @@ extension MainViewController: NSMenuItemValidation {
 
         // Pin Tab
         case #selector(MainViewController.pinOrUnpinTab(_:)):
-            guard tabCollectionViewModel.selectedTabViewModel?.tab.isUrl == true else {
+            guard tabCollectionViewModel.selectedTabViewModel?.tab.isUrl == true,
+                  tabCollectionViewModel.pinnedTabsManager != nil
+            else {
                 return false
             }
             if tabCollectionViewModel.selectionIndex?.isUnpinnedTab == true {
