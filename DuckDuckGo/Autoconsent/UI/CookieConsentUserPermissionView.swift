@@ -24,15 +24,13 @@ struct CookieConsentUserPermissionView<AnimationModel>: View where AnimationMode
     
     var body: some View {
         Group {
-            VStack(spacing: 32) {
-                HStack(alignment: .top) {
+            VStack(alignment: .leading, spacing: 32) {
+                HStack(alignment: .top, spacing: 0) {
                     daxStackView
-                    
+                        .frame(width: Consts.Layout.daxContainerWidth)
                     contentView
-                        .frame(width: Consts.Layout.contentViewWidth)
                 }
                 .frame(height: Consts.Layout.innerContainerHeight)
-                
                 buttonStack
             }
             .frame(width: Consts.Layout.outerContainerWidth)
@@ -100,7 +98,9 @@ struct CookieConsentUserPermissionView_Previews: PreviewProvider {
         
         if #available(macOS 11.0, *) {
             CookieConsentUserPermissionView(sketchAnimationModel: CookieConsentAnimationMock(), result: result).preferredColorScheme(.dark)
+                .padding()
             CookieConsentUserPermissionView(sketchAnimationModel: CookieConsentAnimationMock(), result: result).preferredColorScheme(.light)
+                .padding()
         } else {
             CookieConsentUserPermissionView(sketchAnimationModel: CookieConsentAnimationMock(), result: result)
         }
@@ -117,7 +117,7 @@ private struct PrimaryCTAStyle: ButtonStyle {
             .padding(.vertical, 10)
             .frame(maxWidth: .infinity)
             .truncationMode(.tail)
-            .background(RoundedRectangle(cornerRadius: 8, style: .continuous).fill(color))
+            .background(RoundedRectangle(cornerRadius: Consts.Layout.CTACornerRadius, style: .continuous).fill(color))
             .foregroundColor(.white)
             .font(.system(size: 13, weight: .light, design: .default))
     }
@@ -138,14 +138,13 @@ private struct SecondaryCTAStyle: ButtonStyle {
             .padding(.vertical, 10)
             .frame(maxWidth: .infinity)
             .background(
-                RoundedRectangle(cornerRadius: Consts.Layout.containerCornerRadius,
-                                 style: .continuous)
+                RoundedRectangle(cornerRadius: Consts.Layout.CTACornerRadius, style: .continuous)
                 .fill(color)
                 .shadow(color: .black.opacity(0.1), radius: 0.1, x: 0, y: 1)
                 .shadow(color: .primary.opacity(outterShadowOpacity), radius: 0.1, x: 0, y: -0.6))
         
             .overlay(
-                RoundedRectangle(cornerRadius: Consts.Layout.containerCornerRadius)
+                RoundedRectangle(cornerRadius: Consts.Layout.CTACornerRadius)
                     .stroke(Color.black.opacity(0.1), lineWidth: 1))
     }
 }
@@ -153,10 +152,11 @@ private struct SecondaryCTAStyle: ButtonStyle {
 private enum Consts {
     struct Layout {
         static let outerContainerWidth: CGFloat = 490
-        static let contentViewWidth: CGFloat = 406
+        static let daxContainerWidth: CGFloat = 84
         static let innerContainerHeight: CGFloat = 176
         static let daxImageSize: CGFloat = 64
         static let containerCornerRadius: CGFloat = 12
+        static let CTACornerRadius: CGFloat = 8
     }
     
     struct Font {
