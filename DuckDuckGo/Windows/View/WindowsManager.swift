@@ -64,7 +64,15 @@ final class WindowsManager {
     class func openNewWindow(with tab: Tab, droppingPoint: NSPoint? = nil, contentSize: NSSize? = nil, popUp: Bool = false) {
         let tabCollection = TabCollection()
         tabCollection.append(tab: tab)
-        openNewWindow(with: TabCollectionViewModel(tabCollection: tabCollection),
+
+        let tabCollectionViewModel: TabCollectionViewModel = {
+            if popUp {
+                return .init(tabCollection: tabCollection, pinnedTabsManager: nil)
+            }
+            return .init(tabCollection: tabCollection)
+        }()
+
+        openNewWindow(with: tabCollectionViewModel,
                       droppingPoint: droppingPoint,
                       contentSize: contentSize,
                       popUp: popUp)
