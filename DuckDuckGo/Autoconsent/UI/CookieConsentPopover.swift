@@ -31,6 +31,7 @@ public final class CookieConsentPopover {
     weak var delegate: CookieConsentPopoverDelegate?
     public var viewController: CookieConsentUserPermissionViewController
     public var windowController: NSWindowController
+    private var resizeObserver: Any?
 
     public init() {
         let storyboard = NSStoryboard(name: "CookieConsent", bundle: Bundle.main)
@@ -74,11 +75,33 @@ public final class CookieConsentPopover {
         }
     }
     
-    public func show(on currentTabView: NSView, animated: Bool) {
-        guard let currentTabViewWindow = currentTabView.window,
-        let overlayWindow = windowController.window else {
+    private func windowDidResize(_ parent: NSWindow) {
+        guard let overlayWindow = windowController.window else {
             return
         }
+        
+        let xPosition = (parent.frame.width / 2) - (overlayWindow.frame.width / 2) + parent.frame.origin.x
+        let size = overlayWindow.frame.size
+        let newOrigin = NSPoint(x: xPosition, y: overlayWindow.frame.origin.y)
+        overlayWindow.setFrame(NSRect(origin: newOrigin, size: size), display: true)
+    }
+    
+    private func addObserverForWindowResize(_ window: NSWindow) {
+        resizeObserver = NotificationCenter.default.addObserver(forName: NSWindow.didResizeNotification,
+                                                                object: window,
+                                                                queue: .main) { [weak self] notification in
+            guard let parent = notification.object as? NSWindow else { return }
+            self?.windowDidResize(parent)
+        }
+    }
+    
+    public func show(on currentTabView: NSView, animated: Bool) {
+        guard let currentTabViewWindow = currentTabView.window,
+              let overlayWindow = windowController.window else {
+            return
+        }
+
+        addObserverForWindowResize(currentTabViewWindow)
         
         currentTabViewWindow.addChildWindow(overlayWindow, ordered: .above)
         
