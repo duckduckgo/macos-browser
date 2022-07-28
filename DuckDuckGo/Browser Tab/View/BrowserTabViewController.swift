@@ -126,14 +126,17 @@ final class BrowserTabViewController: NSViewController {
                 self.showTabContent(of: selectedTabViewModel)
                 self.subscribeToErrorViewState()
                 self.subscribeToTabContent(of: selectedTabViewModel)
-                
-                if selectedTabViewModel?.tab == self.cookieConsentPopoverManager.currentTab {
-                    self.cookieConsentPopoverManager.popOver.show(on: self.view, animated: false)
-                } else {
-                    self.cookieConsentPopoverManager.popOver.close(animated: false)
-                }
+                self.showCookieConsentPopoverIfNecessary(selectedTabViewModel)
             }
             .store(in: &cancellables)
+    }
+    
+    private func showCookieConsentPopoverIfNecessary(_ selectedTabViewModel: TabViewModel?) {
+        if selectedTabViewModel?.tab == cookieConsentPopoverManager.currentTab {
+            cookieConsentPopoverManager.popOver.show(on: view, animated: false)
+        } else {
+            cookieConsentPopoverManager.popOver.close(animated: false)
+        }
     }
 
     private func subscribeToTabs() {

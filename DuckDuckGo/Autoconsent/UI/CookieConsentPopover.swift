@@ -79,6 +79,7 @@ public final class CookieConsentPopover {
         let overlayWindow = windowController.window else {
             return
         }
+        
         currentTabViewWindow.addChildWindow(overlayWindow, ordered: .above)
         
         let xPosition = (currentTabViewWindow.frame.width / 2) - (overlayWindow.frame.width / 2) + currentTabViewWindow.frame.origin.x

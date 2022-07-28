@@ -36,7 +36,7 @@ struct CookieConsentUserPermissionView<AnimationModel>: View where AnimationMode
             }
             .frame(width: Consts.Layout.outerContainerWidth)
         }
-        .padding()
+        .padding(Consts.Layout.containerPadding)
         .background(Color("CookieConsentPanelBackground"))
         .cornerRadius(Consts.Layout.containerCornerRadius)
         .overlay(
@@ -162,6 +162,7 @@ private enum Consts {
         static let daxImageSize: CGFloat = 64
         static let containerCornerRadius: CGFloat = 12
         static let CTACornerRadius: CGFloat = 8
+        static let containerPadding: CGFloat = 20
     }
     
     struct Colors {
