@@ -156,7 +156,7 @@ private enum Consts {
         static let contentViewWidth: CGFloat = 406
         static let innerContainerHeight: CGFloat = 176
         static let daxImageSize: CGFloat = 64
-        static let containerCornerRadius: CGFloat = 8
+        static let containerCornerRadius: CGFloat = 12
     }
     
     struct Font {
