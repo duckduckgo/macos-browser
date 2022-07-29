@@ -22,6 +22,11 @@ final class NavigationBarBadgeAnimator: NSObject {
     var queuedAnimation: NavigationBarBadgeAnimationView.AnimationType?
     private var animationID: UUID?
     private(set) var isAnimating = false
+    
+    private enum ButtonsFade {
+        case start
+        case end
+    }
 
     func showNotification(withType type: NavigationBarBadgeAnimationView.AnimationType,
                           buttonsContainer: NSView,
@@ -29,27 +34,52 @@ final class NavigationBarBadgeAnimator: NSObject {
         queuedAnimation = nil
         
         isAnimating = true
-        let animationDuration: CGFloat = 0.5
+
         let newAnimationID = UUID()
         self.animationID = newAnimationID
         
         notificationBadgeContainer.prepareAnimation(.cookieManaged)
-
-        NSAnimationContext.runAnimationGroup { context in
-            context.duration = animationDuration
-            buttonsContainer.animator().alphaValue = 0
-            notificationBadgeContainer.animator().alphaValue = 1
-        } completionHandler: {
+        
+        animateButtonsFade(.start,
+                           buttonsContainer: buttonsContainer,
+                           notificationBadgeContainer: notificationBadgeContainer) {
+            
             notificationBadgeContainer.startAnimation { [weak self] in
                 if self?.animationID == newAnimationID {
-                    NSAnimationContext.runAnimationGroup { context in
-                        context.duration = animationDuration
-                        buttonsContainer.animator().alphaValue = 1
-                        notificationBadgeContainer.animator().alphaValue = 0
-                    } completionHandler: {
+                    self?.animateButtonsFade(.end,
+                                       buttonsContainer: buttonsContainer,
+                                       notificationBadgeContainer: notificationBadgeContainer) {
                         self?.isAnimating = false
                     }
                 }
+            }
+        }
+    }
+    
+    private func animateButtonsFade(_ fadeType: ButtonsFade,
+                                    buttonsContainer: NSView,
+                                    notificationBadgeContainer: NavigationBarBadgeAnimationView,
+                                    completionHandler: @escaping (() -> Void)) {
+        
+        let animationDuration: CGFloat = 0.25
+
+        NSAnimationContext.runAnimationGroup { context in
+            context.duration = animationDuration
+            if fadeType == .start {
+                buttonsContainer.animator().alphaValue = 0
+            } else if fadeType == .end {
+                notificationBadgeContainer.animator().alphaValue = 0
+            }
+        } completionHandler: {
+            NSAnimationContext.runAnimationGroup { context in
+                context.duration = animationDuration
+                if fadeType == .start {
+                    notificationBadgeContainer.animator().alphaValue = 1
+                } else if fadeType == .end {
+                    buttonsContainer.animator().alphaValue = 1
+                }
+            } completionHandler: {
+                completionHandler()
             }
         }
     }
