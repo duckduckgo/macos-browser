@@ -521,10 +521,6 @@ final class Tab: NSObject, Identifiable, ObservableObject {
               webView.url != content.url
         else { return false }
 
-        if webView.url?.youtubeURL == url {
-            return false
-        }
-
         // if content not loaded inspect error
         switch error {
         case .none, // no error
