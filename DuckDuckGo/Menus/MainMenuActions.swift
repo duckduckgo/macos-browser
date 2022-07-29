@@ -401,10 +401,10 @@ extension MainViewController {
             return
         }
         let index = keyEquivalent - 1
-        if keyEquivalent == 9, !tabCollectionViewModel.tabCollection.tabs.isEmpty {
+        if keyEquivalent == 9 {
             tabCollectionViewModel.select(at: .last(in: tabCollectionViewModel))
-        } else if index < tabCollectionViewModel.tabCollection.tabs.count {
-            tabCollectionViewModel.select(at: .unpinned(index))
+        } else if index < tabCollectionViewModel.allTabsCount {
+            tabCollectionViewModel.select(at: .at(index, in: tabCollectionViewModel))
         }
     }
 
