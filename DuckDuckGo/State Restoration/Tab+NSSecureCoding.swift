@@ -23,6 +23,7 @@ extension Tab: NSSecureCoding {
 
     private enum NSSecureCodingKeys {
         static let url = "url"
+        static let videoID = "videoID"
         static let title = "title"
         static let sessionStateData = "ssdata" // Used for session restoration on macOS 10.15 – 11
         static let interactionStateData = "interactionStateData" // Used for session restoration on macOS 12+
@@ -38,12 +39,13 @@ extension Tab: NSSecureCoding {
 
     convenience init?(coder decoder: NSCoder) {
         let url: URL? = decoder.decodeIfPresent(at: NSSecureCodingKeys.url)
+        let videoID: String? = decoder.decodeIfPresent(at: NSSecureCodingKeys.videoID)
         let preferencePane = decoder.decodeIfPresent(at: NSSecureCodingKeys.preferencePane)
             .flatMap(PreferencePaneIdentifier.init(rawValue:))
 
         guard let tabTypeRawValue: Int = decoder.decodeIfPresent(at: NSSecureCodingKeys.tabType),
               let tabType = TabContent.ContentType(rawValue: tabTypeRawValue),
-              let content = TabContent(type: tabType, url: url, preferencePane: preferencePane)
+              let content = TabContent(type: tabType, url: url, videoID: videoID, preferencePane: preferencePane)
         else { return nil }
 
         let visitedDomains = decoder.decodeObject(of: [NSArray.self, NSString.self], forKey: NSSecureCodingKeys.visitedDomains) as? [String] ?? []
@@ -77,6 +79,10 @@ extension Tab: NSSecureCoding {
         lastSelectedAt.map(coder.encode(forKey: NSSecureCodingKeys.lastSelectedAt))
         coder.encode(currentDownload, forKey: NSSecureCodingKeys.currentDownload)
 
+        if let videoID = content.videoID {
+            coder.encode(videoID, forKey: NSSecureCodingKeys.videoID)
+        }
+
         if let pane = content.preferencePane {
             coder.encode(pane.rawValue, forKey: NSSecureCodingKeys.preferencePane)
         }
@@ -92,9 +98,10 @@ private extension Tab.TabContent {
         case bookmarks = 2
         case homePage = 3
         case onboarding = 4
+        case youtubePlayer = 5
     }
 
-    init?(type: ContentType, url: URL?, preferencePane: PreferencePaneIdentifier?) {
+    init?(type: ContentType, url: URL?, videoID: String?, preferencePane: PreferencePaneIdentifier?) {
         switch type {
         case .homePage:
             self = .homePage
@@ -107,6 +114,9 @@ private extension Tab.TabContent {
             self = .preferences(pane: preferencePane)
         case .onboarding:
             self = .onboarding
+        case .youtubePlayer:
+            guard let videoID = videoID else { return nil }
+            self = .youtubePlayer(videoID: videoID)
         }
     }
 
@@ -117,6 +127,7 @@ private extension Tab.TabContent {
         case .bookmarks: return .bookmarks
         case .preferences: return .preferences
         case .onboarding: return .onboarding
+        case .youtubePlayer: return .youtubePlayer
         case .none: return .homePage
         }
     }
@@ -125,6 +136,15 @@ private extension Tab.TabContent {
         switch self {
         case let .preferences(pane: pane):
             return pane
+        default:
+            return nil
+        }
+    }
+
+    var videoID: String? {
+        switch self {
+        case let .youtubePlayer(videoID):
+            return videoID
         default:
             return nil
         }

@@ -67,7 +67,29 @@ extension Preferences {
                         }
                     }
                 }
+
+                Section {
+                    Text("Private Youtube Player")
+                        .font(Const.Fonts.preferencePaneSectionHeader)
+
+                    Toggle("Enable private Youtube player", isOn: $model.isPrivateYoutubePlayerEnabled)
+
+                    Text(privateYoutubePlayerExplanation)
+                        .fixMultilineScrollableText()
+                }
             }
         }
+
+        private let privateYoutubePlayerExplanation: String = {
+            let bulletPoints = [
+                "If YouTube shows ads in the player, they will not be personalized",
+                "Views will not influence your browsing experience on YouTube",
+                "Views will not be used to personalize ads that you see around the web",
+                "No cookies are saved on your computer",
+                "No cookies are included in the request your computer makes to Google to fetch the video"
+            ]
+
+            return bulletPoints.map({ "• " + $0 }).joined(separator: "\n")
+        }()
     }
 }

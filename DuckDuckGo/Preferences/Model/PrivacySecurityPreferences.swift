@@ -42,4 +42,6 @@ final class PrivacySecurityPreferences {
     @UserDefaultsWrapper(key: .autoconsentEnabled, defaultValue: nil)
     public var autoconsentEnabled: Bool?
 
+    @UserDefaultsWrapper(key: .privateYoutubePlayerEnabled, defaultValue: false)
+    var privateYoutubePlayerEnabled: Bool
 }

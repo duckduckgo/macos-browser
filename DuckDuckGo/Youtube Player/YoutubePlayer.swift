@@ -35,14 +35,18 @@ extension URL {
         guard deletingLastPathComponent() == Self.localYoutubePlayerURL else {
             return nil
         }
-        return "https://www.youtube.com/watch?v=\(youtubeVideoID)".url!
+        return Self.youtubeURL(for: youtubeVideoID)
     }
 
     static func localYoutubeURL(for videoID: String) -> URL {
         Self.localYoutubePlayerURL.appendingPathComponent(videoID)
     }
 
-    fileprivate static let localYoutubePlayerURL = Bundle.main.bundleURL
+    static func youtubeURL(for videoID: String) -> URL {
+        "https://www.youtube.com/watch?v=\(videoID)".url!
+    }
+
+    static let localYoutubePlayerURL = Bundle.main.bundleURL
 }
 
 struct YoutubePlayer {

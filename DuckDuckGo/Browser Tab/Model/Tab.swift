@@ -47,6 +47,7 @@ final class Tab: NSObject, Identifiable, ObservableObject {
     enum TabContent: Equatable {
         case homePage
         case url(URL)
+        case youtubePlayer(videoID: String)
         case preferences(pane: PreferencePaneIdentifier?)
         case bookmarks
         case onboarding
@@ -61,8 +62,8 @@ final class Tab: NSObject, Identifiable, ObservableObject {
                 return .anyPreferencePane
             } else if let preferencePane = url.flatMap(PreferencePaneIdentifier.init(url:)) {
                 return .preferences(pane: preferencePane)
-            } else if let youtubeURL = url?.youtubeURL {
-                return .url(youtubeURL)
+            } else if url?.absoluteString.starts(with: URL.localYoutubePlayerURL.absoluteString) == true, let videoID = url?.lastPathComponent {
+                return .youtubePlayer(videoID: videoID)
             } else {
                 return .url(url ?? .blankPage)
             }
@@ -106,7 +107,7 @@ final class Tab: NSObject, Identifiable, ObservableObject {
 
         var title: String? {
             switch self {
-            case .url, .homePage, .none: return nil
+            case .url, .homePage, .none, .youtubePlayer: return nil
             case .preferences: return UserText.tabPreferencesTitle
             case .bookmarks: return UserText.tabBookmarksTitle
             case .onboarding: return UserText.tabOnboardingTitle
@@ -114,14 +115,30 @@ final class Tab: NSObject, Identifiable, ObservableObject {
         }
 
         var url: URL? {
-            guard case .url(let url) = self else { return nil }
-            return url
+            switch self {
+            case .url(let url):
+                return url
+            case .youtubePlayer(let videoID):
+                return .youtubeURL(for: videoID)
+            default:
+                return nil
+            }
         }
 
         var isUrl: Bool {
-            if case .url = self {
+            switch self {
+            case .url, .youtubePlayer:
                 return true
-            } else {
+            default:
+                return false
+            }
+        }
+
+        var isYoutubePlayer: Bool {
+            switch self {
+            case .youtubePlayer:
+                return true
+            default:
                 return false
             }
         }
@@ -232,6 +249,12 @@ final class Tab: NSObject, Identifiable, ObservableObject {
 
     var isLazyLoadingInProgress = false
 
+    private var shouldSkipPrivateYoutubePlayer = false {
+        didSet {
+            Swift.print("Should skip private YT player", shouldSkipPrivateYoutubePlayer)
+        }
+    }
+
     private var isBeingRedirected: Bool = false
 
     @Published private(set) var content: TabContent {
@@ -255,13 +278,19 @@ final class Tab: NSObject, Identifiable, ObservableObject {
         }
         lastUpgradedURL = nil
 
-        switch (self.content, content) {
+        var newContent = content
+
+        if case .youtubePlayer = newContent, let url = newContent.url, shouldSkipPrivateYoutubePlayer {
+            newContent = .url(url)
+        }
+
+        switch (self.content, newContent) {
         case (.preferences(pane: .some), .preferences(pane: nil)):
             // prevent clearing currently selected pane (for state persistence purposes)
             break
         default:
-            if self.content != content {
-                self.content = content
+            if self.content != newContent {
+                self.content = newContent
             }
         }
     }
@@ -420,15 +449,26 @@ final class Tab: NSObject, Identifiable, ObservableObject {
             return
         }
 
-        if let youtubeURL = webView.url?.youtubeURL {
-            webView.load(youtubeURL)
+        if case let .youtubePlayer(videoID) = content {
+            if let url = content.url, shouldSkipPrivateYoutubePlayer {
+                webView.load(url)
+            } else {
+                YoutubePlayer(videoID: videoID).load(in: webView)
+            }
+        } else if case let .url(url) = content,
+                  let videoID = url.youtubeVideoID,
+                  !shouldSkipPrivateYoutubePlayer,
+                  PrivacySecurityPreferences.shared.privateYoutubePlayerEnabled {
+
+            setContent(.youtubePlayer(videoID: videoID))
         } else {
-            if webView.url == nil,
-               let url = self.content.url {
+
+            if webView.url == nil, let url = self.content.url {
                 webView.load(url)
             } else {
                 webView.reload()
             }
+
         }
     }
 
@@ -504,6 +544,8 @@ final class Tab: NSObject, Identifiable, ObservableObject {
         switch content {
         case .url(let value):
             return value
+        case .youtubePlayer(let videoID):
+            return .youtubeURL(for: videoID)
         case .homePage:
             return .homePage
         default:
@@ -517,8 +559,7 @@ final class Tab: NSObject, Identifiable, ObservableObject {
         guard url.isValid,
               (webView.superview != nil || shouldLoadInBackground),
               // don‘t reload when already loaded
-              webView.url != url,
-              webView.url != content.url
+              (webView.url != url && webView.url != content.url) || content.isYoutubePlayer
         else { return false }
 
         // if content not loaded inspect error
@@ -1005,7 +1046,11 @@ extension Tab: WKNavigationDelegate {
     func webView(_ webView: WKWebView,
                  decidePolicyFor navigationAction: WKNavigationAction) async -> WKNavigationActionPolicy {
 
-        if navigationAction.request.url?.isFileURL ?? false {
+        if navigationAction.request.url == .blankPage {
+            return .allow
+        }
+
+        if navigationAction.request.url?.isFileURL == true {
             return .allow
         }
 
@@ -1135,9 +1180,22 @@ extension Tab: WKNavigationDelegate {
             }
         }
 
-        if let youtubeVideoID = navigationAction.request.url?.youtubeVideoID, webView.url?.youtubeURL != navigationAction.request.url {
-            YoutubePlayer(videoID: youtubeVideoID).load(in: webView)
-            return .cancel
+        Swift.print(navigationAction.request.url)
+        if let url = navigationAction.request.url, let youtubeVideoID = url.youtubeVideoID {
+            if case .url = content, !shouldSkipPrivateYoutubePlayer && PrivacySecurityPreferences.shared.privateYoutubePlayerEnabled {
+                setContent(.youtubePlayer(videoID: youtubeVideoID))
+                return .cancel
+            }
+            if case let .youtubePlayer(videoID) = content {
+                if navigationAction.navigationType == .linkActivated, url.youtubeVideoID == videoID {
+                    shouldSkipPrivateYoutubePlayer = true
+                    reload()
+                    return .cancel
+                } else {
+                    YoutubePlayer(videoID: youtubeVideoID).load(in: webView)
+                    return .cancel
+                }
+            }
         }
 
         toggleFBProtection(for: url)
@@ -1236,6 +1294,7 @@ extension Tab: WKNavigationDelegate {
     @MainActor
     func webView(_ webView: WKWebView, didFinish navigation: WKNavigation!) {
         isBeingRedirected = false
+        shouldSkipPrivateYoutubePlayer = false
         invalidateSessionStateData()
         webViewDidFinishNavigationPublisher.send()
         if isAMPProtectionExtracting { isAMPProtectionExtracting = false }
@@ -1248,6 +1307,7 @@ extension Tab: WKNavigationDelegate {
         //        hasError = true
 
         isBeingRedirected = false
+        shouldSkipPrivateYoutubePlayer = false
         invalidateSessionStateData()
         linkProtection.setMainFrameUrl(nil)
         webViewDidFailNavigationPublisher.send()

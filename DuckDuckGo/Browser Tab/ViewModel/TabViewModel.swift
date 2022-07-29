@@ -204,6 +204,12 @@ final class TabViewModel {
             return
         }
 
+        if case .youtubePlayer = tab.content {
+            addressBarString = url.absoluteString
+            passiveAddressBarString = "DuckDuckGo Private Player"
+            return
+        }
+
         if url.isFileURL {
             addressBarString = url.absoluteString
             passiveAddressBarString = url.absoluteString
@@ -251,7 +257,7 @@ final class TabViewModel {
             title = UserText.tabHomeTitle
         case .onboarding:
             title = UserText.tabOnboardingTitle
-        case .url, .none:
+        case .url, .none, .youtubePlayer:
             if let title = tab.title {
                 self.title = title
             } else {
@@ -276,7 +282,7 @@ final class TabViewModel {
         case .bookmarks:
             favicon = Favicon.bookmarks
             return
-        case .url, .onboarding, .none: break
+        case .url, .onboarding, .none, .youtubePlayer: break
         }
 
         if let favicon = tab.favicon {

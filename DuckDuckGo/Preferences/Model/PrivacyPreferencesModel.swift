@@ -40,6 +40,13 @@ final class PrivacyPreferencesModel: ObservableObject {
         }
     }
 
+    @Published
+    var isPrivateYoutubePlayerEnabled: Bool {
+        didSet {
+            privacySecurityPreferences.privateYoutubePlayerEnabled = isPrivateYoutubePlayerEnabled
+        }
+    }
+
     func presentManageFireproofSitesDialog() {
         let fireproofDomainsWindowController = FireproofDomainsViewController.create().wrappedInWindowController()
 
@@ -62,6 +69,7 @@ final class PrivacyPreferencesModel: ObservableObject {
         isLoginDetectionEnabled = privacySecurityPreferences.loginDetectionEnabled
         isGPCEnabled = privacySecurityPreferences.gpcEnabled
         isAutoconsentEnabled = privacySecurityPreferences.autoconsentEnabled ?? false
+        isPrivateYoutubePlayerEnabled = privacySecurityPreferences.privateYoutubePlayerEnabled
     }
 
     private let privacySecurityPreferences: PrivacySecurityPreferences
