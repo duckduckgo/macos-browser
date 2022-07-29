@@ -173,6 +173,7 @@ final class AddressBarButtonsViewController: NSViewController {
         super.viewDidLoad()
 
         setupAnimationViews()
+        setupNotificationAnimationView()
         subscribeToSelectedTabViewModel()
         subscribeToBookmarkList()
         subscribePrivacyDashboardPendingUpdates()
@@ -501,6 +502,10 @@ final class AddressBarButtonsViewController: NSViewController {
 
         animationViewCache[animationName] = animationView
         return animationView
+    }
+    
+    private func setupNotificationAnimationView() {
+        notificationAnimationView.alphaValue = 0.0
     }
 
     private func setupAnimationViews() {

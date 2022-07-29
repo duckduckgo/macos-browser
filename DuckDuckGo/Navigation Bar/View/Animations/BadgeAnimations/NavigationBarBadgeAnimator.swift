@@ -33,7 +33,6 @@ final class NavigationBarBadgeAnimator: NSObject {
         let newAnimationID = UUID()
         self.animationID = newAnimationID
         
-        notificationBadgeContainer.alphaValue = 0
         notificationBadgeContainer.prepareAnimation(.cookieManaged)
 
         NSAnimationContext.runAnimationGroup { context in
