@@ -116,12 +116,13 @@ final class WebViewStateObserver: NSObject {
     private func handleURLChange(in webView: WKWebView, tabViewModel: TabViewModel) {
         if let url = webView.url {
 
-            tabViewModel.tab.setContent(.contentFromURL(url))
             if !webView.isLoading {
                 tabViewModel.tab.addVisit(of: url)
             }
             if let youtubeVideoID = url.youtubeVideoID, PrivacySecurityPreferences.shared.privateYoutubePlayerEnabled {
-                YoutubePlayer(videoID: youtubeVideoID).load(in: webView)
+                tabViewModel.tab.setContent(.youtubePlayer(videoID: youtubeVideoID))
+            } else {
+                tabViewModel.tab.setContent(.contentFromURL(url))
             }
         }
         updateTitle() // The title might not change if webView doesn't think anything is different so update title here as well

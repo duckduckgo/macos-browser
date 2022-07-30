@@ -254,6 +254,7 @@ final class Tab: NSObject, Identifiable, ObservableObject {
             Swift.print("Should skip private YT player", shouldSkipPrivateYoutubePlayer)
         }
     }
+    private var forceReload = false
 
     private var isBeingRedirected: Bool = false
 
@@ -290,6 +291,11 @@ final class Tab: NSObject, Identifiable, ObservableObject {
             break
         default:
             if self.content != newContent {
+
+                if self.content.url == newContent.url {
+                    forceReload = true
+                }
+
                 self.content = newContent
             }
         }
@@ -450,7 +456,7 @@ final class Tab: NSObject, Identifiable, ObservableObject {
         }
 
         if case let .youtubePlayer(videoID) = content {
-            if let url = content.url, shouldSkipPrivateYoutubePlayer {
+            if let url = content.url, shouldSkipPrivateYoutubePlayer || !PrivacySecurityPreferences.shared.privateYoutubePlayerEnabled {
                 webView.load(url)
             } else {
                 YoutubePlayer(videoID: videoID).load(in: webView)
@@ -521,18 +527,24 @@ final class Tab: NSObject, Identifiable, ObservableObject {
             })
         }()
         if shouldLoadURL(url, shouldLoadInBackground: shouldLoadInBackground) {
-            let didRestore: Bool
-            
-            if #available(macOS 12.0, *) {
-                didRestore = restoreInteractionStateDataIfNeeded() || restoreSessionStateDataIfNeeded()
+            if case .youtubePlayer = content, (shouldSkipPrivateYoutubePlayer || !PrivacySecurityPreferences.shared.privateYoutubePlayerEnabled) {
+                setContent(.url(contentURL))
             } else {
-                didRestore = restoreSessionStateDataIfNeeded()
-            }
-            
-            if !didRestore {
-                if url.isFileURL {
-                    webView.loadFileURL(url, allowingReadAccessTo: URL(fileURLWithPath: "/"))
+                let didRestore: Bool
+
+                if #available(macOS 12.0, *) {
+                    didRestore = restoreInteractionStateDataIfNeeded() || restoreSessionStateDataIfNeeded()
                 } else {
+                    didRestore = restoreSessionStateDataIfNeeded()
+                }
+
+                if !didRestore {
+                    if url.isFileURL {
+                        webView.loadFileURL(url, allowingReadAccessTo: URL(fileURLWithPath: "/"))
+                    } else {
+                        webView.load(url)
+                    }
+                } else if case .youtubePlayer = content {
                     webView.load(url)
                 }
             }
@@ -555,12 +567,27 @@ final class Tab: NSObject, Identifiable, ObservableObject {
 
     @MainActor
     private func shouldLoadURL(_ url: URL, shouldLoadInBackground: Bool = false) -> Bool {
+        if forceReload {
+            forceReload = false
+            return true
+        }
+        if let videoID = url.youtubeVideoID {
+            let shouldShowPrivatePlayer = !shouldSkipPrivateYoutubePlayer && PrivacySecurityPreferences.shared.privateYoutubePlayerEnabled
+            if shouldShowPrivatePlayer {
+                return webView.url != URL.localYoutubeURL(for: videoID)
+            } else {
+                return webView.url != content.url
+            }
+        }
         // don‘t reload in background unless shouldLoadInBackground
         guard url.isValid,
               (webView.superview != nil || shouldLoadInBackground),
               // don‘t reload when already loaded
-              (webView.url != url && webView.url != content.url) || content.isYoutubePlayer
-        else { return false }
+              webView.url != url,
+              webView.url != content.url
+        else {
+            return false
+        }
 
         // if content not loaded inspect error
         switch error {
@@ -1189,9 +1216,9 @@ extension Tab: WKNavigationDelegate {
             if case let .youtubePlayer(videoID) = content {
                 if navigationAction.navigationType == .linkActivated, url.youtubeVideoID == videoID {
                     shouldSkipPrivateYoutubePlayer = true
-                    reload()
+                    setContent(.url(url))
                     return .cancel
-                } else {
+                } else if webView.url != URL.localYoutubeURL(for: videoID) {
                     YoutubePlayer(videoID: youtubeVideoID).load(in: webView)
                     return .cancel
                 }
