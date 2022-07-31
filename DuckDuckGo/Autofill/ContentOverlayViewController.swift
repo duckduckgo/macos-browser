@@ -165,6 +165,19 @@ public final class ContentOverlayViewController: NSViewController, EmailManagerR
         }.resume()
     }
     // swiftlint:enable function_parameter_count
+    
+    public func emailManagerKeychainAccessFailed(accessType: EmailKeychainAccessType, error: EmailKeychainAccessError) {
+        var parameters = [
+             "access_type": accessType.rawValue,
+             "error": error.errorDescription
+         ]
+
+         if case let .keychainAccessFailure(status) = error {
+             parameters["keychain_status"] = String(status)
+         }
+        
+        Pixel.fire(.debug(event: .emailAutofillKeychainError), withAdditionalParameters: parameters)
+    }
 
     private enum Constants {
         static let minWidth: CGFloat = 315

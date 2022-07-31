@@ -89,18 +89,30 @@ enum TabIndex: Equatable, Comparable {
 
 extension TabIndex {
     static func first(in viewModel: TabCollectionViewModel) -> TabIndex {
-        return viewModel.pinnedTabsCount > 0 ? .pinned(0) : .unpinned(0)
+        if viewModel.pinnedTabsCount > 0 {
+            return .pinned(0)
+        }
+        assert(viewModel.tabsCount > 0, "There must be at least 1 tab, pinned or unpinned")
+        return .unpinned(0)
     }
 
     static func last(in viewModel: TabCollectionViewModel) -> TabIndex {
-        .unpinned(viewModel.tabsCount - 1)
+        if viewModel.tabsCount > 0 {
+            return .unpinned(viewModel.tabsCount - 1)
+        }
+        assert(viewModel.pinnedTabsCount > 0, "There must be at least 1 tab, pinned or unpinned")
+        return .pinned(viewModel.pinnedTabsCount - 1)
+    }
+
+    static func at(_ position: Int, in viewModel: TabCollectionViewModel) -> TabIndex {
+        .pinned(position).sanitized(for: viewModel)
     }
 
     func next(in viewModel: TabCollectionViewModel) -> TabIndex {
         switch self {
         case .pinned(let index):
             if index >= viewModel.pinnedTabsCount - 1 {
-                return .unpinned(0)
+                return viewModel.tabsCount > 0 ? .unpinned(0) : .first(in: viewModel)
             }
             return .pinned(index + 1)
         case .unpinned(let index):
@@ -129,10 +141,13 @@ extension TabIndex {
     func sanitized(for viewModel: TabCollectionViewModel) -> TabIndex {
         switch self {
         case .pinned(let index):
-            if index >= viewModel.pinnedTabsCount {
+            if index >= viewModel.pinnedTabsCount && viewModel.tabsCount > 0 {
                 return .unpinned(min(index - viewModel.pinnedTabsCount, viewModel.tabsCount - 1))
             }
-            return .pinned(max(0, index))
+            if index < 0 {
+                return viewModel.pinnedTabsCount > 0 ? .pinned(0) : .unpinned(0)
+            }
+            return .pinned(max(0, min(index, viewModel.pinnedTabsCount - 1)))
         case .unpinned(let index):
             if index >= 0 && viewModel.tabsCount == 0 {
                 return .pinned(viewModel.pinnedTabsCount - 1)
