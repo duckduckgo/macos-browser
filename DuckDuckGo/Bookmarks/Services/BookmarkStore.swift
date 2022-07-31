@@ -679,11 +679,29 @@ final class LocalBookmarkStore: BookmarkStore {
             // 2. If the root folder does not exist, create it
             // 3. Add all other top-level entities as children of the root folder
             
+            let rootFolderFetchRequest = Bookmark.singleEntity(with: .rootBookmarkFolderUUID)
+            
             let topLevelEntitiesFetchRequest = Bookmark.topLevelEntitiesFetchRequest()
             topLevelEntitiesFetchRequest.sortDescriptors = [NSSortDescriptor(key: #keyPath(BookmarkManagedObject.dateAdded), ascending: true)]
             topLevelEntitiesFetchRequest.returnsObjectsAsFaults = true
             
             do {
+                // 0. Up front, check if a root folder exists but has been moved deeper into the hierarchy, and remove it if so:
+                
+                if let existingRootFolder = try self.context.fetch(rootFolderFetchRequest).first,
+                   let rootFolderParent = existingRootFolder.parentFolder {
+                    existingRootFolder.children?.forEach { child in
+                        if let bookmarkEntity = child as? BookmarkManagedObject {
+                            bookmarkEntity.parentFolder = rootFolderParent
+                        } else {
+                            assertionFailure("Tried to relocate child that was not a BookmarkManagedObject")
+                        }
+                    }
+                    
+                    // Since the existing root folder's children have been relocated, delete it and let it be recreated later.
+                    context.delete(existingRootFolder)
+                }
+                
                 // 1. Get the existing top level entities and check for a root folder:
                 
                 var existingTopLevelEntities = try self.context.fetch(topLevelEntitiesFetchRequest)
