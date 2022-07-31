@@ -134,6 +134,13 @@ extension NSView {
             return locationInView
         }
     }
+    
+    func imageRepresentation() -> NSImage {
+        let imageRepresentation = bitmapImageRepForCachingDisplay(in: bounds)!
+        cacheDisplay(in: bounds, to: imageRepresentation)
+
+        return NSImage(cgImage: imageRepresentation.cgImage!, size: bounds.size)
+    }
 
     // MARK: - Favicon
 
