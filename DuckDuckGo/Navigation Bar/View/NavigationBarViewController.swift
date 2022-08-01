@@ -306,7 +306,7 @@ final class NavigationBarViewController: NSViewController {
                           // if the tab is not active, don't show the popup
                           return
                       }
-                self.addressBarViewController?.addressBarButtonsViewController?.showNotification(.cookieManaged)                
+                self.addressBarViewController?.addressBarButtonsViewController?.showBadgeNotification(.cookieManaged)                
             }
         }
     }
