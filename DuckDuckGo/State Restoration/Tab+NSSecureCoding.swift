@@ -24,7 +24,8 @@ extension Tab: NSSecureCoding {
     private enum NSSecureCodingKeys {
         static let url = "url"
         static let title = "title"
-        static let sessionStateData = "ssdata"
+        static let sessionStateData = "ssdata" // Used for session restoration on macOS 10.15 – 11
+        static let interactionStateData = "interactionStateData" // Used for session restoration on macOS 12+
         static let favicon = "icon"
         static let tabType = "tabType"
         static let preferencePane = "preferencePane"
@@ -53,6 +54,7 @@ extension Tab: NSSecureCoding {
                   title: decoder.decodeIfPresent(at: NSSecureCodingKeys.title),
                   favicon: decoder.decodeIfPresent(at: NSSecureCodingKeys.favicon),
                   sessionStateData: decoder.decodeIfPresent(at: NSSecureCodingKeys.sessionStateData),
+                  interactionStateData: decoder.decodeIfPresent(at: NSSecureCodingKeys.interactionStateData),
                   lastSelectedAt: decoder.decodeIfPresent(at: NSSecureCodingKeys.lastSelectedAt),
                   currentDownload: currentDownload)
     }
@@ -64,7 +66,13 @@ extension Tab: NSSecureCoding {
         coder.encode(Array(localHistory), forKey: NSSecureCodingKeys.visitedDomains)
         title.map(coder.encode(forKey: NSSecureCodingKeys.title))
         favicon.map(coder.encode(forKey: NSSecureCodingKeys.favicon))
-        getActualSessionStateData().map(coder.encode(forKey: NSSecureCodingKeys.sessionStateData))
+        
+        if #available(macOS 12, *) {
+            getActualInteractionStateData().map(coder.encode(forKey: NSSecureCodingKeys.interactionStateData))
+        } else {
+            getActualSessionStateData().map(coder.encode(forKey: NSSecureCodingKeys.sessionStateData))
+        }
+
         coder.encode(content.type.rawValue, forKey: NSSecureCodingKeys.tabType)
         lastSelectedAt.map(coder.encode(forKey: NSSecureCodingKeys.lastSelectedAt))
         coder.encode(currentDownload, forKey: NSSecureCodingKeys.currentDownload)
