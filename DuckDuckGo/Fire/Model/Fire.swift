@@ -276,13 +276,13 @@ final class Fire {
         // Get domains to burn
         var domains = Set<String>()
         visits.forEach { visit in
-            guard let histotyEntry = visit.historyEntry,
-                  let domain = Fire.getBurningDomain(from: histotyEntry.url) else {
-                assertionFailure("No history entry or url")
+            guard let historyEntry = visit.historyEntry else {
+                assertionFailure("No history entry")
                 return
             }
 
-            if !fireproofDomains.isFireproof(fireproofDomain: domain) {
+            if let domain = Fire.getBurningDomain(from: historyEntry.url),
+               !fireproofDomains.isFireproof(fireproofDomain: domain) {
                 domains.insert(domain)
             }
         }
