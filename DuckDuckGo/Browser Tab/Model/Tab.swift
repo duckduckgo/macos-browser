@@ -456,7 +456,7 @@ final class Tab: NSObject, Identifiable, ObservableObject {
         }
 
         if case let .youtubePlayer(videoID) = content {
-            if let url = content.url, shouldSkipPrivateYoutubePlayer || !PrivacySecurityPreferences.shared.privateYoutubePlayerEnabled {
+            if let url = content.url, shouldSkipPrivateYoutubePlayer || PrivacySecurityPreferences.shared.privateYoutubePlayerEnabled == false {
                 webView.load(url)
             } else {
                 YoutubePlayer(videoID: videoID).load(in: webView)
@@ -464,7 +464,7 @@ final class Tab: NSObject, Identifiable, ObservableObject {
         } else if case let .url(url) = content,
                   let videoID = url.youtubeVideoID,
                   !shouldSkipPrivateYoutubePlayer,
-                  PrivacySecurityPreferences.shared.privateYoutubePlayerEnabled {
+                  PrivacySecurityPreferences.shared.privateYoutubePlayerEnabled == true {
 
             setContent(.youtubePlayer(videoID: videoID))
         } else {
@@ -527,7 +527,7 @@ final class Tab: NSObject, Identifiable, ObservableObject {
             })
         }()
         if shouldLoadURL(url, shouldLoadInBackground: shouldLoadInBackground) {
-            if case .youtubePlayer = content, (shouldSkipPrivateYoutubePlayer || !PrivacySecurityPreferences.shared.privateYoutubePlayerEnabled) {
+            if case .youtubePlayer = content, (shouldSkipPrivateYoutubePlayer || PrivacySecurityPreferences.shared.privateYoutubePlayerEnabled == false) {
                 setContent(.url(contentURL))
             } else {
                 let didRestore: Bool
@@ -572,7 +572,7 @@ final class Tab: NSObject, Identifiable, ObservableObject {
             return true
         }
         if let videoID = url.youtubeVideoID {
-            let shouldShowPrivatePlayer = !shouldSkipPrivateYoutubePlayer && PrivacySecurityPreferences.shared.privateYoutubePlayerEnabled
+            let shouldShowPrivatePlayer = !shouldSkipPrivateYoutubePlayer && PrivacySecurityPreferences.shared.privateYoutubePlayerEnabled == true
             if shouldShowPrivatePlayer {
                 return webView.url != URL.localYoutubeURL(for: videoID)
             } else {
@@ -1209,7 +1209,7 @@ extension Tab: WKNavigationDelegate {
 
         Swift.print(navigationAction.request.url)
         if let url = navigationAction.request.url, let youtubeVideoID = url.youtubeVideoID {
-            if case .url = content, !shouldSkipPrivateYoutubePlayer && PrivacySecurityPreferences.shared.privateYoutubePlayerEnabled {
+            if case .url = content, !shouldSkipPrivateYoutubePlayer && PrivacySecurityPreferences.shared.privateYoutubePlayerEnabled == true {
                 setContent(.youtubePlayer(videoID: youtubeVideoID))
                 return .cancel
             }

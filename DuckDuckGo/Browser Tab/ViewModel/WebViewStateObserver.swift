@@ -119,7 +119,7 @@ final class WebViewStateObserver: NSObject {
             if !webView.isLoading {
                 tabViewModel.tab.addVisit(of: url)
             }
-            if let youtubeVideoID = url.youtubeVideoID, PrivacySecurityPreferences.shared.privateYoutubePlayerEnabled {
+            if let youtubeVideoID = url.youtubeVideoID, PrivacySecurityPreferences.shared.privateYoutubePlayerEnabled == true {
                 tabViewModel.tab.setContent(.youtubePlayer(videoID: youtubeVideoID))
             } else {
                 tabViewModel.tab.setContent(.contentFromURL(url))

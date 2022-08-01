@@ -69,7 +69,7 @@ final class PrivacyPreferencesModel: ObservableObject {
         isLoginDetectionEnabled = privacySecurityPreferences.loginDetectionEnabled
         isGPCEnabled = privacySecurityPreferences.gpcEnabled
         isAutoconsentEnabled = privacySecurityPreferences.autoconsentEnabled ?? false
-        isPrivateYoutubePlayerEnabled = privacySecurityPreferences.privateYoutubePlayerEnabled
+        isPrivateYoutubePlayerEnabled = privacySecurityPreferences.privateYoutubePlayerEnabled ?? false
     }
 
     private let privacySecurityPreferences: PrivacySecurityPreferences
