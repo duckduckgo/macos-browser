@@ -10,7 +10,7 @@ if [ "$1" == "-c" ]; then
 	grep http DuckDuckGo/Configuration/ConfigurationDownloading.swift | while read -r line
 	do
 		# if trimmed line begins with "case" then check the url in the line and ensure
-		# it does not contain localhost or 127.0.0.1
+		# it matches the expected url.
 		if [[ $line =~ ^\s*case ]]; then
 			# Get URL from line and remove quotes
 			url=$(echo $line | awk '{print $4}' | sed 's/^"//' | sed 's/"$//')
