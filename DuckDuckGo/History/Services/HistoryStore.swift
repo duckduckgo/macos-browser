@@ -169,6 +169,7 @@ final class HistoryStore: HistoryStoring {
                 // Check for existence
                 let fetchRequest = HistoryEntryManagedObject.fetchRequest() as NSFetchRequest<HistoryEntryManagedObject>
                 fetchRequest.returnsObjectsAsFaults = false
+                fetchRequest.fetchLimit = 1
                 fetchRequest.predicate = NSPredicate(format: "identifier == %@", entry.identifier as CVarArg)
                 let fetchedObjects: [HistoryEntryManagedObject]
                 do {
