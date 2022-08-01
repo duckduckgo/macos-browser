@@ -68,17 +68,6 @@ extension AppDelegate {
         RecentlyClosedCoordinator.shared.reopenItem(cacheItem)
     }
 
-    @objc func searchHistory(_ sender: NSMenuItem) {
-        let window = WindowsManager.openNewWindow(with: Tab(content: .homePage))
-        let windowController = window?.windowController as? MainWindowController
-        guard let viewController = windowController?.mainViewController else {
-            assertionFailure("No reference to main view controller")
-            return
-        }
-
-        viewController.searchHistory(sender)
-    }
-
     @objc func openVisit(_ sender: NSMenuItem) {
         guard let visit = sender.representedObject as? Visit,
               let url = visit.historyEntry?.url else {
@@ -359,16 +348,6 @@ extension MainViewController {
         }
 
         selectedTabViewModel.tab.openHomePage()
-    }
-
-    @objc func searchHistory(_ sender: NSMenuItem) {
-        guard let viewController = WindowControllersManager.shared.lastKeyMainWindowController?.mainViewController else {
-            assertionFailure("No reference to main view controller")
-            return
-        }
-
-        viewController.navigationBarViewController.addressBarViewController?.addressBarTextField.clearValue()
-        viewController.navigationBarViewController.addressBarViewController?.addressBarTextField.makeMeFirstResponder()
     }
 
     @objc func openVisit(_ sender: NSMenuItem) {
