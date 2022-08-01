@@ -27,12 +27,12 @@ final class MainMenu: NSMenu {
         static let maxTitleLength = 55
     }
 
-    // DuckDuckGo
+    // MARK: - DuckDuckGo
     @IBOutlet weak var checkForUpdatesMenuItem: NSMenuItem?
     @IBOutlet weak var checkForUpdatesSeparatorItem: NSMenuItem?
     @IBOutlet weak var preferencesMenuItem: NSMenuItem!
 
-    // File
+    // MARK: - File
     @IBOutlet weak var newWindowMenuItem: NSMenuItem!
     @IBOutlet weak var newTabMenuItem: NSMenuItem!
     @IBOutlet weak var openLocationMenuItem: NSMenuItem!
@@ -44,11 +44,11 @@ final class MainMenu: NSMenu {
     @IBOutlet weak var shareMenuItem: NSMenuItem!
     @IBOutlet weak var importBrowserDataMenuItem: NSMenuItem!
 
-    // Edit
+    // MARK: - Edit
     @IBOutlet weak var checkSpellingWhileTypingMenuItem: NSMenuItem?
     @IBOutlet weak var checkGrammarWithSpellingMenuItem: NSMenuItem?
 
-    // View
+    // MARK: - View
     @IBOutlet weak var backMenuItem: NSMenuItem?
     @IBOutlet weak var forwardMenuItem: NSMenuItem?
     @IBOutlet weak var reloadMenuItem: NSMenuItem?
@@ -59,7 +59,7 @@ final class MainMenu: NSMenu {
     @IBOutlet weak var zoomOutMenuItem: NSMenuItem?
     @IBOutlet weak var actualSizeMenuItem: NSMenuItem?
 
-    // Bookmarks
+    // MARK: - Bookmarks
     @IBOutlet weak var manageBookmarksMenuItem: NSMenuItem!
     @IBOutlet weak var importBookmarksMenuItem: NSMenuItem!
     @IBOutlet weak var bookmarksMenuItem: NSMenuItem?
@@ -67,7 +67,7 @@ final class MainMenu: NSMenu {
     @IBOutlet weak var favoritesMenuItem: NSMenuItem?
     @IBOutlet weak var favoriteThisPageMenuItem: NSMenuItem?
 
-    // Debug
+    // MARK: - Debug
     @IBOutlet weak var debugMenuItem: NSMenuItem? {
         didSet {
             #if !DEBUG && !REVIEW
@@ -78,7 +78,7 @@ final class MainMenu: NSMenu {
         }
     }
 
-    // Help
+    // MARK: - Help
     @IBOutlet weak var helpMenuItem: NSMenuItem?
     @IBOutlet weak var helpSeparatorMenuItem: NSMenuItem?
     @IBOutlet weak var sendFeedbackMenuItem: NSMenuItem?
