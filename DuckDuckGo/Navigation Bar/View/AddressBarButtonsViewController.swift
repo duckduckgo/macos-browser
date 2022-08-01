@@ -190,7 +190,7 @@ final class AddressBarButtonsViewController: NSViewController {
         super.viewDidAppear()
     }
     
-    func showNotification(_ type: NavigationBarBadgeAnimationView.AnimationType) {
+    func showBadgeNotification(_ type: NavigationBarBadgeAnimationView.AnimationType) {
         if !isAnyShieldAnimationPlaying {
             buttonsBadgeAnimator.showNotification(withType: .cookieManaged,
                                                   buttonsContainer: buttonsContainer,
@@ -206,7 +206,7 @@ final class AddressBarButtonsViewController: NSViewController {
             // Add small time gap in between animations if badge animation was queued
             DispatchQueue.main.asyncAfter(deadline: .now() + 0.6) {
                 if self.tabCollectionViewModel.selectedTab == queuedNotification.selectedTab {
-                    self.showNotification(queuedNotification.animationType)
+                    self.showBadgeNotification(queuedNotification.animationType)
                 } else {
                     self.buttonsBadgeAnimator.queuedAnimation = nil
                 }
