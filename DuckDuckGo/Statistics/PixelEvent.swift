@@ -213,6 +213,8 @@ extension Pixel {
             case feedbackReportingFailed = "feedback_reporting_failed"
             
             case blankNavigationOnBurnFailed = "blank_navigation_on_burn_failed"
+            
+            case emailAutofillKeychainError = "email_autofill_keychain_error"
         }
 
     }

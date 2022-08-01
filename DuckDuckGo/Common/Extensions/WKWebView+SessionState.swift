@@ -22,16 +22,22 @@ extension WKWebView {
     struct DoesNotSupportRestoreFromSessionData: Error {}
 
     @nonobjc
+    @available(macOS, deprecated: 12.0)
     func sessionStateData() throws -> Data? {
-        guard self.responds(to: #selector(WKWebView._sessionStateData))
-            else { throw DoesNotSupportRestoreFromSessionData() }
+        guard self.responds(to: #selector(WKWebView._sessionStateData)) else {
+            throw DoesNotSupportRestoreFromSessionData()
+        }
+
         return self._sessionStateData()
     }
 
     @nonobjc
+    @available(macOS, deprecated: 12.0)
     func restoreSessionState(from data: Data) throws {
-        guard self.responds(to: #selector(WKWebView._restore(fromSessionStateData:)))
-            else { throw DoesNotSupportRestoreFromSessionData() }
+        guard self.responds(to: #selector(WKWebView._restore(fromSessionStateData:))) else {
+            throw DoesNotSupportRestoreFromSessionData()
+        }
+
         self._restore(fromSessionStateData: data)
     }
 
