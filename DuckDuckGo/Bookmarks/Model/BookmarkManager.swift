@@ -246,5 +246,16 @@ final class LocalBookmarkManager: BookmarkManager {
 
         return results
     }
+    
+    // MARK: - Debugging
+    
+    func resetBookmarks() {
+        guard let store = bookmarkStore as? LocalBookmarkStore else {
+            return
+        }
+            
+        store.resetBookmarks()
+        loadBookmarks()
+    }
 
 }

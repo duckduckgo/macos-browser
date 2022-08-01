@@ -204,6 +204,7 @@ final class LocalBookmarkStore: BookmarkStore {
             } catch {
                 assertionFailure("LocalBookmarkStore: Saving of context failed")
                 DispatchQueue.main.async { completion(false, error) }
+                return
             }
 
             DispatchQueue.main.async { completion(true, nil) }
@@ -457,10 +458,6 @@ final class LocalBookmarkStore: BookmarkStore {
 
             DispatchQueue.main.async { completion(nil) }
         }
-    }
-    
-    func getTopLevelFolder(completion: Result<BookmarkManagedObject, Error>) {
-        
     }
 
     // MARK: - Import
@@ -749,6 +746,21 @@ final class LocalBookmarkStore: BookmarkStore {
                 Pixel.fire(.debug(event: .bookmarksStoreRootFolderMigrationFailed, error: error))
             }
         }
+    }
+    
+    func resetBookmarks() {
+        context.performAndWait {
+            let fetchRequest: NSFetchRequest<NSFetchRequestResult> = NSFetchRequest(entityName: BookmarkManagedObject.className())
+            let deleteRequest = NSBatchDeleteRequest(fetchRequest: fetchRequest)
+            
+            do {
+                try context.execute(deleteRequest)
+            } catch {
+                assertionFailure("Failed to reset bookmarks")
+            }
+        }
+        
+        sharedInitialization()
     }
     
     // MARK: - Concurrency
