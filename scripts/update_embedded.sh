@@ -13,8 +13,8 @@ if [ "$1" == "-c" ]; then
 		# it matches the expected url.
 		if [[ $line =~ ^\s*case ]]; then
 			# Get URL from line and remove quotes
-			url=$(echo $line | awk '{print $4}' | sed 's/^"//' | sed 's/"$//')
-			case_name=$(echo $line | awk '{print $2}')
+			url=$(echo "$line" | awk '{print $4}' | sed 's/^"//' | sed 's/"$//')
+			case_name=$(echo "$line" | awk '{print $2}')
 			if [ "$case_name" == "trackerRadar" ] && [ "$url" != "$TDS_URL" ]; then
 				echo "Error: $url does not match $TDS_URL"
 				exit 1
