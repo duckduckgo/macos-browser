@@ -112,7 +112,9 @@ extension HistoryEntry: Hashable {
     }
 
     func hash(into hasher: inout Hasher) {
-        hasher.combine(ObjectIdentifier(self))
+        hasher.combine(id)
     }
 
 }
+
+extension HistoryEntry: Identifiable {}
