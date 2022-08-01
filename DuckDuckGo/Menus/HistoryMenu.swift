@@ -305,7 +305,10 @@ private extension HistoryCoordinating {
     }
 
     func getRecentVisits(maxCount: Int) -> [Visit] {
-        return Array(getSortedArrayOfVisits().prefix(maxCount))
+        return Array(getSortedArrayOfVisits()
+            .prefix(maxCount)
+            .filter { NSCalendar.current.isDateInToday($0.date) }
+        )
     }
 
     func getVisitGroupings() -> [HistoryMenu.HistoryGrouping] {
