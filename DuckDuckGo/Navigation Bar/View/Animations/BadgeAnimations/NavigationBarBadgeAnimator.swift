@@ -19,9 +19,14 @@
 import Cocoa
 
 final class NavigationBarBadgeAnimator: NSObject {
-    var queuedAnimation: NavigationBarBadgeAnimationView.AnimationType?
+    var queuedAnimation: QueueData?
     private var animationID: UUID?
     private(set) var isAnimating = false
+    
+    struct QueueData {
+        var selectedTab: Tab?
+        var animationType: NavigationBarBadgeAnimationView.AnimationType
+    }
     
     private enum ButtonsFade {
         case start

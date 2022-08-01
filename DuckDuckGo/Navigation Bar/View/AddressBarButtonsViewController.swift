@@ -196,7 +196,8 @@ final class AddressBarButtonsViewController: NSViewController {
                                                   buttonsContainer: buttonsContainer,
                                                   and: notificationAnimationView)
         } else {
-            buttonsBadgeAnimator.queuedAnimation = type
+            buttonsBadgeAnimator.queuedAnimation = NavigationBarBadgeAnimator.QueueData(selectedTab: tabCollectionViewModel.selectedTab,
+                                                                                        animationType: type)
         }
     }
     
@@ -204,7 +205,11 @@ final class AddressBarButtonsViewController: NSViewController {
         if let queuedNotification = buttonsBadgeAnimator.queuedAnimation {
             // Add small time gap in between animations if badge animation was queued
             DispatchQueue.main.asyncAfter(deadline: .now() + 0.6) {
-                self.showNotification(queuedNotification)
+                if self.tabCollectionViewModel.selectedTab == queuedNotification.selectedTab {
+                    self.showNotification(queuedNotification.animationType)
+                } else {
+                    self.buttonsBadgeAnimator.queuedAnimation = nil
+                }
             }
         }
     }
