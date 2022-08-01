@@ -53,7 +53,7 @@ extension TabLazyLoaderDataSource {
 extension TabCollectionViewModel: TabLazyLoaderDataSource {
 
     var pinnedTabs: [Tab] {
-        pinnedTabsCollection.tabs
+        pinnedTabsCollection?.tabs ?? []
     }
 
     var tabs: [Tab] {

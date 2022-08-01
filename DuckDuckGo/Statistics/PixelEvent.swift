@@ -221,6 +221,8 @@ extension Pixel {
             case historySaveFailed = "history_save_failed"
             case historyInsertVisitFailed = "history_insert_visit_failed"
             case historyRemoveVisitsFailed = "history_remove_visits_failed"
+
+            case emailAutofillKeychainError = "email_autofill_keychain_error"
         }
 
     }

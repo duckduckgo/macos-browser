@@ -26,6 +26,7 @@
 		373A1AAA283ED86C00586521 /* BookmarksHTMLReaderTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 373A1AA9283ED86C00586521 /* BookmarksHTMLReaderTests.swift */; };
 		373A1AB02842C4EA00586521 /* BookmarkHTMLImporter.swift in Sources */ = {isa = PBXBuildFile; fileRef = 373A1AAF2842C4EA00586521 /* BookmarkHTMLImporter.swift */; };
 		373A1AB228451ED400586521 /* BookmarksHTMLImporterTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 373A1AB128451ED400586521 /* BookmarksHTMLImporterTests.swift */; };
+		37479F152891BC8300302FE2 /* TabCollectionViewModelTests+WithoutPinnedTabsManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37479F142891BC8300302FE2 /* TabCollectionViewModelTests+WithoutPinnedTabsManager.swift */; };
 		37534C9E28104D9B002621E7 /* TabLazyLoaderTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37534C9D28104D9B002621E7 /* TabLazyLoaderTests.swift */; };
 		37534CA028113101002621E7 /* LazyLoadable.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37534C9F28113101002621E7 /* LazyLoadable.swift */; };
 		37534CA3281132CB002621E7 /* TabLazyLoaderDataSource.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37534CA2281132CB002621E7 /* TabLazyLoaderDataSource.swift */; };
@@ -812,6 +813,7 @@
 		373A1AA9283ED86C00586521 /* BookmarksHTMLReaderTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BookmarksHTMLReaderTests.swift; sourceTree = "<group>"; };
 		373A1AAF2842C4EA00586521 /* BookmarkHTMLImporter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BookmarkHTMLImporter.swift; sourceTree = "<group>"; };
 		373A1AB128451ED400586521 /* BookmarksHTMLImporterTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BookmarksHTMLImporterTests.swift; sourceTree = "<group>"; };
+		37479F142891BC8300302FE2 /* TabCollectionViewModelTests+WithoutPinnedTabsManager.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "TabCollectionViewModelTests+WithoutPinnedTabsManager.swift"; sourceTree = "<group>"; };
 		37534C9D28104D9B002621E7 /* TabLazyLoaderTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TabLazyLoaderTests.swift; sourceTree = "<group>"; };
 		37534C9F28113101002621E7 /* LazyLoadable.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LazyLoadable.swift; sourceTree = "<group>"; };
 		37534CA2281132CB002621E7 /* TabLazyLoaderDataSource.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TabLazyLoaderDataSource.swift; sourceTree = "<group>"; };
@@ -3396,6 +3398,7 @@
 			children = (
 				AAC9C01D24CB6BEB00AD1325 /* TabCollectionViewModelTests.swift */,
 				37D23788288009CF00BCE03B /* TabCollectionViewModelTests+PinnedTabs.swift */,
+				37479F142891BC8300302FE2 /* TabCollectionViewModelTests+WithoutPinnedTabsManager.swift */,
 				AAE39D1A24F44885008EF28B /* TabCollectionViewModelDelegateMock.swift */,
 				37534C9D28104D9B002621E7 /* TabLazyLoaderTests.swift */,
 				37534CA42811987D002621E7 /* AdjacentItemEnumeratorTests.swift */,
@@ -4869,6 +4872,7 @@
 				AA9C363025518CA9004B1BA3 /* FireTests.swift in Sources */,
 				B6106BB126A7D8720013B453 /* PermissionStoreTests.swift in Sources */,
 				4BF4951826C08395000547B8 /* ThirdPartyBrowserTests.swift in Sources */,
+				37479F152891BC8300302FE2 /* TabCollectionViewModelTests+WithoutPinnedTabsManager.swift in Sources */,
 				AA63745424C9BF9A00AB2AC4 /* SuggestionContainerTests.swift in Sources */,
 				AAC9C01524CAFBCE00AD1325 /* TabTests.swift in Sources */,
 				B69B504C2726CA2900758A2B /* MockVariantManager.swift in Sources */,
@@ -5073,7 +5077,7 @@
 				CODE_SIGN_IDENTITY = "Developer ID Application";
 				CODE_SIGN_STYLE = Manual;
 				COMBINE_HIDPI_IMAGES = YES;
-				CURRENT_PROJECT_VERSION = 0.26.7;
+				CURRENT_PROJECT_VERSION = 0.27.1;
 				DEVELOPMENT_TEAM = HKE973VLUW;
 				ENABLE_HARDENED_RUNTIME = YES;
 				GCC_PREPROCESSOR_DEFINITIONS = "REVIEW=1";
@@ -5082,7 +5086,7 @@
 					"$(inherited)",
 					"@executable_path/../Frameworks",
 				);
-				MARKETING_VERSION = 0.26.7;
+				MARKETING_VERSION = 0.27.1;
 				PRODUCT_BUNDLE_IDENTIFIER = com.duckduckgo.macos.browser.review;
 				PRODUCT_MODULE_NAME = "$(TARGET_NAME:c99extidentifier)";
 				PRODUCT_NAME = "DuckDuckGo Review";
@@ -5224,7 +5228,7 @@
 				CODE_SIGN_IDENTITY = "Developer ID Application";
 				CODE_SIGN_STYLE = Manual;
 				COMBINE_HIDPI_IMAGES = YES;
-				CURRENT_PROJECT_VERSION = 0.26.7;
+				CURRENT_PROJECT_VERSION = 0.27.1;
 				DEVELOPMENT_TEAM = HKE973VLUW;
 				ENABLE_HARDENED_RUNTIME = YES;
 				INFOPLIST_FILE = DuckDuckGo/Info.plist;
@@ -5232,7 +5236,7 @@
 					"$(inherited)",
 					"@executable_path/../Frameworks",
 				);
-				MARKETING_VERSION = 0.26.7;
+				MARKETING_VERSION = 0.27.1;
 				PRODUCT_BUNDLE_IDENTIFIER = com.duckduckgo.macos.browser;
 				PRODUCT_MODULE_NAME = "$(TARGET_NAME:c99extidentifier)";
 				PRODUCT_NAME = DuckDuckGo;
@@ -5424,7 +5428,7 @@
 				CODE_SIGN_IDENTITY = "";
 				CODE_SIGN_STYLE = Manual;
 				COMBINE_HIDPI_IMAGES = YES;
-				CURRENT_PROJECT_VERSION = 0.26.7;
+				CURRENT_PROJECT_VERSION = 0.27.1;
 				DEVELOPMENT_TEAM = "";
 				ENABLE_HARDENED_RUNTIME = YES;
 				INFOPLIST_FILE = DuckDuckGo/Info.plist;
@@ -5432,7 +5436,7 @@
 					"$(inherited)",
 					"@executable_path/../Frameworks",
 				);
-				MARKETING_VERSION = 0.26.7;
+				MARKETING_VERSION = 0.27.1;
 				PRODUCT_BUNDLE_IDENTIFIER = com.duckduckgo.macos.browser.debug;
 				PRODUCT_MODULE_NAME = "$(TARGET_NAME:c99extidentifier)";
 				PRODUCT_NAME = DuckDuckGo;
@@ -5677,7 +5681,7 @@
 				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
-				CURRENT_PROJECT_VERSION = 0.26.7;
+				CURRENT_PROJECT_VERSION = 0.27.1;
 				DEVELOPMENT_TEAM = HKE973VLUW;
 				ENABLE_HARDENED_RUNTIME = YES;
 				INFOPLIST_FILE = DuckDuckGo/Info.plist;
@@ -5685,7 +5689,7 @@
 					"$(inherited)",
 					"@executable_path/../Frameworks",
 				);
-				MARKETING_VERSION = 0.26.7;
+				MARKETING_VERSION = 0.27.1;
 				PRODUCT_BUNDLE_IDENTIFIER = com.duckduckgo.macos.browser.debug;
 				PRODUCT_MODULE_NAME = "$(TARGET_NAME:c99extidentifier)";
 				PRODUCT_NAME = DuckDuckGo;
@@ -5706,7 +5710,7 @@
 				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
-				CURRENT_PROJECT_VERSION = 0.26.7;
+				CURRENT_PROJECT_VERSION = 0.27.1;
 				DEVELOPMENT_TEAM = HKE973VLUW;
 				ENABLE_HARDENED_RUNTIME = YES;
 				INFOPLIST_FILE = DuckDuckGo/Info.plist;
@@ -5714,7 +5718,7 @@
 					"$(inherited)",
 					"@executable_path/../Frameworks",
 				);
-				MARKETING_VERSION = 0.26.7;
+				MARKETING_VERSION = 0.27.1;
 				PRODUCT_BUNDLE_IDENTIFIER = com.duckduckgo.macos.browser;
 				PRODUCT_MODULE_NAME = "$(TARGET_NAME:c99extidentifier)";
 				PRODUCT_NAME = DuckDuckGo;
@@ -5839,7 +5843,7 @@
 				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
-				CURRENT_PROJECT_VERSION = 0.26.7;
+				CURRENT_PROJECT_VERSION = 0.27.1;
 				DEVELOPMENT_TEAM = HKE973VLUW;
 				ENABLE_HARDENED_RUNTIME = YES;
 				GCC_PREPROCESSOR_DEFINITIONS = "REVIEW=1";
@@ -5848,7 +5852,7 @@
 					"$(inherited)",
 					"@executable_path/../Frameworks",
 				);
-				MARKETING_VERSION = 0.26.7;
+				MARKETING_VERSION = 0.27.1;
 				PRODUCT_BUNDLE_IDENTIFIER = com.duckduckgo.macos.browser.review;
 				PRODUCT_MODULE_NAME = "$(TARGET_NAME:c99extidentifier)";
 				PRODUCT_NAME = "DuckDuckGo Review";
@@ -6017,7 +6021,7 @@
 			repositoryURL = "https://github.com/duckduckgo/BrowserServicesKit";
 			requirement = {
 				kind = exactVersion;
-				version = 18.0.4;
+				version = 19.0.0;
 			};
 		};
 		AA06B6B52672AF8100F541C5 /* XCRemoteSwiftPackageReference "Sparkle" */ = {

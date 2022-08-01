@@ -70,7 +70,10 @@ final class RecentlyClosedCoordinator: RecentlyClosedCoordinating {
     private func subscribeToPinnedTabCollection(of pinnedTabsManager: PinnedTabsManager) {
         let tabCollection = pinnedTabsManager.tabCollection
         tabCollection.didRemoveTabPublisher
-            .sink { [weak self] (tab, index) in
+            .sink { [weak self, weak tabCollection] (tab, index) in
+                guard let tabCollection = tabCollection else {
+                    return
+                }
                 self?.cacheTabContent(tab, of: tabCollection, at: .pinned(index))
             }
             .store(in: &cancellables)
@@ -79,7 +82,10 @@ final class RecentlyClosedCoordinator: RecentlyClosedCoordinating {
     private func subscribeToTabCollection(of mainWindowController: MainWindowController) {
         let tabCollection = mainWindowController.mainViewController.tabCollectionViewModel.tabCollection
         tabCollection.didRemoveTabPublisher
-            .sink { [weak self] (tab, index) in
+            .sink { [weak self, weak tabCollection] (tab, index) in
+                guard let tabCollection = tabCollection else {
+                    return
+                }
                 self?.cacheTabContent(tab, of: tabCollection, at: .unpinned(index))
             }
             .store(in: &cancellables)
