@@ -81,8 +81,10 @@ public final class CookieConsentPopover {
         }
         
         let xPosition = (parent.frame.width / 2) - (overlayWindow.frame.width / 2) + parent.frame.origin.x
+        let yPosition = parent.frame.origin.y + parent.frame.height - overlayWindow.frame.height - AnimationConsts.yAnimationOffset
+
         let size = overlayWindow.frame.size
-        let newOrigin = NSPoint(x: xPosition, y: overlayWindow.frame.origin.y)
+        let newOrigin = NSPoint(x: xPosition, y: yPosition)
         overlayWindow.setFrame(NSRect(origin: newOrigin, size: size), display: true)
     }
     
