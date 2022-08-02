@@ -235,8 +235,8 @@ final class BrowserTabViewController: NSViewController {
             .receive(on: DispatchQueue.main)
 
         tabContentCancellable = tabContentPublisher
-            .flatMap { tabContent -> AnyPublisher<Void, Never> in
-                guard tabContent.isUrl else {
+            .map { [weak tabViewModel] tabContent -> AnyPublisher<Void, Never> in
+                guard let tabViewModel = tabViewModel, tabContent.isUrl else {
                     return Just(()).eraseToAnyPublisher()
                 }
 
@@ -245,9 +245,14 @@ final class BrowserTabViewController: NSViewController {
                     tabViewModel.tab.webViewDidFailNavigationPublisher,
                     tabViewModel.tab.webViewDidReceiveChallengePublisher
                 )
+                .prefix(1)
                 .eraseToAnyPublisher()
             }
-            .sink { [weak self] in
+            .switchToLatest()
+            .sink { [weak self, weak tabViewModel] in
+                guard let tabViewModel = tabViewModel else {
+                    return
+                }
                 self?.showTabContent(of: tabViewModel)
             }
     }
