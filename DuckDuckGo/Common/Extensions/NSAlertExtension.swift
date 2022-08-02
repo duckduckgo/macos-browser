@@ -108,15 +108,4 @@ extension NSAlert {
         alert.addButton(withTitle: UserText.ok)
         return alert
     }
-    
-    static func cookiePopup() -> NSAlert {
-        let alert = NSAlert()
-        alert.messageText = UserText.autoconsentPopupTitle
-        alert.informativeText = UserText.autoconsentPopupDescription
-        alert.addButton(withTitle: UserText.autoconsentPopupEnableButton)
-        alert.addButton(withTitle: UserText.autoconsentPopupLaterButton)
-        alert.addButton(withTitle: UserText.autoconsentPopupNeverButton)
-        return alert
-    }
-
 }

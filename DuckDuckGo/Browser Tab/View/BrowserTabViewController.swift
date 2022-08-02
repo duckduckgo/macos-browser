@@ -30,7 +30,7 @@ protocol BrowserTabViewControllerClickDelegate: AnyObject {
 // swiftlint:disable file_length
 // swiftlint:disable:next type_body_length
 final class BrowserTabViewController: NSViewController {
-
+    
     @IBOutlet weak var errorView: NSView!
     @IBOutlet weak var homePageView: NSView!
     @IBOutlet weak var errorMessageLabel: NSTextField!
@@ -60,6 +60,8 @@ final class BrowserTabViewController: NSViewController {
     private var transientTabContentViewController: NSViewController?
 
     private var mouseDownMonitor: Any?
+    
+    private var cookieConsentPopoverManager = CookieConsentPopoverManager()
 
     required init?(coder: NSCoder) {
         fatalError("BrowserTabViewController: Bad initializer")
@@ -118,12 +120,23 @@ final class BrowserTabViewController: NSViewController {
     private func subscribeToSelectedTabViewModel() {
         tabCollectionViewModel.$selectedTabViewModel
             .sink { [weak self] selectedTabViewModel in
-                self?.tabViewModel = selectedTabViewModel
-                self?.showTabContent(of: selectedTabViewModel)
-                self?.subscribeToErrorViewState()
-                self?.subscribeToTabContent(of: selectedTabViewModel)
+                
+                guard let self = self else { return }
+                self.tabViewModel = selectedTabViewModel
+                self.showTabContent(of: selectedTabViewModel)
+                self.subscribeToErrorViewState()
+                self.subscribeToTabContent(of: selectedTabViewModel)
+                self.showCookieConsentPopoverIfNecessary(selectedTabViewModel)
             }
             .store(in: &cancellables)
+    }
+    
+    private func showCookieConsentPopoverIfNecessary(_ selectedTabViewModel: TabViewModel?) {
+        if selectedTabViewModel?.tab == cookieConsentPopoverManager.currentTab {
+            cookieConsentPopoverManager.popOver.show(on: view, animated: false)
+        } else {
+            cookieConsentPopoverManager.popOver.close(animated: false)
+        }
     }
 
     private func subscribeToTabs() {
@@ -457,12 +470,17 @@ extension BrowserTabViewController: ContentOverlayUserScriptDelegate {
 
 extension BrowserTabViewController: TabDelegate {
 
+    func tab(_ tab: Tab, promptUserForCookieConsent result: @escaping (Bool) -> Void) {
+       cookieConsentPopoverManager.show(on: view, animated: true, result: result)
+       cookieConsentPopoverManager.currentTab = tabViewModel?.tab
+    }
+    
     func tabWillStartNavigation(_ tab: Tab, isUserInitiated: Bool) {
         if isUserInitiated,
            let window = self.view.window,
            window.isPopUpWindow == true,
            window.isKeyWindow == false {
-
+            
             window.makeKeyAndOrderFront(nil)
         }
     }
