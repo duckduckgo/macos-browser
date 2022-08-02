@@ -92,6 +92,7 @@ final class TabBarViewItem: NSCollectionViewItem {
     @IBOutlet weak var rightSeparatorView: ColorView!
     @IBOutlet weak var mouseOverView: MouseOverView!
     @IBOutlet weak var mouseClickView: MouseClickView!
+    @IBOutlet weak var windowDraggingView: WindowDraggingView!
     @IBOutlet weak var faviconWrapperView: NSView!
     @IBOutlet weak var faviconWrapperViewCenterConstraint: NSLayoutConstraint!
     @IBOutlet weak var faviconWrapperViewLeadingConstraint: NSLayoutConstraint!
@@ -142,6 +143,7 @@ final class TabBarViewItem: NSCollectionViewItem {
                 isDragged = false
             }
             updateSubviews()
+            updateWindowDraggingView()
             updateUsedPermissions()
             updateTitleTextFieldMask()
         }
@@ -173,6 +175,11 @@ final class TabBarViewItem: NSCollectionViewItem {
     }
 
     private var lastKnownIndexPath: IndexPath?
+    private var isOnlyTabInCollection: Bool = false {
+        didSet {
+            updateWindowDraggingView()
+        }
+    }
 
     @IBAction func closeButtonAction(_ sender: NSButton) {
         guard let indexPath = self.collectionView?.indexPath(for: self) else {
@@ -207,7 +214,7 @@ final class TabBarViewItem: NSCollectionViewItem {
         delegate?.tabBarViewItemMoveToNewWindowAction(self)
     }
 
-    func subscribe(to tabViewModel: TabViewModel) {
+    func subscribe(to tabViewModel: TabViewModel, tabCollectionViewModel: TabCollectionViewModel) {
         clearSubscriptions()
 
         tabViewModel.$title.sink { [weak self] title in
@@ -221,6 +228,10 @@ final class TabBarViewItem: NSCollectionViewItem {
         tabViewModel.tab.$content.sink { [weak self] content in
             self?.currentURL = content.url
         }.store(in: &cancellables)
+
+        tabCollectionViewModel.tabCollection.$tabs.map { $0.count == 1 }
+            .assign(to: \.isOnlyTabInCollection, onWeaklyHeld: self)
+            .store(in: &cancellables)
 
         tabViewModel.$usedPermissions.assign(to: \.usedPermissions, onWeaklyHeld: self).store(in: &cancellables)
     }
@@ -298,6 +309,10 @@ final class TabBarViewItem: NSCollectionViewItem {
         if rightSeparatorView.isHidden != newIsHidden {
             rightSeparatorView.isHidden = newIsHidden
         }
+    }
+
+    private func updateWindowDraggingView() {
+        windowDraggingView.isHidden = !isOnlyTabInCollection || !isSelected
     }
 
     private func setupMenu() {
