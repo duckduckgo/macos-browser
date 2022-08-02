@@ -81,15 +81,14 @@ class PinnedTabsViewModelTests: XCTestCase {
         XCTAssertEqual(model.itemsWithoutSeparator, [collection.tabs[2], collection.tabs[3], collection.tabs[4]])
     }
 
-    func testWhenThereIsOnlyOneUnselectedItemThenDraggingMovesWindow() throws {
+    func testWhenThereIsOnlyOneItemThenDraggingMovesWindow() throws {
+        let tabA = Tab(content: .url("http://a.com".url!))
+        let tabB = Tab(content: .url("http://b.com".url!))
+
+        model.items = [tabA, tabB]
         XCTAssertFalse(model.dragMovesWindow)
 
-        let tab = Tab(content: .url("http://a.com".url!))
-        model.items = [tab]
-        model.selectedItem = nil
-        XCTAssertFalse(model.dragMovesWindow)
-
-        model.selectedItem = tab
+        model.items = [tabA]
         XCTAssertTrue(model.dragMovesWindow)
     }
 

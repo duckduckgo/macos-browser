@@ -78,9 +78,7 @@ final class PinnedTabsViewModel: ObservableObject {
         tabsCancellable = collection.$tabs.assign(to: \.items, onWeaklyHeld: self)
 
         dragMovesWindowCancellable = $items
-            .combineLatest($selectedItem) { (tabs, selectedTab) -> Bool in
-                tabs.count == 1 && selectedTab != nil
-            }
+            .map { $0.count == 1 }
             .removeDuplicates()
             .assign(to: \.dragMovesWindow, onWeaklyHeld: self)
     }

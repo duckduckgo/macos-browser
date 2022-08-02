@@ -230,6 +230,12 @@ final class TabBarViewController: NSViewController {
                 self?.tabCollectionViewModel.remove(at: .pinned(index))
             }
             .store(in: &cancellables)
+
+        pinnedTabsWindowDraggingView.mouseDownPublisher
+            .sink { [weak self] _ in
+                self?.pinnedTabsViewModel?.selectedItem = self?.pinnedTabsViewModel?.items.first
+            }
+            .store(in: &cancellables)
     }
 
     private func pinnedTabsViewDidUpdateHoveredItem(to index: Int?) {

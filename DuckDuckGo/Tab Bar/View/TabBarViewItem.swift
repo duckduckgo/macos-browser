@@ -143,7 +143,6 @@ final class TabBarViewItem: NSCollectionViewItem {
                 isDragged = false
             }
             updateSubviews()
-            updateWindowDraggingView()
             updateUsedPermissions()
             updateTitleTextFieldMask()
         }
@@ -175,11 +174,6 @@ final class TabBarViewItem: NSCollectionViewItem {
     }
 
     private var lastKnownIndexPath: IndexPath?
-    private var isOnlyTabInCollection: Bool = false {
-        didSet {
-            updateWindowDraggingView()
-        }
-    }
 
     @IBAction func closeButtonAction(_ sender: NSButton) {
         guard let indexPath = self.collectionView?.indexPath(for: self) else {
@@ -229,11 +223,23 @@ final class TabBarViewItem: NSCollectionViewItem {
             self?.currentURL = content.url
         }.store(in: &cancellables)
 
-        tabCollectionViewModel.tabCollection.$tabs.map { $0.count == 1 }
-            .assign(to: \.isOnlyTabInCollection, onWeaklyHeld: self)
+        tabViewModel.$usedPermissions.assign(to: \.usedPermissions, onWeaklyHeld: self).store(in: &cancellables)
+
+        tabCollectionViewModel.tabCollection.$tabs.map { $0.count > 1 }
+            .assign(to: \.windowDraggingView.isHidden, onWeaklyHeld: self)
             .store(in: &cancellables)
 
-        tabViewModel.$usedPermissions.assign(to: \.usedPermissions, onWeaklyHeld: self).store(in: &cancellables)
+        windowDraggingView.mouseDownPublisher
+            .compactMap { [weak tabCollectionViewModel] _ -> TabIndex? in
+                guard let tabCollectionViewModel = tabCollectionViewModel else {
+                    return nil
+                }
+                return .unpinned(0).sanitized(for: tabCollectionViewModel)
+            }
+            .sink { [weak tabCollectionViewModel] index in
+                tabCollectionViewModel?.select(at: index)
+            }
+            .store(in: &cancellables)
     }
 
     func clear() {
@@ -309,10 +315,6 @@ final class TabBarViewItem: NSCollectionViewItem {
         if rightSeparatorView.isHidden != newIsHidden {
             rightSeparatorView.isHidden = newIsHidden
         }
-    }
-
-    private func updateWindowDraggingView() {
-        windowDraggingView.isHidden = !isOnlyTabInCollection || !isSelected
     }
 
     private func setupMenu() {
