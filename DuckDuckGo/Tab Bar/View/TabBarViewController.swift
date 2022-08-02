@@ -578,8 +578,8 @@ final class TabBarViewController: NSViewController {
         var point = view.bounds.origin
         point.y -= TabPreviewWindowController.VerticalSpace.padding.rawValue
         point.x += xPosition
-        let converted = window.convertPoint(toScreen: view.convert(point, to: nil))
-        tabPreviewWindowController.scheduleShowing(parentWindow: window, timerInterval: interval, topLeftPoint: converted)
+        let pointInWindow = view.convert(point, to: nil)
+        tabPreviewWindowController.scheduleShowing(parentWindow: window, timerInterval: interval, topLeftPointInWindow: pointInWindow)
     }
 
     func hideTabPreview() {
