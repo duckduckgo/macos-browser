@@ -3991,6 +3991,7 @@
 			isa = PBXNativeTarget;
 			buildConfigurationList = AA585DA4248FD31500E9A3E2 /* Build configuration list for PBXNativeTarget "DuckDuckGo Privacy Browser" */;
 			buildPhases = (
+				3705272528992C8A000C06A2 /* Check Embedded Config URLs */,
 				AA585D7A248FD31100E9A3E2 /* Sources */,
 				AA8EDF2824925E940071C2E8 /* Swift Lint */,
 				AA585D7B248FD31100E9A3E2 /* Frameworks */,
@@ -4198,6 +4199,24 @@
 /* End PBXResourcesBuildPhase section */
 
 /* Begin PBXShellScriptBuildPhase section */
+		3705272528992C8A000C06A2 /* Check Embedded Config URLs */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+			);
+			inputPaths = (
+			);
+			name = "Check Embedded Config URLs";
+			outputFileListPaths = (
+			);
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "if [ \"$CONFIGURATION\" == \"Release\" ]; then\n   \"${SRCROOT}/scripts/update_embedded.sh\" -c\nfi\n";
+		};
 		AA8EDF2824925E940071C2E8 /* Swift Lint */ = {
 			isa = PBXShellScriptBuildPhase;
 			buildActionMask = 2147483647;
