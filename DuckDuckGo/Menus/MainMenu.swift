@@ -19,6 +19,7 @@
 import Cocoa
 import os.log
 import Combine
+import WebKit
 
 final class MainMenu: NSMenu {
 
@@ -26,43 +27,39 @@ final class MainMenu: NSMenu {
         static let maxTitleLength = 55
     }
 
+    // MARK: - DuckDuckGo
     @IBOutlet weak var checkForUpdatesMenuItem: NSMenuItem?
     @IBOutlet weak var checkForUpdatesSeparatorItem: NSMenuItem?
+    @IBOutlet weak var preferencesMenuItem: NSMenuItem!
 
+    // MARK: - File
     @IBOutlet weak var newWindowMenuItem: NSMenuItem!
     @IBOutlet weak var newTabMenuItem: NSMenuItem!
     @IBOutlet weak var openLocationMenuItem: NSMenuItem!
     @IBOutlet weak var closeWindowMenuItem: NSMenuItem!
     @IBOutlet weak var closeAllWindowsMenuItem: NSMenuItem!
     @IBOutlet weak var closeTabMenuItem: NSMenuItem!
-    @IBOutlet weak var burnWebsiteDataMenuItem: NSMenuItem!
     @IBOutlet weak var printSeparatorItem: NSMenuItem?
     @IBOutlet weak var printMenuItem: NSMenuItem?
     @IBOutlet weak var shareMenuItem: NSMenuItem!
     @IBOutlet weak var importBrowserDataMenuItem: NSMenuItem!
-    @IBOutlet weak var preferencesMenuItem: NSMenuItem!
 
+    // MARK: - Edit
     @IBOutlet weak var checkSpellingWhileTypingMenuItem: NSMenuItem?
     @IBOutlet weak var checkGrammarWithSpellingMenuItem: NSMenuItem?
 
+    // MARK: - View
     @IBOutlet weak var backMenuItem: NSMenuItem?
     @IBOutlet weak var forwardMenuItem: NSMenuItem?
     @IBOutlet weak var reloadMenuItem: NSMenuItem?
     @IBOutlet weak var stopMenuItem: NSMenuItem?
     @IBOutlet weak var homeMenuItem: NSMenuItem?
-    @IBOutlet weak var recentlyClosedMenuItem: NSMenuItem!
-    @IBOutlet weak var reopenLastClosedMenuItem: NSMenuItem? {
-        didSet {
-            reopenMenuItemKeyEquivalentManager.reopenLastClosedMenuItem = reopenLastClosedMenuItem
-        }
-    }
-    @IBOutlet weak var reopenLastClosedWindowMenuItem: NSMenuItem!
-    @IBOutlet weak var reopenAllWindowsFromLastSessionMenuItem: NSMenuItem? {
-        didSet {
-            reopenMenuItemKeyEquivalentManager.lastSessionMenuItem = reopenAllWindowsFromLastSessionMenuItem
-        }
-    }
+    @IBOutlet weak var toggleFullscreenMenuItem: NSMenuItem?
+    @IBOutlet weak var zoomInMenuItem: NSMenuItem?
+    @IBOutlet weak var zoomOutMenuItem: NSMenuItem?
+    @IBOutlet weak var actualSizeMenuItem: NSMenuItem?
 
+    // MARK: - Bookmarks
     @IBOutlet weak var manageBookmarksMenuItem: NSMenuItem!
     @IBOutlet weak var importBookmarksMenuItem: NSMenuItem!
     @IBOutlet weak var bookmarksMenuItem: NSMenuItem?
@@ -70,6 +67,7 @@ final class MainMenu: NSMenu {
     @IBOutlet weak var favoritesMenuItem: NSMenuItem?
     @IBOutlet weak var favoriteThisPageMenuItem: NSMenuItem?
 
+    // MARK: - Debug
     @IBOutlet weak var debugMenuItem: NSMenuItem? {
         didSet {
             #if !DEBUG && !REVIEW
@@ -80,17 +78,12 @@ final class MainMenu: NSMenu {
         }
     }
 
+    // MARK: - Help
     @IBOutlet weak var helpMenuItem: NSMenuItem?
     @IBOutlet weak var helpSeparatorMenuItem: NSMenuItem?
     @IBOutlet weak var sendFeedbackMenuItem: NSMenuItem?
 
-    @IBOutlet weak var toggleFullscreenMenuItem: NSMenuItem?
-    @IBOutlet weak var zoomInMenuItem: NSMenuItem?
-    @IBOutlet weak var zoomOutMenuItem: NSMenuItem?
-    @IBOutlet weak var actualSizeMenuItem: NSMenuItem?
-
     let sharingMenu = SharingMenu()
-    var recentlyClosedMenu: RecentlyClosedMenu?
 
     required init(coder: NSCoder) {
         super.init(coder: coder)
@@ -107,9 +100,6 @@ final class MainMenu: NSMenu {
         }
         sharingMenu.title = shareMenuItem.title
         shareMenuItem.submenu = sharingMenu
-
-        updateRecentlyClosedMenu()
-        updateReopenLastClosedMenuItem()
     }
 
     private func setup() {
@@ -214,26 +204,6 @@ final class MainMenu: NSMenu {
     }
     // swiftlint:enable function_body_length
 
-    private let reopenMenuItemKeyEquivalentManager = ReopenMenuItemKeyEquivalentManager()
-
-    // MARK: - Reopen Last Closed & Recently Closed
-
-    private func updateReopenLastClosedMenuItem() {
-        switch RecentlyClosedCoordinator.shared.cache.last {
-        case is RecentlyClosedWindow:
-            reopenLastClosedMenuItem?.title = UserText.reopenLastClosedWindow
-        default:
-            reopenLastClosedMenuItem?.title = UserText.reopenLastClosedTab
-        }
-
-    }
-
-    private func updateRecentlyClosedMenu() {
-        recentlyClosedMenu = RecentlyClosedMenu(recentlyClosedCoordinator: RecentlyClosedCoordinator.shared)
-        recentlyClosedMenuItem.submenu = recentlyClosedMenu
-        recentlyClosedMenuItem.isEnabled = !(recentlyClosedMenu?.items ?? [] ).isEmpty
-    }
-
 }
 
 extension MainMenu: NSMenuDelegate {
@@ -272,61 +242,4 @@ fileprivate extension NSMenuItem {
         parent?.submenu?.removeItem(self)
     }
 
-}
-
-extension MainMenu {
-    /**
-     * This class manages the shortcut assignment to either of the
-     * "Reopen Last Closed Tab" or "Reopen All Windows from Last Session"
-     * menu items.
-     */
-    final class ReopenMenuItemKeyEquivalentManager {
-        weak var reopenLastClosedMenuItem: NSMenuItem?
-        weak var lastWindowMenuItem: NSMenuItem?
-        weak var lastSessionMenuItem: NSMenuItem?
-
-        enum Const {
-            static let keyEquivalent = "T"
-            static let modifierMask = NSEvent.ModifierFlags.command
-        }
-
-        init(
-            isInInitialStatePublisher: Published<Bool>.Publisher = WindowControllersManager.shared.$isInInitialState,
-            canRestoreLastSessionState: @escaping @autoclosure () -> Bool = NSApp.canRestoreLastSessionState
-        ) {
-            self.canRestoreLastSessionState = canRestoreLastSessionState
-            self.isInInitialStateCancellable = isInInitialStatePublisher
-                .dropFirst()
-                .removeDuplicates()
-                .sink { [weak self] isInInitialState in
-                    self?.updateKeyEquivalent(isInInitialState)
-                }
-        }
-
-        private weak var currentlyAssignedMenuItem: NSMenuItem?
-        private var isInInitialStateCancellable: AnyCancellable?
-        private var canRestoreLastSessionState: () -> Bool
-
-        private func updateKeyEquivalent(_ isInInitialState: Bool) {
-            if isInInitialState && canRestoreLastSessionState() {
-                assignKeyEquivalent(to: lastSessionMenuItem)
-            } else {
-                assignKeyEquivalent(to: reopenLastClosedMenuItem)
-            }
-        }
-
-        func assignKeyEquivalent(to menuItem: NSMenuItem?) {
-            currentlyAssignedMenuItem?.keyEquivalent = ""
-            currentlyAssignedMenuItem?.keyEquivalentModifierMask = []
-            menuItem?.keyEquivalent = Const.keyEquivalent
-            menuItem?.keyEquivalentModifierMask = Const.modifierMask
-            currentlyAssignedMenuItem = menuItem
-        }
-    }
-}
-
-private extension NSApplication {
-    var canRestoreLastSessionState: Bool {
-        (delegate as? AppDelegate)?.stateRestorationManager?.canRestoreLastSessionState ?? false
-    }
 }
