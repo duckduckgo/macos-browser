@@ -62,6 +62,7 @@ final class PinnedTabsViewModel: ObservableObject {
 
     @Published private(set) var selectedItemIndex: Int?
     @Published private(set) var hoveredItemIndex: Int?
+    @Published private(set) var dragMovesWindow: Bool = true
 
     @Published private(set) var itemsWithoutSeparator: Set<Tab> = []
 
@@ -75,11 +76,19 @@ final class PinnedTabsViewModel: ObservableObject {
         contextMenuActionPublisher = contextMenuActionSubject.eraseToAnyPublisher()
         self.fireproofDomains = fireproofDomains
         tabsCancellable = collection.$tabs.assign(to: \.items, onWeaklyHeld: self)
+
+        dragMovesWindowCancellable = $items
+            .combineLatest($selectedItem) { (tabs, selectedTab) -> Bool in
+                tabs.count == 1 && selectedTab != nil
+            }
+            .removeDuplicates()
+            .assign(to: \.dragMovesWindow, onWeaklyHeld: self)
     }
 
     private let tabsDidReorderSubject = PassthroughSubject<[Tab], Never>()
     private let contextMenuActionSubject = PassthroughSubject<ContextMenuAction, Never>()
     private var tabsCancellable: AnyCancellable?
+    private var dragMovesWindowCancellable: AnyCancellable?
     private var fireproofDomains: FireproofDomains
 
     private func updateItemsWithoutSeparator() {

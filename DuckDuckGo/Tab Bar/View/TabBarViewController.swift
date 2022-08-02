@@ -37,6 +37,7 @@ final class TabBarViewController: NSViewController {
     @IBOutlet weak var collectionView: TabBarCollectionView!
     @IBOutlet weak var scrollView: TabBarScrollView!
     @IBOutlet weak var pinnedTabsViewLeadingConstraint: NSLayoutConstraint!
+    @IBOutlet weak var pinnedTabsWindowDraggingView: WindowDraggingView!
     @IBOutlet weak var rightScrollButton: MouseOverButton!
     @IBOutlet weak var leftScrollButton: MouseOverButton!
     @IBOutlet weak var rightShadowImageView: NSImageView!
@@ -141,7 +142,9 @@ final class TabBarViewController: NSViewController {
 
     private func setupPinnedTabsView() {
         layoutPinnedTabsView()
-        subscribeToPinnedTabsViewModel()
+        subscribeToPinnedTabsViewModelOutputs()
+        subscribeToPinnedTabsViewModelInputs()
+        subscribeToPinnedTabsHostingView()
     }
 
     private func layoutPinnedTabsView() {
@@ -160,7 +163,7 @@ final class TabBarViewController: NSViewController {
         ])
     }
 
-    private func subscribeToPinnedTabsViewModel() {
+    private func subscribeToPinnedTabsViewModelInputs() {
         guard let pinnedTabsViewModel = pinnedTabsViewModel else { return }
 
         tabCollectionViewModel.$selectionIndex
@@ -184,6 +187,10 @@ final class TabBarViewController: NSViewController {
             }
             .assign(to: \.shouldDrawLastItemSeparator, onWeaklyHeld: pinnedTabsViewModel)
             .store(in: &cancellables)
+    }
+
+    private func subscribeToPinnedTabsViewModelOutputs() {
+        guard let pinnedTabsViewModel = pinnedTabsViewModel else { return }
 
         pinnedTabsViewModel.tabsDidReorderPublisher
             .sink { [weak self] tabs in
@@ -211,6 +218,12 @@ final class TabBarViewController: NSViewController {
             }
             .store(in: &cancellables)
 
+        pinnedTabsViewModel.$dragMovesWindow.map(!)
+            .assign(to: \.pinnedTabsWindowDraggingView.isHidden, onWeaklyHeld: self)
+            .store(in: &cancellables)
+    }
+
+    private func subscribeToPinnedTabsHostingView() {
         pinnedTabsHostingView?.middleClickPublisher
             .compactMap { [weak self] in self?.pinnedTabsView?.itemIndex(for: $0) }
             .sink { [weak self] index in
