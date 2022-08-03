@@ -210,8 +210,6 @@ extension WKWebView {
 
             printInfo.horizontalPagination = .automatic
             printInfo.verticalPagination = .automatic
-            printInfo.isVerticallyCentered = false
-            printInfo.isHorizontallyCentered = false
             printInfo.leftMargin = 0
             printInfo.rightMargin = 0
             printInfo.topMargin = 0
