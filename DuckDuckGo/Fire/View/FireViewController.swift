@@ -134,28 +134,38 @@ final class FireViewController: NSViewController {
 
     @MainActor
     private func animateFire(burningData: Fire.BurningData) async {
+        var playFireAnimation = true
+
+        // Don't animate on other windows
+        let lastKeyWindowController = WindowControllersManager.shared.lastKeyMainWindowController
+        if view.window?.windowController !== lastKeyWindowController {
+            playFireAnimation = false
+        }
+
         switch burningData {
         case .all: break
         case .specificDomains(let burningDomains):
-            let localHistory = tabCollectionViewModel.tabCollection.localHistory.union(tabCollectionViewModel.pinnedTabsCollection.localHistory)
+            let localHistory = tabCollectionViewModel.selectedTab?.localHistory ?? Set()
             if localHistory.isDisjoint(with: burningDomains) {
-                // Do not play animation in this window since tabs aren't influenced
-                return
+                // Do not play if current tab isn't affected
+                playFireAnimation = false
             }
         }
 
-        await waitForFireAnimationViewIfNeeded()
+        if playFireAnimation {
+            await waitForFireAnimationViewIfNeeded()
 
-        progressIndicatorWrapper.isHidden = true
-        fireViewModel.isAnimationPlaying = true
+            progressIndicatorWrapper.isHidden = true
+            fireViewModel.isAnimationPlaying = true
 
-        fireAnimationView?.play { [weak self] _ in
-            guard let self = self else { return }
+            fireAnimationView?.play { [weak self] _ in
+                guard let self = self else { return }
 
-            self.fireViewModel.isAnimationPlaying = false
-            if self.fireViewModel.fire.burningData != nil {
-                self.progressIndicatorWrapper.isHidden = false
-                self.progressIndicatorWrapperBG.applyDropShadow()
+                self.fireViewModel.isAnimationPlaying = false
+                if self.fireViewModel.fire.burningData != nil {
+                    self.progressIndicatorWrapper.isHidden = false
+                    self.progressIndicatorWrapperBG.applyDropShadow()
+                }
             }
         }
     }

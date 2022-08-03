@@ -101,7 +101,7 @@ final class FirePopoverViewModel {
                     return []
                 }
 
-                return tabCollectionViewModel.tabCollection.localHistory.union(tabCollectionViewModel.pinnedTabsCollection.localHistory)
+                return tabCollectionViewModel.localHistory
             case .allData:
                 return historyCoordinating.history?.visitedDomains ?? Set<String>()
             }
@@ -167,10 +167,10 @@ final class FirePopoverViewModel {
     @Published private(set) var areOtherTabsInfluenced = false
 
     var hasPinnedTabs: Bool {
-        guard let tabCollectionViewModel = tabCollectionViewModel else {
+        guard let pinnedTabsManager = tabCollectionViewModel?.pinnedTabsManager else {
             return false
         }
-        return !tabCollectionViewModel.pinnedTabsManager.tabCollection.tabs.isEmpty
+        return pinnedTabsManager.tabCollection.tabs.isEmpty
     }
 
     private func updateAreOtherTabsInfluenced() {
@@ -178,7 +178,7 @@ final class FirePopoverViewModel {
         var allTabs = WindowControllersManager.shared.mainWindowControllers.flatMap {
             $0.mainViewController.tabCollectionViewModel.tabCollection.tabs
         }
-        if let pinnedTabs = tabCollectionViewModel?.pinnedTabsManager.tabCollection.tabs {
+        if let pinnedTabs = tabCollectionViewModel?.pinnedTabsManager?.tabCollection.tabs {
             allTabs.append(contentsOf: pinnedTabs)
         }
         let otherTabs = allTabs.filter({ $0 != selectedTab })

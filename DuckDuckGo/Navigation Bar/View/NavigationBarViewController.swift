@@ -297,8 +297,7 @@ final class NavigationBarViewController: NSViewController {
     @objc private func showAutoconsentFeedback(_ sender: Notification) {
         if #available(macOS 11, *) {
             guard view.window?.isKeyWindow == true,
-                  let topUrl = sender.userInfo?["topUrl"] as? URL,
-                  let relativeTarget = self.addressBarViewController?.addressBarButtonsViewController?.privacyEntryPointButton
+                  let topUrl = sender.userInfo?["topUrl"] as? URL
             else { return }
             DispatchQueue.main.async { [weak self] in
                 guard let self = self,
@@ -306,9 +305,7 @@ final class NavigationBarViewController: NSViewController {
                           // if the tab is not active, don't show the popup
                           return
                       }
-
-                let viewController = PopoverMessageViewController.createWithMessage(UserText.autoconsentPopoverMessage)
-                viewController.show(onParent: self, relativeTo: relativeTarget)
+                self.addressBarViewController?.addressBarButtonsViewController?.showBadgeNotification(.cookieManaged)                
             }
         }
     }

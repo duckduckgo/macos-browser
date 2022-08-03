@@ -44,17 +44,17 @@ final class TabCollectionViewModel: NSObject {
     private(set) var tabCollection: TabCollection
 
     /// Pinned tabs collection (provided via `PinnedTabsManager` instance).
-    var pinnedTabsCollection: TabCollection {
-        pinnedTabsManager.tabCollection
+    var pinnedTabsCollection: TabCollection? {
+        pinnedTabsManager?.tabCollection
     }
 
     var allTabsCount: Int {
-        pinnedTabsCollection.tabs.count + tabCollection.tabs.count
+        (pinnedTabsCollection?.tabs.count ?? 0) + tabCollection.tabs.count
     }
 
     var changesEnabled = true
 
-    private(set) var pinnedTabsManager: PinnedTabsManager
+    private(set) var pinnedTabsManager: PinnedTabsManager?
 
     /**
      * Contains view models for local tabs
@@ -90,7 +90,7 @@ final class TabCollectionViewModel: NSObject {
     init(
         tabCollection: TabCollection,
         selectionIndex: Int = 0,
-        pinnedTabsManager: PinnedTabsManager = WindowControllersManager.shared.pinnedTabsManager
+        pinnedTabsManager: PinnedTabsManager? = WindowControllersManager.shared.pinnedTabsManager
     ) {
         self.tabCollection = tabCollection
         self.pinnedTabsManager = pinnedTabsManager
@@ -215,6 +215,8 @@ final class TabCollectionViewModel: NSObject {
 
     @discardableResult private func selectPinnedTab(at index: Int, forceChange: Bool = false) -> Bool {
         guard changesEnabled || forceChange else { return false }
+        guard let pinnedTabsCollection = pinnedTabsCollection else { return false }
+
         guard index >= 0, index < pinnedTabsCollection.tabs.count else {
             os_log("TabCollectionViewModel: Index out of bounds", type: .error)
             selectionIndex = nil
@@ -266,8 +268,11 @@ final class TabCollectionViewModel: NSObject {
 
     func insert(tab: Tab, at index: TabIndex = .unpinned(0), selected: Bool = true) {
         guard changesEnabled else { return }
+        guard let tabCollection = tabCollection(for: index) else {
+            os_log("TabCollectionViewModel: Tab collection for index %s not found", type: .error, String(describing: index))
+            return
+        }
 
-        let tabCollection = tabCollection(for: index)
         tabCollection.insert(tab: tab, at: index.item)
         if selected {
             select(at: index)
@@ -321,7 +326,7 @@ final class TabCollectionViewModel: NSObject {
         defer {
             shouldBlockPinnedTabsManagerUpdates = false
         }
-        guard pinnedTabsManager.unpinTab(at: index, published: published) != nil else { return }
+        guard pinnedTabsManager?.unpinTab(at: index, published: published) != nil else { return }
 
         didRemoveTab(at: .pinned(index), withParent: nil)
     }
@@ -335,7 +340,7 @@ final class TabCollectionViewModel: NSObject {
             }
         }
 
-        guard index.isPinnedTab || !pinnedTabsCollection.tabs.isEmpty || tabCollection.tabs.count > 0 else {
+        guard allTabsCount > 0 else {
             selectionIndex = nil
             notifyDelegate()
             return
@@ -449,7 +454,7 @@ final class TabCollectionViewModel: NSObject {
 
         if let index = tabCollection.tabs.firstIndex(where: { $0.webView === webView }) {
             remove(at: .unpinned(index))
-        } else if let index = pinnedTabsCollection.tabs.firstIndex(where: { $0.webView === webView }) {
+        } else if let index = pinnedTabsCollection?.tabs.firstIndex(where: { $0.webView === webView }) {
             remove(at: .pinned(index))
         } else {
             os_log("TabCollection: Failed to get index of the tab", type: .error)
@@ -480,7 +485,7 @@ final class TabCollectionViewModel: NSObject {
         let tabCopy = Tab(content: tab.content, sessionStateData: tab.sessionStateData)
         let newIndex = tabIndex.makeNext()
 
-        tabCollection(for: tabIndex).insert(tab: tabCopy, at: newIndex.item)
+        tabCollection(for: tabIndex)?.insert(tab: tabCopy, at: newIndex.item)
         select(at: newIndex)
 
         if newIndex.isUnpinnedTab {
@@ -490,6 +495,7 @@ final class TabCollectionViewModel: NSObject {
 
     func pinTab(at index: Int) {
         guard changesEnabled else { return }
+        guard let pinnedTabsCollection = pinnedTabsCollection else { return }
 
         guard index >= 0, index < tabCollection.tabs.count else {
             os_log("TabCollectionViewModel: Index out of bounds", type: .error)
@@ -498,7 +504,7 @@ final class TabCollectionViewModel: NSObject {
 
         let tab = tabCollection.tabs[index]
 
-        pinnedTabsManager.pin(tab)
+        pinnedTabsManager?.pin(tab)
         removeUnpinnedTab(at: index, published: false)
         selectPinnedTab(at: pinnedTabsCollection.tabs.count - 1)
     }
@@ -510,7 +516,7 @@ final class TabCollectionViewModel: NSObject {
             shouldBlockPinnedTabsManagerUpdates = false
         }
 
-        guard let tab = pinnedTabsManager.unpinTab(at: index, published: false) else {
+        guard let tab = pinnedTabsManager?.unpinTab(at: index, published: false) else {
             os_log("Unable to unpin a tab", type: .error)
             return
         }
@@ -535,8 +541,11 @@ final class TabCollectionViewModel: NSObject {
 
     func replaceTab(at index: TabIndex, with tab: Tab, forceChange: Bool = false) {
         guard changesEnabled || forceChange else { return }
+        guard let tabCollection = tabCollection(for: index) else {
+            os_log("TabCollectionViewModel: Tab collection for index %s not found", type: .error, String(describing: index))
+            return
+        }
 
-        let tabCollection = tabCollection(for: index)
         tabCollection.replaceTab(at: index.item, with: tab)
 
         guard let selectionIndex = selectionIndex else {
@@ -547,7 +556,7 @@ final class TabCollectionViewModel: NSObject {
     }
 
     private func subscribeToPinnedTabsManager() {
-        pinnedTabsManager.didUnpinTabPublisher
+        pinnedTabsManager?.didUnpinTabPublisher
             .filter { [weak self] _ in self?.shouldBlockPinnedTabsManagerUpdates == false }
             .sink { [weak self] index in
                 self?.handleTabUnpinnedInAnotherTabCollectionViewModel(at: index)
@@ -592,7 +601,7 @@ final class TabCollectionViewModel: NSObject {
         case self.tabCollection:
             selectedTabViewModel = tabViewModel(at: selectionIndex.item)
         case pinnedTabsCollection:
-            selectedTabViewModel = pinnedTabsManager.tabViewModel(at: selectionIndex.item)
+            selectedTabViewModel = pinnedTabsManager?.tabViewModel(at: selectionIndex.item)
         default:
             break
         }
@@ -604,7 +613,7 @@ final class TabCollectionViewModel: NSObject {
 
 extension TabCollectionViewModel {
 
-    private func tabCollection(for selection: TabIndex) -> TabCollection {
+    private func tabCollection(for selection: TabIndex) -> TabCollection? {
         switch selection {
         case .unpinned:
             return tabCollection
@@ -614,7 +623,7 @@ extension TabCollectionViewModel {
     }
 
     private func indexInAllTabs(of tab: Tab) -> TabIndex? {
-        if let index = pinnedTabsCollection.tabs.firstIndex(of: tab) {
+        if let index = pinnedTabsCollection?.tabs.firstIndex(of: tab) {
             return .pinned(index)
         }
         if let index = tabCollection.tabs.firstIndex(of: tab) {
@@ -626,10 +635,19 @@ extension TabCollectionViewModel {
     private func tab(at tabIndex: TabIndex) -> Tab? {
         switch tabIndex {
         case .pinned(let index):
-            return pinnedTabsCollection.tabs[safe: index]
+            return pinnedTabsCollection?.tabs[safe: index]
         case .unpinned(let index):
             return tabCollection.tabs[safe: index]
         }
     }
+}
 
+extension TabCollectionViewModel {
+    var localHistory: Set<String> {
+        var history = tabCollection.localHistory
+        if let pinnedTabsHistory = pinnedTabsCollection?.localHistory {
+            history.formUnion(pinnedTabsHistory)
+        }
+        return history
+    }
 }

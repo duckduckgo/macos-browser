@@ -30,6 +30,10 @@ extension NSMenuItem {
         self.action = selector
     }
 
+    convenience init(title: String) {
+        self.init(title: title, action: nil, keyEquivalent: "")
+    }
+
     var topMenu: NSMenu? {
         var menuItem = self
         while let parent = menuItem.parent {

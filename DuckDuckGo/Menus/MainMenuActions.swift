@@ -20,6 +20,8 @@ import Cocoa
 import os.log
 import BrowserServicesKit
 
+// swiftlint:disable file_length
+
 // Actions are sent to objects of responder chain
 
 // MARK: - Main Menu Actions
@@ -64,6 +66,36 @@ extension AppDelegate {
               }
 
         RecentlyClosedCoordinator.shared.reopenItem(cacheItem)
+    }
+
+    @objc func openVisit(_ sender: NSMenuItem) {
+        guard let visit = sender.representedObject as? Visit,
+              let url = visit.historyEntry?.url else {
+            assertionFailure("Wrong represented object")
+            return
+        }
+
+        WindowsManager.openNewWindow(with: Tab(content: .contentFromURL(url)))
+    }
+
+    @objc func clearAllHistory(_ sender: NSMenuItem) {
+        guard let window = WindowsManager.openNewWindow(with: Tab(content: .homePage)),
+              let windowController = window.windowController as? MainWindowController else {
+            assertionFailure("No reference to main window controller")
+            return
+        }
+
+        windowController.mainViewController.clearAllHistory(sender)
+    }
+
+    @objc func clearThisHistory(_ sender: ClearThisHistoryMenuItem) {
+        guard let window = WindowsManager.openNewWindow(with: Tab(content: .homePage)),
+              let windowController = window.windowController as? MainWindowController else {
+            assertionFailure("No reference to main window controller")
+            return
+        }
+
+        windowController.mainViewController.clearThisHistory(sender)
     }
 
     // MARK: - Window
@@ -318,6 +350,54 @@ extension MainViewController {
         selectedTabViewModel.tab.openHomePage()
     }
 
+    @objc func openVisit(_ sender: NSMenuItem) {
+        guard let visit = sender.representedObject as? Visit,
+              let url = visit.historyEntry?.url else {
+            assertionFailure("Wrong represented object")
+            return
+        }
+
+        guard let selectedTabViewModel = tabCollectionViewModel.selectedTabViewModel else {
+            os_log("MainViewController: No tab view model selected", type: .error)
+            return
+        }
+
+        selectedTabViewModel.tab.setContent(.contentFromURL(url))
+        adjustFirstResponder()
+    }
+
+    @objc func clearAllHistory(_ sender: NSMenuItem) {
+        guard let window = view.window else {
+            assertionFailure("No window")
+            return
+        }
+
+        let alert = NSAlert.clearAllHistoryAndDataAlert()
+        alert.beginSheetModal(for: window, completionHandler: { [weak self] response in
+            guard case .alertFirstButtonReturn = response, let self = self else {
+                return
+            }
+            FireCoordinator.fireViewModel.fire.burnAll(tabCollectionViewModel: self.tabCollectionViewModel)
+        })
+    }
+
+    @objc func clearThisHistory(_ sender: ClearThisHistoryMenuItem) {
+        guard let window = view.window else {
+            assertionFailure("No window")
+            return
+        }
+
+        let dateString = sender.dateString
+        let visits = sender.getVisits()
+        let alert = NSAlert.clearHistoryAndDataAlert(dateString: dateString)
+        alert.beginSheetModal(for: window, completionHandler: { response in
+            guard case .alertFirstButtonReturn = response else {
+                return
+            }
+            FireCoordinator.fireViewModel.fire.burnVisits(of: visits, except: FireproofDomains.shared)
+        })
+    }
+
     // MARK: - Bookmarks
 
     @IBAction func bookmarkThisPage(_ sender: Any) {
@@ -399,10 +479,10 @@ extension MainViewController {
             return
         }
         let index = keyEquivalent - 1
-        if keyEquivalent == 9, !tabCollectionViewModel.tabCollection.tabs.isEmpty {
+        if keyEquivalent == 9 {
             tabCollectionViewModel.select(at: .last(in: tabCollectionViewModel))
-        } else if index < tabCollectionViewModel.tabCollection.tabs.count {
-            tabCollectionViewModel.select(at: .unpinned(index))
+        } else if index < tabCollectionViewModel.allTabsCount {
+            tabCollectionViewModel.select(at: .at(index, in: tabCollectionViewModel))
         }
     }
 
@@ -549,7 +629,10 @@ extension MainViewController {
     }
 
     @IBAction func resetPinnedTabs(_ sender: Any?) {
-        tabCollectionViewModel.pinnedTabsManager.tabCollection.removeAll()
+        if tabCollectionViewModel.selectedTabIndex?.isPinnedTab == true, tabCollectionViewModel.tabCollection.tabs.count > 0 {
+            tabCollectionViewModel.select(at: .unpinned(0))
+        }
+        tabCollectionViewModel.pinnedTabsManager?.tabCollection.removeAll()
     }
 
     @IBAction func showSaveCredentialsPopover(_ sender: Any?) {
@@ -629,7 +712,9 @@ extension MainViewController: NSMenuItemValidation {
 
         // Pin Tab
         case #selector(MainViewController.pinOrUnpinTab(_:)):
-            guard tabCollectionViewModel.selectedTabViewModel?.tab.isUrl == true else {
+            guard tabCollectionViewModel.selectedTabViewModel?.tab.isUrl == true,
+                  tabCollectionViewModel.pinnedTabsManager != nil
+            else {
                 return false
             }
             if tabCollectionViewModel.selectionIndex?.isUnpinnedTab == true {

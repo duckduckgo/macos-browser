@@ -25,6 +25,13 @@ final class ConfigurationDownloaderTests: XCTestCase {
     static let resultData = "test".data(using: .utf8)!
 
     var cancellables = Set<AnyCancellable>()
+    
+    func test_urls_do_not_contain_localhost() {
+        for url in ConfigurationLocation.allCases {
+            XCTAssertFalse(url.rawValue.contains("localhost"))
+            XCTAssertFalse(url.rawValue.contains("127.0.0.1"))
+        }
+    }
 
     func test_when_store_etag_fails_then_failure_returned_and_no_etag_stored() {
         let response = HTTPURLResponse.success

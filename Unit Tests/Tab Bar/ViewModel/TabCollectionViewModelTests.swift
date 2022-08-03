@@ -19,6 +19,7 @@
 import XCTest
 @testable import DuckDuckGo_Privacy_Browser
 
+// MARK: - Tests for TabCollectionViewModel with PinnedTabsManager but without pinned tabs
 final class TabCollectionViewModelTests: XCTestCase {
 
     // MARK: - TabViewModel

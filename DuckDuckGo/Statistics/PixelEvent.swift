@@ -213,6 +213,16 @@ extension Pixel {
             case feedbackReportingFailed = "feedback_reporting_failed"
             
             case blankNavigationOnBurnFailed = "blank_navigation_on_burn_failed"
+
+            case historyRemoveFailed = "history_remove_failed"
+            case historyReloadFailed = "history_reload_failed"
+            case historyCleanEntriesFailed = "history_clean_entries_failed"
+            case historyCleanVisitsFailed = "history_clean_visits_failed"
+            case historySaveFailed = "history_save_failed"
+            case historyInsertVisitFailed = "history_insert_visit_failed"
+            case historyRemoveVisitsFailed = "history_remove_visits_failed"
+
+            case emailAutofillKeychainError = "email_autofill_keychain_error"
         }
 
     }

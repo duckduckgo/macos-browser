@@ -85,7 +85,8 @@ final class AddressBarButtonsViewController: NSViewController {
     var trackerAnimationView3: AnimationView!
     var shieldAnimationView: AnimationView!
     var shieldDotAnimationView: AnimationView!
-
+    @IBOutlet weak var notificationAnimationView: NavigationBarBadgeAnimationView!
+    
     @IBOutlet weak var permissionButtons: NSView!
     @IBOutlet weak var cameraButton: PermissionButton! {
         didSet {
@@ -154,7 +155,8 @@ final class AddressBarButtonsViewController: NSViewController {
     private var permissionsCancellables = Set<AnyCancellable>()
     private var trackerAnimationTriggerCancellable: AnyCancellable?
     private var isMouseOverAnimationVisibleCancellable: AnyCancellable?
-
+    private lazy var buttonsBadgeAnimator = NavigationBarBadgeAnimator()
+    
     required init?(coder: NSCoder) {
         fatalError("AddressBarButtonsViewController: Bad initializer")
     }
@@ -170,6 +172,7 @@ final class AddressBarButtonsViewController: NSViewController {
         super.viewDidLoad()
 
         setupAnimationViews()
+        setupNotificationAnimationView()
         subscribeToSelectedTabViewModel()
         subscribeToBookmarkList()
         subscribePrivacyDashboardPendingUpdates()
@@ -180,6 +183,34 @@ final class AddressBarButtonsViewController: NSViewController {
 
     override func viewWillAppear() {
         setupButtons()
+    }
+    
+    override func viewDidAppear() {
+        super.viewDidAppear()
+    }
+    
+    func showBadgeNotification(_ type: NavigationBarBadgeAnimationView.AnimationType) {
+        if !isAnyShieldAnimationPlaying {
+            buttonsBadgeAnimator.showNotification(withType: .cookieManaged,
+                                                  buttonsContainer: buttonsContainer,
+                                                  and: notificationAnimationView)
+        } else {
+            buttonsBadgeAnimator.queuedAnimation = NavigationBarBadgeAnimator.QueueData(selectedTab: tabCollectionViewModel.selectedTab,
+                                                                                        animationType: type)
+        }
+    }
+    
+    private func playBadgeAnimationIfNecessary() {
+        if let queuedNotification = buttonsBadgeAnimator.queuedAnimation {
+            // Add small time gap in between animations if badge animation was queued
+            DispatchQueue.main.asyncAfter(deadline: .now() + 0.6) {
+                if self.tabCollectionViewModel.selectedTab == queuedNotification.selectedTab {
+                    self.showBadgeNotification(queuedNotification.animationType)
+                } else {
+                    self.buttonsBadgeAnimator.queuedAnimation = nil
+                }
+            }
+        }
     }
 
     var mouseEnterExitTrackingArea: NSTrackingArea?
@@ -476,6 +507,10 @@ final class AddressBarButtonsViewController: NSViewController {
         animationViewCache[animationName] = animationView
         return animationView
     }
+    
+    private func setupNotificationAnimationView() {
+        notificationAnimationView.alphaValue = 0.0
+    }
 
     private func setupAnimationViews() {
         func addAndLayoutAnimationViewIfNeeded(animationView: AnimationView?, animationName: String) -> AnimationView {
@@ -770,18 +805,21 @@ final class AddressBarButtonsViewController: NSViewController {
                 trackerAnimationView?.isHidden = true
                 self?.updatePrivacyEntryPointIcon()
                 self?.updatePermissionButtons()
+                self?.playBadgeAnimationIfNecessary()
             }
         }
 
         updatePrivacyEntryPointIcon()
         updatePermissionButtons()
     }
-    
+
     private func closePopover() {
         privacyDashboardPopover.close()
     }
     
-    private func stopAnimations(trackerAnimations: Bool = true, shieldAnimations: Bool = true) {
+    private func stopAnimations(trackerAnimations: Bool = true,
+                                shieldAnimations: Bool = true,
+                                badgeAnimations: Bool = true) {
         func stopAnimation(_ animationView: AnimationView) {
             if animationView.isAnimationPlaying || !animationView.isHidden {
                 animationView.isHidden = true
@@ -798,6 +836,14 @@ final class AddressBarButtonsViewController: NSViewController {
             stopAnimation(shieldAnimationView)
             stopAnimation(shieldDotAnimationView)
         }
+        if badgeAnimations {
+            stopNotificationBadgeAnimations()
+        }
+    }
+    
+    private func stopNotificationBadgeAnimations() {
+        notificationAnimationView.removeAnimation()
+        buttonsBadgeAnimator.queuedAnimation = nil
     }
 
     private var isAnyTrackerAnimationPlaying: Bool {
@@ -857,8 +903,9 @@ final class AddressBarButtonsViewController: NSViewController {
         isMouseOverAnimationVisibleCancellable = privacyEntryPointButton.$isAnimationViewVisible
             .dropFirst()
             .sink { [weak self] isAnimationViewVisible in
+   
                 if isAnimationViewVisible {
-                    self?.stopAnimations(trackerAnimations: false, shieldAnimations: true)
+                    self?.stopAnimations(trackerAnimations: false, shieldAnimations: true, badgeAnimations: false)
                 } else {
                     self?.updatePrivacyEntryPointIcon()
                 }

@@ -38,6 +38,7 @@ protocol TabDelegate: FileDownloadManagerDelegate, ContentOverlayUserScriptDeleg
 
     func tabPageDOMLoaded(_ tab: Tab)
     func closeTab(_ tab: Tab)
+    func tab(_ tab: Tab, promptUserForCookieConsent result: @escaping (Bool) -> Void)
 }
 
 // swiftlint:disable file_length
@@ -145,6 +146,7 @@ final class Tab: NSObject, Identifiable, ObservableObject {
          error: Error? = nil,
          favicon: NSImage? = nil,
          sessionStateData: Data? = nil,
+         interactionStateData: Data? = nil,
          parentTab: Tab? = nil,
          shouldLoadInBackground: Bool = false,
          canBeClosedWithBack: Bool = false,
@@ -164,6 +166,7 @@ final class Tab: NSObject, Identifiable, ObservableObject {
         self.parentTab = parentTab
         self._canBeClosedWithBack = canBeClosedWithBack
         self.sessionStateData = sessionStateData
+        self.interactionStateData = interactionStateData
         self.lastSelectedAt = lastSelectedAt
         self.currentDownload = currentDownload
 
@@ -281,20 +284,37 @@ final class Tab: NSObject, Identifiable, ObservableObject {
         }
     }
 
+    @available(macOS, obsoleted: 12.0, renamed: "interactionStateData")
     var sessionStateData: Data?
+    var interactionStateData: Data?
 
     func invalidateSessionStateData() {
         sessionStateData = nil
+        interactionStateData = nil
     }
 
     func getActualSessionStateData() -> Data? {
         if let sessionStateData = sessionStateData {
             return sessionStateData
         }
+
         guard webView.url != nil else { return nil }
         // collect and cache actual SessionStateData on demand and store until invalidated
         self.sessionStateData = (try? webView.sessionStateData())
         return self.sessionStateData
+    }
+    
+    @available(macOS 12, *)
+    func getActualInteractionStateData() -> Data? {
+        if let interactionStateData = interactionStateData {
+            return interactionStateData
+        }
+
+        guard webView.url != nil else { return nil }
+        
+        self.interactionStateData = (webView.interactionState as? Data)
+        
+        return self.interactionStateData
     }
 
     func update(url: URL?, userEntered: Bool = true) {
@@ -455,7 +475,14 @@ final class Tab: NSObject, Identifiable, ObservableObject {
             })
         }()
         if shouldLoadURL(url, shouldLoadInBackground: shouldLoadInBackground) {
-            let didRestore = restoreSessionStateDataIfNeeded()
+            let didRestore: Bool
+            
+            if #available(macOS 12.0, *) {
+                didRestore = restoreInteractionStateDataIfNeeded() || restoreSessionStateDataIfNeeded()
+            } else {
+                didRestore = restoreSessionStateDataIfNeeded()
+            }
+            
             if !didRestore {
                 if url.isFileURL {
                     webView.loadFileURL(url, allowingReadAccessTo: URL(fileURLWithPath: "/"))
@@ -502,6 +529,7 @@ final class Tab: NSObject, Identifiable, ObservableObject {
     }
 
     @MainActor
+    @available(macOS, obsoleted: 12.0, renamed: "restoreInteractionStateDataIfNeeded")
     private func restoreSessionStateDataIfNeeded() -> Bool {
         var didRestore: Bool = false
         if let sessionStateData = self.sessionStateData {
@@ -515,6 +543,23 @@ final class Tab: NSObject, Identifiable, ObservableObject {
                 os_log("Tab:setupWebView could not restore session state %s", "\(error)")
             }
         }
+        
+        return didRestore
+    }
+    
+    @MainActor
+    @available(macOS 12, *)
+    private func restoreInteractionStateDataIfNeeded() -> Bool {
+        var didRestore: Bool = false
+        if let interactionStateData = self.interactionStateData {
+            if contentURL.isFileURL {
+                webView.loadFileURL(contentURL, allowingReadAccessTo: URL(fileURLWithPath: "/"))
+            }
+            
+            webView.interactionState = interactionStateData
+            didRestore = true
+        }
+        
         return didRestore
     }
 
@@ -1324,6 +1369,10 @@ extension Tab: HoverUserScriptDelegate {
 extension Tab: AutoconsentUserScriptDelegate {
     func autoconsentUserScript(consentStatus: CookieConsentInfo) {
         self.cookieConsentManaged = consentStatus
+    }
+    
+    func autoconsentUserScriptPromptUserForConsent(_ result: @escaping (Bool) -> Void) {
+        delegate?.tab(self, promptUserForCookieConsent: result)
     }
 }
 
