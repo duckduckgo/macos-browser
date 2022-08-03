@@ -205,12 +205,9 @@ extension WKWebView {
         }
 
         if #available(macOS 11.0, *) {
-            guard var printInfoDictionary = NSPrintInfo.shared.dictionary().mutableCopy() as? [NSPrintInfo.AttributeKey: Any] else { return nil }
-            
-            printInfoDictionary[NSPrintInfo.AttributeKey.jobDisposition] = NSPrintInfo.JobDisposition.spool // Should only use this for PDFs
-            printInfoDictionary[NSPrintInfo.AttributeKey.detailedErrorReporting] = true
-            
+            let printInfoDictionary = (NSPrintInfo.shared.dictionary() as? [NSPrintInfo.AttributeKey: Any]) ?? [:]
             let printInfo = NSPrintInfo(dictionary: printInfoDictionary)
+
             printInfo.horizontalPagination = .automatic
             printInfo.verticalPagination = .automatic
             printInfo.isVerticallyCentered = false
@@ -219,7 +216,7 @@ extension WKWebView {
             printInfo.rightMargin = 0
             printInfo.topMargin = 0
             printInfo.bottomMargin = 0
-            printInfo.scalingFactor = 0.9
+            printInfo.scalingFactor = 0.95
             
             return self.printOperation(with: printInfo)
         }
