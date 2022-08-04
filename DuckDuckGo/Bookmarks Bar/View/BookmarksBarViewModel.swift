@@ -402,11 +402,12 @@ extension BookmarksBarViewModel: NSCollectionViewDelegate, NSCollectionViewDataS
                         }
                     }
                 } else if let webViewItem = item.draggedWebViewValues() {
-                    self.bookmarkManager.makeBookmark(for: webViewItem.url, title: webViewItem.title, isFavorite: false, index: currentIndexPathItem)
+                    let title = webViewItem.title ?? tabCollectionViewModel.title(forTabWithURL: webViewItem.url) ?? webViewItem.url.absoluteString
+                    self.bookmarkManager.makeBookmark(for: webViewItem.url, title: title, isFavorite: false, index: currentIndexPathItem)
                 } else if let draggedString = item.string(forType: .string), let draggedURL = URL(string: draggedString) {
                     let title: String
 
-                    if let selectedTab = tabCollectionViewModel.selectedTab, selectedTab.url == draggedURL, let tabTitle = selectedTab.title {
+                    if let tabTitle = tabCollectionViewModel.title(forTabWithURL: draggedURL) {
                         title = tabTitle
                     } else {
                         title = draggedURL.absoluteString

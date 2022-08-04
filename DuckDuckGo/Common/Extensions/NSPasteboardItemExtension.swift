@@ -34,14 +34,14 @@ extension NSPasteboardItem {
         return nil
     }
 
-    func draggedWebViewValues() -> (title: String, url: URL)? {
+    func draggedWebViewValues() -> (title: String?, url: URL)? {
         guard let urlString = string(forType: .URL), let url = URL(string: urlString) else {
             return nil
         }
         
         // WKWebView pasteboard items include the name of the link under the `public.url-name` type.
         let name = string(forType: NSPasteboard.PasteboardType(rawValue: "public.url-name"))
-        return (title: name ?? urlString, url: url)
+        return (title: name, url: url)
     }
     
 }
