@@ -64,6 +64,7 @@ final class MainMenu: NSMenu {
     }
 
     @IBOutlet weak var manageBookmarksMenuItem: NSMenuItem!
+    @IBOutlet weak var bookmarksMenuToggleBookmarksBarMenuItem: NSMenuItem?
     @IBOutlet weak var importBookmarksMenuItem: NSMenuItem!
     @IBOutlet weak var bookmarksMenuItem: NSMenuItem?
     @IBOutlet weak var bookmarkThisPageMenuItem: NSMenuItem?
@@ -220,6 +221,7 @@ final class MainMenu: NSMenu {
     private func updateBookmarksBarMenuItem() {
         let title = PersistentAppInterfaceSettings.shared.showBookmarksBar ? UserText.hideBookmarksBar : UserText.showBookmarksBar
         toggleBookmarksBarMenuItem?.title = title
+        bookmarksMenuToggleBookmarksBarMenuItem?.title = title
     }
 
     // MARK: - Reopen Last Closed & Recently Closed

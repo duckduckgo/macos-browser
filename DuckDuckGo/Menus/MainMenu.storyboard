@@ -599,6 +599,11 @@ CQ
                                                 <action selector="showManageBookmarks:" target="Ady-hI-5gd" id="meV-V2-zJ2"/>
                                             </connections>
                                         </menuItem>
+                                        <menuItem title="Toggle Bookmarks Bar" keyEquivalent="B" id="SwH-Sh-zIJ">
+                                            <connections>
+                                                <action selector="toggleBookmarksBar:" target="Ady-hI-5gd" id="EkG-vj-emY"/>
+                                            </connections>
+                                        </menuItem>
                                         <menuItem isSeparatorItem="YES" id="aPG-H0-BrG"/>
                                         <menuItem title="Import Bookmarks and Passwords..." id="tNX-Bv-yM3" userLabel="Import Bookmarks...">
                                             <modifierMask key="keyEquivalentModifierMask"/>
@@ -769,6 +774,7 @@ CQ
                             <outlet property="backMenuItem" destination="VWV-vB-Mtc" id="Keo-4E-dRW"/>
                             <outlet property="bookmarkThisPageMenuItem" destination="Nkm-zy-JXD" id="HVV-JT-gvV"/>
                             <outlet property="bookmarksMenuItem" destination="xf8-PW-TOA" id="Pfa-kN-nIj"/>
+                            <outlet property="bookmarksMenuToggleBookmarksBarMenuItem" destination="SwH-Sh-zIJ" id="cAN-ig-8nC"/>
                             <outlet property="burnWebsiteDataMenuItem" destination="b1E-Hc-xhP" id="8br-vM-1Pj"/>
                             <outlet property="checkForUpdatesMenuItem" destination="RbH-ua-rrN" id="pdB-jS-fc3"/>
                             <outlet property="checkForUpdatesSeparatorItem" destination="gNj-hj-EIc" id="EH1-yf-r5I"/>
