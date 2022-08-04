@@ -205,6 +205,17 @@ extension WKWebView {
         }
 
         if #available(macOS 11.0, *) {
+            let printInfoDictionary = (NSPrintInfo.shared.dictionary() as? [NSPrintInfo.AttributeKey: Any]) ?? [:]
+            let printInfo = NSPrintInfo(dictionary: printInfoDictionary)
+
+            printInfo.horizontalPagination = .automatic
+            printInfo.verticalPagination = .automatic
+            printInfo.leftMargin = 0
+            printInfo.rightMargin = 0
+            printInfo.topMargin = 0
+            printInfo.bottomMargin = 0
+            printInfo.scalingFactor = 0.95
+            
             return self.printOperation(with: printInfo)
         }
 
