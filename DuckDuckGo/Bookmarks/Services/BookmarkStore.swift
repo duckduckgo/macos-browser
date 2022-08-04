@@ -54,7 +54,7 @@ protocol BookmarkStore {
     func add(objectsWithUUIDs: [UUID], to parent: BookmarkFolder?, completion: @escaping (Error?) -> Void)
     func update(objectsWithUUIDs uuids: [UUID], update: @escaping (BaseBookmarkEntity) -> Void, completion: @escaping (Error?) -> Void)
     func canMoveObjectWithUUID(objectUUID uuid: UUID, to parent: BookmarkFolder) -> Bool
-    func move(objectUUID: UUID, toIndex: Int, withinParentFolder: ParentFolderType, completion: @escaping (Error?) -> Void)
+    func move(objectUUID: UUID, toIndex: Int?, withinParentFolder: ParentFolderType, completion: @escaping (Error?) -> Void)
     func importBookmarks(_ bookmarks: ImportedBookmarks, source: BookmarkImportSource) -> BookmarkImportResult
 
 }
@@ -459,7 +459,7 @@ final class LocalBookmarkStore: BookmarkStore {
         return canMoveObject
     }
     
-    func move(objectUUID: UUID, toIndex index: Int, withinParentFolder type: ParentFolderType = .parent, completion: @escaping (Error?) -> Void) {
+    func move(objectUUID: UUID, toIndex index: Int?, withinParentFolder type: ParentFolderType = .parent, completion: @escaping (Error?) -> Void) {
         context.perform { [weak self] in
             guard let self = self else {
                 assertionFailure("Couldn't get strong self")
@@ -487,7 +487,7 @@ final class LocalBookmarkStore: BookmarkStore {
 
             currentParentFolder.mutableChildren.remove(bookmarkManagedObject)
             
-            if index < newParentFolder.mutableChildren.count {
+            if let index = index, index < newParentFolder.mutableChildren.count {
                 newParentFolder.mutableChildren.insert(bookmarkManagedObject, at: index)
             } else {
                 newParentFolder.mutableChildren.addObjects(from: [bookmarkManagedObject])

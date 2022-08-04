@@ -202,6 +202,8 @@ extension BookmarksBarViewController: BookmarksBarViewModelDelegate {
         case .toggleFavorite:
             bookmark.isFavorite = !bookmark.isFavorite
             bookmarkManager.update(bookmark: bookmark)
+        case .moveToEnd:
+            bookmarkManager.move(objectUUID: bookmark.id, toIndex: nil) { _ in }
         case .copyURL:
             NSPasteboard.general.copy(url: bookmark.url)
         case .deleteEntity:
@@ -218,6 +220,8 @@ extension BookmarksBarViewController: BookmarksBarViewModelDelegate {
             let menu = bookmarkFolderMenu(items: menuItems)
 
             menu.popUp(positioning: nil, at: CGPoint(x: 0, y: item.view.frame.minY - 7), in: item.view)
+        case .moveToEnd:
+            bookmarkManager.move(objectUUID: folder.id, toIndex: nil) { _ in }
         case .deleteEntity:
             bookmarkManager.remove(folder: folder)
         default:
