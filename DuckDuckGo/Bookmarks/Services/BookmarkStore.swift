@@ -53,6 +53,7 @@ protocol BookmarkStore {
     func update(folder: BookmarkFolder)
     func add(objectsWithUUIDs: [UUID], to parent: BookmarkFolder?, completion: @escaping (Error?) -> Void)
     func update(objectsWithUUIDs uuids: [UUID], update: @escaping (BaseBookmarkEntity) -> Void, completion: @escaping (Error?) -> Void)
+    func canMoveObjectWithUUID(objectUUID uuid: UUID, to parent: BookmarkFolder) -> Bool
     func move(objectUUID: UUID, toIndex: Int, withinParentFolder: ParentFolderType, completion: @escaping (Error?) -> Void)
     func importBookmarks(_ bookmarks: ImportedBookmarks, source: BookmarkImportSource) -> BookmarkImportResult
 
@@ -412,6 +413,50 @@ final class LocalBookmarkStore: BookmarkStore {
 
             DispatchQueue.main.async { completion(true, nil) }
         }
+    }
+    
+    func canMoveObjectWithUUID(objectUUID uuid: UUID, to parent: BookmarkFolder) -> Bool {
+        guard uuid != parent.id else {
+            // A folder cannot set itself as its parent
+            return false
+        }
+        
+        // Assume true by default – the database validations will serve as a final check before any invalid state makes it into the database.
+        var canMoveObject = true
+        
+        context.performAndWait { [weak self] in
+            guard let self = self else {
+                assertionFailure("Couldn't get strong self")
+                return
+            }
+            
+            let folderToMoveFetchRequest = BaseBookmarkEntity.singleEntity(with: uuid)
+            let folderToMoveFetchRequestResults = try? self.context.fetch(folderToMoveFetchRequest)
+            
+            let parentFolderFetchRequest = BaseBookmarkEntity.singleEntity(with: parent.id)
+            let parentFolderFetchRequestResults = try? self.context.fetch(parentFolderFetchRequest)
+            
+            guard let folderToMove = folderToMoveFetchRequestResults?.first as? BookmarkManagedObject,
+                  let parentFolder = parentFolderFetchRequestResults?.first as? BookmarkManagedObject,
+                  folderToMove.isFolder,
+                  parentFolder.isFolder else {
+                return
+            }
+            
+            var currentParentFolder: BookmarkManagedObject? = parentFolder.parentFolder
+            
+            // Check each parent and verify that the folder being moved isn't being given itself as an ancestor
+            while let currentParent = currentParentFolder {
+                if currentParent.id == uuid {
+                    canMoveObject = false
+                    return
+                }
+
+                currentParentFolder = currentParent.parentFolder
+            }
+        }
+
+        return canMoveObject
     }
     
     func move(objectUUID: UUID, toIndex index: Int, withinParentFolder type: ParentFolderType = .parent, completion: @escaping (Error?) -> Void) {

@@ -18,6 +18,7 @@
 
 import AppKit
 import Combine
+import os
 
 protocol BookmarkManagementDetailViewControllerDelegate: AnyObject {
 
@@ -329,8 +330,20 @@ extension BookmarkManagementDetailViewController: NSTableViewDelegate, NSTableVi
     }
 
     private func validateDrop(for draggedFolders: Set<PasteboardFolder>, destination: BaseBookmarkEntity) -> NSDragOperation {
-        guard destination is BookmarkFolder else {
+        guard let destinationFolder = destination as? BookmarkFolder else {
             return .none
+        }
+        
+        for folderID in draggedFolders.map(\.id) {
+            guard let folderUUID = UUID(uuidString: folderID) else {
+                assertionFailure("Failed to convert UUID string to UUID")
+                return .none
+            }
+
+            if !bookmarkManager.canMoveObjectWithUUID(objectUUID: folderUUID, to: destinationFolder) {
+                os_log("Cannot move folder into parent as it would create a cycle", log: .bookmarks, type: .debug)
+                return .none
+            }
         }
 
         let tryingToDragOntoSameFolder = draggedFolders.contains { folder in
@@ -364,8 +377,10 @@ extension BookmarkManagementDetailViewController: NSTableViewDelegate, NSTableVi
         let draggedObjectIdentifierStrings = draggedBookmarks.map(\.id) + draggedFolders.map(\.id)
         let draggedObjectIdentifiers = draggedObjectIdentifierStrings.compactMap(UUID.init(uuidString:))
 
-        LocalBookmarkManager.shared.add(objectsWithUUIDs: draggedObjectIdentifiers, to: parent) { _ in
-            // Does anything need to happen here?
+        LocalBookmarkManager.shared.add(objectsWithUUIDs: draggedObjectIdentifiers, to: parent) { error in
+            if error != nil {
+                os_log("Failed to add objects to parent", log: .bookmarks, type: .error)
+            }
         }
 
         return true
