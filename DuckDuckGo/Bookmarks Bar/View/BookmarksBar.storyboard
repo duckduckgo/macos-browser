@@ -1,0 +1,89 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<document type="com.apple.InterfaceBuilder3.Cocoa.Storyboard.XIB" version="3.0" toolsVersion="20037" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES" initialViewController="JFF-Nj-8om">
+    <dependencies>
+        <deployment identifier="macosx"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="20037"/>
+        <capability name="Named colors" minToolsVersion="9.0"/>
+        <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
+    </dependencies>
+    <scenes>
+        <!--Bookmarks Bar View Controller-->
+        <scene sceneID="bLy-va-d0Z">
+            <objects>
+                <viewController id="JFF-Nj-8om" customClass="BookmarksBarViewController" customModule="DuckDuckGo_Privacy_Browser" customModuleProvider="target" sceneMemberID="viewController">
+                    <view key="view" id="R54-3G-cms">
+                        <rect key="frame" x="0.0" y="0.0" width="676" height="56"/>
+                        <autoresizingMask key="autoresizingMask"/>
+                        <subviews>
+                            <scrollView wantsLayer="YES" borderType="none" autohidesScrollers="YES" horizontalLineScroll="0.0" horizontalPageScroll="0.0" verticalLineScroll="0.0" verticalPageScroll="0.0" hasHorizontalScroller="NO" usesPredominantAxisScrolling="NO" horizontalScrollElasticity="none" verticalScrollElasticity="none" translatesAutoresizingMaskIntoConstraints="NO" id="D39-Of-BIh">
+                                <rect key="frame" x="0.0" y="2" width="676" height="52"/>
+                                <clipView key="contentView" drawsBackground="NO" id="yvk-6W-sd0">
+                                    <rect key="frame" x="0.0" y="0.0" width="676" height="52"/>
+                                    <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                                    <subviews>
+                                        <collectionView selectable="YES" id="vwg-NL-UPk">
+                                            <rect key="frame" x="0.0" y="0.0" width="676" height="52"/>
+                                            <autoresizingMask key="autoresizingMask" widthSizable="YES"/>
+                                            <collectionViewLayout key="collectionViewLayout" id="YNm-eM-CbC"/>
+                                            <color key="primaryBackgroundColor" name="AddressBarFocusedBackgroundColor"/>
+                                        </collectionView>
+                                    </subviews>
+                                    <color key="backgroundColor" name="AddressBarFocusedBackgroundColor"/>
+                                </clipView>
+                                <scroller key="horizontalScroller" hidden="YES" wantsLayer="YES" verticalHuggingPriority="750" horizontal="YES" id="78T-h6-lHw">
+                                    <rect key="frame" x="-100" y="-100" width="644" height="16"/>
+                                    <autoresizingMask key="autoresizingMask"/>
+                                </scroller>
+                                <scroller key="verticalScroller" hidden="YES" wantsLayer="YES" verticalHuggingPriority="750" horizontal="NO" id="p2h-o7-49x">
+                                    <rect key="frame" x="660" y="0.0" width="16" height="52"/>
+                                    <autoresizingMask key="autoresizingMask"/>
+                                </scroller>
+                            </scrollView>
+                            <button verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="Mgr-xJ-Pl5">
+                                <rect key="frame" x="652" y="21" width="16" height="16"/>
+                                <buttonCell key="cell" type="bevel" bezelStyle="rounded" image="Chevron-Double-Right-16" imagePosition="overlaps" alignment="center" imageScaling="proportionallyDown" inset="2" id="6BV-bJ-0Kw">
+                                    <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
+                                    <font key="font" metaFont="system"/>
+                                </buttonCell>
+                                <connections>
+                                    <action selector="clippedItemsIndicatorClicked:" target="JFF-Nj-8om" id="kJ5-LH-jFw"/>
+                                </connections>
+                            </button>
+                            <box verticalHuggingPriority="750" boxType="separator" translatesAutoresizingMaskIntoConstraints="NO" id="X6g-3K-JDi">
+                                <rect key="frame" x="0.0" y="-2" width="676" height="5"/>
+                            </box>
+                        </subviews>
+                        <constraints>
+                            <constraint firstItem="X6g-3K-JDi" firstAttribute="leading" secondItem="R54-3G-cms" secondAttribute="leading" id="0AB-Ps-M7N"/>
+                            <constraint firstItem="D39-Of-BIh" firstAttribute="top" secondItem="R54-3G-cms" secondAttribute="top" constant="2" id="1I1-kg-gBo"/>
+                            <constraint firstAttribute="bottom" secondItem="D39-Of-BIh" secondAttribute="bottom" constant="2" id="1fG-Jn-HEl"/>
+                            <constraint firstAttribute="trailing" secondItem="D39-Of-BIh" secondAttribute="trailing" id="Cvo-oT-HF2"/>
+                            <constraint firstAttribute="trailing" secondItem="Mgr-xJ-Pl5" secondAttribute="trailing" constant="8" id="UCG-Ww-dsY"/>
+                            <constraint firstAttribute="trailing" secondItem="X6g-3K-JDi" secondAttribute="trailing" id="ZaK-nU-eHk"/>
+                            <constraint firstItem="Mgr-xJ-Pl5" firstAttribute="centerY" secondItem="R54-3G-cms" secondAttribute="centerY" constant="-1" id="eoh-hW-GcD"/>
+                            <constraint firstItem="D39-Of-BIh" firstAttribute="leading" secondItem="R54-3G-cms" secondAttribute="leading" id="hOd-Bz-o5j"/>
+                            <constraint firstAttribute="bottom" secondItem="X6g-3K-JDi" secondAttribute="bottom" id="iWj-iC-9gW"/>
+                        </constraints>
+                        <userDefinedRuntimeAttributes>
+                            <userDefinedRuntimeAttribute type="color" keyPath="backgroundColor">
+                                <color key="value" name="AddressBarFocusedBackgroundColor"/>
+                            </userDefinedRuntimeAttribute>
+                        </userDefinedRuntimeAttributes>
+                    </view>
+                    <connections>
+                        <outlet property="bookmarksBarCollectionView" destination="vwg-NL-UPk" id="1LG-QE-Dgd"/>
+                        <outlet property="clippedItemsIndicator" destination="Mgr-xJ-Pl5" id="4ww-Po-dNb"/>
+                    </connections>
+                </viewController>
+                <customObject id="rrD-nk-5c1" userLabel="First Responder" customClass="NSResponder" sceneMemberID="firstResponder"/>
+            </objects>
+            <point key="canvasLocation" x="1054" y="708"/>
+        </scene>
+    </scenes>
+    <resources>
+        <image name="Chevron-Double-Right-16" width="16" height="16"/>
+        <namedColor name="AddressBarFocusedBackgroundColor">
+            <color red="1" green="1" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+        </namedColor>
+    </resources>
+</document>

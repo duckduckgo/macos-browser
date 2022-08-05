@@ -1,0 +1,82 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<document type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="3.0" toolsVersion="20037" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES" customObjectInstantitationMethod="direct">
+    <dependencies>
+        <deployment identifier="macosx"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="20037"/>
+        <capability name="Named colors" minToolsVersion="9.0"/>
+        <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
+    </dependencies>
+    <objects>
+        <customObject id="-2" userLabel="File's Owner"/>
+        <customObject id="-1" userLabel="First Responder" customClass="FirstResponder"/>
+        <customObject id="-3" userLabel="Application" customClass="NSObject"/>
+        <customView id="Hz6-mo-xeY">
+            <rect key="frame" x="0.0" y="0.0" width="184" height="99"/>
+            <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+            <subviews>
+                <customView translatesAutoresizingMaskIntoConstraints="NO" id="Ff3-Xx-JTo" customClass="MouseOverView" customModule="DuckDuckGo_Privacy_Browser" customModuleProvider="target">
+                    <rect key="frame" x="0.0" y="0.0" width="184" height="99"/>
+                    <userDefinedRuntimeAttributes>
+                        <userDefinedRuntimeAttribute type="color" keyPath="mouseOverColor">
+                            <color key="value" name="ButtonMouseOverColor"/>
+                        </userDefinedRuntimeAttribute>
+                    </userDefinedRuntimeAttributes>
+                </customView>
+                <imageView horizontalHuggingPriority="251" verticalHuggingPriority="251" translatesAutoresizingMaskIntoConstraints="NO" id="aEY-jN-qvL" userLabel="Favicon Image View">
+                    <rect key="frame" x="7" y="42" width="16" height="16"/>
+                    <constraints>
+                        <constraint firstAttribute="height" constant="16" id="LbV-fW-nWP"/>
+                        <constraint firstAttribute="width" constant="16" id="s73-Is-qty"/>
+                    </constraints>
+                    <imageCell key="cell" refusesFirstResponder="YES" alignment="left" imageScaling="proportionallyDown" image="Bookmark" id="br4-aE-1QB"/>
+                    <color key="contentTintColor" name="BlackWhite80"/>
+                </imageView>
+                <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="fMp-kj-J3A">
+                    <rect key="frame" x="25" y="42" width="154" height="15"/>
+                    <textFieldCell key="cell" lineBreakMode="truncatingMiddle" alignment="left" title="Bookmark" id="7mq-oj-2L8">
+                        <font key="font" metaFont="cellTitle"/>
+                        <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
+                        <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
+                    </textFieldCell>
+                </textField>
+                <customView translatesAutoresizingMaskIntoConstraints="NO" id="IHK-ff-XkT" customClass="MouseClickView" customModule="DuckDuckGo_Privacy_Browser" customModuleProvider="target">
+                    <rect key="frame" x="0.0" y="0.0" width="184" height="99"/>
+                </customView>
+            </subviews>
+            <constraints>
+                <constraint firstAttribute="trailing" secondItem="IHK-ff-XkT" secondAttribute="trailing" id="1OU-XC-cdf"/>
+                <constraint firstAttribute="trailing" secondItem="Ff3-Xx-JTo" secondAttribute="trailing" id="2VU-ec-cXW"/>
+                <constraint firstItem="IHK-ff-XkT" firstAttribute="top" secondItem="Hz6-mo-xeY" secondAttribute="top" id="7ph-Q0-R4I"/>
+                <constraint firstItem="aEY-jN-qvL" firstAttribute="centerY" secondItem="Hz6-mo-xeY" secondAttribute="centerY" id="FRD-J2-zMP"/>
+                <constraint firstItem="fMp-kj-J3A" firstAttribute="centerY" secondItem="Hz6-mo-xeY" secondAttribute="centerY" id="H0Q-is-CJW"/>
+                <constraint firstAttribute="bottom" secondItem="Ff3-Xx-JTo" secondAttribute="bottom" id="PC6-Xr-IM6"/>
+                <constraint firstItem="Ff3-Xx-JTo" firstAttribute="top" secondItem="Hz6-mo-xeY" secondAttribute="top" id="Q1T-ZH-Ew3"/>
+                <constraint firstItem="IHK-ff-XkT" firstAttribute="leading" secondItem="Hz6-mo-xeY" secondAttribute="leading" id="RMp-c3-xiB"/>
+                <constraint firstAttribute="trailing" secondItem="fMp-kj-J3A" secondAttribute="trailing" constant="7" id="lxn-aE-KVB"/>
+                <constraint firstAttribute="bottom" secondItem="IHK-ff-XkT" secondAttribute="bottom" id="qDr-an-58u"/>
+                <constraint firstItem="fMp-kj-J3A" firstAttribute="leading" secondItem="aEY-jN-qvL" secondAttribute="trailing" constant="4" id="svg-gd-cvC"/>
+                <constraint firstItem="aEY-jN-qvL" firstAttribute="leading" secondItem="Hz6-mo-xeY" secondAttribute="leading" constant="7" id="vtS-fU-Vm0"/>
+                <constraint firstItem="Ff3-Xx-JTo" firstAttribute="leading" secondItem="Hz6-mo-xeY" secondAttribute="leading" id="yst-tx-82t"/>
+            </constraints>
+            <point key="canvasLocation" x="255" y="121"/>
+        </customView>
+        <collectionViewItem id="mo5-Bi-OJI" customClass="BookmarksBarCollectionViewItem" customModule="DuckDuckGo_Privacy_Browser" customModuleProvider="target">
+            <connections>
+                <outlet property="faviconView" destination="aEY-jN-qvL" id="vuC-Cm-ECU"/>
+                <outlet property="mouseClickView" destination="IHK-ff-XkT" id="919-Qr-nRS"/>
+                <outlet property="mouseOverView" destination="Ff3-Xx-JTo" id="lDQ-IQ-fk1"/>
+                <outlet property="titleLabel" destination="fMp-kj-J3A" id="Sxw-1t-GqZ"/>
+                <outlet property="view" destination="Hz6-mo-xeY" id="Zhf-KI-eAw"/>
+            </connections>
+        </collectionViewItem>
+    </objects>
+    <resources>
+        <image name="Bookmark" width="16" height="16"/>
+        <namedColor name="BlackWhite80">
+            <color red="0.0" green="0.0" blue="0.0" alpha="0.80000001192092896" colorSpace="custom" customColorSpace="sRGB"/>
+        </namedColor>
+        <namedColor name="ButtonMouseOverColor">
+            <color red="0.0" green="0.0" blue="0.0" alpha="0.05000000074505806" colorSpace="custom" customColorSpace="sRGB"/>
+        </namedColor>
+    </resources>
+</document>

@@ -881,8 +881,8 @@ final class AddressBarButtonsViewController: NSViewController {
         }
 
         let bookmark = bookmarkManager.makeBookmark(for: url,
-                                                title: selectedTabViewModel.title,
-                                                isFavorite: setFavorite)
+                                                    title: selectedTabViewModel.title,
+                                                    isFavorite: setFavorite)
         updateBookmarkButtonImage(isUrlBookmarked: bookmark != nil)
 
         Pixel.fire(.bookmark(isFavorite: setFavorite, fireproofed: .init(url: url), source: accessPoint))

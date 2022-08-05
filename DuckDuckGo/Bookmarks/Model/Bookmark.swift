@@ -135,7 +135,7 @@ final class Bookmark: BaseBookmarkEntity {
 
     let url: URL
     var isFavorite: Bool
-    var parentFolderUUID: UUID?
+    private(set) var parentFolderUUID: UUID?
 
     // Property oldFavicon can be removed in future updates when favicon cache is built
     var oldFavicon: NSImage?
@@ -151,7 +151,6 @@ final class Bookmark: BaseBookmarkEntity {
          isFavorite: Bool,
          parentFolderUUID: UUID? = nil,
          faviconManagement: FaviconManagement = FaviconManager.shared) {
-
         self.url = url
         self.oldFavicon = oldFavicon
         self.isFavorite = isFavorite
@@ -166,7 +165,8 @@ final class Bookmark: BaseBookmarkEntity {
                   url: newUrl,
                   title: bookmark.title,
                   oldFavicon: nil,
-                  isFavorite: bookmark.isFavorite)
+                  isFavorite: bookmark.isFavorite,
+                  parentFolderUUID: bookmark.parentFolderUUID)
     }
 
 }
