@@ -216,7 +216,7 @@ extension BookmarksBarCollectionViewItem {
     }
     
     func moveToEndMenuItem() -> NSMenuItem {
-        return menuItem("Move To End", #selector(moveToEndMenuItemSelected(_:)))
+        return menuItem(UserText.bookmarksBarContextMenuMoveToEnd, #selector(moveToEndMenuItemSelected(_:)))
     }
     
     @objc
