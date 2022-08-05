@@ -54,7 +54,7 @@ final class MainViewController: NSViewController {
     private var mouseNavButtonsMonitor: Any?
     
     private var bookmarksBarIsVisible: Bool {
-        return !bookmarksBarViewController.view.isHidden
+        return bookmarksBarViewController.parent != nil
     }
     
     private var isInPopUpWindow: Bool {
