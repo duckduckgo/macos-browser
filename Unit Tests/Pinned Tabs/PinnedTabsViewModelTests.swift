@@ -81,6 +81,17 @@ class PinnedTabsViewModelTests: XCTestCase {
         XCTAssertEqual(model.itemsWithoutSeparator, [collection.tabs[2], collection.tabs[3], collection.tabs[4]])
     }
 
+    func testWhenThereIsOnlyOneItemThenDraggingMovesWindow() throws {
+        let tabA = Tab(content: .url("http://a.com".url!))
+        let tabB = Tab(content: .url("http://b.com".url!))
+
+        model.items = [tabA, tabB]
+        XCTAssertFalse(model.dragMovesWindow)
+
+        model.items = [tabA]
+        XCTAssertTrue(model.dragMovesWindow)
+    }
+
     func testThatItemsReorderingIsPublished() throws {
         var events: [[Tab]] = []
         let cancellable = model.tabsDidReorderPublisher.sink(receiveValue: { events.append($0) })

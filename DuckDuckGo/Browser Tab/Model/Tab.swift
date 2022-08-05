@@ -38,6 +38,7 @@ protocol TabDelegate: FileDownloadManagerDelegate, ContentOverlayUserScriptDeleg
 
     func tabPageDOMLoaded(_ tab: Tab)
     func closeTab(_ tab: Tab)
+    func tab(_ tab: Tab, promptUserForCookieConsent result: @escaping (Bool) -> Void)
 }
 
 // swiftlint:disable type_body_length
@@ -1369,6 +1370,10 @@ extension Tab: HoverUserScriptDelegate {
 extension Tab: AutoconsentUserScriptDelegate {
     func autoconsentUserScript(consentStatus: CookieConsentInfo) {
         self.cookieConsentManaged = consentStatus
+    }
+    
+    func autoconsentUserScriptPromptUserForConsent(_ result: @escaping (Bool) -> Void) {
+        delegate?.tab(self, promptUserForCookieConsent: result)
     }
 }
 

@@ -43,7 +43,12 @@ final class HistoryStoreTests: XCTestCase {
         let context = container.viewContext
         let historyStore = HistoryStore(context: context)
 
-        var historyEntry = HistoryEntry(identifier: UUID(), url: URL.duckDuckGo, title: "Test", numberOfVisits: 1, lastVisit: Date())
+        let historyEntry = HistoryEntry(identifier: UUID(),
+                                        url: URL.duckDuckGo,
+                                        title: "Test",
+                                        numberOfVisits: 1,
+                                        lastVisit: Date(),
+                                        visits: [])
         let firstSavingExpectation = self.expectation(description: "Saving")
         save(entry: historyEntry, historyStore: historyStore, expectation: firstSavingExpectation)
 
@@ -77,10 +82,11 @@ final class HistoryStoreTests: XCTestCase {
         let historyStore = HistoryStore(context: context)
 
         let oldHistoryEntry = HistoryEntry(identifier: UUID(),
-                                      url: URL.duckDuckGo,
-                                      title: nil,
-                                      numberOfVisits: 1,
-                                      lastVisit: Date.init(timeIntervalSince1970: 0))
+                                           url: URL.duckDuckGo,
+                                           title: nil,
+                                           numberOfVisits: 1,
+                                           lastVisit: Date.init(timeIntervalSince1970: 0),
+                                           visits: [])
         let firstSavingExpectation = self.expectation(description: "Saving")
         save(entry: oldHistoryEntry, historyStore: historyStore, expectation: firstSavingExpectation)
 
@@ -89,7 +95,8 @@ final class HistoryStoreTests: XCTestCase {
                                            url: URL(string: "wikipedia.org")!,
                                            title: nil,
                                            numberOfVisits: 1,
-                                           lastVisit: Date())
+                                           lastVisit: Date(),
+                                           visits: [])
         let secondSavingExpectation = self.expectation(description: "Saving")
         save(entry: newHistoryEntry, historyStore: historyStore, expectation: secondSavingExpectation)
 
@@ -119,18 +126,20 @@ final class HistoryStoreTests: XCTestCase {
 
         let notToRemoveIdentifier = UUID()
         let historyEntry = HistoryEntry(identifier: notToRemoveIdentifier,
-                                      url: URL.duckDuckGo,
-                                      title: nil,
-                                      numberOfVisits: 1,
-                                      lastVisit: Date())
+                                        url: URL.duckDuckGo,
+                                        title: nil,
+                                        numberOfVisits: 1,
+                                        lastVisit: Date(),
+                                        visits: [])
         let firstSavingExpectation = self.expectation(description: "Saving")
         save(entry: historyEntry, historyStore: historyStore, expectation: firstSavingExpectation)
 
         let toRemoveHistoryEntry = HistoryEntry(identifier: UUID(),
-                                           url: URL(string: "wikipedia.org")!,
-                                           title: nil,
-                                           numberOfVisits: 1,
-                                           lastVisit: Date())
+                                                url: URL(string: "wikipedia.org")!,
+                                                title: nil,
+                                                numberOfVisits: 1,
+                                                lastVisit: Date(),
+                                                visits: [])
         let secondSavingExpectation = self.expectation(description: "Saving")
         save(entry: toRemoveHistoryEntry, historyStore: historyStore, expectation: secondSavingExpectation)
 
@@ -144,10 +153,7 @@ final class HistoryStoreTests: XCTestCase {
                 case .failure(let error):
                     XCTFail("Loading of history failed - \(error.localizedDescription)")
                 }
-            } receiveValue: { history in
-                XCTAssertEqual(history.count, 1)
-                XCTAssertEqual(history.first!.identifier, notToRemoveIdentifier)
-            }
+            } receiveValue: {}
             .store(in: &cancellables)
 
         waitForExpectations(timeout: 1, handler: nil)
@@ -157,13 +163,14 @@ final class HistoryStoreTests: XCTestCase {
 
 fileprivate extension HistoryEntry {
 
-    init(identifier: UUID, url: URL, title: String?, numberOfVisits: Int, lastVisit: Date) {
+    convenience init(identifier: UUID, url: URL, title: String?, numberOfVisits: Int, lastVisit: Date, visits: [Visit]) {
         self.init(identifier: identifier,
                   url: url,
                   title: title,
-                  numberOfVisits: numberOfVisits,
-                  lastVisit: lastVisit,
                   failedToLoad: false,
+                  numberOfTotalVisits: numberOfVisits,
+                  lastVisit: lastVisit,
+                  visits: Set(visits),
                   numberOfTrackersBlocked: 0,
                   blockedTrackingEntities: .init(),
                   trackersFound: false)

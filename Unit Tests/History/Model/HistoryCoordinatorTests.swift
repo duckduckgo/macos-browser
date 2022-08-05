@@ -204,7 +204,7 @@ fileprivate extension HistoryCoordinator {
     static var aHistoryCoordinator: (HistoryStoringMock, HistoryCoordinator) {
         let historyStoringMock = HistoryStoringMock()
         historyStoringMock.cleanOldResult = .success(History())
-        historyStoringMock.removeEntriesResult = .success(History())
+        historyStoringMock.removeEntriesResult = .success(())
         let historyCoordinator = HistoryCoordinator(historyStoring: historyStoringMock)
         Thread.sleep(forTimeInterval: 0.1)
 

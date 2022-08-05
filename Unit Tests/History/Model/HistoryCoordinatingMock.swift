@@ -51,6 +51,12 @@ final class HistoryCoordinatingMock: HistoryCoordinating {
         completion()
     }
 
+    var burnVisitsCalled = false
+    func burnVisits(_ visits: [Visit], completion: @escaping () -> Void) {
+        burnVisitsCalled = true
+        completion()
+    }
+
     var markFailedToLoadUrlCalled = false
     func markFailedToLoadUrl(_ url: URL) {
         markFailedToLoadUrlCalled = true

@@ -22,6 +22,7 @@ import BrowserServicesKit
 
 protocol AutoconsentUserScriptDelegate: AnyObject {
     func autoconsentUserScript(consentStatus: CookieConsentInfo)
+    func autoconsentUserScriptPromptUserForConsent(_ result: @escaping (Bool) -> Void)
 }
 
 protocol UserScriptWithAutoconsent: UserScript {
@@ -405,23 +406,9 @@ extension AutoconsentUserScript {
         }
 
         management.promptLastShown = now
-        let alert = NSAlert.cookiePopup()
-        alert.beginSheetModal(for: window, completionHandler: { response in
-            switch response {
-            case .alertFirstButtonReturn:
-                // User wants to turn on the feature
-                self.preferences.autoconsentEnabled = true
-                callback(true)
-            case .alertSecondButtonReturn:
-                // "Not now"
-                callback(false)
-            case .alertThirdButtonReturn:
-                // "Don't ask again"
-                self.preferences.autoconsentEnabled = false
-                callback(false)
-            case _:
-                callback(false)
-            }
-        })
+        self.delegate?.autoconsentUserScriptPromptUserForConsent { result in
+            self.preferences.autoconsentEnabled = result
+            callback(result)
+        }
     }
 }

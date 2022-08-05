@@ -229,6 +229,9 @@
                                     <constraint firstAttribute="width" placeholder="YES" id="WbS-dd-RX8"/>
                                 </constraints>
                             </customView>
+                            <customView translatesAutoresizingMaskIntoConstraints="NO" id="1Zn-JZ-2g3" customClass="WindowDraggingView" customModule="DuckDuckGo_Privacy_Browser" customModuleProvider="target">
+                                <rect key="frame" x="76" y="1" width="0.0" height="34"/>
+                            </customView>
                             <customView translatesAutoresizingMaskIntoConstraints="NO" id="efe-Pc-ueT" userLabel="Window Dragging View" customClass="WindowDraggingView" customModule="DuckDuckGo_Privacy_Browser" customModuleProvider="target">
                                 <rect key="frame" x="76" y="0.0" width="665" height="34"/>
                             </customView>
@@ -236,6 +239,7 @@
                         <constraints>
                             <constraint firstAttribute="trailing" secondItem="8Av-Au-VBq" secondAttribute="trailing" id="04T-2h-lX4"/>
                             <constraint firstItem="efe-Pc-ueT" firstAttribute="leading" secondItem="O0X-yp-zLn" secondAttribute="leading" priority="250" id="5k3-uY-xby"/>
+                            <constraint firstItem="1Zn-JZ-2g3" firstAttribute="trailing" secondItem="G3c-kC-Gu9" secondAttribute="trailing" id="6rJ-2P-FZy"/>
                             <constraint firstAttribute="bottom" secondItem="O0X-yp-zLn" secondAttribute="bottom" constant="1" id="9nu-uZ-CjI"/>
                             <constraint firstItem="u4N-Qc-LMf" firstAttribute="trailing" secondItem="O0X-yp-zLn" secondAttribute="trailing" id="Bd1-0P-xDt"/>
                             <constraint firstItem="zsA-or-9Xo" firstAttribute="top" secondItem="JQD-ov-FCr" secondAttribute="top" id="CKr-JO-cA6"/>
@@ -247,6 +251,7 @@
                             <constraint firstItem="efe-Pc-ueP" firstAttribute="top" secondItem="JQD-ov-FCr" secondAttribute="top" id="IfJ-U1-mpT"/>
                             <constraint firstItem="dN1-y1-5Xe" firstAttribute="centerY" secondItem="O0X-yp-zLn" secondAttribute="centerY" id="M6c-OC-8Nn"/>
                             <constraint firstItem="O0X-yp-zLn" firstAttribute="leading" secondItem="kOb-4q-pAe" secondAttribute="trailing" id="MVf-BL-bYZ"/>
+                            <constraint firstItem="1Zn-JZ-2g3" firstAttribute="top" secondItem="G3c-kC-Gu9" secondAttribute="top" id="QN9-ks-xLD"/>
                             <constraint firstAttribute="bottom" secondItem="efe-Pc-ueT" secondAttribute="bottom" priority="750" id="Si3-u3-31S"/>
                             <constraint firstAttribute="trailing" secondItem="dN1-y1-5Xe" secondAttribute="trailing" constant="12" id="SiM-7u-jTo"/>
                             <constraint firstItem="efe-Pc-ueP" firstAttribute="leading" secondItem="JQD-ov-FCr" secondAttribute="leading" id="UBO-rv-mb4"/>
@@ -255,8 +260,10 @@
                             <constraint firstItem="O0X-yp-zLn" firstAttribute="leading" secondItem="zsA-or-9Xo" secondAttribute="leading" id="bIL-4K-ggG"/>
                             <constraint firstItem="8Av-Au-VBq" firstAttribute="leading" secondItem="JQD-ov-FCr" secondAttribute="leading" id="djE-ZR-Zcb"/>
                             <constraint firstAttribute="trailing" secondItem="efe-Pc-ueP" secondAttribute="trailing" id="etm-VT-0k2"/>
+                            <constraint firstItem="1Zn-JZ-2g3" firstAttribute="bottom" secondItem="G3c-kC-Gu9" secondAttribute="bottom" id="hCx-vd-PYo"/>
                             <constraint firstItem="dN1-y1-5Xe" firstAttribute="leading" secondItem="efe-Pc-ueT" secondAttribute="trailing" id="hWs-AC-dwE"/>
                             <constraint firstAttribute="bottom" secondItem="efe-Pc-ueP" secondAttribute="bottom" id="iYT-Di-UlL"/>
+                            <constraint firstItem="1Zn-JZ-2g3" firstAttribute="leading" secondItem="G3c-kC-Gu9" secondAttribute="leading" id="kBj-jh-X0L"/>
                             <constraint firstItem="efe-Pc-ueT" firstAttribute="top" secondItem="JQD-ov-FCr" secondAttribute="top" priority="750" id="kNA-2I-L0U"/>
                             <constraint firstItem="G3c-kC-Gu9" firstAttribute="height" secondItem="O0X-yp-zLn" secondAttribute="height" id="n4S-57-Odv"/>
                             <constraint firstAttribute="bottom" secondItem="8Av-Au-VBq" secondAttribute="bottom" id="pat-VC-dVb"/>
@@ -272,6 +279,7 @@
                         <outlet property="leftShadowImageView" destination="zsA-or-9Xo" id="wVp-jj-2UD"/>
                         <outlet property="pinnedTabsContainerView" destination="G3c-kC-Gu9" id="v78-CF-sIa"/>
                         <outlet property="pinnedTabsViewLeadingConstraint" destination="a7p-a2-dhE" id="0hK-dY-o7E"/>
+                        <outlet property="pinnedTabsWindowDraggingView" destination="1Zn-JZ-2g3" id="Rld-aG-FZ2"/>
                         <outlet property="plusButton" destination="qXs-b0-tWI" id="cI1-G5-Plf"/>
                         <outlet property="rightScrollButton" destination="2da-G7-xcP" id="4ka-kI-E1j"/>
                         <outlet property="rightShadowImageView" destination="u4N-Qc-LMf" id="QX4-lD-gfb"/>

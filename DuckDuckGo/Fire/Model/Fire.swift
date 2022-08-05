@@ -39,9 +39,9 @@ final class TabDataCleaner: NSObject, WKNavigationDelegate {
     
     private var completion: (() -> Void)?
     
-    func prepareModelsForCleanup(_ models: [TabViewModel],
-                                 completion: @escaping () -> Void) {
-        guard !models.isEmpty else {
+    func prepareTabsForCleanup(_ tabs: [TabViewModel],
+                               completion: @escaping () -> Void) {
+        guard !tabs.isEmpty else {
             completion()
             return
         }
@@ -49,8 +49,8 @@ final class TabDataCleaner: NSObject, WKNavigationDelegate {
         assert(self.completion == nil)
         self.completion = completion
         
-        numberOfTabs = models.count
-        models.forEach { $0.prepareForDataClearing(caller: self) }
+        numberOfTabs = tabs.count
+        tabs.forEach { $0.prepareForDataClearing(caller: self) }
     }
     
     private func notifyIfDone() {
@@ -74,7 +74,13 @@ final class TabDataCleaner: NSObject, WKNavigationDelegate {
     }
 }
 
+// swiftlint:disable type_body_length
 final class Fire {
+
+    // Drop www prefixes to produce list of burning domains
+    static func getBurningDomain(from url: URL) -> String? {
+        return url.host?.dropWWW()
+    }
     
     private typealias TabCollectionsCleanupInfo = [TabCollectionViewModel: [TabCollectionViewModel.TabCleanupInfo]]
 
@@ -132,7 +138,10 @@ final class Fire {
         }
     }
 
-    func burnDomains(_ domains: Set<String>, completion: (() -> Void)? = nil) {
+    // swiftlint:disable function_body_length
+    func burnDomains(_ domains: Set<String>,
+                     includingHistory: Bool = true,
+                     completion: (() -> Void)? = nil) {
         os_log("Fire started", log: .fire)
 
         burnLastSessionState()
@@ -147,16 +156,22 @@ final class Fire {
             return domain
         })
         let burningDomains = domains.union(wwwDomains)
+
+        // Fireproofed domains shouldn't be in the list of burning domains
+        assert(!burningDomains.contains(where: { domain in
+            FireproofDomains.shared.isFireproof(fireproofDomain: domain)
+        }), "Fireproof domain is burning")
+
         let collectionsCleanupInfo = tabViewModelsFor(domains: burningDomains)
         
         // Prepare all Tabs that are going to be burned
-        let modelsToRemove = collectionsCleanupInfo.values.flatMap { tabViewModelsCleanupInfo in
+        let tabsToRemove = collectionsCleanupInfo.values.flatMap { tabViewModelsCleanupInfo in
             tabViewModelsCleanupInfo.filter({ $0.action == .burn }).compactMap { $0.tabViewModel }
         }
 
         let pinnedTabsViewModels = pinnedTabViewModels(for: burningDomains)
         
-        tabsCleaner.prepareModelsForCleanup(modelsToRemove) {
+        tabsCleaner.prepareTabsForCleanup(tabsToRemove) {
 
             let group = DispatchGroup()
             
@@ -177,14 +192,19 @@ final class Fire {
                 group.leave()
             }
 
-            group.enter()
-            self.burnHistory(of: burningDomains, completion: {
-                self.burnPermissions(of: burningDomains, completion: {
+            if includingHistory {
+                group.enter()
+                self.burnHistory(of: burningDomains, completion: {
                     self.burnFavicons(for: burningDomains) {
-                        self.burnDownloads(of: burningDomains)
                         group.leave()
                     }
                 })
+            }
+
+            group.enter()
+            self.burnPermissions(of: burningDomains, completion: {
+                self.burnDownloads(of: burningDomains)
+                group.leave()
             })
 
             self.burnRecentlyClosed(domains: burningDomains)
@@ -198,6 +218,7 @@ final class Fire {
             }
         }
     }
+    // swiftlint:enable function_body_length
 
     func burnAll(tabCollectionViewModel: TabCollectionViewModel, completion: (() -> Void)? = nil) {
         os_log("Fire started", log: .fire)
@@ -207,7 +228,7 @@ final class Fire {
 
         let pinnedTabsViewModels = pinnedTabViewModels()
 
-        tabsCleaner.prepareModelsForCleanup(allTabViewModels()) {
+        tabsCleaner.prepareTabsForCleanup(allTabViewModels()) {
             let group = DispatchGroup()
             group.enter()
             Task {
@@ -247,7 +268,31 @@ final class Fire {
         }
     }
 
-    // MARK: - Tab Models
+    // Burns visit passed to the method but preserves other visits of same domains
+    func burnVisits(of visits: [Visit],
+                    except fireproofDomains: FireproofDomains,
+                    completion: (() -> Void)? = nil) {
+
+        // Get domains to burn
+        var domains = Set<String>()
+        visits.forEach { visit in
+            guard let historyEntry = visit.historyEntry else {
+                assertionFailure("No history entry")
+                return
+            }
+
+            if let domain = Fire.getBurningDomain(from: historyEntry.url),
+               !fireproofDomains.isFireproof(fireproofDomain: domain) {
+                domains.insert(domain)
+            }
+        }
+
+        historyCoordinating.burnVisits(visits) {
+            self.burnDomains(domains, includingHistory: false, completion: completion)
+        }
+    }
+    
+    // MARK: - Tabs
     
     private func allTabViewModels() -> [TabViewModel] {
         var allTabViewModels = [TabViewModel] ()
@@ -545,8 +590,8 @@ extension History {
 
     var visitedDomains: Set<String> {
         return reduce(Set<String>(), { result, historyEntry in
-            if let host = historyEntry.url.host {
-                return result.union([host.dropWWW()])
+            if let domain = Fire.getBurningDomain(from: historyEntry.url) {
+                return result.union([domain])
             } else {
                 return result
             }

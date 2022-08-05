@@ -17,8 +17,10 @@
 //
 
 import Cocoa
+import Combine
 
 final class WindowDraggingView: NSView {
+    let mouseDownPublisher: AnyPublisher<NSEvent, Never>
 
     override func acceptsFirstMouse(for event: NSEvent?) -> Bool {
         return true
@@ -29,11 +31,23 @@ final class WindowDraggingView: NSView {
     }
 
     override func mouseDown(with event: NSEvent) {
+        mouseDownSubject.send(event)
+
         if event.clickCount == 2 {
             zoom()
         } else {
             drag(with: event)
         }
+    }
+
+    override init(frame frameRect: NSRect) {
+        mouseDownPublisher = mouseDownSubject.eraseToAnyPublisher()
+        super.init(frame: frameRect)
+    }
+
+    required init?(coder: NSCoder) {
+        mouseDownPublisher = mouseDownSubject.eraseToAnyPublisher()
+        super.init(coder: coder)
     }
 
     private func zoom() {
@@ -43,5 +57,6 @@ final class WindowDraggingView: NSView {
     private func drag(with event: NSEvent) {
         window?.performDrag(with: event)
     }
-    
+
+    private let mouseDownSubject = PassthroughSubject<NSEvent, Never>()
 }

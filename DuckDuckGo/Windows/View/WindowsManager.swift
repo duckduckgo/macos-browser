@@ -37,7 +37,7 @@ final class WindowsManager {
                              contentSize: NSSize? = nil,
                              showWindow: Bool = true,
                              popUp: Bool = false,
-                             lazyLoadTabs: Bool = false) -> NSWindow? {
+                             lazyLoadTabs: Bool = false) -> MainWindow? {
         let mainWindowController = makeNewWindow(tabCollectionViewModel: tabCollectionViewModel, popUp: popUp)
 
         if let droppingPoint = droppingPoint {
@@ -58,10 +58,11 @@ final class WindowsManager {
             mainWindowController.mainViewController.tabCollectionViewModel.setUpLazyLoadingIfNeeded()
         }
 
-        return mainWindowController.window
+        return mainWindowController.window as? MainWindow
     }
 
-    class func openNewWindow(with tab: Tab, droppingPoint: NSPoint? = nil, contentSize: NSSize? = nil, popUp: Bool = false) {
+    @discardableResult
+    class func openNewWindow(with tab: Tab, droppingPoint: NSPoint? = nil, contentSize: NSSize? = nil, popUp: Bool = false) -> MainWindow? {
         let tabCollection = TabCollection()
         tabCollection.append(tab: tab)
 
@@ -72,7 +73,7 @@ final class WindowsManager {
             return .init(tabCollection: tabCollection)
         }()
 
-        openNewWindow(with: tabCollectionViewModel,
+        return openNewWindow(with: tabCollectionViewModel,
                       droppingPoint: droppingPoint,
                       contentSize: contentSize,
                       popUp: popUp)

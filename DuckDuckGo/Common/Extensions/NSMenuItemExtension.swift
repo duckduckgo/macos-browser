@@ -47,6 +47,10 @@ extension NSMenuItem {
         action = #selector(MainViewController.openAllInTabs(_:))
     }
 
+    convenience init(title: String) {
+        self.init(title: title, action: nil, keyEquivalent: "")
+    }
+
     var topMenu: NSMenu? {
         var menuItem = self
         while let parent = menuItem.parent {
