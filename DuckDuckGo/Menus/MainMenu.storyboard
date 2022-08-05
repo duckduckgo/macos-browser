@@ -769,7 +769,6 @@ CQ
                             <outlet property="bookmarkThisPageMenuItem" destination="Nkm-zy-JXD" id="HVV-JT-gvV"/>
                             <outlet property="bookmarksMenuItem" destination="xf8-PW-TOA" id="Pfa-kN-nIj"/>
                             <outlet property="bookmarksMenuToggleBookmarksBarMenuItem" destination="SwH-Sh-zIJ" id="cAN-ig-8nC"/>
-                            <outlet property="burnWebsiteDataMenuItem" destination="b1E-Hc-xhP" id="8br-vM-1Pj"/>
                             <outlet property="checkForUpdatesMenuItem" destination="RbH-ua-rrN" id="pdB-jS-fc3"/>
                             <outlet property="checkForUpdatesSeparatorItem" destination="gNj-hj-EIc" id="EH1-yf-r5I"/>
                             <outlet property="checkGrammarWithSpellingMenuItem" destination="mK6-2p-4JG" id="hA4-qY-11q"/>
