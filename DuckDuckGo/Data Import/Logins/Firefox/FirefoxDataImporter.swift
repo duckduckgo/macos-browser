@@ -82,15 +82,22 @@ final class FirefoxDataImporter: DataImporter {
             
             switch faviconsResult {
             case .success(let faviconsByURL):
-                for (pageURLString, favicons) in faviconsByURL {
+                for (pageURLString, fetchedFavicons) in faviconsByURL {
                     if let pageURL = URL(string: pageURLString) {
-                        // TODO: Store favicons
+                        let favicons = fetchedFavicons.map {
+                            Favicon(identifier: UUID(),
+                                    url: pageURL,
+                                    image: $0.image,
+                                    relation: .icon,
+                                    documentUrl: pageURL,
+                                    dateCreated: Date())
+                        }
+                        
+                        faviconManager.handleFavicons(favicons, documentUrl: pageURL)
                     }
                 }
                 
-            case .failure(let error):
-                // Do nothing here, it's not a dealbreaker if favicons aren't imported
-                break
+            case .failure: break // TODO: Send pixel if favicon import fails completely
             }
 
             switch bookmarkResult {
