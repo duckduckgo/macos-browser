@@ -111,6 +111,11 @@ struct PinnedTabInnerView: View {
                 FaviconView(domain: domain, size: 16, font: .caption, sizeCategory: .small)
                     .grayscale(controlActiveState == .key ? 0.0 : 1.0)
                     .opacity(controlActiveState == .key ? 1.0 : 0.60)
+            } else {
+                Image(nsImage: #imageLiteral(resourceName: "Web"))
+                    .frame(maxWidth: 16, maxHeight: 16)
+                    .grayscale(controlActiveState == .key ? 0.0 : 1.0)
+                    .opacity(controlActiveState == .key ? 1.0 : 0.60)
             }
         }
         .frame(width: PinnedTabView.Const.dimension)
