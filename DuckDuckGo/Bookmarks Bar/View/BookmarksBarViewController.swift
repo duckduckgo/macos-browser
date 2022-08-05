@@ -53,6 +53,8 @@ final class BookmarksBarViewController: NSViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
 
+        addContextMenu()
+        
         viewModel.delegate = self
 
         let nib = NSNib(nibNamed: "BookmarksBarCollectionViewItem", bundle: .main)
@@ -70,6 +72,12 @@ final class BookmarksBarViewController: NSViewController {
         bookmarksBarCollectionView.collectionViewLayout = createCenteredCollectionViewLayout()
         
         view.postsFrameChangedNotifications = true
+    }
+    
+    private func addContextMenu() {
+        let menu = NSMenu()
+        menu.delegate = self
+        self.view.menu = menu
     }
     
     override func viewWillAppear() {
@@ -235,4 +243,25 @@ extension BookmarksBarViewController: BookmarksBarViewModelDelegate {
         return menu
     }
     
+}
+
+// MARK: - Menu
+
+extension BookmarksBarViewController: NSMenuDelegate {
+    
+    public func menuNeedsUpdate(_ menu: NSMenu) {
+        menu.removeAllItems()
+        
+        if PersistentAppInterfaceSettings.shared.showBookmarksBar {
+            menu.addItem(withTitle: UserText.hideBookmarksBar, action: #selector(toggleBookmarksBar), keyEquivalent: "")
+        } else {
+            menu.addItem(withTitle: UserText.showBookmarksBar, action: #selector(toggleBookmarksBar), keyEquivalent: "")
+        }
+    }
+    
+    @objc
+    private func toggleBookmarksBar(_ sender: NSMenuItem) {
+        PersistentAppInterfaceSettings.shared.showBookmarksBar.toggle()
+    }
+
 }
