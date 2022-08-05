@@ -24,9 +24,6 @@ custom_rules:
     severity: error
 
 # Rule Config
-line_length:
-  warning: 150
-  ignores_comments: true
 identifier_name:
   min_length: 1
   max_length:

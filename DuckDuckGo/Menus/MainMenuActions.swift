@@ -20,8 +20,6 @@ import Cocoa
 import os.log
 import BrowserServicesKit
 
-// swiftlint:disable file_length
-
 // Actions are sent to objects of responder chain
 
 // MARK: - Main Menu Actions
