@@ -40,9 +40,9 @@ struct PinnedTabView: View {
         } label: {
             PinnedTabInnerView(
                 foregroundColor: foregroundColor,
-                domain: model.url?.host,
                 drawSeparator: !collectionModel.itemsWithoutSeparator.contains(model)
             )
+            .environmentObject(model)
         }
         .buttonStyle(TouchDownButtonStyle())
         .cornerRadius(6, corners: [.topLeft, .topRight])
@@ -90,9 +90,9 @@ struct PinnedTabView: View {
 
 struct PinnedTabInnerView: View {
     var foregroundColor: Color
-    var domain: String?
     var drawSeparator: Bool = true
 
+    @EnvironmentObject var model: Tab
     @Environment(\.controlActiveState) private var controlActiveState
 
     var body: some View {
@@ -107,17 +107,32 @@ struct PinnedTabInnerView: View {
                         .offset(x: proxy.size.width-1, y: 6)
                 }
             }
-            if let domain = domain {
-                FaviconView(domain: domain, size: 16, font: .caption, sizeCategory: .small)
-                    .grayscale(controlActiveState == .key ? 0.0 : 1.0)
-                    .opacity(controlActiveState == .key ? 1.0 : 0.60)
-            } else {
-                Image(nsImage: #imageLiteral(resourceName: "Web"))
-                    .frame(maxWidth: 16, maxHeight: 16)
-                    .grayscale(controlActiveState == .key ? 0.0 : 1.0)
-                    .opacity(controlActiveState == .key ? 1.0 : 0.60)
-            }
+            favicon
+                .grayscale(controlActiveState == .key ? 0.0 : 1.0)
+                .opacity(controlActiveState == .key ? 1.0 : 0.60)
+                .frame(maxWidth: 16, maxHeight: 16)
+                .aspectRatio(contentMode: .fit)
         }
         .frame(width: PinnedTabView.Const.dimension)
+    }
+
+    @ViewBuilder
+    var favicon: some View {
+        if let favicon = model.favicon {
+            Image(nsImage: favicon)
+                .resizable()
+        } else if let domain = model.content.url?.host, let firstLetter = domain.dropWWW().capitalized.first.flatMap(String.init) {
+            ZStack {
+                Rectangle()
+                    .foregroundColor(.forDomain(domain.dropWWW()))
+                Text(firstLetter)
+                    .font(.caption)
+                    .foregroundColor(.white)
+            }
+            .cornerRadius(4.0)
+        } else {
+            Image(nsImage: #imageLiteral(resourceName: "Web"))
+                .resizable()
+        }
     }
 }
