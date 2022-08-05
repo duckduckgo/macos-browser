@@ -24,21 +24,17 @@ struct FaviconView: View {
 
     let domain: String
     let size: CGFloat
-    let font: Font
-    let sizeCategory: Favicon.SizeCategory
 
     @State var image: NSImage?
     @State private var timer = Timer.publish(every: 0.1, tolerance: 0, on: .main, in: .default, options: nil).autoconnect()
 
-    init(domain: String, size: CGFloat = 32, font: Font = .title, sizeCategory: Favicon.SizeCategory = .medium) {
+    init(domain: String, size: CGFloat = 32) {
         self.domain = domain
         self.size = size
-        self.font = font
-        self.sizeCategory = sizeCategory
     }
 
     func refreshImage() {
-        let image = faviconManagement.getCachedFavicon(for: domain, sizeCategory: sizeCategory)?.image
+        let image = faviconManagement.getCachedFavicon(for: domain, sizeCategory: .medium)?.image
         if image?.size.isSmaller(than: CGSize(width: 16, height: 16)) == false {
             self.image = image
         }
@@ -63,7 +59,7 @@ struct FaviconView: View {
                     Rectangle()
                         .foregroundColor(Color.forDomain(domain.dropWWW()))
                     Text(String(domain.dropWWW().capitalized.first ?? "?"))
-                        .font(font)
+                        .font(.title)
                         .foregroundColor(Color.white)
                 }
                 .frame(width: size, height: size)
