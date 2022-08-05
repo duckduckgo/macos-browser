@@ -23,6 +23,7 @@ import BrowserServicesKit
 protocol FaviconManagement {
 
     var areFaviconsLoaded: Bool { get }
+
     func loadFavicons()
 
     func handleFaviconLinks(_ faviconLinks: [FaviconUserScript.FaviconLink],
@@ -34,6 +35,7 @@ protocol FaviconManagement {
     func burnExcept(fireproofDomains: FireproofDomains,
                     bookmarkManager: BookmarkManager,
                     completion: @escaping () -> Void)
+
     func burnDomains(_ domains: Set<String>,
                      except bookmarkManager: BookmarkManager,
                      completion: @escaping () -> Void)

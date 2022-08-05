@@ -22,12 +22,14 @@ final class FirefoxDataImporter: DataImporter {
 
     var primaryPassword: String?
 
-    let loginImporter: LoginImporter
-    let bookmarkImporter: BookmarkImporter
+    private let loginImporter: LoginImporter
+    private let bookmarkImporter: BookmarkImporter
+    private let faviconManager: FaviconManagement
 
-    init(loginImporter: LoginImporter, bookmarkImporter: BookmarkImporter) {
+    init(loginImporter: LoginImporter, bookmarkImporter: BookmarkImporter, faviconManager: FaviconManagement) {
         self.loginImporter = loginImporter
         self.bookmarkImporter = bookmarkImporter
+        self.faviconManager = faviconManager
     }
 
     func importableTypes() -> [DataImport.DataType] {
@@ -74,6 +76,22 @@ final class FirefoxDataImporter: DataImporter {
         if types.contains(.bookmarks) {
             let bookmarkReader = FirefoxBookmarksReader(firefoxDataDirectoryURL: firefoxProfileURL)
             let bookmarkResult = bookmarkReader.readBookmarks()
+            
+            let faviconsReader = FirefoxFaviconsReader(firefoxDataDirectoryURL: firefoxProfileURL)
+            let faviconsResult = faviconsReader.readFavicons()
+            
+            switch faviconsResult {
+            case .success(let faviconsByURL):
+                for (pageURLString, favicons) in faviconsByURL {
+                    if let pageURL = URL(string: pageURLString) {
+                        // TODO: Store favicons
+                    }
+                }
+                
+            case .failure(let error):
+                // Do nothing here, it's not a dealbreaker if favicons aren't imported
+                break
+            }
 
             switch bookmarkResult {
             case .success(let bookmarks):

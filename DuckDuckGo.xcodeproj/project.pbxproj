@@ -107,6 +107,7 @@
 		4B0511E1262CAA8600F6079C /* NSOpenPanelExtensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B0511DF262CAA8600F6079C /* NSOpenPanelExtensions.swift */; };
 		4B0511E2262CAA8600F6079C /* NSViewControllerExtension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B0511E0262CAA8600F6079C /* NSViewControllerExtension.swift */; };
 		4B0511E7262CAB3700F6079C /* UserDefaultsWrapperUtilities.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B0511E6262CAB3700F6079C /* UserDefaultsWrapperUtilities.swift */; };
+		4B0A63E8289DB58E00378EF7 /* FirefoxFaviconsReader.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B0A63E7289DB58E00378EF7 /* FirefoxFaviconsReader.swift */; };
 		4B11060525903E570039B979 /* CoreDataEncryptionTesting.xcdatamodeld in Sources */ = {isa = PBXBuildFile; fileRef = 4B11060325903E570039B979 /* CoreDataEncryptionTesting.xcdatamodeld */; };
 		4B11060A25903EAC0039B979 /* CoreDataEncryptionTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B11060925903EAC0039B979 /* CoreDataEncryptionTests.swift */; };
 		4B117F7D276C0CB5002F3D8C /* LocalStatisticsStoreTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B117F7C276C0CB5002F3D8C /* LocalStatisticsStoreTests.swift */; };
@@ -919,6 +920,7 @@
 		4B0511DF262CAA8600F6079C /* NSOpenPanelExtensions.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = NSOpenPanelExtensions.swift; sourceTree = "<group>"; };
 		4B0511E0262CAA8600F6079C /* NSViewControllerExtension.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = NSViewControllerExtension.swift; sourceTree = "<group>"; };
 		4B0511E6262CAB3700F6079C /* UserDefaultsWrapperUtilities.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UserDefaultsWrapperUtilities.swift; sourceTree = "<group>"; };
+		4B0A63E7289DB58E00378EF7 /* FirefoxFaviconsReader.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FirefoxFaviconsReader.swift; sourceTree = "<group>"; };
 		4B11060425903E570039B979 /* CoreDataEncryptionTesting.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = CoreDataEncryptionTesting.xcdatamodel; sourceTree = "<group>"; };
 		4B11060925903EAC0039B979 /* CoreDataEncryptionTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CoreDataEncryptionTests.swift; sourceTree = "<group>"; };
 		4B117F7C276C0CB5002F3D8C /* LocalStatisticsStoreTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LocalStatisticsStoreTests.swift; sourceTree = "<group>"; };
@@ -2281,6 +2283,7 @@
 			isa = PBXGroup;
 			children = (
 				4BB99CF526FE191E001E4761 /* FirefoxBookmarksReader.swift */,
+				4B0A63E7289DB58E00378EF7 /* FirefoxFaviconsReader.swift */,
 			);
 			path = Firefox;
 			sourceTree = "<group>";
@@ -4524,6 +4527,7 @@
 				85480FCF25D1AA22009424E3 /* ConfigurationStoring.swift in Sources */,
 				AA3D531B27A2F57E00074EC1 /* Feedback.swift in Sources */,
 				4BB99D0626FE1979001E4761 /* RequestFilePermissionViewController.swift in Sources */,
+				4B0A63E8289DB58E00378EF7 /* FirefoxFaviconsReader.swift in Sources */,
 				858A798326A8B75F00A75A42 /* CopyHandler.swift in Sources */,
 				4B8AC93926B48A5100879451 /* FirefoxLoginReader.swift in Sources */,
 				B69B503E2726A12500758A2B /* AtbParser.swift in Sources */,
