@@ -40,7 +40,7 @@ struct PinnedTabView: View {
         } label: {
             PinnedTabInnerView(
                 foregroundColor: foregroundColor,
-                faviconImage: model.favicon,
+                domain: model.url?.host,
                 drawSeparator: !collectionModel.itemsWithoutSeparator.contains(model)
             )
         }
@@ -90,7 +90,7 @@ struct PinnedTabView: View {
 
 struct PinnedTabInnerView: View {
     var foregroundColor: Color
-    var faviconImage: NSImage?
+    var domain: String?
     var drawSeparator: Bool = true
 
     @Environment(\.controlActiveState) private var controlActiveState
@@ -107,12 +107,11 @@ struct PinnedTabInnerView: View {
                         .offset(x: proxy.size.width-1, y: 6)
                 }
             }
-            Image(nsImage: faviconImage ?? #imageLiteral(resourceName: "Web"))
-                .resizable()
-                .grayscale(controlActiveState == .key ? 0.0 : 1.0)
-                .opacity(controlActiveState == .key ? 1.0 : 0.60)
-                .frame(maxWidth: 16, maxHeight: 16)
-                .aspectRatio(contentMode: .fit)
+            if let domain = domain {
+                FaviconView(domain: domain, size: 16, font: .caption, sizeCategory: .small)
+                    .grayscale(controlActiveState == .key ? 0.0 : 1.0)
+                    .opacity(controlActiveState == .key ? 1.0 : 0.60)
+            }
         }
         .frame(width: PinnedTabView.Const.dimension)
     }
