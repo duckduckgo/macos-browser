@@ -134,7 +134,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         }
         
         if FireCoordinator.fireViewModel.isBurning {
-            return .terminateCancel
+            return .terminateLater
         }
 
         stateRestorationManager?.applicationWillTerminate()
