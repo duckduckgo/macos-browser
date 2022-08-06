@@ -22,7 +22,6 @@ import WebKit
 import AVFoundation
 import CoreLocation
 
-// swiftlint:disable:next type_body_length
 final class PermissionModel {
 
     @PublishedAfter var permissions = Permissions()

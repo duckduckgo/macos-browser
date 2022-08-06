@@ -21,7 +21,6 @@ import os.log
 import Combine
 import Lottie
 
-// swiftlint:disable type_body_length
 final class AddressBarViewController: NSViewController {
 
     @IBOutlet weak var addressBarTextField: AddressBarTextField!
@@ -354,7 +353,6 @@ final class AddressBarViewController: NSViewController {
     }
 
 }
-// swiftlint:enable type_body_length
 
 extension AddressBarViewController {
 

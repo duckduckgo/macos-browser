@@ -40,7 +40,6 @@ protocol HistoryCoordinating: AnyObject {
 
 }
 
-// swiftlint:disable type_body_length
 /// Coordinates access to History. Uses its own queue with high qos for all operations.
 final class HistoryCoordinator: HistoryCoordinating {
 

@@ -41,7 +41,6 @@ protocol TabDelegate: FileDownloadManagerDelegate, ContentOverlayUserScriptDeleg
     func tab(_ tab: Tab, promptUserForCookieConsent result: @escaping (Bool) -> Void)
 }
 
-// swiftlint:disable type_body_length
 // swiftlint:disable file_length
 final class Tab: NSObject, Identifiable, ObservableObject {
 

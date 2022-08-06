@@ -59,8 +59,6 @@ protocol BookmarkStore {
 
 }
 
-// swiftlint:disable type_body_length file_length
-
 final class LocalBookmarkStore: BookmarkStore {
     
     enum Constants {
@@ -904,5 +902,3 @@ extension UUID {
     }
     
 }
-
-// swiftlint:enable type_body_length file_length

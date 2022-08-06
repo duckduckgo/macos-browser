@@ -22,9 +22,6 @@ import Combine
 import Lottie
 import SwiftUI
 
-// swiftlint:disable file_length
-// swiftlint:disable type_body_length
-
 final class TabBarViewController: NSViewController {
 
     enum HorizontalSpace: CGFloat {

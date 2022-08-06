@@ -74,7 +74,6 @@ final class TabDataCleaner: NSObject, WKNavigationDelegate {
     }
 }
 
-// swiftlint:disable type_body_length
 final class Fire {
 
     // Drop www prefixes to produce list of burning domains
