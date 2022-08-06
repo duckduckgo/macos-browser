@@ -223,6 +223,8 @@ extension Pixel {
             case historyRemoveVisitsFailed = "history_remove_visits_failed"
 
             case emailAutofillKeychainError = "email_autofill_keychain_error"
+            
+            case bookmarksStoreRootFolderMigrationFailed = "bookmarks_store_root_folder_migration_failed"
         }
 
     }

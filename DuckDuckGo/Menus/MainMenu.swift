@@ -61,11 +61,14 @@ final class MainMenu: NSMenu {
 
     // MARK: - Bookmarks
     @IBOutlet weak var manageBookmarksMenuItem: NSMenuItem!
+    @IBOutlet weak var bookmarksMenuToggleBookmarksBarMenuItem: NSMenuItem?
     @IBOutlet weak var importBookmarksMenuItem: NSMenuItem!
     @IBOutlet weak var bookmarksMenuItem: NSMenuItem?
     @IBOutlet weak var bookmarkThisPageMenuItem: NSMenuItem?
     @IBOutlet weak var favoritesMenuItem: NSMenuItem?
     @IBOutlet weak var favoriteThisPageMenuItem: NSMenuItem?
+    
+    @IBOutlet weak var toggleBookmarksBarMenuItem: NSMenuItem?
 
     // MARK: - Debug
     @IBOutlet weak var debugMenuItem: NSMenuItem? {
@@ -100,6 +103,8 @@ final class MainMenu: NSMenu {
         }
         sharingMenu.title = shareMenuItem.title
         shareMenuItem.submenu = sharingMenu
+
+        updateBookmarksBarMenuItem()
     }
 
     private func setup() {
@@ -204,6 +209,12 @@ final class MainMenu: NSMenu {
     }
     // swiftlint:enable function_body_length
 
+    private func updateBookmarksBarMenuItem() {
+        let title = PersistentAppInterfaceSettings.shared.showBookmarksBar ? UserText.hideBookmarksBar : UserText.showBookmarksBar
+        toggleBookmarksBarMenuItem?.title = title
+        bookmarksMenuToggleBookmarksBarMenuItem?.title = title
+    }
+
 }
 
 extension MainMenu: NSMenuDelegate {
@@ -215,31 +226,6 @@ extension MainMenu: NSMenuDelegate {
         sharingMenu.update()
         shareMenuItem.submenu = sharingMenu
         return false
-    }
-
-}
-
-fileprivate extension NSMenuItem {
-
-    convenience init(bookmarkViewModel: BookmarkViewModel) {
-        self.init()
-
-        title = bookmarkViewModel.menuTitle
-        image = bookmarkViewModel.menuFavicon
-        representedObject = bookmarkViewModel.entity
-        action = #selector(MainViewController.openBookmark(_:))
-    }
-
-    convenience init(bookmarkViewModels: [BookmarkViewModel]) {
-        self.init()
-
-        title = UserText.bookmarksOpenInNewTabs
-        representedObject = bookmarkViewModels
-        action = #selector(MainViewController.openAllInTabs(_:))
-    }
-
-    func removeFromParent() {
-        parent?.submenu?.removeItem(self)
     }
 
 }

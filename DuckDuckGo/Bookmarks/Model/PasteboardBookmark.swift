@@ -22,7 +22,7 @@ typealias PasteboardAttributes = [String: String]
 
 struct PasteboardBookmark: Hashable {
 
-    private struct Key {
+    struct Key {
         static let id = "id"
         static let url = "URL"
         static let title = "title"

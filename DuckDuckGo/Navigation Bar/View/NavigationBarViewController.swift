@@ -137,6 +137,7 @@ final class NavigationBarViewController: NSViewController {
         listenToPasswordManagerNotifications()
         listenToMessageNotifications()
         subscribeToDownloads()
+        addContextMenu()
 
         optionsButton.sendAction(on: .leftMouseDown)
         bookmarkListButton.sendAction(on: .leftMouseDown)
@@ -425,7 +426,7 @@ final class NavigationBarViewController: NSViewController {
         barTop?.constant = homePage ? 16 : verticalPadding
 
         let bottom = animated ? addressBarBottomConstraint.animator() : addressBarBottomConstraint
-        bottom?.constant = homePage ? 0 : verticalPadding
+        bottom?.constant = homePage ? 2 : verticalPadding
 
         let logoWidth = animated ? logoWidthConstraint.animator() : logoWidthConstraint
         logoWidth?.constant = homePage ? 44 : 0
@@ -473,6 +474,12 @@ final class NavigationBarViewController: NSViewController {
             }
             .assign(to: \.progress, onWeaklyHeld: downloadsProgressView)
             .store(in: &downloadsCancellables)
+    }
+    
+    private func addContextMenu() {
+        let menu = NSMenu()
+        menu.delegate = self
+        self.view.menu = menu
     }
 
     private func updatePasswordManagementButton() {
@@ -621,6 +628,25 @@ final class NavigationBarViewController: NSViewController {
         goBackButton.isEnabled = selectedTabViewModel.canGoBack
         goForwardButton.isEnabled = selectedTabViewModel.canGoForward
         refreshButton.isEnabled = selectedTabViewModel.canReload
+    }
+
+}
+
+extension NavigationBarViewController: NSMenuDelegate {
+    
+    public func menuNeedsUpdate(_ menu: NSMenu) {
+        menu.removeAllItems()
+        
+        if PersistentAppInterfaceSettings.shared.showBookmarksBar {
+            menu.addItem(withTitle: UserText.hideBookmarksBar, action: #selector(toggleBookmarksBar), keyEquivalent: "")
+        } else {
+            menu.addItem(withTitle: UserText.showBookmarksBar, action: #selector(toggleBookmarksBar), keyEquivalent: "")
+        }
+    }
+    
+    @objc
+    private func toggleBookmarksBar(_ sender: NSMenuItem) {
+        PersistentAppInterfaceSettings.shared.showBookmarksBar.toggle()
     }
 
 }

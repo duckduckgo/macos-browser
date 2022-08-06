@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<document type="com.apple.InterfaceBuilder3.Cocoa.Storyboard.XIB" version="3.0" toolsVersion="19529" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES">
+<document type="com.apple.InterfaceBuilder3.Cocoa.Storyboard.XIB" version="3.0" toolsVersion="20037" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES">
     <dependencies>
         <deployment identifier="macosx"/>
-        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="19529"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="20037"/>
         <capability name="Named colors" minToolsVersion="9.0"/>
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
     </dependencies>
@@ -366,11 +366,11 @@
             <objects>
                 <viewController storyboardIdentifier="BookmarkPopoverViewController" id="vCQ-b9-yaB" customClass="BookmarkPopoverViewController" customModule="DuckDuckGo_Privacy_Browser" customModuleProvider="target" sceneMemberID="viewController">
                     <view key="view" id="2fn-ed-4g2">
-                        <rect key="frame" x="0.0" y="0.0" width="300" height="200"/>
+                        <rect key="frame" x="0.0" y="0.0" width="300" height="224"/>
                         <autoresizingMask key="autoresizingMask"/>
                         <subviews>
-                            <box boxType="custom" borderType="none" cornerRadius="4" title="Box" id="c5O-sc-fwL">
-                                <rect key="frame" x="-114" y="-184" width="527" height="568"/>
+                            <box boxType="custom" borderType="none" cornerRadius="4" title="Box" id="c5O-sc-fwL" userLabel="Background View">
+                                <rect key="frame" x="-114" y="-160" width="527" height="568"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                 <view key="contentView" id="Z2T-oF-iTc">
                                     <rect key="frame" x="0.0" y="0.0" width="527" height="568"/>
@@ -379,7 +379,7 @@
                                 <color key="fillColor" name="PopoverBackgroundColor"/>
                             </box>
                             <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="b7R-iD-UcK">
-                                <rect key="frame" x="22" y="158" width="256" height="16"/>
+                                <rect key="frame" x="17" y="189" width="266" height="16"/>
                                 <textFieldCell key="cell" lineBreakMode="clipping" title="Bookmark added" id="zKL-Gb-RmD">
                                     <font key="font" metaFont="systemBold"/>
                                     <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
@@ -387,15 +387,29 @@
                                 </textFieldCell>
                             </textField>
                             <textField verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="Ich-82-cIb">
-                                <rect key="frame" x="24" y="113" width="252" height="21"/>
-                                <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" selectable="YES" editable="YES" sendsActionOnEndEditing="YES" borderStyle="bezel" drawsBackground="YES" id="mXp-oh-9G8">
+                                <rect key="frame" x="19" y="144" width="262" height="22"/>
+                                <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" selectable="YES" editable="YES" sendsActionOnEndEditing="YES" borderStyle="bezel" bezelStyle="round" id="mXp-oh-9G8">
                                     <font key="font" metaFont="system"/>
                                     <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
                                     <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
                                 </textFieldCell>
                             </textField>
+                            <popUpButton verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="3Zd-n4-XJh" userLabel="Folder Picker Pop Up Button">
+                                <rect key="frame" x="16" y="110" width="269" height="25"/>
+                                <popUpButtonCell key="cell" type="push" title="Bookmarks" bezelStyle="rounded" alignment="left" lineBreakMode="truncatingTail" state="on" borderStyle="borderAndBezel" imageScaling="proportionallyDown" inset="2" selectedItem="jZh-eA-Xed" id="n67-W5-fMS">
+                                    <behavior key="behavior" lightByBackground="YES" lightByGray="YES"/>
+                                    <font key="font" metaFont="menu"/>
+                                    <menu key="menu" id="sa7-eL-Lqv">
+                                        <items>
+                                            <menuItem title="Bookmarks" state="on" id="jZh-eA-Xed">
+                                                <modifierMask key="keyEquivalentModifierMask"/>
+                                            </menuItem>
+                                        </items>
+                                    </menu>
+                                </popUpButtonCell>
+                            </popUpButton>
                             <customView translatesAutoresizingMaskIntoConstraints="NO" id="PHK-0Q-PGv" userLabel="Separator View" customClass="ColorView" customModule="DuckDuckGo_Privacy_Browser" customModuleProvider="target">
-                                <rect key="frame" x="0.0" y="60" width="300" height="1"/>
+                                <rect key="frame" x="19" y="94" width="262" height="1"/>
                                 <constraints>
                                     <constraint firstAttribute="height" constant="1" id="pce-i3-i0O"/>
                                 </constraints>
@@ -405,9 +419,20 @@
                                     </userDefinedRuntimeAttribute>
                                 </userDefinedRuntimeAttributes>
                             </customView>
+                            <button translatesAutoresizingMaskIntoConstraints="NO" id="fju-6w-rFQ">
+                                <rect key="frame" x="19" y="58" width="262" height="17"/>
+                                <buttonCell key="cell" type="square" title="Add to Favorites" bezelStyle="shadowlessSquare" image="Favorite" imagePosition="left" alignment="left" imageScaling="proportionallyUpOrDown" inset="2" id="Oi3-rg-1fd">
+                                    <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
+                                    <font key="font" metaFont="system"/>
+                                </buttonCell>
+                                <color key="contentTintColor" name="ButtonColor"/>
+                                <connections>
+                                    <action selector="favoritesButtonAction:" target="vCQ-b9-yaB" id="5Ku-TZ-qPS"/>
+                                </connections>
+                            </button>
                             <button verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="3zg-6l-JsQ">
-                                <rect key="frame" x="222" y="10" width="64" height="40"/>
-                                <buttonCell key="cell" type="push" title="Done" bezelStyle="rounded" alignment="center" controlSize="large" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="XYa-Xm-B8n">
+                                <rect key="frame" x="222" y="12" width="66" height="32"/>
+                                <buttonCell key="cell" type="push" title="Done" bezelStyle="rounded" alignment="center" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="XYa-Xm-B8n">
                                     <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
                                     <font key="font" metaFont="system"/>
                                     <string key="keyEquivalent" base64-UTF8="YES">
@@ -419,8 +444,8 @@ DQ
                                 </connections>
                             </button>
                             <button verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="0eB-pX-cZ5">
-                                <rect key="frame" x="141" y="10" width="81" height="40"/>
-                                <buttonCell key="cell" type="push" title="Remove" bezelStyle="rounded" alignment="center" controlSize="large" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="IZ6-xl-fw6">
+                                <rect key="frame" x="143" y="12" width="83" height="32"/>
+                                <buttonCell key="cell" type="push" title="Remove" bezelStyle="rounded" alignment="center" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="IZ6-xl-fw6">
                                     <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
                                     <font key="font" metaFont="system"/>
                                 </buttonCell>
@@ -428,45 +453,39 @@ DQ
                                     <action selector="removeButtonAction:" target="vCQ-b9-yaB" id="gID-s8-sUP"/>
                                 </connections>
                             </button>
-                            <button translatesAutoresizingMaskIntoConstraints="NO" id="fju-6w-rFQ">
-                                <rect key="frame" x="24" y="83" width="252" height="16"/>
-                                <buttonCell key="cell" type="square" title="Add to Favorites" bezelStyle="shadowlessSquare" image="Favorite" imagePosition="left" alignment="left" imageScaling="proportionallyUpOrDown" inset="2" id="Oi3-rg-1fd">
-                                    <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
-                                    <font key="font" metaFont="system"/>
-                                </buttonCell>
-                                <color key="contentTintColor" name="ButtonColor"/>
-                                <connections>
-                                    <action selector="favoritesButtonAction:" target="vCQ-b9-yaB" id="5Ku-TZ-qPS"/>
-                                </connections>
-                            </button>
                         </subviews>
                         <constraints>
-                            <constraint firstItem="fju-6w-rFQ" firstAttribute="trailing" secondItem="b7R-iD-UcK" secondAttribute="trailing" id="0HH-Ow-gFH"/>
-                            <constraint firstAttribute="bottom" secondItem="0eB-pX-cZ5" secondAttribute="bottom" constant="16" id="0P5-Ls-6WB"/>
-                            <constraint firstItem="fju-6w-rFQ" firstAttribute="top" secondItem="Ich-82-cIb" secondAttribute="bottom" constant="14" id="2Iv-Mc-iUE"/>
-                            <constraint firstAttribute="trailing" secondItem="3zg-6l-JsQ" secondAttribute="trailing" constant="20" symbolic="YES" id="4Im-c8-shf"/>
-                            <constraint firstAttribute="bottom" secondItem="3zg-6l-JsQ" secondAttribute="bottom" constant="16" id="4VU-Sj-j46"/>
-                            <constraint firstItem="fju-6w-rFQ" firstAttribute="leading" secondItem="b7R-iD-UcK" secondAttribute="leading" id="IUH-Gl-qq9"/>
-                            <constraint firstAttribute="trailing" secondItem="b7R-iD-UcK" secondAttribute="trailing" constant="24" id="S67-Qw-Hrf"/>
-                            <constraint firstItem="PHK-0Q-PGv" firstAttribute="leading" secondItem="2fn-ed-4g2" secondAttribute="leading" id="Wa1-06-TF0"/>
-                            <constraint firstAttribute="bottom" secondItem="PHK-0Q-PGv" secondAttribute="bottom" constant="60" id="XeY-DJ-34H"/>
-                            <constraint firstItem="Ich-82-cIb" firstAttribute="top" secondItem="b7R-iD-UcK" secondAttribute="bottom" constant="24" id="Xlg-4G-fmw"/>
-                            <constraint firstItem="3zg-6l-JsQ" firstAttribute="leading" secondItem="0eB-pX-cZ5" secondAttribute="trailing" constant="12" symbolic="YES" id="eW9-QH-hDN"/>
-                            <constraint firstItem="b7R-iD-UcK" firstAttribute="top" secondItem="2fn-ed-4g2" secondAttribute="top" constant="26" id="iBs-wS-tC7"/>
-                            <constraint firstAttribute="trailing" secondItem="PHK-0Q-PGv" secondAttribute="trailing" id="rIN-GP-eD1"/>
+                            <constraint firstAttribute="bottom" secondItem="0eB-pX-cZ5" secondAttribute="bottom" constant="19" id="0P5-Ls-6WB"/>
+                            <constraint firstAttribute="trailing" secondItem="3zg-6l-JsQ" secondAttribute="trailing" constant="19" id="4Im-c8-shf"/>
+                            <constraint firstAttribute="bottom" secondItem="3zg-6l-JsQ" secondAttribute="bottom" constant="19" id="4VU-Sj-j46"/>
+                            <constraint firstItem="PHK-0Q-PGv" firstAttribute="leading" secondItem="2fn-ed-4g2" secondAttribute="leading" constant="19" id="CFv-YC-M55"/>
+                            <constraint firstItem="3Zd-n4-XJh" firstAttribute="leading" secondItem="2fn-ed-4g2" secondAttribute="leading" constant="19" id="FpS-ER-cY3"/>
+                            <constraint firstAttribute="trailing" secondItem="fju-6w-rFQ" secondAttribute="trailing" constant="19" id="Mnn-Cv-HyE"/>
+                            <constraint firstAttribute="trailing" secondItem="b7R-iD-UcK" secondAttribute="trailing" constant="19" id="S67-Qw-Hrf"/>
+                            <constraint firstItem="3zg-6l-JsQ" firstAttribute="top" secondItem="fju-6w-rFQ" secondAttribute="bottom" constant="19" id="Sh2-xQ-AIH"/>
+                            <constraint firstItem="3Zd-n4-XJh" firstAttribute="top" secondItem="Ich-82-cIb" secondAttribute="bottom" constant="10" id="WPl-UX-KoC"/>
+                            <constraint firstItem="Ich-82-cIb" firstAttribute="top" secondItem="b7R-iD-UcK" secondAttribute="bottom" constant="23" id="Xlg-4G-fmw"/>
+                            <constraint firstItem="fju-6w-rFQ" firstAttribute="top" secondItem="PHK-0Q-PGv" secondAttribute="bottom" constant="19" id="YnI-lp-IvQ"/>
+                            <constraint firstItem="3zg-6l-JsQ" firstAttribute="leading" secondItem="0eB-pX-cZ5" secondAttribute="trailing" constant="10" id="eW9-QH-hDN"/>
+                            <constraint firstItem="b7R-iD-UcK" firstAttribute="top" secondItem="2fn-ed-4g2" secondAttribute="top" constant="19" id="iBs-wS-tC7"/>
+                            <constraint firstAttribute="trailing" secondItem="PHK-0Q-PGv" secondAttribute="trailing" constant="19" id="iZq-Ix-Png"/>
+                            <constraint firstAttribute="trailing" secondItem="3Zd-n4-XJh" secondAttribute="trailing" constant="19" id="jSv-NC-qdJ"/>
+                            <constraint firstItem="fju-6w-rFQ" firstAttribute="leading" secondItem="2fn-ed-4g2" secondAttribute="leading" constant="19" id="w6B-zZ-zdT"/>
                             <constraint firstItem="Ich-82-cIb" firstAttribute="trailing" secondItem="b7R-iD-UcK" secondAttribute="trailing" id="wRZ-Zo-CRe"/>
+                            <constraint firstItem="PHK-0Q-PGv" firstAttribute="top" secondItem="3Zd-n4-XJh" secondAttribute="bottom" constant="19" id="wfS-U1-SFY"/>
                             <constraint firstItem="Ich-82-cIb" firstAttribute="leading" secondItem="b7R-iD-UcK" secondAttribute="leading" id="xPm-3O-k0Q"/>
-                            <constraint firstItem="b7R-iD-UcK" firstAttribute="leading" secondItem="2fn-ed-4g2" secondAttribute="leading" constant="24" id="yLT-8L-lrN"/>
+                            <constraint firstItem="b7R-iD-UcK" firstAttribute="leading" secondItem="2fn-ed-4g2" secondAttribute="leading" constant="19" id="yLT-8L-lrN"/>
                         </constraints>
                     </view>
                     <connections>
                         <outlet property="favoriteButton" destination="fju-6w-rFQ" id="4Ya-ca-ym6"/>
+                        <outlet property="folderPickerPopUpButton" destination="3Zd-n4-XJh" id="7cN-jA-5l3"/>
                         <outlet property="textField" destination="Ich-82-cIb" id="VaB-Bb-pHa"/>
                     </connections>
                 </viewController>
                 <customObject id="AD4-gD-7Lp" userLabel="First Responder" customClass="NSResponder" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="-588" y="-104"/>
+            <point key="canvasLocation" x="-588" y="-93"/>
         </scene>
         <!--Add Bookmark Modal View Controller-->
         <scene sceneID="D4i-le-BSY">
@@ -912,7 +931,7 @@ Gw
                     </connections>
                 </menu>
             </objects>
-            <point key="canvasLocation" x="-958.5" y="40.5"/>
+            <point key="canvasLocation" x="-991" y="22"/>
         </scene>
     </scenes>
     <resources>

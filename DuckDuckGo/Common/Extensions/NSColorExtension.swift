@@ -43,6 +43,10 @@ extension NSColor {
     static var addressBarShadowColor: NSColor {
         NSColor(named: "AddressBarShadowColor")!
     }
+    
+    static var addressBarSolidSeparatorColor: NSColor {
+        NSColor(named: "AddressBarSolidSeparatorColor")!
+    }
 
     static var suggestionsShadowColor: NSColor {
         NSColor(named: "SuggestionsShadowColor")!

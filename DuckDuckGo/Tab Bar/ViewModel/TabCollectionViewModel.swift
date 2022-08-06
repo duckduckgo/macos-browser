@@ -523,6 +523,14 @@ final class TabCollectionViewModel: NSObject {
 
         insert(tab: tab)
     }
+    
+    func title(forTabWithURL url: URL) -> String? {
+        let matchingTab = tabCollection.tabs.first { tab in
+            tab.url == url
+        }
+        
+        return matchingTab?.title
+    }
 
     private func handleTabUnpinnedInAnotherTabCollectionViewModel(at index: Int) {
         if selectionIndex == .pinned(index) {

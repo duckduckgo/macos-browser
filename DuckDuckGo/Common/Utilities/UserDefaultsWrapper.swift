@@ -82,6 +82,8 @@ public struct UserDefaultsWrapper<T> {
         case appIsRelaunchingAutomatically = "app-relaunching-automatically"
 
         case historyV5toV6Migration = "history.v5.to.v6.migration.2"
+
+        case showBookmarksBar = "bookmarks.bar.show"
     }
 
     enum RemovedKeys: String, CaseIterable {

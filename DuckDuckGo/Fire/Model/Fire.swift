@@ -214,6 +214,7 @@ final class Fire {
                 completion?()
 
                 os_log("Fire finished", log: .fire)
+                NSApp.reply(toApplicationShouldTerminate: true)
             }
         }
     }
@@ -263,6 +264,7 @@ final class Fire {
                 completion?()
                 
                 os_log("Fire finished", log: .fire)
+                NSApp.reply(toApplicationShouldTerminate: true)
             }
         }
     }

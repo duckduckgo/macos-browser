@@ -315,6 +315,10 @@ extension MainViewController {
         navigationBarViewController?.toggleDownloadsPopover(keepButtonVisible: false)
     }
 
+    @IBAction func toggleBookmarksBar(_ sender: Any) {
+        PersistentAppInterfaceSettings.shared.showBookmarksBar.toggle()
+    }
+
     // MARK: - History
 
     @IBAction func back(_ sender: Any?) {
@@ -607,17 +611,7 @@ extension MainViewController {
     }
 
     @IBAction func resetBookmarks(_ sender: Any?) {
-        guard let topLevelEntities = LocalBookmarkManager.shared.list?.topLevelEntities else {
-            return
-        }
-
-        for entity in topLevelEntities {
-            if let folder = entity as? BookmarkFolder {
-                LocalBookmarkManager.shared.remove(folder: folder)
-            } else if let bookmark = entity as? Bookmark {
-                LocalBookmarkManager.shared.remove(bookmark: bookmark)
-            }
-        }
+        LocalBookmarkManager.shared.resetBookmarks()
     }
 
     @IBAction func resetMacWaitlistUnlockState(_ sender: Any?) {

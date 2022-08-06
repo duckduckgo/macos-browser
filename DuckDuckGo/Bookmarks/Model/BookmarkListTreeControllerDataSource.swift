@@ -27,13 +27,6 @@ final class BookmarkListTreeControllerDataSource: BookmarkTreeControllerDataSour
     // MARK: - Private
 
     private func childNodesForRootNode(_ node: BookmarkNode) -> [BookmarkNode] {
-        let favorites = PseudoFolder.favorites
-        let favoritesNode = BookmarkNode(representedObject: favorites, parent: node)
-        favoritesNode.canHaveChildNodes = true
-
-        let blankSpacer = SpacerNode.blank
-        let spacerNode = BookmarkNode(representedObject: blankSpacer, parent: nil)
-
         let topLevelNodes = LocalBookmarkManager.shared.list?.topLevelEntities.compactMap { (item) -> BookmarkNode? in
             if let folder = item as? BookmarkFolder {
                 let itemNode = node.createChildNode(item)
@@ -50,14 +43,10 @@ final class BookmarkListTreeControllerDataSource: BookmarkTreeControllerDataSour
             }
         } ?? []
 
-        return [favoritesNode, spacerNode] + topLevelNodes
+        return topLevelNodes
     }
 
     private func childNodes(_ node: BookmarkNode) -> [BookmarkNode] {
-        if let pseudoFolder = node.representedObject as? PseudoFolder, pseudoFolder == PseudoFolder.favorites {
-            return childNodesForFavoritesPseudoFolder(node)
-        }
-
         if let folder = node.representedObject as? BookmarkFolder {
             return childNodes(for: folder, parentNode: node)
         }
@@ -75,14 +64,6 @@ final class BookmarkListTreeControllerDataSource: BookmarkTreeControllerDataSour
         }
 
         return node
-    }
-
-    private func childNodesForFavoritesPseudoFolder(_ parent: BookmarkNode) -> [BookmarkNode] {
-        return LocalBookmarkManager.shared.list?.favoriteBookmarks.compactMap { (favorite) -> BookmarkNode? in
-            let favoriteNode = parent.findOrCreateChildNode(with: favorite)
-            favoriteNode.canHaveChildNodes = false
-            return favoriteNode
-        } ?? []
     }
 
     private func childNodes(for folder: BookmarkFolder, parentNode: BookmarkNode) -> [BookmarkNode] {
