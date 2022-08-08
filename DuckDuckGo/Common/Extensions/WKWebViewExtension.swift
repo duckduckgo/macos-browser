@@ -189,14 +189,6 @@ extension WKWebView {
             callback(result as? String)
         }
     }
-
-    static var canPrint: Bool {
-        if #available(macOS 11.0, *) {
-            return true
-        } else {
-            return self.instancesRespond(to: #selector(WKWebView._printOperation(with:)))
-        }
-    }
     
     func printOperation(with printInfo: NSPrintInfo = .shared, for frame: Any?) -> NSPrintOperation? {
         if let frame = frame,
@@ -204,24 +196,18 @@ extension WKWebView {
             return self._printOperation(with: printInfo, forFrame: frame)
         }
 
-        if #available(macOS 11.0, *) {
-            let printInfoDictionary = (NSPrintInfo.shared.dictionary() as? [NSPrintInfo.AttributeKey: Any]) ?? [:]
-            let printInfo = NSPrintInfo(dictionary: printInfoDictionary)
+        let printInfoDictionary = (NSPrintInfo.shared.dictionary() as? [NSPrintInfo.AttributeKey: Any]) ?? [:]
+        let printInfo = NSPrintInfo(dictionary: printInfoDictionary)
 
-            printInfo.horizontalPagination = .automatic
-            printInfo.verticalPagination = .automatic
-            printInfo.leftMargin = 0
-            printInfo.rightMargin = 0
-            printInfo.topMargin = 0
-            printInfo.bottomMargin = 0
-            printInfo.scalingFactor = 0.95
-            
-            return self.printOperation(with: printInfo)
-        }
+        printInfo.horizontalPagination = .automatic
+        printInfo.verticalPagination = .automatic
+        printInfo.leftMargin = 0
+        printInfo.rightMargin = 0
+        printInfo.topMargin = 0
+        printInfo.bottomMargin = 0
+        printInfo.scalingFactor = 0.95
 
-        guard self.responds(to: #selector(WKWebView._printOperation(with:))) else { return nil }
-
-        return self._printOperation(with: printInfo)
+        return self.printOperation(with: printInfo)
     }
 
     var fullScreenPlaceholderView: NSView? {

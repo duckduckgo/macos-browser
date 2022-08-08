@@ -47,12 +47,9 @@ final class BookmarkPopoverViewController: NSViewController {
         }
     }
 
-    private var appearanceCancellable: AnyCancellable?
-
     override func viewDidLoad() {
         super.viewDidLoad()
 
-        appearanceCancellable = view.subscribeForAppApperanceUpdates()
         textField.delegate = self
         
         folderPickerSelectionCancellable = folderPickerPopUpButton.selectionPublisher.dropFirst().sink { [weak self] index in

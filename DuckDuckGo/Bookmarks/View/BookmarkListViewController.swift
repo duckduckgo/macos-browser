@@ -72,7 +72,6 @@ final class BookmarkListViewController: NSViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
 
-        view.subscribeForAppApperanceUpdates()?.store(in: &cancellables)
         preferredContentSize = CGSize(width: 420, height: 500)
         
         outlineView.register(BookmarkOutlineViewCell.nib, forIdentifier: BookmarkOutlineViewCell.identifier)

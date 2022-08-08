@@ -62,8 +62,6 @@ final class SaveCredentialsViewController: NSViewController {
 
     private var saveButtonAction: (() -> Void)?
 
-    private var appearanceCancellable: AnyCancellable?
-
     var passwordData: Data {
         let string = hiddenPasswordField.isHidden ? visiblePasswordField.stringValue : hiddenPasswordField.stringValue
         return string.data(using: .utf8)!
@@ -186,7 +184,6 @@ final class SaveCredentialsViewController: NSViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
 
-        appearanceCancellable = view.subscribeForAppApperanceUpdates()
         visiblePasswordField.isHidden = true
         saveButton.becomeFirstResponder()
     }

@@ -49,23 +49,17 @@ struct PasswordManagementItemListView: View {
             
             Divider()
             
-            if #available(macOS 11.0, *) {
-                ScrollView {
-                    ScrollViewReader { proxy in
-                        PasswordManagementItemListStackView()
-                            .onAppear {
-                                // Scrolling to the selected item doesn't work consistently without a very slight delay.
-                                DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
-                                    if let selectionID = model.selected?.id {
-                                        proxy.scrollTo(selectionID, anchor: .center)
-                                    }
+            ScrollView {
+                ScrollViewReader { proxy in
+                    PasswordManagementItemListStackView()
+                        .onAppear {
+                            // Scrolling to the selected item doesn't work consistently without a very slight delay.
+                            DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
+                                if let selectionID = model.selected?.id {
+                                    proxy.scrollTo(selectionID, anchor: .center)
                                 }
                             }
-                    }
-                }
-            } else {
-                ScrollView {
-                    PasswordManagementItemListStackView()
+                        }
                 }
             }
         }
@@ -136,17 +130,9 @@ struct PasswordManagementItemListStackView: View {
     @EnvironmentObject var model: PasswordManagementItemListModel
     
     var body: some View {
-        
-        if #available(macOS 11.0, *) {
-            LazyVStack(alignment: .leading) {
-                PasswordManagementItemStackContentsView()
-            }
-        } else {
-            VStack(alignment: .leading) {
-                PasswordManagementItemStackContentsView()
-            }
+        LazyVStack(alignment: .leading) {
+            PasswordManagementItemStackContentsView()
         }
-        
     }
     
 }

@@ -84,9 +84,7 @@ final class SuggestionViewController: NSViewController {
     }
 
     private func setupTableView() {
-        if #available(macOS 11.0, *) {
-            tableView.style = .plain
-        }
+        tableView.style = .plain
     }
 
     private func addTrackingArea() {

@@ -295,7 +295,7 @@ extension MainViewController {
             return
         }
 
-        selectedTabViewModel.tab.webView.zoomLevel = 1.0
+        selectedTabViewModel.tab.webView.pageZoom = 1.0
     }
 
     @IBAction func toggleDownloads(_ sender: Any) {

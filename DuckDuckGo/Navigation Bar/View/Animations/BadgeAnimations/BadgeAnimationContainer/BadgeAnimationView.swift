@@ -104,14 +104,10 @@ struct ExpandableRectangle: View {
 
 struct BadgeAnimationView_Previews: PreviewProvider {
     static var previews: some View {
-        if #available(macOS 11.0, *) {
-            BadgeAnimationView(animationModel: BadgeNotificationAnimationModel(),
-                               iconView: AnyView(Image(systemName: "globle")),
-                                                 text: "Test")
-            .frame(width: 100, height: 30)
-        } else {
-            Text("No Preview")
-        }
+        BadgeAnimationView(animationModel: BadgeNotificationAnimationModel(),
+                           iconView: AnyView(Image(systemName: "globle")),
+                           text: "Test")
+        .frame(width: 100, height: 30)
     }
 }
 

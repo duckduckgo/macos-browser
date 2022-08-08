@@ -99,7 +99,6 @@ final class PasswordManagementViewController: NSViewController {
 
     var emptyStateCancellable: AnyCancellable?
     var editingCancellable: AnyCancellable?
-    var appearanceCancellable: AnyCancellable?
 
     var domain: String?
     var isEditing = false
@@ -147,8 +146,6 @@ final class PasswordManagementViewController: NSViewController {
         super.viewDidLoad()
         createListView()
         createLoginItemView()
-
-        appearanceCancellable = view.subscribeForAppApperanceUpdates()
 
         emptyStateTitle.attributedStringValue = NSAttributedString.make(emptyStateTitle.stringValue, lineHeight: 1.14, kern: -0.23)
         emptyStateMessage.attributedStringValue = NSAttributedString.make(emptyStateMessage.stringValue, lineHeight: 1.05, kern: -0.08)
@@ -205,13 +202,7 @@ final class PasswordManagementViewController: NSViewController {
             itemModel?.clearSecureVaultModel()
         }
 
-        // Only select the matching item directly if macOS 11 is available, as 10.15 doesn't support scrolling directly to a given
-        // item in SwiftUI. On 10.15, show the matching item by filtering the search bar automatically instead.
-        if #available(macOS 11.0, *) {
-            refetchWithText("", selectItemMatchingDomain: domain?.dropWWW(), clearWhenNoMatches: true)
-        } else {
-            refetchWithText(isDirty ? "" : domain ?? "", clearWhenNoMatches: true)
-        }
+        refetchWithText("", selectItemMatchingDomain: domain?.dropWWW(), clearWhenNoMatches: true)
 
         promptForAuthenticationIfNecessary()
     }

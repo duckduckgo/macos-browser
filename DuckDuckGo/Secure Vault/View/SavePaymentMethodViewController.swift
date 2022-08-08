@@ -48,7 +48,6 @@ final class SavePaymentMethodViewController: NSViewController {
     weak var delegate: SavePaymentMethodDelegate?
     
     private var paymentMethod: SecureVaultModels.CreditCard?
-    private var appearanceCancellable: AnyCancellable?
 
     // MARK: - Public
     
@@ -93,14 +92,6 @@ final class SavePaymentMethodViewController: NSViewController {
     @IBAction func onOpenPreferencesClicked(sender: NSButton) {
         WindowControllersManager.shared.showPreferencesTab()
         self.delegate?.shouldCloseSavePaymentMethodViewController(self)
-    }
-
-    // MARK: -
-
-    override func viewDidLoad() {
-        super.viewDidLoad()
-
-        appearanceCancellable = view.subscribeForAppApperanceUpdates()
     }
 
 }

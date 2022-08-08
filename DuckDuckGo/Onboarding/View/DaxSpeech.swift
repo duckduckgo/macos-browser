@@ -167,11 +167,7 @@ fileprivate struct SpeechBubble: View {
 fileprivate extension Font {
 
     static var daxSpeech: Font = {
-        if #available(macOS 11.0, *) {
-            return .system(size: 15, weight: .light, design: .default)
-        } else {
-            return .system(size: 15)
-        }
+        return .system(size: 15, weight: .light, design: .default)
     }()
 
 }

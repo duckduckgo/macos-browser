@@ -97,10 +97,6 @@ final class MainMenu: NSMenu {
     override func update() {
         super.update()
 
-        if !WKWebView.canPrint {
-            printMenuItem?.removeFromParent()
-            printSeparatorItem?.removeFromParent()
-        }
         sharingMenu.title = shareMenuItem.title
         shareMenuItem.submenu = sharingMenu
 

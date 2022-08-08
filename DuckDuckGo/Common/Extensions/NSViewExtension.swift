@@ -142,30 +142,4 @@ extension NSView {
         layer?.cornerRadius = 3.0
     }
 
-    // MARK: - Appearance updates
-
-    /**
-     * Sets current app appearance to the view and subscribes for subsequent updates.
-     *
-     * This is needed on Catalina for views displayed in popovers that have custom, opaque backgrounds.
-     * Presentation in popover overrides view appearance to `.vibrantLight` or `.vibrantDark`, which
-     * makes subviews such as `NSTextField` and `NSButton` draw their backgrounds with vibrancy effect,
-     * which in turn removes opaque background locally. Calling this method on the top-level view seems
-     * to be solving the issue.
-     *
-     * See [](https://app.asana.com/0/1177771139624306/1202121324275642/f) for an example screenshot.
-     */
-    func subscribeForAppApperanceUpdates() -> AnyCancellable? {
-        if #available(macOS 11.0, *) {
-            return nil
-        }
-
-        appearance = NSApp.effectiveAppearance
-
-        return NSApp
-            .publisher(for: \.effectiveAppearance)
-            .map { $0 as NSAppearance? }
-            .assign(to: \.appearance, onWeaklyHeld: self)
-    }
-
 }

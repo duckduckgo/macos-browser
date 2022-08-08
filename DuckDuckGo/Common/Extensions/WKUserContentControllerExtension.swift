@@ -30,27 +30,19 @@ extension WKUserContentController {
     
     func addHandler(_ userScript: UserScript) {
         for messageName in userScript.messageNames {
-            if #available(macOS 11.0, *) {
-                let contentWorld: WKContentWorld = userScript.getContentWorld()
-                if let handlerWithReply = userScript as? WKScriptMessageHandlerWithReply {
-                    addScriptMessageHandler(handlerWithReply, contentWorld: contentWorld, name: messageName)
-                } else {
-                    add(userScript, contentWorld: contentWorld, name: messageName)
-                }
+            let contentWorld: WKContentWorld = userScript.getContentWorld()
+            if let handlerWithReply = userScript as? WKScriptMessageHandlerWithReply {
+                addScriptMessageHandler(handlerWithReply, contentWorld: contentWorld, name: messageName)
             } else {
-                add(userScript, name: messageName)
+                add(userScript, contentWorld: contentWorld, name: messageName)
             }
         }
     }
 
     func removeHandler(_ userScript: UserScript) {
         userScript.messageNames.forEach {
-            if #available(macOS 11.0, *) {
-                let contentWorld: WKContentWorld = userScript.getContentWorld()
-                removeScriptMessageHandler(forName: $0, contentWorld: contentWorld)
-            } else {
-                removeScriptMessageHandler(forName: $0)
-            }
+            let contentWorld: WKContentWorld = userScript.getContentWorld()
+            removeScriptMessageHandler(forName: $0, contentWorld: contentWorld)
         }
     }
 

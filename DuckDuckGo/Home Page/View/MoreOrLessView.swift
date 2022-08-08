@@ -35,11 +35,7 @@ struct MoreOrLess: View {
             HStack {
                 Text(isExpanded ? UserText.moreOrLessCollapse : UserText.moreOrLessExpand)
                 Group {
-                    if #available(macOS 11.0, *) {
-                        Image("HomeArrowUp")
-                    } else {
-                        Text("^")
-                    }
+                    Image("HomeArrowUp")
                 }
                 .rotationEffect(.degrees(isExpanded ? 0 : 180))
             }

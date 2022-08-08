@@ -47,7 +47,6 @@ final class SaveIdentityViewController: NSViewController {
     weak var delegate: SaveIdentityDelegate?
     
     private var identity: SecureVaultModels.Identity?
-    private var appearanceCancellable: AnyCancellable?
 
     // MARK: - Actions
     
@@ -87,14 +86,6 @@ final class SaveIdentityViewController: NSViewController {
         buildStackView(from: identity)
     }
 
-    // MARK: -
-
-    override func viewDidLoad() {
-        super.viewDidLoad()
-
-        appearanceCancellable = view.subscribeForAppApperanceUpdates()
-    }
-    
     // MARK: - Private
     
     private func buildStackView(from identity: SecureVaultModels.Identity) {
