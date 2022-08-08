@@ -208,8 +208,14 @@ final class HistoryCoordinator: HistoryCoordinating {
         }
     }
 
-    @objc private func cleanOldAndLoad(completionHandler: ((Error?) -> Void)? = nil) {
-        clean(until: .monthAgo, completionHandler: completionHandler)
+    var cleaningDate: Date { .monthAgo }
+
+    @objc private func cleanOld() {
+        clean(until: cleaningDate)
+    }
+
+    private func cleanOldAndLoad(completionHandler: ((Error?) -> Void)?) {
+        clean(until: cleaningDate, completionHandler: completionHandler)
     }
 
     private func clean(until date: Date,
@@ -310,7 +316,7 @@ final class HistoryCoordinator: HistoryCoordinating {
         let timer = Timer(fireAt: .startOfDayTomorrow,
                           interval: .day,
                           target: self,
-                          selector: #selector(cleanOldAndLoad),
+                          selector: #selector(cleanOld),
                           userInfo: nil,
                           repeats: true)
         RunLoop.main.add(timer, forMode: RunLoop.Mode.common)
