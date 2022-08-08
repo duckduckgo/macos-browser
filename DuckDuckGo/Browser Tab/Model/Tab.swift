@@ -911,6 +911,8 @@ extension Tab: SurrogatesUserScriptDelegate {
     func surrogatesUserScript(_ script: SurrogatesUserScript, detectedTracker tracker: DetectedTracker, withSurrogate host: String) {
         trackerInfo?.add(installedSurrogateHost: host)
         trackerInfo?.add(detectedTracker: tracker)
+        guard let url = webView.url else { return }
+        historyCoordinating.addDetectedTracker(tracker, onURL: url)
     }
 }
 
