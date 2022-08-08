@@ -626,7 +626,11 @@ extension MainViewController {
         }
         tabCollectionViewModel.pinnedTabsManager?.tabCollection.removeAll()
     }
-
+    
+    @IBAction func resetFaviconsCache(_ sender: Any?) {
+        print("Resetting favicons cache")
+    }
+    
     @IBAction func showSaveCredentialsPopover(_ sender: Any?) {
         #if DEBUG || REVIEW
         NotificationCenter.default.post(name: .ShowSaveCredentialsPopover, object: nil)
