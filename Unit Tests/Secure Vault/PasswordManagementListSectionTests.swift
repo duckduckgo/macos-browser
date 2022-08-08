@@ -33,6 +33,17 @@ final class PasswordManagementListSectionTests: XCTestCase {
         login(named: "Zulu Two")
     ]
 
+    private lazy var nonASCIIAccounts = [
+        login(named: "a"),
+        login(named: "b"),
+        login(named: "c"),
+        login(named: "s"),
+        login(named: "ą"),
+        login(named: "ć"),
+        login(named: "ś"),
+        login(named: "š")
+    ]
+
     override func setUp() {
         super.setUp()
     }
@@ -50,7 +61,13 @@ final class PasswordManagementListSectionTests: XCTestCase {
         XCTAssertEqual(sections.first!.items.map(\.title), ["Alfa", "Alfa Two"])
         XCTAssertEqual(sections.last!.items.map(\.title), ["Zulu", "Zulu Two"])
     }
-    
+
+    func testWhenSortingItemsByTitle_AndItemsAreNonASCII_ThenSectionsAreSortedUsingLocalizedComparison() {
+        let sections = PasswordManagementListSection.sections(with: nonASCIIAccounts, by: \.firstCharacter, order: .ascending)
+        XCTAssertEqual(sections.count, 8)
+        XCTAssertEqual(sections.map(\.title), ["A", "Ą", "B", "C", "Ć", "S", "Ś", "Š"])
+    }
+
     func testWhenSortingItemsByTitle_AndOrderIsDescending_ThenSectionsAreReverseAlphabetical() {
         let sections = PasswordManagementListSection.sections(with: accounts, by: \.firstCharacter, order: .descending)
         XCTAssertEqual(sections.count, 5)
