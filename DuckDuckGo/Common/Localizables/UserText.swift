@@ -480,10 +480,12 @@ struct UserText {
     static let homePageEmptyStateItemMessage = NSLocalizedString("home.page.empty.state.item.message", value: "Keep browsing to see how many trackers were blocked", comment: "")
     static let homePageNoTrackersFound = NSLocalizedString("home.page.no.trackers.found", value: "No trackers found", comment: "")
     static let homePageNoTrackersBlocked = NSLocalizedString("home.page.no.trackers.blocked", value: "No trackers blocked", comment: "")
+    static let homePageBurnFireproofSiteAlert = NSLocalizedString("home.page.burn.fireproof.site.alert", value: "History will be cleared for this site but related data will remain, because this site is Fireproof.", comment: "Message for an alert displayed when trying to burn a fireproof website")
+    static let homePageClearHistory = NSLocalizedString("home.page.clear.history", value: "Clear History", comment: "Button caption for the burn fireproof website alert")
 
     static let tooltipAddToFavorites = NSLocalizedString("tooltip.addToFavorites", value: "Add to Favorites", comment: "Tooltip for add to favorites button")
-    static let tooltipBurn = NSLocalizedString("tooltip.burn", value: "Burn History and Site Data", comment: "Tooltip for burn button")
-    
+    static let tooltipBurn = NSLocalizedString("tooltip.burn", value: "Clear History and Data from This Site", comment: "Tooltip for burn button")
+
     static let recentlyClosedMenuItemSuffixOne = NSLocalizedString("one.more.tab", value: " (and 1 more tab)", comment: "suffix of string in Recently Closed menu")
     static let recentlyClosedMenuItemSuffixMultiple = NSLocalizedString("n.more.tabs", value: " (and %d more tabs)", comment: "suffix of string in Recently Closed menu")
 

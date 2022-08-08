@@ -155,12 +155,6 @@ final class Fire {
             return domain
         })
         let burningDomains = domains.union(wwwDomains)
-
-        // Fireproofed domains shouldn't be in the list of burning domains
-        assert(!burningDomains.contains(where: { domain in
-            FireproofDomains.shared.isFireproof(fireproofDomain: domain)
-        }), "Fireproof domain is burning")
-
         let collectionsCleanupInfo = tabViewModelsFor(domains: burningDomains)
         
         // Prepare all Tabs that are going to be burned

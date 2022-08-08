@@ -104,6 +104,7 @@ struct RecentlyVisitedSite: View {
     @ObservedObject var site: HomePage.Models.RecentlyVisitedSiteModel
 
     @State var isHovering = false
+    @State var showsAlert = false
 
     var body: some View {
         ZStack(alignment: .top) {
@@ -153,10 +154,16 @@ struct RecentlyVisitedSite: View {
 
                 HoverButton(size: 24, imageName: "Burn", imageSize: 16, cornerRadius: 4) {
                     isHovering = false
-                    site.isBurning = true
-                    withAnimation(.default.delay(0.4)) {
-                        site.isHidden = true
+                    if site.isFireproof {
+                        showsAlert = true
+                    } else {
+                        burn()
                     }
+                }
+                .alert(isPresented: $showsAlert) {
+                    Alert(title: Text(UserText.homePageBurnFireproofSiteAlert),
+                          primaryButton: .destructive(Text(UserText.homePageClearHistory), action: burn),
+                          secondaryButton: .cancel(Text(UserText.cancel)))
                 }
                 .foregroundColor(Color("HomeFeedItemButtonTintColor"))
                 .tooltip(UserText.tooltipBurn)
@@ -188,6 +195,13 @@ struct RecentlyVisitedSite: View {
         .frame(maxWidth: .infinity, minHeight: model.showPagesOnHover ? 126 : 0)
         .padding(.bottom, model.showPagesOnHover ? 0 : 12)
 
+    }
+
+    private func burn() {
+        site.isBurning = true
+        withAnimation(.default.delay(0.4)) {
+            site.isHidden = true
+        }
     }
 
 }
