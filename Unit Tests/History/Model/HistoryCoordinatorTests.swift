@@ -176,6 +176,7 @@ class HistoryCoordinatorTests: XCTestCase {
         Thread.sleep(forTimeInterval: 0.1)
 
         historyCoordinator.commitChanges(url: url)
+        Thread.sleep(forTimeInterval: 0.1)
         XCTAssertEqual(url, historyStoringMock.savedHistoryEntries.last?.url)
         XCTAssertFalse(historyStoringMock.savedHistoryEntries.last?.failedToLoad ?? true)
     }
