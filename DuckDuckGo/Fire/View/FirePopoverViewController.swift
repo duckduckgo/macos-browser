@@ -43,6 +43,7 @@ final class FirePopoverViewController: NSViewController {
 
     @IBOutlet weak var optionsButton: NSPopUpButton!
     @IBOutlet weak var openDetailsButton: NSButton!
+    @IBOutlet weak var openDetailsButtonImageView: NSImageView!
     @IBOutlet weak var closeDetailsButton: NSButton!
     @IBOutlet weak var detailsWrapperView: NSView!
     @IBOutlet weak var contentHeightConstraint: NSLayoutConstraint!
@@ -97,11 +98,10 @@ final class FirePopoverViewController: NSViewController {
     }
 
     @IBAction func optionsButtonAction(_ sender: NSPopUpButton) {
-        guard let tag = sender.selectedItem?.tag else {
-            assertionFailure("No tag in the selected menu item")
+        guard let tag = sender.selectedItem?.tag, let clearingOption = FirePopoverViewModel.ClearingOption(rawValue: tag) else {
+            assertionFailure("Clearing option for not found for the selected menu item")
             return
         }
-        let clearingOption = FirePopoverViewModel.ClearingOption.allCases[tag]
         firePopoverViewModel.clearingOption = clearingOption
         updateCloseDetailsButton()
         updateWarningWrapperView()
@@ -222,9 +222,20 @@ final class FirePopoverViewController: NSViewController {
     }
 
     private func setupOptionsButton() {
-        FirePopoverViewModel.ClearingOption.allCases.enumerated().forEach { (index, option) in
-            optionsButton.menu?.item(withTag: index)?.title = option.string
+        optionsButton.menu?.removeAllItems()
+
+        FirePopoverViewModel.ClearingOption.allCases.forEach { option in
+            if firePopoverViewModel.availableClearingOptions.contains(option) {
+                if option == .allData {
+                    optionsButton.menu?.addItem(.separator())
+                }
+                let item = NSMenuItem(title: option.string)
+                item.tag = option.rawValue
+                optionsButton.menu?.addItem(item)
+            }
         }
+
+        optionsButton.selectItem(at: optionsButton.numberOfItems - 1)
     }
 
     private func updateClearButton() {
@@ -232,8 +243,11 @@ final class FirePopoverViewController: NSViewController {
     }
 
     private func updateOpenDetailsButton() {
-        openDetailsButton.title = firePopoverViewModel.selectable.isEmpty ? UserText.fireDialogNothingToBurn : UserText.fireDialogDetails
-        openDetailsButton.isEnabled = !firePopoverViewModel.selectable.isEmpty
+        let hasDataToBurn = !firePopoverViewModel.selectable.isEmpty
+        let nothingToBurn = firePopoverViewModel.hasOnlySingleFireproofDomain ? UserText.fireDialogSiteIsFireproof : UserText.fireDialogNothingToBurn
+        openDetailsButton.title = hasDataToBurn ? UserText.fireDialogDetails : nothingToBurn
+        openDetailsButton.isEnabled = hasDataToBurn
+        openDetailsButtonImageView.isHidden = !hasDataToBurn
     }
 
 }
