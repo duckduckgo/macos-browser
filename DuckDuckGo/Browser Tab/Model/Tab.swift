@@ -527,26 +527,22 @@ final class Tab: NSObject, Identifiable, ObservableObject {
             })
         }()
         if shouldLoadURL(url, shouldLoadInBackground: shouldLoadInBackground) {
-            if case .youtubePlayer = content, (shouldSkipPrivateYoutubePlayer || PrivacySecurityPreferences.shared.privateYoutubePlayerEnabled == false) {
-                setContent(.url(contentURL))
+            let didRestore: Bool
+
+            if #available(macOS 12.0, *) {
+                didRestore = restoreInteractionStateDataIfNeeded() || restoreSessionStateDataIfNeeded()
             } else {
-                let didRestore: Bool
+                didRestore = restoreSessionStateDataIfNeeded()
+            }
 
-                if #available(macOS 12.0, *) {
-                    didRestore = restoreInteractionStateDataIfNeeded() || restoreSessionStateDataIfNeeded()
+            if !didRestore {
+                if url.isFileURL {
+                    webView.loadFileURL(url, allowingReadAccessTo: URL(fileURLWithPath: "/"))
                 } else {
-                    didRestore = restoreSessionStateDataIfNeeded()
-                }
-
-                if !didRestore {
-                    if url.isFileURL {
-                        webView.loadFileURL(url, allowingReadAccessTo: URL(fileURLWithPath: "/"))
-                    } else {
-                        webView.load(url)
-                    }
-                } else if case .youtubePlayer = content {
                     webView.load(url)
                 }
+            } else if case .youtubePlayer = content {
+                webView.load(url)
             }
         }
     }
