@@ -54,9 +54,10 @@ final class SharingMenu: NSMenu {
         let data = try? PropertyListSerialization.data(fromPropertyList: plist, format: .xml, options: 0)
         let descriptor = NSAppleEventDescriptor(descriptorType: .openSharingSubpane, data: data)
 
+        // https://github.com/feedback-assistant/reports/issues/179
         NSWorkspace.shared.open([url],
                                 withAppBundleIdentifier: nil,
-                                options: .async,
+                                options: [],
                                 additionalEventParamDescriptor: descriptor,
                                 launchIdentifiers: nil)
     }
