@@ -18,6 +18,7 @@
 
 import Cocoa
 import Combine
+import os
 
 protocol FirePopoverViewControllerDelegate: AnyObject {
 
@@ -42,6 +43,7 @@ final class FirePopoverViewController: NSViewController {
     private let historyCoordinating: HistoryCoordinating
 
     @IBOutlet weak var optionsButton: NSPopUpButton!
+    @IBOutlet weak var optionsButtonWidthConstraint: NSLayoutConstraint!
     @IBOutlet weak var openDetailsButton: NSButton!
     @IBOutlet weak var openDetailsButtonImageView: NSImageView!
     @IBOutlet weak var closeDetailsButton: NSButton!
@@ -222,19 +224,34 @@ final class FirePopoverViewController: NSViewController {
     }
 
     private func setupOptionsButton() {
-        optionsButton.menu?.removeAllItems()
+        guard let menu = optionsButton.menu, let font = optionsButton.font else {
+            os_log("FirePopoverViewController: Menu and/or font not present for optionsMenu", type: .error)
+            return
+        }
+        menu.removeAllItems()
+
+        let constraintSize = NSSize(width: .max, height: 0)
+        let attributes = [NSAttributedString.Key.font: font]
+        var maxWidth: CGFloat = 0
 
         FirePopoverViewModel.ClearingOption.allCases.forEach { option in
             if firePopoverViewModel.availableClearingOptions.contains(option) {
                 if option == .allData {
-                    optionsButton.menu?.addItem(.separator())
+                    menu.addItem(.separator())
                 }
+
                 let item = NSMenuItem(title: option.string)
                 item.tag = option.rawValue
-                optionsButton.menu?.addItem(item)
+                menu.addItem(item)
+
+                let width = (option.string as NSString)
+                    .boundingRect(with: constraintSize, options: .usesDeviceMetrics, attributes: attributes, context: nil)
+                    .width
+                maxWidth = max(maxWidth, width)
             }
         }
 
+        optionsButtonWidthConstraint.constant = maxWidth + 32
         optionsButton.selectItem(at: optionsButton.numberOfItems - 1)
     }
 

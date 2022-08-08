@@ -92,15 +92,20 @@ final class FirePopoverViewModel {
     // MARK: - Options
 
     private func updateAvailableClearingOptions() {
+        guard let viewModel = tabCollectionViewModel else {
+            assertionFailure("FirePopoverViewModel: TabCollectionViewModel is not present")
+            return
+        }
+
         var options: [ClearingOption] = []
 
-        if tabCollectionViewModel?.allTabsCount == 1,
-            let currentTab = tabCollectionViewModel?.selectedTabViewModel?.tab,
-            currentTab.localHistory.count == 1 {
-                options.append(.currentSite)
+        let urlTabsCount = viewModel.tabCollection.tabs.filter(\.content.isUrl).count + (viewModel.pinnedTabsCollection?.tabs.count ?? 0)
+
+        if urlTabsCount == 1, let currentTab = viewModel.selectedTabViewModel?.tab, currentTab.localHistory.count == 1 {
+            options.append(.currentSite)
         } else {
             options.append(.currentTab)
-            if (tabCollectionViewModel?.allTabsCount ?? 0) > 1 {
+            if urlTabsCount > 1 {
                 options.append(.currentWindow)
             }
         }
