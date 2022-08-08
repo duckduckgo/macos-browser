@@ -484,7 +484,8 @@ struct UserText {
     static let homePageClearHistory = NSLocalizedString("home.page.clear.history", value: "Clear History", comment: "Button caption for the burn fireproof website alert")
 
     static let tooltipAddToFavorites = NSLocalizedString("tooltip.addToFavorites", value: "Add to Favorites", comment: "Tooltip for add to favorites button")
-    static let tooltipBurn = NSLocalizedString("tooltip.burn", value: "Clear History and Data from This Site", comment: "Tooltip for burn button")
+    static let tooltipClearHistoryAndData = NSLocalizedString("tooltip.clearHistoryAndData", value: "Clear History and Data from This Site", comment: "Tooltip for burn button")
+    static let tooltipClearHistory = NSLocalizedString("tooltip.clearHistory", value: "Clear History from This Site", comment: "Tooltip for burn button")
 
     static let recentlyClosedMenuItemSuffixOne = NSLocalizedString("one.more.tab", value: " (and 1 more tab)", comment: "suffix of string in Recently Closed menu")
     static let recentlyClosedMenuItemSuffixMultiple = NSLocalizedString("n.more.tabs", value: " (and %d more tabs)", comment: "suffix of string in Recently Closed menu")

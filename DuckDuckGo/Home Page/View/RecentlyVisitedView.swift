@@ -166,7 +166,7 @@ struct RecentlyVisitedSite: View {
                           secondaryButton: .cancel(Text(UserText.cancel)))
                 }
                 .foregroundColor(Color("HomeFeedItemButtonTintColor"))
-                .tooltip(UserText.tooltipBurn)
+                .tooltip(fireButtonTooltip)
 
             }
             .padding(.trailing, 12)
@@ -195,6 +195,13 @@ struct RecentlyVisitedSite: View {
         .frame(maxWidth: .infinity, minHeight: model.showPagesOnHover ? 126 : 0)
         .padding(.bottom, model.showPagesOnHover ? 0 : 12)
 
+    }
+
+    private var fireButtonTooltip: String {
+        if site.isFireproof {
+            return UserText.tooltipClearHistory
+        }
+        return UserText.tooltipClearHistoryAndData
     }
 
     private func burn() {
