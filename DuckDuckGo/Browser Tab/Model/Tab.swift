@@ -194,6 +194,9 @@ final class Tab: NSObject, Identifiable, ObservableObject {
     }
 
     deinit {
+        if let url = url {
+            historyCoordinating.commitChanges(url: url)
+        }
         webView.stopLoading()
         webView.stopMediaCapture()
         webView.fullscreenWindowController?.close()
@@ -236,7 +239,10 @@ final class Tab: NSObject, Identifiable, ObservableObject {
         didSet {
             handleFavicon(oldContent: oldValue)
             invalidateSessionStateData()
-            self.error = nil
+            if let oldUrl = oldValue.url {
+                historyCoordinating.commitChanges(url: oldUrl)
+            }
+            error = nil
             Task {
                 await reloadIfNeeded(shouldLoadInBackground: true)
             }
@@ -855,13 +861,13 @@ extension Tab: ContentBlockerRulesUserScriptDelegate {
 extension HistoryCoordinating {
 
     func addDetectedTracker(_ tracker: DetectedTracker, onURL url: URL, contentBlocking: ContentBlocking = ContentBlocking.shared) {
-        trackerFound(onURL: url)
+        trackerFound(on: url)
 
         guard tracker.blocked,
               let domain = tracker.domain,
               let entityName = contentBlocking.entityName(forDomain: domain) else { return }
 
-        addBlockedTracker(entityName: entityName, onURL: url)
+        addBlockedTracker(entityName: entityName, on: url)
     }
 
 }
@@ -905,8 +911,6 @@ extension Tab: SurrogatesUserScriptDelegate {
     func surrogatesUserScript(_ script: SurrogatesUserScript, detectedTracker tracker: DetectedTracker, withSurrogate host: String) {
         trackerInfo?.add(installedSurrogateHost: host)
         trackerInfo?.add(detectedTracker: tracker)
-        guard let url = webView.url else { return }
-        historyCoordinating.addDetectedTracker(tracker, onURL: url)
     }
 }
 

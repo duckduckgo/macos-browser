@@ -35,7 +35,7 @@ final class HistoryCoordinatingMock: HistoryCoordinating {
     }
 
     var addBlockedTrackerCalled = false
-    func addBlockedTracker(entityName: String, onURL url: URL) {
+    func addBlockedTracker(entityName: String, on url: URL) {
         addBlockedTrackerCalled = true
     }
 
@@ -69,7 +69,7 @@ final class HistoryCoordinatingMock: HistoryCoordinating {
     }
 
     var trackerFoundCalled = false
-    func trackerFound(onURL: URL) {
+    func trackerFound(on: URL) {
         trackerFoundCalled = true
     }
 
