@@ -39,6 +39,11 @@ final class HistoryCoordinatingMock: HistoryCoordinating {
         addBlockedTrackerCalled = true
     }
 
+    var commitChangesCalled = false
+    func commitChanges(url: URL) {
+        commitChangesCalled = true
+    }
+
     var burnCalled = false
     func burn(except fireproofDomains: FireproofDomains, completion: @escaping () -> Void) {
         burnCalled = true
