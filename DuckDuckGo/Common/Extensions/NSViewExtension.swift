@@ -67,7 +67,7 @@ extension NSView {
 
     func applyDropShadow() {
         wantsLayer = true
-        layer?.shadowColor = NSColor.controlShadowColor.cgColor
+        layer?.shadowColor = NSColor.black.withAlphaComponent(0.2).cgColor
         layer?.shadowOpacity = 1.0
         layer?.masksToBounds = false
     }
