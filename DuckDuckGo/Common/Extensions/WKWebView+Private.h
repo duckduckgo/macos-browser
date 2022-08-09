@@ -47,9 +47,6 @@ typedef NS_OPTIONS(NSUInteger, _WKCaptureDevices) {
 - (void)_restoreFromSessionStateData:(NSData *)data;
 - (NSData * _Nullable)_sessionStateData;
 
-- (void)createWebArchiveDataWithCompletionHandler:(void (^)(NSData * _Nullable, NSError * _Nullable))completionHandler API_AVAILABLE(macos(11.0), ios(14.0));
-- (void)createPDFWithConfiguration:(id _Nullable)pdfConfiguration completionHandler:(void (^)(NSData * _Nullable pdfDocumentData, NSError * _Nullable error))completionHandler API_AVAILABLE(macos(11.0), ios(14.0));
-
 @property (nonatomic, readonly) _WKMediaCaptureStateDeprecated _mediaCaptureState API_AVAILABLE(macos(10.15), ios(13.0));
 
 - (void)setMicrophoneCaptureState:(WKMediaCaptureState)state completionHandler:(void (^)(void))completionHandler API_AVAILABLE(macos(12.0), ios(15.0));

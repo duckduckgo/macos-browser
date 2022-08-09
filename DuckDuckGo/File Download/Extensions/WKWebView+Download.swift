@@ -101,7 +101,7 @@ extension WKWebView {
     func exportWebContent(to url: URL,
                           as exportType: ContentExportType,
                           completionHandler: ((Result<URL, Error>) -> Void)? = nil) {
-        let create: (@escaping (Data?, Error?) -> Void) -> Void
+        let create: (@escaping (Result<Data, Error>) -> Void) -> Void
         var transform: (Data) throws -> Data = { return $0 }
 
         switch exportType {
@@ -109,7 +109,7 @@ extension WKWebView {
             create = self.createWebArchiveData
 
         case .pdf:
-            create = { self.createPDF(withConfiguration: nil, completionHandler: $0) }
+            create = { self.createPDF(completionHandler: $0) }
 
         case .html:
             create = self.createWebArchiveData
@@ -135,18 +135,23 @@ extension WKWebView {
                                 fileURL: url)
         progress.publish()
 
-        create { (data, error) in
+        create { (result) in
             defer {
                 progress.completedUnitCount = progress.totalUnitCount
                 progress.unpublish()
             }
             do {
-                if let error = error { throw error }
-                guard let data = try data.map(transform) else { throw URLError(.cancelled) }
+                switch result {
+                case .failure(let error):
+                    throw error
+                case .success(let data):
+                    guard let data = try? transform(data) else {
+                        throw URLError(.cancelled)
+                    }
 
-                try data.write(to: url)
-                completionHandler?(.success(url))
-
+                    try data.write(to: url)
+                    completionHandler?(.success(url))
+                }
             } catch {
                 completionHandler?(.failure(error))
             }
