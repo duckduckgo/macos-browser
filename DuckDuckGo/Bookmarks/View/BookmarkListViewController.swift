@@ -344,6 +344,17 @@ extension BookmarkListViewController: FolderMenuItemSelectors {
         LocalBookmarkManager.shared.remove(folder: folder)
     }
     
+    func openInNewTabs(_ sender: NSMenuItem) {
+        guard let tabCollection = WindowControllersManager.shared.lastKeyMainWindowController?.mainViewController.tabCollectionViewModel,
+              let children = (sender.representedObject as? BookmarkFolder)?.children else {
+            assertionFailure("Cannot open in new tabs")
+            return
+        }
+        
+        let tabs = children.compactMap { $0 as? Bookmark }.map { Tab(content: .url($0.url), shouldLoadInBackground: true) }
+        tabCollection.append(tabs: tabs)
+    }
+    
 }
 
 // MARK: - BookmarkListPopover

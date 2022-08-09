@@ -121,6 +121,14 @@ final class BookmarkManagementDetailViewController: NSViewController {
     }
 
     @IBAction func handleDoubleClick(_ sender: NSTableView) {
+        if sender.selectedRowIndexes.count > 1 {
+            let entities = sender.selectedRowIndexes.map { fetchEntity(at: $0) }
+            let bookmarks = entities.compactMap { $0 as? Bookmark }
+            openBookmarksInNewTabs(bookmarks)
+            
+            return
+        }
+
         let index = sender.clickedRow
 
         guard index != -1, editingBookmarkIndex?.index != index, let entity = fetchEntity(at: index) else {
@@ -441,6 +449,16 @@ extension BookmarkManagementDetailViewController: NSTableViewDelegate, NSTableVi
             cell?.isSelected = true
         }
     }
+    
+    fileprivate func openBookmarksInNewTabs(_ bookmarks: [Bookmark]) {
+        guard let tabCollection = WindowControllersManager.shared.lastKeyMainWindowController?.mainViewController.tabCollectionViewModel else {
+            assertionFailure("Cannot open in new tabs")
+            return
+        }
+        
+        let tabs = bookmarks.map { Tab(content: .url($0.url), shouldLoadInBackground: true) }
+        tabCollection.append(tabs: tabs)
+    }
 
 }
 
@@ -564,6 +582,16 @@ extension BookmarkManagementDetailViewController: FolderMenuItemSelectors {
         }
 
         LocalBookmarkManager.shared.remove(folder: folder)
+    }
+    
+    func openInNewTabs(_ sender: NSMenuItem) {
+        guard let children = (sender.representedObject as? BookmarkFolder)?.children else {
+            assertionFailure("Cannot open in new tabs")
+            return
+        }
+        
+        let bookmarks = children.compactMap { $0 as? Bookmark }
+        openBookmarksInNewTabs(bookmarks)
     }
 
 }

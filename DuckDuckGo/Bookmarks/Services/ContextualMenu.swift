@@ -78,6 +78,9 @@ struct ContextualMenu {
 
         menu.addItem(renameFolderMenuItem(folder: folder))
         menu.addItem(deleteFolderMenuItem(folder: folder))
+        menu.addItem(NSMenuItem.separator())
+    
+        menu.addItem(openInNewTabsMenuItem(folder: folder))
 
         return menu
     }
@@ -94,6 +97,10 @@ struct ContextualMenu {
 
     static func deleteFolderMenuItem(folder: BookmarkFolder) -> NSMenuItem {
         return menuItem(UserText.deleteFolder, #selector(FolderMenuItemSelectors.deleteFolder(_:)), folder)
+    }
+    
+    static func openInNewTabsMenuItem(folder: BookmarkFolder) -> NSMenuItem {
+        return menuItem(UserText.bookmarksOpenInNewTabs, #selector(FolderMenuItemSelectors.openInNewTabs(_:)), folder)
     }
 
     static func openBookmarkInNewTabMenuItem(bookmark: Bookmark) -> NSMenuItem {
