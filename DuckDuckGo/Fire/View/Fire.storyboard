@@ -141,8 +141,8 @@
                                         <imageCell key="cell" refusesFirstResponder="YES" alignment="left" imageScaling="proportionallyDown" image="FireHeader" id="Dql-dm-pHB"/>
                                     </imageView>
                                     <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="gVh-tG-Gue">
-                                        <rect key="frame" x="75" y="53" width="179" height="16"/>
-                                        <textFieldCell key="cell" lineBreakMode="clipping" title="Clear History and Data From:" id="98U-sP-UUR">
+                                        <rect key="frame" x="71" y="53" width="187" height="16"/>
+                                        <textFieldCell key="cell" lineBreakMode="clipping" title="Clear Browsing History &amp; Data" id="98U-sP-UUR">
                                             <font key="font" metaFont="system"/>
                                             <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
                                             <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>

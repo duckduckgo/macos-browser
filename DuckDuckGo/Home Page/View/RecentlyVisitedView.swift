@@ -199,9 +199,9 @@ struct RecentlyVisitedSite: View {
 
     private var fireButtonTooltip: String {
         if site.isFireproof {
-            return UserText.tooltipClearHistory
+            return UserText.tooltipClearHistory(domain: site.domain)
         }
-        return UserText.tooltipClearHistoryAndData
+        return UserText.tooltipClearHistoryAndData(domain: site.domain)
     }
 
     private func burn() {
