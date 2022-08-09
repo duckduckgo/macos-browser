@@ -20,9 +20,7 @@ import SwiftUI
 
 fileprivate extension Font {
     static let companyName: Font = .title
-    static let privacySimplified: Font = {
-        return .title3.weight(.semibold)
-    }()
+    static let privacySimplified: Font = .title3.weight(.semibold)
 }
 
 extension Preferences {

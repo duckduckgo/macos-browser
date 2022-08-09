@@ -38,26 +38,11 @@ enum Preferences {
 
     enum Const {
         enum Fonts {
-
-            static let popUpButton: NSFont = {
-                return .preferredFont(forTextStyle: .title1, options: [:])
-            }()
-            
-            static let sideBarItem: Font = {
-                return .body
-            }()
-            
-            static let preferencePaneTitle: Font = {
-                return .title2.weight(.semibold)
-            }()
-            
-            static let preferencePaneSectionHeader: Font = {
-                return .title3.weight(.semibold)
-            }()
-            
-            static let preferencePaneCaption: Font = {
-                return .subheadline
-            }()
+            static let popUpButton: NSFont = .preferredFont(forTextStyle: .title1, options: [:])
+            static let sideBarItem: Font = .body
+            static let preferencePaneTitle: Font = .title2.weight(.semibold)
+            static let preferencePaneSectionHeader: Font = .title3.weight(.semibold)
+            static let preferencePaneCaption: Font = .subheadline
         }
     }
 }
