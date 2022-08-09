@@ -27,41 +27,42 @@ typedef NS_OPTIONS(NSUInteger, _WKMediaCaptureStateDeprecated) {
     _WKMediaCaptureStateDeprecatedActiveCamera = 1 << 1,
     _WKMediaCaptureStateDeprecatedMutedMicrophone = 1 << 2,
     _WKMediaCaptureStateDeprecatedMutedCamera = 1 << 3,
-};
+} API_AVAILABLE(macos(10.13), ios(11.0));
+
 typedef NS_OPTIONS(NSUInteger, _WKMediaMutedState) {
     _WKMediaNoneMuted = 0,
     _WKMediaAudioMuted = 1 << 0,
     _WKMediaCaptureDevicesMuted = 1 << 1,
     _WKMediaScreenCaptureMuted = 1 << 2,
-};
+} API_AVAILABLE(macos(10.13), ios(11.0));
 
 typedef NS_OPTIONS(NSUInteger, _WKCaptureDevices) {
     _WKCaptureDeviceMicrophone = 1 << 0,
     _WKCaptureDeviceCamera = 1 << 1,
     _WKCaptureDeviceDisplay = 1 << 2,
-} API_AVAILABLE(macosx(10.3));
+} API_AVAILABLE(macos(10.13), ios(11.0));
 
 @interface WKWebView (Private)
 
 - (void)_restoreFromSessionStateData:(NSData *)data;
 - (NSData * _Nullable)_sessionStateData;
 
-- (void)createWebArchiveDataWithCompletionHandler:(void (^)(NSData * _Nullable, NSError * _Nullable))completionHandler;
-- (void)createPDFWithConfiguration:(id _Nullable)pdfConfiguration completionHandler:(void (^)(NSData * _Nullable pdfDocumentData, NSError * _Nullable error))completionHandler;
+- (void)createWebArchiveDataWithCompletionHandler:(void (^)(NSData * _Nullable, NSError * _Nullable))completionHandler API_AVAILABLE(macos(11.0), ios(14.0));
+- (void)createPDFWithConfiguration:(id _Nullable)pdfConfiguration completionHandler:(void (^)(NSData * _Nullable pdfDocumentData, NSError * _Nullable error))completionHandler API_AVAILABLE(macos(11.0), ios(14.0));
 
-@property (nonatomic, readonly) _WKMediaCaptureStateDeprecated _mediaCaptureState;
+@property (nonatomic, readonly) _WKMediaCaptureStateDeprecated _mediaCaptureState API_AVAILABLE(macos(10.15), ios(13.0));
 
 - (void)setMicrophoneCaptureState:(WKMediaCaptureState)state completionHandler:(void (^)(void))completionHandler API_AVAILABLE(macos(12.0), ios(15.0));
 - (void)setCameraCaptureState:(WKMediaCaptureState)state completionHandler:(void (^)(void))completionHandler API_AVAILABLE(macos(12.0), ios(15.0));
-- (void)_stopMediaCapture;
+- (void)_stopMediaCapture API_AVAILABLE(macos(10.15.4), ios(13.4));
 
-- (_WKMediaMutedState)_mediaMutedState;
-- (void)_setPageMuted:(_WKMediaMutedState)mutedState;
+- (_WKMediaMutedState)_mediaMutedState API_AVAILABLE(macos(11.0), ios(14.0));
+- (void)_setPageMuted:(_WKMediaMutedState)mutedState API_AVAILABLE(macos(10.13), ios(11.0));
 
 - (NSPrintOperation *)_printOperationWithPrintInfo:(NSPrintInfo *)printInfo;
-- (NSPrintOperation * _Nullable)_printOperationWithPrintInfo:(NSPrintInfo *)printInfo forFrame:(id)frame;
+- (NSPrintOperation * _Nullable)_printOperationWithPrintInfo:(NSPrintInfo *)printInfo forFrame:(id)frame API_AVAILABLE(macos(10.12));
 
-- (NSView *)_fullScreenPlaceholderView;
+- (NSView *)_fullScreenPlaceholderView API_AVAILABLE(macos(10.13.4));
 
 @end
 
