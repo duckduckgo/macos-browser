@@ -28,10 +28,12 @@ protocol HistoryCoordinating: AnyObject {
     var history: History? { get }
 
     func addVisit(of url: URL)
-    func addBlockedTracker(entityName: String, onURL url: URL)
-    func trackerFound(onURL: URL)
+    func addBlockedTracker(entityName: String, on url: URL)
+    func trackerFound(on: URL)
     func updateTitleIfNeeded(title: String, url: URL)
     func markFailedToLoadUrl(_ url: URL)
+    func commitChanges(url: URL)
+
     func title(for url: URL) -> String?
 
     func burn(except fireproofDomains: FireproofDomains, completion: @escaping () -> Void)
@@ -94,11 +96,10 @@ final class HistoryCoordinator: HistoryCoordinating {
             entry.failedToLoad = false
 
             self?.historyDictionary?[url] = entry
-            self?.save(entry: entry)
         }
     }
 
-    func addBlockedTracker(entityName: String, onURL url: URL) {
+    func addBlockedTracker(entityName: String, on url: URL) {
         queue.async(flags: .barrier) { [weak self] in
             guard let historyDictionary = self?.historyDictionary else {
                 os_log("Add tracker to %s ignored, no history", log: .history, url.absoluteString)
@@ -111,11 +112,10 @@ final class HistoryCoordinator: HistoryCoordinating {
             }
 
             entry.addBlockedTracker(entityName: entityName)
-            self?.save(entry: entry)
         }
     }
 
-    func trackerFound(onURL url: URL) {
+    func trackerFound(on url: URL) {
         queue.async(flags: .barrier) { [weak self] in
             guard let historyDictionary = self?.historyDictionary else {
                 os_log("Add tracker to %s ignored, no history", log: .history, url.absoluteString)
@@ -128,7 +128,6 @@ final class HistoryCoordinator: HistoryCoordinating {
             }
 
             entry.trackersFound = true
-            self?.save(entry: entry)
         }
     }
 
@@ -142,12 +141,22 @@ final class HistoryCoordinator: HistoryCoordinating {
             guard !title.isEmpty, entry.title != title else { return }
 
             entry.title = title
-            self?.save(entry: entry)
         }
     }
 
     func markFailedToLoadUrl(_ url: URL) {
         mark(url: url, keyPath: \HistoryEntry.failedToLoad, value: true)
+    }
+
+    func commitChanges(url: URL) {
+        queue.async(flags: .barrier) { [weak self] in
+            guard let historyDictionary = self?.historyDictionary,
+                  let entry = historyDictionary[url] else {
+                return
+            }
+
+            self?.save(entry: entry)
+        }
     }
 
     func title(for url: URL) -> String? {
@@ -324,14 +333,20 @@ final class HistoryCoordinator: HistoryCoordinating {
     }
 
     private func makeHistoryDictionary(from history: History) -> [URL: HistoryEntry] {
-        history.reduce(into: [URL: HistoryEntry](), { $0[$1.url] = $1 })
+        dispatchPrecondition(condition: .onQueue(queue))
+
+        return history.reduce(into: [URL: HistoryEntry](), { $0[$1.url] = $1 })
     }
 
     private func makeHistory(from dictionary: [URL: HistoryEntry]) -> History {
+        dispatchPrecondition(condition: .onQueue(queue))
+
         return History(dictionary.values)
     }
 
     private func save(entry: HistoryEntry) {
+        dispatchPrecondition(condition: .onQueue(queue))
+
         self.historyStoring.save(entry: entry)
             .receive(on: self.queue, options: .init(flags: .barrier))
             .sink(receiveCompletion: { completion in
@@ -361,7 +376,6 @@ final class HistoryCoordinator: HistoryCoordinating {
             }
 
             entry[keyPath: keyPath] = value
-            self?.save(entry: entry)
         }
     }
 
@@ -371,19 +385,21 @@ final class HistoryCoordinator: HistoryCoordinating {
     private var historyV5toV6Migration: Bool
 
     private func migrateModelV5toV6IfNeeded() {
+        queue.async(flags: .barrier) { [weak self] in
+            guard let self = self else { return }
 
-        guard let historyDictionary = historyDictionary,
-              !historyV5toV6Migration else {
-            return
+            guard let historyDictionary = self.historyDictionary,
+                  !self.historyV5toV6Migration else {
+                return
+            }
+
+            self.historyV5toV6Migration = true
+
+            for entry in historyDictionary.values where entry.visits.isEmpty {
+                entry.addOldVisit(date: entry.lastVisit)
+                self.save(entry: entry)
+            }
         }
-
-        historyV5toV6Migration = true
-
-        for entry in historyDictionary.values where entry.visits.isEmpty {
-            entry.addOldVisit(date: entry.lastVisit)
-            save(entry: entry)
-        }
-
     }
 
 }
