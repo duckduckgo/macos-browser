@@ -455,7 +455,7 @@ final class Tab: NSObject, Identifiable, ObservableObject {
         userContentController.$contentBlockingAssets.compactMap { $0?.completionTokens }.eraseToAnyPublisher()
     }
 
-    private static let debugEvents = EventMapping<AMPProtectionDebugEvents> { event, _, _, _, _ in
+    private static let debugEvents = EventMapping<AMPProtectionDebugEvents> { event, _, _, _ in
         switch event {
         case .ampBlockingRulesCompilationFailed:
             Pixel.fire(.ampBlockingRulesCompilationFailed)
@@ -466,6 +466,11 @@ final class Tab: NSObject, Identifiable, ObservableObject {
         LinkProtection(privacyManager: ContentBlocking.shared.privacyConfigurationManager,
                        contentBlockingManager: ContentBlocking.shared.contentBlockingManager,
                        errorReporting: Self.debugEvents)
+    }()
+    
+    lazy var referrerTrimming: ReferrerTrimming = {
+        ReferrerTrimming(privacyManager: ContentBlocking.shared.privacyConfigurationManager,
+                         contentBlockingManager: ContentBlocking.shared.contentBlockingManager)
     }()
 
     @MainActor
