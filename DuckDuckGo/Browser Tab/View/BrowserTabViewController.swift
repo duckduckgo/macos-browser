@@ -27,6 +27,7 @@ protocol BrowserTabViewControllerClickDelegate: AnyObject {
     func browserTabViewController(_ browserTabViewController: BrowserTabViewController, didClickAtPoint: CGPoint)
 }
 
+// swiftlint:disable file_length
 final class BrowserTabViewController: NSViewController {
     
     @IBOutlet weak var errorView: NSView!
@@ -49,6 +50,7 @@ final class BrowserTabViewController: NSViewController {
     private var cancellables = Set<AnyCancellable>()
 
     private var contextMenuExpected = false
+    private var contextMenuTitle: String?
     private var contextMenuLink: URL?
     private var contextMenuImage: URL?
     private var contextMenuSelectedText: String?
@@ -560,9 +562,11 @@ extension BrowserTabViewController: TabDelegate {
     func tab(_ tab: Tab,
              willShowContextMenuAt position: NSPoint,
              image: URL?,
+             title: String?,
              link: URL?,
              selectedText: String?) {
         contextMenuImage = image
+        contextMenuTitle = title
         contextMenuLink = link
         contextMenuExpected = true
         contextMenuSelectedText = selectedText
@@ -727,6 +731,11 @@ extension BrowserTabViewController: LinkMenuItemSelectors {
               let url = contextMenuLink else { return }
 
         tab.download(from: url)
+    }
+    
+    func addLinkToBookmarks(_ sender: NSMenuItem) {
+        guard let url = contextMenuLink else { return }
+        LocalBookmarkManager.shared.makeBookmark(for: url, title: contextMenuTitle ?? url.absoluteString, isFavorite: false)
     }
 
     func copyLink(_ sender: NSMenuItem) {
@@ -1195,3 +1204,4 @@ extension BrowserTabViewController {
         }
     }
 }
+// swiftlint:enable file_length

@@ -24,6 +24,7 @@ protocol ContextMenuDelegate: AnyObject {
     func contextMenu(forUserScript script: ContextMenuUserScript,
                      willShowAt position: NSPoint,
                      image: URL?,
+                     title: String?,
                      link: URL?,
                      selectedText: String?)
 
@@ -48,6 +49,7 @@ final class ContextMenuUserScript: NSObject, StaticUserScript {
 
         var image: URL?
         var link: URL?
+        var title: String?
         let selectedText = dict["selectedText"] as? String
 
         guard let elements = dict["elements"] as? [[String: String]] else { return }
@@ -58,6 +60,7 @@ final class ContextMenuUserScript: NSObject, StaticUserScript {
             switch dict["tagName"] {
             case "A":
                 link = URL(string: url)
+                title = dict["title"]
 
             case "IMG":
                 image = URL(string: url)
@@ -69,6 +72,7 @@ final class ContextMenuUserScript: NSObject, StaticUserScript {
         delegate?.contextMenu(forUserScript: self,
                               willShowAt: point,
                               image: image,
+                              title: title,
                               link: link,
                               selectedText: selectedText)
     }
@@ -86,7 +90,8 @@ final class ContextMenuUserScript: NSObject, StaticUserScript {
     function linkFrom(element) {
         return {
             "tagName": "A",
-            "url": element.href
+            "url": element.href,
+            "title": element.textContent
         };
     }
 

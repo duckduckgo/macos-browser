@@ -27,6 +27,7 @@ final class WebView: WKWebView {
         "WKMenuItemIdentifierOpenLink": #selector(LinkMenuItemSelectors.openLinkInNewTab(_:)),
         "WKMenuItemIdentifierOpenLinkInNewWindow": #selector(LinkMenuItemSelectors.openLinkInNewWindow(_:)),
         "WKMenuItemIdentifierDownloadLinkedFile": #selector(LinkMenuItemSelectors.downloadLinkedFileAs(_:)),
+        "WKMenuItemIdentifierAddLinkToBookmarks": #selector(LinkMenuItemSelectors.addLinkToBookmarks(_:)),
         "WKMenuItemIdentifierCopyLink": #selector(LinkMenuItemSelectors.copyLink(_:)),
 
         // Images
@@ -40,6 +41,7 @@ final class WebView: WKWebView {
         "WKMenuItemIdentifierOpenLink": UserText.openLinkInNewTab,
         "WKMenuItemIdentifierDownloadImage": UserText.saveImageAs,
         "WKMenuItemIdentifierDownloadLinkedFile": UserText.downloadLinkedFileAs,
+        "WKMenuItemIdentifierAddLinkToBookmarks": UserText.addLinkToBookmarks,
         "WKMenuItemIdentifierSearchWeb": UserText.searchWithDuckDuckGo
     ]
   
@@ -115,6 +117,11 @@ final class WebView: WKWebView {
                                                 title: UserText.openImageInNewTab,
                                                 target: uiDelegate,
                                                 selector: #selector(ImageMenuItemSelectors.openImageInNewTab(_:)))
+        
+        menu.insertItemBeforeItemWithIdentifier("WKMenuItemIdentifierCopyLink",
+                                                title: "Add Link to Bookmarks",
+                                                target: uiDelegate,
+                                                selector: #selector(LinkMenuItemSelectors.addLinkToBookmarks(_:)))
 
         menu.insertSeparatorBeforeItemWithIdentifier("WKMenuItemIdentifierCopyImage")
 

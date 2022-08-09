@@ -23,6 +23,7 @@ import Cocoa
     func openLinkInNewTab(_ sender: NSMenuItem)
     func openLinkInNewWindow(_ sender: NSMenuItem)
     func downloadLinkedFileAs(_ sender: NSMenuItem)
+    func addLinkToBookmarks(_ sender: NSMenuItem)
     func copyLink(_ sender: NSMenuItem)
 
 }
