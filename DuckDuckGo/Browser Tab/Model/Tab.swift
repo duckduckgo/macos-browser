@@ -1059,6 +1059,15 @@ extension Tab: WKNavigationDelegate {
         if navigationAction.isTargetingMainFrame, navigationAction.request.mainDocumentURL?.host != lastUpgradedURL?.host {
             lastUpgradedURL = nil
         }
+        
+        if navigationAction.isTargetingMainFrame && navigationAction.navigationType != .backForward {
+            if let newRequest = referrerTrimming.trimReferrer(forNavigation: navigationAction) {
+                defer {
+                    webView.load(newRequest)
+                }
+                return .cancel
+            }
+        }
 
         if navigationAction.isTargetingMainFrame {
             if navigationAction.navigationType == .backForward,
@@ -1234,6 +1243,7 @@ extension Tab: WKNavigationDelegate {
         resetDashboardInfo()
         linkProtection.cancelOngoingExtraction()
         linkProtection.setMainFrameUrl(webView.url)
+        referrerTrimming.setMainFrameUrl(webView.url)
     }
 
     @MainActor
@@ -1243,6 +1253,7 @@ extension Tab: WKNavigationDelegate {
         webViewDidFinishNavigationPublisher.send()
         if isAMPProtectionExtracting { isAMPProtectionExtracting = false }
         linkProtection.setMainFrameUrl(nil)
+        referrerTrimming.setMainFrameUrl(nil)
     }
 
     func webView(_ webView: WKWebView, didFail navigation: WKNavigation!, withError error: Error) {
@@ -1253,6 +1264,7 @@ extension Tab: WKNavigationDelegate {
         isBeingRedirected = false
         invalidateSessionStateData()
         linkProtection.setMainFrameUrl(nil)
+        referrerTrimming.setMainFrameUrl(nil)
         webViewDidFailNavigationPublisher.send()
     }
 
@@ -1268,6 +1280,7 @@ extension Tab: WKNavigationDelegate {
         self.error = error
         isBeingRedirected = false
         linkProtection.setMainFrameUrl(nil)
+        referrerTrimming.setMainFrameUrl(nil)
         webViewDidFailNavigationPublisher.send()
     }
 
