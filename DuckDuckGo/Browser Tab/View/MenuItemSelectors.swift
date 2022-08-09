@@ -60,5 +60,6 @@ import Cocoa
     func editBookmark(_ sender: NSMenuItem)
     func copyBookmark(_ sender: NSMenuItem)
     func deleteBookmark(_ sender: NSMenuItem)
+    func deleteEntities(_ sender: NSMenuItem)
 
 }

@@ -31,6 +31,7 @@ protocol BookmarkManager: AnyObject {
     @discardableResult func makeFolder(for title: String, parent: BookmarkFolder?) -> BookmarkFolder
     func remove(bookmark: Bookmark)
     func remove(folder: BookmarkFolder)
+    func remove(objectsWithUUIDs uuids: [UUID])
     func update(bookmark: Bookmark)
     func update(folder: BookmarkFolder)
     @discardableResult func updateUrl(of bookmark: Bookmark, to newUrl: URL) -> Bookmark?
@@ -149,6 +150,12 @@ final class LocalBookmarkManager: BookmarkManager {
 
     func remove(folder: BookmarkFolder) {
         bookmarkStore.remove(objectsWithUUIDs: [folder.id]) { [weak self] _, _ in
+            self?.loadBookmarks()
+        }
+    }
+    
+    func remove(objectsWithUUIDs uuids: [UUID]) {
+        bookmarkStore.remove(objectsWithUUIDs: uuids) { [weak self] _, _ in
             self?.loadBookmarks()
         }
     }

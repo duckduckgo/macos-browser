@@ -652,4 +652,13 @@ extension BookmarkManagementDetailViewController: BookmarkMenuItemSelectors {
         LocalBookmarkManager.shared.remove(bookmark: bookmark)
     }
     
+    func deleteEntities(_ sender: NSMenuItem) {
+        guard let uuids = sender.representedObject as? [UUID] else {
+            assertionFailure("Failed to cast menu item's represented object to UUID array")
+            return
+        }
+        
+        LocalBookmarkManager.shared.remove(objectsWithUUIDs: uuids)
+    }
+    
 }
