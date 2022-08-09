@@ -17,16 +17,23 @@
 //
 
 import Foundation
+import TrackerRadarKit
 import BrowserServicesKit
 
 struct TrackerInfo: Encodable {
-
-    private(set) var trackersDetected = Set<DetectedTracker>()
-    private(set) var trackersBlocked = Set<DetectedTracker>()
+    
+    enum CodingKeys: String, CodingKey {
+        case trackersDetected
+        case trackersBlocked
+        case installedSurrogates
+    }
+    
+    private(set) var trackersDetected = Set<DetectedRequest>()
+    private(set) var trackersBlocked = Set<DetectedRequest>()
     private(set) var installedSurrogates = Set<String>()
 
-    mutating func add(detectedTracker: DetectedTracker) {
-        if detectedTracker.blocked {
+    mutating func add(detectedTracker: DetectedRequest) {
+        if detectedTracker.isBlocked {
             trackersBlocked.insert(detectedTracker)
         } else {
             trackersDetected.insert(detectedTracker)
@@ -42,5 +49,45 @@ struct TrackerInfo: Encodable {
             trackersBlocked.count == 0 &&
             installedSurrogates.count == 0
     }
+    
+    // We need to adapt new DetectionRequest to old Privacy Dashboard API, code below should be removed once we finalize updated Dashboard
+    func encode(to encoder: Encoder) throws {
+    
+        let tds = ContentBlocking.shared.trackerDataManager.trackerData
+        
+        let transformedDetectedRequests = trackersDetected.map { DetectedRequestAdapter.init(request: $0, tds: tds) }
+        let transformedBlockedRequests = trackersBlocked.map { DetectedRequestAdapter.init(request: $0, tds: tds) }
+        
+        var container = encoder.container(keyedBy: CodingKeys.self)
+        
+        try container.encode(transformedBlockedRequests, forKey: .trackersBlocked)
+        try container.encode(transformedDetectedRequests, forKey: .trackersDetected)
+        try container.encode(installedSurrogates, forKey: .installedSurrogates)
+    }
 
+    final class DetectedRequestAdapter: Encodable {
+        
+        let url: String
+        let pageUrl: String
+        
+        let blocked: Bool
+        let knownTracker: KnownTracker?
+        let entity: Entity?
+        
+        init(request: DetectedRequest, tds: TrackerData) {
+            url = request.url
+            pageUrl = request.pageUrl
+            blocked = request.isBlocked
+            
+            if let tracker = tds.findTracker(forUrl: request.url),
+               let entityName = tracker.owner?.name,
+               let trackerEntity = tds.findEntity(byName: entityName) {
+                knownTracker = tracker
+                entity = trackerEntity
+            } else {
+                knownTracker = nil
+                entity = nil
+            }
+        }
+    }
 }
