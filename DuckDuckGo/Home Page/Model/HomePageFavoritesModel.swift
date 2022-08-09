@@ -71,16 +71,19 @@ extension HomePage.Models {
         @Published private(set) var rows: [[FavoriteModel]] = []
 
         let open: (Bookmark, OpenTarget) -> Void
-        let remove: (Bookmark) -> Void
+        let removeFavorite: (Bookmark) -> Void
+        let deleteBookmark: (Bookmark) -> Void
         let addEdit: (Bookmark?) -> Void
 
         init(open: @escaping (Bookmark, OpenTarget) -> Void,
-             remove: @escaping (Bookmark) -> Void,
+             removeFavorite: @escaping (Bookmark) -> Void,
+             deleteBookmark: @escaping (Bookmark) -> Void,
              addEdit:  @escaping (Bookmark?) -> Void) {
 
             self.showAllFavorites = Self.showAllFavoritesSetting
             self.open = open
-            self.remove = remove
+            self.removeFavorite = removeFavorite
+            self.deleteBookmark = deleteBookmark
             self.addEdit = addEdit
         }
 

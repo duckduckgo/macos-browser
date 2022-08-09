@@ -149,7 +149,8 @@ struct Favorite: View {
                 Button(UserText.openInNewWindow, action: { model.openInNewWindow(bookmark) })
                 Divider()
                 Button(UserText.edit, action: { model.edit(bookmark) })
-                Button(UserText.remove, action: { model.remove(bookmark) })
+                Button(UserText.removeFavorite, action: { model.removeFavorite(bookmark) })
+                Button(UserText.deleteBookmark, action: { model.deleteBookmark(bookmark) })
             }))
 
     }
