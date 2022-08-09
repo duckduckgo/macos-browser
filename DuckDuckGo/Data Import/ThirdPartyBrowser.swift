@@ -101,7 +101,7 @@ enum ThirdPartyBrowser: CaseIterable {
     // Firefox Nightly build.
     private var applicationPath: String? {
         for bundleID in bundleIdentifiers.all {
-            if let path = NSWorkspace.shared.absolutePathForApplication(withBundleIdentifier: bundleID) {
+            if let path = NSWorkspace.shared.urlForApplication(withBundleIdentifier: bundleID)?.path {
                 return path
             }
         }

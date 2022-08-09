@@ -70,7 +70,7 @@ final class RoundedSelectionRowView: NSTableRowView {
     }
 
     override var interiorBackgroundStyle: NSView.BackgroundStyle {
-        return .light
+        return .normal
     }
 
 }
