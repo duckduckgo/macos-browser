@@ -327,24 +327,15 @@ final class TabBarViewController: NSViewController {
 
     private func updateEmptyTabArea() {
         let totalTabWidth = self.totalTabWidth
-        let emptySpace = scrollView.frame.size.width - totalTabWidth
         let plusButtonWidth = HorizontalSpace.buttonPadding.rawValue + HorizontalSpace.button.rawValue
 
         // Window dragging
         let leadingSpace = min(totalTabWidth + plusButtonWidth, scrollView.frame.size.width)
         windowDraggingViewLeadingConstraint.constant = leadingSpace
 
-        // Add button
-        if emptySpace > plusButton.frame.size.width {
-            isAddButtonFloating = true
-        } else {
-            isAddButtonFloating = false
-        }
-        plusButton.alphaValue = isAddButtonFloating ? 0.0 : 1.0
-        plusButton.isEnabled = !isAddButtonFloating
+        plusButton.alphaValue = 0.0
+        plusButton.isEnabled = false
     }
-
-    private var isAddButtonFloating = false
 
     // MARK: - Drag and Drop
 
@@ -466,7 +457,7 @@ final class TabBarViewController: NSViewController {
             return 0
         }
 
-        let tabsWidth = scrollView.bounds.width
+        let tabsWidth = scrollView.bounds.width - HorizontalSpace.button.rawValue - HorizontalSpace.buttonPadding.rawValue
         let minimumWidth = selected ? TabBarViewItem.Width.minimumSelected.rawValue : TabBarViewItem.Width.minimum.rawValue
 
         if tabMode == .divided {
@@ -947,7 +938,7 @@ extension TabBarViewController: NSCollectionViewDelegate {
     func collectionView(_ collectionView: NSCollectionView,
                         layout collectionViewLayout: NSCollectionViewLayout,
                         referenceSizeForFooterInSection section: Int) -> NSSize {
-        let width = isAddButtonFloating ? HorizontalSpace.button.rawValue + HorizontalSpace.buttonPadding.rawValue : 0
+        let width = HorizontalSpace.button.rawValue + HorizontalSpace.buttonPadding.rawValue
         return NSSize(width: width, height: collectionView.frame.size.height)
     }
 
