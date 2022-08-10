@@ -455,7 +455,7 @@ final class Tab: NSObject, Identifiable, ObservableObject {
         userContentController.$contentBlockingAssets.compactMap { $0?.completionTokens }.eraseToAnyPublisher()
     }
 
-    private static let debugEvents = EventMapping<AMPProtectionDebugEvents> { event, _, _, _, _ in
+    private static let debugEvents = EventMapping<AMPProtectionDebugEvents> { event, _, _, _ in
         switch event {
         case .ampBlockingRulesCompilationFailed:
             Pixel.fire(.ampBlockingRulesCompilationFailed)
@@ -849,23 +849,26 @@ extension Tab: ContentBlockerRulesUserScriptDelegate {
     func contentBlockerRulesUserScriptShouldProcessCTLTrackers(_ script: ContentBlockerRulesUserScript) -> Bool {
         return fbBlockingEnabled
     }
-
-    func contentBlockerRulesUserScript(_ script: ContentBlockerRulesUserScript, detectedTracker tracker: DetectedTracker) {
+    
+    func contentBlockerRulesUserScript(_ script: ContentBlockerRulesUserScript, detectedTracker tracker: DetectedRequest) {
         trackerInfo?.add(detectedTracker: tracker)
         guard let url = URL(string: tracker.pageUrl) else { return }
         historyCoordinating.addDetectedTracker(tracker, onURL: url)
     }
 
+    func contentBlockerRulesUserScript(_ script: ContentBlockerRulesUserScript, detectedThirdPartyRequest tracker: DetectedRequest) {
+        // no-op for now
+    }
+    
 }
 
 extension HistoryCoordinating {
 
-    func addDetectedTracker(_ tracker: DetectedTracker, onURL url: URL, contentBlocking: ContentBlocking = ContentBlocking.shared) {
+    func addDetectedTracker(_ tracker: DetectedRequest, onURL url: URL) {
         trackerFound(on: url)
 
-        guard tracker.blocked,
-              let domain = tracker.domain,
-              let entityName = contentBlocking.entityName(forDomain: domain) else { return }
+        guard tracker.isBlocked,
+              let entityName = tracker.entityName else { return }
 
         addBlockedTracker(entityName: entityName, on: url)
     }
@@ -908,7 +911,7 @@ extension Tab: SurrogatesUserScriptDelegate {
         return true
     }
 
-    func surrogatesUserScript(_ script: SurrogatesUserScript, detectedTracker tracker: DetectedTracker, withSurrogate host: String) {
+    func surrogatesUserScript(_ script: SurrogatesUserScript, detectedTracker tracker: DetectedRequest, withSurrogate host: String) {
         trackerInfo?.add(installedSurrogateHost: host)
         trackerInfo?.add(detectedTracker: tracker)
         guard let url = webView.url else { return }
