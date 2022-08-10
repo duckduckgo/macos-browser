@@ -22,9 +22,14 @@ import CoreData
 extension BookmarkManagedObject {
 
     enum BookmarkError: Error {
+        case mustExistInsideRootFolder
         case folderStructureHasCycle
         case folderHasURL
         case bookmarkRequiresURL
+    }
+
+    public var mutableChildren: NSMutableOrderedSet {
+        return mutableOrderedSetValue(forKey: "children")
     }
 
     public override func validateForInsert() throws {
@@ -40,9 +45,16 @@ extension BookmarkManagedObject {
     // MARK: - Private
 
     func validate() throws {
+        try validateThatEntitiesExistInsideTheRootFolder()
         try validateBookmarkURLRequirement()
         try validateThatFoldersDoNotHaveURLs()
         try validateThatFolderHierarchyHasNoCycles()
+    }
+    
+    func validateThatEntitiesExistInsideTheRootFolder() throws {
+        if parentFolder == nil, id != .rootBookmarkFolderUUID {
+            throw BookmarkError.mustExistInsideRootFolder
+        }
     }
 
     func validateBookmarkURLRequirement() throws {

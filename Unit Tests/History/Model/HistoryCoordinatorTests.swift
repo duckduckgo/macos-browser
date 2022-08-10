@@ -50,6 +50,9 @@ class HistoryCoordinatorTests: XCTestCase {
         XCTAssert(historyCoordinator.history!.contains(where: { entry in
             entry.url == url
         }))
+
+        historyCoordinator.commitChanges(url: url)
+        Thread.sleep(forTimeInterval: 0.1)
         XCTAssert(historyStoringMock.saveCalled)
     }
 
@@ -66,6 +69,9 @@ class HistoryCoordinatorTests: XCTestCase {
         XCTAssert(historyCoordinator.history!.contains(where: { entry in
             entry.url == url
         }))
+
+        historyCoordinator.commitChanges(url: url)
+        Thread.sleep(forTimeInterval: 0.1)
         XCTAssert(historyStoringMock.saveCalled)
     }
 
@@ -86,24 +92,30 @@ class HistoryCoordinatorTests: XCTestCase {
         historyCoordinator.addVisit(of: url)
         Thread.sleep(forTimeInterval: 0.1)
 
-        historyStoringMock.saveCalled = false
         let title1 = "Title 1"
         historyCoordinator.updateTitleIfNeeded(title: title1, url: url)
         Thread.sleep(forTimeInterval: 0.1)
-        XCTAssert(historyStoringMock.saveCalled)
         XCTAssertEqual(historyCoordinator.history!.first?.title, title1)
 
-        historyStoringMock.saveCalled = false
         let title2 = "Title 2"
         historyCoordinator.updateTitleIfNeeded(title: title2, url: url)
         Thread.sleep(forTimeInterval: 0.1)
-        XCTAssert(historyStoringMock.saveCalled)
         XCTAssertEqual(historyCoordinator.history!.first?.title, title2)
 
-        historyStoringMock.saveCalled = false
         historyCoordinator.updateTitleIfNeeded(title: title2, url: url)
         Thread.sleep(forTimeInterval: 0.05)
-        XCTAssertFalse(historyStoringMock.saveCalled)
+
+        historyCoordinator.commitChanges(url: url)
+        Thread.sleep(forTimeInterval: 0.1)
+        XCTAssert(historyStoringMock.saveCalled)
+    }
+
+    func testWhenTabChangesContent_commitHistoryIsCalled() {
+        let historyCoordinatorMock = HistoryCoordinatingMock()
+        let tab = Tab(content: .url(.duckDuckGo), historyCoordinating: historyCoordinatorMock)
+        tab.setContent(.url(.aboutDuckDuckGo))
+
+        XCTAssert(historyCoordinatorMock.commitChangesCalled)
     }
 
     func testWhenHistoryIsBurning_ThenHistoryIsCleanedExceptFireproofDomains() {
@@ -143,6 +155,7 @@ class HistoryCoordinatorTests: XCTestCase {
         Thread.sleep(forTimeInterval: 0.1)
 
         historyCoordinator.markFailedToLoadUrl(url)
+        historyCoordinator.commitChanges(url: url)
         Thread.sleep(forTimeInterval: 0.1)
 
         XCTAssertEqual(url, historyStoringMock.savedHistoryEntries.last?.url)
@@ -162,6 +175,8 @@ class HistoryCoordinatorTests: XCTestCase {
         historyCoordinator.addVisit(of: url)
         Thread.sleep(forTimeInterval: 0.1)
 
+        historyCoordinator.commitChanges(url: url)
+        Thread.sleep(forTimeInterval: 0.1)
         XCTAssertEqual(url, historyStoringMock.savedHistoryEntries.last?.url)
         XCTAssertFalse(historyStoringMock.savedHistoryEntries.last?.failedToLoad ?? true)
     }
@@ -204,7 +219,7 @@ fileprivate extension HistoryCoordinator {
     static var aHistoryCoordinator: (HistoryStoringMock, HistoryCoordinator) {
         let historyStoringMock = HistoryStoringMock()
         historyStoringMock.cleanOldResult = .success(History())
-        historyStoringMock.removeEntriesResult = .success(History())
+        historyStoringMock.removeEntriesResult = .success(())
         let historyCoordinator = HistoryCoordinator(historyStoring: historyStoringMock)
         Thread.sleep(forTimeInterval: 0.1)
 

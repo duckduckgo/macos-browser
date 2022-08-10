@@ -6,6 +6,7 @@ disabled_rules:
   - block_based_kvo
   - compiler_protocol_init
   - unused_setter_value
+  - line_length
 
 opt_in_rules:
   - file_header
@@ -23,9 +24,6 @@ custom_rules:
     severity: error
 
 # Rule Config
-line_length:
-  warning: 150
-  ignores_comments: true
 identifier_name:
   min_length: 1
   max_length:
@@ -37,8 +35,11 @@ type_name:
     warning: 80
     error: 100
 file_length:
-  warning: 700
+  warning: 1200
   error: 1200
+type_body_length:
+  warning: 500
+  error: 500
 nesting:
   type_level: 2
 file_header:

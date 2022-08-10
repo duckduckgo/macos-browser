@@ -27,7 +27,7 @@ final class PrivacyDashboardViewController: NSViewController {
         static let initialContentHeight: CGFloat = 550
     }
 
-    @IBOutlet var webView: WKWebView!
+    private var webView: WKWebView!
     private var contentHeightConstraint: NSLayoutConstraint!
     private let privacyDashboardScript = PrivacyDashboardUserScript()
     private var cancellables = Set<AnyCancellable>()

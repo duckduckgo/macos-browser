@@ -16,8 +16,6 @@
 //  limitations under the License.
 //
 
-// swiftlint:disable file_length
-
 import Cocoa
 import os.log
 import BrowserServicesKit
@@ -66,6 +64,36 @@ extension AppDelegate {
               }
 
         RecentlyClosedCoordinator.shared.reopenItem(cacheItem)
+    }
+
+    @objc func openVisit(_ sender: NSMenuItem) {
+        guard let visit = sender.representedObject as? Visit,
+              let url = visit.historyEntry?.url else {
+            assertionFailure("Wrong represented object")
+            return
+        }
+
+        WindowsManager.openNewWindow(with: Tab(content: .contentFromURL(url)))
+    }
+
+    @objc func clearAllHistory(_ sender: NSMenuItem) {
+        guard let window = WindowsManager.openNewWindow(with: Tab(content: .homePage)),
+              let windowController = window.windowController as? MainWindowController else {
+            assertionFailure("No reference to main window controller")
+            return
+        }
+
+        windowController.mainViewController.clearAllHistory(sender)
+    }
+
+    @objc func clearThisHistory(_ sender: ClearThisHistoryMenuItem) {
+        guard let window = WindowsManager.openNewWindow(with: Tab(content: .homePage)),
+              let windowController = window.windowController as? MainWindowController else {
+            assertionFailure("No reference to main window controller")
+            return
+        }
+
+        windowController.mainViewController.clearThisHistory(sender)
     }
 
     // MARK: - Window
@@ -287,6 +315,10 @@ extension MainViewController {
         navigationBarViewController?.toggleDownloadsPopover(keepButtonVisible: false)
     }
 
+    @IBAction func toggleBookmarksBar(_ sender: Any) {
+        PersistentAppInterfaceSettings.shared.showBookmarksBar.toggle()
+    }
+
     // MARK: - History
 
     @IBAction func back(_ sender: Any?) {
@@ -318,6 +350,54 @@ extension MainViewController {
         }
 
         selectedTabViewModel.tab.openHomePage()
+    }
+
+    @objc func openVisit(_ sender: NSMenuItem) {
+        guard let visit = sender.representedObject as? Visit,
+              let url = visit.historyEntry?.url else {
+            assertionFailure("Wrong represented object")
+            return
+        }
+
+        guard let selectedTabViewModel = tabCollectionViewModel.selectedTabViewModel else {
+            os_log("MainViewController: No tab view model selected", type: .error)
+            return
+        }
+
+        selectedTabViewModel.tab.setContent(.contentFromURL(url))
+        adjustFirstResponder()
+    }
+
+    @objc func clearAllHistory(_ sender: NSMenuItem) {
+        guard let window = view.window else {
+            assertionFailure("No window")
+            return
+        }
+
+        let alert = NSAlert.clearAllHistoryAndDataAlert()
+        alert.beginSheetModal(for: window, completionHandler: { [weak self] response in
+            guard case .alertFirstButtonReturn = response, let self = self else {
+                return
+            }
+            FireCoordinator.fireViewModel.fire.burnAll(tabCollectionViewModel: self.tabCollectionViewModel)
+        })
+    }
+
+    @objc func clearThisHistory(_ sender: ClearThisHistoryMenuItem) {
+        guard let window = view.window else {
+            assertionFailure("No window")
+            return
+        }
+
+        let dateString = sender.dateString
+        let visits = sender.getVisits()
+        let alert = NSAlert.clearHistoryAndDataAlert(dateString: dateString)
+        alert.beginSheetModal(for: window, completionHandler: { response in
+            guard case .alertFirstButtonReturn = response else {
+                return
+            }
+            FireCoordinator.fireViewModel.fire.burnVisits(of: visits, except: FireproofDomains.shared)
+        })
     }
 
     // MARK: - Bookmarks
@@ -531,17 +611,7 @@ extension MainViewController {
     }
 
     @IBAction func resetBookmarks(_ sender: Any?) {
-        guard let topLevelEntities = LocalBookmarkManager.shared.list?.topLevelEntities else {
-            return
-        }
-
-        for entity in topLevelEntities {
-            if let folder = entity as? BookmarkFolder {
-                LocalBookmarkManager.shared.remove(folder: folder)
-            } else if let bookmark = entity as? Bookmark {
-                LocalBookmarkManager.shared.remove(bookmark: bookmark)
-            }
-        }
+        LocalBookmarkManager.shared.resetBookmarks()
     }
 
     @IBAction func resetMacWaitlistUnlockState(_ sender: Any?) {

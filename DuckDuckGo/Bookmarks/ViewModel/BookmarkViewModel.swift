@@ -19,7 +19,7 @@
 import AppKit
 
 struct BookmarkViewModel {
-
+ 
     let entity: BaseBookmarkEntity
 
     var menuTitle: String {
@@ -42,9 +42,6 @@ struct BookmarkViewModel {
     }
 
     var menuFavicon: NSImage? {
-        // Once we have bookmark folders
-        // bookmark.isFavorite ? bookmark.favicon?.makeFavoriteOverlay() : bookmark.favicon
-
         if let bookmark = entity as? Bookmark {
             let favicon = bookmark.favicon(.small)?.copy() as? NSImage
             favicon?.size = NSSize.faviconSize
@@ -54,7 +51,6 @@ struct BookmarkViewModel {
         } else {
             return nil
         }
-
     }
 
     // MARK: - Representing Color and Character

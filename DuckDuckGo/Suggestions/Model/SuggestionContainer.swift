@@ -116,6 +116,12 @@ extension SuggestionContainer: SuggestionLoadingDataSource {
 
 }
 
-extension HistoryEntry: BrowserServicesKit.HistoryEntry {}
+extension HistoryEntry: BrowserServicesKit.HistoryEntry {
+
+    var numberOfVisits: Int {
+        return numberOfTotalVisits
+    }
+
+}
 
 extension Bookmark: BrowserServicesKit.Bookmark {}

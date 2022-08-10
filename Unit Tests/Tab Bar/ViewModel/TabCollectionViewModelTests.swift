@@ -20,8 +20,6 @@ import XCTest
 @testable import DuckDuckGo_Privacy_Browser
 
 // MARK: - Tests for TabCollectionViewModel with PinnedTabsManager but without pinned tabs
-
-// swiftlint:disable:next type_body_length
 final class TabCollectionViewModelTests: XCTestCase {
 
     // MARK: - TabViewModel

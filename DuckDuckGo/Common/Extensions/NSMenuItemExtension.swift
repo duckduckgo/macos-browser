@@ -29,6 +29,27 @@ extension NSMenuItem {
         self.init()
         self.action = selector
     }
+    
+    convenience init(bookmarkViewModel: BookmarkViewModel) {
+        self.init()
+
+        title = bookmarkViewModel.menuTitle
+        image = bookmarkViewModel.menuFavicon
+        representedObject = bookmarkViewModel.entity
+        action = #selector(MainViewController.openBookmark(_:))
+    }
+
+    convenience init(bookmarkViewModels: [BookmarkViewModel]) {
+        self.init()
+
+        title = UserText.bookmarksOpenInNewTabs
+        representedObject = bookmarkViewModels
+        action = #selector(MainViewController.openAllInTabs(_:))
+    }
+
+    convenience init(title: String) {
+        self.init(title: title, action: nil, keyEquivalent: "")
+    }
 
     var topMenu: NSMenu? {
         var menuItem = self
@@ -37,6 +58,10 @@ extension NSMenuItem {
         }
 
         return menuItem.menu
+    }
+
+    func removeFromParent() {
+        parent?.submenu?.removeItem(self)
     }
 
 }

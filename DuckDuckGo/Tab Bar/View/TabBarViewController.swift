@@ -22,9 +22,6 @@ import Combine
 import Lottie
 import SwiftUI
 
-// swiftlint:disable file_length
-// swiftlint:disable type_body_length
-
 final class TabBarViewController: NSViewController {
 
     enum HorizontalSpace: CGFloat {
@@ -37,6 +34,7 @@ final class TabBarViewController: NSViewController {
     @IBOutlet weak var collectionView: TabBarCollectionView!
     @IBOutlet weak var scrollView: TabBarScrollView!
     @IBOutlet weak var pinnedTabsViewLeadingConstraint: NSLayoutConstraint!
+    @IBOutlet weak var pinnedTabsWindowDraggingView: WindowDraggingView!
     @IBOutlet weak var rightScrollButton: MouseOverButton!
     @IBOutlet weak var leftScrollButton: MouseOverButton!
     @IBOutlet weak var rightShadowImageView: NSImageView!
@@ -141,7 +139,9 @@ final class TabBarViewController: NSViewController {
 
     private func setupPinnedTabsView() {
         layoutPinnedTabsView()
-        subscribeToPinnedTabsViewModel()
+        subscribeToPinnedTabsViewModelOutputs()
+        subscribeToPinnedTabsViewModelInputs()
+        subscribeToPinnedTabsHostingView()
     }
 
     private func layoutPinnedTabsView() {
@@ -160,7 +160,7 @@ final class TabBarViewController: NSViewController {
         ])
     }
 
-    private func subscribeToPinnedTabsViewModel() {
+    private func subscribeToPinnedTabsViewModelInputs() {
         guard let pinnedTabsViewModel = pinnedTabsViewModel else { return }
 
         tabCollectionViewModel.$selectionIndex
@@ -184,6 +184,10 @@ final class TabBarViewController: NSViewController {
             }
             .assign(to: \.shouldDrawLastItemSeparator, onWeaklyHeld: pinnedTabsViewModel)
             .store(in: &cancellables)
+    }
+
+    private func subscribeToPinnedTabsViewModelOutputs() {
+        guard let pinnedTabsViewModel = pinnedTabsViewModel else { return }
 
         pinnedTabsViewModel.tabsDidReorderPublisher
             .sink { [weak self] tabs in
@@ -211,10 +215,22 @@ final class TabBarViewController: NSViewController {
             }
             .store(in: &cancellables)
 
+        pinnedTabsViewModel.$dragMovesWindow.map(!)
+            .assign(to: \.pinnedTabsWindowDraggingView.isHidden, onWeaklyHeld: self)
+            .store(in: &cancellables)
+    }
+
+    private func subscribeToPinnedTabsHostingView() {
         pinnedTabsHostingView?.middleClickPublisher
             .compactMap { [weak self] in self?.pinnedTabsView?.itemIndex(for: $0) }
             .sink { [weak self] index in
                 self?.tabCollectionViewModel.remove(at: .pinned(index))
+            }
+            .store(in: &cancellables)
+
+        pinnedTabsWindowDraggingView.mouseDownPublisher
+            .sink { [weak self] _ in
+                self?.pinnedTabsViewModel?.selectedItem = self?.pinnedTabsViewModel?.items.first
             }
             .store(in: &cancellables)
     }
@@ -559,8 +575,8 @@ final class TabBarViewController: NSViewController {
         var point = view.bounds.origin
         point.y -= TabPreviewWindowController.VerticalSpace.padding.rawValue
         point.x += xPosition
-        let converted = window.convertPoint(toScreen: view.convert(point, to: nil))
-        tabPreviewWindowController.scheduleShowing(parentWindow: window, timerInterval: interval, topLeftPoint: converted)
+        let pointInWindow = view.convert(point, to: nil)
+        tabPreviewWindowController.scheduleShowing(parentWindow: window, timerInterval: interval, topLeftPointInWindow: pointInWindow)
     }
 
     func hideTabPreview() {
@@ -782,7 +798,7 @@ extension TabBarViewController: NSCollectionViewDataSource {
         }
 
         tabBarViewItem.delegate = self
-        tabBarViewItem.subscribe(to: tabViewModel)
+        tabBarViewItem.subscribe(to: tabViewModel, tabCollectionViewModel: tabCollectionViewModel)
 
         return tabBarViewItem
     }
@@ -832,10 +848,8 @@ extension TabBarViewController: NSCollectionViewDelegate {
         hideTabPreview()
     }
 
-    func collectionView(_ collectionView: NSCollectionView,
-                        canDragItemsAt indexPaths: Set<IndexPath>,
-                        with event: NSEvent) -> Bool {
-        return true
+    func collectionView(_ collectionView: NSCollectionView, canDragItemsAt indexPaths: Set<IndexPath>, with event: NSEvent) -> Bool {
+        tabCollectionViewModel.tabCollection.tabs.count > 1
     }
 
     func collectionView(_ collectionView: NSCollectionView,

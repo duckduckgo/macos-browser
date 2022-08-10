@@ -34,7 +34,7 @@ final class BookmarkStoreMock: BookmarkStore {
     var saveBookmarkCalled = false
     var saveBookmarkSuccess = true
     var saveBookmarkError: Error?
-    func save(bookmark: Bookmark, parent: BookmarkFolder?, completion: @escaping (Bool, Error?) -> Void) {
+    func save(bookmark: Bookmark, parent: BookmarkFolder?, index: Int?, completion: @escaping (Bool, Error?) -> Void) {
         saveBookmarkCalled = true
         bookmarks?.append(bookmark)
         completion(saveBookmarkSuccess, saveBookmarkError)
@@ -90,6 +90,17 @@ final class BookmarkStoreMock: BookmarkStore {
     func importBookmarks(_ bookmarks: ImportedBookmarks, source: BookmarkImportSource) -> BookmarkImportResult {
         importBookmarksCalled = true
         return BookmarkImportResult(successful: 0, duplicates: 0, failed: 0)
+    }
+    
+    var canMoveObjectWithUUIDCalled = false
+    func canMoveObjectWithUUID(objectUUID uuid: UUID, to parent: BookmarkFolder) -> Bool {
+        canMoveObjectWithUUIDCalled = true
+        return true
+    }
+    
+    var moveObjectUUIDCalled = false
+    func move(objectUUID: UUID, toIndex: Int?, withinParentFolder: ParentFolderType, completion: @escaping (Error?) -> Void) {
+        moveObjectUUIDCalled = true
     }
 
 }

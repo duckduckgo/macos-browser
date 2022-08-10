@@ -21,7 +21,6 @@ import Combine
 import os.log
 import BrowserServicesKit
 
-// swiftlint:disable type_body_length file_length
 final class NavigationBarViewController: NSViewController {
 
     enum Constants {
@@ -138,6 +137,7 @@ final class NavigationBarViewController: NSViewController {
         listenToPasswordManagerNotifications()
         listenToMessageNotifications()
         subscribeToDownloads()
+        addContextMenu()
 
         optionsButton.sendAction(on: .leftMouseDown)
         bookmarkListButton.sendAction(on: .leftMouseDown)
@@ -298,8 +298,7 @@ final class NavigationBarViewController: NSViewController {
     @objc private func showAutoconsentFeedback(_ sender: Notification) {
         if #available(macOS 11, *) {
             guard view.window?.isKeyWindow == true,
-                  let topUrl = sender.userInfo?["topUrl"] as? URL,
-                  let relativeTarget = self.addressBarViewController?.addressBarButtonsViewController?.privacyEntryPointButton
+                  let topUrl = sender.userInfo?["topUrl"] as? URL
             else { return }
             DispatchQueue.main.async { [weak self] in
                 guard let self = self,
@@ -307,9 +306,7 @@ final class NavigationBarViewController: NSViewController {
                           // if the tab is not active, don't show the popup
                           return
                       }
-
-                let viewController = PopoverMessageViewController.createWithMessage(UserText.autoconsentPopoverMessage)
-                viewController.show(onParent: self, relativeTo: relativeTarget)
+                self.addressBarViewController?.addressBarButtonsViewController?.showBadgeNotification(.cookieManaged)                
             }
         }
     }
@@ -429,7 +426,7 @@ final class NavigationBarViewController: NSViewController {
         barTop?.constant = homePage ? 16 : verticalPadding
 
         let bottom = animated ? addressBarBottomConstraint.animator() : addressBarBottomConstraint
-        bottom?.constant = homePage ? 0 : verticalPadding
+        bottom?.constant = homePage ? 2 : verticalPadding
 
         let logoWidth = animated ? logoWidthConstraint.animator() : logoWidthConstraint
         logoWidth?.constant = homePage ? 44 : 0
@@ -477,6 +474,12 @@ final class NavigationBarViewController: NSViewController {
             }
             .assign(to: \.progress, onWeaklyHeld: downloadsProgressView)
             .store(in: &downloadsCancellables)
+    }
+    
+    private func addContextMenu() {
+        let menu = NSMenu()
+        menu.delegate = self
+        self.view.menu = menu
     }
 
     private func updatePasswordManagementButton() {
@@ -628,7 +631,25 @@ final class NavigationBarViewController: NSViewController {
     }
 
 }
-// swiftlint:enable type_body_length
+
+extension NavigationBarViewController: NSMenuDelegate {
+    
+    public func menuNeedsUpdate(_ menu: NSMenu) {
+        menu.removeAllItems()
+        
+        if PersistentAppInterfaceSettings.shared.showBookmarksBar {
+            menu.addItem(withTitle: UserText.hideBookmarksBar, action: #selector(toggleBookmarksBar), keyEquivalent: "")
+        } else {
+            menu.addItem(withTitle: UserText.showBookmarksBar, action: #selector(toggleBookmarksBar), keyEquivalent: "")
+        }
+    }
+    
+    @objc
+    private func toggleBookmarksBar(_ sender: NSMenuItem) {
+        PersistentAppInterfaceSettings.shared.showBookmarksBar.toggle()
+    }
+
+}
 
 extension NavigationBarViewController: OptionsButtonMenuDelegate {
 

@@ -21,9 +21,6 @@ import Combine
 import os.log
 import BrowserServicesKit
 
-// swiftlint:disable file_length
-// swiftlint:disable type_body_length
-
 protocol AddressBarTextFieldDelegate: AnyObject {
 
     func adressBarTextField(_ addressBarTextField: AddressBarTextField, didChangeValue value: AddressBarTextField.Value)
@@ -1079,6 +1076,3 @@ final class AddressBarTextFieldCell: NSTextFieldCell {
 fileprivate extension NSStoryboard {
     static let suggestion = NSStoryboard(name: "Suggestion", bundle: .main)
 }
-
-// swiftlint:enable type_body_length
-// swiftlint:enable file_length

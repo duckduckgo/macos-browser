@@ -56,7 +56,7 @@ final class TabPreviewWindowController: NSWindowController {
         NotificationCenter.default.removeObserver(self)
     }
 
-    func scheduleShowing(parentWindow: NSWindow, timerInterval: TimerInterval, topLeftPoint: NSPoint) {
+    func scheduleShowing(parentWindow: NSWindow, timerInterval: TimerInterval, topLeftPointInWindow: CGPoint) {
         if isHiding { return }
 
         guard let childWindows = parentWindow.childWindows,
@@ -68,14 +68,14 @@ final class TabPreviewWindowController: NSWindowController {
         hidingTimer?.invalidate()
 
         if childWindows.contains(tabPreviewWindow) {
-            layout(topLeftPoint: topLeftPoint)
+            layout(topLeftPoint: parentWindow.convertPoint(toScreen: topLeftPointInWindow))
             return
         }
 
         showingTimer?.invalidate()
         showingTimer = Timer.scheduledTimer(withTimeInterval: timerInterval.rawValue, repeats: false, block: { [weak self] _ in
             parentWindow.addChildWindow(tabPreviewWindow, ordered: .above)
-            self?.layout(topLeftPoint: topLeftPoint)
+            self?.layout(topLeftPoint: parentWindow.convertPoint(toScreen: topLeftPointInWindow))
         })
     }
 

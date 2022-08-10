@@ -23,8 +23,6 @@ import CoreLocation
 import WebKit
 @testable import DuckDuckGo_Privacy_Browser
 
-// swiftlint:disable file_length
-// swiftlint:disable type_body_length
 // swiftlint:disable function_body_length
 final class GeolocationProviderTests: XCTestCase {
 
@@ -659,7 +657,6 @@ final class GeolocationProviderTests: XCTestCase {
     }
 
 }
-// swiftlint:enable type_body_length
 // swiftlint:enable function_body_length
 
 extension GeolocationProviderTests: WKUIDelegate {
@@ -769,5 +766,3 @@ extension CLLocation {
         }
     }
 }
-
-// swiftlint:enable file_length

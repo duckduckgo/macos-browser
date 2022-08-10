@@ -61,7 +61,7 @@ final class ContentBlocking {
 
     }
 
-    private static let debugEvents = EventMapping<ContentBlockerDebugEvents> { event, scope, error, parameters, onComplete in
+    private static let debugEvents = EventMapping<ContentBlockerDebugEvents> { event, error, parameters, onComplete in
 #if DEBUG
         guard !AppDelegate.isRunningTests else { return }
 #endif
@@ -85,51 +85,25 @@ final class ContentBlocking {
 
         case .privacyConfigurationCouldNotBeLoaded:
             domainEvent = .privacyConfigurationCouldNotBeLoaded
-
-        case .contentBlockingTDSCompilationFailed:
-            if scope == DefaultContentBlockerRulesListsSource.Constants.trackerDataSetRulesListName {
-                domainEvent = .contentBlockingTDSCompilationFailed
-            } else if scope == ContentBlockerRulesLists.Constants.clickToLoadRulesListName {
-                domainEvent = .clickToLoadTDSCompilationFailed
-            } else {
-                domainEvent = .contentBlockingErrorReportingIssue
+            
+        case .contentBlockingCompilationFailed(let listName, let component):
+            let defaultTDSListName = DefaultContentBlockerRulesListsSource.Constants.trackerDataSetRulesListName
+            
+            let listType: Pixel.Event.CompileRulesListType
+            switch listName {
+            case defaultTDSListName:
+                listType = .tds
+            case ContentBlockerRulesLists.Constants.clickToLoadRulesListName:
+                listType = .clickToLoad
+            case AdClickAttributionRulesSplitter.blockingAttributionRuleListName(forListNamed: defaultTDSListName):
+                listType = .blockingAttribution
+            case AdClickAttributionRulesProvider.Constants.attributedTempRuleListName:
+                listType = .attributed
+            default:
+                listType = .unknown
             }
 
-        case .contentBlockingTempListCompilationFailed:
-            if scope == DefaultContentBlockerRulesListsSource.Constants.trackerDataSetRulesListName {
-                domainEvent = .contentBlockingTempListCompilationFailed
-            } else if scope == ContentBlockerRulesLists.Constants.clickToLoadRulesListName {
-                domainEvent = .clickToLoadTempListCompilationFailed
-            } else {
-                domainEvent = .contentBlockingErrorReportingIssue
-            }
-
-        case .contentBlockingAllowListCompilationFailed:
-            if scope == DefaultContentBlockerRulesListsSource.Constants.trackerDataSetRulesListName {
-                domainEvent = .contentBlockingAllowListCompilationFailed
-            } else if scope == ContentBlockerRulesLists.Constants.clickToLoadRulesListName {
-                domainEvent = .clickToLoadAllowListCompilationFailed
-            } else {
-                domainEvent = .contentBlockingErrorReportingIssue
-            }
-
-        case .contentBlockingUnpSitesCompilationFailed:
-            if scope == DefaultContentBlockerRulesListsSource.Constants.trackerDataSetRulesListName {
-                domainEvent = .contentBlockingUnpSitesCompilationFailed
-            } else if scope == ContentBlockerRulesLists.Constants.clickToLoadRulesListName {
-                domainEvent = .clickToLoadUnpSitesCompilationFailed
-            } else {
-                domainEvent = .contentBlockingErrorReportingIssue
-            }
-
-        case .contentBlockingFallbackCompilationFailed:
-            if scope == DefaultContentBlockerRulesListsSource.Constants.trackerDataSetRulesListName {
-                domainEvent = .contentBlockingFallbackCompilationFailed
-            } else if scope == ContentBlockerRulesLists.Constants.clickToLoadRulesListName {
-                domainEvent = .clickToLoadFallbackCompilationFailed
-            } else {
-                domainEvent = .contentBlockingErrorReportingIssue
-            }
+            domainEvent = .contentBlockingCompilationFailed(listType: listType, component: component)
 
         case .contentBlockingCompilationTime:
             domainEvent = .contentBlockingCompilationTime

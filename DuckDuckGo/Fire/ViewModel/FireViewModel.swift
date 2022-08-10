@@ -25,6 +25,10 @@ final class FireViewModel {
 
     @Published var isAnimationPlaying = false
 
+    var isBurning: Bool {
+        fire.burningData != nil
+    }
+
     /// Publisher that emits true if burning animation or burning process is in progress
     var shouldPreventUserInteraction: AnyPublisher<Bool, Never> {
         Publishers

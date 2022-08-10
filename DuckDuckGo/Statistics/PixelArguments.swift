@@ -406,4 +406,15 @@ extension Pixel.Event {
         case bookmarksHTML = "source-bookmarks-html"
     }
 
+    public enum CompileRulesListType: String, CustomStringConvertible {
+    
+        public var description: String { rawValue }
+        
+        case tds = "tracker_data"
+        case clickToLoad = "click_to_load"
+        case blockingAttribution = "blocking_attribution"
+        case attributed = "attributed"
+        case unknown = "unknown"
+        
+    }
 }
