@@ -27,15 +27,17 @@ internal class ChromiumDataImporter: DataImporter {
     private let applicationDataDirectoryURL: URL
     private let bookmarkImporter: BookmarkImporter
     private let loginImporter: LoginImporter
+    private let cookieImporter: CookieImporter
 
-    init(applicationDataDirectoryURL: URL, loginImporter: LoginImporter, bookmarkImporter: BookmarkImporter) {
+    init(applicationDataDirectoryURL: URL, loginImporter: LoginImporter, bookmarkImporter: BookmarkImporter, cookieImporter: CookieImporter) {
         self.applicationDataDirectoryURL = applicationDataDirectoryURL
         self.loginImporter = loginImporter
         self.bookmarkImporter = bookmarkImporter
+        self.cookieImporter = cookieImporter
     }
 
     func importableTypes() -> [DataImport.DataType] {
-        return [.logins, .bookmarks]
+        return [.logins, .bookmarks, .cookies]
     }
 
     func importData(types: [DataImport.DataType],
@@ -89,7 +91,28 @@ internal class ChromiumDataImporter: DataImporter {
             }
         }
 
-        completion(.success(summary))
+        if types.contains(.cookies) {
+            let cookieReader = ChromiumCookiesReader(chromiumDataDirectoryURL: dataDirectoryURL, processName: processName)
+            let cookiesResult = cookieReader.readCookies()
+
+            switch cookiesResult {
+            case .success(let cookies):
+                if cookies.isEmpty {
+                    completion(.success(summary))
+                } else {
+                    let s = summary
+                    Task { @MainActor in
+                        var summary = s
+                        summary.cookiesResult = await cookieImporter.importCookies(cookies)
+                        completion(.success(summary))
+                    }
+                }
+            case .failure(let error):
+                completion(.failure(.cookies(error)))
+            }
+        } else {
+            completion(.success(summary))
+        }
     }
 
 }

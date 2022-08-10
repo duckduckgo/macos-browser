@@ -364,7 +364,19 @@ struct DataImportError: Error, Equatable {
         switch errorType {
         case .noCookiesFileFound: return DataImportError(actionType: .cookies, errorType: .noFileFound)
         case .unexpectedCookiesDatabaseFormat: return DataImportError(actionType: .cookies, errorType: .cannotReadFile)
-        case .failedToTemporarilyCopyFile: return DataImportError(actionType: .bookmarks, errorType: .failedToTemporarilyCopyFile)
+        case .failedToTemporarilyCopyFile: return DataImportError(actionType: .cookies, errorType: .failedToTemporarilyCopyFile)
+        }
+    }
+
+    static func cookies(_ errorType: ChromiumCookiesReader.ImportError) -> DataImportError {
+        switch errorType {
+        case .noCookiesFileFound: return DataImportError(actionType: .cookies, errorType: .noFileFound)
+        case .unexpectedCookiesDatabaseFormat: return DataImportError(actionType: .cookies, errorType: .cannotReadFile)
+        case .failedToTemporarilyCopyFile: return DataImportError(actionType: .cookies, errorType: .failedToTemporarilyCopyFile)
+        case .decryptionFailed: return DataImportError(actionType: .cookies, errorType: .cannotReadFile)
+        case .failedToDecodePasswordData: return DataImportError(actionType: .cookies, errorType: .cannotReadFile)
+        case .userDeniedKeychainPrompt: return DataImportError(actionType: .cookies, errorType: .userDeniedKeychainPrompt)
+        case .decryptionKeyAccessFailed(let status): return DataImportError(actionType: .cookies, errorType: .couldNotAccessKeychain(status))
         }
     }
 
