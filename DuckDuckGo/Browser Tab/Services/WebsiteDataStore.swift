@@ -39,7 +39,7 @@ internal class WebCacheManager {
     static var shared = WebCacheManager()
 
     private let fireproofDomains: FireproofDomains
-    private let websiteDataStore: WebsiteDataStore
+    let websiteDataStore: WebsiteDataStore
 
     init(fireproofDomains: FireproofDomains = FireproofDomains.shared,
          websiteDataStore: WebsiteDataStore = WKWebsiteDataStore.default()) {

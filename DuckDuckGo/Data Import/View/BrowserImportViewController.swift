@@ -48,6 +48,7 @@ final class BrowserImportViewController: NSViewController {
     @IBOutlet var bookmarksCheckbox: NSButton!
     @IBOutlet var passwordsCheckbox: NSButton!
     @IBOutlet var passwordsWarningLabel: NSTextField!
+    @IBOutlet var cookiesCheckbox: NSButton!
 
     weak var delegate: BrowserImportViewControllerDelegate?
 
@@ -60,6 +61,10 @@ final class BrowserImportViewController: NSViewController {
 
         if passwordsCheckbox.state == .on && !passwordsCheckbox.isHidden {
             options.append(.logins)
+        }
+
+        if cookiesCheckbox.state == .on && !cookiesCheckbox.isHidden {
+            options.append(.cookies)
         }
 
         return options

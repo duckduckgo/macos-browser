@@ -394,6 +394,7 @@ extension Pixel.Event {
 
         case importBookmarks = "bookmarks"
         case importLogins = "logins"
+        case importCookies = "cookies"
         case generic = "generic"
     }
     

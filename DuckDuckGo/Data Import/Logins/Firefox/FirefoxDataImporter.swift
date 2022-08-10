@@ -24,14 +24,16 @@ final class FirefoxDataImporter: DataImporter {
 
     let loginImporter: LoginImporter
     let bookmarkImporter: BookmarkImporter
+    let cookieImporter: CookieImporter
 
-    init(loginImporter: LoginImporter, bookmarkImporter: BookmarkImporter) {
+    init(loginImporter: LoginImporter, bookmarkImporter: BookmarkImporter, cookieImporter: CookieImporter) {
         self.loginImporter = loginImporter
         self.bookmarkImporter = bookmarkImporter
+        self.cookieImporter = cookieImporter
     }
 
     func importableTypes() -> [DataImport.DataType] {
-        return [.logins, .bookmarks]
+        return [.logins, .bookmarks, .cookies]
     }
 
     // swiftlint:disable:next cyclomatic_complexity
@@ -94,7 +96,28 @@ final class FirefoxDataImporter: DataImporter {
             }
         }
 
-        completion(.success(summary))
+        if types.contains(.cookies) {
+            let cookieReader = FirefoxCookiesReader(firefoxDataDirectoryURL: firefoxProfileURL)
+            let cookiesResult = cookieReader.readCookies()
+
+            switch cookiesResult {
+            case .success(let cookies):
+                if cookies.isEmpty {
+                    completion(.success(summary))
+                } else {
+                    let s = summary
+                    Task { @MainActor in
+                        var summary = s
+                        summary.cookiesResult = await cookieImporter.importCookies(cookies)
+                        completion(.success(summary))
+                    }
+                }
+            case .failure(let error):
+                completion(.failure(.cookies(error)))
+            }
+        } else {
+            completion(.success(summary))
+        }
     }
     
     func importData(types: [DataImport.DataType], from profile: DataImport.BrowserProfile?) async -> Result<DataImport.Summary, DataImportError> {

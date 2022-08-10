@@ -82,6 +82,7 @@ enum DataImport {
 
     enum DataType {
         case bookmarks
+        case cookies
         case logins
     }
 
@@ -99,9 +100,10 @@ enum DataImport {
     struct Summary: Equatable {
         var bookmarksResult: BookmarkImportResult?
         var loginsResult: LoginsResult?
+        var cookiesResult: CookieImportResult?
 
         var isEmpty: Bool {
-            bookmarksResult == nil && loginsResult == nil
+            bookmarksResult == nil && loginsResult == nil && cookiesResult == nil
         }
     }
 
@@ -235,12 +237,14 @@ struct DataImportError: Error, Equatable {
     enum ImportErrorAction {
         case bookmarks
         case logins
+        case cookies
         case generic
         
         var pixelEventAction: Pixel.Event.DataImportAction {
             switch self {
             case .bookmarks: return .importBookmarks
             case .logins: return .importLogins
+            case .cookies: return .importCookies
             case .generic: return .generic
             }
         }
@@ -349,6 +353,20 @@ struct DataImportError: Error, Equatable {
     
     let actionType: ImportErrorAction
     let errorType: ImportErrorType
+
+    // MARK: Cookie Error Types
+
+    static func cookies(_ errorType: ImportErrorType) -> DataImportError {
+        return DataImportError(actionType: .cookies, errorType: errorType)
+    }
+
+    static func cookies(_ errorType: FirefoxCookiesReader.ImportError) -> DataImportError {
+        switch errorType {
+        case .noCookiesFileFound: return DataImportError(actionType: .cookies, errorType: .noFileFound)
+        case .unexpectedCookiesDatabaseFormat: return DataImportError(actionType: .cookies, errorType: .cannotReadFile)
+        case .failedToTemporarilyCopyFile: return DataImportError(actionType: .bookmarks, errorType: .failedToTemporarilyCopyFile)
+        }
+    }
 
 }
 
