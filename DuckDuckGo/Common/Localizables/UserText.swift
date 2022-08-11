@@ -524,5 +524,18 @@ struct UserText {
     static let adaptiveDarkModeOptInPopoverConfirmButton = NSLocalizedString("adaptivedarkmode.optinpopover.button.confirm", value: "Enable", comment: "Confirm button for Opt-In adaptive dark mode popover")
     static let adaptiveDarkModeOptInPopoverDenyButton = NSLocalizedString("adaptivedarkmode.optinpopover.button.deny", value: "No Thanks", comment: "Deny button for Opt-In adaptive dark mode popover")
 
+    static let adaptiveDarkModeWebsiteSettingsViewTitle = NSLocalizedString("adaptivedarkmode.website.settingsview.title", value: "Adaptive Dark Mode", comment: "Adaptive Dark Mode website settings view title")
 
+    static let adaptiveDarkModeWebsiteSettingsViewFooter = NSLocalizedString("adaptivedarkmode.website.settingsview.footer", value: "You can manage Adaptive Dark Mode for all sites in Settings", comment: "Adaptive Dark Mode website settings view footer")
+
+    
+    static func adaptiveDarkModeEnabledFor(website: String) -> String {
+        let localized = NSLocalizedString("adaptivedarkmode.website.settingsview.website.enabled", value: "Enabled for \"%@\"", comment: "Adaptive Dark Mode enabled status for website")
+        return String(format: localized, website)
+    }
+    
+    static func adaptiveDarkModeDisabledFor(website: String) -> String {
+        let localized = NSLocalizedString("adaptivedarkmode.website.settingsview.website.enabled", value: "Disabled for \"%@\"", comment: "Adaptive Dark Mode disabled status for website")
+        return String(format: localized, website)
+    }
 }
