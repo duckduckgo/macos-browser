@@ -21,6 +21,7 @@ import BrowserServicesKit
 
 protocol ContextMenuDelegate: AnyObject {
 
+    // swiftlint:disable:next function_parameter_count
     func contextMenu(forUserScript script: ContextMenuUserScript,
                      willShowAt position: NSPoint,
                      image: URL?,
