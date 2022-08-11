@@ -78,33 +78,31 @@ final class FirefoxCookiesReader {
     }
 
     fileprivate struct Cookie: FetchableRecord {
-        let id: Int?
         let name: String?
         let value: String?
         let domain: String?
         let path: String?
         let expiry: Date?
-        let isSecure: Bool
+        let isSecure: String?
         let sameSite: String?
-        let isHTTPOnly: Bool
+        let isHTTPOnly: Bool?
 
         init(row: Row) {
-            id = row["id"]
             name = row["name"]
             value = row["value"]
             domain = row["host"]
             path = row["path"]
             expiry = Date(timeIntervalSince1970: TimeInterval(row["expiry"] as Int))
-            isSecure = row["isSecure"] == 1
+            isSecure = row["isSecure"] == 1 ? "TRUE" : nil
             sameSite = row["sameSite"] != 0 ? "strict" : nil
-            isHTTPOnly = row["isHttpOnly"] == 1
+            isHTTPOnly = row["isHttpOnly"] == 1 ? true : nil
         }
     }
 
     // MARK: - Database Queries
 
     func allCookiesQuery() -> String {
-        return "SELECT id,name,value,host,path,expiry,isSecure,isHttpOnly,sameSite FROM moz_cookies;"
+        return "SELECT name,value,host,path,expiry,isSecure,isHttpOnly,sameSite FROM moz_cookies;"
     }
 }
 

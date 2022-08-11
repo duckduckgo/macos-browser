@@ -130,7 +130,7 @@ final class ChromiumCookiesReader {
         let domain: String?
         let path: String?
         let expiry: Date?
-        let isSecure: Bool
+        let isSecure: String?
         let discard: String?
         let sameSite: String?
         let isHTTPOnly: Bool
@@ -144,11 +144,21 @@ final class ChromiumCookiesReader {
             let expiryTimestamp: Int64? = row["expires_utc"]
             expiry = expiryTimestamp.flatMap(Date.init(chromiumTimestamp:))
 
-            isSecure = row["is_secure"] == 1
-            sameSite = row["samesite"] == 1 ? "strict" : nil
+            isSecure = row["is_secure"] == 1 ? "TRUE" : nil
             isHTTPOnly = row["is_httponly"] == 1
-            discard = row["is_persistent"]
+            discard = row["is_persistent"] == 1 ? "TRUE" : "FALSE"
             port = row["source_port"]
+
+            switch row["samesite"] as? Int {
+            case 0:
+                sameSite = "none"
+            case 1:
+                sameSite = "lax"
+            case 2:
+                sameSite = "strict"
+            default:
+                sameSite = nil
+            }
         }
     }
 
