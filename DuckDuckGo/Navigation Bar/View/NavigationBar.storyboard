@@ -138,7 +138,7 @@
                                 </customSpacing>
                             </stackView>
                             <stackView distribution="fill" orientation="horizontal" alignment="top" spacing="4" horizontalStackHuggingPriority="249.99998474121094" verticalStackHuggingPriority="249.99998474121094" detachesHiddenViews="YES" translatesAutoresizingMaskIntoConstraints="NO" id="aWu-Jm-Oaz" userLabel="Menu Buttons">
-                                <rect key="frame" x="835" y="24" width="92" height="28"/>
+                                <rect key="frame" x="803" y="24" width="124" height="28"/>
                                 <subviews>
                                     <button translatesAutoresizingMaskIntoConstraints="NO" id="1nW-I1-nut" userLabel="Password Management Button" customClass="MouseOverButton" customModule="DuckDuckGo_Privacy_Browser" customModuleProvider="target">
                                         <rect key="frame" x="0.0" y="0.0" width="28" height="28"/>
@@ -218,8 +218,34 @@
                                             <action selector="bookmarksButtonAction:" target="o2v-eH-jTI" id="feR-3s-kbn"/>
                                         </connections>
                                     </button>
-                                    <button translatesAutoresizingMaskIntoConstraints="NO" id="iIF-Ky-unr" customClass="MouseOverButton" customModule="DuckDuckGo_Privacy_Browser" customModuleProvider="target">
+                                    <button translatesAutoresizingMaskIntoConstraints="NO" id="efu-Lo-orX" userLabel="DarkMode Button" customClass="MouseOverButton" customModule="DuckDuckGo_Privacy_Browser" customModuleProvider="target">
                                         <rect key="frame" x="64" y="0.0" width="28" height="28"/>
+                                        <constraints>
+                                            <constraint firstAttribute="width" constant="28" id="Am4-Dq-DFT"/>
+                                            <constraint firstAttribute="height" constant="28" id="QbH-gH-JwS"/>
+                                        </constraints>
+                                        <buttonCell key="cell" type="square" bezelStyle="shadowlessSquare" image="DarkModeNavButton" imagePosition="only" alignment="center" imageScaling="proportionallyDown" inset="2" id="IxP-dN-vtW">
+                                            <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
+                                            <font key="font" metaFont="system"/>
+                                        </buttonCell>
+                                        <color key="contentTintColor" name="ButtonColor"/>
+                                        <userDefinedRuntimeAttributes>
+                                            <userDefinedRuntimeAttribute type="color" keyPath="mouseOverColor">
+                                                <color key="value" name="ButtonMouseOverColor"/>
+                                            </userDefinedRuntimeAttribute>
+                                            <userDefinedRuntimeAttribute type="color" keyPath="mouseDownColor">
+                                                <color key="value" name="ButtonMouseDownColor"/>
+                                            </userDefinedRuntimeAttribute>
+                                            <userDefinedRuntimeAttribute type="number" keyPath="cornerRadius">
+                                                <real key="value" value="4"/>
+                                            </userDefinedRuntimeAttribute>
+                                        </userDefinedRuntimeAttributes>
+                                        <connections>
+                                            <action selector="adaptiveDarkModeButtonAction:" target="o2v-eH-jTI" id="KDb-3f-vpo"/>
+                                        </connections>
+                                    </button>
+                                    <button translatesAutoresizingMaskIntoConstraints="NO" id="iIF-Ky-unr" customClass="MouseOverButton" customModule="DuckDuckGo_Privacy_Browser" customModuleProvider="target">
+                                        <rect key="frame" x="96" y="0.0" width="28" height="28"/>
                                         <constraints>
                                             <constraint firstAttribute="width" constant="28" id="2ry-8Q-yfk"/>
                                             <constraint firstAttribute="height" constant="28" id="s7E-4e-eTj"/>
@@ -250,8 +276,10 @@
                                     <integer value="1000"/>
                                     <integer value="1000"/>
                                     <integer value="1000"/>
+                                    <integer value="1000"/>
                                 </visibilityPriorities>
                                 <customSpacing>
+                                    <real value="3.4028234663852886e+38"/>
                                     <real value="3.4028234663852886e+38"/>
                                     <real value="3.4028234663852886e+38"/>
                                     <real value="3.4028234663852886e+38"/>
@@ -283,6 +311,7 @@
                         </userDefinedRuntimeAttributes>
                     </view>
                     <connections>
+                        <outlet property="adaptiveDarkModeButton" destination="efu-Lo-orX" id="R58-Rh-xC7"/>
                         <outlet property="addressBarBottomConstraint" destination="Xaz-X5-bmg" id="Xsd-Ca-9o5"/>
                         <outlet property="addressBarContainer" destination="Wba-nA-FYj" id="VEq-Sp-Ns1"/>
                         <outlet property="addressBarLeftToNavButtonsConstraint" destination="rfA-3F-QAf" id="IJE-cK-DQ6"/>
@@ -815,6 +844,7 @@
         <image name="Camera-Icon" width="16" height="12"/>
         <image name="Camera-Tab-Blocked" width="16" height="14"/>
         <image name="Clear" width="9" height="9"/>
+        <image name="DarkModeNavButton" width="16" height="16"/>
         <image name="Downloads" width="16" height="16"/>
         <image name="ExternalAppScheme" width="16" height="16"/>
         <image name="Forward" width="16" height="16"/>

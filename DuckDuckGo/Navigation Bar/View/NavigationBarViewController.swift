@@ -40,6 +40,7 @@ final class NavigationBarViewController: NSViewController {
     @IBOutlet weak var daxLogo: NSImageView!
     @IBOutlet weak var addressBarStack: NSStackView!
 
+    @IBOutlet weak var adaptiveDarkModeButton: MouseOverButton!
     @IBOutlet var addressBarLeftToNavButtonsConstraint: NSLayoutConstraint!
     @IBOutlet var addressBarProportionalWidthConstraint: NSLayoutConstraint!
     @IBOutlet var addressBarTopConstraint: NSLayoutConstraint!
@@ -247,6 +248,10 @@ final class NavigationBarViewController: NSViewController {
         }
     }
 
+    @IBAction func adaptiveDarkModeButtonAction(_ sender: MouseOverButton) {
+        print("DarkMode")
+    }
+    
     @IBAction func downloadsButtonAction(_ sender: NSButton) {
         toggleDownloadsPopover(keepButtonVisible: false)
     }
