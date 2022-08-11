@@ -32,6 +32,8 @@
 		31F7F2A6288AD2CA001C0D64 /* NavigationBarBadgeAnimationView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 31F7F2A5288AD2CA001C0D64 /* NavigationBarBadgeAnimationView.swift */; };
 		31FB1CB928A52A080098F221 /* AdaptiveDarkModeOptInAlertView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 31FB1CB828A52A080098F221 /* AdaptiveDarkModeOptInAlertView.swift */; };
 		31FB1CBB28A535C70098F221 /* AdaptiveDarkModeWebsiteSettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 31FB1CBA28A535C70098F221 /* AdaptiveDarkModeWebsiteSettingsView.swift */; };
+		31FB1CBD28A543D00098F221 /* AdaptiveDarkModeWebsiteSettingsPopover.swift in Sources */ = {isa = PBXBuildFile; fileRef = 31FB1CBC28A543D00098F221 /* AdaptiveDarkModeWebsiteSettingsPopover.swift */; };
+		31FB1CC128A5456F0098F221 /* AdaptiveDarkModeWebsiteSettingsViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 31FB1CC028A5456F0098F221 /* AdaptiveDarkModeWebsiteSettingsViewController.swift */; };
 		336D5B18262D8D3C0052E0C9 /* findinpage.js in Resources */ = {isa = PBXBuildFile; fileRef = 336D5AEF262D8D3C0052E0C9 /* findinpage.js */; };
 		339A6B5826A044BA00E3DAE8 /* duckduckgo-privacy-dashboard in Resources */ = {isa = PBXBuildFile; fileRef = 339A6B5726A044BA00E3DAE8 /* duckduckgo-privacy-dashboard */; };
 		37054FC92873301700033B6F /* PinnedTabView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37054FC82873301700033B6F /* PinnedTabView.swift */; };
@@ -844,6 +846,8 @@
 		31F7F2A5288AD2CA001C0D64 /* NavigationBarBadgeAnimationView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NavigationBarBadgeAnimationView.swift; sourceTree = "<group>"; };
 		31FB1CB828A52A080098F221 /* AdaptiveDarkModeOptInAlertView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AdaptiveDarkModeOptInAlertView.swift; sourceTree = "<group>"; };
 		31FB1CBA28A535C70098F221 /* AdaptiveDarkModeWebsiteSettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AdaptiveDarkModeWebsiteSettingsView.swift; sourceTree = "<group>"; };
+		31FB1CBC28A543D00098F221 /* AdaptiveDarkModeWebsiteSettingsPopover.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AdaptiveDarkModeWebsiteSettingsPopover.swift; sourceTree = "<group>"; };
+		31FB1CC028A5456F0098F221 /* AdaptiveDarkModeWebsiteSettingsViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AdaptiveDarkModeWebsiteSettingsViewController.swift; sourceTree = "<group>"; };
 		336B39E22726B4B700C417D3 /* LocalUnprotectedDomains.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LocalUnprotectedDomains.swift; sourceTree = "<group>"; };
 		336D5AEF262D8D3C0052E0C9 /* findinpage.js */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.javascript; path = findinpage.js; sourceTree = "<group>"; };
 		339A6B5726A044BA00E3DAE8 /* duckduckgo-privacy-dashboard */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; name = "duckduckgo-privacy-dashboard"; path = "Submodules/duckduckgo-privacy-dashboard"; sourceTree = SOURCE_ROOT; };
@@ -1732,10 +1736,28 @@
 		31FB1CB728A529B60098F221 /* Adaptive Dark Mode */ = {
 			isa = PBXGroup;
 			children = (
-				31FB1CB828A52A080098F221 /* AdaptiveDarkModeOptInAlertView.swift */,
-				31FB1CBA28A535C70098F221 /* AdaptiveDarkModeWebsiteSettingsView.swift */,
+				31FB1CBF28A544280098F221 /* Opt In Alert */,
+				31FB1CBE28A544190098F221 /* Website Settings View */,
 			);
 			path = "Adaptive Dark Mode";
+			sourceTree = "<group>";
+		};
+		31FB1CBE28A544190098F221 /* Website Settings View */ = {
+			isa = PBXGroup;
+			children = (
+				31FB1CBC28A543D00098F221 /* AdaptiveDarkModeWebsiteSettingsPopover.swift */,
+				31FB1CBA28A535C70098F221 /* AdaptiveDarkModeWebsiteSettingsView.swift */,
+				31FB1CC028A5456F0098F221 /* AdaptiveDarkModeWebsiteSettingsViewController.swift */,
+			);
+			path = "Website Settings View";
+			sourceTree = "<group>";
+		};
+		31FB1CBF28A544280098F221 /* Opt In Alert */ = {
+			isa = PBXGroup;
+			children = (
+				31FB1CB828A52A080098F221 /* AdaptiveDarkModeOptInAlertView.swift */,
+			);
+			path = "Opt In Alert";
 			sourceTree = "<group>";
 		};
 		336D5AEA262D8D3C0052E0C9 /* duckduckgo-find-in-page */ = {
@@ -4863,6 +4885,7 @@
 				85378DA0274E6F42007C5CBF /* NSNotificationName+EmailManager.swift in Sources */,
 				B693955726F04BEC0015B914 /* MouseOverButton.swift in Sources */,
 				AA61C0D02722159B00E6B681 /* FireInfoViewController.swift in Sources */,
+				31FB1CBD28A543D00098F221 /* AdaptiveDarkModeWebsiteSettingsPopover.swift in Sources */,
 				B64C85422694590B0048FEBE /* PermissionButton.swift in Sources */,
 				AAA0CC472533833C0079BC96 /* MoreOptionsMenu.swift in Sources */,
 				37BF3F24286F0AAE00BD9014 /* View+RoundedCorners.swift in Sources */,
@@ -4923,6 +4946,7 @@
 				4BDFA4AE27BF19E500648192 /* ToggleableScrollView.swift in Sources */,
 				85AC3AEF25D5CE9800C7D2AA /* UserScripts.swift in Sources */,
 				B643BF1427ABF772000BACEC /* NSWorkspaceExtension.swift in Sources */,
+				31FB1CC128A5456F0098F221 /* AdaptiveDarkModeWebsiteSettingsViewController.swift in Sources */,
 				4B677439255DBEB800025BD8 /* AppHTTPSUpgradeStore.swift in Sources */,
 				4BC68A722759B2140029A586 /* Waitlist.swift in Sources */,
 				AAB549DF25DAB8F80058460B /* BookmarkViewModel.swift in Sources */,

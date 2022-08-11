@@ -45,6 +45,8 @@ struct AdaptiveDarkModeWebsiteSettingsView: View {
             Text(UserText.adaptiveDarkModeWebsiteSettingsViewFooter)
                 .font(.subheadline)
         }
+        .padding(.horizontal, 20)
+        .padding(.vertical, 16)
     }
 }
 
@@ -53,12 +55,10 @@ struct AdaptiveDarkModeWebsiteSettingsView_Previews: PreviewProvider {
         if #available(macOS 11.0, *) {
             AdaptiveDarkModeWebsiteSettingsView()
                 .preferredColorScheme(.dark)
-                .padding()
                 .frame(width: 400, height: 105)
             
             AdaptiveDarkModeWebsiteSettingsView()
                 .preferredColorScheme(.light)
-                .padding()
                 .frame(width: 400, height: 105)
 
         } else {

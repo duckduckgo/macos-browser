@@ -107,6 +107,8 @@ final class NavigationBarViewController: NSViewController {
         downloadsPopover.isShown
     }
 
+    private lazy var adaptiveDarkModePopover = AdaptiveDarkModeWebsiteSettingsPopover()
+    
     private var urlCancellable: AnyCancellable?
     private var selectedTabViewModelCancellable: AnyCancellable?
     private var credentialsToSaveCancellable: AnyCancellable?
@@ -249,7 +251,7 @@ final class NavigationBarViewController: NSViewController {
     }
 
     @IBAction func adaptiveDarkModeButtonAction(_ sender: MouseOverButton) {
-        print("DarkMode")
+        toggleAdaptiveDarkModePopover()
     }
     
     @IBAction func downloadsButtonAction(_ sender: NSButton) {
@@ -356,6 +358,18 @@ final class NavigationBarViewController: NSViewController {
         Pixel.fire(.manageLogins(source: sender is NSButton ? .button : (sender is MainMenu ? .mainMenu : .moreMenu)))
     }
 
+    private func toggleAdaptiveDarkModePopover() {
+        if adaptiveDarkModePopover.isShown {
+            adaptiveDarkModePopover.close()
+            return
+        }
+        
+        adaptiveDarkModePopover.show(relativeTo: adaptiveDarkModeButton.bounds.insetFromLineOfDeath(),
+                                     of: adaptiveDarkModeButton,
+                                     preferredEdge: .maxY)
+        #warning("Fire pixel?")
+    }
+    
     func toggleDownloadsPopover(keepButtonVisible: Bool, shouldFirePixel: Bool = true) {
         if downloadsPopover.isShown {
             downloadsPopover.close()
