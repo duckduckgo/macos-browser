@@ -42,6 +42,7 @@ final class WebView: WKWebView {
         "WKMenuItemIdentifierDownloadImage": UserText.saveImageAs,
         "WKMenuItemIdentifierDownloadLinkedFile": UserText.downloadLinkedFileAs,
         "WKMenuItemIdentifierAddLinkToBookmarks": UserText.addLinkToBookmarks,
+        "WKMenuItemIdentifierBookmarkPage": UserText.bookmarkPage,
         "WKMenuItemIdentifierSearchWeb": UserText.searchWithDuckDuckGo
     ]
   
@@ -129,6 +130,11 @@ final class WebView: WKWebView {
                                                 title: UserText.copyImageAddress,
                                                 target: uiDelegate,
                                                 selector: #selector(ImageMenuItemSelectors.copyImageAddress(_:)))
+        
+        menu.insertItemAfterItemWithIdentifier("WKMenuItemIdentifierReload",
+                                               title: UserText.bookmarkPage,
+                                               target: uiDelegate,
+                                               selector: #selector(LinkMenuItemSelectors.bookmarkPage(_:)))
 
         // calling .menuWillOpen here manually as it's already calling the latter Menu Owner's willOpenMenu at this point
         (uiDelegate as? NSMenuDelegate)?.menuWillOpen?(menu)

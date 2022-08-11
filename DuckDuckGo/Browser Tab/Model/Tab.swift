@@ -27,6 +27,7 @@ protocol TabDelegate: FileDownloadManagerDelegate, ContentOverlayUserScriptDeleg
     func tabWillStartNavigation(_ tab: Tab, isUserInitiated: Bool)
     func tabDidStartNavigation(_ tab: Tab)
     func tab(_ tab: Tab, requestedNewTabWith content: Tab.TabContent, selected: Bool)
+    // swiftlint:disable:next function_parameter_count
     func tab(_ tab: Tab, willShowContextMenuAt position: NSPoint, image: URL?, title: String?, link: URL?, selectedText: String?)
     func tab(_ tab: Tab, requestedOpenExternalURL url: URL, forUserEnteredURL: Bool)
     func tab(_ tab: Tab, requestedSaveAutofillData autofillData: AutofillData)
@@ -809,6 +810,7 @@ extension Tab: PageObserverUserScriptDelegate {
 
 extension Tab: ContextMenuDelegate {
 
+    // swiftlint:disable:next function_parameter_count
     func contextMenu(forUserScript script: ContextMenuUserScript,
                      willShowAt position: NSPoint,
                      image: URL?,
