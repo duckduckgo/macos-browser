@@ -93,6 +93,19 @@ extension Preferences {
                     ThemePicker()
                         .environmentObject(model)
                 }
+                
+                Section {
+                    Text(UserText.preferencesWebsiteAppearanceTitle)
+                        .font(Const.Fonts.preferencePaneSectionHeader)
+
+                    Toggle(UserText.preferencesAdaptiveDarkModeCheckmark, isOn: $model.useAdaptiveDarkMode)
+                  
+                    #warning("Dark Reader should be a link")
+                    Text(UserText.preferencesAdaptiveDarkModeFooter)
+                        .foregroundColor(.secondary)
+                        .font(.subheadline)
+                        .padding(.leading, 20)
+                }
 
                 Section {
                     Text(UserText.addressBar)

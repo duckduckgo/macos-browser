@@ -515,4 +515,8 @@ struct UserText {
     static let bookmarksBarContextMenuDelete = NSLocalizedString("bookmarks.bar.context-menu.delete", value: "Delete", comment: "Delete menu item for the bookmarks bar context menu")
     static let bookmarksBarContextMenuMoveToEnd = NSLocalizedString("bookmarks.bar.context-menu.move-to-end", value: "Move To End", comment: "Move To End menu item for the bookmarks bar context menu")
     
+    static let preferencesWebsiteAppearanceTitle = NSLocalizedString("preferences.appearance.website.title", value: "Website Appearance", comment: "Title for Website appearance section")
+    static let preferencesAdaptiveDarkModeCheckmark = NSLocalizedString("preferences.appearance.website.darkmode.toggle", value: "Use Adaptive Dark Mode", comment: "Title for adaptive dark mode toggle")
+    static let preferencesAdaptiveDarkModeFooter = NSLocalizedString("preferences.appearance.website.darkmode.footer", value: "Adaptive Dark Mode will try to make all websites you visit use a dark color scheme based on your browser appearance settings. Adaptive Dark Mode is powered by Dark Reader.", comment: "Footer explaining what adaptive dark mode is")
+
 }

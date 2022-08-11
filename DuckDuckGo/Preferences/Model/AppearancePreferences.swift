@@ -22,6 +22,7 @@ protocol AppearancePreferencesPersistor {
     var showFullURL: Bool { get set }
     var showAutocompleteSuggestions: Bool { get set }
     var currentThemeName: String { get set }
+    var useAdaptiveDarkMode: Bool { get set }
 }
 
 struct AppearancePreferencesUserDefaultsPersistor: AppearancePreferencesPersistor {
@@ -33,6 +34,9 @@ struct AppearancePreferencesUserDefaultsPersistor: AppearancePreferencesPersisto
 
     @UserDefaultsWrapper(key: .currentThemeName, defaultValue: ThemeName.systemDefault.rawValue)
     var currentThemeName: String
+    
+    @UserDefaultsWrapper(key: .useAdaptiveDarkMode, defaultValue: false)
+    var useAdaptiveDarkMode: Bool
 }
 
 enum ThemeName: String, Equatable, CaseIterable {
@@ -96,7 +100,13 @@ final class AppearancePreferences: ObservableObject {
             persistor.showAutocompleteSuggestions = showAutocompleteSuggestions
         }
     }
-
+    
+    @Published var useAdaptiveDarkMode: Bool {
+        didSet {
+            persistor.useAdaptiveDarkMode = useAdaptiveDarkMode
+        }
+    }
+    
     func updateUserInterfaceStyle() {
         NSApp.appearance = currentThemeName.appearance
     }
@@ -106,6 +116,7 @@ final class AppearancePreferences: ObservableObject {
         currentThemeName = .init(rawValue: persistor.currentThemeName) ?? .systemDefault
         showFullURL = persistor.showFullURL
         showAutocompleteSuggestions = persistor.showAutocompleteSuggestions
+        useAdaptiveDarkMode = persistor.useAdaptiveDarkMode
     }
 
     private var persistor: AppearancePreferencesPersistor
