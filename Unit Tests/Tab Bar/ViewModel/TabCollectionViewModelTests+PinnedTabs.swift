@@ -263,6 +263,31 @@ extension TabCollectionViewModelTests {
 
         XCTAssertIdentical(firstTabViewModel, tabCollectionViewModel.pinnedTabsManager!.tabViewModel(at: 0))
     }
+
+    // MARK: - Publishers
+
+    func test_WithPinnedTabs_WhenSelectionIndexIsUpdatedWithTheSameValueThenSelectedTabViewModelIsOnlyPublishedOnce() {
+        let tabCollectionViewModel = TabCollectionViewModel.aTabCollectionViewModelWithPinnedTab()
+        let firstTabViewModel = tabCollectionViewModel.pinnedTabsManager!.tabViewModel(at: 0)
+        firstTabViewModel?.tab.url = URL.duckDuckGo
+
+        var events: [TabViewModel?] = []
+        let cancellable = tabCollectionViewModel.$selectedTabViewModel
+            .dropFirst() // dropping the unpinned tab selected by default
+            .sink { tabViewModel in
+                events.append(tabViewModel)
+            }
+
+        tabCollectionViewModel.select(at: .pinned(0))
+        tabCollectionViewModel.select(at: .pinned(0))
+        tabCollectionViewModel.select(at: .pinned(0))
+        tabCollectionViewModel.select(at: .pinned(0))
+
+        cancellable.cancel()
+
+        XCTAssertEqual(events.count, 1)
+        XCTAssertIdentical(events[0], tabCollectionViewModel.selectedTabViewModel)
+    }
 }
 
 fileprivate extension TabCollectionViewModel {
