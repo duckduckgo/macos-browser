@@ -41,6 +41,7 @@
 		373A1AB02842C4EA00586521 /* BookmarkHTMLImporter.swift in Sources */ = {isa = PBXBuildFile; fileRef = 373A1AAF2842C4EA00586521 /* BookmarkHTMLImporter.swift */; };
 		373A1AB228451ED400586521 /* BookmarksHTMLImporterTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 373A1AB128451ED400586521 /* BookmarksHTMLImporterTests.swift */; };
 		3741745128A3BB8300265EA0 /* ChromiumCookiesReader.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3741745028A3BB8200265EA0 /* ChromiumCookiesReader.swift */; };
+		3741745428A5425300265EA0 /* SafariCookiesReader.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3741745328A5425300265EA0 /* SafariCookiesReader.swift */; };
 		37479F152891BC8300302FE2 /* TabCollectionViewModelTests+WithoutPinnedTabsManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37479F142891BC8300302FE2 /* TabCollectionViewModelTests+WithoutPinnedTabsManager.swift */; };
 		37534C9E28104D9B002621E7 /* TabLazyLoaderTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37534C9D28104D9B002621E7 /* TabLazyLoaderTests.swift */; };
 		37534CA028113101002621E7 /* LazyLoadable.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37534C9F28113101002621E7 /* LazyLoadable.swift */; };
@@ -859,6 +860,7 @@
 		373A1AAF2842C4EA00586521 /* BookmarkHTMLImporter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BookmarkHTMLImporter.swift; sourceTree = "<group>"; };
 		373A1AB128451ED400586521 /* BookmarksHTMLImporterTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BookmarksHTMLImporterTests.swift; sourceTree = "<group>"; };
 		3741745028A3BB8200265EA0 /* ChromiumCookiesReader.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChromiumCookiesReader.swift; sourceTree = "<group>"; };
+		3741745328A5425300265EA0 /* SafariCookiesReader.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SafariCookiesReader.swift; sourceTree = "<group>"; };
 		37479F142891BC8300302FE2 /* TabCollectionViewModelTests+WithoutPinnedTabsManager.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "TabCollectionViewModelTests+WithoutPinnedTabsManager.swift"; sourceTree = "<group>"; };
 		37534C9D28104D9B002621E7 /* TabLazyLoaderTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TabLazyLoaderTests.swift; sourceTree = "<group>"; };
 		37534C9F28113101002621E7 /* LazyLoadable.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LazyLoadable.swift; sourceTree = "<group>"; };
@@ -1773,6 +1775,14 @@
 			path = Chromium;
 			sourceTree = "<group>";
 		};
+		3741745228A5424600265EA0 /* Safari */ = {
+			isa = PBXGroup;
+			children = (
+				3741745328A5425300265EA0 /* SafariCookiesReader.swift */,
+			);
+			path = Safari;
+			sourceTree = "<group>";
+		};
 		37534CA128113277002621E7 /* TabLazyLoader */ = {
 			isa = PBXGroup;
 			children = (
@@ -1786,6 +1796,7 @@
 		376C4DBB28A29B5900CC0F5B /* Cookies */ = {
 			isa = PBXGroup;
 			children = (
+				3741745228A5424600265EA0 /* Safari */,
 				3741744F28A3BB7200265EA0 /* Chromium */,
 				376C4DC028A2AC4500CC0F5B /* Firefox */,
 				376C4DBC28A29B7900CC0F5B /* CookieImport.swift */,
@@ -4609,6 +4620,7 @@
 				B6A9E499261474120067D1B9 /* TimedPixel.swift in Sources */,
 				B6C0B23626E732000031CB7F /* DownloadListItem.swift in Sources */,
 				856C98A6256EB59600A22F1F /* MenuItemSelectors.swift in Sources */,
+				3741745428A5425300265EA0 /* SafariCookiesReader.swift in Sources */,
 				B6B1E87E26D5DA0E0062C350 /* DownloadsPopover.swift in Sources */,
 				4B9292A026670D2A00AD2C21 /* SpacerNode.swift in Sources */,
 				B6E61EE8263ACE16004E11AB /* UTType.swift in Sources */,
