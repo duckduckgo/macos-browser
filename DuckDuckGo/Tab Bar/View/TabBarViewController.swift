@@ -39,7 +39,6 @@ final class TabBarViewController: NSViewController {
     @IBOutlet weak var leftScrollButton: MouseOverButton!
     @IBOutlet weak var rightShadowImageView: NSImageView!
     @IBOutlet weak var leftShadowImageView: NSImageView!
-    @IBOutlet weak var plusButton: LongPressButton!
     @IBOutlet weak var fireButton: MouseOverAnimationButton!
     @IBOutlet weak var draggingSpace: NSView!
     @IBOutlet weak var windowDraggingViewLeadingConstraint: NSLayoutConstraint!
@@ -332,9 +331,6 @@ final class TabBarViewController: NSViewController {
         // Window dragging
         let leadingSpace = min(totalTabWidth + plusButtonWidth, scrollView.frame.size.width)
         windowDraggingViewLeadingConstraint.constant = leadingSpace
-
-        plusButton.alphaValue = 0.0
-        plusButton.isEnabled = false
     }
 
     // MARK: - Drag and Drop
