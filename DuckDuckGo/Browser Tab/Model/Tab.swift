@@ -1061,8 +1061,10 @@ extension Tab: WKNavigationDelegate {
             lastUpgradedURL = nil
         }
         
-        if navigationAction.isTargetingMainFrame && navigationAction.navigationType != .backForward {
-            if let newRequest = referrerTrimming.trimReferrer(forNavigation: navigationAction) {
+        if navigationAction.isTargetingMainFrame, navigationAction.navigationType != .backForward, !isRequestingNewTab {
+            if let newRequest = referrerTrimming.trimReferrer(forNavigation: navigationAction,
+                                                              originUrl: webView.url) {
+                self.invalidateBackItemIfNeeded(for: navigationAction)
                 defer {
                     webView.load(newRequest)
                 }
