@@ -22,9 +22,10 @@ import WebKit
 import BrowserServicesKit
 
 protocol OptionsButtonMenuDelegate: AnyObject {
-
+    
     func optionsButtonMenuRequestedBookmarkPopover(_ menu: NSMenu)
     func optionsButtonMenuRequestedToggleBookmarksBar(_ menu: NSMenu)
+    func optionsButtonMenuRequestedBookmarkManagementInterface(_ menu: NSMenu)
     func optionsButtonMenuRequestedLoginsPopover(_ menu: NSMenu, selectedCategory: SecureVaultSorting.Category)
     func optionsButtonMenuRequestedDownloadsPopover(_ menu: NSMenu)
     func optionsButtonMenuRequestedPrint(_ menu: NSMenu)
@@ -111,7 +112,7 @@ final class MoreOptionsMenu: NSMenu {
     }
     
     @objc func openBookmarksManagementInterface(_ sender: NSMenuItem) {
-        actionDelegate?.optionsButtonMenuRequestedBookmarkPopover(self)
+        actionDelegate?.optionsButtonMenuRequestedBookmarkManagementInterface(self)
     }
     
     @objc func toggleBookmarksBar(_ sender: NSMenuItem) {
@@ -372,19 +373,19 @@ final class BookmarksSubMenu: NSMenu {
     }
 
     private func updateMenuItems(with target: AnyObject) {
-        addItem(withTitle: "Show Toolbar Panel", action: #selector(MoreOptionsMenu.openBookmarks(_:)), keyEquivalent: "")
+        addItem(withTitle: UserText.bookmarksShowToolbarPanel, action: #selector(MoreOptionsMenu.openBookmarks(_:)), keyEquivalent: "")
             .targetting(target)
             .firingPixel(Pixel.Event.MoreResult.bookmarksMenuShowToolbarPanel)
         
         if PersistentAppInterfaceSettings.shared.showBookmarksBar {
             addItem(withTitle: UserText.hideBookmarksBar, action: #selector(MoreOptionsMenu.toggleBookmarksBar(_:)), keyEquivalent: "")
                 .targetting(target)
-                // .firingPixel(Pixel.Event.MoreResult.bookmarksMenuShowToolbarPanel)
+                .firingPixel(Pixel.Event.MoreResult.bookmarksMenuHideBookmarksBar)
             
         } else {
             addItem(withTitle: UserText.showBookmarksBar, action: #selector(MoreOptionsMenu.toggleBookmarksBar(_:)), keyEquivalent: "")
                 .targetting(target)
-                // .firingPixel(Pixel.Event.MoreResult.bookmarksMenuShowToolbarPanel)
+                .firingPixel(Pixel.Event.MoreResult.bookmarksMenuShowBookmarksBar)
         }
         
         addItem(withTitle: UserText.bookmarksManageBookmarks, action: #selector(MoreOptionsMenu.openBookmarksManagementInterface), keyEquivalent: "")

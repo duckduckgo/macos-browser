@@ -660,6 +660,10 @@ extension NavigationBarViewController: OptionsButtonMenuDelegate {
     func optionsButtonMenuRequestedToggleBookmarksBar(_ menu: NSMenu) {
         PersistentAppInterfaceSettings.shared.showBookmarksBar.toggle()
     }
+    
+    func optionsButtonMenuRequestedBookmarkManagementInterface(_ menu: NSMenu) {
+        WindowControllersManager.shared.showBookmarksTab()
+    }
 
     func optionsButtonMenuRequestedLoginsPopover(_ menu: NSMenu, selectedCategory: SecureVaultSorting.Category) {
         showPasswordManagementPopover(sender: menu, selectedCategory: selectedCategory)
