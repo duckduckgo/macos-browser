@@ -368,6 +368,14 @@ struct DataImportError: Error, Equatable {
         }
     }
 
+    static func cookies(_ errorType: SafariCookiesReader.ImportError) -> DataImportError {
+        switch errorType {
+        case .noCookiesFileFound: return DataImportError(actionType: .cookies, errorType: .noFileFound)
+        case .unexpectedCookiesDatabaseFormat: return DataImportError(actionType: .cookies, errorType: .cannotReadFile)
+        case .failedToTemporarilyCopyFile: return DataImportError(actionType: .cookies, errorType: .failedToTemporarilyCopyFile)
+        }
+    }
+
     static func cookies(_ errorType: ChromiumCookiesReader.ImportError) -> DataImportError {
         switch errorType {
         case .noCookiesFileFound: return DataImportError(actionType: .cookies, errorType: .noFileFound)

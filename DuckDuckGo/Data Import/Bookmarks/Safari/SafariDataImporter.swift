@@ -29,11 +29,33 @@ internal class SafariDataImporter: DataImporter {
         return !data.isEmpty
     }
 
+    static func canReadCookiesFile() -> Bool {
+        // This is inefficient, but regular FileManager APIs believe this file is unreadable even when granted permission via NSOpenPanel.
+        guard let data = try? Data(contentsOf: cookiesFileURL) else {
+            return false
+        }
+
+        return !data.isEmpty
+    }
+
     static func requestBookmarksFilePermission() -> URL? {
         let openPanel = NSOpenPanel()
         openPanel.directoryURL = bookmarksFileURL
         openPanel.message = UserText.bookmarkImportSafariRequestPermissionButtonTitle
         openPanel.allowedFileTypes = ["plist"]
+        openPanel.allowsOtherFileTypes = false
+        openPanel.canChooseFiles = true
+        openPanel.canChooseDirectories = false
+
+        _ = openPanel.runModal()
+        return openPanel.urls.first
+    }
+
+    static func requestCookiesFilePermission() -> URL? {
+        let openPanel = NSOpenPanel()
+        openPanel.directoryURL = cookiesFileURL
+        openPanel.message = UserText.cookieImportSafariRequestPermissionButtonTitle
+        openPanel.allowedFileTypes = ["binarycookie"]
         openPanel.allowsOtherFileTypes = false
         openPanel.canChooseFiles = true
         openPanel.canChooseDirectories = false
@@ -49,10 +71,19 @@ internal class SafariDataImporter: DataImporter {
         return path.appendingPathComponent("Bookmarks.plist")
     }
 
-    private let bookmarkImporter: BookmarkImporter
+    static private var cookiesFileURL: URL {
+        let library = FileManager.default.urls(for: .libraryDirectory, in: .userDomainMask).first!
+        let path = library.appendingPathComponent("Containers/com.apple.Safari/Data/Library/Cookies")
 
-    init(bookmarkImporter: BookmarkImporter) {
+        return path.appendingPathComponent("Cookies.binarycookies")
+    }
+
+    private let bookmarkImporter: BookmarkImporter
+    private let cookieImporter: CookieImporter
+
+    init(bookmarkImporter: BookmarkImporter, cookieImporter: CookieImporter) {
         self.bookmarkImporter = bookmarkImporter
+        self.cookieImporter = cookieImporter
     }
 
     func importableTypes() -> [DataImport.DataType] {
@@ -86,7 +117,28 @@ internal class SafariDataImporter: DataImporter {
             summary.loginsResult = .awaited
         }
 
-        completion(.success(summary))
+        if types.contains(.cookies) {
+            let cookieReader = SafariCookiesReader(safariCookiesFileURL: Self.cookiesFileURL)
+            let cookiesResult = cookieReader.readCookies()
+
+            switch cookiesResult {
+            case .success(let cookies):
+                if cookies.isEmpty {
+                    completion(.success(summary))
+                } else {
+                    let s = summary
+                    Task { @MainActor in
+                        var summary = s
+                        summary.cookiesResult = await cookieImporter.importCookies(cookies)
+                        completion(.success(summary))
+                    }
+                }
+            case .failure(let error):
+                completion(.failure(.cookies(error)))
+            }
+        } else {
+            completion(.success(summary))
+        }
     }
 
 }

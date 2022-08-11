@@ -48,7 +48,13 @@ final class TemporaryFileHandler {
         defer { deleteTemporarilyCopiedFile() }
         return closure(temporaryFileURL)
     }
-    
+
+    func withTemporaryFile<T>(_ closure: (URL) throws -> T) throws -> T {
+        let temporaryFileURL = try copyFileToTemporaryDirectory()
+        defer { deleteTemporarilyCopiedFile() }
+        return try closure(temporaryFileURL)
+    }
+
     func copyFileToTemporaryDirectory() throws -> URL {
         let fileManager = FileManager.default
         
@@ -78,4 +84,8 @@ extension URL {
         return try handler.withTemporaryFile(closure)
     }
 
+    func withTemporaryFile<T>(_ closure: (URL) throws -> T) throws -> T {
+        let handler = TemporaryFileHandler(fileURL: self)
+        return try handler.withTemporaryFile { try closure($0) }
+    }
 }

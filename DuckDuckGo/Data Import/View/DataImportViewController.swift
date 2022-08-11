@@ -92,7 +92,7 @@ final class DataImportViewController: NSViewController {
                 case .firefox:
                     self.dataImporter = try FirefoxDataImporter(loginImporter: secureVaultImporter(), bookmarkImporter: bookmarkImporter, cookieImporter: cookieImporter)
                 case .safari where !(currentChildViewController is FileImportViewController):
-                    self.dataImporter = SafariDataImporter(bookmarkImporter: bookmarkImporter)
+                    self.dataImporter = SafariDataImporter(bookmarkImporter: bookmarkImporter, cookieImporter: cookieImporter)
                 case .bookmarksHTML:
                     if !(self.dataImporter is BookmarkHTMLImporter) {
                         self.dataImporter = nil
