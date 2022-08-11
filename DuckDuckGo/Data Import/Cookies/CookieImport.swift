@@ -20,7 +20,6 @@ import Foundation
 
 enum CookieImportSource {
     case chromium
-    case duckduckgoWebKit
     case firefox
     case safari
 }
