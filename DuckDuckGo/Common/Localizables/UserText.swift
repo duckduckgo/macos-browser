@@ -519,4 +519,10 @@ struct UserText {
     static let preferencesAdaptiveDarkModeCheckmark = NSLocalizedString("preferences.appearance.website.darkmode.toggle", value: "Use Adaptive Dark Mode", comment: "Title for adaptive dark mode toggle")
     static let preferencesAdaptiveDarkModeFooter = NSLocalizedString("preferences.appearance.website.darkmode.footer", value: "Adaptive Dark Mode will try to make all websites you visit use a dark color scheme based on your browser appearance settings. Adaptive Dark Mode is powered by Dark Reader.", comment: "Footer explaining what adaptive dark mode is")
 
+    static let adaptiveDarkModeOptInPopoverTitle = NSLocalizedString("adaptivedarkmode.optinpopover.title", value: "Use Enable Adaptive Dark Mode?", comment: "Title for Opt-In adaptive dark mode popover")
+    static let adaptiveDarkModeOptInPopoverMessage = NSLocalizedString("adaptivedarkmode.optinpopover.message", value: "Adaptive Dark Mode will try to make all websites you visit use a dark color scheme.", comment: "Message for Opt-In adaptive dark mode popover")
+    static let adaptiveDarkModeOptInPopoverConfirmButton = NSLocalizedString("adaptivedarkmode.optinpopover.button.confirm", value: "Enable", comment: "Confirm button for Opt-In adaptive dark mode popover")
+    static let adaptiveDarkModeOptInPopoverDenyButton = NSLocalizedString("adaptivedarkmode.optinpopover.button.deny", value: "No Thanks", comment: "Deny button for Opt-In adaptive dark mode popover")
+
+
 }
