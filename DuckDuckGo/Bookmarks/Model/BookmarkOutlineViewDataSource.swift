@@ -255,16 +255,26 @@ final class BookmarkOutlineViewDataSource: NSObject, NSOutlineViewDataSource, NS
         }
 
         // Handle the existing destination case:
-
-        guard let parent = representedObject as? BookmarkFolder else { return false }
-
-        bookmarkManager.add(objectsWithUUIDs: draggedObjectIdentifiers, to: parent) { error in
-            if let error = error {
-                os_log("Failed to accept existing parent drop via outline view: %s", error.localizedDescription)
+        
+        if let parent = representedObject as? BookmarkFolder {
+            bookmarkManager.add(objectsWithUUIDs: draggedObjectIdentifiers, to: parent) { error in
+                if let error = error {
+                    os_log("Failed to accept existing parent drop via outline view: %s", error.localizedDescription)
+                }
             }
+            
+            return true
+        } else if representedObject == nil {
+            bookmarkManager.add(objectsWithUUIDs: draggedObjectIdentifiers, to: nil) { error in
+                if let error = error {
+                    os_log("Failed to accept existing parent drop via outline view: %s", error.localizedDescription)
+                }
+            }
+            
+            return true
+        } else {
+            return false
         }
-
-        return true
     }
 
     func outlineView(_ outlineView: NSOutlineView, rowViewForItem item: Any) -> NSTableRowView? {
