@@ -227,7 +227,13 @@ final class BookmarkManagementDetailViewController: NSViewController {
 extension BookmarkManagementDetailViewController: AddBookmarkModalViewControllerDelegate, AddFolderModalViewControllerDelegate {
     
     func addBookmarkViewController(_ viewController: AddBookmarkModalViewController, addedBookmarkWithTitle title: String, url: URL) {
-        if !bookmarkManager.isUrlBookmarked(url: url) {
+        guard !bookmarkManager.isUrlBookmarked(url: url) else {
+            return
+        }
+
+        if case let .folder(selectedFolder) = selectionState {
+            bookmarkManager.makeBookmark(for: url, title: title, isFavorite: false, index: nil, parent: selectedFolder)
+        } else {
             bookmarkManager.makeBookmark(for: url, title: title, isFavorite: false)
         }
     }
