@@ -470,7 +470,8 @@ final class Tab: NSObject, Identifiable, ObservableObject {
     
     lazy var referrerTrimming: ReferrerTrimming = {
         ReferrerTrimming(privacyManager: ContentBlocking.shared.privacyConfigurationManager,
-                         contentBlockingManager: ContentBlocking.shared.contentBlockingManager)
+                         contentBlockingManager: ContentBlocking.shared.contentBlockingManager,
+                         tld: TLD())
     }()
 
     @MainActor
