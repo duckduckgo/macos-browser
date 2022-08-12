@@ -35,7 +35,6 @@ class HistoryCoordinatorTests: XCTestCase {
         let url = URL.duckDuckGo
         historyCoordinator.addVisit(of: url)
 
-        XCTAssertNil(historyCoordinator.history)
         XCTAssertFalse(historyStoringMock.saveCalled)
     }
 

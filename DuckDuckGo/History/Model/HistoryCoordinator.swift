@@ -52,6 +52,7 @@ final class HistoryCoordinator: HistoryCoordinating {
 
     init(historyStoring: HistoryStoring) {
         self.historyStoring = historyStoring
+        historyDictionary = [:]
     }
 
     func loadHistory() {
@@ -199,6 +200,7 @@ final class HistoryCoordinator: HistoryCoordinating {
     private func clean(until date: Date,
                        completionHandler: ((Error?) -> Void)? = nil) {
         historyStoring.cleanOld(until: date)
+            .receive(on: DispatchQueue.main)
             .sink(receiveCompletion: { completion in
                 switch completion {
                 case .finished:
