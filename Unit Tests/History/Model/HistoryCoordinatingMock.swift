@@ -23,6 +23,8 @@ import BrowserServicesKit
 final class HistoryCoordinatingMock: HistoryCoordinating {
 
     var history: History?
+    @Published private(set) var historyDictionary: [URL: DuckDuckGo_Privacy_Browser.HistoryEntry]?
+    var historyDictionaryPublisher: Published<[URL: DuckDuckGo_Privacy_Browser.HistoryEntry]?>.Publisher { $historyDictionary }
 
     var addVisitCalled = false
     func addVisit(of url: URL) {

@@ -118,3 +118,23 @@ extension HistoryEntry: Hashable {
 }
 
 extension HistoryEntry: Identifiable {}
+
+extension HistoryEntry: NSCopying {
+
+    func copy(with zone: NSZone? = nil) -> Any {
+        let visits = visits.compactMap { $0.copy() as? Visit }
+        let entry = HistoryEntry(identifier: identifier,
+                                url: url,
+                                title: title,
+                                failedToLoad: failedToLoad,
+                                numberOfTotalVisits: numberOfTotalVisits,
+                                lastVisit: lastVisit,
+                                visits: Set(visits),
+                                numberOfTrackersBlocked: numberOfTrackersBlocked,
+                                blockedTrackingEntities: blockedTrackingEntities,
+                                trackersFound: trackersFound)
+        entry.visits.forEach { $0.historyEntry = entry }
+        return entry
+    }
+
+}
