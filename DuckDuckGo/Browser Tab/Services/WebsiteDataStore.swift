@@ -188,7 +188,7 @@ internal class WebCacheManager {
         }
 
         removeObservationsData(from: pool)
-        try? pool.vacuum()
+        try? await pool.vacuum()
 
         // For an unknown reason, domains may be still present in the database binary when running `strings` over it, despite SQL queries returning an
         // empty array, and despite vacuuming the database. Delete again to be safe.

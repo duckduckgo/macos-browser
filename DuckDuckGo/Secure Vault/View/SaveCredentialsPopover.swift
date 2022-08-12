@@ -34,9 +34,8 @@ final class SaveCredentialsPopover: NSPopover {
         fatalError("\(Self.self): Bad initializer")
     }
 
-    // swiftlint:disable force_cast
+    // swiftlint:disable:next force_cast
     var viewController: SaveCredentialsViewController { contentViewController as! SaveCredentialsViewController }
-    // swiftlint:enable force_cast
 
     private func setupContentController() {
         let controller = SaveCredentialsViewController.create()

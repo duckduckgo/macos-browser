@@ -278,7 +278,7 @@ class TabLazyLoaderTests: XCTestCase {
         selectedUrlTab.reload()
 
         // Then
-        waitForExpectations(timeout: 0.3)
+        waitForExpectations(timeout: 1)
         XCTAssertEqual(didFinishEvents.count, 1)
         XCTAssertEqual(try XCTUnwrap(didFinishEvents.first), true)
     }
