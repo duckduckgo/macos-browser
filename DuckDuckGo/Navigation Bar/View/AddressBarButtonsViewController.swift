@@ -143,7 +143,11 @@ final class AddressBarButtonsViewController: NSViewController {
             updateButtons()
         }
     }
-    private var isMouseOver = false
+    var isMouseOverNavigationBar = false {
+        didSet {
+            updateBookmarkButtonVisibility()
+        }
+    }
 
     private var selectedTabViewModelCancellable: AnyCancellable?
     private var urlCancellable: AnyCancellable?
@@ -232,24 +236,6 @@ final class AddressBarButtonsViewController: NSViewController {
         mouseEnterExitTrackingArea = trackingArea
     }
 
-    override func mouseMoved(with event: NSEvent) {
-        super.mouseMoved(with: event)
-        isMouseOver = true
-        updateBookmarkButtonVisibility()
-    }
-
-    override func mouseEntered(with event: NSEvent) {
-        super.mouseEntered(with: event)
-        isMouseOver = true
-        updateBookmarkButtonVisibility()
-    }
-
-    override func mouseExited(with event: NSEvent) {
-        super.mouseExited(with: event)
-        isMouseOver = false
-        updateBookmarkButtonVisibility()
-    }
-
     @IBAction func bookmarkButtonAction(_ sender: Any) {
         openBookmarkPopover(setFavorite: false, accessPoint: .button)
     }
@@ -270,7 +256,7 @@ final class AddressBarButtonsViewController: NSViewController {
         guard view.window?.isPopUpWindow == false else { return }
 
         let hasEmptyAddressBar = tabCollectionViewModel.selectedTabViewModel?.addressBarString.isEmpty ?? true
-        let showBookmarkButton = clearButton.isHidden && !hasEmptyAddressBar && (isMouseOver || bookmarkPopover.isShown)
+        let showBookmarkButton = clearButton.isHidden && !hasEmptyAddressBar && (isMouseOverNavigationBar || bookmarkPopover.isShown)
 
         bookmarkButton.isHidden = !showBookmarkButton
     }

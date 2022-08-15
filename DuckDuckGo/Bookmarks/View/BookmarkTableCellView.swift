@@ -29,7 +29,7 @@ import Foundation
 final class BookmarkTableCellView: NSTableCellView, NibLoadable {
 
     static private var defaultBookmarkFavicon = NSImage(named: "Web")
-    static private var folderAccessoryViewImage = NSImage(named: "Forward")
+    static private var folderAccessoryViewImage = NSImage(named: "Chevron-Next-16")
     static private var favoriteAccessoryViewImage = NSImage(named: "Favorite")
     static private var favoriteFilledAccessoryViewImage = NSImage(named: "FavoriteFilledBorder")
     static private var ellipsisAccessoryViewImage = NSImage(named: "Settings")
