@@ -24,7 +24,7 @@ protocol BookmarksBarCollectionViewItemDelegate: AnyObject {
     
     func bookmarksBarCollectionViewItemOpenInNewTabAction(_ item: BookmarksBarCollectionViewItem)
     func bookmarksBarCollectionViewItemOpenInNewWindowAction(_ item: BookmarksBarCollectionViewItem)
-    func bookmarksBarCollectionViewItemToggleFavoriteBookmarkAction(_ item: BookmarksBarCollectionViewItem)
+    func bookmarksBarCollectionViewItemAddToFavoritesAction(_ item: BookmarksBarCollectionViewItem)
     func bookmarksBarCollectionViewItemMoveToEndAction(_ item: BookmarksBarCollectionViewItem)
     func bookmarksBarCollectionViewItemCopyBookmarkURLAction(_ item: BookmarksBarCollectionViewItem)
     func bookmarksBarCollectionViewItemDeleteEntityAction(_ item: BookmarksBarCollectionViewItem)
@@ -168,16 +168,18 @@ extension BookmarksBarCollectionViewItem {
     // MARK: Bookmark Menu Items
     
     func createBookmarkMenuItems(isFavorite: Bool) -> [NSMenuItem] {
-        return [
+        let items = [
             openBookmarkInNewTabMenuItem(),
             openBookmarkInNewWindowMenuItem(),
             NSMenuItem.separator(),
-            toggleBookmarkAsFavoriteMenuItem(isFavorite: isFavorite),
+            addToFavoritesMenuItem(isFavorite: isFavorite),
             moveToEndMenuItem(),
             NSMenuItem.separator(),
             copyBookmarkURLMenuItem(),
             deleteEntityMenuItem()
-        ]
+        ].compactMap { $0 }
+        
+        return items
     }
     
     func openBookmarkInNewTabMenuItem() -> NSMenuItem {
@@ -198,21 +200,17 @@ extension BookmarksBarCollectionViewItem {
         delegate?.bookmarksBarCollectionViewItemOpenInNewWindowAction(self)
     }
     
-    func toggleBookmarkAsFavoriteMenuItem(isFavorite: Bool) -> NSMenuItem {
-        let title: String
-
-        if isFavorite {
-            title = UserText.removeFromFavorites
-        } else {
-            title = UserText.addToFavorites
+    func addToFavoritesMenuItem(isFavorite: Bool) -> NSMenuItem? {
+        guard !isFavorite else {
+            return nil
         }
 
-        return menuItem(title, #selector(toggleBookmarkAsFavoriteMenuItemSelected(_:)))
+        return menuItem(UserText.addToFavorites, #selector(addToFavoritesMenuItemSelected(_:)))
     }
     
     @objc
-    func toggleBookmarkAsFavoriteMenuItemSelected(_ sender: NSMenuItem) {
-        delegate?.bookmarksBarCollectionViewItemToggleFavoriteBookmarkAction(self)
+    func addToFavoritesMenuItemSelected(_ sender: NSMenuItem) {
+        delegate?.bookmarksBarCollectionViewItemAddToFavoritesAction(self)
     }
     
     func moveToEndMenuItem() -> NSMenuItem {

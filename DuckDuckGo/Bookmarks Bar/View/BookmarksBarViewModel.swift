@@ -48,7 +48,7 @@ final class BookmarksBarViewModel: NSObject {
         case openInBackgroundTab
         case openInNewTab
         case openInNewWindow
-        case toggleFavorite
+        case addToFavorites
         case moveToEnd
         case copyURL
         case deleteEntity
@@ -468,8 +468,8 @@ extension BookmarksBarViewModel: BookmarksBarCollectionViewItemDelegate {
         delegate?.bookmarksBarViewModelReceived(action: .openInNewWindow, for: item)
     }
     
-    func bookmarksBarCollectionViewItemToggleFavoriteBookmarkAction(_ item: BookmarksBarCollectionViewItem) {
-        delegate?.bookmarksBarViewModelReceived(action: .toggleFavorite, for: item)
+    func bookmarksBarCollectionViewItemAddToFavoritesAction(_ item: BookmarksBarCollectionViewItem) {
+        delegate?.bookmarksBarViewModelReceived(action: .addToFavorites, for: item)
     }
     
     func bookmarksBarCollectionViewItemMoveToEndAction(_ item: BookmarksBarCollectionViewItem) {
