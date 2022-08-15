@@ -25,6 +25,7 @@ protocol BookmarksBarCollectionViewItemDelegate: AnyObject {
     func bookmarksBarCollectionViewItemOpenInNewTabAction(_ item: BookmarksBarCollectionViewItem)
     func bookmarksBarCollectionViewItemOpenInNewWindowAction(_ item: BookmarksBarCollectionViewItem)
     func bookmarksBarCollectionViewItemAddToFavoritesAction(_ item: BookmarksBarCollectionViewItem)
+    func bookmarksBarCollectionViewEditAction(_ item: BookmarksBarCollectionViewItem)
     func bookmarksBarCollectionViewItemMoveToEndAction(_ item: BookmarksBarCollectionViewItem)
     func bookmarksBarCollectionViewItemCopyBookmarkURLAction(_ item: BookmarksBarCollectionViewItem)
     func bookmarksBarCollectionViewItemDeleteEntityAction(_ item: BookmarksBarCollectionViewItem)
@@ -173,6 +174,7 @@ extension BookmarksBarCollectionViewItem {
             openBookmarkInNewWindowMenuItem(),
             NSMenuItem.separator(),
             addToFavoritesMenuItem(isFavorite: isFavorite),
+            editItem(),
             moveToEndMenuItem(),
             NSMenuItem.separator(),
             copyBookmarkURLMenuItem(),
@@ -213,6 +215,15 @@ extension BookmarksBarCollectionViewItem {
         delegate?.bookmarksBarCollectionViewItemAddToFavoritesAction(self)
     }
     
+    func editItem() -> NSMenuItem {
+        return menuItem("Edit…", #selector(editItemSelected(_:)))
+    }
+    
+    @objc
+    func editItemSelected(_ sender: NSMenuItem) {
+        delegate?.bookmarksBarCollectionViewEditAction(self)
+    }
+    
     func moveToEndMenuItem() -> NSMenuItem {
         return menuItem(UserText.bookmarksBarContextMenuMoveToEnd, #selector(moveToEndMenuItemSelected(_:)))
     }
@@ -244,6 +255,7 @@ extension BookmarksBarCollectionViewItem {
     
     func createFolderMenuItems() -> [NSMenuItem] {
         return [
+            editItem(),
             moveToEndMenuItem(),
             NSMenuItem.separator(),
             deleteEntityMenuItem()

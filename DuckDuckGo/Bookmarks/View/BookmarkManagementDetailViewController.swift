@@ -245,6 +245,11 @@ extension BookmarkManagementDetailViewController: AddBookmarkModalViewController
             bookmarkManager.makeBookmark(for: url, title: title, isFavorite: false)
         }
     }
+    
+    func addBookmarkViewController(_ viewController: AddBookmarkModalViewController, saved bookmark: Bookmark, newURL: URL) {
+        bookmarkManager.update(bookmark: bookmark)
+        _ = bookmarkManager.updateUrl(of: bookmark, to: newURL)
+    }
 
     func addFolderViewController(_ viewController: AddFolderModalViewController, addedFolderWith name: String) {
         if case let .folder(selectedFolder) = selectionState {
@@ -515,7 +520,7 @@ extension BookmarkManagementDetailViewController: BookmarkTableCellViewDelegate 
         bookmarkManager.update(bookmark: bookmark)
 
         if let newURL = newUrl.url, newURL != bookmark.url {
-            _ = LocalBookmarkManager.shared.updateUrl(of: bookmark, to: newURL)
+            _ = bookmarkManager.updateUrl(of: bookmark, to: newURL)
         }
     }
 

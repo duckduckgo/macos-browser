@@ -212,6 +212,11 @@ extension BookmarkListViewController: AddBookmarkModalViewControllerDelegate, Ad
         }
     }
     
+    func addBookmarkViewController(_ viewController: AddBookmarkModalViewController, saved bookmark: Bookmark, newURL: URL) {
+        bookmarkManager.update(bookmark: bookmark)
+        _ = bookmarkManager.updateUrl(of: bookmark, to: newURL)
+    }
+    
     func addFolderViewController(_ viewController: AddFolderModalViewController, addedFolderWith name: String) {
         bookmarkManager.makeFolder(for: name, parent: nil)
     }
