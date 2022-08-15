@@ -104,6 +104,10 @@ struct ContextualMenu {
     static func openInNewTabsMenuItem(folder: BookmarkFolder) -> NSMenuItem {
         return menuItem(UserText.bookmarksOpenInNewTabs, #selector(FolderMenuItemSelectors.openInNewTabs(_:)), folder)
     }
+    
+    static func openBookmarksInNewTabsMenuItem(bookmarks: [Bookmark]) -> NSMenuItem {
+        return menuItem(UserText.bookmarksOpenInNewTabs, #selector(FolderMenuItemSelectors.openInNewTabs(_:)), bookmarks)
+    }
 
     static func openBookmarkInNewTabMenuItem(bookmark: Bookmark) -> NSMenuItem {
         return menuItem(UserText.openInNewTab, #selector(BookmarkMenuItemSelectors.openBookmarkInNewTab(_:)), bookmark)
@@ -150,12 +154,20 @@ struct ContextualMenu {
 
     private static func menu(for entities: [BaseBookmarkEntity]) -> NSMenu {
         let menu = NSMenu(title: "")
+        var menuItems: [NSMenuItem] = []
         
+        let bookmarks = entities.compactMap({ $0 as? Bookmark })
+        if !bookmarks.isEmpty {
+            menuItems.append(openBookmarksInNewTabsMenuItem(bookmarks: bookmarks))
+            menuItems.append(NSMenuItem.separator())
+        }
+
         let title = NSLocalizedString("Delete", comment: "Command")
         let deleteItem = NSMenuItem(title: title, action: #selector(BookmarkMenuItemSelectors.deleteEntities(_:)), keyEquivalent: "")
-        deleteItem.representedObject = entities.map(\.id)
+        deleteItem.representedObject = entities
+        menuItems.append(deleteItem)
 
-        menu.items = [deleteItem]
+        menu.items = menuItems
         
         return menu
     }

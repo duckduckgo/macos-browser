@@ -591,13 +591,14 @@ extension BookmarkManagementDetailViewController: FolderMenuItemSelectors {
     }
     
     func openInNewTabs(_ sender: NSMenuItem) {
-        guard let children = (sender.representedObject as? BookmarkFolder)?.children else {
-            assertionFailure("Cannot open in new tabs")
-            return
+        if let children = (sender.representedObject as? BookmarkFolder)?.children {
+            let bookmarks = children.compactMap { $0 as? Bookmark }
+            openBookmarksInNewTabs(bookmarks)
+        } else if let bookmarks = sender.representedObject as? [Bookmark] {
+            openBookmarksInNewTabs(bookmarks)
+        } else {
+            assertionFailure("Failed to open entity in new tabs")
         }
-        
-        let bookmarks = children.compactMap { $0 as? Bookmark }
-        openBookmarksInNewTabs(bookmarks)
     }
 
 }
