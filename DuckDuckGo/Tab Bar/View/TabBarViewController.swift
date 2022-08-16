@@ -687,7 +687,10 @@ extension TabBarViewController: TabCollectionViewModelDelegate {
         }
         updateTabMode(for: collectionView.numberOfItems(inSection: 0) + 1)
 
-        collectionView.clearSelection()
+        if selected {
+            collectionView.clearSelection()
+        }
+
         if tabMode == .divided {
             collectionView.animator().insertItems(at: lastIndexPathSet)
             if selected {
