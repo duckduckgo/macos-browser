@@ -13,5 +13,6 @@
   },
   "dependencies": {
     "@duckduckgo/autoconsent": "2.1.0"
+    "darkreader": "^4.9.55"
   }
 }
