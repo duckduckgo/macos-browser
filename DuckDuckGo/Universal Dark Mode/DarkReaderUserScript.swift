@@ -33,6 +33,7 @@ final class DarkReaderUserScript: NSObject, StaticUserScript {
     
     func refreshDarkReaderScript(from settings: DarkReaderScriptSettings = .shared, webView: WKWebView) {
         let call = generateDarkReaderCall(from: settings)
+        evaluate(js: "DarkReader.setFetchMethod(window.fetch)", inWebView: webView)
         evaluate(js: call, inWebView: webView)
     }
     
