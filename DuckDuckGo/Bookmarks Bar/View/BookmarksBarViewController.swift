@@ -216,8 +216,7 @@ extension BookmarksBarViewController: BookmarksBarViewModelDelegate {
             addBookmarkViewController.edit(bookmark: bookmark)
             presentAsModalWindow(addBookmarkViewController)
         case .moveToEnd:
-            // TODO: Fix
-            bookmarkManager.move(objectUUIDs: [bookmark.id], toIndex: 0, withinParentFolder: .root) { _ in }
+            bookmarkManager.move(objectUUIDs: [bookmark.id], toIndex: nil, withinParentFolder: .root) { _ in }
         case .copyURL:
             NSPasteboard.general.copy(url: bookmark.url)
         case .deleteEntity:
@@ -240,8 +239,7 @@ extension BookmarksBarViewController: BookmarksBarViewModelDelegate {
             addFolderViewController.edit(folder: folder)
             presentAsModalWindow(addFolderViewController)
         case .moveToEnd:
-            // TODO: Fix
-            bookmarkManager.move(objectUUIDs: [folder.id], toIndex: 0, withinParentFolder: .root) { _ in }
+            bookmarkManager.move(objectUUIDs: [folder.id], toIndex: nil, withinParentFolder: .root) { _ in }
         case .deleteEntity:
             bookmarkManager.remove(folder: folder)
         default:

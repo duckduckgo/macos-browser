@@ -54,7 +54,7 @@ protocol BookmarkStore {
     func add(objectsWithUUIDs: [UUID], to parent: BookmarkFolder?, completion: @escaping (Error?) -> Void)
     func update(objectsWithUUIDs uuids: [UUID], update: @escaping (BaseBookmarkEntity) -> Void, completion: @escaping (Error?) -> Void)
     func canMoveObjectWithUUID(objectUUID uuid: UUID, to parent: BookmarkFolder) -> Bool
-    func move(objectUUIDs: [UUID], toIndex: Int, withinParentFolder: ParentFolderType, completion: @escaping (Error?) -> Void)
+    func move(objectUUIDs: [UUID], toIndex: Int?, withinParentFolder: ParentFolderType, completion: @escaping (Error?) -> Void)
     func importBookmarks(_ bookmarks: ImportedBookmarks, source: BookmarkImportSource) -> BookmarkImportResult
 
 }
@@ -457,8 +457,9 @@ final class LocalBookmarkStore: BookmarkStore {
         return canMoveObject
     }
     
+    // swiftlint:disable:next function_body_length
     func move(objectUUIDs: [UUID],
-              toIndex index: Int,
+              toIndex index: Int?,
               withinParentFolder type: ParentFolderType,
               completion: @escaping (Error?) -> Void) {
         context.perform { [weak self] in
@@ -491,7 +492,7 @@ final class LocalBookmarkStore: BookmarkStore {
                 }
             }
             
-            if index < newParentFolder.mutableChildren.count {
+            if let index = index, index < newParentFolder.mutableChildren.count {
                 var currentInsertionIndex = max(index, 0)
                 
                 for bookmarkManagedObject in bookmarkManagedObjects {
