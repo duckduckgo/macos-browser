@@ -137,7 +137,6 @@ final class Fire {
         }
     }
 
-    // swiftlint:disable function_body_length
     func burnDomains(_ domains: Set<String>,
                      includingHistory: Bool = true,
                      completion: (() -> Void)? = nil) {
@@ -208,11 +207,9 @@ final class Fire {
                 completion?()
 
                 os_log("Fire finished", log: .fire)
-                NSApp.reply(toApplicationShouldTerminate: true)
             }
         }
     }
-    // swiftlint:enable function_body_length
 
     func burnAll(tabCollectionViewModel: TabCollectionViewModel, completion: (() -> Void)? = nil) {
         os_log("Fire started", log: .fire)
@@ -258,7 +255,6 @@ final class Fire {
                 completion?()
                 
                 os_log("Fire finished", log: .fire)
-                NSApp.reply(toApplicationShouldTerminate: true)
             }
         }
     }
