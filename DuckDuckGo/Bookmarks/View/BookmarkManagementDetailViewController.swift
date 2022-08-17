@@ -106,6 +106,12 @@ final class BookmarkManagementDetailViewController: NSViewController, NSMenuItem
         // Clicking anywhere outside of the table view should end editing mode for a given cell.
         updateEditingState(forRowAt: -1)
     }
+    
+    override func keyDown(with event: NSEvent) {
+        if event.charactersIgnoringModifiers == String(UnicodeScalar(NSDeleteCharacter)!) {
+            deleteSelectedItems()
+        }
+    }
 
     fileprivate func reloadData() {
         guard editingBookmarkIndex == nil else {
