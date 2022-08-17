@@ -122,6 +122,7 @@ public final class ContentOverlayViewController: NSViewController, EmailManagerR
         }
 
         let webView = OverlayWebView(frame: .zero, configuration: configuration)
+        webView.allowsLinkPreview = false
         webView.window?.acceptsMouseMovedEvents = true
         webView.window?.ignoresMouseEvents = false
         webView.configuration.userContentController.addHandler(topAutofillUserScript)
