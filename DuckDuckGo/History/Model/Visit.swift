@@ -43,3 +43,15 @@ extension Visit: Hashable {
     }
 
 }
+
+extension Visit: NSCopying {
+
+    func copy(with zone: NSZone? = nil) -> Any {
+        let visit = Visit(date: date,
+                          identifier: identifier,
+                          historyEntry: nil)
+        visit.savingState = savingState
+        return visit
+    }
+
+}

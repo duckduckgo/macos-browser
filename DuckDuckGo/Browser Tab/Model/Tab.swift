@@ -923,6 +923,10 @@ extension Tab: EmailManagerRequestDelegate { }
 
 extension Tab: SecureVaultManagerDelegate {
 
+    public func secureVaultManagerIsEnabledStatus(_: SecureVaultManager) -> Bool {
+        return true
+    }
+    
     func secureVaultManager(_: SecureVaultManager, promptUserToStoreAutofillData data: AutofillData) {
         delegate?.tab(self, requestedSaveAutofillData: data)
     }
