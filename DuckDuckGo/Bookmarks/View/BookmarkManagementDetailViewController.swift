@@ -31,7 +31,7 @@ private struct EditedBookmarkMetadata {
     let index: Int
 }
 
-final class BookmarkManagementDetailViewController: NSViewController {
+final class BookmarkManagementDetailViewController: NSViewController, NSMenuItemValidation {
 
     fileprivate enum Constants {
         static let bookmarkCellIdentifier = NSUserInterfaceItemIdentifier(rawValue: "BookmarksCellIdentifier")
@@ -169,6 +169,18 @@ final class BookmarkManagementDetailViewController: NSViewController {
         addFolderViewController.delegate = self
         beginSheet(addFolderViewController)
     }
+    
+    @IBAction func delete(_ sender: AnyObject) {
+        deleteSelectedItems()
+    }
+    
+    func validateMenuItem(_ menuItem: NSMenuItem) -> Bool {
+        if menuItem.action == #selector(BookmarkManagementDetailViewController.delete(_:)) {
+            return !tableView.selectedRowIndexes.isEmpty
+        }
+        
+        return true
+    }
 
     private func endEditing() {
         if let editingIndex = editingBookmarkIndex?.index {
@@ -226,6 +238,13 @@ final class BookmarkManagementDetailViewController: NSViewController {
         case .favorites:
             return LocalBookmarkManager.shared.list?.favoriteBookmarks.count ?? 0
         }
+    }
+    
+    private func deleteSelectedItems() {
+        let entities = tableView.selectedRowIndexes.compactMap { fetchEntity(at: $0) }
+        let entityUUIDs = entities.map(\.id)
+        
+        bookmarkManager.remove(objectsWithUUIDs: entityUUIDs)
     }
 
 }
