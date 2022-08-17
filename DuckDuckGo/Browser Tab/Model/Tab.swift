@@ -174,6 +174,7 @@ final class Tab: NSObject, Identifiable, ObservableObject {
         configuration.applyStandardConfiguration()
 
         webView = WebView(frame: CGRect.zero, configuration: configuration)
+        webView.allowsLinkPreview = false
         permissions = PermissionModel(webView: webView)
 
         super.init()
