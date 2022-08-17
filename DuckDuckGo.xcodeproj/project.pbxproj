@@ -1739,12 +1739,12 @@
 			isa = PBXGroup;
 			children = (
 				31FB1CBF28A544280098F221 /* Opt In Alert */,
-				31FB1CBE28A544190098F221 /* Website Settings View */,
+				31FB1CBE28A544190098F221 /* Website Settings Popover */,
 			);
 			path = "Adaptive Dark Mode";
 			sourceTree = "<group>";
 		};
-		31FB1CBE28A544190098F221 /* Website Settings View */ = {
+		31FB1CBE28A544190098F221 /* Website Settings Popover */ = {
 			isa = PBXGroup;
 			children = (
 				31FB1CBC28A543D00098F221 /* AdaptiveDarkModeWebsiteSettingsPopover.swift */,
@@ -1752,7 +1752,7 @@
 				31FB1CC028A5456F0098F221 /* AdaptiveDarkModeWebsiteSettingsViewController.swift */,
 				31F63C1B28AD4E2200C5AD60 /* AdaptiveDarkModeWebsiteSettingsViewModel.swift */,
 			);
-			path = "Website Settings View";
+			path = "Website Settings Popover";
 			sourceTree = "<group>";
 		};
 		31FB1CBF28A544280098F221 /* Opt In Alert */ = {

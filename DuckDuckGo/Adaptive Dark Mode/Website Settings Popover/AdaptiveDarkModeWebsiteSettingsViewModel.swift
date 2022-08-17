@@ -21,7 +21,11 @@ import Foundation
 final class AdaptiveDarkModeWebsiteSettingsViewModel: ObservableObject {
     let currentURL: URL
 
-    @Published var isDarkModeEnabled: Bool = false
+    @Published var isDarkModeEnabled: Bool = false {
+        didSet {
+            enableDarkMode(isDarkModeEnabled)
+        }
+    }
     
     var currentDomain: String {
         currentURL.host?.dropWWW() ?? ""
@@ -31,7 +35,7 @@ final class AdaptiveDarkModeWebsiteSettingsViewModel: ObservableObject {
         self.currentURL = currentURL
     }
     
-    func toggleDarkMode() {
-        print("toggle dark mode")
+    private func enableDarkMode(_ enable: Bool) {
+        print("toggle dark mode \(enable)")
     }
 }
