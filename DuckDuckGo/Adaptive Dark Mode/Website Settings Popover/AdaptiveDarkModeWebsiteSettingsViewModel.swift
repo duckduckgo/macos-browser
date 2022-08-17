@@ -36,6 +36,11 @@ final class AdaptiveDarkModeWebsiteSettingsViewModel: ObservableObject {
     }
     
     private func enableDarkMode(_ enable: Bool) {
-        print("toggle dark mode \(enable)")
+        
+        if enable {
+            AdaptiveDarkModeScriptSettings.shared.status = .enabled
+        } else {
+            AdaptiveDarkModeScriptSettings.shared.status = .disabled
+        }
     }
 }
