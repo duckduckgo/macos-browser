@@ -150,10 +150,6 @@ final class BookmarkOutlineViewDataSource: NSObject, NSOutlineViewDataSource, NS
                      validateDrop info: NSDraggingInfo,
                      proposedItem item: Any?,
                      proposedChildIndex index: Int) -> NSDragOperation {
-        guard index == -1 else {
-            return .none
-        }
-
         let destinationNode = nodeForItem(item)
 
         if let bookmarks = PasteboardBookmark.pasteboardBookmarks(with: info.draggingPasteboard) {
@@ -220,16 +216,12 @@ final class BookmarkOutlineViewDataSource: NSObject, NSOutlineViewDataSource, NS
     }
 
     func outlineView(_ outlineView: NSOutlineView, acceptDrop info: NSDraggingInfo, item: Any?, childIndex index: Int) -> Bool {
-        let representedObject = (item as? BookmarkNode)?.representedObject
-        let draggedBookmarks = PasteboardBookmark.pasteboardBookmarks(with: info.draggingPasteboard) ?? Set<PasteboardBookmark>()
-        let draggedFolders = PasteboardFolder.pasteboardFolders(with: info.draggingPasteboard) ?? Set<PasteboardFolder>()
-
-        if draggedBookmarks.isEmpty && draggedFolders.isEmpty {
+        guard let draggedObjectIdentifiers = info.draggingPasteboard.pasteboardItems?.compactMap(\.bookmarkEntityUUID),
+              !draggedObjectIdentifiers.isEmpty else {
             return false
         }
-
-        let draggedObjectIdentifierStrings = draggedBookmarks.map(\.id) + draggedFolders.map(\.id)
-        let draggedObjectIdentifiers = draggedObjectIdentifierStrings.compactMap(UUID.init(uuidString:))
+        
+        let representedObject = (item as? BookmarkNode)?.representedObject
 
         // Handle the nil destination case:
 
@@ -255,7 +247,7 @@ final class BookmarkOutlineViewDataSource: NSObject, NSOutlineViewDataSource, NS
         }
 
         // Handle the existing destination case:
-        
+
         if let parent = representedObject as? BookmarkFolder {
             bookmarkManager.add(objectsWithUUIDs: draggedObjectIdentifiers, to: parent) { error in
                 if let error = error {
