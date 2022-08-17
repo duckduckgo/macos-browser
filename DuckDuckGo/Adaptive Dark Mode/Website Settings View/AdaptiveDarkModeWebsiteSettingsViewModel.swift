@@ -1,5 +1,5 @@
 //
-//  AdaptiveDarkModeWebsiteSettingsPopover.swift
+//  AdaptiveDarkModeWebsiteSettingsViewModel.swift
 //
 //  Copyright © 2022 DuckDuckGo. All rights reserved.
 //
@@ -16,27 +16,22 @@
 //  limitations under the License.
 //
 
-import AppKit
+import Foundation
 
-final class AdaptiveDarkModeWebsiteSettingsPopover: NSPopover {
-    override init() {
-        super.init()
+final class AdaptiveDarkModeWebsiteSettingsViewModel: ObservableObject {
+    let currentURL: URL
 
-        self.behavior = .semitransient
-
-        setupContentController()
+    @Published var isDarkModeEnabled: Bool = false
+    
+    var currentDomain: String {
+        currentURL.host?.dropWWW() ?? ""
     }
-
-    required init?(coder: NSCoder) {
-        fatalError("\(Self.self): Bad initializer")
+    
+    init(currentURL: URL) {
+        self.currentURL = currentURL
     }
-
-    func preparePopoverWithURL(_ url: URL) {
-        let controller = AdaptiveDarkModeWebsiteSettingsViewController(currentURL: url)
-        contentViewController = controller
-
+    
+    func toggleDarkMode() {
+        print("toggle dark mode")
     }
-    private func setupContentController() {
-    }
-
 }

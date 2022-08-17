@@ -364,6 +364,11 @@ final class NavigationBarViewController: NSViewController {
             return
         }
         
+        guard let currentURL = tabCollectionViewModel.selectedTabViewModel?.tab.url else {
+            return
+        }
+        
+        adaptiveDarkModePopover.preparePopoverWithURL(currentURL)
         adaptiveDarkModePopover.show(relativeTo: adaptiveDarkModeButton.bounds.insetFromLineOfDeath(),
                                      of: adaptiveDarkModeButton,
                                      preferredEdge: .maxY)

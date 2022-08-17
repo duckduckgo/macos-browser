@@ -19,23 +19,24 @@
 import SwiftUI
 
 struct AdaptiveDarkModeWebsiteSettingsView: View {
-    @State private var toggle: Bool = false
+    @ObservedObject var viewModel: AdaptiveDarkModeWebsiteSettingsViewModel
+    
     var body: some View {
         VStack (alignment: .leading, spacing: 14) {
             HStack (alignment: .center) {
                 VStack(alignment: .leading) {
                     Text(UserText.adaptiveDarkModeWebsiteSettingsViewTitle)
                         .font(.headline)
-                    if toggle {
-                        Text(UserText.adaptiveDarkModeEnabledFor(website: "duck.com"))
+                    if viewModel.isDarkModeEnabled {
+                        Text(UserText.adaptiveDarkModeEnabledFor(website: viewModel.currentDomain))
                     } else {
-                        Text(UserText.adaptiveDarkModeDisabledFor(website: "duck.com"))
+                        Text(UserText.adaptiveDarkModeDisabledFor(website: viewModel.currentDomain))
                     }
                 }
                 
                 Spacer()
                 
-                Toggle("", isOn: $toggle)
+                Toggle("", isOn: $viewModel.isDarkModeEnabled)
                     .toggleStyle(.switch)
                 
             }
@@ -52,17 +53,20 @@ struct AdaptiveDarkModeWebsiteSettingsView: View {
 
 struct AdaptiveDarkModeWebsiteSettingsView_Previews: PreviewProvider {
     static var previews: some View {
+        let viewModel = AdaptiveDarkModeWebsiteSettingsViewModel(currentURL:
+                                                                    URL(string: "https://www.duck.com")!)
+        
         if #available(macOS 11.0, *) {
-            AdaptiveDarkModeWebsiteSettingsView()
+            AdaptiveDarkModeWebsiteSettingsView(viewModel: viewModel)
                 .preferredColorScheme(.dark)
                 .frame(width: 400, height: 105)
             
-            AdaptiveDarkModeWebsiteSettingsView()
+            AdaptiveDarkModeWebsiteSettingsView(viewModel: viewModel)
                 .preferredColorScheme(.light)
                 .frame(width: 400, height: 105)
 
         } else {
-            AdaptiveDarkModeWebsiteSettingsView()
+            AdaptiveDarkModeWebsiteSettingsView(viewModel: viewModel)
         }
     }
 }

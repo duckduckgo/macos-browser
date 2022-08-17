@@ -20,13 +20,24 @@ import Cocoa
 import SwiftUI
 
 final class AdaptiveDarkModeWebsiteSettingsViewController: NSViewController {
+    let currentURL: URL
+    
+    init(currentURL: URL) {
+        self.currentURL = currentURL
+        super.init(nibName: nil, bundle: nil)
+    }
+    
+    required init?(coder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }
     
     override func viewDidLoad() {
         super.viewDidLoad()
     }
     
     override func loadView() {
-        let hostingView = NSHostingView(rootView: AdaptiveDarkModeWebsiteSettingsView())
+        let viewModel = AdaptiveDarkModeWebsiteSettingsViewModel(currentURL: currentURL)
+        let hostingView = NSHostingView(rootView: AdaptiveDarkModeWebsiteSettingsView(viewModel: viewModel))
         hostingView.frame = NSRect(x: 0, y: 0, width: 400, height: 105)
         view = hostingView
     }
