@@ -66,9 +66,11 @@ final class DarkReaderScriptSettings {
     private var defaultAppearanceSettings: String {
         return """
             {
+                mode: 1,
                 brightness: 100,
-                contrast: 90,
-                sepia: 10
+                contrast: 100,
+                grayscale: 0,
+                sepia: 0,
             }
         """
     }

@@ -21,7 +21,7 @@ import BrowserServicesKit
 
 final class DarkReaderUserScript: NSObject, StaticUserScript {
 
-    static var injectionTime: WKUserScriptInjectionTime { .atDocumentEnd }
+    static var injectionTime: WKUserScriptInjectionTime { .atDocumentStart }
     static var forMainFrameOnly: Bool { false }
     static var source: String = DarkReaderUserScript.loadJS("darkreader", from: .main)
     static var script: WKUserScript = DarkReaderUserScript.makeWKUserScript()
