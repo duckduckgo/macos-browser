@@ -20,7 +20,7 @@ import Foundation
 
 struct PasteboardFolder: Hashable {
 
-    private struct Key {
+    struct Key {
         static let id = "id"
         static let name = "name"
     }

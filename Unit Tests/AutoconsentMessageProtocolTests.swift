@@ -65,11 +65,9 @@ class AutoconsentMessageProtocolTests: XCTestCase {
         userScript.handleMessage(
             replyHandler: {(msg: Any?, _: String?) in
                 expect.fulfill()
-                // swiftlint:disable line_length
                 XCTAssertEqual(self.replyToJson(msg: msg!), """
                 {"config":{"autoAction":"optOut","detectRetries":20,"disabledCmps":[],"enabled":true,"enablePrehide":true},"rules":null,"type":"initResp"}
                 """)
-                // swiftlint:enable line_length
             },
             message: message
         )

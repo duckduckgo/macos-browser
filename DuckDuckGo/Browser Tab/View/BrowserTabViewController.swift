@@ -27,10 +27,8 @@ protocol BrowserTabViewControllerClickDelegate: AnyObject {
     func browserTabViewController(_ browserTabViewController: BrowserTabViewController, didClickAtPoint: CGPoint)
 }
 
-// swiftlint:disable file_length
-// swiftlint:disable:next type_body_length
 final class BrowserTabViewController: NSViewController {
-
+    
     @IBOutlet weak var errorView: NSView!
     @IBOutlet weak var homePageView: NSView!
     @IBOutlet weak var errorMessageLabel: NSTextField!
@@ -60,6 +58,8 @@ final class BrowserTabViewController: NSViewController {
     private var transientTabContentViewController: NSViewController?
 
     private var mouseDownMonitor: Any?
+    
+    private var cookieConsentPopoverManager = CookieConsentPopoverManager()
 
     required init?(coder: NSCoder) {
         fatalError("BrowserTabViewController: Bad initializer")
@@ -118,12 +118,23 @@ final class BrowserTabViewController: NSViewController {
     private func subscribeToSelectedTabViewModel() {
         tabCollectionViewModel.$selectedTabViewModel
             .sink { [weak self] selectedTabViewModel in
-                self?.tabViewModel = selectedTabViewModel
-                self?.showTabContent(of: selectedTabViewModel)
-                self?.subscribeToErrorViewState()
-                self?.subscribeToTabContent(of: selectedTabViewModel)
+                
+                guard let self = self else { return }
+                self.tabViewModel = selectedTabViewModel
+                self.showTabContent(of: selectedTabViewModel)
+                self.subscribeToErrorViewState()
+                self.subscribeToTabContent(of: selectedTabViewModel)
+                self.showCookieConsentPopoverIfNecessary(selectedTabViewModel)
             }
             .store(in: &cancellables)
+    }
+    
+    private func showCookieConsentPopoverIfNecessary(_ selectedTabViewModel: TabViewModel?) {
+        if selectedTabViewModel?.tab == cookieConsentPopoverManager.currentTab {
+            cookieConsentPopoverManager.popOver.show(on: view, animated: false)
+        } else {
+            cookieConsentPopoverManager.popOver.close(animated: false)
+        }
     }
 
     private func subscribeToTabs() {
@@ -137,7 +148,7 @@ final class BrowserTabViewController: NSViewController {
     }
 
     private func subscribeToPinnedTabs() {
-        pinnedTabsDelegatesCancellable = tabCollectionViewModel.pinnedTabsCollection.$tabs
+        pinnedTabsDelegatesCancellable = tabCollectionViewModel.pinnedTabsCollection?.$tabs
             .sink { [weak self] tabs in
                 for tab in tabs where tab.delegate !== self {
                     tab.delegate = self
@@ -202,6 +213,11 @@ final class BrowserTabViewController: NSViewController {
         if let oldWebView = oldWebView, let webViewContainer = webViewContainer, oldWebView !== webView {
             removeWebViewFromHierarchy(webView: oldWebView, container: webViewContainer)
         }
+
+        if setFirstResponderAfterAdding {
+            setFirstResponderAfterAdding = false
+            makeWebViewFirstResponder()
+        }
     }
 
     func subscribeToTabContent(of tabViewModel: TabViewModel?) {
@@ -217,8 +233,8 @@ final class BrowserTabViewController: NSViewController {
             .receive(on: DispatchQueue.main)
 
         tabContentCancellable = tabContentPublisher
-            .flatMap { tabContent -> AnyPublisher<Void, Never> in
-                guard tabContent.isUrl else {
+            .map { [weak tabViewModel] tabContent -> AnyPublisher<Void, Never> in
+                guard let tabViewModel = tabViewModel, tabContent.isUrl else {
                     return Just(()).eraseToAnyPublisher()
                 }
 
@@ -227,9 +243,14 @@ final class BrowserTabViewController: NSViewController {
                     tabViewModel.tab.webViewDidFailNavigationPublisher,
                     tabViewModel.tab.webViewDidReceiveChallengePublisher
                 )
+                .prefix(1)
                 .eraseToAnyPublisher()
             }
-            .sink { [weak self] in
+            .switchToLatest()
+            .sink { [weak self, weak tabViewModel] in
+                guard let tabViewModel = tabViewModel else {
+                    return
+                }
                 self?.showTabContent(of: tabViewModel)
             }
     }
@@ -244,8 +265,15 @@ final class BrowserTabViewController: NSViewController {
     }
 
     func makeWebViewFirstResponder() {
-        self.webView?.makeMeFirstResponder()
+        if let webView = self.webView {
+            webView.makeMeFirstResponder()
+        } else {
+            setFirstResponderAfterAdding = true
+            view.window?.makeFirstResponder(nil)
+        }
     }
+
+    private var setFirstResponderAfterAdding = false
 
     private func setFirstResponderIfNeeded() {
         guard webView?.url != nil else {
@@ -328,7 +356,7 @@ final class BrowserTabViewController: NSViewController {
     }
 
     private func showTabContent(of tabViewModel: TabViewModel?) {
-        guard !tabCollectionViewModel.tabCollection.tabs.isEmpty || !tabCollectionViewModel.pinnedTabsCollection.tabs.isEmpty else {
+        guard tabCollectionViewModel.allTabsCount > 0 else {
             view.window?.close()
             return
         }
@@ -373,7 +401,7 @@ final class BrowserTabViewController: NSViewController {
             return false
         }
 
-        let isPinnedTab = tabCollectionViewModel.pinnedTabsCollection.tabs.contains(tabViewModel.tab)
+        let isPinnedTab = tabCollectionViewModel.pinnedTabsCollection?.tabs.contains(tabViewModel.tab) == true
         let isKeyWindow = view.window?.isKeyWindow == true
 
         let tabIsNotOnScreen = tabViewModel.tab.webView.tabContentView.superview == nil
@@ -445,12 +473,17 @@ extension BrowserTabViewController: ContentOverlayUserScriptDelegate {
 
 extension BrowserTabViewController: TabDelegate {
 
+    func tab(_ tab: Tab, promptUserForCookieConsent result: @escaping (Bool) -> Void) {
+       cookieConsentPopoverManager.show(on: view, animated: true, result: result)
+       cookieConsentPopoverManager.currentTab = tabViewModel?.tab
+    }
+    
     func tabWillStartNavigation(_ tab: Tab, isUserInitiated: Bool) {
         if isUserInitiated,
            let window = self.view.window,
            window.isPopUpWindow == true,
            window.isKeyWindow == false {
-
+            
             window.makeKeyAndOrderFront(nil)
         }
     }
@@ -1162,5 +1195,3 @@ extension BrowserTabViewController {
         }
     }
 }
-
-// swiftlint:enable file_length

@@ -21,16 +21,16 @@ import Carbon.HIToolbox
 import Combine
 import os.log
 
-// swiftlint:disable type_body_length
 final class MainViewController: NSViewController {
 
     @IBOutlet weak var tabBarContainerView: NSView!
     @IBOutlet weak var navigationBarContainerView: NSView!
     @IBOutlet weak var webContainerView: NSView!
     @IBOutlet weak var findInPageContainerView: NSView!
+    @IBOutlet weak var bookmarksBarContainerView: NSView!
     @IBOutlet var navigationBarTopConstraint: NSLayoutConstraint!
     @IBOutlet var addressBarHeightConstraint: NSLayoutConstraint!
-    @IBOutlet var webViewTopConstraint: NSLayoutConstraint!
+    @IBOutlet var bookmarksBarHeightConstraint: NSLayoutConstraint!
 
     @IBOutlet var divider: NSView!
 
@@ -39,16 +39,26 @@ final class MainViewController: NSViewController {
     private(set) var browserTabViewController: BrowserTabViewController!
     private(set) var findInPageViewController: FindInPageViewController!
     private(set) var fireViewController: FireViewController!
+    private(set) var bookmarksBarViewController: BookmarksBarViewController!
 
     let tabCollectionViewModel: TabCollectionViewModel
 
     private var selectedTabViewModelCancellable: AnyCancellable?
+    private var bookmarksBarVisibilityChangedCancellable: AnyCancellable?
     private var navigationalCancellables = Set<AnyCancellable>()
     private var canBookmarkCancellable: AnyCancellable?
     private var canInsertLastRemovedTabCancellable: AnyCancellable?
     private var findInPageCancellable: AnyCancellable?
     private var keyDownMonitor: Any?
     private var mouseNavButtonsMonitor: Any?
+    
+    private var bookmarksBarIsVisible: Bool {
+        return bookmarksBarViewController.parent != nil
+    }
+    
+    private var isInPopUpWindow: Bool {
+        view.window?.isPopUpWindow == true
+    }
 
     required init?(coder: NSCoder) {
         self.tabCollectionViewModel = TabCollectionViewModel()
@@ -65,23 +75,28 @@ final class MainViewController: NSViewController {
 
         listenToKeyDownEvents()
         subscribeToSelectedTabViewModel()
+        subscribeToAppSettingsNotifications()
         findInPageContainerView.applyDropShadow()
-
     }
 
     override func viewWillAppear() {
-        if view.window?.isPopUpWindow == true {
+        if isInPopUpWindow {
             tabBarViewController.view.isHidden = true
             tabBarContainerView.isHidden = true
             navigationBarTopConstraint.constant = 0.0
-            webViewTopConstraint.constant = navigationBarViewController.view.frame.height
             addressBarHeightConstraint.constant = tabBarContainerView.frame.height
+            updateBookmarksBarViewVisibility(visible: false)
         } else {
             navigationBarContainerView.wantsLayer = true
             navigationBarContainerView.layer?.masksToBounds = false
 
             resizeNavigationBarForHomePage(tabCollectionViewModel.selectedTabViewModel?.tab.content == .homePage, animated: false)
+            
+            let bookmarksBarVisible = PersistentAppInterfaceSettings.shared.showBookmarksBar
+            updateBookmarksBarViewVisibility(visible: bookmarksBarVisible)
         }
+        
+        updateDividerColor()
     }
 
     override func viewDidLayout() {
@@ -164,6 +179,41 @@ final class MainViewController: NSViewController {
         self.fireViewController = fireViewController
         return fireViewController
     }
+    
+    @IBSegueAction
+    func createBookmarksBar(coder: NSCoder, sender: Any?, segueIdentifier: String?) -> BookmarksBarViewController? {
+        let bookmarksBarViewController = BookmarksBarViewController(coder: coder, tabCollectionViewModel: tabCollectionViewModel)
+        self.bookmarksBarViewController = bookmarksBarViewController
+        return bookmarksBarViewController
+    }
+    
+    private func updateBookmarksBarViewVisibility(visible: Bool) {
+        let showBookmarksBar = isInPopUpWindow ? false : visible
+
+        if visible {
+            if bookmarksBarViewController.parent == nil {
+                addChild(bookmarksBarViewController)
+
+                bookmarksBarViewController.view.frame = bookmarksBarContainerView.bounds
+                bookmarksBarContainerView.addSubview(bookmarksBarViewController.view)
+            }
+        } else {
+            bookmarksBarViewController.removeFromParent()
+            bookmarksBarViewController.view.removeFromSuperview()
+        }
+        
+        bookmarksBarHeightConstraint.constant = showBookmarksBar ? 34 : 0
+
+        updateDividerColor()
+    }
+    
+    private func updateDividerColor() {
+        NSAppearance.withAppAppearance {
+            let isHomePage = tabCollectionViewModel.selectedTabViewModel?.tab.content == .homePage
+            let backgroundColor: NSColor = (bookmarksBarIsVisible || isHomePage) ? .addressBarFocusedBackgroundColor : .addressBarSolidSeparatorColor
+            (divider as? ColorView)?.backgroundColor = backgroundColor
+        }
+    }
 
     private func subscribeToSelectedTabViewModel() {
         selectedTabViewModelCancellable = tabCollectionViewModel.$selectedTabViewModel.receive(on: DispatchQueue.main).sink { [weak self] _ in
@@ -174,19 +224,25 @@ final class MainViewController: NSViewController {
             self?.adjustFirstResponder()
         }
     }
+    
+    private func subscribeToAppSettingsNotifications() {
+        bookmarksBarVisibilityChangedCancellable = NotificationCenter.default
+            .publisher(for: PersistentAppInterfaceSettings.showBookmarksBarSettingChanged)
+            .sink { [weak self] _ in
+                self?.updateBookmarksBarViewVisibility(visible: PersistentAppInterfaceSettings.shared.showBookmarksBar)
+            }
+    }
 
     private func resizeNavigationBarForHomePage(_ homePage: Bool, animated: Bool) {
         NSAnimationContext.runAnimationGroup { context in
             context.duration = 0.1
 
-            let nonHomePageHeight: CGFloat = view.window?.isPopUpWindow == true ? 42 : 48
+            let nonHomePageHeight: CGFloat = isInPopUpWindow ? 42 : 48
 
             let height = animated ? addressBarHeightConstraint.animator() : addressBarHeightConstraint
-            height?.constant = homePage ? 56 : nonHomePageHeight
+            height?.constant = homePage ? 52 : nonHomePageHeight
 
-            let divider = animated ? self.divider.animator() : self.divider
-            divider?.alphaValue = homePage ? 0 : 1.0
-
+            updateDividerColor()
             navigationBarViewController.resizeAddressBarForHomePage(homePage, animated: animated)
         }
     }

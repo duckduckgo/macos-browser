@@ -38,9 +38,9 @@ protocol TabDelegate: FileDownloadManagerDelegate, ContentOverlayUserScriptDeleg
 
     func tabPageDOMLoaded(_ tab: Tab)
     func closeTab(_ tab: Tab)
+    func tab(_ tab: Tab, promptUserForCookieConsent result: @escaping (Bool) -> Void)
 }
 
-// swiftlint:disable type_body_length
 // swiftlint:disable file_length
 final class Tab: NSObject, Identifiable, ObservableObject {
 
@@ -146,6 +146,7 @@ final class Tab: NSObject, Identifiable, ObservableObject {
          error: Error? = nil,
          favicon: NSImage? = nil,
          sessionStateData: Data? = nil,
+         interactionStateData: Data? = nil,
          parentTab: Tab? = nil,
          shouldLoadInBackground: Bool = false,
          canBeClosedWithBack: Bool = false,
@@ -165,6 +166,7 @@ final class Tab: NSObject, Identifiable, ObservableObject {
         self.parentTab = parentTab
         self._canBeClosedWithBack = canBeClosedWithBack
         self.sessionStateData = sessionStateData
+        self.interactionStateData = interactionStateData
         self.lastSelectedAt = lastSelectedAt
         self.currentDownload = currentDownload
 
@@ -172,6 +174,7 @@ final class Tab: NSObject, Identifiable, ObservableObject {
         configuration.applyStandardConfiguration()
 
         webView = WebView(frame: CGRect.zero, configuration: configuration)
+        webView.allowsLinkPreview = false
         permissions = PermissionModel(webView: webView)
 
         super.init()
@@ -192,6 +195,9 @@ final class Tab: NSObject, Identifiable, ObservableObject {
     }
 
     deinit {
+        if let url = url {
+            historyCoordinating.commitChanges(url: url)
+        }
         webView.stopLoading()
         webView.stopMediaCapture()
         webView.fullscreenWindowController?.close()
@@ -234,7 +240,10 @@ final class Tab: NSObject, Identifiable, ObservableObject {
         didSet {
             handleFavicon(oldContent: oldValue)
             invalidateSessionStateData()
-            self.error = nil
+            if let oldUrl = oldValue.url {
+                historyCoordinating.commitChanges(url: oldUrl)
+            }
+            error = nil
             Task {
                 await reloadIfNeeded(shouldLoadInBackground: true)
             }
@@ -282,20 +291,37 @@ final class Tab: NSObject, Identifiable, ObservableObject {
         }
     }
 
+    @available(macOS, obsoleted: 12.0, renamed: "interactionStateData")
     var sessionStateData: Data?
+    var interactionStateData: Data?
 
     func invalidateSessionStateData() {
         sessionStateData = nil
+        interactionStateData = nil
     }
 
     func getActualSessionStateData() -> Data? {
         if let sessionStateData = sessionStateData {
             return sessionStateData
         }
+
         guard webView.url != nil else { return nil }
         // collect and cache actual SessionStateData on demand and store until invalidated
         self.sessionStateData = (try? webView.sessionStateData())
         return self.sessionStateData
+    }
+    
+    @available(macOS 12, *)
+    func getActualInteractionStateData() -> Data? {
+        if let interactionStateData = interactionStateData {
+            return interactionStateData
+        }
+
+        guard webView.url != nil else { return nil }
+        
+        self.interactionStateData = (webView.interactionState as? Data)
+        
+        return self.interactionStateData
     }
 
     func update(url: URL?, userEntered: Bool = true) {
@@ -430,7 +456,7 @@ final class Tab: NSObject, Identifiable, ObservableObject {
         userContentController.$contentBlockingAssets.compactMap { $0?.completionTokens }.eraseToAnyPublisher()
     }
 
-    private static let debugEvents = EventMapping<AMPProtectionDebugEvents> { event, _, _, _, _ in
+    private static let debugEvents = EventMapping<AMPProtectionDebugEvents> { event, _, _, _ in
         switch event {
         case .ampBlockingRulesCompilationFailed:
             Pixel.fire(.ampBlockingRulesCompilationFailed)
@@ -456,7 +482,14 @@ final class Tab: NSObject, Identifiable, ObservableObject {
             })
         }()
         if shouldLoadURL(url, shouldLoadInBackground: shouldLoadInBackground) {
-            let didRestore = restoreSessionStateDataIfNeeded()
+            let didRestore: Bool
+            
+            if #available(macOS 12.0, *) {
+                didRestore = restoreInteractionStateDataIfNeeded() || restoreSessionStateDataIfNeeded()
+            } else {
+                didRestore = restoreSessionStateDataIfNeeded()
+            }
+            
             if !didRestore {
                 if url.isFileURL {
                     webView.loadFileURL(url, allowingReadAccessTo: URL(fileURLWithPath: "/"))
@@ -503,6 +536,7 @@ final class Tab: NSObject, Identifiable, ObservableObject {
     }
 
     @MainActor
+    @available(macOS, obsoleted: 12.0, renamed: "restoreInteractionStateDataIfNeeded")
     private func restoreSessionStateDataIfNeeded() -> Bool {
         var didRestore: Bool = false
         if let sessionStateData = self.sessionStateData {
@@ -516,6 +550,23 @@ final class Tab: NSObject, Identifiable, ObservableObject {
                 os_log("Tab:setupWebView could not restore session state %s", "\(error)")
             }
         }
+        
+        return didRestore
+    }
+    
+    @MainActor
+    @available(macOS 12, *)
+    private func restoreInteractionStateDataIfNeeded() -> Bool {
+        var didRestore: Bool = false
+        if let interactionStateData = self.interactionStateData {
+            if contentURL.isFileURL {
+                webView.loadFileURL(contentURL, allowingReadAccessTo: URL(fileURLWithPath: "/"))
+            }
+            
+            webView.interactionState = interactionStateData
+            didRestore = true
+        }
+        
         return didRestore
     }
 
@@ -799,25 +850,28 @@ extension Tab: ContentBlockerRulesUserScriptDelegate {
     func contentBlockerRulesUserScriptShouldProcessCTLTrackers(_ script: ContentBlockerRulesUserScript) -> Bool {
         return fbBlockingEnabled
     }
-
-    func contentBlockerRulesUserScript(_ script: ContentBlockerRulesUserScript, detectedTracker tracker: DetectedTracker) {
+    
+    func contentBlockerRulesUserScript(_ script: ContentBlockerRulesUserScript, detectedTracker tracker: DetectedRequest) {
         trackerInfo?.add(detectedTracker: tracker)
         guard let url = URL(string: tracker.pageUrl) else { return }
         historyCoordinating.addDetectedTracker(tracker, onURL: url)
     }
 
+    func contentBlockerRulesUserScript(_ script: ContentBlockerRulesUserScript, detectedThirdPartyRequest tracker: DetectedRequest) {
+        // no-op for now
+    }
+    
 }
 
 extension HistoryCoordinating {
 
-    func addDetectedTracker(_ tracker: DetectedTracker, onURL url: URL, contentBlocking: ContentBlocking = ContentBlocking.shared) {
-        trackerFound(onURL: url)
+    func addDetectedTracker(_ tracker: DetectedRequest, onURL url: URL) {
+        trackerFound(on: url)
 
-        guard tracker.blocked,
-              let domain = tracker.domain,
-              let entityName = contentBlocking.entityName(forDomain: domain) else { return }
+        guard tracker.isBlocked,
+              let entityName = tracker.entityName else { return }
 
-        addBlockedTracker(entityName: entityName, onURL: url)
+        addBlockedTracker(entityName: entityName, on: url)
     }
 
 }
@@ -858,7 +912,7 @@ extension Tab: SurrogatesUserScriptDelegate {
         return true
     }
 
-    func surrogatesUserScript(_ script: SurrogatesUserScript, detectedTracker tracker: DetectedTracker, withSurrogate host: String) {
+    func surrogatesUserScript(_ script: SurrogatesUserScript, detectedTracker tracker: DetectedRequest, withSurrogate host: String) {
         trackerInfo?.add(installedSurrogateHost: host)
         trackerInfo?.add(detectedTracker: tracker)
         guard let url = webView.url else { return }
@@ -870,6 +924,10 @@ extension Tab: EmailManagerRequestDelegate { }
 
 extension Tab: SecureVaultManagerDelegate {
 
+    public func secureVaultManagerIsEnabledStatus(_: SecureVaultManager) -> Bool {
+        return true
+    }
+    
     func secureVaultManager(_: SecureVaultManager, promptUserToStoreAutofillData data: AutofillData) {
         delegate?.tab(self, requestedSaveAutofillData: data)
     }
@@ -877,6 +935,7 @@ extension Tab: SecureVaultManagerDelegate {
     func secureVaultManager(_: SecureVaultManager,
                             promptUserToAutofillCredentialsForDomain domain: String,
                             withAccounts accounts: [SecureVaultModels.WebsiteAccount],
+                            withTrigger trigger: AutofillUserScript.GetTriggerType,
                             completionHandler: @escaping (SecureVaultModels.WebsiteAccount?) -> Void) {
         // no-op on macOS
     }
@@ -1325,6 +1384,10 @@ extension Tab: HoverUserScriptDelegate {
 extension Tab: AutoconsentUserScriptDelegate {
     func autoconsentUserScript(consentStatus: CookieConsentInfo) {
         self.cookieConsentManaged = consentStatus
+    }
+    
+    func autoconsentUserScriptPromptUserForConsent(_ result: @escaping (Bool) -> Void) {
+        delegate?.tab(self, promptUserForCookieConsent: result)
     }
 }
 

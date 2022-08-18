@@ -10,7 +10,7 @@
         <scene sceneID="PEd-7d-5j0">
             <objects>
                 <viewController storyboardIdentifier="PrivacyDashboardViewController" id="bU7-R8-ocO" customClass="PrivacyDashboardViewController" customModule="DuckDuckGo_Privacy_Browser" customModuleProvider="target" sceneMemberID="viewController">
-                    <view key="view" id="tOy-S4-hL0" customClass="PrivacyDashboardView" customModule="DuckDuckGo_Privacy_Browser" customModuleProvider="target">
+                    <view key="view" id="tOy-S4-hL0">
                         <rect key="frame" x="0.0" y="0.0" width="350" height="550"/>
                         <autoresizingMask key="autoresizingMask"/>
                     </view>

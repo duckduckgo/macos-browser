@@ -149,6 +149,7 @@ final class RecentlyVisitedSiteModel: ObservableObject {
     let domain: String
 
     @Published var isFavorite: Bool
+    @Published var isFireproof: Bool
     @Published var blockedEntities = [String]()
     @Published var pages = [RecentlyVisitedPageModel]()
     @Published var numberOfTrackersBlocked = 0
@@ -158,13 +159,14 @@ final class RecentlyVisitedSiteModel: ObservableObject {
     @Published var isBurning = false
     @Published var isHidden = false
 
-    init(domain: String, bookmarkManager: BookmarkManager = LocalBookmarkManager.shared) {
+    init(domain: String, bookmarkManager: BookmarkManager = LocalBookmarkManager.shared, fireproofDomains: FireproofDomains = FireproofDomains.shared) {
         self.domain = domain
         if let url = domain.url {
             isFavorite = bookmarkManager.isUrlFavorited(url: url)
         } else {
             isFavorite = false
         }
+        isFireproof = fireproofDomains.isFireproof(fireproofDomain: domain)
     }
 
     func addBlockedEntities(_ entities: Set<String>) {

@@ -21,7 +21,6 @@ import BrowserServicesKit
 import Combine
 import os.log
 
-// swiftlint:disable type_body_length
 final class DataImportViewController: NSViewController {
 
     enum Constants {
@@ -453,7 +452,6 @@ final class DataImportViewController: NSViewController {
     }
 
 }
-// swiftlint:enable type_body_length
 
 extension DataImportViewController: FileImportViewControllerDelegate {
 

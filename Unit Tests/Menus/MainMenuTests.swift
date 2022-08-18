@@ -22,7 +22,7 @@ import Combine
 
 class MainMenuTests: XCTestCase {
 
-    typealias ReopenMenuItemKeyEquivalentManager = MainMenu.ReopenMenuItemKeyEquivalentManager
+    typealias ReopenMenuItemKeyEquivalentManager = HistoryMenu.ReopenMenuItemKeyEquivalentManager
 
     @Published var isInInitialState = true
 

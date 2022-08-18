@@ -50,7 +50,14 @@ struct PasswordManagementListSection {
                          order: SecureVaultSorting.SortOrder) -> [PasswordManagementListSection] {
         
         let itemsByFirstCharacter: [String: [SecureVaultItem]] = Dictionary(grouping: items) { $0[keyPath: keyPath] }
-        let sortFunction: (String, String) -> Bool = order == .ascending ? (<) : (>)
+        let sortFunction: (String, String) -> Bool = {
+            switch order {
+            case .ascending:
+                return { $0.localizedCaseInsensitiveCompare($1) == .orderedAscending }
+            case .descending:
+                return { $0.localizedCaseInsensitiveCompare($1) == .orderedDescending }
+            }
+        }()
         let sortedKeys = itemsByFirstCharacter.keys.sorted(by: sortFunction)
         
         return sortedKeys.map { key in

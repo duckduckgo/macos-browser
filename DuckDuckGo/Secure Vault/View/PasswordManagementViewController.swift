@@ -21,8 +21,6 @@ import Combine
 import SwiftUI
 import BrowserServicesKit
 
-// swiftlint:disable file_length
-
 protocol PasswordManagementDelegate: AnyObject {
 
     /// May not be called on main thread.
@@ -30,7 +28,7 @@ protocol PasswordManagementDelegate: AnyObject {
 
 }
 
-// swiftlint:disable type_body_length
+// swiftlint:disable:next type_body_length
 final class PasswordManagementViewController: NSViewController {
 
     static func create() -> Self {
@@ -926,5 +924,3 @@ extension PasswordManagementViewController: NSTextViewDelegate {
     }
 
 }
-
-// swiftlint:enable file_length

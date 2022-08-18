@@ -24,8 +24,9 @@ import os.log
 protocol HistoryStoring {
 
     func cleanOld(until date: Date) -> Future<History, Error>
-    func removeEntries(_ entries: [HistoryEntry]) -> Future<History, Error>
     func save(entry: HistoryEntry) -> Future<Void, Error>
+    func removeEntries(_ entries: [HistoryEntry]) -> Future<Void, Error>
+    func removeVisits(_ visits: [Visit]) -> Future<Void, Error>
 
 }
 
@@ -44,7 +45,7 @@ final class HistoryStore: HistoryStoring {
 
     private lazy var context = Database.shared.makeContext(concurrencyType: .privateQueueConcurrencyType, name: "History")
 
-    func removeEntries(_ entries: [HistoryEntry]) -> Future<History, Error> {
+    func removeEntries(_ entries: [HistoryEntry]) -> Future<Void, Error> {
         return Future { [weak self] promise in
             self?.context.perform {
                 guard let self = self else {
@@ -57,8 +58,7 @@ final class HistoryStore: HistoryStoring {
                 case .failure(let error):
                     promise(.failure(error))
                 case .success:
-                    let reloadResult = self.reload(self.context)
-                    promise(reloadResult)
+                    promise(.success(()))
                 }
             }
         }
@@ -100,6 +100,7 @@ final class HistoryStore: HistoryStoring {
                 NSManagedObjectContext.mergeChanges(fromRemoteContextSave: changes, into: [context])
                 os_log("%d items cleaned from history", log: .history, deletedObjects.count)
             } catch {
+                Pixel.fire(.debug(event: .historyRemoveFailed, error: error))
                 return .failure(error)
             }
         }
@@ -112,16 +113,17 @@ final class HistoryStore: HistoryStoring {
         fetchRequest.returnsObjectsAsFaults = false
         do {
             let historyEntries = try context.fetch(fetchRequest)
-            os_log("%d items loaded from history", log: .history, historyEntries.count)
+            os_log("%d entries loaded from history", log: .history, historyEntries.count)
             let history = History(historyEntries: historyEntries)
             return .success(history)
         } catch {
+            Pixel.fire(.debug(event: .historyReloadFailed, error: error))
             return .failure(error)
         }
     }
 
     private func clean(_ context: NSManagedObjectContext, until date: Date) -> Result<Void, Error> {
-        // Clean using batch delete request
+        // Clean using batch delete requests
         let deleteRequest = NSFetchRequest<NSFetchRequestResult>(entityName: HistoryEntryManagedObject.className())
         deleteRequest.predicate = NSPredicate(format: "lastVisit < %@", date as NSDate)
         let batchDeleteRequest = NSBatchDeleteRequest(fetchRequest: deleteRequest)
@@ -132,9 +134,26 @@ final class HistoryStore: HistoryStoring {
             let deletedObjects = result?.result as? [NSManagedObjectID] ?? []
             let changes: [AnyHashable: Any] = [ NSDeletedObjectsKey: deletedObjects ]
             NSManagedObjectContext.mergeChanges(fromRemoteContextSave: changes, into: [context])
-            os_log("%d items cleaned from history", log: .history, deletedObjects.count)
+            os_log("%d entries cleaned from history", log: .history, deletedObjects.count)
+        } catch {
+            Pixel.fire(.debug(event: .historyCleanEntriesFailed, error: error))
+            return .failure(error)
+        }
+
+        let visitDeleteRequest = NSFetchRequest<NSFetchRequestResult>(entityName: VisitManagedObject.className())
+        visitDeleteRequest.predicate = NSPredicate(format: "date < %@", date as NSDate)
+        let visitBatchDeleteRequest = NSBatchDeleteRequest(fetchRequest: visitDeleteRequest)
+        visitBatchDeleteRequest.resultType = .resultTypeObjectIDs
+
+        do {
+            let result = try context.execute(visitBatchDeleteRequest) as? NSBatchDeleteResult
+            let deletedObjects = result?.result as? [NSManagedObjectID] ?? []
+            let changes: [AnyHashable: Any] = [ NSDeletedObjectsKey: deletedObjects ]
+            NSManagedObjectContext.mergeChanges(fromRemoteContextSave: changes, into: [context])
+            os_log("%d visits cleaned from history", log: .history, deletedObjects.count)
             return .success(())
         } catch {
+            Pixel.fire(.debug(event: .historyCleanVisitsFailed, error: error))
             return .failure(error)
         }
     }
@@ -149,6 +168,8 @@ final class HistoryStore: HistoryStoring {
 
                 // Check for existence
                 let fetchRequest = HistoryEntryManagedObject.fetchRequest() as NSFetchRequest<HistoryEntryManagedObject>
+                fetchRequest.returnsObjectsAsFaults = false
+                fetchRequest.fetchLimit = 1
                 fetchRequest.predicate = NSPredicate(format: "identifier == %@", entry.identifier as CVarArg)
                 let fetchedObjects: [HistoryEntryManagedObject]
                 do {
@@ -160,9 +181,11 @@ final class HistoryStore: HistoryStoring {
 
                 assert(fetchedObjects.count <= 1, "More than 1 history entry with the same identifier")
 
+                let historyEntryManagedObject: HistoryEntryManagedObject
                 if let fetchedObject = fetchedObjects.first {
                     // Update existing
                     fetchedObject.update(with: entry)
+                    historyEntryManagedObject = fetchedObject
                 } else {
                     // Add new
                     let insertedObject = NSEntityDescription.insertNewObject(forEntityName: HistoryEntryManagedObject.className(), into: self.context)
@@ -171,26 +194,113 @@ final class HistoryStore: HistoryStoring {
                         return
                     }
                     historyEntryMO.update(with: entry, afterInsertion: true)
+                    historyEntryManagedObject = historyEntryMO
                 }
-
+                let insertNewVisitsResult = self.insertNewVisits(of: entry,
+                                                                 into: historyEntryManagedObject,
+                                                                 context: self.context)
                 do {
                     try self.context.save()
                 } catch {
+                    Pixel.fire(.debug(event: .historyCleanEntriesFailed, error: error))
                     promise(.failure(HistoryStoreError.savingFailed))
                     return
                 }
 
-                promise(.success(()))
+                promise(insertNewVisitsResult)
             }
         }
     }
+
+    private func insertNewVisits(of historyEntry: HistoryEntry,
+                                 into historyEntryManagedObject: HistoryEntryManagedObject,
+                                 context: NSManagedObjectContext) -> Result<Void, Error> {
+        var success = true
+        historyEntry.visits
+            .filter {
+                $0.savingState == .initialized
+            }
+            .forEach {
+                $0.savingState = .saved
+                if case .failure = self.insert(visit: $0,
+                                               into: historyEntryManagedObject,
+                                               context: context) {
+                    success = false
+                }
+            }
+        return success ? .success(()) : .failure(HistoryStoreError.savingFailed)
+    }
+
+    private func insert(visit: Visit,
+                        into historyEntryManagedObject: HistoryEntryManagedObject,
+                        context: NSManagedObjectContext) -> Result<Void, Error> {
+        let insertedObject = NSEntityDescription.insertNewObject(forEntityName: VisitManagedObject.className(), into: context)
+        guard let visitMO = insertedObject as? VisitManagedObject else {
+            Pixel.fire(.debug(event: .historyInsertVisitFailed))
+            return .failure(HistoryStoreError.savingFailed)
+        }
+        visitMO.update(with: visit, historyEntryManagedObject: historyEntryManagedObject)
+        return .success(())
+    }
+
+    func removeVisits(_ visits: [Visit]) -> Future<Void, Error> {
+        return Future { [weak self] promise in
+            self?.context.perform {
+                guard let self = self else {
+                    promise(.failure(HistoryStoreError.storeDeallocated))
+                    return
+                }
+
+                switch self.remove(visits, context: self.context) {
+                case .failure(let error):
+                    promise(.failure(error))
+                case .success:
+                    promise(.success(()))
+                }
+            }
+        }
+    }
+
+    private func remove(_ visits: [Visit], context: NSManagedObjectContext) -> Result<Void, Error> {
+        // To avoid long predicate, execute multiple times
+        let chunkedVisits = visits.chunked(into: 100)
+
+        for visits in chunkedVisits {
+            let deleteRequest = NSFetchRequest<NSFetchRequestResult>(entityName: VisitManagedObject.className())
+            let predicates = visits.compactMap({ (visit: Visit) -> NSPredicate? in
+                guard let historyEntry = visit.historyEntry else {
+                    assertionFailure("No history entry")
+                    return nil
+                }
+
+                return NSPredicate(format: "historyEntry.identifier == %@ && date == %@", argumentArray: [historyEntry.identifier, visit.date])
+            })
+            deleteRequest.predicate = NSCompoundPredicate(type: .or, subpredicates: predicates)
+            let batchDeleteRequest = NSBatchDeleteRequest(fetchRequest: deleteRequest)
+            batchDeleteRequest.resultType = .resultTypeObjectIDs
+            do {
+                let result = try self.context.execute(batchDeleteRequest) as? NSBatchDeleteResult
+                let deletedObjects = result?.result as? [NSManagedObjectID] ?? []
+                let changes: [AnyHashable: Any] = [ NSDeletedObjectsKey: deletedObjects ]
+                NSManagedObjectContext.mergeChanges(fromRemoteContextSave: changes, into: [context])
+                os_log("%d visits cleaned from history", log: .history, deletedObjects.count)
+                assert(deletedObjects.count >= visits.count, "Not all visits removed")
+            } catch {
+                Pixel.fire(.debug(event: .historyRemoveVisitsFailed))
+                return .failure(error)
+            }
+        }
+
+        return .success(())
+    }
+
 }
 
 fileprivate extension History {
 
     init(historyEntries: [HistoryEntryManagedObject]) {
         self = historyEntries.reduce(into: History(), {
-            if let historyEntry = HistoryEntry(historyMO: $1) {
+            if let historyEntry = HistoryEntry(historyEntryMO: $1) {
                 $0.append(historyEntry)
             }
         })
@@ -200,28 +310,38 @@ fileprivate extension History {
 
 fileprivate extension HistoryEntry {
 
-    init?(historyMO: HistoryEntryManagedObject) {
-        guard let url = historyMO.urlEncrypted as? URL,
-              let identifier = historyMO.identifier,
-              let lastVisit = historyMO.lastVisit else {
+    convenience init?(historyEntryMO: HistoryEntryManagedObject) {
+        guard let url = historyEntryMO.urlEncrypted as? URL,
+              let identifier = historyEntryMO.identifier,
+              let lastVisit = historyEntryMO.lastVisit else {
             assertionFailure("HistoryEntry: Failed to init HistoryEntry from HistoryEntryManagedObject")
             return nil
         }
 
-        let title = historyMO.titleEncrypted as? String
-        let numberOfVisits = historyMO.numberOfVisits
-        let numberOfTrackersBlocked = historyMO.numberOfTrackersBlocked
-        let blockedTrackingEntities = historyMO.blockedTrackingEntities ?? ""
+        let title = historyEntryMO.titleEncrypted as? String
+        let numberOfTotalVisits = historyEntryMO.numberOfTotalVisits
+        let numberOfTrackersBlocked = historyEntryMO.numberOfTrackersBlocked
+        let blockedTrackingEntities = historyEntryMO.blockedTrackingEntities ?? ""
+        let visits = Set(historyEntryMO.visits?.allObjects.compactMap {
+            Visit(visitMO: $0 as? VisitManagedObject)
+        } ?? [])
+
+        assert(Dictionary(grouping: visits, by: \.date).filter({ $1.count > 1 }).isEmpty, "Duplicate of visit stored")
 
         self.init(identifier: identifier,
                   url: url,
                   title: title,
-                  numberOfVisits: Int(numberOfVisits),
+                  failedToLoad: historyEntryMO.failedToLoad,
+                  numberOfTotalVisits: Int(numberOfTotalVisits),
                   lastVisit: lastVisit,
-                  failedToLoad: historyMO.failedToLoad,
+                  visits: visits,
                   numberOfTrackersBlocked: Int(numberOfTrackersBlocked),
                   blockedTrackingEntities: Set<String>(blockedTrackingEntities.components(separatedBy: "|")),
-                  trackersFound: historyMO.trackersFound)
+                  trackersFound: historyEntryMO.trackersFound)
+
+        visits.forEach { visit in
+            visit.historyEntry = self
+        }
     }
 
 }
@@ -241,12 +361,35 @@ fileprivate extension HistoryEntryManagedObject {
         if let title = entry.title, !title.isEmpty {
             self.titleEncrypted = title as NSString
         }
-        numberOfVisits = Int64(entry.numberOfVisits)
+        numberOfTotalVisits = Int64(entry.numberOfTotalVisits)
         lastVisit = entry.lastVisit
         failedToLoad = entry.failedToLoad
         numberOfTrackersBlocked = Int64(entry.numberOfTrackersBlocked)
         blockedTrackingEntities = entry.blockedTrackingEntities.isEmpty ? "" : entry.blockedTrackingEntities.joined(separator: "|")
         trackersFound = entry.trackersFound
+    }
+
+}
+
+private extension VisitManagedObject {
+
+    func update(with visit: Visit, historyEntryManagedObject: HistoryEntryManagedObject) {
+        date = visit.date
+        historyEntry = historyEntryManagedObject
+    }
+
+}
+
+private extension Visit {
+
+    convenience init?(visitMO: VisitManagedObject?) {
+        guard let visitMO = visitMO, let date = visitMO.date else {
+            assertionFailure("Bad type or date is nil")
+            return nil
+        }
+        
+        self.init(date: date)
+        savingState = .saved
     }
 
 }

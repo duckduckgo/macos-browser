@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<document type="com.apple.InterfaceBuilder3.Cocoa.Storyboard.XIB" version="3.0" toolsVersion="19529" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES" initialViewController="o2v-eH-jTI">
+<document type="com.apple.InterfaceBuilder3.Cocoa.Storyboard.XIB" version="3.0" toolsVersion="20037" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES" initialViewController="o2v-eH-jTI">
     <dependencies>
         <deployment identifier="macosx"/>
-        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="19529"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="20037"/>
         <capability name="Named colors" minToolsVersion="9.0"/>
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
     </dependencies>
@@ -15,6 +15,9 @@
                         <rect key="frame" x="0.0" y="0.0" width="939" height="62"/>
                         <autoresizingMask key="autoresizingMask"/>
                         <subviews>
+                            <customView translatesAutoresizingMaskIntoConstraints="NO" id="NH1-AA-WuB" customClass="MouseOverView" customModule="DuckDuckGo_Privacy_Browser" customModuleProvider="target">
+                                <rect key="frame" x="0.0" y="0.0" width="939" height="62"/>
+                            </customView>
                             <customView translatesAutoresizingMaskIntoConstraints="NO" id="EQw-GG-GMA" customClass="WindowDraggingView" customModule="DuckDuckGo_Privacy_Browser" customModuleProvider="target">
                                 <rect key="frame" x="0.0" y="0.0" width="939" height="62"/>
                             </customView>
@@ -261,16 +264,20 @@
                         </subviews>
                         <constraints>
                             <constraint firstAttribute="bottom" secondItem="EQw-GG-GMA" secondAttribute="bottom" id="4ye-CO-dDp"/>
+                            <constraint firstAttribute="bottom" secondItem="NH1-AA-WuB" secondAttribute="bottom" id="HA6-mL-Nho"/>
+                            <constraint firstAttribute="trailing" secondItem="NH1-AA-WuB" secondAttribute="trailing" id="JW6-7R-CZ1"/>
                             <constraint firstItem="eEh-kf-smR" firstAttribute="leading" secondItem="hYV-nu-QIp" secondAttribute="leading" constant="12" id="MQ7-vv-adb"/>
                             <constraint firstItem="aWu-Jm-Oaz" firstAttribute="top" secondItem="eEh-kf-smR" secondAttribute="top" id="S2g-Lx-lQw"/>
                             <constraint firstAttribute="trailing" secondItem="aWu-Jm-Oaz" secondAttribute="trailing" constant="12" id="UeG-qO-bD2"/>
                             <constraint firstAttribute="bottom" secondItem="gIy-el-24l" secondAttribute="bottom" constant="6" id="Xaz-X5-bmg"/>
                             <constraint firstItem="EQw-GG-GMA" firstAttribute="top" secondItem="hYV-nu-QIp" secondAttribute="top" id="ctd-w7-EMF"/>
                             <constraint firstItem="aWu-Jm-Oaz" firstAttribute="leading" relation="greaterThanOrEqual" secondItem="gIy-el-24l" secondAttribute="trailing" constant="16" id="eSb-tj-UdD"/>
+                            <constraint firstItem="NH1-AA-WuB" firstAttribute="leading" secondItem="hYV-nu-QIp" secondAttribute="leading" id="euD-BR-Nr8"/>
                             <constraint firstItem="EQw-GG-GMA" firstAttribute="leading" secondItem="hYV-nu-QIp" secondAttribute="leading" id="hpe-5Y-XTJ"/>
                             <constraint firstItem="gIy-el-24l" firstAttribute="top" secondItem="hYV-nu-QIp" secondAttribute="top" constant="6" id="km5-nE-hfK"/>
                             <constraint firstAttribute="trailing" secondItem="EQw-GG-GMA" secondAttribute="trailing" id="oYK-XH-0iN"/>
                             <constraint firstItem="eEh-kf-smR" firstAttribute="top" secondItem="hYV-nu-QIp" secondAttribute="top" constant="10" id="qeF-30-DZN"/>
+                            <constraint firstItem="NH1-AA-WuB" firstAttribute="top" secondItem="hYV-nu-QIp" secondAttribute="top" id="qza-Ll-shg"/>
                             <constraint firstItem="gIy-el-24l" firstAttribute="leading" relation="greaterThanOrEqual" secondItem="eEh-kf-smR" secondAttribute="trailing" constant="16" id="rfA-3F-QAf"/>
                             <constraint firstItem="gIy-el-24l" firstAttribute="width" secondItem="hYV-nu-QIp" secondAttribute="width" multiplier="0.6" id="rqL-Vd-lnY"/>
                             <constraint firstItem="eEh-kf-smR" firstAttribute="leading" secondItem="hYV-nu-QIp" secondAttribute="leading" constant="12" id="yWl-jM-JYI"/>
@@ -296,6 +303,7 @@
                         <outlet property="goBackButton" destination="kky-0N-Cfd" id="RA9-yE-URS"/>
                         <outlet property="goForwardButton" destination="mdE-u0-Ei5" id="7wT-nX-Avr"/>
                         <outlet property="logoWidthConstraint" destination="jSz-y8-vaJ" id="BbD-cr-Hyv"/>
+                        <outlet property="mouseOverView" destination="NH1-AA-WuB" id="vtX-Ha-nWn"/>
                         <outlet property="navigationButtons" destination="eEh-kf-smR" id="XC4-bo-89V"/>
                         <outlet property="optionsButton" destination="iIF-Ky-unr" id="vvZ-mm-idv"/>
                         <outlet property="passwordManagementButton" destination="1nW-I1-nut" id="wDs-oE-b7d"/>
@@ -502,25 +510,32 @@
             <objects>
                 <viewController id="mcr-nj-GmC" customClass="AddressBarButtonsViewController" customModule="DuckDuckGo_Privacy_Browser" customModuleProvider="target" sceneMemberID="viewController">
                     <view key="view" id="Bhg-sv-n5J">
-                        <rect key="frame" x="0.0" y="0.0" width="578" height="32"/>
+                        <rect key="frame" x="0.0" y="0.0" width="578" height="34"/>
                         <autoresizingMask key="autoresizingMask"/>
                         <subviews>
                             <customView translatesAutoresizingMaskIntoConstraints="NO" id="lYD-6T-NGB">
-                                <rect key="frame" x="0.0" y="0.0" width="32" height="32"/>
+                                <rect key="frame" x="0.0" y="1" width="32" height="32"/>
                                 <constraints>
                                     <constraint firstAttribute="width" constant="32" id="RjE-bU-jDw"/>
                                     <constraint firstAttribute="height" constant="32" id="dh9-1Y-sAv"/>
                                 </constraints>
                             </customView>
                             <customView translatesAutoresizingMaskIntoConstraints="NO" id="hdY-An-3W8">
-                                <rect key="frame" x="0.0" y="1" width="100" height="30"/>
+                                <rect key="frame" x="0.0" y="2" width="100" height="30"/>
                                 <constraints>
                                     <constraint firstAttribute="height" constant="30" id="4cN-ij-M5x"/>
                                     <constraint firstAttribute="width" constant="100" id="CQO-D3-iVT"/>
                                 </constraints>
                             </customView>
+                            <customView translatesAutoresizingMaskIntoConstraints="NO" id="1qw-sL-vFK" userLabel="NotificationAnimationView" customClass="NavigationBarBadgeAnimationView" customModule="DuckDuckGo_Privacy_Browser" customModuleProvider="target">
+                                <rect key="frame" x="2" y="3" width="150" height="28"/>
+                                <constraints>
+                                    <constraint firstAttribute="height" constant="28" id="KJD-Tz-wTu"/>
+                                    <constraint firstAttribute="width" constant="150" id="bfq-Cs-mcP"/>
+                                </constraints>
+                            </customView>
                             <button hidden="YES" translatesAutoresizingMaskIntoConstraints="NO" id="taC-vG-1fV" customClass="AddressBarButton" customModule="DuckDuckGo_Privacy_Browser" customModuleProvider="target">
-                                <rect key="frame" x="545" y="0.0" width="32" height="32"/>
+                                <rect key="frame" x="545" y="1" width="32" height="32"/>
                                 <constraints>
                                     <constraint firstAttribute="width" constant="32" id="3ze-iM-E0b"/>
                                     <constraint firstAttribute="height" constant="32" id="nLM-v6-jHW"/>
@@ -546,7 +561,7 @@
                                 </connections>
                             </button>
                             <button hidden="YES" translatesAutoresizingMaskIntoConstraints="NO" id="kRc-0m-oqe" customClass="MouseOverButton" customModule="DuckDuckGo_Privacy_Browser" customModuleProvider="target">
-                                <rect key="frame" x="546" y="3" width="26" height="26"/>
+                                <rect key="frame" x="546" y="4" width="26" height="26"/>
                                 <constraints>
                                     <constraint firstAttribute="width" constant="26" id="8Ag-uG-RA7"/>
                                     <constraint firstAttribute="height" constant="26" id="B6E-P0-EL6"/>
@@ -572,7 +587,7 @@
                                 </connections>
                             </button>
                             <stackView distribution="equalSpacing" orientation="horizontal" alignment="centerY" spacing="0.0" horizontalStackHuggingPriority="249.99998474121094" verticalStackHuggingPriority="249.99998474121094" detachesHiddenViews="YES" translatesAutoresizingMaskIntoConstraints="NO" id="HEu-ro-RSA">
-                                <rect key="frame" x="0.0" y="0.0" width="192" height="32"/>
+                                <rect key="frame" x="0.0" y="0.0" width="194" height="32"/>
                                 <subviews>
                                     <button hidden="YES" translatesAutoresizingMaskIntoConstraints="NO" id="nOW-iY-XmO" customClass="MouseOverAnimationButton" customModule="DuckDuckGo_Privacy_Browser" customModuleProvider="target">
                                         <rect key="frame" x="0.0" y="0.0" width="32" height="32"/>
@@ -766,6 +781,8 @@
                             <constraint firstAttribute="trailing" secondItem="taC-vG-1fV" secondAttribute="trailing" constant="1" id="26X-xU-JjT"/>
                             <constraint firstItem="lYD-6T-NGB" firstAttribute="leading" secondItem="Bhg-sv-n5J" secondAttribute="leading" id="6Ie-01-AzV"/>
                             <constraint firstItem="HEu-ro-RSA" firstAttribute="centerY" secondItem="Bhg-sv-n5J" secondAttribute="centerY" id="BRs-q1-MOh"/>
+                            <constraint firstItem="1qw-sL-vFK" firstAttribute="centerY" secondItem="Bhg-sv-n5J" secondAttribute="centerY" id="Cl5-vM-wFc"/>
+                            <constraint firstItem="1qw-sL-vFK" firstAttribute="leading" secondItem="Bhg-sv-n5J" secondAttribute="leading" constant="2" id="IGR-F0-d7K"/>
                             <constraint firstItem="HEu-ro-RSA" firstAttribute="leading" secondItem="Bhg-sv-n5J" secondAttribute="leading" id="JJu-Ej-iFq"/>
                             <constraint firstItem="kRc-0m-oqe" firstAttribute="centerY" secondItem="Bhg-sv-n5J" secondAttribute="centerY" id="T0S-fo-y1J"/>
                             <constraint firstAttribute="trailing" secondItem="kRc-0m-oqe" secondAttribute="trailing" constant="6" id="WeU-Fb-omO"/>
@@ -786,6 +803,7 @@
                         <outlet property="imageButton" destination="psi-hX-Kh9" id="gEt-yl-q9m"/>
                         <outlet property="imageButtonWrapper" destination="3Iv-YW-zn2" id="rzK-lJ-auZ"/>
                         <outlet property="microphoneButton" destination="uao-nC-0co" id="UHu-oA-rTl"/>
+                        <outlet property="notificationAnimationView" destination="1qw-sL-vFK" id="b5X-px-pwG"/>
                         <outlet property="permissionButtons" destination="8UU-A8-1nD" id="gYJ-VW-MEG"/>
                         <outlet property="popupsButton" destination="qqY-h9-UQ7" id="1QY-I6-oNC"/>
                         <outlet property="privacyDashboardPositioningView" destination="lYD-6T-NGB" id="y2g-pX-zea"/>

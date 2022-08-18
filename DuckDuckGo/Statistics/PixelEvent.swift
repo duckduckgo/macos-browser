@@ -17,6 +17,7 @@
 //
 
 import Foundation
+import BrowserServicesKit
 
 // swiftlint:disable identifier_name
 extension Pixel {
@@ -167,52 +168,54 @@ extension Pixel {
 
         case debug(event: Debug, error: Error? = nil)
 
-        enum Debug: String, CustomStringConvertible {
-            var description: String { rawValue }
+        enum Debug {
 
-            case dbInitializationError = "dbie"
-            case dbSaveExcludedHTTPSDomainsError = "dbsw"
-            case dbSaveBloomFilterError = "dbsb"
+            case dbInitializationError
+            case dbSaveExcludedHTTPSDomainsError
+            case dbSaveBloomFilterError
 
-            case configurationFetchError = "cfgfetch"
+            case configurationFetchError
 
-            case trackerDataParseFailed = "tds_p"
-            case trackerDataReloadFailed = "tds_r"
-            case trackerDataCouldNotBeLoaded = "tds_l"
+            case trackerDataParseFailed
+            case trackerDataReloadFailed
+            case trackerDataCouldNotBeLoaded
+
+            case privacyConfigurationParseFailed
+            case privacyConfigurationReloadFailed
+            case privacyConfigurationCouldNotBeLoaded
+
+            case fileStoreWriteFailed
+            case fileMoveToDownloadsFailed
+
+            case suggestionsFetchFailed
+            case appOpenURLFailed
+            case appStateRestorationFailed
+
+            case contentBlockingErrorReportingIssue
             
-            case privacyConfigurationParseFailed = "pcf_p"
-            case privacyConfigurationReloadFailed = "pcf_r"
-            case privacyConfigurationCouldNotBeLoaded = "pcf_l"
+            case contentBlockingCompilationFailed(listType: CompileRulesListType,
+                                                  component: ContentBlockerDebugEvents.Component)
 
-            case fileStoreWriteFailed = "fswf"
-            case fileMoveToDownloadsFailed = "df"
+            case contentBlockingCompilationTime
 
-            case suggestionsFetchFailed = "sgf"
-            case appOpenURLFailed = "url"
-            case appStateRestorationFailed = "srf"
-            
-            case contentBlockingErrorReportingIssue = "content_blocking_error_reporting_issue"
+            case secureVaultInitError
+            case secureVaultError
 
-            case contentBlockingTDSCompilationFailed = "content_blocking_compilation_error_fetched_tds"
-            case contentBlockingTempListCompilationFailed = "content_blocking_compilation_error_temp_list"
-            case contentBlockingAllowListCompilationFailed = "content_blocking_compilation_error_allow_list"
-            case contentBlockingUnpSitesCompilationFailed = "content_blocking_compilation_error_unprotected_list"
-            case contentBlockingFallbackCompilationFailed = "content_blocking_compilation_error_fallback_tds"
+            case feedbackReportingFailed
 
-            case contentBlockingCompilationTime = "content_blocking_compilation_time"
+            case blankNavigationOnBurnFailed
 
-            case clickToLoadTDSCompilationFailed = "click_to_load_compilation_error_fetched_tds"
-            case clickToLoadTempListCompilationFailed = "click_to_load_compilation_error_temp_list"
-            case clickToLoadAllowListCompilationFailed = "click_to_load_compilation_error_allow_list"
-            case clickToLoadUnpSitesCompilationFailed = "click_to_load_compilation_error_unprotected_list"
-            case clickToLoadFallbackCompilationFailed = "click_to_load_compilation_error_fallback_tds"
+            case historyRemoveFailed
+            case historyReloadFailed
+            case historyCleanEntriesFailed
+            case historyCleanVisitsFailed
+            case historySaveFailed
+            case historyInsertVisitFailed
+            case historyRemoveVisitsFailed
 
-            case secureVaultInitError = "secure_vault_init_error"
-            case secureVaultError = "secure_vault_error"
+            case emailAutofillKeychainError
 
-            case feedbackReportingFailed = "feedback_reporting_failed"
-            
-            case blankNavigationOnBurnFailed = "blank_navigation_on_burn_failed"
+            case bookmarksStoreRootFolderMigrationFailed
         }
 
     }
@@ -373,5 +376,102 @@ extension Pixel.Event {
             return "m_mac_amp_rules_compilation_failed"
         }
     }
+}
 
+extension Pixel.Event.Debug {
+    
+    var name: String {
+        switch self {
+        
+        case .dbInitializationError:
+            return "dbie"
+        case .dbSaveExcludedHTTPSDomainsError:
+            return "dbsw"
+        case .dbSaveBloomFilterError:
+            return "dbsb"
+            
+        case .configurationFetchError:
+            return "cfgfetch"
+            
+        case .trackerDataParseFailed:
+            return "tds_p"
+        case .trackerDataReloadFailed:
+            return "tds_r"
+        case .trackerDataCouldNotBeLoaded:
+            return "tds_l"
+            
+        case .privacyConfigurationParseFailed:
+            return "pcf_p"
+        case .privacyConfigurationReloadFailed:
+            return "pcf_r"
+        case .privacyConfigurationCouldNotBeLoaded:
+            return "pcf_l"
+            
+        case .fileStoreWriteFailed:
+            return "fswf"
+        case .fileMoveToDownloadsFailed:
+            return "df"
+            
+        case .suggestionsFetchFailed:
+            return "sgf"
+        case .appOpenURLFailed:
+            return "url"
+        case .appStateRestorationFailed:
+            return "srf"
+            
+        case .contentBlockingErrorReportingIssue:
+            return "content_blocking_error_reporting_issue"
+            
+        case .contentBlockingCompilationFailed(let listType, let component):
+            let componentString: String
+            switch component {
+            case .tds:
+                componentString = "fetched_tds"
+            case .allowlist:
+                componentString = "allow_list"
+            case .tempUnprotected:
+                componentString = "temp_list"
+            case .localUnprotected:
+                componentString = "unprotected_list"
+            case .fallbackTds:
+                componentString = "fallback_tds"
+            }
+            return "content_blocking_\(listType)_compilation_error_\(componentString)"
+            
+        case .contentBlockingCompilationTime:
+            return "content_blocking_compilation_time"
+            
+        case .secureVaultInitError:
+            return "secure_vault_init_error"
+        case .secureVaultError:
+            return "secure_vault_error"
+            
+        case .feedbackReportingFailed:
+            return "feedback_reporting_failed"
+            
+        case .blankNavigationOnBurnFailed:
+            return "blank_navigation_on_burn_failed"
+            
+        case .historyRemoveFailed:
+            return "history_remove_failed"
+        case .historyReloadFailed:
+            return "history_reload_failed"
+        case .historyCleanEntriesFailed:
+            return "history_clean_entries_failed"
+        case .historyCleanVisitsFailed:
+            return "history_clean_visits_failed"
+        case .historySaveFailed:
+            return "history_save_failed"
+        case .historyInsertVisitFailed:
+            return "history_insert_visit_failed"
+        case .historyRemoveVisitsFailed:
+            return "history_remove_visits_failed"
+            
+        case .emailAutofillKeychainError:
+            return "email_autofill_keychain_error"
+            
+        case .bookmarksStoreRootFolderMigrationFailed:
+            return "bookmarks_store_root_folder_migration_failed"
+        }
+    }
 }

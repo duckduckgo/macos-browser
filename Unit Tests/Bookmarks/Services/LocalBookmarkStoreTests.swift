@@ -34,7 +34,7 @@ final class LocalBookmarkStoreTests: XCTestCase {
 
         let bookmark = Bookmark(id: UUID(), url: URL.duckDuckGo, title: "DuckDuckGo", isFavorite: true)
 
-        bookmarkStore.save(bookmark: bookmark, parent: nil) { (success, error) in
+        bookmarkStore.save(bookmark: bookmark, parent: nil, index: nil) { (success, error) in
             XCTAssert(success)
             XCTAssertNil(error)
 
@@ -64,7 +64,7 @@ final class LocalBookmarkStoreTests: XCTestCase {
         let loadingExpectation = self.expectation(description: "Loading")
 
         let bookmark = Bookmark(id: UUID(), url: URL.duckDuckGo, title: "DuckDuckGo", isFavorite: true)
-        bookmarkStore.save(bookmark: bookmark, parent: nil) { (success, error) in
+        bookmarkStore.save(bookmark: bookmark, parent: nil, index: nil) { (success, error) in
             XCTAssert(success)
             XCTAssertNil(error)
 
@@ -100,7 +100,7 @@ final class LocalBookmarkStoreTests: XCTestCase {
 
         let bookmark = Bookmark(id: UUID(), url: URL.duckDuckGo, title: "DuckDuckGo", isFavorite: true)
 
-        bookmarkStore.save(bookmark: bookmark, parent: nil) { (success, error) in
+        bookmarkStore.save(bookmark: bookmark, parent: nil, index: nil) { (success, error) in
             XCTAssert(success)
             XCTAssertNil(error)
 
@@ -222,6 +222,57 @@ final class LocalBookmarkStoreTests: XCTestCase {
 
         waitForExpectations(timeout: 2, handler: nil)
     }
+    
+    func testWhenMovingBookmarkWithinParentCollection_AndIndexIsValid_ThenBookmarkIsMoved() async {
+        let container = CoreData.bookmarkContainer()
+        let context = container.viewContext
+        let bookmarkStore = LocalBookmarkStore(context: context)
+        
+        let folder = BookmarkFolder(id: UUID(), title: "Parent")
+        let bookmark1 = Bookmark(id: UUID(), url: URL(string: "https://example.com")!, title: "Example 1", isFavorite: false)
+        let bookmark2 = Bookmark(id: UUID(), url: URL(string: "https://example.com")!, title: "Example 2", isFavorite: false)
+        let bookmark3 = Bookmark(id: UUID(), url: URL(string: "https://example.com")!, title: "Example 3", isFavorite: false)
+        
+        // Save the initial bookmarks state:
+        
+        _ = await bookmarkStore.save(folder: folder, parent: nil)
+        _ = await bookmarkStore.save(bookmark: bookmark1, parent: folder, index: nil)
+        _ = await bookmarkStore.save(bookmark: bookmark2, parent: folder, index: nil)
+        _ = await bookmarkStore.save(bookmark: bookmark3, parent: folder, index: nil)
+
+        // Fetch persisted bookmarks back from the store:
+        
+        guard case let .success(initialTopLevelEntities) = await bookmarkStore.loadAll(type: .topLevelEntities),
+              let initialParentFolder = initialTopLevelEntities.first as? BookmarkFolder else {
+            XCTFail("Couldn't load top level entities")
+            return
+        }
+        
+        XCTAssertEqual(initialParentFolder.children.count, 3)
+        
+        // Verify initial order of saved bookmarks:
+        
+        let initialBookmarkUUIDs = [bookmark1.id, bookmark2.id, bookmark3.id]
+        let initialFetchedBookmarkUUIDs = initialParentFolder.children.map(\.id)
+        XCTAssertEqual(initialBookmarkUUIDs, initialFetchedBookmarkUUIDs)
+        
+        // Update the order of the bookmarks:
+        
+        let moveBookmarksError = await bookmarkStore.move(objectUUID: bookmark3.id, toIndex: 0)
+        XCTAssertNil(moveBookmarksError)
+        
+        // Check the new bookmarks order:
+        
+        guard case let .success(updatedTopLevelEntities) = await bookmarkStore.loadAll(type: .topLevelEntities),
+              let updatedParentFolder = updatedTopLevelEntities.first as? BookmarkFolder else {
+            XCTFail("Couldn't load top level entities")
+            return
+        }
+        
+        let expectedBookmarkUUIDs = [bookmark3.id, bookmark1.id, bookmark2.id]
+        let updatedFetchedBookmarkUUIDs = updatedParentFolder.children.map(\.id)
+        XCTAssertEqual(expectedBookmarkUUIDs, updatedFetchedBookmarkUUIDs)
+    }
 
     func testWhenBookmarkIsAdded_AndFolderHasBeenProvided_ThenBookmarkIsSavedToParentFolder() {
         let container = CoreData.bookmarkContainer()
@@ -241,7 +292,7 @@ final class LocalBookmarkStoreTests: XCTestCase {
 
             saveFolderExpectation.fulfill()
 
-            bookmarkStore.save(bookmark: bookmark, parent: folder) { (success, error) in
+            bookmarkStore.save(bookmark: bookmark, parent: folder, index: nil) { (success, error) in
                 XCTAssert(success)
                 XCTAssertNil(error)
 

@@ -17,9 +17,10 @@
 //
 
 import XCTest
+import Combine
 @testable import DuckDuckGo_Privacy_Browser
 
-// swiftlint:disable:next type_body_length
+// MARK: - Tests for TabCollectionViewModel with PinnedTabsManager but without pinned tabs
 final class TabCollectionViewModelTests: XCTestCase {
 
     // MARK: - TabViewModel
@@ -433,6 +434,29 @@ final class TabCollectionViewModelTests: XCTestCase {
         XCTAssertEqual(firstTabViewModel?.tab.url, tabCollectionViewModel.tabViewModel(at: 1)?.tab.url)
     }
 
+    // MARK: - Publishers
+
+    func testWhenSelectionIndexIsUpdatedWithTheSameValueThenSelectedTabViewModelIsOnlyPublishedOnce() {
+        let tabCollectionViewModel = TabCollectionViewModel.aTabCollectionViewModel()
+        let firstTabViewModel = tabCollectionViewModel.tabViewModel(at: 0)
+        firstTabViewModel?.tab.url = URL.duckDuckGo
+
+        var events: [TabViewModel?] = []
+        let cancellable = tabCollectionViewModel.$selectedTabViewModel
+            .sink { tabViewModel in
+                events.append(tabViewModel)
+            }
+
+        tabCollectionViewModel.select(at: .unpinned(0))
+        tabCollectionViewModel.select(at: .unpinned(0))
+        tabCollectionViewModel.select(at: .unpinned(0))
+        tabCollectionViewModel.select(at: .unpinned(0))
+
+        cancellable.cancel()
+
+        XCTAssertEqual(events.count, 1)
+        XCTAssertIdentical(events[0], tabCollectionViewModel.selectedTabViewModel)
+    }
 }
 
 fileprivate extension TabCollectionViewModel {

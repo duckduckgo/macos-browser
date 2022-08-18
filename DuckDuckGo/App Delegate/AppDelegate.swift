@@ -86,6 +86,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         Waitlist.unlockExistingInstallIfNecessary()
         #endif
 
+        HistoryCoordinator.shared.loadHistory()
         PrivacyFeatures.httpsUpgrade.loadDataAsync()
         LocalBookmarkManager.shared.loadBookmarks()
         FaviconManager.shared.loadFavicons()

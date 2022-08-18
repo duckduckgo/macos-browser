@@ -18,7 +18,6 @@
 
 import Foundation
 
-// swiftlint:disable line_length
 extension UserText {
 
     static let pmSaveCredentialsEditableTitle = NSLocalizedString("pm.save-credentials.editable.title", value: "Save Login?", comment: "Title for the editable Save Credentials popover")

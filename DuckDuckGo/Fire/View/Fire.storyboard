@@ -126,35 +126,43 @@
             <objects>
                 <viewController storyboardIdentifier="FirePopoverViewController" id="DMI-mh-xLJ" customClass="FirePopoverViewController" customModule="DuckDuckGo_Privacy_Browser" customModuleProvider="target" sceneMemberID="viewController">
                     <view key="view" id="dGd-Gc-P2e" customClass="ColorView" customModule="DuckDuckGo_Privacy_Browser" customModuleProvider="target">
-                        <rect key="frame" x="0.0" y="0.0" width="328" height="250"/>
+                        <rect key="frame" x="0.0" y="0.0" width="328" height="270"/>
                         <autoresizingMask key="autoresizingMask"/>
                         <subviews>
                             <customView translatesAutoresizingMaskIntoConstraints="NO" id="3Jn-h4-fXL" userLabel="Header Wrapper View">
-                                <rect key="frame" x="0.0" y="102" width="328" height="148"/>
+                                <rect key="frame" x="0.0" y="102" width="328" height="168"/>
                                 <subviews>
                                     <imageView horizontalHuggingPriority="251" verticalHuggingPriority="251" translatesAutoresizingMaskIntoConstraints="NO" id="acV-lE-jVh">
-                                        <rect key="frame" x="100" y="64" width="128" height="64"/>
+                                        <rect key="frame" x="100" y="84" width="128" height="64"/>
                                         <constraints>
                                             <constraint firstAttribute="width" constant="128" id="jv0-mb-KeT"/>
                                             <constraint firstAttribute="height" constant="64" id="zhN-YS-juD"/>
                                         </constraints>
                                         <imageCell key="cell" refusesFirstResponder="YES" alignment="left" imageScaling="proportionallyDown" image="FireHeader" id="Dql-dm-pHB"/>
                                     </imageView>
+                                    <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="gVh-tG-Gue">
+                                        <rect key="frame" x="71" y="53" width="187" height="16"/>
+                                        <textFieldCell key="cell" lineBreakMode="clipping" title="Clear Browsing History &amp; Data" id="98U-sP-UUR">
+                                            <font key="font" metaFont="system"/>
+                                            <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
+                                            <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
+                                        </textFieldCell>
+                                    </textField>
                                     <popUpButton translatesAutoresizingMaskIntoConstraints="NO" id="ckJ-6G-38h">
-                                        <rect key="frame" x="122" y="22" width="133" height="37"/>
+                                        <rect key="frame" x="43" y="11" width="243" height="37"/>
                                         <constraints>
                                             <constraint firstAttribute="height" constant="30" id="AOr-Ku-GpD"/>
-                                            <constraint firstAttribute="width" constant="127" id="f5G-AU-bU2"/>
+                                            <constraint firstAttribute="width" constant="237" id="f5G-AU-bU2"/>
                                         </constraints>
-                                        <popUpButtonCell key="cell" type="bevel" title="All Data" bezelStyle="regularSquare" alignment="left" lineBreakMode="truncatingTail" state="on" borderStyle="border" tag="2" inset="2" selectedItem="36I-OU-7Bw" id="j8q-KC-blV">
+                                        <popUpButtonCell key="cell" type="bevel" title="All Sites" bezelStyle="regularSquare" alignment="center" lineBreakMode="truncatingTail" state="on" borderStyle="border" tag="2" inset="2" selectedItem="36I-OU-7Bw" id="j8q-KC-blV">
                                             <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
                                             <font key="font" metaFont="menu"/>
                                             <menu key="menu" id="oaR-se-uak">
                                                 <items>
-                                                    <menuItem title="Current Tab" id="0e7-Td-3OA"/>
-                                                    <menuItem title="Current Window" tag="1" id="15H-Hj-EPs"/>
+                                                    <menuItem title="All Sites Visited in Current Tab" id="0e7-Td-3OA"/>
+                                                    <menuItem title="All Sites Visited in Current Window" tag="1" id="15H-Hj-EPs"/>
                                                     <menuItem isSeparatorItem="YES" id="diM-Ta-dwx"/>
-                                                    <menuItem title="All Data" state="on" tag="2" id="36I-OU-7Bw"/>
+                                                    <menuItem title="All Sites" state="on" tag="2" id="36I-OU-7Bw"/>
                                                 </items>
                                             </menu>
                                         </popUpButtonCell>
@@ -162,23 +170,15 @@
                                             <action selector="optionsButtonAction:" target="DMI-mh-xLJ" id="4KY-AK-Ajq"/>
                                         </connections>
                                     </popUpButton>
-                                    <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="gVh-tG-Gue">
-                                        <rect key="frame" x="83" y="33" width="36" height="16"/>
-                                        <textFieldCell key="cell" lineBreakMode="clipping" title="Clear" id="98U-sP-UUR">
-                                            <font key="font" metaFont="system"/>
-                                            <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
-                                            <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
-                                        </textFieldCell>
-                                    </textField>
                                 </subviews>
                                 <constraints>
-                                    <constraint firstItem="ckJ-6G-38h" firstAttribute="leading" secondItem="gVh-tG-Gue" secondAttribute="trailing" constant="8" symbolic="YES" id="8AV-IM-RHq"/>
-                                    <constraint firstItem="ckJ-6G-38h" firstAttribute="top" secondItem="acV-lE-jVh" secondAttribute="bottom" constant="8" symbolic="YES" id="BKV-CU-Oeh"/>
-                                    <constraint firstAttribute="height" constant="148" id="KFj-xA-het"/>
+                                    <constraint firstItem="ckJ-6G-38h" firstAttribute="top" secondItem="gVh-tG-Gue" secondAttribute="bottom" constant="8" symbolic="YES" id="8kx-GV-lIj"/>
+                                    <constraint firstAttribute="height" constant="168" id="KFj-xA-het"/>
                                     <constraint firstItem="acV-lE-jVh" firstAttribute="top" secondItem="3Jn-h4-fXL" secondAttribute="top" constant="20" id="TNw-m8-oz1"/>
                                     <constraint firstItem="gVh-tG-Gue" firstAttribute="top" secondItem="acV-lE-jVh" secondAttribute="bottom" constant="15" id="dzE-fi-9Qb"/>
-                                    <constraint firstItem="ckJ-6G-38h" firstAttribute="centerX" secondItem="3Jn-h4-fXL" secondAttribute="centerX" constant="24" id="eVG-pj-q6k"/>
+                                    <constraint firstItem="ckJ-6G-38h" firstAttribute="centerX" secondItem="3Jn-h4-fXL" secondAttribute="centerX" id="eVG-pj-q6k"/>
                                     <constraint firstItem="acV-lE-jVh" firstAttribute="centerX" secondItem="3Jn-h4-fXL" secondAttribute="centerX" id="jdZ-Ii-nMi"/>
+                                    <constraint firstItem="gVh-tG-Gue" firstAttribute="centerX" secondItem="3Jn-h4-fXL" secondAttribute="centerX" id="tyz-0E-3Lc"/>
                                 </constraints>
                             </customView>
                             <customView translatesAutoresizingMaskIntoConstraints="NO" id="sbc-pJ-bul" userLabel="Open Wrapper View">
@@ -448,8 +448,10 @@ Gw
                         <outlet property="detailsWrapperView" destination="6vZ-d2-qnR" id="TKb-Ux-TIk"/>
                         <outlet property="detailsWrapperViewHeightContraint" destination="sJt-dl-rlH" id="7pa-Kc-9xB"/>
                         <outlet property="openDetailsButton" destination="ACx-m8-z0K" id="cu4-zz-MhA"/>
+                        <outlet property="openDetailsButtonImageView" destination="8qK-6q-RQT" id="ezj-KU-kE6"/>
                         <outlet property="openWrapperView" destination="sbc-pJ-bul" id="dUO-6T-MLY"/>
                         <outlet property="optionsButton" destination="ckJ-6G-38h" id="xSK-KE-yMk"/>
+                        <outlet property="optionsButtonWidthConstraint" destination="f5G-AU-bU2" id="jhf-Pr-fJo"/>
                         <outlet property="warningButton" destination="Bir-wk-iOW" id="kOP-t7-e5z"/>
                         <outlet property="warningWrapperView" destination="r7f-Ig-GcB" id="cSU-Xr-Bin"/>
                     </connections>

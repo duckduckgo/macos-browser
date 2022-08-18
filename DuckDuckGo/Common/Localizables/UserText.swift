@@ -32,6 +32,7 @@ struct UserText {
     static let next = NSLocalizedString("next", value: "Next", comment: "Next button")
     static let pasteAndGo = NSLocalizedString("paste.and.go", value: "Paste & Go", comment: "Paste & Go button")
     static let pasteAndSearch = NSLocalizedString("paste.and.search", value: "Paste & Search", comment: "Paste & Search button")
+    static let clear = NSLocalizedString("clear", value: "Clear", comment: "Clear button")
 
     static let duplicateTab = NSLocalizedString("duplicate.tab", value: "Duplicate Tab", comment: "Menu item. Duplicate as a verb")
     static let pinTab = NSLocalizedString("pin.tab", value: "Pin Tab", comment: "Menu item. Pin as a verb")
@@ -61,14 +62,6 @@ struct UserText {
                                                          value: "Visit",
                                                          comment: "Address bar suffix of possibly visited website. Example: spreadprivacy.com . Visit spreadprivacy.com")
 
-    static let burnAlertMessageText = NSLocalizedString("burn.alert.message.text",
-                                                        value: "Are you sure you want to burn everything?",
-                                                        comment: "")
-    static let burnAlertInformativeText = NSLocalizedString("burn.alert.informative.text",
-                                                            value: "This will close all tabs and clear website data.",
-                                                            comment: "")
-    static let burn = NSLocalizedString("burn", value: "Burn", comment: "Burn button")
-
     static let navigateBack = NSLocalizedString("navigate.back", value: "Back", comment: "Context menu item")
     static let closeAndReturnToParentFormat = NSLocalizedString("close.tab.on.back.format",
                                                                 value: "Close and Return to “%@”",
@@ -97,19 +90,22 @@ struct UserText {
     static let printMenuItem = NSLocalizedString("print.menu.item", value: "Print…", comment: "Menu item title")
     static let newWindowMenuItem = NSLocalizedString("new.window.menu.item", value: "New Window", comment: "Menu item title")
     
+    static let fireproofSites = NSLocalizedString("fireproof.sites", value: "Fireproof Sites", comment: "Fireproof sites list title")
     static let fireproofCheckboxTitle = NSLocalizedString("fireproof.checkbox.title", value: "Ask to Fireproof websites when signing in", comment: "Fireproof settings checkbox title")
     static let fireproofExplanation = NSLocalizedString("fireproof.explanation", value: "Websites rely on cookies to keep you signed in. When you Fireproof a site, cookies won’t be erased and you'll stay signed in, even after using the Fire Button. We still block third-party trackers found on Fireproof websites.", comment: "Fireproofing mechanism explanation")
     static let manageFireproofSites = NSLocalizedString("fireproof.manage-sites", value: "Manage Fireproof Sites...", comment: "Fireproof settings button caption")
 
-    static let fireDialogFireproofSites = NSLocalizedString("fire.dialog.fireproof.sites", value: "Fireproof Sites", comment: "Category of domains in fire button dialog")
-    static let fireDialogClearSites = NSLocalizedString("fire.dialog.clear.sites", value: "Clear data for the following sites", comment: "Category of domains in fire button dialog")
-    static let allData = NSLocalizedString("fire.all-data", value: "All data", comment: "Configuration option for fire button")
-    static let currentTab = NSLocalizedString("fire.currentTab", value: "Current tab", comment: "Configuration option for fire button")
-    static let currentWindow = NSLocalizedString("fire.currentWindow", value: "Current window", comment: "Configuration option for fire button")
+    static let fireDialogFireproofSites = NSLocalizedString("fire.dialog.fireproof.sites", value: "Fireproof sites won't be cleared", comment: "Category of domains in fire button dialog")
+    static let fireDialogClearSites = NSLocalizedString("fire.dialog.clear.sites", value: "Selected sites will be cleared", comment: "Category of domains in fire button dialog")
+    static let allData = NSLocalizedString("fire.all-sites", value: "All sites", comment: "Configuration option for fire button")
+    static let currentSite = NSLocalizedString("fire.currentSite", value: "Current site", comment: "Configuration option for fire button")
+    static let currentTab = NSLocalizedString("fire.currentTab", value: "All sites visited in current tab", comment: "Configuration option for fire button")
+    static let currentWindow = NSLocalizedString("fire.currentWindow", value: "All sites visited in current window", comment: "Configuration option for fire button")
     static let allDataDescription = NSLocalizedString("fire.all-data.description", value: "Clear all tabs and related site data", comment: "Description of the 'All Data' configuration option for the fire button")
     static let currentWindowDescription = NSLocalizedString("fire.current-window.description", value: "Clear current window and related site data", comment: "Description of the 'Current Window' configuration option for the fire button")
     static let selectedDomainsDescription = NSLocalizedString("fire.selected-domains.description", value: "Clear selected domains and related site data", comment: "Description of the 'Current Window' configuration option for the fire button")
     static let fireDialogNothingToBurn = NSLocalizedString("fire.dialog.nothing-to-burn", value: "No data to clear", comment: "Information label to inform there is no domain for burning")
+    static let fireDialogSiteIsFireproof = NSLocalizedString("fire.dialog.site-is-fireproof", value: "Nothing to clear. This is one of your Fireproof Sites.", comment: "Information label to inform that a fireproof website won't be burned")
     static let fireDialogDetails = NSLocalizedString("fire.dialog.details", value: "Details", comment: "Button to show more details")
     static let fireDialogAllTabsWillClose = NSLocalizedString("fire.dialog.all-tabs-will-close", value: "All tabs open to selected sites will close", comment: "Warning label shown in an expanded view of the fire popover")
     static let fireDialogAllUnpinnedTabsWillClose = NSLocalizedString("fire.dialog.all-unpinned-tabs-will-close", value: "All unpinned tabs open to selected sites will close", comment: "Warning label shown in an expanded view of the fire popover")
@@ -484,21 +480,56 @@ struct UserText {
     static let homePageEmptyStateItemMessage = NSLocalizedString("home.page.empty.state.item.message", value: "Keep browsing to see how many trackers were blocked", comment: "")
     static let homePageNoTrackersFound = NSLocalizedString("home.page.no.trackers.found", value: "No trackers found", comment: "")
     static let homePageNoTrackersBlocked = NSLocalizedString("home.page.no.trackers.blocked", value: "No trackers blocked", comment: "")
+    static let homePageBurnFireproofSiteAlert = NSLocalizedString("home.page.burn.fireproof.site.alert", value: "History will be cleared for this site, but related data will remain, because this site is Fireproof", comment: "Message for an alert displayed when trying to burn a fireproof website")
+    static let homePageClearHistory = NSLocalizedString("home.page.clear.history", value: "Clear History", comment: "Button caption for the burn fireproof website alert")
 
     static let tooltipAddToFavorites = NSLocalizedString("tooltip.addToFavorites", value: "Add to Favorites", comment: "Tooltip for add to favorites button")
-    static let tooltipBurn = NSLocalizedString("tooltip.burn", value: "Burn History and Site Data", comment: "Tooltip for burn button")
-    
-    static let autoconsentPopoverMessage = NSLocalizedString("Cookie consent pop-up managed", comment: "Popover message")
-    static let autoconsentPopupTitle = NSLocalizedString("Let DuckDuckGo try to manage cookie consent pop-ups?", comment: "messageText")
-    static let autoconsentPopupDescription = NSLocalizedString("On some sites, we can automatically set preferences to minimize cookies 🍪 and maximize privacy, then close the pop-up.", comment: "informativeText")
-    static let autoconsentPopupEnableButton = NSLocalizedString("Manage Them for Me", comment: "")
-    static let autoconsentPopupLaterButton = NSLocalizedString("Not Now", comment: "")
-    static let autoconsentPopupNeverButton = NSLocalizedString("Don't Ask Again", comment: "")
+
+    static func tooltipClearHistoryAndData(domain: String) -> String {
+        let localized = NSLocalizedString("tooltip.clearHistoryAndData",
+                                          value: "Clear browsing history and data for %@",
+                                          comment: "Tooltip for burn button")
+        return String(format: localized, domain)
+    }
+    static func tooltipClearHistory(domain: String) -> String {
+        let localized = NSLocalizedString("tooltip.clearHistory",
+                                          value: "Clear browsing history for %@",
+                                          comment: "Tooltip for burn button")
+        return String(format: localized, domain)
+    }
 
     static let recentlyClosedMenuItemSuffixOne = NSLocalizedString("one.more.tab", value: " (and 1 more tab)", comment: "suffix of string in Recently Closed menu")
     static let recentlyClosedMenuItemSuffixMultiple = NSLocalizedString("n.more.tabs", value: " (and %d more tabs)", comment: "suffix of string in Recently Closed menu")
 
     static let reopenLastClosedTab = NSLocalizedString("reopen.last.closed.tab", value: "Reopen Last Closed Tab", comment: "")
     static let reopenLastClosedWindow = NSLocalizedString("reopen.last.closed.window", value: "Reopen Last Closed Window", comment: "")
+    static let cookiesManagedNotification = NSLocalizedString("notification.badge.cookiesmanaged", value: "Cookies Managed", comment: "Notification that appears when browser automatically handle cookies")
 
+    static let autoconsentModalTitle = NSLocalizedString("autoconsent.modal.title", value: "Looks like this site has a cookie consent pop-up 👇", comment: "Title for modal asking the user to auto manage cookies")
+    
+    static let autoconsentModalBody = NSLocalizedString("autoconsent.modal.body", value: "Want me to handle these for you? I can try to minimize cookies, maximize privacy, and hide pop-ups like these.", comment: "Body for modal asking the user to auto manage cookies")
+   
+    static let autoconsentModalConfirmButton = NSLocalizedString("autoconsent.modal.cta.confirm", value: "Manage Cookie Pop-ups", comment: "Confirm button for modal asking the user to auto manage cookies")
+    static let autoconsentModalDenyButton = NSLocalizedString("autoconsent.modal.cta.deny", value: "No Thanks", comment: "Deny button for modal asking the user to auto manage cookies")
+
+    static let clearAllHistoryMenuItem = NSLocalizedString("history.menu.clear.all.history", value: "Clear All History…", comment: "Menu item to clear all history")
+    static let clearThisHistoryMenuItem = NSLocalizedString("history.menu.clear.this.history", value: "Clear This History…", comment: "Menu item to clear parts of history and data")
+    static let recentlyVisitedMenuSection = NSLocalizedString("history.menu.recently.visited", value: "Recently Visited", comment: "Section header of the history menu")
+    static let olderMenuItem = NSLocalizedString("history.menu.older", value: "Older…", comment: "Menu item representing older history")
+
+    static let clearAllDataQuestion = NSLocalizedString("history.menu.clear.all.history.question", value: "Clear all history and \nclose all tabs?", comment: "Alert with the confirmation to clear all history and data")
+    static let clearAllDataDescription = NSLocalizedString("history.menu.clear.all.history.description", value: "Cookies and site data for all sites will also be cleared, unless the site is Fireproof.", comment: "Description in the alert with the confirmation to clear all data")
+
+    static let clearDataHeader = NSLocalizedString("history.menu.clear.data.question", value: "Clear History for %@?", comment: "Alert with the confirmation to clear all data")
+    static let clearDataDescription = NSLocalizedString("history.menu.clear.data.description", value: "Cookies and other data for sites visited on this day will also be cleared unless the site is Fireproof. History from other days will not be cleared.", comment: "Description in the alert with the confirmation to clear browsing history")
+    static let clearDataTodayHeader = NSLocalizedString("history.menu.clear.data.today.question", value: "Clear history for today \nand close all tabs?", comment: "Alert with the confirmation to clear all data")
+    static let clearDataTodayDescription = NSLocalizedString("history.menu.clear.data.today.description", value: "Cookies and other data for sites visited today will also be cleared unless the site is Fireproof. History from other days will not be cleared.", comment: "Description in the alert with the confirmation to clear browsing history")
+
+    static let showBookmarksBar = NSLocalizedString("bookmarks.bar.show", value: "Show Bookmarks Bar", comment: "Menu item for showing the bookmarks bar")
+    static let hideBookmarksBar = NSLocalizedString("bookmarks.bar.hide", value: "Hide Bookmarks Bar", comment: "Menu item for hiding the bookmarks bar")
+    static let bookmarksBarFolderEmpty = NSLocalizedString("bookmarks.bar.folder.empty", value: "Empty", comment: "Empty state for a bookmarks bar folder")
+    static let bookmarksBarContextMenuCopy = NSLocalizedString("bookmarks.bar.context-menu.copy", value: "Copy", comment: "Copy menu item for the bookmarks bar context menu")
+    static let bookmarksBarContextMenuDelete = NSLocalizedString("bookmarks.bar.context-menu.delete", value: "Delete", comment: "Delete menu item for the bookmarks bar context menu")
+    static let bookmarksBarContextMenuMoveToEnd = NSLocalizedString("bookmarks.bar.context-menu.move-to-end", value: "Move To End", comment: "Move To End menu item for the bookmarks bar context menu")
+    
 }

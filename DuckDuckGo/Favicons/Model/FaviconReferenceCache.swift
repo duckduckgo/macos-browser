@@ -46,6 +46,7 @@ final class FaviconReferenceCache {
                 switch completion {
                 case .finished:
                     os_log("References loaded successfully", log: .favicons)
+                    NotificationCenter.default.post(name: .faviconCacheUpdated, object: nil)
                     completionHandler?(nil)
                 case .failure(let error):
                     os_log("Loading of references failed: %s", log: .favicons, type: .error, error.localizedDescription)

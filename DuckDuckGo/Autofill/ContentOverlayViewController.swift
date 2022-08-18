@@ -122,6 +122,7 @@ public final class ContentOverlayViewController: NSViewController, EmailManagerR
         }
 
         let webView = OverlayWebView(frame: .zero, configuration: configuration)
+        webView.allowsLinkPreview = false
         webView.window?.acceptsMouseMovedEvents = true
         webView.window?.ignoresMouseEvents = false
         webView.configuration.userContentController.addHandler(topAutofillUserScript)
@@ -165,6 +166,19 @@ public final class ContentOverlayViewController: NSViewController, EmailManagerR
         }.resume()
     }
     // swiftlint:enable function_parameter_count
+    
+    public func emailManagerKeychainAccessFailed(accessType: EmailKeychainAccessType, error: EmailKeychainAccessError) {
+        var parameters = [
+             "access_type": accessType.rawValue,
+             "error": error.errorDescription
+         ]
+
+         if case let .keychainAccessFailure(status) = error {
+             parameters["keychain_status"] = String(status)
+         }
+        
+        Pixel.fire(.debug(event: .emailAutofillKeychainError), withAdditionalParameters: parameters)
+    }
 
     private enum Constants {
         static let minWidth: CGFloat = 315
@@ -191,6 +205,10 @@ extension ContentOverlayViewController: OverlayAutofillUserScriptPresentationDel
 }
 
 extension ContentOverlayViewController: SecureVaultManagerDelegate {
+    
+    public func secureVaultManagerIsEnabledStatus(_: SecureVaultManager) -> Bool {
+        return true
+    }
 
     public func secureVaultManager(_: SecureVaultManager, promptUserToStoreAutofillData data: AutofillData) {
         // No-op, the content overlay view controller should not be prompting the user to store data
@@ -199,6 +217,7 @@ extension ContentOverlayViewController: SecureVaultManagerDelegate {
     public func secureVaultManager(_: SecureVaultManager,
                                    promptUserToAutofillCredentialsForDomain domain: String,
                                    withAccounts accounts: [SecureVaultModels.WebsiteAccount],
+                                   withTrigger trigger: AutofillUserScript.GetTriggerType,
                                    completionHandler: @escaping (SecureVaultModels.WebsiteAccount?) -> Void) {
         // no-op on macOS
     }

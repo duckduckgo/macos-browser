@@ -19,27 +19,70 @@
 import Foundation
 import BrowserServicesKit
 
-struct HistoryEntry {
+final class HistoryEntry {
+
+    init(identifier: UUID,
+         url: URL,
+         title: String? = nil,
+         failedToLoad: Bool,
+         numberOfTotalVisits: Int,
+         lastVisit: Date,
+         visits: Set<Visit>,
+         numberOfTrackersBlocked: Int,
+         blockedTrackingEntities: Set<String>,
+         trackersFound: Bool) {
+        self.identifier = identifier
+        self.url = url
+        self.title = title
+        self.failedToLoad = failedToLoad
+        self.numberOfTotalVisits = numberOfTotalVisits
+        self.lastVisit = lastVisit
+        self.visits = visits
+        self.numberOfTrackersBlocked = numberOfTrackersBlocked
+        self.blockedTrackingEntities = blockedTrackingEntities
+        self.trackersFound = trackersFound
+    }
 
     let identifier: UUID
     let url: URL
     var title: String?
-    var numberOfVisits: Int
-    var lastVisit: Date
     var failedToLoad: Bool
+
+    // MARK: - Visits
+
+    // Kept here because of migration. Can be used as computed property once visits of HistoryEntryMO are filled with all necessary info
+    // (In use for 1 month by majority of users)
+    var numberOfTotalVisits: Int
+    var lastVisit: Date
+
+    var visits: Set<Visit>
+
+    func addVisit() {
+        let visit = Visit(date: Date(), historyEntry: self)
+        visits.insert(visit)
+
+        numberOfTotalVisits += 1
+        lastVisit = Date.startOfMinuteNow
+    }
+
+    // Used for migration
+    func addOldVisit(date: Date) {
+        let visit = Visit(date: date, historyEntry: self)
+        visits.insert(visit)
+    }
+
+    // MARK: - Tracker blocking info
+
     var numberOfTrackersBlocked: Int
     var blockedTrackingEntities: Set<String>
     var trackersFound: Bool
 
-    mutating func addVisit() {
-        numberOfVisits += 1
-        lastVisit = Date.startOfMinuteNow
-    }
-
-    mutating func addBlockedTracker(entityName: String) {
+    func addBlockedTracker(entityName: String) {
         numberOfTrackersBlocked += 1
 
-        assert(!entityName.trimWhitespace().isEmpty)
+        guard !entityName.trimWhitespace().isEmpty else {
+            return
+        }
         blockedTrackingEntities.insert(entityName)
     }
 
@@ -47,13 +90,14 @@ struct HistoryEntry {
 
 extension HistoryEntry {
 
-    init(url: URL) {
+    convenience init(url: URL) {
         self.init(identifier: UUID(),
                   url: url,
                   title: nil,
-                  numberOfVisits: 0,
-                  lastVisit: Date.startOfMinuteNow,
                   failedToLoad: false,
+                  numberOfTotalVisits: 0,
+                  lastVisit: Date.startOfMinuteNow,
+                  visits: Set<Visit>(),
                   numberOfTrackersBlocked: 0,
                   blockedTrackingEntities: Set<String>(),
                   trackersFound: false)
@@ -63,8 +107,34 @@ extension HistoryEntry {
 
 extension HistoryEntry: Hashable {
 
+    static func == (lhs: HistoryEntry, rhs: HistoryEntry) -> Bool {
+        lhs === rhs
+    }
+
     func hash(into hasher: inout Hasher) {
-        hasher.combine(identifier.hashValue)
+        hasher.combine(id)
+    }
+
+}
+
+extension HistoryEntry: Identifiable {}
+
+extension HistoryEntry: NSCopying {
+
+    func copy(with zone: NSZone? = nil) -> Any {
+        let visits = visits.compactMap { $0.copy() as? Visit }
+        let entry = HistoryEntry(identifier: identifier,
+                                url: url,
+                                title: title,
+                                failedToLoad: failedToLoad,
+                                numberOfTotalVisits: numberOfTotalVisits,
+                                lastVisit: lastVisit,
+                                visits: Set(visits),
+                                numberOfTrackersBlocked: numberOfTrackersBlocked,
+                                blockedTrackingEntities: blockedTrackingEntities,
+                                trackersFound: trackersFound)
+        entry.visits.forEach { $0.historyEntry = entry }
+        return entry
     }
 
 }

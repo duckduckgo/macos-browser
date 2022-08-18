@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<document type="com.apple.InterfaceBuilder3.Cocoa.Storyboard.XIB" version="3.0" toolsVersion="19529" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES">
+<document type="com.apple.InterfaceBuilder3.Cocoa.Storyboard.XIB" version="3.0" toolsVersion="20037" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES">
     <dependencies>
         <deployment identifier="macosx"/>
-        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="19529"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="20037"/>
         <capability name="Named colors" minToolsVersion="9.0"/>
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
     </dependencies>
@@ -24,16 +24,6 @@
                                     <segue destination="Nfk-V8-FAE" kind="embed" destinationCreationSelector="createTabBarViewControllerWithCoder:sender:segueIdentifier:" id="dL6-gI-9Hl"/>
                                 </connections>
                             </containerView>
-                            <containerView translatesAutoresizingMaskIntoConstraints="NO" id="SYo-8W-jl3">
-                                <rect key="frame" x="0.0" y="0.0" width="1024" height="703"/>
-                                <constraints>
-                                    <constraint firstAttribute="width" relation="greaterThanOrEqual" constant="512" id="FeK-TC-TkT"/>
-                                    <constraint firstAttribute="height" relation="greaterThanOrEqual" constant="178" id="OOl-4a-Y8I"/>
-                                </constraints>
-                                <connections>
-                                    <segue destination="wo6-dV-Q3Q" kind="embed" destinationCreationSelector="createWebViewControllerWithCoder:sender:segueIdentifier:" id="A2b-sp-a54"/>
-                                </connections>
-                            </containerView>
                             <customView translatesAutoresizingMaskIntoConstraints="NO" id="af1-Eb-VaG" userLabel="Separator" customClass="ColorView" customModule="DuckDuckGo_Privacy_Browser" customModuleProvider="target">
                                 <rect key="frame" x="0.0" y="708" width="1024" height="1"/>
                                 <constraints>
@@ -45,6 +35,15 @@
                                     </userDefinedRuntimeAttribute>
                                 </userDefinedRuntimeAttributes>
                             </customView>
+                            <containerView translatesAutoresizingMaskIntoConstraints="NO" id="kfs-1U-pfm" userLabel="Bookmarks Bar Container View">
+                                <rect key="frame" x="0.0" y="674" width="1024" height="34"/>
+                                <constraints>
+                                    <constraint firstAttribute="height" constant="34" id="D6Z-21-RpW"/>
+                                </constraints>
+                                <connections>
+                                    <segue destination="aql-HV-xza" kind="embed" destinationCreationSelector="createBookmarksBarWithCoder:sender:segueIdentifier:" id="TuO-tg-e0N"/>
+                                </connections>
+                            </containerView>
                             <containerView translatesAutoresizingMaskIntoConstraints="NO" id="wFH-xq-50o">
                                 <rect key="frame" x="0.0" y="709" width="1024" height="42"/>
                                 <constraints>
@@ -52,6 +51,16 @@
                                 </constraints>
                                 <connections>
                                     <segue destination="R9l-dg-lKa" kind="embed" destinationCreationSelector="createNavigationBarViewControllerWithCoder:sender:segueIdentifier:" id="Br9-o3-sQ8"/>
+                                </connections>
+                            </containerView>
+                            <containerView translatesAutoresizingMaskIntoConstraints="NO" id="SYo-8W-jl3">
+                                <rect key="frame" x="0.0" y="0.0" width="1024" height="674"/>
+                                <constraints>
+                                    <constraint firstAttribute="width" relation="greaterThanOrEqual" constant="512" id="FeK-TC-TkT"/>
+                                    <constraint firstAttribute="height" relation="greaterThanOrEqual" constant="178" id="OOl-4a-Y8I"/>
+                                </constraints>
+                                <connections>
+                                    <segue destination="wo6-dV-Q3Q" kind="embed" destinationCreationSelector="createWebViewControllerWithCoder:sender:segueIdentifier:" id="A2b-sp-a54"/>
                                 </connections>
                             </containerView>
                             <containerView hidden="YES" translatesAutoresizingMaskIntoConstraints="NO" id="Jbn-9T-FNt" userLabel="Find in Page Container View">
@@ -77,12 +86,15 @@
                             <constraint firstAttribute="trailing" secondItem="UE1-Pg-JIe" secondAttribute="trailing" id="DIS-8Z-gS4"/>
                             <constraint firstAttribute="trailing" secondItem="SYo-8W-jl3" secondAttribute="trailing" id="EJ8-cX-El9"/>
                             <constraint firstAttribute="trailing" secondItem="lYg-bX-QrJ" secondAttribute="trailing" id="HkZ-fV-qYb"/>
+                            <constraint firstItem="SYo-8W-jl3" firstAttribute="top" secondItem="kfs-1U-pfm" secondAttribute="bottom" id="JX7-Ev-c3Y"/>
+                            <constraint firstItem="kfs-1U-pfm" firstAttribute="leading" secondItem="m2S-Jp-Qdl" secondAttribute="leading" id="Npp-De-0qc"/>
                             <constraint firstItem="lYg-bX-QrJ" firstAttribute="top" secondItem="m2S-Jp-Qdl" secondAttribute="top" id="PNG-fr-pcs"/>
                             <constraint firstItem="Jbn-9T-FNt" firstAttribute="centerX" secondItem="wFH-xq-50o" secondAttribute="centerX" id="PQa-4m-EpD"/>
                             <constraint firstItem="wFH-xq-50o" firstAttribute="top" secondItem="m2S-Jp-Qdl" secondAttribute="top" constant="38" id="TRm-AX-VcL"/>
+                            <constraint firstAttribute="trailing" secondItem="kfs-1U-pfm" secondAttribute="trailing" id="WtE-KK-sPb"/>
                             <constraint firstItem="wFH-xq-50o" firstAttribute="leading" secondItem="m2S-Jp-Qdl" secondAttribute="leading" id="XQv-BZ-2ci"/>
+                            <constraint firstItem="kfs-1U-pfm" firstAttribute="top" secondItem="af1-Eb-VaG" secondAttribute="bottom" id="Xfr-6f-7N4"/>
                             <constraint firstItem="af1-Eb-VaG" firstAttribute="top" secondItem="wFH-xq-50o" secondAttribute="bottom" id="ajK-M4-7Qf"/>
-                            <constraint firstItem="SYo-8W-jl3" firstAttribute="top" secondItem="m2S-Jp-Qdl" secondAttribute="top" constant="86" id="js0-Db-kRi"/>
                             <constraint firstItem="lYg-bX-QrJ" firstAttribute="leading" secondItem="m2S-Jp-Qdl" secondAttribute="leading" id="kVB-Sz-8Sv"/>
                             <constraint firstItem="af1-Eb-VaG" firstAttribute="leading" secondItem="m2S-Jp-Qdl" secondAttribute="leading" id="oLA-yb-nB8"/>
                             <constraint firstItem="UE1-Pg-JIe" firstAttribute="leading" secondItem="m2S-Jp-Qdl" secondAttribute="leading" id="qA7-89-XxQ"/>
@@ -95,18 +107,27 @@
                     </view>
                     <connections>
                         <outlet property="addressBarHeightConstraint" destination="vZS-tl-wOP" id="cCS-Fd-zJd"/>
+                        <outlet property="bookmarksBarContainerView" destination="kfs-1U-pfm" id="4FY-K8-M2a"/>
+                        <outlet property="bookmarksBarHeightConstraint" destination="D6Z-21-RpW" id="AMj-Ll-fEc"/>
                         <outlet property="divider" destination="af1-Eb-VaG" id="Nws-XY-cPD"/>
                         <outlet property="findInPageContainerView" destination="Jbn-9T-FNt" id="5Sl-UV-Fa9"/>
                         <outlet property="navigationBarContainerView" destination="wFH-xq-50o" id="hbq-xV-McI"/>
                         <outlet property="navigationBarTopConstraint" destination="TRm-AX-VcL" id="cCS-Fd-hJd"/>
                         <outlet property="tabBarContainerView" destination="lYg-bX-QrJ" id="nor-E0-cFP"/>
                         <outlet property="webContainerView" destination="SYo-8W-jl3" id="DoZ-Ih-dHA"/>
-                        <outlet property="webViewTopConstraint" destination="js0-Db-kRi" id="puD-Cr-Val"/>
                     </connections>
                 </viewController>
                 <customObject id="rPt-NT-nkU" userLabel="First Responder" customClass="NSResponder" sceneMemberID="firstResponder"/>
             </objects>
             <point key="canvasLocation" x="75" y="1178.5"/>
+        </scene>
+        <!--BookmarksBar-->
+        <scene sceneID="Oyo-re-WAl">
+            <objects>
+                <controllerPlaceholder storyboardName="BookmarksBar" id="aql-HV-xza" sceneMemberID="viewController"/>
+                <customObject id="Rg1-ug-XrN" userLabel="First Responder" customClass="NSResponder" sceneMemberID="firstResponder"/>
+            </objects>
+            <point key="canvasLocation" x="870" y="1152"/>
         </scene>
         <!--TabBar-->
         <scene sceneID="XSA-KE-InJ">
@@ -114,7 +135,7 @@
                 <customObject id="NXm-I5-OhA" userLabel="First Responder" customClass="NSResponder" sceneMemberID="firstResponder"/>
                 <controllerPlaceholder storyboardName="TabBar" id="Nfk-V8-FAE" sceneMemberID="viewController"/>
             </objects>
-            <point key="canvasLocation" x="849" y="1066"/>
+            <point key="canvasLocation" x="848" y="1052"/>
         </scene>
         <!--NavigationBar-->
         <scene sceneID="Sc0-ir-Na8">
@@ -122,7 +143,7 @@
                 <customObject id="Pfq-lf-Cxf" userLabel="First Responder" customClass="NSResponder" sceneMemberID="firstResponder"/>
                 <controllerPlaceholder storyboardName="NavigationBar" id="R9l-dg-lKa" sceneMemberID="viewController"/>
             </objects>
-            <point key="canvasLocation" x="869" y="1112"/>
+            <point key="canvasLocation" x="869" y="1103"/>
         </scene>
         <!--FindInPage-->
         <scene sceneID="PQx-g7-OSP">
@@ -130,7 +151,7 @@
                 <customObject id="AN6-a3-PL9" userLabel="First Responder" customClass="NSResponder" sceneMemberID="firstResponder"/>
                 <controllerPlaceholder storyboardName="FindInPage" id="0cy-cn-sdp" sceneMemberID="viewController"/>
             </objects>
-            <point key="canvasLocation" x="860" y="1170"/>
+            <point key="canvasLocation" x="860" y="1202"/>
         </scene>
         <!--Fire-->
         <scene sceneID="1LJ-1c-OxA">
@@ -138,7 +159,7 @@
                 <controllerPlaceholder storyboardName="Fire" id="cnP-Wp-dck" sceneMemberID="viewController"/>
                 <customObject id="uyP-DE-lLX" userLabel="First Responder" customClass="NSResponder" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="838" y="1228"/>
+            <point key="canvasLocation" x="838" y="1252"/>
         </scene>
         <!--BrowserTab-->
         <scene sceneID="O3n-py-FOu">
@@ -146,7 +167,7 @@
                 <customObject id="ECq-3v-dmj" userLabel="First Responder" customClass="NSResponder" sceneMemberID="firstResponder"/>
                 <controllerPlaceholder storyboardName="BrowserTab" id="wo6-dV-Q3Q" sceneMemberID="viewController"/>
             </objects>
-            <point key="canvasLocation" x="862" y="1280"/>
+            <point key="canvasLocation" x="862" y="1302"/>
         </scene>
     </scenes>
     <resources>

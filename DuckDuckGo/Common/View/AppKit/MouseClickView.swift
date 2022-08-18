@@ -21,6 +21,7 @@ import Cocoa
 protocol MouseClickViewDelegate: AnyObject {
 
     func mouseClickView(_ mouseClickView: MouseClickView, mouseDownEvent: NSEvent)
+    func mouseClickView(_ mouseClickView: MouseClickView, mouseUpEvent: NSEvent)
     func mouseClickView(_ mouseClickView: MouseClickView, rightMouseDownEvent: NSEvent)
     func mouseClickView(_ mouseClickView: MouseClickView, otherMouseDownEvent: NSEvent)
 
@@ -29,6 +30,7 @@ protocol MouseClickViewDelegate: AnyObject {
 extension MouseClickViewDelegate {
 
     func mouseClickView(_ mouseClickView: MouseClickView, mouseDownEvent: NSEvent) {}
+    func mouseClickView(_ mouseClickView: MouseClickView, mouseUpEvent: NSEvent) {}
     func mouseClickView(_ mouseClickView: MouseClickView, rightMouseDownEvent: NSEvent) {}
     func mouseClickView(_ mouseClickView: MouseClickView, otherMouseDownEvent: NSEvent) {}
 
@@ -59,6 +61,13 @@ final class MouseClickView: NSView {
     }
 
     override func mouseDown(with event: NSEvent) {
+        let coordinateInWindow = event.locationInWindow
+        let coordinateInView = self.convert(coordinateInWindow, from: nil)
+        
+        if !self.bounds.contains(coordinateInView) {
+            return
+        }
+        
         guard !repostMultiClickEventIfNeeded(event) else { return }
 
         super.mouseDown(with: event)
@@ -69,6 +78,7 @@ final class MouseClickView: NSView {
         guard !repostMultiClickEventIfNeeded(event) else { return }
 
         super.mouseUp(with: event)
+        delegate?.mouseClickView(self, mouseUpEvent: event)
     }
 
     override func rightMouseDown(with event: NSEvent) {
