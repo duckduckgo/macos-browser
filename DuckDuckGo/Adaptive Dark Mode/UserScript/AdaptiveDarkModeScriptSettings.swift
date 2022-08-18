@@ -45,16 +45,19 @@ final class AdaptiveDarkModeScriptSettings {
     private var defaultAppearanceSettings: String {
         return """
             {
+                mode: 1,
                 brightness: 100,
-                contrast: 90,
-                sepia: 10
+                contrast: 100,
+                grayscale: 0,
+                sepia: 0,
             }
         """
     }
     
     func appearanceSettingsJSON() -> String {
-        let settings = AdaptiveDarkModeAppearanceSettings(brightness: 100, contrast: 90, sepia: 10)
-        return (try? JSONEncoder().encode(settings).utf8String()) ?? defaultAppearanceSettings
+       // let settings = AdaptiveDarkModeAppearanceSettings(brightness: 100, contrast: 90, sepia: 10)
+        //return (try? JSONEncoder().encode(settings).utf8String()) ?? defaultAppearanceSettings
+        return defaultAppearanceSettings
     }
 }
 
