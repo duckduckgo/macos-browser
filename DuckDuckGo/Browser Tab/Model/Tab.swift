@@ -1254,7 +1254,6 @@ extension Tab: WKNavigationDelegate {
         if isAMPProtectionExtracting { isAMPProtectionExtracting = false }
         linkProtection.setMainFrameUrl(nil)
         adaptiveDarkModeScript?.refreshDarkReaderScript(webView: webView)
-
     }
 
     func webView(_ webView: WKWebView, didFail navigation: WKNavigation!, withError error: Error) {
