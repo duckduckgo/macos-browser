@@ -18,10 +18,11 @@
 
 import Foundation
 import BrowserServicesKit
+import WebKit
 
 final class AdaptiveDarkModeUserScript: NSObject, StaticUserScript {
 
-    static var injectionTime: WKUserScriptInjectionTime { .atDocumentEnd }
+    static var injectionTime: WKUserScriptInjectionTime { .atDocumentStart }
     static var forMainFrameOnly: Bool { false }
     static var source: String = AdaptiveDarkModeUserScript.loadJS("darkreader", from: .main)
     static var script: WKUserScript = AdaptiveDarkModeUserScript.makeWKUserScript()
