@@ -18,11 +18,18 @@
 
 import AppKit
 import SwiftUI
+import Combine
+
+protocol AdaptiveDarkModeWebsiteSettingsPopoverDelegate: AnyObject {
+    func adaptiveDarkModeWebsiteSettingsPopover(_ popover: AdaptiveDarkModeWebsiteSettingsPopover, didChangeStatus enabled: Bool)
+}
 
 final class AdaptiveDarkModeWebsiteSettingsPopover: NSPopover {
+    private var statusCancellables = Set<AnyCancellable>()
+    weak var statusDelegate: AdaptiveDarkModeWebsiteSettingsPopoverDelegate?
+    
     override init() {
         super.init()
-
         self.behavior = .semitransient
     }
 
@@ -31,16 +38,28 @@ final class AdaptiveDarkModeWebsiteSettingsPopover: NSPopover {
     }
 
     func preparePopoverWithURL(_ url: URL) {
-        let controller = AdaptiveDarkModeWebsiteSettingsViewController(currentURL: url)
+        let domain = url.host?.dropWWW() ?? ""
+        let isDarkModeEnabled = !DarkModeSettingsStore.shared.isDomainOnExceptionList(domain: domain)
+        
+        let viewModel = AdaptiveDarkModeWebsiteSettingsViewModel(currentDomain: domain, isEnabled: isDarkModeEnabled)
+        
+        viewModel.$isDarkModeEnabled
+            .dropFirst()
+            .sink { [weak self] enabled in
+                guard let self = self else { return }
+                self.statusDelegate?.adaptiveDarkModeWebsiteSettingsPopover(self, didChangeStatus: enabled)
+            }.store(in: &statusCancellables)
+        
+        let controller = AdaptiveDarkModeWebsiteSettingsViewController(viewModel: viewModel)
         contentViewController = controller
     }
 }
 
 final class AdaptiveDarkModeWebsiteSettingsViewController: NSViewController {
-    let currentURL: URL
+    private let viewModel: AdaptiveDarkModeWebsiteSettingsViewModel
     
-    init(currentURL: URL) {
-        self.currentURL = currentURL
+    init(viewModel: AdaptiveDarkModeWebsiteSettingsViewModel) {
+        self.viewModel = viewModel
         super.init(nibName: nil, bundle: nil)
     }
     
@@ -49,7 +68,6 @@ final class AdaptiveDarkModeWebsiteSettingsViewController: NSViewController {
     }
 
     override func loadView() {
-        let viewModel = AdaptiveDarkModeWebsiteSettingsViewModel(currentURL: currentURL)
         let hostingView = NSHostingView(rootView: AdaptiveDarkModeWebsiteSettingsView(viewModel: viewModel))
         hostingView.frame = NSRect(x: 0, y: 0, width: 400, height: 105)
         view = hostingView

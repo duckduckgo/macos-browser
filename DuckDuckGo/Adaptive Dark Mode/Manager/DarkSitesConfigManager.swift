@@ -20,6 +20,8 @@ import Foundation
 import OSLog
 
 struct DarkSitesConfigManager {
+    static let shared = DarkSitesConfigManager()
+
     private let log = OSLog(subsystem: "com.duckduckgo.instrumentation", category: "DarkModeInstrumentation")
 
     // ETag: W/"fb87499571281a90fd8bcef3d0e0e3a70334480df5ee452db4fc51e6c4f3d43b"
@@ -42,8 +44,7 @@ struct DarkSitesConfigManager {
         }
         
         print("Checking if \(url) is in darklist")
-        guard let host = url.host else { return false }
-        let value = "\(host)\(url.path)"
+        let value = url.path
         
         let result = darkSites.filter { value.contains($0) }
         return result.count > 0

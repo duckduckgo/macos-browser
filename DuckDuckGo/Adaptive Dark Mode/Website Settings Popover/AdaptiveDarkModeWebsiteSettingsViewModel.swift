@@ -19,28 +19,22 @@
 import Foundation
 
 final class AdaptiveDarkModeWebsiteSettingsViewModel: ObservableObject {
-    let currentURL: URL
-
-    @Published var isDarkModeEnabled: Bool = false {
-        didSet {
-            enableDarkMode(isDarkModeEnabled)
-        }
+    let currentDomain: String
+    @Published var isDarkModeEnabled: Bool
+    
+    init(currentDomain: String, isEnabled: Bool) {
+        self.currentDomain = currentDomain
+        self.isDarkModeEnabled = isEnabled
     }
     
-    var currentDomain: String {
-        currentURL.host?.dropWWW() ?? ""
-    }
-    
-    init(currentURL: URL) {
-        self.currentURL = currentURL
-    }
-    
-    private func enableDarkMode(_ enable: Bool) {
-        
-        if enable {
-            AdaptiveDarkModeScriptSettings.shared.status = .enabled
-        } else {
-            AdaptiveDarkModeScriptSettings.shared.status = .disabled
-        }
-    }
+//    private func enableDarkMode(_ enable: Bool) {
+//
+//        if enable {
+//            AdaptiveDarkModeScriptSettings.shared.status = .enabled
+//            DarkModeSettingsStore.shared.removeDomainFromExceptionList(domain: currentDomain)
+//        } else {
+//            AdaptiveDarkModeScriptSettings.shared.status = .disabled
+//            DarkModeSettingsStore.shared.addDomainToExceptionList(domain: currentDomain)
+//        }
+//    }
 }

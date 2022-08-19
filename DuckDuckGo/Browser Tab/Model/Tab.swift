@@ -124,6 +124,12 @@ final class Tab: NSObject, Identifiable, ObservableObject {
             }
         }
     }
+    
+    var isDarkModeEnabled: Bool = false {
+        didSet {
+            refreshDarkReader(enabled: isDarkModeEnabled)
+        }
+    }
 
     weak var autofillScript: WebsiteAutofillUserScript?
     weak var delegate: TabDelegate? {
@@ -183,11 +189,6 @@ final class Tab: NSObject, Identifiable, ObservableObject {
         NotificationCenter.default.addObserver(self,
                                                selector: #selector(onDuckDuckGoEmailSignOut),
                                                name: .emailDidSignOut,
-                                               object: nil)
-        
-        NotificationCenter.default.addObserver(self,
-                                               selector: #selector(refreshDarkReader),
-                                               name: .darkReaderSettingsChanged,
                                                object: nil)
     }
 
@@ -680,8 +681,8 @@ final class Tab: NSObject, Identifiable, ObservableObject {
     // MARK: - Adaptive Dark Mode
     weak var adaptiveDarkModeScript: AdaptiveDarkModeUserScript?
     
-    @objc func refreshDarkReader(_ notification: Notification) {
-        adaptiveDarkModeScript?.refreshDarkReaderScript(webView: webView)
+    func refreshDarkReader(enabled: Bool) {
+        adaptiveDarkModeScript?.refreshDarkReaderScript(enabled: enabled, webView: webView)
     }
 
     // MARK: - Global & Local History
@@ -1252,7 +1253,7 @@ extension Tab: WKNavigationDelegate {
         webViewDidFinishNavigationPublisher.send()
         if isAMPProtectionExtracting { isAMPProtectionExtracting = false }
         linkProtection.setMainFrameUrl(nil)
-        adaptiveDarkModeScript?.refreshDarkReaderScript(webView: webView)
+        refreshDarkReader(enabled: isDarkModeEnabled)
     }
 
     func webView(_ webView: WKWebView, didFail navigation: WKNavigation!, withError error: Error) {
@@ -1408,4 +1409,10 @@ extension Tab: TabDataClearing {
         webView.navigationDelegate = caller
         webView.load(URL(string: "about:blank")!)
     }
+}
+
+// MARK: - Adaptive Dark Mode
+
+extension Tab {
+    
 }

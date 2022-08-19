@@ -32,8 +32,8 @@ final class AdaptiveDarkModeUserScript: NSObject, StaticUserScript {
         assertionFailure("Didn't expect to get a script message from Dark Reader")
     }
     
-    func refreshDarkReaderScript(from settings: AdaptiveDarkModeScriptSettings = .shared, webView: WKWebView) {
-        let call = generateDarkReaderCall(from: settings)
+    func refreshDarkReaderScript(enabled: Bool, webView: WKWebView) {
+        let call = generateDarkReaderCall(enabled: enabled)
         evaluate(js: "DarkReader.setFetchMethod(window.fetch)", inWebView: webView)
         evaluate(js: call, inWebView: webView)
     }
@@ -46,13 +46,22 @@ final class AdaptiveDarkModeUserScript: NSObject, StaticUserScript {
         }
     }
     
-    private func generateDarkReaderCall(from settings: AdaptiveDarkModeScriptSettings) -> String {
-        switch settings.status {
-        case .auto:
-            return "DarkReader.auto(\(settings.appearanceSettingsJSON()));"
-        case .enabled:
-            return "DarkReader.enable(\(settings.appearanceSettingsJSON()));"
-        case .disabled:
+    private var defaultAppearanceSettings: String {
+        return """
+            {
+                mode: 1,
+                brightness: 100,
+                contrast: 100,
+                grayscale: 0,
+                sepia: 0,
+            }
+        """
+    }
+    
+    private func generateDarkReaderCall(enabled: Bool) -> String {
+        if enabled {
+            return "DarkReader.enable(\(defaultAppearanceSettings));"
+        } else {
             return "DarkReader.disable()"
         }
     }

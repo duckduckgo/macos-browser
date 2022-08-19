@@ -53,8 +53,7 @@ struct AdaptiveDarkModeWebsiteSettingsView: View {
 
 struct AdaptiveDarkModeWebsiteSettingsView_Previews: PreviewProvider {
     static var previews: some View {
-        let viewModel = AdaptiveDarkModeWebsiteSettingsViewModel(currentURL:
-                                                                    URL(string: "https://www.duck.com")!)
+        let viewModel = AdaptiveDarkModeWebsiteSettingsViewModel(currentDomain: "duck.com", isEnabled: true)
         
         if #available(macOS 11.0, *) {
             AdaptiveDarkModeWebsiteSettingsView(viewModel: viewModel)

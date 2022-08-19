@@ -107,10 +107,16 @@ final class NavigationBarViewController: NSViewController {
         downloadsPopover.isShown
     }
 
-    private lazy var adaptiveDarkModeSettingsPopover = AdaptiveDarkModeWebsiteSettingsPopover()
+    private lazy var adaptiveDarkModeSettingsPopover: AdaptiveDarkModeWebsiteSettingsPopover = {
+        let popover = AdaptiveDarkModeWebsiteSettingsPopover()
+        popover.statusDelegate = self
+        return popover
+    }()
+    
     private lazy var adaptiveDarkModeDiscoveryPopover = AdaptiveDarkModeDiscoveryPopOver()
 
     private var urlCancellable: AnyCancellable?
+    private var contentCancellable: AnyCancellable?
     private var selectedTabViewModelCancellable: AnyCancellable?
     private var credentialsToSaveCancellable: AnyCancellable?
     private var passwordManagerNotificationCancellable: AnyCancellable?
@@ -145,6 +151,7 @@ final class NavigationBarViewController: NSViewController {
         listenToMessageNotifications()
         subscribeToDownloads()
         addContextMenu()
+        updateAdaptiveDarkModeStatus()
 
         optionsButton.sendAction(on: .leftMouseDown)
         bookmarkListButton.sendAction(on: .leftMouseDown)
@@ -413,7 +420,7 @@ final class NavigationBarViewController: NSViewController {
             self?.subscribeToNavigationActionFlags()
             self?.subscribeToCredentialsToSave()
             self?.subscribeToTabContent()
-            self?.subscribeToURLChange()
+            self?.subscribeToThrottledContentChange()
         }
     }
 
@@ -741,37 +748,62 @@ extension NavigationBarViewController {
                                      preferredEdge: .maxY)
     }
     
-    private func subscribeToURLChange() {
-        guard let selectedTabViewModel = tabCollectionViewModel.selectedTabViewModel else {
-            return
-        }
-        
-        selectedTabViewModel.$addressBarString
+    private func subscribeToThrottledContentChange() {
+        urlCancellable = tabCollectionViewModel.selectedTabViewModel?.tab.$content
             .receive(on: DispatchQueue.main)
-            .debounce(for: .seconds(0.3), scheduler: DispatchQueue.main)
+            .throttle(for: .seconds(0.7), scheduler: DispatchQueue.main, latest: true)
             .removeDuplicates()
-            .sink { [weak self]  _ in
+            .sink(receiveValue: { [weak self] _ in
                 self?.updateAdaptiveDarkModeStatus()
-        } .store(in: &addressChangeCancellable)
-    }
+            })
+   }
     
     private func updateAdaptiveDarkModeStatus() {
-        guard let currentDomain = tabCollectionViewModel
-            .selectedTabViewModel?
-            .addressBarString else { return }
+        guard let currentDomain = tabCollectionViewModel.selectedTabViewModel?.tab.url?.host?.dropWWW()
+        else {
+            adaptiveDarkModeButton.isHidden = true
+            return
+        }
         
         if adaptiveDarkModeManager.shouldDisplayFeatureDiscoveryPopUp(withDomain: currentDomain) {
             displayAdaptiveDarkModeDiscoveryPopover()
             adaptiveDarkModeButton.isHidden = false
             displayAdaptiveDarkModeDiscoveryPopover()
         } else if adaptiveDarkModeManager.shouldDisplayNavigationBarButton(withDomain: currentDomain) {
+            let isDomainOnExceptionList = DarkModeSettingsStore.shared.isDomainOnExceptionList(domain: currentDomain)
+            updateCurrentTabWithDarkModeStatus(!isDomainOnExceptionList)
             adaptiveDarkModeButton.isHidden = false
         } else {
             adaptiveDarkModeButton.isHidden = true
+            updateCurrentTabWithDarkModeStatus(false)
+        }
+    }
+    
+    private func updateCurrentTabWithDarkModeStatus(_ enabled: Bool) {
+        guard let selectedTabModel = tabCollectionViewModel.selectedTabViewModel else { return }
+        
+        if selectedTabModel.tab.isDarkModeEnabled != enabled {
+            selectedTabModel.tab.isDarkModeEnabled = enabled
         }
     }
 }
 
+extension NavigationBarViewController: AdaptiveDarkModeWebsiteSettingsPopoverDelegate {
+   
+    func adaptiveDarkModeWebsiteSettingsPopover(_ popover: AdaptiveDarkModeWebsiteSettingsPopover, didChangeStatus enabled: Bool) {
+        
+        guard let currentDomain = tabCollectionViewModel.selectedTabViewModel?.tab.url?.host?.dropWWW() else { return }
+
+        if enabled {
+            DarkModeSettingsStore.shared.removeDomainFromExceptionList(domain: currentDomain)
+        } else {
+            DarkModeSettingsStore.shared.addDomainToExceptionList(domain: currentDomain)
+        }
+        
+        updateCurrentTabWithDarkModeStatus(enabled)
+      
+    }
+}
 
 #if DEBUG || REVIEW
 extension NavigationBarViewController {
