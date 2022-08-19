@@ -684,7 +684,6 @@ final class Tab: NSObject, Identifiable, ObservableObject {
         adaptiveDarkModeScript?.refreshDarkReaderScript(webView: webView)
     }
 
-
     // MARK: - Global & Local History
 
     private var historyCoordinating: HistoryCoordinating

@@ -118,7 +118,7 @@ final class NavigationBarViewController: NSViewController {
     private var addressChangeCancellable = Set<AnyCancellable>()
     private var downloadsCancellables = Set<AnyCancellable>()
     
-    private let adaptiveDarkModeManager = AdaptiveDarkModeManager()
+    private var adaptiveDarkModeManager = AdaptiveDarkModeManager()
 
     required init?(coder: NSCoder) {
         fatalError("NavigationBarViewController: Bad initializer")
@@ -384,7 +384,7 @@ final class NavigationBarViewController: NSViewController {
             adaptiveDarkModeDiscoveryPopover.close()
             return
         }
-        
+        adaptiveDarkModeManager.setDiscoveryPopUpAsDisplayed()
         adaptiveDarkModeDiscoveryPopover.show(relativeTo: adaptiveDarkModeButton.bounds.insetFromLineOfDeath(),
                                      of: adaptiveDarkModeButton,
                                      preferredEdge: .maxY)
@@ -646,21 +646,22 @@ final class NavigationBarViewController: NSViewController {
             .receive(on: DispatchQueue.main)
             .debounce(for: .seconds(0.3), scheduler: DispatchQueue.main)
             .removeDuplicates()
-            .sink { [weak self]  addressBarString in
+            .sink { [weak self]  _ in
                 self?.updateAdaptiveDarkModeStatus()
         } .store(in: &addressChangeCancellable)
     }
-
-    private func displayAdaptiveDarkModeDiscoveryPopUpIfNecessary() {
-        if adaptiveDarkModeManager.shouldDisplayFeatureDiscoveryPopUp {
-            displayAdaptiveDarkModeDiscoveryPopover()
-        }
-    }
     
     private func updateAdaptiveDarkModeStatus() {
-        if adaptiveDarkModeManager.shouldDisplayNavigationBarButton {
+        guard let currentDomain = tabCollectionViewModel
+            .selectedTabViewModel?
+            .addressBarString else { return }
+        
+        if adaptiveDarkModeManager.shouldDisplayFeatureDiscoveryPopUp(withDomain: currentDomain) {
+            displayAdaptiveDarkModeDiscoveryPopover()
             adaptiveDarkModeButton.isHidden = false
-            displayAdaptiveDarkModeDiscoveryPopUpIfNecessary()
+            displayAdaptiveDarkModeDiscoveryPopover()
+        } else if adaptiveDarkModeManager.shouldDisplayNavigationBarButton(withDomain: currentDomain) {
+            adaptiveDarkModeButton.isHidden = false
         } else {
             adaptiveDarkModeButton.isHidden = true
         }

@@ -61,7 +61,6 @@ public struct UserDefaultsWrapper<T> {
         case currentThemeName = "com.duckduckgo.macos.currentThemeNameKey"
         case showFullURL = "preferences.appearance.show-full-url"
         case showAutocompleteSuggestions = "preferences.appearance.show-autocomplete-suggestions"
-        case useAdaptiveDarkMode = "preferences.appearance.useAdaptiveDarkMode"
         
         // ATB
         case installDate = "statistics.installdate.key"
@@ -85,6 +84,11 @@ public struct UserDefaultsWrapper<T> {
         case historyV5toV6Migration = "history.v5.to.v6.migration.2"
 
         case showBookmarksBar = "bookmarks.bar.show"
+        
+        // Adaptive Dark Mode
+        case adaptiveDarkModeDiscoveryPopUpDisplayed = "adaptivedarkmode.displayed"
+        case useAdaptiveDarkMode = "preferences.appearance.useAdaptiveDarkMode"
+
     }
 
     enum RemovedKeys: String, CaseIterable {

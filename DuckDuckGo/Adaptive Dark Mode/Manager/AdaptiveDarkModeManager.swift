@@ -19,13 +19,45 @@
 import Foundation
 
 struct AdaptiveDarkModeManager {
+    @UserDefaultsWrapper(key: .adaptiveDarkModeDiscoveryPopUpDisplayed, defaultValue: false)
+    private var adaptiveDarkModeDiscoveryPopUpDisplayed: Bool
     private let darkSitesManager = DarkSitesConfigManager()
     
-    var shouldDisplayFeatureDiscoveryPopUp: Bool {
+    #warning("darkSitesManager.isURLInList is being called twice, this should be fixed")
+    // shouldDisplayFeatureDiscoveryPopUp and shouldDisplayNavigationBarButton
+    func shouldDisplayFeatureDiscoveryPopUp(withDomain domain: String) -> Bool {
+        
+        guard !adaptiveDarkModeDiscoveryPopUpDisplayed,
+              isBrowserUsingDarkMode(),
+              let url = URL(string: domain),
+              !darkSitesManager.isURLInList(url) else { return false }
+        
         return true
     }
     
-    var shouldDisplayNavigationBarButton: Bool {
+    mutating func setDiscoveryPopUpAsDisplayed() {
+        self.adaptiveDarkModeDiscoveryPopUpDisplayed = true
+    }
+    
+    func shouldDisplayNavigationBarButton(withDomain domain: String) -> Bool {
+        
+        if isBrowserUsingDarkMode(),
+           AppearancePreferences.shared.useAdaptiveDarkMode,
+           isBrowserUsingDarkMode(),
+           let url = URL(string: domain),
+           !darkSitesManager.isURLInList(url) {
+            return true
+        }
+        
+        return false
+    }
+    
+    private func doesWebsiteImplementsColorSchemeDark() -> Bool {
         return true
+    }
+    
+    private func isBrowserUsingDarkMode() -> Bool {
+        return ((AppearancePreferences.shared.currentThemeName == .dark) ||
+                (AppearancePreferences.shared.currentThemeName == .systemDefault) && NSApp.effectiveAppearance.name == .darkAqua)
     }
 }

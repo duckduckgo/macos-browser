@@ -23,15 +23,18 @@ struct AppearancePreferencesPersistorMock: AppearancePreferencesPersistor {
     var showFullURL: Bool
     var showAutocompleteSuggestions: Bool
     var currentThemeName: String
+    var useAdaptiveDarkMode: Bool
 
     init(
         showFullURL: Bool = false,
         showAutocompleteSuggestions: Bool = true,
-        currentThemeName: String = ThemeName.systemDefault.rawValue
+        currentThemeName: String = ThemeName.systemDefault.rawValue,
+        useAdaptiveDarkMode: Bool = false
     ) {
         self.showFullURL = showFullURL
         self.showAutocompleteSuggestions = showAutocompleteSuggestions
         self.currentThemeName = currentThemeName
+        self.useAdaptiveDarkMode = useAdaptiveDarkMode
     }
 }
 
@@ -42,25 +45,29 @@ final class AppearancePreferencesTests: XCTestCase {
             persistor: AppearancePreferencesPersistorMock(
                 showFullURL: false,
                 showAutocompleteSuggestions: true,
-                currentThemeName: ThemeName.systemDefault.rawValue
+                currentThemeName: ThemeName.systemDefault.rawValue,
+                useAdaptiveDarkMode: false
             )
         )
 
         XCTAssertEqual(model.showFullURL, false)
         XCTAssertEqual(model.showAutocompleteSuggestions, true)
         XCTAssertEqual(model.currentThemeName, ThemeName.systemDefault)
+        XCTAssertEqual(model.useAdaptiveDarkMode, false)
 
         model = AppearancePreferences(
             persistor: AppearancePreferencesPersistorMock(
                 showFullURL: true,
                 showAutocompleteSuggestions: false,
-                currentThemeName: ThemeName.light.rawValue
+                currentThemeName: ThemeName.light.rawValue,
+                useAdaptiveDarkMode: true
             )
         )
 
         XCTAssertEqual(model.showFullURL, true)
         XCTAssertEqual(model.showAutocompleteSuggestions, false)
         XCTAssertEqual(model.currentThemeName, ThemeName.light)
+        XCTAssertEqual(model.useAdaptiveDarkMode, true)
     }
 
     func testWhenInitializedWithGarbageThenThemeIsSetToSystemDefault() throws {

@@ -32,6 +32,8 @@ final class Instruments {
         case clearingData
 
         case injectScripts
+        
+        case scanDarkSitesList
     }
 
     static let shared = Instruments()

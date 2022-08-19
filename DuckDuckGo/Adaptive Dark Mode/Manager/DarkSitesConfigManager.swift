@@ -17,9 +17,12 @@
 //
 
 import Foundation
+import OSLog
 
 struct DarkSitesConfigManager {
-    //ETag: W/"fb87499571281a90fd8bcef3d0e0e3a70334480df5ee452db4fc51e6c4f3d43b"
+    private let log = OSLog(subsystem: "com.duckduckgo.instrumentation", category: "DarkModeInstrumentation")
+
+    // ETag: W/"fb87499571281a90fd8bcef3d0e0e3a70334480df5ee452db4fc51e6c4f3d43b"
 
     private let darkSites: [String]
 
@@ -29,6 +32,16 @@ struct DarkSitesConfigManager {
 
     #warning("Test code, needs to be improved")
     func isURLInList(_ url: URL) -> Bool {
+        
+        let logName = StaticString(stringLiteral: "Dark List Scan")
+        let listScanID = OSSignpostID(log: log)
+        os_signpost(.begin, log: log, name: logName, signpostID: listScanID)
+        
+        defer {
+            os_signpost(.end, log: log, name: logName, signpostID: listScanID)
+        }
+        
+        print("Checking if \(url) is in darklist")
         guard let host = url.host else { return false }
         let value = "\(host)\(url.path)"
         
