@@ -113,8 +113,12 @@ final class NavigationBarViewController: NSViewController {
         return popover
     }()
     
-    private lazy var adaptiveDarkModeDiscoveryPopover = AdaptiveDarkModeDiscoveryPopOver()
-
+    private lazy var adaptiveDarkModeDiscoveryPopover: AdaptiveDarkModeDiscoveryPopOver = {
+        let popover = AdaptiveDarkModeDiscoveryPopOver()
+        popover.statusDelegate = self
+        return popover
+    }()
+    
     private var urlCancellable: AnyCancellable?
     private var contentCancellable: AnyCancellable?
     private var selectedTabViewModelCancellable: AnyCancellable?
@@ -739,10 +743,8 @@ extension NavigationBarViewController {
     
     private func displayAdaptiveDarkModeDiscoveryPopover() {
         if adaptiveDarkModeDiscoveryPopover.isShown {
-            adaptiveDarkModeDiscoveryPopover.close()
             return
         }
-        adaptiveDarkModeManager.setDiscoveryPopUpAsDisplayed()
         adaptiveDarkModeDiscoveryPopover.show(relativeTo: adaptiveDarkModeButton.bounds.insetFromLineOfDeath(),
                                      of: adaptiveDarkModeButton,
                                      preferredEdge: .maxY)
@@ -766,7 +768,6 @@ extension NavigationBarViewController {
         }
         
         if adaptiveDarkModeManager.shouldDisplayFeatureDiscoveryPopUp(withDomain: currentDomain) {
-            displayAdaptiveDarkModeDiscoveryPopover()
             adaptiveDarkModeButton.isHidden = false
             displayAdaptiveDarkModeDiscoveryPopover()
         } else if adaptiveDarkModeManager.shouldDisplayNavigationBarButton(withDomain: currentDomain) {
@@ -801,7 +802,17 @@ extension NavigationBarViewController: AdaptiveDarkModeWebsiteSettingsPopoverDel
         }
         
         updateCurrentTabWithDarkModeStatus(enabled)
-      
+    }
+}
+
+extension NavigationBarViewController: AdaptiveDarkModeDiscoveryPopOverDelegate {
+    
+    func adaptiveDarkModeDiscoveryPopOver(_ popover: AdaptiveDarkModeDiscoveryPopOver, didEnable enabled: Bool) {
+        popover.close()
+        #warning("This shouldn't be in here")
+        adaptiveDarkModeManager.setDiscoveryPopUpAsDisplayed()
+        AppearancePreferences.shared.useAdaptiveDarkMode = enabled
+        updateAdaptiveDarkModeStatus()
     }
 }
 

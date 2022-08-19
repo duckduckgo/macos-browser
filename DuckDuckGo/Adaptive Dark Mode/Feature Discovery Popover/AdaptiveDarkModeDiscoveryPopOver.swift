@@ -19,7 +19,14 @@
 import AppKit
 import SwiftUI
 
+protocol AdaptiveDarkModeDiscoveryPopOverDelegate: AnyObject {
+    func adaptiveDarkModeDiscoveryPopOver(_ popover: AdaptiveDarkModeDiscoveryPopOver, didEnable enabled: Bool)
+
+}
+
 final class AdaptiveDarkModeDiscoveryPopOver: NSPopover {
+    weak var statusDelegate: AdaptiveDarkModeDiscoveryPopOverDelegate?
+
     override init() {
         super.init()
         
@@ -32,13 +39,26 @@ final class AdaptiveDarkModeDiscoveryPopOver: NSPopover {
     }
     
     private func setupContentController() {
-        contentViewController = AdaptiveDarkModeDiscoveryViewController()
+        contentViewController = AdaptiveDarkModeDiscoveryViewController(enableDarkMode: { [weak self] enabled in
+            guard let self = self else { return }
+            self.statusDelegate?.adaptiveDarkModeDiscoveryPopOver(self, didEnable: enabled)
+        })
     }
 }
 
 final class AdaptiveDarkModeDiscoveryViewController: NSViewController {
+    let enableDarkMode: (Bool) -> Void
 
+    internal init(enableDarkMode: @escaping (Bool) -> Void) {
+        self.enableDarkMode = enableDarkMode
+        super.init(nibName: nil, bundle: nil)
+    }
+    
+    required init?(coder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }
+    
     override func loadView() {
-        view = NSHostingView(rootView: AdaptiveDarkModeDiscoveryAlertView())
+        view = NSHostingView(rootView: AdaptiveDarkModeDiscoveryAlertView(enableDarkMode: enableDarkMode))
     }
 }

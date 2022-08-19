@@ -20,6 +20,7 @@ import SwiftUI
 
 struct AdaptiveDarkModeDiscoveryAlertView: View {
     private let defaultSpacing: CGFloat = 15
+    let enableDarkMode: (Bool) -> Void
     
     var body: some View {
         HStack(spacing: defaultSpacing) {
@@ -33,13 +34,13 @@ struct AdaptiveDarkModeDiscoveryAlertView: View {
                 }
                 HStack {
                     Button {
-                        print("No")
+                        enableDarkMode(false)
                     } label: {
                         Text(UserText.adaptiveDarkModeOptInPopoverDenyButton)
                             .frame(maxWidth: .infinity)
                     }
                     Button {
-                        print("Yes")
+                        enableDarkMode(true)
                     } label: {
                         Text(UserText.adaptiveDarkModeOptInPopoverConfirmButton)
                             .frame(maxWidth: .infinity)
@@ -53,13 +54,13 @@ struct AdaptiveDarkModeDiscoveryAlertView: View {
 struct AdaptiveDarkModeDiscoveryAlertView_Previews: PreviewProvider {
     static var previews: some View {
         if #available(macOS 11.0, *) {
-            AdaptiveDarkModeDiscoveryAlertView()
+            AdaptiveDarkModeDiscoveryAlertView(enableDarkMode: { _ in })
                 .preferredColorScheme(.dark)
             
-            AdaptiveDarkModeDiscoveryAlertView()
+            AdaptiveDarkModeDiscoveryAlertView(enableDarkMode: { _ in })
                 .preferredColorScheme(.light)
         } else {
-            AdaptiveDarkModeDiscoveryAlertView()
+            AdaptiveDarkModeDiscoveryAlertView(enableDarkMode: { _ in })
         }
     }
 }
