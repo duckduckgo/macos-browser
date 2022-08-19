@@ -20,6 +20,7 @@ import Cocoa
 import WebKit
 import Combine
 import BrowserServicesKit
+import PrivacyDashboard
 
 final class PrivacyDashboardViewController: NSViewController {
 
@@ -84,8 +85,11 @@ final class PrivacyDashboardViewController: NSViewController {
     override func viewWillAppear() {
         guard let tabViewModel = tabViewModel else { return }
 
-        let url = Bundle.main.url(forResource: "popup", withExtension: "html", subdirectory: "duckduckgo-privacy-dashboard/build/macos/html")!
-        webView.loadFileURL(url, allowingReadAccessTo: url.deletingLastPathComponent())
+        // This is part of shared logic pasted from the dashboard package
+        guard let url = Bundle.privacyDashboardURL else { return }
+        webView.loadFileURL(url, allowingReadAccessTo: url.deletingLastPathComponent().deletingLastPathComponent())
+        //
+        
         prepareContentBlockingCancellable(publisher: tabViewModel.tab.cbrCompletionTokensPublisher)
     }
 
