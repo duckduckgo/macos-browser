@@ -1,5 +1,5 @@
 //
-//  AdaptiveDarkModeWebsiteSettingsViewController.swift
+//  AdaptiveDarkModeDiscoveryPopOver.swift
 //
 //  Copyright © 2022 DuckDuckGo. All rights reserved.
 //
@@ -16,29 +16,29 @@
 //  limitations under the License.
 //
 
-import Cocoa
+import AppKit
 import SwiftUI
 
-final class AdaptiveDarkModeWebsiteSettingsViewController: NSViewController {
-    let currentURL: URL
-    
-    init(currentURL: URL) {
-        self.currentURL = currentURL
-        super.init(nibName: nil, bundle: nil)
+final class AdaptiveDarkModeDiscoveryPopOver: NSPopover {
+    override init() {
+        super.init()
+        
+        self.behavior = .semitransient
+        setupContentController()
     }
     
     required init?(coder: NSCoder) {
-        fatalError("init(coder:) has not been implemented")
+        fatalError("\(Self.self): Bad initializer")
     }
     
-    override func viewDidLoad() {
-        super.viewDidLoad()
+    private func setupContentController() {
+        contentViewController = AdaptiveDarkModeDiscoveryViewController()
     }
-    
+}
+
+final class AdaptiveDarkModeDiscoveryViewController: NSViewController {
+
     override func loadView() {
-        let viewModel = AdaptiveDarkModeWebsiteSettingsViewModel(currentURL: currentURL)
-        let hostingView = NSHostingView(rootView: AdaptiveDarkModeWebsiteSettingsView(viewModel: viewModel))
-        hostingView.frame = NSRect(x: 0, y: 0, width: 400, height: 105)
-        view = hostingView
+        view = NSHostingView(rootView: AdaptiveDarkModeDiscoveryAlertView())
     }
 }

@@ -17,14 +17,13 @@
 //
 
 import AppKit
+import SwiftUI
 
 final class AdaptiveDarkModeWebsiteSettingsPopover: NSPopover {
     override init() {
         super.init()
 
         self.behavior = .semitransient
-
-        setupContentController()
     }
 
     required init?(coder: NSCoder) {
@@ -34,9 +33,25 @@ final class AdaptiveDarkModeWebsiteSettingsPopover: NSPopover {
     func preparePopoverWithURL(_ url: URL) {
         let controller = AdaptiveDarkModeWebsiteSettingsViewController(currentURL: url)
         contentViewController = controller
-
     }
-    private func setupContentController() {
+}
+
+final class AdaptiveDarkModeWebsiteSettingsViewController: NSViewController {
+    let currentURL: URL
+    
+    init(currentURL: URL) {
+        self.currentURL = currentURL
+        super.init(nibName: nil, bundle: nil)
+    }
+    
+    required init?(coder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
     }
 
+    override func loadView() {
+        let viewModel = AdaptiveDarkModeWebsiteSettingsViewModel(currentURL: currentURL)
+        let hostingView = NSHostingView(rootView: AdaptiveDarkModeWebsiteSettingsView(viewModel: viewModel))
+        hostingView.frame = NSRect(x: 0, y: 0, width: 400, height: 105)
+        view = hostingView
+    }
 }

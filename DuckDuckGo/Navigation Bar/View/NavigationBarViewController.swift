@@ -107,14 +107,18 @@ final class NavigationBarViewController: NSViewController {
         downloadsPopover.isShown
     }
 
-    private lazy var adaptiveDarkModePopover = AdaptiveDarkModeWebsiteSettingsPopover()
-    
+    private lazy var adaptiveDarkModeSettingsPopover = AdaptiveDarkModeWebsiteSettingsPopover()
+    private lazy var adaptiveDarkModeDiscoveryPopover = AdaptiveDarkModeDiscoveryPopOver()
+
     private var urlCancellable: AnyCancellable?
     private var selectedTabViewModelCancellable: AnyCancellable?
     private var credentialsToSaveCancellable: AnyCancellable?
     private var passwordManagerNotificationCancellable: AnyCancellable?
     private var navigationButtonsCancellables = Set<AnyCancellable>()
+    private var addressChangeCancellable = Set<AnyCancellable>()
     private var downloadsCancellables = Set<AnyCancellable>()
+    
+    private let adaptiveDarkModeManager = AdaptiveDarkModeManager()
 
     required init?(coder: NSCoder) {
         fatalError("NavigationBarViewController: Bad initializer")
@@ -359,8 +363,8 @@ final class NavigationBarViewController: NSViewController {
     }
 
     private func toggleAdaptiveDarkModePopover() {
-        if adaptiveDarkModePopover.isShown {
-            adaptiveDarkModePopover.close()
+        if adaptiveDarkModeSettingsPopover.isShown {
+            adaptiveDarkModeSettingsPopover.close()
             return
         }
         
@@ -368,11 +372,22 @@ final class NavigationBarViewController: NSViewController {
             return
         }
         
-        adaptiveDarkModePopover.preparePopoverWithURL(currentURL)
-        adaptiveDarkModePopover.show(relativeTo: adaptiveDarkModeButton.bounds.insetFromLineOfDeath(),
+        adaptiveDarkModeSettingsPopover.preparePopoverWithURL(currentURL)
+        adaptiveDarkModeSettingsPopover.show(relativeTo: adaptiveDarkModeButton.bounds.insetFromLineOfDeath(),
                                      of: adaptiveDarkModeButton,
                                      preferredEdge: .maxY)
         #warning("Fire pixel?")
+    }
+    
+    private func displayAdaptiveDarkModeDiscoveryPopover() {
+        if adaptiveDarkModeDiscoveryPopover.isShown {
+            adaptiveDarkModeDiscoveryPopover.close()
+            return
+        }
+        
+        adaptiveDarkModeDiscoveryPopover.show(relativeTo: adaptiveDarkModeButton.bounds.insetFromLineOfDeath(),
+                                     of: adaptiveDarkModeButton,
+                                     preferredEdge: .maxY)
     }
     
     func toggleDownloadsPopover(keepButtonVisible: Bool, shouldFirePixel: Bool = true) {
@@ -429,6 +444,7 @@ final class NavigationBarViewController: NSViewController {
             self?.subscribeToNavigationActionFlags()
             self?.subscribeToCredentialsToSave()
             self?.subscribeToTabContent()
+            self?.subscribeToURLChange()
         }
     }
 
@@ -619,6 +635,35 @@ final class NavigationBarViewController: NSViewController {
         popover.show(relativeTo: passwordManagementButton.bounds.insetFromLineOfDeath(),
                      of: passwordManagementButton,
                      preferredEdge: .minY)
+    }
+    
+    private func subscribeToURLChange() {
+        guard let selectedTabViewModel = tabCollectionViewModel.selectedTabViewModel else {
+            return
+        }
+        
+        selectedTabViewModel.$addressBarString
+            .receive(on: DispatchQueue.main)
+            .debounce(for: .seconds(0.3), scheduler: DispatchQueue.main)
+            .removeDuplicates()
+            .sink { [weak self]  addressBarString in
+                self?.updateAdaptiveDarkModeStatus()
+        } .store(in: &addressChangeCancellable)
+    }
+
+    private func displayAdaptiveDarkModeDiscoveryPopUpIfNecessary() {
+        if adaptiveDarkModeManager.shouldDisplayFeatureDiscoveryPopUp {
+            displayAdaptiveDarkModeDiscoveryPopover()
+        }
+    }
+    
+    private func updateAdaptiveDarkModeStatus() {
+        if adaptiveDarkModeManager.shouldDisplayNavigationBarButton {
+            adaptiveDarkModeButton.isHidden = false
+            displayAdaptiveDarkModeDiscoveryPopUpIfNecessary()
+        } else {
+            adaptiveDarkModeButton.isHidden = true
+        }
     }
 
     private func subscribeToNavigationActionFlags() {

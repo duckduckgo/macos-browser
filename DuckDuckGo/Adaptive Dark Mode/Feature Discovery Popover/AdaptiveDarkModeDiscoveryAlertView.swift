@@ -1,5 +1,5 @@
 //
-//  AdaptiveDarkModeOptInAlertView.swift
+//  AdaptiveDarkModeDiscoveryAlertView.swift
 //
 //  Copyright © 2022 DuckDuckGo. All rights reserved.
 //
@@ -18,7 +18,7 @@
 
 import SwiftUI
 
-struct AdaptiveDarkModeOptInAlertView: View {
+struct AdaptiveDarkModeDiscoveryAlertView: View {
     private let defaultSpacing: CGFloat = 15
     
     var body: some View {
@@ -50,16 +50,16 @@ struct AdaptiveDarkModeOptInAlertView: View {
     }
 }
 
-struct AdaptiveDarkModeOptInAlertView_Previews: PreviewProvider {
+struct AdaptiveDarkModeDiscoveryAlertView_Previews: PreviewProvider {
     static var previews: some View {
         if #available(macOS 11.0, *) {
-            AdaptiveDarkModeOptInAlertView()
+            AdaptiveDarkModeDiscoveryAlertView()
                 .preferredColorScheme(.dark)
             
-            AdaptiveDarkModeOptInAlertView()
+            AdaptiveDarkModeDiscoveryAlertView()
                 .preferredColorScheme(.light)
         } else {
-            AdaptiveDarkModeOptInAlertView()
+            AdaptiveDarkModeDiscoveryAlertView()
         }
     }
 }

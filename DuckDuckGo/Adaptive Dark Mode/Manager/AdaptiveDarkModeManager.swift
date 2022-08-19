@@ -21,7 +21,7 @@ import Foundation
 struct AdaptiveDarkModeManager {
     private let darkSitesManager = DarkSitesConfigManager()
     
-    var shouldDisplayDarkModeFeatureDiscoveryPopUp: Bool {
+    var shouldDisplayFeatureDiscoveryPopUp: Bool {
         return true
     }
     
@@ -29,5 +29,3 @@ struct AdaptiveDarkModeManager {
         return true
     }
 }
-
-
