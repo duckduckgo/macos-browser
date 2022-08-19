@@ -16,6 +16,7 @@
 		14505A08256084EF00272CC6 /* UserAgent.swift in Sources */ = {isa = PBXBuildFile; fileRef = 14505A07256084EF00272CC6 /* UserAgent.swift */; };
 		1456D6E124EFCBC300775049 /* TabBarCollectionView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1456D6E024EFCBC300775049 /* TabBarCollectionView.swift */; };
 		14D9B8FB24F7E089000D4D13 /* AddressBarViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 14D9B8F924F7E089000D4D13 /* AddressBarViewController.swift */; };
+		1E00E78C28AFB4940032CDC0 /* PrivacyDashboard in Frameworks */ = {isa = PBXBuildFile; productRef = 1E00E78B28AFB4940032CDC0 /* PrivacyDashboard */; };
 		3106AD76287F000600159FE5 /* CookieConsentUserPermissionViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3106AD75287F000600159FE5 /* CookieConsentUserPermissionViewController.swift */; };
 		311B262728E73E0A00FD181A /* TabShadowConfig.swift in Sources */ = {isa = PBXBuildFile; fileRef = 311B262628E73E0A00FD181A /* TabShadowConfig.swift */; };
 		313AEDA1287CAD1D00E1E8F4 /* CookieConsentUserPermissionView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 313AEDA0287CAD1D00E1E8F4 /* CookieConsentUserPermissionView.swift */; };
@@ -1669,6 +1670,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				1E00E78C28AFB4940032CDC0 /* PrivacyDashboard in Frameworks */,
 				9807F645278CA16F00E1547B /* BrowserServicesKit in Frameworks */,
 				85AE2FF224A33A2D002D507F /* WebKit.framework in Frameworks */,
 				4B82E9B325B69E3E00656FE7 /* TrackerRadarKit in Frameworks */,
@@ -4229,6 +4231,7 @@
 				85FF55C725F82E4F00E2AB99 /* Lottie */,
 				AA06B6B62672AF8100F541C5 /* Sparkle */,
 				9807F644278CA16F00E1547B /* BrowserServicesKit */,
+				1E00E78B28AFB4940032CDC0 /* PrivacyDashboard */,
 			);
 			productName = DuckDuckGo;
 			productReference = AA585D7E248FD31100E9A3E2 /* DuckDuckGo.app */;
@@ -6304,6 +6307,10 @@
 /* End XCRemoteSwiftPackageReference section */
 
 /* Begin XCSwiftPackageProductDependency section */
+		1E00E78B28AFB4940032CDC0 /* PrivacyDashboard */ = {
+			isa = XCSwiftPackageProductDependency;
+			productName = PrivacyDashboard;
+		};
 		4B82E9B225B69E3E00656FE7 /* TrackerRadarKit */ = {
 			isa = XCSwiftPackageProductDependency;
 			package = 4B82E9B125B69E3E00656FE7 /* XCRemoteSwiftPackageReference "TrackerRadarKit" */;
