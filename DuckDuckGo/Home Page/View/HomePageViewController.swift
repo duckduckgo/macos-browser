@@ -82,6 +82,12 @@ final class HomePageViewController: NSViewController {
         subscribeToBurningData()
     }
 
+    override func viewWillAppear() {
+        super.viewWillAppear()
+
+        subscribeToHistory()
+    }
+
     override func viewDidAppear() {
         super.viewDidAppear()
         refreshModels()
@@ -92,8 +98,15 @@ final class HomePageViewController: NSViewController {
         host?.frame = self.view.frame
     }
 
+    override func viewWillDisappear() {
+        super.viewWillDisappear()
+
+        historyCancellable = nil
+    }
+
     func refreshModels() {
         guard !AppDelegate.isRunningTests else { return }
+
         refreshFavoritesModel()
         refreshRecentlyVisitedModel()
         refreshDefaultBrowserModel()
@@ -206,6 +219,15 @@ final class HomePageViewController: NSViewController {
                 if burningData == nil {
                     self?.refreshModels()
                 }
+            }
+    }
+
+    private var historyCancellable: AnyCancellable?
+    private func subscribeToHistory() {
+        historyCancellable = historyCoordinating.historyDictionaryPublisher.dropFirst()
+            .receive(on: DispatchQueue.main)
+            .sink { [weak self] _ in
+                self?.refreshModels()
             }
     }
 

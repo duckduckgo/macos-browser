@@ -122,6 +122,7 @@ public final class ContentOverlayViewController: NSViewController, EmailManagerR
         }
 
         let webView = OverlayWebView(frame: .zero, configuration: configuration)
+        webView.allowsLinkPreview = false
         webView.window?.acceptsMouseMovedEvents = true
         webView.window?.ignoresMouseEvents = false
         webView.configuration.userContentController.addHandler(topAutofillUserScript)
@@ -204,6 +205,10 @@ extension ContentOverlayViewController: OverlayAutofillUserScriptPresentationDel
 }
 
 extension ContentOverlayViewController: SecureVaultManagerDelegate {
+    
+    public func secureVaultManagerIsEnabledStatus(_: SecureVaultManager) -> Bool {
+        return true
+    }
 
     public func secureVaultManager(_: SecureVaultManager, promptUserToStoreAutofillData data: AutofillData) {
         // No-op, the content overlay view controller should not be prompting the user to store data

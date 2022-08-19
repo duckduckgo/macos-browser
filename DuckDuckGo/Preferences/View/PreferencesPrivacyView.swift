@@ -29,7 +29,7 @@ extension Preferences {
                     .font(Const.Fonts.preferencePaneTitle)
 
                 Section {
-                    Text(UserText.fireDialogFireproofSites)
+                    Text(UserText.fireproofSites)
                         .font(Const.Fonts.preferencePaneSectionHeader)
 
                     Toggle(UserText.fireproofCheckboxTitle, isOn: $model.isLoginDetectionEnabled)

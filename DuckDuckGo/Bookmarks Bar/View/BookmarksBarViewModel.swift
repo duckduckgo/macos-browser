@@ -404,7 +404,7 @@ extension BookmarksBarViewModel: NSCollectionViewDelegate, NSCollectionViewDataS
                     }
                 } else if let webViewItem = item.draggedWebViewValues() {
                     let title = webViewItem.title ?? tabCollectionViewModel.title(forTabWithURL: webViewItem.url) ?? webViewItem.url.absoluteString
-                    self.bookmarkManager.makeBookmark(for: webViewItem.url, title: title, isFavorite: false, index: currentIndexPathItem)
+                    self.bookmarkManager.makeBookmark(for: webViewItem.url, title: title, isFavorite: false, index: currentIndexPathItem, parent: nil)
                 } else if let draggedString = item.string(forType: .string), let draggedURL = URL(string: draggedString) {
                     let title: String
 
@@ -414,7 +414,7 @@ extension BookmarksBarViewModel: NSCollectionViewDelegate, NSCollectionViewDataS
                         title = draggedURL.absoluteString
                     }
 
-                    self.bookmarkManager.makeBookmark(for: draggedURL, title: title, isFavorite: false, index: currentIndexPathItem)
+                    self.bookmarkManager.makeBookmark(for: draggedURL, title: title, isFavorite: false, index: currentIndexPathItem, parent: nil)
                 }
                 
                 currentIndexPathItem += 1

@@ -174,6 +174,7 @@ final class Tab: NSObject, Identifiable, ObservableObject {
         configuration.applyStandardConfiguration()
 
         webView = WebView(frame: CGRect.zero, configuration: configuration)
+        webView.allowsLinkPreview = false
         permissions = PermissionModel(webView: webView)
 
         super.init()
@@ -929,6 +930,10 @@ extension Tab: EmailManagerRequestDelegate { }
 
 extension Tab: SecureVaultManagerDelegate {
 
+    public func secureVaultManagerIsEnabledStatus(_: SecureVaultManager) -> Bool {
+        return true
+    }
+    
     func secureVaultManager(_: SecureVaultManager, promptUserToStoreAutofillData data: AutofillData) {
         delegate?.tab(self, requestedSaveAutofillData: data)
     }
@@ -1247,7 +1252,7 @@ extension Tab: WKNavigationDelegate {
         resetDashboardInfo()
         linkProtection.cancelOngoingExtraction()
         linkProtection.setMainFrameUrl(webView.url)
-        referrerTrimming.setMainFrameUrl(webView.url)
+        referrerTrimming.onBeginNavigation(to: webView.url)
     }
 
     @MainActor
@@ -1257,7 +1262,7 @@ extension Tab: WKNavigationDelegate {
         webViewDidFinishNavigationPublisher.send()
         if isAMPProtectionExtracting { isAMPProtectionExtracting = false }
         linkProtection.setMainFrameUrl(nil)
-        referrerTrimming.setMainFrameUrl(nil)
+        referrerTrimming.onFinishNavigation()
     }
 
     func webView(_ webView: WKWebView, didFail navigation: WKNavigation!, withError error: Error) {
@@ -1268,7 +1273,7 @@ extension Tab: WKNavigationDelegate {
         isBeingRedirected = false
         invalidateSessionStateData()
         linkProtection.setMainFrameUrl(nil)
-        referrerTrimming.setMainFrameUrl(nil)
+        referrerTrimming.onFailedNavigation()
         webViewDidFailNavigationPublisher.send()
     }
 
@@ -1284,7 +1289,7 @@ extension Tab: WKNavigationDelegate {
         self.error = error
         isBeingRedirected = false
         linkProtection.setMainFrameUrl(nil)
-        referrerTrimming.setMainFrameUrl(nil)
+        referrerTrimming.onFailedNavigation()
         webViewDidFailNavigationPublisher.send()
     }
 

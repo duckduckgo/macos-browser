@@ -28,6 +28,7 @@ final class NavigationBarViewController: NSViewController {
         static let downloadsPopoverAutoHidingInterval: TimeInterval = 10
     }
 
+    @IBOutlet weak var mouseOverView: MouseOverView!
     @IBOutlet weak var goBackButton: NSButton!
     @IBOutlet weak var goForwardButton: NSButton!
     @IBOutlet weak var refreshButton: NSButton!
@@ -131,6 +132,8 @@ final class NavigationBarViewController: NSViewController {
         view.layer?.masksToBounds = false
         addressBarContainer.wantsLayer = true
         addressBarContainer.layer?.masksToBounds = false
+
+        mouseOverView.delegate = self
 
         setupNavigationButtonMenus()
         subscribeToSelectedTabViewModel()
@@ -628,6 +631,14 @@ final class NavigationBarViewController: NSViewController {
         goBackButton.isEnabled = selectedTabViewModel.canGoBack
         goForwardButton.isEnabled = selectedTabViewModel.canGoForward
         refreshButton.isEnabled = selectedTabViewModel.canReload
+    }
+
+}
+
+extension NavigationBarViewController: MouseOverViewDelegate {
+
+    func mouseOverView(_ mouseOverView: MouseOverView, isMouseOver: Bool) {
+        addressBarViewController?.addressBarButtonsViewController?.isMouseOverNavigationBar = isMouseOver
     }
 
 }
