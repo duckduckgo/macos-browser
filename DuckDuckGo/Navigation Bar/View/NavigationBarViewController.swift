@@ -60,6 +60,7 @@ final class NavigationBarViewController: NSViewController {
     private static let inactiveDownloadsImage = NSImage(named: "Downloads")
 
     var addressBarViewController: AddressBarViewController?
+    private let darkModeManager = AdaptiveDarkModeManagerNew()
 
     private var tabCollectionViewModel: TabCollectionViewModel
 
@@ -127,7 +128,8 @@ final class NavigationBarViewController: NSViewController {
     private var navigationButtonsCancellables = Set<AnyCancellable>()
     private var addressChangeCancellable = Set<AnyCancellable>()
     private var downloadsCancellables = Set<AnyCancellable>()
-    
+    private var adaptiveDarkModeCancellables = Set<AnyCancellable>()
+
     private var adaptiveDarkModeManager = AdaptiveDarkModeManager()
 
     required init?(coder: NSCoder) {
@@ -155,8 +157,9 @@ final class NavigationBarViewController: NSViewController {
         listenToMessageNotifications()
         subscribeToDownloads()
         addContextMenu()
-        updateAdaptiveDarkModeStatus()
-
+        //updateAdaptiveDarkModeStatus()
+        setupAdaptiveDarkModeButtons()
+        subscribeToAdaptiveDarkMode()
         optionsButton.sendAction(on: .leftMouseDown)
         bookmarkListButton.sendAction(on: .leftMouseDown)
         downloadsButton.sendAction(on: .leftMouseDown)
@@ -420,11 +423,11 @@ final class NavigationBarViewController: NSViewController {
     }
 
     private func subscribeToSelectedTabViewModel() {
-        selectedTabViewModelCancellable = tabCollectionViewModel.$selectedTabViewModel.receive(on: DispatchQueue.main).sink { [weak self] _ in
+        selectedTabViewModelCancellable = tabCollectionViewModel.$selectedTabViewModel.receive(on: DispatchQueue.main).sink { [weak self] viewModel in
             self?.subscribeToNavigationActionFlags()
             self?.subscribeToCredentialsToSave()
             self?.subscribeToTabContent()
-            self?.subscribeToThrottledContentChange()
+            self?.darkModeManager.tab = viewModel?.tab
         }
     }
 
@@ -720,6 +723,19 @@ extension NavigationBarViewController: DownloadsViewControllerDelegate {
 
 extension NavigationBarViewController {
     
+    private func subscribeToAdaptiveDarkMode() {
+        darkModeManager.$adaptiveDarkModeAvailable
+            .receive(on: DispatchQueue.main)
+            .sink { [weak self] available in
+                self?.adaptiveDarkModeButton.isHidden = !available
+            }.store(in: &adaptiveDarkModeCancellables)
+    }
+
+    private func setupAdaptiveDarkModeButtons() {
+        self.adaptiveDarkModeButton.isHidden = true
+    }
+    //
+    
     @IBAction func adaptiveDarkModeButtonAction(_ sender: MouseOverButton) {
         toggleAdaptiveDarkModePopover()
     }
@@ -749,17 +765,7 @@ extension NavigationBarViewController {
                                      of: adaptiveDarkModeButton,
                                      preferredEdge: .maxY)
     }
-    
-    private func subscribeToThrottledContentChange() {
-        urlCancellable = tabCollectionViewModel.selectedTabViewModel?.tab.$content
-            .receive(on: DispatchQueue.main)
-            .throttle(for: .seconds(0.7), scheduler: DispatchQueue.main, latest: true)
-            .removeDuplicates()
-            .sink(receiveValue: { [weak self] _ in
-                self?.updateAdaptiveDarkModeStatus()
-            })
-   }
-    
+
     private func updateAdaptiveDarkModeStatus() {
         guard let currentDomain = tabCollectionViewModel.selectedTabViewModel?.tab.url?.host?.dropWWW()
         else {

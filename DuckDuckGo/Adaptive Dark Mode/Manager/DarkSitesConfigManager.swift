@@ -43,9 +43,10 @@ struct DarkSitesConfigManager {
             os_signpost(.end, log: log, name: logName, signpostID: listScanID)
         }
         
-        print("Checking if \(url) is in darklist")
-        let value = url.path
-        
+        guard let host = url.host else { return false }
+        let value = "\(host)\(url.path)"
+        print("Checking if \(value) is in darklist")
+
         let result = darkSites.filter { value.contains($0) }
         return result.count > 0
     }
