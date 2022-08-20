@@ -1765,6 +1765,15 @@
 			path = "Settings Data";
 			sourceTree = "<group>";
 		};
+		31EE3C1528B0DF58005FA6C6 /* UI */ = {
+			isa = PBXGroup;
+			children = (
+				31FB1CBF28A544280098F221 /* Feature Discovery Popover */,
+				31FB1CBE28A544190098F221 /* Website Settings Popover */,
+			);
+			path = UI;
+			sourceTree = "<group>";
+		};
 		31F63C1F28AD5ECB00C5AD60 /* UserScript */ = {
 			isa = PBXGroup;
 			children = (
@@ -1787,11 +1796,10 @@
 		31FB1CB728A529B60098F221 /* Adaptive Dark Mode */ = {
 			isa = PBXGroup;
 			children = (
+				31EE3C1528B0DF58005FA6C6 /* UI */,
 				31BC108E28AE7988005973EA /* Resources */,
 				31BC108B28AE71EF005973EA /* Manager */,
 				31F63C1F28AD5ECB00C5AD60 /* UserScript */,
-				31FB1CBF28A544280098F221 /* Feature Discovery Popover */,
-				31FB1CBE28A544190098F221 /* Website Settings Popover */,
 			);
 			path = "Adaptive Dark Mode";
 			sourceTree = "<group>";
