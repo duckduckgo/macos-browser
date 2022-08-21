@@ -157,7 +157,6 @@ final class NavigationBarViewController: NSViewController {
         listenToMessageNotifications()
         subscribeToDownloads()
         addContextMenu()
-        //updateAdaptiveDarkModeStatus()
         setupAdaptiveDarkModeButtons()
         subscribeToAdaptiveDarkMode()
         optionsButton.sendAction(on: .leftMouseDown)
@@ -371,7 +370,6 @@ final class NavigationBarViewController: NSViewController {
                                        preferredEdge: .minY)
         Pixel.fire(.manageLogins(source: sender is NSButton ? .button : (sender is MainMenu ? .mainMenu : .moreMenu)))
     }
-
    
     func toggleDownloadsPopover(keepButtonVisible: Bool, shouldFirePixel: Bool = true) {
         if downloadsPopover.isShown {
@@ -719,7 +717,6 @@ extension NavigationBarViewController: DownloadsViewControllerDelegate {
 }
 
 // MARK: - Adaptive Dark Mode
-#warning("Probably better to create a class to handle all dark mode popover logic")
 
 extension NavigationBarViewController {
     
@@ -729,12 +726,20 @@ extension NavigationBarViewController {
             .sink { [weak self] available in
                 self?.adaptiveDarkModeButton.isHidden = !available
             }.store(in: &adaptiveDarkModeCancellables)
+        
+        darkModeManager.$shouldDisplayDiscoveryPopUp
+            .receive(on: DispatchQueue.main)
+            .sink { [weak self] shouldDisplay in
+                if shouldDisplay {
+                    self?.displayAdaptiveDarkModeDiscoveryPopover()
+                } else {
+                }
+            }.store(in: &adaptiveDarkModeCancellables)
     }
 
     private func setupAdaptiveDarkModeButtons() {
         self.adaptiveDarkModeButton.isHidden = true
     }
-    //
     
     @IBAction func adaptiveDarkModeButtonAction(_ sender: MouseOverButton) {
         toggleAdaptiveDarkModePopover()
@@ -765,49 +770,17 @@ extension NavigationBarViewController {
                                      of: adaptiveDarkModeButton,
                                      preferredEdge: .maxY)
     }
-
-    private func updateAdaptiveDarkModeStatus() {
-        guard let currentDomain = tabCollectionViewModel.selectedTabViewModel?.tab.url?.host?.dropWWW()
-        else {
-            adaptiveDarkModeButton.isHidden = true
-            return
-        }
-        
-        if adaptiveDarkModeManager.shouldDisplayFeatureDiscoveryPopUp(withDomain: currentDomain) {
-            adaptiveDarkModeButton.isHidden = false
-            displayAdaptiveDarkModeDiscoveryPopover()
-        } else if adaptiveDarkModeManager.shouldDisplayNavigationBarButton(withDomain: currentDomain) {
-            let isDomainOnExceptionList = DarkModeSettingsStore.shared.isDomainOnExceptionList(domain: currentDomain)
-            updateCurrentTabWithDarkModeStatus(!isDomainOnExceptionList)
-            adaptiveDarkModeButton.isHidden = false
-        } else {
-            adaptiveDarkModeButton.isHidden = true
-            updateCurrentTabWithDarkModeStatus(false)
-        }
-    }
-    
-    private func updateCurrentTabWithDarkModeStatus(_ enabled: Bool) {
-        guard let selectedTabModel = tabCollectionViewModel.selectedTabViewModel else { return }
-        
-        if selectedTabModel.tab.isDarkModeEnabled != enabled {
-            selectedTabModel.tab.isDarkModeEnabled = enabled
-        }
-    }
 }
 
 extension NavigationBarViewController: AdaptiveDarkModeWebsiteSettingsPopoverDelegate {
    
     func adaptiveDarkModeWebsiteSettingsPopover(_ popover: AdaptiveDarkModeWebsiteSettingsPopover, didChangeStatus enabled: Bool) {
         
-        guard let currentDomain = tabCollectionViewModel.selectedTabViewModel?.tab.url?.host?.dropWWW() else { return }
-
         if enabled {
-            DarkModeSettingsStore.shared.removeDomainFromExceptionList(domain: currentDomain)
+            darkModeManager.removeCurrentTabFromExceptionList()
         } else {
-            DarkModeSettingsStore.shared.addDomainToExceptionList(domain: currentDomain)
+            darkModeManager.addCurrentTabToExceptionList()
         }
-        
-        updateCurrentTabWithDarkModeStatus(enabled)
     }
 }
 
@@ -815,10 +788,7 @@ extension NavigationBarViewController: AdaptiveDarkModeDiscoveryPopOverDelegate 
     
     func adaptiveDarkModeDiscoveryPopOver(_ popover: AdaptiveDarkModeDiscoveryPopOver, didEnable enabled: Bool) {
         popover.close()
-        #warning("This shouldn't be in here")
-        adaptiveDarkModeManager.setDiscoveryPopUpAsDisplayed()
-        AppearancePreferences.shared.useAdaptiveDarkMode = enabled
-        updateAdaptiveDarkModeStatus()
+        darkModeManager.enableAdaptiveDarkMode(enabled)
     }
 }
 

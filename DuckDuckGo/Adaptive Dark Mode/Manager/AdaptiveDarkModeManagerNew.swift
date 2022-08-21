@@ -23,9 +23,21 @@ final class AdaptiveDarkModeManagerNew {
     private let darkSitesConfigManager: DarkSitesConfigManager
     private let appearancePreferences: AppearancePreferences
     private let settingsStore: DarkModeSettingsStore
-    @Published var adaptiveDarkModeAvailable: Bool = false
-    @Published var currentTabDarkModeEnabled: Bool = false
     private var tabCancellable: AnyCancellable?
+    private var preferencesCancellable: AnyCancellable?
+
+    @Published var adaptiveDarkModeAvailable: Bool = false
+    @Published var shouldDisplayDiscoveryPopUp: Bool = false
+  
+    @Published var currentTabDarkModeEnabled: Bool = false {
+        didSet {
+            tab?.isDarkModeEnabled = currentTabDarkModeEnabled
+        }
+    }
+ 
+    @UserDefaultsWrapper(key: .adaptiveDarkModeDiscoveryPopUpDisplayed, defaultValue: false)
+    private var adaptiveDarkModeDiscoveryPopUpDisplayed: Bool
+
     weak var tab: Tab? {
         didSet {
             if let tab = tab {
@@ -35,6 +47,10 @@ final class AdaptiveDarkModeManagerNew {
                 currentTabDarkModeEnabled = false
             }
         }
+    }
+    
+    private var currentDomain: String {
+        tab?.url?.host?.dropWWW() ?? ""
     }
     
     private var isAdaptiveDarkModeOn: Bool {
@@ -59,6 +75,27 @@ final class AdaptiveDarkModeManagerNew {
         self.appearancePreferences = appearancePreferences
         self.settingsStore = settingsStore
         self.tab = tab
+        
+        self.subscribeToPreferencesChange()
+    }
+    
+    func enableAdaptiveDarkMode(_ enable: Bool) {
+        adaptiveDarkModeDiscoveryPopUpDisplayed = true
+        appearancePreferences.useAdaptiveDarkMode = enable
+        
+        if let tab = tab {
+            setupDarkModeWithTab(tab)
+        }
+    }
+    
+    private func subscribeToPreferencesChange() {
+        preferencesCancellable = appearancePreferences.$useAdaptiveDarkMode
+            .receive(on: DispatchQueue.main)
+            .sink(receiveValue: { [weak self] value in
+                if value {
+                    self?.adaptiveDarkModeDiscoveryPopUpDisplayed = true
+                }
+            })
     }
     
     private func subscribeToTabContentChange(_ tab: Tab) {
@@ -73,27 +110,40 @@ final class AdaptiveDarkModeManagerNew {
     
     private func setupDarkModeWithTab(_ tab: Tab) {
         if tab.url != nil,
-           isAdaptiveDarkModeOn,
+           (isAdaptiveDarkModeOn || !adaptiveDarkModeDiscoveryPopUpDisplayed),
            isDarkThemeOn,
            !isPreferColorSchemeDarkSupported,
            !isTabURLonDarkSitesConfig(tab) {
             adaptiveDarkModeAvailable = true
         } else {
             adaptiveDarkModeAvailable = false
+            currentTabDarkModeEnabled = false
+            return
         }
         
-        self.currentTabDarkModeEnabled = !isTabURLonDarkSitesConfig(tab)
+        if !adaptiveDarkModeDiscoveryPopUpDisplayed {
+            shouldDisplayDiscoveryPopUp = true
+        } else {
+            currentTabDarkModeEnabled = !isTabDomainOnExceptionList(tab)
+        }
+    }
+    
+    func removeCurrentTabFromExceptionList() {
+        settingsStore.removeDomainFromExceptionList(domain: currentDomain)
+        currentTabDarkModeEnabled = true
+    }
+    
+    func addCurrentTabToExceptionList() {
+        settingsStore.addDomainToExceptionList(domain: currentDomain)
+        currentTabDarkModeEnabled = false
     }
     
     private func isTabDomainOnExceptionList(_ tab: Tab) -> Bool {
-        guard let domain = tab.url?.host else { return false }
-        print("Checking if \(domain) is on exception list")
-        return settingsStore.isDomainOnExceptionList(domain: domain)
+        return settingsStore.isDomainOnExceptionList(domain: currentDomain)
     }
     
     private func isTabURLonDarkSitesConfig(_ tab: Tab) -> Bool {
         guard let url = tab.url else { return false }
-        print("Checking if \(url) is on dark sites config")
         return darkSitesConfigManager.isURLInList(url)
     }
 }
