@@ -17,46 +17,133 @@
 //
 
 import Foundation
+import Combine
 
-struct AdaptiveDarkModeManager {
+final class AdaptiveDarkModeManager {
+    private let darkSitesConfigManager: DarkSitesConfigManager
+    private let appearancePreferences: AppearancePreferences
+    private let settingsStore: DarkModeSettingsStore
+    private var tabCancellable: AnyCancellable?
+    private var preferencesCancellable: AnyCancellable?
+
+    @Published var adaptiveDarkModeAvailable: Bool = false
+    @Published var shouldDisplayDiscoveryPopUp: Bool = false
+  
+    @Published var currentTabDarkModeEnabled: Bool = false {
+        didSet {
+            tab?.isDarkModeEnabled = currentTabDarkModeEnabled
+        }
+    }
+ 
     @UserDefaultsWrapper(key: .adaptiveDarkModeDiscoveryPopUpDisplayed, defaultValue: false)
     private var adaptiveDarkModeDiscoveryPopUpDisplayed: Bool
-    private let darkSitesManager = DarkSitesConfigManager()
-    
-    private var isDarkThemeEnabled: Bool {
-        ((AppearancePreferences.shared.currentThemeName == .dark) ||
-                (AppearancePreferences.shared.currentThemeName == .systemDefault) && NSApp.effectiveAppearance.name == .darkAqua)
-    }
-    
-#warning("darkSitesManager.isURLInList is being called twice, this should be fixed")
-    // shouldDisplayFeatureDiscoveryPopUp and shouldDisplayNavigationBarButton
-    func shouldDisplayFeatureDiscoveryPopUp(withDomain domain: String) -> Bool {
-        
-        guard isDarkThemeEnabled,
-              !adaptiveDarkModeDiscoveryPopUpDisplayed,
-              let url = URL(string: domain),
-              !darkSitesManager.isURLInList(url) else { return false }
-        
-        return true
-    }
-    
-    mutating func setDiscoveryPopUpAsDisplayed() {
-        self.adaptiveDarkModeDiscoveryPopUpDisplayed = true
-    }
-    
-    func shouldDisplayNavigationBarButton(withDomain domain: String) -> Bool {
-        
-        if isDarkThemeEnabled,
-           AppearancePreferences.shared.useAdaptiveDarkMode,
-           let url = URL(string: domain),
-           !darkSitesManager.isURLInList(url) {
-            return true
+
+    weak var tab: Tab? {
+        didSet {
+            if let tab = tab {
+                subscribeToTabContentChange(tab)
+            } else {
+                adaptiveDarkModeAvailable = false
+                currentTabDarkModeEnabled = false
+            }
         }
-        
+    }
+    
+    private var currentDomain: String {
+        tab?.url?.host?.dropWWW() ?? ""
+    }
+    
+    private var isAdaptiveDarkModeOn: Bool {
+        appearancePreferences.useAdaptiveDarkMode
+    }
+    
+    private var isDarkThemeOn: Bool {
+        ((appearancePreferences.currentThemeName == .dark) ||
+         (appearancePreferences.currentThemeName == .systemDefault) && NSApp.effectiveAppearance.name == .darkAqua)
+    }
+    
+#warning("UserScript should return the real flag here")
+    private var isPreferColorSchemeDarkSupported: Bool {
         return false
     }
     
-    private func doesWebsiteImplementsColorSchemeDark() -> Bool {
-        return true
+    internal init(darkSitesConfigManager: DarkSitesConfigManager = .shared,
+                  appearancePreferences: AppearancePreferences = .shared,
+                  settingsStore: DarkModeSettingsStore = .shared,
+                  tab: Tab? = nil) {
+        self.darkSitesConfigManager = darkSitesConfigManager
+        self.appearancePreferences = appearancePreferences
+        self.settingsStore = settingsStore
+        self.tab = tab
+        
+        self.subscribeToPreferencesChange()
+    }
+    
+    func enableAdaptiveDarkMode(_ enable: Bool) {
+        adaptiveDarkModeDiscoveryPopUpDisplayed = true
+        appearancePreferences.useAdaptiveDarkMode = enable
+        
+        if let tab = tab {
+            setupDarkModeWithTab(tab)
+        }
+    }
+    
+    private func subscribeToPreferencesChange() {
+        preferencesCancellable = appearancePreferences.$useAdaptiveDarkMode
+            .receive(on: DispatchQueue.main)
+            .sink(receiveValue: { [weak self] value in
+                if value {
+                    self?.adaptiveDarkModeDiscoveryPopUpDisplayed = true
+                }
+            })
+    }
+    
+    private func subscribeToTabContentChange(_ tab: Tab) {
+        tabCancellable = tab.$content
+            .receive(on: DispatchQueue.main)
+            .throttle(for: .seconds(0.7), scheduler: DispatchQueue.main, latest: true)
+            .removeDuplicates()
+            .sink(receiveValue: { [weak self] _ in
+                self?.setupDarkModeWithTab(tab)
+            })
+   }
+    
+    private func setupDarkModeWithTab(_ tab: Tab) {
+        if tab.url != nil,
+           (isAdaptiveDarkModeOn || !adaptiveDarkModeDiscoveryPopUpDisplayed),
+           isDarkThemeOn,
+           !isPreferColorSchemeDarkSupported,
+           !isTabURLonDarkSitesConfig(tab) {
+            adaptiveDarkModeAvailable = true
+        } else {
+            adaptiveDarkModeAvailable = false
+            currentTabDarkModeEnabled = false
+            return
+        }
+        
+        if !adaptiveDarkModeDiscoveryPopUpDisplayed {
+            shouldDisplayDiscoveryPopUp = true
+        } else {
+            currentTabDarkModeEnabled = !isTabDomainOnExceptionList(tab)
+        }
+    }
+    
+    func removeCurrentTabFromExceptionList() {
+        settingsStore.removeDomainFromExceptionList(domain: currentDomain)
+        currentTabDarkModeEnabled = true
+    }
+    
+    func addCurrentTabToExceptionList() {
+        settingsStore.addDomainToExceptionList(domain: currentDomain)
+        currentTabDarkModeEnabled = false
+    }
+    
+    private func isTabDomainOnExceptionList(_ tab: Tab) -> Bool {
+        return settingsStore.isDomainOnExceptionList(domain: currentDomain)
+    }
+    
+    private func isTabURLonDarkSitesConfig(_ tab: Tab) -> Bool {
+        guard let url = tab.url else { return false }
+        return darkSitesConfigManager.isURLInList(url)
     }
 }

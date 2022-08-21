@@ -18,7 +18,7 @@
 		14D9B8FB24F7E089000D4D13 /* AddressBarViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 14D9B8F924F7E089000D4D13 /* AddressBarViewController.swift */; };
 		3106AD76287F000600159FE5 /* CookieConsentUserPermissionViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3106AD75287F000600159FE5 /* CookieConsentUserPermissionViewController.swift */; };
 		313AEDA1287CAD1D00E1E8F4 /* CookieConsentUserPermissionView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 313AEDA0287CAD1D00E1E8F4 /* CookieConsentUserPermissionView.swift */; };
-		3157FCE228B0ED4100643DCA /* AdaptiveDarkModeManagerNew.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3157FCE128B0ED4100643DCA /* AdaptiveDarkModeManagerNew.swift */; };
+		3157FCE228B0ED4100643DCA /* AdaptiveDarkModeManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3157FCE128B0ED4100643DCA /* AdaptiveDarkModeManager.swift */; };
 		3171D6B82889849F0068632A /* CookieManagedNotificationView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3171D6B72889849F0068632A /* CookieManagedNotificationView.swift */; };
 		3171D6BA288984D00068632A /* BadgeAnimationView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3171D6B9288984D00068632A /* BadgeAnimationView.swift */; };
 		3171D6DB2889B64D0068632A /* CookieManagedNotificationContainerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3171D6DA2889B64D0068632A /* CookieManagedNotificationContainerView.swift */; };
@@ -29,7 +29,6 @@
 		31B7C84F288008E00049841F /* CookieConsent.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 31B7C84E288008E00049841F /* CookieConsent.storyboard */; };
 		31B7C85128800A5D0049841F /* CookieConsentPopover.swift in Sources */ = {isa = PBXBuildFile; fileRef = 31B7C85028800A5D0049841F /* CookieConsentPopover.swift */; };
 		31B9226C288054D5001F55B7 /* CookieConsentPopoverManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 31B9226B288054D5001F55B7 /* CookieConsentPopoverManager.swift */; };
-		31BC108D28AE71FF005973EA /* AdaptiveDarkModeManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 31BC108C28AE71FF005973EA /* AdaptiveDarkModeManager.swift */; };
 		31BC109028AE7997005973EA /* dark-sites.config in Resources */ = {isa = PBXBuildFile; fileRef = 31BC108F28AE7997005973EA /* dark-sites.config */; };
 		31BC109228AE844F005973EA /* DarkSitesConfigManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 31BC109128AE844F005973EA /* DarkSitesConfigManager.swift */; };
 		31C1C52728AF9A6800328F14 /* AdaptiveDarkModeDiscoveryPopOver.swift in Sources */ = {isa = PBXBuildFile; fileRef = 31C1C52628AF9A6800328F14 /* AdaptiveDarkModeDiscoveryPopOver.swift */; };
@@ -841,7 +840,7 @@
 		14D9B8F924F7E089000D4D13 /* AddressBarViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AddressBarViewController.swift; sourceTree = "<group>"; };
 		3106AD75287F000600159FE5 /* CookieConsentUserPermissionViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CookieConsentUserPermissionViewController.swift; sourceTree = "<group>"; };
 		313AEDA0287CAD1D00E1E8F4 /* CookieConsentUserPermissionView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CookieConsentUserPermissionView.swift; sourceTree = "<group>"; };
-		3157FCE128B0ED4100643DCA /* AdaptiveDarkModeManagerNew.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AdaptiveDarkModeManagerNew.swift; sourceTree = "<group>"; };
+		3157FCE128B0ED4100643DCA /* AdaptiveDarkModeManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AdaptiveDarkModeManager.swift; sourceTree = "<group>"; };
 		3171D6B72889849F0068632A /* CookieManagedNotificationView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CookieManagedNotificationView.swift; sourceTree = "<group>"; };
 		3171D6B9288984D00068632A /* BadgeAnimationView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BadgeAnimationView.swift; sourceTree = "<group>"; };
 		3171D6DA2889B64D0068632A /* CookieManagedNotificationContainerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CookieManagedNotificationContainerView.swift; sourceTree = "<group>"; };
@@ -852,7 +851,6 @@
 		31B7C84E288008E00049841F /* CookieConsent.storyboard */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; path = CookieConsent.storyboard; sourceTree = "<group>"; };
 		31B7C85028800A5D0049841F /* CookieConsentPopover.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CookieConsentPopover.swift; sourceTree = "<group>"; };
 		31B9226B288054D5001F55B7 /* CookieConsentPopoverManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CookieConsentPopoverManager.swift; sourceTree = "<group>"; };
-		31BC108C28AE71FF005973EA /* AdaptiveDarkModeManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AdaptiveDarkModeManager.swift; sourceTree = "<group>"; };
 		31BC108F28AE7997005973EA /* dark-sites.config */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = "dark-sites.config"; sourceTree = "<group>"; };
 		31BC109128AE844F005973EA /* DarkSitesConfigManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DarkSitesConfigManager.swift; sourceTree = "<group>"; };
 		31C1C52628AF9A6800328F14 /* AdaptiveDarkModeDiscoveryPopOver.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AdaptiveDarkModeDiscoveryPopOver.swift; sourceTree = "<group>"; };
@@ -1743,9 +1741,8 @@
 		31BC108B28AE71EF005973EA /* Manager */ = {
 			isa = PBXGroup;
 			children = (
-				31BC108C28AE71FF005973EA /* AdaptiveDarkModeManager.swift */,
 				31BC109128AE844F005973EA /* DarkSitesConfigManager.swift */,
-				3157FCE128B0ED4100643DCA /* AdaptiveDarkModeManagerNew.swift */,
+				3157FCE128B0ED4100643DCA /* AdaptiveDarkModeManager.swift */,
 			);
 			path = Manager;
 			sourceTree = "<group>";
@@ -4866,7 +4863,7 @@
 				373A1AB02842C4EA00586521 /* BookmarkHTMLImporter.swift in Sources */,
 				4B8D9062276D1D880078DB17 /* LocaleExtension.swift in Sources */,
 				4BE4005527CF3F19007D3161 /* SavePaymentMethodViewController.swift in Sources */,
-				3157FCE228B0ED4100643DCA /* AdaptiveDarkModeManagerNew.swift in Sources */,
+				3157FCE228B0ED4100643DCA /* AdaptiveDarkModeManager.swift in Sources */,
 				AAFE068326C7082D005434CC /* WebKitVersionProvider.swift in Sources */,
 				B63D467A25BFC3E100874977 /* NSCoderExtensions.swift in Sources */,
 				B3FB199327BD0AD400513DC1 /* CookieConsentInfo.swift in Sources */,
@@ -5032,7 +5029,6 @@
 				AAC5E4F625D6BF2C007F5990 /* AddressBarButtonsViewController.swift in Sources */,
 				4B59023D26B35F3600489384 /* ChromeDataImporter.swift in Sources */,
 				B68C92C42750EF76002AC6B0 /* PixelDataRecord.swift in Sources */,
-				31BC108D28AE71FF005973EA /* AdaptiveDarkModeManager.swift in Sources */,
 				853014D625E671A000FB8205 /* PageObserverUserScript.swift in Sources */,
 				B642738227B65BAC0005DFD1 /* SecureVaultErrorReporter.swift in Sources */,
 				4B139AFD26B60BD800894F82 /* NSImageExtensions.swift in Sources */,

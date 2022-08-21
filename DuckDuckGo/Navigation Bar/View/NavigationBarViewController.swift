@@ -60,7 +60,7 @@ final class NavigationBarViewController: NSViewController {
     private static let inactiveDownloadsImage = NSImage(named: "Downloads")
 
     var addressBarViewController: AddressBarViewController?
-    private let darkModeManager = AdaptiveDarkModeManagerNew()
+    private let adaptiveDarkModeManager = AdaptiveDarkModeManager()
 
     private var tabCollectionViewModel: TabCollectionViewModel
 
@@ -129,8 +129,6 @@ final class NavigationBarViewController: NSViewController {
     private var addressChangeCancellable = Set<AnyCancellable>()
     private var downloadsCancellables = Set<AnyCancellable>()
     private var adaptiveDarkModeCancellables = Set<AnyCancellable>()
-
-    private var adaptiveDarkModeManager = AdaptiveDarkModeManager()
 
     required init?(coder: NSCoder) {
         fatalError("NavigationBarViewController: Bad initializer")
@@ -425,7 +423,7 @@ final class NavigationBarViewController: NSViewController {
             self?.subscribeToNavigationActionFlags()
             self?.subscribeToCredentialsToSave()
             self?.subscribeToTabContent()
-            self?.darkModeManager.tab = viewModel?.tab
+            self?.adaptiveDarkModeManager.tab = viewModel?.tab
         }
     }
 
@@ -721,13 +719,13 @@ extension NavigationBarViewController: DownloadsViewControllerDelegate {
 extension NavigationBarViewController {
     
     private func subscribeToAdaptiveDarkMode() {
-        darkModeManager.$adaptiveDarkModeAvailable
+        adaptiveDarkModeManager.$adaptiveDarkModeAvailable
             .receive(on: DispatchQueue.main)
             .sink { [weak self] available in
                 self?.adaptiveDarkModeButton.isHidden = !available
             }.store(in: &adaptiveDarkModeCancellables)
         
-        darkModeManager.$shouldDisplayDiscoveryPopUp
+        adaptiveDarkModeManager.$shouldDisplayDiscoveryPopUp
             .receive(on: DispatchQueue.main)
             .sink { [weak self] shouldDisplay in
                 if shouldDisplay {
@@ -777,9 +775,9 @@ extension NavigationBarViewController: AdaptiveDarkModeWebsiteSettingsPopoverDel
     func adaptiveDarkModeWebsiteSettingsPopover(_ popover: AdaptiveDarkModeWebsiteSettingsPopover, didChangeStatus enabled: Bool) {
         
         if enabled {
-            darkModeManager.removeCurrentTabFromExceptionList()
+            adaptiveDarkModeManager.removeCurrentTabFromExceptionList()
         } else {
-            darkModeManager.addCurrentTabToExceptionList()
+            adaptiveDarkModeManager.addCurrentTabToExceptionList()
         }
     }
 }
@@ -788,7 +786,7 @@ extension NavigationBarViewController: AdaptiveDarkModeDiscoveryPopOverDelegate 
     
     func adaptiveDarkModeDiscoveryPopOver(_ popover: AdaptiveDarkModeDiscoveryPopOver, didEnable enabled: Bool) {
         popover.close()
-        darkModeManager.enableAdaptiveDarkMode(enabled)
+        adaptiveDarkModeManager.enableAdaptiveDarkMode(enabled)
     }
 }
 
