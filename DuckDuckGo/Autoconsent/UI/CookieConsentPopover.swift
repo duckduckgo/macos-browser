@@ -48,7 +48,7 @@ public final class CookieConsentPopover {
         viewController.delegate = self
     }
     
-    public func close(animated: Bool) {
+    public func close(animated: Bool, completion: (() -> Void)? = nil) {
         guard let overlayWindow = windowController.window else {
             return
         }
@@ -57,6 +57,10 @@ public final class CookieConsentPopover {
         let removeWindow = {
             overlayWindow.parent?.removeChildWindow(overlayWindow)
             overlayWindow.orderOut(nil)
+            
+            if let completion = completion {
+                completion()
+            }
         }
         
         if animated {
