@@ -32,7 +32,7 @@ extension EmailUrls {
     }
 
     var emailProtectionLink: URL {
-        #if DEBUG || REVIEW
+        #if DEBUG
         return URL(string: DevUrl.emailProtectionLink)!
         #else
         return URL(string: Url.emailProtectionLink)!
