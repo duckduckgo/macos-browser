@@ -51,9 +51,23 @@ final class UserContentController: WKUserContentController {
     where Pub.Failure == Never, Pub.Output == ContentBlockingAssets {
 
         self.privacyConfigurationManager = privacyConfigurationManager
+        var scriptsEnabledForTab = true;
         super.init()
 
         cancellable = assetsPublisher.receive(on: DispatchQueue.main).map { $0 }.assign(to: \.contentBlockingAssets, onWeaklyHeld: self)
+
+        NotificationCenter.default.addObserver(forName: .ToggleUserScripts, object: nil, queue: .main) {[weak self] _ in
+            scriptsEnabledForTab = !scriptsEnabledForTab;
+            if (scriptsEnabledForTab) {
+                guard let contentBlockingAssets = self?.contentBlockingAssets else { return }
+                self?.installContentRuleLists(contentBlockingAssets.contentRuleLists)
+                self?.installUserScripts(contentBlockingAssets.userScripts)
+                print("✅ user scripts back on")
+            } else {
+                print("❌ removed all user scripts")
+                self?.removeAllUserScripts();
+            }
+        }
 
 #if DEBUG
         // make sure delegate for UserScripts is set shortly after init
@@ -131,3 +145,9 @@ extension UserContentController {
     }
 
 }
+
+#if DEBUG || REVIEW
+extension NSNotification.Name {
+    public static let ToggleUserScripts = NSNotification.Name("ToggleUserScripts")
+}
+#endif

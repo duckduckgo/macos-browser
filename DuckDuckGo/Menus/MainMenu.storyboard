@@ -672,6 +672,12 @@ CQ
                                 <modifierMask key="keyEquivalentModifierMask"/>
                                 <menu key="submenu" title="Debug" systemMenu="help" autoenablesItems="NO" id="y0w-AM-Bho">
                                     <items>
+                                        <menuItem title="Toggle Content Scripts" id="cx9-Xa-WUR">
+                                            <modifierMask key="keyEquivalentModifierMask"/>
+                                            <connections>
+                                                <action selector="toggleUserScripts:" target="Ady-hI-5gd" id="123-where-to-create-this"/>
+                                            </connections>
+                                        </menuItem>
                                         <menuItem title="Reset Data" id="Yxs-rU-Pbe">
                                             <modifierMask key="keyEquivalentModifierMask"/>
                                             <menu key="submenu" title="Reset Data" id="DVQ-kv-udm">

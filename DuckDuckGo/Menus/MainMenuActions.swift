@@ -627,6 +627,12 @@ extension MainViewController {
         tabCollectionViewModel.pinnedTabsManager?.tabCollection.removeAll()
     }
 
+    @IBAction func toggleUserScripts(_ sender: Any?) {
+        #if DEBUG || REVIEW
+        NotificationCenter.default.post(name: .ToggleUserScripts, object: nil)
+        #endif
+    }
+
     @IBAction func showSaveCredentialsPopover(_ sender: Any?) {
         #if DEBUG || REVIEW
         NotificationCenter.default.post(name: .ShowSaveCredentialsPopover, object: nil)
