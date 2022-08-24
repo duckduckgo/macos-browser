@@ -150,6 +150,10 @@ final class BookmarkOutlineViewDataSource: NSObject, NSOutlineViewDataSource, NS
                      validateDrop info: NSDraggingInfo,
                      proposedItem item: Any?,
                      proposedChildIndex index: Int) -> NSDragOperation {
+        if contentMode == .foldersOnly, index != -1 {
+            return .none
+        }
+        
         let destinationNode = nodeForItem(item)
 
         if let bookmarks = PasteboardBookmark.pasteboardBookmarks(with: info.draggingPasteboard) {
@@ -249,7 +253,7 @@ final class BookmarkOutlineViewDataSource: NSObject, NSOutlineViewDataSource, NS
         // Handle the existing destination case:
 
         if let parent = representedObject as? BookmarkFolder {
-            bookmarkManager.add(objectsWithUUIDs: draggedObjectIdentifiers, to: parent) { error in
+            bookmarkManager.move(objectUUIDs: draggedObjectIdentifiers, toIndex: index, withinParentFolder: .parent(parent.id)) { error in
                 if let error = error {
                     os_log("Failed to accept existing parent drop via outline view: %s", error.localizedDescription)
                 }
@@ -257,7 +261,7 @@ final class BookmarkOutlineViewDataSource: NSObject, NSOutlineViewDataSource, NS
             
             return true
         } else if representedObject == nil {
-            bookmarkManager.add(objectsWithUUIDs: draggedObjectIdentifiers, to: nil) { error in
+            bookmarkManager.move(objectUUIDs: draggedObjectIdentifiers, toIndex: index, withinParentFolder: .root) { error in
                 if let error = error {
                     os_log("Failed to accept existing parent drop via outline view: %s", error.localizedDescription)
                 }
