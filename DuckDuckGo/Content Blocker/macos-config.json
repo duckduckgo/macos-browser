@@ -1,6 +1,6 @@
 {
     "readme": "https://github.com/duckduckgo/privacy-configuration",
-    "version": 1660907875341,
+    "version": 1661270003722,
     "features": {
         "adClickAttribution": {
             "readme": "https://help.duckduckgo.com/duckduckgo-help-pages/privacy/web-tracking-protections/#3rd-party-tracker-loading-protection",
@@ -1019,11 +1019,11 @@
                     "scene7.com": {
                         "rules": [
                             {
-                                "rule": "basspro.scene7.com/s7viewersdk/3.11/MixedMediaViewer/js/s7sdk/utils/Utils.js",
+                                "rule": "scene7.com/s7viewersdk/3.11/MixedMediaViewer/js/s7sdk/utils/Utils.js",
                                 "domains": [
-                                    "cabelas.com"
+                                    "<all>"
                                 ],
-                                "reason": "Product images don't render on product pages."
+                                "reason": "https://github.com/duckduckgo/privacy-configuration/issues/356"
                             }
                         ]
                     },
