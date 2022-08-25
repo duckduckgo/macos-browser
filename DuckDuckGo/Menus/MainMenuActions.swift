@@ -638,6 +638,11 @@ extension MainViewController {
         NotificationCenter.default.post(name: .ShowCredentialsSavedPopover, object: nil)
         #endif
     }
+    
+    @IBAction func fetchConfigurationNow(_ sender: Any?) {
+        ConfigurationManager.shared.lastUpdateTime = .distantPast
+        ConfigurationManager.shared.refreshIfNeeded()
+    }
 
     // MARK: - Developer Tools
 
