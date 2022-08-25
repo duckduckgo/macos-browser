@@ -80,7 +80,7 @@ final class HistoryEntry {
     func addBlockedTracker(entityName: String) {
         numberOfTrackersBlocked += 1
 
-        guard !entityName.trimWhitespace().isEmpty else {
+        guard !entityName.trimmingWhitespace().isEmpty else {
             return
         }
         blockedTrackingEntities.insert(entityName)

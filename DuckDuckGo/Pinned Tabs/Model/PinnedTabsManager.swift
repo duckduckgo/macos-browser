@@ -67,7 +67,7 @@ final class PinnedTabsManager {
     }
 
     var pinnedDomains: Set<String> {
-        Set(tabCollection.tabs.compactMap { $0.url?.host?.dropWWW() })
+        Set(tabCollection.tabs.compactMap { $0.url?.host?.droppingWwwPrefix() })
     }
 
     func setUp(with collection: TabCollection) {

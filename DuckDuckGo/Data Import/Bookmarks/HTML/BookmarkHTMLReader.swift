@@ -338,7 +338,7 @@ private extension XMLNode {
     }
 
     var text: String? {
-        stringValue?.trimmingWhitespaces()
+        stringValue?.trimmingWhitespace()
     }
 
     var bookmark: ImportedBookmarks.BookmarkOrFolder? {

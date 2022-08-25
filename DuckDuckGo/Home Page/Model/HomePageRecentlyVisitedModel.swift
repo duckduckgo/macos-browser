@@ -64,7 +64,7 @@ final class RecentlyVisitedModel: ObservableObject {
             .forEach {
 
             numberOfTrackersBlocked += $0.numberOfTrackersBlocked
-            guard let host = $0.url.host?.dropWWW() else { return }
+            guard let host = $0.url.host?.droppingWwwPrefix() else { return }
 
             var site = sitesByDomain[host]
             if site == nil {
@@ -100,7 +100,7 @@ final class RecentlyVisitedModel: ObservableObject {
             bookmarkManager.update(bookmark: bookmark)
             site.isFavorite = bookmark.isFavorite
         } else {
-            bookmarkManager.makeBookmark(for: url, title: site.domain.dropWWW(), isFavorite: true)
+            bookmarkManager.makeBookmark(for: url, title: site.domain.droppingWwwPrefix(), isFavorite: true)
             site.isFavorite = true
         }
     }
@@ -206,9 +206,9 @@ final class RecentlyVisitedSiteModel: ObservableObject {
             } else if !showTitlesForPagesSetting {
 
                 $0.displayTitle = $0.url.absoluteString
-                    .drop(prefix: "https://")
-                    .drop(prefix: "http://")
-                    .drop(prefix: $0.url.host ?? "")
+                    .dropping(prefix: "https://")
+                    .dropping(prefix: "http://")
+                    .dropping(prefix: $0.url.host ?? "")
 
             } else if $0.actualTitle?.isEmpty ?? true { // Blank titles
 

@@ -198,7 +198,7 @@ final class PermissionModel {
                                    to decision: PersistedPermissionDecision) {
 
         // If Always Allow/Deny for the current host: Grant/Revoke the permission
-        guard webView?.url?.host?.dropWWW() == domain else { return }
+        guard webView?.url?.host?.droppingWwwPrefix() == domain else { return }
 
         switch (decision, self.permissions[permissionType]) {
         case (.deny, .some):

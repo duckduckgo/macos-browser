@@ -692,7 +692,7 @@ final class Tab: NSObject, Identifiable, ObservableObject {
 
         // Add to local history
         if let host = url.host, !host.isEmpty {
-            localHistory.insert(host.dropWWW())
+            localHistory.insert(host.droppingWwwPrefix())
         }
     }
 

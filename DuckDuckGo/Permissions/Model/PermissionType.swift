@@ -52,7 +52,7 @@ enum PermissionType: Hashable {
         case Constants.popups.rawValue: self = .popups
         default:
             if rawValue.hasPrefix(Constants.external.rawValue) {
-                let scheme = rawValue.drop(prefix: Constants.external.rawValue)
+                let scheme = rawValue.dropping(prefix: Constants.external.rawValue)
                 guard !scheme.isEmpty else { return nil }
                 self = .externalScheme(scheme: scheme)
                 return
