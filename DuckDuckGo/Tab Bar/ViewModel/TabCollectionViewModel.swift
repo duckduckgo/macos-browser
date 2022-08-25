@@ -614,8 +614,10 @@ final class TabCollectionViewModel: NSObject {
             break
         }
 
-        selectedTabViewModel?.tab.lastSelectedAt = Date()
-        self.selectedTabViewModel = selectedTabViewModel
+        if self.selectedTabViewModel !== selectedTabViewModel {
+            selectedTabViewModel?.tab.lastSelectedAt = Date()
+            self.selectedTabViewModel = selectedTabViewModel
+        }
     }
 }
 

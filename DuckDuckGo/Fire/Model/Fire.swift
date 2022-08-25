@@ -137,7 +137,6 @@ final class Fire {
         }
     }
 
-    // swiftlint:disable function_body_length
     func burnDomains(_ domains: Set<String>,
                      includingHistory: Bool = true,
                      completion: (() -> Void)? = nil) {
@@ -155,12 +154,6 @@ final class Fire {
             return domain
         })
         let burningDomains = domains.union(wwwDomains)
-
-        // Fireproofed domains shouldn't be in the list of burning domains
-        assert(!burningDomains.contains(where: { domain in
-            FireproofDomains.shared.isFireproof(fireproofDomain: domain)
-        }), "Fireproof domain is burning")
-
         let collectionsCleanupInfo = tabViewModelsFor(domains: burningDomains)
         
         // Prepare all Tabs that are going to be burned
@@ -214,11 +207,9 @@ final class Fire {
                 completion?()
 
                 os_log("Fire finished", log: .fire)
-                NSApp.reply(toApplicationShouldTerminate: true)
             }
         }
     }
-    // swiftlint:enable function_body_length
 
     func burnAll(tabCollectionViewModel: TabCollectionViewModel, completion: (() -> Void)? = nil) {
         os_log("Fire started", log: .fire)
@@ -264,7 +255,6 @@ final class Fire {
                 completion?()
                 
                 os_log("Fire finished", log: .fire)
-                NSApp.reply(toApplicationShouldTerminate: true)
             }
         }
     }
