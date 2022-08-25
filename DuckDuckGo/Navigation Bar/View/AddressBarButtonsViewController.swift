@@ -148,7 +148,16 @@ final class AddressBarButtonsViewController: NSViewController {
             updateBookmarkButtonVisibility()
         }
     }
-
+    
+    private var _privateYoutubeDiscoveryPopoverManager: PrivateYoutubePopoverManager?
+    private var privateYoutubeDiscoveryPopoverManager: PrivateYoutubePopoverManager {
+        if _privateYoutubeDiscoveryPopoverManager == nil {
+            _privateYoutubeDiscoveryPopoverManager = PrivateYoutubePopoverManager()
+            _privateYoutubeDiscoveryPopoverManager!.statusDelegate = self
+        }
+        return _privateYoutubeDiscoveryPopoverManager!
+    }
+    
     private var selectedTabViewModelCancellable: AnyCancellable?
     private var urlCancellable: AnyCancellable?
     private var trackerInfoCancellable: AnyCancellable?
@@ -249,9 +258,10 @@ final class AddressBarButtonsViewController: NSViewController {
             permissionAuthorizationPopover.close()
         }
         _popupBlockedPopover?.close()
+        
         openPrivacyDashboard()
     }
-
+ 
     private func updateBookmarkButtonVisibility() {
         guard view.window?.isPopUpWindow == false else { return }
 
@@ -329,7 +339,6 @@ final class AddressBarButtonsViewController: NSViewController {
         }
         privacyDashboardPopover.viewController.tabViewModel = selectedTabViewModel
         privacyDashboardPopover.show(relativeTo: privacyDashboardPositioningView.bounds, of: privacyDashboardPositioningView, preferredEdge: .maxY)
-
         privacyEntryPointButton.state = .on
     }
 
@@ -553,6 +562,7 @@ final class AddressBarButtonsViewController: NSViewController {
         urlCancellable = selectedTabViewModel.tab.$content.receive(on: DispatchQueue.main).sink { [weak self] _ in
             self?.stopAnimations()
             self?.updateBookmarkButtonImage()
+            self?.displayYoutubeDiscoveryPopoverIfNecessary()
         }
     }
 
@@ -958,4 +968,38 @@ final class TrackerAnimationImageProvider: AnimationImageProvider {
         }
     }
 
+}
+
+// MARK: - Private Youtube
+
+extension AddressBarButtonsViewController {
+    
+    private func displayYoutubeDiscoveryPopoverIfNecessary() {
+        guard let selectedTabViewModel = tabCollectionViewModel.selectedTabViewModel,
+              let url = selectedTabViewModel.tab.content.url,
+              PrivacySecurityPreferences.shared.privateYoutubePlayerEnabled != true,
+              url.youtubeVideoID != nil else {
+            return
+        }
+        
+        openPrivateYoutubeDiscoveryPopover()
+    }
+
+    private func openPrivateYoutubeDiscoveryPopover() {
+        
+        privateYoutubeDiscoveryPopoverManager.show(relativeTo: privacyDashboardPositioningView.bounds.insetFromLineOfDeath(), of: privacyDashboardPositioningView, preferredEdge: .minY)
+    }
+}
+
+extension AddressBarButtonsViewController: PrivateYoutubePopoverManagerDelegate {
+    
+    func privateYoutubePopoverManager(_ popover: PrivateYoutubePopoverManager, didEnable enabled: Bool) {
+        popover.close()
+        PrivacySecurityPreferences.shared.privateYoutubePlayerEnabled = enabled
+        
+        guard enabled,
+              let tab = tabCollectionViewModel.selectedTabViewModel?.tab else { return }
+        tab.reload()
+    }
+    
 }

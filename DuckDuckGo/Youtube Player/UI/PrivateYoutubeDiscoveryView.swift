@@ -19,6 +19,8 @@
 import SwiftUI
 
 struct PrivateYoutubeDiscoveryView: View {
+    let completion: (Bool) -> Void
+    
     var body: some View {
         HStack(spacing: 30) {
             Image("Private-youtube-player-image")
@@ -28,20 +30,20 @@ struct PrivateYoutubeDiscoveryView: View {
             VStack(alignment: .leading, spacing: 20) {
                 VStack(alignment: .leading, spacing: 5) {
                 Text("Watch this video privately")
-                    .font(.title3)
+                    .font(.headline)
                 Text("DuckDuckGo YouTube Player removes cookies and trackers from YouTube videos so you can watch them without personalized ads and without influencing your YouTube recommendations.")
                 }
                 
                 HStack {
                     Button {
-                        
+                        completion(false)
                     } label: {
                         Text("No Thanks")
                             .frame(maxWidth: .infinity)
                     }
                     
                     Button {
-                        
+                        completion(true)
                     } label: {
                         Text("Try it Now")
                             .frame(maxWidth: .infinity)
@@ -56,6 +58,6 @@ struct PrivateYoutubeDiscoveryView: View {
 
 struct PrivateYoutubeDiscoveryView_Previews: PreviewProvider {
     static var previews: some View {
-        PrivateYoutubeDiscoveryView()
+        PrivateYoutubeDiscoveryView { _ in }
     }
 }
