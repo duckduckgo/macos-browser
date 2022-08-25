@@ -48,6 +48,8 @@ final class FaviconManager: FaviconManagement {
     
     private let faviconURLSession = URLSession(configuration: .ephemeral)
 
+    @Published var faviconsLoaded = false
+
     func loadFavicons() {
         imageCache.loadFavicons { _ in
             self.imageCache.cleanOldExcept(fireproofDomains: FireproofDomains.shared,
@@ -55,6 +57,7 @@ final class FaviconManager: FaviconManagement {
                 self.referenceCache.loadReferences { _ in
                     self.referenceCache.cleanOldExcept(fireproofDomains: FireproofDomains.shared,
                                                        bookmarkManager: LocalBookmarkManager.shared)
+                    self.faviconsLoaded = true
                 }
             }
         }
