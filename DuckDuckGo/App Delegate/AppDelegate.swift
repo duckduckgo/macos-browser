@@ -129,15 +129,9 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
             if alert.runModal() == .cancel {
                 return .terminateCancel
             }
-
             FileDownloadManager.shared.cancelAll(waitUntilDone: true)
             DownloadListCoordinator.shared.sync()
         }
-        
-        if FireCoordinator.fireViewModel.isBurning {
-            return .terminateLater
-        }
-
         stateRestorationManager?.applicationWillTerminate()
 
         return .terminateNow

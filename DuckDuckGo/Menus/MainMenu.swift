@@ -123,9 +123,30 @@ final class MainMenu: NSMenu {
         #endif
 
         subscribeToBookmarkList()
+        subscribeToFavicons()
     }
 
     // MARK: - Bookmarks
+
+    var faviconsCancellable: AnyCancellable?
+    private func subscribeToFavicons() {
+        faviconsCancellable = FaviconManager.shared.$faviconsLoaded
+            .receive(on: DispatchQueue.main).sink(receiveValue: { [weak self] loaded in
+                if loaded {
+                    self?.updateFavicons(self?.bookmarksMenuItem)
+                    self?.updateFavicons(self?.favoritesMenuItem)
+                }
+        })
+    }
+
+    private func updateFavicons(_ menuItem: NSMenuItem?) {
+        if let bookmark = menuItem?.representedObject as? Bookmark {
+            menuItem?.image = BookmarkViewModel(entity: bookmark).menuFavicon
+        }
+        menuItem?.submenu?.items.forEach { menuItem in
+            updateFavicons(menuItem)
+        }
+    }
 
     var bookmarkListCancellable: AnyCancellable?
     private func subscribeToBookmarkList() {

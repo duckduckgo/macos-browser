@@ -315,7 +315,7 @@ final class EmailOptionsButtonSubMenu: NSMenu {
     }
 
     @objc func turnOnEmailAction(_ sender: NSMenuItem) {
-        let tab = Tab(content: .url(EmailUrls().emailLandingPage))
+        let tab = Tab(content: .url(EmailUrls().emailProtectionLink))
         tabCollectionViewModel.append(tab: tab)
         Pixel.fire(.moreMenu(result: .emailProtection))
     }
