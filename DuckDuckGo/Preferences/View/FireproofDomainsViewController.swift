@@ -98,7 +98,7 @@ extension FireproofDomainsViewController: NSTableViewDataSource, NSTableViewDele
     func tableView(_ tableView: NSTableView, viewFor tableColumn: NSTableColumn?, row: Int) -> NSView? {
         if let cell = tableView.makeView(withIdentifier: Constants.cellIdentifier, owner: nil) as? NSTableCellView {
             let domain = fireproofDomains[row]
-            cell.textField?.stringValue = domain.dropWWW()
+            cell.textField?.stringValue = domain.droppingWwwPrefix()
             cell.imageView?.image = faviconManagement.getCachedFavicon(for: domain, sizeCategory: .small)?.image
             cell.imageView?.applyFaviconStyle()
 
@@ -122,7 +122,7 @@ extension FireproofDomainsViewController: NSTextFieldDelegate {
         if field.stringValue.isEmpty {
             filteredFireproofDomains = nil
         } else {
-            filteredFireproofDomains = allFireproofDomains.filter { $0.dropWWW().contains(field.stringValue) }
+            filteredFireproofDomains = allFireproofDomains.filter { $0.droppingWwwPrefix().contains(field.stringValue) }
         }
 
         reloadData()
