@@ -212,6 +212,11 @@ extension BookmarkListViewController: AddBookmarkModalViewControllerDelegate, Ad
         }
     }
     
+    func addBookmarkViewController(_ viewController: AddBookmarkModalViewController, saved bookmark: Bookmark, newURL: URL) {
+        bookmarkManager.update(bookmark: bookmark)
+        _ = bookmarkManager.updateUrl(of: bookmark, to: newURL)
+    }
+    
     func addFolderViewController(_ viewController: AddFolderModalViewController, addedFolderWith name: String) {
         bookmarkManager.makeFolder(for: name, parent: nil)
     }
@@ -315,6 +320,15 @@ extension BookmarkListViewController: BookmarkMenuItemSelectors {
         LocalBookmarkManager.shared.remove(bookmark: bookmark)
     }
     
+    func deleteEntities(_ sender: NSMenuItem) {
+        guard let uuids = sender.representedObject as? [UUID] else {
+            assertionFailure("Failed to cast menu item's represented object to UUID array")
+            return
+        }
+        
+        LocalBookmarkManager.shared.remove(objectsWithUUIDs: uuids)
+    }
+    
 }
 
 extension BookmarkListViewController: FolderMenuItemSelectors {
@@ -342,6 +356,17 @@ extension BookmarkListViewController: FolderMenuItemSelectors {
         }
         
         LocalBookmarkManager.shared.remove(folder: folder)
+    }
+    
+    func openInNewTabs(_ sender: NSMenuItem) {
+        guard let tabCollection = WindowControllersManager.shared.lastKeyMainWindowController?.mainViewController.tabCollectionViewModel,
+              let children = (sender.representedObject as? BookmarkFolder)?.children else {
+            assertionFailure("Cannot open in new tabs")
+            return
+        }
+        
+        let tabs = children.compactMap { $0 as? Bookmark }.map { Tab(content: .url($0.url), shouldLoadInBackground: true) }
+        tabCollection.append(tabs: tabs)
     }
     
 }

@@ -23,6 +23,8 @@ import Cocoa
     func openLinkInNewTab(_ sender: NSMenuItem)
     func openLinkInNewWindow(_ sender: NSMenuItem)
     func downloadLinkedFileAs(_ sender: NSMenuItem)
+    func addLinkToBookmarks(_ sender: NSMenuItem)
+    func bookmarkPage(_ sender: NSMenuItem)
     func copyLink(_ sender: NSMenuItem)
 
 }
@@ -47,6 +49,7 @@ import Cocoa
     func newFolder(_ sender: NSMenuItem)
     func renameFolder(_ sender: NSMenuItem)
     func deleteFolder(_ sender: NSMenuItem)
+    func openInNewTabs(_ sender: NSMenuItem)
 
 }
 
@@ -58,5 +61,6 @@ import Cocoa
     func editBookmark(_ sender: NSMenuItem)
     func copyBookmark(_ sender: NSMenuItem)
     func deleteBookmark(_ sender: NSMenuItem)
+    func deleteEntities(_ sender: NSMenuItem)
 
 }
