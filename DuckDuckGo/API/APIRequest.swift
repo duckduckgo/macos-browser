@@ -105,7 +105,7 @@ enum APIRequest {
                               headers: HTTPHeaders = APIHeaders().defaultHeaders,
                               timeoutInterval: TimeInterval = 60.0) -> URLRequest {
         let url = (try? parameters?.reduce(url) { partialResult, parameter in
-            try partialResult.addParameter(
+            try partialResult.appendingParameter(
                 name: parameter.key,
                 value: parameter.value,
                 allowedReservedCharacters: allowedQueryReservedCharacters
