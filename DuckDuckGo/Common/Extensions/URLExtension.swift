@@ -53,9 +53,8 @@ extension URL {
         }
 
         do {
-            var searchUrl = Self.duckDuckGo
-            searchUrl = try searchUrl.addParameter(name: DuckDuckGoParameters.search.rawValue, value: trimmedQuery)
-            return searchUrl
+            return try Self.duckDuckGo
+                .appendingParameter(name: DuckDuckGoParameters.search.rawValue, value: trimmedQuery)
         } catch let error {
             os_log("URL extension: %s", type: .error, error.localizedDescription)
             return nil
@@ -133,20 +132,24 @@ extension URL {
 
     static func searchAtb(atbWithVariant: String, setAtb: String) -> URL? {
         return try? Self.initialAtb
-            .addParameter(name: DuckDuckGoParameters.ATB.atb, value: atbWithVariant)
-            .addParameter(name: DuckDuckGoParameters.ATB.setAtb, value: setAtb)
+            .appendingParameters([
+                DuckDuckGoParameters.ATB.atb: atbWithVariant,
+                DuckDuckGoParameters.ATB.setAtb: setAtb
+            ])
     }
 
     static func appRetentionAtb(atbWithVariant: String, setAtb: String) -> URL? {
         return try? Self.initialAtb
-            .addParameter(name: DuckDuckGoParameters.ATB.activityType, value: DuckDuckGoParameters.ATB.appUsageValue)
-            .addParameter(name: DuckDuckGoParameters.ATB.atb, value: atbWithVariant)
-            .addParameter(name: DuckDuckGoParameters.ATB.setAtb, value: setAtb)
+            .appendingParameters([
+                DuckDuckGoParameters.ATB.activityType: DuckDuckGoParameters.ATB.appUsageValue,
+                DuckDuckGoParameters.ATB.atb: atbWithVariant,
+                DuckDuckGoParameters.ATB.setAtb: setAtb
+            ])
     }
 
     static func exti(forAtb atb: String) -> URL? {
         let extiUrl = URL(string: Self.exti)!
-        return try? extiUrl.addParameter(name: DuckDuckGoParameters.ATB.atb, value: atb)
+        return try? extiUrl.appendingParameter(name: DuckDuckGoParameters.ATB.atb, value: atb)
     }
 
     // MARK: - Components
