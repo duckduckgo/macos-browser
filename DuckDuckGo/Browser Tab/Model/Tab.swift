@@ -774,6 +774,7 @@ final class Tab: NSObject, Identifiable, ObservableObject {
     
     private weak var youtubeUserScript: YoutubePlayerUserScript?
     
+    #warning("Enable the youtube injection if necessary")
     func enableYoutubeIfNecessary() {
         if url?.absoluteString.contains("youtube.com") == true,
            youtubeUserScript?.isEnabled == false {
@@ -781,6 +782,7 @@ final class Tab: NSObject, Identifiable, ObservableObject {
         }
     }
     
+    #warning("Call the enabled() method on the javascript file")
     func enableYoutubePlayerScript(_ enable: Bool) {
         self.youtubeUserScript?.evaluateJSCall(call: "enable()", webView: self.webView)
         youtubeUserScript?.isEnabled = enable
