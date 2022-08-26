@@ -42,7 +42,7 @@ final class PermissionContextMenu: NSMenu {
     init(permissions: [(key: PermissionType, value: PermissionState)],
          domain: String,
          delegate: PermissionContextMenuDelegate?) {
-        self.domain = domain.dropWWW()
+        self.domain = domain.droppingWwwPrefix()
         self.permissions = permissions
         self.actionDelegate = delegate
         super.init(title: "")

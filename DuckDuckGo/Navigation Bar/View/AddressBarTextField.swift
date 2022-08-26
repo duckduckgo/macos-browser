@@ -531,7 +531,7 @@ final class AddressBarTextField: NSTextField {
 
     private var stringValueWithoutSuffix: String {
         if let suffix = suffix {
-            return stringValue.drop(suffix: suffix.string)
+            return stringValue.dropping(suffix: suffix.string)
         } else {
             return stringValue
         }
@@ -670,7 +670,7 @@ final class AddressBarTextField: NSTextField {
 
     @objc private func pasteAndGo(_ menuItem: NSMenuItem) {
         guard let pasteboardString = NSPasteboard.general.string(forType: .string),
-              let url = URL(trimmedAddressBarString: pasteboardString.trimmingWhitespaces()) else {
+              let url = URL(trimmedAddressBarString: pasteboardString.trimmingWhitespace()) else {
                   assertionFailure("Pasteboard doesn't contain URL")
                   return
               }
@@ -977,7 +977,7 @@ extension AddressBarTextField: NSTextViewDelegate {
     }
 
     private func makePasteAndDoMenuItem() -> NSMenuItem? {
-        if let trimmedPasteboardString = NSPasteboard.general.string(forType: .string)?.trimmingWhitespaces(),
+        if let trimmedPasteboardString = NSPasteboard.general.string(forType: .string)?.trimmingWhitespace(),
            trimmedPasteboardString.count > 0 {
             if URL(trimmedAddressBarString: trimmedPasteboardString) != nil {
                 return Self.pasteAndGoMenuItem
