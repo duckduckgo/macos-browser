@@ -309,7 +309,7 @@ final class BrowserTabViewController: NSViewController {
         guard tabCollectionViewModel.selectDisplayableTabIfPresent(content) == false else {
             return
         }
-
+        
         let tab = Tab(content: content,
                       parentTab: parentTab,
                       shouldLoadInBackground: true,
@@ -719,7 +719,7 @@ extension BrowserTabViewController: LinkMenuItemSelectors {
 
     func openLinkInNewWindow(_ sender: NSMenuItem) {
         guard let url = contextMenuLink else { return }
-        WindowsManager.openNewWindow(with: url)
+        WindowsManager.openNewWindow(with: url, sourceTab: tabViewModel?.tab)
     }
 
     func downloadLinkedFileAs(_ sender: NSMenuItem) {

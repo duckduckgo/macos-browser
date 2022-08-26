@@ -148,6 +148,7 @@ final class Tab: NSObject, Identifiable, ObservableObject {
          sessionStateData: Data? = nil,
          interactionStateData: Data? = nil,
          parentTab: Tab? = nil,
+         attributionState: AdClickAttributionLogic.State? = nil,
          shouldLoadInBackground: Bool = false,
          canBeClosedWithBack: Bool = false,
          lastSelectedAt: Date? = nil,
@@ -179,7 +180,7 @@ final class Tab: NSObject, Identifiable, ObservableObject {
 
         super.init()
 
-        initAttributionLogic()
+        initAttributionLogic(state: attributionState ?? parentTab?.adClickAttributionLogic.state)
         setupWebView(shouldLoadInBackground: shouldLoadInBackground)
 
         NotificationCenter.default.addObserver(self,
@@ -446,7 +447,12 @@ final class Tab: NSObject, Identifiable, ObservableObject {
                 return false
             }
         } else {
-            userContentController.disableGlobalContentRuleList(withIdentifier: ContentBlockerRulesLists.Constants.clickToLoadRulesListName)
+            do {
+                try userContentController.disableGlobalContentRuleList(withIdentifier: ContentBlockerRulesLists.Constants.clickToLoadRulesListName)
+            } catch {
+                assertionFailure("FB List was not enabled")
+                return false
+            }
         }
         self.fbBlockingEnabled = enabled
 
@@ -475,9 +481,17 @@ final class Tab: NSObject, Identifiable, ObservableObject {
     private let adClickAttributionDetection = ContentBlocking.shared.makeAdClickAttributionDetection()
     let adClickAttributionLogic = ContentBlocking.shared.makeAdClickAttributionLogic()
     
-    private func initAttributionLogic() {
+    public var currentAttributionState: AdClickAttributionLogic.State? {
+        adClickAttributionLogic.state
+    }
+    
+    private func initAttributionLogic(state: AdClickAttributionLogic.State?) {
         adClickAttributionLogic.delegate = self
         adClickAttributionDetection.delegate = adClickAttributionLogic
+        
+        if let state = state {
+            adClickAttributionLogic.applyInheritedAttribution(state: state)
+        }
     }
 
     @MainActor
@@ -940,10 +954,11 @@ extension Tab: AdClickAttributionLogicDelegate {
                           didRequestRuleApplication rules: ContentBlockerRulesManager.Rules?,
                           forVendor vendor: String?) {
         let contentBlockerRulesScript = userContentController.contentBlockingAssets?.userScripts.contentBlockerRulesScript
+        let attributedTempListName = AdClickAttributionRulesProvider.Constants.attributedTempRuleListName
         
         guard ContentBlocking.shared.privacyConfigurationManager.privacyConfig.isEnabled(featureKey: .contentBlocking)
          else {
-            userContentController.removeLocalContentRuleList(withIdentifier: "a") // FIX
+            userContentController.removeLocalContentRuleList(withIdentifier: attributedTempListName)
             contentBlockerRulesScript?.currentAdClickAttributionVendor = nil
             contentBlockerRulesScript?.supplementaryTrackerData = []
             return
@@ -951,10 +966,20 @@ extension Tab: AdClickAttributionLogicDelegate {
         
         contentBlockerRulesScript?.currentAdClickAttributionVendor = vendor
         if let rules = rules {
-            userContentController.installLocalContentRuleList(rules.rulesList, identifier: "a") // FIX
+            
+            let globalListName = DefaultContentBlockerRulesListsSource.Constants.trackerDataSetRulesListName
+            let globalAttributionListName = AdClickAttributionRulesSplitter.blockingAttributionRuleListName(forListNamed: globalListName)
+            
+            if vendor != nil {
+                userContentController.installLocalContentRuleList(rules.rulesList, identifier: attributedTempListName)
+                try? userContentController.disableGlobalContentRuleList(withIdentifier: globalAttributionListName)
+            } else {
+                userContentController.removeLocalContentRuleList(withIdentifier: attributedTempListName)
+                try? userContentController.enableGlobalContentRuleList(withIdentifier: globalAttributionListName)
+            }
+            
             contentBlockerRulesScript?.supplementaryTrackerData = [rules.trackerData]
         } else {
-            userContentController.removeLocalContentRuleList(withIdentifier: "a") // FIX
             contentBlockerRulesScript?.supplementaryTrackerData = []
         }
     }

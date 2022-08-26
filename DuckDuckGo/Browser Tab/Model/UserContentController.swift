@@ -100,10 +100,10 @@ final class UserContentController: WKUserContentController {
         self.add(ruleList)
     }
 
-    func disableGlobalContentRuleList(withIdentifier identifier: String) {
+    struct ContentRulesNotEnabledError: Error {}
+    func disableGlobalContentRuleList(withIdentifier identifier: String) throws {
         guard let ruleList = self.contentBlockingAssets?.globalRuleLists[identifier] else {
-            assertionFailure("Rule list not installed")
-            return
+            throw ContentRulesNotEnabledError()
         }
         self.remove(ruleList)
     }
