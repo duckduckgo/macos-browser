@@ -22,21 +22,51 @@ final class CookieConsentPopoverManager: CookieConsentPopoverDelegate {
     var completion: ((Bool) -> Void)?
     weak var currentTab: Tab?
     
-    lazy var popOver: CookieConsentPopover = {
-        let popover = CookieConsentPopover()
-        popover.delegate = self
-        return popover
-    }()
+    private(set) var popOver: CookieConsentPopover?
     
     func cookieConsentPopover(_ popOver: CookieConsentPopover, didFinishWithResult result: Bool) {
-        popOver.close(animated: true)
+        popOver.close(animated: true) { [weak self] in
+            self?.popOver = nil
+            self?.currentTab = nil
+        }
+        
         if let completion = completion {
             completion(result)
         }
     }
+    
+    func show(on view: NSView, animated: Bool, result: ((Bool) -> Void)? = nil) {
+        preparePopover()
+        
+        guard let popOver = popOver else {
+            return
+        }
 
-    func show(on view: NSView, animated: Bool, result: @escaping (Bool) -> Void) {
-        popOver.show(on: view, animated: true)
-        self.completion = result
+        popOver.show(on: view, animated: animated)
+        if let result = result {
+            self.completion = result
+        }
+    }
+    
+    func close(animated: Bool) {
+        guard let popOver = popOver else {
+            return
+        }
+        
+        popOver.close(animated: animated)
+    }
+
+    private func preparePopover() {
+        // If the tab was closed, we want to start the animation again
+        if currentTab == nil {
+            popOver = nil
+        }
+        
+        guard popOver == nil else {
+            return
+        }
+        
+        popOver = CookieConsentPopover()
+        popOver?.delegate = self
     }
 }
