@@ -213,7 +213,8 @@ final class LocalBookmarkStoreTests: XCTestCase {
             firstSaveExpectation.fulfill()
 
             bookmarkStore.save(folder: folder, parent: nil) { (success, error) in
-                XCTAssertFalse(success)
+                // `true` is provided here anyway, in case the error in unrelated to the save action.
+                XCTAssert(success)
                 XCTAssertNotNil(error)
 
                 secondSaveExpectation.fulfill()
