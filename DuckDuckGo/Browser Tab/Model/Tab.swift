@@ -221,7 +221,7 @@ final class Tab: NSObject, Identifiable, ObservableObject {
         webView.stopMediaCapture()
         webView.fullscreenWindowController?.close()
         userContentController.removeAllUserScripts()
-
+        
         cbaTimeReporter?.tabWillClose(self.instrumentation.currentTabIdentifier)
     }
 
@@ -769,7 +769,23 @@ final class Tab: NSObject, Identifiable, ObservableObject {
     func updateVisitTitle(_ title: String, url: URL) {
         historyCoordinating.updateTitleIfNeeded(title: title, url: url)
     }
-
+    
+    // MARK: - Youtube Player
+    
+    private weak var youtubeUserScript: YoutubePlayerUserScript?
+    
+    func enableYoutubeIfNecessary() {
+        if url?.absoluteString.contains("youtube.com") == true,
+           youtubeUserScript?.isEnabled == false {
+            enableYoutubePlayerScript(true)
+        }
+    }
+    
+    func enableYoutubePlayerScript(_ enable: Bool) {
+        self.youtubeUserScript?.evaluateJSCall(call: "enable()", webView: self.webView)
+        youtubeUserScript?.isEnabled = enable
+    }
+    
     // MARK: - Dashboard Info
 
     @Published private(set) var trackerInfo: TrackerInfo?
@@ -826,6 +842,8 @@ extension Tab: UserContentControllerDelegate {
         userScripts.hoverUserScript.delegate = self
         userScripts.autoconsentUserScript?.delegate = self
 
+        youtubeUserScript = userScripts.youtubePlayerScript
+        
         findInPageScript = userScripts.findInPageScript
         attachFindInPage()
     }
@@ -1337,6 +1355,7 @@ extension Tab: WKNavigationDelegate {
         webViewDidFinishNavigationPublisher.send()
         if isAMPProtectionExtracting { isAMPProtectionExtracting = false }
         linkProtection.setMainFrameUrl(nil)
+        enableYoutubeIfNecessary()
     }
 
     func webView(_ webView: WKWebView, didFail navigation: WKNavigation!, withError error: Error) {

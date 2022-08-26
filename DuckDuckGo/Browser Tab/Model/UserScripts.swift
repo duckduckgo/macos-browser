@@ -37,7 +37,8 @@ final class UserScripts {
     let contentScopeUserScript: ContentScopeUserScript
     let autofillScript: WebsiteAutofillUserScript
     let autoconsentUserScript: UserScriptWithAutoconsent?
-
+    let youtubePlayerScript = YoutubePlayerUserScript()
+    
     init(with sourceProvider: ScriptSourceProviding) {
         clickToLoadScript = ClickToLoadUserScript(scriptSourceProvider: sourceProvider)
         contentBlockerRulesScript = ContentBlockerRulesUserScript(configuration: sourceProvider.contentBlockerRulesConfig!)
@@ -71,7 +72,8 @@ final class UserScripts {
         hoverUserScript,
         clickToLoadScript,
         contentScopeUserScript,
-        autofillScript
+        autofillScript,
+        youtubePlayerScript
     ]
 
     lazy var scripts = userScripts.map { $0.makeWKUserScript() }

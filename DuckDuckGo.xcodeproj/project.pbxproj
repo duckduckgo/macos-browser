@@ -20,6 +20,8 @@
 		3139B9D328B805C5008ACAD5 /* PrivateYoutubeDiscoveryView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3139B9D228B805C5008ACAD5 /* PrivateYoutubeDiscoveryView.swift */; };
 		3139B9D528B805FC008ACAD5 /* PrivateYoutubePopoverManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3139B9D428B805FC008ACAD5 /* PrivateYoutubePopoverManager.swift */; };
 		313AEDA1287CAD1D00E1E8F4 /* CookieConsentUserPermissionView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 313AEDA0287CAD1D00E1E8F4 /* CookieConsentUserPermissionView.swift */; };
+		31680D0828B92E4E007BA7DA /* youtube-inject.js in Resources */ = {isa = PBXBuildFile; fileRef = 31680D0728B92E4E007BA7DA /* youtube-inject.js */; };
+		31680D0A28B92F82007BA7DA /* YoutubePlayerUserScript.swift in Sources */ = {isa = PBXBuildFile; fileRef = 31680D0928B92F82007BA7DA /* YoutubePlayerUserScript.swift */; };
 		3171D6B82889849F0068632A /* CookieManagedNotificationView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3171D6B72889849F0068632A /* CookieManagedNotificationView.swift */; };
 		3171D6BA288984D00068632A /* BadgeAnimationView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3171D6B9288984D00068632A /* BadgeAnimationView.swift */; };
 		3171D6DB2889B64D0068632A /* CookieManagedNotificationContainerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3171D6DA2889B64D0068632A /* CookieManagedNotificationContainerView.swift */; };
@@ -835,6 +837,8 @@
 		3139B9D228B805C5008ACAD5 /* PrivateYoutubeDiscoveryView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PrivateYoutubeDiscoveryView.swift; sourceTree = "<group>"; };
 		3139B9D428B805FC008ACAD5 /* PrivateYoutubePopoverManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PrivateYoutubePopoverManager.swift; sourceTree = "<group>"; };
 		313AEDA0287CAD1D00E1E8F4 /* CookieConsentUserPermissionView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CookieConsentUserPermissionView.swift; sourceTree = "<group>"; };
+		31680D0728B92E4E007BA7DA /* youtube-inject.js */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.javascript; path = "youtube-inject.js"; sourceTree = "<group>"; };
+		31680D0928B92F82007BA7DA /* YoutubePlayerUserScript.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = YoutubePlayerUserScript.swift; sourceTree = "<group>"; };
 		3171D6B72889849F0068632A /* CookieManagedNotificationView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CookieManagedNotificationView.swift; sourceTree = "<group>"; };
 		3171D6B9288984D00068632A /* BadgeAnimationView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BadgeAnimationView.swift; sourceTree = "<group>"; };
 		3171D6DA2889B64D0068632A /* CookieManagedNotificationContainerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CookieManagedNotificationContainerView.swift; sourceTree = "<group>"; };
@@ -1776,6 +1780,7 @@
 				3139B9B228B7FE31008ACAD5 /* UI */,
 				37479F0F28912BF200302FE2 /* Resources */,
 				37479F0C28912B8700302FE2 /* YoutubePlayer.swift */,
+				31680D0928B92F82007BA7DA /* YoutubePlayerUserScript.swift */,
 			);
 			path = "Youtube Player";
 			sourceTree = "<group>";
@@ -1784,6 +1789,7 @@
 			isa = PBXGroup;
 			children = (
 				37479F1028912C0B00302FE2 /* youtube_player_template.html */,
+				31680D0728B92E4E007BA7DA /* youtube-inject.js */,
 			);
 			path = Resources;
 			sourceTree = "<group>";
@@ -4337,6 +4343,7 @@
 				85A0117425AF2EDF00FA6A0C /* FindInPage.storyboard in Resources */,
 				85589E8127BBB8630038AD11 /* HomePage.storyboard in Resources */,
 				AA80EC89256C49B8007083E7 /* Localizable.strings in Resources */,
+				31680D0828B92E4E007BA7DA /* youtube-inject.js in Resources */,
 				B31055C627A1BA1D001AC618 /* userscript.js in Resources */,
 				EA4617F0273A28A700F110A2 /* fb-tds.json in Resources */,
 				AAE8B102258A41C000E81239 /* TabPreview.storyboard in Resources */,
@@ -4612,6 +4619,7 @@
 				85589E9E27BFE4500038AD11 /* DefaultBrowserPromptView.swift in Sources */,
 				4B29759C28284DBC00187C4E /* FirefoxBerkeleyDatabaseReader.m in Sources */,
 				4B78A86B26BB3ADD0071BB16 /* BrowserImportSummaryViewController.swift in Sources */,
+				31680D0A28B92F82007BA7DA /* YoutubePlayerUserScript.swift in Sources */,
 				AA512D1424D99D9800230283 /* FaviconManager.swift in Sources */,
 				AABEE6AB24ACA0F90043105B /* SuggestionTableRowView.swift in Sources */,
 				37CD54CB27F2FDD100F1F7B9 /* DownloadsPreferences.swift in Sources */,
