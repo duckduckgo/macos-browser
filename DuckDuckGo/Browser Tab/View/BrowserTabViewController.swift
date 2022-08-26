@@ -114,7 +114,7 @@ final class BrowserTabViewController: NSViewController {
     private func windowWillClose(_ notification: NSNotification) {
         self.removeWebViewFromHierarchy()
     }
-
+    
     private func subscribeToSelectedTabViewModel() {
         tabCollectionViewModel.$selectedTabViewModel
             .sink { [weak self] selectedTabViewModel in
@@ -128,12 +128,14 @@ final class BrowserTabViewController: NSViewController {
             }
             .store(in: &cancellables)
     }
-    
+
     private func showCookieConsentPopoverIfNecessary(_ selectedTabViewModel: TabViewModel?) {
-        if selectedTabViewModel?.tab == cookieConsentPopoverManager.currentTab {
-            cookieConsentPopoverManager.popOver.show(on: view, animated: false)
+        if let selectedTab = selectedTabViewModel?.tab,
+           let cookiePopoverTab = cookieConsentPopoverManager.currentTab,
+           selectedTab == cookiePopoverTab {
+            cookieConsentPopoverManager.show(on: view, animated: false)
         } else {
-            cookieConsentPopoverManager.popOver.close(animated: false)
+            cookieConsentPopoverManager.close(animated: false)
         }
     }
 
@@ -475,7 +477,7 @@ extension BrowserTabViewController: TabDelegate {
 
     func tab(_ tab: Tab, promptUserForCookieConsent result: @escaping (Bool) -> Void) {
        cookieConsentPopoverManager.show(on: view, animated: true, result: result)
-       cookieConsentPopoverManager.currentTab = tabViewModel?.tab
+       cookieConsentPopoverManager.currentTab = tab
     }
     
     func tabWillStartNavigation(_ tab: Tab, isUserInitiated: Bool) {

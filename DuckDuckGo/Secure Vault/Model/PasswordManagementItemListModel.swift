@@ -112,7 +112,7 @@ enum SecureVaultItem: Equatable, Identifiable, Comparable {
     var displayTitle: String {
         switch self {
         case .account(let account):
-            return ((account.title ?? "").isEmpty == true ? account.domain.dropWWW() : account.title) ?? ""
+            return ((account.title ?? "").isEmpty == true ? account.domain.droppingWwwPrefix() : account.title) ?? ""
         case .card(let card):
             return card.title
         case .identity(let identity):

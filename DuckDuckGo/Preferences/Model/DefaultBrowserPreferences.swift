@@ -48,7 +48,7 @@ struct SystemDefaultBrowserProvider: DefaultBrowserProvider {
     init(bundleIdentifier: String = AppVersion.shared.identifier) {
         var bundleID = bundleIdentifier
         #if DEBUG
-        bundleID = bundleID.drop(suffix: ".debug")
+        bundleID = bundleID.dropping(suffix: ".debug")
         #endif
         self.bundleIdentifier = bundleIdentifier
     }

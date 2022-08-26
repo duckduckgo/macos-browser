@@ -17,6 +17,7 @@
 //
 
 import Foundation
+import BrowserServicesKit
 
 private typealias URLPatterns = [String: [NSRegularExpression]]
 
@@ -82,7 +83,7 @@ extension URL {
     }
 
     private func matches(any patterns: URLPatterns) -> Bool {
-        guard let host = self.host?.dropWWW(),
+        guard let host = self.host?.droppingWwwPrefix(),
               let matchingKey = patterns.keys.first(where: { host.contains($0) }),
               let pattern = patterns[matchingKey] else { return false }
 

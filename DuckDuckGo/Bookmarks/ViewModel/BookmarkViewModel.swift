@@ -80,7 +80,7 @@ struct BookmarkViewModel {
             preconditionFailure("\(#file): Attempted to provide representing character for non-Bookmark")
         }
 
-        return bookmark.url.host?.dropWWW().first?.uppercased() ?? "-"
+        return bookmark.url.host?.droppingWwwPrefix().first?.uppercased() ?? "-"
     }
 
 }
