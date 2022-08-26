@@ -26,6 +26,7 @@ protocol OptionsButtonMenuDelegate: AnyObject {
     func optionsButtonMenuRequestedBookmarkPopover(_ menu: NSMenu)
     func optionsButtonMenuRequestedToggleBookmarksBar(_ menu: NSMenu)
     func optionsButtonMenuRequestedBookmarkManagementInterface(_ menu: NSMenu)
+    func optionsButtonMenuRequestedBookmarkImportInterface(_ menu: NSMenu)
     func optionsButtonMenuRequestedLoginsPopover(_ menu: NSMenu, selectedCategory: SecureVaultSorting.Category)
     func optionsButtonMenuRequestedDownloadsPopover(_ menu: NSMenu)
     func optionsButtonMenuRequestedPrint(_ menu: NSMenu)
@@ -117,6 +118,10 @@ final class MoreOptionsMenu: NSMenu {
     
     @objc func toggleBookmarksBar(_ sender: NSMenuItem) {
         actionDelegate?.optionsButtonMenuRequestedToggleBookmarksBar(self)
+    }
+    
+    @objc func openBookmarkImportInterface(_ sender: NSMenuItem) {
+        actionDelegate?.optionsButtonMenuRequestedBookmarkImportInterface(self)
     }
 
     @objc func openDownloads(_ sender: NSMenuItem) {
@@ -377,22 +382,39 @@ final class BookmarksSubMenu: NSMenu {
             .targetting(target)
             .firingPixel(Pixel.Event.MoreResult.bookmarksMenuShowToolbarPanel)
         
-        if PersistentAppInterfaceSettings.shared.showBookmarksBar {
-            addItem(withTitle: UserText.hideBookmarksBar, action: #selector(MoreOptionsMenu.toggleBookmarksBar(_:)), keyEquivalent: "")
-                .targetting(target)
-                .firingPixel(Pixel.Event.MoreResult.bookmarksMenuHideBookmarksBar)
-            
-        } else {
-            addItem(withTitle: UserText.showBookmarksBar, action: #selector(MoreOptionsMenu.toggleBookmarksBar(_:)), keyEquivalent: "")
-                .targetting(target)
-                .firingPixel(Pixel.Event.MoreResult.bookmarksMenuShowBookmarksBar)
-        }
-        
         addItem(withTitle: UserText.bookmarksManageBookmarks, action: #selector(MoreOptionsMenu.openBookmarksManagementInterface), keyEquivalent: "")
             .targetting(target)
             .firingPixel(Pixel.Event.MoreResult.bookmarksMenuManageBookmarks)
 
+        if PersistentAppInterfaceSettings.shared.showBookmarksBar {
+            addItem(withTitle: UserText.hideBookmarksBar, action: #selector(MoreOptionsMenu.toggleBookmarksBar(_:)), keyEquivalent: "B")
+                .targetting(target)
+                .firingPixel(Pixel.Event.MoreResult.bookmarksMenuHideBookmarksBar)
+            
+        } else {
+            addItem(withTitle: UserText.showBookmarksBar, action: #selector(MoreOptionsMenu.toggleBookmarksBar(_:)), keyEquivalent: "B")
+                .targetting(target)
+                .firingPixel(Pixel.Event.MoreResult.bookmarksMenuShowBookmarksBar)
+        }
+
         addItem(NSMenuItem.separator())
+        
+        addItem(withTitle: "Import Bookmarks and Passwords...", action: #selector(MoreOptionsMenu.openBookmarkImportInterface(_:)), keyEquivalent: "")
+            .targetting(target)
+            .firingPixel(Pixel.Event.MoreResult.bookmarksMenuImportBookmarks)
+        
+        addItem(NSMenuItem.separator())
+        
+        if let favorites = LocalBookmarkManager.shared.list?.favoriteBookmarks {
+            let favoriteViewModels = favorites.compactMap(BookmarkViewModel.init(entity:))
+            let favoriteMenuItems = bookmarkMenuItems(from: favoriteViewModels)
+            
+            let favoritesItem = addItem(withTitle: "Favorites", action: nil, keyEquivalent: "")
+            favoritesItem.submenu = NSMenu(items: favoriteMenuItems)
+            favoritesItem.image = NSImage(named: "Favorite")
+            
+            addItem(NSMenuItem.separator())
+        }
         
         guard let entities = LocalBookmarkManager.shared.list?.topLevelEntities else {
             return
