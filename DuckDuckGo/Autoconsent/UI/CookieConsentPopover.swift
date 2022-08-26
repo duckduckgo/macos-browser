@@ -57,10 +57,7 @@ public final class CookieConsentPopover {
         let removeWindow = {
             overlayWindow.parent?.removeChildWindow(overlayWindow)
             overlayWindow.orderOut(nil)
-            
-            if let completion = completion {
-                completion()
-            }
+            completion?()
         }
         
         if animated {
