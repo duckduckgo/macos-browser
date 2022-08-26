@@ -69,9 +69,8 @@ final class ContentBlocking {
         adClickAttributionRulesProvider = AdClickAttributionRulesProvider(config: adClickAttribution,
                                                                           compiledRulesSource: contentBlockingManager,
                                                                           exceptionsSource: exceptionsSource,
-                                                                          errorReporting: nil,
-                                                                          compilationErrorReporting: nil) // TODO - pixel handling
-
+                                                                          errorReporting: attributionDebugEvents,
+                                                                          compilationErrorReporting: Self.debugEvents)
     }
 
     private static let debugEvents = EventMapping<ContentBlockerDebugEvents> { event, error, parameters, onComplete in
