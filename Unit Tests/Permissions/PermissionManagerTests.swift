@@ -34,7 +34,7 @@ final class PermissionManagerTests: XCTestCase {
         store.permissions = [.entity1, .entity2]
         let result1 = manager.permission(forDomain: "www." + PermissionEntity.entity1.domain,
                                          permissionType: PermissionEntity.entity1.type)
-        let result2 = manager.permission(forDomain: PermissionEntity.entity2.domain.dropWWW(),
+        let result2 = manager.permission(forDomain: PermissionEntity.entity2.domain.droppingWwwPrefix(),
                                          permissionType: PermissionEntity.entity2.type)
         let result3 = manager.permission(forDomain: "otherdomain.com", permissionType: .microphone)
 
@@ -115,7 +115,7 @@ final class PermissionManagerTests: XCTestCase {
                                        .add(domain: PermissionEntity.entity1.domain,
                                             permissionType: PermissionEntity.entity1.type,
                                             decision: .allow),
-                                       .add(domain: PermissionEntity.entity2.domain.dropWWW(),
+                                       .add(domain: PermissionEntity.entity2.domain.droppingWwwPrefix(),
                                             permissionType: PermissionEntity.entity2.type,
                                             decision: .deny)])
         XCTAssertEqual(result1, .allow)
@@ -182,7 +182,7 @@ final class PermissionManagerTests: XCTestCase {
 
         let e = expectation(description: "permission published")
         let c = manager.permissionPublisher.sink { value in
-            XCTAssertEqual(value.domain, PermissionEntity.entity2.domain.dropWWW())
+            XCTAssertEqual(value.domain, PermissionEntity.entity2.domain.droppingWwwPrefix())
             XCTAssertEqual(value.permissionType, PermissionEntity.entity2.type)
             XCTAssertEqual(value.decision, .ask)
             e.fulfill()
@@ -218,7 +218,7 @@ final class PermissionManagerTests: XCTestCase {
         let fireproofDomains = FireproofDomains(store: FireproofDomainsStoreMock())
         fireproofDomains.add(domain: PermissionEntity.entity1.domain)
 
-        manager.burnPermissions(of: [PermissionEntity.entity2.domain.dropWWW()]) {}
+        manager.burnPermissions(of: [PermissionEntity.entity2.domain.droppingWwwPrefix()]) {}
 
         XCTAssertEqual(store.history, [.load, .clear(exceptions: [PermissionEntity.entity1.permission])])
         XCTAssertEqual(manager.permission(forDomain: PermissionEntity.entity1.domain,

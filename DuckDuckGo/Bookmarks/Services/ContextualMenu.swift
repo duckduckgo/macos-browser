@@ -25,9 +25,9 @@ struct ContextualMenu {
         guard let objects = objects, objects.count > 0 else {
             return menuForNoSelection()
         }
-
-        if objects.count > 1 {
-            return nil
+        
+        if objects.count > 1, let entities = objects as? [BaseBookmarkEntity] {
+            return menu(for: entities)
         }
 
         let node = objects.first as? BookmarkNode
@@ -41,6 +41,8 @@ struct ContextualMenu {
             return nil
         }
     }
+    
+    // MARK: - Single Item Menu Creation
 
     private static func menuForNoSelection() -> NSMenu {
         let menu = NSMenu(title: "")
@@ -78,6 +80,9 @@ struct ContextualMenu {
 
         menu.addItem(renameFolderMenuItem(folder: folder))
         menu.addItem(deleteFolderMenuItem(folder: folder))
+        menu.addItem(NSMenuItem.separator())
+    
+        menu.addItem(openInNewTabsMenuItem(folder: folder))
 
         return menu
     }
@@ -94,6 +99,14 @@ struct ContextualMenu {
 
     static func deleteFolderMenuItem(folder: BookmarkFolder) -> NSMenuItem {
         return menuItem(UserText.deleteFolder, #selector(FolderMenuItemSelectors.deleteFolder(_:)), folder)
+    }
+    
+    static func openInNewTabsMenuItem(folder: BookmarkFolder) -> NSMenuItem {
+        return menuItem(UserText.bookmarksOpenInNewTabs, #selector(FolderMenuItemSelectors.openInNewTabs(_:)), folder)
+    }
+    
+    static func openBookmarksInNewTabsMenuItem(bookmarks: [Bookmark]) -> NSMenuItem {
+        return menuItem(UserText.bookmarksOpenInNewTabs, #selector(FolderMenuItemSelectors.openInNewTabs(_:)), bookmarks)
     }
 
     static func openBookmarkInNewTabMenuItem(bookmark: Bookmark) -> NSMenuItem {
@@ -114,6 +127,18 @@ struct ContextualMenu {
         }
 
         return menuItem(title, #selector(BookmarkMenuItemSelectors.toggleBookmarkAsFavorite(_:)), bookmark)
+    }
+    
+    static func addBookmarksToFavoritesMenuItem(bookmarks: [Bookmark], allFavorites: Bool) -> NSMenuItem {
+        let title: String
+
+        if allFavorites {
+            title = UserText.removeFromFavorites
+        } else {
+            title = UserText.addToFavorites
+        }
+
+        return menuItem(title, #selector(BookmarkMenuItemSelectors.toggleBookmarkAsFavorite(_:)), bookmarks)
     }
 
     static func editBookmarkMenuItem(bookmark: Bookmark) -> NSMenuItem {
@@ -136,5 +161,38 @@ struct ContextualMenu {
         item.representedObject = representedObject
         return item
     }
+    
+    // MARK: - Multi-Item Menu Creation
 
+    private static func menu(for entities: [BaseBookmarkEntity]) -> NSMenu {
+        let menu = NSMenu(title: "")
+        var menuItems: [NSMenuItem] = []
+        
+        let bookmarks = entities.compactMap({ $0 as? Bookmark })
+
+        if !bookmarks.isEmpty {
+            menuItems.append(openBookmarksInNewTabsMenuItem(bookmarks: bookmarks))
+            
+            // If all selected items are bookmarks and they all have the same favourite status, show a menu item to add/remove them all as favourites.
+            if bookmarks.count == entities.count {
+                if bookmarks.allSatisfy({ $0.isFavorite }) {
+                    menuItems.append(addBookmarksToFavoritesMenuItem(bookmarks: bookmarks, allFavorites: true))
+                } else if bookmarks.allSatisfy({ !$0.isFavorite }) {
+                    menuItems.append(addBookmarksToFavoritesMenuItem(bookmarks: bookmarks, allFavorites: false))
+                }
+            }
+            
+            menuItems.append(NSMenuItem.separator())
+        }
+
+        let title = NSLocalizedString("Delete", comment: "Command")
+        let deleteItem = NSMenuItem(title: title, action: #selector(BookmarkMenuItemSelectors.deleteEntities(_:)), keyEquivalent: "")
+        deleteItem.representedObject = entities
+        menuItems.append(deleteItem)
+
+        menu.items = menuItems
+        
+        return menu
+    }
+    
 }

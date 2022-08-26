@@ -78,7 +78,7 @@ final class Fire {
 
     // Drop www prefixes to produce list of burning domains
     static func getBurningDomain(from url: URL) -> String? {
-        return url.host?.dropWWW()
+        return url.host?.droppingWwwPrefix()
     }
     
     private typealias TabCollectionsCleanupInfo = [TabCollectionViewModel: [TabCollectionViewModel.TabCleanupInfo]]

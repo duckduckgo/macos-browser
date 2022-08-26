@@ -32,7 +32,75 @@ struct Favorites: View {
 
     var body: some View {
 
-        let addButton = ZStack(alignment: .top) {
+        if #available(macOS 11.0, *) {
+            LazyVStack(spacing: 4) {
+                FavoritesGrid(isHovering: $isHovering)
+            }
+            .frame(maxWidth: .infinity)
+            .onHover { isHovering in
+                self.isHovering = isHovering
+            }
+        } else {
+            VStack(spacing: 4) {
+                FavoritesGrid(isHovering: $isHovering)
+            }
+            .frame(maxWidth: .infinity)
+            .onHover { isHovering in
+                self.isHovering = isHovering
+            }
+        }
+
+    }
+
+}
+    
+struct FavoritesGrid: View {
+    
+    @EnvironmentObject var model: HomePage.Models.FavoritesModel
+    
+    @Binding var isHovering: Bool
+    
+    var rowIndices: Range<Int> {
+        model.showAllFavorites ? model.rows.indices : model.rows.indices.prefix(HomePage.favoritesRowCountWhenCollapsed)
+    }
+
+    var body: some View {
+
+        ForEach(rowIndices, id: \.self) { index in
+
+            HStack(alignment: .top, spacing: 20) {
+                ForEach(model.rows[index], id: \.id) { favorite in
+
+                    switch favorite.favoriteType {
+                    case .bookmark(let bookmark):
+                        Favorite(bookmark: bookmark)
+
+                    case .addButton:
+                        FavoritesGridAddButton()
+
+                    case .ghostButton:
+                        FavoritesGridGhostButton()
+                    }
+                }
+            }
+            
+        }
+
+        MoreOrLess(isExpanded: $model.showAllFavorites)
+            .padding(.top, 2)
+            .visibility(model.rows.count > HomePage.favoritesRowCountWhenCollapsed && isHovering ? .visible : .invisible)
+
+    }
+    
+}
+    
+private struct FavoritesGridAddButton: View {
+    
+    @EnvironmentObject var model: HomePage.Models.FavoritesModel
+
+    var body: some View {
+        
+        ZStack(alignment: .top) {
             FavoriteTemplate(title: UserText.addFavorite, domain: nil)
             ZStack {
                 Image("Add")
@@ -43,47 +111,24 @@ struct Favorites: View {
         .link {
             model.addNew()
         }
-
-        let ghostButton = VStack {
+        
+    }
+    
+}
+    
+private struct FavoritesGridGhostButton: View {
+    
+    var body: some View {
+        
+        VStack {
             RoundedRectangle(cornerRadius: 12)
                 .stroke(Color("HomeFavoritesGhostColor"), style: StrokeStyle(lineWidth: 1.5, dash: [4.0, 2.0]))
                 .frame(width: 64, height: 64)
-        }.frame(width: 64)
-
-        VStack(spacing: 4) {
-
-            ForEach(rowIndices, id: \.self) { index in
-
-                HStack(alignment: .top, spacing: 20) {
-                    ForEach(model.rows[index], id: \.id) { favorite in
-
-                        switch favorite.favoriteType {
-                        case .bookmark(let bookmark):
-                            Favorite(bookmark: bookmark)
-
-                        case .addButton:
-                            addButton
-
-                        case .ghostButton:
-                            ghostButton
-                        }
-                    }
-                }
-                
-            }
-
-            MoreOrLess(isExpanded: $model.showAllFavorites)
-                .padding(.top, 2)
-                .visibility(model.rows.count > HomePage.favoritesRowCountWhenCollapsed && isHovering ? .visible : .invisible)
-
         }
-        .frame(maxWidth: .infinity)
-        .onHover { isHovering in
-            self.isHovering = isHovering
-        }
-
+        .frame(width: 64)
+        
     }
-
+    
 }
 
 struct FavoriteTemplate: View {
@@ -149,7 +194,8 @@ struct Favorite: View {
                 Button(UserText.openInNewWindow, action: { model.openInNewWindow(bookmark) })
                 Divider()
                 Button(UserText.edit, action: { model.edit(bookmark) })
-                Button(UserText.remove, action: { model.remove(bookmark) })
+                Button(UserText.removeFavorite, action: { model.removeFavorite(bookmark) })
+                Button(UserText.deleteBookmark, action: { model.deleteBookmark(bookmark) })
             }))
 
     }

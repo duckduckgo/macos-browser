@@ -51,7 +51,7 @@ internal class FireproofDomains {
     private func loadFireproofDomains() -> FireproofDomainsContainer {
         dispatchPrecondition(condition: .onQueue(.main))
         do {
-            if let domains = legacyUserDefaultsFireproofDomains?.map({ $0.dropWWW() }),
+            if let domains = legacyUserDefaultsFireproofDomains?.map({ $0.droppingWwwPrefix() }),
                !domains.isEmpty {
 
                 var container = FireproofDomainsContainer()
@@ -91,7 +91,7 @@ internal class FireproofDomains {
             return
         }
 
-        let domainWithoutWWW = domain.dropWWW()
+        let domainWithoutWWW = domain.droppingWwwPrefix()
         do {
             let id = try store.add(domainWithoutWWW)
             try container.add(domain: domainWithoutWWW, withId: id)
@@ -129,7 +129,7 @@ internal class FireproofDomains {
     }
 
     func isFireproof(cookieDomain: String) -> Bool {
-        let domainWithoutDotPrefix = cookieDomain.drop(prefix: ".")
+        let domainWithoutDotPrefix = cookieDomain.dropping(prefix: ".")
         return container.contains(domain: domainWithoutDotPrefix, includingSuperdomains: false)
             || (cookieDomain.hasPrefix(".") && container.contains(superdomain: domainWithoutDotPrefix))
     }

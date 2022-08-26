@@ -52,7 +52,7 @@ final class PermissionManager: PermissionManagerProtocol {
         do {
             let entities = try store.loadPermissions()
             for entity in entities {
-                self.set(entity.permission, forDomain: entity.domain.dropWWW(), permissionType: entity.type)
+                self.set(entity.permission, forDomain: entity.domain.droppingWwwPrefix(), permissionType: entity.type)
             }
         } catch {
             os_log("PermissionStore: Failed to load permissions", type: .error)
@@ -67,11 +67,11 @@ final class PermissionManager: PermissionManagerProtocol {
     private(set) var persistedPermissionTypes = Set<PermissionType>()
 
     func permission(forDomain domain: String, permissionType: PermissionType) -> PersistedPermissionDecision {
-        return permissions[domain.dropWWW()]?[permissionType]?.decision ?? .ask
+        return permissions[domain.droppingWwwPrefix()]?[permissionType]?.decision ?? .ask
     }
 
     func hasPermissionPersisted(forDomain domain: String, permissionType: PermissionType) -> Bool {
-        return permissions[domain.dropWWW()]?[permissionType] != nil
+        return permissions[domain.droppingWwwPrefix()]?[permissionType] != nil
     }
 
     func setPermission(_ decision: PersistedPermissionDecision, forDomain domain: String, permissionType: PermissionType) {
@@ -79,7 +79,7 @@ final class PermissionManager: PermissionManagerProtocol {
         assert(permissionType.canPersistDeniedDecision || decision != .deny)
 
         let storedPermission: StoredPermission
-        let domain = domain.dropWWW()
+        let domain = domain.droppingWwwPrefix()
         guard self.permission(forDomain: domain, permissionType: permissionType) != decision else { return }
 
         defer {
