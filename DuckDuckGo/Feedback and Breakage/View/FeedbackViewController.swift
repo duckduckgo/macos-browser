@@ -237,7 +237,7 @@ final class FeedbackViewController: NSViewController {
 
         switch selectedFormOption {
         case .feedback:
-            if !browserFeedbackTextView.string.trimmingWhitespaces().isEmpty {
+            if !browserFeedbackTextView.string.trimmingWhitespace().isEmpty {
                 submitButton.isEnabled = true
             } else {
                 submitButton.isEnabled = false

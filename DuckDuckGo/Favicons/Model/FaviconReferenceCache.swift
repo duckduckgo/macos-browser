@@ -113,7 +113,7 @@ final class FaviconReferenceCache {
             }
         } else if let host = documentURL.host,
                     let hostCacheEntry = hostReferences[host] ?? (host.hasPrefix("www") ?
-                                                                  hostReferences[host.dropWWW()] : hostReferences["www.\(host)"]) {
+                                                                  hostReferences[host.droppingWwwPrefix()] : hostReferences["www.\(host)"]) {
             switch sizeCategory {
             case .small: return hostCacheEntry.smallFaviconUrl ?? hostCacheEntry.mediumFaviconUrl
             default: return hostCacheEntry.mediumFaviconUrl
@@ -128,7 +128,7 @@ final class FaviconReferenceCache {
             return nil
         }
 
-        let hostCacheEntry = hostReferences[host] ?? (host.hasPrefix("www") ? hostReferences[host.dropWWW()] : hostReferences["www.\(host)"])
+        let hostCacheEntry = hostReferences[host] ?? (host.hasPrefix("www") ? hostReferences[host.droppingWwwPrefix()] : hostReferences["www.\(host)"])
 
         switch sizeCategory {
         case .small: return hostCacheEntry?.smallFaviconUrl ?? hostCacheEntry?.mediumFaviconUrl

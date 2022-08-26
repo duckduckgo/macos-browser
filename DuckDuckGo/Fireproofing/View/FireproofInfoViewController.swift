@@ -29,7 +29,7 @@ final class FireproofInfoViewController: NSViewController {
         let storyboard = NSStoryboard(name: Constants.storyboardName, bundle: nil)
 
         return storyboard.instantiateController(identifier: Constants.identifier) { coder in
-            return FireproofInfoViewController(coder: coder, domain: domain.dropWWW())
+            return FireproofInfoViewController(coder: coder, domain: domain.droppingWwwPrefix())
         }
     }
 

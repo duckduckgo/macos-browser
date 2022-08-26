@@ -178,7 +178,7 @@ extension FileDownloadManager: WebKitDownloadTaskDelegate {
         // drop known extension, it would be appended by SavePanel
         var suggestedFilename = suggestedFilename
         if let ext = fileType?.fileExtension {
-            suggestedFilename = suggestedFilename.drop(suffix: "." + ext)
+            suggestedFilename = suggestedFilename.dropping(suffix: "." + ext)
         }
 
         locationChooser(suggestedFilename, downloadLocation, fileType.map { [$0] } ?? []) { url, fileType in

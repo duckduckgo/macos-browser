@@ -33,7 +33,7 @@ final class CopyHandler: NSObject {
         NSPasteboard.general.clearContents()
         NSPasteboard.general.setString(selectedText, forType: .string)
 
-        if let urlString = URL(trimmedAddressBarString: selectedText.trimmingWhitespaces())?.absoluteString,
+        if let urlString = URL(trimmedAddressBarString: selectedText.trimmingWhitespace())?.absoluteString,
             urlString == selectedText {
             NSPasteboard.general.setString(urlString, forType: .URL)
         }
