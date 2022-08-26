@@ -661,10 +661,14 @@ extension BookmarkManagementDetailViewController: BookmarkMenuItemSelectors {
             bookmark.isFavorite.toggle()
             LocalBookmarkManager.shared.update(bookmark: bookmark)
         } else if let bookmarks = sender.representedObject as? [Bookmark] {
-            for bookmark in bookmarks {
-                bookmark.isFavorite.toggle()
-                LocalBookmarkManager.shared.update(bookmark: bookmark)
-            }
+            let bookmarkIdentifiers = bookmarks.map(\.id)
+            bookmarkManager.update(objectsWithUUIDs: bookmarkIdentifiers, update: { entity in
+                (entity as? Bookmark)?.isFavorite.toggle()
+            }, completion: { error in
+                if error != nil {
+                    assertionFailure("Failed to update bookmarks: ")
+                }
+            })
         } else {
             assertionFailure("Failed to cast menu represented object to Bookmark")
         }
