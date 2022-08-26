@@ -119,7 +119,10 @@ final class BookmarkManagementDetailViewController: NSViewController, NSMenuItem
             return
         }
         emptyState.isHidden = !(bookmarkManager.list?.topLevelEntities.isEmpty ?? true)
-        self.tableView.reloadData()
+        
+        let scrollPosition = tableView.visibleRect.origin
+        tableView.reloadData()
+        tableView.scroll(scrollPosition)
     }
 
     @IBAction func onImportClicked(_ sender: NSButton) {
@@ -654,13 +657,17 @@ extension BookmarkManagementDetailViewController: BookmarkMenuItemSelectors {
     }
 
     func toggleBookmarkAsFavorite(_ sender: NSMenuItem) {
-        guard let bookmark = sender.representedObject as? Bookmark else {
+        if let bookmark = sender.representedObject as? Bookmark {
+            bookmark.isFavorite.toggle()
+            LocalBookmarkManager.shared.update(bookmark: bookmark)
+        } else if let bookmarks = sender.representedObject as? [Bookmark] {
+            for bookmark in bookmarks {
+                bookmark.isFavorite.toggle()
+                LocalBookmarkManager.shared.update(bookmark: bookmark)
+            }
+        } else {
             assertionFailure("Failed to cast menu represented object to Bookmark")
-            return
         }
-
-        bookmark.isFavorite.toggle()
-        LocalBookmarkManager.shared.update(bookmark: bookmark)
     }
 
     func editBookmark(_ sender: NSMenuItem) {
