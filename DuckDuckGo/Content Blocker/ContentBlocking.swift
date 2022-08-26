@@ -145,43 +145,44 @@ final class ContentBlocking {
     }
     
     private let attributionEvents = EventMapping<AdClickAttributionEvents> { event, _, parameters, _ in
-//        let domainEvent: Pixel.Event
-//        switch event {
-//        case .adAttributionDetected:
-//            domainEvent = .adClickAttributionDetected
-//        case .adAttributionActive:
-//            domainEvent = .adClickAttributionActive
-//        }
-//
-//        Pixel.fire(pixel: domainEvent, withAdditionalParameters: parameters ?? [:], includedParameters: [.appVersion])
+        let domainEvent: Pixel.Event
+        switch event {
+        case .adAttributionDetected:
+            domainEvent = .adClickAttributionDetected
+        case .adAttributionActive:
+            domainEvent = .adClickAttributionActive
+        }
+
+        Pixel.fire(domainEvent, withAdditionalParameters: parameters ?? [:])
     }
     
     private let attributionDebugEvents = EventMapping<AdClickAttributionDebugEvents> { event, _, _, _ in
-//        let domainEvent: Pixel.Event
-//        switch event {
-//        case .adAttributionCompilationFailedForAttributedRulesList:
-//            domainEvent = .adAttributionCompilationFailedForAttributedRulesList
-//        case .adAttributionGlobalAttributedRulesDoNotExist:
-//            domainEvent = .adAttributionGlobalAttributedRulesDoNotExist
-//        case .adAttributionDetectionHeuristicsDidNotMatchDomain:
-//            domainEvent = .adAttributionDetectionHeuristicsDidNotMatchDomain
-//        case .adAttributionLogicUnexpectedStateOnRulesCompiled:
-//            domainEvent = .adAttributionLogicUnexpectedStateOnRulesCompiled
-//        case .adAttributionLogicUnexpectedStateOnInheritedAttribution:
-//            domainEvent = .adAttributionLogicUnexpectedStateOnInheritedAttribution
-//        case .adAttributionLogicUnexpectedStateOnRulesCompilationFailed:
-//            domainEvent = .adAttributionLogicUnexpectedStateOnRulesCompilationFailed
-//        case .adAttributionDetectionInvalidDomainInParameter:
-//            domainEvent = .adAttributionDetectionInvalidDomainInParameter
-//        case .adAttributionLogicRequestingAttributionTimedOut:
-//            domainEvent = .adAttributionLogicRequestingAttributionTimedOut
-//        case .adAttributionLogicWrongVendorOnSuccessfulCompilation:
-//            domainEvent = .adAttributionLogicWrongVendorOnSuccessfulCompilation
-//        case .adAttributionLogicWrongVendorOnFailedCompilation:
-//            domainEvent = .adAttributionLogicWrongVendorOnFailedCompilation
-//        }
-//
-//        Pixel.fire(pixel: domainEvent, includedParameters: [])
+        let domainEvent: Pixel.Event.Debug
+        switch event {
+        case .adAttributionCompilationFailedForAttributedRulesList:
+            domainEvent = .adAttributionCompilationFailedForAttributedRulesList
+        case .adAttributionGlobalAttributedRulesDoNotExist:
+            domainEvent = .adAttributionGlobalAttributedRulesDoNotExist
+        case .adAttributionDetectionHeuristicsDidNotMatchDomain:
+            domainEvent = .adAttributionDetectionHeuristicsDidNotMatchDomain
+        case .adAttributionLogicUnexpectedStateOnRulesCompiled:
+            domainEvent = .adAttributionLogicUnexpectedStateOnRulesCompiled
+        case .adAttributionLogicUnexpectedStateOnInheritedAttribution:
+            domainEvent = .adAttributionLogicUnexpectedStateOnInheritedAttribution
+        case .adAttributionLogicUnexpectedStateOnRulesCompilationFailed:
+            domainEvent = .adAttributionLogicUnexpectedStateOnRulesCompilationFailed
+        case .adAttributionDetectionInvalidDomainInParameter:
+            domainEvent = .adAttributionDetectionInvalidDomainInParameter
+        case .adAttributionLogicRequestingAttributionTimedOut:
+            domainEvent = .adAttributionLogicRequestingAttributionTimedOut
+        case .adAttributionLogicWrongVendorOnSuccessfulCompilation:
+            domainEvent = .adAttributionLogicWrongVendorOnSuccessfulCompilation
+        case .adAttributionLogicWrongVendorOnFailedCompilation:
+            domainEvent = .adAttributionLogicWrongVendorOnFailedCompilation
+        }
+
+        Pixel.fire(.debug(event: domainEvent, error: nil),
+                   includeAppVersionParameter: false)
     }
 }
 
