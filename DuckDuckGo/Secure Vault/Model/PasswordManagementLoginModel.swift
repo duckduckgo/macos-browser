@@ -98,13 +98,13 @@ final class PasswordManagementLoginModel: ObservableObject, PasswordManagementIt
     }
 
     func normalizedDomain(_ domain: String) -> String {
-        let trimmed = domain.trimmingWhitespaces()
+        let trimmed = domain.trimmingWhitespace()
         if !trimmed.starts(with: "https://") && !trimmed.starts(with: "http://") && trimmed.contains("://") {
             // Contains some other protocol, so don't mess with it
             return domain
         }
 
-        let noSchemeOrWWW = domain.drop(prefix: "https://").drop(prefix: "http://").dropWWW()
+        let noSchemeOrWWW = domain.dropping(prefix: "https://").dropping(prefix: "http://").droppingWwwPrefix()
         return URLComponents(string: "https://\(noSchemeOrWWW)")?.host ?? ""
     }
 

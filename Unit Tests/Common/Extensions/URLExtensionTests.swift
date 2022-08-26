@@ -22,26 +22,6 @@ import Combine
 
 final class URLExtensionTests: XCTestCase {
 
-    func test_external_urls_are_valid() {
-        XCTAssertTrue("mailto://user@host.tld".url!.isValid)
-        XCTAssertTrue("sms://+44776424232323".url!.isValid)
-        XCTAssertTrue("ftp://example.com".url!.isValid)
-    }
-
-    func test_navigational_urls_are_valid() {
-        XCTAssertTrue("http://example.com".url!.isValid)
-        XCTAssertTrue("https://example.com".url!.isValid)
-        XCTAssertTrue("http://localhost".url!.isValid)
-        XCTAssertTrue("http://localdomain".url!.isValid)
-    }
-
-    func test_when_no_scheme_in_string_url_has_scheme() {
-        XCTAssertEqual("duckduckgo.com".url!.absoluteString, "http://duckduckgo.com")
-        XCTAssertEqual("example.com".url!.absoluteString, "http://example.com")
-        XCTAssertEqual("localhost".url!.absoluteString, "http://localhost")
-        XCTAssertNil("localdomain".url)
-    }
-
     func test_makeURL_from_addressBarString() {
         let data: [(string: String, expected: String)] = [
             ("https://duckduckgo.com/?q=search string with spaces", "https://duckduckgo.com/?q=search%20string%20with%20spaces"),
@@ -103,81 +83,4 @@ final class URLExtensionTests: XCTestCase {
         }
     }
 
-    func testWhenPunycodeUrlIsCalledOnEmptyStringThenUrlIsNotReturned() {
-        XCTAssertNil(URL(trimmedAddressBarString: "")?.absoluteString)
-    }
-
-    func testWhenPunycodeUrlIsCalledOnQueryThenUrlIsNotReturned() {
-        XCTAssertNil(URL(trimmedAddressBarString: " ")?.absoluteString)
-    }
-
-    func testWhenPunycodeUrlIsCalledOnQueryWithSpaceThenUrlIsNotReturned() {
-        XCTAssertNil(URL(trimmedAddressBarString: "https://www.duckduckgo .com/html?q=search")?.absoluteString)
-        XCTAssertNil(URL(trimmedAddressBarString: "https://www.duckduckgo.com/html?q =search")?.absoluteString)
-    }
-
-    func testWhenPunycodeUrlIsCalledOnLocalHostnameThenUrlIsNotReturned() {
-        XCTAssertNil(URL(trimmedAddressBarString: "💩")?.absoluteString)
-    }
-
-    func testWhenDefineSearchRequestIsMadeItIsNotInterpretedAsLocalURL() {
-        XCTAssertNil(URL(trimmedAddressBarString: "define:300/spartans")?.absoluteString)
-    }
-
-    func testAddressBarURLParsing() {
-        let addresses = [
-            "user@somehost.local:9091/index.html",
-            "something.local:9100",
-            "user@localhost:5000",
-            "user:password@localhost:5000",
-            "localhost",
-            "localhost:5000",
-            "sms://+44123123123",
-            "mailto:test@example.com",
-            "https://",
-            "http://duckduckgo.com",
-            "https://duckduckgo.com",
-            "https://duckduckgo.com/",
-            "duckduckgo.com",
-            "duckduckgo.com/html?q=search",
-            "www.duckduckgo.com",
-            "https://www.duckduckgo.com/html?q=search",
-            "https://www.duckduckgo.com/html/?q=search",
-            "ftp://www.duckduckgo.com",
-            "file:///users/user/Documents/afile"
-        ]
-
-        for address in addresses {
-            let url = URL(trimmedAddressBarString: address)
-            var expectedString = address
-            let expectedScheme = address.split(separator: "/").first.flatMap {
-                $0.hasSuffix(":") ? String($0).drop(suffix: ":") : nil
-            }?.lowercased() ?? "http"
-            if !address.hasPrefix(expectedScheme) {
-                expectedString = expectedScheme + "://" + address
-            }
-            XCTAssertEqual(url?.scheme, expectedScheme)
-            XCTAssertEqual(url?.absoluteString, expectedString)
-        }
-    }
-
-    func testWhenPunycodeUrlIsCalledWithEncodedUrlsThenUrlIsReturned() {
-        XCTAssertEqual("http://xn--ls8h.la", "💩.la".decodedURL?.absoluteString)
-        XCTAssertEqual("http://xn--ls8h.la/", "💩.la/".decodedURL?.absoluteString)
-        XCTAssertEqual("http://82.xn--b1aew.xn--p1ai", "82.мвд.рф".decodedURL?.absoluteString)
-        XCTAssertEqual("http://xn--ls8h.la:8080", "http://💩.la:8080".decodedURL?.absoluteString)
-        XCTAssertEqual("http://xn--ls8h.la", "http://💩.la".decodedURL?.absoluteString)
-        XCTAssertEqual("https://xn--ls8h.la", "https://💩.la".decodedURL?.absoluteString)
-        XCTAssertEqual("https://xn--ls8h.la/", "https://💩.la/".decodedURL?.absoluteString)
-        XCTAssertEqual("https://xn--ls8h.la/path/to/resource", "https://💩.la/path/to/resource".decodedURL?.absoluteString)
-        XCTAssertEqual("https://xn--ls8h.la/path/to/resource?query=true", "https://💩.la/path/to/resource?query=true".decodedURL?.absoluteString)
-        XCTAssertEqual("https://xn--ls8h.la/%F0%9F%92%A9", "https://💩.la/💩".decodedURL?.absoluteString)
-    }
-
-}
-
-private extension String {
-    var decodedURL: URL? {
-        URL(trimmedAddressBarString: self)
-    }
 }

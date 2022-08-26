@@ -120,7 +120,7 @@ final class SaveCredentialsViewController: NSViewController {
             self.delegate?.shouldCloseSaveCredentialsViewController(self)
         }
 
-        var account = SecureVaultModels.WebsiteAccount(username: usernameField.stringValue.trimmingWhitespaces(),
+        var account = SecureVaultModels.WebsiteAccount(username: usernameField.stringValue.trimmingWhitespace(),
                                                        domain: domainLabel.stringValue)
         account.id = credentials?.account.id
         let credentials = SecureVaultModels.WebsiteCredentials(account: account, password: passwordData)
@@ -169,7 +169,7 @@ final class SaveCredentialsViewController: NSViewController {
             return
         }
 
-        let alert = NSAlert.fireproofAlert(with: host.dropWWW())
+        let alert = NSAlert.fireproofAlert(with: host.droppingWwwPrefix())
         alert.beginSheetModal(for: window) { response in
             if response == NSApplication.ModalResponse.alertFirstButtonReturn {
                 Pixel.fire(.fireproof(kind: .pwm, suggested: .suggested))
