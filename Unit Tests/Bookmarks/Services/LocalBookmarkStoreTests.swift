@@ -350,7 +350,7 @@ final class LocalBookmarkStoreTests: XCTestCase {
         waitForExpectations(timeout: 3, handler: nil)
     }
 
-    func testWhenBookmarksAreImported_AndDuplicatesExist_ThenNoBookmarksAreImported() async {
+    func testWhenBookmarksAreImported_AndDuplicatesExist_ThenBookmarksAreStillImported() async {
         let container = CoreData.bookmarkContainer()
         let context = container.viewContext
         let bookmarkStore = LocalBookmarkStore(context: context)
@@ -360,8 +360,8 @@ final class LocalBookmarkStoreTests: XCTestCase {
         _ = bookmarkStore.importBookmarks(importedBookmarks, source: .safari)
         let result = bookmarkStore.importBookmarks(importedBookmarks, source: .safari)
 
-        XCTAssertEqual(result.successful, 0)
-        XCTAssertEqual(result.duplicates, 2)
+        XCTAssertEqual(result.successful, 2)
+        XCTAssertEqual(result.duplicates, 0)
         XCTAssertEqual(result.failed, 0)
 
         let loadResult = await bookmarkStore.loadAll(type: .bookmarks)
@@ -451,7 +451,7 @@ final class LocalBookmarkStoreTests: XCTestCase {
         }
     }
     
-    func createMockImportedBookmarks() -> ImportedBookmarks {
+    private func createMockImportedBookmarks() -> ImportedBookmarks {
         let bookmark1 = ImportedBookmarks.BookmarkOrFolder(name: "DuckDuckGo", type: "bookmark", urlString: "https://duckduckgo.com", children: nil)
         let bookmark2 = ImportedBookmarks.BookmarkOrFolder(name: "Duck", type: "bookmark", urlString: "https://duck.com", children: nil)
         let folder1 = ImportedBookmarks.BookmarkOrFolder(name: "Folder", type: "folder", urlString: nil, children: [bookmark2])
