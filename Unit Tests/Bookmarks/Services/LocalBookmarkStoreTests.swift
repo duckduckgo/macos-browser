@@ -399,20 +399,56 @@ final class LocalBookmarkStoreTests: XCTestCase {
         
         switch bookmarksResult {
         case .success(let bookmarks):
+            var totalFavorites = 0
+
             for bookmarkEntity in bookmarks {
-                if let bookmark = bookmarkEntity as? Bookmark {
-                    print(bookmark)
-                } else {
-                    XCTFail("Failed to get Bookmark from BaseBookmarkEntity")
+                if let bookmark = bookmarkEntity as? Bookmark, bookmark.isFavorite {
+                    totalFavorites += 1
                 }
             }
+            
+            XCTAssertEqual(totalFavorites, 1)
         case .failure:
             XCTFail("Did not expect failure when checking bookmarksResult")
         }
     }
     
-    func testWhenSafariBookmarksAreImported_AndTheBookmarksStoreIsNotEmpty_ThenBookmarksAreImportedToTheirOwnFolder_AndNoBookmarksAreFavorited() {
+    func testWhenSafariBookmarksAreImported_AndTheBookmarksStoreIsNotEmpty_ThenBookmarksAreImportedToTheirOwnFolder_AndNoBookmarksAreFavorited() async {
+        let container = CoreData.bookmarkContainer()
+        let context = container.viewContext
+        let bookmarkStore = LocalBookmarkStore(context: context)
+        let importedBookmarks = createMockImportedBookmarks()
+
+        // Import Safari bookmarks twice, one to initially populate the store and again to create the "Imported from Safari" folder.
+        _ = bookmarkStore.importBookmarks(importedBookmarks, source: .safari)
+        _ = bookmarkStore.importBookmarks(importedBookmarks, source: .safari)
+
+        let topLevelEntitiesResult = await bookmarkStore.loadAll(type: .topLevelEntities)
+        let bookmarksResult = await bookmarkStore.loadAll(type: .bookmarks)
         
+        switch topLevelEntitiesResult {
+        case .success(let entities):
+            XCTAssert(entities.contains(where: { $0.title == "DuckDuckGo" }))
+            XCTAssert(entities.contains(where: { $0.title == "Folder" }))
+            XCTAssert(entities.contains(where: { $0.title == "Imported from Safari" }))
+        case .failure:
+            XCTFail("Did not expect failure when checking topLevelEntitiesResult")
+        }
+        
+        switch bookmarksResult {
+        case .success(let bookmarks):
+            var totalFavorites = 0
+
+            for bookmarkEntity in bookmarks {
+                if let bookmark = bookmarkEntity as? Bookmark, bookmark.isFavorite {
+                    totalFavorites += 1
+                }
+            }
+            
+            XCTAssertEqual(totalFavorites, 1)
+        case .failure:
+            XCTFail("Did not expect failure when checking bookmarksResult")
+        }
     }
     
     func createMockImportedBookmarks() -> ImportedBookmarks {

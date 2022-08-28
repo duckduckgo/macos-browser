@@ -580,12 +580,17 @@ final class LocalBookmarkStore: BookmarkStore {
                                                    bookmarkURLs: Set<URL>) -> BookmarkImportResult {
         
         var total = BookmarkImportResult(successful: 0, duplicates: 0, failed: 0)
-        
+        var parent: BookmarkManagedObject?
+
+        if rootLevelFolder?.children?.count != 0 {
+            parent = createFolder(titled: "Imported from Safari", in: self.context)
+        }
+
         if let bookmarksBar = bookmarks.topLevelFolders.bookmarkBar.children {
             let result = recursivelyCreateEntities(from: bookmarksBar,
-                                                   parent: nil,
+                                                   parent: parent,
                                                    existingBookmarkURLs: bookmarkURLs,
-                                                   markBookmarksAsFavorite: true,
+                                                   markBookmarksAsFavorite: (parent == nil),
                                                    in: self.context)
 
             total += result
@@ -593,7 +598,7 @@ final class LocalBookmarkStore: BookmarkStore {
 
         if let otherBookmarks = bookmarks.topLevelFolders.otherBookmarks.children {
             let result = recursivelyCreateEntities(from: otherBookmarks,
-                                                   parent: nil,
+                                                   parent: parent,
                                                    existingBookmarkURLs: bookmarkURLs,
                                                    markBookmarksAsFavorite: false,
                                                    in: self.context)
@@ -657,12 +662,6 @@ final class LocalBookmarkStore: BookmarkStore {
         var total = BookmarkImportResult(successful: 0, duplicates: 0, failed: 0)
 
         for bookmarkOrFolder in bookmarks {
-            if let bookmarkURL = bookmarkOrFolder.url, existingBookmarkURLs.contains(bookmarkURL) {
-                // Avoid creating bookmarks that already exist in the database.
-                total.duplicates += 1
-                continue
-            }
-
             if bookmarkOrFolder.isInvalidBookmark {
                 // Skip importing bookmarks that don't have a valid URL
                 total.failed += 1
