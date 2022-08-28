@@ -581,12 +581,9 @@ final class LocalBookmarkStore: BookmarkStore {
         
         var total = BookmarkImportResult(successful: 0, duplicates: 0, failed: 0)
         
-        let existingFolder = allFolders.first { ($0.titleEncrypted as? String) == UserText.bookmarkImportImportedFavorites }
-        let parent = existingFolder ?? createFolder(titled: UserText.bookmarkImportImportedFavorites, in: self.context)
-        
         if let bookmarksBar = bookmarks.topLevelFolders.bookmarkBar.children {
             let result = recursivelyCreateEntities(from: bookmarksBar,
-                                                   parent: parent,
+                                                   parent: nil,
                                                    existingBookmarkURLs: bookmarkURLs,
                                                    markBookmarksAsFavorite: true,
                                                    in: self.context)
@@ -688,7 +685,7 @@ final class LocalBookmarkStore: BookmarkStore {
                 let result = recursivelyCreateEntities(from: children,
                                                        parent: bookmarkManagedObject,
                                                        existingBookmarkURLs: existingBookmarkURLs,
-                                                       markBookmarksAsFavorite: markBookmarksAsFavorite,
+                                                       markBookmarksAsFavorite: false,
                                                        in: context)
 
                 total += result
