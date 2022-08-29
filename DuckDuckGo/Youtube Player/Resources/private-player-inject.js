@@ -1,1 +1,1 @@
-alert("I'm injected on the private player")
+alert("Private player JS injection")
