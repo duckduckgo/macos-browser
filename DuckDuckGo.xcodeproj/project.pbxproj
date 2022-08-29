@@ -10,6 +10,7 @@
 		0230C0A3272080090018F728 /* KeyedCodingExtension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0230C0A2272080090018F728 /* KeyedCodingExtension.swift */; };
 		0230C0A52721F3750018F728 /* GPCRequestFactory.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0230C0A42721F3750018F728 /* GPCRequestFactory.swift */; };
 		026ADE1426C3010C002518EE /* macos-config.json in Resources */ = {isa = PBXBuildFile; fileRef = 026ADE1326C3010C002518EE /* macos-config.json */; };
+		1071390328BD08F3009DB05E /* fallback.js in Resources */ = {isa = PBXBuildFile; fileRef = 1071390228BD08F3009DB05E /* fallback.js */; };
 		142879DA24CE1179005419BB /* SuggestionViewModelTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 142879D924CE1179005419BB /* SuggestionViewModelTests.swift */; };
 		142879DC24CE1185005419BB /* SuggestionContainerViewModelTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 142879DB24CE1185005419BB /* SuggestionContainerViewModelTests.swift */; };
 		1430DFF524D0580F00B8978C /* TabBarViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1430DFF424D0580F00B8978C /* TabBarViewController.swift */; };
@@ -832,6 +833,7 @@
 		0230C0A2272080090018F728 /* KeyedCodingExtension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KeyedCodingExtension.swift; sourceTree = "<group>"; };
 		0230C0A42721F3750018F728 /* GPCRequestFactory.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GPCRequestFactory.swift; sourceTree = "<group>"; };
 		026ADE1326C3010C002518EE /* macos-config.json */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.json; path = "macos-config.json"; sourceTree = "<group>"; };
+		1071390228BD08F3009DB05E /* fallback.js */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.javascript; path = fallback.js; sourceTree = "<group>"; };
 		142879D924CE1179005419BB /* SuggestionViewModelTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SuggestionViewModelTests.swift; sourceTree = "<group>"; };
 		142879DB24CE1185005419BB /* SuggestionContainerViewModelTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SuggestionContainerViewModelTests.swift; sourceTree = "<group>"; };
 		1430DFF424D0580F00B8978C /* TabBarViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TabBarViewController.swift; sourceTree = "<group>"; };
@@ -1751,6 +1753,7 @@
 			isa = PBXGroup;
 			children = (
 				31F63C2428AD622500C5AD60 /* darkreader.js */,
+				1071390228BD08F3009DB05E /* fallback.js */,
 				31BC108F28AE7997005973EA /* dark-sites.config */,
 			);
 			path = Resources;
@@ -4455,6 +4458,7 @@
 				EAA29AEA278D2E43007070CF /* ProximaNova-Reg-webfont.woff2 in Resources */,
 				EAFAD6CA2728BD1200F9DF00 /* clickToLoad.js in Resources */,
 				336D5B18262D8D3C0052E0C9 /* findinpage.js in Resources */,
+				1071390328BD08F3009DB05E /* fallback.js in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
