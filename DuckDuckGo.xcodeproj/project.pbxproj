@@ -20,6 +20,7 @@
 		3139B9D328B805C5008ACAD5 /* PrivateYoutubeDiscoveryView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3139B9D228B805C5008ACAD5 /* PrivateYoutubeDiscoveryView.swift */; };
 		3139B9D528B805FC008ACAD5 /* PrivateYoutubePopoverManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3139B9D428B805FC008ACAD5 /* PrivateYoutubePopoverManager.swift */; };
 		313AEDA1287CAD1D00E1E8F4 /* CookieConsentUserPermissionView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 313AEDA0287CAD1D00E1E8F4 /* CookieConsentUserPermissionView.swift */; };
+		31441D9B28BD33D1008E3EA3 /* private-player-inject.js in Resources */ = {isa = PBXBuildFile; fileRef = 31441D9A28BD33D1008E3EA3 /* private-player-inject.js */; };
 		31680D0828B92E4E007BA7DA /* youtube-inject.js in Resources */ = {isa = PBXBuildFile; fileRef = 31680D0728B92E4E007BA7DA /* youtube-inject.js */; };
 		31680D0A28B92F82007BA7DA /* YoutubePlayerUserScript.swift in Sources */ = {isa = PBXBuildFile; fileRef = 31680D0928B92F82007BA7DA /* YoutubePlayerUserScript.swift */; };
 		3171D6B82889849F0068632A /* CookieManagedNotificationView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3171D6B72889849F0068632A /* CookieManagedNotificationView.swift */; };
@@ -837,6 +838,7 @@
 		3139B9D228B805C5008ACAD5 /* PrivateYoutubeDiscoveryView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PrivateYoutubeDiscoveryView.swift; sourceTree = "<group>"; };
 		3139B9D428B805FC008ACAD5 /* PrivateYoutubePopoverManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PrivateYoutubePopoverManager.swift; sourceTree = "<group>"; };
 		313AEDA0287CAD1D00E1E8F4 /* CookieConsentUserPermissionView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CookieConsentUserPermissionView.swift; sourceTree = "<group>"; };
+		31441D9A28BD33D1008E3EA3 /* private-player-inject.js */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.javascript; path = "private-player-inject.js"; sourceTree = "<group>"; };
 		31680D0728B92E4E007BA7DA /* youtube-inject.js */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.javascript; path = "youtube-inject.js"; sourceTree = "<group>"; };
 		31680D0928B92F82007BA7DA /* YoutubePlayerUserScript.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = YoutubePlayerUserScript.swift; sourceTree = "<group>"; };
 		3171D6B72889849F0068632A /* CookieManagedNotificationView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CookieManagedNotificationView.swift; sourceTree = "<group>"; };
@@ -1790,6 +1792,7 @@
 			children = (
 				37479F1028912C0B00302FE2 /* youtube_player_template.html */,
 				31680D0728B92E4E007BA7DA /* youtube-inject.js */,
+				31441D9A28BD33D1008E3EA3 /* private-player-inject.js */,
 			);
 			path = Resources;
 			sourceTree = "<group>";
@@ -4383,6 +4386,7 @@
 				EA18D1CA272F0DC8006DC101 /* social_images in Resources */,
 				AA7EB6E927E880A600036718 /* shield-dot-mouse-over.json in Resources */,
 				AA80EC8F256C49BC007083E7 /* Localizable.stringsdict in Resources */,
+				31441D9B28BD33D1008E3EA3 /* private-player-inject.js in Resources */,
 				EAC80DE0271F6C0100BBF02D /* fb-sdk.js in Resources */,
 				85625994269C8F9600EE44BC /* PasswordManager.storyboard in Resources */,
 				AA7EB6E327E7D05500036718 /* dark-flame-mouse-over.json in Resources */,

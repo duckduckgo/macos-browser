@@ -70,5 +70,9 @@ struct YoutubePlayer {
 
     func load(in webView: WKWebView) {
         webView.loadHTMLString(htmlString, baseURL: .localYoutubeURL(for: videoID))
+        guard let fileURL = Bundle.main.url(forResource: "private-player-inject", withExtension: "js"),
+              let template = try? String(contentsOf: fileURL) else { return }
+
+        webView.evaluateJavaScript(template)
     }
 }
