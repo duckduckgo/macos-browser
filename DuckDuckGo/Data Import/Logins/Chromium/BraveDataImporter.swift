@@ -23,6 +23,10 @@ final class BraveDataImporter: ChromiumDataImporter {
     override var processName: String {
         return "Brave"
     }
+    
+    override var source: DataImport.Source {
+        return .brave
+    }
 
     init(loginImporter: LoginImporter, bookmarkImporter: BookmarkImporter) {
         let applicationSupport = FileManager.default.urls(for: .applicationSupportDirectory, in: .userDomainMask).first!

@@ -23,6 +23,10 @@ final class ChromeDataImporter: ChromiumDataImporter {
     override var processName: String {
         return "Chrome"
     }
+    
+    override var source: DataImport.Source {
+        return .chrome
+    }
 
     init(loginImporter: LoginImporter, bookmarkImporter: BookmarkImporter) {
         let applicationSupport = FileManager.default.urls(for: .applicationSupportDirectory, in: .userDomainMask).first!

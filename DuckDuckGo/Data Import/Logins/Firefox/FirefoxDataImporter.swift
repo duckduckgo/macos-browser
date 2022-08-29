@@ -103,7 +103,7 @@ final class FirefoxDataImporter: DataImporter {
             switch bookmarkResult {
             case .success(let bookmarks):
                 do {
-                    summary.bookmarksResult = try bookmarkImporter.importBookmarks(bookmarks, source: .firefox)
+                    summary.bookmarksResult = try bookmarkImporter.importBookmarks(bookmarks, source: .thirdPartyBrowser(.firefox))
                 } catch {
                     guard let error = error as? FirefoxBookmarksReader.ImportError else {
                         completion(.failure(.bookmarks(.unexpectedBookmarksDatabaseFormat)))

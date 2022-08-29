@@ -368,19 +368,43 @@ final class LocalBookmarkStoreTests: XCTestCase {
         
         switch loadResult {
         case .success(let bookmarks):
-            XCTAssertEqual(bookmarks.count, 2)
+            XCTAssertEqual(bookmarks.count, 4)
         case .failure:
             XCTFail("Did not expect failure")
         }
     }
 
     func testWhenSafariBookmarksAreImported_AndTheBookmarksStoreIsEmpty_ThenBookmarksAreImportedToTheRootFolder_AndRootBookmarksAreFavorited() async {
+        await validateInitialImport(for: .safari)
+    }
+    
+    func testWhenChromeBookmarksAreImported_AndTheBookmarksStoreIsEmpty_ThenBookmarksAreImportedToTheRootFolder_AndRootBookmarksAreFavorited() async {
+        await validateInitialImport(for: .chromium)
+    }
+    
+    func testWhenFirefoxBookmarksAreImported_AndTheBookmarksStoreIsEmpty_ThenBookmarksAreImportedToTheRootFolder_AndRootBookmarksAreFavorited() async {
+        await validateInitialImport(for: .firefox)
+    }
+    
+    func testWhenSafariBookmarksAreImported_AndTheBookmarksStoreIsNotEmpty_ThenBookmarksAreImportedToTheirOwnFolder_AndNoBookmarksAreFavorited() async {
+        await validateSubsequentImport(for: .safari)
+    }
+    
+    func testWhenChromeBookmarksAreImported_AndTheBookmarksStoreIsNotEmpty_ThenBookmarksAreImportedToTheirOwnFolder_AndNoBookmarksAreFavorited() async {
+        await validateSubsequentImport(for: .chromium)
+    }
+    
+    func testWhenFirefoxBookmarksAreImported_AndTheBookmarksStoreIsNotEmpty_ThenBookmarksAreImportedToTheirOwnFolder_AndNoBookmarksAreFavorited() async {
+        await validateSubsequentImport(for: .firefox)
+    }
+    
+    private func validateInitialImport(for source: BookmarkImportSource) async {
         let container = CoreData.bookmarkContainer()
         let context = container.viewContext
         let bookmarkStore = LocalBookmarkStore(context: context)
         let importedBookmarks = createMockImportedBookmarks()
 
-        let result = bookmarkStore.importBookmarks(importedBookmarks, source: .safari)
+        let result = bookmarkStore.importBookmarks(importedBookmarks, source: source)
 
         XCTAssertEqual(result.successful, 2)
         XCTAssertEqual(result.duplicates, 0)
@@ -413,15 +437,15 @@ final class LocalBookmarkStoreTests: XCTestCase {
         }
     }
     
-    func testWhenSafariBookmarksAreImported_AndTheBookmarksStoreIsNotEmpty_ThenBookmarksAreImportedToTheirOwnFolder_AndNoBookmarksAreFavorited() async {
+    private func validateSubsequentImport(for source: BookmarkImportSource) async {
         let container = CoreData.bookmarkContainer()
         let context = container.viewContext
         let bookmarkStore = LocalBookmarkStore(context: context)
         let importedBookmarks = createMockImportedBookmarks()
 
-        // Import Safari bookmarks twice, one to initially populate the store and again to create the "Imported from Safari" folder.
-        _ = bookmarkStore.importBookmarks(importedBookmarks, source: .safari)
-        _ = bookmarkStore.importBookmarks(importedBookmarks, source: .safari)
+        // Import bookmarks twice, one to initially populate the store and again to create the "Imported from [Browser]" folder.
+        _ = bookmarkStore.importBookmarks(importedBookmarks, source: source)
+        _ = bookmarkStore.importBookmarks(importedBookmarks, source: source)
 
         let topLevelEntitiesResult = await bookmarkStore.loadAll(type: .topLevelEntities)
         let bookmarksResult = await bookmarkStore.loadAll(type: .bookmarks)

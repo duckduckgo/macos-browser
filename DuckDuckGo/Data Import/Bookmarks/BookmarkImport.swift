@@ -18,11 +18,9 @@
 
 import Foundation
 
-enum BookmarkImportSource {
-    case chromium
+enum BookmarkImportSource: Equatable {
     case duckduckgoWebKit
-    case firefox
-    case safari
+    case thirdPartyBrowser(DataImport.Source)
 }
 
 protocol BookmarkImporter {

@@ -71,7 +71,7 @@ internal class SafariDataImporter: DataImporter {
             switch bookmarkResult {
             case .success(let bookmarks):
                 do {
-                    summary.bookmarksResult = try bookmarkImporter.importBookmarks(bookmarks, source: .safari)
+                    summary.bookmarksResult = try bookmarkImporter.importBookmarks(bookmarks, source: .thirdPartyBrowser(.safari))
                 } catch {
                     completion(.failure(.bookmarks(.cannotAccessCoreData)))
                     return

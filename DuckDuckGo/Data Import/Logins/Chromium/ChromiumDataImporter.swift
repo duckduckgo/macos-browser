@@ -23,6 +23,10 @@ internal class ChromiumDataImporter: DataImporter {
     var processName: String {
         fatalError("Subclasses must provide their own process name")
     }
+    
+    var source: DataImport.Source {
+        fatalError("Subclasses must return a source")
+    }
 
     private let applicationDataDirectoryURL: URL
     private let bookmarkImporter: BookmarkImporter
@@ -70,7 +74,7 @@ internal class ChromiumDataImporter: DataImporter {
             switch bookmarkResult {
             case .success(let bookmarks):
                 do {
-                    summary.bookmarksResult = try bookmarkImporter.importBookmarks(bookmarks, source: .chromium)
+                    summary.bookmarksResult = try bookmarkImporter.importBookmarks(bookmarks, source: .thirdPartyBrowser(source))
                 } catch {
                     completion(.failure(.bookmarks(.cannotAccessSecureVault)))
                     return

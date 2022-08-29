@@ -106,9 +106,11 @@ final class BookmarkHTMLReader {
         if cursor?.rootDocument?.isDDGBookmarksDocument == true {
             return .duckduckgoWebKit
         }
+
         if isInSafariFormat {
-            return .safari
+            return .thirdPartyBrowser(.bookmarksHTML)
         }
+
         return nil
     }
 
@@ -261,10 +263,10 @@ final class BookmarkHTMLReader {
 private extension BookmarkImportSource {
     var supportsSafariBookmarksHTMLFormat: Bool {
         switch self {
-        case .duckduckgoWebKit, .safari:
+        case .duckduckgoWebKit:
             return true
-        default:
-            return false
+        case .thirdPartyBrowser(let browser):
+            return browser == .safari
         }
     }
 }

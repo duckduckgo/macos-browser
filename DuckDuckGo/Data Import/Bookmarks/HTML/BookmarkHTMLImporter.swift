@@ -47,7 +47,7 @@ final class BookmarkHTMLImporter: DataImporter {
             case let .success(importedData):
                 do {
                     // default to anything that is not Safari or DDG (which require special handling)
-                    let source: BookmarkImportSource = importedData.source ?? .chromium
+                    let source: BookmarkImportSource = importedData.source ?? .thirdPartyBrowser(.bookmarksHTML)
                     let bookmarksResult = try self.bookmarkImporter.importBookmarks(importedData.bookmarks, source: source)
                     DispatchQueue.main.async {
                         completion(.success(.init(bookmarksResult: bookmarksResult)))

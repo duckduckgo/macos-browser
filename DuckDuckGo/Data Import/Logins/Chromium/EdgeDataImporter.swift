@@ -23,6 +23,10 @@ final class EdgeDataImporter: ChromiumDataImporter {
     override var processName: String {
         return "Microsoft Edge"
     }
+    
+    override var source: DataImport.Source {
+        return .edge
+    }
 
     init(loginImporter: LoginImporter, bookmarkImporter: BookmarkImporter) {
         let applicationSupport = FileManager.default.urls(for: .applicationSupportDirectory, in: .userDomainMask).first!
