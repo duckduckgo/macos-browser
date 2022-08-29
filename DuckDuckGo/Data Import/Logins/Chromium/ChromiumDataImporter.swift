@@ -31,11 +31,13 @@ internal class ChromiumDataImporter: DataImporter {
     private let applicationDataDirectoryURL: URL
     private let bookmarkImporter: BookmarkImporter
     private let loginImporter: LoginImporter
+    private let faviconManager: FaviconManagement
 
-    init(applicationDataDirectoryURL: URL, loginImporter: LoginImporter, bookmarkImporter: BookmarkImporter) {
+    init(applicationDataDirectoryURL: URL, loginImporter: LoginImporter, bookmarkImporter: BookmarkImporter, faviconManager: FaviconManagement) {
         self.applicationDataDirectoryURL = applicationDataDirectoryURL
         self.loginImporter = loginImporter
         self.bookmarkImporter = bookmarkImporter
+        self.faviconManager = faviconManager
     }
 
     func importableTypes() -> [DataImport.DataType] {
@@ -70,7 +72,30 @@ internal class ChromiumDataImporter: DataImporter {
         if types.contains(.bookmarks) {
             let bookmarkReader = ChromiumBookmarksReader(chromiumDataDirectoryURL: dataDirectoryURL)
             let bookmarkResult = bookmarkReader.readBookmarks()
+            
+            let faviconsReader = ChromiumFaviconsReader(chromiumDataDirectoryURL: dataDirectoryURL)
+            let faviconsResult = faviconsReader.readFavicons()
 
+            switch faviconsResult {
+            case .success(let faviconsByURL):
+                for (pageURLString, fetchedFavicons) in faviconsByURL {
+                    if let pageURL = URL(string: pageURLString) {
+                        let favicons = fetchedFavicons.map {
+                            Favicon(identifier: UUID(),
+                                    url: pageURL,
+                                    image: $0.image,
+                                    relation: .icon,
+                                    documentUrl: pageURL,
+                                    dateCreated: Date())
+                        }
+                        
+                        faviconManager.handleFavicons(favicons, documentUrl: pageURL)
+                    }
+                }
+                
+            case .failure: break // TODO: Send pixel if favicon import fails completely
+            }
+            
             switch bookmarkResult {
             case .success(let bookmarks):
                 do {

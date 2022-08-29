@@ -138,8 +138,6 @@ final class FaviconManager: FaviconManagement {
     }
     
     func handleFavicons(_ newFavicons: [Favicon], documentUrl: URL) {
-        print("Handling favicons for \(documentUrl)")
-
         // Insert new favicons to cache
         newFavicons.forEach { newFavicon in
             self.imageCache.insert(newFavicon)

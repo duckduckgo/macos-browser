@@ -108,6 +108,7 @@
 		4B0511E2262CAA8600F6079C /* NSViewControllerExtension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B0511E0262CAA8600F6079C /* NSViewControllerExtension.swift */; };
 		4B0511E7262CAB3700F6079C /* UserDefaultsWrapperUtilities.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B0511E6262CAB3700F6079C /* UserDefaultsWrapperUtilities.swift */; };
 		4B0A63E8289DB58E00378EF7 /* FirefoxFaviconsReader.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B0A63E7289DB58E00378EF7 /* FirefoxFaviconsReader.swift */; };
+		4B0AACAC28BC63ED001038AC /* ChromiumFaviconsReader.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B0AACAB28BC63ED001038AC /* ChromiumFaviconsReader.swift */; };
 		4B11060525903E570039B979 /* CoreDataEncryptionTesting.xcdatamodeld in Sources */ = {isa = PBXBuildFile; fileRef = 4B11060325903E570039B979 /* CoreDataEncryptionTesting.xcdatamodeld */; };
 		4B11060A25903EAC0039B979 /* CoreDataEncryptionTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B11060925903EAC0039B979 /* CoreDataEncryptionTests.swift */; };
 		4B117F7D276C0CB5002F3D8C /* LocalStatisticsStoreTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B117F7C276C0CB5002F3D8C /* LocalStatisticsStoreTests.swift */; };
@@ -921,6 +922,7 @@
 		4B0511E0262CAA8600F6079C /* NSViewControllerExtension.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = NSViewControllerExtension.swift; sourceTree = "<group>"; };
 		4B0511E6262CAB3700F6079C /* UserDefaultsWrapperUtilities.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UserDefaultsWrapperUtilities.swift; sourceTree = "<group>"; };
 		4B0A63E7289DB58E00378EF7 /* FirefoxFaviconsReader.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FirefoxFaviconsReader.swift; sourceTree = "<group>"; };
+		4B0AACAB28BC63ED001038AC /* ChromiumFaviconsReader.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChromiumFaviconsReader.swift; sourceTree = "<group>"; };
 		4B11060425903E570039B979 /* CoreDataEncryptionTesting.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = CoreDataEncryptionTesting.xcdatamodel; sourceTree = "<group>"; };
 		4B11060925903EAC0039B979 /* CoreDataEncryptionTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CoreDataEncryptionTests.swift; sourceTree = "<group>"; };
 		4B117F7C276C0CB5002F3D8C /* LocalStatisticsStoreTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LocalStatisticsStoreTests.swift; sourceTree = "<group>"; };
@@ -2292,6 +2294,7 @@
 			isa = PBXGroup;
 			children = (
 				4BB99CF926FE191E001E4761 /* ChromiumBookmarksReader.swift */,
+				4B0AACAB28BC63ED001038AC /* ChromiumFaviconsReader.swift */,
 				4BB99CFA26FE191E001E4761 /* ImportedBookmarks.swift */,
 			);
 			path = Chromium;
@@ -4579,6 +4582,7 @@
 				4B29759C28284DBC00187C4E /* FirefoxBerkeleyDatabaseReader.m in Sources */,
 				4B78A86B26BB3ADD0071BB16 /* BrowserImportSummaryViewController.swift in Sources */,
 				AA512D1424D99D9800230283 /* FaviconManager.swift in Sources */,
+				4B0AACAC28BC63ED001038AC /* ChromiumFaviconsReader.swift in Sources */,
 				AABEE6AB24ACA0F90043105B /* SuggestionTableRowView.swift in Sources */,
 				37CD54CB27F2FDD100F1F7B9 /* DownloadsPreferences.swift in Sources */,
 				4B9292AA26670D3700AD2C21 /* Bookmark.xcmappingmodel in Sources */,

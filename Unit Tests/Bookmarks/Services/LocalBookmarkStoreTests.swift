@@ -331,7 +331,7 @@ final class LocalBookmarkStoreTests: XCTestCase {
         let topLevelFolders = ImportedBookmarks.TopLevelFolders(bookmarkBar: bookmarkBar, otherBookmarks: otherBookmarks)
         let importedBookmarks = ImportedBookmarks(topLevelFolders: topLevelFolders)
 
-        let result = bookmarkStore.importBookmarks(importedBookmarks, source: .safari)
+        let result = bookmarkStore.importBookmarks(importedBookmarks, source: .thirdPartyBrowser(.safari))
 
         XCTAssertEqual(result.successful, 1)
         XCTAssertEqual(result.duplicates, 0)
@@ -357,8 +357,8 @@ final class LocalBookmarkStoreTests: XCTestCase {
         let importedBookmarks = createMockImportedBookmarks()
 
         // Import bookmarks once, and then again to test duplicates
-        _ = bookmarkStore.importBookmarks(importedBookmarks, source: .safari)
-        let result = bookmarkStore.importBookmarks(importedBookmarks, source: .safari)
+        _ = bookmarkStore.importBookmarks(importedBookmarks, source: .thirdPartyBrowser(.safari))
+        let result = bookmarkStore.importBookmarks(importedBookmarks, source: .thirdPartyBrowser(.safari))
 
         XCTAssertEqual(result.successful, 2)
         XCTAssertEqual(result.duplicates, 0)
@@ -375,27 +375,27 @@ final class LocalBookmarkStoreTests: XCTestCase {
     }
 
     func testWhenSafariBookmarksAreImported_AndTheBookmarksStoreIsEmpty_ThenBookmarksAreImportedToTheRootFolder_AndRootBookmarksAreFavorited() async {
-        await validateInitialImport(for: .safari)
+        await validateInitialImport(for: .thirdPartyBrowser(.safari))
     }
     
     func testWhenChromeBookmarksAreImported_AndTheBookmarksStoreIsEmpty_ThenBookmarksAreImportedToTheRootFolder_AndRootBookmarksAreFavorited() async {
-        await validateInitialImport(for: .chromium)
+        await validateInitialImport(for: .thirdPartyBrowser(.chrome))
     }
     
     func testWhenFirefoxBookmarksAreImported_AndTheBookmarksStoreIsEmpty_ThenBookmarksAreImportedToTheRootFolder_AndRootBookmarksAreFavorited() async {
-        await validateInitialImport(for: .firefox)
+        await validateInitialImport(for: .thirdPartyBrowser(.firefox))
     }
     
     func testWhenSafariBookmarksAreImported_AndTheBookmarksStoreIsNotEmpty_ThenBookmarksAreImportedToTheirOwnFolder_AndNoBookmarksAreFavorited() async {
-        await validateSubsequentImport(for: .safari)
+        await validateSubsequentImport(for: .thirdPartyBrowser(.safari))
     }
     
     func testWhenChromeBookmarksAreImported_AndTheBookmarksStoreIsNotEmpty_ThenBookmarksAreImportedToTheirOwnFolder_AndNoBookmarksAreFavorited() async {
-        await validateSubsequentImport(for: .chromium)
+        await validateSubsequentImport(for: .thirdPartyBrowser(.chrome))
     }
     
     func testWhenFirefoxBookmarksAreImported_AndTheBookmarksStoreIsNotEmpty_ThenBookmarksAreImportedToTheirOwnFolder_AndNoBookmarksAreFavorited() async {
-        await validateSubsequentImport(for: .firefox)
+        await validateSubsequentImport(for: .thirdPartyBrowser(.firefox))
     }
     
     private func validateInitialImport(for source: BookmarkImportSource) async {
@@ -454,7 +454,7 @@ final class LocalBookmarkStoreTests: XCTestCase {
         case .success(let entities):
             XCTAssert(entities.contains(where: { $0.title == "DuckDuckGo" }))
             XCTAssert(entities.contains(where: { $0.title == "Folder" }))
-            XCTAssert(entities.contains(where: { $0.title == "Imported from Safari" }))
+            XCTAssert(entities.contains(where: { $0.title == "Imported from" }))
         case .failure:
             XCTFail("Did not expect failure when checking topLevelEntitiesResult")
         }
