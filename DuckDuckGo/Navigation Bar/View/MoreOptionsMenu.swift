@@ -23,6 +23,7 @@ import BrowserServicesKit
 
 protocol OptionsButtonMenuDelegate: AnyObject {
     
+    func optionsButtonMenuRequestedBookmarkThisPage(_ sender: NSMenuItem)
     func optionsButtonMenuRequestedBookmarkPopover(_ menu: NSMenu)
     func optionsButtonMenuRequestedToggleBookmarksBar(_ menu: NSMenu)
     func optionsButtonMenuRequestedBookmarkManagementInterface(_ menu: NSMenu)
@@ -108,6 +109,10 @@ final class MoreOptionsMenu: NSMenu {
         selectedTabViewModel.tab.requestFireproofToggle()
     }
 
+    @objc func bookmarkPage(_ sender: NSMenuItem) {
+        actionDelegate?.optionsButtonMenuRequestedBookmarkThisPage(sender)
+    }
+    
     @objc func openBookmarks(_ sender: NSMenuItem) {
         actionDelegate?.optionsButtonMenuRequestedBookmarkPopover(self)
     }
@@ -193,7 +198,7 @@ final class MoreOptionsMenu: NSMenu {
     }
 
     private func addUtilityItems() {
-        let bookmarksSubMenu = BookmarksSubMenu(targetting: self)
+        let bookmarksSubMenu = BookmarksSubMenu(targetting: self, tabCollectionViewModel: tabCollectionViewModel)
         
         addItem(withTitle: UserText.bookmarks, action: #selector(openBookmarks), keyEquivalent: "")
             .targetting(self)
@@ -368,16 +373,26 @@ final class ZoomSubMenu: NSMenu {
 
 final class BookmarksSubMenu: NSMenu {
     
-    init(targetting target: AnyObject) {
+    init(targetting target: AnyObject, tabCollectionViewModel: TabCollectionViewModel) {
         super.init(title: UserText.passwordManagement)
-        updateMenuItems(with: target)
+        self.autoenablesItems = false
+        updateMenuItems(with: tabCollectionViewModel, target: target)
     }
 
     required init(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
 
-    private func updateMenuItems(with target: AnyObject) {
+    private func updateMenuItems(with tabCollectionViewModel: TabCollectionViewModel, target: AnyObject) {
+        let bookmarkPageItem = addItem(withTitle: UserText.bookmarkThisPage, action: #selector(MoreOptionsMenu.bookmarkPage(_:)), keyEquivalent: "d")
+            .withModifierMask([.command])
+            .targetting(target)
+            .firingPixel(Pixel.Event.MoreResult.bookmarksMenuBookmarkThisPage)
+
+        bookmarkPageItem.isEnabled = tabCollectionViewModel.selectedTabViewModel?.canBeBookmarked == true
+        
+        addItem(NSMenuItem.separator())
+        
         addItem(withTitle: UserText.bookmarksShowToolbarPanel, action: #selector(MoreOptionsMenu.openBookmarks(_:)), keyEquivalent: "")
             .targetting(target)
             .firingPixel(Pixel.Event.MoreResult.bookmarksMenuShowToolbarPanel)
@@ -387,12 +402,14 @@ final class BookmarksSubMenu: NSMenu {
             .firingPixel(Pixel.Event.MoreResult.bookmarksMenuManageBookmarks)
 
         if PersistentAppInterfaceSettings.shared.showBookmarksBar {
-            addItem(withTitle: UserText.hideBookmarksBar, action: #selector(MoreOptionsMenu.toggleBookmarksBar(_:)), keyEquivalent: "B")
+            addItem(withTitle: UserText.hideBookmarksBar, action: #selector(MoreOptionsMenu.toggleBookmarksBar(_:)), keyEquivalent: "b")
+                .withModifierMask([.shift, .command])
                 .targetting(target)
                 .firingPixel(Pixel.Event.MoreResult.bookmarksMenuHideBookmarksBar)
             
         } else {
-            addItem(withTitle: UserText.showBookmarksBar, action: #selector(MoreOptionsMenu.toggleBookmarksBar(_:)), keyEquivalent: "B")
+            addItem(withTitle: UserText.showBookmarksBar, action: #selector(MoreOptionsMenu.toggleBookmarksBar(_:)), keyEquivalent: "b")
+                .withModifierMask([.shift, .command])
                 .targetting(target)
                 .firingPixel(Pixel.Event.MoreResult.bookmarksMenuShowBookmarksBar)
         }
@@ -518,6 +535,12 @@ extension NSMenuItem {
     @discardableResult
     func withSubmenu(_ submenu: NSMenu) -> NSMenuItem {
         self.submenu = submenu
+        return self
+    }
+    
+    @discardableResult
+    func withModifierMask(_ mask: NSEvent.ModifierFlags) -> NSMenuItem {
+        self.keyEquivalentModifierMask = mask
         return self
     }
 

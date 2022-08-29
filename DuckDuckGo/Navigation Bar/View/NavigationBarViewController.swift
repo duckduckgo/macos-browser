@@ -664,6 +664,12 @@ extension NavigationBarViewController: NSMenuDelegate {
 
 extension NavigationBarViewController: OptionsButtonMenuDelegate {
 
+    func optionsButtonMenuRequestedBookmarkThisPage(_ sender: NSMenuItem) {
+        addressBarViewController?
+            .addressBarButtonsViewController?
+            .openBookmarkPopover(setFavorite: false, accessPoint: .init(sender: sender, default: .moreMenu))
+    }
+
     func optionsButtonMenuRequestedBookmarkPopover(_ menu: NSMenu) {
         showBookmarkListPopover()
     }
