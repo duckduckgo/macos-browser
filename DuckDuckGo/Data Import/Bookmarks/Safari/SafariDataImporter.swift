@@ -67,28 +67,28 @@ internal class SafariDataImporter: DataImporter {
             let bookmarkReader = SafariBookmarksReader(safariBookmarksFileURL: Self.bookmarksFileURL)
             let bookmarkResult = bookmarkReader.readBookmarks()
 
-//            let faviconsReader = SafariFaviconsReader(safariDataDirectoryURL: Self.safariDataDirectoryURL)
-//            let faviconsResult = faviconsReader.readFavicons()
-//            
-//            switch faviconsResult {
-//            case .success(let faviconsByURL):
-//                for (pageURLString, fetchedFavicons) in faviconsByURL {
-//                    if let pageURL = URL(string: pageURLString) {
-//                        let favicons = fetchedFavicons.map {
-//                            Favicon(identifier: UUID(),
-//                                    url: pageURL,
-//                                    image: $0.image,
-//                                    relation: .icon,
-//                                    documentUrl: pageURL,
-//                                    dateCreated: Date())
-//                        }
-//
-//                        faviconManager.handleFavicons(favicons, documentUrl: pageURL)
-//                    }
-//                }
-//                
-//            case .failure: break // TODO: Send pixel if favicon import fails completely
-//            }
+            let faviconsReader = SafariFaviconsReader(safariDataDirectoryURL: Self.safariDataDirectoryURL)
+            let faviconsResult = faviconsReader.readFavicons()
+            
+            switch faviconsResult {
+            case .success(let faviconsByURL):
+                for (pageURLString, fetchedFavicons) in faviconsByURL {
+                    if let pageURL = URL(string: pageURLString) {
+                        let favicons = fetchedFavicons.map {
+                            Favicon(identifier: UUID(),
+                                    url: pageURL,
+                                    image: $0.image,
+                                    relation: .icon,
+                                    documentUrl: pageURL,
+                                    dateCreated: Date())
+                        }
+
+                        faviconManager.handleFavicons(favicons, documentUrl: pageURL)
+                    }
+                }
+                
+            case .failure: break // TODO: Send pixel if favicon import fails completely
+            }
 
             switch bookmarkResult {
             case .success(let bookmarks):

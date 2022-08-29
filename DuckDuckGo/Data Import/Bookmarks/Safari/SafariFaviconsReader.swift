@@ -17,12 +17,13 @@
 //
 
 import Foundation
+import CryptoKit
 import GRDB
 
 final class SafariFaviconsReader {
 
     enum Constants {
-        static let faviconsDatabaseName = "favicons.db"
+        static let faviconsDatabaseName = "TouchIconCacheSettings.db"
     }
 
     enum ImportError: Error {
@@ -32,23 +33,15 @@ final class SafariFaviconsReader {
     }
     
     fileprivate final class SafariFaviconRecord: FetchableRecord {
-        let pageURL: String
-        let iconURL: String
-        let size: Int
-        let uuid: String
+        let host: String
 
         init(row: Row) {
-            pageURL = row["page_url"]
-            iconURL = row["icon_url"]
-            size = row["width"]
-            uuid = row["uuid"]
+            host = row["host"]
         }
     }
     
     final class SafariFavicon {
-        let pageURL: String
-        let iconURL: String
-        let size: Int
+        let host: String
         let imageData: Data
         
         var image: NSImage? {
@@ -56,9 +49,7 @@ final class SafariFaviconsReader {
         }
         
         fileprivate init(faviconRecord: SafariFaviconRecord, imageData: Data) {
-            self.pageURL = faviconRecord.pageURL
-            self.iconURL = faviconRecord.iconURL
-            self.size = faviconRecord.size
+            self.host = faviconRecord.host
             self.imageData = imageData
         }
     }
@@ -67,7 +58,7 @@ final class SafariFaviconsReader {
 
     init(safariDataDirectoryURL: URL) {
         self.safariFaviconsDatabaseURL = safariDataDirectoryURL
-            .appendingPathComponent("Favicon Cache")
+            .appendingPathComponent("Touch Icons Cache")
             .appendingPathComponent(Constants.faviconsDatabaseName)
     }
 
@@ -96,14 +87,15 @@ final class SafariFaviconsReader {
             }
             
             let favicons: [SafariFavicon] = faviconRecords.compactMap { record in
-                guard let imageData = fetchImageData(with: record.uuid) else {
+                guard let imageData = fetchImageData(with: record.host) else {
                     return nil
                 }
 
+                print("GOT DATA FOR HOST \(record.host) OF LENGTH \(imageData.count)")
                 return SafariFavicon(faviconRecord: record, imageData: imageData)
             }
 
-            let faviconsByURL = Dictionary(grouping: favicons, by: { $0.pageURL })
+            let faviconsByURL = Dictionary(grouping: favicons, by: { $0.host })
             
             return .success(faviconsByURL)
         } catch {
@@ -111,11 +103,20 @@ final class SafariFaviconsReader {
         }
     }
     
-    private func fetchImageData(with uuid: String) -> Data? {
-        let cleanedUUID = uuid.replacingOccurrences(of: "-", with: "")
+    private func fetchImageData(with host: String) -> Data? {
+        guard let hostData = host.data(using: .utf8) else {
+            return nil
+        }
+
+        let imageUUID = CryptoKit.Insecure.MD5.hash(data: hostData)
+        let hash = imageUUID.map {
+            String(format: "%02hhx", $0)
+        }.joined().uppercased()
+
         let faviconsDirectoryURL = safariFaviconsDatabaseURL.deletingLastPathComponent()
-        let faviconURL = faviconsDirectoryURL.appendingPathComponent("favicons").appendingPathComponent(cleanedUUID)
+        let faviconURL = faviconsDirectoryURL.appendingPathComponent("Images").appendingPathComponent(hash).appendingPathExtension("png")
         
+        print("Getting favicon at ", faviconURL)
         return try? Data(contentsOf: faviconURL)
     }
 
@@ -124,11 +125,9 @@ final class SafariFaviconsReader {
     func allFaviconsQuery() -> String {
         return """
         SELECT
-            page_url.url AS page_url, icon_info.url AS icon_url, icon_info.width, page_url.uuid
+            host
         FROM
-            page_url
-        JOIN
-            icon_info ON icon_info.uuid = page_url.uuid
+            cache_settings;
         """
     }
 
