@@ -93,7 +93,7 @@ final class DataImportViewController: NSViewController {
                                                                 bookmarkImporter: bookmarkImporter,
                                                                 faviconManager: FaviconManager.shared)
                 case .safari where !(currentChildViewController is FileImportViewController):
-                    self.dataImporter = SafariDataImporter(bookmarkImporter: bookmarkImporter)
+                    self.dataImporter = SafariDataImporter(bookmarkImporter: bookmarkImporter, faviconManager: FaviconManager.shared)
                 case .bookmarksHTML:
                     if !(self.dataImporter is BookmarkHTMLImporter) {
                         self.dataImporter = nil

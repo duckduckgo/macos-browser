@@ -21,38 +21,37 @@ import Foundation
 internal class SafariDataImporter: DataImporter {
 
     static func canReadBookmarksFile() -> Bool {
-        // This is inefficient, but regular FileManager APIs believe this file is unreadable even when granted permission via NSOpenPanel.
-        guard let data = try? Data(contentsOf: bookmarksFileURL) else {
-            return false
-        }
-
-        return !data.isEmpty
+        return FileManager.default.isReadableFile(atPath: safariDataDirectoryURL.path)
     }
 
-    static func requestBookmarksFilePermission() -> URL? {
+    static func requestSafariDataDirectoryPermission() -> URL? {
         let openPanel = NSOpenPanel()
-        openPanel.directoryURL = bookmarksFileURL
+        openPanel.directoryURL = safariDataDirectoryURL
         openPanel.message = UserText.bookmarkImportSafariRequestPermissionButtonTitle
-        openPanel.allowedFileTypes = ["plist"]
+        openPanel.allowedFileTypes = nil
         openPanel.allowsOtherFileTypes = false
-        openPanel.canChooseFiles = true
-        openPanel.canChooseDirectories = false
+        openPanel.canChooseFiles = false
+        openPanel.canChooseDirectories = true
 
         _ = openPanel.runModal()
         return openPanel.urls.first
     }
-
-    static private var bookmarksFileURL: URL {
+    
+    static private var safariDataDirectoryURL: URL {
         let applicationSupport = FileManager.default.urls(for: .libraryDirectory, in: .userDomainMask).first!
-        let path = applicationSupport.appendingPathComponent("Safari/")
-
-        return path.appendingPathComponent("Bookmarks.plist")
+        return applicationSupport.appendingPathComponent("Safari/")
+    }
+    
+    static private var bookmarksFileURL: URL {
+        return safariDataDirectoryURL.appendingPathComponent("Bookmarks.plist")
     }
 
     private let bookmarkImporter: BookmarkImporter
+    private let faviconManager: FaviconManagement
 
-    init(bookmarkImporter: BookmarkImporter) {
+    init(bookmarkImporter: BookmarkImporter, faviconManager: FaviconManagement) {
         self.bookmarkImporter = bookmarkImporter
+        self.faviconManager = faviconManager
     }
 
     func importableTypes() -> [DataImport.DataType] {
@@ -67,6 +66,29 @@ internal class SafariDataImporter: DataImporter {
         if types.contains(.bookmarks) {
             let bookmarkReader = SafariBookmarksReader(safariBookmarksFileURL: Self.bookmarksFileURL)
             let bookmarkResult = bookmarkReader.readBookmarks()
+
+//            let faviconsReader = SafariFaviconsReader(safariDataDirectoryURL: Self.safariDataDirectoryURL)
+//            let faviconsResult = faviconsReader.readFavicons()
+//            
+//            switch faviconsResult {
+//            case .success(let faviconsByURL):
+//                for (pageURLString, fetchedFavicons) in faviconsByURL {
+//                    if let pageURL = URL(string: pageURLString) {
+//                        let favicons = fetchedFavicons.map {
+//                            Favicon(identifier: UUID(),
+//                                    url: pageURL,
+//                                    image: $0.image,
+//                                    relation: .icon,
+//                                    documentUrl: pageURL,
+//                                    dateCreated: Date())
+//                        }
+//
+//                        faviconManager.handleFavicons(favicons, documentUrl: pageURL)
+//                    }
+//                }
+//                
+//            case .failure: break // TODO: Send pixel if favicon import fails completely
+//            }
 
             switch bookmarkResult {
             case .success(let bookmarks):

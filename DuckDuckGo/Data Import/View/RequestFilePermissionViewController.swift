@@ -66,7 +66,7 @@ final class RequestFilePermissionViewController: NSViewController {
     }
 
     @IBAction private func presentBookmarksOpenPanel(_ sender: AnyObject) {
-        if let url = SafariDataImporter.requestBookmarksFilePermission(), (try? Data(contentsOf: url)) != nil {
+        if let _ = SafariDataImporter.requestSafariDataDirectoryPermission(), SafariDataImporter.canReadBookmarksFile() {
             delegate?.requestFilePermissionViewControllerDidReceivePermission(self)
         }
     }
