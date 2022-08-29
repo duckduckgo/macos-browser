@@ -27258,8 +27258,6 @@
         }
     ]
     function enable(themeOptions, fixes) {
-        fixes = atob(fixes)
-        console.log(fixes)
         if (themeOptions === void 0) { themeOptions = {}; }
         if (fixes === void 0) { fixes = null; }
       if (!fixes) {

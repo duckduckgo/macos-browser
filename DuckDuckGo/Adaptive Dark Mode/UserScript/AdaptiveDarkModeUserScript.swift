@@ -60,7 +60,7 @@ final class AdaptiveDarkModeUserScript: NSObject, StaticUserScript {
     
     private var redditSettings: String {
         
-        let base64String = """
+        #"""
         {
             "url": [
                 "reddit.com"
@@ -73,9 +73,7 @@ final class AdaptiveDarkModeUserScript: NSObject, StaticUserScript {
             "ignoreInlineStyle": [],
             "ignoreImageAnalysis": []
         }
-""".data(using: .utf8)?.base64EncodedString() ?? ""
-        
-        return "\"\(base64String)\""
+"""#
         
     }
     
