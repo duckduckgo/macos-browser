@@ -26,10 +26,10 @@ final class AdaptiveDarkModeUserScript: NSObject, StaticUserScript {
     static var forMainFrameOnly: Bool { false }
     static var source: String = AdaptiveDarkModeUserScript.loadJS("darkreader", from: .main)
     static var script: WKUserScript = AdaptiveDarkModeUserScript.makeWKUserScript()
-    var messageNames: [String] { [""] }
+    var messageNames: [String] { ["darkModeHandler"] }
 
     func userContentController(_ userContentController: WKUserContentController, didReceive message: WKScriptMessage) {
-        assertionFailure("Didn't expect to get a script message from Dark Reader")
+        assertionFailure("Didn't expect to get a script message from Dark Reader \(message)")
     }
     
     func refreshDarkReaderScript(enabled: Bool, webView: WKWebView, url: URL) {
@@ -60,26 +60,7 @@ final class AdaptiveDarkModeUserScript: NSObject, StaticUserScript {
             }
         """
     }
-    
-    private var redditSettings: String {
-        
-        #"""
-        {
-            "url": [
-                "reddit.com"
-            ],
-            "invert": [
-                "[role=\"slider\"]",
-                "video ~ div [style^=\"height\"]"
-            ],
-            "css": "[role=\"slider\"] > div:nth-child(4) {\n    background-color: ${#0079d3} !important;\n}\n[style^=\"--background\"] {\n    --background: ${#FFFFFF} !important;\n}\n[style^=\"--canvas\"] {\n    --canvas: ${#DAE0E6} !important;\n}\n[style^=\"--pseudo-before-background\"] {\n    --pseudo-before-background: ${#DAE0E6} !important;\n}\n[style^=\"--comments-overlay-background\"] {\n    --comments-overlay-background: ${#DAE0E6} !important;\n}\n[style^=\"--commentswrapper-gradient-color\"] {\n    --comments-overlay-background: ${#DAE0E6} !important;\n}\n[style^=\"--fakelightbox-overlay-background\"] {\n    --fakelightbox-overlay-background: ${#DAE0E6} !important;\n}\n.md p>a[href=\"#s\"]::after, a[href=\"#s\"]::after {\n    color: #000;\n}\nheader a[aria-label=\"Home\"] svg:last-child g,\nheader > div > div + div a[href] *,\nheader > div > div + div button[aria-label] * {\n    fill: var(--darkreader-neutral-text) !important;\n}\n#COIN_PURCHASE_DROPDOWN_ID > div {\n    background: linear-gradient(180deg,hsla(0,0%,100%,.1) 45.96%,hsla(0,0%,100%,.57) 46%,hsla(0,0%,100%,0) 130%),${gold} !important;\n}\n#COIN_PURCHASE_DROPDOWN_ID > div > span {\n    color: ${white} !important;\n}\n.md-spoiler-text:not([data-revealed])::selection {\n    color: transparent !important;\n    background-color: var(--darkreader-bg--newCommunityTheme-metaText) !important;\n}\ndiv[role=\"menu\"][style^=\"position: fixed\"] button button[role=\"switch\"][aria-checked=\"false\"] {\n    background-color: ${gray} !important;\n}\ndiv[role=\"menu\"][style^=\"position: fixed\"] button button[role=\"switch\"] > div {\n    background-color: ${black} !important;\n}",
-            "ignoreInlineStyle": [],
-            "ignoreImageAnalysis": []
-        }
-"""#
-        
-    }
-    
+
     private func generateDarkReaderCall(enabled: Bool, fixes: String) -> String {
         if enabled {
             return "DarkReader.enable(\(defaultAppearanceSettings), \(fixes));"

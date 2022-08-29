@@ -37,6 +37,8 @@ final class UserScripts {
     let contentScopeUserScript: ContentScopeUserScript
     let autofillScript: WebsiteAutofillUserScript
     let adaptiveDarkModeScript = AdaptiveDarkModeUserScript()
+    let adaptiveDarkModeFallbackScript = AdaptiveDarkModeFallbackUserScript()
+    
     let autoconsentUserScript: UserScriptWithAutoconsent?
 
     init(with sourceProvider: ScriptSourceProviding) {
@@ -73,7 +75,8 @@ final class UserScripts {
         clickToLoadScript,
         contentScopeUserScript,
         autofillScript,
-        adaptiveDarkModeScript
+        adaptiveDarkModeScript,
+        adaptiveDarkModeFallbackScript
     ]
 
     lazy var scripts = userScripts.map { $0.makeWKUserScript() }

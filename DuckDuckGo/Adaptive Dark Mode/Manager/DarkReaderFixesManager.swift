@@ -48,9 +48,8 @@ struct DarkReaderFixesManager {
             return fix.url.contains(currentDomain)
         }
         if let fix = fixes.first {
-            
             let encoded = try? JSONEncoder().encode(fix).utf8String()
-            print("Returning FIX \(encoded)")
+            print("Returning FIX for \(currentDomain)")
             return encoded ?? ""
         } else {
             return ""
