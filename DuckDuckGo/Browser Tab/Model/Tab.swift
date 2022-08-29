@@ -682,7 +682,8 @@ final class Tab: NSObject, Identifiable, ObservableObject {
     weak var adaptiveDarkModeScript: AdaptiveDarkModeUserScript?
     
     func refreshDarkReader(enabled: Bool) {
-        adaptiveDarkModeScript?.refreshDarkReaderScript(enabled: enabled, webView: webView)
+        guard let url = url else { return }
+        adaptiveDarkModeScript?.refreshDarkReaderScript(enabled: enabled, webView: webView, url: url)
     }
 
     // MARK: - Global & Local History
