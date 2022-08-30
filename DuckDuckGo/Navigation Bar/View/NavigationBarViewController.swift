@@ -499,7 +499,11 @@ final class NavigationBarViewController: NSViewController {
             return
         }
 
-        passwordManagementButton.isHidden = !passwordManagementPopover.isShown
+        if LocalPinningManager.shared.isPinned(.autofill) {
+            passwordManagementButton.isHidden = false
+        } else {
+            passwordManagementButton.isHidden = !passwordManagementPopover.isShown
+        }
 
         passwordManagementPopover.viewController.domain = nil
         guard let url = url, let domain = url.host else {
@@ -547,7 +551,11 @@ final class NavigationBarViewController: NSViewController {
     }
 
     private func updateBookmarksButton() {
-        bookmarkListButton.isHidden = !bookmarkListPopover.isShown
+        if LocalPinningManager.shared.isPinned(.bookmarks) {
+            bookmarkListButton.isHidden = false
+        } else {
+            bookmarkListButton.isHidden = !bookmarkListPopover.isShown
+        }
     }
 
     private func subscribeToCredentialsToSave() {

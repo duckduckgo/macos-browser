@@ -46,6 +46,7 @@ final class PasswordManagementViewController: NSViewController {
     @IBOutlet var itemContainer: NSView!
     @IBOutlet var addVaultItemButton: NSButton!
     @IBOutlet var moreButton: NSButton!
+    @IBOutlet var pinButton: MouseOverButton!
     @IBOutlet var searchField: NSTextField!
     @IBOutlet var divider: NSView!
     @IBOutlet var emptyState: NSView!
@@ -196,6 +197,8 @@ final class PasswordManagementViewController: NSViewController {
             listView.frame = listContainer.bounds
             listContainer.addSubview(listView)
         }
+        
+        updatePinButton()
     }
 
     override func viewDidAppear() {
@@ -221,6 +224,10 @@ final class PasswordManagementViewController: NSViewController {
         listView?.removeFromSuperview()
     }
 
+    private func updatePinButton() {
+        pinButton.backgroundColor = LocalPinningManager.shared.isPinned(.autofill) ? NSColor.buttonMouseOverColor : nil
+    }
+    
     private func promptForAuthenticationIfNecessary() {
         let authenticator = DeviceAuthenticator.shared
 
@@ -241,6 +248,11 @@ final class PasswordManagementViewController: NSViewController {
     @IBAction func moreButtonAction(_ sender: NSButton) {
         let location = NSPoint(x: sender.frame.origin.x, y: sender.frame.origin.y - (sender.frame.height / 2) + 6)
         sender.menu?.popUp(positioning: nil, at: location, in: sender.superview)
+    }
+    
+    @IBAction func pinButtonAction(_ sender: NSButton) {
+        LocalPinningManager.shared.togglePinning(for: .autofill)
+        updatePinButton()
     }
 
     @IBAction func openAutofillPreferences(_ sender: Any) {
