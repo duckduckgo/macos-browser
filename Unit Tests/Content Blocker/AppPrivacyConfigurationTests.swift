@@ -21,6 +21,18 @@ import TrackerRadarKit
 import BrowserServicesKit
 @testable import DuckDuckGo_Privacy_Browser
 
+final class MockDomainsProtectionStore: DomainsProtectionStore {
+    var unprotectedDomains = Set<String>()
+
+    func disableProtection(forDomain domain: String) {
+        unprotectedDomains.insert(domain)
+    }
+
+    func enableProtection(forDomain domain: String) {
+        unprotectedDomains.remove(domain)
+    }
+}
+
 class AppPrivacyConfigurationTests: XCTestCase {
 
     func testWhenEmbeddedDataIsUpdatedThenUpdateSHAAndEtag() {
@@ -30,6 +42,22 @@ class AppPrivacyConfigurationTests: XCTestCase {
         XCTAssertEqual(data.sha256,
                        AppPrivacyConfigurationDataProvider.Constants.embeddedDataSHA,
                        "Error: please update SHA and ETag when changing embedded config")
+    }
+    
+    func testWhenEmbeddedDataIsUsedThenItCanBeParsed() {
+        
+        let provider = AppPrivacyConfigurationDataProvider()
+        
+        let jsonData = provider.embeddedData
+        let json = try? JSONSerialization.jsonObject(with: jsonData, options: []) as? [String: Any]
+        let configData = PrivacyConfigurationData(json: json!)
+
+        let config = AppPrivacyConfiguration(data: configData,
+                                             identifier: "",
+                                             localProtection: MockDomainsProtectionStore())
+        
+        XCTAssert(config.isEnabled(featureKey: .contentBlocking))
+        
     }
 
 }
