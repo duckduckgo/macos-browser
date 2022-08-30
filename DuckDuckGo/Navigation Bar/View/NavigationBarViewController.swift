@@ -111,6 +111,7 @@ final class NavigationBarViewController: NSViewController {
     private var selectedTabViewModelCancellable: AnyCancellable?
     private var credentialsToSaveCancellable: AnyCancellable?
     private var passwordManagerNotificationCancellable: AnyCancellable?
+    private var pinningManagerNotificationCancellable: AnyCancellable?
     private var navigationButtonsCancellables = Set<AnyCancellable>()
     private var downloadsCancellables = Set<AnyCancellable>()
 
@@ -138,6 +139,7 @@ final class NavigationBarViewController: NSViewController {
         setupNavigationButtonMenus()
         subscribeToSelectedTabViewModel()
         listenToPasswordManagerNotifications()
+        listenToPinningManagerNotifications()
         listenToMessageNotifications()
         subscribeToDownloads()
         addContextMenu()
@@ -256,6 +258,13 @@ final class NavigationBarViewController: NSViewController {
 
     func listenToPasswordManagerNotifications() {
         passwordManagerNotificationCancellable = NotificationCenter.default.publisher(for: .PasswordManagerChanged).sink { [weak self] _ in
+            self?.updatePasswordManagementButton()
+        }
+    }
+    
+    func listenToPinningManagerNotifications() {
+        pinningManagerNotificationCancellable = NotificationCenter.default.publisher(for: .PinnedViewsChanged).sink { [weak self] _ in
+            self?.updateBookmarksButton()
             self?.updatePasswordManagementButton()
         }
     }

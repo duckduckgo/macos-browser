@@ -714,14 +714,14 @@ Gw
                             <box verticalHuggingPriority="750" boxType="separator" translatesAutoresizingMaskIntoConstraints="NO" id="Wgx-ZT-vUV" userLabel="Divider">
                                 <rect key="frame" x="0.0" y="406" width="420" height="5"/>
                             </box>
-                            <stackView distribution="fill" orientation="horizontal" alignment="top" horizontalStackHuggingPriority="249.99998474121094" verticalStackHuggingPriority="249.99998474121094" detachesHiddenViews="YES" translatesAutoresizingMaskIntoConstraints="NO" id="0If-Lj-8IG">
-                                <rect key="frame" x="280" y="419" width="120" height="24"/>
+                            <stackView distribution="fill" orientation="horizontal" alignment="centerY" spacing="4" horizontalStackHuggingPriority="249.99998474121094" verticalStackHuggingPriority="249.99998474121094" detachesHiddenViews="YES" translatesAutoresizingMaskIntoConstraints="NO" id="0If-Lj-8IG">
+                                <rect key="frame" x="259" y="417" width="141" height="28"/>
                                 <subviews>
                                     <button translatesAutoresizingMaskIntoConstraints="NO" id="qBa-rT-8sF" userLabel="New Bookmark Button" customClass="MouseOverButton" customModule="DuckDuckGo_Privacy_Browser" customModuleProvider="target">
-                                        <rect key="frame" x="0.0" y="0.0" width="24" height="24"/>
+                                        <rect key="frame" x="0.0" y="0.0" width="28" height="28"/>
                                         <constraints>
-                                            <constraint firstAttribute="height" constant="24" id="9mk-iy-mXT"/>
-                                            <constraint firstAttribute="width" constant="24" id="kiL-Lk-pWq"/>
+                                            <constraint firstAttribute="height" constant="28" id="9mk-iy-mXT"/>
+                                            <constraint firstAttribute="width" constant="28" id="kiL-Lk-pWq"/>
                                         </constraints>
                                         <buttonCell key="cell" type="square" bezelStyle="shadowlessSquare" image="AddBookmark" imagePosition="only" alignment="center" imageScaling="proportionallyDown" inset="2" id="KBc-mO-g1J">
                                             <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
@@ -744,10 +744,10 @@ Gw
                                         </connections>
                                     </button>
                                     <button translatesAutoresizingMaskIntoConstraints="NO" id="xMD-lr-ArK" userLabel="New Folder Button" customClass="MouseOverButton" customModule="DuckDuckGo_Privacy_Browser" customModuleProvider="target">
-                                        <rect key="frame" x="32" y="0.0" width="24" height="24"/>
+                                        <rect key="frame" x="32" y="0.0" width="28" height="28"/>
                                         <constraints>
-                                            <constraint firstAttribute="height" constant="24" id="BWu-UC-Ow7"/>
-                                            <constraint firstAttribute="width" constant="24" id="wml-gt-OK1"/>
+                                            <constraint firstAttribute="height" constant="28" id="BWu-UC-Ow7"/>
+                                            <constraint firstAttribute="width" constant="28" id="wml-gt-OK1"/>
                                         </constraints>
                                         <buttonCell key="cell" type="square" bezelStyle="shadowlessSquare" image="AddFolder" imagePosition="only" alignment="center" imageScaling="proportionallyDown" inset="2" id="EkA-sE-QuN">
                                             <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
@@ -769,11 +769,18 @@ Gw
                                             <action selector="newFolderButtonClicked:" target="Scx-gG-IP9" id="Pk2-ov-PP7"/>
                                         </connections>
                                     </button>
-                                    <button translatesAutoresizingMaskIntoConstraints="NO" id="pTk-xE-OqR" userLabel="Show Management UI Button" customClass="MouseOverButton" customModule="DuckDuckGo_Privacy_Browser" customModuleProvider="target">
-                                        <rect key="frame" x="64" y="0.0" width="24" height="24"/>
+                                    <box horizontalHuggingPriority="750" boxType="separator" translatesAutoresizingMaskIntoConstraints="NO" id="fEN-MQ-Uoc">
+                                        <rect key="frame" x="62" y="5" width="17" height="18"/>
                                         <constraints>
-                                            <constraint firstAttribute="width" constant="24" id="cBD-Aw-Rsl"/>
-                                            <constraint firstAttribute="height" constant="24" id="rgG-V6-CDn"/>
+                                            <constraint firstAttribute="width" constant="13" id="Mv3-8I-hdg"/>
+                                            <constraint firstAttribute="height" constant="18" id="rtz-NW-cwa"/>
+                                        </constraints>
+                                    </box>
+                                    <button translatesAutoresizingMaskIntoConstraints="NO" id="pTk-xE-OqR" userLabel="Show Management UI Button" customClass="MouseOverButton" customModule="DuckDuckGo_Privacy_Browser" customModuleProvider="target">
+                                        <rect key="frame" x="81" y="0.0" width="28" height="28"/>
+                                        <constraints>
+                                            <constraint firstAttribute="width" constant="28" id="cBD-Aw-Rsl"/>
+                                            <constraint firstAttribute="height" constant="28" id="rgG-V6-CDn"/>
                                         </constraints>
                                         <buttonCell key="cell" type="square" bezelStyle="shadowlessSquare" image="Expand" imagePosition="only" alignment="center" imageScaling="proportionallyDown" inset="2" id="jdG-cU-IZR">
                                             <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
@@ -795,11 +802,11 @@ Gw
                                             <action selector="openManagementInterface:" target="Scx-gG-IP9" id="kQf-pI-TID"/>
                                         </connections>
                                     </button>
-                                    <button translatesAutoresizingMaskIntoConstraints="NO" id="CiL-HI-ctU" userLabel="Show Management UI Button" customClass="MouseOverButton" customModule="DuckDuckGo_Privacy_Browser" customModuleProvider="target">
-                                        <rect key="frame" x="96" y="0.0" width="24" height="24"/>
+                                    <button translatesAutoresizingMaskIntoConstraints="NO" id="CiL-HI-ctU" userLabel="Pin Button" customClass="MouseOverButton" customModule="DuckDuckGo_Privacy_Browser" customModuleProvider="target">
+                                        <rect key="frame" x="113" y="0.0" width="28" height="28"/>
                                         <constraints>
-                                            <constraint firstAttribute="width" constant="24" id="3Hg-AP-F6V"/>
-                                            <constraint firstAttribute="height" constant="24" id="iSa-Z0-YTR"/>
+                                            <constraint firstAttribute="width" constant="28" id="3Hg-AP-F6V"/>
+                                            <constraint firstAttribute="height" constant="28" id="iSa-Z0-YTR"/>
                                         </constraints>
                                         <buttonCell key="cell" type="square" bezelStyle="shadowlessSquare" image="Pin" imagePosition="only" alignment="center" imageScaling="proportionallyDown" inset="2" id="ngj-7b-GCM">
                                             <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
@@ -827,8 +834,10 @@ Gw
                                     <integer value="1000"/>
                                     <integer value="1000"/>
                                     <integer value="1000"/>
+                                    <integer value="1000"/>
                                 </visibilityPriorities>
                                 <customSpacing>
+                                    <real value="3.4028234663852886e+38"/>
                                     <real value="3.4028234663852886e+38"/>
                                     <real value="3.4028234663852886e+38"/>
                                     <real value="3.4028234663852886e+38"/>

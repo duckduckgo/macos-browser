@@ -21,6 +21,7 @@ import Foundation
 enum PinnableView: String {
     case autofill
     case bookmarks
+    case downloads
 }
 
 protocol PinningManager {
@@ -50,10 +51,20 @@ final class LocalPinningManager: PinningManager {
         } else {
             pinnedViewStrings.append(view.rawValue)
         }
+        
+        NotificationCenter.default.post(name: .PinnedViewsChanged, object: nil)
     }
     
     func isPinned(_ view: PinnableView) -> Bool {
         return pinnedViewStrings.contains(view.rawValue)
     }
+
+}
+
+// MARK: - NSNotification
+
+extension NSNotification.Name {
+
+    static let PinnedViewsChanged = NSNotification.Name("pinning.pinnedViewsChanged")
 
 }
