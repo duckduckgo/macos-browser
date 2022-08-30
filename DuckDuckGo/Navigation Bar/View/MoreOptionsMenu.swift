@@ -396,10 +396,6 @@ final class BookmarksSubMenu: NSMenu {
         addItem(withTitle: UserText.bookmarksShowToolbarPanel, action: #selector(MoreOptionsMenu.openBookmarks(_:)), keyEquivalent: "")
             .targetting(target)
             .firingPixel(Pixel.Event.MoreResult.bookmarksMenuShowToolbarPanel)
-        
-        addItem(withTitle: UserText.bookmarksManageBookmarks, action: #selector(MoreOptionsMenu.openBookmarksManagementInterface), keyEquivalent: "")
-            .targetting(target)
-            .firingPixel(Pixel.Event.MoreResult.bookmarksMenuManageBookmarks)
 
         if PersistentAppInterfaceSettings.shared.showBookmarksBar {
             addItem(withTitle: UserText.hideBookmarksBar, action: #selector(MoreOptionsMenu.toggleBookmarksBar(_:)), keyEquivalent: "b")
@@ -414,12 +410,6 @@ final class BookmarksSubMenu: NSMenu {
                 .firingPixel(Pixel.Event.MoreResult.bookmarksMenuShowBookmarksBar)
         }
 
-        addItem(NSMenuItem.separator())
-        
-        addItem(withTitle: "Import Bookmarks and Passwords...", action: #selector(MoreOptionsMenu.openBookmarkImportInterface(_:)), keyEquivalent: "")
-            .targetting(target)
-            .firingPixel(Pixel.Event.MoreResult.bookmarksMenuImportBookmarks)
-        
         addItem(NSMenuItem.separator())
         
         if let favorites = LocalBookmarkManager.shared.list?.favoriteBookmarks {
@@ -441,6 +431,12 @@ final class BookmarksSubMenu: NSMenu {
         let menuItems = bookmarkMenuItems(from: bookmarkViewModels, topLevel: true)
         
         self.items.append(contentsOf: menuItems)
+        
+        addItem(NSMenuItem.separator())
+
+        addItem(withTitle: "Import Bookmarks and Passwords...", action: #selector(MoreOptionsMenu.openBookmarkImportInterface(_:)), keyEquivalent: "")
+            .targetting(target)
+            .firingPixel(Pixel.Event.MoreResult.bookmarksMenuImportBookmarks)
     }
     
     private func bookmarkMenuItems(from bookmarkViewModels: [BookmarkViewModel], topLevel: Bool = true) -> [NSMenuItem] {

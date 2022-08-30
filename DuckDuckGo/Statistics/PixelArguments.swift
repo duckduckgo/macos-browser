@@ -338,7 +338,6 @@ extension Pixel.Event {
         case bookmarksMenuShowToolbarPanel = "bookmarks-show-toolbar-panel"
         case bookmarksMenuShowBookmarksBar = "bookmarks-show-bookmarks-bar"
         case bookmarksMenuHideBookmarksBar = "bookmarks-hide-bookmarks-bar"
-        case bookmarksMenuManageBookmarks = "bookmarks-manage"
         case bookmarksMenuImportBookmarks = "bookmarks-import-bookmarks"
         case loginsMenu = "logins-menu"
         case loginsMenuAllItems = "logins-menu-all-items"
