@@ -712,12 +712,6 @@ CQ
                                                             <action selector="resetPinnedTabs:" target="Ady-hI-5gd" id="4iv-wI-8wp"/>
                                                         </connections>
                                                     </menuItem>
-                                                    <menuItem title="Reset Favicons Cache" id="Hmm-yf-OlJ">
-                                                        <modifierMask key="keyEquivalentModifierMask"/>
-                                                        <connections>
-                                                            <action selector="resetFaviconsCache:" target="Ady-hI-5gd" id="eWi-sq-YGw"/>
-                                                        </connections>
-                                                    </menuItem>
                                                 </items>
                                             </menu>
                                         </menuItem>

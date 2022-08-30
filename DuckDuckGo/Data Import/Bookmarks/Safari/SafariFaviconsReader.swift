@@ -34,6 +34,22 @@ final class SafariFaviconsReader {
     
     fileprivate final class SafariFaviconRecord: FetchableRecord {
         let host: String
+        
+        var formattedHost: String? {
+            guard let url = URL(string: host) else {
+                return nil
+            }
+            
+            guard var components = URLComponents(url: url, resolvingAgainstBaseURL: true) else {
+                return nil
+            }
+
+            components.scheme = "https"
+            components.host = components.path
+            components.path = ""
+            
+            return components.string
+        }
 
         init(row: Row) {
             host = row["host"]
@@ -48,8 +64,8 @@ final class SafariFaviconsReader {
             NSImage(data: imageData)
         }
         
-        fileprivate init(faviconRecord: SafariFaviconRecord, imageData: Data) {
-            self.host = faviconRecord.host
+        fileprivate init(host: String, imageData: Data) {
+            self.host = host
             self.imageData = imageData
         }
     }
@@ -91,8 +107,11 @@ final class SafariFaviconsReader {
                     return nil
                 }
 
-                print("GOT DATA FOR HOST \(record.host) OF LENGTH \(imageData.count)")
-                return SafariFavicon(faviconRecord: record, imageData: imageData)
+                guard let formattedHost = record.formattedHost else {
+                    return nil
+                }
+
+                return SafariFavicon(host: formattedHost, imageData: imageData)
             }
 
             let faviconsByURL = Dictionary(grouping: favicons, by: { $0.host })
@@ -116,7 +135,6 @@ final class SafariFaviconsReader {
         let faviconsDirectoryURL = safariFaviconsDatabaseURL.deletingLastPathComponent()
         let faviconURL = faviconsDirectoryURL.appendingPathComponent("Images").appendingPathComponent(hash).appendingPathExtension("png")
         
-        print("Getting favicon at ", faviconURL)
         return try? Data(contentsOf: faviconURL)
     }
 
