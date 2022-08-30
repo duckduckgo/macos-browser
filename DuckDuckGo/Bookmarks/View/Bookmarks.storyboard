@@ -590,7 +590,8 @@ Gw
                     </view>
                     <connections>
                         <outlet property="addButton" destination="dgc-zb-fvL" id="61T-p5-zDv"/>
-                        <outlet property="titleTextField" destination="wUW-im-K6u" id="anT-Wa-vDH"/>
+                        <outlet property="bookmarkTitleTextField" destination="wUW-im-K6u" id="Mo6-RW-ekU"/>
+                        <outlet property="titleTextField" destination="oOL-3u-yUF" id="g1K-Yh-dyG"/>
                         <outlet property="urlTextField" destination="Rch-BQ-Djd" id="9zy-3H-EVK"/>
                     </connections>
                 </viewController>

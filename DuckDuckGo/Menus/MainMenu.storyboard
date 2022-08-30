@@ -494,7 +494,7 @@
                                 <modifierMask key="keyEquivalentModifierMask"/>
                                 <menu key="submenu" title="Bookmarks" id="AGQ-XC-31O">
                                     <items>
-                                        <menuItem title="Bookmark This Page..." enabled="NO" keyEquivalent="d" id="Nkm-zy-JXD">
+                                        <menuItem title="Bookmark This Page" enabled="NO" keyEquivalent="d" id="Nkm-zy-JXD">
                                             <connections>
                                                 <action selector="bookmarkThisPage:" target="Ady-hI-5gd" id="Mah-44-bE1"/>
                                             </connections>

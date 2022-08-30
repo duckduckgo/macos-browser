@@ -729,7 +729,7 @@ extension MainViewController: NSMenuItemValidation {
              #selector(MainViewController.printWebView(_:)):
             return tabCollectionViewModel.selectedTabViewModel?.canReload == true
 
-        // Marge all windows
+        // Merge all windows
         case #selector(MainViewController.mergeAllWindows(_:)):
             return WindowControllersManager.shared.mainWindowControllers.count > 1
 
