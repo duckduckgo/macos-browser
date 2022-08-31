@@ -31,7 +31,7 @@ private struct EditedBookmarkMetadata {
     let index: Int
 }
 
-final class BookmarkManagementDetailViewController: NSViewController {
+final class BookmarkManagementDetailViewController: NSViewController, NSMenuItemValidation {
 
     fileprivate enum Constants {
         static let bookmarkCellIdentifier = NSUserInterfaceItemIdentifier(rawValue: "BookmarksCellIdentifier")
@@ -106,6 +106,12 @@ final class BookmarkManagementDetailViewController: NSViewController {
         // Clicking anywhere outside of the table view should end editing mode for a given cell.
         updateEditingState(forRowAt: -1)
     }
+    
+    override func keyDown(with event: NSEvent) {
+        if event.charactersIgnoringModifiers == String(UnicodeScalar(NSDeleteCharacter)!) {
+            deleteSelectedItems()
+        }
+    }
 
     fileprivate func reloadData() {
         guard editingBookmarkIndex == nil else {
@@ -113,7 +119,10 @@ final class BookmarkManagementDetailViewController: NSViewController {
             return
         }
         emptyState.isHidden = !(bookmarkManager.list?.topLevelEntities.isEmpty ?? true)
-        self.tableView.reloadData()
+        
+        let scrollPosition = tableView.visibleRect.origin
+        tableView.reloadData()
+        tableView.scroll(scrollPosition)
     }
 
     @IBAction func onImportClicked(_ sender: NSButton) {
@@ -121,6 +130,14 @@ final class BookmarkManagementDetailViewController: NSViewController {
     }
 
     @IBAction func handleDoubleClick(_ sender: NSTableView) {
+        if sender.selectedRowIndexes.count > 1 {
+            let entities = sender.selectedRowIndexes.map { fetchEntity(at: $0) }
+            let bookmarks = entities.compactMap { $0 as? Bookmark }
+            openBookmarksInNewTabs(bookmarks)
+            
+            return
+        }
+
         let index = sender.clickedRow
 
         guard index != -1, editingBookmarkIndex?.index != index, let entity = fetchEntity(at: index) else {
@@ -160,6 +177,18 @@ final class BookmarkManagementDetailViewController: NSViewController {
         let addFolderViewController = AddFolderModalViewController.create()
         addFolderViewController.delegate = self
         beginSheet(addFolderViewController)
+    }
+    
+    @IBAction func delete(_ sender: AnyObject) {
+        deleteSelectedItems()
+    }
+    
+    func validateMenuItem(_ menuItem: NSMenuItem) -> Bool {
+        if menuItem.action == #selector(BookmarkManagementDetailViewController.delete(_:)) {
+            return !tableView.selectedRowIndexes.isEmpty
+        }
+        
+        return true
     }
 
     private func endEditing() {
@@ -219,6 +248,13 @@ final class BookmarkManagementDetailViewController: NSViewController {
             return LocalBookmarkManager.shared.list?.favoriteBookmarks.count ?? 0
         }
     }
+    
+    private func deleteSelectedItems() {
+        let entities = tableView.selectedRowIndexes.compactMap { fetchEntity(at: $0) }
+        let entityUUIDs = entities.map(\.id)
+        
+        bookmarkManager.remove(objectsWithUUIDs: entityUUIDs)
+    }
 
 }
 
@@ -236,6 +272,11 @@ extension BookmarkManagementDetailViewController: AddBookmarkModalViewController
         } else {
             bookmarkManager.makeBookmark(for: url, title: title, isFavorite: false)
         }
+    }
+    
+    func addBookmarkViewController(_ viewController: AddBookmarkModalViewController, saved bookmark: Bookmark, newURL: URL) {
+        bookmarkManager.update(bookmark: bookmark)
+        _ = bookmarkManager.updateUrl(of: bookmark, to: newURL)
     }
 
     func addFolderViewController(_ viewController: AddFolderModalViewController, addedFolderWith name: String) {
@@ -447,6 +488,16 @@ extension BookmarkManagementDetailViewController: NSTableViewDelegate, NSTableVi
             cell?.isSelected = true
         }
     }
+    
+    fileprivate func openBookmarksInNewTabs(_ bookmarks: [Bookmark]) {
+        guard let tabCollection = WindowControllersManager.shared.lastKeyMainWindowController?.mainViewController.tabCollectionViewModel else {
+            assertionFailure("Cannot open in new tabs")
+            return
+        }
+        
+        let tabs = bookmarks.map { Tab(content: .url($0.url), shouldLoadInBackground: true) }
+        tabCollection.append(tabs: tabs)
+    }
 
 }
 
@@ -497,7 +548,7 @@ extension BookmarkManagementDetailViewController: BookmarkTableCellViewDelegate 
         bookmarkManager.update(bookmark: bookmark)
 
         if let newURL = newUrl.url, newURL != bookmark.url {
-            _ = LocalBookmarkManager.shared.updateUrl(of: bookmark, to: newURL)
+            _ = bookmarkManager.updateUrl(of: bookmark, to: newURL)
         }
     }
 
@@ -571,6 +622,17 @@ extension BookmarkManagementDetailViewController: FolderMenuItemSelectors {
 
         LocalBookmarkManager.shared.remove(folder: folder)
     }
+    
+    func openInNewTabs(_ sender: NSMenuItem) {
+        if let children = (sender.representedObject as? BookmarkFolder)?.children {
+            let bookmarks = children.compactMap { $0 as? Bookmark }
+            openBookmarksInNewTabs(bookmarks)
+        } else if let bookmarks = sender.representedObject as? [Bookmark] {
+            openBookmarksInNewTabs(bookmarks)
+        } else {
+            assertionFailure("Failed to open entity in new tabs")
+        }
+    }
 
 }
 
@@ -595,13 +657,21 @@ extension BookmarkManagementDetailViewController: BookmarkMenuItemSelectors {
     }
 
     func toggleBookmarkAsFavorite(_ sender: NSMenuItem) {
-        guard let bookmark = sender.representedObject as? Bookmark else {
+        if let bookmark = sender.representedObject as? Bookmark {
+            bookmark.isFavorite.toggle()
+            LocalBookmarkManager.shared.update(bookmark: bookmark)
+        } else if let bookmarks = sender.representedObject as? [Bookmark] {
+            let bookmarkIdentifiers = bookmarks.map(\.id)
+            bookmarkManager.update(objectsWithUUIDs: bookmarkIdentifiers, update: { entity in
+                (entity as? Bookmark)?.isFavorite.toggle()
+            }, completion: { error in
+                if error != nil {
+                    assertionFailure("Failed to update bookmarks: ")
+                }
+            })
+        } else {
             assertionFailure("Failed to cast menu represented object to Bookmark")
-            return
         }
-
-        bookmark.isFavorite.toggle()
-        LocalBookmarkManager.shared.update(bookmark: bookmark)
     }
 
     func editBookmark(_ sender: NSMenuItem) {
@@ -628,6 +698,15 @@ extension BookmarkManagementDetailViewController: BookmarkMenuItemSelectors {
         }
 
         LocalBookmarkManager.shared.remove(bookmark: bookmark)
+    }
+    
+    func deleteEntities(_ sender: NSMenuItem) {
+        guard let uuids = sender.representedObject as? [UUID] else {
+            assertionFailure("Failed to cast menu item's represented object to UUID array")
+            return
+        }
+        
+        LocalBookmarkManager.shared.remove(objectsWithUUIDs: uuids)
     }
     
 }

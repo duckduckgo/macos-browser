@@ -39,7 +39,7 @@ struct FireproofDomainsContainer {
 
     @discardableResult
     mutating func add(domain: String, withId id: NSManagedObjectID) throws -> String {
-        let domain = domain.dropWWW()
+        let domain = domain.droppingWwwPrefix()
         try domainsToIds.updateInPlace(key: domain) { value in
             guard value == nil else { throw DomainAlreadyAdded() }
             value = id
@@ -57,7 +57,7 @@ struct FireproofDomainsContainer {
     }
 
     mutating func remove(domain: String) -> NSManagedObjectID? {
-        let domain = domain.dropWWW()
+        let domain = domain.droppingWwwPrefix()
         guard let idx = domainsToIds.index(forKey: domain) else {
             assertionFailure("\(domain) is not Fireproof")
             return nil
@@ -82,7 +82,7 @@ struct FireproofDomainsContainer {
     }
 
     func contains(domain: String, includingSuperdomains: Bool = true) -> Bool {
-        let domain = domain.dropWWW()
+        let domain = domain.droppingWwwPrefix()
         return domainsToIds[domain] != nil || (includingSuperdomains && contains(superdomain: domain))
     }
 

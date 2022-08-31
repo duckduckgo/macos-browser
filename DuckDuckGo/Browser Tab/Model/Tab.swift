@@ -27,7 +27,8 @@ protocol TabDelegate: FileDownloadManagerDelegate, ContentOverlayUserScriptDeleg
     func tabWillStartNavigation(_ tab: Tab, isUserInitiated: Bool)
     func tabDidStartNavigation(_ tab: Tab)
     func tab(_ tab: Tab, requestedNewTabWith content: Tab.TabContent, selected: Bool)
-    func tab(_ tab: Tab, willShowContextMenuAt position: NSPoint, image: URL?, link: URL?, selectedText: String?)
+    // swiftlint:disable:next function_parameter_count
+    func tab(_ tab: Tab, willShowContextMenuAt position: NSPoint, image: URL?, title: String?, link: URL?, selectedText: String?)
     func tab(_ tab: Tab, requestedOpenExternalURL url: URL, forUserEnteredURL: Bool)
     func tab(_ tab: Tab, requestedSaveAutofillData autofillData: AutofillData)
     func tab(_ tab: Tab,
@@ -698,7 +699,7 @@ final class Tab: NSObject, Identifiable, ObservableObject {
 
         // Add to local history
         if let host = url.host, !host.isEmpty {
-            localHistory.insert(host.dropWWW())
+            localHistory.insert(host.droppingWwwPrefix())
         }
     }
 
@@ -822,12 +823,14 @@ extension Tab: PageObserverUserScriptDelegate {
 
 extension Tab: ContextMenuDelegate {
 
+    // swiftlint:disable:next function_parameter_count
     func contextMenu(forUserScript script: ContextMenuUserScript,
                      willShowAt position: NSPoint,
                      image: URL?,
+                     title: String?,
                      link: URL?,
                      selectedText: String?) {
-        delegate?.tab(self, willShowContextMenuAt: position, image: image, link: link, selectedText: selectedText)
+        delegate?.tab(self, willShowContextMenuAt: position, image: image, title: title, link: link, selectedText: selectedText)
     }
 
 }

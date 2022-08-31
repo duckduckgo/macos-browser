@@ -73,6 +73,10 @@
                 {
                     "domain": "freecodecamp.org",
                     "reason": "Clicking 'get started' reloads the page and does not progress to the login page."
+                },
+                {
+                    "domain": "www.audiosciencereview.com",
+                    "reason": "Pages on the site end up in redirect loops in Firefox."
                 }
             ],
             "settings": {

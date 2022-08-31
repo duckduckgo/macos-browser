@@ -22,6 +22,7 @@ import Combine
 protocol AddBookmarkModalViewControllerDelegate: AnyObject {
 
     func addBookmarkViewController(_ viewController: AddBookmarkModalViewController, addedBookmarkWithTitle title: String, url: URL)
+    func addBookmarkViewController(_ viewController: AddBookmarkModalViewController, saved bookmark: Bookmark, newURL: URL)
 
 }
 
@@ -59,28 +60,41 @@ final class AddBookmarkModalViewController: NSViewController {
     }
 
     @IBOutlet var titleTextField: NSTextField!
+    @IBOutlet var bookmarkTitleTextField: NSTextField!
     @IBOutlet var urlTextField: NSTextField!
     @IBOutlet var addButton: NSButton!
 
     private var hasValidInput: Bool {
         guard let url = urlTextField.stringValue.url else { return false }
 
-        let isBookmarked = LocalBookmarkManager.shared.isUrlBookmarked(url: url)
-        let isInputValid = !titleTextField.stringValue.isEmpty && url.isValid && !isBookmarked
+        if originalBookmark != nil {
+            return !bookmarkTitleTextField.stringValue.isEmpty && url.isValid
+        } else {
+            let isBookmarked = LocalBookmarkManager.shared.isUrlBookmarked(url: url)
+            let isInputValid = !bookmarkTitleTextField.stringValue.isEmpty && url.isValid && !isBookmarked
 
-        return isInputValid
+            return isInputValid
+        }
     }
 
     weak var delegate: AddBookmarkModalViewControllerDelegate?
+    
+    private var originalBookmark: Bookmark?
 
     override func viewDidLoad() {
         super.viewDidLoad()
         updateWithCurrentTabWebsite()
+        updateWithExistingBookmark()
+        updateAddButton()
     }
 
     override func viewWillAppear() {
         super.viewWillAppear()
         applyModalWindowStyleIfNeeded()
+    }
+    
+    func edit(bookmark: Bookmark) {
+        self.originalBookmark = bookmark
     }
 
     @IBAction private func cancel(_ sender: NSButton) {
@@ -91,8 +105,14 @@ final class AddBookmarkModalViewController: NSViewController {
         guard let url = urlTextField.stringValue.url else {
             return
         }
+        
+        if let bookmark = originalBookmark {
+            bookmark.title = bookmarkTitleTextField.stringValue
+            delegate?.addBookmarkViewController(self, saved: bookmark, newURL: url)
+        } else {
+            delegate?.addBookmarkViewController(self, addedBookmarkWithTitle: bookmarkTitleTextField.stringValue, url: url)
+        }
 
-        delegate?.addBookmarkViewController(self, addedBookmarkWithTitle: titleTextField.stringValue, url: url)
         dismiss()
     }
 
@@ -102,10 +122,21 @@ final class AddBookmarkModalViewController: NSViewController {
 
     private func updateWithCurrentTabWebsite() {
         if let website = currentTabWebsite, !LocalBookmarkManager.shared.isUrlBookmarked(url: website.url) {
-            titleTextField.stringValue = website.title ?? ""
+            bookmarkTitleTextField.stringValue = website.title ?? ""
             urlTextField.stringValue = website.url.absoluteString
         }
+
         updateAddButton()
+    }
+    
+    private func updateWithExistingBookmark() {
+        if let originalBookmark = originalBookmark {
+            titleTextField.stringValue = UserText.updateBookmark
+            bookmarkTitleTextField.stringValue = originalBookmark.title
+            urlTextField.stringValue = originalBookmark.url.absoluteString
+            
+            addButton.title = UserText.save
+        }
     }
 
 }
