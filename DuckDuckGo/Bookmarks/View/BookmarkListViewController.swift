@@ -112,6 +112,7 @@ final class BookmarkListViewController: NSViewController {
     
     private func updatePinButton() {
         pinButton.backgroundColor = LocalPinningManager.shared.isPinned(.bookmarks) ? NSColor.buttonMouseOverColor : nil
+        pinButton.image = LocalPinningManager.shared.isPinned(.bookmarks) ? NSImage(named: "Pin-Remove") : NSImage(named: "Pin")
     }
     
     @IBAction func newBookmarkButtonClicked(_ sender: AnyObject) {

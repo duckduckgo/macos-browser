@@ -226,6 +226,7 @@ final class PasswordManagementViewController: NSViewController {
 
     private func updatePinButton() {
         pinButton.backgroundColor = LocalPinningManager.shared.isPinned(.autofill) ? NSColor.buttonMouseOverColor : nil
+        pinButton.image = LocalPinningManager.shared.isPinned(.autofill) ? NSImage(named: "Pin-Remove") : NSImage(named: "Pin")
     }
     
     private func promptForAuthenticationIfNecessary() {
