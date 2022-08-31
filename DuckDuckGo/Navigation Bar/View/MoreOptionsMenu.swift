@@ -397,24 +397,13 @@ final class BookmarksSubMenu: NSMenu {
             .targetting(target)
             .firingPixel(Pixel.Event.MoreResult.bookmarksMenuShowToolbarPanel)
 
-        if PersistentAppInterfaceSettings.shared.showBookmarksBar {
-            addItem(withTitle: UserText.hideBookmarksBar, action: #selector(MoreOptionsMenu.toggleBookmarksBar(_:)), keyEquivalent: "b")
-                .withModifierMask([.shift, .command])
-                .targetting(target)
-                .firingPixel(Pixel.Event.MoreResult.bookmarksMenuHideBookmarksBar)
-            
-        } else {
-            addItem(withTitle: UserText.showBookmarksBar, action: #selector(MoreOptionsMenu.toggleBookmarksBar(_:)), keyEquivalent: "b")
-                .withModifierMask([.shift, .command])
-                .targetting(target)
-                .firingPixel(Pixel.Event.MoreResult.bookmarksMenuShowBookmarksBar)
-        }
-
         addItem(NSMenuItem.separator())
         
         if let favorites = LocalBookmarkManager.shared.list?.favoriteBookmarks {
             let favoriteViewModels = favorites.compactMap(BookmarkViewModel.init(entity:))
-            let favoriteMenuItems = bookmarkMenuItems(from: favoriteViewModels)
+            let potentialItems = bookmarkMenuItems(from: favoriteViewModels)
+            
+            let favoriteMenuItems = potentialItems.isEmpty ? [NSMenuItem.empty] : potentialItems
             
             let favoritesItem = addItem(withTitle: "Favorites", action: nil, keyEquivalent: "")
             favoritesItem.submenu = NSMenu(items: favoriteMenuItems)
