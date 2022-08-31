@@ -239,12 +239,14 @@ final class NavigationBarViewController: NSViewController {
     }
 
     @IBAction func bookmarksButtonAction(_ sender: NSButton) {
-        showBookmarkListPopover()
+        if bookmarkListPopover.isShown {
+            bookmarkListPopover.close()
+        } else {
+            showBookmarkListPopover()
+        }
     }
 
     @IBAction func passwordManagementButtonAction(_ sender: NSButton) {
-        // Use the category that is already selected
-
         if passwordManagementPopover.isShown {
             passwordManagementPopover.close()
         } else {
