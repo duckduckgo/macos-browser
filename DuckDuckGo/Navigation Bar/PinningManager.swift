@@ -21,7 +21,6 @@ import Foundation
 enum PinnableView: String {
     case autofill
     case bookmarks
-    case downloads
 }
 
 protocol PinningManager {
@@ -34,16 +33,9 @@ protocol PinningManager {
 final class LocalPinningManager: PinningManager {
 
     static let shared = LocalPinningManager()
-
-    var autofillPinned = false
-    var bookmarksPinned = false
     
     @UserDefaultsWrapper(key: .pinnedViews, defaultValue: [])
     private var pinnedViewStrings: [String]
-    
-    private var pinnedViews: [PinnableView] {
-        return pinnedViewStrings.compactMap(PinnableView.init(rawValue:))
-    }
 
     func togglePinning(for view: PinnableView) {
         if isPinned(view) {
