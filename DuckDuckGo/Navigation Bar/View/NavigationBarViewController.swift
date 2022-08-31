@@ -672,11 +672,35 @@ extension NavigationBarViewController: NSMenuDelegate {
         } else {
             menu.addItem(withTitle: UserText.showBookmarksBar, action: #selector(toggleBookmarksBar), keyEquivalent: "")
         }
+        
+        menu.addItem(NSMenuItem.separator())
+        
+        if LocalPinningManager.shared.isPinned(.autofill) {
+            menu.addItem(withTitle: UserText.unPinAutofillPanel, action: #selector(toggleAutofillPanelPinning), keyEquivalent: "")
+        } else {
+            menu.addItem(withTitle: UserText.pinAutofillPanel, action: #selector(toggleAutofillPanelPinning), keyEquivalent: "")
+        }
+        
+        if LocalPinningManager.shared.isPinned(.bookmarks) {
+            menu.addItem(withTitle: UserText.unPinBookmarksPanel, action: #selector(toggleBookmarksPanelPinning), keyEquivalent: "")
+        } else {
+            menu.addItem(withTitle: UserText.pinBookmarksPanel, action: #selector(toggleBookmarksPanelPinning), keyEquivalent: "")
+        }
     }
     
     @objc
     private func toggleBookmarksBar(_ sender: NSMenuItem) {
         PersistentAppInterfaceSettings.shared.showBookmarksBar.toggle()
+    }
+    
+    @objc
+    private func toggleAutofillPanelPinning(_ sender: NSMenuItem) {
+        LocalPinningManager.shared.togglePinning(for: .autofill)
+    }
+    
+    @objc
+    private func toggleBookmarksPanelPinning(_ sender: NSMenuItem) {
+        LocalPinningManager.shared.togglePinning(for: .bookmarks)
     }
 
 }

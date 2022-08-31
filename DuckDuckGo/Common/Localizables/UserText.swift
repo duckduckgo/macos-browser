@@ -537,4 +537,9 @@ struct UserText {
     static let bookmarksBarContextMenuDelete = NSLocalizedString("bookmarks.bar.context-menu.delete", value: "Delete", comment: "Delete menu item for the bookmarks bar context menu")
     static let bookmarksBarContextMenuMoveToEnd = NSLocalizedString("bookmarks.bar.context-menu.move-to-end", value: "Move to End", comment: "Move to End menu item for the bookmarks bar context menu")
     
+    static let pinAutofillPanel = NSLocalizedString("pinning.pin-autofill-panel", value: "Pin Autofill Panel", comment: "Menu item for pinning the autofill panel")
+    static let unPinAutofillPanel = NSLocalizedString("pinning.un-pin-autofill-panel", value: "Unpin Autofill Panel", comment: "Menu item for unpinning the autofill panel")
+    
+    static let pinBookmarksPanel = NSLocalizedString("pinning.pin-bookmarks-panel", value: "Pin Bookmarks Panel", comment: "Menu item for pinning the bookmarks panel")
+    static let unPinBookmarksPanel = NSLocalizedString("pinning.un-pin-bookmarks-panel", value: "Unpin Bookmarks Panel", comment: "Menu item for unpinning the bookmarks panel")
 }
