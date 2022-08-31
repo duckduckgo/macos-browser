@@ -52,7 +52,7 @@ final class PixelStoreTests: XCTestCase {
         var oldContainer: NSPersistentContainer! = NSPersistentContainer.createPersistentContainer(at: url,
                                                                                                    modelName: "OldPixelDataModel",
                                                                                                    bundle: Bundle(for: type(of: self)))
-        var oldContext: NSManagedObjectContext! = oldContainer.viewContext
+        var oldContext: NSManagedObjectContext! = oldContainer.newBackgroundContext()
         func updateModelOld(_ managedObject: NSManagedObject) -> (PixelDataRecord) throws -> Void {
             { record in
                 managedObject.setValue(record.key, forKey: #keyPath(PixelData.key))
@@ -62,14 +62,19 @@ final class PixelStoreTests: XCTestCase {
         var oldStore: LocalPixelDataStore! = LocalPixelDataStore(context: oldContext, updateModel: updateModelOld, entityName: PixelData.className())
 
         let e1 = expectation(description: "Double saved")
-        oldStore.set(1.23, forKey: "a") { error in
-            XCTAssertNil(error)
-            e1.fulfill()
+        oldContext.perform {
+            oldStore.set(1.23, forKey: "a") { error in
+                XCTAssertNil(error)
+                e1.fulfill()
+            }
         }
+        
         let e2 = expectation(description: "Int saved")
-        oldStore.set(1, forKey: "b") { error in
-            XCTAssertNil(error)
-            e2.fulfill()
+        oldContext.perform {
+            oldStore.set(1, forKey: "b") { error in
+                XCTAssertNil(error)
+                e2.fulfill()
+            }
         }
 
         waitForExpectations(timeout: 1)
