@@ -738,7 +738,7 @@ CQ
                                             <modifierMask key="keyEquivalentModifierMask"/>
                                             <menu key="submenu" title="Configuration" id="z0p-D5-iYh">
                                                 <items>
-                                                    <menuItem title="Show Save Credentials Popover" id="ZB2-SK-OqK" userLabel="Fetch configuration now">
+                                                    <menuItem title="Fetch configuration now" id="ZB2-SK-OqK" userLabel="Fetch configuration now">
                                                         <modifierMask key="keyEquivalentModifierMask"/>
                                                         <connections>
                                                             <action selector="fetchConfigurationNow:" target="Ady-hI-5gd" id="31i-Lv-4r5"/>
