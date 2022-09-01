@@ -67,8 +67,7 @@ final class RecentlyVisitedModel: ObservableObject {
             guard let host = $0.url.host?.droppingWwwPrefix() else { return }
 
             var site = sitesByDomain[host]
-            if site == nil {
-                let newSite = RecentlyVisitedSiteModel(domain: host, originalURL: $0.url)
+            if site == nil, let newSite = RecentlyVisitedSiteModel(originalURL: $0.url) {
                 sitesByDomain[host] = newSite
                 recentSites.append(newSite)
                 site = newSite
@@ -165,10 +164,13 @@ final class RecentlyVisitedSiteModel: ObservableObject {
     @Published var isBurning = false
     @Published var isHidden = false
 
-    init(domain: String,
-         originalURL: URL,
-         bookmarkManager: BookmarkManager = LocalBookmarkManager.shared,
-         fireproofDomains: FireproofDomains = FireproofDomains.shared) {
+    init?(originalURL: URL,
+          bookmarkManager: BookmarkManager = LocalBookmarkManager.shared,
+          fireproofDomains: FireproofDomains = FireproofDomains.shared) {
+        guard let domain = originalURL.host?.droppingWwwPrefix() else {
+            return nil
+        }
+        
         self.domain = domain
         
         var components = URLComponents()

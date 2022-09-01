@@ -22,25 +22,26 @@ import XCTest
 class RecentlyVisitedSiteModelTests: XCTestCase {
 
     func testWhenOriginalURLIsHTTPS_ThenModelURLIsHTTPS() {
-        assertModelWithURL(URL(string: "https://example.com")!, matches: URL(string: "https://example.com")!)
+        assertModelWithURL(URL(string: "https://example.com")!, matches: URL(string: "https://example.com")!, expectedDomain: "example.com")
     }
     
     func testWhenOriginalURLIsHTTP_ThenModelURLIsHTTP() {
-        assertModelWithURL(URL(string: "http://example.com")!, matches: URL(string: "http://example.com")!)
+        assertModelWithURL(URL(string: "http://example.com")!, matches: URL(string: "http://example.com")!, expectedDomain: "example.com")
     }
     
     func testWhenOriginalURLContainsAdditionalInformation_ThenModelURLOnlyUsesSchemeAndHost() {
-        assertModelWithURL(URL(string: "http://example.com/path?test=true#fragment")!, matches: URL(string: "http://example.com")!)
-        assertModelWithURL(URL(string: "https://example.com/path?test=true#fragment")!, matches: URL(string: "https://example.com")!)
+        assertModelWithURL(URL(string: "http://example.com/path?test=true#fragment")!, matches: URL(string: "http://example.com")!, expectedDomain: "example.com")
+        assertModelWithURL(URL(string: "https://example.com/path?test=true#fragment")!, matches: URL(string: "https://example.com")!, expectedDomain: "example.com")
     }
     
-    func testWhenUsingDataURL_ThenOnlySchemeIsReturned() {
-        assertModelWithURL(URL(string: "data:text/html,%3Ch1%3EHello%2C%20World%21%3C%2Fh1%3E")!, matches: URL(string: "data:")!)
+    func testWhenOriginalURLContainsWWW_ThenDomainDoesNotIncludeIt() {
+        assertModelWithURL(URL(string: "http://www.example.com")!, matches: URL(string: "http://www.example.com")!, expectedDomain: "example.com")
     }
-    
-    private func assertModelWithURL(_ url: URL, matches expectedURL: URL) {
-        let model = HomePage.Models.RecentlyVisitedSiteModel(domain: "example.com", originalURL: url)
-        XCTAssertEqual(model.url, expectedURL)
+
+    private func assertModelWithURL(_ url: URL, matches expectedURL: URL, expectedDomain: String) {
+        let model = HomePage.Models.RecentlyVisitedSiteModel(originalURL: url)
+        XCTAssertEqual(model?.domain, expectedDomain)
+        XCTAssertEqual(model?.url, expectedURL)
     }
 
 }
