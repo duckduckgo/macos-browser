@@ -33,8 +33,8 @@ final class NavigationBarViewController: NSViewController {
     @IBOutlet weak var goForwardButton: NSButton!
     @IBOutlet weak var refreshButton: NSButton!
     @IBOutlet weak var optionsButton: NSButton!
-    @IBOutlet weak var bookmarkListButton: NSButton!
-    @IBOutlet weak var passwordManagementButton: NSButton!
+    @IBOutlet weak var bookmarkListButton: MouseOverButton!
+    @IBOutlet weak var passwordManagementButton: MouseOverButton!
     @IBOutlet weak var downloadsButton: MouseOverButton!
     @IBOutlet weak var navigationButtons: NSView!
     @IBOutlet weak var addressBarContainer: NSView!
@@ -111,7 +111,6 @@ final class NavigationBarViewController: NSViewController {
     private var selectedTabViewModelCancellable: AnyCancellable?
     private var credentialsToSaveCancellable: AnyCancellable?
     private var passwordManagerNotificationCancellable: AnyCancellable?
-    private var pinningManagerNotificationCancellable: AnyCancellable?
     private var navigationButtonsCancellables = Set<AnyCancellable>()
     private var downloadsCancellables = Set<AnyCancellable>()
 
@@ -265,9 +264,25 @@ final class NavigationBarViewController: NSViewController {
     }
     
     func listenToPinningManagerNotifications() {
-        pinningManagerNotificationCancellable = NotificationCenter.default.publisher(for: .PinnedViewsChanged).sink { [weak self] _ in
-            self?.updateBookmarksButton()
-            self?.updatePasswordManagementButton()
+        NotificationCenter.default.addObserver(forName: .PinnedViewsChanged, object: nil, queue: .main) { [weak self] notification in
+            guard let self = self else {
+                return
+            }
+            
+            if let userInfo = notification.userInfo as? [String: String],
+               let viewType = userInfo[LocalPinningManager.pinnedViewChangedNotificationViewTypeKey],
+               let view = PinnableView(rawValue: viewType) {
+                switch view {
+                case .autofill:
+                    self.updatePasswordManagementButton(animated: true)
+                case .bookmarks:
+                    self.updateBookmarksButton(animated: true)
+                }
+            } else {
+                assertionFailure("Failed to get changed pinned view type")
+                self.updateBookmarksButton()
+                self.updatePasswordManagementButton()
+            }
         }
     }
 
@@ -496,7 +511,7 @@ final class NavigationBarViewController: NSViewController {
         self.view.menu = menu
     }
 
-    private func updatePasswordManagementButton() {
+    private func updatePasswordManagementButton(animated: Bool = false) {
         let url = tabCollectionViewModel.selectedTabViewModel?.tab.content.url
 
         passwordManagementButton.image = NSImage(named: "PasswordManagement")
@@ -514,6 +529,18 @@ final class NavigationBarViewController: NSViewController {
             passwordManagementButton.isHidden = false
         } else {
             passwordManagementButton.isHidden = !passwordManagementPopover.isShown
+        }
+        
+        if animated {
+            NSAppearance.withAppAppearance {
+                let animation = CABasicAnimation(keyPath: "backgroundColor")
+                animation.duration = 0.11
+                animation.repeatCount = 2
+                animation.autoreverses = true
+                animation.fromValue = NSColor.clear.cgColor
+                animation.toValue = NSColor.buttonMouseDownColor.cgColor
+                passwordManagementButton.backgroundLayer.add(animation, forKey: "backgroundColor")
+            }
         }
 
         passwordManagementPopover.viewController.domain = nil
@@ -561,11 +588,23 @@ final class NavigationBarViewController: NSViewController {
         downloadsButton.isHidden = true
     }
 
-    private func updateBookmarksButton() {
+    private func updateBookmarksButton(animated: Bool = false) {
         if LocalPinningManager.shared.isPinned(.bookmarks) {
             bookmarkListButton.isHidden = false
         } else {
             bookmarkListButton.isHidden = !bookmarkListPopover.isShown
+        }
+        
+        if animated {
+            NSAppearance.withAppAppearance {
+                let animation = CABasicAnimation(keyPath: "backgroundColor")
+                animation.duration = 0.11
+                animation.repeatCount = 2
+                animation.autoreverses = true
+                animation.fromValue = NSColor.clear.cgColor
+                animation.toValue = NSColor.buttonMouseDownColor.cgColor
+                bookmarkListButton.backgroundLayer.add(animation, forKey: "backgroundColor")
+            }
         }
     }
 
