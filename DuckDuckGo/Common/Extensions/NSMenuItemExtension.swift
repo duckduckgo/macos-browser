@@ -20,6 +20,10 @@ import Cocoa
 
 extension NSMenuItem {
 
+    static var empty: NSMenuItem {
+        return NSMenuItem(title: UserText.bookmarksBarFolderEmpty, action: nil, target: nil, keyEquivalent: "")
+    }
+    
     convenience init(title string: String, action selector: Selector?, target: AnyObject?, keyEquivalent charCode: String) {
         self.init(title: string, action: selector, keyEquivalent: charCode)
         self.target = target
