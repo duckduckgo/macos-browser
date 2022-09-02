@@ -101,6 +101,7 @@ final class MainMenu: NSMenu {
             printMenuItem?.removeFromParent()
             printSeparatorItem?.removeFromParent()
         }
+
         sharingMenu.title = shareMenuItem.title
         shareMenuItem.submenu = sharingMenu
 

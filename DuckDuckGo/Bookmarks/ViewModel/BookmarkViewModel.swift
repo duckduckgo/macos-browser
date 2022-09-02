@@ -45,7 +45,8 @@ struct BookmarkViewModel {
         if let bookmark = entity as? Bookmark {
             let favicon = bookmark.favicon(.small)?.copy() as? NSImage
             favicon?.size = NSSize.faviconSize
-            return favicon
+            
+            return favicon ?? NSImage(named: "BookmarkDefaultFavicon")
         } else if entity is BookmarkFolder {
             return NSImage(named: "Folder")
         } else {
