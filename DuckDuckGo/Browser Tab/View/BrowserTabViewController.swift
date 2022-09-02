@@ -23,6 +23,8 @@ import Combine
 import SwiftUI
 import BrowserServicesKit
 
+// swiftlint:disable file_length
+
 protocol BrowserTabViewControllerClickDelegate: AnyObject {
     func browserTabViewController(_ browserTabViewController: BrowserTabViewController, didClickAtPoint: CGPoint)
 }
@@ -60,6 +62,7 @@ final class BrowserTabViewController: NSViewController {
     private var mouseDownMonitor: Any?
     
     private var cookieConsentPopoverManager = CookieConsentPopoverManager()
+    private let youtubePrivateVideo = PrivateYoutubePlayerChromeViewController()
 
     required init?(coder: NSCoder) {
         fatalError("BrowserTabViewController: Bad initializer")
@@ -87,6 +90,7 @@ final class BrowserTabViewController: NSViewController {
         subscribeToTabs()
         subscribeToSelectedTabViewModel()
         subscribeToErrorViewState()
+        subscribeToURL()
     }
 
     override func viewWillAppear() {
@@ -125,6 +129,8 @@ final class BrowserTabViewController: NSViewController {
                 self.subscribeToErrorViewState()
                 self.subscribeToTabContent(of: selectedTabViewModel)
                 self.showCookieConsentPopoverIfNecessary(selectedTabViewModel)
+                self.hideYoutubePlayer()
+
             }
             .store(in: &cancellables)
     }
@@ -263,6 +269,14 @@ final class BrowserTabViewController: NSViewController {
             )
         }
     }
+    
+    private var urlCancellable: AnyCancellable?
+
+    private func subscribeToURL() {
+        urlCancellable = tabViewModel?.$addressBarString.receive(on: DispatchQueue.main).sink { [weak self] _ in
+            self?.hideYoutubePlayer()
+        }
+    }
 
     func makeWebViewFirstResponder() {
         if let webView = self.webView {
@@ -344,6 +358,7 @@ final class BrowserTabViewController: NSViewController {
         self.addChild(vc)
         view.addAndLayout(vc.view)
     }
+    
 
     private func showTransientTabContentController(_ vc: NSViewController) {
         transientTabContentViewController?.removeCompletely()
@@ -361,7 +376,7 @@ final class BrowserTabViewController: NSViewController {
             return
         }
         scheduleHoverLabelUpdatesForUrl(nil)
-
+        
         switch tabViewModel?.tab.content {
         case .bookmarks:
             removeAllTabContent()
@@ -381,11 +396,14 @@ final class BrowserTabViewController: NSViewController {
             }
             showTransientTabContentController(OnboardingViewController.create(withDelegate: self))
 
-        case .url, .youtubePlayer:
+        case .url:
             if shouldReplaceWebView(for: tabViewModel) {
                 removeAllTabContent(includingWebView: true)
                 changeWebView(tabViewModel: tabViewModel)
             }
+            
+        case let .youtubePlayer(videoID):
+            displayPrivatePlayerChrome(videoID: videoID)
 
         case .homePage:
             removeAllTabContent()
@@ -394,6 +412,22 @@ final class BrowserTabViewController: NSViewController {
         default:
             break
         }
+    }
+    
+    override func viewDidLayout() {
+        super.viewDidLayout()
+        youtubePrivateVideo.view.frame = view.bounds
+    }
+    
+    private func displayPrivatePlayerChrome(videoID: String) {
+        youtubePrivateVideo.view.isHidden = false
+        showTabContentController(youtubePrivateVideo)
+        youtubePrivateVideo.loadVideoID(videoID: videoID)
+    }
+    
+    private func hideYoutubePlayer() {
+        youtubePrivateVideo.view.isHidden = true
+        youtubePrivateVideo.removeFromParent()
     }
 
     private func shouldReplaceWebView(for tabViewModel: TabViewModel?) -> Bool {

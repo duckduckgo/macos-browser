@@ -1240,6 +1240,9 @@ extension Tab: WKNavigationDelegate {
 
         Swift.print(navigationAction.request.url)
         if let url = navigationAction.request.url, let youtubeVideoID = url.youtubeVideoID {
+            webView.stopLoading()
+            return .cancel
+            
             if case .url = content, !shouldSkipPrivateYoutubePlayer && PrivacySecurityPreferences.shared.privateYoutubePlayerEnabled == true {
                 setContent(.youtubePlayer(videoID: youtubeVideoID))
                 return .cancel
@@ -1250,7 +1253,7 @@ extension Tab: WKNavigationDelegate {
                     setContent(.url(url))
                     return .cancel
                 } else if webView.url != URL.localYoutubeURL(for: videoID) {
-                    YoutubePlayer(videoID: youtubeVideoID).load(in: webView)
+                    // YoutubePlayer(videoID: youtubeVideoID).load(in: webView)
                     return .cancel
                 }
             }
