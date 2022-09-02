@@ -93,6 +93,7 @@ final class Tab: NSObject, Identifiable, ObservableObject {
                 return false
             }
         }
+        
 
         func matchesDisplayableTab(_ other: TabContent) -> Bool {
             switch (self, other) {
@@ -152,6 +153,7 @@ final class Tab: NSObject, Identifiable, ObservableObject {
     }
     private let cbaTimeReporter: ContentBlockingAssetsCompilationTimeReporter?
     private let pinnedTabsManager: PinnedTabsManager
+    private var youtubePlayerID: String?
 
     init(content: TabContent,
          faviconManagement: FaviconManagement = FaviconManager.shared,
@@ -466,7 +468,8 @@ final class Tab: NSObject, Identifiable, ObservableObject {
             if let url = content.url, shouldSkipPrivateYoutubePlayer || PrivacySecurityPreferences.shared.privateYoutubePlayerEnabled == false {
                 webView.load(url)
             } else {
-                YoutubePlayer(videoID: videoID).load(in: webView)
+                youtubePlayerID = videoID
+                webView.load(URL(string: "https://player-poc.pages.dev/private_player_template_only")!)
             }
         } else if case let .url(url) = content,
                   let videoID = url.youtubeVideoID,
@@ -1250,7 +1253,8 @@ extension Tab: WKNavigationDelegate {
                     setContent(.url(url))
                     return .cancel
                 } else if webView.url != URL.localYoutubeURL(for: videoID) {
-                    YoutubePlayer(videoID: youtubeVideoID).load(in: webView)
+                    youtubePlayerID = videoID
+                    webView.load(URL(string: "https://player-poc.pages.dev/private_player_template_only")!)
                     return .cancel
                 }
             }
@@ -1261,6 +1265,7 @@ extension Tab: WKNavigationDelegate {
 
         return .allow
     }
+    
 
     // swiftlint:enable cyclomatic_complexity
     // swiftlint:enable function_body_length
@@ -1358,6 +1363,14 @@ extension Tab: WKNavigationDelegate {
         if isAMPProtectionExtracting { isAMPProtectionExtracting = false }
         linkProtection.setMainFrameUrl(nil)
         enableYoutubeIfNecessary()
+        injectYoutubeIDIfNecessary()
+    }
+    
+    private func injectYoutubeIDIfNecessary() {
+        if webView.url?.absoluteString.contains("player-poc.pages") == true,
+           let videoID = youtubePlayerID {
+            webView.evaluateJavaScript("insertVideoIdIntoPlayer('\(videoID)')")
+        }
     }
 
     func webView(_ webView: WKWebView, didFail navigation: WKNavigation!, withError error: Error) {
