@@ -405,7 +405,7 @@ final class BookmarksSubMenu: NSMenu {
             
             let favoriteMenuItems = potentialItems.isEmpty ? [NSMenuItem.empty] : potentialItems
             
-            let favoritesItem = addItem(withTitle: "Favorites", action: nil, keyEquivalent: "")
+            let favoritesItem = addItem(withTitle: UserText.favorites, action: nil, keyEquivalent: "")
             favoritesItem.submenu = NSMenu(items: favoriteMenuItems)
             favoritesItem.image = NSImage(named: "Favorite")
             
