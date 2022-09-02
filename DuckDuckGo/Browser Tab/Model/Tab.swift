@@ -1136,6 +1136,10 @@ extension Tab: WKNavigationDelegate {
             lastUpgradedURL = nil
         }
         
+        if navigationAction.isTargetingMainFrame, navigationAction.navigationType == .backForward {
+            adClickAttributionLogic.onBackForwardNavigation(mainFrameURL: webView.url)
+        }
+        
         if navigationAction.isTargetingMainFrame, navigationAction.navigationType != .backForward {
             if let newRequest = referrerTrimming.trimReferrer(forNavigation: navigationAction,
                                                               originUrl: webView.url ?? navigationAction.sourceFrame.webView?.url) {
@@ -1330,6 +1334,7 @@ extension Tab: WKNavigationDelegate {
         linkProtection.setMainFrameUrl(webView.url)
         referrerTrimming.onBeginNavigation(to: webView.url)
         adClickAttributionDetection.onStartNavigation(url: webView.url)
+        
     }
 
     @MainActor
