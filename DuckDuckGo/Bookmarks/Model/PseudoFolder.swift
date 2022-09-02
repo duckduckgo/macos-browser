@@ -20,8 +20,8 @@ import Foundation
 
 final class PseudoFolder: Equatable {
 
-    static let favorites = PseudoFolder(id: UUID(), name: "Favorites", icon: NSImage(named: "FavoriteFilledBorder")!)
-    static let bookmarks = PseudoFolder(id: UUID(), name: "Bookmarks", icon: NSImage(named: "Folder")!)
+    static let favorites = PseudoFolder(id: UUID(), name: UserText.favorites, icon: NSImage(named: "FavoriteFilledBorder")!)
+    static let bookmarks = PseudoFolder(id: UUID(), name: UserText.bookmarks, icon: NSImage(named: "Folder")!)
 
     let id: UUID
     let name: String

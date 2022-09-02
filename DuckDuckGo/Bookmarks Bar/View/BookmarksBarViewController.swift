@@ -249,7 +249,7 @@ extension BookmarksBarViewController: BookmarksBarViewModelDelegate {
     
     private func bookmarkFolderMenu(items: [NSMenuItem]) -> NSMenu {
         let menu = NSMenu()
-        menu.items = items.isEmpty ? [NSMenuItem(title: UserText.bookmarksBarFolderEmpty, action: nil, target: nil, keyEquivalent: "")] : items
+        menu.items = items.isEmpty ? [NSMenuItem.empty] : items
         return menu
     }
     
