@@ -477,6 +477,12 @@ final class Tab: NSObject, Identifiable, ObservableObject {
                        errorReporting: Self.debugEvents)
     }()
     
+    lazy var referrerTrimming: ReferrerTrimming = {
+        ReferrerTrimming(privacyManager: ContentBlocking.shared.privacyConfigurationManager,
+                         contentBlockingManager: ContentBlocking.shared.contentBlockingManager,
+                         tld: TLD())
+    }()
+    
     // MARK: - Ad Click Attribution
     
     private let adClickAttributionDetection = ContentBlocking.shared.makeAdClickAttributionDetection()
@@ -1129,6 +1135,17 @@ extension Tab: WKNavigationDelegate {
         if navigationAction.isTargetingMainFrame, navigationAction.request.mainDocumentURL?.host != lastUpgradedURL?.host {
             lastUpgradedURL = nil
         }
+        
+        if navigationAction.isTargetingMainFrame, navigationAction.navigationType != .backForward {
+            if let newRequest = referrerTrimming.trimReferrer(forNavigation: navigationAction,
+                                                              originUrl: webView.url ?? navigationAction.sourceFrame.webView?.url) {
+                self.invalidateBackItemIfNeeded(for: navigationAction)
+                defer {
+                    webView.load(newRequest)
+                }
+                return .cancel
+            }
+        }
 
         if navigationAction.isTargetingMainFrame {
             if navigationAction.navigationType == .backForward,
@@ -1311,6 +1328,7 @@ extension Tab: WKNavigationDelegate {
         resetDashboardInfo()
         linkProtection.cancelOngoingExtraction()
         linkProtection.setMainFrameUrl(webView.url)
+        referrerTrimming.onBeginNavigation(to: webView.url)
         adClickAttributionDetection.onStartNavigation(url: webView.url)
     }
 
@@ -1321,6 +1339,7 @@ extension Tab: WKNavigationDelegate {
         webViewDidFinishNavigationPublisher.send()
         if isAMPProtectionExtracting { isAMPProtectionExtracting = false }
         linkProtection.setMainFrameUrl(nil)
+        referrerTrimming.onFinishNavigation()
         adClickAttributionDetection.onDidFinishNavigation(url: webView.url)
         adClickAttributionLogic.onDidFinishNavigation(host: webView.url?.host)
     }
@@ -1333,6 +1352,7 @@ extension Tab: WKNavigationDelegate {
         isBeingRedirected = false
         invalidateSessionStateData()
         linkProtection.setMainFrameUrl(nil)
+        referrerTrimming.onFailedNavigation()
         adClickAttributionDetection.onDidFailNavigation()
         webViewDidFailNavigationPublisher.send()
     }
@@ -1349,6 +1369,7 @@ extension Tab: WKNavigationDelegate {
         self.error = error
         isBeingRedirected = false
         linkProtection.setMainFrameUrl(nil)
+        referrerTrimming.onFailedNavigation()
         adClickAttributionDetection.onDidFailNavigation()
         webViewDidFailNavigationPublisher.send()
     }
