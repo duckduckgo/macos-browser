@@ -111,6 +111,7 @@ final class NavigationBarViewController: NSViewController {
     private var selectedTabViewModelCancellable: AnyCancellable?
     private var credentialsToSaveCancellable: AnyCancellable?
     private var passwordManagerNotificationCancellable: AnyCancellable?
+    private var pinnedViewsNotificationCancellable: AnyCancellable?
     private var navigationButtonsCancellables = Set<AnyCancellable>()
     private var downloadsCancellables = Set<AnyCancellable>()
 
@@ -264,7 +265,7 @@ final class NavigationBarViewController: NSViewController {
     }
     
     func listenToPinningManagerNotifications() {
-        NotificationCenter.default.addObserver(forName: .PinnedViewsChanged, object: nil, queue: .main) { [weak self] notification in
+        pinnedViewsNotificationCancellable = NotificationCenter.default.publisher(for: .PinnedViewsChanged).sink { [weak self] notification in
             guard let self = self else {
                 return
             }
