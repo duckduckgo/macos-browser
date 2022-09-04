@@ -533,15 +533,27 @@ final class NavigationBarViewController: NSViewController {
         }
         
         if animated {
-            NSAppearance.withAppAppearance {
-                let animation = CABasicAnimation(keyPath: "backgroundColor")
-                animation.duration = 0.11
-                animation.repeatCount = 2
-                animation.autoreverses = true
-                animation.fromValue = NSColor.clear.cgColor
-                animation.toValue = NSColor.buttonMouseDownColor.cgColor
-                passwordManagementButton.backgroundLayer.add(animation, forKey: "backgroundColor")
-            }
+//            NSAppearance.withAppAppearance {
+//                let animation = CABasicAnimation(keyPath: "backgroundColor")
+//                animation.duration = 0.11
+//                animation.repeatCount = 2
+//                animation.autoreverses = true
+//                animation.fromValue = NSColor.clear.cgColor
+//                animation.toValue = NSColor.buttonMouseDownColor.cgColor
+//                passwordManagementButton.backgroundLayer.add(animation, forKey: "backgroundColor")
+//            }
+            
+            // let accessoryView = NSView(frame: NSRect(x: 0, y: 0, width: 15, height: 15))
+            let accessoryView = NSImageView(image: NSImage(named: "Pin")!)
+            accessoryView.frame = NSRect(x: 0, y: 0, width: 18, height: 18)
+            accessoryView.wantsLayer = true
+            accessoryView.layer?.backgroundColor = NSColor.controlAccentColor.cgColor
+            accessoryView.contentTintColor = .white
+            accessoryView.imageScaling = .scaleProportionallyDown
+            accessoryView.layer?.masksToBounds = true
+            accessoryView.layer?.cornerRadius = 18 / 2
+
+            passwordManagementButton.showAnimatedAccessoryView(accessoryView)
         }
 
         passwordManagementPopover.viewController.domain = nil
