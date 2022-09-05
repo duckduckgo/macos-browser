@@ -93,6 +93,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         _ = ConfigurationManager.shared
         _ = DownloadListCoordinator.shared
         _ = RecentlyClosedCoordinator.shared
+        BitwardenManager.shared.initCommunication()
 
         AtbAndVariantCleanup.cleanup()
         DefaultVariantManager().assignVariantIfNeeded { _ in

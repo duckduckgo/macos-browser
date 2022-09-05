@@ -68,6 +68,10 @@ extension OSLog {
     static var bookmarks: OSLog {
         Logging.bookmarksLoggingEnabled ? Logging.bookmarksLog : .disabled
     }
+
+    static var bitwarden: OSLog {
+        Logging.bitwardenLoggingEnabled ? Logging.bitwardenLog : .disabled
+    }
 }
 
 struct Logging {
@@ -105,7 +109,10 @@ struct Logging {
     fileprivate static let autoconsentLoggingEnabled = false
     fileprivate static let autoconsentLog: OSLog = OSLog(subsystem: Bundle.main.bundleIdentifier ?? "DuckDuckGo", category: "Autoconsent")
     
-    fileprivate static let bookmarksLoggingEnabled = true
+    fileprivate static let bookmarksLoggingEnabled = false
     fileprivate static let bookmarksLog: OSLog = OSLog(subsystem: Bundle.main.bundleIdentifier ?? "DuckDuckGo", category: "Bookmarks")
+
+    fileprivate static let bitwardenLoggingEnabled = true
+    fileprivate static let bitwardenLog: OSLog = OSLog(subsystem: Bundle.main.bundleIdentifier ?? "DuckDuckGo", category: "Bitwarden")
 
 }
