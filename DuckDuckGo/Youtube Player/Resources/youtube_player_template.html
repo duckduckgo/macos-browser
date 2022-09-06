@@ -2,33 +2,788 @@
 <html>
     <head>
         <title>Private Player</title>
-        <meta name='viewport' content='width=device-width, initial-scale=1.0'>
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <style>
-            .container{position: relative;width: 100%;height: 0;padding-bottom: 56.25%; background-color: black}
-            iframe{position: absolute;top:0;left:0;width:100%;height:100%;}
-            body {background-color: #222;}
-            p {color: white; font-size: large;}
-            li {color: white; font-size: large;}
+            body {
+                background: #222222;
+                color: rgba(255, 255, 255, 0.85);
+                font-family: system-ui;
+                font-size: 13px;
+                line-height: 16px;
+                letter-spacing: -0.08px;
+            }
+
+            iframe, #player {
+                width: 64vw;
+                height: 36vw;
+            }
+
+            #player {
+                border-radius: 12px;
+                overflow: hidden;
+                z-index: 10;
+                position: relative;
+            }
+
+            .player-error {
+                text-align: center;
+                line-height: 36vw;
+                background: #2f2f2f;
+            }
+
+            .content {
+                width: 64vw;
+                margin: 20px auto;
+                box-shadow: 0px 10px 24px rgba(0, 0, 0, 0.32);
+            }
+
+            .content-body {
+                background: rgba(255, 255, 255, 0.06);
+                border-radius: 12px;
+                transition: opacity 0.5s linear;
+                opacity: 1;
+            }
+
+            .content-body.faded {
+                opacity: 0.3;
+            }
+
+            .header {
+                padding-top: 21px;
+                margin-top: -12px;
+                background: rgba(255, 255, 255, 0.03);
+                height: 45px;
+            }
+
+            .header::after {
+                content: "";
+                visibility: hidden;
+                display: block;
+                clear: both;
+            }
+
+            .logo {
+                float: left;
+                font-style: normal;
+                font-weight: 600;
+                color: #FFFFFF;
+                margin-left: 17px;
+                margin-top: 6px;
+            }
+
+            .logo .logo-icon {
+                margin-bottom: -8px;
+                margin-right: 6px;
+            }
+
+            .logo .play-icon {
+                margin-bottom: -6px;
+                margin-left: 7px;
+            }
+
+            .menu {
+                float: right;
+            }
+
+            .menu > form, .menu > div {
+                float: left;
+            }
+
+            .play-on-youtube {
+                display: flex;
+                flex-direction: row;
+                justify-content: center;
+                align-items: center;
+                padding: 0px 0;
+                gap: 6px;
+                width: 103.38px;
+                height: 36px;
+                background: rgba(255, 255, 255, 0.25);
+                box-shadow: 0px 0px 0px 0.5px rgb(0 0 0 / 10%), 0px 0px 1px rgb(0 0 0 / 5%), 0px 1px 1px rgb(0 0 0 / 20%), inset 0px 0.5px 0px rgb(255 255 255 / 20%), inset 0px 1px 0px rgb(255 255 255 / 5%);
+                border-radius: 8px;
+                float: left;
+                margin-right: 18px;
+            }
+
+            .settings-label,
+            .settings-toggle-container {
+                cursor: pointer;
+                float: left;
+            }
+
+            .settings-toggle-container {
+                margin-left: 10px;
+            }
+
+            .list {
+                clear: both;
+                overflow: hidden;
+                height: 0px;
+            }
+
+            .list ul {
+                list-style-type: none;
+                margin: 0;
+                padding: 0;
+                margin-left: 14px;
+                margin-top: 10px;
+            }
+
+            .list ul svg {
+                margin-bottom: -6px;
+            }
+
+            .list ul li {
+                padding-bottom: 12px;
+            }
+
+            .list .list-copy svg {
+                margin-right: 9px;
+            }
+
+            .list .list-settings input {
+                margin-right: 6px;
+            }
+
+            .list.columns ul {
+                float: left;
+                width: calc(50% - 14px);
+            }
+
+            .list.columns .list-settings {
+                margin-left: 30px;
+                width:calc(50% - 30px);
+            }
+
+
+            .list-toggle {
+                cursor: pointer;
+                margin-top: 12px;
+                margin-right: 18px;
+            }
+
+            .list-toggle svg {
+                transform: rotate(180deg);
+                transform-origin: center;
+            }
+
+            .list-toggle.expanded svg {
+                transform: rotate(0deg);
+            }
+
+            .list.expanded {
+                height: 108px;
+            }
+
+            .hidden {
+                display: none;
+            }
+
+            .animate, .animate .animatable {
+                transition: all 0.3s linear;
+            }
+
+            /* --- --- CUSTOM FORM SWITCH FROM DUCKDUCKGO.COM --- --- */
+
+            .frm__switch {
+                align-self: center;
+                display: flex;
+            }
+
+            .frm__switch + .frm__label {
+                max-width: 75%;
+            }
+
+            .frm__switch .frm__switch__label.btn {
+                width: 28px;
+                height: 12px;
+                padding: 2px;
+                border-radius: 8px;
+                position: relative;
+                background-color: lightgray;
+                border: none;
+                transition: background-color 150ms linear;
+                margin-left: auto;
+                cursor: pointer;
+            }
+
+            .frm__switch .frm__switch__label.btn:hover {
+                opacity: 0.9;
+            }
+
+            .frm__switch .frm__switch__label.btn .frm__switch-on,
+            .frm__switch .frm__switch__label.btn .frm__switch-off {
+                display: none;
+            }
+
+            .frm__switch .frm__switch__label.btn::after {
+                content: "";
+                width: 12px;
+                height: 12px;
+                background: white;
+                border-radius: 6px;
+                position: absolute;
+                top: 2px;
+                left: 2px;
+                transition: left 100ms ease-in;
+            }
+
+            .frm__switch.is-checked .frm__switch__label.btn  {
+                background-color: #3969EF;
+                border-color: #3969EF;
+                transition: background-color 150ms linear;
+            }
+
+            .frm__switch.is-checked .frm__switch__label.btn::after {
+                left: 18px;
+                transition: left 100ms ease-in;
+            }
+
+            .frm__switch__inp {
+                border: 0;
+                clip: rect(0 0 0 0);
+                height: 1px;
+                margin: -1px;
+                overflow: hidden;
+                padding: 0;
+                position: absolute;
+                width: 1px;
+            }
         </style>
     </head>
     <body>
-        <div class='container'>
-            <div id='player'>
-              <iframe src="https://www.youtube-nocookie.com/embed/%%VIDEOID%%?wmode=transparent&iv_load_policy=3&autoplay=1&html5=1&showinfo=0&rel=0&modestbranding=0&playsinline=0&theme=light"
-                  frameborder="0" allowfullscreen sandbox="allow-popups allow-scripts allow-same-origin"></iframe>
+        <div class="content">
+            <div id="player">
+                <iframe id="video-player" frameborder="0" allow="autoplay; encrypted-media" allowfullscreen></iframe>
+            </div>
+            <div class="content-body">
+                <div class="header">
+                    <div class="logo">
+                        <!-- <svg width="24" height="25" viewBox="0 0 24 25" fill="none" xmlns="http://www.w3.org/2000/svg" class="logo-icon">
+                            <path d="M14.1402 21.131C13.7869 20.4471 13.4176 19.4492 13.2017 19.019C12.5115 17.6248 11.8165 15.6603 12.1321 14.3929C12.1894 14.1622 11.4812 5.86576 10.9807 5.59713C10.4246 5.29882 9.216 4.90493 8.5896 4.79946C8.15292 4.72859 8.05479 4.8522 7.87162 4.88021C8.04498 4.89834 8.866 5.30542 9.02465 5.32849C8.866 5.43726 8.39661 5.32519 8.09732 5.45869C7.94521 5.52955 7.83236 5.78995 7.83563 5.91191C8.691 5.82456 10.0272 5.91026 10.8188 6.26295C10.1891 6.33546 9.23236 6.41622 8.82184 6.63376C7.62792 7.26662 7.10129 8.74824 7.41531 10.5249C7.70643 12.1779 8.99537 18.6144 9.51709 21.131C10.4362 21.4474 11.1212 21.6069 12.145 21.6069C13.1395 21.6069 13.5841 21.2381 14.1402 21.131Z" fill="#D5D7D8"/>
+                            <path fill-rule="evenodd" clip-rule="evenodd" d="M9.98431 21.2998C9.80923 20.0461 9.49398 18.7306 9.23216 17.4923C8.65596 14.7671 7.93939 11.3779 7.72236 10.1651C7.40449 8.382 7.72236 7.10886 8.9359 6.46981C9.35145 6.25127 9.94414 6.09233 10.5799 6.02114C9.77859 5.66519 8.82828 5.52778 7.9591 5.61553C7.95693 5.37438 8.23556 5.30072 8.49618 5.23181C8.63279 5.1957 8.76446 5.16089 8.84815 5.10395C8.77135 5.09287 8.64002 5.00492 8.50451 4.91416C8.35667 4.81515 8.20384 4.71281 8.11142 4.7033C9.21403 4.51457 10.3481 4.69171 11.3381 5.21157C11.8431 5.48308 12.2007 5.77281 12.4209 6.07578C12.9954 6.1867 13.5036 6.39365 13.8364 6.72642C14.8579 7.74626 15.7685 10.074 15.3877 11.4134C15.2801 11.7842 15.035 12.0557 14.7271 12.2792C14.49 12.452 14.3637 12.4084 14.2048 12.3537C13.9631 12.2705 13.6463 12.1614 12.7503 12.7478C12.6178 12.8338 12.576 13.3034 12.5437 13.6657C12.5288 13.833 12.5159 13.9775 12.497 14.0507C12.1792 15.3238 12.8795 17.2956 13.5798 18.6979C13.7139 18.9652 13.8898 19.3023 14.0885 19.683C14.1984 19.8935 14.5199 20.7096 14.6405 20.9424C12.4209 21.7688 12.1751 21.8631 9.98431 21.2998Z" fill="white"/>
+                            <path d="M9.85686 10.7012C10.2514 10.7012 10.5711 10.4213 10.5711 10.0762C10.5711 9.73099 10.2514 9.45117 9.85686 9.45117C9.46237 9.45117 9.14258 9.73099 9.14258 10.0762C9.14258 10.4213 9.46237 10.7012 9.85686 10.7012Z" fill="#2D4F8E"/>
+                            <path d="M10.1725 10.0697C10.2684 10.0697 10.346 9.99199 10.346 9.89617C10.346 9.80034 10.2684 9.72266 10.1725 9.72266C10.0767 9.72266 9.99902 9.80034 9.99902 9.89617C9.99902 9.99199 10.0767 10.0697 10.1725 10.0697Z" fill="white"/>
+                            <path d="M14.2666 10.5031C14.5541 10.5031 14.7872 10.2313 14.7872 9.89586C14.7872 9.56047 14.5541 9.28857 14.2666 9.28857C13.9791 9.28857 13.7461 9.56047 13.7461 9.89586C13.7461 10.2313 13.9791 10.5031 14.2666 10.5031Z" fill="#2D4F8E"/>
+                            <path d="M14.469 9.80942C14.5489 9.80942 14.6137 9.73174 14.6137 9.63591C14.6137 9.54009 14.5489 9.4624 14.469 9.4624C14.389 9.4624 14.3242 9.54009 14.3242 9.63591C14.3242 9.73174 14.389 9.80942 14.469 9.80942Z" fill="white"/>
+                            <path d="M9.9291 8.30723C9.9291 8.30723 9.46635 8.09871 9.01725 8.37923C8.56968 8.65825 8.58485 8.94177 8.58485 8.94177C8.58485 8.94177 8.34664 8.41673 8.98084 8.15872C9.61959 7.9037 9.9291 8.30723 9.9291 8.30723Z" fill="#2D4F8E"/>
+                            <path d="M14.6137 8.2078C14.6137 8.2078 14.2487 8.06457 13.9655 8.06686C13.3839 8.07144 13.2256 8.2479 13.2256 8.2479C13.2256 8.2479 13.3239 7.82738 14.0671 7.91217C14.3087 7.94196 14.5137 8.05196 14.6137 8.2078Z" fill="#2D4F8E"/>
+                            <path d="M12.0108 12.8643C12.0749 12.4677 13.061 11.7199 13.7612 11.673C14.4613 11.6276 14.6786 11.639 15.2615 11.4933C15.846 11.3492 17.3526 10.9607 17.7668 10.7616C18.1841 10.5625 19.9501 10.8604 18.7061 11.5807C18.1669 11.8931 16.715 12.4661 15.6772 12.7883C14.6411 13.1088 14.0112 12.4807 13.6674 13.01C13.3939 13.4293 13.6127 14.0039 14.8505 14.1237C16.5243 14.284 18.1278 13.3435 18.3044 13.8437C18.481 14.3439 16.8681 14.9654 15.8835 14.9865C14.9005 15.0059 12.9188 14.3131 12.6234 14.0994C12.3249 13.8858 11.9295 13.3839 12.0108 12.8643Z" fill="#FDD20A"/>
+                            <path d="M15.4382 16.7917C15.1405 16.7228 13.9976 17.5422 13.5494 17.8746C13.5312 17.8008 13.5164 17.7403 13.5015 17.7067C13.4287 17.5237 12.3288 17.6278 12.0377 17.9049C11.3431 17.554 9.91412 16.884 9.88434 17.2954C9.84134 17.8427 9.88434 20.0725 10.1738 20.242C10.3855 20.3663 11.5482 19.7266 12.1601 19.3723C12.1783 19.379 12.1949 19.3841 12.2164 19.3908C12.5885 19.4764 13.2931 19.3908 13.5428 19.2229C13.5676 19.2061 13.5875 19.1775 13.6024 19.144C14.1663 19.3656 15.3158 19.7921 15.5623 19.6997C15.893 19.5688 15.8103 16.8773 15.4382 16.7917Z" fill="#65BC46"/>
+                            <path d="M12.3032 19.2499C11.9194 19.1671 12.0491 18.7948 12.0491 17.9243L12.0474 17.9226C12.0474 17.921 12.0491 17.9177 12.0491 17.916C11.9484 17.9739 11.8836 18.0418 11.8836 18.1179H11.8853C11.8853 18.9884 11.7557 19.3624 12.1394 19.4451C12.5249 19.5279 13.2514 19.4451 13.509 19.2797C13.5516 19.2515 13.5806 19.1969 13.5994 19.1241C13.2992 19.2631 12.6562 19.3277 12.3032 19.2499Z" fill="#43A244"/>
+                            <path fill-rule="evenodd" clip-rule="evenodd" d="M12 22.1299C17.5228 22.1299 22 17.6527 22 12.1299C22 6.60704 17.5228 2.12988 12 2.12988C6.47715 2.12988 2 6.60704 2 12.1299C2 17.6527 6.47715 22.1299 12 22.1299ZM12 21.1299C16.9706 21.1299 21 17.1004 21 12.1299C21 7.15932 16.9706 3.12988 12 3.12988C7.02944 3.12988 3 7.15932 3 12.1299C3 17.1004 7.02944 21.1299 12 21.1299Z" fill="white"/>
+                        </svg>
+                        DuckDuckGo YouTube Player
+                        -->
+                        <svg width="24" height="25" viewBox="0 0 24 25" fill="none" xmlns="http://www.w3.org/2000/svg" class="logo-icon">
+                            <path d="M12 23.1299C18.0751 23.1299 23 18.205 23 12.1299C23 6.05475 18.0751 1.12988 12 1.12988C5.92487 1.12988 1 6.05475 1 12.1299C1 18.205 5.92487 23.1299 12 23.1299Z" fill="#DE5833"/>
+                            <path d="M14.1404 21.131C13.7872 20.4471 13.4179 19.4492 13.202 19.019C12.5118 17.6248 11.8167 15.6603 12.1324 14.3929C12.1896 14.1622 11.4814 5.86576 10.981 5.59713C10.4249 5.29882 9.21625 4.90493 8.58985 4.79946C8.15317 4.72859 8.05504 4.8522 7.87186 4.88021C8.04522 4.89834 8.86625 5.30542 9.02489 5.32849C8.86625 5.43726 8.39686 5.32519 8.09756 5.45869C7.94546 5.52955 7.83261 5.78995 7.83588 5.91191C8.69125 5.82456 10.0275 5.91026 10.819 6.26295C10.1894 6.33546 9.2326 6.41622 8.82209 6.63376C7.62817 7.26662 7.10154 8.74824 7.41555 10.5249C7.70667 12.1779 8.99561 18.6144 9.51734 21.131C10.4365 21.4474 11.1214 21.6069 12.1453 21.6069C13.1398 21.6069 13.5844 21.2381 14.1404 21.131Z" fill="#D5D7D8"/>
+                            <path fill-rule="evenodd" clip-rule="evenodd" d="M9.98431 21.2998C9.80923 20.0461 9.49398 18.7306 9.23216 17.4923C8.65596 14.7671 7.93939 11.3779 7.72236 10.1651C7.40449 8.382 7.72236 7.10886 8.9359 6.46981C9.35145 6.25127 9.94414 6.09233 10.5799 6.02114C9.77859 5.66519 8.82828 5.52778 7.9591 5.61553C7.95693 5.37438 8.23556 5.30072 8.49618 5.23181C8.63279 5.1957 8.76446 5.16089 8.84815 5.10395C8.77135 5.09287 8.64002 5.00492 8.50451 4.91416C8.35667 4.81515 8.20384 4.71281 8.11142 4.7033C9.21403 4.51457 10.3481 4.69171 11.3381 5.21157C11.8431 5.48308 12.2007 5.77281 12.4209 6.07578C12.9954 6.1867 13.5036 6.39365 13.8364 6.72642C14.8579 7.74626 15.7685 10.074 15.3877 11.4134C15.2801 11.7842 15.035 12.0557 14.7271 12.2792C14.49 12.452 14.3637 12.4084 14.2048 12.3537C13.9631 12.2705 13.6463 12.1614 12.7503 12.7478C12.6178 12.8338 12.576 13.3034 12.5437 13.6657C12.5288 13.833 12.5159 13.9775 12.497 14.0507C12.1792 15.3238 12.8795 17.2956 13.5798 18.6979C13.7139 18.9652 13.8898 19.3023 14.0885 19.683C14.1984 19.8935 14.5199 20.7096 14.6405 20.9424C12.4209 21.7688 12.1751 21.8631 9.98431 21.2998Z" fill="white"/>
+                            <path d="M9.85711 10.7012C10.2516 10.7012 10.5714 10.4213 10.5714 10.0762C10.5714 9.73099 10.2516 9.45117 9.85711 9.45117C9.46262 9.45117 9.14282 9.73099 9.14282 10.0762C9.14282 10.4213 9.46262 10.7012 9.85711 10.7012Z" fill="#2D4F8E"/>
+                            <path d="M10.1723 10.0697C10.2681 10.0697 10.3458 9.99199 10.3458 9.89617C10.3458 9.80034 10.2681 9.72266 10.1723 9.72266C10.0765 9.72266 9.99878 9.80034 9.99878 9.89617C9.99878 9.99199 10.0765 10.0697 10.1723 10.0697Z" fill="white"/>
+                            <path d="M14.2664 10.5031C14.5539 10.5031 14.7869 10.2313 14.7869 9.89586C14.7869 9.56047 14.5539 9.28857 14.2664 9.28857C13.9789 9.28857 13.7458 9.56047 13.7458 9.89586C13.7458 10.2313 13.9789 10.5031 14.2664 10.5031Z" fill="#2D4F8E"/>
+                            <path d="M14.469 9.80942C14.5489 9.80942 14.6137 9.73174 14.6137 9.63591C14.6137 9.54009 14.5489 9.4624 14.469 9.4624C14.389 9.4624 14.3242 9.54009 14.3242 9.63591C14.3242 9.73174 14.389 9.80942 14.469 9.80942Z" fill="white"/>
+                            <path d="M9.9291 8.30723C9.9291 8.30723 9.46635 8.09871 9.01725 8.37923C8.56968 8.65825 8.58485 8.94177 8.58485 8.94177C8.58485 8.94177 8.34664 8.41673 8.98084 8.15872C9.61959 7.9037 9.9291 8.30723 9.9291 8.30723Z" fill="#2D4F8E"/>
+                            <path d="M14.6137 8.2078C14.6137 8.2078 14.2487 8.06457 13.9655 8.06686C13.3839 8.07144 13.2256 8.2479 13.2256 8.2479C13.2256 8.2479 13.3239 7.82738 14.0671 7.91217C14.3087 7.94196 14.5137 8.05196 14.6137 8.2078Z" fill="#2D4F8E"/>
+                            <path d="M12.0108 12.8643C12.0749 12.4677 13.061 11.7199 13.7612 11.673C14.4613 11.6276 14.6786 11.639 15.2615 11.4933C15.846 11.3492 17.3526 10.9607 17.7668 10.7616C18.1841 10.5625 19.9501 10.8604 18.7061 11.5807C18.1669 11.8931 16.715 12.4661 15.6772 12.7883C14.6411 13.1088 14.0112 12.4807 13.6674 13.01C13.3939 13.4293 13.6127 14.0039 14.8505 14.1237C16.5243 14.284 18.1278 13.3435 18.3044 13.8437C18.481 14.3439 16.8681 14.9654 15.8835 14.9865C14.9005 15.0059 12.9188 14.3131 12.6234 14.0994C12.3249 13.8858 11.9295 13.3839 12.0108 12.8643Z" fill="#FDD20A"/>
+                            <path d="M15.438 16.7917C15.1403 16.7228 13.9974 17.5422 13.5492 17.8746C13.531 17.8008 13.5161 17.7403 13.5012 17.7067C13.4285 17.5237 12.3286 17.6278 12.0375 17.9049C11.3429 17.554 9.91387 16.884 9.8841 17.2954C9.8411 17.8427 9.8841 20.0725 10.1735 20.242C10.3852 20.3663 11.5479 19.7266 12.1599 19.3723C12.1781 19.379 12.1946 19.3841 12.2161 19.3908C12.5883 19.4764 13.2928 19.3908 13.5426 19.2229C13.5674 19.2061 13.5872 19.1775 13.6021 19.144C14.1661 19.3656 15.3156 19.7921 15.562 19.6997C15.8928 19.5688 15.8101 16.8773 15.438 16.7917Z" fill="#65BC46"/>
+                            <path d="M12.3032 19.2499C11.9194 19.1671 12.0491 18.7948 12.0491 17.9243L12.0474 17.9226C12.0474 17.921 12.0491 17.9177 12.0491 17.916C11.9484 17.9739 11.8836 18.0418 11.8836 18.1179H11.8853C11.8853 18.9884 11.7557 19.3624 12.1394 19.4451C12.5249 19.5279 13.2514 19.4451 13.509 19.2797C13.5516 19.2515 13.5806 19.1969 13.5994 19.1241C13.2992 19.2631 12.6562 19.3277 12.3032 19.2499Z" fill="#43A244"/>
+                            <path fill-rule="evenodd" clip-rule="evenodd" d="M12 22.1299C17.5228 22.1299 22 17.6527 22 12.1299C22 6.60704 17.5228 2.12988 12 2.12988C6.47715 2.12988 2 6.60704 2 12.1299C2 17.6527 6.47715 22.1299 12 22.1299ZM12 21.1299C16.9706 21.1299 21 17.1004 21 12.1299C21 7.15932 16.9706 3.12988 12 3.12988C7.02944 3.12988 3 7.15932 3 12.1299C3 17.1004 7.02944 21.1299 12 21.1299Z" fill="white"/>
+                        </svg>Private Player
+                        <svg width="20" height="21" viewBox="0 0 20 21" fill="none" xmlns="http://www.w3.org/2000/svg" class="play-icon">
+                            <rect x="0.75" y="3.37988" width="18.5" height="13.5" rx="2.25" stroke="white" stroke-opacity="0.8" stroke-width="1.5"/>
+                            <path fill-rule="evenodd" clip-rule="evenodd" d="M13.0588 10.7716C13.5624 10.4872 13.5624 9.77256 13.0588 9.48817L8.93913 7.16158C8.4377 6.87839 7.8125 7.2345 7.8125 7.80329L7.8125 12.4565C7.8125 13.0253 8.4377 13.3814 8.93913 13.0982L13.0588 10.7716Z" fill="white" fill-opacity="0.8"/>
+                        </svg>
+                    </div>
+                    <div class="menu">
+                        <!--
+                        <form class="setting">
+                            <div class="settings-label">Always open videos in player</div>
+                            <div class="settings-toggle-container">
+                                <div class="frm__switch  frm-input">
+                                    <input id="setting" class="frm__switch__inp" type="checkbox" />
+                                    <label class="frm__switch__label  btn" for="setting">
+                                        <span class="frm__switch-on">On</span>
+                                        <span class="frm__switch-off">Off</span>
+                                    </label>
+                                </div>
+                            </div>
+                        </form>
+                        -->
+                        <a href="#" class="play-on-youtube" rel="noopener">
+                            <svg width="72" height="17" viewBox="0 0 72 17" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                <g clip-path="url(#clip0_736_38254)">
+                                <path fill-rule="evenodd" clip-rule="evenodd" d="M20.893 0.619295C21.8676 0.882824 22.636 1.65459 22.8983 2.63341C23.3856 4.42165 23.3669 8.14871 23.3669 8.14871C23.3669 8.14871 23.3669 11.8569 22.8983 13.6452C22.636 14.624 21.8676 15.3958 20.893 15.6593C19.1126 16.1299 11.991 16.1299 11.991 16.1299C11.991 16.1299 4.88819 16.1299 3.08905 15.6405C2.11452 15.3769 1.34613 14.6052 1.08376 13.6264C0.615234 11.8569 0.615234 8.12988 0.615234 8.12988C0.615234 8.12988 0.615234 4.42165 1.08376 2.63341C1.34613 1.65459 2.13326 0.864 3.08905 0.600471C4.86945 0.129883 11.991 0.129883 11.991 0.129883C11.991 0.129883 19.1126 0.129883 20.893 0.619295ZM15.6459 8.12983L9.72371 11.5557V4.70395L15.6459 8.12983Z" fill="white" fill-opacity="0.8"/>
+                                <path d="M33.6561 14.6991C33.2063 14.3979 32.8877 13.9273 32.7003 13.2685C32.5129 12.6285 32.4192 11.7626 32.4192 10.7085V9.25905C32.4192 8.18611 32.5316 7.32023 32.7378 6.66141C32.9627 6.00258 33.3 5.53199 33.7498 5.23082C34.2183 4.92964 34.818 4.77905 35.5677 4.77905C36.2986 4.77905 36.8983 4.92964 37.3481 5.23082C37.7979 5.53199 38.1165 6.02141 38.3226 6.66141C38.5288 7.30141 38.6412 8.16729 38.6412 9.25905V10.7085C38.6412 11.7814 38.5475 12.6285 38.3414 13.2873C38.1352 13.9273 37.8166 14.4167 37.3668 14.7179C36.917 15.0191 36.2986 15.1696 35.5302 15.1696C34.7431 15.1508 34.1059 15.0002 33.6561 14.6991ZM36.1861 13.1179C36.3173 12.7979 36.3735 12.252 36.3735 11.5179V8.39317C36.3735 7.67788 36.3173 7.15082 36.1861 6.81199C36.055 6.47317 35.8488 6.32258 35.5302 6.32258C35.2303 6.32258 35.0055 6.49199 34.893 6.81199C34.7618 7.15082 34.7056 7.67788 34.7056 8.39317V11.5179C34.7056 12.252 34.7618 12.7979 34.893 13.1179C35.0055 13.4379 35.2303 13.6073 35.5489 13.6073C35.8488 13.6073 36.055 13.4567 36.1861 13.1179Z" fill="white" fill-opacity="0.8"/>
+                                <path d="M68.2518 10.7276V11.2358C68.2518 11.8758 68.2706 12.3652 68.3081 12.6852C68.3456 13.0052 68.4205 13.2499 68.5517 13.3817C68.6641 13.5323 68.8516 13.6076 69.1139 13.6076C69.4513 13.6076 69.6762 13.4758 69.8074 13.2123C69.9385 12.9488 69.9948 12.5158 70.0135 11.8946L71.9438 12.0076C71.9626 12.1017 71.9626 12.2146 71.9626 12.3652C71.9626 13.2876 71.7189 13.9841 71.2129 14.4358C70.7069 14.8876 69.9948 15.1135 69.0764 15.1135C67.9707 15.1135 67.2023 14.7558 66.7526 14.0593C66.3028 13.3629 66.0779 12.2899 66.0779 10.8217V9.07111C66.0779 7.56523 66.3028 6.47346 66.7713 5.77699C67.2398 5.08052 68.027 4.7417 69.1327 4.7417C69.9011 4.7417 70.5008 4.89229 70.9131 5.17464C71.3254 5.45699 71.6065 5.90876 71.7752 6.49229C71.9438 7.09464 72.0188 7.92288 72.0188 8.97699V10.6899H68.2518V10.7276ZM68.533 6.51111C68.4205 6.6617 68.3456 6.88758 68.3081 7.20758C68.2706 7.52758 68.2518 8.01699 68.2518 8.67582V9.39111H69.9011V8.67582C69.9011 8.03582 69.8823 7.5464 69.8448 7.20758C69.8073 6.86876 69.7136 6.64288 69.6012 6.51111C69.4888 6.37935 69.3013 6.30405 69.0764 6.30405C68.8141 6.28523 68.6454 6.36052 68.533 6.51111Z" fill="white" fill-opacity="0.8"/>
+                                <path d="M28.1838 10.5393L25.635 1.25928H27.8652L28.7648 5.45692C28.9897 6.49222 29.1583 7.37693 29.2708 8.11104H29.327C29.402 7.58398 29.5706 6.7181 29.833 5.47575L30.7701 1.25928H33.0002L30.414 10.5393V14.9816H28.2025V10.5393H28.1838Z" fill="white" fill-opacity="0.8"/>
+                                <path d="M45.8936 4.96729V15.0002H44.1319L43.9445 13.7767H43.8883C43.4198 14.699 42.6889 15.1696 41.7331 15.1696C41.0771 15.1696 40.5899 14.9438 40.2713 14.5108C39.9527 14.0779 39.8027 13.4002 39.8027 12.459V4.96729H42.0517V12.3273C42.0517 12.779 42.1079 13.099 42.2016 13.2873C42.2953 13.4755 42.464 13.5696 42.6889 13.5696C42.8763 13.5696 43.0637 13.5132 43.2511 13.3814C43.4385 13.2685 43.5697 13.1179 43.6446 12.9296V4.96729H45.8936Z" fill="white" fill-opacity="0.8"/>
+                                <path d="M57.4195 4.96729V15.0002H55.6578L55.4704 13.7767H55.4142C54.9456 14.699 54.2147 15.1696 53.2589 15.1696C52.603 15.1696 52.1157 14.9438 51.7971 14.5108C51.4785 14.0779 51.3286 13.4002 51.3286 12.459V4.96729H53.5775V12.3273C53.5775 12.779 53.6338 13.099 53.7275 13.2873C53.8212 13.4755 53.9898 13.5696 54.2147 13.5696C54.4021 13.5696 54.5896 13.5132 54.777 13.3814C54.9644 13.2685 55.0956 13.1179 55.1705 12.9296V4.96729H57.4195Z" fill="white" fill-opacity="0.8"/>
+                                <path d="M52.0039 3.08516H49.7737V14.9816H47.581V3.08516H45.3508V1.25928H52.0039V3.08516Z" fill="white" fill-opacity="0.8"/>
+                                <path d="M64.8596 6.56745C64.7284 5.92745 64.5036 5.47568 64.2037 5.19333C63.9038 4.91098 63.4728 4.76039 62.9481 4.76039C62.5358 4.76039 62.1422 4.87333 61.7861 5.11804C61.43 5.34392 61.1489 5.66392 60.9615 6.04039H60.9428V0.750977H58.7688V14.9816H60.6242L60.8491 14.0404H60.9053C61.074 14.3792 61.3363 14.6427 61.6924 14.8498C62.0485 15.038 62.4233 15.151 62.8543 15.151C63.6227 15.151 64.1662 14.7933 64.5223 14.0969C64.8784 13.4004 65.0658 12.2898 65.0658 10.8027V9.22156C65.047 8.07333 64.9908 7.18862 64.8596 6.56745ZM62.7981 10.6522C62.7981 11.3863 62.7606 11.951 62.7044 12.3651C62.6482 12.7792 62.5358 13.0804 62.4046 13.2498C62.2546 13.4192 62.0672 13.5133 61.8423 13.5133C61.6549 13.5133 61.4863 13.4757 61.3363 13.3816C61.1864 13.2874 61.0552 13.1557 60.9615 12.9863V7.30156C61.0365 7.03803 61.1677 6.81215 61.3551 6.62392C61.5425 6.45451 61.7486 6.36039 61.9548 6.36039C62.1797 6.36039 62.3671 6.45451 62.4795 6.62392C62.6107 6.81215 62.6857 7.11333 62.7419 7.52745C62.7981 7.96039 62.8169 8.56274 62.8169 9.33451V10.6522H62.7981Z" fill="white" fill-opacity="0.8"/>
+                                </g>
+                                <defs>
+                                <clipPath id="clip0_736_38254">
+                                <rect width="71.3846" height="16" fill="white" transform="translate(0.615234 0.129883)"/>
+                                </clipPath>
+                                </defs>
+                            </svg>
+                        </a>
+
+                        <div class="list-toggle">
+                            <svg width="16" height="17" viewBox="0 0 16 17" fill="none" xmlns="http://www.w3.org/2000/svg" class="animatable">
+                                <path d="M13.5 10.1299L8 4.62988L2.5 10.1299" stroke="white" stroke-opacity="0.8" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                            </svg>
+                        </div>
+                    </div>
+                </div>
+                <div class="list columns">
+                    <ul class="list-copy">
+                        <li>
+                            <svg width="20" height="21" viewBox="0 0 20 21" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                <path fill-rule="evenodd" clip-rule="evenodd" d="M10 1.12988C5.02944 1.12988 1 5.15932 1 10.1299C1 15.1004 5.02944 19.1299 10 19.1299C14.9706 19.1299 19 15.1004 19 10.1299C19 5.15932 14.9706 1.12988 10 1.12988ZM2.5 10.1299C2.5 5.98775 5.85786 2.62988 10 2.62988C14.1421 2.62988 17.5 5.98775 17.5 10.1299C17.5 14.272 14.1421 17.6299 10 17.6299C5.85786 17.6299 2.5 14.272 2.5 10.1299ZM13.7803 8.41021C14.0732 8.11732 14.0732 7.64245 13.7803 7.34955C13.4874 7.05666 13.0126 7.05666 12.7197 7.34955L8.75 11.3192L7.28033 9.84955C6.98744 9.55666 6.51256 9.55666 6.21967 9.84955C5.92678 10.1424 5.92678 10.6173 6.21967 10.9102L8.21967 12.9102C8.51256 13.2031 8.98744 13.2031 9.28033 12.9102L13.7803 8.41021Z" fill="#7295F6"/>
+                            </svg>Cookies and trackers are <b>removed</b>
+                        </li>
+                        <li>
+                            <svg width="20" height="21" viewBox="0 0 20 21" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                <path fill-rule="evenodd" clip-rule="evenodd" d="M10 1.12988C5.02944 1.12988 1 5.15932 1 10.1299C1 15.1004 5.02944 19.1299 10 19.1299C14.9706 19.1299 19 15.1004 19 10.1299C19 5.15932 14.9706 1.12988 10 1.12988ZM2.5 10.1299C2.5 5.98775 5.85786 2.62988 10 2.62988C14.1421 2.62988 17.5 5.98775 17.5 10.1299C17.5 14.272 14.1421 17.6299 10 17.6299C5.85786 17.6299 2.5 14.272 2.5 10.1299ZM13.7803 8.41021C14.0732 8.11732 14.0732 7.64245 13.7803 7.34955C13.4874 7.05666 13.0126 7.05666 12.7197 7.34955L8.75 11.3192L7.28033 9.84955C6.98744 9.55666 6.51256 9.55666 6.21967 9.84955C5.92678 10.1424 5.92678 10.6173 6.21967 10.9102L8.21967 12.9102C8.51256 13.2031 8.98744 13.2031 9.28033 12.9102L13.7803 8.41021Z" fill="#7295F6"/>
+                            </svg>Any ads you see will <b>not</b> be personalized
+                        </li>
+                        <li>
+                            <svg width="20" height="21" viewBox="0 0 20 21" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                <path fill-rule="evenodd" clip-rule="evenodd" d="M10 1.12988C5.02944 1.12988 1 5.15932 1 10.1299C1 15.1004 5.02944 19.1299 10 19.1299C14.9706 19.1299 19 15.1004 19 10.1299C19 5.15932 14.9706 1.12988 10 1.12988ZM2.5 10.1299C2.5 5.98775 5.85786 2.62988 10 2.62988C14.1421 2.62988 17.5 5.98775 17.5 10.1299C17.5 14.272 14.1421 17.6299 10 17.6299C5.85786 17.6299 2.5 14.272 2.5 10.1299ZM13.7803 8.41021C14.0732 8.11732 14.0732 7.64245 13.7803 7.34955C13.4874 7.05666 13.0126 7.05666 12.7197 7.34955L8.75 11.3192L7.28033 9.84955C6.98744 9.55666 6.51256 9.55666 6.21967 9.84955C5.92678 10.1424 5.92678 10.6173 6.21967 10.9102L8.21967 12.9102C8.51256 13.2031 8.98744 13.2031 9.28033 12.9102L13.7803 8.41021Z" fill="#7295F6"/>
+                            </svg>Views <b>don't</b> affect your YouTube recommendations
+                        </li>
+                    </ul>
+                    <ul class="list-settings">
+                        <li>
+                            <form class="setting">
+                                <div class="settings-label">Always open videos in player</div>
+                                <div class="settings-toggle-container">
+                                    <div class="frm__switch  frm-input">
+                                        <input id="setting" class="frm__switch__inp" type="checkbox" />
+                                        <label class="frm__switch__label  btn" for="setting">
+                                            <span class="frm__switch-on">On</span>
+                                            <span class="frm__switch-off">Off</span>
+                                        </label>
+                                    </div>
+                                </div>
+                            </form>
+                        </li>
+                        <!-- <li>
+                            <input type="checkbox" id="setting1"><label for="setting1">Always open videos in player</label>
+                        </li>
+                        <li>
+                            <input type="checkbox" id="setting2"><label for="setting2">Only open external links in player</label>
+                        </li>
+                        <li>
+                            <input type="checkbox" id="setting3"><label for="setting3">Show player button on YouTube</label>
+                        </li> -->
+                    </ul>
+                </div>
             </div>
         </div>
-        <p>Private Media Player</p>
-        <ul>
-          <li>Views will not influence your browsing experience on YouTube</li>
-          <li>Views will not be used to personalize ads that you see around the web</li>
-          <li>If YouTube shows ads in the player, they will not be personalized</li>
-          <li>No cookies are saved on your computer</li>
-          <li>No cookies are included in the request your computer makes to Google to fetch the video</li>
-        </ul>
         <script type="text/javascript">
-            alert('Try sending a message from the Private Player HTML page.');
-            window.postMessage({message: 'test'}, window.origin);
+            const VideoPlayer = {
+                /**
+                 * Returns the video player iframe
+                 * @returns {HTMLElement}
+                 */
+                iframe: () => {
+                    return document.querySelector('#video-player');
+                },
+
+                /**
+                 * Returns the iframe player container
+                 * @returns {HTMLElement}
+                 */
+                playerContainer: () => {
+                    return document.querySelector('#player');
+                },
+                /**
+                 * Returns the full YouTube embed URL used for the player iframe, using the video id
+                 * @param {string} videoId
+                 */
+                videoEmbedURL: (videoId) => {
+                    return `https://www.youtube-nocookie.com/embed/${videoId}?wmode=transparent&iv_load_policy=3&autoplay=1&html5=1&showinfo=0&rel=0&modestbranding=1&playsinline=0&theme=light`;
+                },
+                /**
+                 * Sets up the video player:
+                 * 1. Fetches the video id
+                 * 2. If the video id is correctly formatted, it loads the YouTube video in the iframe, otherwise displays an error message
+                 */
+                init: () => {
+                    let videoId = Comms.getVideoId();
+
+                    if (videoId) {
+                        VideoPlayer.iframe().setAttribute('src', VideoPlayer.videoEmbedURL(videoId));
+                    } else {
+                        VideoPlayer.showVideoError('Malformed video id');
+                    }
+                },
+                /**
+                 * Show an error instead of the video player iframe
+                 */
+                showVideoError: (errorMessage) => {
+                    VideoPlayer.playerContainer().innerHTML = `<div class="player-error"><b>ERROR:</b> ${errorMessage}</div>`;
+                }
+            };
+
+            const Comms = {
+                /**
+                 * Sends a message to native
+                 * NATIVE NOTE: This sends an arbitrary `setting` to native with the value of `value`
+                 * Currently only used for setting setAlwaysOpenSettingTo = true || false
+                 * @param {string} setting - key/name of the setting
+                 * @param {*} value - value (could be anything) of what to set the setting to.
+                 */
+                sendToNative: (setting, value) => {
+                    try {
+                        window.webkit.messageHandlers[setting].postMessage(value)
+                    } catch (e) {
+                        console.error('Unable to send message to native. Tried sending window.webkit.messageHandlers.'+setting+'.postMessage('+value+')\n\n', e);
+                    }
+                },
+
+                /**
+                 * Return the value of a query string parameter.
+                 * NATIVE NOTE: This returns the contents of a query string parameter. Currently
+                 * used to get the 'v'-parameter which should contain the video id.
+                 * @param {string} parameter
+                 */
+                getFromQueryString: (parameter) => {
+                    return new URL(window.location).searchParams.get(parameter);
+                },
+
+                /**
+                 * Validates that the input string is a valid video id. If so, returns the video id
+                 * otherwise returns false.
+                 * @param {string} input
+                 * @returns {(string|false)}
+                 */
+                validateVideoId: (input) => {
+                    if (/^[a-zA-Z0-9-_]*$/g.test(input)) {
+                        return input;
+                    }
+                    return false;
+                },
+
+                /**
+                 * Gets the video id from the ?v= query-string parameter of this file.
+                 */
+                getVideoId: () => {
+                    return Comms.validateVideoId(Comms.getFromQueryString('v'));
+                },
+
+                /**
+                 * Listens for a 'message' sent from native, and calls the 'callback' with the contents of
+                 * the 'message'.
+                 * NATIVE NOTE: Currently used to listen for messages named 'alwaysOpenSetting' which can contain
+                 * a boolean true|false. This happens when user updates the setting outside of the PPP, or in a different
+                 * tab.
+                 * @param {string} message
+                 * @param {function} callback
+                 */
+                listen: (message, callback) => {
+                    window.addEventListener('message', (e) => {
+                        if (e && e.data && typeof e.data[message] !== 'undefined') {
+                            callback(e.data[message]);
+                        }
+                    });
+                },
+
+                /**
+                 * Starts listening for 'alwaysOpenSetting' coming from native, and if we receive it
+                 * update the 'Setting' to the value of the message (true || false)
+                 *
+                 * To mock, use:
+                 * window.postMessage({ alwaysOpenSetting: false })
+                 */
+                init: () => {
+                    Comms.listen('alwaysOpenSetting', (value) => {
+                        Setting.set(value);
+                    });
+                }
+            };
+
+            const Setting = {
+                /**
+                 * Returns the checkbox
+                 * @returns {HTMLElement}
+                 */
+                checkbox: () => {
+                    return document.querySelector('#setting');
+                },
+                /**
+                 * Returns the settings label
+                 * @returns {HTMLElement}
+                 */
+                label: () => {
+                    return document.querySelector('.settings-label');
+                },
+                /**
+                 * Returns the container of the checkbox
+                 * @returns {HTMLElement}
+                 */
+                checkboxContainer: () => {
+                    return document.querySelector('.frm__switch');
+                },
+
+                /**
+                 * Set the value of the checkbox
+                 * 1. Set the actual 'checked' property of the checkbox
+                 * 2. Update the toggle with the correct classes
+                 * @param {boolean} value
+                 */
+                set: (value) => {
+                    Setting.checkbox().checked = value;
+                    Setting.updateCheckboxToggle(value)
+                },
+
+                /**
+                 * Update the checkbox value and send the new setting value to native
+                 * @param {boolean} checked
+                 */
+                updateAndSend: (checked) => {
+                    Setting.updateCheckboxToggle(checked);
+                    Comms.sendToNative('setAlwaysOpenSettingTo', checked);
+                },
+                /**
+                 * Updates the checkbox toggle with correct classes based on 'checked'
+                 * @param {boolean} checked
+                 */
+                updateCheckboxToggle: (checked) => {
+                    if (checked) {
+                        Setting.checkboxContainer().classList.add('is-checked');
+                    } else {
+                        Setting.checkboxContainer().classList.remove('is-checked');
+                    }
+                },
+                /**
+                 * Initializes the setting checkbox:
+                 * 1. Listens for (user) changes on the actual checkbox
+                 * 2. Listens for to clicks on the checkbox text
+                 */
+                init: () => {
+                    let checkbox = Setting.checkbox();
+
+                    checkbox.addEventListener('change', () => {
+                        Setting.updateAndSend(checkbox.checked);
+                    });
+
+                    Setting.label().addEventListener('click', () => {
+                        checkbox.checked = !checkbox.checked;
+                        Setting.updateAndSend(checkbox.checked);
+                    });
+                }
+            };
+
+            const ToggleSection = {
+                /**
+                 * NATIVE NOTE: We need to do exactly the same as for the Setting for the state of the ToggleSection, because
+                 * for example if the user hides the section, next time they open the PPP, it should stay hidden. This is not
+                 * yet implemented on the Frontend side.
+                 */
+
+                /**
+                 * Whether it is expanded or not
+                 */
+                isExpanded: true,
+
+                /**
+                 * Returns the collapsible list
+                 * @returns {HTMLElement}
+                 */
+                list: () => {
+                    return document.querySelector('.list');
+                },
+                /**
+                 * Returns the toggle / chevron used to collapse/expand the list
+                 * @returns {HTMLElement}
+                 */
+                toggle: () => {
+                    return document.querySelector('.list-toggle');
+                },
+                /**
+                 * Utility for returning the classes of the list and toggle
+                 * @returns {object}
+                 */
+                getClasses: () => {
+                    return {
+                        list: ToggleSection.list().classList,
+                        toggle: ToggleSection.toggle().classList
+                    }
+                },
+
+                /**
+                 * 1. Set the initial state: collapsed/expanded
+                 * 2. Once set, add the animate classes so that any further changes (by user)
+                 * triggers the animation
+                 * NATIVE NOTE: This might need to be changed if the setting is updated from outside the PPP
+                 */
+                setInitial: () => {
+                    ToggleSection.setExpanded(ToggleSection.isExpanded);
+                    let classes = ToggleSection.getClasses();
+
+                    classes.list.add('animate');
+                    classes.toggle.add('animate');
+                },
+
+                /**
+                 * 1. Set the initial state
+                 * 2. Listen for clicks to the toggle/chevron
+                 */
+                init: () => {
+                    ToggleSection.setInitial();
+
+                    ToggleSection.toggle().addEventListener('click', () => {
+                        ToggleSection.setExpanded(!ToggleSection.isExpanded);
+                    });
+                },
+
+                /**
+                 * Method to set the expanded state of the toggle section.
+                 * @param {boolean} shouldExpand
+                 */
+                setExpanded: (shouldExpand) => {
+                    let classes = ToggleSection.getClasses();
+
+                    if (shouldExpand) {
+                        classes.list.add('expanded');
+                        classes.toggle.add('expanded');
+                        ToggleSection.isExpanded = true;
+                    } else {
+                        classes.list.remove('expanded');
+                        classes.toggle.remove('expanded');
+                        ToggleSection.isExpanded = false;
+                    }
+                }
+            }
+
+            const PlayOnYouTube = {
+                /**
+                 * Returns the YouTube button
+                 * @returns {HTMLElement}
+                 */
+                button: () => {
+                    return document.querySelector('.play-on-youtube');
+                },
+                /**
+                 * Returns the full YouTube source URL for a video, based on video id
+                 * @param {string} videoId
+                 * @returns {string}
+                 */
+                getVideoLinkURL: (videoId) => {
+                    return 'https://www.youtube.com/watch?v='+videoId;
+                },
+                /**
+                 * If there is a valid video id, set the 'href' of the YouTube button to the
+                 * video link url
+                 */
+                init: () => {
+                    let videoId = Comms.getVideoId();
+
+                    if (videoId) {
+                        PlayOnYouTube.button().setAttribute('href', PlayOnYouTube.getVideoLinkURL(videoId));
+                    }
+                }
+            };
+
+            const MouseMove = {
+                /**
+                 * How long to wait (inactivity) before fading out the content below the player
+                 */
+                limit: 2000,
+
+                /**
+                 * Transition time - needs to match value in CSS.
+                 */
+                fadeTransitionTime: 500,
+
+                /**
+                 * Internal, used for timeout and state.
+                 */
+                timer: null,
+                isFaded: false,
+
+                /**
+                 * Fade out content below player in case there is mouse inactivity
+                 * after the MouseMove.limit
+                 */
+                init: () => {
+                    document.addEventListener('mousemove', () => {
+                        if (MouseMove.timer) {
+                            clearTimeout(MouseMove.timer);
+                        }
+                        if (MouseMove.isFaded) {
+                            MouseMove.fadeInContent();
+                        }
+
+                        MouseMove.timer = setTimeout(() => {
+                            MouseMove.fadeOutContent();
+                        }, MouseMove.limit);
+                    });
+                },
+
+                /**
+                 * Returns all content below the player
+                 * @returns {HTMLElement}
+                 */
+                content: () => {
+                    return document.querySelector('.content-body');
+                },
+
+                /**
+                 * Fades out content
+                 */
+                fadeOutContent: () => {
+                    MouseMove.updateContent(true);
+                },
+
+                /**
+                 * Fades in content
+                 */
+                fadeInContent: () => {
+                    MouseMove.updateContent(false);
+                },
+
+                /**
+                 * Updates the faded state of the content below the player
+                 */
+                updateContent: (isFaded) => {
+                    MouseMove.content().classList[isFaded ? 'add' : 'remove']('faded');
+                    setTimeout(() => {
+                        MouseMove.isFaded = isFaded;
+                    }, MouseMove.fadeTransitionTime);
+                },
+            };
+
+            /**
+             * NATIVE NOTE: This is called on load by the native and sets the inital value of the
+             * setting.
+             */
+            window.setInitialAlwaysOpenSetting = (value) => {
+                Setting.set(value);
+            }
+
+            /**
+             * NATIVE NOTE: This is here just for mocking purposes. It should be removed from this file and
+             * called directly from native.
+             */
+            window.setInitialAlwaysOpenSetting(false);
+
+            /**
+             * Initializes all parts of the page on load.
+             */
+            document.addEventListener('DOMContentLoaded', () => {
+                Setting.init();
+                Comms.init();
+                ToggleSection.init();
+                VideoPlayer.init();
+                PlayOnYouTube.init();
+                MouseMove.init();
+            });
         </script>
     </body>
 </html>
+
