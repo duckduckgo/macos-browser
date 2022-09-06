@@ -21,15 +21,53 @@ import BrowserServicesKit
 import WebKit
 
 final class YoutubePlayerUserScript: NSObject, StaticUserScript {
-    static var injectionTime: WKUserScriptInjectionTime { .atDocumentStart }
-    static var forMainFrameOnly: Bool { false }
-    static var source: String = YoutubePlayerUserScript.loadJS("youtube-inject", from: .main)
-    static var script: WKUserScript = YoutubePlayerUserScript.makeWKUserScript()
-    var messageNames: [String] { [""] }
-    var isEnabled = false
     
+    enum MessageNames: String, CaseIterable {
+        case setAlwaysOpenSettingTo
+        case setToggleSectionExpanded
+    }
+    
+    public var requiresRunInPageContentWorld: Bool {
+        return true
+    }
+    
+    static var injectionTime: WKUserScriptInjectionTime { .atDocumentStart}
+    static var forMainFrameOnly: Bool { false }
+    static var source: String = ""
+    static var script: WKUserScript = YoutubePlayerUserScript.makeWKUserScript()
+    var messageNames: [String] { MessageNames.allCases.map(\.rawValue) }
+
     func userContentController(_ userContentController: WKUserContentController, didReceive message: WKScriptMessage) {
-        print("Message \(message)")
+        
+        guard let messageType = MessageNames(rawValue: message.name) else {
+            assertionFailure("YoutubePlayerUserScript: unexpected message name \(message.name)")
+            return
+        }
+        
+        switch messageType {
+        case .setToggleSectionExpanded:
+            handleToggleSectionExpanded(message: message)
+        case .setAlwaysOpenSettingTo:
+            handleAlwaysOpenSettings(message: message)
+        }
+    }
+    
+    private func handleToggleSectionExpanded(message: WKScriptMessage) {
+        guard let isExpanded = message.body as? Bool else {
+            assertionFailure("YoutubePlayerUserScript: expected Bool")
+            return
+        }
+        
+        print("Toggle section expanded \(isExpanded)")
+    }
+    
+    private func handleAlwaysOpenSettings(message: WKScriptMessage) {
+        guard let alwaysOpenOnPrivatePlayer = message.body as? Bool else {
+            assertionFailure("YoutubePlayerUserScript: expected Bool")
+            return
+        }
+        
+        print("Always open \(alwaysOpenOnPrivatePlayer)")
     }
     
     func evaluateJSCall(call: String, webView: WKWebView) {

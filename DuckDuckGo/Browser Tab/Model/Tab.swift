@@ -772,20 +772,20 @@ final class Tab: NSObject, Identifiable, ObservableObject {
     
     // MARK: - Youtube Player
     
-    private weak var youtubeUserScript: YoutubePlayerUserScript?
+    private weak var youtubeOverlayScript: YoutubeOverlayUserScript?
     
     #warning("Enable the youtube injection if necessary")
     func enableYoutubeIfNecessary() {
         if url?.absoluteString.contains("youtube.com") == true,
-           youtubeUserScript?.isEnabled == false {
+           youtubeOverlayScript?.isEnabled == false {
             enableYoutubePlayerScript(true)
         }
     }
     
     #warning("Call the enabled() method on the javascript file")
     func enableYoutubePlayerScript(_ enable: Bool) {
-        self.youtubeUserScript?.evaluateJSCall(call: "enable()", webView: self.webView)
-        youtubeUserScript?.isEnabled = enable
+        self.youtubeOverlayScript?.evaluateJSCall(call: "enable()", webView: self.webView)
+        youtubeOverlayScript?.isEnabled = enable
     }
     
     // MARK: - Dashboard Info
@@ -844,7 +844,7 @@ extension Tab: UserContentControllerDelegate {
         userScripts.hoverUserScript.delegate = self
         userScripts.autoconsentUserScript?.delegate = self
 
-        youtubeUserScript = userScripts.youtubePlayerScript
+        youtubeOverlayScript = userScripts.youtubeOverlayScript
         
         findInPageScript = userScripts.findInPageScript
         attachFindInPage()
