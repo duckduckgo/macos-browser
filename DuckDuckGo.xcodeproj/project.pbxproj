@@ -71,6 +71,7 @@
 		37AFCE8B27DB69BC00471A10 /* PreferencesGeneralView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37AFCE8A27DB69BC00471A10 /* PreferencesGeneralView.swift */; };
 		37AFCE9227DB8CAD00471A10 /* PreferencesAboutView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37AFCE9127DB8CAD00471A10 /* PreferencesAboutView.swift */; };
 		37B11B3928095E6600CBB621 /* TabLazyLoader.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37B11B3828095E6600CBB621 /* TabLazyLoader.swift */; };
+		37BD4A4428C724DC00997CB4 /* SafariCookiesReaderTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37BD4A4328C724DC00997CB4 /* SafariCookiesReaderTests.swift */; };
 		37BF3F14286D8A6500BD9014 /* PinnedTabsManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37BF3F13286D8A6500BD9014 /* PinnedTabsManager.swift */; };
 		37BF3F21286F0A7A00BD9014 /* PinnedTabsViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37BF3F1E286F0A7A00BD9014 /* PinnedTabsViewModel.swift */; };
 		37BF3F22286F0A7A00BD9014 /* PinnedTabsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37BF3F1F286F0A7A00BD9014 /* PinnedTabsView.swift */; };
@@ -890,6 +891,7 @@
 		37AFCE8A27DB69BC00471A10 /* PreferencesGeneralView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PreferencesGeneralView.swift; sourceTree = "<group>"; };
 		37AFCE9127DB8CAD00471A10 /* PreferencesAboutView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PreferencesAboutView.swift; sourceTree = "<group>"; };
 		37B11B3828095E6600CBB621 /* TabLazyLoader.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TabLazyLoader.swift; sourceTree = "<group>"; };
+		37BD4A4328C724DC00997CB4 /* SafariCookiesReaderTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SafariCookiesReaderTests.swift; sourceTree = "<group>"; };
 		37BF3F13286D8A6500BD9014 /* PinnedTabsManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PinnedTabsManager.swift; sourceTree = "<group>"; };
 		37BF3F1E286F0A7A00BD9014 /* PinnedTabsViewModel.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PinnedTabsViewModel.swift; sourceTree = "<group>"; };
 		37BF3F1F286F0A7A00BD9014 /* PinnedTabsView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PinnedTabsView.swift; sourceTree = "<group>"; };
@@ -2212,6 +2214,7 @@
 				4B2975982828285900187C4E /* FirefoxKeyReaderTests.swift */,
 				4B8AC93C26B49BE600879451 /* FirefoxLoginReaderTests.swift */,
 				4BB99D0E26FE1A84001E4761 /* SafariBookmarksReaderTests.swift */,
+				37BD4A4328C724DC00997CB4 /* SafariCookiesReaderTests.swift */,
 				4BF4951726C08395000547B8 /* ThirdPartyBrowserTests.swift */,
 				37A803DA27FD69D300052F4C /* Data Import Resources */,
 			);
@@ -5063,6 +5066,7 @@
 				4BF6961D28BE911100D402D4 /* RecentlyVisitedSiteModelTests.swift in Sources */,
 				4BBF0917282DD6EF00EE1418 /* TemporaryFileHandlerTests.swift in Sources */,
 				B6A5A27925B93FFF00AA7ADA /* StateRestorationManagerTests.swift in Sources */,
+				37BD4A4428C724DC00997CB4 /* SafariCookiesReaderTests.swift in Sources */,
 				4B9292BB2667103100AD2C21 /* BookmarkNodeTests.swift in Sources */,
 				4B0219A825E0646500ED7DEA /* WebsiteDataStoreTests.swift in Sources */,
 				AAC9C01E24CB6BEB00AD1325 /* TabCollectionViewModelTests.swift in Sources */,

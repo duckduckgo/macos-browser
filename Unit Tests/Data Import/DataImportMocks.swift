@@ -47,3 +47,13 @@ struct MockBookmarkImporter: BookmarkImporter {
     var importBookmarks: (ImportedBookmarks, BookmarkImportSource) -> BookmarkImportResult
 
 }
+
+struct MockCookieImporter: CookieImporter {
+
+    func importCookies(_ cookies: [HTTPCookie]) async -> CookieImportResult {
+        importCookiesImpl(cookies)
+    }
+
+    var importCookiesImpl: ([HTTPCookie]) -> CookieImportResult
+
+}

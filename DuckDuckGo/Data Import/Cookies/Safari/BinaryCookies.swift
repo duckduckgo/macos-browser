@@ -21,60 +21,58 @@ import Foundation
 final class BinaryReader {
     fileprivate var data: Data
 
-    var bufferPosition: Int = 0
+    var cursor: Int = 0
 
     init(data: Data) {
         self.data = data
     }
 
     func readSlice(length: Int) -> Data {
-        let slice = data.subdata(in: bufferPosition..<bufferPosition+length)
-        bufferPosition += length
+        let slice = self.slice(loc: cursor, len: length)
+        cursor += length
         return slice
     }
 
     func readDoubleBE() -> Int64 {
-        let data = readDoubleBE(offset: bufferPosition)
-        bufferPosition += 8
+        let data = readDoubleBE(offset: cursor)
+        cursor += 8
+        return data
+    }
+
+    func readDoubleLE() -> Int64 {
+        let data = readDoubleLE(offset: cursor)
+        cursor += 8
+        return data
+    }
+
+    func readIntBE() -> UInt32 {
+        let data = readIntBE(offset: cursor)
+        cursor += 4
+        return data
+    }
+
+    func readIntLE() -> UInt32 {
+        let data = readIntLE(offset: cursor)
+        cursor += 4
         return data
     }
 
     func readDoubleBE(offset: Int) -> Int64 {
         let data = slice(loc: offset, len: 8)
-//        let out: double_t = data.withUnsafeBytes { $0.load(as: double_t.self) }
-//        return Int64(NSSwapHostDoubleToBig(Double(out)).v)
-        let out: Int64 = data.reversed().withUnsafeBytes { $0.load(as: Int64.self) }
-        return out
-    }
-
-    func readIntBE() -> UInt32 {
-        let data = readIntBE(offset: bufferPosition)
-        bufferPosition += 4
-        return data
+        let out: Int64 = data.withUnsafeBytes { $0.load(as: Int64.self) }
+        return out.byteSwapped
     }
 
     func readIntBE(offset: Int) -> UInt32 {
         let data = slice(loc: offset, len: 4)
-        let out: UInt32 = data.reversed().withUnsafeBytes { $0.load(as: UInt32.self) }
-        return out
-    }
-
-    func readDoubleLE() -> Int64 {
-        let data = readDoubleLE(offset: bufferPosition)
-        bufferPosition += 8
-        return data
+        let out: UInt32 = data.withUnsafeBytes { $0.load(as: UInt32.self) }
+        return out.byteSwapped
     }
 
     func readDoubleLE(offset: Int) -> Int64 {
         let data = slice(loc: offset, len: 8)
         let out: double_t = data.withUnsafeBytes { $0.load(as: double_t.self) }
         return Int64(out)
-    }
-
-    func readIntLE() -> UInt32 {
-        let data = readIntLE(offset: bufferPosition)
-        bufferPosition += 4
-        return data
     }
 
     @discardableResult
@@ -107,44 +105,55 @@ struct Cookie {
 }
 
 final class CookieParser {
-    var numPages: UInt32 = 0
-    var pageSizes: [UInt32] = []
+
+    enum Const {
+        static let fileSignature = "cook"
+        static let macEpochOffset: Int64 = 978307199
+    }
+
     var pageNumCookies: [UInt32] = []
     var pageCookieOffsets: [[UInt32]] = []
     var pages: [BinaryReader] = []
     var cookieData: [[BinaryReader]] = []
     var cookies: [Cookie] = []
 
-    var reader: BinaryReader?
-
     func processCookieData(data: Data) throws -> [Cookie] {
-        reader = BinaryReader(data: data)
+        let reader = BinaryReader(data: data)
 
-        let header = reader!.readSlice(length: 4).utf8String()
+        let signature = reader.readSlice(length: 4).utf8String()
 
-        if header == "cook" {
-            getNumPages()
-            getPageSizes()
-            getPages()
-
-            for index in pages.indices {
-                try getNumCookies(index: index)
-                getCookieOffsets(index: index)
-                getCookieData(index: index)
-
-                for cookieIndex in cookieData[index].indices {
-                    try parseCookieData(cookie: cookieData[index][cookieIndex])
-                }
-            }
-        } else {
+        guard signature == Const.fileSignature else {
             throw BinaryCookiesError.badFileHeader
+        }
+
+        let numPages = reader.readIntBE()
+
+        let pageSizes: [UInt32] = {
+            var sizes = [UInt32]()
+            for _ in 0..<numPages {
+                sizes.append(reader.readIntBE())
+            }
+            return sizes
+        }()
+
+        for pageSize in pageSizes {
+            pages.append(BinaryReader(data: reader.readSlice(length: Int(pageSize))))
+        }
+
+        for index in pages.indices {
+            try getNumCookies(index: index)
+            getCookieOffsets(index: index)
+            getCookieData(index: index)
+
+            for cookieIndex in cookieData[index].indices {
+                try parseCookieData(cookie: cookieData[index][cookieIndex])
+            }
         }
 
         return cookies
     }
 
     func parseCookieData(cookie: BinaryReader) throws {
-        let macEpochOffset: Int64 = 978307199
         var offsets: [UInt32] = [UInt32]()
 
         cookie.readIntLE(offset: 0) // unknown
@@ -162,8 +171,8 @@ final class CookieParser {
             throw BinaryCookiesError.invalidEndOfCookieData
         }
 
-        let expiration = (cookie.readDoubleLE(offset: 32 + 8) + macEpochOffset)
-        let creation = (cookie.readDoubleLE(offset: 40 + 8) + macEpochOffset)
+        let expiration = (cookie.readDoubleLE(offset: 32 + 8) + Const.macEpochOffset)
+        let creation = (cookie.readDoubleLE(offset: 40 + 8) + Const.macEpochOffset)
         var domain: String = ""
         var name: String = ""
         var path: String = ""
@@ -202,10 +211,6 @@ final class CookieParser {
         }
 
         cookies.append(Cookie(expiration: expiration, creation: creation, domain: domain, name: name, path: path, value: value, secure: secure, http: http))
-    }
-
-    func getNumPages() {
-        numPages = reader!.readIntBE()
     }
 
     func getCookieOffsets(index: Int) {
@@ -247,18 +252,6 @@ final class CookieParser {
         }
 
         cookieData.append(pageCookies)
-    }
-
-    func getPageSizes() {
-        for _ in 0..<numPages {
-            pageSizes.append(reader!.readIntBE())
-        }
-    }
-
-    func getPages() {
-        for pageSize in pageSizes {
-            pages.append(BinaryReader(data: reader!.readSlice(length: Int(pageSize))))
-        }
     }
 }
 
