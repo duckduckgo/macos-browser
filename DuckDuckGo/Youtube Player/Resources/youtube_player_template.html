@@ -400,6 +400,7 @@
                 playerContainer: () => {
                     return document.querySelector('#player');
                 },
+
                 /**
                  * Returns the full YouTube embed URL used for the player iframe, using the video id
                  * @param {string} videoId
@@ -421,6 +422,7 @@
                         VideoPlayer.showVideoError('Malformed video id');
                     }
                 },
+
                 /**
                  * Show an error instead of the video player iframe
                  */
@@ -548,6 +550,7 @@
                     Setting.updateCheckboxToggle(checked);
                     Comms.sendToNative('setAlwaysOpenSettingTo', checked);
                 },
+
                 /**
                  * Updates the checkbox toggle with correct classes based on 'checked'
                  * @param {boolean} checked
@@ -559,6 +562,7 @@
                         Setting.checkboxContainer().classList.remove('is-checked');
                     }
                 },
+
                 /**
                  * Initializes the setting checkbox:
                  * 1. Listens for (user) changes on the actual checkbox
@@ -581,8 +585,7 @@
             const ToggleSection = {
                 /**
                  * NATIVE NOTE: We need to do exactly the same as for the Setting for the state of the ToggleSection, because
-                 * for example if the user hides the section, next time they open the PPP, it should stay hidden. This is not
-                 * yet implemented on the Frontend side.
+                 * for example if the user hides the section, next time they open the PPP, it should stay hidden.
                  */
 
                 /**
@@ -597,6 +600,7 @@
                 list: () => {
                     return document.querySelector('.list');
                 },
+
                 /**
                  * Returns the toggle / chevron used to collapse/expand the list
                  * @returns {HTMLElement}
@@ -619,10 +623,11 @@
                  * 1. Set the initial state: collapsed/expanded
                  * 2. Once set, add the animate classes so that any further changes (by user)
                  * triggers the animation
-                 * NATIVE NOTE: This might need to be changed if the setting is updated from outside the PPP
                  */
-                setInitial: () => {
-                    ToggleSection.setExpanded(ToggleSection.isExpanded);
+                setInitial: (isExpanded) => {
+                    ToggleSection.isExpanded = isExpanded;
+                    ToggleSection.setExpanded(isExpanded);
+
                     let classes = ToggleSection.getClasses();
 
                     classes.list.add('animate');
@@ -630,14 +635,19 @@
                 },
 
                 /**
-                 * 1. Set the initial state
-                 * 2. Listen for clicks to the toggle/chevron
+                 * NATIVE NOTE:
+                 * 1. Listen for clicks to the toggle/chevron, sends the new state to native and then updates the state.
+                 * 2. Listens for messages coming from native whether to update the state, for example if a user changes
+                 * it in a PPP in a different tab.
                  */
                 init: () => {
-                    ToggleSection.setInitial();
-
                     ToggleSection.toggle().addEventListener('click', () => {
+                        Comms.sendToNative('setToggleSectionExpanded', !ToggleSection.isExpanded);
                         ToggleSection.setExpanded(!ToggleSection.isExpanded);
+                    });
+
+                    Comms.listen('toggleSectionExpanded', (value) => {
+                        ToggleSection.setExpanded(value);
                     });
                 },
 
@@ -658,7 +668,7 @@
                         ToggleSection.isExpanded = false;
                     }
                 }
-            }
+            };
 
             const PlayOnYouTube = {
                 /**
@@ -668,6 +678,7 @@
                 button: () => {
                     return document.querySelector('.play-on-youtube');
                 },
+
                 /**
                  * Returns the full YouTube source URL for a video, based on video id
                  * @param {string} videoId
@@ -676,6 +687,7 @@
                 getVideoLinkURL: (videoId) => {
                     return 'https://www.youtube.com/watch?v='+videoId;
                 },
+
                 /**
                  * If there is a valid video id, set the 'href' of the YouTube button to the
                  * video link url
@@ -711,18 +723,26 @@
                  * after the MouseMove.limit
                  */
                 init: () => {
-                    document.addEventListener('mousemove', () => {
-                        if (MouseMove.timer) {
-                            clearTimeout(MouseMove.timer);
-                        }
-                        if (MouseMove.isFaded) {
-                            MouseMove.fadeInContent();
-                        }
+                    document.addEventListener('mousemove', MouseMove.handleFadeState);
 
-                        MouseMove.timer = setTimeout(() => {
-                            MouseMove.fadeOutContent();
-                        }, MouseMove.limit);
-                    });
+                    // Don't count clicks as inactivity and reset the timer.
+                    document.addEventListener('mousedown', MouseMove.handleFadeState);
+                },
+
+                /**
+                 *
+                 */
+                handleFadeState: () => {
+                    if (MouseMove.timer) {
+                        clearTimeout(MouseMove.timer);
+                    }
+                    if (MouseMove.isFaded) {
+                        MouseMove.fadeInContent();
+                    }
+
+                    MouseMove.timer = setTimeout(() => {
+                        MouseMove.fadeOutContent();
+                    }, MouseMove.limit);
                 },
 
                 /**
@@ -759,18 +779,23 @@
             };
 
             /**
-             * NATIVE NOTE: This is called on load by the native and sets the inital value of the
-             * setting.
+             * NATIVE NOTE: These are called on load by the native and sets the inital value of the
+             * setting and toggle section state.
              */
             window.setInitialAlwaysOpenSetting = (value) => {
                 Setting.set(value);
             }
 
+            window.setToggleSectionExpanded = (isExpanded) => {
+                ToggleSection.setInitial(isExpanded)
+            }
+
             /**
-             * NATIVE NOTE: This is here just for mocking purposes. It should be removed from this file and
+             * NATIVE NOTE: These are here just for mocking purposes. It should be removed from this file and
              * called directly from native.
              */
-            window.setInitialAlwaysOpenSetting(false);
+            window.setInitialAlwaysOpenSetting(true);
+            window.setToggleSectionExpanded(true);
 
             /**
              * Initializes all parts of the page on load.
@@ -786,4 +811,3 @@
         </script>
     </body>
 </html>
-
