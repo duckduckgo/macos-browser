@@ -31,7 +31,7 @@ class SafariCookiesReaderTests: XCTestCase {
             return
         }
 
-        XCTAssertEqual(cookies.count, 13)
+        XCTAssertEqual(cookies.count, 8)
     }
 
     private func cookiesFileURL() -> URL {

@@ -58,9 +58,10 @@ fileprivate extension HTTPCookie {
             .path: cookie.path,
             .name: cookie.name,
             .value: cookie.value,
-            .expires: Date(timeIntervalSince1970: TimeInterval(cookie.expiration)),
+            .expires: Date(timeIntervalSince1970: cookie.expiration),
             .secure: cookie.secure ? "TRUE": "FALSE",
             .version: "1",
+            .sameSitePolicy: cookie.sameSite,
             .httpOnly: cookie.http
         ]
         self.init(properties: properties.compactMapValues { $0 })

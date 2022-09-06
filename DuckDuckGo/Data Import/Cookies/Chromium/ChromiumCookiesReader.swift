@@ -132,7 +132,7 @@ final class ChromiumCookiesReader {
         let expiry: Date?
         let isSecure: String?
         let discard: String?
-        let sameSite: String?
+        let sameSite: HTTPCookieStringPolicy?
         let isHTTPOnly: Bool
         let port: String?
 
@@ -150,12 +150,10 @@ final class ChromiumCookiesReader {
             port = row["source_port"]
 
             switch row["samesite"] as? Int {
-            case 0:
-                sameSite = "none"
             case 1:
-                sameSite = "lax"
+                sameSite = .sameSiteLax
             case 2:
-                sameSite = "strict"
+                sameSite = .sameSiteStrict
             default:
                 sameSite = nil
             }

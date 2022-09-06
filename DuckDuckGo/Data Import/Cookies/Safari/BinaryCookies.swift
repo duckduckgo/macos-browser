@@ -18,6 +18,18 @@
 
 import Foundation
 
+struct CookieFlags: OptionSet {
+    let rawValue: UInt32
+
+    static let secure = CookieFlags(rawValue: 1 << 0)
+    static let httpOnly = CookieFlags(rawValue: 1 << 2)
+    static let sameSiteLax  = CookieFlags(rawValue: 1 << 3)
+
+    init(rawValue: UInt32) {
+        self.rawValue = rawValue
+    }
+}
+
 final class BinaryReader {
     fileprivate var data: Data
 
@@ -33,57 +45,46 @@ final class BinaryReader {
         return slice
     }
 
-    func readDoubleBE() -> Int64 {
-        let data = readDoubleBE(offset: cursor)
-        cursor += 8
-        return data
-    }
-
-    func readDoubleLE() -> Int64 {
-        let data = readDoubleLE(offset: cursor)
+    func readDoubleLE() -> Double {
+        let data = readDoubleLE(at: cursor)
         cursor += 8
         return data
     }
 
     func readIntBE() -> UInt32 {
-        let data = readIntBE(offset: cursor)
+        let data = readIntBE(at: cursor)
         cursor += 4
         return data
     }
 
+    @discardableResult
     func readIntLE() -> UInt32 {
-        let data = readIntLE(offset: cursor)
+        let data = readIntLE(at: cursor)
         cursor += 4
         return data
     }
 
-    func readDoubleBE(offset: Int) -> Int64 {
-        let data = slice(loc: offset, len: 8)
-        let out: Int64 = data.withUnsafeBytes { $0.load(as: Int64.self) }
-        return out.byteSwapped
-    }
-
-    func readIntBE(offset: Int) -> UInt32 {
+    func readIntBE(at offset: Int) -> UInt32 {
         let data = slice(loc: offset, len: 4)
         let out: UInt32 = data.withUnsafeBytes { $0.load(as: UInt32.self) }
         return out.byteSwapped
     }
 
-    func readDoubleLE(offset: Int) -> Int64 {
+    func readDoubleLE(at offset: Int) -> Double {
         let data = slice(loc: offset, len: 8)
-        let out: double_t = data.withUnsafeBytes { $0.load(as: double_t.self) }
-        return Int64(out)
+        let out: Double = data.withUnsafeBytes { $0.load(as: Double.self) }
+        return out
     }
 
     @discardableResult
-    func readIntLE(offset: Int) -> UInt32 {
+    func readIntLE(at offset: Int) -> UInt32 {
         let data = slice(loc: offset, len: 4)
         let out: UInt32 = data.withUnsafeBytes { $0.load(as: UInt32.self) }
         return out
     }
 
     func slice(loc: Int, len: Int) -> Data {
-        return self.data.subdata(in: loc..<loc+len)
+        self.data.subdata(in: loc..<loc+len)
     }
 }
 
@@ -94,21 +95,23 @@ enum BinaryCookiesError: Error {
 }
 
 struct Cookie {
-    var expiration: Int64
-    var creation: Int64
+    var expiration: TimeInterval
+    var creation: TimeInterval
     var domain: String
     var name: String
     var path: String
     var value: String
     var secure: Bool = false
     var http: Bool = false
+    var sameSite: HTTPCookieStringPolicy?
 }
 
 final class CookieParser {
 
     enum Const {
         static let fileSignature = "cook"
-        static let macEpochOffset: Int64 = 978307199
+        static let macEpochOffset: TimeInterval = 978307199
+        static let endOfCookie: UInt32 = 0
     }
 
     var pageNumCookies: [UInt32] = []
@@ -156,33 +159,30 @@ final class CookieParser {
     func parseCookieData(cookie: BinaryReader) throws {
         var offsets: [UInt32] = [UInt32]()
 
-        cookie.readIntLE(offset: 0) // unknown
-        cookie.readIntLE(offset: 4) // unknown2
-        let flags = cookie.readIntLE(offset: 4 + 4) // flags
-        cookie.readIntLE(offset: 8 + 4) // unknown3
-        offsets.append(cookie.readIntLE(offset: 12 + 4)) // domain
-        offsets.append(cookie.readIntLE(offset: 16 + 4)) // name
-        offsets.append(cookie.readIntLE(offset: 20 + 4)) // path
-        offsets.append(cookie.readIntLE(offset: 24 + 4)) // value
+        let flags = CookieFlags(rawValue: cookie.readIntLE(at: 8)) // flags
 
-        let endOfCookie = cookie.readIntLE(offset: 28 + 4)
+        offsets.append(cookie.readIntLE(at: 16)) // domain
+        offsets.append(cookie.readIntLE(at: 20)) // name
+        offsets.append(cookie.readIntLE(at: 24)) // path
+        offsets.append(cookie.readIntLE(at: 28)) // value
 
-        if endOfCookie != 0 {
+        let endOfCookie = cookie.readIntLE(at: 32)
+
+        guard endOfCookie == Const.endOfCookie else {
             throw BinaryCookiesError.invalidEndOfCookieData
         }
 
-        let expiration = (cookie.readDoubleLE(offset: 32 + 8) + Const.macEpochOffset)
-        let creation = (cookie.readDoubleLE(offset: 40 + 8) + Const.macEpochOffset)
-        var domain: String = ""
-        var name: String = ""
-        var path: String = ""
-        var value: String = ""
-        var secure: Bool = false
-        var http: Bool = false
+        let expiration = cookie.readDoubleLE(at: 40) + Const.macEpochOffset
+        let creation = cookie.readDoubleLE(at: 48) + Const.macEpochOffset
 
         guard let cookieString = String(data: cookie.data, encoding: .ascii) else {
             throw BinaryCookiesError.invalidEndOfCookieData
         }
+
+        var domain: String = ""
+        var name: String = ""
+        var path: String = ""
+        var value: String = ""
 
         for (index, offset) in offsets.enumerated() {
             let offsetIndex = cookieString.index(cookieString.startIndex, offsetBy: Int(offset))
@@ -201,16 +201,11 @@ final class CookieParser {
             }
         }
 
-        if flags == 1 {
-            secure = true
-        } else if flags == 4 {
-            http = true
-        } else if flags == 5 {
-            secure = true
-            http = true
-        }
+        let secure = flags.contains(.secure)
+        let http = flags.contains(.httpOnly)
+        let sameSite: HTTPCookieStringPolicy? = flags.contains(.sameSiteLax) ? .sameSiteLax : nil
 
-        cookies.append(Cookie(expiration: expiration, creation: creation, domain: domain, name: name, path: path, value: value, secure: secure, http: http))
+        cookies.append(Cookie(expiration: expiration, creation: creation, domain: domain, name: name, path: path, value: value, secure: secure, http: http, sameSite: sameSite))
     }
 
     func getCookieOffsets(index: Int) {
@@ -246,7 +241,7 @@ final class CookieParser {
         var pageCookies: [BinaryReader] = [BinaryReader]()
 
         for cookieOffset in cookieOffsets {
-            let cookieSize = page.readIntLE(offset: Int(cookieOffset))
+            let cookieSize = page.readIntLE(at: Int(cookieOffset))
 
             pageCookies.append(BinaryReader(data: page.slice(loc: Int(cookieOffset), len: Int(cookieSize))))
         }
