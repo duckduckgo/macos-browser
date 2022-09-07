@@ -35,7 +35,8 @@ final class SafariCookiesReader {
     func readCookies() -> Result<[HTTPCookie], SafariCookiesReader.ImportError> {
         do {
             return try safariCookiesFileURL.withTemporaryFile { temporaryDatabaseURL in
-                let cookiesResult = try BinaryCookies.parse(cookieURL: temporaryDatabaseURL)
+                let parser = BinaryCookiesParser(cookiesFileURL: temporaryDatabaseURL)
+                let cookiesResult = try parser.parse()
                 switch cookiesResult {
                 case .success(let cookies):
                     let httpCookies = cookies.compactMap(HTTPCookie.init(cookie:))
@@ -52,7 +53,7 @@ final class SafariCookiesReader {
 }
 
 fileprivate extension HTTPCookie {
-    convenience init?(cookie: Cookie) {
+    convenience init?(cookie: BinaryCookiesParser.Cookie) {
         let properties: [HTTPCookiePropertyKey: Any?] = [
             .domain: cookie.domain,
             .path: cookie.path,

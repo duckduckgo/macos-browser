@@ -41,7 +41,7 @@
 		373A1AB02842C4EA00586521 /* BookmarkHTMLImporter.swift in Sources */ = {isa = PBXBuildFile; fileRef = 373A1AAF2842C4EA00586521 /* BookmarkHTMLImporter.swift */; };
 		373A1AB228451ED400586521 /* BookmarksHTMLImporterTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 373A1AB128451ED400586521 /* BookmarksHTMLImporterTests.swift */; };
 		3741745128A3BB8300265EA0 /* ChromiumCookiesReader.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3741745028A3BB8200265EA0 /* ChromiumCookiesReader.swift */; };
-		3741745428A5425300265EA0 /* BinaryCookies.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3741745328A5425300265EA0 /* BinaryCookies.swift */; };
+		3741745428A5425300265EA0 /* BinaryCookiesParser.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3741745328A5425300265EA0 /* BinaryCookiesParser.swift */; };
 		3741745628A5A49900265EA0 /* SafariCookiesReader.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3741745528A5A49900265EA0 /* SafariCookiesReader.swift */; };
 		37479F152891BC8300302FE2 /* TabCollectionViewModelTests+WithoutPinnedTabsManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37479F142891BC8300302FE2 /* TabCollectionViewModelTests+WithoutPinnedTabsManager.swift */; };
 		37534C9E28104D9B002621E7 /* TabLazyLoaderTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37534C9D28104D9B002621E7 /* TabLazyLoaderTests.swift */; };
@@ -72,6 +72,7 @@
 		37AFCE9227DB8CAD00471A10 /* PreferencesAboutView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37AFCE9127DB8CAD00471A10 /* PreferencesAboutView.swift */; };
 		37B11B3928095E6600CBB621 /* TabLazyLoader.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37B11B3828095E6600CBB621 /* TabLazyLoader.swift */; };
 		37BD4A4428C724DC00997CB4 /* SafariCookiesReaderTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37BD4A4328C724DC00997CB4 /* SafariCookiesReaderTests.swift */; };
+		37BD4A4628C7777400997CB4 /* BinaryDataReader.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37BD4A4528C7777400997CB4 /* BinaryDataReader.swift */; };
 		37BF3F14286D8A6500BD9014 /* PinnedTabsManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37BF3F13286D8A6500BD9014 /* PinnedTabsManager.swift */; };
 		37BF3F21286F0A7A00BD9014 /* PinnedTabsViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37BF3F1E286F0A7A00BD9014 /* PinnedTabsViewModel.swift */; };
 		37BF3F22286F0A7A00BD9014 /* PinnedTabsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37BF3F1F286F0A7A00BD9014 /* PinnedTabsView.swift */; };
@@ -862,7 +863,7 @@
 		373A1AAF2842C4EA00586521 /* BookmarkHTMLImporter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BookmarkHTMLImporter.swift; sourceTree = "<group>"; };
 		373A1AB128451ED400586521 /* BookmarksHTMLImporterTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BookmarksHTMLImporterTests.swift; sourceTree = "<group>"; };
 		3741745028A3BB8200265EA0 /* ChromiumCookiesReader.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChromiumCookiesReader.swift; sourceTree = "<group>"; };
-		3741745328A5425300265EA0 /* BinaryCookies.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BinaryCookies.swift; sourceTree = "<group>"; };
+		3741745328A5425300265EA0 /* BinaryCookiesParser.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BinaryCookiesParser.swift; sourceTree = "<group>"; };
 		3741745528A5A49900265EA0 /* SafariCookiesReader.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SafariCookiesReader.swift; sourceTree = "<group>"; };
 		37479F142891BC8300302FE2 /* TabCollectionViewModelTests+WithoutPinnedTabsManager.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "TabCollectionViewModelTests+WithoutPinnedTabsManager.swift"; sourceTree = "<group>"; };
 		37534C9D28104D9B002621E7 /* TabLazyLoaderTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TabLazyLoaderTests.swift; sourceTree = "<group>"; };
@@ -892,6 +893,7 @@
 		37AFCE9127DB8CAD00471A10 /* PreferencesAboutView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PreferencesAboutView.swift; sourceTree = "<group>"; };
 		37B11B3828095E6600CBB621 /* TabLazyLoader.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TabLazyLoader.swift; sourceTree = "<group>"; };
 		37BD4A4328C724DC00997CB4 /* SafariCookiesReaderTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SafariCookiesReaderTests.swift; sourceTree = "<group>"; };
+		37BD4A4528C7777400997CB4 /* BinaryDataReader.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BinaryDataReader.swift; sourceTree = "<group>"; };
 		37BF3F13286D8A6500BD9014 /* PinnedTabsManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PinnedTabsManager.swift; sourceTree = "<group>"; };
 		37BF3F1E286F0A7A00BD9014 /* PinnedTabsViewModel.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PinnedTabsViewModel.swift; sourceTree = "<group>"; };
 		37BF3F1F286F0A7A00BD9014 /* PinnedTabsView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PinnedTabsView.swift; sourceTree = "<group>"; };
@@ -1782,8 +1784,9 @@
 		3741745228A5424600265EA0 /* Safari */ = {
 			isa = PBXGroup;
 			children = (
-				3741745328A5425300265EA0 /* BinaryCookies.swift */,
 				3741745528A5A49900265EA0 /* SafariCookiesReader.swift */,
+				37BD4A4528C7777400997CB4 /* BinaryDataReader.swift */,
+				3741745328A5425300265EA0 /* BinaryCookiesParser.swift */,
 			);
 			path = Safari;
 			sourceTree = "<group>";
@@ -4626,7 +4629,7 @@
 				B6A9E499261474120067D1B9 /* TimedPixel.swift in Sources */,
 				B6C0B23626E732000031CB7F /* DownloadListItem.swift in Sources */,
 				856C98A6256EB59600A22F1F /* MenuItemSelectors.swift in Sources */,
-				3741745428A5425300265EA0 /* BinaryCookies.swift in Sources */,
+				3741745428A5425300265EA0 /* BinaryCookiesParser.swift in Sources */,
 				B6B1E87E26D5DA0E0062C350 /* DownloadsPopover.swift in Sources */,
 				4B9292A026670D2A00AD2C21 /* SpacerNode.swift in Sources */,
 				B6E61EE8263ACE16004E11AB /* UTType.swift in Sources */,
@@ -4879,6 +4882,7 @@
 				B6A9E47026146A250067D1B9 /* DateExtension.swift in Sources */,
 				AAE7527A263B046100B973F8 /* History.xcdatamodeld in Sources */,
 				B64C853D26944B940048FEBE /* PermissionStore.swift in Sources */,
+				37BD4A4628C7777400997CB4 /* BinaryDataReader.swift in Sources */,
 				AA75A0AE26F3500C0086B667 /* PrivacyIconViewModel.swift in Sources */,
 				4BB99D0126FE191E001E4761 /* ChromiumBookmarksReader.swift in Sources */,
 				B6C0B23426E71BCD0031CB7F /* Downloads.xcdatamodeld in Sources */,
