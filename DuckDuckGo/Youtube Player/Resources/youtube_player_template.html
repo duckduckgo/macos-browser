@@ -462,7 +462,7 @@
                  * for example privateplayer:123, it returns 123.
                  */
                 getPathName: () => {
-                    return window.location.pathname
+                    return window.location.pathname.replace('/embed/', '');
                 },
 
                 /**
