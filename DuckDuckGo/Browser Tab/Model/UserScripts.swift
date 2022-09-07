@@ -37,6 +37,8 @@ final class UserScripts {
     let contentScopeUserScript: ContentScopeUserScript
     let autofillScript: WebsiteAutofillUserScript
     let autoconsentUserScript: UserScriptWithAutoconsent?
+    let youtubeOverlayScript = YoutubeOverlayUserScript()
+    let youtubePlayerUserScript = YoutubePlayerUserScript()
 
     init(with sourceProvider: ScriptSourceProviding) {
         clickToLoadScript = ClickToLoadUserScript(scriptSourceProvider: sourceProvider)
@@ -71,7 +73,10 @@ final class UserScripts {
         hoverUserScript,
         clickToLoadScript,
         contentScopeUserScript,
-        autofillScript
+        autofillScript,
+        youtubeOverlayScript,
+        youtubePlayerUserScript
+
     ]
 
     lazy var scripts = userScripts.map { $0.makeWKUserScript() }

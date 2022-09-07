@@ -29,6 +29,14 @@
 		31B7C85128800A5D0049841F /* CookieConsentPopover.swift in Sources */ = {isa = PBXBuildFile; fileRef = 31B7C85028800A5D0049841F /* CookieConsentPopover.swift */; };
 		31B9226C288054D5001F55B7 /* CookieConsentPopoverManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 31B9226B288054D5001F55B7 /* CookieConsentPopoverManager.swift */; };
 		31CF3432288B0B1B0087244B /* NavigationBarBadgeAnimator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 31CF3431288B0B1B0087244B /* NavigationBarBadgeAnimator.swift */; };
+		31F28C4F28C8EEC500119F70 /* YoutubePlayerUserScript.swift in Sources */ = {isa = PBXBuildFile; fileRef = 31F28C4C28C8EEC500119F70 /* YoutubePlayerUserScript.swift */; };
+		31F28C5128C8EEC500119F70 /* YoutubeOverlayUserScript.swift in Sources */ = {isa = PBXBuildFile; fileRef = 31F28C4E28C8EEC500119F70 /* YoutubeOverlayUserScript.swift */; };
+		31F28C5328C8EECA00119F70 /* PrivatePlayerSchemeHandler.swift in Sources */ = {isa = PBXBuildFile; fileRef = 31F28C5228C8EECA00119F70 /* PrivatePlayerSchemeHandler.swift */; };
+		31F28C5828C8EEDB00119F70 /* youtube_player_template.html in Resources */ = {isa = PBXBuildFile; fileRef = 31F28C5528C8EEDB00119F70 /* youtube_player_template.html */; };
+		31F28C5928C8EEDB00119F70 /* youtube-inject.js in Resources */ = {isa = PBXBuildFile; fileRef = 31F28C5628C8EEDB00119F70 /* youtube-inject.js */; };
+		31F28C5A28C8EEDB00119F70 /* private-player-inject.js in Resources */ = {isa = PBXBuildFile; fileRef = 31F28C5728C8EEDB00119F70 /* private-player-inject.js */; };
+		31F28C5E28C8EEE700119F70 /* PrivateYoutubeDiscoveryView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 31F28C5C28C8EEE700119F70 /* PrivateYoutubeDiscoveryView.swift */; };
+		31F28C5F28C8EEE700119F70 /* PrivateYoutubePopoverManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 31F28C5D28C8EEE700119F70 /* PrivateYoutubePopoverManager.swift */; };
 		31F7F2A6288AD2CA001C0D64 /* NavigationBarBadgeAnimationView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 31F7F2A5288AD2CA001C0D64 /* NavigationBarBadgeAnimationView.swift */; };
 		336D5B18262D8D3C0052E0C9 /* findinpage.js in Resources */ = {isa = PBXBuildFile; fileRef = 336D5AEF262D8D3C0052E0C9 /* findinpage.js */; };
 		339A6B5826A044BA00E3DAE8 /* duckduckgo-privacy-dashboard in Resources */ = {isa = PBXBuildFile; fileRef = 339A6B5726A044BA00E3DAE8 /* duckduckgo-privacy-dashboard */; };
@@ -842,6 +850,14 @@
 		31B7C85028800A5D0049841F /* CookieConsentPopover.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CookieConsentPopover.swift; sourceTree = "<group>"; };
 		31B9226B288054D5001F55B7 /* CookieConsentPopoverManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CookieConsentPopoverManager.swift; sourceTree = "<group>"; };
 		31CF3431288B0B1B0087244B /* NavigationBarBadgeAnimator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NavigationBarBadgeAnimator.swift; sourceTree = "<group>"; };
+		31F28C4C28C8EEC500119F70 /* YoutubePlayerUserScript.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = YoutubePlayerUserScript.swift; sourceTree = "<group>"; };
+		31F28C4E28C8EEC500119F70 /* YoutubeOverlayUserScript.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = YoutubeOverlayUserScript.swift; sourceTree = "<group>"; };
+		31F28C5228C8EECA00119F70 /* PrivatePlayerSchemeHandler.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PrivatePlayerSchemeHandler.swift; sourceTree = "<group>"; };
+		31F28C5528C8EEDB00119F70 /* youtube_player_template.html */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.html; path = youtube_player_template.html; sourceTree = "<group>"; };
+		31F28C5628C8EEDB00119F70 /* youtube-inject.js */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.javascript; path = "youtube-inject.js"; sourceTree = "<group>"; };
+		31F28C5728C8EEDB00119F70 /* private-player-inject.js */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.javascript; path = "private-player-inject.js"; sourceTree = "<group>"; };
+		31F28C5C28C8EEE700119F70 /* PrivateYoutubeDiscoveryView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PrivateYoutubeDiscoveryView.swift; sourceTree = "<group>"; };
+		31F28C5D28C8EEE700119F70 /* PrivateYoutubePopoverManager.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PrivateYoutubePopoverManager.swift; sourceTree = "<group>"; };
 		31F7F2A5288AD2CA001C0D64 /* NavigationBarBadgeAnimationView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NavigationBarBadgeAnimationView.swift; sourceTree = "<group>"; };
 		336B39E22726B4B700C417D3 /* LocalUnprotectedDomains.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LocalUnprotectedDomains.swift; sourceTree = "<group>"; };
 		336D5AEF262D8D3C0052E0C9 /* findinpage.js */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.javascript; path = findinpage.js; sourceTree = "<group>"; };
@@ -1718,6 +1734,37 @@
 				3184AC6C288F29D800C35E4B /* BadgeNotificationAnimationModel.swift */,
 			);
 			path = BadgeAnimationContainer;
+			sourceTree = "<group>";
+		};
+		31F28C4B28C8EE9000119F70 /* Youtube Player */ = {
+			isa = PBXGroup;
+			children = (
+				31F28C5B28C8EEE100119F70 /* UI */,
+				31F28C5428C8EED100119F70 /* Resources */,
+				31F28C5228C8EECA00119F70 /* PrivatePlayerSchemeHandler.swift */,
+				31F28C4E28C8EEC500119F70 /* YoutubeOverlayUserScript.swift */,
+				31F28C4C28C8EEC500119F70 /* YoutubePlayerUserScript.swift */,
+			);
+			path = "Youtube Player";
+			sourceTree = "<group>";
+		};
+		31F28C5428C8EED100119F70 /* Resources */ = {
+			isa = PBXGroup;
+			children = (
+				31F28C5728C8EEDB00119F70 /* private-player-inject.js */,
+				31F28C5528C8EEDB00119F70 /* youtube_player_template.html */,
+				31F28C5628C8EEDB00119F70 /* youtube-inject.js */,
+			);
+			path = Resources;
+			sourceTree = "<group>";
+		};
+		31F28C5B28C8EEE100119F70 /* UI */ = {
+			isa = PBXGroup;
+			children = (
+				31F28C5C28C8EEE700119F70 /* PrivateYoutubeDiscoveryView.swift */,
+				31F28C5D28C8EEE700119F70 /* PrivateYoutubePopoverManager.swift */,
+			);
+			path = UI;
 			sourceTree = "<group>";
 		};
 		31F7F2A4288AD299001C0D64 /* BadgeAnimations */ = {
@@ -2880,6 +2927,7 @@
 				AACF6FD426BC35C200CF09F9 /* User Agent */,
 				4BC68A6C2759ADC20029A586 /* Waitlist */,
 				AA6EF9AE25066F99004754E6 /* Windows */,
+				31F28C4B28C8EE9000119F70 /* Youtube Player */,
 				AA585D85248FD31400E9A3E2 /* Assets.xcassets */,
 				4B677454255DC18000025BD8 /* Bridging.h */,
 				AAD86E502678D104005C11BE /* DuckDuckGoCI.entitlements */,
@@ -4335,6 +4383,7 @@
 				AA7412B324D0B3AC00D22FE0 /* TabBarViewItem.xib in Resources */,
 				85480F8A25CDC360009424E3 /* MainMenu.storyboard in Resources */,
 				4B677435255DBEB800025BD8 /* httpsMobileV2FalsePositives.json in Resources */,
+				31F28C5828C8EEDB00119F70 /* youtube_player_template.html in Resources */,
 				4BD18F05283F151F00058124 /* BookmarksBar.storyboard in Resources */,
 				AA3439792754D55100B241FA /* trackers-1.json in Resources */,
 				AA34397C2754D55100B241FA /* dark-trackers-1.json in Resources */,
@@ -4343,6 +4392,7 @@
 				4B92929026670D1700AD2C21 /* BookmarkTableCellView.xib in Resources */,
 				85AC7AD927BD625000FFB69B /* HomePageAssets.xcassets in Resources */,
 				339A6B5826A044BA00E3DAE8 /* duckduckgo-privacy-dashboard in Resources */,
+				31F28C5928C8EEDB00119F70 /* youtube-inject.js in Resources */,
 				AA7EB6E727E8809D00036718 /* shield-mouse-over.json in Resources */,
 				4B92928E26670D1700AD2C21 /* BookmarkOutlineViewCell.xib in Resources */,
 				B64C84DE2692D7400048FEBE /* PermissionAuthorization.storyboard in Resources */,
@@ -4362,6 +4412,7 @@
 				AA34397B2754D55100B241FA /* trackers-3.json in Resources */,
 				026ADE1426C3010C002518EE /* macos-config.json in Resources */,
 				4B677432255DBEB800025BD8 /* httpsMobileV2BloomSpec.json in Resources */,
+				31F28C5A28C8EEDB00119F70 /* private-player-inject.js in Resources */,
 				AA2CB12D2587BB5600AA6FBE /* TabBarFooter.xib in Resources */,
 				AA80EC67256C4691007083E7 /* BrowserTab.storyboard in Resources */,
 				AAE246F42709EF3B00BEEAEE /* FirePopoverCollectionViewItem.xib in Resources */,
@@ -4508,6 +4559,7 @@
 				4B59024326B35F7C00489384 /* BrowserImportViewController.swift in Sources */,
 				4B9292D72667124000AD2C21 /* NSPopUpButtonExtension.swift in Sources */,
 				85D33F1225C82EB3002B91A6 /* ConfigurationManager.swift in Sources */,
+				31F28C4F28C8EEC500119F70 /* YoutubePlayerUserScript.swift in Sources */,
 				B6A9E48426146AAB0067D1B9 /* PixelParameters.swift in Sources */,
 				AA5FA697275F90C400DCE9C9 /* FaviconImageCache.swift in Sources */,
 				1430DFF524D0580F00B8978C /* TabBarViewController.swift in Sources */,
@@ -4790,6 +4842,7 @@
 				4BA1A6B8258B081600F6F690 /* EncryptionKeyStoring.swift in Sources */,
 				B65783E725F8AAFB00D8DB33 /* String+Punycode.swift in Sources */,
 				B657841A25FA484B00D8DB33 /* NSException+Catch.m in Sources */,
+				31F28C5F28C8EEE700119F70 /* PrivateYoutubePopoverManager.swift in Sources */,
 				B684592F25C93FBF00DC17B6 /* AppStateRestorationManager.swift in Sources */,
 				EA0BA3A9272217E6002A0B6C /* ClickToLoadUserScript.swift in Sources */,
 				AAA892EA250A4CEF005B37B2 /* WindowControllersManager.swift in Sources */,
@@ -4837,6 +4890,7 @@
 				85C48CCC278D808F00D3263E /* NSAttributedStringExtension.swift in Sources */,
 				AA7EB6E527E7D6DC00036718 /* AnimationView.swift in Sources */,
 				8562599A269CA0A600EE44BC /* NSRectExtension.swift in Sources */,
+				31F28C5128C8EEC500119F70 /* YoutubeOverlayUserScript.swift in Sources */,
 				B6040856274B830F00680351 /* DictionaryExtension.swift in Sources */,
 				B684592725C93C0500DC17B6 /* Publishers.NestedObjectChanges.swift in Sources */,
 				85589E9A27BFE3C30038AD11 /* FaviconView.swift in Sources */,
@@ -4929,6 +4983,7 @@
 				4BC68A722759B2140029A586 /* Waitlist.swift in Sources */,
 				AAB549DF25DAB8F80058460B /* BookmarkViewModel.swift in Sources */,
 				85707F28276A34D900DC0649 /* DaxSpeech.swift in Sources */,
+				31F28C5328C8EECA00119F70 /* PrivatePlayerSchemeHandler.swift in Sources */,
 				AA13DCB4271480B0006D48D3 /* FirePopoverViewModel.swift in Sources */,
 				F41D174125CB131900472416 /* NSColorExtension.swift in Sources */,
 				AA7E919C2875C65000AB6B62 /* Stored.swift in Sources */,
@@ -4941,6 +4996,7 @@
 				B6A9E45B261460350067D1B9 /* APIHeaders.swift in Sources */,
 				85625996269C953C00EE44BC /* PasswordManagementViewController.swift in Sources */,
 				4BB99D0226FE191E001E4761 /* ImportedBookmarks.swift in Sources */,
+				31F28C5E28C8EEE700119F70 /* PrivateYoutubeDiscoveryView.swift in Sources */,
 				AA6EF9B3250785D5004754E6 /* NSMenuExtension.swift in Sources */,
 				AA7412B524D1536B00D22FE0 /* MainWindowController.swift in Sources */,
 				AA9FF95924A1ECF20039E328 /* Tab.swift in Sources */,
