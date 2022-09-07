@@ -1041,7 +1041,25 @@ extension Tab: WKNavigationDelegate {
     @MainActor
     func webView(_ webView: WKWebView,
                  decidePolicyFor navigationAction: WKNavigationAction) async -> WKNavigationActionPolicy {
-
+        
+        if navigationAction.request.url?.absoluteString.contains("nocookie") == true,
+           navigationAction.request.value(forHTTPHeaderField: "Referer") == nil {
+            
+            var newRequest = navigationAction.request
+            newRequest.addValue("http://localhost/", forHTTPHeaderField: "Referer")
+            
+            guard let file = Bundle.main.url(forResource: "youtube_player_template", withExtension: "html") else { return .cancel }
+            let html = try? String(contentsOf: file)
+            
+            if #available(macOS 12.0, *) {
+                webView.loadSimulatedRequest(newRequest, responseHTML: html!)
+            } else {
+                return .cancel
+            }
+            
+            return .cancel
+        }
+        
         if navigationAction.request.url?.isFileURL ?? false {
             return .allow
         }
