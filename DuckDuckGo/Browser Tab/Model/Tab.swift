@@ -716,12 +716,15 @@ final class Tab: NSObject, Identifiable, ObservableObject {
         if url?.absoluteString.contains("youtube.com") == true,
            youtubeOverlayScript?.isEnabled == false {
             enableYoutubePlayerScript(true)
+        } else {
+            enableYoutubePlayerScript(false)
         }
     }
     
     #warning("Call the enabled() method on the javascript file")
     func enableYoutubePlayerScript(_ enable: Bool) {
-        self.youtubeOverlayScript?.evaluateJSCall(call: "enable()", webView: self.webView)
+        let message = enable ? "enable()" : "disable()"
+        self.youtubeOverlayScript?.evaluateJSCall(call: message, webView: self.webView)
         youtubeOverlayScript?.isEnabled = enable
     }
     

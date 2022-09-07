@@ -1,6 +1,6 @@
 
 function enable() {
-    alert('Injected and ran YouTube Icon Overlay script.');
+    console.log('Injected and ran YouTube Icon Overlay script.');
     
     const Icons = {
         dax: `
@@ -730,5 +730,5 @@ function enable() {
 }
 
 function disable() {
-    alert("I'm injected, but disabled =D")
+    console.log("I'm injected, but disabled =D")
 }
