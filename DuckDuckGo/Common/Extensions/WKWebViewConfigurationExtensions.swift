@@ -34,6 +34,11 @@ extension WKWebViewConfiguration {
             preferences.javaScriptCanOpenWindowsAutomatically = false
         }
         preferences.isFraudulentWebsiteWarningEnabled = false
+        
+        if urlSchemeHandler(forURLScheme: PrivatePlayerSchemeHandler.scheme) == nil {
+            setURLSchemeHandler(PrivatePlayerSchemeHandler(), forURLScheme: PrivatePlayerSchemeHandler.scheme)
+        }
+
         self.userContentController = UserContentController()
         self.processPool.geolocationProvider = GeolocationProvider(processPool: self.processPool)
      }

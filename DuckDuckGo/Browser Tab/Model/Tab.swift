@@ -707,6 +707,24 @@ final class Tab: NSObject, Identifiable, ObservableObject {
         historyCoordinating.updateTitleIfNeeded(title: title, url: url)
     }
 
+    // MARK: - Youtube Player
+    
+    private weak var youtubeOverlayScript: YoutubeOverlayUserScript?
+    
+    #warning("Enable the youtube injection if necessary")
+    func enableYoutubeIfNecessary() {
+        if url?.absoluteString.contains("youtube.com") == true,
+           youtubeOverlayScript?.isEnabled == false {
+            enableYoutubePlayerScript(true)
+        }
+    }
+    
+    #warning("Call the enabled() method on the javascript file")
+    func enableYoutubePlayerScript(_ enable: Bool) {
+        self.youtubeOverlayScript?.evaluateJSCall(call: "enable()", webView: self.webView)
+        youtubeOverlayScript?.isEnabled = enable
+    }
+    
     // MARK: - Dashboard Info
 
     @Published private(set) var trackerInfo: TrackerInfo?
@@ -762,6 +780,7 @@ extension Tab: UserContentControllerDelegate {
         userScripts.printingUserScript.delegate = self
         userScripts.hoverUserScript.delegate = self
         userScripts.autoconsentUserScript?.delegate = self
+        youtubeOverlayScript = userScripts.youtubeOverlayScript
 
         findInPageScript = userScripts.findInPageScript
         attachFindInPage()
@@ -1026,6 +1045,10 @@ extension Tab: WKNavigationDelegate {
         if navigationAction.request.url?.isFileURL ?? false {
             return .allow
         }
+        
+        if navigationAction.request.url?.scheme == PrivatePlayerSchemeHandler.scheme {
+            return .allow
+        }
 
         let isLinkActivated = navigationAction.navigationType == .linkActivated
         let isNavigatingAwayFromPinnedTab: Bool = {
@@ -1265,6 +1288,7 @@ extension Tab: WKNavigationDelegate {
         if isAMPProtectionExtracting { isAMPProtectionExtracting = false }
         linkProtection.setMainFrameUrl(nil)
         referrerTrimming.onFinishNavigation()
+        enableYoutubeIfNecessary()
     }
 
     func webView(_ webView: WKWebView, didFail navigation: WKNavigation!, withError error: Error) {
