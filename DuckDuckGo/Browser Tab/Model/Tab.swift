@@ -1111,6 +1111,10 @@ extension Tab: WKNavigationDelegate {
         if navigationAction.request.url?.isFileURL == true {
             return .allow
         }
+        
+        if navigationAction.request.url?.scheme == PrivatePlayerSchemeHandler.scheme {
+            return .allow
+        }
 
         let isLinkActivated = navigationAction.navigationType == .linkActivated
         let isNavigatingAwayFromPinnedTab: Bool = {

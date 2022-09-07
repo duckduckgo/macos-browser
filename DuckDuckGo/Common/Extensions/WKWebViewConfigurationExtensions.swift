@@ -35,6 +35,9 @@ extension WKWebViewConfiguration {
         }
         preferences.isFraudulentWebsiteWarningEnabled = false
         self.userContentController = UserContentController()
+        
+        setURLSchemeHandler(PrivatePlayerSchemeHandler(), forURLScheme: PrivatePlayerSchemeHandler.scheme)
+
         self.processPool.geolocationProvider = GeolocationProvider(processPool: self.processPool)
      }
 
