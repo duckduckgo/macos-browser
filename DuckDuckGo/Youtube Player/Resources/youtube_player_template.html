@@ -458,6 +458,14 @@
                 },
 
                 /**
+                 * NATIVE NOTE: Gets the 'pathname', this is everything to the right of the ':' of in
+                 * for example privateplayer:123, it returns 123.
+                 */
+                getPathName: () => {
+                    return window.location.pathname
+                },
+
+                /**
                  * Validates that the input string is a valid video id. If so, returns the video id
                  * otherwise returns false.
                  * @param {string} input
@@ -474,7 +482,7 @@
                  * Gets the video id from the ?v= query-string parameter of this file.
                  */
                 getVideoId: () => {
-                    return Comms.validateVideoId(Comms.getFromQueryString('v'));
+                    return Comms.validateVideoId(Comms.getPathName());
                 },
 
                 /**
