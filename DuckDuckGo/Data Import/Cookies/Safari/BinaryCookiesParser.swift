@@ -21,6 +21,7 @@ import Foundation
 final class BinaryCookiesParser {
 
     enum BinaryCookiesError: Error {
+        case cannotAccessFile
         case badFileHeader
         case invalidEndOfCookieData
         case unexpectedCookieHeaderValue
@@ -30,13 +31,15 @@ final class BinaryCookiesParser {
         self.fileURL = cookiesFileURL
     }
 
-    func parse() throws -> Result<[Cookie], BinaryCookiesError> {
-        let data = try Data(contentsOf: fileURL)
+    func parse() -> Result<[Cookie], BinaryCookiesError> {
         do {
+            let data = try Data(contentsOf: fileURL)
             let cookies = try processCookieData(data: data)
             return .success(cookies)
         } catch let e as BinaryCookiesError {
             return .failure(e)
+        } catch {
+            return .failure(.cannotAccessFile)
         }
     }
 

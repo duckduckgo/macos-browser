@@ -36,7 +36,7 @@ final class SafariCookiesReader {
         do {
             return try safariCookiesFileURL.withTemporaryFile { temporaryDatabaseURL in
                 let parser = BinaryCookiesParser(cookiesFileURL: temporaryDatabaseURL)
-                let cookiesResult = try parser.parse()
+                let cookiesResult = parser.parse()
                 switch cookiesResult {
                 case .success(let cookies):
                     let httpCookies = cookies.compactMap(HTTPCookie.init(cookie:))
