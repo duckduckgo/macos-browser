@@ -25,12 +25,7 @@ final class CoreDataHistoryImporter: HistoryImporter {
         self.historyCoordinator = historyCoordinator
     }
 
-    func importHistory(_ visits: [ImportedHistoryVisit]) async -> HistoryImportResult {
-        return await withCheckedContinuation { continuation in
-            historyCoordinator.importVisits(visits) {
-                continuation.resume(returning: .init(successful: 0, failed: 0))
-            }
-        }
+    func importHistory(_ visits: [ImportedHistoryVisit]) -> HistoryImportResult {
+        return historyCoordinator.importVisits(visits)
     }
-
 }

@@ -59,7 +59,7 @@ final class FirefoxHistoryReader {
                     throw ImportError.unexpectedHistoryDatabaseFormat
                 }
 
-                return rootEntries.map(ImportedHistoryVisit.init)
+                return rootEntries.compactMap(ImportedHistoryVisit.init)
             }
 
             return .success(visits)
@@ -70,11 +70,11 @@ final class FirefoxHistoryReader {
 
     fileprivate struct HistoryRow: FetchableRecord {
         let url: String
-        let title: String
+        let title: String?
         let date: Date
 
         init(row: Row) {
-            url = row["id"]
+            url = row["url"]
             title = row["title"]
             let timestamp: Int = row["visit_date"]
             date = Date(timeIntervalSince1970: TimeInterval(timestamp) / 1e6)
@@ -107,8 +107,11 @@ final class FirefoxHistoryReader {
 
 private extension ImportedHistoryVisit {
 
-    init(_ row: FirefoxHistoryReader.HistoryRow) {
-        url = row.url
+    init?(_ row: FirefoxHistoryReader.HistoryRow) {
+        guard let url = row.url.url else {
+            return nil
+        }
+        self.url = url
         title = row.title
         date = row.date
     }

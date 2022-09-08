@@ -101,10 +101,11 @@ enum DataImport {
     struct Summary: Equatable {
         var bookmarksResult: BookmarkImportResult?
         var loginsResult: LoginsResult?
+        var historyResult: HistoryImportResult?
         var cookiesResult: CookieImportResult?
 
         var isEmpty: Bool {
-            bookmarksResult == nil && loginsResult == nil && cookiesResult == nil
+            bookmarksResult == nil && loginsResult == nil && historyResult == nil && cookiesResult == nil
         }
     }
 
@@ -238,6 +239,7 @@ struct DataImportError: Error, Equatable {
     enum ImportErrorAction {
         case bookmarks
         case logins
+        case history
         case cookies
         case generic
         
@@ -245,6 +247,7 @@ struct DataImportError: Error, Equatable {
             switch self {
             case .bookmarks: return .importBookmarks
             case .logins: return .importLogins
+            case .history: return .importHistory
             case .cookies: return .importCookies
             case .generic: return .generic
             }
@@ -354,6 +357,26 @@ struct DataImportError: Error, Equatable {
     
     let actionType: ImportErrorAction
     let errorType: ImportErrorType
+
+    // MARK: History Error Types
+
+    static func history(_ errorType: ImportErrorType) -> DataImportError {
+        return DataImportError(actionType: .history, errorType: errorType)
+    }
+
+    static func history(_ errorType: FirefoxHistoryReader.ImportError) -> DataImportError {
+        switch errorType {
+        case .noHistoryFileFound: return DataImportError(actionType: .history, errorType: .noFileFound)
+        case .unexpectedHistoryDatabaseFormat: return DataImportError(actionType: .history, errorType: .cannotReadFile)
+        case .failedToTemporarilyCopyFile: return DataImportError(actionType: .history, errorType: .failedToTemporarilyCopyFile)
+        }
+    }
+
+//    static func history(_ errorType: SafariBookmarksReader.ImportError) -> DataImportError {
+//        switch errorType {
+//        case .unexpectedBookmarksFileFormat: return DataImportError(actionType: .bookmarks, errorType: .cannotReadFile)
+//        }
+//    }
 
     // MARK: Cookie Error Types
 

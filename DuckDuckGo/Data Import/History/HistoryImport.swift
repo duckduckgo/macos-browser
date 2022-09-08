@@ -35,11 +35,11 @@ struct HistoryImportResult: Equatable {
 }
 
 struct ImportedHistoryVisit {
-    let url: String
-    let title: String
+    let url: URL
+    let title: String?
     let date: Date
 }
 
 protocol HistoryImporter {
-    func importHistory(_ visits: [ImportedHistoryVisit]) async -> HistoryImportResult
+    func importHistory(_ visits: [ImportedHistoryVisit]) -> HistoryImportResult
 }

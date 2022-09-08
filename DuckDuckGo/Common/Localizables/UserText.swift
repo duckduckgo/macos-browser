@@ -404,6 +404,20 @@ struct UserText {
         return String(format: localized, String(totalFailedImports))
     }
 
+    static func successfulHistoryImports(_ totalSuccessfulImports: Int) -> String {
+        let localized = NSLocalizedString("import.history.browser.successful-imports",
+                                          value: "History items: %@",
+                                          comment: "Status text indicating the number of successful history item imports")
+        return String(format: localized, String(totalSuccessfulImports))
+    }
+
+    static func successfulCookiesImports(_ totalSuccessfulImports: Int) -> String {
+        let localized = NSLocalizedString("import.cookies.browser.successful-imports",
+                                          value: "Cookies: %@",
+                                          comment: "Status text indicating the number of successful cookie imports")
+        return String(format: localized, String(totalSuccessfulImports))
+    }
+
     static let bookmarkImportSafariPermissionDescription = NSLocalizedString("import.bookmarks.safari.permission-description", value: "DuckDuckGo needs your permission to read the Safari bookmarks file. Select the Bookmarks.plist file to import bookmarks.", comment: "Description text for the Safari bookmark import permission screen")
     static let bookmarkImportSafariRequestPermissionButtonTitle = NSLocalizedString("import.bookmarks.safari.permission-button.title", value: "Select Bookmarks File…", comment: "Text for the Safari bookmark import permission button")
     static let cookieImportSafariRequestPermissionButtonTitle = NSLocalizedString("import.cookies.safari.permission-button.title", value: "Select Cookies File…", comment: "Text for the Safari cookie import permission button")

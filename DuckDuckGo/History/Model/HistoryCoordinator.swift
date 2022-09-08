@@ -41,7 +41,7 @@ protocol HistoryCoordinating: AnyObject {
     func burnDomains(_ domains: Set<String>, completion: @escaping () -> Void)
     func burnVisits(_ visits: [Visit], completion: @escaping () -> Void)
 
-    func importVisits(_ visits: [ImportedHistoryVisit], completion: @escaping() -> Void)
+    func importVisits(_ visits: [ImportedHistoryVisit]) -> HistoryImportResult
 }
 
 /// Coordinates access to History. Uses its own queue with high qos for all operations.
@@ -188,8 +188,24 @@ final class HistoryCoordinator: HistoryCoordinating {
         }
     }
 
-    func importVisits(_ visits: [ImportedHistoryVisit], completion: @escaping () -> Void) {
-        completion()
+    func importVisits(_ visits: [ImportedHistoryVisit]) -> HistoryImportResult {
+        for visit in visits {
+            if let historyEntry = historyDictionary?[visit.url] {
+                historyEntry.addOldVisit(date: visit.date)
+                if visit.date > historyEntry.lastVisit {
+                    historyEntry.lastVisit = visit.date
+                    historyEntry.title = visit.title
+                }
+                save(entry: historyEntry)
+            } else {
+                let historyEntry = HistoryEntry(url: visit.url)
+                historyDictionary?[visit.url] = historyEntry
+                historyEntry.lastVisit = visit.date
+                historyEntry.title = visit.title
+                save(entry: historyEntry)
+            }
+        }
+        return .init(successful: visits.count, failed: 0)
     }
 
     var cleaningDate: Date { .monthAgo }

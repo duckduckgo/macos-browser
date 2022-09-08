@@ -47,6 +47,12 @@ final class BrowserImportSummaryViewController: NSViewController {
     @IBOutlet var passwordSummaryRow: NSView!
     @IBOutlet var passwordSummaryLabel: NSTextField!
 
+    @IBOutlet var historySummaryRow: NSView!
+    @IBOutlet var historySummaryLabel: NSTextField!
+
+    @IBOutlet var cookiesSummaryRow: NSView!
+    @IBOutlet var cookiesSummaryLabel: NSTextField!
+
     private let summary: DataImport.Summary
 
     init?(coder: NSCoder, summary: DataImport.Summary) {
@@ -86,10 +92,21 @@ final class BrowserImportSummaryViewController: NSViewController {
                 bookmarkFailureRow.isHidden = true
             }
         }
+
         if case .completed(let result) = summary.loginsResult {
             passwordSummaryRow.isHidden = false
             passwordSummaryLabel.stringValue = UserText
                 .loginImportSuccessfulBrowserImports(totalSuccessfulImports: result.successfulImports.count)
+        }
+
+        if let result = summary.historyResult {
+            historySummaryRow.isHidden = false
+            historySummaryLabel.stringValue = UserText.successfulHistoryImports(result.successful)
+        }
+
+        if let result = summary.cookiesResult {
+            cookiesSummaryRow.isHidden = false
+            cookiesSummaryLabel.stringValue = UserText.successfulCookiesImports(result.successful)
         }
     }
 

@@ -24,16 +24,18 @@ final class FirefoxDataImporter: DataImporter {
 
     let loginImporter: LoginImporter
     let bookmarkImporter: BookmarkImporter
+    let historyImporter: HistoryImporter
     let cookieImporter: CookieImporter
 
-    init(loginImporter: LoginImporter, bookmarkImporter: BookmarkImporter, cookieImporter: CookieImporter) {
+    init(loginImporter: LoginImporter, bookmarkImporter: BookmarkImporter, historyImporter: HistoryImporter, cookieImporter: CookieImporter) {
         self.loginImporter = loginImporter
         self.bookmarkImporter = bookmarkImporter
+        self.historyImporter = historyImporter
         self.cookieImporter = cookieImporter
     }
 
     func importableTypes() -> [DataImport.DataType] {
-        return [.logins, .bookmarks, .cookies]
+        return [.logins, .bookmarks, .history, .cookies]
     }
 
     // swiftlint:disable:next cyclomatic_complexity
@@ -93,6 +95,23 @@ final class FirefoxDataImporter: DataImporter {
             case .failure(let error):
                 completion(.failure(.bookmarks(error)))
                 return
+            }
+        }
+
+        if types.contains(.history) {
+            let historyReader = FirefoxHistoryReader(firefoxDataDirectoryURL: firefoxProfileURL)
+            let historyResult = historyReader.readHistory()
+
+            switch historyResult {
+            case .success(let visits):
+                if visits.isEmpty {
+                    completion(.success(summary))
+                } else {
+                    summary.historyResult = historyImporter.importHistory(visits)
+                    completion(.success(summary))
+                }
+            case .failure(let error):
+                completion(.failure(.history(error)))
             }
         }
 

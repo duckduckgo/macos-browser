@@ -79,6 +79,7 @@ final class DataImportViewController: NSViewController {
             renderCurrentViewState()
 
             let bookmarkImporter = CoreDataBookmarkImporter(bookmarkManager: LocalBookmarkManager.shared)
+            let historyImporter = CoreDataHistoryImporter(historyCoordinator: HistoryCoordinator.shared)
             let cookieImporter = WebKitCookieImporter(cookieStore: WKWebsiteDataStore.default().httpCookieStore)
 
             do {
@@ -90,7 +91,7 @@ final class DataImportViewController: NSViewController {
                 case .edge:
                     self.dataImporter = try EdgeDataImporter(loginImporter: secureVaultImporter(), bookmarkImporter: bookmarkImporter, cookieImporter: cookieImporter)
                 case .firefox:
-                    self.dataImporter = try FirefoxDataImporter(loginImporter: secureVaultImporter(), bookmarkImporter: bookmarkImporter, cookieImporter: cookieImporter)
+                    self.dataImporter = try FirefoxDataImporter(loginImporter: secureVaultImporter(), bookmarkImporter: bookmarkImporter, historyImporter: historyImporter, cookieImporter: cookieImporter)
                 case .safari where !(currentChildViewController is FileImportViewController):
                     self.dataImporter = SafariDataImporter(bookmarkImporter: bookmarkImporter, cookieImporter: cookieImporter)
                 case .bookmarksHTML:
