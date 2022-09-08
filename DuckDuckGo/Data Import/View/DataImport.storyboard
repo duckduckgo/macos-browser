@@ -202,7 +202,7 @@ Gw
                         <autoresizingMask key="autoresizingMask"/>
                         <subviews>
                             <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="pLM-zg-r5i">
-                                <rect key="frame" x="18" y="146" width="473" height="16"/>
+                                <rect key="frame" x="18" y="170" width="473" height="16"/>
                                 <textFieldCell key="cell" lineBreakMode="clipping" title="Import Complete:" id="fnj-an-rLQ">
                                     <font key="font" usesAppearanceFont="YES"/>
                                     <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
@@ -210,10 +210,10 @@ Gw
                                 </textFieldCell>
                             </textField>
                             <stackView distribution="fillEqually" orientation="vertical" alignment="leading" horizontalStackHuggingPriority="249.99998474121094" verticalStackHuggingPriority="249.99998474121094" detachesHiddenViews="YES" translatesAutoresizingMaskIntoConstraints="NO" id="QDv-FK-S6H">
-                                <rect key="frame" x="20" y="0.0" width="469" height="136"/>
+                                <rect key="frame" x="20" y="0.0" width="469" height="160"/>
                                 <subviews>
                                     <customView translatesAutoresizingMaskIntoConstraints="NO" id="EI8-cC-sJU" userLabel="Bookmarks Row">
-                                        <rect key="frame" x="0.0" y="120" width="469" height="16"/>
+                                        <rect key="frame" x="0.0" y="144" width="469" height="16"/>
                                         <subviews>
                                             <imageView horizontalHuggingPriority="251" verticalHuggingPriority="251" translatesAutoresizingMaskIntoConstraints="NO" id="D8R-6v-Qkq" userLabel="Checkmark">
                                                 <rect key="frame" x="0.0" y="0.0" width="16" height="16"/>
@@ -243,7 +243,7 @@ Gw
                                         </constraints>
                                     </customView>
                                     <customView translatesAutoresizingMaskIntoConstraints="NO" id="5kb-ea-sNd" userLabel="Duplicate Bookmarks Row">
-                                        <rect key="frame" x="0.0" y="96" width="469" height="16"/>
+                                        <rect key="frame" x="0.0" y="120" width="469" height="16"/>
                                         <subviews>
                                             <imageView horizontalHuggingPriority="251" verticalHuggingPriority="251" translatesAutoresizingMaskIntoConstraints="NO" id="bFG-nJ-vRu" userLabel="Checkmark">
                                                 <rect key="frame" x="0.0" y="0.0" width="16" height="16"/>
@@ -273,7 +273,7 @@ Gw
                                         </constraints>
                                     </customView>
                                     <customView translatesAutoresizingMaskIntoConstraints="NO" id="fh4-V9-bq2" userLabel="Failed Bookmarks Row">
-                                        <rect key="frame" x="0.0" y="72" width="469" height="16"/>
+                                        <rect key="frame" x="0.0" y="96" width="469" height="16"/>
                                         <subviews>
                                             <imageView horizontalHuggingPriority="251" verticalHuggingPriority="251" translatesAutoresizingMaskIntoConstraints="NO" id="9Ca-In-O4J" userLabel="Checkmark">
                                                 <rect key="frame" x="0.0" y="0.0" width="16" height="16"/>
@@ -303,7 +303,7 @@ Gw
                                         </constraints>
                                     </customView>
                                     <customView translatesAutoresizingMaskIntoConstraints="NO" id="Wd7-d2-7lv" userLabel="Passwords Row">
-                                        <rect key="frame" x="0.0" y="48" width="469" height="16"/>
+                                        <rect key="frame" x="0.0" y="72" width="469" height="16"/>
                                         <subviews>
                                             <imageView horizontalHuggingPriority="251" verticalHuggingPriority="251" translatesAutoresizingMaskIntoConstraints="NO" id="iu0-qM-euh" userLabel="Checkmark">
                                                 <rect key="frame" x="0.0" y="0.0" width="16" height="16"/>
@@ -333,7 +333,7 @@ Gw
                                         </constraints>
                                     </customView>
                                     <customView translatesAutoresizingMaskIntoConstraints="NO" id="n9h-bX-VHa" userLabel="History Row">
-                                        <rect key="frame" x="0.0" y="24" width="469" height="16"/>
+                                        <rect key="frame" x="0.0" y="48" width="469" height="16"/>
                                         <subviews>
                                             <imageView horizontalHuggingPriority="251" verticalHuggingPriority="251" translatesAutoresizingMaskIntoConstraints="NO" id="ejT-Bt-mcx" userLabel="Checkmark">
                                                 <rect key="frame" x="0.0" y="0.0" width="16" height="16"/>
@@ -345,7 +345,7 @@ Gw
                                             </imageView>
                                             <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="FTh-O4-4ak">
                                                 <rect key="frame" x="22" y="0.0" width="449" height="16"/>
-                                                <textFieldCell key="cell" lineBreakMode="clipping" title="History items:" id="Sud-G2-f56">
+                                                <textFieldCell key="cell" lineBreakMode="clipping" title="History Items:" id="Sud-G2-f56">
                                                     <font key="font" metaFont="system"/>
                                                     <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
                                                     <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
@@ -360,6 +360,36 @@ Gw
                                             <constraint firstItem="FTh-O4-4ak" firstAttribute="leading" secondItem="ejT-Bt-mcx" secondAttribute="trailing" constant="8" symbolic="YES" id="OeV-cD-IpL"/>
                                             <constraint firstItem="FTh-O4-4ak" firstAttribute="top" secondItem="n9h-bX-VHa" secondAttribute="top" id="c9A-f2-j8a"/>
                                             <constraint firstAttribute="bottom" secondItem="ejT-Bt-mcx" secondAttribute="bottom" id="d7R-0d-da8"/>
+                                        </constraints>
+                                    </customView>
+                                    <customView translatesAutoresizingMaskIntoConstraints="NO" id="Jg1-am-KO3" userLabel="Duplicate History Row">
+                                        <rect key="frame" x="0.0" y="24" width="469" height="16"/>
+                                        <subviews>
+                                            <imageView horizontalHuggingPriority="251" verticalHuggingPriority="251" translatesAutoresizingMaskIntoConstraints="NO" id="uKp-6b-Vyy" userLabel="Checkmark">
+                                                <rect key="frame" x="0.0" y="0.0" width="16" height="16"/>
+                                                <constraints>
+                                                    <constraint firstAttribute="width" constant="16" id="6cy-TE-Fg5"/>
+                                                    <constraint firstAttribute="height" constant="16" id="wF3-Y8-kNs"/>
+                                                </constraints>
+                                                <imageCell key="cell" refusesFirstResponder="YES" alignment="left" imageScaling="proportionallyDown" image="Error" id="pJw-5f-hg4"/>
+                                            </imageView>
+                                            <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="gej-YP-lJf">
+                                                <rect key="frame" x="22" y="0.0" width="449" height="16"/>
+                                                <textFieldCell key="cell" lineBreakMode="clipping" title="Duplicate History Items:" id="S4O-40-brx">
+                                                    <font key="font" metaFont="system"/>
+                                                    <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
+                                                    <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
+                                                </textFieldCell>
+                                            </textField>
+                                        </subviews>
+                                        <constraints>
+                                            <constraint firstItem="uKp-6b-Vyy" firstAttribute="top" secondItem="Jg1-am-KO3" secondAttribute="top" id="A3c-QR-uw8"/>
+                                            <constraint firstItem="gej-YP-lJf" firstAttribute="leading" secondItem="uKp-6b-Vyy" secondAttribute="trailing" constant="8" symbolic="YES" id="DMx-Ia-yUu"/>
+                                            <constraint firstAttribute="bottom" secondItem="uKp-6b-Vyy" secondAttribute="bottom" id="SCx-Ax-NxD"/>
+                                            <constraint firstAttribute="trailing" secondItem="gej-YP-lJf" secondAttribute="trailing" id="aFN-IM-cAh"/>
+                                            <constraint firstAttribute="bottom" secondItem="gej-YP-lJf" secondAttribute="bottom" id="lZJ-j5-Yq1"/>
+                                            <constraint firstItem="gej-YP-lJf" firstAttribute="top" secondItem="Jg1-am-KO3" secondAttribute="top" id="mN4-Dd-Pvi"/>
+                                            <constraint firstItem="uKp-6b-Vyy" firstAttribute="leading" secondItem="Jg1-am-KO3" secondAttribute="leading" id="uaQ-bd-ehR"/>
                                         </constraints>
                                     </customView>
                                     <customView translatesAutoresizingMaskIntoConstraints="NO" id="bbz-98-r65" userLabel="Cookies Row">
@@ -404,8 +434,10 @@ Gw
                                     <integer value="1000"/>
                                     <integer value="1000"/>
                                     <integer value="1000"/>
+                                    <integer value="1000"/>
                                 </visibilityPriorities>
                                 <customSpacing>
+                                    <real value="3.4028234663852886e+38"/>
                                     <real value="3.4028234663852886e+38"/>
                                     <real value="3.4028234663852886e+38"/>
                                     <real value="3.4028234663852886e+38"/>
@@ -434,6 +466,8 @@ Gw
                         <outlet property="bookmarkSummaryRow" destination="EI8-cC-sJU" id="Ndo-kn-jNo"/>
                         <outlet property="cookiesSummaryLabel" destination="sC4-3V-2mJ" id="97Z-SZ-eqP"/>
                         <outlet property="cookiesSummaryRow" destination="bbz-98-r65" id="nuF-zC-lWZ"/>
+                        <outlet property="historyDuplicatesLabel" destination="gej-YP-lJf" id="Z3y-RO-rFV"/>
+                        <outlet property="historyDuplicatesRow" destination="Jg1-am-KO3" id="Xxc-er-3Lk"/>
                         <outlet property="historySummaryLabel" destination="FTh-O4-4ak" id="pxH-NG-cR3"/>
                         <outlet property="historySummaryRow" destination="n9h-bX-VHa" id="Uup-2F-lfc"/>
                         <outlet property="passwordSummaryLabel" destination="MKa-AL-0wK" id="1OS-WG-uW7"/>

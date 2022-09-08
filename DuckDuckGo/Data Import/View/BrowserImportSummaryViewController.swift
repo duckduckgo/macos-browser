@@ -50,6 +50,9 @@ final class BrowserImportSummaryViewController: NSViewController {
     @IBOutlet var historySummaryRow: NSView!
     @IBOutlet var historySummaryLabel: NSTextField!
 
+    @IBOutlet var historyDuplicatesRow: NSView!
+    @IBOutlet var historyDuplicatesLabel: NSTextField!
+
     @IBOutlet var cookiesSummaryRow: NSView!
     @IBOutlet var cookiesSummaryLabel: NSTextField!
 
@@ -102,6 +105,13 @@ final class BrowserImportSummaryViewController: NSViewController {
         if let result = summary.historyResult {
             historySummaryRow.isHidden = false
             historySummaryLabel.stringValue = UserText.successfulHistoryImports(result.successful)
+
+            if result.duplicates > 0 {
+                historyDuplicatesRow.isHidden = false
+                historyDuplicatesLabel.stringValue = UserText.duplicateHistoryImports(result.duplicates)
+            } else {
+                historyDuplicatesRow.isHidden = true
+            }
         }
 
         if let result = summary.cookiesResult {

@@ -406,9 +406,16 @@ struct UserText {
 
     static func successfulHistoryImports(_ totalSuccessfulImports: Int) -> String {
         let localized = NSLocalizedString("import.history.browser.successful-imports",
-                                          value: "History items: %@",
+                                          value: "History Items: %@",
                                           comment: "Status text indicating the number of successful history item imports")
         return String(format: localized, String(totalSuccessfulImports))
+    }
+
+    static func duplicateHistoryImports(_ totalDuplicatedImports: Int) -> String {
+        let localized = NSLocalizedString("import.history.browser.duplicate-imports",
+                                          value: "Duplicate History Items Skipped: %@",
+                                          comment: "Status text indicating the number of duplicate history item imports")
+        return String(format: localized, String(totalDuplicatedImports))
     }
 
     static func successfulCookiesImports(_ totalSuccessfulImports: Int) -> String {

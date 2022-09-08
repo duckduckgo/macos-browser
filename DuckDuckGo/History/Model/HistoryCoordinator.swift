@@ -189,23 +189,36 @@ final class HistoryCoordinator: HistoryCoordinating {
     }
 
     func importVisits(_ visits: [ImportedHistoryVisit]) -> HistoryImportResult {
+        var successful = 0
+        var duplicates = 0
+
         for visit in visits {
             if let historyEntry = historyDictionary?[visit.url] {
-                historyEntry.addOldVisit(date: visit.date)
-                if visit.date > historyEntry.lastVisit {
-                    historyEntry.lastVisit = visit.date
-                    historyEntry.title = visit.title
+                if historyEntry.visits.contains(where: { $0.date == visit.date }) {
+                    duplicates += 1
+                } else {
+                    historyEntry.addOldVisit(date: visit.date)
+                    if visit.date > historyEntry.lastVisit {
+                        historyEntry.lastVisit = visit.date
+                        historyEntry.title = visit.title
+                    }
+                    save(entry: historyEntry)
+                    successful += 1
                 }
-                save(entry: historyEntry)
             } else {
                 let historyEntry = HistoryEntry(url: visit.url)
-                historyDictionary?[visit.url] = historyEntry
-                historyEntry.lastVisit = visit.date
-                historyEntry.title = visit.title
-                save(entry: historyEntry)
+                if historyEntry.visits.contains(where: { $0.date == visit.date }) {
+                    duplicates += 1
+                } else {
+                    historyDictionary?[visit.url] = historyEntry
+                    historyEntry.lastVisit = visit.date
+                    historyEntry.title = visit.title
+                    save(entry: historyEntry)
+                    successful += 1
+                }
             }
         }
-        return .init(successful: visits.count, failed: 0)
+        return .init(successful: successful, duplicates: duplicates)
     }
 
     var cleaningDate: Date { .monthAgo }

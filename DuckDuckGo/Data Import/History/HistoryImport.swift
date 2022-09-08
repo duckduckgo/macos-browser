@@ -26,13 +26,12 @@ enum HistoryImportSource {
 
 struct HistoryImportResult: Equatable {
     var successful: Int
-    var failed: Int
+    var duplicates: Int
 
     static func += (left: inout HistoryImportResult, right: HistoryImportResult) {
         left.successful += right.successful
-        left.failed += right.failed
-    }
-}
+        left.duplicates += right.duplicates
+    }}
 
 struct ImportedHistoryVisit {
     let url: URL
