@@ -82,6 +82,7 @@ enum DataImport {
 
     enum DataType {
         case bookmarks
+        case history
         case cookies
         case logins
     }

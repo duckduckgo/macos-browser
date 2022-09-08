@@ -62,6 +62,9 @@
 		378205F8283BC6A600D1D4AA /* StartupPreferencesTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 378205F7283BC6A600D1D4AA /* StartupPreferencesTests.swift */; };
 		378205FB283C277800D1D4AA /* MainMenuTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 378205FA283C277800D1D4AA /* MainMenuTests.swift */; };
 		379DE4BD27EA31AC002CC3DE /* PreferencesAutofillView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 379DE4BC27EA31AC002CC3DE /* PreferencesAutofillView.swift */; };
+		379F74E428C9D3C3003CF254 /* HistoryImport.swift in Sources */ = {isa = PBXBuildFile; fileRef = 379F74E328C9D3C3003CF254 /* HistoryImport.swift */; };
+		379F74E628C9D7D1003CF254 /* CoreDataHistoryImporter.swift in Sources */ = {isa = PBXBuildFile; fileRef = 379F74E528C9D7D1003CF254 /* CoreDataHistoryImporter.swift */; };
+		379F74E928C9F755003CF254 /* FirefoxHistoryReader.swift in Sources */ = {isa = PBXBuildFile; fileRef = 379F74E828C9F755003CF254 /* FirefoxHistoryReader.swift */; };
 		37A4CEBA282E992F00D75B89 /* StartupPreferences.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37A4CEB9282E992F00D75B89 /* StartupPreferences.swift */; };
 		37A803DB27FD69D300052F4C /* Data Import Resources in Resources */ = {isa = PBXBuildFile; fileRef = 37A803DA27FD69D300052F4C /* Data Import Resources */; };
 		37AFCE8127DA2CA600471A10 /* PreferencesViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37AFCE8027DA2CA600471A10 /* PreferencesViewController.swift */; };
@@ -883,6 +886,9 @@
 		378205F7283BC6A600D1D4AA /* StartupPreferencesTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StartupPreferencesTests.swift; sourceTree = "<group>"; };
 		378205FA283C277800D1D4AA /* MainMenuTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MainMenuTests.swift; sourceTree = "<group>"; };
 		379DE4BC27EA31AC002CC3DE /* PreferencesAutofillView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PreferencesAutofillView.swift; sourceTree = "<group>"; };
+		379F74E328C9D3C3003CF254 /* HistoryImport.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HistoryImport.swift; sourceTree = "<group>"; };
+		379F74E528C9D7D1003CF254 /* CoreDataHistoryImporter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CoreDataHistoryImporter.swift; sourceTree = "<group>"; };
+		379F74E828C9F755003CF254 /* FirefoxHistoryReader.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FirefoxHistoryReader.swift; sourceTree = "<group>"; };
 		37A4CEB9282E992F00D75B89 /* StartupPreferences.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = StartupPreferences.swift; sourceTree = "<group>"; };
 		37A803DA27FD69D300052F4C /* Data Import Resources */ = {isa = PBXFileReference; lastKnownFileType = folder; path = "Data Import Resources"; sourceTree = "<group>"; };
 		37AFCE8027DA2CA600471A10 /* PreferencesViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PreferencesViewController.swift; sourceTree = "<group>"; };
@@ -1837,6 +1843,24 @@
 			path = Menus;
 			sourceTree = "<group>";
 		};
+		379F74E228C9D3B6003CF254 /* History */ = {
+			isa = PBXGroup;
+			children = (
+				379F74E728C9F74A003CF254 /* Firefox */,
+				379F74E328C9D3C3003CF254 /* HistoryImport.swift */,
+				379F74E528C9D7D1003CF254 /* CoreDataHistoryImporter.swift */,
+			);
+			path = History;
+			sourceTree = "<group>";
+		};
+		379F74E728C9F74A003CF254 /* Firefox */ = {
+			isa = PBXGroup;
+			children = (
+				379F74E828C9F755003CF254 /* FirefoxHistoryReader.swift */,
+			);
+			path = Firefox;
+			sourceTree = "<group>";
+		};
 		37BF3F12286D8A4B00BD9014 /* Pinned Tabs */ = {
 			isa = PBXGroup;
 			children = (
@@ -2141,6 +2165,7 @@
 				4B7A57CE279A4EF300B1C70E /* ChromePreferences.swift */,
 				4BB99CF326FE191E001E4761 /* Bookmarks */,
 				4B723DF126B0002B00E14D75 /* Logins */,
+				379F74E228C9D3B6003CF254 /* History */,
 				376C4DBB28A29B5900CC0F5B /* Cookies */,
 				4B723DEC26B0002B00E14D75 /* View */,
 			);
@@ -4531,6 +4556,7 @@
 				4B92928F26670D1700AD2C21 /* BookmarkTableCellView.swift in Sources */,
 				4B9292CF2667123700AD2C21 /* BookmarkManagementSidebarViewController.swift in Sources */,
 				4B39AAF627D9B2C700A73FD5 /* NSStackViewExtension.swift in Sources */,
+				379F74E628C9D7D1003CF254 /* CoreDataHistoryImporter.swift in Sources */,
 				B637273D26CCF0C200C8CB02 /* OptionalExtension.swift in Sources */,
 				4BE65477271FCD41008D1D63 /* PasswordManagementLoginItemView.swift in Sources */,
 				AA80EC54256BE3BC007083E7 /* UserText.swift in Sources */,
@@ -4833,6 +4859,7 @@
 				373A1AB02842C4EA00586521 /* BookmarkHTMLImporter.swift in Sources */,
 				4B8D9062276D1D880078DB17 /* LocaleExtension.swift in Sources */,
 				4BE4005527CF3F19007D3161 /* SavePaymentMethodViewController.swift in Sources */,
+				379F74E428C9D3C3003CF254 /* HistoryImport.swift in Sources */,
 				AAFE068326C7082D005434CC /* WebKitVersionProvider.swift in Sources */,
 				B63D467A25BFC3E100874977 /* NSCoderExtensions.swift in Sources */,
 				B3FB199327BD0AD400513DC1 /* CookieConsentInfo.swift in Sources */,
@@ -4875,6 +4902,7 @@
 				B6A9E47726146A570067D1B9 /* PixelEvent.swift in Sources */,
 				AA2CB1352587C29500AA6FBE /* TabBarFooter.swift in Sources */,
 				4BE5336C286912D40019DBFD /* BookmarksBarCollectionViewItem.swift in Sources */,
+				379F74E928C9F755003CF254 /* FirefoxHistoryReader.swift in Sources */,
 				B6C0B23926E742610031CB7F /* FileDownloadError.swift in Sources */,
 				4B9292AB26670D3700AD2C21 /* BookmarkMigrationPolicy.swift in Sources */,
 				85589EA027BFE60E0038AD11 /* MoreOrLessView.swift in Sources */,

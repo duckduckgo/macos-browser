@@ -382,14 +382,14 @@ Gw
             <objects>
                 <viewController storyboardIdentifier="BrowserImportViewController" id="NYV-k5-Kxh" customClass="BrowserImportViewController" customModule="DuckDuckGo_Privacy_Browser" customModuleProvider="target" sceneMemberID="viewController">
                     <view key="view" id="jY2-NF-ftb">
-                        <rect key="frame" x="0.0" y="0.0" width="522" height="166"/>
+                        <rect key="frame" x="0.0" y="0.0" width="522" height="186"/>
                         <autoresizingMask key="autoresizingMask"/>
                         <subviews>
                             <stackView distribution="fill" orientation="vertical" alignment="leading" horizontalStackHuggingPriority="249.99998474121094" verticalStackHuggingPriority="249.99998474121094" detachesHiddenViews="YES" translatesAutoresizingMaskIntoConstraints="NO" id="ubR-la-MhZ">
-                                <rect key="frame" x="20" y="17" width="482" height="149"/>
+                                <rect key="frame" x="20" y="17" width="482" height="169"/>
                                 <subviews>
                                     <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="nz5-5G-Zws">
-                                        <rect key="frame" x="-2" y="133" width="89" height="16"/>
+                                        <rect key="frame" x="-2" y="153" width="89" height="16"/>
                                         <textFieldCell key="cell" lineBreakMode="clipping" title="Select Profile:" id="FRc-rN-qNZ">
                                             <font key="font" metaFont="system"/>
                                             <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
@@ -397,7 +397,7 @@ Gw
                                         </textFieldCell>
                                     </textField>
                                     <popUpButton verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="YeL-CL-i2K">
-                                        <rect key="frame" x="-3" y="101" width="131" height="25"/>
+                                        <rect key="frame" x="-3" y="121" width="131" height="25"/>
                                         <popUpButtonCell key="cell" type="push" title="Browser Profile" bezelStyle="rounded" alignment="left" lineBreakMode="truncatingTail" state="on" borderStyle="borderAndBezel" imageScaling="proportionallyDown" inset="2" selectedItem="1g6-Jy-ahO" id="5eM-qQ-JZd">
                                             <behavior key="behavior" lightByBackground="YES" lightByGray="YES"/>
                                             <font key="font" metaFont="menu"/>
@@ -409,7 +409,7 @@ Gw
                                         </popUpButtonCell>
                                     </popUpButton>
                                     <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="cub-aJ-1ti">
-                                        <rect key="frame" x="-2" y="81" width="136" height="16"/>
+                                        <rect key="frame" x="-2" y="101" width="136" height="16"/>
                                         <textFieldCell key="cell" lineBreakMode="clipping" title="Select data to import:" id="Wce-nN-umc">
                                             <font key="font" usesAppearanceFont="YES"/>
                                             <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
@@ -417,10 +417,10 @@ Gw
                                         </textFieldCell>
                                     </textField>
                                     <stackView distribution="fill" orientation="vertical" alignment="leading" spacing="4" horizontalStackHuggingPriority="249.99998474121094" verticalStackHuggingPriority="249.99998474121094" detachesHiddenViews="YES" translatesAutoresizingMaskIntoConstraints="NO" id="4W0-UP-EJ0" userLabel="Passwords Stack View">
-                                        <rect key="frame" x="0.0" y="0.0" width="154" height="73"/>
+                                        <rect key="frame" x="0.0" y="0.0" width="154" height="93"/>
                                         <subviews>
                                             <button verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="w0g-Sf-AVj">
-                                                <rect key="frame" x="-2" y="56" width="94" height="18"/>
+                                                <rect key="frame" x="-2" y="76" width="94" height="18"/>
                                                 <buttonCell key="cell" type="check" title="Bookmarks" bezelStyle="regularSquare" imagePosition="left" state="on" inset="2" id="7dW-N0-mQW">
                                                     <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
                                                     <font key="font" metaFont="system"/>
@@ -430,7 +430,7 @@ Gw
                                                 </connections>
                                             </button>
                                             <button verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="GGX-yw-24n">
-                                                <rect key="frame" x="-2" y="36" width="91" height="18"/>
+                                                <rect key="frame" x="-2" y="56" width="91" height="18"/>
                                                 <buttonCell key="cell" type="check" title="Passwords" bezelStyle="regularSquare" imagePosition="left" state="on" inset="2" id="dM3-0G-bfD">
                                                     <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
                                                     <font key="font" metaFont="system"/>
@@ -440,13 +440,23 @@ Gw
                                                 </connections>
                                             </button>
                                             <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="4sI-9q-JHc" userLabel="Close Browser Warning Label">
-                                                <rect key="frame" x="18" y="20" width="138" height="13"/>
+                                                <rect key="frame" x="18" y="40" width="138" height="13"/>
                                                 <textFieldCell key="cell" lineBreakMode="clipping" title="Requires Safari 15 or later" id="NZY-cf-zjf">
                                                     <font key="font" size="11" name="SFProText-Regular"/>
                                                     <color key="textColor" name="BlackWhite50"/>
                                                     <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
                                                 </textFieldCell>
                                             </textField>
+                                            <button verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="gnU-7e-CsT">
+                                                <rect key="frame" x="-2" y="19" width="70" height="18"/>
+                                                <buttonCell key="cell" type="check" title="History" bezelStyle="regularSquare" imagePosition="left" state="on" inset="2" id="6bF-rn-aqC">
+                                                    <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
+                                                    <font key="font" metaFont="system"/>
+                                                </buttonCell>
+                                                <connections>
+                                                    <action selector="selectedImportOptionsChanged:" target="NYV-k5-Kxh" id="UlC-17-BQ0"/>
+                                                </connections>
+                                            </button>
                                             <button verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="y7F-L4-y8H">
                                                 <rect key="frame" x="-2" y="-1" width="75" height="18"/>
                                                 <buttonCell key="cell" type="check" title="Cookies" bezelStyle="regularSquare" imagePosition="left" state="on" inset="2" id="Zsg-d4-aPV">
@@ -466,8 +476,10 @@ Gw
                                             <integer value="1000"/>
                                             <integer value="1000"/>
                                             <integer value="1000"/>
+                                            <integer value="1000"/>
                                         </visibilityPriorities>
                                         <customSpacing>
+                                            <real value="3.4028234663852886e+38"/>
                                             <real value="3.4028234663852886e+38"/>
                                             <real value="3.4028234663852886e+38"/>
                                             <real value="3.4028234663852886e+38"/>
@@ -505,6 +517,7 @@ Gw
                     <connections>
                         <outlet property="bookmarksCheckbox" destination="w0g-Sf-AVj" id="YdR-rV-R3z"/>
                         <outlet property="cookiesCheckbox" destination="y7F-L4-y8H" id="UUN-ZT-l3z"/>
+                        <outlet property="historyCheckbox" destination="gnU-7e-CsT" id="Ub2-lK-YKn"/>
                         <outlet property="importOptionsStackView" destination="ubR-la-MhZ" id="H6J-RS-LUg"/>
                         <outlet property="passwordsCheckbox" destination="GGX-yw-24n" id="Jva-fg-K11"/>
                         <outlet property="passwordsWarningLabel" destination="4sI-9q-JHc" id="KcV-wz-6cG"/>
