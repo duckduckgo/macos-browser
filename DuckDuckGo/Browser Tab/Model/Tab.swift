@@ -1045,29 +1045,22 @@ extension Tab: WKNavigationDelegate {
     func webView(_ webView: WKWebView,
                  decidePolicyFor navigationAction: WKNavigationAction) async -> WKNavigationActionPolicy {
         
-        if #available(macOS 12.0, *) {
-            if navigationAction.request.url?.absoluteString.contains("nocookie") == true,
-               navigationAction.request.value(forHTTPHeaderField: "Referer") == nil {
-                
-                var newRequest = navigationAction.request
-                newRequest.addValue("http://localhost/", forHTTPHeaderField: "Referer")
-                
-                guard let file = Bundle.main.url(forResource: "youtube_player_template", withExtension: "html") else { return .cancel }
-                let html = try? String(contentsOf: file)
-                
-                webView.loadSimulatedRequest(newRequest, responseHTML: html!)
-                return .cancel
-            }
-        }
-        
         if navigationAction.request.url?.isFileURL ?? false {
             return .allow
         }
         
-        if navigationAction.request.url?.scheme == PrivatePlayerSchemeHandler.scheme {
-            return .allow
+        if navigationAction.request.url?.isPrivatePlayerScheme == true {
+            if #available(macOS 12.0, *) {
+                let youtubeHandler = YoutubePlayerNavigationHandler()
+                let newRequest = youtubeHandler.makePrivatePlayerRequest(from: navigationAction.request)
+                let html = youtubeHandler.makeHTMLFromTemplate()
+                webView.loadSimulatedRequest(newRequest, responseHTML: html)
+                return .cancel
+            } else {
+                return .allow
+            }
         }
-
+        
         let isLinkActivated = navigationAction.navigationType == .linkActivated
         let isNavigatingAwayFromPinnedTab: Bool = {
             let isNavigatingToAnotherDomain = navigationAction.request.url?.host != url?.host
