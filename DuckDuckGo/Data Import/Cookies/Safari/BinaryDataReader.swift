@@ -32,34 +32,22 @@ final class BinaryDataReader {
         return slice
     }
 
-    func readDoubleLE() -> Double {
-        let data = readDoubleLE(at: cursor)
-        cursor += 8
-        return data
+    func readIntLE() -> UInt32 {
+        let value = readIntLE(at: cursor)
+        cursor += 4
+        return value
     }
 
     func readIntBE() -> UInt32 {
-        let data = readIntBE(at: cursor)
+        let value = readIntBE(at: cursor)
         cursor += 4
-        return data
+        return value
     }
 
-    func readIntLE() -> UInt32 {
-        let data = readIntLE(at: cursor)
-        cursor += 4
-        return data
-    }
-
-    func readIntBE(at offset: Int) -> UInt32 {
-        let data = slice(loc: offset, len: 4)
-        let out: UInt32 = data.withUnsafeBytes { $0.load(as: UInt32.self) }
-        return out.byteSwapped
-    }
-
-    func readDoubleLE(at offset: Int) -> Double {
-        let data = slice(loc: offset, len: 8)
-        let out: Double = data.withUnsafeBytes { $0.load(as: Double.self) }
-        return out
+    func readDoubleLE() -> Double {
+        let value = readDoubleLE(at: cursor)
+        cursor += 8
+        return value
     }
 
     func readIntLE(at offset: Int) -> UInt32 {
@@ -68,7 +56,17 @@ final class BinaryDataReader {
         return out
     }
 
+    func readIntBE(at offset: Int) -> UInt32 {
+        readIntLE(at: offset).byteSwapped
+    }
+
+    func readDoubleLE(at offset: Int) -> Double {
+        let data = slice(loc: offset, len: 8)
+        let out: Double = data.withUnsafeBytes { $0.load(as: Double.self) }
+        return out
+    }
+
     func slice(loc: Int, len: Int) -> Data {
-        self.data.subdata(in: loc..<loc+len)
+        data.subdata(in: loc..<loc+len)
     }
 }
