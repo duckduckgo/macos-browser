@@ -99,11 +99,7 @@ extension SuggestionContainer: SuggestionLoadingDataSource {
                            completion: @escaping (Data?, Error?) -> Void) {
         var url = url
         parameters.forEach {
-            do {
-                try url = url.appendingParameter(name: $0.key, value: $0.value)
-            } catch {
-                assertionFailure("SuggestionContainer: Failed to add parameter")
-            }
+            url = url.appendingParameter(name: $0.key, value: $0.value)
         }
         
         var request = URLRequest.defaultRequest(with: url)

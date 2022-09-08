@@ -104,14 +104,8 @@ enum APIRequest {
                               allowedQueryReservedCharacters: CharacterSet? = nil,
                               headers: HTTPHeaders = APIHeaders().defaultHeaders,
                               timeoutInterval: TimeInterval = 60.0) -> URLRequest {
-        let url = (try? parameters?.reduce(url) { partialResult, parameter in
-            try partialResult.appendingParameter(
-                name: parameter.key,
-                value: parameter.value,
-                allowedReservedCharacters: allowedQueryReservedCharacters
-            )
-        }) ?? url
-        var urlRequest = URLRequest(url: url)
+        let url = url.appendingParameters(parameters ?? [:], allowedReservedCharacters: allowedQueryReservedCharacters)
+        var urlRequest = URLRequest(url: url, timeoutInterval: timeoutInterval)
         urlRequest.allHTTPHeaderFields = headers
         urlRequest.httpMethod = method.rawValue
         urlRequest.timeoutInterval = timeoutInterval
