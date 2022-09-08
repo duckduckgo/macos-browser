@@ -194,13 +194,6 @@ fileprivate extension HTTPCookiePropertyKey {
     static let httpOnly = HTTPCookiePropertyKey("HttpOnly")
 }
 
-fileprivate extension Date {
-    init(chromiumTimestamp: Int64) {
-        let seconds = Int(chromiumTimestamp / 1000000)
-        self.init(timeIntervalSince1970: TimeInterval(seconds) - 11644473600)
-    }
-}
-
 private func decrypt(passwordData: Data, with key: Data) -> String? {
     guard passwordData.count >= 4 else {
         return nil

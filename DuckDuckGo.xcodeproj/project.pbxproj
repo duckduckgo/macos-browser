@@ -65,6 +65,8 @@
 		379F74E428C9D3C3003CF254 /* HistoryImport.swift in Sources */ = {isa = PBXBuildFile; fileRef = 379F74E328C9D3C3003CF254 /* HistoryImport.swift */; };
 		379F74E628C9D7D1003CF254 /* CoreDataHistoryImporter.swift in Sources */ = {isa = PBXBuildFile; fileRef = 379F74E528C9D7D1003CF254 /* CoreDataHistoryImporter.swift */; };
 		379F74E928C9F755003CF254 /* FirefoxHistoryReader.swift in Sources */ = {isa = PBXBuildFile; fileRef = 379F74E828C9F755003CF254 /* FirefoxHistoryReader.swift */; };
+		379F74EC28CA85F1003CF254 /* ChromiumHistoryReader.swift in Sources */ = {isa = PBXBuildFile; fileRef = 379F74EB28CA85F1003CF254 /* ChromiumHistoryReader.swift */; };
+		379F74EE28CA8BAE003CF254 /* Date+Chromium.swift in Sources */ = {isa = PBXBuildFile; fileRef = 379F74ED28CA8BAE003CF254 /* Date+Chromium.swift */; };
 		37A4CEBA282E992F00D75B89 /* StartupPreferences.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37A4CEB9282E992F00D75B89 /* StartupPreferences.swift */; };
 		37A803DB27FD69D300052F4C /* Data Import Resources in Resources */ = {isa = PBXBuildFile; fileRef = 37A803DA27FD69D300052F4C /* Data Import Resources */; };
 		37AFCE8127DA2CA600471A10 /* PreferencesViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37AFCE8027DA2CA600471A10 /* PreferencesViewController.swift */; };
@@ -889,6 +891,8 @@
 		379F74E328C9D3C3003CF254 /* HistoryImport.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HistoryImport.swift; sourceTree = "<group>"; };
 		379F74E528C9D7D1003CF254 /* CoreDataHistoryImporter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CoreDataHistoryImporter.swift; sourceTree = "<group>"; };
 		379F74E828C9F755003CF254 /* FirefoxHistoryReader.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FirefoxHistoryReader.swift; sourceTree = "<group>"; };
+		379F74EB28CA85F1003CF254 /* ChromiumHistoryReader.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChromiumHistoryReader.swift; sourceTree = "<group>"; };
+		379F74ED28CA8BAE003CF254 /* Date+Chromium.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Date+Chromium.swift"; sourceTree = "<group>"; };
 		37A4CEB9282E992F00D75B89 /* StartupPreferences.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = StartupPreferences.swift; sourceTree = "<group>"; };
 		37A803DA27FD69D300052F4C /* Data Import Resources */ = {isa = PBXFileReference; lastKnownFileType = folder; path = "Data Import Resources"; sourceTree = "<group>"; };
 		37AFCE8027DA2CA600471A10 /* PreferencesViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PreferencesViewController.swift; sourceTree = "<group>"; };
@@ -1847,6 +1851,7 @@
 			isa = PBXGroup;
 			children = (
 				379F74E728C9F74A003CF254 /* Firefox */,
+				379F74EA28CA8488003CF254 /* Chromium */,
 				379F74E328C9D3C3003CF254 /* HistoryImport.swift */,
 				379F74E528C9D7D1003CF254 /* CoreDataHistoryImporter.swift */,
 			);
@@ -1859,6 +1864,14 @@
 				379F74E828C9F755003CF254 /* FirefoxHistoryReader.swift */,
 			);
 			path = Firefox;
+			sourceTree = "<group>";
+		};
+		379F74EA28CA8488003CF254 /* Chromium */ = {
+			isa = PBXGroup;
+			children = (
+				379F74EB28CA85F1003CF254 /* ChromiumHistoryReader.swift */,
+			);
+			path = Chromium;
 			sourceTree = "<group>";
 		};
 		37BF3F12286D8A4B00BD9014 /* Pinned Tabs */ = {
@@ -2160,6 +2173,7 @@
 			isa = PBXGroup;
 			children = (
 				4B723DEB26B0002B00E14D75 /* DataImport.swift */,
+				379F74ED28CA8BAE003CF254 /* Date+Chromium.swift */,
 				4B5A4F4B27F3A5AA008FBD88 /* NSNotificationName+DataImport.swift */,
 				4B59024726B3673600489384 /* ThirdPartyBrowser.swift */,
 				4B7A57CE279A4EF300B1C70E /* ChromePreferences.swift */,
@@ -4650,6 +4664,7 @@
 				4B0511CA262CAA5A00F6079C /* FireproofDomainsViewController.swift in Sources */,
 				AA4D700725545EF800C3411E /* URLEventHandler.swift in Sources */,
 				AA92127725ADA07900600CD4 /* WKWebViewExtension.swift in Sources */,
+				379F74EE28CA8BAE003CF254 /* Date+Chromium.swift in Sources */,
 				AAAB9114288EB1D600A057A9 /* CleanThisHistoryMenuItem.swift in Sources */,
 				B6106BA426A7BEA40013B453 /* PermissionAuthorizationState.swift in Sources */,
 				B6A9E499261474120067D1B9 /* TimedPixel.swift in Sources */,
@@ -4724,6 +4739,7 @@
 				4B9292DB2667125D00AD2C21 /* ContextualMenu.swift in Sources */,
 				AA68C3D32490ED62001B8783 /* NavigationBarViewController.swift in Sources */,
 				AA585DAF2490E6E600E9A3E2 /* MainViewController.swift in Sources */,
+				379F74EC28CA85F1003CF254 /* ChromiumHistoryReader.swift in Sources */,
 				AA5FA69A275F91C700DCE9C9 /* Favicon.swift in Sources */,
 				AABEE69A24A902A90043105B /* SuggestionContainerViewModel.swift in Sources */,
 				AA840A9827319D1600E63CDD /* FirePopoverWrapperViewController.swift in Sources */,

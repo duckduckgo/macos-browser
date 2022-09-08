@@ -24,11 +24,11 @@ final class EdgeDataImporter: ChromiumDataImporter {
         return "Microsoft Edge"
     }
 
-    init(loginImporter: LoginImporter, bookmarkImporter: BookmarkImporter, cookieImporter: CookieImporter) {
+    init(loginImporter: LoginImporter, bookmarkImporter: BookmarkImporter, historyImporter: HistoryImporter, cookieImporter: CookieImporter) {
         let applicationSupport = FileManager.default.urls(for: .applicationSupportDirectory, in: .userDomainMask).first!
         let defaultDataURL = applicationSupport.appendingPathComponent("Microsoft Edge/Default/")
 
-        super.init(applicationDataDirectoryURL: defaultDataURL, loginImporter: loginImporter, bookmarkImporter: bookmarkImporter, cookieImporter: cookieImporter)
+        super.init(applicationDataDirectoryURL: defaultDataURL, loginImporter: loginImporter, bookmarkImporter: bookmarkImporter, historyImporter: historyImporter, cookieImporter: cookieImporter)
     }
 
 }

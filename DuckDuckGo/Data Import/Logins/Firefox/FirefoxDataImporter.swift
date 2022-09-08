@@ -104,12 +104,7 @@ final class FirefoxDataImporter: DataImporter {
 
             switch historyResult {
             case .success(let visits):
-                if visits.isEmpty {
-                    completion(.success(summary))
-                } else {
-                    summary.historyResult = historyImporter.importHistory(visits)
-                    completion(.success(summary))
-                }
+                summary.historyResult = historyImporter.importHistory(visits)
             case .failure(let error):
                 completion(.failure(.history(error)))
             }

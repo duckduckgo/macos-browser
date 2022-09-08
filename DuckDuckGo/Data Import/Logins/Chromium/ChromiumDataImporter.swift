@@ -27,17 +27,19 @@ internal class ChromiumDataImporter: DataImporter {
     private let applicationDataDirectoryURL: URL
     private let bookmarkImporter: BookmarkImporter
     private let loginImporter: LoginImporter
+    private let historyImporter: HistoryImporter
     private let cookieImporter: CookieImporter
 
-    init(applicationDataDirectoryURL: URL, loginImporter: LoginImporter, bookmarkImporter: BookmarkImporter, cookieImporter: CookieImporter) {
+    init(applicationDataDirectoryURL: URL, loginImporter: LoginImporter, bookmarkImporter: BookmarkImporter, historyImporter: HistoryImporter, cookieImporter: CookieImporter) {
         self.applicationDataDirectoryURL = applicationDataDirectoryURL
         self.loginImporter = loginImporter
         self.bookmarkImporter = bookmarkImporter
+        self.historyImporter = historyImporter
         self.cookieImporter = cookieImporter
     }
 
     func importableTypes() -> [DataImport.DataType] {
-        return [.logins, .bookmarks, .cookies]
+        return [.logins, .bookmarks, .history, .cookies]
     }
 
     func importData(types: [DataImport.DataType],
@@ -88,6 +90,18 @@ internal class ChromiumDataImporter: DataImporter {
                     completion(.failure(.bookmarks(.cannotReadFile)))
                     return
                 }
+            }
+        }
+
+        if types.contains(.history) {
+            let historyReader = ChromiumHistoryReader(chromiumDataDirectoryURL: dataDirectoryURL)
+            let historyResult = historyReader.readHistory()
+
+            switch historyResult {
+            case .success(let visits):
+                summary.historyResult = historyImporter.importHistory(visits)
+            case .failure(let error):
+                completion(.failure(.history(error)))
             }
         }
 

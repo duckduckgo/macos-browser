@@ -1,5 +1,5 @@
 //
-//  FirefoxHistoryReader.swift
+//  ChromiumHistoryReader.swift
 //
 //  Copyright © 2022 DuckDuckGo. All rights reserved.
 //
@@ -19,10 +19,10 @@
 import Foundation
 import GRDB
 
-final class FirefoxHistoryReader {
+final class ChromiumHistoryReader {
 
     enum Constants {
-        static let placesDatabaseName = "places.sqlite"
+        static let historyDatabaseName = "History"
     }
 
     enum ImportError: Error {
@@ -31,15 +31,15 @@ final class FirefoxHistoryReader {
         case unexpectedHistoryDatabaseFormat
     }
 
-    private let firefoxPlacesDatabaseURL: URL
+    private let chromiumHistoryDatabaseURL: URL
 
-    init(firefoxDataDirectoryURL: URL) {
-        self.firefoxPlacesDatabaseURL = firefoxDataDirectoryURL.appendingPathComponent(Constants.placesDatabaseName)
+    init(chromiumDataDirectoryURL: URL) {
+        chromiumHistoryDatabaseURL = chromiumDataDirectoryURL.appendingPathComponent(Constants.historyDatabaseName)
     }
 
-    func readHistory() -> Result<[ImportedHistoryVisit], FirefoxHistoryReader.ImportError> {
+    func readHistory() -> Result<[ImportedHistoryVisit], ChromiumHistoryReader.ImportError> {
         do {
-            return try firefoxPlacesDatabaseURL.withTemporaryFile { temporaryDatabaseURL in
+            return try chromiumHistoryDatabaseURL.withTemporaryFile { temporaryDatabaseURL in
                 return readHistory(fromDatabaseURL: temporaryDatabaseURL)
             }
         } catch {
@@ -49,7 +49,7 @@ final class FirefoxHistoryReader {
 
     // MARK: - Private
 
-    private func readHistory(fromDatabaseURL databaseURL: URL) -> Result<[ImportedHistoryVisit], FirefoxHistoryReader.ImportError> {
+    private func readHistory(fromDatabaseURL databaseURL: URL) -> Result<[ImportedHistoryVisit], ChromiumHistoryReader.ImportError> {
         do {
             let queue = try DatabaseQueue(path: databaseURL.path)
 
@@ -82,8 +82,8 @@ final class FirefoxHistoryReader {
                 self.title = nil
             }
 
-            let timestamp: Int = row["visit_date"]
-            date = Date(timeIntervalSince1970: TimeInterval(timestamp) / 1e6)
+            let timestamp: Int64 = row["visit_time"]
+            date = Date(chromiumTimestamp: timestamp)
         }
     }
 
@@ -92,19 +92,19 @@ final class FirefoxHistoryReader {
     func historyEntriesQuery(since date: Date) -> String {
         return """
         SELECT
-            moz_places.url,
-            moz_places.title,
-            moz_historyvisits.visit_date
+            urls.url,
+            urls.title,
+            visits.visit_time
         FROM
-            moz_historyvisits
+            visits
         LEFT JOIN
-            moz_places
+            urls
         ON
-            moz_historyvisits.place_id = moz_places.id
+            urls.id = visits.url
         WHERE
-            moz_historyvisits.visit_date >= \(Int(date.timeIntervalSince1970 * 1e6))
+            visits.visit_time >= \(date.chromiumTimestamp)
         ORDER BY
-            moz_historyvisits.visit_date
+            visits.visit_time
         ;
         """
     }
@@ -113,7 +113,7 @@ final class FirefoxHistoryReader {
 
 private extension ImportedHistoryVisit {
 
-    init?(_ row: FirefoxHistoryReader.HistoryRow) {
+    init?(_ row: ChromiumHistoryReader.HistoryRow) {
         guard let url = row.url.url else {
             return nil
         }

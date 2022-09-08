@@ -85,11 +85,11 @@ final class DataImportViewController: NSViewController {
             do {
                 switch viewState.selectedImportSource {
                 case .brave:
-                    self.dataImporter = try BraveDataImporter(loginImporter: secureVaultImporter(), bookmarkImporter: bookmarkImporter, cookieImporter: cookieImporter)
+                    self.dataImporter = try BraveDataImporter(loginImporter: secureVaultImporter(), bookmarkImporter: bookmarkImporter, historyImporter: historyImporter, cookieImporter: cookieImporter)
                 case .chrome:
-                    self.dataImporter = try ChromeDataImporter(loginImporter: secureVaultImporter(), bookmarkImporter: bookmarkImporter, cookieImporter: cookieImporter)
+                    self.dataImporter = try ChromeDataImporter(loginImporter: secureVaultImporter(), bookmarkImporter: bookmarkImporter, historyImporter: historyImporter, cookieImporter: cookieImporter)
                 case .edge:
-                    self.dataImporter = try EdgeDataImporter(loginImporter: secureVaultImporter(), bookmarkImporter: bookmarkImporter, cookieImporter: cookieImporter)
+                    self.dataImporter = try EdgeDataImporter(loginImporter: secureVaultImporter(), bookmarkImporter: bookmarkImporter, historyImporter: historyImporter, cookieImporter: cookieImporter)
                 case .firefox:
                     self.dataImporter = try FirefoxDataImporter(loginImporter: secureVaultImporter(), bookmarkImporter: bookmarkImporter, historyImporter: historyImporter, cookieImporter: cookieImporter)
                 case .safari where !(currentChildViewController is FileImportViewController):
