@@ -108,7 +108,6 @@ enum APIRequest {
         var urlRequest = URLRequest(url: url, timeoutInterval: timeoutInterval)
         urlRequest.allHTTPHeaderFields = headers
         urlRequest.httpMethod = method.rawValue
-        urlRequest.timeoutInterval = timeoutInterval
         return urlRequest
     }
     
