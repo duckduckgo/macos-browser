@@ -33,6 +33,10 @@ final class AdaptiveDarkModeUserScript: NSObject, StaticUserScript {
     }
     
     func refreshDarkReaderScript(enabled: Bool, webView: WKWebView, url: URL) {
+        evaluate(js: "enable()", inWebView: webView)
+
+        return
+        
         #warning("This manager should not be here")
         print("DARK MODE FOR \(url)")
         let fixes = DarkReaderFixesManager.shared.fixesForURL(url)
