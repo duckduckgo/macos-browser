@@ -711,7 +711,7 @@ final class Tab: NSObject, Identifiable, ObservableObject {
     
     private weak var youtubeOverlayScript: YoutubeOverlayUserScript?
     
-    #warning("Enable the youtube injection if necessary")
+    #warning("Check if we really need to call this instead of JS handling this for us")
     func enableYoutubeIfNecessary() {
         if url?.absoluteString.contains("youtube.com") == true,
            youtubeOverlayScript?.isEnabled == false {
@@ -721,7 +721,6 @@ final class Tab: NSObject, Identifiable, ObservableObject {
         }
     }
     
-    #warning("Call the enabled() method on the javascript file")
     func enableYoutubePlayerScript(_ enable: Bool) {
         let message = enable ? "enable()" : "disable()"
         self.youtubeOverlayScript?.evaluateJSCall(call: message, webView: self.webView)
@@ -1049,6 +1048,7 @@ extension Tab: WKNavigationDelegate {
             return .allow
         }
         
+        #warning("This should probably be moved to PrivatePlayerSchemeHandler somehow")
         if navigationAction.request.url?.isPrivatePlayerScheme == true {
             if #available(macOS 12.0, *) {
                 let youtubeHandler = YoutubePlayerNavigationHandler()
