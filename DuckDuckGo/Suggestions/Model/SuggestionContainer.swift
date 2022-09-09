@@ -97,11 +97,7 @@ extension SuggestionContainer: SuggestionLoadingDataSource {
                            suggestionDataFromUrl url: URL,
                            withParameters parameters: [String: String],
                            completion: @escaping (Data?, Error?) -> Void) {
-        var url = url
-        parameters.forEach {
-            url = url.appendingParameter(name: $0.key, value: $0.value)
-        }
-        
+        var url = url.appendingParameters(parameters)
         var request = URLRequest.defaultRequest(with: url)
         request.timeoutInterval = 1
 
