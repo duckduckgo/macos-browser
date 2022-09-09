@@ -45,7 +45,7 @@ class PixelTests: XCTestCase {
         
         stub(condition: { request -> Bool in
             if let url = request.url {
-                XCTAssertEqual("1.0", try? url.getParameter(name: "duration"))
+                XCTAssertEqual("1.0", url.getParameter(named: "duration"))
                 return true
             }
             
@@ -85,8 +85,8 @@ class PixelTests: XCTestCase {
         let params = ["param1": "value1", "param2": "value2"]
 
         stub(condition: isHost(host) && isPath("/t/ml_mac_app-launch_as-default_app-launch")) { request -> HTTPStubsResponse in
-            XCTAssertEqual("value1", try? request.url?.getParameter(name: "param1"))
-            XCTAssertEqual("value2", try? request.url?.getParameter(name: "param2"))
+            XCTAssertEqual("value1", request.url?.getParameter(named: "param1"))
+            XCTAssertEqual("value2", request.url?.getParameter(named: "param2"))
             expectation.fulfill()
             return HTTPStubsResponse(data: Data(), statusCode: 200, headers: nil)
         }
@@ -101,8 +101,8 @@ class PixelTests: XCTestCase {
         let error = NSError(domain: "TestErrorDomain", code: 42, userInfo: nil)
 
         stub(condition: isHost(host) && isPath("/t/m_mac_debug_url")) { request -> HTTPStubsResponse in
-            XCTAssertEqual("TestErrorDomain", try? request.url?.getParameter(name: "d"))
-            XCTAssertEqual("42", try? request.url?.getParameter(name: "e"))
+            XCTAssertEqual("TestErrorDomain", request.url?.getParameter(named: "d"))
+            XCTAssertEqual("42", request.url?.getParameter(named: "e"))
             expectation.fulfill()
             return HTTPStubsResponse(data: Data(), statusCode: 200, headers: nil)
         }
@@ -118,10 +118,10 @@ class PixelTests: XCTestCase {
         let error = NSError(domain: "TestErrorDomain", code: 42, userInfo: ["key": 41])
 
         stub(condition: isHost(host) && isPath("/t/ml_mac_app-launch_as-default_app-launch")) { request -> HTTPStubsResponse in
-            XCTAssertEqual("TheMainQuestion", try? request.url?.getParameter(name: "d"))
-            XCTAssertEqual("42", try? request.url?.getParameter(name: "e"))
-            XCTAssertEqual("value1", try? request.url?.getParameter(name: "param1"))
-            XCTAssertEqual("value2", try? request.url?.getParameter(name: "param2"))
+            XCTAssertEqual("TheMainQuestion", request.url?.getParameter(named: "d"))
+            XCTAssertEqual("42", request.url?.getParameter(named: "e"))
+            XCTAssertEqual("value1", request.url?.getParameter(named: "param1"))
+            XCTAssertEqual("value2", request.url?.getParameter(named: "param2"))
             expectation.fulfill()
             return HTTPStubsResponse(data: Data(), statusCode: 200, headers: nil)
         }
