@@ -265,10 +265,12 @@ final class AddressBarTextField: NSTextField {
            let oldURL = selectedTabViewModel.tab.content.url,
             oldURL.isDuckDuckGoSearch {
             if let ia = oldURL.getParameter(named: URL.DuckDuckGoParameters.ia.rawValue) {
-                url = url.appendingParameter(name: URL.DuckDuckGoParameters.ia.rawValue, value: ia)
+                url = url.removingParameters(named: [URL.DuckDuckGoParameters.ia.rawValue])
+                    .appendingParameter(name: URL.DuckDuckGoParameters.ia.rawValue, value: ia)
             }
             if let iax = oldURL.getParameter(named: URL.DuckDuckGoParameters.iax.rawValue) {
-                url = url.appendingParameter(name: URL.DuckDuckGoParameters.iax.rawValue, value: iax)
+                url = url.removingParameters(named: [URL.DuckDuckGoParameters.iax.rawValue])
+                    .appendingParameter(name: URL.DuckDuckGoParameters.iax.rawValue, value: iax)
             }
         }
 
