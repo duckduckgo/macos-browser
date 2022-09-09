@@ -380,11 +380,13 @@ struct DataImportError: Error, Equatable {
         }
     }
 
-//    static func history(_ errorType: SafariBookmarksReader.ImportError) -> DataImportError {
-//        switch errorType {
-//        case .unexpectedBookmarksFileFormat: return DataImportError(actionType: .bookmarks, errorType: .cannotReadFile)
-//        }
-//    }
+    static func history(_ errorType: SafariHistoryReader.ImportError) -> DataImportError {
+        switch errorType {
+        case .noHistoryFileFound: return DataImportError(actionType: .history, errorType: .noFileFound)
+        case .unexpectedHistoryDatabaseFormat: return DataImportError(actionType: .history, errorType: .cannotReadFile)
+        case .failedToTemporarilyCopyFile: return DataImportError(actionType: .history, errorType: .failedToTemporarilyCopyFile)
+        }
+    }
 
     // MARK: Cookie Error Types
 

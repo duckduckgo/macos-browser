@@ -1,5 +1,5 @@
 //
-//  Date+Chromium.swift
+//  Date+Import.swift
 //
 //  Copyright © 2022 DuckDuckGo. All rights reserved.
 //
@@ -19,12 +19,27 @@
 import Foundation
 
 extension Date {
+
+    private enum Const {
+        static let macEpochOffset: TimeInterval = 978307199
+        static let chromiumEpochOffset: TimeInterval = 11644473600
+    }
+
+    init(macTimestamp: TimeInterval) {
+        let timeIntervalSince1970 = macTimestamp + Const.macEpochOffset
+        self.init(timeIntervalSince1970: timeIntervalSince1970)
+    }
+
+    var macTimestamp: TimeInterval {
+        timeIntervalSince1970 - Const.macEpochOffset
+    }
+
     init(chromiumTimestamp: Int64) {
         let seconds = Int(chromiumTimestamp / 1000000)
-        self.init(timeIntervalSince1970: TimeInterval(seconds) - 11644473600)
+        self.init(timeIntervalSince1970: TimeInterval(seconds) - Const.chromiumEpochOffset)
     }
 
     var chromiumTimestamp: Int64 {
-        Int64((timeIntervalSince1970 + 11644473600) * 1000000)
+        Int64((timeIntervalSince1970 + Const.chromiumEpochOffset) * 1000000)
     }
 }

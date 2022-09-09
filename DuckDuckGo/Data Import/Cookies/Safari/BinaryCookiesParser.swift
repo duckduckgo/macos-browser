@@ -98,8 +98,8 @@ final class BinaryCookiesParser {
         offsets.append(cookieData.readIntLE(at: 24)) // path
         offsets.append(cookieData.readIntLE(at: 28)) // value
 
-        let expiration = cookieData.readDoubleLE(at: 40) + Const.macEpochOffset
-        let creation = cookieData.readDoubleLE(at: 48) + Const.macEpochOffset
+        let expiration = Date(macTimestamp: cookieData.readDoubleLE(at: 40))
+        let creation = Date(macTimestamp: cookieData.readDoubleLE(at: 48))
 
         guard let cookieString = String(data: cookieData.data, encoding: .ascii) else {
             throw BinaryCookiesError.invalidEndOfCookieData
@@ -166,8 +166,8 @@ final class BinaryCookiesParser {
     }
 
     struct Cookie {
-        var expiration: TimeInterval
-        var creation: TimeInterval
+        var expiration: Date
+        var creation: Date
         var domain: String
         var name: String
         var path: String
@@ -182,7 +182,6 @@ private extension BinaryCookiesParser {
 
     enum Const {
         static let fileSignature = "cook"
-        static let macEpochOffset: TimeInterval = 978307199
         static let cookieHeaderValue: UInt32 = 256
         static let endOfCookie: UInt32 = 0
     }

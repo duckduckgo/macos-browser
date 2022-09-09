@@ -71,6 +71,13 @@ internal class SafariDataImporter: DataImporter {
         return path.appendingPathComponent("Bookmarks.plist")
     }
 
+    static private var historyFileURL: URL {
+        let applicationSupport = FileManager.default.urls(for: .libraryDirectory, in: .userDomainMask).first!
+        let path = applicationSupport.appendingPathComponent("Safari")
+
+        return path.appendingPathComponent("History.db")
+    }
+
     static private var cookiesFileURL: URL {
         let library = FileManager.default.urls(for: .libraryDirectory, in: .userDomainMask).first!
         let path = library.appendingPathComponent("Containers/com.apple.Safari/Data/Library/Cookies")
@@ -79,10 +86,12 @@ internal class SafariDataImporter: DataImporter {
     }
 
     private let bookmarkImporter: BookmarkImporter
+    private let historyImporter: HistoryImporter
     private let cookieImporter: CookieImporter
 
-    init(bookmarkImporter: BookmarkImporter, cookieImporter: CookieImporter) {
+    init(bookmarkImporter: BookmarkImporter, historyImporter: HistoryImporter, cookieImporter: CookieImporter) {
         self.bookmarkImporter = bookmarkImporter
+        self.historyImporter = historyImporter
         self.cookieImporter = cookieImporter
     }
 
@@ -115,6 +124,18 @@ internal class SafariDataImporter: DataImporter {
 
         if types.contains(.logins) {
             summary.loginsResult = .awaited
+        }
+
+        if types.contains(.history) {
+            let historyReader = SafariHistoryReader(safariHistoryDatabaseURL: Self.historyFileURL)
+            let historyResult = historyReader.readHistory()
+
+            switch historyResult {
+            case .success(let visits):
+                summary.historyResult = historyImporter.importHistory(visits)
+            case .failure(let error):
+                completion(.failure(.history(error)))
+            }
         }
 
         if types.contains(.cookies) {

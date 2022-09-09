@@ -59,7 +59,7 @@ fileprivate extension HTTPCookie {
             .path: cookie.path,
             .name: cookie.name,
             .value: cookie.value,
-            .expires: Date(timeIntervalSince1970: cookie.expiration),
+            .expires: cookie.expiration,
             .secure: cookie.secure ? "TRUE": "FALSE",
             .version: "1",
             .sameSitePolicy: cookie.sameSite,
