@@ -35,19 +35,25 @@ final class LocalPinningManager: PinningManager {
     static let shared = LocalPinningManager()
     
     static let pinnedViewChangedNotificationViewTypeKey = "pinning.pinnedViewChanged.viewType"
+    static let pinnedViewChangedNotificationIsBeingAdded = "pinning.pinnedViewChanged.isBeingAdded"
     
     @UserDefaultsWrapper(key: .pinnedViews, defaultValue: [])
     private var pinnedViewStrings: [String]
 
     func togglePinning(for view: PinnableView) {
+        let didPinView: Bool
+        
         if isPinned(view) {
             pinnedViewStrings.removeAll(where: { $0 == view.rawValue })
+            didPinView = false
         } else {
             pinnedViewStrings.append(view.rawValue)
+            didPinView = true
         }
         
         NotificationCenter.default.post(name: .PinnedViewsChanged, object: nil, userInfo: [
-            Self.pinnedViewChangedNotificationViewTypeKey: view.rawValue
+            Self.pinnedViewChangedNotificationViewTypeKey: view.rawValue,
+            Self.pinnedViewChangedNotificationIsBeingAdded: didPinView
         ])
     }
     

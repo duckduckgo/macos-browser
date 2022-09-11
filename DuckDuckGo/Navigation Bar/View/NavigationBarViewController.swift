@@ -270,14 +270,15 @@ final class NavigationBarViewController: NSViewController {
                 return
             }
             
-            if let userInfo = notification.userInfo as? [String: String],
-               let viewType = userInfo[LocalPinningManager.pinnedViewChangedNotificationViewTypeKey],
+            if let userInfo = notification.userInfo as? [String: Any],
+               let viewType = userInfo[LocalPinningManager.pinnedViewChangedNotificationViewTypeKey] as? String,
+               let didPinView = userInfo[LocalPinningManager.pinnedViewChangedNotificationIsBeingAdded] as? Bool,
                let view = PinnableView(rawValue: viewType) {
                 switch view {
                 case .autofill:
-                    self.updatePasswordManagementButton(animated: true)
+                    self.updatePasswordManagementButton(animated: true, buttonWasPinned: didPinView)
                 case .bookmarks:
-                    self.updateBookmarksButton(animated: true)
+                    self.updateBookmarksButton(animated: true, buttonWasPinned: didPinView)
                 }
             } else {
                 assertionFailure("Failed to get changed pinned view type")
@@ -512,7 +513,7 @@ final class NavigationBarViewController: NSViewController {
         self.view.menu = menu
     }
 
-    private func updatePasswordManagementButton(animated: Bool = false) {
+    private func updatePasswordManagementButton(animated: Bool = false, buttonWasPinned: Bool = false) {
         let url = tabCollectionViewModel.selectedTabViewModel?.tab.content.url
 
         passwordManagementButton.image = NSImage(named: "PasswordManagement")
@@ -533,27 +534,21 @@ final class NavigationBarViewController: NSViewController {
         }
         
         if animated {
-//            NSAppearance.withAppAppearance {
-//                let animation = CABasicAnimation(keyPath: "backgroundColor")
-//                animation.duration = 0.11
-//                animation.repeatCount = 2
-//                animation.autoreverses = true
-//                animation.fromValue = NSColor.clear.cgColor
-//                animation.toValue = NSColor.buttonMouseDownColor.cgColor
-//                passwordManagementButton.backgroundLayer.add(animation, forKey: "backgroundColor")
-//            }
-            
-            // let accessoryView = NSView(frame: NSRect(x: 0, y: 0, width: 15, height: 15))
-            let accessoryView = NSImageView(image: NSImage(named: "Pin")!)
-            accessoryView.frame = NSRect(x: 0, y: 0, width: 18, height: 18)
-            accessoryView.wantsLayer = true
-            accessoryView.layer?.backgroundColor = NSColor.controlAccentColor.cgColor
+            let accessoryView = buttonWasPinned ? NSImageView(image: NSImage(named: "Pin-12")!) : NSImageView(image: NSImage(named: "Pin-Remove-12")!)
+            accessoryView.frame = NSRect(x: 0, y: 0, width: 12, height: 12)
             accessoryView.contentTintColor = .white
-            accessoryView.imageScaling = .scaleProportionallyDown
-            accessoryView.layer?.masksToBounds = true
-            accessoryView.layer?.cornerRadius = 18 / 2
+            
+            let paddedView = PaddedView(frame: NSRect(x: 0, y: 0, width: 18, height: 18),
+                                        view: accessoryView,
+                                        padding: 3,
+                                        subviewSize: CGSize(width: 12, height: 12))
 
-            passwordManagementButton.showAnimatedAccessoryView(accessoryView)
+            paddedView.wantsLayer = true
+            paddedView.layer?.backgroundColor = NSColor.controlAccentColor.cgColor
+            paddedView.layer?.masksToBounds = true
+            paddedView.layer?.cornerRadius = 18 / 2
+
+            passwordManagementButton.showAnimatedAccessoryView(paddedView, playsInReverse: !buttonWasPinned)
         }
 
         passwordManagementPopover.viewController.domain = nil
@@ -601,7 +596,7 @@ final class NavigationBarViewController: NSViewController {
         downloadsButton.isHidden = true
     }
 
-    private func updateBookmarksButton(animated: Bool = false) {
+    private func updateBookmarksButton(animated: Bool = false, buttonWasPinned: Bool = false) {
         if LocalPinningManager.shared.isPinned(.bookmarks) {
             bookmarkListButton.isHidden = false
         } else {
@@ -609,15 +604,21 @@ final class NavigationBarViewController: NSViewController {
         }
         
         if animated {
-            NSAppearance.withAppAppearance {
-                let animation = CABasicAnimation(keyPath: "backgroundColor")
-                animation.duration = 0.11
-                animation.repeatCount = 2
-                animation.autoreverses = true
-                animation.fromValue = NSColor.clear.cgColor
-                animation.toValue = NSColor.buttonMouseDownColor.cgColor
-                bookmarkListButton.backgroundLayer.add(animation, forKey: "backgroundColor")
-            }
+            let accessoryView = buttonWasPinned ? NSImageView(image: NSImage(named: "Pin-12")!) : NSImageView(image: NSImage(named: "Pin-Remove-12")!)
+            accessoryView.frame = NSRect(x: 0, y: 0, width: 12, height: 12)
+            accessoryView.contentTintColor = .white
+            
+            let paddedView = PaddedView(frame: NSRect(x: 0, y: 0, width: 18, height: 18),
+                                        view: accessoryView,
+                                        padding: 3,
+                                        subviewSize: CGSize(width: 12, height: 12))
+
+            paddedView.wantsLayer = true
+            paddedView.layer?.backgroundColor = NSColor.controlAccentColor.cgColor
+            paddedView.layer?.masksToBounds = true
+            paddedView.layer?.cornerRadius = 18 / 2
+
+            bookmarkListButton.showAnimatedAccessoryView(paddedView, playsInReverse: !buttonWasPinned)
         }
     }
 
