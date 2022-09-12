@@ -77,7 +77,7 @@ final class PixelStoreTests: XCTestCase {
             }
         }
 
-        waitForExpectations(timeout: 1)
+        waitForExpectations(timeout: 5)
         oldContext = nil
         oldStore = nil
         oldContainer = nil
