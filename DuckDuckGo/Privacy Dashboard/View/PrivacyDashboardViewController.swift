@@ -273,6 +273,15 @@ extension PrivacyDashboardViewController: PrivacyDashboardUserScriptDelegate {
             }
         }
     }
+
+    func userScript(_ userScript: PrivacyDashboardUserScript, didRequestOpenUrlInNewTab url: URL) {
+        guard let tabCollection = WindowControllersManager.shared.lastKeyMainWindowController?.mainViewController.tabCollectionViewModel
+        else {
+            assertionFailure("could not access shared tabCollectionViewModel")
+            return
+        }
+        tabCollection.appendNewTab(with: .url(url), selected: true)
+    }
 }
 
 extension PrivacyDashboardViewController: WKNavigationDelegate {
