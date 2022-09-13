@@ -27,7 +27,7 @@ protocol PrivacyDashboardUserScriptDelegate: AnyObject {
     func userScript(_ userScript: PrivacyDashboardUserScript, didSetPermission permission: PermissionType, to state: PermissionAuthorizationState)
     func userScript(_ userScript: PrivacyDashboardUserScript, setPermission permission: PermissionType, paused: Bool)
     func userScript(_ userScript: PrivacyDashboardUserScript, setHeight height: Int)
-
+    func userScript(_ userScript: PrivacyDashboardUserScript, didRequestOpenUrlInNewTab: URL)
 }
 
 final class PrivacyDashboardUserScript: NSObject, StaticUserScript {
@@ -38,6 +38,7 @@ final class PrivacyDashboardUserScript: NSObject, StaticUserScript {
         case privacyDashboardSetPermission
         case privacyDashboardSetPermissionPaused
         case privacyDashboardSetHeight
+        case privacyDashboardOpenUrlInNewTab
     }
 
     static var injectionTime: WKUserScriptInjectionTime { .atDocumentStart }
@@ -70,7 +71,22 @@ final class PrivacyDashboardUserScript: NSObject, StaticUserScript {
 
         case .privacyDashboardSetHeight:
             handleSetHeight(message: message)
+
+        case .privacyDashboardOpenUrlInNewTab:
+            handleOpenUrlInNewTab(message: message)
         }
+    }
+
+    private func handleOpenUrlInNewTab(message: WKScriptMessage) {
+        guard let dict = message.body as? [String: Any],
+              let urlString = dict["url"] as? String,
+              let url = URL(string: urlString)
+        else {
+            assertionFailure("handleOpenUrlInNewTab: expected { url: '...' } ")
+            return;
+        }
+
+        delegate?.userScript(self, didRequestOpenUrlInNewTab: url)
     }
 
     private func handleSetProtection(message: WKScriptMessage) {
