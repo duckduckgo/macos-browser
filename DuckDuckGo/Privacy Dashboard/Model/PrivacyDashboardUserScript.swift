@@ -83,7 +83,7 @@ final class PrivacyDashboardUserScript: NSObject, StaticUserScript {
               let url = URL(string: urlString)
         else {
             assertionFailure("handleOpenUrlInNewTab: expected { url: '...' } ")
-            return;
+            return
         }
 
         delegate?.userScript(self, didRequestOpenUrlInNewTab: url)
