@@ -180,13 +180,18 @@ final class BookmarksBarViewModel: NSObject {
         }
 
         if bookmarksBarItemsTotalWidth >= clipThreshold {
-            if clipLastBarItem() {
-                delegate?.bookmarksBarViewModelReloadedData()
+            while bookmarksBarItemsTotalWidth >= clipThreshold {
+                if !clipLastBarItem() {
+                    // Short circuit the while loop in the case that clipping the last item doesn't succeed.
+                    break
+                }
             }
-        } else if let nextRestorableClippedItem = clippedItems.first {
+
+            delegate?.bookmarksBarViewModelReloadedData()
+        } else if !clippedItems.isEmpty {
             var restoredItem = false
 
-            while true {
+            while let nextRestorableClippedItem = clippedItems.first {
                 if !restoreNextClippedItemToBookmarksBarIfPossible(item: nextRestorableClippedItem) {
                     break
                 }
@@ -223,11 +228,11 @@ final class BookmarksBarViewModel: NSObject {
             textSizeCalculationLabel.stringValue = buttonTitle
             textSizeCalculationLabel.sizeToFit()
 
-            let cappedTitleWidth = min(Constants.maximumButtonWidth, textSizeCalculationLabel.frame.width)
+            let cappedTitleWidth = ceil(min(Constants.maximumButtonWidth, textSizeCalculationLabel.frame.width))
             let calculatedWidth = min(Constants.maximumButtonWidth, textSizeCalculationLabel.frame.width) + Constants.additionalItemWidth
             collectionViewItemSizeCache[buttonTitle] = cappedTitleWidth
             
-            return calculatedWidth
+            return ceil(calculatedWidth)
         }
     }
     

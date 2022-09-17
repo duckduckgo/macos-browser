@@ -52,13 +52,7 @@ extension URL {
             return nil
         }
 
-        do {
-            return try Self.duckDuckGo
-                .appendingParameter(name: DuckDuckGoParameters.search.rawValue, value: trimmedQuery)
-        } catch let error {
-            os_log("URL extension: %s", type: .error, error.localizedDescription)
-            return nil
-        }
+        return Self.duckDuckGo.appendingParameter(name: DuckDuckGoParameters.search.rawValue, value: trimmedQuery)
     }
 
     static func makeURL(from addressBarString: String) -> URL? {
@@ -130,16 +124,16 @@ extension URL {
         return URL(string: Self.atb)!
     }
 
-    static func searchAtb(atbWithVariant: String, setAtb: String) -> URL? {
-        return try? Self.initialAtb
+    static func searchAtb(atbWithVariant: String, setAtb: String) -> URL {
+        return Self.initialAtb
             .appendingParameters([
                 DuckDuckGoParameters.ATB.atb: atbWithVariant,
                 DuckDuckGoParameters.ATB.setAtb: setAtb
             ])
     }
 
-    static func appRetentionAtb(atbWithVariant: String, setAtb: String) -> URL? {
-        return try? Self.initialAtb
+    static func appRetentionAtb(atbWithVariant: String, setAtb: String) -> URL {
+        return Self.initialAtb
             .appendingParameters([
                 DuckDuckGoParameters.ATB.activityType: DuckDuckGoParameters.ATB.appUsageValue,
                 DuckDuckGoParameters.ATB.atb: atbWithVariant,
@@ -147,9 +141,9 @@ extension URL {
             ])
     }
 
-    static func exti(forAtb atb: String) -> URL? {
+    static func exti(forAtb atb: String) -> URL {
         let extiUrl = URL(string: Self.exti)!
-        return try? extiUrl.appendingParameter(name: DuckDuckGoParameters.ATB.atb, value: atb)
+        return extiUrl.appendingParameter(name: DuckDuckGoParameters.ATB.atb, value: atb)
     }
 
     // MARK: - Components
@@ -290,15 +284,13 @@ extension URL {
         absoluteString.starts(with: Self.duckDuckGo.absoluteString)
     }
 
-    // swiftlint:disable unused_optional_binding
     var isDuckDuckGoSearch: Bool {
-        if isDuckDuckGo, path.isEmpty || path == "/", let _ = try? getParameter(name: DuckDuckGoParameters.search.rawValue) {
+        if isDuckDuckGo, path.isEmpty || path == "/", getParameter(named: DuckDuckGoParameters.search.rawValue) != nil {
             return true
         }
 
         return false
     }
-    // swiftlint:enable unused_optional_binding
 
     enum DuckDuckGoParameters: String {
         case search = "q"
@@ -318,7 +310,7 @@ extension URL {
 
     var searchQuery: String? {
         guard isDuckDuckGoSearch else { return nil }
-        return try? getParameter(name: DuckDuckGoParameters.search.rawValue)
+        return getParameter(named: DuckDuckGoParameters.search.rawValue)
     }
 
     // MARK: - Punycode
