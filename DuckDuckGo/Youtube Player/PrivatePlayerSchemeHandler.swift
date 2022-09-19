@@ -21,21 +21,31 @@ import WebKit
 
 final class PrivatePlayerSchemeHandler: NSObject, WKURLSchemeHandler {
     static let scheme = "privateplayer"
-    
+
     func webView(_ webView: WKWebView, start urlSchemeTask: WKURLSchemeTask) {
+
         print("Scheme Start")
-        guard let file = Bundle.main.url(forResource: "youtube_player_template", withExtension: "html"),
-        let requestURL = urlSchemeTask.request.url else { return }
-        guard let data = try? String(contentsOf: file).data(using: .utf8) else { return }
-        
-        let response = URLResponse(url: requestURL,
-                                   mimeType: "text/html",
-                                   expectedContentLength: data.count,
-                                   textEncodingName: nil)
-        
-        urlSchemeTask.didReceive(response)
-        urlSchemeTask.didReceive(data)
-        urlSchemeTask.didFinish()
+
+        if #available(macOS 12.0, *) {
+            let youtubeHandler = YoutubePlayerNavigationHandler()
+            let newRequest = youtubeHandler.makePrivatePlayerRequest(from: urlSchemeTask.request)
+            let html = youtubeHandler.makeHTMLFromTemplate()
+            webView.loadSimulatedRequest(newRequest, responseHTML: html)
+        } else {
+            guard let file = Bundle.main.url(forResource: "youtube_player_template", withExtension: "html"),
+            let requestURL = urlSchemeTask.request.url else { return }
+            guard let data = try? String(contentsOf: file).data(using: .utf8) else { return }
+
+            let response = URLResponse(url: requestURL,
+                                       mimeType: "text/html",
+                                       expectedContentLength: data.count,
+                                       textEncodingName: nil)
+
+            urlSchemeTask.didReceive(response)
+            urlSchemeTask.didReceive(data)
+            urlSchemeTask.didFinish()
+        }
+
     }
     
     func webView(_ webView: WKWebView, stop urlSchemeTask: WKURLSchemeTask) {

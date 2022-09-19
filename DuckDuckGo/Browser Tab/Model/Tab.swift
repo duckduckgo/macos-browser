@@ -1048,17 +1048,8 @@ extension Tab: WKNavigationDelegate {
             return .allow
         }
         
-        #warning("This should probably be moved to PrivatePlayerSchemeHandler somehow")
         if navigationAction.request.url?.isPrivatePlayerScheme == true {
-            if #available(macOS 12.0, *) {
-                let youtubeHandler = YoutubePlayerNavigationHandler()
-                let newRequest = youtubeHandler.makePrivatePlayerRequest(from: navigationAction.request)
-                let html = youtubeHandler.makeHTMLFromTemplate()
-                webView.loadSimulatedRequest(newRequest, responseHTML: html)
-                return .cancel
-            } else {
-                return .allow
-            }
+            return .allow
         }
         
         let isLinkActivated = navigationAction.navigationType == .linkActivated
