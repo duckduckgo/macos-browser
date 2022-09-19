@@ -19,7 +19,9 @@
 import Foundation
 
 struct YoutubePlayerNavigationHandler {
-    
+    static let privatePlayerHost = "www.youtube-nocookie.com"
+    static let privatePlayerFragment = "privateplayer"
+
     func makePrivatePlayerRequest(from originalRequest: URLRequest) -> URLRequest {
        
         let videoID: String
@@ -31,7 +33,7 @@ struct YoutubePlayerNavigationHandler {
         }
         
         #warning("Check if all these queries are required or not")
-        let url = URL(string: "https://www.youtube-nocookie.com/embed/\(videoID)?wmode=transparent&iv_load_policy=3&autoplay=1&html5=1&showinfo=0&rel=0&modestbranding=1&playsinline=0")!
+        let url = URL(string: "https://\(Self.privatePlayerHost)/embed/\(videoID)?wmode=transparent&iv_load_policy=3&autoplay=1&html5=1&showinfo=0&rel=0&modestbranding=1&playsinline=0#\(Self.privatePlayerFragment)")!
         
         var request = URLRequest(url: url)
         request.addValue("http://localhost/", forHTTPHeaderField: "Referer")
@@ -54,5 +56,10 @@ struct YoutubePlayerNavigationHandler {
 extension URL {
     var isPrivatePlayerScheme: Bool {
         scheme == PrivatePlayerSchemeHandler.scheme
+    }
+
+    var isPrivatePlayer: Bool {
+        isPrivatePlayerScheme ||
+        host == YoutubePlayerNavigationHandler.privatePlayerHost && fragment == YoutubePlayerNavigationHandler.privatePlayerFragment
     }
 }
