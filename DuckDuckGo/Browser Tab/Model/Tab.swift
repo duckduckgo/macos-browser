@@ -711,17 +711,19 @@ final class Tab: NSObject, Identifiable, ObservableObject {
     
     private weak var youtubeOverlayScript: YoutubeOverlayUserScript?
     
-    #warning("Enable the youtube injection if necessary")
+    #warning("Check if we really need to call this instead of JS handling this for us")
     func enableYoutubeIfNecessary() {
         if url?.absoluteString.contains("youtube.com") == true,
            youtubeOverlayScript?.isEnabled == false {
             enableYoutubePlayerScript(true)
+        } else {
+            enableYoutubePlayerScript(false)
         }
     }
     
-    #warning("Call the enabled() method on the javascript file")
     func enableYoutubePlayerScript(_ enable: Bool) {
-        self.youtubeOverlayScript?.evaluateJSCall(call: "enable()", webView: self.webView)
+        let message = enable ? "enable()" : "disable()"
+        self.youtubeOverlayScript?.evaluateJSCall(call: message, webView: self.webView)
         youtubeOverlayScript?.isEnabled = enable
     }
     
@@ -1042,32 +1044,23 @@ extension Tab: WKNavigationDelegate {
     func webView(_ webView: WKWebView,
                  decidePolicyFor navigationAction: WKNavigationAction) async -> WKNavigationActionPolicy {
         
-        if navigationAction.request.url?.absoluteString.contains("nocookie") == true,
-           navigationAction.request.value(forHTTPHeaderField: "Referer") == nil {
-            
-            var newRequest = navigationAction.request
-            newRequest.addValue("http://localhost/", forHTTPHeaderField: "Referer")
-            
-            guard let file = Bundle.main.url(forResource: "youtube_player_template", withExtension: "html") else { return .cancel }
-            let html = try? String(contentsOf: file)
-            
-            if #available(macOS 12.0, *) {
-                webView.loadSimulatedRequest(newRequest, responseHTML: html!)
-            } else {
-                return .cancel
-            }
-            
-            return .cancel
-        }
-        
         if navigationAction.request.url?.isFileURL ?? false {
             return .allow
         }
         
-        if navigationAction.request.url?.scheme == PrivatePlayerSchemeHandler.scheme {
-            return .allow
+        #warning("This should probably be moved to PrivatePlayerSchemeHandler somehow")
+        if navigationAction.request.url?.isPrivatePlayerScheme == true {
+            if #available(macOS 12.0, *) {
+                let youtubeHandler = YoutubePlayerNavigationHandler()
+                let newRequest = youtubeHandler.makePrivatePlayerRequest(from: navigationAction.request)
+                let html = youtubeHandler.makeHTMLFromTemplate()
+                webView.loadSimulatedRequest(newRequest, responseHTML: html)
+                return .cancel
+            } else {
+                return .allow
+            }
         }
-
+        
         let isLinkActivated = navigationAction.navigationType == .linkActivated
         let isNavigatingAwayFromPinnedTab: Bool = {
             let isNavigatingToAnotherDomain = navigationAction.request.url?.host != url?.host
