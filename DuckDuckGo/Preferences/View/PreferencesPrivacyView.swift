@@ -23,6 +23,14 @@ extension Preferences {
     struct PrivacyView: View {
         @ObservedObject var model: PrivacyPreferencesModel
 
+        var privatePlayerModeBinding: Binding<PrivacyPreferencesModel.PrivatePlayerMode> {
+            .init {
+                model.privatePlayerMode
+            } set: { newValue in
+                model.privatePlayerMode = newValue
+            }
+        }
+
         var body: some View {
             VStack(alignment: .leading, spacing: 0) {
                 Text(UserText.privacy)
@@ -49,6 +57,31 @@ extension Preferences {
                         .fixMultilineScrollableText()
 
                     Text(UserText.autoconsentExplanation)
+                        .fixMultilineScrollableText()
+                }
+
+                Section {
+                    Text(UserText.privatePlayerSettingsTitle)
+                        .font(Const.Fonts.preferencePaneSectionHeader)
+
+                    Picker(selection: privatePlayerModeBinding, content: {
+                        Text(UserText.privatePlayerAlwaysOpenInPlayer)
+                            .padding(.bottom, 4)
+                            .tag(PrivacyPreferencesModel.PrivatePlayerMode.enabled)
+
+                        Text(UserText.privatePlayerShowPlayerButtons)
+                            .padding(.bottom, 4)
+                            .tag(PrivacyPreferencesModel.PrivatePlayerMode.alwaysAsk)
+
+                        Text(UserText.privatePlayerOff)
+                            .padding(.bottom, 4)
+                            .tag(PrivacyPreferencesModel.PrivatePlayerMode.disabled)
+
+                    }, label: {})
+                    .pickerStyle(.radioGroup)
+                    .offset(x: Const.pickerHorizontalOffset)
+
+                    Text(UserText.privatePlayerExplanation)
                         .fixMultilineScrollableText()
                 }
 

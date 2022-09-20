@@ -24,7 +24,6 @@ final class YoutubePlayerUserScript: NSObject, StaticUserScript {
     
     enum MessageNames: String, CaseIterable {
         case setAlwaysOpenSettingTo
-        case setToggleSectionExpanded
     }
     
     public var requiresRunInPageContentWorld: Bool {
@@ -37,6 +36,15 @@ final class YoutubePlayerUserScript: NSObject, StaticUserScript {
     static var script: WKUserScript = YoutubePlayerUserScript.makeWKUserScript()
     var messageNames: [String] { MessageNames.allCases.map(\.rawValue) }
 
+    func setAlwaysOpenInPrivatePlayer(_ enabled: Bool, inWebView webView: WKWebView) {
+        let value = enabled ? "true" : "false"
+        let js = """
+            window.postMessage({ alwaysOpenSetting: \(value) });
+            window.setAlwaysOpenSetting(\(value));
+        """
+        evaluate(js: js, inWebView: webView)
+    }
+
     func userContentController(_ userContentController: WKUserContentController, didReceive message: WKScriptMessage) {
         
         guard let messageType = MessageNames(rawValue: message.name) else {
@@ -45,20 +53,9 @@ final class YoutubePlayerUserScript: NSObject, StaticUserScript {
         }
         
         switch messageType {
-        case .setToggleSectionExpanded:
-            handleToggleSectionExpanded(message: message)
         case .setAlwaysOpenSettingTo:
             handleAlwaysOpenSettings(message: message)
         }
-    }
-    
-    private func handleToggleSectionExpanded(message: WKScriptMessage) {
-        guard let isExpanded = message.body as? Bool else {
-            assertionFailure("YoutubePlayerUserScript: expected Bool")
-            return
-        }
-        
-        print("Toggle section expanded \(isExpanded)")
     }
     
     private func handleAlwaysOpenSettings(message: WKScriptMessage) {
@@ -68,6 +65,7 @@ final class YoutubePlayerUserScript: NSObject, StaticUserScript {
         }
         
         print("Always open \(alwaysOpenOnPrivatePlayer)")
+        PrivacySecurityPreferences.shared.privateYoutubePlayerEnabled = alwaysOpenOnPrivatePlayer
     }
     
     func evaluateJSCall(call: String, webView: WKWebView) {

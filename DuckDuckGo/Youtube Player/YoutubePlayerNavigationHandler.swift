@@ -31,17 +31,21 @@ struct YoutubePlayerNavigationHandler {
             assertionFailure("Request should have ID")
             videoID = ""
         }
-        
+
+        return makePrivatePlayerRequest(for: videoID)
+    }
+
+    func makePrivatePlayerRequest(for videoID: String) -> URLRequest {
         #warning("Check if all these queries are required or not")
         let url = URL(string: "https://\(Self.privatePlayerHost)/embed/\(videoID)?wmode=transparent&iv_load_policy=3&autoplay=1&html5=1&showinfo=0&rel=0&modestbranding=1&playsinline=0#\(Self.privatePlayerFragment)")!
-        
+
         var request = URLRequest(url: url)
         request.addValue("http://localhost/", forHTTPHeaderField: "Referer")
         request.httpMethod = "GET"
-        
+
         return request
     }
-    
+
     func makeHTMLFromTemplate(_ template: String = "youtube_player_template") -> String {
         guard let file = Bundle.main.url(forResource: template, withExtension: "html"),
               let html = try? String(contentsOf: file) else {
@@ -59,7 +63,16 @@ extension URL {
     }
 
     var isPrivatePlayer: Bool {
-        isPrivatePlayerScheme ||
         host == YoutubePlayerNavigationHandler.privatePlayerHost && fragment == YoutubePlayerNavigationHandler.privatePlayerFragment
+    }
+
+    var youtubeVideoID: String? {
+        guard let components = URLComponents.init(url: self, resolvingAgainstBaseURL: false),
+              components.host?.droppingWwwPrefix() == "youtube.com",
+              components.path == "/watch"
+        else {
+            return nil
+        }
+        return components.queryItems?.first(where: { $0.name == "v" })?.value
     }
 }
