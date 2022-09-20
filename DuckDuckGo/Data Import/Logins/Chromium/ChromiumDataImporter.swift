@@ -121,7 +121,8 @@ internal class ChromiumDataImporter: DataImporter {
                 }
             }
             
-        case .failure: break // TODO: Send pixel if favicon import fails completely
+        case .failure:
+            Pixel.fire(.faviconImportFailed(source: self.source.pixelEventSource))
         }
     }
 
