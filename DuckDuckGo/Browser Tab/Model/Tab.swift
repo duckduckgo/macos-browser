@@ -478,6 +478,10 @@ final class Tab: NSObject, Identifiable, ObservableObject {
 
     @MainActor
     private func reloadIfNeeded(shouldLoadInBackground: Bool = false) async {
+        guard content.isUrl else {
+            return
+        }
+
         let url: URL = await {
             if contentURL.isFileURL {
                 return contentURL
