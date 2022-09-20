@@ -730,14 +730,6 @@ final class Tab: NSObject, Identifiable, ObservableObject {
                     self.youtubePlayerScript?.setAlwaysOpenInPrivatePlayer(isEnabled, inWebView: self.webView)
                 }
                 .store(in: &youtubePlayerCancellables)
-            PrivacySecurityPreferences.shared.$privateYoutubePlayerShowsDetails
-                .sink { [weak self] isEnabled in
-                    guard let self = self else {
-                        return
-                    }
-                    self.youtubePlayerScript?.setShowsDetails(isEnabled, inWebView: self.webView)
-                }
-                .store(in: &youtubePlayerCancellables)
         } else {
             youtubePlayerCancellables.removeAll()
         }

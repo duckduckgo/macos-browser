@@ -24,7 +24,6 @@ final class YoutubePlayerUserScript: NSObject, StaticUserScript {
     
     enum MessageNames: String, CaseIterable {
         case setAlwaysOpenSettingTo
-        case setToggleSectionExpanded
     }
     
     public var requiresRunInPageContentWorld: Bool {
@@ -46,12 +45,6 @@ final class YoutubePlayerUserScript: NSObject, StaticUserScript {
         evaluate(js: js, inWebView: webView)
     }
 
-    func setShowsDetails(_ enabled: Bool, inWebView webView: WKWebView) {
-        let value = enabled ? "true" : "false"
-        let js = "window.postMessage({ toggleSectionExpanded: \(value) })"
-        evaluate(js: js, inWebView: webView)
-    }
-
     func userContentController(_ userContentController: WKUserContentController, didReceive message: WKScriptMessage) {
         
         guard let messageType = MessageNames(rawValue: message.name) else {
@@ -60,21 +53,9 @@ final class YoutubePlayerUserScript: NSObject, StaticUserScript {
         }
         
         switch messageType {
-        case .setToggleSectionExpanded:
-            handleToggleSectionExpanded(message: message)
         case .setAlwaysOpenSettingTo:
             handleAlwaysOpenSettings(message: message)
         }
-    }
-    
-    private func handleToggleSectionExpanded(message: WKScriptMessage) {
-        guard let isExpanded = message.body as? Bool else {
-            assertionFailure("YoutubePlayerUserScript: expected Bool")
-            return
-        }
-        
-        print("Toggle section expanded \(isExpanded)")
-        PrivacySecurityPreferences.shared.privateYoutubePlayerShowsDetails = isExpanded
     }
     
     private func handleAlwaysOpenSettings(message: WKScriptMessage) {

@@ -53,12 +53,4 @@ final class PrivacySecurityPreferences {
             udWrapper.wrappedValue = privateYoutubePlayerEnabled
         }
     }
-
-    @Published
-    var privateYoutubePlayerShowsDetails: Bool = UserDefaultsWrapper(key: .privateYoutubePlayerShowsDetails, defaultValue: true).wrappedValue {
-        didSet {
-            var udWrapper = UserDefaultsWrapper(key: .privateYoutubePlayerShowsDetails, defaultValue: true)
-            udWrapper.wrappedValue = privateYoutubePlayerShowsDetails
-        }
-    }
 }
