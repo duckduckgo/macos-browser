@@ -496,12 +496,20 @@ final class LocalBookmarkStore: BookmarkStore {
                 var currentInsertionIndex = max(index, 0)
                 
                 for bookmarkManagedObject in bookmarkManagedObjects {
+                    let movingObjectWithinSameFolder = bookmarkManagedObject.parentFolder?.id == newParentFolder.id
+                    
+                    var adjustedInsertionIndex = currentInsertionIndex
+                    
+                    if movingObjectWithinSameFolder, currentInsertionIndex > newParentFolder.mutableChildren.index(of: bookmarkManagedObject) {
+                        adjustedInsertionIndex -= 1
+                    }
+                    
                     bookmarkManagedObject.parentFolder = nil
                     
                     // Removing the bookmark from its current parent may have removed it from the collection it is about to be added to, so re-check
                     // the bounds before inserting.
-                    if currentInsertionIndex < newParentFolder.mutableChildren.count {
-                        newParentFolder.mutableChildren.insert(bookmarkManagedObject, at: currentInsertionIndex)
+                    if adjustedInsertionIndex < newParentFolder.mutableChildren.count {
+                        newParentFolder.mutableChildren.insert(bookmarkManagedObject, at: adjustedInsertionIndex)
                     } else {
                         newParentFolder.mutableChildren.add(bookmarkManagedObject)
                     }
@@ -876,7 +884,7 @@ final class LocalBookmarkStore: BookmarkStore {
         }
     }
     
-    func move(objectUUIDs: [UUID], toIndex index: Int, withinParentFolder parent: ParentFolderType) async -> Error? {
+    func move(objectUUIDs: [UUID], toIndex index: Int?, withinParentFolder parent: ParentFolderType) async -> Error? {
         return await withCheckedContinuation { continuation in
             move(objectUUIDs: objectUUIDs, toIndex: index, withinParentFolder: parent) { error in
                 if let error = error {

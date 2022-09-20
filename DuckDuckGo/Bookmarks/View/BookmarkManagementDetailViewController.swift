@@ -389,7 +389,6 @@ extension BookmarkManagementDetailViewController: NSTableViewDelegate, NSTableVi
             }
 
             if !bookmarkManager.canMoveObjectWithUUID(objectUUID: folderUUID, to: destinationFolder) {
-                os_log("Cannot move folder into parent as it would create a cycle", log: .bookmarks, type: .debug)
                 return .none
             }
         }
