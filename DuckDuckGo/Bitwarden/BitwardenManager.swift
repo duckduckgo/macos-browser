@@ -18,6 +18,7 @@
 
 import Foundation
 import SwiftUI
+import OpenSSL
 
 protocol BitwardenManagement {
 
@@ -35,7 +36,6 @@ final class BitwardenManager {
     var state: BitwardenStatus = .disabled
 
     private lazy var communicator: BitwardenCommunication = BitwardenComunicator()
-    private var sharedKey: String?
 
     private init() {}
 
@@ -44,6 +44,7 @@ final class BitwardenManager {
     }
 
     func initCommunication() {
+        generateKeyPair()
         communicator.delegate = self
         communicator.enabled = true
     }
@@ -77,7 +78,7 @@ final class BitwardenManager {
             sendHandshake()
             return
         case "disconnected":
-            // Bitwarden application isn't running
+            // Bitwarden application isn't running || User didn't approve DuckDuckGo browser integration
             disableAndScheduleNextAttempt()
         default:
             assertionFailure("Unknown command")
@@ -90,16 +91,21 @@ final class BitwardenManager {
             return
         }
 
-        self.sharedKey = sharedKey
-
-        //TODO send status message
+        //TODO Decrypt the shared key
+        //TODO Send status message
     }
 
     private func sendHandshake() {
-        guard let messageData = BitwardenMessage.makeHandshakeMessage(with: "MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAl0Vawl/toXzkEvB82FEtqHP4xlU2ab/v0crqIfXfIoWF/XXdHGIdrZeilnRXPPJT1B9dTsasttEZNnua/0Rek/cjNDHtzT52irfoZYS7X6HNIfOi54Q+egPRQ1H7iNHVZz3K8Db9GCSKPeC8MbW6gVCzb15esCe1gGzg6wkMuWYDFYPoh/oBqcIqrGah7firqB1nDedzEjw32heP2DAffVN084iTDjiWrJNUxBJ2pDD5Z9dT3MzQ2s09ew1yMWK2z37rT3YerC7OgEDmo3WYo3xL3qYJznu3EO2nmrYjiRa40wKSjxsTlUcxDF+F0uMW8oR9EMUHgepdepfAtLsSAQIDAQAB").data else {
+        guard let publicKey64Encoded = publicKey else {
+            assertionFailure("Public key is missing")
+            return
+        }
+
+        guard let messageData = BitwardenMessage.makeHandshakeMessage(with: publicKey64Encoded).data else {
             assertionFailure("Making the handshake message failed")
             return
         }
+
         communicator.send(messageData: messageData)
     }
 
@@ -109,6 +115,16 @@ final class BitwardenManager {
             return
         }
         communicator.send(messageData: messageData)
+    }
+    
+    // MARK: - Keys
+
+    let openSSLWrapper = OpenSSLWrapper()
+
+    var publicKey: String?
+
+    private func generateKeyPair() {
+        publicKey = openSSLWrapper.generateKeys()
     }
 
 }

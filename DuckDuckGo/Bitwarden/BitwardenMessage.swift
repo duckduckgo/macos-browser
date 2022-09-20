@@ -18,6 +18,7 @@
 
 import Foundation
 
+//TODO Divide at least to response and request
 struct BitwardenMessage: Codable {
 
     let messageId: String?
@@ -29,9 +30,9 @@ struct BitwardenMessage: Codable {
     struct Payload: Codable {
 
         let error: String?
-        let publicKey: String?
+        let publicKey: String? // base64 encoded
         let status: String?
-        let sharedKey: Data?
+        let sharedKey: String? // base64 encoded
 
     }
 
