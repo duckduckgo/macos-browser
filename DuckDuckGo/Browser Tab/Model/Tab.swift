@@ -710,21 +710,28 @@ final class Tab: NSObject, Identifiable, ObservableObject {
     // MARK: - Youtube Player
     
     private weak var youtubeOverlayScript: YoutubeOverlayUserScript?
-    
-    #warning("Check if we really need to call this instead of JS handling this for us")
-    func enableYoutubeIfNecessary() {
-        if url?.absoluteString.contains("youtube.com") == true,
-           youtubeOverlayScript?.isEnabled == false {
-            enableYoutubePlayerScript(true)
+    private weak var youtubePlayerScript: YoutubePlayerUserScript?
+    fileprivate var youtubePlayerCancellable: AnyCancellable?
+
+    func setUpYoutubeScriptsIfNeeded() {
+        if url?.host?.droppingWwwPrefix() == "youtube.com" {
+            youtubeOverlayScript?.setEnabled(true, in: webView)
         } else {
-            enableYoutubePlayerScript(false)
+            youtubeOverlayScript?.setEnabled(false, in: webView)
         }
-    }
-    
-    func enableYoutubePlayerScript(_ enable: Bool) {
-        let message = enable ? "enable()" : "disable()"
-        self.youtubeOverlayScript?.evaluateJSCall(call: message, webView: self.webView)
-        youtubeOverlayScript?.isEnabled = enable
+
+        if url?.isPrivatePlayer == true {
+            youtubePlayerCancellable = PrivacySecurityPreferences.shared.$privateYoutubePlayerEnabled
+                .sink { [weak self] value in
+                    guard let self = self else {
+                        return
+                    }
+                    let isEnabled = value == true
+                    self.youtubePlayerScript?.setAlwaysOpenInPrivatePlayer(isEnabled, inWebView: self.webView)
+                }
+        } else {
+            youtubePlayerCancellable = nil
+        }
     }
     
     // MARK: - Dashboard Info
@@ -783,6 +790,7 @@ extension Tab: UserContentControllerDelegate {
         userScripts.hoverUserScript.delegate = self
         userScripts.autoconsentUserScript?.delegate = self
         youtubeOverlayScript = userScripts.youtubeOverlayScript
+        youtubePlayerScript = userScripts.youtubePlayerUserScript
 
         findInPageScript = userScripts.findInPageScript
         attachFindInPage()
@@ -1290,7 +1298,7 @@ extension Tab: WKNavigationDelegate {
         if isAMPProtectionExtracting { isAMPProtectionExtracting = false }
         linkProtection.setMainFrameUrl(nil)
         referrerTrimming.onFinishNavigation()
-        enableYoutubeIfNecessary()
+        setUpYoutubeScriptsIfNeeded()
     }
 
     func webView(_ webView: WKWebView, didFail navigation: WKNavigation!, withError error: Error) {

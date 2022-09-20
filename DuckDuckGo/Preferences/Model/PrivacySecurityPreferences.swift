@@ -42,4 +42,15 @@ final class PrivacySecurityPreferences {
     @UserDefaultsWrapper(key: .autoconsentEnabled, defaultValue: nil)
     public var autoconsentEnabled: Bool?
 
+    // This setting is an optional boolean as it has three states:
+    // - nil: User has not chosen a setting
+    // - true: Enabled by the user
+    // - false: Disabled by the user
+    @Published
+    var privateYoutubePlayerEnabled: Bool? = UserDefaultsWrapper(key: .privateYoutubePlayerEnabled, defaultValue: nil).wrappedValue {
+        didSet {
+            var udWrapper = UserDefaultsWrapper(key: .privateYoutubePlayerEnabled, defaultValue: Bool?.none)
+            udWrapper.wrappedValue = privateYoutubePlayerEnabled
+        }
+    }
 }

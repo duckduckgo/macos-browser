@@ -26,7 +26,15 @@ final class YoutubeOverlayUserScript: NSObject, StaticUserScript {
     static var source: String = YoutubeOverlayUserScript.loadJS("youtube-inject", from: .main)
     static var script: WKUserScript = YoutubeOverlayUserScript.makeWKUserScript()
     var messageNames: [String] { [""] }
-    var isEnabled = false
+    private(set) var isEnabled = false
+
+    func setEnabled(_ isEnabled: Bool, in webView: WKWebView) {
+        if self.isEnabled != isEnabled {
+            let message = isEnabled ? "enable()" : "disable()"
+            evaluateJSCall(call: message, webView: webView)
+            self.isEnabled = isEnabled
+        }
+    }
     
     func userContentController(_ userContentController: WKUserContentController, didReceive message: WKScriptMessage) {
         print("Message \(message)")

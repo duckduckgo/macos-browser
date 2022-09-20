@@ -65,4 +65,14 @@ extension URL {
     var isPrivatePlayer: Bool {
         host == YoutubePlayerNavigationHandler.privatePlayerHost && fragment == YoutubePlayerNavigationHandler.privatePlayerFragment
     }
+
+    var youtubeVideoID: String? {
+        guard let components = URLComponents.init(url: self, resolvingAgainstBaseURL: false),
+              components.host?.droppingWwwPrefix() == "youtube.com",
+              components.path == "/watch"
+        else {
+            return nil
+        }
+        return components.queryItems?.first(where: { $0.name == "v" })?.value
+    }
 }
