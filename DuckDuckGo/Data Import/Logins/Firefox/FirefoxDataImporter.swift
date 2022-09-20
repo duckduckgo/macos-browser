@@ -36,7 +36,7 @@ final class FirefoxDataImporter: DataImporter {
         return [.logins, .bookmarks]
     }
 
-    // swiftlint:disable:next cyclomatic_complexity
+    // swiftlint:disable:next cyclomatic_complexity function_body_length
     func importData(types: [DataImport.DataType],
                     from profile: DataImport.BrowserProfile?,
                     completion: @escaping (Result<DataImport.Summary, DataImportError>) -> Void) {
@@ -76,29 +76,8 @@ final class FirefoxDataImporter: DataImporter {
         if types.contains(.bookmarks) {
             let bookmarkReader = FirefoxBookmarksReader(firefoxDataDirectoryURL: firefoxProfileURL)
             let bookmarkResult = bookmarkReader.readBookmarks()
-            
-            let faviconsReader = FirefoxFaviconsReader(firefoxDataDirectoryURL: firefoxProfileURL)
-            let faviconsResult = faviconsReader.readFavicons()
-            
-            switch faviconsResult {
-            case .success(let faviconsByURL):
-                for (pageURLString, fetchedFavicons) in faviconsByURL {
-                    if let pageURL = URL(string: pageURLString) {
-                        let favicons = fetchedFavicons.map {
-                            Favicon(identifier: UUID(),
-                                    url: pageURL,
-                                    image: $0.image,
-                                    relation: .icon,
-                                    documentUrl: pageURL,
-                                    dateCreated: Date())
-                        }
-                        
-                        faviconManager.handleFavicons(favicons, documentUrl: pageURL)
-                    }
-                }
-                
-            case .failure: break // TODO: Send pixel if favicon import fails completely
-            }
+
+            importFavicons(from: firefoxProfileURL)
 
             switch bookmarkResult {
             case .success(let bookmarks):
@@ -127,6 +106,31 @@ final class FirefoxDataImporter: DataImporter {
             importData(types: types, from: profile) { result in
                 continuation.resume(returning: result)
             }
+        }
+    }
+    
+    private func importFavicons(from firefoxProfileURL: URL) {
+        let faviconsReader = FirefoxFaviconsReader(firefoxDataDirectoryURL: firefoxProfileURL)
+        let faviconsResult = faviconsReader.readFavicons()
+        
+        switch faviconsResult {
+        case .success(let faviconsByURL):
+            for (pageURLString, fetchedFavicons) in faviconsByURL {
+                if let pageURL = URL(string: pageURLString) {
+                    let favicons = fetchedFavicons.map {
+                        Favicon(identifier: UUID(),
+                                url: pageURL,
+                                image: $0.image,
+                                relation: .icon,
+                                documentUrl: pageURL,
+                                dateCreated: Date())
+                    }
+                    
+                    faviconManager.handleFavicons(favicons, documentUrl: pageURL)
+                }
+            }
+            
+        case .failure: break // TODO: Send pixel if favicon import fails completely
         }
     }
 
