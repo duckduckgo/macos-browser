@@ -108,7 +108,7 @@ final class BookmarkHTMLReader {
         }
 
         if isInSafariFormat {
-            return .thirdPartyBrowser(.bookmarksHTML)
+            return .thirdPartyBrowser(.safari)
         }
 
         return nil
