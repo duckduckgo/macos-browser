@@ -136,6 +136,12 @@ struct UserText {
     static let autoconsentCheckboxTitle = NSLocalizedString("autoconsent.checkbox.title", value: "Let DuckDuckGo manage cookie consent pop-ups", comment: "Autoconsent settings checkbox title")
     static let autoconsentExplanation = NSLocalizedString("autoconsent.explanation", value: "When DuckDuckGo detects cookie consent pop-ups on sites you visit, we'll automatically set your cookie preferences to minimize cookies and maximize privacy, then close the pop-ups.", comment: "Autoconsent feature explanation in settings")
 
+    static let privatePlayerSettingsTitle = NSLocalizedString("private-player.title", value: "DuckPlayer", comment: "Private YouTube Player settings title")
+    static let privatePlayerAlwaysOpenInPlayer = NSLocalizedString("private-player.always-open-in-player", value: "Always open YouTube videos in player", comment: "Private YouTube Player option")
+    static let privatePlayerShowPlayerButtons = NSLocalizedString("private-player.show-buttons", value: "Show player buttons on YouTube", comment: "Private YouTube Player option")
+    static let privatePlayerOff = NSLocalizedString("private-player.off", value: "Off", comment: "Private YouTube Player option")
+    static let privatePlayerExplanation = NSLocalizedString("private-player.explanation", value: "DuckPlayer protects your viewing activity from advertiser profiling and from influencing YouTube's recommendation algorithm.", comment: "Private YouTube Player explanation in settings")
+
     static let gpcSettingsTitle = NSLocalizedString("gpc.title", value: "Global Privacy Control (GPC)", comment: "GPC settings title")
     static let gpcCheckboxTitle = NSLocalizedString("gpc.checkbox.title", value: "Enable Global Privacy Control", comment: "GPC settings checkbox title")
     static let gpcExplanation = NSLocalizedString("gpc.explanation", value: "DuckDuckGo automatically blocks many trackers. With Global Privacy Control (GPC), you can also ask participating websites to restrict selling or sharing your personal data with other companies.", comment: "GPC explanation in settings")

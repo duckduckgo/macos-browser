@@ -20,10 +20,43 @@ import Foundation
 
 final class PrivacyPreferencesModel: ObservableObject {
 
+    enum PrivatePlayerMode {
+        case enabled, alwaysAsk, disabled
+
+        init(_ privateYoutubePlayerEnabled: Bool?) {
+            switch privateYoutubePlayerEnabled {
+            case true:
+                self = .enabled
+            case false:
+                self = .disabled
+            default:
+                self = .alwaysAsk
+            }
+        }
+
+        var boolValue: Bool? {
+            switch self {
+            case .enabled:
+                return true
+            case .alwaysAsk:
+                return nil
+            case .disabled:
+                return false
+            }
+        }
+    }
+
     @Published
     var isLoginDetectionEnabled: Bool {
         didSet {
             privacySecurityPreferences.loginDetectionEnabled = isLoginDetectionEnabled
+        }
+    }
+
+    @Published
+    var privatePlayerMode: PrivatePlayerMode {
+        didSet {
+            privacySecurityPreferences.privateYoutubePlayerEnabled = privatePlayerMode.boolValue
         }
     }
 
@@ -60,6 +93,7 @@ final class PrivacyPreferencesModel: ObservableObject {
     init(privacySecurityPreferences: PrivacySecurityPreferences = .shared) {
         self.privacySecurityPreferences = privacySecurityPreferences
         isLoginDetectionEnabled = privacySecurityPreferences.loginDetectionEnabled
+        privatePlayerMode = .init(privacySecurityPreferences.privateYoutubePlayerEnabled)
         isGPCEnabled = privacySecurityPreferences.gpcEnabled
         isAutoconsentEnabled = privacySecurityPreferences.autoconsentEnabled ?? false
     }
