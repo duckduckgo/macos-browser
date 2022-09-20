@@ -31,7 +31,7 @@ extension EmailManagerRequestDelegate {
                       completion: @escaping (Data?, Error?) -> Void) {
         let currentQueue = OperationQueue.current
 
-        let finalURL = (try? url.appendingParameters(parameters ?? [:])) ?? url
+        let finalURL = url.appendingParameters(parameters ?? [:])
 
         var request = URLRequest(url: finalURL, timeoutInterval: timeoutInterval)
         request.allHTTPHeaderFields = headers

@@ -22,8 +22,12 @@ import WebKit
 import BrowserServicesKit
 
 protocol OptionsButtonMenuDelegate: AnyObject {
-
+    
+    func optionsButtonMenuRequestedBookmarkThisPage(_ sender: NSMenuItem)
     func optionsButtonMenuRequestedBookmarkPopover(_ menu: NSMenu)
+    func optionsButtonMenuRequestedToggleBookmarksBar(_ menu: NSMenu)
+    func optionsButtonMenuRequestedBookmarkManagementInterface(_ menu: NSMenu)
+    func optionsButtonMenuRequestedBookmarkImportInterface(_ menu: NSMenu)
     func optionsButtonMenuRequestedLoginsPopover(_ menu: NSMenu, selectedCategory: SecureVaultSorting.Category)
     func optionsButtonMenuRequestedDownloadsPopover(_ menu: NSMenu)
     func optionsButtonMenuRequestedPrint(_ menu: NSMenu)
@@ -105,8 +109,24 @@ final class MoreOptionsMenu: NSMenu {
         selectedTabViewModel.tab.requestFireproofToggle()
     }
 
+    @objc func bookmarkPage(_ sender: NSMenuItem) {
+        actionDelegate?.optionsButtonMenuRequestedBookmarkThisPage(sender)
+    }
+    
     @objc func openBookmarks(_ sender: NSMenuItem) {
         actionDelegate?.optionsButtonMenuRequestedBookmarkPopover(self)
+    }
+    
+    @objc func openBookmarksManagementInterface(_ sender: NSMenuItem) {
+        actionDelegate?.optionsButtonMenuRequestedBookmarkManagementInterface(self)
+    }
+    
+    @objc func toggleBookmarksBar(_ sender: NSMenuItem) {
+        actionDelegate?.optionsButtonMenuRequestedToggleBookmarksBar(self)
+    }
+    
+    @objc func openBookmarkImportInterface(_ sender: NSMenuItem) {
+        actionDelegate?.optionsButtonMenuRequestedBookmarkImportInterface(self)
     }
 
     @objc func openDownloads(_ sender: NSMenuItem) {
@@ -178,9 +198,12 @@ final class MoreOptionsMenu: NSMenu {
     }
 
     private func addUtilityItems() {
+        let bookmarksSubMenu = BookmarksSubMenu(targetting: self, tabCollectionViewModel: tabCollectionViewModel)
+        
         addItem(withTitle: UserText.bookmarks, action: #selector(openBookmarks), keyEquivalent: "")
             .targetting(self)
             .withImage(NSImage(named: "Bookmarks"))
+            .withSubmenu(bookmarksSubMenu)
             .firingPixel(Pixel.Event.MoreResult.bookmarksList)
 
         addItem(withTitle: UserText.downloads, action: #selector(openDownloads), keyEquivalent: "j")
@@ -348,6 +371,96 @@ final class ZoomSubMenu: NSMenu {
 
 }
 
+final class BookmarksSubMenu: NSMenu {
+    
+    init(targetting target: AnyObject, tabCollectionViewModel: TabCollectionViewModel) {
+        super.init(title: UserText.passwordManagement)
+        self.autoenablesItems = false
+        updateMenuItems(with: tabCollectionViewModel, target: target)
+    }
+
+    required init(coder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }
+
+    private func updateMenuItems(with tabCollectionViewModel: TabCollectionViewModel, target: AnyObject) {
+        let bookmarkPageItem = addItem(withTitle: UserText.bookmarkThisPage, action: #selector(MoreOptionsMenu.bookmarkPage(_:)), keyEquivalent: "d")
+            .withModifierMask([.command])
+            .targetting(target)
+            .firingPixel(Pixel.Event.MoreResult.bookmarksMenuBookmarkThisPage)
+
+        bookmarkPageItem.isEnabled = tabCollectionViewModel.selectedTabViewModel?.canBeBookmarked == true
+        
+        addItem(NSMenuItem.separator())
+        
+        addItem(withTitle: UserText.bookmarksShowToolbarPanel, action: #selector(MoreOptionsMenu.openBookmarks(_:)), keyEquivalent: "")
+            .targetting(target)
+            .firingPixel(Pixel.Event.MoreResult.bookmarksMenuShowToolbarPanel)
+
+        addItem(NSMenuItem.separator())
+        
+        if let favorites = LocalBookmarkManager.shared.list?.favoriteBookmarks {
+            let favoriteViewModels = favorites.compactMap(BookmarkViewModel.init(entity:))
+            let potentialItems = bookmarkMenuItems(from: favoriteViewModels)
+            
+            let favoriteMenuItems = potentialItems.isEmpty ? [NSMenuItem.empty] : potentialItems
+            
+            let favoritesItem = addItem(withTitle: UserText.favorites, action: nil, keyEquivalent: "")
+            favoritesItem.submenu = NSMenu(items: favoriteMenuItems)
+            favoritesItem.image = NSImage(named: "Favorite")
+            
+            addItem(NSMenuItem.separator())
+        }
+        
+        guard let entities = LocalBookmarkManager.shared.list?.topLevelEntities else {
+            return
+        }
+        
+        let bookmarkViewModels = entities.compactMap(BookmarkViewModel.init(entity:))
+        let menuItems = bookmarkMenuItems(from: bookmarkViewModels, topLevel: true)
+        
+        self.items.append(contentsOf: menuItems)
+        
+        addItem(NSMenuItem.separator())
+
+        addItem(withTitle: "Import Bookmarks and Passwords...", action: #selector(MoreOptionsMenu.openBookmarkImportInterface(_:)), keyEquivalent: "")
+            .targetting(target)
+            .firingPixel(Pixel.Event.MoreResult.bookmarksMenuImportBookmarks)
+    }
+    
+    private func bookmarkMenuItems(from bookmarkViewModels: [BookmarkViewModel], topLevel: Bool = true) -> [NSMenuItem] {
+        var menuItems = [NSMenuItem]()
+
+        if !topLevel {
+            let showOpenInTabsItem = bookmarkViewModels.compactMap { $0.entity as? Bookmark }.count > 1
+            if showOpenInTabsItem {
+                menuItems.append(NSMenuItem(bookmarkViewModels: bookmarkViewModels))
+                menuItems.append(.separator())
+            }
+        }
+
+        for viewModel in bookmarkViewModels {
+            let menuItem = NSMenuItem(bookmarkViewModel: viewModel)
+
+            if let folder = viewModel.entity as? BookmarkFolder {
+                let subMenu = NSMenu(title: folder.title)
+                let childViewModels = folder.children.map(BookmarkViewModel.init)
+                let childMenuItems = bookmarkMenuItems(from: childViewModels, topLevel: false)
+                subMenu.items = childMenuItems
+
+                if !subMenu.items.isEmpty {
+                    menuItem.submenu = subMenu
+                }
+            }
+
+            menuItems.append(menuItem)
+        }
+
+        return menuItems
+    }
+    
+}
+
 final class LoginsSubMenu: NSMenu {
 
     init(targetting target: AnyObject) {
@@ -407,6 +520,12 @@ extension NSMenuItem {
     @discardableResult
     func withSubmenu(_ submenu: NSMenu) -> NSMenuItem {
         self.submenu = submenu
+        return self
+    }
+    
+    @discardableResult
+    func withModifierMask(_ mask: NSEvent.ModifierFlags) -> NSMenuItem {
+        self.keyEquivalentModifierMask = mask
         return self
     }
 

@@ -104,8 +104,11 @@ final class BookmarksBarViewController: NSViewController {
     
     @objc
     private func frameChangeNotification() {
-        viewModel.clipOrRestoreBookmarksBarItems()
-        refreshClippedIndicator()
+        // Wait until the frame change has taken effect for subviews before calculating changes to the list of items.
+        DispatchQueue.main.async {
+            self.viewModel.clipOrRestoreBookmarksBarItems()
+            self.refreshClippedIndicator()
+        }
     }
     
     override func removeFromParent() {
@@ -249,7 +252,7 @@ extension BookmarksBarViewController: BookmarksBarViewModelDelegate {
     
     private func bookmarkFolderMenu(items: [NSMenuItem]) -> NSMenu {
         let menu = NSMenu()
-        menu.items = items.isEmpty ? [NSMenuItem(title: UserText.bookmarksBarFolderEmpty, action: nil, target: nil, keyEquivalent: "")] : items
+        menu.items = items.isEmpty ? [NSMenuItem.empty] : items
         return menu
     }
     

@@ -664,8 +664,26 @@ extension NavigationBarViewController: NSMenuDelegate {
 
 extension NavigationBarViewController: OptionsButtonMenuDelegate {
 
+    func optionsButtonMenuRequestedBookmarkThisPage(_ sender: NSMenuItem) {
+        addressBarViewController?
+            .addressBarButtonsViewController?
+            .openBookmarkPopover(setFavorite: false, accessPoint: .init(sender: sender, default: .moreMenu))
+    }
+
     func optionsButtonMenuRequestedBookmarkPopover(_ menu: NSMenu) {
         showBookmarkListPopover()
+    }
+
+    func optionsButtonMenuRequestedToggleBookmarksBar(_ menu: NSMenu) {
+        PersistentAppInterfaceSettings.shared.showBookmarksBar.toggle()
+    }
+    
+    func optionsButtonMenuRequestedBookmarkManagementInterface(_ menu: NSMenu) {
+        WindowControllersManager.shared.showBookmarksTab()
+    }
+    
+    func optionsButtonMenuRequestedBookmarkImportInterface(_ menu: NSMenu) {
+        DataImportViewController.show()
     }
 
     func optionsButtonMenuRequestedLoginsPopover(_ menu: NSMenu, selectedCategory: SecureVaultSorting.Category) {
