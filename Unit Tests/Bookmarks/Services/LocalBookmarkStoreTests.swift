@@ -454,7 +454,7 @@ final class LocalBookmarkStoreTests: XCTestCase {
         case .success(let entities):
             XCTAssert(entities.contains(where: { $0.title == "DuckDuckGo" }))
             XCTAssert(entities.contains(where: { $0.title == "Folder" }))
-            XCTAssert(entities.contains(where: { $0.title == "Imported from" }))
+            XCTAssert(entities.contains(where: { $0.title.contains("Imported from") }))
         case .failure:
             XCTFail("Did not expect failure when checking topLevelEntitiesResult")
         }

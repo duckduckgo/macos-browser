@@ -103,4 +103,3 @@ final class ChromiumFaviconsReader {
     }
 
 }
-
