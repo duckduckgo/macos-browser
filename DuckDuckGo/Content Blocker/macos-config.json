@@ -1,49 +1,40 @@
 {
     "readme": "https://github.com/duckduckgo/privacy-configuration",
-    "version": 1661422548137,
+    "version": 1663413419716,
     "features": {
         "adClickAttribution": {
             "readme": "https://help.duckduckgo.com/duckduckgo-help-pages/privacy/web-tracking-protections/#3rd-party-tracker-loading-protection",
-            "state": "disabled",
+            "state": "enabled",
             "exceptions": [],
             "settings": {
                 "linkFormats": [
                     {
                         "url": "duckduckgo.com/y.js",
-                        "parameterName": "u3",
                         "adDomainParameterName": "ad_domain",
                         "desc": "SERP Ads"
                     },
                     {
                         "url": "www.search-company.site/y.js",
-                        "parameterName": "u3",
                         "adDomainParameterName": "ad_domain",
                         "desc": "Test Domain"
                     },
                     {
                         "url": "www.search-company.example/y.js",
-                        "parameterName": "u3",
                         "adDomainParameterName": "ad_domain",
                         "desc": "Test Domain"
                     },
                     {
                         "url": "links.duckduckgo.com/m.js",
-                        "parameterName": "dsl",
-                        "parameterValue": "1",
                         "adDomainParameterName": "ad_domain",
                         "desc": "Shopping Ads"
                     },
                     {
                         "url": "www.search-company.site/m.js",
-                        "parameterName": "dsl",
-                        "parameterValue": "1",
                         "adDomainParameterName": "ad_domain",
                         "desc": "Test Domain"
                     },
                     {
                         "url": "www.search-company.example/m.js",
-                        "parameterName": "dsl",
-                        "parameterValue": "1",
                         "adDomainParameterName": "ad_domain",
                         "desc": "Test Domain"
                     }
@@ -359,16 +350,38 @@
         },
         "referrer": {
             "exceptions": [],
-            "state": "disabled"
+            "state": "enabled"
         },
         "trackerAllowlist": {
             "state": "enabled",
             "settings": {
                 "allowlistedTrackers": {
+                    "3lift.com": {
+                        "rules": [
+                            {
+                                "rule": "tlx.3lift.com/header/auction",
+                                "domains": [
+                                    "aternos.org"
+                                ],
+                                "reason": "https://github.com/duckduckgo/privacy-configuration/issues/328"
+                            }
+                        ]
+                    },
                     "4dex.io": {
                         "rules": [
                             {
                                 "rule": "mp.4dex.io/prebid",
+                                "domains": [
+                                    "aternos.org"
+                                ],
+                                "reason": "https://github.com/duckduckgo/privacy-configuration/issues/328"
+                            }
+                        ]
+                    },
+                    "a-mo.net": {
+                        "rules": [
+                            {
+                                "rule": "prebid.a-mo.net/a/c",
                                 "domains": [
                                     "aternos.org"
                                 ],
@@ -551,6 +564,17 @@
                             }
                         ]
                     },
+                    "computerworld.com": {
+                        "rules": [
+                            {
+                                "rule": "cmpv2.computerworld.com/",
+                                "domains": [
+                                    "computerworld.com"
+                                ],
+                                "reason": "https://github.com/duckduckgo/privacy-configuration/issues/344"
+                            }
+                        ]
+                    },
                     "criteo.com": {
                         "rules": [
                             {
@@ -588,6 +612,28 @@
                                     "wsj.com"
                                 ],
                                 "reason": "Opinion section article elements do not render. Note that Firefox Enhanced Tracking Protection may prevent mitigation from succeeding on Firefox."
+                            }
+                        ]
+                    },
+                    "demdex.net": {
+                        "rules": [
+                            {
+                                "rule": "dpm.demdex.net/id",
+                                "domains": [
+                                    "homedepot.com"
+                                ],
+                                "reason": "https://github.com/duckduckgo/privacy-configuration/issues/393"
+                            }
+                        ]
+                    },
+                    "derstandard.de": {
+                        "rules": [
+                            {
+                                "rule": "spcmp.r53.derstandard.de/",
+                                "domains": [
+                                    "derstandard.de"
+                                ],
+                                "reason": "https://github.com/duckduckgo/privacy-configuration/issues/344"
                             }
                         ]
                     },
@@ -671,6 +717,20 @@
                     },
                     "gemius.pl": {
                         "rules": [
+                            {
+                                "rule": "gapl.hit.gemius.pl/gplayer.js",
+                                "domains": [
+                                    "tvp.pl"
+                                ],
+                                "reason": "https://github.com/duckduckgo/privacy-configuration/issues/376"
+                            },
+                            {
+                                "rule": "pro.hit.gemius.pl/gstream.js",
+                                "domains": [
+                                    "tvp.pl"
+                                ],
+                                "reason": "https://github.com/duckduckgo/privacy-configuration/issues/376"
+                            },
                             {
                                 "rule": "wp.hit.gemius.pl/xgemius.js",
                                 "domains": [
@@ -788,6 +848,18 @@
                             }
                         ]
                     },
+                    "klaviyo.com": {
+                        "rules": [
+                            {
+                                "rule": "www.klaviyo.com/media/js/public/klaviyo_subscribe.js",
+                                "domains": [
+                                    "fearofgod.com",
+                                    "shopyalehome.com"
+                                ],
+                                "reason": "https://github.com/duckduckgo/privacy-configuration/issues/362"
+                            }
+                        ]
+                    },
                     "liveperson.net": {
                         "rules": [
                             {
@@ -844,6 +916,17 @@
                             }
                         ]
                     },
+                    "omnitagjs.com": {
+                        "rules": [
+                            {
+                                "rule": "hb-api.omnitagjs.com/hb-api/prebid/v1",
+                                "domains": [
+                                    "aternos.org"
+                                ],
+                                "reason": "https://github.com/duckduckgo/privacy-configuration/issues/328"
+                            }
+                        ]
+                    },
                     "openx.net": {
                         "rules": [
                             {
@@ -893,6 +976,17 @@
                                     "primaryarms.com"
                                 ],
                                 "reason": "Images in the large scrolling image banner on main page do not render.,Note that this CNAMEs to marvel-b4-cdn.bc0a.com at time of mitigation."
+                            }
+                        ]
+                    },
+                    "privacy-mgmt.com": {
+                        "rules": [
+                            {
+                                "rule": "privacy-mgmt.com/",
+                                "domains": [
+                                    "<all>"
+                                ],
+                                "reason": "https://github.com/duckduckgo/privacy-configuration/issues/344"
                             }
                         ]
                     },
@@ -995,13 +1089,20 @@
                                     "<all>"
                                 ],
                                 "reason": "https://github.com/duckduckgo/privacy-configuration/issues/334"
+                            },
+                            {
+                                "rule": "vendors.privacymanager.io/vendor-list.json",
+                                "domains": [
+                                    "<all>"
+                                ],
+                                "reason": "https://github.com/duckduckgo/privacy-configuration/issues/334"
                             }
                         ]
                     },
                     "pubmatic.com": {
                         "rules": [
                             {
-                                "rule": "hpopenbid.pubmatic.com/translator",
+                                "rule": "hbopenbid.pubmatic.com/translator",
                                 "domains": [
                                     "aternos.org"
                                 ],
@@ -1078,6 +1179,17 @@
                                     "sky.com"
                                 ],
                                 "reason": "https://github.com/duckduckgo/privacy-configuration/issues/342"
+                            }
+                        ]
+                    },
+                    "spiegel.de": {
+                        "rules": [
+                            {
+                                "rule": "sp-spiegel-de.spiegel.de/",
+                                "domains": [
+                                    "spiegel.de"
+                                ],
+                                "reason": "https://github.com/duckduckgo/privacy-configuration/issues/344"
                             }
                         ]
                     },
