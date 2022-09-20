@@ -85,13 +85,14 @@ final class BitwardenManager {
         }
     }
 
-    private func handleHandshakeResponce(sharedKey: String, status: String) {
+    private func handleHandshakeResponce(encryptedSharedKey: String, status: String) {
         guard status == "success" else {
             disableAndScheduleNextAttempt()
             return
         }
 
-        //TODO Decrypt the shared key
+        self.sharedKey = openSSLWrapper.decryptSharedKey(encryptedSharedKey)
+
         //TODO Send status message
     }
 
@@ -122,6 +123,7 @@ final class BitwardenManager {
     let openSSLWrapper = OpenSSLWrapper()
 
     var publicKey: String?
+    var sharedKey: String?
 
     private func generateKeyPair() {
         publicKey = openSSLWrapper.generateKeys()
@@ -143,8 +145,8 @@ extension BitwardenManager: BitwardenCommunicatorDelegate {
             return
         }
 
-        if let sharedKey = message.payload?.sharedKey, let status = message.payload?.status {
-            handleHandshakeResponce(sharedKey: sharedKey, status: status)
+        if let encryptedSharedKey = message.payload?.sharedKey, let status = message.payload?.status {
+            handleHandshakeResponce(encryptedSharedKey: encryptedSharedKey, status: status)
         }
 
         //TODO check id of received message

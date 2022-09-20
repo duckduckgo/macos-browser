@@ -24,6 +24,7 @@ NS_ASSUME_NONNULL_BEGIN
 @interface OpenSSLWrapper : NSObject
 
 - (NSString *)generateKeys;
+- (NSString *)decryptSharedKey:(NSString *)sharedKey;
 
 @end
 
