@@ -40,7 +40,6 @@ final class YoutubePlayerUserScript: NSObject, StaticUserScript {
         let value = enabled ? "true" : "false"
         let js = """
             window.postMessage({ alwaysOpenSetting: \(value) });
-            window.setAlwaysOpenSetting(\(value));
         """
         evaluate(js: js, inWebView: webView)
     }
