@@ -53,7 +53,7 @@ extension FileManager {
         }
 
         let ownerDirectory = destURL.deletingLastPathComponent()
-        let fileNameWithoutExtension = destURL.lastPathComponent.drop(suffix: suffix)
+        let fileNameWithoutExtension = destURL.lastPathComponent.dropping(suffix: suffix)
 
         for copy in 0... {
             let destURL: URL = {

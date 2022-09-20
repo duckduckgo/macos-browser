@@ -90,7 +90,7 @@ enum APIRequest {
                 var etag = httpResponse?.headerValue(for: APIHeaders.Name.etag)
                 
                 // Handle weak etags
-                etag = etag?.drop(prefix: "W/")
+                etag = etag?.dropping(prefix: "W/")
                 completion(Response(data: data, etag: etag, urlResponse: response), nil)
             }
         }
@@ -104,17 +104,10 @@ enum APIRequest {
                               allowedQueryReservedCharacters: CharacterSet? = nil,
                               headers: HTTPHeaders = APIHeaders().defaultHeaders,
                               timeoutInterval: TimeInterval = 60.0) -> URLRequest {
-        let url = (try? parameters?.reduce(url) { partialResult, parameter in
-            try partialResult.addParameter(
-                name: parameter.key,
-                value: parameter.value,
-                allowedReservedCharacters: allowedQueryReservedCharacters
-            )
-        }) ?? url
-        var urlRequest = URLRequest(url: url)
+        let url = url.appendingParameters(parameters ?? [:], allowedReservedCharacters: allowedQueryReservedCharacters)
+        var urlRequest = URLRequest(url: url, timeoutInterval: timeoutInterval)
         urlRequest.allHTTPHeaderFields = headers
         urlRequest.httpMethod = method.rawValue
-        urlRequest.timeoutInterval = timeoutInterval
         return urlRequest
     }
     

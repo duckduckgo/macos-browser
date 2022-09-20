@@ -651,13 +651,21 @@ extension BookmarkManagementDetailViewController: BookmarkMenuItemSelectors {
     }
 
     func toggleBookmarkAsFavorite(_ sender: NSMenuItem) {
-        guard let bookmark = sender.representedObject as? Bookmark else {
+        if let bookmark = sender.representedObject as? Bookmark {
+            bookmark.isFavorite.toggle()
+            LocalBookmarkManager.shared.update(bookmark: bookmark)
+        } else if let bookmarks = sender.representedObject as? [Bookmark] {
+            let bookmarkIdentifiers = bookmarks.map(\.id)
+            bookmarkManager.update(objectsWithUUIDs: bookmarkIdentifiers, update: { entity in
+                (entity as? Bookmark)?.isFavorite.toggle()
+            }, completion: { error in
+                if error != nil {
+                    assertionFailure("Failed to update bookmarks: ")
+                }
+            })
+        } else {
             assertionFailure("Failed to cast menu represented object to Bookmark")
-            return
         }
-
-        bookmark.isFavorite.toggle()
-        LocalBookmarkManager.shared.update(bookmark: bookmark)
     }
 
     func editBookmark(_ sender: NSMenuItem) {

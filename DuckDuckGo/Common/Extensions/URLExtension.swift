@@ -20,6 +20,14 @@ import Foundation
 import os.log
 import BrowserServicesKit
 
+extension URL.NavigationalScheme {
+
+    static var validSchemes: [URL.NavigationalScheme] {
+        return [.http, .https, .file]
+    }
+
+}
+
 extension URL {
 
     // MARK: - Local
@@ -44,18 +52,11 @@ extension URL {
             return nil
         }
 
-        do {
-            var searchUrl = Self.duckDuckGo
-            searchUrl = try searchUrl.addParameter(name: DuckDuckGoParameters.search.rawValue, value: trimmedQuery)
-            return searchUrl
-        } catch let error {
-            os_log("URL extension: %s", type: .error, error.localizedDescription)
-            return nil
-        }
+        return Self.duckDuckGo.appendingParameter(name: DuckDuckGoParameters.search.rawValue, value: trimmedQuery)
     }
 
     static func makeURL(from addressBarString: String) -> URL? {
-        let trimmed = addressBarString.trimmingWhitespaces()
+        let trimmed = addressBarString.trimmingWhitespace()
 
         if let addressBarUrl = URL(trimmedAddressBarString: trimmed), addressBarUrl.isValid {
             return addressBarUrl
@@ -67,105 +68,6 @@ extension URL {
 
         os_log("URL extension: Making URL from %s failed", type: .error, addressBarString)
         return nil
-    }
-
-    /// URL and URLComponents can't cope with emojis and international characters so this routine does some manual processing while trying to
-    /// retain the input as much as possible.
-    init?(trimmedAddressBarString: String) {
-        var s = trimmedAddressBarString
-
-        // Creates URL even if user enters one slash "/" instead of two slashes "//" after the hypertext scheme component
-        if let scheme = NavigationalScheme.hypertextSchemes.first(where: { s.hasPrefix($0.rawValue + ":/") }),
-           !s.hasPrefix(scheme.separated()) {
-            s = scheme.separated() + s.dropFirst(scheme.separated().count - 1)
-        }
-
-        if let url = URL(string: s) {
-            // if URL has domain:port or user:password@domain mistakengly interpreted as a scheme
-            if let urlWithScheme = URL(string: NavigationalScheme.http.separated() + s),
-               urlWithScheme.port != nil || urlWithScheme.user != nil {
-                // could be a local domain but user needs to use the protocol to specify that
-                // make exception for "localhost"
-                guard urlWithScheme.host?.contains(".") == true || urlWithScheme.host == .localhost else { return nil }
-                self = urlWithScheme
-                return
-
-            } else if url.scheme != nil {
-                self = url
-                return
-
-            } else if let hostname = s.split(separator: "/").first {
-                guard hostname.contains(".") || String(hostname) == .localhost else {
-                    // could be a local domain but user needs to use the protocol to specify that
-                    return nil
-                }
-            } else {
-                return nil
-            }
-
-            s = NavigationalScheme.http.separated() + s
-        }
-
-        self.init(punycodeEncodedString: s)
-    }
-
-    private init?(punycodeEncodedString: String) {
-        var s = punycodeEncodedString
-        let scheme: String
-
-        if s.hasPrefix(URL.NavigationalScheme.http.separated()) {
-            scheme = URL.NavigationalScheme.http.separated()
-        } else if s.hasPrefix(URL.NavigationalScheme.https.separated()) {
-            scheme = URL.NavigationalScheme.https.separated()
-        } else if !s.contains(".") {
-            return nil
-        } else {
-            scheme = URL.NavigationalScheme.http.separated()
-            s = scheme + s
-        }
-
-        let urlAndQuery = s.split(separator: "?")
-        guard !urlAndQuery.isEmpty, !urlAndQuery[0].contains(" ") else {
-            return nil
-        }
-
-        var query = ""
-        if urlAndQuery.count > 1 {
-            // replace spaces with %20 in query values
-            do {
-                struct Throwable: Error {}
-                query = try "?" + urlAndQuery[1].components(separatedBy: "&").map { component in
-                    try component.components(separatedBy: "=").enumerated().map { (idx, component) -> String in
-                        if idx == 0 { // name
-                            // don't allow spaces in query names
-                            guard !component.contains(" ") else { throw Throwable() }
-                            return component
-                        } else { // value
-                            return component.replacingOccurrences(of: " ", with: "%20")
-                        }
-                    }.joined(separator: "=")
-                }.joined(separator: "&")
-            } catch {
-                return nil
-            }
-        }
-
-        let componentsWithoutQuery = urlAndQuery[0].split(separator: "/").dropFirst().map(String.init)
-        guard !componentsWithoutQuery.isEmpty else {
-            return nil
-        }
-
-        let host = componentsWithoutQuery[0].punycodeEncodedHostname
-
-        let encodedPath = componentsWithoutQuery
-            .dropFirst()
-            .map { $0.addingPercentEncoding(withAllowedCharacters: NSCharacterSet.urlPathAllowed) ?? $0 }
-            .joined(separator: "/")
-
-        let hostPathSeparator = !encodedPath.isEmpty || urlAndQuery[0].hasSuffix("/") ? "/" : ""
-        let url = scheme + host + hostPathSeparator + encodedPath + query
-
-        self.init(string: url)
     }
 
     static func makeURL(fromSuggestionPhrase phrase: String) -> URL? {
@@ -222,47 +124,29 @@ extension URL {
         return URL(string: Self.atb)!
     }
 
-    static func searchAtb(atbWithVariant: String, setAtb: String) -> URL? {
-        return try? Self.initialAtb
-            .addParameter(name: DuckDuckGoParameters.ATB.atb, value: atbWithVariant)
-            .addParameter(name: DuckDuckGoParameters.ATB.setAtb, value: setAtb)
+    static func searchAtb(atbWithVariant: String, setAtb: String) -> URL {
+        return Self.initialAtb
+            .appendingParameters([
+                DuckDuckGoParameters.ATB.atb: atbWithVariant,
+                DuckDuckGoParameters.ATB.setAtb: setAtb
+            ])
     }
 
-    static func appRetentionAtb(atbWithVariant: String, setAtb: String) -> URL? {
-        return try? Self.initialAtb
-            .addParameter(name: DuckDuckGoParameters.ATB.activityType, value: DuckDuckGoParameters.ATB.appUsageValue)
-            .addParameter(name: DuckDuckGoParameters.ATB.atb, value: atbWithVariant)
-            .addParameter(name: DuckDuckGoParameters.ATB.setAtb, value: setAtb)
+    static func appRetentionAtb(atbWithVariant: String, setAtb: String) -> URL {
+        return Self.initialAtb
+            .appendingParameters([
+                DuckDuckGoParameters.ATB.activityType: DuckDuckGoParameters.ATB.appUsageValue,
+                DuckDuckGoParameters.ATB.atb: atbWithVariant,
+                DuckDuckGoParameters.ATB.setAtb: setAtb
+            ])
     }
 
-    static func exti(forAtb atb: String) -> URL? {
+    static func exti(forAtb atb: String) -> URL {
         let extiUrl = URL(string: Self.exti)!
-        return try? extiUrl.addParameter(name: DuckDuckGoParameters.ATB.atb, value: atb)
+        return extiUrl.appendingParameter(name: DuckDuckGoParameters.ATB.atb, value: atb)
     }
 
     // MARK: - Components
-
-    struct NavigationalScheme: RawRepresentable, Hashable {
-        let rawValue: String
-
-        static let separator = "://"
-
-        static let http = NavigationalScheme(rawValue: "http")
-        static let https = NavigationalScheme(rawValue: "https")
-        static let file = NavigationalScheme(rawValue: "ftp")
-
-        func separated() -> String {
-            self.rawValue + Self.separator
-        }
-
-        static var hypertextSchemes: [NavigationalScheme] {
-            return [.http, .https]
-        }
-
-        static var validSchemes: [NavigationalScheme] {
-            return [.http, .https, .file]
-        }
-    }
 
     enum HostPrefix: String {
         case www
@@ -295,7 +179,7 @@ extension URL {
                  (.none, _):
                 break
             case (.some(false), true):
-                host = host.drop(prefix: HostPrefix.www.separated())
+                host = host.dropping(prefix: HostPrefix.www.separated())
             case (.some(true), false):
                 host = HostPrefix.www.separated() + host
             }
@@ -312,7 +196,7 @@ extension URL {
            let schemeRange = components.rangeOfScheme {
             string.replaceSubrange(schemeRange, with: "")
             if string.hasPrefix(URL.NavigationalScheme.separator) {
-                string = string.drop(prefix: URL.NavigationalScheme.separator)
+                string = string.dropping(prefix: URL.NavigationalScheme.separator)
             }
         }
 
@@ -326,12 +210,12 @@ extension URL {
 
     func toString(forUserInput input: String, decodePunycode: Bool = true) -> String {
         let hasInputScheme = input.hasOrIsPrefix(of: self.separatedScheme ?? "")
-        let hasInputWww = input.drop(prefix: self.separatedScheme ?? "").hasOrIsPrefix(of: URL.HostPrefix.www.rawValue)
+        let hasInputWww = input.dropping(prefix: self.separatedScheme ?? "").hasOrIsPrefix(of: URL.HostPrefix.www.rawValue)
         let hasInputHost = (decodePunycode ? host?.idnaDecoded : host)?.hasOrIsPrefix(of: input) ?? false
 
         return self.toString(decodePunycode: decodePunycode,
                              dropScheme: input.isEmpty || !(hasInputScheme && !hasInputHost),
-                             needsWWW: !input.drop(prefix: self.separatedScheme ?? "").isEmpty
+                             needsWWW: !input.dropping(prefix: self.separatedScheme ?? "").isEmpty
                                 && hasInputWww
                                 && !hasInputHost,
                              dropTrailingSlash: !input.hasSuffix("/"))
@@ -347,7 +231,7 @@ extension URL {
 
             filename = url.lastPathComponent
         } else {
-            filename = url.host?.dropWWW().replacingOccurrences(of: ".", with: "_") ?? ""
+            filename = url.host?.droppingWwwPrefix().replacingOccurrences(of: ".", with: "_") ?? ""
         }
         guard !filename.isEmpty else { return nil }
 
@@ -360,18 +244,6 @@ extension URL {
     }
 
     // MARK: - Validity
-
-    var isValid: Bool {
-        guard let scheme = scheme.map(NavigationalScheme.init) else { return false }
-
-        if NavigationalScheme.hypertextSchemes.contains(scheme) {
-           return host?.isValidHost == true && user == nil
-        }
-
-        // This effectively allows file:// and External App Scheme URLs to be entered by user
-        // Without this check single word entries get treated like domains
-        return true
-    }
 
     var isDataURL: Bool {
         return scheme == "data"
@@ -412,15 +284,13 @@ extension URL {
         absoluteString.starts(with: Self.duckDuckGo.absoluteString)
     }
 
-    // swiftlint:disable unused_optional_binding
     var isDuckDuckGoSearch: Bool {
-        if isDuckDuckGo, path.isEmpty || path == "/", let _ = try? getParameter(name: DuckDuckGoParameters.search.rawValue) {
+        if isDuckDuckGo, path.isEmpty || path == "/", getParameter(named: DuckDuckGoParameters.search.rawValue) != nil {
             return true
         }
 
         return false
     }
-    // swiftlint:enable unused_optional_binding
 
     enum DuckDuckGoParameters: String {
         case search = "q"
@@ -440,7 +310,7 @@ extension URL {
 
     var searchQuery: String? {
         guard isDuckDuckGoSearch else { return nil }
-        return try? getParameter(name: DuckDuckGoParameters.search.rawValue)
+        return getParameter(named: DuckDuckGoParameters.search.rawValue)
     }
 
     // MARK: - Punycode

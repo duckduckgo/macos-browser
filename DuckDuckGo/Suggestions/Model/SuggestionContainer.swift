@@ -97,15 +97,7 @@ extension SuggestionContainer: SuggestionLoadingDataSource {
                            suggestionDataFromUrl url: URL,
                            withParameters parameters: [String: String],
                            completion: @escaping (Data?, Error?) -> Void) {
-        var url = url
-        parameters.forEach {
-            if let newUrl = try? url.addParameter(name: $0.key, value: $0.value) {
-                url = newUrl
-            } else {
-                assertionFailure("SuggestionContainer: Failed to add parameter")
-            }
-        }
-        
+        let url = url.appendingParameters(parameters)
         var request = URLRequest.defaultRequest(with: url)
         request.timeoutInterval = 1
 

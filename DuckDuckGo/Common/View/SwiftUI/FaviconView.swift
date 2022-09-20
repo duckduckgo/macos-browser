@@ -57,8 +57,8 @@ struct FaviconView: View {
 
                 ZStack {
                     Rectangle()
-                        .foregroundColor(Color.forDomain(domain.dropWWW()))
-                    Text(String(domain.dropWWW().capitalized.first ?? "?"))
+                        .foregroundColor(Color.forDomain(domain.droppingWwwPrefix()))
+                    Text(String(domain.droppingWwwPrefix().capitalized.first ?? "?"))
                         .font(.title)
                         .foregroundColor(Color.white)
                 }

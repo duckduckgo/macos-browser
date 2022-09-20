@@ -257,9 +257,9 @@ extension AutoconsentUserScript {
         let script = """
         (() => {
         try {
-            return !!(\(messageData.code))
+            return !!(\(messageData.code));
         } catch (e) {
-          // ignore CSP errors
+          // ignore any errors
           return;
         }
         })();

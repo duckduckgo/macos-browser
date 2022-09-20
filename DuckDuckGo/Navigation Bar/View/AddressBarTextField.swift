@@ -264,13 +264,13 @@ final class AddressBarTextField: NSTextField {
         if url.isDuckDuckGoSearch,
            let oldURL = selectedTabViewModel.tab.content.url,
             oldURL.isDuckDuckGoSearch {
-            if let ia = try? oldURL.getParameter(name: URL.DuckDuckGoParameters.ia.rawValue),
-               let newURL = try? url.addParameter(name: URL.DuckDuckGoParameters.ia.rawValue, value: ia) {
-                url = newURL
+            if let ia = oldURL.getParameter(named: URL.DuckDuckGoParameters.ia.rawValue) {
+                url = url.removingParameters(named: [URL.DuckDuckGoParameters.ia.rawValue])
+                    .appendingParameter(name: URL.DuckDuckGoParameters.ia.rawValue, value: ia)
             }
-            if let iax = try? oldURL.getParameter(name: URL.DuckDuckGoParameters.iax.rawValue),
-               let newURL = try? url.addParameter(name: URL.DuckDuckGoParameters.iax.rawValue, value: iax) {
-                url = newURL
+            if let iax = oldURL.getParameter(named: URL.DuckDuckGoParameters.iax.rawValue) {
+                url = url.removingParameters(named: [URL.DuckDuckGoParameters.iax.rawValue])
+                    .appendingParameter(name: URL.DuckDuckGoParameters.iax.rawValue, value: iax)
             }
         }
 
@@ -531,7 +531,7 @@ final class AddressBarTextField: NSTextField {
 
     private var stringValueWithoutSuffix: String {
         if let suffix = suffix {
-            return stringValue.drop(suffix: suffix.string)
+            return stringValue.dropping(suffix: suffix.string)
         } else {
             return stringValue
         }
@@ -670,7 +670,7 @@ final class AddressBarTextField: NSTextField {
 
     @objc private func pasteAndGo(_ menuItem: NSMenuItem) {
         guard let pasteboardString = NSPasteboard.general.string(forType: .string),
-              let url = URL(trimmedAddressBarString: pasteboardString.trimmingWhitespaces()) else {
+              let url = URL(trimmedAddressBarString: pasteboardString.trimmingWhitespace()) else {
                   assertionFailure("Pasteboard doesn't contain URL")
                   return
               }
@@ -977,7 +977,7 @@ extension AddressBarTextField: NSTextViewDelegate {
     }
 
     private func makePasteAndDoMenuItem() -> NSMenuItem? {
-        if let trimmedPasteboardString = NSPasteboard.general.string(forType: .string)?.trimmingWhitespaces(),
+        if let trimmedPasteboardString = NSPasteboard.general.string(forType: .string)?.trimmingWhitespace(),
            trimmedPasteboardString.count > 0 {
             if URL(trimmedAddressBarString: trimmedPasteboardString) != nil {
                 return Self.pasteAndGoMenuItem

@@ -122,6 +122,7 @@ public final class ContentOverlayViewController: NSViewController, EmailManagerR
         }
 
         let webView = OverlayWebView(frame: .zero, configuration: configuration)
+        webView.allowsLinkPreview = false
         webView.window?.acceptsMouseMovedEvents = true
         webView.window?.ignoresMouseEvents = false
         webView.configuration.userContentController.addHandler(topAutofillUserScript)
@@ -146,13 +147,7 @@ public final class ContentOverlayViewController: NSViewController, EmailManagerR
                              completion: @escaping (Data?, Error?) -> Void) {
         let currentQueue = OperationQueue.current
 
-        let finalURL: URL
-
-        if let parameters = parameters {
-            finalURL = (try? url.addParameters(parameters)) ?? url
-        } else {
-            finalURL = url
-        }
+        let finalURL = url.appendingParameters(parameters ?? [:])
 
         var request = URLRequest(url: finalURL, timeoutInterval: timeoutInterval)
         request.allHTTPHeaderFields = headers

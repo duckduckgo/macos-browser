@@ -182,6 +182,11 @@ final class BookmarkTableCellView: NSTableCellView, NibLoadable {
         self.entity = bookmark
 
         faviconImageView.image = bookmark.favicon(.small) ?? NSImage(named: "BookmarkDefaultFavicon")
+        
+        if bookmark.isFavorite {
+            accessoryImageView.isHidden = false
+        }
+        
         accessoryImageView.image = bookmark.isFavorite ? Self.favoriteAccessoryViewImage : nil
         favoriteButton.image = bookmark.isFavorite ? Self.favoriteFilledAccessoryViewImage : Self.favoriteAccessoryViewImage
         primaryTitleLabelValue = bookmark.title

@@ -202,7 +202,7 @@ final class LocalBookmarkStore: BookmarkStore {
                 try self.context.save()
             } catch {
                 assertionFailure("LocalBookmarkStore: Saving of context failed")
-                DispatchQueue.main.async { completion(false, error) }
+                DispatchQueue.main.async { completion(true, error) }
                 return
             }
 
@@ -232,7 +232,7 @@ final class LocalBookmarkStore: BookmarkStore {
                 try self.context.save()
             } catch {
                 assertionFailure("LocalBookmarkStore: Saving of context failed")
-                DispatchQueue.main.async { completion(false, error) }
+                DispatchQueue.main.async { completion(true, error) }
             }
 
             DispatchQueue.main.async { completion(true, nil) }
@@ -405,7 +405,7 @@ final class LocalBookmarkStore: BookmarkStore {
                     assertionFailure("LocalBookmarkStore: Saving of context failed")
                 }
 
-                DispatchQueue.main.async { completion(false, error) }
+                DispatchQueue.main.async { completion(true, error) }
                 return
             }
 

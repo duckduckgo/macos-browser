@@ -64,11 +64,10 @@ final class RecentlyVisitedModel: ObservableObject {
             .forEach {
 
             numberOfTrackersBlocked += $0.numberOfTrackersBlocked
-            guard let host = $0.url.host?.dropWWW() else { return }
+            guard let host = $0.url.host?.droppingWwwPrefix() else { return }
 
             var site = sitesByDomain[host]
-            if site == nil {
-                let newSite = RecentlyVisitedSiteModel(domain: host)
+            if site == nil, let newSite = RecentlyVisitedSiteModel(originalURL: $0.url) {
                 sitesByDomain[host] = newSite
                 recentSites.append(newSite)
                 site = newSite
@@ -100,13 +99,13 @@ final class RecentlyVisitedModel: ObservableObject {
             bookmarkManager.update(bookmark: bookmark)
             site.isFavorite = bookmark.isFavorite
         } else {
-            bookmarkManager.makeBookmark(for: url, title: site.domain.dropWWW(), isFavorite: true)
+            bookmarkManager.makeBookmark(for: url, title: site.domain.droppingWwwPrefix(), isFavorite: true)
             site.isFavorite = true
         }
     }
 
     func open(_ site: RecentlyVisitedSiteModel) {
-        guard let url = site.domain.url else { return }
+        guard let url = site.url else { return }
         self.open(url)
     }
 
@@ -147,8 +146,15 @@ final class RecentlyVisitedSiteModel: ObservableObject {
     let maxPageListSize = 10
 
     let domain: String
+    
+    var url: URL? {
+        return baseURL ?? domain.url
+    }
+    
+    private let baseURL: URL?
 
     @Published var isFavorite: Bool
+    @Published var isFireproof: Bool
     @Published var blockedEntities = [String]()
     @Published var pages = [RecentlyVisitedPageModel]()
     @Published var numberOfTrackersBlocked = 0
@@ -158,13 +164,27 @@ final class RecentlyVisitedSiteModel: ObservableObject {
     @Published var isBurning = false
     @Published var isHidden = false
 
-    init(domain: String, bookmarkManager: BookmarkManager = LocalBookmarkManager.shared) {
+    init?(originalURL: URL,
+          bookmarkManager: BookmarkManager = LocalBookmarkManager.shared,
+          fireproofDomains: FireproofDomains = FireproofDomains.shared) {
+        guard let domain = originalURL.host?.droppingWwwPrefix() else {
+            return nil
+        }
+        
         self.domain = domain
+        
+        var components = URLComponents()
+        components.scheme = originalURL.scheme
+        components.host = originalURL.host
+        self.baseURL = components.url
+
         if let url = domain.url {
             isFavorite = bookmarkManager.isUrlFavorited(url: url)
         } else {
             isFavorite = false
         }
+
+        isFireproof = fireproofDomains.isFireproof(fireproofDomain: domain)
     }
 
     func addBlockedEntities(_ entities: Set<String>) {
@@ -204,9 +224,9 @@ final class RecentlyVisitedSiteModel: ObservableObject {
             } else if !showTitlesForPagesSetting {
 
                 $0.displayTitle = $0.url.absoluteString
-                    .drop(prefix: "https://")
-                    .drop(prefix: "http://")
-                    .drop(prefix: $0.url.host ?? "")
+                    .dropping(prefix: "https://")
+                    .dropping(prefix: "http://")
+                    .dropping(prefix: $0.url.host ?? "")
 
             } else if $0.actualTitle?.isEmpty ?? true { // Blank titles
 

@@ -21,14 +21,16 @@ import BrowserServicesKit
 
 final class FirePopoverViewModel {
 
-    enum ClearingOption: CaseIterable {
+    enum ClearingOption: Int, CaseIterable {
 
+        case currentSite
         case currentTab
         case currentWindow
         case allData
 
         var string: String {
             switch self {
+            case .currentSite: return UserText.currentSite
             case .currentTab: return UserText.currentTab
             case .currentWindow: return UserText.currentWindow
             case .allData: return UserText.allData
@@ -48,6 +50,7 @@ final class FirePopoverViewModel {
          fireproofDomains: FireproofDomains,
          faviconManagement: FaviconManagement,
          initialClearingOption: ClearingOption = .allData) {
+
         self.fireViewModel = fireViewModel
         self.tabCollectionViewModel = tabCollectionViewModel
         self.historyCoordinating = historyCoordinating
@@ -55,6 +58,7 @@ final class FirePopoverViewModel {
         self.faviconManagement = faviconManagement
         self.clearingOption = initialClearingOption
 
+        updateAvailableClearingOptions()
         updateItems(for: initialClearingOption)
     }
 
@@ -72,6 +76,8 @@ final class FirePopoverViewModel {
     private let fireproofDomains: FireproofDomains
     private let faviconManagement: FaviconManagement
 
+    private(set) var availableClearingOptions = ClearingOption.allCases
+    private(set) var hasOnlySingleFireproofDomain: Bool = false
     @Published private(set) var selectable: [Item] = []
     @Published private(set) var fireproofed: [Item] = []
     @Published private(set) var selected: Set<Int> = Set() {
@@ -85,11 +91,35 @@ final class FirePopoverViewModel {
 
     // MARK: - Options
 
+    private func updateAvailableClearingOptions() {
+        guard let viewModel = tabCollectionViewModel else {
+            assertionFailure("FirePopoverViewModel: TabCollectionViewModel is not present")
+            return
+        }
+
+        var options: [ClearingOption] = []
+
+        let urlTabsCount = viewModel.tabCollection.tabs.filter(\.content.isUrl).count + (viewModel.pinnedTabsCollection?.tabs.count ?? 0)
+
+        if urlTabsCount == 1, let currentTab = viewModel.selectedTabViewModel?.tab, currentTab.localHistory.count == 1 {
+            options.append(.currentSite)
+        } else {
+            options.append(.currentTab)
+            if urlTabsCount > 1 {
+                options.append(.currentWindow)
+            }
+        }
+
+        options.append(.allData)
+
+        availableClearingOptions = options
+    }
+
     private func updateItems(for clearingOption: ClearingOption) {
 
         func visitedDomains(basedOn clearingOption: ClearingOption) -> Set<String> {
             switch clearingOption {
-            case .currentTab:
+            case .currentTab, .currentSite:
                 guard let tab = tabCollectionViewModel?.selectedTabViewModel?.tab else {
                     assertionFailure("No tab selected")
                     return Set<String>()
@@ -115,6 +145,12 @@ final class FirePopoverViewModel {
             }
         let selectable = visitedDomains
             .subtracting(fireproofed)
+
+        if visitedDomains.count == 1, let domain = visitedDomains.first, fireproofed.contains(domain) {
+            self.hasOnlySingleFireproofDomain = true
+        } else {
+            self.hasOnlySingleFireproofDomain = false
+        }
 
         self.selectable = selectable
             .map { Item(domain: $0, favicon: faviconManagement.getCachedFavicon(for: $0, sizeCategory: .small)?.image) }

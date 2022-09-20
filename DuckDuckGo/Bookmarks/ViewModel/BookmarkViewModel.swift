@@ -45,7 +45,8 @@ struct BookmarkViewModel {
         if let bookmark = entity as? Bookmark {
             let favicon = bookmark.favicon(.small)?.copy() as? NSImage
             favicon?.size = NSSize.faviconSize
-            return favicon
+            
+            return favicon ?? NSImage(named: "BookmarkDefaultFavicon")
         } else if entity is BookmarkFolder {
             return NSImage(named: "Folder")
         } else {
@@ -80,7 +81,7 @@ struct BookmarkViewModel {
             preconditionFailure("\(#file): Attempted to provide representing character for non-Bookmark")
         }
 
-        return bookmark.url.host?.dropWWW().first?.uppercased() ?? "-"
+        return bookmark.url.host?.droppingWwwPrefix().first?.uppercased() ?? "-"
     }
 
 }

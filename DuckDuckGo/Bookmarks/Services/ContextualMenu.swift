@@ -128,6 +128,18 @@ struct ContextualMenu {
 
         return menuItem(title, #selector(BookmarkMenuItemSelectors.toggleBookmarkAsFavorite(_:)), bookmark)
     }
+    
+    static func addBookmarksToFavoritesMenuItem(bookmarks: [Bookmark], allFavorites: Bool) -> NSMenuItem {
+        let title: String
+
+        if allFavorites {
+            title = UserText.removeFromFavorites
+        } else {
+            title = UserText.addToFavorites
+        }
+
+        return menuItem(title, #selector(BookmarkMenuItemSelectors.toggleBookmarkAsFavorite(_:)), bookmarks)
+    }
 
     static func editBookmarkMenuItem(bookmark: Bookmark) -> NSMenuItem {
         let title = NSLocalizedString("Edit…", comment: "Command")
@@ -157,8 +169,19 @@ struct ContextualMenu {
         var menuItems: [NSMenuItem] = []
         
         let bookmarks = entities.compactMap({ $0 as? Bookmark })
+
         if !bookmarks.isEmpty {
             menuItems.append(openBookmarksInNewTabsMenuItem(bookmarks: bookmarks))
+            
+            // If all selected items are bookmarks and they all have the same favourite status, show a menu item to add/remove them all as favourites.
+            if bookmarks.count == entities.count {
+                if bookmarks.allSatisfy({ $0.isFavorite }) {
+                    menuItems.append(addBookmarksToFavoritesMenuItem(bookmarks: bookmarks, allFavorites: true))
+                } else if bookmarks.allSatisfy({ !$0.isFavorite }) {
+                    menuItems.append(addBookmarksToFavoritesMenuItem(bookmarks: bookmarks, allFavorites: false))
+                }
+            }
+            
             menuItems.append(NSMenuItem.separator())
         }
 

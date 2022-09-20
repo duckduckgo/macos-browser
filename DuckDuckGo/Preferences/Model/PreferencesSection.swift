@@ -54,7 +54,7 @@ enum PreferencePaneIdentifier: String, Equatable, Hashable, Identifiable {
 
     init?(url: URL) {
         // manually extract path because URLs such as "about:preferences" can't figure out their host or path
-        let path = url.absoluteString.drop(prefix: URL.preferences.absoluteString + "/")
+        let path = url.absoluteString.dropping(prefix: URL.preferences.absoluteString + "/")
         self.init(rawValue: path)
     }
 
