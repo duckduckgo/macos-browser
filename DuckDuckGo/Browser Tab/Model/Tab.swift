@@ -711,7 +711,7 @@ final class Tab: NSObject, Identifiable, ObservableObject {
     
     private weak var youtubeOverlayScript: YoutubeOverlayUserScript?
     private weak var youtubePlayerScript: YoutubePlayerUserScript?
-    fileprivate var youtubePlayerCancellable: AnyCancellable?
+    private var youtubePlayerCancellables: Set<AnyCancellable> = []
 
     func setUpYoutubeScriptsIfNeeded() {
         if url?.host?.droppingWwwPrefix() == "youtube.com" {
@@ -721,7 +721,7 @@ final class Tab: NSObject, Identifiable, ObservableObject {
         }
 
         if url?.isPrivatePlayer == true {
-            youtubePlayerCancellable = PrivacySecurityPreferences.shared.$privateYoutubePlayerEnabled
+            PrivacySecurityPreferences.shared.$privateYoutubePlayerEnabled
                 .sink { [weak self] value in
                     guard let self = self else {
                         return
@@ -729,8 +729,17 @@ final class Tab: NSObject, Identifiable, ObservableObject {
                     let isEnabled = value == true
                     self.youtubePlayerScript?.setAlwaysOpenInPrivatePlayer(isEnabled, inWebView: self.webView)
                 }
+                .store(in: &youtubePlayerCancellables)
+            PrivacySecurityPreferences.shared.$privateYoutubePlayerShowsDetails
+                .sink { [weak self] isEnabled in
+                    guard let self = self else {
+                        return
+                    }
+                    self.youtubePlayerScript?.setShowsDetails(isEnabled, inWebView: self.webView)
+                }
+                .store(in: &youtubePlayerCancellables)
         } else {
-            youtubePlayerCancellable = nil
+            youtubePlayerCancellables.removeAll()
         }
     }
     

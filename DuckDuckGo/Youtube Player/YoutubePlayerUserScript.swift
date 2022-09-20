@@ -43,6 +43,12 @@ final class YoutubePlayerUserScript: NSObject, StaticUserScript {
         evaluate(js: js, inWebView: webView)
     }
 
+    func setShowsDetails(_ enabled: Bool, inWebView webView: WKWebView) {
+        let value = enabled ? "true" : "false"
+        let js = "window.postMessage({ toggleSectionExpanded: \(value) })"
+        evaluate(js: js, inWebView: webView)
+    }
+
     func userContentController(_ userContentController: WKUserContentController, didReceive message: WKScriptMessage) {
         
         guard let messageType = MessageNames(rawValue: message.name) else {
@@ -65,6 +71,7 @@ final class YoutubePlayerUserScript: NSObject, StaticUserScript {
         }
         
         print("Toggle section expanded \(isExpanded)")
+        PrivacySecurityPreferences.shared.privateYoutubePlayerShowsDetails = isExpanded
     }
     
     private func handleAlwaysOpenSettings(message: WKScriptMessage) {
