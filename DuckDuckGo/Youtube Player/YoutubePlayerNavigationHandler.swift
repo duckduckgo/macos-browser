@@ -58,6 +58,18 @@ struct YoutubePlayerNavigationHandler {
 }
 
 extension URL {
+    static func privatePlayer(_ videoID: String) -> URL {
+        "\(PrivatePlayerSchemeHandler.scheme):\(videoID)".url!
+    }
+
+    static func youtubeNoCookie(_ videoID: String) -> URL {
+        "https://\(YoutubePlayerNavigationHandler.privatePlayerHost)/embed/\(videoID)?wmode=transparent&iv_load_policy=3&autoplay=1&html5=1&showinfo=0&rel=0&modestbranding=1&playsinline=0#\(YoutubePlayerNavigationHandler.privatePlayerFragment)".url!
+    }
+
+    static func youtube(_ videoID: String) -> URL {
+        "https://www.youtube.com/watch?v=\(videoID)".url!
+    }
+
     var isPrivatePlayerScheme: Bool {
         scheme == PrivatePlayerSchemeHandler.scheme
     }
@@ -66,11 +78,20 @@ extension URL {
         host == YoutubePlayerNavigationHandler.privatePlayerHost && fragment == YoutubePlayerNavigationHandler.privatePlayerFragment
     }
 
+    var isYoutubeVideo: Bool {
+        host?.droppingWwwPrefix() == "youtube.com" && path == "/watch"
+    }
+
     var youtubeVideoID: String? {
-        guard let components = URLComponents.init(url: self, resolvingAgainstBaseURL: false),
-              components.host?.droppingWwwPrefix() == "youtube.com",
-              components.path == "/watch"
-        else {
+        if isPrivatePlayerScheme {
+            return absoluteString.split(separator: ":").last.flatMap(String.init)
+        }
+
+        if isPrivatePlayer {
+            return lastPathComponent
+        }
+
+        guard isYoutubeVideo, let components = URLComponents.init(url: self, resolvingAgainstBaseURL: false) else {
             return nil
         }
         return components.queryItems?.first(where: { $0.name == "v" })?.value

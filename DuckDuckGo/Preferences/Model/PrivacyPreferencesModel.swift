@@ -17,6 +17,7 @@
 //
 
 import Foundation
+import Combine
 
 final class PrivacyPreferencesModel: ObservableObject {
 
@@ -96,7 +97,19 @@ final class PrivacyPreferencesModel: ObservableObject {
         privatePlayerMode = .init(privacySecurityPreferences.privateYoutubePlayerEnabled)
         isGPCEnabled = privacySecurityPreferences.gpcEnabled
         isAutoconsentEnabled = privacySecurityPreferences.autoconsentEnabled ?? false
+
+        privacySecurityPreferences.$privateYoutubePlayerEnabled
+            .map(PrivatePlayerMode.init)
+            .removeDuplicates()
+            .assign(to: \.privatePlayerMode, onWeaklyHeld: self)
+            .store(in: &cancellables)
+
+        privacySecurityPreferences.$gpcEnabled
+            .removeDuplicates()
+            .assign(to: \.isGPCEnabled, onWeaklyHeld: self)
+            .store(in: &cancellables)
     }
 
     private let privacySecurityPreferences: PrivacySecurityPreferences
+    private var cancellables: Set<AnyCancellable> = []
 }
