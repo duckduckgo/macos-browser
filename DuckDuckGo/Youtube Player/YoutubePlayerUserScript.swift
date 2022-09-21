@@ -38,9 +38,7 @@ final class YoutubePlayerUserScript: NSObject, StaticUserScript {
 
     func setAlwaysOpenInPrivatePlayer(_ enabled: Bool, inWebView webView: WKWebView) {
         let value = enabled ? "true" : "false"
-        let js = """
-            window.postMessage({ alwaysOpenSetting: \(value) });
-        """
+        let js = "window.postMessage({ alwaysOpenSetting: \(value) });"
         evaluate(js: js, inWebView: webView)
     }
 

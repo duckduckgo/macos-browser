@@ -48,6 +48,7 @@ final class Tab: NSObject, Identifiable, ObservableObject {
     enum TabContent: Equatable {
         case homePage
         case url(URL)
+        case privatePlayer(videoID: String)
         case preferences(pane: PreferencePaneIdentifier?)
         case bookmarks
         case onboarding
@@ -62,6 +63,8 @@ final class Tab: NSObject, Identifiable, ObservableObject {
                 return .anyPreferencePane
             } else if let preferencePane = url.flatMap(PreferencePaneIdentifier.init(url:)) {
                 return .preferences(pane: preferencePane)
+            } else if url?.isPrivatePlayerScheme == true || url?.isPrivatePlayer == true, let videoID = url?.youtubeVideoID {
+                return .privatePlayer(videoID: videoID)
             } else {
                 return .url(url ?? .blankPage)
             }
@@ -105,7 +108,7 @@ final class Tab: NSObject, Identifiable, ObservableObject {
 
         var title: String? {
             switch self {
-            case .url, .homePage, .none: return nil
+            case .url, .homePage, .privatePlayer, .none: return nil
             case .preferences: return UserText.tabPreferencesTitle
             case .bookmarks: return UserText.tabBookmarksTitle
             case .onboarding: return UserText.tabOnboardingTitle
@@ -113,14 +116,29 @@ final class Tab: NSObject, Identifiable, ObservableObject {
         }
 
         var url: URL? {
-            guard case .url(let url) = self else { return nil }
-            return url
+            switch self {
+            case .url(let url):
+                return url
+            case .privatePlayer(let videoID):
+                return .privatePlayer(videoID)
+            default:
+                return nil
+            }
         }
 
         var isUrl: Bool {
             if case .url = self {
                 return true
             } else {
+                return false
+            }
+        }
+
+        var isPrivatePlayer: Bool {
+            switch self {
+            case .privatePlayer:
+                return true
+            default:
                 return false
             }
         }
@@ -371,7 +389,13 @@ final class Tab: NSObject, Identifiable, ObservableObject {
         case committed
         case finished
     }
-    private var mainFrameLoadState: FrameLoadState = .finished
+    private var mainFrameLoadState: FrameLoadState = .finished {
+        didSet {
+            if mainFrameLoadState == .finished {
+                setUpYoutubeScriptsIfNeeded()
+            }
+        }
+    }
     private var clientRedirectedDuringNavigationURL: URL?
     private var externalSchemeOpenedPerPageLoad = false
 
@@ -426,8 +450,9 @@ final class Tab: NSObject, Identifiable, ObservableObject {
             return
         }
 
-        if webView.url == nil,
-           let url = self.content.url {
+        if webView.url == nil, let url = content.url {
+            webView.load(url)
+        } else if case .privatePlayer = content, let url = content.url {
             webView.load(url)
         } else {
             webView.reload()
@@ -478,7 +503,7 @@ final class Tab: NSObject, Identifiable, ObservableObject {
 
     @MainActor
     private func reloadIfNeeded(shouldLoadInBackground: Bool = false) async {
-        guard content.isUrl else {
+        guard content.url != nil else {
             return
         }
 
@@ -500,8 +525,12 @@ final class Tab: NSObject, Identifiable, ObservableObject {
             } else {
                 didRestore = restoreSessionStateDataIfNeeded()
             }
-            
-            if !didRestore {
+
+            if content.isPrivatePlayer {
+                let url = contentURL
+                webView.goBack()
+                webView.load(url)
+            } else if !didRestore {
                 if url.isFileURL {
                     webView.loadFileURL(url, allowingReadAccessTo: URL(fileURLWithPath: "/"))
                 } else {
@@ -516,6 +545,8 @@ final class Tab: NSObject, Identifiable, ObservableObject {
         switch content {
         case .url(let value):
             return value
+        case .privatePlayer(let videoID):
+            return .privatePlayer(videoID)
         case .homePage:
             return .homePage
         default:
@@ -532,6 +563,10 @@ final class Tab: NSObject, Identifiable, ObservableObject {
               webView.url != url,
               webView.url != content.url
         else { return false }
+
+        if case .privatePlayer(let videoID) = content, webView.url == .youtubeNoCookie(videoID) {
+            return false
+        }
 
         // if content not loaded inspect error
         switch error {
@@ -1064,7 +1099,7 @@ extension Tab: WKNavigationDelegate {
         if navigationAction.request.url?.isPrivatePlayerScheme == true {
             return .allow
         }
-        
+
         let isLinkActivated = navigationAction.navigationType == .linkActivated
         let isNavigatingAwayFromPinnedTab: Bool = {
             let isNavigatingToAnotherDomain = navigationAction.request.url?.host != url?.host
@@ -1303,7 +1338,6 @@ extension Tab: WKNavigationDelegate {
         if isAMPProtectionExtracting { isAMPProtectionExtracting = false }
         linkProtection.setMainFrameUrl(nil)
         referrerTrimming.onFinishNavigation()
-        setUpYoutubeScriptsIfNeeded()
     }
 
     func webView(_ webView: WKWebView, didFail navigation: WKNavigation!, withError error: Error) {

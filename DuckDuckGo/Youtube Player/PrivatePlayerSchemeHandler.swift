@@ -26,15 +26,15 @@ final class PrivatePlayerSchemeHandler: NSObject, WKURLSchemeHandler {
 
         print("Scheme Start")
 
+        let youtubeHandler = YoutubePlayerNavigationHandler()
+        let html = youtubeHandler.makeHTMLFromTemplate()
+
         if #available(macOS 12.0, *) {
-            let youtubeHandler = YoutubePlayerNavigationHandler()
             let newRequest = youtubeHandler.makePrivatePlayerRequest(from: urlSchemeTask.request)
-            let html = youtubeHandler.makeHTMLFromTemplate()
             webView.loadSimulatedRequest(newRequest, responseHTML: html)
         } else {
-            guard let file = Bundle.main.url(forResource: "youtube_player_template", withExtension: "html"),
-            let requestURL = urlSchemeTask.request.url else { return }
-            guard let data = try? String(contentsOf: file).data(using: .utf8) else { return }
+            guard let requestURL = urlSchemeTask.request.url else { return }
+            guard let data = html.data(using: .utf8) else { return }
 
             let response = URLResponse(url: requestURL,
                                        mimeType: "text/html",
