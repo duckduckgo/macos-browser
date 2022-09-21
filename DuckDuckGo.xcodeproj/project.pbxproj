@@ -230,6 +230,8 @@
 		4B9292D92667124B00AD2C21 /* BookmarkListTreeControllerDataSource.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B9292D82667124B00AD2C21 /* BookmarkListTreeControllerDataSource.swift */; };
 		4B9292DB2667125D00AD2C21 /* ContextualMenu.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B9292DA2667125D00AD2C21 /* ContextualMenu.swift */; };
 		4B980E212817604000282EE1 /* NSNotificationName+Debug.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B980E202817604000282EE1 /* NSNotificationName+Debug.swift */; };
+		4B98D28628DBA376003C2B6F /* ConnectBitwardenViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B98D28528DBA376003C2B6F /* ConnectBitwardenViewController.swift */; };
+		4B98D28828DBA980003C2B6F /* BitwardenInstallationService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B98D28728DBA980003C2B6F /* BitwardenInstallationService.swift */; };
 		4BA1A69B258B076900F6F690 /* FileStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4BA1A69A258B076900F6F690 /* FileStore.swift */; };
 		4BA1A6A0258B079600F6F690 /* DataEncryption.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4BA1A69F258B079600F6F690 /* DataEncryption.swift */; };
 		4BA1A6A5258B07DF00F6F690 /* EncryptedValueTransformer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4BA1A6A4258B07DF00F6F690 /* EncryptedValueTransformer.swift */; };
@@ -1049,6 +1051,8 @@
 		4B9292D82667124B00AD2C21 /* BookmarkListTreeControllerDataSource.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = BookmarkListTreeControllerDataSource.swift; sourceTree = "<group>"; };
 		4B9292DA2667125D00AD2C21 /* ContextualMenu.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ContextualMenu.swift; sourceTree = "<group>"; };
 		4B980E202817604000282EE1 /* NSNotificationName+Debug.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "NSNotificationName+Debug.swift"; sourceTree = "<group>"; };
+		4B98D28528DBA376003C2B6F /* ConnectBitwardenViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConnectBitwardenViewController.swift; sourceTree = "<group>"; };
+		4B98D28728DBA980003C2B6F /* BitwardenInstallationService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BitwardenInstallationService.swift; sourceTree = "<group>"; };
 		4BA1A69A258B076900F6F690 /* FileStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FileStore.swift; sourceTree = "<group>"; };
 		4BA1A69F258B079600F6F690 /* DataEncryption.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DataEncryption.swift; sourceTree = "<group>"; };
 		4BA1A6A4258B07DF00F6F690 /* EncryptedValueTransformer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EncryptedValueTransformer.swift; sourceTree = "<group>"; };
@@ -2232,6 +2236,31 @@
 			path = Extensions;
 			sourceTree = "<group>";
 		};
+		4B98D28228DB9F6B003C2B6F /* Bitwarden */ = {
+			isa = PBXGroup;
+			children = (
+				4B98D28428DBA0EA003C2B6F /* View */,
+				4B98D28328DBA0E5003C2B6F /* Model */,
+			);
+			path = Bitwarden;
+			sourceTree = "<group>";
+		};
+		4B98D28328DBA0E5003C2B6F /* Model */ = {
+			isa = PBXGroup;
+			children = (
+				4B98D28728DBA980003C2B6F /* BitwardenInstallationService.swift */,
+			);
+			path = Model;
+			sourceTree = "<group>";
+		};
+		4B98D28428DBA0EA003C2B6F /* View */ = {
+			isa = PBXGroup;
+			children = (
+				4B98D28528DBA376003C2B6F /* ConnectBitwardenViewController.swift */,
+			);
+			path = View;
+			sourceTree = "<group>";
+		};
 		4BA1A691258B06F600F6F690 /* File System */ = {
 			isa = PBXGroup;
 			children = (
@@ -2852,6 +2881,7 @@
 		AA585D80248FD31100E9A3E2 /* DuckDuckGo */ = {
 			isa = PBXGroup;
 			children = (
+				4B98D28228DB9F6B003C2B6F /* Bitwarden */,
 				B31055BB27A1BA0E001AC618 /* Autoconsent */,
 				7B1E819A27C8874900FF0E60 /* Autofill */,
 				B6A9E47526146A440067D1B9 /* API */,
@@ -4591,6 +4621,7 @@
 				B6106BA426A7BEA40013B453 /* PermissionAuthorizationState.swift in Sources */,
 				B6A9E499261474120067D1B9 /* TimedPixel.swift in Sources */,
 				B6C0B23626E732000031CB7F /* DownloadListItem.swift in Sources */,
+				4B98D28628DBA376003C2B6F /* ConnectBitwardenViewController.swift in Sources */,
 				856C98A6256EB59600A22F1F /* MenuItemSelectors.swift in Sources */,
 				B6B1E87E26D5DA0E0062C350 /* DownloadsPopover.swift in Sources */,
 				4B9292A026670D2A00AD2C21 /* SpacerNode.swift in Sources */,
@@ -4635,6 +4666,7 @@
 				B6AAAC2D260330580029438D /* PublishedAfter.swift in Sources */,
 				37054FCE2876472D00033B6F /* WebViewSnapshotView.swift in Sources */,
 				4BBC16A027C4859400E00A38 /* DeviceAuthenticationService.swift in Sources */,
+				4B98D28828DBA980003C2B6F /* BitwardenInstallationService.swift in Sources */,
 				3776582F27F82E62009A6B35 /* AutofillPreferences.swift in Sources */,
 				AAD8078727B3F45600CF7703 /* WebsiteBreakage.swift in Sources */,
 				4BE6547E271FCD4D008D1D63 /* PasswordManagementIdentityModel.swift in Sources */,
