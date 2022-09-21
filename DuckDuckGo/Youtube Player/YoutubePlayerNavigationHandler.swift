@@ -74,6 +74,10 @@ extension URL {
         host == YoutubePlayerNavigationHandler.privatePlayerHost && fragment == YoutubePlayerNavigationHandler.privatePlayerFragment
     }
 
+    var isYoutubeVideo: Bool {
+        host?.droppingWwwPrefix() == "youtube.com" && path == "/watch"
+    }
+
     var youtubeVideoID: String? {
         if isPrivatePlayerScheme {
             return absoluteString.split(separator: ":").last.flatMap(String.init)
@@ -87,9 +91,5 @@ extension URL {
             return nil
         }
         return components.queryItems?.first(where: { $0.name == "v" })?.value
-    }
-
-    private var isYoutubeVideo: Bool {
-        host?.droppingWwwPrefix() == "youtube.com" && path == "/watch"
     }
 }

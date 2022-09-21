@@ -57,17 +57,28 @@ final class Tab: NSObject, Identifiable, ObservableObject {
         static func contentFromURL(_ url: URL?) -> TabContent {
             if url == .homePage {
                 return .homePage
-            } else if url == .welcome {
-                return .onboarding
-            } else if url == .preferences {
-                return .anyPreferencePane
-            } else if let preferencePane = url.flatMap(PreferencePaneIdentifier.init(url:)) {
-                return .preferences(pane: preferencePane)
-            } else if url?.isPrivatePlayerScheme == true || url?.isPrivatePlayer == true, let videoID = url?.youtubeVideoID {
-                return .privatePlayer(videoID: videoID)
-            } else {
-                return .url(url ?? .blankPage)
             }
+
+            if url == .welcome {
+                return .onboarding
+            }
+
+            if url == .preferences {
+                return .anyPreferencePane
+            }
+
+            if let preferencePane = url.flatMap(PreferencePaneIdentifier.init(url:)) {
+                return .preferences(pane: preferencePane)
+            }
+
+            if let videoID = url?.youtubeVideoID {
+                let shouldAlwaysOpenPrivatePlayer = url?.isYoutubeVideo == true && PrivacySecurityPreferences.shared.privateYoutubePlayerEnabled == true
+                if url?.isPrivatePlayerScheme == true || url?.isPrivatePlayer == true || shouldAlwaysOpenPrivatePlayer {
+                    return .privatePlayer(videoID: videoID)
+                }
+            }
+
+            return .url(url ?? .blankPage)
         }
 
         static var displayableTabTypes: [TabContent] {
@@ -1098,6 +1109,15 @@ extension Tab: WKNavigationDelegate {
         
         if navigationAction.request.url?.isPrivatePlayerScheme == true {
             return .allow
+        }
+
+        if navigationAction.isTargetingMainFrame,
+           navigationAction.request.url?.isYoutubeVideo == true,
+           PrivacySecurityPreferences.shared.privateYoutubePlayerEnabled == true,
+           let videoID = navigationAction.request.url?.youtubeVideoID {
+
+            webView.load(.privatePlayer(videoID))
+            return .cancel
         }
 
         let isLinkActivated = navigationAction.navigationType == .linkActivated
