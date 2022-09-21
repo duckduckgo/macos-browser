@@ -45,7 +45,6 @@ final class BookmarkListViewController: NSViewController {
     @IBOutlet var emptyState: NSView!
     @IBOutlet var emptyStateTitle: NSTextField!
     @IBOutlet var emptyStateMessage: NSTextField!
-    @IBOutlet var pinButton: MouseOverButton!
 
     private var cancellables = Set<AnyCancellable>()
     private var bookmarkManager: BookmarkManager = LocalBookmarkManager.shared
@@ -98,7 +97,6 @@ final class BookmarkListViewController: NSViewController {
         super.viewWillAppear()
 
         reloadData()
-        updatePinButton()
     }
 
     private func reloadData() {
@@ -108,11 +106,6 @@ final class BookmarkListViewController: NSViewController {
         outlineView.reloadData()
         
         expandAndRestore(selectedNodes: selectedNodes)
-    }
-    
-    private func updatePinButton() {
-        pinButton.backgroundColor = LocalPinningManager.shared.isPinned(.bookmarks) ? NSColor.buttonMouseOverColor : nil
-        pinButton.image = LocalPinningManager.shared.isPinned(.bookmarks) ? NSImage(named: "Pin-Remove") : NSImage(named: "Pin")
     }
     
     @IBAction func newBookmarkButtonClicked(_ sender: AnyObject) {
@@ -132,11 +125,6 @@ final class BookmarkListViewController: NSViewController {
         WindowControllersManager.shared.showBookmarksTab()
         delegate?.popoverShouldClose(self)
         Pixel.fire(.manageBookmarks(source: .button))
-    }
-    
-    @IBAction func pinButtonClicked(_ sender: NSButton) {
-        LocalPinningManager.shared.togglePinning(for: .bookmarks)
-        updatePinButton()
     }
     
     @IBAction func handleClick(_ sender: NSOutlineView) {

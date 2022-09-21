@@ -272,13 +272,14 @@ final class NavigationBarViewController: NSViewController {
             
             if let userInfo = notification.userInfo as? [String: Any],
                let viewType = userInfo[LocalPinningManager.pinnedViewChangedNotificationViewTypeKey] as? String,
-               let didPinView = userInfo[LocalPinningManager.pinnedViewChangedNotificationIsBeingAdded] as? Bool,
                let view = PinnableView(rawValue: viewType) {
                 switch view {
                 case .autofill:
-                    self.updatePasswordManagementButton(animated: true, buttonWasPinned: didPinView)
+                    self.updatePasswordManagementButton()
                 case .bookmarks:
-                    self.updateBookmarksButton(animated: true, buttonWasPinned: didPinView)
+                    self.updateBookmarksButton()
+                case .downloads:
+                    self.updateDownloadsButton()
                 }
             } else {
                 assertionFailure("Failed to get changed pinned view type")
@@ -513,7 +514,7 @@ final class NavigationBarViewController: NSViewController {
         self.view.menu = menu
     }
 
-    private func updatePasswordManagementButton(animated: Bool = false, buttonWasPinned: Bool = false) {
+    private func updatePasswordManagementButton() {
         let url = tabCollectionViewModel.selectedTabViewModel?.tab.content.url
 
         passwordManagementButton.image = NSImage(named: "PasswordManagement")
@@ -532,24 +533,6 @@ final class NavigationBarViewController: NSViewController {
         } else {
             passwordManagementButton.isHidden = !passwordManagementPopover.isShown
         }
-        
-        if animated {
-            let accessoryView = buttonWasPinned ? NSImageView(image: NSImage(named: "Pin-12")!) : NSImageView(image: NSImage(named: "Pin-Remove-12")!)
-            accessoryView.frame = NSRect(x: 0, y: 0, width: 12, height: 12)
-            accessoryView.contentTintColor = .white
-            
-            let paddedView = PaddedView(frame: NSRect(x: 0, y: 0, width: 18, height: 18),
-                                        view: accessoryView,
-                                        padding: 3,
-                                        subviewSize: CGSize(width: 12, height: 12))
-
-            paddedView.wantsLayer = true
-            paddedView.layer?.backgroundColor = NSColor.controlAccentColor.cgColor
-            paddedView.layer?.masksToBounds = true
-            paddedView.layer?.cornerRadius = 18 / 2
-
-            passwordManagementButton.showAnimatedAccessoryView(paddedView, playsInReverse: !buttonWasPinned)
-        }
 
         passwordManagementPopover.viewController.domain = nil
         guard let url = url, let domain = url.host else {
@@ -559,6 +542,13 @@ final class NavigationBarViewController: NSViewController {
     }
 
     private func updateDownloadsButton() {
+        if LocalPinningManager.shared.isPinned(.downloads) {
+            downloadsButton.isHidden = false
+            return
+        } else {
+            // bookmarkListButton.isHidden = !bookmarkListPopover.isShown
+        }
+
         let hasActiveDownloads = DownloadListCoordinator.shared.hasActiveDownloads
         downloadsButton.image = hasActiveDownloads ? Self.activeDownloadsImage : Self.inactiveDownloadsImage
         let isTimerActive = downloadsButtonHidingTimer != nil
@@ -591,34 +581,18 @@ final class NavigationBarViewController: NSViewController {
     }
 
     private func hideDownloadButtonIfPossible() {
-        if DownloadListCoordinator.shared.hasActiveDownloads || self.downloadsPopover.isShown { return }
-
+        if LocalPinningManager.shared.isPinned(.downloads) ||
+        DownloadListCoordinator.shared.hasActiveDownloads ||
+        self.downloadsPopover.isShown { return }
+        
         downloadsButton.isHidden = true
     }
 
-    private func updateBookmarksButton(animated: Bool = false, buttonWasPinned: Bool = false) {
+    private func updateBookmarksButton() {
         if LocalPinningManager.shared.isPinned(.bookmarks) {
             bookmarkListButton.isHidden = false
         } else {
             bookmarkListButton.isHidden = !bookmarkListPopover.isShown
-        }
-        
-        if animated {
-            let accessoryView = buttonWasPinned ? NSImageView(image: NSImage(named: "Pin-12")!) : NSImageView(image: NSImage(named: "Pin-Remove-12")!)
-            accessoryView.frame = NSRect(x: 0, y: 0, width: 12, height: 12)
-            accessoryView.contentTintColor = .white
-            
-            let paddedView = PaddedView(frame: NSRect(x: 0, y: 0, width: 18, height: 18),
-                                        view: accessoryView,
-                                        padding: 3,
-                                        subviewSize: CGSize(width: 12, height: 12))
-
-            paddedView.wantsLayer = true
-            paddedView.layer?.backgroundColor = NSColor.controlAccentColor.cgColor
-            paddedView.layer?.masksToBounds = true
-            paddedView.layer?.cornerRadius = 18 / 2
-
-            bookmarkListButton.showAnimatedAccessoryView(paddedView, playsInReverse: !buttonWasPinned)
         }
     }
 
@@ -729,15 +703,21 @@ extension NavigationBarViewController: NSMenuDelegate {
         menu.addItem(NSMenuItem.separator())
         
         if LocalPinningManager.shared.isPinned(.autofill) {
-            menu.addItem(withTitle: UserText.unPinAutofillPanel, action: #selector(toggleAutofillPanelPinning), keyEquivalent: "")
+            menu.addItem(withTitle: UserText.hideAutofillPanel, action: #selector(toggleAutofillPanelPinning), keyEquivalent: "")
         } else {
-            menu.addItem(withTitle: UserText.pinAutofillPanel, action: #selector(toggleAutofillPanelPinning), keyEquivalent: "")
+            menu.addItem(withTitle: UserText.showAutofillPanel, action: #selector(toggleAutofillPanelPinning), keyEquivalent: "")
         }
         
         if LocalPinningManager.shared.isPinned(.bookmarks) {
-            menu.addItem(withTitle: UserText.unPinBookmarksPanel, action: #selector(toggleBookmarksPanelPinning), keyEquivalent: "")
+            menu.addItem(withTitle: UserText.hideBookmarksPanel, action: #selector(toggleBookmarksPanelPinning), keyEquivalent: "")
         } else {
-            menu.addItem(withTitle: UserText.pinBookmarksPanel, action: #selector(toggleBookmarksPanelPinning), keyEquivalent: "")
+            menu.addItem(withTitle: UserText.showBookmarksPanel, action: #selector(toggleBookmarksPanelPinning), keyEquivalent: "")
+        }
+        
+        if LocalPinningManager.shared.isPinned(.downloads) {
+            menu.addItem(withTitle: UserText.hideDownloadsPanel, action: #selector(toggleDownloadsPanelPinning), keyEquivalent: "")
+        } else {
+            menu.addItem(withTitle: UserText.showDownloadsPanel, action: #selector(toggleDownloadsPanelPinning), keyEquivalent: "")
         }
     }
     
@@ -754,6 +734,11 @@ extension NavigationBarViewController: NSMenuDelegate {
     @objc
     private func toggleBookmarksPanelPinning(_ sender: NSMenuItem) {
         LocalPinningManager.shared.togglePinning(for: .bookmarks)
+    }
+    
+    @objc
+    private func toggleDownloadsPanelPinning(_ sender: NSMenuItem) {
+        LocalPinningManager.shared.togglePinning(for: .downloads)
     }
 
 }

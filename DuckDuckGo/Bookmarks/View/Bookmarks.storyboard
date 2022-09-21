@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<document type="com.apple.InterfaceBuilder3.Cocoa.Storyboard.XIB" version="3.0" toolsVersion="20037" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES">
+<document type="com.apple.InterfaceBuilder3.Cocoa.Storyboard.XIB" version="3.0" toolsVersion="21225" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES">
     <dependencies>
         <deployment identifier="macosx"/>
-        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="20037"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="21225"/>
         <capability name="Named colors" minToolsVersion="9.0"/>
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
     </dependencies>
@@ -715,7 +715,7 @@ Gw
                                 <rect key="frame" x="0.0" y="406" width="420" height="5"/>
                             </box>
                             <stackView distribution="fill" orientation="horizontal" alignment="centerY" spacing="4" horizontalStackHuggingPriority="249.99998474121094" verticalStackHuggingPriority="249.99998474121094" detachesHiddenViews="YES" translatesAutoresizingMaskIntoConstraints="NO" id="0If-Lj-8IG">
-                                <rect key="frame" x="259" y="417" width="141" height="28"/>
+                                <rect key="frame" x="291" y="417" width="109" height="28"/>
                                 <subviews>
                                     <button translatesAutoresizingMaskIntoConstraints="NO" id="qBa-rT-8sF" userLabel="New Bookmark Button" customClass="MouseOverButton" customModule="DuckDuckGo_Privacy_Browser" customModuleProvider="target">
                                         <rect key="frame" x="0.0" y="0.0" width="28" height="28"/>
@@ -802,42 +802,14 @@ Gw
                                             <action selector="openManagementInterface:" target="Scx-gG-IP9" id="kQf-pI-TID"/>
                                         </connections>
                                     </button>
-                                    <button translatesAutoresizingMaskIntoConstraints="NO" id="CiL-HI-ctU" userLabel="Pin Button" customClass="MouseOverButton" customModule="DuckDuckGo_Privacy_Browser" customModuleProvider="target">
-                                        <rect key="frame" x="113" y="0.0" width="28" height="28"/>
-                                        <constraints>
-                                            <constraint firstAttribute="width" constant="28" id="3Hg-AP-F6V"/>
-                                            <constraint firstAttribute="height" constant="28" id="iSa-Z0-YTR"/>
-                                        </constraints>
-                                        <buttonCell key="cell" type="square" bezelStyle="shadowlessSquare" image="Pin" imagePosition="only" alignment="center" imageScaling="proportionallyDown" inset="2" id="ngj-7b-GCM">
-                                            <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
-                                            <font key="font" metaFont="system"/>
-                                        </buttonCell>
-                                        <color key="contentTintColor" name="ButtonColor"/>
-                                        <userDefinedRuntimeAttributes>
-                                            <userDefinedRuntimeAttribute type="color" keyPath="mouseOverColor">
-                                                <color key="value" name="ButtonMouseOverColor"/>
-                                            </userDefinedRuntimeAttribute>
-                                            <userDefinedRuntimeAttribute type="color" keyPath="mouseDownColor">
-                                                <color key="value" name="ButtonMouseDownColor"/>
-                                            </userDefinedRuntimeAttribute>
-                                            <userDefinedRuntimeAttribute type="number" keyPath="cornerRadius">
-                                                <real key="value" value="4"/>
-                                            </userDefinedRuntimeAttribute>
-                                        </userDefinedRuntimeAttributes>
-                                        <connections>
-                                            <action selector="pinButtonClicked:" target="Scx-gG-IP9" id="IZ4-wW-eEl"/>
-                                        </connections>
-                                    </button>
                                 </subviews>
                                 <visibilityPriorities>
                                     <integer value="1000"/>
                                     <integer value="1000"/>
                                     <integer value="1000"/>
                                     <integer value="1000"/>
-                                    <integer value="1000"/>
                                 </visibilityPriorities>
                                 <customSpacing>
-                                    <real value="3.4028234663852886e+38"/>
                                     <real value="3.4028234663852886e+38"/>
                                     <real value="3.4028234663852886e+38"/>
                                     <real value="3.4028234663852886e+38"/>
@@ -971,7 +943,6 @@ Gw
                         <outlet property="emptyStateMessage" destination="1Te-SN-ek2" id="7Lu-g0-VVP"/>
                         <outlet property="emptyStateTitle" destination="1ce-Da-33o" id="n3W-I6-rcZ"/>
                         <outlet property="outlineView" destination="66p-cd-DbA" id="Shg-RA-vKK"/>
-                        <outlet property="pinButton" destination="CiL-HI-ctU" id="qIk-RV-pqC"/>
                     </connections>
                 </viewController>
                 <customObject id="mvI-Nr-XXc" userLabel="First Responder" customClass="NSResponder" sceneMemberID="firstResponder"/>
@@ -990,7 +961,6 @@ Gw
         <image name="BookmarksEmpty" width="128" height="96"/>
         <image name="Expand" width="16" height="16"/>
         <image name="Favorite" width="16" height="16"/>
-        <image name="Pin" width="16" height="16"/>
         <namedColor name="ButtonColor">
             <color red="0.28627450980392155" green="0.28627450980392155" blue="0.28627450980392155" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
         </namedColor>
