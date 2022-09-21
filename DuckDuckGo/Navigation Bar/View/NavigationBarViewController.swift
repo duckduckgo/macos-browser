@@ -515,6 +515,12 @@ final class NavigationBarViewController: NSViewController {
     }
 
     private func updatePasswordManagementButton() {
+        let menu = NSMenu()
+        let item = menu.addItem(withTitle: UserText.showAutofillPanel, action: #selector(toggleAutofillPanelPinning), keyEquivalent: "")
+        item.state = (LocalPinningManager.shared.isPinned(.autofill)) ? .on : .off
+        
+        passwordManagementButton.menu = menu
+        
         let url = tabCollectionViewModel.selectedTabViewModel?.tab.content.url
 
         passwordManagementButton.image = NSImage(named: "PasswordManagement")
@@ -542,6 +548,12 @@ final class NavigationBarViewController: NSViewController {
     }
 
     private func updateDownloadsButton(updatingFromPinnedViewsNotification: Bool = false) {
+        let menu = NSMenu()
+        let item = menu.addItem(withTitle: UserText.showDownloadsPanel, action: #selector(toggleDownloadsPanelPinning(_:)), keyEquivalent: "")
+        item.state = (LocalPinningManager.shared.isPinned(.downloads)) ? .on : .off
+        
+        downloadsButton.menu = menu
+        
         if LocalPinningManager.shared.isPinned(.downloads) {
             downloadsButton.isHidden = false
             return
@@ -596,6 +608,12 @@ final class NavigationBarViewController: NSViewController {
     }
 
     private func updateBookmarksButton() {
+        let menu = NSMenu()
+        let item = menu.addItem(withTitle: UserText.showBookmarksPanel, action: #selector(toggleBookmarksPanelPinning(_:)), keyEquivalent: "")
+        item.state = (LocalPinningManager.shared.isPinned(.bookmarks)) ? .on : .off
+        
+        bookmarkListButton.menu = menu
+        
         if LocalPinningManager.shared.isPinned(.bookmarks) {
             bookmarkListButton.isHidden = false
         } else {
@@ -701,31 +719,19 @@ extension NavigationBarViewController: NSMenuDelegate {
     public func menuNeedsUpdate(_ menu: NSMenu) {
         menu.removeAllItems()
         
-        if PersistentAppInterfaceSettings.shared.showBookmarksBar {
-            menu.addItem(withTitle: UserText.hideBookmarksBar, action: #selector(toggleBookmarksBar), keyEquivalent: "")
-        } else {
-            menu.addItem(withTitle: UserText.showBookmarksBar, action: #selector(toggleBookmarksBar), keyEquivalent: "")
-        }
+        let bookmarksBarItem = menu.addItem(withTitle: UserText.showBookmarksBar, action: #selector(toggleBookmarksBar), keyEquivalent: "")
+        bookmarksBarItem.state = PersistentAppInterfaceSettings.shared.showBookmarksBar ? .on : .off
         
         menu.addItem(NSMenuItem.separator())
         
-        if LocalPinningManager.shared.isPinned(.autofill) {
-            menu.addItem(withTitle: UserText.hideAutofillPanel, action: #selector(toggleAutofillPanelPinning), keyEquivalent: "")
-        } else {
-            menu.addItem(withTitle: UserText.showAutofillPanel, action: #selector(toggleAutofillPanelPinning), keyEquivalent: "")
-        }
+        let autofillItem = menu.addItem(withTitle: UserText.showAutofillPanel, action: #selector(toggleAutofillPanelPinning), keyEquivalent: "")
+        autofillItem.state = (LocalPinningManager.shared.isPinned(.autofill)) ? .on : .off
         
-        if LocalPinningManager.shared.isPinned(.bookmarks) {
-            menu.addItem(withTitle: UserText.hideBookmarksPanel, action: #selector(toggleBookmarksPanelPinning), keyEquivalent: "")
-        } else {
-            menu.addItem(withTitle: UserText.showBookmarksPanel, action: #selector(toggleBookmarksPanelPinning), keyEquivalent: "")
-        }
+        let bookmarksItem = menu.addItem(withTitle: UserText.showBookmarksPanel, action: #selector(toggleBookmarksPanelPinning), keyEquivalent: "")
+        bookmarksItem.state = (LocalPinningManager.shared.isPinned(.bookmarks)) ? .on : .off
         
-        if LocalPinningManager.shared.isPinned(.downloads) {
-            menu.addItem(withTitle: UserText.hideDownloadsPanel, action: #selector(toggleDownloadsPanelPinning), keyEquivalent: "")
-        } else {
-            menu.addItem(withTitle: UserText.showDownloadsPanel, action: #selector(toggleDownloadsPanelPinning), keyEquivalent: "")
-        }
+        let downloadsItem = menu.addItem(withTitle: UserText.showDownloadsPanel, action: #selector(toggleDownloadsPanelPinning), keyEquivalent: "")
+        downloadsItem.state = (LocalPinningManager.shared.isPinned(.downloads)) ? .on : .off
     }
     
     @objc
