@@ -759,7 +759,7 @@ final class Tab: NSObject, Identifiable, ObservableObject {
             youtubeOverlayScript?.setEnabled(false, in: webView)
         }
 
-        if url?.isPrivatePlayer == true {
+        if url?.isPrivatePlayerScheme == true {
             PrivacySecurityPreferences.shared.$privateYoutubePlayerEnabled
                 .sink { [weak self] value in
                     guard let self = self else {
