@@ -279,7 +279,7 @@ final class NavigationBarViewController: NSViewController {
                 case .bookmarks:
                     self.updateBookmarksButton()
                 case .downloads:
-                    self.updateDownloadsButton()
+                    self.updateDownloadsButton(updatingFromPinnedViewsNotification: true)
                 }
             } else {
                 assertionFailure("Failed to get changed pinned view type")
@@ -541,12 +541,10 @@ final class NavigationBarViewController: NSViewController {
         passwordManagementPopover.viewController.domain = domain
     }
 
-    private func updateDownloadsButton() {
+    private func updateDownloadsButton(updatingFromPinnedViewsNotification: Bool = false) {
         if LocalPinningManager.shared.isPinned(.downloads) {
             downloadsButton.isHidden = false
             return
-        } else {
-            // bookmarkListButton.isHidden = !bookmarkListPopover.isShown
         }
 
         let hasActiveDownloads = DownloadListCoordinator.shared.hasActiveDownloads
@@ -557,6 +555,15 @@ final class NavigationBarViewController: NSViewController {
 
         if !downloadsButton.isHidden { setDownloadButtonHidingTimer() }
         downloadsButton.isMouseDown = downloadsPopover.isShown
+        
+        // If the user has selected Hide Downloads from the navigation bar context menu, and no downloads are active, then force it to be hidden
+        // even if the timer is active.
+        if updatingFromPinnedViewsNotification {
+            if !LocalPinningManager.shared.isPinned(.downloads) {
+                invalidateDownloadButtonHidingTimer()
+                downloadsButton.isHidden = !hasActiveDownloads
+            }
+        }
     }
 
     private var downloadsButtonHidingTimer: Timer?
@@ -566,7 +573,7 @@ final class NavigationBarViewController: NSViewController {
         let timerBlock: (Timer) -> Void = { [weak self] _ in
             guard let self = self else { return }
 
-            self.invalideDownloadButtonHidingTimer()
+            self.invalidateDownloadButtonHidingTimer()
             self.hideDownloadButtonIfPossible()
         }
 
@@ -575,7 +582,7 @@ final class NavigationBarViewController: NSViewController {
                                                           block: timerBlock)
     }
 
-    private func invalideDownloadButtonHidingTimer() {
+    private func invalidateDownloadButtonHidingTimer() {
         self.downloadsButtonHidingTimer?.invalidate()
         self.downloadsButtonHidingTimer = nil
     }
@@ -800,7 +807,7 @@ extension NavigationBarViewController: NSPopoverDelegate {
 extension NavigationBarViewController: DownloadsViewControllerDelegate {
 
     func clearDownloadsActionTriggered() {
-        invalideDownloadButtonHidingTimer()
+        invalidateDownloadButtonHidingTimer()
         hideDownloadButtonIfPossible()
     }
 
