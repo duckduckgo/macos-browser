@@ -66,6 +66,10 @@ extension URL {
         "https://\(YoutubePlayerNavigationHandler.privatePlayerHost)/embed/\(videoID)?wmode=transparent&iv_load_policy=3&autoplay=1&html5=1&showinfo=0&rel=0&modestbranding=1&playsinline=0#\(YoutubePlayerNavigationHandler.privatePlayerFragment)".url!
     }
 
+    static func youtube(_ videoID: String) -> URL {
+        "https://www.youtube.com/watch?v=\(videoID)".url!
+    }
+
     var isPrivatePlayerScheme: Bool {
         scheme == PrivatePlayerSchemeHandler.scheme
     }

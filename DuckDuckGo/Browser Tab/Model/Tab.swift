@@ -575,7 +575,7 @@ final class Tab: NSObject, Identifiable, ObservableObject {
               webView.url != content.url
         else { return false }
 
-        if case .privatePlayer(let videoID) = content, webView.url == .youtubeNoCookie(videoID) {
+        if case .privatePlayer(let videoID) = content, webView.url == .youtubeNoCookie(videoID) || webView.url == .youtube(videoID) {
             return false
         }
 
@@ -1116,8 +1116,10 @@ extension Tab: WKNavigationDelegate {
            PrivacySecurityPreferences.shared.privateYoutubePlayerEnabled == true,
            let videoID = navigationAction.request.url?.youtubeVideoID {
 
-            webView.load(.privatePlayer(videoID))
-            return .cancel
+            guard case .privatePlayer = content else {
+                webView.load(.privatePlayer(videoID))
+                return .cancel
+            }
         }
 
         let isLinkActivated = navigationAction.navigationType == .linkActivated
