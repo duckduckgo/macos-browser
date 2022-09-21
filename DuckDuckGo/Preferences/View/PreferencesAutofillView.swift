@@ -42,6 +42,14 @@ extension Preferences {
     struct AutofillView: View {
         @ObservedObject var model: AutofillPreferencesModel
 
+        var passwordManagerBinding: Binding<PasswordManager> {
+            .init {
+                model.passwordManager
+            } set: { newValue in
+                model.passwordManagerSettingsChange(passwordManager: newValue)
+            }
+        }
+        
         var isAutoLockEnabledBinding: Binding<Bool> {
             .init {
                 model.isAutoLockEnabled
@@ -63,6 +71,31 @@ extension Preferences {
                 Text(UserText.autofill)
                     .font(Const.Fonts.preferencePaneTitle)
 
+                // Password Manager:
+                
+                Section(spacing: 0) {
+                    Text(UserText.autofillPasswordManager)
+                        .font(Const.Fonts.preferencePaneSectionHeader)
+                        .padding(.bottom, 6)
+
+                    Picker(selection: passwordManagerBinding, content: {
+                        Text(UserText.autofillPasswordManagerDuckDuckGo).tag(PasswordManager.duckduckgo)
+
+                        Text(UserText.autofillPasswordManagerBitwarden).tag(PasswordManager.bitwarden)
+                    }, label: {})
+                    .pickerStyle(.radioGroup)
+                    .offset(x: Const.autoLockPickerHorizontalOffset)
+                    .padding(.bottom, 6)
+
+                    Text(UserText.autofillPasswordManagerBitwardenDisclaimer)
+                        .font(Const.Fonts.preferencePaneCaption)
+                        .foregroundColor(Color("GreyTextColor"))
+                        .fixMultilineScrollableText()
+                        .offset(x: Const.autoLockWarningOffset)
+                }
+                
+                // Ask to Save:
+                
                 Section(spacing: 0) {
                     Text(UserText.autofillAskToSave)
                         .font(Const.Fonts.preferencePaneSectionHeader)
@@ -84,6 +117,8 @@ extension Preferences {
                     }
                 }
 
+                // Auto-Lock:
+                
                 Section(spacing: 0) {
                     Text(UserText.autofillAutoLock)
                         .font(Const.Fonts.preferencePaneSectionHeader)

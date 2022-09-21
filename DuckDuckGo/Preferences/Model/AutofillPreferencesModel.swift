@@ -49,6 +49,12 @@ final class AutofillPreferencesModel: ObservableObject {
             persistor.autoLockThreshold = autoLockThreshold
         }
     }
+    
+    @Published private(set) var passwordManager: PasswordManager {
+        didSet {
+            persistor.passwordManager = passwordManager
+        }
+    }
 
     func authorizeAutoLockSettingsChange(
         isEnabled isAutoLockEnabledNewValue: Bool? = nil,
@@ -87,6 +93,10 @@ final class AutofillPreferencesModel: ObservableObject {
             }
         }
     }
+    
+    func passwordManagerSettingsChange(passwordManager: PasswordManager) {
+        self.passwordManager = passwordManager
+    }
 
     func openImportBrowserDataWindow() {
         NSApp.sendAction(#selector(AppDelegate.openImportBrowserDataWindow(_:)), to: nil, from: nil)
@@ -104,6 +114,7 @@ final class AutofillPreferencesModel: ObservableObject {
         askToSaveUsernamesAndPasswords = persistor.askToSaveUsernamesAndPasswords
         askToSaveAddresses = persistor.askToSaveAddresses
         askToSavePaymentMethods = persistor.askToSavePaymentMethods
+        passwordManager = persistor.passwordManager
     }
 
     private var persistor: AutofillPreferencesPersistor
