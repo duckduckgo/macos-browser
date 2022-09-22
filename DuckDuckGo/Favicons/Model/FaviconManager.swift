@@ -101,39 +101,12 @@ final class FaviconManager: FaviconManagement {
 
                     return nil
                 }
+            
+            let favicon = self.handleFaviconReferenceCacheInsertion(documentURL: documentUrl,
+                                                                    cachedFavicons: cachedFavicons,
+                                                                    newFavicons: newFavicons)
 
-            let noFaviconPickedYet = self.referenceCache.getFaviconUrl(for: documentUrl, sizeCategory: .small) == nil
-            let newFaviconLoaded = !newFavicons.isEmpty
-            let currentSmallFaviconUrl = self.referenceCache.getFaviconUrl(for: documentUrl, sizeCategory: .small)
-            let currentMediumFaviconUrl = self.referenceCache.getFaviconUrl(for: documentUrl, sizeCategory: .medium)
-            let cachedFaviconUrls = cachedFavicons.map {$0.url}
-            let faviconsOutdated: Bool = {
-                if let currentSmallFaviconUrl = currentSmallFaviconUrl, !cachedFaviconUrls.contains(currentSmallFaviconUrl) {
-                    return true
-                }
-                if let currentMediumFaviconUrl = currentMediumFaviconUrl, !cachedFaviconUrls.contains(currentMediumFaviconUrl) {
-                    return true
-                }
-                return false
-            }()
-
-            // If we haven't pick a favicon yet or there is a new favicon loaded or favicons are outdated
-            // Pick the most suitable favicons. Otherwise use cached references
-            if noFaviconPickedYet || newFaviconLoaded || faviconsOutdated {
-                cachedFavicons = cachedFavicons.sorted(by: { $0.longestSide < $1.longestSide })
-                let mediumFavicon = FaviconSelector.getMostSuitableFavicon(for: .medium, favicons: cachedFavicons)
-                let smallFavicon = FaviconSelector.getMostSuitableFavicon(for: .small, favicons: cachedFavicons)
-                self.referenceCache.insert(faviconUrls: (smallFavicon?.url, mediumFavicon?.url), documentUrl: documentUrl)
-                completion(smallFavicon)
-            } else {
-                guard let currentSmallFaviconUrl = currentSmallFaviconUrl,
-                      let cachedFavicon = self.imageCache.get(faviconUrl: currentSmallFaviconUrl) else {
-                          completion(nil)
-                          return
-                      }
-
-                completion(cachedFavicon)
-            }
+            completion(favicon)
         }
     }
     
@@ -146,18 +119,23 @@ final class FaviconManager: FaviconManagement {
         let faviconLinks = newFavicons.map(\.url)
 
         // Pick most suitable favicons
-        var cachedFavicons: [Favicon] = faviconLinks.compactMap { faviconLink -> Favicon? in
+        let cachedFavicons: [Favicon] = faviconLinks.compactMap { faviconLink -> Favicon? in
             if let favicon = self.imageCache.get(faviconUrl: faviconLink), favicon.dateCreated > Date.weekAgo {
                 return favicon
             }
-            
+
             return nil
         }
-
-        let noFaviconPickedYet = self.referenceCache.getFaviconUrl(for: documentUrl, sizeCategory: .small) == nil
+        
+        handleFaviconReferenceCacheInsertion(documentURL: documentUrl, cachedFavicons: cachedFavicons, newFavicons: newFavicons)
+    }
+    
+    @discardableResult
+    private func handleFaviconReferenceCacheInsertion(documentURL: URL, cachedFavicons: [Favicon], newFavicons: [Favicon]) -> Favicon? {
+        let noFaviconPickedYet = self.referenceCache.getFaviconUrl(for: documentURL, sizeCategory: .small) == nil
         let newFaviconLoaded = !newFavicons.isEmpty
-        let currentSmallFaviconUrl = self.referenceCache.getFaviconUrl(for: documentUrl, sizeCategory: .small)
-        let currentMediumFaviconUrl = self.referenceCache.getFaviconUrl(for: documentUrl, sizeCategory: .medium)
+        let currentSmallFaviconUrl = self.referenceCache.getFaviconUrl(for: documentURL, sizeCategory: .small)
+        let currentMediumFaviconUrl = self.referenceCache.getFaviconUrl(for: documentURL, sizeCategory: .medium)
         let cachedFaviconUrls = cachedFavicons.map {$0.url}
         let faviconsOutdated: Bool = {
             if let currentSmallFaviconUrl = currentSmallFaviconUrl, !cachedFaviconUrls.contains(currentSmallFaviconUrl) {
@@ -172,10 +150,18 @@ final class FaviconManager: FaviconManagement {
         // If we haven't pick a favicon yet or there is a new favicon loaded or favicons are outdated
         // Pick the most suitable favicons. Otherwise use cached references
         if noFaviconPickedYet || newFaviconLoaded || faviconsOutdated {
-            cachedFavicons = cachedFavicons.sorted(by: { $0.longestSide < $1.longestSide })
-            let mediumFavicon = FaviconSelector.getMostSuitableFavicon(for: .medium, favicons: cachedFavicons)
-            let smallFavicon = FaviconSelector.getMostSuitableFavicon(for: .small, favicons: cachedFavicons)
-            self.referenceCache.insert(faviconUrls: (smallFavicon?.url, mediumFavicon?.url), documentUrl: documentUrl)
+            let sortedCachedFavicons = cachedFavicons.sorted(by: { $0.longestSide < $1.longestSide })
+            let mediumFavicon = FaviconSelector.getMostSuitableFavicon(for: .medium, favicons: sortedCachedFavicons)
+            let smallFavicon = FaviconSelector.getMostSuitableFavicon(for: .small, favicons: sortedCachedFavicons)
+            self.referenceCache.insert(faviconUrls: (smallFavicon?.url, mediumFavicon?.url), documentUrl: documentURL)
+            return smallFavicon
+        } else {
+            guard let currentSmallFaviconUrl = currentSmallFaviconUrl,
+                  let cachedFavicon = self.imageCache.get(faviconUrl: currentSmallFaviconUrl) else {
+                      return nil
+                  }
+
+            return cachedFavicon
         }
     }
 
