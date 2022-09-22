@@ -89,7 +89,7 @@ final class FaviconManager: FaviconManagement {
             }
 
             // Pick most suitable favicons
-            var cachedFavicons: [Favicon] = faviconLinks
+            let cachedFavicons: [Favicon] = faviconLinks
                 .compactMap { faviconLink -> Favicon? in
                     guard let faviconUrl = URL(string: faviconLink.href) else {
                         return nil

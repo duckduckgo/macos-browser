@@ -519,23 +519,10 @@ final class LocalBookmarkStore: BookmarkStore {
 
         context.performAndWait {
             do {
-                var bookmarkURLs = Set<URL>()
-                let allBookmarks = try context.fetch(Bookmark.bookmarksFetchRequest())
-
-                for bookmark in allBookmarks {
-                    guard let bookmarkURL = bookmark.urlEncrypted as? URL else { continue }
-                    bookmarkURLs.insert(bookmarkURL)
-                }
-
                 let bookmarkCountBeforeImport = try context.count(for: Bookmark.bookmarksFetchRequest())
                 let allFolders = try context.fetch(BookmarkFolder.bookmarkFoldersFetchRequest())
-                
-                switch source {
-                case .duckduckgoWebKit:
-                    total += createEntitiesFromDDGWebKitBookmarks(allFolders: allFolders, bookmarks: bookmarks, bookmarkURLs: bookmarkURLs)
-                case .thirdPartyBrowser(let source):
-                    total += createEntitiesFromBookmarks(allFolders: allFolders, bookmarks: bookmarks, importSourceName: source.importSourceName)
-                }
+
+                total += createEntitiesFromBookmarks(allFolders: allFolders, bookmarks: bookmarks, importSourceName: source.importSourceName)
 
                 try self.context.save()
                 let bookmarkCountAfterImport = try context.count(for: Bookmark.bookmarksFetchRequest())
@@ -554,9 +541,7 @@ final class LocalBookmarkStore: BookmarkStore {
         return total
     }
 
-    private func createEntitiesFromDDGWebKitBookmarks(allFolders: [BookmarkManagedObject],
-                                                      bookmarks: ImportedBookmarks,
-                                                      bookmarkURLs: Set<URL>) -> BookmarkImportResult {
+    private func createEntitiesFromDDGWebKitBookmarks(allFolders: [BookmarkManagedObject], bookmarks: ImportedBookmarks) -> BookmarkImportResult {
 
         var total = BookmarkImportResult(successful: 0, duplicates: 0, failed: 0)
 
