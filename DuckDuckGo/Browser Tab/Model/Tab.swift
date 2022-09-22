@@ -1103,7 +1103,11 @@ extension Tab: WKNavigationDelegate {
     func webView(_ webView: WKWebView,
                  decidePolicyFor navigationAction: WKNavigationAction) async -> WKNavigationActionPolicy {
         
-        if navigationAction.request.url?.isFileURL ?? false {
+        if navigationAction.request.url?.isFileURL == true {
+            if navigationAction.request.url?.path == YoutubePlayerNavigationHandler.htmlTemplatePath {
+                // don't allow loading Youtube Player directly
+                return .cancel
+            }
             return .allow
         }
         

@@ -22,6 +22,14 @@ struct YoutubePlayerNavigationHandler {
     static let privatePlayerHost = "www.youtube-nocookie.com"
     static let privatePlayerFragment = "privateplayer"
 
+    static var htmlTemplatePath: String {
+        guard let file = Bundle.main.path(forResource: Self.htmlTemplateFileName, ofType: "html") else {
+            assertionFailure("YouTube Private Player HTML template not found")
+            return ""
+        }
+        return file
+    }
+
     func makePrivatePlayerRequest(from originalRequest: URLRequest) -> URLRequest {
        
         let videoID: String
@@ -49,15 +57,15 @@ struct YoutubePlayerNavigationHandler {
         return request
     }
 
-    func makeHTMLFromTemplate(_ template: String = "youtube_player_template") -> String {
-        guard let file = Bundle.main.url(forResource: template, withExtension: "html"),
-              let html = try? String(contentsOf: file) else {
+    func makeHTMLFromTemplate() -> String {
+        guard let html = try? String(contentsOfFile: Self.htmlTemplatePath) else {
             assertionFailure("Should be able to load template")
             return ""
-            
         }
         return html
     }
+
+    private static let htmlTemplateFileName = "youtube_player_template"
 }
 
 extension URL {
