@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
     <head>
-        <title>Private Player</title>
+        <title>Duck Player</title>
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <style>
             :root {
@@ -61,15 +61,14 @@
                 position: absolute;
                 left: 0;
                 right: 0;
-                top: 0;
-                bottom: 0;
-                background: linear-gradient(0deg, rgba(0,0,0,0.4), rgba(0,0,0,0.7) 60%);
+                top: -50%;
+                height: 100%;
+                background: linear-gradient(0deg, rgba(0,0,0,0), #101010 70%);
                 transition: all 0.5s linear;
-                opacity: 0;
             }
 
             .bg.faded::after {
-                opacity: 1;
+                top: 30%;
             }
 
             body {
@@ -460,7 +459,7 @@
                                 <path d="M16.0532 16.6618C15.7555 16.593 14.6126 17.4123 14.1644 17.7448C14.1462 17.6709 14.1313 17.6104 14.1165 17.5769C14.0437 17.3938 12.9438 17.4979 12.6527 17.775C11.9581 17.4241 10.5291 16.7541 10.4993 17.1655C10.4563 17.7129 10.4993 19.9426 10.7888 20.1122C11.0005 20.2364 12.1632 19.5967 12.7751 19.2424C12.7933 19.2491 12.8099 19.2542 12.8314 19.2609C13.2035 19.3465 13.9081 19.2609 14.1578 19.093C14.1826 19.0762 14.2025 19.0477 14.2173 19.0141C14.7813 19.2357 15.9308 19.6622 16.1772 19.5698C16.508 19.4389 16.4253 16.7474 16.0532 16.6618Z" fill="#65BC46"/>
                                 <path d="M12.9184 19.12C12.5347 19.0372 12.6643 18.6649 12.6643 17.7944L12.6626 17.7928C12.6626 17.7911 12.6643 17.7878 12.6643 17.7861C12.5637 17.8441 12.4989 17.9119 12.4989 17.988H12.5006C12.5006 18.8585 12.3709 19.2325 12.7547 19.3153C13.1401 19.398 13.8667 19.3153 14.1242 19.1498C14.1668 19.1216 14.1958 19.067 14.2146 18.9942C13.9144 19.1332 13.2715 19.1978 12.9184 19.12Z" fill="#43A244"/>
                                 <path fill-rule="evenodd" clip-rule="evenodd" d="M12.6152 22C18.1381 22 22.6152 17.5228 22.6152 12C22.6152 6.47715 18.1381 2 12.6152 2C7.09239 2 2.61523 6.47715 2.61523 12C2.61523 17.5228 7.09239 22 12.6152 22ZM12.6152 21C17.5858 21 21.6152 16.9706 21.6152 12C21.6152 7.02944 17.5858 3 12.6152 3C7.64467 3 3.61523 7.02944 3.61523 12C3.61523 16.9706 7.64467 21 12.6152 21Z" fill="white"/>
-                            </svg>DuckPlayer
+                            </svg>Duck Player
                             <div class="info-icon-container">
                                 <svg width="17" height="16" viewBox="0 0 17 16" fill="none" xmlns="http://www.w3.org/2000/svg" class="info-icon">
                                     <g clip-path="url(#clip0_1010_25499)">
@@ -475,7 +474,7 @@
                                     </defs>
                                 </svg>
                                 <div class="info-tooltip">
-                                    DuckPlayer protects your viewing activity from advertiser profiling and from influencing YouTube's recommendation algorithm.
+                                    Duck Player protects your viewing activity from advertiser profiling and from influencing YouTube's recommendation algorithm.
                                     <!--<svg class="tooltip-close" width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
                                         <path d="M11.4419 5.44194C11.686 5.19786 11.686 4.80214 11.4419 4.55806C11.1979 4.31398 10.8021 4.31398 10.5581 4.55806L8 7.11612L5.44194 4.55806C5.19786 4.31398 4.80214 4.31398 4.55806 4.55806C4.31398 4.80214 4.31398 5.19786 4.55806 5.44194L7.11612 8L4.55806 10.5581C4.31398 10.8021 4.31398 11.1979 4.55806 11.4419C4.80214 11.686 5.19786 11.686 5.44194 11.4419L8 8.88388L10.5581 11.4419C10.8021 11.686 11.1979 11.686 11.4419 11.4419C11.686 11.1979 11.686 10.8021 11.4419 10.5581L8.88388 8L11.4419 5.44194Z" fill="white" fill-opacity="0.8"/>
                                     </svg>-->
@@ -553,7 +552,7 @@
                     let videoId = Comms.getVideoId();
 
                     if (videoId) {
-                        VideoPlayer.iframe().setAttribute('src', VideoPlayer.videoEmbedURL(videoId));
+                        VideoPlayer.iframe().setAttribute('src', VideoPlayer.videoEmbedURL(encodeURIComponent(videoId)));
                     } else {
                         VideoPlayer.showVideoError('Malformed video id');
                     }
@@ -1004,4 +1003,3 @@
         </script>
     </body>
 </html>
-
