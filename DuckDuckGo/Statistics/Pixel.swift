@@ -40,11 +40,14 @@ final class Pixel {
     func fire(pixelNamed pixelName: String,
               withAdditionalParameters params: [String: String]? = nil,
               allowedQueryReservedCharacters: CharacterSet? = nil,
+              includeAppVersionParameter: Bool = true,
               withHeaders headers: HTTPHeaders = APIHeaders().defaultHeaders,
               onComplete: @escaping (Error?) -> Void = {_ in }) {
 
         var newParams = params ?? [:]
-        newParams[Parameters.appVersion] = AppVersion.shared.versionNumber
+        if includeAppVersionParameter {
+            newParams[Parameters.appVersion] = AppVersion.shared.versionNumber
+        }
         #if DEBUG
             newParams[Parameters.test] = Values.test
         #endif
@@ -78,6 +81,7 @@ final class Pixel {
     static func fire(_ event: Pixel.Event,
                      withAdditionalParameters parameters: [String: String]? = nil,
                      allowedQueryReservedCharacters: CharacterSet? = nil,
+                     includeAppVersionParameter: Bool = true,
                      onComplete: @escaping (Error?) -> Void = {_ in }) {
         let newParams: [String: String]?
         switch (event.parameters, parameters) {
@@ -94,6 +98,7 @@ final class Pixel {
         Self.shared?.fire(pixelNamed: event.name,
                           withAdditionalParameters: newParams,
                           allowedQueryReservedCharacters: allowedQueryReservedCharacters,
+                          includeAppVersionParameter: includeAppVersionParameter,
                           onComplete: onComplete)
     }
 
