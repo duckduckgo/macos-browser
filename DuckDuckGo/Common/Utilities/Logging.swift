@@ -87,7 +87,7 @@ struct Logging {
     fileprivate static let dataImportExportLoggingEnabled = false
     fileprivate static let dataImportExportLog: OSLog = OSLog(subsystem: Bundle.main.bundleIdentifier ?? "DuckDuckGo", category: "Data Import/Export")
 
-    fileprivate static let pixelLoggingEnabled = false
+    fileprivate static let pixelLoggingEnabled = true
     fileprivate static let pixelLog: OSLog = OSLog(subsystem: Bundle.main.bundleIdentifier ?? "DuckDuckGo", category: "Pixel")
 
     fileprivate static let contentBlockingLoggingEnabled = false
@@ -105,7 +105,7 @@ struct Logging {
     fileprivate static let autoconsentLoggingEnabled = false
     fileprivate static let autoconsentLog: OSLog = OSLog(subsystem: Bundle.main.bundleIdentifier ?? "DuckDuckGo", category: "Autoconsent")
     
-    fileprivate static let bookmarksLoggingEnabled = true
+    fileprivate static let bookmarksLoggingEnabled = false
     fileprivate static let bookmarksLog: OSLog = OSLog(subsystem: Bundle.main.bundleIdentifier ?? "DuckDuckGo", category: "Bookmarks")
 
 }
