@@ -480,6 +480,9 @@
                                         </menuItem>
                                         <menuItem title="Reopen All Windows from Last Session" enabled="NO" id="C6V-uF-uX8">
                                             <modifierMask key="keyEquivalentModifierMask"/>
+                                            <connections>
+                                                <action selector="reopenAllWindowsFromLastSession:" target="Ady-hI-5gd" id="oMb-VL-XMO"/>
+                                            </connections>
                                         </menuItem>
                                         <menuItem isSeparatorItem="YES" id="eoz-XM-HpQ"/>
                                     </items>
