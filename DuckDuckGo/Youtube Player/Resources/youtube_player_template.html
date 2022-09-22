@@ -621,7 +621,17 @@
                  * Gets the video id from the ?v= query-string parameter of this file.
                  */
                 getVideoId: () => {
-                    return Comms.validateVideoId(Comms.getPathName());
+                    let validVideoId = Comms.validateVideoId(Comms.getPathName());
+
+                    if (validVideoId) {
+                        return Comms.sanitizeVideoId(validVideoId);
+                    }
+
+                    return false;
+                },
+
+                sanitizeVideoId: (untrusted) => {
+                    return untrusted.replace(/[^a-zA-Z0-9-_]/g, '');
                 },
 
                 /**
@@ -635,7 +645,7 @@
                  */
                 listen: (message, callback) => {
                     window.addEventListener('message', (e) => {
-                        if (e && e.data && typeof e.data[message] !== 'undefined') {
+                        if (e && e.data && typeof e.data[message] !== 'undefined' && e.origin && e.origin === "https://www.youtube-nocookie.com") {
                             callback(e.data[message]);
                         }
                     });
