@@ -577,7 +577,6 @@ final class Tab: NSObject, Identifiable, ObservableObject {
         return didRestore
     }
 
-    @MainActor
     private func addHomePageToWebViewIfNeeded() {
         guard !AppDelegate.isRunningTests else { return }
         if content == .homePage && webView.url == nil {
@@ -611,17 +610,17 @@ final class Tab: NSObject, Identifiable, ObservableObject {
         superviewObserver = webView.observe(\.superview, options: .old) { [weak self] _, change in
             // if the webView is being added to superview - reload if needed
             if case .some(.none) = change.oldValue {
-                Task { [weak self] in
+                Task { @MainActor [weak self] in
                     await self?.reloadIfNeeded()
                 }
             }
         }
 
         // background tab loading should start immediately
-        Task {
+        Task { @MainActor in
             await reloadIfNeeded(shouldLoadInBackground: shouldLoadInBackground)
             if !shouldLoadInBackground {
-                await addHomePageToWebViewIfNeeded()
+                addHomePageToWebViewIfNeeded()
             }
         }
     }
