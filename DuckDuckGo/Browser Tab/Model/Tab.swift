@@ -524,7 +524,7 @@ final class Tab: NSObject, Identifiable, ObservableObject {
             
             if !didRestore {
                 if url.isFileURL {
-                    webView.loadFileURL(url, allowingReadAccessTo: URL(fileURLWithPath: "/"))
+                    _ = webView.loadFileURL(url, allowingReadAccessTo: URL(fileURLWithPath: "/"))
                 } else {
                     webView.load(url)
                 }
@@ -573,7 +573,7 @@ final class Tab: NSObject, Identifiable, ObservableObject {
         var didRestore: Bool = false
         if let sessionStateData = self.sessionStateData {
             if contentURL.isFileURL {
-                webView.loadFileURL(contentURL, allowingReadAccessTo: URL(fileURLWithPath: "/"))
+                _ = webView.loadFileURL(contentURL, allowingReadAccessTo: URL(fileURLWithPath: "/"))
             }
             do {
                 try webView.restoreSessionState(from: sessionStateData)
@@ -592,7 +592,7 @@ final class Tab: NSObject, Identifiable, ObservableObject {
         var didRestore: Bool = false
         if let interactionStateData = self.interactionStateData {
             if contentURL.isFileURL {
-                webView.loadFileURL(contentURL, allowingReadAccessTo: URL(fileURLWithPath: "/"))
+                _ = webView.loadFileURL(contentURL, allowingReadAccessTo: URL(fileURLWithPath: "/"))
             }
             
             webView.interactionState = interactionStateData
@@ -1143,7 +1143,7 @@ extension Tab: WKNavigationDelegate {
             if let newRequest = referrerTrimming.trimReferrer(forNavigation: navigationAction,
                                                               originUrl: webView.url ?? navigationAction.sourceFrame.webView?.url) {
                 defer {
-                    webView.load(newRequest)
+                    _ = webView.load(newRequest)
                 }
                 return .cancel
             }
@@ -1163,7 +1163,7 @@ extension Tab: WKNavigationDelegate {
                       let request = GPCRequestFactory.shared.requestForGPC(basedOn: navigationAction.request) {
                 self.invalidateBackItemIfNeeded(for: navigationAction)
                 defer {
-                    webView.load(request)
+                    _ = webView.load(request)
                 }
                 return .cancel
             }
