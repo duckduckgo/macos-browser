@@ -28,7 +28,12 @@ final class ContentBlocking {
     let privacyConfigurationManager: PrivacyConfigurationManager
     let trackerDataManager: TrackerDataManager
     let contentBlockingManager: ContentBlockerRulesManager
-    let contentBlockingUpdating: ContentBlockingUpdating
+    let userContentUpdating: UserContentUpdating
+
+    let tld = TLD()
+    
+    let adClickAttribution: AdClickAttributing
+    let adClickAttributionRulesProvider: AdClickAttributionRulesProvider
 
     private let contentBlockerRulesSource: ContentBlockerRulesLists
     private let exceptionsSource: DefaultContentBlockerRulesExceptionsSource
@@ -46,8 +51,10 @@ final class ContentBlocking {
                                                 data: DefaultConfigurationStorage.shared.loadData(for: .trackerRadar),
                                                 embeddedDataProvider: AppTrackerDataSetProvider(),
                                                 errorReporting: Self.debugEvents)
+        
+        adClickAttribution = AdClickAttributionFeature(with: privacyConfigurationManager)
 
-        contentBlockerRulesSource = ContentBlockerRulesLists(trackerDataManager: trackerDataManager)
+        contentBlockerRulesSource = ContentBlockerRulesLists(trackerDataManager: trackerDataManager, adClickAttribution: adClickAttribution)
         exceptionsSource = DefaultContentBlockerRulesExceptionsSource(privacyConfigManager: privacyConfigurationManager)
 
         contentBlockingManager = ContentBlockerRulesManager(rulesSource: contentBlockerRulesSource,
@@ -55,10 +62,15 @@ final class ContentBlocking {
                                                             cache: ContentBlockingRulesCache(),
                                                             errorReporting: Self.debugEvents,
                                                             logger: OSLog.contentBlocking)
-        contentBlockingUpdating = ContentBlockingUpdating(contentBlockerRulesManager: contentBlockingManager,
-                                                          privacyConfigurationManager: privacyConfigurationManager,
-                                                          configStorage: configStorage)
-
+        userContentUpdating = UserContentUpdating(contentBlockerRulesManager: contentBlockingManager,
+                                                  privacyConfigurationManager: privacyConfigurationManager,
+                                                  configStorage: configStorage)
+        
+        adClickAttributionRulesProvider = AdClickAttributionRulesProvider(config: adClickAttribution,
+                                                                          compiledRulesSource: contentBlockingManager,
+                                                                          exceptionsSource: exceptionsSource,
+                                                                          errorReporting: attributionDebugEvents,
+                                                                          compilationErrorReporting: Self.debugEvents)
     }
 
     private static let debugEvents = EventMapping<ContentBlockerDebugEvents> { event, error, parameters, onComplete in
@@ -111,62 +123,66 @@ final class ContentBlocking {
 
         Pixel.fire(.debug(event: domainEvent, error: error), withAdditionalParameters: parameters, onComplete: onComplete)
     }
-}
-
-final class ContentBlockingUpdating {
-
-    private struct BufferedValue {
-        let rulesUpdate: ContentBlockerRulesManager.UpdateEvent
-        let sourceProvider: ScriptSourceProviding
-
-        init(rulesUpdate: ContentBlockerRulesManager.UpdateEvent, sourceProvider: ScriptSourceProviding) {
-            self.rulesUpdate = rulesUpdate
-            self.sourceProvider = sourceProvider
-        }
+    
+    // MARK: - Ad Click Attribution
+    
+    public func makeAdClickAttributionDetection() -> AdClickAttributionDetection {
+        AdClickAttributionDetection(feature: adClickAttribution,
+                                    tld: tld,
+                                    eventReporting: attributionEvents,
+                                    errorReporting: attributionDebugEvents,
+                                    log: OSLog.attribution)
     }
-
-    @Published private var bufferedValue: BufferedValue?
-    private var cancellable: AnyCancellable?
-
-    private(set) var userContentBlockingAssets: AnyPublisher<UserContentController.ContentBlockingAssets, Never>!
-
-    init(contentBlockerRulesManager: ContentBlockerRulesManagerProtocol,
-         privacyConfigurationManager: PrivacyConfigurationManager = ContentBlocking.shared.privacyConfigurationManager,
-         configStorage: ConfigurationStoring = DefaultConfigurationStorage.shared,
-         privacySecurityPreferences: PrivacySecurityPreferences = PrivacySecurityPreferences.shared) {
-
-        let makeValue: (ContentBlockerRulesManager.UpdateEvent) -> BufferedValue = { rulesUpdate in
-            let sourceProvider = DefaultScriptSourceProvider(configStorage: configStorage,
-                                                             privacyConfigurationManager: privacyConfigurationManager,
-                                                             privacySettings: privacySecurityPreferences,
-                                                             contentBlockingManager: contentBlockerRulesManager)
-            return BufferedValue(rulesUpdate: rulesUpdate, sourceProvider: sourceProvider)
+    
+    public func makeAdClickAttributionLogic() -> AdClickAttributionLogic {
+        AdClickAttributionLogic(featureConfig: adClickAttribution,
+                                rulesProvider: adClickAttributionRulesProvider,
+                                tld: tld,
+                                eventReporting: attributionEvents,
+                                errorReporting: attributionDebugEvents,
+                                log: OSLog.attribution)
+    }
+    
+    private let attributionEvents = EventMapping<AdClickAttributionEvents> { event, _, parameters, _ in
+        let domainEvent: Pixel.Event
+        switch event {
+        case .adAttributionDetected:
+            domainEvent = .adClickAttributionDetected
+        case .adAttributionActive:
+            domainEvent = .adClickAttributionActive
         }
 
-        // 1. Collect updates from ContentBlockerRulesManager and generate UserScripts based on its output
-        cancellable = contentBlockerRulesManager.updatesPublisher
-            // regenerate UserScripts on gpcEnabled preference updated
-            .combineLatest(privacySecurityPreferences.$gpcEnabled)
-            .map { $0.0 } // drop gpcEnabled value: $0.1
-            // DefaultScriptSourceProvider instance should be created once per rules/config change and fed into UserScripts initialization
-            .map(makeValue)
-            .assign(to: \.bufferedValue, onWeaklyHeld: self) // buffer latest update value
-
-        // 2. Publish ContentBlockingAssets(Rules+Scripts) for WKUserContentController per subscription
-        self.userContentBlockingAssets = $bufferedValue
-            .compactMap { $0 } // drop initial nil
-            .map { value in
-                UserContentController.ContentBlockingAssets(contentRuleLists: value.rulesUpdate.rules
-                                                                .reduce(into: [String: WKContentRuleList](), { result, rules in
-                                                                    result[rules.name] = rules.rulesList
-                                                                }),
-                                                            userScripts: UserScripts(with: value.sourceProvider),
-                                                            completionTokens: value.rulesUpdate.completionTokens)
-            }
-            .eraseToAnyPublisher()
-
+        Pixel.fire(domainEvent, withAdditionalParameters: parameters ?? [:])
     }
+    
+    private let attributionDebugEvents = EventMapping<AdClickAttributionDebugEvents> { event, _, _, _ in
+        let domainEvent: Pixel.Event.Debug
+        switch event {
+        case .adAttributionCompilationFailedForAttributedRulesList:
+            domainEvent = .adAttributionCompilationFailedForAttributedRulesList
+        case .adAttributionGlobalAttributedRulesDoNotExist:
+            domainEvent = .adAttributionGlobalAttributedRulesDoNotExist
+        case .adAttributionDetectionHeuristicsDidNotMatchDomain:
+            domainEvent = .adAttributionDetectionHeuristicsDidNotMatchDomain
+        case .adAttributionLogicUnexpectedStateOnRulesCompiled:
+            domainEvent = .adAttributionLogicUnexpectedStateOnRulesCompiled
+        case .adAttributionLogicUnexpectedStateOnInheritedAttribution:
+            domainEvent = .adAttributionLogicUnexpectedStateOnInheritedAttribution
+        case .adAttributionLogicUnexpectedStateOnRulesCompilationFailed:
+            domainEvent = .adAttributionLogicUnexpectedStateOnRulesCompilationFailed
+        case .adAttributionDetectionInvalidDomainInParameter:
+            domainEvent = .adAttributionDetectionInvalidDomainInParameter
+        case .adAttributionLogicRequestingAttributionTimedOut:
+            domainEvent = .adAttributionLogicRequestingAttributionTimedOut
+        case .adAttributionLogicWrongVendorOnSuccessfulCompilation:
+            domainEvent = .adAttributionLogicWrongVendorOnSuccessfulCompilation
+        case .adAttributionLogicWrongVendorOnFailedCompilation:
+            domainEvent = .adAttributionLogicWrongVendorOnFailedCompilation
+        }
 
+        Pixel.fire(.debug(event: domainEvent, error: nil),
+                   includeAppVersionParameter: false)
+    }
 }
 
 protocol ContentBlockerRulesManagerProtocol: AnyObject {

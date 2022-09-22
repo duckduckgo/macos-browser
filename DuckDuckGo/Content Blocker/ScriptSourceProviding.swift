@@ -86,6 +86,7 @@ struct DefaultScriptSourceProvider: ScriptSourceProviding {
         return DefaultContentBlockerUserScriptConfig(privacyConfiguration: privacyConfigurationManager.privacyConfig,
                                                      trackerData: trackerData,
                                                      ctlTrackerData: ctlTrackerData,
+                                                     tld: ContentBlocking.shared.tld,
                                                      trackerDataManager: ContentBlocking.shared.trackerDataManager)
     }
 
@@ -106,6 +107,7 @@ struct DefaultScriptSourceProvider: ScriptSourceProviding {
                                                  trackerData: rules?.trackerData,
                                                  encodedSurrogateTrackerData: rules?.encodedTrackerData,
                                                  trackerDataManager: ContentBlocking.shared.trackerDataManager,
+                                                 tld: ContentBlocking.shared.tld,
                                                  isDebugBuild: isDebugBuild)
     }
 

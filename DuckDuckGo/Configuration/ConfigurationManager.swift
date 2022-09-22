@@ -122,7 +122,7 @@ final class ConfigurationManager {
 
     }
 
-    private func refreshIfNeeded() {
+    public func refreshIfNeeded() {
         guard self.isReadyToRefresh(), refreshCancellable == nil else {
             os_log("Configuration refresh is not needed at this time", log: .config, type: .debug)
             return
