@@ -540,7 +540,7 @@ struct UserText {
     static let bookmarksBarContextMenuDelete = NSLocalizedString("bookmarks.bar.context-menu.delete", value: "Delete", comment: "Delete menu item for the bookmarks bar context menu")
     static let bookmarksBarContextMenuMoveToEnd = NSLocalizedString("bookmarks.bar.context-menu.move-to-end", value: "Move to End", comment: "Move to End menu item for the bookmarks bar context menu")
     
-    static let showAutofillPanel = NSLocalizedString("pinning.show-autofill", value: "Show Autofill", comment: "Menu item for showing the autofill panel")
-    static let showDownloadsPanel = NSLocalizedString("pinning.show-downloads", value: "Show Downloads", comment: "Menu item for showing the downloads panel")
-    static let showBookmarksPanel = NSLocalizedString("pinning.show-bookmarks", value: "Show Bookmarks", comment: "Menu item for showing the bookmarks panel")
+    static let showAutofillPanel = NSLocalizedString("pinning.show-autofill", value: "Show Autofill Shortcut", comment: "Menu item for showing the autofill panel")
+    static let showDownloadsPanel = NSLocalizedString("pinning.show-downloads", value: "Show Downloads Shortcut", comment: "Menu item for showing the downloads panel")
+    static let showBookmarksPanel = NSLocalizedString("pinning.show-bookmarks", value: "Show Bookmarks Shortcut", comment: "Menu item for showing the bookmarks panel")
 }
