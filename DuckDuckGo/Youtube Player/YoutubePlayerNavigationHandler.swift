@@ -25,8 +25,11 @@ struct YoutubePlayerNavigationHandler {
     func makePrivatePlayerRequest(from originalRequest: URLRequest) -> URLRequest {
        
         let videoID: String
-        if let requestID = originalRequest.url?.absoluteString.split(separator: ":").last {
-            videoID = String(requestID)
+        if let query = originalRequest.url?.absoluteString.split(separator: ":").last,
+           let components = URLComponents(string: "?\(query)"),
+           let urlVideoID = components.queryItems?.first(where: { $0.value == nil })?.name {
+
+            videoID = urlVideoID
         } else {
             assertionFailure("Request should have ID")
             videoID = ""
@@ -78,7 +81,23 @@ extension URL {
         host == YoutubePlayerNavigationHandler.privatePlayerHost && fragment == YoutubePlayerNavigationHandler.privatePlayerFragment
     }
 
+    /// Returns true only if the video represents a playlist itself, i.e. doesn't have `index` query parameter
+    var isYoutubePlaylist: Bool {
+        guard isYoutubeWatch, let components = URLComponents(url: self, resolvingAgainstBaseURL: false) else {
+            return false
+        }
+
+        let isPlaylistURL = components.queryItems?.contains(where: { $0.name == "list" }) == true &&
+        components.queryItems?.contains(where: { $0.name == "index" }) == false
+
+        return isPlaylistURL
+    }
+
     var isYoutubeVideo: Bool {
+        isYoutubeWatch && !isYoutubePlaylist
+    }
+
+    private var isYoutubeWatch: Bool {
         host?.droppingWwwPrefix() == "youtube.com" && path == "/watch"
     }
 
@@ -91,7 +110,7 @@ extension URL {
             return lastPathComponent
         }
 
-        guard isYoutubeVideo, let components = URLComponents.init(url: self, resolvingAgainstBaseURL: false) else {
+        guard isYoutubeVideo, let components = URLComponents(url: self, resolvingAgainstBaseURL: false) else {
             return nil
         }
         return components.queryItems?.first(where: { $0.name == "v" })?.value
