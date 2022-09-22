@@ -97,6 +97,19 @@ extension URL {
         isYoutubeWatch && !isYoutubePlaylist
     }
 
+    var isYoutubeVideoRecommendation: Bool {
+        guard isYoutubeVideo,
+              let components = URLComponents(url: self, resolvingAgainstBaseURL: false),
+              let featureQueryParameter = components.queryItems?.first(where: { $0.name == "feature" })?.value
+        else {
+            return false
+        }
+
+        let recommendationFeatures = [ "emb_rel_end", "emb_rel_pause" ]
+
+        return recommendationFeatures.contains(featureQueryParameter)
+    }
+
     private var isYoutubeWatch: Bool {
         host?.droppingWwwPrefix() == "youtube.com" && path == "/watch"
     }

@@ -1111,14 +1111,18 @@ extension Tab: WKNavigationDelegate {
             return .allow
         }
 
-        if navigationAction.isTargetingMainFrame,
-           navigationAction.request.url?.isYoutubeVideo == true,
-           PrivacySecurityPreferences.shared.privateYoutubePlayerEnabled == true,
-           let videoID = navigationAction.request.url?.youtubeVideoID {
+        if navigationAction.isTargetingMainFrame || content.isPrivatePlayer, navigationAction.request.url?.isYoutubeVideo == true {
 
-            guard case .privatePlayer = content else {
-                webView.load(.privatePlayer(videoID))
-                return .cancel
+            let alwaysOpenInPrivatePlayer = PrivacySecurityPreferences.shared.privateYoutubePlayerEnabled == true
+            let didSelectRecommendationFromPrivatePlayer = content.isPrivatePlayer && navigationAction.request.url?.isYoutubeVideoRecommendation == true
+
+            if alwaysOpenInPrivatePlayer || didSelectRecommendationFromPrivatePlayer,
+                let videoID = navigationAction.request.url?.youtubeVideoID {
+
+                guard case .privatePlayer(let currentVideoID) = content, currentVideoID == videoID else {
+                    webView.load(.privatePlayer(videoID))
+                    return .cancel
+                }
             }
         }
 
