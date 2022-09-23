@@ -783,7 +783,7 @@ final class Tab: NSObject, Identifiable, ObservableObject {
     private var youtubePlayerCancellables: Set<AnyCancellable> = []
 
     func setUpYoutubeScriptsIfNeeded() {
-        if webView.url?.host?.droppingWwwPrefix() == "youtube.com" {
+        if webView.url?.host?.droppingWwwPrefix() == "youtube.com" && PrivacySecurityPreferences.shared.privateYoutubePlayerEnabled != false {
             youtubeOverlayScript?.setEnabled(true, in: webView)
         } else {
             youtubeOverlayScript?.setEnabled(false, in: webView)
