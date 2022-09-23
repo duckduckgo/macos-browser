@@ -288,12 +288,23 @@ final class Tab: NSObject, Identifiable, ObservableObject {
         guard contentChangeEnabled else {
             return
         }
+        if self.content != .none, case .privatePlayer(let parentVideoID) = parentTab?.content, webView.url?.isYoutubeVideo == true, webView.url?.youtubeVideoID == parentVideoID {
+            return
+        }
+
         lastUpgradedURL = nil
+
 
         switch (self.content, content) {
         case (.preferences(pane: .some), .preferences(pane: nil)):
             // prevent clearing currently selected pane (for state persistence purposes)
             break
+        case (.privatePlayer(let oldVideoID), .privatePlayer(let videoID)):
+            if oldVideoID == videoID, case .privatePlayer(let parentVideoID) = parentTab?.content, parentVideoID == videoID {
+                self.content = .url(.youtube(videoID))
+            } else if oldVideoID == videoID, let url = webView.url, url.isYoutubeVideo == true {
+                self.content = .url(url)
+            }
         default:
             if self.content != content {
                 self.content = content
@@ -1120,12 +1131,14 @@ extension Tab: WKNavigationDelegate {
             let alwaysOpenInPrivatePlayer = PrivacySecurityPreferences.shared.privateYoutubePlayerEnabled == true
             let didSelectRecommendationFromPrivatePlayer = content.isPrivatePlayer && navigationAction.request.url?.isYoutubeVideoRecommendation == true
 
-            if alwaysOpenInPrivatePlayer || didSelectRecommendationFromPrivatePlayer,
-                let videoID = navigationAction.request.url?.youtubeVideoID {
+            if alwaysOpenInPrivatePlayer || didSelectRecommendationFromPrivatePlayer, let videoID = navigationAction.request.url?.youtubeVideoID {
 
-                guard case .privatePlayer(let currentVideoID) = content, currentVideoID == videoID else {
-                    webView.load(.privatePlayer(videoID))
-                    return .cancel
+                if case .privatePlayer(let parentVideoID) = parentTab?.content, parentVideoID == videoID {} else {
+
+                    guard case .privatePlayer(let currentVideoID) = content, currentVideoID == videoID, webView.url?.isPrivatePlayer == true else {
+                        webView.load(.privatePlayer(videoID))
+                        return .cancel
+                    }
                 }
             }
         }
@@ -1218,7 +1231,7 @@ extension Tab: WKNavigationDelegate {
             defer {
                 delegate?.tab(
                     self,
-                    requestedNewTabWith: navigationAction.request.url.map { .url($0) } ?? .none,
+                    requestedNewTabWith: navigationAction.request.url.map { .contentFromURL($0) } ?? .none,
                     selected: shouldSelectNewTab)
             }
             return .cancel
