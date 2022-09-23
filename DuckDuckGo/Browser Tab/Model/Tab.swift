@@ -288,12 +288,15 @@ final class Tab: NSObject, Identifiable, ObservableObject {
         guard contentChangeEnabled else {
             return
         }
-        if self.content != .none, case .privatePlayer(let parentVideoID) = parentTab?.content, webView.url?.isYoutubeVideo == true, webView.url?.youtubeVideoID == parentVideoID {
-            return
-        }
 
         lastUpgradedURL = nil
 
+        if case .privatePlayer(let parentVideoID) = parentTab?.content, let url = webView.url, url.isYoutubeVideo == true, url.youtubeVideoID == parentVideoID {
+            if self.content == .none {
+                self.content = .url(url)
+            }
+            return
+        }
 
         switch (self.content, content) {
         case (.preferences(pane: .some), .preferences(pane: nil)):
