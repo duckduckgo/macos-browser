@@ -698,6 +698,11 @@ final class Tab: NSObject, Identifiable, ObservableObject {
     private func handleFavicon(oldContent: TabContent) {
         guard faviconManagement.areFaviconsLoaded else { return }
 
+        if content.isPrivatePlayer {
+            favicon = NSImage(named: "PrivatePlayer")!
+            return
+        }
+
         guard content.isUrl, let url = content.url else {
             favicon = nil
             return

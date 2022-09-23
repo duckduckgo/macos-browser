@@ -48,6 +48,10 @@ final class VisitViewModel {
             return nil
         }
 
+        if historyEntry.url.isPrivatePlayer {
+            return NSImage(named: "PrivatePlayer")!
+        }
+
         return faviconManager.getCachedFavicon(for: historyEntry.url, sizeCategory: .small)?.image
     }
 
