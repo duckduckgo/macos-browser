@@ -74,6 +74,10 @@ final class WKBackForwardListItemViewModel {
             return NSImage(named: "HomeFavicon")
         }
 
+        if backForwardListItem.url?.isPrivatePlayer == true {
+            return NSImage(named: "PrivatePlayer")
+        }
+
         if let url = backForwardListItem.url,
            let favicon = faviconManagement.getCachedFavicon(for: url, sizeCategory: .small),
            let image = favicon.image?.resizedToFaviconSize() {
