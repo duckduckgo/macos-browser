@@ -37,7 +37,7 @@ struct YoutubePlayerNavigationHandler {
            let components = URLComponents(string: "?\(query)"),
            let urlVideoID = components.queryItems?.first(where: { $0.value == nil })?.name {
 
-            videoID = urlVideoID
+            videoID = urlVideoID.removingCharacters(in: .youtubeVideoIDNotAllowed)
         } else {
             assertionFailure("Request should have ID")
             videoID = ""
@@ -123,17 +123,24 @@ extension URL {
     }
 
     var youtubeVideoID: String? {
-        if isPrivatePlayerScheme {
-            return absoluteString.split(separator: ":").last.flatMap(String.init)
-        }
+        let unsafeID: String? = {
+            if isPrivatePlayerScheme {
+                return absoluteString.split(separator: ":").last.flatMap(String.init)
+            }
 
-        if isPrivatePlayer {
-            return lastPathComponent
-        }
+            if isPrivatePlayer {
+                return lastPathComponent
+            }
 
-        guard isYoutubeVideo, let components = URLComponents(url: self, resolvingAgainstBaseURL: false) else {
-            return nil
-        }
-        return components.queryItems?.first(where: { $0.name == "v" })?.value
+            guard isYoutubeVideo, let components = URLComponents(url: self, resolvingAgainstBaseURL: false) else {
+                return nil
+            }
+            return components.queryItems?.first(where: { $0.name == "v" })?.value
+        }()
+        return unsafeID?.removingCharacters(in: .youtubeVideoIDNotAllowed)
     }
+}
+
+private extension CharacterSet {
+    static let youtubeVideoIDNotAllowed = CharacterSet(charactersIn: "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789-_").inverted
 }

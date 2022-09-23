@@ -288,12 +288,26 @@ final class Tab: NSObject, Identifiable, ObservableObject {
         guard contentChangeEnabled else {
             return
         }
+
         lastUpgradedURL = nil
+
+        if case .privatePlayer(let parentVideoID) = parentTab?.content, let url = webView.url, url.isYoutubeVideo == true, url.youtubeVideoID == parentVideoID {
+            if self.content == .none {
+                self.content = .url(url)
+            }
+            return
+        }
 
         switch (self.content, content) {
         case (.preferences(pane: .some), .preferences(pane: nil)):
             // prevent clearing currently selected pane (for state persistence purposes)
             break
+        case (.privatePlayer(let oldVideoID), .privatePlayer(let videoID)):
+            if oldVideoID == videoID, case .privatePlayer(let parentVideoID) = parentTab?.content, parentVideoID == videoID {
+                self.content = .url(.youtube(videoID))
+            } else if oldVideoID == videoID, let url = webView.url, url.isYoutubeVideo == true {
+                self.content = .url(url)
+            }
         default:
             if self.content != content {
                 self.content = content
@@ -684,6 +698,11 @@ final class Tab: NSObject, Identifiable, ObservableObject {
     private func handleFavicon(oldContent: TabContent) {
         guard faviconManagement.areFaviconsLoaded else { return }
 
+        if content.isPrivatePlayer {
+            favicon = NSImage(named: "PrivatePlayer")!
+            return
+        }
+
         guard content.isUrl, let url = content.url else {
             favicon = nil
             return
@@ -764,7 +783,7 @@ final class Tab: NSObject, Identifiable, ObservableObject {
     private var youtubePlayerCancellables: Set<AnyCancellable> = []
 
     func setUpYoutubeScriptsIfNeeded() {
-        if webView.url?.host?.droppingWwwPrefix() == "youtube.com" {
+        if webView.url?.host?.droppingWwwPrefix() == "youtube.com" && PrivacySecurityPreferences.shared.privateYoutubePlayerEnabled != false {
             youtubeOverlayScript?.setEnabled(true, in: webView)
         } else {
             youtubeOverlayScript?.setEnabled(false, in: webView)
@@ -1120,12 +1139,14 @@ extension Tab: WKNavigationDelegate {
             let alwaysOpenInPrivatePlayer = PrivacySecurityPreferences.shared.privateYoutubePlayerEnabled == true
             let didSelectRecommendationFromPrivatePlayer = content.isPrivatePlayer && navigationAction.request.url?.isYoutubeVideoRecommendation == true
 
-            if alwaysOpenInPrivatePlayer || didSelectRecommendationFromPrivatePlayer,
-                let videoID = navigationAction.request.url?.youtubeVideoID {
+            if alwaysOpenInPrivatePlayer || didSelectRecommendationFromPrivatePlayer, let videoID = navigationAction.request.url?.youtubeVideoID {
 
-                guard case .privatePlayer(let currentVideoID) = content, currentVideoID == videoID else {
-                    webView.load(.privatePlayer(videoID))
-                    return .cancel
+                if case .privatePlayer(let parentVideoID) = parentTab?.content, parentVideoID == videoID {} else {
+
+                    guard case .privatePlayer(let currentVideoID) = content, currentVideoID == videoID, webView.url?.isPrivatePlayer == true else {
+                        webView.load(.privatePlayer(videoID))
+                        return .cancel
+                    }
                 }
             }
         }
@@ -1218,7 +1239,7 @@ extension Tab: WKNavigationDelegate {
             defer {
                 delegate?.tab(
                     self,
-                    requestedNewTabWith: navigationAction.request.url.map { .url($0) } ?? .none,
+                    requestedNewTabWith: navigationAction.request.url.map { .contentFromURL($0) } ?? .none,
                     selected: shouldSelectNewTab)
             }
             return .cancel
