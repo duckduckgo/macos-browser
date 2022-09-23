@@ -398,6 +398,14 @@ final class LocalBookmarkStoreTests: XCTestCase {
         await validateSubsequentImport(for: .thirdPartyBrowser(.firefox))
     }
     
+    func testWhenHTMLBookmarksAreImported_AndTheBookmarksStoreIsNotEmpty_ThenBookmarksAreImportedToTheirOwnFolder_AndNoBookmarksAreFavorited() async {
+        await validateSubsequentImport(for: .thirdPartyBrowser(.bookmarksHTML))
+    }
+    
+    func testWhenDDGHTMLBookmarksAreImported_AndTheBookmarksStoreIsNotEmpty_ThenBookmarksAreImportedToTheirOwnFolder_AndNoBookmarksAreFavorited() async {
+        await validateSubsequentImport(for: .duckduckgoWebKit)
+    }
+    
     private func validateInitialImport(for source: BookmarkImportSource) async {
         let container = CoreData.bookmarkContainer()
         let context = container.viewContext
