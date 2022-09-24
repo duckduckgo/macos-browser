@@ -3687,14 +3687,7 @@
                 "Action Pixels",
                 "Embedded Content"
             ],
-            "default": "block",
-            "rules": [
-                {
-                    "rule": "bat\\.bing\\.com",
-                    "action": "ignore",
-                    "comment": "Allow to load, but all other protections apply, including cookie protection"
-                }
-            ]
+            "default": "block"
         },
         "bit.ly": {
             "domain": "bit.ly",
