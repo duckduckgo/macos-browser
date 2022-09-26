@@ -225,7 +225,7 @@ final class Tab: NSObject, Identifiable, ObservableObject {
     }
 
     deinit {
-        if let url = url {
+        if let url = webView.url {
             historyCoordinating.commitChanges(url: url)
         }
         webView.stopLoading()
