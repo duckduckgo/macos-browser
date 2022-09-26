@@ -2,7 +2,7 @@
 
 set -eo pipefail
 
-TDS_URL="https://staticcdn.duckduckgo.com/trackerblocking/v2.1/apple-tds.json"
+TDS_URL="https://staticcdn.duckduckgo.com/trackerblocking/v3/apple-tds.json"
 CONFIG_URL="https://staticcdn.duckduckgo.com/trackerblocking/config/v2/macos-config.json"
 
 # If -c is passed, then check the URLs in the Configuration files are correct.
@@ -55,7 +55,7 @@ performUpdate() {
 
 	printf "Existing ETag: %s\n" "${old_etag}"
 	printf "Existing SHA256: %s\n" "${old_sha}"
- 
+
 	curl -s -o "$temp_filename" -H "If-None-Match: \"${old_etag}\"" --etag-save "$temp_etag_filename" "${file_url}"
 
 	if test -f $temp_filename; then
