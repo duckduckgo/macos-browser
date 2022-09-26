@@ -26,7 +26,7 @@ struct PreferencesSection: Hashable, Identifiable {
     static let defaultSections: [PreferencesSection] = [
         .init(
             id: .regularPreferencePanes,
-            panes: [.general, .appearance, .privacy, .autofill, .downloads]
+            panes: [.general, .appearance, .privacy, .privatePlayer, .autofill, .downloads]
         ),
         .init(
             id: .about,
@@ -44,6 +44,7 @@ enum PreferencePaneIdentifier: String, Equatable, Hashable, Identifiable {
     case general
     case appearance
     case privacy
+    case privatePlayer
     case autofill
     case downloads
     case about
@@ -66,6 +67,8 @@ enum PreferencePaneIdentifier: String, Equatable, Hashable, Identifiable {
             return UserText.appearance
         case .privacy:
             return UserText.privacy
+        case .privatePlayer:
+            return UserText.privatePlayer
         case .autofill:
             return UserText.autofill
         case .downloads:
@@ -83,6 +86,8 @@ enum PreferencePaneIdentifier: String, Equatable, Hashable, Identifiable {
             return "Appearance"
         case .privacy:
             return "Privacy"
+        case .privatePlayer:
+            return "Private Player"
         case .autofill:
             return "Autofill"
         case .downloads:

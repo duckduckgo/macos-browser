@@ -48,6 +48,8 @@ extension Preferences {
                                 AppearanceView(model: .shared)
                             case .privacy:
                                 PrivacyView(model: PrivacyPreferencesModel())
+                            case .privatePlayer:
+                                PrivatePlayerView(model: PrivatePlayerPreferencesModel())
                             case .autofill:
                                 AutofillView(model: AutofillPreferencesModel())
                             case .downloads:

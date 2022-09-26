@@ -61,31 +61,6 @@ extension Preferences {
                 }
 
                 Section {
-                    Text(UserText.privatePlayerSettingsTitle)
-                        .font(Const.Fonts.preferencePaneSectionHeader)
-
-                    Picker(selection: privatePlayerModeBinding, content: {
-                        Text(UserText.privatePlayerAlwaysOpenInPlayer)
-                            .padding(.bottom, 4)
-                            .tag(PrivacyPreferencesModel.PrivatePlayerMode.enabled)
-
-                        Text(UserText.privatePlayerShowPlayerButtons)
-                            .padding(.bottom, 4)
-                            .tag(PrivacyPreferencesModel.PrivatePlayerMode.alwaysAsk)
-
-                        Text(UserText.privatePlayerOff)
-                            .padding(.bottom, 4)
-                            .tag(PrivacyPreferencesModel.PrivatePlayerMode.disabled)
-
-                    }, label: {})
-                    .pickerStyle(.radioGroup)
-                    .offset(x: Const.pickerHorizontalOffset)
-
-                    Text(UserText.privatePlayerExplanation)
-                        .fixMultilineScrollableText()
-                }
-
-                Section {
                     Text(UserText.gpcSettingsTitle)
                         .font(Const.Fonts.preferencePaneSectionHeader)
 
