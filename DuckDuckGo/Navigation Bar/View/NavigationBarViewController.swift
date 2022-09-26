@@ -516,8 +516,8 @@ final class NavigationBarViewController: NSViewController {
 
     private func updatePasswordManagementButton() {
         let menu = NSMenu()
-        let item = menu.addItem(withTitle: UserText.showAutofillPanel, action: #selector(toggleAutofillPanelPinning), keyEquivalent: "")
-        item.state = (LocalPinningManager.shared.isPinned(.autofill)) ? .on : .off
+        let title = LocalPinningManager.shared.toggleShortcutInterfaceTitle(for: .autofill)
+        menu.addItem(withTitle: title, action: #selector(toggleAutofillPanelPinning), keyEquivalent: "")
         
         passwordManagementButton.menu = menu
         
@@ -549,8 +549,8 @@ final class NavigationBarViewController: NSViewController {
 
     private func updateDownloadsButton(updatingFromPinnedViewsNotification: Bool = false) {
         let menu = NSMenu()
-        let item = menu.addItem(withTitle: UserText.showDownloadsPanel, action: #selector(toggleDownloadsPanelPinning(_:)), keyEquivalent: "")
-        item.state = (LocalPinningManager.shared.isPinned(.downloads)) ? .on : .off
+        let title = LocalPinningManager.shared.toggleShortcutInterfaceTitle(for: .downloads)
+        menu.addItem(withTitle: title, action: #selector(toggleDownloadsPanelPinning(_:)), keyEquivalent: "")
         
         downloadsButton.menu = menu
         
@@ -609,8 +609,8 @@ final class NavigationBarViewController: NSViewController {
 
     private func updateBookmarksButton() {
         let menu = NSMenu()
-        let item = menu.addItem(withTitle: UserText.showBookmarksPanel, action: #selector(toggleBookmarksPanelPinning(_:)), keyEquivalent: "")
-        item.state = (LocalPinningManager.shared.isPinned(.bookmarks)) ? .on : .off
+        let title = LocalPinningManager.shared.toggleShortcutInterfaceTitle(for: .bookmarks)
+        menu.addItem(withTitle: title, action: #selector(toggleBookmarksPanelPinning(_:)), keyEquivalent: "")
         
         bookmarkListButton.menu = menu
         
@@ -719,19 +719,19 @@ extension NavigationBarViewController: NSMenuDelegate {
     public func menuNeedsUpdate(_ menu: NSMenu) {
         menu.removeAllItems()
         
-        let bookmarksBarItem = menu.addItem(withTitle: UserText.showBookmarksBar, action: #selector(toggleBookmarksBar), keyEquivalent: "")
-        bookmarksBarItem.state = PersistentAppInterfaceSettings.shared.showBookmarksBar ? .on : .off
+        let bookmarksBarTitle = PersistentAppInterfaceSettings.shared.showBookmarksBar ? UserText.hideBookmarksBar : UserText.showBookmarksBar
+        let bookmarksBarItem = menu.addItem(withTitle: bookmarksBarTitle, action: #selector(toggleBookmarksBar), keyEquivalent: "B")
         
         menu.addItem(NSMenuItem.separator())
         
-        let autofillItem = menu.addItem(withTitle: UserText.showAutofillPanel, action: #selector(toggleAutofillPanelPinning), keyEquivalent: "")
-        autofillItem.state = (LocalPinningManager.shared.isPinned(.autofill)) ? .on : .off
-        
-        let bookmarksItem = menu.addItem(withTitle: UserText.showBookmarksPanel, action: #selector(toggleBookmarksPanelPinning), keyEquivalent: "")
-        bookmarksItem.state = (LocalPinningManager.shared.isPinned(.bookmarks)) ? .on : .off
-        
-        let downloadsItem = menu.addItem(withTitle: UserText.showDownloadsPanel, action: #selector(toggleDownloadsPanelPinning), keyEquivalent: "")
-        downloadsItem.state = (LocalPinningManager.shared.isPinned(.downloads)) ? .on : .off
+        let autofillTitle = LocalPinningManager.shared.toggleShortcutInterfaceTitle(for: .autofill)
+        let autofillItem = menu.addItem(withTitle: autofillTitle, action: #selector(toggleAutofillPanelPinning), keyEquivalent: "A")
+
+        let bookmarksTitle = LocalPinningManager.shared.toggleShortcutInterfaceTitle(for: .bookmarks)
+        let bookmarksItem = menu.addItem(withTitle: bookmarksTitle, action: #selector(toggleBookmarksPanelPinning), keyEquivalent: "K")
+
+        let downloadsTitle = LocalPinningManager.shared.toggleShortcutInterfaceTitle(for: .downloads)
+        let downloadsItem = menu.addItem(withTitle: downloadsTitle, action: #selector(toggleDownloadsPanelPinning), keyEquivalent: "J")
     }
     
     @objc

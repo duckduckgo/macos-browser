@@ -55,6 +55,14 @@ final class LocalPinningManager: PinningManager {
     func isPinned(_ view: PinnableView) -> Bool {
         return pinnedViewStrings.contains(view.rawValue)
     }
+    
+    func toggleShortcutInterfaceTitle(for view: PinnableView) -> String {
+        switch view {
+        case .autofill: return isPinned(.autofill) ? UserText.hideAutofillShortcut : UserText.showAutofillShortcut
+        case .bookmarks: return isPinned(.bookmarks) ? UserText.hideBookmarksShortcut : UserText.showBookmarksShortcut
+        case .downloads: return isPinned(.downloads) ? UserText.hideDownloadsShortcut : UserText.showDownloadsShortcut
+        }
+    }
 
 }
 
