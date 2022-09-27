@@ -138,9 +138,10 @@ final class Tab: NSObject, Identifiable, ObservableObject {
         }
 
         var isUrl: Bool {
-            if case .url = self {
+            switch self {
+            case .url, .privatePlayer:
                 return true
-            } else {
+            default:
                 return false
             }
         }
@@ -225,7 +226,7 @@ final class Tab: NSObject, Identifiable, ObservableObject {
     }
 
     deinit {
-        if let url = url {
+        if content.isUrl, let url = webView.url {
             historyCoordinating.commitChanges(url: url)
         }
         webView.stopLoading()
@@ -302,10 +303,10 @@ final class Tab: NSObject, Identifiable, ObservableObject {
         case (.preferences(pane: .some), .preferences(pane: nil)):
             // prevent clearing currently selected pane (for state persistence purposes)
             break
-        case (.privatePlayer(let oldVideoID), .privatePlayer(let videoID)):
-            if oldVideoID == videoID, case .privatePlayer(let parentVideoID) = parentTab?.content, parentVideoID == videoID {
+        case (.privatePlayer(let oldVideoID), .privatePlayer(let videoID)) where oldVideoID == videoID:
+            if case .privatePlayer(let parentVideoID) = parentTab?.content, parentVideoID == videoID {
                 self.content = .url(.youtube(videoID))
-            } else if oldVideoID == videoID, let url = webView.url, url.isYoutubeVideo == true {
+            } else if let url = webView.url, url.isYoutubeVideo == true {
                 self.content = .url(url)
             }
         default:

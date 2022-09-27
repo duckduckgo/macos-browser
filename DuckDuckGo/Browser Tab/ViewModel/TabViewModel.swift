@@ -198,7 +198,7 @@ final class TabViewModel {
             return
         }
 
-        guard let url = tabURL else {
+        guard tab.content.isUrl, let url = tabURL else {
             addressBarString = ""
             passiveAddressBarString = ""
             return

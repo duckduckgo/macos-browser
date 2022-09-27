@@ -20,7 +20,6 @@ import Foundation
 
 struct YoutubePlayerNavigationHandler {
     static let privatePlayerHost = "www.youtube-nocookie.com"
-    static let privatePlayerFragment = "privateplayer"
 
     static var htmlTemplatePath: String {
         guard let file = Bundle.main.path(forResource: Self.htmlTemplateFileName, ofType: "html") else {
@@ -47,10 +46,7 @@ struct YoutubePlayerNavigationHandler {
     }
 
     func makePrivatePlayerRequest(for videoID: String) -> URLRequest {
-        #warning("Check if all these queries are required or not")
-        let url = URL(string: "https://\(Self.privatePlayerHost)/embed/\(videoID)?wmode=transparent&iv_load_policy=3&autoplay=1&html5=1&showinfo=0&rel=0&modestbranding=1&playsinline=0#\(Self.privatePlayerFragment)")!
-
-        var request = URLRequest(url: url)
+        var request = URLRequest(url: .youtubeNoCookie(videoID))
         request.addValue("http://localhost/", forHTTPHeaderField: "Referer")
         request.httpMethod = "GET"
 
@@ -74,7 +70,7 @@ extension URL {
     }
 
     static func youtubeNoCookie(_ videoID: String) -> URL {
-        "https://\(YoutubePlayerNavigationHandler.privatePlayerHost)/embed/\(videoID)?wmode=transparent&iv_load_policy=3&autoplay=1&html5=1&showinfo=0&rel=0&modestbranding=1&playsinline=0#\(YoutubePlayerNavigationHandler.privatePlayerFragment)".url!
+        "https://\(YoutubePlayerNavigationHandler.privatePlayerHost)/embed/\(videoID)?wmode=transparent&iv_load_policy=3&autoplay=1&html5=1&showinfo=0&rel=0&modestbranding=1&playsinline=0".url!
     }
 
     static func youtube(_ videoID: String) -> URL {
@@ -86,7 +82,7 @@ extension URL {
     }
 
     var isPrivatePlayer: Bool {
-        host == YoutubePlayerNavigationHandler.privatePlayerHost && fragment == YoutubePlayerNavigationHandler.privatePlayerFragment
+        host == YoutubePlayerNavigationHandler.privatePlayerHost
     }
 
     /// Returns true only if the video represents a playlist itself, i.e. doesn't have `index` query parameter
