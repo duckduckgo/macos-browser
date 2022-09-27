@@ -104,6 +104,7 @@
 		37D2771527E870D4003365FD /* PreferencesAppearanceView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37D2771427E870D4003365FD /* PreferencesAppearanceView.swift */; };
 		37F19A6528E1B3FB00740DC6 /* PreferencesPrivatePlayerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37F19A6428E1B3FB00740DC6 /* PreferencesPrivatePlayerView.swift */; };
 		37F19A6728E1B43200740DC6 /* PrivatePlayerPreferencesModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37F19A6628E1B43200740DC6 /* PrivatePlayerPreferencesModel.swift */; };
+		37F19A6A28E2F2D000740DC6 /* PrivatePlayer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37F19A6928E2F2D000740DC6 /* PrivatePlayer.swift */; };
 		4B0135CE2729F1AA00D54834 /* NSPasteboardExtension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B0135CD2729F1AA00D54834 /* NSPasteboardExtension.swift */; };
 		4B02198925E05FAC00ED7DEA /* FireproofingURLExtensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B02197F25E05FAC00ED7DEA /* FireproofingURLExtensions.swift */; };
 		4B02198A25E05FAC00ED7DEA /* FireproofDomains.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B02198125E05FAC00ED7DEA /* FireproofDomains.swift */; };
@@ -928,6 +929,7 @@
 		37D2771427E870D4003365FD /* PreferencesAppearanceView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PreferencesAppearanceView.swift; sourceTree = "<group>"; };
 		37F19A6428E1B3FB00740DC6 /* PreferencesPrivatePlayerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PreferencesPrivatePlayerView.swift; sourceTree = "<group>"; };
 		37F19A6628E1B43200740DC6 /* PrivatePlayerPreferencesModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PrivatePlayerPreferencesModel.swift; sourceTree = "<group>"; };
+		37F19A6928E2F2D000740DC6 /* PrivatePlayer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PrivatePlayer.swift; sourceTree = "<group>"; };
 		4B0135CD2729F1AA00D54834 /* NSPasteboardExtension.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = NSPasteboardExtension.swift; sourceTree = "<group>"; };
 		4B02197F25E05FAC00ED7DEA /* FireproofingURLExtensions.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = FireproofingURLExtensions.swift; sourceTree = "<group>"; };
 		4B02198125E05FAC00ED7DEA /* FireproofDomains.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = FireproofDomains.swift; sourceTree = "<group>"; };
@@ -1747,10 +1749,11 @@
 			children = (
 				31F28C5B28C8EEE100119F70 /* UI */,
 				31F28C5428C8EED100119F70 /* Resources */,
+				37F19A6928E2F2D000740DC6 /* PrivatePlayer.swift */,
 				31F28C5228C8EECA00119F70 /* PrivatePlayerSchemeHandler.swift */,
+				315AA06F28CA5CC800200030 /* YoutubePlayerNavigationHandler.swift */,
 				31F28C4E28C8EEC500119F70 /* YoutubeOverlayUserScript.swift */,
 				31F28C4C28C8EEC500119F70 /* YoutubePlayerUserScript.swift */,
-				315AA06F28CA5CC800200030 /* YoutubePlayerNavigationHandler.swift */,
 			);
 			path = "Youtube Player";
 			sourceTree = "<group>";
@@ -4702,6 +4705,7 @@
 				4B9292DB2667125D00AD2C21 /* ContextualMenu.swift in Sources */,
 				AA68C3D32490ED62001B8783 /* NavigationBarViewController.swift in Sources */,
 				AA585DAF2490E6E600E9A3E2 /* MainViewController.swift in Sources */,
+				37F19A6A28E2F2D000740DC6 /* PrivatePlayer.swift in Sources */,
 				AA5FA69A275F91C700DCE9C9 /* Favicon.swift in Sources */,
 				AABEE69A24A902A90043105B /* SuggestionContainerViewModel.swift in Sources */,
 				AA840A9827319D1600E63CDD /* FirePopoverWrapperViewController.swift in Sources */,

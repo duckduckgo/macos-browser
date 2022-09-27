@@ -700,7 +700,7 @@ final class Tab: NSObject, Identifiable, ObservableObject {
         guard faviconManagement.areFaviconsLoaded else { return }
 
         if content.isPrivatePlayer {
-            favicon = NSImage(named: "PrivatePlayer")!
+            favicon = .privatePlayer
             return
         }
 
@@ -1122,34 +1122,9 @@ extension Tab: WKNavigationDelegate {
     @MainActor
     func webView(_ webView: WKWebView,
                  decidePolicyFor navigationAction: WKNavigationAction) async -> WKNavigationActionPolicy {
-        
-        if navigationAction.request.url?.isFileURL == true {
-            if navigationAction.request.url?.path == YoutubePlayerNavigationHandler.htmlTemplatePath {
-                // don't allow loading Youtube Player directly
-                return .cancel
-            }
-            return .allow
-        }
-        
-        if navigationAction.request.url?.isPrivatePlayerScheme == true {
-            return .allow
-        }
-
-        if navigationAction.isTargetingMainFrame || content.isPrivatePlayer, navigationAction.request.url?.isYoutubeVideo == true {
-
-            let alwaysOpenInPrivatePlayer = PrivacySecurityPreferences.shared.privateYoutubePlayerEnabled == true
-            let didSelectRecommendationFromPrivatePlayer = content.isPrivatePlayer && navigationAction.request.url?.isYoutubeVideoRecommendation == true
-
-            if alwaysOpenInPrivatePlayer || didSelectRecommendationFromPrivatePlayer, let videoID = navigationAction.request.url?.youtubeVideoID {
-
-                if case .privatePlayer(let parentVideoID) = parentTab?.content, parentVideoID == videoID {} else {
-
-                    guard case .privatePlayer(let currentVideoID) = content, currentVideoID == videoID, webView.url?.isPrivatePlayer == true else {
-                        webView.load(.privatePlayer(videoID))
-                        return .cancel
-                    }
-                }
-            }
+                
+        if let policy = PrivatePlayer.decidePolicy(for: navigationAction, in: self) {
+            return policy
         }
 
         let isLinkActivated = navigationAction.navigationType == .linkActivated
