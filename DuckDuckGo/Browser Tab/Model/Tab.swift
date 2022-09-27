@@ -138,9 +138,10 @@ final class Tab: NSObject, Identifiable, ObservableObject {
         }
 
         var isUrl: Bool {
-            if case .url = self {
+            switch self {
+            case .url, .privatePlayer:
                 return true
-            } else {
+            default:
                 return false
             }
         }
@@ -225,7 +226,7 @@ final class Tab: NSObject, Identifiable, ObservableObject {
     }
 
     deinit {
-        if let url = webView.url {
+        if content.isUrl, let url = webView.url {
             historyCoordinating.commitChanges(url: url)
         }
         webView.stopLoading()
