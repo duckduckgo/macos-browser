@@ -396,6 +396,7 @@
 		9833912F27AAA3CE00DAF119 /* AppTrackerDataSetProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9833912E27AAA3CE00DAF119 /* AppTrackerDataSetProvider.swift */; };
 		9833913127AAA4B500DAF119 /* trackerData.json in Resources */ = {isa = PBXBuildFile; fileRef = 9833913027AAA4B500DAF119 /* trackerData.json */; };
 		9833913327AAAEEE00DAF119 /* EmbeddedTrackerDataTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9833913227AAAEEE00DAF119 /* EmbeddedTrackerDataTests.swift */; };
+		983DFB2528B67036006B7E34 /* UserContentUpdating.swift in Sources */ = {isa = PBXBuildFile; fileRef = 983DFB2428B67036006B7E34 /* UserContentUpdating.swift */; };
 		98EB5D1027516A4800681FE6 /* AppPrivacyConfigurationTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 98EB5D0F27516A4800681FE6 /* AppPrivacyConfigurationTests.swift */; };
 		AA06B6B72672AF8100F541C5 /* Sparkle in Frameworks */ = {isa = PBXBuildFile; productRef = AA06B6B62672AF8100F541C5 /* Sparkle */; };
 		AA0877B826D5160D00B05660 /* SafariVersionReaderTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA0877B726D5160D00B05660 /* SafariVersionReaderTests.swift */; };
@@ -1214,6 +1215,7 @@
 		9833912E27AAA3CE00DAF119 /* AppTrackerDataSetProvider.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppTrackerDataSetProvider.swift; sourceTree = "<group>"; };
 		9833913027AAA4B500DAF119 /* trackerData.json */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.json; path = trackerData.json; sourceTree = "<group>"; };
 		9833913227AAAEEE00DAF119 /* EmbeddedTrackerDataTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EmbeddedTrackerDataTests.swift; sourceTree = "<group>"; };
+		983DFB2428B67036006B7E34 /* UserContentUpdating.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UserContentUpdating.swift; sourceTree = "<group>"; };
 		98EB5D0F27516A4800681FE6 /* AppPrivacyConfigurationTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppPrivacyConfigurationTests.swift; sourceTree = "<group>"; };
 		AA0877B726D5160D00B05660 /* SafariVersionReaderTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SafariVersionReaderTests.swift; sourceTree = "<group>"; };
 		AA0877B926D5161D00B05660 /* WebKitVersionProviderTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WebKitVersionProviderTests.swift; sourceTree = "<group>"; };
@@ -3258,6 +3260,7 @@
 				AA9FF95824A1ECF20039E328 /* Tab.swift */,
 				85AC3AEE25D5CE9800C7D2AA /* UserScripts.swift */,
 				F4A6198B283CFFBB007F2080 /* ContentScopeFeatureFlagging.swift */,
+				983DFB2428B67036006B7E34 /* UserContentUpdating.swift */,
 				B61F015425EDD5A700ABB5A3 /* UserContentController.swift */,
 			);
 			path = Model;
@@ -4750,6 +4753,7 @@
 				B6A924D92664C72E001A28CA /* WebKitDownloadTask.swift in Sources */,
 				4B59023E26B35F3600489384 /* ChromiumLoginReader.swift in Sources */,
 				85D885B326A5A9DE0077C374 /* NSAlert+PasswordManager.swift in Sources */,
+				983DFB2528B67036006B7E34 /* UserContentUpdating.swift in Sources */,
 				4B7A57CF279A4EF300B1C70E /* ChromePreferences.swift in Sources */,
 				AA6AD95B2704B6DB00159F8A /* FirePopoverViewController.swift in Sources */,
 				4BE4005327CF3DC3007D3161 /* SavePaymentMethodPopover.swift in Sources */,
@@ -5285,7 +5289,7 @@
 				CODE_SIGN_IDENTITY = "Developer ID Application";
 				CODE_SIGN_STYLE = Manual;
 				COMBINE_HIDPI_IMAGES = YES;
-				CURRENT_PROJECT_VERSION = "$(MARKETING_VERSION)";
+				CURRENT_PROJECT_VERSION = 0.28.10;
 				DEVELOPMENT_TEAM = HKE973VLUW;
 				ENABLE_HARDENED_RUNTIME = YES;
 				GCC_PREPROCESSOR_DEFINITIONS = "REVIEW=1";
@@ -5294,7 +5298,7 @@
 					"$(inherited)",
 					"@executable_path/../Frameworks",
 				);
-				MARKETING_VERSION = "$(MARKETING_VERSION)";
+				MARKETING_VERSION = 0.28.10;
 				PRODUCT_BUNDLE_IDENTIFIER = com.duckduckgo.macos.browser.review;
 				PRODUCT_MODULE_NAME = "$(TARGET_NAME:c99extidentifier)";
 				PRODUCT_NAME = "DuckDuckGo Review";
@@ -5437,7 +5441,7 @@
 				CODE_SIGN_IDENTITY = "Developer ID Application";
 				CODE_SIGN_STYLE = Manual;
 				COMBINE_HIDPI_IMAGES = YES;
-				CURRENT_PROJECT_VERSION = "$(MARKETING_VERSION)";
+				CURRENT_PROJECT_VERSION = 0.28.10;
 				DEVELOPMENT_TEAM = HKE973VLUW;
 				ENABLE_HARDENED_RUNTIME = YES;
 				INFOPLIST_FILE = DuckDuckGo/Info.plist;
@@ -5445,7 +5449,7 @@
 					"$(inherited)",
 					"@executable_path/../Frameworks",
 				);
-				MARKETING_VERSION = "$(MARKETING_VERSION)";
+				MARKETING_VERSION = 0.28.10;
 				PRODUCT_BUNDLE_IDENTIFIER = com.duckduckgo.macos.browser;
 				PRODUCT_MODULE_NAME = "$(TARGET_NAME:c99extidentifier)";
 				PRODUCT_NAME = DuckDuckGo;
@@ -5638,7 +5642,7 @@
 				CODE_SIGN_IDENTITY = "";
 				CODE_SIGN_STYLE = Manual;
 				COMBINE_HIDPI_IMAGES = YES;
-				CURRENT_PROJECT_VERSION = "$(MARKETING_VERSION)";
+				CURRENT_PROJECT_VERSION = 0.28.10;
 				DEVELOPMENT_TEAM = "";
 				ENABLE_HARDENED_RUNTIME = YES;
 				INFOPLIST_FILE = DuckDuckGo/Info.plist;
@@ -5646,7 +5650,7 @@
 					"$(inherited)",
 					"@executable_path/../Frameworks",
 				);
-				MARKETING_VERSION = "$(MARKETING_VERSION)";
+				MARKETING_VERSION = 0.28.10;
 				PRODUCT_BUNDLE_IDENTIFIER = com.duckduckgo.macos.browser.debug;
 				PRODUCT_MODULE_NAME = "$(TARGET_NAME:c99extidentifier)";
 				PRODUCT_NAME = DuckDuckGo;
@@ -5893,7 +5897,7 @@
 				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
-				CURRENT_PROJECT_VERSION = "$(MARKETING_VERSION)";
+				CURRENT_PROJECT_VERSION = 0.28.10;
 				DEVELOPMENT_TEAM = HKE973VLUW;
 				ENABLE_HARDENED_RUNTIME = YES;
 				INFOPLIST_FILE = DuckDuckGo/Info.plist;
@@ -5901,7 +5905,7 @@
 					"$(inherited)",
 					"@executable_path/../Frameworks",
 				);
-				MARKETING_VERSION = "$(MARKETING_VERSION)";
+				MARKETING_VERSION = 0.28.10;
 				PRODUCT_BUNDLE_IDENTIFIER = com.duckduckgo.macos.browser.debug;
 				PRODUCT_MODULE_NAME = "$(TARGET_NAME:c99extidentifier)";
 				PRODUCT_NAME = DuckDuckGo;
@@ -5922,7 +5926,7 @@
 				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
-				CURRENT_PROJECT_VERSION = "$(MARKETING_VERSION)";
+				CURRENT_PROJECT_VERSION = 0.28.10;
 				DEVELOPMENT_TEAM = HKE973VLUW;
 				ENABLE_HARDENED_RUNTIME = YES;
 				INFOPLIST_FILE = DuckDuckGo/Info.plist;
@@ -5930,7 +5934,7 @@
 					"$(inherited)",
 					"@executable_path/../Frameworks",
 				);
-				MARKETING_VERSION = "$(MARKETING_VERSION)";
+				MARKETING_VERSION = 0.28.10;
 				PRODUCT_BUNDLE_IDENTIFIER = com.duckduckgo.macos.browser;
 				PRODUCT_MODULE_NAME = "$(TARGET_NAME:c99extidentifier)";
 				PRODUCT_NAME = DuckDuckGo;
@@ -6056,7 +6060,7 @@
 				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
-				CURRENT_PROJECT_VERSION = "$(MARKETING_VERSION)";
+				CURRENT_PROJECT_VERSION = 0.28.10;
 				DEVELOPMENT_TEAM = HKE973VLUW;
 				ENABLE_HARDENED_RUNTIME = YES;
 				GCC_PREPROCESSOR_DEFINITIONS = "REVIEW=1";
@@ -6065,7 +6069,7 @@
 					"$(inherited)",
 					"@executable_path/../Frameworks",
 				);
-				MARKETING_VERSION = "$(MARKETING_VERSION)";
+				MARKETING_VERSION = 0.28.10;
 				PRODUCT_BUNDLE_IDENTIFIER = com.duckduckgo.macos.browser.review;
 				PRODUCT_MODULE_NAME = "$(TARGET_NAME:c99extidentifier)";
 				PRODUCT_NAME = "DuckDuckGo Review";
@@ -6234,7 +6238,7 @@
 			repositoryURL = "https://github.com/duckduckgo/BrowserServicesKit";
 			requirement = {
 				kind = exactVersion;
-				version = 29.0.0;
+				version = 30.0.0;
 			};
 		};
 		AA06B6B52672AF8100F541C5 /* XCRemoteSwiftPackageReference "Sparkle" */ = {

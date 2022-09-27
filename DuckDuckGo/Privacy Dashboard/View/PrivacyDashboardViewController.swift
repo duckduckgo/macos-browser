@@ -24,7 +24,7 @@ import BrowserServicesKit
 final class PrivacyDashboardViewController: NSViewController {
 
     struct Constants {
-        static let initialContentHeight: CGFloat = 550
+        static let initialContentHeight: CGFloat = 662
     }
 
     private var webView: WKWebView!
@@ -35,13 +35,23 @@ final class PrivacyDashboardViewController: NSViewController {
 
     weak var tabViewModel: TabViewModel?
     var serverTrustViewModel: ServerTrustViewModel?
-
+    
     private var contentBlockinRulesUpdatedCancellable: AnyCancellable?
     
     /// Running the resize animation block during the popover animation causes frame hitching.
     /// The animation only needs to run when transitioning between views in the popover, so this is used to track when to run the animation.
     /// This should be set to true any time the popover is displayed (i.e., reset to true when dismissing the popover), and false after the initial resize pass is complete.
     private var skipLayoutAnimation = true
+    
+    private var preferredMaxHeight: CGFloat = Constants.initialContentHeight
+    func setPreferredMaxHeight(_ height: CGFloat) {
+        guard height > Constants.initialContentHeight else { return }
+        
+        preferredMaxHeight = height
+        if let webView = webView {
+            webView.reload()
+        }
+    }
 
     override func viewDidLoad() {
         privacyDashboardScript.delegate = self
@@ -247,18 +257,31 @@ extension PrivacyDashboardViewController: PrivacyDashboardUserScriptDelegate {
     }
 
     func userScript(_ userScript: PrivacyDashboardUserScript, setHeight height: Int) {
+        var height = CGFloat(height)
+        if height > preferredMaxHeight {
+            height = preferredMaxHeight
+        }
+        
         if skipLayoutAnimation {
-            contentHeightConstraint.constant = CGFloat(height)
+            contentHeightConstraint.constant = height
             skipLayoutAnimation = false
         } else {
             NSAnimationContext.runAnimationGroup { [weak self] context in
                 context.duration = 1/3
                 context.timingFunction = CAMediaTimingFunction(name: .easeInEaseOut)
-                self?.contentHeightConstraint.animator().constant = CGFloat(height)
+                self?.contentHeightConstraint.animator().constant = height
             }
         }
     }
 
+    func userScript(_ userScript: PrivacyDashboardUserScript, didRequestOpenUrlInNewTab url: URL) {
+        guard let tabCollection = WindowControllersManager.shared.lastKeyMainWindowController?.mainViewController.tabCollectionViewModel
+        else {
+            assertionFailure("could not access shared tabCollectionViewModel")
+            return
+        }
+        tabCollection.appendNewTab(with: .url(url), selected: true)
+    }
 }
 
 extension PrivacyDashboardViewController: WKNavigationDelegate {

@@ -68,6 +68,10 @@ extension OSLog {
     static var bookmarks: OSLog {
         Logging.bookmarksLoggingEnabled ? Logging.bookmarksLog : .disabled
     }
+    
+    static var attribution: OSLog {
+        Logging.attributionLoggingEnabled ? Logging.attributionLog : .disabled
+    }
 }
 
 struct Logging {
@@ -107,5 +111,8 @@ struct Logging {
     
     fileprivate static let bookmarksLoggingEnabled = false
     fileprivate static let bookmarksLog: OSLog = OSLog(subsystem: Bundle.main.bundleIdentifier ?? "DuckDuckGo", category: "Bookmarks")
+    
+    fileprivate static let attributionLoggingEnabled = true
+    fileprivate static let attributionLog: OSLog = OSLog(subsystem: Bundle.main.bundleIdentifier ?? "DuckDuckGo", category: "Ad Attribution")
 
 }

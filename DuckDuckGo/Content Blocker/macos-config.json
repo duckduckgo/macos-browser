@@ -1,6 +1,6 @@
 {
     "readme": "https://github.com/duckduckgo/privacy-configuration",
-    "version": 1663413419716,
+    "version": 1664020210518,
     "features": {
         "adClickAttribution": {
             "readme": "https://help.duckduckgo.com/duckduckgo-help-pages/privacy/web-tracking-protections/#3rd-party-tracker-loading-protection",
@@ -142,6 +142,11 @@
         },
         "clickToPlay": {
             "exceptions": [],
+            "settings": {
+                "Facebook": {
+                    "clicksBeforeSimpleVersion": 3
+                }
+            },
             "state": "enabled"
         },
         "contentBlocking": {
@@ -407,6 +412,17 @@
                             }
                         ]
                     },
+                    "ads-twitter.com": {
+                        "rules": [
+                            {
+                                "rule": "static.ads-twitter.com/uwt.js",
+                                "domains": [
+                                    "hentaihaven.xxx"
+                                ],
+                                "reason": "https://github.com/duckduckgo/privacy-configuration/issues/452"
+                            }
+                        ]
+                    },
                     "adsafeprotected.com": {
                         "rules": [
                             {
@@ -432,6 +448,17 @@
                             }
                         ]
                     },
+                    "ahacdn.me": {
+                        "rules": [
+                            {
+                                "rule": "ahacdn.me",
+                                "domains": [
+                                    "<all>"
+                                ],
+                                "reason": "https://github.com/duckduckgo/privacy-configuration/issues/447"
+                            }
+                        ]
+                    },
                     "aldi-digital.co.uk": {
                         "rules": [
                             {
@@ -448,9 +475,9 @@
                             {
                                 "rule": "alicdn.com",
                                 "domains": [
-                                    "aliexpress.com"
+                                    "aliexpress.us"
                                 ],
-                                "reason": "Page content renders as text without images."
+                                "reason": "https://github.com/duckduckgo/privacy-configuration/issues/460"
                             }
                         ]
                     },
@@ -564,6 +591,17 @@
                             }
                         ]
                     },
+                    "cloudfront.net": {
+                        "rules": [
+                            {
+                                "rule": "d3oxtup47gylpj.cloudfront.net/theme/onlyfans/spa/chunk-vendors.js",
+                                "domains": [
+                                    "onlyfans.com"
+                                ],
+                                "reason": "https://github.com/duckduckgo/privacy-configuration/issues/440"
+                            }
+                        ]
+                    },
                     "computerworld.com": {
                         "rules": [
                             {
@@ -572,6 +610,17 @@
                                     "computerworld.com"
                                 ],
                                 "reason": "https://github.com/duckduckgo/privacy-configuration/issues/344"
+                            }
+                        ]
+                    },
+                    "cookiepro.com": {
+                        "rules": [
+                            {
+                                "rule": "cookie-cdn.cookiepro.com",
+                                "domains": [
+                                    "<all>"
+                                ],
+                                "reason": "https://github.com/duckduckgo/privacy-configuration/issues/466"
                             }
                         ]
                     },
@@ -612,6 +661,17 @@
                                     "wsj.com"
                                 ],
                                 "reason": "Opinion section article elements do not render. Note that Firefox Enhanced Tracking Protection may prevent mitigation from succeeding on Firefox."
+                            }
+                        ]
+                    },
+                    "daumcdn.net": {
+                        "rules": [
+                            {
+                                "rule": "daumcdn.net",
+                                "domains": [
+                                    "<all>"
+                                ],
+                                "reason": "https://github.com/duckduckgo/privacy-configuration/issues/444"
                             }
                         ]
                     },
@@ -680,6 +740,57 @@
                             }
                         ]
                     },
+                    "edgekey.net": {
+                        "rules": [
+                            {
+                                "rule": "scene7.com.edgekey.net/s7viewersdk/3.11/MixedMediaViewer/js/s7sdk/utils/Utils.js",
+                                "domains": [
+                                    "<all>"
+                                ],
+                                "reason": "https://github.com/duckduckgo/privacy-configuration/issues/356"
+                            }
+                        ]
+                    },
+                    "ezoic.com": {
+                        "rules": [
+                            {
+                                "rule": "videosvc.ezoic.com/play",
+                                "domains": [
+                                    "<all>"
+                                ],
+                                "reason": "https://github.com/duckduckgo/privacy-configuration/issues/468"
+                            },
+                            {
+                                "rule": "video-streaming.ezoic.com",
+                                "domains": [
+                                    "<all>"
+                                ],
+                                "reason": "https://github.com/duckduckgo/privacy-configuration/issues/468"
+                            }
+                        ]
+                    },
+                    "ezoic.net": {
+                        "rules": [
+                            {
+                                "rule": "g.ezoic.net",
+                                "domains": [
+                                    "<all>"
+                                ],
+                                "reason": "https://github.com/duckduckgo/privacy-configuration/issues/468"
+                            }
+                        ]
+                    },
+                    "ezoiccdn.com": {
+                        "rules": [
+                            {
+                                "rule": "sf.ezoiccdn.com",
+                                "domains": [
+                                    "<all>"
+                                ],
+                                "reason": "https://github.com/duckduckgo/privacy-configuration/issues/468"
+                            }
+                        ]
+                    },
                     "facebook.net": {
                         "rules": [
                             {
@@ -715,6 +826,24 @@
                             }
                         ]
                     },
+                    "geetest.com": {
+                        "rules": [
+                            {
+                                "rule": "api.geetest.com",
+                                "domains": [
+                                    "<all>"
+                                ],
+                                "reason": "https://github.com/duckduckgo/privacy-configuration/issues/462"
+                            },
+                            {
+                                "rule": "static.geetest.com",
+                                "domains": [
+                                    "<all>"
+                                ],
+                                "reason": "https://github.com/duckduckgo/privacy-configuration/issues/462"
+                            }
+                        ]
+                    },
                     "gemius.pl": {
                         "rules": [
                             {
@@ -740,6 +869,24 @@
                             }
                         ]
                     },
+                    "getshogun.com": {
+                        "rules": [
+                            {
+                                "rule": "cdn.getshogun.com",
+                                "domains": [
+                                    "<all>"
+                                ],
+                                "reason": "https://github.com/duckduckgo/privacy-configuration/issues/450"
+                            },
+                            {
+                                "rule": "lib.getshogun.com",
+                                "domains": [
+                                    "<all>"
+                                ],
+                                "reason": "https://github.com/duckduckgo/privacy-configuration/issues/450"
+                            }
+                        ]
+                    },
                     "google-analytics.com": {
                         "rules": [
                             {
@@ -759,6 +906,35 @@
                             }
                         ]
                     },
+                    "google.co.uk": {
+                        "rules": [
+                            {
+                                "rule": "maps.google.co.uk/maps",
+                                "domains": [
+                                    "<all>"
+                                ],
+                                "reason": "https://github.com/duckduckgo/privacy-configuration/issues/472"
+                            }
+                        ]
+                    },
+                    "google.com": {
+                        "rules": [
+                            {
+                                "rule": "cse.google.com/cse.js",
+                                "domains": [
+                                    "<all>"
+                                ],
+                                "reason": "https://github.com/duckduckgo/privacy-configuration/issues/475"
+                            },
+                            {
+                                "rule": "www.google.com/maps/",
+                                "domains": [
+                                    "<all>"
+                                ],
+                                "reason": "https://github.com/duckduckgo/privacy-configuration/issues/472"
+                            }
+                        ]
+                    },
                     "googlesyndication.com": {
                         "rules": [
                             {
@@ -772,9 +948,10 @@
                             {
                                 "rule": "tpc.googlesyndication.com/pagead/js/loader21.html",
                                 "domains": [
+                                    "laprensa.hn",
                                     "rumble.com"
                                 ],
-                                "reason": "After clicking to play a video, the video will display a grey box for several seconds before playing."
+                                "reason": "https://github.com/duckduckgo/privacy-configuration/issues/388"
                             }
                         ]
                     },
@@ -805,6 +982,17 @@
                             }
                         ]
                     },
+                    "gstatic.com": {
+                        "rules": [
+                            {
+                                "rule": "maps.gstatic.com",
+                                "domains": [
+                                    "<all>"
+                                ],
+                                "reason": "https://github.com/duckduckgo/privacy-configuration/issues/472"
+                            }
+                        ]
+                    },
                     "iesnare.com": {
                         "rules": [
                             {
@@ -814,6 +1002,45 @@
                                     "ups.com"
                                 ],
                                 "reason": "rei.com - When going to write a review for a product, there is an adblocker warning, and submission of the review fails.,ups.com - When trying to reset password, there is an error 'We are sorry, the application encountered an error during processing.'"
+                            }
+                        ]
+                    },
+                    "inq.com": {
+                        "rules": [
+                            {
+                                "rule": "inq.com/chatrouter",
+                                "domains": [
+                                    "<all>"
+                                ],
+                                "reason": "https://github.com/duckduckgo/privacy-configuration/issues/479"
+                            },
+                            {
+                                "rule": "inq.com/chatskins",
+                                "domains": [
+                                    "<all>"
+                                ],
+                                "reason": "https://github.com/duckduckgo/privacy-configuration/issues/479"
+                            },
+                            {
+                                "rule": "inq.com/tagserver/init",
+                                "domains": [
+                                    "<all>"
+                                ],
+                                "reason": "https://github.com/duckduckgo/privacy-configuration/issues/479"
+                            },
+                            {
+                                "rule": "inq.com/tagserver/launch",
+                                "domains": [
+                                    "<all>"
+                                ],
+                                "reason": "https://github.com/duckduckgo/privacy-configuration/issues/479"
+                            },
+                            {
+                                "rule": "inq.com/tagserver/postToServer",
+                                "domains": [
+                                    "<all>"
+                                ],
+                                "reason": "https://github.com/duckduckgo/privacy-configuration/issues/479"
                             }
                         ]
                     },
@@ -857,6 +1084,17 @@
                                     "shopyalehome.com"
                                 ],
                                 "reason": "https://github.com/duckduckgo/privacy-configuration/issues/362"
+                            }
+                        ]
+                    },
+                    "listrakbi.com": {
+                        "rules": [
+                            {
+                                "rule": "cdn.listrakbi.com/scripts/script.js",
+                                "domains": [
+                                    "<all>"
+                                ],
+                                "reason": "https://github.com/duckduckgo/privacy-configuration/issues/457"
                             }
                         ]
                     },
@@ -916,6 +1154,24 @@
                             }
                         ]
                     },
+                    "nuance.com": {
+                        "rules": [
+                            {
+                                "rule": "nuance.com/media/launch",
+                                "domains": [
+                                    "<all>"
+                                ],
+                                "reason": "https://github.com/duckduckgo/privacy-configuration/issues/479"
+                            },
+                            {
+                                "rule": "nuance.com/media/sites",
+                                "domains": [
+                                    "<all>"
+                                ],
+                                "reason": "https://github.com/duckduckgo/privacy-configuration/issues/479"
+                            }
+                        ]
+                    },
                     "omnitagjs.com": {
                         "rules": [
                             {
@@ -924,6 +1180,17 @@
                                     "aternos.org"
                                 ],
                                 "reason": "https://github.com/duckduckgo/privacy-configuration/issues/328"
+                            }
+                        ]
+                    },
+                    "onlyfans.com": {
+                        "rules": [
+                            {
+                                "rule": "static.onlyfans.com",
+                                "domains": [
+                                    "onlyfans.com"
+                                ],
+                                "reason": "https://github.com/duckduckgo/privacy-configuration/issues/440"
                             }
                         ]
                     },
@@ -976,6 +1243,17 @@
                                     "primaryarms.com"
                                 ],
                                 "reason": "Images in the large scrolling image banner on main page do not render.,Note that this CNAMEs to marvel-b4-cdn.bc0a.com at time of mitigation."
+                            }
+                        ]
+                    },
+                    "privacy-center.org": {
+                        "rules": [
+                            {
+                                "rule": "sdk.privacy-center.org",
+                                "domains": [
+                                    "<all>"
+                                ],
+                                "reason": "https://github.com/duckduckgo/privacy-configuration/issues/339"
                             }
                         ]
                     },
@@ -1121,8 +1399,26 @@
                             }
                         ]
                     },
+                    "rncdn7.com": {
+                        "rules": [
+                            {
+                                "rule": "rncdn7.com",
+                                "domains": [
+                                    "<all>"
+                                ],
+                                "reason": "https://github.com/duckduckgo/privacy-configuration/issues/436"
+                            }
+                        ]
+                    },
                     "scene7.com": {
                         "rules": [
+                            {
+                                "rule": "scene7.com/is/image/",
+                                "domains": [
+                                    "<all>"
+                                ],
+                                "reason": "https://github.com/duckduckgo/privacy-configuration/issues/356"
+                            },
                             {
                                 "rule": "scene7.com/s7viewersdk/3.11/MixedMediaViewer/js/s7sdk/utils/Utils.js",
                                 "domains": [
@@ -1171,6 +1467,17 @@
                             }
                         ]
                     },
+                    "shopeemobile.com": {
+                        "rules": [
+                            {
+                                "rule": "deo.shopeemobile.com/shopee",
+                                "domains": [
+                                    "<all>"
+                                ],
+                                "reason": "https://github.com/duckduckgo/privacy-configuration/issues/442"
+                            }
+                        ]
+                    },
                     "sky.com": {
                         "rules": [
                             {
@@ -1190,6 +1497,17 @@
                                     "spiegel.de"
                                 ],
                                 "reason": "https://github.com/duckduckgo/privacy-configuration/issues/344"
+                            }
+                        ]
+                    },
+                    "strpst.com": {
+                        "rules": [
+                            {
+                                "rule": "strpst.com",
+                                "domains": [
+                                    "<all>"
+                                ],
+                                "reason": "https://github.com/duckduckgo/privacy-configuration/issues/438"
                             }
                         ]
                     },
@@ -1215,6 +1533,17 @@
                             }
                         ]
                     },
+                    "trustpilot.com": {
+                        "rules": [
+                            {
+                                "rule": "widget.trustpilot.com/bootstrap/v5/tp.widget.bootstrap.min.js",
+                                "domains": [
+                                    "domesticandgeneral.com"
+                                ],
+                                "reason": "https://github.com/duckduckgo/privacy-configuration/issues/466"
+                            }
+                        ]
+                    },
                     "twitter.com": {
                         "rules": [
                             {
@@ -1234,14 +1563,67 @@
                             }
                         ]
                     },
+                    "usercentrics.eu": {
+                        "rules": [
+                            {
+                                "rule": "api.usercentrics.eu/settings",
+                                "domains": [
+                                    "<all>"
+                                ],
+                                "reason": "https://github.com/duckduckgo/privacy-configuration/issues/477"
+                            },
+                            {
+                                "rule": "api.usercentrics.eu/tcf",
+                                "domains": [
+                                    "<all>"
+                                ],
+                                "reason": "https://github.com/duckduckgo/privacy-configuration/issues/477"
+                            },
+                            {
+                                "rule": "app.usercentrics.eu/browser",
+                                "domains": [
+                                    "<all>"
+                                ],
+                                "reason": "https://github.com/duckduckgo/privacy-configuration/issues/477"
+                            },
+                            {
+                                "rule": "graphql.usercentrics.eu/graphql",
+                                "domains": [
+                                    "<all>"
+                                ],
+                                "reason": "https://github.com/duckduckgo/privacy-configuration/issues/477"
+                            },
+                            {
+                                "rule": "privacy-proxy.usercentrics.eu/latest/",
+                                "domains": [
+                                    "<all>"
+                                ],
+                                "reason": "https://github.com/duckduckgo/privacy-configuration/issues/477"
+                            }
+                        ]
+                    },
                     "yandex.ru": {
                         "rules": [
                             {
-                                "rule": "yandex.ru",
+                                "rule": "frontend.vh.yandex.ru/player/",
                                 "domains": [
-                                    "tvrain.ru"
+                                    "<all>"
                                 ],
-                                "reason": "Adwall renders over video and video does not play."
+                                "reason": "https://github.com/duckduckgo/privacy-configuration/issues/366"
+                            },
+                            {
+                                "rule": "strm.yandex.ru/get/",
+                                "domains": [
+                                    "<all>"
+                                ],
+                                "reason": "https://github.com/duckduckgo/privacy-configuration/issues/366"
+                            },
+                            {
+                                "rule": "strm.yandex.ru/vh-special-converted/vod-content/",
+                                "domains": [
+                                    "<all>"
+                                ],
+                                "reason": "https://github.com/duckduckgo/privacy-configuration/issues/366"
                             }
                         ]
                     },

@@ -50,10 +50,29 @@ final class ContentBlockerRulesLists: DefaultContentBlockerRulesListsSource {
         return digest.map {
             String(format: "%02hhx", $0)
         }.joined()
-    }    
+    }
+    
+    private let adClickAttribution: AdClickAttributing
+    
+    init(trackerDataManager: TrackerDataManager, adClickAttribution: AdClickAttributing) {
+        self.adClickAttribution = adClickAttribution
+        super.init(trackerDataManager: trackerDataManager)
+    }
     
     override var contentBlockerRulesLists: [ContentBlockerRulesList] {
         var result = super.contentBlockerRulesLists
+        
+        if adClickAttribution.isEnabled,
+           let tdsRulesIndex = result.firstIndex(where: { $0.name == DefaultContentBlockerRulesListsSource.Constants.trackerDataSetRulesListName }) {
+            let tdsRules = result[tdsRulesIndex]
+            let allowlistedTrackerNames = adClickAttribution.allowlist.map { $0.entity }
+            let splitter = AdClickAttributionRulesSplitter(rulesList: tdsRules, allowlistedTrackerNames: allowlistedTrackerNames)
+            if let splitRules = splitter.split() {
+                result.remove(at: tdsRulesIndex)
+                result.append(splitRules.0)
+                result.append(splitRules.1)
+            }
+        }
         
         // Add new ones
         let etag = MD5(data: Self.fbTrackerDataFile)

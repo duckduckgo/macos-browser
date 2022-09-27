@@ -328,6 +328,9 @@ final class AddressBarButtonsViewController: NSViewController {
             return
         }
         privacyDashboardPopover.viewController.tabViewModel = selectedTabViewModel
+        
+        let positioningViewInWindow = privacyDashboardPositioningView.convert(privacyDashboardPositioningView.bounds, to: view.window?.contentView)
+        privacyDashboardPopover.setPreferredMaxHeight(positioningViewInWindow.origin.y)
         privacyDashboardPopover.show(relativeTo: privacyDashboardPositioningView.bounds, of: privacyDashboardPositioningView, preferredEdge: .maxY)
 
         privacyEntryPointButton.state = .on
